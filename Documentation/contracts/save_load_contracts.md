@@ -6,10 +6,11 @@ and candidate transaction) are implemented; see their evidence
 ([lot 1](../implementation/reports/save_load_messages.md),
 [lot 2](../implementation/reports/save_load_container.md),
 [lot 3](../implementation/reports/save_load_records.md),
-[lot 4](../implementation/reports/save_load_session.md)). `GameSession::save_game` and
-`load_game` save and load in memory through a candidate session; every original class is
-AlwaysLoad, NotSaved or Unsupported, so a save of a real game is refused by name, and no
-save reaches the game or a file yet. The other lots are pending.** The Save and Load screens stay disabled until the lots below land. The
+[lot 4](../implementation/reports/save_load_session.md)). Lot 8 (movers and brushes,
+[evidence](../implementation/reports/save_load_movers.md)) declares its 18 classes Original.
+`GameSession::save_game` and `load_game` save and load in memory through a candidate session;
+every other original class is AlwaysLoad, NotSaved or Unsupported, so a save of a real game is
+still refused by name, and no save reaches the game or a file yet. The other lots are pending.** The Save and Load screens stay disabled until the lots below land. The
 [audit](../implementation/save_load_audit/readme.md) is the evidence for every
 original rule cited here; its [source ledger](../implementation/sources/save_load_audit_sources.json)
 records the audited files. Read [level replacement](level_change_contracts.md),
@@ -703,9 +704,74 @@ of `Current.sav`. Lot 6 wraps it in META and a slot file; nothing in the game ca
   selections, queued commands and input ownership, and excludes the preparation time from the
   next delta, as after a NEW_LEVEL commit (lot 6 wires this).
 - **Real worlds.** 50 of the 58 mounted worlds bind their SkyPointers to Door or
-  CDestructableBrush objects, which only a save can supply. Until lot 8, their
-  always-load-only restore fails the sky preflight. SubwayA, SteamTunnels, SubwayB, SubwayC
+  CDestructableBrush objects, which only a save can supply. Their always-load-only restore
+  fails the sky preflight; lot 8 makes those objects restorable. SubwayA, SteamTunnels, SubwayB, SubwayC
   and PowerStation restore from an always-load-only image, then save and load again.
+
+### Implemented movers and brushes (lot 8)
+
+The original Save/Load bodies of Door, RotatingDoor, the Rotating aggregate, CDestructableBrush
+with RotatingBrush and WorldModelDebris, CDestructableModel with RotatingModel, the CDebris and
+CDestructable aggregates, VolumeBrush with Water, Blood, Acid, Ladder, Conveyor, Damage,
+Minefield and FreeFall, TripLaser and Tchernotronic. The 18 registered classes are Original with
+payload version 1; their `PRECREATE_SAVEGAME` refusals are gone.
+
+- **Byte order.** Each class writes its block before its parent, then the aggregates run in
+  reverse order of addition: a RotatingBrush writes CDestructableBrush, Rotating, CDebris,
+  CDestructable; a WorldModelDebris writes its own block first. Fields follow the original
+  order and widths: booleans are bytes, RotatingDoor's open directions are shorts written as DWords,
+  the CDestructable block keeps its `0xcececece` markers. Empty strings are the original NULL
+  HSTRING; the others are written with `WriteToMessageString`, which produces the same bytes
+  without a temporary HSTRING (session string tokens are never reused, so repeated saves
+  would exhaust them).
+- **Restore branches.** `PRECREATE_SAVEGAME` reads no property and keeps only the original
+  post-processing (BSP name, cleared skin, the constructor's flags, TripLaser's forced model
+  and skin). `INITIALUPDATE_SAVEGAME` skips the initialization: aggregates bind their owner from
+  their Load (the original self references), and the engine record restores bodies, blocking
+  priority, schedule and user flags. Loads decode and check every field before changing a
+  member; a value the port cannot represent fails the restore by class name through the new
+  `RejectPayload` service. Payloads must still be consumed exactly (D5).
+- **Clocks.** Relative times (`t - GetTime()`: Rotating's last and start times, TripLaser's
+  damage time, VolumeBrush's last damage time, Tchernotronic's removal time) restore to the
+  nearest float that yields the saved difference again, so a save right after a load
+  reproduces the bytes. Where the original float subtraction rounded, the absolute value can
+  land one ulp away. CDestructableModel's fade clock stays absolute, valid because a full
+  restore restores the clock. Countdowns (Door's open time, Rotating's spin time left, the
+  damage death delay) are durations. The state machines resume from the restored next-update
+  deadline: a door mid-motion, a dying brush, flying debris, a flickering laser and a
+  Tchernotronic counting down continue exactly as the saved world does.
+- **Port-only state.** The Rotating block ends with the pose angles of the replacement world-model
+  rotation; before its first move a rotator's pose is still the authored rotation while the
+  source's angles are zero. Loads check that the pose (and a RotatingDoor's current angles)
+  describes the restored rotation. A world model's shell is rebuilt by lot 3 at the saved
+  rotation and position, so the atomic pusher/rider solver and actual bounds centers apply
+  unchanged on the next move.
+- **Values the port does not model.** Never-assigned original fields are written as the
+  original's NULL or zero (CDestructableBrush's debris skin, CDebris's second texture and
+  model, Door's `m_dwFlags`); Door's uninitialized `m_bLocked` carries the authored Locked
+  value. Constructor constants (CDebris's explosion radius and damage, VolumeBrush's
+  constructor flags) are written and must match on load. The port keeps the authored
+  VolumeBrush viscosity, not the original's internally inverted value, and Chrome is refused at
+  creation, so it is saved as false.
+- **Losses kept.** Door and Rotating busy loops, the destructible model's sliding loop and
+  every one-shot are not restarted; TripLaser restarts its loop in Load, as the original does.
+  Destroyed objects stay gone. A door's self-spawned Trigger is saved by reference, so such a
+  door is refused (Trigger, lot 7) until the trigger lot lands.
+- **Departures.** Decision 4: the original VolumeBrush forgets `m_hPlayerClass` on a restore
+  and routes the player through the non-player branch; the port's engine marks the player in
+  `ContainerPhysics`, so a restored volume keeps recognizing it. The saved container code is
+  kept: the original reapplies the class constructor's code at precreate, which would turn a
+  generic VolumeBrush authored with another Code into CC_NOTHING, while the port's subclasses
+  take their code from properties.
+- **Expected re-save rewrites.** Only one: CDestructableBrush's precreate ORs
+  `FLAG_FULLPOSITIONRES | FLAG_MODELGOURAUDSHADE` back into a started WorldModelDebris, whose
+  Start replaced every flag. Every other OBJS, LINK and ATCH byte of these classes is identical
+  after a load.
+- **Sky membership.** A restored Door or CDestructableBrush brings back INSKY and its slot from
+  the engine record; the restore-mode world's always-load SkyPointer then adds the same object
+  again at its first update, which the engine treats as no change. All 50 sky worlds restore
+  their lot-8 objects through `load_game` with no sky failure. No sky world is restorable whole
+  yet: each still holds classes of lots 5, 7, 9, 10 or 11 (see the evidence).
 
 ## Restored and regenerated state
 

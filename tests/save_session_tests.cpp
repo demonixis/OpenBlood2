@@ -498,11 +498,32 @@ namespace
         const std::set<std::string> not_saved{"B2BaseClass",    "BaseClass", "CClientSFX",
                                               "CClientSplatFX", "CGib",      "CHandWeaponModel",
                                               "FlagObject",     "FlagStand", "NagaCeilingDebris"};
+        // Lot 8: movers, brushes, volumes, TripLaser and Tchernotronic carry original payloads.
+        const std::set<std::string> original{"Acid",
+                                             "Blood",
+                                             "CDestructableBrush",
+                                             "CDestructableModel",
+                                             "Conveyor",
+                                             "Damage",
+                                             "Door",
+                                             "FreeFall",
+                                             "Ladder",
+                                             "Minefield",
+                                             "RotatingBrush",
+                                             "RotatingDoor",
+                                             "RotatingModel",
+                                             "Tchernotronic",
+                                             "TripLaser",
+                                             "VolumeBrush",
+                                             "Water",
+                                             "WorldModelDebris"};
         std::size_t unsupported = 0;
         for (auto type : g.objects.classes())
         {
             const auto support = save_support(type);
-            if (always.contains(type->name))
+            if (original.contains(type->name))
+                CHECK(support == SaveSupport::Original && type->payload_version == 1);
+            else if (always.contains(type->name))
                 CHECK(support == SaveSupport::AlwaysLoad);
             else if (not_saved.contains(type->name))
                 CHECK(support == SaveSupport::NotSaved);
@@ -518,12 +539,17 @@ namespace
             CHECK(g.objects.find_class(name));
         for (const auto& name : not_saved)
             CHECK(g.objects.find_class(name));
+        for (const auto& name : original)
+            CHECK(g.objects.find_class(name));
         // Original always-load classes OpenBlood2 does not register: none is placed in a shipped world.
         for (auto name : {"Script", "LightFX", "WreckingBall", "SoccerGoal", "WorldModel", "FogSphere"})
             CHECK(!g.objects.find_class(name));
-        CHECK(unsupported > 150 && save_class_schema(g.objects).empty()); // No class lot has landed yet.
-        std::cout << g.objects.classes().size() << " classes: " << always.size() << " AlwaysLoad, " << not_saved.size()
-                  << " NotSaved, " << unsupported << " Unsupported\n";
+        const auto build_schema = save_class_schema(g.objects);
+        CHECK(unsupported > 100 && build_schema.size() == original.size());
+        for (const auto& name : original)
+            CHECK(build_schema.contains(name) && build_schema.at(name) == 1);
+        std::cout << g.objects.classes().size() << " classes: " << original.size() << " Original, " << always.size()
+                  << " AlwaysLoad, " << not_saved.size() << " NotSaved, " << unsupported << " Unsupported\n";
         // The schema follows the declaration, including inherited AlwaysLoad.
         Objects registry;
         CHECK(register_original_classes(registry));
@@ -532,7 +558,7 @@ namespace
         CHECK(registry.register_class(probe_type) && registry.register_class(always_type) &&
               registry.register_class(child));
         const auto schema = save_class_schema(registry);
-        CHECK(schema.size() == 1 && schema.at("SessionProbe") == 1);
+        CHECK(schema.size() == original.size() + 1 && schema.at("SessionProbe") == 1);
         return true;
     }
 

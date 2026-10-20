@@ -625,6 +625,14 @@ namespace OpenBlood2
         messages_.erase(it);
         ++message_stats.released;
     }
+    void ServerAdapter::RejectPayload(HMESSAGEWRITE h, std::string_view reason)
+    {
+        trace_service("RejectPayload");
+        if (!payload_ || payload_->message != h)
+            return;
+        if (const auto it = messages_.find(h); it != messages_.end())
+            latch(it->second, payload_->report->class_name + ": " + std::string(reason));
+    }
     void ServerAdapter::ResetRead(HMESSAGEREAD h)
     {
         trace_service("ResetRead");

@@ -8,8 +8,9 @@ and [explosion](explosion_contracts.md) contracts. Source: `ObjectDLL/Tchernotro
 
 `BEGIN_CLASS` declares hidden `Filename`/`Skin` defaults (`Models\WorldObjects\Technoberg.abc`
 and its skin), read by the base precreate like any model, and `DestroyTriggerTarget` /
-`DestroyTriggerMessage`, read for world-file and string creation. Save restoration is
-refused at precreate; Save/Load are unavailable.
+`DestroyTriggerMessage`, read for world-file and string creation. A savegame creation
+reads no property and skips initial update; the original Save/Load block restores the
+state ([save/load lot 8](save_load_contracts.md#implemented-movers-and-brushes-lot-8)).
 
 InitialUpdate (not savegame) adds `USRFLG_SAVEABLE`, sets exactly `FLAG_VISIBLE | FLAG_SOLID`
 (B2BaseClass then adds `FLAG_DONTFOLLOWSTANDING`), looks up the `static_model` and `animate`

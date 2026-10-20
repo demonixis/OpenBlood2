@@ -29,8 +29,11 @@ class VolumeBrush : public B2BaseClass
   private:
     bool ReadProp(ObjectCreateStruct&);
     void CreateSurface();
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
     float last_damage_time_ = 0;
     DDWORD saved_flags_ = 0;
+    DVector last_position_{}; // Original m_vLastPos: the position the surface was created at.
 };
 class Water : public VolumeBrush
 {

@@ -9,8 +9,9 @@ The class is B2BaseClass/OT_MODEL with the source BEGIN_CLASS schema (Dims,
 Color, Alpha, StartOn, TouchTriggerTarget/Message, Sound, TouchSound, Damage and
 the hidden Filename/Skin). Precreate reads the properties for world files and
 string creation, then forces `Models\default.abc` and `Skins\ammo\beamred.dtx`.
-Non-finite or out-of-range values reject precreate; savegame precreate rejects
-(save/load are not ported).
+Non-finite or out-of-range values reject precreate. Savegame precreate forces the
+same model and skin and reads nothing; the original Save/Load block is ported
+([save/load lot 8](save_load_contracts.md#implemented-movers-and-brushes-lot-8)).
 
 InitialUpdate marks the object savable, scales Color by 1/255, doubles Dims and
 uses them as the model scale, and sets the object color/alpha. The beam runs
@@ -39,4 +40,4 @@ marks removal. Each update while off toggles: a hidden beam shows for 0.2–0.3 
 a visible one hides again (and is removed after KILL). Removal kills the loop.
 
 Inspection retains touches, beam hits, damage messages, flickers and the last
-sound result. Save/load and client SFX beyond the model are not ported.
+sound result. Client SFX beyond the model are not ported.

@@ -27,4 +27,8 @@ class CDebris : public Aggregate
 
   protected:
     DDWORD EngineMessageFn(LPBASECLASS, DDWORD, void*, DFLOAT) override;
+
+  private:
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };

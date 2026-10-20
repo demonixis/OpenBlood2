@@ -3,7 +3,7 @@
 #include "game/brush_messages.h"
 #include <string>
 // Original ObjectDLL/Tchernotronic (5/11/98): a triggered model that animates, then
-// explodes and removes itself. Save/load are unavailable; see tchernotronic_contracts.md.
+// explodes and removes itself, with its Save/Load block; see tchernotronic_contracts.md.
 class Tchernotronic : public B2BaseClass
 {
   public:
@@ -27,4 +27,6 @@ class Tchernotronic : public B2BaseClass
     void TriggerMsg(HOBJECT, const char*);
     bool PlayAnimation(DDWORD);
     void AddExplosion(DVector);
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };

@@ -1,5 +1,6 @@
 // Original WorldModelDebris rules; see Documentation/contracts/world_debris_contracts.md.
 #include "WorldModelDebris.h"
+#include "SaveFields.h"
 #include "engine/collision.h"
 #include <cmath>
 using namespace OpenBlood2;
@@ -86,10 +87,36 @@ DDWORD WorldModelDebris::EngineMessageFn(DDWORD message, void* data, DFLOAT reas
         return accepted && rotating.valid && physics_vector(initial_velocity) && std::isfinite(gravity_multiplier) &&
                std::abs(gravity_multiplier) <= 1000;
     }
-    if (message == MID_INITIALUPDATE)
+    if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME)
     {
         rotating.Init(m_hObject);
         rotating.SetOff(); // Overrides authored StartOn before aggregate INITIALUPDATE.
+    }
+    if (message == MID_SAVEOBJECT && data)
+    {
+        // Original WorldModelDebris.cpp:207-216, before the CDestructableBrush block.
+        const auto h = *static_cast<HMESSAGEWRITE*>(data);
+        server->WriteToMessageVector(h, &initial_velocity);
+        server->WriteToMessageByte(h, on);
+        server->WriteToMessageFloat(h, gravity_multiplier);
+    }
+    if (message == MID_LOADOBJECT && data)
+    {
+        // Original WorldModelDebris.cpp:226-235. Velocity and acceleration are engine record fields.
+        const auto h = *static_cast<HMESSAGEREAD*>(data);
+        DVector velocity{};
+        bool saved_on = false;
+        server->ReadFromMessageVector(h, &velocity);
+        const bool ok = OpenBlood2::save_fields::read_bool(h, saved_on);
+        const float multiplier = server->ReadFromMessageFloat(h);
+        if (ok && (!physics_vector(velocity) || !std::isfinite(multiplier) || std::abs(multiplier) > 1000))
+            server->RejectPayload(h, "world debris block holds values the port cannot represent");
+        else if (ok)
+        {
+            initial_velocity = velocity;
+            on = saved_on;
+            gravity_multiplier = multiplier;
+        }
     }
     if (message == MID_UPDATE)
         Update();

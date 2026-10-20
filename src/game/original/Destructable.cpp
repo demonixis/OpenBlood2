@@ -104,6 +104,10 @@ DDWORD CDestructable::EngineMessageFn(LPBASECLASS owner, DDWORD message, void* d
         if (server->GetPropGeneric("TriggerDestroyOnly", &prop) == DE_OK)
             trigger_only = prop.m_Bool != 0;
     }
+    if (message == MID_SAVEOBJECT && data)
+        SaveMessage(*static_cast<HMESSAGEWRITE*>(data));
+    if (message == MID_LOADOBJECT && data)
+        LoadMessage(*static_cast<HMESSAGEREAD*>(data));
     if (message == MID_UPDATE)
     {
         m_fLastDamageAmount = m_fLastDamagePercent = 0; // Original per-update accumulators.

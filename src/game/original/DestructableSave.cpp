@@ -2,7 +2,9 @@
 // validation precedes mutation, and no old object/attacker identity is serialized.
 #include "Destructable.h"
 #include "PlayerObj.h"
+#include "SaveFields.h"
 #include "engine/collision.h"
+#include "spawn_object.h"
 #include <cmath>
 
 namespace
@@ -117,7 +119,9 @@ bool CDestructable::Load(const OpenBlood2::DestructableState& state, std::string
     }
     if (!valid(state, error))
         return false;
-    if (!state.spawn_object.empty() && !server->ValidateSpawnObject(state.spawn_object))
+    // The precreate rule: a class absent from the original stays an accepted no-op spawn.
+    if (!state.spawn_object.empty() && !SpawnClassAbsentFromOriginal(state.spawn_object) &&
+        !server->ValidateSpawnObject(state.spawn_object))
     {
         error = "Saved destruction spawn is unavailable";
         return false;
@@ -160,4 +164,100 @@ bool CDestructable::Load(const OpenBlood2::DestructableState& state, std::string
         ++m_dwNumDestructables;
     }
     return true;
+}
+
+namespace
+{
+    constexpr DDWORD block_marker = 0xcececece; // Original framing DWord before and after the block.
+}
+void CDestructable::SaveMessage(HMESSAGEWRITE h)
+{
+    // Original Destructable.cpp:1134-1176. The non-damageable sentinel is the typed Save's.
+    auto* s = BaseClass::GetServerDE();
+    OpenBlood2::DestructableState state;
+    std::string error;
+    if (!Save(state, error))
+    {
+        s->RejectPayload(h, error);
+        return;
+    }
+    s->WriteToMessageDWord(h, block_marker);
+    s->WriteToLoadSaveMessageObject(h, m_hObject);
+    s->WriteToMessageByte(h, state.apply_damage_physics);
+    s->WriteToMessageFloat(h, state.mass);
+    s->WriteToMessageFloat(h, state.max_health);
+    s->WriteToMessageFloat(h, state.max_mega_health);
+    s->WriteToMessageFloat(h, state.health);
+    s->WriteToMessageFloat(h, state.death_health);
+    s->WriteToMessageFloat(h, state.max_armor);
+    s->WriteToMessageFloat(h, state.max_necro_armor);
+    s->WriteToMessageFloat(h, state.armor);
+    s->WriteToMessageFloat(h, state.resistance);
+    s->WriteToMessageByte(h, state.dead);
+    s->WriteToMessageByte(h, state.nigh_invulnerable);
+    s->WriteToMessageByte(h, static_cast<DBYTE>(state.last_type));
+    s->WriteToMessageByte(h, state.last_location);
+    s->WriteToMessageVector(h, &state.last_direction);
+    s->WriteToMessageFloat(h, state.last_amount);
+    s->WriteToMessageFloat(h, state.last_percent);
+    namespace F = OpenBlood2::save_fields;
+    F::write_string(h, state.damage_target);
+    F::write_string(h, state.damage_message);
+    F::write_string(h, state.death_target);
+    F::write_string(h, state.death_message);
+    F::write_string(h, state.spawn_object);
+    s->WriteToMessageVector(h, &state.spawn_velocity);
+    s->WriteToMessageByte(h, state.god_mode);
+    s->WriteToMessageByte(h, state.trigger_only);
+    s->WriteToMessageFloat(h, state.death_delay);
+    s->WriteToMessageDWord(h, block_marker);
+}
+void CDestructable::LoadMessage(HMESSAGEREAD h)
+{
+    // Original Destructable.cpp:1189-1245: every field is decoded and checked before the typed
+    // Load commits. The markers must match; the original read and ignored them.
+    auto* s = BaseClass::GetServerDE();
+    namespace F = OpenBlood2::save_fields;
+    OpenBlood2::DestructableState state;
+    HOBJECT self = nullptr;
+    bool ok = s->ReadFromMessageDWord(h) == block_marker;
+    s->ReadFromLoadSaveMessageObject(h, &self);
+    ok = F::read_bool(h, state.apply_damage_physics) && ok;
+    state.mass = s->ReadFromMessageFloat(h);
+    state.max_health = s->ReadFromMessageFloat(h);
+    state.max_mega_health = s->ReadFromMessageFloat(h);
+    state.health = s->ReadFromMessageFloat(h);
+    state.death_health = s->ReadFromMessageFloat(h);
+    state.max_armor = s->ReadFromMessageFloat(h);
+    state.max_necro_armor = s->ReadFromMessageFloat(h);
+    state.armor = s->ReadFromMessageFloat(h);
+    state.resistance = s->ReadFromMessageFloat(h);
+    ok = F::read_bool(h, state.dead) && ok;
+    ok = F::read_bool(h, state.nigh_invulnerable) && ok;
+    state.last_type = static_cast<OpenBlood2::DamageType>(s->ReadFromMessageByte(h));
+    state.last_location = s->ReadFromMessageByte(h);
+    s->ReadFromMessageVector(h, &state.last_direction);
+    state.last_amount = s->ReadFromMessageFloat(h);
+    state.last_percent = s->ReadFromMessageFloat(h);
+    ok = F::read_string(h, state.damage_target, 100) && ok;
+    ok = F::read_string(h, state.damage_message, 100) && ok;
+    ok = F::read_string(h, state.death_target, 100) && ok;
+    ok = F::read_string(h, state.death_message, 100) && ok;
+    ok = F::read_string(h, state.spawn_object, 100) && ok;
+    s->ReadFromMessageVector(h, &state.spawn_velocity);
+    ok = F::read_bool(h, state.god_mode) && ok;
+    ok = F::read_bool(h, state.trigger_only) && ok;
+    state.death_delay = s->ReadFromMessageFloat(h);
+    ok = s->ReadFromMessageDWord(h) == block_marker && ok;
+    if (!ok)
+    {
+        s->RejectPayload(h, "damage block framing or field rejected");
+        return;
+    }
+    // Original "gross hack": the self reference is used only while Init has not bound one.
+    if (!m_hObject)
+        m_hObject = self;
+    std::string error;
+    if (!Load(state, error))
+        s->RejectPayload(h, error);
 }

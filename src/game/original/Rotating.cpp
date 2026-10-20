@@ -1,5 +1,6 @@
 // Selected ObjectDLL/Rotating.cpp rules. See m2_brush_sources.json for adaptations.
 #include "Rotating.h"
+#include "SaveFields.h"
 #include "engine/collision.h"
 #include "engine/objects.h"
 #include <cmath>
@@ -139,7 +140,7 @@ void Rotating::UpdateSpin(bool up)
 DDWORD Rotating::EngineMessageFn(LPBASECLASS owner, DDWORD message, void* data, DFLOAT reason)
 {
     auto* server = BaseClass::GetServerDE();
-    if (message == MID_PRECREATE && data)
+    if (message == MID_PRECREATE && data && reason != PRECREATE_SAVEGAME)
     {
         if (reason == PRECREATE_WORLDFILE)
             ReadProp(); // String creation retains source defaults.
@@ -151,7 +152,12 @@ DDWORD Rotating::EngineMessageFn(LPBASECLASS owner, DDWORD message, void* data, 
         valid = valid && physics_vector(pose_angles) &&
                 std::abs(vector_dot(expected.m_Vec, actual.m_Vec) + expected.m_Spin * actual.m_Spin) >= .99999f;
     }
-    if (message == MID_INITIALUPDATE && server->IsObjectAlive(object))
+    if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    if (message == MID_LOADOBJECT && data)
+        Load(owner, *static_cast<HMESSAGEREAD*>(data));
+    // Original InitialUpdate is skipped for INITIALUPDATE_SAVEGAME; Load restores the state.
+    if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME && server->IsObjectAlive(object))
     {
         if (state != Off)
             SetNormalRotation();
@@ -200,4 +206,92 @@ DDWORD Rotating::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD messa
             server->FreeString(text);
     }
     return Aggregate::ObjectMessageFn(owner, sender, message, read);
+}
+void Rotating::Save(HMESSAGEWRITE h)
+{
+    // Original Rotating.cpp:685-712, then the OpenBlood2 pose angles: the replacement world-model
+    // rotation poses the shell from them, and before the first move they still hold the
+    // authored rotation while the source's zero-based angles do not.
+    auto* s = BaseClass::GetServerDE();
+    namespace F = OpenBlood2::save_fields;
+    const float now = s->GetTime();
+    s->WriteToLoadSaveMessageObject(h, object);
+    s->WriteToMessageVector(h, &velocity);
+    s->WriteToMessageVector(h, &normal_velocity);
+    s->WriteToMessageVector(h, &sign);
+    s->WriteToMessageVector(h, &spin_up);
+    s->WriteToMessageVector(h, &spin_down);
+    s->WriteToMessageVector(h, &time_left);
+    s->WriteToMessageFloat(h, last_time - now);
+    s->WriteToMessageFloat(h, start_time - now);
+    s->WriteToMessageFloat(h, angles.x);
+    s->WriteToMessageFloat(h, angles.y);
+    s->WriteToMessageFloat(h, angles.z);
+    s->WriteToMessageDWord(h, state);
+    F::write_string(h, busy_sound);
+    F::write_string(h, spin_up_sound);
+    F::write_string(h, spin_down_sound);
+    s->WriteToMessageFloat(h, sound_radius);
+    s->WriteToMessageVector(h, &pose_angles);
+}
+void Rotating::Load(LPBASECLASS owner, HMESSAGEREAD h)
+{
+    // Original Rotating.cpp:723-750. Busy loops are not restarted (original loss).
+    auto* s = BaseClass::GetServerDE();
+    namespace F = OpenBlood2::save_fields;
+    const float now = s->GetTime();
+    HOBJECT self = nullptr;
+    DVector v[6]{}, saved_angles{}, saved_pose{};
+    std::string busy, up, down;
+    s->ReadFromLoadSaveMessageObject(h, &self);
+    for (auto& value : v)
+        s->ReadFromMessageVector(h, &value);
+    const float last = s->ReadFromMessageFloat(h), start = s->ReadFromMessageFloat(h);
+    saved_angles.x = s->ReadFromMessageFloat(h);
+    saved_angles.y = s->ReadFromMessageFloat(h);
+    saved_angles.z = s->ReadFromMessageFloat(h);
+    const DDWORD saved_state = s->ReadFromMessageDWord(h);
+    bool ok = F::read_string(h, busy);
+    ok = F::read_string(h, up) && ok;
+    ok = F::read_string(h, down) && ok;
+    const float radius = s->ReadFromMessageFloat(h);
+    s->ReadFromMessageVector(h, &saved_pose);
+    if (!ok)
+        return;
+    bool valid_vectors = physics_vector(saved_angles) && physics_vector(saved_pose);
+    for (const auto& value : v)
+        valid_vectors = valid_vectors && physics_vector(value);
+    // The replacement rotation requires the pose angles to describe the restored rotation.
+    bool aligned = true;
+    if (!model_rotation && valid_vectors && s->IsObjectAlive(self))
+    {
+        DRotation actual;
+        const auto expected = rotation_from_euler(saved_pose);
+        aligned = s->GetObjectRotation(self, &actual) == DE_OK &&
+                  std::abs(vector_dot(expected.m_Vec, actual.m_Vec) + expected.m_Spin * actual.m_Spin) >= .99999f;
+    }
+    if (!valid_vectors || !std::isfinite(last) || !std::isfinite(start) || saved_state > SpinDown ||
+        !F::finite(radius) || radius < 0 || !s->IsObjectAlive(self) || s->HandleToObject(self) != owner || !aligned)
+    {
+        s->RejectPayload(h, "rotation block holds values the port cannot represent");
+        return;
+    }
+    object = self;
+    velocity = v[0];
+    normal_velocity = v[1];
+    sign = v[2];
+    spin_up = v[3];
+    spin_down = v[4];
+    time_left = v[5];
+    last_time = F::restored_time(last, now);
+    start_time = F::restored_time(start, now);
+    angles = saved_angles;
+    state = static_cast<State>(saved_state);
+    busy_sound = std::move(busy);
+    spin_up_sound = std::move(up);
+    spin_down_sound = std::move(down);
+    sound_radius = radius;
+    pose_angles = saved_pose;
+    last_sound.clear();
+    sound_loop = false;
 }

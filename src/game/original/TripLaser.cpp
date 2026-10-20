@@ -1,5 +1,6 @@
 // Selected original ObjectDLL/TripLaser.cpp. See trip_laser_contracts.md.
 #include "TripLaser.h"
+#include "SaveFields.h"
 #include "engine/collision.h"
 #include "game/key_messages.h"
 #include "game/weapon_messages.h"
@@ -24,12 +25,8 @@ DDWORD TripLaser::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         case MID_PRECREATE:
         {
             const auto result = B2BaseClass::EngineMessageFn(message, data, reason);
-            if (!data || reason == PRECREATE_SAVEGAME)
-            {
-                if (data)
-                    g_pServerDE->RejectPrecreate("TripLaser save restoration is not implemented");
+            if (!data)
                 return 0;
-            }
             auto* state = static_cast<ObjectCreateStruct*>(data);
             if ((reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP) && !ReadProp())
                 return 0;
@@ -44,6 +41,14 @@ DDWORD TripLaser::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
             break;
         case MID_TOUCHNOTIFY:
             HandleTouch(static_cast<HOBJECT>(data));
+            break;
+        case MID_SAVEOBJECT:
+            if (data)
+                Save(*static_cast<HMESSAGEWRITE*>(data));
+            break;
+        case MID_LOADOBJECT:
+            if (data)
+                Load(*static_cast<HMESSAGEREAD*>(data));
             break;
     }
     return B2BaseClass::EngineMessageFn(message, data, reason);
@@ -235,5 +240,75 @@ void TripLaser::HandleTouch(HOBJECT other)
         request.priority = 2; // SOUNDPRIORITY_MISC_HIGH
         request.reverb_requested = true;
         last_touch_voice = g_pServerDE->PlayCharacterSound(m_hObject, request, false, sound_error);
+    }
+}
+void TripLaser::Save(HMESSAGEWRITE h)
+{
+    // Original TripLaser.cpp:488-511. The damage clock is relative; the loop is not saved.
+    auto* s = g_pServerDE;
+    namespace F = save_fields;
+    s->WriteToMessageVector(h, &m_vDims);
+    s->WriteToMessageVector(h, &m_vColor);
+    s->WriteToMessageFloat(h, m_fAlpha);
+    s->WriteToMessageFloat(h, m_fDamage);
+    s->WriteToMessageFloat(h, m_fDamageTime - s->GetTime());
+    F::write_string(h, m_hstrTriggerTarget);
+    F::write_string(h, m_hstrTriggerMessage);
+    F::write_string(h, m_hstrSound);
+    F::write_string(h, m_hstrTouchSound);
+    s->WriteToMessageVector(h, &m_vEndPoints[0]);
+    s->WriteToMessageVector(h, &m_vEndPoints[1]);
+    s->WriteToMessageDWord(h, m_dwFlags);
+    s->WriteToMessageByte(h, m_bTriggered);
+    s->WriteToMessageByte(h, m_bRemove);
+}
+void TripLaser::Load(HMESSAGEREAD h)
+{
+    // Original TripLaser.cpp:523-563, decoded and checked before any member changes. A triggered
+    // laser restarts its attached loop, as the original Load does.
+    auto* s = g_pServerDE;
+    namespace F = save_fields;
+    const float now = s->GetTime();
+    DVector dims{}, color{}, ends[2]{};
+    std::string text[4];
+    s->ReadFromMessageVector(h, &dims);
+    s->ReadFromMessageVector(h, &color);
+    const float alpha = s->ReadFromMessageFloat(h), damage = s->ReadFromMessageFloat(h);
+    const float damage_time = s->ReadFromMessageFloat(h);
+    bool ok = true;
+    for (auto& value : text)
+        ok = F::read_string(h, value) && ok;
+    s->ReadFromMessageVector(h, &ends[0]);
+    s->ReadFromMessageVector(h, &ends[1]);
+    const DDWORD flags = s->ReadFromMessageDWord(h);
+    bool triggered = false, remove = false;
+    ok = F::read_bool(h, triggered) && ok;
+    ok = F::read_bool(h, remove) && ok;
+    if (!ok)
+        return;
+    if (!physics_vector(dims) || !physics_vector(color) || !physics_vector(ends[0]) || !physics_vector(ends[1]) ||
+        !std::isfinite(alpha) || !F::finite(damage) || !std::isfinite(damage_time))
+    {
+        s->RejectPayload(h, "trip laser block holds values the port cannot represent");
+        return;
+    }
+    m_vDims = dims;
+    m_vColor = color;
+    m_fAlpha = alpha;
+    m_fDamage = damage;
+    m_fDamageTime = F::restored_time(damage_time, now);
+    m_hstrTriggerTarget = std::move(text[0]);
+    m_hstrTriggerMessage = std::move(text[1]);
+    m_hstrSound = std::move(text[2]);
+    m_hstrTouchSound = std::move(text[3]);
+    m_vEndPoints[0] = ends[0];
+    m_vEndPoints[1] = ends[1];
+    m_dwFlags = flags;
+    m_bTriggered = triggered;
+    m_bRemove = remove;
+    if (m_bTriggered)
+    {
+        StopLoop();
+        StartLoop();
     }
 }

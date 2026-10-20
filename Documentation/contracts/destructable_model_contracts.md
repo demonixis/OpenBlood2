@@ -19,8 +19,9 @@ Precreate calls the base/aggregates once before reading model properties. Nonemp
 InitFilename/InitSkin override inherited resource fields. Pushable forces gravity
 and touch notification; string creation additionally forces the original solid,
 visible, shadow and Gouraud flags. Difficulty filtering precedes initialization.
-Chrome, save/restore, world-bypassing bodies, invalid numeric properties and partial
-destroy-resource pairs reject creation. A lone damage filename or skin is retained
+Chrome, world-bypassing bodies, invalid numeric properties and partial
+destroy-resource pairs reject creation. A savegame creation skips initial update and
+restores through the original Save/Load block ([save/load lot 8](save_load_contracts.md#implemented-movers-and-brushes-lot-8)). A lone damage filename or skin is retained
 but disables the damage threshold, as in the source. Missing required ABC data fails
 initialization and is reported as a failed world entry, never successful geometry.
 

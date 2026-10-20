@@ -127,7 +127,8 @@ direction, cumulative damage, amount), retaining the latest 32 until world unloa
 This is a destruction request, not rendered debris, spawned fragments or sound.
 The source surface fallback through debris materials and decals remain pending.
 Pushable/gravity brushes, Exploding=true and nonempty SpawnObject reject creation
-because their missing branches affect gameplay. Save/restore creation rejects.
+because their missing branches affect gameplay. Savegame creation restores through
+the original Save/Load blocks ([save/load lot 8](save_load_contracts.md#implemented-movers-and-brushes-lot-8)).
 No missing/ambiguous model is replaced by arbitrary geometry.
 Duplicate names now bind the first model in file order ([duplicate-name rule](object_contracts.md#duplicate-bsp-names)).
 

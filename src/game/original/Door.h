@@ -4,7 +4,7 @@
 #include <string>
 
 // Selected original Door.cpp/Door.h rules, with typed translation results.
-// Portals and save restoration remain pending.
+// Portals remain pending; Save/Load follow the original byte block.
 class Door : public B2BaseClass
 {
   public:
@@ -51,4 +51,8 @@ class Door : public B2BaseClass
     void SetClosing();
     virtual void Move(bool opening);
     void StartSound(const std::string&, bool loop);
+
+  private:
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };

@@ -1,5 +1,6 @@
 // Selected original brush lifecycle; bounded BoxPhysics body services support Pushable/Gravity.
 #include "DestructableBrush.h"
+#include "SaveFields.h"
 #include "WorldModelDebris.h"
 #include "engine/collision.h"
 #include <cmath>
@@ -14,9 +15,19 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
     if (message == MID_PRECREATE)
     {
         const auto accepted = B2BaseClass::EngineMessageFn(message, data, reason);
-        if (!accepted || !data || reason == 3 || !debris.valid)
+        if (accepted && data && reason == PRECREATE_SAVEGAME)
         {
-            if (accepted && data && reason != 3)
+            // Original PostPropRead still runs; the saved flags already hold its bits and the
+            // constructor's BoxPhysics/Pushable defaults add nothing. Properties are not read.
+            auto& create = *static_cast<ObjectCreateStruct*>(data);
+            SAFE_STRCPY(create.m_Filename, create.m_Name);
+            create.m_SkinName[0] = 0;
+            create.m_Flags |= FLAG_FULLPOSITIONRES | FLAG_MODELGOURAUDSHADE;
+            return 1;
+        }
+        if (!accepted || !data || !debris.valid)
+        {
+            if (accepted && data)
                 server->RejectPrecreate("invalid debris Scale");
             return 0;
         }
@@ -78,7 +89,13 @@ DDWORD CDestructableBrush::EngineMessageFn(DDWORD message, void* data, DFLOAT re
         }
         return 1;
     }
-    if (message == MID_INITIALUPDATE)
+    if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
+    // INITIALUPDATE_SAVEGAME skips everything: the aggregates bind their owner in Load and the
+    // engine record restores the body, blocking priority, schedule and user flags.
+    if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME)
     {
         if (!m_damage.Init(m_hObject) || !debris.Init(m_hObject))
             return 0;
@@ -154,4 +171,51 @@ void CDestructableBrush::CreateWorldModelDebris()
             return;
     }
     ++world_debris_failed; // Bounded traversal; never report truncated work as complete.
+}
+
+void CDestructableBrush::Save(HMESSAGEWRITE h)
+{
+    // Original DestructableBrush.cpp:385-400. m_hstrDebrisSkin is never assigned (NULL).
+    auto* s = GetServerDE();
+    s->WriteToMessageFloat(h, hit_points);
+    s->WriteToMessageFloat(h, mass);
+    s->WriteToMessageByte(h, destructable);
+    s->WriteToMessageByte(h, pushable);
+    s->WriteToMessageByte(h, box_physics);
+    s->WriteToMessageByte(h, allow_marks);
+    s->WriteToMessageHString(h, nullptr);
+    s->WriteToMessageDWord(h, surface);
+    s->WriteToMessageByte(h, fire_through);
+}
+void CDestructableBrush::Load(HMESSAGEREAD h)
+{
+    // Original DestructableBrush.cpp:410-424, decoded and checked before any member changes.
+    auto* s = GetServerDE();
+    namespace F = OpenBlood2::save_fields;
+    const float saved_hit_points = s->ReadFromMessageFloat(h), saved_mass = s->ReadFromMessageFloat(h);
+    bool saved_destructable = false, saved_pushable = false, saved_box = false, saved_marks = false, saved_fire = false;
+    std::string skin;
+    bool ok = F::read_bool(h, saved_destructable);
+    ok = F::read_bool(h, saved_pushable) && ok;
+    ok = F::read_bool(h, saved_box) && ok;
+    ok = F::read_bool(h, saved_marks) && ok;
+    ok = F::read_string(h, skin) && ok;
+    const DDWORD saved_surface = s->ReadFromMessageDWord(h);
+    ok = F::read_bool(h, saved_fire) && ok;
+    if (!ok)
+        return;
+    if (!F::finite(saved_hit_points) || !F::finite(saved_mass) || saved_mass < 0 || saved_surface > 255 ||
+        !skin.empty())
+    {
+        s->RejectPayload(h, "brush block holds values the port cannot represent");
+        return;
+    }
+    hit_points = saved_hit_points;
+    mass = saved_mass;
+    destructable = saved_destructable;
+    pushable = saved_pushable;
+    box_physics = saved_box;
+    allow_marks = saved_marks;
+    surface = saved_surface;
+    fire_through = saved_fire;
 }

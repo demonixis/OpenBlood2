@@ -156,7 +156,10 @@ namespace
             CHECK(!model(g, p));
         auto missing = model(g, {{"InitFilename", std::string("missing.abc")}});
         CHECK(!missing || !g.server.IsObjectAlive(missing));
-        CHECK(!model(g, {}, Creation::Restore));
+        // A restore creation is accepted and leaves everything to Load (save_load_contracts lot 8).
+        auto restored = model(g, {}, Creation::Restore);
+        CHECK(restored && get(g, restored) && !get(g, restored)->initialized && !get(g, restored)->m_damage.m_hObject);
+        g.server.RemoveObject(restored);
         CHECK(g.objects.finish_frame() && CDestructable::m_dwNumDestructables == 0);
         CHECK(!g.server.string_count() && !g.server.message_count());
         auto replacement =

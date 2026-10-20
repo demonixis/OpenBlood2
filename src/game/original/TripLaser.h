@@ -2,7 +2,7 @@
 #include "B2BaseClass.h"
 #include "engine/audio.h"
 #include <string>
-// Selected original ObjectDLL/TripLaser (10/23/97). Save/load are unavailable;
+// Selected original ObjectDLL/TripLaser (10/23/97), including its Save/Load block;
 // see Documentation/contracts/trip_laser_contracts.md.
 class TripLaser : public B2BaseClass
 {
@@ -34,4 +34,6 @@ class TripLaser : public B2BaseClass
     void TriggerMsg(const char*);
     void StartLoop();
     void StopLoop();
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };

@@ -1,5 +1,6 @@
 // Selected original CDebris and SetupClientGibFX; see m2_explosion_sources.json.
 #include "Debris.h"
+#include "SaveFields.h"
 #include "engine/collision.h"
 #include "radius_damage.h"
 #include <cmath>
@@ -38,6 +39,10 @@ DDWORD CDebris::EngineMessageFn(LPBASECLASS owner, DDWORD message, void* data, D
         text("CustomSound", sound);
         valid = std::isfinite(scale) && std::abs(scale) <= 1e6f;
     }
+    if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
     if (message == MID_INITIALUPDATE && reason != 3)
         for (unsigned i = 0; i < materials.size(); ++i)
             if (materials[i])
@@ -87,4 +92,74 @@ void CDebris::Create(DVector direction, float damage)
             effect.flags = surfaces[i] / 10 | 0x200 | custom_flag;
             server->RecordDebrisEffect(effect);
         }
+}
+namespace
+{
+    // Original stream order of the material flags; `names` holds the emission order.
+    constexpr std::array<unsigned, 9> saved_materials{0, 1, 2, 8, 5, 3, 4, 6, 7};
+} // namespace
+void CDebris::Save(HMESSAGEWRITE h)
+{
+    // Original Debris.cpp:462-490. Texture2/Model2 are never assigned (NULL), and the
+    // explosion radius and damage keep their constructor values.
+    auto* s = BaseClass::GetServerDE();
+    namespace F = OpenBlood2::save_fields;
+    s->WriteToLoadSaveMessageObject(h, object);
+    F::write_string(h, sound);
+    F::write_string(h, texture);
+    s->WriteToMessageHString(h, nullptr);
+    F::write_string(h, model);
+    s->WriteToMessageHString(h, nullptr);
+    s->WriteToMessageByte(h, amount);
+    s->WriteToMessageFloat(h, scale);
+    s->WriteToMessageByte(h, exploding);
+    for (auto i : saved_materials)
+        s->WriteToMessageByte(h, materials[i]);
+    s->WriteToMessageByte(h, custom);
+    s->WriteToMessageDWord(h, surface);
+    s->WriteToMessageFloat(h, explosion_radius);
+    s->WriteToMessageFloat(h, explosion_damage);
+}
+void CDebris::Load(HMESSAGEREAD h)
+{
+    // Original Debris.cpp:501-532; decoded and checked before any member changes.
+    auto* s = BaseClass::GetServerDE();
+    namespace F = OpenBlood2::save_fields;
+    HOBJECT self = nullptr;
+    std::string saved_sound, saved_texture, unused_texture, saved_model, unused_model;
+    std::array<bool, 9> saved{};
+    bool saved_exploding = false, saved_custom = false;
+    s->ReadFromLoadSaveMessageObject(h, &self);
+    bool ok = F::read_string(h, saved_sound);
+    ok = F::read_string(h, saved_texture) && ok;
+    ok = F::read_string(h, unused_texture) && ok;
+    ok = F::read_string(h, saved_model) && ok;
+    ok = F::read_string(h, unused_model) && ok;
+    const DBYTE saved_amount = s->ReadFromMessageByte(h);
+    const float saved_scale = s->ReadFromMessageFloat(h);
+    ok = F::read_bool(h, saved_exploding) && ok;
+    for (auto i : saved_materials)
+        ok = F::read_bool(h, saved[i]) && ok;
+    ok = F::read_bool(h, saved_custom) && ok;
+    const DDWORD saved_surface = s->ReadFromMessageDWord(h);
+    const float radius = s->ReadFromMessageFloat(h), damage = s->ReadFromMessageFloat(h);
+    if (!ok)
+        return;
+    // Values the port keeps as constructor constants or never assigns must be unchanged.
+    if (!unused_texture.empty() || !unused_model.empty() || !F::finite(saved_scale) || saved_surface > 255 ||
+        radius != explosion_radius || damage != explosion_damage)
+    {
+        s->RejectPayload(h, "debris block holds values the port cannot represent");
+        return;
+    }
+    object = self;
+    sound = std::move(saved_sound);
+    texture = std::move(saved_texture);
+    model = std::move(saved_model);
+    amount = saved_amount;
+    scale = saved_scale;
+    exploding = saved_exploding;
+    materials = saved;
+    custom = saved_custom;
+    surface = saved_surface;
 }

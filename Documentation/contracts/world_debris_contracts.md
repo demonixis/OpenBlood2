@@ -39,8 +39,9 @@ subclass-before-parent update order and once-per-step aggregate dispatch remain.
 
 Failed typed gravity/support/start services suspend scheduling and expose an
 error. Rotation retains its existing moved/blocked/invalid/unavailable report;
-blocked rotation does not cancel the source state/ramp clock. Save/restore remains
-explicitly rejected. No new mutable original global or shared table is introduced.
+blocked rotation does not cancel the source state/ramp clock. Savegame creation skips
+the initialization and restores through the original Save/Load blocks
+([save/load lot 8](save_load_contracts.md#implemented-movers-and-brushes-lot-8)). No new mutable original global or shared table is introduced.
 
 ## Replacement physics boundary
 

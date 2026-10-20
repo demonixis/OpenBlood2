@@ -14,6 +14,7 @@ class CDestructableModel : public B2BaseClass
     bool destructable = true, pushable = false, dead_state = false, initialized = false;
     float hit_points = 100, damage_hit_points = 50, mass = 100, scale = 1;
     float alpha = 1, target_alpha = 1, fade_rate = 0, last_time = 0;
+    float yaw = 0; // Original m_fYaw: the authored Rotation's y, saved but otherwise unused.
     DVector init_dims{}, damage_dims{}, destroy_dims{}, tint{}, last_position{};
     DDWORD destroy_flags = FLAG_VISIBLE | FLAG_SOLID | FLAG_GRAVITY;
     unsigned surface = 0, dimensions_publications = 0, destructions = 0;
@@ -41,4 +42,6 @@ class CDestructableModel : public B2BaseClass
     void Update();
     void TouchNotify(HOBJECT, float);
     bool Fail(const char*);
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };
