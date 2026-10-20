@@ -90,3 +90,7 @@ This return is permitted only outside object callbacks before the first AI updat
 tentacle scale/grounding during runtime cannot use the authored-anchor exception.
 This extends initial placement only; runtime collision is unchanged. It is a
 replacement box-physics adaptation, not a claim of verified retail physics.
+
+[Save/load lot 12](save_load_contracts.md#implemented-bosses-and-special-enemies-lot-12) saves the Ancient One's full health (and the
+constructor's never-assigned fire clock) and each tentacle's raw death clock, scale and hiding flag;
+spawned and placed tentacles restore as ordinary saved NPCs.

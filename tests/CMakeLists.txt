@@ -109,7 +109,7 @@ foreach(case IN ITEMS layout refusals)
     set_tests_properties(save_ai.${case} PROPERTIES LABELS "headless;objects;save" TIMEOUT 120)
 endforeach()
 if(BLOOD2_TEST_DATA_DIR)
-    foreach(case IN ITEMS classes states worlds)
+    foreach(case IN ITEMS classes states bosses worlds)
         add_test(NAME save_ai.${case} COMMAND save_ai_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/save-ai-${case}"
                                               "${BLOOD2_TEST_DATA_DIR}")
         set_tests_properties(save_ai.${case} PROPERTIES LABELS "private;headless;save" TIMEOUT 1800)

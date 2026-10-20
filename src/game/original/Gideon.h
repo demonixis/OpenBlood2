@@ -48,6 +48,9 @@ class Gideon : public AI_Mgr
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
     bool OnAcceptedDamage() override;
+    // Original Gideon/EnhancedGideon::Save/Load (save/load lot 12): the same four floats.
+    void SaveSubclass(HMESSAGEWRITE) override;
+    void LoadSubclass(HMESSAGEREAD) override;
 
   private:
     bool PublishHealth(float);

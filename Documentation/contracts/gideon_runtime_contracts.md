@@ -114,3 +114,8 @@ diagnostic now includes class/name. This is validation of the existing typed set
 contract, not an implementation of retail depenetration or successful corpse creation.
 A focused floor-overlap regression verifies rollback; the unchanged input actions
 then pass without health, ammo, difficulty or collision bypasses.
+
+[Save/load lot 12](save_load_contracts.md#implemented-bosses-and-special-enemies-lot-12) saves Gideon's and EnhancedGideon's
+shield duration, raw last-shield and last-panic clocks and full health. Their initial update keeps
+running on a restore (boss bar re-armed, gravity stripped); the fire node and EnhancedGideon's
+no-fire flag are not saved, as in the original.

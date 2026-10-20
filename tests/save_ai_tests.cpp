@@ -3,12 +3,17 @@
 #include "engine/save_objects.h"
 #include "game/game_settings.h"
 #include "game/original/AI_Mgr.h"
+#include "game/original/AncientOne.h"
+#include "game/original/BoneLeech.h"
 #include "game/original/CivilianAI.h"
 #include "game/original/Corpse.h"
 #include "game/original/CultistAI.h"
 #include "game/original/Fanatic.h"
+#include "game/original/Gideon.h"
+#include "game/original/Naga.h"
 #include "game/original/PathMgr.h"
 #include "game/original/SmellHint.h"
+#include "game/original/ZealotAI.h"
 #include "save_ai_fixture.h"
 #include "save_rewrites.h"
 #include "save_world_fixture.h"
@@ -726,13 +731,6 @@ namespace
                 std::cerr << diagnostic << '\n';
         return a && a->RuntimeReady() ? a : nullptr;
     }
-    HOBJECT named(GameSession& g, std::string_view name)
-    {
-        for (auto id : g.objects.snapshot())
-            if (auto* r = g.objects.get(id); r && r->life == Life::Alive && name == r->state.m_Name)
-                return r->handle;
-        return nullptr;
-    }
     bool steps(GameSession& g, unsigned n)
     {
         for (unsigned i = 0; i < n; ++i)
@@ -742,13 +740,6 @@ namespace
                     std::cerr << d << '\n';
                 return false;
             }
-        return true;
-    }
-    bool damage(GameSession& g, HOBJECT from, HOBJECT to, float amount, DamageType type = DamageType::Normal)
-    {
-        auto msg = g.server.StartMessageToObject(g.server.HandleToObject(from), to, damage_message);
-        CHECK(msg && g.server.WriteDamage(msg, {{0, 0, 1}, {}, amount, type, from}) == DE_OK);
-        CHECK(g.server.EndMessage(msg) == DE_OK);
         return true;
     }
     bool trigger(GameSession& g, HOBJECT to, const char* text)
@@ -771,6 +762,7 @@ namespace
     struct Trip
     {
         unsigned after = 90;
+        bool resave = true; // False where an original Load replays a state (the attach handshake).
         std::function<bool(GameSession&)> check;
         std::function<bool(GameSession&)> continued;
     };
@@ -787,9 +779,20 @@ namespace
         // restored player pings the NPCs at once. Carry it over so the comparison isolates AI state.
         CHECK(player(*game));
         const float next_ping = player(*game)->m_fNextPingTime;
-        std::vector<GameSave> expected(trip.after);
-        for (auto& image : expected)
-            CHECK(steps(*game, 1) && game->save_game(image, error));
+        // A shot of a class still Unsupported (lot 9 projectiles) refuses the save: the comparison
+        // stops at the last step that could be saved.
+        std::vector<GameSave> expected;
+        for (unsigned i = 0; i < trip.after; ++i)
+        {
+            CHECK(steps(*game, 1));
+            GameSave image;
+            if (!game->save_game(image, error))
+            {
+                CHECK(error.find("Unsupported") != std::string::npos);
+                break;
+            }
+            expected.push_back(std::move(image));
+        }
         if (!GameSession::load_game(game, saved, error))
         {
             std::cerr << label << " load refused at " << game->game_load.stage << ": " << error << '\n';
@@ -804,12 +807,12 @@ namespace
         }
         GameSave again;
         CHECK(game->save_game(again, error));
-        if (!same_image(saved.image, again.image, false))
+        if (trip.resave && !same_image(saved.image, again.image, false))
         {
             std::cerr << label << ": the restored world saves different bytes\n";
             return false;
         }
-        for (unsigned i = 0; i < trip.after; ++i)
+        for (unsigned i = 0; i < expected.size(); ++i)
         {
             GameSave y;
             CHECK(steps(*game, 1) && game->save_game(y, error));
@@ -822,7 +825,7 @@ namespace
         if (trip.continued)
             CHECK(trip.continued(*game));
         std::cout << label << ": " << saved.image.records << " records, " << saved.image.objects.size()
-                  << " OBJS bytes, " << trip.after << " identical steps\n";
+                  << " OBJS bytes, " << expected.size() << " identical steps\n";
         return true;
     }
     AI_Mgr* first_ai(GameSession& g, std::string_view type)
@@ -835,9 +838,12 @@ namespace
     // Every lot-11 class saved and loaded idle, then continuing identically.
     bool classes()
     {
-        const char* types[]{"CultistAI",  "CivilianAI", "Fanatic",    "ShikariAI",   "SoulDrudge",   "MadScientistAI",
-                            "Behemoth",   "Prophet",    "DrudgeLord", "GabriellaAI", "GabriellaREV", "OpheliaAI",
-                            "OpheliaREV", "IshmaelAI",  "IshmaelREV", "CalebAI",     "DeathShroud"};
+        const char* types[]{"CultistAI", "CivilianAI", "Fanatic", "ShikariAI", "SoulDrudge", "MadScientistAI",
+                            "Behemoth", "Prophet", "DrudgeLord", "GabriellaAI", "GabriellaREV", "OpheliaAI",
+                            "OpheliaREV", "IshmaelAI", "IshmaelREV", "CalebAI", "DeathShroud",
+                            // Lot 12.
+                            "Gideon", "EnhancedGideon", "UndeadGideon", "AncientOne", "AncientOneTentacle", "Naga",
+                            "ZealotAI", "BoneLeech", "Thief", "TheHandAI", "DrudgePriest"};
         for (auto type : types)
         {
             std::unique_ptr<GameSession> game;
@@ -887,6 +893,15 @@ namespace
             CHECK(steps(g, 1));
         }
         return done();
+    }
+    // True while no object of a class still Unsupported (projectiles of lot 9) would refuse the save.
+    bool saveable_now(GameSession& g)
+    {
+        for (auto id : g.objects.snapshot())
+            if (const auto* r = g.objects.get(id); r && r->life == Life::Alive && (r->user_flags & USRFLG_SAVEABLE) &&
+                                                   save_support(r->type) == SaveSupport::Unsupported)
+                return false;
+        return true;
     }
     void narrow(AI_Mgr& a)
     {
@@ -1121,6 +1136,152 @@ namespace
         }
         return true;
     }
+    // Lot 12: a boss attacking with its shield and mid-teleport, a creature attached to the player and
+    // the Ancient One with its tentacles.
+    bool bosses()
+    {
+        {
+            std::unique_ptr<GameSession> game;
+            CHECK(arena(game));
+            player(*game)->m_damage.apply_damage_physics = false;
+            auto* a = dynamic_cast<Gideon*>(npc(*game, "Gideon", {0, 120, 200}));
+            CHECK(a);
+            // Labelled fixture: armor at most 25 and a shield older than its 60 s duration (the clock
+            // starts at 0) select the shield at the first attack.
+            a->m_damage.SetArmorPoints(0);
+            a->m_fLastShield = -61;
+            const auto target = player(*game)->m_hObject;
+            const bool ready = until(
+                *game, 1800, [&] { return a->GetTarget() == target && a->shield_grants > 0 && saveable_now(*game); });
+            if (!ready)
+                std::cerr << "gideon target " << (a->GetTarget() == target) << " state " << a->m_nState << " shields "
+                          << a->shield_grants << " saveable " << saveable_now(*game) << " shots " << a->fire_shots
+                          << " error " << a->runtime_error << '\n';
+            CHECK(ready);
+            const float shield = a->m_fLastShield, full = a->m_fFullHealth;
+            Trip trip;
+            trip.check = [&](GameSession& g)
+            {
+                auto* b = dynamic_cast<Gideon*>(first_ai(g, "Gideon"));
+                CHECK(b && b->GetTarget() == player(g)->m_hObject && b->m_fLastShield == shield &&
+                      b->m_fFullHealth == full && b->m_szFireNode == "rr_gun" && b->m_bCreateHealth);
+                return true;
+            };
+            CHECK(round_trip("Gideon attacking with a shield", game, trip));
+        }
+        {
+            std::unique_ptr<GameSession> game;
+            CHECK(arena(game));
+            player(*game)->m_damage.apply_damage_physics = false;
+            auto* a = dynamic_cast<Gideon*>(npc(*game, "Gideon", {0, 120, 200}));
+            CHECK(a);
+            CHECK(until(*game, 900, [&] { return a->GetTarget() != nullptr; }));
+            CHECK(a->SetNewState(AI_Mgr::StateTeleport));
+            CHECK(until(*game, 600, [&]
+                        { return a->m_nState == AI_Mgr::StateTeleport && a->fade_calls > 3 && saveable_now(*game); }));
+            const auto phase = a->Metacmd;
+            Trip trip;
+            trip.check = [&](GameSession& g)
+            {
+                auto* b = dynamic_cast<Gideon*>(first_ai(g, "Gideon"));
+                CHECK(b && b->m_nState == AI_Mgr::StateTeleport && b->Metacmd == phase);
+                return true;
+            };
+            CHECK(round_trip("Gideon mid-teleport", game, trip));
+        }
+        {
+            std::unique_ptr<GameSession> game;
+            CHECK(arena(game));
+            auto* a = dynamic_cast<BoneLeech*>(npc(*game, "BoneLeech", {0, 40, 600}));
+            CHECK(a);
+            const auto target = player(*game)->m_hObject;
+            CHECK(until(*game, 1200, [&] { return a->attached == target && a->Metacmd == 3 && a->damage_ticks > 0; }));
+            const float health = player(*game)->m_damage.m_fHitPoints;
+            Trip trip;
+            trip.after = 0;
+            trip.resave = false; // The original Load restarts the attach state and its handshake.
+            trip.check = [&](GameSession& g)
+            {
+                auto* b = dynamic_cast<BoneLeech*>(first_ai(g, "BoneLeech"));
+                CHECK(b && b->attached == player(g)->m_hObject && b->track == b->attached);
+                CHECK(b->m_nState == AI_Mgr::StateEnemyAttach && b->Metacmd == 1 && !b->proceed);
+                CHECK(g.server.GetObjectFlags(b->m_hObject) & FLAG_REALLYCLOSE);
+                return true;
+            };
+            trip.continued = [&](GameSession& g)
+            {
+                // The restored client acknowledges again and the creature feeds on.
+                auto* b = dynamic_cast<BoneLeech*>(first_ai(g, "BoneLeech"));
+                CHECK(b && until(g, 240, [&] { return b->Metacmd == 3 && b->damage_ticks > 0; }));
+                CHECK(g.client_shell.creature == b->m_hObject && player(g)->m_damage.m_fHitPoints < health);
+                return true;
+            };
+            CHECK(round_trip("BoneLeech attached to the player", game, trip));
+        }
+        {
+            std::unique_ptr<GameSession> game;
+            CHECK(arena(game));
+            player(*game)->m_damage.apply_damage_physics = false;
+            auto* a = dynamic_cast<AncientOne*>(npc(*game, "AncientOne", {0, 40, -500}));
+            CHECK(a);
+            for (DVector at : {DVector{-300, 40, -100}, DVector{300, 40, -100}})
+                CHECK(npc(*game, "AncientOneTentacle", at));
+            CHECK(steps(*game, 10) && a->SpawnTentacle() && game->server.IsObjectAlive(a->last_tentacle));
+            CHECK(until(*game, 600, [&] { return a->GetTarget() != nullptr && saveable_now(*game); }));
+            unsigned tentacles = 0;
+            for (auto id : game->objects.snapshot())
+                tentacles += get<AncientOneTentacle>(*game, game->objects.get(id)->handle) != nullptr;
+            CHECK(tentacles == 3);
+            Trip trip;
+            // The original idle guard (m_fWaitForIdleTime, m_bHasTargeted) is not saved: a restored
+            // tentacle that drops its target goes Idle where the saved one searches (after 36 steps
+            // here). Compare up to that original loss, then check it.
+            trip.after = 30;
+            trip.check = [&](GameSession& g)
+            {
+                unsigned restored = 0;
+                for (auto id : g.objects.snapshot())
+                    if (auto* t = get<AncientOneTentacle>(g, g.objects.get(id)->handle))
+                    {
+                        restored += t->RuntimeReady();
+                        CHECK(t->m_fWaitForIdleTime == 0 && !t->m_bHasTargeted);
+                    }
+                auto* b = dynamic_cast<AncientOne*>(first_ai(g, "AncientOne"));
+                CHECK(b && restored == tentacles && b->GetTarget() == player(g)->m_hObject);
+                return true;
+            };
+            trip.continued = [&](GameSession& g)
+            {
+                CHECK(steps(g, 120));
+                for (auto id : g.objects.snapshot())
+                    if (auto* t = get<AI_Mgr>(g, g.objects.get(id)->handle))
+                        CHECK(t->RuntimeReady());
+                return true;
+            };
+            CHECK(round_trip("Ancient One with its tentacles", game, trip));
+        }
+        {
+            // Naga: the DWord-written, Float-read whomp count and the kept spike (departure).
+            std::unique_ptr<GameSession> game;
+            CHECK(arena(game));
+            auto* a = dynamic_cast<Naga*>(npc(*game, "Naga", {0, 40, -600}));
+            CHECK(a);
+            narrow(*a);
+            CHECK(steps(*game, 10) && game->server.IsObjectAlive(a->spike));
+            a->ceiling_whomps = 7;
+            Trip trip;
+            trip.after = 30;
+            trip.check = [&](GameSession& g)
+            {
+                auto* b = dynamic_cast<Naga*>(first_ai(g, "Naga"));
+                CHECK(b && b->ceiling_whomps == 0 && g.server.IsObjectAlive(b->spike) && b->spike_attachment);
+                CHECK(g.objects.get(b->spike)->attachment);
+                return true;
+            };
+            CHECK(round_trip("Naga with a whomp count", game, trip));
+        }
+        return true;
+    }
     // Real worlds (private data): for every mounted world, the classes still blocking a whole save;
     // a world with none saves, loads, saves the same bytes again and runs on.
     bool worlds()
@@ -1182,7 +1343,7 @@ namespace
                 list += (list.empty() ? "" : ", ") + type + " x" + std::to_string(count);
                 ++totals[type];
             }
-            std::cout << name << ": " << npcs << " lot-11 NPCs; "
+            std::cout << name << ": " << npcs << " NPCs; "
                       << (blocking.empty() ? "no blocking class" : "blocked by " + list) << '\n';
             if (!blocking.empty() && npcs)
             {
@@ -1264,7 +1425,7 @@ namespace
             npc_restores += npcs > 0; // A world restored whole also restores its NPCs (lots 7 and 10).
             restored.push_back(name);
         }
-        std::cout << entered << " of " << names.size() << " worlds entered, " << ai_worlds << " with lot-11 NPCs, "
+        std::cout << entered << " of " << names.size() << " worlds entered, " << ai_worlds << " with NPCs, "
                   << npc_restores << " restored their supported objects; " << whole << " restored whole:";
         for (const auto& n : restored)
             std::cout << ' ' << n;
@@ -1293,7 +1454,7 @@ int main(int argc, char** argv)
     if (!write_arena())
         return 1;
     const std::map<std::string, std::function<bool()>> private_cases{
-        {"classes", classes}, {"states", states}, {"worlds", worlds}};
+        {"classes", classes}, {"states", states}, {"bosses", bosses}, {"worlds", worlds}};
     auto it = private_cases.find(mode);
     return it != private_cases.end() && it->second() ? 0 : 1;
 }

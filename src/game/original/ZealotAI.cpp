@@ -172,6 +172,8 @@ bool ZealotAI::MC_Fire_Stand()
     }
     else
     {
+        if (start_staff && !s->IsObjectAlive(staff))
+            start_staff = false; // A restored cast lost its unsaved staff source; the original's NULL calls do nothing.
         if (start_staff)
         {
             // Presentation recipes not yet ported are reported independently of combat.

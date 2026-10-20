@@ -22,9 +22,9 @@ namespace save_rewrites
         {
             if (save_ai::is_ai(r.class_name))
             {
-                // Lot 11: AI_Mgr::Load adds GetTime() to the raw m_fLastUpdate.
-                if (const auto at = save_ai::last_update_offset(r.class_name, r.payload); at != std::size_t(-1))
-                    std::fill_n(r.payload.begin() + std::ptrdiff_t(at), 4, std::uint8_t(0));
+                // Lot 11: AI_Mgr::Load adds GetTime() to the raw m_fLastUpdate. Lot 12: Naga's whomp
+                // count, written as a DWord and read as a Float.
+                save_ai::normalize_payload(r.class_name, r.payload);
             }
             else if (r.class_name == "CCorpse") // Lot 11: PostPropRead restores its constant flags.
                 r.flags = FLAG_VISIBLE | FLAG_RAYHIT | FLAG_GRAVITY | FLAG_MODELKEYS | FLAG_REMOVEIFOUTSIDE;

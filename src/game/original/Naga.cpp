@@ -49,7 +49,10 @@ DDWORD Naga::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         if (s->CreateAttachment(m_hObject, spike, "l_gun", &offset, &rotation, &spike_attachment) != DE_OK ||
             !s->GetObjectColor(m_hObject, color, alpha) || !s->SetObjectColor(m_hObject, color, 0))
             return RuntimeFailure("Naga spike attachment/entrance unavailable");
-        s->SetObjectFlags(m_hObject, s->GetObjectFlags(m_hObject) & ~(FLAG_SHADOW | FLAG_SOLID));
+        // Original: the shadow and solid flags are cleared for a fresh object only; a restore keeps
+        // the saved flags (the spike and the zero alpha are set on every path, as the original does).
+        if (reason != INITIALUPDATE_SAVEGAME)
+            s->SetObjectFlags(m_hObject, s->GetObjectFlags(m_hObject) & ~(FLAG_SHADOW | FLAG_SOLID));
     }
     return result;
 }

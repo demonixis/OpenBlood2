@@ -112,3 +112,8 @@ Focused private-data tests exercise actor attacks/healing/teleport/attachment,
 pickups, weapon firing and the time-bomb fuse. Synthetic tests cover sky replacement,
 unequal SPR dimensions, explicit/default velocity PCM equality and release limits.
 Keep headless, sanitizer and real-display results separate when reporting a run.
+
+[Save/load lot 12](save_load_contracts.md#implemented-bosses-and-special-enemies-lot-12) saves Naga (the DWord-written,
+Float-read whomp count; the spike its restored initial update creates is kept, a recorded
+departure), Zealot (float, staff-start and divine flags; the unsaved staff start is cleared by the
+next fire update) and Thief through BoneLeech's block.

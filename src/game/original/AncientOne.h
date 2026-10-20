@@ -19,6 +19,9 @@ class AncientOne final : public AI_Mgr
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
     bool OnAcceptedDamage() override;
+    // Original AncientOne::Save/Load (save/load lot 12).
+    void SaveSubclass(HMESSAGEWRITE) override;
+    void LoadSubclass(HMESSAGEREAD) override;
 
   private:
     bool PublishHealth(float);
@@ -43,6 +46,9 @@ class AncientOneTentacle final : public AI_Mgr
 
   protected:
     DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
+    // Original AncientOneTentacle::Save/Load (save/load lot 12).
+    void SaveSubclass(HMESSAGEWRITE) override;
+    void LoadSubclass(HMESSAGEREAD) override;
     bool OnAcceptedDamage() override
     {
         return HandleDamage();

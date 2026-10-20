@@ -517,9 +517,20 @@ namespace
         const std::set<std::string> not_saved{"B2BaseClass",    "BaseClass", "CClientSFX",
                                               "CClientSplatFX", "CGib",      "CHandWeaponModel",
                                               "FlagObject",     "FlagStand", "NagaCeilingDebris"};
-        // Lot 5: the player. Lot 8: movers, brushes, volumes, TripLaser and Tchernotronic. Lot 11:
-        // AI_Mgr's NPC subclasses and CCorpse. Lot 10: effect publishers and audio emitters.
-        const std::set<std::string> original{"Behemoth",
+        // Lot 5: the player. Lot 8: movers, brushes, volumes, TripLaser and Tchernotronic. Lots 11
+        // and 12: AI_Mgr's NPC subclasses and CCorpse. Lot 10: effect publishers and audio emitters.
+        const std::set<std::string> original{"AncientOne",
+                                             "AncientOneTentacle",
+                                             "BoneLeech",
+                                             "DrudgePriest",
+                                             "EnhancedGideon",
+                                             "Gideon",
+                                             "Naga",
+                                             "TheHandAI",
+                                             "Thief",
+                                             "UndeadGideon",
+                                             "ZealotAI",
+                                             "Behemoth",
                                              "CCorpse",
                                              "CalebAI",
                                              "CivilianAI",

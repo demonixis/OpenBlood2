@@ -56,3 +56,6 @@ valid clocks; the real Ancient City scene runs 180 frames in every difficulty.
 This is verified entry, selected combat behavior and rendering, not complete boss
 battle/campaign traversal or NPC save support. M2 closure and its GPU reservation
 remain unchanged. Source hashes and raw evidence are in the implementation ledger.
+
+[Save/load lot 12](save_load_contracts.md#implemented-bosses-and-special-enemies-lot-12) saves UndeadGideon's full health; the boss bar is
+re-armed by the constructor's flag, as in the original.

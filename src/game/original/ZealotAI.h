@@ -19,6 +19,11 @@ class ZealotAI final : public AI_Mgr
     HATTACHMENT staff_attachment = 0;
     std::string staff_error;
 
+  protected:
+    // Original ZealotAI::Save/Load (save/load lot 12).
+    void SaveSubclass(HMESSAGEWRITE) override;
+    void LoadSubclass(HMESSAGEREAD) override;
+
   private:
     void ClearStaff();
     bool Attack(bool far);

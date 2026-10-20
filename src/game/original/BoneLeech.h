@@ -24,4 +24,17 @@ class BoneLeech : public AI_Mgr
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
     DDWORD ObjectMessageFn(HOBJECT, DDWORD, HMESSAGEREAD) override;
+    // Original BoneLeech/Thief/TheHandAI::Save/Load (one block each; save/load lot 12), the port's
+    // detach state, and the original MID_LOADOBJECT re-attachment after the aggregates.
+    void SaveSubclass(HMESSAGEWRITE) override;
+    void LoadSubclass(HMESSAGEREAD) override;
+    void AfterLoad(HMESSAGEREAD) override;
+    HOBJECT SavedEnemyAttach() const override
+    {
+        return attached;
+    }
+    bool AcceptsEnemyAttach() const override
+    {
+        return true;
+    }
 };

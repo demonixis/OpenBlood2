@@ -17,8 +17,8 @@ Lot 13 (native state, [evidence](../implementation/reports/save_load_native.md))
 engine classes, sky and PolyGrid republication, VoiceMgr and CommLink across a load, and
 refuses CTF saves by name.
 Lot 11 (AI core, [evidence](../implementation/reports/save_load_ai.md)) declares the 17 AI_Mgr
-NPC classes and CCorpse Original.
-Lot 6 (slots, Quick and Restart, menus, [evidence](../implementation/reports/save_load_slots.md))
+NPC classes and CCorpse Original, lot 12 (bosses and special enemies,
+[evidence](../implementation/reports/save_load_bosses.md)) the other 11 NPC classes. Lot 6 (slots, Quick and Restart, menus, [evidence](../implementation/reports/save_load_slots.md))
 writes and reads the slot, quick and level-entry files and enables the Save and Load screens,
 F5/F6 and the death Load menu. `GameSession::save_game` and `load_game` save and load through a
 candidate session, with the local player and its client blob. Every other original class is
@@ -1268,6 +1268,50 @@ lot 12.
 - **Real worlds.** 35 of the 58 worlds hold lot-11 NPCs; all of them restore every supported
   object through `load_game` and the NPCs keep running. No lot-11 class blocks a world any more;
   each world is still blocked by classes of lots 9, 10 or 12 (the evidence lists them).
+
+### Implemented bosses and special enemies (lot 12)
+
+The original Save/Load bodies of Gideon and EnhancedGideon (shield duration, raw last-shield, full
+health, raw last-panic), UndeadGideon (full health), AncientOne (`m_fLastFire`, always the
+constructor's 0, and full health), AncientOneTentacle (raw time of death, the constructor's
+`m_fLastIdle` 0, scale, hiding), Naga, ZealotAI, BoneLeech with Thief and TheHandAI, and
+DrudgePriest (raw last spawn) (`src/game/original/BossSave.cpp`). The 11 classes are Original with
+payload version 1. Each block is written before AI_Mgr's (lot 11).
+
+- **Initial updates.** Gideon's and EnhancedGideon's run on every path, as the original's: health
+  bar re-armed, Gideon's full health from the current hit points (then overwritten by Load), gravity
+  stripped after the base. DrudgePriest restarts its ambient loop and strips gravity. Naga creates and
+  attaches its spike and sets alpha 0 on every path; it clears SHADOW and SOLID for a fresh object
+  only, as the original does. The fire node (`rr_gun`), the boss bars' re-arm flags and
+  EnhancedGideon's `m_bNoFire` are not saved.
+- **BoneLeech, Thief, TheHandAI.** One block each (the port's Thief and TheHandAI derive from
+  BoneLeech; the original writes the block once): the jump flag (the port's FIRE_JUMP command), the
+  raw damage and detach clocks. AI_Mgr's `m_hEnemyAttach` slot holds the attached player. An
+  OpenBlood2 tail follows: the tracked player (LoadSave; its link comes back with LINK) and the world
+  flags and dimensions the replacement detach restores. After the aggregates, the original
+  re-attachment runs: the creature points at the player again, restarts `STATE_EnemyAttach` (the
+  attach handshake and the client acknowledgement are replayed, as `m_bProceedAttach` is not saved)
+  and takes `FLAG_REALLYCLOSE` without gravity. An attached record whose target is not the player
+  is refused.
+- **Naga.** The whomp count is written as a DWord and read as a Float, as the original does: a
+  small count reloads as 0 (a listed rewrite). The spike is a plain object reference: the NULL
+  sentinel (D7). Alpha is re-applied with the current colour.
+- **ZealotAI.** The packed float, staff-start and divine byte and the never-assigned
+  `m_fMaxHeight` (written 0). The staff effect is an unsaved BaseClass; a restored cast keeps
+  its start flag with no staff, which the next update clears (the original's calls on the NULL
+  object do nothing).
+- **Inventory.** The damage aggregate's typed validator now admits strengths up to 10 (Gideon's);
+  players keep 1–6 through ValidateAttributes.
+- **Departures.** Decision 4: the original Naga Load overwrites the spike its initial update just
+  created with the stale plain handle, orphaning a visible model that no longer hides or shows.
+  The port keeps the new spike.
+- **Expected re-save rewrites.** Naga's whomp count (above). A creature attached to the player
+  restarts its attach state on load (Metacmd 1, its last state, no animation), so its record differs
+  until the handshake has run again.
+- **Real worlds.** With lots 11 and 12 every AI_Mgr class is Original. All 35 worlds that hold NPCs
+  restore every supported object, the bosses included, through `load_game` and their NPCs keep
+  running; the remaining blockers are lot 9's pickups and projectiles and lot 10's effect publishers
+  and emitters (the evidence lists them per world).
 
 ## Restored and regenerated state
 

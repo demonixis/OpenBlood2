@@ -33,6 +33,7 @@ Runtime test logs and measurements belong in the
 - [Save/load effects and emitters](save_load_effects_sources.json): lot 10 Save/Load bodies of SoundFX, RandomSoundFX, the light family, scene explosions, particle streams, lightning, warp gates and DetailSprite.
 - [Save/load native state](save_load_native_sources.json): lot 13 engine class flags, PolyGrid/VolumeBrush surfaces, the VoiceMgr reset and CommLink on a load, and the multiplayer save guard.
 - [Save/load AI core](save_load_ai_sources.json): lot 11 AI_Mgr, script and path lists, CultistAI, CivilianAI, Fanatic, CCorpse and the AI_Mgr-only subclasses.
+- [Save/load bosses](save_load_bosses_sources.json): lot 12 Gideon family, Ancient One and tentacles, Naga, Zealot, BoneLeech/Thief/TheHand and DrudgePriest.
 
 - [Original music asset preparation](m2_music_asset_sources.json)
 

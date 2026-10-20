@@ -26,6 +26,9 @@ class Naga final : public AI_Mgr
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
     bool OnAcceptedDamage() override;
+    // Original Naga::Save/Load (save/load lot 12).
+    void SaveSubclass(HMESSAGEWRITE) override;
+    void LoadSubclass(HMESSAGEREAD) override;
 
   private:
     bool Fade(bool in);

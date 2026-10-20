@@ -26,6 +26,9 @@ class DrudgePriest final : public AI_Mgr
 
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+    // Original DrudgePriest::Save/Load (save/load lot 12).
+    void SaveSubclass(HMESSAGEWRITE) override;
+    void LoadSubclass(HMESSAGEREAD) override;
 };
 class DeathShroud final : public AI_Mgr
 {

@@ -115,3 +115,8 @@ textureless tagged models, remote-eye tint, blindness and close leech geometry.
 Captures are written under the build's tests/inventory-use-gpu directory. Headless,
 private-data, GPU and sanitizer results are distinct; these are bounded interaction
 checks, not full level completion or a new milestone acceptance.
+
+[Save/load lot 12](save_load_contracts.md#implemented-bosses-and-special-enemies-lot-12) saves an attached BoneLeech, Thief or TheHand: the
+attached player in AI_Mgr's enemy-attachment slot, the raw damage and detach clocks and a port tail
+with the tracked player and the world flags and dimensions the detach restores. A load replays the
+original attach handshake with the restored client; the client's darkening and USE counters restart.

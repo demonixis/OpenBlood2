@@ -138,3 +138,9 @@ nonfinite editor positions versus invalid gameplay data, sky-only resources,
 zero-area PolyGrids, particle clocks/budgets/visibility, long resets and stale
 brush planes versus strict volumes. Run object lifetime tests and Clang
 ASan/UBSan separately from the inspector-free real-display Release checks.
+
+[Save/load lot 11](save_load_contracts.md#implemented-ai-core-lot-11) saves Behemoth and DeathShroud
+(DeathShroud restarts its loop in its restored initial update) and
+[lot 12](save_load_contracts.md#implemented-bosses-and-special-enemies-lot-12) DrudgePriest (its raw
+last-spawn clock; the ambient loop restarts, gravity is stripped) and TheHandAI through BoneLeech's
+block.

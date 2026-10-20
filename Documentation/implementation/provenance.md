@@ -1923,3 +1923,15 @@ republished effects) are OpenBlood2 code. See the
 [contract](../contracts/save_load_contracts.md#implemented-effect-publishers-and-audio-emitters-lot-10),
 the [evidence](reports/save_load_effects.md) and the
 [source ledger](sources/save_load_effects_sources.json).
+
+## Bosses and special enemies save/load (2026-10-21)
+
+Save/load lot 12 adds selective ports of the original Save/Load bodies of `ObjectDLL/Gideon.cpp`,
+`EnhancedGideon.cpp`, `UndeadGideon.cpp`, `AncientOne.cpp`, `AncientOneTentacle.cpp`, `Naga.cpp`
+(including the DWord-written, Float-read whomp count), `ZealotAI.cpp`, `boneleech.cpp` with `thief.cpp`
+and `TheHandAI.cpp` (their `MID_LOADOBJECT` re-attachment), and `drudgepriest.cpp`, over the port's
+existing members. The BoneLeech detach tail, the checks before change, the Naga spike and Zealot staff
+handling and the NPC strength bound are replacement code. See the
+[contract](../contracts/save_load_contracts.md#implemented-bosses-and-special-enemies-lot-12),
+the [evidence](reports/save_load_bosses.md) and the
+[source ledger](sources/save_load_bosses_sources.json).

@@ -9,7 +9,8 @@ namespace
 {
     bool valid(const OpenBlood2::InventoryState& state, std::string& error)
     {
-        if (state.strength < 1 || state.strength > 6 || state.magic < 1 || state.magic > 6 ||
+        // Players keep 1..6 (ValidateAttributes); the original NPC strengths are 5 and Gideon's 10.
+        if (state.strength < 1 || state.strength > 10 || state.magic < 1 || state.magic > 6 ||
             state.current_slot >= state.right.size() ||
             (state.current_slot >= 10 && !state.right[state.current_slot]) || !std::isfinite(state.damage_multiplier) ||
             state.damage_multiplier < 0 || state.damage_multiplier > 1000 || state.keys.size() > 256 ||

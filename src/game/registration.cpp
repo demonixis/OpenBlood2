@@ -748,7 +748,7 @@ namespace OpenBlood2
             "DrudgePriest",
             &ai_manager,
             construct_npc<DrudgePriest, AI_Mgr::NPCType::DrudgePriest>,
-            {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{40, 30, 37}}}};
+            {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{40, 30, 37}}}, SaveSupport::Original, 1};
         const ClassInfo later_DeathShroud{
             "DeathShroud",
             &ai_manager,
@@ -760,25 +760,25 @@ namespace OpenBlood2
             "TheHandAI",
             &ai_manager,
             construct_npc<TheHandAI, AI_Mgr::NPCType::TheHand>,
-            {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{4, 4, 5}}}};
+            {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{4, 4, 5}}}, SaveSupport::Original, 1};
         const ClassInfo vomit_projectile{"CVomitProjectile", &base, construct<CVomitProjectile>, {}};
         const ClassInfo skull_projectile{"CSkullProjectile", &base, construct<CSkullProjectile>, {}};
         const ClassInfo campaign_Thief{
             "Thief",
             &ai_manager,
             construct_npc<Thief, AI_Mgr::NPCType::Thief>,
-            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{9, 9, 8}}}};
+            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{9, 9, 8}}}, SaveSupport::Original, 1};
         const ClassInfo campaign_Naga{"Naga",
                                       &ai_manager,
                                       construct_npc<Naga, AI_Mgr::NPCType::Naga>,
-                                      {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}}};
+                                      {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}}, SaveSupport::Original, 1};
         const ClassInfo campaign_ZealotAI{"ZealotAI",
                                           &ai_manager,
                                           construct_npc<ZealotAI, AI_Mgr::NPCType::Zealot>,
                                           {{"RandomHitPoints", 50.0f},
                                            {"AIState", std::string("IDLE"), true, 31},
                                            {"Dims", DVector{12, 44, 12}},
-                                           {"Divine", false}}};
+                                           {"Divine", false}}, SaveSupport::Original, 1};
         const ClassInfo cultist{"CultistAI",
                                 &ai_manager,
                                 construct_npc<CultistAI, AI_Mgr::NPCType::Cultist>,
@@ -832,7 +832,7 @@ namespace OpenBlood2
             "BoneLeech",
             &ai_manager,
             construct_npc<BoneLeech, AI_Mgr::NPCType::BoneLeech>,
-            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{2, 1.5f, 11}}}};
+            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{2, 1.5f, 11}}}, SaveSupport::Original, 1};
         const ClassInfo drudge_lord{
             "DrudgeLord",
             &ai_manager,
@@ -893,25 +893,25 @@ namespace OpenBlood2
             "Gideon",
             &ai_manager,
             construct_npc<Gideon, AI_Mgr::NPCType::Gideon>,
-            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Enhanced", false}}};
+            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Enhanced", false}}, SaveSupport::Original, 1};
         const ClassInfo ancient_one{"AncientOne",
                                     &ai_manager,
                                     construct_npc<AncientOne, AI_Mgr::NPCType::AncientOne>,
-                                    {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}}};
+                                    {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}}, SaveSupport::Original, 1};
         const ClassInfo ancient_tentacle{"AncientOneTentacle",
                                          &ai_manager,
                                          construct_npc<AncientOneTentacle, AI_Mgr::NPCType::AncientOneTentacle>,
-                                         {{"AIState", std::string("IDLE"), true, 31}}};
+                                         {{"AIState", std::string("IDLE"), true, 31}}, SaveSupport::Original, 1};
         const ClassInfo undead_gideon{
             "UndeadGideon",
             &ai_manager,
             construct_npc<UndeadGideon, AI_Mgr::NPCType::UndeadGideon>,
-            {{"RandomHitPoints", 50.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{70, 88, 70}}}};
+            {{"RandomHitPoints", 50.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{70, 88, 70}}}, SaveSupport::Original, 1};
         const ClassInfo enhanced_gideon{
             "EnhancedGideon",
             &ai_manager,
             construct_npc<EnhancedGideon, AI_Mgr::NPCType::EnhancedGideon>,
-            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Enhanced", false}}};
+            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Enhanced", false}}, SaveSupport::Original, 1};
         // Save/load lot 5: CPlayerObj + CBaseCharacter (0 bytes) + CMovement + CInventoryMgr + CDestructable.
         const ClassInfo player{"CPlayerObj", &character, construct<CPlayerObj>, {}, SaveSupport::Original, 1};
         const ClassInfo world_properties{

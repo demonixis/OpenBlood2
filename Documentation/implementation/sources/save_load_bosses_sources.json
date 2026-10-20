@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-21",
+  "scope": "Save/load lot 12: original Save/Load bodies of the bosses and special enemies (Gideon, EnhancedGideon, UndeadGideon, AncientOne, AncientOneTentacle, Naga, ZealotAI, BoneLeech with Thief and TheHandAI, DrudgePriest), the BoneLeech family's original re-attachment and their save-support declarations. The bodies are selective ports recorded in the provenance ledger; the checks, the BoneLeech detach tail and the Naga and Zealot departures are OpenBlood2 code.",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Gideon.cpp",
+      "source_sha256": "994afe0150bd2a2333f4f447cb6190cca8b141ca294900724d58f1860d094500",
+      "purpose": "Gideon Save/Load (811-831): shield duration, raw last-shield, full health, raw last-panic; InitialUpdate on every path (full health from the current hit points, m_bCreateHealth) and the gravity strip after the base; the unsaved fire node."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/EnhancedGideon.cpp",
+      "source_sha256": "91a7448dbe0fbd2b9831f538f477b2eb7b30933a468512ff5c8ac6ab6ce70e09",
+      "purpose": "The same four floats (835-855); InitialUpdate re-arms only m_bCreateHealth; the unsaved m_bNoFire."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/UndeadGideon.cpp",
+      "source_sha256": "fb598d820a640b3d31d8b557f810785f5c026d6edf907957d42ff4ddc7dfd892",
+      "purpose": "Full health only (524-532); the constructor's m_bCreateHealth."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/AncientOne.cpp",
+      "source_sha256": "6480c77a9e3f100b1b1b711c86dec3b1307f06bee3cb95f98861e871e4f22f04",
+      "purpose": "m_fLastFire (constructor 0, never assigned) and full health (418-434)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/AncientOneTentacle.cpp",
+      "source_sha256": "d25b596b56b008d71a9ec34530a83733c01c4dc85b73b0e84a2ae43db5b8bcd5",
+      "purpose": "Raw time of death (uninitialized until death), m_fLastIdle (constructor 0; its writer commented out), scale and the hiding byte (569-589)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Naga.cpp",
+      "source_sha256": "8e78496affa4fd4a142467644bafe95454dd13dc0d8d16b635c85a230efdbe9e",
+      "purpose": "The DWord-written, Float-read whomp count, the plain-object spike, full health and alpha (514-541); the spike created and attached by every initial update; SHADOW/SOLID cleared for a fresh object only."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ZealotAI.cpp",
+      "source_sha256": "c0bdbc9e5d2c68835a60a9cb6df5ec6ee757428d8454cb4a3e89af4412773276",
+      "purpose": "The packed float/staff/divine byte and m_fMaxHeight (863-890); the unsaved staff object with its saved start flag."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ZealotAI.h",
+      "source_sha256": "f45e2e5dea110d3d2cf8c1d4341377b767cdd227cd8dd888584eb8a6eb8c0663",
+      "purpose": "m_fMaxHeight declared, never assigned."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/boneleech.cpp",
+      "source_sha256": "3603c50cebdf87f022da476f0c889d90cb1129ee642de2aaf523b16a72c8359e",
+      "purpose": "The subclass m_bJumping and raw damage/detach clocks (495-507); MID_LOADOBJECT re-points m_hEnemyAttach to the player and restarts STATE_EnemyAttach (133-150); the unsaved m_bProceedAttach handshake."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/thief.cpp",
+      "source_sha256": "8f9a06d097004dc9fff0af6f2873febee44db78aff1b60602d4601af175b034d",
+      "purpose": "The same block and re-attachment as BoneLeech, written once."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/TheHandAI.cpp",
+      "source_sha256": "ddf58327327d5e0e575bbbe799604e4aa7be9e9b4acd37203d1395bc83a9dda8",
+      "purpose": "The same block and re-attachment as BoneLeech, written once."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/drudgepriest.cpp",
+      "source_sha256": "24525564bc65838877518dd9cdc1dadcb2a52f33674224062645670a4345a94b",
+      "purpose": "Raw last spawn (466-474); InitialUpdate on every path restarts the ambient loop and strips gravity."
+    }
+  ]
+}
