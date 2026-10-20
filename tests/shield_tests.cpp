@@ -113,7 +113,7 @@ namespace
         CObjectParticleFX fx;
         NodePose pose;
         std::minstd_rand random(1);
-        CHECK(!fx.Init(18, 1, random, error) && !fx.Init(19, 0, random, error));
+        CHECK(!fx.Init(0, 1, random, error) && !fx.Init(19, 0, random, error)); // OBJFX_NONE; absent parent.
         CHECK(fx.Init(19, 1, random, error) && !fx.CreateObject(missing, pose, 0, error));
         pose.rotation.m_Spin = 0;
         CHECK(!fx.CreateObject(r, pose, 0, error));

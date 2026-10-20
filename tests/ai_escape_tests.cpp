@@ -359,7 +359,9 @@ namespace
         CHECK(!a->AI_STATE_GuardLocation());
         auto table = std::make_shared<CAnim_Sound>();
         table->m_nAnim_TAUNT[6] = 9999;
-        CHECK(a->InitStatics(table) && !a->MC_Taunt_Beg());
+        const auto playing = g.objects.get(a->m_hObject)->animation.animation;
+        CHECK(a->InitStatics(table) && a->MC_Taunt_Beg() && a->animation_clip_retained);
+        CHECK(g.objects.get(a->m_hObject)->animation.animation == playing);
         a->Metacmd = std::numeric_limits<int>::max();
         CHECK(!a->AI_STATE_Escape_Hide());
         return true;

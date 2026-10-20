@@ -84,7 +84,7 @@ namespace
         auto* player = g.server_shell.Player(g.local_client);
         const auto initial = player->m_InventoryMgr.GetAmmoCount(1);
         for (auto value : {PickupMessage{PickupKind::Weapon, 0, 12},
-                           {PickupKind::Weapon, 15, 12}, // Orb: no pickup class.
+                           {PickupKind::Weapon, WEAP_MELEE, 12}, // No original pickup class.
                            {PickupKind::Weapon, 1, -1},
                            {PickupKind::Weapon, 1, std::numeric_limits<float>::infinity()}})
         {

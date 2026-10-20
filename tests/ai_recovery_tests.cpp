@@ -198,7 +198,9 @@ namespace
         a->Metacmd = 0;
         auto table = std::make_shared<CAnim_Sound>();
         table->m_nAnim_CROUCH[TYPE_PISTOL] = 9999;
-        CHECK(a->InitStatics(table) && !a->MC_Crouch() && a->Metacmd == 0);
+        // Original invalid-ordinal no-op: the current crouch clip keeps playing.
+        CHECK(a->InitStatics(table) && a->MC_Crouch() && a->Metacmd == 1 && a->animation_clip_retained);
+        CHECK(r->animation.animation == 50 + TYPE_PISTOL);
         return true;
     }
     bool crawling(const char*)
