@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-20",
+  "scope": "Save/load lot 1: original CSBase message declarations and their Save/Load call patterns. Curated declarations only; no original implementation was imported.",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/AppHeaders/CSBase.h",
+      "source_sha256": "75b25e703d242cd9e3077e1deef587fdaf44eb5054f1fe434d3539cd47d78770",
+      "purpose": "Message primitive set and ownership comments: Byte/Word/DWord/Float/String/Vector/Rotation/HString, HMessageWrite/HMessageRead nesting (EndHMessageRead frees readers), WriteToMessageObject forbidden in MID_SAVEOBJECT, Write/ReadFromLoadSaveMessageObject only inside MID_SAVEOBJECT/MID_LOADOBJECT, automatic end-of-message rewind."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PlayerObj.cpp",
+      "source_sha256": "93056622f9f083f11447a471ecae6f115b7dc3937daf7d251d2396724f3d2003",
+      "purpose": "Save writes the client blob with WriteToMessageHMessageRead and frees it; Load reads it with ReadFromMessageHMessageRead and forwards it with WriteToMessageHMessageRead; plain WriteToMessageObject/ReadFromMessageObject for m_hCameraObj inside Save/Load."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Naga.cpp",
+      "source_sha256": "8e78496affa4fd4a142467644bafe95454dd13dc0d8d16b635c85a230efdbe9e",
+      "purpose": "Plain WriteToMessageObject/ReadFromMessageObject pair for m_hSpike inside Save/Load (stored as NULL, D7)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/corpse.cpp",
+      "source_sha256": "58fd31f4d3a10fb8d5b503155fce10272d1a179069ebdef81f34ce48765a728d",
+      "purpose": "Unchecked _mbscpy of ReadFromMessageString into m_szSoundDir; motivates ReadFromMessageStringBuffer."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/InventoryMgr.cpp",
+      "source_sha256": "aab29291e988ac7c3e1424f41076b5c0adc6243cd60198ea2cc6381d402d0e53",
+      "purpose": "WriteToMessageString with DNULL (line 1685): a null pointer writes an empty string."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/AI_Mgr.cpp",
+      "source_sha256": "7275c3a4f9374926e0a5e7cce4d533ae59ea558027bda1448b223a283e66fb09",
+      "purpose": "Typical WriteToLoadSaveMessageObject/ReadFromLoadSaveMessageObject usage with an out-parameter."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "36a810c80ce87eb2304716e9e1dbaae25304c02c542019b0858c9dc99f2d1006",
+      "purpose": "SaveClientData nests a StartHMessageWrite blob with WriteToMessageHMessageWrite; LoadClientData reads it with ReadFromMessageHMessageRead."
+    },
+    {
+      "source": "sources/lithtech/runtime/server/src/game_serialize.cpp",
+      "source_sha256": "f0d9b69077e9d99037c252882b118238a58a004f0a943106afdac633d82893f8",
+      "purpose": "Later-runtime corroboration only: save references become list indices, NULL for going-away or unlisted objects; nested messages inside saves use runtime-ID semantics (refused here)."
+    }
+  ]
+}

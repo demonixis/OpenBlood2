@@ -11,8 +11,8 @@ all client-shell operations, or a list of completed gameplay features.
 - **Implemented (bounded)**: a concrete implementation exists, subject to its
   subsystem contracts. Invalid handles, missing resources, unsupported modes and
   exhausted limits may still fail. This label never means every input works.
-- **Explicitly unsupported**: SaveObjects, RestoreObjects and EndHMessageRead
-  still reject their requests. Supported player KeepAlive restoration is a
+- **Explicitly unsupported**: SaveObjects and RestoreObjects still reject their
+  requests. EndHMessageRead now releases owned nested readers (save-load lot 1). Supported player KeepAlive restoration is a
   separate typed path; it does not implement general world save files.
 - **Unclassified**: an observed name absent from the catalogue remains visible.
   It is never silently counted as supported.

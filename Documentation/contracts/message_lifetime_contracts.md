@@ -27,8 +27,11 @@ are unchanged and remain separately bounded.
 Routed dispatch is still synchronous and checked, with the same owned bytes and
 typed damage/key/pickup payloads. A callback borrows its reader: it cannot release
 or write that message, while it may create and release nested messages. Existing
-read-cursor reset, 64 KiB packet bound, truncated-field failures, deferred receiver
-removal and unavailable owned nested-read behavior remain unchanged. Closing or
+read-cursor reset, 64 KiB packet bound, truncated-field failures and deferred receiver
+removal remain unchanged. Owned nested readers now exist for the
+[save-message primitives](save_load_contracts.md#implemented-primitives-lot-1): they
+are read-only, count toward the live limit and are released only by
+`EndHMessageRead`; a save/load payload message is borrowed for its dispatch only. Closing or
 writing a stale/foreign identity never changes another live payload. Session
 teardown and NEW_LEVEL do not reassign identities from the old adapter.
 

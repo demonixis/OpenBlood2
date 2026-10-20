@@ -1,8 +1,11 @@
 # Save and load
 
-Status: **design contract for roadmap task 3.3. Lot 2 (container and fingerprint) is
-implemented, see its [evidence](../implementation/reports/save_load_container.md); the other
-lots are pending.** The Save and Load screens stay disabled until the lots below land. The
+Status: **design contract for roadmap task 3.3. Lots 1 (save-message primitives) and 2
+(container and fingerprint) are implemented; see their evidence
+([lot 1](../implementation/reports/save_load_messages.md),
+[lot 2](../implementation/reports/save_load_container.md)). No save or load reaches the
+game yet; the other lots are pending.** The Save and Load screens stay disabled until the
+lots below land. The
 [audit](../implementation/save_load_audit/readme.md) is the evidence for every
 original rule cited here; its [source ledger](../implementation/sources/save_load_audit_sources.json)
 records the audited files. Read [level replacement](level_change_contracts.md),
@@ -216,14 +219,57 @@ one encoding:
 | Plain object inside a save | NULL sentinel plus a per-class diagnostic (D7) |
 | Nested message | u32 length ≤ 16 KiB, then bytes (the client blob) |
 
-`WriteToMessageCompVector` and `WriteToMessageCompPosition` appear only in
-original effect messages, never in Save bodies, and are refused in a save
-context. The reader latches its first error. The original reader rewinds
-automatically at the end of a message; inside `MID_LOADOBJECT` that rewind is
-disabled, so a read past the end is an over-read. Over-reads and under-reads are
-failures (D5). An original read whose type differs from its write is reproduced
-literally; Naga's DWord-written, Float-read counter keeps that original
-behavior unless a departure is recorded.
+`WriteToMessageCompVector`, `WriteToMessageCompPosition` and
+`WriteToMessageFormattedHString` appear only in original effect messages, never in
+Save bodies. They are not declared, so a save body that calls them does not
+compile; effect messages stay typed. The reader latches its first error. The
+original reader rewinds automatically at the end of a message; inside
+`MID_LOADOBJECT` that rewind is disabled, so a read past the end is an over-read.
+Over-reads and under-reads are failures (D5). An original read whose type differs
+from its write is reproduced literally; Naga's DWord-written, Float-read counter
+keeps that original behavior unless a departure is recorded.
+
+#### Implemented primitives (lot 1)
+
+`ServerAdapter::save_object_payload` and `load_object_payload` dispatch
+`MID_SAVEOBJECT`/`MID_LOADOBJECT` to one object. `pData` points to the message
+handle and `fData` carries dwParam. Lot 3 builds `SaveObjects`/`RestoreObjects` on
+them; nothing calls them from the game yet.
+
+- **Dispatch context.** The payload message exists only for the call and is
+  borrowed: the callback cannot release, route or (on load) write it. A dispatch is
+  refused unless the adapter is the bound session, no object callback is running,
+  no other payload dispatch is active and the object is alive.
+- **Index table.** `SaveIndex` is the dense save-list table. It maps a handle to its
+  record index when saving and an index to the restored handle when loading. A
+  LoadSave write stores the index of a listed, alive target. A NULL, stale,
+  going-away or unlisted target stores `0xFFFFFFFF`. A load resolves the sentinel to
+  NULL; an index past the table, or naming an object that no longer exists, fails.
+- **Context refusal.** LoadSave writes and reads work only on the active payload
+  message of the matching direction. On any other message, including a nested
+  message created inside the callback, they fail and latch that message. Plain
+  `WriteToMessageObject` writes the sentinel inside a save and counts it (D7). Plain
+  `ReadFromMessageObject` inside a load requires the sentinel and returns NULL.
+  Outside saves, both plain calls are refused and recorded as unavailable;
+  ordinary object references stay typed.
+- **Failure scope.** Any message refusal during the dispatch (a stale handle, a
+  borrowed release, a bound, a wrong context) fails that dispatch. The report
+  keeps the first error.
+- **Strings.** `ReadFromMessageString` returns text owned by the message until it
+  is released, and `""` after a failure. `ReadFromMessageStringBuffer` copies into
+  a fixed buffer and fails, without overrunning, when the text and its terminator
+  do not fit. A null `WriteToMessageString` pointer writes an empty string
+  (`InventoryMgr.cpp:1685` passes `DNULL`).
+- **Nested messages.** `WriteToMessageHMessageWrite` nests a standalone writer.
+  `WriteToMessageHMessageRead` nests an owned nested reader or a borrowed callback
+  reader; it forwards the whole payload regardless of the read cursor. Routed sends,
+  typed side-car messages and payload messages never nest.
+  `ReadFromMessageHMessageRead` returns an owned, read-only reader that only
+  `EndHMessageRead` releases. Nested bytes are ordinary, so references inside them
+  are refused.
+- **Report.** Each dispatch reports the class name, payload and consumed bytes,
+  resolved and NULL references, plain-object NULLs, nested messages and the first
+  error. Counters never change payload bytes.
 
 ### Fingerprint
 

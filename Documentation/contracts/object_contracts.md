@@ -50,9 +50,9 @@ Internal IDs contain slot and generation. Legacy `HOBJECT` values point to stabl
 | Links | Unique directed links, no self-links; `MID_LINKBROKEN` when either endpoint is removed; explicit break sends no notification | `links_lists` |
 | Strings | Create/copy/free reference ownership, stable data until final free, safe stale-handle lookup | `original_objects`, `messages_strings` |
 | Object messages | Real virtual `CSBase`/`ServerDE` methods; synchronous `EndMessage`, owned bounded buffer, borrowed callback reader, nested calls bounded at 128 | `messages_strings`, `aggregate_dispatch` |
-| Message fields | Little-endian 32-bit integers and copied nullable strings; reads return caller-owned `HSTRING`; rewind at end as specified by original `CSBase` | `messages_strings`; no pointer serialization or network/save compatibility claim |
+| Message fields | Little-endian Byte/Word/DWord, binary32 Float/Vector/Rotation, bounded strings and nullable `HSTRING`s, nested messages and save-only object references (see [save-message primitives](save_load_contracts.md#implemented-primitives-lot-1)); reads return caller-owned `HSTRING`; rewind at end as specified by original `CSBase`, except inside `MID_LOADOBJECT` | `messages_strings`, `save_messages.*`; no pointer serialization or network/save-file compatibility claim |
 | Game variables | `GAME_DIFFICULTY`, `GAME_GAMETYPE`, initialized to medium/single; explicit harness setter | `original_objects`, `unsupported_teardown` |
-| Deferred services | `MoveObject`, `SaveObjects`, `RestoreObjects` return `DE_ERROR` and record the service name; owned nested readers are not exposed | `unsupported_teardown` |
+| Deferred services | `MoveObject`, `SaveObjects`, `RestoreObjects` return `DE_ERROR` and record the service name; plain object references outside saves are refused and recorded | `unsupported_teardown`, `save_messages.context` |
 | Other original APIs | Not declared in this subset; importing a caller produces a compiler error until the service is deliberately added | No generic successful stub or null vtable |
 
 Diagnostics retain the latest 32 failures; `Objects::error()` is the most recent failure, not an implicit success status. Successful operations must be judged by their return value. Null/missing getters return the declared sentinel; property getters return `DE_NOTFOUND` outside a creation context.

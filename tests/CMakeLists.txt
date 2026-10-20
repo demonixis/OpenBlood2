@@ -30,6 +30,14 @@ foreach(case IN ITEMS builtin_model original_objects nested_creation reasons_pro
     set_tests_properties(objects.${case} PROPERTIES LABELS "headless;objects" TIMEOUT 10)
 endforeach()
 
+add_executable(save_message_tests save_message_tests.cpp)
+target_link_libraries(save_message_tests PRIVATE blood2_game)
+blood2_project_options(save_message_tests)
+foreach(case IN ITEMS golden_layout round_trip truncation overflow references context nested)
+    add_test(NAME save_messages.${case} COMMAND save_message_tests "${case}")
+    set_tests_properties(save_messages.${case} PROPERTIES LABELS "headless;objects;save" TIMEOUT 30)
+endforeach()
+
 add_executable(object_snapshot_tests object_snapshot_tests.cpp)
 target_link_libraries(object_snapshot_tests PRIVATE blood2_game)
 blood2_project_options(object_snapshot_tests)

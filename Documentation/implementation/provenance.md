@@ -1784,3 +1784,16 @@ replaced by a data-only named-resource read in `engine/string_resources.cpp`. Th
 font is a replacement (Dear ImGui's default font). See the
 [contracts](../contracts/menu_contracts.md#credits-roll-ccreditsccredit) and the
 [source ledger](sources/menu_credits_sources.json).
+
+## Save-message primitives (2026-10-20)
+
+Save/load lot 1 extends the curated `legacy/server_de.h` `CSBase` declarations with
+the remaining original message calls used by Save/Load bodies (Byte, Word, Float,
+String, Vector, Rotation, nested messages, plain and LoadSave object references).
+`ReadFromMessageStringBuffer` is an OpenBlood2 addition. The implementations in
+`game/server_messages.cpp` and the `SaveIndex`/report types in `game/save_message.h`
+are replacement engine code; no original implementation was copied. The message
+handling previously in `server_adapter.cpp` moved there unchanged in behavior. See
+the [contract](../contracts/save_load_contracts.md#implemented-primitives-lot-1), the
+[evidence](reports/save_load_messages.md) and the
+[source ledger](sources/save_load_messages_sources.json).

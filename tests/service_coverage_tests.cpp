@@ -41,8 +41,7 @@ namespace
         {
             if (definition.boundary == ServiceBoundary::Interface)
                 CHECK(listed.insert(std::string(definition.name)).second);
-            const bool unavailable = definition.name == "SaveObjects" || definition.name == "RestoreObjects" ||
-                                     definition.name == "EndHMessageRead";
+            const bool unavailable = definition.name == "SaveObjects" || definition.name == "RestoreObjects";
             CHECK(definition.support == (unavailable ? ServiceSupport::Unavailable : ServiceSupport::Bounded));
         }
         CHECK(listed == declared);
@@ -114,7 +113,7 @@ namespace
             }
             CHECK(s.trace_enabled);
         }
-        CHECK(!s.trace_enabled && s.unavailable_history.size() == 3);
+        CHECK(!s.trace_enabled && s.unavailable_history.size() == 2);
         rows = service_coverage(s.service_calls);
         CHECK(find(rows, "GetPathManager")->calls == 1 && find(rows, "SetVelocity")->calls == 1);
         CHECK(find(rows, "SaveObjects")->calls == 1 && find(rows, "RestoreObjects")->calls == 1 &&

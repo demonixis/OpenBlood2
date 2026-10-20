@@ -22,15 +22,44 @@ namespace OpenBlood2
 // implementation/tests as original callers arrive. Absent services fail to
 // compile; the explicitly deferred services below return DE_ERROR + diagnostics.
 // Read-only input strings are const; fixed-width integers replace Windows long.
+// Original CSBase message set used by Save/Load bodies (save_load_contracts
+// "Message primitives"). CompVector/CompPosition and FormattedHString are
+// absent: they appear only in original effect messages, which stay typed.
+// LoadSave references work only on the message of a save/load dispatch; plain
+// object references are NULL inside saves and refused elsewhere.
 class CSBase
 {
   public:
     virtual ~CSBase() = default;
     virtual HMESSAGEWRITE StartHMessageWrite() = 0;
+    virtual DRESULT WriteToMessageFloat(HMESSAGEWRITE, float) = 0;
+    virtual DRESULT WriteToMessageByte(HMESSAGEWRITE, DBYTE) = 0;
+    virtual DRESULT WriteToMessageWord(HMESSAGEWRITE, D_WORD) = 0;
     virtual DRESULT WriteToMessageDWord(HMESSAGEWRITE, DDWORD) = 0;
+    virtual DRESULT WriteToMessageString(HMESSAGEWRITE, const char*) = 0;
+    virtual DRESULT WriteToMessageVector(HMESSAGEWRITE, const DVector*) = 0;
+    virtual DRESULT WriteToMessageRotation(HMESSAGEWRITE, const DRotation*) = 0;
     virtual DRESULT WriteToMessageHString(HMESSAGEWRITE, HSTRING) = 0;
+    virtual DRESULT WriteToMessageHMessageWrite(HMESSAGEWRITE, HMESSAGEWRITE data) = 0;
+    virtual DRESULT WriteToMessageHMessageRead(HMESSAGEWRITE, HMESSAGEREAD data) = 0;
+    virtual DRESULT WriteToMessageObject(HMESSAGEWRITE, HOBJECT) = 0;
+    virtual DRESULT WriteToLoadSaveMessageObject(HMESSAGEWRITE, HOBJECT) = 0;
+    virtual float ReadFromMessageFloat(HMESSAGEREAD) = 0;
+    virtual DBYTE ReadFromMessageByte(HMESSAGEREAD) = 0;
+    virtual D_WORD ReadFromMessageWord(HMESSAGEREAD) = 0;
     virtual DDWORD ReadFromMessageDWord(HMESSAGEREAD) = 0;
+    // Valid until the message is released; "" after a failed read.
+    virtual const char* ReadFromMessageString(HMESSAGEREAD) = 0;
+    // OpenBlood2 checked copy for fixed Load buffers: a string that does not fit
+    // (with its terminator) latches a read failure instead of overrunning.
+    virtual DRESULT ReadFromMessageStringBuffer(HMESSAGEREAD, char* buffer, DDWORD capacity) = 0;
+    virtual void ReadFromMessageVector(HMESSAGEREAD, DVector*) = 0;
+    virtual void ReadFromMessageRotation(HMESSAGEREAD, DRotation*) = 0;
+    virtual HOBJECT ReadFromMessageObject(HMESSAGEREAD) = 0;
     virtual HSTRING ReadFromMessageHString(HMESSAGEREAD) = 0;
+    virtual DRESULT ReadFromLoadSaveMessageObject(HMESSAGEREAD, HOBJECT*) = 0;
+    // Returns an owned reader released by EndHMessageRead.
+    virtual HMESSAGEREAD ReadFromMessageHMessageRead(HMESSAGEREAD) = 0;
     virtual void EndHMessageWrite(HMESSAGEWRITE) = 0;
     virtual void EndHMessageRead(HMESSAGEREAD) = 0;
     virtual void ResetRead(HMESSAGEREAD) = 0;

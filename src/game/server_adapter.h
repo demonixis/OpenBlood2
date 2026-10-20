@@ -23,6 +23,7 @@
 #include "game/player_restore.h"
 #include "game/polygrids.h"
 #include "game/projectile_report.h"
+#include "game/save_message.h"
 #include "game/service_coverage.h"
 #include "game/session.h"
 #include "game/sparks.h"
@@ -30,8 +31,10 @@
 #include "game/weapon_sprites.h"
 #include "game/world_preparation.h"
 #include <array>
+#include <deque>
 #include <optional>
 #include <random>
+#include <span>
 #include <unordered_set>
 
 struct StringHandle
@@ -308,13 +311,47 @@ namespace OpenBlood2
         }
 
         HMESSAGEWRITE StartHMessageWrite() override;
+        DRESULT WriteToMessageFloat(HMESSAGEWRITE, float) override;
+        DRESULT WriteToMessageByte(HMESSAGEWRITE, DBYTE) override;
+        DRESULT WriteToMessageWord(HMESSAGEWRITE, D_WORD) override;
         DRESULT WriteToMessageDWord(HMESSAGEWRITE, DDWORD) override;
+        DRESULT WriteToMessageString(HMESSAGEWRITE, const char*) override;
+        DRESULT WriteToMessageVector(HMESSAGEWRITE, const DVector*) override;
+        DRESULT WriteToMessageRotation(HMESSAGEWRITE, const DRotation*) override;
         DRESULT WriteToMessageHString(HMESSAGEWRITE, HSTRING) override;
+        DRESULT WriteToMessageHMessageWrite(HMESSAGEWRITE, HMESSAGEWRITE) override;
+        DRESULT WriteToMessageHMessageRead(HMESSAGEWRITE, HMESSAGEREAD) override;
+        DRESULT WriteToMessageObject(HMESSAGEWRITE, HOBJECT) override;
+        DRESULT WriteToLoadSaveMessageObject(HMESSAGEWRITE, HOBJECT) override;
+        float ReadFromMessageFloat(HMESSAGEREAD) override;
+        DBYTE ReadFromMessageByte(HMESSAGEREAD) override;
+        D_WORD ReadFromMessageWord(HMESSAGEREAD) override;
         DDWORD ReadFromMessageDWord(HMESSAGEREAD) override;
+        const char* ReadFromMessageString(HMESSAGEREAD) override;
+        DRESULT ReadFromMessageStringBuffer(HMESSAGEREAD, char*, DDWORD) override;
+        void ReadFromMessageVector(HMESSAGEREAD, DVector*) override;
+        void ReadFromMessageRotation(HMESSAGEREAD, DRotation*) override;
+        HOBJECT ReadFromMessageObject(HMESSAGEREAD) override;
         HSTRING ReadFromMessageHString(HMESSAGEREAD) override;
+        DRESULT ReadFromLoadSaveMessageObject(HMESSAGEREAD, HOBJECT*) override;
+        HMESSAGEREAD ReadFromMessageHMessageRead(HMESSAGEREAD) override;
         void EndHMessageWrite(HMESSAGEWRITE) override;
         void EndHMessageRead(HMESSAGEREAD) override;
         void ResetRead(HMESSAGEREAD) override;
+        // MID_SAVEOBJECT/MID_LOADOBJECT dispatch through a borrowed bounded payload
+        // message (save_load_contracts "Message primitives"). pData points to the
+        // message handle and fData carries dwParam. Only this message accepts
+        // LoadSave references, resolved through the index table. A load must
+        // consume exactly its payload. Refused while a callback or another
+        // payload dispatch runs, or while this adapter is not the bound one.
+        bool save_object_payload(HOBJECT, DDWORD param, const SaveIndex&, std::vector<std::uint8_t>& payload,
+                                 SavePayloadReport&);
+        bool load_object_payload(HOBJECT, DDWORD param, std::span<const std::uint8_t> payload, const SaveIndex&,
+                                 SavePayloadReport&);
+        bool payload_dispatching() const
+        {
+            return payload_.has_value();
+        }
         HMESSAGEWRITE StartMessageToObject(LPBASECLASS, HOBJECT, DDWORD) override;
         DRESULT EndMessage(HMESSAGEWRITE) override;
         bool GetObjectColor(HOBJECT, DVector&, float&) override;
@@ -357,6 +394,9 @@ namespace OpenBlood2
             std::vector<std::uint8_t> bytes;
             std::size_t cursor = 0;
             bool bad = false, routed = false, borrowed = false;
+            bool reader = false;              // Owned nested reader; released only by EndHMessageRead.
+            std::deque<std::string> strings;  // ReadFromMessageString results, stable until release.
+            std::string failure;              // First latched failure.
             HOBJECT sender = nullptr, receiver = nullptr;
             DDWORD id = 0;
             std::optional<float> immobilize;
@@ -423,8 +463,26 @@ namespace OpenBlood2
         ObjectLink* add_to_list(ObjectList*, HOBJECT);
         void remove_from_list(ObjectList*, HOBJECT);
         void release_list(ObjectList*);
+        struct PayloadDispatch
+        {
+            HMESSAGEWRITE message;
+            bool load = false;
+            const SaveIndex* index = nullptr;
+            SavePayloadReport* report = nullptr;
+        };
+        std::optional<PayloadDispatch> payload_; // Active only during one save/load dispatch.
+        PayloadDispatch* payload(HMESSAGEWRITE, bool load);
+        bool dispatch_ready(HOBJECT, SavePayloadReport&);
+        MessageHandle create_message();
+        void latch(Message&, const std::string& detail);
+        bool reject(Message&, ObjectError, std::string detail);
+        bool refuse(ObjectError, std::string detail);
+        bool read_text(HMESSAGEREAD, bool nullable, std::string& text, bool& null);
+        DRESULT nest(HMESSAGEWRITE, HMESSAGEREAD data, bool reader);
         Message* writable(HMESSAGEWRITE);
         Message* readable(HMESSAGEREAD, std::size_t bytes);
+        DRESULT append(HMESSAGEWRITE, const std::uint8_t* data, std::size_t size);
+        bool take(HMESSAGEREAD, std::uint8_t* data, std::size_t size);
         DRESULT unsupported(const char* service);
     };
 
