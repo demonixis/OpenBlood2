@@ -1,0 +1,319 @@
+{
+  "description": "Read-only audit of original Blood II and later LithTech save/restore code for the save/load design (roadmap 3.3). No code was imported.",
+  "root": "LithTech reference tree (lithtech/)",
+  "sources": [
+    {
+      "path": "Blood2/AppHeaders/CSBase.h",
+      "sha256": "75b25e703d242cd9e3077e1deef587fdaf44eb5054f1fe434d3539cd47d78770"
+    },
+    {
+      "path": "Blood2/AppHeaders/basedefs_de.h",
+      "sha256": "0d83661f95323204f967600ff3c25996cb11a792c24b9570a48bdbb34b8db38b"
+    },
+    {
+      "path": "Blood2/AppHeaders/basetypes_de.h",
+      "sha256": "9447597d4d3d893572d0e74929352e9ffd742a7520aaf2d3f3c37ff4598fe4cb"
+    },
+    {
+      "path": "Blood2/AppHeaders/engineobjects.c",
+      "sha256": "70730e7e8aa704de5c6ddfa40194227832260812f951a49fd76e7735b530f75f"
+    },
+    {
+      "path": "Blood2/AppHeaders/server_de.h",
+      "sha256": "3b61477e2c14f331f0847ae6cbe48e2a93b6e25444bb7956c83c00f71d409275"
+    },
+    {
+      "path": "Blood2/AppHeaders/serverobj_de.h",
+      "sha256": "f065e20774eaac58a135c7920d14acb2dc2d1b2bb224be869c912758771b1d9a"
+    },
+    {
+      "path": "Blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "36a810c80ce87eb2304716e9e1dbaae25304c02c542019b0858c9dc99f2d1006"
+    },
+    {
+      "path": "Blood2/ClientShellDLL/BloodClientShell.h",
+      "sha256": "83956dffff04cd998463716315eabd8b255a8c94f6164d803954b4ca8f36e93f"
+    },
+    {
+      "path": "Blood2/ClientShellDLL/LoadSave.cpp",
+      "sha256": "085b26a3d836a506a227e1c022642d703b0cc28df48f884e67981e43ee1911a2"
+    },
+    {
+      "path": "Blood2/ClientShellDLL/LoadSave.h",
+      "sha256": "4c3dd6f94958bd0c75c1f05c31546c68120b2042f0370b568de984ea63e02588"
+    },
+    {
+      "path": "Blood2/ClientShellDLL/MenuLoadGame.cpp",
+      "sha256": "35344ea4778488d7d577aab061f93d71cb50a1c5fee3b4ffe1b308166b4a7712"
+    },
+    {
+      "path": "Blood2/ClientShellDLL/MenuSaveGame.cpp",
+      "sha256": "00e9910cb51493088091ab3dddf4b1556355586b77991901534154b6887f49eb"
+    },
+    {
+      "path": "Blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "7275c3a4f9374926e0a5e7cce4d533ae59ea558027bda1448b223a283e66fb09"
+    },
+    {
+      "path": "Blood2/ObjectDLL/AncientOne.cpp",
+      "sha256": "6480c77a9e3f100b1b1b711c86dec3b1307f06bee3cb95f98861e871e4f22f04"
+    },
+    {
+      "path": "Blood2/ObjectDLL/AncientOneTentacle.cpp",
+      "sha256": "d25b596b56b008d71a9ec34530a83733c01c4dc85b73b0e84a2ae43db5b8bcd5"
+    },
+    {
+      "path": "Blood2/ObjectDLL/B2BaseClass.cpp",
+      "sha256": "0ba57de82459b0d7de97c93e53d55cb32ac05b6743efa271d8fc3c2b5944aa13"
+    },
+    {
+      "path": "Blood2/ObjectDLL/BaseCharacter.cpp",
+      "sha256": "6dcf0d6f2bf3c9ee4caec8ee906d191869eece9bc1f69ebb88ae80ed25875172"
+    },
+    {
+      "path": "Blood2/ObjectDLL/BloodServerShell.h",
+      "sha256": "e605e3e1e33ff6156f3ec27f7d59a0fb2ac9ce7141c424d44feec89f61c6dafe"
+    },
+    {
+      "path": "Blood2/ObjectDLL/CameraObj.cpp",
+      "sha256": "a7a796f5a7d046ecc3ddf41e6bed9cb908265e0656b0653a20cd1937b6504a3c"
+    },
+    {
+      "path": "Blood2/ObjectDLL/CinematicTrigger.cpp",
+      "sha256": "bdced10225c2b9868af90fba6c4504a84642bd37a0edb793f4d11c5873641971"
+    },
+    {
+      "path": "Blood2/ObjectDLL/CivilianAI.cpp",
+      "sha256": "f7f9692709396236e5fd6c0c050152d789a531011e51d1be93a2cfec7e1df863"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ClientExplosionSFX.cpp",
+      "sha256": "87cfd53215253da70d66a1ade5d70495a812889f1d9ca47d72ce34a124c50342"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ClientLaserBeamSFX.cpp",
+      "sha256": "e62f705a487ad59b8b6317f3200712238ee252aff465d0535769f8436313024f"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ClientLightFX.cpp",
+      "sha256": "4610ac78791d766785dbcfe4d8893ce74d5474e408f45606b2a4a2cbe095b2cb"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ClientLightningSFX.cpp",
+      "sha256": "a47b9673efecf8b6a0aa7a69303259a67d37827bdc3897e2f367187e62068253"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ClientParticleStreamSFX.cpp",
+      "sha256": "7a33e2c244415f960bbf84c9a7452f0af0c62d98b9ecee4f45ec6f17a9221c81"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ClientWarpGateSFX.cpp",
+      "sha256": "0ef582587832867193dae5e9db8f33ee6684fd5b4a51f0aec3be8a1fe3bb42b3"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ConversationTrigger.cpp",
+      "sha256": "1716b9e29cd61e48d0c91fc39acc69969cd2c2dc14c660d7fcf8a71d377943f7"
+    },
+    {
+      "path": "Blood2/ObjectDLL/CultistAI.cpp",
+      "sha256": "ffb973d7fd476978c4cf0cf71c0d702f6c5ed795161e410b215773687a2b703b"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Debris.cpp",
+      "sha256": "cccf3b6458c84e39ec8b12b7b0bb5708b3f0ba08ba9fdf0fde8c87a7a9de6ca8"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Destructable.cpp",
+      "sha256": "c0d8b72b729e806a6ca8f0e44a57054aef30e20c4d75b745df29f97fb36199ca"
+    },
+    {
+      "path": "Blood2/ObjectDLL/DestructableBrush.cpp",
+      "sha256": "429fd282ca2dce073a96bac78256a84c9784a22c7c261e0da0f1b86ed359a997"
+    },
+    {
+      "path": "Blood2/ObjectDLL/DestructableModel.cpp",
+      "sha256": "a725d5d5d84f539de382f73ea266b0ab92380eb4911fa2188c997322e69efd86"
+    },
+    {
+      "path": "Blood2/ObjectDLL/DetailSprite.cpp",
+      "sha256": "cf1827e0acbd2534a0b1c05ac464389ffc603c7b9b6b14fea5d09879d6667663"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Door.cpp",
+      "sha256": "790e77cd68450b4dd49b853931c987055aa65f7f859b57465fc80a8e650cfcb9"
+    },
+    {
+      "path": "Blood2/ObjectDLL/EnhancedGideon.cpp",
+      "sha256": "91a7448dbe0fbd2b9831f538f477b2eb7b30933a468512ff5c8ac6ab6ce70e09"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ExitTrigger.cpp",
+      "sha256": "70350829d00135294983ef6622191aa224c1ef602f379063f19f3f3f9a93025d"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Fanatic.cpp",
+      "sha256": "9e2e3f7d19771994fa1c9647df073306e34d317f80ac9e8b5ed9009bcf26c327"
+    },
+    {
+      "path": "Blood2/ObjectDLL/GameInvItems.cpp",
+      "sha256": "883af352df59bf3159651940039e4eb4a8ba4bb9531dacfab089150edb36cff9"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Gideon.cpp",
+      "sha256": "994afe0150bd2a2333f4f447cb6190cca8b141ca294900724d58f1860d094500"
+    },
+    {
+      "path": "Blood2/ObjectDLL/InvItem.h",
+      "sha256": "e680a279b6cd0cb4a4533a065d983f8f7c01611bc8b2525c0caa0af76a849a7c"
+    },
+    {
+      "path": "Blood2/ObjectDLL/InventoryMgr.cpp",
+      "sha256": "aab29291e988ac7c3e1424f41076b5c0adc6243cd60198ea2cc6381d402d0e53"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ItemPickups.cpp",
+      "sha256": "1ae96d4e47ea46a709e06eacba3f2e9f206632791884af3ad421520a08ef801a"
+    },
+    {
+      "path": "Blood2/ObjectDLL/KeyData.cpp",
+      "sha256": "f90e51dfb589103ad544fac4c4cc5ae4a96a766d2686af7f965ae2b0af5b81a1"
+    },
+    {
+      "path": "Blood2/ObjectDLL/KeyFramer.cpp",
+      "sha256": "38629579968ef3923f70f3439896987c366009947587b3d28e821b1bc0c724f7"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Naga.cpp",
+      "sha256": "8e78496affa4fd4a142467644bafe95454dd13dc0d8d16b635c85a230efdbe9e"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ObjectivesTrigger.cpp",
+      "sha256": "4ba3f9dbc530a7efefdd0e0d717c73a7d3097e9eee4545d8c764ad350a5919ba"
+    },
+    {
+      "path": "Blood2/ObjectDLL/PathListData.cpp",
+      "sha256": "389c71708f7b6bf3c05ffec0e1e843c1eff0d6dea45a863e03caacbb70bd76f1"
+    },
+    {
+      "path": "Blood2/ObjectDLL/PickupObject.cpp",
+      "sha256": "7f75a9fcbc23aabe64cb1ce21f02d63cce2b38110e5d98c8a60e94f0a4ebb43c"
+    },
+    {
+      "path": "Blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "93056622f9f083f11447a471ecae6f115b7dc3937daf7d251d2396724f3d2003"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Projectile.cpp",
+      "sha256": "27bfe497aa58e263e544c3aaf70b044de9d04190d80ee1d7b5c5aaf9f54190d7"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Rain.cpp",
+      "sha256": "2347f91d80f43278ecf62f5528da4722c4381ce5bb465613c50c60180528a7aa"
+    },
+    {
+      "path": "Blood2/ObjectDLL/RandomSoundFX.cpp",
+      "sha256": "f91b9ba5740be333c686cbcbdebe52dfc5bc9f0abedd5043b2ba2578a1b3bc9e"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Rotating.cpp",
+      "sha256": "225aa9241ea37863f17ece9f30c888314bff1e56b4cf036a2696cfaebc8691aa"
+    },
+    {
+      "path": "Blood2/ObjectDLL/RotatingDoor.cpp",
+      "sha256": "8feb3d970eb3ceecc200a38b6ffb3385f8da09c021641f96247218e58789b913"
+    },
+    {
+      "path": "Blood2/ObjectDLL/SeeingEye.cpp",
+      "sha256": "166430ee7683e151d1288f3fda0605e1e1f887b6c0e2df39a6a8776ce909c20e"
+    },
+    {
+      "path": "Blood2/ObjectDLL/SoundFX.cpp",
+      "sha256": "58c2c6cc04948618ea38acb4275e2a613a3a87a4196507dfb5428bacab55e2b2"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Spawner.cpp",
+      "sha256": "9b42ecccd37302dcfe53db45fad529adca65ecc61f9963b49f595eb88e802ffd"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Tchernotronic.cpp",
+      "sha256": "48a20efb9d14d37efe80b54888a05cfa794a175649d54bbd66e7d74c721480e5"
+    },
+    {
+      "path": "Blood2/ObjectDLL/TheHandAI.cpp",
+      "sha256": "ddf58327327d5e0e575bbbe799604e4aa7be9e9b4acd37203d1395bc83a9dda8"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Trigger.cpp",
+      "sha256": "c6cb75d4154c4c03c4166c96de6aecba68303750c5b6b89cb8c78ba5c6704596"
+    },
+    {
+      "path": "Blood2/ObjectDLL/TripLaser.cpp",
+      "sha256": "51f13936e868ef47ca478b2a4181c53cf7990c8fc9be040bc948e51fdcc52572"
+    },
+    {
+      "path": "Blood2/ObjectDLL/UndeadGideon.cpp",
+      "sha256": "fb598d820a640b3d31d8b557f810785f5c026d6edf907957d42ff4ddc7dfd892"
+    },
+    {
+      "path": "Blood2/ObjectDLL/VolumeBrush.cpp",
+      "sha256": "442cc81f7cd87c69882cc42028e62ad67e359e995cb7e47f7c4a0d2cb06709bb"
+    },
+    {
+      "path": "Blood2/ObjectDLL/WorldModelDebris.cpp",
+      "sha256": "0395f9ad24728739397ab9c7f7e2c84a5a20cb4b823f8f4487cc72370ef5f6a4"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ZealotAI.cpp",
+      "sha256": "c0bdbc9e5d2c68835a60a9cb6df5ec6ee757428d8454cb4a3e89af4412773276"
+    },
+    {
+      "path": "Blood2/ObjectDLL/boneleech.cpp",
+      "sha256": "3603c50cebdf87f022da476f0c889d90cb1129ee642de2aaf523b16a72c8359e"
+    },
+    {
+      "path": "Blood2/ObjectDLL/corpse.cpp",
+      "sha256": "58fd31f4d3a10fb8d5b503155fce10272d1a179069ebdef81f34ce48765a728d"
+    },
+    {
+      "path": "Blood2/ObjectDLL/drudgepriest.cpp",
+      "sha256": "24525564bc65838877518dd9cdc1dadcb2a52f33674224062645670a4345a94b"
+    },
+    {
+      "path": "Blood2/ObjectDLL/movement.cpp",
+      "sha256": "2c4a4aef6eb8862a258dac44b2b26396ff720a8456c9320f0e19603ebbe591b6"
+    },
+    {
+      "path": "Blood2/ObjectDLL/thief.cpp",
+      "sha256": "8f9a06d097004dc9fff0af6f2873febee44db78aff1b60602d4601af175b034d"
+    },
+    {
+      "path": "Blood2/Shared/ClientServerShared.h",
+      "sha256": "7c7cc762788dac33785d88cbae32f56489d35c731e753ef25baa3cc60e644606"
+    },
+    {
+      "path": "Blood2/Shared/SharedDefs.h",
+      "sha256": "24c3d2752c18bf884afa0f376a129e68d0885b13da93410253e69db46d549423"
+    },
+    {
+      "path": "runtime/server/src/game_serialize.cpp",
+      "sha256": "f0d9b69077e9d99037c252882b118238a58a004f0a943106afdac633d82893f8"
+    },
+    {
+      "path": "runtime/server/src/s_object.cpp",
+      "sha256": "32777bcf2a221ae7c6c8cc6890a102f33120b75f2eb3f60ec7578d54f4b65d68"
+    },
+    {
+      "path": "runtime/server/src/serverde_impl.cpp",
+      "sha256": "5e1973f36bea781f23f99d7e0bb32ddb474ebf83c142c6877b15c157ba2fd53f"
+    },
+    {
+      "path": "runtime/server/src/servermgr.cpp",
+      "sha256": "021b651f6d93a426ee9b1150bc1c17a2f57987c2f1f9f9c4a69c2abbae413e5f"
+    }
+  ],
+  "adaptations": [
+    "Design only: the contract defines an OpenBlood2-native versioned container; original .sav files are neither read nor written",
+    "Later LithTech runtime evidence corroborates engine ordering; it is not a trace of the 1998 executable",
+    "Selective imports of the audited Save/Load bodies will receive their own ledger records in the implementation lots"
+  ]
+}

@@ -51,6 +51,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Keyboard fire and relative mouse controls](player_control_contracts.md)
 - [Named keep-alive player entry](player_keepalive_contracts.md)
 - [Player engine restoration and restored client association](player_restore_contracts.md)
+- [Save and load: design, format and lot plan](save_load_contracts.md)
 - [Selected original player fields and restore initialization](player_state_contracts.md)
 - [Play entry and first Cultist combat corrections](playtest_input_contracts.md)
 - [Interactive world entry and NPC preservation](session_playback_contracts.md)

@@ -21,6 +21,8 @@ hashes merely because an implementation file or its documentation links changed.
 Runtime test logs and measurements belong in the
 [dedicated evidence directory](../reports/evidence).
 
+- [Save/load audit](save_load_audit_sources.json): read-only audit of original and later-LithTech save/restore code; no import.
+
 - [Original music asset preparation](m2_music_asset_sources.json)
 
 - [DLS decoding references and private format quirks](m2_music_dls_sources.json)
