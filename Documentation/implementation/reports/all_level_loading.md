@@ -9,8 +9,8 @@ initial deltas, three seconds of simulation with movement, a runtime failure
 recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
 combat, multiplayer or GPU certification. M2 closure remains unchanged.
 
-Current verified opening gate after iteration 12: **49 / 58 pass, 9 / 58 fail**
-([audit 10](evidence/all-levels-audit-10.log)). Remaining worlds:
+Current verified opening gate after iteration 13: **49 / 58 pass, 9 / 58 fail**
+([audit 11](evidence/all-levels-audit-11.log)). Remaining worlds:
 Rooftop, Ancient City, Arena, Ancient One,
 End and the four CTF maps. Initial-entry and three-second simulation
 coverage is not complete gameplay/traversal acceptance. The tables below retain
@@ -472,3 +472,44 @@ actual tv01 destruction and Life Leech spawn.
 frames on NVIDIA RTX 3060, dummy audio, and exits 0. Dev inspector and Release
 applications build. These checks do not certify full traversal or network play;
 M2 closure and M3 scope are unchanged.
+
+
+## Iteration 13: original Gabriella and Ophelia variants
+
+GabriellaAI/REV and OpheliaAI/REV now instantiate their actual models, skins,
+inventories and independent animation tables. Original decisions, two-weapon
+switching, standing/crouched/running attacks, escape and timed sidesteps are
+connected to the existing checked AI lifecycle. [Contracts](../../contracts/chosen_ai_contracts.md)
+record sniper, no-weapon, target-loss, missing-break and velocity quirks.
+
+[Audit 11](evidence/all-levels-audit-11.log) remains **49 / 58 passing**, with
+seven fewer unported source entries and no new creation failures. Remaining
+implementations: IshmaelAI/REV and Orb, EnhancedGideon, UndeadGideon,
+AncientOne/tentacles and FlagStand/FlagObject. The four affected worlds still
+require these other original classes; no admission check is bypassed.
+
+[50 Dev tests](evidence/all-levels-lot13-dev.log) pass: Chosen profiles/actions/
+authored worlds plus AI runtime/fire and Fanatic/Prophet regressions. Tests verify
+all difficulties, table separation, real alternate/primary shots, sniper crouch,
+virtual two-animation weapon switching, one-second sidestep velocity and escape
+fallbacks. All seven authored instances initialize.
+
+The [initial run](evidence/all-levels-lot13-initial.log) exposed a fixture reusing
+collision after world unload. The [second run](evidence/all-levels-lot13-second.log)
+tried to initialize the same session twice and aimed a sniper through an intervening
+actor; both fixture errors are corrected, without weakening collision or lifecycle.
+
+[All 50 ASan/UBSan tests](evidence/all-levels-lot13-sanitizers.log) pass with
+leak detection enabled (153.44 seconds).
+
+[Four Release tests](evidence/all-levels-lot13-release.log) pass, including GPU
+readback of all four actual model/skin pairs at three clip times.
+[Detailed results](evidence/all-levels-lot13-release-detail.log): 23,600 filled
+pixels, zero CPU/GPU differences. Captures were visually inspected. Dev inspector
+and Release applications build; no shader, renderer or dependency changes.
+These focused checks are not full encounter/traversal acceptance.
+
+![Gabriella](evidence/all-levels-chosen-0.png)
+![Ophelia](evidence/all-levels-chosen-1.png)
+![Gabriella revenant](evidence/all-levels-chosen-2.png)
+![Ophelia revenant](evidence/all-levels-chosen-3.png)

@@ -1,0 +1,26 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1166: chosen_ai.profiles
+1/3 Test #1166: chosen_ai.profiles ...............***Failed    0.02 sec
+setup:25: g.initialize() && g.resources.mount_game(config, error)
+profiles:52: setup(g, root)
+
+    Start 1167: chosen_ai.actions
+2/3 Test #1167: chosen_ai.actions ................***Failed    0.02 sec
+actions:138: o->Fire(true) && o->fire_shots == 1 && o->alternate_choices == 0
+
+    Start 1168: chosen_ai.worlds
+3/3 Test #1168: chosen_ai.worlds .................   Passed    0.12 sec
+
+33% tests passed, 2 tests failed out of 3
+
+Label Time Summary:
+chosen_ai    =   0.16 sec*proc (3 tests)
+headless     =   0.16 sec*proc (3 tests)
+private      =   0.16 sec*proc (3 tests)
+
+Total Test time (real) =   0.17 sec
+
+The following tests FAILED:
+	1166 - chosen_ai.profiles (Failed)                       chosen_ai headless private
+	1167 - chosen_ai.actions (Failed)                        chosen_ai headless private
+Errors while running CTest

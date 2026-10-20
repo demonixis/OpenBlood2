@@ -2799,3 +2799,18 @@ if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
     set_tests_properties(gpu.warp_gate PROPERTIES LABELS "gpu;private;warp" TIMEOUT 120 RUN_SERIAL TRUE
         ENVIRONMENT "SDL_AUDIODRIVER=dummy" FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
 endif()
+
+add_executable(chosen_ai_tests chosen_ai_tests.cpp)
+target_link_libraries(chosen_ai_tests PRIVATE blood2_game)
+blood2_project_options(chosen_ai_tests)
+if(BLOOD2_TEST_DATA_DIR)
+    foreach(case profiles actions worlds)
+        add_test(NAME chosen_ai.${case} COMMAND chosen_ai_tests "${case}" "${BLOOD2_TEST_DATA_DIR}")
+        set_tests_properties(chosen_ai.${case} PROPERTIES LABELS "headless;private;chosen_ai" TIMEOUT 180)
+    endforeach()
+endif()
+
+if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
+    add_test(NAME gpu.chosen_models COMMAND model_skinning_gpu_tests "${CMAKE_CURRENT_BINARY_DIR}/chosen-model" "${BLOOD2_TEST_DATA_DIR}" chosen)
+    set_tests_properties(gpu.chosen_models PROPERTIES LABELS "gpu;private;chosen_ai" TIMEOUT 120 RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+endif()

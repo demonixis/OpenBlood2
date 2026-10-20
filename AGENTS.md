@@ -1,5 +1,11 @@
 # Blood2 Project Instructions
 
+The [Gabriella/Ophelia continuation](Documentation/contracts/chosen_ai_contracts.md) adds original AI/REV profiles,
+combat, weapon switching, escape and timed sidesteps. Preserve independent class
+tables, Ophelia's sniper crouch, revenant target-loss branches, original empty
+inventory behavior and checked lifetime. Remaining Chosen/bosses/flags stay in
+the complete-level backlog; M2 closure is unchanged.
+
 The [Office spawn continuation](Documentation/contracts/pickup_contracts.md#spawn-classes-absent-from-the-original)
 retains the original destructible tv01 while TheAngerPU resolves to no class and
 spawns nothing. Preserve explicit absent-class reports and reject unaudited names;

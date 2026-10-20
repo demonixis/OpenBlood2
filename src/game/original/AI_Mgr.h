@@ -117,12 +117,17 @@ class AI_Mgr : public CBaseCharacter
         DrudgePriest,
         DeathShroud,
         TheHand,
-        Caleb
+        Caleb,
+        Gabriella,
+        GabriellaREV,
+        Ophelia,
+        OpheliaREV
     };
     static void ResetRuntimeTables();
     // Shared class/gender tables: Cultist m/f, Civilian m/f, Gideon, Fanatic, Prophet, SoulDrudge, Shikari,
-    // MadScientist, BoneLeech, DrudgeLord, Thief, Naga, Zealot, Behemoth, Priest, Shroud, Hand, Caleb.
-    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 20>;
+    // MadScientist, BoneLeech, DrudgeLord, Thief, Naga, Zealot, Behemoth, Priest, Shroud, Hand, Caleb,
+    // Gabriella/REV and Ophelia/REV (four independent original static tables).
+    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 24>;
     // Original WeaponStrToInt prefixes; false for a matched family not integrated here.
     static bool WeaponStrToInt(std::string_view, DBYTE&);
     static void ExchangeRuntimeTables(RuntimeTables&);
@@ -319,7 +324,7 @@ class AI_Mgr : public CBaseCharacter
     int recoil_node = -1, recoil_slot = -1;
     std::string damage_reaction_error;
     virtual bool MC_Idle();
-    bool MC_BestWeapon();
+    virtual bool MC_BestWeapon();
     virtual bool MC_Fire_Stand();
     bool MC_Fire_Crouch();
     bool CheckClearShot(DVector origin, DVector& direction, bool alternate = false);

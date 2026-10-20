@@ -1,4 +1,5 @@
 #include "game/original/AI_Mgr.h"
+#include "game/original/ChosenAI.h"
 #include "game/original/Corpse.h"
 #include "game/original/CultistAI.h"
 #include "game/original/Fanatic.h"
@@ -593,6 +594,17 @@ namespace OpenBlood2
                 ImGui::Text("Melee swings %llu (clip %d) | alternate fire choices %llu",
                             (unsigned long long)p->melee_swings, p->melee_roll,
                             (unsigned long long)p->alternate_choices);
+        }
+        if (const auto* chosen = dynamic_cast<const ChosenAI*>(target_ai);
+            chosen && ImGui::CollapsingHeader("Original Chosen actions", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::Text("%s | revenant %s | attack updates %llu", chosen->Ophelia() ? "Ophelia" : "Gabriella",
+                        chosen->Revenant() ? "yes" : "no", (unsigned long long)chosen->crouch_attack_updates);
+            ImGui::Text("Alternate choices %llu | weapon switches %llu | sidesteps %llu",
+                        (unsigned long long)chosen->alternate_choices, (unsigned long long)chosen->weapon_switches,
+                        (unsigned long long)chosen->sidesteps);
+            ImGui::Text("Distance %.2f | height %.2f | dodge flags 0x%x | command %d", chosen->crouch_attack_distance,
+                        chosen->crouch_attack_height, unsigned(chosen->m_nDodgeFlags), chosen->m_nCurMetacmd);
         }
         if (const auto* boss = dynamic_cast<const Gideon*>(target_ai);
             boss && ImGui::CollapsingHeader("Original Gideon combat actions", ImGuiTreeNodeFlags_DefaultOpen))

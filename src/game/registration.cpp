@@ -8,6 +8,7 @@
 #include "game/original/CameraObj.h"
 #include "game/original/CameraSpot.h"
 #include "game/original/CampaignProjectiles.h"
+#include "game/original/ChosenAI.h"
 #include "game/original/CinematicTrigger.h"
 #include "game/original/CivilianAI.h"
 #include "game/original/ClientExplosionSFX.h"
@@ -572,6 +573,34 @@ namespace OpenBlood2
                                        {"DamageRadius", 300.0f},
                                        {"Sound", std::string("Sounds\\Thunder.wav")},
                                        {"SoundRadius", 1000.0f}}};
+        const ClassInfo chosen_GabriellaAI{"GabriellaAI",
+                                           &ai_manager,
+                                           construct_npc<GabriellaAI, AI_Mgr::NPCType::Gabriella>,
+                                           {{"AIState", std::string("PASSIVE"), true, 31},
+                                            {"AIWeapon1", std::string("MINIGUN"), true, 31},
+                                            {"AIWeapon2", std::string("NAPALM"), true, 31},
+                                            {"Dims", DVector{12, 46, 12}}}};
+        const ClassInfo chosen_GabriellaREV{"GabriellaREV",
+                                            &ai_manager,
+                                            construct_npc<GabriellaREV, AI_Mgr::NPCType::GabriellaREV>,
+                                            {{"AIState", std::string("PASSIVE"), true, 31},
+                                             {"AIWeapon1", std::string("MINIGUN"), true, 31},
+                                             {"AIWeapon2", std::string("NAPALM"), true, 31},
+                                             {"Dims", DVector{12, 46, 12}}}};
+        const ClassInfo chosen_OpheliaAI{"OpheliaAI",
+                                         &ai_manager,
+                                         construct_npc<OpheliaAI, AI_Mgr::NPCType::Ophelia>,
+                                         {{"AIState", std::string("PASSIVE"), true, 31},
+                                          {"AIWeapon1", std::string("TESLA"), true, 31},
+                                          {"AIWeapon2", std::string("SNIPER"), true, 31},
+                                          {"Dims", DVector{12, 46, 12}}}};
+        const ClassInfo chosen_OpheliaREV{"OpheliaREV",
+                                          &ai_manager,
+                                          construct_npc<OpheliaREV, AI_Mgr::NPCType::OpheliaREV>,
+                                          {{"AIState", std::string("PASSIVE"), true, 31},
+                                           {"AIWeapon1", std::string("TESLA"), true, 31},
+                                           {"AIWeapon2", std::string("SNIPER"), true, 31},
+                                           {"Dims", DVector{12, 46, 12}}}};
         const ClassInfo caleb_ai{"CalebAI",
                                  &ai_manager,
                                  construct_npc<CalebAI, AI_Mgr::NPCType::Caleb>,
@@ -1235,7 +1264,9 @@ namespace OpenBlood2
                objects.register_class(game_start) && objects.register_class(path) &&
                objects.register_class(world_properties) && objects.register_class(smell) &&
                objects.register_class(exit_hint) && objects.register_class(character) &&
-               objects.register_class(ai_manager) && objects.register_class(caleb_ai) &&
+               objects.register_class(ai_manager) && objects.register_class(chosen_GabriellaAI) &&
+               objects.register_class(chosen_GabriellaREV) && objects.register_class(chosen_OpheliaAI) &&
+               objects.register_class(chosen_OpheliaREV) && objects.register_class(caleb_ai) &&
                objects.register_class(sparks_obj) && objects.register_class(later_Behemoth) &&
                objects.register_class(later_DrudgePriest) && objects.register_class(later_DeathShroud) &&
                objects.register_class(later_TheHandAI) && objects.register_class(skull_projectile) &&

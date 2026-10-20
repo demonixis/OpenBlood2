@@ -1,0 +1,90 @@
+Start testing: Oct 20 12:12 CEST
+----------------------------------------------------------
+1282/1285 Testing: chosen_ai.profiles
+1282/1285 Test: chosen_ai.profiles
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/chosen_ai_tests" "profiles" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"chosen_ai.profiles" start time: Oct 20 12:12 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"chosen_ai.profiles" end time: Oct 20 12:12 CEST
+"chosen_ai.profiles" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1283/1285 Testing: chosen_ai.actions
+1283/1285 Test: chosen_ai.actions
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/chosen_ai_tests" "actions" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"chosen_ai.actions" start time: Oct 20 12:12 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"chosen_ai.actions" end time: Oct 20 12:12 CEST
+"chosen_ai.actions" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1284/1285 Testing: chosen_ai.worlds
+1284/1285 Test: chosen_ai.worlds
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/chosen_ai_tests" "worlds" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"chosen_ai.worlds" start time: Oct 20 12:12 CEST
+Output:
+----------------------------------------------------------
+23_rooftop OpheliaAI HP=401 armor=400
+24b_arena GabriellaREV HP=600.485 armor=600
+24b_arena OpheliaREV HP=400.737 armor=400
+25_ancientone OpheliaAI HP=400.399 armor=400
+25_ancientone GabriellaAI HP=600.032 armor=600
+end GabriellaAI HP=600.399 armor=600
+end OpheliaAI HP=400.032 armor=400
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"chosen_ai.worlds" end time: Oct 20 12:12 CEST
+"chosen_ai.worlds" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1285/1285 Testing: gpu.chosen_models
+1285/1285 Test: gpu.chosen_models
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/model_skinning_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/chosen-model" "/home/yann/.steam/steam/steamapps/common/Blood II" "chosen"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.chosen_models" start time: Oct 20 12:12 CEST
+Output:
+----------------------------------------------------------
+Synthetic mask 0 time 0: 3365/3365 filled, 0 differing, max delta 0
+Synthetic mask 0 time 37.5: 3489/3489 filled, 0 differing, max delta 0
+Synthetic mask 0 time 100: 3421/3421 filled, 0 differing, max delta 0
+Synthetic mask 1 time 0: 1737/1737 filled, 0 differing, max delta 0
+Synthetic mask 1 time 37.5: 1929/1929 filled, 0 differing, max delta 0
+Synthetic mask 1 time 100: 1987/1987 filled, 0 differing, max delta 0
+Synthetic mask 2 time 0: 1526/1526 filled, 0 differing, max delta 0
+Synthetic mask 2 time 37.5: 1412/1412 filled, 0 differing, max delta 0
+Synthetic mask 2 time 100: 1103/1103 filled, 0 differing, max delta 0
+Retail CPU/GPU skinning equivalence: 4 distinct assets at three clip times, 23600 filled pixels, 0 differing by more than 1, max delta 0
+GPU skinning matches CPU posing, deformation, scale, hidden faces and instance transforms
+<end of output>
+Test time =   0.90 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.chosen_models" end time: Oct 20 12:12 CEST
+"gpu.chosen_models" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 20 12:12 CEST
+
+chosen_ai =   1.11 sec*proc
+
+gpu =   0.90 sec*proc
+
+headless =   0.21 sec*proc
+
+private =   1.11 sec*proc
+

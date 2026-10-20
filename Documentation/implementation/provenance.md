@@ -1665,3 +1665,13 @@ brush/destruction behavior. LifeLeechPU is added to the typed spawn allowlist.
 [Source hashes](sources/all_levels_office_spawn_sources.json) and
 [pickup contracts](../contracts/pickup_contracts.md#spawn-classes-absent-from-the-original)
 record the evidence. Neither class aliases nor altered commercial data are used.
+
+### Complete-level continuation: Gabriella and Ophelia
+
+Four original AI/REV classes share identical methods in ChosenAI while retaining
+source-specific sniper, target-loss and no-weapon branches. Original static
+animation tables remain distinct. Constructor profiles, Fire, ComputeState,
+MC_BestWeapon, attacks, escape and Dodge/AI_Mgr sidesteps come from the
+[hashed originals](sources/all_levels_chosen_ai_sources.json).
+[Contracts](../contracts/chosen_ai_contracts.md) record finite checked adaptations
+and source quirks. Reference sources, retail data and graphics stack are unchanged.

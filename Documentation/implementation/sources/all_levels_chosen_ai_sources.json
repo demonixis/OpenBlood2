@@ -1,0 +1,45 @@
+{
+  "selection": "Original GabriellaAI/REV and OpheliaAI/REV profiles, decisions, weapon switching, combat, escape and timed sidesteps",
+  "sources": [
+    {
+      "path": "sources/blood2/ObjectDLL/GabriellaAI.cpp",
+      "sha256": "25efe3b357388d93221df4cc48eba4b734ada0488fd99dcd70dcd9162a8b0d5d"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GabriellaAI.h",
+      "sha256": "693f8577751682d8d3ea4cdb2d9a163a51e2873604a4a1d7b622e337db70f7f2"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GabriellaREV.cpp",
+      "sha256": "00c1a9c34b44e80561b4f296440000dc3471385db1cb24f07cc1f06c4df4af0e"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GabriellaREV.h",
+      "sha256": "841e1895588be91628deda7c760ff6cac852afc0d23fa30139066a2868fdb923"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/OpheliaAI.cpp",
+      "sha256": "e18f8aa096ef2bcab5d88eb0ae0dee7aa06bcc140ae0a266386ba7e79a239547"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/OpheliaAI.h",
+      "sha256": "85895c7fc0672fdc0bf4b076816114ed275e2eb4b7e49fa0eba29e8e90ddb731"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/OpheliaREV.cpp",
+      "sha256": "d160961a781f463793f0a74196045c1ea78de13efccb36baf90a63c43b4a7951"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/OpheliaREV.h",
+      "sha256": "b5c775f8e90a7dc9d9fa5849db4e199affc67529923a7c2bde74970f01fcef37"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350"
+    }
+  ]
+}

@@ -174,6 +174,21 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
         npc_weapons[0] = leech ? "BONELEECH_SUCK" : "SOUL_HOOK";
         npc_weapons[1] = leech ? "NONE" : "FIREBALL";
     }
+    if (type == NPCType::Gabriella || type == NPCType::GabriellaREV || type == NPCType::Ophelia ||
+        type == NPCType::OpheliaREV)
+    {
+        const bool ophelia = type == NPCType::Ophelia || type == NPCType::OpheliaREV;
+        m_fHearingDist = m_fSeeingDist = 1500;
+        m_fRollSpeed = 105;
+        m_fJumpSpeed = 400;
+        m_dwFlags = 0x0b;
+        npc_hp = npc_armor = ophelia ? 400 : 600;
+        m_szAIState = "PASSIVE";
+        npc_weapons[0] = ophelia ? "TESLA" : "MINIGUN";
+        npc_weapons[1] = ophelia ? "SNIPER" : "NAPALM";
+        npc_ammo = {
+            500, ophelia ? 100.f : 0.f, 150, 50, 100, 100, ophelia ? 500.f : 400.f, ophelia ? 500.f : 600.f, 500, 0};
+    }
     if (type == NPCType::Caleb)
     {
         m_fHearingDist = 0;
@@ -398,6 +413,15 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
         model = "Models/Enemies/" + name + ".abc";
         skin = "Skins/Enemies/" + name + ".dtx";
     }
+    else if (npc_type == NPCType::Gabriella || npc_type == NPCType::GabriellaREV || npc_type == NPCType::Ophelia ||
+             npc_type == NPCType::OpheliaREV)
+    {
+        const bool ophelia = npc_type == NPCType::Ophelia || npc_type == NPCType::OpheliaREV;
+        const bool revenant = npc_type == NPCType::GabriellaREV || npc_type == NPCType::OpheliaREV;
+        const std::string name = ophelia ? "ophelia" : "gabriella";
+        model = "Models/Characters/" + name + ".abc";
+        skin = "Skins/Characters/" + (revenant ? std::string(ophelia ? "ophrev" : "gabrev") : name) + ".dtx";
+    }
     else if (npc_type == NPCType::Caleb)
     {
         model = "Models/Characters/caleb.abc";
@@ -483,7 +507,11 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     if (runtime_initialized || reason == INITIALUPDATE_SAVEGAME || !s->IsObjectAlive(m_hObject))
         return RuntimeFailure("Invalid or repeated NPC initialization");
     const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
-    const auto group = npc_type == NPCType::Caleb          ? 19
+    const auto group = npc_type == NPCType::Gabriella      ? 20
+                       : npc_type == NPCType::GabriellaREV ? 21
+                       : npc_type == NPCType::Ophelia      ? 22
+                       : npc_type == NPCType::OpheliaREV   ? 23
+                       : npc_type == NPCType::Caleb        ? 19
                        : npc_type == NPCType::Behemoth     ? 15
                        : npc_type == NPCType::DrudgePriest ? 16
                        : npc_type == NPCType::DeathShroud  ? 17
@@ -545,25 +573,28 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         if (!npc_male && !initialize_table(3, !tables[3], "sounds/enemies/f_civ"))
             return RuntimeFailure("NPC female animation table initialization failed");
     }
-    else if (!initialize_table(group, !tables[group],
-                               npc_type == NPCType::Caleb          ? "sounds/chosen/caleb"
-                               : npc_type == NPCType::Behemoth     ? "sounds/enemies/Behemoth"
-                               : npc_type == NPCType::DrudgePriest ? "sounds/enemies/drudgepriest"
-                               : npc_type == NPCType::DeathShroud  ? "sounds/enemies/DeathShroud"
-                               : npc_type == NPCType::TheHand      ? "sounds/enemies/TheHand"
-                               : npc_type == NPCType::Thief        ? "sounds/enemies/Thief"
-                               : npc_type == NPCType::Naga         ? "sounds/enemies/Naga"
-                               : npc_type == NPCType::Zealot       ? "sounds/enemies/Zealot"
-                               : npc_type == NPCType::BoneLeech    ? "sounds/enemies/boneleech"
-                               : npc_type == NPCType::DrudgeLord   ? "sounds/enemies/drudgelord"
-                               : npc_type == NPCType::Gideon       ? "sounds/enemies/Gideon"
-                               : npc_type == NPCType::Fanatic      ? "sounds/enemies/fanatic"
-                               : npc_type == NPCType::Prophet      ? "sounds/enemies/Prophet"
-                               : npc_type == NPCType::SoulDrudge   ? "sounds/enemies/souldrudge"
-                               : npc_type == NPCType::Shikari      ? "sounds/enemies/shikari"
-                               : npc_type == NPCType::MadScientist ? "sounds/enemies/madscientist"
-                               : male_group                        ? "sounds/enemies/m_cultist"
-                                                                   : "sounds/enemies/f_cultist"))
+    else if (!initialize_table(
+                 group, !tables[group],
+                 (npc_type == NPCType::Gabriella || npc_type == NPCType::GabriellaREV) ? "sounds/chosen/gabriella"
+                 : (npc_type == NPCType::Ophelia || npc_type == NPCType::OpheliaREV)   ? "sounds/chosen/ophelia"
+                 : npc_type == NPCType::Caleb                                          ? "sounds/chosen/caleb"
+                 : npc_type == NPCType::Behemoth                                       ? "sounds/enemies/Behemoth"
+                 : npc_type == NPCType::DrudgePriest                                   ? "sounds/enemies/drudgepriest"
+                 : npc_type == NPCType::DeathShroud                                    ? "sounds/enemies/DeathShroud"
+                 : npc_type == NPCType::TheHand                                        ? "sounds/enemies/TheHand"
+                 : npc_type == NPCType::Thief                                          ? "sounds/enemies/Thief"
+                 : npc_type == NPCType::Naga                                           ? "sounds/enemies/Naga"
+                 : npc_type == NPCType::Zealot                                         ? "sounds/enemies/Zealot"
+                 : npc_type == NPCType::BoneLeech                                      ? "sounds/enemies/boneleech"
+                 : npc_type == NPCType::DrudgeLord                                     ? "sounds/enemies/drudgelord"
+                 : npc_type == NPCType::Gideon                                         ? "sounds/enemies/Gideon"
+                 : npc_type == NPCType::Fanatic                                        ? "sounds/enemies/fanatic"
+                 : npc_type == NPCType::Prophet                                        ? "sounds/enemies/Prophet"
+                 : npc_type == NPCType::SoulDrudge                                     ? "sounds/enemies/souldrudge"
+                 : npc_type == NPCType::Shikari                                        ? "sounds/enemies/shikari"
+                 : npc_type == NPCType::MadScientist                                   ? "sounds/enemies/madscientist"
+                 : male_group                                                          ? "sounds/enemies/m_cultist"
+                                                                                       : "sounds/enemies/f_cultist"))
         return RuntimeFailure("NPC shared animation table initialization failed: " + table_error);
     auto table = tables[group];
     if (!InitStatics(table) || !m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))

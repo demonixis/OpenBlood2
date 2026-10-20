@@ -1,0 +1,113 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  427: ai_fire.selection
+ 1/50 Test  #427: ai_fire.selection ................   Passed    0.02 sec
+      Start  428: ai_fire.clearance
+ 2/50 Test  #428: ai_fire.clearance ................   Passed    0.02 sec
+      Start  429: ai_fire.filters
+ 3/50 Test  #429: ai_fire.filters ..................   Passed    0.03 sec
+      Start  430: ai_fire.head
+ 4/50 Test  #430: ai_fire.head .....................   Passed    0.02 sec
+      Start  431: ai_fire.aim
+ 5/50 Test  #431: ai_fire.aim ......................   Passed    0.02 sec
+      Start  432: ai_fire.keys
+ 6/50 Test  #432: ai_fire.keys .....................   Passed    0.02 sec
+      Start  433: ai_fire.cadence
+ 7/50 Test  #433: ai_fire.cadence ..................   Passed    0.02 sec
+      Start  434: ai_fire.recovery
+ 8/50 Test  #434: ai_fire.recovery .................   Passed    0.02 sec
+      Start  435: ai_fire.failures
+ 9/50 Test  #435: ai_fire.failures .................   Passed    0.02 sec
+      Start  436: ai_fire.lifetime
+10/50 Test  #436: ai_fire.lifetime .................   Passed    0.03 sec
+      Start  437: ai_fire.script_stand
+11/50 Test  #437: ai_fire.script_stand .............   Passed    0.03 sec
+      Start  438: ai_fire.script_moving
+12/50 Test  #438: ai_fire.script_moving ............   Passed    0.03 sec
+      Start  439: ai_fire.script_refusal
+13/50 Test  #439: ai_fire.script_refusal ...........   Passed    0.03 sec
+      Start  440: ai_fire.script_lifetime
+14/50 Test  #440: ai_fire.script_lifetime ..........   Passed    0.03 sec
+      Start  441: ai_fire.script_routes
+15/50 Test  #441: ai_fire.script_routes ............   Passed    0.03 sec
+      Start  442: ai_fire.catalog
+16/50 Test  #442: ai_fire.catalog ..................   Passed    0.97 sec
+      Start  443: ai_fire.subway
+17/50 Test  #443: ai_fire.subway ...................   Passed   12.75 sec
+      Start  444: ai_fire.script_private
+18/50 Test  #444: ai_fire.script_private ...........   Passed   17.67 sec
+      Start  526: ai_runtime.ammo_receive
+19/50 Test  #526: ai_runtime.ammo_receive ..........   Passed    0.02 sec
+      Start  527: ai_runtime.ammo_search
+20/50 Test  #527: ai_runtime.ammo_search ...........   Passed    0.02 sec
+      Start  528: ai_runtime.activation
+21/50 Test  #528: ai_runtime.activation ............   Passed    0.02 sec
+      Start  529: ai_runtime.animation_clearance
+22/50 Test  #529: ai_runtime.animation_clearance ...   Passed    0.03 sec
+      Start  530: ai_runtime.visibility
+23/50 Test  #530: ai_runtime.visibility ............   Passed    0.02 sec
+      Start  531: ai_runtime.visibility_filter
+24/50 Test  #531: ai_runtime.visibility_filter .....   Passed    0.03 sec
+      Start  532: ai_runtime.visibility_atomic
+25/50 Test  #532: ai_runtime.visibility_atomic .....   Passed    0.02 sec
+      Start  533: ai_runtime.lifetime
+26/50 Test  #533: ai_runtime.lifetime ..............   Passed    0.03 sec
+      Start  534: ai_runtime.targets
+27/50 Test  #534: ai_runtime.targets ...............   Passed    0.02 sec
+      Start  535: ai_runtime.tracking
+28/50 Test  #535: ai_runtime.tracking ..............   Passed    0.02 sec
+      Start  536: ai_runtime.camera
+29/50 Test  #536: ai_runtime.camera ................   Passed    0.02 sec
+      Start  537: ai_runtime.spatial
+30/50 Test  #537: ai_runtime.spatial ...............   Passed    0.02 sec
+      Start  538: ai_runtime.triggers
+31/50 Test  #538: ai_runtime.triggers ..............   Passed    0.02 sec
+      Start  539: ai_runtime.body
+32/50 Test  #539: ai_runtime.body ..................   Passed    0.02 sec
+      Start  540: ai_runtime.missing
+33/50 Test  #540: ai_runtime.missing ...............   Passed    0.02 sec
+      Start  541: ai_runtime.catalog
+34/50 Test  #541: ai_runtime.catalog ...............   Passed    2.25 sec
+      Start  542: ai_runtime.failures
+35/50 Test  #542: ai_runtime.failures ..............   Passed    0.39 sec
+      Start  543: ai_runtime.subway
+36/50 Test  #543: ai_runtime.subway ................   Passed   22.79 sec
+      Start  544: ai_runtime.arena
+37/50 Test  #544: ai_runtime.arena .................   Passed    1.76 sec
+      Start  545: ai_runtime.sparse_weapons
+38/50 Test  #545: ai_runtime.sparse_weapons ........   Passed    0.62 sec
+      Start  546: ai_runtime.clearance_private
+39/50 Test  #546: ai_runtime.clearance_private .....   Passed   78.60 sec
+      Start  547: ai_runtime.ammo_private
+40/50 Test  #547: ai_runtime.ammo_private ..........   Passed    1.34 sec
+      Start 1079: fanatic_prophet.weapons
+41/50 Test #1079: fanatic_prophet.weapons ..........   Passed    0.02 sec
+      Start 1080: fanatic_prophet.decisions
+42/50 Test #1080: fanatic_prophet.decisions ........   Passed    0.02 sec
+      Start 1081: fanatic_prophet.howitzer
+43/50 Test #1081: fanatic_prophet.howitzer .........   Passed    0.02 sec
+      Start 1082: fanatic_prophet.catalog
+44/50 Test #1082: fanatic_prophet.catalog ..........   Passed    1.39 sec
+      Start 1083: fanatic_prophet.kamikaze
+45/50 Test #1083: fanatic_prophet.kamikaze .........   Passed    1.25 sec
+      Start 1084: fanatic_prophet.actions
+46/50 Test #1084: fanatic_prophet.actions ..........   Passed    0.65 sec
+      Start 1085: fanatic_prophet.world
+47/50 Test #1085: fanatic_prophet.world ............   Passed    1.94 sec
+      Start 1157: chosen_ai.profiles
+48/50 Test #1157: chosen_ai.profiles ...............   Passed    1.75 sec
+      Start 1158: chosen_ai.actions
+49/50 Test #1158: chosen_ai.actions ................   Passed    0.59 sec
+      Start 1159: chosen_ai.worlds
+50/50 Test #1159: chosen_ai.worlds .................   Passed    5.91 sec
+
+100% tests passed, 0 tests failed out of 50
+
+Label Time Summary:
+ai_fire            =  31.77 sec*proc (18 tests)
+ai_runtime         = 108.10 sec*proc (22 tests)
+chosen_ai          =   8.26 sec*proc (3 tests)
+fanatic_prophet    =   5.29 sec*proc (7 tests)
+headless           = 153.42 sec*proc (50 tests)
+private            = 152.62 sec*proc (17 tests)
+
+Total Test time (real) = 153.44 sec

@@ -1,0 +1,19 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 1282: chosen_ai.profiles
+1/4 Test #1282: chosen_ai.profiles ...............   Passed    0.06 sec
+    Start 1283: chosen_ai.actions
+2/4 Test #1283: chosen_ai.actions ................   Passed    0.02 sec
+    Start 1284: chosen_ai.worlds
+3/4 Test #1284: chosen_ai.worlds .................   Passed    0.13 sec
+    Start 1285: gpu.chosen_models
+4/4 Test #1285: gpu.chosen_models ................   Passed    0.90 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+chosen_ai    =   1.11 sec*proc (4 tests)
+gpu          =   0.90 sec*proc (1 test)
+headless     =   0.21 sec*proc (3 tests)
+private      =   1.11 sec*proc (4 tests)
+
+Total Test time (real) =   1.13 sec
