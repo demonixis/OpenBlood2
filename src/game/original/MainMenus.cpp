@@ -129,12 +129,19 @@ namespace OpenBlood2
                 AddLargeTextItemOption(IDS_MENU_MOUSE_USEWHEEL, -1);
                 break;
             case MenuPage::Load:
-                AddLargeTextItemOption(IDS_MENU_LOADGAME_RESTART, -1);
-                AddLargeTextItemOption(IDS_MENU_LOADGAME_QUICKLOAD, -1);
-                [[fallthrough]];
+                // CMenuLoadGame::InitSavedGameSlots: "RESTART: %s", "QUICKLOAD: %s", then the slots.
+                items.push_back({IDS_MENU_LOADGAME_RESTART, int(MENU_CMD_LOAD_SAVE_GAME), saves.restart.loadable,
+                                 {}, -1, {}, {}, saves.restart.name});
+                items.push_back({IDS_MENU_LOADGAME_QUICKLOAD, int(MENU_CMD_LOAD_SAVE_GAME), saves.quick.loadable,
+                                 {}, -1, {}, {}, saves.quick.name});
+                for (const auto& slot : saves.slots)
+                    items.push_back({0, int(MENU_CMD_LOAD_SAVE_GAME), slot.loadable, slot.name, -1, {}});
+                break;
             case MenuPage::Save:
-                for (unsigned i = 0; i < 8; ++i)
-                    items.push_back({0, -1, false, "Slot " + std::to_string(i + 1) + " - unavailable", -1, {}});
+                // CMenuSaveGame::InitSavedGameSlots: the eight slot names; any slot may be overwritten.
+                for (const auto& slot : saves.slots)
+                    items.push_back({0, int(MENU_CMD_SAVE_GAME), in_world && alive && saves.unavailable.empty(),
+                                     slot.name, -1, {}});
                 break;
             case MenuPage::Quit:
                 items.push_back({0, int(MENU_CMD_EXIT), true, "Yes", -1, {}});
@@ -180,7 +187,28 @@ namespace OpenBlood2
         active = true;
         pending_ = {};
         error.clear();
+        top = MenuPage::Main;
         build(MenuPage::Main);
+    }
+    void Menu::open_load(bool world, bool living)
+    {
+        open(world, living);
+        if (demo())
+            return; // Original _DEMO opens the main menu.
+        top = MenuPage::Load;
+        build(MenuPage::Load);
+    }
+    void Menu::set_saves(const MenuSaveSlots& next)
+    {
+        if (saves == next)
+            return;
+        saves = next;
+        if (!active || (page != MenuPage::Save && page != MenuPage::Load))
+            return;
+        const int keep = selected;
+        build(page);
+        if (keep >= 0 && keep < int(items.size()) && enabled(items[keep]))
+            selected = keep;
     }
     void Menu::close()
     {
@@ -204,15 +232,18 @@ namespace OpenBlood2
             return;
         }
         cue(MenuCue::Back);
+        if (page == top)
+        {
+            // Original VK_ESCAPE on the top-level menu: MenuReturnToGame only in a world.
+            if (in_world)
+            {
+                pending_.action = MenuAction::Resume;
+                close();
+            }
+            return;
+        }
         switch (page)
         {
-            case MenuPage::Main:
-                if (in_world)
-                {
-                    pending_.action = MenuAction::Resume;
-                    close();
-                }
-                break;
             case MenuPage::Solo:
             case MenuPage::Options:
             case MenuPage::Quit:
@@ -260,7 +291,8 @@ namespace OpenBlood2
         }
         if (!active || promotion != MenuPromotion::None || selected < 0 || selected >= int(items.size()) ||
             !enabled(items[selected]) || pending_.action == MenuAction::NewGame ||
-            pending_.action == MenuAction::Credits || pending_.action == MenuAction::Quit)
+            pending_.action == MenuAction::Credits || pending_.action == MenuAction::Quit ||
+            pending_.action == MenuAction::SaveGame || pending_.action == MenuAction::LoadGame)
             return;
         if (items[selected].setting >= 0)
         {
@@ -336,6 +368,14 @@ namespace OpenBlood2
                 break;
             case MENU_CMD_LOAD_GAME_MENU:
                 build(MenuPage::Load);
+                break;
+            case MENU_CMD_SAVE_GAME: // CMenuSaveGame::OnCommand: MenuSaveGame(row).
+                pending_.action = MenuAction::SaveGame;
+                pending_.slot = selected;
+                break;
+            case MENU_CMD_LOAD_SAVE_GAME: // CMenuLoadGame::OnCommand: Restart, Quickload, then row - 2.
+                pending_.action = MenuAction::LoadGame;
+                pending_.slot = selected == 0 ? -2 : selected == 1 ? -1 : selected - 2;
                 break;
             case MENU_CMD_QUIT:
                 if (demo())

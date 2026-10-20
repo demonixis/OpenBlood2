@@ -83,6 +83,8 @@ target_sources(blood2_game PRIVATE src/game/server_exits.cpp src/game/original/E
 target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
     src/game/original/InventoryMgr.cpp src/game/original/InventorySave.cpp src/game/original/Weapon.cpp src/game/original/Voodoo.cpp src/game/original/WeaponSound.cpp src/game/original/WeaponVector.cpp src/game/original/WeaponFX.cpp src/game/original/ViewWeapon.cpp)
 target_sources(blood2_game PRIVATE src/game/original/Music.cpp src/game/music_catalog.cpp)
+target_sources(blood2_game PRIVATE src/game/save_slots.cpp)
+target_include_directories(blood2_game PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
 target_sources(blood2_game PRIVATE src/game/original/MainMenus.cpp src/game/menu_canvas.cpp src/game/menu_audio.cpp
     src/game/menu_preferences.cpp src/game/new_game.cpp src/game/menu_resources.cpp)
 target_link_libraries(blood2_game PUBLIC engine)

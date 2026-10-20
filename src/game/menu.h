@@ -2,6 +2,7 @@
 #include "engine/hud_surface.h"
 #include "engine/string_resources.h"
 #include "game/menu_resources.h"
+#include <array>
 #include <optional>
 
 namespace OpenBlood2
@@ -27,7 +28,9 @@ namespace OpenBlood2
         NewGame,
         Credits, // Original MenuCredits: StartNewGame("Credits", CUSTOM, MEDIUM), or GS_CREDITS in a world.
         Quit,
-        Settings
+        Settings,
+        SaveGame, // Original MenuSaveGame(slot): slot 0..7.
+        LoadGame  // Original MenuLoadGame(slot): SLOT_CURRENT (-2, Restart), SLOT_QUICK (-1) or 0..7.
     };
     enum class MenuCue
     {
@@ -40,6 +43,23 @@ namespace OpenBlood2
         MenuAction action = MenuAction::None;
         unsigned character = 0, difficulty = 1;
         bool story = true;
+        int slot = 0; // SaveGame/LoadGame only.
+    };
+    // The owner's slot listing (CSavedGameInfo): names as the original menus print them, and
+    // whether a row can be activated. Load rows are enabled for readable and unreadable files, so
+    // an unreadable row reports its reason; empty rows are disabled.
+    struct MenuSaveRow
+    {
+        std::string name = "<EMPTY SLOT>";
+        bool loadable = false;
+        bool operator==(const MenuSaveRow&) const = default;
+    };
+    struct MenuSaveSlots
+    {
+        MenuSaveRow restart, quick;
+        std::array<MenuSaveRow, 8> slots;
+        std::string unavailable; // Nonempty when saves cannot be used at all (shown on both pages).
+        bool operator==(const MenuSaveSlots&) const = default;
     };
     struct MenuSettings
     {
@@ -66,6 +86,7 @@ namespace OpenBlood2
         // renderer, normal maps.
         int setting = -1;
         HudRect rect{}, slider_rect{};
+        std::string insertion; // FormatMessage %1!s! argument of the Load page's RESTART/QUICKLOAD strings.
     };
     // Typed service adapter for the selected original menu Build/OnCommand code.
     // No original client ABI or hidden dependency on ImGui/SDL input.
@@ -78,6 +99,12 @@ namespace OpenBlood2
             return edition_ == MenuEdition::Demo;
         }
         void open(bool in_world, bool alive = true);
+        // Original single-player death USE: SetCurrentMenu(MENU_ID_LOAD_GAME, MENU_ID_LOAD_GAME), so
+        // the Load page is the top level and Esc returns to the game.
+        void open_load(bool in_world, bool alive);
+        // Replaces the slot listing; a visible Save or Load page is rebuilt, keeping its selection.
+        void set_saves(const MenuSaveSlots&);
+        MenuSaveSlots saves;
         void show_promotion(MenuPromotion, bool exit = false);
         void dismiss_promotion();
         void end_demo();
@@ -97,7 +124,7 @@ namespace OpenBlood2
         MenuCommand take_command();
         bool active = false, in_world = false, alive = true;
         bool audio_failed = false; // Nonmodal application-owned audio status.
-        MenuPage page = MenuPage::Main;
+        MenuPage page = MenuPage::Main, top = MenuPage::Main;
         std::vector<MenuItem> items;
         std::vector<MenuCue> cues;
         MenuSettings settings;

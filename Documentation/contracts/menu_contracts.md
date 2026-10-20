@@ -107,8 +107,10 @@ paths. `--menu-smoke` never reads or writes normal preferences.
 ## UI-M5/UI-M6 screens and final traversal
 
 Save contains eight source slots; Load adds source Restart and Quickload rows.
-Every row is disabled and the screen explicitly says saving/loading is unavailable.
-No file snapshot or invented successful save is produced. Quit uses the original
+[Save/load lot 6](save_load_contracts.md#implemented-slots-quick-and-restart-lot-6) enables
+them over real slot files: the rows show the original slot names, a save or load closes the
+menu, a refusal keeps the page under the error modal, and death USE opens Load as the top
+level. The demo keeps no rows. Quit uses the original
 localized prompt with keyboard/mouse Yes/No controls (No selected initially); Y/N
 also confirm/cancel. BloodBath and custom levels remain disabled; Credits is covered
 by the [Credits entry](#credits-entry) section.
@@ -130,7 +132,8 @@ this case before delivery; the saturation test now checks it directly.
 The automated traversal tags its injected keyboard/mouse/focus events and excludes
 physical/compositor input noise only in `--menu-smoke`. Normal focus handling is
 unchanged and is separately exercised by input tests. Load labels substitute only
-the source `%1!s!` string insertion; unknown insertion syntax fails explicitly.
+the source `%1!s!` string insertion (the Restart and Quickload names); unknown insertion
+syntax fails explicitly.
 
 Audio failures use a persistent nonmodal bitmap-font notice and the application
 log; they never capture navigation. Application request/preference errors use a

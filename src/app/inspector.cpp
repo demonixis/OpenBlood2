@@ -1621,6 +1621,7 @@ namespace OpenBlood2
         ImGui::EndDisabled();
         draw_destination_trial(game);
         draw_level_change(game);
+        draw_saved_games(game);
         draw_destination(game);
         ImGui::BeginDisabled(player);
         if (ImGui::Button("Load destination for inspection"))

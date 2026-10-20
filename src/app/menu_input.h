@@ -18,6 +18,8 @@ namespace OpenBlood2
         // Owner-set CBloodClientShell::m_bRollCredits: key downs also reach the roll.
         bool roll_credits = false;
         bool credits_exit = false;
+        // Original F5/F6 (OnKeyDown, retail only): owned requests consumed at the frame boundary.
+        bool quick_save = false, quick_load = false;
         std::vector<int> credit_keys; // Original VK codes for CCredits::HandleInput.
         static int credits_vk(SDL_Scancode code)
         {
@@ -56,6 +58,7 @@ namespace OpenBlood2
                 return;
             }
             menu.cancel_pointer();
+            quick_save = quick_load = false;
             controls.player_changed(player && !menu.active && !credits_screen && !inspector);
         }
         // True means the caller should forward this event to ImGui's inspector.
@@ -183,6 +186,20 @@ namespace OpenBlood2
                 }
                 return false;
             }
+            // F5 quicksaves without pausing when in the world and alive; F6 quickloads in play,
+            // dead or alive. The single-player check belongs to the save itself (D12).
+            if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && !menu.demo() &&
+                (e.key.scancode == SDL_SCANCODE_F5 || e.key.scancode == SDL_SCANCODE_F6))
+            {
+                if (e.key.scancode == SDL_SCANCODE_F5 && player && alive)
+                    quick_save = true;
+                if (e.key.scancode == SDL_SCANCODE_F6 && player)
+                    quick_load = true;
+                return false;
+            }
+            if ((e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_KEY_UP) &&
+                (e.key.scancode == SDL_SCANCODE_F5 || e.key.scancode == SDL_SCANCODE_F6))
+                return false;
             // Diagnostic control shortcuts do not change interactive ownership.
             if ((e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_KEY_UP) &&
                 (e.key.scancode == SDL_SCANCODE_F1 || e.key.scancode == SDL_SCANCODE_F2 ||

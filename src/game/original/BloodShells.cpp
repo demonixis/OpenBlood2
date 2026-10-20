@@ -871,6 +871,11 @@ bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
             creature_light = 1;
         }
     }
+    if (pressed && death_camera.active)
+    {
+        dead_use_menu = true;
+        ++dead_use_menus;
+    }
     if (pressed)
         server.OnMessage(client_, OpenBlood2::PlayerUse{rotation});
     return true; // A blocked USE command does not terminate a valid session.

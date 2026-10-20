@@ -115,4 +115,7 @@ Old voice handles/deadlines are never transferred; rollback leaves them intact.
 [Save/load lot 5](save_load_contracts.md#implemented-player-and-client-lot-5): the transferred snapshot carries power flags with their relative
 expiries; the destination records client load type 2 and sets the original shell console
 values (`GAME_GOTOSTARTPOINT` 1, `GAME_REVISITING` 0, `GAME_DOAUTOSAVE` 1). A whole-game
-load reuses this promotion through `load_game`.
+load reuses this promotion through `load_game`. Since
+[lot 6](save_load_contracts.md#implemented-slots-quick-and-restart-lot-6) the frontend takes the
+level-entry snapshot after each commit, and a loaded game resets UI and input with the same
+`reset_after_promotion` as the commit.

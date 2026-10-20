@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-20",
+  "scope": "Save/load lot 6: slot, quick and level-entry files, META naming, the Load and Save menu rows, F5/F6, death to the Load menu and the level-entry snapshot. The slot rules, labels, commands and key guards were selected from the references below; the file layout, listing, notices and modals are replacement code over the lot 2 container. No original code was copied beyond the rules recorded in the provenance ledger.",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/LoadSave.cpp",
+      "source_sha256": "085b26a3d836a506a227e1c022642d703b0cc28df48f884e67981e43ee1911a2",
+      "purpose": "CSavedGameInfo: the \"<EMPTY SLOT>\" default (25, 41), LoadInfo/SaveInfo over SLOT_CURRENT, SLOT_QUICK and the eight slots (67-233), ClearSaveSlot and CopySlot as whole-directory operations (245-414), SetSlotName's world title plus the \" [%.15s]\" ctime suffix and the bare Current name (429-453)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/LoadSave.h",
+      "source_sha256": "4c3dd6f94958bd0c75c1f05c31546c68120b2042f0370b568de984ea63e02588",
+      "purpose": "MAX_SAVESLOTS 8, MAX_SAVENAME, SLOT_CURRENT -2, SLOT_QUICK -1, SLOT_NONE and the SavedInfo record."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MenuLoadGame.cpp",
+      "source_sha256": "35344ea4778488d7d577aab061f93d71cb50a1c5fee3b4ffe1b308166b4a7712",
+      "purpose": "InitSavedGameSlots: RESTART and QUICKLOAD formatted with the Current and Quick names, then the eight slot names; OnCommand row 0 SLOT_CURRENT, row 1 SLOT_QUICK, row n slot n - 2."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MenuSaveGame.cpp",
+      "source_sha256": "00e9910cb51493088091ab3dddf4b1556355586b77991901534154b6887f49eb",
+      "purpose": "InitSavedGameSlots: the eight slot names; OnCommand MenuSaveGame(row)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MenuCommands.h",
+      "source_sha256": "36bb2da68f333db41d557d05140f97618ef7f58689e03ce46a843cc281909f5e",
+      "purpose": "MENU_CMD_LOAD_SAVE_GAME 600 and MENU_CMD_SAVE_GAME 700."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MainMenus.cpp",
+      "source_sha256": "4e52be34bfd90c547c1e9c26ab7d77711aa873b91b67bb99112621d3f0172091",
+      "purpose": "SetCurrentMenu with a top-level menu id; VK_ESCAPE on the top-level menu returns to the game in a world (1137-1170); the Single Player menu's in-world, single-player and alive Save guard (806-817)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "36a810c80ce87eb2304716e9e1dbaae25304c02c542019b0858c9dc99f2d1006",
+      "purpose": "OnCommandOn COMMAND_USE while dead: single player opens the Load menu as the top level, _DEMO the main menu (3488-3526); OnKeyDown F5 quicksave without pausing and \"Quicksave...\", F6 quickload and \"Quickload...\" (3877-3896); MenuNewGame's ClearSaveSlot(SLOT_CURRENT) (8151-8185); MenuLoadGame (8325-8402) and MenuSaveGame (8413-8454); InitSinglePlayer's CMSG_AUTOSAVE (5378-5395); GetWorldTitle's worldname token and file-name fallback (7116-7210)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/ClientUtilities.cpp",
+      "source_sha256": "04d5e37bc480f40d31b2de74bd30eafee61fab0aa544bdff15403eac4b6194f4",
+      "purpose": "PrintError's inverted check (73-75): every original LoadSave error is silent, which D3 replaces with reported failures."
+    }
+  ]
+}

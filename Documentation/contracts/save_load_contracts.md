@@ -9,10 +9,12 @@ and candidate transaction) and 5 (player and client) are implemented; see their 
 [lot 4](../implementation/reports/save_load_session.md),
 [lot 5](../implementation/reports/save_load_player.md)). Lot 8 (movers and brushes,
 [evidence](../implementation/reports/save_load_movers.md)) declares its 18 classes Original.
-`GameSession::save_game` and `load_game` save and load in memory through a candidate session,
-with the local player and its client blob. Every other original class is AlwaysLoad, NotSaved
-or Unsupported, so a save of a real game is still refused by name, and no save reaches the game
-or a file yet. The other lots are pending.** The Save and Load screens stay disabled until the lots below land. The
+Lot 6 (slots, Quick and Restart, menus, [evidence](../implementation/reports/save_load_slots.md))
+writes and reads the slot, quick and level-entry files and enables the Save and Load screens,
+F5/F6 and the death Load menu. `GameSession::save_game` and `load_game` save and load through a
+candidate session, with the local player and its client blob. Every other original class is
+AlwaysLoad, NotSaved or Unsupported, so a save of a real game is still refused by name. The other
+lots are pending.** The
 [audit](../implementation/save_load_audit/readme.md) is the evidence for every
 original rule cited here; its [source ledger](../implementation/sources/save_load_audit_sources.json)
 records the audited files. Read [level replacement](level_change_contracts.md),
@@ -146,6 +148,7 @@ place OpenBlood2 differs.
 | D11 | No version or data check | Versioned container, game-data and mod fingerprint, per-class payload versions |
 | D12 | F2/F3 and the server handlers have no multiplayer guard | Saving and loading are refused outside single-player game types |
 | D13 | A restored model keeps the file precreate chose; the later runtime applies the saved animation trackers to it | The engine record's model and skin replace it before the animation track is checked and applied. CPlayerObj's precreate forces `Caleb.abc`, so another character would otherwise lose or refuse its track ([lot 5](#implemented-player-and-client-lot-5)) |
+| D14 | A failed autosave leaves the previous `Auto.sav`, so Restart can reach an earlier level | A refused level-entry snapshot removes `current.ob2sav` and the in-memory snapshot; Restart is then empty ([lot 6](#implemented-slots-quick-and-restart-lot-6)) |
 
 ## Save file format
 
@@ -614,7 +617,7 @@ Process-wide counters (message, audio and effect IDs) are never rewound.
 
 `GameSession::save_game` and `GameSession::load_game` (`src/game/saved_game.cpp`) work on an
 in-memory `GameSave`: the normalized world path, the fingerprint, and the `SaveObjects` image
-of `Current.sav`. Lot 6 wraps it in META and a slot file; nothing in the game calls them yet.
+of `Current.sav`. [Lot 6](#implemented-slots-quick-and-restart-lot-6) wraps it in META and a slot file.
 
 - **Save support.** `ClassInfo::save` is the declaration. AlwaysLoad is the original
   `CF_ALWAYSLOAD` and is inherited.
@@ -825,6 +828,98 @@ clears UI state on commit; lot 9 makes SeeingEye Original and replaces the throw
 refusal (its Load re-links the owner and sends `MID_ATTACH`); lot 11 declares the NPCs, whose
 `CMovement` records carry their own owner, and CCorpse, which reuses the `CDestructable`
 block and its owner reference.
+
+### Implemented slots, Quick and Restart (lot 6)
+
+`SaveSlots` (`src/game/save_slots.*`) turns the original `Save\SaveN`, `Save\Quick` and
+`Save\Current` directories into one container file each. `SaveFlow` (`src/app/save_flow.h`)
+connects them to the menus, F5/F6 and death; the frontend consumes its requests at the owning
+frame boundary. The original rules are `LoadSave.cpp`, `MenuLoadGame.cpp`, `MenuSaveGame.cpp` and
+`BloodClientShell.cpp` (`MenuSaveGame`, `MenuLoadGame`, `OnKeyDown`, `OnCommandOn`).
+
+- **Files** (decision 1). `SDL_GetPrefPath("OpenBlood2", "Blood2")/saves/retail/` holds
+  `slot0.ob2sav`–`slot7.ob2sav`, `quick.ob2sav` and `current.ob2sav`.
+  - A slot or quick file is a full save: META (kind slot with its number, or quick), FPRT, CONS,
+    CLCK, OBJS, LINK, ATCH and, when a level-entry snapshot exists, that snapshot as AUTO.
+  - `current.ob2sav` is the level-entry snapshot itself: a top-level container of kind level
+    entry with no AUTO. It is the Restart source.
+  - Every write uses `write_file_atomic` and removes stale temporaries of that file after the
+    rename. A refused or failed save keeps the previous file.
+  - A file whose META kind or slot differs from its name is refused as a format error.
+  - Smoke runs and the demo never use the directory.
+- **META.** The world title is the original `GetWorldTitle`: the last `worldname` token of the
+  DAT world info string (commands end at `;`, quotes group), else the world file name without
+  its directory and extension.
+  - A slot or the quicksave is named `title [Mmm dd hh:mm:ss]`, the original `SetSlotName`
+    suffix (`ctime` + 4, local time, space-padded day). The snapshot keeps the bare title, like
+    the original Current slot.
+  - Game type and difficulty come from the console and the character from the player. They are
+    informational: a load uses the saved console. The version text is the build's
+    `PROJECT_VERSION`.
+- **Listing.** At startup and after each save or load, the header and META of all ten files are
+  read (original `LoadInfo`).
+  - An empty slot reads `<EMPTY SLOT>`; an unreadable one reads `<UNREADABLE: fault>` with the
+    lot 2 fault name (a kind mismatch is `format`). Fingerprints are checked only on load.
+  - Load rows are enabled for readable and unreadable files, so activating an unreadable row
+    shows its full reason. Empty rows are disabled; the original returned FALSE silently.
+- **Save** (`MenuSaveGame`). `save_game` runs at the frame boundary, then the file is written.
+  A refusal by `SaveObjects` lists the classes without save support, as its report names them:
+  "This game cannot be saved yet. These classes have no save support: Class (Unsupported), …".
+  Any other refusal shows `save_game`'s reason.
+- **Level-entry snapshot** (the `CMSG_AUTOSAVE` round trip). It is taken after a menu New Game,
+  the Credits world, a NEW_LEVEL commit, an inspector level start and a direct `--view-world`
+  entry, and only while `GAME_DOAUTOSAVE` is nonzero, so never after a restore.
+  - `save_game` runs with `SAVETYPE_AUTO`: the request carries save type 0 and the image lands in
+    the logical `Auto` store, as `Auto.sav` did.
+  - The snapshot is kept in memory and written to `current.ob2sav`. New Game first removes both
+    (`ClearSaveSlot(SLOT_CURRENT)`); Credits does not, as `MenuCredits` does not.
+  - A refused snapshot is silent, like the original autosave: it is logged and shown in the
+    inspector. It removes both copies (D14). A failed file write keeps the snapshot in memory
+    and reports the error.
+- **Load** (`MenuLoadGame`). The whole file is read and decoded, including AUTO, before anything
+  changes. Its kind must match the slot. It becomes a `GameSave` (dwParam 0, console and portals,
+  the FPRT class list as the image's), and `load_game` runs.
+  - A fingerprint refusal also names the saved and the running OpenBlood2 versions (decision 6);
+    the mount differences come from `check_fingerprint` (decision 5).
+  - Only after promotion does the snapshot follow the file. Restart keeps its own. A slot or the
+    quicksave brings its AUTO into memory and `current.ob2sav`, or removes both when it has none,
+    so Restart always means the start of the loaded slot's level.
+  - Restart restores the snapshot through the same `LOADTYPE_RESTORESAVE` path. The original's
+    `LOADTYPE_RESTOREAUTOSAVE` differs only in the file `RestoreGame` reads; the client's load
+    type (3 instead of 4) is written to the blob and discarded on load.
+  - After a load the frontend clears the inspector selection, the controlled object, queued game
+    input, the F5/F6 and dead-USE requests and input ownership, as after the NEW_LEVEL commit
+    (`reset_after_promotion`), and excludes the preparation time from the next delta.
+- **Menus.** The Load page lists `RESTART: %s` and `QUICKLOAD: %s` (cres.dll strings 547 and 548,
+  with the `%1!s!` insertion), then the eight slot names; the Save page lists the eight names.
+  - Rows use the original `MENU_CMD_LOAD_SAVE_GAME` (600) and `MENU_CMD_SAVE_GAME` (700). Load
+    row 0 is `SLOT_CURRENT`, row 1 `SLOT_QUICK`, row n the slot n − 2.
+  - Save rows are enabled in the world, alive, with saves available. The Single Player menu's
+    Save Game row keeps its in-world and alive guard.
+  - A successful save or load closes the menu and resumes play (`SMSG_SAVEGAME_ACK` →
+    `GS_PLAYING`, `StartNewGame`). A failure keeps the page under the error modal (D3).
+  - When saves are unavailable, both pages print the reason and every row is disabled.
+- **Death.** `USE` while the death camera is active sets `dead_use_menu`. In a single-player game
+  type the frontend opens the Load page as the top-level menu
+  (`SetCurrentMenu(MENU_ID_LOAD_GAME, MENU_ID_LOAD_GAME)`), so Esc returns to the game. The USE
+  request still reaches the server, as before. The demo keeps its Enter retry; the original
+  demo's main menu on USE is not ported.
+- **Keys** (decision 2), retail only, not over the menu, inspector or credits screen:
+  - F5 needs a live player in the world. It saves the quick slot at the next frame boundary
+    without pausing and overwrites without confirmation. The notice "Quicksave..." shows for
+    1.5 s of UI time; the original drew its box for two frames.
+  - F6 needs a player in the world, alive or dead. It loads the quick slot and shows
+    "Quickload...", or "No quicksave to load." when the slot is empty (the original said nothing).
+  - A refused F5 or F6 opens the menu, which pauses the game, under the error modal (D3).
+  - F2 and F3 keep their OpenBlood2 bindings.
+- **Demo** (decision 7). The demo has no slot directory, no Save or Load rows, and ignores F5 and
+  F6. `save_game` and `load_game` still refuse the demo edition themselves.
+- **Inspector.** The Session panel's "Saved games" node shows the directory, the counters, the
+  snapshot state, `GAME_DOAUTOSAVE`, the last action and refusal (with refused classes and the
+  load stage), file errors, the visible notice and the META of all ten files.
+
+Real games are still mostly refused until the class lots (7, 9 to 13) declare their classes
+Original; the screens and keys already report those refusals by name.
 
 ### Implemented movers and brushes (lot 8)
 

@@ -751,7 +751,7 @@ namespace
             CHECK(canvas.surface->rgba.size() == 640 * 480 * 4);
             if (menu.page == MenuPage::Load)
                 for (unsigned i = 0; i < 2; ++i)
-                    CHECK(menu.items[i].literal.ends_with("unavailable") &&
+                    CHECK(menu.items[i].literal.ends_with("<EMPTY SLOT>") &&
                           menu.items[i].literal.find('%') == std::string::npos);
             for (const auto& item : menu.items)
                 CHECK(item.rect.bottom <= 425 && item.rect.right <= 625);

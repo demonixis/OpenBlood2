@@ -6,6 +6,7 @@
 #include "engine/runtime.h"
 #include "engine/sprite_view.h"
 #include "engine/world_view.h"
+#include "game/save_slots.h"
 #include "game/server_adapter.h"
 
 class CNewStatusBar;
@@ -116,6 +117,10 @@ namespace OpenBlood2
         void draw_destination(const GameSession&);
         void draw_destination_trial(const GameSession&);
         void draw_level_change(const GameSession&);
+        // Saved games (save/load lot 6): slot files, the level-entry snapshot and the last outcome.
+        const SaveSlots* saves = nullptr;
+        std::string save_notice;
+        void draw_saved_games(const GameSession&);
         void forget_world();
         ObjectId remove_request{};
         std::string spawn_request;

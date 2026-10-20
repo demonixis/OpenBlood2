@@ -39,9 +39,14 @@ namespace OpenBlood2
         }
     } // namespace
 
-    bool GameSession::save_game(GameSave& out, std::string& error)
+    bool GameSession::save_game(GameSave& out, std::string& error, DBYTE save_type)
     {
         error.clear();
+        if (save_type != SAVETYPE_CURRENT && save_type != SAVETYPE_AUTO)
+        {
+            error = "Unknown save type";
+            return false;
+        }
         const auto refuse = [&](std::string why)
         {
             error = std::move(why);
@@ -92,14 +97,15 @@ namespace OpenBlood2
         if (!request)
             return refuse("The save request message was refused");
         server.WriteToMessageString(request, world_path.c_str()); // m_szFilename, ignored by the server.
-        server.WriteToMessageByte(request, SAVETYPE_CURRENT);
+        server.WriteToMessageByte(request, save_type);
         client_shell.SaveClientData(request);
         const bool saved = server_shell.OnSaveGameMessage(local_client, request);
         server.EndHMessageWrite(request);
         player->ClearClientSaveData(); // A refused save never consumed it.
         if (!saved)
             return refuse("SaveObjects: " + server.last_save.error);
-        next.image = *server.save_store.find(SaveStoreSlot::Current);
+        next.image =
+            *server.save_store.find(save_type == SAVETYPE_AUTO ? SaveStoreSlot::Auto : SaveStoreSlot::Current);
         // SaveObjects wrote the schema of the classes present: unique, ascending and versioned.
         next.fingerprint.classes = next.image.classes;
         next.fingerprint.class_schema = class_schema_digest(next.fingerprint.classes);

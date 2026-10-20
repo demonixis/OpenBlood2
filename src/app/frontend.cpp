@@ -5,6 +5,7 @@
 #include "app/menu_input.h"
 #include "app/menu_renderer.h"
 #include "app/menu_smoke.h"
+#include "app/save_flow.h"
 #include "app/scene_presenter.h"
 #include "app/session_playback.h"
 #include "app/ui_runtime.h"
@@ -55,6 +56,36 @@ namespace OpenBlood2
             (!menu_preferences_path(preferences, preference_error) ||
              !load_menu_preferences(preferences, menu.settings, preference_error)))
             spdlog::warn("Preferences: {}", preference_error);
+        // Saved games (decision 1): the per-user directory, never in smoke runs or the demo (decision 7).
+        SaveFlow saves;
+        if (config.demo)
+            saves.slots.unavailable = "The demo edition has no saved games.";
+        else if (options.menu_smoke || options.demo_smoke)
+            saves.slots.unavailable = "Saved games are disabled in diagnostic runs.";
+        else if (std::filesystem::path directory; save_directory(directory, error))
+        {
+            saves.slots = SaveSlots(directory);
+            saves.slots.refresh();
+            spdlog::info("Saved games: {}", path_text(directory));
+        }
+        else
+        {
+            saves.slots.unavailable = "Saved games are unavailable: " + error;
+            spdlog::warn("{}", saves.slots.unavailable);
+        }
+        saves.sync(menu);
+        // The level-entry snapshot after a NEW_GAME or NEW_LEVEL entry (original autosave).
+        const auto level_entered = [&](GameSession& session, bool new_game)
+        {
+            std::string why;
+            if (!saves.slots.enabled())
+                return;
+            if (saves.level_entered(session, new_game, why))
+                spdlog::info("Level-entry snapshot: {}",
+                             saves.slots.level_entry() ? "saved for Restart" : "not taken (no autosave requested)");
+            else
+                spdlog::warn("Level-entry snapshot unavailable; Restart is empty: {}", why);
+        };
         std::unique_ptr<MenuCanvas> canvas;
         std::unique_ptr<MenuAudio> menu_audio;
         MenuRenderer menu_renderer(runtime.gpu);
@@ -93,6 +124,7 @@ namespace OpenBlood2
             if (!game->run_world(error))
                 return failed(6);
             spdlog::info("World ready: {}", game->world_path);
+            level_entered(*game, false);
         }
         else
             menu.open(false);
@@ -141,6 +173,8 @@ namespace OpenBlood2
             const double delta =
                 options.menu_smoke || options.demo_smoke ? 1. / 60 : app_frame_delta(double(tick - previous) / 1e9);
             previous = tick;
+            saves.sync(menu);
+            saves.notice.advance(delta);
             if (menu.active && !canvas->compose(menu, 0, error))
                 return failed(4);
             if (options.menu_smoke &&
@@ -284,6 +318,7 @@ namespace OpenBlood2
                 else
                 {
                     spdlog::info("World ready: {}", game->world_path);
+                    level_entered(*game, !credits);
                     menu.error.clear();
                     menu.close();
                     selection.id = {};
@@ -294,6 +329,55 @@ namespace OpenBlood2
                     input.reset(menu, true);
                 }
                 previous = SDL_GetTicksNS();
+            }
+            {
+                // Save/Load rows, F5 and F6: owned requests consumed here, at the frame boundary.
+                const auto loaded = [&](const char* what)
+                {
+                    spdlog::info("{} loaded: {} ({} records)", what, game->world_path, game->game_load.records);
+                    menu.error.clear();
+                    reset_after_promotion(menu, input, selection, controlled, game->client_shell);
+#if BLOOD2_INSPECTOR
+                    inspector.forget_world();
+#endif
+                    previous = SDL_GetTicksNS();
+                };
+                const auto refused = [&](const char* what)
+                {
+                    spdlog::warn("{} refused: {}", what, error);
+                    if (!menu.active) // Pause under the modal, as the menu does.
+                    {
+                        auto* owner = game->server_shell.Player(game->local_client);
+                        menu.open(game->client_shell.m_bInWorld, owner && !owner->m_damage.IsDead());
+                        input.reset(menu, game->client_shell.m_bInWorld);
+                    }
+                    menu.error = error;
+                };
+                const auto outcome = saves.command(command, game, menu, error);
+                if (outcome == SaveFlow::Outcome::Saved)
+                {
+                    spdlog::info("Saved game: {}", saves.slots.report.last_action);
+                    input.reset(menu, true);
+                }
+                else if (outcome == SaveFlow::Outcome::Loaded)
+                    loaded("Saved game");
+                else if (outcome == SaveFlow::Outcome::Failed)
+                    refused(command.action == MenuAction::SaveGame ? "Save" : "Load");
+                if (std::exchange(input.quick_save, false))
+                {
+                    if (saves.quick_save(*game, error) == SaveFlow::Outcome::Saved)
+                        spdlog::info("Quicksave: {}", game->world_path);
+                    else
+                        refused("Quicksave");
+                }
+                if (std::exchange(input.quick_load, false))
+                {
+                    const auto quick = saves.quick_load(game, error);
+                    if (quick == SaveFlow::Outcome::Loaded)
+                        loaded("Quickload");
+                    else if (quick == SaveFlow::Outcome::Failed)
+                        refused("Quickload");
+                }
             }
 #if BLOOD2_INSPECTOR
             if (auto level = std::exchange(inspector.start_level_request, {}); !level.empty())
@@ -308,6 +392,7 @@ namespace OpenBlood2
                 else
                 {
                     spdlog::info("World ready: {}", game->world_path);
+                    level_entered(*game, false);
                     inspector.world_error.clear();
                     menu.close();
                     selection.id = {};
@@ -473,9 +558,8 @@ namespace OpenBlood2
                 {
                     spdlog::info("NEW_LEVEL committed: {} -> {} / start {}", game->level_change.source_world,
                                  game->world_path, game->level_change.selected_start);
-                    selection.id = {};
-                    controlled = {};
-                    input.reset(menu, true);
+                    reset_after_promotion(menu, input, selection, controlled, game->client_shell);
+                    level_entered(*game, false);
 #if BLOOD2_INSPECTOR
                     inspector.forget_world();
 #endif
@@ -483,6 +567,20 @@ namespace OpenBlood2
                 }
                 else if (change == LevelChangeResult::Rejected)
                     spdlog::warn("Level change retained world: {}", error);
+                // Original single-player death USE: GS_MENU, PauseGame and the Load menu (_DEMO: none here;
+                // the demo keeps its Enter retry).
+                if (std::exchange(game->client_shell.dead_use_menu, false) && menu_enabled && !menu.demo() &&
+                    game->client_shell.m_bInWorld)
+                {
+                    const auto type =
+                        int(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_GAMETYPE")));
+                    if (type == GAMETYPE_SINGLE || type == GAMETYPE_ACTION || type == GAMETYPE_CUSTOM)
+                    {
+                        menu.open_load(true, false);
+                        saves.sync(menu);
+                        input.reset(menu, true);
+                    }
+                }
             }
             if (input.credits_screen)
                 game->client_shell.m_Credits.Update(static_cast<float>(delta)); // Original UpdateCredits.
@@ -524,6 +622,15 @@ namespace OpenBlood2
                                         client.ctf.team, client.ctf.flag_icon),
                               game->resources, error))
                     return failed(4);
+                if (saves.notice.visible())
+                {
+                    const auto& io = ImGui::GetIO();
+                    const auto size = ImGui::CalcTextSize(saves.notice.text.c_str());
+                    const ImVec2 at{(io.DisplaySize.x - size.x) * .5f, io.DisplaySize.y * .25f};
+                    auto* draw = ImGui::GetForegroundDrawList();
+                    draw->AddText({at.x + 1, at.y + 1}, IM_COL32(0, 0, 0, 255), saves.notice.text.c_str());
+                    draw->AddText(at, IM_COL32(255, 255, 255, 255), saves.notice.text.c_str());
+                }
             }
             if (!menu.error.empty())
             {
@@ -545,6 +652,8 @@ namespace OpenBlood2
             inspector.hud_status = hud.status_bar();
             inspector.mouse_captured = input.controls.mouse_captured;
             inspector.waiting_for_player = waiting_for_player(*game);
+            inspector.saves = &saves.slots;
+            inspector.save_notice = saves.notice.visible() ? saves.notice.text : std::string{};
             const bool was_visible = input.inspector;
             inspector.draw(config, data, input.inspector, frames, *game, selection);
             if (was_visible && !input.inspector)

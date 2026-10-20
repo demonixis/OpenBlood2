@@ -155,7 +155,7 @@ namespace OpenBlood2
                         error = "Unsupported load-menu string insertion";
                         return false;
                     }
-                    label.replace(marker, 5, "unavailable");
+                    label.replace(marker, 5, item.insertion);
                 }
                 item.literal = label;
             }
@@ -220,8 +220,8 @@ namespace OpenBlood2
             }
             y += font.height + (menu.small() ? 5 : 0);
         }
-        if (menu.page == MenuPage::Save || menu.page == MenuPage::Load)
-            text(*surface, small_, "Saving and loading are not available yet.", 180, 440);
+        if ((menu.page == MenuPage::Save || menu.page == MenuPage::Load) && !menu.saves.unavailable.empty())
+            text(*surface, small_, menu.saves.unavailable, 180, 440);
         if (menu.demo() &&
             (menu.page == MenuPage::Options || menu.page == MenuPage::Audio || menu.page == MenuPage::Mouse))
             text(*surface, small_, "Grey options are unavailable in OpenBlood2.", 180, 440);

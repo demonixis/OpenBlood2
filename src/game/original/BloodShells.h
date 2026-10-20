@@ -116,6 +116,10 @@ class CBloodClientShell
     bool UpdateMovement(CBloodServerShell&, double, std::string&);
     bool UpdateUse(CBloodServerShell&);
     bool use_down = false, use_was_down = false, alt_fire_was_down = false;
+    // Original OnCommandOn(COMMAND_USE) while dead in GS_PLAYING: single player switches to
+    // GS_MENU, pauses and opens the Load menu. The application owns the menu and consumes this.
+    bool dead_use_menu = false;
+    std::uint64_t dead_use_menus = 0;
     bool medkit_down = false, medkit_was_down = false;
     bool flashlight_down = false, flashlight_was_down = false;
     CFlashlightFX flashlight;

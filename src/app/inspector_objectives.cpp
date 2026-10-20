@@ -108,6 +108,65 @@ namespace OpenBlood2
             "Owned historical report. Initialization checks do not certify later gameplay or complete M2.");
         ImGui::TreePop();
     }
+    void Inspector::draw_saved_games(const GameSession& game)
+    {
+        if (!saves || !ImGui::TreeNode("Saved games (slots, quicksave, Restart)"))
+            return;
+        const auto& r = saves->report;
+        if (saves->enabled())
+            ImGui::TextWrapped("Directory: %s", path_text(saves->directory()).c_str());
+        else
+            ImGui::TextWrapped("%s", saves->unavailable.c_str());
+        ImGui::Text("Saves %llu (quick %llu) / refused %llu | Loads %llu (quick %llu, Restart %llu) / refused %llu / "
+                    "empty %llu",
+                    (unsigned long long)r.saves, (unsigned long long)r.quick_saves, (unsigned long long)r.save_refusals,
+                    (unsigned long long)r.loads, (unsigned long long)r.quick_loads, (unsigned long long)r.restarts,
+                    (unsigned long long)r.load_refusals, (unsigned long long)r.empty_loads);
+        ImGui::Text("Level-entry snapshot: %s (%zu bytes) | taken %llu / refused %llu / skipped %llu / cleared %llu",
+                    saves->level_entry() ? "held" : "none", saves->level_entry() ? saves->level_entry()->size() : 0,
+                    (unsigned long long)r.level_entries, (unsigned long long)r.level_entry_refusals,
+                    (unsigned long long)r.level_entry_skips, (unsigned long long)r.level_entry_clears);
+        ImGui::Text("Game: GAME_DOAUTOSAVE %s / saves %llu / load attempts %llu, committed %llu, rejected %llu",
+                    game.server.GetVarValueFloat(game.server.GetGameConVar("GAME_DOAUTOSAVE")) != 0 ? "1" : "0",
+                    (unsigned long long)game.game_saves, (unsigned long long)game.game_load.attempts,
+                    (unsigned long long)game.game_load.committed, (unsigned long long)game.game_load.rejected);
+        if (!r.last_action.empty())
+            ImGui::TextWrapped("Last: %s (%llu bytes written)%s%s", r.last_action.c_str(),
+                               (unsigned long long)r.last_bytes, r.last_error.empty() ? "" : " - ",
+                               r.last_error.c_str());
+        if (!game.game_load.stage.empty())
+            ImGui::TextWrapped("Last load refusal stage: %s: %s", game.game_load.stage.c_str(),
+                               game.game_load.error.c_str());
+        for (const auto& name : r.refused_classes)
+            ImGui::BulletText("No save support: %s", name.c_str());
+        if (!r.level_entry_error.empty())
+            ImGui::TextWrapped("Level entry: %s", r.level_entry_error.c_str());
+        if (!r.file_error.empty())
+            ImGui::TextWrapped("File: %s", r.file_error.c_str());
+        if (!save_notice.empty())
+            ImGui::Text("Notice: %s", save_notice.c_str());
+        const auto row = [&](int slot, const char* label)
+        {
+            const auto& info = saves->info(slot);
+            if (info.state == SaveSlotInfo::State::Empty)
+                ImGui::TextDisabled("%s: empty", label);
+            else if (info.state == SaveSlotInfo::State::Unreadable)
+                ImGui::TextWrapped("%s: unreadable (%s) %s", label, save_fault_name(info.error.fault),
+                                   info.error.text.c_str());
+            else
+                ImGui::TextWrapped("%s: %s | %s | type %u / character %u / difficulty %u | %.1f s | %s", label,
+                                   info.meta.display_name.c_str(), info.meta.world_path.c_str(), info.meta.game_type,
+                                   info.meta.character, info.meta.difficulty, info.meta.simulated_seconds,
+                                   info.meta.version.c_str());
+        };
+        row(SLOT_CURRENT, "Restart (current)");
+        row(SLOT_QUICK, "Quick");
+        for (int slot = 0; slot < MAX_SAVESLOTS; ++slot)
+            row(slot, ("Slot " + std::to_string(slot)).c_str());
+        ImGui::TextWrapped("Inspection only. META rows come from the header quick read; a load validates the whole "
+                           "file, its fingerprint and class schema first.");
+        ImGui::TreePop();
+    }
     void Inspector::draw_destination_trial(const GameSession& game)
     {
         const auto& d = game.destination_trial;

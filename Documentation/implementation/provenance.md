@@ -1860,3 +1860,17 @@ record's model overwrite (departure D13) are replacement engine code. See the
 [contract](../contracts/save_load_contracts.md#implemented-player-and-client-lot-5),
 the [evidence](reports/save_load_player.md) and the
 [source ledger](sources/save_load_player_sources.json).
+
+## Save slots, Quick and Restart (2026-10-20)
+
+Save/load lot 6 follows the original client rules of `ClientShellDLL/LoadSave.cpp` and
+`LoadSave.h` (slot ids, `<EMPTY SLOT>`, the `SetSlotName` timestamp suffix),
+`MenuLoadGame.cpp` and `MenuSaveGame.cpp` (row lists and row-to-slot commands),
+`MenuCommands.h` (command ids), `MainMenus.cpp` (top-level Esc) and `BloodClientShell.cpp`
+(`MenuSaveGame`, `MenuLoadGame`, `MenuNewGame`'s `ClearSaveSlot`, F5/F6, death USE to the
+Load menu, `GetWorldTitle`). The menu rows extend the existing selective `MainMenus.cpp` port.
+The slot files, listing, level-entry snapshot, notices, modals and inspector rows are
+replacement code over the lot 2 container; no original source text was copied. See the
+[contract](../contracts/save_load_contracts.md#implemented-slots-quick-and-restart-lot-6),
+the [evidence](reports/save_load_slots.md) and the
+[source ledger](sources/save_load_slots_sources.json).

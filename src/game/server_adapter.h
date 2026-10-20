@@ -581,10 +581,11 @@ namespace OpenBlood2
                                    DBYTE game_type = 0);
         bool rehearse_destination(const WorldMessage&, std::string_view start, std::string& error);
         bool inspect_destination(const WorldMessage&, std::string_view start, std::string& error);
-        // Saves the bound idle session through the original shell SaveGame (Current.sav,
-        // players and console). Refused, naming the classes, when a saveable object's class
-        // has no save support or a supported class's object is not marked USRFLG_SAVEABLE.
-        bool save_game(GameSave&, std::string& error);
+        // Saves the bound idle session through the original shell SaveGame (Current.sav, or
+        // Auto.sav for SAVETYPE_AUTO, the level-entry autosave; players and console). Refused,
+        // naming the classes, when a saveable object's class has no save support or a supported
+        // class's object is not marked USRFLG_SAVEABLE.
+        bool save_game(GameSave&, std::string& error, DBYTE save_type = 1 /* SAVETYPE_CURRENT */);
         std::uint64_t game_saves = 0; // Successful save_game calls.
         GameLoadReport game_load;
         // Loads `save` into a candidate session and promotes it exactly like NEW_LEVEL; any

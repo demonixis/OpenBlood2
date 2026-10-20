@@ -10,7 +10,8 @@ and [provenance](../implementation/sources/m2_player_control_sources.json). **M2
 
 [Original menus](menu_contracts.md) supersede the interactive bindings below:
 normal startup opens the main menu; F10 toggles inspection, Esc pauses/resumes,
-and F1/F2/F3 do not change game input ownership. Inspection alone keeps simulation
+and F1/F2/F3 do not change game input ownership. F5 quicksaves and F6 quickloads
+([save/load lot 6](save_load_contracts.md#implemented-slots-quick-and-restart-lot-6)). Inspection alone keeps simulation
 running; inspection over a menu keeps it paused. Audio/Mouse options supply gains,
 sensitivity and vertical inversion. The earlier adapter below remains the explicit
 smoke path, preserving its test commands and clocks.
