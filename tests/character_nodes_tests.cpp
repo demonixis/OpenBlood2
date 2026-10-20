@@ -185,9 +185,9 @@ namespace
         CHECK(!p->RestoreModelState(e) && !p->restore_model_loaded && r->velocity.y == 2);
         p->SetClient(nullptr);
         CHECK(g.server.disconnect_client(client));
-        p->m_bPowerupActivated[PU_TRIPLEDAMAGE] = true;
+        p->ctf_team = 1; // Unsaved CTF match state still refuses the tail; active powers no longer do.
         CHECK(!p->RestoreModelState(e));
-        p->m_bPowerupActivated[PU_TRIPLEDAMAGE] = false;
+        p->ctf_team = 0;
         // Model failure is reported, not converted to a completed tail.
         r->animation.animation = UINT32_MAX;
         CHECK(!p->RestoreModelState(e) && !p->restore_model_error.empty() && r->velocity.y == 2);

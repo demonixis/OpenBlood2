@@ -120,3 +120,9 @@ active-only charge, local audio, checked child lifetime and forced-inactive
 Restore/KeepAlive. One radial point light is rendered over the unlit world/models;
 GetPointShade, shadows and general dynamic illumination remain unavailable.
 Earlier blanket flashlight omissions are superseded only by this bounded subset.
+
+[Save/load lot 5](save_load_contracts.md#implemented-player-and-client-lot-5) writes these values in the original `CInventoryMgr` byte layout for
+`MID_SAVEOBJECT` and reads them back through the same validator and staged load: markers,
+weapon types, inventory bombs, raw ammunition, the item list (typed items in type order,
+keys with their strings, NULL names for other items), current slot and weapon, and the
+damage multiplier. dwParam 1 drops keys as here. A thrown eye is refused until lot 9.

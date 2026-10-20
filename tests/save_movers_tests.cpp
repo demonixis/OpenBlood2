@@ -169,6 +169,15 @@ namespace
         for (auto& r : records)
             if (r.class_name == "WorldModelDebris")
                 r.flags &= ~(FLAG_FULLPOSITIONRES | FLAG_MODELGOURAUDSHADE);
+            else if (r.class_name == "CPlayerObj")
+            {
+                // Lot 5's listed player rewrites (Load's flags, velocity, node reset, zoom and the
+                // blob's load type); save_player checks the player's bytes field by field.
+                r.flags &= ~FLAG_SHADOW;
+                r.velocity = {};
+                r.hidden_nodes.clear();
+                r.payload.clear();
+            }
     }
     // Relative float clocks (Save writes t - GetTime()) restore to the same saved difference, but
     // when the original subtraction rounded, the absolute value may land one ulp away; later
@@ -882,6 +891,13 @@ namespace
                 continue;
             }
             ++entered;
+            // A load requires exactly one saved local player (lot 5, D6). Multiplayer maps use the
+            // explicit local-inspection marker.
+            game->server_shell.inspection_start = true;
+            if (!game->enter_player(error))
+                std::cout << name << ": no player (" << error.substr(0, 120) << ")\n";
+            else if (auto* player = game->server_shell.Player(game->local_client); player && player->ctf_team)
+                player->ctf_team = 0; // CTF match state is never saved (D12); this image tests lot-8 objects.
             std::size_t pointers = 0;
             for (const auto& row : game->world.objects)
                 pointers += row.class_name == "SkyPointer";

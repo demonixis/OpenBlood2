@@ -96,6 +96,10 @@ DDWORD CInventoryMgr::EngineMessageFn(LPBASECLASS object, DDWORD message, void* 
             ai && ai->npc_type != AI_Mgr::NPCType::Diagnostic && ai->RuntimeReady())
             if (!UpdateHandModels())
                 ai->RuntimeFailure("NPC held weapon update failed");
+    if (message == MID_SAVEOBJECT)
+        Save(*static_cast<HMESSAGEWRITE*>(data), static_cast<DDWORD>(fData));
+    if (message == MID_LOADOBJECT)
+        Load(*static_cast<HMESSAGEREAD*>(data), static_cast<DDWORD>(fData));
     if (message == MID_LINKBROKEN && data == m_hMuzzleFlash)
     {
         // The engine notifies on either endpoint's removal. Release this owned

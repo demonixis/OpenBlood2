@@ -103,3 +103,12 @@ physics parity and the M2 gate remain open.
 The later [timed-power contracts](powerup_contracts.md) supersede the blanket
 active-power refusal for Stealth only: the source saves no power state, so
 capture drops an active invisibility. Other active powers still refuse.
+
+The [save/load player lot](save_load_contracts.md#implemented-player-and-client-lot-5) completes the value block. `PlayerState` now also
+holds spectator mode, the five power flags with relative expiries and the sound stack,
+the relative idle clock and `PlayerCarried`, the original fields this port keeps without
+interpreting them. `CPlayerObj::Save`/`Load` write them in the original byte layout for
+`MID_SAVEOBJECT`, then the client blob. The active-power refusal is removed because the
+original Save covers every power, so NEW_LEVEL snapshots carry them too; CTF, Orb and
+weapon-callback refusals remain. The statements above that powers are refused or that the
+source saves no power state are superseded.

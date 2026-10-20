@@ -1,6 +1,7 @@
 #pragma once
 #include "cpp_engineobjects_de.h"
 #include <cmath>
+#include <optional>
 #include <string>
 
 // Helpers shared by original Save/Load bodies (save_load_contracts lot 8). The port keeps
@@ -54,6 +55,32 @@ namespace OpenBlood2::save_fields
         out.clear();
         s->RejectPayload(h, "saved string exceeds " + std::to_string(limit) + " bytes");
         return false;
+    }
+    // Nullable variants (save/load lot 5): a NULL HString stays distinct from an empty one.
+    inline void write_nullable(HMESSAGEWRITE h, const char* text)
+    {
+        if (text)
+            g_pServerDE->WriteToMessageString(h, text);
+        else
+            g_pServerDE->WriteToMessageHString(h, nullptr);
+    }
+    inline bool read_nullable(HMESSAGEREAD h, std::optional<std::string>& out, std::size_t limit = MAX_GP_STRING_LEN)
+    {
+        auto* s = g_pServerDE;
+        out.reset();
+        const auto value = s->ReadFromMessageHString(h);
+        if (!value)
+            return true;
+        const char* text = s->GetStringData(value);
+        std::string read = text ? text : "";
+        s->FreeString(value);
+        if (read.size() > limit)
+        {
+            s->RejectPayload(h, "saved string exceeds " + std::to_string(limit) + " bytes");
+            return false;
+        }
+        out = std::move(read);
+        return true;
     }
     // The original writes booleans as (DBYTE); anything but 0 or 1 is refused.
     inline bool read_bool(HMESSAGEREAD h, bool& out)

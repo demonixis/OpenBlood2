@@ -232,8 +232,9 @@ namespace
         CHECK(p.AddPowerup(7, 30));
         PlayerRestoreState saved;
         std::string error;
-        saved.world = "unchanged";
-        CHECK(!g.capture_player(saved, error) && saved.world == "unchanged");
+        // Active Anger travels with its relative expiry and the tripled multiplier (save/load lot 5).
+        CHECK(g.capture_player(saved, error) && saved.player.powers[PU_TRIPLEDAMAGE] &&
+              saved.inventory.damage_multiplier == 1.5f && saved.player.power_offsets[PU_TRIPLEDAMAGE] > 29.9f);
         p.ResetPowerups();
         CHECK(inv.damage_multiplier == .5f && !p.IsPowerupActive(PU_TRIPLEDAMAGE));
         CHECK(g.capture_player(saved, error) && saved.inventory.damage_multiplier == .5f);

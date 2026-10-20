@@ -111,3 +111,8 @@ complete M2 gate remain open.
 The [player VoiceMgr continuation](player_voice_contracts.md) preserves unique
 reply flags and client/group random history only after successful preparation.
 Old voice handles/deadlines are never transferred; rollback leaves them intact.
+
+[Save/load lot 5](save_load_contracts.md#implemented-player-and-client-lot-5): the transferred snapshot carries power flags with their relative
+expiries; the destination records client load type 2 and sets the original shell console
+values (`GAME_GOTOSTARTPOINT` 1, `GAME_REVISITING` 0, `GAME_DOAUTOSAVE` 1). A whole-game
+load reuses this promotion through `load_game`.

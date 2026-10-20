@@ -1,7 +1,9 @@
-// Selected InventoryMgr.cpp:2843-3061 Save/Load branches. Typed values replace
-// message serialization; staging replaces destructive Term-before-read.
+// Selected InventoryMgr.cpp:2843-3061 Save/Load branches: typed values, and their original
+// byte layout for MID_SAVEOBJECT/MID_LOADOBJECT. Staging replaces destructive Term-before-read.
 #include "InventoryMgr.h"
+#include "SaveFields.h"
 #include <cmath>
+#include <string>
 
 namespace
 {
@@ -205,4 +207,224 @@ bool CInventoryMgr::Load(const OpenBlood2::InventoryState& state, OpenBlood2::In
                 weapon->Init(m_hOwner, this, left);
     ++revision;
     return true;
+}
+
+namespace
+{
+    // Original Shared/SharedDefs.h item types and InventoryMgr.cpp's block marker.
+    constexpr DBYTE INV_NONE = 0, INV_MEDKIT = 1, INV_FLASHLIGHT = 2, INV_NIGHTGOGGLES = 3, INV_THEEYE = 4,
+                    INV_BINOCULARS = 5, INV_KEY = 6, INV_BASEINVWEAPON = 7;
+    constexpr DDWORD inventory_marker = 0xcececece;
+    constexpr unsigned original_weapon_slots = 10, original_inventory_weapons = 3;
+} // namespace
+
+// The original writes its item list in pickup order. This port keeps typed items rather than
+// that intrusive list, so items are written in type order (medkit, flashlight, goggles, eye,
+// binoculars, then keys in pickup order); a load restores that order. Non-key items carry
+// their original picture names but no item names: the port has no server FormatString.
+void CInventoryMgr::Save(HMESSAGEWRITE h, DDWORD)
+{
+    auto* s = BaseClass::GetServerDE();
+    OpenBlood2::InventoryState state;
+    std::string error;
+    if (!Save(state, error))
+    {
+        s->RejectPayload(h, "CInventoryMgr Save: " + error);
+        return;
+    }
+    const auto byte = [&](unsigned value) { s->WriteToMessageByte(h, static_cast<DBYTE>(value)); };
+    s->WriteToMessageDWord(h, inventory_marker);
+    byte(state.strength);
+    byte(state.magic);
+    byte(0); // m_bGodMode: this port has no inventory cheat.
+    byte(state.infinite_ammo);
+    for (unsigned i = 0; i < original_weapon_slots; ++i)
+    {
+        byte(state.right[i]); // Weapons are recreated from their types; no CWeapon state is saved.
+        byte(state.left[i]);
+    }
+    for (unsigned i = 0; i < original_inventory_weapons; ++i)
+    {
+        const auto type = state.right[original_weapon_slots + i];
+        byte(type ? type + INV_BASEINVWEAPON - WEAP_PROXIMITYBOMB : INV_NONE);
+    }
+    for (float ammo : state.ammo) // AMMO_MAXAMMOTYPES + 1 raw pools.
+        s->WriteToMessageFloat(h, ammo);
+    const bool eye_item = eye && eye->available;
+    const DDWORD count = (medkit ? 1 : 0) + (flashlight ? 1 : 0) + (goggles ? 1 : 0) + (eye_item ? 1 : 0) +
+                         (binoculars ? 1 : 0) + static_cast<DDWORD>(keys.size());
+    s->WriteToMessageDWord(h, count);
+    // The manager writes the type, then CInvItem::Save its own block (InvItem.h:193-207).
+    const auto item = [&](DBYTE type, const char* name, const char* display, const char* pic, const char* pic_h,
+                          bool dropped, bool active, DBYTE charges)
+    {
+        byte(type);
+        s->WriteToLoadSaveMessageObject(h, m_hOwner);
+        for (const char* text : {name, display, pic, pic_h})
+            OpenBlood2::save_fields::write_nullable(h, text);
+        byte(1); // m_bInitialized: Update marks every carried item initialized.
+        byte(dropped);
+        byte(type);
+        byte(active);
+        byte(charges);
+    };
+    if (medkit)
+        item(INV_MEDKIT, nullptr, nullptr, "medkit.pcx", "medkit_h.pcx", false, false, medkit->count);
+    if (flashlight)
+    {
+        item(INV_FLASHLIGHT, nullptr, nullptr, "flashlight.pcx", "flashlight_h.pcx", false, flashlight->active,
+             flashlight->count);
+        s->WriteToMessageFloat(h, flashlight->remaining); // m_fDischargeTime: a remaining duration.
+    }
+    if (goggles)
+    {
+        item(INV_NIGHTGOGGLES, nullptr, nullptr, "night_vision.pcx", "night_vision_h.pcx", false, goggles->active,
+             goggles->count);
+        s->WriteToMessageFloat(h, goggles->remaining);
+    }
+    if (eye_item)
+    {
+        item(INV_THEEYE, nullptr, nullptr, "the_eye.pcx", "the_eye_h.pcx", eye->eye != nullptr, eye->active, 1);
+        s->WriteToLoadSaveMessageObject(h, eye->eye); // m_hSeeingObject.
+    }
+    if (binoculars)
+        item(INV_BINOCULARS, nullptr, nullptr, "binoculars.pcx", "binoculars_h.pcx", false, binoculars->active, 1);
+    for (const auto& key : keys)
+        item(INV_KEY, key.name.c_str(), key.display_name.c_str(), key.icon.c_str(), key.highlighted_icon.c_str(), false,
+             false, key.uses);
+    s->WriteToMessageDWord(h, state.current_slot);
+    const auto* current = CurrentWeapon();
+    s->WriteToMessageDWord(h, current ? current->data.m_nType : 0); // m_nCurWeapon.
+    s->WriteToMessageDWord(h, INV_NONE);                            // Current item: this port has no item cursor.
+    s->WriteToMessageDWord(h, 0);                                   // m_WeapCount: never set by the original.
+    s->WriteToMessageFloat(h, state.damage_multiplier);
+    s->WriteToMessageFloat(h, 1); // m_fFireRateMultiplier: the original default, unchanged here.
+    s->WriteToMessageFloat(h, 1); // m_fMeleeMultiplier: never set by the original.
+    byte(0);                      // m_bDropEye.
+    s->WriteToMessageDWord(h, inventory_marker);
+}
+
+void CInventoryMgr::Load(HMESSAGEREAD h, DDWORD param)
+{
+    auto* s = BaseClass::GetServerDE();
+    OpenBlood2::InventoryState state;
+    std::string problem;
+    const auto refuse = [&](std::string why)
+    {
+        if (problem.empty())
+            problem = std::move(why);
+    };
+    const auto byte = [&] { return s->ReadFromMessageByte(h); };
+    const auto flag = [&]
+    {
+        const auto value = byte();
+        if (value > 1)
+            refuse("a saved boolean is out of range");
+        return value != 0;
+    };
+    if (s->ReadFromMessageDWord(h) != inventory_marker)
+        refuse("opening block marker is invalid");
+    state.strength = byte();
+    state.magic = byte();
+    flag(); // m_bGodMode: no inventory cheat in this port.
+    state.infinite_ammo = flag();
+    for (unsigned i = 0; i < original_weapon_slots; ++i)
+    {
+        state.right[i] = byte();
+        state.left[i] = byte();
+    }
+    for (unsigned i = 0; i < original_inventory_weapons; ++i)
+        if (const auto type = byte(); type != INV_NONE)
+        {
+            // Save writes slot i's own bomb type; the original then calls AddInventoryWeapon(type, i).
+            if (type != INV_BASEINVWEAPON + i)
+                refuse("inventory weapon " + std::to_string(i) + " has type " + std::to_string(type));
+            state.right[original_weapon_slots + i] = static_cast<DBYTE>(WEAP_PROXIMITYBOMB + i);
+        }
+    for (float& ammo : state.ammo)
+        ammo = s->ReadFromMessageFloat(h);
+    const DDWORD count = s->ReadFromMessageDWord(h);
+    if (count > 5 + 256) // One of each typed item and the 256-key bound.
+    {
+        s->RejectPayload(h, "CInventoryMgr Load: item count exceeds the inventory bound");
+        return;
+    }
+    HOBJECT eye_object = nullptr;
+    for (DDWORD i = 0; i < count && problem.empty(); ++i)
+    {
+        const DBYTE type = byte();
+        HOBJECT owner = nullptr;
+        s->ReadFromLoadSaveMessageObject(h, &owner); // Read into a temporary and discarded, as the original.
+        std::optional<std::string> name, display, pic, pic_h;
+        for (auto* text : {&name, &display, &pic, &pic_h})
+            if (!OpenBlood2::save_fields::read_nullable(h, *text))
+                return;
+        byte();                   // m_bInitialized.
+        byte();                   // m_bDropped (uninitialized garbage for most original items).
+        const DBYTE own = byte(); // m_nType.
+        byte();                   // m_bIsActive: forced FALSE on every load.
+        const DBYTE charges = byte();
+        if (own != type)
+            refuse("item block type differs from its list type");
+        switch (type)
+        {
+            case INV_MEDKIT:
+                if (state.medkit_charge)
+                    refuse("duplicate medkit");
+                state.medkit_charge = charges;
+                break;
+            case INV_FLASHLIGHT:
+            case INV_NIGHTGOGGLES:
+            {
+                auto& slot = type == INV_FLASHLIGHT ? state.flashlight : state.goggles;
+                if (slot)
+                    refuse("duplicate charged item");
+                slot = OpenBlood2::FlashlightState{charges, s->ReadFromMessageFloat(h)};
+                break;
+            }
+            case INV_THEEYE:
+                if (state.eye)
+                    refuse("duplicate eye");
+                state.eye = true;
+                s->ReadFromLoadSaveMessageObject(h, &eye_object);
+                break;
+            case INV_BINOCULARS:
+                if (state.binoculars)
+                    refuse("duplicate binoculars");
+                state.binoculars = true;
+                break;
+            case INV_KEY:
+                state.keys.push_back(
+                    {name.value_or(""), display.value_or(""), pic.value_or(""), pic_h.value_or(""), charges});
+                break;
+            default: // The original switch skips the item's data and desynchronizes.
+                refuse("unsupported item type " + std::to_string(type));
+                break;
+        }
+    }
+    if (!problem.empty())
+    {
+        s->RejectPayload(h, "CInventoryMgr Load: " + problem);
+        return;
+    }
+    const DDWORD slot = s->ReadFromMessageDWord(h);
+    state.current_slot = static_cast<DBYTE>(slot < 0x100 ? slot : 0xFF); // Out of range: refused by the validator.
+    s->ReadFromMessageDWord(h); // m_nCurWeapon: derived from the restored slot.
+    s->ReadFromMessageDWord(h); // Current item: this port has no item cursor.
+    s->ReadFromMessageDWord(h); // m_WeapCount: never initialized by the original.
+    state.damage_multiplier = s->ReadFromMessageFloat(h);
+    s->ReadFromMessageFloat(h); // m_fFireRateMultiplier and m_fMeleeMultiplier are unused here.
+    s->ReadFromMessageFloat(h);
+    flag(); // m_bDropEye.
+    if (s->ReadFromMessageDWord(h) != inventory_marker)
+        refuse("closing block marker is invalid");
+    std::string error;
+    if (!problem.empty())
+        s->RejectPayload(h, "CInventoryMgr Load: " + problem);
+    else if (eye_object) // A thrown eye is a SeeingEye record; its class is not supported yet (lot 9).
+        s->RejectPayload(h, "CInventoryMgr Load: a thrown eye requires SeeingEye restoration (lot 9)");
+    else if (!Load(state,
+                   param == 1 ? OpenBlood2::InventoryLoadType::KeepAlive : OpenBlood2::InventoryLoadType::Restore,
+                   error))
+        s->RejectPayload(h, "CInventoryMgr Load: " + error);
 }

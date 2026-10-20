@@ -42,6 +42,9 @@ class CMovement : public Aggregate
     bool CalculatePath(DVector destination);
     bool ClearToPoint(DVector start, DVector destination, DVector dimensions, OpenBlood2::SegmentHit&);
     bool ConsolidatePath(); // Original optional method; CalculatePath does not call it.
+    // Original Save/Load (movement.cpp:584-638): owner reference, cached transform and path.
+    void Save(HMESSAGEWRITE, DDWORD);
+    void Load(LPBASECLASS owner_object, HMESSAGEREAD, DDWORD);
     std::span<const DVector> path() const
     {
         return points;

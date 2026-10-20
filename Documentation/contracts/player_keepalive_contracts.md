@@ -78,3 +78,8 @@ No destination callbacks run and no active session is discarded; safe automatic 
 The [destination initialization rehearsal](destination_trial_contracts.md) extends the structural scan with temporary original callbacks and copied-player named entry.
 It isolates the current original globals, destroys the temporary session and resumes the unchanged source gameplay state.
 Ordinary second-session binding remains forbidden; no automatic transfer or completed M2 acceptance is claimed.
+
+[Save/load lot 5](save_load_contracts.md#implemented-player-and-client-lot-5): the keep-alive snapshot now carries the five power flags, their
+relative expiries and the sound stack, the client records load type 2 (`NEW_LEVEL`), and
+the destination's fresh load sets `GAME_GOTOSTARTPOINT` 1, `GAME_REVISITING` 0 and
+`GAME_DOAUTOSAVE` 1 as the original `LoadWorld` does.

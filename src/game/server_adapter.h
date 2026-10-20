@@ -92,6 +92,11 @@ namespace OpenBlood2
         bool ValidateSpawnObject(std::string_view) override;
         void RejectPrecreate(std::string_view reason) override;
         void RejectPayload(HMESSAGEWRITE, std::string_view reason) override;
+        DRESULT SendClientSaveData(HMESSAGEREAD blob) override;
+        // The SMSG_CLIENTSAVEDATA payload a restored player's Load queued (its nested blob),
+        // as an owned reader released by EndHMessageRead; null when none is pending.
+        HMESSAGEREAD take_client_save_data();
+        std::optional<std::vector<std::uint8_t>> client_save_data; // At most one: single-player only.
         void RecordSpawn(const SpawnReport&) override;
         void RecordPickup(HOBJECT, const PickupReport&) override;
         DRESULT WritePickupMessage(HMESSAGEWRITE, const PickupMessage&) override;
@@ -208,6 +213,7 @@ namespace OpenBlood2
             client_strings = {};
             client_strings_error.clear();
             client_strings_attempted = false;
+            client_save_data.reset();
         }
         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
         DRESULT ResolveInitialWorldOverlap(HOBJECT) override;
@@ -346,6 +352,7 @@ namespace OpenBlood2
         void EndHMessageWrite(HMESSAGEWRITE) override;
         void EndHMessageRead(HMESSAGEREAD) override;
         void ResetRead(HMESSAGEREAD) override;
+        bool MessageFullyRead(HMESSAGEREAD) override;
         // MID_SAVEOBJECT/MID_LOADOBJECT dispatch through a borrowed bounded payload
         // message (save_load_contracts "Message primitives"). pData points to the
         // message handle and fData carries dwParam. Only this message accepts
@@ -586,6 +593,9 @@ namespace OpenBlood2
         // candidate after the original classes (tests and tools; the game passes none).
         static bool load_game(std::unique_ptr<GameSession>& current, const GameSave& save, std::string& error,
                               std::span<const ClassInfo* const> extra_classes = {});
+        // The load's player step: exactly one restored local player (D6), attached to a new
+        // client through the saved-client shell branch, then its SMSG_CLIENTSAVEDATA delivered.
+        bool attach_saved_player(std::string& error);
         bool load_world(const WorldMessage& message, std::string& error);
         // Restore mode (LOADTYPE_RESTORESAVE): only CF_ALWAYSLOAD rows are created, every other
         // row is SavedState. The saved console and clock are applied after the world reset and

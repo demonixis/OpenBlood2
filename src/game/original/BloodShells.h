@@ -37,6 +37,10 @@ class CBloodServerShell
     // frame boundary and the candidate session (GameSession::save_game/load_game).
     bool SaveGame(DBYTE bySaveType, bool bSavePlayers, bool bSaveConsole);
     bool RestoreGame(DBYTE bySaveType);
+    // Original CMSG_SAVEGAME (BloodServerShell.cpp:401-431): file name (ignored), save type and
+    // the nested client blob, attached to the sender's player before SaveGame. No ACK is sent;
+    // the caller reports the result.
+    bool OnSaveGameMessage(HCLIENT, HMESSAGEREAD);
     CPlayerObj* Player(HCLIENT);
     bool CapturePlayerInventory(HCLIENT);
     struct InventoryCapture
@@ -88,6 +92,12 @@ class CBloodClientShell
     bool StartNewWorld(const char*, OpenBlood2::WorldMessage&);
     bool OnEnterWorld(HCLIENT, bool restored = false);
     bool restored_entry = false;
+    // Original SaveClientData/LoadClientData (BloodClientShell.cpp:6351-6431): the client blob
+    // a save nests in CMSG_SAVEGAME and a restore receives back in SMSG_CLIENTSAVEDATA.
+    void SaveClientData(HMESSAGEWRITE);
+    bool LoadClientData(HMESSAGEREAD, std::string& error);
+    int m_nLastLoadType = OpenBlood2::LOADTYPE_NEW_GAME; // Saved in the blob, discarded on load.
+    std::uint64_t client_data_saves = 0, client_data_loads = 0;
     OpenBlood2::PlayerInit entry_profile;
     // Original PreLoadWorld END/CREDITS test, evaluated at entry from the normalized
     // world path; m_Credits then rolls over the world (CM_CREDITS, no screen clear).

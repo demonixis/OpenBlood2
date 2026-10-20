@@ -278,10 +278,23 @@ namespace OpenBlood2
             return bad("bound BSP model differs from the saved first same-named model");
         if (s.type == OT_CONTAINER && !same_bits(s.position, r->state.m_Pos))
             return bad("a container cannot move from its BSP origin");
-        // Check every resource-dependent field before changing anything.
-        if (r->model)
+        // Departure D13: the saved model and skin replace what precreate chose, since the saved
+        // animation track belongs to them. CPlayerObj's PostPropRead forces Caleb.abc and only its
+        // Load re-selects the character (save_load_contracts lot 5).
+        auto restored_model = r->model;
+        const bool model_file =
+            s.type == OT_MODEL && !s.filename.empty() && r->model &&
+            (!same_path(s.filename, r->state.m_Filename) || !same_path(s.skin, r->state.m_SkinName));
+        if (model_file && !same_path(s.filename, r->state.m_Filename))
         {
-            const auto& model = *r->model;
+            std::string why;
+            if (!objects_.models || !objects_.models->load(s.filename, restored_model, why))
+                return bad("saved model " + s.filename + " is unavailable: " + why);
+        }
+        // Check every resource-dependent field before changing anything.
+        if (restored_model)
+        {
+            const auto& model = *restored_model;
             if (s.animation >= model.animations.size() || s.animation_time > model.animations[s.animation].duration)
                 return bad("saved animation track does not fit the restored model");
             if (!s.hidden_nodes.empty() && s.hidden_nodes.size() != model.nodes.size())
@@ -300,6 +313,13 @@ namespace OpenBlood2
             return bad("saved sky membership: " + sky_error);
         // The engine overwrites these after INITIALUPDATE_SAVEGAME. Flags, the next-update
         // delay and the name keep whatever precreate and initial update set.
+        if (model_file)
+        {
+            r->model = std::move(restored_model);
+            r->model_error.clear();
+            legacy_copy(r->state.m_Filename, s.filename.c_str());
+            legacy_copy(r->state.m_SkinName, s.skin.c_str());
+        }
         r->user_flags = s.user_flags;
         r->dimensions = s.dimensions;
         r->color = s.color;
@@ -669,9 +689,11 @@ namespace OpenBlood2
             }
             report.objects.clear();
             report.local_client = nullptr;
+            client_save_data.reset(); // A blob queued by a rolled-back player Load.
             return failed(std::move(why));
         };
 
+        client_save_data.reset();
         // Pass 1: PRECREATE(3) with the saved creation fields, INITIALUPDATE(3), then the
         // remaining engine fields. A refusal fails the restore: there are no NULL holes.
         SaveIndex index;

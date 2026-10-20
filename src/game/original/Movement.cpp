@@ -93,8 +93,64 @@ DDWORD CMovement::EngineMessageFn(LPBASECLASS object, DDWORD message, void* data
 {
     if (message == MID_UPDATE && initialized)
         Update();
-    // Save/load is deliberately absent from the bounded interface, not a successful no-op service.
+    if (message == MID_SAVEOBJECT)
+        Save(*static_cast<HMESSAGEWRITE*>(data), static_cast<DDWORD>(value));
+    if (message == MID_LOADOBJECT)
+        Load(object, *static_cast<HMESSAGEREAD*>(data), static_cast<DDWORD>(value));
     return Aggregate::EngineMessageFn(object, message, data, value);
+}
+void CMovement::Save(HMESSAGEWRITE h, DDWORD)
+{
+    auto* server = BaseClass::GetServerDE();
+    // NULL for an owner that never initialized this aggregate, such as the player.
+    server->WriteToLoadSaveMessageObject(h, initialized ? owner : nullptr);
+    server->WriteToMessageRotation(h, &rotation);
+    for (const auto* v : {&right, &up, &forward, &position, &last_position})
+        server->WriteToMessageVector(h, v);
+    server->WriteToMessageDWord(h, static_cast<DDWORD>(points.size()));
+    for (const auto& point : points)
+        server->WriteToMessageVector(h, &point);
+}
+void CMovement::Load(LPBASECLASS object, HMESSAGEREAD h, DDWORD)
+{
+    auto* server = BaseClass::GetServerDE();
+    HOBJECT saved_owner = nullptr;
+    server->ReadFromLoadSaveMessageObject(h, &saved_owner);
+    DRotation rot;
+    server->ReadFromMessageRotation(h, &rot);
+    DVector axes[5];
+    for (auto& v : axes)
+        server->ReadFromMessageVector(h, &v);
+    const DDWORD count = server->ReadFromMessageDWord(h);
+    if (count > max_points) // The original list has no bound; the typed path keeps its budget.
+    {
+        server->RejectPayload(h, "CMovement Load: path exceeds the movement point budget");
+        return;
+    }
+    std::vector<DVector> path(count);
+    for (auto& point : path)
+        server->ReadFromMessageVector(h, &point);
+    const auto norm = vector_dot(rot.m_Vec, rot.m_Vec) + rot.m_Spin * rot.m_Spin;
+    bool finite = std::isfinite(norm);
+    for (const auto& v : axes)
+        finite = finite && physics_vector(v);
+    for (const auto& v : path)
+        finite = finite && physics_vector(v);
+    if ((saved_owner && (!object || saved_owner != object->m_hObject)) || !finite)
+    {
+        server->RejectPayload(h, "CMovement Load: the owner is not this object or the cached transform is invalid");
+        return;
+    }
+    owner = saved_owner;
+    initialized = sampled = saved_owner != nullptr; // The saved transform is the last sample.
+    rotation = rot;
+    right = axes[0];
+    up = axes[1];
+    forward = axes[2];
+    position = axes[3];
+    last_position = axes[4];
+    points = std::move(path); // Empty after initial update: the original appends to an empty list.
+    added_points += count;    // AddPosToPathList also counts each loaded point.
 }
 bool CMovement::GetNextPathPoint(DVector& out) const
 {

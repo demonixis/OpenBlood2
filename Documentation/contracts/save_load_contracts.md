@@ -1,16 +1,18 @@
 # Save and load
 
 Status: **design contract for roadmap task 3.3. Lots 1 (save-message primitives), 2
-(container and fingerprint), 3 (engine records and the clock) and 4 (restore-mode world
-and candidate transaction) are implemented; see their evidence
+(container and fingerprint), 3 (engine records and the clock), 4 (restore-mode world
+and candidate transaction) and 5 (player and client) are implemented; see their evidence
 ([lot 1](../implementation/reports/save_load_messages.md),
 [lot 2](../implementation/reports/save_load_container.md),
 [lot 3](../implementation/reports/save_load_records.md),
-[lot 4](../implementation/reports/save_load_session.md)). Lot 8 (movers and brushes,
+[lot 4](../implementation/reports/save_load_session.md),
+[lot 5](../implementation/reports/save_load_player.md)). Lot 8 (movers and brushes,
 [evidence](../implementation/reports/save_load_movers.md)) declares its 18 classes Original.
-`GameSession::save_game` and `load_game` save and load in memory through a candidate session;
-every other original class is AlwaysLoad, NotSaved or Unsupported, so a save of a real game is
-still refused by name, and no save reaches the game or a file yet. The other lots are pending.** The Save and Load screens stay disabled until the lots below land. The
+`GameSession::save_game` and `load_game` save and load in memory through a candidate session,
+with the local player and its client blob. Every other original class is AlwaysLoad, NotSaved
+or Unsupported, so a save of a real game is still refused by name, and no save reaches the game
+or a file yet. The other lots are pending.** The Save and Load screens stay disabled until the lots below land. The
 [audit](../implementation/save_load_audit/readme.md) is the evidence for every
 original rule cited here; its [source ledger](../implementation/sources/save_load_audit_sources.json)
 records the audited files. Read [level replacement](level_change_contracts.md),
@@ -143,6 +145,7 @@ place OpenBlood2 differs.
 | D10 | Gameplay randomness is the unsaved CRT `rand()` | The server gameplay generator state is saved |
 | D11 | No version or data check | Versioned container, game-data and mod fingerprint, per-class payload versions |
 | D12 | F2/F3 and the server handlers have no multiplayer guard | Saving and loading are refused outside single-player game types |
+| D13 | A restored model keeps the file precreate chose; the later runtime applies the saved animation trackers to it | The engine record's model and skin replace it before the animation track is checked and applied. CPlayerObj's precreate forces `Caleb.abc`, so another character would otherwise lose or refuse its track ([lot 5](#implemented-player-and-client-lot-5)) |
 
 ## Save file format
 
@@ -291,13 +294,15 @@ engine-record capture and application.
   same-named model in this world; a container's basis equal to its rotation; no sky slot
   held twice. Then pass 1 (`Objects::create_restored`, the engine overwrite), the index
   table, pass 2 and links and attachments, as in the [load sequence](#load-sequence).
-  The overwrite covers user flags, dimensions, colour, physics, animation and hidden
-  nodes (checked against the restored model), the sprite track (checked against the
-  restored sprite), activity and deactivation, position and sky membership.
+  The overwrite covers the model and skin of a model object (D13, lot 5), user flags,
+  dimensions, colour, physics, animation and hidden nodes (checked against the restored
+  model), the sprite track (checked against the restored sprite), activity and
+  deactivation, position and sky membership.
   - A world model's base shell is rebuilt at the saved basis; a saved rotation is posed
     once about the BSP origin, before initial update, and the saved translation is then
     the usual offset. A container must stay at its BSP origin.
-  - The local-client record is reported, not associated: lot 5 attaches the client.
+  - The local-client record is reported, not associated: `load_game` attaches the client
+    ([lot 5](#implemented-player-and-client-lot-5)).
   - An existing link, or an existing attachment of the same parent and child, is kept.
     Any other attachment goes through the engine's attachment rules.
   - Deferred removals requested by Loads stay for the owner's frame end.
@@ -642,8 +647,8 @@ of `Current.sav`. Lot 6 wraps it in META and a slot file; nothing in the game ca
   - A live object whose class is Original or Unsupported but lacks `USRFLG_SAVEABLE` refuses
     the save by name. The shell's list would otherwise drop it silently.
   - The fingerprint is built before `SaveGame`, so a refused save leaves the store unchanged.
-  - The player is not required yet (lot 5). CPlayerObj is Unsupported, so a world with a
-    player is refused by name.
+  - Since lot 5 the live local player is required and its client blob is attached first
+    ([lot 5](#implemented-player-and-client-lot-5)).
 - **Restore-mode world.** `load_saved_world` takes `LOADTYPE_RESTORESAVE` (3, the original
   value) with the saved game type and difficulty. The message parser still refuses that load
   type.
@@ -688,8 +693,9 @@ of `Current.sav`. Lot 6 wraps it in META and a slot file; nothing in the game ca
      source's `SaveStore`; the loaded image becomes its `Current`. The source's store is not
      touched (D2).
   5. *world* and *restore*: the restore-mode world above.
-  6. *player*: a record with the local-client flag is refused, because the restored-client
-     association is lot 5. A candidate is never promoted with an unattached player.
+  6. *player*: exactly one restored local player is attached to a new client and receives
+     its client blob ([lot 5](#implemented-player-and-client-lot-5)). A candidate is never
+     promoted with an unattached player.
   7. *validation*: `check_world_initialization` (dispositions and unavailable services), NPC
      runtime failures, no pending level change or live message, music errors, and the strict
      presentation preflight.
@@ -705,8 +711,120 @@ of `Current.sav`. Lot 6 wraps it in META and a slot file; nothing in the game ca
   next delta, as after a NEW_LEVEL commit (lot 6 wires this).
 - **Real worlds.** 50 of the 58 mounted worlds bind their SkyPointers to Door or
   CDestructableBrush objects, which only a save can supply. Their always-load-only restore
-  fails the sky preflight; lot 8 makes those objects restorable. SubwayA, SteamTunnels, SubwayB, SubwayC
-  and PowerStation restore from an always-load-only image, then save and load again.
+  fails the sky preflight; lot 8 makes those objects restorable. SubwayA, SteamTunnels, SubwayB,
+  SubwayC and PowerStation restore from a player-only image (since lot 5), then save and load
+  again.
+
+### Implemented player and client (lot 5)
+
+CPlayerObj is Original (payload version 1). Its record is the original chain:
+`CPlayerObj::Save`, `CBaseCharacter` (0 bytes), then the aggregates in reverse order of
+addition, `CMovement`, `CInventoryMgr` and `CDestructable` (`src/game/original/PlayerSave.cpp`,
+`Movement.cpp`, `InventorySave.cpp`, and lot 8's `CDestructable` block in
+`DestructableSave.cpp`). Each aggregate saves for any owner, so the class lots that declare
+NPCs and corpses reuse it.
+
+- **Original layouts.** Every field is written in the original order with the original
+  call: Byte, Word, DWord, Float, Vector, Rotation, HString, LoadSave object, plain object
+  and nested message. The [evidence](../implementation/reports/save_load_player.md#byte-layouts)
+  lists the blocks. Fields the port interprets come from its members. Original fields it
+  keeps without interpreting (demo playback, control flags, scores, bindings, view and gun
+  vectors, slow death, swim jump, burning and the idle clock) start at the original
+  constructor values and are carried unchanged as `PlayerCarried`. Fields with no port
+  storage are written with fixed values: inventory god mode 0 (no cheats), the fire-rate
+  multiplier 1 and `m_bDropEye` 0 (their defaults), `m_WeapCount` 0, the melee multiplier 1
+  and item `m_bDropped` 0 except for a thrown eye (uninitialized in the original), a plain
+  NULL camera object (D7) and, for the player, a NULL `CMovement` owner because it never
+  initializes that aggregate.
+- **Typed validators.** Each byte body converts to the existing typed value
+  (`PlayerState`, `InventoryState`, `DestructableState`) and calls the typed Save or Load,
+  so their checks and staged, all-or-nothing commits apply. A refusal calls lot 8's
+  `RejectPayload` service, which fails the dispatch. Strings are written with lot 8's
+  `save_fields` helpers, which never allocate a session string token. Booleans must be 0 or 1, the `0xCECECECE` markers must be present, `(DBYTE)` words
+  must fit a byte, the power sound stack holds at most 15 entries of 0–4 and a movement
+  path at most 64 points. The original reads all of these raw.
+- **Preserved quirks.** Relative clocks are saved as `x − GetTime()` and loaded as
+  `saved + GetTime()`, including the −1 "not falling" sentinel; the load picks the nearest
+  float that saves the same offset again (lot 8's `restored_time`). Countdowns and durations
+  are raw. Attributes and maxima load without `ValidateAttributes`; the first update
+  derives speeds from the raw speed attribute. A non-destructible owner saves the
+  CanDamage 1.0e6 sentinel; an uninitialized `m_nLastDamageLocation` byte round-trips.
+  Weapons are recreated from their types and ammunition is assigned raw afterwards. Keys
+  are dropped only for dwParam 1. Every item loads inactive. The client blob is consumed
+  by the first save that includes the player and broadcast by its Load. The Load tail calls
+  `SetCharacter`, resets the named nodes, sets the original flags without SHADOW, zeroes the
+  velocity and turns zoom (both bytes) off.
+- **Port adaptations.**
+  - The port keeps typed items, not the original intrusive list. Items are written in
+    type order (medkit, flashlight, goggles, eye, binoculars, then keys in pickup order),
+    and a load restores that order. The original writes pickup order.
+  - Non-key items carry their original picture names but NULL item names: the port has no
+    server `FormatString`. The current item is written as `INV_NONE`: the port has no item
+    cursor.
+  - An unknown item type is refused; the original skips the item's data and desynchronizes.
+    A thrown eye (a non-NULL SeeingEye reference) is refused until lot 9.
+  - The original does not save the eye level. The crouch state and eye level are derived
+    from the saved movement state, and the client reads the eye level from the player, as
+    before, instead of an `SMSG_EYELEVEL` message.
+- **Powers and imprisonment.** All five power flags, their relative expiries and the
+  power sound stack are saved; the sound handles are not, and `CheckPowerups` restarts the
+  top power's loop. Anger's ×3 travels in the inventory damage multiplier, Willpower's nigh
+  invulnerability in the damage aggregate and Stealth's alpha in the engine colour.
+  Imprisonment saves its flag, relative start and length. The typed `PlayerState` used by
+  NEW_LEVEL now carries the same block, so the active-power refusal is removed from
+  `SaveFields`, `LoadFields` and `RestoreModelState`; the CTF, Orb and weapon-callback
+  refusals remain.
+- **Client blob.** `CBloodClientShell::SaveClientData` writes the original fields: night
+  goggles, wonky time and flags, blind time and flag, fade in, out and value, music level,
+  `m_nLastLoadType` (1 new game, 2 new level, 3 restore), game type, and the objectives title
+  and text (NULL until the first objectives message).
+  - The port has no wonky vision: it writes the idle values and refuses a blob that holds
+    any.
+  - The blind time is an absolute client time, valid because a full restore keeps the clock.
+  - `LoadClientData` discards the goggles flag and the load type, requires the game type to
+    equal the restored console and the blob to be read exactly (new `MessageFullyRead`
+    query), then restores fade, blind time, objectives (with no resource ID) and the music
+    level through `PlayMusicLevel`. The original's trailing `maxfps 0` has no equivalent.
+- **CMSG_SAVEGAME.** `save_game` builds the original request (file name, `SAVETYPE_CURRENT`,
+  the nested blob). The shell's `OnSaveGameMessage` attaches the blob to the sender's player
+  before `SaveGame`. A refused save releases the blob, which the original kept pending (or
+  leaked without a player).
+- **SMSG_CLIENTSAVEDATA.** The player's Load hands the blob to the new `SendClientSaveData`
+  service, the typed replacement for the original broadcast. It holds at most one blob: a
+  second fails the Load (D6). The load delivers it to `LoadClientData` after the client's
+  restored entry. The original order is unverified; its probable order lets `OnEnterWorld`
+  reset fade and wonky afterwards, while OpenBlood2 keeps the saved fade.
+- **load_game's player step.**
+  1. The image must hold exactly one CPlayerObj, carrying the local-client flag and alive
+     (D6). The original Load restores a dead player, but the port has no corpse
+     restoration, and a save of a dead player is refused anyway.
+  2. A new local client is attached through `OnRestoredClientEnterWorld`: `SetClient`,
+     `SMSG_PLAYERINIT_SINGLEPLAYER`, `SMSG_FORCEROTATION` and the first client state. There
+     is no `GoToStartPoint` and no fresh `SINGLEPLAYER_INIT`.
+  3. The client enters the world as restored, the blob is delivered, and the player
+     messages, weapons, hand models, frame end and attachments are processed.
+
+  The validation stage adds RunWorld's player checks (in the world, associated, alive,
+  client music) and leaves the promoted session `Ready`.
+- **save_game admission.** As the original `MenuSaveGame`: the live local player must be
+  in the world, not dead, with its profile received.
+- **Shell console.** A fresh or keep-alive `LoadWorld` now sets `GAME_GOTOSTARTPOINT` to 1,
+  `GAME_REVISITING` to 0 and `GAME_DOAUTOSAVE` to 1. A restore sets all three to 0, then
+  `RespawnPlayer` sets `GAME_GOTOSTARTPOINT` back to 1.
+- **Model and skin.** The engine record's model and skin replace the precreate choice
+  before the animation track is applied (D13).
+- **Expected rewrites.** A save right after a load reproduces the player's record except:
+  - the flags (no SHADOW) and the zeroed velocity;
+  - hidden nodes reset by name;
+  - zoom 0;
+  - the blob's load type 3;
+  - items written in type order.
+
+Lots 6, 9 and 11 build on this: lot 6 wires `save_game`/`load_game` to files and menus and
+clears UI state on commit; lot 9 makes SeeingEye Original and replaces the thrown-eye
+refusal (its Load re-links the owner and sends `MID_ATTACH`); lot 11 declares the NPCs, whose
+`CMovement` records carry their own owner, and CCorpse, which reuses the `CDestructable`
+block and its owner reference.
 
 ### Implemented movers and brushes (lot 8)
 

@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-20",
+  "scope": "Save/load lot 5: the original CPlayerObj, CMovement, CInventoryMgr (with its items) and CDestructable Save/Load byte bodies over the existing typed values, the client SaveClientData/LoadClientData blob, CMSG_SAVEGAME and SMSG_CLIENTSAVEDATA, the restored-client association and the shell console variables. Field order, types and Load side effects were selected from the references below; the bodies are written over the port's typed state. Selective excerpts are recorded in the provenance ledger.",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PlayerObj.cpp",
+      "source_sha256": "93056622f9f083f11447a471ecae6f115b7dc3937daf7d251d2396724f3d2003",
+      "purpose": "Save/Load (6541-6873): field order and types, relative clocks, the power block and sound stack, the plain-object camera write, (DBYTE) words, the one-shot client blob and its broadcast, the Load tail (SetCharacter, ResetNodes, flags without SHADOW, zero velocity, zoom off); SetClientSaveData (5905-5913); constructor defaults (311-420) for the carried fields; PostPropRead forcing Caleb.abc on every precreate (574-580)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PlayerObj.h",
+      "source_sha256": "cbb04f7354450a1b423b1b19652f27810a0ae95aef02e5567e4def1498e385ae",
+      "purpose": "PowerupType (five types) and PU_MAXSTACK 15."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/BaseCharacter.cpp",
+      "source_sha256": "6dcf0d6f2bf3c9ee4caec8ee906d191869eece9bc1f69ebb88ae80ed25875172",
+      "purpose": "Empty Save/Load; AddAggregate order (damage, inventory, movement), so the aggregates save CMovement, CInventoryMgr, CDestructable."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/movement.cpp",
+      "source_sha256": "2c4a4aef6eb8862a258dac44b2b26396ff720a8456c9320f0e19603ebbe591b6",
+      "purpose": "Save/Load (584-638): owner LoadSave reference, cached transform and path points."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/InventoryMgr.cpp",
+      "source_sha256": "aab29291e988ac7c3e1424f41076b5c0adc6243cd60198ea2cc6381d402d0e53",
+      "purpose": "Save/Load (2843-3064): markers, weapon and inventory-bomb bytes, raw ammo after recreation, the item list and its type switch, keys dropped for dwLoadType 1, current slot/weapon/item, unused multipliers; constructor defaults (fire-rate multiplier 1, god mode and drop eye false)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/InvItem.h",
+      "source_sha256": "e680a279b6cd0cb4a4533a065d983f8f7c01611bc8b2525c0caa0af76a849a7c",
+      "purpose": "CInvItem::Save/Load (186-238): owner reference read into a temporary, four HStrings, flags, type and count; active forced off on every load."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/GameInvItems.cpp",
+      "source_sha256": "883af352df59bf3159651940039e4eb4a8ba4bb9531dacfab089150edb36cff9",
+      "purpose": "Item Init picture names and counts; flashlight and goggles discharge time; CInvTheEye LoadSave seeing-eye reference."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/GameInvItems.h",
+      "source_sha256": "334caf2d413c9b5040425425b8df77f0cd37cd4d2404f39f85087d67a82cf0ac",
+      "purpose": "CInvKey::Setup: picture, highlighted picture, name, display name and use count."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Destructable.cpp",
+      "source_sha256": "c0d8b72b729e806a6ca8f0e44a57054aef30e20c4d75b745df29f97fb36199ca",
+      "purpose": "Save/Load (1134-1245): markers, owner reference kept only when unset, the 1.0e6 health sentinel and inferred CanDamage, raw values and trigger strings."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/BloodServerShell.cpp",
+      "source_sha256": "c431dfea17da8c3100ac3921e03d9bfe88c2d639cf7cba0f7763834de5681e1a",
+      "purpose": "CMSG_SAVEGAME (401-431); RespawnPlayer's saved-client branch (746-795); LoadWorld's GAME_GOTOSTARTPOINT, GAME_REVISITING and GAME_DOAUTOSAVE values (974-982)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "36a810c80ce87eb2304716e9e1dbaae25304c02c542019b0858c9dc99f2d1006",
+      "purpose": "SaveClientData/LoadClientData (6351-6431): blob fields, discarded goggles flag and load type, objectives update, maxfps."
+    },
+    {
+      "source": "sources/lithtech/Blood2/Shared/SharedDefs.h",
+      "source_sha256": "24c3d2752c18bf884afa0f376a129e68d0885b13da93410253e69db46d549423",
+      "purpose": "INV_* item types, INV_BASEINVWEAPON, SLOTCOUNT_*, AMMO_MAXAMMOTYPES, CDATA_SHOWGUN, LOADTYPE_*."
+    },
+    {
+      "source": "sources/lithtech/Blood2/AppHeaders/CSBase.h",
+      "source_sha256": "75b25e703d242cd9e3077e1deef587fdaf44eb5054f1fe434d3539cd47d78770",
+      "purpose": "Nested message calls and the LoadSave versus plain object rule."
+    },
+    {
+      "source": "sources/lithtech/runtime/server/src/game_serialize.cpp",
+      "source_sha256": "f0d9b69077e9d99037c252882b118238a58a004f0a943106afdac633d82893f8",
+      "purpose": "Later-runtime context for D13: the saved filename feeds the create struct before PRECREATE_SAVEGAME, the object is created from the struct precreate leaves, and the saved model animation trackers are applied afterwards. Not a 1998 trace."
+    }
+  ]
+}

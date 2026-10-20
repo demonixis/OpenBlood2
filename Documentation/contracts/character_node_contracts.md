@@ -98,3 +98,7 @@ The [burning death/dismemberment continuation](death_effect_contracts.md) supers
 blanket fire/gib/corpse-damage omissions for its selected original paths. Real
 flame/smoke particles, burned corpses, runtime limbs and flesh models now run with
 inspection. Blood-spurt/splat FX, generic gib/save services and full M2 remain open.
+
+[Save/load lot 5](save_load_contracts.md#implemented-player-and-client-lot-5): `RestoreModelState` also resets the zoom type with the zoom flag, as
+the original Load does, and no longer refuses an active power. The whole-game byte Load runs
+this tail.

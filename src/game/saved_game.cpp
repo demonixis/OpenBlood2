@@ -61,6 +61,12 @@ namespace OpenBlood2
             return refuse("Saving is limited to single-player game types (D12)");
         if (resources.demo())
             return refuse("The demo edition has no saves (decision 7)");
+        // Original MenuSaveGame: only in the world and alive; the save carries the local player.
+        auto* player = server_shell.Player(local_client);
+        if (!local_client || !client_shell.m_bInWorld || !player || client_shell.player != player->m_hObject ||
+            !server.IsObjectAlive(player->m_hObject) || player->m_bDead || player->m_damage.IsDead() ||
+            !player->attributes_received)
+            return refuse("A save requires the live local player in the world");
         // A live object of a saveable class without the original marking would be left out of
         // the shell's list and lost silently: refuse it by name instead.
         std::set<std::string> unmarked;
@@ -80,7 +86,18 @@ namespace OpenBlood2
         SaveError fingerprint;
         if (!build_fingerprint(resources, world_path, {}, next.fingerprint, fingerprint))
             return refuse("Fingerprint: " + fingerprint.text);
-        if (!server_shell.SaveGame(SAVETYPE_CURRENT, true, true))
+        // CMSG_SAVEGAME: the client nests its SaveClientData blob in the request, and the server
+        // attaches it to the sender's player before SaveGame; the player's Save consumes it.
+        const auto request = server.StartHMessageWrite();
+        if (!request)
+            return refuse("The save request message was refused");
+        server.WriteToMessageString(request, world_path.c_str()); // m_szFilename, ignored by the server.
+        server.WriteToMessageByte(request, SAVETYPE_CURRENT);
+        client_shell.SaveClientData(request);
+        const bool saved = server_shell.OnSaveGameMessage(local_client, request);
+        server.EndHMessageWrite(request);
+        player->ClearClientSaveData(); // A refused save never consumed it.
+        if (!saved)
             return refuse("SaveObjects: " + server.last_save.error);
         next.image = *server.save_store.find(SaveStoreSlot::Current);
         // SaveObjects wrote the schema of the classes present: unique, ascending and versioned.
@@ -88,6 +105,59 @@ namespace OpenBlood2
         next.fingerprint.class_schema = class_schema_digest(next.fingerprint.classes);
         out = std::move(next);
         ++game_saves;
+        return true;
+    }
+
+    bool GameSession::attach_saved_player(std::string& error)
+    {
+        error.clear();
+        const auto restored = server.last_restore.local_client;
+        std::size_t players = 0;
+        for (auto id : objects.snapshot())
+            if (const auto* r = objects.get(id);
+                r && r->life == Life::Alive && dynamic_cast<const CPlayerObj*>(r->game.get()))
+                ++players;
+        auto* player = restored ? dynamic_cast<CPlayerObj*>(server.HandleToObject(restored)) : nullptr;
+        if (!restored)
+            error = "The save holds no local player (D6)";
+        else if (players != 1 || !player)
+            error = "A saved game holds exactly one local player (D6); found " + std::to_string(players) + " players";
+        else if (player->m_bDead || player->m_damage.IsDead())
+            error = "Restoring a dead player and its independent corpse is unavailable";
+        if (!error.empty())
+            return false;
+        // OnClientEnterWorld's saved-client branch: SetClient, PLAYERINIT and FORCEROTATION (the
+        // client reads the eye level from the player), never GoToStartPoint or a fresh profile.
+        local_client = server.connect_client();
+        if (!local_client || !server_shell.OnRestoredClientEnterWorld(local_client, restored))
+        {
+            error = player->entry_error.empty() ? "Restored client association failed" : player->entry_error;
+            return false;
+        }
+        if (!client_shell.OnEnterWorld(local_client, true))
+        {
+            error = "Client entry of the restored player failed";
+            return false;
+        }
+        // SMSG_CLIENTSAVEDATA, queued by the player's Load, reaches LoadClientData after the entry reset.
+        if (const auto data = server.take_client_save_data())
+        {
+            const bool loaded = client_shell.LoadClientData(data, error);
+            server.EndHMessageRead(data);
+            if (!loaded)
+                return false;
+        }
+        if (!pump_player_messages(error) || !client_shell.Update() ||
+            !client_shell.SyncWeapons(models, resources, server_shell, error) ||
+            !player->m_InventoryMgr.UpdateHandModels() || !objects.finish_frame() || !objects.refresh_attachments() ||
+            !server.IsObjectAlive(restored) || server.GetClientUserData(local_client) != restored)
+        {
+            if (error.empty())
+                error = "Restored player entry failed";
+            return false;
+        }
+        trace.push_back("Restored player -> saved-client shell branch (FORCEROTATION, no start point) -> "
+                        "SMSG_CLIENTSAVEDATA -> LoadClientData");
         return true;
     }
 
@@ -200,13 +270,10 @@ namespace OpenBlood2
             }
             report.world_loaded = report.restored = true;
             report.records = candidate->server.last_restore.records;
-            // 10. The restored-client branch is lot 5; never promote an unassociated player.
+            // 10. Exactly one saved local player (D6), reattached through the restored-client branch.
             stage = "player";
-            if (candidate->server.last_restore.local_client)
-            {
-                error = "The save holds the local player; its client association is not implemented yet (lot 5)";
+            if (!candidate->attach_saved_player(error))
                 return false;
-            }
             // 11. The checks of checked startup and NEW_LEVEL.
             stage = "validation";
             if (!check_world_initialization(*candidate, report, error))
@@ -218,13 +285,21 @@ namespace OpenBlood2
                         error = "Original NPC failure: " + std::string(r->state.m_Name) + ": " + ai->runtime_error;
                         return false;
                     }
-            if (candidate->pending_level_change)
+            // RunWorld's player checks: the attached player must be live and associated.
+            const auto* player = candidate->server_shell.Player(candidate->local_client);
+            if (!candidate->client_shell.m_bInWorld || !player || candidate->client_shell.player != player->m_hObject ||
+                !candidate->server.IsObjectAlive(player->m_hObject) || player->m_bDead || player->m_damage.IsDead())
+                error = "RunWorld requires a live player associated with the original client";
+            else if (candidate->pending_level_change)
                 error = "A restored object requested a level change";
             else if (candidate->server.message_count())
                 error = "Live messages remain after the restore";
-            else if (!candidate->server.audio.music_error.empty())
-                error = "Music: " + candidate->server.audio.music_error;
-            return error.empty() && check_world_presentation(*candidate, report, error);
+            else if (candidate->client_shell.music.failures || !candidate->server.audio.music_error.empty())
+                error = "Music: " + candidate->client_shell.music.error + " " + candidate->server.audio.music_error;
+            if (!error.empty() || !check_world_presentation(*candidate, report, error))
+                return false;
+            candidate->state = SessionState::Ready;
+            return true;
         }();
         if (!prepared)
         {

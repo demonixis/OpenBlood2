@@ -73,9 +73,10 @@ class CPlayerObj : public CBaseCharacter
     std::uint64_t remote_commands = 0, remote_signals = 0;
     std::string remote_error;
     // Original activation storage/query. Willpower, Stealth and Anger are collected
-    // and timed (PlayerPowers.cpp). Their original Save block remains unported.
+    // and timed (PlayerPowers.cpp); Save/Load carry all five flags and expiry times.
     std::array<bool, PU_MAXTYPES> m_bPowerupActivated{};
     float m_fInvisibleTime = 0, m_fNighInvulnerableTime = 0, m_fTripleDamageTime = 0;
+    float m_fIncorporealTime = 0, m_fSilentTime = 0;           // Unavailable powers; saved like the others.
     std::array<PowerupType, 15> m_ePowerupSoundStack{PU_NONE}; // Source PU_MAXSTACK.
     int m_nPowerupSoundStackPos = 0;
     OpenBlood2::SoundId m_hPowerupStartSound = 0, m_hPowerupEndSound = 0, m_hPowerupLoopSound = 0;
@@ -145,6 +146,22 @@ class CPlayerObj : public CBaseCharacter
     bool SaveFields(OpenBlood2::PlayerState&, std::string&) const;
     bool LoadFields(const OpenBlood2::PlayerState&, std::string&);
     bool RestoreModelState(std::string&);
+    // Original Save/Load (PlayerObj.cpp:6541-6873): the value block above in the original
+    // byte layout, then the one-shot client blob (save_load_contracts lot 5).
+    void Save(HMESSAGEWRITE, DDWORD);
+    void Load(HMESSAGEREAD, DDWORD);
+    // Original SetClientSaveData: owns the CMSG_SAVEGAME blob until the next Save consumes it.
+    void SetClientSaveData(HMESSAGEREAD);
+    void ClearClientSaveData()
+    {
+        SetClientSaveData(nullptr);
+    }
+    bool HasClientSaveData() const
+    {
+        return static_cast<bool>(m_hClientSaveData);
+    }
+    OpenBlood2::PlayerCarried original_values; // Saved original fields this port does not interpret.
+    float m_startIdle = 0;                     // Original idle clock; saved, not interpreted.
     bool restore_model_loaded = false, restore_engine_loaded = false;
     std::string restore_model_error;
     bool restore_initialization = false, restore_fields_loaded = false;
@@ -269,6 +286,7 @@ class CPlayerObj : public CBaseCharacter
     float animation_start_ = 0;
     HCLIENT m_hClient = nullptr;
     HSTRING m_hstrTrigger = nullptr, m_hstrPlayerName = nullptr;
+    HMESSAGEREAD m_hClientSaveData = nullptr;
     HOBJECT initial_smell_ = nullptr;
     bool zoom_sent_ = false; // Last delivered SMSG_ZOOMVIEW state; the client starts unzoomed.
 };

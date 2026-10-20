@@ -375,14 +375,17 @@ namespace
         CHECK(p.AddPowerup(6, 30) && p.IsPowerupActive(PU_INVISIBLE));
         p.ResetPowerups();
         CHECK(!p.IsPowerupActive(PU_INVISIBLE) && r->alpha == 1 && (r->state.m_Flags & FLAG_SHADOW));
-        // The source saves no power state: capture drops it, the engine snapshot keeps the color.
+        // The original Save carries the power flag, its relative expiry and the sound stack;
+        // the engine snapshot keeps the color (save/load lot 5).
         CHECK(p.AddPowerup(6, 30));
         PlayerRestoreState s;
         std::string e;
-        CHECK(g.capture_player(s, e) && std::abs(s.alpha - .08f) < 1e-6f);
+        CHECK(g.capture_player(s, e) && std::abs(s.alpha - .08f) < 1e-6f && s.player.powers[PU_INVISIBLE] &&
+              s.player.power_offsets[PU_INVISIBLE] > 29.9f && s.player.power_sounds.size() == 1);
         CHECK(g.leave_player() && g.restore_player(s, e));
         auto& restored = player(g);
-        CHECK(!restored.IsPowerupActive(PU_INVISIBLE) &&
+        CHECK(restored.IsPowerupActive(PU_INVISIBLE) && restored.m_nPowerupSoundStackPos == 1 &&
+              std::abs(restored.m_fInvisibleTime - g.server.GetTime() - s.player.power_offsets[PU_INVISIBLE]) < 1e-3f &&
               std::abs(g.objects.get(restored.m_hObject)->alpha - .08f) < 1e-6f);
         CHECK(!restored.AddPowerup(8, 30)); // Other powers stay unported.
         return true;

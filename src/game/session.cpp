@@ -379,6 +379,15 @@ namespace OpenBlood2
             trace.push_back("Server RestoreGame -> RestoreObjects(Current.sav, 0, RESTORETIME): " +
                             std::to_string(server.last_restore.records) + " records");
         }
+        else
+        {
+            // Original LoadWorld (BloodServerShell.cpp:974-982) for a fresh or keep-alive entry:
+            // go to the start point and request the level-entry autosave; never a revisit.
+            server.SetGameConVar("GAME_GOTOSTARTPOINT", "1");
+            server.SetGameConVar("GAME_REVISITING", "0");
+            server.SetGameConVar("GAME_DOAUTOSAVE", "1");
+        }
+        client_shell.m_nLastLoadType = request.load_type; // The client's m_nLastLoadType.
         if (!server_shell.PostStartWorld())
         {
             error = "Original shell path snapshot failed: " + server_shell.paths.error();

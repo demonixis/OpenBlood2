@@ -4,6 +4,7 @@
 #include "BloodShells.h"
 #include "ClientCrosshair.h"
 #include "MenuIds.h"
+#include "SaveFields.h"
 #include "engine/string_resources.h"
 #include "game/game_settings.h"
 #include <algorithm>
@@ -72,6 +73,17 @@ bool CBloodServerShell::RestoreGame(DBYTE bySaveType)
 {
     const char* szSavePath = save_path(bySaveType);
     return szSavePath && server_.RestoreObjects(szSavePath, 0, RESTOREOBJECTS_RESTORETIME) == DE_OK;
+}
+bool CBloodServerShell::OnSaveGameMessage(HCLIENT hSender, HMESSAGEREAD hMessage)
+{
+    server_.ReadFromMessageString(hMessage); // pFilename: read and ignored by the original.
+    const DBYTE bySaveType = server_.ReadFromMessageByte(hMessage);
+    const HMESSAGEREAD hClientSaveData = server_.ReadFromMessageHMessageRead(hMessage);
+    if (CPlayerObj* pPlayerObj = Player(hSender))
+        pPlayerObj->SetClientSaveData(hClientSaveData);
+    else if (hClientSaveData)
+        server_.EndHMessageRead(hClientSaveData); // The original leaked a blob without a player.
+    return SaveGame(bySaveType == SAVETYPE_CURRENT ? SAVETYPE_CURRENT : SAVETYPE_AUTO, true, true);
 }
 CPlayerObj* CBloodServerShell::Player(HCLIENT client)
 {
@@ -337,6 +349,90 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     blocker = "M2 is closed for the selected SubwayA-to-CityHub session with reservation M2-GPU-001. "
               "Whole-world saves and unexercised gameplay paths are not validated.";
     return true;
+}
+void CBloodClientShell::SaveClientData(HMESSAGEWRITE hMsg)
+{
+    const HMESSAGEWRITE hSaveMsg = server_.StartHMessageWrite();
+    // m_eMusicLevel is refreshed from the music state first; this port reads it directly.
+    server_.WriteToMessageByte(hSaveMsg, night_goggles);
+    server_.WriteToMessageFloat(hSaveMsg, 0); // m_fWonkyTime, m_bWonkyVision, m_bWonkyNoMove: no wonky
+    server_.WriteToMessageByte(hSaveMsg, 0);  // vision in this port, so the original idle values.
+    server_.WriteToMessageByte(hSaveMsg, 0);
+    server_.WriteToMessageFloat(hSaveMsg, blind_until); // m_fBlindTime: an absolute client time, never rebased.
+    server_.WriteToMessageByte(hSaveMsg, server_.GetTime() < blind_until);
+    server_.WriteToMessageByte(hSaveMsg, fade.fade_in);
+    server_.WriteToMessageByte(hSaveMsg, fade.fade_out);
+    server_.WriteToMessageFloat(hSaveMsg, fade.value);
+    server_.WriteToMessageByte(hSaveMsg, music.logical_level);
+    server_.WriteToMessageFloat(hSaveMsg, static_cast<float>(m_nLastLoadType));
+    server_.WriteToMessageFloat(hSaveMsg, server_.GetVarValueFloat(server_.GetGameConVar("GAME_GAMETYPE")));
+    // The original title and text stay NULL until the first objectives message.
+    const bool objectives_known = objective_messages || objectives_resolved;
+    // No HSTRING per save: session string tokens are never reused.
+    OpenBlood2::save_fields::write_nullable(hSaveMsg, objectives_known ? objectives.title.c_str() : nullptr);
+    OpenBlood2::save_fields::write_nullable(hSaveMsg, objectives_known ? objectives.text.c_str() : nullptr);
+    server_.WriteToMessageHMessageWrite(hMsg, hSaveMsg);
+    server_.EndHMessageWrite(hSaveMsg);
+    ++client_data_saves;
+}
+bool CBloodClientShell::LoadClientData(HMESSAGEREAD hMsg, std::string& error)
+{
+    const HMESSAGEREAD hLoadMsg = server_.ReadFromMessageHMessageRead(hMsg);
+    if (!hLoadMsg)
+    {
+        error = "SMSG_CLIENTSAVEDATA holds no client blob";
+        return false;
+    }
+    bool booleans = true;
+    const auto flag = [&]
+    {
+        const auto value = server_.ReadFromMessageByte(hLoadMsg);
+        booleans = booleans && value <= 1;
+        return value != 0;
+    };
+    flag(); // bNightVisionActive: read and discarded; the goggles start off.
+    const float wonky_time = server_.ReadFromMessageFloat(hLoadMsg);
+    const bool wonky_vision = flag(), wonky_no_move = flag();
+    const bool wonky = wonky_vision || wonky_no_move;
+    const float blind_time = server_.ReadFromMessageFloat(hLoadMsg);
+    const bool blind = flag();
+    const bool fade_in = flag(), fade_out = flag();
+    const float fade_value = server_.ReadFromMessageFloat(hLoadMsg);
+    const DBYTE music_level = server_.ReadFromMessageByte(hLoadMsg);
+    const float load_type = server_.ReadFromMessageFloat(hLoadMsg); // Read and discarded.
+    const float game_type = server_.ReadFromMessageFloat(hLoadMsg);
+    std::optional<std::string> title, text;
+    const bool strings = OpenBlood2::save_fields::read_nullable(hLoadMsg, title) &&
+                         OpenBlood2::save_fields::read_nullable(hLoadMsg, text);
+    const bool complete = strings && server_.MessageFullyRead(hLoadMsg);
+    server_.EndHMessageRead(hLoadMsg);
+    if (!complete || !booleans)
+        error = "The client blob is truncated, oversized or holds an invalid boolean";
+    else if (!std::isfinite(wonky_time) || wonky_time != 0 || wonky)
+        error = "The client blob holds wonky vision, which this port does not implement";
+    else if (!std::isfinite(blind_time) || !std::isfinite(fade_value) || fade_value < 0 || fade_value > 1 ||
+             !std::isfinite(load_type) || music_level > 3)
+        error = "The client blob holds an invalid blind clock, fade, load type or music level";
+    else if (game_type != server_.GetVarValueFloat(server_.GetGameConVar("GAME_GAMETYPE")))
+        error = "The client blob's game type differs from the restored console";
+    if (!error.empty())
+        return false;
+    // m_fBlindTime is an absolute client time; the full restore kept the clock, so it still holds.
+    blind_until = blind || blind_time <= server_.GetTime() ? blind_time : 0;
+    fade.fade_in = fade_in;
+    fade.fade_out = fade_out;
+    fade.value = fade_value;
+    if (title && text)
+    {
+        objectives = {0, *title, *text}; // UpdateObjectives with the saved strings; no resource ID.
+        objectives_resolved = true;
+        objectives_error.clear();
+    }
+    // OnEnterWorld played silence; the client restarts music at the restored level.
+    if (music_level != music.logical_level)
+        music.PlayMusicLevel(music_level, music_catalog_, audio_);
+    ++client_data_loads;
+    return true; // The trailing "maxfps 0" console command has no equivalent here.
 }
 void CBloodClientShell::OnExitWorld()
 {

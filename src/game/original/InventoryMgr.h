@@ -27,6 +27,9 @@ class CInventoryMgr : public Aggregate
     // Restore before client association: rebuilding live client views is a
     // separate player-transfer responsibility, never silently bypassed here.
     bool Load(const OpenBlood2::InventoryState&, OpenBlood2::InventoryLoadType, std::string&);
+    // Original byte layout of the values above (InventoryMgr.cpp:2843-3061); dwParam 1 drops keys.
+    void Save(HMESSAGEWRITE, DDWORD);
+    void Load(HMESSAGEREAD, DDWORD);
     InventoryResult AddItem(DBYTE, DBYTE);
     InventoryResult AddInventoryWeapon(DBYTE, DBYTE);
     InventoryResult SelectInventoryWeapon(DBYTE);

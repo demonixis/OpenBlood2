@@ -100,3 +100,10 @@ now supplies accepted ordinary-movement impulses, original player falling damage
 engine mass/friction and saved server-falling state. Earlier blanket omissions are
 superseded only for this boundary; dedicated mover/body/projectile forces, retail
 physics parity and the M2 gate remain open.
+
+[Save/load lot 5](save_load_contracts.md#implemented-player-and-client-lot-5) restores the player from a whole-game save through the same
+original Load tail and saved-client branch: the byte Load runs `LoadFields` and
+`RestoreModelState` (which now also resets the zoom type), and `load_game` attaches a new
+client through `OnRestoredClientEnterWorld`, then delivers the saved client blob. The
+crouch state and eye level are derived from the saved movement state. `restore_player`
+remains the NEW_LEVEL path; power timers are no longer missing from either.

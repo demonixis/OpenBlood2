@@ -84,3 +84,8 @@ state and safe named destination entry remain unported for keep-alive. General
 saves, full NPC/brush restoration, other damage modifiers and the previously absent
 MID_UPDATE maximum-stat clamps are not implemented here. Do not treat these value
 snapshots as complete object restoration or M2 acceptance.
+
+Save/load lot 8 writes these values in the original `CDestructable` byte layout, between the
+two `0xCECECECE` markers, for any Original owner. [Save/load lot 5](save_load_contracts.md#implemented-player-and-client-lot-5)
+saves the player through it; the typed Load's associated-player refusal does not apply there,
+because a restored player has no client during its Load.

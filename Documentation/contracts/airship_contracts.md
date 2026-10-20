@@ -39,9 +39,9 @@ stack executes the existing start/loop/end paths.
 Preserve the source time quirk. Stealth's last-five-second blink calculation overwrites
 the local time used by the following Anger expiry check, so it can defer expiry.
 The original Player Save writes power activation, expiry offsets and sound-stack
-entries (PlayerObj.cpp:6588–6601); the existing typed snapshot does not implement
-that block. Active Anger therefore retains the explicit capture/restore refusal,
-preventing Inventory Save's damage multiplier from surviving without its expiry.
+entries (PlayerObj.cpp:6588–6601). [Save/load lot 5](save_load_contracts.md#implemented-player-and-client-lot-5) ports that block, so active
+Anger now travels with its expiry and the inventory multiplier; the capture/restore
+refusal described here is superseded.
 Capture after reset/expiry works. The existing Stealth/Willpower snapshot omissions
 are partial-port limitations, not original Save behavior; this change does not
 extend their serialization.

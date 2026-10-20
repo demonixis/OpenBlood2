@@ -97,6 +97,7 @@ namespace OpenBlood2
         {
             if (!destination->initialize() || !destination->load_world(fresh, error))
                 return false;
+            destination->client_shell.m_nLastLoadType = LOADTYPE_NEW_LEVEL; // The client's StartNewWorld type.
             report.world_loaded = true;
             if (!check_world_initialization(*destination, report, error))
                 return false;

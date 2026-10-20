@@ -212,11 +212,24 @@ namespace
         dir.children["worlds"].files["save1.dat"] = dat(save1);
         dir.children["worlds"].files["unported.dat"] = dat(unported);
         dir.children["worlds"].files["bare.dat"] = dat(save1, "absent.dtx");
-        dir.children["worlds"].files["other.dat"] = dat(
-            {object("SessionAlwaysLoad", {text("Name", "always")}), object("SessionProbe", {text("Name", "probe-a")})});
+        dir.children["worlds"].files["other.dat"] =
+            dat({object("SessionAlwaysLoad", {text("Name", "always")}),
+                 object("GameStartPoint", {text("Name", "start")}), object("SessionProbe", {text("Name", "probe-a")})});
         dir.files["t.dtx"] = dtx();
         dir.children["models"].files["path1.abc"] = test_model::abc(false, true).b; // PathPoint's model.
         dir.children["skins"].files["path1.dtx"] = dtx();
+        // The player a save requires (lot 5): Caleb and the default weapons' view models.
+        dir.children["models"].children["characters"].files["caleb.abc"] = test_model::abc(false, true).b;
+        dir.children["skins"].children["characters"].files["caleb1.dtx"] = dtx();
+        for (auto path : {"beretta_pv.abc", "lh_beretta_pv.abc", "c_knife_pv.abc"})
+            dir.children["models"].children["weapons"].files[path] = test_model::abc(true).b;
+        for (auto path : {"c_beretta_pv_t.dtx", "c_knife_pv_t.dtx"})
+            dir.children["skins"].children["weapons"].files[path] = dtx();
+        for (auto name : {"beretta_pu", "knifec_pu"})
+        {
+            dir.children["models"].children["powerups"].files[std::string(name) + ".abc"] = test_model::abc(true).b;
+            dir.children["skins"].children["powerups"].files[std::string(name) + ".dtx"] = dtx();
+        }
         test_model::Writer archive;
         archive.b.resize(168);
         archive.b[0] = archive.b[62] = archive.b[124] = 13;
@@ -356,6 +369,11 @@ namespace
         CHECK(setup(*game));
         std::string error;
         CHECK(game->request_world(world, error));
+        // Original entry without RunWorld's checks: the unported and bare worlds refuse those
+        // only when loaded. A save requires the live local player (lot 5).
+        if (!game->enter_player(error))
+            std::cerr << "player entry: " << error << '\n';
+        CHECK(game->local_client);
         for (int i = 0; i < 20; ++i)
             CHECK(game->step(.05));
         auto *a = probe(*game, "probe-a"), *b = probe(*game, "probe-b");
@@ -498,11 +516,12 @@ namespace
         const std::set<std::string> not_saved{"B2BaseClass",    "BaseClass", "CClientSFX",
                                               "CClientSplatFX", "CGib",      "CHandWeaponModel",
                                               "FlagObject",     "FlagStand", "NagaCeilingDebris"};
-        // Lot 8: movers, brushes, volumes, TripLaser and Tchernotronic carry original payloads.
+        // Lot 5: the player. Lot 8: movers, brushes, volumes, TripLaser and Tchernotronic.
         const std::set<std::string> original{"Acid",
                                              "Blood",
                                              "CDestructableBrush",
                                              "CDestructableModel",
+                                             "CPlayerObj",
                                              "Conveyor",
                                              "Damage",
                                              "Door",
@@ -567,7 +586,7 @@ namespace
         GameSession g;
         CHECK(setup(g));
         std::string error;
-        CHECK(g.request_world("save1", error));
+        CHECK(g.request_world("save1", error) && g.enter_player(error));
         const auto make = [&](const char* type, Properties p = {})
         { return g.objects.create(g.objects.find_class(type), {}, Creation::World, p); };
         struct Row
@@ -623,9 +642,10 @@ namespace
         g.server.SetObjectUserFlags(unmarked, 0);
         CHECK(!g.save_game(save, error) && contains(error, "not marked USRFLG_SAVEABLE: Trigger") &&
               error.find("SaveObjects") == std::string::npos);
-        // Without any Unsupported object, a marked NotSaved object still refuses by name.
+        // Without any Unsupported object, a marked NotSaved object still refuses by name. The
+        // player (Original since lot 5) and its unsaved children stay.
         for (auto id : g.objects.snapshot())
-            if (const auto* r = g.objects.get(id); r && save_support(r->type) != SaveSupport::AlwaysLoad)
+            if (const auto* r = g.objects.get(id); r && save_support(r->type) == SaveSupport::Unsupported)
                 g.objects.remove(r->handle);
         CHECK(g.objects.finish_frame());
         const auto base = make("B2BaseClass");
@@ -639,11 +659,19 @@ namespace
     bool refusals()
     {
         GameSession g;
-        CHECK(test_player::setup(g, root, true, false));
+        CHECK(test_player::setup(g, root));
         GameSave save;
         std::string error;
-        // Only the always-load start point exists; the synthetic world is not a mounted DAT.
+        // Original MenuSaveGame: no save without the live local player in the world (lot 5).
+        CHECK(!g.save_game(save, error) && contains(error, "live local player"));
+        CHECK(g.enter_player(error));
+        auto* player = g.server_shell.Player(g.local_client);
+        player->m_bDead = DTRUE;
+        CHECK(!g.save_game(save, error) && contains(error, "live local player"));
+        player->m_bDead = DFALSE;
+        // Only the always-load start point and the player exist; the synthetic world is not a mounted DAT.
         CHECK(!g.save_game(save, error) && contains(error, "Fingerprint: World synthetic.dat"));
+        CHECK(!player->HasClientSaveData() && g.server.message_count() == 0);
         CHECK(!g.server.save_store.find(SaveStoreSlot::Current)); // A failed save keeps the previous image.
         const auto revision = g.server.save_store.revision();
         g.server.SetGameConVar("GAME_GAMETYPE", "1"); // Bloodbath.
@@ -678,8 +706,8 @@ namespace
         GameSave save;
         CHECK(saved_world(game, save));
         std::string error;
-        CHECK(save.world_path == "worlds/save1.dat" && save.image.records == 2 && save.image.console_saved);
-        const std::vector<SaveClass> schema{{"SessionProbe", 1}};
+        CHECK(save.world_path == "worlds/save1.dat" && save.image.records == 3 && save.image.console_saved);
+        const std::vector<SaveClass> schema{{"CPlayerObj", 1}, {"SessionProbe", 1}};
         CHECK(save.image.classes == schema && save.fingerprint.classes == save.image.classes);
         CHECK(game->game_saves == 1 && *game->server.save_store.find(SaveStoreSlot::Current) == save.image);
         CHECK(game->server_shell.SaveGame(SAVETYPE_AUTO, true, true)); // The original Auto.sav image.
@@ -697,7 +725,7 @@ namespace
             CHECK(error.empty() && game.get() != owner && g_pServerDE == &game->server);
             const auto& report = game->game_load;
             CHECK(report.committed == cycle + 1 && report.rejected == 0 && report.stage.empty());
-            CHECK(report.cleanup_complete && !report.source_retained && report.restored && report.records == 2);
+            CHECK(report.cleanup_complete && !report.source_retained && report.restored && report.records == 3);
             CHECK(game->world_revision == revision + cycle + 1 && report.destination_revision == game->world_revision);
             // The candidate copied the store, then replaced Current: the revision only grows.
             CHECK(report.destination_store_revision == report.source_store_revision + 1);
@@ -716,7 +744,9 @@ namespace
                 CHECK(state == (row.class_name == "SessionProbe" ? EntryState::SavedState : EntryState::Created));
             }
             CHECK(created == 7 && saved == 2 && report.unknown == 0 && report.failed == 0);
-            CHECK(game->state == SessionState::Inspection && !game->local_client);
+            // The saved local player is attached to a new client (lot 5); the session runs.
+            CHECK(game->state == SessionState::Ready && game->local_client &&
+                  game->server_shell.Player(game->local_client) && game->client_shell.restored_entry);
             // The clock, console and probe state, before any step. The always-load observer drew
             // once from the restored generator (D10), so only the generator moved on.
             auto expected = clock;
@@ -726,23 +756,33 @@ namespace
             auto *a = probe(*game, "probe-a"), *b = probe(*game, "probe-b");
             CHECK(a && b && a->value == 7 && b->value == 11 && a->ref == b->m_hObject && !b->ref);
             CHECK(var(*game, "SessionVar") == "saved" && var(*game, "GAME_WORLDNAME") == "worlds/save1.dat");
-            for (auto name : {"GAME_GOTOSTARTPOINT", "GAME_REVISITING", "GAME_DOAUTOSAVE"})
-                CHECK(var(*game, name) == "0");
+            // LoadWorld forced all three to 0; RespawnPlayer then set GOTOSTARTPOINT back to 1.
+            CHECK(var(*game, "GAME_GOTOSTARTPOINT") == "1" && var(*game, "GAME_REVISITING") == "0" &&
+                  var(*game, "GAME_DOAUTOSAVE") == "0");
             CHECK(SmellHint::m_dwNumSmells == 1 && ExitHint::m_dwNumExits == 1 && !g_hActiveCamera);
             CHECK(observed.size() == 1 && observed[0].reason == INITIALUPDATE_WORLDFILE);
-            // A save right after the load reproduces the loaded OBJS, LINK and ATCH bytes; CLCK
-            // differs only in the generator the always-load draw advanced.
+            // A save right after the load reproduces the loaded LINK and ATCH bytes and every
+            // probe record; the player record carries its listed original rewrites (save_player
+            // checks them); CLCK differs only in the generator the always-load draw advanced.
             GameSave again;
             CHECK(game->save_game(again, error) && again.fingerprint == save.fingerprint);
-            CHECK(again.image.objects == save.image.objects && again.image.links == save.image.links &&
-                  again.image.attachments == save.image.attachments && again.image.classes == save.image.classes &&
-                  again.image.records == save.image.records);
-            // The console's only rewrite: the original LoadWorld forces the three shell variables to 0.
+            CHECK(again.image.links == save.image.links && again.image.attachments == save.image.attachments &&
+                  again.image.classes == save.image.classes && again.image.records == save.image.records);
+            std::vector<SaveEngineRecord> first, second;
+            SaveError records_error;
+            CHECK(decode_save_records(save.image.objects, first, records_error) &&
+                  decode_save_records(again.image.objects, second, records_error) && first.size() == second.size());
+            for (std::size_t i = 0; i < first.size(); ++i)
+                CHECK(first[i].class_name == "CPlayerObj"
+                          ? second[i].class_name == "CPlayerObj" && second[i].local_client
+                          : first[i] == second[i]);
+            // The console's rewrites: LoadWorld forces the shell variables to 0, then RespawnPlayer
+            // sets GOTOSTARTPOINT to 1 again.
             std::map<std::string, std::string> console, reloaded;
             for (const auto& variable : save.image.console)
                 console[variable.name] = variable.value;
-            for (auto name : {"GAME_GOTOSTARTPOINT", "GAME_REVISITING", "GAME_DOAUTOSAVE"})
-                console[name] = "0";
+            console["GAME_GOTOSTARTPOINT"] = "1";
+            console["GAME_REVISITING"] = console["GAME_DOAUTOSAVE"] = "0";
             for (const auto& variable : again.image.console)
                 reloaded[variable.name] = variable.value;
             CHECK(reloaded == console);
@@ -774,6 +814,7 @@ namespace
         CHECK(game->request_world("save1", error));
         CHECK(observed.size() == 1 && observed[0].world_time == 0); // The world-load reset.
         const auto fresh_draw = observed[0].draw;                   // The first draw after seed 1.
+        CHECK(game->enter_player(error));
         for (int i = 0; i < 8; ++i)
             CHECK(game->step(.25));
         GameSave save;
@@ -811,7 +852,7 @@ namespace
         game = std::make_unique<GameSession>();
         CHECK(setup(*game));
         std::string error;
-        CHECK(game->request_world("save1", error));
+        CHECK(game->request_world("save1", error) && game->enter_player(error));
         CHECK(var(*game, "WorldName") == "Authored" && game->server.gravity.y == -1500);
         game->server.SetGameConVar("WorldName", "Changed at runtime");
         game->server.SetGameConVar("GAME_DIFFICULTY", "2");
@@ -822,7 +863,7 @@ namespace
         CHECK(var(*game, "WorldName") == "Changed at runtime" && var(*game, "GAME_DIFFICULTY") == "2");
         CHECK(game->server.gravity.y == -1500); // WorldProperties' authored value, as the original.
         // A world without WorldProperties keeps the saved global force.
-        CHECK(game->request_world("other", error));
+        CHECK(game->request_world("other", error) && game->enter_player(error));
         CHECK(game->server.SetGlobalForce(&force) == DE_OK && game->save_game(save, error));
         CHECK(load(game, save, error) && game->server.gravity.y == -100);
         return true;
@@ -898,14 +939,15 @@ namespace
         bad = save;
         bad.image.objects.resize(bad.image.objects.size() - 1);
         CHECK(refused(bad, "restore", "RestoreObjects"));
-        // A local-client record: the association is lot 5, so it is never promoted unattached.
+        // Without the local-client flag the restored player is not the local one (D6).
         std::vector<SaveEngineRecord> records;
         SaveError codec;
         CHECK(decode_save_records(save.image.objects, records, codec));
-        records[0].local_client = true;
+        for (auto& record : records)
+            record.local_client = false;
         bad = save;
         CHECK(encode_save_records(records, bad.image.objects, codec));
-        CHECK(refused(bad, "player", "local player"));
+        CHECK(refused(bad, "player", "no local player"));
         // The admission checks of checked startup and NEW_LEVEL.
         hooks.loaded = [](HOBJECT) { g_pServerDE->StartHMessageWrite(); }; // Leaked by a Load.
         CHECK(refused(save, "validation", "Live messages remain"));
@@ -937,10 +979,12 @@ namespace
 
     bool private_worlds(const std::filesystem::path& data)
     {
-        // Real worlds restored from an always-load-only image: the DAT's CF_ALWAYSLOAD rows come
-        // back, everything else is SavedState, and the restored world saves and loads again. Only
-        // these single-player worlds have no SkyPointer; every other one binds its sky slots to
-        // Door or CDestructableBrush objects, which must come from the save (lot 8).
+        // Real worlds restored from a player-only image: the DAT's CF_ALWAYSLOAD rows come back,
+        // everything else is SavedState, the saved local player is reattached with its health,
+        // armor, inventory, position and powers (lot 5), and the restored world saves and loads
+        // again through the original shell. Only these single-player worlds have no SkyPointer;
+        // every other one binds its sky slots to Door or CDestructableBrush objects, which must come
+        // from the save (lot 8).
         for (const auto* name : {"01_SubwayA", "04_SteamTunnels", "08_SubwayB", "14_SubwayC", "20_PowerStation"})
         {
             auto game = std::make_unique<GameSession>();
@@ -950,6 +994,9 @@ namespace
             std::string error;
             CHECK(game->resources.mount_game(config, error));
             CHECK(game->request_world(name, error));
+            if (!game->run_world(error))
+                std::cerr << name << " entry: " << error << '\n';
+            CHECK(game->local_client);
             std::size_t fresh_always = 0;
             for (std::size_t i = 0; i < game->entries.size(); ++i)
                 if (const auto type = game->objects.find_class(game->world.objects[i].class_name);
@@ -964,12 +1011,24 @@ namespace
             DVector force{0, -1, 0};
             DVector authored{};
             CHECK(game->server.GetGlobalForce(&authored) == DE_OK && game->server.SetGlobalForce(&force) == DE_OK);
+            auto* player = game->server_shell.Player(game->local_client);
+            CHECK(player);
+            player->m_damage.SetHitPoints(61);
+            player->m_damage.SetArmorPoints(17);
+            player->m_InventoryMgr.SetAmmoCount(1, 77);
+            CHECK(player->m_InventoryMgr.AddKey({"key1", "Key One", "key.pcx", "key_h.pcx", 1}) == InventoryResult::Ok);
+            CHECK(player->AddPowerup(7, 30) && player->AddPowerup(5, 40)); // Anger and Willpower.
+            auto position = game->objects.get(player->m_hObject)->state.m_Pos;
+            float anger = player->m_fTripleDamageTime - game->server.GetTime();
+            // Every other saveable class is Unsupported until its lot: the image holds the player.
             SaveObjectsReport saved;
-            CHECK(game->server.save_objects("Save\\Current\\Current.sav", {}, 0,
+            const std::array<HOBJECT, 1> list{player->m_hObject};
+            CHECK(game->server.save_objects("Save\\Current\\Current.sav", list, 0,
                                             SAVEOBJECTS_SAVEGAMECONSOLE | SAVEOBJECTS_SAVEPORTALS, saved));
             GameSave save{game->world_path, {}, *game->server.save_store.find(SaveStoreSlot::Current)};
             SaveError fingerprint;
-            CHECK(build_fingerprint(game->resources, save.world_path, {}, save.fingerprint, fingerprint));
+            CHECK(
+                build_fingerprint(game->resources, save.world_path, save.image.classes, save.fingerprint, fingerprint));
             auto clock = game->server.save_clock();
             for (unsigned cycle = 0; cycle < 2; ++cycle)
             {
@@ -978,7 +1037,7 @@ namespace
                 std::cout << name << " load " << cycle << ": " << report.entries.size() << " rows, "
                           << report.checked_textures << " textures, " << game->objects.snapshot().size() << " objects; "
                           << error << '\n';
-                CHECK(error.empty() && report.unknown == 0 && report.failed == 0 && report.records == 0);
+                CHECK(error.empty() && report.unknown == 0 && report.failed == 0 && report.records == 1);
                 std::size_t always = 0, saved_rows = 0;
                 for (std::size_t i = 0; i < game->entries.size(); ++i)
                 {
@@ -992,15 +1051,32 @@ namespace
                 }
                 CHECK(always == fresh_always && saved_rows > 0);
                 for (auto id : game->objects.snapshot())
-                    CHECK(save_support(game->objects.get(id)->type) == SaveSupport::AlwaysLoad);
+                {
+                    const auto support = save_support(game->objects.get(id)->type);
+                    CHECK(support == SaveSupport::AlwaysLoad || support == SaveSupport::NotSaved ||
+                          game->objects.get(id)->type->name == "CPlayerObj");
+                }
                 CHECK(game->objects.time() == clock.time &&
                       game->server.world_time() == clock.time - clock.world_origin);
                 CHECK(var(*game, "FarZ") == "1234");
                 DVector restored{};
                 CHECK(game->server.GetGlobalForce(&restored) == DE_OK && restored.y == authored.y);
+                // The reattached local player.
+                player = game->server_shell.Player(game->local_client);
+                CHECK(player && game->state == SessionState::Ready && game->client_shell.m_bInWorld);
+                const auto& at = game->objects.get(player->m_hObject)->state.m_Pos;
+                CHECK(at.x == position.x && at.y == position.y && at.z == position.z);
+                CHECK(player->m_damage.m_fHitPoints == 61 && player->m_damage.m_fArmorPoints == 17 &&
+                      player->m_InventoryMgr.GetAmmoCount(1) == 77 && player->m_InventoryMgr.keys.size() == 1);
+                CHECK(player->IsPowerupActive(PU_TRIPLEDAMAGE) && player->IsPowerupActive(PU_INVULNERABLE) &&
+                      player->m_InventoryMgr.damage_multiplier == 3 && player->m_damage.m_bNighInvulnerable);
+                CHECK(std::abs(player->m_fTripleDamageTime - game->server.GetTime() - anger) < 1e-3f);
+                CHECK(game->client_shell.client_data_loads == cycle); // The shell save attaches the blob.
                 for (int i = 0; i < 30; ++i)
                     CHECK(game->step(.05));
-                CHECK(game->save_game(save, error) && save.image.records == 0);
+                anger = player->m_fTripleDamageTime - game->server.GetTime();
+                position = game->objects.get(player->m_hObject)->state.m_Pos; // The player may settle.
+                CHECK(game->save_game(save, error) && save.image.records == 1);
                 clock = game->server.save_clock();
                 game->server.SetGameConVar("FarZ", "authored"); // The saved value must win again.
             }

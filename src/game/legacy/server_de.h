@@ -63,6 +63,9 @@ class CSBase
     virtual void EndHMessageWrite(HMESSAGEWRITE) = 0;
     virtual void EndHMessageRead(HMESSAGEREAD) = 0;
     virtual void ResetRead(HMESSAGEREAD) = 0;
+    // OpenBlood2 check for a fixed-layout reader (the client save blob): true when every byte
+    // was read without a failure. The original reader silently rewinds at the end instead.
+    virtual bool MessageFullyRead(HMESSAGEREAD) = 0;
 };
 
 namespace OpenBlood2
@@ -121,6 +124,9 @@ class ServerDE : public CSBase
     // Save or Load body can refuse state it cannot represent before changing anything.
     // Ignored for any other message.
     virtual void RejectPayload(HMESSAGEWRITE, std::string_view reason) = 0;
+    // Typed replacement for the original StartMessage(NULL, SMSG_CLIENTSAVEDATA) broadcast of a
+    // restored player's client blob: the restore delivers it once a client is attached.
+    virtual DRESULT SendClientSaveData(HMESSAGEREAD blob) = 0;
     virtual void RecordSpawn(const OpenBlood2::SpawnReport&) = 0;
     virtual void RecordPickup(HOBJECT, const OpenBlood2::PickupReport&) = 0;
     virtual DRESULT WritePickupMessage(HMESSAGEWRITE, const OpenBlood2::PickupMessage&) = 0;

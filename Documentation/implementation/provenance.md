@@ -1842,3 +1842,21 @@ and data. No game, engine or renderer code was imported. The donor NoMadEngine
 patterns match the retail catalogue. The published shading techniques are listed in the
 [source ledger](sources/enhanced_renderer_sources.json). See the
 [contract](../contracts/enhanced_renderer_contracts.md).
+
+## Player and client save/load (2026-10-20)
+
+Save/load lot 5 adds selective ports of the original Save/Load bodies of
+`ObjectDLL/PlayerObj.cpp` (`CPlayerObj::Save`/`Load`, `SetClientSaveData`),
+`movement.cpp` (`CMovement`), `InventoryMgr.cpp` with `InvItem.h` and
+`GameInvItems.cpp` (`CInventoryMgr` and its items): their field order, call types,
+markers, sentinels and Load side effects, written over the port's existing typed values
+and validators; the player's CDestructable block is lot 8's. The client shell gains
+selective `SaveClientData`/`LoadClientData` (`ClientShellDLL/BloodClientShell.cpp`) and
+the server shell the `CMSG_SAVEGAME` handler and `LoadWorld`'s shell console values
+(`ObjectDLL/BloodServerShell.cpp`). Original fields without port storage are carried
+unchanged or written with their original idle values, as the contract lists.
+`SendClientSaveData`, `MessageFullyRead`, the restored-player attachment and the engine
+record's model overwrite (departure D13) are replacement engine code. See the
+[contract](../contracts/save_load_contracts.md#implemented-player-and-client-lot-5),
+the [evidence](reports/save_load_player.md) and the
+[source ledger](sources/save_load_player_sources.json).

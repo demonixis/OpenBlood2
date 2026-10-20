@@ -945,7 +945,7 @@ namespace
         CHECK(*g.server.save_store.find(SaveStoreSlot::Current) == previous); // Previous image kept.
         // An original class keeps the Unsupported default until its lot declares it; lot 4
         // declared the CF_ALWAYSLOAD ones, which are skipped.
-        CHECK(save_support(g.objects.find_class("CPlayerObj")) == SaveSupport::Unsupported);
+        CHECK(save_support(g.objects.find_class("CultistAI")) == SaveSupport::Unsupported);
         auto trigger = g.objects.create(g.objects.find_class("Trigger"), {}, Creation::World, {});
         auto spot = g.objects.create(g.objects.find_class("CameraSpot"), {}, Creation::World, {});
         std::vector<HOBJECT> original{trigger, spot, b};

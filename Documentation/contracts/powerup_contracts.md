@@ -20,9 +20,8 @@ InvulnerabilityPU (EnhancementBase, model `Invulnerability_pu`, resource 313,
 CheckPowerups tests it before invisibility: on expiry it clears the flag, the
 nigh invulnerability and the glow, ends the sound and plays the VME_POWERUP voice
 group (single player); IDS_GENERAL_WILLPOWER_EXP is not delivered (counted).
-ResetPowerups (death) clears it first. Capture drops the power, but the source
-CDestructable Save keeps `m_bNighInvulnerable`, so a transferred player stays
-nigh invulnerable with no timer — a limitation of the current partial snapshot.
+ResetPowerups (death) clears it first. Save/Load and KeepAlive carry the flag and its
+relative expiry with the CDestructable nigh invulnerability ([save/load lot 5](save_load_contracts.md#implemented-player-and-client-lot-5)).
 
 ## Pickup
 
@@ -56,11 +55,12 @@ three handles.
 
 ## Save, KeepAlive and restore
 
-The original Save writes power flags, expiry offsets and sound-stack entries
-(PlayerObj.cpp:6588–6601). The partial typed snapshot omits this block and drops an active
-invisibility; the engine snapshot keeps the translucent color, so a restored or
-transferred player stays translucent with PU_INVISIBLE inactive (AI sees it) until
-something resets its color — a partial-port limitation. Later
-LithTech serializes object color (game_serialize.cpp), corroborating this.
-Active Anger capture remains explicitly refused so its damage factor cannot become
-permanent. Full timed-power serialization is outside the Airship entry continuation.
+The original Save writes all five power flags, their expiry offsets (`deadline −
+GetTime()`) and the sound-stack entries (PlayerObj.cpp:6588–6601); Load adds the
+destination time back. [Save/load lot 5](save_load_contracts.md#implemented-player-and-client-lot-5) ports this block for whole-game saves
+and the typed NEW_LEVEL snapshot, so no active power is refused any more and each
+expires at its saved deadline. Anger's factor travels in the inventory damage
+multiplier, Willpower's nigh invulnerability in CDestructable and Stealth's alpha in
+the engine color. The sound handles are not saved: CheckPowerups restarts the top
+power's loop. The earlier statement that the source saves no power state, the dropped
+invisibility and the Anger refusal are superseded.

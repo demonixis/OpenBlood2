@@ -26,6 +26,7 @@ Runtime test logs and measurements belong in the
 - [Save/load container](save_load_container_sources.json): lot 2 container and fingerprint; new code, no original source read or imported.
 - [Save/load engine records](save_load_records_sources.json): lot 3 SaveObjects/RestoreObjects; original file names and flags consulted, no implementation imported.
 - [Save/load candidate transaction](save_load_session_sources.json): lot 4 declarations, marking, shell SaveGame/RestoreGame and the restore-mode world; selective shell excerpts recorded in provenance.
+- [Save/load player and client](save_load_player_sources.json): lot 5 CPlayerObj, CMovement, CInventoryMgr and CDestructable Save/Load, the client blob and the restored client; selective excerpts recorded in provenance.
 - [Save/load movers and brushes](save_load_movers_sources.json): lot 8 Save/Load bodies of doors, rotators, destructible brushes and models, debris, volumes, TripLaser and Tchernotronic.
 
 - [Original music asset preparation](m2_music_asset_sources.json)

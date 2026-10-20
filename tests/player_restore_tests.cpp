@@ -114,9 +114,13 @@ namespace
             auto* p = g.server_shell.Player(g.local_client);
             PlayerRestoreState untouched;
             untouched.world = "unchanged";
-            p->m_bPowerupActivated[PU_TRIPLEDAMAGE] = true;
-            CHECK(!g.capture_player(untouched, e) && untouched.world == "unchanged");
+            p->m_bPowerupActivated[PU_TRIPLEDAMAGE] = true; // Active Anger now travels with its expiry.
+            PlayerRestoreState powered;
+            CHECK(g.capture_player(powered, e) && powered.player.powers[PU_TRIPLEDAMAGE]);
             p->m_bPowerupActivated[PU_TRIPLEDAMAGE] = false;
+            p->ctf_team = 1; // CTF match state stays unsaved.
+            CHECK(!g.capture_player(untouched, e) && untouched.world == "unchanged");
+            p->ctf_team = 0;
             p->door_push_pending = true;
             CHECK(!g.capture_player(untouched, e));
             p->door_push_pending = false;

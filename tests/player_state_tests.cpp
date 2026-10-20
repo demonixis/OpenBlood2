@@ -250,15 +250,28 @@ namespace
         CHECK(!loaded && allocations == 2 && g.server.string_count() == count);
         PlayerState after;
         CHECK(p->SaveFields(after, error) && after == s);
-        // The source saves no power state: invisibility is dropped, other powers stay unported.
-        p->m_bPowerupActivated[PU_INVISIBLE] = true;
-        CHECK(p->SaveFields(after, error) && after == s);
-        p->m_bPowerupActivated[PU_INVISIBLE] = false;
-        p->m_bPowerupActivated[PU_TRIPLEDAMAGE] = true;
+        // The original Save writes every power's flag and relative expiry (save/load lot 5).
+        p->m_bPowerupActivated[PU_INVISIBLE] = p->m_bPowerupActivated[PU_TRIPLEDAMAGE] = true;
+        p->m_fTripleDamageTime = g.server.GetTime() + 2.5f;
+        CHECK(p->SaveFields(after, error) && after.powers[PU_INVISIBLE] && after.powers[PU_TRIPLEDAMAGE] &&
+              after.power_offsets[PU_TRIPLEDAMAGE] == 2.5f);
+        auto expected = s;
+        expected.powers = after.powers;
+        expected.power_offsets = after.power_offsets;
+        CHECK(after == expected);
+        p->m_bPowerupActivated = {};
+        p->m_fTripleDamageTime = 0;
+        // A sound stack entry the original never pushes is refused rather than saved.
+        p->m_nPowerupSoundStackPos = 1;
+        p->m_ePowerupSoundStack[0] = PU_NONE;
         PlayerState untouched;
         untouched.name = "unchanged";
-        CHECK(!p->SaveFields(untouched, error) && untouched.name == "unchanged" && !p->LoadFields(s, error));
-        p->m_bPowerupActivated[PU_TRIPLEDAMAGE] = false;
+        CHECK(!p->SaveFields(untouched, error) && untouched.name == "unchanged");
+        p->m_nPowerupSoundStackPos = 0;
+        auto stack = s;
+        stack.power_sounds = {PU_MAXTYPES};
+        CHECK(!p->LoadFields(stack, error));
+        CHECK(p->SaveFields(after, error) && after == s);
         p->m_fYaw = std::numeric_limits<float>::infinity();
         CHECK(!p->SaveFields(untouched, error) && untouched.name == "unchanged");
         p->m_fYaw = s.yaw;
@@ -308,8 +321,12 @@ namespace
               g.client_shell.world_exit.queued == 1);
         p->m_fAirLevel = 25;
         CHECK(c.state.air == 35);
-        p->m_bPowerupActivated[PU_SILENT] = true;
-        CHECK(!g.server_shell.CapturePlayerFields(g.local_client) && !c.valid && c.captures == 1 && !c.state.name);
+        p->m_bPowerupActivated[PU_SILENT] = true; // Saved like every power (save/load lot 5).
+        CHECK(g.server_shell.CapturePlayerFields(g.local_client) && c.valid && c.captures == 2 &&
+              c.state.powers[PU_SILENT]);
+        p->ctf_team = 1; // CTF match state stays unsaved.
+        CHECK(!g.server_shell.CapturePlayerFields(g.local_client) && !c.valid && c.captures == 2 && !c.state.name);
+        p->ctf_team = 0;
         CHECK(g.unload_world() && c.attempts == 0 && !c.valid);
         return true;
     }

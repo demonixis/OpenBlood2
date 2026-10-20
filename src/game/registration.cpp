@@ -837,7 +837,8 @@ namespace OpenBlood2
             &ai_manager,
             construct_npc<EnhancedGideon, AI_Mgr::NPCType::EnhancedGideon>,
             {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Enhanced", false}}};
-        const ClassInfo player{"CPlayerObj", &character, construct<CPlayerObj>, {}};
+        // Save/load lot 5: CPlayerObj + CBaseCharacter (0 bytes) + CMovement + CInventoryMgr + CDestructable.
+        const ClassInfo player{"CPlayerObj", &character, construct<CPlayerObj>, {}, SaveSupport::Original, 1};
         const ClassInfo world_properties{
             "WorldProperties",
             &b2base,

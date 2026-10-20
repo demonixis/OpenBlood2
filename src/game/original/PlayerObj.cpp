@@ -59,6 +59,8 @@ CPlayerObj::~CPlayerObj()
         server->FreeString(m_hstrTrigger);
     if (m_hstrPlayerName)
         server->FreeString(m_hstrPlayerName);
+    if (m_hClientSaveData)
+        server->EndHMessageRead(m_hClientSaveData); // The original leaked a blob no save consumed.
     // Creation rollback owns the initial smell until entry succeeds. Ordinary
     // lifetime leaves the world-owned scent to its original 20-second timeout.
     if (!attributes_received && initial_smell_)
@@ -540,6 +542,12 @@ DDWORD CPlayerObj::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
             break;
         case MID_UPDATE:
             result = Update(static_cast<DVector*>(data));
+            break;
+        case MID_SAVEOBJECT: // Before CBaseCharacter (0 bytes) and the aggregates, as the original.
+            Save(*static_cast<HMESSAGEWRITE*>(data), static_cast<DDWORD>(fData));
+            break;
+        case MID_LOADOBJECT:
+            Load(*static_cast<HMESSAGEREAD*>(data), static_cast<DDWORD>(fData));
             break;
         default:
             break;

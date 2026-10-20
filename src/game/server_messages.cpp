@@ -640,6 +640,12 @@ namespace OpenBlood2
         if (it != messages_.end())
             it->second.cursor = 0;
     }
+    bool ServerAdapter::MessageFullyRead(HMESSAGEREAD h)
+    {
+        trace_service("MessageFullyRead");
+        const auto it = messages_.find(h);
+        return it != messages_.end() && !it->second.bad && it->second.cursor == it->second.bytes.size();
+    }
     HMESSAGEWRITE ServerAdapter::StartMessageToObject(LPBASECLASS sender, HOBJECT receiver, DDWORD id)
     {
         if (!trace_service("StartMessageToObject"))
@@ -780,5 +786,40 @@ namespace OpenBlood2
         messages_.erase(it);
         ++message_stats.released;
         return ok;
+    }
+    DRESULT ServerAdapter::SendClientSaveData(HMESSAGEREAD blob)
+    {
+        if (!trace_service("SendClientSaveData"))
+            return DE_ERROR;
+        const auto it = messages_.find(blob);
+        if (it == messages_.end() || it->second.bad || it->second.bytes.size() > max_nested_message)
+        {
+            refuse(ObjectError::InvalidHandle, "SendClientSaveData requires a valid bounded blob");
+            return DE_INVALIDPARAMS;
+        }
+        if (client_save_data)
+        {
+            refuse(ObjectError::Limit, "A second client save blob: saves hold one local player (D6)");
+            return DE_ERROR;
+        }
+        client_save_data = it->second.bytes; // The whole blob, like WriteToMessageHMessageRead.
+        return DE_OK;
+    }
+    HMESSAGEREAD ServerAdapter::take_client_save_data()
+    {
+        if (!client_save_data)
+            return nullptr;
+        const auto h = create_message();
+        if (!h)
+            return nullptr;
+        // SMSG_CLIENTSAVEDATA carries the blob as a nested message (LoadClientData reads it back).
+        auto& m = messages_.at(h);
+        m.reader = true;
+        std::uint8_t prefix[4];
+        put(prefix, static_cast<std::uint32_t>(client_save_data->size()), 4);
+        m.bytes.assign(prefix, prefix + 4);
+        m.bytes.insert(m.bytes.end(), client_save_data->begin(), client_save_data->end());
+        client_save_data.reset();
+        return h;
     }
 } // namespace OpenBlood2
