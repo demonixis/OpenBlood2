@@ -24,6 +24,10 @@ if(NOT BLOOD2_BUILD_REVISION)
     set(BLOOD2_BUILD_REVISION "unknown")
 endif()
 configure_file(cmake/build_info.h.in generated/build_info.h @ONLY)
+# Enhanced-renderer material classes, compiled into the binary (see config/materials.json).
+file(READ "${PROJECT_SOURCE_DIR}/config/materials.json" BLOOD2_SURFACE_MANIFEST)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/config/materials.json")
+configure_file(cmake/surface_manifest.h.in generated/surface_manifest.h @ONLY)
 
 add_library(blood2_startup STATIC src/engine/config.cpp src/engine/resources.cpp src/engine/sha256.cpp src/startup/protocol.cpp)
 target_include_directories(blood2_startup PUBLIC src)
@@ -31,7 +35,7 @@ target_include_directories(blood2_startup PRIVATE "${PROJECT_BINARY_DIR}/generat
 blood2_project_options(blood2_startup)
 
 if(BLOOD2_BUILD_GAME)
-add_library(engine STATIC src/engine/world_lights.cpp src/engine/world_shade.cpp src/engine/gpu_registry.cpp src/engine/model_renderer.cpp src/engine/hud_surface.cpp src/engine/polygrid_view.cpp src/engine/sky.cpp src/engine/particles.cpp src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/world_shaders.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/world.cpp)
+add_library(engine STATIC src/engine/world_lights.cpp src/engine/world_shade.cpp src/engine/gpu_registry.cpp src/engine/model_renderer.cpp src/engine/hud_surface.cpp src/engine/polygrid_view.cpp src/engine/sky.cpp src/engine/particles.cpp src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/world_shaders.cpp src/engine/surface_materials.cpp src/engine/normal_maps.cpp src/engine/light_grid.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/world.cpp)
 target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/audio_stream.cpp src/engine/music_asset.cpp src/engine/ima_style.cpp src/engine/ima_curve.cpp src/engine/ima_curve_event.cpp src/engine/ima_variation.cpp src/engine/ima_note_event.cpp src/engine/ima_note_pitch.cpp src/engine/ima_harmony.cpp src/engine/ima_selection.cpp src/engine/ima_cursor.cpp src/engine/ima_band.cpp src/engine/ima_section.cpp src/engine/ima_clock.cpp src/engine/ima_program.cpp src/engine/ima_playlist.cpp src/engine/ima_transport.cpp src/engine/ima_timeline.cpp src/engine/dls_bank.cpp src/engine/dls_sampler.cpp src/engine/dls_midi_queue.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/model_store.cpp)
 target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp src/engine/logging.cpp src/engine/crash_capture.cpp)
 target_sources(engine PRIVATE src/engine/atomic_file.cpp src/engine/save_file.cpp src/engine/save_fingerprint.cpp src/engine/save_objects.cpp)

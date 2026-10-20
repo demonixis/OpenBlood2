@@ -3,6 +3,7 @@
 #include "app/model_scene.h"
 #include "app/polygrid_scene.h"
 #include "app/sprite_scene.h"
+#include "engine/light_grid.h"
 #include "engine/model_renderer.h"
 #include "engine/world_renderer.h"
 
@@ -13,6 +14,13 @@ namespace OpenBlood2
     {
         bool available = false; // Atlas formats supported by the device.
         std::size_t candidates = 0, casters = 0, beyond_limit = 0, distant = 0, unbounded = 0, outside = 0;
+    };
+    // Enhanced renderer state of the last update(). Inspection/measurement only.
+    struct SurfaceStats
+    {
+        std::size_t grid_lights = 0, grid_cells = 0, grid_dropped = 0;
+        float grid_cell_size = 0;
+        std::uint64_t grid_build_ns = 0;
     };
     // Counters of the most recently recorded frame. Inspection/measurement only.
     struct PresentationStats
@@ -62,6 +70,14 @@ namespace OpenBlood2
         // Original "LightMap" setting (off at low detail): a change rebuilds the world mesh.
         bool lightmaps = true;
         bool per_pixel_lighting = false; // Model light per pixel instead of per vertex.
+        // Renderer selection: Original keeps the original shaders; Standard/High enable the
+        // physically based world and model shading, optionally with generated normal maps.
+        SurfaceShading shading = SurfaceShading::Original;
+        bool normal_maps = false;
+        SurfaceManifest surface_manifest; // Built-in config/materials.json unless replaced before update().
+        NormalMapCache normal_map_cache;  // Survives world changes; generated maps are content-addressed.
+        LightGrid light_grid;
+        SurfaceStats surface_stats;
         float shadow_aspect = 16.f / 9;  // Viewport aspect for caster culling; record() keeps it current.
         std::vector<ModelRenderer::ShadowCaster> shadow_casters;
         ShadowUniform shadow_uniform;
@@ -86,6 +102,12 @@ namespace OpenBlood2
         bool record_shadow_tiles(SDL_GPUCommandBuffer*, std::string& error);
         TextureHandle shadow_atlas_, shadow_depth_;
         bool built_lightmaps_ = true;
+        bool prepare_surface(GameSession&, std::string& error);
+        SurfaceScene surface_scene_;
+        bool manifest_loaded_ = false;
+        std::uint64_t grid_revision_ = UINT64_MAX;
+        SurfaceShading applied_shading_ = SurfaceShading::Original;
+        bool applied_normal_maps_ = false;
         TextureHandle depth_;
         Uint32 depth_width_ = 0, depth_height_ = 0;
     };

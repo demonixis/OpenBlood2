@@ -34,8 +34,8 @@ int test_menu_preferences(int argc, char** argv)
         // The shared atomic writer keeps the exact preference bytes.
         std::ifstream in(path, std::ios::binary);
         const std::string bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        CHECK(bytes == "version=2\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
-                       "invert_y=1\ndetail=2\npixel_lighting=0\n");
+        CHECK(bytes == "version=3\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
+                       "invert_y=1\ndetail=2\npixel_lighting=0\nrenderer=0\nquality=0\nnormal_maps=1\n");
     }
     settings.sound = true;
     CHECK(save_menu_preferences(path, settings, error));
@@ -50,7 +50,40 @@ int test_menu_preferences(int argc, char** argv)
         out << "version=1\nsound=1\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\ninvert_y=1\n";
     }
     CHECK(load_menu_preferences(path, loaded, error) && loaded.detail == 2 && !loaded.pixel_lighting &&
-          loaded.sensitivity == 730);
+          loaded.sensitivity == 730 && loaded.renderer == 0 && loaded.normal_maps);
+    {
+        // Version 2 files keep their display settings and load the renderer defaults.
+        std::ofstream out(path);
+        out << "version=2\nsound=1\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\ninvert_y=1\n"
+               "detail=1\npixel_lighting=1\n";
+    }
+    CHECK(load_menu_preferences(path, loaded, error) && loaded.detail == 1 && loaded.pixel_lighting &&
+          loaded.renderer == 0 && loaded.quality == 0 && loaded.normal_maps);
+    {
+        std::ofstream out(path);
+        out << "version=3\nsound=1\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\ninvert_y=1\n"
+               "detail=1\npixel_lighting=0\nrenderer=1\nquality=1\nnormal_maps=0\n";
+    }
+    CHECK(load_menu_preferences(path, loaded, error) && loaded.renderer == 1 && loaded.quality == 1 &&
+          !loaded.normal_maps);
+    for (const auto text : {"renderer=2\nquality=0\nnormal_maps=0\n", "renderer=0\nquality=0\nnormal_maps=2\n",
+                            "renderer=0\nquality=0\n"})
+    {
+        {
+            std::ofstream out(path);
+            out << "version=3\nsound=1\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\ninvert_y=1\n"
+                   "detail=1\npixel_lighting=0\n"
+                << text;
+        }
+        CHECK(!load_menu_preferences(path, loaded, error) && !error.empty());
+    }
+    {
+        // Version 2 with version 3 keys is incomplete/unsupported.
+        std::ofstream out(path);
+        out << "version=2\nsound=1\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\ninvert_y=1\n"
+               "detail=1\npixel_lighting=0\nrenderer=1\n";
+    }
+    CHECK(!load_menu_preferences(path, loaded, error) && !error.empty());
     {
         std::ofstream out(path);
         out << "version=1\nsound=1\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\ninvert_y=1\n"

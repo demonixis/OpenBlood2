@@ -32,6 +32,7 @@ namespace OpenBlood2
         instance_assets_.clear();
         textures_.clear();
         texture_paths_.clear();
+        surface_materials_.clear();
         revision_ = UINT64_MAX;
         visible_.clear();
         stats.triangles = stats.draws = stats.alpha_batches = 0;
@@ -68,6 +69,11 @@ namespace OpenBlood2
             }
             revision_ = view.revision;
             ++stats.uploads;
+        }
+        if (enhanced() && !surface_materials_.refresh(*surface, *registry_, view.mesh.materials, error))
+        {
+            revision_ = UINT64_MAX;
+            return false;
         }
         // Each asset's static corner stream is the same validated stream ModelView checked.
         asset_vertices = 0;
@@ -155,6 +161,14 @@ namespace OpenBlood2
             error = "Diagnostic renderer not prepared";
             return false;
         }
+        const bool shaded = enhanced();
+        if (shaded && (surface_materials_.uniforms.size() < textures_.size() ||
+                       surface_materials_.normals.size() < textures_.size() || !surface_materials_.sampler ||
+                       !registry_->get(surface->lights) || !registry_->get(surface->cells)))
+        {
+            error = "Enhanced surface materials not prepared";
+            return false;
+        }
         const Uint32 top = target.letterbox ? height_ / 6 : 0, height = height_ - 2 * top;
         const float aspect = float(width_) / float(height);
         const auto frustum = view_frustum(eye, view_rotation, aspect);
@@ -205,11 +219,18 @@ namespace OpenBlood2
                              [](const Visible& a, const Visible& b) { return a.depth > b.depth; });
         SDL_GPUViewport viewport{0, float(top), float(width_), float(height), target.min_depth, target.max_depth};
         SDL_SetGPUViewport(target.pass, &viewport);
-        SDL_BindGPUGraphicsPipeline(target.pass, pipelines_->get(translucent || style_ == DrawStyle::SpriteAlpha
-                                                                     ? WorldPipeline::SkinnedAlpha
-                                                                     : WorldPipeline::SkinnedOpaque));
+        const bool blended = translucent || style_ == DrawStyle::SpriteAlpha;
+        SDL_BindGPUGraphicsPipeline(
+            target.pass, pipelines_->get(shaded    ? (blended ? WorldPipeline::SkinnedSurfaceAlpha
+                                                              : WorldPipeline::SkinnedSurfaceOpaque)
+                                         : blended ? WorldPipeline::SkinnedAlpha
+                                                   : WorldPipeline::SkinnedOpaque));
         SDL_GPUBuffer* storage[] = {registry_->get(palette_), registry_->get(deformation_)};
         SDL_BindGPUVertexStorageBuffers(target.pass, 0, storage, 2);
+        if (shaded)
+            SurfaceMaterials::bind_scene(*surface, *registry_, target.commands, target.pass, eye);
+        SurfaceMaterialUniform pushed_material;
+        bool has_material = false;
         static const ShadowUniform no_shadows{}; // Models receive no model shadows.
         SDL_PushGPUFragmentUniformData(target.commands, 1, &no_shadows, sizeof(no_shadows));
         const bool illuminate = style_ == DrawStyle::Opaque && !close_view;
@@ -252,11 +273,12 @@ namespace OpenBlood2
             SDL_PushGPUVertexUniformData(target.commands, 0, &skinned, sizeof(skinned));
             FragmentLightUniform fragment;
             fragment.scene_color = {target.scene_color.x, target.scene_color.y, target.scene_color.z, 1};
-            fragment.modulation = {d.alpha, 0, 0, per_pixel_lighting ? 1.f : 0.f};
+            const bool pixel_light = per_pixel_lighting || shaded;
+            fragment.modulation = {d.alpha, 0, 0, pixel_light ? 1.f : 0.f};
             fragment.position_radius = {light.position.x, light.position.y, light.position.z,
                                         illuminate ? light.radius : 0};
             fragment.light_color = {light.color.x, light.color.y, light.color.z, 0};
-            if (per_pixel_lighting)
+            if (pixel_light)
             {
                 fragment.model_ambient = skinned.ambient;
                 fragment.model_color = {skinned.color[0], skinned.color[1], skinned.color[2], skinned.scale[3]};
@@ -269,13 +291,30 @@ namespace OpenBlood2
                 SDL_BindGPUVertexBuffers(target.pass, 0, &binding, 1);
                 bound_buffer = buffer;
             }
+            if (shaded)
+            {
+                // Lit (Saturate N.L) instances take the physically based path; unlit, flat and
+                // FLAG_NOLIGHT instances keep the original shading.
+                auto parameters = surface_materials_.uniforms[instance.material];
+                const bool lit = instance.light.scale > 1;
+                parameters.material[3] = lit ? parameters.material[3] + 1 : 4;
+                if (!has_material || !(parameters == pushed_material))
+                {
+                    SDL_PushGPUFragmentUniformData(target.commands, 3, &parameters, sizeof(parameters));
+                    pushed_material = parameters;
+                    has_material = true;
+                }
+            }
             if (auto* skin = registry_->get(textures_[instance.material]); skin != bound_texture)
             {
                 // Models have no lightmap; slot 1 holds white to keep the binding valid.
                 auto* white = registry_->get(textures_[0]);
-                const SDL_GPUTextureSamplerBinding textures[]{
-                    {skin, sampler_}, {white, lightmap_sampler_}, {white, shadow_sampler_}};
-                SDL_BindGPUFragmentSamplers(target.pass, 0, textures, 3);
+                auto* normal = shaded ? registry_->get(surface_materials_.normals[instance.material]) : nullptr;
+                const SDL_GPUTextureSamplerBinding textures[]{{skin, sampler_},
+                                                              {white, lightmap_sampler_},
+                                                              {white, shadow_sampler_},
+                                                              {normal ? normal : white, surface_materials_.sampler}};
+                SDL_BindGPUFragmentSamplers(target.pass, 0, textures, shaded ? 4 : 3);
                 bound_texture = skin;
             }
             SDL_DrawGPUPrimitives(target.pass, asset.count, 1, 0, 0);

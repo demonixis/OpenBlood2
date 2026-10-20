@@ -111,9 +111,12 @@ namespace OpenBlood2
                 break;
             case MenuPage::Display:
                 // Source CMenuDisplay offers renderer, resolution and DETAIL LEVEL; SDL owns the first
-                // two. The lighting row is a replacement option without an original string.
+                // two. The renderer, lighting and normal-map rows are replacement options without
+                // original strings.
                 setting(IDS_MENU_DISPLAY_DETAIL_LOW + unsigned(std::clamp(settings.detail, 0, 2)), 6);
+                items.push_back({0, -1, true, {}, 8, {}});
                 items.push_back({0, -1, true, {}, 7, {}});
+                items.push_back({0, -1, true, {}, 9, {}});
                 break;
             case MenuPage::Mouse:
                 setting(IDS_MENU_MOUSE_SENSITIVITY, 4);
@@ -383,8 +386,17 @@ namespace OpenBlood2
                 items[selected].string_id = IDS_MENU_DISPLAY_DETAIL_LOW + unsigned(settings.detail);
                 items[selected].literal.clear(); // Recomposed from the new original string.
                 break;
-            case 7:
-                settings.pixel_lighting = !settings.pixel_lighting;
+            case 7: // The lighting profile of the selected renderer.
+                if (settings.renderer)
+                    settings.quality = !settings.quality;
+                else
+                    settings.pixel_lighting = !settings.pixel_lighting;
+                break;
+            case 8:
+                settings.renderer = !settings.renderer;
+                break;
+            case 9:
+                settings.normal_maps = !settings.normal_maps;
                 break;
             default:
                 return;

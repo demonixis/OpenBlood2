@@ -165,6 +165,14 @@ bullet holes, mipmap offset or other `detail*.cfg` values.
 files still load with display defaults, and either version rejects keys of the other.
 Writes always produce version 2.
 
+The [enhanced renderer](enhanced_renderer_contracts.md) adds `RENDERER [ORIGINAL/ENHANCED]`
+(setting 8) after DETAIL LEVEL and `NORMAL MAPS [GENERATED/OFF]` (setting 9, disabled with
+the original renderer) after LIGHTING. With ENHANCED, the LIGHTING row cycles
+`STANDARD/HIGH` instead of `PER VERTEX/PER PIXEL`; each renderer keeps its own choice.
+`preferences.cfg` version 3 adds `renderer`, `quality` and `normal_maps`. Writes produce
+version 3, versions 1 and 2 load with the renderer defaults, and keys of a later version
+are rejected. This supersedes the version 2 write statement above.
+
 
 Normal `--demo` now uses the [demo menu and edition provider](demo_menu_contracts.md).
 The fixed-offset experiment remains removed. `--demo --view-world` retains the

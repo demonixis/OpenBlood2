@@ -110,3 +110,12 @@ The [baked lighting continuation](baked_lighting_contracts.md) changes both frag
 The [lightmap continuation](lightmap_contracts.md) adds vertex attribute/varying 3 (lightmap page coordinates; skinned models output -1) and fragment texture/sampler 1 (the lightmap page, a bilinear clamped sampler) to all shaders. The fragment uniform's `modulation.y` carries the lightmap scale. All eight artifacts were regenerated.
 
 The [model shadow continuation](model_shadow_contracts.md) adds `shadow.frag` (caster heights, no resources) and gives both world fragments texture/sampler 2 (shadow tiles) and uniform buffer 1 (`ShadowUniform`). `skinned.vert` treats `forward.w > 0.5` as an orthographic projection for the tiles. Ten artifacts are now regenerated together.
+
+The [enhanced renderer](enhanced_renderer_contracts.md) adds `pbr.frag.hlsl`, compiled
+four times with `-DPBR_HIGH`/`-DPBR_ALPHA` defines (`pbr_frag`, `pbr_high_frag`,
+`pbr_alpha_frag`, `pbr_high_alpha_frag`). These are the first fragment shaders reading
+read-only storage buffers: after four sampled textures, at `t4`/`t5` in space2. They
+also use uniform buffers 2 and 3. `world.vert` gains vertex attribute and varying 4 (the
+face-plane normal). Eighteen artifacts are now regenerated together. Every original
+fragment artifact is byte-identical after regeneration. Only Metal execution on Apple M5
+was verified.

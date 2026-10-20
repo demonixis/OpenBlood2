@@ -1,0 +1,3 @@
+#pragma once
+// Generated from config/materials.json at configure time; edit that file instead.
+static constexpr char blood2_surface_manifest[] = R"blood2json(@BLOOD2_SURFACE_MANIFEST@)blood2json";

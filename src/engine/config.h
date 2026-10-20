@@ -46,6 +46,10 @@ namespace OpenBlood2
         bool bench = false, bench_sweep = false;
         bool model_shadows = true;   // FLAG_SHADOW model shadows (original high-detail MaxModelShadows).
         bool pixel_lighting = false; // Model light per pixel (the frontend uses the Display setting).
+        // Renderer for the bench and direct paths (the frontend uses the Display settings):
+        // 0 original, 1 enhanced standard, 2 enhanced high; generated normal maps.
+        int renderer = 0;
+        bool normal_maps = false;
         std::uint32_t bench_width = 1920, bench_height = 1080;
     };
 

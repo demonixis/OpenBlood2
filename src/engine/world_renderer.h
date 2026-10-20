@@ -1,6 +1,8 @@
 #pragma once
 #include "engine/gpu_registry.h"
 #include "engine/model_view.h"
+#include "engine/normal_maps.h"
+#include "engine/surface_materials.h"
 #include "engine/point_light.h"
 #include "engine/world_view.h"
 #include <SDL3/SDL_gpu.h>
@@ -34,7 +36,46 @@ namespace OpenBlood2
         SkinnedOpaque, // GPU-skinned ABC models (SkinnedVertex input, node palette storage).
         SkinnedAlpha,
         ShadowCaster, // Skinned caster heights into a shadow_tile_format tile (depth-tested).
+        // Enhanced renderer only (null with SurfaceShading::Original): world faces and lit models.
+        SurfaceOpaque,
+        SurfaceAlpha,
+        SkinnedSurfaceOpaque,
+        SkinnedSurfaceAlpha,
         Count
+    };
+    // Fragment shading of world faces and models. Original keeps the original shaders, which
+    // stay the selectable reference; Standard and High select the enhanced (PBR) shaders.
+    enum class SurfaceShading
+    {
+        Original,
+        Standard,
+        High
+    };
+    // Enhanced fragment uniform slot 2 (std140), pushed once per record: camera and light grid.
+    struct SurfaceFrameUniform
+    {
+        std::array<float, 4> eye{}, grid_origin{}; // grid_origin.w: 1 / cell size.
+        std::array<std::uint32_t, 4> grid_size{};  // Cells per axis; w: cell count.
+    };
+    static_assert(sizeof(SurfaceFrameUniform) == 48);
+    // Enhanced fragment uniform slot 3 (std140), pushed when the material changes.
+    struct SurfaceMaterialUniform
+    {
+        // Roughness, metallic, dielectric F0 scale, flags: 1 lit model, 2 normal map,
+        // 4 original shading (unlit/flat models).
+        std::array<float, 4> material{.8f, 0, 1, 0};
+        bool operator==(const SurfaceMaterialUniform&) const = default;
+    };
+    // Enhanced-renderer state shared by the scene renderers that opt in (world faces and
+    // lit models), owned by the presenter. Renderers resolve per-material parameters and
+    // normal maps again whenever `revision` changes.
+    struct SurfaceScene
+    {
+        const SurfaceManifest* manifest = nullptr;
+        NormalMapCache* normal_maps = nullptr; // Null: generated normal maps disabled.
+        BufferHandle lights, cells;            // Light grid storage buffers (LightGrid layout).
+        SurfaceFrameUniform frame;             // eye is filled per record.
+        std::uint64_t revision = 0;
     };
     // Vertical model shadow tiles store caster world heights; uncovered texels keep the clear value.
     inline constexpr SDL_GPUTextureFormat shadow_tile_format = SDL_GPU_TEXTUREFORMAT_R32_FLOAT;
@@ -83,8 +124,13 @@ namespace OpenBlood2
         }
         WorldPipelines(const WorldPipelines&) = delete;
         WorldPipelines& operator=(const WorldPipelines&) = delete;
-        // No-op when already prepared for this format; failure releases every pipeline.
+        // No-op when already prepared for this format and shading; failure releases every pipeline.
         bool prepare(SDL_GPUTextureFormat, std::string& error);
+        bool prepare(SDL_GPUTextureFormat, SurfaceShading, std::string& error);
+        SurfaceShading shading() const
+        {
+            return shading_;
+        }
         SDL_GPUGraphicsPipeline* get(WorldPipeline kind) const
         {
             return pipelines_[static_cast<std::size_t>(kind)];
@@ -100,6 +146,7 @@ namespace OpenBlood2
         SDL_GPUDevice* device_ = nullptr;
         std::array<SDL_GPUGraphicsPipeline*, static_cast<std::size_t>(WorldPipeline::Count)> pipelines_{};
         SDL_GPUTextureFormat format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
+        SurfaceShading shading_ = SurfaceShading::Original;
     };
     // Destination of record(): an already begun render pass whose color/depth
     // formats match the prepared pipelines. Depth range selects a viewport slice.
@@ -116,6 +163,26 @@ namespace OpenBlood2
         SDL_GPUTexture* shadow_atlas = nullptr;
         const ShadowUniform* shadows = nullptr;
         DVector scene_color{1, 1, 1}; // Original SetGlobalLightScale, scene only.
+    };
+    // Per-material enhanced parameters and normal maps of one renderer, parallel to its
+    // material textures; resolved again when the materials or the SurfaceScene revision change.
+    struct SurfaceMaterials
+    {
+        std::vector<SurfaceMaterialUniform> uniforms;
+        std::vector<TextureHandle> normals;
+        std::uint64_t revision = UINT64_MAX;
+        SDL_GPUSampler* sampler = nullptr; // Registry-owned trilinear repeat sampler.
+        void clear()
+        {
+            uniforms.clear();
+            normals.clear();
+            revision = UINT64_MAX;
+        }
+        // Resolves every material not yet resolved (or all after a revision change).
+        bool refresh(const SurfaceScene&, GpuRegistry&, std::span<const WorldMaterial>, std::string& error);
+        // Binds the light grid storage buffers and pushes the frame uniform for this eye.
+        static bool bind_scene(const SurfaceScene&, const GpuRegistry&, SDL_GPUCommandBuffer*, SDL_GPURenderPass*,
+                               DVector eye);
     };
     class WorldRenderer
     {
@@ -159,6 +226,8 @@ namespace OpenBlood2
         void clear_geometry();
         WorldViewStats stats;
         bool receive_shadows = false; // Opaque/translucent world passes read the shadow tiles.
+        // Enhanced renderer state; world faces use it when the pipelines are not Original.
+        const SurfaceScene* surface = nullptr;
         Uint32 width() const
         {
             return width_;
@@ -185,6 +254,11 @@ namespace OpenBlood2
         SDL_GPUSampler *sampler_ = nullptr, *lightmap_sampler_ = nullptr, *shadow_sampler_ = nullptr; // Registry-owned.
         Uint32 width_ = 0, height_ = 0;
         std::uint64_t revision_ = UINT64_MAX;
+        SurfaceMaterials surface_materials_;
+        bool enhanced() const
+        {
+            return surface && pipelines_->shading() != SurfaceShading::Original && style_ == DrawStyle::Opaque;
+        }
         // Checks every input and selects visible_/alpha_order_ before any pass is begun.
         bool validate(const WorldMesh&, std::span<const WorldDraw>, DVector eye, DRotation view, WorldPass,
                       double surface_time, const PointLight&, bool letterbox, bool close_view, std::string& error);

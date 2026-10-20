@@ -56,6 +56,10 @@ namespace OpenBlood2
         // materials until clear()) and acquires the rest; `paths` tracks the prefix.
         bool refresh_textures(std::span<const WorldMaterial>, std::vector<TextureHandle>& handles,
                               std::vector<std::string>& paths, std::string& error);
+        // Content-addressed texture derived from material data (for example a generated normal
+        // map), keyed by `kind` and its pixels. Shares the material lifetime: clear_textures()
+        // releases it. Null with an error when the texture is invalid or over budget.
+        TextureHandle derived_texture(std::string_view kind, const Texture&, std::string& error);
         // Render targets and other textures with explicit lifetime (not content-addressed).
         TextureHandle create_texture(const SDL_GPUTextureCreateInfo&, std::string& error);
         SDL_GPUTexture* get(TextureHandle) const;
@@ -64,6 +68,8 @@ namespace OpenBlood2
         SDL_GPUSampler* sampler(bool clamp, std::string& error);
         // Bilinear, clamped, single level: lightmap pages (texels sit on the light grid).
         SDL_GPUSampler* lightmap_sampler(std::string& error);
+        // Trilinear, repeating: generated normal maps (enhanced renderer).
+        SDL_GPUSampler* normal_sampler(std::string& error);
 
         BufferHandle create_buffer(SDL_GPUBufferUsageFlags, Uint32 bytes, std::string& error);
         // Replaces the buffer with a larger one when needed; contents are not preserved.
@@ -128,6 +134,8 @@ namespace OpenBlood2
             Uint32 level = 0, width = 0, height = 0;
         };
         TextureHandle add_texture(SDL_GPUTexture*, bool content, std::size_t bytes, std::string key);
+        // Validates, creates and stages one content texture; registers it under `key`.
+        TextureHandle upload_content(std::string key, const Texture&, std::string& error);
         void prune_shared();
         SDL_GPUDevice* device_ = nullptr;
         std::vector<TextureSlot> textures_{TextureSlot{}}; // Slot 0 is the null handle.
@@ -136,7 +144,7 @@ namespace OpenBlood2
         std::vector<std::uint32_t> free_buffers_;
         std::unordered_map<std::string, TextureHandle> content_; // key + content hash -> texture
         std::map<const void*, SharedSlot> shared_;
-        std::array<SDL_GPUSampler*, 3> samplers_{}; // Repeat, clamp, lightmap.
+        std::array<SDL_GPUSampler*, 4> samplers_{}; // Repeat, clamp, lightmap, normal map.
         std::vector<std::uint8_t> staging_;
         std::vector<BufferCopy> buffer_copies_;
         std::vector<TextureCopy> texture_copies_;

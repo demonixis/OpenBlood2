@@ -230,6 +230,60 @@ namespace OpenBlood2
         SDL_EndGPURenderPass(pass);
         return recorded;
     }
+    bool ScenePresenter::prepare_surface(GameSession& game, std::string& error)
+    {
+        const bool enhanced = shading != SurfaceShading::Original;
+        world_renderer.surface = model_renderer.surface = enhanced ? &surface_scene_ : nullptr;
+        if (!enhanced)
+            return true;
+        if (!manifest_loaded_)
+        {
+            if (!surface_manifest.classes() || surface_manifest.rules() + surface_manifest.overrides() == 0)
+                if (!surface_manifest.parse_builtin(error))
+                    return false;
+            manifest_loaded_ = true;
+        }
+        surface_scene_.manifest = &surface_manifest;
+        surface_scene_.normal_maps = normal_maps ? &normal_map_cache : nullptr;
+        if (applied_shading_ != shading || applied_normal_maps_ != normal_maps)
+        {
+            ++surface_scene_.revision; // Renderers resolve materials and normal maps again.
+            applied_shading_ = shading;
+            applied_normal_maps_ = normal_maps;
+        }
+        if (grid_revision_ == mesh_revision && registry.get(surface_scene_.lights))
+            return true;
+        const auto started = SDL_GetTicksNS();
+        std::vector<StaticLight> lights;
+        StaticLightStats light_stats;
+        if (!game.world_path.empty() && !world_static_lights(game.world, lights, light_stats, error))
+            return false;
+        if (!build_light_grid(lights, light_grid, error))
+            return false;
+        // Storage buffers always hold at least one element so the binding is never empty.
+        static const std::array<float, 4> no_light{};
+        const auto light_bytes = static_cast<Uint32>(std::max<std::size_t>(1, light_grid.lights.size()) * 16);
+        const auto cell_bytes = static_cast<Uint32>(light_grid.cells.size() * 4);
+        if (!registry.reserve(surface_scene_.lights, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, light_bytes, error) ||
+            !registry.reserve(surface_scene_.cells, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, cell_bytes, error) ||
+            !registry.stage(surface_scene_.lights,
+                            light_grid.lights.empty() ? no_light.data() : light_grid.lights.data()->data(),
+                            light_bytes, true, error) ||
+            !registry.stage(surface_scene_.cells, light_grid.cells.data(), cell_bytes, true, error))
+            return false;
+        auto& frame = surface_scene_.frame;
+        frame.grid_origin = {light_grid.origin[0], light_grid.origin[1], light_grid.origin[2],
+                             1 / light_grid.cell_size};
+        frame.grid_size = {light_grid.dimensions[0], light_grid.dimensions[1], light_grid.dimensions[2],
+                           static_cast<std::uint32_t>(light_grid.cell_count())};
+        grid_revision_ = mesh_revision;
+        surface_stats.grid_lights = lights.size();
+        surface_stats.grid_cells = light_grid.cell_count();
+        surface_stats.grid_dropped = light_grid.dropped;
+        surface_stats.grid_cell_size = light_grid.cell_size;
+        surface_stats.grid_build_ns = SDL_GetTicksNS() - started;
+        return true;
+    }
     bool ScenePresenter::update(GameSession& game, std::string& error)
     {
         error.clear();
@@ -265,6 +319,8 @@ namespace OpenBlood2
                 return fail("Model lighting");
             mesh_revision = game.world_revision;
         }
+        if (!prepare_surface(game, error))
+            return fail("Enhanced renderer");
         render_world = game.client_shell.m_bInWorld && !world_mesh.ranges.empty();
         const auto started = SDL_GetTicksNS();
         if (!OpenBlood2::world_draws(world_mesh, game.objects, world_draws, world_renderer.stats, error))
@@ -346,6 +402,8 @@ namespace OpenBlood2
         for (auto* renderer : {&world_renderer.stats, &model_renderer.stats, &explosion_model_renderer.stats,
                                &polygrid_renderer.stats, &sprite_renderer.stats, &sky_sprite_renderer.stats})
             renderer->draw_calls = renderer->culled = 0;
+        if (!pipelines.prepare(format, shading, error))
+            return fail("World pipelines");
         // Renderers stage uploads in the shared registry; one copy pass in the frame's
         // command buffer records them all before the scene pass.
         if (!world_renderer.prepare(world_mesh, mesh_revision, format, width, height, error))

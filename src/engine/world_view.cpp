@@ -485,6 +485,7 @@ namespace OpenBlood2
                     {
                         const auto p = model.points[polygon.points[corner]];
                         WorldVertex vertex{vector_subtract(p, range.pivot), color};
+                        vertex.normal = vector_scale(normal, 1 / length);
                         if (baked)
                         {
                             const auto& rgb = polygon.colors[corner];

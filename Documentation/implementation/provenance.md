@@ -1814,3 +1814,14 @@ recorded decision-4 marking departures. The save-support declarations, `save_gam
 [contract](../contracts/save_load_contracts.md#implemented-restore-mode-world-and-transaction-lot-4),
 the [evidence](reports/save_load_session.md) and the
 [source ledger](sources/save_load_session_sources.json).
+
+## Enhanced renderer (2026-10-20)
+
+The physically based shaders (`engine/shaders/pbr.frag.hlsl`), the material manifest
+reader (`engine/surface_materials.*`), the normal-map generator (`engine/normal_maps.*`),
+the light grid (`engine/light_grid.*`) and `config/materials.json` are replacement code
+and data. No game, engine or renderer code was imported. The donor NoMadEngine
+`materials.json` inspired the class names only: its values were retuned and none of its
+patterns match the retail catalogue. The published shading techniques are listed in the
+[source ledger](sources/enhanced_renderer_sources.json). See the
+[contract](../contracts/enhanced_renderer_contracts.md).

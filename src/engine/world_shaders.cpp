@@ -1,4 +1,12 @@
 #include "engine/world_shaders.h"
+#include "engine/shaders/pbr_alpha_frag.h"
+#include "engine/shaders/pbr_alpha_frag_msl.h"
+#include "engine/shaders/pbr_frag.h"
+#include "engine/shaders/pbr_frag_msl.h"
+#include "engine/shaders/pbr_high_alpha_frag.h"
+#include "engine/shaders/pbr_high_alpha_frag_msl.h"
+#include "engine/shaders/pbr_high_frag.h"
+#include "engine/shaders/pbr_high_frag_msl.h"
 #include "engine/shaders/shadow_frag.h"
 #include "engine/shaders/shadow_frag_msl.h"
 #include "engine/shaders/skinned_vert.h"
@@ -67,6 +75,20 @@ namespace OpenBlood2
                 info.num_samplers = sprite_frag_samplers;
                 info.num_storage_buffers = sprite_frag_storage_buffers;
                 break;
+#define BLOOD2_PBR_SHADER(kind, name)                                                                                  \
+    case WorldShader::kind:                                                                                            \
+        info.stage = SDL_GPU_SHADERSTAGE_FRAGMENT;                                                                     \
+        info.code = spirv ? reinterpret_cast<const Uint8*>(name) : reinterpret_cast<const Uint8*>(name##_msl);         \
+        info.code_size = spirv ? sizeof(name) : sizeof(name##_msl) - 1;                                                \
+        info.num_uniform_buffers = name##_uniforms;                                                                    \
+        info.num_samplers = name##_samplers;                                                                           \
+        info.num_storage_buffers = name##_storage_buffers;                                                             \
+        break;
+            BLOOD2_PBR_SHADER(PbrFragment, pbr_frag)
+            BLOOD2_PBR_SHADER(PbrHighFragment, pbr_high_frag)
+            BLOOD2_PBR_SHADER(PbrAlphaFragment, pbr_alpha_frag)
+            BLOOD2_PBR_SHADER(PbrHighAlphaFragment, pbr_high_alpha_frag)
+#undef BLOOD2_PBR_SHADER
             default:
                 info = {};
                 return false;

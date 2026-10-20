@@ -344,6 +344,10 @@ namespace OpenBlood2
             presenter.lightmaps = settings.detail >= 1;
             presenter.model_shadows = options.model_shadows && settings.detail >= 2;
             presenter.per_pixel_lighting = settings.pixel_lighting;
+            presenter.shading = !settings.renderer ? SurfaceShading::Original
+                                : settings.quality ? SurfaceShading::High
+                                                   : SurfaceShading::Standard;
+            presenter.normal_maps = settings.normal_maps;
             if (menu_audio)
             {
                 menu_audio->focus(menu.active && menu.promotion == MenuPromotion::None);

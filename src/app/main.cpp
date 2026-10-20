@@ -366,6 +366,8 @@ namespace
         OpenBlood2::ScenePresenter presenter(runtime.gpu);
         presenter.model_shadows = options.model_shadows;
         presenter.per_pixel_lighting = options.pixel_lighting;
+        presenter.shading = OpenBlood2::SurfaceShading(options.renderer);
+        presenter.normal_maps = options.normal_maps;
         const auto& world_mesh = presenter.world_mesh;
         const auto& world_renderer = presenter.world_renderer;
         const auto& model_scene = presenter.model_scene;
@@ -1762,6 +1764,8 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --bench-sweep       Bench with a presentation-only 360-degree yaw sweep\n"
                      "  --no-model-shadows  Disable FLAG_SHADOW model shadows (original low/medium detail)\n"
                      "  --pixel-lighting    Light models per pixel (menu: Options > Display)\n"
+                     "  --renderer MODE     original (default), standard or high enhanced shading (menu: Display)\n"
+                     "  --normal-maps       Generate normal maps for the enhanced renderer (menu: Display)\n"
                      "  --capture FILE.png  Save the third GPU frame after UI layout has settled (bench: last frame)\n"
                      "  --menu-smoke        Selected-edition menu SDL traversal, isolated preferences/pause checks\n"
                      "  --demo-smoke        Menu-free demo SDL pause, authored exits and ending diagnostic\n"

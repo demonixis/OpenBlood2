@@ -50,6 +50,10 @@ namespace OpenBlood2
         // MaxModelShadows) and the replacement per-pixel model lighting option.
         int detail = 2;
         bool pixel_lighting = false;
+        // Replacement renderer rows: 0 original shaders, 1 enhanced (physically based); the
+        // enhanced lighting quality (0 standard, 1 high) and generated normal maps.
+        int renderer = 0, quality = 0;
+        bool normal_maps = true;
         bool operator==(const MenuSettings&) const = default;
     };
     struct MenuItem
@@ -58,7 +62,8 @@ namespace OpenBlood2
         int command = -1;
         bool enabled = true;
         std::string literal;
-        // Setting IDs: sound, volume, music, volume, sensitivity, invert Y, detail, lighting.
+        // Setting IDs: sound, volume, music, volume, sensitivity, invert Y, detail, lighting,
+        // renderer, normal maps.
         int setting = -1;
         HudRect rect{}, slider_rect{};
     };
@@ -103,7 +108,8 @@ namespace OpenBlood2
         std::uint64_t revision = 0;
         bool enabled(const MenuItem& item) const
         {
-            return item.enabled && !(item.setting == 1 && !settings.sound) && !(item.setting == 3 && !settings.music);
+            return item.enabled && !(item.setting == 1 && !settings.sound) && !(item.setting == 3 && !settings.music) &&
+                   !(item.setting == 9 && !settings.renderer);
         }
         bool small() const;
         const char* title() const;

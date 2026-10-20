@@ -9,14 +9,17 @@ namespace OpenBlood2
 {
     namespace
     {
-        // Version 1 has the first seven keys; version 2 adds the display settings.
-        constexpr std::array<const char*, 9> names{"version",     "sound",    "music",  "sound_volume",  "music_volume",
-                                                   "sensitivity", "invert_y", "detail", "pixel_lighting"};
-        constexpr std::size_t version1_keys = 7;
+        // Version 1 has the first seven keys; version 2 adds the display settings; version 3 adds
+        // the renderer selection.
+        constexpr std::array<const char*, 12> names{
+            "version",  "sound",          "music",    "sound_volume", "music_volume", "sensitivity",
+            "invert_y", "detail",         "pixel_lighting", "renderer", "quality",     "normal_maps"};
+        constexpr std::array<std::size_t, 3> version_keys{7, 9, 12};
         bool valid(const MenuSettings& s)
         {
             return s.sound_volume >= 0 && s.sound_volume <= 50 && s.music_volume >= 0 && s.music_volume <= 50 &&
-                   s.sensitivity >= 100 && s.sensitivity <= 1500 && s.detail >= 0 && s.detail <= 2;
+                   s.sensitivity >= 100 && s.sensitivity <= 1500 && s.detail >= 0 && s.detail <= 2 &&
+                   (s.renderer == 0 || s.renderer == 1) && (s.quality == 0 || s.quality == 1);
         }
     } // namespace
     bool menu_preferences_path(std::filesystem::path& output, std::string& error)
@@ -83,12 +86,12 @@ namespace OpenBlood2
             }
             seen[key] = true;
         }
-        const std::size_t required = values[0] == 2 ? names.size() : version1_keys;
-        if (input.bad() || (values[0] != 1 && values[0] != 2) ||
-            std::find(seen.begin(), seen.begin() + required, false) != seen.begin() + required ||
-            std::find(seen.begin() + required, seen.end(), true) != seen.end() || values[1] < 0 || values[1] > 1 ||
-            values[2] < 0 || values[2] > 1 || values[6] < 0 || values[6] > 1 ||
-            (required == names.size() && (values[8] < 0 || values[8] > 1)))
+        const bool known = values[0] >= 1 && values[0] <= int(version_keys.size());
+        const std::size_t required = known ? version_keys[values[0] - 1] : 0;
+        auto flag = [&](std::size_t key) { return key >= required || (values[key] >= 0 && values[key] <= 1); };
+        if (input.bad() || !known || std::find(seen.begin(), seen.begin() + required, false) != seen.begin() + required ||
+            std::find(seen.begin() + required, seen.end(), true) != seen.end() || !flag(1) || !flag(2) || !flag(6) ||
+            !flag(8) || !flag(11))
         {
             error = "Incomplete or unsupported preferences";
             return false;
@@ -100,10 +103,16 @@ namespace OpenBlood2
         result.music_volume = values[4];
         result.sensitivity = values[5];
         result.invert_y = values[6];
-        if (required == names.size())
+        if (required >= version_keys[1])
         {
             result.detail = values[7];
             result.pixel_lighting = values[8];
+        }
+        if (required >= version_keys[2])
+        {
+            result.renderer = values[9];
+            result.quality = values[10];
+            result.normal_maps = values[11];
         }
         if (!valid(result))
         {
@@ -121,7 +130,7 @@ namespace OpenBlood2
             error = "Preferences out of range";
             return false;
         }
-        const std::array<int, names.size()> values{2,
+        const std::array<int, names.size()> values{3,
                                                    settings.sound,
                                                    settings.music,
                                                    settings.sound_volume,
@@ -129,7 +138,10 @@ namespace OpenBlood2
                                                    settings.sensitivity,
                                                    settings.invert_y,
                                                    settings.detail,
-                                                   settings.pixel_lighting};
+                                                   settings.pixel_lighting,
+                                                   settings.renderer,
+                                                   settings.quality,
+                                                   settings.normal_maps};
         std::string text;
         for (unsigned i = 0; i < values.size(); ++i)
             text += std::string(names[i]) + '=' + std::to_string(values[i]) + '\n';

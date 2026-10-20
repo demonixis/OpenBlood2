@@ -14,6 +14,7 @@ namespace OpenBlood2
         std::array<float, 2> uv{};
         // Lightmap page coordinates; negative when the face uses its vertex light instead.
         std::array<float, 2> lightmap{-1, -1};
+        DVector normal{}; // Unit face plane normal (model space); zero for FX geometry. Lighting only.
     };
     // Shipped Blood II defaults.cfg sets "Saturate" 1 (later LithTech: MODULATE2X/SRCCOLOR). Light
     // terms that include N.L (lightmaps, Gouraud-shaded models) are doubled; the preprocessor's

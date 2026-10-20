@@ -159,8 +159,16 @@ namespace OpenBlood2
                 }
                 item.literal = label;
             }
-            if (item.setting == 7) // Replacement option, styled after the original DETAIL LEVEL row.
-                label = item.literal = menu.settings.pixel_lighting ? "LIGHTING [PER PIXEL]" : "LIGHTING [PER VERTEX]";
+            // Replacement options, styled after the original DETAIL LEVEL row.
+            const auto& display = menu.settings;
+            if (item.setting == 7)
+                label = item.literal = display.renderer ? (display.quality ? "LIGHTING [HIGH]" : "LIGHTING [STANDARD]")
+                                       : display.pixel_lighting ? "LIGHTING [PER PIXEL]"
+                                                                : "LIGHTING [PER VERTEX]";
+            else if (item.setting == 8)
+                label = item.literal = display.renderer ? "RENDERER [ENHANCED]" : "RENDERER [ORIGINAL]";
+            else if (item.setting == 9)
+                label = item.literal = display.normal_maps ? "NORMAL MAPS [GENERATED]" : "NORMAL MAPS [OFF]";
             const bool enabled = menu.enabled(item);
             const auto& font = menu.small()              ? small_
                                : !enabled                ? disabled_

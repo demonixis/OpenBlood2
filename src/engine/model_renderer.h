@@ -47,6 +47,8 @@ namespace OpenBlood2
         void clear_geometry();
         // Evaluate the model light per pixel (interpolated normals) instead of per vertex.
         bool per_pixel_lighting = false;
+        // Enhanced renderer state; lit models use it when the pipelines are not Original.
+        const SurfaceScene* surface = nullptr;
         WorldViewStats stats;
         std::size_t staged_bytes = 0;   // Last prepare(): new assets, palettes and deformation.
         std::size_t asset_vertices = 0; // Static corners of the assets this renderer drew last.
@@ -69,5 +71,10 @@ namespace OpenBlood2
         std::uint64_t revision_ = UINT64_MAX;
         Uint32 width_ = 0, height_ = 0;
         std::vector<Visible> visible_;
+        SurfaceMaterials surface_materials_;
+        bool enhanced() const
+        {
+            return surface && pipelines_->shading() != SurfaceShading::Original && style_ == DrawStyle::Opaque;
+        }
     };
 } // namespace OpenBlood2

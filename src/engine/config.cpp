@@ -215,6 +215,18 @@ namespace OpenBlood2
                 options.model_shadows = false;
             else if (arg == "--pixel-lighting")
                 options.pixel_lighting = true;
+            else if (arg == "--normal-maps")
+                options.normal_maps = true;
+            else if (arg == "--renderer")
+            {
+                const auto value = ++i < args.size() ? args[i] : std::string_view{};
+                if (value != "original" && value != "standard" && value != "high")
+                {
+                    error = "--renderer requires original, standard or high";
+                    return false;
+                }
+                options.renderer = value == "original" ? 0 : value == "standard" ? 1 : 2;
+            }
             else if (arg == "--bench-sweep")
                 options.bench = options.bench_sweep = true;
             else if (arg == "--bench-size")

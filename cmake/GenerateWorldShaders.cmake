@@ -12,8 +12,20 @@ file(MAKE_DIRECTORY "${OUTPUT_DIR}")
 # Temporary binaries/metadata never become distributable game assets.
 set(work "${OUTPUT_DIR}/.generation")
 file(MAKE_DIRECTORY "${work}")
-foreach(shader world_vert skinned_vert world_frag sprite_frag shadow_frag)
+# Each entry: generated name, then the HLSL file stem; the enhanced (PBR) fragment variants
+# compile one source with defines.
+set(pbr_frag_defines)
+set(pbr_high_frag_defines -DPBR_HIGH)
+set(pbr_alpha_frag_defines -DPBR_ALPHA)
+set(pbr_high_alpha_frag_defines -DPBR_HIGH -DPBR_ALPHA)
+foreach(shader world_vert skinned_vert world_frag sprite_frag shadow_frag pbr_frag pbr_high_frag pbr_alpha_frag
+        pbr_high_alpha_frag)
     string(REPLACE "_" "." filename "${shader}")
+    set(defines)
+    if(shader MATCHES "^pbr_")
+        set(filename "pbr.frag")
+        set(defines ${${shader}_defines})
+    endif()
     set(source "${shader_dir}/${filename}.hlsl")
     if(shader MATCHES "_vert$")
         set(stage vertex)
@@ -25,7 +37,7 @@ foreach(shader world_vert skinned_vert world_frag sprite_frag shadow_frag)
         if(target STREQUAL "MSL")
             set(extra --msl-version 1.2.0)
         endif()
-        execute_process(COMMAND "${SHADERCROSS}" "${source}" -s HLSL -d ${target} -t ${stage} -e main ${extra}
+        execute_process(COMMAND "${SHADERCROSS}" "${source}" -s HLSL -d ${target} -t ${stage} -e main ${defines} ${extra}
             -o "${work}/${shader}.${target}" COMMAND_ERROR_IS_FATAL ANY)
     endforeach()
     # SPIR-V words as a C array, little-endian byte order from the binary module.

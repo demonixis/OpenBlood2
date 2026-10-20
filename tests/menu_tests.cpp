@@ -127,9 +127,10 @@ namespace
         menu.build(MenuPage::Options);
         CHECK(menu.items[0].command == int(MENU_CMD_DISPLAY) && menu.enabled(menu.items[0]) && menu.selected == 0);
         menu.activate();
-        CHECK(menu.page == MenuPage::Display && menu.items.size() == 2 && menu.small());
+        CHECK(menu.page == MenuPage::Display && menu.items.size() == 4 && menu.small());
         CHECK(menu.items[0].setting == 6 && menu.items[0].string_id == IDS_MENU_DISPLAY_DETAIL_HIGH &&
-              menu.items[1].setting == 7 && !menu.items[1].string_id);
+              menu.items[1].setting == 8 && !menu.items[1].string_id && menu.items[2].setting == 7 &&
+              !menu.items[2].string_id && menu.items[3].setting == 9 && !menu.enabled(menu.items[3]));
         menu.take_command();
         menu.selected = 0;
         menu.activate();
@@ -139,11 +140,32 @@ namespace
         CHECK(menu.settings.detail == 2 && menu.items[0].string_id == IDS_MENU_DISPLAY_DETAIL_HIGH);
         menu.adjust(-1);
         CHECK(menu.settings.detail == 1 && menu.items[0].string_id == IDS_MENU_DISPLAY_DETAIL_MEDIUM);
-        menu.selected = 1;
+        menu.selected = 2;
         menu.activate();
         CHECK(menu.settings.pixel_lighting && menu.take_command().action == MenuAction::Settings);
         menu.adjust(1);
         CHECK(!menu.settings.pixel_lighting);
+        // RENDERER switches the LIGHTING row to the enhanced profiles and enables NORMAL MAPS.
+        menu.selected = 1;
+        menu.activate();
+        CHECK(menu.settings.renderer == 1 && menu.enabled(menu.items[3]) &&
+              menu.take_command().action == MenuAction::Settings);
+        menu.selected = 2;
+        menu.activate();
+        CHECK(menu.settings.quality == 1 && !menu.settings.pixel_lighting);
+        menu.selected = 3;
+        menu.activate();
+        CHECK(!menu.settings.normal_maps);
+        menu.activate();
+        menu.selected = 1;
+        menu.activate();
+        CHECK(menu.settings.renderer == 0 && !menu.enabled(menu.items[3]) && menu.settings.quality == 1 &&
+              menu.settings.normal_maps);
+        menu.selected = 3;
+        menu.activate(); // Disabled with the original renderer.
+        CHECK(menu.settings.normal_maps);
+        menu.settings.quality = 0;
+        menu.take_command();
         menu.back();
         CHECK(menu.page == MenuPage::Options && !strcmp(menu.title(), "options.pcx"));
         auto fit = MenuViewport::fit(1920, 1080);

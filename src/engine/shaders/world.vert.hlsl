@@ -10,6 +10,7 @@ struct Input
     float3 color : TEXCOORD1;
     float2 uv : TEXCOORD2;
     float2 lightmap : TEXCOORD3;
+    float3 normal : TEXCOORD4; // Face plane normal (zero for FX geometry); lighting only.
 };
 struct Output
 {
@@ -17,7 +18,7 @@ struct Output
     float2 texCoord : TEXCOORD1;
     float3 worldPosition : TEXCOORD2;
     float2 lightmapCoord : TEXCOORD3;
-    float3 worldNormal : TEXCOORD4; // Models only; world faces are not lit per pixel.
+    float3 worldNormal : TEXCOORD4; // Enhanced renderer only; the original world shaders ignore it.
     float4 position : SV_Position;
 };
 Output main(Input input)
@@ -34,6 +35,6 @@ Output main(Input input)
     output.faceColor = input.color;
     output.texCoord = input.uv + textureOffset.xy;
     output.lightmapCoord = input.lightmap;
-    output.worldNormal = float3(0.0, 1.0, 0.0);
+    output.worldNormal = input.normal + 2.0 * cross(q, cross(q, input.normal) + quaternion.w * input.normal);
     return output;
 }

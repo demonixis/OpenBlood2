@@ -138,16 +138,6 @@ namespace OpenBlood2
                 out.push_back({});
                 continue;
             }
-            const auto bytes = image->rgba.size() + image->mip_rgba.size();
-            if (!image->width || !image->height || image->width > 1024 || image->height > 1024 || image->mipmaps > 11 ||
-                image->rgba.size() != std::size_t(image->width) * image->height * 4 ||
-                image->mip_rgba.size() != texture_mip_bytes(*image) ||
-                bytes > texture_byte_limit - stats.texture_bytes || bytes > staging_limit - staging_.size())
-            {
-                out.clear();
-                error = "Invalid GPU texture dimensions/payload/budget";
-                return false;
-            }
             auto key = (materials.empty() ? std::string("<white>") : materials[i].path) + '#' +
                        std::to_string(content_hash(*image));
             if (const auto found = content_.find(key); found != content_.end() && get(found->second))
@@ -156,42 +146,69 @@ namespace OpenBlood2
                 ++stats.texture_hits;
                 continue;
             }
-            SDL_GPUTextureCreateInfo info{};
-            info.type = SDL_GPU_TEXTURETYPE_2D;
-            info.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
-            info.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
-            info.width = image->width;
-            info.height = image->height;
-            info.layer_count_or_depth = 1;
-            info.num_levels = std::max(1u, image->mipmaps);
-            if (stats.textures + stats.targets >= texture_limit)
+            const auto handle = upload_content(std::move(key), *image, error);
+            if (!handle)
             {
                 out.clear();
-                error = "GPU texture count limit exceeded";
                 return false;
             }
-            auto* texture = SDL_CreateGPUTexture(device_, &info);
-            if (!texture)
-            {
-                out.clear();
-                error = SDL_GetError();
-                return false;
-            }
-            const auto handle = add_texture(texture, true, bytes, key);
-            content_.emplace(std::move(key), handle);
-            std::size_t offset = staging_.size();
-            staging_.insert(staging_.end(), image->rgba.begin(), image->rgba.end());
-            staging_.insert(staging_.end(), image->mip_rgba.begin(), image->mip_rgba.end());
-            for (Uint32 level = 0, w = image->width, h = image->height; level < info.num_levels;
-                 ++level, w = std::max(1u, w / 2), h = std::max(1u, h / 2))
-            {
-                texture_copies_.push_back({handle, offset, level, w, h});
-                offset += std::size_t(w) * h * 4;
-            }
-            ++stats.texture_uploads;
             out.push_back(handle);
         }
         return true;
+    }
+    TextureHandle GpuRegistry::upload_content(std::string key, const Texture& image, std::string& error)
+    {
+        const auto bytes = image.rgba.size() + image.mip_rgba.size();
+        if (!image.width || !image.height || image.width > 1024 || image.height > 1024 || image.mipmaps > 11 ||
+            image.rgba.size() != std::size_t(image.width) * image.height * 4 ||
+            image.mip_rgba.size() != texture_mip_bytes(image) || bytes > texture_byte_limit - stats.texture_bytes ||
+            bytes > staging_limit - staging_.size())
+        {
+            error = "Invalid GPU texture dimensions/payload/budget";
+            return {};
+        }
+        SDL_GPUTextureCreateInfo info{};
+        info.type = SDL_GPU_TEXTURETYPE_2D;
+        info.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
+        info.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
+        info.width = image.width;
+        info.height = image.height;
+        info.layer_count_or_depth = 1;
+        info.num_levels = std::max(1u, image.mipmaps);
+        if (stats.textures + stats.targets >= texture_limit)
+        {
+            error = "GPU texture count limit exceeded";
+            return {};
+        }
+        auto* texture = SDL_CreateGPUTexture(device_, &info);
+        if (!texture)
+        {
+            error = SDL_GetError();
+            return {};
+        }
+        const auto handle = add_texture(texture, true, bytes, key);
+        content_.emplace(std::move(key), handle);
+        std::size_t offset = staging_.size();
+        staging_.insert(staging_.end(), image.rgba.begin(), image.rgba.end());
+        staging_.insert(staging_.end(), image.mip_rgba.begin(), image.mip_rgba.end());
+        for (Uint32 level = 0, w = image.width, h = image.height; level < info.num_levels;
+             ++level, w = std::max(1u, w / 2), h = std::max(1u, h / 2))
+        {
+            texture_copies_.push_back({handle, offset, level, w, h});
+            offset += std::size_t(w) * h * 4;
+        }
+        ++stats.texture_uploads;
+        return handle;
+    }
+    TextureHandle GpuRegistry::derived_texture(std::string_view kind, const Texture& image, std::string& error)
+    {
+        auto key = std::string(kind) + '#' + std::to_string(content_hash(image));
+        if (const auto found = content_.find(key); found != content_.end() && get(found->second))
+        {
+            ++stats.texture_hits;
+            return found->second;
+        }
+        return upload_content(std::move(key), image, error);
     }
     bool GpuRegistry::refresh_textures(std::span<const WorldMaterial> materials, std::vector<TextureHandle>& handles,
                                        std::vector<std::string>& paths, std::string& error)
@@ -235,6 +252,22 @@ namespace OpenBlood2
             info.max_lod = 1000; // Authored DTX levels; point sampling within each level.
             info.address_mode_u = info.address_mode_v = info.address_mode_w =
                 clamp ? SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE : SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+            sampler = SDL_CreateGPUSampler(device_, &info);
+            if (!sampler)
+                error = SDL_GetError();
+        }
+        return sampler;
+    }
+    SDL_GPUSampler* GpuRegistry::normal_sampler(std::string& error)
+    {
+        auto*& sampler = samplers_[3];
+        if (!sampler)
+        {
+            SDL_GPUSamplerCreateInfo info{};
+            info.min_filter = info.mag_filter = SDL_GPU_FILTER_LINEAR;
+            info.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR;
+            info.max_lod = 1000;
+            info.address_mode_u = info.address_mode_v = info.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
             sampler = SDL_CreateGPUSampler(device_, &info);
             if (!sampler)
                 error = SDL_GetError();

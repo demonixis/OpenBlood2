@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-20",
+  "scope": "Enhanced (physically based) renderer: material manifest, generated normal maps, static-light grid and PBR fragment shaders; no game, engine or renderer code imported",
+  "retail_evidence": [
+    {
+      "file": "BLOOD2.REZ, BLOOD2P.REZ, BLOOD2P2.REZ (installed Blood II)",
+      "purpose": "DTX catalogue (3825 textures) measured by surface.retail to write and check config/materials.json rules."
+    }
+  ],
+  "design_references": [
+    {
+      "source": "NoMadEngine 6d91073 assets/blood2/config/materials.json",
+      "purpose": "Inspiration for named material classes; its patterns match no retail path and its single-star matcher is not reproduced."
+    },
+    {
+      "source": "Walter, Marschner, Li, Torrance, 'Microfacet Models for Refraction through Rough Surfaces' (EGSR 2007)",
+      "purpose": "GGX normal distribution."
+    },
+    {
+      "source": "Hammon, 'PBR Diffuse Lighting for GGX+Smith Microsurfaces' (GDC 2017)",
+      "purpose": "Approximate height-correlated Smith visibility 0.5 / lerp(2 NL NV, NL + NV, alpha)."
+    },
+    {
+      "source": "Karis, 'Physically Based Shading on Mobile' (Unreal Engine blog, 2014)",
+      "purpose": "Analytic environment BRDF approximation used with baked light as uniform environment radiance."
+    },
+    {
+      "source": "Fdez-Aguera, 'A Multiple-Scattering Microfacet Model for Real-Time Image-based Lighting' (JCGT 8(1), 2019)",
+      "purpose": "Energy compensation 1 + F0 (1 / E_ss - 1) for rough metals."
+    },
+    {
+      "source": "Schueler, 'Followup: Normal Mapping Without Precomputed Tangents' (2013)",
+      "purpose": "Screen-derivative cotangent frame; no tangent stream is stored."
+    }
+  ]
+}
