@@ -10,9 +10,9 @@ Percentages are task estimates, not acceptance. Only the user accepts a mileston
 | --- | ---: | --- |
 | Mounted non-multiplayer worlds that open | 36 / 36 | Includes Ancient City, Ancient One, Credits, End and Drop; opening is not campaign traversal. |
 | All mounted worlds that open | 58 / 58 | Includes 22 multiplayer maps, inspected locally, with the four CTF maps. |
-| Beta-ready game (M0–M4) | **~85%** | Weighted milestones below. |
-| With the graphics upgrade (M0–M6) | ~70% | Adds optional PBR and post-processing. |
-| Whole roadmap (M0–M9) | **~52%** | Adds gamepad, Quest VR/Android and LAN. |
+| Beta-ready game (M0–M4) | **~88%** | Weighted milestones below. |
+| With the graphics upgrade (M0–M6) | ~72% | Adds optional PBR and post-processing. |
+| Whole roadmap (M0–M9) | **~54%** | Adds gamepad, Quest VR/Android and LAN. |
 
 Weights reflect estimated effort: M0 4, M1 6, M2 28, M3 14, M4 8, M5 7,
 M6 6, M7 3, M8 11, M9 13. Later work (M10+) is not counted.
@@ -32,13 +32,13 @@ accept M3 or provide network play.
 | M0 | 100% | Independent C++20 build, SDL_GPU, configuration, logs and inspector. |
 | M1 | 100% | Original-code integration: objects, typed services, callbacks and lifetime. |
 | M2 | 100% — closed with reservation | World readers, gameplay services and the selected SubwayA → CityHub session. |
-| M3 | ~45% — current | Every level playable, credits, save/load, then a public beta whose bug list validates the campaign. |
+| M3 | ~55% — current | Every level playable, credits, save/load, then a public beta whose bug list validates the campaign. |
 | M4 | ~85% | Original rendering on Vulkan (Linux, Windows) and Metal (macOS). D3D12 is not planned. |
 | M5 | ~0% | Optional PBR shader set with JSON texture/material bindings; the legacy set remains selectable. |
 | M6 | 0% | PBR-only post-processing: bloom from emissive maps, GTAO, SSR, tonemapping; AA for both sets. |
 | M7 | ~5% | Gamepad: action layer, rebinding, hotplug, menus; a parallel track, needed before M8. |
 | M8 | 0% | VR on Meta Quest through OpenXR; also the Android gate. |
-| M9 | ~5% | LAN multiplayer: Bloodbath, CTF and Team on the original multiplayer maps. |
+| M9 | ~10% | LAN multiplayer: Bloodbath, CTF and Team on the original multiplayer maps. |
 
 The milestones after M4 were renumbered on 2026-10-20. Earlier reports use the
 old numbers: M5 campaign/persistence, M6 packages and optimization, M7 mobile,
@@ -166,7 +166,7 @@ ship, so Co-op is assessed separately.
 | 9.2 | Wire protocol and transport: versioned, bounded encoding of every typed message; UDP with reliable and unreliable channels; fuzzed decoders | M | 9.0 |
 | 9.3 | Sessions: listen and headless dedicated server, LAN discovery, handshake (protocol, data and mod fingerprint), join/leave/timeout, map rotation | M | 9.2 |
 | 9.4 | Multi-player server: N players and clients, the original multiplayer branches, respawn, slow death and humiliation, frags, item respawn, game-type filtering, start points, frag and time limits | L | 9.1 |
-| 9.5 | Game modes: Bloodbath; CTF with FlagStand, FlagObjects and TeamMgr; Team | M | 9.4, 3.1 |
+| 9.5 | Game modes: Bloodbath; CTF with FlagStand, FlagObjects and TeamMgr; Team. The CTF objects, capture rules, world-owned scores and team HUD already run in local inspection ([contracts](contracts/ctf_contracts.md)); network team management and the other modes remain. | M | 9.4 |
 | 9.6 | Network movement and fire: the original client-side movement upload with server bounds, remote interpolation, server-side hits, loss and latency | M–L | 9.2, 9.4 |
 | 9.7 | Multiplayer UI: host and join screens, name, character and team, FragInfo scoreboard, MessageMgr chat, gamepad navigation | M | 9.3, M7 |
 | 9.8 | Validation: headless multi-client loopback on every bb_ and ctf_ map, simulated loss and latency, sanitizers, Windows/Linux/macOS interoperability, a LAN playtest | M | all |
