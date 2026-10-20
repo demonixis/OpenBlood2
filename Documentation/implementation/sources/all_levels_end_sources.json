@@ -1,0 +1,17 @@
+{
+  "selection": "Original Trigger/script animation flow; later-engine unchanged-dimensions preflight corroboration, exact equality replacement",
+  "sources": [
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Trigger.cpp",
+      "sha256": "373658121f86b4d792eeb986a0e093291af3e1205b831385f142cf2ea445198c"
+    },
+    {
+      "path": "sources/lithtech/runtime/shared/src/moveobject.cpp",
+      "sha256": "ab363eba59ebfd89865a1d5619ffb95a82c474c319adc8d89c921da63b2d79f9"
+    }
+  ]
+}

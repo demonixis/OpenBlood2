@@ -1,0 +1,41 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/dev/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/dev/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 492
+    Start  492: ai_script.animations
+
+492: Test command: /home/yann/projects/lithtech/Blood2/build/dev/tests/ai_script_tests "animations" "/home/yann/projects/lithtech/Blood2/build/dev/tests/ai-script-animations"
+492: Working Directory: /home/yann/projects/lithtech/Blood2/build/dev/tests
+492: Test timeout computed to be: 30
+492: state_error= requested=4294967295
+1/2 Test  #492: ai_script.animations .............***Failed    0.00 sec
+test 1182
+    Start 1182: ai_script.end_private
+
+1182: Test command: /home/yann/projects/lithtech/Blood2/build/dev/tests/end_script_tests "/home/yann/Games/Blood2"
+1182: Working Directory: /home/yann/projects/lithtech/Blood2/build/dev/tests
+1182: Test timeout computed to be: 180
+1182: CalebAI0 script=walk_nogun error=AI_Update: Script animation model/current playback unavailable state_error=AI animation resize unavailable or invalid lookup=2 requested=2 actual=0 retained=0
+2/2 Test #1182: ai_script.end_private ............***Failed    0.04 sec
+
+0% tests passed, 2 tests failed out of 2
+
+Label Time Summary:
+ai_script    =   0.04 sec*proc (2 tests)
+headless     =   0.04 sec*proc (2 tests)
+private      =   0.04 sec*proc (1 test)
+
+Total Test time (real) =   0.05 sec
+
+The following tests FAILED:
+	492 - ai_script.animations (Failed)                     ai_script headless
+	1182 - ai_script.end_private (Failed)                    ai_script headless private
+Errors while running CTest
+Output from these tests are in: /home/yann/projects/lithtech/Blood2/build/dev/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

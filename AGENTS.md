@@ -1,5 +1,7 @@
 # Blood2 Project Instructions
 
+The [End script correction](Documentation/contracts/ai_animation_clearance_contracts.md#unchanged-dimensions-from-a-contact-callback) accepts a validated exact no-op resize from a contact callback. Preserve changed-size reentrancy refusal, invalid/unavailable service failures and original scripts. The complete-level audit now passes 51/58; remaining bosses and CTF behavior stay in its separate queue. M2 closure is unchanged.
+
 The [Ishmael/REV continuation](Documentation/contracts/ishmael_contracts.md) adds source combat, heal, teleport/recoil and per-object
 death damage, with actual heal/Divine effects. Preserve independent tables,
 revenant gravity/target-loss branches, missing original laugh diagnostics and

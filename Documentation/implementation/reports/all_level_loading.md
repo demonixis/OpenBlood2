@@ -9,9 +9,9 @@ initial deltas, three seconds of simulation with movement, a runtime failure
 recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
 combat, multiplayer or GPU certification. M2 closure remains unchanged.
 
-Current verified opening gate after iteration 15: **50 / 58 pass, 8 / 58 fail**
-([audit 13](evidence/all-levels-audit-13.log)). Remaining worlds:
-Rooftop, Ancient City, Ancient One, End and the four CTF maps. Initial-entry and three-second simulation
+Current verified opening gate after iteration 16: **51 / 58 pass, 7 / 58 fail**
+([audit 14](evidence/all-levels-audit-14.log)). Remaining worlds:
+Rooftop, Ancient City, Ancient One and the four CTF maps. Initial-entry and three-second simulation
 coverage is not complete gameplay/traversal acceptance. The tables below retain
 the initial baseline; iteration records explain resolved and newly exposed blockers.
 
@@ -625,3 +625,30 @@ future timeout is raised to 300 seconds on this measured evidence; its workload,
 assertions, compiler optimization and production code are unchanged. CTest metadata
 was checked after the budget adjustment; the identical long workload was not run
 a fourth time. These are focused behavior/opening checks, not campaign acceptance.
+
+## Iteration 16: End's triggered animation
+
+End's Trigger invokes Caleb's original walk script synchronously inside a movement
+contact. The [captured stack](evidence/all-levels-lot16-resize-stack.log) identifies
+the `moving_` guard in ResizeObject: even an exactly unchanged body was rejected.
+The existing clip is ordinal 2; the initial missing-animation hypothesis was
+incorrect, and its speculative script change was discarded. The retained
+[initial failure](evidence/all-levels-lot16-initial.log) records that diagnosis.
+
+[The engine correction](../../contracts/ai_animation_clearance_contracts.md#unchanged-dimensions-from-a-contact-callback)
+accepts a validated exact no-op without collision work or mutation. Actual size
+changes during movement remain refused. Scripts/assets are unchanged.
+[Audit 14](evidence/all-levels-audit-14.log) passes **51 / 58**, fails **7 / 58**:
+End now passes all difficulties, simulation and runtime/cleanup rechecks.
+
+All 22 selected AI state/script checks pass in
+[Dev](evidence/all-levels-lot16-dev.log),
+[Release](evidence/all-levels-lot16-release.log) and
+[Clang Debug ASan/UBSan with leak detection](evidence/all-levels-lot16-sanitizers.log).
+The added touch test verifies unchanged success, changed-size refusal, stable
+position/extents and preserved invalid/unavailable-service errors. The real End
+case observes Caleb's authored nonlooping walk animation, advances three seconds
+and verifies runtime readiness and cleanup at all three difficulties.
+The [Release application](evidence/all-levels-end-gpu.log) opens End and renders
+three frames on NVIDIA RTX 3060. Both applications build; graphics pipelines and
+dependencies are unchanged. This is entry/simulation coverage, not full traversal.

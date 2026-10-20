@@ -74,10 +74,18 @@ namespace OpenBlood2
         auto* r = objects_.get(h);
         if (!r || r->life != Life::Alive || r->attachment || (r->container() || r->world_model) ||
             !physics_vector(dimensions) || dimensions.x <= 0 || dimensions.y <= 0 || dimensions.z <= 0 ||
-            !physics_vector(r->state.m_Pos) || moving_)
+            !physics_vector(r->state.m_Pos))
             return ResizeResult::Invalid;
         if (!collision || !collision_ready)
             return ResizeResult::Unavailable;
+        // Original scripts can select an animation synchronously from a touch
+        // callback. Equal extents need no collision transaction (also the first
+        // branch in later LithTech ChangeObjectDimensions). Keep actual changes
+        // forbidden during a move; do not re-sweep or move an unchanged body.
+        if (dimensions.x == r->dimensions.x && dimensions.y == r->dimensions.y && dimensions.z == r->dimensions.z)
+            return ResizeResult::Resized;
+        if (moving_)
+            return ResizeResult::Invalid;
         // Local SetAnimation/ResetDims replacement. Preserve the feet and test
         // the entire requested shape before committing. No partial resize or
         // pushing other objects; a blocked clip keeps its position and clock.

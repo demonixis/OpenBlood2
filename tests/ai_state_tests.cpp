@@ -69,6 +69,28 @@ namespace
             return AI_Mgr::OnStringKey(args);
         }
     };
+    struct ResizeOnTouch : AI_Mgr
+    {
+        unsigned touches = 0;
+        OpenBlood2::ResizeResult unchanged = OpenBlood2::ResizeResult::Invalid;
+        OpenBlood2::ResizeResult changed = OpenBlood2::ResizeResult::Resized;
+        DDWORD EngineMessageFn(DDWORD m, void* d, DFLOAT f) override
+        {
+            if (m == MID_TOUCHNOTIFY)
+            {
+                ++touches;
+                DVector dims;
+                auto* server = GetServerDE();
+                if (server->GetObjectDims(m_hObject, &dims) != DE_OK)
+                    return 0;
+                unchanged = server->ResizeObject(m_hObject, dims);
+                dims.y += 1;
+                changed = server->ResizeObject(m_hObject, dims);
+                return 1;
+            }
+            return AI_Mgr::EngineMessageFn(m, d, f);
+        }
+    };
     template <class T = AI_Mgr> T* actor(GameSession& g, const char* name = "AIStateProbe", DVector pos = {0, 5, 0})
     {
         if (!g.objects.find_class(name))
@@ -240,6 +262,35 @@ namespace
         a->m_vScale = {3, 3, 3};
         CHECK(a->SetAnimation(3) && !a->animation_blocked && near(r->dimensions.y, 12));
         CHECK(near(r->state.m_Pos.y, before.y + 4) && a->animation_resize_blocks == 1);
+        return true;
+    }
+    bool resize_callback(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        auto* a = actor<ResizeOnTouch>(g, "ResizeOnTouchProbe");
+        CHECK(a);
+        auto* r = g.objects.get(a->m_hObject);
+        r->state.m_Flags |= FLAG_TOUCH_NOTIFY;
+        const auto before = r->state.m_Pos;
+        const auto dims = r->dimensions;
+        ObjectCreateStruct state;
+        state.m_Pos = {-20, before.y, 0};
+        state.m_Flags = FLAG_SOLID;
+        const auto mover = g.objects.create(g.objects.find_class("BaseClass"), state);
+        CHECK(mover);
+        g.objects.get(mover)->dimensions = {1, 1, 1};
+        DVector destination{20, before.y, 0};
+        CHECK(g.server.MoveObject(mover, &destination) == DE_OK);
+        CHECK(a->touches == 1 && a->unchanged == ResizeResult::Resized && a->changed == ResizeResult::Invalid);
+        CHECK(r->state.m_Pos.x == before.x && r->state.m_Pos.y == before.y && r->state.m_Pos.z == before.z);
+        CHECK(r->dimensions.x == dims.x && r->dimensions.y == dims.y && r->dimensions.z == dims.z);
+        // Missing collision and invalid extents still fail, even for a no-op.
+        g.server.collision_ready = false;
+        CHECK(g.server.ResizeObject(a->m_hObject, dims) == ResizeResult::Unavailable);
+        g.server.collision_ready = true;
+        r->dimensions.x = 0;
+        CHECK(g.server.ResizeObject(a->m_hObject, r->dimensions) == ResizeResult::Invalid);
         return true;
     }
     bool decisions(const char*)
@@ -501,10 +552,18 @@ int main(int argc, char** argv)
 {
     if (argc < 2)
         return 2;
-    const std::map<std::string, std::function<bool(const char*)>> tests{
-        {"symbols", symbols},     {"transitions", transitions}, {"commands", commands}, {"resize", resize},
-        {"decisions", decisions}, {"civilian", civilian},       {"dispatch", dispatch}, {"failures", failures},
-        {"lifetime", lifetime},   {"catalog", catalog},         {"subway", subway}};
+    const std::map<std::string, std::function<bool(const char*)>> tests{{"symbols", symbols},
+                                                                        {"transitions", transitions},
+                                                                        {"commands", commands},
+                                                                        {"resize", resize},
+                                                                        {"resize_callback", resize_callback},
+                                                                        {"decisions", decisions},
+                                                                        {"civilian", civilian},
+                                                                        {"dispatch", dispatch},
+                                                                        {"failures", failures},
+                                                                        {"lifetime", lifetime},
+                                                                        {"catalog", catalog},
+                                                                        {"subway", subway}};
     auto t = tests.find(argv[1]);
     return t != tests.end() && t->second(argc > 2 ? argv[2] : "") ? 0 : 1;
 }

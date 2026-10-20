@@ -1695,3 +1695,13 @@ replacement slot ordering. [Contracts](../contracts/ishmael_contracts.md) and
 [source hashes](sources/all_levels_ishmael_sources.json) retain these limits,
 missing original laugh resources and unavailable point-light illumination.
 Reference/commercial data and the graphics stack are unchanged.
+
+### Complete-level continuation: End contact animation
+
+The engine no-op resize branch preserves the original synchronous Trigger → SCRIPT
+→ SetAnimation path when extents are unchanged. Later LithTech's initial
+ChangeObjectDimensions trivial rejection corroborates avoiding collision work.
+[Contracts](../contracts/ai_animation_clearance_contracts.md#unchanged-dimensions-from-a-contact-callback)
+and [source hashes](sources/all_levels_end_sources.json) distinguish this exact
+equality adaptation from retail physics parity. No script, asset or game rule is
+substituted.

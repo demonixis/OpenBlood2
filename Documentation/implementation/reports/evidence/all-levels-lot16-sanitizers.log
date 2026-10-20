@@ -1,0 +1,55 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  416: ai_state.symbols
+ 1/22 Test  #416: ai_state.symbols .................   Passed    0.02 sec
+      Start  417: ai_state.transitions
+ 2/22 Test  #417: ai_state.transitions .............   Passed    0.02 sec
+      Start  418: ai_state.commands
+ 3/22 Test  #418: ai_state.commands ................   Passed    0.02 sec
+      Start  419: ai_state.resize
+ 4/22 Test  #419: ai_state.resize ..................   Passed    0.02 sec
+      Start  420: ai_state.resize_callback
+ 5/22 Test  #420: ai_state.resize_callback .........   Passed    0.02 sec
+      Start  421: ai_state.decisions
+ 6/22 Test  #421: ai_state.decisions ...............   Passed    0.02 sec
+      Start  422: ai_state.civilian
+ 7/22 Test  #422: ai_state.civilian ................   Passed    0.02 sec
+      Start  423: ai_state.dispatch
+ 8/22 Test  #423: ai_state.dispatch ................   Passed    0.03 sec
+      Start  424: ai_state.failures
+ 9/22 Test  #424: ai_state.failures ................   Passed    0.02 sec
+      Start  425: ai_state.lifetime
+10/22 Test  #425: ai_state.lifetime ................   Passed    0.03 sec
+      Start  426: ai_state.catalog
+11/22 Test  #426: ai_state.catalog .................   Passed    1.01 sec
+      Start  427: ai_state.subway
+12/22 Test  #427: ai_state.subway ..................   Passed   36.87 sec
+      Start  477: ai_script.parsing
+13/22 Test  #477: ai_script.parsing ................   Passed    0.02 sec
+      Start  478: ai_script.sequencing
+14/22 Test  #478: ai_script.sequencing .............   Passed    0.02 sec
+      Start  479: ai_script.waiting
+15/22 Test  #479: ai_script.waiting ................   Passed    0.02 sec
+      Start  480: ai_script.animations
+16/22 Test  #480: ai_script.animations .............   Passed    0.02 sec
+      Start  481: ai_script.state_target
+17/22 Test  #481: ai_script.state_target ...........   Passed    0.02 sec
+      Start  482: ai_script.movement
+18/22 Test  #482: ai_script.movement ...............   Passed    0.03 sec
+      Start  483: ai_script.lifetime
+19/22 Test  #483: ai_script.lifetime ...............   Passed    0.03 sec
+      Start  484: ai_script.audio
+20/22 Test  #484: ai_script.audio ..................   Passed    0.04 sec
+      Start  485: ai_script.catalog
+21/22 Test  #485: ai_script.catalog ................   Passed    3.49 sec
+      Start 1174: ai_script.end_private
+22/22 Test #1174: ai_script.end_private ............   Passed    7.00 sec
+
+100% tests passed, 0 tests failed out of 22
+
+Label Time Summary:
+ai_script    =  10.70 sec*proc (10 tests)
+ai_state     =  38.13 sec*proc (12 tests)
+headless     =  48.83 sec*proc (22 tests)
+private      =  48.37 sec*proc (4 tests)
+
+Total Test time (real) =  48.86 sec

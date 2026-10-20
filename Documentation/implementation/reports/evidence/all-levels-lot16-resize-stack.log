@@ -1,0 +1,30 @@
+Breakpoint 1 at 0x4ce640: file /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp, line 72.
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <ima:enforcing>
+  <https://debuginfod.fedoraproject.org/>
+  <ima:ignore>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Breakpoint 1, OpenBlood2::ServerAdapter::ResizeObject (this=0x7fffffff8bc8, h=0xc43a50, dimensions=...) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:72
+72	    {
+#0  OpenBlood2::ServerAdapter::ResizeObject (this=0x7fffffff8bc8, h=0xc43a50, dimensions=...) at /home/yann/projects/lithtech/Blood2/src/game/server_physics.cpp:72
+#1  0x000000000051b6da in AI_Mgr::SetAnimation (this=this@entry=0x1209500, clip=2) at /home/yann/projects/lithtech/Blood2/src/game/original/AIState.cpp:111
+#2  0x00000000005120bb in AI_Mgr::UpdateScriptCommand (this=0x1209500, paths=...) at /home/yann/projects/lithtech/Blood2/src/game/original/AIScript.cpp:199
+#3  0x0000000000512a88 in AI_Mgr::AI_STATE_Script (this=this@entry=0x1209500, paths=...) at /home/yann/projects/lithtech/Blood2/src/game/original/AIScript.cpp:241
+#4  0x00000000005053f9 in AI_Mgr::RuntimeUpdateStep (this=0x1209500) at /home/yann/projects/lithtech/Blood2/src/game/original/AIRuntime.cpp:842
+#5  0x0000000000505e4c in AI_Mgr::AI_Update (this=0x1209500) at /home/yann/projects/lithtech/Blood2/src/game/original/AIRuntime.cpp:736
+#6  0x000000000052ed27 in AI_Mgr::HandleTrigger (this=this@entry=0x1209500, sender=sender@entry=0xab0750, text="Script 1;PLAYANIMATION walk_nogun;") at /home/yann/projects/lithtech/Blood2/src/game/original/AITrigger.cpp:263
+#7  0x000000000052ef07 in AI_Mgr::ObjectMessageFn (this=0x1209500, sender=0xab0750, message=1000, read=...) at /usr/include/c++/16/string_view:154
+#8  0x000000000065b122 in BaseClass::_ObjectMsgFn (pObject=<optimized out>, hSender=0xab0750, messageID=1000, hRead=...) at /home/yann/projects/lithtech/Blood2/src/game/legacy/cpp_engineobjects_de.h:136
+#9  OpenBlood2::Objects::message (this=0x7fffffff8a10, receiver=<optimized out>, sender=0xab0750, id=1000, read=read@entry=...) at /home/yann/projects/lithtech/Blood2/src/engine/objects.cpp:776
+#10 0x0000000000469572 in OpenBlood2::ServerAdapter::EndMessage (this=0x7fffffff8bc8, h=...) at /home/yann/projects/lithtech/Blood2/src/game/server_adapter.cpp:778
+#11 0x000000000061da76 in SendTriggerMsgToObject (pSender=<optimized out>, hObj=<optimized out>, bRemoveObject=<optimized out>, hMsg=<optimized out>) at /home/yann/projects/lithtech/Blood2/src/game/original/trigger_helpers.cpp:23
+#12 SendTriggerMsgToObjects (pSender=pSender@entry=0x147d760, hName=hName@entry=0xafb140, hMsg=hMsg@entry=0xa98e30) at /home/yann/projects/lithtech/Blood2/src/game/original/trigger_helpers.cpp:55
+#13 0x00000000004d9450 in Trigger::SendMessage (this=this@entry=0x147d760, index=index@entry=0, command="Script 1;PLAYANIMATION walk_nogun;") at /home/yann/projects/lithtech/Blood2/src/game/original/Trigger.cpp:188
+#14 0x00000000004da904 in Trigger::Activate (this=0x147d760, sender=sender@entry=0xab0a10, touch=touch@entry=true) at /home/yann/projects/lithtech/Blood2/src/game/original/Trigger.cpp:170
+#15 0x00000000004db88c in Trigger::EngineMessageFn (this=0x147d760, message=3, data=0xab0a10, reason=-0) at /home/yann/projects/lithtech/Blood2/src/game/original/Trigger.cpp:235

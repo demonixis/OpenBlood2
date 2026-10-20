@@ -73,3 +73,25 @@ reset on repetition and still reject missing model services. Private catalog
 tests retain their availability counts while checking the no-op behavior.
 Slaughter House passes the three-difficulty entry/simulation/recheck audit; this
 does not certify all scripted paths or claim that the missing clip is present.
+
+## Unchanged dimensions from a contact callback
+
+End's authored Trigger sends CalebAI0 `Script 1;PLAYANIMATION walk_nogun;`
+synchronously during player movement. The clip exists (ordinal 2), and its scaled
+user dimensions exactly equal Caleb's physical dimensions. Rejecting every
+ResizeObject call while `moving_` is set incorrectly suspended this script.
+
+After live-owner/type, finite positive dimensions and collision availability
+validation, exactly equal dimensions now succeed without mutation or a collision
+sweep. Later LithTech ChangeObjectDimensions likewise checks for an unchanged
+shape before its collision work; this implementation deliberately uses exact
+component equality, with no tolerance-based resizing. Actual dimension changes
+remain rejected during a move, and missing collision/invalid dimensions still
+fail. No callbacks, position changes, penetration acceptance or animation aliases
+are added. The original script and its animation name remain unchanged.
+
+A synthetic touch callback checks both unchanged success and changed-size refusal
+with stable position/extents. The private End regression observes the actual
+Caleb animation after entry, then advances three seconds and rechecks every
+runtime service at all three difficulties, followed by clean unload. See
+[iteration 16](../implementation/reports/all_level_loading.md#iteration-16-ends-triggered-animation).
