@@ -32,8 +32,8 @@ AncientOneTentacle, FlagStand) are being ported in separate work.
 | M2 | 100% — closed with reservation | World readers, gameplay services and the selected SubwayA → CityHub session. |
 | M3 | ~45% — current | Every level playable, credits, save/load, then a public beta whose bug list validates the campaign. |
 | M4 | ~85% | Original rendering on Vulkan (Linux, Windows) and Metal (macOS). D3D12 is not planned. |
-| M5 | ~0% | Optional PBR: JSON texture/material bindings, with the original renderer kept as an option. |
-| M6 | 0% | Post-processing: bloom from PBR emissive maps, GTAO, SSR, tonemapping. |
+| M5 | ~0% | Optional PBR shader set with JSON texture/material bindings; the legacy set remains selectable. |
+| M6 | 0% | PBR-only post-processing: bloom from emissive maps, GTAO, SSR, tonemapping; AA for both sets. |
 | M7 | ~5% | Gamepad: action layer, rebinding, hotplug, menus; a parallel track, needed before M8. |
 | M8 | 0% | VR on Meta Quest through OpenXR; also the Android gate. |
 | M9 | ~5% | LAN multiplayer: Bloodbath, CTF and Team on the original multiplayer maps. |
@@ -107,8 +107,8 @@ dependency. What it actually provides:
 | 5.0 | Measure the donor patterns against the retail texture catalogue (world DATs, ABC skins, sprites). List what is covered, what is missed and what is ambiguous. |
 | 5.1 | Versioned JSON manifest: classes plus wildcard patterns, exact per-texture overrides and optional maps (normal, roughness/metal, AO, emissive). Bounded parsing with explicit errors. Texture packs stay external. |
 | 5.2 | Emissive identification: DAT fullbright/SURF_BRIGHT faces, the donor's lava/fluid classes, manifest entries and emissive maps. This is the input for M6 bloom. |
-| 5.3 | GGX/Cook-Torrance HLSL path on the existing lightmaps, static lights and model lighting. Normal maps where they exist, and an optional derivative bump otherwise. Regenerate all SPIR-V/MSL artifacts together. |
-| 5.4 | Display option to switch between PBR and the original renderer. The original renderer keeps its current pixel output, checked by the GPU readback tests. |
+| 5.3 | A PBR shader set beside the legacy set: GGX/Cook-Torrance world and skinned-model shaders that output tangents, on the existing lightmaps, static lights and model shadows. Normal maps where they exist, and an optional derivative bump otherwise. Sprite, particle, shadow-atlas, sky and UI shaders stay shared. Regenerate all SPIR-V/MSL artifacts together. |
+| 5.4 | Display option to switch between PBR and the legacy set. The legacy set is frozen as the original reference: it keeps its current pixel output, checked by the GPU readback tests, and takes no PBR inputs. |
 | 5.5 | Material inspection (resolved class, maps, emissive flag) and fallback reporting for missing or invalid bindings. |
 
 ## M6 — post-processing
@@ -116,7 +116,7 @@ dependency. What it actually provides:
 The donor has a GL post stack: a threshold bloom (downsample, Kawase blur,
 upsample), SSAO (not GTAO), SSR, SSGI and motion blur, plus an "uber" pass
 with ACES tonemapping, FXAA, sharpening, vignette and color grading. These
-are design references only. The target:
+are design references only. The target, all for the PBR set:
 
 - An HDR scene target.
 - Bloom driven by the emissive mask from 5.2 instead of a luminance threshold
@@ -125,7 +125,11 @@ are design references only. The target:
 - Tonemapping and anti-aliasing.
 - A quality setting per effect, and every effect can be turned off.
 
-The original renderer path keeps its current output.
+Post-processing is PBR-only. The legacy set renders in low dynamic range and
+has no roughness or normal inputs. Tonemapping, bloom, SSR and GTAO would
+therefore either change the original look or be meaningless there. Only
+effects that keep the image's meaning stay available to both sets:
+anti-aliasing, and later render scaling and FSR1.
 
 ## M8 — VR on Quest
 
