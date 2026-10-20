@@ -467,8 +467,10 @@ namespace OpenBlood2
         bool queue_level_change(const WorldMessage&, std::string_view start, std::string&);
         // Called only at an owning frame boundary, after all callbacks/step references have returned.
         static LevelChangeResult process_level_change(std::unique_ptr<GameSession>&, std::string&);
+        // game_type is GAMETYPE_SINGLE or the original custom-level GAMETYPE_CUSTOM (MenuCredits).
         static bool start_new_game(std::unique_ptr<GameSession>&, std::string_view world, DBYTE difficulty,
-                                   DBYTE character, std::string& error, bool inspection_start = false);
+                                   DBYTE character, std::string& error, bool inspection_start = false,
+                                   DBYTE game_type = 0);
         bool rehearse_destination(const WorldMessage&, std::string_view start, std::string& error);
         bool inspect_destination(const WorldMessage&, std::string_view start, std::string& error);
         bool load_world(const WorldMessage& message, std::string& error);

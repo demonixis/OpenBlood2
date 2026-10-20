@@ -1,4 +1,5 @@
 #include "app/hud.h"
+#include "game/menu.h"
 #include "game/original/ClientCrosshair.h"
 #include "game/original/WeaponDefs.h"
 #include <algorithm>
@@ -31,6 +32,50 @@ namespace OpenBlood2
         ImGui::GetBackgroundDrawList()->AddRectFilled(
             viewport->Pos, {viewport->Pos.x + viewport->Size.x, viewport->Pos.y + viewport->Size.y},
             IM_COL32(0, 0, 0, alpha));
+        return true;
+    }
+    bool draw_credits(const CCredits& credits)
+    {
+        const auto& drawn = credits.drawn;
+        if (!drawn.credit || !std::isfinite(drawn.color))
+            return false;
+        // SetupColor1(m_fColor, 0, 0): black is the transparent key over the world and
+        // invisible on the cleared screen, so a zero red channel draws nothing.
+        const int red = std::clamp(static_cast<int>(drawn.color * 255.f), 0, 255);
+        if (!red)
+            return false;
+        const auto* viewport = ImGui::GetMainViewport();
+        const auto fit = MenuViewport::fit(viewport->Size.x, viewport->Size.y);
+        if (fit.scale <= 0)
+            return false;
+        auto* font = ImGui::GetFont();
+        auto* list = ImGui::GetBackgroundDrawList();
+        const int count = drawn.credit->GetNumStrings(), height = credits.font_height;
+        for (int i = 0; i < count; ++i)
+        {
+            const auto* source = drawn.credit->GetString(i);
+            if (!source)
+                continue;
+            std::string text; // Windows-1252 resource bytes; Latin-1 to UTF-8 for display.
+            for (const unsigned char c : *source)
+            {
+                if (c < 0x80)
+                    text += char(c);
+                else
+                {
+                    text += char(0xc0 | (c >> 6));
+                    text += char(0x80 | (c & 0x3f));
+                }
+            }
+            // Original DrawString: rcDraw.left = x - xString / 2, top = y - yString / 2.
+            const int width = static_cast<int>(
+                std::ceil(font->CalcTextSizeA(float(height), FLT_MAX, 0, text.c_str(), text.c_str() + text.size()).x));
+            const int center = credit_line_center(240, count, i, height, credits.font_spacing);
+            const int left = 320 - width / 2, top = center - height / 2;
+            list->AddText(font, height * fit.scale,
+                          {viewport->Pos.x + fit.x + left * fit.scale, viewport->Pos.y + fit.y + top * fit.scale},
+                          IM_COL32(red, 0, 0, 255), text.c_str(), text.c_str() + text.size());
+        }
         return true;
     }
     HudRenderer::~HudRenderer()

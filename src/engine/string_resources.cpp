@@ -1,5 +1,6 @@
 #include "engine/string_resources.h"
 #include "engine/formats/reader.h"
+#include <algorithm>
 #include <set>
 #include <vector>
 namespace OpenBlood2
@@ -82,7 +83,24 @@ namespace OpenBlood2
             }
             return r.good();
         }
-        bool decode(std::span<const std::uint8_t> bytes, StringResources& out, std::uint16_t language)
+        // Validated PE image: resource directory bytes plus RVA-to-file mapping.
+        struct Image
+        {
+            std::vector<Section> sections;
+            std::span<const std::uint8_t> resources;
+            bool map(std::uint32_t rva, std::uint32_t size, std::uint32_t& offset) const
+            {
+                unsigned matches = 0;
+                for (const auto& section : sections)
+                    if (rva >= section.rva && range(rva - section.rva, size, section.size))
+                    {
+                        offset = section.offset + (rva - section.rva);
+                        ++matches;
+                    }
+                return matches == 1;
+            }
+        };
+        bool image(std::span<const std::uint8_t> bytes, Image& out)
         {
             if (bytes.size() < 64 || bytes.size() > 32 * 1024 * 1024 || bytes[0] != 'M' || bytes[1] != 'Z')
                 return false;
@@ -110,7 +128,6 @@ namespace OpenBlood2
             const auto resource_rva = opt.u32(), resource_size = opt.u32();
             if (!opt.good() || resource_size < 16 || resource_size > 16 * 1024 * 1024)
                 return false;
-            std::vector<Section> sections;
             for (unsigned i = 0; i < count; ++i)
             {
                 header.skip(12);
@@ -118,23 +135,105 @@ namespace OpenBlood2
                 header.skip(16);
                 if (!header.good() || !range(offset, size, bytes.size()))
                     return false;
-                sections.push_back({rva, size, offset});
+                out.sections.push_back({rva, size, offset});
             }
-            auto map = [&](std::uint32_t rva, std::uint32_t size, std::uint32_t& offset)
-            {
-                unsigned matches = 0;
-                for (const auto& section : sections)
-                    if (rva >= section.rva && range(rva - section.rva, size, section.size))
-                    {
-                        offset = section.offset + (rva - section.rva);
-                        ++matches;
-                    }
-                return matches == 1;
-            };
             std::uint32_t resource_offset = 0;
-            if (!map(resource_rva, resource_size, resource_offset))
+            if (!out.map(resource_rva, resource_size, resource_offset))
                 return false;
-            const auto resources = bytes.subspan(resource_offset, resource_size);
+            out.resources = bytes.subspan(resource_offset, resource_size);
+            return true;
+        }
+        // Named entries of one directory level (IMAGE_RESOURCE_DIR_STRING_U), ASCII-uppercased
+        // like the case-insensitive FindResource name comparison. Non-ASCII names are rejected.
+        bool named_directory(std::span<const std::uint8_t> resources, std::uint32_t offset,
+                             std::vector<std::pair<std::string, std::uint32_t>>& entries)
+        {
+            if (!range(offset, 16, resources.size()))
+                return false;
+            Reader r(resources.subspan(offset));
+            r.skip(12);
+            const auto named = r.u16(), ids = r.u16();
+            if (std::size_t(named) + ids > 4096)
+                return false;
+            std::set<std::string> unique;
+            for (unsigned i = 0; i < named; ++i)
+            {
+                const auto name = r.u32(), child = r.u32();
+                if (!r.good() || !(name & 0x80000000u))
+                    return false;
+                const auto at = name & 0x7fffffffu;
+                if (!range(at, 2, resources.size()))
+                    return false;
+                Reader text(resources.subspan(at));
+                const auto length = text.u16();
+                if (!length || length > 256)
+                    return false;
+                std::string value;
+                for (unsigned c = 0; c < length; ++c)
+                {
+                    const auto unit = text.u16();
+                    if (!unit || unit > 0x7f)
+                        return false;
+                    value += static_cast<char>(unit >= 'a' && unit <= 'z' ? unit - 32 : unit);
+                }
+                if (!text.good() || !unique.insert(value).second)
+                    return false;
+                entries.emplace_back(std::move(value), child);
+            }
+            return r.good();
+        }
+        std::string upper(std::string_view text)
+        {
+            std::string value(text);
+            for (auto& c : value)
+                if (c >= 'a' && c <= 'z')
+                    c = static_cast<char>(c - 32);
+            return value;
+        }
+        bool named_resource(std::span<const std::uint8_t> bytes, std::string_view type, std::string_view name,
+                            std::vector<std::uint8_t>& out)
+        {
+            Image pe;
+            if (type.empty() || name.empty() || !image(bytes, pe))
+                return false;
+            const auto resources = pe.resources;
+            std::vector<std::pair<std::string, std::uint32_t>> types, names;
+            if (!named_directory(resources, 0, types))
+                return false;
+            const auto wanted_type = upper(type), wanted_name = upper(name);
+            const auto type_entry =
+                std::find_if(types.begin(), types.end(), [&](const auto& entry) { return entry.first == wanted_type; });
+            if (type_entry == types.end() || !(type_entry->second & 0x80000000u))
+                return false;
+            const auto names_offset = type_entry->second & 0x7fffffffu;
+            if (!names_offset || !named_directory(resources, names_offset, names))
+                return false;
+            const auto name_entry =
+                std::find_if(names.begin(), names.end(), [&](const auto& entry) { return entry.first == wanted_name; });
+            if (name_entry == names.end() || !(name_entry->second & 0x80000000u))
+                return false;
+            const auto langs_offset = name_entry->second & 0x7fffffffu;
+            std::vector<Entry> langs;
+            if (langs_offset == names_offset || !langs_offset || !directory(resources, langs_offset, langs) ||
+                langs.size() != 1 || (langs[0].offset & 0x80000000u) || !range(langs[0].offset, 16, resources.size()))
+                return false; // One resource language only; FindResource's locale choice is not reproduced.
+            Reader data(resources.subspan(langs[0].offset));
+            const auto rva = data.u32(), size = data.u32();
+            std::uint32_t offset = 0;
+            if (!data.good() || size > 1024 * 1024 || !pe.map(rva, size, offset))
+                return false;
+            const auto payload = bytes.subspan(offset, size);
+            out.assign(payload.begin(), payload.end());
+            return true;
+        }
+        bool decode(std::span<const std::uint8_t> bytes, StringResources& out, std::uint16_t language)
+        {
+            Image pe;
+            if (!image(bytes, pe))
+                return false;
+            const auto resources = pe.resources;
+            auto map = [&](std::uint32_t rva, std::uint32_t size, std::uint32_t& offset)
+            { return pe.map(rva, size, offset); };
             std::vector<Entry> types;
             if (!directory(resources, 0, types))
                 return false;
@@ -216,6 +315,21 @@ namespace OpenBlood2
         if (!decode(bytes, next, language))
         {
             error = "PE strings: malformed/unsupported image, language ambiguity or reader budget exceeded";
+            return false;
+        }
+        out = std::move(next);
+        return true;
+    }
+    bool read_named_resource(std::span<const std::uint8_t> bytes, std::string_view type, std::string_view name,
+                             std::vector<std::uint8_t>& out, std::string& error)
+    {
+        out.clear();
+        error.clear();
+        std::vector<std::uint8_t> next;
+        if (!named_resource(bytes, type, name, next))
+        {
+            error = "PE resource " + std::string(type) + "/" + std::string(name) +
+                    ": missing, malformed, multi-language or over the 1 MiB reader budget";
             return false;
         }
         out = std::move(next);

@@ -1,4 +1,5 @@
 #pragma once
+#include "game/original/Credits.h"
 #include "game/original/NewStatusBar.h"
 #include "game/player_messages.h"
 #include <SDL3/SDL.h>
@@ -41,4 +42,7 @@ namespace OpenBlood2
         bool upload(std::string& error);
     };
     bool draw_screen_fade(float scale, bool in_world);
+    // The last drawn CCredit, centered in the 640x480 menu viewport. Replacement font:
+    // Dear ImGui's embedded default instead of the original GDI Arial request.
+    bool draw_credits(const CCredits&);
 } // namespace OpenBlood2

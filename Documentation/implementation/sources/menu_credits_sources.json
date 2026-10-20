@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-20",
+  "scope": "Main menu Credits entry: original MenuCredits world request, custom game type, the END/CREDITS roll flag, the CCredits/CCredit text roll from cres.dll TEXT/CREDITS and the in-world GS_CREDITS screen; no renderer or font code imported",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "36a810c80ce87eb2304716e9e1dbaae25304c02c542019b0858c9dc99f2d1006",
+      "purpose": "MenuCredits: outside a world StartNewGame(\"Credits\", STARTGAME_NORMAL, GAMETYPE_CUSTOM, LOADTYPE_NEW_GAME, DIFFICULTY_MEDIUM) without SetCharacterInfo; inside a world Term + Init(CM_CREDITS, clear) + PauseGame + GS_CREDITS. PreLoadWorld sets m_bRollCredits for END/CREDITS and Terms m_Credits; GS_PLAYING Inits the roll with bClearScreen FALSE and updates it, then updates it again after RenderCamera ([blg]); OnKeyDown sends every key to the roll outside GS_CREDITS; GS_CREDITS Esc Terms and returns to play, other keys go to HandleInput; OnExitWorld Terms."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/Credits.cpp",
+      "source_sha256": "27f63afe0d3e4f7adda770a33b2a464a6288f942254f9c500f0000188e8e1cf7",
+      "purpose": "CCredit/CCredits ported to game/original/Credits.cpp: ## blocks, >END, >TIME: with atof, line splitting, MAX_CREDIT_STRINGS 12 / MAX_CREDITS 256, SetStaticInfo font size and CM_CREDITS 4 s / 2 s defaults, state machine (0.5 s fade-in, hold, 0.4 s fade-out with the 0.1 floor when not clearing, hold-out), speed/pause/advance keys, endless wrap, Draw/DrawString centering and SetupColor1 red ramp."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/Credits.h",
+      "source_sha256": "2dbd34af24bb9241867cca0ec0acb72c500713e13d4f4ca8e2a415162d8cc2e1",
+      "purpose": "Constants (MAX_CREDIT_STRINGS, MAX_CREDITS, speed limits, CS_/CM_ values), IncSpeed/DecSpeed and Clear/GetCredit inlines."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/CreditsWin.cpp",
+      "source_sha256": "fe18d927ea113a65a1bc87b978d846089497b3ec4b98700c502820e3b7e59dfd",
+      "purpose": "FindResource(cres_hinstance, \"CREDITS\", \"TEXT\"): replaced by the data-only read_named_resource PE reader on the mounted cres.dll."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MainMenus.cpp",
+      "source_sha256": "4e52be34bfd90c547c1e9c26ab7d77711aa873b91b67bb99112621d3f0172091",
+      "purpose": "MENU_CMD_CREDITS dispatches to MenuCredits."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/B2BaseClass.cpp",
+      "source_sha256": "0ba57de82459b0d7de97c93e53d55cb32ac05b6743efa271d8fc3c2b5944aa13",
+      "purpose": "TypeCustom/OPT_FLAG_CUSTOM filtering applies to GAMETYPE_CUSTOM worlds; the existing port is unchanged."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/GameStates.cpp",
+      "source_sha256": "6379688a9c2babdf635113a380d469c03a8ff7df7e47d3c1dbacd36fbafd8c8f",
+      "purpose": "OnExitCreditsState Terms m_Credits."
+    },
+    {
+      "source": "sources/lithtech/Blood2/Shared/ClientRes.h",
+      "source_sha256": "753b0f280eb27e771f274c4c73349585676ef1824d228c09142c67a4414a60fc",
+      "purpose": "IDS_CREDITSFONT = 206 (\"Arial\" in the installed cres.dll)."
+    }
+  ],
+  "adaptations": [
+    "The world name test runs at player entry on the normalized world path instead of in PreLoadWorld.",
+    "GAMETYPE_CUSTOM is accepted only for fresh NEW_GAME requests; NEW_LEVEL, saves and multiplayer types still refuse explicitly.",
+    "Credits strings are owned std::string copies; the static speed, pause, hold defaults and font request are members of the CCredits owner in the client shell instead of globals.",
+    "The resource is read as data through a bounded PE reader: one language only, ASCII names, 1 MiB payload; text ends at the resource size or the first NUL.",
+    "The original 256-byte line and 1024-byte block buffers overflowed silently; longer text is an explicit failure leaving an inited, empty roll. A missing resource is also reported instead of silently showing nothing.",
+    "The roll update (Init then two Update calls per frame) runs in the session step after the client shell update; the GS_CREDITS screen updates once per frontend frame with the clamped frame delta.",
+    "Drawing uses the 640x480 menu viewport (font size chosen for a 640-pixel screen) and Dear ImGui's embedded default font at 22 virtual pixels instead of the GDI Arial 14x22 font; the requested face and size are recorded. Text bytes are shown as Latin-1.",
+    "A zero 8-bit red channel draws nothing (the original black transparent key / black-on-black)."
+  ]
+}

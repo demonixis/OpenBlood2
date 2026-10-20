@@ -146,7 +146,6 @@ namespace OpenBlood2
             switch (item.command)
             {
                 case MENU_CMD_BLOODBATH:
-                case MENU_CMD_CREDITS:
                     item.enabled = demo();
                     break;
                 case -1:
@@ -257,7 +256,8 @@ namespace OpenBlood2
             return;
         }
         if (!active || promotion != MenuPromotion::None || selected < 0 || selected >= int(items.size()) ||
-            !enabled(items[selected]) || pending_.action == MenuAction::NewGame || pending_.action == MenuAction::Quit)
+            !enabled(items[selected]) || pending_.action == MenuAction::NewGame ||
+            pending_.action == MenuAction::Credits || pending_.action == MenuAction::Quit)
             return;
         if (items[selected].setting >= 0)
         {
@@ -286,6 +286,8 @@ namespace OpenBlood2
             case MENU_CMD_CREDITS:
                 if (demo())
                     show_promotion(MenuPromotion::Info);
+                else
+                    pending_.action = MenuAction::Credits; // Owner: credits world, or text credits in a world.
                 break;
             case MENU_CMD_START_ACTION:
                 if (demo())

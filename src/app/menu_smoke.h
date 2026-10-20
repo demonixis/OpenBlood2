@@ -200,7 +200,8 @@ namespace OpenBlood2
                 case 212:
                     key(SDL_SCANCODE_ESCAPE);
                     break;
-                case 213:
+                case 213: // Options, the enabled in-world Credits row, Quit.
+                    key(SDL_SCANCODE_DOWN);
                     key(SDL_SCANCODE_DOWN);
                     key(SDL_SCANCODE_DOWN);
                     break;

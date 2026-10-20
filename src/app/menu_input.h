@@ -2,6 +2,8 @@
 #include "app/demo_flow.h"
 #include "app/movement_controls.h"
 #include "game/menu.h"
+#include "game/original/Credits.h"
+#include <vector>
 namespace OpenBlood2
 {
     // Normal interactive input. Smoke tests deliberately retain their original adapter.
@@ -11,9 +13,40 @@ namespace OpenBlood2
         bool inspector = false;
         bool demo_mode = false;
         DemoFlow demo;
+        // Original GS_CREDITS: the in-world text-only credits screen pauses play.
+        bool credits_screen = false;
+        // Owner-set CBloodClientShell::m_bRollCredits: key downs also reach the roll.
+        bool roll_credits = false;
+        bool credits_exit = false;
+        std::vector<int> credit_keys; // Original VK codes for CCredits::HandleInput.
+        static int credits_vk(SDL_Scancode code)
+        {
+            switch (code)
+            {
+                case SDL_SCANCODE_UP:
+                    return CREDITS_VK_UP;
+                case SDL_SCANCODE_DOWN:
+                    return CREDITS_VK_DOWN;
+                case SDL_SCANCODE_HOME:
+                    return CREDITS_VK_HOME;
+                case SDL_SCANCODE_RETURN:
+                case SDL_SCANCODE_KP_ENTER:
+                    return CREDITS_VK_RETURN;
+                case SDL_SCANCODE_SPACE:
+                    return CREDITS_VK_SPACE;
+                case SDL_SCANCODE_PAGEDOWN:
+                    return CREDITS_VK_NEXT;
+                case SDL_SCANCODE_PAUSE:
+                    return CREDITS_VK_PAUSE;
+                case SDL_SCANCODE_ESCAPE:
+                    return CREDITS_VK_ESCAPE;
+                default:
+                    return 0;
+            }
+        }
         bool paused(const Menu& menu) const
         {
-            return demo_mode ? demo.paused() : menu.active;
+            return demo_mode ? demo.paused() : menu.active || credits_screen;
         }
         void reset(Menu& menu, bool player)
         {
@@ -23,7 +56,7 @@ namespace OpenBlood2
                 return;
             }
             menu.cancel_pointer();
-            controls.player_changed(player && !menu.active && !inspector);
+            controls.player_changed(player && !menu.active && !credits_screen && !inspector);
         }
         // True means the caller should forward this event to ImGui's inspector.
         bool event(const SDL_Event& e, SDL_WindowID window, Menu& menu, bool player, bool alive,
@@ -42,7 +75,7 @@ namespace OpenBlood2
             {
                 controls.event(e, window);
                 menu.cancel_pointer();
-                if (player && !menu.active && !inspector)
+                if (player && !menu.active && !credits_screen && !inspector)
                     menu.open(true, alive);
                 reset(menu, player);
                 return inspector;
@@ -76,6 +109,18 @@ namespace OpenBlood2
             }
             if (inspector)
                 return true;
+            // Original OnKeyDown: the roll sees every key down (repeats included) before the
+            // menu/game; GS_CREDITS consumes keys, and Esc leaves it.
+            if (e.type == SDL_EVENT_KEY_DOWN && (roll_credits || credits_screen))
+                if (const int vk = credits_vk(e.key.scancode))
+                {
+                    if (credits_screen && vk == CREDITS_VK_ESCAPE)
+                        credits_exit = credits_exit || !e.key.repeat;
+                    else
+                        credit_keys.push_back(vk);
+                }
+            if (credits_screen)
+                return false;
             if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.scancode == SDL_SCANCODE_ESCAPE)
             {
                 if (menu.active)

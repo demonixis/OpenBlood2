@@ -25,6 +25,7 @@ namespace OpenBlood2
         None,
         Resume,
         NewGame,
+        Credits, // Original MenuCredits: StartNewGame("Credits", CUSTOM, MEDIUM), or GS_CREDITS in a world.
         Quit,
         Settings
     };

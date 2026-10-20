@@ -1452,7 +1452,7 @@ namespace
             else
                 CHECK(error == (std::string_view(name) == "trial7"
                                     ? "Invalid sky object/index"
-                                    : "Only bound world models are supported in the sky"));
+                                    : "Only bound world models and sprites are supported in the sky"));
             CHECK(game.get() == owner && game->objects.snapshot() == ids && game->objects.time() == time);
             CHECK(game->level_change.cleanup_complete && globals.unchanged() && g_pServerDE == &game->server);
             CHECK(game->server.list_count() == 0 && game->level_change.unknown == 0 &&

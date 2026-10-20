@@ -133,6 +133,7 @@ namespace OpenBlood2
         auto previous = SDL_GetTicksNS();
         ObjectId controlled{};
         std::string reported_audio;
+        std::uint64_t reported_credits_failures = 0;
         while (!done && (!options.frame_limit || frames < options.frame_limit))
         {
             const bool paused_at_start = input.paused(menu);
@@ -156,6 +157,7 @@ namespace OpenBlood2
                 if (!demo_smoke.before(frames, runtime.window, *game, input, error))
                     return failed(4);
             }
+            input.roll_credits = game->client_shell.m_bInWorld && game->client_shell.m_bRollCredits;
             SDL_Event event;
             int width = 0, height = 0;
             SDL_GetWindowSize(runtime.window, &width, &height);
@@ -203,6 +205,19 @@ namespace OpenBlood2
             }
             if (done || input.demo.quit)
                 break;
+            {
+                auto& credits = game->client_shell.m_Credits;
+                for (const int key : std::exchange(input.credit_keys, {}))
+                    credits.HandleInput(key);
+                if (std::exchange(input.credits_exit, false) && input.credits_screen)
+                {
+                    // Original GS_CREDITS Esc in a world: Term, GS_PLAYING, PauseGame(FALSE).
+                    credits.Term();
+                    input.credits_screen = false;
+                    neutralize_app_input(game->client_shell);
+                    input.reset(menu, game->client_shell.m_bInWorld);
+                }
+            }
             // Freeze queued game output before any potentially slow preparation.
             if (!game->server.audio.pause_output(input.paused(menu), error))
                 return failed(4);
@@ -229,17 +244,42 @@ namespace OpenBlood2
             auto command = menu.take_command();
             if (command.action == MenuAction::Quit)
                 break;
-            if (command.action == MenuAction::NewGame)
+            if (command.action == MenuAction::Credits && game->client_shell.m_bInWorld)
             {
-                const char* world = first_level(config.demo);
-                spdlog::info("New game requested: world={}; character={}; difficulty={}", world,
-                             command.story ? 0 : int(command.character), int(command.difficulty));
+                // Original MenuCredits in a game: the "lame" text-only GS_CREDITS screen.
+                auto& shell = game->client_shell;
+                shell.m_Credits.Term();
+                if (!shell.InitCredits(true, error))
+                {
+                    shell.m_Credits.Term();
+                    menu.error = error;
+                    spdlog::error("Credits failed: {}", error);
+                }
+                else
+                {
+                    spdlog::info("Credits screen: {} credits from cres.dll TEXT/CREDITS; font request {} {}x{} "
+                                 "drawn with the replacement UI font",
+                                 shell.m_Credits.GetNumCredits(), shell.m_Credits.font_name, shell.m_Credits.font_width,
+                                 shell.m_Credits.font_height);
+                    menu.close();
+                    input.credits_screen = true;
+                    neutralize_app_input(shell);
+                    input.reset(menu, true);
+                }
+                previous = SDL_GetTicksNS();
+            }
+            else if (command.action == MenuAction::NewGame || command.action == MenuAction::Credits)
+            {
+                const bool credits = command.action == MenuAction::Credits;
+                const auto start = menu_world_start(*game, command, first_level(config.demo));
+                spdlog::info("{} requested: world={}; character={}; difficulty={}; type={}",
+                             credits ? "Credits" : "New game", start.world, int(start.character), int(start.difficulty),
+                             int(start.game_type));
                 // Execute the owned profile request outside SDL event dispatch.
-                if (!GameSession::start_new_game(game, world, DBYTE(command.difficulty),
-                                                 DBYTE(command.story ? 0 : command.character), error))
+                if (!start_menu_world(game, start, error))
                 {
                     menu.error = error;
-                    spdlog::error("New game failed: {}", error);
+                    spdlog::error("{} failed: {}", credits ? "Credits" : "New game", error);
                 }
                 else
                 {
@@ -440,8 +480,15 @@ namespace OpenBlood2
                 else if (change == LevelChangeResult::Rejected)
                     spdlog::warn("Level change retained world: {}", error);
             }
+            if (input.credits_screen)
+                game->client_shell.m_Credits.Update(static_cast<float>(delta)); // Original UpdateCredits.
+            if (game->client_shell.credits_failures != reported_credits_failures)
+            {
+                reported_credits_failures = game->client_shell.credits_failures;
+                spdlog::warn("Credits roll: {}", game->client_shell.credits_error);
+            }
             selection.refresh(game->objects);
-            if (!menu.active && !input.demo.finished() && !presenter.update(*game, error))
+            if (!menu.active && !input.credits_screen && !input.demo.finished() && !presenter.update(*game, error))
                 return failed(5);
             ImGui_ImplSDLGPU3_NewFrame();
             ImGui_ImplSDL3_NewFrame();
@@ -459,8 +506,13 @@ namespace OpenBlood2
                 if (!canvas->compose(menu, 0, error) || !menu_renderer.draw(*canvas, error))
                     return failed(4);
             }
+            else if (input.credits_screen)
+                draw_credits(game->client_shell.m_Credits);
             else
             {
+                // The original rolls credits inside Start3D/End3D, below fades and the status bar.
+                if (game->client_shell.m_bInWorld && game->client_shell.m_bRollCredits)
+                    draw_credits(game->client_shell.m_Credits);
                 draw_screen_fade(game->client_shell.fade.Scale(), game->client_shell.m_bInWorld);
                 const auto& client = game->client_shell;
                 if (!hud.draw(hud_state(client.stats, client.m_bInWorld, client.view.object != nullptr,
@@ -526,7 +578,8 @@ namespace OpenBlood2
             if (target)
             {
                 auto* color_target = save ? capture.texture : target;
-                const bool world = !menu.active && !input.demo.finished() && presenter.render_world;
+                const bool world =
+                    !menu.active && !input.credits_screen && !input.demo.finished() && presenter.render_world;
                 if (world &&
                     !presenter.record(*game, commands, color_target,
                                       SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), w, h, error))

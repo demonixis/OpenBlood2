@@ -110,7 +110,8 @@ Save contains eight source slots; Load adds source Restart and Quickload rows.
 Every row is disabled and the screen explicitly says saving/loading is unavailable.
 No file snapshot or invented successful save is produced. Quit uses the original
 localized prompt with keyboard/mouse Yes/No controls (No selected initially); Y/N
-also confirm/cancel. Credits, BloodBath and custom levels remain disabled.
+also confirm/cancel. BloodBath and custom levels remain disabled; Credits is covered
+by the [Credits entry](#credits-entry) section.
 
 `--menu-smoke` injects explicit SDL events into the real frontend with its own
 1/60 clock. It checks original entry, repeated confirmation, menu/inspector
@@ -169,3 +170,100 @@ Normal `--demo` now uses the [demo menu and edition provider](demo_menu_contract
 The fixed-offset experiment remains removed. `--demo --view-world` retains the
 [menu-free direct route](demo_contracts.md); retail behavior stays shared and
 separately tested.
+
+## Credits entry
+
+Outside a world, the retail main menu's Credits row emits `MenuAction::Credits`.
+The frontend performs the original `MenuCredits` request outside SDL dispatch:
+`StartNewGame("Credits", GAMETYPE_CUSTOM, LOADTYPE_NEW_GAME, DIFFICULTY_MEDIUM)`.
+The original does not call `SetCharacterInfo` here, so the character is the one of
+the last entered game (Caleb before any game). `menu_world_start` and
+`start_menu_world` in `app/session_playback.h` hold this mapping for the frontend
+and the headless test.
+
+- `GAMETYPE_CUSTOM` is the original single-player custom-level type. It is accepted
+  only for a fresh NEW_GAME request, through request parsing, world preparation and
+  player entry. The existing `!= GAMETYPE_SINGLE` branches of ported original code
+  now see it as the original did. NEW_LEVEL, saves and multiplayer types still
+  refuse explicitly. Guards that refuse non-single modes (player death, NPC weapon
+  drops, player restoration) remain explicit failures in this mode.
+- The same transactional `start_new_game` is used: a refused request keeps the
+  current session, and the error is shown on the menu.
+- `CBloodClientShell::m_bRollCredits` follows the original PreLoadWorld test (END or
+  CREDITS, with or without the Worlds prefix, case-insensitive), evaluated at player
+  entry from the normalized world path and cleared on exit.
+- Return to the menu matches the original: the `credits` world has no exit and
+  the roll never ends by itself. Esc opens the in-world main menu; Resume returns to
+  the world, and Single Player or Quit leave it.
+- In a world the Credits row emits the same action and the frontend shows the
+  original text-only GS_CREDITS screen: `m_Credits.Term()`, then
+  `Init(CM_CREDITS, bClearScreen = TRUE)`. Play pauses (simulation, game audio, mouse
+  capture), the screen is cleared to black and the world is not drawn. Esc runs the
+  original GS_CREDITS branch: `Term`, back to GS_PLAYING, unpause. Other keys go to
+  `CCredits::HandleInput`. Focus loss does not stack the menu over this screen. A
+  missing or malformed resource keeps the menu open with the error.
+- The demo edition keeps its Prime Gibs promotion unchanged.
+
+### Credits roll (CCredits/CCredit)
+
+`game/original/Credits.{h,cpp}` ports the original classes with owned strings, an
+explicit frame time and the static state (speed, pause, hold defaults, font request)
+held by the `CCredits` owner in `CBloodClientShell::m_Credits`.
+
+- **Resource.** `CBloodClientShell::InitCredits` reads `cres.dll` from the mounted
+  REZ files and `read_named_resource(..., "TEXT", "CREDITS")` returns the raw bytes
+  of that named resource. The PE reader in `engine/string_resources.cpp` executes no
+  code. Type and name compare ASCII case-insensitively like `FindResource`; the entry
+  must have exactly one language, and non-ASCII names, bad offsets, RVAs outside a
+  section and payloads over 1 MiB are rejected. The add-on `CREDITS_AO` and the
+  `INTRO` texts are not used by this edition.
+- **Parsing (`AddCredits`, `CCredit::Init`, `AddString`).** The text is read up to
+  the resource size or the first NUL. `##` ends a block, and the newlines after it
+  are skipped. A block that starts with `>END` at its `##` stops parsing. The text
+  after the last `##` is never added. Each block is split on CR/LF; runs of line
+  breaks collapse, so only a leading line break makes an empty string. `>TIME:`
+  followed by text sets the hold time with `atof` prefix rules (a value of 0 or less
+  keeps the default); `>TIME:` alone is text. At most `MAX_CREDIT_STRINGS` (12)
+  strings are kept, and later lines, including `>TIME:` lines, are dropped and
+  counted. At most `MAX_CREDITS` (256) blocks are kept; later ones are dropped and
+  counted. Text is handled as single bytes (`_mbsinc` under an SBCS code page).
+- **Fixed buffers.** The original copied lines into 256-byte and blocks into
+  1024-byte stack buffers without checks. The port refuses longer text explicitly
+  and keeps an inited, empty roll, as the original did when the resource was missing.
+  The installed text has 87 blocks and fits.
+- **States.** CS_START → CS_FADEIN 0.5 s (red 0 → 1) → CS_HOLDIN (the block's
+  `>TIME`, else 4 s) → CS_FADEOUT 0.4 s (red 1 → 0) → CS_HOLDOUT 2 s (nothing drawn)
+  → CS_DONE, then the next block. Each `Update` call runs one state step, and the
+  transition out of CS_START and CS_DONE take a call each. The frame time is
+  multiplied by the speed and is zero while paused. In CM_CREDITS the last block
+  wraps to the first forever; CM_INTRO is ported but unused (it ends after the last
+  block and ignores the speed keys).
+- **Roll over the world.** In the END and CREDITS worlds (`m_bRollCredits`), the
+  first played frame calls `Init(CM_CREDITS, bClearScreen = FALSE)`. Every frame then
+  calls `Update` twice: in the GS_PLAYING branch and after `RenderCamera` (the `[blg]`
+  call). Only the second call's drawing survives the screen clear, and the timers
+  advance twice per frame. The session step reproduces this. In this mode the
+  fade-out stops at red 0.1 and moves straight to CS_HOLDOUT. Opening the menu
+  freezes the roll; returning from the text-only screen restarts it from the first
+  block. Entry and exit `Term` the roll.
+- **Keys** (`HandleInput`, repeats included). Up and Down change the speed by 0.2
+  within 0.4..5.0, Home resets it to 1, Return/keypad Enter/Space/PgDn jump to the
+  next block in CS_HOLDIN, Pause toggles the pause, and Esc only sets the done flag.
+  As in the original `OnKeyDown`, the roll receives keys before the menu and the
+  game, so the same keys still move the player or the menu selection. Init resets
+  speed and pause.
+- **Drawing.** `draw_credits` (app/hud.cpp) draws the last drawn block in the
+  640×480 menu viewport, below the screen fade and the status bar. The vertical
+  arithmetic is the original `Draw`/`DrawString` integer centering around (320, 240)
+  with 22-pixel lines and 4-pixel spacing. The color is `SetupColor1(red, 0, 0)`
+  with truncation to 8 bits; a zero red channel draws nothing, because black was the
+  transparent key over the world and is invisible on the cleared screen.
+- **Font (replacement).** The original created a GDI font from `IDS_CREDITSFONT`
+  (cres.dll string 206, `Arial` in the installed data, with an `Arial` fallback) at
+  14×22 for screens wider than 520 pixels. The port records that request in
+  `CCredits::font_name/font_width/font_height`. It draws with Dear ImGui's embedded
+  default font at 22 virtual pixels, without the requested 14-pixel average width
+  and without GDI's rasterization. No system font is loaded.
+
+See the [implementation report](../implementation/reports/menu_credits.md) and the
+[source ledger](../implementation/sources/menu_credits_sources.json).

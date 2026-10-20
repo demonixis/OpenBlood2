@@ -1,3 +1,4 @@
+#include "game/game_settings.h"
 #include "game/server_adapter.h"
 namespace OpenBlood2
 {
@@ -18,12 +19,13 @@ namespace OpenBlood2
         output = {};
         error.clear();
         std::string normalized;
-        if (request.game_type != 0 || request.difficulty > 3 ||
+        const bool custom = request.game_type == GAMETYPE_CUSTOM && request.load_type == LOADTYPE_NEW_GAME;
+        if ((request.game_type != GAMETYPE_SINGLE && !custom) || request.difficulty > 3 ||
             (request.load_type != LOADTYPE_NEW_GAME && request.load_type != LOADTYPE_NEW_LEVEL) ||
             !resource_path(request.filename, normalized) || normalized != request.filename ||
             !normalized.starts_with("worlds/") || !normalized.ends_with(".dat"))
         {
-            error = "World preparation requires a normalized single-player request";
+            error = "World preparation requires a normalized single-player or custom NEW_GAME request";
             return false;
         }
         PreparedWorld next;

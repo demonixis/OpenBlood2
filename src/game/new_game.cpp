@@ -1,3 +1,4 @@
+#include "game/game_settings.h"
 #include "game/original/CharacterProfiles.h"
 #include "game/original_globals.h"
 #include "game/server_adapter.h"
@@ -5,20 +6,21 @@
 namespace OpenBlood2
 {
     bool GameSession::start_new_game(std::unique_ptr<GameSession>& current, std::string_view world, DBYTE difficulty,
-                                     DBYTE character, std::string& error, bool inspection_start)
+                                     DBYTE character, std::string& error, bool inspection_start, DBYTE game_type)
     {
         error.clear();
         if (!current || current->objects.busy() || ServerAdapter::active_ != &current->server ||
             g_pServerDE != &current->server || !current->server.bound_ || !character_profile(character) ||
-            difficulty > 2 || world.empty() || world.size() > 255 || world.find('\0') != world.npos ||
+            difficulty > 2 || (game_type != GAMETYPE_SINGLE && game_type != GAMETYPE_CUSTOM) || world.empty() ||
+            world.size() > 255 || world.find('\0') != world.npos ||
             current->world_revision == std::numeric_limits<std::uint64_t>::max())
         {
-            error = "New game requires an active idle owner and supported solo profile";
+            error = "New game requires an active idle owner, supported solo profile and single/custom game type";
             return false;
         }
         WorldMessage request;
         const std::string path(world);
-        if (!original_world_request(path.c_str(), 0, LOADTYPE_NEW_GAME, difficulty, request))
+        if (!original_world_request(path.c_str(), game_type, LOADTYPE_NEW_GAME, difficulty, request))
         {
             error = "Invalid new-game request";
             return false;

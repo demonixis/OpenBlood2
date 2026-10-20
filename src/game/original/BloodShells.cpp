@@ -3,8 +3,11 @@
 // client data / packet reads with checked handles and owned typed values.
 #include "BloodShells.h"
 #include "ClientCrosshair.h"
+#include "MenuIds.h"
+#include "engine/string_resources.h"
 #include "game/game_settings.h"
 #include <algorithm>
+#include <cctype>
 #include <climits>
 #include <cmath>
 
@@ -232,6 +235,21 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     client_ = client;
     player = object;
     m_bInWorld = true;
+    m_bRollCredits = false;
+    if (const auto var = server_.GetGameConVar("GAME_WORLDNAME"))
+        if (const auto* value = server_.GetVarValueString(var))
+        {
+            // Original accepts "END"/"CREDITS" with or without the Worlds prefix (case-insensitive).
+            std::string world = value;
+            std::transform(world.begin(), world.end(), world.begin(),
+                           [](unsigned char c) { return c == '\\' ? '/' : char(std::tolower(c)); });
+            if (world.starts_with("worlds/"))
+                world.erase(0, 7);
+            if (world.ends_with(".dat"))
+                world.resize(world.size() - 4);
+            m_bRollCredits = world == "end" || world == "credits";
+        }
+    m_Credits.Term();
     m_bFirstUpdate = true;
     restored_entry = restored;
     m_bFirstWorld = !restored;
@@ -290,6 +308,8 @@ void CBloodClientShell::OnExitWorld()
     player = nullptr;
     client_ = nullptr;
     m_bInWorld = false;
+    m_bRollCredits = false;
+    m_Credits.Term();
     restored_entry = false;
     m_bFirstWorld = true;
     m_bFirstUpdate = true;
@@ -515,6 +535,57 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
         }
     }
     return true;
+}
+bool CBloodClientShell::InitCredits(bool clear_screen, std::string& error)
+{
+    // CreditsWin_GetTextBuffer: FindResource(cres_hinstance, "CREDITS", "TEXT"), read as data.
+    std::vector<std::uint8_t> dll, text;
+    error.clear();
+    const auto* resource = resources_.find("cres.dll");
+    if (!resource)
+        error = "Credits: cres.dll is missing";
+    else if (resource->size > 32 * 1024 * 1024)
+        error = "Credits: cres.dll exceeds the 32 MiB resource reader limit";
+    else if (resources_.read("cres.dll", dll, error))
+        OpenBlood2::read_named_resource(dll, "TEXT", "CREDITS", text, error);
+    std::string parse_error;
+    // An unavailable resource still leaves an inited, empty roll, like the original.
+    const bool parsed = m_Credits.Init(text, CM_CREDITS, clear_screen, 640, &parse_error);
+    // SetStaticInfo: FormatString(IDS_CREDITSFONT), falling back to "Arial".
+    OpenBlood2::StringResources strings;
+    std::string strings_error;
+    if (!dll.empty() && OpenBlood2::read_string_resources(dll, strings, strings_error))
+        if (const auto found = strings.strings.find(IDS_CREDITSFONT);
+            found != strings.strings.end() && !found->second.empty())
+            m_Credits.font_name = found->second;
+    if (error.empty())
+        error = parse_error;
+    else
+        m_Credits.error = error;
+    if (error.empty() && !parsed)
+        error = "Credits: TEXT/CREDITS could not be parsed";
+    if (!error.empty())
+    {
+        credits_error = error;
+        ++credits_failures;
+        return false;
+    }
+    return true;
+}
+void CBloodClientShell::UpdateRollCredits(double seconds)
+{
+    if (!m_bInWorld || !m_bRollCredits)
+        return;
+    const auto frame = static_cast<float>(seconds);
+    if (m_Credits.IsInited())
+        m_Credits.Update(frame);
+    else
+    {
+        std::string error;
+        InitCredits(false, error);
+    }
+    if (m_Credits.IsInited())
+        m_Credits.Update(frame);
 }
 bool CBloodClientShell::Update()
 {

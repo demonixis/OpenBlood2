@@ -1,0 +1,77 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start   59: world.level_change
+      Start 1083: menus.profiles
+      Start 1226: ctf.worlds
+ 1/32 Test   #59: world.level_change ................   Passed    0.01 sec
+      Start   79: world.destination_trial_private
+ 2/32 Test   #79: world.destination_trial_private ...   Passed    0.85 sec
+      Start   78: world.level_change_private
+ 3/32 Test   #78: world.level_change_private ........   Passed    0.70 sec
+      Start 1081: menus.session
+ 4/32 Test #1081: menus.session .....................   Passed    0.25 sec
+      Start 1082: menus.credits
+ 5/32 Test #1082: menus.credits .....................   Passed    0.17 sec
+      Start  936: hud.private
+ 6/32 Test  #936: hud.private .......................   Passed    0.18 sec
+      Start 1224: ctf.replacement
+ 7/32 Test #1224: ctf.replacement ...................   Passed    0.12 sec
+      Start 1080: menus.artwork
+ 8/32 Test #1080: menus.artwork .....................   Passed    0.04 sec
+      Start 1223: ctf.contact
+ 9/32 Test #1223: ctf.contact .......................   Passed    0.04 sec
+      Start 1219: ctf.capture
+10/32 Test #1219: ctf.capture .......................   Passed    0.04 sec
+      Start 1221: ctf.owner
+11/32 Test #1221: ctf.owner .........................   Passed    0.04 sec
+      Start 1217: ctf.profiles
+12/32 Test #1217: ctf.profiles ......................   Passed    0.04 sec
+      Start 1222: ctf.death
+13/32 Test #1222: ctf.death .........................   Passed    0.04 sec
+      Start 1225: ctf.hud
+14/32 Test #1225: ctf.hud ...........................   Passed    0.05 sec
+      Start 1220: ctf.lifetime
+15/32 Test #1083: menus.profiles ....................   Passed    2.61 sec
+      Start 1218: ctf.carry
+16/32 Test #1220: ctf.lifetime ......................   Passed    0.04 sec
+      Start   61: world.destination_trials
+17/32 Test   #61: world.destination_trials ..........   Passed    0.01 sec
+      Start   58: world.session_start
+18/32 Test   #58: world.session_start ...............   Passed    0.01 sec
+      Start   64: world.destination_lifetime
+19/32 Test   #64: world.destination_lifetime ........   Passed    0.00 sec
+      Start 1084: menus.preferences
+20/32 Test #1084: menus.preferences .................   Passed    0.01 sec
+      Start 1079: menus.credits_text
+21/32 Test #1218: ctf.carry .........................   Passed    0.05 sec
+      Start   74: world.session_lifecycle
+22/32 Test #1079: menus.credits_text ................   Passed    0.00 sec
+      Start 1078: menus.state
+23/32 Test   #74: world.session_lifecycle ...........   Passed    0.00 sec
+      Start   63: world.destination_schema
+24/32 Test #1078: menus.state .......................   Passed    0.00 sec
+      Start   75: world.session_messages
+25/32 Test   #63: world.destination_schema ..........   Passed    0.00 sec
+      Start   62: world.destination_messages
+26/32 Test   #75: world.session_messages ............   Passed    0.00 sec
+      Start  935: hud.session
+27/32 Test   #62: world.destination_messages ........   Passed    0.00 sec
+      Start  932: hud.bitmaps
+28/32 Test  #932: hud.bitmaps .......................   Passed    0.00 sec
+      Start  933: hud.values
+29/32 Test  #935: hud.session .......................   Passed    0.00 sec
+      Start  934: hud.input
+30/32 Test  #933: hud.values ........................   Passed    0.00 sec
+31/32 Test  #934: hud.input .........................   Passed    0.00 sec
+32/32 Test #1226: ctf.worlds ........................   Passed    2.81 sec
+
+100% tests passed, 0 tests failed out of 32
+
+Label Time Summary:
+ctf         =   3.27 sec*proc (10 tests)
+headless    =   8.13 sec*proc (32 tests)
+hud         =   0.19 sec*proc (5 tests)
+menus       =   3.08 sec*proc (7 tests)
+private     =   8.07 sec*proc (17 tests)
+world       =   1.59 sec*proc (10 tests)
+
+Total Test time (real) =   2.83 sec

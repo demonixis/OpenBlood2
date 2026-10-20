@@ -1,0 +1,91 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start 1226: ctf.worlds
+      Start   79: world.destination_trial_private
+      Start   78: world.level_change_private
+ 1/32 Test   #78: world.level_change_private ........   Passed    0.68 sec
+      Start  936: hud.private
+ 2/32 Test   #79: world.destination_trial_private ...   Passed    0.82 sec
+      Start 1224: ctf.replacement
+ 3/32 Test  #936: hud.private .......................   Passed    0.19 sec
+      Start 1223: ctf.contact
+ 4/32 Test #1223: ctf.contact .......................   Passed    0.07 sec
+      Start 1221: ctf.owner
+ 5/32 Test #1224: ctf.replacement ...................   Passed    0.16 sec
+      Start 1217: ctf.profiles
+ 6/32 Test #1221: ctf.owner .........................   Passed    0.07 sec
+      Start 1225: ctf.hud
+ 7/32 Test #1217: ctf.profiles ......................   Passed    0.07 sec
+      Start 1219: ctf.capture
+ 8/32 Test #1225: ctf.hud ...........................   Passed    0.07 sec
+      Start 1222: ctf.death
+ 9/32 Test #1222: ctf.death .........................   Passed    0.08 sec
+      Start 1220: ctf.lifetime
+10/32 Test #1219: ctf.capture .......................   Passed    0.15 sec
+      Start   59: world.level_change
+11/32 Test   #59: world.level_change ................***Failed    0.04 sec
+trial1: World texture t.dtx: Missing exact-path resource
+trial2: No single-player GameStartPoint
+trial3: Start point has no supported ground collision
+trial4: World initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+trial5: World initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+trial6: Destination start trigger requested another level during entry
+broken: DAT v56: invalid/unsupported section offsets near byte 4
+missing: Resource not found: worlds/missing.dat
+level_change:1453: error == (std::string_view(name) == "trial7" ? "Invalid sky object/index" : "Only bound world models are supported in the sky")
+
+      Start   61: world.destination_trials
+12/32 Test   #61: world.destination_trials ..........   Passed    0.01 sec
+      Start 1218: ctf.carry
+13/32 Test #1220: ctf.lifetime ......................   Passed    0.07 sec
+      Start   64: world.destination_lifetime
+14/32 Test   #64: world.destination_lifetime ........   Passed    0.00 sec
+      Start   58: world.session_start
+15/32 Test   #58: world.session_start ...............   Passed    0.01 sec
+      Start 1084: menus.preferences
+16/32 Test #1084: menus.preferences .................   Passed    0.00 sec
+      Start 1078: menus.state
+17/32 Test #1078: menus.state .......................   Passed    0.00 sec
+      Start   63: world.destination_schema
+18/32 Test   #63: world.destination_schema ..........   Passed    0.00 sec
+      Start   62: world.destination_messages
+19/32 Test   #62: world.destination_messages ........   Passed    0.00 sec
+      Start   74: world.session_lifecycle
+20/32 Test   #74: world.session_lifecycle ...........   Passed    0.00 sec
+      Start   75: world.session_messages
+21/32 Test   #75: world.session_messages ............   Passed    0.00 sec
+      Start  935: hud.session
+22/32 Test  #935: hud.session .......................   Passed    0.00 sec
+      Start  932: hud.bitmaps
+23/32 Test  #932: hud.bitmaps .......................   Passed    0.00 sec
+      Start  934: hud.input
+24/32 Test  #934: hud.input .........................   Passed    0.00 sec
+      Start  933: hud.values
+25/32 Test  #933: hud.values ........................   Passed    0.00 sec
+      Start 1079: menus.credits_text
+26/32 Test #1079: menus.credits_text ................   Passed    0.00 sec
+      Start 1080: menus.artwork
+27/32 Test #1218: ctf.carry .........................   Passed    0.06 sec
+      Start 1081: menus.session
+28/32 Test #1080: menus.artwork .....................   Passed    0.06 sec
+      Start 1082: menus.credits
+29/32 Test #1082: menus.credits .....................   Passed    0.29 sec
+      Start 1083: menus.profiles
+30/32 Test #1081: menus.session .....................   Passed    0.37 sec
+31/32 Test #1226: ctf.worlds ........................   Passed    4.25 sec
+32/32 Test #1083: menus.profiles ....................   Passed    4.32 sec
+
+97% tests passed, 1 tests failed out of 32
+
+Label Time Summary:
+ctf         =   5.05 sec*proc (10 tests)
+headless    =  11.87 sec*proc (32 tests)
+hud         =   0.20 sec*proc (5 tests)
+menus       =   5.05 sec*proc (7 tests)
+private     =  11.77 sec*proc (17 tests)
+world       =   1.58 sec*proc (10 tests)
+
+Total Test time (real) =   6.00 sec
+
+The following tests FAILED:
+	 59 - world.level_change (Failed)                       headless world
+Errors while running CTest

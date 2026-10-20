@@ -1,0 +1,63 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start 1187: menus.profiles
+      Start 1351: ctf.worlds
+      Start 1185: menus.session
+ 1/25 Test #1185: menus.session ....................   Passed    0.25 sec
+      Start 1349: ctf.replacement
+ 2/25 Test #1349: ctf.replacement ..................   Passed    0.12 sec
+      Start 1348: ctf.contact
+ 3/25 Test #1348: ctf.contact ......................   Passed    0.05 sec
+      Start 1035: hud.private
+ 4/25 Test #1035: hud.private ......................   Passed    0.18 sec
+      Start 1347: ctf.death
+ 5/25 Test #1347: ctf.death ........................   Passed    0.05 sec
+      Start 1350: ctf.hud
+ 6/25 Test #1350: ctf.hud ..........................   Passed    0.05 sec
+      Start 1344: ctf.capture
+ 7/25 Test #1344: ctf.capture ......................   Passed    0.05 sec
+      Start 1346: ctf.owner
+ 8/25 Test #1346: ctf.owner ........................   Passed    0.05 sec
+      Start 1342: ctf.profiles
+ 9/25 Test #1342: ctf.profiles .....................   Passed    0.05 sec
+      Start 1345: ctf.lifetime
+10/25 Test #1345: ctf.lifetime .....................   Passed    0.05 sec
+      Start 1343: ctf.carry
+11/25 Test #1343: ctf.carry ........................   Passed    0.05 sec
+      Start 1183: menus.artwork
+12/25 Test #1183: menus.artwork ....................   Passed    0.04 sec
+      Start 1181: menus.state
+13/25 Test #1181: menus.state ......................   Passed    0.00 sec
+      Start 1031: hud.bitmaps
+14/25 Test #1031: hud.bitmaps ......................   Passed    0.00 sec
+      Start 1034: hud.session
+15/25 Test #1034: hud.session ......................   Passed    0.00 sec
+      Start 1188: menus.preferences
+16/25 Test #1188: menus.preferences ................   Passed    0.00 sec
+      Start 1032: hud.values
+17/25 Test #1032: hud.values .......................   Passed    0.00 sec
+      Start 1033: hud.input
+18/25 Test #1033: hud.input ........................   Passed    0.00 sec
+      Start 1182: menus.credits_text
+19/25 Test #1182: menus.credits_text ...............   Passed    0.00 sec
+      Start 1186: menus.credits
+20/25 Test #1186: menus.credits ....................   Passed    0.18 sec
+21/25 Test #1187: menus.profiles ...................   Passed    2.55 sec
+22/25 Test #1351: ctf.worlds .......................   Passed    2.73 sec
+      Start 1189: gpu.menu_traversal
+23/25 Test #1189: gpu.menu_traversal ...............   Passed    2.93 sec
+      Start 1353: gpu.ctf_hud
+24/25 Test #1353: gpu.ctf_hud ......................   Passed    0.65 sec
+      Start 1036: gpu.hud
+25/25 Test #1036: gpu.hud ..........................   Passed    0.68 sec
+
+100% tests passed, 0 tests failed out of 25
+
+Label Time Summary:
+ctf         =   3.88 sec*proc (11 tests)
+gpu         =   4.26 sec*proc (3 tests)
+headless    =   6.45 sec*proc (22 tests)
+hud         =   0.87 sec*proc (6 tests)
+menus       =   5.97 sec*proc (8 tests)
+private     =  10.70 sec*proc (18 tests)
+
+Total Test time (real) =   7.02 sec

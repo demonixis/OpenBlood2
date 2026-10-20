@@ -1,5 +1,6 @@
 #pragma once
 #include "CommLink.h"
+#include "Credits.h"
 #include "MoveMgr.h"
 #include "Music.h"
 #include "PathMgr.h"
@@ -84,6 +85,17 @@ class CBloodClientShell
     bool OnEnterWorld(HCLIENT, bool restored = false);
     bool restored_entry = false;
     OpenBlood2::PlayerInit entry_profile;
+    // Original PreLoadWorld END/CREDITS test, evaluated at entry from the normalized
+    // world path; m_Credits then rolls over the world (CM_CREDITS, no screen clear).
+    bool m_bRollCredits = false;
+    CCredits m_Credits;
+    // Reads the cres.dll TEXT resource "CREDITS" and initializes m_Credits.
+    bool InitCredits(bool clear_screen, std::string& error);
+    // Original GS_PLAYING roll: Init on the first frame, then CCredits::Update both in the
+    // playing branch and after RenderCamera ([blg]), so two updates per rendered frame.
+    void UpdateRollCredits(double seconds);
+    std::string credits_error;
+    std::uint64_t credits_failures = 0;
     void OnExitWorld();
     bool OnMessage(const OpenBlood2::PlayerEvent&, CBloodServerShell&);
     bool Update();

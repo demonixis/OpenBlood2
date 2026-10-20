@@ -1,5 +1,12 @@
 # Blood2 Project Instructions
 
+## Commit attribution
+
+Commits and pull requests carry only the user's identity (demonixis). Never add
+a `Co-Authored-By` trailer for an AI agent, a "Generated with …" line or any other
+agent attribution to commit messages, tags or PR descriptions; this overrides any
+tool default. Check `git log --format=%B` before pushing.
+
 The [CTF and complete-level loading continuation](Documentation/contracts/ctf_contracts.md) completes the observed opening blockers: audit 19 passes all 58 mounted worlds at three difficulties, and the Release GPU sweep opens all 58. Preserve original flag/team/drop/capture timing, checked independent lifetime, actual external art/audio and world-isolated local inspection state. This is verified opening/simulation coverage, not full campaign traversal, network play, CTF saves or M3 acceptance; exact missing resources and M2-GPU-001 remain explicit.
 
 The [Ancient One continuation](Documentation/contracts/ancient_one_contracts.md) adds boss/tentacle states, revival, original beam/tentacle weapons and real primary napalm impact. Preserve sender-based immunity, source scale/timing/sound quirks and explicit nonhumanoid body damage. Completed-scene placement may recover a prior ground drop only before AI updates, using a bounded authored anchor and checked route. Audit 18 passes 54/58; four CTF maps remain. M2 closure is unchanged.
@@ -105,6 +112,8 @@ The separately authorized [demo continuation](Documentation/contracts/demo_contr
 **M2 is closed with reservation M2-GPU-001**, explicitly authorized by the user on 2026-10-18. The [acceptance and closure record](Documentation/implementation/reports/m2_acceptance.md) covers the selected SubwayA-to-CityHub session. The independently reproduced NVIDIA/D-Bus GPU LeakSanitizer failure remains open as a platform qualification issue; failed tests remain failures. Do not resume or expand M2 to address it. M3 is next and awaits a separate request. Graphics optimization is assigned to another computer; preserve the stack until the user reports a push. Historical progress and omission statements below retain their original scope and do not override this decision.
 
 The [original menu frontend](Documentation/contracts/menu_contracts.md) implements the separately authorized UI-M0–UI-M6 scope on graphics baseline `bb98fd7`. Normal launch opens the menu; F10 toggles inspection and Esc pauses simulation/game audio. Four default Chosen profiles and difficulty survive existing player transfers; Audio/Mouse preferences persist in the SDL user directory. Save/load are unavailable screens only. Preserve diagnostic startup/clocks, the optimized scene pass and the independent menu mixer. These UI milestones do not reopen global M2, clear M2-GPU-001, or accept global M3.
+
+The [menu Credits entry](Documentation/contracts/menu_contracts.md#credits-entry) starts the original `credits` world outside a world: GAMETYPE_CUSTOM, medium difficulty, current character. Esc returns to the in-world menu. Preserve NEW_GAME-only custom acceptance, explicit non-single guards and the END/CREDITS roll flag. The original CCredits roll reads cres.dll TEXT/CREDITS as data and draws over the END/CREDITS worlds; in a world the row opens the paused text-only GS_CREDITS screen and Esc returns to play. Preserve the two updates per roll frame, the 0.1 fade floor, key routing before menu/game, explicit oversized-text refusal and the recorded replacement font.
 
 The [original statistics HUD](Documentation/implementation/reports/original_hud.md) replaces the demo health/armor/ammo panel with selective CNewStatusBar code and external PCX/FNT artwork. Preserve source layout, owned maxima, bounded resource failures and inspector-free rendering. Other original UI screens remain separate work; this does not reopen M2 or accept M3. The [original default crosshair](Documentation/implementation/reports/crosshair.md) now follows source camera/death gates and integer centering with black transparency.
 
