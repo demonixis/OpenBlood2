@@ -1655,3 +1655,13 @@ scheduling, visibility, scale/alpha, emission and rotation. The
 zero-duration ramps, bounded ownership and the original color helper. The retail
 Client.exe SPR-particle branch corroborates the later-engine reference; no binary,
 commercial resource, source-reference, shader or dependency is modified.
+
+### Complete-level continuation: Office destruction spawn
+
+Office's authored TheAngerPU is absent from the original tree and the mounted
+retail object.lto name strings. The existing audited absent-class path now preserves
+original SpawnObject's null-GetClass return for it, while retaining tv01's actual
+brush/destruction behavior. LifeLeechPU is added to the typed spawn allowlist.
+[Source hashes](sources/all_levels_office_spawn_sources.json) and
+[pickup contracts](../contracts/pickup_contracts.md#spawn-classes-absent-from-the-original)
+record the evidence. Neither class aliases nor altered commercial data are used.

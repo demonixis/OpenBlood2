@@ -1,4 +1,5 @@
 #include "game/original/AI_Mgr.h"
+#include "game/original/DestructableBrush.h"
 #include "game/server_adapter.h"
 #include "game/world_validation.h"
 #include <iostream>
@@ -6,6 +7,42 @@
 using namespace OpenBlood2;
 namespace
 {
+    bool office_spawn(const char* root)
+    {
+        GameSession game;
+        Config config;
+        config.data_dir = root;
+        std::string error;
+        if (!game.initialize() || !game.resources.mount_game(config, error) || !game.request_world("22_office", error))
+        {
+            std::cerr << error << '\n';
+            return false;
+        }
+        CDestructableBrush* tv = nullptr;
+        for (auto id : game.objects.snapshot())
+            if (auto* r = game.objects.get(id); r && std::string_view(r->state.m_Name) == "tv01")
+                tv = dynamic_cast<CDestructableBrush*>(r->game.get());
+        if (!tv || tv->m_damage.spawn_object != "TheAngerPU" || !tv->m_damage.spawn_valid ||
+            game.server.GetClass("TheAngerPU") || !game.server.GetClass("AngerPU"))
+            return false;
+        const auto handle = tv->m_hObject;
+        const auto message = game.server.StartMessageToObject(tv, handle, damage_message);
+        if (!message || game.server.WriteDamage(message, {{0, 0, 1}, {}, 100, DamageType::Normal, handle}) != DE_OK ||
+            game.server.EndMessage(message) != DE_OK || game.server.spawn_reports.empty())
+            return false;
+        const auto& report = game.server.spawn_reports.back();
+        if (report.source != "tv01" || report.request != "TheAngerPU" || report.child ||
+            !report.outcome.starts_with("No original class"))
+            return false;
+        if (!game.step(.01) || game.server.IsObjectAlive(handle))
+        {
+            for (const auto& failure : game.step_errors())
+                std::cerr << failure << '\n';
+            return false;
+        }
+        std::cout << "Original Office tv01 destroyed; absent TheAngerPU creates no child or AngerPU alias\n";
+        return game.unload_world() && !game.server.message_count() && !game.server.string_count();
+    }
     bool check(const char* root, const char* world)
     {
         auto game = std::make_unique<GameSession>();
@@ -120,6 +157,8 @@ int main(int argc, char** argv)
 {
     if (argc != 3)
         return 2;
+    if (std::string_view(argv[1]) == "office_spawn")
+        return office_spawn(argv[2]) ? 0 : 1;
     if (std::string_view(argv[1]) != "audit")
         return check(argv[2], argv[1]) ? 0 : 1;
     Config config;

@@ -9,9 +9,9 @@ initial deltas, three seconds of simulation with movement, a runtime failure
 recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
 combat, multiplayer or GPU certification. M2 closure remains unchanged.
 
-Current verified opening gate after iteration 11: **48 / 58 pass, 10 / 58 fail**
-([audit 9](evidence/all-levels-audit-09.log)). Remaining worlds:
-Office, Rooftop, Ancient City, Arena, Ancient One,
+Current verified opening gate after iteration 12: **49 / 58 pass, 9 / 58 fail**
+([audit 10](evidence/all-levels-audit-10.log)). Remaining worlds:
+Rooftop, Ancient City, Arena, Ancient One,
 End and the four CTF maps. Initial-entry and three-second simulation
 coverage is not complete gameplay/traversal acceptance. The tables below retain
 the initial baseline; iteration records explain resolved and newly exposed blockers.
@@ -432,3 +432,43 @@ is unchanged. This opening and smoke evidence is not full traversal or M3 accept
 
 ![Warp sprite and particles](evidence/all-levels-warp-gate.png)
 ![SPR-textured particles without the central sprite](evidence/all-levels-warp-particles.png)
+
+
+## Iteration 12: Office and audited destruction spawns
+
+Office's `tv01` now retains original destruction behavior even though its authored
+`TheAngerPU` spawn names no original class. The original helper returns null at
+GetClass: the television dies and records no child. The name stays unregistered,
+ValidateSpawnObject still rejects it, and it is never aliased to AngerPU. The
+[read-only retail-module check](evidence/all-levels-lot12-retail-class-check.log)
+corroborates the source absence. Contracts retain the module hash and source ledger.
+
+The audit also caught a missing allowlist entry for the already implemented
+LifeLeechPU. Its original typed spawn now creates the real pickup and applies
+the requested velocity after initialization; the focused projectile test checks
+its actual model and all three velocity components.
+
+[Audit 10](evidence/all-levels-audit-10.log) passes **49 / 58**, fails **9 / 58**.
+Remaining: Rooftop, Ancient City, Arena, Ancient One, End, and four CTF worlds.
+Work remains on Chosen/REV, Enhanced/Undead Gideon, AncientOne/tentacles and
+FlagStand/FlagObject. Office passes all three difficulties and the simulation gate;
+a separate test damages the actual authored tv01 and checks removal, no child,
+explicit report and cleanup.
+
+[14 Dev tests](evidence/all-levels-lot12-dev.log) and
+[14 Release tests](evidence/all-levels-lot12-release.log) pass. The
+[initial run](evidence/all-levels-lot12-initial.log) and
+[first count correction](evidence/all-levels-lot12-counts-incomplete.log) retained
+stale full-catalog expectations: admitting tv01 changes destructible counts from
+2490/38 created/rejected to 2491/37, explosions/detonations 50 to 51 and dynamic
+brushes 138 to 139; the previous spawn rejection is gone. Counts now match the
+new behavior and the separate destruction test guards the no-child outcome.
+
+[All 14 ASan/UBSan tests](evidence/all-levels-lot12-sanitizers.log) also pass
+with leak detection enabled (159.66 seconds total), including the catalog,
+actual tv01 destruction and Life Leech spawn.
+
+[Office GPU opening](evidence/all-levels-office-gpu.log) renders three Release
+frames on NVIDIA RTX 3060, dummy audio, and exits 0. Dev inspector and Release
+applications build. These checks do not certify full traversal or network play;
+M2 closure and M3 scope are unchanged.

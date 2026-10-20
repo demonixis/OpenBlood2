@@ -1,5 +1,10 @@
 # Blood2 Project Instructions
 
+The [Office spawn continuation](Documentation/contracts/pickup_contracts.md#spawn-classes-absent-from-the-original)
+retains the original destructible tv01 while TheAngerPU resolves to no class and
+spawns nothing. Preserve explicit absent-class reports and reject unaudited names;
+do not alias it to AngerPU. LifeLeechPU now uses the existing typed spawn path.
+
 The [original WarpGate continuation](Documentation/contracts/warp_gate_contracts.md) connects the source controller,
 sprite ramps and both particle systems, including retail SPR particle textures.
 Preserve deferred ON/OFF visibility, asymmetric ramp denominator, non-reset emission

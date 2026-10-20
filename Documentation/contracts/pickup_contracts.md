@@ -164,3 +164,19 @@ search), and the authoring errors `DieBugDieAmmo`, `FareAmmoPU` and
 destructible naming one is accepted and its death records "No original class:
 nothing spawns" with no child. They stay rejected by ValidateSpawnObject; other
 unknown names still reject creation, so unported original classes stay visible.
+
+
+The complete-level continuation also identifies Office's `tv01` destruction
+request `TheAngerPU`: no class or occurrence exists in the original source tree;
+`PowerupPickups.cpp` defines only `AngerPU`. Like the existing audited absent
+names, it follows the original SpawnObject null-GetClass return. The television
+is created, can be destroyed and records no child; TheAngerPU remains unregistered
+and is never redirected to AngerPU. Unknown names outside the audited list still
+reject creation. The authored request and resource data are unchanged.
+
+The installed retail `object.lto` (938,496 bytes, mounted from BLOOD2P2.REZ)
+corroborates the source scan: it contains the NUL-terminated AngerPU name once
+and no TheAngerPU string. SHA-256:
+`f7fe5db1d8664872bd051100daa8bf82169aeb11c15408b9fd9db21d8390efa7`.
+The read-only check records metadata/counts only; no commercial module is copied
+into the repository or executed.

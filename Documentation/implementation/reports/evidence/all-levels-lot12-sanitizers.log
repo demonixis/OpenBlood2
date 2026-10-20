@@ -1,0 +1,41 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  183: brushes.state
+ 1/14 Test  #183: brushes.state ....................   Passed    0.04 sec
+      Start  184: brushes.spin
+ 2/14 Test  #184: brushes.spin .....................   Passed    0.05 sec
+      Start  185: brushes.geometry
+ 3/14 Test  #185: brushes.geometry .................   Passed    0.06 sec
+      Start  186: brushes.limits
+ 4/14 Test  #186: brushes.limits ...................   Passed    0.10 sec
+      Start  187: brushes.transport
+ 5/14 Test  #187: brushes.transport ................   Passed    0.05 sec
+      Start  188: brushes.destruction
+ 6/14 Test  #188: brushes.destruction ..............   Passed    0.04 sec
+      Start  189: brushes.lifetime
+ 7/14 Test  #189: brushes.lifetime .................   Passed    0.04 sec
+      Start  190: brushes.catalog
+ 8/14 Test  #190: brushes.catalog ..................   Passed   54.36 sec
+      Start 1111: reported_levels.22_office
+ 9/14 Test #1111: reported_levels.22_office ........   Passed   98.77 sec
+      Start 1112: reported_levels.office_spawn
+10/14 Test #1112: reported_levels.office_spawn .....   Passed    4.80 sec
+      Start 1150: leech.healing
+11/14 Test #1150: leech.healing ....................   Passed    0.30 sec
+      Start 1151: leech.projectiles
+12/14 Test #1151: leech.projectiles ................   Passed    0.30 sec
+      Start 1152: leech.alternate
+13/14 Test #1152: leech.alternate ..................   Passed    0.30 sec
+      Start 1153: leech.client
+14/14 Test #1153: leech.client .....................   Passed    0.41 sec
+
+100% tests passed, 0 tests failed out of 14
+
+Label Time Summary:
+brushes         =  54.75 sec*proc (8 tests)
+campaign        = 103.58 sec*proc (2 tests)
+headless        = 159.64 sec*proc (14 tests)
+private         =  54.36 sec*proc (1 test)
+private-data    = 104.89 sec*proc (6 tests)
+weapons         =   1.31 sec*proc (4 tests)
+
+Total Test time (real) = 159.66 sec

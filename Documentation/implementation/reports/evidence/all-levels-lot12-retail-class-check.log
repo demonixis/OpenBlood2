@@ -1,0 +1,5 @@
+cres.dll bytes=112640 AngerPU=0 TheAngerPU=0 archive="BLOOD2P2.REZ" offset=820408
+cshell.dll bytes=820224 AngerPU=0 TheAngerPU=0 archive="BLOOD2P2.REZ" offset=168
+object.lto bytes=938496 AngerPU=1 TheAngerPU=0 archive="BLOOD2P2.REZ" offset=1285480
+sres.dll bytes=112640 AngerPU=0 TheAngerPU=0 archive="BLOOD2P2.REZ" offset=2223976
+object.lto SHA256 f7fe5db1d8664872bd051100daa8bf82169aeb11c15408b9fd9db21d8390efa7

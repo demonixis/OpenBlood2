@@ -171,6 +171,12 @@ namespace
         CHECK(damage(g, typo, 100));
         CHECK(!g.server.spawn_reports.empty() && !g.server.spawn_reports.back().child &&
               g.server.spawn_reports.back().outcome.starts_with("No original class"));
+        auto anger_typo = brush(g, {{"SpawnObject", std::string("TheAngerPU")}}, false);
+        CHECK(anger_typo && !g.server.GetClass("TheAngerPU") && g.server.GetClass("AngerPU"));
+        CHECK(!g.server.ValidateSpawnObject("TheAngerPU") && SpawnClassAbsentFromOriginal("TheAngerPU"));
+        CHECK(damage(g, anger_typo, 100));
+        CHECK(g.server.spawn_reports.back().request == "TheAngerPU" && !g.server.spawn_reports.back().child &&
+              g.server.spawn_reports.back().outcome.starts_with("No original class"));
         auto h = brush(g, {{"StartOn", false}});
         CHECK(h);
         CHECK(g.step(20) && command(g, h, "ON") && g.step(.02));
@@ -437,14 +443,14 @@ namespace
             std::cout << name << "=" << n << '\n';
         CHECK(unreadable == 0 && counts["RotatingBrush"].created == 137 && counts["RotatingBrush"].rejected == 1 &&
               counts["RotatingBrush"].moved == 137 && counts["RotatingBrush"].filtered == 0 &&
-              counts["CDestructableBrush"].created == 2490 && counts["CDestructableBrush"].rejected == 38 &&
-              counts["CDestructableBrush"].filtered == 0 && counts["CDestructableBrush"].explosive == 50 &&
-              counts["CDestructableBrush"].detonated == 50 && counts["CDestructableBrush"].spawned == 74 &&
-              counts["CDestructableBrush"].compound == 3 && counts["CDestructableBrush"].dynamic == 138 &&
+              counts["CDestructableBrush"].created == 2491 && counts["CDestructableBrush"].rejected == 37 &&
+              counts["CDestructableBrush"].filtered == 0 && counts["CDestructableBrush"].explosive == 51 &&
+              counts["CDestructableBrush"].detonated == 51 && counts["CDestructableBrush"].spawned == 74 &&
+              counts["CDestructableBrush"].compound == 3 && counts["CDestructableBrush"].dynamic == 139 &&
               counts["CDestructableBrush"].polygon == 29 && counts["CDestructableBrush"].boundary == 2);
         CHECK(!failures.contains("CDestructableBrush/shell") && !failures.contains("CDestructableBrush/schema") &&
               !failures.contains("CDestructableBrush/ambiguous") && failures["CDestructableBrush/missing"] == 37 &&
-              !failures.contains("CDestructableBrush/polygon dynamics") && failures["CDestructableBrush/spawn"] == 1 &&
+              !failures.contains("CDestructableBrush/polygon dynamics") && !failures.contains("CDestructableBrush/spawn") &&
               counts["CDestructableBrush"].absent_spawns == 2 && !failures.contains("RotatingBrush/ambiguous"));
         CHECK(g.request_world("01_SubwayA", error));
         std::map<EntryState, unsigned> entries;

@@ -1,0 +1,111 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start  203: brushes.catalog
+      Start 1120: reported_levels.22_office
+ 1/14 Test  #203: brushes.catalog ..................***Failed    1.83 sec
+worlds/02_cityhub.dat startfences: 3 closed components / 2 shared edges
+worlds/02_cityhub.dat CDestructableBrush fallengrills: fallengrills: Missing named world model
+worlds/02_cityhubb.dat startfences: 3 closed components / 2 shared edges
+worlds/02_cityhubb.dat CDestructableBrush fallengrills: fallengrills: Missing named world model
+worlds/02_cityhubc.dat startfences: 3 closed components / 2 shared edges
+worlds/02_cityhubc.dat CDestructableBrush fallengrills: fallengrills: Missing named world model
+worlds/03_museum.dat CDestructableBrush Vent2: Vent2: Missing named world model
+worlds/05_cdm.dat CDestructableBrush SecScreen: SecScreen: Missing named world model
+worlds/05_cdmb.dat CDestructableBrush CDestructableBrush1: CDestructableBrush1: Missing named world model
+worlds/09_abandoned_buildings.dat CDestructableBrush table2: table2: Missing named world model
+worlds/16_bridge.dat CDestructableBrush fuckme: fuckme: Missing named world model
+worlds/16_bridge.dat CDestructableBrush sign: sign: Missing named world model
+worlds/16_bridge.dat RotatingBrush spinner: spinner: Missing named world model
+worlds/16_bridge.dat CDestructableBrush CRATE5: CRATE5: Missing named world model
+worlds/16_bridge.dat CDestructableBrush CRATE4: CRATE4: Missing named world model
+worlds/16_bridge.dat CDestructableBrush noname: noname: Missing named world model
+worlds/17_entrance.dat CDestructableBrush box11: box11: Missing named world model
+worlds/17_entrance.dat CDestructableBrush box12: box12: Missing named world model
+worlds/19_lobby.dat CDestructableBrush screen: screen: Missing named world model
+worlds/19_lobby.dat CDestructableBrush break12: break12: Missing named world model
+worlds/19_lobby.dat CDestructableBrush endglass: endglass: Missing named world model
+worlds/19_lobby.dat CDestructableBrush endglass2: endglass2: Missing named world model
+worlds/19_lobbyb.dat CDestructableBrush endglass: endglass: Missing named world model
+worlds/19_lobbyb.dat CDestructableBrush endglass2: endglass2: Missing named world model
+worlds/19_lobbyc.dat CDestructableBrush COKE: COKE: Missing named world model
+worlds/19_lobbyc.dat CDestructableBrush JERKOFF: JERKOFF: Missing named world model
+worlds/19_lobbyc.dat CDestructableBrush JERKOFF: JERKOFF: Missing named world model
+worlds/19_lobbyc.dat CDestructableBrush endglass: endglass: Missing named world model
+worlds/19_lobbyc.dat CDestructableBrush endglass2: endglass2: Missing named world model
+worlds/20_powerstation.dat CDestructableBrush grill: grill: Missing named world model
+worlds/21_laboratory.dat CDestructableBrush w1: w1: Missing named world model
+worlds/21_laboratory.dat CDestructableBrush noname: noname: Missing named world model
+worlds/21_laboratory.dat CDestructableBrush w6: w6: Missing named world model
+worlds/21_laboratory.dat CDestructableBrush w3: w3: Missing named world model
+worlds/21_laboratory.dat CDestructableBrush w5: w5: Missing named world model
+worlds/22_office.dat CDestructableBrush boombrush2: boombrush2: Missing named world model
+worlds/22_office.dat CDestructableBrush boombrush3: boombrush3: Missing named world model
+worlds/22_office.dat CDestructableBrush boombrush4: boombrush4: Missing named world model
+worlds/22_office.dat CDestructableBrush boombrush6: boombrush6: Missing named world model
+worlds/22_office.dat CDestructableBrush boomdoor: boomdoor: Missing named world model
+worlds/22_office.dat CDestructableBrush boombrush6: boombrush6: Missing named world model
+CDestructableBrush created=2491 rejected=37 filtered=0 moved=54 explosive=51 detonated=51 dynamic=139 polygon=29 boundary=2 blocked=3 spawned=74
+RotatingBrush created=137 rejected=1 filtered=0 moved=137 explosive=0 detonated=0 dynamic=0 polygon=0 boundary=0 blocked=0 spawned=0
+SpawnObject BMGAmmoPU=2
+SpawnObject BatterAmmoPU=1
+SpawnObject BatteryAmmoPU=1
+SpawnObject BinocularsPU=1
+SpawnObject BulletAmmoPU=20
+SpawnObject DieBugDieAmmoPU=2
+SpawnObject FlareAmmoPU=7
+SpawnObject FlashLightPU=1
+SpawnObject FlashlightPU=1
+SpawnObject FuelAmmoPU=2
+SpawnObject HealthPU=3
+SpawnObject InvulnerabilityPU=1
+SpawnObject MedKitPU=6
+SpawnObject MegaHealthPU=1
+SpawnObject NecroWardPU=1
+SpawnObject RocketAmmoPU=1
+SpawnObject ShellAmmoPU=14
+SpawnObject TheAngerPU=1
+SpawnObject WardPU=12
+CDestructableBrush/missing=37
+RotatingBrush/missing=1
+catalog:451: !failures.contains("CDestructableBrush/shell") && !failures.contains("CDestructableBrush/schema") && !failures.contains("CDestructableBrush/ambiguous") && failures["CDestructableBrush/missing"] == 37 && !failures.contains("CDestructableBrush/polygon dynamics") && failures["CDestructableBrush/spawn"] == 1 && counts["CDestructableBrush"].absent_spawns == 2 && !failures.contains("RotatingBrush/ambiguous")
+
+      Start 1121: reported_levels.office_spawn
+ 2/14 Test #1121: reported_levels.office_spawn .....   Passed    0.28 sec
+      Start 1162: leech.client
+ 3/14 Test #1162: leech.client .....................   Passed    0.04 sec
+      Start 1160: leech.projectiles
+ 4/14 Test #1160: leech.projectiles ................   Passed    0.03 sec
+      Start 1159: leech.healing
+ 5/14 Test #1159: leech.healing ....................   Passed    0.03 sec
+      Start 1161: leech.alternate
+ 6/14 Test #1161: leech.alternate ..................   Passed    0.03 sec
+      Start  198: brushes.geometry
+ 7/14 Test  #198: brushes.geometry .................   Passed    0.01 sec
+      Start  199: brushes.limits
+ 8/14 Test  #199: brushes.limits ...................   Passed    0.01 sec
+      Start  202: brushes.lifetime
+ 9/14 Test  #202: brushes.lifetime .................   Passed    0.01 sec
+      Start  201: brushes.destruction
+10/14 Test  #201: brushes.destruction ..............   Passed    0.01 sec
+      Start  197: brushes.spin
+11/14 Test  #197: brushes.spin .....................   Passed    0.01 sec
+      Start  200: brushes.transport
+12/14 Test  #200: brushes.transport ................   Passed    0.01 sec
+      Start  196: brushes.state
+13/14 Test  #196: brushes.state ....................   Passed    0.01 sec
+14/14 Test #1120: reported_levels.22_office ........   Passed    7.91 sec
+
+93% tests passed, 1 tests failed out of 14
+
+Label Time Summary:
+brushes         =   1.86 sec*proc (8 tests)
+campaign        =   8.19 sec*proc (2 tests)
+headless        =  10.19 sec*proc (14 tests)
+private         =   1.83 sec*proc (1 test)
+private-data    =   8.33 sec*proc (6 tests)
+weapons         =   0.14 sec*proc (4 tests)
+
+Total Test time (real) =   7.95 sec
+
+The following tests FAILED:
+	203 - brushes.catalog (Failed)                          brushes headless private
+Errors while running CTest

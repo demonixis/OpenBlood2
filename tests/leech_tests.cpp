@@ -1,6 +1,7 @@
 #include "app/sprite_scene.h"
 #include "game/original/LeechProjectile.h"
 #include "game/original/WeaponPickups.h"
+#include "game/original/spawn_object.h"
 #include "player_fixture.h"
 #include <cmath>
 #include <numbers>
@@ -105,6 +106,14 @@ namespace
         CHECK(weapon && weapon->data.m_nAmmoUse == 2 && weapon->data.m_nAltAmmoUse == 100);
         CHECK(weapon->data.m_fProjVelocity == 1000 && weapon->data.m_nDamageRadius == 100);
         CHECK(std::string(WeaponPickupClass(16)) == "LifeLeechPU");
+        CHECK(g.server.ValidateSpawnObject("LifeLeechPU"));
+        auto spawned = SpawnObject("LifeLeechPU", {200, 200, 0}, {}, {10, 20, 30});
+        CHECK(spawned && dynamic_cast<LifeLeechPU*>(g.server.HandleToObject(spawned)));
+        DVector spawned_velocity;
+        CHECK(g.server.GetVelocity(spawned, &spawned_velocity) == DE_OK && spawned_velocity.x == 10 &&
+              spawned_velocity.y == 20 && spawned_velocity.z == 30 && g.objects.get(spawned)->model);
+        CHECK(g.objects.remove(spawned) && g.objects.finish_frame());
+
         inventory.SetAmmoCount(AMMO_FOCUS, 500);
         WeaponFire shot{{0, 200, 0}, {0, 0, 1}, 42, 16, false, false};
         CHECK(weapon->Fire(shot) == FireResult::Fired);

@@ -96,3 +96,9 @@ invalid alignment 3 still fails. Component publications retain independent
 resource errors. Renderers stay read-only and shader/dependency sources are
 unchanged. Inspection exposes curves, trail scale, loop, light position and
 pending illumination; existing effect panels expose all component lifetimes.
+
+
+The complete-level spawn audit adds LifeLeechPU to the typed destruction/spawner
+allowlist. This uses the already registered original pickup and source creation
+path, followed by the requested initial velocity. It does not create a new alias;
+invalid properties and missing required resources continue to fail.
