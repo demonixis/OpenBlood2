@@ -19,7 +19,7 @@ The documentation reorganization preserves every existing JSON file byte for
 byte. Add a new record for a new source selection; do not refresh historical
 hashes merely because an implementation file or its documentation links changed.
 Runtime test logs and measurements belong in the
-[dedicated evidence directory](../../../../Documentation/Implementation/evidence).
+[dedicated evidence directory](../reports/evidence).
 
 - [Original music asset preparation](m2_music_asset_sources.json)
 
@@ -37,3 +37,5 @@ Runtime test logs and measurements belong in the
 - [GPU lifetime diagnostic sources](m2_gpu_lifetime_sources.json): project teardown baseline, pinned SDL APIs and system Vulkan probe; no original-game import.
 
 - [M2 acceptance](m2_acceptance_sources.json): original missing-zero sound selection, inspection provenance and stronger selected-session checks; no graphics-stack change.
+
+- [Crypt, Bridge, Entrance and Lobby sources](later_levels_sources.json): four original enemies, Minigun, particle systems and bounded authored-data adaptations.

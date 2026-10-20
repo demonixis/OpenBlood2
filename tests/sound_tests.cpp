@@ -331,8 +331,8 @@ namespace
         std::cout << "worlds=" << worlds << " sounds=" << sounds << " streams=" << streams << " missing=" << missing
                   << " invalid=" << invalid << " metadata=" << metadata << " started=" << started
                   << " rejected=" << rejected << " failed=" << failed << '\n';
-        CHECK(worlds == 57 && sounds == 792 && streams == 302 && missing == 15 && !invalid && !metadata);
-        CHECK(started == 769 && rejected == 0 && failed == 23); // Equal authored radii play.
+        CHECK(worlds == 58 && sounds == 800 && streams == 302 && missing == 16 && !invalid && !metadata);
+        CHECK(started == 776 && rejected == 0 && failed == 24); // Equal authored radii play.
         return true;
     }
     bool subway(const std::filesystem::path& root)

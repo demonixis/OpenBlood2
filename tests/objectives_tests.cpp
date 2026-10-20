@@ -256,7 +256,7 @@ namespace
         }
         std::cout << "worlds=" << worlds << " objectives=" << entries << " created=" << created
                   << " rejected=" << rejected << " missing_resource_pairs=" << missing << '\n';
-        CHECK(worlds == 57 && entries == 53 && created == 53 && rejected == 0 && missing == 0);
+        CHECK(worlds == 58 && entries == 55 && created == 55 && rejected == 0 && missing == 0);
         CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
         unsigned sent = 0;
         for (auto id : g.objects.snapshot())

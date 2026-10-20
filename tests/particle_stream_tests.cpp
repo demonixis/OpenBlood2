@@ -1,6 +1,7 @@
 #include "app/sprite_scene.h"
 #include "explosion_flame_fixture.h"
 #include "game/original/ClientParticleStreamSFX.h"
+#include "game/original/ParticleSystem.h"
 #include <cmath>
 #include <limits>
 using namespace OpenBlood2;
@@ -249,6 +250,65 @@ namespace
         CHECK(g.step(.1) && g.server.particle_streams.active.empty());
         return true;
     }
+    bool system(const std::filesystem::path& root)
+    {
+        GameSession g;
+        std::string e;
+        CHECK(g.initialize() && test_explosion_flame::mount(g.resources, root, e));
+        g.server.client_resources = &g.resources;
+        const auto type = g.objects.find_class("ParticleSystem");
+        CHECK(type && !g.objects.create(type, {}, Creation::Runtime));
+        CHECK(!g.objects.create(type, {}, Creation::World, {{"ParticleFlags", 1}}));
+        CHECK(g.objects.finish_frame());
+        auto h = g.objects.create(type, {}, Creation::World,
+                                  {{"TextureName", std::string("SpriteTextures/drop32_1.dtx")},
+                                   {"ParticlesPerSecond", 100.f},
+                                   {"MinimumVelocity", -10.f},
+                                   {"MaximumVelocity", 10.f},
+                                   {"EmissionRadius", 2.f},
+                                   {"VelocityOffset", 3.f},
+                                   {"ParticleLifetime", 1.f},
+                                   {"Gravity", 0.f},
+                                   {"RotationVelocity", 2.f},
+                                   {"BurstWait", 0.f}});
+        auto* emitter = h ? dynamic_cast<ParticleSystem*>(g.server.HandleToObject(h)) : nullptr;
+        CHECK(emitter && emitter->effect && !g.objects.get(h)->scheduled);
+        auto& fx = g.server.particle_streams.active[0].effect;
+        CHECK(fx.settings.system && fx.particles.empty() && !fx.system_visible);
+        CHECK(g.step(.1) && fx.particles.empty());
+        CHECK(g.step(.1) && fx.particles.size() == 10 && !fx.system_visible);
+        CHECK(fx.system_rotation.m_Vec.y != 0);
+        for (const auto& p : fx.particles)
+            CHECK(p.position.x >= -2 && p.position.x <= 2 && p.velocity.y >= -10 && p.velocity.y <= 10 &&
+                  p.lifetime == 1);
+        SpriteView scene;
+        CHECK(update_sprite_scene(g, scene, e) && scene.entries.empty());
+        g.server.SetObjectUserFlags(h, 1);
+        CHECK(g.step(.1) && fx.system_visible && update_sprite_scene(g, scene, e) && !scene.entries.empty());
+        const auto emitted = fx.emitted;
+        g.server.SetObjectUserFlags(h, 0);
+        CHECK(g.step(.1) && fx.emitted == emitted); // Source one-update hide transition.
+        CHECK(g.step(.1) && fx.emitted > emitted);  // Hidden systems keep their simulation clock.
+        CHECK(g.objects.remove(h) && g.step(.01) && g.server.particle_streams.active.empty());
+        ParticleStreamSettings s;
+        s.system = true;
+        s.particles_per_second = 0;
+        s.min_life = s.max_life = 1;
+        CParticleStreamFX zero;
+        std::minstd_rand random(17);
+        NodePose pose;
+        CHECK(zero.Init(s, e) && zero.CreateObject(g.resources, pose, 0, random, e));
+        CHECK(zero.Update(1, &pose, false, random) && zero.Update(2, &pose, false, random) && zero.particles.empty());
+        s.particles_per_second = 10000;
+        CHECK(zero.Init(s, e) && zero.CreateObject(g.resources, pose, 0, random, e));
+        CHECK(zero.Update(1, &pose, false, random) && !zero.Update(2, &pose, false, random) && !zero.error.empty());
+        s.alpha = 7;
+        CHECK(zero.Init(s, e) && near(zero.alpha, 249.f / 255));
+        s.alpha = std::numeric_limits<float>::infinity();
+        CHECK(!zero.Init(s, e));
+        CHECK(g.unload_world() && g.objects.snapshot().empty());
+        return true;
+    }
     bool budgets(const std::filesystem::path& root)
     {
         GameSession g;
@@ -352,6 +412,7 @@ int main(int argc, char** argv)
             : m == "ramps"    ? ramps(argv[2])
             : m == "failures" ? failures(argv[2])
             : m == "session"  ? session(argv[2])
+            : m == "system"   ? system(argv[2])
             : m == "budgets"  ? budgets(argv[2])
                               : m == "private" && private_world(argv[2]))
                ? 0

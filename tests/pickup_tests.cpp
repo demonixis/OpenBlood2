@@ -483,20 +483,20 @@ namespace
             rejected += n;
         }
         CHECK(counts["BerettaPU"] == 1 && counts["SubMachineGunPU"] == 4 && counts["FlareGunPU"] == 2 &&
-              counts["AssaultRiflePU"] == 5 && counts["MedKitPU"] == 22 && counts["ProximitiesPU"] == 161 &&
-              counts["RemotesPU"] == 107 && counts["FlashlightPU"] == 10 && counts["SniperRiflePU"] == 4 &&
-              counts["BinocularsPU"] == 4 && counts["ShotgunPU"] == 3 && counts["SingularityPU"] == 1);
+              counts["AssaultRiflePU"] == 6 && counts["MedKitPU"] == 23 && counts["ProximitiesPU"] == 164 &&
+              counts["RemotesPU"] == 111 && counts["FlashlightPU"] == 10 && counts["SniperRiflePU"] == 5 &&
+              counts["BinocularsPU"] == 4 && counts["ShotgunPU"] == 4 && counts["SingularityPU"] == 1);
         CHECK(failures.empty()); // Retired TypeAction rows are created.
         CHECK(counts["HowitzerPU"] == 1 && counts["NapalmCannonPU"] == 1 && counts["DeathRayPU"] == 1 &&
-              counts["TimeBombPU"] == 34);
+              counts["TimeBombPU"] == 34 && counts["MiniGunPU"] == 1);
         // 1785 includes the four SniperRiflePU pickups, 14 StealthPU,
         // 13 InvulnerabilityPU, 4 BinocularsPU, 3 ShotgunPU and 1 SingularityPU. 70 container spawns include the
         // bouncing item/weapon leaves.
         CHECK(counts["StealthPU"] == 14 && counts["InvulnerabilityPU"] == 13);
         // BugSpray, NightGoggles and TheEye add 25 authored pickups; Voodoo adds four.
         CHECK(counts["BugSprayPU"] == 3 && counts["NightGogglesPU"] == 10 && counts["TheEyePU"] == 12);
-        CHECK(worlds == 57 && created == 1876 && counts["AngerPU"] == 25 && counts["VoodooDollPU"] == 4 &&
-              missing == 0 && rejected == 0 && spawns == 70);
+        CHECK(worlds == 58 && created == 1904 && counts["AngerPU"] == 25 && counts["VoodooDollPU"] == 4 &&
+              missing == 0 && rejected == 0 && spawns == 75);
         return true;
     }
 } // namespace

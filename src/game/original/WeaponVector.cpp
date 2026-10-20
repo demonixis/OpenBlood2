@@ -81,6 +81,9 @@ FireResult CWeapon::FireVector()
             damage = h != nullptr; // No damage aggregate/actor exists for the primary-world sentinel.
             alert_after = !dynamic_cast<CBaseCharacter*>(object);
         }
+        // Original CMiniGun::AddImpact is empty; damage, material continuation and hearing still run.
+        if (data.m_nType == WEAP_MINIGUN)
+            impact.effect_requested = false;
         if (impact.effect_requested)
         {
             impact.effect.m_nAmmoType = data.m_nAmmoType;

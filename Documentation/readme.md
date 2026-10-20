@@ -4,6 +4,7 @@
 | --- | --- |
 | [Roadmap](roadmap.md) | M0–M8 completion and future work. |
 | [Build and play](getting_started.md) | Requirements, commands, controls and platforms. |
+| [CI builds](ci_builds.md) | Desktop archives, headless tests and dual-remote workflow. |
 | [Tests](testing.md) | Headless, private-data, GPU and sanitizer commands. |
 | [Launcher](launcher.md) | Game selection, demo installation and REZ mods. |
 | [Logs](logging.md) / [crash capture](crash_capture.md) | Collect and inspect diagnostics. |

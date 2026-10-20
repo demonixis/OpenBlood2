@@ -26,7 +26,7 @@ bool PolyGridView::add(std::uint64_t id, bool visible, NodePose pose, DVector di
     error.clear();
     WorldViewUniform uniform;
     if (entries.size() >= 128 || width < 2 || width > 128 || heights.size() != width * width || !physics_vector(dims) ||
-        dims.x <= 0 || dims.z <= 0 || dims.y < 0 || !std::isfinite(alpha) || alpha < 0 || alpha > 1 ||
+        dims.x < 0 || dims.z < 0 || dims.y < 0 || !std::isfinite(alpha) || alpha < 0 || alpha > 1 ||
         !world_view_uniform({}, {}, 1, {0, pose.position, pose.rotation}, uniform))
     {
         error = "Invalid PolyGrid mesh/pose/budget";
@@ -83,7 +83,7 @@ bool PolyGridView::add(std::uint64_t id, bool visible, NodePose pose, DVector di
         if (!e.error.empty())
             return true;
     }
-    if (!visible)
+    if (!visible || dims.x == 0 || dims.z == 0)
         return true;
     const auto count = 6 * (width - 1) * (width - 1);
     if (mesh.vertices.size() + count > 1000000)

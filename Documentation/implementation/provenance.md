@@ -1,5 +1,15 @@
 # Source and Dependency Provenance
 
+## Crypt, Bridge, Entrance and Lobby
+
+Selected Behemoth, DrudgePriest, DeathShroud, TheHandAI, ParticleSystem and
+Minigun/monster weapon paths now execute through the existing typed services.
+The [contract](../contracts/later_levels_contracts.md) separates source behavior
+from byte-alpha conversion, nonhumanoid damage and geometry adaptations;
+[source hashes](sources/later_levels_sources.json) record the untouched donors.
+Known malformed resource references remain exact-path omissions. Commercial
+archives, dependency pins and reference trees are unchanged; M2 is not reopened.
+
 ## Desktop launcher L0 through L2
 
 New project-owned SDL3/SDL_GPU/ImGui UI and process/state code reuse the existing

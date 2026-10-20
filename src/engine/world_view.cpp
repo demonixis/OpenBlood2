@@ -322,7 +322,7 @@ namespace OpenBlood2
                 if ((surface.flags & (1u << 3)) && !(surface.flags & (1u << 4)))
                     color = {.65f, .25f, .5f};
                 std::uint32_t material = 0;
-                if (resources && !model.textures.empty())
+                if (resources && !model.textures.empty() && !(surface.flags & (1u << 4)))
                 {
                     if (surface.texture >= model.textures.size() || !physics_vector(surface.origin) ||
                         !physics_vector(surface.u) || !physics_vector(surface.v))

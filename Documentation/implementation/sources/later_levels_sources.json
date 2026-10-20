@@ -1,0 +1,149 @@
+{
+  "date": "2026-10-19",
+  "baseline": "1f9f9db",
+  "scope": "Separately requested Crypt, Bridge, Entrance and Lobby startup and focused actor/weapon continuation; M2 closure unchanged",
+  "sources": [
+    {
+      "path": "Blood2/ObjectDLL/Behemoth.cpp",
+      "sha256": "5bbcb529c4bf0041f9a30dc3a92cc36f95f9b6f70bc1294dd89029209c7dca49"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Behemoth.h",
+      "sha256": "1a7de65a6d32af385f0fc0eef9f77038283862303da46dd6037cccf539b69340"
+    },
+    {
+      "path": "Blood2/ObjectDLL/DrudgePriest.cpp",
+      "sha256": "24525564bc65838877518dd9cdc1dadcb2a52f33674224062645670a4345a94b"
+    },
+    {
+      "path": "Blood2/ObjectDLL/DrudgePriest.h",
+      "sha256": "e6fe74c32345d11b69839f162cba964bf31a6f4ce58fb2823914241dfb7a89ec"
+    },
+    {
+      "path": "Blood2/ObjectDLL/DeathShroud.cpp",
+      "sha256": "05c42383f9629ea9ffe4df1dadc041788a3fc251358cea2c88eee5d00c35344f"
+    },
+    {
+      "path": "Blood2/ObjectDLL/DeathShroud.h",
+      "sha256": "9033d4e59f31c7a58dde4b11a60b7a13e48f8d35a1c1f5682363d6108498041d"
+    },
+    {
+      "path": "Blood2/ObjectDLL/TheHandAI.cpp",
+      "sha256": "ddf58327327d5e0e575bbbe799604e4aa7be9e9b4acd37203d1395bc83a9dda8"
+    },
+    {
+      "path": "Blood2/ObjectDLL/TheHandAI.h",
+      "sha256": "3a35a2d81a880ccf30b753b295f7b01aeb04de8b96f853e7b6d370f1accf9a64"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ParticleSystem.cpp",
+      "sha256": "4181cbe68a7240d3e7d3e1cd616aa9b5e57744590eeb7b95342e4547be9a265d"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ParticleSystem.h",
+      "sha256": "4555952c17b5fc1befa4e73ca5762127c34f8ff44733f5e65b636700d9839808"
+    },
+    {
+      "path": "Blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "7275c3a4f9374926e0a5e7cce4d533ae59ea558027bda1448b223a283e66fb09"
+    },
+    {
+      "path": "Blood2/ObjectDLL/BoneLeech.cpp",
+      "sha256": "3603c50cebdf87f022da476f0c889d90cb1129ee642de2aaf523b16a72c8359e"
+    },
+    {
+      "path": "Blood2/ObjectDLL/GameWeapons.cpp",
+      "sha256": "979f6e82b231714dd18209fcb8fcfce949c6e4b5235c618c5150bd5c0be332a2"
+    },
+    {
+      "path": "Blood2/ObjectDLL/GameWeapons.h",
+      "sha256": "d8533873a2f4130cb9f6e4cc230ab33ce1ae033ee54b8bcc1d5f124efe60a8cf"
+    },
+    {
+      "path": "Blood2/ObjectDLL/GameProjectiles.cpp",
+      "sha256": "f0f732be5d373324ef2071690fc43317a908aad5d5bade18f59c9e9ccfbcb9fe"
+    },
+    {
+      "path": "Blood2/ObjectDLL/GameProjectiles.h",
+      "sha256": "f285b2e417c48af164bf99d2169668f5790ed72191affa5e34d329cec5b68786"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Projectile.cpp",
+      "sha256": "27bfe497aa58e263e544c3aaf70b044de9d04190d80ee1d7b5c5aaf9f54190d7"
+    },
+    {
+      "path": "Blood2/ObjectDLL/WeaponPickups.cpp",
+      "sha256": "b9565e2e9bf02dc6b656b404098de72ca950675c11a946541c6a2d955f4de209"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Spawner.cpp",
+      "sha256": "9b42ecccd37302dcfe53db45fad529adca65ecc61f9963b49f595eb88e802ffd"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Destructable.cpp",
+      "sha256": "c0d8b72b729e806a6ca8f0e44a57054aef30e20c4d75b745df29f97fb36199ca"
+    },
+    {
+      "path": "Blood2/ObjectDLL/Trigger.cpp",
+      "sha256": "c6cb75d4154c4c03c4166c96de6aecba68303750c5b6b89cb8c78ba5c6704596"
+    },
+    {
+      "path": "Blood2/ObjectDLL/PolyGrid.cpp",
+      "sha256": "d903561ac5a9efb94dd4c10526a54116f4bf476c0eb7ea1fe7433b430ef354b7"
+    },
+    {
+      "path": "Blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "36a810c80ce87eb2304716e9e1dbaae25304c02c542019b0858c9dc99f2d1006"
+    },
+    {
+      "path": "Blood2/ClientShellDLL/ParticleSystemFX.cpp",
+      "sha256": "731411de6b872a941c564943127ffb7eb8b1872a9cb3768e359a030b33ebb078"
+    },
+    {
+      "path": "Blood2/ClientShellDLL/ParticleSystemFX.h",
+      "sha256": "01b5bcaf7de3448cfbe4413c068917af94242303120771885c04d193b0c22c78"
+    },
+    {
+      "path": "Blood2/ClientShellDLL/PolyGridFX.cpp",
+      "sha256": "4eadfc611107dfbd3dc05f4e78895e0d19d137f080767b1f72d1cbffeb8b3985"
+    },
+    {
+      "path": "Blood2/Shared/WeaponDefs.cpp",
+      "sha256": "7693d587a88491eb5499847efcc7cc3d0a81b14bf17dcaa0f63a979f9e394a9d"
+    },
+    {
+      "path": "Blood2/Shared/SharedDefs.h",
+      "sha256": "24c3d2752c18bf884afa0f376a129e68d0885b13da93410253e69db46d549423"
+    },
+    {
+      "path": "runtime/client/src/clientde_impl.cpp",
+      "sha256": "abcb1404c1a1fa3462fec343232a2387676674b677f77a9f19c7f67c714c865b"
+    },
+    {
+      "path": "runtime/client/src/particlesystem.cpp",
+      "sha256": "1efc6713379529f2a840cb15243ca4b8bdf846092ac5e7c67427df0ecbcf0d44"
+    },
+    {
+      "path": "Blood2/ClientShellDLL/ParticleStreamFX.cpp",
+      "sha256": "538c39cbda4f1d1531a27674916c644c08b11ad2f5020a1c287cc0393003e832"
+    },
+    {
+      "path": "Blood2/ObjectDLL/ClientParticleStreamSFX.cpp",
+      "sha256": "7a33e2c244415f960bbf84c9a7452f0af0c62d98b9ecee4f45ec6f17a9221c81"
+    },
+    {
+      "path": "Blood2/ObjectDLL/InventoryMgr.cpp",
+      "sha256": "aab29291e988ac7c3e1424f41076b5c0adc6243cd60198ea2cc6381d402d0e53"
+    }
+  ],
+  "adaptations": [
+    "Typed owned runtime classes and particle effects reuse existing checked handles, aggregate dispatch and deferred destruction.",
+    "Nonhumanoid TheHand and DeathShroud use body damage without invented head nodes.",
+    "Portable RNG, sparse weapon IDs and explicit byte-alpha wrapping are not retail-bit-identical claims.",
+    "Static non-box bodies extend the existing triangle-boundary adapter; volumes stay strict.",
+    "Two nonfinite editor light positions are retained as invalid metadata; gameplay values remain strict.",
+    "Exact authored missing-resource entries remain counted omissions without resource aliases.",
+    "Zero-area PolyGrid texture failures remain inspectable; sky portal textures are not loaded because rendering never samples them.",
+    "Drudge lightning visuals, missing Priest ambient WAV, chrome and full campaign traversal remain explicit boundaries."
+  ]
+}

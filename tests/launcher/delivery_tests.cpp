@@ -194,7 +194,7 @@ namespace
         CHECK(resources.read("x", bytes, error) && bytes[0] == 42);
         loaded.push_back(loaded.front());
         CHECK(!save_mods(root / "mods.cfg", loaded, error));
-        std::ofstream(root / "future.cfg") << "version=2\n";
+        std::ofstream(root / "future.cfg", std::ios::binary) << "version=2\n";
         CHECK(!load_mods(root / "future.cfg", loaded, error));
         CHECK(!save_mods(root / "future.cfg", mods, error) && read(root / "future.cfg") == "version=2\n");
         Options options;

@@ -50,10 +50,12 @@ int main(int argc, char** argv)
     if (ec)
         return 13;
     {
-        std::ofstream out(options.log_dir / "argv.txt");
+        // The parent compares these UTF-8 records byte for byte on every platform.
+        std::ofstream out(options.log_dir / "argv.txt", std::ios::binary);
         for (int i = 1; i < argc; ++i)
             out << argv[i] << '\n';
-        std::ofstream(options.log_dir / "resolved.txt") << path_text(config.data_dir) << '\n' << config.demo << '\n';
+        std::ofstream(options.log_dir / "resolved.txt", std::ios::binary)
+            << path_text(config.data_dir) << '\n' << config.demo << '\n';
     }
     std::string behavior;
     std::ifstream(config.data_dir / "launcher-test-behavior") >> behavior;
@@ -63,6 +65,6 @@ int main(int argc, char** argv)
         SDL_Delay(200);
     else
         SDL_Delay(50);
-    std::ofstream(options.log_dir / "finished.txt") << "finished\n";
+    std::ofstream(options.log_dir / "finished.txt", std::ios::binary) << "finished\n";
     return behavior == "failure" ? 17 : 0;
 }

@@ -28,7 +28,7 @@ bool SpawnClassAbsentFromOriginal(std::string_view request)
     std::string name, props;
     if (!OpenBlood2::split_spawn(request, name, props))
         return false;
-    for (const char* absent : {"RocketAmmoPU", "DieBugDieAmmo", "FareAmmoPU", "LifeEssencePU"})
+    for (const char* absent : {"RocketAmmoPU", "DieBugDieAmmo", "FareAmmoPU", "LifeEssencePU", "BatterAmmoPU"})
         if (OpenBlood2::same_name(name, absent))
             return true;
     return false;

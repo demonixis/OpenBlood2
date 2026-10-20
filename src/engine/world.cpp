@@ -7,6 +7,8 @@ namespace OpenBlood2
 {
     const PropertyValue* WorldObject::find(std::string_view name) const
     {
+        if (invalid_editor_position && !CaseLess{}(name, "Pos") && !CaseLess{}("Pos", name))
+            return nullptr;
         for (const auto& p : properties)
             if (!CaseLess{}(p.name, name) && !CaseLess{}(name, p.name))
                 return &p.value;
@@ -14,7 +16,7 @@ namespace OpenBlood2
     }
     namespace
     {
-        bool property(Reader& r, WorldProperty& out)
+        bool property(Reader& r, WorldProperty& out, WorldObject& object)
         {
             out.name = r.string(100);
             out.type = r.u8();
@@ -27,6 +29,18 @@ namespace OpenBlood2
                     out.value = p.string();
                     break;
                 case 1:
+                    if ((object.class_name == "Light" || object.class_name == "DirLight") && out.name == "Pos")
+                    {
+                        // 16_bridge contains NaN positions on two preprocessor lights. These are
+                        // already baked into the BSP; never turn their invalid metadata into a light/pose.
+                        const DVector v{std::bit_cast<float>(p.u32()), std::bit_cast<float>(p.u32()),
+                                        std::bit_cast<float>(p.u32())};
+                        out.value = v;
+                        object.invalid_editor_position =
+                            !std::isfinite(v.x) || !std::isfinite(v.y) || !std::isfinite(v.z);
+                        break;
+                    }
+                    [[fallthrough]];
                 case 2:
                     out.value = p.vec();
                     break;
@@ -321,8 +335,13 @@ namespace OpenBlood2
             for (std::uint32_t j = 0; j < properties; ++j)
             {
                 WorldProperty p;
-                if (!property(o, p) || !names.insert(p.name).second)
-                    return fail("typed property");
+                const auto at = objects + list.position() - size + o.position();
+                if (!property(o, p, object) || !names.insert(p.name).second)
+                {
+                    error = "DAT v56: invalid/unsupported typed property " + object.class_name + "." + p.name +
+                            " at byte " + std::to_string(at);
+                    return false;
+                }
                 object.properties.push_back(std::move(p));
             }
             if (!o.good() || o.remaining())

@@ -33,6 +33,13 @@ Normal launch opens the original menu; Esc pauses. Add `--view-world` for direct
 entry. Save/load is unavailable. Use `release` for an optimized build without the
 inspector, `debug` for debugging. See [setup and controls](Documentation/getting_started.md).
 
+## CI builds
+
+[GitHub Actions](https://github.com/demonixis/OpenBlood2/actions/workflows/ci.yml)
+builds and tests Release versions for Windows x64, Linux x64 and macOS Apple
+Silicon. Each successful job provides a game + launcher archive; see
+[CI builds](Documentation/ci_builds.md) for downloads, test scope and pushing to both remotes.
+
 ## Contributing and license
 
 Read [AGENTS.md](AGENTS.md) and [contributing](Documentation/contributing.md).

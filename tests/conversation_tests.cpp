@@ -230,7 +230,7 @@ namespace
         }
         std::cout << "Conversation catalog worlds=" << worlds << " entries=" << entries << " rejected=" << rejected
                   << " cues=" << cues << " mapped=" << mapped << " decoded=" << decoded << '\n';
-        CHECK(worlds == 57 && entries == 7 && rejected == 0 && cues == 7 && mapped == 0 && decoded == 0);
+        CHECK(worlds == 58 && entries == 8 && rejected == 0 && cues == 8 && mapped == 0 && decoded == 0);
         CHECK(g.unload_world());
         return true;
     }

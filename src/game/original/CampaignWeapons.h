@@ -58,3 +58,28 @@ class CWeapTimeBomb final : public CWeapProximityBomb
   public:
     CWeapTimeBomb() : CWeapProximityBomb(WEAP_TIMEBOMB) {}
 };
+
+class CDrudgeLightning final : public CWeapon
+{
+  public:
+    CDrudgeLightning() : CWeapon(WEAP_DRUDGE_LIGHTNING) {}
+    FireResult FireVector() override;
+    DVector lightning_end{};
+    std::string effect_error;
+};
+
+class CMiniGun final : public CWeapon
+{
+  public:
+    CMiniGun() : CWeapon(WEAP_MINIGUN) {}
+};
+class CBehemothShockwave final : public CWeapon
+{
+  public:
+    CBehemothShockwave() : CWeapon(WEAP_BEHEMOTH_SHOCKWAVE) {}
+};
+class CSkull final : public CWeapon
+{
+  public:
+    CSkull() : CWeapon(WEAP_SKULL) {}
+};

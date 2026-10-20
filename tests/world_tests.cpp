@@ -1,4 +1,5 @@
 #include "audio_fixture.h"
+#include "engine/world_lights.h"
 #include "game/original/AI_Mgr.h"
 #include "game/original/AmmoPickups.h"
 #include "game/original/CameraObj.h"
@@ -108,7 +109,8 @@ namespace
         return out;
     }
     Writer dat(bool gameplay = false, bool sounds = false, bool sprites = false, bool destination = false,
-               unsigned trial = 0, const Surface* effect = nullptr, unsigned surface_count = 1)
+               unsigned trial = 0, const Surface* effect = nullptr, unsigned surface_count = 1,
+               const Writer* source_object = nullptr)
     {
         Writer w;
         w.u32(56);
@@ -128,7 +130,9 @@ namespace
         Writer yes;
         yes.byte(1);
         w.u32(trial ? (trial == 2 ? 6 : 7) : destination ? 5 : sprites ? 6 : gameplay || sounds ? 4 : 1);
-        if (trial)
+        if (source_object)
+            w.append(*source_object);
+        else if (trial)
         {
             Writer arrival;
             arrival.vec(trial == 3 ? 10000 : 0, 100, 0);
@@ -442,6 +446,44 @@ namespace
         const float x = a.m_Vec.x, y = a.m_Vec.y, z = a.m_Vec.z;
         CHECK(std::abs(2 * (x * z + a.m_Spin * y) - std::cos(.3f) * std::sin(.7f)) < 1e-6f);
         CHECK(std::abs(2 * (y * z - a.m_Spin * x) + std::sin(.3f)) < 1e-6f);
+        for (auto cls : {"Light", "DirLight", "GameStartPoint"})
+            for (const auto* key : {"Pos", "Color"})
+                for (float f : {std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::infinity(), 1.f})
+                {
+                    Writer vector;
+                    vector.vec(f, 192, -960);
+                    auto source = object(cls, {prop(key, 1, vector)});
+                    auto file = dat(false, false, false, false, 0, nullptr, 1, &source);
+                    const bool editor = std::string_view(cls) != "GameStartPoint" && std::string_view(key) == "Pos";
+                    const bool invalid = !std::isfinite(f);
+                    CHECK(read_world(file.data, w, error) == (!invalid || editor));
+                    if (!invalid || editor)
+                    {
+                        CHECK(w.objects[0].invalid_editor_position == (editor && invalid));
+                        CHECK(bool(w.objects[0].find(key)) == !(editor && invalid));
+                        if (editor && invalid)
+                        {
+                            CHECK(!std::isfinite(std::get<DVector>(w.objects[0].properties[0].value).x));
+                            std::vector<StaticLight> lights;
+                            StaticLightStats stats;
+                            CHECK(world_static_lights(w, lights, stats, error) && lights.empty() && stats.invalid == 1);
+                        }
+                    }
+                    else
+                        CHECK(w.objects.empty() && w.models.empty() &&
+                              error.find(std::string(cls) + "." + key) != error.npos);
+                }
+        Writer broken;
+        broken.vec(NAN, 0, 0);
+        broken.byte(0);
+        auto source = object("Light", {prop("Pos", 1, broken)});
+        CHECK(!read_world(dat(false, false, false, false, 0, nullptr, 1, &source).data, w, error));
+        Writer nan;
+        nan.vec(NAN, 0, 0);
+        source = object("Light", {prop("Pos", 2, nan)}); // A color property is not the editor-position exception.
+        CHECK(!read_world(dat(false, false, false, false, 0, nullptr, 1, &source).data, w, error));
+        source = object("Light", {prop("Pos", 1, nan), prop("pos", 1, nan)});
+        CHECK(!read_world(dat(false, false, false, false, 0, nullptr, 1, &source).data, w, error));
         return true;
     }
     bool world_geometry()
@@ -963,6 +1005,26 @@ namespace
         CHECK(d.scan_complete && d.source_revision != game.world_revision && d.entries[0].name == "owned");
         return true;
     }
+    bool malformed_destination(GameSession& game, const char* tag)
+    {
+        // Deliberately corrupt synthetic data; repaired commercial levels are not negative fixtures.
+        test_player::Directory directory;
+        directory.children["worlds"].files["malformed-test.dat"] = {55, 0, 0, 0};
+        test_model::Writer archive;
+        archive.b.resize(168);
+        archive.b[0] = archive.b[62] = archive.b[124] = 13;
+        archive.b[1] = archive.b[63] = archive.b[125] = 10;
+        archive.b[126] = 26;
+        archive.patch(127, 1);
+        auto [offset, size] = test_player::write_dir(archive, directory);
+        archive.patch(131, offset);
+        archive.patch(135, size);
+        auto file = std::filesystem::current_path() / (std::string(tag) + "-invalid.rez");
+        CHECK(save(file, archive.b));
+        std::string error;
+        CHECK(game.resources.mount(file, error));
+        return true;
+    }
     bool destination_private(const std::filesystem::path& root)
     {
         GameSession game;
@@ -971,6 +1033,7 @@ namespace
         config.data_dir = root;
         std::string error;
         CHECK(game.resources.mount_game(config, error));
+        CHECK(malformed_destination(game, "destination_private"));
         for (unsigned cycle = 0; cycle < 3; ++cycle)
         {
             CHECK(game.request_world("01_SubwayA", error) && game.enter_player(error));
@@ -1024,7 +1087,7 @@ namespace
                       error.find("KeepAliveSave/KeepAliveLoad") != std::string::npos);
             }
             WorldMessage broken;
-            CHECK(original_world_request("16_bridge", 0, LOADTYPE_NEW_LEVEL, 0, broken));
+            CHECK(original_world_request("malformed-test", 0, LOADTYPE_NEW_LEVEL, 0, broken));
             CHECK(!game.inspect_destination(broken, "start", error));
             CHECK(game.objects.snapshot() == ids && game.world_revision == revision && game.objects.time() == time);
             CHECK(!game.destination_inspection.scan_complete && game.destination_inspection.entries.empty());
@@ -1450,6 +1513,7 @@ namespace
         config.data_dir = root;
         std::string error;
         CHECK(game->resources.mount_game(config, error));
+        CHECK(malformed_destination(*game, "level_change_private"));
         CHECK(game->request_world("01_SubwayA", error) && game->enter_player(error));
         CHECK(game->step(.016));
         for (unsigned cycle = 0; cycle < 3; ++cycle)
@@ -1468,7 +1532,7 @@ namespace
             for (const auto& [id, voice] : game->server.audio.voices())
                 voices[id] = voice.cursor;
             WorldMessage message;
-            CHECK(original_world_request("16_bridge", 0, LOADTYPE_NEW_LEVEL, 0, message));
+            CHECK(original_world_request("malformed-test", 0, LOADTYPE_NEW_LEVEL, 0, message));
             CHECK(game->queue_level_change(message, "start", error));
             CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
             std::cout << "Malformed destination refusal " << cycle << ": " << error << '\n';
@@ -1521,6 +1585,7 @@ namespace
         config.data_dir = root;
         std::string error;
         CHECK(game.resources.mount_game(config, error));
+        CHECK(malformed_destination(game, "destination_trial_private"));
         for (unsigned cycle = 0; cycle < 3; ++cycle)
         {
             CHECK(game.request_world("01_SubwayA", error) && game.enter_player(error));
@@ -1576,7 +1641,7 @@ namespace
                 voices[id] = voice.cursor;
             GlobalSnapshot globals;
             CHECK(globals.capture());
-            for (auto name : {"02_cityhub", "01_subwaya", "16_bridge"})
+            for (auto name : {"02_cityhub", "01_subwaya", "16_bridge", "malformed-test"})
             {
                 WorldMessage message;
                 CHECK(original_world_request(name, 0, LOADTYPE_NEW_LEVEL, 0, message));
@@ -1587,13 +1652,15 @@ namespace
                           << " created=" << d.created << " unknown=" << d.unknown << " failed=" << d.failed
                           << " objects=" << d.runtime_objects << " error=" << error << '\n';
                 CHECK(globals.unchanged() && g_pServerDE == &game.server && d.cleanup_complete);
-                if (std::string_view(name) == "16_bridge")
+                if (std::string_view(name) == "malformed-test")
                     CHECK(!ok && !d.world_loaded && !d.player_entered);
                 else
                 {
                     CHECK(ok && d.player_entered && d.health == 37 && d.bullets == 1234);
                     if (std::string_view(name) == "02_cityhub")
                         CHECK(d.created == 453 && d.unknown == 0 && d.failed == 0 && d.omitted == 1);
+                    else if (std::string_view(name) == "16_bridge")
+                        CHECK(d.created == 285 && d.unknown == 0 && d.failed == 0);
                     else
                         CHECK(d.created == 204 && d.unknown == 0 && d.failed == 0);
                 }

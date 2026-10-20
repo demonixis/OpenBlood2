@@ -2,6 +2,7 @@
 #include "app/movement_controls.h"
 #include "app/ui_runtime.h"
 #include "engine/capture.h"
+#include "engine/config.h"
 #include "game/original/ClientCrosshair.h"
 #include "game/original/Weapon.h"
 #include "player_fixture.h"
@@ -442,7 +443,7 @@ namespace
                 if (frame == 1)
                     CHECK(first != pixels);
                 CHECK(capture.save(
-                    (root / ("hud-" + std::to_string(width) + "-" + std::to_string(frame) + ".png")).c_str()));
+                    path_text(root / ("hud-" + std::to_string(width) + "-" + std::to_string(frame) + ".png")).c_str()));
                 std::cout << "cycle " << cycle << " frame " << frame << " HUD pixels " << lit << "\n";
             }
             CHECK(g.unload_world());

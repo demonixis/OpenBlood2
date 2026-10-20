@@ -344,7 +344,7 @@ namespace
                   << '\n';
         for (const auto& [c, n] : classes)
             std::cout << c << '=' << n << '\n';
-        CHECK(worlds == 57 && count == 72 && off == 2 && !filtered && classes["ClientLightFX"] == 16 &&
+        CHECK(worlds == 58 && count == 72 && off == 2 && !filtered && classes["ClientLightFX"] == 16 &&
               classes["Flicker3WaveLightFX"] == 1 && classes["Flicker4WaveLightFX"] == 3 &&
               classes["FlickerLight"] == 9 && classes["GlowingLight"] == 42 && classes["StrobeWaveLightFX"] == 1);
         for (int cycle = 0; cycle < 2; ++cycle)

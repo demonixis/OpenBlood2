@@ -68,6 +68,8 @@ const char* WeaponPickupClass(DDWORD type)
 {
     switch (type)
     {
+        case WEAP_MINIGUN:
+            return "MiniGunPU";
         case WEAP_HOWITZER:
             return "HowitzerPU";
         case WEAP_NAPALMCANNON:
@@ -165,4 +167,12 @@ DeathRayPU::DeathRayPU()
     file = "DeathRay_pu";
     display_name = "Cabalco Death Ray";
     resource_id = IDS_WEAPON_DEATHRAY;
+}
+
+MiniGunPU::MiniGunPU()
+{
+    value = {OpenBlood2::PickupKind::Weapon, WEAP_MINIGUN, 100};
+    file = "Minigun_pu";
+    display_name = "Vulcan Cannon";
+    resource_id = IDS_WEAPON_MINIGUN;
 }

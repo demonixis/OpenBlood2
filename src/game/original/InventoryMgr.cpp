@@ -221,6 +221,16 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         weapon = std::make_unique<CNapalmCannon>();
     else if (type == WEAP_DEATHRAY)
         weapon = std::make_unique<CDeathRay>();
+    else if (type == WEAP_MINIGUN)
+        weapon = std::make_unique<CMiniGun>();
+    else if (type == WEAP_BEHEMOTH_SHOCKWAVE)
+        weapon = std::make_unique<CBehemothShockwave>();
+    else if (type == WEAP_SKULL)
+        weapon = std::make_unique<CSkull>();
+    else if (type == WEAP_BEHEMOTH_CLAW || type == WEAP_HAND_SQUEEZE)
+        weapon = std::make_unique<CBoneleechSuck>(type); // Same original primary slash-sound draw.
+    else if (type == WEAP_DRUDGE_LIGHTNING)
+        weapon = std::make_unique<CDrudgeLightning>();
     else if (type == WEAP_NAGA_SPIKE)
         weapon = std::make_unique<CNagaSpike>();
     else if (type == WEAP_NAGA_DEBRIS)

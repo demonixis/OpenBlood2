@@ -43,6 +43,16 @@ Cathedral omits two absent decorative resources, Sewage one missing Container BS
 and Slaughter House none. Counts below use source entries, excluding generated children.
 The other worlds have not been re-audited by this continuation.
 
+The 2026-10-19 [Crypt/Bridge/Entrance/Lobby continuation](../contracts/later_levels_contracts.md)
+adds six verified rows below: all start through the Levels-tab transaction in
+all three difficulties. They retain respectively 2, 15, 8, 15, 6 and 9 explicit
+omissions for 15_crypt, 16_bridge, 17_entrance, 19_lobby, 19_lobbyb and 19_lobbyc.
+These include existing absent BSP models and the exact authored missing assets
+listed in the contract. Bridge's two invalid editor light positions are retained
+as excluded metadata. Corpus tests now read 58 DATs instead of 57, and rejection
+transaction tests use a synthetic malformed DAT rather than the repaired Bridge.
+Other rows retain their previous measurement scope.
+
 ## How to refresh
 
 ```bash
@@ -56,7 +66,7 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 ## Status by world
 
 `starts` means the world passes entry validation and starts (01_SubwayA,
-02_CityHub, 02_CityHubC, 03_Museum, 04_SteamTunnels, 05_CDM, 05_CDMB, 06_Airship1, 06_Airship2, 07_Cathedral, 08_SubwayB, 10_SewageTreatmentPlant, 11_Slaughter_House, Drop, BB_DeathCanyon, BB_Drain). Batches are defined in the next section.
+02_CityHub, 02_CityHubC, 03_Museum, 04_SteamTunnels, 05_CDM, 05_CDMB, 06_Airship1, 06_Airship2, 07_Cathedral, 08_SubwayB, 10_SewageTreatmentPlant, 11_Slaughter_House, 15_Crypt, 16_Bridge, 17_Entrance, 19_Lobby, 19_LobbyB, 19_LobbyC, Drop, BB_DeathCanyon, BB_Drain). Batches are defined in the next section.
 
 | World | Created | Unported (classes) | Failed | Batches needed |
 |---|---:|---:|---:|---|
@@ -75,6 +85,12 @@ refusal reads `Rejected precreate: <class>: <reason>`.
 | 09_abandoned_buildings | 657 | 22 (9) | 32 | L2, L4, L5, L6, L7, L8, L10, L11 |
 | 10_sewagetreatmentplant | 124 | 0 (0) | 0 | **starts** |
 | 11_slaughter_house | 507 | 0 (0) | 0 | **starts** |
+| 15_crypt | 174 | 0 (0) | 0 | **starts** |
+| 16_bridge | 285 | 0 (0) | 0 | **starts** |
+| 17_entrance | 390 | 0 (0) | 0 | **starts** |
+| 19_lobby | 438 | 0 (0) | 0 | **starts** |
+| 19_lobbyb | 119 | 0 (0) | 0 | **starts** |
+| 19_lobbyc | 106 | 0 (0) | 0 | **starts** |
 | 21_laboratory | 303 | 17 (7) | 7 | L6, L7, L8, L11 |
 | 22_office | 494 | 4 (2) | 7 | L2, L6, L7, L8, L10 |
 | 23_rooftop | 136 | 6 (5) | 0 | L8, L9, L10 |

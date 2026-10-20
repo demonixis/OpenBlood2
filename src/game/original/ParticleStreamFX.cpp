@@ -24,9 +24,11 @@ bool OpenBlood2::valid_particle_stream(const ParticleStreamSettings& s)
     auto bound = [](float v, float lo, float hi) { return std::isfinite(v) && v >= lo && v <= hi; };
     auto color = [&](DVector v) { return bound(v.x, 0, 255) && bound(v.y, 0, 255) && bound(v.z, 0, 255); };
     auto path = [](const std::string& p) { return p.size() <= 1000 && p.find('\0') == p.npos; };
-    return bound(s.radius, 0, 640000) && bound(s.position_radius, 0, 10000) && bound(s.min_velocity, 0, 10000) &&
+    return bound(s.particles_per_second, 0, 10000) && bound(s.burst_wait, 0, 600) &&
+           bound(s.rotation_velocity, -10000, 10000) && bound(s.radius, 0, 640000) &&
+           bound(s.position_radius, 0, 10000) && bound(s.min_velocity, s.system ? -10000 : 0, 10000) &&
            bound(s.max_velocity, s.min_velocity, 10000) && bound(s.spread, 0, 10000) && s.count <= 256 &&
-           color(s.min_color) && color(s.max_color) && bound(s.alpha, 0, 1) && bound(s.min_life, 0, 600) &&
+           color(s.min_color) && color(s.max_color) && std::isfinite(s.alpha) && bound(s.min_life, 0, 600) &&
            bound(s.max_life, s.min_life, 600) && bound(s.ramp_time, 0, 600) && bound(s.delay, 0, 600) &&
            bound(s.gravity, -10000, 10000) && s.ramp_flags <= 15 && path(s.texture) &&
            bound(s.sound_radius, 0, 100000) && std::all_of(s.sounds.begin(), s.sounds.end(), path);
@@ -41,6 +43,12 @@ bool CParticleStreamFX::Init(const ParticleStreamSettings& s, std::string& failu
         return false;
     }
     settings = s;
+    // Later LithTech stores SetObjectColor alpha in an unsigned byte. Define the
+    // wrapping explicitly instead of invoking an out-of-range float-to-byte cast.
+    double byte_alpha = std::fmod(std::trunc(double(s.alpha) * 255), 256.);
+    if (byte_alpha < 0)
+        byte_alpha += 256;
+    alpha = float(byte_alpha / 255.);
     state = s.on ? 2 : 0;
     initialized_ = true;
     return true;
@@ -137,7 +145,12 @@ bool CParticleStreamFX::CreateObject(const Resources& resources, NodePose pose, 
     position = pose.position;
     direction = rotate_vector(pose.rotation, {0, 0, 1});
     last_time = now;
-    if (state && !AddParticles(float(now), random, budget, failure))
+    if (settings.system)
+    {
+        system_rotation = pose.rotation;
+        system_visible = settings.on;
+    }
+    if (!settings.system && state && !AddParticles(float(now), random, budget, failure))
         return false;
     created_ = true;
     return true;
@@ -155,7 +168,10 @@ bool CParticleStreamFX::Update(double now, const NodePose* pose, bool visible, s
         return false;
     if (!advance_particles(particles, settings.gravity, now - last_time, error))
         return false;
+    const auto dt = now - last_time;
     last_time = now;
+    if (settings.system)
+        return SystemUpdate(now, dt, *pose, visible, random, budget);
     if (now < next_update)
         return true;
     next_update = now + .001;
@@ -175,4 +191,61 @@ bool CParticleStreamFX::Update(double now, const NodePose* pose, bool visible, s
     }
     // The original SFXMgr never reads the sound tail; no sound enters this client effect.
     return time <= last_add + settings.delay || AddParticles(time, random, budget, error);
+}
+
+// Selected ClientShellDLL/ParticleSystemFX: floor(rate * elapsed), no fractional carry or catch-up loop.
+bool CParticleStreamFX::SystemUpdate(double now, double dt, const NodePose& pose, bool visible,
+                                     std::minstd_rand& random, std::size_t budget)
+{
+    position = pose.position;
+    const bool hidden_now = system_visible != visible && !visible;
+    system_visible = visible;
+    if (hidden_now)
+    {
+        system_last_ = now;
+        next_update = now + system_wait_;
+        return true;
+    }
+    if (first_system_update_)
+    {
+        system_last_ = now;
+        next_update = now + .01;
+        first_system_update_ = false;
+    }
+    if (now < next_update)
+        return true;
+    const double number = std::floor(settings.particles_per_second * (now - system_last_));
+    budget = std::min<std::size_t>(2048, budget);
+    if (particles.size() > budget || number > double(budget - particles.size()))
+    {
+        error = "ParticleSystem particle capacity exhausted";
+        return false;
+    }
+    const auto count = static_cast<unsigned>(number);
+    const float r = settings.position_radius, v = settings.spread;
+    for (unsigned i = 0; i < count; ++i)
+    {
+        Particle p;
+        float t[6];
+        for (auto& value : t)
+            value = draw(random, 0, 1);
+        p.position = {-r + 2 * r * t[0], -r + 2 * r * t[1], -r + 2 * r * t[2]};
+        p.velocity = {-v + 2 * v * t[3], settings.min_velocity + (settings.max_velocity - settings.min_velocity) * t[4],
+                      -v + 2 * v * t[5]};
+        // Later engine AddParticles reuses position/velocity samples for RGB and lifetime.
+        const auto c = settings.min_color, d = vector_subtract(settings.max_color, c);
+        p.color = {(c.x + d.x * t[0]) / 255, (c.y + d.y * t[5]) / 255, (c.z + d.z * t[3]) / 255};
+        p.lifetime = settings.min_life;
+        particles.push_back(p);
+    }
+    system_wait_ = settings.burst_wait > .001f ? settings.burst_wait * draw(random, .01f, 1) : .01;
+    next_update = now + system_wait_;
+    if (settings.rotation_velocity != 0)
+        system_rotation =
+            compose_rotation(system_rotation, rotation_from_euler({0, float(dt) * settings.rotation_velocity, 0}));
+    system_last_ = now;
+    ++updates;
+    ++bursts;
+    emitted += count;
+    return true;
 }

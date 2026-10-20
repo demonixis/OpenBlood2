@@ -2586,6 +2586,8 @@ namespace OpenBlood2
                 ImGui::Text("#%llu | %u x %u | %s | frame %u | updates %llu", (unsigned long long)f.id, f.width,
                             f.width, f.visible ? "visible" : "hidden", f.track.frame, (unsigned long long)f.updates);
                 ImGui::TextWrapped("%s", f.settings.sprite.c_str());
+                if (!f.texture_error.empty())
+                    ImGui::TextWrapped("Zero-area texture lookup: %s", f.texture_error.c_str());
             }
             for (const auto& report : game.server.polygrids.reports)
                 if (!report.error.empty())

@@ -313,7 +313,7 @@ namespace
         }
         std::cout << "worlds=" << worlds << " controllers=" << controllers << " refs=" << references
                   << " missing=" << missing << " invalid=" << invalid << " rejected=" << rejected << '\n';
-        CHECK(worlds == 57 && controllers == 54 && references == 223 && missing == 35 && !invalid && !rejected);
+        CHECK(worlds == 58 && controllers == 54 && references == 223 && missing == 35 && !invalid && !rejected);
         return true;
     }
     bool subway(const std::filesystem::path& root)

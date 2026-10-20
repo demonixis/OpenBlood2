@@ -85,3 +85,9 @@ class DeathRayPU final : public WeaponPickup
   public:
     DeathRayPU();
 };
+
+class MiniGunPU final : public WeaponPickup
+{
+  public:
+    MiniGunPU();
+};

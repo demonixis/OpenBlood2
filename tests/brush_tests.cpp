@@ -137,6 +137,19 @@ namespace
         CHECK(g.step(.1) && r.angles.y == angle);
         g.server.SetObjectState(h, OBJSTATE_ACTIVE);
         CHECK(g.step(.1) && r.angles.y > angle);
+        CHECK(g.objects.remove(h) && g.objects.finish_frame());
+        auto stale = test_brush::box("stale-plane", {-20, 40, -2}, {20, 60, 2});
+        stale.planes[0].distance += 10;
+        g.world.models.push_back(stale);
+        auto static_mesh = g.objects.create(g.objects.find_class("CDestructableBrush"), {}, Creation::World,
+                                            {{"Name", std::string("stale-plane")}, {"BoxPhysics", false}});
+        CHECK(static_mesh && g.objects.get(static_mesh)->world_model->off_plane_faces > 0);
+        CHECK(g.server.IntersectSegment({0, 50, -50}, {0, 50, 50}, nullptr, hit) == SegmentResult::Hit &&
+              hit.object == static_mesh);
+        CHECK(!g.objects.create(g.objects.find_class("CDestructableBrush"), {}, Creation::World,
+                                {{"Name", std::string("stale-plane")}, {"BoxPhysics", true}}));
+        CHECK(!g.objects.create(g.objects.find_class("Water"), {}, Creation::World,
+                                {{"Name", std::string("stale-plane")}}));
         return true;
     }
     bool limits(const std::filesystem::path& root)
@@ -149,6 +162,11 @@ namespace
         CHECK(!brush(g, {{"YAxisRevTime", 1e-40f}}));
         CHECK(!brush(g, {{"Rotation", rotation_from_euler({0, .4f, 0})}}));
         CHECK(g.objects.finish_frame() && g.objects.snapshot().empty());
+        auto typo = brush(g, {{"SpawnObject", std::string("BatterAmmoPU")}}, false);
+        CHECK(typo && !g.server.GetClass("BatterAmmoPU") && SpawnClassAbsentFromOriginal("BatterAmmoPU"));
+        CHECK(damage(g, typo, 100));
+        CHECK(!g.server.spawn_reports.empty() && !g.server.spawn_reports.back().child &&
+              g.server.spawn_reports.back().outcome.starts_with("No original class"));
         auto h = brush(g, {{"StartOn", false}});
         CHECK(h);
         CHECK(g.step(20) && command(g, h, "ON") && g.step(.02));
@@ -413,17 +431,17 @@ namespace
             std::cout << "SpawnObject " << name << "=" << n << '\n';
         for (const auto& [name, n] : failures)
             std::cout << name << "=" << n << '\n';
-        CHECK(unreadable == 1 && counts["RotatingBrush"].created == 136 && counts["RotatingBrush"].rejected == 0 &&
-              counts["RotatingBrush"].moved == 136 && counts["RotatingBrush"].filtered == 0 &&
-              counts["CDestructableBrush"].created == 2420 && counts["CDestructableBrush"].rejected == 35 &&
+        CHECK(unreadable == 0 && counts["RotatingBrush"].created == 137 && counts["RotatingBrush"].rejected == 1 &&
+              counts["RotatingBrush"].moved == 137 && counts["RotatingBrush"].filtered == 0 &&
+              counts["CDestructableBrush"].created == 2489 && counts["CDestructableBrush"].rejected == 39 &&
               counts["CDestructableBrush"].filtered == 0 && counts["CDestructableBrush"].explosive == 50 &&
-              counts["CDestructableBrush"].detonated == 50 && counts["CDestructableBrush"].spawned == 69 &&
-              counts["CDestructableBrush"].compound == 3 && counts["CDestructableBrush"].dynamic == 137 &&
-              counts["CDestructableBrush"].polygon == 28 && counts["CDestructableBrush"].boundary == 1);
-        CHECK(failures["CDestructableBrush/shell"] == 2 && !failures.contains("CDestructableBrush/schema") &&
-              !failures.contains("CDestructableBrush/ambiguous") && failures["CDestructableBrush/missing"] == 32 &&
+              counts["CDestructableBrush"].detonated == 50 && counts["CDestructableBrush"].spawned == 74 &&
+              counts["CDestructableBrush"].compound == 3 && counts["CDestructableBrush"].dynamic == 138 &&
+              counts["CDestructableBrush"].polygon == 29 && counts["CDestructableBrush"].boundary == 1);
+        CHECK(failures["CDestructableBrush/shell"] == 1 && !failures.contains("CDestructableBrush/schema") &&
+              !failures.contains("CDestructableBrush/ambiguous") && failures["CDestructableBrush/missing"] == 37 &&
               !failures.contains("CDestructableBrush/polygon dynamics") && failures["CDestructableBrush/spawn"] == 1 &&
-              counts["CDestructableBrush"].absent_spawns == 1 && !failures.contains("RotatingBrush/ambiguous"));
+              counts["CDestructableBrush"].absent_spawns == 2 && !failures.contains("RotatingBrush/ambiguous"));
         CHECK(g.request_world("01_SubwayA", error));
         std::map<EntryState, unsigned> entries;
         for (const auto& e : g.entries)

@@ -29,7 +29,7 @@ namespace
                                              {"HOWITZ", WEAP_HOWITZER, true},
                                              {"FLAME", 0, false},
                                              {"NAPALM", WEAP_NAPALMCANNON, true},
-                                             {"MINIG", 0, false},
+                                             {"MINIG", WEAP_MINIGUN, true},
                                              {"VOODO", 0, false},
                                              {"ORB", 0, false},
                                              {"LASER", 0, false},
@@ -45,19 +45,19 @@ namespace
                                              {"SOUL_AXE", WEAP_SOUL_AXE, true},
                                              {"SOUL_PIPE", WEAP_SOUL_PIPE, true},
                                              {"SOUL_HOOK", WEAP_SOUL_HOOK, true},
-                                             {"BEHEMOTH_CLAW", 0, false},
+                                             {"BEHEMOTH_CLAW", WEAP_BEHEMOTH_CLAW, true},
                                              {"HEAL", WEAP_ZEALOT_HEAL, true},
                                              {"SHIELD", WEAP_ZEALOT_SHIELD, true},
                                              {"ENERGY_BLAST", WEAP_ZEALOT_ENERGYBLAST, true},
                                              {"GROUND_FIRE", WEAP_ZEALOT_GROUNDFIRE, true},
                                              {"SHOCKWAVE", WEAP_ZEALOT_SHOCKWAVE, true},
                                              {"FIREBALL", WEAP_DRUDGE_FIREBALL, true},
-                                             {"LIGHTNING", 0, false},
-                                             {"HAND_SQUEEZE", 0, false},
+                                             {"LIGHTNING", WEAP_DRUDGE_LIGHTNING, true},
+                                             {"HAND_SQUEEZE", WEAP_HAND_SQUEEZE, true},
                                              {"THIEF_SUCK", WEAP_THIEF_SUCK, true},
                                              {"BONELEECH_SUCK", WEAP_BONELEECH_SUCK, true},
                                              {"NIGHTMARE_BITE", 0, false},
-                                             {"BEHEMOTH_SHOCKWAVE", 0, false},
+                                             {"BEHEMOTH_SHOCKWAVE", WEAP_BEHEMOTH_SHOCKWAVE, true},
                                              {"DEATHSHROUD_ZAP", 0, false},
                                              {"NAGA_BLAST", WEAP_NAGA_EYEBEAM, true},
                                              {"NAGA_SPIKE", WEAP_NAGA_SPIKE, true},
@@ -69,7 +69,7 @@ namespace
                                              {"GIDEON_SPEAR", 0, false},
                                              {"ANCIENTONE_BEAM", 0, false},
                                              {"ANCIENTONE_TENTACLE", 0, false},
-                                             {"SKULL", 0, false}};
+                                             {"SKULL", WEAP_SKULL, true}};
 } // namespace
 bool AI_Mgr::WeaponStrToInt(std::string_view name, DBYTE& id)
 {
@@ -227,6 +227,41 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
         npc_armor = 50;
         npc_weapons = {"HEAL", "SHIELD", "ENERGY_BLAST", "GROUND_FIRE", "SHOCKWAVE"};
     }
+    if (type == NPCType::Behemoth || type == NPCType::DrudgePriest || type == NPCType::DeathShroud)
+    {
+        const bool behemoth = type == NPCType::Behemoth, priest = type == NPCType::DrudgePriest;
+        m_fHearingDist = behemoth ? 2000 : 3000;
+        m_fSensingDist = behemoth ? 200 : 3000;
+        m_fSmellingDist = behemoth ? 2000 : 0;
+        m_fSeeingDist = behemoth ? 1000 : priest ? 1500 : 3000;
+        m_fWalkSpeed = 100;
+        m_fRunSpeed = behemoth ? 320 : 180;
+        m_fRollSpeed = 3.5f;
+        m_dwFlags = 0;
+        m_bCabal = false;
+        npc_hp = behemoth ? 5000 : priest ? 1000 : 800;
+        npc_armor = behemoth ? 1000 : priest ? 100 : 200;
+        npc_weapons = behemoth
+                          ? std::array<std::string, 5>{"BEHEMOTH_CLAW", "BEHEMOTH_SHOCKWAVE", "NONE", "NONE", "NONE"}
+                      : priest ? std::array<std::string, 5>{"FIREBALL", "LIGHTNING", "SOUL_HOOK", "NONE", "NONE"}
+                               : std::array<std::string, 5>{"SKULL", "NONE", "NONE", "NONE", "NONE"};
+        if (behemoth || priest)
+            m_damage.apply_damage_physics = false;
+    }
+    if (type == NPCType::TheHand)
+    {
+        m_fHearingDist = m_fSensingDist = 1000;
+        m_fSmellingDist = 0;
+        m_fSeeingDist = 800;
+        m_fRunSpeed = 80;
+        m_fJumpSpeed = 600;
+        m_fRollSpeed = 3.5f;
+        m_dwFlags = 0x240;
+        m_bCabal = false;
+        npc_hp = 10;
+        npc_armor = 0;
+        npc_weapons[0] = "HAND_SQUEEZE";
+    }
     if (type == NPCType::Gideon)
     {
         m_fHearingDist = 0;
@@ -331,7 +366,17 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
         return RuntimeFailure("Invalid NPC authored state");
     std::string model, skin;
     int variant = 1;
-    if (npc_type == NPCType::Gideon)
+    if (npc_type == NPCType::Behemoth || npc_type == NPCType::DrudgePriest || npc_type == NPCType::DeathShroud ||
+        npc_type == NPCType::TheHand)
+    {
+        const std::string name = npc_type == NPCType::Behemoth       ? "behemoth"
+                                 : npc_type == NPCType::DrudgePriest ? "drudgepriest"
+                                 : npc_type == NPCType::DeathShroud  ? "DeathShroud"
+                                                                     : "TheHand";
+        model = "Models/Enemies/" + name + ".abc";
+        skin = "Skins/Enemies/" + name + ".dtx";
+    }
+    else if (npc_type == NPCType::Gideon)
     {
         model = "Models/Enemies/gideon.abc";
         skin = "Skins/Enemies/gideon.dtx";
@@ -423,16 +468,20 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     if (runtime_initialized || reason == INITIALUPDATE_SAVEGAME || !s->IsObjectAlive(m_hObject))
         return RuntimeFailure("Invalid or repeated NPC initialization");
     const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
-    const auto group = npc_type == NPCType::Thief        ? 12
-                       : npc_type == NPCType::Naga       ? 13
-                       : npc_type == NPCType::Zealot     ? 14
-                       : npc_type == NPCType::BoneLeech  ? 10
-                       : npc_type == NPCType::DrudgeLord ? 11
-                       : npc_type == NPCType::Gideon     ? 4
-                       : npc_type == NPCType::Fanatic    ? 5
-                       : npc_type == NPCType::Prophet    ? 6
-                       : npc_type == NPCType::SoulDrudge ? 7
-                       : npc_type == NPCType::Shikari    ? 8
+    const auto group = npc_type == NPCType::Behemoth       ? 15
+                       : npc_type == NPCType::DrudgePriest ? 16
+                       : npc_type == NPCType::DeathShroud  ? 17
+                       : npc_type == NPCType::TheHand      ? 18
+                       : npc_type == NPCType::Thief        ? 12
+                       : npc_type == NPCType::Naga         ? 13
+                       : npc_type == NPCType::Zealot       ? 14
+                       : npc_type == NPCType::BoneLeech    ? 10
+                       : npc_type == NPCType::DrudgeLord   ? 11
+                       : npc_type == NPCType::Gideon       ? 4
+                       : npc_type == NPCType::Fanatic      ? 5
+                       : npc_type == NPCType::Prophet      ? 6
+                       : npc_type == NPCType::SoulDrudge   ? 7
+                       : npc_type == NPCType::Shikari      ? 8
                        : npc_type == NPCType::MadScientist
                            ? 9
                            : (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
@@ -446,7 +495,8 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         {
             if (!value.SetAnimationIndexes(m_hObject))
                 return false;
-            if (npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief || npc_type == NPCType::Naga)
+            if (npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief || npc_type == NPCType::TheHand ||
+                npc_type == NPCType::DeathShroud || npc_type == NPCType::Naga)
             {
                 // These shipped nonhumanoid models have no head/neck. The donor reads uninitialized
                 // head coordinates here. Keep localization unavailable; use the
@@ -480,7 +530,11 @@ bool AI_Mgr::RuntimeInitialize(int reason)
             return RuntimeFailure("NPC female animation table initialization failed");
     }
     else if (!initialize_table(group, !tables[group],
-                               npc_type == NPCType::Thief          ? "sounds/enemies/Thief"
+                               npc_type == NPCType::Behemoth       ? "sounds/enemies/Behemoth"
+                               : npc_type == NPCType::DrudgePriest ? "sounds/enemies/drudgepriest"
+                               : npc_type == NPCType::DeathShroud  ? "sounds/enemies/DeathShroud"
+                               : npc_type == NPCType::TheHand      ? "sounds/enemies/TheHand"
+                               : npc_type == NPCType::Thief        ? "sounds/enemies/Thief"
                                : npc_type == NPCType::Naga         ? "sounds/enemies/Naga"
                                : npc_type == NPCType::Zealot       ? "sounds/enemies/Zealot"
                                : npc_type == NPCType::BoneLeech    ? "sounds/enemies/boneleech"
@@ -538,7 +592,8 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     }
     const float difficulty = GetGameDifficulty() == 0 ? .25f : GetGameDifficulty() == 2 ? 1.5f : 1;
     // Cultist, Fanatic and Prophet InitialUpdate add a 0.5 multiplier before the base difficulty.
-    const bool halved = npc_type == NPCType::Cultist || npc_type == NPCType::Fanatic || npc_type == NPCType::Prophet;
+    const bool halved = npc_type == NPCType::Cultist || npc_type == NPCType::Fanatic || npc_type == NPCType::Prophet ||
+                        npc_type == NPCType::DeathShroud;
     m_InventoryMgr.damage_multiplier = (halved ? .5f : npc_divine ? 1.5f : 1) * difficulty;
     float unit;
     if (!s->RandomFloat(0, 1, unit))
@@ -549,7 +604,8 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     m_damage.m_fMaxHitPoints = m_damage.m_fMaxMegaHitPoints = hp;
     m_damage.SetArmorPoints(npc_armor * difficulty);
     m_damage.m_fMaxArmorPoints = m_damage.m_fMaxNecroArmorPoints = npc_armor * difficulty;
-    m_fAIMass = npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief ? 125 : 250;
+    m_fAIMass =
+        npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief || npc_type == NPCType::TheHand ? 125 : 250;
     m_damage.m_fMass = m_fAIMass;
     if (!s->ConfigureCharacterBody(m_hObject, m_damage.m_fMass, 5 + m_damage.m_fMass * 10 / 500))
         return RuntimeFailure("NPC mass/friction configuration failed");
@@ -574,7 +630,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         return RuntimeFailure("NPC initial model dimensions/scale/animation failed: " + state_error);
     s->SetNextUpdate(m_hObject, .001f);
     m_bSetShutdown = false;
-    if (reason == INITIALUPDATE_WORLDFILE && npc_type != NPCType::Gideon)
+    if (reason == INITIALUPDATE_WORLDFILE && npc_type != NPCType::Gideon && npc_type != NPCType::DrudgePriest)
     {
         const auto result = s->MoveObjectToGround(m_hObject);
         // Original AI_Mgr ignores a ground-ray miss: retain a clear authored body
@@ -587,11 +643,13 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     // Replacement placement policy, not the source world-only ground drop:
     // spawned boxes can straddle authored walls too (Demo_01 spawn101). Separate
     // them once before simulation, without ground dropping or changing launch velocity.
-    if (reason != INITIALUPDATE_WORLDFILE && npc_type != NPCType::Gideon &&
+    if ((reason != INITIALUPDATE_WORLDFILE || npc_type == NPCType::DrudgePriest) && npc_type != NPCType::Gideon &&
         s->ResolveInitialWorldOverlap(m_hObject) != DE_OK)
         return RuntimeFailure("NPC spawned world-overlap placement failed");
     m_fLastUpdate = s->GetTime();
-    m_damage.ai_body_hits = npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief || npc_type == NPCType::Naga;
+    m_damage.ai_body_hits = npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief ||
+                            npc_type == NPCType::TheHand || npc_type == NPCType::DeathShroud ||
+                            npc_type == NPCType::Naga;
     m_damage.ai_hit_localization = !m_damage.ai_body_hits;
     runtime_initialized = true;
     return true;

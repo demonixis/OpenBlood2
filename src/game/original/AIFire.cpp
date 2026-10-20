@@ -122,22 +122,25 @@ bool AI_Mgr::Fire(bool alternate)
     auto* weapon = m_InventoryMgr.CurrentWeapon();
     if (!weapon)
         return fail(FireResult::Unavailable, "AI has no current weapon");
-    if (weapon->data.m_nType != WEAP_HOWITZER && weapon->data.m_nType != WEAP_NAPALMCANNON &&
-        weapon->data.m_nType != WEAP_ZEALOT_HEAL && weapon->data.m_nType != WEAP_ZEALOT_SHIELD &&
-        weapon->data.m_nType != WEAP_ZEALOT_GROUNDFIRE && weapon->data.m_nType != WEAP_ZEALOT_SHOCKWAVE &&
-        weapon->data.m_nType != WEAP_BERETTA && weapon->data.m_nType != WEAP_SUBMACHINEGUN &&
-        weapon->data.m_nType != WEAP_SNIPERRIFLE && weapon->data.m_nType != WEAP_SHOTGUN &&
-        weapon->data.m_nType != WEAP_SINGULARITY && weapon->data.m_nType != WEAP_ASSAULTRIFLE &&
-        weapon->data.m_nType != WEAP_FLAREGUN && weapon->data.m_nType != WEAP_TESLACANNON &&
-        weapon->data.m_nType != WEAP_SOUL_CROWBAR && weapon->data.m_nType != WEAP_SHIKARI_CLAW &&
-        weapon->data.m_nType != WEAP_SHIKARI_SPIT && weapon->data.m_nType != WEAP_SOUL_AXE &&
-        weapon->data.m_nType != WEAP_SOUL_PIPE && weapon->data.m_nType != WEAP_MELEE &&
-        weapon->data.m_nType != WEAP_NAGA_EYEBEAM && weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST &&
-        weapon->data.m_nType != WEAP_GIDEON_WIND && weapon->data.m_nType != WEAP_GIDEON_SHIELD &&
-        weapon->data.m_nType != WEAP_SOUL_HOOK && weapon->data.m_nType != WEAP_DRUDGE_FIREBALL)
+    if (weapon->data.m_nType != WEAP_MINIGUN && weapon->data.m_nType != WEAP_BEHEMOTH_CLAW &&
+        weapon->data.m_nType != WEAP_BEHEMOTH_SHOCKWAVE && weapon->data.m_nType != WEAP_DRUDGE_LIGHTNING &&
+        weapon->data.m_nType != WEAP_SKULL && weapon->data.m_nType != WEAP_HOWITZER &&
+        weapon->data.m_nType != WEAP_NAPALMCANNON && weapon->data.m_nType != WEAP_ZEALOT_HEAL &&
+        weapon->data.m_nType != WEAP_ZEALOT_SHIELD && weapon->data.m_nType != WEAP_ZEALOT_GROUNDFIRE &&
+        weapon->data.m_nType != WEAP_ZEALOT_SHOCKWAVE && weapon->data.m_nType != WEAP_BERETTA &&
+        weapon->data.m_nType != WEAP_SUBMACHINEGUN && weapon->data.m_nType != WEAP_SNIPERRIFLE &&
+        weapon->data.m_nType != WEAP_SHOTGUN && weapon->data.m_nType != WEAP_SINGULARITY &&
+        weapon->data.m_nType != WEAP_ASSAULTRIFLE && weapon->data.m_nType != WEAP_FLAREGUN &&
+        weapon->data.m_nType != WEAP_TESLACANNON && weapon->data.m_nType != WEAP_SOUL_CROWBAR &&
+        weapon->data.m_nType != WEAP_SHIKARI_CLAW && weapon->data.m_nType != WEAP_SHIKARI_SPIT &&
+        weapon->data.m_nType != WEAP_SOUL_AXE && weapon->data.m_nType != WEAP_SOUL_PIPE &&
+        weapon->data.m_nType != WEAP_MELEE && weapon->data.m_nType != WEAP_NAGA_EYEBEAM &&
+        weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST && weapon->data.m_nType != WEAP_GIDEON_WIND &&
+        weapon->data.m_nType != WEAP_GIDEON_SHIELD && weapon->data.m_nType != WEAP_SOUL_HOOK &&
+        weapon->data.m_nType != WEAP_DRUDGE_FIREBALL)
         return fail(FireResult::Unavailable, "AI weapon-specific aiming is not integrated");
     DRotation rotation;
-    const bool naga = weapon->data.m_nType == WEAP_NAGA_EYEBEAM;
+    const bool naga = weapon->data.m_nType == WEAP_NAGA_EYEBEAM || weapon->data.m_nType == WEAP_SKULL;
     const bool energy = weapon->data.m_nType == WEAP_ZEALOT_ENERGYBLAST;
     fire_gun_node =
         server->GetModelNodeTransform(m_hObject,
@@ -148,9 +151,9 @@ bool AI_Mgr::Fire(bool alternate)
     if (energy && !fire_gun_node)
         return fail(FireResult::Unavailable, "Energy blast r_hand_extra2 node unavailable");
     if (naga && !fire_gun_node)
-        return fail(FireResult::Unavailable, "Naga beam head_gun node unavailable");
+        return fail(FireResult::Unavailable, "Projectile head_gun node unavailable");
     const auto type = weapon->data.m_nType;
-    if (type == WEAP_SHIKARI_SPIT || type == WEAP_DRUDGE_FIREBALL)
+    if (type == WEAP_SHIKARI_SPIT || type == WEAP_DRUDGE_FIREBALL || type == WEAP_DRUDGE_LIGHTNING)
     {
         // Original branch: from the head node toward the cached target position.
         DRotation head_rotation;
@@ -168,7 +171,8 @@ bool AI_Mgr::Fire(bool alternate)
         }
     }
     else if (type == WEAP_SOUL_CROWBAR || type == WEAP_SOUL_AXE || type == WEAP_SOUL_PIPE || type == WEAP_SOUL_HOOK ||
-             type == WEAP_SHIKARI_CLAW || type == WEAP_ZEALOT_SHOCKWAVE || type == WEAP_ZEALOT_SHIELD)
+             type == WEAP_SHIKARI_CLAW || type == WEAP_BEHEMOTH_CLAW || type == WEAP_ZEALOT_SHOCKWAVE ||
+             type == WEAP_ZEALOT_SHIELD)
     {
         // Original weapon-specific branch: body position along the cached forward vector.
         fire_gun_node = false;
@@ -176,7 +180,7 @@ bool AI_Mgr::Fire(bool alternate)
             return fail(FireResult::Unavailable, "AI body position/forward cache unavailable");
         fire_direction = m_MoveObj.GetForwardVector();
     }
-    else if (type == WEAP_ZEALOT_HEAL)
+    else if (type == WEAP_ZEALOT_HEAL || type == WEAP_BEHEMOTH_SHOCKWAVE)
     {
         if (server->GetObjectPos(m_hObject, &fire_origin) != DE_OK)
             return fail(FireResult::Unavailable, "Heal body position unavailable");

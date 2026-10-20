@@ -371,7 +371,7 @@ namespace
         }
         std::cout << "Door catalog: created=" << created << ", rejected=" << rejected << ", unreadable=" << skipped
                   << ", SelfTrigger=" << self_triggers << ", polygon=" << polygon << "\n";
-        CHECK(created == 685 && rejected == 13 && skipped == 1 && self_triggers == 159 && polygon == 127 &&
+        CHECK(created == 689 && rejected == 13 && skipped == 0 && self_triggers == 159 && polygon == 127 &&
               compound == 16);
         // Retired TypeAction rows are created; duplicate names bind the first model in file order.
         CHECK(!failures.contains("schema") && !failures.contains("ambiguous") && failures["missing"] == 12 &&

@@ -574,3 +574,147 @@ void CNapalmFireball::AddExplosion(DVector p, DVector n)
 {
     PublishCampaignExplosion(m_hObject, p, n, 6);
 }
+// Original skull: seek the nearest moving character head within 200 units.
+CSkullProjectile::CSkullProjectile() : CProjectile(OT_MODEL)
+{
+    filename = "Models\\Powerups\\skull.abc";
+    skin = "Skins\\Powerups\\skull.dtx";
+    damage_type = DamageType::Normal;
+}
+CSkullProjectile::~CSkullProjectile()
+{
+    if (loop && g_pServerDE)
+        g_pServerDE->KillSound(loop);
+}
+bool CSkullProjectile::InitialUpdate()
+{
+    if (!CProjectile::InitialUpdate() || !g_pServerDE->ScaleObject(m_hObject, {.5f, .5f, .5f}))
+        return false;
+    g_pServerDE->PublishObjectParticles(m_hObject, 3, trail_error);
+    return true;
+}
+bool CSkullProjectile::Update()
+{
+    auto* s = g_pServerDE;
+    s->SetNextUpdate(m_hObject, .001f);
+    if (!configured)
+        return Fail("Skull setup unavailable");
+    if (!loop)
+    {
+        SoundRequest request;
+        request.resource = "Sounds\\Enemies\\deathshroud\\flyskull.wav";
+        request.inner_radius = 75;
+        request.outer_radius = 750;
+        request.speaker = m_hObject;
+        request.priority = 1;
+        request.reverb_requested = false;
+        request.loop = true;
+        loop = s->PlayObjectLoopSound(m_hObject, request, sound_error);
+        DVector color;
+        float alpha;
+        if (!s->GetObjectColor(m_hObject, color, alpha) || !s->SetObjectColor(m_hObject, color, .6f))
+            return Fail("Skull color unavailable");
+    }
+    if (m_bExplode || m_damage.IsDead())
+    {
+        if (loop)
+        {
+            s->KillSound(loop);
+            loop = 0;
+        }
+        Explode();
+        return false;
+    }
+    DVector position, target{}, velocity;
+    DRotation rotation;
+    if (s->GetObjectPos(m_hObject, &position) != DE_OK || s->GetObjectRotation(m_hObject, &rotation) != DE_OK ||
+        s->GetVelocity(m_hObject, &velocity) != DE_OK)
+        return Fail("Skull transform unavailable");
+    tracked = nullptr;
+    float nearest = 200 * 200;
+    auto& head = CDestructable::m_DestructableHead;
+    for (auto* link = head.m_pNext; link && link != &head; link = link->m_pNext)
+    {
+        const auto h = static_cast<CDestructable*>(link->m_pData)->m_hObject;
+        if (!h)
+            break;
+        if (h == m_hFiredFrom || !s->IsObjectAlive(h) || !dynamic_cast<CBaseCharacter*>(s->HandleToObject(h)))
+            continue;
+        DVector v, p;
+        DRotation r;
+        if (s->GetVelocity(h, &v) != DE_OK || (v.x == 0 && v.y == 0 && v.z == 0) ||
+            !s->GetModelNodeTransform(h, "head", &p, &r))
+            continue;
+        const auto delta = vector_subtract(p, position);
+        const float d = vector_dot(delta, delta);
+        if (d <= nearest)
+        {
+            tracked = h;
+            target = p;
+            nearest = d;
+        }
+    }
+    if (tracked && nearest > 1e-12f)
+    {
+        DRotation desired, blended;
+        if (s->AlignRotation(desired, vector_subtract(target, position)) != DE_OK ||
+            s->InterpolateRotation(blended, rotation, desired, 1 - std::sqrt(nearest) / 200) != DE_OK ||
+            s->SetObjectRotation(m_hObject, &blended) != DE_OK)
+            return Fail("Skull steering unavailable");
+        rotation = blended;
+    }
+    velocity = vector_scale(rotate_vector(rotation, {0, 0, 1}), std::sqrt(vector_dot(velocity, velocity)));
+    if (s->SetVelocity(m_hObject, &velocity) != DE_OK)
+        return Fail("Skull velocity unavailable");
+    return true; // Source override has no base lifetime expiration.
+}
+void CSkullProjectile::HandleContact(const SegmentHit& hit)
+{
+    auto* s = g_pServerDE;
+    if (!configured || m_hHitObject || m_bExplode || failed || !s->IsObjectAlive(m_hObject) ||
+        hit.object == m_hFiredFrom)
+        return;
+    if (hit.object && (!s->IsObjectAlive(hit.object) || !(s->GetObjectFlags(hit.object) & FLAG_SOLID)))
+        return;
+    if (!hit.object && hit.polygon == UINT32_MAX)
+        return;
+    contacted = true;
+    contact = hit;
+    if (hit.object && dynamic_cast<CBaseCharacter*>(s->HandleToObject(hit.object)))
+    {
+        DVector zero{}, p;
+        DRotation r;
+        s->SetVelocity(m_hObject, &zero);
+        m_hHitObject = hit.object;
+        if (s->GetModelNodeTransform(hit.object, "head", &p, &r))
+        {
+            const auto forward = vector_scale(rotate_vector(r, {0, 0, 1}), 7.5f);
+            p = vector_add(p, forward);
+            s->TeleportObject(m_hObject, &p);
+            DRotation facing;
+            if (s->AlignRotation(facing, vector_scale(forward, -1)) == DE_OK)
+                s->SetObjectRotation(m_hObject, &facing);
+            const auto message = s->StartMessageToObject(this, hit.object, damage_message);
+            if (!message)
+            {
+                Fail("Skull contact damage allocation failed");
+                return;
+            }
+            const auto written = s->WriteDamage(message, {forward, p, m_fDamage, damage_type, m_hFiredFrom});
+            const auto delivered = s->EndMessage(message);
+            if (written != DE_OK || delivered != DE_OK)
+            {
+                Fail("Skull contact damage failed");
+                return;
+            }
+            ++contact_damage;
+        }
+    }
+    m_bExplode = true;
+    if (hit.object && s->IsObjectAlive(hit.object) && s->CreateInterObjectLink(m_hObject, hit.object) != DE_OK)
+        Fail("Skull contact link failed");
+}
+void CSkullProjectile::AddExplosion(DVector p, DVector n)
+{
+    PublishCampaignExplosion(m_hObject, p, n, 14, "Sounds\\Weapons\\howitzer\\impact.wav", 750);
+}

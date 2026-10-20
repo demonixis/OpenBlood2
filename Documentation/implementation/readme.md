@@ -6,6 +6,7 @@ accepted with open GPU reservation **M2-GPU-001**. M3 remains unaccepted.
 | Record | Location |
 | --- | --- |
 | Original-code imports and adaptations | [Provenance](provenance.md) |
+| Crypt / Bridge / Entrance / Lobby | [Contract](../contracts/later_levels_contracts.md) / [source ledger](sources/later_levels_sources.json) |
 | Per-world gaps and implementation batches | [Level gaps](level_gaps.md) |
 | Source selections, commits and hashes | [Source ledgers](sources/readme.md) |
 | M0 / M1 validation | [M0](reports/m0.md) / [M1](reports/m1.md) |

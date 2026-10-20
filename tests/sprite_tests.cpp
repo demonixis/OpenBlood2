@@ -346,7 +346,7 @@ namespace
         std::cout << "worlds=" << worlds << " sources=" << count << " manifests=" << loaded << " missing=" << missing
                   << " invalid=" << invalid << " rejected=" << rejected << " flush=" << flush << " repeat=" << repeat
                   << '\n';
-        CHECK(worlds == 57 && count == 124 && missing == 4 && invalid == 0 && rejected == 4 && loaded == 120 &&
+        CHECK(worlds == 58 && count == 126 && missing == 4 && invalid == 0 && rejected == 4 && loaded == 122 &&
               flush == 3 && repeat == 0);
         return true;
     }
