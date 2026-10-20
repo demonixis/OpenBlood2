@@ -2,6 +2,16 @@
 #include <cmath>
 namespace OpenBlood2
 {
+    std::uint64_t ServerAdapter::PublishWarpGate(HOBJECT owner, const WarpGateSettings& settings, std::string& error)
+    {
+        trace_service("PublishWarpGate");
+        if (!client_resources || !objects_.sprites)
+        {
+            error = "Warp resources unavailable";
+            return 0;
+        }
+        return warp_gates.publish(owner, settings, *this, *objects_.sprites, *client_resources, objects_.time(), error);
+    }
     std::uint64_t ServerAdapter::PublishLightning(HOBJECT source, const LightningSettings& settings, std::string& error)
     {
         trace_service("PublishLightning");

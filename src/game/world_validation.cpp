@@ -1,6 +1,7 @@
 #include "game/world_validation.h"
 #include "engine/world_view.h"
 #include "game/original/ClientLightningSFX.h"
+#include "game/original/ClientWarpGateSFX.h"
 #include "game/original/Minefield.h"
 #include "game/original/SkyObjects.h"
 #include "game/original/SparksObj.h"
@@ -117,6 +118,19 @@ namespace OpenBlood2
                                 entry.detail += "; missing exact authored sound Sounds\\Thunder.wav; bolt/damage "
                                                 "retained, no sound alias";
                 }
+        for (auto id : game.objects.snapshot())
+            if (const auto* r = game.objects.get(id); r && r->life == Life::Alive)
+                if (const auto* gate = dynamic_cast<const CClientWarpGateSFX*>(r->game.get());
+                    gate && !gate->error.empty())
+                {
+                    error = "Warp gate " + std::string(r->state.m_Name) + ": " + gate->error;
+                    return false;
+                }
+        if (!game.server.warp_gates.update_error.empty())
+        {
+            error = "Warp gate update: " + game.server.warp_gates.update_error;
+            return false;
+        }
         report.unavailable_services.clear();
         for (const auto& [name, count] : game.server.unavailable_services)
             if (count)

@@ -26,6 +26,7 @@
 #include "game/service_coverage.h"
 #include "game/session.h"
 #include "game/sparks.h"
+#include "game/warp_gates.h"
 #include "game/weapon_sprites.h"
 #include "game/world_preparation.h"
 #include <array>
@@ -102,6 +103,8 @@ namespace OpenBlood2
         ExplosionSprites explosion_sprites;
         Sparks sparks;
         LightningBolts lightning;
+        WarpGates warp_gates;
+        std::uint64_t PublishWarpGate(HOBJECT, const WarpGateSettings&, std::string&) override;
         std::uint64_t PublishLightning(HOBJECT, const LightningSettings&, std::string&) override;
         std::uint64_t PublishSparks(HOBJECT, const SparkSettings&, std::string&) override;
         BloodSpurts blood_spurts;
@@ -176,6 +179,7 @@ namespace OpenBlood2
             explosion_sprites.clear();
             sparks.clear();
             lightning.clear();
+            warp_gates.clear();
             blood_spurts.clear();
             blood_splats.clear();
             weapon_sprites.clear();

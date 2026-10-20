@@ -1,0 +1,26 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1120: reported_levels.09_abandoned_buildings
+    Start 1163: warp_gate.catalog
+1/4 Test #1163: warp_gate.catalog ........................***Failed    0.23 sec
+09_abandoned_buildings gates=1 particles=50 prepared=51
+184: g.server.warp_gates.advance(1.01 + step / 60.0, g.server) 
+
+    Start 1162: warp_gate.controller
+2/4 Test #1162: warp_gate.controller .....................   Passed    0.01 sec
+    Start 1161: warp_gate.formulas
+3/4 Test #1161: warp_gate.formulas .......................   Passed    0.01 sec
+4/4 Test #1120: reported_levels.09_abandoned_buildings ...   Passed    6.81 sec
+
+75% tests passed, 1 tests failed out of 4
+
+Label Time Summary:
+campaign        =   6.81 sec*proc (1 test)
+headless        =   7.06 sec*proc (4 tests)
+private-data    =   7.06 sec*proc (4 tests)
+warp            =   0.26 sec*proc (3 tests)
+
+Total Test time (real) =   6.82 sec
+
+The following tests FAILED:
+	1163 - warp_gate.catalog (Failed)                        headless private-data warp
+Errors while running CTest

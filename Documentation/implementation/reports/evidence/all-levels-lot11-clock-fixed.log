@@ -1,0 +1,16 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1161: warp_gate.formulas
+1/3 Test #1161: warp_gate.formulas ...............   Passed    0.01 sec
+    Start 1162: warp_gate.controller
+2/3 Test #1162: warp_gate.controller .............   Passed    0.01 sec
+    Start 1163: warp_gate.catalog
+3/3 Test #1163: warp_gate.catalog ................   Passed    0.23 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+headless        =   0.26 sec*proc (3 tests)
+private-data    =   0.26 sec*proc (3 tests)
+warp            =   0.26 sec*proc (3 tests)
+
+Total Test time (real) =   0.27 sec

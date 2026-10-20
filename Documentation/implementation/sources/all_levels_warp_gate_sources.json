@@ -1,0 +1,37 @@
+{
+  "selection": "Original WarpGate controller, sprite and particle callbacks; later-engine particle texture reference corroborated against retail Client.exe",
+  "sources": [
+    {
+      "path": "sources/blood2/ObjectDLL/ClientWarpGateSFX.cpp",
+      "sha256": "bfbb22dbcdb48d741b4ce411240919066b2bcc41880410f0afe09b31d481a095"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ClientWarpGateSFX.h",
+      "sha256": "840f1c35caeebd93aa16969d132ed17e0430a8e334928f4ef749aa24ecd2141c"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/WarpGateFX.cpp",
+      "sha256": "02603a642887e10aa266625c63196915193ac9b4a46a07d9be1639e10a5abb7b"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/WarpGateFX.h",
+      "sha256": "4a7bf1f99bf4581c86fb7b8aaf29f0abd8bcce882ba7111466c4490b83f5e3a8"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/BaseParticleSystemFX.cpp",
+      "sha256": "34e41cf4f0735f5d8d61b83bdd9a1592020f63dfcdd90d9d5646ff4fbf73eb13"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/SpecialFX.h",
+      "sha256": "dcfd9269663839444fd506f8597ed5d3e6e9c4f348f0d85cfec0dc94223912d4"
+    },
+    {
+      "path": "sources/lithtech/runtime/client/src/particlesystem.cpp",
+      "sha256": "1efc6713379529f2a840cb15243ca4b8bdf846092ac5e7c67427df0ecbcf0d44"
+    },
+    {
+      "path": "sources/lithtech/runtime/client/src/clientmgr.cpp",
+      "sha256": "2a22c800265ab15930bce615d07eb668269ede86f560fed74bf3088951468d6c"
+    }
+  ]
+}

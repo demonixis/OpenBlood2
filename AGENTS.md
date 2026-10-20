@@ -1,5 +1,11 @@
 # Blood2 Project Instructions
 
+The [original WarpGate continuation](Documentation/contracts/warp_gate_contracts.md) connects the source controller,
+sprite ramps and both particle systems, including retail SPR particle textures.
+Preserve deferred ON/OFF visibility, asymmetric ramp denominator, non-reset emission
+clock, source color/rotation quirks and owner-bound lifetime. Zero-count textures
+remain unused; required-resource failures stay explicit. M2 closure is unchanged.
+
 The [Life Leech continuation](Documentation/contracts/life_leech_contracts.md) adds the original pickup/weapon, curved primary,
 one-pass alternate push and post-armor healing. Preserve per-update curvature,
 player-flag death gate, source attribution, real comet/impact components and

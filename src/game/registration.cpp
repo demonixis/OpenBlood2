@@ -15,6 +15,7 @@
 #include "game/original/ClientLightningSFX.h"
 #include "game/original/ClientParticleStreamSFX.h"
 #include "game/original/ClientSplatFX.h"
+#include "game/original/ClientWarpGateSFX.h"
 #include "game/original/ConversationTrigger.h"
 #include "game/original/Corpse.h"
 #include "game/original/CultistAI.h"
@@ -507,6 +508,58 @@ namespace OpenBlood2
                     p.push_back({name, 0.0f, false});
                 for (int i = 1; i <= 5; ++i)
                     p.push_back({"AIWeapon" + std::to_string(i), std::string{}, false, 31});
+                return p;
+            }()};
+        const ClassInfo warp_gate_sfx{
+            "CClientWarpGateSFX", &client_sfx, construct<CClientWarpGateSFX>, []
+            {
+                const WarpGateSettings defaults;
+                std::vector<PropertySpec> p{{"RampUpTime", 5.0f},
+                                            {"RampDownTime", 5.0f},
+                                            {"InitiallyOn", false},
+                                            {"SpriteMinScale", .1f},
+                                            {"SpriteMaxScale", 1.0f},
+                                            {"SpriteAlpha", .75f},
+                                            {"SpriteRampUpType", std::int32_t(1)},
+                                            {"SpriteRampDownType", std::int32_t(2)},
+                                            {"SpriteAlign", false},
+                                            {"SpriteFile", defaults.sprite.resource},
+                                            {"SoundRadius", 200.0f},
+                                            {"RampUpSound", std::string{}},
+                                            {"LoopSound", std::string{}},
+                                            {"RampDownSound", std::string{}},
+                                            {"SpriteData", std::int32_t(0), false},
+                                            {"ParticleSystem1Data", std::int32_t(0), false},
+                                            {"ParticleSystem2Data", std::int32_t(0), false}};
+                for (unsigned i = 0; i < 2; ++i)
+                {
+                    const auto prefix = "PS" + std::to_string(i + 1);
+                    const auto& v = defaults.particles[i];
+                    for (const auto& prop : std::vector<PropertySpec>{{"SystemRadius", v.radius},
+                                                                      {"PositionRadius", v.position_radius},
+                                                                      {"Offset", v.offset},
+                                                                      {"Rotations", v.rotations},
+                                                                      {"MinVelocity", v.min_velocity},
+                                                                      {"MaxVelocity", v.max_velocity},
+                                                                      {"NumParticles", std::int32_t(v.count)},
+                                                                      {"EmitType", std::int32_t(v.emit)},
+                                                                      {"MinColor", v.min_color},
+                                                                      {"MaxColor", v.max_color},
+                                                                      {"SystemAlpha", v.alpha},
+                                                                      {"MinLifetime", v.min_life},
+                                                                      {"MaxLifetime", v.max_life},
+                                                                      {"AddDelay", v.delay},
+                                                                      {"Gravity", v.gravity},
+                                                                      {"RampUpType", std::int32_t(v.ramp_up)},
+                                                                      {"RampDownType", std::int32_t(v.ramp_down)},
+                                                                      {"Align", v.align},
+                                                                      {"ParticleFile", v.resource}})
+                    {
+                        auto entry = prop;
+                        entry.name = prefix + entry.name;
+                        p.push_back(std::move(entry));
+                    }
+                }
                 return p;
             }()};
         const ClassInfo lightning_sfx{"CClientLightningSFX",
@@ -1165,20 +1218,21 @@ namespace OpenBlood2
                objects.register_class(builtin_container) && objects.register_class(builtin_sprite) &&
                objects.register_class(b2base) && objects.register_class(camera) && objects.register_class(client_sfx) &&
                objects.register_class(client_splat) && objects.register_class(particle_stream) &&
-               objects.register_class(lightning_sfx) && objects.register_class(scene_explosion) &&
-               objects.register_class(client_light) && objects.register_class(light_SquareWaveLightFX) &&
-               objects.register_class(light_SawWaveLightFX) && objects.register_class(light_RampUpWaveLightFX) &&
-               objects.register_class(light_RampDownWaveLightFX) && objects.register_class(light_SineWaveLightFX) &&
-               objects.register_class(light_Flicker1WaveLightFX) && objects.register_class(light_Flicker2WaveLightFX) &&
-               objects.register_class(light_Flicker3WaveLightFX) && objects.register_class(light_Flicker4WaveLightFX) &&
-               objects.register_class(light_StrobeWaveLightFX) && objects.register_class(light_SearchWaveLightFX) &&
-               objects.register_class(light_FlickerLight) && objects.register_class(light_GlowingLight) &&
-               objects.register_class(camera_object) && objects.register_class(cinematic_trigger) &&
-               objects.register_class(random_sound) && objects.register_class(sound_fx) &&
-               objects.register_class(detail_sprite) && objects.register_class(spawner) &&
-               objects.register_class(trip_laser) && objects.register_class(tchernotronic) &&
-               objects.register_class(sound) && objects.register_class(keyframer) && objects.register_class(key) &&
-               objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
+               objects.register_class(warp_gate_sfx) && objects.register_class(lightning_sfx) &&
+               objects.register_class(scene_explosion) && objects.register_class(client_light) &&
+               objects.register_class(light_SquareWaveLightFX) && objects.register_class(light_SawWaveLightFX) &&
+               objects.register_class(light_RampUpWaveLightFX) && objects.register_class(light_RampDownWaveLightFX) &&
+               objects.register_class(light_SineWaveLightFX) && objects.register_class(light_Flicker1WaveLightFX) &&
+               objects.register_class(light_Flicker2WaveLightFX) && objects.register_class(light_Flicker3WaveLightFX) &&
+               objects.register_class(light_Flicker4WaveLightFX) && objects.register_class(light_StrobeWaveLightFX) &&
+               objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
+               objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
+               objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
+               objects.register_class(sound_fx) && objects.register_class(detail_sprite) &&
+               objects.register_class(spawner) && objects.register_class(trip_laser) &&
+               objects.register_class(tchernotronic) && objects.register_class(sound) &&
+               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
+               objects.register_class(game_start) && objects.register_class(path) &&
                objects.register_class(world_properties) && objects.register_class(smell) &&
                objects.register_class(exit_hint) && objects.register_class(character) &&
                objects.register_class(ai_manager) && objects.register_class(caleb_ai) &&

@@ -2,6 +2,7 @@
 namespace OpenBlood2
 {
     struct LightningSettings;
+    struct WarpGateSettings;
 }
 #include "basedefs_de.h"
 #include "engine/audio.h"
@@ -49,6 +50,7 @@ class PathMgr;
 class ServerDE : public CSBase
 {
   public:
+    virtual std::uint64_t PublishWarpGate(HOBJECT, const OpenBlood2::WarpGateSettings&, std::string&) = 0;
     virtual bool SetSkyDefinition(const OpenBlood2::SkyDefinition&) = 0;
     virtual bool AddSkyObject(HOBJECT, unsigned) = 0;
     virtual void ReportSkyFailure(std::string_view) = 0;

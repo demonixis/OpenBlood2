@@ -1,5 +1,6 @@
 #include "app/sprite_scene.h"
 #include <algorithm>
+#include <cmath>
 namespace OpenBlood2
 {
     bool update_sprite_scene(const GameSession& game, SpriteView& scene, std::string& error)
@@ -24,6 +25,44 @@ namespace OpenBlood2
                            game.resources, error, fx.alpha))
                 return false;
             scene.entries.back().client_effect = fx.id;
+        }
+        for (const auto& gate : game.server.warp_gates.active)
+        {
+            if (gate.sprite_ready)
+            {
+                const auto& fx = gate.sprite;
+                auto pose = fx.pose;
+                DDWORD flags = FLAG_VISIBLE | FLAG_SPRITECHROMAKEY | (fx.settings.align ? FLAG_ROTATEABLESPRITE : 0);
+                // Two negative sprite axes are exactly a half-turn about its normal.
+                if (fx.scale < 0)
+                {
+                    DRotation roll;
+                    roll.m_Vec = {0, 0, 1};
+                    roll.m_Spin = 0;
+                    pose.rotation = compose_rotation(fx.settings.align ? pose.rotation : view.rotation, roll);
+                    flags |= FLAG_ROTATEABLESPRITE;
+                }
+                const float scale = std::abs(fx.scale);
+                if (!scene.add(fx.sprite.get(), fx.track, pose, {scale, scale, 0}, flags, {}, game.resources, error,
+                               fx.alpha))
+                    return false;
+                scene.entries.back().warp_gate = gate.id;
+            }
+            for (unsigned j = 0; j < 2; ++j)
+                if (gate.particle_ready[j])
+                {
+                    const auto& fx = gate.particles[j];
+                    for (unsigned i = 0; i < fx.particles.size(); ++i)
+                    {
+                        const auto& p = fx.particles[i];
+                        if (!scene.add_particle(
+                                fx.texture, vector_add(fx.pose.position, rotate_vector(fx.pose.rotation, p.position)),
+                                fx.settings.radius / 640.f, p.color, fx.alpha, gate.id, i, game.resources, error))
+                            return false;
+                        scene.entries.back().particle_system = 0;
+                        scene.entries.back().warp_gate = gate.id;
+                    }
+                }
         }
         for (const auto& bolt : game.server.lightning.active)
             for (const auto& segment : bolt.segments)

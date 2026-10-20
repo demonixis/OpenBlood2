@@ -1,0 +1,23 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 1232: reported_levels.09_abandoned_buildings
+1/5 Test #1232: reported_levels.09_abandoned_buildings ...   Passed    6.62 sec
+    Start 1276: warp_gate.formulas
+2/5 Test #1276: warp_gate.formulas .......................   Passed    0.02 sec
+    Start 1277: warp_gate.controller
+3/5 Test #1277: warp_gate.controller .....................   Passed    0.01 sec
+    Start 1278: warp_gate.catalog
+4/5 Test #1278: warp_gate.catalog ........................   Passed    0.22 sec
+    Start 1279: gpu.warp_gate
+5/5 Test #1279: gpu.warp_gate ............................   Passed    0.65 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Label Time Summary:
+campaign        =   6.62 sec*proc (1 test)
+gpu             =   0.65 sec*proc (1 test)
+headless        =   6.87 sec*proc (4 tests)
+private         =   0.65 sec*proc (1 test)
+private-data    =   6.87 sec*proc (4 tests)
+warp            =   0.91 sec*proc (4 tests)
+
+Total Test time (real) =   7.55 sec

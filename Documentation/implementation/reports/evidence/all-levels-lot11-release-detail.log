@@ -1,0 +1,98 @@
+Start testing: Oct 20 11:47 CEST
+----------------------------------------------------------
+1232/1279 Testing: reported_levels.09_abandoned_buildings
+1232/1279 Test: reported_levels.09_abandoned_buildings
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/reported_level_tests" "09_abandoned_buildings" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"reported_levels.09_abandoned_buildings" start time: Oct 20 11:47 CEST
+Output:
+----------------------------------------------------------
+09_abandoned_buildings start=Start1 multiplayer-inspection=0 09_abandoned_buildings difficulty=1 passed
+09_abandoned_buildings start=Start1 multiplayer-inspection=0 09_abandoned_buildings difficulty=0 passed
+09_abandoned_buildings start=Start1 multiplayer-inspection=0 09_abandoned_buildings difficulty=2 passed
+<end of output>
+Test time =   6.62 sec
+----------------------------------------------------------
+Test Passed.
+"reported_levels.09_abandoned_buildings" end time: Oct 20 11:47 CEST
+"reported_levels.09_abandoned_buildings" time elapsed: 00:00:06
+----------------------------------------------------------
+
+1276/1279 Testing: warp_gate.formulas
+1276/1279 Test: warp_gate.formulas
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/warp_gate_tests" "formulas" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"warp_gate.formulas" start time: Oct 20 11:47 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"warp_gate.formulas" end time: Oct 20 11:47 CEST
+"warp_gate.formulas" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1277/1279 Testing: warp_gate.controller
+1277/1279 Test: warp_gate.controller
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/warp_gate_tests" "controller" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"warp_gate.controller" start time: Oct 20 11:47 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"warp_gate.controller" end time: Oct 20 11:47 CEST
+"warp_gate.controller" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1278/1279 Testing: warp_gate.catalog
+1278/1279 Test: warp_gate.catalog
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/warp_gate_tests" "catalog" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"warp_gate.catalog" start time: Oct 20 11:47 CEST
+Output:
+----------------------------------------------------------
+09_abandoned_buildings gates=1 particles=50 prepared=51
+24b_arena gates=6 particles=465 prepared=471
+<end of output>
+Test time =   0.22 sec
+----------------------------------------------------------
+Test Passed.
+"warp_gate.catalog" end time: Oct 20 11:47 CEST
+"warp_gate.catalog" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1279/1279 Testing: gpu.warp_gate
+1279/1279 Test: gpu.warp_gate
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/warp_gate_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/warp-gate" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.warp_gate" start time: Oct 20 11:47 CEST
+Output:
+----------------------------------------------------------
+warp lit=3404 entries=61
+animated particle pixels=1271
+<end of output>
+Test time =   0.65 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.warp_gate" end time: Oct 20 11:47 CEST
+"gpu.warp_gate" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 20 11:47 CEST
+
+campaign =   6.62 sec*proc
+
+gpu =   0.65 sec*proc
+
+headless =   6.87 sec*proc
+
+private =   0.65 sec*proc
+
+private-data =   6.87 sec*proc
+
+warp =   0.91 sec*proc
+

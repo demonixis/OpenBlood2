@@ -9,8 +9,8 @@ initial deltas, three seconds of simulation with movement, a runtime failure
 recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
 combat, multiplayer or GPU certification. M2 closure remains unchanged.
 
-Current verified opening gate after iteration 10: **47 / 58 pass, 11 / 58 fail**
-([audit 8](evidence/all-levels-audit-08.log)). Remaining worlds: Abandoned Buildings,
+Current verified opening gate after iteration 11: **48 / 58 pass, 10 / 58 fail**
+([audit 9](evidence/all-levels-audit-09.log)). Remaining worlds:
 Office, Rooftop, Ancient City, Arena, Ancient One,
 End and the four CTF maps. Initial-entry and three-second simulation
 coverage is not complete gameplay/traversal acceptance. The tables below retain
@@ -389,3 +389,46 @@ actual impact sprites, expiry and empty-scene readback. Both applications build.
 [Temple GPU opening](evidence/all-levels-temple-gpu.log) renders three inspector-free
 Release frames on NVIDIA RTX 3060, dummy audio, and exits 0. This is an opening
 and short-simulation gate; complete traversal, networking and M3 are unaccepted.
+
+
+## Iteration 11: WarpGate and Abandoned Buildings
+
+The [WarpGate contracts](../../contracts/warp_gate_contracts.md) cover the
+original controller, sprite and two independent particle systems. All seven
+catalog gates now create and emit; three use actual SPR particle textures,
+confirmed against the installed retail executable. Abandoned Buildings' zero-count
+PS2 retains its unused directory-only texture field. No asset is substituted.
+Original deferred visibility, asymmetric ramps, emission clock, cached axes,
+color helper and per-update rotation remain intact. Sounds are properties only,
+as in the original controller.
+
+[Audit 9](evidence/all-levels-audit-09.log) passes **48 / 58**, fails **10 / 58**.
+Abandoned Buildings passes all three difficulties, initial tiny deltas, movement,
+three-second simulation, runtime recheck and cleanup. Arena's six WarpGate entries
+are implemented; its three REV actors still block admission.
+
+[41 Dev regressions](evidence/all-levels-lot11-dev.log) pass (objects, sprites,
+object particles, streams, lightning and warp gates).
+The [first run](evidence/all-levels-lot11-initial.log) failed on missing editor
+property-group markers; these are now declared with the original integer type.
+The [second run](evidence/all-levels-lot11-second.log) passed Abandoned but exposed
+an incorrect test-clock reset on switching worlds. The
+[unchanged failing repetition](evidence/all-levels-lot11-clock-failure.log) is
+retained; the [corrected fixture](evidence/all-levels-lot11-clock-fixed.log) uses
+the actual monotonic object clock and passes all three WarpGate cases.
+
+[Four ASan/UBSan tests](evidence/all-levels-lot11-sanitizers.log) pass with leak
+detection enabled, including Abandoned in all three difficulties (204.45 seconds)
+and all seven actual gates.
+
+[Five Release tests](evidence/all-levels-lot11-release.log) pass, including
+Abandoned and GPU readback. [Detailed results](evidence/all-levels-lot11-release-detail.log)
+record 3,404 visible combined pixels and 1,271 pixels from SPR-textured particles
+alone, followed by complete removal and empty-scene readback. Captures were
+visually inspected. [Abandoned GPU opening](evidence/all-levels-abandoned-gpu.log)
+renders three Release frames on NVIDIA RTX 3060 with dummy audio and exits 0.
+Both Release and inspector applications build; renderer/shader/dependency state
+is unchanged. This opening and smoke evidence is not full traversal or M3 acceptance.
+
+![Warp sprite and particles](evidence/all-levels-warp-gate.png)
+![SPR-textured particles without the central sprite](evidence/all-levels-warp-particles.png)

@@ -1,0 +1,19 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 1111: reported_levels.09_abandoned_buildings
+1/4 Test #1111: reported_levels.09_abandoned_buildings ...   Passed  204.45 sec
+    Start 1152: warp_gate.formulas
+2/4 Test #1152: warp_gate.formulas .......................   Passed    0.28 sec
+    Start 1153: warp_gate.controller
+3/4 Test #1153: warp_gate.controller .....................   Passed    0.28 sec
+    Start 1154: warp_gate.catalog
+4/4 Test #1154: warp_gate.catalog ........................   Passed    9.09 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+campaign        = 204.45 sec*proc (1 test)
+headless        = 214.09 sec*proc (4 tests)
+private-data    = 214.09 sec*proc (4 tests)
+warp            =   9.65 sec*proc (3 tests)
+
+Total Test time (real) = 214.13 sec

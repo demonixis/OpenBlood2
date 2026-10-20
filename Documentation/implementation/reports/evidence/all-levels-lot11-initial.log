@@ -1,0 +1,29 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1120: reported_levels.09_abandoned_buildings
+    Start 1161: warp_gate.formulas
+1/4 Test #1161: warp_gate.formulas .......................   Passed    0.01 sec
+    Start 1162: warp_gate.controller
+2/4 Test #1162: warp_gate.controller .....................   Passed    0.02 sec
+    Start 1163: warp_gate.catalog
+3/4 Test #1163: warp_gate.catalog ........................***Failed    0.20 sec
+193: displayed > owners.size() && !g.server.warp_gates.failed 
+
+4/4 Test #1120: reported_levels.09_abandoned_buildings ...***Failed    0.26 sec
+09_abandoned_buildings entry=1120 class=CClientWarpGateSFX Creation failed: CClientWarpGateSFX: invalid property ParticleSystem1Data
+09_abandoned_buildings: World initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+
+
+50% tests passed, 2 tests failed out of 4
+
+Label Time Summary:
+campaign        =   0.26 sec*proc (1 test)
+headless        =   0.49 sec*proc (4 tests)
+private-data    =   0.49 sec*proc (4 tests)
+warp            =   0.23 sec*proc (3 tests)
+
+Total Test time (real) =   0.28 sec
+
+The following tests FAILED:
+	1120 - reported_levels.09_abandoned_buildings (Failed)   campaign headless private-data
+	1163 - warp_gate.catalog (Failed)                        headless private-data warp
+Errors while running CTest

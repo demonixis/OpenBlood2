@@ -1,5 +1,6 @@
 #include "game/original/BuiltinSprite.h"
 #include "game/original/ClientLightningSFX.h"
+#include "game/original/ClientWarpGateSFX.h"
 #include "game/original/DetailSprite.h"
 #include "game/original/SparksObj.h"
 #include "inspector.h"
@@ -40,6 +41,42 @@ namespace OpenBlood2
                 ImGui::TextWrapped("Event %llu %s | segments %u | particles %u | ended %d | %s",
                                    (unsigned long long)report.id, report.source.c_str(), report.segments,
                                    report.particles, report.ended, report.error.c_str());
+        }
+        if (ImGui::CollapsingHeader("Original warp gates"))
+        {
+            const auto& gates = game.server.warp_gates;
+            ImGui::Text("Active %zu | particles %zu | failed %llu", gates.active.size(), gates.particle_count(),
+                        (unsigned long long)gates.failed);
+            ImGui::TextWrapped("Sound properties are retained but never played by the original controller.");
+            for (auto id : game.objects.snapshot())
+                if (const auto* r = game.objects.get(id))
+                    if (const auto* gate = dynamic_cast<const CClientWarpGateSFX*>(r->game.get()))
+                    {
+                        ImGui::Text("%s | ON %d | visible %d | first update %d | event %llu", r->state.m_Name, gate->on,
+                                    (game.server.GetObjectUserFlags(gate->m_hObject) & 1u) != 0, gate->first_update,
+                                    (unsigned long long)gate->event);
+                        ImGui::TextWrapped("%s", gate->error.c_str());
+                        for (const auto& sound : gate->sounds)
+                            ImGui::TextWrapped("Unused sound: %s", sound.c_str());
+                    }
+            for (const auto& gate : gates.active)
+            {
+                ImGui::Text("Gate %llu | sprite ready %d / started %d | scale %.3f alpha %.3f",
+                            (unsigned long long)gate.id, gate.sprite_ready, gate.sprite.started, gate.sprite.scale,
+                            gate.sprite.alpha);
+                for (unsigned i = 0; i < 2; ++i)
+                {
+                    const auto& p = gate.particles[i];
+                    ImGui::Text("PS%u | ready %d | particles %zu | emitted %llu | alpha %.3f | last add %.3f", i + 1,
+                                gate.particle_ready[i], p.particles.size(), (unsigned long long)p.emitted, p.alpha,
+                                p.last_add);
+                    ImGui::TextWrapped("Texture: %s%s | %s", p.texture.c_str(),
+                                       p.settings.count ? "" : " (unused: zero particles)", p.error.c_str());
+                }
+            }
+            for (const auto& r : gates.reports)
+                ImGui::TextWrapped("Event %llu %s | ended %d | %s", (unsigned long long)r.id, r.source.c_str(), r.ended,
+                                   r.error.c_str());
         }
         draw_sparks(game);
         draw_blood_spurts(game);

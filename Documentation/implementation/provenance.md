@@ -1645,3 +1645,13 @@ FIRETRAIL_1 and explosion recipes 16/17 are selectively adapted from the origina
 the source alternate's uninitialized axis/zero distance, portable cosmetic RNG,
 existing typed services and unavailable illumination. Commercial assets remain
 external; source references and renderer shaders are unchanged.
+
+### Complete-level continuation: WarpGate
+
+Original CClientWarpGateSFX and both client WarpGate callbacks supply properties,
+scheduling, visibility, scale/alpha, emission and rotation. The
+[source hashes](sources/all_levels_warp_gate_sources.json) and
+[contracts](../contracts/warp_gate_contracts.md) document finite initialization,
+zero-duration ramps, bounded ownership and the original color helper. The retail
+Client.exe SPR-particle branch corroborates the later-engine reference; no binary,
+commercial resource, source-reference, shader or dependency is modified.

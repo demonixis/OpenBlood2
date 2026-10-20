@@ -745,6 +745,7 @@ namespace OpenBlood2
         ok = server.flesh_gibs.advance(objects.time(), server) && ok;
         ok = server.sparks.advance(objects.time()) && ok;
         ok = server.lightning.advance(objects.time()) && ok;
+        ok = server.warp_gates.advance(objects.time(), server) && ok;
         ok = server.blood_spurts.advance(objects.time(), server) && ok;
         ok = server.explosion_fragments.advance(objects.time(), server) && ok;
         ok = server.object_particles.advance(objects.time(), server) && ok;
@@ -777,6 +778,7 @@ namespace OpenBlood2
         add("Flesh gibs", server.flesh_gibs.update_error);
         add("Sparks", server.sparks.update_error);
         add("Lightning", server.lightning.update_error);
+        add("Warp gate", server.warp_gates.update_error);
         add("Blood spurts", server.blood_spurts.update_error);
         add("Explosion fragments", server.explosion_fragments.update_error);
         add("Object particles", server.object_particles.update_error);

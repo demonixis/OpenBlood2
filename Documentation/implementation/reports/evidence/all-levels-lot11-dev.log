@@ -1,0 +1,98 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start  660: object_particles.private
+      Start  315: sprites.catalog
+ 1/41 Test  #315: sprites.catalog ..................   Passed    1.21 sec
+      Start 1163: warp_gate.catalog
+ 2/41 Test  #660: object_particles.private .........   Passed    1.44 sec
+      Start  316: sprites.subway
+ 3/41 Test  #316: sprites.subway ...................   Passed    0.17 sec
+      Start 1156: lightning.catalog
+ 4/41 Test #1163: warp_gate.catalog ................   Passed    0.44 sec
+      Start   13: objects.message_churn
+ 5/41 Test   #13: objects.message_churn ............   Passed    0.20 sec
+      Start  841: particle_stream.budgets
+ 6/41 Test  #841: particle_stream.budgets ..........   Passed    0.01 sec
+      Start 1162: warp_gate.controller
+ 7/41 Test #1162: warp_gate.controller .............   Passed    0.03 sec
+      Start 1155: lightning.emitter
+ 8/41 Test #1155: lightning.emitter ................   Passed    0.03 sec
+      Start 1161: warp_gate.formulas
+ 9/41 Test #1161: warp_gate.formulas ...............   Passed    0.03 sec
+      Start  842: particle_stream.system
+10/41 Test  #842: particle_stream.system ...........   Passed    0.01 sec
+      Start   14: objects.message_limit
+11/41 Test #1156: lightning.catalog ................   Passed    0.35 sec
+      Start 1154: lightning.formulas
+12/41 Test #1154: lightning.formulas ...............   Passed    0.02 sec
+      Start  840: particle_stream.session
+13/41 Test  #840: particle_stream.session ..........   Passed    0.00 sec
+      Start  837: particle_stream.clocks
+14/41 Test  #837: particle_stream.clocks ...........   Passed    0.00 sec
+      Start  838: particle_stream.ramps
+15/41 Test  #838: particle_stream.ramps ............   Passed    0.00 sec
+      Start  836: particle_stream.rules
+16/41 Test  #836: particle_stream.rules ............   Passed    0.00 sec
+      Start  839: particle_stream.failures
+17/41 Test   #14: objects.message_limit ............   Passed    0.04 sec
+      Start  658: object_particles.failures
+18/41 Test  #839: particle_stream.failures .........   Passed    0.00 sec
+      Start  659: object_particles.session
+19/41 Test  #658: object_particles.failures ........   Passed    0.00 sec
+      Start  312: sprites.placement
+20/41 Test  #659: object_particles.session .........   Passed    0.00 sec
+      Start  309: sprites.reader
+21/41 Test  #312: sprites.placement ................   Passed    0.00 sec
+      Start  314: sprites.failures
+22/41 Test  #309: sprites.reader ...................   Passed    0.00 sec
+      Start  313: sprites.ray
+23/41 Test  #313: sprites.ray ......................   Passed    0.00 sec
+      Start  311: sprites.properties
+24/41 Test  #314: sprites.failures .................   Passed    0.01 sec
+      Start  656: object_particles.emission
+25/41 Test  #311: sprites.properties ...............   Passed    0.01 sec
+26/41 Test  #656: object_particles.emission ........   Passed    0.00 sec
+      Start  657: object_particles.stopping
+      Start  310: sprites.clock
+27/41 Test  #657: object_particles.stopping ........   Passed    0.00 sec
+      Start   15: objects.unsupported_teardown
+28/41 Test  #310: sprites.clock ....................   Passed    0.00 sec
+      Start    3: objects.builtin_model
+29/41 Test    #3: objects.builtin_model ............   Passed    0.00 sec
+      Start   12: objects.messages_strings
+30/41 Test   #15: objects.unsupported_teardown .....   Passed    0.01 sec
+      Start   16: objects.creation_failures
+31/41 Test   #12: objects.messages_strings .........   Passed    0.00 sec
+      Start   11: objects.links_lists
+32/41 Test   #16: objects.creation_failures ........   Passed    0.00 sec
+      Start    4: objects.original_objects
+33/41 Test   #11: objects.links_lists ..............   Passed    0.00 sec
+      Start    8: objects.deferred_removal
+34/41 Test    #4: objects.original_objects .........   Passed    0.00 sec
+      Start    5: objects.nested_creation
+35/41 Test    #8: objects.deferred_removal .........   Passed    0.00 sec
+      Start    6: objects.reasons_properties
+36/41 Test    #5: objects.nested_creation ..........   Passed    0.00 sec
+      Start    7: objects.scheduling
+37/41 Test    #6: objects.reasons_properties .......   Passed    0.00 sec
+      Start   10: objects.handles_selection
+38/41 Test    #7: objects.scheduling ...............   Passed    0.00 sec
+      Start    9: objects.aggregate_dispatch
+39/41 Test   #10: objects.handles_selection ........   Passed    0.00 sec
+      Start  843: particle_stream.private
+40/41 Test    #9: objects.aggregate_dispatch .......   Passed    0.00 sec
+41/41 Test  #843: particle_stream.private ..........   Passed    6.68 sec
+
+100% tests passed, 0 tests failed out of 41
+
+Label Time Summary:
+headless            =  10.78 sec*proc (41 tests)
+lightning           =   0.41 sec*proc (3 tests)
+object_particles    =   1.46 sec*proc (5 tests)
+objects             =   0.28 sec*proc (14 tests)
+particle_stream     =   6.72 sec*proc (8 tests)
+private             =   9.51 sec*proc (4 tests)
+private-data        =   0.90 sec*proc (6 tests)
+sprites             =   1.41 sec*proc (8 tests)
+warp                =   0.50 sec*proc (3 tests)
+
+Total Test time (real) =   8.76 sec
