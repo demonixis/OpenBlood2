@@ -1,0 +1,32 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/dev/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/dev/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1176
+    Start 1176: ishmael.keys
+
+1176: Test command: /home/yann/projects/lithtech/Blood2/build/dev/tests/ishmael_tests "keys" "/home/yann/Games/Blood2"
+1176: Working Directory: /home/yann/projects/lithtech/Blood2/build/dev/tests
+1176: Test timeout computed to be: 180
+1176: keys:164: a->RuntimeReady() && a->fire_shots > 0
+1/1 Test #1176: ishmael.keys .....................***Failed    0.02 sec
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+headless    =   0.02 sec*proc (1 test)
+ishmael     =   0.02 sec*proc (1 test)
+private     =   0.02 sec*proc (1 test)
+
+Total Test time (real) =   0.04 sec
+
+The following tests FAILED:
+	1176 - ishmael.keys (Failed)                             headless ishmael private
+Errors while running CTest
+Output from these tests are in: /home/yann/projects/lithtech/Blood2/build/dev/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

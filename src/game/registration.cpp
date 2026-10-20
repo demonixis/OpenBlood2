@@ -33,6 +33,7 @@
 #include "game/original/Gideon.h"
 #include "game/original/Grenade.h"
 #include "game/original/HandWeaponModel.h"
+#include "game/original/IshmaelAI.h"
 #include "game/original/ItemPickups.h"
 #include "game/original/Key.h"
 #include "game/original/KeyFramer.h"
@@ -604,6 +605,22 @@ namespace OpenBlood2
                                            {"AIWeapon1", std::string("TESLA"), true, 31},
                                            {"AIWeapon2", std::string("SNIPER"), true, 31},
                                            {"Dims", DVector{12, 46, 12}}}};
+        const ClassInfo chosen_IshmaelAI{"IshmaelAI",
+                                         &ai_manager,
+                                         construct_npc<IshmaelAI, AI_Mgr::NPCType::Ishmael>,
+                                         {{"AIState", std::string("PASSIVE"), true, 31},
+                                          {"AIWeapon1", std::string("ORB"), true, 31},
+                                          {"AIWeapon2", std::string("HEAL"), true, 31},
+                                          {"AIWeapon3", std::string("SHOCKWAVE"), true, 31},
+                                          {"Dims", DVector{12, 39, 12}}}};
+        const ClassInfo chosen_IshmaelREV{"IshmaelREV",
+                                          &ai_manager,
+                                          construct_npc<IshmaelREV, AI_Mgr::NPCType::IshmaelREV>,
+                                          {{"AIState", std::string("PASSIVE"), true, 31},
+                                           {"AIWeapon1", std::string("ORB"), true, 31},
+                                           {"AIWeapon2", std::string("HEAL"), true, 31},
+                                           {"AIWeapon3", std::string("SHOCKWAVE"), true, 31},
+                                           {"Dims", DVector{12, 39, 12}}}};
         const ClassInfo caleb_ai{"CalebAI",
                                  &ai_manager,
                                  construct_npc<CalebAI, AI_Mgr::NPCType::Caleb>,
@@ -1268,7 +1285,8 @@ namespace OpenBlood2
                objects.register_class(game_start) && objects.register_class(path) &&
                objects.register_class(world_properties) && objects.register_class(smell) &&
                objects.register_class(exit_hint) && objects.register_class(character) &&
-               objects.register_class(ai_manager) && objects.register_class(chosen_GabriellaAI) &&
+               objects.register_class(ai_manager) && objects.register_class(chosen_IshmaelAI) &&
+               objects.register_class(chosen_IshmaelREV) && objects.register_class(chosen_GabriellaAI) &&
                objects.register_class(chosen_GabriellaREV) && objects.register_class(chosen_OpheliaAI) &&
                objects.register_class(chosen_OpheliaREV) && objects.register_class(caleb_ai) &&
                objects.register_class(sparks_obj) && objects.register_class(later_Behemoth) &&

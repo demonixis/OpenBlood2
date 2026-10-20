@@ -1,0 +1,131 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start    3: objects.builtin_model
+ 1/56 Test    #3: objects.builtin_model ........................   Passed    0.00 sec
+      Start    4: objects.original_objects
+ 2/56 Test    #4: objects.original_objects .....................   Passed    0.00 sec
+      Start    5: objects.nested_creation
+ 3/56 Test    #5: objects.nested_creation ......................   Passed    0.00 sec
+      Start    6: objects.reasons_properties
+ 4/56 Test    #6: objects.reasons_properties ...................   Passed    0.00 sec
+      Start    7: objects.scheduling
+ 5/56 Test    #7: objects.scheduling ...........................   Passed    0.00 sec
+      Start    8: objects.deferred_removal
+ 6/56 Test    #8: objects.deferred_removal .....................   Passed    0.00 sec
+      Start    9: objects.aggregate_dispatch
+ 7/56 Test    #9: objects.aggregate_dispatch ...................   Passed    0.00 sec
+      Start   10: objects.handles_selection
+ 8/56 Test   #10: objects.handles_selection ....................   Passed    0.00 sec
+      Start   11: objects.links_lists
+ 9/56 Test   #11: objects.links_lists ..........................   Passed    0.00 sec
+      Start   12: objects.messages_strings
+10/56 Test   #12: objects.messages_strings .....................   Passed    0.00 sec
+      Start   13: objects.message_churn
+11/56 Test   #13: objects.message_churn ........................   Passed    0.10 sec
+      Start   14: objects.message_limit
+12/56 Test   #14: objects.message_limit ........................   Passed    0.02 sec
+      Start   15: objects.unsupported_teardown
+13/56 Test   #15: objects.unsupported_teardown .................   Passed    0.00 sec
+      Start   16: objects.creation_failures
+14/56 Test   #16: objects.creation_failures ....................   Passed    0.00 sec
+      Start  634: explosion_models.formulas
+15/56 Test  #634: explosion_models.formulas ....................   Passed    0.00 sec
+      Start  635: explosion_models.recipes
+16/56 Test  #635: explosion_models.recipes .....................   Passed    0.00 sec
+      Start  636: explosion_models.failures
+17/56 Test  #636: explosion_models.failures ....................   Passed    0.00 sec
+      Start  637: explosion_models.session
+18/56 Test  #637: explosion_models.session .....................   Passed    0.00 sec
+      Start  638: explosion_models.private
+19/56 Test  #638: explosion_models.private .....................   Passed    0.18 sec
+      Start  639: explosion_lights.lifecycle
+20/56 Test  #639: explosion_lights.lifecycle ...................   Passed    0.00 sec
+      Start  640: explosion_lights.recipes
+21/56 Test  #640: explosion_lights.recipes .....................   Passed    0.00 sec
+      Start  641: explosion_lights.failures
+22/56 Test  #641: explosion_lights.failures ....................   Passed    0.00 sec
+      Start  642: explosion_lights.session
+23/56 Test  #642: explosion_lights.session .....................   Passed    0.00 sec
+      Start  643: explosion_lights.private
+24/56 Test  #643: explosion_lights.private .....................   Passed    0.43 sec
+      Start  644: explosion_rings.motion
+25/56 Test  #644: explosion_rings.motion .......................   Passed    0.00 sec
+      Start  645: explosion_rings.lifecycle
+26/56 Test  #645: explosion_rings.lifecycle ....................   Passed    0.00 sec
+      Start  646: explosion_rings.recipes
+27/56 Test  #646: explosion_rings.recipes ......................   Passed    0.00 sec
+      Start  647: explosion_rings.failures
+28/56 Test  #647: explosion_rings.failures .....................   Passed    0.00 sec
+      Start  648: explosion_rings.session
+29/56 Test  #648: explosion_rings.session ......................   Passed    0.00 sec
+      Start  649: explosion_rings.private
+30/56 Test  #649: explosion_rings.private ......................   Passed    0.54 sec
+      Start  656: object_particles.emission
+31/56 Test  #656: object_particles.emission ....................   Passed    0.00 sec
+      Start  657: object_particles.stopping
+32/56 Test  #657: object_particles.stopping ....................   Passed    0.00 sec
+      Start  658: object_particles.failures
+33/56 Test  #658: object_particles.failures ....................   Passed    0.00 sec
+      Start  659: object_particles.session
+34/56 Test  #659: object_particles.session .....................   Passed    0.00 sec
+      Start  660: object_particles.private
+35/56 Test  #660: object_particles.private .....................   Passed    1.12 sec
+      Start 1115: campaign_expansion.07_cathedral
+36/56 Test #1115: campaign_expansion.07_cathedral ..............   Passed    0.99 sec
+      Start 1116: campaign_expansion.10_sewagetreatmentplant
+37/56 Test #1116: campaign_expansion.10_sewagetreatmentplant ...   Passed    0.90 sec
+      Start 1117: campaign_expansion.11_slaughter_house
+38/56 Test #1117: campaign_expansion.11_slaughter_house ........   Passed    7.94 sec
+      Start 1118: campaign_expansion.actors
+39/56 Test #1118: campaign_expansion.actors ....................   Passed    0.03 sec
+      Start 1119: campaign_expansion.weapons
+40/56 Test #1119: campaign_expansion.weapons ...................   Passed    0.02 sec
+      Start 1166: chosen_ai.profiles
+41/56 Test #1166: chosen_ai.profiles ...........................   Passed    0.05 sec
+      Start 1167: chosen_ai.actions
+42/56 Test #1167: chosen_ai.actions ............................   Passed    0.02 sec
+      Start 1168: chosen_ai.worlds
+43/56 Test #1168: chosen_ai.worlds .............................   Passed    0.13 sec
+      Start 1169: orb.steering
+44/56 Test #1169: orb.steering .................................   Passed    0.02 sec
+      Start 1170: orb.attachment
+45/56 Test #1170: orb.attachment ...............................   Passed    0.02 sec
+      Start 1171: orb.camera
+46/56 Test #1171: orb.camera ...................................   Passed    0.02 sec
+      Start 1172: orb.client
+47/56 Test #1172: orb.client ...................................   Passed    0.02 sec
+      Start 1173: orb.effects
+48/56 Test #1173: orb.effects ..................................   Passed    0.02 sec
+      Start 1174: ishmael.profiles
+49/56 Test #1174: ishmael.profiles .............................   Passed    0.04 sec
+      Start 1175: ishmael.actions
+50/56 Test #1175: ishmael.actions ..............................   Passed    0.02 sec
+      Start 1176: ishmael.keys
+51/56 Test #1176: ishmael.keys .................................   Passed    0.02 sec
+      Start 1177: ishmael.teleport
+52/56 Test #1177: ishmael.teleport .............................   Passed    0.02 sec
+      Start 1178: ishmael.death
+53/56 Test #1178: ishmael.death ................................   Passed    0.02 sec
+      Start 1179: ishmael.effects
+54/56 Test #1179: ishmael.effects ..............................   Passed    0.02 sec
+      Start 1180: ishmael.sphere
+55/56 Test #1180: ishmael.sphere ...............................   Passed    0.01 sec
+      Start 1181: ishmael.worlds
+56/56 Test #1181: ishmael.worlds ...............................   Passed    0.10 sec
+
+100% tests passed, 0 tests failed out of 56
+
+Label Time Summary:
+campaign            =   9.89 sec*proc (5 tests)
+chosen_ai           =   0.19 sec*proc (3 tests)
+explosion_lights    =   0.44 sec*proc (5 tests)
+explosion_models    =   0.19 sec*proc (5 tests)
+explosion_rings     =   0.55 sec*proc (6 tests)
+headless            =  12.85 sec*proc (56 tests)
+ishmael             =   0.23 sec*proc (8 tests)
+object_particles    =   1.12 sec*proc (5 tests)
+objects             =   0.14 sec*proc (14 tests)
+orb                 =   0.10 sec*proc (5 tests)
+private             =   2.79 sec*proc (20 tests)
+private-data        =   9.89 sec*proc (5 tests)
+
+Total Test time (real) =  12.88 sec

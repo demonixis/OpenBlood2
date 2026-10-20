@@ -12,8 +12,9 @@ FireResult CZealotSpell::FireVector()
         return last_shot.result = FireResult::Invalid;
     if (data.m_nType == WEAP_ZEALOT_HEAL)
     {
-        s->PublishObjectParticles(m_hOwner, 18, effect_error);
-        return last_shot.result = FireResult::Fired; // Health changes only on Zealot's animation completion.
+        const auto event = s->PublishObjectParticles(m_hOwner, 18, effect_error);
+        // Health changes only on the original actor's animation completion.
+        return last_shot.result = event && effect_error.empty() ? FireResult::Fired : FireResult::Unavailable;
     }
     SegmentHit hit;
     const auto query = s->IntersectSegment(last_shot.request.position, last_shot.end, nullptr, hit, false,

@@ -3,7 +3,7 @@ namespace OpenBlood2
 {
     struct LightningSettings;
     struct WarpGateSettings;
-}
+} // namespace OpenBlood2
 #include "basedefs_de.h"
 #include "engine/audio.h"
 #include "engine/body_placement.h"
@@ -166,6 +166,7 @@ class ServerDE : public CSBase
     virtual DRESULT GetModelNodeHideStatus(HOBJECT, const char*, DBOOL*) = 0;
     virtual DRESULT SetModelNodeHideStatus(HOBJECT, const char*, DBOOL) = 0;
     virtual DRESULT GetObjectDims(HOBJECT, DVector*) = 0;
+    virtual bool CollectObjectsTouchingSphere(DVector, float, std::vector<HOBJECT>&) = 0;
     virtual DRESULT SetObjectRotation(HOBJECT, const DRotation*) = 0;
     virtual DRESULT MoveObjectToGround(HOBJECT) = 0;
     virtual DBOOL CompareStringsUpper(HSTRING, HSTRING) = 0;

@@ -150,3 +150,5 @@ class CSkullProjectile final : public CProjectile
     bool Update() override;
     void AddExplosion(DVector, DVector) override;
 };
+
+bool PublishDivineShockball(HOBJECT, DVector, DVector, OpenBlood2::SceneExplosionReport&, const char* = nullptr);

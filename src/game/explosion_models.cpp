@@ -14,7 +14,7 @@ namespace OpenBlood2
             error = "Explosion requires a finite position and nonzero normal";
             return false;
         }
-        if (type == 17)
+        if (type == 17 || type == 22)
         {
             ExplosionModelSettings s;
             s.position = position;
@@ -27,8 +27,8 @@ namespace OpenBlood2
             s.waveform = 1;
             s.fade = 1;
             s.random_rotation = 0;
-            s.model = "Models\\Explosions\\duel_sphere.abc";
-            s.skin = "Skins\\Explosions\\leechball2.dtx";
+            s.model = type == 22 ? "Models\\Explosions\\exp_sphere.abc" : "Models\\Explosions\\duel_sphere.abc";
+            s.skin = type == 22 ? "Skins\\Explosions\\divineball.dtx" : "Skins\\Explosions\\leechball2.dtx";
             output = std::move(s);
             return true;
         }

@@ -1,0 +1,125 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start    3: objects.builtin_model
+ 1/51 Test    #3: objects.builtin_model ............   Passed    0.00 sec
+      Start    4: objects.original_objects
+ 2/51 Test    #4: objects.original_objects .........   Passed    0.00 sec
+      Start    5: objects.nested_creation
+ 3/51 Test    #5: objects.nested_creation ..........   Passed    0.00 sec
+      Start    6: objects.reasons_properties
+ 4/51 Test    #6: objects.reasons_properties .......   Passed    0.00 sec
+      Start    7: objects.scheduling
+ 5/51 Test    #7: objects.scheduling ...............   Passed    0.00 sec
+      Start    8: objects.deferred_removal
+ 6/51 Test    #8: objects.deferred_removal .........   Passed    0.00 sec
+      Start    9: objects.aggregate_dispatch
+ 7/51 Test    #9: objects.aggregate_dispatch .......   Passed    0.00 sec
+      Start   10: objects.handles_selection
+ 8/51 Test   #10: objects.handles_selection ........   Passed    0.00 sec
+      Start   11: objects.links_lists
+ 9/51 Test   #11: objects.links_lists ..............   Passed    0.00 sec
+      Start   12: objects.messages_strings
+10/51 Test   #12: objects.messages_strings .........   Passed    0.00 sec
+      Start   13: objects.message_churn
+11/51 Test   #13: objects.message_churn ............   Passed    0.11 sec
+      Start   14: objects.message_limit
+12/51 Test   #14: objects.message_limit ............   Passed    0.03 sec
+      Start   15: objects.unsupported_teardown
+13/51 Test   #15: objects.unsupported_teardown .....   Passed    0.00 sec
+      Start   16: objects.creation_failures
+14/51 Test   #16: objects.creation_failures ........   Passed    0.00 sec
+      Start  634: explosion_models.formulas
+15/51 Test  #634: explosion_models.formulas ........   Passed    0.00 sec
+      Start  635: explosion_models.recipes
+16/51 Test  #635: explosion_models.recipes .........   Passed    0.00 sec
+      Start  636: explosion_models.failures
+17/51 Test  #636: explosion_models.failures ........   Passed    0.00 sec
+      Start  637: explosion_models.session
+18/51 Test  #637: explosion_models.session .........   Passed    0.00 sec
+      Start  638: explosion_models.private
+19/51 Test  #638: explosion_models.private .........   Passed    0.22 sec
+      Start  639: explosion_lights.lifecycle
+20/51 Test  #639: explosion_lights.lifecycle .......   Passed    0.00 sec
+      Start  640: explosion_lights.recipes
+21/51 Test  #640: explosion_lights.recipes .........   Passed    0.00 sec
+      Start  641: explosion_lights.failures
+22/51 Test  #641: explosion_lights.failures ........   Passed    0.00 sec
+      Start  642: explosion_lights.session
+23/51 Test  #642: explosion_lights.session .........   Passed    0.00 sec
+      Start  643: explosion_lights.private
+24/51 Test  #643: explosion_lights.private .........   Passed    0.53 sec
+      Start  644: explosion_rings.motion
+25/51 Test  #644: explosion_rings.motion ...........   Passed    0.00 sec
+      Start  645: explosion_rings.lifecycle
+26/51 Test  #645: explosion_rings.lifecycle ........   Passed    0.00 sec
+      Start  646: explosion_rings.recipes
+27/51 Test  #646: explosion_rings.recipes ..........   Passed    0.00 sec
+      Start  647: explosion_rings.failures
+28/51 Test  #647: explosion_rings.failures .........   Passed    0.00 sec
+      Start  648: explosion_rings.session
+29/51 Test  #648: explosion_rings.session ..........   Passed    0.00 sec
+      Start  649: explosion_rings.private
+30/51 Test  #649: explosion_rings.private ..........   Passed    0.85 sec
+      Start  656: object_particles.emission
+31/51 Test  #656: object_particles.emission ........   Passed    0.00 sec
+      Start  657: object_particles.stopping
+32/51 Test  #657: object_particles.stopping ........   Passed    0.00 sec
+      Start  658: object_particles.failures
+33/51 Test  #658: object_particles.failures ........   Passed    0.00 sec
+      Start  659: object_particles.session
+34/51 Test  #659: object_particles.session .........   Passed    0.00 sec
+      Start  660: object_particles.private
+35/51 Test  #660: object_particles.private .........   Passed    1.32 sec
+      Start 1166: chosen_ai.profiles
+36/51 Test #1166: chosen_ai.profiles ...............   Passed    0.06 sec
+      Start 1167: chosen_ai.actions
+37/51 Test #1167: chosen_ai.actions ................   Passed    0.02 sec
+      Start 1168: chosen_ai.worlds
+38/51 Test #1168: chosen_ai.worlds .................   Passed    0.16 sec
+      Start 1169: orb.steering
+39/51 Test #1169: orb.steering .....................   Passed    0.02 sec
+      Start 1170: orb.attachment
+40/51 Test #1170: orb.attachment ...................   Passed    0.02 sec
+      Start 1171: orb.camera
+41/51 Test #1171: orb.camera .......................   Passed    0.02 sec
+      Start 1172: orb.client
+42/51 Test #1172: orb.client .......................   Passed    0.02 sec
+      Start 1173: orb.effects
+43/51 Test #1173: orb.effects ......................   Passed    0.02 sec
+      Start 1174: ishmael.profiles
+44/51 Test #1174: ishmael.profiles .................   Passed    0.05 sec
+      Start 1175: ishmael.actions
+45/51 Test #1175: ishmael.actions ..................   Passed    0.02 sec
+      Start 1176: ishmael.keys
+46/51 Test #1176: ishmael.keys .....................***Failed    0.02 sec
+keys:164: a->RuntimeReady() && a->fire_shots > 0
+
+      Start 1177: ishmael.teleport
+47/51 Test #1177: ishmael.teleport .................   Passed    0.02 sec
+      Start 1178: ishmael.death
+48/51 Test #1178: ishmael.death ....................   Passed    0.02 sec
+      Start 1179: ishmael.effects
+49/51 Test #1179: ishmael.effects ..................   Passed    0.02 sec
+      Start 1180: ishmael.sphere
+50/51 Test #1180: ishmael.sphere ...................   Passed    0.02 sec
+      Start 1181: ishmael.worlds
+51/51 Test #1181: ishmael.worlds ...................   Passed    0.13 sec
+
+98% tests passed, 1 tests failed out of 51
+
+Label Time Summary:
+chosen_ai           =   0.24 sec*proc (3 tests)
+explosion_lights    =   0.54 sec*proc (5 tests)
+explosion_models    =   0.23 sec*proc (5 tests)
+explosion_rings     =   0.86 sec*proc (6 tests)
+headless            =   3.78 sec*proc (51 tests)
+ishmael             =   0.29 sec*proc (8 tests)
+object_particles    =   1.33 sec*proc (5 tests)
+objects             =   0.16 sec*proc (14 tests)
+orb                 =   0.12 sec*proc (5 tests)
+private             =   3.57 sec*proc (20 tests)
+
+Total Test time (real) =   3.81 sec
+
+The following tests FAILED:
+	1176 - ishmael.keys (Failed)                             headless ishmael private
+Errors while running CTest

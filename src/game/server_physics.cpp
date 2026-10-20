@@ -10,6 +10,30 @@
 
 namespace OpenBlood2
 {
+    bool ServerAdapter::CollectObjectsTouchingSphere(DVector center, float radius, std::vector<HOBJECT>& output)
+    {
+        trace_service("CollectObjectsTouchingSphere");
+        output.clear();
+        if (!physics_vector(center) || !std::isfinite(radius) || radius < 0 || radius > 1000000)
+            return false;
+        // Later LithTech reference: box broad phase, then strict expanded bounding sphere.
+        // Stable slot order replaces the unavailable historical spatial-tree traversal order.
+        for (auto id : objects_.snapshot())
+        {
+            const auto* record = objects_.get(id);
+            if (!record || record->life != Life::Alive)
+                continue;
+            const auto delta = vector_subtract(record->state.m_Pos, center);
+            const auto dims = record->dimensions;
+            if (std::abs(delta.x) > radius + dims.x || std::abs(delta.y) > radius + dims.y ||
+                std::abs(delta.z) > radius + dims.z)
+                continue;
+            const double full = radius + std::sqrt(double(vector_dot(dims, dims))) + .1;
+            if (double(vector_dot(delta, delta)) < full * full)
+                output.push_back(record->handle);
+        }
+        return true;
+    }
     CollisionQuery ServerAdapter::sweep_scene(HOBJECT ignore, DVector from, DVector to, DVector dims,
                                               CollisionHit& nearest, const std::vector<ObjectId>& ids,
                                               HOBJECT ignore_extra, double allowed_penetration, StartOverlap start)

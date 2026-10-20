@@ -258,6 +258,7 @@ namespace OpenBlood2
         DRESULT GetModelNodeHideStatus(HOBJECT, const char*, DBOOL*) override;
         DRESULT SetModelNodeHideStatus(HOBJECT, const char*, DBOOL) override;
         DRESULT GetObjectDims(HOBJECT, DVector*) override;
+        bool CollectObjectsTouchingSphere(DVector, float, std::vector<HOBJECT>&) override;
         DRESULT SetObjectRotation(HOBJECT, const DRotation*) override;
         DRESULT MoveObjectToGround(HOBJECT) override;
         DBOOL CompareStringsUpper(HSTRING, HSTRING) override;

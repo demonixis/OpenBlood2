@@ -1,0 +1,21 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 1108: campaign_expansion.11_slaughter_house
+1/2 Test #1108: campaign_expansion.11_slaughter_house ...***Timeout 120.11 sec
+
+    Start 1167: ishmael.keys
+2/2 Test #1167: ishmael.keys ............................   Passed    0.46 sec
+
+50% tests passed, 1 tests failed out of 2
+
+Label Time Summary:
+campaign        = 120.11 sec*proc (1 test)
+headless        = 120.57 sec*proc (2 tests)
+ishmael         =   0.46 sec*proc (1 test)
+private         =   0.46 sec*proc (1 test)
+private-data    = 120.11 sec*proc (1 test)
+
+Total Test time (real) = 120.59 sec
+
+The following tests FAILED:
+	1108 - campaign_expansion.11_slaughter_house (Timeout)   campaign headless private-data
+Errors while running CTest

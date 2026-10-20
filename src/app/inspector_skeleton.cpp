@@ -5,6 +5,7 @@
 #include "game/original/Fanatic.h"
 #include "game/original/Gib.h"
 #include "game/original/Gideon.h"
+#include "game/original/IshmaelAI.h"
 #include "game/original/Prophet.h"
 #include "game/original/SmellHint.h"
 #include "inspector.h"
@@ -594,6 +595,17 @@ namespace OpenBlood2
                 ImGui::Text("Melee swings %llu (clip %d) | alternate fire choices %llu",
                             (unsigned long long)p->melee_swings, p->melee_roll,
                             (unsigned long long)p->alternate_choices);
+        }
+        if (const auto* ishmael = dynamic_cast<const IshmaelAI*>(target_ai);
+            ishmael && ImGui::TreeNode("Original Ishmael state"))
+        {
+            ImGui::Text("Revenant: %s; heals %llu; teleports %llu; death deliveries %llu",
+                        ishmael->Revenant() ? "yes" : "no", (unsigned long long)ishmael->heals,
+                        (unsigned long long)ishmael->teleports, (unsigned long long)ishmael->death_deliveries);
+            ImGui::TextWrapped("Death FX: %s %s %s %s", ishmael->death_effect.model_error.c_str(),
+                               ishmael->death_effect.ring_error.c_str(), ishmael->death_effect.light_error.c_str(),
+                               ishmael->death_effect.sound_error.c_str());
+            ImGui::TreePop();
         }
         if (const auto* chosen = dynamic_cast<const ChosenAI*>(target_ai);
             chosen && ImGui::CollapsingHeader("Original Chosen actions", ImGuiTreeNodeFlags_DefaultOpen))

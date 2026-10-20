@@ -1,0 +1,121 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1292
+      Start 1292: ishmael.profiles
+
+1292: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ishmael_tests "profiles" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1292: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1292: Test timeout computed to be: 180
+ 1/10 Test #1292: ishmael.profiles .................   Passed    0.05 sec
+test 1293
+      Start 1293: ishmael.actions
+
+1293: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ishmael_tests "actions" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1293: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1293: Test timeout computed to be: 180
+ 2/10 Test #1293: ishmael.actions ..................   Passed    0.02 sec
+test 1294
+      Start 1294: ishmael.keys
+
+1294: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ishmael_tests "keys" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1294: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1294: Test timeout computed to be: 180
+1294: key probe state=1 command=3 updates=74 keys=1 error=
+1294: Actual Ishmael animation-key Orb shots=1
+ 3/10 Test #1294: ishmael.keys .....................   Passed    0.02 sec
+test 1295
+      Start 1295: ishmael.teleport
+
+1295: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ishmael_tests "teleport" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1295: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1295: Test timeout computed to be: 180
+1295: Ishmael laugh1 indexed=0
+1295: Ishmael laugh2 indexed=0
+1295: Ishmael laugh3 indexed=0
+1295: sounds/chosen/ishmael\laugh3.wav: Missing or oversized sound resource
+1295: sounds/chosen/ishmael\laugh2.wav: Missing or oversized sound resource
+ 4/10 Test #1295: ishmael.teleport .................   Passed    0.02 sec
+test 1296
+      Start 1296: ishmael.death
+
+1296: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ishmael_tests "death" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1296: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1296: Test timeout computed to be: 180
+ 5/10 Test #1296: ishmael.death ....................   Passed    0.02 sec
+test 1297
+      Start 1297: ishmael.effects
+
+1297: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ishmael_tests "effects" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1297: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1297: Test timeout computed to be: 180
+ 6/10 Test #1297: ishmael.effects ..................   Passed    0.02 sec
+test 1298
+      Start 1298: ishmael.sphere
+
+1298: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ishmael_tests "sphere" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1298: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1298: Test timeout computed to be: 180
+ 7/10 Test #1298: ishmael.sphere ...................   Passed    0.02 sec
+test 1299
+      Start 1299: ishmael.worlds
+
+1299: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ishmael_tests "worlds" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1299: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1299: Test timeout computed to be: 180
+ 8/10 Test #1299: ishmael.worlds ...................   Passed    0.10 sec
+test 1300
+      Start 1300: gpu.ishmael_models
+
+1300: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/model_skinning_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/ishmael-model" "/home/yann/.steam/steam/steamapps/common/Blood II" "ishmael"
+1300: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1300: Test timeout computed to be: 120
+1300: Synthetic mask 0 time 0: 3365/3365 filled, 0 differing, max delta 0
+1300: Synthetic mask 0 time 37.5: 3489/3489 filled, 0 differing, max delta 0
+1300: Synthetic mask 0 time 100: 3421/3421 filled, 0 differing, max delta 0
+1300: Synthetic mask 1 time 0: 1737/1737 filled, 0 differing, max delta 0
+1300: Synthetic mask 1 time 37.5: 1929/1929 filled, 0 differing, max delta 0
+1300: Synthetic mask 1 time 100: 1987/1987 filled, 0 differing, max delta 0
+1300: Synthetic mask 2 time 0: 1526/1526 filled, 0 differing, max delta 0
+1300: Synthetic mask 2 time 37.5: 1412/1412 filled, 0 differing, max delta 0
+1300: Synthetic mask 2 time 100: 1103/1103 filled, 0 differing, max delta 0
+1300: Retail CPU/GPU skinning equivalence: 2 distinct assets at three clip times, 16269 filled pixels, 0 differing by more than 1, max delta 0
+1300: GPU skinning matches CPU posing, deformation, scale, hidden faces and instance transforms
+ 9/10 Test #1300: gpu.ishmael_models ...............   Passed    0.68 sec
+test 1301
+      Start 1301: gpu.ishmael_effects
+
+1301: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ishmael_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/ishmael-capture" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1301: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1301: Test timeout computed to be: 120
+1301: Heal blue pixels=216 particles=18
+1301: Divine shockball red pixels=120000 models=1
+10/10 Test #1301: gpu.ishmael_effects ..............   Passed    0.55 sec
+
+The following tests passed:
+	ishmael.profiles
+	ishmael.actions
+	ishmael.keys
+	ishmael.teleport
+	ishmael.death
+	ishmael.effects
+	ishmael.sphere
+	ishmael.worlds
+	gpu.ishmael_models
+	gpu.ishmael_effects
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+gpu         =   1.23 sec*proc (2 tests)
+headless    =   0.26 sec*proc (8 tests)
+ishmael     =   1.50 sec*proc (10 tests)
+private     =   1.50 sec*proc (10 tests)
+
+Total Test time (real) =   1.52 sec

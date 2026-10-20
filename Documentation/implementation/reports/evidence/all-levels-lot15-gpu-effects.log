@@ -1,0 +1,30 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1301
+    Start 1301: gpu.ishmael_effects
+
+1301: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ishmael_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/ishmael-capture" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1301: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1301: Test timeout computed to be: 120
+1301: Heal blue pixels=216 particles=18
+1301: Divine shockball red pixels=2923 models=1
+1/1 Test #1301: gpu.ishmael_effects ..............   Passed    0.48 sec
+
+The following tests passed:
+	gpu.ishmael_effects
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+gpu        =   0.48 sec*proc (1 test)
+ishmael    =   0.48 sec*proc (1 test)
+private    =   0.48 sec*proc (1 test)
+
+Total Test time (real) =   0.50 sec

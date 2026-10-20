@@ -1,5 +1,11 @@
 # Blood2 Project Instructions
 
+The [Ishmael/REV continuation](Documentation/contracts/ishmael_contracts.md) adds source combat, heal, teleport/recoil and per-object
+death damage, with actual heal/Divine effects. Preserve independent tables,
+revenant gravity/target-loss branches, missing original laugh diagnostics and
+checked inactive-inclusive sphere snapshots. End's script and remaining bosses/flags
+stay in the complete-level queue; M2 closure is unchanged.
+
 The [original Orb continuation](Documentation/contracts/orb_contracts.md) adds both flying/attached modes, source damage clocks,
 actual trails/fragments/audio and the alternate player camera. Preserve signed
 velocity targeting, checked Orb/Seeing Eye priority, aim during movement blocking,

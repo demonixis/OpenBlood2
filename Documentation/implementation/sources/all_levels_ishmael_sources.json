@@ -1,0 +1,57 @@
+{
+  "selection": "Original IshmaelAI/REV, heal18 and Divine shockball22; later-engine sphere-query geometry (not retail spatial traversal order)",
+  "sources": [
+    {
+      "path": "sources/blood2/ObjectDLL/IshmaelAI.cpp",
+      "sha256": "7652f745606bfcfbc0a6e026676786d81edc0157b93308cb3674c23e6c1378a4"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/IshmaelAI.h",
+      "sha256": "a3738832e68e04da442de2a022805a6c98576f83c4b8f45376b25b67013d99e4"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/IshmaelREV.cpp",
+      "sha256": "0c889e044a2b35d4b0abbc3db3caa4b01cfdc57c157f95c1e70e278de87e85a1"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/IshmaelREV.h",
+      "sha256": "881ac4a99b8b6b3aa1430be38fcfa4dc0155bc934911e79af3ae93a63542ff2a"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Anim_Sound.h",
+      "sha256": "3e42f686a5f492bdca336efdba239d61617b366221c559c8942f6e35824ccde4"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GameWeapons.cpp",
+      "sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GameProjectiles.cpp",
+      "sha256": "d713d649cab9e9378ae7992ad74b0e608b6af534f3c5a4df39125219c0970e4f"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ObjectFX.cpp",
+      "sha256": "1af815cdb07c8e0fcd56bebb723e78b539cd3398221a78e3b3fcf977bf109c48"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
+      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342"
+    },
+    {
+      "path": "sources/lithtech/runtime/server/src/serverde_impl.cpp",
+      "sha256": "5e1973f36bea781f23f99d7e0bb32ddb474ebf83c142c6877b15c157ba2fd53f"
+    },
+    {
+      "path": "sources/lithtech/runtime/world/src/world_tree.cpp",
+      "sha256": "ba509c8bb89518e9023b10e0cc317cde47ee2297640a19fe15c645820651e194"
+    },
+    {
+      "path": "sources/lithtech/runtime/world/src/de_objects.h",
+      "sha256": "b45f7d0b5846843ccbeab2e6c044d6d30fef4f5eceb7b0ae0ec716d9bf6f9f8f"
+    }
+  ]
+}

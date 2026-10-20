@@ -1,0 +1,19 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1176: ishmael.teleport
+1/1 Test #1176: ishmael.teleport .................***Failed    0.02 sec
+sounds/chosen/ishmael\laugh3.wav: Missing or oversized sound resource
+teleport:167: npc->AnimSound()->sound_error.empty()
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+headless    =   0.02 sec*proc (1 test)
+ishmael     =   0.02 sec*proc (1 test)
+private     =   0.02 sec*proc (1 test)
+
+Total Test time (real) =   0.04 sec
+
+The following tests FAILED:
+	1176 - ishmael.teleport (Failed)                         headless ishmael private
+Errors while running CTest

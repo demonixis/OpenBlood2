@@ -61,8 +61,8 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_ran
         return Init(type, owner, failure);
     failure.clear();
     *this = {};
-    if ((type != 3 && type != 19 && type != 36 && type != 21 && type != 24 && type != 31 && type != 32 && type != 33 &&
-         (type < 12 || type > 17)) ||
+    if ((type != 3 && type != 18 && type != 19 && type != 36 && type != 21 && type != 24 && type != 31 && type != 32 &&
+         type != 33 && (type < 12 || type > 17)) ||
         !owner)
     {
         failure = "Unsupported object particle recipe or absent parent";
@@ -152,24 +152,24 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_ran
         return true;
     }
     const bool shield = type == 19;
-    radius = shield ? 500.f : 1750.f;
+    radius = shield || type == 18 ? 500.f : 1750.f;
     gravity = shield ? 0.f : 150.f;
     duration = shield ? 5.f : 2.5f;
     density = 0;
     add_delay = .1f;
-    requested_alpha = shield ? 1.f : .5f;
+    requested_alpha = shield || type == 18 ? 1.f : .5f;
     min_life = shield ? .5f : .75f;
-    max_life = shield ? .75f : 1.f;
+    max_life = shield ? .75f : type == 18 ? .9f : 1.f;
     authored_count = shield ? 24 : 18;
     flags = 0;
     ramp_down = .25f;
-    position_radius = shield ? 45.f : 25.f;
+    position_radius = shield ? 45.f : type == 18 ? 20.f : 25.f;
     offset = shield ? DVector{} : DVector{-25, 0, 0};
     rotations =
         shield ? DVector{draw(random, 0, .01f), draw(random, 0, .015f), draw(random, 0, .01f)} : DVector{0, .025f, 0};
     min_color = shield ? DVector{192, 192, 0} : DVector{0, 0, 255};
-    max_color = shield ? DVector{255, 255, 255} : DVector{196, 196, 255};
-    texture = shield ? "SpriteTextures\\Lensflare_1.dtx" : "SpriteTextures\\smoke64_2.dtx";
+    max_color = shield || type == 18 ? DVector{255, 255, 255} : DVector{196, 196, 255};
+    texture = shield || type == 18 ? "SpriteTextures\\Lensflare_1.dtx" : "SpriteTextures\\smoke64_2.dtx";
     initialized_ = true;
     return true;
 }

@@ -9,10 +9,9 @@ initial deltas, three seconds of simulation with movement, a runtime failure
 recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
 combat, multiplayer or GPU certification. M2 closure remains unchanged.
 
-Current verified opening gate after iteration 14: **49 / 58 pass, 9 / 58 fail**
-([audit 12](evidence/all-levels-audit-12.log)). Remaining worlds:
-Rooftop, Ancient City, Arena, Ancient One,
-End and the four CTF maps. Initial-entry and three-second simulation
+Current verified opening gate after iteration 15: **50 / 58 pass, 8 / 58 fail**
+([audit 13](evidence/all-levels-audit-13.log)). Remaining worlds:
+Rooftop, Ancient City, Ancient One, End and the four CTF maps. Initial-entry and three-second simulation
 coverage is not complete gameplay/traversal acceptance. The tables below retain
 the initial baseline; iteration records explain resolved and newly exposed blockers.
 
@@ -561,3 +560,68 @@ externally terminated with status 143 during that encounter; its
 [incomplete output](evidence/all-levels-lot14-sanitizers-interrupted.log) is retained
 and is not counted as a successful run. All 80 selected checks subsequently pass.
 These focused checks and opening audit do not certify complete campaign traversal.
+
+
+## Iteration 15: original Ishmael and revenant
+
+IshmaelAI and IshmaelREV now have original profiles, independent model tables,
+actual weapon/animation-key attacks, heal, teleport/recoil and death behavior.
+[Contracts](../../contracts/ishmael_contracts.md) preserve their target-loss/gravity
+differences, health multiplier and per-target death damage. The new checked sphere
+query includes inactive objects and body extents rather than substituting a
+center-only/destructible-only query. Heal18 and Divine shockball22 have real
+commercial particles, models and audio; point-light illumination remains outside
+this continuation.
+
+[Audit 13](evidence/all-levels-audit-13.log) passes **50 / 58**, fails **8 / 58**.
+Arena now passes all three difficulties and the simulation gate. End has no missing
+class but reaches a newly exposed original Caleb script-animation rejection.
+Remaining work: that script path, EnhancedGideon, UndeadGideon, AncientOne,
+Tentacle and the four CTF worlds' FlagStand/FlagObject behavior. No incomplete
+class placeholders or admission exceptions are introduced.
+
+[56 Dev checks](evidence/all-levels-lot15-dev.log) pass, including eight Ishmael
+cases, original Chosen/Orb, object contracts, particle/model/ring/light services
+and Cathedral/Sewage/Slaughter regressions. Tests cover all difficulty profiles,
+actual Orb FIRE_KEY delivery, both attack weapons, heal timing, source fade and
+revenant gravity, real death effects and per-target damage without falloff,
+inactive/body-extent sphere selection, cleanup and all three authored instances.
+
+The [first test run](evidence/all-levels-lot15-initial.log) exposed the original
+missing laugh resource. [Diagnosis](evidence/all-levels-lot15-teleport-debug.log)
+and [all-three index checks](evidence/all-levels-lot15-second.log) confirm that
+laugh1/2/3 are all absent. Tests preserve these exact sound failures and verify
+continued source teleport behavior; they do not require invented audio.
+The [initial key fixture](evidence/all-levels-lot15-dev-initial.log) did not advance
+model clocks; its [second revision](evidence/all-levels-lot15-key-second.log)
+allowed the original automatic deactivation without player wake-up. The
+[final fixture](evidence/all-levels-lot15-key-final.log) runs real session/model
+updates with explicit diagnostic activation and observes an actual Orb shot.
+
+[Ten Release checks](evidence/all-levels-lot15-release.log) pass, including both
+actual model/skin pairs at three animation times: 16,269 filled pixels, zero
+CPU/GPU differences. The [final effects readback](evidence/all-levels-lot15-gpu-effects.log)
+uses the same alpha style as production and a camera outside the shockball:
+216 blue heal pixels, 2,923 red shockball pixels and exact empty background after
+expiry. Captures were visually inspected. [Arena application opening](evidence/all-levels-arena-gpu.log)
+renders three Release frames and exits successfully on NVIDIA RTX 3060.
+Dev inspector and Release applications build; shaders and dependencies are unchanged.
+
+![Ishmael](evidence/all-levels-ishmael-0.png)
+![Ishmael revenant](evidence/all-levels-ishmael-1.png)
+![Original heal ring](evidence/all-levels-ishmael-heal.png)
+![Original Divine shockball](evidence/all-levels-ishmael-shockball.png)
+
+All 56 selected behaviors also complete under Clang Debug ASan/UBSan with leak
+detection. The [combined run](evidence/all-levels-lot15-sanitizers-initial.log)
+passes 54 tests, retains the old key fixture failure and times out Slaughter House
+at 120 seconds. The [recheck](evidence/all-levels-lot15-sanitizers-recheck.log)
+passes the corrected key fixture and reproduces that timeout without compilation.
+The [same Slaughter House binary](evidence/all-levels-lot15-sanitizers-slaughter-timed.log)
+then completes every assertion, all three difficulties and cleanup in **238.19
+seconds**, exit 0, under an external 240-second bound. The two CTest timeouts remain
+recorded failures, not silently reclassified passes. Only that sanitizer test's
+future timeout is raised to 300 seconds on this measured evidence; its workload,
+assertions, compiler optimization and production code are unchanged. CTest metadata
+was checked after the budget adjustment; the identical long workload was not run
+a fourth time. These are focused behavior/opening checks, not campaign acceptance.

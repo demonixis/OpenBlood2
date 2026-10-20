@@ -16,13 +16,13 @@ namespace OpenBlood2
         }
         if (type == 6 || type == 8)
             return true; // No ring branch in these high-detail recipes.
-        if (type == 17)
+        if (type == 17 || type == 22)
         {
-            const auto n = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
+            const auto n = type == 22 ? normal : vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
             ExplosionRingSettings s;
             s.position = vector_add(pos, vector_scale(n, 30));
             s.normal = n;
-            s.color = {1, .85f, 0};
+            s.color = type == 22 ? DVector{1, 0, 0} : DVector{1, .85f, 0};
             s.radius = 7500;
             s.position_radius = 25;
             s.velocity = 1000;

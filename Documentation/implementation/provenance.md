@@ -1684,3 +1684,14 @@ integrated using typed services. [Source hashes](sources/all_levels_orb_sources.
 and [contracts](../contracts/orb_contracts.md) record exact source behavior and
 finite initialization/lifetime adaptations. Commercial/reference data, renderer
 pipelines and dependency revisions are unchanged.
+
+### Complete-level continuation: Ishmael and revenant
+
+Original IshmaelAI/REV profiles, state/animation rules, teleport, heal and death
+are shared without removing their distinct target-loss/gravity branches. Actual
+heal18 and Divine shockball22 recipes use the commercial resources. The bounded
+sphere query follows the later-engine geometric reference with explicitly
+replacement slot ordering. [Contracts](../contracts/ishmael_contracts.md) and
+[source hashes](sources/all_levels_ishmael_sources.json) retain these limits,
+missing original laugh resources and unavailable point-light illumination.
+Reference/commercial data and the graphics stack are unchanged.

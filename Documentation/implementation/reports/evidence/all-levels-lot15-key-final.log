@@ -1,0 +1,30 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/dev/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/dev/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1176
+    Start 1176: ishmael.keys
+
+1176: Test command: /home/yann/projects/lithtech/Blood2/build/dev/tests/ishmael_tests "keys" "/home/yann/Games/Blood2"
+1176: Working Directory: /home/yann/projects/lithtech/Blood2/build/dev/tests
+1176: Test timeout computed to be: 180
+1176: key probe state=1 command=3 updates=74 keys=1 error=
+1176: Actual Ishmael animation-key Orb shots=1
+1/1 Test #1176: ishmael.keys .....................   Passed    0.02 sec
+
+The following tests passed:
+	ishmael.keys
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+headless    =   0.02 sec*proc (1 test)
+ishmael     =   0.02 sec*proc (1 test)
+private     =   0.02 sec*proc (1 test)
+
+Total Test time (real) =   0.04 sec

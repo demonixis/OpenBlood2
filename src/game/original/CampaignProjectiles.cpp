@@ -34,6 +34,30 @@ void PublishCampaignExplosion(HOBJECT source, DVector p, DVector n, unsigned typ
     }
     s->RecordSceneExplosion(r);
 }
+bool PublishDivineShockball(HOBJECT source, DVector p, DVector n, SceneExplosionReport& r, const char* sound)
+{
+    auto* s = g_pServerDE;
+    r = {};
+    r.source = s->GetObjectName(source);
+    r.position = p;
+    r.normal = n;
+    r.type = 22;
+    r.model_event = s->PublishExplosionModels(source, 22, p, n, r.model_error);
+    r.ring_event = s->PublishExplosionRings(source, 22, p, n, r.ring_error);
+    r.light_event = s->PublishExplosionLights(source, 22, p, n, r.light_error);
+    if (sound)
+    {
+        SoundRequest request;
+        r.sound = request.resource = sound;
+        request.inner_radius = 200;
+        request.outer_radius = 2000;
+        request.priority = 1;
+        r.voice = s->PlayDetachedSound(source, request, p, r.sound_error);
+    }
+    s->RecordSceneExplosion(r);
+    return r.model_event && r.ring_event && r.light_event && r.model_error.empty() && r.ring_error.empty() &&
+           r.light_error.empty() && r.sound_error.empty();
+}
 CTimeBomb::CTimeBomb()
 {
     skin = "Skins\\Ammo\\c4_time.dtx";
@@ -223,8 +247,14 @@ bool CGroundStrikeProjectile::Update()
 void CShockwaveProjectile::AddExplosion(DVector p, DVector n)
 {
     auto* ai = dynamic_cast<AI_Mgr*>(g_pServerDE->HandleToObject(m_hFiredFrom));
-    PublishCampaignExplosion(m_hObject, p, n,
-                             ai && ai->npc_type == AI_Mgr::NPCType::Zealot && !ai->npc_divine ? 19 : 22);
+    if (ai && ai->npc_type == AI_Mgr::NPCType::Zealot && !ai->npc_divine)
+        PublishCampaignExplosion(m_hObject, p, n, 19);
+    else
+    {
+        SceneExplosionReport effect;
+        if (!PublishDivineShockball(m_hObject, p, n, effect))
+            Fail("Divine shockwave presentation failed");
+    }
 }
 bool CShockwaveProjectile::Update()
 {
@@ -248,6 +278,8 @@ bool CShockwaveProjectile::Update()
     else if (query != SegmentResult::Miss)
         return Fail("Zealot shockwave ground ray unavailable");
     AddExplosion(p, normal);
+    if (failed)
+        return false;
     std::vector<HOBJECT> snapshot;
     auto& head = CDestructable::m_DestructableHead;
     for (auto* link = head.m_pNext; link && link != &head; link = link->m_pNext)
