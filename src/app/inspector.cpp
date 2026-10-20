@@ -8,6 +8,7 @@
 #include "game/original/ClientLightFX.h"
 #include "game/original/DestructableModel.h"
 #include "game/original/Door.h"
+#include "game/original/FlagObjects.h"
 #include "game/original/FlareProjectile.h"
 #include "game/original/Grenade.h"
 #include "game/original/Key.h"
@@ -1700,6 +1701,26 @@ namespace OpenBlood2
         }
         else if (!hud_status)
             ImGui::TextUnformatted("Original HUD resources await the first visible player frame.");
+        if (player && player->ctf_team)
+        {
+            ImGui::Text("CTF local inspection: team %d, player score %d, teams %d / %d", player->ctf_team,
+                        player->ctf_score, g_ctf.team_scores[0], g_ctf.team_scores[1]);
+            if (ImGui::Button("Join blue team"))
+                player->SetCTFTeam(1);
+            ImGui::SameLine();
+            if (ImGui::Button("Join red team"))
+                player->SetCTFTeam(2);
+            ImGui::SameLine();
+            if (ImGui::Button("Drop carried flag"))
+                player->DropFlag();
+            ImGui::TextWrapped("%s", game.client_shell.ctf.notice.c_str());
+            ImGui::TextWrapped("%s %s", player->ctf_error.c_str(), game.client_shell.ctf.error.c_str());
+            for (const auto* f : g_ctf.flags)
+                if (f)
+                    ImGui::Text("Flag team %d: stand %d, ground %d, carried %d; grabs %llu returns %llu drops %llu",
+                                f->team, f->in_stand, f->on_ground, f->with_player, (unsigned long long)f->grabs,
+                                (unsigned long long)f->returns, (unsigned long long)f->drops);
+        }
         const auto& boss_client = game.client_shell;
         ImGui::Text("Boss health messages %llu | raw ratio %.3f | bar %s",
                     (unsigned long long)boss_client.boss_health_messages, boss_client.boss_health.fraction,

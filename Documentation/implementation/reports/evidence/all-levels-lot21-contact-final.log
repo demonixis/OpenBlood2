@@ -1,0 +1,21 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1221: ctf.contact
+1/2 Test #1221: ctf.contact ......................***Failed    0.04 sec
+Contact: start 1100,563.375,1536 end 1300,554,1536 actual 1172,554,1536 flag 1200,563.375,1536 dims 13.7253,35.9156,6.49403 grabs 0 trigger flaggive error 
+contact:225: p->m_hFlagObject == f->m_hObject && f->with_player && f->grabs == 1 && pump(*g)
+
+    Start 1222: ctf.replacement
+2/2 Test #1222: ctf.replacement ..................   Passed    0.11 sec
+
+50% tests passed, 1 tests failed out of 2
+
+Label Time Summary:
+ctf         =   0.16 sec*proc (2 tests)
+headless    =   0.16 sec*proc (2 tests)
+private     =   0.16 sec*proc (2 tests)
+
+Total Test time (real) =   0.17 sec
+
+The following tests FAILED:
+	1221 - ctf.contact (Failed)                              ctf headless private
+Errors while running CTest

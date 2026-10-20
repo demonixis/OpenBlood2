@@ -151,6 +151,17 @@ class CBloodClientShell
         bool pending = false;
         bool demo_end_pending = false; // Owned terminal intent; never a DAT load request.
     } world_exit;
+    struct CTFState
+    {
+        DBYTE team = 0, flag_icon = 0;
+        int score = 0;
+        std::uint64_t messages = 0, notices = 0, sounds = 0;
+        float last_need_flag = 0;
+        std::uint32_t notice_resource = 0;
+        std::string notice, error;
+        OpenBlood2::SoundId voice = 0;
+    } ctf;
+    bool HandleCTF(const OpenBlood2::CTFEvent&);
     OpenBlood2::BossHealth boss_health;
     std::uint64_t boss_health_messages = 0;
     bool boss_health_visible = false;

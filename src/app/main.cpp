@@ -889,7 +889,8 @@ namespace
             if (!hud.draw(OpenBlood2::hud_state(game->client_shell.stats, game->client_shell.m_bInWorld,
                                                 game->client_shell.view.object != nullptr,
                                                 game->client_shell.death_camera.active,
-                                                game->client_shell.m_bShowCrosshair, game->client_shell.m_nCrosshair),
+                                                game->client_shell.m_bShowCrosshair, game->client_shell.m_nCrosshair,
+                                                game->client_shell.ctf.team, game->client_shell.ctf.flag_icon),
                           game->resources, error))
             {
                 spdlog::error("Original HUD: {}", error);

@@ -1,0 +1,277 @@
+Start testing: Oct 20 14:51 CEST
+----------------------------------------------------------
+1036/1351 Testing: gpu.hud
+1036/1351 Test: gpu.hud
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/hud_tests" "gpu" "/home/yann/projects/lithtech/Blood2/build/release/tests/hud-gpu" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.hud" start time: Oct 20 14:51 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+cycle 0 frame 0 HUD pixels 4153
+cycle 0 frame 1 HUD pixels 3705
+cycle 0 frame 2 HUD pixels 3658
+cycle 0 frame 3 HUD pixels 3642
+cycle 0 frame 4 HUD pixels 0
+cycle 0 frame 5 HUD pixels 4369
+cycle 0 frame 6 HUD pixels 0
+cycle 0 frame 7 HUD pixels 16
+cycle 1 frame 0 HUD pixels 4153
+cycle 1 frame 1 HUD pixels 3705
+cycle 1 frame 2 HUD pixels 3658
+cycle 1 frame 3 HUD pixels 3642
+cycle 1 frame 4 HUD pixels 0
+cycle 1 frame 5 HUD pixels 4369
+cycle 1 frame 6 HUD pixels 0
+cycle 1 frame 7 HUD pixels 16
+cycle 2 frame 0 HUD pixels 1702
+cycle 2 frame 1 HUD pixels 1425
+cycle 2 frame 2 HUD pixels 1378
+cycle 2 frame 3 HUD pixels 1362
+cycle 2 frame 4 HUD pixels 0
+cycle 2 frame 5 HUD pixels 2087
+cycle 2 frame 6 HUD pixels 0
+cycle 2 frame 7 HUD pixels 16
+<end of output>
+Test time =   0.74 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.hud" end time: Oct 20 14:51 CEST
+"gpu.hud" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1340/1351 Testing: ctf.profiles
+1340/1351 Test: ctf.profiles
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ctf_tests" "profiles" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ctf.profiles" start time: Oct 20 14:51 CEST
+Output:
+----------------------------------------------------------
+team 1 stand=-1216,531.375,-1536 flag=-1232,563.375,-1536 dims=35.9156
+team 2 stand=1216,531.375,1536 flag=1200,563.375,1536 dims=35.9156
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ctf.profiles" end time: Oct 20 14:51 CEST
+"ctf.profiles" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1341/1351 Testing: ctf.carry
+1341/1351 Test: ctf.carry
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ctf_tests" "carry" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ctf.carry" start time: Oct 20 14:51 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ctf.carry" end time: Oct 20 14:51 CEST
+"ctf.carry" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1342/1351 Testing: ctf.capture
+1342/1351 Test: ctf.capture
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ctf_tests" "capture" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ctf.capture" start time: Oct 20 14:51 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"ctf.capture" end time: Oct 20 14:51 CEST
+"ctf.capture" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1343/1351 Testing: ctf.lifetime
+1343/1351 Test: ctf.lifetime
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ctf_tests" "lifetime" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ctf.lifetime" start time: Oct 20 14:51 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ctf.lifetime" end time: Oct 20 14:51 CEST
+"ctf.lifetime" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1344/1351 Testing: ctf.owner
+1344/1351 Test: ctf.owner
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ctf_tests" "owner" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ctf.owner" start time: Oct 20 14:51 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"ctf.owner" end time: Oct 20 14:51 CEST
+"ctf.owner" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1345/1351 Testing: ctf.death
+1345/1351 Test: ctf.death
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ctf_tests" "death" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ctf.death" start time: Oct 20 14:51 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"ctf.death" end time: Oct 20 14:51 CEST
+"ctf.death" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1346/1351 Testing: ctf.contact
+1346/1351 Test: ctf.contact
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ctf_tests" "contact" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ctf.contact" start time: Oct 20 14:51 CEST
+Output:
+----------------------------------------------------------
+Contact: start 1100,598.375,1536 end 1300,598.375,1536 actual 1300,598.375,1536 flag 1300,673.375,1536 dims 13.7253,35.9156,6.49403 grabs 1 trigger flaggrab error 
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"ctf.contact" end time: Oct 20 14:51 CEST
+"ctf.contact" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1347/1351 Testing: ctf.replacement
+1347/1351 Test: ctf.replacement
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ctf_tests" "replacement" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ctf.replacement" start time: Oct 20 14:51 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.13 sec
+----------------------------------------------------------
+Test Passed.
+"ctf.replacement" end time: Oct 20 14:51 CEST
+"ctf.replacement" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1348/1351 Testing: ctf.hud
+1348/1351 Test: ctf.hud
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ctf_tests" "hud" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ctf.hud" start time: Oct 20 14:51 CEST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"ctf.hud" end time: Oct 20 14:51 CEST
+"ctf.hud" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1349/1351 Testing: ctf.worlds
+1349/1351 Test: ctf.worlds
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/ctf_tests" "worlds" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"ctf.worlds" start time: Oct 20 14:51 CEST
+Output:
+----------------------------------------------------------
+multi/ctf_cabana opened, simulated and unloaded
+multi/ctf_deadcities opened, simulated and unloaded
+multi/ctf_dmx opened, simulated and unloaded
+multi/ctf_jam opened, simulated and unloaded
+<end of output>
+Test time =   2.70 sec
+----------------------------------------------------------
+Test Passed.
+"ctf.worlds" end time: Oct 20 14:51 CEST
+"ctf.worlds" time elapsed: 00:00:02
+----------------------------------------------------------
+
+1350/1351 Testing: gpu.ctf_models
+1350/1351 Test: gpu.ctf_models
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/model_skinning_gpu_tests" "/home/yann/projects/lithtech/Blood2/build/release/tests/ctf-model" "/home/yann/.steam/steam/steamapps/common/Blood II" "ctf"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.ctf_models" start time: Oct 20 14:51 CEST
+Output:
+----------------------------------------------------------
+Synthetic mask 0 time 0: 3365/3365 filled, 0 differing, max delta 0
+Synthetic mask 0 time 37.5: 3489/3489 filled, 0 differing, max delta 0
+Synthetic mask 0 time 100: 3421/3421 filled, 0 differing, max delta 0
+Synthetic mask 1 time 0: 1737/1737 filled, 0 differing, max delta 0
+Synthetic mask 1 time 37.5: 1929/1929 filled, 0 differing, max delta 0
+Synthetic mask 1 time 100: 1987/1987 filled, 0 differing, max delta 0
+Synthetic mask 2 time 0: 1526/1526 filled, 0 differing, max delta 0
+Synthetic mask 2 time 37.5: 1412/1412 filled, 0 differing, max delta 0
+Synthetic mask 2 time 100: 1103/1103 filled, 0 differing, max delta 0
+Retail CPU/GPU skinning equivalence: 4 distinct assets at three clip times, 14554 filled pixels, 0 differing by more than 1, max delta 0
+GPU skinning matches CPU posing, deformation, scale, hidden faces and instance transforms
+<end of output>
+Test time =   0.71 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.ctf_models" end time: Oct 20 14:51 CEST
+"gpu.ctf_models" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1351/1351 Testing: gpu.ctf_hud
+1351/1351 Test: gpu.ctf_hud
+Command: "/home/yann/projects/lithtech/Blood2/build/release/tests/hud_tests" "gpu_ctf" "/home/yann/projects/lithtech/Blood2/build/release/tests/ctf-hud" "/home/yann/.steam/steam/steamapps/common/Blood II"
+Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+"gpu.ctf_hud" start time: Oct 20 14:51 CEST
+Output:
+----------------------------------------------------------
+GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+cycle 0 frame 0 HUD pixels 8424
+cycle 0 frame 1 HUD pixels 7979
+cycle 0 frame 2 HUD pixels 6389
+cycle 0 frame 3 HUD pixels 6373
+cycle 0 frame 4 HUD pixels 0
+cycle 0 frame 5 HUD pixels 7441
+cycle 0 frame 6 HUD pixels 0
+cycle 0 frame 7 HUD pixels 16
+cycle 1 frame 0 HUD pixels 8424
+cycle 1 frame 1 HUD pixels 7979
+cycle 1 frame 2 HUD pixels 6389
+cycle 1 frame 3 HUD pixels 6373
+cycle 1 frame 4 HUD pixels 0
+cycle 1 frame 5 HUD pixels 7441
+cycle 1 frame 6 HUD pixels 0
+cycle 1 frame 7 HUD pixels 16
+cycle 2 frame 0 HUD pixels 5973
+cycle 2 frame 1 HUD pixels 5699
+cycle 2 frame 2 HUD pixels 4109
+cycle 2 frame 3 HUD pixels 4093
+cycle 2 frame 4 HUD pixels 0
+cycle 2 frame 5 HUD pixels 5159
+cycle 2 frame 6 HUD pixels 0
+cycle 2 frame 7 HUD pixels 16
+<end of output>
+Test time =   0.73 sec
+----------------------------------------------------------
+Test Passed.
+"gpu.ctf_hud" end time: Oct 20 14:51 CEST
+"gpu.ctf_hud" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 20 14:51 CEST
+
+ctf =   4.64 sec*proc
+
+gpu =   2.18 sec*proc
+
+headless =   3.20 sec*proc
+
+hud =   0.74 sec*proc
+
+private =   5.39 sec*proc
+

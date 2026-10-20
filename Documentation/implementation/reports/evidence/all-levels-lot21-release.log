@@ -1,0 +1,50 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start 1036: gpu.hud
+ 1/11 Test #1036: gpu.hud ..........................   Passed    0.70 sec
+      Start 1340: ctf.profiles
+ 2/11 Test #1340: ctf.profiles .....................   Passed    0.06 sec
+      Start 1341: ctf.carry
+ 3/11 Test #1341: ctf.carry ........................   Passed    0.04 sec
+      Start 1342: ctf.capture
+ 4/11 Test #1342: ctf.capture ......................   Passed    0.05 sec
+      Start 1343: ctf.lifetime
+ 5/11 Test #1343: ctf.lifetime .....................   Passed    0.04 sec
+      Start 1344: ctf.owner
+ 6/11 Test #1344: ctf.owner ........................   Passed    0.04 sec
+      Start 1345: ctf.death
+ 7/11 Test #1345: ctf.death ........................   Passed    0.05 sec
+      Start 1346: ctf.hud
+ 8/11 Test #1346: ctf.hud ..........................   Passed    0.05 sec
+      Start 1347: ctf.worlds
+ 9/11 Test #1347: ctf.worlds .......................   Passed    2.77 sec
+      Start 1348: gpu.ctf_models
+10/11 Test #1348: gpu.ctf_models ...................***Failed    0.68 sec
+Synthetic mask 0 time 0: 3365/3365 filled, 0 differing, max delta 0
+Synthetic mask 0 time 37.5: 3489/3489 filled, 0 differing, max delta 0
+Synthetic mask 0 time 100: 3421/3421 filled, 0 differing, max delta 0
+Synthetic mask 1 time 0: 1737/1737 filled, 0 differing, max delta 0
+Synthetic mask 1 time 37.5: 1929/1929 filled, 0 differing, max delta 0
+Synthetic mask 1 time 100: 1987/1987 filled, 0 differing, max delta 0
+Synthetic mask 2 time 0: 1526/1526 filled, 0 differing, max delta 0
+Synthetic mask 2 time 37.5: 1412/1412 filled, 0 differing, max delta 0
+Synthetic mask 2 time 100: 1103/1103 filled, 0 differing, max delta 0
+Retail CPU/GPU skinning equivalence: 3 distinct assets at three clip times, 10918 filled pixels, 0 differing by more than 1, max delta 0
+317: ctf ? compared == 4 : ancient ? compared >= 2 : undead || enhanced ? compared == 1 : ishmael ? compared == 2 : chosen ? compared == 4 : compared >= 10  
+
+      Start 1349: gpu.ctf_hud
+11/11 Test #1349: gpu.ctf_hud ......................   Passed    0.66 sec
+
+91% tests passed, 1 tests failed out of 11
+
+Label Time Summary:
+ctf         =   4.44 sec*proc (10 tests)
+gpu         =   2.04 sec*proc (3 tests)
+headless    =   3.10 sec*proc (8 tests)
+hud         =   0.70 sec*proc (1 test)
+private     =   5.14 sec*proc (11 tests)
+
+Total Test time (real) =   5.17 sec
+
+The following tests FAILED:
+	1348 - gpu.ctf_models (Failed)                           ctf gpu private
+Errors while running CTest

@@ -9,7 +9,7 @@
 // Original ProcessTriggerMsg uses only a space-delimited first token. Fade
 // suffixes are ignored, and dispatch has no dead-player guard. Other command
 // families remain explicitly inspectable rather than pretending they ran.
-void CPlayerObj::ProcessTriggerMsg(HMESSAGEREAD read)
+void CPlayerObj::ProcessTriggerMsg(HMESSAGEREAD read, HOBJECT sender)
 {
     auto* server = GetServerDE();
     auto text = server->ReadFromMessageHString(read);
@@ -65,13 +65,12 @@ void CPlayerObj::ProcessTriggerMsg(HMESSAGEREAD read)
                 player_trigger_error = "Music client delivery failed";
         }
     }
-    else if (OpenBlood2::same_name(token, "flaggrab") || OpenBlood2::same_name(token, "flaggive") ||
-             OpenBlood2::same_name(token, "flagdrop"))
-    {
-        ++unsupported_triggers;
-        last_unsupported_player_trigger = last_player_trigger;
-        player_trigger_error = "Player trigger command is not integrated";
-    }
+    else if (OpenBlood2::same_name(token, "flaggrab"))
+        GrabFlag(sender);
+    else if (OpenBlood2::same_name(token, "flaggive"))
+        GiveFlag(sender);
+    else if (OpenBlood2::same_name(token, "flagdrop"))
+        DropFlag();
     else
         ++ignored_triggers; // Original ProcessTriggerMsg has no branch for this token.
 }
@@ -86,7 +85,7 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
             return 0;
     }
     if (message == 1000 /* MID_TRIGGER */)
-        ProcessTriggerMsg(read);
+        ProcessTriggerMsg(read, sender);
     // Original PlayerObj.cpp 4266-4280: ignore volume damage during the first
     // two level seconds. The explicit level clock survives delayed player entry
     // without restarting the grace period, and resets on world replacement.

@@ -1,4 +1,4 @@
-# All mounted retail levels — implementation backlog
+# All mounted retail levels — opening audit and implementation record
 
 Requested on 2026-10-20. Baseline `25e6acc`, external retail 2.1 installation,
 58 mounted DAT worlds. [Raw audit](evidence/all-levels-audit-01.log).
@@ -9,20 +9,27 @@ initial deltas, three seconds of simulation with movement, a runtime failure
 recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
 combat, multiplayer or GPU certification. M2 closure remains unchanged.
 
-Current verified opening gate after iteration 20: **54 / 58 pass, 4 / 58 fail**
-([audit 18](evidence/all-levels-audit-18.log)). Remaining worlds:
-the four CTF maps. Initial-entry and three-second simulation
-coverage is not complete gameplay/traversal acceptance. The tables below retain
-the initial baseline; iteration records explain resolved and newly exposed blockers.
+Current verified opening gate after iteration 21: **58 / 58 pass, 0 / 58 fail**
+([audit 19](evidence/all-levels-audit-19.log)). All three difficulties pass entry,
+initial deltas, three seconds of simulation/movement, runtime recheck and unload.
+The [inspector-free Release GPU sweep](evidence/all-levels-gpu-audit-02.log) also
+passes **58 / 58**, rendering three frames per world on NVIDIA RTX 3060.
+Individual commands and output are retained in [the GPU evidence directory](evidence/all-levels-gpu-audit-02/).
 
-## Remaining implementation queue after iteration 20
+## Remaining implementation queue after iteration 21
 
-| Worlds | Required original behavior |
-| --- | --- |
-| `multi/ctf_cabana`, `multi/ctf_deadcities`, `multi/ctf_dmx`, `multi/ctf_jam` | FlagStand and FlagObject models/owned lifetime, touch/trigger handoff, player attachment, drop/death return, timed ground return and original capture/team conditions with truthful local inspection state. Network play is not supplied by the map-inspection entry mode. |
-| All 58 worlds | Repeat all-difficulty entry, simulation/runtime recheck and cleanup after each relevant correction; complete the GPU opening sweep once every map passes admission. Full campaign traversal remains a separate coverage limit. |
+No unresolved blocker remains in the mounted 58-world **opening gate**. Every
+class/service required by the observed failures has a source-based implementation
+or an explicitly documented original missing-resource/data behavior, with the
+original data preserved. Earlier tables and failed logs retain their dated scope.
 
-## Work queue
+This closes the requested loading loop, not complete campaign traversal or retail
+parity. Long battles/scripts, every path/interaction, network play, CTF saves,
+remaining original screens, light illumination and platform qualification remain
+outside this opening coverage. Exact absent authored resources remain visible;
+58 passing openings do not manufacture those assets or clear M2-GPU-001.
+
+## Initial work queue
 
 1. Port missing original classes and their actual required behavior/services.
    Do not register inert placeholders to satisfy admission.
@@ -847,3 +854,79 @@ modified; this continuation does not reopen M2 or clear its GPU reservation.
 ![Ancient One](evidence/all-levels-ancient-one.png)
 
 ![Primary napalm impact](evidence/all-levels-ancient-impact.png)
+
+## Iteration 21: CTF and completion of the mounted-world opening gate
+
+[Original FlagObject/FlagStand and local player capture](../../contracts/ctf_contracts.md)
+now supply the last four map dependencies: actual models/skins, stand placement,
+owned touch triggers, carrying, ground drop, 30-second return, own-flag return,
+capture/team conditions and scoring. Real WAV feedback and original PCX team/flag
+icons are connected. Unexpected removals and staged world replacement preserve
+checked lifetime; snapshots explicitly refuse unsupported CTF match restoration.
+There is no inert class registration or fabricated commercial resource.
+
+The [first tests](evidence/all-levels-lot21-initial.log) pass six of seven cases;
+the original world offset fails. [Placement diagnostics](evidence/all-levels-lot21-placement.log)
+show character ResizeObject raised the nonsolid flag by its half-height. The
+nonphysical centered-dimension branch fixes that error. The
+[second run](evidence/all-levels-lot21-second.log) passes 20 CTF/attachment/HUD checks.
+An [expanded regression run](evidence/all-levels-lot21-dev.log) fails the old
+unclassified-service gate: six completed continuations were missing from the
+coverage catalog. Declaring those actual bounded implementations, including the
+world-finalization-only placement boundary, makes all
+[35 Dev regressions](evidence/all-levels-lot21-dev-final.log) pass. The catalog is
+checked against every declared and traced boundary, without weakening its test.
+
+The additional [contact/replacement tests](evidence/all-levels-lot21-contacts.log)
+initially fail only the contact path. [Diagnostics](evidence/all-levels-lot21-contact-diagnosis.log)
+and the [reverse approach](evidence/all-levels-lot21-contact-final.log) show that
+Cabana's actual solid pedestal stops the player before reaching the flag from
+either ground path. A crossing above that pedestal, as during a jump, exercises
+real swept contact, owned trigger and attachment successfully. All
+[ten final CTF cases](evidence/all-levels-lot21-ctf-final.log) pass, including
+unexpected owner removal and transactional replacement of a world while carrying.
+No collision bypass or contact change was added to make this fixture pass.
+
+The [first Release run](evidence/all-levels-lot21-release.log) fails only its
+model-count assertion: deduplication by model path skipped one skin of the shared
+flag base. The CTF fixture now distinguishes model/skin pairs. All
+[13 final Release checks](evidence/all-levels-lot21-release-final.log) pass.
+[Detailed readback](evidence/all-levels-lot21-release-detail.log) covers both flags
+and both base colors at three clip times: **14554 filled pixels, zero CPU/GPU
+differences**. HUD tests compare actual team/carried-flag PCX pixels, exact magenta
+transparency, switching/dropping, camera hiding and three viewport sizes. Both
+normal and CTF HUD GPU suites pass. Captures were visually inspected.
+
+[35 Clang Debug ASan/UBSan regressions with leak detection](evidence/all-levels-lot21-sanitizers.log) also pass, including the original SubwayA exit/transition
+sequence. The [two final sanitizer additions](evidence/all-levels-lot21-sanitizers-final.log)
+pass real swept flag contact and CTF-to-CTF staged world replacement. These are
+headless checks; the independent GPU sanitizer reservation is unchanged.
+
+[Exhaustive audit 19](evidence/all-levels-audit-19.log) now passes **58 / 58** worlds,
+with **zero failures**, at difficulties 1, 0 and 2. Each includes fresh transactional
+entry, tiny initial deltas, 180 simulated frames, runtime failure recheck and
+string/message/list/object cleanup. Command:
+`build/dev/tests/reported_level_tests audit /home/yann/Games/Blood2`.
+
+The [second complete GPU sweep](evidence/all-levels-gpu-audit-02.log) also passes
+**58 / 58**, with no logged error or Vulkan validation failure. Each independent
+inspector-free Release process runs
+`build/release/blood2 --data-dir <external-retail-root> --world <mounted-world> --view-world --frames 3`.
+[Individual logs](evidence/all-levels-gpu-audit-02/) retain the exact command, GPU,
+world-ready and three-frame completion for every map. This supersedes the first
+42/58 GPU sweep without rewriting any of its failed evidence.
+
+A final source comparison restores the local flag-grab sound's original
+miscellaneous-medium priority. Its decoded voice/priority/no-reverb assertions
+pass in [Dev](evidence/all-levels-lot21-audio-dev.log),
+[Release](evidence/all-levels-lot21-audio-release.log) and
+[ASan/UBSan with leaks](evidence/all-levels-lot21-audio-sanitizers.log); both
+applications are rebuilt. This changes no opening/rendering path.
+
+No dependency pin, shader, reference source or commercial asset changed. M2
+closure and its GPU sanitizer reservation remain unchanged. The opening loop is
+complete for the mounted corpus; the coverage limits listed at the top still apply.
+
+![Blue team carrying red](evidence/all-levels-ctf-blue-hud.png)
+
+![Red team carrying blue](evidence/all-levels-ctf-red-hud.png)

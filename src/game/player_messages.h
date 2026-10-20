@@ -153,6 +153,22 @@ namespace OpenBlood2
     {
         bool in = false;
     };
+    enum class CTFEventKind : DBYTE
+    {
+        Team,
+        Grabbed,
+        Returned,
+        Dropped,
+        NeedFlag,
+        Captured
+    };
+    struct CTFEvent
+    {
+        CTFEventKind kind = CTFEventKind::Team;
+        DBYTE team = 0;
+        int points = 0;
+        HOBJECT capturer = nullptr; // Identity only; never dereferenced by presentation.
+    };
     struct BossHealth
     {
         float fraction = 0;
@@ -181,5 +197,5 @@ namespace OpenBlood2
     using PlayerEvent =
         std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats, MissionObjectives,
                      WorldExit, BossHealth, Conversation, InventoryAction, ScreenFade, VoiceEvent, VoiceStop,
-                     PlayerDead, MusicCommand, ZoomView, SeeingEyeView, CreatureAttach, OrbView>;
+                     PlayerDead, MusicCommand, ZoomView, SeeingEyeView, CreatureAttach, OrbView, CTFEvent>;
 } // namespace OpenBlood2

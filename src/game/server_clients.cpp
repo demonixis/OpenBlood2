@@ -104,6 +104,10 @@ namespace OpenBlood2
                            value.blind_seconds >= 0 && value.blind_seconds <= 10;
                 else if constexpr (std::is_same_v<T, CreatureAttach>)
                     return value.creature && value.enemy;
+                else if constexpr (std::is_same_v<T, CTFEvent>)
+                    return value.team <= 2 &&
+                           static_cast<DBYTE>(value.kind) <= static_cast<DBYTE>(CTFEventKind::Captured) &&
+                           value.points >= 0 && value.points <= 1000000;
                 else if constexpr (std::is_same_v<T, BossHealth>)
                     return std::isfinite(value.fraction);
                 else if constexpr (std::is_same_v<T, WorldExit>)

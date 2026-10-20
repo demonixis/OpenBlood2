@@ -29,6 +29,7 @@
 #include "game/original/ExitHint.h"
 #include "game/original/ExitTrigger.h"
 #include "game/original/Fanatic.h"
+#include "game/original/FlagObjects.h"
 #include "game/original/FlareProjectile.h"
 #include "game/original/GameStartPoint.h"
 #include "game/original/Gib.h"
@@ -632,6 +633,14 @@ namespace OpenBlood2
                                   {"ArmorPoints", 0.0f},
                                   {"AIState", std::string("IDLE"), true, 31},
                                   {"AIWeapon", std::string("NONE")}}};
+        const ClassInfo flag_object{"FlagObject",
+                                    &b2base,
+                                    construct<FlagObject>,
+                                    {{"ObjectName", std::string("CTF_Flag")}, {"TeamID", std::int32_t(0)}}};
+        const ClassInfo flag_stand{"FlagStand",
+                                   &b2base,
+                                   construct<FlagStand>,
+                                   {{"ObjectName", std::string("CTF_FlagStand")}, {"TeamID", std::int32_t(0)}}};
         const ClassInfo sparks_obj{"SparksObj",
                                    &b2base,
                                    construct<SparksObj>,
@@ -1311,6 +1320,7 @@ namespace OpenBlood2
                objects.register_class(chosen_IshmaelREV) && objects.register_class(chosen_GabriellaAI) &&
                objects.register_class(chosen_GabriellaREV) && objects.register_class(chosen_OpheliaAI) &&
                objects.register_class(chosen_OpheliaREV) && objects.register_class(caleb_ai) &&
+               objects.register_class(flag_object) && objects.register_class(flag_stand) &&
                objects.register_class(sparks_obj) && objects.register_class(later_Behemoth) &&
                objects.register_class(later_DrudgePriest) && objects.register_class(later_DeathShroud) &&
                objects.register_class(later_TheHandAI) && objects.register_class(vomit_projectile) &&

@@ -1,0 +1,30 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1215: ctf.profiles
+1/7 Test #1215: ctf.profiles .....................***Failed    0.04 sec
+profiles:41: std::abs(r->state.m_Pos.x - br->state.m_Pos.x +16) < .01 && std::abs(r->state.m_Pos.y - br->state.m_Pos.y -32) < .01
+
+    Start 1216: ctf.carry
+2/7 Test #1216: ctf.carry ........................   Passed    0.04 sec
+    Start 1217: ctf.capture
+3/7 Test #1217: ctf.capture ......................   Passed    0.04 sec
+    Start 1218: ctf.lifetime
+4/7 Test #1218: ctf.lifetime .....................   Passed    0.04 sec
+    Start 1219: ctf.death
+5/7 Test #1219: ctf.death ........................   Passed    0.04 sec
+    Start 1220: ctf.hud
+6/7 Test #1220: ctf.hud ..........................   Passed    0.04 sec
+    Start 1221: ctf.worlds
+7/7 Test #1221: ctf.worlds .......................   Passed    2.55 sec
+
+86% tests passed, 1 tests failed out of 7
+
+Label Time Summary:
+ctf         =   2.80 sec*proc (7 tests)
+headless    =   2.80 sec*proc (7 tests)
+private     =   2.80 sec*proc (7 tests)
+
+Total Test time (real) =   2.82 sec
+
+The following tests FAILED:
+	1215 - ctf.profiles (Failed)                             ctf headless private
+Errors while running CTest

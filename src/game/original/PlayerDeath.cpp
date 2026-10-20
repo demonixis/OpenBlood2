@@ -22,6 +22,7 @@ void CPlayerObj::HandleDeath()
         death_error = "Player death requires a checked local client";
         return;
     }
+    DropFlag(); // Source drops before checking the lethal attacker.
     // Original null WhoKilledMeLast guard. Identity comparison needs no live
     // attacker pointer: the attacker may have been removed since the lethal hit.
     if (!m_damage.last_damage.attacker)

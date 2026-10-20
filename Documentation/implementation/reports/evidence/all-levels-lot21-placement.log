@@ -1,0 +1,2 @@
+team 1 stand=-1216,531.375,-1536 flag=-1232,599.291,-1536 dims=35.9156
+profiles:42: std::abs(r->state.m_Pos.x - br->state.m_Pos.x +16) < .01 && std::abs(r->state.m_Pos.y - br->state.m_Pos.y -32) < .01

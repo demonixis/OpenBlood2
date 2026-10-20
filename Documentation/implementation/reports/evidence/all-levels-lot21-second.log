@@ -1,0 +1,52 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start  375: attachments.root
+ 1/20 Test  #375: attachments.root .................   Passed    0.00 sec
+      Start  376: attachments.nodes
+ 2/20 Test  #376: attachments.nodes ................   Passed    0.00 sec
+      Start  377: attachments.rejects
+ 3/20 Test  #377: attachments.rejects ..............   Passed    0.01 sec
+      Start  378: attachments.lifetime
+ 4/20 Test  #378: attachments.lifetime .............   Passed    0.00 sec
+      Start  379: attachments.held
+ 5/20 Test  #379: attachments.held .................   Passed    0.00 sec
+      Start  380: attachments.missing
+ 6/20 Test  #380: attachments.missing ..............   Passed    0.00 sec
+      Start  381: attachments.catalog
+ 7/20 Test  #381: attachments.catalog ..............   Passed    0.03 sec
+      Start  382: attachments.subway
+ 8/20 Test  #382: attachments.subway ...............   Passed    0.13 sec
+      Start  932: hud.bitmaps
+ 9/20 Test  #932: hud.bitmaps ......................   Passed    0.00 sec
+      Start  933: hud.values
+10/20 Test  #933: hud.values .......................   Passed    0.00 sec
+      Start  934: hud.input
+11/20 Test  #934: hud.input ........................   Passed    0.00 sec
+      Start  935: hud.session
+12/20 Test  #935: hud.session ......................   Passed    0.01 sec
+      Start  936: hud.private
+13/20 Test  #936: hud.private ......................   Passed    0.17 sec
+      Start 1215: ctf.profiles
+14/20 Test #1215: ctf.profiles .....................   Passed    0.04 sec
+      Start 1216: ctf.carry
+15/20 Test #1216: ctf.carry ........................   Passed    0.04 sec
+      Start 1217: ctf.capture
+16/20 Test #1217: ctf.capture ......................   Passed    0.04 sec
+      Start 1218: ctf.lifetime
+17/20 Test #1218: ctf.lifetime .....................   Passed    0.04 sec
+      Start 1219: ctf.death
+18/20 Test #1219: ctf.death ........................   Passed    0.04 sec
+      Start 1220: ctf.hud
+19/20 Test #1220: ctf.hud ..........................   Passed    0.04 sec
+      Start 1221: ctf.worlds
+20/20 Test #1221: ctf.worlds .......................   Passed    2.59 sec
+
+100% tests passed, 0 tests failed out of 20
+
+Label Time Summary:
+attachments    =   0.18 sec*proc (8 tests)
+ctf            =   2.83 sec*proc (7 tests)
+headless       =   3.18 sec*proc (20 tests)
+hud            =   0.18 sec*proc (5 tests)
+private        =   3.15 sec*proc (10 tests)
+
+Total Test time (real) =   3.20 sec

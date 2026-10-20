@@ -4,6 +4,7 @@
 #include "game/original/ClientParticleStreamSFX.h"
 #include "game/original/DestructableModel.h"
 #include "game/original/DetailSprite.h"
+#include "game/original/FlagObjects.h"
 #include "game/original/ParticleSystem.h"
 #include "game/original/PickupObject.h"
 #include "game/original/SkyObjects.h"
@@ -663,7 +664,10 @@ namespace OpenBlood2
         if (!cleared)
             return false;
         if (g_pServerDE == &server)
+        {
             AI_Mgr::ResetRuntimeTables();
+            g_ctf = {};
+        }
         server.reset_world_time();
         server_shell.PreStartWorld();
         server_shell.start_point_name.clear();

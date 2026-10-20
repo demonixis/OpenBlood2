@@ -2,6 +2,7 @@
 #include "engine/world_view.h"
 #include "game/original/ClientLightningSFX.h"
 #include "game/original/ClientWarpGateSFX.h"
+#include "game/original/FlagObjects.h"
 #include "game/original/Minefield.h"
 #include "game/original/SkyObjects.h"
 #include "game/original/SparksObj.h"
@@ -73,6 +74,31 @@ namespace OpenBlood2
                               row.state == EntryState::AbsentOriginalClass || row.state == EntryState::MissingResource;
             report.entries.push_back(std::move(row));
         }
+        if (!game.client_shell.ctf.error.empty())
+        {
+            error = "CTF client: " + game.client_shell.ctf.error;
+            return false;
+        }
+        for (auto id : game.objects.snapshot())
+            if (const auto* r = game.objects.get(id); r && r->life == Life::Alive)
+            {
+                if (const auto* f = dynamic_cast<const FlagObject*>(r->game.get());
+                    f && (!f->error.empty() || !f->sound_error.empty()))
+                {
+                    error = "FlagObject: " + f->error + " " + f->sound_error;
+                    return false;
+                }
+                if (const auto* f = dynamic_cast<const FlagStand*>(r->game.get()); f && !f->error.empty())
+                {
+                    error = "FlagStand: " + f->error;
+                    return false;
+                }
+                if (const auto* p = dynamic_cast<const CPlayerObj*>(r->game.get()); p && !p->ctf_error.empty())
+                {
+                    error = "Player CTF: " + p->ctf_error;
+                    return false;
+                }
+            }
         for (auto id : game.objects.snapshot())
             if (const auto* r = game.objects.get(id); r && r->life == Life::Alive)
                 if (const auto* mine = dynamic_cast<const Minefield*>(r->game.get()); mine && !mine->error.empty())

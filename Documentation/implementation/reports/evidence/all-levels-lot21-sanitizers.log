@@ -1,0 +1,86 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start   65: world.level_change_private
+ 1/35 Test   #65: world.level_change_private ........   Passed   33.82 sec
+      Start   66: world.destination_trial_private
+ 2/35 Test   #66: world.destination_trial_private ...   Passed   37.69 sec
+      Start  362: attachments.root
+ 3/35 Test  #362: attachments.root ..................   Passed    0.02 sec
+      Start  363: attachments.nodes
+ 4/35 Test  #363: attachments.nodes .................   Passed    0.02 sec
+      Start  364: attachments.rejects
+ 5/35 Test  #364: attachments.rejects ...............   Passed    0.38 sec
+      Start  365: attachments.lifetime
+ 6/35 Test  #365: attachments.lifetime ..............   Passed    0.02 sec
+      Start  366: attachments.held
+ 7/35 Test  #366: attachments.held ..................   Passed    0.06 sec
+      Start  367: attachments.missing
+ 8/35 Test  #367: attachments.missing ...............   Passed    0.05 sec
+      Start  368: attachments.catalog
+ 9/35 Test  #368: attachments.catalog ...............   Passed    1.06 sec
+      Start  369: attachments.subway
+10/35 Test  #369: attachments.subway ................   Passed    5.70 sec
+      Start  596: player_state.roundtrip
+11/35 Test  #596: player_state.roundtrip ............   Passed    0.04 sec
+      Start  597: player_state.clocks
+12/35 Test  #597: player_state.clocks ...............   Passed    0.03 sec
+      Start  598: player_state.initialization
+13/35 Test  #598: player_state.initialization .......   Passed    0.04 sec
+      Start  599: player_state.failures
+14/35 Test  #599: player_state.failures .............   Passed    0.04 sec
+      Start  600: player_state.capture
+15/35 Test  #600: player_state.capture ..............   Passed    0.04 sec
+      Start  601: player_state.private
+16/35 Test  #601: player_state.private ..............   Passed    7.92 sec
+      Start  919: hud.bitmaps
+17/35 Test  #919: hud.bitmaps .......................   Passed    0.02 sec
+      Start  920: hud.values
+18/35 Test  #920: hud.values ........................   Passed    0.02 sec
+      Start  921: hud.input
+19/35 Test  #921: hud.input .........................   Passed    0.02 sec
+      Start  922: hud.session
+20/35 Test  #922: hud.session .......................   Passed    0.05 sec
+      Start  923: hud.private
+21/35 Test  #923: hud.private .......................   Passed    8.22 sec
+      Start  928: coverage.catalog
+22/35 Test  #928: coverage.catalog ..................   Passed    5.36 sec
+      Start  929: coverage.observations
+23/35 Test  #929: coverage.observations .............   Passed    0.02 sec
+      Start  930: coverage.private
+24/35 Test  #930: coverage.private ..................   Passed   78.96 sec
+      Start  935: screen_fade.values
+25/35 Test  #935: screen_fade.values ................   Passed    0.02 sec
+      Start  936: screen_fade.session
+26/35 Test  #936: screen_fade.session ...............   Passed    0.06 sec
+      Start  937: screen_fade.private
+27/35 Test  #937: screen_fade.private ...............   Passed  138.72 sec
+      Start 1206: ctf.profiles
+28/35 Test #1206: ctf.profiles ......................   Passed    1.22 sec
+      Start 1207: ctf.carry
+29/35 Test #1207: ctf.carry .........................   Passed    1.26 sec
+      Start 1208: ctf.capture
+30/35 Test #1208: ctf.capture .......................   Passed    1.25 sec
+      Start 1209: ctf.lifetime
+31/35 Test #1209: ctf.lifetime ......................   Passed    1.23 sec
+      Start 1210: ctf.owner
+32/35 Test #1210: ctf.owner .........................   Passed    1.20 sec
+      Start 1211: ctf.death
+33/35 Test #1211: ctf.death .........................   Passed    1.21 sec
+      Start 1212: ctf.hud
+34/35 Test #1212: ctf.hud ...........................   Passed    1.22 sec
+      Start 1213: ctf.worlds
+35/35 Test #1213: ctf.worlds ........................   Passed   90.47 sec
+
+100% tests passed, 0 tests failed out of 35
+
+Label Time Summary:
+attachments     =   7.33 sec*proc (8 tests)
+ctf             =  99.05 sec*proc (8 tests)
+headless        = 417.46 sec*proc (35 tests)
+hud             =   8.32 sec*proc (5 tests)
+player_state    =   8.12 sec*proc (6 tests)
+private         = 411.13 sec*proc (16 tests)
+screen_fade     = 138.80 sec*proc (3 tests)
+services        =  84.35 sec*proc (3 tests)
+world           =  71.50 sec*proc (2 tests)
+
+Total Test time (real) = 417.49 sec

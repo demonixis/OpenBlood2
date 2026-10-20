@@ -1,0 +1,12 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 1207: ctf.carry
+1/1 Test #1207: ctf.carry ........................   Passed    1.28 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+ctf         =   1.28 sec*proc (1 test)
+headless    =   1.28 sec*proc (1 test)
+private     =   1.28 sec*proc (1 test)
+
+Total Test time (real) =   1.30 sec

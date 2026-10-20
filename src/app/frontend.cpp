@@ -464,7 +464,8 @@ namespace OpenBlood2
                 draw_screen_fade(game->client_shell.fade.Scale(), game->client_shell.m_bInWorld);
                 const auto& client = game->client_shell;
                 if (!hud.draw(hud_state(client.stats, client.m_bInWorld, client.view.object != nullptr,
-                                        client.death_camera.active, client.m_bShowCrosshair, client.m_nCrosshair),
+                                        client.death_camera.active, client.m_bShowCrosshair, client.m_nCrosshair,
+                                        client.ctf.team, client.ctf.flag_icon),
                               game->resources, error))
                     return failed(4);
             }

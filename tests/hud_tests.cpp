@@ -322,7 +322,7 @@ namespace
         }
         return true;
     }
-    bool gpu(const std::filesystem::path& root, const std::filesystem::path& content)
+    bool gpu(const std::filesystem::path& root, const std::filesystem::path& content, bool ctf = false)
     {
         Runtime runtime;
         std::string error;
@@ -369,9 +369,14 @@ namespace
                 ImGui::GetIO().DisplaySize = {float(width), float(height)};
                 ImGui::GetIO().DisplayFramebufferScale = {1, 1};
                 ImGui::NewFrame();
-                const auto display =
-                    frame == 7 ? hud_state({}, true, false)
-                               : hud_state(g.client_shell.stats, g.client_shell.m_bInWorld, frame == 4, frame == 3);
+                auto display = frame == 7
+                                   ? hud_state({}, true, false)
+                                   : hud_state(g.client_shell.stats, g.client_shell.m_bInWorld, frame == 4, frame == 3);
+                if (ctf && frame < 6)
+                {
+                    display.ctf_team = frame == 1 ? 2 : 1;
+                    display.ctf_flag = frame < 2 ? display.ctf_team : 0;
+                }
                 CHECK(renderer.draw(display, artwork, error));
                 ImGui::Render();
                 CHECK(!ImGui::GetIO().WantCaptureKeyboard && !ImGui::GetIO().WantCaptureMouse);
@@ -418,7 +423,7 @@ namespace
                                 ++upper;
                         }
                     }
-                CHECK(display.crosshair_visible ? upper > 0 : upper == 0);
+                CHECK(display.crosshair_visible || (display.visible && display.ctf_team) ? upper > 0 : upper == 0);
                 CHECK(frame == 4 || frame == 6 ? lit == 0 : frame == 7 ? lit > 0 && lit < 1000 : lit > 1000);
                 const auto rect = original_crosshair_rect({0, 0, width, height}, crosshair->width, crosshair->height);
                 const bool bgra = SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window) ==
@@ -438,6 +443,33 @@ namespace
                             CHECK(std::abs(int(pixels[dst + c]) - expected) <= 1);
                         }
                     }
+                if (ctf && display.visible && display.ctf_team)
+                {
+                    const auto* bar = renderer.status_bar();
+                    CHECK(bar && bar->team_icon);
+                    for (auto* icon : {bar->team_icon, bar->flag_icon})
+                    {
+                        if (!icon)
+                            continue;
+                        const unsigned left = width - icon->width - 5;
+                        const unsigned top = icon == bar->team_icon ? 5 : bar->team_icon->height + 10;
+                        unsigned opaque = 0;
+                        for (unsigned y = 0; y < icon->height; ++y)
+                            for (unsigned x = 0; x < icon->width; ++x)
+                            {
+                                const auto src = (y * icon->width + x) * 4, dst = ((top + y) * width + left + x) * 4;
+                                const bool transparent =
+                                    icon->rgba[src] == 255 && icon->rgba[src + 1] == 0 && icon->rgba[src + 2] == 255;
+                                opaque += !transparent;
+                                for (unsigned c = 0; c < 3; ++c)
+                                {
+                                    const int expected = transparent ? pixels[c] : icon->rgba[src + (bgra ? 2 - c : c)];
+                                    CHECK(std::abs(int(pixels[dst + c]) - expected) <= 1);
+                                }
+                            }
+                        CHECK(opaque > 0);
+                    }
+                }
                 if (frame == 0)
                     first = pixels;
                 if (frame == 1)
@@ -466,6 +498,8 @@ int main(int argc, char** argv)
         return session(argv[2]) ? 0 : 1;
     if (mode == "private")
         return private_data(argv[2]) ? 0 : 1;
+    if (mode == "gpu_ctf")
+        return argc == 4 && gpu(argv[2], argv[3], true) ? 0 : 1;
     if (mode == "gpu")
         return argc == 4 && gpu(argv[2], argv[3]) ? 0 : 1;
     return 2;

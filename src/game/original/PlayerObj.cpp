@@ -6,6 +6,7 @@
 #include "CameraObj.h"
 #include "CharacterNodes.h"
 #include "CharacterProfiles.h"
+#include "FlagObjects.h"
 #include "GameStartPoint.h"
 #include <algorithm>
 #include <cmath>
@@ -316,6 +317,9 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name, bool inspection_start)
         entry_error = "No single-player GameStartPoint";
         return false;
     }
+    if (inspection_start && (g_ctf.flags[0] || g_ctf.flags[1]) && !ctf_team)
+        if (!SetCTFTeam(start->GetTeamID() == 2 ? 2 : 1))
+            return false;
     const auto* selected_name = server->GetStringData(start->GetName());
     entry_start_name = selected_name ? selected_name : "";
     m_fYaw = start->GetPitchYawRoll().y;
@@ -512,6 +516,18 @@ DDWORD CPlayerObj::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
             result = InitialUpdate(static_cast<int>(fData));
             break;
         case MID_LINKBROKEN:
+            if (data == m_hFlagObject)
+            {
+                if (m_hFlagAttach)
+                    g_pServerDE->RemoveAttachment(m_hFlagAttach);
+                m_hFlagAttach = 0;
+                if (g_pServerDE->IsObjectAlive(m_hFlagObject))
+                    if (auto* flag = dynamic_cast<FlagObject*>(g_pServerDE->HandleToObject(m_hFlagObject)))
+                        flag->ReturnToFlagStand();
+                m_hFlagObject = nullptr;
+                if (g_pServerDE->IsObjectAlive(m_hObject))
+                    NotifyCTF(OpenBlood2::CTFEventKind::Dropped);
+            }
             if (data == orb_object)
                 orb_object = nullptr;
             // This engine also notifies a pending owner before its destructor.

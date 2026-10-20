@@ -61,6 +61,11 @@ namespace
             error = "Player fields require a live initialized owner outside damage callbacks";
             return false;
         }
+        if (player.ctf_team || player.m_hFlagObject || player.m_hFlagAttach)
+        {
+            error = "CTF player requires unsaved match/flag state";
+            return false;
+        }
         if (server->IsObjectAlive(player.orb_object))
         {
             error = "Active Orb requires unsaved projectile/camera state";

@@ -3,6 +3,7 @@
 #include "game/original/AmmoPickups.h"
 #include "game/original/CameraObj.h"
 #include "game/original/ExitHint.h"
+#include "game/original/FlagObjects.h"
 #include "game/original/SmellHint.h"
 
 namespace OpenBlood2
@@ -21,6 +22,7 @@ namespace OpenBlood2
         std::array<DDWORD, 7> saved_counts{};
         HOBJECT camera = nullptr;
         AI_Mgr::RuntimeTables tables;
+        CTFWorldState ctf;
         void exchange()
         {
             for (std::size_t i = 0; i < heads.size(); ++i)
@@ -30,13 +32,14 @@ namespace OpenBlood2
             }
             std::swap(g_hActiveCamera, camera);
             AI_Mgr::ExchangeRuntimeTables(tables);
+            std::swap(g_ctf, ctf);
         }
         bool empty() const
         {
             for (auto* count : counts)
                 if (*count)
                     return false;
-            return !g_hActiveCamera;
+            return !g_hActiveCamera && !g_ctf.flags[0] && !g_ctf.flags[1];
         }
     };
 } // namespace OpenBlood2

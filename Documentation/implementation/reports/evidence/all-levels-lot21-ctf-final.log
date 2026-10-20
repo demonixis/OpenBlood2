@@ -1,0 +1,30 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start 1215: ctf.profiles
+ 1/10 Test #1215: ctf.profiles .....................   Passed    0.04 sec
+      Start 1216: ctf.carry
+ 2/10 Test #1216: ctf.carry ........................   Passed    0.05 sec
+      Start 1217: ctf.capture
+ 3/10 Test #1217: ctf.capture ......................   Passed    0.04 sec
+      Start 1218: ctf.lifetime
+ 4/10 Test #1218: ctf.lifetime .....................   Passed    0.04 sec
+      Start 1219: ctf.owner
+ 5/10 Test #1219: ctf.owner ........................   Passed    0.04 sec
+      Start 1220: ctf.death
+ 6/10 Test #1220: ctf.death ........................   Passed    0.04 sec
+      Start 1221: ctf.contact
+ 7/10 Test #1221: ctf.contact ......................   Passed    0.04 sec
+      Start 1222: ctf.replacement
+ 8/10 Test #1222: ctf.replacement ..................   Passed    0.14 sec
+      Start 1223: ctf.hud
+ 9/10 Test #1223: ctf.hud ..........................   Passed    0.05 sec
+      Start 1224: ctf.worlds
+10/10 Test #1224: ctf.worlds .......................   Passed    2.98 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+ctf         =   3.46 sec*proc (10 tests)
+headless    =   3.46 sec*proc (10 tests)
+private     =   3.46 sec*proc (10 tests)
+
+Total Test time (real) =   3.48 sec

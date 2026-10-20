@@ -69,6 +69,10 @@ class CNewStatusBar
   public:
     explicit CNewStatusBar(const OpenBlood2::Resources& resources) : canvas(resources), demo_(resources.demo()) {}
     bool Init();
+    bool UpdateCTF(DBYTE team, DBYTE flag);
+    const OpenBlood2::HudSurface* team_icon = nullptr;
+    const OpenBlood2::HudSurface* flag_icon = nullptr;
+    DBYTE team_id = 0, flag_color = 0;
     bool Update(const OpenBlood2::PlayerStats&, unsigned width, unsigned height);
     std::array<const StatTab*, 4> tabs() const
     {

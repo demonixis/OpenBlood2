@@ -16,11 +16,12 @@ namespace OpenBlood2
         const auto norm = std::sqrt(vector_dot(rotation->m_Vec, rotation->m_Vec) + rotation->m_Spin * rotation->m_Spin);
         if (!std::isfinite(norm) || norm < 1e-6f)
             return DE_INVALIDPARAMS;
+        // Touch-only children retain their flags, but attached records are excluded from contacts.
         // Bounded visual children only. Do not silently replace physics or permit cycles/chains.
         if (p->attachment || c->attachment || c->container() || c->world_model || c->client_movement || c->model_body ||
             (c->state.m_ObjectType != OT_MODEL && c->state.m_ObjectType != OT_NORMAL &&
              c->state.m_ObjectType != OT_SPRITE) ||
-            (c->state.m_Flags & (FLAG_SOLID | FLAG_GRAVITY | FLAG_RAYHIT | FLAG_TOUCH_NOTIFY)) ||
+            (c->state.m_Flags & (FLAG_SOLID | FLAG_GRAVITY | FLAG_RAYHIT)) ||
             vector_dot(c->velocity, c->velocity) != 0 || vector_dot(c->acceleration, c->acceleration) != 0)
             return DE_ERROR;
         for (const auto& [id, a] : attachments_)

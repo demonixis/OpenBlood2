@@ -1746,3 +1746,22 @@ localization; the subclass notification runs without adding humanoid spheres.
 The multi-model impact batch commits only after every model resource is ready.
 A later platform can correct an earlier ground drop using a bounded authored
 anchor; runtime collision, shaders, dependencies and commercial data are unchanged.
+
+## Complete-level CTF continuation (2026-10-20)
+
+Selective original FlagObjects and PlayerObj flag rules now drive actual external
+models, owned trigger delivery, checked attachments, drop/return/capture, local
+score and real WAV playback. Selected BloodClientShell/NewStatusBar branches
+supply typed notifications and original PCX team/carried-flag presentation.
+[Contracts](../contracts/ctf_contracts.md) distinguish original branches from
+world-global isolation, safe removal, bounded arithmetic and the deterministic
+local inspection team policy. [Source hashes](sources/all_levels_ctf_sources.json)
+include later LithTech's nonphysical centered-dimension evidence. No source or
+commercial asset was modified. Network transport, remote scoreboard/console
+presentation and CTF saves are not supplied by map inspection.
+
+The service coverage catalog also now declares the previously implemented
+PublishWarpGate, PublishLightning, CollectObjectsTouchingSphere, WriteImmobilize,
+ReadImmobilize and world-finalization ResolveInitialActorOverlap boundaries.
+Their behavior is unchanged; they are bounded services with explicit failures,
+not unclassified or globally complete engine features.

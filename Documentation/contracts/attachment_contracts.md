@@ -105,3 +105,12 @@ keep the playable-session gate open. Linux software/hardware graphics checks do
 not establish retail attachment timing, other-platform or XR parity.
 
 The [animated model continuation](model_view_contracts.md) supersedes earlier model/skin rendering omissions for existing ABC/held/view models. It also corrects the absent-TransformInfo quaternion default at the reader boundary, shared by all pose/node/attachment queries. Explicit zero remains direct and nonzero flags remain unsupported. Close-view projection is replacement presentation; required gameplay/FX and M2 remain open.
+
+## CTF touch-only children
+
+The [CTF continuation](ctf_contracts.md) admits touch-only nonsolid children and
+preserves that flag across attachment/detachment. All attached records remain
+excluded from generic contact/physics traversal. Solid, gravity and ray-hit
+children, nonzero velocities, chains/cycles and independent transforms still
+reject. Flag removal clears the checked player handle; unexpected carrier removal
+returns the independent flag. Original held weapon behavior is unchanged.

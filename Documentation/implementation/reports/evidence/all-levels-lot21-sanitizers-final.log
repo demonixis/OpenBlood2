@@ -1,0 +1,14 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 1212: ctf.contact
+1/2 Test #1212: ctf.contact ......................   Passed    1.21 sec
+    Start 1213: ctf.replacement
+2/2 Test #1213: ctf.replacement ..................   Passed    3.98 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Label Time Summary:
+ctf         =   5.19 sec*proc (2 tests)
+headless    =   5.19 sec*proc (2 tests)
+private     =   5.19 sec*proc (2 tests)
+
+Total Test time (real) =   5.21 sec

@@ -1,0 +1,38 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start 1036: gpu.hud
+ 1/13 Test #1036: gpu.hud ..........................   Passed    0.74 sec
+      Start 1340: ctf.profiles
+ 2/13 Test #1340: ctf.profiles .....................   Passed    0.04 sec
+      Start 1341: ctf.carry
+ 3/13 Test #1341: ctf.carry ........................   Passed    0.04 sec
+      Start 1342: ctf.capture
+ 4/13 Test #1342: ctf.capture ......................   Passed    0.05 sec
+      Start 1343: ctf.lifetime
+ 5/13 Test #1343: ctf.lifetime .....................   Passed    0.04 sec
+      Start 1344: ctf.owner
+ 6/13 Test #1344: ctf.owner ........................   Passed    0.04 sec
+      Start 1345: ctf.death
+ 7/13 Test #1345: ctf.death ........................   Passed    0.05 sec
+      Start 1346: ctf.contact
+ 8/13 Test #1346: ctf.contact ......................   Passed    0.05 sec
+      Start 1347: ctf.replacement
+ 9/13 Test #1347: ctf.replacement ..................   Passed    0.13 sec
+      Start 1348: ctf.hud
+10/13 Test #1348: ctf.hud ..........................   Passed    0.05 sec
+      Start 1349: ctf.worlds
+11/13 Test #1349: ctf.worlds .......................   Passed    2.70 sec
+      Start 1350: gpu.ctf_models
+12/13 Test #1350: gpu.ctf_models ...................   Passed    0.71 sec
+      Start 1351: gpu.ctf_hud
+13/13 Test #1351: gpu.ctf_hud ......................   Passed    0.73 sec
+
+100% tests passed, 0 tests failed out of 13
+
+Label Time Summary:
+ctf         =   4.64 sec*proc (12 tests)
+gpu         =   2.18 sec*proc (3 tests)
+headless    =   3.20 sec*proc (10 tests)
+hud         =   0.74 sec*proc (1 test)
+private     =   5.39 sec*proc (13 tests)
+
+Total Test time (real) =   5.42 sec

@@ -135,7 +135,7 @@ namespace OpenBlood2
             active().trace_service("SetObjectFlags");
             if (auto* r = active().objects_.get(h))
             {
-                if (r->attachment && (flags & (FLAG_SOLID | FLAG_GRAVITY | FLAG_RAYHIT | FLAG_TOUCH_NOTIFY)))
+                if (r->attachment && (flags & (FLAG_SOLID | FLAG_GRAVITY | FLAG_RAYHIT)))
                 {
                     active().objects_.fail(ObjectError::Unsupported, "Physical attached children are unsupported");
                     return;

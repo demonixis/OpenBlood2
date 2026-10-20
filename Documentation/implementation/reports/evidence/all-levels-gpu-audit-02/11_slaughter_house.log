@@ -1,0 +1,17 @@
+Command: ['/home/yann/projects/lithtech/Blood2/build/release/blood2', '--data-dir', '/home/yann/Games/Blood2', '--world', '11_slaughter_house', '--view-world', '--frames', '3']
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792500652226863701-0
+[info] OpenBlood2 0.3.0 / 00b729f-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-00b729f (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=11_slaughter_house; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 11_slaughter_house (direct entry)
+[info] World ready: worlds/11_slaughter_house.dat
+[info] Frontend complete: 3 frames, world worlds/11_slaughter_house.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0

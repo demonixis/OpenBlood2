@@ -51,7 +51,17 @@ class CPlayerObj : public CBaseCharacter
 {
   public:
     ~CPlayerObj() override;
-    void ProcessTriggerMsg(HMESSAGEREAD);
+    void ProcessTriggerMsg(HMESSAGEREAD, HOBJECT sender = nullptr);
+    void GrabFlag(HOBJECT);
+    void GiveFlag(HOBJECT);
+    void DropFlag(bool notify = true);
+    bool SetCTFTeam(int);
+    void NotifyCTF(OpenBlood2::CTFEventKind, int points = 0, HOBJECT capturer = nullptr);
+    int ctf_team = 0, ctf_score = 0;
+    HOBJECT m_hFlagObject = nullptr;
+    HATTACHMENT m_hFlagAttach = 0;
+    std::string ctf_error;
+    std::uint64_t ctf_messages = 0;
     std::uint64_t music_messages = 0;
     std::uint64_t trigger_messages = 0, fade_messages = 0, unsupported_triggers = 0, ignored_triggers = 0;
     std::string last_player_trigger, last_unsupported_player_trigger, player_trigger_error;

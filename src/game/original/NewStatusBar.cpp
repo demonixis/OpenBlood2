@@ -285,3 +285,26 @@ void CNewStatusBar::JustifySurface(const OpenBlood2::HudSurface* surf, unsigned 
             return;
     }
 }
+
+// Original SetTeamID/DisplayFlag: external multipatch PCX, cached owned surfaces.
+bool CNewStatusBar::UpdateCTF(DBYTE team, DBYTE flag)
+{
+    if (team > 2 || flag > 2)
+        return false;
+    if (team == team_id && flag == flag_color)
+        return true;
+    const auto* next_team = team ? canvas.CreateSurfaceFromBitmap(team == 1 ? "interface_multipatch\\teamblue.pcx"
+                                                                            : "interface_multipatch\\teamred.pcx")
+                                 : nullptr;
+    const auto* next_flag = flag ? canvas.CreateSurfaceFromBitmap(flag == 1 ? "interface_multipatch\\flagred.pcx"
+                                                                            : "interface_multipatch\\flagblue.pcx")
+                                 : nullptr;
+    if ((team && !next_team) || (flag && !next_flag))
+        return false;
+    team_icon = next_team;
+    flag_icon = next_flag;
+    team_id = team;
+    flag_color = flag;
+    ++revision;
+    return true;
+}

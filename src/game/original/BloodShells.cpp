@@ -5,6 +5,7 @@
 #include "ClientCrosshair.h"
 #include "game/game_settings.h"
 #include <algorithm>
+#include <climits>
 #include <cmath>
 
 void CBloodServerShell::PreStartWorld()
@@ -104,6 +105,7 @@ CPlayerObj* CBloodServerShell::CreatePlayer(HCLIENT client)
     player->SetClient(client);
     if (server_.SetClientUserData(client, player->m_hObject) != DE_OK || !player->Respawn())
     {
+        player->DropFlag(false);
         player->SetClient(nullptr);
         server_.SetClientUserData(client, nullptr);
         server_.RemoveObject(player->m_hObject);
@@ -163,6 +165,7 @@ CPlayerObj* CBloodServerShell::OnRestoredClientEnterWorld(HCLIENT client, HOBJEC
         server_.FreeString(name);
     if (!ok || !server_.IsObjectAlive(object) || !player->InitializeClientState())
     {
+        player->DropFlag(false);
         player->SetClient(nullptr);
         server_.SetClientUserData(client, nullptr);
         return nullptr;
@@ -175,6 +178,7 @@ void CBloodServerShell::OnClientExitWorld(HCLIENT client)
     auto* player = Player(client);
     if (player)
     {
+        player->DropFlag(false);
         player->SetClient(nullptr);
         server_.RemoveObject(player->m_hObject);
     }
@@ -243,6 +247,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     physics = {};
     stats = {};
     world_exit = {};
+    ctf = {};
     boss_health = {};
     boss_health_messages = 0;
     boss_health_visible = false;
@@ -300,6 +305,7 @@ void CBloodClientShell::OnExitWorld()
     physics = {};
     stats = {};
     world_exit = {};
+    ctf = {};
     boss_health = {};
     boss_health_messages = 0;
     boss_health_visible = false;
@@ -472,6 +478,8 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     }
     else if (const auto* value = std::get_if<OpenBlood2::PlayerStats>(&event))
         stats = *value;
+    else if (const auto* value = std::get_if<OpenBlood2::CTFEvent>(&event))
+        return HandleCTF(*value);
     else if (const auto* value = std::get_if<OpenBlood2::BossHealth>(&event))
     {
         if (!std::isfinite(value->fraction))
@@ -748,5 +756,61 @@ bool CBloodClientShell::UpdateCameraSelection()
         }
     }
     listener_position = view.object && view.settings.listener ? view.position : position;
+    return true;
+}
+
+// Original SMSG_*THEFLAG / NEEDYOURFLAG local client branches.
+bool CBloodClientShell::HandleCTF(const OpenBlood2::CTFEvent& event)
+{
+    using namespace OpenBlood2;
+    if (event.team > 2 || static_cast<DBYTE>(event.kind) > static_cast<DBYTE>(CTFEventKind::Captured) ||
+        event.points < 0 || event.points > 1000000)
+        return false;
+    ++ctf.messages;
+    std::uint32_t notice = 0;
+    if (event.kind == CTFEventKind::Team)
+        ctf.team = event.team;
+    else if (event.kind == CTFEventKind::Grabbed || event.kind == CTFEventKind::Returned)
+    {
+        if (event.kind == CTFEventKind::Grabbed)
+            ctf.flag_icon = ctf.team == 1 ? 1 : ctf.team == 2 ? 2 : 0;
+        SoundRequest sound;
+        sound.resource = "sounds_multipatch\\CtfFlagGrab.wav";
+        sound.priority = 1; // Original CBloodClientShell::PlaySound: MISC_MEDIUM.
+        sound.space = SoundSpace::Local;
+        sound.reverb_requested = false;
+        ctf.voice = server_.PlayLocalSound(player, sound, ctf.error);
+        ctf.sounds += ctf.voice != 0;
+        notice = event.kind == CTFEventKind::Grabbed ? 7000 : 7001;
+    }
+    else if (event.kind == CTFEventKind::Dropped)
+        ctf.flag_icon = 0;
+    else if (event.kind == CTFEventKind::NeedFlag)
+    {
+        if (ctf.last_need_flag + 20 < server_.GetTime())
+        {
+            notice = 7009;
+            ctf.last_need_flag = server_.GetTime();
+        }
+    }
+    else if (event.kind == CTFEventKind::Captured)
+    {
+        ctf.flag_icon = 0;
+        if (event.capturer == player)
+        {
+            if (ctf.score > INT_MAX - event.points)
+                return false;
+            ctf.score += event.points;
+            notice = 7005;
+        }
+        // Remote player names/rosters are not represented by this local client.
+    }
+    if (notice)
+    {
+        ctf.notice_resource = notice;
+        ++ctf.notices;
+        if (!server_.GetClientResourceString(notice, ctf.notice))
+            ctf.error = "Original CTF string resource unavailable";
+    }
     return true;
 }

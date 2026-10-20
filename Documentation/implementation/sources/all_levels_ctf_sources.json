@@ -1,0 +1,49 @@
+{
+  "scope": "Original CTF objects, local capture/notification and status icons; no network transport",
+  "sources": [
+    {
+      "path": "sources/blood2/ObjectDLL/FlagObjects.cpp",
+      "sha256": "a6714c84ed5990f43f61c0a92d87adc651295bc312f5a343a955b8ee110872c7"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/FlagObjects.h",
+      "sha256": "4f3cf4e29424ff6df51b11368d70b6b6f2a746e0b18a61a22b7236a549fe3d31"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/NewStatusBar.cpp",
+      "sha256": "c4dee3b2502db56a1a85b94a55c64fca9ddab0a1e69421858b27aeac02e324f5"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/NetStart.cpp",
+      "sha256": "320bd6f451fc7d08f93c294899af379756fa8432d439731b63c65124057dacbf"
+    },
+    {
+      "path": "sources/blood2/Shared/ClientRes.h",
+      "sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b"
+    },
+    {
+      "path": "sources/blood2/Shared/SoundTypes.h",
+      "sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1"
+    },
+    {
+      "path": "sources/lithtech/runtime/shared/src/moveobject.cpp",
+      "sha256": "ab363eba59ebfd89865a1d5619ffb95a82c474c319adc8d89c921da63b2d79f9",
+      "role": "Later engine nonphysical centered dimensions; not generation-identical proof"
+    }
+  ],
+  "adaptations": [
+    "Owned typed client events and trigger sender identity",
+    "World-context exchange of original static registry and local scoring state",
+    "Checked non-owning attachments, removal links and initial nonphysical centered dimensions",
+    "Deterministic local inspection team for neutral multiplayer marker",
+    "Bounded score arithmetic; explicit missing resources and unsaved CTF state"
+  ]
+}

@@ -239,12 +239,14 @@ int main(int argc, char** argv)
         CHECK(game.resources.mount_game(config, error));
         std::size_t compared = 0, filled = 0, differing = 0;
         int max_delta = 0;
+        const bool ctf = argc == 4 && std::string_view(argv[3]) == "ctf";
         const bool ancient = argc == 4 && std::string_view(argv[3]) == "ancient";
         const bool undead = argc == 4 && std::string_view(argv[3]) == "undead";
         const bool enhanced = argc == 4 && std::string_view(argv[3]) == "enhanced";
         const bool ishmael = argc == 4 && std::string_view(argv[3]) == "ishmael";
         const bool chosen = argc == 4 && std::string_view(argv[3]) == "chosen";
-        const auto worlds = ancient             ? std::vector<const char*>{"25_ancientone"}
+        const auto worlds = ctf                 ? std::vector<const char*>{"multi/ctf_cabana"}
+                            : ancient           ? std::vector<const char*>{"25_ancientone"}
                             : undead            ? std::vector<const char*>{"24_ancientcity"}
                             : enhanced          ? std::vector<const char*>{"23_rooftop"}
                             : chosen || ishmael ? std::vector<const char*>{"end", "24b_arena"}
@@ -258,8 +260,13 @@ int main(int argc, char** argv)
             for (std::size_t i = 0; i < probe.entries.size(); ++i)
             {
                 auto* r = game.objects.get(probe.entries[i].object);
-                if (!r || !r->model || probe.entries[i].range == UINT32_MAX ||
-                    std::find(seen.begin(), seen.end(), probe.entries[i].label) != seen.end())
+                if (!r || !r->model || probe.entries[i].range == UINT32_MAX)
+                    continue;
+                const auto asset_key =
+                    ctf ? std::string(r->state.m_Filename) + "|" + r->state.m_SkinName : probe.entries[i].label;
+                if (std::find(seen.begin(), seen.end(), asset_key) != seen.end())
+                    continue;
+                if (ctf && r->type->name != "FlagObject" && r->type->name != "FlagStand")
                     continue;
                 if (ancient && std::string_view(r->state.m_SkinName) != "Skins/Enemies/AncientOne.dtx")
                     continue;
@@ -272,7 +279,7 @@ int main(int argc, char** argv)
                     continue;
                 if (enhanced && std::string_view(r->state.m_SkinName) != "Skins/Enemies/GideonE.dtx")
                     continue;
-                seen.push_back(probe.entries[i].label);
+                seen.push_back(asset_key);
                 const auto& clip = r->model->animations[r->animation.animation];
                 const auto original = r->animation;
                 for (double fraction : {0.0, 0.37, 1.0})
@@ -310,7 +317,8 @@ int main(int argc, char** argv)
         std::cout << "Retail CPU/GPU skinning equivalence: " << compared << " distinct assets at three clip times, "
                   << filled << " filled pixels, " << differing << " differing by more than 1, max delta " << max_delta
                   << '\n';
-        CHECK(ancient              ? compared >= 2
+        CHECK(ctf                  ? compared == 4
+              : ancient            ? compared >= 2
               : undead || enhanced ? compared == 1
               : ishmael            ? compared == 2
               : chosen             ? compared == 4

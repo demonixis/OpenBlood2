@@ -89,3 +89,11 @@ Windows/macOS/mobile execution and full-game UI acceptance remain unverified.
 The shipped Build 108 demo lacks `weapons/raidcanister.pcx`. Its explicit HUD variant
 keeps the secondary ammunition number without that decorative icon. Other required
 art remains strict; retail composition is unchanged. See [demo contracts](demo_contracts.md).
+
+## CTF inspection icons
+
+The [CTF continuation](ctf_contracts.md) adds selective original team and carried
+flag PCX presentation at native top-right positions. Its atlas is now 1024x128;
+exact magenta transparency and existing stat/crosshair composition remain.
+This supersedes the blanket team-display omission only for these two icons;
+network scoreboards and the original console overlay remain unavailable.

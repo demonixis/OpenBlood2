@@ -1,0 +1,2 @@
+Contact: start 1300,563.375,1536 end 1100,554,1536 actual 1260,554,1536 flag 1200,563.375,1536 dims 13.7253,35.9156,6.49403 grabs 0 trigger flaggive error 
+contact:219: p->m_hFlagObject == f->m_hObject && f->with_player && f->grabs == 1 && pump(*g)

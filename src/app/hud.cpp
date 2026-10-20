@@ -7,11 +7,13 @@
 namespace OpenBlood2
 {
     HudState hud_state(const PlayerStats& s, bool in_world, bool external_camera, bool dead, bool show_crosshair,
-                       DBYTE crosshair)
+                       DBYTE crosshair, DBYTE ctf_team, DBYTE ctf_flag)
     {
         HudState h;
         h.stats = s;
         h.crosshair = crosshair;
+        h.ctf_team = ctf_team;
+        h.ctf_flag = ctf_flag;
         h.crosshair_visible = show_crosshair && original_crosshair_visible(in_world, external_camera, dead);
         if (!in_world || external_camera)
             return h;
@@ -112,6 +114,25 @@ namespace OpenBlood2
                 if (!data[d] && !data[d + 1] && !data[d + 2])
                     data[d + 3] = 0;
             }
+        for (auto [surface, slot] : {std::pair{status_->team_icon, team_x}, std::pair{status_->flag_icon, flag_x}})
+        {
+            if (!surface)
+                continue;
+            if (surface->width > 128 || surface->height > height)
+            {
+                SDL_UnmapGPUTransferBuffer(device_, transfer_);
+                error = "CTF icon exceeds atlas bounds";
+                return false;
+            }
+            for (unsigned y = 0; y < surface->height; ++y)
+                for (unsigned x = 0; x < surface->width; ++x)
+                {
+                    const auto from = (y * surface->width + x) * 4, to = (y * width + slot + x) * 4;
+                    std::copy_n(surface->rgba.data() + from, 4, data + to);
+                    if (data[to] == 255 && data[to + 1] == 0 && data[to + 2] == 255)
+                        data[to + 3] = 0;
+                }
+        }
         SDL_UnmapGPUTransferBuffer(device_, transfer_);
         auto* commands = SDL_AcquireGPUCommandBuffer(device_);
         if (!commands)
@@ -182,6 +203,11 @@ namespace OpenBlood2
             error = status_->canvas.error.empty() ? "Invalid original HUD state" : status_->canvas.error;
             return false;
         }
+        if (!status_->UpdateCTF(h.ctf_team, h.ctf_flag))
+        {
+            error = status_->canvas.error.empty() ? "Invalid CTF HUD state" : status_->canvas.error;
+            return false;
+        }
         if (uploaded_revision_ != status_->revision && !upload(error))
             return false;
         auto* draw = ImGui::GetBackgroundDrawList();
@@ -198,6 +224,20 @@ namespace OpenBlood2
             }
             offset += s.width;
             ++i;
+        }
+        if (h.visible && h.ctf_team)
+        {
+            const unsigned team_height = status_->team_icon ? status_->team_icon->height : 0;
+            for (auto [surface, slot] : {std::pair{status_->team_icon, team_x}, std::pair{status_->flag_icon, flag_x}})
+            {
+                if (!surface)
+                    continue;
+                const ImVec2 p{viewport->Pos.x + viewport->Size.x - surface->width - 5,
+                               viewport->Pos.y + (slot == team_x ? 5 : team_height + 10)};
+                draw->AddImage((ImTextureID)(intptr_t)texture_, p, {p.x + surface->width, p.y + surface->height},
+                               {float(slot) / atlas_width, 0},
+                               {float(slot + surface->width) / atlas_width, float(surface->height) / atlas_height});
+            }
         }
         if (h.crosshair_visible)
         {

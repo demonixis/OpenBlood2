@@ -1,5 +1,7 @@
 # Blood2 Project Instructions
 
+The [CTF and complete-level loading continuation](Documentation/contracts/ctf_contracts.md) completes the observed opening blockers: audit 19 passes all 58 mounted worlds at three difficulties, and the Release GPU sweep opens all 58. Preserve original flag/team/drop/capture timing, checked independent lifetime, actual external art/audio and world-isolated local inspection state. This is verified opening/simulation coverage, not full campaign traversal, network play, CTF saves or M3 acceptance; exact missing resources and M2-GPU-001 remain explicit.
+
 The [Ancient One continuation](Documentation/contracts/ancient_one_contracts.md) adds boss/tentacle states, revival, original beam/tentacle weapons and real primary napalm impact. Preserve sender-based immunity, source scale/timing/sound quirks and explicit nonhumanoid body damage. Completed-scene placement may recover a prior ground drop only before AI updates, using a bounded authored anchor and checked route. Audit 18 passes 54/58; four CTF maps remain. M2 closure is unchanged.
 
 The [UndeadGideon continuation](Documentation/contracts/undead_gideon_contracts.md) adds the original boss, health/combat and jump/dodge rules. Preserve original landing/relaunch behavior, enabled impulses and real model-key fire. Completed-scene placement repeats the bounded initial separation; loop-clock roundoff clamps only internal remainder, never invalid inputs. Audit 17 passes 53/58; Ancient One/Tentacle and four CTF maps remain. M2 closure is unchanged.

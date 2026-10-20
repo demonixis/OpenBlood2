@@ -1,0 +1,249 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start  375: attachments.root
+ 1/24 Test  #375: attachments.root .................   Passed    0.00 sec
+      Start  376: attachments.nodes
+ 2/24 Test  #376: attachments.nodes ................   Passed    0.00 sec
+      Start  377: attachments.rejects
+ 3/24 Test  #377: attachments.rejects ..............   Passed    0.01 sec
+      Start  378: attachments.lifetime
+ 4/24 Test  #378: attachments.lifetime .............   Passed    0.00 sec
+      Start  379: attachments.held
+ 5/24 Test  #379: attachments.held .................   Passed    0.00 sec
+      Start  380: attachments.missing
+ 6/24 Test  #380: attachments.missing ..............   Passed    0.00 sec
+      Start  381: attachments.catalog
+ 7/24 Test  #381: attachments.catalog ..............   Passed    0.03 sec
+      Start  382: attachments.subway
+ 8/24 Test  #382: attachments.subway ...............   Passed    0.15 sec
+      Start  932: hud.bitmaps
+ 9/24 Test  #932: hud.bitmaps ......................   Passed    0.00 sec
+      Start  933: hud.values
+10/24 Test  #933: hud.values .......................   Passed    0.00 sec
+      Start  934: hud.input
+11/24 Test  #934: hud.input ........................   Passed    0.00 sec
+      Start  935: hud.session
+12/24 Test  #935: hud.session ......................   Passed    0.00 sec
+      Start  936: hud.private
+13/24 Test  #936: hud.private ......................   Passed    0.22 sec
+      Start  948: screen_fade.values
+14/24 Test  #948: screen_fade.values ...............   Passed    0.00 sec
+      Start  949: screen_fade.session
+15/24 Test  #949: screen_fade.session ..............   Passed    0.00 sec
+      Start  950: screen_fade.private
+16/24 Test  #950: screen_fade.private ..............***Failed    1.77 sec
+Original SubwayA camera intro expired after 12.0167 simulation seconds
+Relay reached at 2052.82 activations=1
+Trail peaks: 10240 per system, 10240 total
+EXIT_TRACE	0	AddObjectToList	Implemented (bounded)	0
+EXIT_TRACE	0	AddSkyObject	Implemented (bounded)	0
+EXIT_TRACE	0	AdvanceModelProjectile	Implemented (bounded)	0
+EXIT_TRACE	0	AlignRotation	Implemented (bounded)	1714
+EXIT_TRACE	0	BreakInterObjectLink	Implemented (bounded)	162
+EXIT_TRACE	0	CastRay	Implemented (bounded)	323
+EXIT_TRACE	0	CastWorldRay	Implemented (bounded)	0
+EXIT_TRACE	0	CompareStringsUpper	Implemented (bounded)	10
+EXIT_TRACE	0	ConfigureCharacterBody	Implemented (bounded)	19
+EXIT_TRACE	0	ConfigureModelBody	Implemented (bounded)	0
+EXIT_TRACE	0	ConfigureWorldBody	Implemented (bounded)	0
+EXIT_TRACE	0	CopyString	Implemented (bounded)	0
+EXIT_TRACE	0	CreateAttachment	Implemented (bounded)	11
+EXIT_TRACE	0	CreateInterObjectLink	Implemented (bounded)	202
+EXIT_TRACE	0	CreateObject	Implemented (bounded)	46
+EXIT_TRACE	0	CreateObjectList	Implemented (bounded)	0
+EXIT_TRACE	0	CreateObjectProps	Implemented (bounded)	2
+EXIT_TRACE	0	CreateString	Implemented (bounded)	218
+EXIT_TRACE	0	EndHMessageRead	Explicitly unsupported	0
+EXIT_TRACE	0	EndHMessageWrite	Implemented (bounded)	0
+EXIT_TRACE	0	EndMessage	Implemented (bounded)	5977
+EXIT_TRACE	0	FindAttachment	Implemented (bounded)	1934
+EXIT_TRACE	0	FindNamedObjects	Implemented (bounded)	46
+EXIT_TRACE	0	FreeString	Implemented (bounded)	565
+EXIT_TRACE	0	GetAcceleration	Implemented (bounded)	0
+EXIT_TRACE	0	GetAnimIndex	Implemented (bounded)	2847
+EXIT_TRACE	0	GetAttachedModelNodeTransform	Implemented (bounded)	0
+EXIT_TRACE	0	GetCameraView	Implemented (bounded)	3153
+EXIT_TRACE	0	GetClass	Implemented (bounded)	92
+EXIT_TRACE	0	GetClientResourceString	Implemented (bounded)	2
+EXIT_TRACE	0	GetClientUserData	Implemented (bounded)	38223
+EXIT_TRACE	0	GetContainers	Implemented (bounded)	101627
+EXIT_TRACE	0	GetFrameTime	Implemented (bounded)	4790
+EXIT_TRACE	0	GetGameConVar	Implemented (bounded)	457
+EXIT_TRACE	0	GetGlobalForce	Implemented (bounded)	4
+EXIT_TRACE	0	GetModelAnimUserDims	Implemented (bounded)	1658
+EXIT_TRACE	0	GetModelAnimation	Implemented (bounded)	831
+EXIT_TRACE	0	GetModelAnimationName	Implemented (bounded)	2709
+EXIT_TRACE	0	GetModelFilenames	Implemented (bounded)	2
+EXIT_TRACE	0	GetModelLooping	Implemented (bounded)	2
+EXIT_TRACE	0	GetModelNodeHideStatus	Implemented (bounded)	294
+EXIT_TRACE	0	GetModelNodeTransform	Implemented (bounded)	1752
+EXIT_TRACE	0	GetModelPlaybackState	Implemented (bounded)	2666
+EXIT_TRACE	0	GetMovementState	Implemented (bounded)	24946
+EXIT_TRACE	0	GetNextObject	Implemented (bounded)	227
+EXIT_TRACE	0	GetObjectClass	Implemented (bounded)	263
+EXIT_TRACE	0	GetObjectColor	Implemented (bounded)	0
+EXIT_TRACE	0	GetObjectDims	Implemented (bounded)	1359
+EXIT_TRACE	0	GetObjectFlags	Implemented (bounded)	11154
+EXIT_TRACE	0	GetObjectName	Implemented (bounded)	120
+EXIT_TRACE	0	GetObjectPos	Implemented (bounded)	20528
+EXIT_TRACE	0	GetObjectRotation	Implemented (bounded)	2418
+EXIT_TRACE	0	GetObjectState	Implemented (bounded)	3
+EXIT_TRACE	0	GetObjectType	Implemented (bounded)	0
+EXIT_TRACE	0	GetObjectUserFlags	Implemented (bounded)	89
+EXIT_TRACE	0	GetPathManager	Implemented (bounded)	752
+EXIT_TRACE	0	GetPointContainerCode	Implemented (bounded)	10
+EXIT_TRACE	0	GetPropBool	Implemented (bounded)	764
+EXIT_TRACE	0	GetPropGeneric	Implemented (bounded)	10755
+EXIT_TRACE	0	GetPropReal	Implemented (bounded)	764
+EXIT_TRACE	0	GetPropString	Implemented (bounded)	72
+EXIT_TRACE	0	GetPropVector	Implemented (bounded)	64
+EXIT_TRACE	0	GetSoundDuration	Implemented (bounded)	20
+EXIT_TRACE	0	GetStringData	Implemented (bounded)	436
+EXIT_TRACE	0	GetTime	Implemented (bounded)	35986
+EXIT_TRACE	0	GetVarValueFloat	Implemented (bounded)	455
+EXIT_TRACE	0	GetVarValueString	Implemented (bounded)	2
+EXIT_TRACE	0	GetVelocity	Implemented (bounded)	12787
+EXIT_TRACE	0	GetWorldTime	Implemented (bounded)	1
+EXIT_TRACE	0	DemoBuild	Implemented (bounded)	16
+EXIT_TRACE	0	HandleToObject	Implemented (bounded)	61030
+EXIT_TRACE	0	InterpolateRotation	Implemented (bounded)	2412
+EXIT_TRACE	0	IntersectSegment	Implemented (bounded)	5240
+EXIT_TRACE	0	IntersectWorldSegment	Implemented (bounded)	486
+EXIT_TRACE	0	IsKindOf	Implemented (bounded)	269
+EXIT_TRACE	0	IsObjectAlive	Implemented (bounded)	184275
+EXIT_TRACE	0	IsSoundDone	Implemented (bounded)	2996
+EXIT_TRACE	0	KillSound	Implemented (bounded)	33
+EXIT_TRACE	0	MoveKeyframedObject	Implemented (bounded)	19726
+EXIT_TRACE	0	MoveObject	Implemented (bounded)	29188
+EXIT_TRACE	0	MoveObjectToGround	Implemented (bounded)	16
+EXIT_TRACE	0	MoveWorldModel	Implemented (bounded)	329
+EXIT_TRACE	0	ObjectToHandle	Implemented (bounded)	1339
+EXIT_TRACE	0	PingObjects	Implemented (bounded)	51
+EXIT_TRACE	0	PlaceNonSolidModel	Implemented (bounded)	2
+EXIT_TRACE	0	PlayCharacterSound	Implemented (bounded)	37
+EXIT_TRACE	0	PlayCinematicSound	Implemented (bounded)	7
+EXIT_TRACE	0	PlayClientSound	Implemented (bounded)	5
+EXIT_TRACE	0	PlayDetachedSound	Implemented (bounded)	25
+EXIT_TRACE	0	PlayLocalSound	Implemented (bounded)	0
+EXIT_TRACE	0	PlayObjectLoopSound	Implemented (bounded)	2
+EXIT_TRACE	0	PlaySoundAt	Implemented (bounded)	28
+EXIT_TRACE	0	PlayWorldSound	Implemented (bounded)	4
+EXIT_TRACE	0	PublishBloodSplat	Implemented (bounded)	2
+EXIT_TRACE	0	PublishBloodSpurt	Implemented (bounded)	0
+EXIT_TRACE	0	PublishCameraEffect	Implemented (bounded)	2
+EXIT_TRACE	0	PublishClientBloodSplat	Implemented (bounded)	5
+EXIT_TRACE	0	PublishClientBloodSpurt	Implemented (bounded)	8
+EXIT_TRACE	0	PublishExplosionFlames	Implemented (bounded)	9
+EXIT_TRACE	0	PublishExplosionFragments	Implemented (bounded)	9
+EXIT_TRACE	0	PublishExplosionLights	Implemented (bounded)	9
+EXIT_TRACE	0	PublishExplosionModels	Implemented (bounded)	9
+EXIT_TRACE	0	PublishExplosionRings	Implemented (bounded)	9
+EXIT_TRACE	0	PublishExplosionSprites	Implemented (bounded)	9
+EXIT_TRACE	0	PublishFleshGibs	Implemented (bounded)	0
+EXIT_TRACE	0	PublishLaserBeam	Implemented (bounded)	0
+EXIT_TRACE	0	PublishLightEffect	Implemented (bounded)	12
+EXIT_TRACE	0	PublishObjectParticles	Implemented (bounded)	0
+EXIT_TRACE	0	PublishParticleStream	Implemented (bounded)	0
+EXIT_TRACE	0	PublishPolyGrid	Implemented (bounded)	0
+EXIT_TRACE	0	PublishSparks	Implemented (bounded)	15
+EXIT_TRACE	0	PublishWeaponSprites	Implemented (bounded)	1
+EXIT_TRACE	0	QueryModelNodeTransform	Implemented (bounded)	198
+EXIT_TRACE	0	RandomFloat	Implemented (bounded)	61
+EXIT_TRACE	0	RandomInt	Implemented (bounded)	72
+EXIT_TRACE	0	ReadDamage	Implemented (bounded)	12
+EXIT_TRACE	0	ReadFromMessageDWord	Implemented (bounded)	352
+EXIT_TRACE	0	ReadFromMessageHString	Implemented (bounded)	352
+EXIT_TRACE	0	ReadKeyMessage	Implemented (bounded)	0
+EXIT_TRACE	0	ReadPickupMessage	Implemented (bounded)	0
+EXIT_TRACE	0	RecordBrushDestruction	Implemented (bounded)	0
+EXIT_TRACE	0	RecordDebrisEffect	Implemented (bounded)	0
+EXIT_TRACE	0	RecordExplosionEffect	Implemented (bounded)	0
+EXIT_TRACE	0	RecordPickup	Implemented (bounded)	0
+EXIT_TRACE	0	RecordProjectile	Implemented (bounded)	0
+EXIT_TRACE	0	RecordSceneExplosion	Implemented (bounded)	9
+EXIT_TRACE	0	RecordSpawn	Implemented (bounded)	6
+EXIT_TRACE	0	RejectPrecreate	Implemented (bounded)	2
+EXIT_TRACE	0	RelinquishList	Implemented (bounded)	46
+EXIT_TRACE	0	RemoveAttachment	Implemented (bounded)	2
+EXIT_TRACE	0	RemoveCameraEffect	Implemented (bounded)	0
+EXIT_TRACE	0	RemoveLightEffect	Implemented (bounded)	0
+EXIT_TRACE	0	RemoveObject	Implemented (bounded)	38
+EXIT_TRACE	0	RemoveObjectFromList	Implemented (bounded)	0
+EXIT_TRACE	0	ReportSkyFailure	Implemented (bounded)	0
+EXIT_TRACE	0	ResetModelAnimation	Implemented (bounded)	28
+EXIT_TRACE	0	ResetRead	Implemented (bounded)	0
+EXIT_TRACE	0	ResizeObject	Implemented (bounded)	1605
+EXIT_TRACE	0	ResolveInitialWorldOverlap	Implemented (bounded)	0
+EXIT_TRACE	0	RestoreObjects	Explicitly unsupported	0
+EXIT_TRACE	0	RotateWorldModel	Implemented (bounded)	0
+EXIT_TRACE	0	SaveObjects	Explicitly unsupported	0
+EXIT_TRACE	0	ScaleObject	Implemented (bounded)	18
+EXIT_TRACE	0	SendBossHealth	Implemented (bounded)	449
+EXIT_TRACE	0	SendConversation	Implemented (bounded)	0
+EXIT_TRACE	0	SendObjectives	Implemented (bounded)	1
+EXIT_TRACE	0	SendToClient	Implemented (bounded)	482
+EXIT_TRACE	0	SendWorldExit	Implemented (bounded)	1
+EXIT_TRACE	0	SetAcceleration	Implemented (bounded)	3159
+EXIT_TRACE	0	SetBlockingPriority	Implemented (bounded)	3272
+EXIT_TRACE	0	SetClientUserData	Implemented (bounded)	2
+EXIT_TRACE	0	SetDeactivationTime	Implemented (bounded)	16
+EXIT_TRACE	0	SetGameConVar	Implemented (bounded)	32
+EXIT_TRACE	0	SetGlobalForce	Implemented (bounded)	1
+EXIT_TRACE	0	SetModelAnimation	Implemented (bounded)	61
+EXIT_TRACE	0	SetModelFilenames	Implemented (bounded)	2
+EXIT_TRACE	0	SetModelLooping	Implemented (bounded)	43
+EXIT_TRACE	0	SetModelNodeHideStatus	Implemented (bounded)	38
+EXIT_TRACE	0	SetNextUpdate	Implemented (bounded)	24918
+EXIT_TRACE	0	SetObjectColor	Implemented (bounded)	0
+EXIT_TRACE	0	SetObjectDims	Implemented (bounded)	67
+EXIT_TRACE	0	SetObjectFlags	Implemented (bounded)	271
+EXIT_TRACE	0	SetObjectRotation	Implemented (bounded)	21627
+EXIT_TRACE	0	SetObjectState	Implemented (bounded)	17
+EXIT_TRACE	0	SetObjectUserFlags	Implemented (bounded)	207
+EXIT_TRACE	0	SetSkyDefinition	Implemented (bounded)	0
+EXIT_TRACE	0	SetVelocity	Implemented (bounded)	3818
+EXIT_TRACE	0	StartHMessageWrite	Implemented (bounded)	5977
+EXIT_TRACE	0	StartMessageToObject	Implemented (bounded)	5977
+EXIT_TRACE	0	TeleportObject	Implemented (bounded)	3
+EXIT_TRACE	0	ValidateSpawnObject	Implemented (bounded)	11
+EXIT_TRACE	0	WriteDamage	Implemented (bounded)	352
+EXIT_TRACE	0	WriteKeyMessage	Implemented (bounded)	0
+EXIT_TRACE	0	WritePickupMessage	Implemented (bounded)	5445
+EXIT_TRACE	0	WriteToMessageDWord	Implemented (bounded)	180
+EXIT_TRACE	0	WriteToMessageHString	Implemented (bounded)	180
+EXIT_TRACE	0	ConnectClient	Implemented (bounded)	1
+EXIT_TRACE	0	DisconnectClient	Implemented (bounded)	0
+EXIT_TRACE	0	MID_MODELSTRINGKEY	Implemented (bounded)	18
+private_exit:230: row.support != ServiceSupport::Unclassified && (row.support != ServiceSupport::Unavailable || row.calls == 0)
+
+      Start 1215: ctf.profiles
+17/24 Test #1215: ctf.profiles .....................   Passed    0.04 sec
+      Start 1216: ctf.carry
+18/24 Test #1216: ctf.carry ........................   Passed    0.04 sec
+      Start 1217: ctf.capture
+19/24 Test #1217: ctf.capture ......................   Passed    0.04 sec
+      Start 1218: ctf.lifetime
+20/24 Test #1218: ctf.lifetime .....................   Passed    0.04 sec
+      Start 1219: ctf.owner
+21/24 Test #1219: ctf.owner ........................   Passed    0.04 sec
+      Start 1220: ctf.death
+22/24 Test #1220: ctf.death ........................   Passed    0.04 sec
+      Start 1221: ctf.hud
+23/24 Test #1221: ctf.hud ..........................   Passed    0.04 sec
+      Start 1222: ctf.worlds
+24/24 Test #1222: ctf.worlds .......................   Passed    2.62 sec
+
+96% tests passed, 1 tests failed out of 24
+
+Label Time Summary:
+attachments    =   0.20 sec*proc (8 tests)
+ctf            =   2.90 sec*proc (8 tests)
+headless       =   5.11 sec*proc (24 tests)
+hud            =   0.23 sec*proc (5 tests)
+private        =   5.07 sec*proc (12 tests)
+screen_fade    =   1.78 sec*proc (3 tests)
+
+Total Test time (real) =   5.13 sec
+
+The following tests FAILED:
+	950 - screen_fade.private (Failed)                      headless private screen_fade
+Errors while running CTest
