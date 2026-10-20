@@ -5,8 +5,10 @@ AddPowerup/CheckPowerups/ResetPowerups/Start/EndPowerupSound
 (PlayerObj.cpp:3670–4046). Willpower (POWERUP_INVULNERABILITY, PU_INVULNERABLE)
 and Stealth (POWERUP_STEALTH, PU_INVISIBLE) are collected and timed.
 [Anger](airship_contracts.md#anger) now adds the original triple-damage lifecycle;
-Revenant, incorporeal and silence remain unported and keep refusing death, capture
-and restore.
+RevenantPU is now registered with its original resource 316, Revenant_pu model,
+rotation and POWERUP_REVENANT (8), value 30. Original PlayerObj::AddPowerup has
+no case 8, so touching it sends the offer but does not acknowledge or remove it.
+No incorporeal effect is invented; incorporeal and silence remain unavailable.
 
 ## Willpower
 

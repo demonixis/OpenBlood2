@@ -53,3 +53,12 @@ AngerPU::AngerPU()
     display_name = "The Anger";
     resource_id = 315; // IDS_POWERUP_ANGER.
 }
+
+RevenantPU::RevenantPU()
+{
+    value = {OpenBlood2::PickupKind::Powerup, 8, 30}; // POWERUP_REVENANT.
+    file = "Revenant_pu";
+    display_name = "Revenant";
+    resource_id = 316; // IDS_POWERUP_REVENANT.
+    // Original CPlayerObj::AddPowerup has no case for this type: no acknowledgement.
+}

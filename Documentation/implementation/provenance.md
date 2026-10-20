@@ -1575,3 +1575,14 @@ explicit adaptations. Later engine references support sky replacement and native
 SPR frames; DLS1's explicitly authored default velocity edge selects existing gain
 once. The [ledger](sources/cathedral_sewage_slaughter_sources.json) records source
 hashes and compatibility boundaries. No reference source or commercial asset is changed.
+
+## Complete-level audit, first class additions (2026-10-20)
+
+RotatingModel.h/.cpp selectively integrate original ObjectDLL/RotatingModel.h/.cpp
+(constructor and EngineMessageFn), reusing the existing checked Rotating and
+CDestructableModel ports. Normal-model rotation is the ordinary-object branch
+corroborated by later lithtech/runtime/server/src/serverde_impl.cpp
+si_DoObjectRotation; it does not resize a model or move riders.
+PowerupPickups.cpp imports the original RevenantPU constructor (type 8, amount 30,
+resource 316); PlayerObj.cpp AddPowerup's absence of a Revenant branch is preserved.
+See the [complete audit backlog](reports/all_level_loading.md).

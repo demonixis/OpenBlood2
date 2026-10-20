@@ -1,5 +1,11 @@
 # Blood2 Project Instructions
 
+The [complete mounted-level audit](Documentation/implementation/reports/all_level_loading.md) tracks the separately requested
+loading continuation. RotatingModel reuses original rotation rules with an
+ordinary model pose and unchanged physics extents. RevenantPU preserves the
+source player refusal (no invented power). Keep runtime rechecks and explicit
+remaining failures; entry smoke coverage is not complete campaign acceptance.
+
 The [reported-level loading correction](Documentation/implementation/reports/reported_level_loading.md)
 admits bounded inverted Sound radii with original inner-first attenuation and
 accounts for pickups acknowledged during initialization as CollectedPickup.

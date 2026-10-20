@@ -19,6 +19,7 @@ class Rotating : public Aggregate
     float last_time = 0, start_time = 0, sound_radius = 1000;
     std::string spin_up_sound, busy_sound, spin_down_sound, last_sound;
     bool sound_loop = false, valid = true;
+    bool model_rotation = false;
     unsigned sound_requests = 0, commands = 0;
     OpenBlood2::MoverResult last_move = OpenBlood2::MoverResult::Moved;
     void Init(HOBJECT);

@@ -12,8 +12,20 @@ namespace
         Config config;
         config.data_dir = root;
         std::string error;
+        const auto step_failure = [&]
+        {
+            for (const auto& why : game->step_errors())
+                std::cerr << why << '\n';
+            for (const auto& why : game->objects.diagnostics())
+                std::cerr << "Object: " << why << '\n';
+            for (const auto& why : game->trace)
+                std::cerr << "Session: " << why << '\n';
+        };
         if (!game->initialize() || !game->resources.mount_game(config, error))
+        {
+            std::cerr << world << ": initialization/mount failed: " << error << '\n';
             return false;
+        }
         // Preserve per-source diagnostics before start_new_game discards a rejected candidate.
         if (!game->request_world(std::string_view(world) == "collection" ? "18_temple" : world, error))
         {
@@ -52,7 +64,11 @@ namespace
             }
             for (double dt : {0., 1e-8, 1e-6, 1e-4, 1. / 144})
                 if (!game->step(dt))
+                {
+                    std::cerr << world << ": initial step dt=" << dt << " failed\n";
+                    step_failure();
                     return false;
+                }
             game->client_shell.movement_input.forward = true;
             for (unsigned i = 0; i < 180; ++i)
             {
@@ -60,8 +76,8 @@ namespace
                     game->client_shell.movement_input.forward = false;
                 if (!game->step(1. / 60))
                 {
-                    for (const auto& why : game->step_errors())
-                        std::cerr << why << '\n';
+                    std::cerr << world << ": simulation step " << i << " failed\n";
+                    step_failure();
                     return false;
                 }
             }
@@ -69,12 +85,22 @@ namespace
             if (!game->run_world(error))
             {
                 std::cerr << world << ": " << error << '\n';
+                for (auto id : game->objects.snapshot())
+                    if (auto* r = game->objects.get(id))
+                        if (auto* ai = dynamic_cast<AI_Mgr*>(r->game.get()); ai && ai->runtime_failed)
+                            std::cerr << "NPC " << r->state.m_Name << " model=" << r->state.m_Filename
+                                      << " requested_clip=" << ai->requested_animation
+                                      << " clips=" << (r->model ? r->model->animations.size() : 0)
+                                      << " state=" << ai->m_nState << " metacmd=" << ai->Metacmd << '\n';
                 return false;
             }
             std::cout << world << " difficulty=" << unsigned(difficulty) << " passed\n";
         }
-        return game->unload_world() && game->objects.snapshot().empty() && !game->server.string_count() &&
-               !game->server.message_count() && !game->server.list_count();
+        const bool clean = game->unload_world() && game->objects.snapshot().empty() && !game->server.string_count() &&
+                           !game->server.message_count() && !game->server.list_count();
+        if (!clean)
+            std::cerr << world << ": unload/ownership cleanup failed\n";
+        return clean;
     }
 } // namespace
 int main(int argc, char** argv)

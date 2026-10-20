@@ -90,7 +90,17 @@ void Rotating::UpdateNormalRotation()
         vector_add(angles, {sign.x * velocity.x * dt, sign.y * velocity.y * dt, sign.z * velocity.z * dt});
     DVector position;
     server->GetObjectPos(object, &position);
-    last_move = server->RotateWorldModel(object, {pose_angles, next, position, position});
+    if (model_rotation)
+    {
+        // Original RotateObject rotates an ordinary model's visual pose, leaving
+        // its axis-aligned physics dimensions unchanged.
+        const auto rotation = rotation_from_euler(next);
+        last_move = physics_vector(next) && server->SetObjectRotation(object, &rotation) == DE_OK
+                        ? MoverResult::Moved
+                        : MoverResult::Unavailable;
+    }
+    else
+        last_move = server->RotateWorldModel(object, {pose_angles, next, position, position});
     if (last_move == MoverResult::Moved)
         angles = pose_angles = next;
     // Source updates its timestamp even if RotateObject fails. Do not accumulate

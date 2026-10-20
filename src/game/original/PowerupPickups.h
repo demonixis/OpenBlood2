@@ -23,6 +23,11 @@ class AngerPU : public EnhancementBase
   public:
     AngerPU();
 };
+class RevenantPU : public EnhancementBase
+{
+  public:
+    RevenantPU();
+};
 class StealthPU : public EnhancementBase
 {
   public:

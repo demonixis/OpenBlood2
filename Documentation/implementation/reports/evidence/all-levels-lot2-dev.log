@@ -1,0 +1,61 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start  195: brushes.state
+ 1/24 Test  #195: brushes.state ....................   Passed    0.00 sec
+      Start  196: brushes.spin
+ 2/24 Test  #196: brushes.spin .....................   Passed    0.00 sec
+      Start  197: brushes.geometry
+ 3/24 Test  #197: brushes.geometry .................   Passed    0.00 sec
+      Start  198: brushes.limits
+ 4/24 Test  #198: brushes.limits ...................   Passed    0.00 sec
+      Start  199: brushes.transport
+ 5/24 Test  #199: brushes.transport ................   Passed    0.00 sec
+      Start  200: brushes.destruction
+ 6/24 Test  #200: brushes.destruction ..............   Passed    0.00 sec
+      Start  201: brushes.lifetime
+ 7/24 Test  #201: brushes.lifetime .................   Passed    0.00 sec
+      Start  202: brushes.catalog
+ 8/24 Test  #202: brushes.catalog ..................   Passed    0.92 sec
+      Start  752: destructable_models.properties
+ 9/24 Test  #752: destructable_models.properties ...   Passed    0.00 sec
+      Start  753: destructable_models.rejects
+10/24 Test  #753: destructable_models.rejects ......   Passed    0.00 sec
+      Start  754: destructable_models.damage
+11/24 Test  #754: destructable_models.damage .......   Passed    0.00 sec
+      Start  755: destructable_models.cascade
+12/24 Test  #755: destructable_models.cascade ......   Passed    0.00 sec
+      Start  756: destructable_models.fade
+13/24 Test  #756: destructable_models.fade .........   Passed    0.00 sec
+      Start  757: destructable_models.physics
+14/24 Test  #757: destructable_models.physics ......   Passed    0.00 sec
+      Start  758: destructable_models.filters
+15/24 Test  #758: destructable_models.filters ......   Passed    0.00 sec
+      Start  759: destructable_models.audio
+16/24 Test  #759: destructable_models.audio ........   Passed    0.00 sec
+      Start  760: destructable_models.unnamed
+17/24 Test  #760: destructable_models.unnamed ......   Passed    0.00 sec
+      Start  761: destructable_models.rotating
+18/24 Test  #761: destructable_models.rotating .....   Passed    0.00 sec
+      Start  762: destructable_models.city
+19/24 Test  #762: destructable_models.city .........   Passed    0.26 sec
+      Start 1098: airship.06_airship1
+20/24 Test #1098: airship.06_airship1 ..............   Passed    1.06 sec
+      Start 1099: airship.06_airship2
+21/24 Test #1099: airship.06_airship2 ..............   Passed    2.78 sec
+      Start 1100: airship.weapons
+22/24 Test #1100: airship.weapons ..................   Passed    0.03 sec
+      Start 1101: airship.anger
+23/24 Test #1101: airship.anger ....................   Passed    0.02 sec
+      Start 1102: airship.revenant
+24/24 Test #1102: airship.revenant .................   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 24
+
+Label Time Summary:
+airship                =   3.91 sec*proc (5 tests)
+brushes                =   0.94 sec*proc (8 tests)
+destructable_models    =   0.29 sec*proc (11 tests)
+headless               =   5.13 sec*proc (24 tests)
+private                =   1.18 sec*proc (2 tests)
+private-data           =   3.91 sec*proc (5 tests)
+
+Total Test time (real) =   5.15 sec

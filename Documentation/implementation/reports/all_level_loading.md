@@ -1,0 +1,105 @@
+# All mounted retail levels — implementation backlog
+
+Requested on 2026-10-20. Baseline `25e6acc`, external retail 2.1 installation,
+58 mounted DAT worlds. [Raw audit](evidence/all-levels-audit-01.log).
+
+The first complete pass found **32 passing / 26 failing** worlds. Each passing
+world completed transactional player entry at difficulties 1, 0 and 2, tiny
+initial deltas, three seconds of simulation with movement, a runtime failure
+recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
+combat, multiplayer or GPU certification. M2 closure remains unchanged.
+
+## Work queue
+
+1. Port missing original classes and their actual required behavior/services.
+   Do not register inert placeholders to satisfy admission.
+2. Diagnose solid model geometry and NPC/player placement failures. Preserve
+   atomic motion and reject unresolved overlap.
+3. Diagnose CivilianAI animation selection against its actual model and original
+   source; no arbitrary animation substitution.
+4. Account for exact malformed/absent authored resources with explicit diagnostics
+   and source-supported adaptations; do not invent replacement commercial assets.
+5. Improve diagnostic coverage for the silent Midgard failure. Distinguish actual
+   multiplayer entry requirements from single-player test assumptions.
+6. Rebuild, run focused regressions and sanitizers, commit each validated lot,
+   then rerun the complete audit. Add GPU opening checks once admission succeeds.
+   Keep newly exposed later failures in this queue until resolved.
+
+## Unregistered classes in this pass
+
+Counts are rejected source entries, not distinct implementations.
+
+| Class | Entries |
+| --- | ---: |
+| `AncientOne` | 2 |
+| `AncientOneTentacle` | 16 |
+| `CClientLightningSFX` | 10 |
+| `CClientWarpGateSFX` | 7 |
+| `CalebAI` | 4 |
+| `EnhancedGideon` | 2 |
+| `FlagStand` | 8 |
+| `GabriellaAI` | 2 |
+| `GabriellaREV` | 1 |
+| `IshmaelAI` | 2 |
+| `IshmaelREV` | 1 |
+| `LifeLeechPU` | 3 |
+| `Minefield` | 8 |
+| `OpheliaAI` | 3 |
+| `OpheliaREV` | 1 |
+| `RevenantPU` | 3 |
+| `RotatingModel` | 1 |
+| `SparksObj` | 1 |
+| `UndeadGideon` | 1 |
+
+## Failing worlds and observed blockers
+
+| World | Observed blockers |
+| --- | --- |
+| `09_abandoned_buildings` | 09_abandoned_buildings entry=237 class=CDestructableBrush Creation failed: helloyou3: Container face is not on its plane<br>09_abandoned_buildings entry=1120 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>09_abandoned_buildings: World initialization rejected: 1 unsupported classes, 1 failed entries, 0 unavailable services |
+| `11_slaughter_house` | 11_slaughter_house: Original NPC failure: CivilianAI0: AI_Update: AI animation model/clip unavailable |
+| `12_train_station` | 12_train_station entry=672 class=Sprite Creation failed: Sprite0: Missing, oversized or non-SPR sprite resource: spritetextures\redlight1.spr<br>12_train_station entry=727 class=SoulDrudge Creation failed: NPC world ground placement failed: result 61 body 20.674137,35.827911,20.674137<br>12_train_station entry=737 class=BoneLeech Creation failed: NPC world ground placement failed: result 1 body 6.891021,1.251030,6.891021<br>12_train_station entry=738 class=BoneLeech Creation failed: NPC world ground placement failed: result 1 body 6.891021,1.251030,6.891021<br>12_train_station: World initialization rejected: 0 unsupported classes, 4 failed entries, 0 unavailable services |
+| `18_temple` | 18_temple entry=141 class=DetailSprite Creation failed: sprites\redlight1.spr: Missing, oversized or non-SPR sprite resource: <br>18_temple entry=465 class=LifeLeechPU Class not ported: Required original class is not registered<br>18_temple: World initialization rejected: 1 unsupported classes, 1 failed entries, 0 unavailable services |
+| `20_powerstation` | 20_powerstation entry=497 class=SparksObj Class not ported: Required original class is not registered<br>20_powerstation entry=803 class=CClientLightningSFX Class not ported: Required original class is not registered<br>20_powerstation: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services |
+| `21_laboratory` | 21_laboratory entry=583 class=CClientLightningSFX Class not ported: Required original class is not registered<br>21_laboratory entry=684 class=RotatingModel Class not ported: Required original class is not registered<br>21_laboratory: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services |
+| `22_office` | 22_office entry=177 class=CDestructableModel Creation failed: Model clip-zero dimensions unavailable: Model resource not mounted: modelsworldobjects\urinal2.abc<br>22_office entry=775 class=CDestructableBrush Creation failed: Rejected precreate: CDestructableBrush: SpawnObject not accepted: TheAngerPU<br>22_office: World initialization rejected: 0 unsupported classes, 2 failed entries, 0 unavailable services |
+| `23_rooftop` | 23_rooftop entry=244 class=EnhancedGideon Class not ported: Required original class is not registered<br>23_rooftop entry=252 class=OpheliaAI Class not ported: Required original class is not registered<br>23_rooftop entry=253 class=CalebAI Class not ported: Required original class is not registered<br>23_rooftop entry=259 class=LifeLeechPU Class not ported: Required original class is not registered<br>23_rooftop: World initialization rejected: 4 unsupported classes, 0 failed entries, 0 unavailable services |
+| `24_ancientcity` | 24_ancientcity entry=312 class=UndeadGideon Class not ported: Required original class is not registered<br>24_ancientcity entry=390 class=EnhancedGideon Class not ported: Required original class is not registered<br>24_ancientcity: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services |
+| `24b_arena` | 24b_arena entry=106 class=GabriellaREV Class not ported: Required original class is not registered<br>24b_arena entry=110 class=IshmaelREV Class not ported: Required original class is not registered<br>24b_arena entry=135 class=CClientLightningSFX Class not ported: Required original class is not registered<br>24b_arena entry=136 class=CClientLightningSFX Class not ported: Required original class is not registered<br>24b_arena entry=137 class=CClientLightningSFX Class not ported: Required original class is not registered<br>24b_arena entry=138 class=OpheliaREV Class not ported: Required original class is not registered<br>24b_arena entry=158 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena entry=159 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena entry=160 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena entry=227 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena entry=228 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena entry=229 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena: World initialization rejected: 12 unsupported classes, 0 failed entries, 0 unavailable services |
+| `25_ancientone` | 25_ancientone entry=15 class=AncientOne Class not ported: Required original class is not registered<br>25_ancientone entry=16 class=LifeLeechPU Class not ported: Required original class is not registered<br>25_ancientone entry=22 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=23 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=24 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=25 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=26 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=27 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=28 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=29 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=117 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=118 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=119 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=120 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=121 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=122 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=123 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=124 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=125 class=AncientOne Class not ported: Required original class is not registered<br>25_ancientone entry=157 class=CalebAI Class not ported: Required original class is not registered<br>25_ancientone entry=177 class=CClientLightningSFX Class not ported: Required original class is not registered<br>25_ancientone entry=178 class=CClientLightningSFX Class not ported: Required original class is not registered<br>25_ancientone entry=179 class=CClientLightningSFX Class not ported: Required original class is not registered<br>25_ancientone entry=180 class=CClientLightningSFX Class not ported: Required original class is not registered<br>25_ancientone entry=181 class=CClientLightningSFX Class not ported: Required original class is not registered<br>25_ancientone entry=202 class=IshmaelAI Class not ported: Required original class is not registered<br>25_ancientone entry=203 class=OpheliaAI Class not ported: Required original class is not registered<br>25_ancientone entry=204 class=GabriellaAI Class not ported: Required original class is not registered<br>25_ancientone: World initialization rejected: 28 unsupported classes, 0 failed entries, 0 unavailable services |
+| `credits` | credits entry=9 class=CalebAI Class not ported: Required original class is not registered<br>credits: World initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services |
+| `end` | end entry=13 class=CalebAI Class not ported: Required original class is not registered<br>end entry=14 class=IshmaelAI Class not ported: Required original class is not registered<br>end entry=15 class=GabriellaAI Class not ported: Required original class is not registered<br>end entry=16 class=OpheliaAI Class not ported: Required original class is not registered<br>end: World initialization rejected: 4 unsupported classes, 0 failed entries, 0 unavailable services |
+| `multi/bb_area15` | multi/bb_area15: Player entry: Original player creation/start-point entry failed |
+| `multi/bb_bloodkeep` | multi/bb_bloodkeep entry=21 class=Sound Creation failed: Missing or oversized sound resource<br>multi/bb_bloodkeep: World initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services |
+| `multi/bb_brownstar` | multi/bb_brownstar: Player entry: Original player creation/start-point entry failed |
+| `multi/bb_cabana` | multi/bb_cabana entry=56 class=RevenantPU Class not ported: Required original class is not registered<br>multi/bb_cabana: World initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services |
+| `multi/bb_condemned` | multi/bb_condemned entry=150 class=Sound Creation failed: Missing or oversized sound resource<br>multi/bb_condemned entry=151 class=Sound Creation failed: Missing or oversized sound resource<br>multi/bb_condemned entry=239 class=Door Creation failed: Buildings: Open or non-manifold container shell: 4 edges / balance 0 in component 3 at -7488 -1986 -1568 -> -7488 -2048 -1568<br>multi/bb_condemned: World initialization rejected: 0 unsupported classes, 3 failed entries, 0 unavailable services |
+| `multi/bb_crypt` | multi/bb_crypt: Player entry: Original player creation/start-point entry failed |
+| `multi/bb_fields` | multi/bb_fields entry=59 class=Minefield Class not ported: Required original class is not registered<br>multi/bb_fields entry=60 class=Minefield Class not ported: Required original class is not registered<br>multi/bb_fields entry=61 class=Minefield Class not ported: Required original class is not registered<br>multi/bb_fields entry=62 class=Minefield Class not ported: Required original class is not registered<br>multi/bb_fields entry=63 class=Minefield Class not ported: Required original class is not registered<br>multi/bb_fields entry=64 class=Minefield Class not ported: Required original class is not registered<br>multi/bb_fields entry=65 class=Minefield Class not ported: Required original class is not registered<br>multi/bb_fields entry=66 class=Minefield Class not ported: Required original class is not registered<br>multi/bb_fields: World initialization rejected: 8 unsupported classes, 0 failed entries, 0 unavailable services |
+| `multi/bb_midgard` | Failure without diagnostic; improve the audit before classifying. |
+| `multi/bb_rooftop` | multi/bb_rooftop: Player entry: Original player creation/start-point entry failed |
+| `multi/ctf_cabana` | multi/ctf_cabana entry=56 class=RevenantPU Class not ported: Required original class is not registered<br>multi/ctf_cabana entry=118 class=RevenantPU Class not ported: Required original class is not registered<br>multi/ctf_cabana entry=136 class=FlagStand Class not ported: Required original class is not registered<br>multi/ctf_cabana entry=137 class=FlagStand Class not ported: Required original class is not registered<br>multi/ctf_cabana: World initialization rejected: 4 unsupported classes, 0 failed entries, 0 unavailable services |
+| `multi/ctf_deadcities` | multi/ctf_deadcities entry=588 class=FlagStand Class not ported: Required original class is not registered<br>multi/ctf_deadcities entry=589 class=FlagStand Class not ported: Required original class is not registered<br>multi/ctf_deadcities: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services |
+| `multi/ctf_dmx` | multi/ctf_dmx entry=485 class=FlagStand Class not ported: Required original class is not registered<br>multi/ctf_dmx entry=486 class=FlagStand Class not ported: Required original class is not registered<br>multi/ctf_dmx: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services |
+| `multi/ctf_jam` | multi/ctf_jam entry=516 class=FlagStand Class not ported: Required original class is not registered<br>multi/ctf_jam entry=517 class=FlagStand Class not ported: Required original class is not registered<br>multi/ctf_jam: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services |
+
+## Iteration 2: original RotatingModel and RevenantPU
+
+Both classes now register their original behavior. RotatingModel shares the
+original aggregate and exposes its state in Objects; RevenantPU uses the original
+model/skin and offer, with no fabricated player acceptance for unhandled type 8.
+`multi/bb_cabana` now passes all three difficulties. `21_laboratory` remains blocked
+by CClientLightningSFX. Midgard fails during the initial 0.0001 s step: NecroWardPU0 starts
+10.6571 units inside world polygon 449, normal (0,1,0), at (-96,256,-224).
+It is not an unreadable DAT. Slaughter House requests ordinal 17 on labtech.abc,
+which has only 17 clips (0–16); the requested state is 19, Metacmd 1. The backlog above records the baseline pass.
+
+Dev focused regressions: all 24 brush, destructible-model and Airship/power tests
+pass. New tests exercise visual rotation with stable body extents, stopping,
+cleanup, real Revenant assets and original non-acknowledgement.
+
+The same 24 tests pass under Clang ASan/UBSan with leak detection enabled:
+[Dev](evidence/all-levels-lot2-dev.log),
+[sanitizers](evidence/all-levels-lot2-sanitizers.log).
+[Cabana admission](evidence/all-levels-cabana.log) passes all three difficulties;
+[GPU opening](evidence/all-levels-cabana-gpu.log) renders three frames on the
+NVIDIA RTX 3060 and exits 0 (SDL dummy audio). Dev inspector application builds.

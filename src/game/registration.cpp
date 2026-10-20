@@ -49,6 +49,7 @@
 #include "game/original/RemoteBomb.h"
 #include "game/original/RotatingBrush.h"
 #include "game/original/RotatingDoor.h"
+#include "game/original/RotatingModel.h"
 #include "game/original/SeeingEye.h"
 #include "game/original/ShikariAI.h"
 #include "game/original/SingularityProjectile.h"
@@ -808,6 +809,7 @@ namespace OpenBlood2
         const ClassInfo armor_base{"ArmorBase", &powerup_pickup, construct<ArmorBase>, {}};
         const ClassInfo enhancement_base{"EnhancementBase", &powerup_pickup, construct<EnhancementBase>, {}};
         const ClassInfo anger_pickup{"AngerPU", &enhancement_base, construct<AngerPU>, {}};
+        const ClassInfo revenant_pickup{"RevenantPU", &enhancement_base, construct<RevenantPU>, {}};
         const ClassInfo stealth_pickup{"StealthPU", &enhancement_base, construct<StealthPU>, {}};
         const ClassInfo willpower_pickup{"InvulnerabilityPU", &enhancement_base, construct<InvulnerabilityPU>, {}};
         const ClassInfo bullet_ammo{"BulletAmmoPU", &ammo_pickup, construct<BulletAmmoPU>, {}};
@@ -1033,6 +1035,12 @@ namespace OpenBlood2
                                            }
                                            return p;
                                        }()};
+        const ClassInfo rotating_model{"RotatingModel", &destructable_model, construct<RotatingModel>, []
+                                       {
+                                           auto p = rotating_brush.properties;
+                                           std::erase_if(p, [](const auto& prop) { return prop.name == "AllowMarks"; });
+                                           return p;
+                                       }()};
         const ClassInfo world_debris{"WorldModelDebris", &destructable_brush, construct<WorldModelDebris>, []
                                      {
                                          auto p = rotating_brush.properties;
@@ -1156,14 +1164,15 @@ namespace OpenBlood2
                objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
                objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
                objects.register_class(megahealth_pickup) && objects.register_class(enhancement_base) &&
-               objects.register_class(anger_pickup) && objects.register_class(stealth_pickup) &&
-               objects.register_class(willpower_pickup) && objects.register_class(ward_pickup) &&
-               objects.register_class(necroward_pickup) && objects.register_class(exit_trigger) &&
-               objects.register_class(objectives_trigger) && objects.register_class(conversation_trigger) &&
-               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
-               objects.register_class(door) && objects.register_class(rotating_door) &&
-               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
-               objects.register_class(rotating_brush) && objects.register_class(world_debris) &&
+               objects.register_class(anger_pickup) && objects.register_class(revenant_pickup) &&
+               objects.register_class(stealth_pickup) && objects.register_class(willpower_pickup) &&
+               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
+               objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
+               objects.register_class(conversation_trigger) && objects.register_class(big_trigger) &&
+               objects.register_class(toggle_trigger) && objects.register_class(door) &&
+               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
+               objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
+               objects.register_class(rotating_model) && objects.register_class(world_debris) &&
                objects.register_class(hand_model) && objects.register_class(gib) && objects.register_class(corpse) &&
                objects.register_class(proximity) && objects.register_class(remote) && objects.register_class(grenade) &&
                objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&

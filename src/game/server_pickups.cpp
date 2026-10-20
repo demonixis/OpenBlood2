@@ -36,7 +36,7 @@ namespace OpenBlood2
                           "RemotesPU",      "BerettaPU",      "SubMachineGunPU",   "FlareGunPU",     "AssaultRiflePU",
                           "AngerPU",        "SniperRiflePU",  "TeslaCannonPU",     "VoodooDollPU",   "ShotgunPU",
                           "BoneLeech",      "HowitzerPU",     "MiniGunPU",         "NapalmCannonPU", "DeathRayPU",
-                          "TimeBombPU",     "SingularityPU",  "Fanatic",           "Prophet"})
+                          "TimeBombPU",     "SingularityPU",  "Fanatic",           "Prophet",        "RevenantPU"})
             supported |= same_name(type, name);
         Properties parsed;
         return supported && objects_.parse_properties(objects_.find_class(type), props, parsed);

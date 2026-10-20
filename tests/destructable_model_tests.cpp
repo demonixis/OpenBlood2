@@ -1,6 +1,7 @@
 #include "app/model_scene.h"
 #include "audio_fixture.h"
 #include "game/original/DestructableModel.h"
+#include "game/original/RotatingModel.h"
 #include <algorithm>
 #include <limits>
 using namespace OpenBlood2;
@@ -15,6 +16,38 @@ using namespace OpenBlood2;
     } while (false)
 namespace
 {
+    bool rotating(const char* root)
+    {
+        GameSession g;
+        CHECK(test_player::setup(g, root, false));
+        auto h = g.objects.create(g.objects.find_class("RotatingModel"), {}, Creation::World,
+                                  {{"InitFilename", std::string("models/characters/caleb.abc")},
+                                   {"InitSkin", std::string("skins/characters/caleb1.dtx")},
+                                   {"Pos", DVector{0, 100, 0}},
+                                   {"Gravity", false},
+                                   {"YAxisRevTime", 4.f},
+                                   {"Rotation", EulerAngles{{0, .5f, 0}}}});
+        auto* r = g.objects.get(h);
+        auto* m = r ? dynamic_cast<RotatingModel*>(r->game.get()) : nullptr;
+        CHECK(m && m->initialized && m->rotating.state == Rotating::Normal);
+        const auto dims = r->dimensions;
+        CHECK(g.step(.1) && m->rotating.last_move == MoverResult::Moved);
+        CHECK(std::abs(m->rotating.angles.y - .15707963f) < .001f);
+        CHECK(std::abs(r->state.m_Rotation.m_Vec.y - std::sin(.15707963f / 2)) < .001f);
+        CHECK(r->dimensions.x == dims.x && r->dimensions.y == dims.y && r->dimensions.z == dims.z);
+        // Explicit original aggregate command through the normal message ownership path.
+        auto msg = g.server.StartMessageToObject(m, h, 1000);
+        CHECK(msg);
+        auto command = g.server.CreateString("OFF");
+        CHECK(command && g.server.WriteToMessageHString(msg, command) == DE_OK);
+        g.server.FreeString(command);
+        CHECK(g.server.EndMessage(msg) == DE_OK && g.step(.1));
+        CHECK(m->rotating.state == Rotating::Off);
+        const auto stopped = r->state.m_Rotation;
+        CHECK(g.step(.1) && r->state.m_Rotation.m_Vec.y == stopped.m_Vec.y);
+        CHECK(g.unload_world() && CDestructable::m_dwNumDestructables == 0);
+        return true;
+    }
     bool near(float a, float b)
     {
         return std::abs(a - b) < .02f;
@@ -366,7 +399,8 @@ int main(int argc, char** argv)
     if (argc != 3)
         return 2;
     const std::string test = argv[1];
-    const bool ok = test == "unnamed"      ? unnamed()
+    const bool ok = test == "rotating"     ? rotating(argv[2])
+                    : test == "unnamed"    ? unnamed()
                     : test == "properties" ? properties(argv[2])
                     : test == "rejects"    ? rejects(argv[2])
                     : test == "damage"     ? damage(argv[2])

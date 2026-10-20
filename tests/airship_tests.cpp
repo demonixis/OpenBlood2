@@ -187,6 +187,22 @@ namespace
         CHECK(g.unload_world());
         return true;
     }
+    bool revenant(const char* root)
+    {
+        GameSession g;
+        CHECK(fixture(g, root));
+        auto& p = *g.server_shell.Player(g.local_client);
+        auto h = g.objects.create(g.objects.find_class("RevenantPU"), {}, Creation::World,
+                                  {{"Pos", DVector{200, 100, 200}}});
+        auto* item = h ? dynamic_cast<RevenantPU*>(g.server.HandleToObject(h)) : nullptr;
+        CHECK(item && item->value.type == 8 && item->value.amount == 30 && item->resource_id == 316);
+        CHECK(g.objects.get(h)->model && item->rotate_fx);
+        CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, p.m_hObject));
+        CHECK(g.server.IsObjectAlive(h) && !item->picked_up && item->attempts == 1);
+        CHECK(p.powerup_pickups == 0 && !p.IsPowerupActive(PU_INCORPOREAL));
+        CHECK(g.unload_world());
+        return true;
+    }
     bool anger(const char* root)
     {
         GameSession g;
@@ -245,5 +261,7 @@ int main(int argc, char** argv)
         return weapons(argv[2]) ? 0 : 1;
     if (std::string_view(argv[1]) == "anger")
         return anger(argv[2]) ? 0 : 1;
+    if (std::string_view(argv[1]) == "revenant")
+        return revenant(argv[2]) ? 0 : 1;
     return entry(argv[2], argv[1]) ? 0 : 1;
 }

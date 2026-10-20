@@ -18,6 +18,7 @@
 #include "game/original/RemoteBomb.h"
 #include "game/original/RotatingBrush.h"
 #include "game/original/RotatingDoor.h"
+#include "game/original/RotatingModel.h"
 #include "game/original/SoundFX.h"
 #include "game/original/Trigger.h"
 #include "game/original/VolumeBrush.h"
@@ -877,6 +878,14 @@ namespace OpenBlood2
                         if (const auto* model = dynamic_cast<const CDestructableModel*>(object->game.get()))
                         {
                             ImGui::SeparatorText("Original destructible model");
+                            if (const auto* rotating = dynamic_cast<const RotatingModel*>(model))
+                            {
+                                const auto& v = rotating->rotating;
+                                ImGui::Text("Rotating aggregate: state %d | result %d | commands %u", int(v.state),
+                                            int(v.last_move), v.commands);
+                                ImGui::Text("Euler %.3f %.3f %.3f | velocity %.3f %.3f %.3f", v.pose_angles.x,
+                                            v.pose_angles.y, v.pose_angles.z, v.velocity.x, v.velocity.y, v.velocity.z);
+                            }
                             ImGui::Text("HP %.2f / %.2f | damage threshold %.2f | dead %s | destructible %s",
                                         model->m_damage.m_fHitPoints, model->hit_points, model->damage_hit_points,
                                         model->dead_state ? "yes" : "no", model->destructable ? "yes" : "no");

@@ -102,3 +102,19 @@ hidden/inactive as well as visible instances. Existing model/skeleton/resource v
 show ABC/skin/pose state without advancing simulation. Readiness and source-entry
 counts do not imply a playable CityHub or safe automatic NEW_LEVEL. Required
 remaining classes/services, world transfer and M2 remain incomplete.
+
+## RotatingModel
+
+Original ObjectDLL/RotatingModel.cpp adds the existing Rotating aggregate to
+CDestructableModel and binds its owner before forwarding initial update. The
+original axis/reverse/ramp/command and zero-based-angle rules are shared with
+RotatingBrush. Ordinary model rotation uses the checked SetObjectRotation
+service; physics dimensions remain axis-aligned and unchanged. Later LithTech
+serverde_impl.cpp si_DoObjectRotation corroborates this ordinary-object branch.
+World-model brushes retain their existing atomic rotating collision solver.
+
+Destruction and removal still pass through the same aggregate chain once; a
+pending owner cannot rotate. The Objects inspector exposes state, requested
+angles, speed and result for hidden/inactive models too. Rotation sounds retain
+the existing diagnostic-only behavior; this addition does not claim audio or
+retail rotational physics parity.
