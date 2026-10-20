@@ -2,6 +2,18 @@
 #include "NapalmProjectile.h"
 #include "Projectile.h"
 #include "ProximityBomb.h"
+class CVomitProjectile final : public CProjectile
+{
+  public:
+    CVomitProjectile();
+    std::uint64_t trail = 0;
+
+  protected:
+    bool InitialUpdate() override;
+    bool Update() override;
+    // Original m_bExplosion/m_bClientFX/m_bShockwave are all false.
+    void AddExplosion(DVector, DVector) override {}
+};
 class CTimeBomb final : public CProximityBomb
 {
   public:

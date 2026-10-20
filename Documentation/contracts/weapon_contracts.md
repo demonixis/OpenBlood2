@@ -1,5 +1,8 @@
 # Original Inventory and Vector Weapon Boundary
 
+The [Undead Gideon weapon continuation](gideon_weapons_contracts.md) adds original
+spear/vomit and typed timed player imprisonment.
+
 The [Life Leech continuation](life_leech_contracts.md) adds weapon 16, its original
 pickup, both projectiles, post-armor healing and real visual components. Earlier
 weapon limits retain their historical scope.

@@ -1,5 +1,8 @@
 # Selected original player fields and restore initialization
 
+The [imprisonment continuation](gideon_weapons_contracts.md) also saves its active
+flag, relative start clock and length using the original offset convention.
+
 > Continued by [player restore contracts](player_restore_contracts.md): supported
 > engine state and original restored-client association now execute in the same
 > loaded world. Earlier blanket omissions below are historical. Full client/world

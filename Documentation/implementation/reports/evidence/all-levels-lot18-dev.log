@@ -1,0 +1,86 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start  115: movement.walking
+ 1/33 Test  #115: movement.walking .................   Passed    0.01 sec
+      Start  116: movement.jumping
+ 2/33 Test  #116: movement.jumping .................   Passed    0.00 sec
+      Start  117: movement.collisions
+ 3/33 Test  #117: movement.collisions ..............   Passed    0.01 sec
+      Start  118: movement.world_collision
+ 4/33 Test  #118: movement.world_collision .........   Passed    0.01 sec
+      Start  119: movement.support
+ 5/33 Test  #119: movement.support .................   Passed    0.00 sec
+      Start  120: movement.boundaries
+ 6/33 Test  #120: movement.boundaries ..............   Passed    0.00 sec
+      Start  121: movement.timing
+ 7/33 Test  #121: movement.timing ..................   Passed    0.01 sec
+      Start  122: movement.lifetime
+ 8/33 Test  #122: movement.lifetime ................   Passed    0.00 sec
+      Start  123: movement.controls
+ 9/33 Test  #123: movement.controls ................   Passed    0.00 sec
+      Start  124: movement.private
+10/33 Test  #124: movement.private .................   Passed    1.57 sec
+      Start  609: player_state.roundtrip
+11/33 Test  #609: player_state.roundtrip ...........   Passed    0.00 sec
+      Start  610: player_state.clocks
+12/33 Test  #610: player_state.clocks ..............   Passed    0.00 sec
+      Start  611: player_state.initialization
+13/33 Test  #611: player_state.initialization ......   Passed    0.00 sec
+      Start  612: player_state.failures
+14/33 Test  #612: player_state.failures ............   Passed    0.00 sec
+      Start  613: player_state.capture
+15/33 Test  #613: player_state.capture .............   Passed    0.00 sec
+      Start  614: player_state.private
+16/33 Test  #614: player_state.private .............   Passed    0.15 sec
+      Start  620: player_restore.roundtrip
+17/33 Test  #620: player_restore.roundtrip .........   Passed    0.00 sec
+      Start  621: player_restore.failures
+18/33 Test  #621: player_restore.failures ..........***Failed    0.00 sec
+failures:151: !g.restore_player(bad, e) && !e.empty() && g.restoration.error == e
+
+      Start  622: player_restore.lifetime
+19/33 Test  #622: player_restore.lifetime ..........   Passed    0.00 sec
+      Start  623: player_restore.private
+20/33 Test  #623: player_restore.private ...........   Passed    0.17 sec
+      Start 1170: orb.steering
+21/33 Test #1170: orb.steering .....................   Passed    0.02 sec
+      Start 1171: orb.attachment
+22/33 Test #1171: orb.attachment ...................   Passed    0.02 sec
+      Start 1172: orb.camera
+23/33 Test #1172: orb.camera .......................   Passed    0.02 sec
+      Start 1173: orb.client
+24/33 Test #1173: orb.client .......................   Passed    0.02 sec
+      Start 1174: orb.effects
+25/33 Test #1174: orb.effects ......................   Passed    0.02 sec
+      Start 1190: gideon_weapons.definitions
+26/33 Test #1190: gideon_weapons.definitions .......   Passed    0.00 sec
+      Start 1191: gideon_weapons.timer
+27/33 Test #1191: gideon_weapons.timer .............   Passed    0.01 sec
+      Start 1192: gideon_weapons.messages
+28/33 Test #1192: gideon_weapons.messages ..........   Passed    0.01 sec
+      Start 1193: gideon_weapons.movement
+29/33 Test #1193: gideon_weapons.movement ..........   Passed    0.01 sec
+      Start 1194: gideon_weapons.saved
+30/33 Test #1194: gideon_weapons.saved .............   Passed    0.02 sec
+      Start 1195: gideon_weapons.spear
+31/33 Test #1195: gideon_weapons.spear .............   Passed    0.01 sec
+      Start 1196: gideon_weapons.vomit
+32/33 Test #1196: gideon_weapons.vomit .............   Passed    0.01 sec
+      Start 1197: gideon_weapons.lifetime
+33/33 Test #1197: gideon_weapons.lifetime ..........   Passed    0.01 sec
+
+97% tests passed, 1 tests failed out of 33
+
+Label Time Summary:
+gideon_weapons    =   0.10 sec*proc (8 tests)
+headless          =   2.14 sec*proc (33 tests)
+movement          =   1.61 sec*proc (10 tests)
+orb               =   0.09 sec*proc (5 tests)
+player_restore    =   0.18 sec*proc (4 tests)
+player_state      =   0.16 sec*proc (6 tests)
+private           =   2.08 sec*proc (16 tests)
+
+Total Test time (real) =   2.16 sec
+
+The following tests FAILED:
+	621 - player_restore.failures (Failed)                  headless player_restore
+Errors while running CTest

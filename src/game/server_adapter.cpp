@@ -641,7 +641,7 @@ namespace OpenBlood2
         auto* m = writable(h);
         if (!m)
             return DE_INVALIDPARAMS;
-        if (m->damage || m->key || m->pickup)
+        if (m->damage || m->key || m->pickup || m->immobilize)
         {
             m->bad = true;
             return DE_INVALIDPARAMS;
@@ -771,7 +771,7 @@ namespace OpenBlood2
         if (it == messages_.end() || it->second.borrowed)
             return DE_INVALIDPARAMS;
         auto& m = it->second;
-        bool ok = m.routed && !m.bad;
+        bool ok = m.routed && !m.bad && (m.id != immobilize_message || m.immobilize.has_value());
         if (ok)
         {
             m.borrowed = true;

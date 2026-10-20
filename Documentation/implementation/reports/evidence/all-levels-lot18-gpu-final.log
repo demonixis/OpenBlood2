@@ -1,0 +1,30 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1319
+    Start 1319: gpu.vomit
+
+1319: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/vomit_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/vomit-gpu" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1319: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1319: Test timeout computed to be: 120
+1319: flight lit=479 entries=50
+1319: 479 Vomit/trail pixels, source no-impact FX and expiry verified
+1/1 Test #1319: gpu.vomit ........................   Passed    0.47 sec
+
+The following tests passed:
+	gpu.vomit
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+gideon_weapons    =   0.47 sec*proc (1 test)
+gpu               =   0.47 sec*proc (1 test)
+private           =   0.47 sec*proc (1 test)
+
+Total Test time (real) =   0.49 sec

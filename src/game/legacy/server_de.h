@@ -137,6 +137,8 @@ class ServerDE : public CSBase
         OpenBlood2::SegmentObjects objects = OpenBlood2::SegmentObjects::SolidOnly,
         OpenBlood2::SegmentFilter filter = OpenBlood2::SegmentFilter::None,
         OpenBlood2::SegmentStart start = OpenBlood2::SegmentStart::IncludeInterior) = 0;
+    virtual DRESULT WriteImmobilize(HMESSAGEWRITE, float seconds) = 0;
+    virtual bool ReadImmobilize(HMESSAGEREAD, float& seconds) = 0;
     virtual DRESULT WriteDamage(HMESSAGEWRITE, const OpenBlood2::Damage&) = 0;
     virtual bool ReadDamage(HMESSAGEREAD, OpenBlood2::Damage&) = 0;
     // Source adaptation: client association is a checked object handle, never a

@@ -5,6 +5,36 @@
 #include "engine/collision.h"
 #include <cmath>
 using namespace OpenBlood2;
+FireResult CGideonSpear::FireVector()
+{
+    auto* s = g_pServerDE;
+    immobilize_target = nullptr;
+    immobilize_error.clear();
+    if (!s || !firing || !s->IsObjectAlive(m_hOwner))
+        return last_shot.result = FireResult::Invalid;
+    SegmentHit hit;
+    const auto query = s->IntersectSegment(last_shot.request.position, last_shot.end, nullptr, hit, false,
+                                           SegmentObjects::SolidOnly, SegmentFilter::None, SegmentStart::SkipInterior);
+    if (query != SegmentResult::Hit && query != SegmentResult::Miss)
+    {
+        immobilize_error = "Spear preliminary ray unavailable";
+        return last_shot.result = FireResult::Unavailable;
+    }
+    if (query == SegmentResult::Hit && dynamic_cast<CPlayerObj*>(s->HandleToObject(hit.object)))
+    {
+        immobilize_target = hit.object;
+        auto message = s->StartMessageToObject(s->HandleToObject(m_hOwner), hit.object, immobilize_message);
+        const auto written = message ? s->WriteImmobilize(message, 4.f) : DE_ERROR;
+        const auto delivered = message ? s->EndMessage(message) : DE_ERROR;
+        if (written != DE_OK || delivered != DE_OK)
+        {
+            immobilize_error = "Spear immobilization message failed";
+            return last_shot.result = FireResult::DeliveryFailed;
+        }
+        ++immobilize_deliveries; // Transport count; an already imprisoned player ignores the request.
+    }
+    return CWeapon::FireVector(); // Original independent ordinary damage ray follows the prepass.
+}
 FireResult CZealotSpell::FireVector()
 {
     auto* s = g_pServerDE;

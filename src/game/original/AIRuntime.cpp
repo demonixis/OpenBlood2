@@ -65,8 +65,8 @@ namespace
                                              {"GIDEON_SHIELD", WEAP_GIDEON_SHIELD, true},
                                              {"GIDEON_WIND", WEAP_GIDEON_WIND, true},
                                              {"GIDEON_GOO", 0, false},
-                                             {"GIDEON_VOMIT", 0, false},
-                                             {"GIDEON_SPEAR", 0, false},
+                                             {"GIDEON_VOMIT", WEAP_GIDEON_VOMIT, true},
+                                             {"GIDEON_SPEAR", WEAP_GIDEON_SPEAR, true},
                                              {"ANCIENTONE_BEAM", 0, false},
                                              {"ANCIENTONE_TENTACLE", 0, false},
                                              {"SKULL", WEAP_SKULL, true}};

@@ -61,7 +61,7 @@ bool CPlayerObj::OnCommandDetonate()
 {
     if (IsDemoBuild())
         return true; // Original _DEMO compiles COMMAND_DETONATE out: the command does nothing.
-    if (!g_pServerDE->IsObjectAlive(m_hObject) || m_bDead || m_damage.IsDead() || movement_blocked ||
+    if (!g_pServerDE->IsObjectAlive(m_hObject) || m_bDead || m_damage.IsDead() || MovementBlocked() ||
         camera_movement_blocked)
         return false;
     ++remote_commands;

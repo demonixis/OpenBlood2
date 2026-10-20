@@ -18,6 +18,12 @@ namespace
             error = "Invalid saved player clock, angle or air level";
             return false;
         }
+        if (!std::isfinite(state.imprison_start_offset) || !std::isfinite(now + state.imprison_start_offset) ||
+            !std::isfinite(state.imprison_length) || state.imprison_length < 0)
+        {
+            error = "Invalid saved player imprisonment clock";
+            return false;
+        }
         if (!std::isfinite(state.fall_start_offset) || !std::isfinite(state.fall_start_offset + now) ||
             !std::isfinite(state.min_fall_y) || !std::isfinite(state.max_fall_y) ||
             std::abs(state.min_fall_y) > 1000000 || std::abs(state.max_fall_y) > 1000000 ||
@@ -92,6 +98,9 @@ bool CPlayerObj::SaveFields(OpenBlood2::PlayerState& output, std::string& error)
     state.smell_delay = m_fSmellDelay;
     state.dead = m_bDead != 0; // Player death flag is distinct from its damage aggregate.
     state.movement_blocked = movement_blocked;
+    state.imprisoned = m_bImprisoned;
+    state.imprison_start_offset = m_fImprisonStart - now;
+    state.imprison_length = m_fImprisonLength;
     state.falling = m_bFalling;
     state.server_falling = m_bServerFalling;
     state.fall_start_offset = m_startFall - now;
@@ -174,6 +183,9 @@ bool CPlayerObj::LoadFields(const OpenBlood2::PlayerState& state, std::string& e
     m_fSmellDelay = state.smell_delay;
     m_bDead = state.dead;
     movement_blocked = state.movement_blocked;
+    m_bImprisoned = state.imprisoned;
+    m_fImprisonStart = state.imprison_start_offset + now;
+    m_fImprisonLength = state.imprison_length;
     m_bFalling = state.falling;
     m_bServerFalling = state.server_falling;
     m_startFall = state.fall_start_offset + now;

@@ -663,6 +663,7 @@ namespace OpenBlood2
             &ai_manager,
             construct_npc<TheHandAI, AI_Mgr::NPCType::TheHand>,
             {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{4, 4, 5}}}};
+        const ClassInfo vomit_projectile{"CVomitProjectile", &base, construct<CVomitProjectile>, {}};
         const ClassInfo skull_projectile{"CSkullProjectile", &base, construct<CSkullProjectile>, {}};
         const ClassInfo campaign_Thief{
             "Thief",
@@ -1297,10 +1298,10 @@ namespace OpenBlood2
                objects.register_class(chosen_OpheliaREV) && objects.register_class(caleb_ai) &&
                objects.register_class(sparks_obj) && objects.register_class(later_Behemoth) &&
                objects.register_class(later_DrudgePriest) && objects.register_class(later_DeathShroud) &&
-               objects.register_class(later_TheHandAI) && objects.register_class(skull_projectile) &&
-               objects.register_class(campaign_Thief) && objects.register_class(campaign_Naga) &&
-               objects.register_class(campaign_ZealotAI) && objects.register_class(cultist) &&
-               objects.register_class(civilian) && objects.register_class(gideon) &&
+               objects.register_class(later_TheHandAI) && objects.register_class(vomit_projectile) &&
+               objects.register_class(skull_projectile) && objects.register_class(campaign_Thief) &&
+               objects.register_class(campaign_Naga) && objects.register_class(campaign_ZealotAI) &&
+               objects.register_class(cultist) && objects.register_class(civilian) && objects.register_class(gideon) &&
                objects.register_class(enhanced_gideon) && objects.register_class(fanatic) &&
                objects.register_class(prophet) && objects.register_class(bone_leech) &&
                objects.register_class(drudge_lord) && objects.register_class(soul_drudge) &&

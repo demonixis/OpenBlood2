@@ -79,6 +79,12 @@ void CPlayerObj::ProcessTriggerMsg(HMESSAGEREAD read)
 DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
 {
     auto* server = GetServerDE();
+    if (message == OpenBlood2::immobilize_message && !m_bImprisoned && !m_bDead)
+    {
+        float seconds;
+        if (!server->ReadImmobilize(read, seconds) || !Imprison(seconds))
+            return 0;
+    }
     if (message == 1000 /* MID_TRIGGER */)
         ProcessTriggerMsg(read);
     // Original PlayerObj.cpp 4266-4280: ignore volume damage during the first

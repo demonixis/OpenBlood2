@@ -38,7 +38,8 @@ namespace OpenBlood2
         HOBJECT attacker = nullptr;
         bool area_effect = false; // Source DAMAGE_FLAG_AREAEFFECT, separate from the base type.
     };
-    inline constexpr DDWORD damage_message = 1001; // Source AppHeaders/generic_msg_de.h MID_DAMAGE.
+    inline constexpr DDWORD immobilize_message = 3505; // Original MID_IMMOBILIZE.
+    inline constexpr DDWORD damage_message = 1001;     // Source AppHeaders/generic_msg_de.h MID_DAMAGE.
     struct SegmentHit
     {
         DVector point{}, normal{};

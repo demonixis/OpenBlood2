@@ -215,7 +215,11 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         return InventoryResult::NotAvailable;
     // Original strength gate was commented out; do not introduce a new one.
     std::unique_ptr<CWeapon> weapon;
-    if (type == WEAP_ORB)
+    if (type == WEAP_GIDEON_VOMIT)
+        weapon = std::make_unique<CVomit>();
+    else if (type == WEAP_GIDEON_SPEAR)
+        weapon = std::make_unique<CGideonSpear>();
+    else if (type == WEAP_ORB)
         weapon = std::make_unique<COrb>();
     else if (type == WEAP_LIFELEECH)
         weapon = std::make_unique<CLifeLeech>();

@@ -181,6 +181,16 @@ class CPlayerObj : public CBaseCharacter
     bool OnCommandItem(DBYTE);
     bool command_run = false;
     bool movement_blocked = false, camera_movement_blocked = false;
+    bool m_bImprisoned = false;
+    float m_fImprisonStart = 0, m_fImprisonLength = 0;
+    std::uint64_t imprison_requests = 0, imprison_accepts = 0, imprison_expiries = 0;
+    std::string imprison_notice, imprison_error;
+    bool Imprison(float seconds);
+    bool CheckImprisonment();
+    bool MovementBlocked() const
+    {
+        return movement_blocked || m_bImprisoned;
+    }
     bool door_push_pending = false;
     DVector door_push_velocity{};
     std::uint64_t door_pushes = 0;

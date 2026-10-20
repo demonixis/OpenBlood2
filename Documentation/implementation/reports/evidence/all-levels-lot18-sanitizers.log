@@ -1,0 +1,115 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start    3: objects.builtin_model
+ 1/49 Test    #3: objects.builtin_model ............   Passed    0.02 sec
+      Start    4: objects.original_objects
+ 2/49 Test    #4: objects.original_objects .........   Passed    0.02 sec
+      Start    5: objects.nested_creation
+ 3/49 Test    #5: objects.nested_creation ..........   Passed    0.02 sec
+      Start    6: objects.reasons_properties
+ 4/49 Test    #6: objects.reasons_properties .......   Passed    0.02 sec
+      Start    7: objects.scheduling
+ 5/49 Test    #7: objects.scheduling ...............   Passed    0.02 sec
+      Start    8: objects.deferred_removal
+ 6/49 Test    #8: objects.deferred_removal .........   Passed    0.02 sec
+      Start    9: objects.aggregate_dispatch
+ 7/49 Test    #9: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start   10: objects.handles_selection
+ 8/49 Test   #10: objects.handles_selection ........   Passed    0.02 sec
+      Start   11: objects.links_lists
+ 9/49 Test   #11: objects.links_lists ..............   Passed    0.02 sec
+      Start   12: objects.messages_strings
+10/49 Test   #12: objects.messages_strings .........   Passed    0.05 sec
+      Start   13: objects.message_churn
+11/49 Test   #13: objects.message_churn ............   Passed    6.29 sec
+      Start   14: objects.message_limit
+12/49 Test   #14: objects.message_limit ............   Passed    0.54 sec
+      Start   15: objects.unsupported_teardown
+13/49 Test   #15: objects.unsupported_teardown .....   Passed    0.07 sec
+      Start   16: objects.creation_failures
+14/49 Test   #16: objects.creation_failures ........   Passed    0.04 sec
+      Start  102: movement.walking
+15/49 Test  #102: movement.walking .................   Passed    0.27 sec
+      Start  103: movement.jumping
+16/49 Test  #103: movement.jumping .................   Passed    0.12 sec
+      Start  104: movement.collisions
+17/49 Test  #104: movement.collisions ..............   Passed    0.21 sec
+      Start  105: movement.world_collision
+18/49 Test  #105: movement.world_collision .........   Passed    0.37 sec
+      Start  106: movement.support
+19/49 Test  #106: movement.support .................   Passed    0.11 sec
+      Start  107: movement.boundaries
+20/49 Test  #107: movement.boundaries ..............   Passed    0.07 sec
+      Start  108: movement.timing
+21/49 Test  #108: movement.timing ..................   Passed    0.25 sec
+      Start  109: movement.lifetime
+22/49 Test  #109: movement.lifetime ................   Passed    0.06 sec
+      Start  110: movement.controls
+23/49 Test  #110: movement.controls ................   Passed    0.02 sec
+      Start  111: movement.private
+24/49 Test  #111: movement.private .................   Passed   48.69 sec
+      Start  420: ai_state.resize_callback
+25/49 Test  #420: ai_state.resize_callback .........   Passed    0.02 sec
+      Start  596: player_state.roundtrip
+26/49 Test  #596: player_state.roundtrip ...........   Passed    0.04 sec
+      Start  597: player_state.clocks
+27/49 Test  #597: player_state.clocks ..............   Passed    0.03 sec
+      Start  598: player_state.initialization
+28/49 Test  #598: player_state.initialization ......   Passed    0.04 sec
+      Start  599: player_state.failures
+29/49 Test  #599: player_state.failures ............   Passed    0.04 sec
+      Start  600: player_state.capture
+30/49 Test  #600: player_state.capture .............   Passed    0.04 sec
+      Start  601: player_state.private
+31/49 Test  #601: player_state.private .............   Passed    7.42 sec
+      Start  607: player_restore.roundtrip
+32/49 Test  #607: player_restore.roundtrip .........   Passed    0.05 sec
+      Start  608: player_restore.failures
+33/49 Test  #608: player_restore.failures ..........   Passed    0.10 sec
+      Start  609: player_restore.lifetime
+34/49 Test  #609: player_restore.lifetime ..........   Passed    0.08 sec
+      Start  610: player_restore.private
+35/49 Test  #610: player_restore.private ...........   Passed    8.23 sec
+      Start 1161: orb.steering
+36/49 Test #1161: orb.steering .....................   Passed    0.61 sec
+      Start 1162: orb.attachment
+37/49 Test #1162: orb.attachment ...................   Passed    0.62 sec
+      Start 1163: orb.camera
+38/49 Test #1163: orb.camera .......................   Passed    0.48 sec
+      Start 1164: orb.client
+39/49 Test #1164: orb.client .......................   Passed    0.64 sec
+      Start 1165: orb.effects
+40/49 Test #1165: orb.effects ......................   Passed    0.47 sec
+      Start 1174: ai_script.end_private
+41/49 Test #1174: ai_script.end_private ............   Passed    6.57 sec
+      Start 1181: gideon_weapons.definitions
+42/49 Test #1181: gideon_weapons.definitions .......   Passed    0.02 sec
+      Start 1182: gideon_weapons.timer
+43/49 Test #1182: gideon_weapons.timer .............   Passed    0.33 sec
+      Start 1183: gideon_weapons.messages
+44/49 Test #1183: gideon_weapons.messages ..........   Passed    0.34 sec
+      Start 1184: gideon_weapons.movement
+45/49 Test #1184: gideon_weapons.movement ..........   Passed    0.33 sec
+      Start 1185: gideon_weapons.saved
+46/49 Test #1185: gideon_weapons.saved .............   Passed    0.46 sec
+      Start 1186: gideon_weapons.spear
+47/49 Test #1186: gideon_weapons.spear .............   Passed    0.31 sec
+      Start 1187: gideon_weapons.vomit
+48/49 Test #1187: gideon_weapons.vomit .............   Passed    0.30 sec
+      Start 1188: gideon_weapons.lifetime
+49/49 Test #1188: gideon_weapons.lifetime ..........   Passed    0.33 sec
+
+100% tests passed, 0 tests failed out of 49
+
+Label Time Summary:
+ai_script         =   6.57 sec*proc (1 test)
+ai_state          =   0.02 sec*proc (1 test)
+gideon_weapons    =   2.40 sec*proc (8 tests)
+headless          =  85.23 sec*proc (49 tests)
+movement          =  50.16 sec*proc (10 tests)
+objects           =   7.18 sec*proc (14 tests)
+orb               =   2.82 sec*proc (5 tests)
+player_restore    =   8.47 sec*proc (4 tests)
+player_state      =   7.61 sec*proc (6 tests)
+private           =  76.12 sec*proc (17 tests)
+
+Total Test time (real) =  85.28 sec

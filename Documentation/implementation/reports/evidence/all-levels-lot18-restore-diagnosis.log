@@ -1,0 +1,17 @@
+restore corruption 0
+restore corruption 1
+restore corruption 2
+restore corruption 3
+restore corruption 4
+restore corruption 5
+restore corruption 6
+restore corruption 7
+restore corruption 8
+restore corruption 9
+restore corruption 10
+restore corruption 11
+restore corruption 12
+restore corruption 13
+restore corruption 14
+restore corruption 15
+failures:153: !g.restore_player(bad, e) && !e.empty() && g.restoration.error == e

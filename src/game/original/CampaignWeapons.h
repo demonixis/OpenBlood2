@@ -1,5 +1,24 @@
 #pragma once
 #include "Weapon.h"
+class CVomit final : public CWeapon
+{
+  public:
+    CVomit() : CWeapon(WEAP_GIDEON_VOMIT)
+    {
+        damage_type = OpenBlood2::DamageType::Fire;
+    }
+    // The original projectile override removes gravity. CVomitProjectile's
+    // flags already encode that policy; its damage type remains NORMAL.
+};
+class CGideonSpear final : public CWeapon
+{
+  public:
+    CGideonSpear() : CWeapon(WEAP_GIDEON_SPEAR) {}
+    FireResult FireVector() override;
+    HOBJECT immobilize_target = nullptr;
+    std::uint64_t immobilize_deliveries = 0;
+    std::string immobilize_error;
+};
 class CHowitzer final : public CWeapon
 {
   public:

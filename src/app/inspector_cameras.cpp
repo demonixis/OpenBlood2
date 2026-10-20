@@ -91,7 +91,16 @@ namespace OpenBlood2
         ImGui::Text("Listener request %.1f %.1f %.1f", client.listener_position.x, client.listener_position.y,
                     client.listener_position.z);
         if (const auto* owner = game.server_shell.Player(game.local_client))
+        {
             ImGui::Text("Camera blocks movement / USE / fire: %s", owner->camera_movement_blocked ? "yes" : "no");
+            ImGui::Text("Imprisoned %s | start %.3f | duration %.3f | accepted %llu | expired %llu",
+                        owner->m_bImprisoned ? "yes" : "no", owner->m_fImprisonStart, owner->m_fImprisonLength,
+                        (unsigned long long)owner->imprison_accepts, (unsigned long long)owner->imprison_expiries);
+            ImGui::TextWrapped("Original imprisonment notice (console overlay unavailable): %s",
+                               owner->imprison_notice.c_str());
+            if (!owner->imprison_error.empty())
+                ImGui::TextWrapped("%s", owner->imprison_error.c_str());
+        }
         ImGui::Separator();
         ImGui::TextWrapped(
             "Client selection uses the first active camera descriptor; server listener selection follows "

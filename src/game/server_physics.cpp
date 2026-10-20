@@ -80,9 +80,12 @@ namespace OpenBlood2
             return ResizeResult::Unavailable;
         // Original scripts can select an animation synchronously from a touch
         // callback. Equal extents need no collision transaction (also the first
-        // branch in later LithTech ChangeObjectDimensions). Keep actual changes
-        // forbidden during a move; do not re-sweep or move an unchanged body.
-        if (dimensions.x == r->dimensions.x && dimensions.y == r->dimensions.y && dimensions.z == r->dimensions.z)
+        // branch in later LithTech ChangeObjectDimensions). During a move, the
+        // body already belongs to the checked collision transaction. Outside it,
+        // keep the placement check: restore uses equal extents to validate a
+        // newly staged saved position, which has not been checked by a move.
+        if (moving_ && dimensions.x == r->dimensions.x && dimensions.y == r->dimensions.y &&
+            dimensions.z == r->dimensions.z)
             return ResizeResult::Resized;
         if (moving_)
             return ResizeResult::Invalid;

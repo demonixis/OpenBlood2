@@ -216,6 +216,8 @@ namespace OpenBlood2
                                        SegmentObjects objects = SegmentObjects::SolidOnly,
                                        SegmentFilter filter = SegmentFilter::None,
                                        SegmentStart start = SegmentStart::IncludeInterior) override;
+        DRESULT WriteImmobilize(HMESSAGEWRITE, float seconds) override;
+        bool ReadImmobilize(HMESSAGEREAD, float& seconds) override;
         DRESULT WriteDamage(HMESSAGEWRITE, const Damage&) override;
         bool ReadDamage(HMESSAGEREAD, Damage&) override;
         HCLIENT connect_client();
@@ -356,6 +358,7 @@ namespace OpenBlood2
             bool bad = false, routed = false, borrowed = false;
             HOBJECT sender = nullptr, receiver = nullptr;
             DDWORD id = 0;
+            std::optional<float> immobilize;
             std::optional<Damage> damage;
             std::optional<KeyMessage> key;
             std::optional<PickupMessage> pickup;

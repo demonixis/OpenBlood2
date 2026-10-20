@@ -143,6 +143,8 @@ namespace
                 [](auto& v) { v.inventory.right[1] = 255; },
                 [](auto& v) { v.damage.health = NAN; },
                 [](auto& v) { v.player.strength = 0; },
+                [](auto& v) { v.player.imprison_length = -1; },
+                [](auto& v) { v.player.imprison_start_offset = NAN; },
                 [](auto& v) { v.player.name = std::string(101, 'x'); }};
             for (const auto& mutate : corrupt)
             {

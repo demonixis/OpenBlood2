@@ -506,7 +506,7 @@ namespace OpenBlood2
         auto* owner = server_shell.Player(local_client);
         // Original OnCommandOn dead/movement guard, then COMMAND_WEAPON_0..9.
         if (!client_shell.m_bInWorld || !owner || owner->m_bDead || owner->m_damage.IsDead() ||
-            owner->movement_blocked || owner->camera_movement_blocked || slot >= 10)
+            owner->MovementBlocked() || owner->camera_movement_blocked || slot >= 10)
         {
             error = "Weapon command blocked";
             return false;

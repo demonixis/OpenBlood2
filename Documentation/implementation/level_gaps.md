@@ -6,6 +6,10 @@ post-update validation; keep that distinction from entry-only success. The first
 correction adds verified startup for 12_train_stationb and 13_downtown and fixes
 the source accounting of a pickup collected during initialization in 18_temple.
 
+The current complete corpus status and remaining implementation list are maintained
+in [all-level loading](reports/all_level_loading.md#remaining-implementation-queue-after-iteration-18).
+The older per-world table below retains its dated scope.
+
 Snapshot of what blocks each mounted Blood II world from starting, grouped into
 implementation batches. Measured on 2026-10-18 at `b52bb66` against the retail
 2.1 data (BLOOD2, BLOOD2P, BLOOD2P2, BLOOD2NM and SOUND archives), difficulty 1,

@@ -9,7 +9,7 @@ using namespace OpenBlood2;
 // Dead multiplayer respawn / slow-death rescue are outside the accepted session.
 bool CPlayerObj::OnCommandUse()
 {
-    if (!g_pServerDE->IsObjectAlive(m_hObject) || movement_blocked || camera_movement_blocked ||
+    if (!g_pServerDE->IsObjectAlive(m_hObject) || MovementBlocked() || camera_movement_blocked ||
         (m_InventoryMgr.eye && m_InventoryMgr.eye->active))
         return false;
     ++use_commands;
@@ -76,7 +76,7 @@ bool CPlayerObj::OnCommandItem(DBYTE type)
     const bool eye_off = type == 4 && m_InventoryMgr.eye && m_InventoryMgr.eye->active;
     if (!g_pServerDE->IsObjectAlive(m_hObject) || m_bDead || m_damage.IsDead() ||
         (!eye_off &&
-         (movement_blocked || camera_movement_blocked || (type != 7 && type != 8 && type != 9 && command_run))))
+         (MovementBlocked() || camera_movement_blocked || (type != 7 && type != 8 && type != 9 && command_run))))
         return false;
     return m_InventoryMgr.SetActiveItem(type) == InventoryResult::Ok;
 }
@@ -84,7 +84,7 @@ bool CPlayerObj::OnCommandItem(DBYTE type)
 bool CPlayerObj::OnCommandAltFire()
 {
     auto* s = GetServerDE();
-    if (!s->IsObjectAlive(m_hObject) || m_bDead || m_damage.IsDead() || movement_blocked || camera_movement_blocked ||
+    if (!s->IsObjectAlive(m_hObject) || m_bDead || m_damage.IsDead() || MovementBlocked() || camera_movement_blocked ||
         (m_InventoryMgr.eye && m_InventoryMgr.eye->active))
         return false;
     const auto* weapon = m_InventoryMgr.CurrentWeapon();

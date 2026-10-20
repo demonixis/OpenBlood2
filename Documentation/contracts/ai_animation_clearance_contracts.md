@@ -95,3 +95,10 @@ with stable position/extents. The private End regression observes the actual
 Caleb animation after entry, then advances three seconds and rechecks every
 runtime service at all three difficulties, followed by clean unload. See
 [iteration 16](../implementation/reports/all_level_loading.md#iteration-16-ends-triggered-animation).
+
+The subsequent imprisonment/restore regression suite narrowed this exception to
+`moving_` contact dispatch. Outside a movement transaction, equal extents still
+perform the checked placement query: saved-player restoration stages position
+and dimensions before calling ResizeObject, so equality alone must not approve
+a saved body inside the floor. The retained restore failure fixture covers this
+boundary; the End callback exception remains unchanged.

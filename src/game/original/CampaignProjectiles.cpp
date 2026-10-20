@@ -9,6 +9,26 @@
 #include <cmath>
 #include <numbers>
 using namespace OpenBlood2;
+CVomitProjectile::CVomitProjectile() : CProjectile(OT_NORMAL)
+{
+    filename = "Sprites\\napalmprime.spr";
+    skin = nullptr;
+    damage_type = DamageType::Normal; // Weapon's FIRE type is not passed to source Setup.
+}
+bool CVomitProjectile::InitialUpdate()
+{
+    if (!CProjectile::InitialUpdate())
+        return false;
+    trail = g_pServerDE->PublishObjectParticles(m_hObject, 3, trail_error, .25f);
+    return trail && trail_error.empty();
+}
+bool CVomitProjectile::Update()
+{
+    const float scale = g_pServerDE->GetTime() - m_fStartTime < .01f ? 0 : .25f;
+    if (!g_pServerDE->ScaleObject(m_hObject, {scale, scale, scale}))
+        return Fail("Vomit projectile scale unavailable");
+    return CProjectile::Update();
+}
 void PublishCampaignExplosion(HOBJECT source, DVector p, DVector n, unsigned type, const char* sound, float radius)
 {
     auto* s = g_pServerDE;

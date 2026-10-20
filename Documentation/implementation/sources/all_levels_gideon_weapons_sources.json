@@ -1,0 +1,33 @@
+{
+  "selection": "Original Undead Gideon spear/vomit, player imprisonment, saved clocks and ObjectFX3 lifetime scale",
+  "sources": [
+    {
+      "path": "sources/blood2/ObjectDLL/GameWeapons.cpp",
+      "sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GameWeapons.h",
+      "sha256": "593008bca266b8037db7076475fc7d93f86af63c35b41e455c107b9dc3f6bc19"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GameProjectiles.cpp",
+      "sha256": "d713d649cab9e9378ae7992ad74b0e608b6af534f3c5a4df39125219c0970e4f"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Projectile.cpp",
+      "sha256": "52b805c67775579b5703e0ad1099a8ea44d76b245349c8f6d1fac0a1b3b74ef2"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "path": "sources/blood2/Shared/WeaponDefs.h",
+      "sha256": "9a16f7a9f5fe8c57be73aac97bbeb87e712725bc856b1fb110c531875fa655ca"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ObjectFX.cpp",
+      "sha256": "1af815cdb07c8e0fcd56bebb723e78b539cd3398221a78e3b3fcf977bf109c48"
+    }
+  ]
+}

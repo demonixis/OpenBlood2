@@ -12,6 +12,38 @@
 
 namespace OpenBlood2
 {
+    DRESULT ServerAdapter::WriteImmobilize(HMESSAGEWRITE h, float seconds)
+    {
+        trace_service("WriteImmobilize");
+        auto* m = writable(h);
+        if (!m)
+            return DE_INVALIDPARAMS;
+        if (!m->routed || m->id != immobilize_message || !IsObjectAlive(m->sender) || !IsObjectAlive(m->receiver) ||
+            !m->bytes.empty() || m->damage || m->key || m->pickup || m->immobilize || !std::isfinite(seconds) ||
+            seconds < 0 || !std::isfinite(GetTime() + seconds))
+        {
+            m->bad = true;
+            return DE_INVALIDPARAMS;
+        }
+        m->immobilize = seconds;
+        return DE_OK;
+    }
+    bool ServerAdapter::ReadImmobilize(HMESSAGEREAD h, float& seconds)
+    {
+        trace_service("ReadImmobilize");
+        seconds = 0;
+        auto it = messages_.find(h);
+        if (it == messages_.end())
+            return false;
+        auto& m = it->second;
+        if (!m.borrowed || m.bad || m.id != immobilize_message || !m.immobilize)
+        {
+            m.bad = true;
+            return false;
+        }
+        seconds = *m.immobilize;
+        return true;
+    }
     SegmentResult ServerAdapter::IntersectSegment(DVector from, DVector to, HOBJECT ignore, SegmentHit& out,
                                                   bool fire_through, SegmentObjects objects, SegmentFilter filter,
                                                   SegmentStart start)
@@ -125,9 +157,9 @@ namespace OpenBlood2
             (lightning_attribution || (attacker && attacker->life == Life::Alive && m->sender == value.attacker) ||
              (projectile && projectile->configured && projectile->m_hFiredFrom == value.attacker &&
               (!value.attacker || (attacker && attacker->life == Life::Alive))));
-        if (m->id != damage_message || !m->bytes.empty() || m->damage || m->key || m->pickup || !attribution ||
-            !physics_vector(value.position) || !physics_vector(value.direction) || !std::isfinite(value.amount) ||
-            value.amount < 0 || value.amount > 1e6f ||
+        if (m->id != damage_message || !m->bytes.empty() || m->damage || m->key || m->pickup || m->immobilize ||
+            !attribution || !physics_vector(value.position) || !physics_vector(value.direction) ||
+            !std::isfinite(value.amount) || value.amount < 0 || value.amount > 1e6f ||
             (value.type != DamageType::Fire && value.type != DamageType::Normal && value.type != DamageType::Melee &&
              value.type != DamageType::Explode && value.type != DamageType::Suffocate &&
              value.type != DamageType::Death && value.type != DamageType::FreeFall && value.type != DamageType::Blind &&

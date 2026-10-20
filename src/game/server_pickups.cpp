@@ -86,7 +86,7 @@ namespace OpenBlood2
             (value.kind != PickupKind::Ammo && value.kind != PickupKind::Powerup && value.kind != PickupKind::Weapon &&
              value.kind != PickupKind::Item) ||
             (m->id != request && m->id != picked_up_message) || !m->bytes.empty() || m->damage || m->key || m->pickup ||
-            !IsObjectAlive(m->sender) || value.type < 1 || value.type > limit ||
+            m->immobilize || !IsObjectAlive(m->sender) || value.type < 1 || value.type > limit ||
             (value.kind == PickupKind::Weapon && !WeaponPickupClass(value.type)) || !std::isfinite(value.amount) ||
             value.amount < 0 || value.amount > 1e6f ||
             (value.kind == PickupKind::Item &&

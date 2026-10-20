@@ -1714,3 +1714,15 @@ Gideon algorithms. [Contracts](../contracts/enhanced_gideon_contracts.md) and
 [source hashes](sources/all_levels_enhanced_gideon_sources.json) record selective
 reuse, original quirks and checked service boundaries. Registration retains the
 original AI_Mgr parent; the C++ helper inheritance shares implementation only.
+
+### Complete-level continuation: Undead Gideon weapon prerequisites
+
+Original CVomit/CGideonSpear definitions, projectile trail/scaling, player
+MID_IMMOBILIZE/CheckItemsAndSpells and imprisonment Save/Load fields are connected
+through typed services. [Contracts](../contracts/gideon_weapons_contracts.md) and
+[source hashes](sources/all_levels_gideon_weapons_sources.json) retain repeated-hit,
+strict-expiry and Normal-projectile-damage quirks. The movement block composes
+with existing reasons and uses the existing single body integrator. Original
+console text is resolved but its overlay remains unavailable. Restoration checks
+also narrow the End no-op resize exception to an active contact transaction, so
+staged saved positions still receive collision validation.

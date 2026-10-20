@@ -9,11 +9,20 @@ initial deltas, three seconds of simulation with movement, a runtime failure
 recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
 combat, multiplayer or GPU certification. M2 closure remains unchanged.
 
-Current verified opening gate after iteration 17: **52 / 58 pass, 6 / 58 fail**
-([audit 15](evidence/all-levels-audit-15.log)). Remaining worlds:
+Current verified opening gate after iteration 18: **52 / 58 pass, 6 / 58 fail**
+([audit 16](evidence/all-levels-audit-16.log)). Remaining worlds:
 Ancient City, Ancient One and the four CTF maps. Initial-entry and three-second simulation
 coverage is not complete gameplay/traversal acceptance. The tables below retain
 the initial baseline; iteration records explain resolved and newly exposed blockers.
+
+## Remaining implementation queue after iteration 18
+
+| Worlds | Required original behavior |
+| --- | --- |
+| `24_ancientcity` | UndeadGideon profile/model/table, boss-health lifecycle, target decisions, attack choice, head-node fire, forward jump and lateral dodge/recoil. Spear/vomit and timed player imprisonment are implemented in iteration 18; Skull, lightning and shockwave use their existing implementations. |
+| `25_ancientone` | AncientOne and AncientOneTentacle profiles, health/target/attack states, original beam/tentacle weapons and effects, tentacle spawning/lifetime. |
+| `multi/ctf_cabana`, `multi/ctf_deadcities`, `multi/ctf_dmx`, `multi/ctf_jam` | FlagStand and FlagObject models/owned lifetime, touch/trigger handoff, player attachment, drop/death return, timed ground return and original capture/team conditions with truthful local inspection state. Network play is not supplied by the map-inspection entry mode. |
+| All 58 worlds | Repeat all-difficulty entry, simulation/runtime recheck and cleanup after each relevant correction; complete the GPU opening sweep once every map passes admission. Full campaign traversal remains a separate coverage limit. |
 
 ## Work queue
 
@@ -692,3 +701,51 @@ dependencies are unchanged. Entry/simulation coverage is not full boss/campaign
 traversal, network play or a new milestone acceptance.
 
 ![EnhancedGideon](evidence/all-levels-enhanced-gideon.png)
+
+## Iteration 18: Undead Gideon weapon prerequisites
+
+[Original spear/vomit and player imprisonment](../../contracts/gideon_weapons_contracts.md)
+now execute through owned typed messages and the existing physics/particle paths.
+The spear applies four seconds without refreshing an active effect; wall occlusion
+blocks both its preliminary imprisonment ray and ordinary damage. Vomit has real
+source trail particles, Normal direct damage, ten-second expiry and no invented
+impact explosion. Relative imprisonment clocks survive typed player restoration.
+The original localized notices are inspected; their console overlay is not supplied.
+
+The [first focused run](evidence/all-levels-lot18-initial.log) passed six tests but
+omitted the first-update client message pump before resuming movement. The
+[corrected fixture](evidence/all-levels-lot18-second.log) passes all seven cases.
+The [broader run](evidence/all-levels-lot18-dev.log) then found a real restore
+regression: iteration 16's unconditional equal-size success skipped collision for
+a newly staged saved position. [Diagnosis](evidence/all-levels-lot18-restore-diagnosis.log)
+identifies the floor-overlap assertion. The no-op exception is now restricted to
+an active movement transaction. Ordinary equal-size calls retain the placement
+check; End's synchronous contact script still passes. The restore suite also
+rejects malformed imprisonment clocks before mutation.
+
+[49 Dev checks](evidence/all-levels-lot18-dev-final.log) and
+[49 Clang Debug ASan/UBSan checks with leak detection](evidence/all-levels-lot18-sanitizers.log)
+pass: objects, movement, player state/restoration, Orb, End/contact resize and eight
+new weapon/imprisonment cases. The subsequently added wall-occluded spear
+assertions also [pass in Dev](evidence/all-levels-lot18-spear-dev.log) and are included
+in both sanitizer and Release runs. Both applications build. Commands used:
+`cmake --build build/{dev,release,sanitize} --target ...` for the corresponding
+applications and test targets, then CTest restricted to these named suites;
+GPU tests are excluded from sanitizers.
+
+The [Release run](evidence/all-levels-lot18-release.log) passes all 49 headless tests;
+its first GPU fixture fails a pixel-count assertion because the small trail was
+mostly outside the camera view (18 lit pixels). With the camera centered near the
+actual emitter, the [GPU readback](evidence/all-levels-lot18-gpu-final.log) passes:
+479 visible pixels, no impact explosion, exact empty background after removal.
+The production recipe and threshold are unchanged. The capture was visually
+inspected. Initial failures remain retained in their raw logs.
+
+[Audit 16](evidence/all-levels-audit-16.log) again passes **52 / 58**, fails **6 / 58**,
+including all three difficulties and runtime/unload checks for passing maps.
+UndeadGideon itself is the next implementation; AncientOne/Tentacle and the CTF
+flag/player behavior remain in the explicit queue above. This lot changes no
+commercial/reference data, shaders or dependencies and does not certify full
+campaign traversal or reopen M2.
+
+![Original vomit trail](evidence/all-levels-vomit-flight.png)

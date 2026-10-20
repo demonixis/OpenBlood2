@@ -1,0 +1,30 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1190: gideon_weapons.definitions
+1/7 Test #1190: gideon_weapons.definitions .......   Passed    0.00 sec
+    Start 1191: gideon_weapons.timer
+2/7 Test #1191: gideon_weapons.timer .............   Passed    0.01 sec
+    Start 1192: gideon_weapons.messages
+3/7 Test #1192: gideon_weapons.messages ..........   Passed    0.01 sec
+    Start 1193: gideon_weapons.movement
+4/7 Test #1193: gideon_weapons.movement ..........***Failed    0.01 sec
+movement:123: g.client_shell.UpdateMovement(g.server_shell, .05, error) && g.client_shell.move_mgr.m_dwControlFlags != 0
+
+    Start 1194: gideon_weapons.saved
+5/7 Test #1194: gideon_weapons.saved .............   Passed    0.02 sec
+    Start 1195: gideon_weapons.spear
+6/7 Test #1195: gideon_weapons.spear .............   Passed    0.01 sec
+    Start 1196: gideon_weapons.vomit
+7/7 Test #1196: gideon_weapons.vomit .............   Passed    0.01 sec
+
+86% tests passed, 1 tests failed out of 7
+
+Label Time Summary:
+gideon_weapons    =   0.08 sec*proc (7 tests)
+headless          =   0.08 sec*proc (7 tests)
+private           =   0.08 sec*proc (7 tests)
+
+Total Test time (real) =   0.10 sec
+
+The following tests FAILED:
+	1193 - gideon_weapons.movement (Failed)                  gideon_weapons headless private
+Errors while running CTest

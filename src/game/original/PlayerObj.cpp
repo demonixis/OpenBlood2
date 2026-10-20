@@ -414,7 +414,7 @@ DBOOL CPlayerObj::Update(DVector*)
             ++activation_ping_failures;
     }
     // Original order: UpdateStats, then CheckPowerups.
-    if (!UpdateStats() || !CheckPowerups() || !UpdateLandingSound() || !UpdateSmellTrail())
+    if (!UpdateStats() || !CheckPowerups() || !CheckImprisonment() || !UpdateLandingSound() || !UpdateSmellTrail())
         return DFALSE;
     // Original Update handles the first death after stats and smell, before
     // aggregate update clears accumulated frame damage.
@@ -539,7 +539,7 @@ FireResult CPlayerObj::HandleWeaponFireMessage(const OpenBlood2::WeaponFire& req
     if (!m_hClient || !attributes_received || m_damage.IsDead() ||
         GetServerDE()->GetClientUserData(m_hClient) != m_hObject)
         return FireResult::Invalid;
-    if (movement_blocked || camera_movement_blocked || (m_InventoryMgr.eye && m_InventoryMgr.eye->active))
+    if (MovementBlocked() || camera_movement_blocked || (m_InventoryMgr.eye && m_InventoryMgr.eye->active))
         return FireResult::Blocked;
     const auto result = m_InventoryMgr.FireCurrentWeapon(request);
     if (result == FireResult::Fired || result == FireResult::DeliveryFailed)

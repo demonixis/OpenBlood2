@@ -70,7 +70,7 @@ bool CPlayerObj::UpdateLandingSound()
 {
     // Original HandleMovement guards surround this block. Blocked/dead players
     // keep their history; free movement resets its start before the source air update.
-    if (m_damage.IsDead() || movement_blocked)
+    if (m_damage.IsDead() || MovementBlocked())
         return true;
     auto* server = GetServerDE();
     OpenBlood2::MovementState body;
