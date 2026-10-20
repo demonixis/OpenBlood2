@@ -2,6 +2,125 @@
 namespace
 {
     constexpr WeaponData definitions[] = {
+        // Ancient One eyebeam attack
+        {
+            "Models\\Weapons\\knifec_pv.abc",  // Model
+            "Models\\Weapons\\knifec_pv.abc",  // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx", // Skin
+            nullptr,                           // Model
+            nullptr,                           // Skin
+            WEAP_ANCIENTONE_BEAM,              // Type
+            TYPE_MELEE,                        // Fire type
+            AMMO_NONE,                         // Ammo type
+            1,                                 // Ammo Use
+            1,                                 // Alt Ammo Use
+            35.0f,                             // Min Damage
+            70.0f,                             // Max Damage
+            35.0f,                             // Min Alt damage
+            70.0f,                             // Max Alt damage
+            1.0f,                              // Reload time
+            0.0f,                              // Alt reload time
+            {0.0f, 0.0f},                      // Spread
+            {0.0f, 0.0f},                      // Alt Spread
+            0.0f,                              // Projectile Velocity
+            0.0f,                              // Alt Projectile Velocity
+            12000.0f,                          // Range
+            12000.0f,                          // Alt Range
+            1,                                 // Shots per fire
+            1,                                 // Alt Shots per fire
+            1,                                 // Strength or Magic required
+            0,                                 // Two-handed Strength or Magic required
+            0,                                 // Damage Radius (projectiles)
+            0,                                 // Alt Damage Radius (projectiles)
+            DFALSE,                            // Alt fire zoom
+            DFALSE,                            // Semi-auto
+            "",                                // Fire sound
+            "",                                // Alt Fire sound
+            "",                                // Empty weapon sound
+            "",                                // Alt Empty weapon sound
+            nullptr,                           // Projectile class
+            nullptr,                           // Alt Projectile class
+            0,                                 // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                // Muzzle Flash color
+            "Ancientone_Beam",                 // Name
+            0,                                 // Name ID (resource)
+            "",                                // flash sprite name
+            "",                                // alt flash Sprite name
+            0.25f,                             // Flash duration
+            0.10f,                             // Flash scale
+            {0.0f, 0.0f, 0.0f},                // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},               // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},             // Recoil
+            {0.0f, 0.0f, 0.1f},                // Flash position
+            0.625f,                            // Eject interval
+            0.0f,                              // View kick
+            DFALSE,                            // View kick is Cumulative
+            DFALSE,                            // Animation looping
+            DFALSE,                            // Alt anim looping
+            nullptr,                           // Icon for status bar
+            nullptr,                           // Highlighted icon for status bar
+        },
+        // AncientOne Tentacle
+        {
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Models\\Weapons\\knifec_pv.abc",   // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",  // Skin
+            nullptr,                            // Model
+            nullptr,                            // Skin
+            WEAP_ANCIENTONE_TENTACLE,           // Type
+            TYPE_MELEE,                         // Fire type
+            AMMO_NONE,                          // Ammo type
+            1,                                  // Ammo Use
+            1,                                  // Alt Ammo Use
+            15.0f,                              // Min Damage
+            20.0f,                              // Max Damage
+            20.0f,                              // Min Alt damage
+            40.0f,                              // Max Alt damage
+            0.01f,                              // Reload time
+            0.0f,                               // Alt reload time
+            {0.0f, 0.0f},                       // Spread
+            {0.0f, 0.0f},                       // Alt Spread
+            0.0f,                               // Projectile Velocity
+            0.0f,                               // Alt Projectile Velocity
+            800.0f,                             // Range
+            800.0f,                             // Alt Range
+            1,                                  // Shots per fire
+            1,                                  // Alt Shots per fire
+            1,                                  // Strength or Magic required
+            0,                                  // Two-handed Strength or Magic required
+            0,                                  // Damage Radius (projectiles)
+            0,                                  // Alt Damage Radius (projectiles)
+            DFALSE,                             // Alt fire zoom
+            DFALSE,                             // Semi-auto
+            "Sounds\\Weapons\\Knife\\fire.wav", // Fire sound
+            "Sounds\\Weapons\\Knife\\alt.wav",  // Alt Fire sound
+            "",                                 // Empty weapon sound
+            "",                                 // Alt Empty weapon sound
+            nullptr,                            // Projectile class
+            nullptr,                            // Alt Projectile class
+            0,                                  // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Flash color
+            "AncientOne_Tentacle",              // Name
+            0,                                  // Name ID (resource)
+            "",                                 // flash sprite name
+            "",                                 // alt flash Sprite name
+            0.25f,                              // Flash duration
+            0.0f,                               // Flash scale
+            {0.0f, 0.0f, 0.0f},                 // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                 // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},              // Recoil
+            {0.0f, 0.0f, 0.1f},                 // Flash position
+            0.625f,                             // Eject interval
+            0.0f,                               // View kick
+            DFALSE,                             // View kick is Cumulative
+            DFALSE,                             // Animation looping
+            DFALSE,                             // Alt anim looping
+            nullptr,                            // Icon for status bar
+            nullptr,                            // Highlighted icon for status bar
+        },
+
         // Undead Gideon vomit attack
         {
             "Models\\Weapons\\knifec_pv.abc",   // Model

@@ -55,7 +55,7 @@ namespace OpenBlood2
             out.push_back(s);
             return true;
         }
-        if (type > 3 && type != 6 && type != 8)
+        if (type > 4 && type != 6 && type != 8)
         {
             error = "Explosion light recipe is unavailable";
             return false;
@@ -77,7 +77,7 @@ namespace OpenBlood2
         s.color1 = {1, .5f, 0};
         s.color2 = {1, 1, 1};
         s.duration = 1.25f;
-        s.radius1 = type == 0 || type == 6 ? 150.f : type == 1 ? 200.f : 250.f;
+        s.radius1 = type == 4 ? 300.f : type == 0 || type == 6 ? 150.f : type == 1 ? 200.f : 250.f;
         s.radius2 = 0;
         out.push_back(s);
         s.color1 = {.2f, .2f, .2f};

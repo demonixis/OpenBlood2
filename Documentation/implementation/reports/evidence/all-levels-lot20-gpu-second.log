@@ -1,0 +1,33 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1339
+    Start 1339: gpu.ancient_effects
+
+1339: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ancient_effects_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/ancient-effects" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1339: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1339: Test timeout computed to be: 120
+1339: Ancient red-large beam pixels=0
+1339: 111: red > 100  
+1/1 Test #1339: gpu.ancient_effects ..............***Failed    0.54 sec
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+ancient_one    =   0.54 sec*proc (1 test)
+gpu            =   0.54 sec*proc (1 test)
+private        =   0.54 sec*proc (1 test)
+
+Total Test time (real) =   0.56 sec
+
+The following tests FAILED:
+	1339 - gpu.ancient_effects (Failed)                      ancient_one gpu private
+Errors while running CTest
+Output from these tests are in: /home/yann/projects/lithtech/Blood2/build/release/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

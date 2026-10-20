@@ -122,7 +122,8 @@ bool AI_Mgr::Fire(bool alternate)
     auto* weapon = m_InventoryMgr.CurrentWeapon();
     if (!weapon)
         return fail(FireResult::Unavailable, "AI has no current weapon");
-    if (weapon->data.m_nType != WEAP_ORB && weapon->data.m_nType != WEAP_LIFELEECH &&
+    if (weapon->data.m_nType != WEAP_ANCIENTONE_BEAM && weapon->data.m_nType != WEAP_ANCIENTONE_TENTACLE &&
+        weapon->data.m_nType != WEAP_ORB && weapon->data.m_nType != WEAP_LIFELEECH &&
         weapon->data.m_nType != WEAP_MINIGUN && weapon->data.m_nType != WEAP_BEHEMOTH_CLAW &&
         weapon->data.m_nType != WEAP_BEHEMOTH_SHOCKWAVE && weapon->data.m_nType != WEAP_DRUDGE_LIGHTNING &&
         weapon->data.m_nType != WEAP_SKULL && weapon->data.m_nType != WEAP_HOWITZER &&
@@ -141,7 +142,9 @@ bool AI_Mgr::Fire(bool alternate)
         weapon->data.m_nType != WEAP_DRUDGE_FIREBALL)
         return fail(FireResult::Unavailable, "AI weapon-specific aiming is not integrated");
     DRotation rotation;
-    const bool naga = weapon->data.m_nType == WEAP_NAGA_EYEBEAM || weapon->data.m_nType == WEAP_SKULL;
+    const bool ancient_beam = weapon->data.m_nType == WEAP_ANCIENTONE_BEAM;
+    const bool ancient_tentacle = weapon->data.m_nType == WEAP_ANCIENTONE_TENTACLE;
+    const bool naga = ancient_beam || weapon->data.m_nType == WEAP_NAGA_EYEBEAM || weapon->data.m_nType == WEAP_SKULL;
     const bool energy = weapon->data.m_nType == WEAP_ZEALOT_ENERGYBLAST;
     fire_gun_node =
         server->GetModelNodeTransform(m_hObject,
@@ -154,7 +157,22 @@ bool AI_Mgr::Fire(bool alternate)
     if (naga && !fire_gun_node)
         return fail(FireResult::Unavailable, "Projectile head_gun node unavailable");
     const auto type = weapon->data.m_nType;
-    if (type == WEAP_SHIKARI_SPIT || type == WEAP_DRUDGE_FIREBALL || type == WEAP_DRUDGE_LIGHTNING)
+    if (ancient_beam)
+    {
+        fire_direction = vector_subtract(m_vTargetPos, fire_origin);
+        if (!normalize(fire_direction) || !m_MoveObj.initialized)
+            return fail(FireResult::Invalid, "Ancient One head/forward direction unavailable");
+        fire_direction.x = m_MoveObj.GetForwardVector().x;
+        fire_direction.z = m_MoveObj.GetForwardVector().z;
+    }
+    else if (ancient_tentacle)
+    {
+        fire_gun_node = false;
+        if (server->GetObjectPos(m_hObject, &fire_origin) != DE_OK)
+            return fail(FireResult::Unavailable, "Tentacle origin unavailable");
+        fire_direction = vector_subtract(m_vTargetPos, fire_origin);
+    }
+    else if (type == WEAP_SHIKARI_SPIT || type == WEAP_DRUDGE_FIREBALL || type == WEAP_DRUDGE_LIGHTNING)
     {
         // Original branch: from the head node toward the cached target position.
         DRotation head_rotation;
@@ -198,7 +216,8 @@ bool AI_Mgr::Fire(bool alternate)
     }
     if (!normalize(fire_direction))
         return fail(FireResult::Invalid, "AI aim direction is degenerate or invalid");
-    if (!energy && type != WEAP_DRUDGE_FIREBALL && !CheckClearShot(fire_origin, fire_direction, alternate))
+    if (!ancient_beam && !ancient_tentacle && !energy && type != WEAP_DRUDGE_FIREBALL &&
+        !CheckClearShot(fire_origin, fire_direction, alternate))
     {
         if (clear_shot.outcome == AIClearOutcome::Invalid || clear_shot.outcome == AIClearOutcome::Unavailable)
             return fail(FireResult::Unavailable, "AI clearance query failed");

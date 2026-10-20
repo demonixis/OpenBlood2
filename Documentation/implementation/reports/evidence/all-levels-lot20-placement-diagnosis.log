@@ -1,0 +1,21 @@
+AncientOne pos 256,-164.606,-128 dims 352.607,347.393,352.607
+AncientOneTentacle pos -512,-278.432,-384 dims 180.36,233.567,180.36
+AncientOneTentacle pos -128,-422,-640 dims 75,90,75
+AncientOneTentacle pos 640,-422,-640 dims 75,90,75
+AncientOneTentacle pos 1024,-280.57,-384 dims 182.142,231.429,182.142
+AncientOneTentacle pos 1024,-279.664,128 dims 181.388,232.335,181.388
+AncientOneTentacle pos 640,-422,384 dims 75,90,75
+AncientOneTentacle pos -128,-422,384 dims 75,90,75
+AncientOneTentacle pos -512,-278.518,128 dims 180.433,233.481,180.433
+AncientOneTentacles2 pos -4864,-279.257,-384 dims 181.048,232.742,181.048
+AncientOneTentacles2 pos -4480,-1245.9,-640 dims 186.585,226.098,186.585
+AncientOneTentacles2 pos -3712,-1246.16,-640 dims 186.801,225.838,186.801
+AncientOneTentacles2 pos -3328,-284.151,-384 dims 185.127,227.848,185.127
+AncientOneTentacles2 pos -3328,-283.271,128 dims 184.393,228.728,184.393
+AncientOneTentacles2 pos -3712,-1240.09,384 dims 181.745,231.907,181.745
+AncientOneTentacles2 pos -4480,-1250.53,384 dims 190.444,221.467,190.444
+AncientOneTentacles2 pos -4864,-280.964,128 dims 182.471,231.035,182.471
+AncientOne2 pos -4096,-659.781,-128 dims 351.596,348.404,351.596
+ overlaps DeathTrap depths 1119.6,264.623,1119.6 center -4096,-544,-128 dims 768,32,768
+World initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+AncientOne2 NPC placement against the completed world failed

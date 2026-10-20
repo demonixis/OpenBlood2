@@ -1,4 +1,5 @@
 #include "game/original/AI_Mgr.h"
+#include "game/original/AncientOne.h"
 #include "game/original/ChosenAI.h"
 #include "game/original/Corpse.h"
 #include "game/original/CultistAI.h"
@@ -618,6 +619,26 @@ namespace OpenBlood2
                         (unsigned long long)chosen->sidesteps);
             ImGui::Text("Distance %.2f | height %.2f | dodge flags 0x%x | command %d", chosen->crouch_attack_distance,
                         chosen->crouch_attack_height, unsigned(chosen->m_nDodgeFlags), chosen->m_nCurMetacmd);
+        }
+        if (const auto* boss = dynamic_cast<const AncientOne*>(target_ai);
+            boss && ImGui::CollapsingHeader("Original Ancient One", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::Text("HP %.2f / captured %.2f | ratio %.3f | create %s", boss->m_damage.m_fHitPoints,
+                        boss->m_fFullHealth, boss->boss_health_fraction, boss->m_bCreateHealth ? "yes" : "no");
+            ImGui::Text("Health requests %llu | delivered %llu | no audience %llu | spawned %llu",
+                        (unsigned long long)boss->health_requests, (unsigned long long)boss->health_deliveries,
+                        (unsigned long long)boss->health_no_client, (unsigned long long)boss->tentacles_spawned);
+            if (!boss->health_error.empty())
+                ImGui::TextWrapped("%s", boss->health_error.c_str());
+        }
+        if (const auto* t = dynamic_cast<const AncientOneTentacle*>(target_ai);
+            t && ImGui::CollapsingHeader("Original Ancient One tentacle", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::Text("Scale factor %.3f | death time %.3f | hiding %s", t->m_fScaleBy, t->m_fTimeOfDeath,
+                        t->m_bHiding ? "yes" : "no");
+            ImGui::Text("Scale updates %llu | revivals %llu | ignored boss damage %llu",
+                        (unsigned long long)t->scale_updates, (unsigned long long)t->revivals,
+                        (unsigned long long)t->ignored_boss_damage);
         }
         if (const auto* boss = dynamic_cast<const UndeadGideon*>(target_ai);
             boss && ImGui::CollapsingHeader("Original UndeadGideon", ImGuiTreeNodeFlags_DefaultOpen))

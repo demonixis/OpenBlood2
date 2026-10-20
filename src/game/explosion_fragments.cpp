@@ -16,7 +16,7 @@ namespace OpenBlood2
         }
         ExplosionFragmentReport report{next_event_++, type, std::string(source), {}, {}, {}, {}};
         if (!physics_vector(pos) || !physics_vector(normal) || vector_dot(normal, normal) < 1e-12f ||
-            (type > 3 && type != 6 && type != 8 && type != 21))
+            (type > 4 && type != 6 && type != 8 && type != 21))
         {
             report.error = "Invalid explosion or unavailable fragment recipe";
             ++failed;

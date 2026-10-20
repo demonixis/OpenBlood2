@@ -1,0 +1,49 @@
+{
+  "selection": "Original AncientOne/Tentacle, weapon 46/47 and high-detail napalm impact; typed ownership and bounded initial placement adaptations",
+  "sources": [
+    {
+      "path": "sources/blood2/ObjectDLL/AncientOne.cpp",
+      "sha256": "f6799537a735d22efdee3cfcb4f657c4753c4e10efe87e5420b93b1d99e7ef1c"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AncientOne.h",
+      "sha256": "0cc1859df4041b4b7a2cd440475b88f9ce1215d55b3f559e486198841cef6efb"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AncientOneTentacle.cpp",
+      "sha256": "7525156bdacd06170dbf10e8155f44b2cbb4ebc5da2f296c6de85bbb57cda585"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AncientOneTentacle.h",
+      "sha256": "859bce887acc62a7f2a88ae433478ef9b534460a4f305e84594680b9fc5ce460"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GameWeapons.cpp",
+      "sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GameWeapons.h",
+      "sha256": "593008bca266b8037db7076475fc7d93f86af63c35b41e455c107b9dc3f6bc19"
+    },
+    {
+      "path": "sources/blood2/Shared/WeaponDefs.cpp",
+      "sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f"
+    },
+    {
+      "path": "sources/blood2/Shared/SFXMsgIds.h",
+      "sha256": "d835c9589f2338bad9606df92c8bd4394ea232ff2cc325b0c8aa4c49474d9f4f"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
+      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/LaserBeamFX.cpp",
+      "sha256": "7f729e2e2b79fc9111b9b16e152ace1a274177d280ed9c0ac12e3535665a87d1"
+    }
+  ]
+}

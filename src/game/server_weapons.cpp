@@ -54,7 +54,7 @@ namespace OpenBlood2
         if ((filter != SegmentFilter::None && filter != SegmentFilter::AIVisibility &&
              filter != SegmentFilter::AIShot && filter != SegmentFilter::IgnoreCharacters &&
              filter != SegmentFilter::IgnoreVolumes && filter != SegmentFilter::IgnoreOwnerClass &&
-             filter != SegmentFilter::ProjectileContact) ||
+             filter != SegmentFilter::IgnoreAncientTentacles && filter != SegmentFilter::ProjectileContact) ||
             (start != SegmentStart::IncludeInterior && start != SegmentStart::SkipInterior) ||
             (objects != SegmentObjects::SolidOnly && objects != SegmentObjects::SolidOrRayHit &&
              objects != SegmentObjects::All) ||
@@ -98,6 +98,9 @@ namespace OpenBlood2
             if (filter == SegmentFilter::IgnoreVolumes && dynamic_cast<const VolumeBrush*>(record->game.get()))
                 continue;
             if (filter == SegmentFilter::IgnoreCharacters && dynamic_cast<const CBaseCharacter*>(record->game.get()))
+                continue;
+            if (filter == SegmentFilter::IgnoreAncientTentacles &&
+                Objects::is_kind_of(record->type, objects_.find_class("AncientOneTentacle")))
                 continue;
             if (filter == SegmentFilter::IgnoreOwnerClass && Objects::is_kind_of(record->type, owner->type))
                 continue;

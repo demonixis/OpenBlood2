@@ -239,11 +239,13 @@ int main(int argc, char** argv)
         CHECK(game.resources.mount_game(config, error));
         std::size_t compared = 0, filled = 0, differing = 0;
         int max_delta = 0;
+        const bool ancient = argc == 4 && std::string_view(argv[3]) == "ancient";
         const bool undead = argc == 4 && std::string_view(argv[3]) == "undead";
         const bool enhanced = argc == 4 && std::string_view(argv[3]) == "enhanced";
         const bool ishmael = argc == 4 && std::string_view(argv[3]) == "ishmael";
         const bool chosen = argc == 4 && std::string_view(argv[3]) == "chosen";
-        const auto worlds = undead              ? std::vector<const char*>{"24_ancientcity"}
+        const auto worlds = ancient             ? std::vector<const char*>{"25_ancientone"}
+                            : undead            ? std::vector<const char*>{"24_ancientcity"}
                             : enhanced          ? std::vector<const char*>{"23_rooftop"}
                             : chosen || ishmael ? std::vector<const char*>{"end", "24b_arena"}
                                                 : std::vector<const char*>{"01_SubwayA", "02_CityHub"};
@@ -258,6 +260,8 @@ int main(int argc, char** argv)
                 auto* r = game.objects.get(probe.entries[i].object);
                 if (!r || !r->model || probe.entries[i].range == UINT32_MAX ||
                     std::find(seen.begin(), seen.end(), probe.entries[i].label) != seen.end())
+                    continue;
+                if (ancient && std::string_view(r->state.m_SkinName) != "Skins/Enemies/AncientOne.dtx")
                     continue;
                 if (chosen && std::string_view(r->state.m_Filename) != "Models/Characters/gabriella.abc" &&
                     std::string_view(r->state.m_Filename) != "Models/Characters/ophelia.abc")
@@ -306,7 +310,11 @@ int main(int argc, char** argv)
         std::cout << "Retail CPU/GPU skinning equivalence: " << compared << " distinct assets at three clip times, "
                   << filled << " filled pixels, " << differing << " differing by more than 1, max delta " << max_delta
                   << '\n';
-        CHECK(undead || enhanced ? compared == 1 : ishmael ? compared == 2 : chosen ? compared == 4 : compared >= 10);
+        CHECK(ancient              ? compared >= 2
+              : undead || enhanced ? compared == 1
+              : ishmael            ? compared == 2
+              : chosen             ? compared == 4
+                                   : compared >= 10);
     }
     gpu_renderer.clear_geometry();
     cpu_renderer.clear_geometry();

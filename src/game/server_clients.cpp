@@ -1,4 +1,5 @@
 #include "engine/world_model.h"
+#include "game/original/AI_Mgr.h"
 #include "game/server_adapter.h"
 #include <algorithm>
 #include <cmath>
@@ -352,10 +353,24 @@ namespace OpenBlood2
                     // Shell interiors have no unique escape normal. Use the
                     // nearest clear face-adjacent candidate, bounded by the
                     // actor's dimensions rather than a potentially huge BSP.
+                    // A later platform may appear after this actor already dropped
+                    // below it. A vertical return may use the authored spawn as its
+                    // bounded anchor, but only along the unchanged original XZ.
+                    // The complete endpoint and swept route still must be clear.
+                    const auto authored = r->properties.find("Pos");
+                    const auto* anchor =
+                        authored == r->properties.end() ? nullptr : std::get_if<DVector>(&authored->second);
+                    const auto* actor = dynamic_cast<const AI_Mgr*>(r->game.get());
+                    const bool restore_drop =
+                        actor && actor->runtime_updates == 0 && !objects_.busy() && other->world_model && anchor &&
+                        physics_vector(*anchor) && std::abs(anchor->x - origin.x) < .01f &&
+                        std::abs(anchor->z - origin.z) < .01f && origin.y < anchor->y && candidate.x == origin.x &&
+                        candidate.z == origin.z && candidate.y >= anchor->y &&
+                        candidate.y - anchor->y <= r->dimensions.y + .01f;
                     const bool shell_limit =
                         other->world_model &&
                         (std::hypot(delta.x, delta.z) > 2 * std::min(r->dimensions.x, r->dimensions.z) + .01f ||
-                         std::abs(delta.y) > r->dimensions.y + .01f);
+                         (std::abs(delta.y) > r->dimensions.y + .01f && !restore_drop));
                     if (shell_limit || distance(candidate) > limit * limit ||
                         sweep_scene(h, candidate, candidate, r->dimensions, hit, ids) != CollisionQuery::Miss ||
                         sweep_scene(h, origin, candidate, r->dimensions, hit, ids, other->handle, .01,

@@ -1736,3 +1736,13 @@ quirks and limits. Complete-scene initial placement repeats the existing bounded
 solver after later source rows exist. Internal animation remainder roundoff is
 clamped without accepting invalid input clocks. Neither is claimed retail physics
 parity; reference/commercial data and graphics pipelines are unchanged.
+
+### Complete-level continuation: Ancient One and tentacles
+
+[Original profiles, health/states, revival, beam/tentacle weapons and napalm impact](../contracts/ancient_one_contracts.md)
+use the checked shared engine services. [Source hashes](sources/all_levels_ancient_one_sources.json)
+record the source methods and recipes. Nonhumanoid damage retains explicit body
+localization; the subclass notification runs without adding humanoid spheres.
+The multi-model impact batch commits only after every model resource is ready.
+A later platform can correct an earlier ground drop using a bounded authored
+anchor; runtime collision, shaders, dependencies and commercial data are unchanged.

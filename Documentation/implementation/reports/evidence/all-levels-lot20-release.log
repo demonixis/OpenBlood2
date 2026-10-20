@@ -1,0 +1,120 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1330
+      Start 1330: ancient_one.profiles
+
+1330: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ancient_one_tests "profiles" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1330: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1330: Test timeout computed to be: 240
+ 1/10 Test #1330: ancient_one.profiles .............   Passed    0.04 sec
+test 1331
+      Start 1331: ancient_one.decisions
+
+1331: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ancient_one_tests "decisions" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1331: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1331: Test timeout computed to be: 240
+ 2/10 Test #1331: ancient_one.decisions ............   Passed    0.02 sec
+test 1332
+      Start 1332: ancient_one.scale
+
+1332: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ancient_one_tests "scale" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1332: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1332: Test timeout computed to be: 240
+ 3/10 Test #1332: ancient_one.scale ................   Passed    0.02 sec
+test 1333
+      Start 1333: ancient_one.damage
+
+1333: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ancient_one_tests "damage" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1333: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1333: Test timeout computed to be: 240
+ 4/10 Test #1333: ancient_one.damage ...............   Passed    0.02 sec
+test 1334
+      Start 1334: ancient_one.beam
+
+1334: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ancient_one_tests "beam" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1334: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1334: Test timeout computed to be: 240
+ 5/10 Test #1334: ancient_one.beam .................   Passed    0.02 sec
+test 1335
+      Start 1335: ancient_one.spawn
+
+1335: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ancient_one_tests "spawn" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1335: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1335: Test timeout computed to be: 240
+ 6/10 Test #1335: ancient_one.spawn ................   Passed    0.02 sec
+test 1336
+      Start 1336: ancient_one.keys
+
+1336: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ancient_one_tests "keys" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1336: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1336: Test timeout computed to be: 240
+1336: Ancient actual model-key shots=1
+ 7/10 Test #1336: ancient_one.keys .................   Passed    0.02 sec
+test 1337
+      Start 1337: ancient_one.world
+
+1337: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ancient_one_tests "world" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1337: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1337: Test timeout computed to be: 240
+ 8/10 Test #1337: ancient_one.world ................   Passed    1.45 sec
+test 1338
+      Start 1338: gpu.ancient_one
+
+1338: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/model_skinning_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/ancient-one" "/home/yann/.steam/steam/steamapps/common/Blood II" "ancient"
+1338: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1338: Test timeout computed to be: 120
+1338: Synthetic mask 0 time 0: 3365/3365 filled, 0 differing, max delta 0
+1338: Synthetic mask 0 time 37.5: 3489/3489 filled, 0 differing, max delta 0
+1338: Synthetic mask 0 time 100: 3421/3421 filled, 0 differing, max delta 0
+1338: Synthetic mask 1 time 0: 1737/1737 filled, 0 differing, max delta 0
+1338: Synthetic mask 1 time 37.5: 1929/1929 filled, 0 differing, max delta 0
+1338: Synthetic mask 1 time 100: 1987/1987 filled, 0 differing, max delta 0
+1338: Synthetic mask 2 time 0: 1526/1526 filled, 0 differing, max delta 0
+1338: Synthetic mask 2 time 37.5: 1412/1412 filled, 0 differing, max delta 0
+1338: Synthetic mask 2 time 100: 1103/1103 filled, 0 differing, max delta 0
+1338: Retail CPU/GPU skinning equivalence: 5 distinct assets at three clip times, 8976 filled pixels, 0 differing by more than 1, max delta 0
+1338: GPU skinning matches CPU posing, deformation, scale, hidden faces and instance transforms
+ 9/10 Test #1338: gpu.ancient_one ..................   Passed    0.81 sec
+test 1339
+      Start 1339: gpu.ancient_effects
+
+1339: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/ancient_effects_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/ancient-effects" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1339: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1339: Test timeout computed to be: 120
+1339: Ancient red-large beam pixels=0
+1339: 101: red > 100  
+10/10 Test #1339: gpu.ancient_effects ..............***Failed    0.60 sec
+
+The following tests passed:
+	ancient_one.profiles
+	ancient_one.decisions
+	ancient_one.scale
+	ancient_one.damage
+	ancient_one.beam
+	ancient_one.spawn
+	ancient_one.keys
+	ancient_one.world
+	gpu.ancient_one
+
+90% tests passed, 1 tests failed out of 10
+
+Label Time Summary:
+ancient_one    =   3.00 sec*proc (10 tests)
+gpu            =   1.40 sec*proc (2 tests)
+headless       =   1.60 sec*proc (8 tests)
+private        =   3.00 sec*proc (10 tests)
+
+Total Test time (real) =   3.03 sec
+
+The following tests FAILED:
+	1339 - gpu.ancient_effects (Failed)                      ancient_one gpu private
+Errors while running CTest
+Output from these tests are in: /home/yann/projects/lithtech/Blood2/build/release/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

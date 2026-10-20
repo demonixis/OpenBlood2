@@ -1,4 +1,5 @@
 #include "game/original/AmmoPickups.h"
+#include "game/original/AncientOne.h"
 #include "game/original/B2BaseClass.h"
 #include "game/original/BoneLeech.h"
 #include "game/original/BugSprayProjectile.h"
@@ -781,6 +782,14 @@ namespace OpenBlood2
             &ai_manager,
             construct_npc<Gideon, AI_Mgr::NPCType::Gideon>,
             {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Enhanced", false}}};
+        const ClassInfo ancient_one{"AncientOne",
+                                    &ai_manager,
+                                    construct_npc<AncientOne, AI_Mgr::NPCType::AncientOne>,
+                                    {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}}};
+        const ClassInfo ancient_tentacle{"AncientOneTentacle",
+                                         &ai_manager,
+                                         construct_npc<AncientOneTentacle, AI_Mgr::NPCType::AncientOneTentacle>,
+                                         {{"AIState", std::string("IDLE"), true, 31}}};
         const ClassInfo undead_gideon{
             "UndeadGideon",
             &ai_manager,
@@ -1309,6 +1318,7 @@ namespace OpenBlood2
                objects.register_class(campaign_Naga) && objects.register_class(campaign_ZealotAI) &&
                objects.register_class(cultist) && objects.register_class(civilian) && objects.register_class(gideon) &&
                objects.register_class(enhanced_gideon) && objects.register_class(undead_gideon) &&
+               objects.register_class(ancient_one) && objects.register_class(ancient_tentacle) &&
                objects.register_class(fanatic) && objects.register_class(prophet) &&
                objects.register_class(bone_leech) && objects.register_class(drudge_lord) &&
                objects.register_class(soul_drudge) && objects.register_class(shikari) &&

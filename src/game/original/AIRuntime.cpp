@@ -66,6 +66,8 @@ namespace
                                              {"GIDEON_WIND", WEAP_GIDEON_WIND, true},
                                              {"GIDEON_GOO", 0, false},
                                              {"GIDEON_VOMIT", WEAP_GIDEON_VOMIT, true},
+                                             {"ANCIENTONE_BEAM", WEAP_ANCIENTONE_BEAM, true},
+                                             {"ANCIENTONE_TENTACLE", WEAP_ANCIENTONE_TENTACLE, true},
                                              {"GIDEON_SPEAR", WEAP_GIDEON_SPEAR, true},
                                              {"ANCIENTONE_BEAM", 0, false},
                                              {"ANCIENTONE_TENTACLE", 0, false},
@@ -302,6 +304,23 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
         npc_armor = 0;
         npc_weapons[0] = "HAND_SQUEEZE";
     }
+    if (type == NPCType::AncientOne || type == NPCType::AncientOneTentacle)
+    {
+        const bool boss = type == NPCType::AncientOne;
+        m_fHearingDist = boss ? 10000 : 0;
+        m_fSensingDist = boss ? 10000 : 1000;
+        m_fSmellingDist = 0;
+        m_fSeeingDist = boss ? 18000 : 2000;
+        m_fWalkSpeed = m_fRunSpeed = m_fRollSpeed = 0;
+        m_dwFlags = boss ? 0x100 : 0;
+        m_bCabal = false;
+        m_damage.apply_damage_physics = false;
+        npc_hp = boss ? 22000 : 200;
+        npc_armor = boss ? 2000 : 0;
+        npc_weapons[0] = boss ? "ANCIENTONE_BEAM" : "ANCIENTONE_TENTACLE";
+        if (boss)
+            npc_weapons[1] = "ANCIENTONE_TENTACLE";
+    }
     if (type == NPCType::UndeadGideon)
     {
         m_fHearingDist = m_fSmellingDist = 2000;
@@ -436,6 +455,14 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
         model = "Models/Enemies/" + name + ".abc";
         skin = "Skins/Enemies/" + name + ".dtx";
     }
+    else if (npc_type == NPCType::AncientOne || npc_type == NPCType::AncientOneTentacle)
+    {
+        if (npc_type == NPCType::AncientOneTentacle && !s->RandomInt(1, 4, variant))
+            return RuntimeFailure("Tentacle model RNG unavailable");
+        model = npc_type == NPCType::AncientOne ? "Models/Enemies/AncientOne.abc"
+                                                : "models/enemies/ancientone_t" + std::to_string(variant) + ".abc";
+        skin = "Skins/Enemies/AncientOne.dtx";
+    }
     else if (npc_type == NPCType::UndeadGideon)
     {
         model = "Models/Enemies/Undead_Gideon.abc";
@@ -552,29 +579,31 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     if (runtime_initialized || reason == INITIALUPDATE_SAVEGAME || !s->IsObjectAlive(m_hObject))
         return RuntimeFailure("Invalid or repeated NPC initialization");
     const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
-    const auto group = npc_type == NPCType::UndeadGideon     ? 27
-                       : npc_type == NPCType::EnhancedGideon ? 26
-                       : npc_type == NPCType::Ishmael        ? 24
-                       : npc_type == NPCType::IshmaelREV     ? 25
-                       : npc_type == NPCType::Gabriella      ? 20
-                       : npc_type == NPCType::GabriellaREV   ? 21
-                       : npc_type == NPCType::Ophelia        ? 22
-                       : npc_type == NPCType::OpheliaREV     ? 23
-                       : npc_type == NPCType::Caleb          ? 19
-                       : npc_type == NPCType::Behemoth       ? 15
-                       : npc_type == NPCType::DrudgePriest   ? 16
-                       : npc_type == NPCType::DeathShroud    ? 17
-                       : npc_type == NPCType::TheHand        ? 18
-                       : npc_type == NPCType::Thief          ? 12
-                       : npc_type == NPCType::Naga           ? 13
-                       : npc_type == NPCType::Zealot         ? 14
-                       : npc_type == NPCType::BoneLeech      ? 10
-                       : npc_type == NPCType::DrudgeLord     ? 11
-                       : npc_type == NPCType::Gideon         ? 4
-                       : npc_type == NPCType::Fanatic        ? 5
-                       : npc_type == NPCType::Prophet        ? 6
-                       : npc_type == NPCType::SoulDrudge     ? 7
-                       : npc_type == NPCType::Shikari        ? 8
+    const auto group = npc_type == NPCType::AncientOne           ? 28
+                       : npc_type == NPCType::AncientOneTentacle ? 29
+                       : npc_type == NPCType::UndeadGideon       ? 27
+                       : npc_type == NPCType::EnhancedGideon     ? 26
+                       : npc_type == NPCType::Ishmael            ? 24
+                       : npc_type == NPCType::IshmaelREV         ? 25
+                       : npc_type == NPCType::Gabriella          ? 20
+                       : npc_type == NPCType::GabriellaREV       ? 21
+                       : npc_type == NPCType::Ophelia            ? 22
+                       : npc_type == NPCType::OpheliaREV         ? 23
+                       : npc_type == NPCType::Caleb              ? 19
+                       : npc_type == NPCType::Behemoth           ? 15
+                       : npc_type == NPCType::DrudgePriest       ? 16
+                       : npc_type == NPCType::DeathShroud        ? 17
+                       : npc_type == NPCType::TheHand            ? 18
+                       : npc_type == NPCType::Thief              ? 12
+                       : npc_type == NPCType::Naga               ? 13
+                       : npc_type == NPCType::Zealot             ? 14
+                       : npc_type == NPCType::BoneLeech          ? 10
+                       : npc_type == NPCType::DrudgeLord         ? 11
+                       : npc_type == NPCType::Gideon             ? 4
+                       : npc_type == NPCType::Fanatic            ? 5
+                       : npc_type == NPCType::Prophet            ? 6
+                       : npc_type == NPCType::SoulDrudge         ? 7
+                       : npc_type == NPCType::Shikari            ? 8
                        : npc_type == NPCType::MadScientist
                            ? 9
                            : (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
@@ -588,7 +617,8 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         {
             if (!value.SetAnimationIndexes(m_hObject))
                 return false;
-            if (npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief || npc_type == NPCType::TheHand ||
+            if (npc_type == NPCType::AncientOne || npc_type == NPCType::AncientOneTentacle ||
+                npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief || npc_type == NPCType::TheHand ||
                 npc_type == NPCType::DeathShroud || npc_type == NPCType::Naga)
             {
                 // These shipped nonhumanoid models have no head/neck. The donor reads uninitialized
@@ -637,16 +667,18 @@ bool AI_Mgr::RuntimeInitialize(int reason)
                  : npc_type == NPCType::Zealot                                           ? "sounds/enemies/Zealot"
                  : npc_type == NPCType::BoneLeech                                        ? "sounds/enemies/boneleech"
                  : npc_type == NPCType::DrudgeLord                                       ? "sounds/enemies/drudgelord"
-                 : npc_type == NPCType::UndeadGideon   ? "sounds/enemies/Undead_Gideon"
-                 : npc_type == NPCType::EnhancedGideon ? "sounds/enemies/EnhancedGideon"
-                 : npc_type == NPCType::Gideon         ? "sounds/enemies/Gideon"
-                 : npc_type == NPCType::Fanatic        ? "sounds/enemies/fanatic"
-                 : npc_type == NPCType::Prophet        ? "sounds/enemies/Prophet"
-                 : npc_type == NPCType::SoulDrudge     ? "sounds/enemies/souldrudge"
-                 : npc_type == NPCType::Shikari        ? "sounds/enemies/shikari"
-                 : npc_type == NPCType::MadScientist   ? "sounds/enemies/madscientist"
-                 : male_group                          ? "sounds/enemies/m_cultist"
-                                                       : "sounds/enemies/f_cultist"))
+                 : npc_type == NPCType::AncientOne                                       ? "sounds/enemies/AncientOne"
+                 : npc_type == NPCType::AncientOneTentacle ? "sounds/enemies/AncientOneTentacle"
+                 : npc_type == NPCType::UndeadGideon       ? "sounds/enemies/Undead_Gideon"
+                 : npc_type == NPCType::EnhancedGideon     ? "sounds/enemies/EnhancedGideon"
+                 : npc_type == NPCType::Gideon             ? "sounds/enemies/Gideon"
+                 : npc_type == NPCType::Fanatic            ? "sounds/enemies/fanatic"
+                 : npc_type == NPCType::Prophet            ? "sounds/enemies/Prophet"
+                 : npc_type == NPCType::SoulDrudge         ? "sounds/enemies/souldrudge"
+                 : npc_type == NPCType::Shikari            ? "sounds/enemies/shikari"
+                 : npc_type == NPCType::MadScientist       ? "sounds/enemies/madscientist"
+                 : male_group                              ? "sounds/enemies/m_cultist"
+                                                           : "sounds/enemies/f_cultist"))
         return RuntimeFailure("NPC shared animation table initialization failed: " + table_error);
     auto table = tables[group];
     if (!InitStatics(table) || !m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))
@@ -722,7 +754,10 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     float scale;
     if (!s->RandomFloat(-.05f, .1f, scale))
         return RuntimeFailure("NPC scale RNG failed");
-    const float base_scale = npc_type == NPCType::BoneLeech ? 2 : 1;
+    const float base_scale = npc_type == NPCType::AncientOne           ? 5
+                             : npc_type == NPCType::AncientOneTentacle ? 2.5f
+                             : npc_type == NPCType::BoneLeech          ? 2
+                                                                       : 1;
     m_vScale = {base_scale - scale, base_scale + scale, base_scale - scale};
     // Supply the model's initial centered bounds before the later foot-anchored clip resize.
     DVector dims;
@@ -731,8 +766,9 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         return RuntimeFailure("NPC initial model dimensions/scale/animation failed: " + state_error);
     s->SetNextUpdate(m_hObject, .001f);
     m_bSetShutdown = false;
-    if (reason == INITIALUPDATE_WORLDFILE && npc_type != NPCType::Gideon && npc_type != NPCType::EnhancedGideon &&
-        npc_type != NPCType::DrudgePriest)
+    if ((reason == INITIALUPDATE_WORLDFILE || npc_type == NPCType::AncientOne ||
+         npc_type == NPCType::AncientOneTentacle) &&
+        npc_type != NPCType::Gideon && npc_type != NPCType::EnhancedGideon && npc_type != NPCType::DrudgePriest)
     {
         const auto result = s->MoveObjectToGround(m_hObject);
         // Original AI_Mgr ignores a ground-ray miss: retain a clear authored body
@@ -749,7 +785,8 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         npc_type != NPCType::EnhancedGideon && s->ResolveInitialWorldOverlap(m_hObject) != DE_OK)
         return RuntimeFailure("NPC spawned world-overlap placement failed");
     m_fLastUpdate = s->GetTime();
-    m_damage.ai_body_hits = npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief ||
+    m_damage.ai_body_hits = npc_type == NPCType::AncientOne || npc_type == NPCType::AncientOneTentacle ||
+                            npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief ||
                             npc_type == NPCType::TheHand || npc_type == NPCType::DeathShroud ||
                             npc_type == NPCType::Naga;
     m_damage.ai_hit_localization = !m_damage.ai_body_hits;

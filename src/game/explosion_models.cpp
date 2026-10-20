@@ -90,21 +90,69 @@ namespace OpenBlood2
             error = "Invalid explosion model source/event";
             return 0;
         }
-        ExplosionModelReport report{next_event_++, 0, type, std::string(source), {}};
-        std::optional<ExplosionModelSettings> setting;
-        if (original_explosion_model(type, position, normal, random_, setting, report.error) && setting)
+        ExplosionModelReport report{next_event_++, 0, type, std::string(source), {}, {}};
+        std::vector<ExplosionModelSettings> settings;
+        if (type == 4)
         {
-            CExplosionModelFX fx;
-            if (active.size() >= 128 || next_id_ == UINT64_MAX)
-                report.error = "Explosion model capacity exhausted";
-            else if (fx.Init(*setting, report.error) && fx.CreateObject(models, resources, now, random_, report.error))
+            if (!physics_vector(position) || !physics_vector(normal) || vector_dot(normal, normal) < 1e-12f)
+                report.error = "Invalid napalm explosion pose";
+            else
             {
-                report.model = fx.id = next_id_++;
+                ExplosionModelSettings s;
+                s.normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
+                s.position = vector_add(position, vector_scale(s.normal, 10));
+                s.fade = 1;
+                s.random_rotation = 1;
+                s.model = "Models\\Explosions\\Exp_sphere_2.abc";
+                s.scale1 = {20, 20, 20};
+                s.scale2 = {400, 400, 400};
+                s.duration = .75f;
+                s.alpha = 1;
+                s.waveform = 0;
+                settings.push_back(s);
+                s.scale1 = {35, 35, 35};
+                s.scale2 = {350, 350, 350};
+                s.alpha = .75f;
+                s.waveform = 2;
+                settings.push_back(s);
+                s.scale1 = {50, 50, 50};
+                s.scale2 = {450, 450, 450};
+                s.duration = 1;
+                s.alpha = .5f;
+                s.waveform = 1;
+                s.skin = "Skins\\Explosions\\Explosion.dtx";
+                settings.push_back(s);
+            }
+        }
+        else
+        {
+            std::optional<ExplosionModelSettings> setting;
+            if (original_explosion_model(type, position, normal, random_, setting, report.error) && setting)
+                settings.push_back(*setting);
+        }
+        std::vector<CExplosionModelFX> prepared;
+        if (report.error.empty() && (active.size() + settings.size() > 128 || settings.size() > UINT64_MAX - next_id_))
+            report.error = "Explosion model capacity exhausted";
+        for (const auto& setting : settings)
+        {
+            if (!report.error.empty())
+                break;
+            CExplosionModelFX fx;
+            if (!fx.Init(setting, report.error) || !fx.CreateObject(models, resources, now, random_, report.error))
+                break;
+            prepared.push_back(std::move(fx));
+        }
+        if (report.error.empty())
+            for (auto& fx : prepared)
+            {
+                fx.id = next_id_++;
                 fx.event = report.id;
+                if (!report.model)
+                    report.model = fx.id;
+                report.models.push_back(fx.id);
                 active.push_back(std::move(fx));
                 ++started;
             }
-        }
         if (!report.error.empty())
             ++failed;
         error = report.error;

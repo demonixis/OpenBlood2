@@ -105,6 +105,30 @@ class CWeapon
     WeaponShot last_shot;
 };
 // Original visual ray and ordinary damage ray deliberately have different filters.
+class CAncientOneBeam final : public CWeapon
+{
+  public:
+    CAncientOneBeam() : CWeapon(WEAP_ANCIENTONE_BEAM) {}
+    FireResult FireVector() override;
+    std::uint64_t beam = 0;
+    DVector beam_end{};
+    std::string beam_error, explosion_error;
+};
+class CAncientOneTentacle final : public CWeapon
+{
+  public:
+    CAncientOneTentacle() : CWeapon(WEAP_ANCIENTONE_TENTACLE)
+    {
+        damage_type = OpenBlood2::DamageType::Melee;
+    }
+    void BeginFire(bool alternate) override;
+    const char* FireSound(bool alternate) const override
+    {
+        return alternate ? alt_sound : fire_sound;
+    }
+    const char* fire_sound = "Sounds\\Weapons\\Knife\\fire.wav";
+    const char* alt_sound = "Sounds\\Weapons\\Knife\\alt.wav";
+};
 class CNagaEyes final : public CWeapon
 {
   public:

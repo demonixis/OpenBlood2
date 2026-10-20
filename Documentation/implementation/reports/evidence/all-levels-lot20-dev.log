@@ -1,0 +1,200 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start    3: objects.builtin_model
+ 1/90 Test    #3: objects.builtin_model ............   Passed    0.00 sec
+      Start    4: objects.original_objects
+ 2/90 Test    #4: objects.original_objects .........   Passed    0.00 sec
+      Start    5: objects.nested_creation
+ 3/90 Test    #5: objects.nested_creation ..........   Passed    0.00 sec
+      Start    6: objects.reasons_properties
+ 4/90 Test    #6: objects.reasons_properties .......   Passed    0.00 sec
+      Start    7: objects.scheduling
+ 5/90 Test    #7: objects.scheduling ...............   Passed    0.00 sec
+      Start    8: objects.deferred_removal
+ 6/90 Test    #8: objects.deferred_removal .........   Passed    0.00 sec
+      Start    9: objects.aggregate_dispatch
+ 7/90 Test    #9: objects.aggregate_dispatch .......   Passed    0.00 sec
+      Start   10: objects.handles_selection
+ 8/90 Test   #10: objects.handles_selection ........   Passed    0.00 sec
+      Start   11: objects.links_lists
+ 9/90 Test   #11: objects.links_lists ..............   Passed    0.00 sec
+      Start   12: objects.messages_strings
+10/90 Test   #12: objects.messages_strings .........   Passed    0.00 sec
+      Start   13: objects.message_churn
+11/90 Test   #13: objects.message_churn ............   Passed    0.09 sec
+      Start   14: objects.message_limit
+12/90 Test   #14: objects.message_limit ............   Passed    0.02 sec
+      Start   15: objects.unsupported_teardown
+13/90 Test   #15: objects.unsupported_teardown .....   Passed    0.00 sec
+      Start   16: objects.creation_failures
+14/90 Test   #16: objects.creation_failures ........   Passed    0.00 sec
+      Start  441: ai_fire.selection
+15/90 Test  #441: ai_fire.selection ................   Passed    0.00 sec
+      Start  442: ai_fire.clearance
+16/90 Test  #442: ai_fire.clearance ................   Passed    0.00 sec
+      Start  443: ai_fire.filters
+17/90 Test  #443: ai_fire.filters ..................   Passed    0.00 sec
+      Start  444: ai_fire.head
+18/90 Test  #444: ai_fire.head .....................   Passed    0.00 sec
+      Start  445: ai_fire.aim
+19/90 Test  #445: ai_fire.aim ......................   Passed    0.00 sec
+      Start  446: ai_fire.keys
+20/90 Test  #446: ai_fire.keys .....................   Passed    0.00 sec
+      Start  447: ai_fire.cadence
+21/90 Test  #447: ai_fire.cadence ..................   Passed    0.00 sec
+      Start  448: ai_fire.recovery
+22/90 Test  #448: ai_fire.recovery .................   Passed    0.00 sec
+      Start  449: ai_fire.failures
+23/90 Test  #449: ai_fire.failures .................   Passed    0.00 sec
+      Start  450: ai_fire.lifetime
+24/90 Test  #450: ai_fire.lifetime .................   Passed    0.00 sec
+      Start  451: ai_fire.script_stand
+25/90 Test  #451: ai_fire.script_stand .............   Passed    0.00 sec
+      Start  452: ai_fire.script_moving
+26/90 Test  #452: ai_fire.script_moving ............   Passed    0.00 sec
+      Start  453: ai_fire.script_refusal
+27/90 Test  #453: ai_fire.script_refusal ...........   Passed    0.00 sec
+      Start  454: ai_fire.script_lifetime
+28/90 Test  #454: ai_fire.script_lifetime ..........   Passed    0.00 sec
+      Start  455: ai_fire.script_routes
+29/90 Test  #455: ai_fire.script_routes ............   Passed    0.00 sec
+      Start  456: ai_fire.catalog
+30/90 Test  #456: ai_fire.catalog ..................   Passed    0.03 sec
+      Start  457: ai_fire.subway
+31/90 Test  #457: ai_fire.subway ...................   Passed    0.42 sec
+      Start  458: ai_fire.script_private
+32/90 Test  #458: ai_fire.script_private ...........   Passed    0.57 sec
+      Start  562: ai_hit.geometry
+33/90 Test  #562: ai_hit.geometry ..................   Passed    0.00 sec
+      Start  563: ai_hit.query
+34/90 Test  #563: ai_hit.query .....................   Passed    0.00 sec
+      Start  564: ai_hit.modifiers
+35/90 Test  #564: ai_hit.modifiers .................   Passed    0.00 sec
+      Start  565: ai_hit.reactions
+36/90 Test  #565: ai_hit.reactions .................   Passed    0.00 sec
+      Start  566: ai_hit.recoil
+37/90 Test  #566: ai_hit.recoil ....................   Passed    0.00 sec
+      Start  567: ai_hit.guards
+38/90 Test  #567: ai_hit.guards ....................   Passed    0.00 sec
+      Start  568: ai_hit.sides
+39/90 Test  #568: ai_hit.sides .....................   Passed    0.00 sec
+      Start  569: ai_hit.lifetime
+40/90 Test  #569: ai_hit.lifetime ..................   Passed    0.00 sec
+      Start  570: ai_hit.hidden
+41/90 Test  #570: ai_hit.hidden ....................   Passed    0.00 sec
+      Start  571: ai_hit.catalog
+42/90 Test  #571: ai_hit.catalog ...................   Passed    0.02 sec
+      Start  631: explosion_sprites.formulas
+43/90 Test  #631: explosion_sprites.formulas .......   Passed    0.00 sec
+      Start  632: explosion_sprites.failures
+44/90 Test  #632: explosion_sprites.failures .......   Passed    0.00 sec
+      Start  633: explosion_sprites.session
+45/90 Test  #633: explosion_sprites.session ........   Passed    0.00 sec
+      Start  634: explosion_sprites.private
+46/90 Test  #634: explosion_sprites.private ........   Passed    0.20 sec
+      Start  635: explosion_models.formulas
+47/90 Test  #635: explosion_models.formulas ........   Passed    0.25 sec
+      Start  636: explosion_models.recipes
+48/90 Test  #636: explosion_models.recipes .........   Passed    0.00 sec
+      Start  637: explosion_models.failures
+49/90 Test  #637: explosion_models.failures ........   Passed    0.14 sec
+      Start  638: explosion_models.session
+50/90 Test  #638: explosion_models.session .........   Passed    0.11 sec
+      Start  639: explosion_models.private
+51/90 Test  #639: explosion_models.private .........   Passed    0.20 sec
+      Start  640: explosion_lights.lifecycle
+52/90 Test  #640: explosion_lights.lifecycle .......   Passed    0.00 sec
+      Start  641: explosion_lights.recipes
+53/90 Test  #641: explosion_lights.recipes .........   Passed    0.00 sec
+      Start  642: explosion_lights.failures
+54/90 Test  #642: explosion_lights.failures ........   Passed    0.00 sec
+      Start  643: explosion_lights.session
+55/90 Test  #643: explosion_lights.session .........   Passed    0.00 sec
+      Start  644: explosion_lights.private
+56/90 Test  #644: explosion_lights.private .........   Passed    0.46 sec
+      Start  645: explosion_rings.motion
+57/90 Test  #645: explosion_rings.motion ...........   Passed    0.00 sec
+      Start  646: explosion_rings.lifecycle
+58/90 Test  #646: explosion_rings.lifecycle ........   Passed    0.00 sec
+      Start  647: explosion_rings.recipes
+59/90 Test  #647: explosion_rings.recipes ..........   Passed    0.00 sec
+      Start  648: explosion_rings.failures
+60/90 Test  #648: explosion_rings.failures .........   Passed    0.00 sec
+      Start  649: explosion_rings.session
+61/90 Test  #649: explosion_rings.session ..........   Passed    0.00 sec
+      Start  650: explosion_rings.private
+62/90 Test  #650: explosion_rings.private ..........   Passed    0.59 sec
+      Start  651: explosion_fragments.lifecycle
+63/90 Test  #651: explosion_fragments.lifecycle ....   Passed    0.00 sec
+      Start  652: explosion_fragments.collision
+64/90 Test  #652: explosion_fragments.collision ....   Passed    0.00 sec
+      Start  653: explosion_fragments.recipes
+65/90 Test  #653: explosion_fragments.recipes ......   Passed    0.00 sec
+      Start  654: explosion_fragments.failures
+66/90 Test  #654: explosion_fragments.failures .....   Passed    0.00 sec
+      Start  655: explosion_fragments.session
+67/90 Test  #655: explosion_fragments.session ......   Passed    0.00 sec
+      Start  656: explosion_fragments.private
+68/90 Test  #656: explosion_fragments.private ......   Passed    1.00 sec
+      Start  662: explosion_flames.zones
+69/90 Test  #662: explosion_flames.zones ...........   Passed    0.00 sec
+      Start  663: explosion_flames.lifecycle
+70/90 Test  #663: explosion_flames.lifecycle .......   Passed    0.00 sec
+      Start  664: explosion_flames.failures
+71/90 Test  #664: explosion_flames.failures ........   Passed    0.00 sec
+      Start  665: explosion_flames.session
+72/90 Test  #665: explosion_flames.session .........   Passed    0.00 sec
+      Start  666: explosion_flames.private
+73/90 Test  #666: explosion_flames.private .........   Passed    0.51 sec
+      Start 1198: undead_gideon.profiles
+74/90 Test #1198: undead_gideon.profiles ...........   Passed    0.04 sec
+      Start 1199: undead_gideon.decisions
+75/90 Test #1199: undead_gideon.decisions ..........   Passed    0.02 sec
+      Start 1200: undead_gideon.choices
+76/90 Test #1200: undead_gideon.choices ............   Passed    0.02 sec
+      Start 1201: undead_gideon.movement
+77/90 Test #1201: undead_gideon.movement ...........   Passed    0.02 sec
+      Start 1202: undead_gideon.fire
+78/90 Test #1202: undead_gideon.fire ...............   Passed    0.02 sec
+      Start 1203: undead_gideon.damage
+79/90 Test #1203: undead_gideon.damage .............   Passed    0.02 sec
+      Start 1204: undead_gideon.keys
+80/90 Test #1204: undead_gideon.keys ...............   Passed    0.02 sec
+      Start 1205: undead_gideon.placement
+81/90 Test #1205: undead_gideon.placement ..........   Passed    0.02 sec
+      Start 1206: undead_gideon.world
+82/90 Test #1206: undead_gideon.world ..............   Passed    2.60 sec
+      Start 1207: ancient_one.profiles
+83/90 Test #1207: ancient_one.profiles .............   Passed    0.04 sec
+      Start 1208: ancient_one.decisions
+84/90 Test #1208: ancient_one.decisions ............   Passed    0.02 sec
+      Start 1209: ancient_one.scale
+85/90 Test #1209: ancient_one.scale ................   Passed    0.01 sec
+      Start 1210: ancient_one.damage
+86/90 Test #1210: ancient_one.damage ...............   Passed    0.02 sec
+      Start 1211: ancient_one.beam
+87/90 Test #1211: ancient_one.beam .................   Passed    0.02 sec
+      Start 1212: ancient_one.spawn
+88/90 Test #1212: ancient_one.spawn ................   Passed    0.02 sec
+      Start 1213: ancient_one.keys
+89/90 Test #1213: ancient_one.keys .................   Passed    0.02 sec
+      Start 1214: ancient_one.world
+90/90 Test #1214: ancient_one.world ................   Passed    1.59 sec
+
+100% tests passed, 0 tests failed out of 90
+
+Label Time Summary:
+ai_fire                =   1.04 sec*proc (18 tests)
+ai_hit                 =   0.04 sec*proc (10 tests)
+ancient_one            =   1.73 sec*proc (8 tests)
+explosion_flames       =   0.52 sec*proc (5 tests)
+explosion_fragments    =   1.02 sec*proc (6 tests)
+explosion_lights       =   0.47 sec*proc (5 tests)
+explosion_models       =   0.71 sec*proc (5 tests)
+explosion_rings        =   0.60 sec*proc (6 tests)
+explosion_sprites      =   0.21 sec*proc (4 tests)
+headless               =   9.23 sec*proc (90 tests)
+objects                =   0.14 sec*proc (14 tests)
+private                =   8.48 sec*proc (27 tests)
+undead_gideon          =   2.75 sec*proc (9 tests)
+
+Total Test time (real) =   9.27 sec

@@ -419,8 +419,8 @@ namespace OpenBlood2
         }
         if (ImGui::CollapsingHeader("Last 64 model deliveries / failures"))
             for (const auto& r : models.reports)
-                ImGui::TextWrapped("Event %llu / type %u / model %llu / %s", (unsigned long long)r.id, r.type,
-                                   (unsigned long long)r.model,
+                ImGui::TextWrapped("Event %llu / type %u / first model %llu / %zu models / %s",
+                                   (unsigned long long)r.id, r.type, (unsigned long long)r.model, r.models.size(),
                                    r.error.empty() ? (r.model ? "created" : "no model branch authored")
                                                    : r.error.c_str());
         const auto& effects = game.server.explosion_sprites;

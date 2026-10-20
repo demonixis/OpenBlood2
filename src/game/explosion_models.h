@@ -9,6 +9,7 @@ namespace OpenBlood2
         std::uint64_t id = 0, model = 0;
         DDWORD type = 0;
         std::string source, error;
+        std::vector<std::uint64_t> models;
     };
     class ExplosionModels
     {

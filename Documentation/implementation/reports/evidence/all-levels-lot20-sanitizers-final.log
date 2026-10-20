@@ -1,0 +1,31 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start 1196: undead_gideon.placement
+ 1/10 Test #1196: undead_gideon.placement ..........   Passed    0.39 sec
+      Start 1197: undead_gideon.world
+ 2/10 Test #1197: undead_gideon.world ..............   Passed   72.76 sec
+      Start 1198: ancient_one.profiles
+ 3/10 Test #1198: ancient_one.profiles .............   Passed    0.91 sec
+      Start 1199: ancient_one.decisions
+ 4/10 Test #1199: ancient_one.decisions ............   Passed    0.31 sec
+      Start 1200: ancient_one.scale
+ 5/10 Test #1200: ancient_one.scale ................   Passed    0.29 sec
+      Start 1201: ancient_one.damage
+ 6/10 Test #1201: ancient_one.damage ...............   Passed    0.33 sec
+      Start 1202: ancient_one.beam
+ 7/10 Test #1202: ancient_one.beam .................   Passed    0.33 sec
+      Start 1203: ancient_one.spawn
+ 8/10 Test #1203: ancient_one.spawn ................   Passed    0.32 sec
+      Start 1204: ancient_one.keys
+ 9/10 Test #1204: ancient_one.keys .................   Passed    0.34 sec
+      Start 1205: ancient_one.world
+10/10 Test #1205: ancient_one.world ................   Passed   52.91 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+ancient_one      =  55.75 sec*proc (8 tests)
+headless         = 128.90 sec*proc (10 tests)
+private          = 128.90 sec*proc (10 tests)
+undead_gideon    =  73.15 sec*proc (2 tests)
+
+Total Test time (real) = 128.92 sec

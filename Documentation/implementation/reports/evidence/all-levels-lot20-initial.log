@@ -1,0 +1,69 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1207: ancient_one.profiles
+1/6 Test #1207: ancient_one.profiles .............***Failed    0.02 sec
+AncientOne: NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+AncientOneTentacle: NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+profiles:33: a && t && a->RuntimeReady() && t->RuntimeReady()
+
+    Start 1208: ancient_one.decisions
+2/6 Test #1208: ancient_one.decisions ............***Failed    0.01 sec
+AncientOne: NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+AncientOneTentacle: NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+decisions:51: a && t && a->RuntimeReady() && t->RuntimeReady()
+
+    Start 1209: ancient_one.scale
+3/6 Test #1209: ancient_one.scale ................***Failed    0.01 sec
+AncientOneTentacle: NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+scale:68: t && t->RuntimeReady()
+
+    Start 1210: ancient_one.damage
+4/6 Test #1210: ancient_one.damage ...............***Failed    0.01 sec
+AncientOne: NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+AncientOneTentacle: NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+damage:99: a && t && a->RuntimeReady() && t->RuntimeReady() && g.objects.advance(.002)
+
+    Start 1211: ancient_one.beam
+5/6 Test #1211: ancient_one.beam .................***Failed    0.01 sec
+AncientOne: NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+beam:115: a && a->RuntimeReady()
+
+    Start 1212: ancient_one.world
+6/6 Test #1212: ancient_one.world ................***Failed    0.06 sec
+World initialization rejected: 0 unsupported classes, 18 failed entries, 0 unavailable services
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+NPC shared animation table initialization failed: Missing head node; no hit spheres generated
+
+
+0% tests passed, 6 tests failed out of 6
+
+Label Time Summary:
+ancient_one    =   0.13 sec*proc (6 tests)
+headless       =   0.13 sec*proc (6 tests)
+private        =   0.13 sec*proc (6 tests)
+
+Total Test time (real) =   0.15 sec
+
+The following tests FAILED:
+	1207 - ancient_one.profiles (Failed)                     ancient_one headless private
+	1208 - ancient_one.decisions (Failed)                    ancient_one headless private
+	1209 - ancient_one.scale (Failed)                        ancient_one headless private
+	1210 - ancient_one.damage (Failed)                       ancient_one headless private
+	1211 - ancient_one.beam (Failed)                         ancient_one headless private
+	1212 - ancient_one.world (Failed)                        ancient_one headless private
+Errors while running CTest

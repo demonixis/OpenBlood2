@@ -48,6 +48,12 @@ namespace OpenBlood2
                 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
             unavailable = "light illumination";
         }
+        else if (type == 4)
+        {
+            add(30, .75f, .75f, 1.5f, 1, 0, 0, "Sprites\\napalm.spr");
+            add(25, .5f, 2.5f, 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
+            unavailable = "light illumination";
+        }
         else if (type == 16 || type == 17)
         {
             if (type == 16)

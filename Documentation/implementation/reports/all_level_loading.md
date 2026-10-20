@@ -9,17 +9,16 @@ initial deltas, three seconds of simulation with movement, a runtime failure
 recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
 combat, multiplayer or GPU certification. M2 closure remains unchanged.
 
-Current verified opening gate after iteration 19: **53 / 58 pass, 5 / 58 fail**
-([audit 17](evidence/all-levels-audit-17.log)). Remaining worlds:
-Ancient One and the four CTF maps. Initial-entry and three-second simulation
+Current verified opening gate after iteration 20: **54 / 58 pass, 4 / 58 fail**
+([audit 18](evidence/all-levels-audit-18.log)). Remaining worlds:
+the four CTF maps. Initial-entry and three-second simulation
 coverage is not complete gameplay/traversal acceptance. The tables below retain
 the initial baseline; iteration records explain resolved and newly exposed blockers.
 
-## Remaining implementation queue after iteration 19
+## Remaining implementation queue after iteration 20
 
 | Worlds | Required original behavior |
 | --- | --- |
-| `25_ancientone` | AncientOne and AncientOneTentacle profiles, health/target/attack states, original beam/tentacle weapons and effects, tentacle spawning/lifetime. |
 | `multi/ctf_cabana`, `multi/ctf_deadcities`, `multi/ctf_dmx`, `multi/ctf_jam` | FlagStand and FlagObject models/owned lifetime, touch/trigger handoff, player attachment, drop/death return, timed ground return and original capture/team conditions with truthful local inspection state. Network play is not supplied by the map-inspection entry mode. |
 | All 58 worlds | Repeat all-difficulty entry, simulation/runtime recheck and cleanup after each relevant correction; complete the GPU opening sweep once every map passes admission. Full campaign traversal remains a separate coverage limit. |
 
@@ -78,7 +77,6 @@ Counts are rejected source entries, not distinct implementations.
 | `22_office` | 22_office entry=177 class=CDestructableModel Creation failed: Model clip-zero dimensions unavailable: Model resource not mounted: modelsworldobjects\urinal2.abc<br>22_office entry=775 class=CDestructableBrush Creation failed: Rejected precreate: CDestructableBrush: SpawnObject not accepted: TheAngerPU<br>22_office: World initialization rejected: 0 unsupported classes, 2 failed entries, 0 unavailable services |
 | `23_rooftop` | 23_rooftop entry=244 class=EnhancedGideon Class not ported: Required original class is not registered<br>23_rooftop entry=252 class=OpheliaAI Class not ported: Required original class is not registered<br>23_rooftop entry=253 class=CalebAI Class not ported: Required original class is not registered<br>23_rooftop entry=259 class=LifeLeechPU Class not ported: Required original class is not registered<br>23_rooftop: World initialization rejected: 4 unsupported classes, 0 failed entries, 0 unavailable services |
 | `24b_arena` | 24b_arena entry=106 class=GabriellaREV Class not ported: Required original class is not registered<br>24b_arena entry=110 class=IshmaelREV Class not ported: Required original class is not registered<br>24b_arena entry=135 class=CClientLightningSFX Class not ported: Required original class is not registered<br>24b_arena entry=136 class=CClientLightningSFX Class not ported: Required original class is not registered<br>24b_arena entry=137 class=CClientLightningSFX Class not ported: Required original class is not registered<br>24b_arena entry=138 class=OpheliaREV Class not ported: Required original class is not registered<br>24b_arena entry=158 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena entry=159 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena entry=160 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena entry=227 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena entry=228 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena entry=229 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena: World initialization rejected: 12 unsupported classes, 0 failed entries, 0 unavailable services |
-| `25_ancientone` | 25_ancientone entry=15 class=AncientOne Class not ported: Required original class is not registered<br>25_ancientone entry=16 class=LifeLeechPU Class not ported: Required original class is not registered<br>25_ancientone entry=22 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=23 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=24 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=25 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=26 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=27 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=28 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=29 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=117 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=118 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=119 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=120 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=121 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=122 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=123 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=124 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=125 class=AncientOne Class not ported: Required original class is not registered<br>25_ancientone entry=157 class=CalebAI Class not ported: Required original class is not registered<br>25_ancientone entry=177 class=CClientLightningSFX Class not ported: Required original class is not registered<br>25_ancientone entry=178 class=CClientLightningSFX Class not ported: Required original class is not registered<br>25_ancientone entry=179 class=CClientLightningSFX Class not ported: Required original class is not registered<br>25_ancientone entry=180 class=CClientLightningSFX Class not ported: Required original class is not registered<br>25_ancientone entry=181 class=CClientLightningSFX Class not ported: Required original class is not registered<br>25_ancientone entry=202 class=IshmaelAI Class not ported: Required original class is not registered<br>25_ancientone entry=203 class=OpheliaAI Class not ported: Required original class is not registered<br>25_ancientone entry=204 class=GabriellaAI Class not ported: Required original class is not registered<br>25_ancientone: World initialization rejected: 28 unsupported classes, 0 failed entries, 0 unavailable services |
 | `credits` | credits entry=9 class=CalebAI Class not ported: Required original class is not registered<br>credits: World initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services |
 | `end` | end entry=13 class=CalebAI Class not ported: Required original class is not registered<br>end entry=14 class=IshmaelAI Class not ported: Required original class is not registered<br>end entry=15 class=GabriellaAI Class not ported: Required original class is not registered<br>end entry=16 class=OpheliaAI Class not ported: Required original class is not registered<br>end: World initialization rejected: 4 unsupported classes, 0 failed entries, 0 unavailable services |
 | `multi/bb_area15` | multi/bb_area15: Player entry: Original player creation/start-point entry failed |
@@ -790,3 +788,62 @@ or campaign traversal, network play or GPU sanitizer qualification. No shader,
 dependency, reference source or commercial file was modified.
 
 ![Undead Gideon](evidence/all-levels-undead-gideon.png)
+
+## Iteration 20: Ancient One, tentacles and primary napalm impact
+
+[Original AncientOne/Tentacle and weapon 46/47](../../contracts/ancient_one_contracts.md)
+now execute their health, targeting, animation-key attacks, scaling/revival,
+spawn and damage rules. The beam has actual red-large rendering and primary
+napalm impact models, sprites and particles. Its evaluated lights retain the
+existing illumination limitation. [Audit 18](evidence/all-levels-audit-18.log)
+passes **54 / 58**, fails **4 / 58**. All non-CTF mounted maps pass the opening
+gate at all three difficulties; this is not full campaign/boss traversal.
+
+The [initial run](evidence/all-levels-lot20-initial.log) exposed missing humanoid
+head nodes in the boss and tentacle models. Their explicit nonhumanoid body-damage
+policy replaces undefined source hit-sphere inputs. The
+[second run](evidence/all-levels-lot20-second.log) revealed missing subclass health
+notification for body damage and the unimplemented primary napalm recipe. These
+now execute through owned typed callbacks and actual external assets.
+The [third run](evidence/all-levels-lot20-third.log) leaves only AncientOne2's
+placement failure. [Overlap diagnosis](evidence/all-levels-lot20-placement-diagnosis.log)
+and [authored-position evidence](evidence/all-levels-lot20-authored-placement.log)
+show it had dropped beneath the later DeathTrap slab. The bounded authored-anchor
+return makes the [fourth run](evidence/all-levels-lot20-fourth.log) pass.
+[Additional spawn/lethal-damage coverage](evidence/all-levels-lot20-fifth.log) also
+passes. The final test checks that the same return is refused after AI updates
+have begun, without changing the position on refusal.
+
+[90 Dev regression checks](evidence/all-levels-lot20-dev.log), then the same
+[90 final Dev checks](evidence/all-levels-lot20-dev-final.log), pass: eight new
+Ancient One cases, UndeadGideon, AI aiming/damage, objects and six explosion
+component suites. The final run includes the explicit initialization-only return
+guard and its negative runtime test. Actual model keys fire the beam; tests also
+verify boss-sender immunity, ordinary lethal damage followed by revival, ten-second
+threshold, scale/alpha endpoints, original swapped sounds, ray filtering and
+independent spawned lifetime.
+
+[90 Clang Debug ASan/UBSan checks with leak detection](evidence/all-levels-lot20-sanitizers.log) also pass. The [final sanitizer recheck](evidence/all-levels-lot20-sanitizers-final.log) passes all ten Ancient One and UndeadGideon placement/world checks, including the initialization-only guard and runtime refusal.
+
+The [first Release run](evidence/all-levels-lot20-release.log) passes all eight
+headless cases and the five-asset model check; the effects image check fails with
+zero beam pixels. The [second image fixture](evidence/all-levels-lot20-gpu-second.log)
+remains a failure: its camera was calculated from local vertices without the
+object transform. Applying that transform fixes the test camera. The
+[final Release run](evidence/all-levels-lot20-release-final.log) passes all ten
+checks. Actual boss/four tentacle models compare at three clip times: 8976 filled
+pixels, zero CPU/GPU differences. The beam readback has 95662 red pixels; the
+primary impact has 369 visible pixels, three model instances and 34 sprite/particle
+entries, followed by exact empty background after expiry. Captures were inspected.
+The [Release application](evidence/all-levels-ancientone-gpu.log) opens Ancient One,
+renders three frames on NVIDIA RTX 3060 and exits successfully.
+
+Both applications build. Commands use `cmake --build build/{dev,release,sanitize}`
+with the corresponding app/test targets, then CTest restricted to the named
+Ancient One, UndeadGideon, AI hit/fire, object and explosion suites. Initial failures
+remain retained. No shader, dependency, commercial data or reference source was
+modified; this continuation does not reopen M2 or clear its GPU reservation.
+
+![Ancient One](evidence/all-levels-ancient-one.png)
+
+![Primary napalm impact](evidence/all-levels-ancient-impact.png)

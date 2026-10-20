@@ -1,0 +1,22 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1207: ancient_one.profiles
+1/6 Test #1207: ancient_one.profiles .............   Passed    0.03 sec
+    Start 1208: ancient_one.decisions
+2/6 Test #1208: ancient_one.decisions ............   Passed    0.01 sec
+    Start 1209: ancient_one.scale
+3/6 Test #1209: ancient_one.scale ................   Passed    0.01 sec
+    Start 1210: ancient_one.damage
+4/6 Test #1210: ancient_one.damage ...............   Passed    0.01 sec
+    Start 1211: ancient_one.beam
+5/6 Test #1211: ancient_one.beam .................   Passed    0.01 sec
+    Start 1212: ancient_one.world
+6/6 Test #1212: ancient_one.world ................   Passed    1.43 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Label Time Summary:
+ancient_one    =   1.51 sec*proc (6 tests)
+headless       =   1.51 sec*proc (6 tests)
+private        =   1.51 sec*proc (6 tests)
+
+Total Test time (real) =   1.53 sec
