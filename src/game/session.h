@@ -14,6 +14,7 @@ namespace OpenBlood2
     {
         Created,
         WorldSound,
+        CollectedPickup, // Original acknowledged pickup consumed during initial ground placement.
         EditorOnly,
         Unsupported,
         Filtered,

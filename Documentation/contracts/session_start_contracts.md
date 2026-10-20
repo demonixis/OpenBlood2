@@ -16,6 +16,11 @@ required; a queued level transition rejects startup without consuming the intent
 Every source object must have a disposition. Unknown classes, failed entries and
 recorded unavailable services reject admission. Editor-only, difficulty-filtered
 and the documented missing-named-BSP omissions retain their distinct meanings.
+An original pickup acknowledged and consumed during its initial ground placement
+has the distinct `CollectedPickup` disposition, with no runtime handle. This is
+successful gameplay, not a missing-resource omission or an initialization failure.
+The original acknowledgement and deferred removal remain mandatory; arbitrary
+initial removals do not qualify. Destination rehearsals count collections separately.
 A missing BSP is never a created object or a general resource-error exemption.
 
 Existing live NPC runtime failures reject the check before player entry and again

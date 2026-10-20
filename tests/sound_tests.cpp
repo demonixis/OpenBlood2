@@ -164,8 +164,22 @@ namespace
     {
         GameSession g;
         CHECK(test_audio::setup(g, root));
+        // Original distance branch checks the inner radius first. Inverted authored
+        // radii (Train Station ambient loops) form a hard edge at the inner radius.
+        auto inverted = make(g, {{"Filename", std::string("cue.wav")}, {"InnerRadius", 200.f}, {"OuterRadius", 100.f}});
+        CHECK(inverted && get(g, inverted)->sound);
+        const auto sound = get(g, inverted)->sound;
+        CHECK(g.objects.finish_frame());
+        for (float distance : {0.f, 100.f, 150.f, 200.f, 200.01f, 300.f})
+        {
+            CHECK(g.server.advance_audio(.01, {distance, 0, 0}, {}));
+            const auto* voice = g.server.audio.get(sound);
+            const float expected = distance <= 200 ? 1.f : 0.f;
+            CHECK(voice && voice->left == expected && voice->right == expected);
+        }
+        CHECK(g.server.KillSound(sound));
         for (const auto& p : std::vector<Properties>{{{"Filename", std::string("absent.wav")}},
-                                                     {{"Filename", std::string("cue.wav")}, {"InnerRadius", 150.0f}},
+                                                     {{"Filename", std::string("cue.wav")}, {"InnerRadius", 1e7f}},
                                                      {{"Filename", std::string("cue.wav")}, {"OuterRadius", -1.0f}}})
         {
             auto h = make(g, p);
@@ -332,7 +346,7 @@ namespace
                   << " invalid=" << invalid << " metadata=" << metadata << " started=" << started
                   << " rejected=" << rejected << " failed=" << failed << '\n';
         CHECK(worlds == 58 && sounds == 800 && streams == 302 && missing == 16 && !invalid && !metadata);
-        CHECK(started == 776 && rejected == 0 && failed == 24); // Equal authored radii play.
+        CHECK(started == 784 && rejected == 0 && failed == 16); // Eight inverted-radius loops also play.
         return true;
     }
     bool subway(const std::filesystem::path& root)

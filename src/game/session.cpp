@@ -5,6 +5,7 @@
 #include "game/original/DestructableModel.h"
 #include "game/original/DetailSprite.h"
 #include "game/original/ParticleSystem.h"
+#include "game/original/PickupObject.h"
 #include "game/original/SkyObjects.h"
 #include "game/original/Sound.h"
 #include "game/server_adapter.h"
@@ -22,6 +23,8 @@ namespace OpenBlood2
                 return "Original instance";
             case EntryState::WorldSound:
                 return "World-owned sound";
+            case EntryState::CollectedPickup:
+                return "Collected during initialization";
             case EntryState::EditorOnly:
                 return "Preprocessor only";
             case EntryState::Unsupported:
@@ -145,6 +148,12 @@ namespace OpenBlood2
                     entry.detail =
                         entry.sound ? "Original Sound removed after transferring its loop to the world" : sound->error;
                 }
+                else if (const auto* pickup = r ? dynamic_cast<const PickupObject*>(r->game.get()) : nullptr;
+                         pickup && pickup->picked_up)
+                {
+                    entry.state = EntryState::CollectedPickup;
+                    entry.detail = "Original pickup offer acknowledged during initial ground placement";
+                }
                 else if (const auto* sky = r ? dynamic_cast<const SkyObject*>(r->game.get()) : nullptr;
                          sky && !sky->error.empty())
                 {
@@ -253,6 +262,10 @@ namespace OpenBlood2
                     {"CClientParticleStreamSFX", "ParticleFile", "SpriteTextures\\singlemus02.dtxr",
                      "Missing exact-path resource"},
                     {"Sound", "Filename", "sounds\\hum.wav", "Missing or oversized sound resource"},
+                    {"Sound", "Filename", "", "Invalid sound resource path"},
+                    {"Sound", "Filename", "sounds\\ambient\\sewerdrip1.wav", "Missing streaming sound resource"},
+                    {"Sound", "Filename", "sounds\\ambients\\amb1.wav", "Missing or oversized sound resource"},
+                    {"Sound", "Filename", "sounds\\ambients\\neonloop1.wav", "Missing or oversized sound resource"},
                     {"ParticleSystem", "TextureName", "Sprite Textures\\lightn32.dtx", "Missing exact-path resource"},
                     {"CDestructableModel", "InitFilename", "models\\worldobjects\\woodcratesmalll.abc",
                      "Model clip-zero dimensions unavailable"},

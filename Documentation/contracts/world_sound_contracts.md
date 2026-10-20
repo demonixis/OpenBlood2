@@ -86,6 +86,10 @@ silently discarded. M2's acceptance gate is unchanged.
 
 Distance gain is full at or inside InnerRadius and zero at or beyond OuterRadius,
 linear between. Equal radii (authored on retail ambient loops such as amb7/wind1)
-are therefore a hard edge and never divide by a zero falloff; this branch order is
+are therefore a hard edge and never divide by a zero falloff. The 2026-10-20
+[reported-level correction](../implementation/reports/reported_level_loading.md)
+also admits inverted radii, as authored by eight Train Station loops: they use
+the same hard edge at InnerRadius because that branch is tested first. This is
 later LithTech CSoundInstance behavior, not a verified 1998 trace. Requests still
-reject InnerRadius > OuterRadius and a non-positive OuterRadius.
+reject negative InnerRadius, non-positive OuterRadius, nonfinite values and
+either radius above one million. Authored radii are not swapped or clamped.

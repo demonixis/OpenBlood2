@@ -1,0 +1,34 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+      Start  326: sound.defaults
+ 1/11 Test  #326: sound.defaults ......................   Passed    0.00 sec
+      Start  327: sound.loops
+ 2/11 Test  #327: sound.loops .........................   Passed    0.00 sec
+      Start  328: sound.resampling
+ 3/11 Test  #328: sound.resampling ....................   Passed    0.00 sec
+      Start  329: sound.lifetime
+ 4/11 Test  #329: sound.lifetime ......................   Passed    0.00 sec
+      Start  330: sound.failures
+ 5/11 Test  #330: sound.failures ......................   Passed    0.00 sec
+      Start  331: sound.metadata
+ 6/11 Test  #331: sound.metadata ......................   Passed    0.00 sec
+      Start  332: sound.catalog
+ 7/11 Test  #332: sound.catalog .......................   Passed    0.46 sec
+      Start  333: sound.subway
+ 8/11 Test  #333: sound.subway ........................   Passed    0.24 sec
+      Start 1229: reported_levels.12_train_stationb
+ 9/11 Test #1229: reported_levels.12_train_stationb ...   Passed    2.40 sec
+      Start 1230: reported_levels.13_downtown
+10/11 Test #1230: reported_levels.13_downtown .........   Passed    2.96 sec
+      Start 1231: reported_levels.collection
+11/11 Test #1231: reported_levels.collection ..........   Passed    0.08 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Label Time Summary:
+campaign        =   5.44 sec*proc (3 tests)
+headless        =   6.16 sec*proc (11 tests)
+private         =   0.70 sec*proc (2 tests)
+private-data    =   5.44 sec*proc (3 tests)
+sound           =   0.72 sec*proc (8 tests)
+
+Total Test time (real) =   6.18 sec

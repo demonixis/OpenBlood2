@@ -1,5 +1,11 @@
 # Per-world gaps and implementation batches
 
+The [2026-10-20 reported-level audit](reports/reported_level_loading.md) supersedes
+the old journal for the sixteen reported worlds. Its startup check includes a
+post-update validation; keep that distinction from entry-only success. The first
+correction adds verified startup for 12_train_stationb and 13_downtown and fixes
+the source accounting of a pickup collected during initialization in 18_temple.
+
 Snapshot of what blocks each mounted Blood II world from starting, grouped into
 implementation batches. Measured on 2026-10-18 at `b52bb66` against the retail
 2.1 data (BLOOD2, BLOOD2P, BLOOD2P2, BLOOD2NM and SOUND archives), difficulty 1,

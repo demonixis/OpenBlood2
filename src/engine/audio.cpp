@@ -246,7 +246,7 @@ namespace OpenBlood2
         if (voices_.size() >= 128 || !next_sound || next_sound == std::numeric_limits<SoundId>::max() ||
             !physics_vector(position) || !std::isfinite(request.volume) || request.volume < 0 || request.volume > 1 ||
             !std::isfinite(request.inner_radius) || !std::isfinite(request.outer_radius) || request.inner_radius < 0 ||
-            request.outer_radius <= 0 || request.outer_radius < request.inner_radius || request.outer_radius > 1e6f ||
+            request.outer_radius <= 0 || request.inner_radius > 1e6f || request.outer_radius > 1e6f ||
             request.resource.size() > 100 ||
             (request.space != SoundSpace::Local && request.space != SoundSpace::Ambient &&
              request.space != SoundSpace::Spatial))

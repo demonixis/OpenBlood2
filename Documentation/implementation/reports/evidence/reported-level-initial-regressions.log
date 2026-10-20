@@ -1,0 +1,187 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start   3: objects.builtin_model
+ 1/61 Test   #3: objects.builtin_model .............   Passed    0.00 sec
+      Start   4: objects.original_objects
+ 2/61 Test   #4: objects.original_objects ..........   Passed    0.00 sec
+      Start   5: objects.nested_creation
+ 3/61 Test   #5: objects.nested_creation ...........   Passed    0.00 sec
+      Start   6: objects.reasons_properties
+ 4/61 Test   #6: objects.reasons_properties ........   Passed    0.00 sec
+      Start   7: objects.scheduling
+ 5/61 Test   #7: objects.scheduling ................   Passed    0.00 sec
+      Start   8: objects.deferred_removal
+ 6/61 Test   #8: objects.deferred_removal ..........   Passed    0.00 sec
+      Start   9: objects.aggregate_dispatch
+ 7/61 Test   #9: objects.aggregate_dispatch ........   Passed    0.00 sec
+      Start  10: objects.handles_selection
+ 8/61 Test  #10: objects.handles_selection .........   Passed    0.00 sec
+      Start  11: objects.links_lists
+ 9/61 Test  #11: objects.links_lists ...............   Passed    0.00 sec
+      Start  12: objects.messages_strings
+10/61 Test  #12: objects.messages_strings ..........   Passed    0.00 sec
+      Start  13: objects.message_churn
+11/61 Test  #13: objects.message_churn .............   Passed    0.12 sec
+      Start  14: objects.message_limit
+12/61 Test  #14: objects.message_limit .............   Passed    0.03 sec
+      Start  15: objects.unsupported_teardown
+13/61 Test  #15: objects.unsupported_teardown ......   Passed    0.01 sec
+      Start  16: objects.creation_failures
+14/61 Test  #16: objects.creation_failures .........   Passed    0.00 sec
+      Start  58: world.session_start
+15/61 Test  #58: world.session_start ...............   Passed    0.01 sec
+      Start  59: world.level_change
+16/61 Test  #59: world.level_change ................   Passed    0.01 sec
+      Start  60: world.surface_effects
+17/61 Test  #60: world.surface_effects .............   Passed    0.04 sec
+      Start  61: world.destination_trials
+18/61 Test  #61: world.destination_trials ..........   Passed    0.01 sec
+      Start  62: world.destination_messages
+19/61 Test  #62: world.destination_messages ........   Passed    0.00 sec
+      Start  63: world.destination_schema
+20/61 Test  #63: world.destination_schema ..........   Passed    0.00 sec
+      Start  64: world.destination_lifetime
+21/61 Test  #64: world.destination_lifetime ........   Passed    0.01 sec
+      Start  65: world.sprite_entries
+22/61 Test  #65: world.sprite_entries ..............   Passed    0.01 sec
+      Start  66: world.sound_entries
+23/61 Test  #66: world.sound_entries ...............   Passed    0.01 sec
+      Start  67: world.rez_structure
+24/61 Test  #67: world.rez_structure ...............   Passed    0.00 sec
+      Start  68: world.rez_rejection
+25/61 Test  #68: world.rez_rejection ...............   Passed    0.00 sec
+      Start  69: world.resource_mount
+26/61 Test  #69: world.resource_mount ..............   Passed    0.01 sec
+      Start  70: world.world_properties
+27/61 Test  #70: world.world_properties ............   Passed    0.00 sec
+      Start  71: world.world_geometry
+28/61 Test  #71: world.world_geometry ..............   Passed    0.00 sec
+      Start  72: world.world_rejection
+29/61 Test  #72: world.world_rejection .............   Passed    0.00 sec
+      Start  73: world.mutations
+30/61 Test  #73: world.mutations ...................   Passed    0.01 sec
+      Start  74: world.session_lifecycle
+31/61 Test  #74: world.session_lifecycle ...........   Passed    0.00 sec
+      Start  75: world.session_messages
+32/61 Test  #75: world.session_messages ............   Passed    0.00 sec
+      Start  76: world.original_trigger
+33/61 Test  #76: world.original_trigger ............   Passed    0.00 sec
+      Start  77: world.session_start_private
+34/61 Test  #77: world.session_start_private .......   Passed    1.50 sec
+      Start  78: world.level_change_private
+35/61 Test  #78: world.level_change_private ........   Passed    1.01 sec
+      Start  79: world.destination_trial_private
+36/61 Test  #79: world.destination_trial_private ...   Passed    1.31 sec
+      Start  80: world.destination_private
+37/61 Test  #80: world.destination_private .........***Failed    0.22 sec
+Cycle 0: worlds/01_subwaya.dat: 580 entries / 208 schema / 372 editor / 0 unknown / 0 invalid / 116 models / 14300 triangles / 4095 collision nodes
+Cycle 0: worlds/02_cityhub.dat: 1026 entries / 485 schema / 541 editor / 0 unknown / 0 invalid / 100 models / 39724 triangles / 16383 collision nodes
+destination_private:1072: d.entries.size() == 1026 && d.schema_checked == 485 && d.editor_only == 541 && d.unknown == 0 && d.invalid == 0 && d.models == 100 && d.triangles == 39745
+
+      Start  81: world.private
+38/61 Test  #81: world.private .....................   Passed    0.26 sec
+      Start 291: randomsound.defaults
+39/61 Test #291: randomsound.defaults ..............   Passed    0.00 sec
+      Start 292: randomsound.commands
+40/61 Test #292: randomsound.commands ..............   Passed    0.01 sec
+      Start 293: randomsound.sequence
+41/61 Test #293: randomsound.sequence ..............   Passed    0.01 sec
+      Start 294: randomsound.random
+42/61 Test #294: randomsound.random ................   Passed    0.01 sec
+      Start 295: randomsound.spatial
+43/61 Test #295: randomsound.spatial ...............***Failed    0.01 sec
+spatial:205: !g.server.PlaySoundAt(h, r, {}, error)
+
+      Start 296: randomsound.lifetime
+44/61 Test #296: randomsound.lifetime ..............   Passed    0.01 sec
+      Start 297: randomsound.failures
+45/61 Test #297: randomsound.failures ..............   Passed    0.01 sec
+      Start 298: randomsound.catalog
+46/61 Test #298: randomsound.catalog ...............   Passed    0.93 sec
+      Start 299: randomsound.subway
+47/61 Test #299: randomsound.subway ................   Passed    0.25 sec
+      Start 300: sound.defaults
+48/61 Test #300: sound.defaults ....................   Passed    0.01 sec
+      Start 301: sound.loops
+49/61 Test #301: sound.loops .......................   Passed    0.01 sec
+      Start 302: sound.resampling
+50/61 Test #302: sound.resampling ..................   Passed    0.01 sec
+      Start 303: sound.lifetime
+51/61 Test #303: sound.lifetime ....................   Passed    0.00 sec
+      Start 304: sound.failures
+52/61 Test #304: sound.failures ....................   Passed    0.00 sec
+      Start 305: sound.metadata
+53/61 Test #305: sound.metadata ....................   Passed    0.01 sec
+      Start 306: sound.catalog
+54/61 Test #306: sound.catalog .....................***Failed    1.00 sec
+worlds/01_subwaya.dat sounds\ambient\subwayloop1.wav world loop=1 frames=198623 rate=22050
+worlds/01_subwaya.dat sounds\ambient\subwayloop1.wav world loop=2 frames=198623 rate=22050
+worlds/01_subwaya.dat sounds\ambient\subwayloop1.wav world loop=3 frames=198623 rate=22050
+worlds/01_subwaya.dat sounds\ambient\subwayloop1.wav world loop=4 frames=198623 rate=22050
+worlds/09_abandoned_buildings.dat sounds\ambients\amb1.wav decode=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\amb1.wav playback=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\neonloop1.wav decode=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\neonloop1.wav playback=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\neonloop1.wav decode=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\neonloop1.wav playback=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\neonloop1.wav decode=Missing or oversized sound resource
+worlds/09_abandoned_buildings.dat sounds\ambients\neonloop1.wav playback=Missing or oversized sound resource
+worlds/12_train_station.dat  decode=Invalid sound resource path
+worlds/12_train_station.dat  playback=Invalid sound resource path
+worlds/12_train_stationb.dat  decode=Invalid sound resource path
+worlds/12_train_stationb.dat  playback=Invalid sound resource path
+worlds/13_downtown.dat sounds\ambient\sewerdrip1.wav decode=Missing or oversized sound resource
+worlds/13_downtown.dat sounds\ambient\sewerdrip1.wav playback=Missing streaming sound resource
+worlds/16_bridge.dat sounds\ambient\sewage1 decode=Missing or oversized sound resource
+worlds/16_bridge.dat sounds\ambient\sewage1 playback=Missing or oversized sound resource
+worlds/17_entrance.dat sounds\hum.wav decode=Missing or oversized sound resource
+worlds/17_entrance.dat sounds\hum.wav playback=Missing or oversized sound resource
+worlds/multi/bb_bloodkeep.dat sounds\ambient\chantloop2.wav decode=Missing or oversized sound resource
+worlds/multi/bb_bloodkeep.dat sounds\ambient\chantloop2.wav playback=Missing or oversized sound resource
+worlds/multi/bb_condemned.dat sounds\ambient\neonlight1.wavt decode=Missing or oversized sound resource
+worlds/multi/bb_condemned.dat sounds\ambient\neonlight1.wavt playback=Missing or oversized sound resource
+worlds/multi/bb_condemned.dat sounds\ambient\neonlight2.wavt decode=Missing or oversized sound resource
+worlds/multi/bb_condemned.dat sounds\ambient\neonlight2.wavt playback=Missing or oversized sound resource
+worlds/multi/bb_jgrave.dat  decode=Invalid sound resource path
+worlds/multi/bb_jgrave.dat  playback=Invalid sound resource path
+worlds/multi/bb_jgrave.dat  decode=Invalid sound resource path
+worlds/multi/bb_jgrave.dat  playback=Invalid sound resource path
+worlds/multi/bb_jgrave.dat  decode=Invalid sound resource path
+worlds/multi/bb_jgrave.dat  playback=Invalid sound resource path
+worlds/multi/bb_jgrave.dat  decode=Invalid sound resource path
+worlds/multi/bb_jgrave.dat  playback=Invalid sound resource path
+worlds=58 sounds=800 streams=302 missing=16 invalid=0 metadata=0 started=784 rejected=0 failed=16
+catalog:350: started == 776 && rejected == 0 && failed == 24
+
+      Start 307: sound.subway
+55/61 Test #307: sound.subway ......................   Passed    0.40 sec
+      Start 769: audio_stream.pcm
+56/61 Test #769: audio_stream.pcm ..................   Passed    0.01 sec
+      Start 770: audio_stream.malformed
+57/61 Test #770: audio_stream.malformed ............   Passed    0.01 sec
+      Start 771: audio_stream.mixer
+58/61 Test #771: audio_stream.mixer ................   Passed    0.01 sec
+      Start 772: audio_stream.seams
+59/61 Test #772: audio_stream.seams ................   Passed    0.05 sec
+      Start 773: audio_stream.truncation
+60/61 Test #773: audio_stream.truncation ...........   Passed    0.00 sec
+      Start 774: audio_stream.city
+61/61 Test #774: audio_stream.city .................   Passed    0.40 sec
+
+95% tests passed, 3 tests failed out of 61
+
+Label Time Summary:
+audio_stream    =   0.49 sec*proc (6 tests)
+headless        =   7.76 sec*proc (61 tests)
+objects         =   0.19 sec*proc (14 tests)
+private         =   7.27 sec*proc (10 tests)
+randomsound     =   1.23 sec*proc (9 tests)
+sound           =   1.42 sec*proc (8 tests)
+world           =   4.44 sec*proc (24 tests)
+
+Total Test time (real) =   7.80 sec
+
+The following tests FAILED:
+	 80 - world.destination_private (Failed)                headless private world
+	295 - randomsound.spatial (Failed)                      headless randomsound
+	306 - sound.catalog (Failed)                            headless private sound
+Errors while running CTest

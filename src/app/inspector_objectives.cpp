@@ -121,6 +121,7 @@ namespace OpenBlood2
                     d.player_entered ? "yes" : "no", d.cleanup_complete ? "complete" : "not completed");
         ImGui::Text("%zu created / %zu sounds / %zu editor / %zu filtered / %zu unknown / %zu failed", d.created,
                     d.sounds, d.editor_only, d.filtered, d.unknown, d.failed);
+        ImGui::Text("Pickups collected during initialization: %zu", d.collected);
         ImGui::Text("Omitted missing world models: %zu (no runtime instance)", d.omitted);
         if (d.player_entered)
             ImGui::Text("Restored HP %.1f / armor %.1f / bullets %.1f / keys %zu / active camera %s", d.health, d.armor,

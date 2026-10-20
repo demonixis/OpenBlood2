@@ -202,7 +202,11 @@ namespace
         CHECK(!g.server.PlaySoundAt(h, r, {}, error));
         r.inner_radius = 80;
         r.outer_radius = 75;
-        CHECK(!g.server.PlaySoundAt(h, r, {}, error));
+        id = g.server.PlaySoundAt(h, r, {80, 0, 0}, error);
+        CHECK(id && g.server.advance_audio(.01, {}, {}));
+        v = g.server.audio.get(id);
+        CHECK(v && v->left == 1 && v->right == 1);
+        CHECK(g.server.advance_audio(.01, {-1, 0, 0}, {}) && v->left == 0 && v->right == 0);
         return true;
     }
     bool lifetime(const std::filesystem::path& root)

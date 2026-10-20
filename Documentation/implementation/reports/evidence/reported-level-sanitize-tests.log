@@ -1,0 +1,34 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  287: sound.defaults
+ 1/11 Test  #287: sound.defaults ......................   Passed    0.04 sec
+      Start  288: sound.loops
+ 2/11 Test  #288: sound.loops .........................   Passed    0.05 sec
+      Start  289: sound.resampling
+ 3/11 Test  #289: sound.resampling ....................   Passed    0.04 sec
+      Start  290: sound.lifetime
+ 4/11 Test  #290: sound.lifetime ......................   Passed    0.04 sec
+      Start  291: sound.failures
+ 5/11 Test  #291: sound.failures ......................   Passed    0.04 sec
+      Start  292: sound.metadata
+ 6/11 Test  #292: sound.metadata ......................   Passed    0.04 sec
+      Start  293: sound.catalog
+ 7/11 Test  #293: sound.catalog .......................   Passed   24.28 sec
+      Start  294: sound.subway
+ 8/11 Test  #294: sound.subway ........................   Passed    7.16 sec
+      Start 1108: reported_levels.12_train_stationb
+ 9/11 Test #1108: reported_levels.12_train_stationb ...   Passed   69.60 sec
+      Start 1109: reported_levels.13_downtown
+10/11 Test #1109: reported_levels.13_downtown .........   Passed   81.80 sec
+      Start 1110: reported_levels.collection
+11/11 Test #1110: reported_levels.collection ..........   Passed    3.05 sec
+
+100% tests passed, 0 tests failed out of 11
+
+Label Time Summary:
+campaign        = 154.44 sec*proc (3 tests)
+headless        = 186.14 sec*proc (11 tests)
+private         =  31.44 sec*proc (2 tests)
+private-data    = 154.44 sec*proc (3 tests)
+sound           =  31.70 sec*proc (8 tests)
+
+Total Test time (real) = 186.16 sec

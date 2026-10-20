@@ -1,5 +1,12 @@
 # Blood2 Project Instructions
 
+The [reported-level loading correction](Documentation/implementation/reports/reported_level_loading.md)
+admits bounded inverted Sound radii with original inner-first attenuation and
+accounts for pickups acknowledged during initialization as CollectedPickup.
+Keep collections distinct from missing resources, sound transfers and failures.
+World-entry audits must recheck NPC/runtime failures after simulation; entry alone
+does not certify a functioning level. M2 closure is unchanged.
+
 The separately requested [Crypt/Bridge/Entrance/Lobby continuation](Documentation/contracts/later_levels_contracts.md) adds four original enemies, Minigun and ParticleSystem. Preserve strict startup, nonhumanoid body damage, exact missing-resource accounting, invalid editor-light metadata and checked ownership. Sky portal textures and zero-area PolyGrid textures are not required for visible rendering; other missing resources still fail. This does not reopen M2 or certify whole-campaign traversal.
 
 The separately authorized [demo continuation](Documentation/contracts/demo_contracts.md) provides Demo_01/Demo_02, original Voodoo/Focus and Enter death retry. The [demo menu](Documentation/contracts/demo_menu_contracts.md) now opens on normal `--demo` launch, with limited source branches and an explicit edition resource provider. Promotions and EndGame return to Main; Quit uses the source Info exit promotion. `--demo --view-world` preserves menu-free direct play. Keep the documented future checkpoint hook, shared retail behavior, explicit resource failures and source/commercial data intact. The old fixed-offset experiment remains removed; M2 closure and its GPU reservation are unchanged.

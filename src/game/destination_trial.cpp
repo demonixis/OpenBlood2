@@ -85,6 +85,9 @@ namespace OpenBlood2
                     case EntryState::WorldSound:
                         ++next.sounds;
                         break;
+                    case EntryState::CollectedPickup:
+                        ++next.collected;
+                        break;
                     case EntryState::EditorOnly:
                         ++next.editor_only;
                         break;

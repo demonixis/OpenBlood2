@@ -1,0 +1,53 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start  291: randomsound.defaults
+ 1/20 Test  #291: randomsound.defaults ................   Passed    0.00 sec
+      Start  292: randomsound.commands
+ 2/20 Test  #292: randomsound.commands ................   Passed    0.00 sec
+      Start  293: randomsound.sequence
+ 3/20 Test  #293: randomsound.sequence ................   Passed    0.00 sec
+      Start  294: randomsound.random
+ 4/20 Test  #294: randomsound.random ..................   Passed    0.00 sec
+      Start  295: randomsound.spatial
+ 5/20 Test  #295: randomsound.spatial .................   Passed    0.00 sec
+      Start  296: randomsound.lifetime
+ 6/20 Test  #296: randomsound.lifetime ................   Passed    0.00 sec
+      Start  297: randomsound.failures
+ 7/20 Test  #297: randomsound.failures ................   Passed    0.00 sec
+      Start  298: randomsound.catalog
+ 8/20 Test  #298: randomsound.catalog .................   Passed    0.53 sec
+      Start  299: randomsound.subway
+ 9/20 Test  #299: randomsound.subway ..................   Passed    0.16 sec
+      Start  300: sound.defaults
+10/20 Test  #300: sound.defaults ......................   Passed    0.00 sec
+      Start  301: sound.loops
+11/20 Test  #301: sound.loops .........................   Passed    0.00 sec
+      Start  302: sound.resampling
+12/20 Test  #302: sound.resampling ....................   Passed    0.00 sec
+      Start  303: sound.lifetime
+13/20 Test  #303: sound.lifetime ......................   Passed    0.00 sec
+      Start  304: sound.failures
+14/20 Test  #304: sound.failures ......................   Passed    0.00 sec
+      Start  305: sound.metadata
+15/20 Test  #305: sound.metadata ......................   Passed    0.00 sec
+      Start  306: sound.catalog
+16/20 Test  #306: sound.catalog .......................   Passed    0.54 sec
+      Start  307: sound.subway
+17/20 Test  #307: sound.subway ........................   Passed    0.24 sec
+      Start 1117: reported_levels.12_train_stationb
+18/20 Test #1117: reported_levels.12_train_stationb ...   Passed    2.89 sec
+      Start 1118: reported_levels.13_downtown
+19/20 Test #1118: reported_levels.13_downtown .........   Passed    3.23 sec
+      Start 1119: reported_levels.collection
+20/20 Test #1119: reported_levels.collection ..........   Passed    0.09 sec
+
+100% tests passed, 0 tests failed out of 20
+
+Label Time Summary:
+campaign        =   6.20 sec*proc (3 tests)
+headless        =   7.71 sec*proc (20 tests)
+private         =   1.46 sec*proc (4 tests)
+private-data    =   6.20 sec*proc (3 tests)
+randomsound     =   0.71 sec*proc (9 tests)
+sound           =   0.80 sec*proc (8 tests)
+
+Total Test time (real) =   7.75 sec
