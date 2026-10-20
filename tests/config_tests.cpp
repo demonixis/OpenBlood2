@@ -3,6 +3,7 @@
 #include <array>
 #include <fstream>
 #include <iostream>
+#include "scratch_dir.h"
 
 namespace fs = std::filesystem;
 using namespace OpenBlood2;
@@ -265,14 +266,10 @@ int main(int argc, char** argv)
     const fs::path root = fs::absolute(path_from_utf8(argv[2]) / name, ec);
     if (ec)
         return 2;
-    fs::remove_all(root, ec);
-    if (ec)
-        return 2;
-    fs::create_directories(root, ec);
-    if (ec)
+    if (!OpenBlood2::Testing::reset_scratch_dir(root))
         return 2;
     const bool ok = test(root);
-    fs::remove_all(root, ec);
+    OpenBlood2::Testing::remove_scratch_dir(root);
     if (ok)
         std::cout << "PASS " << name << '\n';
     return ok ? 0 : 1;

@@ -10,6 +10,7 @@
 #include <iostream>
 #include <map>
 #include <random>
+#include "scratch_dir.h"
 
 using namespace OpenBlood2;
 using Bytes = std::vector<std::uint8_t>;
@@ -746,8 +747,8 @@ namespace
     }
     bool atomic()
     {
+        CHECK(OpenBlood2::Testing::reset_scratch_dir(root));
         std::error_code ec;
-        std::filesystem::remove_all(root, ec);
         const auto path = root / "nested" / "slot0.ob2sav";
         std::string error;
         const Bytes first{1, 2, 3}, second{4, 5};

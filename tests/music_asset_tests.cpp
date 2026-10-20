@@ -5,6 +5,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include "scratch_dir.h"
 using namespace OpenBlood2;
 namespace fs = std::filesystem;
 #define CHECK(x)                                                                                                       \
@@ -184,8 +185,7 @@ namespace
     {
         std::string error;
         std::error_code ec;
-        fs::remove_all(root, ec);
-        CHECK(!ec);
+        CHECK(OpenBlood2::Testing::reset_scratch_dir(root));
         fs::create_directories(root / "Music/Test", ec);
         CHECK(!ec);
         auto props = properties();

@@ -19,6 +19,7 @@
 #include <map>
 #include <optional>
 #include <set>
+#include "scratch_dir.h"
 
 // Original AI_Mgr, CultistAI, CivilianAI, Fanatic, CCorpse and AI_Mgr-only subclass Save/Load
 // (save_load_contracts lot 11): the byte layout, checked refusals and the ledge departure on a
@@ -1303,8 +1304,8 @@ int main(int argc, char** argv)
         return 2;
     const std::string mode = argv[1];
     root = argv[2];
-    std::filesystem::remove_all(root);
-    std::filesystem::create_directories(root);
+    if (!OpenBlood2::Testing::reset_scratch_dir(root))
+        return 2;
     const std::map<std::string, std::function<bool()>> headless{{"layout", layout}, {"refusals", refusals}};
     if (auto it = headless.find(mode); it != headless.end())
         return it->second() ? 0 : 1;

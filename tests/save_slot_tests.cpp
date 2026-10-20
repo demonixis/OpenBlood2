@@ -6,6 +6,7 @@
 #include "save_world_fixture.h"
 #include <fstream>
 #include <iostream>
+#include "scratch_dir.h"
 
 // Slots, Quick and Restart (save_load_contracts lot 6): slot naming, the META quick read, real
 // files in a temporary preference directory, corrupt and mismatch refusals, F5/F6, the demo
@@ -78,8 +79,7 @@ namespace
     std::filesystem::path fresh(std::string_view name)
     {
         const auto dir = root / "prefs" / name / "saves" / "retail";
-        std::error_code ec;
-        std::filesystem::remove_all(dir, ec);
+        OpenBlood2::Testing::remove_scratch_dir(dir);
         return dir;
     }
     float& health(GameSession& g)

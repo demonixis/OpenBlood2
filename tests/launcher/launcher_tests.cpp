@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <thread>
+#include "../scratch_dir.h"
 
 using namespace OpenBlood2;
 using namespace OpenBlood2::Launcher;
@@ -115,10 +116,7 @@ int main(int argc, char** argv)
     if (argc != 3)
         return 2;
     const auto root = fs::absolute(path_from_utf8(argv[2]));
-    std::error_code ec;
-    fs::remove_all(root, ec);
-    fs::create_directories(root, ec);
-    if (ec)
+    if (!OpenBlood2::Testing::reset_scratch_dir(root))
         return 2;
     const std::string_view test(argv[1]);
     const bool ok = test == "state" ? state_test(root) : test == "dialogs" && dialogs();

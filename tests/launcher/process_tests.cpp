@@ -3,6 +3,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include "../scratch_dir.h"
 
 using namespace OpenBlood2;
 using namespace OpenBlood2::Launcher;
@@ -272,10 +273,7 @@ int main(int argc, char** argv)
     const auto fixture = fs::absolute(path_from_utf8(argv[3]));
     if (mode == "detach_parent")
         return detach_parent(root, fixture) ? 0 : 1;
-    std::error_code ec;
-    fs::remove_all(root, ec);
-    fs::create_directories(root, ec);
-    if (ec)
+    if (!OpenBlood2::Testing::reset_scratch_dir(root))
         return 2;
     bool ok = false;
     if (mode == "protocol")

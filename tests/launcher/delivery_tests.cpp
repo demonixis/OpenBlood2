@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <miniz.h>
+#include "../scratch_dir.h"
 
 using namespace OpenBlood2;
 using namespace OpenBlood2::Launcher;
@@ -285,8 +286,8 @@ int main(int argc, char** argv)
     const std::string_view mode(argv[1]);
     const auto root = fs::absolute(path_from_utf8(argv[2]));
     std::error_code ec;
-    if (mode != "download" && mode != "install")
-        fs::remove_all(root, ec);
+    if (mode != "download" && mode != "install" && !OpenBlood2::Testing::remove_scratch_dir(root))
+        return 2;
     fs::create_directories(root, ec);
     if (ec)
         return 2;
