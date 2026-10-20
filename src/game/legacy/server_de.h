@@ -102,7 +102,7 @@ class ServerDE : public CSBase
     virtual std::uint64_t PublishBloodSpurt(HOBJECT, const OpenBlood2::BloodSpurtSettings&, std::string&) = 0;
     virtual std::uint64_t PublishBloodSplat(HOBJECT, const OpenBlood2::BloodSplatSettings&, std::string&) = 0;
     virtual std::uint64_t PublishFleshGibs(HOBJECT, DVector, DVector, DVector, float, unsigned, std::string&) = 0;
-    virtual std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) = 0;
+    virtual std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&, float lifetime_scale = 1) = 0;
     virtual std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&, DBYTE type = 0) = 0;
     virtual std::uint64_t PublishExplosionFragments(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
     virtual std::uint64_t PublishExplosionFlames(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;

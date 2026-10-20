@@ -1,9 +1,10 @@
 #include "game/object_particles.h"
 #include <algorithm>
+#include <cmath>
 namespace OpenBlood2
 {
     std::uint64_t ObjectParticles::publish(HOBJECT owner, unsigned recipe, ServerDE& server, const Resources* resources,
-                                           double now, std::string& error)
+                                           double now, std::string& error, float lifetime_scale)
     {
         error.clear();
         ObjectParticleReport report;
@@ -17,15 +18,23 @@ namespace OpenBlood2
             if (!resources || server.GetObjectPos(owner, &pose.position) != DE_OK ||
                 server.GetObjectRotation(owner, &pose.rotation) != DE_OK)
                 error = "Object particle resources/pose unavailable";
-            else if (recipe != 19 && recipe != 36 && recipe != 21 && recipe != 24 && recipe != 31 && recipe != 32 &&
-                     (recipe < 12 || recipe > 17))
+            else if (!std::isfinite(lifetime_scale) || lifetime_scale < .25f || lifetime_scale > 2 ||
+                     (recipe != 3 && lifetime_scale != 1))
+                error = "Unsupported object particle lifetime scale";
+            else if (recipe != 3 && recipe != 19 && recipe != 36 && recipe != 21 && recipe != 24 && recipe != 31 &&
+                     recipe != 32 && (recipe < 12 || recipe > 17))
                 error = "Object-bound particle recipe unavailable";
             else if (active.size() >= 128 || next_id_ == UINT64_MAX)
                 error = "Object particle system capacity exhausted";
             else
             {
                 CObjectParticleFX fx;
-                if (fx.Init(recipe, next_id_, random_, error) && fx.CreateObject(*resources, pose, now, error))
+                if (fx.Init(recipe, next_id_, random_, error))
+                {
+                    fx.min_life *= lifetime_scale;
+                    fx.max_life *= lifetime_scale;
+                }
+                if (error.empty() && fx.CreateObject(*resources, pose, now, error))
                 {
                     report.id = fx.id = next_id_++;
                     active.push_back({owner, std::move(fx)});

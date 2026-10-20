@@ -1,0 +1,28 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 1270: leech.healing
+1/5 Test #1270: leech.healing ....................   Passed    0.04 sec
+    Start 1271: leech.projectiles
+2/5 Test #1271: leech.projectiles ................   Passed    0.04 sec
+    Start 1272: leech.alternate
+3/5 Test #1272: leech.alternate ..................   Passed    0.04 sec
+    Start 1273: leech.client
+4/5 Test #1273: leech.client .....................   Passed    0.04 sec
+    Start 1274: gpu.leech
+5/5 Test #1274: gpu.leech ........................***Failed    0.95 sec
+flight lit=12 entries=51
+104: lit > 100  
+
+
+80% tests passed, 1 tests failed out of 5
+
+Label Time Summary:
+gpu             =   0.95 sec*proc (1 test)
+headless        =   0.16 sec*proc (4 tests)
+private-data    =   1.11 sec*proc (5 tests)
+weapons         =   1.11 sec*proc (5 tests)
+
+Total Test time (real) =   1.16 sec
+
+The following tests FAILED:
+	1274 - gpu.leech (Failed)                                gpu private-data weapons
+Errors while running CTest

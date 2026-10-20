@@ -303,7 +303,7 @@ bool CProjectile::AddImpact(DVector position)
         }
     }
     AddExplosion(point, normal);
-    return true;
+    return !failed;
 }
 
 bool CEnergyBlastProjectile::InitialUpdate()

@@ -45,7 +45,7 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_ran
         return Init(type, owner, failure);
     failure.clear();
     *this = {};
-    if ((type != 19 && type != 36 && type != 21 && type != 24 && type != 31 && type != 32 &&
+    if ((type != 3 && type != 19 && type != 36 && type != 21 && type != 24 && type != 31 && type != 32 &&
          (type < 12 || type > 17)) ||
         !owner)
     {
@@ -54,6 +54,24 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_ran
     }
     recipe = type;
     parent = owner;
+    if (type == 3)
+    {
+        radius = 200;
+        position_radius = 6;
+        gravity = 0;
+        add_delay = .025f;
+        authored_count = 1;
+        density = 10;
+        requested_alpha = .5f;
+        min_life = .25f;
+        max_life = .75f;
+        min_color = {255, 192, 0};
+        max_color = {255, 255, 0};
+        flags = 0x0f;
+        texture = "SpriteTextures\\Firepart64.dtx";
+        initialized_ = true;
+        return true;
+    }
     if (type == 31 || type == 32)
     {
         radius = type == 31 ? 400.f : 1500.f;
@@ -254,7 +272,8 @@ bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t 
 {
     const auto delta = vector_subtract(last_position, position);
     const float distance = std::sqrt(vector_dot(delta, delta));
-    const float samples = (recipe == 21 || recipe == 31 || recipe == 32) ? distance / (density * radius / 1000.f) : 1.f;
+    const float samples =
+        (recipe == 3 || recipe == 21 || recipe == 31 || recipe == 32) ? distance / (density * radius / 1000.f) : 1.f;
     if (!std::isfinite(samples) || samples > 2048)
     {
         error = "Object particle stream capacity exceeded";
@@ -278,22 +297,26 @@ bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t 
         auto right = rotate_vector(basis, {1, 0, 0});
         const auto forward = rotate_vector(basis, {0, 0, 1});
         around(basis, forward, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
-        if (recipe == 19 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32)
+        if (recipe == 3 || recipe == 19 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32)
             around(basis, right, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
         right = vector_scale(right, 1 / std::sqrt(vector_dot(right, right)));
         const float speed = draw(random, recipe == 31 ? -5.f : 0.f,
                                  recipe == 31                   ? 5.f
                                  : recipe == 21 || recipe == 24 ? 25.f
                                                                 : 0.f); // Original zero-speed draw still consumes RNG.
-        auto start = vector_scale(right, recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32
-                                             ? draw(random, 0, position_radius)
+        float comet_distance = 0;
+        auto start = vector_scale(right, recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32
+                                             ? (comet_distance = draw(random, 0, position_radius))
                                              : position_radius);
-        if (recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32)
+        if (recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32)
             start = vector_add(
                 start, vector_add(vector_subtract(position, origin), vector_scale(step, float(i / authored_count))));
         const auto color = vector_scale(
             vector_add(min_color, vector_scale(vector_subtract(max_color, min_color), draw(random, 0, 1))), 1 / 255.f);
-        particles.push_back({start, vector_scale(right, speed), draw(random, min_life, max_life), color});
+        particles.push_back({start, vector_scale(right, speed),
+                             recipe == 3 ? max_life - (max_life - min_life) * (comet_distance / position_radius)
+                                         : draw(random, min_life, max_life),
+                             color});
     }
     emitted += count;
     return true;
@@ -332,7 +355,7 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
         if (duration < elapsed)
             return false;
     }
-    else if (recipe == 1 || recipe == 31 || recipe == 32)
+    else if (recipe == 1 || recipe == 3 || recipe == 31 || recipe == 32)
     {
         const auto difference = vector_subtract(owner->position, last_object_position);
         if (difference.x == 0 && difference.y == 0 && difference.z == 0)
@@ -349,7 +372,7 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
         // ALIGNROTATION affects emission, not the fixed smoke system transform.
         source_rotation = owner->rotation;
     }
-    else if (recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32)
+    else if (recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32)
     {
         if (moving)
             position = owner->position;

@@ -1,0 +1,65 @@
+{
+  "selection": "Life Leech weapon/pickup, curved primary, alternate push, post-armor healing and original visual recipes",
+  "sources": [
+    {
+      "path": "sources/blood2/ObjectDLL/GameProjectiles.cpp",
+      "sha256": "d713d649cab9e9378ae7992ad74b0e608b6af534f3c5a4df39125219c0970e4f"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GameProjectiles.h",
+      "sha256": "9acd38645c28d90b508a0a55a02760bcea5c6c40318b6266635711d2ba1f1bc0"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Projectile.cpp",
+      "sha256": "52b805c67775579b5703e0ad1099a8ea44d76b245349c8f6d1fac0a1b3b74ef2"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/GameWeapons.h",
+      "sha256": "593008bca266b8037db7076475fc7d93f86af63c35b41e455c107b9dc3f6bc19"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/WeaponPickups.cpp",
+      "sha256": "116eac417209ee2cc523044e02ff615406b597164df9df5d5f2e0be80cfbc1d4"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/PlayerObj.h",
+      "sha256": "fb92d0a74b30d2a13b0589a2e4f90658a366cc2163e1fe37d446b2b50ed1da4a"
+    },
+    {
+      "path": "sources/blood2/Shared/WeaponDefs.cpp",
+      "sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f"
+    },
+    {
+      "path": "sources/blood2/Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b"
+    },
+    {
+      "path": "sources/blood2/Shared/SFXMsgIds.h",
+      "sha256": "d835c9589f2338bad9606df92c8bd4394ea232ff2cc325b0c8aa4c49474d9f4f"
+    },
+    {
+      "path": "sources/blood2/Shared/ClientRes.h",
+      "sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ExplosionFX.cpp",
+      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ObjectFX.cpp",
+      "sha256": "1af815cdb07c8e0fcd56bebb723e78b539cd3398221a78e3b3fcf977bf109c48"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/ObjectFX.h",
+      "sha256": "f10854489408e05859507a3b73cfbbd1ba3514988aa7caf93ec48d992bbfaffe"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/GameWeapons.cpp",
+      "sha256": "292753e7a91be363aa955731d552f967845c6a783dd6aeec954db59e2d2128d7"
+    }
+  ]
+}

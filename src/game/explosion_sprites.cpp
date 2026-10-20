@@ -2,6 +2,8 @@
 #include "engine/collision.h"
 #include <algorithm>
 #include <cmath>
+#include <numbers>
+#include <random>
 namespace OpenBlood2
 {
     bool original_explosion_sprites(DDWORD type, DVector position, DVector normal,
@@ -46,6 +48,17 @@ namespace OpenBlood2
                 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
             unavailable = "light illumination";
         }
+        else if (type == 16 || type == 17)
+        {
+            if (type == 16)
+            {
+                add(10, .25f, .75f, .5f, .75f, 0, 0, "Sprites\\explodesmall.spr");
+                add(15, .25f, 1, 3, .85f, 1, 0, "Sprites\\smokepuff2.spr");
+            }
+            else
+                add(0, .25f, 1.5f, .75f, 1, 1, 2, "Sprites\\explode128.spr");
+            unavailable = "light illumination";
+        }
         else if (type == 6)
         {
             add(0, .25f, .25f, .5f, 1, 0, 1, "Sprites\\debrisimp.spr");
@@ -78,6 +91,7 @@ namespace OpenBlood2
         report.id = next_event_++;
         report.type = type;
         report.source = source;
+        std::minstd_rand random(report.id); // Portable per-event cosmetic stream.
         std::vector<ExplosionSpriteSettings> settings;
         if (original_explosion_sprites(type, pos, normal, settings, report.unavailable, report.error))
             for (const auto& setting : settings)
@@ -90,7 +104,10 @@ namespace OpenBlood2
                 }
                 CExplosionSpriteFX fx;
                 std::string failure;
-                if (!fx.Init(setting, failure) || !fx.CreateObject(store, now, failure))
+                const float roll = setting.align == 2 ? 2 * std::numbers::pi_v<float> * float(random() - random.min()) /
+                                                            float(random.max() - random.min())
+                                                      : 0;
+                if (!fx.Init(setting, failure) || !fx.CreateObject(store, now, failure, roll))
                 {
                     ++failed;
                     if (!report.error.empty())

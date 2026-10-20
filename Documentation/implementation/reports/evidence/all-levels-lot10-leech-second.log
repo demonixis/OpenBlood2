@@ -1,0 +1,22 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1156: leech.healing
+1/3 Test #1156: leech.healing ....................   Passed    0.01 sec
+    Start 1157: leech.projectiles
+2/3 Test #1157: leech.projectiles ................***Failed    0.02 sec
+projectiles:115: g.server.GetVelocity(h, &velocity) == DE_OK && near(velocity.z, 1000)
+
+    Start 1158: leech.alternate
+3/3 Test #1158: leech.alternate ..................   Passed    0.01 sec
+
+67% tests passed, 1 tests failed out of 3
+
+Label Time Summary:
+headless        =   0.04 sec*proc (3 tests)
+private-data    =   0.04 sec*proc (3 tests)
+weapons         =   0.04 sec*proc (3 tests)
+
+Total Test time (real) =   0.06 sec
+
+The following tests FAILED:
+	1157 - leech.projectiles (Failed)                        headless private-data weapons
+Errors while running CTest

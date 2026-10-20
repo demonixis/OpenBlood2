@@ -1,0 +1,28 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 1232: reported_levels.18_temple
+1/5 Test #1232: reported_levels.18_temple ........   Passed    2.77 sec
+    Start 1270: leech.healing
+2/5 Test #1270: leech.healing ....................   Passed    0.04 sec
+    Start 1271: leech.projectiles
+3/5 Test #1271: leech.projectiles ................   Passed    0.04 sec
+    Start 1272: leech.alternate
+4/5 Test #1272: leech.alternate ..................   Passed    0.04 sec
+    Start 1273: gpu.leech
+5/5 Test #1273: gpu.leech ........................***Failed    1.22 sec
+102: lit > 100  
+
+
+80% tests passed, 1 tests failed out of 5
+
+Label Time Summary:
+campaign        =   2.77 sec*proc (1 test)
+gpu             =   1.22 sec*proc (1 test)
+headless        =   2.88 sec*proc (4 tests)
+private-data    =   4.10 sec*proc (5 tests)
+weapons         =   1.34 sec*proc (4 tests)
+
+Total Test time (real) =   4.15 sec
+
+The following tests FAILED:
+	1273 - gpu.leech (Failed)                                gpu private-data weapons
+Errors while running CTest

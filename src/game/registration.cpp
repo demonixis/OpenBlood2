@@ -36,6 +36,7 @@
 #include "game/original/KeyFramer.h"
 #include "game/original/KeyPickup.h"
 #include "game/original/LaterEnemies.h"
+#include "game/original/LeechProjectile.h"
 #include "game/original/MadScientistAI.h"
 #include "game/original/Minefield.h"
 #include "game/original/Naga.h"
@@ -157,6 +158,8 @@ namespace OpenBlood2
         const ClassInfo bugspray_alt_projectile{"CBugSprayAltProjectile", &base, construct<CBugSprayAltProjectile>, {}};
         const ClassInfo napalm_projectile{"CNapalmProjectile", &base, construct<CNapalmProjectile>, {}};
         const ClassInfo loogie{"CShikariLoogieProjectile", &base, construct<CShikariLoogieProjectile>, {}};
+        const ClassInfo leech_prime{"CLeechPrimeProjectile", &base, construct<CLeechPrimeProjectile>, {}};
+        const ClassInfo leech_alt{"CLeechAltProjectile", &base, construct<CLeechAltProjectile>, {}};
         const ClassInfo singularity_projectile{"CSingularityProjectile", &base, construct<CSingularityProjectile>, {}};
         const ClassInfo flare_alt{"CFlareAltProjectile", &base, construct<CFlareAltProjectile>, {}};
         const ClassInfo flare_burst{"CFlareBurstProjectile", &base, construct<CFlareBurstProjectile>, {}};
@@ -830,6 +833,7 @@ namespace OpenBlood2
         const ClassInfo tesla_pickup{"TeslaCannonPU", &weapon_pickup, construct<TeslaCannonPU>, {}};
         const ClassInfo voodoo_pickup{"VoodooDollPU", &weapon_pickup, construct<VoodooDollPU>, {}};
         const ClassInfo shotgun_pickup{"ShotgunPU", &weapon_pickup, construct<ShotgunPU>, {}};
+        const ClassInfo leech_pickup{"LifeLeechPU", &weapon_pickup, construct<LifeLeechPU>, {}};
         const ClassInfo singularity_pickup{"SingularityPU", &weapon_pickup, construct<SingularityPU>, {}};
         const ClassInfo mac10_pickup{"SubMachineGunPU", &weapon_pickup, construct<SubMachineGunPU>, {}};
         const ClassInfo campaign_HowitzerPU{"HowitzerPU", &weapon_pickup, construct<HowitzerPU>, {}};
@@ -1230,9 +1234,10 @@ namespace OpenBlood2
                objects.register_class(tesla_ball) && objects.register_class(napalm_projectile) &&
                objects.register_class(seeing_eye) && objects.register_class(bugspray_projectile) &&
                objects.register_class(bugspray_alt_projectile) && objects.register_class(loogie) &&
-               objects.register_class(singularity_projectile) && objects.register_class(flare_burst) &&
-               objects.register_class(energy_projectile) && objects.register_class(campaign_CTimeBomb) &&
-               objects.register_class(campaign_CNagaSpikeProjectile) &&
+               objects.register_class(leech_prime) && objects.register_class(leech_alt) &&
+               objects.register_class(leech_pickup) && objects.register_class(singularity_projectile) &&
+               objects.register_class(flare_burst) && objects.register_class(energy_projectile) &&
+               objects.register_class(campaign_CTimeBomb) && objects.register_class(campaign_CNagaSpikeProjectile) &&
                objects.register_class(campaign_CNagaDebrisProjectile) &&
                objects.register_class(campaign_NagaCeilingDebris) &&
                objects.register_class(campaign_CGroundStrikeProjectile) &&

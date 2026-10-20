@@ -123,7 +123,7 @@ namespace OpenBlood2
         std::uint64_t PublishPolyGrid(HOBJECT, const PolyGridSettings&, std::string&) override;
         ParticleStreams particle_streams;
         std::uint64_t PublishParticleStream(HOBJECT, const ParticleStreamSettings&, std::string&) override;
-        std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&) override;
+        std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&, float lifetime_scale = 1) override;
         std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&, DBYTE type = 0) override;
         ExplosionLights explosion_lights;
         ExplosionRings explosion_rings;

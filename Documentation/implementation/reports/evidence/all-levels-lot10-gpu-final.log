@@ -1,0 +1,12 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 1274: gpu.leech
+1/1 Test #1274: gpu.leech ........................   Passed    1.15 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+gpu             =   1.15 sec*proc (1 test)
+private-data    =   1.15 sec*proc (1 test)
+weapons         =   1.15 sec*proc (1 test)
+
+Total Test time (real) =   1.19 sec

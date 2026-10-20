@@ -1,6 +1,7 @@
 // Selected shared damage/lifetime and brush trigger branches; see m2_brush_sources.json.
 #include "Destructable.h"
 #include "AI_Mgr.h"
+#include "PlayerObj.h"
 #include "engine/collision.h"
 #include "engine/objects.h"
 #include "spawn_object.h"
@@ -238,6 +239,12 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD 
             // A checked token avoids sharing/breaking the AI target's directed link.
             if (dynamic_cast<AI_Mgr*>(owner) && damage.type != OpenBlood2::DamageType::Death)
                 last_damager_ = damage.attacker;
+            // Original post-armor life leech, before victim death handling. Slow death
+            // is a separate, unavailable multiplayer state in this local runtime.
+            if (damage.type == OpenBlood2::DamageType::Leech && dynamic_cast<CBaseCharacter*>(owner))
+                if (auto* player = dynamic_cast<CPlayerObj*>(BaseClass::GetServerDE()->HandleToObject(damage.attacker));
+                    player && !player->m_bDead)
+                    player->m_damage.Heal(amount / 10.f);
             if (m_fHitPoints <= 0)
             {
                 m_bDead = DTRUE;

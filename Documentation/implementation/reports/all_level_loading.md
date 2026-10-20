@@ -9,9 +9,9 @@ initial deltas, three seconds of simulation with movement, a runtime failure
 recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
 combat, multiplayer or GPU certification. M2 closure remains unchanged.
 
-Current verified opening gate after iteration 9: **46 / 58 pass, 12 / 58 fail**
-([audit 7](evidence/all-levels-audit-07.log)). Remaining worlds: Abandoned Buildings,
-Temple, Office, Rooftop, Ancient City, Arena, Ancient One,
+Current verified opening gate after iteration 10: **47 / 58 pass, 11 / 58 fail**
+([audit 8](evidence/all-levels-audit-08.log)). Remaining worlds: Abandoned Buildings,
+Office, Rooftop, Ancient City, Arena, Ancient One,
 End and the four CTF maps. Initial-entry and three-second simulation
 coverage is not complete gameplay/traversal acceptance. The tables below retain
 the initial baseline; iteration records explain resolved and newly exposed blockers.
@@ -342,3 +342,50 @@ frames on NVIDIA RTX 3060, dummy audio, and exit 0.
 FlagStand/FlagObject, and Office's unknown authored TheAngerPU destruction spawn.
 No alias is supplied. Opening and short simulation do not certify full traversal,
 network play or global M3 acceptance.
+
+## Iteration 10: Life Leech and Temple
+
+The [Life Leech contracts](../../contracts/life_leech_contracts.md) cover the
+original pickup/weapon, curved primary, one-pass alternate push, post-armor
+healing, real comet particles and both impact composites. Client animation keys
+now exercise both modes with the real view model and exact Focus consumption.
+Source undefined rotation/zero-distance behavior is replaced with documented
+finite operations; point-light illumination remains unavailable.
+
+[Audit 8](evidence/all-levels-audit-08.log) passes **47 / 58**, fails **11 / 58**.
+Temple passes all three difficulties, simulation and cleanup. Remaining work:
+WarpGate, Chosen/REV and boss classes, FlagStand/FlagObject, and Office's unknown
+TheAngerPU spawn. LifeLeech entries in Rooftop and Ancient One are no longer
+rejected, but those worlds still fail on other missing classes.
+
+[50 Dev regressions](evidence/all-levels-lot10-dev.log) pass; the final
+player-death flag and saved-damage checks pass in
+[10 focused Dev tests](evidence/all-levels-lot10-final-dev.log), followed by
+[4 weapon/client cases](evidence/all-levels-lot10-client.log). The initial
+[8-case run](evidence/all-levels-lot10-initial.log) exposed an incomplete attached
+loop request. The [next run](evidence/all-levels-lot10-leech-second.log) exposed
+a fixture assertion that ignored original player aim correction. Both failures
+are retained; the corrected test measures curvature from the actual firing direction.
+
+The [56-case sanitizer run](evidence/all-levels-lot10-sanitizers.log) passes 54
+and times out in objects.message_churn (10 seconds) and weapons.private
+(240 seconds) while compilation was also running. The suite remains a failed
+run. The same two tests, with unchanged deadlines,
+[pass in isolation](evidence/all-levels-lot10-san-retry.log) in 6.15 and 106.24
+seconds. The [final four Life Leech cases](evidence/all-levels-lot10-san-leech-final.log)
+pass under ASan/UBSan with leak detection, including actual client FIRE_KEY use.
+
+[Release](evidence/all-levels-lot10-release.log) passes Temple and all three
+initial weapon tests, but fails the new GPU pixel threshold.
+[Diagnosis](evidence/all-levels-lot10-gpu-diagnosis.log) passes all four weapon
+cases and finds only 12 visible pixels at the distant test camera. The closer
+fixture [passes](evidence/all-levels-lot10-gpu-final.log) without changing
+production dimensions or rendering: [397 pixels](evidence/all-levels-lot10-gpu-readback.log),
+actual impact sprites, expiry and empty-scene readback. Both applications build.
+
+![Life Leech projectile and original comet trail](evidence/all-levels-leech-flight.png)
+![Life Leech primary impact](evidence/all-levels-leech-impact.png)
+
+[Temple GPU opening](evidence/all-levels-temple-gpu.log) renders three inspector-free
+Release frames on NVIDIA RTX 3060, dummy audio, and exits 0. This is an opening
+and short-simulation gate; complete traversal, networking and M3 are unaccepted.

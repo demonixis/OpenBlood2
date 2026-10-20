@@ -111,7 +111,7 @@ namespace
             if (kind == 2)
                 s.fade = 6;
             if (kind == 3)
-                s.align = 2;
+                s.align = 3;
             if (kind == 4)
                 s.alpha = 2;
             if (kind == 5)

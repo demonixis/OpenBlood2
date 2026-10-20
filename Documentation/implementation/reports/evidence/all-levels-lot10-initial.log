@@ -1,0 +1,35 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start  630: explosion_sprites.formulas
+1/8 Test  #630: explosion_sprites.formulas .......   Passed    0.00 sec
+    Start  631: explosion_sprites.failures
+2/8 Test  #631: explosion_sprites.failures .......   Passed    0.00 sec
+    Start  632: explosion_sprites.session
+3/8 Test  #632: explosion_sprites.session ........   Passed    0.00 sec
+    Start  633: explosion_sprites.private
+4/8 Test  #633: explosion_sprites.private ........   Passed    0.18 sec
+    Start 1120: reported_levels.18_temple
+5/8 Test #1120: reported_levels.18_temple ........   Passed    1.23 sec
+    Start 1156: leech.healing
+6/8 Test #1156: leech.healing ....................   Passed    0.02 sec
+    Start 1157: leech.projectiles
+7/8 Test #1157: leech.projectiles ................***Failed    0.02 sec
+projectiles:110: prime->flight_sound && g.objects.get(h)->state.m_Scale.x == 0
+
+    Start 1158: leech.alternate
+8/8 Test #1158: leech.alternate ..................   Passed    0.02 sec
+
+88% tests passed, 1 tests failed out of 8
+
+Label Time Summary:
+campaign             =   1.23 sec*proc (1 test)
+explosion_sprites    =   0.19 sec*proc (4 tests)
+headless             =   1.48 sec*proc (8 tests)
+private              =   0.18 sec*proc (1 test)
+private-data         =   1.29 sec*proc (4 tests)
+weapons              =   0.05 sec*proc (3 tests)
+
+Total Test time (real) =   1.50 sec
+
+The following tests FAILED:
+	1157 - leech.projectiles (Failed)                        headless private-data weapons
+Errors while running CTest

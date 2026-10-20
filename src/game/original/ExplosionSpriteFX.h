@@ -19,7 +19,7 @@ class CExplosionSpriteFX
 {
   public:
     bool Init(const OpenBlood2::ExplosionSpriteSettings&, std::string& error);
-    bool CreateObject(OpenBlood2::SpriteStore&, double now, std::string& error);
+    bool CreateObject(OpenBlood2::SpriteStore&, double now, std::string& error, float alignment_roll = 0);
     bool Update(double now);
     OpenBlood2::ExplosionSpriteSettings settings;
     std::shared_ptr<const OpenBlood2::Sprite> sprite;

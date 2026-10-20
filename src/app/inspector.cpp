@@ -12,6 +12,7 @@
 #include "game/original/Grenade.h"
 #include "game/original/Key.h"
 #include "game/original/KeyPickup.h"
+#include "game/original/LeechProjectile.h"
 #include "game/original/Minefield.h"
 #include "game/original/NewStatusBar.h"
 #include "game/original/Projectile.h"
@@ -1008,6 +1009,19 @@ namespace OpenBlood2
                                 ImGui::Text(
                                     "Alternate flare: cached velocity %s / emitted children %u / effect type %u",
                                     flare->get_velocity ? "pending" : "yes", flare->children, flare->explosion_type);
+                            if (const auto* leech = dynamic_cast<const CLeechPrimeProjectile*>(projectile))
+                            {
+                                ImGui::Text(
+                                    "Leech: curve %.3f / amplitude %.2f / no base expiry / trail %llu scale %.2f",
+                                    leech->curve, leech->amplitude, (unsigned long long)leech->trail,
+                                    leech->trail_scale);
+                                ImGui::Text("Loop %llu / light at %.2f %.2f %.2f",
+                                            (unsigned long long)leech->flight_sound, leech->light_position.x,
+                                            leech->light_position.y, leech->light_position.z);
+                                ImGui::TextWrapped("%s %s", leech->light_error.c_str(), leech->sound_error.c_str());
+                            }
+                            if (const auto* leech = dynamic_cast<const CLeechAltProjectile*>(projectile))
+                                ImGui::Text("Leech alternate: pushes %llu", (unsigned long long)leech->pushes);
                             ImGui::TextWrapped("Pending: %s", projectile->trail_error.c_str());
                             if (!projectile->error.empty())
                                 ImGui::TextWrapped("Failure: %s", projectile->error.c_str());

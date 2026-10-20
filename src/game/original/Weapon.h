@@ -171,6 +171,12 @@ class CShotgun final : public CWeapon
   public:
     CShotgun() : CWeapon(WEAP_SHOTGUN) {}
 };
+// Original CLifeLeech only selects its weapon definition.
+class CLifeLeech final : public CWeapon
+{
+  public:
+    CLifeLeech() : CWeapon(WEAP_LIFELEECH) {}
+};
 // Original CSingularity::FireProjectile: a blue-large laser to the first solid hit,
 // then the ordinary (zero-velocity) CSingularityProjectile.
 class CSingularity final : public CWeapon

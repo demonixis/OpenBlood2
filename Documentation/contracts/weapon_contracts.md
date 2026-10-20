@@ -1,5 +1,9 @@
 # Original Inventory and Vector Weapon Boundary
 
+The [Life Leech continuation](life_leech_contracts.md) adds weapon 16, its original
+pickup, both projectiles, post-armor healing and real visual components. Earlier
+weapon limits retain their historical scope.
+
 > The [compact HUD continuation](hud_contracts.md) now displays actual current ammunition and supports numeric owned-slot commands. Earlier blanket HUD omissions remain historical; original artwork and the M2 gate are still incomplete.
 
 The [M16/grenade continuation](assault_contracts.md) adds ID 9 and mode-specific ammo, original grenade callbacks and explicit finite key-bound metadata warnings. Earlier supported-weapon limits are historical; remaining services and M2 stay open.

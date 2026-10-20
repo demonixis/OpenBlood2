@@ -48,6 +48,11 @@ class ShotgunPU : public WeaponPickup
   public:
     ShotgunPU();
 };
+class LifeLeechPU final : public WeaponPickup
+{
+  public:
+    LifeLeechPU();
+};
 class SingularityPU : public WeaponPickup
 {
   public:

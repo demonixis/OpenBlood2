@@ -1,0 +1,18 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 1147: leech.healing
+1/4 Test #1147: leech.healing ....................   Passed    0.31 sec
+    Start 1148: leech.projectiles
+2/4 Test #1148: leech.projectiles ................   Passed    0.30 sec
+    Start 1149: leech.alternate
+3/4 Test #1149: leech.alternate ..................   Passed    0.30 sec
+    Start 1150: leech.client
+4/4 Test #1150: leech.client .....................   Passed    0.42 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+headless        =   1.33 sec*proc (4 tests)
+private-data    =   1.33 sec*proc (4 tests)
+weapons         =   1.33 sec*proc (4 tests)
+
+Total Test time (real) =   1.35 sec

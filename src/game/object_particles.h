@@ -17,7 +17,8 @@ namespace OpenBlood2
     class ObjectParticles
     {
       public:
-        std::uint64_t publish(HOBJECT, unsigned, ServerDE&, const Resources*, double, std::string&);
+        std::uint64_t publish(HOBJECT, unsigned, ServerDE&, const Resources*, double, std::string&,
+                              float lifetime_scale = 1);
         bool advance(double, ServerDE&);
         void clear();
         std::size_t particle_count() const;

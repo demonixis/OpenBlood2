@@ -2,6 +2,66 @@
 namespace
 {
     constexpr WeaponData definitions[] = {
+        // Life Leech
+        {
+            "Models\\Weapons\\Lifeleech_pv.abc",              // Model
+            "Models\\Weapons\\Lifeleech_pv.abc",              // Model
+            "Skins\\Weapons\\C_Lifeleech_pv_t.dtx",           // Skin
+            "Models\\Powerups\\Lifeleech_pu.abc",             // 3rd person model
+            "Skins\\Powerups\\Lifeleech_pu.dtx",              // 3rd person skin
+            WEAP_LIFELEECH,                                   // Type
+            TYPE_MELEE,                                       // Fire type
+            AMMO_FOCUS,                                       // Ammo type
+            2,                                                // Ammo Use
+            100,                                              // Alt Ammo Use
+            20.0f,                                            // Min Damage
+            30.0f,                                            // Max Damage
+            75.0f,                                            // Min Alt damage
+            100.0f,                                           // Max Alt damage
+            0.15f,                                            // Reload time
+            1.0f,                                             // Alt reload time
+            {0.0f, 0.0f},                                     // Spread
+            {0.0f, 0.0f},                                     // Alt Spread
+            1000.0f,                                          // Projectile Velocity
+            0.0f,                                             // Alt Projectile Velocity
+            3500.0f,                                          // Range
+            3500.0f,                                          // Alt Range
+            1,                                                // Shots per fire
+            1,                                                // Alt Shots per fire
+            1,                                                // Strength or Magic required
+            0,                                                // Two-handed Strength or Magic required
+            100,                                              // Damage Radius (projectiles)
+            0,                                                // Alt Damage Radius (projectiles)
+            DFALSE,                                           // Alt fire zoom
+            DFALSE,                                           // Semi-auto
+            "",                                               // Fire sound
+            "Sounds\\Weapons\\lifeleech\\alt.wav",            // Alt Fire sound
+            "",                                               // Empty weapon sound
+            "",                                               // Alt Empty weapon sound
+            "CLeechPrimeProjectile",                          // Projectile class
+            "CLeechAltProjectile",                            // Alt Projectile class
+            0,                                                // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                               // Muzzle Flash color
+            "Life Leech",                                     // Name
+            IDS_WEAPON_LIFELEECH,                             // Name ID (resource)
+            "",                                               // flash sprite name
+            "",                                               // alt flash Sprite name
+            0.25f,                                            // Flash duration
+            0.10f,                                            // Flash scale
+            {0.0f, 0.0f, 0.0f},                               // 3rd person gun offset
+            {-1.2f, -1.0f, 3.3f},                             // Gun Offset
+            {0.0f, 0.0f, 0.0f},                               // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                            // Recoil
+            {1.5f, -4.5f, 25.0f},                             // Flash position
+            0.625f,                                           // Eject interval
+            0.0f,                                             // View kick
+            DFALSE,                                           // View kick is Cumulative
+            DTRUE,                                            // Animation looping
+            DFALSE,                                           // Alt anim looping
+            "interface\\statusbar\\weapons\\lifeleech.pcx",   // Icon for status bar
+            "interface\\statusbar\\weapons\\lifeleech_h.pcx", // Highlighted icon for status bar
+        },
+
         // Original Shared/WeaponDefs.cpp: MINIGUN
 
         {

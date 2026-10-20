@@ -41,6 +41,7 @@ namespace
             case DamageType::Vision:
             case DamageType::Electric:
             case DamageType::Acid:
+            case DamageType::Leech:
                 break;
             default:
                 error = "Unsupported saved damage type";

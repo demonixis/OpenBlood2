@@ -10,7 +10,7 @@ bool CExplosionSpriteFX::Init(const ExplosionSpriteSettings& input, std::string&
     auto valid_scale = [](DVector v) { return physics_vector(v) && v.x >= 0 && v.y >= 0 && v.z >= 0; };
     if (!physics_vector(input.position) || !physics_vector(input.normal) || !valid_scale(input.scale1) ||
         !valid_scale(input.scale2) || !std::isfinite(input.duration) || input.duration <= 0 || input.duration > 600 ||
-        !std::isfinite(input.alpha) || input.alpha < 0 || input.alpha > 1 || input.fade > 5 || input.align > 1 ||
+        !std::isfinite(input.alpha) || input.alpha < 0 || input.alpha > 1 || input.fade > 5 || input.align > 2 ||
         (input.resource && (input.resource->size() > 1000 || input.resource->find('\0') != std::string::npos)))
     {
         failure = "Invalid explosion sprite descriptor or unsupported random alignment";
@@ -23,10 +23,10 @@ bool CExplosionSpriteFX::Init(const ExplosionSpriteSettings& input, std::string&
     initialized_ = true;
     return true;
 }
-bool CExplosionSpriteFX::CreateObject(SpriteStore& store, double now, std::string& failure)
+bool CExplosionSpriteFX::CreateObject(SpriteStore& store, double now, std::string& failure, float alignment_roll)
 {
     failure.clear();
-    if (!initialized_ || sprite || !std::isfinite(now) || now < 0)
+    if (!initialized_ || sprite || !std::isfinite(now) || now < 0 || !std::isfinite(alignment_roll))
     {
         failure = "Invalid explosion sprite creation state/time";
         return false;
@@ -35,6 +35,14 @@ bool CExplosionSpriteFX::CreateObject(SpriteStore& store, double now, std::strin
     {
         failure = "Cannot align explosion sprite to a zero/invalid normal";
         return false;
+    }
+    if (settings.align == 2)
+    {
+        DRotation roll;
+        roll.m_Vec = vector_scale(settings.normal, std::sin(alignment_roll / 2) /
+                                                       std::sqrt(vector_dot(settings.normal, settings.normal)));
+        roll.m_Spin = std::cos(alignment_roll / 2);
+        rotation = compose_rotation(roll, rotation);
     }
     const auto path = settings.resource ? *settings.resource : "Sprites\\Explosn.spr";
     if (!store.load(path, sprite, failure))

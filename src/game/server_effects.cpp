@@ -103,10 +103,11 @@ namespace OpenBlood2
         trace_service("PublishParticleStream");
         return particle_streams.publish(owner, settings, *this, client_resources, objects_.time(), error);
     }
-    std::uint64_t ServerAdapter::PublishObjectParticles(HOBJECT owner, unsigned type, std::string& error)
+    std::uint64_t ServerAdapter::PublishObjectParticles(HOBJECT owner, unsigned type, std::string& error,
+                                                        float lifetime_scale)
     {
         trace_service("PublishObjectParticles");
-        return object_particles.publish(owner, type, *this, client_resources, objects_.time(), error);
+        return object_particles.publish(owner, type, *this, client_resources, objects_.time(), error, lifetime_scale);
     }
     std::uint64_t ServerAdapter::PublishLaserBeam(HOBJECT source, DVector from, DVector to, std::string& error,
                                                   DBYTE type)

@@ -58,7 +58,9 @@ Position/scales use existing finite physics bounds, scales are nonnegative,
 duration is (0,600] seconds, alpha is [0,1], fade is 0..5 and resource paths are at
 most 1,000 bytes without embedded NUL. Alignment 0 faces the camera, alignment 1
 uses the shared +Y-up forward convention (deterministic vertical fallback).
-Random alignment 2 is explicitly unsupported. Zero recipe normals fail before
+The [Life Leech continuation](life_leech_contracts.md) adds alignment 2: align to
+the normal, then apply a portable random roll around it. Alignment 3 remains
+invalid. Zero recipe normals fail before
 normalization. SPR loading checks manifests/resources; actual DTX decoding remains
 a separate current-frame presentation operation and can still fail visibly.
 

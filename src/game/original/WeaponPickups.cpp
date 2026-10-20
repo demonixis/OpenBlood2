@@ -22,6 +22,13 @@ ShotgunPU::ShotgunPU()
     display_name = "Sawed-off Shotgun";
     resource_id = IDS_WEAPON_SHOTGUN;
 }
+LifeLeechPU::LifeLeechPU()
+{
+    value = {OpenBlood2::PickupKind::Weapon, WEAP_LIFELEECH, 0};
+    file = "Lifeleech_pu";
+    display_name = "Life Leech";
+    resource_id = IDS_WEAPON_LIFELEECH;
+}
 SingularityPU::SingularityPU()
 {
     value = {OpenBlood2::PickupKind::Weapon, WEAP_SINGULARITY, 100};
@@ -68,6 +75,8 @@ const char* WeaponPickupClass(DDWORD type)
 {
     switch (type)
     {
+        case WEAP_LIFELEECH:
+            return "LifeLeechPU";
         case WEAP_MINIGUN:
             return "MiniGunPU";
         case WEAP_HOWITZER:

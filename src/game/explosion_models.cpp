@@ -14,6 +14,24 @@ namespace OpenBlood2
             error = "Explosion requires a finite position and nonzero normal";
             return false;
         }
+        if (type == 17)
+        {
+            ExplosionModelSettings s;
+            s.position = position;
+            s.normal = normal;
+            s.scale1 = {100, 100, 100};
+            s.scale2 = {1000, 1000, 1000};
+            s.rotations = {.05f, 0, 0};
+            s.duration = .5f;
+            s.alpha = .5f;
+            s.waveform = 1;
+            s.fade = 1;
+            s.random_rotation = 0;
+            s.model = "Models\\Explosions\\duel_sphere.abc";
+            s.skin = "Skins\\Explosions\\leechball2.dtx";
+            output = std::move(s);
+            return true;
+        }
         if (type == 20)
         {
             ExplosionModelSettings s;

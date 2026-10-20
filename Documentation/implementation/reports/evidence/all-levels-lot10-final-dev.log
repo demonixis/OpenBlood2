@@ -1,0 +1,33 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start  602: destructable_state.roundtrip
+ 1/10 Test  #602: destructable_state.roundtrip .....   Passed    0.01 sec
+      Start  603: destructable_state.behavior
+ 2/10 Test  #603: destructable_state.behavior ......   Passed    0.01 sec
+      Start  604: destructable_state.sentinel
+ 3/10 Test  #604: destructable_state.sentinel ......   Passed    0.01 sec
+      Start  605: destructable_state.failures
+ 4/10 Test  #605: destructable_state.failures ......   Passed    0.01 sec
+      Start  606: destructable_state.capture
+ 5/10 Test  #606: destructable_state.capture .......   Passed    0.01 sec
+      Start  607: destructable_state.private
+ 6/10 Test  #607: destructable_state.private .......   Passed    0.72 sec
+      Start 1120: reported_levels.18_temple
+ 7/10 Test #1120: reported_levels.18_temple ........   Passed    4.64 sec
+      Start 1156: leech.healing
+ 8/10 Test #1156: leech.healing ....................   Passed    0.05 sec
+      Start 1157: leech.projectiles
+ 9/10 Test #1157: leech.projectiles ................   Passed    0.05 sec
+      Start 1158: leech.alternate
+10/10 Test #1158: leech.alternate ..................   Passed    0.05 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Label Time Summary:
+campaign              =   4.64 sec*proc (1 test)
+destructable_state    =   0.76 sec*proc (6 tests)
+headless              =   5.55 sec*proc (10 tests)
+private               =   0.72 sec*proc (1 test)
+private-data          =   4.78 sec*proc (4 tests)
+weapons               =   0.14 sec*proc (3 tests)
+
+Total Test time (real) =   5.59 sec

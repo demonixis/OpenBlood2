@@ -33,7 +33,7 @@ namespace
                                              {"VOODO", 0, false},
                                              {"ORB", 0, false},
                                              {"LASER", 0, false},
-                                             {"LIFEL", 0, false},
+                                             {"LIFEL", WEAP_LIFELEECH, true},
                                              {"TESLA", WEAP_TESLACANNON, true},
                                              {"MELEE", WEAP_MELEE, true},
                                              {"SINGULAR", WEAP_SINGULARITY, true},

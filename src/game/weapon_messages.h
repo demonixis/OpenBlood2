@@ -27,7 +27,8 @@ namespace OpenBlood2
         DropWeapon = 11,
         Vision = 12,
         Electric = 13, // Laser and lightning (Tesla alternate, TeslaBall bolts).
-        Acid = 14
+        Acid = 14,
+        Leech = 15
     };
     struct Damage
     {

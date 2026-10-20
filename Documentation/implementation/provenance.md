@@ -1635,3 +1635,13 @@ behavior. [Source hashes](sources/all_levels_lightning_sources.json) and
 zero-initialized particle positions, finite empty segments and bounded storage.
 No shader, dependency or commercial/reference file changed. Exact missing
 Thunder/lightpop2 audio remains visible as partial source omissions.
+
+### Complete-level continuation: Life Leech
+
+Weapon 16, LifeLeechPU, both original projectile callbacks, post-armor healing,
+FIRETRAIL_1 and explosion recipes 16/17 are selectively adapted from the original
+[hashed sources](sources/all_levels_life_leech_sources.json).
+[Contracts](../contracts/life_leech_contracts.md) document finite adaptations for
+the source alternate's uninitialized axis/zero distance, portable cosmetic RNG,
+existing typed services and unavailable illumination. Commercial assets remain
+external; source references and renderer shaders are unchanged.

@@ -1,5 +1,11 @@
 # Blood2 Project Instructions
 
+The [Life Leech continuation](Documentation/contracts/life_leech_contracts.md) adds the original pickup/weapon, curved primary,
+one-pass alternate push and post-armor healing. Preserve per-update curvature,
+player-flag death gate, source attribution, real comet/impact components and
+explicit finite-axis adaptations. Light illumination remains unavailable; this
+loading continuation does not reopen M2.
+
 The [world lightning continuation](Documentation/contracts/lightning_contracts.md) adds original ray/radius damage,
 actual bolt particles/fade and evaluated point-light states. Preserve trigger
 attribution, integer segment scaling, cumulative rotations, random-form typo

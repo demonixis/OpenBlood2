@@ -1,0 +1,117 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start    3: objects.builtin_model
+ 1/50 Test    #3: objects.builtin_model ............   Passed    0.00 sec
+      Start    4: objects.original_objects
+ 2/50 Test    #4: objects.original_objects .........   Passed    0.00 sec
+      Start    5: objects.nested_creation
+ 3/50 Test    #5: objects.nested_creation ..........   Passed    0.00 sec
+      Start    6: objects.reasons_properties
+ 4/50 Test    #6: objects.reasons_properties .......   Passed    0.00 sec
+      Start    7: objects.scheduling
+ 5/50 Test    #7: objects.scheduling ...............   Passed    0.00 sec
+      Start    8: objects.deferred_removal
+ 6/50 Test    #8: objects.deferred_removal .........   Passed    0.00 sec
+      Start    9: objects.aggregate_dispatch
+ 7/50 Test    #9: objects.aggregate_dispatch .......   Passed    0.00 sec
+      Start   10: objects.handles_selection
+ 8/50 Test   #10: objects.handles_selection ........   Passed    0.00 sec
+      Start   11: objects.links_lists
+ 9/50 Test   #11: objects.links_lists ..............   Passed    0.00 sec
+      Start   12: objects.messages_strings
+10/50 Test   #12: objects.messages_strings .........   Passed    0.00 sec
+      Start   13: objects.message_churn
+11/50 Test   #13: objects.message_churn ............   Passed    0.09 sec
+      Start   14: objects.message_limit
+12/50 Test   #14: objects.message_limit ............   Passed    0.02 sec
+      Start   15: objects.unsupported_teardown
+13/50 Test   #15: objects.unsupported_teardown .....   Passed    0.00 sec
+      Start   16: objects.creation_failures
+14/50 Test   #16: objects.creation_failures ........   Passed    0.00 sec
+      Start  106: weapons.inventory
+15/50 Test  #106: weapons.inventory ................   Passed    0.00 sec
+      Start  107: weapons.segments
+16/50 Test  #107: weapons.segments .................   Passed    0.00 sec
+      Start  108: weapons.firing
+17/50 Test  #108: weapons.firing ...................   Passed    0.00 sec
+      Start  109: weapons.melee
+18/50 Test  #109: weapons.melee ....................   Passed    0.00 sec
+      Start  110: weapons.damage
+19/50 Test  #110: weapons.damage ...................   Passed    0.00 sec
+      Start  111: weapons.animation
+20/50 Test  #111: weapons.animation ................   Passed    0.01 sec
+      Start  112: weapons.lifetime
+21/50 Test  #112: weapons.lifetime .................   Passed    0.00 sec
+      Start  113: weapons.rollback
+22/50 Test  #113: weapons.rollback .................   Passed    0.00 sec
+      Start  114: weapons.private
+23/50 Test  #114: weapons.private ..................   Passed    3.82 sec
+      Start  630: explosion_sprites.formulas
+24/50 Test  #630: explosion_sprites.formulas .......   Passed    0.00 sec
+      Start  631: explosion_sprites.failures
+25/50 Test  #631: explosion_sprites.failures .......   Passed    0.00 sec
+      Start  632: explosion_sprites.session
+26/50 Test  #632: explosion_sprites.session ........   Passed    0.00 sec
+      Start  633: explosion_sprites.private
+27/50 Test  #633: explosion_sprites.private ........   Passed    0.18 sec
+      Start  656: object_particles.emission
+28/50 Test  #656: object_particles.emission ........   Passed    0.00 sec
+      Start  657: object_particles.stopping
+29/50 Test  #657: object_particles.stopping ........   Passed    0.00 sec
+      Start  658: object_particles.failures
+30/50 Test  #658: object_particles.failures ........   Passed    0.00 sec
+      Start  659: object_particles.session
+31/50 Test  #659: object_particles.session .........   Passed    0.00 sec
+      Start  660: object_particles.private
+32/50 Test  #660: object_particles.private .........   Passed    1.11 sec
+      Start  701: energy.weapon
+33/50 Test  #701: energy.weapon ....................   Passed    0.00 sec
+      Start  702: energy.filters
+34/50 Test  #702: energy.filters ...................   Passed    0.00 sec
+      Start  703: energy.lifetime
+35/50 Test  #703: energy.lifetime ..................   Passed    0.00 sec
+      Start  704: energy.callbacks
+36/50 Test  #704: energy.callbacks .................   Passed    0.00 sec
+      Start  705: energy.failures
+37/50 Test  #705: energy.failures ..................   Passed    0.00 sec
+      Start  706: energy.ai
+38/50 Test  #706: energy.ai ........................   Passed    0.00 sec
+      Start  707: energy.private
+39/50 Test  #707: energy.private ...................   Passed    0.30 sec
+      Start  714: shield.recipes
+40/50 Test  #714: shield.recipes ...................   Passed    0.00 sec
+      Start  715: shield.clock
+41/50 Test  #715: shield.clock .....................   Passed    0.00 sec
+      Start  716: shield.failures
+42/50 Test  #716: shield.failures ..................   Passed    0.00 sec
+      Start  717: shield.weapon
+43/50 Test  #717: shield.weapon ....................   Passed    0.00 sec
+      Start  718: shield.session
+44/50 Test  #718: shield.session ...................   Passed    0.00 sec
+      Start  719: shield.ai
+45/50 Test  #719: shield.ai ........................   Passed    0.00 sec
+      Start  720: shield.private
+46/50 Test  #720: shield.private ...................   Passed    0.30 sec
+      Start 1120: reported_levels.18_temple
+47/50 Test #1120: reported_levels.18_temple ........   Passed    1.21 sec
+      Start 1156: leech.healing
+48/50 Test #1156: leech.healing ....................   Passed    0.01 sec
+      Start 1157: leech.projectiles
+49/50 Test #1157: leech.projectiles ................   Passed    0.01 sec
+      Start 1158: leech.alternate
+50/50 Test #1158: leech.alternate ..................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 50
+
+Label Time Summary:
+campaign             =   1.21 sec*proc (1 test)
+energy               =   0.32 sec*proc (7 tests)
+explosion_sprites    =   0.19 sec*proc (4 tests)
+headless             =   7.18 sec*proc (50 tests)
+object_particles     =   1.12 sec*proc (5 tests)
+objects              =   0.14 sec*proc (14 tests)
+private              =   5.72 sec*proc (5 tests)
+private-data         =   1.25 sec*proc (4 tests)
+shield               =   0.31 sec*proc (7 tests)
+weapons              =   3.89 sec*proc (12 tests)
+
+Total Test time (real) =   7.20 sec
