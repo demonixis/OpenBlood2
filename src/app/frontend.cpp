@@ -87,7 +87,10 @@ namespace OpenBlood2
         if (options.view_world || options.demo_smoke)
         {
             spdlog::info("Loading world: {} (direct entry)", options.world);
-            if (!game->request_world(options.world, error) || !game->run_world(error))
+            if (!game->request_world(options.world, error))
+                return failed(6);
+            game->server_shell.inspection_start = options.view_world;
+            if (!game->run_world(error))
                 return failed(6);
             spdlog::info("World ready: {}", game->world_path);
         }
@@ -257,7 +260,7 @@ namespace OpenBlood2
             {
                 spdlog::info("Inspector level requested: world={}; difficulty={}", level,
                              inspector.start_level_difficulty);
-                if (!GameSession::start_new_game(game, level, DBYTE(inspector.start_level_difficulty), 0, error))
+                if (!GameSession::start_new_game(game, level, DBYTE(inspector.start_level_difficulty), 0, error, true))
                 {
                     inspector.world_error = error;
                     spdlog::error("Inspector level failed: {}", error);

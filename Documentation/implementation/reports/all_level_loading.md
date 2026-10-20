@@ -166,3 +166,33 @@ Train Station tests pass in [Dev](evidence/all-levels-lot4-dev.log) and
 The [Release map test](evidence/all-levels-lot4-release.log) passes.
 [Release GPU opening](evidence/all-levels-train-gpu.log) renders three frames
 on the NVIDIA RTX 3060 and exits 0 with dummy audio.
+
+The [third exhaustive audit](evidence/all-levels-audit-03.log), before adding
+multiplayer-marker inspection, passes **36 / 58** and fails **22 / 58**.
+Train Station is the newly passing map. The baseline table above remains historical.
+
+## Iteration 5: inspection of multiplayer-only start markers
+
+The inspector level chooser and explicit `--view-world` entry may use the first
+live authored multiplayer marker when no solo marker exists. This is a local
+inspection policy: it keeps the solo profile and simulation, requires normal
+checked ground placement, and records the actual marker and multiplayer fallback
+in the Session inspector. Solo markers retain priority. Normal New Game,
+restored entry and campaign transitions retain their original solo selection.
+The opt-in resets on world unload/replacement; transactional inspection requests
+set it on the candidate only. Missing all markers still fails.
+
+The audit now explicitly exercises inspection entry and prints the marker mode.
+This can establish local opening of multiplayer geometry, not network play,
+team selection, CTF rules or multiplayer respawn parity.
+
+Validation: all seven player entry regression cases and Area15, Bloodkeep,
+Condemned and Rooftop pass in [Dev](evidence/all-levels-lot5-dev.log) and
+[ASan/UBSan/leak checks](evidence/all-levels-lot5-sanitizers.log).
+The [Release six-map run](evidence/all-levels-lot5-release.log) has the same four
+passes and two retained failures. Brownstar now reaches `floorplate.spr` with
+raw FPS 65537; Crypt now reaches its Sprite moon sky target, which the current
+world-model-only sky service rejects. The overall runs are **11/13** and **4/6**,
+not passing suites. These two newly exposed failures are the next lot.
+[Area15 Release GPU opening](evidence/all-levels-area15-gpu.log) renders three
+frames on NVIDIA RTX 3060 and exits 0 (dummy audio).

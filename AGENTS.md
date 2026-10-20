@@ -1,5 +1,10 @@
 # Blood2 Project Instructions
 
+The [complete-level inspection entry](Documentation/contracts/player_contracts.md#explicit-multiplayer-map-inspection)
+allows an authored multiplayer marker only from explicit local inspection when no
+solo marker exists. Preserve solo priority, checked grounding, visible selection
+and opt-in reset. This does not enable network play or change campaign entry.
+
 The [complete-level placement continuation](Documentation/implementation/reports/all_level_loading.md) adds bounded
 initial floor-edge lifts and NPC escape from an overlapping world-model shell.
 Runtime collision remains strict. BoxPhysics world models now accept validated

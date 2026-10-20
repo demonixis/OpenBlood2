@@ -138,9 +138,9 @@ class CPlayerObj : public CBaseCharacter
     bool restore_model_loaded = false, restore_engine_loaded = false;
     std::string restore_model_error;
     bool restore_initialization = false, restore_fields_loaded = false;
-    bool GoToStartPoint(HSTRING start_name);
+    bool GoToStartPoint(HSTRING start_name, bool inspection_start = false);
     std::string entry_start_name; // Owned inspection of the actual selected marker.
-    bool entry_start_fallback = false;
+    bool entry_start_fallback = false, entry_start_multiplayer = false;
     bool SetCharacter(DBYTE);
     bool OnSinglePlayerInit(const OpenBlood2::PlayerInit&);
     void ValidateAttributes();

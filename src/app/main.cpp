@@ -13,7 +13,6 @@
 #include "cinematic_smoke.h"
 #include "engine/capture.h"
 #include "engine/config.h"
-#include "startup/protocol.h"
 #include "engine/crash_capture.h"
 #include "engine/logging.h"
 #include "engine/runtime.h"
@@ -29,6 +28,7 @@
 #include "random_sound_smoke.h"
 #include "scene_explosion_smoke.h"
 #include "sprite_smoke.h"
+#include "startup/protocol.h"
 #include "trigger_smoke.h"
 #include "world_sound_smoke.h"
 
@@ -131,6 +131,7 @@ namespace
                          game->world.objects.size(), game->objects.snapshot().size(), game->world.models.size());
             if (options.player_smoke || options.view_world)
             {
+                game->server_shell.inspection_start = options.view_world;
                 if (!(options.view_world ? game->run_world(error) : game->enter_player(error)))
                 {
                     spdlog::error("Player entry: {}", error);
@@ -564,7 +565,7 @@ namespace
             if (auto level = std::exchange(inspector.start_level_request, {}); !level.empty())
             {
                 if (!OpenBlood2::GameSession::start_new_game(game_owner, level, DBYTE(inspector.start_level_difficulty),
-                                                             0, error))
+                                                             0, error, true))
                     inspector.world_error = error;
                 else
                 {

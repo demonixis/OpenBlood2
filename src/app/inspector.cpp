@@ -1693,6 +1693,8 @@ namespace OpenBlood2
             ImGui::Text("Player updates: %llu | Entry resets: %llu | Destructable list: %u",
                         static_cast<unsigned long long>(player->updates),
                         static_cast<unsigned long long>(player->respawns), CDestructable::m_dwNumDestructables);
+            ImGui::Text("Entry marker: %s | multiplayer inspection %d", player->entry_start_name.c_str(),
+                        player->entry_start_multiplayer);
             ImGui::Text("Server position %.3f %.3f %.3f | Half dimensions %.1f %.1f %.1f", record->state.m_Pos.x,
                         record->state.m_Pos.y, record->state.m_Pos.z, record->dimensions.x, record->dimensions.y,
                         record->dimensions.z);

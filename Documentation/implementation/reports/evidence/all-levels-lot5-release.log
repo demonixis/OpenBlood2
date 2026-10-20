@@ -1,0 +1,31 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 1232: reported_levels.multi/bb_area15
+1/6 Test #1232: reported_levels.multi/bb_area15 ......   Passed    0.47 sec
+    Start 1233: reported_levels.multi/bb_bloodkeep
+2/6 Test #1233: reported_levels.multi/bb_bloodkeep ...   Passed    0.50 sec
+    Start 1234: reported_levels.multi/bb_brownstar
+3/6 Test #1234: reported_levels.multi/bb_brownstar ...***Failed    0.05 sec
+multi/bb_brownstar: World texture sprites/floorplate.spr: Invalid SPR header/count/rate/flags
+
+    Start 1235: reported_levels.multi/bb_condemned
+4/6 Test #1235: reported_levels.multi/bb_condemned ...   Passed    1.92 sec
+    Start 1236: reported_levels.multi/bb_crypt
+5/6 Test #1236: reported_levels.multi/bb_crypt .......***Failed    0.11 sec
+multi/bb_crypt: Only bound world models are supported in the sky
+
+    Start 1237: reported_levels.multi/bb_rooftop
+6/6 Test #1237: reported_levels.multi/bb_rooftop .....   Passed    0.70 sec
+
+67% tests passed, 2 tests failed out of 6
+
+Label Time Summary:
+campaign        =   3.75 sec*proc (6 tests)
+headless        =   3.75 sec*proc (6 tests)
+private-data    =   3.75 sec*proc (6 tests)
+
+Total Test time (real) =   3.77 sec
+
+The following tests FAILED:
+	1234 - reported_levels.multi/bb_brownstar (Failed)       campaign headless private-data
+	1236 - reported_levels.multi/bb_crypt (Failed)           campaign headless private-data
+Errors while running CTest

@@ -20,6 +20,40 @@ using namespace OpenBlood2;
 namespace
 {
     using test_player::setup;
+    bool inspection_start(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(setup(game, root, false));
+        std::string error;
+        CHECK(!game.enter_player(error));
+        game.server_shell.inspection_start = true;
+        CHECK(!game.enter_player(error)); // No marker still fails; no origin fallback.
+        auto mp = game.objects.create(game.objects.find_class("GameStartPoint"), {}, Creation::World,
+                                      {{"Name", std::string("mp-only")},
+                                       {"Multiplayer", true},
+                                       {"Pos", DVector{32, 100, 64}},
+                                       {"Rotation", EulerAngles{{0, .75f, 0}}}});
+        CHECK(mp);
+        game.server_shell.inspection_start = false;
+        CHECK(!game.enter_player(error) && !game.local_client);
+        game.server_shell.inspection_start = true;
+        CHECK(game.enter_player(error));
+        auto* player = game.server_shell.Player(game.local_client);
+        CHECK(player && player->entry_start_multiplayer && player->entry_start_name == "mp-only");
+        CHECK(game.client_shell.position.x == 32 && game.client_shell.position.z == 64);
+        CHECK(std::abs(game.client_shell.position.y - 41.001f) < .01f);
+        CHECK(game.client_shell.rotation.yaw == .75f);
+        CHECK(game.leave_player());
+        CHECK(game.objects.create(game.objects.find_class("GameStartPoint"), {}, Creation::World,
+                                  {{"Name", std::string("start")}, {"Pos", DVector{64, 100, 32}}}));
+        CHECK(game.enter_player(error));
+        player = game.server_shell.Player(game.local_client);
+        CHECK(player && !player->entry_start_multiplayer && player->entry_start_name == "start");
+        CHECK(game.client_shell.position.x == 64);
+        CHECK(game.unload_world());
+        CHECK(!game.server_shell.inspection_start && !game.server.string_count() && !game.server.list_count());
+        return true;
+    }
     bool handles(const std::filesystem::path& root)
     {
         GameSession game;
@@ -313,7 +347,9 @@ int main(int argc, char** argv)
         return 2;
     std::string name = argv[1];
     bool ok = false;
-    if (name == "handles")
+    if (name == "inspection_start")
+        ok = inspection_start(argv[2]);
+    else if (name == "handles")
         ok = handles(argv[2]);
     else if (name == "lifecycle")
         ok = lifecycle(argv[2]);

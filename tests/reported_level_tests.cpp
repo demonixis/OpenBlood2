@@ -57,7 +57,7 @@ namespace
             return false;
         for (DBYTE difficulty : {1, 0, 2})
         {
-            if (!GameSession::start_new_game(game, world, difficulty, 0, error))
+            if (!GameSession::start_new_game(game, world, difficulty, 0, error, true))
             {
                 std::cerr << world << ": " << error << '\n';
                 return false;
@@ -94,6 +94,9 @@ namespace
                                       << " state=" << ai->m_nState << " metacmd=" << ai->Metacmd << '\n';
                 return false;
             }
+            const auto* player = game->server_shell.Player(game->local_client);
+            std::cout << world << " start=" << player->entry_start_name
+                      << " multiplayer-inspection=" << player->entry_start_multiplayer << ' ';
             std::cout << world << " difficulty=" << unsigned(difficulty) << " passed" << std::endl;
         }
         const bool clean = game->unload_world() && game->objects.snapshot().empty() && !game->server.string_count() &&

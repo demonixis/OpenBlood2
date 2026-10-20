@@ -64,6 +64,7 @@ class CBloodServerShell
     std::string start_point_name; // Original CopyString ownership, retained across PreStartWorld.
     PathMgr paths;
     bool world_started = false;
+    bool inspection_start = false; // Explicit local inspection may use an authored multiplayer marker.
     std::uint64_t updates = 0;
 
   private:

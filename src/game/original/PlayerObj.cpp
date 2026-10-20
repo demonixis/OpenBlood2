@@ -256,11 +256,12 @@ bool CPlayerObj::OnSinglePlayerInit(const OpenBlood2::PlayerInit& init)
     attributes_received = true;
     return true;
 }
-bool CPlayerObj::GoToStartPoint(HSTRING start_name)
+bool CPlayerObj::GoToStartPoint(HSTRING start_name, bool inspection_start)
 {
     auto* server = GetServerDE();
     entry_start_name.clear();
     entry_start_fallback = false;
+    entry_start_multiplayer = false;
     auto* list = server->FindNamedObjects("Blood2StartPoint");
     if (!list)
         return false;
@@ -281,9 +282,12 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name)
         return false;
     GameStartPoint* start = nullptr;
     GameStartPoint* fallback = nullptr;
+    GameStartPoint* multiplayer = nullptr;
     for (auto* link = list->m_pFirstLink; link; link = link->m_pNext)
     {
         auto* candidate = dynamic_cast<GameStartPoint*>(server->HandleToObject(link->m_hObject));
+        if (candidate && server->IsObjectAlive(link->m_hObject) && candidate->IsMultiplayer() && !multiplayer)
+            multiplayer = candidate;
         if (candidate && server->IsObjectAlive(link->m_hObject) && !candidate->IsMultiplayer())
         {
             fallback = candidate;
@@ -300,6 +304,12 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name)
     {
         start = fallback;
         entry_start_fallback = true;
+    }
+    if (!start && inspection_start)
+    {
+        // Inspector policy only: deterministic first authored marker, never a fabricated origin.
+        start = multiplayer;
+        entry_start_multiplayer = start != nullptr;
     }
     if (!start)
     {

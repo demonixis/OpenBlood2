@@ -5,7 +5,7 @@
 namespace OpenBlood2
 {
     bool GameSession::start_new_game(std::unique_ptr<GameSession>& current, std::string_view world, DBYTE difficulty,
-                                     DBYTE character, std::string& error)
+                                     DBYTE character, std::string& error, bool inspection_start)
     {
         error.clear();
         if (!current || current->objects.busy() || ServerAdapter::active_ != &current->server ||
@@ -32,8 +32,12 @@ namespace OpenBlood2
         auto destination = std::make_unique<GameSession>();
         destination->resources = source.resources;
         select_character(character, destination->client_shell.entry_profile);
-        const bool ready =
-            destination->initialize() && destination->load_world(request, error) && destination->run_world(error);
+        bool ready = destination->initialize() && destination->load_world(request, error);
+        if (ready)
+        {
+            destination->server_shell.inspection_start = inspection_start;
+            ready = destination->run_world(error);
+        }
         auto restore_source = [&]
         {
             source_globals.exchange();

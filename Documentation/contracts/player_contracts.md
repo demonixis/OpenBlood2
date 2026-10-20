@@ -190,3 +190,17 @@ hidden-UI updates, selection invalidation, world unload/re-entry and restored
 object/string counts, also in the inspector-free Release build.
 
 The [single-player death continuation](player_death_contracts.md) supersedes the missing selected Caleb death/corpse/gib and client death-camera paths above. Active powers, multiplayer death and whole-world/dead-player restoration remain unavailable. M2 is still incomplete.
+
+## Explicit multiplayer-map inspection
+
+The separately requested complete-level audit adds an engine inspection opt-in
+for fresh entry only. `--view-world` and the inspector level chooser set it;
+normal New Game, restored players and campaign transitions do not. Original solo
+marker matching and last-solo fallback remain first. Only when no live solo
+marker exists may inspection use the first live authored multiplayer marker.
+This deterministic selection is inspection policy, not the original multiplayer
+spawn algorithm. Position, yaw, trigger, checked grounding and client message
+ownership use the existing entry path. Missing markers or blocked ground fail.
+`entry_start_multiplayer` exposes the selection. Unload/replacement resets the
+opt-in, and candidate transaction rollback does not alter the prior session.
+Game type remains solo: this does not implement networking or team/CTF rules.

@@ -1,0 +1,46 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start   97: player.handles
+ 1/13 Test   #97: player.handles .......................   Passed    0.00 sec
+      Start   98: player.lifecycle
+ 2/13 Test   #98: player.lifecycle .....................   Passed    0.00 sec
+      Start   99: player.rollback
+ 3/13 Test   #99: player.rollback ......................   Passed    0.00 sec
+      Start  100: player.messages
+ 4/13 Test  #100: player.messages ......................   Passed    0.00 sec
+      Start  101: player.callbacks
+ 5/13 Test  #101: player.callbacks .....................   Passed    0.00 sec
+      Start  102: player.smell
+ 6/13 Test  #102: player.smell .........................   Passed    0.00 sec
+      Start  103: player.inspection_start
+ 7/13 Test  #103: player.inspection_start ..............   Passed    0.00 sec
+      Start 1120: reported_levels.multi/bb_area15
+ 8/13 Test #1120: reported_levels.multi/bb_area15 ......   Passed    0.49 sec
+      Start 1121: reported_levels.multi/bb_bloodkeep
+ 9/13 Test #1121: reported_levels.multi/bb_bloodkeep ...   Passed    0.64 sec
+      Start 1122: reported_levels.multi/bb_brownstar
+10/13 Test #1122: reported_levels.multi/bb_brownstar ...***Failed    0.06 sec
+multi/bb_brownstar: World texture sprites/floorplate.spr: Invalid SPR header/count/rate/flags
+
+      Start 1123: reported_levels.multi/bb_condemned
+11/13 Test #1123: reported_levels.multi/bb_condemned ...   Passed    2.76 sec
+      Start 1124: reported_levels.multi/bb_crypt
+12/13 Test #1124: reported_levels.multi/bb_crypt .......***Failed    0.13 sec
+multi/bb_crypt: Only bound world models are supported in the sky
+
+      Start 1125: reported_levels.multi/bb_rooftop
+13/13 Test #1125: reported_levels.multi/bb_rooftop .....   Passed    1.29 sec
+
+85% tests passed, 2 tests failed out of 13
+
+Label Time Summary:
+campaign        =   5.37 sec*proc (6 tests)
+headless        =   5.39 sec*proc (13 tests)
+player          =   0.02 sec*proc (7 tests)
+private-data    =   5.37 sec*proc (6 tests)
+
+Total Test time (real) =   5.41 sec
+
+The following tests FAILED:
+	1122 - reported_levels.multi/bb_brownstar (Failed)       campaign headless private-data
+	1124 - reported_levels.multi/bb_crypt (Failed)           campaign headless private-data
+Errors while running CTest

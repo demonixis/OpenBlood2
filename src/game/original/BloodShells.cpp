@@ -10,6 +10,7 @@
 void CBloodServerShell::PreStartWorld()
 {
     paths.ClearPathList();
+    inspection_start = false;
     world_started = false;
     updates = 0;
     inventory_capture = {};
@@ -119,7 +120,7 @@ bool CBloodServerShell::RespawnPlayer(CPlayerObj* player, HCLIENT client)
         server_.SendToClient(client, OpenBlood2::PlayerInitRequest{}) != DE_OK)
         return false;
     // Fresh single-player only: no saved client refs, team selection or restore.
-    if (!player->GoToStartPoint(nullptr))
+    if (!player->GoToStartPoint(nullptr, inspection_start))
         return false;
     server_.SetGameConVar("GAME_GOTOSTARTPOINT", "1");
     return true;
