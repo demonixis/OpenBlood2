@@ -30,10 +30,26 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::string& fa
 {
     failure.clear();
     *this = {};
-    if (type != 1 || !owner)
+    if ((type != 1 && type != 34) || !owner)
     {
         failure = "Unsupported object particle recipe or absent parent";
         return false;
+    }
+    recipe = type;
+    if (type == 34)
+    {
+        radius = 200;
+        gravity = 0;
+        position_radius = 3;
+        density = 5;
+        add_delay = .025f;
+        flags = 0x3f;
+        requested_alpha = 1;
+        min_life = .15f;
+        max_life = .20f;
+        min_color = {128, 128, 255};
+        max_color = {255, 255, 255};
+        texture = "SpriteTextures\\Lensflare32_1.dtx";
     }
     parent = owner;
     initialized_ = true;
@@ -41,11 +57,11 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::string& fa
 }
 bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_rand& random, std::string& failure)
 {
-    if (type == 1)
+    if (type == 1 || type == 34)
         return Init(type, owner, failure);
     failure.clear();
     *this = {};
-    if ((type != 3 && type != 19 && type != 36 && type != 21 && type != 24 && type != 31 && type != 32 &&
+    if ((type != 3 && type != 19 && type != 36 && type != 21 && type != 24 && type != 31 && type != 32 && type != 33 &&
          (type < 12 || type > 17)) ||
         !owner)
     {
@@ -72,21 +88,21 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_ran
         initialized_ = true;
         return true;
     }
-    if (type == 31 || type == 32)
+    if (type == 31 || type == 32 || type == 33)
     {
-        radius = type == 31 ? 400.f : 1500.f;
+        radius = type == 33 ? 200.f : type == 31 ? 400.f : 1500.f;
         position_radius = 3;
-        gravity = type == 31 ? -75.f : 100.f;
-        add_delay = type == 31 ? .025f : .01f;
-        authored_count = type == 31 ? 3 : 1;
+        gravity = type == 33 ? 0.f : type == 31 ? -75.f : 100.f;
+        add_delay = type != 32 ? .025f : .01f;
+        authored_count = type != 32 ? 3 : 1;
         density = 7.5f;
-        requested_alpha = type == 31 ? 1.f : .5f;
-        min_life = type == 31 ? .25f : .35f;
-        max_life = type == 31 ? .35f : .5f;
-        min_color = type == 31 ? DVector{0, 32, 0} : DVector{192, 192, 0};
-        max_color = type == 31 ? DVector{128, 196, 0} : DVector{255, 255, 255};
+        requested_alpha = type != 32 ? 1.f : .5f;
+        min_life = type != 32 ? .25f : .35f;
+        max_life = type != 32 ? .35f : .5f;
+        min_color = type == 33 ? DVector{128, 128, 255} : type == 31 ? DVector{0, 32, 0} : DVector{192, 192, 0};
+        max_color = type == 33 ? DVector{255, 255, 255} : type == 31 ? DVector{128, 196, 0} : DVector{255, 255, 255};
         flags = 0x0f;
-        texture = type == 31 ? "SpriteTextures\\Lensflare32_1.dtx" : "SpriteTextures\\flames1_09.dtx";
+        texture = type != 32 ? "SpriteTextures\\Lensflare32_1.dtx" : "SpriteTextures\\flames1_09.dtx";
         initialized_ = true;
         return true;
     }
@@ -181,7 +197,7 @@ bool CObjectParticleFX::AddParticles(std::minstd_rand& random, std::size_t budge
 {
     if (recipe >= 12 && recipe <= 17)
         return AddCylinderParticles(random, budget);
-    if (recipe != 1)
+    if (recipe != 1 && recipe != 34)
         return AddShellParticles(random, budget);
     const auto delta = vector_subtract(last_position, position);
     const float distance = std::sqrt(vector_dot(delta, delta));
@@ -211,11 +227,13 @@ bool CObjectParticleFX::AddParticles(std::minstd_rand& random, std::size_t budge
     particles.reserve(particles.size() + count);
     for (unsigned i = 0; i < count; ++i)
     {
-        const float speed = draw(random, 20, 50);
+        const float speed = draw(random, 20, recipe == 34 ? 40 : 50);
         const float ratio = draw(random, 0, 1); // One shared color ratio, not three channel draws.
         const float color = (96 + (192 - 96) * ratio) / 255.f;
         const float life = draw(random, min_life, max_life);
-        particles.push_back({start, vector_scale(forward, speed), life, {color, color, color}});
+        particles.push_back({start, vector_scale(forward, speed), life,
+                             recipe == 34 ? DVector{(128 + 127 * ratio) / 255.f, (128 + 127 * ratio) / 255.f, 1}
+                                          : DVector{color, color, color}});
         start = vector_add(start, step);
     }
     emitted += count;
@@ -272,8 +290,9 @@ bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t 
 {
     const auto delta = vector_subtract(last_position, position);
     const float distance = std::sqrt(vector_dot(delta, delta));
-    const float samples =
-        (recipe == 3 || recipe == 21 || recipe == 31 || recipe == 32) ? distance / (density * radius / 1000.f) : 1.f;
+    const float samples = (recipe == 3 || recipe == 21 || recipe == 31 || recipe == 32 || recipe == 33)
+                              ? distance / (density * radius / 1000.f)
+                              : 1.f;
     if (!std::isfinite(samples) || samples > 2048)
     {
         error = "Object particle stream capacity exceeded";
@@ -297,18 +316,19 @@ bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t 
         auto right = rotate_vector(basis, {1, 0, 0});
         const auto forward = rotate_vector(basis, {0, 0, 1});
         around(basis, forward, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
-        if (recipe == 3 || recipe == 19 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32)
+        if (recipe == 3 || recipe == 19 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32 || recipe == 33)
             around(basis, right, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
         right = vector_scale(right, 1 / std::sqrt(vector_dot(right, right)));
-        const float speed = draw(random, recipe == 31 ? -5.f : 0.f,
-                                 recipe == 31                   ? 5.f
+        const float speed = draw(random, (recipe == 31 || recipe == 33) ? -5.f : 0.f,
+                                 (recipe == 31 || recipe == 33) ? 5.f
                                  : recipe == 21 || recipe == 24 ? 25.f
                                                                 : 0.f); // Original zero-speed draw still consumes RNG.
         float comet_distance = 0;
-        auto start = vector_scale(right, recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32
+        auto start = vector_scale(right, recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32 ||
+                                                 recipe == 33
                                              ? (comet_distance = draw(random, 0, position_radius))
                                              : position_radius);
-        if (recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32)
+        if (recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32 || recipe == 33)
             start = vector_add(
                 start, vector_add(vector_subtract(position, origin), vector_scale(step, float(i / authored_count))));
         const auto color = vector_scale(
@@ -355,7 +375,7 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
         if (duration < elapsed)
             return false;
     }
-    else if (recipe == 1 || recipe == 3 || recipe == 31 || recipe == 32)
+    else if (recipe == 1 || recipe == 34 || recipe == 3 || recipe == 31 || recipe == 32 || recipe == 33)
     {
         const auto difference = vector_subtract(owner->position, last_object_position);
         if (difference.x == 0 && difference.y == 0 && difference.z == 0)
@@ -365,14 +385,14 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
         } // Zero ramp-down time; never resumes in single player.
         last_object_position = owner->position;
     }
-    if (recipe == 1)
+    if (recipe == 1 || recipe == 34)
     {
         if (moving)
             position = owner->position;
         // ALIGNROTATION affects emission, not the fixed smoke system transform.
         source_rotation = owner->rotation;
     }
-    else if (recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32)
+    else if (recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32 || recipe == 33)
     {
         if (moving)
             position = owner->position;

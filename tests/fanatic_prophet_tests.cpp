@@ -96,6 +96,7 @@ namespace
                                                         {"SHOTGXX", WEAP_SHOTGUN},
                                                         {"SINGULARITY", WEAP_SINGULARITY},
                                                         {"HOWITZER", WEAP_HOWITZER},
+                                                        {"ORB", WEAP_ORB},
                                                         {"HEAL", WEAP_ZEALOT_HEAL},
                                                         {"SHIELD", WEAP_ZEALOT_SHIELD},
                                                         {"GROUND_FIRE", WEAP_ZEALOT_GROUNDFIRE},
@@ -104,7 +105,7 @@ namespace
             CHECK(AI_Mgr::WeaponStrToInt(name, id) && id == expected);
         CHECK(AI_Mgr::WeaponStrToInt("SKULL", id) && id == WEAP_SKULL);
         // A matched branch whose weapon is not integrated is never replaced by Beretta.
-        for (auto name : {"PROX_BOMB", "GIDEON_GOO", "ORB"})
+        for (auto name : {"PROX_BOMB", "GIDEON_GOO"})
             CHECK(!AI_Mgr::WeaponStrToInt(name, id));
         return true;
     }

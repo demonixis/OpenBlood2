@@ -33,7 +33,7 @@ bool CExplosionFragFX::Init(const ExplosionFragSettings& s, std::string& failure
         !positive(s.rotate_max) || !bound(s.spread, 0, 10000) || !bound(s.duration, .001f, 600) ||
         !bound(s.velocity, 0, 10000) || !bound(s.bounce, 0, 1) || !bound(s.gravity, -10000, 10000) ||
         !bound(s.fade_time, 0, s.duration) || !bound(s.alpha, 0, 1) || s.spawn_explosion || s.spawn_type ||
-        s.trail_type > 1 || !path(s.model) || !path(s.skin))
+        (s.trail_type > 1 && s.trail_type != 34) || !path(s.model) || !path(s.skin))
     {
         failure = "Invalid or unsupported explosion fragment descriptor (spawn/trail modes are bounded)";
         return false;
@@ -105,7 +105,7 @@ bool CExplosionFragFX::CreateObject(ModelStore& models, const Resources& resourc
         return false;
     }
     if (settings.trail_type)
-        trail_error = "Original OBJFX_SMOKETRAIL_1 particle trail unavailable";
+        trail_error = "Original explosion-fragment particle trail not yet bound";
     alpha = settings.alpha;
     start_time = last_time = now;
     return true;

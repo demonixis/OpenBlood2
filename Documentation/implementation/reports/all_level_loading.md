@@ -9,8 +9,8 @@ initial deltas, three seconds of simulation with movement, a runtime failure
 recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
 combat, multiplayer or GPU certification. M2 closure remains unchanged.
 
-Current verified opening gate after iteration 13: **49 / 58 pass, 9 / 58 fail**
-([audit 11](evidence/all-levels-audit-11.log)). Remaining worlds:
+Current verified opening gate after iteration 14: **49 / 58 pass, 9 / 58 fail**
+([audit 12](evidence/all-levels-audit-12.log)). Remaining worlds:
 Rooftop, Ancient City, Arena, Ancient One,
 End and the four CTF maps. Initial-entry and three-second simulation
 coverage is not complete gameplay/traversal acceptance. The tables below retain
@@ -513,3 +513,51 @@ These focused checks are not full encounter/traversal acceptance.
 ![Ophelia](evidence/all-levels-chosen-1.png)
 ![Gabriella revenant](evidence/all-levels-chosen-2.png)
 ![Ophelia revenant](evidence/all-levels-chosen-3.png)
+
+
+## Iteration 14: original Orb weapon, projectiles and camera
+
+The original Orb dependency is implemented before registering IshmaelAI/REV.
+Both actual projectile modes, guidance, head attachment, periodic damage, audio,
+client FIRE_KEY delivery, pickup, NPC use and alternate camera are connected.
+[Contracts](../../contracts/orb_contracts.md) preserve signed-component targeting,
+strict clocks, final explosion damage and checked camera/link ownership.
+Actual blue/white trails and ten metal fragments use the original assets and
+recipes; inspector state includes component errors.
+
+[Audit 12](evidence/all-levels-audit-12.log) remains **49 / 58 passing**, **9 failing**.
+Remaining classes: IshmaelAI/REV, EnhancedGideon, UndeadGideon, AncientOne,
+Tentacle, FlagStand and FlagObject. No world admission rule was relaxed.
+
+[66 Dev regressions](evidence/all-levels-lot14-dev.log) and the separate
+[14 object-contract tests](evidence/all-levels-lot14-objects.log) pass. Five focused
+Orb cases cover signed guidance/no base timeout, head damage and deferred removal,
+actual alternate camera/aim/input gates, player/NPC fire, pickup, original particle
+settings, fragment lifetime and explicit trail-capacity failure. Existing Leech,
+AI, inventory-use, player-state and camera tests pass as well.
+
+The retained [initial fixture run](evidence/all-levels-lot14-initial.log) used
+an exact .001-second step smaller than the float scheduling deadline, and later
+[attachment diagnosis](evidence/all-levels-lot14-attachment-debug.log) showed the
+original localized damage modifier: delivered 12 damage is not always 12 health
+lost. The fixture now tests delivery and actual health loss separately.
+
+[Six Release tests](evidence/all-levels-lot14-release.log) pass, including GPU
+readback: 279 Orb/trail pixels, 334 impact pixels with all ten actual fragment
+models, and exact empty background after expiry. Captures were visually checked.
+The [initial GPU failure](evidence/all-levels-lot14-release-initial.log) exposed
+poor fixture framing; the [second](evidence/all-levels-lot14-gpu-second.log)
+exposed its missing explosion-model scene submission. Both fixture errors were
+fixed without reducing pixel thresholds or changing production rendering.
+Dev inspector and Release applications build. No shaders/dependencies changed.
+
+![Orb and trail](evidence/all-levels-orb-flight.png)
+![Orb impact fragments](evidence/all-levels-orb-impact.png)
+
+[79 ASan/UBSan checks](evidence/all-levels-lot14-sanitizers.log) pass (158.82 seconds),
+plus the separately run [clearance encounter](evidence/all-levels-lot14-sanitizers-clearance.log)
+(86.54 seconds), with leak detection enabled. The first combined command was
+externally terminated with status 143 during that encounter; its
+[incomplete output](evidence/all-levels-lot14-sanitizers-interrupted.log) is retained
+and is not counted as a successful run. All 80 selected checks subsequently pass.
+These focused checks and opening audit do not certify complete campaign traversal.

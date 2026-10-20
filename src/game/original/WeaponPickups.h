@@ -96,3 +96,9 @@ class MiniGunPU final : public WeaponPickup
   public:
     MiniGunPU();
 };
+
+class OrbPU final : public WeaponPickup
+{
+  public:
+    OrbPU();
+};

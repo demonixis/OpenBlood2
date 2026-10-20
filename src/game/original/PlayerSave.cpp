@@ -55,6 +55,11 @@ namespace
             error = "Player fields require a live initialized owner outside damage callbacks";
             return false;
         }
+        if (server->IsObjectAlive(player.orb_object))
+        {
+            error = "Active Orb requires unsaved projectile/camera state";
+            return false;
+        }
         // This partial snapshot omits power flags/timers (the original Save writes them).
         // Keep the existing Stealth/Willpower transfer boundary; Anger stays refused
         // so its inventory multiplier cannot become permanent without an expiry.

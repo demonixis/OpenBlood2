@@ -1675,3 +1675,12 @@ MC_BestWeapon, attacks, escape and Dodge/AI_Mgr sidesteps come from the
 [hashed originals](sources/all_levels_chosen_ai_sources.json).
 [Contracts](../contracts/chosen_ai_contracts.md) record finite checked adaptations
 and source quirks. Reference sources, retail data and graphics stack are unchanged.
+
+### Complete-level continuation: Orb
+
+Original weapon/view definitions, OrbPU, both GameProjectiles callbacks, player
+Orb ownership, client camera and ObjectFX33/34/Explosion21 recipes are selectively
+integrated using typed services. [Source hashes](sources/all_levels_orb_sources.json)
+and [contracts](../contracts/orb_contracts.md) record exact source behavior and
+finite initialization/lifetime adaptations. Commercial/reference data, renderer
+pipelines and dependency revisions are unchanged.

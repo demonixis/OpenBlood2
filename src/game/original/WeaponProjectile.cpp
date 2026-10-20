@@ -1,5 +1,6 @@
 #include "InventoryMgr.h"
 #include "LaserBeamFX.h"
+#include "OrbProjectile.h"
 #include "Projectile.h"
 #include "Weapon.h"
 #include "engine/collision.h"
@@ -73,4 +74,18 @@ FireResult CSingularity::FireProjectile()
     else
         beam_error = "Singularity beam ray unavailable";
     return CWeapon::FireProjectile();
+}
+
+FireResult COrb::FireProjectile()
+{
+    const auto result = CWeapon::FireProjectile();
+    if (result != FireResult::Fired || !last_shot.request.alternate)
+        return result;
+    auto* orb = dynamic_cast<COrbAltProjectile*>(BaseClass::GetServerDE()->HandleToObject(projectile));
+    if (!orb || !orb->StartCamera())
+    {
+        projectile_error = orb ? orb->camera_error : "Orb camera projectile unavailable";
+        return last_shot.result = FireResult::Unavailable;
+    }
+    return result;
 }

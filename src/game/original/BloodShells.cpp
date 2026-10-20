@@ -396,7 +396,8 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
         }
         return true;
     }
-    if (std::holds_alternative<OpenBlood2::SeeingEyeView>(event) ||
+    if (std::holds_alternative<OpenBlood2::OrbView>(event) ||
+        std::holds_alternative<OpenBlood2::SeeingEyeView>(event) ||
         std::holds_alternative<OpenBlood2::CreatureAttach>(event))
         return HandleInventoryView(event, server);
     if (const auto* value = std::get_if<OpenBlood2::InventoryAction>(&event))
@@ -681,7 +682,7 @@ bool CBloodClientShell::UpdateWeapons(CBloodServerShell& server, double seconds,
 bool CBloodClientShell::UpdateZoom(double seconds)
 {
     // Original UpdateCamera first-person branch: 8 rad/s toward 12.5 or default 90 degrees.
-    // External cameras keep the current value; this port has no seeing-eye/orb views.
+    // External cameras keep the stored zoom value.
     if (view.object || !std::isfinite(seconds) || seconds < 0)
         return true;
     if (!m_fovX)
@@ -697,6 +698,9 @@ bool CBloodClientShell::UpdateZoom(double seconds)
 }
 float CBloodClientShell::ViewFovX() const
 {
+    // Original Orb camera overrides the stored zoom with default +45 degrees.
+    if (view.object && view.object == orb_view)
+        return OpenBlood2::original_fov_normal * 1.5f;
     // Letterbox cameras use the default FOV; other views use the current value.
     if ((view.object && view.settings.type == 1) || !m_fovX)
         return OpenBlood2::original_fov_normal;
@@ -715,6 +719,14 @@ bool CBloodClientShell::UpdateCameraSelection()
         server_.GetObjectPos(seeing_eye, &view.position);
         view.rotation = OpenBlood2::rotation_from_euler({rotation.pitch, rotation.yaw, 0});
         server_.SetObjectRotation(seeing_eye, &view.rotation);
+    }
+    else if (orb_view && server_.IsObjectAlive(orb_view) && !owner->m_damage.IsDead())
+    {
+        view.object = orb_view;
+        view.settings = {0, false, false, true};
+        if (server_.GetObjectPos(orb_view, &view.position) != DE_OK)
+            return false;
+        view.rotation = OpenBlood2::rotation_from_euler({rotation.pitch, rotation.yaw, 0});
     }
     owner->camera_movement_blocked = view.object && !view.settings.player_movement;
     player_visible = view.object && !view.settings.hide_player && !death_camera.active;

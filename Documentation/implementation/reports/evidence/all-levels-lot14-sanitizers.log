@@ -1,0 +1,178 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start    3: objects.builtin_model
+ 1/79 Test    #3: objects.builtin_model ............   Passed    0.02 sec
+      Start    4: objects.original_objects
+ 2/79 Test    #4: objects.original_objects .........   Passed    0.02 sec
+      Start    5: objects.nested_creation
+ 3/79 Test    #5: objects.nested_creation ..........   Passed    0.02 sec
+      Start    6: objects.reasons_properties
+ 4/79 Test    #6: objects.reasons_properties .......   Passed    0.02 sec
+      Start    7: objects.scheduling
+ 5/79 Test    #7: objects.scheduling ...............   Passed    0.02 sec
+      Start    8: objects.deferred_removal
+ 6/79 Test    #8: objects.deferred_removal .........   Passed    0.02 sec
+      Start    9: objects.aggregate_dispatch
+ 7/79 Test    #9: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start   10: objects.handles_selection
+ 8/79 Test   #10: objects.handles_selection ........   Passed    0.02 sec
+      Start   11: objects.links_lists
+ 9/79 Test   #11: objects.links_lists ..............   Passed    0.02 sec
+      Start   12: objects.messages_strings
+10/79 Test   #12: objects.messages_strings .........   Passed    0.04 sec
+      Start   13: objects.message_churn
+11/79 Test   #13: objects.message_churn ............   Passed    5.86 sec
+      Start   14: objects.message_limit
+12/79 Test   #14: objects.message_limit ............   Passed    0.40 sec
+      Start   15: objects.unsupported_teardown
+13/79 Test   #15: objects.unsupported_teardown .....   Passed    0.07 sec
+      Start   16: objects.creation_failures
+14/79 Test   #16: objects.creation_failures ........   Passed    0.04 sec
+      Start  230: cameras.defaults
+15/79 Test  #230: cameras.defaults .................   Passed    0.03 sec
+      Start  231: cameras.timing
+16/79 Test  #231: cameras.timing ...................   Passed    0.02 sec
+      Start  232: cameras.links
+17/79 Test  #232: cameras.links ....................   Passed    0.02 sec
+      Start  233: cameras.selection
+18/79 Test  #233: cameras.selection ................   Passed    0.02 sec
+      Start  234: cameras.player
+19/79 Test  #234: cameras.player ...................   Passed    0.20 sec
+      Start  235: cameras.validation
+20/79 Test  #235: cameras.validation ...............   Passed    0.02 sec
+      Start  236: cameras.catalog
+21/79 Test  #236: cameras.catalog ..................   Passed   35.30 sec
+      Start  526: ai_runtime.ammo_receive
+22/79 Test  #526: ai_runtime.ammo_receive ..........   Passed    0.02 sec
+      Start  527: ai_runtime.ammo_search
+23/79 Test  #527: ai_runtime.ammo_search ...........   Passed    0.02 sec
+      Start  528: ai_runtime.activation
+24/79 Test  #528: ai_runtime.activation ............   Passed    0.02 sec
+      Start  529: ai_runtime.animation_clearance
+25/79 Test  #529: ai_runtime.animation_clearance ...   Passed    0.03 sec
+      Start  530: ai_runtime.visibility
+26/79 Test  #530: ai_runtime.visibility ............   Passed    0.02 sec
+      Start  531: ai_runtime.visibility_filter
+27/79 Test  #531: ai_runtime.visibility_filter .....   Passed    0.03 sec
+      Start  532: ai_runtime.visibility_atomic
+28/79 Test  #532: ai_runtime.visibility_atomic .....   Passed    0.02 sec
+      Start  533: ai_runtime.lifetime
+29/79 Test  #533: ai_runtime.lifetime ..............   Passed    0.03 sec
+      Start  534: ai_runtime.targets
+30/79 Test  #534: ai_runtime.targets ...............   Passed    0.02 sec
+      Start  535: ai_runtime.tracking
+31/79 Test  #535: ai_runtime.tracking ..............   Passed    0.02 sec
+      Start  536: ai_runtime.camera
+32/79 Test  #536: ai_runtime.camera ................   Passed    0.02 sec
+      Start  537: ai_runtime.spatial
+33/79 Test  #537: ai_runtime.spatial ...............   Passed    0.02 sec
+      Start  538: ai_runtime.triggers
+34/79 Test  #538: ai_runtime.triggers ..............   Passed    0.02 sec
+      Start  539: ai_runtime.body
+35/79 Test  #539: ai_runtime.body ..................   Passed    0.02 sec
+      Start  540: ai_runtime.missing
+36/79 Test  #540: ai_runtime.missing ...............   Passed    0.02 sec
+      Start  541: ai_runtime.catalog
+37/79 Test  #541: ai_runtime.catalog ...............   Passed    2.42 sec
+      Start  542: ai_runtime.failures
+38/79 Test  #542: ai_runtime.failures ..............   Passed    0.41 sec
+      Start  543: ai_runtime.subway
+39/79 Test  #543: ai_runtime.subway ................   Passed   24.16 sec
+      Start  544: ai_runtime.arena
+40/79 Test  #544: ai_runtime.arena .................   Passed    1.84 sec
+      Start  545: ai_runtime.sparse_weapons
+41/79 Test  #545: ai_runtime.sparse_weapons ........   Passed    0.65 sec
+      Start  547: ai_runtime.ammo_private
+42/79 Test  #547: ai_runtime.ammo_private ..........   Passed    1.43 sec
+      Start  595: player_state.roundtrip
+43/79 Test  #595: player_state.roundtrip ...........   Passed    0.04 sec
+      Start  596: player_state.clocks
+44/79 Test  #596: player_state.clocks ..............   Passed    0.04 sec
+      Start  597: player_state.initialization
+45/79 Test  #597: player_state.initialization ......   Passed    0.04 sec
+      Start  598: player_state.failures
+46/79 Test  #598: player_state.failures ............   Passed    0.04 sec
+      Start  599: player_state.capture
+47/79 Test  #599: player_state.capture .............   Passed    0.04 sec
+      Start  600: player_state.private
+48/79 Test  #600: player_state.private .............   Passed    7.76 sec
+      Start  637: explosion_fragments.lifecycle
+49/79 Test  #637: explosion_fragments.lifecycle ....   Passed    0.03 sec
+      Start  638: explosion_fragments.collision
+50/79 Test  #638: explosion_fragments.collision ....   Passed    0.04 sec
+      Start  639: explosion_fragments.recipes
+51/79 Test  #639: explosion_fragments.recipes ......   Passed    0.05 sec
+      Start  640: explosion_fragments.failures
+52/79 Test  #640: explosion_fragments.failures .....   Passed    0.07 sec
+      Start  641: explosion_fragments.session
+53/79 Test  #641: explosion_fragments.session ......   Passed    0.03 sec
+      Start  642: explosion_fragments.private
+54/79 Test  #642: explosion_fragments.private ......   Passed   29.72 sec
+      Start  643: object_particles.emission
+55/79 Test  #643: object_particles.emission ........   Passed    0.02 sec
+      Start  644: object_particles.stopping
+56/79 Test  #644: object_particles.stopping ........   Passed    0.02 sec
+      Start  645: object_particles.failures
+57/79 Test  #645: object_particles.failures ........   Passed    0.03 sec
+      Start  646: object_particles.session
+58/79 Test  #646: object_particles.session .........   Passed    0.03 sec
+      Start  647: object_particles.private
+59/79 Test  #647: object_particles.private .........   Passed   33.86 sec
+      Start 1079: fanatic_prophet.weapons
+60/79 Test #1079: fanatic_prophet.weapons ..........   Passed    0.02 sec
+      Start 1080: fanatic_prophet.decisions
+61/79 Test #1080: fanatic_prophet.decisions ........   Passed    0.03 sec
+      Start 1081: fanatic_prophet.howitzer
+62/79 Test #1081: fanatic_prophet.howitzer .........   Passed    0.03 sec
+      Start 1082: fanatic_prophet.catalog
+63/79 Test #1082: fanatic_prophet.catalog ..........   Passed    1.44 sec
+      Start 1083: fanatic_prophet.kamikaze
+64/79 Test #1083: fanatic_prophet.kamikaze .........   Passed    1.28 sec
+      Start 1084: fanatic_prophet.actions
+65/79 Test #1084: fanatic_prophet.actions ..........   Passed    0.68 sec
+      Start 1085: fanatic_prophet.world
+66/79 Test #1085: fanatic_prophet.world ............   Passed    1.97 sec
+      Start 1094: inventory_use.goggles
+67/79 Test #1094: inventory_use.goggles ............   Passed    1.55 sec
+      Start 1095: inventory_use.eye
+68/79 Test #1095: inventory_use.eye ................   Passed    0.47 sec
+      Start 1096: inventory_use.leech
+69/79 Test #1096: inventory_use.leech ..............   Passed    0.86 sec
+      Start 1097: inventory_use.bugspray
+70/79 Test #1097: inventory_use.bugspray ...........   Passed    0.81 sec
+      Start 1150: leech.healing
+71/79 Test #1150: leech.healing ....................   Passed    0.31 sec
+      Start 1151: leech.projectiles
+72/79 Test #1151: leech.projectiles ................   Passed    0.30 sec
+      Start 1152: leech.alternate
+73/79 Test #1152: leech.alternate ..................   Passed    0.31 sec
+      Start 1153: leech.client
+74/79 Test #1153: leech.client .....................   Passed    0.42 sec
+      Start 1160: orb.steering
+75/79 Test #1160: orb.steering .....................   Passed    0.61 sec
+      Start 1161: orb.attachment
+76/79 Test #1161: orb.attachment ...................   Passed    0.63 sec
+      Start 1162: orb.camera
+77/79 Test #1162: orb.camera .......................   Passed    0.51 sec
+      Start 1163: orb.client
+78/79 Test #1163: orb.client .......................   Passed    0.68 sec
+      Start 1164: orb.effects
+79/79 Test #1164: orb.effects ......................   Passed    0.48 sec
+
+100% tests passed, 0 tests failed out of 79
+
+Label Time Summary:
+ai_runtime             =  31.29 sec*proc (21 tests)
+cameras                =  35.63 sec*proc (7 tests)
+explosion_fragments    =  29.95 sec*proc (6 tests)
+fanatic_prophet        =   5.44 sec*proc (7 tests)
+headless               = 158.78 sec*proc (79 tests)
+inventory_use          =   3.69 sec*proc (4 tests)
+object_particles       =  33.96 sec*proc (5 tests)
+objects                =   6.62 sec*proc (14 tests)
+orb                    =   2.92 sec*proc (5 tests)
+player_state           =   7.97 sec*proc (6 tests)
+private                = 145.84 sec*proc (19 tests)
+private-data           =   5.02 sec*proc (8 tests)
+weapons                =   1.33 sec*proc (4 tests)
+
+Total Test time (real) = 158.82 sec

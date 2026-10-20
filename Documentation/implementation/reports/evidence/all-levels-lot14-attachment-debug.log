@@ -1,0 +1,19 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1170: orb.attachment
+1/1 Test #1170: orb.attachment ...................***Failed    0.02 sec
+Orb tick=1 hp 601 -> 595 fail=
+attachment:114: p->damage_ticks == 1 && std::abs(t->m_damage.m_fHitPoints - (hp - 12)) < .001f
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+headless    =   0.02 sec*proc (1 test)
+orb         =   0.02 sec*proc (1 test)
+private     =   0.02 sec*proc (1 test)
+
+Total Test time (real) =   0.04 sec
+
+The following tests FAILED:
+	1170 - orb.attachment (Failed)                           headless orb private
+Errors while running CTest

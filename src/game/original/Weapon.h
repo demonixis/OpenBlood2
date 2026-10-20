@@ -171,6 +171,12 @@ class CShotgun final : public CWeapon
   public:
     CShotgun() : CWeapon(WEAP_SHOTGUN) {}
 };
+class COrb final : public CWeapon
+{
+  public:
+    COrb() : CWeapon(WEAP_ORB) {}
+    FireResult FireProjectile() override;
+};
 // Original CLifeLeech only selects its weapon definition.
 class CLifeLeech final : public CWeapon
 {

@@ -291,6 +291,8 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
         else
             animation.looping = false;
     }
+    if (type == WEAP_ORB && state == WS_REST)
+        animation.looping = true; // Original client COrb idle spin.
     last_firing_ = primary || alternate;
     if (animation.animation == no_animation)
         return true; // Original missing-animation fallback above.

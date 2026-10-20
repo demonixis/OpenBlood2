@@ -96,7 +96,7 @@ class CBloodClientShell
     bool binoculars_down = false, binoculars_was_down = false;
     bool goggles_down = false, goggles_was_down = false, eye_down = false, eye_was_down = false;
     bool night_goggles = false;
-    HOBJECT seeing_eye = nullptr, creature = nullptr;
+    HOBJECT seeing_eye = nullptr, creature = nullptr, orb_view = nullptr;
     OpenBlood2::SoundId goggles_loop = 0, eye_loop = 0;
     float blind_until = 0, creature_light = 1, creature_damage_time = 0, last_use_hit = 0;
     unsigned use_hits = 0, total_use_hits = 0;

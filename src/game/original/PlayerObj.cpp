@@ -405,7 +405,8 @@ DBOOL CPlayerObj::Update(DVector*)
     if (m_bFirstUpdate && !InitializeClientState())
         return DFALSE;
     UpdateSound();
-    if (server->GetTime() > m_fNextPingTime)
+    if ((server->IsObjectAlive(g_hActiveCamera) || !server->IsObjectAlive(orb_object)) &&
+        server->GetTime() > m_fNextPingTime)
     {
         m_fNextPingTime = server->GetTime() + .5f;
         const auto observer = server->IsObjectAlive(g_hActiveCamera) ? g_hActiveCamera : m_hObject;
@@ -511,6 +512,8 @@ DDWORD CPlayerObj::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
             result = InitialUpdate(static_cast<int>(fData));
             break;
         case MID_LINKBROKEN:
+            if (data == orb_object)
+                orb_object = nullptr;
             // This engine also notifies a pending owner before its destructor.
             // Keep that owner's list intact so original destruction removes charges.
             if (g_pServerDE->IsObjectAlive(m_hObject))
@@ -542,4 +545,15 @@ FireResult CPlayerObj::HandleWeaponFireMessage(const OpenBlood2::WeaponFire& req
     if (result == FireResult::Fired || result == FireResult::DeliveryFailed)
         UpdateStats();
     return result;
+}
+
+bool CPlayerObj::SetOrbObject(HOBJECT object)
+{
+    auto* s = GetServerDE();
+    if (object && !s->IsObjectAlive(object))
+        return false;
+    if (object && s->CreateInterObjectLink(m_hObject, object) != DE_OK)
+        return false;
+    orb_object = object; // Original retains previous links; breaking one must not clear a newer orb.
+    return true;
 }

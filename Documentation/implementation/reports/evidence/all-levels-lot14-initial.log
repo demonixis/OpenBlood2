@@ -1,0 +1,30 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1169: orb.steering
+1/4 Test #1169: orb.steering .....................***Failed    0.02 sec
+steering:89: g.objects.advance(.001) && !p->tracked && !p->failed
+
+    Start 1170: orb.attachment
+2/4 Test #1170: orb.attachment ...................***Failed    0.02 sec
+attachment:112: g.objects.advance(.001) && p->damage_ticks == 1 && std::abs(t->m_damage.m_fHitPoints - (hp - 12)) < .001f
+
+    Start 1171: orb.camera
+3/4 Test #1171: orb.camera .......................***Failed    0.02 sec
+camera:167: g.objects.advance(.001) && player->orb_object == h
+
+    Start 1172: orb.effects
+4/4 Test #1172: orb.effects ......................   Passed    0.02 sec
+
+25% tests passed, 3 tests failed out of 4
+
+Label Time Summary:
+headless    =   0.08 sec*proc (4 tests)
+orb         =   0.08 sec*proc (4 tests)
+private     =   0.08 sec*proc (4 tests)
+
+Total Test time (real) =   0.10 sec
+
+The following tests FAILED:
+	1169 - orb.steering (Failed)                             headless orb private
+	1170 - orb.attachment (Failed)                           headless orb private
+	1171 - orb.camera (Failed)                               headless orb private
+Errors while running CTest

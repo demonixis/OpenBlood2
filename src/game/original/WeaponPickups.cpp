@@ -22,6 +22,13 @@ ShotgunPU::ShotgunPU()
     display_name = "Sawed-off Shotgun";
     resource_id = IDS_WEAPON_SHOTGUN;
 }
+OrbPU::OrbPU()
+{
+    value = {OpenBlood2::PickupKind::Weapon, WEAP_ORB, 0};
+    file = "Orb_pu";
+    display_name = "The Orb";
+    resource_id = IDS_WEAPON_ORB;
+}
 LifeLeechPU::LifeLeechPU()
 {
     value = {OpenBlood2::PickupKind::Weapon, WEAP_LIFELEECH, 0};
@@ -75,6 +82,8 @@ const char* WeaponPickupClass(DDWORD type)
 {
     switch (type)
     {
+        case WEAP_ORB:
+            return "OrbPU";
         case WEAP_LIFELEECH:
             return "LifeLeechPU";
         case WEAP_MINIGUN:

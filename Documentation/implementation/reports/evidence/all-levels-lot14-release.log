@@ -1,0 +1,72 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1286
+    Start 1286: orb.steering
+
+1286: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/orb_tests "steering" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1286: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1286: Test timeout computed to be: 180
+1/6 Test #1286: orb.steering .....................   Passed    0.02 sec
+test 1287
+    Start 1287: orb.attachment
+
+1287: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/orb_tests "attachment" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1287: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1287: Test timeout computed to be: 180
+2/6 Test #1287: orb.attachment ...................   Passed    0.02 sec
+test 1288
+    Start 1288: orb.camera
+
+1288: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/orb_tests "camera" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1288: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1288: Test timeout computed to be: 180
+3/6 Test #1288: orb.camera .......................   Passed    0.02 sec
+test 1289
+    Start 1289: orb.client
+
+1289: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/orb_tests "client" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1289: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1289: Test timeout computed to be: 180
+4/6 Test #1289: orb.client .......................   Passed    0.02 sec
+test 1290
+    Start 1290: orb.effects
+
+1290: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/orb_tests "effects" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1290: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1290: Test timeout computed to be: 180
+5/6 Test #1290: orb.effects ......................   Passed    0.02 sec
+test 1291
+    Start 1291: gpu.orb
+
+1291: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/orb_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/orb-capture" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1291: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1291: Test timeout computed to be: 120
+1291: flight lit=279 entries=69
+1291: impact lit=334 models=10
+1291: 279 Orb/trail pixels, real impact fragments and expiry verified
+6/6 Test #1291: gpu.orb ..........................   Passed    0.53 sec
+
+The following tests passed:
+	orb.steering
+	orb.attachment
+	orb.camera
+	orb.client
+	orb.effects
+	gpu.orb
+
+100% tests passed, 0 tests failed out of 6
+
+Label Time Summary:
+gpu         =   0.53 sec*proc (1 test)
+headless    =   0.11 sec*proc (5 tests)
+orb         =   0.65 sec*proc (6 tests)
+private     =   0.65 sec*proc (6 tests)
+
+Total Test time (real) =   0.67 sec

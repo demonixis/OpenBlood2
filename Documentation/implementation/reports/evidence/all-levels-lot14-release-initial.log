@@ -1,0 +1,30 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 1286: orb.steering
+1/6 Test #1286: orb.steering .....................   Passed    0.03 sec
+    Start 1287: orb.attachment
+2/6 Test #1287: orb.attachment ...................   Passed    0.03 sec
+    Start 1288: orb.camera
+3/6 Test #1288: orb.camera .......................   Passed    0.02 sec
+    Start 1289: orb.client
+4/6 Test #1289: orb.client .......................   Passed    0.02 sec
+    Start 1290: orb.effects
+5/6 Test #1290: orb.effects ......................   Passed    0.02 sec
+    Start 1291: gpu.orb
+6/6 Test #1291: gpu.orb ..........................***Failed    0.69 sec
+flight lit=67 entries=198
+120: lit > 100  
+
+
+83% tests passed, 1 tests failed out of 6
+
+Label Time Summary:
+gpu         =   0.69 sec*proc (1 test)
+headless    =   0.13 sec*proc (5 tests)
+orb         =   0.82 sec*proc (6 tests)
+private     =   0.82 sec*proc (6 tests)
+
+Total Test time (real) =   0.84 sec
+
+The following tests FAILED:
+	1291 - gpu.orb (Failed)                                  gpu orb private
+Errors while running CTest

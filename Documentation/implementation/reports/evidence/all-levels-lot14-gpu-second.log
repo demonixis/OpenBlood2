@@ -1,0 +1,34 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1291
+    Start 1291: gpu.orb
+
+1291: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/orb_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/orb-capture" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1291: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1291: Test timeout computed to be: 120
+1291: flight lit=279 entries=69
+1291: impact lit=88 models=0
+1291: 137: impact_lit > 100  
+1/1 Test #1291: gpu.orb ..........................***Failed    0.52 sec
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+gpu        =   0.52 sec*proc (1 test)
+orb        =   0.52 sec*proc (1 test)
+private    =   0.52 sec*proc (1 test)
+
+Total Test time (real) =   0.54 sec
+
+The following tests FAILED:
+	1291 - gpu.orb (Failed)                                  gpu orb private
+Errors while running CTest
+Output from these tests are in: /home/yann/projects/lithtech/Blood2/build/release/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

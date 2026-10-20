@@ -43,6 +43,11 @@ namespace OpenBlood2
         bool on = false;
         DBYTE type = 0;
     };
+    struct OrbView
+    {
+        HOBJECT orb = nullptr;
+        bool active = false;
+    };
     struct SeeingEyeView
     {
         HOBJECT eye = nullptr;
@@ -176,5 +181,5 @@ namespace OpenBlood2
     using PlayerEvent =
         std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats, MissionObjectives,
                      WorldExit, BossHealth, Conversation, InventoryAction, ScreenFade, VoiceEvent, VoiceStop,
-                     PlayerDead, MusicCommand, ZoomView, SeeingEyeView, CreatureAttach>;
+                     PlayerDead, MusicCommand, ZoomView, SeeingEyeView, CreatureAttach, OrbView>;
 } // namespace OpenBlood2

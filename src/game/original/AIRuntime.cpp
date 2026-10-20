@@ -31,7 +31,7 @@ namespace
                                              {"NAPALM", WEAP_NAPALMCANNON, true},
                                              {"MINIG", WEAP_MINIGUN, true},
                                              {"VOODO", 0, false},
-                                             {"ORB", 0, false},
+                                             {"ORB", WEAP_ORB, true},
                                              {"LASER", 0, false},
                                              {"LIFEL", WEAP_LIFELEECH, true},
                                              {"TESLA", WEAP_TESLACANNON, true},

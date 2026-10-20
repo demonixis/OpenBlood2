@@ -1,6 +1,7 @@
 // Original BloodClientShell and ViewCreature callbacks behind checked local messages.
 #include "BloodShells.h"
 #include "BoneLeech.h"
+#include "OrbProjectile.h"
 #include "SeeingEye.h"
 #include "engine/collision.h"
 #include <cmath>
@@ -19,6 +20,7 @@ bool CBloodServerShell::OnMessage(HCLIENT client, const PlayerRotation& rotation
     if (!p || !std::isfinite(rotation.pitch) || !std::isfinite(rotation.yaw) || std::abs(rotation.pitch) > 1000000 ||
         std::abs(rotation.yaw) > 1000000)
         return false;
+    p->rotation_received = true;
     p->m_fPitch = rotation.pitch;
     p->m_fYaw = rotation.yaw;
     if (p->m_InventoryMgr.eye && p->m_InventoryMgr.eye->active)
@@ -39,7 +41,7 @@ void CBloodClientShell::ClearInventoryEffects()
         if (auto* b = dynamic_cast<BoneLeech*>(server_.HandleToObject(creature)); b && b->attached == player)
             b->Detach();
     goggles_loop = eye_loop = 0;
-    seeing_eye = creature = nullptr;
+    seeing_eye = creature = orb_view = nullptr;
     night_goggles = false;
     goggles_down = goggles_was_down = eye_down = eye_was_down = false;
     blind_until = creature_damage_time = last_use_hit = 0;
@@ -48,6 +50,22 @@ void CBloodClientShell::ClearInventoryEffects()
 }
 bool CBloodClientShell::HandleInventoryView(const PlayerEvent& event, CBloodServerShell& server)
 {
+    if (const auto* v = std::get_if<OrbView>(&event))
+    {
+        if (!v->active)
+        {
+            if (orb_view == v->orb)
+                orb_view = nullptr;
+        }
+        else
+        {
+            auto* orb = server_.IsObjectAlive(v->orb) ? dynamic_cast<COrbAltProjectile*>(server_.HandleToObject(v->orb))
+                                                      : nullptr;
+            if (orb && orb->m_hFiredFrom == player)
+                orb_view = v->orb;
+        }
+        return UpdateCameraSelection();
+    }
     if (const auto* v = std::get_if<SeeingEyeView>(&event))
     {
         if (eye_loop)
@@ -97,6 +115,8 @@ bool CBloodClientShell::HandleInventoryView(const PlayerEvent& event, CBloodServ
 }
 bool CBloodClientShell::UpdateInventoryEffects()
 {
+    if (orb_view && !server_.IsObjectAlive(orb_view))
+        orb_view = nullptr;
     if (seeing_eye && !server_.IsObjectAlive(seeing_eye))
         seeing_eye = nullptr;
     auto loop = [&](bool active, SoundId& voice, const char* resource, int priority)

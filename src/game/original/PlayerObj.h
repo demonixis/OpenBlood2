@@ -200,6 +200,9 @@ class CPlayerObj : public CBaseCharacter
         m_hClient = client;
         m_InventoryMgr.SetClient(client);
     }
+    HOBJECT orb_object = nullptr;
+    bool rotation_received = false;
+    bool SetOrbObject(HOBJECT);
     HCLIENT GetClient() const
     {
         return m_hClient;

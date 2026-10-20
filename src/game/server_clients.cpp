@@ -96,6 +96,8 @@ namespace OpenBlood2
                            value.event < (value.group ? 12 : 9);
                 else if constexpr (std::is_same_v<T, InventoryAction>)
                     return value.type == 1 || value.type == 2 || value.type == 3 || value.type == 5;
+                else if constexpr (std::is_same_v<T, OrbView>)
+                    return value.orb != nullptr;
                 else if constexpr (std::is_same_v<T, SeeingEyeView>)
                     return (!value.active || value.eye) && std::isfinite(value.blind_seconds) &&
                            value.blind_seconds >= 0 && value.blind_seconds <= 10;

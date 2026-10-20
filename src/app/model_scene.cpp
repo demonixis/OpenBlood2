@@ -56,7 +56,7 @@ namespace OpenBlood2
             if (!record || record->life != Life::Alive || record->state.m_ObjectType != OT_MODEL)
                 continue;
             bool visible = (record->state.m_Flags & FLAG_VISIBLE) != 0;
-            if (record->handle == client.seeing_eye)
+            if (record->handle == client.seeing_eye || record->handle == client.orb_view)
                 visible = false; // The camera is inside this model; do not draw its interior.
             bool unresolved = false;
             if (record->attachment)

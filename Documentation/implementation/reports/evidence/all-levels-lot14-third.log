@@ -1,0 +1,18 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1169: orb.steering
+1/4 Test #1169: orb.steering .....................   Passed    0.02 sec
+    Start 1170: orb.attachment
+2/4 Test #1170: orb.attachment ...................   Passed    0.02 sec
+    Start 1171: orb.camera
+3/4 Test #1171: orb.camera .......................   Passed    0.02 sec
+    Start 1172: orb.effects
+4/4 Test #1172: orb.effects ......................   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+headless    =   0.07 sec*proc (4 tests)
+orb         =   0.07 sec*proc (4 tests)
+private     =   0.07 sec*proc (4 tests)
+
+Total Test time (real) =   0.09 sec

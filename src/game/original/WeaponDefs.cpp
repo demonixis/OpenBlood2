@@ -2,6 +2,65 @@
 namespace
 {
     constexpr WeaponData definitions[] = {
+        // The Orb
+        {
+            "Models\\Weapons\\Orb_pv.abc",              // Model
+            "Models\\Weapons\\Orb_pv.abc",              // Model
+            "Skins\\Weapons\\C_Orb_pv_t.dtx",           // Skin
+            "Models\\Powerups\\Orb_pu.abc",             // 3rd person model
+            "Skins\\Powerups\\Orb_pu.dtx",              // 3rd person skin
+            WEAP_ORB,                                   // Type
+            TYPE_PISTOL,                                // Fire type
+            AMMO_FOCUS,                                 // Ammo type
+            20,                                         // Ammo Use
+            200,                                        // Alt Ammo Use
+            10.0f,                                      // Min Damage
+            15.0f,                                      // Max Damage
+            10.0f,                                      // Min Alt damage
+            15.0f,                                      // Max Alt damage
+            1.0f,                                       // Reload time
+            5.0f,                                       // Alt reload time
+            {0.0f, 0.0f},                               // Spread
+            {0.0f, 0.0f},                               // Alt Spread
+            500.0f,                                     // Projectile Velocity
+            500.0f,                                     // Alt Projectile Velocity
+            3500.0f,                                    // Range
+            3500.0f,                                    // Alt Range
+            1,                                          // Shots per fire
+            1,                                          // Alt Shots per fire
+            1,                                          // Strength or Magic required
+            0,                                          // Two-handed Strength or Magic required
+            0,                                          // Damage Radius (projectiles)
+            0,                                          // Alt Damage Radius (projectiles)
+            DFALSE,                                     // Alt fire zoom
+            DFALSE,                                     // Semi-auto
+            "",                                         // Fire sound
+            "",                                         // Alt Fire sound
+            "",                                         // Empty weapon sound
+            "",                                         // Alt Empty weapon sound
+            "COrbProjectile",                           // Projectile class
+            "COrbAltProjectile",                        // Alt Projectile class
+            0,                                          // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                         // Muzzle Flash color
+            "The Orb",                                  // Name
+            IDS_WEAPON_ORB,                             // Name ID (resource)
+            "",                                         // flash sprite name
+            "",                                         // alt flash Sprite name
+            0.0f,                                       // Flash duration
+            0.0f,                                       // Flash scale
+            {0.0f, 0.0f, 0.0f},                         // 3rd person gun offset
+            {0.0f, -0.5f, 2.4f},                        // Gun Offset
+            {0.0f, 0.0f, 0.0f},                         // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                      // Recoil
+            {0.0f, -5.0f, 20.0f},                       // Flash position
+            0.625f,                                     // Eject interval
+            0.0f,                                       // View kick
+            DFALSE,                                     // View kick is Cumulative
+            DFALSE,                                     // Animation looping
+            DFALSE,                                     // Alt anim looping
+            "interface\\statusbar\\weapons\\orb.pcx",   // Icon for status bar
+            "interface\\statusbar\\weapons\\orb_h.pcx", // Highlighted icon for status bar
+        },
         // Life Leech
         {
             "Models\\Weapons\\Lifeleech_pv.abc",              // Model

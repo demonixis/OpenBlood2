@@ -1,0 +1,247 @@
+01_subwaya start=noname multiplayer-inspection=0 01_subwaya difficulty=1 passed
+01_subwaya start=noname multiplayer-inspection=0 01_subwaya difficulty=0 passed
+01_subwaya start=noname multiplayer-inspection=0 01_subwaya difficulty=2 passed
+AUDIT 01_subwaya PASS
+02_cityhub start=start multiplayer-inspection=0 02_cityhub difficulty=1 passed
+02_cityhub start=start multiplayer-inspection=0 02_cityhub difficulty=0 passed
+02_cityhub start=start multiplayer-inspection=0 02_cityhub difficulty=2 passed
+AUDIT 02_cityhub PASS
+02_cityhubb start=start multiplayer-inspection=0 02_cityhubb difficulty=1 passed
+02_cityhubb start=start multiplayer-inspection=0 02_cityhubb difficulty=0 passed
+02_cityhubb start=start multiplayer-inspection=0 02_cityhubb difficulty=2 passed
+AUDIT 02_cityhubb PASS
+02_cityhubc start=start multiplayer-inspection=0 02_cityhubc difficulty=1 passed
+02_cityhubc start=start multiplayer-inspection=0 02_cityhubc difficulty=0 passed
+02_cityhubc start=start multiplayer-inspection=0 02_cityhubc difficulty=2 passed
+AUDIT 02_cityhubc PASS
+03_museum start=start multiplayer-inspection=0 03_museum difficulty=1 passed
+03_museum start=start multiplayer-inspection=0 03_museum difficulty=0 passed
+03_museum start=start multiplayer-inspection=0 03_museum difficulty=2 passed
+AUDIT 03_museum PASS
+04_steamtunnels start=start multiplayer-inspection=0 04_steamtunnels difficulty=1 passed
+04_steamtunnels start=start multiplayer-inspection=0 04_steamtunnels difficulty=0 passed
+04_steamtunnels start=start multiplayer-inspection=0 04_steamtunnels difficulty=2 passed
+AUDIT 04_steamtunnels PASS
+05_cdm start=04_egress multiplayer-inspection=0 05_cdm difficulty=1 passed
+05_cdm start=04_egress multiplayer-inspection=0 05_cdm difficulty=0 passed
+05_cdm start=04_egress multiplayer-inspection=0 05_cdm difficulty=2 passed
+AUDIT 05_cdm PASS
+05_cdmb start=05_egress multiplayer-inspection=0 05_cdmb difficulty=1 passed
+05_cdmb start=05_egress multiplayer-inspection=0 05_cdmb difficulty=0 passed
+05_cdmb start=05_egress multiplayer-inspection=0 05_cdmb difficulty=2 passed
+AUDIT 05_cdmb PASS
+06_airship1 start=start multiplayer-inspection=0 06_airship1 difficulty=1 passed
+06_airship1 start=start multiplayer-inspection=0 06_airship1 difficulty=0 passed
+06_airship1 start=start multiplayer-inspection=0 06_airship1 difficulty=2 passed
+AUDIT 06_airship1 PASS
+06_airship2 start=start multiplayer-inspection=0 06_airship2 difficulty=1 passed
+06_airship2 start=start multiplayer-inspection=0 06_airship2 difficulty=0 passed
+06_airship2 start=start multiplayer-inspection=0 06_airship2 difficulty=2 passed
+AUDIT 06_airship2 PASS
+07_cathedral start=02_egressc multiplayer-inspection=0 07_cathedral difficulty=1 passed
+07_cathedral start=02_egressc multiplayer-inspection=0 07_cathedral difficulty=0 passed
+07_cathedral start=02_egressc multiplayer-inspection=0 07_cathedral difficulty=2 passed
+AUDIT 07_cathedral PASS
+08_subwayb start=08_start1 multiplayer-inspection=0 08_subwayb difficulty=1 passed
+08_subwayb start=08_start1 multiplayer-inspection=0 08_subwayb difficulty=0 passed
+08_subwayb start=08_start1 multiplayer-inspection=0 08_subwayb difficulty=2 passed
+AUDIT 08_subwayb PASS
+09_abandoned_buildings start=Start1 multiplayer-inspection=0 09_abandoned_buildings difficulty=1 passed
+09_abandoned_buildings start=Start1 multiplayer-inspection=0 09_abandoned_buildings difficulty=0 passed
+09_abandoned_buildings start=Start1 multiplayer-inspection=0 09_abandoned_buildings difficulty=2 passed
+AUDIT 09_abandoned_buildings PASS
+10_sewagetreatmentplant start=start multiplayer-inspection=0 10_sewagetreatmentplant difficulty=1 passed
+10_sewagetreatmentplant start=start multiplayer-inspection=0 10_sewagetreatmentplant difficulty=0 passed
+10_sewagetreatmentplant start=start multiplayer-inspection=0 10_sewagetreatmentplant difficulty=2 passed
+AUDIT 10_sewagetreatmentplant PASS
+11_slaughter_house start=start1 multiplayer-inspection=0 11_slaughter_house difficulty=1 passed
+11_slaughter_house start=start1 multiplayer-inspection=0 11_slaughter_house difficulty=0 passed
+11_slaughter_house start=start1 multiplayer-inspection=0 11_slaughter_house difficulty=2 passed
+AUDIT 11_slaughter_house PASS
+12_train_station start=start1 multiplayer-inspection=0 12_train_station difficulty=1 passed
+12_train_station start=start1 multiplayer-inspection=0 12_train_station difficulty=0 passed
+12_train_station start=start1 multiplayer-inspection=0 12_train_station difficulty=2 passed
+AUDIT 12_train_station PASS
+12_train_stationb start=start1 multiplayer-inspection=0 12_train_stationb difficulty=1 passed
+12_train_stationb start=start1 multiplayer-inspection=0 12_train_stationb difficulty=0 passed
+12_train_stationb start=start1 multiplayer-inspection=0 12_train_stationb difficulty=2 passed
+AUDIT 12_train_stationb PASS
+13_downtown start=GameStartPoint0 multiplayer-inspection=0 13_downtown difficulty=1 passed
+13_downtown start=GameStartPoint0 multiplayer-inspection=0 13_downtown difficulty=0 passed
+13_downtown start=GameStartPoint0 multiplayer-inspection=0 13_downtown difficulty=2 passed
+AUDIT 13_downtown PASS
+14_subwayc start=noname multiplayer-inspection=0 14_subwayc difficulty=1 passed
+14_subwayc start=noname multiplayer-inspection=0 14_subwayc difficulty=0 passed
+14_subwayc start=noname multiplayer-inspection=0 14_subwayc difficulty=2 passed
+AUDIT 14_subwayc PASS
+15_crypt start=start1 multiplayer-inspection=0 15_crypt difficulty=1 passed
+15_crypt start=start1 multiplayer-inspection=0 15_crypt difficulty=0 passed
+15_crypt start=start1 multiplayer-inspection=0 15_crypt difficulty=2 passed
+AUDIT 15_crypt PASS
+16_bridge start=GameStartPoint0 multiplayer-inspection=0 16_bridge difficulty=1 passed
+16_bridge start=GameStartPoint0 multiplayer-inspection=0 16_bridge difficulty=0 passed
+16_bridge start=GameStartPoint0 multiplayer-inspection=0 16_bridge difficulty=2 passed
+AUDIT 16_bridge PASS
+17_entrance start=GameStartPoint0 multiplayer-inspection=0 17_entrance difficulty=1 passed
+17_entrance start=GameStartPoint0 multiplayer-inspection=0 17_entrance difficulty=0 passed
+17_entrance start=GameStartPoint0 multiplayer-inspection=0 17_entrance difficulty=2 passed
+AUDIT 17_entrance PASS
+18_temple start=GameStartPoint0 multiplayer-inspection=0 18_temple difficulty=1 passed
+18_temple start=GameStartPoint0 multiplayer-inspection=0 18_temple difficulty=0 passed
+18_temple start=GameStartPoint0 multiplayer-inspection=0 18_temple difficulty=2 passed
+AUDIT 18_temple PASS
+19_lobby start=GameStartPoint0 multiplayer-inspection=0 19_lobby difficulty=1 passed
+19_lobby start=GameStartPoint0 multiplayer-inspection=0 19_lobby difficulty=0 passed
+19_lobby start=GameStartPoint0 multiplayer-inspection=0 19_lobby difficulty=2 passed
+AUDIT 19_lobby PASS
+19_lobbyb start=revisit multiplayer-inspection=0 19_lobbyb difficulty=1 passed
+19_lobbyb start=revisit multiplayer-inspection=0 19_lobbyb difficulty=0 passed
+19_lobbyb start=revisit multiplayer-inspection=0 19_lobbyb difficulty=2 passed
+AUDIT 19_lobbyb PASS
+19_lobbyc start=revisit2 multiplayer-inspection=0 19_lobbyc difficulty=1 passed
+19_lobbyc start=revisit2 multiplayer-inspection=0 19_lobbyc difficulty=0 passed
+19_lobbyc start=revisit2 multiplayer-inspection=0 19_lobbyc difficulty=2 passed
+AUDIT 19_lobbyc PASS
+20_powerstation start=noname multiplayer-inspection=0 20_powerstation difficulty=1 passed
+20_powerstation start=noname multiplayer-inspection=0 20_powerstation difficulty=0 passed
+20_powerstation start=noname multiplayer-inspection=0 20_powerstation difficulty=2 passed
+AUDIT 20_powerstation PASS
+21_laboratory start=noname multiplayer-inspection=0 21_laboratory difficulty=1 passed
+21_laboratory start=noname multiplayer-inspection=0 21_laboratory difficulty=0 passed
+21_laboratory start=noname multiplayer-inspection=0 21_laboratory difficulty=2 passed
+AUDIT 21_laboratory PASS
+22_office start=start multiplayer-inspection=0 22_office difficulty=1 passed
+22_office start=start multiplayer-inspection=0 22_office difficulty=0 passed
+22_office start=start multiplayer-inspection=0 22_office difficulty=2 passed
+AUDIT 22_office PASS
+23_rooftop entry=244 class=EnhancedGideon Class not ported: Required original class is not registered
+23_rooftop: World initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+AUDIT 23_rooftop FAIL
+24_ancientcity entry=312 class=UndeadGideon Class not ported: Required original class is not registered
+24_ancientcity entry=390 class=EnhancedGideon Class not ported: Required original class is not registered
+24_ancientcity: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services
+AUDIT 24_ancientcity FAIL
+24b_arena entry=110 class=IshmaelREV Class not ported: Required original class is not registered
+24b_arena: World initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+AUDIT 24b_arena FAIL
+25_ancientone entry=15 class=AncientOne Class not ported: Required original class is not registered
+25_ancientone entry=22 class=AncientOneTentacle Class not ported: Required original class is not registered
+25_ancientone entry=23 class=AncientOneTentacle Class not ported: Required original class is not registered
+25_ancientone entry=24 class=AncientOneTentacle Class not ported: Required original class is not registered
+25_ancientone entry=25 class=AncientOneTentacle Class not ported: Required original class is not registered
+25_ancientone entry=26 class=AncientOneTentacle Class not ported: Required original class is not registered
+25_ancientone entry=27 class=AncientOneTentacle Class not ported: Required original class is not registered
+25_ancientone entry=28 class=AncientOneTentacle Class not ported: Required original class is not registered
+25_ancientone entry=29 class=AncientOneTentacle Class not ported: Required original class is not registered
+25_ancientone entry=117 class=AncientOneTentacle Class not ported: Required original class is not registered
+25_ancientone entry=118 class=AncientOneTentacle Class not ported: Required original class is not registered
+25_ancientone entry=119 class=AncientOneTentacle Class not ported: Required original class is not registered
+25_ancientone entry=120 class=AncientOneTentacle Class not ported: Required original class is not registered
+25_ancientone entry=121 class=AncientOneTentacle Class not ported: Required original class is not registered
+25_ancientone entry=122 class=AncientOneTentacle Class not ported: Required original class is not registered
+25_ancientone entry=123 class=AncientOneTentacle Class not ported: Required original class is not registered
+25_ancientone entry=124 class=AncientOneTentacle Class not ported: Required original class is not registered
+25_ancientone entry=125 class=AncientOne Class not ported: Required original class is not registered
+25_ancientone entry=202 class=IshmaelAI Class not ported: Required original class is not registered
+25_ancientone: World initialization rejected: 19 unsupported classes, 0 failed entries, 0 unavailable services
+AUDIT 25_ancientone FAIL
+credits start=GameStartPoint multiplayer-inspection=0 credits difficulty=1 passed
+credits start=GameStartPoint multiplayer-inspection=0 credits difficulty=0 passed
+credits start=GameStartPoint multiplayer-inspection=0 credits difficulty=2 passed
+AUDIT credits PASS
+drop start=GameStartPoint0 multiplayer-inspection=0 drop difficulty=1 passed
+drop start=GameStartPoint0 multiplayer-inspection=0 drop difficulty=0 passed
+drop start=GameStartPoint0 multiplayer-inspection=0 drop difficulty=2 passed
+AUDIT drop PASS
+end entry=14 class=IshmaelAI Class not ported: Required original class is not registered
+end: World initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+AUDIT end FAIL
+multi/bb_area15 start=noname multiplayer-inspection=1 multi/bb_area15 difficulty=1 passed
+multi/bb_area15 start=noname multiplayer-inspection=1 multi/bb_area15 difficulty=0 passed
+multi/bb_area15 start=noname multiplayer-inspection=1 multi/bb_area15 difficulty=2 passed
+AUDIT multi/bb_area15 PASS
+multi/bb_bloodarena start=noname multiplayer-inspection=0 multi/bb_bloodarena difficulty=1 passed
+multi/bb_bloodarena start=noname multiplayer-inspection=0 multi/bb_bloodarena difficulty=0 passed
+multi/bb_bloodarena start=noname multiplayer-inspection=0 multi/bb_bloodarena difficulty=2 passed
+AUDIT multi/bb_bloodarena PASS
+multi/bb_bloodkeep start=GameStartPoint4 multiplayer-inspection=1 multi/bb_bloodkeep difficulty=1 passed
+multi/bb_bloodkeep start=GameStartPoint4 multiplayer-inspection=1 multi/bb_bloodkeep difficulty=0 passed
+multi/bb_bloodkeep start=GameStartPoint4 multiplayer-inspection=1 multi/bb_bloodkeep difficulty=2 passed
+AUDIT multi/bb_bloodkeep PASS
+multi/bb_bodies start=GameStartPoint0 multiplayer-inspection=0 multi/bb_bodies difficulty=1 passed
+multi/bb_bodies start=GameStartPoint0 multiplayer-inspection=0 multi/bb_bodies difficulty=0 passed
+multi/bb_bodies start=GameStartPoint0 multiplayer-inspection=0 multi/bb_bodies difficulty=2 passed
+AUDIT multi/bb_bodies PASS
+multi/bb_bridge start=noname multiplayer-inspection=0 multi/bb_bridge difficulty=1 passed
+multi/bb_bridge start=noname multiplayer-inspection=0 multi/bb_bridge difficulty=0 passed
+multi/bb_bridge start=noname multiplayer-inspection=0 multi/bb_bridge difficulty=2 passed
+AUDIT multi/bb_bridge PASS
+multi/bb_brownstar start=noname multiplayer-inspection=1 multi/bb_brownstar difficulty=1 passed
+multi/bb_brownstar start=noname multiplayer-inspection=1 multi/bb_brownstar difficulty=0 passed
+multi/bb_brownstar start=noname multiplayer-inspection=1 multi/bb_brownstar difficulty=2 passed
+AUDIT multi/bb_brownstar PASS
+multi/bb_cabana start=GameStartPoint8 multiplayer-inspection=0 multi/bb_cabana difficulty=1 passed
+multi/bb_cabana start=GameStartPoint8 multiplayer-inspection=0 multi/bb_cabana difficulty=0 passed
+multi/bb_cabana start=GameStartPoint8 multiplayer-inspection=0 multi/bb_cabana difficulty=2 passed
+AUDIT multi/bb_cabana PASS
+multi/bb_chosenarena start=GameStartPoint0 multiplayer-inspection=0 multi/bb_chosenarena difficulty=1 passed
+multi/bb_chosenarena start=GameStartPoint0 multiplayer-inspection=0 multi/bb_chosenarena difficulty=0 passed
+multi/bb_chosenarena start=GameStartPoint0 multiplayer-inspection=0 multi/bb_chosenarena difficulty=2 passed
+AUDIT multi/bb_chosenarena PASS
+multi/bb_condemned start=GameStartPoint9 multiplayer-inspection=1 multi/bb_condemned difficulty=1 passed
+multi/bb_condemned start=GameStartPoint9 multiplayer-inspection=1 multi/bb_condemned difficulty=0 passed
+multi/bb_condemned start=GameStartPoint9 multiplayer-inspection=1 multi/bb_condemned difficulty=2 passed
+AUDIT multi/bb_condemned PASS
+multi/bb_crypt start=GameStartPoint10 multiplayer-inspection=1 multi/bb_crypt difficulty=1 passed
+multi/bb_crypt start=GameStartPoint10 multiplayer-inspection=1 multi/bb_crypt difficulty=0 passed
+multi/bb_crypt start=GameStartPoint10 multiplayer-inspection=1 multi/bb_crypt difficulty=2 passed
+AUDIT multi/bb_crypt PASS
+multi/bb_deathcanyon start=GameStartPoint0 multiplayer-inspection=0 multi/bb_deathcanyon difficulty=1 passed
+multi/bb_deathcanyon start=GameStartPoint0 multiplayer-inspection=0 multi/bb_deathcanyon difficulty=0 passed
+multi/bb_deathcanyon start=GameStartPoint0 multiplayer-inspection=0 multi/bb_deathcanyon difficulty=2 passed
+AUDIT multi/bb_deathcanyon PASS
+multi/bb_drain start=GameStartPoint0 multiplayer-inspection=0 multi/bb_drain difficulty=1 passed
+multi/bb_drain start=GameStartPoint0 multiplayer-inspection=0 multi/bb_drain difficulty=0 passed
+multi/bb_drain start=GameStartPoint0 multiplayer-inspection=0 multi/bb_drain difficulty=2 passed
+AUDIT multi/bb_drain PASS
+multi/bb_dustbowl start=GameStartPoint0 multiplayer-inspection=0 multi/bb_dustbowl difficulty=1 passed
+multi/bb_dustbowl start=GameStartPoint0 multiplayer-inspection=0 multi/bb_dustbowl difficulty=0 passed
+multi/bb_dustbowl start=GameStartPoint0 multiplayer-inspection=0 multi/bb_dustbowl difficulty=2 passed
+AUDIT multi/bb_dustbowl PASS
+multi/bb_fields start=GameStartPoint0 multiplayer-inspection=0 multi/bb_fields difficulty=1 passed
+multi/bb_fields start=GameStartPoint0 multiplayer-inspection=0 multi/bb_fields difficulty=0 passed
+multi/bb_fields start=GameStartPoint0 multiplayer-inspection=0 multi/bb_fields difficulty=2 passed
+AUDIT multi/bb_fields PASS
+multi/bb_jgrave start=GameStartPoint0 multiplayer-inspection=0 multi/bb_jgrave difficulty=1 passed
+multi/bb_jgrave start=GameStartPoint0 multiplayer-inspection=0 multi/bb_jgrave difficulty=0 passed
+multi/bb_jgrave start=GameStartPoint0 multiplayer-inspection=0 multi/bb_jgrave difficulty=2 passed
+AUDIT multi/bb_jgrave PASS
+multi/bb_midgard start=GameStartPoint0 multiplayer-inspection=0 multi/bb_midgard difficulty=1 passed
+multi/bb_midgard start=GameStartPoint0 multiplayer-inspection=0 multi/bb_midgard difficulty=0 passed
+multi/bb_midgard start=GameStartPoint0 multiplayer-inspection=0 multi/bb_midgard difficulty=2 passed
+AUDIT multi/bb_midgard PASS
+multi/bb_power start=GameStartPoint0 multiplayer-inspection=0 multi/bb_power difficulty=1 passed
+multi/bb_power start=GameStartPoint0 multiplayer-inspection=0 multi/bb_power difficulty=0 passed
+multi/bb_power start=GameStartPoint0 multiplayer-inspection=0 multi/bb_power difficulty=2 passed
+AUDIT multi/bb_power PASS
+multi/bb_rooftop start=GameStartPoint1 multiplayer-inspection=1 multi/bb_rooftop difficulty=1 passed
+multi/bb_rooftop start=GameStartPoint1 multiplayer-inspection=1 multi/bb_rooftop difficulty=0 passed
+multi/bb_rooftop start=GameStartPoint1 multiplayer-inspection=1 multi/bb_rooftop difficulty=2 passed
+AUDIT multi/bb_rooftop PASS
+multi/ctf_cabana entry=136 class=FlagStand Class not ported: Required original class is not registered
+multi/ctf_cabana entry=137 class=FlagStand Class not ported: Required original class is not registered
+multi/ctf_cabana: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services
+AUDIT multi/ctf_cabana FAIL
+multi/ctf_deadcities entry=588 class=FlagStand Class not ported: Required original class is not registered
+multi/ctf_deadcities entry=589 class=FlagStand Class not ported: Required original class is not registered
+multi/ctf_deadcities: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services
+AUDIT multi/ctf_deadcities FAIL
+multi/ctf_dmx entry=485 class=FlagStand Class not ported: Required original class is not registered
+multi/ctf_dmx entry=486 class=FlagStand Class not ported: Required original class is not registered
+multi/ctf_dmx: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services
+AUDIT multi/ctf_dmx FAIL
+multi/ctf_jam entry=516 class=FlagStand Class not ported: Required original class is not registered
+multi/ctf_jam entry=517 class=FlagStand Class not ported: Required original class is not registered
+multi/ctf_jam: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services
+AUDIT multi/ctf_jam FAIL
+AUDIT TOTAL passed=49 failed=9

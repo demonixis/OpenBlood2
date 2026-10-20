@@ -1,5 +1,11 @@
 # Blood2 Project Instructions
 
+The [original Orb continuation](Documentation/contracts/orb_contracts.md) adds both flying/attached modes, source damage clocks,
+actual trails/fragments/audio and the alternate player camera. Preserve signed
+velocity targeting, checked Orb/Seeing Eye priority, aim during movement blocking,
+source no-timeout flight and deferred camera/link cleanup. Ishmael/boss/flag classes
+remain in the complete-level backlog; this does not reopen M2.
+
 The [Gabriella/Ophelia continuation](Documentation/contracts/chosen_ai_contracts.md) adds original AI/REV profiles,
 combat, weapon switching, escape and timed sidesteps. Preserve independent class
 tables, Ophelia's sniper crouch, revenant target-loss branches, original empty

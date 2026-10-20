@@ -16,12 +16,12 @@ namespace OpenBlood2
         }
         ExplosionFragmentReport report{next_event_++, type, std::string(source), {}, {}, {}, {}};
         if (!physics_vector(pos) || !physics_vector(normal) || vector_dot(normal, normal) < 1e-12f ||
-            (type > 3 && type != 6 && type != 8))
+            (type > 3 && type != 6 && type != 8 && type != 21))
         {
             report.error = "Invalid explosion or unavailable fragment recipe";
             ++failed;
         }
-        else if (type == 3)
+        else if (type == 3 || type == 21)
         {
             normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
             auto draw = [&](float lo, float hi)
@@ -30,22 +30,22 @@ namespace OpenBlood2
                                 float(std::minstd_rand::max() - std::minstd_rand::min());
             };
             // Original loop draws a NEW bound at every condition, not one count.
-            for (unsigned i = 0; i < 2 + (random_() - std::minstd_rand::min()) % 4; ++i)
+            for (unsigned i = 0; (type == 21 ? i < 10 : i < 2 + (random_() - std::minstd_rand::min()) % 4); ++i)
             {
                 ExplosionFragSettings s;
                 s.position = pos;
                 s.normal = normal;
-                s.scale = {1, 1, 1};
+                s.scale = type == 21 ? DVector{.25f, .25f, .25f} : DVector{1, 1, 1};
                 s.rotate_max = {1, 1, 1};
-                s.bounce = .25f;
-                s.duration = 10;
-                s.gravity = 1;
+                s.bounce = type == 21 ? .5f : .25f;
+                s.duration = type == 21 ? 7 : 10;
+                s.gravity = type == 21 ? .125f : 1;
                 s.fade_time = 2;
-                s.trail_type = 1;
+                s.trail_type = type == 21 ? 34 : 1;
                 s.model = "Models\\Gibs\\gibmetal2.abc";
                 s.skin = "Skins\\Gibs\\gibmetal3.dtx";
-                s.spread = draw(40, 60);
-                s.velocity = draw(20, 40);
+                s.spread = type == 21 ? draw(2, 15) : draw(40, 60);
+                s.velocity = type == 21 ? draw(3, 6) : draw(20, 40);
                 CExplosionFragFX fx;
                 std::string failure;
                 if (active.size() >= 128 || next_id_ == UINT64_MAX)
@@ -72,6 +72,12 @@ namespace OpenBlood2
                     {
                         ++trail_failed;
                         report.unavailable = trail_failure;
+                        if (type == 21)
+                        {
+                            if (!report.error.empty())
+                                report.error += "; ";
+                            report.error += trail_failure;
+                        }
                     }
                     report.fragments.push_back(fx.id);
                     active.push_back(std::move(fx));

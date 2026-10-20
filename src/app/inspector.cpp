@@ -15,6 +15,7 @@
 #include "game/original/LeechProjectile.h"
 #include "game/original/Minefield.h"
 #include "game/original/NewStatusBar.h"
+#include "game/original/OrbProjectile.h"
 #include "game/original/Projectile.h"
 #include "game/original/ProximityBomb.h"
 #include "game/original/RemoteBomb.h"
@@ -1009,6 +1010,16 @@ namespace OpenBlood2
                                 ImGui::Text(
                                     "Alternate flare: cached velocity %s / emitted children %u / effect type %u",
                                     flare->get_velocity ? "pending" : "yes", flare->children, flare->explosion_type);
+                            if (const auto* orb = dynamic_cast<const COrbProjectile*>(projectile))
+                            {
+                                ImGui::Text("Orb: alternate %d / attached %d / ticks %llu / trail %llu / camera %d",
+                                            orb->alternate, orb->attached, (unsigned long long)orb->damage_ticks,
+                                            (unsigned long long)orb->trail, orb->camera_started);
+                                if (!orb->sound_error.empty())
+                                    ImGui::TextWrapped("Audio: %s", orb->sound_error.c_str());
+                                if (!orb->camera_error.empty())
+                                    ImGui::TextWrapped("Camera: %s", orb->camera_error.c_str());
+                            }
                             if (const auto* leech = dynamic_cast<const CLeechPrimeProjectile*>(projectile))
                             {
                                 ImGui::Text(

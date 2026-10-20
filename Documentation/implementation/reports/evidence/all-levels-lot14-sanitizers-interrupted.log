@@ -1,0 +1,84 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start    3: objects.builtin_model
+ 1/80 Test    #3: objects.builtin_model ............   Passed    0.02 sec
+      Start    4: objects.original_objects
+ 2/80 Test    #4: objects.original_objects .........   Passed    0.02 sec
+      Start    5: objects.nested_creation
+ 3/80 Test    #5: objects.nested_creation ..........   Passed    0.02 sec
+      Start    6: objects.reasons_properties
+ 4/80 Test    #6: objects.reasons_properties .......   Passed    0.02 sec
+      Start    7: objects.scheduling
+ 5/80 Test    #7: objects.scheduling ...............   Passed    0.02 sec
+      Start    8: objects.deferred_removal
+ 6/80 Test    #8: objects.deferred_removal .........   Passed    0.02 sec
+      Start    9: objects.aggregate_dispatch
+ 7/80 Test    #9: objects.aggregate_dispatch .......   Passed    0.02 sec
+      Start   10: objects.handles_selection
+ 8/80 Test   #10: objects.handles_selection ........   Passed    0.02 sec
+      Start   11: objects.links_lists
+ 9/80 Test   #11: objects.links_lists ..............   Passed    0.02 sec
+      Start   12: objects.messages_strings
+10/80 Test   #12: objects.messages_strings .........   Passed    0.04 sec
+      Start   13: objects.message_churn
+11/80 Test   #13: objects.message_churn ............   Passed    5.78 sec
+      Start   14: objects.message_limit
+12/80 Test   #14: objects.message_limit ............   Passed    0.40 sec
+      Start   15: objects.unsupported_teardown
+13/80 Test   #15: objects.unsupported_teardown .....   Passed    0.07 sec
+      Start   16: objects.creation_failures
+14/80 Test   #16: objects.creation_failures ........   Passed    0.04 sec
+      Start  230: cameras.defaults
+15/80 Test  #230: cameras.defaults .................   Passed    0.02 sec
+      Start  231: cameras.timing
+16/80 Test  #231: cameras.timing ...................   Passed    0.02 sec
+      Start  232: cameras.links
+17/80 Test  #232: cameras.links ....................   Passed    0.02 sec
+      Start  233: cameras.selection
+18/80 Test  #233: cameras.selection ................   Passed    0.02 sec
+      Start  234: cameras.player
+19/80 Test  #234: cameras.player ...................   Passed    0.19 sec
+      Start  235: cameras.validation
+20/80 Test  #235: cameras.validation ...............   Passed    0.02 sec
+      Start  236: cameras.catalog
+21/80 Test  #236: cameras.catalog ..................   Passed   35.59 sec
+      Start  526: ai_runtime.ammo_receive
+22/80 Test  #526: ai_runtime.ammo_receive ..........   Passed    0.02 sec
+      Start  527: ai_runtime.ammo_search
+23/80 Test  #527: ai_runtime.ammo_search ...........   Passed    0.02 sec
+      Start  528: ai_runtime.activation
+24/80 Test  #528: ai_runtime.activation ............   Passed    0.02 sec
+      Start  529: ai_runtime.animation_clearance
+25/80 Test  #529: ai_runtime.animation_clearance ...   Passed    0.03 sec
+      Start  530: ai_runtime.visibility
+26/80 Test  #530: ai_runtime.visibility ............   Passed    0.02 sec
+      Start  531: ai_runtime.visibility_filter
+27/80 Test  #531: ai_runtime.visibility_filter .....   Passed    0.03 sec
+      Start  532: ai_runtime.visibility_atomic
+28/80 Test  #532: ai_runtime.visibility_atomic .....   Passed    0.02 sec
+      Start  533: ai_runtime.lifetime
+29/80 Test  #533: ai_runtime.lifetime ..............   Passed    0.03 sec
+      Start  534: ai_runtime.targets
+30/80 Test  #534: ai_runtime.targets ...............   Passed    0.02 sec
+      Start  535: ai_runtime.tracking
+31/80 Test  #535: ai_runtime.tracking ..............   Passed    0.02 sec
+      Start  536: ai_runtime.camera
+32/80 Test  #536: ai_runtime.camera ................   Passed    0.02 sec
+      Start  537: ai_runtime.spatial
+33/80 Test  #537: ai_runtime.spatial ...............   Passed    0.02 sec
+      Start  538: ai_runtime.triggers
+34/80 Test  #538: ai_runtime.triggers ..............   Passed    0.02 sec
+      Start  539: ai_runtime.body
+35/80 Test  #539: ai_runtime.body ..................   Passed    0.02 sec
+      Start  540: ai_runtime.missing
+36/80 Test  #540: ai_runtime.missing ...............   Passed    0.02 sec
+      Start  541: ai_runtime.catalog
+37/80 Test  #541: ai_runtime.catalog ...............   Passed    2.29 sec
+      Start  542: ai_runtime.failures
+38/80 Test  #542: ai_runtime.failures ..............   Passed    0.42 sec
+      Start  543: ai_runtime.subway
+39/80 Test  #543: ai_runtime.subway ................   Passed   23.49 sec
+      Start  544: ai_runtime.arena
+40/80 Test  #544: ai_runtime.arena .................   Passed    1.78 sec
+      Start  545: ai_runtime.sparse_weapons
+41/80 Test  #545: ai_runtime.sparse_weapons ........   Passed    0.61 sec
+      Start  546: ai_runtime.clearance_private
