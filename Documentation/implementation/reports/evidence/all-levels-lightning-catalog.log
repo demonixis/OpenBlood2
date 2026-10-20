@@ -1,0 +1,11 @@
+20_powerstation KABOOM sound=Sounds\Thunder.wav indexed=0 fires=1 fxerror= audioerror=Missing or oversized sound resource from=512,-224,1896 to=513.968,-64,2057.11
+21_laboratory lightning2 sound=Sounds\Events\zap3.wav indexed=1 fires=1 fxerror= audioerror= from=-784,-272,-1200 to=-789.573,-272,-1599.1
+24b_arena Lightning1 sound=Sounds\Ambient\Lightning2.wav indexed=1 fires=1 fxerror= audioerror= from=480,496,0 to=480,-22.5598,6.18172e-05
+24b_arena Lightning1 sound=Sounds\Ambient\Lightning2.wav indexed=1 fires=1 fxerror= audioerror= from=-480,496,0 to=-480,-22.5598,3.09086e-05
+24b_arena Lightning1 sound=Sounds\Ambient\Lightning2.wav indexed=1 fires=1 fxerror= audioerror= from=0,496,480 to=0,-22.5598,480
+25_ancientone Lightning1 sound=Sounds\Thunder.wav indexed=0 fires=1 fxerror= audioerror=Missing or oversized sound resource from=-4032,-416,-64 to=-2743.65,322.695,407.469
+25_ancientone Lightning2 sound=Sounds\Thunder.wav indexed=0 fires=1 fxerror= audioerror=Missing or oversized sound resource from=-4096,-416,-96 to=-3567.44,1536,-1480.16
+25_ancientone Lightning3 sound=Sounds\Thunder.wav indexed=0 fires=1 fxerror= audioerror=Missing or oversized sound resource from=-4000,-416,-96 to=-5695.47,570.859,1854.42
+25_ancientone Lightning4 sound=Sounds\Thunder.wav indexed=0 fires=1 fxerror= audioerror=Missing or oversized sound resource from=-4096,-416,-32 to=-2544.24,1536,1823.88
+25_ancientone Lightning5 sound=Sounds\Thunder.wav indexed=0 fires=1 fxerror= audioerror=Missing or oversized sound resource from=-4032,-416,-96 to=-4759.97,1536,2409.69
+TOTAL 10

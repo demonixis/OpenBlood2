@@ -1,0 +1,29 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1120: reported_levels.20_powerstation
+1/4 Test #1120: reported_levels.20_powerstation ...***Failed    0.29 sec
+20_powerstation: SparksObj CVBC:  Missing or oversized sound resource
+
+    Start 1121: reported_levels.21_laboratory
+2/4 Test #1121: reported_levels.21_laboratory .....   Passed    3.73 sec
+    Start 1152: lightning.formulas
+3/4 Test #1152: lightning.formulas ................   Passed    0.02 sec
+    Start 1153: lightning.emitter
+4/4 Test #1153: lightning.emitter .................***Failed    0.01 sec
+Lightning radius damage cancelled 
+117: light->fires == 1 && light->event && light->error.empty() && light->voice && light->sound_error.empty() 
+
+
+50% tests passed, 2 tests failed out of 4
+
+Label Time Summary:
+campaign        =   4.02 sec*proc (2 tests)
+headless        =   4.05 sec*proc (4 tests)
+lightning       =   0.03 sec*proc (2 tests)
+private-data    =   4.05 sec*proc (4 tests)
+
+Total Test time (real) =   4.07 sec
+
+The following tests FAILED:
+	1120 - reported_levels.20_powerstation (Failed)          campaign headless private-data
+	1153 - lightning.emitter (Failed)                        headless lightning private-data
+Errors while running CTest

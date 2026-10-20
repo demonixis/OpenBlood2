@@ -1,0 +1,81 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start    3: objects.builtin_model
+ 1/33 Test    #3: objects.builtin_model .............   Passed    0.00 sec
+      Start    4: objects.original_objects
+ 2/33 Test    #4: objects.original_objects ..........   Passed    0.00 sec
+      Start    5: objects.nested_creation
+ 3/33 Test    #5: objects.nested_creation ...........   Passed    0.00 sec
+      Start    6: objects.reasons_properties
+ 4/33 Test    #6: objects.reasons_properties ........   Passed    0.00 sec
+      Start    7: objects.scheduling
+ 5/33 Test    #7: objects.scheduling ................   Passed    0.00 sec
+      Start    8: objects.deferred_removal
+ 6/33 Test    #8: objects.deferred_removal ..........   Passed    0.00 sec
+      Start    9: objects.aggregate_dispatch
+ 7/33 Test    #9: objects.aggregate_dispatch ........   Passed    0.00 sec
+      Start   10: objects.handles_selection
+ 8/33 Test   #10: objects.handles_selection .........   Passed    0.00 sec
+      Start   11: objects.links_lists
+ 9/33 Test   #11: objects.links_lists ...............   Passed    0.00 sec
+      Start   12: objects.messages_strings
+10/33 Test   #12: objects.messages_strings ..........   Passed    0.00 sec
+      Start   13: objects.message_churn
+11/33 Test   #13: objects.message_churn .............   Passed    0.09 sec
+      Start   14: objects.message_limit
+12/33 Test   #14: objects.message_limit .............   Passed    0.03 sec
+      Start   15: objects.unsupported_teardown
+13/33 Test   #15: objects.unsupported_teardown ......   Passed    0.00 sec
+      Start   16: objects.creation_failures
+14/33 Test   #16: objects.creation_failures .........   Passed    0.00 sec
+      Start  106: weapons.inventory
+15/33 Test  #106: weapons.inventory .................   Passed    0.00 sec
+      Start  107: weapons.segments
+16/33 Test  #107: weapons.segments ..................   Passed    0.00 sec
+      Start  108: weapons.firing
+17/33 Test  #108: weapons.firing ....................   Passed    0.00 sec
+      Start  109: weapons.melee
+18/33 Test  #109: weapons.melee .....................   Passed    0.00 sec
+      Start  110: weapons.damage
+19/33 Test  #110: weapons.damage ....................   Passed    0.00 sec
+      Start  111: weapons.animation
+20/33 Test  #111: weapons.animation .................   Passed    0.01 sec
+      Start  112: weapons.lifetime
+21/33 Test  #112: weapons.lifetime ..................   Passed    0.00 sec
+      Start  113: weapons.rollback
+22/33 Test  #113: weapons.rollback ..................   Passed    0.00 sec
+      Start  114: weapons.private
+23/33 Test  #114: weapons.private ...................   Passed    5.67 sec
+      Start  927: sparks.formulas
+24/33 Test  #927: sparks.formulas ...................   Passed    0.00 sec
+      Start  928: sparks.selection
+25/33 Test  #928: sparks.selection ..................   Passed    0.01 sec
+      Start  929: sparks.failures
+26/33 Test  #929: sparks.failures ...................   Passed    0.00 sec
+      Start  930: sparks.private
+27/33 Test  #930: sparks.private ....................   Passed    0.28 sec
+      Start 1120: reported_levels.20_powerstation
+28/33 Test #1120: reported_levels.20_powerstation ...   Passed    0.88 sec
+      Start 1121: reported_levels.21_laboratory
+29/33 Test #1121: reported_levels.21_laboratory .....   Passed    5.41 sec
+      Start 1150: world_actors.sparks
+30/33 Test #1150: world_actors.sparks ...............   Passed    0.02 sec
+      Start 1151: world_actors.caleb
+31/33 Test #1151: world_actors.caleb ................   Passed    0.02 sec
+      Start 1152: lightning.formulas
+32/33 Test #1152: lightning.formulas ................   Passed    0.03 sec
+      Start 1153: lightning.emitter
+33/33 Test #1153: lightning.emitter .................   Passed    0.03 sec
+
+100% tests passed, 0 tests failed out of 33
+
+Label Time Summary:
+campaign        =   6.33 sec*proc (4 tests)
+headless        =  12.53 sec*proc (33 tests)
+lightning       =   0.06 sec*proc (2 tests)
+objects         =   0.14 sec*proc (14 tests)
+private         =   5.95 sec*proc (2 tests)
+private-data    =   6.39 sec*proc (6 tests)
+sparks          =   0.30 sec*proc (4 tests)
+weapons         =   5.70 sec*proc (9 tests)
+
+Total Test time (real) =  12.55 sec

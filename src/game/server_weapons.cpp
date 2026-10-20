@@ -1,4 +1,5 @@
 #include "engine/world_model.h"
+#include "game/original/ClientLightningSFX.h"
 #include "game/original/DestructableBrush.h"
 #include "game/original/DestructableModel.h"
 #include "game/original/Door.h"
@@ -115,10 +116,15 @@ namespace OpenBlood2
         auto* attacker = objects_.get(value.attacker);
         const auto* sender = objects_.get(m->sender);
         const auto* projectile = sender ? dynamic_cast<const CProjectile*>(sender->game.get()) : nullptr;
-        const bool attribution = sender && sender->life == Life::Alive &&
-                                 ((attacker && attacker->life == Life::Alive && m->sender == value.attacker) ||
-                                  (projectile && projectile->configured && projectile->m_hFiredFrom == value.attacker &&
-                                   (!value.attacker || (attacker && attacker->life == Life::Alive))));
+        const auto* lightning = sender ? dynamic_cast<const CClientLightningSFX*>(sender->game.get()) : nullptr;
+        const bool lightning_attribution = lightning && lightning->AllowsDamageAttribution(value.attacker) &&
+                                           value.area_effect && value.type == DamageType::Normal &&
+                                           (!value.attacker || (attacker && attacker->life == Life::Alive));
+        const bool attribution =
+            sender && sender->life == Life::Alive &&
+            (lightning_attribution || (attacker && attacker->life == Life::Alive && m->sender == value.attacker) ||
+             (projectile && projectile->configured && projectile->m_hFiredFrom == value.attacker &&
+              (!value.attacker || (attacker && attacker->life == Life::Alive))));
         if (m->id != damage_message || !m->bytes.empty() || m->damage || m->key || m->pickup || !attribution ||
             !physics_vector(value.position) || !physics_vector(value.direction) || !std::isfinite(value.amount) ||
             value.amount < 0 || value.amount > 1e6f ||

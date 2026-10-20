@@ -1,0 +1,37 @@
+{
+  "selection": "World lightning trigger/ray/damage/audio; original bolt and segment particles/lights",
+  "sources": [
+    {
+      "path": "sources/blood2/ObjectDLL/ClientLightningSFX.cpp",
+      "sha256": "41a38c20f5d019c4ed321b292c63b17e7862ff9a9ed31b853633086b2de3f338"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ClientLightningSFX.h",
+      "sha256": "06e9ea7b54a27d734f7a4a39337b98e598e9e8db657aeac18928b90998e9065d"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/LightningFX.cpp",
+      "sha256": "d66d01cde4b40f3fd7eb35253f9e69a4fabd0d3c28e266ac289a45906f79ab94"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/LightningFX.h",
+      "sha256": "56f81f64cd11baacb04126758faf1b1d66ef8bbf4b0a2d201429cca670ff75ec"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/LightningSegmentFX.cpp",
+      "sha256": "5e18b83951d3878fd3feb54c166a6141e6f28caaca9aec9aeaa5c2213ac95a5a"
+    },
+    {
+      "path": "sources/blood2/ClientShellDLL/LightningSegmentFX.h",
+      "sha256": "42305981f2d859eb7e4961a4a57d0ece0ac7c28d1d4d343fd889bda023411172"
+    },
+    {
+      "path": "sources/blood2/Shared/SFXMsgIds.h",
+      "sha256": "d835c9589f2338bad9606df92c8bd4394ea232ff2cc325b0c8aa4c49474d9f4f"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3"
+    }
+  ]
+}

@@ -25,6 +25,16 @@ namespace OpenBlood2
                 return false;
             scene.entries.back().client_effect = fx.id;
         }
+        for (const auto& bolt : game.server.lightning.active)
+            for (const auto& segment : bolt.segments)
+                for (unsigned i = 0; i < segment.particles.size(); ++i)
+                {
+                    if (!scene.add_particle(bolt.texture, segment.particles[i].position, segment.radius / 640.f,
+                                            segment.color, bolt.alpha, bolt.id, i, game.resources, error))
+                        return false;
+                    scene.entries.back().particle_system = 0;
+                    scene.entries.back().lightning_bolt = bolt.id;
+                }
         for (const auto& fx : game.server.sparks.active)
             for (unsigned i = 0; i < fx.particles.size(); ++i)
             {

@@ -2,6 +2,17 @@
 #include <cmath>
 namespace OpenBlood2
 {
+    std::uint64_t ServerAdapter::PublishLightning(HOBJECT source, const LightningSettings& settings, std::string& error)
+    {
+        trace_service("PublishLightning");
+        if (!IsObjectAlive(source) || !client_resources)
+        {
+            error = "Lightning owner/resources unavailable";
+            return 0;
+        }
+        return lightning.publish(settings, GetObjectName(source), *client_resources, objects_.time(), error);
+    }
+
     std::uint64_t ServerAdapter::PublishSparks(HOBJECT source, const SparkSettings& settings, std::string& error)
     {
         trace_service("PublishSparks");

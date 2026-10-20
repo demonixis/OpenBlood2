@@ -1,5 +1,11 @@
 # Blood2 Project Instructions
 
+The [world lightning continuation](Documentation/contracts/lightning_contracts.md) adds original ray/radius damage,
+actual bolt particles/fade and evaluated point-light states. Preserve trigger
+attribution, integer segment scaling, cumulative rotations, random-form typo
+and detached lifetime. Exact missing emitter sounds remain partial omissions;
+point-light illumination is still unavailable. M2 closure is unchanged.
+
 The [CalebAI/SparksObj continuation](Documentation/contracts/world_actor_contracts.md) adds original Caleb defaults/shared
 AI tables and real world sparks/audio requests. Preserve source Type-lookup,
 zero-origin particle, strict timing and OFF-clock quirks. The missing authored

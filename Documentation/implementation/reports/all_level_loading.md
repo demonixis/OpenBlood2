@@ -9,9 +9,9 @@ initial deltas, three seconds of simulation with movement, a runtime failure
 recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
 combat, multiplayer or GPU certification. M2 closure remains unchanged.
 
-Current verified opening gate after iteration 8: **44 / 58 pass, 14 / 58 fail**
-([audit 6](evidence/all-levels-audit-06.log)). Remaining worlds: Abandoned Buildings,
-Temple, Power Station, Laboratory, Office, Rooftop, Ancient City, Arena, Ancient One,
+Current verified opening gate after iteration 9: **46 / 58 pass, 12 / 58 fail**
+([audit 7](evidence/all-levels-audit-07.log)). Remaining worlds: Abandoned Buildings,
+Temple, Office, Rooftop, Ancient City, Arena, Ancient One,
 End and the four CTF maps. Initial-entry and three-second simulation
 coverage is not complete gameplay/traversal acceptance. The tables below retain
 the initial baseline; iteration records explain resolved and newly exposed blockers.
@@ -300,3 +300,45 @@ default spark sound and a missing collision world in the isolated Caleb fixture.
 The sound test now authors an explicitly present sound; the Caleb fixture installs
 a floor. Production defaults and strict animation/resize checks were preserved.
 These initial failures remain distinct from the passing reruns.
+
+## Iteration 9: original lightning and explicit partial sound omissions
+
+[Lightning contracts](../../contracts/lightning_contracts.md) describe the original
+ray, trigger-attributed radius damage, segment shapes, particle fade and detached
+lifetime. Actual DTX billboards render through the existing particle path. Three
+point-light states are evaluated; their world illumination remains unavailable.
+Power Station and Laboratory now pass all three difficulties and short simulation.
+
+Exact authored missing emitter sounds remain visible partial omissions on their
+Created entries. This applies to Power Station CVBC/KABOOM and Ancient One
+Lightning1–5. The sound is never substituted or reported as played. The exception
+requires the actual DAT-created object, authored path and missing resource; a
+runtime lookalike with the same name still fails. Visual/damage failures remain
+fatal. [Catalog activation](evidence/all-levels-lightning-catalog.log) exercises
+all ten surviving emitters: four real voices and six missing Thunder requests.
+
+[Initial tests](evidence/all-levels-lot9-dev-initial.log) fail on CVBC's absent
+sound and the old damage-attribution guard. Lightning now grants attribution
+only during its synchronous source radius delivery; outside-event forgery stays
+rejected. The failed run remains separate from passing reruns.
+
+Validation: [33 Dev regressions](evidence/all-levels-lot9-dev.log),
+[34 ASan/UBSan/leak regressions](evidence/all-levels-lot9-sanitizers.log),
+[6 Release tests including GPU readback](evidence/all-levels-lot9-release.log) pass.
+The final source-identity guard passes [5 Dev cases](evidence/all-levels-lot9-dev-final.log),
+the added [runtime-lookalike case](evidence/all-levels-lot9-catalog-identity.log),
+[3 sanitizer cases](evidence/all-levels-lot9-san-identity.log) and
+[5 Release cases](evidence/all-levels-lot9-release-identity.log). Both applications
+build. GPU readback checks visible bolt pixels, fading, particle expiry and
+remaining light lifetime.
+
+![Original lightning particles](evidence/all-levels-lightning.png)
+
+[Power Station](evidence/all-levels-powerstation-gpu.log) and
+[Laboratory](evidence/all-levels-laboratory-gpu.log) each render three Release
+frames on NVIDIA RTX 3060, dummy audio, and exit 0.
+[Exhaustive audit 7](evidence/all-levels-audit-07.log) passes **46 / 58** and fails
+**12 / 58**. Remaining work: LifeLeech, WarpGate, Chosen/REV and boss behavior,
+FlagStand/FlagObject, and Office's unknown authored TheAngerPU destruction spawn.
+No alias is supplied. Opening and short simulation do not certify full traversal,
+network play or global M3 acceptance.

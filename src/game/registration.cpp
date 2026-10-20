@@ -12,6 +12,7 @@
 #include "game/original/CivilianAI.h"
 #include "game/original/ClientExplosionSFX.h"
 #include "game/original/ClientLightFX.h"
+#include "game/original/ClientLightningSFX.h"
 #include "game/original/ClientParticleStreamSFX.h"
 #include "game/original/ClientSplatFX.h"
 #include "game/original/ConversationTrigger.h"
@@ -505,6 +506,16 @@ namespace OpenBlood2
                     p.push_back({"AIWeapon" + std::to_string(i), std::string{}, false, 31});
                 return p;
             }()};
+        const ClassInfo lightning_sfx{"CClientLightningSFX",
+                                      &client_sfx,
+                                      construct<CClientLightningSFX>,
+                                      {{"LightningShape", std::int32_t(2)},
+                                       {"LightningForm", std::int32_t(1)},
+                                       {"LightningType", std::int32_t(2)},
+                                       {"Damage", 500.0f},
+                                       {"DamageRadius", 300.0f},
+                                       {"Sound", std::string("Sounds\\Thunder.wav")},
+                                       {"SoundRadius", 1000.0f}}};
         const ClassInfo caleb_ai{"CalebAI",
                                  &ai_manager,
                                  construct_npc<CalebAI, AI_Mgr::NPCType::Caleb>,
@@ -1150,20 +1161,20 @@ namespace OpenBlood2
                objects.register_class(builtin_container) && objects.register_class(builtin_sprite) &&
                objects.register_class(b2base) && objects.register_class(camera) && objects.register_class(client_sfx) &&
                objects.register_class(client_splat) && objects.register_class(particle_stream) &&
-               objects.register_class(scene_explosion) && objects.register_class(client_light) &&
-               objects.register_class(light_SquareWaveLightFX) && objects.register_class(light_SawWaveLightFX) &&
-               objects.register_class(light_RampUpWaveLightFX) && objects.register_class(light_RampDownWaveLightFX) &&
-               objects.register_class(light_SineWaveLightFX) && objects.register_class(light_Flicker1WaveLightFX) &&
-               objects.register_class(light_Flicker2WaveLightFX) && objects.register_class(light_Flicker3WaveLightFX) &&
-               objects.register_class(light_Flicker4WaveLightFX) && objects.register_class(light_StrobeWaveLightFX) &&
-               objects.register_class(light_SearchWaveLightFX) && objects.register_class(light_FlickerLight) &&
-               objects.register_class(light_GlowingLight) && objects.register_class(camera_object) &&
-               objects.register_class(cinematic_trigger) && objects.register_class(random_sound) &&
-               objects.register_class(sound_fx) && objects.register_class(detail_sprite) &&
-               objects.register_class(spawner) && objects.register_class(trip_laser) &&
-               objects.register_class(tchernotronic) && objects.register_class(sound) &&
-               objects.register_class(keyframer) && objects.register_class(key) && objects.register_class(start) &&
-               objects.register_class(game_start) && objects.register_class(path) &&
+               objects.register_class(lightning_sfx) && objects.register_class(scene_explosion) &&
+               objects.register_class(client_light) && objects.register_class(light_SquareWaveLightFX) &&
+               objects.register_class(light_SawWaveLightFX) && objects.register_class(light_RampUpWaveLightFX) &&
+               objects.register_class(light_RampDownWaveLightFX) && objects.register_class(light_SineWaveLightFX) &&
+               objects.register_class(light_Flicker1WaveLightFX) && objects.register_class(light_Flicker2WaveLightFX) &&
+               objects.register_class(light_Flicker3WaveLightFX) && objects.register_class(light_Flicker4WaveLightFX) &&
+               objects.register_class(light_StrobeWaveLightFX) && objects.register_class(light_SearchWaveLightFX) &&
+               objects.register_class(light_FlickerLight) && objects.register_class(light_GlowingLight) &&
+               objects.register_class(camera_object) && objects.register_class(cinematic_trigger) &&
+               objects.register_class(random_sound) && objects.register_class(sound_fx) &&
+               objects.register_class(detail_sprite) && objects.register_class(spawner) &&
+               objects.register_class(trip_laser) && objects.register_class(tchernotronic) &&
+               objects.register_class(sound) && objects.register_class(keyframer) && objects.register_class(key) &&
+               objects.register_class(start) && objects.register_class(game_start) && objects.register_class(path) &&
                objects.register_class(world_properties) && objects.register_class(smell) &&
                objects.register_class(exit_hint) && objects.register_class(character) &&
                objects.register_class(ai_manager) && objects.register_class(caleb_ai) &&

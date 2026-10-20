@@ -1,0 +1,24 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 1232: reported_levels.20_powerstation
+1/6 Test #1232: reported_levels.20_powerstation ...   Passed    0.71 sec
+    Start 1233: reported_levels.21_laboratory
+2/6 Test #1233: reported_levels.21_laboratory .....   Passed    3.81 sec
+    Start 1265: lightning.formulas
+3/6 Test #1265: lightning.formulas ................   Passed    0.02 sec
+    Start 1266: lightning.emitter
+4/6 Test #1266: lightning.emitter .................   Passed    0.02 sec
+    Start 1267: lightning.catalog
+5/6 Test #1267: lightning.catalog .................   Passed    0.20 sec
+    Start 1268: gpu.lightning
+6/6 Test #1268: gpu.lightning .....................   Passed    2.49 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Label Time Summary:
+campaign        =   4.53 sec*proc (2 tests)
+gpu             =   2.49 sec*proc (1 test)
+headless        =   4.76 sec*proc (5 tests)
+lightning       =   2.73 sec*proc (4 tests)
+private-data    =   7.25 sec*proc (6 tests)
+
+Total Test time (real) =   7.27 sec

@@ -56,3 +56,7 @@ and detached effect ownership are reused. Tests cover strict deadlines, source
 origin/type quirks, truncation, switch prefixes, OFF/removal ordering, unchanged
 clocks, missing sound, real particles/audio and unload. No renderer/dependency
 change, network support or complete campaign traversal is claimed.
+
+The [lightning continuation](lightning_contracts.md#exact-missing-authored-audio)
+now admits the exact CVBC source sound absence while retaining particles and
+its visible error. This supersedes the opening blocker above only for that row.

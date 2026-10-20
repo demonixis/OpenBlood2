@@ -1625,3 +1625,13 @@ SparksObj and CClientSparksSFX recipes use actual existing particle/audio servic
 [source hashes](sources/all_levels_world_actor_sources.json) preserve the boolean
 property lookup and zero-position packet quirks. No original files, assets or
 dependencies changed. Missing lightpop2.wav remains explicitly unresolved.
+
+## World lightning
+
+Original CClientLightningSFX, CLightningBoltFX and CLightningSegmentFX supply
+ray, attribution, damage/audio, segment geometry/colors, fade and child-light
+behavior. [Source hashes](sources/all_levels_lightning_sources.json) and
+[contracts](../contracts/lightning_contracts.md) record typed ownership,
+zero-initialized particle positions, finite empty segments and bounded storage.
+No shader, dependency or commercial/reference file changed. Exact missing
+Thunder/lightpop2 audio remains visible as partial source omissions.

@@ -1,4 +1,5 @@
 #include "game/original/BuiltinSprite.h"
+#include "game/original/ClientLightningSFX.h"
 #include "game/original/DetailSprite.h"
 #include "game/original/SparksObj.h"
 #include "inspector.h"
@@ -12,6 +13,34 @@ namespace OpenBlood2
                            "world-depth quads. "
                            "Rotatable sprites use their object pose; others face the camera. Unlit replacement "
                            "presentation: glow, view bias, no-Z and sky modes remain unavailable.");
+        if (ImGui::CollapsingHeader("Original lightning"))
+        {
+            const auto& bolts = game.server.lightning;
+            ImGui::Text("Active %zu | particles %zu | failed %llu", bolts.active.size(), bolts.live_particles(),
+                        (unsigned long long)bolts.failed);
+            for (auto id : game.objects.snapshot())
+                if (const auto* r = game.objects.get(id))
+                    if (const auto* emitter = dynamic_cast<const CClientLightningSFX*>(r->game.get()))
+                    {
+                        ImGui::Text("%s | fires %llu | damage deliveries %u | voice %llu", r->state.m_Name,
+                                    (unsigned long long)emitter->fires, emitter->targets.delivered,
+                                    (unsigned long long)emitter->voice);
+                        ImGui::TextWrapped("%s %s", emitter->error.c_str(), emitter->sound_error.c_str());
+                    }
+            for (const auto& bolt : bolts.active)
+            {
+                ImGui::Text("Bolt %llu | segments %zu | alpha %.3f", (unsigned long long)bolt.id, bolt.segments.size(),
+                            bolt.alpha);
+                for (const auto& light : bolt.lights)
+                    ImGui::Text("Point light %.1f %.1f %.1f | radius %.1f (illumination unavailable)",
+                                light.settings.position.x, light.settings.position.y, light.settings.position.z,
+                                light.radius);
+            }
+            for (const auto& report : bolts.reports)
+                ImGui::TextWrapped("Event %llu %s | segments %u | particles %u | ended %d | %s",
+                                   (unsigned long long)report.id, report.source.c_str(), report.segments,
+                                   report.particles, report.ended, report.error.c_str());
+        }
         draw_sparks(game);
         draw_blood_spurts(game);
         draw_blood_splats(game);

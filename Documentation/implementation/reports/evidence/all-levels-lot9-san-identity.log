@@ -1,0 +1,16 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 1143: lightning.formulas
+1/3 Test #1143: lightning.formulas ...............   Passed    0.31 sec
+    Start 1144: lightning.emitter
+2/3 Test #1144: lightning.emitter ................   Passed    0.30 sec
+    Start 1145: lightning.catalog
+3/3 Test #1145: lightning.catalog ................   Passed    9.27 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Label Time Summary:
+headless        =   9.88 sec*proc (3 tests)
+lightning       =   9.88 sec*proc (3 tests)
+private-data    =   9.88 sec*proc (3 tests)
+
+Total Test time (real) =   9.89 sec

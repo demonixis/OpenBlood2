@@ -14,6 +14,7 @@
 #include "game/explosion_sprites.h"
 #include "game/flesh_gibs.h"
 #include "game/laser_beams.h"
+#include "game/lightning.h"
 #include "game/music_catalog.h"
 #include "game/object_particles.h"
 #include "game/original/BloodShells.h"
@@ -100,6 +101,8 @@ namespace OpenBlood2
         std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
         ExplosionSprites explosion_sprites;
         Sparks sparks;
+        LightningBolts lightning;
+        std::uint64_t PublishLightning(HOBJECT, const LightningSettings&, std::string&) override;
         std::uint64_t PublishSparks(HOBJECT, const SparkSettings&, std::string&) override;
         BloodSpurts blood_spurts;
         std::uint64_t PublishClientBloodSplat(const BloodSplatSettings&, std::string_view, std::string&) override;
@@ -172,6 +175,7 @@ namespace OpenBlood2
             projectile_reports.clear();
             explosion_sprites.clear();
             sparks.clear();
+            lightning.clear();
             blood_spurts.clear();
             blood_splats.clear();
             weapon_sprites.clear();

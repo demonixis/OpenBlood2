@@ -94,6 +94,16 @@ namespace
                                       << " state=" << ai->m_nState << " metacmd=" << ai->Metacmd << '\n';
                 return false;
             }
+            if (std::string_view(world) == "20_powerstation")
+            {
+                unsigned omissions = 0;
+                for (const auto& row : game->startup.entries)
+                    if (row.class_name == "SparksObj" && row.name == "CVBC" && row.state == EntryState::Created &&
+                        row.detail.find("missing exact authored sound") != std::string::npos)
+                        ++omissions;
+                if (omissions != 1 || game->resources.find("Sounds\\lightpop2.wav"))
+                    return false; // One component omission; the original emitter must stay alive.
+            }
             const auto* player = game->server_shell.Player(game->local_client);
             std::cout << world << " start=" << player->entry_start_name
                       << " multiplayer-inspection=" << player->entry_start_multiplayer << ' ';

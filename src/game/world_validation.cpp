@@ -1,5 +1,6 @@
 #include "game/world_validation.h"
 #include "engine/world_view.h"
+#include "game/original/ClientLightningSFX.h"
 #include "game/original/Minefield.h"
 #include "game/original/SkyObjects.h"
 #include "game/original/SparksObj.h"
@@ -8,6 +9,44 @@
 
 namespace OpenBlood2
 {
+    namespace
+    {
+        bool omitted_emitter_sound(const GameSession& game, const ObjectRecord& object, std::string_view path,
+                                   std::string_view failure)
+        {
+            if ((!failure.empty() && failure != "Missing or oversized sound resource") || game.resources.find(path))
+                return false;
+            // Exact absent shipped references. These original callers continue visual/gameplay work after PlaySound
+            // failure.
+            struct Row
+            {
+                const char* world;
+                const char* type;
+                const char* name;
+                const char* sound;
+            };
+            constexpr Row rows[]{
+                {"worlds/20_powerstation.dat", "SparksObj", "CVBC", "Sounds\\lightpop2.wav"},
+                {"worlds/20_powerstation.dat", "CClientLightningSFX", "KABOOM", "Sounds\\Thunder.wav"},
+                {"worlds/25_ancientone.dat", "CClientLightningSFX", "Lightning1", "Sounds\\Thunder.wav"},
+                {"worlds/25_ancientone.dat", "CClientLightningSFX", "Lightning2", "Sounds\\Thunder.wav"},
+                {"worlds/25_ancientone.dat", "CClientLightningSFX", "Lightning3", "Sounds\\Thunder.wav"},
+                {"worlds/25_ancientone.dat", "CClientLightningSFX", "Lightning4", "Sounds\\Thunder.wav"},
+                {"worlds/25_ancientone.dat", "CClientLightningSFX", "Lightning5", "Sounds\\Thunder.wav"}};
+            for (const auto& row : rows)
+                if (game.world_path == row.world && object.type->name == row.type &&
+                    std::string_view(object.state.m_Name) == row.name && path == row.sound)
+                    for (std::size_t i = 0; i < game.entries.size() && i < game.world.objects.size(); ++i)
+                        if (game.entries[i].object == object.id && game.entries[i].state == EntryState::Created)
+                            if (const auto* property = game.world.objects[i].find(
+                                    object.type->name == "SparksObj" ? "SparkSound" : "Sound"))
+                                if (const auto* authored = std::get_if<std::string>(property);
+                                    authored && *authored == path)
+                                    return true;
+            return false;
+        }
+    } // namespace
+
     bool check_world_initialization(GameSession& game, WorldValidation& report, std::string& error)
     {
         // Run normal original callbacks first. A registered class or a successful
@@ -42,12 +81,41 @@ namespace OpenBlood2
                 }
         for (auto id : game.objects.snapshot())
             if (const auto* r = game.objects.get(id); r && r->life == Life::Alive)
-                if (const auto* emitter = dynamic_cast<const SparksObj*>(r->game.get());
-                    emitter && (!emitter->error.empty() || !emitter->sound_error.empty()))
+                if (const auto* emitter = dynamic_cast<const SparksObj*>(r->game.get()))
                 {
-                    error = "SparksObj " + std::string(r->state.m_Name) + ": " + emitter->error + " " +
-                            emitter->sound_error;
-                    return false;
+                    // Exact shipped CVBC sound absence. Keep the emitter and real particles;
+                    // the original PlaySparkSound failure does not stop AddSparks.
+                    const bool absent_authored_sound =
+                        omitted_emitter_sound(game, *r, emitter->sound, emitter->sound_error);
+                    if (!emitter->error.empty() || (!emitter->sound_error.empty() && !absent_authored_sound))
+                    {
+                        error = "SparksObj " + std::string(r->state.m_Name) + ": " + emitter->error + " " +
+                                emitter->sound_error;
+                        return false;
+                    }
+                    if (absent_authored_sound)
+                        for (auto& entry : report.entries)
+                            if (entry.class_name == "SparksObj" && entry.name == "CVBC")
+                                entry.detail += "; missing exact authored sound Sounds\\lightpop2.wav; particles "
+                                                "retained, no sound alias";
+                }
+        for (auto id : game.objects.snapshot())
+            if (const auto* r = game.objects.get(id); r && r->life == Life::Alive)
+                if (const auto* emitter = dynamic_cast<const CClientLightningSFX*>(r->game.get()))
+                {
+                    const bool absent_authored_sound =
+                        omitted_emitter_sound(game, *r, emitter->sound, emitter->sound_error);
+                    if (!emitter->error.empty() || (!emitter->sound_error.empty() && !absent_authored_sound))
+                    {
+                        error = "Lightning " + std::string(r->state.m_Name) + ": " + emitter->error + " " +
+                                emitter->sound_error;
+                        return false;
+                    }
+                    if (absent_authored_sound)
+                        for (auto& entry : report.entries)
+                            if (entry.class_name == "CClientLightningSFX" && entry.name == r->state.m_Name)
+                                entry.detail += "; missing exact authored sound Sounds\\Thunder.wav; bolt/damage "
+                                                "retained, no sound alias";
                 }
         report.unavailable_services.clear();
         for (const auto& [name, count] : game.server.unavailable_services)
