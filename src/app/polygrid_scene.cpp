@@ -16,7 +16,7 @@ namespace OpenBlood2
                 error = "PolyGrid current sprite frame unavailable";
                 return false;
             }
-            const auto path = fx.sprite && fx.track.frame < fx.sprite->frames.size()
+            const auto path = fx.sprite && fx.track.has_frame && fx.track.frame < fx.sprite->frames.size()
                                   ? std::string_view(fx.sprite->frames[fx.track.frame])
                                   : std::string_view{};
             if (!scene.add(fx.id, (record->user_flags & 1u) != 0, fx.pose, fx.settings.dims, fx.width, fx.heights,

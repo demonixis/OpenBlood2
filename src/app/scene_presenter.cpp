@@ -10,7 +10,8 @@ namespace OpenBlood2
           model_renderer(DrawStyle::Opaque, pipelines, registry),
           explosion_model_renderer(DrawStyle::SpriteAlpha, pipelines, registry),
           polygrid_renderer(DrawStyle::Opaque, pipelines, registry),
-          sprite_renderer(DrawStyle::SpriteAlpha, pipelines, registry)
+          sprite_renderer(DrawStyle::SpriteAlpha, pipelines, registry),
+          sky_sprite_renderer(DrawStyle::Opaque, pipelines, registry)
     {
         model_scene.gpu_skinning = explosion_model_scene.gpu_skinning = true;
         world_renderer.receive_shadows = true;
@@ -239,7 +240,7 @@ namespace OpenBlood2
         };
         rebuilt = mesh_revision != game.world_revision || built_lightmaps_ != lightmaps;
         const auto model_revision = model_scene.revision, effect_revision = explosion_model_scene.revision,
-                   sprite_revision = sprite_scene.revision;
+                   sprite_revision = sprite_scene.revision, sky_sprite_revision = sky_sprite_scene.revision;
         if (rebuilt)
         {
             world_renderer.clear_geometry();
@@ -251,6 +252,8 @@ namespace OpenBlood2
             polygrid_renderer.clear_geometry();
             sprite_scene.clear();
             sprite_renderer.clear_geometry();
+            sky_sprite_scene.clear();
+            sky_sprite_renderer.clear_geometry();
             registry.clear_textures(); // Material textures belong to one world revision.
             world_mesh = {};
             world_draws.clear();
@@ -269,6 +272,37 @@ namespace OpenBlood2
         if (!game.server.sky.draws(game.world, world_mesh, game.objects, game.client_shell.view.position, sky_draws,
                                    sky_eye, error))
             return fail("Sky presentation");
+        sky_order.clear();
+        if (!sky_sprite_scene.begin_frame(sky_eye, game.client_shell.view.rotation, error))
+            return fail("Sky sprite camera");
+        std::size_t world_index = 0;
+        for (auto id : game.server.sky.objects)
+        {
+            const auto* r = game.objects.get(id);
+            if (!r || r->life != Life::Alive || !(r->state.m_Flags & FLAG_VISIBLE))
+                continue;
+            if (r->state.m_ObjectType != OT_SPRITE)
+            {
+                sky_order.push_back({false, world_index++});
+                continue;
+            }
+            const auto before = sky_sprite_scene.draws.size();
+            if (!sky_sprite_scene.add(r->sprite.get(), r->sprite_track, {r->state.m_Pos, r->state.m_Rotation},
+                                      r->state.m_Scale, r->state.m_Flags & ~FLAG_SKYOBJECT, id, game.resources, error,
+                                      r->alpha, r->color))
+                return fail("Sky sprite");
+            if (!sky_sprite_scene.entries.back().error.empty())
+            {
+                error = sky_sprite_scene.entries.back().error;
+                return fail("Sky sprite");
+            }
+            if (sky_sprite_scene.draws.size() > before)
+            {
+                // Ordinary sprites use SpriteAlpha style; sky chooses alpha per batch instead.
+                sky_sprite_scene.mesh.ranges.back().batches.front().translucent = true;
+                sky_order.push_back({true, before});
+            }
+        }
         const auto world_done = SDL_GetTicksNS();
         if (!update_model_scene(game, model_scene, error))
             return fail("Model presentation");
@@ -287,9 +321,9 @@ namespace OpenBlood2
         stats.world_ns = world_done - started;
         stats.models_ns = models_done - world_done;
         stats.effects_ns = SDL_GetTicksNS() - models_done;
-        resources_changed = rebuilt || model_revision != model_scene.revision ||
-                            effect_revision != explosion_model_scene.revision ||
-                            sprite_revision != sprite_scene.revision;
+        resources_changed =
+            rebuilt || model_revision != model_scene.revision || effect_revision != explosion_model_scene.revision ||
+            sprite_revision != sprite_scene.revision || sky_sprite_revision != sky_sprite_scene.revision;
         return true;
     }
     bool ScenePresenter::record(GameSession& game, SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target,
@@ -310,7 +344,7 @@ namespace OpenBlood2
         const auto started = SDL_GetTicksNS();
         stats.passes = 0;
         for (auto* renderer : {&world_renderer.stats, &model_renderer.stats, &explosion_model_renderer.stats,
-                               &polygrid_renderer.stats, &sprite_renderer.stats})
+                               &polygrid_renderer.stats, &sprite_renderer.stats, &sky_sprite_renderer.stats})
             renderer->draw_calls = renderer->culled = 0;
         // Renderers stage uploads in the shared registry; one copy pass in the frame's
         // command buffer records them all before the scene pass.
@@ -326,6 +360,9 @@ namespace OpenBlood2
             return fail("PolyGrid viewport");
         if (!sprite_renderer.prepare(sprite_scene.mesh, sprite_scene.revision, format, width, height, error, true))
             return fail("Sprite viewport");
+        if (!sky_sprite_renderer.prepare(sky_sprite_scene.mesh, sky_sprite_scene.revision, format, width, height, error,
+                                         true))
+            return fail("Sky sprite viewport");
         if (!registry.flush(commands, error))
             return fail("GPU uploads");
         if (!record_shadow_tiles(commands, error))
@@ -386,12 +423,33 @@ namespace OpenBlood2
         // Same order as the former separate passes: sky, opaque world/models, sorted
         // world/model alpha, explosion models, PolyGrids, sprites, then view models.
         const char* stage = nullptr;
-        if (!sky_draws.empty() &&
-            !world_renderer.record(scene, world_mesh, sky_draws, sky_eye, view.rotation, error, WorldPass::Sky, time))
-            stage = "World viewport";
-        else if (!world_renderer.record(scene, world_mesh, world_draws, view.position, view.rotation, error,
-                                        sky_draws.empty() ? WorldPass::Opaque : WorldPass::OpaqueWithSky, time,
-                                        flashlight))
+        std::size_t sky_world_batches = 0, sky_sprite_batches = 0;
+        const auto world_sky_frames = world_renderer.stats.sky_frames;
+        const auto sprite_sky_frames = sky_sprite_renderer.stats.sky_frames;
+        for (const auto& item : sky_order)
+        {
+            const auto& mesh = item.sprite ? sky_sprite_scene.mesh : world_mesh;
+            const auto& draws = item.sprite ? sky_sprite_scene.draws : sky_draws;
+            auto& renderer = item.sprite ? sky_sprite_renderer : world_renderer;
+            if (!renderer.record(scene, mesh, std::span<const WorldDraw>(draws).subspan(item.index, 1), sky_eye,
+                                 view.rotation, error, WorldPass::Sky, time))
+            {
+                stage = "Sky viewport";
+                break;
+            }
+            (item.sprite ? sky_sprite_batches : sky_world_batches) += renderer.stats.sky_batches;
+        }
+        world_renderer.stats.sky_frames = world_sky_frames + !sky_draws.empty();
+        sky_sprite_renderer.stats.sky_frames = sprite_sky_frames + !sky_sprite_scene.draws.empty();
+        world_renderer.stats.sky_batches = sky_world_batches;
+        sky_sprite_renderer.stats.sky_batches = sky_sprite_batches;
+        if (stage)
+        {
+            SDL_EndGPURenderPass(pass);
+            return fail(stage);
+        }
+        if (!world_renderer.record(scene, world_mesh, world_draws, view.position, view.rotation, error,
+                                   sky_order.empty() ? WorldPass::Opaque : WorldPass::OpaqueWithSky, time, flashlight))
             stage = "World viewport";
         else if (!model_renderer.record(scene, model_scene, model_scene.world_draws, view.position, view.rotation,
                                         error, WorldPass::Opaque, flashlight))
@@ -423,10 +481,10 @@ namespace OpenBlood2
             return fail(stage);
         stats.draw_calls = world_renderer.stats.draw_calls + model_renderer.stats.draw_calls +
                            explosion_model_renderer.stats.draw_calls + polygrid_renderer.stats.draw_calls +
-                           sprite_renderer.stats.draw_calls;
+                           sprite_renderer.stats.draw_calls + sky_sprite_renderer.stats.draw_calls;
         stats.culled = world_renderer.stats.culled + model_renderer.stats.culled +
                        explosion_model_renderer.stats.culled + polygrid_renderer.stats.culled +
-                       sprite_renderer.stats.culled;
+                       sprite_renderer.stats.culled + sky_sprite_renderer.stats.culled;
         stats.record_ns = SDL_GetTicksNS() - started;
         ++stats.frames;
         return true;

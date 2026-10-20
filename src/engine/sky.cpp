@@ -30,8 +30,9 @@ namespace OpenBlood2
         const auto* r = store.get(h);
         if (!r || r->life != Life::Alive || index >= objects.size())
             e = "Invalid sky object/index";
-        else if (r->state.m_ObjectType != OT_WORLDMODEL || !r->world_model)
-            e = "Only bound world models are supported in the sky";
+        else if (!((r->state.m_ObjectType == OT_WORLDMODEL && r->world_model) ||
+                   (r->state.m_ObjectType == OT_SPRITE && r->sprite)))
+            e = "Only bound world models and sprites are supported in the sky";
         else
         {
             e.clear();
@@ -101,11 +102,15 @@ namespace OpenBlood2
         draws.clear();
         sky_eye = {};
         e.clear();
+        bool visible = false;
         for (auto id : objects)
         {
             const auto* r = store.get(id);
             if (!r || r->life != Life::Alive || !(r->state.m_Flags & FLAG_VISIBLE))
                 continue;
+            visible = true;
+            if (r->state.m_ObjectType == OT_SPRITE && r->sprite)
+                continue; // Sprite mesh uses the same sky camera and interleaved slot order.
             std::size_t match = r->world_model_index; // Bound at creation (first in file order).
             if (match >= mesh.ranges.size() || CaseLess{}(mesh.ranges[match].name, r->state.m_Filename) ||
                 CaseLess{}(r->state.m_Filename, mesh.ranges[match].name))
@@ -120,7 +125,7 @@ namespace OpenBlood2
             }
             draws.push_back({unsigned(match), r->state.m_Pos, r->state.m_Rotation, r->alpha});
         }
-        if (!draws.empty() && !sky_view_position(definition, world.min, world.max, eye, sky_eye))
+        if (visible && !sky_view_position(definition, world.min, world.max, eye, sky_eye))
         {
             e = "Invalid sky/world projection extents";
             draws.clear();

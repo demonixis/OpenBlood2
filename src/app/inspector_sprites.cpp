@@ -70,6 +70,7 @@ namespace OpenBlood2
             ImGui::Text("Rotation quaternion %.3f %.3f %.3f %.3f", q.m_Vec.x, q.m_Vec.y, q.m_Vec.z, q.m_Spin);
             ImGui::Text("SPR %u fps / %zu frames | frame %u | %.3f ms", s.fps, s.frames.size(), r->sprite_track.frame,
                         r->sprite_track.milliseconds);
+            ImGui::Text("Current frame present: %d", r->sprite_track.has_frame);
             ImGui::Text("Transparent %d / translucent %d / color key 0x%x", s.transparent, s.translucent, s.color_key);
             ImGui::TextWrapped("Manifest: %s", r->state.m_Filename);
             const auto& path = s.frames[r->sprite_track.frame];

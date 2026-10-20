@@ -114,3 +114,18 @@ alpha, the smaller near plane, lack of sky depth writes, normal world occlusion,
 portal omission, resize, cache replacement and invalid draw recovery. Transition tests reject missing/non-world-model pointer
 targets while preserving source identities, globals, clock, client and list ownership. Private GPU
 captures include two sky directions and a combined sky/world view over two reloads.
+
+## Sprite sky layers
+
+The complete-level audit extends the accepted sky types to resource-bound
+OT_SPRITE objects, used by Crypt's `moon`. Missing sprite resources still fail.
+World geometry and sprite billboards share the compressed sky camera, .01 near
+plane, depth-disabled pipelines and ascending authored slot order. The presenter
+interleaves the two existing meshes at those slots; it does not distance-sort
+sky layers or append every sprite above all clouds. Alpha, frame clocks, scaling,
+rotation, object color and hidden/stale lifetime use ordinary sprite rules.
+Sky sprites are excluded from the ordinary scene. A sprite-only sky still
+computes the projection and suppresses sky portal faces. Geometry/texture uploads
+share the existing registry and scene pass; dependencies and shaders are unchanged.
+Models and PolyGrids in sky remain unsupported. This supersedes only the earlier
+sprite refusal. Unload clears the separate sprite snapshot and GPU geometry.

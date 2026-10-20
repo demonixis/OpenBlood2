@@ -1,0 +1,31 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start  932: gpu.sky
+1/5 Test  #932: gpu.sky ..............................   Passed    2.43 sec
+    Start  978: gpu.world_sprite
+2/5 Test  #978: gpu.world_sprite .....................   Passed    0.55 sec
+    Start 1234: reported_levels.multi/bb_brownstar
+3/5 Test #1234: reported_levels.multi/bb_brownstar ...   Passed    1.19 sec
+    Start 1236: reported_levels.multi/bb_crypt
+4/5 Test #1236: reported_levels.multi/bb_crypt .......   Passed    0.77 sec
+    Start 1256: gpu.sky_sprite
+5/5 Test #1256: gpu.sky_sprite .......................***Failed    0.37 sec
+78: presenter.update(game, error) Sky sprite: Sprite glow/bias/no-Z/sky presentation unavailable 
+
+
+80% tests passed, 1 tests failed out of 5
+
+Label Time Summary:
+campaign        =   1.96 sec*proc (2 tests)
+gpu             =   3.36 sec*proc (3 tests)
+headless        =   1.96 sec*proc (2 tests)
+private         =   0.37 sec*proc (1 test)
+private-data    =   1.96 sec*proc (2 tests)
+sky             =   2.81 sec*proc (2 tests)
+sprite          =   0.93 sec*proc (2 tests)
+world_view      =   0.55 sec*proc (1 test)
+
+Total Test time (real) =   5.34 sec
+
+The following tests FAILED:
+	1256 - gpu.sky_sprite (Failed)                           gpu private sky sprite
+Errors while running CTest

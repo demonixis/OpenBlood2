@@ -217,6 +217,9 @@ namespace
         CHECK(world_material_frame(mesh, animation, .25, frame) && frame == a);
         CHECK(world_material_frame(mesh, animation, .375, frame) && frame == a);
         CHECK(world_material_frame(mesh, animation, 1000000.125, frame));
+        mesh.materials[animation].fps = 65537;
+        CHECK(world_material_frame(mesh, animation, 0, frame) && frame == a);
+        CHECK(world_material_frame(mesh, animation, 1000000.125, frame) && frame == a);
         CHECK(!world_material_frame(mesh, animation, -1, frame));
         CHECK(!world_material_frame(mesh, animation, std::numeric_limits<double>::infinity(), frame));
         mesh.materials[animation].frames[0] = animation;

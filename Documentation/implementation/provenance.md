@@ -1596,3 +1596,14 @@ when the index is out of range. shared/src/modellt_impl.cpp SetCurAnim and
 server/src/serverde_impl.cpp SetModelAnimation preserve that no-op. The AI port
 now checks valid current playback before applying these source rules. No missing
 clip is supplied, and no source table or commercial resource is changed.
+
+## Zero-duration SPR and sprite sky continuation (2026-10-20)
+
+The installed original Client.exe loader/tracker and world-surface update were
+inspected directly for Brownstar's raw FPS 65537. Hash and precise addresses are
+recorded in [sprite contracts](../contracts/sprite_contracts.md#zero-length-original-animations).
+The existing integer-period timing is retained, with an explicit absent current
+frame and first-texture retention for world surfaces. SkyPointer's original
+object-agnostic target registration now accepts bound sprite targets; the engine
+billboard renderer uses the existing sky camera and ordered depth-disabled pass.
+This is a renderer extension, not a new game rule or a replacement asset.

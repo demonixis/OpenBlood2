@@ -51,6 +51,8 @@ namespace
         CHECK(scene.draws.empty() && !scene.entries[0].visible && scene.entries[0].error.empty());
         CHECK(scene.revision == revision && scene.mesh.materials.size() == 2);
         CHECK(scene.add(&sprite, track, {}, {0, 1, 1}, FLAG_VISIBLE, {}, resources, error) && scene.draws.empty());
+        CHECK(scene.add(&sprite, {0, 0, false}, {}, {1, 1, 1}, FLAG_VISIBLE, {}, resources, error));
+        CHECK(scene.draws.empty() && !scene.entries.back().visible && scene.entries.back().error.empty());
         scene.clear();
         CHECK(scene.revision > revision && scene.mesh.materials.size() == 1 && scene.entries.empty());
         return true;

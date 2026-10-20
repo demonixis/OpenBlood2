@@ -1,0 +1,50 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+      Start  296: sprites.reader
+ 1/18 Test  #296: sprites.reader .......................   Passed    0.07 sec
+      Start  297: sprites.clock
+ 2/18 Test  #297: sprites.clock ........................   Passed    0.02 sec
+      Start  298: sprites.properties
+ 3/18 Test  #298: sprites.properties ...................   Passed    0.04 sec
+      Start  299: sprites.placement
+ 4/18 Test  #299: sprites.placement ....................   Passed    0.04 sec
+      Start  300: sprites.ray
+ 5/18 Test  #300: sprites.ray ..........................   Passed    0.04 sec
+      Start  301: sprites.failures
+ 6/18 Test  #301: sprites.failures .....................   Passed    0.04 sec
+      Start  302: sprites.catalog
+ 7/18 Test  #302: sprites.catalog ......................   Passed   48.36 sec
+      Start  303: sprites.subway
+ 8/18 Test  #303: sprites.subway .......................   Passed    5.82 sec
+      Start  614: sprite_view.geometry
+ 9/18 Test  #614: sprite_view.geometry .................   Passed    0.02 sec
+      Start  615: sprite_view.failures
+10/18 Test  #615: sprite_view.failures .................   Passed    0.27 sec
+      Start  616: sprite_view.subway
+11/18 Test  #616: sprite_view.subway ...................   Passed    7.47 sec
+      Start  831: sky.rules
+12/18 Test  #831: sky.rules ............................   Passed    0.02 sec
+      Start  832: sky.pointers
+13/18 Test  #832: sky.pointers .........................   Passed    0.02 sec
+      Start  833: sky.projection
+14/18 Test  #833: sky.projection .......................   Passed    0.02 sec
+      Start  834: sky.lifetime
+15/18 Test  #834: sky.lifetime .........................   Passed    0.02 sec
+      Start  835: sky.private
+16/18 Test  #835: sky.private ..........................   Passed    9.96 sec
+      Start 1113: reported_levels.multi/bb_brownstar
+17/18 Test #1113: reported_levels.multi/bb_brownstar ...   Passed   41.72 sec
+      Start 1115: reported_levels.multi/bb_crypt
+18/18 Test #1115: reported_levels.multi/bb_crypt .......   Passed   27.42 sec
+
+100% tests passed, 0 tests failed out of 18
+
+Label Time Summary:
+campaign        =  69.14 sec*proc (2 tests)
+headless        = 141.36 sec*proc (18 tests)
+private         =  71.60 sec*proc (4 tests)
+private-data    =  69.14 sec*proc (2 tests)
+sky             =  10.04 sec*proc (5 tests)
+sprite_view     =   7.75 sec*proc (3 tests)
+sprites         =  54.42 sec*proc (8 tests)
+
+Total Test time (real) = 141.39 sec

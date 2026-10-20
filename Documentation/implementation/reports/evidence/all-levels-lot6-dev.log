@@ -1,0 +1,43 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start  309: sprites.reader
+ 1/15 Test  #309: sprites.reader .......................   Passed    0.00 sec
+      Start  310: sprites.clock
+ 2/15 Test  #310: sprites.clock ........................   Passed    0.00 sec
+      Start  311: sprites.properties
+ 3/15 Test  #311: sprites.properties ...................   Passed    0.00 sec
+      Start  312: sprites.placement
+ 4/15 Test  #312: sprites.placement ....................   Passed    0.00 sec
+      Start  313: sprites.ray
+ 5/15 Test  #313: sprites.ray ..........................   Passed    0.00 sec
+      Start  314: sprites.failures
+ 6/15 Test  #314: sprites.failures .....................   Passed    0.00 sec
+      Start  315: sprites.catalog
+ 7/15 Test  #315: sprites.catalog ......................   Passed    0.66 sec
+      Start  316: sprites.subway
+ 8/15 Test  #316: sprites.subway .......................   Passed    0.14 sec
+      Start  844: sky.rules
+ 9/15 Test  #844: sky.rules ............................   Passed    0.00 sec
+      Start  845: sky.pointers
+10/15 Test  #845: sky.pointers .........................   Passed    0.00 sec
+      Start  846: sky.projection
+11/15 Test  #846: sky.projection .......................   Passed    0.00 sec
+      Start  847: sky.lifetime
+12/15 Test  #847: sky.lifetime .........................   Passed    0.00 sec
+      Start  848: sky.private
+13/15 Test  #848: sky.private ..........................   Passed    0.25 sec
+      Start 1122: reported_levels.multi/bb_brownstar
+14/15 Test #1122: reported_levels.multi/bb_brownstar ...   Passed    1.18 sec
+      Start 1124: reported_levels.multi/bb_crypt
+15/15 Test #1124: reported_levels.multi/bb_crypt .......   Passed    0.79 sec
+
+100% tests passed, 0 tests failed out of 15
+
+Label Time Summary:
+campaign        =   1.97 sec*proc (2 tests)
+headless        =   3.03 sec*proc (15 tests)
+private         =   1.04 sec*proc (3 tests)
+private-data    =   1.97 sec*proc (2 tests)
+sky             =   0.25 sec*proc (5 tests)
+sprites         =   0.81 sec*proc (8 tests)
+
+Total Test time (real) =   3.05 sec

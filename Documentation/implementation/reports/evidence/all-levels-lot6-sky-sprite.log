@@ -1,0 +1,13 @@
+Test project /home/yann/projects/lithtech/Blood2/build/release
+    Start 1256: gpu.sky_sprite
+1/1 Test #1256: gpu.sky_sprite ...................   Passed    2.31 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Label Time Summary:
+gpu        =   2.31 sec*proc (1 test)
+private    =   2.31 sec*proc (1 test)
+sky        =   2.31 sec*proc (1 test)
+sprite     =   2.31 sec*proc (1 test)
+
+Total Test time (real) =   2.33 sec

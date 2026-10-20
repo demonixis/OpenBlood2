@@ -1,0 +1,25 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 405: texture.decode
+1/7 Test #405: texture.decode ...................   Passed    0.00 sec
+    Start 406: texture.malformed
+2/7 Test #406: texture.malformed ................   Passed    0.00 sec
+    Start 407: texture.mapping
+3/7 Test #407: texture.mapping ..................   Passed    0.02 sec
+    Start 408: texture.corpus
+4/7 Test #408: texture.corpus ...................   Passed    0.34 sec
+    Start 627: sprite_view.geometry
+5/7 Test #627: sprite_view.geometry .............   Passed    0.00 sec
+    Start 628: sprite_view.failures
+6/7 Test #628: sprite_view.failures .............   Passed    0.02 sec
+    Start 629: sprite_view.subway
+7/7 Test #629: sprite_view.subway ...............   Passed    0.35 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Label Time Summary:
+headless       =   0.75 sec*proc (7 tests)
+private        =   0.69 sec*proc (2 tests)
+sprite_view    =   0.37 sec*proc (3 tests)
+texture        =   0.37 sec*proc (4 tests)
+
+Total Test time (real) =   0.78 sec

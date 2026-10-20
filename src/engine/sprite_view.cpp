@@ -41,7 +41,8 @@ namespace OpenBlood2
     {
         const std::string_view path =
             sprite && track.frame < sprite->frames.size() ? sprite->frames[track.frame] : std::string_view{};
-        return add_frame(path, track.frame, pose, scale, flags, object, resources, error, alpha, color, false);
+        return add_frame(path, track.frame, pose, scale, track.has_frame ? flags : flags & ~FLAG_VISIBLE, object,
+                         resources, error, alpha, color, false);
     }
     bool SpriteView::add_particle(std::string_view path, DVector position, float extent, DVector color, float alpha,
                                   std::uint64_t system, unsigned index, const Resources& resources, std::string& error)

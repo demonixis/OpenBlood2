@@ -81,8 +81,8 @@ namespace
         CHECK(!read_sprite(b, s, error));
         for (auto count : {0u, 4097u})
             CHECK(!read_sprite(spr(count), s, error));
-        for (auto fps : {0u, 1001u})
-            CHECK(!read_sprite(spr(1, fps), s, error));
+        CHECK(!read_sprite(spr(1, 0), s, error));
+        CHECK(read_sprite(spr(5, 65537), s, error) && s.fps == 65537);
         for (auto name : {"", "../bad.dtx", "/abs.dtx", "a/../../bad.dtx", "a.wav"})
             CHECK(!read_sprite(spr(1, 10, name), s, error));
         b = spr();
@@ -118,6 +118,11 @@ namespace
         for (unsigned i = 0; i < 60; ++i)
             CHECK(advance_sprite(s, t, 1.0 / 60));
         CHECK(t.frame == 0 && std::abs(t.milliseconds - 10) < 1e-7); // 3*66ms, preserving fractional ticks.
+        CHECK(read_sprite(spr(5, 65537), s, error));
+        t = {};
+        CHECK(t.has_frame && t.frame == 0);
+        CHECK(advance_sprite(s, t, .01) && !t.has_frame && t.frame == 0 && t.milliseconds == 0);
+        CHECK(advance_sprite(s, t, 60) && !t.has_frame);
         return true;
     }
     bool properties(const std::filesystem::path& root)

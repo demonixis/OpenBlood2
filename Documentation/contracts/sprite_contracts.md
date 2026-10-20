@@ -94,3 +94,22 @@ The [sprite presentation continuation](sprite_view_contracts.md) now draws suppo
 original sprites with actual DTX alpha and shared world/model depth, before view
 weapons. Earlier blanket sprite-rendering omissions are superseded for this bounded
 subset. World/model opacity policy is unchanged; required FX and M2 remain open.
+
+## Zero-length original animations
+
+The complete-level audit found `sprites/floorplate.spr` with five valid DTX frames
+and raw uint32 FPS 65537. The original installed Client.exe loader at 0x463a10
+reads that uint32 unchanged, stores it at animation+0x2c, and calculates
+`(1000 / fps) * count` (0x463b09–0x463b1f). The tracker initializes frame zero
+(0x463c60) but clears its current frame when animation length is zero
+(0x463cad–0x463cb2, 0x463d08). The world-surface update at 0x401c23–0x401c39
+only replaces the surface texture when a current frame exists, retaining the
+initial texture otherwise. The later runtime source confirms the tracker rule.
+
+The reader therefore accepts every nonzero uint32 FPS without truncating or
+clamping it. Existing count, byte, boolean and path bounds remain. A period of
+zero clears `SpriteTrack::has_frame` without division/modulo by zero. Sprite
+objects stop drawing, PolyGrids have no sprite texture, and world materials retain
+the initial frame. FPS zero still fails instead of reproducing division by zero.
+These rules do not alter commercial files or fabricate an animation speed.
+Client.exe SHA-256: `edf7442f26dcbef72c3b69b4560d0fa41d6c9dafa45e603fb12bd32fe6eb2dd7`.

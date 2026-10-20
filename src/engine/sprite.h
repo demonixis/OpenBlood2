@@ -14,6 +14,7 @@ namespace OpenBlood2
     {
         double milliseconds = 0;
         unsigned frame = 0;
+        bool has_frame = true; // Original zero-length animation clears the current frame on update.
     };
     bool read_sprite(std::span<const std::uint8_t>, Sprite&, std::string&);
     bool advance_sprite(const Sprite&, SpriteTrack&, double seconds);

@@ -54,7 +54,7 @@ namespace OpenBlood2
         WorldPipelines pipelines; // Declared before the renderers that borrow it.
         WorldRenderer world_renderer;
         ModelRenderer model_renderer, explosion_model_renderer; // GPU skinning of both model views.
-        WorldRenderer polygrid_renderer, sprite_renderer;
+        WorldRenderer polygrid_renderer, sprite_renderer, sky_sprite_renderer;
         ModelView model_scene, explosion_model_scene;
         ModelLighting model_lighting; // Static light objects shading model_scene instances.
         // Vertical model shadows: FLAG_SHADOW casters nearest the camera, one tile each.
@@ -72,7 +72,13 @@ namespace OpenBlood2
         static constexpr float shadow_margin = 8, shadow_distance = 2048, shadow_strength = .6f, shadow_fade = 96,
                                shadow_bias = 2, shadow_elevation = 40; // Minimum light elevation, degrees.
         PolyGridView polygrid_scene;
-        SpriteView sprite_scene;
+        SpriteView sprite_scene, sky_sprite_scene;
+        struct SkyDraw
+        {
+            bool sprite = false;
+            std::size_t index = 0;
+        };
+        std::vector<SkyDraw> sky_order; // Interleaved authored slots, never distance sorted.
         PresentationStats stats;
 
       private:

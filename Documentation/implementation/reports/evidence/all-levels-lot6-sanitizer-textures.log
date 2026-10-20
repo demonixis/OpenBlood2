@@ -1,0 +1,18 @@
+Test project /home/yann/projects/lithtech/Blood2/build/sanitize
+    Start 392: texture.decode
+1/4 Test #392: texture.decode ...................   Passed    0.02 sec
+    Start 393: texture.malformed
+2/4 Test #393: texture.malformed ................   Passed    0.02 sec
+    Start 394: texture.mapping
+3/4 Test #394: texture.mapping ..................   Passed    0.82 sec
+    Start 395: texture.corpus
+4/4 Test #395: texture.corpus ...................   Passed   10.55 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Label Time Summary:
+headless    =  11.41 sec*proc (4 tests)
+private     =  10.55 sec*proc (1 test)
+texture     =  11.41 sec*proc (4 tests)
+
+Total Test time (real) =  11.43 sec

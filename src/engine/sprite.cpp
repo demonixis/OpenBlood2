@@ -12,8 +12,8 @@ namespace OpenBlood2
         s.fps = r.u32();
         const auto transparent = r.u32(), translucent = r.u32();
         s.color_key = r.u32();
-        if (bytes.size() > 1024 * 1024 || !r.good() || count == 0 || count > 4096 || s.fps == 0 || s.fps > 1000 ||
-            transparent > 1 || translucent > 1)
+        if (bytes.size() > 1024 * 1024 || !r.good() || count == 0 || count > 4096 || s.fps == 0 || transparent > 1 ||
+            translucent > 1)
         {
             error = "Invalid SPR header/count/rate/flags";
             return false;
@@ -41,12 +41,18 @@ namespace OpenBlood2
     }
     bool advance_sprite(const Sprite& s, SpriteTrack& track, double seconds)
     {
-        if (!std::isfinite(seconds) || seconds < 0 || seconds > 60 || s.fps == 0 || s.fps > 1000 || s.frames.empty() ||
+        if (!std::isfinite(seconds) || seconds < 0 || seconds > 60 || s.fps == 0 || s.frames.empty() ||
             s.frames.size() > 4096 || !std::isfinite(track.milliseconds) || track.milliseconds < 0)
             return false;
         // Later LithTech SPR clock uses integer milliseconds per frame. Fractional
         // milliseconds are retained here across simulation ticks, independent of UI.
         const auto period = 1000 / s.fps;
+        if (!period)
+        {
+            track.has_frame = false; // spr_UpdateTracker: zero animation length, no current frame.
+            return true;
+        }
+        track.has_frame = true;
         const double duration = period * s.frames.size();
         track.milliseconds = std::fmod(track.milliseconds + seconds * 1000, duration);
         track.frame = static_cast<unsigned>(track.milliseconds / period);

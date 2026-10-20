@@ -9,6 +9,13 @@ initial deltas, three seconds of simulation with movement, a runtime failure
 recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
 combat, multiplayer or GPU certification. M2 closure remains unchanged.
 
+Current verified opening gate after iteration 6: **42 / 58 pass, 16 / 58 fail**
+([audit 4](evidence/all-levels-audit-04.log)). Remaining worlds: Abandoned Buildings,
+Temple, Power Station, Laboratory, Office, Rooftop, Ancient City, Arena, Ancient One,
+Credits, End, Fields and the four CTF maps. Initial-entry and three-second simulation
+coverage is not complete gameplay/traversal acceptance. The tables below retain
+the initial baseline; iteration records explain resolved and newly exposed blockers.
+
 ## Work queue
 
 1. Port missing original classes and their actual required behavior/services.
@@ -196,3 +203,38 @@ world-model-only sky service rejects. The overall runs are **11/13** and **4/6**
 not passing suites. These two newly exposed failures are the next lot.
 [Area15 Release GPU opening](evidence/all-levels-area15-gpu.log) renders three
 frames on NVIDIA RTX 3060 and exits 0 (dummy audio).
+
+## Iteration 6: Brownstar animated material and Crypt moon
+
+Brownstar's SPR stores FPS 65537, which makes the original integer frame period
+zero. Inspection of the installed Client.exe confirms both the zero-length tracker
+and the world-surface guard that retains its initial texture when no current frame
+exists. The bounded reader now accepts this original representation; no path,
+frame, texture or playback speed is substituted. Tests cover zero-duration clocks,
+current-frame absence and retained world material selection.
+
+Crypt's `moon` is a bound Sprite, at sky slot 2 between authored BSP layers.
+The sky registry and presenter now accept that type and interleave its textured
+billboard at the original slot, using the existing depth-disabled sky pipelines.
+The sprite does not also draw in the ordinary scene. Hidden/stale slots, alpha,
+resource validation, compressed camera and unload ownership remain checked.
+
+Validation: [15 Dev sprite/sky/map cases](evidence/all-levels-lot6-dev.log) and
+[7 Dev texture/sprite-view cases](evidence/all-levels-lot6-dev-textures.log) pass.
+The corresponding [18 sanitizer cases](evidence/all-levels-lot6-sanitizers.log) and
+[4 texture cases](evidence/all-levels-lot6-sanitizer-textures.log) pass with leak
+detection. Dev inspector and Release applications build; pre-existing aggregate
+initializer warnings at texture_tests.cpp:185 remain visible.
+
+The [initial Release run](evidence/all-levels-lot6-release-initial.log) passes both
+maps and the existing sky/world-sprite pixel tests, but fails the new sky-sprite
+integration. The dedicated sky snapshot now consumes FLAG_SKYOBJECT at its boundary
+and uses explicit SkyAlpha batches in the opaque sky renderer. The corrected
+[Crypt GPU test](evidence/all-levels-lot6-sky-sprite.log) passes: slots 1 star,
+2 moon, 3/4 clouds, 5 Sky; 17,196 moon pixels differ when hidden. The test isolates
+sky geometry from the player room for that pixel assertion and checks unload.
+The [Brownstar](evidence/all-levels-brownstar-gpu.log) and
+[Crypt](evidence/all-levels-crypt-gpu.log) normal Release direct-entry runs each
+render three complete frames and exit 0 on NVIDIA RTX 3060, dummy audio.
+
+![Crypt authored sky layers](evidence/all-levels-crypt-sky.png)

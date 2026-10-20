@@ -122,12 +122,15 @@ namespace OpenBlood2
         const auto& entry = mesh.materials[material];
         if (entry.frames.empty())
             return entry.fps == 0;
-        if (!entry.fps || entry.fps > 1000 || entry.frames.size() > 4096)
+        if (!entry.fps || entry.frames.size() > 4096)
             return false;
         const auto period = 1000 / entry.fps;
         const double duration = period * entry.frames.size();
-        const auto frame = std::min(entry.frames.size() - 1,
-                                    static_cast<std::size_t>(std::fmod(time, duration / 1000.) * 1000 / period));
+        // Original world surface retains its initialized texture when the tracker has no frame.
+        const auto frame = !period
+                               ? 0
+                               : std::min(entry.frames.size() - 1,
+                                          static_cast<std::size_t>(std::fmod(time, duration / 1000.) * 1000 / period));
         image = entry.frames[frame];
         return image < mesh.materials.size() && mesh.materials[image].error.empty() &&
                mesh.materials[image].frames.empty() && mesh.materials[image].fps == 0;

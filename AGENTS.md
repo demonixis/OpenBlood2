@@ -1,5 +1,10 @@
 # Blood2 Project Instructions
 
+The [Brownstar/Crypt presentation continuation](Documentation/implementation/reports/all_level_loading.md)
+retains original zero-duration SPR semantics and interleaves bound sprite sky
+layers by authored slot. Preserve current-frame absence, world initial-texture
+retention, sky/world separation and checked resources; no asset edits or FPS clamps.
+
 The [complete-level inspection entry](Documentation/contracts/player_contracts.md#explicit-multiplayer-map-inspection)
 allows an authored multiplayer marker only from explicit local inspection when no
 solo marker exists. Preserve solo priority, checked grounding, visible selection

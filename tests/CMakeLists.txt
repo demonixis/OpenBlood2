@@ -2715,3 +2715,13 @@ if(BLOOD2_TEST_DATA_DIR)
         set_tests_properties(later_levels.${world} PROPERTIES LABELS "headless;private-data;campaign" TIMEOUT 180)
     endforeach()
 endif()
+
+if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
+    add_executable(sky_sprite_gpu_tests sky_sprite_gpu_tests.cpp ../src/app/scene_presenter.cpp
+        ../src/app/model_lighting.cpp ../src/app/model_scene.cpp ../src/app/polygrid_scene.cpp ../src/app/sprite_scene.cpp)
+    target_link_libraries(sky_sprite_gpu_tests PRIVATE blood2_game)
+    blood2_project_options(sky_sprite_gpu_tests)
+    add_test(NAME gpu.sky_sprite COMMAND sky_sprite_gpu_tests "${BLOOD2_TEST_DATA_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/sky-sprite")
+    set_tests_properties(gpu.sky_sprite PROPERTIES LABELS "gpu;private;sky;sprite" TIMEOUT 120 RUN_SERIAL TRUE
+        ENVIRONMENT "SDL_AUDIODRIVER=dummy" FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+endif()
