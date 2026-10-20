@@ -20,6 +20,8 @@ class CProximityBomb : public CProjectile
   protected:
     bool Update() override;
     void AddExplosion(DVector, DVector) override;
+    void SaveBlock(ProjectileBlock&) const override;
+    std::string LoadBlock(const ProjectileBlock&) override;
 
   protected:
     virtual void Sound(const char*);

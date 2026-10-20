@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-20",
+  "scope": "Save/load lot 9: original Save/Load bodies of PickupObject (every pickup), KeyPickup, CProjectile (the projectile family, grenades and bombs) and SeeingEye with the CInvTheEye reference, their PRECREATE_SAVEGAME and INITIALUPDATE_SAVEGAME branches and save-support declarations. The bodies are selective ports recorded in the provenance ledger; the checks, the shooter tail (departure D15), the remote-charge relisting and the trail republication are OpenBlood2 code.",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PickupObject.cpp",
+      "source_sha256": "7f75a9fcbc23aabe64cb1ce21f02d63cce2b38110e5d98c8a60e94f0a4ebb43c",
+      "purpose": "PickupObject Save/Load field order (PickupObject.cpp:617-674), relative m_fLastTime, PostPropRead on every precreate (flag rule, m_dwFlags copy, model from m_szFile), InitialUpdate skipped on a savegame, the constructor constants and the single-player removal in PickedUp."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PickupObject.h",
+      "source_sha256": "4f686a81030ddebca9f4e4e02b2e0f42ce3f82c2972e5cead51dc7a20f582311",
+      "purpose": "Member list: which fields exist and which are saved."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ItemPickups.cpp",
+      "source_sha256": "1ae96d4e47ea46a709e06eacba3f2e9f206632791884af3ad421520a08ef801a",
+      "purpose": "KeyPickup block before PickupObject's (ItemPickups.cpp:480-511), property reads only on WORLDFILE/STRINGPROP, model strings applied only when set; item pickup constructors (m_nType, m_szObjectName, m_nNameID) and the multiplayer-only respawn branch."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/AmmoPickups.cpp",
+      "source_sha256": "c00c35d8ccb524296dc443dacf60154f3b97c8d1b4c172c2bd11eed69c60e2e0",
+      "purpose": "Unconditional AmmoPickup list insertion at initial update and the ammo constructors."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PowerupPickups.cpp",
+      "source_sha256": "5f80930713a75f48a3f6b1eb8a6a2a5dc42b6ae57289d8e955e372d11cca35a9",
+      "purpose": "Powerup constructors; m_bRotate is never set."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/WeaponPickups.cpp",
+      "source_sha256": "b9565e2e9bf02dc6b656b404098de72ca950675c11a946541c6a2d955f4de209",
+      "purpose": "Weapon pickup constructors and SetBounce(false) for drops."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Projectile.cpp",
+      "source_sha256": "27bfe497aa58e263e544c3aaf70b044de9d04190d80ee1d7b5c5aaf9f54190d7",
+      "purpose": "CProjectile Save/Load (Projectile.cpp:830-920): 26 fields, relative m_fStartTime, the unsaved m_hFiredFrom ('Can't tell'); constructor defaults; PostPropRead and InitialUpdate skipped on a savegame; the persistent SFX_OBJECTFX trail message."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Projectile.h",
+      "source_sha256": "af96e3fa250d48f27d6271c34f5eb62369462bbe372058852c22c3b128640fce",
+      "purpose": "Member list, including the special members m_LastPos, m_bArmed and the spin fields."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/GameProjectiles.cpp",
+      "source_sha256": "f0f732be5d373324ef2071690fc43317a908aad5d5bade18f59c9e9ccfbcb9fe",
+      "purpose": "No subclass Save/Load; constructors (shadowed m_fStartTime, bounce counts, bomb flags and delays, random spin), proximity/remote/time bomb update and touch rules, the Tesla ball and Singularity attract clocks, the flare fragment's unset colour."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/GameProjectiles.h",
+      "source_sha256": "f285b2e417c48af164bf99d2169668f5790ed72191affa5e34d329cec5b68786",
+      "purpose": "Per-class members, to tell saved base fields from unsaved shadows."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/SeeingEye.cpp",
+      "source_sha256": "166430ee7683e151d1288f3fda0605e1e1f887b6c0e2df39a6a8776ce909c20e",
+      "purpose": "SeeingEye Save/Load (SeeingEye.cpp:488-516): owner and stuck object as LoadSave references, dropped flag; Load re-links and re-attaches; m_hClient and m_fNextPingTime unsaved; precreate and initial update skipped on a savegame."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/GameInvItems.cpp",
+      "source_sha256": "883af352df59bf3159651940039e4eb4a8ba4bb9531dacfab089150edb36cff9",
+      "purpose": "CInvTheEye Save/Load (GameInvItems.cpp:932-972): m_hSeeingObject as a LoadSave reference and SeeingEye::Init with the restore's NULL client."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PlayerObj.cpp",
+      "source_sha256": "93056622f9f083f11447a471ecae6f115b7dc3937daf7d251d2396724f3d2003",
+      "purpose": "The unsaved remote-bomb list and its destructor/Respawn cleanup."
+    }
+  ]
+}

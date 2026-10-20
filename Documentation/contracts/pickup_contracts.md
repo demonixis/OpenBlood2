@@ -131,7 +131,8 @@ without Dear ImGui.
 
 This increment does not implement weapon pickups, timed bonuses, inventory items,
 multiplayer scaling/respawn, bouncing/rotating pickup FX, localized HUD strings,
-audio, AI pickup seeking, save/restore or a full original session. It does not
+audio, AI pickup seeking or a full original session (saved games are
+[save/load lot 9](save_load_contracts.md#implemented-pickups-and-projectiles-lot-9)). It does not
 make ammo-consuming weapons beyond the current Beretta/knife subset available.
 ManaAmmoPU is commented out in the source; RocketAmmoPU is not guessed as an alias.
 Missing/ambiguous world models and polygon dynamics

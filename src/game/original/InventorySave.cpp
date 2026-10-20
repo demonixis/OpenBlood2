@@ -2,6 +2,7 @@
 // byte layout for MID_SAVEOBJECT/MID_LOADOBJECT. Staging replaces destructive Term-before-read.
 #include "InventoryMgr.h"
 #include "SaveFields.h"
+#include "SeeingEye.h"
 #include <cmath>
 #include <string>
 
@@ -422,10 +423,18 @@ void CInventoryMgr::Load(HMESSAGEREAD h, DDWORD param)
     std::string error;
     if (!problem.empty())
         s->RejectPayload(h, "CInventoryMgr Load: " + problem);
-    else if (eye_object) // A thrown eye is a SeeingEye record; its class is not supported yet (lot 9).
-        s->RejectPayload(h, "CInventoryMgr Load: a thrown eye requires SeeingEye restoration (lot 9)");
+    else if (eye_object && !dynamic_cast<SeeingEye*>(s->HandleToObject(eye_object)))
+        s->RejectPayload(h, "CInventoryMgr Load: the thrown eye reference is not a SeeingEye");
     else if (!Load(state,
                    param == 1 ? OpenBlood2::InventoryLoadType::KeepAlive : OpenBlood2::InventoryLoadType::Restore,
                    error))
         s->RejectPayload(h, "CInventoryMgr Load: " + error);
+    else if (eye_object && eye)
+    {
+        // Original CInvTheEye::Load: SeeingEye::Init(owner, client) with the restore's NULL client.
+        // The eye's own Load (later in the save order) reads the same owner again; the saved
+        // eye->owner interlink is restored after every Load.
+        eye->eye = eye_object;
+        static_cast<SeeingEye*>(s->HandleToObject(eye_object))->m_hFiredFrom = m_hOwner;
+    }
 }

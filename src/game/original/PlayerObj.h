@@ -68,6 +68,7 @@ class CPlayerObj : public CBaseCharacter
     bool AddRemoteBomb(HOBJECT);
     void RemoveRemoteBomb(HOBJECT);
     void ClearRemoteBombs();
+    bool RestoreRemoteBomb(HOBJECT);
     bool OnCommandDetonate();
     ObjectList* remote_bombs = nullptr;
     std::uint64_t remote_commands = 0, remote_signals = 0;

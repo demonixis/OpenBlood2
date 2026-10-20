@@ -17,6 +17,7 @@
 #include "save_ai_fixture.h"
 #include "save_rewrites.h"
 #include "save_world_fixture.h"
+#include "scratch_dir.h"
 #include <array>
 #include <bit>
 #include <cstring>
@@ -25,7 +26,6 @@
 #include <map>
 #include <optional>
 #include <set>
-#include "scratch_dir.h"
 
 // Original AI_Mgr, CultistAI, CivilianAI, Fanatic, CCorpse and AI_Mgr-only subclass Save/Load
 // (save_load_contracts lot 11): the byte layout, checked refusals and the ledge departure on a
@@ -1403,6 +1403,9 @@ namespace
             GameSave save;
             if (!game->save_game(save, error))
             {
+                // Lot 13 refuses a CTF world by name: its team flags are multiplayer state.
+                if (error.find("CTF games cannot be saved") != std::string::npos)
+                    continue;
                 std::cerr << name << " save refused: " << error << '\n';
                 return false;
             }

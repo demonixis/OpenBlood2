@@ -74,6 +74,8 @@ class CTeslaBallProjectile final : public CProjectile
     bool Update() override;
     void AddExplosion(DVector, DVector) override;
     void FireBolt();
+    void SaveBlock(ProjectileBlock&) const override;
+    std::string LoadBlock(const ProjectileBlock&) override;
 };
 // Original CShikariLoogieProjectile (GameProjectiles.cpp): an OT_NORMAL Acid spit that
 // damages what it hits directly (no radius, no explosion); its bug-spray trail is
@@ -89,6 +91,7 @@ class CShikariLoogieProjectile final : public CProjectile
         trail_error = "OBJFX_BUGSPRAY_1 trail (scale 0.25, SCALELIFETIME) unavailable";
         flags |= FLAG_FORCECLIENTUPDATE;
     }
+
   protected:
     bool Update() override;
     void AddExplosion(DVector, DVector) override;

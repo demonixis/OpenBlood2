@@ -14,6 +14,8 @@ using namespace OpenBlood2;
 CProjectile::CProjectile(DBYTE type) : BaseClass(type)
 {
     AddAggregate(&m_damage);
+    if (g_pServerDE)
+        scale_start = g_pServerDE->GetTime();
 }
 bool CProjectile::Fail(const char* text)
 {
@@ -88,18 +90,33 @@ DDWORD CProjectile::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
     if (message == MID_PRECREATE)
     {
-        // This bounded runtime import does not claim source save/load or authored projectiles.
-        if (!data || reason != 0)
+        // Runtime creation or a saved-game restore; authored projectiles are not claimed.
+        if (!data || (reason != PRECREATE_NORMAL && reason != PRECREATE_SAVEGAME))
             return 0;
         const auto result = BaseClass::EngineMessageFn(message, data, reason);
+        if (reason == PRECREATE_SAVEGAME)
+            return result; // Original skips PostPropRead: the engine record carries file and update.
         auto& state = *static_cast<ObjectCreateStruct*>(data);
         legacy_copy(state.m_Filename, filename ? filename : "");
         legacy_copy(state.m_SkinName, skin ? skin : "");
         state.m_NextUpdate = .001f;
         return result;
     }
-    if (message == MID_INITIALUPDATE && !InitialUpdate())
-        Fail("Projectile initialization failed");
+    if (message == MID_INITIALUPDATE)
+    {
+        if (reason != INITIALUPDATE_SAVEGAME && !InitialUpdate())
+            Fail("Projectile initialization failed");
+    }
+    else if (message == MID_SAVEOBJECT)
+    {
+        if (data)
+            SaveObject(*static_cast<HMESSAGEWRITE*>(data));
+    }
+    else if (message == MID_LOADOBJECT)
+    {
+        if (data)
+            LoadObject(*static_cast<HMESSAGEREAD*>(data));
+    }
     else if (message == MID_UPDATE && g_pServerDE->IsObjectAlive(m_hObject) && !Update() && !failed)
         Finish(exploded ? "exploded" : "expired");
     else if (message == MID_LINKBROKEN)
@@ -315,7 +332,7 @@ bool CEnergyBlastProjectile::InitialUpdate()
 }
 bool CEnergyBlastProjectile::Update()
 {
-    const float scale = g_pServerDE->GetTime() - m_fStartTime < .01f ? 0 : .25f;
+    const float scale = g_pServerDE->GetTime() - scale_start < .01f ? 0 : .25f;
     if (!g_pServerDE->ScaleObject(m_hObject, {scale, scale, scale}))
         return Fail("Energy projectile scale rejected");
     return CProjectile::Update();

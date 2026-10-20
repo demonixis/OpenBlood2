@@ -24,7 +24,7 @@ bool CVomitProjectile::InitialUpdate()
 }
 bool CVomitProjectile::Update()
 {
-    const float scale = g_pServerDE->GetTime() - m_fStartTime < .01f ? 0 : .25f;
+    const float scale = g_pServerDE->GetTime() - scale_start < .01f ? 0 : .25f;
     if (!g_pServerDE->ScaleObject(m_hObject, {scale, scale, scale}))
         return Fail("Vomit projectile scale unavailable");
     return CProjectile::Update();
@@ -259,7 +259,7 @@ CGroundStrikeProjectile::CGroundStrikeProjectile() : CProjectile(OT_NORMAL)
 }
 bool CGroundStrikeProjectile::Update()
 {
-    const float scale = g_pServerDE->GetTime() - m_fStartTime < .01f ? 0 : .25f;
+    const float scale = g_pServerDE->GetTime() - scale_start < .01f ? 0 : .25f;
     if (!g_pServerDE->ScaleObject(m_hObject, {scale, scale, scale}))
         return Fail("Ground strike scale unavailable");
     return CProjectile::Update();

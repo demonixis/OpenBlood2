@@ -13,6 +13,8 @@ Lot 7 (world logic, [evidence](../implementation/reports/save_load_world_logic.m
 10 classes Original.
 Lot 10 (effect publishers and audio emitters,
 [evidence](../implementation/reports/save_load_effects.md)) declares its 21 classes Original.
+Lot 9 (pickups and projectiles, [evidence](../implementation/reports/save_load_pickups.md))
+declares its 85 classes Original.
 Lot 13 (native state, [evidence](../implementation/reports/save_load_native.md)) checks the
 engine classes, sky and PolyGrid republication, VoiceMgr and CommLink across a load, and
 refuses CTF saves by name.
@@ -159,6 +161,7 @@ place OpenBlood2 differs.
 | D12 | F2/F3 and the server handlers have no multiplayer guard | Saving and loading are refused outside single-player game types |
 | D13 | A restored model keeps the file precreate chose; the later runtime applies the saved animation trackers to it | The engine record's model and skin replace it before the animation track is checked and applied. CPlayerObj's precreate forces `Caleb.abc`, so another character would otherwise lose or refuse its track ([lot 5](#implemented-player-and-client-lot-5)) |
 | D14 | A failed autosave leaves the previous `Auto.sav`, so Restart can reach an earlier level | A refused level-entry snapshot removes `current.ob2sav` and the in-memory snapshot; Restart is then empty ([lot 6](#implemented-slots-quick-and-restart-lot-6)) |
+| D15 | CProjectile never saves `m_hFiredFrom`; a restored projectile has no shooter and the player loses its remote-charge list | The CProjectile block ends with the shooter as a LoadSave reference; a restored remote charge rejoins its player's list ([lot 9](#implemented-pickups-and-projectiles-lot-9)) |
 
 ## Save file format
 
@@ -776,7 +779,7 @@ NPCs and corpses reuse it.
     server `FormatString`. The current item is written as `INV_NONE`: the port has no item
     cursor.
   - An unknown item type is refused; the original skips the item's data and desynchronizes.
-    A thrown eye (a non-NULL SeeingEye reference) is refused until lot 9.
+    A thrown eye (a non-NULL SeeingEye reference) was refused until lot 9, which binds it.
   - The original does not save the eye level. The crouch state and eye level are derived
     from the saved movement state, and the client reads the eye level from the player, as
     before, instead of an `SMSG_EYELEVEL` message.
@@ -994,8 +997,74 @@ payload version 1; their `PRECREATE_SAVEGAME` refusals are gone.
 - **Sky membership.** A restored Door or CDestructableBrush brings back INSKY and its slot from
   the engine record; the restore-mode world's always-load SkyPointer then adds the same object
   again at its first update, which the engine treats as no change. All 50 sky worlds restore
-  their lot-8 objects through `load_game` with no sky failure. No sky world is restorable whole
-  yet: each still holds classes of lots 5, 7, 9, 10 or 11 (see the evidence).
+  their lot-8 objects through `load_game` with no sky failure. Since lot 9, nine multiplayer
+  sky maps restore whole; every campaign sky world still holds classes of lots 10, 11 or 12.
+
+### Implemented pickups and projectiles (lot 9)
+
+The original Save/Load bodies of PickupObject (and through it every pickup), KeyPickup,
+CProjectile (and through it the whole projectile family, grenades and bombs included) and
+SeeingEye. Their 85 registered classes are Original with payload version 1
+(`PickupSave.cpp`, `ProjectileSave.cpp`, `SeeingEye.cpp`); their `PRECREATE_SAVEGAME`
+refusals are gone.
+
+- **Byte order.** A pickup writes PickupObject's 15 fields; KeyPickup writes its own five
+  (model, skin, both icons, use count) before them, as the original KeyPickup derives from
+  PickupObject while the port's does not. A projectile writes CProjectile's 26 fields, the
+  OpenBlood2 shooter tail below, then the CDestructable block. SeeingEye writes only its
+  owner, stuck object and dropped flag, then CDestructable: the original eye derives from
+  BaseClass and never writes CProjectile's fields.
+- **Restore branches.** Pickup precreate reads no property but keeps `PostPropRead`: the
+  model from the class's file and `TOUCH_NOTIFY | VISIBLE | GRAVITY` added to the saved flags,
+  `SHADOW` removed. Initial update is skipped, except the AmmoPickup list insertion (AI
+  `FindAmmo`) and WeaponPickup's single-player check, which the original runs
+  unconditionally. A projectile's precreate skips `PostPropRead` (the engine record carries
+  file and update) and its initial update is skipped.
+- **Mapped fields.** Pickups: type, value, `m_dwFlags`, bounce acceleration, bouncing and
+  rest position, trigger target and message; the object name is the class's
+  `m_szObjectName`. CProjectile: direction, speed, flags, damage type, radius, relative start
+  time, damage, lifetime and the explode latch; grenades map last position and spin, the
+  proximity, time and remote bombs also the armed flag, the Tesla ball and the Singularity
+  the armed flag. Loads decode the whole block, check it and only then assign; a refusal
+  goes through `RejectPayload`.
+- **Values the port does not model.** The single-player pickup constants (`m_bFirstUpdate` 1,
+  respawn time 0, `m_bRotate` 0, yaw 0, the never-assigned `m_fLastTime` written relative)
+  and the projectile presentation fields (`m_bRemoveFromWorld`, damage message, shockwave,
+  explosion and sparks flags, scales, light colour, duration, filename, dims) are written as
+  the CProjectile constructor's values, or 0 where the original left them unset (special
+  members of classes that do not use them), and must match on load. The port has no server
+  `FormatString`, so a pickup's display name is NULL and a key's is its object name.
+- **Original losses kept.** Unsaved subclass state restarts from the constructor, as in the
+  original: grenade bounce count, proximity get-away time, hit-character and both sound flags
+  (an armed bomb plays its arm sound again), remote falling flag, flare colour and tracking,
+  orb tracking and attachment, leech curve, napalm fireball bounces, death-ray bounce clock.
+  The subclasses' shadowed `m_fStartTime` (constructor `GetTime()`) is the new
+  `CProjectile::scale_start`, so the 0.01-second scale delay and the alternate flare's burst
+  timer restart; the Tesla ball's and Singularity's attract clocks (constructor 0) are lost,
+  so an armed one ends on its first update after a load. Hit objects, weapon types and the
+  client ID are lost. Every flight, bounce and arm loop restarts in Update; no sound is saved.
+- **Effects.** The engine-saved trail effect message of the original becomes republication in
+  Load: grenade, primary orb, life-leech primary, bug spray, vomit and skull trails. A flare
+  fragment keeps the engine colour its last update set (the original reads an uninitialized
+  colour).
+- **Departures.** D15: the original never saves `m_hFiredFrom`; the CProjectile block ends with
+  the shooter as a LoadSave reference, because the port's shooter exclusion, shooter-anchored
+  one-update projectiles and damage attribution would otherwise fail or hit the shooter.
+  With it, a remote charge its player has not signalled is listed again on that player in
+  load order (`CPlayerObj::RestoreRemoteBomb`, list only), so a restored player can still
+  detonate it; the original loses the list. A restored thrown eye turns its view off on the
+  owner's current client when it is removed (the original's unsaved client leaves the view
+  on a removed eye).
+- **Links.** Load creates no interlink: the projectile-shooter, player-charge and
+  eye-owner/stuck links are saved interlinks that the restore re-creates after every Load,
+  so LINK keeps its order. CInventoryMgr's Load binds a thrown eye (it must be a SeeingEye)
+  and sets its owner, as the original `SeeingEye::Init(owner, NULL)`; the lot-5 refusal is
+  gone. A saved alternate orb never holds its player's camera (the player's save refuses an
+  active Orb), so a restored one does not create it again.
+- **Expected re-save rewrites.** Only one: a pickup whose flags lacked `TOUCH_NOTIFY`,
+  `VISIBLE` or `GRAVITY` regains them from `PostPropRead`. Every other OBJS and LINK byte of
+  these classes is identical after a load. Pickups never respawn in single player (the
+  original removes a collected pickup), so no respawning state exists to save.
 
 ### Implemented world logic (lot 7)
 

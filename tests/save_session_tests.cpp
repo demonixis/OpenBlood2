@@ -519,91 +519,118 @@ namespace
                                               "FlagObject",     "FlagStand", "NagaCeilingDebris"};
         // Lot 5: the player. Lot 8: movers, brushes, volumes, TripLaser and Tchernotronic. Lots 11
         // and 12: AI_Mgr's NPC subclasses and CCorpse. Lot 10: effect publishers and audio emitters.
-        const std::set<std::string> original{"AncientOne",
-                                             "AncientOneTentacle",
-                                             "BoneLeech",
-                                             "DrudgePriest",
-                                             "EnhancedGideon",
-                                             "Gideon",
-                                             "Naga",
-                                             "TheHandAI",
-                                             "Thief",
-                                             "UndeadGideon",
-                                             "ZealotAI",
-                                             "Behemoth",
-                                             "CCorpse",
-                                             "CalebAI",
-                                             "CivilianAI",
-                                             "CultistAI",
-                                             "DeathShroud",
-                                             "DrudgeLord",
-                                             "Fanatic",
-                                             "GabriellaAI",
-                                             "GabriellaREV",
-                                             "IshmaelAI",
-                                             "IshmaelREV",
-                                             "MadScientistAI",
-                                             "OpheliaAI",
-                                             "OpheliaREV",
-                                             "Prophet",
-                                             "ShikariAI",
-                                             "SoulDrudge",
-                                             "Acid",
-                                             "Blood",
-                                             "CClientExplosionSFX",
-                                             "CClientLightningSFX",
-                                             "CClientParticleStreamSFX",
-                                             "CClientWarpGateSFX",
-                                             "CDestructableBrush",
-                                             "CDestructableModel",
-                                             "CPlayerObj",
-                                             "ClientLightFX",
-                                             "DetailSprite",
-                                             "Flicker1WaveLightFX",
-                                             "Flicker2WaveLightFX",
-                                             "Flicker3WaveLightFX",
-                                             "Flicker4WaveLightFX",
-                                             "FlickerLight",
-                                             "GlowingLight",
-                                             "RampDownWaveLightFX",
-                                             "RampUpWaveLightFX",
-                                             "RandomSoundFX",
-                                             "SawWaveLightFX",
-                                             "SearchWaveLightFX",
-                                             "SineWaveLightFX",
-                                             "SoundFX",
-                                             "SquareWaveLightFX",
-                                             "StrobeWaveLightFX",
-                                             "Conveyor",
-                                             "Damage",
-                                             "Door",
-                                             "FreeFall",
-                                             "Ladder",
-                                             "Minefield",
-                                             "RotatingBrush",
-                                             "RotatingDoor",
-                                             "RotatingModel",
-                                             "Tchernotronic",
-                                             "TripLaser",
-                                             "VolumeBrush",
-                                             "Water",
-                                             "WorldModelDebris",
-                                             // Lot 7: world logic.
-                                             "BigTrigger",
-                                             "CameraObj",
-                                             "CinematicTrigger",
-                                             "ConversationTrigger",
-                                             "ExitTrigger",
-                                             "KeyFramer",
-                                             "ObjectivesTrigger",
-                                             "Spawner",
-                                             "ToggleTrigger",
-                                             "Trigger"};
+        const std::set<std::string> original{
+            "AncientOne", "AncientOneTentacle", "BoneLeech", "DrudgePriest", "EnhancedGideon", "Gideon", "Naga",
+            "TheHandAI", "Thief", "UndeadGideon", "ZealotAI", "Behemoth", "CCorpse", "CalebAI", "CivilianAI",
+            "CultistAI", "DeathShroud", "DrudgeLord", "Fanatic", "GabriellaAI", "GabriellaREV", "IshmaelAI",
+            "IshmaelREV", "MadScientistAI", "OpheliaAI", "OpheliaREV", "Prophet", "ShikariAI", "SoulDrudge", "Acid",
+            "Blood", "CClientExplosionSFX", "CClientLightningSFX", "CClientParticleStreamSFX", "CClientWarpGateSFX",
+            "CDestructableBrush", "CDestructableModel", "CPlayerObj", "ClientLightFX", "DetailSprite",
+            "Flicker1WaveLightFX", "Flicker2WaveLightFX", "Flicker3WaveLightFX", "Flicker4WaveLightFX", "FlickerLight",
+            "GlowingLight", "RampDownWaveLightFX", "RampUpWaveLightFX", "RandomSoundFX", "SawWaveLightFX",
+            "SearchWaveLightFX", "SineWaveLightFX", "SoundFX", "SquareWaveLightFX", "StrobeWaveLightFX", "Conveyor",
+            "Damage", "Door", "FreeFall", "Ladder", "Minefield", "RotatingBrush", "RotatingDoor", "RotatingModel",
+            "Tchernotronic", "TripLaser", "VolumeBrush", "Water", "WorldModelDebris",
+            // Lot 7: world logic.
+            "BigTrigger", "CameraObj", "CinematicTrigger", "ConversationTrigger", "ExitTrigger", "KeyFramer",
+            "ObjectivesTrigger", "Spawner", "ToggleTrigger", "Trigger"};
+        // Lot 9: every pickup, KeyPickup, the projectile family and SeeingEye.
+        const std::set<std::string> lot9{"AmmoPickup",
+                                         "AngerPU",
+                                         "ArmorBase",
+                                         "AssaultRiflePU",
+                                         "BMGAmmoPU",
+                                         "BatteryAmmoPU",
+                                         "BerettaPU",
+                                         "BinocularsPU",
+                                         "BugSprayPU",
+                                         "BulletAmmoPU",
+                                         "CBehemothShockwaveProjectile",
+                                         "CBugSprayAltProjectile",
+                                         "CBugSprayProjectile",
+                                         "CDeathRayProjectile",
+                                         "CEnergyBlastProjectile",
+                                         "CFlareAltProjectile",
+                                         "CFlareBurstProjectile",
+                                         "CFlareProjectile",
+                                         "CGrenade",
+                                         "CGroundStrikeProjectile",
+                                         "CHowitzerAltFrag",
+                                         "CHowitzerAltShell",
+                                         "CHowitzerShell",
+                                         "CLeechAltProjectile",
+                                         "CLeechPrimeProjectile",
+                                         "CNagaDebrisProjectile",
+                                         "CNagaSpikeProjectile",
+                                         "CNapalmAltProjectile",
+                                         "CNapalmFireball",
+                                         "CNapalmProjectile",
+                                         "COrbAltProjectile",
+                                         "COrbProjectile",
+                                         "CProximityBomb",
+                                         "CRemoteBomb",
+                                         "CShikariLoogieProjectile",
+                                         "CShockwaveProjectile",
+                                         "CSingularityProjectile",
+                                         "CSkullProjectile",
+                                         "CTeslaBallProjectile",
+                                         "CTeslaBoltProjectile",
+                                         "CTeslaProjectile",
+                                         "CTimeBomb",
+                                         "CVomitProjectile",
+                                         "DeathRayPU",
+                                         "DieBugDieAmmoPU",
+                                         "EnhancementBase",
+                                         "FlareAmmoPU",
+                                         "FlareGunPU",
+                                         "FlashlightPU",
+                                         "FuelAmmoPU",
+                                         "HealthBase",
+                                         "HealthPU",
+                                         "HowitzerAmmoPU",
+                                         "HowitzerPU",
+                                         "InvulnerabilityPU",
+                                         "ItemPickup",
+                                         "ItemPickupCharged",
+                                         "ItemPickupWeapon",
+                                         "KeyPickup",
+                                         "LifeLeechPU",
+                                         "MedKitPU",
+                                         "MegaHealthPU",
+                                         "MiniGunPU",
+                                         "NapalmCannonPU",
+                                         "NecroWardPU",
+                                         "NightGogglesPU",
+                                         "OrbPU",
+                                         "PickupObject",
+                                         "PowerupPickup",
+                                         "ProximitiesPU",
+                                         "RemotesPU",
+                                         "RevenantPU",
+                                         "SeeingEye",
+                                         "ShellAmmoPU",
+                                         "ShotgunPU",
+                                         "SingularityPU",
+                                         "SniperRiflePU",
+                                         "StealthPU",
+                                         "SubMachineGunPU",
+                                         "TeslaCannonPU",
+                                         "TheEyePU",
+                                         "TimeBombPU",
+                                         "VoodooDollPU",
+                                         "WardPU",
+                                         "WeaponPickup"};
+        const auto declared = [&]
+        {
+            auto all = original;
+            all.insert(lot9.begin(), lot9.end());
+            return all;
+        }();
         std::size_t unsupported = 0;
         for (auto type : g.objects.classes())
         {
             const auto support = save_support(type);
-            if (original.contains(type->name))
+            if (declared.contains(type->name))
                 CHECK(support == SaveSupport::Original && type->payload_version == 1);
             else if (always.contains(type->name))
                 CHECK(support == SaveSupport::AlwaysLoad);
@@ -621,16 +648,16 @@ namespace
             CHECK(g.objects.find_class(name));
         for (const auto& name : not_saved)
             CHECK(g.objects.find_class(name));
-        for (const auto& name : original)
+        for (const auto& name : declared)
             CHECK(g.objects.find_class(name));
         // Original always-load classes OpenBlood2 does not register: none is placed in a shipped world.
         for (auto name : {"Script", "LightFX", "WreckingBall", "SoccerGoal", "WorldModel", "FogSphere"})
             CHECK(!g.objects.find_class(name));
         const auto build_schema = save_class_schema(g.objects);
-        CHECK(unsupported > 0 && build_schema.size() == original.size()); // Lots 9 and 12 remain.
-        for (const auto& name : original)
+        CHECK(unsupported > 0 && build_schema.size() == declared.size()); // Lot 12 remains.
+        for (const auto& name : declared)
             CHECK(build_schema.contains(name) && build_schema.at(name) == 1);
-        std::cout << g.objects.classes().size() << " classes: " << original.size() << " Original, " << always.size()
+        std::cout << g.objects.classes().size() << " classes: " << declared.size() << " Original, " << always.size()
                   << " AlwaysLoad, " << not_saved.size() << " NotSaved, " << unsupported << " Unsupported\n";
         // The schema follows the declaration, including inherited AlwaysLoad.
         Objects registry;
@@ -640,7 +667,7 @@ namespace
         CHECK(registry.register_class(probe_type) && registry.register_class(always_type) &&
               registry.register_class(child));
         const auto schema = save_class_schema(registry);
-        CHECK(schema.size() == original.size() + 1 && schema.at("SessionProbe") == 1);
+        CHECK(schema.size() == declared.size() + 1 && schema.at("SessionProbe") == 1);
         return true;
     }
 

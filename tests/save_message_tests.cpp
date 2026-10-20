@@ -542,8 +542,8 @@ namespace
         server.EndHMessageWrite(blob);
         auto reader = server.ReadFromMessageHMessageRead(outer);
         CHECK(reader && server.message_count() == 2);
-        CHECK(server.WriteToMessageByte(reader, 1) == DE_INVALIDPARAMS);      // Readers are read-only.
-        server.EndHMessageWrite(reader);                                     // Wrong release call: refused.
+        CHECK(server.WriteToMessageByte(reader, 1) == DE_INVALIDPARAMS); // Readers are read-only.
+        server.EndHMessageWrite(reader);                                 // Wrong release call: refused.
         CHECK(server.message_count() == 2 && server.ReadFromMessageString(reader) == std::string("objectives"));
         // Forward a reader (PlayerObj Load → SMSG_CLIENTSAVEDATA) without consuming its owner.
         auto forward = server.StartHMessageWrite();
@@ -553,7 +553,7 @@ namespace
         forward = server.StartHMessageWrite();
         auto writer = server.StartHMessageWrite();
         CHECK(server.WriteToMessageHMessageRead(forward, writer) == DE_INVALIDPARAMS); // Writer is not a reader.
-        server.EndHMessageRead(writer); // Not a nested reader: refused.
+        server.EndHMessageRead(writer);                                                // Not a nested reader: refused.
         CHECK(server.message_count() == 4);
         server.EndHMessageWrite(writer);
         server.EndHMessageWrite(forward);
@@ -605,12 +605,9 @@ namespace
 } // namespace
 int main(int argc, char** argv)
 {
-    const std::pair<const char*, bool (*)()> cases[] = {{"golden_layout", golden_layout},
-                                                        {"round_trip", round_trip},
-                                                        {"truncation", truncation},
-                                                        {"overflow", overflow},
-                                                        {"references", references},
-                                                        {"context", context},
+    const std::pair<const char*, bool (*)()> cases[] = {{"golden_layout", golden_layout}, {"round_trip", round_trip},
+                                                        {"truncation", truncation},       {"overflow", overflow},
+                                                        {"references", references},       {"context", context},
                                                         {"nested", nested_messages}};
     if (argc != 2)
         return 2;

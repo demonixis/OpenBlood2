@@ -167,45 +167,65 @@ namespace OpenBlood2
                                         {"Alpha", 1.0f}},
                                        SaveSupport::AlwaysLoad};
         const ClassInfo shockwave_projectile{
-            "CBehemothShockwaveProjectile", &base, construct<CBehemothShockwaveProjectile>, {}};
-        const ClassInfo remote{"CRemoteBomb", &base, construct<CRemoteBomb>, {}};
-        const ClassInfo proximity{"CProximityBomb", &base, construct<CProximityBomb>, {}};
-        const ClassInfo grenade{"CGrenade", &base, construct<CGrenade>, {}};
-        const ClassInfo flare_projectile{"CFlareProjectile", &base, construct<CFlareProjectile>, {}};
-        const ClassInfo tesla_projectile{"CTeslaProjectile", &base, construct<CTeslaProjectile>, {}};
-        const ClassInfo tesla_bolt{"CTeslaBoltProjectile", &base, construct<CTeslaBoltProjectile>, {}};
-        const ClassInfo tesla_ball{"CTeslaBallProjectile", &base, construct<CTeslaBallProjectile>, {}};
-        const ClassInfo seeing_eye{"SeeingEye", &base, construct<SeeingEye>, {}};
-        const ClassInfo bugspray_projectile{"CBugSprayProjectile", &base, construct<CBugSprayProjectile>, {}};
-        const ClassInfo bugspray_alt_projectile{"CBugSprayAltProjectile", &base, construct<CBugSprayAltProjectile>, {}};
-        const ClassInfo napalm_projectile{"CNapalmProjectile", &base, construct<CNapalmProjectile>, {}};
-        const ClassInfo loogie{"CShikariLoogieProjectile", &base, construct<CShikariLoogieProjectile>, {}};
-        const ClassInfo orb_prime{"COrbProjectile", &base, construct<COrbProjectile>, {}};
-        const ClassInfo orb_alt{"COrbAltProjectile", &base, construct<COrbAltProjectile>, {}};
-        const ClassInfo leech_prime{"CLeechPrimeProjectile", &base, construct<CLeechPrimeProjectile>, {}};
-        const ClassInfo leech_alt{"CLeechAltProjectile", &base, construct<CLeechAltProjectile>, {}};
-        const ClassInfo singularity_projectile{"CSingularityProjectile", &base, construct<CSingularityProjectile>, {}};
-        const ClassInfo flare_alt{"CFlareAltProjectile", &base, construct<CFlareAltProjectile>, {}};
-        const ClassInfo flare_burst{"CFlareBurstProjectile", &base, construct<CFlareBurstProjectile>, {}};
-        const ClassInfo energy_projectile{"CEnergyBlastProjectile", &base, construct<CEnergyBlastProjectile>, {}};
-        const ClassInfo campaign_CTimeBomb{"CTimeBomb", &base, construct<CTimeBomb>, {}};
+            "CBehemothShockwaveProjectile", &base, construct<CBehemothShockwaveProjectile>, {},
+            SaveSupport::Original,          1};
+        const ClassInfo remote{"CRemoteBomb", &base, construct<CRemoteBomb>, {}, SaveSupport::Original, 1};
+        const ClassInfo proximity{"CProximityBomb", &base, construct<CProximityBomb>, {}, SaveSupport::Original, 1};
+        const ClassInfo grenade{"CGrenade", &base, construct<CGrenade>, {}, SaveSupport::Original, 1};
+        const ClassInfo flare_projectile{"CFlareProjectile",    &base, construct<CFlareProjectile>, {},
+                                         SaveSupport::Original, 1};
+        const ClassInfo tesla_projectile{"CTeslaProjectile",    &base, construct<CTeslaProjectile>, {},
+                                         SaveSupport::Original, 1};
+        const ClassInfo tesla_bolt{"CTeslaBoltProjectile", &base, construct<CTeslaBoltProjectile>, {},
+                                   SaveSupport::Original,  1};
+        const ClassInfo tesla_ball{"CTeslaBallProjectile", &base, construct<CTeslaBallProjectile>, {},
+                                   SaveSupport::Original,  1};
+        const ClassInfo seeing_eye{"SeeingEye", &base, construct<SeeingEye>, {}, SaveSupport::Original, 1};
+        const ClassInfo bugspray_projectile{"CBugSprayProjectile", &base, construct<CBugSprayProjectile>, {},
+                                            SaveSupport::Original, 1};
+        const ClassInfo bugspray_alt_projectile{"CBugSprayAltProjectile", &base, construct<CBugSprayAltProjectile>, {},
+                                                SaveSupport::Original,    1};
+        const ClassInfo napalm_projectile{"CNapalmProjectile",   &base, construct<CNapalmProjectile>, {},
+                                          SaveSupport::Original, 1};
+        const ClassInfo loogie{"CShikariLoogieProjectile", &base, construct<CShikariLoogieProjectile>, {},
+                               SaveSupport::Original,      1};
+        const ClassInfo orb_prime{"COrbProjectile", &base, construct<COrbProjectile>, {}, SaveSupport::Original, 1};
+        const ClassInfo orb_alt{"COrbAltProjectile", &base, construct<COrbAltProjectile>, {}, SaveSupport::Original, 1};
+        const ClassInfo leech_prime{"CLeechPrimeProjectile", &base, construct<CLeechPrimeProjectile>, {},
+                                    SaveSupport::Original,   1};
+        const ClassInfo leech_alt{"CLeechAltProjectile", &base, construct<CLeechAltProjectile>, {},
+                                  SaveSupport::Original, 1};
+        const ClassInfo singularity_projectile{"CSingularityProjectile", &base, construct<CSingularityProjectile>, {},
+                                               SaveSupport::Original,    1};
+        const ClassInfo flare_alt{"CFlareAltProjectile", &base, construct<CFlareAltProjectile>, {},
+                                  SaveSupport::Original, 1};
+        const ClassInfo flare_burst{"CFlareBurstProjectile", &base, construct<CFlareBurstProjectile>, {},
+                                    SaveSupport::Original,   1};
+        const ClassInfo energy_projectile{"CEnergyBlastProjectile", &base, construct<CEnergyBlastProjectile>, {},
+                                          SaveSupport::Original,    1};
+        const ClassInfo campaign_CTimeBomb{"CTimeBomb", &base, construct<CTimeBomb>, {}, SaveSupport::Original, 1};
         const ClassInfo campaign_CNagaSpikeProjectile{
-            "CNagaSpikeProjectile", &base, construct<CNagaSpikeProjectile>, {}};
+            "CNagaSpikeProjectile", &base, construct<CNagaSpikeProjectile>, {}, SaveSupport::Original, 1};
         const ClassInfo campaign_CNagaDebrisProjectile{
-            "CNagaDebrisProjectile", &base, construct<CNagaDebrisProjectile>, {}};
+            "CNagaDebrisProjectile", &base, construct<CNagaDebrisProjectile>, {}, SaveSupport::Original, 1};
         const ClassInfo campaign_NagaCeilingDebris{
             "NagaCeilingDebris", &base, construct<NagaCeilingDebris>, {}, SaveSupport::NotSaved};
         const ClassInfo campaign_CGroundStrikeProjectile{
-            "CGroundStrikeProjectile", &base, construct<CGroundStrikeProjectile>, {}};
+            "CGroundStrikeProjectile", &base, construct<CGroundStrikeProjectile>, {}, SaveSupport::Original, 1};
         const ClassInfo campaign_CShockwaveProjectile{
-            "CShockwaveProjectile", &base, construct<CShockwaveProjectile>, {}};
-        const ClassInfo campaign_CDeathRayProjectile{"CDeathRayProjectile", &base, construct<CDeathRayProjectile>, {}};
-        const ClassInfo campaign_CHowitzerAltShell{"CHowitzerAltShell", &base, construct<CHowitzerAltShell>, {}};
-        const ClassInfo campaign_CHowitzerAltFrag{"CHowitzerAltFrag", &base, construct<CHowitzerAltFrag>, {}};
+            "CShockwaveProjectile", &base, construct<CShockwaveProjectile>, {}, SaveSupport::Original, 1};
+        const ClassInfo campaign_CDeathRayProjectile{"CDeathRayProjectile", &base, construct<CDeathRayProjectile>, {},
+                                                     SaveSupport::Original, 1};
+        const ClassInfo campaign_CHowitzerAltShell{"CHowitzerAltShell",   &base, construct<CHowitzerAltShell>, {},
+                                                   SaveSupport::Original, 1};
+        const ClassInfo campaign_CHowitzerAltFrag{"CHowitzerAltFrag",    &base, construct<CHowitzerAltFrag>, {},
+                                                  SaveSupport::Original, 1};
         const ClassInfo campaign_CNapalmAltProjectile{
-            "CNapalmAltProjectile", &base, construct<CNapalmAltProjectile>, {}};
-        const ClassInfo campaign_CNapalmFireball{"CNapalmFireball", &base, construct<CNapalmFireball>, {}};
-        const ClassInfo howitzer_shell{"CHowitzerShell", &base, construct<CHowitzerShell>, {}};
+            "CNapalmAltProjectile", &base, construct<CNapalmAltProjectile>, {}, SaveSupport::Original, 1};
+        const ClassInfo campaign_CNapalmFireball{"CNapalmFireball",     &base, construct<CNapalmFireball>, {},
+                                                 SaveSupport::Original, 1};
+        const ClassInfo howitzer_shell{"CHowitzerShell",      &base, construct<CHowitzerShell>, {},
+                                       SaveSupport::Original, 1};
         const ClassInfo hand_model{"CHandWeaponModel", &base, construct<CHandWeaponModel>, {}, SaveSupport::NotSaved};
         const ClassInfo b2base{
             "B2BaseClass",
@@ -361,7 +381,10 @@ namespace OpenBlood2
                                      SaveSupport::Original,
                                      1};
         const ClassInfo cinematic_trigger{
-            "CinematicTrigger", &b2base, construct<CinematicTrigger>, []
+            "CinematicTrigger",
+            &b2base,
+            construct<CinematicTrigger>,
+            []
             {
                 std::vector<PropertySpec> p{{"TypeActionMode", false}};
                 for (unsigned i = 1; i <= 10; ++i)
@@ -376,15 +399,13 @@ namespace OpenBlood2
             }(),
             SaveSupport::Original,
             1};
-        const ClassInfo keyframer{"KeyFramer",
-                                  &b2base,
-                                  construct<KeyFramer>,
-                                  {{"ObjectName", std::string{}},
-                                   {"BaseKeyName", std::string{}},
-                                   {"StartActive", false},
-                                   {"Looping", false}},
-                                  SaveSupport::Original,
-                                  1};
+        const ClassInfo keyframer{
+            "KeyFramer",
+            &b2base,
+            construct<KeyFramer>,
+            {{"ObjectName", std::string{}}, {"BaseKeyName", std::string{}}, {"StartActive", false}, {"Looping", false}},
+            SaveSupport::Original,
+            1};
         const ClassInfo client_sfx{"CClientSFX", &b2base, construct<CClientSFX>, {}, SaveSupport::NotSaved};
         const ClassInfo client_splat{
             "CClientSplatFX", &client_sfx, construct<CClientSplatFX>, {}, SaveSupport::NotSaved};
@@ -748,7 +769,9 @@ namespace OpenBlood2
             "DrudgePriest",
             &ai_manager,
             construct_npc<DrudgePriest, AI_Mgr::NPCType::DrudgePriest>,
-            {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{40, 30, 37}}}, SaveSupport::Original, 1};
+            {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{40, 30, 37}}},
+            SaveSupport::Original,
+            1};
         const ClassInfo later_DeathShroud{
             "DeathShroud",
             &ai_manager,
@@ -760,25 +783,35 @@ namespace OpenBlood2
             "TheHandAI",
             &ai_manager,
             construct_npc<TheHandAI, AI_Mgr::NPCType::TheHand>,
-            {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{4, 4, 5}}}, SaveSupport::Original, 1};
-        const ClassInfo vomit_projectile{"CVomitProjectile", &base, construct<CVomitProjectile>, {}};
-        const ClassInfo skull_projectile{"CSkullProjectile", &base, construct<CSkullProjectile>, {}};
+            {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{4, 4, 5}}},
+            SaveSupport::Original,
+            1};
+        const ClassInfo vomit_projectile{"CVomitProjectile",    &base, construct<CVomitProjectile>, {},
+                                         SaveSupport::Original, 1};
+        const ClassInfo skull_projectile{"CSkullProjectile",    &base, construct<CSkullProjectile>, {},
+                                         SaveSupport::Original, 1};
         const ClassInfo campaign_Thief{
             "Thief",
             &ai_manager,
             construct_npc<Thief, AI_Mgr::NPCType::Thief>,
-            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{9, 9, 8}}}, SaveSupport::Original, 1};
+            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{9, 9, 8}}},
+            SaveSupport::Original,
+            1};
         const ClassInfo campaign_Naga{"Naga",
                                       &ai_manager,
                                       construct_npc<Naga, AI_Mgr::NPCType::Naga>,
-                                      {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}}, SaveSupport::Original, 1};
+                                      {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}},
+                                      SaveSupport::Original,
+                                      1};
         const ClassInfo campaign_ZealotAI{"ZealotAI",
                                           &ai_manager,
                                           construct_npc<ZealotAI, AI_Mgr::NPCType::Zealot>,
                                           {{"RandomHitPoints", 50.0f},
                                            {"AIState", std::string("IDLE"), true, 31},
                                            {"Dims", DVector{12, 44, 12}},
-                                           {"Divine", false}}, SaveSupport::Original, 1};
+                                           {"Divine", false}},
+                                          SaveSupport::Original,
+                                          1};
         const ClassInfo cultist{"CultistAI",
                                 &ai_manager,
                                 construct_npc<CultistAI, AI_Mgr::NPCType::Cultist>,
@@ -832,7 +865,9 @@ namespace OpenBlood2
             "BoneLeech",
             &ai_manager,
             construct_npc<BoneLeech, AI_Mgr::NPCType::BoneLeech>,
-            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{2, 1.5f, 11}}}, SaveSupport::Original, 1};
+            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{2, 1.5f, 11}}},
+            SaveSupport::Original,
+            1};
         const ClassInfo drudge_lord{
             "DrudgeLord",
             &ai_manager,
@@ -893,25 +928,35 @@ namespace OpenBlood2
             "Gideon",
             &ai_manager,
             construct_npc<Gideon, AI_Mgr::NPCType::Gideon>,
-            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Enhanced", false}}, SaveSupport::Original, 1};
+            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Enhanced", false}},
+            SaveSupport::Original,
+            1};
         const ClassInfo ancient_one{"AncientOne",
                                     &ai_manager,
                                     construct_npc<AncientOne, AI_Mgr::NPCType::AncientOne>,
-                                    {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}}, SaveSupport::Original, 1};
+                                    {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}},
+                                    SaveSupport::Original,
+                                    1};
         const ClassInfo ancient_tentacle{"AncientOneTentacle",
                                          &ai_manager,
                                          construct_npc<AncientOneTentacle, AI_Mgr::NPCType::AncientOneTentacle>,
-                                         {{"AIState", std::string("IDLE"), true, 31}}, SaveSupport::Original, 1};
+                                         {{"AIState", std::string("IDLE"), true, 31}},
+                                         SaveSupport::Original,
+                                         1};
         const ClassInfo undead_gideon{
             "UndeadGideon",
             &ai_manager,
             construct_npc<UndeadGideon, AI_Mgr::NPCType::UndeadGideon>,
-            {{"RandomHitPoints", 50.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{70, 88, 70}}}, SaveSupport::Original, 1};
+            {{"RandomHitPoints", 50.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{70, 88, 70}}},
+            SaveSupport::Original,
+            1};
         const ClassInfo enhanced_gideon{
             "EnhancedGideon",
             &ai_manager,
             construct_npc<EnhancedGideon, AI_Mgr::NPCType::EnhancedGideon>,
-            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Enhanced", false}}, SaveSupport::Original, 1};
+            {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Enhanced", false}},
+            SaveSupport::Original,
+            1};
         // Save/load lot 5: CPlayerObj + CBaseCharacter (0 bytes) + CMovement + CInventoryMgr + CDestructable.
         const ClassInfo player{"CPlayerObj", &character, construct<CPlayerObj>, {}, SaveSupport::Original, 1};
         const ClassInfo world_properties{
@@ -1061,59 +1106,88 @@ namespace OpenBlood2
                                 {"YScaleDuration", 10.0f}},
                                SaveSupport::Original,
                                1};
-        const ClassInfo pickup{"PickupObject",
-                               &b2base,
-                               construct<PickupObject>,
-                               {{"PickupTriggerTarget", std::string{}}, {"PickupTriggerMessage", std::string{}}}};
-        const ClassInfo item_pickup{"ItemPickup", &pickup, construct<ItemPickup>, {}};
-        const ClassInfo charged_pickup{"ItemPickupCharged", &item_pickup, construct<ItemPickupCharged>, {}};
-        const ClassInfo item_weapon{"ItemPickupWeapon", &item_pickup, construct<ItemPickupWeapon>, {}};
-        const ClassInfo remote_pickup{"RemotesPU", &item_weapon, construct<RemotesPU>, {}};
-        const ClassInfo proximity_pickup{"ProximitiesPU", &item_weapon, construct<ProximitiesPU>, {}};
-        const ClassInfo flashlight_pickup{"FlashlightPU", &charged_pickup, construct<FlashlightPU>, {}};
-        const ClassInfo medkit_pickup{"MedKitPU", &charged_pickup, construct<MedKitPU>, {}};
-        const ClassInfo binoculars_pickup{"BinocularsPU", &charged_pickup, construct<BinocularsPU>, {}};
-        const ClassInfo eye_pickup{"TheEyePU", &charged_pickup, construct<TheEyePU>, {}};
-        const ClassInfo goggles_pickup{"NightGogglesPU", &charged_pickup, construct<NightGogglesPU>, {}};
-        const ClassInfo weapon_pickup{"WeaponPickup", &pickup, construct<WeaponPickup>, {}};
-        const ClassInfo bugspray_pickup{"BugSprayPU", &weapon_pickup, construct<BugSprayPU>, {}};
-        const ClassInfo beretta_pickup{"BerettaPU", &weapon_pickup, construct<BerettaPU>, {}};
-        const ClassInfo assault_pickup{"AssaultRiflePU", &weapon_pickup, construct<AssaultRiflePU>, {}};
-        const ClassInfo flare_pickup{"FlareGunPU", &weapon_pickup, construct<FlareGunPU>, {}};
-        const ClassInfo tesla_pickup{"TeslaCannonPU", &weapon_pickup, construct<TeslaCannonPU>, {}};
-        const ClassInfo voodoo_pickup{"VoodooDollPU", &weapon_pickup, construct<VoodooDollPU>, {}};
-        const ClassInfo shotgun_pickup{"ShotgunPU", &weapon_pickup, construct<ShotgunPU>, {}};
-        const ClassInfo orb_pickup{"OrbPU", &weapon_pickup, construct<OrbPU>, {}};
-        const ClassInfo leech_pickup{"LifeLeechPU", &weapon_pickup, construct<LifeLeechPU>, {}};
-        const ClassInfo singularity_pickup{"SingularityPU", &weapon_pickup, construct<SingularityPU>, {}};
-        const ClassInfo mac10_pickup{"SubMachineGunPU", &weapon_pickup, construct<SubMachineGunPU>, {}};
-        const ClassInfo campaign_HowitzerPU{"HowitzerPU", &weapon_pickup, construct<HowitzerPU>, {}};
-        const ClassInfo campaign_NapalmCannonPU{"NapalmCannonPU", &weapon_pickup, construct<NapalmCannonPU>, {}};
-        const ClassInfo campaign_DeathRayPU{"DeathRayPU", &weapon_pickup, construct<DeathRayPU>, {}};
-        const ClassInfo campaign_TimeBombPU{"TimeBombPU", &item_weapon, construct<TimeBombPU>, {}};
-        const ClassInfo minigun_pickup{"MiniGunPU", &weapon_pickup, construct<MiniGunPU>, {}};
-        const ClassInfo sniper_pickup{"SniperRiflePU", &weapon_pickup, construct<SniperRiflePU>, {}};
-        const ClassInfo ammo_pickup{"AmmoPickup", &pickup, construct<AmmoPickup>, {}};
-        const ClassInfo powerup_pickup{"PowerupPickup", &pickup, construct<PowerupPickup>, {}};
-        const ClassInfo health_base{"HealthBase", &powerup_pickup, construct<HealthBase>, {}};
-        const ClassInfo armor_base{"ArmorBase", &powerup_pickup, construct<ArmorBase>, {}};
-        const ClassInfo enhancement_base{"EnhancementBase", &powerup_pickup, construct<EnhancementBase>, {}};
-        const ClassInfo anger_pickup{"AngerPU", &enhancement_base, construct<AngerPU>, {}};
-        const ClassInfo revenant_pickup{"RevenantPU", &enhancement_base, construct<RevenantPU>, {}};
-        const ClassInfo stealth_pickup{"StealthPU", &enhancement_base, construct<StealthPU>, {}};
-        const ClassInfo willpower_pickup{"InvulnerabilityPU", &enhancement_base, construct<InvulnerabilityPU>, {}};
-        const ClassInfo bullet_ammo{"BulletAmmoPU", &ammo_pickup, construct<BulletAmmoPU>, {}};
-        const ClassInfo shell_ammo{"ShellAmmoPU", &ammo_pickup, construct<ShellAmmoPU>, {}};
-        const ClassInfo bmg_ammo{"BMGAmmoPU", &ammo_pickup, construct<BMGAmmoPU>, {}};
-        const ClassInfo flare_ammo{"FlareAmmoPU", &ammo_pickup, construct<FlareAmmoPU>, {}};
-        const ClassInfo diebugdie_ammo{"DieBugDieAmmoPU", &ammo_pickup, construct<DieBugDieAmmoPU>, {}};
-        const ClassInfo howitzer_ammo{"HowitzerAmmoPU", &ammo_pickup, construct<HowitzerAmmoPU>, {}};
-        const ClassInfo fuel_ammo{"FuelAmmoPU", &ammo_pickup, construct<FuelAmmoPU>, {}};
-        const ClassInfo battery_ammo{"BatteryAmmoPU", &ammo_pickup, construct<BatteryAmmoPU>, {}};
-        const ClassInfo health_pickup{"HealthPU", &health_base, construct<HealthPU>, {}};
-        const ClassInfo megahealth_pickup{"MegaHealthPU", &health_base, construct<MegaHealthPU>, {}};
-        const ClassInfo ward_pickup{"WardPU", &armor_base, construct<WardPU>, {}};
-        const ClassInfo necroward_pickup{"NecroWardPU", &armor_base, construct<NecroWardPU>, {}};
+        const ClassInfo pickup{
+            "PickupObject",          &b2base,
+            construct<PickupObject>, {{"PickupTriggerTarget", std::string{}}, {"PickupTriggerMessage", std::string{}}},
+            SaveSupport::Original,   1};
+        const ClassInfo item_pickup{"ItemPickup", &pickup, construct<ItemPickup>, {}, SaveSupport::Original, 1};
+        const ClassInfo charged_pickup{
+            "ItemPickupCharged", &item_pickup, construct<ItemPickupCharged>, {}, SaveSupport::Original, 1};
+        const ClassInfo item_weapon{
+            "ItemPickupWeapon", &item_pickup, construct<ItemPickupWeapon>, {}, SaveSupport::Original, 1};
+        const ClassInfo remote_pickup{"RemotesPU", &item_weapon, construct<RemotesPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo proximity_pickup{
+            "ProximitiesPU", &item_weapon, construct<ProximitiesPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo flashlight_pickup{
+            "FlashlightPU", &charged_pickup, construct<FlashlightPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo medkit_pickup{"MedKitPU", &charged_pickup, construct<MedKitPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo binoculars_pickup{
+            "BinocularsPU", &charged_pickup, construct<BinocularsPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo eye_pickup{"TheEyePU", &charged_pickup, construct<TheEyePU>, {}, SaveSupport::Original, 1};
+        const ClassInfo goggles_pickup{
+            "NightGogglesPU", &charged_pickup, construct<NightGogglesPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo weapon_pickup{"WeaponPickup", &pickup, construct<WeaponPickup>, {}, SaveSupport::Original, 1};
+        const ClassInfo bugspray_pickup{"BugSprayPU", &weapon_pickup,        construct<BugSprayPU>,
+                                        {},           SaveSupport::Original, 1};
+        const ClassInfo beretta_pickup{"BerettaPU", &weapon_pickup, construct<BerettaPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo assault_pickup{
+            "AssaultRiflePU", &weapon_pickup, construct<AssaultRiflePU>, {}, SaveSupport::Original, 1};
+        const ClassInfo flare_pickup{"FlareGunPU", &weapon_pickup, construct<FlareGunPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo tesla_pickup{
+            "TeslaCannonPU", &weapon_pickup, construct<TeslaCannonPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo voodoo_pickup{
+            "VoodooDollPU", &weapon_pickup, construct<VoodooDollPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo shotgun_pickup{"ShotgunPU", &weapon_pickup, construct<ShotgunPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo orb_pickup{"OrbPU", &weapon_pickup, construct<OrbPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo leech_pickup{
+            "LifeLeechPU", &weapon_pickup, construct<LifeLeechPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo singularity_pickup{
+            "SingularityPU", &weapon_pickup, construct<SingularityPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo mac10_pickup{
+            "SubMachineGunPU", &weapon_pickup, construct<SubMachineGunPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo campaign_HowitzerPU{"HowitzerPU", &weapon_pickup,        construct<HowitzerPU>,
+                                            {},           SaveSupport::Original, 1};
+        const ClassInfo campaign_NapalmCannonPU{
+            "NapalmCannonPU", &weapon_pickup, construct<NapalmCannonPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo campaign_DeathRayPU{"DeathRayPU", &weapon_pickup,        construct<DeathRayPU>,
+                                            {},           SaveSupport::Original, 1};
+        const ClassInfo campaign_TimeBombPU{"TimeBombPU", &item_weapon,          construct<TimeBombPU>,
+                                            {},           SaveSupport::Original, 1};
+        const ClassInfo minigun_pickup{"MiniGunPU", &weapon_pickup, construct<MiniGunPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo sniper_pickup{
+            "SniperRiflePU", &weapon_pickup, construct<SniperRiflePU>, {}, SaveSupport::Original, 1};
+        const ClassInfo ammo_pickup{"AmmoPickup", &pickup, construct<AmmoPickup>, {}, SaveSupport::Original, 1};
+        const ClassInfo powerup_pickup{"PowerupPickup",       &pickup, construct<PowerupPickup>, {},
+                                       SaveSupport::Original, 1};
+        const ClassInfo health_base{"HealthBase", &powerup_pickup, construct<HealthBase>, {}, SaveSupport::Original, 1};
+        const ClassInfo armor_base{"ArmorBase", &powerup_pickup, construct<ArmorBase>, {}, SaveSupport::Original, 1};
+        const ClassInfo enhancement_base{
+            "EnhancementBase", &powerup_pickup, construct<EnhancementBase>, {}, SaveSupport::Original, 1};
+        const ClassInfo anger_pickup{"AngerPU", &enhancement_base, construct<AngerPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo revenant_pickup{"RevenantPU", &enhancement_base,     construct<RevenantPU>,
+                                        {},           SaveSupport::Original, 1};
+        const ClassInfo stealth_pickup{"StealthPU", &enhancement_base,     construct<StealthPU>,
+                                       {},          SaveSupport::Original, 1};
+        const ClassInfo willpower_pickup{
+            "InvulnerabilityPU", &enhancement_base, construct<InvulnerabilityPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo bullet_ammo{
+            "BulletAmmoPU", &ammo_pickup, construct<BulletAmmoPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo shell_ammo{"ShellAmmoPU", &ammo_pickup, construct<ShellAmmoPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo bmg_ammo{"BMGAmmoPU", &ammo_pickup, construct<BMGAmmoPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo flare_ammo{"FlareAmmoPU", &ammo_pickup, construct<FlareAmmoPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo diebugdie_ammo{
+            "DieBugDieAmmoPU", &ammo_pickup, construct<DieBugDieAmmoPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo howitzer_ammo{
+            "HowitzerAmmoPU", &ammo_pickup, construct<HowitzerAmmoPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo fuel_ammo{"FuelAmmoPU", &ammo_pickup, construct<FuelAmmoPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo battery_ammo{
+            "BatteryAmmoPU", &ammo_pickup, construct<BatteryAmmoPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo health_pickup{"HealthPU", &health_base, construct<HealthPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo megahealth_pickup{
+            "MegaHealthPU", &health_base, construct<MegaHealthPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo ward_pickup{"WardPU", &armor_base, construct<WardPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo necroward_pickup{
+            "NecroWardPU", &armor_base, construct<NecroWardPU>, {}, SaveSupport::Original, 1};
         const ClassInfo key_pickup{"KeyPickup",
                                    &b2base,
                                    construct<KeyPickup>,
@@ -1125,9 +1199,14 @@ namespace OpenBlood2
                                     {"ModelSkin", std::string("skins/powerups/key.dtx")},
                                     {"UseCount", std::int32_t(1)},
                                     {"PickupTriggerTarget", std::string{}},
-                                    {"PickupTriggerMessage", std::string{}}}};
+                                    {"PickupTriggerMessage", std::string{}}},
+                                   SaveSupport::Original,
+                                   1};
         const ClassInfo trigger{
-            "Trigger", &b2base, construct<Trigger>, []
+            "Trigger",
+            &b2base,
+            construct<Trigger>,
+            []
             {
                 std::vector<PropertySpec> properties{{"Dims", DVector{}},
                                                      {"ResetTime", 0.0f},
@@ -1185,7 +1264,10 @@ namespace OpenBlood2
             SaveSupport::Original,
             1};
         const ClassInfo conversation_trigger{
-            "ConversationTrigger", &trigger, construct<ConversationTrigger>, []
+            "ConversationTrigger",
+            &trigger,
+            construct<ConversationTrigger>,
+            []
             {
                 std::vector<PropertySpec> p{
                     {"CharacterType", std::int32_t(0)}, {"RepeatLastMessage", false}, {"LoopToFirstMessage", false},
@@ -1199,7 +1281,10 @@ namespace OpenBlood2
             SaveSupport::Original,
             1};
         const ClassInfo big_trigger{"BigTrigger", &trigger, construct<BigTrigger>, {}, SaveSupport::Original, 1};
-        const ClassInfo toggle_trigger{"ToggleTrigger", &trigger, construct<ToggleTrigger>, []
+        const ClassInfo toggle_trigger{"ToggleTrigger",
+                                       &trigger,
+                                       construct<ToggleTrigger>,
+                                       []
                                        {
                                            std::vector<PropertySpec> properties{{"StartOn", false}};
                                            for (unsigned i = 1; i <= 10; ++i)

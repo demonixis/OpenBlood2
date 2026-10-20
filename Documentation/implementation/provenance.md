@@ -1848,6 +1848,20 @@ schedule). See the [contract](../contracts/save_load_contracts.md#implemented-wo
 the [evidence](reports/save_load_world_logic.md) and the
 [source ledger](sources/save_load_world_logic_sources.json).
 
+## Pickups and projectiles save/load (2026-10-20)
+
+Save/load lot 9 adds selective ports of the original `Save`/`Load` bodies and their dispatch
+from `ObjectDLL/PickupObject.cpp`, `ItemPickups.cpp` (KeyPickup), `Projectile.cpp`,
+`SeeingEye.cpp` and `GameInvItems.cpp` (CInvTheEye): field order and widths, the relative
+clocks, `PostPropRead` on a pickup restore and the skipped projectile and eye restore branches.
+The port maps the fields onto its typed members, decodes and checks every block before
+changing a member, appends the shooter reference to the CProjectile block (departure D15),
+lists a restored remote charge again on its player and republishes the trails the original's
+engine-saved effect message replayed. See the
+[contract](../contracts/save_load_contracts.md#implemented-pickups-and-projectiles-lot-9),
+the [evidence](reports/save_load_pickups.md) and the
+[source ledger](sources/save_load_pickups_sources.json).
+
 ## Enhanced renderer (2026-10-20)
 
 The physically based shaders (`engine/shaders/pbr.frag.hlsl`), the material manifest

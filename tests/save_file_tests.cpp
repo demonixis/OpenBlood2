@@ -1,5 +1,6 @@
 #include "engine/atomic_file.h"
 #include "engine/save_fingerprint.h"
+#include "scratch_dir.h"
 #include <SDL3/SDL.h>
 #include <algorithm>
 #include <bit>
@@ -10,7 +11,6 @@
 #include <iostream>
 #include <map>
 #include <random>
-#include "scratch_dir.h"
 
 using namespace OpenBlood2;
 using Bytes = std::vector<std::uint8_t>;
@@ -428,7 +428,7 @@ namespace
             [](auto& s) { s.clock.assign(F::max_clock + 1, 0); },
             [](auto& s) { s.links.assign(F::max_links + 1, 0); },
             [](auto& s) { s.level_entry = Bytes{1, 2, 3}; },
-            [](auto& s) { s.level_entry = encoded(sample(true)); }, // AUTO inside AUTO.
+            [](auto& s) { s.level_entry = encoded(sample(true)); },  // AUTO inside AUTO.
             [](auto& s) { s.level_entry = encoded(sample(false)); }, // A slot, not a level entry.
             [](auto& s)
             {
@@ -710,18 +710,16 @@ namespace
         current.edition = SaveEdition::Demo;
         CHECK(refused(current, registered, {"edition retail, installed demo"}));
         // Classes: unregistered and payload version, all named.
-        CHECK(refused(saved, {{"CPlayerObj", 2}}, {"class Door is not registered",
-                                                   "class CPlayerObj payload version 1, build 2"}));
+        CHECK(refused(saved, {{"CPlayerObj", 2}},
+                      {"class Door is not registered", "class CPlayerObj payload version 1, build 2"}));
         // Several differences are listed together.
         current = saved;
         current.edition = SaveEdition::Demo;
         current.world.fill(0);
         CHECK(refused(current, {}, {"edition", "world DAT", "class CPlayerObj", "class Door"}));
         // A missing world, an unnormalized path and an invalid class schema.
-        CHECK(!build_fingerprint(r, "missing.dat", classes, current, error) &&
-              error.fault == SaveFault::Fingerprint);
-        CHECK(!build_fingerprint(r, "../test.dat", classes, current, error) &&
-              error.fault == SaveFault::Fingerprint);
+        CHECK(!build_fingerprint(r, "missing.dat", classes, current, error) && error.fault == SaveFault::Fingerprint);
+        CHECK(!build_fingerprint(r, "../test.dat", classes, current, error) && error.fault == SaveFault::Fingerprint);
         CHECK(!build_fingerprint(r, "test.dat", {{"Door", 1}, {"CPlayerObj", 1}}, current, error) &&
               error.fault == SaveFault::Format);
         CHECK(!build_fingerprint(r, "test.dat", {{"Door", 0}}, current, error) && error.fault == SaveFault::Format);
@@ -815,22 +813,22 @@ namespace
                 const auto pos = random() % bytes.size();
                 switch (random() % 5)
                 {
-                case 0:
-                    bytes[pos] = std::uint8_t(random());
-                    break;
-                case 1:
-                    bytes.insert(bytes.begin() + pos, std::uint8_t(random()));
-                    break;
-                case 2:
-                    bytes.erase(bytes.begin() + pos);
-                    break;
-                case 3:
-                    bytes.resize(pos);
-                    break;
-                default:
-                    // Large little-endian lengths at a random position.
-                    if (pos + 4 <= bytes.size())
-                        put32(bytes, pos, random() % 2 ? 0xFFFFFFFFu : std::uint32_t(random()));
+                    case 0:
+                        bytes[pos] = std::uint8_t(random());
+                        break;
+                    case 1:
+                        bytes.insert(bytes.begin() + pos, std::uint8_t(random()));
+                        break;
+                    case 2:
+                        bytes.erase(bytes.begin() + pos);
+                        break;
+                    case 3:
+                        bytes.resize(pos);
+                        break;
+                    default:
+                        // Large little-endian lengths at a random position.
+                        if (pos + 4 <= bytes.size())
+                            put32(bytes, pos, random() % 2 ? 0xFFFFFFFFu : std::uint32_t(random()));
                 }
             }
             SaveContainer out;
@@ -855,9 +853,10 @@ namespace
 int main(int argc, char** argv)
 {
     const std::map<std::string, bool (*)()> cases{
-        {"digests", digests},     {"golden", golden},   {"roundtrip", roundtrip}, {"truncation", truncation},
-        {"bitflips", bitflips},   {"bounds", bounds},   {"versions", versions},   {"order", order},
-        {"fingerprint", fingerprint}, {"atomic", atomic}, {"fuzz", fuzz}};
+        {"digests", digests},       {"golden", golden},     {"roundtrip", roundtrip},
+        {"truncation", truncation}, {"bitflips", bitflips}, {"bounds", bounds},
+        {"versions", versions},     {"order", order},       {"fingerprint", fingerprint},
+        {"atomic", atomic},         {"fuzz", fuzz}};
     if (argc != 3 || !cases.count(argv[1]))
         return 2;
     root = path_from_utf8(argv[2]) / argv[1];

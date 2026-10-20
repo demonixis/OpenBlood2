@@ -1,6 +1,7 @@
 // Original ObjectDLL/SeeingEye.cpp, with the shared bounded model-flight integrator.
 #include "SeeingEye.h"
 #include "PlayerObj.h"
+#include "SaveFields.h"
 #include "engine/collision.h"
 #include <cmath>
 using namespace OpenBlood2;
@@ -118,7 +119,10 @@ void SeeingEye::RemoveEye(bool destroyed)
         if (auto* item = owner->m_InventoryMgr.eye.get(); item && item->eye == m_hObject)
         {
             const bool active = item->active;
-            g_pServerDE->SendToClient(client, SeeingEyeView{m_hObject, false, destroyed && active ? 10.f : 0.f});
+            // Departure: a restored eye has no saved client (the original's stays NULL and leaves
+            // an active view on the removed eye); it reaches the owner's current client instead.
+            g_pServerDE->SendToClient(client ? client : owner->GetClient(),
+                                      SeeingEyeView{m_hObject, false, destroyed && active ? 10.f : 0.f});
             item->eye = nullptr;
             item->active = false;
             item->available = !destroyed; // Executable source Remove(true) consumes the item.
@@ -159,4 +163,40 @@ DDWORD SeeingEye::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD r
     if (message == damage_message && m_damage.IsDead())
         RemoveEye(true);
     return result;
+}
+void SeeingEye::SaveObject(HMESSAGEWRITE h)
+{
+    auto* s = g_pServerDE;
+    if (!configured || removing_)
+    {
+        s->RejectPayload(h, "an unconfigured or removed eye cannot be saved");
+        return;
+    }
+    s->WriteToLoadSaveMessageObject(h, m_hFiredFrom); // m_hOwner.
+    s->WriteToLoadSaveMessageObject(h, stuck);        // m_hStuckObject.
+    s->WriteToMessageByte(h, dropped);
+}
+void SeeingEye::LoadObject(HMESSAGEREAD h)
+{
+    // Original Load re-links the owner and re-attaches a stuck eye. Both are saved interlinks the
+    // restore re-creates after every Load, in their saved order; the port's live attachment is
+    // the link alone (no MID_ATTACH). The client stays unbound (the original's m_hClient is not
+    // saved); the next ping is immediate.
+    auto* s = g_pServerDE;
+    HOBJECT owner = nullptr, stuck_object = nullptr;
+    s->ReadFromLoadSaveMessageObject(h, &owner);
+    s->ReadFromLoadSaveMessageObject(h, &stuck_object);
+    bool is_dropped = false;
+    if (!save_fields::read_bool(h, is_dropped))
+        return;
+    if (stuck_object && !is_dropped)
+    {
+        s->RejectPayload(h, "a stuck eye must be dropped");
+        return;
+    }
+    m_hFiredFrom = owner;
+    stuck = stuck_object;
+    dropped = is_dropped;
+    configured = true;
+    client = nullptr;
 }

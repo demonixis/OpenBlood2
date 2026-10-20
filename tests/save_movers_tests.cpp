@@ -905,10 +905,16 @@ namespace
             std::cout << name << ": " << pointers << " sky pointers, " << sky_objects.size() << " sky objects, "
                       << covered.size() << " lot-8 objects; "
                       << (blocking.empty() ? "no blocking class" : "blocked by " + names) << '\n';
-            if (blocking.empty())
+            // Lot 13 refuses a CTF world by name: its team flags are multiplayer state.
+            GameSave whole_save;
+            if (blocking.empty() && !game->save_game(whole_save, error))
             {
-                GameSave save;
-                CHECK(game->save_game(save, error));
+                CHECK(error.find("CTF games cannot be saved") != std::string::npos);
+                std::cout << "  whole save refused: CTF\n";
+            }
+            else if (blocking.empty())
+            {
+                auto& save = whole_save;
                 SaveImage first = save.image;
                 for (unsigned cycle = 0; cycle < 2; ++cycle)
                 {

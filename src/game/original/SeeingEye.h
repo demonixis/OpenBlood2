@@ -25,6 +25,10 @@ class SeeingEye final : public CProjectile
     {
         Fail("SeeingEye cannot explode");
     }
+    // Original SeeingEye.cpp:488-516: the owner, stuck object and dropped flag, never the
+    // CProjectile block (the original eye derives from BaseClass).
+    void SaveObject(HMESSAGEWRITE) override;
+    void LoadObject(HMESSAGEREAD) override;
 
   private:
     bool removing_ = false;

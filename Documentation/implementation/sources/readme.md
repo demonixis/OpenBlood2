@@ -34,6 +34,7 @@ Runtime test logs and measurements belong in the
 - [Save/load native state](save_load_native_sources.json): lot 13 engine class flags, PolyGrid/VolumeBrush surfaces, the VoiceMgr reset and CommLink on a load, and the multiplayer save guard.
 - [Save/load AI core](save_load_ai_sources.json): lot 11 AI_Mgr, script and path lists, CultistAI, CivilianAI, Fanatic, CCorpse and the AI_Mgr-only subclasses.
 - [Save/load bosses](save_load_bosses_sources.json): lot 12 Gideon family, Ancient One and tentacles, Naga, Zealot, BoneLeech/Thief/TheHand and DrudgePriest.
+- [Save/load pickups and projectiles](save_load_pickups_sources.json): lot 9 Save/Load bodies of PickupObject, KeyPickup, CProjectile and SeeingEye with the CInvTheEye reference.
 
 - [Original music asset preparation](m2_music_asset_sources.json)
 

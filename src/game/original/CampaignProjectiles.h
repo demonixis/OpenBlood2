@@ -13,6 +13,7 @@ class CVomitProjectile final : public CProjectile
     bool Update() override;
     // Original m_bExplosion/m_bClientFX/m_bShockwave are all false.
     void AddExplosion(DVector, DVector) override {}
+    std::string LoadBlock(const ProjectileBlock&) override;
 };
 class CTimeBomb final : public CProximityBomb
 {
@@ -161,6 +162,7 @@ class CSkullProjectile final : public CProjectile
     bool InitialUpdate() override;
     bool Update() override;
     void AddExplosion(DVector, DVector) override;
+    std::string LoadBlock(const ProjectileBlock&) override;
 };
 
 bool PublishDivineShockball(HOBJECT, DVector, DVector, OpenBlood2::SceneExplosionReport&, const char* = nullptr);

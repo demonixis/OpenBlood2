@@ -39,7 +39,7 @@ bool CNapalmProjectile::InitialUpdate()
 bool CNapalmProjectile::Update()
 {
     // Hidden (scale zero) for its first 0.01 s, then 0.25.
-    const float scale = g_pServerDE->GetTime() - m_fStartTime < .01f ? 0 : .25f;
+    const float scale = g_pServerDE->GetTime() - scale_start < .01f ? 0 : .25f;
     if (!flight_sound)
     {
         // PlaySoundFromObject(.., 750, MISC_MEDIUM, loop, handle): attached and retained.

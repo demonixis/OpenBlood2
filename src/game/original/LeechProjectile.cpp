@@ -93,7 +93,7 @@ bool CLeechPrimeProjectile::Update()
         Explode();
         return false;
     }
-    const float scale = s->GetTime() - m_fStartTime < .01f ? 0 : .2f;
+    const float scale = s->GetTime() - scale_start < .01f ? 0 : .2f;
     DRotation rotation;
     DVector velocity;
     if (!s->ScaleObject(m_hObject, {scale, scale, scale}) || !s->SetObjectColor(m_hObject, color, 1) ||

@@ -529,12 +529,10 @@ namespace
             const DVector points[]{{0, 100, 0}, {100, 100, 0}, {100, 100, 200}};
             for (unsigned i = 0; i < 3; ++i)
             {
-                Properties props{{"Name", "k" + std::to_string(i)},
-                                 {"Pos", points[i]},
-                                 {"TimeStamp", i ? 1.0f : 0.0f},
-                                 {"SoundName", std::string(i == 1 ? "long.wav" : "")},
-                                 {"SoundRadius", 400.0f},
-                                 {"LoopSound", true}};
+                Properties props{
+                    {"Name", "k" + std::to_string(i)}, {"Pos", points[i]},
+                    {"TimeStamp", i ? 1.0f : 0.0f},    {"SoundName", std::string(i == 1 ? "long.wav" : "")},
+                    {"SoundRadius", 400.0f},           {"LoopSound", true}};
                 if (i == 2)
                 {
                     props.emplace("MessageTarget", std::string("sink"));
@@ -755,11 +753,11 @@ namespace
             const char* expected;
         };
         const std::vector<Corruption> corruptions{
-            {0, 0, 2, "Trigger: saved boolean"},                           // m_bActive.
+            {0, 0, 2, "Trigger: saved boolean"},                             // m_bActive.
             {1, records[1].payload.size() - 6, 9, "Spawner: saved boolean"}, // m_bCreateRiftEffect.
             // m_nNumMessages, after "default.wav" and seven NULL waves and the character byte.
             {2, 4 + 11 + 7 * 4 + 1, 9, "ConversationTrigger: saved conversation"},
-            {3, 4, 3, "CameraObj: camera block"},                          // m_nType.
+            {3, 4, 3, "CameraObj: camera block"}, // m_nType.
         };
         auto attempt = [&](const std::vector<SaveEngineRecord>& bad, const char* expected)
         {
@@ -829,7 +827,7 @@ namespace
                     worlds.push_back(path.substr(7, path.size() - 11));
             }
         }
-        const std::set<std::string> lot7{"Trigger",          "BigTrigger", "ToggleTrigger",       "ExitTrigger",
+        const std::set<std::string> lot7{"Trigger",           "BigTrigger", "ToggleTrigger",       "ExitTrigger",
                                          "ObjectivesTrigger", "Spawner",    "ConversationTrigger", "CinematicTrigger",
                                          "KeyFramer",         "CameraObj"};
         unsigned entered = 0, restored = 0, whole = 0;
@@ -877,13 +875,14 @@ namespace
                 covered.push_back(r->handle);
                 if (lot7.contains(r->type->name))
                     ++present[r->type->name];
-                if (const auto* f = dynamic_cast<const KeyFramer*>(r->game.get()); f && f->targets.size() > f->keys.size())
+                if (const auto* f = dynamic_cast<const KeyFramer*>(r->game.get());
+                    f && f->targets.size() > f->keys.size())
                 {
                     ++overfull; // The original layout loses these targets' offsets.
-                    std::cout << "  keyframer " << r->state.m_Name << " (" << f->object_name << "): "
-                              << f->targets.size() << " targets, " << f->keys.size() << " keys, first target "
-                              << game->objects.get(f->targets.front().object)->type->name << ", active "
-                              << f->active << '\n';
+                    std::cout << "  keyframer " << r->state.m_Name << " (" << f->object_name
+                              << "): " << f->targets.size() << " targets, " << f->keys.size() << " keys, first target "
+                              << game->objects.get(f->targets.front().object)->type->name << ", active " << f->active
+                              << '\n';
                 }
             }
             std::string names, mine;
@@ -900,10 +899,16 @@ namespace
             std::cout << name << ": " << (mine.empty() ? "no lot-7 object" : mine)
                       << (overfull ? "; " + std::to_string(overfull) + " keyframers with more targets than keys" : "")
                       << "; " << (blocking.empty() ? "no blocking class" : "blocked by " + names) << '\n';
-            if (blocking.empty())
+            // Lot 13 refuses a CTF world by name: its team flags are multiplayer state.
+            GameSave whole_save;
+            if (blocking.empty() && !game->save_game(whole_save, error))
             {
-                GameSave save;
-                CHECK(game->save_game(save, error));
+                CHECK(error.find("CTF games cannot be saved") != std::string::npos);
+                std::cout << "  whole save refused: CTF\n";
+            }
+            else if (blocking.empty())
+            {
+                auto& save = whole_save;
                 SaveImage first = save.image;
                 if (!GameSession::load_game(game, save, error))
                 {
@@ -967,8 +972,8 @@ int main(int argc, char** argv)
     if (mode != "private")
         std::filesystem::create_directories(root, ec);
     const std::map<std::string_view, std::function<bool()>> cases{
-        {"triggers", triggers},     {"doors", doors},           {"spawners", spawners}, {"keyframers", keyframers},
-        {"cameras", cameras},       {"cinematics", cinematics}, {"refusals", refusals}};
+        {"triggers", triggers}, {"doors", doors},           {"spawners", spawners}, {"keyframers", keyframers},
+        {"cameras", cameras},   {"cinematics", cinematics}, {"refusals", refusals}};
     if (mode == "private")
         return private_worlds(argv[2], argc > 3 ? argv[3] : "") ? 0 : 1; // Optional world filter.
     const auto it = cases.find(mode);

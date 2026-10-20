@@ -11,6 +11,7 @@ class CBugSprayProjectile : public CProjectile
   protected:
     bool InitialUpdate() override;
     void AddExplosion(DVector, DVector) override;
+    std::string LoadBlock(const ProjectileBlock&) override;
     bool alternate_ = false;
 };
 class CBugSprayAltProjectile final : public CBugSprayProjectile

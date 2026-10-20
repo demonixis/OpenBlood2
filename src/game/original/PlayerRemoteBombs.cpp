@@ -39,6 +39,36 @@ bool CPlayerObj::AddRemoteBomb(HOBJECT h)
     }
     return true;
 }
+bool CPlayerObj::RestoreRemoteBomb(HOBJECT h)
+{
+    // Save/load lot 9: list a restored charge again. The player->charge link is a saved interlink
+    // that the restore re-creates after every Load, so only the list entry is rebuilt here.
+    remote_error.clear();
+    auto* bomb = g_pServerDE->IsObjectAlive(h) ? dynamic_cast<CRemoteBomb*>(g_pServerDE->HandleToObject(h)) : nullptr;
+    if (!g_pServerDE->IsObjectAlive(m_hObject) || !bomb || !bomb->configured || bomb->m_hFiredFrom != m_hObject)
+    {
+        remote_error = "Invalid restored remote bomb owner or projectile";
+        return false;
+    }
+    if (remote_bombs)
+        for (auto* link = remote_bombs->m_pFirstLink; link; link = link->m_pNext)
+            if (link->m_hObject == h)
+                return true;
+    const bool created = !remote_bombs;
+    if (created)
+        remote_bombs = g_pServerDE->CreateObjectList();
+    if (!remote_bombs || !g_pServerDE->AddObjectToList(remote_bombs, h))
+    {
+        remote_error = "Remote bomb list unavailable";
+        if (created && remote_bombs)
+        {
+            g_pServerDE->RelinquishList(remote_bombs);
+            remote_bombs = nullptr;
+        }
+        return false;
+    }
+    return true;
+}
 void CPlayerObj::RemoveRemoteBomb(HOBJECT h)
 {
     if (!remote_bombs)

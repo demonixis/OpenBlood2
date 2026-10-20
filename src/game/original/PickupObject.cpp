@@ -26,7 +26,7 @@ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
     if (message == MID_PRECREATE)
     {
-        if (!B2BaseClass::EngineMessageFn(message, data, reason) || reason == 3 || !data || file.empty())
+        if (!B2BaseClass::EngineMessageFn(message, data, reason) || !data || file.empty())
             return 0;
         auto& create = *static_cast<ObjectCreateStruct*>(data);
         auto text = [&](const char* key, std::string& out)
@@ -35,19 +35,30 @@ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
             if (g_pServerDE->GetPropGeneric(key, &p) == DE_OK)
                 out = p.m_String;
         };
-        text("PickupTriggerTarget", pickup_target);
-        text("PickupTriggerMessage", pickup_command);
+        if (reason != PRECREATE_SAVEGAME) // A restore reads no property (Load sets the strings).
+        {
+            text("PickupTriggerTarget", pickup_target);
+            text("PickupTriggerMessage", pickup_command);
+        }
+        // PostPropRead runs for every reason, a restore included: it re-adds TOUCH_NOTIFY,
+        // VISIBLE and GRAVITY to the saved flags (an original rewrite) before Load sets m_dwFlags.
         SAFE_STRCPY(create.m_Filename, ("Models/Powerups/" + file + ".abc").c_str());
         SAFE_STRCPY(create.m_SkinName, ("Skins/Powerups/" + file + ".dtx").c_str());
         create.m_ObjectType = OT_MODEL;
         create.m_Flags |= FLAG_TOUCH_NOTIFY | FLAG_VISIBLE | FLAG_GRAVITY;
         create.m_Flags &= ~FLAG_SHADOW;
+        m_dwFlags = create.m_Flags;
         return 1;
     }
+    if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    else if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
     // A subclass may already have removed itself (original _DEMO bomb pickups).
     // The source keeps configuring the doomed object; checked transforms reject a
-    // pending removal, so skip placement while the base chain still runs.
-    if (message == MID_INITIALUPDATE && g_pServerDE->IsObjectAlive(m_hObject))
+    // pending removal, so skip placement while the base chain still runs. A restore skips
+    // InitialUpdate: the engine record carries dims, user flags and the (zero) update.
+    if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME && g_pServerDE->IsObjectAlive(m_hObject))
     {
         DVector dims;
         if (g_pServerDE->GetModelAnimUserDims(m_hObject, &dims, g_pServerDE->GetModelAnimation(m_hObject)) != DE_OK)

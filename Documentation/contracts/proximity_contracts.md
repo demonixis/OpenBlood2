@@ -118,6 +118,10 @@ shader, reference repository or commercial asset is added.
 Remote bombs, flashlight, missing fallengrills geometry, full composite lighting,
 bomb projectile save/restore, original item HUD and complete M2 acceptance remain
 open. This increment is not a completed CityHub playthrough or campaign transfer.
+A saved game now carries bomb projectiles ([save/load lot 9](save_load_contracts.md#implemented-pickups-and-projectiles-lot-9)): armed state, spin, last
+position, the explode latch and the start clock restore; the get-away time, the hit-character
+flag and both sound flags restart from the constructor as in the original, so an armed bomb
+plays its arm sound again.
 
 The [remote-bomb continuation](remote_bomb_contracts.md) adds weapon50 in reserved
 slot11, ammo11/item8, RemotesPU, R selection and the separate B detonation command.

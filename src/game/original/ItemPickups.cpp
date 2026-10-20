@@ -5,7 +5,7 @@ DDWORD ItemPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
     // Multiplayer scaling/respawn are not implemented; string creation bounces (PickupObject).
     if (message == MID_PRECREATE &&
-        ((reason != PRECREATE_WORLDFILE && reason != PRECREATE_STRINGPROP) ||
+        ((reason != PRECREATE_WORLDFILE && reason != PRECREATE_STRINGPROP && reason != PRECREATE_SAVEGAME) ||
          g_pServerDE->GetVarValueFloat(g_pServerDE->GetGameConVar("GAME_GAMETYPE")) != GAMETYPE_SINGLE))
         return 0;
     return PickupObject::EngineMessageFn(message, data, reason);

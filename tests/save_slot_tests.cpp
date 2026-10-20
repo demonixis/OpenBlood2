@@ -4,9 +4,9 @@
 #include "game/game_settings.h"
 #include "game/original/MenuIds.h"
 #include "save_world_fixture.h"
+#include "scratch_dir.h"
 #include <fstream>
 #include <iostream>
-#include "scratch_dir.h"
 
 // Slots, Quick and Restart (save_load_contracts lot 6): slot naming, the META quick read, real
 // files in a temporary preference directory, corrupt and mismatch refusals, F5/F6, the demo
@@ -32,9 +32,9 @@ namespace
     {
         return save_world::write_archive(
                    root / "player.rez",
-                   {{"player", save_world::dat({object("WorldProperties", {text("Name", "WorldProperties0")}),
-                                                object("GameStartPoint",
-                                                       {text("Name", "start"), vector("Pos", {0, 10, 0})})})},
+                   {{"player",
+                     save_world::dat({object("WorldProperties", {text("Name", "WorldProperties0")}),
+                                      object("GameStartPoint", {text("Name", "start"), vector("Pos", {0, 10, 0})})})},
                     {"next", save_world::dat({object("GameStartPoint",
                                                      {text("Name", "arrival"), vector("Pos", {40, 10, 40})})})}}) &&
                save_world::write_archive(root / "mod.rez", {{"modlevel", save_world::dat({})}});
@@ -284,11 +284,15 @@ namespace
                 c.payload_version += 1;
         container.fingerprint.class_schema = class_schema_digest(container.fingerprint.classes);
         container.meta.version = "0.0.1";
-        CHECK(write_save_file(slots.path(1), [&] {
-            auto copy = container;
-            copy.meta.slot = 1;
-            return copy;
-        }(), fault));
+        CHECK(write_save_file(
+            slots.path(1),
+            [&]
+            {
+                auto copy = container;
+                copy.meta.slot = 1;
+                return copy;
+            }(),
+            fault));
         modded.reset();
         std::unique_ptr<GameSession> plain;
         CHECK(empty_session(plain));

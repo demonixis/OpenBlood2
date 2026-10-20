@@ -93,6 +93,7 @@ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/o
     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp src/game/original/RotatingModel.cpp
     src/game/original/WorldModelDebris.cpp
     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
+target_sources(blood2_game PRIVATE src/game/original/ProjectileSave.cpp src/game/original/PickupSave.cpp)
 add_executable(blood2_app src/app/model_lighting.cpp src/app/scene_presenter.cpp src/app/bench.cpp src/app/polygrid_scene.cpp src/app/hud.cpp src/app/ui_runtime.cpp src/app/path_manager_smoke.cpp src/app/ai_model_key_smoke.cpp src/app/character_motion_smoke.cpp src/app/main.cpp src/app/model_scene.cpp src/app/sprite_scene.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
 target_sources(blood2_app PRIVATE src/app/menu_renderer.cpp src/app/frontend.cpp)
 set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)

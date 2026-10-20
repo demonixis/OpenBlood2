@@ -25,6 +25,7 @@ class COrbProjectile : public CProjectile
     bool InitialUpdate() override;
     bool Update() override;
     void AddExplosion(DVector, DVector) override;
+    std::string LoadBlock(const ProjectileBlock&) override;
 
   private:
     bool Steer();

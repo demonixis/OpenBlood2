@@ -109,9 +109,9 @@ namespace
         GameSession g;
         CHECK(g.initialize());
         const std::map<std::string, SaveSupport> native{
-            {"BaseClass", SaveSupport::NotSaved}, {"Model", SaveSupport::AlwaysLoad},
-            {"Container", SaveSupport::AlwaysLoad}, {"Sprite", SaveSupport::AlwaysLoad},
-            {"Sound", SaveSupport::AlwaysLoad}, {"DemoSkyWorldModel", SaveSupport::AlwaysLoad},
+            {"BaseClass", SaveSupport::NotSaved},    {"Model", SaveSupport::AlwaysLoad},
+            {"Container", SaveSupport::AlwaysLoad},  {"Sprite", SaveSupport::AlwaysLoad},
+            {"Sound", SaveSupport::AlwaysLoad},      {"DemoSkyWorldModel", SaveSupport::AlwaysLoad},
             {"SkyPointer", SaveSupport::AlwaysLoad}, {"StartPoint", SaveSupport::AlwaysLoad}};
         std::size_t seen = 0;
         for (auto type : g.objects.classes())
@@ -188,8 +188,7 @@ namespace
             CHECK(encode_save_records(records, bad.image.objects, codec));
             bad.image.classes = bad.fingerprint.classes = {{type, 1}};
             CHECK(!GameSession::load_game(game, bad, error) && contains(error, type) &&
-                  game->game_load.stage == "fingerprint" &&
-                  game->server.polygrids.active.size() == 1);
+                  game->game_load.stage == "fingerprint" && game->server.polygrids.active.size() == 1);
         }
         return true;
     }

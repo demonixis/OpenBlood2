@@ -7,9 +7,18 @@ DDWORD KeyPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
     if (message == MID_PRECREATE)
     {
-        if (!B2BaseClass::EngineMessageFn(message, data, reason) || reason == 3 || !data)
+        if (!B2BaseClass::EngineMessageFn(message, data, reason) || !data)
             return 0;
         auto& create = *static_cast<ObjectCreateStruct*>(data);
+        if (reason == PRECREATE_SAVEGAME)
+        {
+            // No property is read; only PickupObject's PostPropRead flag rule runs (the strings
+            // that would set a model are still NULL before Load). Load sets m_dwFlags.
+            create.m_Flags |= FLAG_TOUCH_NOTIFY | FLAG_VISIBLE | FLAG_GRAVITY;
+            create.m_Flags &= ~FLAG_SHADOW;
+            m_dwFlags = create.m_Flags;
+            return 1;
+        }
         auto string = [&](const char* key, std::string& out)
         {
             GenericProp prop;
@@ -21,11 +30,10 @@ DDWORD KeyPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         string("HiIconFile", item.highlighted_icon);
         string("PickupTriggerTarget", pickup_target);
         string("PickupTriggerMessage", pickup_command);
-        std::string model, skin;
-        string("ModelFile", model);
-        string("ModelSkin", skin);
-        SAFE_STRCPY(create.m_Filename, model.c_str());
-        SAFE_STRCPY(create.m_SkinName, skin.c_str());
+        string("ModelFile", model_file);
+        string("ModelSkin", model_skin);
+        SAFE_STRCPY(create.m_Filename, model_file.c_str());
+        SAFE_STRCPY(create.m_SkinName, model_skin.c_str());
         GenericProp prop;
         if (g_pServerDE->GetPropGeneric("UseCount", &prop) == DE_OK)
             item.uses = static_cast<DBYTE>(std::clamp(prop.m_Long, 0, 255));
@@ -37,9 +45,14 @@ DDWORD KeyPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         create.m_ObjectType = OT_MODEL;
         create.m_Flags |= FLAG_TOUCH_NOTIFY | FLAG_VISIBLE | FLAG_GRAVITY;
         create.m_Flags &= ~FLAG_SHADOW;
+        m_dwFlags = create.m_Flags;
         return 1;
     }
-    if (message == MID_INITIALUPDATE)
+    if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    else if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
+    else if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME)
     {
         DVector dims;
         if (g_pServerDE->GetModelAnimUserDims(m_hObject, &dims, g_pServerDE->GetModelAnimation(m_hObject)) != DE_OK)

@@ -54,6 +54,8 @@ namespace save_rewrites
             }
             else if (r.class_name == "WorldModelDebris") // Lot 8: CDestructableBrush's PostPropRead.
                 r.flags &= ~(FLAG_FULLPOSITIONRES | FLAG_MODELGOURAUDSHADE);
+            else if (r.class_name.ends_with("PU") || r.class_name == "KeyPickup")
+                r.flags |= FLAG_TOUCH_NOTIFY | FLAG_VISIBLE | FLAG_GRAVITY; // Lot 9: PickupObject's PostPropRead.
             // Lot 10: the ClientLightFX family's PostPropRead flags and schedule, and the explosion,
             // lightning and warp gate initial updates' reschedule (each keeps polling at its phase).
             if (light_class(r.class_name))

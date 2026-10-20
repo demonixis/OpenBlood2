@@ -100,8 +100,10 @@ not the contradictory introductory source comment claiming automatic return.
 Normal retrieval keeps the item and does not blind. Owner removal and item teardown
 remove the child through deferred callbacks without deleting the active inventory
 method. Inventory snapshots retain ownership only: on cross-world restoration the
-eye is back in hand, inactive, with no old-world handle. Whole-world save files and
-restoration of a deployed eye/host remain unavailable.
+eye is back in hand, inactive, with no old-world handle. A saved game restores a
+deployed eye ([save/load lot 9](save_load_contracts.md#implemented-pickups-and-projectiles-lot-9)): the inventory binds the restored SeeingEye, which keeps its
+owner, stuck object and dropped flag; the item loads inactive, and a later removal turns the
+view off on the owner's current client.
 
 ## Verification
 

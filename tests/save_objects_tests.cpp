@@ -58,49 +58,49 @@ namespace
         {
             switch (id)
             {
-            case MID_PRECREATE:
-            {
-                auto& state = *static_cast<ObjectCreateStruct*>(data);
-                hooks.events.push_back("precreate " + std::string(state.m_Name) + " " + std::to_string(int(param)));
-                if (hooks.precreate && !hooks.precreate(state, param))
-                    return 0;
-                break;
-            }
-            case MID_INITIALUPDATE:
-                hooks.events.push_back("initial " + name() + " " + std::to_string(int(param)));
-                if (hooks.initial)
-                    hooks.initial(m_hObject, param);
-                break;
-            case MID_SAVEOBJECT:
-            {
-                const auto h = *static_cast<HMESSAGEWRITE*>(data);
-                hooks.events.push_back("save " + name());
-                hooks.params.push_back(param);
-                if (hooks.save)
-                    hooks.save(m_hObject, h, static_cast<DDWORD>(param));
-                else
+                case MID_PRECREATE:
                 {
-                    g_pServerDE->WriteToMessageDWord(h, value);
-                    g_pServerDE->WriteToLoadSaveMessageObject(h, ref);
+                    auto& state = *static_cast<ObjectCreateStruct*>(data);
+                    hooks.events.push_back("precreate " + std::string(state.m_Name) + " " + std::to_string(int(param)));
+                    if (hooks.precreate && !hooks.precreate(state, param))
+                        return 0;
+                    break;
                 }
-                break;
-            }
-            case MID_LOADOBJECT:
-            {
-                const auto h = *static_cast<HMESSAGEREAD*>(data);
-                hooks.events.push_back("load " + name());
-                hooks.params.push_back(param);
-                if (hooks.load)
-                    hooks.load(m_hObject, h, static_cast<DDWORD>(param));
-                else
+                case MID_INITIALUPDATE:
+                    hooks.events.push_back("initial " + name() + " " + std::to_string(int(param)));
+                    if (hooks.initial)
+                        hooks.initial(m_hObject, param);
+                    break;
+                case MID_SAVEOBJECT:
                 {
-                    value = g_pServerDE->ReadFromMessageDWord(h);
-                    g_pServerDE->ReadFromLoadSaveMessageObject(h, &ref);
+                    const auto h = *static_cast<HMESSAGEWRITE*>(data);
+                    hooks.events.push_back("save " + name());
+                    hooks.params.push_back(param);
+                    if (hooks.save)
+                        hooks.save(m_hObject, h, static_cast<DDWORD>(param));
+                    else
+                    {
+                        g_pServerDE->WriteToMessageDWord(h, value);
+                        g_pServerDE->WriteToLoadSaveMessageObject(h, ref);
+                    }
+                    break;
                 }
-                break;
-            }
-            default:
-                break;
+                case MID_LOADOBJECT:
+                {
+                    const auto h = *static_cast<HMESSAGEREAD*>(data);
+                    hooks.events.push_back("load " + name());
+                    hooks.params.push_back(param);
+                    if (hooks.load)
+                        hooks.load(m_hObject, h, static_cast<DDWORD>(param));
+                    else
+                    {
+                        value = g_pServerDE->ReadFromMessageDWord(h);
+                        g_pServerDE->ReadFromLoadSaveMessageObject(h, &ref);
+                    }
+                    break;
+                }
+                default:
+                    break;
             }
             return BaseClass::EngineMessageFn(id, data, param);
         }
@@ -550,8 +550,8 @@ namespace
         for (std::size_t n = 0; n < bytes.size(); ++n)
             CHECK(!decode_save_attachments(std::span(bytes).first(n), 3, attachment_back, error));
         for (auto bad : {SaveAttachment{0, 0, "", {}, {}}, SaveAttachment{0, 3, "", {}, {}},
-                         SaveAttachment{0, 1, std::string(101, 'x'), {}, {}},
-                         SaveAttachment{0, 1, "", {NAN, 0, 0}, {}}, SaveAttachment{0, 1, "", {}, {{0, 0, 0}, 0}}})
+                         SaveAttachment{0, 1, std::string(101, 'x'), {}, {}}, SaveAttachment{0, 1, "", {NAN, 0, 0}, {}},
+                         SaveAttachment{0, 1, "", {}, {{0, 0, 0}, 0}}})
             CHECK(!encode_save_attachments(std::vector{bad}, 3, bytes, error));
         Golden twice_attached;
         twice_attached.u32(2);
@@ -689,11 +689,11 @@ namespace
         s.SetObjectState(w.volume, OBJSTATE_INACTIVE);
 
         probe(g, w.plain)->value = 0xC0FFEE;
-        probe(g, w.plain)->ref = w.model;         // Listed: remapped.
-        probe(g, w.model)->ref = w.always;        // Always-load: NULL.
-        probe(g, w.sprite)->ref = w.unsaved;      // Not listed: NULL.
-        probe(g, w.brush)->ref = w.always_child;  // Inherits always-load: NULL.
-        probe(g, w.child)->ref = w.child;         // Itself.
+        probe(g, w.plain)->ref = w.model;        // Listed: remapped.
+        probe(g, w.model)->ref = w.always;       // Always-load: NULL.
+        probe(g, w.sprite)->ref = w.unsaved;     // Not listed: NULL.
+        probe(g, w.brush)->ref = w.always_child; // Inherits always-load: NULL.
+        probe(g, w.child)->ref = w.child;        // Itself.
         s.SetNextUpdate(w.plain, 0.001f);
         s.SetNextUpdate(w.child, 0.5f);
         CHECK(g.objects.advance(0.25)); // child and plain overdue? plain updated; child still pending.
@@ -746,9 +746,9 @@ namespace
             CHECK(saved.listed == 11 && saved.saved == 8 && saved.always_load == 2 && saved.duplicates == 1);
             CHECK(saved.links == 2 && saved.attachments == 1);
             // Creation order: model, sprite, brush, volume, plain, child, player, spinner.
-            CHECK((hooks.events == std::vector<std::string>{"save model", "save sprite", "save brush", "save volume",
-                                                            "save plain", "save child", "save player",
-                                                            "save spinner"}));
+            CHECK(
+                (hooks.events == std::vector<std::string>{"save model", "save sprite", "save brush", "save volume",
+                                                          "save plain", "save child", "save player", "save spinner"}));
             const auto* image = g.server.save_store.find(SaveStoreSlot::Current);
             CHECK(image && image->records == 8 && image->console_saved && image->param == 0);
             CHECK((image->classes == std::vector<SaveClass>{{"SaveBrushProbe", 2},
@@ -779,8 +779,8 @@ namespace
             CHECK(list[3].world_model_index == 3 && list[3].activity == OBJSTATE_INACTIVE);
             CHECK(list[5].scheduled && list[5].update_remaining == 0); // Overdue while inactive.
             CHECK(list[6].local_client && !list[0].local_client);
-            CHECK(saved.classes.size() == 6 && saved.classes[3].name == "SaveProbe" &&
-                  saved.classes[3].records == 2 && saved.classes[3].references == 2);
+            CHECK(saved.classes.size() == 6 && saved.classes[3].name == "SaveProbe" && saved.classes[3].records == 2 &&
+                  saved.classes[3].references == 2);
             store = g.server.save_store;
             for (int i = 0; i < 4; ++i)
             {
@@ -810,8 +810,7 @@ namespace
         RestoreObjectsReport restored;
         CHECK(g.server.restore_objects("save/current/CURRENT.SAV", 0, RESTOREOBJECTS_RESTORETIME, restored));
         CHECK(restored.error.empty() && restored.records == 8 && restored.objects.size() == 8);
-        CHECK(restored.clock_restored && restored.console_restored && restored.links == 2 &&
-              restored.attachments == 1);
+        CHECK(restored.clock_restored && restored.console_restored && restored.links == 2 && restored.attachments == 1);
         CHECK(g.server.save_clock() == clock && g.objects.time() == clock.time);
         CHECK(g.server.world_time() == clock.time - clock.world_origin);
         CHECK(std::string(g.server.GetVarValueString(g.server.GetGameConVar("SaveProbeVar"))) == "value with spaces");
@@ -847,14 +846,15 @@ namespace
         CHECK(m->activity == OBJSTATE_INACTIVE_TOUCH && m->auto_deactivate && m->deactivation_period == 7.5);
         CHECK(remaining_delay(clock.time, m->deactivate_at) == deactivation_remaining && m->scheduled);
         CHECK(remaining_delay(clock.time, m->due) == update_remaining); // Exact, not the float hint.
-        CHECK(m->animation.animation == 2 && m->animation.time == 25 && !m->animation.looping &&
-              !m->animation.done && !m->animation.first);
+        CHECK(m->animation.animation == 2 && m->animation.time == 25 && !m->animation.looping && !m->animation.done &&
+              !m->animation.first);
         CHECK(m->hidden_nodes == (std::vector<std::uint8_t>{0, 1}) && m->state.m_ContainerCode == 7);
         const auto* sp = g.objects.get(sprite);
         CHECK(sp->sprite_track.milliseconds == 120.5 && sp->sprite_track.frame == 2 && !sp->sprite_track.has_frame);
         CHECK(same(sp->color, {1, .5f, .25f}) && sp->alpha == .75f);
-        const auto sky_slot = std::find(g.server.sky.objects.begin(), g.server.sky.objects.end(),
-                                        g.objects.get(brush)->id) - g.server.sky.objects.begin();
+        const auto sky_slot =
+            std::find(g.server.sky.objects.begin(), g.server.sky.objects.end(), g.objects.get(brush)->id) -
+            g.server.sky.objects.begin();
         CHECK(sky_slot == 4 && g.server.sky.registered.size() == 2);
         CHECK(std::find(g.server.sky.objects.begin(), g.server.sky.objects.end(), sp->id) ==
               g.server.sky.objects.end());
@@ -945,13 +945,13 @@ namespace
         CHECK(*g.server.save_store.find(SaveStoreSlot::Current) == previous); // Previous image kept.
         // An original class keeps the Unsupported default until its lot declares it; lot 4
         // declared the CF_ALWAYSLOAD ones, which are skipped. AI_Mgr is never placed (lot 11
-        // declares its subclasses only).
+        // declares its subclasses only); CBaseCharacter stays Unsupported with lot 12 pending.
         CHECK(save_support(g.objects.find_class("AI_Mgr")) == SaveSupport::Unsupported);
-        auto pickup = g.objects.create(g.objects.find_class("HealthPU"), {}, Creation::World, {});
+        auto character = g.objects.create(g.objects.find_class("CBaseCharacter"), {}, Creation::World, {});
         auto spot = g.objects.create(g.objects.find_class("CameraSpot"), {}, Creation::World, {});
-        std::vector<HOBJECT> original{pickup, spot, b};
-        CHECK(pickup && spot && !save(g, original, report) &&
-              report.refused == std::vector<std::string>{"HealthPU (Unsupported)"} && report.always_load == 1);
+        std::vector<HOBJECT> original{character, spot, b};
+        CHECK(character && spot && !save(g, original, report) &&
+              report.refused == std::vector<std::string>{"CBaseCharacter (Unsupported)"} && report.always_load == 1);
         // A stale handle in the list is an explicit refusal.
         CHECK(g.objects.remove(u) && g.objects.finish_frame());
         std::vector<HOBJECT> stale{b, u};
@@ -1114,24 +1114,110 @@ namespace
         SoundRequest sound;
         sound.resource = "sounds\\none.wav";
         std::vector<Attempt> attempts{
-            {"CreateObject", [&] { CHECK(!make(g, probe_type, "created")); return true; }},
-            {"RemoveObject", [&] { s.RemoveObject(other); return true; }},
-            {"SetNextUpdate", [&] { s.SetNextUpdate(other, 1); return true; }},
-            {"SetObjectState", [&] { s.SetObjectState(other, OBJSTATE_INACTIVE); return true; }},
-            {"SetDeactivationTime", [&] { CHECK(!s.SetDeactivationTime(other, 2)); return true; }},
-            {"PingObjects", [&] { CHECK(!s.PingObjects(other)); return true; }},
-            {"StartMessageToObject", [&] { CHECK(!s.StartMessageToObject(nullptr, other, 1000)); return true; }},
-            {"CreateInterObjectLink", [&] { CHECK(s.CreateInterObjectLink(other, target) != DE_OK); return true; }},
-            {"BreakInterObjectLink", [&] { s.BreakInterObjectLink(other, target); return true; }},
+            {"CreateObject",
+             [&]
+             {
+                 CHECK(!make(g, probe_type, "created"));
+                 return true;
+             }},
+            {"RemoveObject",
+             [&]
+             {
+                 s.RemoveObject(other);
+                 return true;
+             }},
+            {"SetNextUpdate",
+             [&]
+             {
+                 s.SetNextUpdate(other, 1);
+                 return true;
+             }},
+            {"SetObjectState",
+             [&]
+             {
+                 s.SetObjectState(other, OBJSTATE_INACTIVE);
+                 return true;
+             }},
+            {"SetDeactivationTime",
+             [&]
+             {
+                 CHECK(!s.SetDeactivationTime(other, 2));
+                 return true;
+             }},
+            {"PingObjects",
+             [&]
+             {
+                 CHECK(!s.PingObjects(other));
+                 return true;
+             }},
+            {"StartMessageToObject",
+             [&]
+             {
+                 CHECK(!s.StartMessageToObject(nullptr, other, 1000));
+                 return true;
+             }},
+            {"CreateInterObjectLink",
+             [&]
+             {
+                 CHECK(s.CreateInterObjectLink(other, target) != DE_OK);
+                 return true;
+             }},
+            {"BreakInterObjectLink",
+             [&]
+             {
+                 s.BreakInterObjectLink(other, target);
+                 return true;
+             }},
             {"CreateAttachment",
-             [&] { CHECK(s.CreateAttachment(target, other, nullptr, &v, &q, &attachment) != DE_OK); return true; }},
-            {"RandomInt", [&] { int x = 0; CHECK(!s.RandomInt(0, 9, x)); return true; }},
-            {"RandomFloat", [&] { float x = 0; CHECK(!s.RandomFloat(0, 9, x)); return true; }},
-            {"PlayClientSound", [&] { CHECK(!s.PlayClientSound(sound, v, error)); return true; }},
-            {"PlayObjectLoopSound", [&] { CHECK(!s.PlayObjectLoopSound(other, sound, error)); return true; }},
-            {"PublishSparks", [&] { CHECK(!s.PublishSparks(other, {}, error)); return true; }},
-            {"SetObjectFlags", [&] { s.SetObjectFlags(other, FLAG_VISIBLE); return true; }},  // Detected.
-            {"SetGameConVar", [&] { s.SetGameConVar("PureProbe", "1"); return true; }},       // Detected.
+             [&]
+             {
+                 CHECK(s.CreateAttachment(target, other, nullptr, &v, &q, &attachment) != DE_OK);
+                 return true;
+             }},
+            {"RandomInt",
+             [&]
+             {
+                 int x = 0;
+                 CHECK(!s.RandomInt(0, 9, x));
+                 return true;
+             }},
+            {"RandomFloat",
+             [&]
+             {
+                 float x = 0;
+                 CHECK(!s.RandomFloat(0, 9, x));
+                 return true;
+             }},
+            {"PlayClientSound",
+             [&]
+             {
+                 CHECK(!s.PlayClientSound(sound, v, error));
+                 return true;
+             }},
+            {"PlayObjectLoopSound",
+             [&]
+             {
+                 CHECK(!s.PlayObjectLoopSound(other, sound, error));
+                 return true;
+             }},
+            {"PublishSparks",
+             [&]
+             {
+                 CHECK(!s.PublishSparks(other, {}, error));
+                 return true;
+             }},
+            {"SetObjectFlags",
+             [&]
+             {
+                 s.SetObjectFlags(other, FLAG_VISIBLE);
+                 return true;
+             }}, // Detected.
+            {"SetGameConVar",
+             [&]
+             {
+                 s.SetGameConVar("PureProbe", "1");
+                 return true;
+             }}, // Detected.
             {"CastRay",
              [&]
              {
@@ -1139,8 +1225,19 @@ namespace
                  s.CastRay(v, {4, 5, 6}, hit);
                  return true;
              }},
-            {"FindNamedObjects", [&] { if (auto* l = s.FindNamedObjects("x")) s.RelinquishList(l); return true; }},
-            {"SaveObjects", [&] { CHECK(s.SaveObjects(current, nullptr, 0, 0) != DE_OK); return true; }},
+            {"FindNamedObjects",
+             [&]
+             {
+                 if (auto* l = s.FindNamedObjects("x"))
+                     s.RelinquishList(l);
+                 return true;
+             }},
+            {"SaveObjects",
+             [&]
+             {
+                 CHECK(s.SaveObjects(current, nullptr, 0, 0) != DE_OK);
+                 return true;
+             }},
         };
         for (const auto& attempt : attempts)
         {
@@ -1262,8 +1359,13 @@ namespace
         CHECK(attempt(none, "not the original", RESTOREOBJECTS_RESTORETIME, "Save\\Current\\Other.sav"));
         CHECK(attempt(none, "no saved Auto image", RESTOREOBJECTS_RESTORETIME, autosave));
         CHECK(attempt(none, "unknown RestoreObjects flags", 2));
-        CHECK(attempt([](auto& g, auto&) { CHECK(g.objects.remove(make(g, probe_type, "gone"))); return true; },
-                      "deferred removals"));
+        CHECK(attempt(
+            [](auto& g, auto&)
+            {
+                CHECK(g.objects.remove(make(g, probe_type, "gone")));
+                return true;
+            },
+            "deferred removals"));
         // Corruption is refused while decoding, before anything changes.
         CHECK(attempt([](auto&, auto& image) { image.objects.pop_back(); }, "OBJS"));
         CHECK(attempt([](auto&, auto& image) { image.objects[0] = 0xFF; }, "OBJS"));
@@ -1391,10 +1493,10 @@ int main(int argc, char** argv)
     root = argv[2];
     std::error_code ec;
     std::filesystem::create_directories(root, ec);
-    const std::map<std::string, bool (*)()> cases{{"codec", codec},       {"deadlines", deadlines},
-                                                  {"roundtrip", roundtrip}, {"order", order},
-                                                  {"dispatch", dispatch}, {"phases", phases}, {"purity", purity},
-                                                  {"failures", failures}, {"store", store_rules}};
+    const std::map<std::string, bool (*)()> cases{
+        {"codec", codec},   {"deadlines", deadlines}, {"roundtrip", roundtrip},
+        {"order", order},   {"dispatch", dispatch},   {"phases", phases},
+        {"purity", purity}, {"failures", failures},   {"store", store_rules}};
     const auto found = cases.find(argv[1]);
     return found != cases.end() && found->second() ? 0 : 1;
 }

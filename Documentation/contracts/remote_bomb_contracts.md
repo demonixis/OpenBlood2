@@ -86,9 +86,12 @@ damage remains deferred; no callback destroys its current C++ instance.
 
 Supported Restore/KeepAlive preserve slot11, raw ammo and current selection. Invalid
 slot/type/hand combinations reject before mutation; slot12 stays unavailable.
-The original player save subset does not serialize the active bomb list. The old
-player destroys listed charges; the restored player starts with no remote handles.
-World projectile save/load and whole-world checkpoint restoration remain absent.
+The original player save subset does not serialize the active bomb list. On a typed
+NEW_LEVEL the old player destroys listed charges; the restored player starts with no remote
+handles. A saved game ([save/load lot 9](save_load_contracts.md#implemented-pickups-and-projectiles-lot-9))
+saves each charge with its shooter (departure D15); a charge its player has not signalled
+rejoins the restored player's list in load order, its player link restored as a saved
+interlink, so the player can still detonate it. Its falling flag restarts, as in the original.
 
 Weapons exposes selected ammo/charge, list size, command/signal totals and errors.
 Objects exposes actual hidden/live model resources, Armed/Falling, spin, contacts,

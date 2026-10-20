@@ -208,7 +208,7 @@ bool CFlareAltProjectile::Update()
             return Fail("Flare burst velocity unavailable");
         get_velocity = false;
     }
-    const auto elapsed = g_pServerDE->GetTime() - m_fStartTime;
+    const auto elapsed = g_pServerDE->GetTime() - scale_start; // Source shadow m_fStartTime.
     if (elapsed > .1f)
     {
         const auto speed = std::sqrt(vector_dot(cached_velocity, cached_velocity));

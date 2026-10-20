@@ -63,7 +63,7 @@ CTeslaProjectile::~CTeslaProjectile()
 bool CTeslaProjectile::Update()
 {
     // Hidden (scale zero) for its first 0.01 s, then 0.175.
-    const float scale = g_pServerDE->GetTime() - m_fStartTime < .01f ? 0 : .175f;
+    const float scale = g_pServerDE->GetTime() - scale_start < .01f ? 0 : .175f;
     if (!flight_sound)
     {
         // PlaySoundFromObject(.., 600, MISC_MEDIUM, loop, handle): attached and retained.
@@ -206,7 +206,7 @@ bool CShikariLoogieProjectile::Update()
 {
     // Hidden (scale zero) for its first 0.01 s, then 0.25. An OT_NORMAL object has no
     // visual, so the scale is state only.
-    const float scale = g_pServerDE->GetTime() - m_fStartTime < .01f ? 0 : .25f;
+    const float scale = g_pServerDE->GetTime() - scale_start < .01f ? 0 : .25f;
     if (!g_pServerDE->ScaleObject(m_hObject, {scale, scale, scale}))
         return Fail("Loogie scale rejected");
     return CProjectile::Update();
