@@ -13,6 +13,7 @@ accepted with open GPU reservation **M2-GPU-001**. M3 remains unaccepted.
 | Save/load lot 2 (container and fingerprint) | [Report](reports/save_load_container.md) / [source ledger](sources/save_load_container_sources.json) |
 | Save/load lot 3 (engine records and the clock) | [Report](reports/save_load_records.md) / [source ledger](sources/save_load_records_sources.json) |
 | Save/load lot 4 (restore-mode world and candidate transaction) | [Report](reports/save_load_session.md) / [source ledger](sources/save_load_session_sources.json) |
+| Save/load lot 8 (movers and brushes) | [Report](reports/save_load_movers.md) / [source ledger](sources/save_load_movers_sources.json) |
 | Source selections, commits and hashes | [Source ledgers](sources/readme.md) |
 | M0 / M1 validation | [M0](reports/m0.md) / [M1](reports/m1.md) |
 | M2 criterion matrix and GPU reservation | [Acceptance](reports/m2_acceptance.md) |

@@ -117,6 +117,10 @@ class ServerDE : public CSBase
     virtual bool ValidateSpawnObject(std::string_view) = 0;
     // Explains a precreate refusal in the creation failure; ignored outside precreate.
     virtual void RejectPrecreate(std::string_view reason) = 0;
+    // Fails the active MID_SAVEOBJECT/MID_LOADOBJECT payload with a reason, so an original
+    // Save or Load body can refuse state it cannot represent before changing anything.
+    // Ignored for any other message.
+    virtual void RejectPayload(HMESSAGEWRITE, std::string_view reason) = 0;
     virtual void RecordSpawn(const OpenBlood2::SpawnReport&) = 0;
     virtual void RecordPickup(HOBJECT, const OpenBlood2::PickupReport&) = 0;
     virtual DRESULT WritePickupMessage(HMESSAGEWRITE, const OpenBlood2::PickupMessage&) = 0;

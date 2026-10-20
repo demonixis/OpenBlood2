@@ -11,4 +11,8 @@ class RotatingDoor : public Door
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
     void Move(bool opening) override;
+
+  private:
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };

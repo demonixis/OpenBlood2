@@ -101,7 +101,8 @@ namespace OpenBlood2
         // (inherited): the registered game classes of the original list and the engine
         // built-ins, rebuilt from the DAT on a restore. NotSaved: the original never marks the
         // class USRFLG_SAVEABLE and a restore loses it (bases, gibs, transient effects, CTF
-        // flags). Every other class stays Unsupported until its lot supplies Original bodies.
+        // flags). Original (with a payload version): lot 8's movers, brushes, volumes, TripLaser
+        // and Tchernotronic. Every other class stays Unsupported until its lot supplies bodies.
         //
         // Original registration defaults. Optional BaseClass reader properties are
         // declared without injecting values that would override ObjectCreateStruct.
@@ -275,7 +276,9 @@ namespace OpenBlood2
                                       {{"Filename", std::string("Models\\WorldObjects\\Technoberg.abc")},
                                        {"Skin", std::string("Skins\\WorldObjects\\Technoberg.dtx")},
                                        {"DestroyTriggerTarget", std::string{}},
-                                       {"DestroyTriggerMessage", std::string{}}}};
+                                       {"DestroyTriggerMessage", std::string{}}},
+                                      SaveSupport::Original,
+                                      1};
         const ClassInfo trip_laser{"TripLaser",
                                    &b2base,
                                    construct<TripLaser>,
@@ -289,7 +292,9 @@ namespace OpenBlood2
                                     {"TouchTriggerMessage", std::string{}},
                                     {"Sound", std::string{}},
                                     {"TouchSound", std::string{}},
-                                    {"Damage", 10.0f}}};
+                                    {"Damage", 10.0f}},
+                                   SaveSupport::Original,
+                                   1};
         const ClassInfo spawner{"Spawner",
                                 &b2base,
                                 construct<Spawner>,
@@ -939,27 +944,35 @@ namespace OpenBlood2
                                 {"NumSurfacePolies", std::int32_t(160)},
                                 {"Locked", false},
                                 {"UnlockKeyRemove", false},
-                                {"UnlockKeyName", std::string{}}}};
+                                {"UnlockKeyName", std::string{}}},
+                               SaveSupport::Original,
+                               1};
         const ClassInfo water{"Water",
                               &volume,
                               construct<Water>,
                               {{"Viscosity", .5f},
                                {"Code", std::int32_t(CC_WATER)},
                                {"DamageType", std::int32_t(6)},
-                               {"SpriteSurfaceName", std::string("Sprites\\WaterBlue.spr")}}};
+                               {"SpriteSurfaceName", std::string("Sprites\\WaterBlue.spr")}},
+                              SaveSupport::Original,
+                              1};
         const ClassInfo blood{"Blood",
                               &volume,
                               construct<Blood>,
                               {{"Viscosity", .8f},
                                {"Code", std::int32_t(CC_BLOOD)},
                                {"DamageType", std::int32_t(6)},
-                               {"SpriteSurfaceName", std::string("Sprites\\WaterBlood.spr")}}};
+                               {"SpriteSurfaceName", std::string("Sprites\\WaterBlood.spr")}},
+                              SaveSupport::Original,
+                              1};
         const ClassInfo acid{"Acid",
                              &volume,
                              construct<Acid>,
                              {{"Viscosity", .5f},
                               {"Code", std::int32_t(CC_ACID)},
-                              {"SpriteSurfaceName", std::string("Sprites\\WaterAcid.spr")}}};
+                              {"SpriteSurfaceName", std::string("Sprites\\WaterAcid.spr")}},
+                             SaveSupport::Original,
+                             1};
         const ClassInfo ladder{"Ladder",
                                &volume,
                                construct<Ladder>,
@@ -969,7 +982,9 @@ namespace OpenBlood2
                                 {"SurfaceColor1", DVector{}},
                                 {"SurfaceColor2", DVector{}},
                                 {"XScaleDuration", 10.0f},
-                                {"YScaleDuration", 10.0f}}};
+                                {"YScaleDuration", 10.0f}},
+                               SaveSupport::Original,
+                               1};
         const ClassInfo pickup{"PickupObject",
                                &b2base,
                                construct<PickupObject>,
@@ -1144,8 +1159,13 @@ namespace OpenBlood2
                               {"TouchActivate", false},
                               {"ObjectActivate", false},
                               {"NamedObjectActivate", false},
-                              {"Locked", false}}};
-        const ClassInfo destructable_brush{"CDestructableBrush", &b2base, construct<CDestructableBrush>, []
+                              {"Locked", false}},
+                             SaveSupport::Original,
+                             1};
+        const ClassInfo destructable_brush{"CDestructableBrush",
+                                           &b2base,
+                                           construct<CDestructableBrush>,
+                                           []
                                            {
                                                std::vector<PropertySpec> p{{"Visible", true},
                                                                            {"Solid", true},
@@ -1175,9 +1195,14 @@ namespace OpenBlood2
                                                                  "Plastic", "Flesh", "Liquid", "Exploding", "Custom"})
                                                    p.push_back({name, false});
                                                return p;
-                                           }()};
+                                           }(),
+                                           SaveSupport::Original,
+                                           1};
         const ClassInfo destructable_model{
-            "CDestructableModel", &b2base, construct<CDestructableModel>, []
+            "CDestructableModel",
+            &b2base,
+            construct<CDestructableModel>,
+            []
             {
                 std::vector<PropertySpec> p{{"DebrisStuff", std::int32_t(0), false},
                                             {"Visible", true},
@@ -1216,8 +1241,13 @@ namespace OpenBlood2
                                   "Exploding", "Custom"})
                     p.push_back({name, false});
                 return p;
-            }()};
-        const ClassInfo rotating_brush{"RotatingBrush", &destructable_brush, construct<RotatingBrush>, []
+            }(),
+            SaveSupport::Original,
+            1};
+        const ClassInfo rotating_brush{"RotatingBrush",
+                                       &destructable_brush,
+                                       construct<RotatingBrush>,
+                                       []
                                        {
                                            std::vector<PropertySpec> p{{"RotatingStuff", std::int32_t(0), false},
                                                                        {"AllowMarks", false},
@@ -1233,14 +1263,24 @@ namespace OpenBlood2
                                                p.push_back({std::string(axis) + "RotateForward", true});
                                            }
                                            return p;
-                                       }()};
-        const ClassInfo rotating_model{"RotatingModel", &destructable_model, construct<RotatingModel>, []
+                                       }(),
+                                       SaveSupport::Original,
+                                       1};
+        const ClassInfo rotating_model{"RotatingModel",
+                                       &destructable_model,
+                                       construct<RotatingModel>,
+                                       []
                                        {
                                            auto p = rotating_brush.properties;
                                            std::erase_if(p, [](const auto& prop) { return prop.name == "AllowMarks"; });
                                            return p;
-                                       }()};
-        const ClassInfo world_debris{"WorldModelDebris", &destructable_brush, construct<WorldModelDebris>, []
+                                       }(),
+                                       SaveSupport::Original,
+                                       1};
+        const ClassInfo world_debris{"WorldModelDebris",
+                                     &destructable_brush,
+                                     construct<WorldModelDebris>,
+                                     []
                                      {
                                          auto p = rotating_brush.properties;
                                          for (auto& prop : p)
@@ -1252,14 +1292,18 @@ namespace OpenBlood2
                                          p.push_back({"InitialVelocity", DVector{}});
                                          p.push_back({"GravityMultiplier", 1.0f});
                                          return p;
-                                     }()};
+                                     }(),
+                                     SaveSupport::Original,
+                                     1};
         const ClassInfo rotating_door{"RotatingDoor",
                                       &door,
                                       construct<RotatingDoor>,
                                       {{"RotationPoint", DVector{}},
                                        {"RotationAngles", DVector{}},
                                        {"BoxPhysics", false},
-                                       {"PushPlayerBack", true}}};
+                                       {"PushPlayerBack", true}},
+                                      SaveSupport::Original,
+                                      1};
         const ClassInfo camera{"CameraSpot", &b2base, construct<CameraSpot>, {}, SaveSupport::AlwaysLoad};
         const ClassInfo conveyor{"Conveyor",
                                  &volume,
@@ -1270,7 +1314,9 @@ namespace OpenBlood2
                                   {"SurfaceColor1", DVector{}},
                                   {"SurfaceColor2", DVector{}},
                                   {"XScaleDuration", 10.0f},
-                                  {"YScaleDuration", 10.0f}}};
+                                  {"YScaleDuration", 10.0f}},
+                                 SaveSupport::Original,
+                                 1};
         const ClassInfo damage{"Damage",
                                &volume,
                                construct<::Damage>,
@@ -1281,8 +1327,13 @@ namespace OpenBlood2
                                 {"SurfaceColor1", DVector{}},
                                 {"SurfaceColor2", DVector{}},
                                 {"XScaleDuration", 10.0f},
-                                {"YScaleDuration", 10.0f}}};
-        const ClassInfo minefield{"Minefield", &volume, construct<Minefield>, []
+                                {"YScaleDuration", 10.0f}},
+                               SaveSupport::Original,
+                               1};
+        const ClassInfo minefield{"Minefield",
+                                  &volume,
+                                  construct<Minefield>,
+                                  []
                                   {
                                       auto p = damage.properties;
                                       for (auto& property : p)
@@ -1294,7 +1345,9 @@ namespace OpenBlood2
                                       p.push_back({"YScaleMin", 15.0f});
                                       p.push_back({"YScaleMax", 25.0f});
                                       return p;
-                                  }()};
+                                  }(),
+                                  SaveSupport::Original,
+                                  1};
         const ClassInfo freefall{"FreeFall",
                                  &volume,
                                  construct<FreeFall>,
@@ -1306,7 +1359,9 @@ namespace OpenBlood2
                                   {"SurfaceColor1", DVector{}},
                                   {"SurfaceColor2", DVector{}},
                                   {"XScaleDuration", 10.0f},
-                                  {"YScaleDuration", 10.0f}}};
+                                  {"YScaleDuration", 10.0f}},
+                                 SaveSupport::Original,
+                                 1};
         const ClassInfo key{"Key",
                             &b2base,
                             construct<Key>,

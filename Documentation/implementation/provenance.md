@@ -1814,3 +1814,20 @@ recorded decision-4 marking departures. The save-support declarations, `save_gam
 [contract](../contracts/save_load_contracts.md#implemented-restore-mode-world-and-transaction-lot-4),
 the [evidence](reports/save_load_session.md) and the
 [source ledger](sources/save_load_session_sources.json).
+
+## Movers and brushes save/load (2026-10-20)
+
+Save/load lot 8 adds selective ports of the original `Save`/`Load` bodies and their
+`MID_SAVEOBJECT`/`MID_LOADOBJECT` dispatch from `ObjectDLL/Door.cpp`, `RotatingDoor.cpp`,
+`Rotating.cpp`, `DestructableBrush.cpp`, `Debris.cpp`, `WorldModelDebris.cpp`,
+`DestructableModel.cpp`, `Destructable.cpp`, `VolumeBrush.cpp`, `TripLaser.cpp` and
+`Tchernotronic.cpp`: field order and widths, relative and absolute clocks, the
+`PRECREATE_SAVEGAME` post-processing and skipped `INITIALUPDATE_SAVEGAME` work, the
+CDestructable framing markers and the VolumeBrush and TripLaser Load tails. The port maps the
+fields onto its typed members, decodes and checks every block before changing a member
+(through the new `RejectPayload` service), appends the replacement rotation's pose angles to
+the Rotating block and records two departures (the VolumeBrush player class and container
+code). See the
+[contract](../contracts/save_load_contracts.md#implemented-movers-and-brushes-lot-8),
+the [evidence](reports/save_load_movers.md) and the
+[source ledger](sources/save_load_movers_sources.json).

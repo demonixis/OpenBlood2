@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-20",
+  "scope": "Save/load lot 8: original Save/Load bodies of the movers and brushes (Door, RotatingDoor, the Rotating aggregate, CDestructableBrush, CDebris, WorldModelDebris, CDestructableModel, the CDestructable aggregate block, VolumeBrush and its types, TripLaser, Tchernotronic), their PRECREATE_SAVEGAME and INITIALUPDATE_SAVEGAME branches and save-support declarations. The bodies are selective ports recorded in the provenance ledger; the checks, the RejectPayload service and the clock inverse are OpenBlood2 code.",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Door.cpp",
+      "source_sha256": "790e77cd68450b4dd49b853931c987055aa65f7f859b57465fc80a8e650cfcb9",
+      "purpose": "Door Save/Load field order (Door.cpp:1110-1189), DTF_* trigger flags, PostPropRead on every precreate, InitialUpdate returning at once for INITIALUPDATE_SAVEGAME, the never-assigned m_bLocked/m_dwFlags and the unsaved busy-loop handle."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/RotatingDoor.cpp",
+      "source_sha256": "8feb3d970eb3ceecc200a38b6ffb3385f8da09c021641f96247218e58789b913",
+      "purpose": "RotatingDoor block before Door's (RotatingDoor.cpp:473-524), short open directions written as DWords, current angles, the unconditional degree-to-radian precreate conversion and the skipped savegame InitialUpdate."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Rotating.cpp",
+      "source_sha256": "225aa9241ea37863f17ece9f30c888314bff1e56b4cf036a2696cfaebc8691aa",
+      "purpose": "Rotating aggregate block (Rotating.cpp:685-750): self reference, velocities, spin times, relative last/start times, zero-based current angles, state and sound strings; InitialUpdate skipped on a savegame."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/RotatingBrush.cpp",
+      "source_sha256": "5a7d9961ae58c800447cf9bb0ae401a0344df85d3b4e426eec1b747fd01d48e2",
+      "purpose": "Aggregate addition order (CDestructableBrush's, then Rotating) and the unconditional Init on initial update."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/RotatingModel.cpp",
+      "source_sha256": "a803b063ecf49e1db8367600c251ca74ed2a3b77ef062d67ce8ce536700d3526",
+      "purpose": "Aggregate addition order on CDestructableModel and the unconditional Init."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/DestructableBrush.cpp",
+      "source_sha256": "429fd282ca2dce073a96bac78256a84c9784a22c7c261e0da0f1b86ed359a997",
+      "purpose": "CDestructableBrush block (DestructableBrush.cpp:385-424), the never-assigned debris skin, PostPropRead on every precreate and the non-savegame-only initial update."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Debris.cpp",
+      "source_sha256": "cccf3b6458c84e39ec8b12b7b0bb5708b3f0ba08ba9fdf0fde8c87a7a9de6ca8",
+      "purpose": "CDebris aggregate block (Debris.cpp:462-532), material flag order, never-assigned Texture2/Model2 and constructor explosion radius/damage."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/WorldModelDebris.cpp",
+      "source_sha256": "0395f9ad24728739397ab9c7f7e2c84a5a20cb4b823f8f4487cc72370ef5f6a4",
+      "purpose": "WorldModelDebris block before CDestructableBrush's (WorldModelDebris.cpp:207-235) and the non-savegame Init/SetOff."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/DestructableModel.cpp",
+      "source_sha256": "a725d5d5d84f539de382f73ea266b0ab92380eb4911fa2188c997322e69efd86",
+      "purpose": "CDestructableModel block (DestructableModel.cpp:969-1050), m_dwDestroyFlags from the three destroy booleans, m_fYaw from the Rotation property, the absolute m_fLastTime and the unsaved sliding state."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Destructable.cpp",
+      "source_sha256": "c0d8b72b729e806a6ca8f0e44a57054aef30e20c4d75b745df29f97fb36199ca",
+      "purpose": "CDestructable aggregate block (Destructable.cpp:1134-1245): framing markers, self reference stored only while unbound, non-damageable health sentinel and list re-insertion."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/VolumeBrush.cpp",
+      "source_sha256": "442cc81f7cd87c69882cc42028e62ad67e359e995cb7e47f7c4a0d2cb06709bb",
+      "purpose": "VolumeBrush block (VolumeBrush.cpp:758-878), constructor m_dwFlags, m_vLastPos at surface creation, the Load tail recreating the surface and resetting user flags, the constructor container code reapplied at precreate and the m_hPlayerClass set only by the non-savegame initial update."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/VolumeBrushTypes.cpp",
+      "source_sha256": "271c2fd72602a920da9b85640612af3122db83922826aa9ccde69eabbb0a7df6",
+      "purpose": "Volume subclasses add constructor constants only, no saved state."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/TripLaser.cpp",
+      "source_sha256": "51f13936e868ef47ca478b2a4181c53cf7990c8fc9be040bc948e51fdcc52572",
+      "purpose": "TripLaser block (TripLaser.cpp:488-563), relative damage time, forced model/skin on every precreate and the loop restarted in Load when triggered."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Tchernotronic.cpp",
+      "source_sha256": "48a20efb9d14d37efe80b54888a05cfa794a175649d54bbd66e7d74c721480e5",
+      "purpose": "Tchernotronic block (Tchernotronic.cpp:434-480), relative removal time and the unconditional property read."
+    }
+  ]
+}

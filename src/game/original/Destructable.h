@@ -13,6 +13,9 @@ class CDestructable : public Aggregate
     DBOOL Init(HOBJECT, CInventoryMgr* = nullptr);
     bool Save(OpenBlood2::DestructableState&, std::string&) const;
     bool Load(const OpenBlood2::DestructableState&, std::string&);
+    // Original byte block of MID_SAVEOBJECT/MID_LOADOBJECT over the typed values above.
+    void SaveMessage(HMESSAGEWRITE);
+    void LoadMessage(HMESSAGEREAD);
     void SetHitPoints(float hp)
     {
         m_fHitPoints = hp;

@@ -1,6 +1,7 @@
 // Original ObjectDLL/Tchernotronic.cpp (Monolith). See tchernotronic_contracts.md.
 #include "Tchernotronic.h"
 #include "PlayerObj.h"
+#include "SaveFields.h"
 #include "radius_damage.h"
 #include "trigger_helpers.h"
 #include <cctype>
@@ -26,12 +27,7 @@ DDWORD Tchernotronic::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
             break;
         case MID_PRECREATE:
         {
-            if (data && reason == PRECREATE_SAVEGAME)
-            {
-                g_pServerDE->RejectPrecreate("Tchernotronic save restoration is not implemented");
-                return 0;
-            }
-            GenericProp prop;
+            GenericProp prop; // The original reads properties for every reason; none exist on a restore.
             auto text = [&](const char* key, std::string& out)
             {
                 if (g_pServerDE->GetPropGeneric(key, &prop) == DE_OK && prop.m_String[0])
@@ -47,6 +43,14 @@ DDWORD Tchernotronic::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         case MID_INITIALUPDATE:
             if (reason != INITIALUPDATE_SAVEGAME && g_pServerDE->IsObjectAlive(m_hObject))
                 InitialUpdate();
+            break;
+        case MID_SAVEOBJECT:
+            if (data)
+                Save(*static_cast<HMESSAGEWRITE*>(data));
+            break;
+        case MID_LOADOBJECT:
+            if (data)
+                Load(*static_cast<HMESSAGEREAD*>(data));
             break;
     }
     return B2BaseClass::EngineMessageFn(message, data, reason);
@@ -165,4 +169,42 @@ void Tchernotronic::AddExplosion(DVector position)
     r.voice = s->PlayDetachedSound(m_hObject, request, position, r.sound_error);
     targets = r.targets = DamageObjectsInRadius(m_hObject, this, position, 200, 100, DamageType::Explode);
     s->RecordSceneExplosion(r);
+}
+void Tchernotronic::Save(HMESSAGEWRITE h)
+{
+    // Original Tchernotronic.cpp:434-446; the removal clock is relative.
+    auto* s = g_pServerDE;
+    save_fields::write_string(h, m_hstrTriggerTarget);
+    save_fields::write_string(h, m_hstrTriggerMessage);
+    s->WriteToMessageDWord(h, m_nRestAnim);
+    s->WriteToMessageDWord(h, m_nMovingAnim);
+    s->WriteToMessageByte(h, m_bTimer);
+    s->WriteToMessageFloat(h, m_fRemoveTime - s->GetTime());
+}
+void Tchernotronic::Load(HMESSAGEREAD h)
+{
+    // Original Tchernotronic.cpp:457-480, decoded and checked before any member changes.
+    auto* s = g_pServerDE;
+    namespace F = save_fields;
+    const float now = s->GetTime();
+    std::string target, text;
+    bool ok = F::read_string(h, target);
+    ok = F::read_string(h, text) && ok;
+    const DDWORD rest = s->ReadFromMessageDWord(h), moving = s->ReadFromMessageDWord(h);
+    bool timer = false;
+    ok = F::read_bool(h, timer) && ok;
+    const float remove = s->ReadFromMessageFloat(h);
+    if (!ok)
+        return;
+    if (!std::isfinite(remove))
+    {
+        s->RejectPayload(h, "Tchernotronic removal clock is not finite");
+        return;
+    }
+    m_hstrTriggerTarget = std::move(target);
+    m_hstrTriggerMessage = std::move(text);
+    m_nRestAnim = rest;
+    m_nMovingAnim = moving;
+    m_bTimer = timer;
+    m_fRemoveTime = F::restored_time(remove, now);
 }

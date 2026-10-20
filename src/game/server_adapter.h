@@ -91,6 +91,7 @@ namespace OpenBlood2
         PathMgr* ai_paths = nullptr;
         bool ValidateSpawnObject(std::string_view) override;
         void RejectPrecreate(std::string_view reason) override;
+        void RejectPayload(HMESSAGEWRITE, std::string_view reason) override;
         void RecordSpawn(const SpawnReport&) override;
         void RecordPickup(HOBJECT, const PickupReport&) override;
         DRESULT WritePickupMessage(HMESSAGEWRITE, const PickupMessage&) override;

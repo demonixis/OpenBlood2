@@ -1,6 +1,7 @@
 // Selective original-source port. See destructable_model_contracts.md for boundaries.
 #include "DestructableModel.h"
 #include "PlayerObj.h"
+#include "SaveFields.h"
 #include "engine/collision.h"
 #include "engine/model_commands.h"
 #include <algorithm>
@@ -85,6 +86,8 @@ bool CDestructableModel::ReadProp(ObjectCreateStruct& create)
     text("DestroyFilename", destroy_model);
     text("DestroySkin", destroy_skin);
     text("SlidingSound", sliding_path);
+    if (s->GetPropGeneric("Rotation", &p) == DE_OK)
+        yaw = p.m_Vec.y;
     vec("InitDims", init_dims);
     vec("DamageDims", damage_dims);
     vec("DestroyDims", destroy_dims);
@@ -408,17 +411,17 @@ bool CDestructableModel::HandleTriggerMessage(std::string_view text)
 }
 DDWORD CDestructableModel::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
-    if (message == MID_SAVEOBJECT || message == MID_LOADOBJECT)
-    {
-        trigger_error = "Destructible model save/restore is unavailable";
-        return 0;
-    }
+    if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
     if (message == MID_PRECREATE)
     {
         const auto result = B2BaseClass::EngineMessageFn(message, data, reason);
-        if (!result || !data || reason == PRECREATE_SAVEGAME)
+        if (!result || !data)
             return 0;
         auto& create = *static_cast<ObjectCreateStruct*>(data);
+        // On PRECREATE_SAVEGAME the constructor's Chrome/Pushable defaults add no flags.
         create.m_ObjectType = OT_MODEL;
         if ((reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP) && !ReadProp(create))
             return 0;
@@ -432,7 +435,8 @@ DDWORD CDestructableModel::EngineMessageFn(DDWORD message, void* data, DFLOAT re
     if (message == MID_INITIALUPDATE)
     {
         const auto result = B2BaseClass::EngineMessageFn(message, data, reason);
-        if (GetServerDE()->IsObjectAlive(m_hObject))
+        // Original InitialUpdate does nothing for INITIALUPDATE_SAVEGAME; Load restores the members.
+        if (reason != INITIALUPDATE_SAVEGAME && GetServerDE()->IsObjectAlive(m_hObject))
             InitialUpdate(reason);
         return result;
     }
@@ -461,4 +465,112 @@ DDWORD CDestructableModel::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESS
             s->FreeString(text);
     }
     return B2BaseClass::ObjectMessageFn(sender, message, read);
+}
+void CDestructableModel::Save(HMESSAGEWRITE h)
+{
+    // Original DestructableModel.cpp:969-1006. Chrome is refused at creation, so it is false.
+    // m_fLastTime is absolute: a full restore restores the clock. The sliding loop is not saved.
+    auto* s = GetServerDE();
+    namespace F = save_fields;
+    F::write_string(h, damage_model);
+    F::write_string(h, damage_skin);
+    F::write_string(h, destroy_model);
+    F::write_string(h, destroy_skin);
+    s->WriteToMessageVector(h, &init_dims);
+    s->WriteToMessageVector(h, &damage_dims);
+    s->WriteToMessageVector(h, &destroy_dims);
+    s->WriteToMessageDWord(h, destroy_flags);
+    s->WriteToMessageByte(h, dead_state);
+    s->WriteToMessageFloat(h, hit_points);
+    s->WriteToMessageFloat(h, damage_hit_points);
+    s->WriteToMessageFloat(h, mass);
+    s->WriteToMessageFloat(h, alpha);
+    s->WriteToMessageFloat(h, yaw);
+    s->WriteToMessageByte(h, (destroy_flags & FLAG_VISIBLE) != 0);
+    s->WriteToMessageByte(h, (destroy_flags & FLAG_SOLID) != 0);
+    s->WriteToMessageByte(h, (destroy_flags & FLAG_GRAVITY) != 0);
+    s->WriteToMessageByte(h, destructable);
+    s->WriteToMessageByte(h, pushable);
+    s->WriteToMessageDWord(h, surface);
+    s->WriteToMessageByte(h, 0);
+    s->WriteToMessageFloat(h, scale);
+    s->WriteToMessageVector(h, &tint);
+    s->WriteToMessageFloat(h, target_alpha);
+    s->WriteToMessageFloat(h, fade_rate);
+    s->WriteToMessageFloat(h, last_time);
+    F::write_string(h, sliding_path);
+}
+void CDestructableModel::Load(HMESSAGEREAD h)
+{
+    // Original DestructableModel.cpp:1016-1050, decoded and checked before any member changes.
+    // The damaged or destroyed model, skin, scale, colour and dimensions are engine record fields.
+    auto* s = GetServerDE();
+    namespace F = save_fields;
+    std::string models[4], sliding_sound_path;
+    bool ok = true;
+    for (auto& text : models)
+        ok = F::read_string(h, text, MAX_CS_FILENAME_LEN) && ok;
+    DVector dims[3]{}, saved_tint{};
+    for (auto& value : dims)
+        s->ReadFromMessageVector(h, &value);
+    const DDWORD saved_destroy_flags = s->ReadFromMessageDWord(h);
+    bool dead = false, visible = false, solid = false, gravity = false, saved_destructable = false,
+         saved_pushable = false, chrome = false;
+    ok = F::read_bool(h, dead) && ok;
+    float scalars[5];
+    for (auto& value : scalars)
+        value = s->ReadFromMessageFloat(h);
+    ok = F::read_bool(h, visible) && ok;
+    ok = F::read_bool(h, solid) && ok;
+    ok = F::read_bool(h, gravity) && ok;
+    ok = F::read_bool(h, saved_destructable) && ok;
+    ok = F::read_bool(h, saved_pushable) && ok;
+    const DDWORD saved_surface = s->ReadFromMessageDWord(h);
+    ok = F::read_bool(h, chrome) && ok;
+    const float saved_scale = s->ReadFromMessageFloat(h);
+    s->ReadFromMessageVector(h, &saved_tint);
+    const float saved_target = s->ReadFromMessageFloat(h), saved_rate = s->ReadFromMessageFloat(h),
+                saved_last = s->ReadFromMessageFloat(h);
+    ok = F::read_string(h, sliding_sound_path) && ok;
+    if (!ok)
+        return;
+    const auto [saved_hit_points, saved_damage_hit_points, saved_mass, saved_alpha, saved_yaw] = scalars;
+    const DDWORD derived = (visible ? FLAG_VISIBLE : 0) | (solid ? FLAG_SOLID : 0) | (gravity ? FLAG_GRAVITY : 0);
+    for (const auto& value : dims)
+        ok = ok && dimensions(value);
+    if (!ok || chrome || saved_destroy_flags != derived || models[2].empty() != models[3].empty() ||
+        !F::finite(saved_hit_points) || !F::finite(saved_damage_hit_points) || !F::finite(saved_mass) ||
+        saved_mass < 0 || !(saved_alpha >= 0 && saved_alpha <= 1) || !std::isfinite(saved_yaw) || saved_surface > 255 ||
+        !F::finite(saved_scale) || saved_scale <= 0 || !physics_vector(saved_tint) || saved_tint.x < 0 ||
+        saved_tint.y < 0 || saved_tint.z < 0 || saved_tint.x > 255 || saved_tint.y > 255 || saved_tint.z > 255 ||
+        !(saved_target >= 0 && saved_target <= 1) || !std::isfinite(saved_rate) || !std::isfinite(saved_last))
+    {
+        s->RejectPayload(h, "destructible model block holds values the port cannot represent");
+        return;
+    }
+    damage_model = std::move(models[0]);
+    damage_skin = std::move(models[1]);
+    destroy_model = std::move(models[2]);
+    destroy_skin = std::move(models[3]);
+    init_dims = dims[0];
+    damage_dims = dims[1];
+    destroy_dims = dims[2];
+    destroy_flags = saved_destroy_flags;
+    dead_state = dead;
+    hit_points = saved_hit_points;
+    damage_hit_points = saved_damage_hit_points;
+    mass = saved_mass;
+    alpha = saved_alpha;
+    yaw = saved_yaw;
+    destructable = saved_destructable;
+    pushable = saved_pushable;
+    surface = saved_surface;
+    scale = saved_scale;
+    tint = saved_tint;
+    target_alpha = saved_target;
+    fade_rate = saved_rate;
+    last_time = saved_last;
+    sliding_path = std::move(sliding_sound_path);
+    // The transient sliding/standing state and the loop restart empty, as in the original.
+    initialized = true;
 }

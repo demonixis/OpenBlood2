@@ -33,6 +33,8 @@ class Rotating : public Aggregate
     DDWORD ObjectMessageFn(LPBASECLASS, HOBJECT, DDWORD, HMESSAGEREAD) override;
 
   private:
+    void Save(HMESSAGEWRITE);
+    void Load(LPBASECLASS, HMESSAGEREAD);
     void ReadProp();
     void UpdateNormalRotation();
     void UpdateSpin(bool up);

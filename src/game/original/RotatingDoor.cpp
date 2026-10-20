@@ -1,4 +1,5 @@
 #include "RotatingDoor.h"
+#include "SaveFields.h"
 #include "engine/collision.h"
 #include "engine/objects.h"
 #include <cmath>
@@ -12,6 +13,10 @@ DDWORD RotatingDoor::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
     {
         if (!Door::EngineMessageFn(message, data, reason))
             return 0;
+        // The original also converts the constructor speeds to radians here; Door::Load then
+        // overwrites them with the saved radians.
+        if (reason == PRECREATE_SAVEGAME)
+            return 1;
         g_pServerDE->GetPropVector("RotationAngles", &rotation_angles);
         g_pServerDE->GetPropVector("RotationPoint", &rotation_point);
         GenericProp prop;
@@ -30,7 +35,11 @@ DDWORD RotatingDoor::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         closing_speed *= radians;
         return 1;
     }
-    if (message == MID_INITIALUPDATE)
+    if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
+    if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME)
     {
         closed_angles = angles;
         open_angles = vector_add(angles, vector_scale(rotation_angles, radians));
@@ -108,4 +117,64 @@ void RotatingDoor::Move(bool opening)
         else
             SetClosed();
     }
+}
+void RotatingDoor::Save(HMESSAGEWRITE h)
+{
+    // Original RotatingDoor.cpp:473-493, before the Door block. The open directions are
+    // shorts written as DWords; the angles are the current ones.
+    auto* s = g_pServerDE;
+    s->WriteToMessageVector(h, &rotation_angles);
+    s->WriteToMessageVector(h, &rotation_point);
+    s->WriteToMessageVector(h, &open_angles);
+    s->WriteToMessageVector(h, &closed_angles);
+    s->WriteToMessageVector(h, &original_position);
+    for (float direction : {open_direction.x, open_direction.y, open_direction.z})
+        s->WriteToMessageDWord(h, static_cast<DDWORD>(static_cast<std::int32_t>(direction)));
+    s->WriteToMessageFloat(h, angles.x);
+    s->WriteToMessageFloat(h, angles.y);
+    s->WriteToMessageFloat(h, angles.z);
+    s->WriteToMessageByte(h, push_player_back);
+}
+void RotatingDoor::Load(HMESSAGEREAD h)
+{
+    // Original RotatingDoor.cpp:504-524, decoded and checked before any member changes.
+    auto* s = g_pServerDE;
+    DVector v[5]{}, saved_angles{};
+    float direction[3]{};
+    for (auto& value : v)
+        s->ReadFromMessageVector(h, &value);
+    bool ok = true;
+    for (auto& value : direction)
+    {
+        const auto raw = s->ReadFromMessageDWord(h);
+        value = static_cast<short>(raw);
+        ok = ok && (raw == 0 || raw == 1 || raw == 0xFFFFFFFFu);
+    }
+    saved_angles.x = s->ReadFromMessageFloat(h);
+    saved_angles.y = s->ReadFromMessageFloat(h);
+    saved_angles.z = s->ReadFromMessageFloat(h);
+    bool push = false;
+    if (!save_fields::read_bool(h, push))
+        return;
+    for (const auto& value : v)
+        ok = ok && physics_vector(value);
+    // The replacement rotation poses the shell from the current angles: they must describe
+    // the restored rotation.
+    DRotation actual;
+    const auto expected = rotation_from_euler(saved_angles);
+    ok = ok && physics_vector(saved_angles) && s->GetObjectRotation(m_hObject, &actual) == DE_OK &&
+         std::abs(vector_dot(expected.m_Vec, actual.m_Vec) + expected.m_Spin * actual.m_Spin) >= .99999f;
+    if (!ok)
+    {
+        s->RejectPayload(h, "rotating door block holds values the port cannot represent");
+        return;
+    }
+    rotation_angles = v[0];
+    rotation_point = v[1];
+    open_angles = v[2];
+    closed_angles = v[3];
+    original_position = v[4];
+    open_direction = {direction[0], direction[1], direction[2]};
+    angles = saved_angles;
+    push_player_back = push;
 }

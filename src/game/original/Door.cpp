@@ -1,4 +1,5 @@
 #include "Door.h"
+#include "SaveFields.h"
 #include "Trigger.h"
 #include "engine/collision.h"
 #include <algorithm>
@@ -253,15 +254,32 @@ DDWORD Door::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
     if (message == MID_PRECREATE)
     {
         const auto accepted = B2BaseClass::EngineMessageFn(message, data, reason);
-        // Save payloads are not implemented; do not instantiate fake restores.
-        return accepted && reason != 3 && data && ReadProp(*static_cast<ObjectCreateStruct*>(data));
+        if (accepted && data && reason == PRECREATE_SAVEGAME)
+        {
+            // Original PostPropRead still runs: bind by name and add the mover flags. The saved
+            // flags already hold BOXPHYSICS when the door used it; it is neither added nor cleared.
+            auto& create = *static_cast<ObjectCreateStruct*>(data);
+            create.m_ObjectType = OT_WORLDMODEL;
+            SAFE_STRCPY(create.m_Filename, create.m_Name);
+            create.m_SkinName[0] = 0;
+            create.m_Flags |=
+                FLAG_GOTHRUWORLD | FLAG_FULLPOSITIONRES | FLAG_MODELGOURAUDSHADE | FLAG_DONTFOLLOWSTANDING;
+            return 1;
+        }
+        return accepted && data && ReadProp(*static_cast<ObjectCreateStruct*>(data));
     }
+    if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
     if (message == MID_LINKBROKEN && data == trigger)
     {
         g_pServerDE->RemoveObject(trigger);
         trigger = nullptr;
     }
-    if (message == MID_INITIALUPDATE)
+    // Original InitialUpdate returns at once for INITIALUPDATE_SAVEGAME: no trigger, no
+    // open/closed recomputation; the engine record restores the schedule and user flags.
+    if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME)
     {
         g_pServerDE->GetObjectPos(m_hObject, &closed_pos);
         open_pos = vector_add(closed_pos, vector_scale(move_dir, move_dist));
@@ -342,4 +360,114 @@ DDWORD Door::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read)
         }
     }
     return B2BaseClass::ObjectMessageFn(sender, message, read);
+}
+namespace
+{
+    // Original Door.h DTF_* trigger flags.
+    constexpr DDWORD self_trigger_flag = 1, trigger_closed_flag = 2, start_open_flag = 4, remains_open_flag = 8;
+} // namespace
+void Door::Save(HMESSAGEWRITE h)
+{
+    // Original Door.cpp:1110-1144. m_bLocked and m_dwFlags are never assigned by the source;
+    // the port writes its authored Locked value and zero. The busy loop is not saved.
+    auto* s = g_pServerDE;
+    namespace F = save_fields;
+    s->WriteToLoadSaveMessageObject(h, trigger);
+    s->WriteToMessageDWord(h, (self_trigger ? self_trigger_flag : 0) | (trigger_closed ? trigger_closed_flag : 0) |
+                                  (start_open ? start_open_flag : 0) | (remains_open ? remains_open_flag : 0));
+    s->WriteToMessageFloat(h, speed);
+    s->WriteToMessageFloat(h, move_dist);
+    s->WriteToMessageVector(h, &move_dir);
+    F::write_string(h, open_busy);
+    F::write_string(h, open_stop);
+    F::write_string(h, close_busy);
+    F::write_string(h, close_stop);
+    s->WriteToMessageFloat(h, wait_time);
+    s->WriteToMessageVector(h, &trigger_dims);
+    s->WriteToMessageFloat(h, closing_speed);
+    s->WriteToMessageByte(h, locked);
+    s->WriteToMessageByte(h, box_physics);
+    s->WriteToMessageVector(h, &open_pos);
+    s->WriteToMessageVector(h, &closed_pos);
+    s->WriteToMessageDWord(h, state);
+    s->WriteToMessageFloat(h, open_time);
+    s->WriteToMessageFloat(h, sound_radius);
+    F::write_string(h, portal);
+    s->WriteToMessageDWord(h, 0);
+    s->WriteToMessageDWord(h, waveform);
+    s->WriteToMessageByte(h, started_moving);
+    s->WriteToMessageFloat(h, open_delay);
+    s->WriteToMessageByte(h, fire_through);
+}
+void Door::Load(HMESSAGEREAD h)
+{
+    // Original Door.cpp:1155-1189, decoded and checked before any member changes. A door saved
+    // while moving resumes silently: the original never restarts its busy loop.
+    auto* s = g_pServerDE;
+    namespace F = save_fields;
+    HOBJECT saved_trigger = nullptr;
+    s->ReadFromLoadSaveMessageObject(h, &saved_trigger);
+    const DDWORD flags = s->ReadFromMessageDWord(h);
+    const float saved_speed = s->ReadFromMessageFloat(h), saved_dist = s->ReadFromMessageFloat(h);
+    DVector dir{}, dims{}, open{}, closed{};
+    std::string sounds[4], saved_portal;
+    s->ReadFromMessageVector(h, &dir);
+    bool ok = true;
+    for (auto& sound : sounds)
+        ok = F::read_string(h, sound) && ok;
+    const float wait = s->ReadFromMessageFloat(h);
+    s->ReadFromMessageVector(h, &dims);
+    const float closing = s->ReadFromMessageFloat(h);
+    bool saved_locked = false, saved_box = false, moving = false, fire = false;
+    ok = F::read_bool(h, saved_locked) && ok;
+    ok = F::read_bool(h, saved_box) && ok;
+    s->ReadFromMessageVector(h, &open);
+    s->ReadFromMessageVector(h, &closed);
+    const DDWORD saved_state = s->ReadFromMessageDWord(h);
+    const float saved_open_time = s->ReadFromMessageFloat(h), radius = s->ReadFromMessageFloat(h);
+    ok = F::read_string(h, saved_portal) && ok;
+    s->ReadFromMessageDWord(h); // m_dwFlags: never assigned by the source, unused.
+    const DDWORD wave = s->ReadFromMessageDWord(h);
+    ok = F::read_bool(h, moving) && ok;
+    const float delay = s->ReadFromMessageFloat(h);
+    ok = F::read_bool(h, fire) && ok;
+    if (!ok)
+        return;
+    for (float value : {saved_speed, saved_dist, wait, closing, saved_open_time, radius, delay})
+        ok = ok && F::finite(value);
+    if (!ok || flags > 15 || saved_state < Closed || saved_state > Opening || wave > 3 || delay < 0 || radius < 0 ||
+        !physics_vector(dir) || !physics_vector(dims) || !physics_vector(open) || !physics_vector(closed))
+    {
+        s->RejectPayload(h, "door block holds values the port cannot represent");
+        return;
+    }
+    trigger = saved_trigger;
+    self_trigger = flags & self_trigger_flag;
+    trigger_closed = flags & trigger_closed_flag;
+    start_open = flags & start_open_flag;
+    remains_open = flags & remains_open_flag;
+    speed = saved_speed;
+    move_dist = saved_dist;
+    move_dir = dir;
+    open_busy = std::move(sounds[0]);
+    open_stop = std::move(sounds[1]);
+    close_busy = std::move(sounds[2]);
+    close_stop = std::move(sounds[3]);
+    wait_time = wait;
+    trigger_dims = dims;
+    closing_speed = closing;
+    locked = saved_locked;
+    box_physics = saved_box;
+    open_pos = open;
+    closed_pos = closed;
+    state = static_cast<State>(saved_state);
+    open_time = saved_open_time;
+    sound_radius = radius;
+    portal = std::move(saved_portal);
+    waveform = wave;
+    started_moving = moving;
+    open_delay = delay;
+    fire_through = fire;
+    // Inspection only: portals are not modelled and the original Load does not re-apply them.
+    portal_open = state != Closed && (state != Opening || started_moving);
 }
