@@ -103,3 +103,6 @@ Moving train/platform collision is still absent.
 CraneControl, Minefield, key handshakes, save/restore, AI container reactions,
 liquid surfaces and underwater effects remain pending. Movers/pushers, full
 combat and the remaining required classes still prevent playable startup.
+
+The separately requested [Minefield continuation](minefield_contracts.md) supersedes
+the Minefield omission above; other historical omissions keep their stated scope.

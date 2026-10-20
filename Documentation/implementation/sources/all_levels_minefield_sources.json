@@ -1,0 +1,25 @@
+{
+  "selection": "Original Minefield defaults, physics, damage and explosion; existing typed services",
+  "sources": [
+    {
+      "path": "sources/blood2/ObjectDLL/VolumeBrushTypes.cpp",
+      "sha256": "f38190b88a30be71b587d0758093b85f4d0102631edb5eb7564cc91f7efa3021"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/VolumeBrushTypes.h",
+      "sha256": "8971e136d2e6fb1d0fefe1189646abdbc0bcef13b052aea8227596912743b140"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/BaseCharacter.h",
+      "sha256": "40160424f0b03f38b2513ba34e9abb44bc27d8a92b5735470d9d995f01d1face"
+    },
+    {
+      "path": "sources/blood2/Shared/ContainerCodes.h",
+      "sha256": "e06bd4c2b5a9a4b32c1883f9e3f59bb1ffe419d7eb4232a2a3f6570c400fce64"
+    },
+    {
+      "path": "sources/blood2/Shared/SFXMsgIds.h",
+      "sha256": "d835c9589f2338bad9606df92c8bd4394ea232ff2cc325b0c8aa4c49474d9f4f"
+    }
+  ]
+}

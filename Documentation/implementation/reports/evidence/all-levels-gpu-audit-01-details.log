@@ -1,0 +1,1028 @@
+
+WORLD 01_subwaya
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484269121903112-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=01_subwaya; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 01_subwaya (direct entry)
+[info] World ready: worlds/01_subwaya.dat
+[info] Frontend complete: 3 frames, world worlds/01_subwaya.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 02_cityhub
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484271748543336-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=02_cityhub; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 02_cityhub (direct entry)
+[info] World ready: worlds/02_cityhub.dat
+[info] Frontend complete: 3 frames, world worlds/02_cityhub.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 02_cityhubb
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484272764719404-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=02_cityhubb; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 02_cityhubb (direct entry)
+[info] World ready: worlds/02_cityhubb.dat
+[info] Frontend complete: 3 frames, world worlds/02_cityhubb.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 02_cityhubc
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484273780636658-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=02_cityhubc; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 02_cityhubc (direct entry)
+[info] World ready: worlds/02_cityhubc.dat
+[info] Frontend complete: 3 frames, world worlds/02_cityhubc.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 03_museum
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484274796953550-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=03_museum; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 03_museum (direct entry)
+[info] World ready: worlds/03_museum.dat
+[info] Frontend complete: 3 frames, world worlds/03_museum.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 04_steamtunnels
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484275813338736-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=04_steamtunnels; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 04_steamtunnels (direct entry)
+[info] World ready: worlds/04_steamtunnels.dat
+[info] Frontend complete: 3 frames, world worlds/04_steamtunnels.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 05_cdm
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484276679258280-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=05_cdm; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 05_cdm (direct entry)
+[info] World ready: worlds/05_cdm.dat
+[info] Frontend complete: 3 frames, world worlds/05_cdm.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 05_cdmb
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484277695849317-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=05_cdmb; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 05_cdmb (direct entry)
+[info] World ready: worlds/05_cdmb.dat
+[info] Frontend complete: 3 frames, world worlds/05_cdmb.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 06_airship1
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484278361810937-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=06_airship1; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 06_airship1 (direct entry)
+[info] World ready: worlds/06_airship1.dat
+[info] Frontend complete: 3 frames, world worlds/06_airship1.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 06_airship2
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484279127704262-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=06_airship2; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 06_airship2 (direct entry)
+[info] World ready: worlds/06_airship2.dat
+[info] Frontend complete: 3 frames, world worlds/06_airship2.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 07_cathedral
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484279943503152-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=07_cathedral; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 07_cathedral (direct entry)
+[info] World ready: worlds/07_cathedral.dat
+[info] Frontend complete: 3 frames, world worlds/07_cathedral.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 08_subwayb
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484280709481222-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=08_subwayb; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 08_subwayb (direct entry)
+[info] World ready: worlds/08_subwayb.dat
+[info] Frontend complete: 3 frames, world worlds/08_subwayb.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 09_abandoned_buildings
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484281374633341-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=09_abandoned_buildings; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 09_abandoned_buildings (direct entry)
+[error] Frontend: World initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+[info] Session finished: exit_code=6
+
+WORLD 10_sewagetreatmentplant
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484281989816288-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=10_sewagetreatmentplant; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 10_sewagetreatmentplant (direct entry)
+[info] World ready: worlds/10_sewagetreatmentplant.dat
+[info] Frontend complete: 3 frames, world worlds/10_sewagetreatmentplant.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 11_slaughter_house
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484282705758950-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=11_slaughter_house; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 11_slaughter_house (direct entry)
+[info] World ready: worlds/11_slaughter_house.dat
+[info] Frontend complete: 3 frames, world worlds/11_slaughter_house.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 12_train_station
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484283922106349-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=12_train_station; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 12_train_station (direct entry)
+[info] World ready: worlds/12_train_station.dat
+[info] Frontend complete: 3 frames, world worlds/12_train_station.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 12_train_stationb
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484285088101942-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=12_train_stationb; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 12_train_stationb (direct entry)
+[info] World ready: worlds/12_train_stationb.dat
+[info] Frontend complete: 3 frames, world worlds/12_train_stationb.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 13_downtown
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484285954123296-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=13_downtown; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 13_downtown (direct entry)
+[info] World ready: worlds/13_downtown.dat
+[info] Frontend complete: 3 frames, world worlds/13_downtown.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 14_subwayc
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484286869888164-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=14_subwayc; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 14_subwayc (direct entry)
+[info] World ready: worlds/14_subwayc.dat
+[info] Frontend complete: 3 frames, world worlds/14_subwayc.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 15_crypt
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484287685186108-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=15_crypt; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 15_crypt (direct entry)
+[info] World ready: worlds/15_crypt.dat
+[info] Frontend complete: 3 frames, world worlds/15_crypt.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 16_bridge
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484288350797737-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=16_bridge; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 16_bridge (direct entry)
+[info] World ready: worlds/16_bridge.dat
+[info] Frontend complete: 3 frames, world worlds/16_bridge.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 17_entrance
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484289266479018-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=17_entrance; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 17_entrance (direct entry)
+[info] World ready: worlds/17_entrance.dat
+[info] Frontend complete: 3 frames, world worlds/17_entrance.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 18_temple
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484290182392065-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=18_temple; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 18_temple (direct entry)
+[error] Frontend: World initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+[info] Session finished: exit_code=6
+
+WORLD 19_lobby
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484290697287812-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=19_lobby; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 19_lobby (direct entry)
+[info] World ready: worlds/19_lobby.dat
+[info] Frontend complete: 3 frames, world worlds/19_lobby.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 19_lobbyb
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484291764017348-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=19_lobbyb; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 19_lobbyb (direct entry)
+[info] World ready: worlds/19_lobbyb.dat
+[info] Frontend complete: 3 frames, world worlds/19_lobbyb.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 19_lobbyc
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484292479505780-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=19_lobbyc; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 19_lobbyc (direct entry)
+[info] World ready: worlds/19_lobbyc.dat
+[info] Frontend complete: 3 frames, world worlds/19_lobbyc.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD 20_powerstation
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484293194732553-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=20_powerstation; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 20_powerstation (direct entry)
+[error] Frontend: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services
+[info] Session finished: exit_code=6
+
+WORLD 21_laboratory
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484293710169243-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=21_laboratory; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 21_laboratory (direct entry)
+[error] Frontend: World initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+[info] Session finished: exit_code=6
+
+WORLD 22_office
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484294275224626-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=22_office; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 22_office (direct entry)
+[error] Frontend: World initialization rejected: 0 unsupported classes, 1 failed entries, 0 unavailable services
+[info] Session finished: exit_code=6
+
+WORLD 23_rooftop
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484294840254960-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=23_rooftop; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 23_rooftop (direct entry)
+[error] Frontend: World initialization rejected: 4 unsupported classes, 0 failed entries, 0 unavailable services
+[info] Session finished: exit_code=6
+
+WORLD 24_ancientcity
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484295355619704-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=24_ancientcity; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 24_ancientcity (direct entry)
+[error] Frontend: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services
+[info] Session finished: exit_code=6
+
+WORLD 24b_arena
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484295871172538-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=24b_arena; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 24b_arena (direct entry)
+[error] Frontend: World initialization rejected: 12 unsupported classes, 0 failed entries, 0 unavailable services
+[info] Session finished: exit_code=6
+
+WORLD 25_ancientone
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484296386520593-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=25_ancientone; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: 25_ancientone (direct entry)
+[error] Frontend: World initialization rejected: 28 unsupported classes, 0 failed entries, 0 unavailable services
+[info] Session finished: exit_code=6
+
+WORLD credits
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484296901207131-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=credits; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: credits (direct entry)
+[error] Frontend: World initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services
+[info] Session finished: exit_code=6
+
+WORLD drop
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484297415949658-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=drop; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: drop (direct entry)
+[info] World ready: worlds/drop.dat
+[info] Frontend complete: 3 frames, world worlds/drop.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD end
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484297980976217-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=end; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: end (direct entry)
+[error] Frontend: World initialization rejected: 4 unsupported classes, 0 failed entries, 0 unavailable services
+[info] Session finished: exit_code=6
+
+WORLD multi_bb_area15
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484298495990631-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_area15; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_area15 (direct entry)
+[info] World ready: worlds/multi/bb_area15.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_area15.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_bb_bloodarena
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484299112079907-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_bloodarena; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_bloodarena (direct entry)
+[info] World ready: worlds/multi/bb_bloodarena.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_bloodarena.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_bb_bloodkeep
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484299777136604-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_bloodkeep; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_bloodkeep (direct entry)
+[info] World ready: worlds/multi/bb_bloodkeep.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_bloodkeep.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_bb_bodies
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484300442920754-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_bodies; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_bodies (direct entry)
+[info] World ready: worlds/multi/bb_bodies.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_bodies.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_bb_bridge
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484301058729371-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_bridge; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_bridge (direct entry)
+[info] World ready: worlds/multi/bb_bridge.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_bridge.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_bb_brownstar
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484301775155914-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_brownstar; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_brownstar (direct entry)
+[info] World ready: worlds/multi/bb_brownstar.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_brownstar.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_bb_cabana
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484302390428741-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_cabana; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_cabana (direct entry)
+[info] World ready: worlds/multi/bb_cabana.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_cabana.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_bb_chosenarena
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484303005571740-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_chosenarena; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_chosenarena (direct entry)
+[info] World ready: worlds/multi/bb_chosenarena.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_chosenarena.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_bb_condemned
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484303671020647-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_condemned; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_condemned (direct entry)
+[info] World ready: worlds/multi/bb_condemned.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_condemned.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_bb_crypt
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484304387165616-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_crypt; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_crypt (direct entry)
+[info] World ready: worlds/multi/bb_crypt.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_crypt.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_bb_deathcanyon
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484305052601227-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_deathcanyon; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_deathcanyon (direct entry)
+[info] World ready: worlds/multi/bb_deathcanyon.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_deathcanyon.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_bb_drain
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484305618409514-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_drain; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_drain (direct entry)
+[info] World ready: worlds/multi/bb_drain.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_drain.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_bb_dustbowl
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484306234293022-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_dustbowl; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_dustbowl (direct entry)
+[info] World ready: worlds/multi/bb_dustbowl.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_dustbowl.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_bb_fields
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484306799202540-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_fields; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_fields (direct entry)
+[error] Frontend: World initialization rejected: 8 unsupported classes, 0 failed entries, 0 unavailable services
+[info] Session finished: exit_code=6
+
+WORLD multi_bb_jgrave
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484307314668315-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_jgrave; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_jgrave (direct entry)
+[info] World ready: worlds/multi/bb_jgrave.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_jgrave.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_bb_midgard
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484308030209994-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_midgard; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_midgard (direct entry)
+[info] World ready: worlds/multi/bb_midgard.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_midgard.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_bb_power
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484308645322082-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_power; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_power (direct entry)
+[info] World ready: worlds/multi/bb_power.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_power.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_bb_rooftop
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484309260695950-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/bb_rooftop; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/bb_rooftop (direct entry)
+[info] World ready: worlds/multi/bb_rooftop.dat
+[info] Frontend complete: 3 frames, world worlds/multi/bb_rooftop.dat, menu audio starts 0/failures 0
+[info] Session finished: exit_code=0
+
+WORLD multi_ctf_cabana
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484309876098020-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/ctf_cabana; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/ctf_cabana (direct entry)
+[error] Frontend: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services
+[info] Session finished: exit_code=6
+
+WORLD multi_ctf_deadcities
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484310391196684-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/ctf_deadcities; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/ctf_deadcities (direct entry)
+[error] Frontend: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services
+[info] Session finished: exit_code=6
+
+WORLD multi_ctf_dmx
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484310906125249-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/ctf_dmx; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/ctf_dmx (direct entry)
+[error] Frontend: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services
+[info] Session finished: exit_code=6
+
+WORLD multi_ctf_jam
+[info] Log session: /home/yann/.local/share/OpenBlood2/Blood2/logs/session-1792484311421220375-0
+[info] OpenBlood2 0.3.0 / 1eb965c-dirty / Release / GNU 16.2.1; platform=Linux; SDL=SDL-3.5.0-1eb965c (pinned 6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1)
+[info] Crash capture ready: all-thread stacks and core dump in the log session directory
+[info] Requested world=multi/ctf_jam; demo=false; config=blood2.local.ini; inspector=false; view=true; bench=false; headless=false; frames=3
+[info] External data: /home/yann/Games/Blood2 (--data-dir)
+[info] BLOOD2.REZ: detected, 267758913 bytes
+[info] SOUND.REZ: detected, 204633068 bytes
+[info] BLOOD2P.REZ: detected, 24133434 bytes
+[info] BLOOD2P2.REZ: detected, 2337176 bytes
+[info] BLOOD2NM.REZ: detected, 108939094 bytes
+[info] Readme declares: Blood II: The Chosen Version 2.1 Readme
+[info] GPU device: NVIDIA GeForce RTX 3060 Laptop GPU
+[info] Loading world: multi/ctf_jam (direct entry)
+[error] Frontend: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services
+[info] Session finished: exit_code=6

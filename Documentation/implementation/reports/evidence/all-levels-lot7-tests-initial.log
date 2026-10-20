@@ -1,0 +1,26 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1120: reported_levels.multi/bb_fields
+1/3 Test #1120: reported_levels.multi/bb_fields ...   Passed    0.64 sec
+    Start 1145: containers.minefield
+2/3 Test #1145: containers.minefield ..............***Failed    0.00 sec
+79: player->m_damage.GetLastDamager() == player->m_hObject
+
+    Start 1146: containers.minefield_private
+3/3 Test #1146: containers.minefield_private ......***Failed    0.02 sec
+79: player->m_damage.GetLastDamager() == player->m_hObject
+
+
+33% tests passed, 2 tests failed out of 3
+
+Label Time Summary:
+campaign        =   0.64 sec*proc (1 test)
+containers      =   0.02 sec*proc (2 tests)
+headless        =   0.66 sec*proc (3 tests)
+private-data    =   0.66 sec*proc (2 tests)
+
+Total Test time (real) =   0.68 sec
+
+The following tests FAILED:
+	1145 - containers.minefield (Failed)                     containers headless
+	1146 - containers.minefield_private (Failed)             containers headless private-data
+Errors while running CTest

@@ -144,3 +144,6 @@ code: as the original player does for non-VolumeBrush containers, gravity and
 current are zero and Hidden is false. It occupies one of the four tracked body
 slots and, being first, can answer a point query before a later VolumeBrush.
 Retail 03_Museum (44) and 05_CDM (1, `officepool`) author code 0.
+
+The separately requested [Minefield continuation](minefield_contracts.md) supersedes
+the Minefield omission above; other historical omissions keep their stated scope.

@@ -1,5 +1,10 @@
 # Blood2 Project Instructions
 
+The [Fields Minefield continuation](Documentation/contracts/minefield_contracts.md) preserves original self-attributed
+Death damage, airborne-player and Hidden exceptions, and actual grenade FX/audio.
+Keep generic container-code validation, no radial damage, checked support and
+explicit component failures. This loading continuation does not reopen M2.
+
 The [Brownstar/Crypt presentation continuation](Documentation/implementation/reports/all_level_loading.md)
 retains original zero-duration SPR semantics and interleaves bound sprite sky
 layers by authored slot. Preserve current-frame absence, world initial-texture

@@ -12,6 +12,7 @@
 #include "game/original/Grenade.h"
 #include "game/original/Key.h"
 #include "game/original/KeyPickup.h"
+#include "game/original/Minefield.h"
 #include "game/original/NewStatusBar.h"
 #include "game/original/Projectile.h"
 #include "game/original/ProximityBomb.h"
@@ -2728,6 +2729,14 @@ namespace OpenBlood2
             if (dynamic_cast<const Conveyor*>(brush))
                 ImGui::TextWrapped("Player: ladder braking/cap, gravity retained. Server: supported characters only; "
                                    "original Hidden exception retained. No volume damage.");
+            if (const auto* mine = dynamic_cast<const Minefield*>(brush))
+            {
+                ImGui::TextWrapped(
+                    "Minefield: player or supported character; self-attributed Death damage. Hidden does not disarm.");
+                ImGui::Text("Explosions %llu", static_cast<unsigned long long>(mine->explosions));
+                if (!mine->error.empty())
+                    ImGui::TextWrapped("Failure: %s", mine->error.c_str());
+            }
             if (dynamic_cast<const FreeFall*>(brush))
                 ImGui::TextWrapped("FreeFall: zero liquid gravity, no air depletion; source damage remains active.");
             ImGui::Text("%zu triangles | %s closed shell", shape.triangles.size(),

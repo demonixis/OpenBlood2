@@ -567,7 +567,7 @@ namespace
         CHECK(!(game.objects.get(belt)->state.m_Flags & FLAG_RAYHIT));
         CHECK(!volume(game, "Damage", "invalid", {800, 0, -100}, {900, 200, 100}, {{"Damage", 10000001.0f}}));
         CHECK(game.objects.finish_frame());
-        CHECK(!game.objects.find_class("CraneControl") && !game.objects.find_class("Minefield"));
+        CHECK(!game.objects.find_class("CraneControl") && game.objects.find_class("Minefield"));
         CHECK(!volume(game, "VolumeBrush", "unsupported", {800, 0, -100}, {900, 200, 100},
                       {{"Code", std::int32_t(CC_CRANECONTROL)}}));
         CHECK(game.objects.finish_frame());

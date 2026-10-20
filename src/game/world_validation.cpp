@@ -1,5 +1,6 @@
 #include "game/world_validation.h"
 #include "engine/world_view.h"
+#include "game/original/Minefield.h"
 #include "game/original/SkyObjects.h"
 #include "game/server_adapter.h"
 #include <set>
@@ -31,6 +32,13 @@ namespace OpenBlood2
                               row.state == EntryState::AbsentOriginalClass || row.state == EntryState::MissingResource;
             report.entries.push_back(std::move(row));
         }
+        for (auto id : game.objects.snapshot())
+            if (const auto* r = game.objects.get(id); r && r->life == Life::Alive)
+                if (const auto* mine = dynamic_cast<const Minefield*>(r->game.get()); mine && !mine->error.empty())
+                {
+                    error = "Minefield " + std::string(r->state.m_Name) + ": " + mine->error;
+                    return false;
+                }
         report.unavailable_services.clear();
         for (const auto& [name, count] : game.server.unavailable_services)
             if (count)

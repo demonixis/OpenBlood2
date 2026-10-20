@@ -35,6 +35,7 @@
 #include "game/original/KeyPickup.h"
 #include "game/original/LaterEnemies.h"
 #include "game/original/MadScientistAI.h"
+#include "game/original/Minefield.h"
 #include "game/original/Naga.h"
 #include "game/original/NapalmProjectile.h"
 #include "game/original/ObjectivesTrigger.h"
@@ -1083,6 +1084,19 @@ namespace OpenBlood2
                                 {"SurfaceColor2", DVector{}},
                                 {"XScaleDuration", 10.0f},
                                 {"YScaleDuration", 10.0f}}};
+        const ClassInfo minefield{"Minefield", &volume, construct<Minefield>, []
+                                  {
+                                      auto p = damage.properties;
+                                      for (auto& property : p)
+                                          if (property.name == "Damage")
+                                              property.value = 0.0f;
+                                      p.push_back({"SpriteSurfaceName", std::string{}});
+                                      p.push_back({"XScaleMin", 15.0f});
+                                      p.push_back({"XScaleMax", 25.0f});
+                                      p.push_back({"YScaleMin", 15.0f});
+                                      p.push_back({"YScaleMax", 25.0f});
+                                      return p;
+                                  }()};
         const ClassInfo freefall{"FreeFall",
                                  &volume,
                                  construct<FreeFall>,
@@ -1141,7 +1155,8 @@ namespace OpenBlood2
                objects.register_class(player) && objects.register_class(particle_system) &&
                objects.register_class(polygrid) && objects.register_class(volume) && objects.register_class(water) &&
                objects.register_class(blood) && objects.register_class(acid) && objects.register_class(ladder) &&
-               objects.register_class(conveyor) && objects.register_class(damage) && objects.register_class(freefall) &&
+               objects.register_class(conveyor) && objects.register_class(damage) &&
+               objects.register_class(minefield) && objects.register_class(freefall) &&
                objects.register_class(trigger) && objects.register_class(key_pickup) &&
                objects.register_class(pickup) && objects.register_class(item_pickup) &&
                objects.register_class(item_weapon) && objects.register_class(proximity_pickup) &&

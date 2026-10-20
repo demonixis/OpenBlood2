@@ -9,10 +9,10 @@ initial deltas, three seconds of simulation with movement, a runtime failure
 recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
 combat, multiplayer or GPU certification. M2 closure remains unchanged.
 
-Current verified opening gate after iteration 6: **42 / 58 pass, 16 / 58 fail**
-([audit 4](evidence/all-levels-audit-04.log)). Remaining worlds: Abandoned Buildings,
+Current verified opening gate after iteration 7: **43 / 58 pass, 15 / 58 fail**
+([audit 5](evidence/all-levels-audit-05.log)). Remaining worlds: Abandoned Buildings,
 Temple, Power Station, Laboratory, Office, Rooftop, Ancient City, Arena, Ancient One,
-Credits, End, Fields and the four CTF maps. Initial-entry and three-second simulation
+Credits, End and the four CTF maps. Initial-entry and three-second simulation
 coverage is not complete gameplay/traversal acceptance. The tables below retain
 the initial baseline; iteration records explain resolved and newly exposed blockers.
 
@@ -238,3 +238,35 @@ The [Brownstar](evidence/all-levels-brownstar-gpu.log) and
 render three complete frames and exit 0 on NVIDIA RTX 3060, dummy audio.
 
 ![Crypt authored sky layers](evidence/all-levels-crypt-sky.png)
+
+## Iteration 7: Fields mines and complete GPU opening audit
+
+The [original Minefield](../../contracts/minefield_contracts.md) now creates all
+eight Fields volumes with actual death damage, grenade components and decoded
+sound. The source player/standing-character/Hidden exceptions and self-attributed
+damage remain intact. No broad damage radius or replacement game rule was added.
+
+The [first GPU audit](evidence/all-levels-gpu-audit-01.log) attempted **all 58**
+worlds with Release direct inspection and three frames on NVIDIA RTX 3060, dummy
+audio. Its **42 passes / 16 failures** exactly match audit 4;
+[per-world output](evidence/all-levels-gpu-audit-01-details.log) retains every
+failed entry. This run preceded Minefield integration.
+
+Validation: [36 Dev cases](evidence/all-levels-lot7-dev.log) and
+[36 ASan/UBSan/leak cases](evidence/all-levels-lot7-sanitizers.log) pass, including
+object callbacks, containers, mines and Fields at all three difficulties.
+[Three Release cases](evidence/all-levels-lot7-release.log) pass, and
+[Fields GPU opening](evidence/all-levels-fields-gpu.log) renders three frames and
+exits 0. Both applications build.
+
+The initial [focused test failure](evidence/all-levels-lot7-tests-initial.log)
+used the AI-only retaliation accessor to assert player damage attribution; the
+correct assertion checks the actual typed damage payload. The initial
+[regression failure](evidence/all-levels-lot7-regressions-initial.log) asserted
+Minefield was unregistered; that obsolete expectation is now reversed. These
+failed runs remain retained, separate from the passing reruns.
+
+[Exhaustive audit 5](evidence/all-levels-audit-05.log) passes **43 / 58** and fails
+**15 / 58**. The remaining implementation queue is unchanged except Fields is
+resolved. This validates local level entry and short simulation, not complete
+traversal, CTF/network play or global M3 acceptance.

@@ -1607,3 +1607,12 @@ frame and first-texture retention for world surfaces. SkyPointer's original
 object-agnostic target registration now accepts bound sprite targets; the engine
 billboard renderer uses the existing sky camera and ordered depth-disabled pass.
 This is a renderer extension, not a new game rule or a replacement asset.
+
+## Fields Minefield continuation
+
+Original VolumeBrushTypes Minefield now executes through checked volume support,
+self-attributed Death messages and existing grenade component/audio services.
+[source hashes](sources/all_levels_minefield_sources.json) and
+[contracts](../contracts/minefield_contracts.md) retain the Hidden exception,
+player support exception, Code=8 metadata and no radius damage. No dependency,
+commercial asset or reference-source changes.
