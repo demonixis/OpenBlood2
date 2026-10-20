@@ -70,4 +70,6 @@ poses, scales and colors are checked. Exhaustion is a failure, never dropped
 particles reported as success. IDs survive unload, records are bounded, and
 owner removal clears children on the next client advance. Teardown clears all
 owned resources/particles. Required-resource and runtime failures remain visible
-to world validation and the inspector. Save/restore remains unavailable.
+to world validation and the inspector. The original Save/Load block is ported; a restored
+gate past its first update publishes its children again (decision-4 departure,
+[save/load lot 10](save_load_contracts.md#implemented-effect-publishers-and-audio-emitters-lot-10)).

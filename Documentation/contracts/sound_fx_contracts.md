@@ -13,15 +13,15 @@ M2 remains incomplete; registration never implies successful authored playback.
 World/string creation reads StartOn, RampUpSound, RampDownSound, Sound, Priority,
 OuterRadius, InnerRadius, Volume, Ambient and FileStream. Defaults match the
 original registration; runtime creation retains the constructor's zero radii,
-zero volume and non-ambient mode. Restore creation explicitly rejects.
+zero volume and non-ambient mode. Restore creation reads nothing; the original
+Save/Load block is ported, keeping the saved next update ([save/load lot 10](save_load_contracts.md#implemented-effect-publishers-and-audio-emitters-lot-10)).
 Priority/volume cast to bytes; volume below 100 controls gain, otherwise full gain.
 
 InitialUpdate marks the object saveable, immediately enters ON when StartOn, and
 then **disables updates**, including any duration scheduled by that first playback.
 Startup bypasses the ramp-up sound. The base initial callback and difficulty
 filter run afterwards, as in the source. A filtered object releases its newly
-started voice during deferred destruction. The saveable bit does not implement
-save/restore.
+started voice during deferred destruction. A restore skips this initial update.
 
 Trigger commands match whole strings case-insensitively: ON/TRIGGER, OFF and
 TOGGLE. Unknown/empty/null commands do nothing. Each recognized command calls
@@ -58,8 +58,8 @@ FileStream/TIMESYNC fails explicitly before playback. Invalid radii, missing or
 malformed WAVs, region-loop metadata and voice budgets retain existing mixer
 failures. Spatial reverb intent is retained but output is dry; priority is
 metadata without arbitration. CacheFiles is omitted: mounted resources are
-indexed and decoded on demand, not claimed precached. Save/load and streaming
-remain unavailable. Historical VoiceType schemas remain rejected, including all
+indexed and decoded on demand, not claimed precached. Streaming remains
+unavailable. Historical VoiceType schemas remain rejected, including all
 five CityHub SoundFX entries; their FileStream=true request is an additional
 unimplemented service even if the schema were resolved. Do not discard that
 property or pretend full-clip loading implements streaming.

@@ -270,7 +270,9 @@ namespace OpenBlood2
                                        {"RepeatX", std::int32_t(1)},
                                        {"RepeatY", std::int32_t(1)},
                                        {"SpacingX", 0.0f},
-                                       {"SpacingY", 0.0f}}};
+                                       {"SpacingY", 0.0f}},
+                                      SaveSupport::Original,
+                                      1};
         // Original BEGIN_CLASS(Tchernotronic): hidden Technoberg model/skin, destroy trigger.
         const ClassInfo tchernotronic{"Tchernotronic",
                                       &b2base,
@@ -338,8 +340,13 @@ namespace OpenBlood2
                                   {"InnerRadius", 100.0f},
                                   {"Volume", std::int32_t(100)},
                                   {"Ambient", true},
-                                  {"FileStream", false}}};
-        const ClassInfo random_sound{"RandomSoundFX", &b2base, construct<RandomSoundFX>, []
+                                  {"FileStream", false}},
+                                 SaveSupport::Original,
+                                 1};
+        const ClassInfo random_sound{"RandomSoundFX",
+                                     &b2base,
+                                     construct<RandomSoundFX>,
+                                     []
                                      {
                                          std::vector<PropertySpec> p{
                                              {"InitiallyOn", true},         {"PositionalSound", true},
@@ -350,7 +357,9 @@ namespace OpenBlood2
                                          for (unsigned i = 1; i <= 10; ++i)
                                              p.push_back({"SoundFile" + std::to_string(i), std::string{}});
                                          return p;
-                                     }()};
+                                     }(),
+                                     SaveSupport::Original,
+                                     1};
         const ClassInfo cinematic_trigger{
             "CinematicTrigger", &b2base, construct<CinematicTrigger>, []
             {
@@ -405,7 +414,9 @@ namespace OpenBlood2
                                          {"SoundRadius", 200.f},
                                          {"RampUpSound", std::string{}},
                                          {"LoopSound", std::string{}},
-                                         {"RampDownSound", std::string{}}}};
+                                         {"RampDownSound", std::string{}}},
+                                        SaveSupport::Original,
+                                        1};
         const ClassInfo scene_explosion{"CClientExplosionSFX",
                                         &client_sfx,
                                         construct<CClientExplosionSFX>,
@@ -413,8 +424,13 @@ namespace OpenBlood2
                                          {"Damage", 50.0f},
                                          {"DamageRadius", 200.0f},
                                          {"Direction", DVector{0, 1, 0}},
-                                         {"WaveFile", std::string("Sounds\\exp_tnt.wav")}}};
-        const ClassInfo client_light{"ClientLightFX", &client_sfx, construct<ClientLightFX>, []
+                                         {"WaveFile", std::string("Sounds\\exp_tnt.wav")}},
+                                        SaveSupport::Original,
+                                        1};
+        const ClassInfo client_light{"ClientLightFX",
+                                     &client_sfx,
+                                     construct<ClientLightFX>,
+                                     []
                                      {
                                          std::vector<PropertySpec> p{{"HitPoints", 1.0f},
                                                                      {"LightSwitch", true},
@@ -442,72 +458,82 @@ namespace OpenBlood2
                                                            "DontLightBackfacingFlag", "FogLightFlag"})
                                              p.push_back({name, false});
                                          return p;
-                                     }()};
+                                     }(),
+                                     SaveSupport::Original,
+                                     1};
         const ClassInfo light_SquareWaveLightFX{
-            "SquareWaveLightFX",
-            &client_light,
-            construct<SquareWaveLightFX>,
-            {{"IntensityWaveform", std::int32_t(1)}, {"RadiusWaveform", std::int32_t(1)}}};
+            "SquareWaveLightFX",          &client_light,
+            construct<SquareWaveLightFX>, {{"IntensityWaveform", std::int32_t(1)}, {"RadiusWaveform", std::int32_t(1)}},
+            SaveSupport::Original,        1};
         const ClassInfo light_SawWaveLightFX{
-            "SawWaveLightFX",
-            &client_light,
-            construct<SawWaveLightFX>,
-            {{"IntensityWaveform", std::int32_t(2)}, {"RadiusWaveform", std::int32_t(2)}}};
+            "SawWaveLightFX",          &client_light,
+            construct<SawWaveLightFX>, {{"IntensityWaveform", std::int32_t(2)}, {"RadiusWaveform", std::int32_t(2)}},
+            SaveSupport::Original,     1};
         const ClassInfo light_RampUpWaveLightFX{
-            "RampUpWaveLightFX",
-            &client_light,
-            construct<RampUpWaveLightFX>,
-            {{"IntensityWaveform", std::int32_t(3)}, {"RadiusWaveform", std::int32_t(3)}}};
+            "RampUpWaveLightFX",          &client_light,
+            construct<RampUpWaveLightFX>, {{"IntensityWaveform", std::int32_t(3)}, {"RadiusWaveform", std::int32_t(3)}},
+            SaveSupport::Original,        1};
         const ClassInfo light_RampDownWaveLightFX{
             "RampDownWaveLightFX",
             &client_light,
             construct<RampDownWaveLightFX>,
-            {{"IntensityWaveform", std::int32_t(4)}, {"RadiusWaveform", std::int32_t(4)}}};
+            {{"IntensityWaveform", std::int32_t(4)}, {"RadiusWaveform", std::int32_t(4)}},
+            SaveSupport::Original,
+            1};
         const ClassInfo light_SineWaveLightFX{
-            "SineWaveLightFX",
-            &client_light,
-            construct<SineWaveLightFX>,
-            {{"IntensityWaveform", std::int32_t(5)}, {"RadiusWaveform", std::int32_t(5)}}};
+            "SineWaveLightFX",          &client_light,
+            construct<SineWaveLightFX>, {{"IntensityWaveform", std::int32_t(5)}, {"RadiusWaveform", std::int32_t(5)}},
+            SaveSupport::Original,      1};
         const ClassInfo light_Flicker1WaveLightFX{
             "Flicker1WaveLightFX",
             &client_light,
             construct<Flicker1WaveLightFX>,
-            {{"IntensityWaveform", std::int32_t(6)}, {"RadiusWaveform", std::int32_t(6)}}};
+            {{"IntensityWaveform", std::int32_t(6)}, {"RadiusWaveform", std::int32_t(6)}},
+            SaveSupport::Original,
+            1};
         const ClassInfo light_Flicker2WaveLightFX{
             "Flicker2WaveLightFX",
             &client_light,
             construct<Flicker2WaveLightFX>,
-            {{"IntensityWaveform", std::int32_t(7)}, {"RadiusWaveform", std::int32_t(7)}}};
+            {{"IntensityWaveform", std::int32_t(7)}, {"RadiusWaveform", std::int32_t(7)}},
+            SaveSupport::Original,
+            1};
         const ClassInfo light_Flicker3WaveLightFX{
             "Flicker3WaveLightFX",
             &client_light,
             construct<Flicker3WaveLightFX>,
-            {{"IntensityWaveform", std::int32_t(8)}, {"RadiusWaveform", std::int32_t(8)}}};
+            {{"IntensityWaveform", std::int32_t(8)}, {"RadiusWaveform", std::int32_t(8)}},
+            SaveSupport::Original,
+            1};
         const ClassInfo light_Flicker4WaveLightFX{
             "Flicker4WaveLightFX",
             &client_light,
             construct<Flicker4WaveLightFX>,
-            {{"IntensityWaveform", std::int32_t(9)}, {"RadiusWaveform", std::int32_t(9)}}};
+            {{"IntensityWaveform", std::int32_t(9)}, {"RadiusWaveform", std::int32_t(9)}},
+            SaveSupport::Original,
+            1};
         const ClassInfo light_StrobeWaveLightFX{
             "StrobeWaveLightFX",
             &client_light,
             construct<StrobeWaveLightFX>,
-            {{"IntensityWaveform", std::int32_t(10)}, {"RadiusWaveform", std::int32_t(10)}}};
+            {{"IntensityWaveform", std::int32_t(10)}, {"RadiusWaveform", std::int32_t(10)}},
+            SaveSupport::Original,
+            1};
         const ClassInfo light_SearchWaveLightFX{
             "SearchWaveLightFX",
             &client_light,
             construct<SearchWaveLightFX>,
-            {{"IntensityWaveform", std::int32_t(11)}, {"RadiusWaveform", std::int32_t(11)}}};
+            {{"IntensityWaveform", std::int32_t(11)}, {"RadiusWaveform", std::int32_t(11)}},
+            SaveSupport::Original,
+            1};
         const ClassInfo light_FlickerLight{
-            "FlickerLight",
-            &client_light,
-            construct<FlickerLight>,
-            {{"IntensityWaveform", std::int32_t(7)}, {"RadiusWaveform", std::int32_t(7)}}};
+            "FlickerLight",          &client_light,
+            construct<FlickerLight>, {{"IntensityWaveform", std::int32_t(7)}, {"RadiusWaveform", std::int32_t(7)}},
+            SaveSupport::Original,   1};
         const ClassInfo light_GlowingLight{
-            "GlowingLight",
-            &client_light,
-            construct<GlowingLight>,
-            {{"IntensityWaveform", std::int32_t(5)}, {"RadiusWaveform", std::int32_t(5)}}};
+            "GlowingLight",          &client_light,
+            construct<GlowingLight>, {{"IntensityWaveform", std::int32_t(5)}, {"RadiusWaveform", std::int32_t(5)}},
+            SaveSupport::Original,   1};
         const ClassInfo start{"StartPoint", &base, construct<StartPoint>, {}, SaveSupport::AlwaysLoad};
         const ClassInfo game_start{"GameStartPoint",
                                    &start,
@@ -553,7 +579,10 @@ namespace OpenBlood2
                 return p;
             }()};
         const ClassInfo warp_gate_sfx{
-            "CClientWarpGateSFX", &client_sfx, construct<CClientWarpGateSFX>, []
+            "CClientWarpGateSFX",
+            &client_sfx,
+            construct<CClientWarpGateSFX>,
+            []
             {
                 const WarpGateSettings defaults;
                 std::vector<PropertySpec> p{{"RampUpTime", 5.0f},
@@ -603,7 +632,9 @@ namespace OpenBlood2
                     }
                 }
                 return p;
-            }()};
+            }(),
+            SaveSupport::Original,
+            1};
         const ClassInfo lightning_sfx{"CClientLightningSFX",
                                       &client_sfx,
                                       construct<CClientLightningSFX>,
@@ -613,7 +644,9 @@ namespace OpenBlood2
                                        {"Damage", 500.0f},
                                        {"DamageRadius", 300.0f},
                                        {"Sound", std::string("Sounds\\Thunder.wav")},
-                                       {"SoundRadius", 1000.0f}}};
+                                       {"SoundRadius", 1000.0f}},
+                                      SaveSupport::Original,
+                                      1};
         const ClassInfo chosen_GabriellaAI{"GabriellaAI",
                                            &ai_manager,
                                            construct_npc<GabriellaAI, AI_Mgr::NPCType::Gabriella>,

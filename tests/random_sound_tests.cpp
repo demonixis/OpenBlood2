@@ -245,7 +245,11 @@ namespace
         CHECK(!make(g, {{"MinWaitTime", 61.0f}, {"MaxWaitTime", 60.0f}}));
         CHECK(!make(g, {{"PosRangeRadius", -1.0f}}));
         CHECK(!make(g, {{"SoundRadius", 0.0f}}));
-        CHECK(!g.objects.create(g.objects.find_class("RandomSoundFX"), {}, Creation::Restore));
+        // Save/load lot 10: a restore creation reads no property and schedules nothing; its Load
+        // and the engine record supply the state.
+        const auto restored = g.objects.create(g.objects.find_class("RandomSoundFX"), {}, Creation::Restore);
+        CHECK(restored && !g.objects.get(restored)->scheduled);
+        g.objects.remove(restored);
         CHECK(g.objects.finish_frame());
         CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty());
         return true;

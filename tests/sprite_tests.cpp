@@ -261,6 +261,8 @@ namespace
             CHECK(!make(g, {{"RepeatY", std::int32_t(n)}}));
         CHECK(!make(g, {{"RepeatX", std::int32_t(33)}, {"RepeatY", std::int32_t(33)}}));
         CHECK(!make(g, {{"Bogus", true}})); // Undeclared names still reject (TypeAction is a retired flag).
+        // A restore creation reads no property (save/load lot 10); without the engine record's
+        // sprite filename the engine still refuses the sprite object.
         CHECK(!g.objects.create(g.objects.find_class("DetailSprite"), {}, Creation::Restore));
         CHECK(g.objects.finish_frame() && g.objects.snapshot().empty());
         auto failed = make(g, {{"FlushWithWorld", true},

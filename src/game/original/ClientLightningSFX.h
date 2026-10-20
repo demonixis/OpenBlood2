@@ -17,6 +17,8 @@ class CClientLightningSFX : public CClientSFX
     }
 
   private:
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
     HOBJECT damage_sender_ = nullptr;
     bool delivering_damage_ = false;
 

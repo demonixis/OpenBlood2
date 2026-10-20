@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-20",
+  "scope": "Save/load lot 10: original Save/Load bodies of the effect publishers and audio emitters (SoundFX, RandomSoundFX, the ClientLightFX family, CClientExplosionSFX, CClientParticleStreamSFX, CClientLightningSFX, CClientWarpGateSFX, DetailSprite), their PRECREATE_SAVEGAME and INITIALUPDATE_SAVEGAME branches, the persistent effect messages carried as block tails and save-support declarations. The bodies are selective ports recorded in the provenance ledger; the checks, the republication and the four decision-4 departures are OpenBlood2 code.",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/SoundFX.cpp",
+      "source_sha256": "58c2c6cc04948618ea38acb4275e2a613a3a87a4196507dfb5428bacab55e2b2",
+      "purpose": "SoundFX Save/Load field order (SoundFX.cpp:511-561), PostPropRead on every precreate with the constructor's StartOn (:307-314), the skipped savegame InitialUpdate, UpdateSound's duration scheduling and the Load tail that restarts the sound then calls SetNextUpdate(0)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/RandomSoundFX.cpp",
+      "source_sha256": "f91b9ba5740be333c686cbcbdebe52dfc5bc9f0abedd5043b2ba2578a1b3bc9e",
+      "purpose": "RandomSoundFX Save/Load (RandomSoundFX.cpp:452-520), the ten HSTRING slots after the first-gap break, the skipped savegame InitialUpdate and the missing USRFLG_SAVEABLE marking."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ClientLightFX.cpp",
+      "source_sha256": "4610ac78791d766785dbcfe4d8893ce74d5474e408f45606b2a4a2cbe095b2cb",
+      "purpose": "ClientLightFX block (ClientLightFX.cpp:632-663) with the absolute start time, PostPropRead on every precreate (:474-490), the dispatch to B2BaseClass, the SFX_LIGHT message field order of SendEffectMessage (:587-609) and the saveable marking only for an initially-on light (Init)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ClientExplosionSFX.cpp",
+      "source_sha256": "87cfd53215253da70d66a1ade5d70495a812889f1d9ca47d72ce34a124c50342",
+      "purpose": "CClientExplosionSFX block (ClientExplosionSFX.cpp:414-450), the unconditional ReadProp and initial update (0.1 s, cached position, SAVEABLE) and removal of a triggered emitter."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ClientExplosionSFX.h",
+      "source_sha256": "266a0dca37c3c625dd1ad9ab2b50969ed1a7740537895fa1a0998a452c053d6d",
+      "purpose": "Constructor values (m_fOffset 0, m_bTriggered 0)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ClientParticleStreamSFX.cpp",
+      "source_sha256": "7a33e2c244415f960bbf84c9a7452f0af0c62d98b9ecee4f45ec6f17a9221c81",
+      "purpose": "CClientParticleStreamSFX Save/Load of bOn only (:261-288), the world-file-only ReadProp, the skipped savegame initial update and the SFX_PARTICLESTREAM message order of SetupFX (:49-77)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ClientLightningSFX.cpp",
+      "source_sha256": "a47b9673efecf8b6a0aa7a69303259a67d37827bdc3897e2f367187e62068253",
+      "purpose": "CClientLightningSFX block (:203-251), the unconditional ReadProp and 0.1 s initial update, and the instant bolt."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ClientLightningSFX.h",
+      "source_sha256": "2328d5e63d3943dfdef3c862097b9ebf82c6d99807d50e19376c2358873fc17f",
+      "purpose": "bTriggered initialized to 0 and never assigned."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ClientWarpGateSFX.cpp",
+      "source_sha256": "0ef582587832867193dae5e9db8f33ee6684fd5b4a51f0aec3be8a1fe3bb42b3",
+      "purpose": "CClientWarpGateSFX block of 54 fields (:468-612), the never-assigned bInitiallyOn, the unconditional one-second initial update, bFirstUpdate and SetupFX's three instant messages."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ClientWarpGateSFX.h",
+      "source_sha256": "62b6297788220979e584f0de2374dd891944a62df513b19d4bf21fe37216acda",
+      "purpose": "Member layout of the sprite and particle settings."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/DetailSprite.cpp",
+      "source_sha256": "cf1827e0acbd2534a0b1c05ac464389ffc603c7b9b6b14fea5d09879d6667663",
+      "purpose": "DetailSprite block (:322-356), the never-assigned m_bAlignedToWorld, world/string-only precreate and the skipped savegame initial update."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/DetailSprite.h",
+      "source_sha256": "0839be897a0c4dc10a86f5ae2150972a7625bf3afb1922e5f58b3c24b8a92204",
+      "purpose": "m_bAlignedToWorld declared without an initializer."
+    }
+  ]
+}

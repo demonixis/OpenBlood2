@@ -668,6 +668,12 @@ namespace OpenBlood2
                 if (!objects_.finish_frame() || !removed)
                     break;
             }
+            // Owner-bound effects a removed record's Load published again (lot 10) go with it; the
+            // clock below may move back past their publication.
+            auto gone = [this](HOBJECT owner) { return !IsObjectAlive(owner); };
+            std::erase_if(light_effects, [&](const auto& l) { return gone(l.source); });
+            std::erase_if(particle_streams.active, [&](const auto& s) { return gone(s.owner); });
+            std::erase_if(warp_gates.active, [&](const auto& w) { return gone(w.owner); });
             if (previous.clock)
             {
                 if (!objects_.restore_clock(previous.time, previous.frame_time))

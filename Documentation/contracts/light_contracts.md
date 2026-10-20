@@ -18,7 +18,8 @@ calls B2BaseClass as the source does, bypassing CClientSFX's FORCECLIENTUPDATE h
 World/string creation reads properties; runtime creation retains constructor
 values, including NONE waves, radius minimum 0, frequency 0 and lifetime -1.
 World defaults instead use radius minimum 200, frequency 4 and lifetime 0.
-Restore rejects; save/load/cache and the general SFX manager are not implemented.
+A restore reads no property, keeps PostPropRead and publishes the saved effect message
+again from its Load ([save/load lot 10](save_load_contracts.md#implemented-effect-publishers-and-audio-emitters-lot-10)); cache and the general SFX manager are not implemented.
 
 Source clamps remain asymmetric: LifeTime and IntensityMin/RadiusMin are at least
 zero, IntensityMax is at most 255. Do not sort min/max or impose a new gameplay

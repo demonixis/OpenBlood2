@@ -1,5 +1,6 @@
 // Selected original ObjectDLL/ClientLightningSFX.cpp.
 #include "ClientLightningSFX.h"
+#include "SaveFields.h"
 #include "engine/collision.h"
 #include "radius_damage.h"
 #include <cmath>
@@ -9,8 +10,12 @@ DDWORD CClientLightningSFX::EngineMessageFn(DDWORD message, void* data, DFLOAT r
     auto* s = GetServerDE();
     if (message == MID_PRECREATE)
     {
-        if (!data || reason == PRECREATE_SAVEGAME)
+        if (!data)
             return 0;
+        // The source reads its properties for every reason; on a restore the reads fail and
+        // Load overwrites every field, so the port reads nothing.
+        if (reason == PRECREATE_SAVEGAME)
+            return CClientSFX::EngineMessageFn(message, data, reason);
         GenericProp prop;
         if (s->GetPropGeneric("LightningShape", &prop) == DE_OK)
             bolt.shape = DBYTE(prop.m_Long);
@@ -28,7 +33,11 @@ DDWORD CClientLightningSFX::EngineMessageFn(DDWORD message, void* data, DFLOAT r
             sound_radius > 1e6f)
             return 0;
     }
-    else if (message == MID_INITIALUPDATE)
+    else if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    else if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
+    else if (message == MID_INITIALUPDATE) // Unconditional: a restore is rescheduled at 0.1 s.
     {
         s->SetObjectFlags(m_hObject, (s->GetObjectFlags(m_hObject) & ~FLAG_GRAVITY) | FLAG_FORCECLIENTUPDATE);
         s->SetObjectUserFlags(m_hObject, s->GetObjectUserFlags(m_hObject) | (1u << 3));
@@ -104,4 +113,53 @@ void CClientLightningSFX::Fire(HOBJECT sender)
         if (!failure.empty())
             sound_error = failure;
     }
+}
+void CClientLightningSFX::Save(HMESSAGEWRITE h)
+{
+    // Original ClientLightningSFX.cpp:203-222. The endpoints are the last bolt's; a bolt is an
+    // instant effect and never saved. bTriggered is never assigned after the constructor's 0.
+    auto* s = g_pServerDE;
+    s->WriteToMessageVector(h, &bolt.source);
+    s->WriteToMessageVector(h, &bolt.destination);
+    s->WriteToMessageByte(h, bolt.shape);
+    s->WriteToMessageByte(h, bolt.form);
+    s->WriteToMessageByte(h, bolt.type);
+    s->WriteToMessageFloat(h, damage);
+    s->WriteToMessageFloat(h, damage_radius);
+    save_fields::write_string(h, sound);
+    s->WriteToMessageFloat(h, sound_radius);
+    s->WriteToMessageByte(h, 0);
+}
+void CClientLightningSFX::Load(HMESSAGEREAD h)
+{
+    // Original ClientLightningSFX.cpp:232-251, decoded and checked before any member changes,
+    // with the precreate bounds.
+    auto* s = g_pServerDE;
+    namespace F = save_fields;
+    LightningSettings saved;
+    s->ReadFromMessageVector(h, &saved.source);
+    s->ReadFromMessageVector(h, &saved.destination);
+    saved.shape = s->ReadFromMessageByte(h);
+    saved.form = s->ReadFromMessageByte(h);
+    saved.type = s->ReadFromMessageByte(h);
+    const float saved_damage = s->ReadFromMessageFloat(h), saved_radius = s->ReadFromMessageFloat(h);
+    std::string saved_sound;
+    bool ok = F::read_string(h, saved_sound);
+    const float saved_sound_radius = s->ReadFromMessageFloat(h);
+    const DBYTE triggered = s->ReadFromMessageByte(h);
+    if (!ok)
+        return;
+    if (!physics_vector(saved.source) || !std::isfinite(saved.destination.x) || !std::isfinite(saved.destination.y) ||
+        !std::isfinite(saved.destination.z) || saved.type > 2 || !std::isfinite(saved_damage) || saved_damage < 0 ||
+        saved_damage > 1e6f || !std::isfinite(saved_radius) || saved_radius < 0 || saved_radius > 1e6f ||
+        !std::isfinite(saved_sound_radius) || saved_sound_radius <= 0 || saved_sound_radius > 1e6f || triggered)
+    {
+        s->RejectPayload(h, "lightning block holds values the port cannot represent");
+        return;
+    }
+    bolt = saved;
+    damage = saved_damage;
+    damage_radius = saved_radius;
+    sound = std::move(saved_sound);
+    sound_radius = saved_sound_radius;
 }

@@ -1905,3 +1905,21 @@ spawn rule in the damage block are replacement code. See the
 [contract](../contracts/save_load_contracts.md#implemented-ai-core-lot-11),
 the [evidence](reports/save_load_ai.md) and the
 [source ledger](sources/save_load_ai_sources.json).
+
+## Effect publishers and audio emitters save/load (2026-10-20)
+
+Save/load lot 10 adds selective ports of the original `Save`/`Load` bodies and their
+`MID_SAVEOBJECT`/`MID_LOADOBJECT` dispatch from `ObjectDLL/SoundFX.cpp`, `RandomSoundFX.cpp`,
+`ClientLightFX.cpp`, `ClientExplosionSFX.cpp`, `ClientParticleStreamSFX.cpp`,
+`ClientLightningSFX.cpp`, `ClientWarpGateSFX.cpp` and `DetailSprite.cpp`: field order and
+widths, the absolute light start time, the `PRECREATE_SAVEGAME` post-processing (ClientLightFX's
+`PostPropRead`) and skipped or unconditional `INITIALUPDATE_SAVEGAME` work, constructor values of
+never-assigned fields, and SoundFX's Load restart of its sound. The SFX_LIGHT and
+SFX_PARTICLESTREAM message layouts of `SendEffectMessage`/`SetupFX` are reused as block tails that
+the port publishes again from Load, in place of the original engine record's effect message. The
+checks, the republication, the rollback of republished effects and four decision-4 departures
+(saved RandomSoundFX and initially-off lights, SoundFX's kept schedule, the warp gate's
+republished effects) are OpenBlood2 code. See the
+[contract](../contracts/save_load_contracts.md#implemented-effect-publishers-and-audio-emitters-lot-10),
+the [evidence](reports/save_load_effects.md) and the
+[source ledger](sources/save_load_effects_sources.json).

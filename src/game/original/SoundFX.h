@@ -3,6 +3,7 @@
 #include "engine/audio.h"
 
 // Selected original ObjectDLL/SoundFX; strings are owned values, voices checked identities.
+// Save/Load: save_load_contracts lot 10.
 class SoundFX : public B2BaseClass
 {
   public:
@@ -31,5 +32,7 @@ class SoundFX : public B2BaseClass
 
   private:
     void ReadProp();
-    void UpdateSound();
+    void UpdateSound(bool schedule = true);
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };

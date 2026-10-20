@@ -20,6 +20,8 @@ class ClientLightFX : public CClientSFX
   private:
     bool ReadProp();
     bool InitialUpdate();
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };
 class SquareWaveLightFX : public ClientLightFX
 {

@@ -11,6 +11,8 @@ and candidate transaction) and 5 (player and client) are implemented; see their 
 [evidence](../implementation/reports/save_load_movers.md)) declares its 18 classes Original.
 Lot 7 (world logic, [evidence](../implementation/reports/save_load_world_logic.md)) declares its
 10 classes Original.
+Lot 10 (effect publishers and audio emitters,
+[evidence](../implementation/reports/save_load_effects.md)) declares its 21 classes Original.
 Lot 13 (native state, [evidence](../implementation/reports/save_load_native.md)) checks the
 engine classes, sky and PolyGrid republication, VoiceMgr and CommLink across a load, and
 refuses CTF saves by name.
@@ -20,8 +22,9 @@ Lot 6 (slots, Quick and Restart, menus, [evidence](../implementation/reports/sav
 writes and reads the slot, quick and level-entry files and enables the Save and Load screens,
 F5/F6 and the death Load menu. `GameSession::save_game` and `load_game` save and load through a
 candidate session, with the local player and its client blob. Every other original class is
-AlwaysLoad, NotSaved or Unsupported, so a save of a real game is still refused by name. The other
-lots are pending.** The
+AlwaysLoad, NotSaved or Unsupported. Five worlds (06_airship1, 08_subwayb, credits, drop and end)
+now save and load whole; a save of any other world is still refused, naming its lot-9 or lot-12
+classes. The other lots are pending.** The
 [audit](../implementation/save_load_audit/readme.md) is the evidence for every
 original rule cited here; its [source ledger](../implementation/sources/save_load_audit_sources.json)
 records the audited files. Read [level replacement](level_change_contracts.md),
@@ -538,9 +541,10 @@ Smell, Exit, AmmoPickup and Camera lists.
 A save made immediately after a load, before simulation advances, must
 reproduce the loaded OBJS, LINK and ATCH bytes. The only allowed differences are
 the fields an original `PRECREATE_SAVEGAME`, `INITIALUPDATE_SAVEGAME` or Load
-deliberately rewrites. Examples: ClientLightFX resets its flags, SoundFX clears
-its next update, and CPlayerObj hard-sets flags and zeroes velocity. Each class
-lists its expected rewrites. This is the primary round-trip property tested
+deliberately rewrites. Examples: ClientLightFX resets its flags and next update,
+the scene explosion, lightning and warp gate initial updates reschedule their
+polling, and CPlayerObj hard-sets flags and zeroes velocity. Each class lists its
+expected rewrites. This is the primary round-trip property tested
 below.
 
 ## Load sequence
@@ -643,8 +647,8 @@ of `Current.sav`. [Lot 6](#implemented-slots-quick-and-restart-lot-6) wraps it i
   Trigger now add it to the existing user flags, as the original does, instead of replacing
   them. Two decision-4 departures mark what the original left unmarked: every light of the
   ClientLightFX family (the original marks only a light that starts on) and RandomSoundFX.
-  Until lot 10 supplies their payloads, a save that includes them is refused by name; they
-  are never silently lost.
+  Lot 10 supplies their payloads ([lot 10](#implemented-effect-publishers-and-audio-emitters-lot-10));
+  until then a save that included them was refused by name, never silently lost.
 - **Save list.** The original shell `SaveGame` lists every `USRFLG_SAVEABLE` object, first
   through `GetNextObject`, then through `GetNextInactiveObject`. The latter is the original
   inactive enumeration, now a bounded service. Players are included. It then calls
@@ -1047,6 +1051,77 @@ blocks, and CameraObj. The 10 registered classes are Original with payload versi
 - **Expected re-save rewrites.** CameraObj only: the forced flags, the schedule (0.01 s active,
   none inactive) and, for a timed active camera, the deactivation time. Every other OBJS, LINK
   and ATCH byte of these classes is identical after a load.
+
+### Implemented effect publishers and audio emitters (lot 10)
+
+The original Save/Load bodies of SoundFX, RandomSoundFX, ClientLightFX with its 13 registered
+subclasses (the eleven wave lights, FlickerLight and GlowingLight, which add no code),
+CClientExplosionSFX, CClientParticleStreamSFX, CClientLightningSFX, CClientWarpGateSFX and
+DetailSprite. The 21 registered classes are Original with payload version 1; their
+`PRECREATE_SAVEGAME` refusals are gone. ClientLightFX's record ends with lot 8's
+`CDestructable` block.
+
+- **Byte order and values.** Fields follow the original order and widths with lot 8's
+  `save_fields` helpers: booleans are 0 or 1, empty strings are NULL, ClientLightFX's start
+  time is absolute (valid because a full restore restores the clock). Never-assigned original
+  fields are written with their constructor value and must match on load: the explosion's
+  `m_fOffset` (0, world emitters never call `Setup`), lightning's `bTriggered` (0) and the warp
+  gate's `bInitiallyOn` (0; ReadProp reads `InitiallyOn` into `bOn`). DetailSprite's
+  uninitialized `m_bAlignedToWorld` is carried as a byte. Each Load decodes and checks its
+  block (the precreate bounds, the light and stream descriptor validators, RandomSoundFX's
+  list of `count` leading files) and refuses through `RejectPayload` before changing a member.
+- **Restore branches.** `PRECREATE_SAVEGAME` reads no property. The explosion and lightning
+  sources read properties for every reason, which on a restore fails and leaves values Load
+  overwrites; the port reads nothing. ClientLightFX keeps its `PostPropRead`: with the
+  constructor's ON it resets the flags to `VISIBLE | GOTHRUWORLD` and the next update to
+  0.01 s. `INITIALUPDATE_SAVEGAME` skips SoundFX, RandomSoundFX, ClientLightFX, the particle
+  stream and DetailSprite initialization. The explosion (0.1 s), lightning (0.1 s) and warp
+  gate (1 s) initial updates are unconditional in the source and reschedule as before.
+- **Effect messages.** The original engine record kept each object's persistent special-effect
+  message and replayed it on a restore. OpenBlood2's record has no effect message and its
+  publications are typed, so ClientLightFX (SFX_LIGHT) and the particle stream
+  (SFX_PARTICLESTREAM) append the message they published, in its original field order without
+  the effect ID byte, to their own block. Load publishes it again through
+  `PublishLightEffect` or `PublishParticleStream`, once per owner; a failed republication
+  refuses the restore. The stream keeps the descriptor as published, including the initial
+  ON, as the replayed message did; the saved ON and `USRFLG_VISIBLE` then drive the client,
+  whose particles and ramp clock start again. Light waveforms evaluate the absolute restored
+  clock, so every phase continues; an invisible light's last evaluated colour is the client's
+  and is not restored.
+- **Sounds.** No voice is saved. SoundFX's Load restarts the current state's sound from its
+  start (an ambient ON loops), as the original. TripLaser (lot 8) is the other class that
+  restarts its own loop. RandomSoundFX starts nothing: its next wait is the restored next
+  update, and the saved generator (D10) then draws the same waits, choices and offsets.
+- **Instant effects.** A scene explosion's components and a lightning bolt are one-shot
+  effects and are lost. A triggered explosion emitter is removed by its next update, which
+  its initial update reschedules at 0.1 s.
+- **Decision-4 departures.**
+  - RandomSoundFX was never saveable, so its objects vanished; lot 4 marks it and its original
+    Save/Load bodies now run.
+  - ClientLightFX was saveable only when it started on, so an initially-off light vanished;
+    lot 4 marks every light. Such a light then follows the original restore path of an on
+    light (rescheduled at 0.01 s; its update only reschedules and checks the lifetime).
+  - SoundFX's `PostPropRead` rescheduled a restored object from the constructor's StartOn and
+    its Load ended with `SetNextUpdate(0)`, freezing RampUp, RampDown and a non-ambient ON.
+    The port keeps the saved next update in both places and Load restarts the sound without
+    rescheduling, so each ramp reaches its next state at the saved deadline.
+  - The warp gate's `SetupFX` published three instant messages the engine never kept, and the
+    restored `bFirstUpdate` is 0, so its visuals were lost. A gate saved after its first update
+    publishes them again from its Load, once, through `PublishWarpGate`; a gate saved before
+    it publishes at that update, as before. The client ramps start again.
+- **Rollback.** A refused restore also discards the light effects, particle streams and warp
+  gates that the removed records' Loads published, before the clock moves back.
+- **Expected re-save rewrites.** A save right after a load reproduces every OBJS, LINK and
+  ATCH byte of these classes except: the ClientLightFX family's flags and next update; the
+  next update of the explosion, lightning and warp gate emitters (each then keeps polling at
+  its own phase).
+- **Real worlds.** The private run lists, for every mounted world, the classes still blocking
+  a whole save and restores every Original object of each world through `load_game`: each
+  light, stream and published warp gate comes back once, and SoundFX loops restart. With lots 7
+  and 11, 06_airship1, 08_subwayb, credits, drop and end save and load whole; the other worlds
+  still hold classes of lots 9 or 12 (see the evidence). The save tests share one list of the
+  lots' listed rewrites (`tests/save_rewrites.h`).
+
 ### Implemented native state (lot 13)
 
 Lot 13 covers the state that no original class saves: engine-implemented classes, the owner-bound
@@ -1205,8 +1280,8 @@ lot 12.
 | Always-load world objects (start points, path points, keys, hints, WorldProperties, PolyGrid, ParticleSystem, SparksObj, LightFX, built-in Model/Sprite/Container/Sound/sky) | Recreated from the DAT in authored state; references to them read NULL |
 | Server voices, music transport | Never saved. Classes restart their own loops in Load or initial update; DAT `Sound` objects replay; music restarts at the saved level |
 | Client VoiceMgr and CommLink | Never saved. The unique-line flags and next play time reset as after the original `StartNewGame`; the on/off state, randomness and group choices continue; the communication panel starts idle ([lot 13](#implemented-native-state-lot-13)) |
-| Owner-bound effects (PolyGrid surfaces, particle streams, warp gates, lightning, object particles, light effects, camera views, sky) | Republished by the restored owner through the same publication path the original's saved effect message fed. Whether WarpGate keeps the original's lost visuals is open decision 4 |
-| Detached cosmetic effects (explosions, sparks, spurts, splats, fragments, gibs, flame/smoke, laser beams, weapon sprites) | Lost, as in the original |
+| Owner-bound effects (PolyGrid surfaces, particle streams, warp gates, object particles, light effects, camera views, sky) | Republished by the restored owner through the same publication path the original's saved effect message fed; lights, particle streams and warp gates since [lot 10](#implemented-effect-publishers-and-audio-emitters-lot-10), the warp gate through a decision-4 departure |
+| Detached cosmetic effects (explosions, lightning bolts, sparks, spurts, splats, fragments, gibs, flame/smoke, laser beams, weapon sprites) | Lost, as in the original |
 | HUD, crosshair, view weapons, MoveMgr prediction, zoom | Rebuilt: the player Load zeroes stat caches, the first update republishes, and ForcePos resets prediction |
 | Path manager, AI shared animation tables, container index, posed shells, collision | Rebuilt from restored objects and the DAT |
 | Runtime SmellHint trail, start-point name, cheats, unsaved per-class members | Lost, as in the original |

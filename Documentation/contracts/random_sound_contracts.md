@@ -41,8 +41,9 @@ source's duplicate FreeString is corrected: each owned message read releases onc
 Resource strings use values, and voice IDs use the existing checked monotonic type.
 
 Invalid/nonfinite/negative ranges, reversed waits, radius <= 0 or values above
-1,000,000 reject precreate; restore creation also rejects. These are explicit bounded
-adaptations. Save/load and original cache callbacks remain unavailable. `RandomInt`
+1,000,000 reject precreate; a restore reads nothing and its Load checks the same bounds. These
+are explicit bounded adaptations. Original cache callbacks remain unavailable; Save/Load is
+ported and the class is saveable ([save/load lot 10](save_load_contracts.md#implemented-effect-publishers-and-audio-emitters-lot-10)). `RandomInt`
 uses the existing session-seeded generator with an inclusive uniform distribution;
 resetting the world restores its seed. It does not claim the retail random sequence
 or cross-standard-library bit identity. Sharing the generator with light phase

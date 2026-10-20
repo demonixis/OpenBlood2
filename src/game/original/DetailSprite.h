@@ -3,13 +3,14 @@
 #include "game/weapon_messages.h"
 #include <string>
 #include <vector>
-// Selected original ObjectDLL/DetailSprite; save/load remain unavailable.
+// Selected original ObjectDLL/DetailSprite; Save/Load: save_load_contracts lot 10.
 class DetailSprite : public B2BaseClass
 {
   public:
     DetailSprite() : B2BaseClass(OT_SPRITE) {}
     DVector scale{1, 1, 1};
     bool flush = false, rotatable = false, chromakey = false, repeat = false;
+    bool aligned_to_world = false; // Original m_bAlignedToWorld: saved, never assigned.
     unsigned repeat_x = 1, repeat_y = 1;
     float spacing_x = 0, spacing_y = 0;
     std::string filename, error;
@@ -23,4 +24,6 @@ class DetailSprite : public B2BaseClass
     bool ReadProp();
     bool InitialUpdate();
     bool CreateAnotherSprite(DVector, DRotation);
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };

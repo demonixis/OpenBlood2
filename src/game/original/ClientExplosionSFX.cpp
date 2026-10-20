@@ -1,5 +1,6 @@
 // Selected ObjectDLL/ClientExplosionSFX.cpp; see SCENE_explosion_contracts.md.
 #include "ClientExplosionSFX.h"
+#include "SaveFields.h"
 #include "engine/collision.h"
 #include "radius_damage.h"
 #include <cmath>
@@ -24,12 +25,19 @@ DDWORD CClientExplosionSFX::EngineMessageFn(DDWORD message, void* data, DFLOAT r
         return 0;
     if (message == MID_PRECREATE)
     {
-        // Source reads properties for every creation reason, unlike most B2 classes.
-        if (!data || reason == 3 || !ReadProp())
+        // Source reads properties for every creation reason, unlike most B2 classes. On a
+        // restore its reads fail and leave garbage that Load overwrites; the port reads nothing.
+        if (!data || (reason != PRECREATE_SAVEGAME && !ReadProp()))
             return 0;
     }
+    else if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    else if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
     else if (message == MID_INITIALUPDATE)
     {
+        // Unconditional in the source, so a restore is rescheduled at 0.1 s and its position
+        // (then overwritten by Load) is re-read.
         g_pServerDE->SetNextUpdate(m_hObject, .1f);
         g_pServerDE->GetObjectPos(m_hObject, &position);
         g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | 8u);
@@ -97,4 +105,50 @@ void CClientExplosionSFX::SetupFX()
     report.sound_error = sound_error;
     // Durable inspection distinguishes actual sprite components from missing composite FX.
     g_pServerDE->RecordSceneExplosion(report);
+}
+void CClientExplosionSFX::Save(HMESSAGEWRITE h)
+{
+    // Original ClientExplosionSFX.cpp:414-426. World-placed emitters never call Setup, so the
+    // offset keeps its constructor zero. The explosion itself is an instant effect, never saved.
+    auto* s = g_pServerDE;
+    s->WriteToMessageVector(h, &position);
+    s->WriteToMessageVector(h, &normal);
+    s->WriteToMessageFloat(h, 0.0f);
+    s->WriteToMessageFloat(h, damage);
+    s->WriteToMessageFloat(h, radius);
+    s->WriteToMessageDWord(h, type);
+    save_fields::write_string(h, sound);
+    s->WriteToMessageByte(h, triggered);
+}
+void CClientExplosionSFX::Load(HMESSAGEREAD h)
+{
+    // Original ClientExplosionSFX.cpp:438-450, decoded and checked before any member changes. A
+    // triggered emitter is removed at its next update, as in the saved world.
+    auto* s = g_pServerDE;
+    namespace F = save_fields;
+    DVector saved_position{}, saved_normal{};
+    s->ReadFromMessageVector(h, &saved_position);
+    s->ReadFromMessageVector(h, &saved_normal);
+    const float offset = s->ReadFromMessageFloat(h), saved_damage = s->ReadFromMessageFloat(h),
+                saved_radius = s->ReadFromMessageFloat(h);
+    const DDWORD saved_type = s->ReadFromMessageDWord(h);
+    std::string saved_sound;
+    bool saved_triggered = false;
+    bool ok = F::read_string(h, saved_sound, MAX_CS_FILENAME_LEN - 1);
+    ok = F::read_bool(h, saved_triggered) && ok;
+    if (!ok)
+        return;
+    if (!physics_vector(saved_position) || !physics_vector(saved_normal) || offset != 0 || !F::finite(saved_damage) ||
+        !F::finite(saved_radius))
+    {
+        s->RejectPayload(h, "explosion block holds values the port cannot represent");
+        return;
+    }
+    position = saved_position;
+    normal = saved_normal;
+    damage = saved_damage;
+    radius = saved_radius;
+    type = saved_type;
+    sound = std::move(saved_sound);
+    triggered = saved_triggered;
 }

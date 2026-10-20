@@ -22,13 +22,13 @@ Read the [source ledger](../implementation/sources/m2_scene_explosion_sources.js
 CClientExplosionSFX retains CClientSFX -> B2BaseClass ancestry and callback order.
 All precreate reasons read ExplosionType, Damage, DamageRadius, Direction and
 WaveFile. World/string/runtime properties are supplied by the typed registry;
-restore rejects. Signed ExplosionType converts to the original uint32 value.
+a restore reads nothing (its Load supplies every field). Signed ExplosionType converts to the original uint32 value.
 Direction remains unnormalized on the server. Damage/radius are finite and bounded
 in absolute value by 1,000,000; signed and zero values are retained. Initial update
 stores the initial position, sets SAVEABLE and schedules 0.1 seconds. Each update
 rearms 0.1 and removes a triggered emitter through deferred destruction.
 CClientSFX preserves FORCECLIENTUPDATE; original difficulty filtering runs last.
-SAVEABLE does not mean save/restore is implemented.
+The original Save/Load block is ported ([save/load lot 10](save_load_contracts.md#implemented-effect-publishers-and-audio-emitters-lot-10)).
 
 MID_TRIGGER accepts case-insensitive whole-token TRIGGER only. It does not check
 the triggered bit before firing, so repeated messages before the next scheduled

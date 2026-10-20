@@ -1,8 +1,19 @@
-// Selected original ObjectDLL/RandomSoundFX.cpp. Save/load and precache remain unavailable.
+// Selected original ObjectDLL/RandomSoundFX.cpp. Precache remains unavailable.
 #include "RandomSoundFX.h"
+#include "SaveFields.h"
 #include <algorithm>
 #include <cmath>
 using namespace OpenBlood2;
+namespace
+{
+    // Explicit bounded adaptation: reject malformed ranges rather than scheduling undefined time/positions.
+    bool valid_ranges(float position_radius, float sound_radius, float min_wait, float max_wait)
+    {
+        return std::isfinite(position_radius) && position_radius >= 0 && position_radius <= 1e6f &&
+               std::isfinite(sound_radius) && sound_radius > 0 && sound_radius <= 1e6f && std::isfinite(min_wait) &&
+               std::isfinite(max_wait) && min_wait >= 0 && min_wait <= max_wait && max_wait <= 1e6f;
+    }
+} // namespace
 RandomSoundFX::~RandomSoundFX()
 {
     if (g_pServerDE && sound)
@@ -35,10 +46,7 @@ bool RandomSoundFX::ReadProp()
             sounds[i] = prop.m_String;
             ++count;
         }
-    // Explicit bounded adaptation: reject malformed ranges rather than scheduling undefined time/positions.
-    return std::isfinite(position_radius) && position_radius >= 0 && position_radius <= 1e6f &&
-           std::isfinite(sound_radius) && sound_radius > 0 && sound_radius <= 1e6f && std::isfinite(min_wait) &&
-           std::isfinite(max_wait) && min_wait >= 0 && min_wait <= max_wait && max_wait <= 1e6f;
+    return valid_ranges(position_radius, sound_radius, min_wait, max_wait);
 }
 void RandomSoundFX::ScheduleWait()
 {
@@ -50,16 +58,20 @@ DDWORD RandomSoundFX::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
     if (message == MID_PRECREATE)
     {
-        if (!data || reason == 3)
+        if (!data)
             return 0;
         if ((reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP) && !ReadProp())
             return 0;
     }
-    else if (message == MID_INITIALUPDATE)
+    else if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    else if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
+    else if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME)
     {
-        // The original never marks RandomSoundFX saveable, so it vanished from a restore.
-        // Decision-4 departure (save_load_contracts lot 4): it is saveable; until its payload
-        // lands a save naming it is refused.
+        // The original never marks RandomSoundFX saveable, so it vanished from a restore (its
+        // Save/Load were dead code). Decision-4 departure (save_load_contracts lots 4 and 10): it
+        // is saveable, and a restore keeps its saved wait through the engine's next update.
         g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | USRFLG_SAVEABLE);
         if (on)
             ScheduleWait();
@@ -130,4 +142,64 @@ bool RandomSoundFX::Update()
     if (on)
         ScheduleWait(); // Delays are independent of the previous clip's duration, including failed starts.
     return true;
+}
+void RandomSoundFX::Save(HMESSAGEWRITE h)
+{
+    // Original RandomSoundFX.cpp:452-481. The playing voice is not saved.
+    auto* s = g_pServerDE;
+    s->WriteToMessageByte(h, on);
+    s->WriteToMessageByte(h, positional);
+    s->WriteToMessageByte(h, sequential);
+    s->WriteToMessageByte(h, loop_sequence);
+    s->WriteToMessageFloat(h, position_radius);
+    s->WriteToMessageFloat(h, sound_radius);
+    s->WriteToMessageFloat(h, min_wait);
+    s->WriteToMessageFloat(h, max_wait);
+    s->WriteToMessageByte(h, volume);
+    s->WriteToMessageByte(h, static_cast<DBYTE>(count));
+    s->WriteToMessageByte(h, static_cast<DBYTE>(current));
+    for (const auto& file : sounds)
+        save_fields::write_string(h, file);
+}
+void RandomSoundFX::Load(HMESSAGEREAD h)
+{
+    // Original RandomSoundFX.cpp:490-520, decoded and checked before any member changes. The
+    // original Load starts nothing: the next wait comes from the restored next update. Only the
+    // first `count` files are set (the first empty authored slot ends the list).
+    auto* s = g_pServerDE;
+    namespace F = save_fields;
+    bool flags[4]{};
+    bool ok = true;
+    for (auto& flag : flags)
+        ok = F::read_bool(h, flag) && ok;
+    const float radii[2]{s->ReadFromMessageFloat(h), s->ReadFromMessageFloat(h)};
+    const float waits[2]{s->ReadFromMessageFloat(h), s->ReadFromMessageFloat(h)};
+    const DBYTE saved_volume = s->ReadFromMessageByte(h), saved_count = s->ReadFromMessageByte(h),
+                saved_current = s->ReadFromMessageByte(h);
+    std::array<std::string, 10> files;
+    for (auto& file : files)
+        ok = F::read_string(h, file) && ok;
+    if (!ok)
+        return;
+    bool valid = valid_ranges(radii[0], radii[1], waits[0], waits[1]) && saved_count <= files.size() &&
+                 saved_volume <= 100 && (saved_current < saved_count || saved_current == 0);
+    for (unsigned i = 0; valid && i < files.size(); ++i)
+        valid = files[i].empty() == (i >= saved_count);
+    if (!valid)
+    {
+        s->RejectPayload(h, "random sound block holds values the port cannot represent");
+        return;
+    }
+    on = flags[0];
+    positional = flags[1];
+    sequential = flags[2];
+    loop_sequence = flags[3];
+    position_radius = radii[0];
+    sound_radius = radii[1];
+    min_wait = waits[0];
+    max_wait = waits[1];
+    volume = saved_volume;
+    count = saved_count;
+    current = saved_current;
+    sounds = std::move(files);
 }

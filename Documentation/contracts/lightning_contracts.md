@@ -23,8 +23,8 @@ cross-owner identity only for Normal area damage while that emitter is deliverin
 its synchronous original radius call. Other forged identities remain rejected.
 Reentrant self-activation is explicitly rejected; checked snapshots and deferred
 removal preserve the existing lifetime boundary. Damage/visual/audio failures
-are distinct, durable diagnostics. The source's .1 polling remains; save/restore
-is explicitly unavailable.
+are distinct, durable diagnostics. The source's .1 polling remains, also after a
+restore; the original Save/Load block is ported ([save/load lot 10](save_load_contracts.md#implemented-effect-publishers-and-audio-emitters-lot-10)).
 
 ## Client source behavior
 

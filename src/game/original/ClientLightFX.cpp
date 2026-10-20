@@ -1,5 +1,6 @@
 // Selected original ObjectDLL/ClientLightFX.cpp. See light_contracts.md.
 #include "ClientLightFX.h"
+#include "SaveFields.h"
 #include "engine/collision.h"
 #include <algorithm>
 #include <cmath>
@@ -80,7 +81,7 @@ bool ClientLightFX::InitialUpdate()
     settings.radius.phase *= 3.14159265358979323846f / 180;
     // The original marks only a light that starts on (USRFLG_VISIBLE | USRFLG_SAVEABLE), so an
     // initially-off light vanished from a restore. Decision-4 departure (save_load_contracts
-    // lot 4): every light is saveable; until its payload lands a save naming it is refused.
+    // lots 4 and 10): every light is saveable and restores with its state.
     g_pServerDE->SetObjectUserFlags(m_hObject,
                                     g_pServerDE->GetObjectUserFlags(m_hObject) | (on ? 1u : 0u) | USRFLG_SAVEABLE);
     return g_pServerDE->PublishLightEffect(m_hObject, settings);
@@ -89,7 +90,9 @@ DDWORD ClientLightFX::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
     if (message == MID_PRECREATE)
     {
-        if (!data || reason == 3 || !B2BaseClass::EngineMessageFn(message, data, reason))
+        // A restore reads no property: PostPropRead below sees the constructor's ON and resets
+        // the saved flags to VISIBLE | GOTHRUWORLD and the next update to 0.01 s, as the original.
+        if (!data || !B2BaseClass::EngineMessageFn(message, data, reason))
             return 0;
         if (reason == 1 || reason == 2)
         {
@@ -110,7 +113,11 @@ DDWORD ClientLightFX::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         c.m_Flags |= FLAG_GOTHRUWORLD;
         return 1;
     }
-    if (message == MID_INITIALUPDATE)
+    if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    else if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
+    else if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME)
     {
         if (!InitialUpdate())
             g_pServerDE->RemoveObject(m_hObject);
@@ -154,4 +161,81 @@ DDWORD ClientLightFX::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGERE
     if (message == damage_message && damage.IsDead())
         g_pServerDE->RemoveObject(m_hObject);
     return result;
+}
+namespace
+{
+    // The persistent SFX_LIGHT message of the original SendEffectMessage (ClientLightFX.cpp
+    // :587-609), in its field order without the effect ID byte. The original engine record kept
+    // it; OpenBlood2's record has no effect message, so it is an OpenBlood2 tail of this block.
+    void write_light_message(HMESSAGEWRITE h, LightSettings& l)
+    {
+        auto* s = g_pServerDE;
+        s->WriteToMessageVector(h, &l.color);
+        s->WriteToMessageDWord(h, l.flags);
+        for (const auto* w : {&l.intensity, &l.radius})
+        {
+            s->WriteToMessageFloat(h, w->min);
+            s->WriteToMessageFloat(h, w->max);
+            s->WriteToMessageByte(h, w->kind);
+            s->WriteToMessageFloat(h, w->frequency);
+            s->WriteToMessageFloat(h, w->phase);
+        }
+        save_fields::write_string(h, l.ramp_up_sound);
+        save_fields::write_string(h, l.ramp_down_sound);
+    }
+    bool read_light_message(HMESSAGEREAD h, LightSettings& l)
+    {
+        auto* s = g_pServerDE;
+        s->ReadFromMessageVector(h, &l.color);
+        l.flags = s->ReadFromMessageDWord(h);
+        for (auto* w : {&l.intensity, &l.radius})
+        {
+            w->min = s->ReadFromMessageFloat(h);
+            w->max = s->ReadFromMessageFloat(h);
+            w->kind = s->ReadFromMessageByte(h);
+            w->frequency = s->ReadFromMessageFloat(h);
+            w->phase = s->ReadFromMessageFloat(h);
+        }
+        const bool ok = save_fields::read_string(h, l.ramp_up_sound, 100);
+        return save_fields::read_string(h, l.ramp_down_sound, 100) && ok;
+    }
+} // namespace
+void ClientLightFX::Save(HMESSAGEWRITE h)
+{
+    // Original ClientLightFX.cpp:632-641: the start time is absolute, valid because a full
+    // restore restores the clock. The CDestructable aggregate block follows.
+    auto* s = g_pServerDE;
+    s->WriteToMessageByte(h, on);
+    s->WriteToMessageByte(h, dynamic);
+    s->WriteToMessageFloat(h, lifetime);
+    s->WriteToMessageFloat(h, start_time);
+    write_light_message(h, settings);
+}
+void ClientLightFX::Load(HMESSAGEREAD h)
+{
+    // Original ClientLightFX.cpp:655-663, decoded and checked before any member changes. The
+    // published light comes back from the saved effect message, as the original engine replayed
+    // it; its waveforms evaluate the absolute restored clock, so every phase continues.
+    auto* s = g_pServerDE;
+    namespace F = save_fields;
+    bool saved_on = false, saved_dynamic = false;
+    bool ok = F::read_bool(h, saved_on);
+    ok = F::read_bool(h, saved_dynamic) && ok;
+    const float saved_lifetime = s->ReadFromMessageFloat(h), saved_start = s->ReadFromMessageFloat(h);
+    LightSettings light;
+    ok = read_light_message(h, light) && ok;
+    if (!ok)
+        return;
+    if (!F::finite(saved_lifetime) || !std::isfinite(saved_start) || !valid_light_settings(light))
+    {
+        s->RejectPayload(h, "light block holds values the port cannot represent");
+        return;
+    }
+    on = saved_on;
+    dynamic = saved_dynamic;
+    lifetime = saved_lifetime;
+    start_time = saved_start;
+    settings = std::move(light);
+    if (!s->PublishLightEffect(m_hObject, settings))
+        s->RejectPayload(h, "the saved light cannot be published again");
 }

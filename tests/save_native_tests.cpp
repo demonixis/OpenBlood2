@@ -4,6 +4,7 @@
 #include "game/original/PolyGrid.h"
 #include "game/original/VolumeBrush.h"
 #include "game/world_validation.h"
+#include "save_rewrites.h"
 #include "save_world_fixture.h"
 #include <algorithm>
 #include <functional>
@@ -323,9 +324,18 @@ namespace
                     CHECK(check_restored_publications(*game, error));
                     GameSave again;
                     CHECK(game->save_game(again, error));
-                    // After the first load the listed rewrites are applied; later loads reproduce bytes.
+                    // A save right after a load reproduces the records apart from every lot's listed
+                    // rewrites (save_rewrites.h); after the first load the others match byte for byte.
                     if (cycle)
-                        CHECK(again.image.objects == before);
+                    {
+                        std::vector<SaveEngineRecord> x, y;
+                        SaveError decode_error;
+                        CHECK(decode_save_records(before, x, decode_error) &&
+                              decode_save_records(again.image.objects, y, decode_error));
+                        save_rewrites::apply(x);
+                        save_rewrites::apply(y);
+                        CHECK(x == y);
+                    }
                     CHECK(steps(*game, 30) && game->server.unavailable_services.empty());
                     CHECK(game->save_game(save, error));
                 }

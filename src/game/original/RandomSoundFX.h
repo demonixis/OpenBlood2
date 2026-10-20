@@ -3,6 +3,7 @@
 #include "engine/audio.h"
 #include <array>
 // Selected original ObjectDLL/RandomSoundFX.h; value-owned resources and checked voice ID.
+// Save/Load: save_load_contracts lot 10.
 class RandomSoundFX : public B2BaseClass
 {
   public:
@@ -24,5 +25,7 @@ class RandomSoundFX : public B2BaseClass
   private:
     bool ReadProp();
     bool Update();
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
     void ScheduleWait();
 };

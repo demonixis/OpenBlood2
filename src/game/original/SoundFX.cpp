@@ -1,5 +1,6 @@
 // Original ObjectDLL/SoundFX.cpp rules; see Documentation/contracts/sound_fx_contracts.md.
 #include "SoundFX.h"
+#include "SaveFields.h"
 #include "game/key_messages.h"
 #include <algorithm>
 using namespace OpenBlood2;
@@ -54,19 +55,28 @@ DDWORD SoundFX::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
     if (message == MID_PRECREATE)
     {
-        if (!data || reason == 3)
-            return 0; // Save/restore is unavailable.
+        if (!data)
+            return 0;
         // Observed historical metadata is retained, not mapped to a guessed audio behavior.
         GenericProp legacy_voice;
-        if (g_pServerDE->GetPropGeneric("VoiceType", &legacy_voice) == DE_OK && legacy_voice.m_Long != 0)
+        if (reason != PRECREATE_SAVEGAME && g_pServerDE->GetPropGeneric("VoiceType", &legacy_voice) == DE_OK &&
+            legacy_voice.m_Long != 0)
             return 0;
         const auto result = B2BaseClass::EngineMessageFn(message, data, reason);
         if (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP)
             ReadProp();
-        static_cast<ObjectCreateStruct*>(data)->m_NextUpdate = start_on ? .01f : 0;
+        // Decision-4 departure (save_load_contracts lot 10): the original PostPropRead also
+        // rescheduled a restored object from the constructor's StartOn, and its Load then cleared
+        // the schedule, freezing every ramp. A restore keeps the saved next update instead.
+        if (reason != PRECREATE_SAVEGAME)
+            static_cast<ObjectCreateStruct*>(data)->m_NextUpdate = start_on ? .01f : 0;
         return result;
     }
-    if (message == MID_INITIALUPDATE)
+    if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    else if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
+    else if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME)
     {
         g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 3));
         if (start_on)
@@ -122,7 +132,7 @@ DDWORD SoundFX::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD rea
     }
     return B2BaseClass::ObjectMessageFn(sender, message, read);
 }
-void SoundFX::UpdateSound()
+void SoundFX::UpdateSound(bool schedule)
 {
     if (sound)
         g_pServerDE->KillSound(sound);
@@ -176,10 +186,68 @@ void SoundFX::UpdateSound()
         ++failures;
     // Original precedence also queries duration for a failed non-ambient ON request.
     // UpdateSound does not cancel a previous deadline when no new one is obtained.
-    if ((sound && (state == RampUp || state == RampDown)) || (state == On && !ambient))
+    if (schedule && ((sound && (state == RampUp || state == RampDown)) || (state == On && !ambient)))
     {
         float duration = 0;
         if (g_pServerDE->GetSoundDuration(sound, duration))
             g_pServerDE->SetNextUpdate(m_hObject, duration);
     }
+}
+void SoundFX::Save(HMESSAGEWRITE h)
+{
+    // Original SoundFX.cpp:511-525. StartOn is init-only and the voice is never saved.
+    auto* s = g_pServerDE;
+    namespace F = save_fields;
+    s->WriteToMessageByte(h, state);
+    F::write_string(h, ramp_up);
+    F::write_string(h, ramp_down);
+    F::write_string(h, sound_path);
+    s->WriteToMessageFloat(h, outer_radius);
+    s->WriteToMessageFloat(h, inner_radius);
+    s->WriteToMessageByte(h, volume);
+    s->WriteToMessageByte(h, ambient);
+    s->WriteToMessageByte(h, file_stream);
+    s->WriteToMessageByte(h, priority);
+}
+void SoundFX::Load(HMESSAGEREAD h)
+{
+    // Original SoundFX.cpp:538-561, decoded and checked before any member changes. Load restarts
+    // the current state's sound from its start, as the original does. Decision-4 departure: the
+    // original then called SetNextUpdate(0), which froze RampUp, RampDown and a non-ambient ON;
+    // the restored next update is kept, so the state machine continues from the saved deadline.
+    auto* s = g_pServerDE;
+    namespace F = save_fields;
+    const DBYTE saved_state = s->ReadFromMessageByte(h);
+    std::string text[3];
+    bool ok = true;
+    for (auto& value : text)
+        ok = F::read_string(h, value) && ok;
+    const float outer = s->ReadFromMessageFloat(h), inner = s->ReadFromMessageFloat(h);
+    const DBYTE saved_volume = s->ReadFromMessageByte(h);
+    bool saved_ambient = false, saved_stream = false;
+    ok = F::read_bool(h, saved_ambient) && ok;
+    ok = F::read_bool(h, saved_stream) && ok;
+    const DBYTE saved_priority = s->ReadFromMessageByte(h);
+    if (!ok)
+        return;
+    // UpdateSound leaves RampUp without a ramp-up sound and RampDown without a ramp-down sound
+    // at once, so neither can be saved.
+    if (saved_state > RampDown || !F::finite(outer) || !F::finite(inner) ||
+        (saved_state == RampUp && text[0].empty()) || (saved_state == RampDown && text[1].empty()))
+    {
+        s->RejectPayload(h, "sound block holds values the port cannot represent");
+        return;
+    }
+    state = static_cast<State>(saved_state);
+    ramp_up = std::move(text[0]);
+    ramp_down = std::move(text[1]);
+    sound_path = std::move(text[2]);
+    outer_radius = outer;
+    inner_radius = inner;
+    volume = saved_volume;
+    ambient = saved_ambient;
+    file_stream = saved_stream;
+    priority = saved_priority;
+    sound = 0;
+    UpdateSound(false);
 }

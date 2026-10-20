@@ -1,5 +1,6 @@
 // Selected original ObjectDLL/ClientParticleStreamSFX.cpp. See particle_stream_contracts.md.
 #include "ClientParticleStreamSFX.h"
+#include "SaveFields.h"
 using namespace OpenBlood2;
 bool CClientParticleStreamSFX::ReadProp()
 {
@@ -48,11 +49,16 @@ DDWORD CClientParticleStreamSFX::EngineMessageFn(DDWORD message, void* data, DFL
         return 0;
     if (message == MID_PRECREATE)
     {
-        // Source only initialized its fields for world-file creation. Reject other reasons explicitly.
-        if (!data || reason != PRECREATE_WORLDFILE || !ReadProp())
+        // Source only initialized its fields for world-file creation. Reject other reasons
+        // explicitly, except a restore, whose Load supplies every field.
+        if (!data || (reason != PRECREATE_SAVEGAME && (reason != PRECREATE_WORLDFILE || !ReadProp())))
             return 0;
     }
-    else if (message == MID_INITIALUPDATE)
+    else if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    else if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
+    else if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME)
     {
         g_pServerDE->SetNextUpdate(m_hObject, 0);
         g_pServerDE->SetObjectFlags(m_hObject,
@@ -60,7 +66,8 @@ DDWORD CClientParticleStreamSFX::EngineMessageFn(DDWORD message, void* data, DFL
         auto flags = g_pServerDE->GetObjectUserFlags(m_hObject) | 8u;
         flags = settings.on ? flags | 1u : flags & ~1u;
         g_pServerDE->SetObjectUserFlags(m_hObject, flags);
-        effect = g_pServerDE->PublishParticleStream(m_hObject, settings, error);
+        published = settings;
+        effect = g_pServerDE->PublishParticleStream(m_hObject, published, error);
         if (!effect)
             g_pServerDE->RemoveObject(m_hObject);
     }
@@ -85,4 +92,77 @@ DDWORD CClientParticleStreamSFX::ObjectMessageFn(HOBJECT sender, DDWORD message,
         g_pServerDE->SetObjectUserFlags(m_hObject, settings.on ? flags | 1u : flags & ~1u);
     }
     return CClientSFX::ObjectMessageFn(sender, message, read);
+}
+namespace
+{
+    // The persistent SFX_PARTICLESTREAM message of the original SetupFX
+    // (ClientParticleStreamSFX.cpp:49-77), in its field order without the effect ID byte. The
+    // original engine record kept it; OpenBlood2's has none, so it is a tail of this block.
+    void write_stream_message(HMESSAGEWRITE h, const ParticleStreamSettings& p)
+    {
+        auto* s = g_pServerDE;
+        for (float value : {p.radius, p.position_radius, p.min_velocity, p.max_velocity})
+            s->WriteToMessageFloat(h, value);
+        s->WriteToMessageDWord(h, p.count);
+        s->WriteToMessageFloat(h, p.spread);
+        s->WriteToMessageVector(h, &p.min_color);
+        s->WriteToMessageVector(h, &p.max_color);
+        for (float value : {p.alpha, p.min_life, p.max_life, p.ramp_time, p.delay, p.gravity})
+            s->WriteToMessageFloat(h, value);
+        s->WriteToMessageByte(h, p.ramp_flags);
+        s->WriteToMessageByte(h, p.on);
+        save_fields::write_string(h, p.texture);
+        s->WriteToMessageFloat(h, p.sound_radius);
+        for (const auto& sound : p.sounds)
+            save_fields::write_string(h, sound);
+    }
+    bool read_stream_message(HMESSAGEREAD h, ParticleStreamSettings& p)
+    {
+        auto* s = g_pServerDE;
+        for (float* value : {&p.radius, &p.position_radius, &p.min_velocity, &p.max_velocity})
+            *value = s->ReadFromMessageFloat(h);
+        p.count = s->ReadFromMessageDWord(h);
+        p.spread = s->ReadFromMessageFloat(h);
+        s->ReadFromMessageVector(h, &p.min_color);
+        s->ReadFromMessageVector(h, &p.max_color);
+        for (float* value : {&p.alpha, &p.min_life, &p.max_life, &p.ramp_time, &p.delay, &p.gravity})
+            *value = s->ReadFromMessageFloat(h);
+        p.ramp_flags = s->ReadFromMessageByte(h);
+        bool ok = save_fields::read_bool(h, p.on);
+        ok = save_fields::read_string(h, p.texture, 1000) && ok;
+        p.sound_radius = s->ReadFromMessageFloat(h);
+        for (auto& sound : p.sounds)
+            ok = save_fields::read_string(h, sound, 1000) && ok;
+        return ok;
+    }
+} // namespace
+void CClientParticleStreamSFX::Save(HMESSAGEWRITE h)
+{
+    // Original ClientParticleStreamSFX.cpp:261-271: only ON changes; the rest is the effect message.
+    g_pServerDE->WriteToMessageByte(h, settings.on);
+    write_stream_message(h, published);
+}
+void CClientParticleStreamSFX::Load(HMESSAGEREAD h)
+{
+    // Original ClientParticleStreamSFX.cpp:281-288, decoded and checked before any member
+    // changes. The stream comes back from its saved effect message, as the original engine
+    // replayed it: the client starts from the published ON and USRFLG_VISIBLE drives any ramp.
+    auto* s = g_pServerDE;
+    bool on = false;
+    ParticleStreamSettings saved;
+    bool ok = save_fields::read_bool(h, on);
+    ok = read_stream_message(h, saved) && ok;
+    if (!ok)
+        return;
+    if (!valid_particle_stream(saved))
+    {
+        s->RejectPayload(h, "particle stream message holds values the port cannot represent");
+        return;
+    }
+    published = std::move(saved);
+    settings = published;
+    settings.on = on;
+    effect = s->PublishParticleStream(m_hObject, published, error);
+    if (!effect)
+        s->RejectPayload(h, "the saved particle stream cannot be published again: " + error);
 }

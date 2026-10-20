@@ -84,7 +84,11 @@ namespace
         CHECK(close(light(g, str)->settings.intensity.phase, pi / 2) &&
               close(light(g, str)->settings.radius.phase, -pi / 2) && light(g, str)->damage.m_fHitPoints == 4);
         CHECK(g.server.GetLightEffect(str)->settings.ramp_up_sound == "sounds/a.wav" && !g.server.string_count());
-        CHECK(!g.objects.create(g.objects.find_class("ClientLightFX"), {}, Creation::Restore));
+        // Save/load lot 10: a restore creation reads no property and publishes only from its Load.
+        const auto restored = g.objects.create(g.objects.find_class("ClientLightFX"), {}, Creation::Restore);
+        CHECK(restored && !g.server.GetLightEffect(restored));
+        g.objects.remove(restored);
+        CHECK(g.objects.finish_frame());
         CHECK(g.unload_world() && g.server.light_effects.empty() && !CDestructable::m_dwNumDestructables);
         return true;
     }

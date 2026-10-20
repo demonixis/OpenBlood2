@@ -155,7 +155,11 @@ namespace
     {
         GameSession g;
         CHECK(test_audio::setup(g, root));
-        CHECK(!g.objects.create(g.objects.find_class("SoundFX"), {}, Creation::Restore));
+        // Save/load lot 10: a restore creation reads no property and starts nothing until its Load.
+        const auto restored = g.objects.create(g.objects.find_class("SoundFX"), {}, Creation::Restore);
+        CHECK(restored && g.server.audio.voices().empty());
+        g.objects.remove(restored);
+        CHECK(g.objects.finish_frame());
         CHECK(!make(g, {{"VoiceType", std::int32_t(1)}})); // Nonzero historical behavior is not guessed.
         auto p = props();
         p["RampUpSound"] = std::string("missing.wav");

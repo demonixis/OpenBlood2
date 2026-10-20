@@ -95,7 +95,10 @@ namespace
         CHECK(e && e->position.x == 1 && e->normal.y == 7 && e->type == 0xffffffffu && e->damage == -5 &&
               e->radius == -10);
         CHECK(command(g, e->m_hObject, "TRIGGER") && e->targets.null_damager && !e->targets.cancelled && !e->voice);
-        CHECK(!g.objects.create(g.objects.find_class("CClientExplosionSFX"), {}, Creation::Restore));
+        // Save/load lot 10: a restore creation reads no property; its Load supplies every field.
+        const auto restored = g.objects.create(g.objects.find_class("CClientExplosionSFX"), {}, Creation::Restore);
+        CHECK(restored && g.objects.get(restored)->scheduled);
+        g.objects.remove(restored);
         auto filtered = make(g, {{"DifficultyMed", false}});
         CHECK(filtered && filtered->filtered && g.objects.get(filtered->m_hObject)->life == Life::Pending);
         CHECK(g.objects.finish_frame());

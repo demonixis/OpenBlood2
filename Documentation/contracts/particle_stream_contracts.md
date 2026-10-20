@@ -16,8 +16,9 @@ USRFLG_VISIBLE alone controls emission. The server's whole command uses
 case-sensitive prefix comparisons: TOGGLE (six characters), ON (two), OFF (three).
 Unknown commands still reapply the current state. The copied trigger string is
 released exactly once. Source strings become owned values, without packet ABI or
-borrowed client pointers. Runtime/string/save creation rejects explicitly because
-the original only initializes these fields on world-file creation.
+borrowed client pointers. Runtime/string creation rejects explicitly because the
+original only initializes these fields on world-file creation. A restore reads nothing:
+its Load republishes the saved effect message ([save/load lot 10](save_load_contracts.md#implemented-effect-publishers-and-audio-emitters-lot-10)).
 
 An initially enabled stream starts directly in state 2 and emits immediately;
 it does not ramp up. An initially disabled stream starts empty. Client states are

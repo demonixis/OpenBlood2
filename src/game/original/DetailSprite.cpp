@@ -1,5 +1,6 @@
 // Selected original ObjectDLL/DetailSprite.cpp. Value-owned filename; bounded repeat work.
 #include "DetailSprite.h"
+#include "SaveFields.h"
 #include "engine/collision.h"
 #include <algorithm>
 using namespace OpenBlood2;
@@ -33,7 +34,7 @@ DDWORD DetailSprite::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
     if (message == MID_PRECREATE)
     {
-        if (!data || reason == 3)
+        if (!data)
             return 0;
         if (reason == PRECREATE_WORLDFILE || reason == PRECREATE_STRINGPROP)
         {
@@ -52,8 +53,12 @@ DDWORD DetailSprite::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
                 legacy_copy(state.m_Filename, filename.c_str());
         }
     }
-    else if (message == MID_INITIALUPDATE && !InitialUpdate())
+    else if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME && !InitialUpdate())
         g_pServerDE->RemoveObject(m_hObject);
+    else if (message == MID_SAVEOBJECT && data)
+        Save(*static_cast<HMESSAGEWRITE*>(data));
+    else if (message == MID_LOADOBJECT && data)
+        Load(*static_cast<HMESSAGEREAD*>(data));
     return B2BaseClass::EngineMessageFn(message, data, reason);
 }
 bool DetailSprite::InitialUpdate()
@@ -131,4 +136,43 @@ bool DetailSprite::CreateAnotherSprite(DVector position, DRotation rotation)
     }
     children.push_back(child->m_hObject);
     return true;
+}
+void DetailSprite::Save(HMESSAGEWRITE h)
+{
+    // Original DetailSprite.cpp:322-334. The repeat settings are init-only: repeats are
+    // independent DetailSprites (with no filename member) that save themselves. The engine
+    // record restores the sprite, its frame clock, scale, flags and placement.
+    auto* s = g_pServerDE;
+    s->WriteToMessageVector(h, &scale);
+    save_fields::write_string(h, filename);
+    s->WriteToMessageByte(h, rotatable);
+    s->WriteToMessageByte(h, chromakey);
+    s->WriteToMessageByte(h, aligned_to_world);
+    s->WriteToMessageByte(h, flush);
+}
+void DetailSprite::Load(HMESSAGEREAD h)
+{
+    // Original DetailSprite.cpp:344-356, decoded and checked before any member changes.
+    auto* s = g_pServerDE;
+    namespace F = save_fields;
+    DVector saved_scale{};
+    s->ReadFromMessageVector(h, &saved_scale);
+    std::string saved_filename;
+    bool flags[4]{};
+    bool ok = F::read_string(h, saved_filename);
+    for (auto& flag : flags)
+        ok = F::read_bool(h, flag) && ok;
+    if (!ok)
+        return;
+    if (!physics_vector(saved_scale))
+    {
+        s->RejectPayload(h, "detail sprite scale is outside the physics bounds");
+        return;
+    }
+    scale = saved_scale;
+    filename = std::move(saved_filename);
+    rotatable = flags[0];
+    chromakey = flags[1];
+    aligned_to_world = flags[2];
+    flush = flags[3];
 }

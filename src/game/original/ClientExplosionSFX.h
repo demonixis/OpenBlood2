@@ -22,4 +22,6 @@ class CClientExplosionSFX : public CClientSFX
   private:
     bool ReadProp();
     void SetupFX();
+    void Save(HMESSAGEWRITE);
+    void Load(HMESSAGEREAD);
 };

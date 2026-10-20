@@ -15,6 +15,7 @@
 #include "game/original/WorldModelDebris.h"
 #include "game/original/trigger_helpers.h"
 #include "player_fixture.h"
+#include "save_rewrites.h"
 #include <array>
 #include <bit>
 #include <functional>
@@ -161,23 +162,10 @@ namespace
         SaveError error;
         return decode_save_records(image.objects, records, error);
     }
-    // The original rewrites listed by save_load_contracts: CDestructableBrush's PostPropRead
-    // adds FULLPOSITIONRES | MODELGOURAUDSHADE back to a started WorldModelDebris, whose Start
-    // replaced every flag.
+    // Every lot's listed re-save rewrites (save_rewrites.h).
     void listed_rewrites(std::vector<SaveEngineRecord>& records)
     {
-        for (auto& r : records)
-            if (r.class_name == "WorldModelDebris")
-                r.flags &= ~(FLAG_FULLPOSITIONRES | FLAG_MODELGOURAUDSHADE);
-            else if (r.class_name == "CPlayerObj")
-            {
-                // Lot 5's listed player rewrites (Load's flags, velocity, node reset, zoom and the
-                // blob's load type); save_player checks the player's bytes field by field.
-                r.flags &= ~FLAG_SHADOW;
-                r.velocity = {};
-                r.hidden_nodes.clear();
-                r.payload.clear();
-            }
+        save_rewrites::apply(records);
     }
     // Relative float clocks (Save writes t - GetTime()) restore to the same saved difference, but
     // when the original subtraction rounded, the absolute value may land one ulp away; later
@@ -937,6 +925,14 @@ namespace
                 }
                 ++whole;
                 whole_names.push_back(name);
+                // A whole restore passed the sky preflight with every sky object (lots 7, 10 and 11
+                // made worlds whole); the handles above belong to the replaced session.
+                if (!sky_objects.empty())
+                {
+                    ++sky_worlds;
+                    ++sky_restored;
+                }
+                continue;
             }
             if (sky_objects.empty())
                 continue;

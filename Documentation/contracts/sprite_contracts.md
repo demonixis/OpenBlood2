@@ -14,7 +14,8 @@ creation structure. The registered Rotatable default is true, but the runtime
 constructor's member is false. Precreate clears the skin, sets the scale and
 visible/rotateable/chromakey flags; BaseClass property overrides still run after
 these writes. Initial update disables the 0.1-second schedule and marks saveable.
-The saveable flag does not imply save/restore support.
+The original Save/Load block is ported; a restore skips both callbacks' work
+([save/load lot 10](save_load_contracts.md#implemented-effect-publishers-and-audio-emitters-lot-10)).
 
 Flush uses the authored forward vector with IGNORE_NONSOLID and without
 INTERSECT_OBJECTS. The typed CastWorldRay queries only solid primary-world
@@ -40,7 +41,7 @@ max(1, RepeatX)*RepeatY exceeds 1024. Nonfinite/out-of-domain scale, spacing and
 child positions fail. These are explicit safety bounds; negative counts do not
 produce huge unsigned loops. Partial repeat failures remove the failed parent
 but retain already created independent children, with an explicit error. Unknown
-properties, restore, missing SPR and missing frame resources fail creation.
+properties, missing SPR and missing frame resources fail creation.
 
 ## Manifest and playback services
 
@@ -76,7 +77,7 @@ flush result/polygon, repeat handles, manifest metadata and current frame presen
 Object IDs distinguish unnamed/repeated instances. The XZ overlay shows positions
 and authored forward axes only. DTX decoding,
 textured world drawing, billboards, transparency/depth behavior, clipping,
-SpriteControl APIs, save/restore and verified retail visual/timing parity remain
+SpriteControl APIs and verified retail visual/timing parity remain
 unavailable. The ordinary World view retains all rejected source properties.
 
 SubwayA's twelve authored blood splats all bind sprites\bloodsplat3.spr: one

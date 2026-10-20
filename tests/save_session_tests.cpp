@@ -323,6 +323,7 @@ namespace
         return std::make_unique<T>();
     }
     ClassInfo probe_type{"SessionProbe", nullptr, construct<Probe>, {}, SaveSupport::Original, 1};
+    ClassInfo unsupported_type{"SessionUnsupported", nullptr, construct<Probe>, {}}; // Marks itself saveable.
     ClassInfo probe_v2{"SessionProbe", nullptr, construct<Probe>, {}, SaveSupport::Original, 2};
     ClassInfo always_type{"SessionAlwaysLoad", nullptr, construct<AlwaysProbe>, {}, SaveSupport::AlwaysLoad};
     const std::array<const ClassInfo*, 2> extra{&probe_type, &always_type};
@@ -517,7 +518,7 @@ namespace
                                               "CClientSplatFX", "CGib",      "CHandWeaponModel",
                                               "FlagObject",     "FlagStand", "NagaCeilingDebris"};
         // Lot 5: the player. Lot 8: movers, brushes, volumes, TripLaser and Tchernotronic. Lot 11:
-        // AI_Mgr's NPC subclasses and CCorpse.
+        // AI_Mgr's NPC subclasses and CCorpse. Lot 10: effect publishers and audio emitters.
         const std::set<std::string> original{"Behemoth",
                                              "CCorpse",
                                              "CalebAI",
@@ -538,9 +539,30 @@ namespace
                                              "SoulDrudge",
                                              "Acid",
                                              "Blood",
+                                             "CClientExplosionSFX",
+                                             "CClientLightningSFX",
+                                             "CClientParticleStreamSFX",
+                                             "CClientWarpGateSFX",
                                              "CDestructableBrush",
                                              "CDestructableModel",
                                              "CPlayerObj",
+                                             "ClientLightFX",
+                                             "DetailSprite",
+                                             "Flicker1WaveLightFX",
+                                             "Flicker2WaveLightFX",
+                                             "Flicker3WaveLightFX",
+                                             "Flicker4WaveLightFX",
+                                             "FlickerLight",
+                                             "GlowingLight",
+                                             "RampDownWaveLightFX",
+                                             "RampUpWaveLightFX",
+                                             "RandomSoundFX",
+                                             "SawWaveLightFX",
+                                             "SearchWaveLightFX",
+                                             "SineWaveLightFX",
+                                             "SoundFX",
+                                             "SquareWaveLightFX",
+                                             "StrobeWaveLightFX",
                                              "Conveyor",
                                              "Damage",
                                              "Door",
@@ -594,7 +616,7 @@ namespace
         for (auto name : {"Script", "LightFX", "WreckingBall", "SoccerGoal", "WorldModel", "FogSphere"})
             CHECK(!g.objects.find_class(name));
         const auto build_schema = save_class_schema(g.objects);
-        CHECK(unsupported > 100 && build_schema.size() == original.size());
+        CHECK(unsupported > 0 && build_schema.size() == original.size()); // Lots 9 and 12 remain.
         for (const auto& name : original)
             CHECK(build_schema.contains(name) && build_schema.at(name) == 1);
         std::cout << g.objects.classes().size() << " classes: " << original.size() << " Original, " << always.size()
@@ -619,6 +641,8 @@ namespace
         CHECK(g.request_world("save1", error) && g.enter_player(error));
         const auto make = [&](const char* type, Properties p = {})
         { return g.objects.create(g.objects.find_class(type), {}, Creation::World, p); };
+        unsupported_type.parent = g.objects.find_class("BaseClass");
+        CHECK(g.objects.register_class(unsupported_type));
         struct Row
         {
             const char* type;
@@ -638,6 +662,7 @@ namespace
             {"RandomSoundFX", {}, true},                       // Departure: the original never marks it.
             {"RandomSoundFX", {{"InitiallyOn", false}}, true},
             {"CClientExplosionSFX", {}, true},
+            {"SessionUnsupported", {}, true},
             {"GameStartPoint", {}, false},
             {"PathPoint", {}, false},
             {"SmellHint", {}, false},
@@ -658,9 +683,11 @@ namespace
         GameSave save;
         const auto before = g.server.save_store.revision();
         CHECK(!g.save_game(save, error) && contains(error, "SaveObjects: listed classes cannot be saved"));
-        for (auto name : {"CClientExplosionSFX (Unsupported)", "ClientLightFX", "RandomSoundFX", "SoundFX"})
-            CHECK(contains(error, name));
-        for (auto name : {"BigTrigger", "CinematicTrigger", "KeyFramer", "Spawner", "Trigger ("}) // Lot 7.
+        // Lots 7 and 10 made every original row above Original; the synthetic class keeps an
+        // Unsupported saveable object in the list.
+        CHECK(contains(error, "SessionUnsupported (Unsupported)"));
+        for (auto name : {"BigTrigger", "CinematicTrigger", "KeyFramer", "Spawner", "Trigger (", "CClientExplosionSFX",
+                          "ClientLightFX", "RandomSoundFX", "SoundFX"})
             CHECK(error.find(name) == std::string::npos);
         CHECK(error.find("PathPoint") == std::string::npos && error.find("BaseClass") == std::string::npos);
         CHECK(g.server.save_store.revision() == before && !g.server.save_store.find(SaveStoreSlot::Current));
@@ -1041,9 +1068,16 @@ namespace
                     ++fresh_always;
             for (int i = 0; i < 30; ++i)
                 CHECK(game->step(.05));
-            GameSave refused;
-            CHECK(!game->save_game(refused, error) && contains(error, "(Unsupported)"));
-            std::cout << name << " refusal: " << error.substr(0, 160) << "...\n";
+            // A whole save is refused by name while a class lot is missing; once every class of the
+            // world is supported it succeeds (08_SubwayB since lots 7, 10 and 11).
+            GameSave whole;
+            if (game->save_game(whole, error))
+                std::cout << name << ": saved whole\n";
+            else
+            {
+                CHECK(contains(error, "(Unsupported)"));
+                std::cout << name << " refusal: " << error.substr(0, 160) << "...\n";
+            }
             game->server.SetGameConVar("FarZ", "1234"); // WorldProperties sets it at creation.
             DVector force{0, -1, 0};
             DVector authored{};

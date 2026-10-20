@@ -10,6 +10,7 @@
 #include "game/original/PathMgr.h"
 #include "game/original/SmellHint.h"
 #include "save_ai_fixture.h"
+#include "save_rewrites.h"
 #include "save_world_fixture.h"
 #include <array>
 #include <bit>
@@ -219,34 +220,10 @@ namespace
         SaveError error;
         return decode_save_records(image.objects, records, error);
     }
-    // The re-save rewrites listed by save_load_contracts: AI_Mgr::Load adds GetTime() to the raw
-    // m_fLastUpdate (AI_Mgr.cpp:6912); CCorpse's PostPropRead restores its constant flags; lot 5's
-    // player rewrites (flags, velocity, node reset, zoom and the blob's load type).
+    // Every lot's listed re-save rewrites (save_rewrites.h).
     void listed_rewrites(std::vector<SaveEngineRecord>& records)
     {
-        for (auto& r : records)
-            if (is_ai(r.class_name))
-            {
-                Decoder d{r.payload, subclass_bytes(r.class_name)};
-                ai_block(d);
-                if (const auto* field = d.find("last_update"); d.ok && field)
-                    std::fill_n(r.payload.begin() + std::ptrdiff_t(field->offset), 4, std::uint8_t(0));
-            }
-            else if (r.class_name == "CCorpse")
-                r.flags = FLAG_VISIBLE | FLAG_RAYHIT | FLAG_GRAVITY | FLAG_MODELKEYS | FLAG_REMOVEIFOUTSIDE;
-            else if (r.class_name == "CPlayerObj")
-            {
-                r.flags &= ~FLAG_SHADOW;
-                r.velocity = {};
-                r.hidden_nodes.clear();
-                r.payload.clear();
-                // Lot 5 (observed, not listed there): the client attach resets the acceleration a
-                // moving player had, and the restored player's first update restarts its clip.
-                r.acceleration = {};
-                r.animation = 0;
-                r.animation_time = 0;
-                r.animation_looping = r.animation_done = r.animation_first = false;
-            }
+        save_rewrites::apply(records);
     }
     bool same(DVector a, DVector b)
     {
@@ -1284,6 +1261,7 @@ namespace
                     return false;
                 }
             ++whole;
+            npc_restores += npcs > 0; // A world restored whole also restores its NPCs (lots 7 and 10).
             restored.push_back(name);
         }
         std::cout << entered << " of " << names.size() << " worlds entered, " << ai_worlds << " with lot-11 NPCs, "
