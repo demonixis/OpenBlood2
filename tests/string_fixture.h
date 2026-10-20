@@ -55,6 +55,58 @@ namespace test_strings
         w.b.insert(w.b.end(), r.b.begin(), r.b.end());
         return w;
     }
+    // Minimal PE with one named resource (e.g. TEXT/CREDITS) and `languages` language entries.
+    inline test_model::Writer text_pe(std::u16string_view type, std::u16string_view name, std::string_view payload,
+                                      unsigned languages = 1)
+    {
+        using test_model::Writer;
+        Writer r;
+        r.b.resize(16 + 8 + 16 + 8 + 16 + 8 * languages);
+        const unsigned names = 24, langs = 48;
+        r.patch(12, 1); // One named entry.
+        r.patch(20, 0x80000000 | names);
+        r.patch(names + 12, 1);
+        r.patch(names + 20, 0x80000000 | langs);
+        r.patch(langs + 12, languages << 16);
+        auto text = [&](std::u16string_view value)
+        {
+            const auto at = static_cast<unsigned>(r.b.size());
+            r.u16(static_cast<unsigned>(value.size()));
+            for (char16_t c : value)
+                r.u16(c);
+            return at;
+        };
+        r.patch(16, 0x80000000 | text(type));
+        r.patch(names + 16, 0x80000000 | text(name));
+        for (unsigned i = 0; i < languages; ++i)
+        {
+            const auto entry = static_cast<unsigned>(r.b.size());
+            r.b.resize(entry + 16);
+            r.patch(langs + 16 + 8 * i, 1033 + i);
+            r.patch(langs + 20 + 8 * i, entry);
+            r.patch(entry, 0x1000 + static_cast<unsigned>(r.b.size()));
+            r.patch(entry + 4, static_cast<unsigned>(payload.size()));
+            r.b.insert(r.b.end(), payload.begin(), payload.end());
+        }
+        Writer w;
+        w.b.resize(0x200);
+        w.b[0] = 'M';
+        w.b[1] = 'Z';
+        w.patch(60, 64);
+        w.patch(64, 0x4550);
+        w.patch(68, 0x10000 | 0x14c);
+        w.patch(84, 224);
+        w.patch(88, 0x10b);
+        w.patch(88 + 92, 16);
+        w.patch(88 + 112, 0x1000);
+        w.patch(88 + 116, static_cast<unsigned>(r.b.size()));
+        const unsigned section = 88 + 224;
+        w.patch(section + 12, 0x1000);
+        w.patch(section + 16, static_cast<unsigned>(r.b.size()));
+        w.patch(section + 20, 0x200);
+        w.b.insert(w.b.end(), r.b.begin(), r.b.end());
+        return w;
+    }
     inline bool mount(OpenBlood2::GameSession& g, const std::filesystem::path& root,
                       const std::vector<std::uint8_t>& bytes)
     {

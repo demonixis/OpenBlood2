@@ -1723,3 +1723,13 @@ shell records the original END/CREDITS roll flag. No original code is copied bey
 these rules; the CCredits text overlay is not imported. See the
 [contracts](../contracts/menu_contracts.md#credits-entry), the
 [report](reports/menu_credits.md) and the [source ledger](sources/menu_credits_sources.json).
+
+## Credits text roll (2026-10-20)
+
+`game/original/Credits.{h,cpp}` is a selective port of the original
+`ClientShellDLL/Credits.cpp` CCredit/CCredits roll (parsing, states, timers and keys)
+with owned strings and owner-held static state. The CreditsWin `FindResource` call is
+replaced by a data-only named-resource read in `engine/string_resources.cpp`. The
+font is a replacement (Dear ImGui's default font). See the
+[contracts](../contracts/menu_contracts.md#credits-roll-ccreditsccredit) and the
+[source ledger](sources/menu_credits_sources.json).

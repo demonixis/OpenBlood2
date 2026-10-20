@@ -8,6 +8,7 @@
 #include "game/original/CharacterProfiles.h"
 #include "game/original/MenuIds.h"
 #include "game/server_adapter.h"
+#include "string_fixture.h"
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlgpu3.h>
@@ -80,10 +81,10 @@ namespace
         menu.activate();
         CHECK(menu.page == MenuPage::Main && menu.take_command().action == MenuAction::Credits);
         menu.open(true);
-        CHECK(!menu.enabled(menu.items[3])); // In-world "lame" text credits are not ported.
+        CHECK(menu.enabled(menu.items[3])); // In a world the owner opens the text-only GS_CREDITS screen.
         menu.selected = 3;
         menu.activate();
-        CHECK(menu.take_command().action == MenuAction::None);
+        CHECK(menu.take_command().action == MenuAction::Credits);
         menu.open(false);
         menu.selected = 4;
         menu.activate();
@@ -304,6 +305,214 @@ namespace
         CHECK(!audio.ambient);
         return true;
     }
+    std::span<const std::uint8_t> bytes(std::string_view text)
+    {
+        return {reinterpret_cast<const std::uint8_t*>(text.data()), text.size()};
+    }
+    std::string_view line(const CCredits& credits, int credit, int string)
+    {
+        const auto* c = credits.GetCredit(credit);
+        const auto* s = c ? c->GetString(string) : nullptr;
+        return s ? std::string_view(*s) : std::string_view("<none>");
+    }
+    // Original CCredits/CCredit parsing, timers, keys and the TEXT resource reader (synthetic).
+    bool credits_text()
+    {
+        std::string error;
+        CCredits credits;
+        CHECK(!credits.IsInited() && credits.IsDone());
+        // "##" separators, leading newlines skipped, blank lines collapse, >TIME: hold override,
+        // ">TIME:" alone is text, the block after the last "##" is never added.
+        CHECK(credits.Init(bytes("A\r\n\r\nB  \r\n>TIME:1.5\r\n##\r\n\r\nC\n>TIME:\n>TIME:abc\n##D##tail"), CM_CREDITS,
+                           true, 640, &error));
+        CHECK(credits.IsInited() && !credits.IsDone() && credits.GetNumCredits() == 3);
+        CHECK(credits.GetCredit(0)->GetNumStrings() == 2 && line(credits, 0, 0) == "A" && line(credits, 0, 1) == "B  ");
+        CHECK(credits.GetCredit(0)->GetHoldTime() == 1.5f);
+        CHECK(credits.GetCredit(1)->GetNumStrings() == 2 && line(credits, 1, 1) == ">TIME:");
+        CHECK(credits.GetCredit(1)->GetHoldTime() == 0.f); // atof("abc"): not > 0, so the default hold applies.
+        CHECK(line(credits, 2, 0) == "D" && credits.font_width == 14 && credits.font_height == 22);
+        // ">END" ends parsing at its "##"; a NUL ends the resource; an empty first line is a string.
+        CHECK(credits.Init(bytes("\r\nX##>END##Y##"), CM_CREDITS, true, 640, &error) && credits.GetNumCredits() == 1);
+        CHECK(credits.GetCredit(0)->GetNumStrings() == 2 && line(credits, 0, 0).empty() && line(credits, 0, 1) == "X");
+        CHECK(credits.Init(bytes(std::string_view("P##\0Q##", 7)), CM_CREDITS, true, 640, &error) &&
+              credits.GetNumCredits() == 1);
+        // MAX_CREDIT_STRINGS 12 (a later >TIME: is also dropped) and MAX_CREDITS 256.
+        std::string many;
+        for (int i = 0; i < 14; ++i)
+            many += "L" + std::to_string(i) + "\n";
+        many += ">TIME:9\n##";
+        CHECK(credits.Init(bytes(many), CM_CREDITS, true, 640, &error));
+        CHECK(credits.GetCredit(0)->GetNumStrings() == 12 && line(credits, 0, 11) == "L11" &&
+              credits.GetCredit(0)->GetHoldTime() == -1.f && credits.dropped_strings == 3);
+        std::string hundreds;
+        for (int i = 0; i < 300; ++i)
+            hundreds += "x##";
+        CHECK(credits.Init(bytes(hundreds), CM_CREDITS, true, 640, &error));
+        CHECK(credits.GetNumCredits() == MAX_CREDITS && credits.dropped_credits == 44);
+        // Original fixed buffers overflow; the port fails explicitly with an inited, empty roll.
+        CHECK(!credits.Init(bytes(std::string(256, 'w') + "##"), CM_CREDITS, true, 640, &error) && !error.empty());
+        CHECK(credits.IsInited() && credits.GetNumCredits() == 0);
+        CHECK(!credits.Init(bytes(std::string(1024, 'w') + "##"), CM_CREDITS, true, 640, &error));
+        CHECK(credits.Init(bytes(std::string(255, 'w') + "##"), CM_CREDITS, true, 640, &error));
+        credits.Update(1);
+        CHECK(credits.drawn.credit == nullptr); // Empty Update is harmless.
+        CHECK(credits.Init(bytes("a##"), CM_CREDITS, true, 360, &error) && credits.font_height == 14);
+        CHECK(credits.Init(bytes("a##"), CM_CREDITS, true, 361, &error) && credits.font_height == 16);
+
+        // Clear-screen state machine: fade-in 0.5 s, hold (>TIME or 4 s), fade-out 0.4 s,
+        // hold-out 2 s; red ramp 0..1..0; then the next credit; endless wrap in CM_CREDITS.
+        CHECK(credits.Init(bytes("A\n>TIME:1.5\n##B##"), CM_CREDITS, true, 640, &error));
+        const auto* first = credits.GetCredit(0);
+        credits.Update(0.25f);
+        CHECK(first->GetState() == CS_FADEIN && !credits.drawn.credit && first->GetTimer() == 0.5f);
+        credits.Update(0.25f);
+        CHECK(credits.drawn.credit == first && credits.drawn.color == 0.5f);
+        credits.Update(0.25f);
+        CHECK(credits.drawn.color == 1.f && first->GetState() == CS_HOLDIN && first->GetTimer() == 1.5f);
+        credits.Update(1.f);
+        CHECK(credits.drawn.color == 1.f && first->GetTimer() == 0.5f);
+        credits.Update(0.5f);
+        CHECK(first->GetState() == CS_FADEOUT && first->GetTimer() == 0.4f);
+        credits.Update(0.1f);
+        CHECK(std::abs(credits.drawn.color - 0.75f) < 1e-6f);
+        credits.Update(1.f);
+        CHECK(credits.drawn.color == 0.f && first->GetState() == CS_HOLDOUT && first->GetTimer() == 2.f);
+        credits.Update(1.5f);
+        CHECK(!credits.drawn.credit && first->GetState() == CS_HOLDOUT);
+        credits.Update(0.5f);
+        CHECK(first->GetState() == CS_DONE && credits.GetCurrentCredit() == 0);
+        credits.Update(0.f);
+        CHECK(credits.GetCurrentCredit() == 1 && credits.GetCredit(1)->GetState() == CS_START);
+        credits.Update(0.f);
+        credits.Update(0.5f);
+        credits.Update(0.f);
+        CHECK(credits.GetCredit(1)->GetState() == CS_HOLDIN && credits.GetCredit(1)->GetTimer() == 4.f);
+        // Return/Space/PgDn: next credit straight to HOLDIN; the last wraps to the first.
+        credits.HandleInput(CREDITS_VK_RETURN);
+        CHECK(credits.GetCurrentCredit() == 0 && first->GetState() == CS_HOLDIN && first->GetTimer() == 1.5f);
+        credits.HandleInput(CREDITS_VK_NEXT);
+        CHECK(credits.GetCurrentCredit() == 1);
+        credits.HandleInput(CREDITS_VK_SPACE);
+        CHECK(credits.GetCurrentCredit() == 0 && !credits.IsDone());
+        // Speed keys scale the frame time; Pause freezes it; Escape only sets the done flag.
+        for (int i = 0; i < 40; ++i)
+            credits.HandleInput(CREDITS_VK_UP);
+        CHECK(credits.GetSpeed() >= MAX_CREDITS_SPEED - 1e-4f && credits.GetSpeed() < MAX_CREDITS_SPEED + .2f);
+        for (int i = 0; i < 40; ++i)
+            credits.HandleInput(CREDITS_VK_DOWN);
+        CHECK(credits.GetSpeed() <= MIN_CREDITS_SPEED + 1e-4f && credits.GetSpeed() > MIN_CREDITS_SPEED - .2f);
+        credits.HandleInput(CREDITS_VK_HOME);
+        CHECK(credits.GetSpeed() == 1.f);
+        credits.HandleInput(CREDITS_VK_UP);
+        credits.HandleInput(CREDITS_VK_UP);
+        credits.HandleInput(CREDITS_VK_UP);
+        credits.HandleInput(CREDITS_VK_UP);
+        credits.HandleInput(CREDITS_VK_UP);
+        const float speed = credits.GetSpeed(), before = first->GetTimer();
+        credits.Update(0.125f);
+        CHECK(std::abs(first->GetTimer() - (before - 0.125f * speed)) < 1e-5f);
+        credits.HandleInput(CREDITS_VK_PAUSE);
+        CHECK(credits.IsPaused());
+        credits.Update(0.5f);
+        CHECK(std::abs(first->GetTimer() - (before - 0.125f * speed)) < 1e-5f && credits.drawn.credit == first);
+        credits.HandleInput(CREDITS_VK_PAUSE);
+        credits.HandleInput(CREDITS_VK_ESCAPE);
+        CHECK(credits.IsDone() && !credits.IsPaused());
+        // Re-init resets speed and pause.
+        credits.HandleInput(CREDITS_VK_PAUSE);
+        CHECK(credits.Init(bytes("A##"), CM_CREDITS, true, 640, &error) && credits.GetSpeed() == 1.f &&
+              !credits.IsPaused());
+
+        // Roll over the world: the fade-out stops at the 0.1 minimum.
+        CHECK(credits.Init(bytes("A##B##"), CM_CREDITS, false, 640, &error) && !credits.IsClearingScreen());
+        credits.HandleInput(CREDITS_VK_RETURN);
+        credits.HandleInput(CREDITS_VK_RETURN); // Back to credit 0 in HOLDIN (4 s default).
+        CHECK(first->GetState() == CS_HOLDIN && first->GetTimer() == 4.f);
+        credits.Update(4.f);
+        CHECK(first->GetState() == CS_FADEOUT);
+        credits.Update(0.375f);
+        CHECK(credits.drawn.color == 0.1f && first->GetState() == CS_HOLDOUT && first->GetTimer() == 2.f);
+
+        // Intro mode keys: only the HOLDIN fade-out request; it finishes after the last credit.
+        CHECK(credits.Init(bytes("A##"), CM_INTRO, true, 640, &error));
+        credits.HandleInput(CREDITS_VK_UP);
+        credits.HandleInput(CREDITS_VK_RETURN);
+        CHECK(credits.GetSpeed() == 1.f && first->GetState() == CS_START);
+        for (int i = 0; i < 4; ++i)
+            credits.Update(0.5f);
+        CHECK(first->GetState() == CS_HOLDIN);
+        credits.HandleInput(CREDITS_VK_SPACE);
+        CHECK(first->GetState() == CS_FADEOUT);
+        credits.Term();
+        CHECK(!credits.IsInited() && credits.GetNumCredits() == 0);
+
+        // Vertical layout: CCredit::Draw centers the block; each string centered on its line.
+        CHECK(credit_line_center(240, 1, 0, 22, 4) == 240 && credit_line_center(240, 2, 0, 22, 4) == 227 &&
+              credit_line_center(240, 2, 1, 22, 4) == 253 && credit_line_center(240, 3, 0, 22, 4) == 214);
+
+        // Named TEXT resource reader: data only, case-insensitive names, single language.
+        const std::string payload = "Name\r\n>TIME:2\r\n##\r\n>END\r\n";
+        auto pe = test_strings::text_pe(u"TEXT", u"CREDITS", payload);
+        std::vector<std::uint8_t> text;
+        CHECK(read_named_resource(pe.b, "text", "Credits", text, error));
+        CHECK(std::string(text.begin(), text.end()) == payload);
+        CHECK(credits.Init(text, CM_CREDITS, true, 640, &error) && credits.GetNumCredits() == 1 &&
+              credits.GetCredit(0)->GetHoldTime() == 2.f);
+        CHECK(!read_named_resource(pe.b, "TEXT", "INTRO", text, error) && text.empty() && !error.empty());
+        CHECK(!read_named_resource(pe.b, "BITMAP", "CREDITS", text, error));
+        CHECK(!read_named_resource(test_strings::text_pe(u"TEXT", u"CREDITS", payload, 2).b, "TEXT", "CREDITS", text,
+                                   error));
+        CHECK(!read_named_resource(test_strings::text_pe(u"TEXT", u"CR\u00c9DITS", payload).b, "TEXT", "CREDITS", text,
+                                   error));
+        for (std::size_t i = 0; i < pe.b.size(); ++i)
+            CHECK(!read_named_resource(std::span(pe.b).first(i), "TEXT", "CREDITS", text, error));
+        auto bad = pe;
+        bad.patch(0x200 + 98, 0x10); // Data entry RVA (after the 72-byte directories and two names) before the section.
+        CHECK(!read_named_resource(bad.b, "TEXT", "CREDITS", text, error));
+
+        // Input: roll keys are queued for CCredits as well as the game; GS_CREDITS consumes them.
+        Menu menu;
+        MenuInput input;
+        input.controls.focused = true;
+        SDL_Event key{};
+        key.type = SDL_EVENT_KEY_DOWN;
+        key.key.windowID = 7;
+        key.key.scancode = SDL_SCANCODE_UP;
+        input.roll_credits = true;
+        input.event(key, 7, menu, true, true, false, 640, 480);
+        key.key.scancode = SDL_SCANCODE_PAGEDOWN;
+        key.key.repeat = true;
+        input.event(key, 7, menu, true, true, false, 640, 480);
+        CHECK(input.credit_keys == std::vector<int>({CREDITS_VK_UP, CREDITS_VK_NEXT}) && !input.paused(menu));
+        input.credit_keys.clear();
+        key.key.repeat = false;
+        key.key.scancode = SDL_SCANCODE_ESCAPE;
+        input.event(key, 7, menu, true, true, false, 640, 480);
+        CHECK(menu.active && input.credit_keys == std::vector<int>({CREDITS_VK_ESCAPE}) && !input.credits_exit);
+        // Keys still reach the roll from the in-world menu, like the original OnKeyDown.
+        input.credit_keys.clear();
+        key.key.scancode = SDL_SCANCODE_HOME;
+        input.event(key, 7, menu, true, true, false, 640, 480);
+        CHECK(input.credit_keys == std::vector<int>({CREDITS_VK_HOME}));
+        menu.close();
+        input.credit_keys.clear();
+        input.roll_credits = false;
+        input.credits_screen = true;
+        CHECK(input.paused(menu));
+        key.key.scancode = SDL_SCANCODE_SPACE;
+        input.event(key, 7, menu, true, true, false, 640, 480);
+        key.key.scancode = SDL_SCANCODE_W;
+        input.event(key, 7, menu, true, true, false, 640, 480);
+        key.key.scancode = SDL_SCANCODE_ESCAPE;
+        input.event(key, 7, menu, true, true, false, 640, 480);
+        CHECK(input.credit_keys == std::vector<int>({CREDITS_VK_SPACE}) && input.credits_exit && !menu.active);
+        SDL_Event focus{};
+        focus.type = SDL_EVENT_WINDOW_FOCUS_LOST;
+        focus.window.windowID = 7;
+        input.event(focus, 7, menu, true, true, false, 640, 480);
+        CHECK(!menu.active); // Focus loss does not stack the menu over GS_CREDITS.
+        return true;
+    }
     // Menu Credits -> original MenuCredits world request -> custom-type entry into the credits world.
     bool credits(const std::filesystem::path& content)
     {
@@ -328,15 +537,67 @@ namespace
         CHECK(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_DIFFICULTY")) == DIFFICULTY_MEDIUM);
         CHECK(game->startup.accepted && game->startup.player_entered && game->startup.unknown == 0 &&
               game->startup.failed == 0);
+        // The installed cres.dll TEXT/CREDITS: 87 credits before ">END"; IDS_CREDITSFONT (206)
+        // names the GDI font the original requested.
+        {
+            std::vector<std::uint8_t> dll, text;
+            StringResources strings;
+            CHECK(game->resources.read("cres.dll", dll, error) &&
+                  read_named_resource(dll, "TEXT", "CREDITS", text, error));
+            CHECK(read_string_resources(dll, strings, error) && strings.strings.at(IDS_CREDITSFONT) == "Arial");
+            CCredits parsed;
+            CHECK(parsed.Init(text, CM_CREDITS, true, 640, &error) && parsed.GetNumCredits() == 87);
+            CHECK(parsed.dropped_credits == 0 && parsed.dropped_strings == 0);
+            CHECK(parsed.GetCredit(0)->GetNumStrings() == 1 && line(parsed, 0, 0) == " " &&
+                  parsed.GetCredit(0)->GetHoldTime() == 0.1f);
+            CHECK(line(parsed, 1, 0) == "Blood 2: The Chosen" &&
+                  line(parsed, 1, 1) == "is powered/transfused by LithTech" &&
+                  parsed.GetCredit(1)->GetHoldTime() == 4.f);
+            CHECK(line(parsed, 86, 0) == "Monolith still rulez!!!" && parsed.GetCredit(86)->GetHoldTime() == 5.f);
+            int strings_total = 0;
+            for (int i = 0; i < parsed.GetNumCredits(); ++i)
+            {
+                strings_total += parsed.GetCredit(i)->GetNumStrings();
+                CHECK(parsed.GetCredit(i)->GetHoldTime() > 0); // Every installed block sets >TIME.
+            }
+            CHECK(strings_total > 87 * 2);
+        }
+        // Roll over the credits world: Init on the first frame, then two CCredits::Update
+        // calls per frame (GS_PLAYING branch and the post-RenderCamera [blg] call).
+        auto& roll = game->client_shell.m_Credits;
+        CHECK(!roll.IsInited());
         const auto time = game->objects.time();
-        for (int i = 0; i < 300; ++i)
+        CHECK(step_app_session(*game, 1. / 60));
+        CHECK(roll.IsInited() && !roll.IsClearingScreen() && roll.GetNumCredits() == 87 && roll.updates == 1 &&
+              roll.font_name == "Arial" && game->client_shell.credits_failures == 0);
+        CHECK(step_app_session(*game, 1. / 60) && roll.updates == 3);
+        // Credit 0: 0.5 s fade-in + 0.1 s hold + 0.4 s fade-out (0.1 floor) + 2 s hold-out,
+        // at double rate: about 1.5 s of play, then credit 1 fades in.
+        bool drew_second = false;
+        for (int i = 0; i < 298; ++i)
+        {
             CHECK(step_app_session(*game, 1. / 60));
+            if (roll.drawn.credit == roll.GetCredit(1))
+            {
+                drew_second = true;
+                CHECK(roll.drawn.color >= 0 && roll.drawn.color <= 1);
+            }
+            CHECK(roll.drawn.credit == nullptr || roll.drawn.color >= 0.1f ||
+                  roll.drawn.credit->GetState() == CS_FADEIN);
+        }
+        CHECK(drew_second && roll.GetCurrentCredit() >= 1 && roll.updates == 599);
         CHECK(game->objects.time() > time + 4.9 && game->client_shell.m_bInWorld);
+        // In-world menu Credits: the text-only screen re-inits the same CCredits with a clear.
+        CHECK(game->client_shell.InitCredits(true, error) && roll.IsClearingScreen() && roll.GetCurrentCredit() == 0);
+        roll.Update(1.f / 60);
+        CHECK(roll.GetCredit(0)->GetState() == CS_FADEIN);
+        roll.Term(); // Esc: Term; the next play frame starts the roll from the first credit.
+        CHECK(step_app_session(*game, 1. / 60) && roll.IsInited() && !roll.IsClearingScreen() && roll.updates == 1);
         auto* player = game->server_shell.Player(game->local_client);
         CHECK(player && !player->m_damage.IsDead());
         // Original Esc in the credits world opens the in-world main menu; Resume returns to it.
         menu.open(true, true);
-        CHECK(menu.active && menu.page == MenuPage::Main && !menu.enabled(menu.items[3]));
+        CHECK(menu.active && menu.page == MenuPage::Main && menu.enabled(menu.items[3]));
         menu.back();
         CHECK(!menu.active && menu.take_command().action == MenuAction::Resume);
         // The Credits request keeps the current configured character (no SetCharacterInfo).
@@ -346,8 +607,8 @@ namespace
         CHECK(start.character == 2);
         // Failures are explicit and retain the current session.
         auto* previous = game.get();
-        CHECK(!GameSession::start_new_game(game, "Credits", 1, 0, error, false, GAMETYPE_BLOODBATH) &&
-              !error.empty() && game.get() == previous);
+        CHECK(!GameSession::start_new_game(game, "Credits", 1, 0, error, false, GAMETYPE_BLOODBATH) && !error.empty() &&
+              game.get() == previous);
         start.world = "missing-credits-world";
         CHECK(!start_menu_world(game, start, error) && !error.empty() && game.get() == previous);
         WorldMessage message;
@@ -514,6 +775,8 @@ int main(int argc, char** argv)
         return test_menu_preferences(argc - 1, argv + 1);
     if (mode == "state")
         return state() ? 0 : 1;
+    if (mode == "credits_text")
+        return credits_text() ? 0 : 1;
     if (argc < 3)
         return 2;
     if (mode == "profiles")

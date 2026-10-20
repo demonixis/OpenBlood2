@@ -66,7 +66,7 @@ progress, and every one is recorded.
 | # | Task | Status |
 | --- | --- | --- |
 | 3.1 | Every mounted world opens (all-level audit) | 52 / 58. UndeadGideon, AncientOne/Tentacle and FlagStand are in progress on the Linux computer. |
-| 3.2 | Menu Credits entry opens the `credits` world | Done: original custom-type request, Esc returns to the menu ([report](implementation/reports/menu_credits.md)). The CCredits text overlay is not ported yet. |
+| 3.2 | Menu Credits entry opens the `credits` world | Done: original custom-type request, the CCredits text roll from cres.dll over the world, and the in-world text-only credits screen ([report](implementation/reports/menu_credits.md)). The font is a replacement. |
 | 3.3 | Save/load: the original slots, Quicksave/Quickload and Restart rows on the existing screens, and whole-world plus player serialization | Partial building blocks: the original CInventoryMgr, CDestructable and player field Save/Load used for level transitions. The screens are disabled. |
 | 3.4 | Campaign chaining: every authored NEW_LEVEL/EndEpisode in order, with KeepAlive inventory and stats | SubwayA → CityHub has a scripted test. The user has played the rest without a recorded result. |
 | 3.5 | Bosses and endgame: Gideon, EnhancedGideon, UndeadGideon, AncientOne, End script, credits | Gideon and EnhancedGideon work. The others are blocked on 3.1. |

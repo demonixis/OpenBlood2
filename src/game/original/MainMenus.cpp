@@ -148,10 +148,6 @@ namespace OpenBlood2
                 case MENU_CMD_BLOODBATH:
                     item.enabled = demo();
                     break;
-                case MENU_CMD_CREDITS:
-                    // Retail in-world MenuCredits shows the text-only "lame" credits, which are not ported.
-                    item.enabled = demo() || !in_world;
-                    break;
                 case -1:
                 case MENU_CMD_CUSTOM_LEVEL:
                 case MENU_CMD_CUSTOMIZE_CONTROLS:
@@ -290,8 +286,8 @@ namespace OpenBlood2
             case MENU_CMD_CREDITS:
                 if (demo())
                     show_promotion(MenuPromotion::Info);
-                else if (!in_world)
-                    pending_.action = MenuAction::Credits; // The owner starts the credits world.
+                else
+                    pending_.action = MenuAction::Credits; // Owner: credits world, or text credits in a world.
                 break;
             case MENU_CMD_START_ACTION:
                 if (demo())

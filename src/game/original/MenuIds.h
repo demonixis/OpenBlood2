@@ -1,5 +1,6 @@
 #pragma once
 // Selected original identifiers from Shared/ClientRes.h and ClientShellDLL/MenuCommands.h.
+inline constexpr unsigned IDS_CREDITSFONT = 206;
 inline constexpr unsigned IDS_MENU_MAIN_SINGLEPLAYER = 500;
 inline constexpr unsigned IDS_MENU_MAIN_BLOODBATH = 501;
 inline constexpr unsigned IDS_MENU_MAIN_OPTIONS = 502;

@@ -1,8 +1,9 @@
 # Menu Credits entry
 
 Date: 2026-10-20. Roadmap task 3.2 (M3). The retail main menu's Credits row now
-opens the original `credits` world. M2 closure and its GPU reservation are
-unchanged; this does not accept M3.
+opens the original `credits` world, and the original CCredits text rolls over it.
+In a world the same row shows the original text-only credits screen. M2 closure
+and its GPU reservation are unchanged; this does not accept M3.
 
 ## What the original does
 
@@ -36,32 +37,65 @@ unchanged; this does not accept M3.
 - A refused request keeps the current session and shows the error on the menu.
 - The demo edition keeps its Prime Gibs promotion.
 
+## Text roll (follow-up, same day)
+
+- `game/original/Credits.{h,cpp}` ports CCredit/CCredits: `##` blocks, `>END`,
+  `>TIME:` hold override, 12 strings per block, 256 blocks, the fade/hold state
+  machine, the red ramp, the speed/pause/advance keys and the endless wrap. The
+  [contracts](../../contracts/menu_contracts.md#credits-roll-ccreditsccredit) list
+  every rule.
+- `read_named_resource` extends the bounded PE reader with named resource types
+  and names. The client shell reads `TEXT/CREDITS` from the mounted `cres.dll`
+  without executing code. The installed text has 87 blocks; `IDS_CREDITSFONT` is
+  `Arial`.
+- In the END and CREDITS worlds the roll is inited on the first frame and updated
+  twice per frame, as the original GS_PLAYING branch and its post-`RenderCamera`
+  call do. Over the world the fade-out stops at 10 % red.
+- In a world, the Credits row opens GS_CREDITS: play pauses, the screen is black,
+  the roll restarts with screen clearing, and Esc returns to play. Back in the
+  credits world the roll starts again from the first block.
+- The frontend draws the current block in the 640×480 menu viewport, below the
+  screen fade and the HUD. The font is a replacement (Dear ImGui's default font at
+  22 virtual pixels for the original GDI Arial 14×22); the warning that the overlay
+  was missing is removed.
+
 ## Remaining differences
 
 | Area | Status |
 | --- | --- |
-| CCredits text overlay | Not ported. It needs the cres.dll TEXT resource reader, a font and the CCredit fade/hold timers. The frontend logs a warning when a roll-credits world starts. |
-| In-world Credits row | Disabled. The text-only GS_CREDITS screen depends on the same overlay. |
+| Credits font | Replacement: ImGui's embedded font, not GDI Arial. The 14-pixel average width and GDI rasterization are not reproduced. |
+| Oversized credit text | The original overflowed its 256/1024-byte buffers; the port refuses such text explicitly. The installed text fits. |
+| Add-on and intro texts | `CREDITS_AO`/`INTRO`/`INTRO_AO` are not read; CM_INTRO is ported but unused. |
 | Custom-mode guards | Player death, NPC weapon drops and player restoration still refuse non-single modes explicitly. The credits world does not reach them in the tested run. |
 | Custom NEW_LEVEL | Refused. Custom levels that chain to another world remain unsupported. |
 
 ## Validation
 
 [Evidence](evidence/menu-credits-tests.log), macOS on Apple M5, Dev and
-inspector-free Release builds.
+inspector-free Release builds. The first section is the world entry; the second is
+the text roll follow-up.
 
-- `menus.state` checks that Credits is enabled outside a world and produces
-  `MenuAction::Credits`, and that it is disabled in a world.
-- `menus.credits` (private data, headless) checks the menu command, the request
-  mapping, entry into `worlds/credits.dat` with custom type and medium difficulty,
-  a clean startup report, the roll flag and five seconds of simulation with a
-  living player. It also checks the in-world menu and Resume, that the current
-  character is kept, and the explicit refusals: a multiplayer type, a missing world
-  and custom NEW_LEVEL syntax.
-- The full headless suites have 17 failures in both Dev and Release. The same 17
-  fail at the unmodified base commit `2936c87`, so this change adds none.
-- `--menu-smoke` passes on Metal. The in-world traversal is unchanged because
-  Credits stays disabled in a world.
+- `menus.state` checks that Credits is enabled and produces `MenuAction::Credits`
+  both outside and inside a world.
+- `menus.credits_text` (synthetic, headless) checks parsing (`##`, `>END`, NUL,
+  `>TIME:` with atof rules, blank lines, the 12-string and 256-block limits, the
+  explicit buffer refusals, screen-width font sizes), every state and its timers
+  and colors, the 0.1 floor over the world, speed limits, Pause, Return/Space/PgDn
+  advance and wrap, CM_INTRO keys, the vertical layout arithmetic, the named PE
+  resource reader (case, missing type/name, two languages, non-ASCII names,
+  truncation, a bad RVA) and the key routing for the roll and GS_CREDITS.
+- `menus.credits` (private data, headless) adds the installed `cres.dll` text (87
+  blocks, first/second/last block contents and hold times, `IDS_CREDITSFONT` =
+  `Arial`). In the credits world it checks Init on the first frame, two updates per
+  frame for 300 frames, the advance to the second block, the clear-screen re-init of
+  the in-world screen and the roll restart after Esc. The earlier world, menu and
+  refusal checks are unchanged.
+- The full headless suites still have the same 17 failures in Dev and Release as
+  the base commit; this change adds none.
+- `--menu-smoke` passes on Metal in Dev and Release. Its in-world step now presses
+  Down three times to pass the enabled Credits row before Quit. The demo traversal
+  passes unchanged.
 
-The interactive Credits selection was not driven through the SDL frontend. The
-headless test covers the same mapping and session call.
+The rendered overlay and the GS_CREDITS screen were not checked visually or driven
+through the SDL frontend. The headless tests cover the state, the key routing and
+the layout arithmetic; the ImGui drawing itself is untested.
