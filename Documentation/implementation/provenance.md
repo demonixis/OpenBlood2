@@ -1726,3 +1726,13 @@ with existing reasons and uses the existing single body integrator. Original
 console text is resolved but its overlay remains unavailable. Restoration checks
 also narrow the End no-op resize exception to an active contact transaction, so
 staged saved positions still receive collision validation.
+
+### Complete-level continuation: UndeadGideon
+
+Original profile, health publication, decisions, attacks, head-node fire and
+jump/dodge/recoil now use checked existing services. [Contracts](../contracts/undead_gideon_contracts.md)
+and [source hashes](sources/all_levels_undead_gideon_sources.json) record source
+quirks and limits. Complete-scene initial placement repeats the existing bounded
+solver after later source rows exist. Internal animation remainder roundoff is
+clamped without accepting invalid input clocks. Neither is claimed retail physics
+parity; reference/commercial data and graphics pipelines are unchanged.

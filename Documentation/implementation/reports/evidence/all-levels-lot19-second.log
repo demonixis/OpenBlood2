@@ -1,0 +1,30 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1198: undead_gideon.profiles
+1/6 Test #1198: undead_gideon.profiles ...........   Passed    0.03 sec
+    Start 1199: undead_gideon.decisions
+2/6 Test #1199: undead_gideon.decisions ..........   Passed    0.01 sec
+    Start 1200: undead_gideon.choices
+3/6 Test #1200: undead_gideon.choices ............   Passed    0.02 sec
+    Start 1201: undead_gideon.movement
+4/6 Test #1201: undead_gideon.movement ...........***Failed    0.01 sec
+movement:152: a->MC_Jump() && a->m_nCurMetacmd == 999 && a->m_bAnimating && a->Metacmd == phase
+
+    Start 1202: undead_gideon.fire
+5/6 Test #1202: undead_gideon.fire ...............   Passed    0.01 sec
+    Start 1203: undead_gideon.world
+6/6 Test #1203: undead_gideon.world ..............***Failed    0.12 sec
+
+
+67% tests passed, 2 tests failed out of 6
+
+Label Time Summary:
+headless         =   0.21 sec*proc (6 tests)
+private          =   0.21 sec*proc (6 tests)
+undead_gideon    =   0.21 sec*proc (6 tests)
+
+Total Test time (real) =   0.23 sec
+
+The following tests FAILED:
+	1201 - undead_gideon.movement (Failed)                   headless private undead_gideon
+	1203 - undead_gideon.world (Failed)                      headless private undead_gideon
+Errors while running CTest

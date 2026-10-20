@@ -108,6 +108,24 @@ namespace
             k.time = 0;
         CHECK(!advance_animation(m, track, 60, events, error));
         CHECK(track.time == before.time && events[0] == 42);
+        m.animations[0].duration = 300;
+        for (unsigned i = 0; i < 3; ++i)
+            m.animations[0].keys[i].time = i * 150;
+        track.reset();
+        std::array<unsigned, 3> emitted{};
+        for (unsigned frame = 0; frame < 1800; ++frame)
+        {
+            CHECK(advance_animation(m, track, 1. / 60, events, error));
+            CHECK(track.time >= 0 && track.time <= 300);
+            for (auto key : events)
+            {
+                CHECK(key < emitted.size());
+                ++emitted[key];
+            }
+        }
+        CHECK((emitted == std::array<unsigned, 3>{101, 100, 100}));
+        track.time = -1e-14; // Do not accept a corrupt input clock as rounding.
+        CHECK(!advance_animation(m, track, 1. / 60, events, error));
         return true;
     }
     std::function<void(BaseClass&, DDWORD, void*)> callback;

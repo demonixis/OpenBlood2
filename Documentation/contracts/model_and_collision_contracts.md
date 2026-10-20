@@ -18,6 +18,10 @@ This continuation implements engine services and two original classes. It does
 `CPlayerObj`. The Caleb preview is an inspection resource, never a substitute
 player object. `RunWorld` remains blocked.
 
+The [UndeadGideon continuation](undead_gideon_contracts.md) documents complete-scene
+initial actor separation and the internal animation-loop roundoff correction.
+Incoming invalid clocks and unresolved initial placement remain failures.
+
 ## ABC v6
 
 `engine/model.cpp` reads `MonolithExport Model File v6` through bounded,

@@ -1,0 +1,116 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+      Start    3: objects.builtin_model
+ 1/51 Test    #3: objects.builtin_model ............   Passed    0.00 sec
+      Start    4: objects.original_objects
+ 2/51 Test    #4: objects.original_objects .........   Passed    0.00 sec
+      Start    5: objects.nested_creation
+ 3/51 Test    #5: objects.nested_creation ..........   Passed    0.00 sec
+      Start    6: objects.reasons_properties
+ 4/51 Test    #6: objects.reasons_properties .......   Passed    0.00 sec
+      Start    7: objects.scheduling
+ 5/51 Test    #7: objects.scheduling ...............   Passed    0.00 sec
+      Start    8: objects.deferred_removal
+ 6/51 Test    #8: objects.deferred_removal .........   Passed    0.00 sec
+      Start    9: objects.aggregate_dispatch
+ 7/51 Test    #9: objects.aggregate_dispatch .......   Passed    0.00 sec
+      Start   10: objects.handles_selection
+ 8/51 Test   #10: objects.handles_selection ........   Passed    0.00 sec
+      Start   11: objects.links_lists
+ 9/51 Test   #11: objects.links_lists ..............   Passed    0.00 sec
+      Start   12: objects.messages_strings
+10/51 Test   #12: objects.messages_strings .........   Passed    0.00 sec
+      Start   13: objects.message_churn
+11/51 Test   #13: objects.message_churn ............   Passed    0.19 sec
+      Start   14: objects.message_limit
+12/51 Test   #14: objects.message_limit ............   Passed    0.04 sec
+      Start   15: objects.unsupported_teardown
+13/51 Test   #15: objects.unsupported_teardown .....   Passed    0.01 sec
+      Start   16: objects.creation_failures
+14/51 Test   #16: objects.creation_failures ........   Passed    0.01 sec
+      Start   85: services.animation_events
+15/51 Test   #85: services.animation_events ........   Passed    0.00 sec
+      Start   86: services.model_callbacks
+16/51 Test   #86: services.model_callbacks .........   Passed    0.00 sec
+      Start   91: services.contact_overlap
+17/51 Test   #91: services.contact_overlap .........   Passed    0.03 sec
+      Start   93: services.placement_service
+18/51 Test   #93: services.placement_service .......   Passed    0.00 sec
+      Start  468: ai_navigation.sample
+19/51 Test  #468: ai_navigation.sample .............   Passed    0.00 sec
+      Start  469: ai_navigation.clearance
+20/51 Test  #469: ai_navigation.clearance ..........   Passed    0.00 sec
+      Start  470: ai_navigation.parallel_axes
+21/51 Test  #470: ai_navigation.parallel_axes ......   Passed    0.00 sec
+      Start  471: ai_navigation.rays
+22/51 Test  #471: ai_navigation.rays ...............   Passed    0.00 sec
+      Start  472: ai_navigation.direct
+23/51 Test  #472: ai_navigation.direct .............   Passed    0.00 sec
+      Start  473: ai_navigation.detour
+24/51 Test  #473: ai_navigation.detour .............   Passed    0.00 sec
+      Start  474: ai_navigation.blocked
+25/51 Test  #474: ai_navigation.blocked ............   Passed    0.00 sec
+      Start  475: ai_navigation.limits
+26/51 Test  #475: ai_navigation.limits .............   Passed    0.01 sec
+      Start  476: ai_navigation.lifetime
+27/51 Test  #476: ai_navigation.lifetime ...........   Passed    0.01 sec
+      Start  477: ai_navigation.subway
+28/51 Test  #477: ai_navigation.subway .............   Passed    0.24 sec
+      Start  478: ai_navigation.cityhub_parallel
+29/51 Test  #478: ai_navigation.cityhub_parallel ...   Passed    0.39 sec
+      Start  499: ai_locomotion.dodge
+30/51 Test  #499: ai_locomotion.dodge ..............   Passed    0.00 sec
+      Start  500: ai_locomotion.rolls
+31/51 Test  #500: ai_locomotion.rolls ..............   Passed    0.00 sec
+      Start  501: ai_locomotion.obstruction
+32/51 Test  #501: ai_locomotion.obstruction ........   Passed    0.00 sec
+      Start  502: ai_locomotion.rays
+33/51 Test  #502: ai_locomotion.rays ...............   Passed    0.00 sec
+      Start  503: ai_locomotion.navigate
+34/51 Test  #503: ai_locomotion.navigate ...........   Passed    0.00 sec
+      Start  504: ai_locomotion.ledges
+35/51 Test  #504: ai_locomotion.ledges .............   Passed    0.00 sec
+      Start  505: ai_locomotion.walking
+36/51 Test  #505: ai_locomotion.walking ............   Passed    0.00 sec
+      Start  506: ai_locomotion.physics
+37/51 Test  #506: ai_locomotion.physics ............   Passed    0.00 sec
+      Start  507: ai_locomotion.moving_fire
+38/51 Test  #507: ai_locomotion.moving_fire ........   Passed    0.00 sec
+      Start  508: ai_locomotion.keys
+39/51 Test  #508: ai_locomotion.keys ...............   Passed    0.00 sec
+      Start  509: ai_locomotion.lifetime
+40/51 Test  #509: ai_locomotion.lifetime ...........   Passed    0.01 sec
+      Start  510: ai_locomotion.attacks
+41/51 Test  #510: ai_locomotion.attacks ............   Passed    0.00 sec
+      Start  511: ai_locomotion.catalog
+42/51 Test  #511: ai_locomotion.catalog ............   Passed    0.05 sec
+      Start 1198: undead_gideon.profiles
+43/51 Test #1198: undead_gideon.profiles ...........   Passed    0.08 sec
+      Start 1199: undead_gideon.decisions
+44/51 Test #1199: undead_gideon.decisions ..........   Passed    0.04 sec
+      Start 1200: undead_gideon.choices
+45/51 Test #1200: undead_gideon.choices ............   Passed    0.04 sec
+      Start 1201: undead_gideon.movement
+46/51 Test #1201: undead_gideon.movement ...........   Passed    0.03 sec
+      Start 1202: undead_gideon.fire
+47/51 Test #1202: undead_gideon.fire ...............   Passed    0.03 sec
+      Start 1203: undead_gideon.damage
+48/51 Test #1203: undead_gideon.damage .............   Passed    0.03 sec
+      Start 1204: undead_gideon.keys
+49/51 Test #1204: undead_gideon.keys ...............   Passed    0.03 sec
+      Start 1205: undead_gideon.placement
+50/51 Test #1205: undead_gideon.placement ..........   Passed    0.03 sec
+      Start 1206: undead_gideon.world
+51/51 Test #1206: undead_gideon.world ..............   Passed    5.05 sec
+
+100% tests passed, 0 tests failed out of 51
+
+Label Time Summary:
+ai_locomotion    =   0.10 sec*proc (13 tests)
+ai_navigation    =   0.68 sec*proc (11 tests)
+headless         =   6.49 sec*proc (51 tests)
+objects          =   0.29 sec*proc (14 tests)
+private          =   6.06 sec*proc (12 tests)
+services         =   0.04 sec*proc (4 tests)
+undead_gideon    =   5.38 sec*proc (9 tests)
+
+Total Test time (real) =   6.55 sec

@@ -1,0 +1,11 @@
+24_ancientcity: initial step dt=0.0001 failed
+Object: MoveObject starts penetrating geometry; depenetration is not implemented: Fanatic / Fanatic-Jerry (CDestructableModel / Box-ammo1, depth 1.49313, normal -0 -0 -1, at 1408 168.649 128)
+Session: Client StartNewWorld load-command excerpt -> CMSG_LOADWORLD (108)
+Session: Server LoadWorld read-order excerpt -> fresh single-player settings
+Session: REZ exact-path resolution -> DAT v56 structural validation
+Session: World properties -> original MID_PRECREATE / MID_INITIALUPDATE
+Session: Server PreStartWorld / PostStartWorld entry subset: path data copied; player entry available separately
+Session: Server OnClientEnterWorld -> CreatePlayer -> CPlayerObj InitialUpdate/Respawn -> GoToStartPoint
+Session: Client OnEnterWorld -> PLAYERINIT_SINGLEPLAYER -> SINGLEPLAYER_INIT -> original attribute/respawn subset
+Session: M2 is closed for the selected SubwayA-to-CityHub session with reservation M2-GPU-001. Whole-world saves and unexercised gameplay paths are not validated.
+Session: Original session startup validated; future simulation/resource requests remain checked

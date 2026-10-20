@@ -1,0 +1,122 @@
+UpdateCTestConfiguration  from :/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Parse Config file:/home/yann/projects/lithtech/Blood2/build/release/DartConfiguration.tcl
+Test project /home/yann/projects/lithtech/Blood2/build/release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 92
+      Start   92: services.animation_events
+
+92: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/services_tests "animation_events"
+92: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+92: Test timeout computed to be: 30
+ 1/11 Test   #92: services.animation_events ........   Passed    0.00 sec
+test 1320
+      Start 1320: undead_gideon.profiles
+
+1320: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/undead_gideon_tests "profiles" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1320: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1320: Test timeout computed to be: 240
+ 2/11 Test #1320: undead_gideon.profiles ...........   Passed    0.05 sec
+test 1321
+      Start 1321: undead_gideon.decisions
+
+1321: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/undead_gideon_tests "decisions" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1321: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1321: Test timeout computed to be: 240
+ 3/11 Test #1321: undead_gideon.decisions ..........   Passed    0.02 sec
+test 1322
+      Start 1322: undead_gideon.choices
+
+1322: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/undead_gideon_tests "choices" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1322: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1322: Test timeout computed to be: 240
+ 4/11 Test #1322: undead_gideon.choices ............   Passed    0.02 sec
+test 1323
+      Start 1323: undead_gideon.movement
+
+1323: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/undead_gideon_tests "movement" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1323: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1323: Test timeout computed to be: 240
+ 5/11 Test #1323: undead_gideon.movement ...........   Passed    0.02 sec
+test 1324
+      Start 1324: undead_gideon.fire
+
+1324: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/undead_gideon_tests "fire" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1324: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1324: Test timeout computed to be: 240
+ 6/11 Test #1324: undead_gideon.fire ...............   Passed    0.02 sec
+test 1325
+      Start 1325: undead_gideon.damage
+
+1325: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/undead_gideon_tests "damage" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1325: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1325: Test timeout computed to be: 240
+ 7/11 Test #1325: undead_gideon.damage .............   Passed    0.02 sec
+test 1326
+      Start 1326: undead_gideon.keys
+
+1326: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/undead_gideon_tests "keys" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1326: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1326: Test timeout computed to be: 240
+1326: UndeadGideon actual model-key shots=1
+ 8/11 Test #1326: undead_gideon.keys ...............   Passed    0.02 sec
+test 1327
+      Start 1327: undead_gideon.placement
+
+1327: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/undead_gideon_tests "placement" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1327: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1327: Test timeout computed to be: 240
+ 9/11 Test #1327: undead_gideon.placement ..........   Passed    0.02 sec
+test 1328
+      Start 1328: undead_gideon.world
+
+1328: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/undead_gideon_tests "world" "/home/yann/.steam/steam/steamapps/common/Blood II"
+1328: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1328: Test timeout computed to be: 240
+10/11 Test #1328: undead_gideon.world ..............   Passed    2.61 sec
+test 1329
+      Start 1329: gpu.undead_gideon
+
+1329: Test command: /home/yann/projects/lithtech/Blood2/build/release/tests/model_skinning_gpu_tests "/home/yann/projects/lithtech/Blood2/build/release/tests/undead-gideon" "/home/yann/.steam/steam/steamapps/common/Blood II" "undead"
+1329: Working Directory: /home/yann/projects/lithtech/Blood2/build/release/tests
+1329: Test timeout computed to be: 120
+1329: Synthetic mask 0 time 0: 3365/3365 filled, 0 differing, max delta 0
+1329: Synthetic mask 0 time 37.5: 3489/3489 filled, 0 differing, max delta 0
+1329: Synthetic mask 0 time 100: 3421/3421 filled, 0 differing, max delta 0
+1329: Synthetic mask 1 time 0: 1737/1737 filled, 0 differing, max delta 0
+1329: Synthetic mask 1 time 37.5: 1929/1929 filled, 0 differing, max delta 0
+1329: Synthetic mask 1 time 100: 1987/1987 filled, 0 differing, max delta 0
+1329: Synthetic mask 2 time 0: 1526/1526 filled, 0 differing, max delta 0
+1329: Synthetic mask 2 time 37.5: 1412/1412 filled, 0 differing, max delta 0
+1329: Synthetic mask 2 time 100: 1103/1103 filled, 0 differing, max delta 0
+1329: Retail CPU/GPU skinning equivalence: 1 distinct assets at three clip times, 3840 filled pixels, 0 differing by more than 1, max delta 0
+1329: GPU skinning matches CPU posing, deformation, scale, hidden faces and instance transforms
+11/11 Test #1329: gpu.undead_gideon ................   Passed    0.83 sec
+
+The following tests passed:
+	services.animation_events
+	undead_gideon.profiles
+	undead_gideon.decisions
+	undead_gideon.choices
+	undead_gideon.movement
+	undead_gideon.fire
+	undead_gideon.damage
+	undead_gideon.keys
+	undead_gideon.placement
+	undead_gideon.world
+	gpu.undead_gideon
+
+100% tests passed, 0 tests failed out of 11
+
+Label Time Summary:
+gpu              =   0.83 sec*proc (1 test)
+headless         =   2.80 sec*proc (10 tests)
+private          =   3.63 sec*proc (10 tests)
+services         =   0.00 sec*proc (1 test)
+undead_gideon    =   3.63 sec*proc (10 tests)
+
+Total Test time (real) =   3.66 sec

@@ -8,6 +8,7 @@
 #include "game/original/IshmaelAI.h"
 #include "game/original/Prophet.h"
 #include "game/original/SmellHint.h"
+#include "game/original/UndeadGideon.h"
 #include "inspector.h"
 #include <algorithm>
 #include <imgui.h>
@@ -617,6 +618,23 @@ namespace OpenBlood2
                         (unsigned long long)chosen->sidesteps);
             ImGui::Text("Distance %.2f | height %.2f | dodge flags 0x%x | command %d", chosen->crouch_attack_distance,
                         chosen->crouch_attack_height, unsigned(chosen->m_nDodgeFlags), chosen->m_nCurMetacmd);
+        }
+        if (const auto* boss = dynamic_cast<const UndeadGideon*>(target_ai);
+            boss && ImGui::CollapsingHeader("Original UndeadGideon", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::Text("Health %.3f / captured %.3f | ratio %.3f | create-health %s", boss->m_damage.m_fHitPoints,
+                        boss->m_fFullHealth, boss->boss_health_fraction, boss->m_bCreateHealth ? "yes" : "no");
+            ImGui::Text("Health requests %llu | queued %llu | no audience %llu",
+                        (unsigned long long)boss->health_requests, (unsigned long long)boss->health_deliveries,
+                        (unsigned long long)boss->health_no_client);
+            if (!boss->health_error.empty())
+                ImGui::TextWrapped("%s", boss->health_error.c_str());
+            ImGui::Text("Selected weapon %u | fire column %u | distance %.2f | height %.2f", boss->selected_weapon,
+                        boss->fire_column, boss->attack_distance, boss->attack_height);
+            ImGui::Text("Jumps %llu | dodges %llu | command %d", (unsigned long long)boss->jumps,
+                        (unsigned long long)boss->dodges, boss->m_nCurMetacmd);
+            ImGui::TextWrapped(
+                "Original own-class landing test retains jump command 999; dodge ends only on primary-world support.");
         }
         if (const auto* boss = dynamic_cast<const Gideon*>(target_ai);
             boss && ImGui::CollapsingHeader("Original Gideon combat actions", ImGuiTreeNodeFlags_DefaultOpen))

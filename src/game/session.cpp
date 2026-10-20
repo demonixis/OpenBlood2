@@ -303,6 +303,18 @@ namespace OpenBlood2
             entries.push_back(std::move(entry));
         }
         objects.finish_frame();
+        // Original source order initializes NPCs before some solid Model rows.
+        // Finish bounded initial placement against the complete scene before a
+        // first physics step; keep refused placement visible in source accounting.
+        for (auto& entry : entries)
+            if (auto* r = objects.get(entry.object); r && r->life == Life::Alive)
+                if (auto* ai = dynamic_cast<AI_Mgr*>(r->game.get()); ai && ai->RuntimeReady())
+                    if (server.ResolveInitialActorOverlap(r->handle) != DE_OK)
+                    {
+                        entry.state = EntryState::Failed;
+                        entry.detail = "NPC placement against the completed world failed";
+                        ai->RuntimeFailure(entry.detail);
+                    }
         if (!server_shell.PostStartWorld())
         {
             error = "Original shell path snapshot failed: " + server_shell.paths.error();

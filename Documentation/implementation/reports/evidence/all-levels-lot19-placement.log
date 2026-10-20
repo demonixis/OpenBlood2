@@ -1,0 +1,49 @@
+Test project /home/yann/projects/lithtech/Blood2/build/dev
+    Start 1198: undead_gideon.profiles
+1/6 Test #1198: undead_gideon.profiles ...........   Passed    0.03 sec
+    Start 1199: undead_gideon.decisions
+2/6 Test #1199: undead_gideon.decisions ..........   Passed    0.01 sec
+    Start 1200: undead_gideon.choices
+3/6 Test #1200: undead_gideon.choices ............   Passed    0.02 sec
+    Start 1201: undead_gideon.movement
+4/6 Test #1201: undead_gideon.movement ...........   Passed    0.01 sec
+    Start 1202: undead_gideon.fire
+5/6 Test #1202: undead_gideon.fire ...............   Passed    0.02 sec
+    Start 1203: undead_gideon.world
+6/6 Test #1203: undead_gideon.world ..............***Failed    0.21 sec
+Fanatic Fanatic-Jerry pos 1408,168.649,126.506 dims 17.7474,40.6481,17.7474
+CDestructableModel Box-ammo1 pos -640,-32.8036,-3200.31 dims 19.9755,9.89049,17.6611
+CDestructableModel Box-ammo1 pos 1312,137.891,160 dims 19.9755,9.89049,17.6611
+CDestructableModel Box-ammo1 pos 1376,160,160 dims 19.539,9.89049,15.7457
+CDestructableModel Box-ammo1 pos 1280,137.891,96 dims 15.7242,9.89049,19.5317
+CDestructableModel Box-ammo1 pos -640.146,-28.2694,-3136.16 dims 15.7672,9.89049,19.5464
+CDestructableModel Box-ammo1 pos -608,-8.48741,-3136 dims 19.7519,9.89049,19.1126
+CDestructableModel Box-ammo1 pos -704,-34.9629,-3200 dims 13.6257,9.89049,18.6391
+CDestructableModel Box-ammo1 pos -767.846,-33.0948,-3136.01 dims 13.6257,9.89049,18.6391
+CDestructableModel Box-ammo1 pos -624,137.891,2528 dims 15.7242,9.89049,19.5317
+CDestructableModel Box-ammo1 pos -656,157.672,2528 dims 19.9828,9.89049,17.7741
+CDestructableModel Box-ammo1 pos -640,177.454,2528 dims 19.4938,9.89049,15.6159
+CDestructableModel Box-ammo1 pos -576,137.891,2528 dims 19.8024,9.89049,19.0075
+CDestructableModel Box-ammo1 pos 1562.21,137.891,1394.35 dims 19.8024,9.89049,19.0075
+CDestructableModel Box-ammo1 pos 1522.89,137.891,1366.82 dims 15.7242,9.89049,19.5317
+CDestructableModel Box-ammo1 pos 1496.68,157.672,1348.47 dims 19.9828,9.89049,17.7741
+CDestructableModel Box-ammo1 pos 1509.79,177.454,1357.65 dims 19.4938,9.89049,15.6159
+CDestructableModel Box-ammo1 pos -2056,137.891,-438.431 dims 19.8024,9.89049,19.0075
+CDestructableModel Box-ammo1 pos -2032,137.891,-480 dims 15.7242,9.89049,19.5317
+CDestructableModel Box-ammo1 pos -2016,157.672,-507.713 dims 19.9828,9.89049,17.7741
+CDestructableModel Box-ammo1 pos -2024,177.454,-493.856 dims 19.4938,9.89049,15.6159
+Invalid animation time
+
+
+83% tests passed, 1 tests failed out of 6
+
+Label Time Summary:
+headless         =   0.31 sec*proc (6 tests)
+private          =   0.31 sec*proc (6 tests)
+undead_gideon    =   0.31 sec*proc (6 tests)
+
+Total Test time (real) =   0.33 sec
+
+The following tests FAILED:
+	1203 - undead_gideon.world (Failed)                      headless private undead_gideon
+Errors while running CTest

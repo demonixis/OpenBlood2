@@ -302,6 +302,22 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
         npc_armor = 0;
         npc_weapons[0] = "HAND_SQUEEZE";
     }
+    if (type == NPCType::UndeadGideon)
+    {
+        m_fHearingDist = m_fSmellingDist = 2000;
+        m_fSensingDist = 500;
+        m_fSeeingDist = 1000;
+        m_fWalkSpeed = 180;
+        m_fRunSpeed = 350;
+        m_fRollSpeed = 320;
+        m_fJumpSpeed = 360;
+        m_damage.apply_damage_physics = true; // Original CDestructable default; this boss does not disable it.
+        m_dwFlags = 0x2a;                     // JUMP | DODGE | ALWAYSRECOIL.
+        m_bCabal = false;
+        npc_hp = 12000;
+        npc_armor = 0;
+        npc_weapons = {"GIDEON_SPEAR", "SKULL", "GIDEON_VOMIT", "LIGHTNING", "BEHEMOTH_SHOCKWAVE"};
+    }
     if (type == NPCType::Gideon || type == NPCType::EnhancedGideon)
     {
         m_fHearingDist = 0;
@@ -420,6 +436,11 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
         model = "Models/Enemies/" + name + ".abc";
         skin = "Skins/Enemies/" + name + ".dtx";
     }
+    else if (npc_type == NPCType::UndeadGideon)
+    {
+        model = "Models/Enemies/Undead_Gideon.abc";
+        skin = "Skins/Enemies/Undead_Gideon.dtx";
+    }
     else if (npc_type == NPCType::Gideon || npc_type == NPCType::EnhancedGideon)
     {
         model = "Models/Enemies/gideon.abc";
@@ -531,28 +552,29 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     if (runtime_initialized || reason == INITIALUPDATE_SAVEGAME || !s->IsObjectAlive(m_hObject))
         return RuntimeFailure("Invalid or repeated NPC initialization");
     const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
-    const auto group = npc_type == NPCType::EnhancedGideon ? 26
-                       : npc_type == NPCType::Ishmael      ? 24
-                       : npc_type == NPCType::IshmaelREV   ? 25
-                       : npc_type == NPCType::Gabriella    ? 20
-                       : npc_type == NPCType::GabriellaREV ? 21
-                       : npc_type == NPCType::Ophelia      ? 22
-                       : npc_type == NPCType::OpheliaREV   ? 23
-                       : npc_type == NPCType::Caleb        ? 19
-                       : npc_type == NPCType::Behemoth     ? 15
-                       : npc_type == NPCType::DrudgePriest ? 16
-                       : npc_type == NPCType::DeathShroud  ? 17
-                       : npc_type == NPCType::TheHand      ? 18
-                       : npc_type == NPCType::Thief        ? 12
-                       : npc_type == NPCType::Naga         ? 13
-                       : npc_type == NPCType::Zealot       ? 14
-                       : npc_type == NPCType::BoneLeech    ? 10
-                       : npc_type == NPCType::DrudgeLord   ? 11
-                       : npc_type == NPCType::Gideon       ? 4
-                       : npc_type == NPCType::Fanatic      ? 5
-                       : npc_type == NPCType::Prophet      ? 6
-                       : npc_type == NPCType::SoulDrudge   ? 7
-                       : npc_type == NPCType::Shikari      ? 8
+    const auto group = npc_type == NPCType::UndeadGideon     ? 27
+                       : npc_type == NPCType::EnhancedGideon ? 26
+                       : npc_type == NPCType::Ishmael        ? 24
+                       : npc_type == NPCType::IshmaelREV     ? 25
+                       : npc_type == NPCType::Gabriella      ? 20
+                       : npc_type == NPCType::GabriellaREV   ? 21
+                       : npc_type == NPCType::Ophelia        ? 22
+                       : npc_type == NPCType::OpheliaREV     ? 23
+                       : npc_type == NPCType::Caleb          ? 19
+                       : npc_type == NPCType::Behemoth       ? 15
+                       : npc_type == NPCType::DrudgePriest   ? 16
+                       : npc_type == NPCType::DeathShroud    ? 17
+                       : npc_type == NPCType::TheHand        ? 18
+                       : npc_type == NPCType::Thief          ? 12
+                       : npc_type == NPCType::Naga           ? 13
+                       : npc_type == NPCType::Zealot         ? 14
+                       : npc_type == NPCType::BoneLeech      ? 10
+                       : npc_type == NPCType::DrudgeLord     ? 11
+                       : npc_type == NPCType::Gideon         ? 4
+                       : npc_type == NPCType::Fanatic        ? 5
+                       : npc_type == NPCType::Prophet        ? 6
+                       : npc_type == NPCType::SoulDrudge     ? 7
+                       : npc_type == NPCType::Shikari        ? 8
                        : npc_type == NPCType::MadScientist
                            ? 9
                            : (npc_type == NPCType::Cultist ? 0 : 2) + (male_group ? 0 : 1);
@@ -615,6 +637,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
                  : npc_type == NPCType::Zealot                                           ? "sounds/enemies/Zealot"
                  : npc_type == NPCType::BoneLeech                                        ? "sounds/enemies/boneleech"
                  : npc_type == NPCType::DrudgeLord                                       ? "sounds/enemies/drudgelord"
+                 : npc_type == NPCType::UndeadGideon   ? "sounds/enemies/Undead_Gideon"
                  : npc_type == NPCType::EnhancedGideon ? "sounds/enemies/EnhancedGideon"
                  : npc_type == NPCType::Gideon         ? "sounds/enemies/Gideon"
                  : npc_type == NPCType::Fanatic        ? "sounds/enemies/fanatic"
@@ -681,8 +704,9 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     m_damage.m_fMaxHitPoints = m_damage.m_fMaxMegaHitPoints = hp;
     m_damage.SetArmorPoints(npc_armor * difficulty);
     m_damage.m_fMaxArmorPoints = m_damage.m_fMaxNecroArmorPoints = npc_armor * difficulty;
-    m_fAIMass =
-        npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief || npc_type == NPCType::TheHand ? 125 : 250;
+    m_fAIMass = npc_type == NPCType::UndeadGideon                                                              ? 3000
+                : npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief || npc_type == NPCType::TheHand ? 125
+                                                                                                               : 250;
     m_damage.m_fMass = m_fAIMass;
     if (!s->ConfigureCharacterBody(m_hObject, m_damage.m_fMass, 5 + m_damage.m_fMass * 10 / 500))
         return RuntimeFailure("NPC mass/friction configuration failed");

@@ -124,13 +124,14 @@ class AI_Mgr : public CBaseCharacter
         OpheliaREV,
         Ishmael,
         IshmaelREV,
-        EnhancedGideon
+        EnhancedGideon,
+        UndeadGideon
     };
     static void ResetRuntimeTables();
     // Shared class/gender tables: Cultist m/f, Civilian m/f, Gideon, Fanatic, Prophet, SoulDrudge, Shikari,
     // MadScientist, BoneLeech, DrudgeLord, Thief, Naga, Zealot, Behemoth, Priest, Shroud, Hand, Caleb,
     // Gabriella/REV, Ophelia/REV and Ishmael/REV (six independent original static tables).
-    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 27>;
+    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 28>;
     // Original WeaponStrToInt prefixes; false for a matched family not integrated here.
     static bool WeaponStrToInt(std::string_view, DBYTE&);
     static void ExchangeRuntimeTables(RuntimeTables&);
@@ -228,7 +229,7 @@ class AI_Mgr : public CBaseCharacter
     bool tracked_position_valid = false;
     std::uint64_t tracked_changes = 0, tracked_invalidations = 0, escape_updates = 0;
     float escape_hint_dot = 0;
-    bool MC_Jump();
+    virtual bool MC_Jump();
     bool MC_Crouch();
     bool MC_Crawl();
     bool MC_Fire_Crawl();

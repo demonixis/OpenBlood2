@@ -9,17 +9,16 @@ initial deltas, three seconds of simulation with movement, a runtime failure
 recheck and resource cleanup. This is an opening/smoke gate, not full traversal,
 combat, multiplayer or GPU certification. M2 closure remains unchanged.
 
-Current verified opening gate after iteration 18: **52 / 58 pass, 6 / 58 fail**
-([audit 16](evidence/all-levels-audit-16.log)). Remaining worlds:
-Ancient City, Ancient One and the four CTF maps. Initial-entry and three-second simulation
+Current verified opening gate after iteration 19: **53 / 58 pass, 5 / 58 fail**
+([audit 17](evidence/all-levels-audit-17.log)). Remaining worlds:
+Ancient One and the four CTF maps. Initial-entry and three-second simulation
 coverage is not complete gameplay/traversal acceptance. The tables below retain
 the initial baseline; iteration records explain resolved and newly exposed blockers.
 
-## Remaining implementation queue after iteration 18
+## Remaining implementation queue after iteration 19
 
 | Worlds | Required original behavior |
 | --- | --- |
-| `24_ancientcity` | UndeadGideon profile/model/table, boss-health lifecycle, target decisions, attack choice, head-node fire, forward jump and lateral dodge/recoil. Spear/vomit and timed player imprisonment are implemented in iteration 18; Skull, lightning and shockwave use their existing implementations. |
 | `25_ancientone` | AncientOne and AncientOneTentacle profiles, health/target/attack states, original beam/tentacle weapons and effects, tentacle spawning/lifetime. |
 | `multi/ctf_cabana`, `multi/ctf_deadcities`, `multi/ctf_dmx`, `multi/ctf_jam` | FlagStand and FlagObject models/owned lifetime, touch/trigger handoff, player attachment, drop/death return, timed ground return and original capture/team conditions with truthful local inspection state. Network play is not supplied by the map-inspection entry mode. |
 | All 58 worlds | Repeat all-difficulty entry, simulation/runtime recheck and cleanup after each relevant correction; complete the GPU opening sweep once every map passes admission. Full campaign traversal remains a separate coverage limit. |
@@ -78,7 +77,6 @@ Counts are rejected source entries, not distinct implementations.
 | `21_laboratory` | 21_laboratory entry=583 class=CClientLightningSFX Class not ported: Required original class is not registered<br>21_laboratory entry=684 class=RotatingModel Class not ported: Required original class is not registered<br>21_laboratory: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services |
 | `22_office` | 22_office entry=177 class=CDestructableModel Creation failed: Model clip-zero dimensions unavailable: Model resource not mounted: modelsworldobjects\urinal2.abc<br>22_office entry=775 class=CDestructableBrush Creation failed: Rejected precreate: CDestructableBrush: SpawnObject not accepted: TheAngerPU<br>22_office: World initialization rejected: 0 unsupported classes, 2 failed entries, 0 unavailable services |
 | `23_rooftop` | 23_rooftop entry=244 class=EnhancedGideon Class not ported: Required original class is not registered<br>23_rooftop entry=252 class=OpheliaAI Class not ported: Required original class is not registered<br>23_rooftop entry=253 class=CalebAI Class not ported: Required original class is not registered<br>23_rooftop entry=259 class=LifeLeechPU Class not ported: Required original class is not registered<br>23_rooftop: World initialization rejected: 4 unsupported classes, 0 failed entries, 0 unavailable services |
-| `24_ancientcity` | 24_ancientcity entry=312 class=UndeadGideon Class not ported: Required original class is not registered<br>24_ancientcity entry=390 class=EnhancedGideon Class not ported: Required original class is not registered<br>24_ancientcity: World initialization rejected: 2 unsupported classes, 0 failed entries, 0 unavailable services |
 | `24b_arena` | 24b_arena entry=106 class=GabriellaREV Class not ported: Required original class is not registered<br>24b_arena entry=110 class=IshmaelREV Class not ported: Required original class is not registered<br>24b_arena entry=135 class=CClientLightningSFX Class not ported: Required original class is not registered<br>24b_arena entry=136 class=CClientLightningSFX Class not ported: Required original class is not registered<br>24b_arena entry=137 class=CClientLightningSFX Class not ported: Required original class is not registered<br>24b_arena entry=138 class=OpheliaREV Class not ported: Required original class is not registered<br>24b_arena entry=158 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena entry=159 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena entry=160 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena entry=227 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena entry=228 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena entry=229 class=CClientWarpGateSFX Class not ported: Required original class is not registered<br>24b_arena: World initialization rejected: 12 unsupported classes, 0 failed entries, 0 unavailable services |
 | `25_ancientone` | 25_ancientone entry=15 class=AncientOne Class not ported: Required original class is not registered<br>25_ancientone entry=16 class=LifeLeechPU Class not ported: Required original class is not registered<br>25_ancientone entry=22 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=23 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=24 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=25 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=26 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=27 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=28 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=29 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=117 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=118 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=119 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=120 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=121 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=122 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=123 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=124 class=AncientOneTentacle Class not ported: Required original class is not registered<br>25_ancientone entry=125 class=AncientOne Class not ported: Required original class is not registered<br>25_ancientone entry=157 class=CalebAI Class not ported: Required original class is not registered<br>25_ancientone entry=177 class=CClientLightningSFX Class not ported: Required original class is not registered<br>25_ancientone entry=178 class=CClientLightningSFX Class not ported: Required original class is not registered<br>25_ancientone entry=179 class=CClientLightningSFX Class not ported: Required original class is not registered<br>25_ancientone entry=180 class=CClientLightningSFX Class not ported: Required original class is not registered<br>25_ancientone entry=181 class=CClientLightningSFX Class not ported: Required original class is not registered<br>25_ancientone entry=202 class=IshmaelAI Class not ported: Required original class is not registered<br>25_ancientone entry=203 class=OpheliaAI Class not ported: Required original class is not registered<br>25_ancientone entry=204 class=GabriellaAI Class not ported: Required original class is not registered<br>25_ancientone: World initialization rejected: 28 unsupported classes, 0 failed entries, 0 unavailable services |
 | `credits` | credits entry=9 class=CalebAI Class not ported: Required original class is not registered<br>credits: World initialization rejected: 1 unsupported classes, 0 failed entries, 0 unavailable services |
@@ -749,3 +747,46 @@ commercial/reference data, shaders or dependencies and does not certify full
 campaign traversal or reopen M2.
 
 ![Original vomit trail](evidence/all-levels-vomit-flight.png)
+
+## Iteration 19: UndeadGideon and Ancient City
+
+[UndeadGideon](../../contracts/undead_gideon_contracts.md) now executes original
+profile, health, combat choices, actual animation-key fire, jump/dodge/recoil and
+damage impulses. [Audit 17](evidence/all-levels-audit-17.log) passes **53 / 58**,
+fails **5 / 58**. Ancient City passes all three difficulties and runtime/unload
+checks; Ancient One and four CTF maps remain in the current queue.
+
+[Initial](evidence/all-levels-lot19-initial.log) and
+[second](evidence/all-levels-lot19-second.log) failures exposed the port's disabled
+default damage impulses and movement fixtures that assumed grounded support
+without applying the real body position/velocity. The original enabled impulse
+setting is now explicit; the fixtures establish actual support.
+[Third-run diagnostics](evidence/all-levels-lot19-third.log),
+[object overlap evidence](evidence/all-levels-lot19-city-diagnosis.log) and
+[placement results](evidence/all-levels-lot19-placement.log) identify later solid
+rows overlapping earlier NPCs. Repeating the same bounded placement after all
+rows exist makes the [all-difficulty entry recheck](evidence/all-levels-lot19-city-recheck.log)
+pass. The constant-60-Hz test then exposed a separate
+[negative loop remainder](evidence/all-levels-lot19-clock-diagnosis.log); clamping
+only internal subtraction roundoff resolves it. The
+[focused rerun](evidence/all-levels-lot19-fourth.log) passes all ten checks.
+
+[51 Dev checks](evidence/all-levels-lot19-dev.log) and the same
+[51 Clang Debug ASan/UBSan checks with leak detection](evidence/all-levels-lot19-sanitizers.log) pass. They cover the nine new boss/placement/world
+cases, shared navigation/locomotion, animation events and object contracts.
+[Release](evidence/all-levels-lot19-release.log) passes ten headless checks plus
+GPU readback of the actual boss model/skin: three clip times, 3840 filled pixels,
+zero CPU/GPU differences. The capture was visually inspected. The
+[Release application](evidence/all-levels-ancientcity-gpu.log) opens Ancient City,
+renders three frames and exits successfully on NVIDIA RTX 3060.
+
+Both applications build. Commands: `cmake --build build/{dev,release,sanitize}`
+with the corresponding app/test targets, followed by CTest restricted to
+`undead_gideon`, selected `services`, `ai_navigation`, `ai_locomotion`, `objects`
+and the Release-only `gpu.undead_gideon` test.
+
+Initial failed logs remain failures. These checks do not certify full boss battles
+or campaign traversal, network play or GPU sanitizer qualification. No shader,
+dependency, reference source or commercial file was modified.
+
+![Undead Gideon](evidence/all-levels-undead-gideon.png)

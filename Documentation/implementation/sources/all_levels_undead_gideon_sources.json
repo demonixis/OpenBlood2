@@ -1,0 +1,25 @@
+{
+  "selection": "Original UndeadGideon profile, health, combat, head fire, jumping and dodging; original base damage-physics default",
+  "sources": [
+    {
+      "path": "sources/blood2/ObjectDLL/UndeadGideon.cpp",
+      "sha256": "3a5cea6dca2ee7481a15bac8e94d856a68296ccaa2becd685e0644eec9554737"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/UndeadGideon.h",
+      "sha256": "19ae2605f862d02ad33a36a39e81de982115fe9109478446ee05aa2993a6ba89"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.cpp",
+      "sha256": "05a1604d3b41223f0ddaf8bc77d66d00ea8886639e75b500cfea93e25115b7e7"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/AI_Mgr.h",
+      "sha256": "fa76aabb5bc2766a65f20a9288d34098c30739da626556777f338086a023c350"
+    },
+    {
+      "path": "sources/blood2/ObjectDLL/Destructable.cpp",
+      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462"
+    }
+  ]
+}

@@ -301,6 +301,80 @@ namespace OpenBlood2
         return DE_ERROR; // No partial correction commits.
     }
 
+    DRESULT ServerAdapter::ResolveInitialActorOverlap(HOBJECT h)
+    {
+        trace_service("ResolveInitialActorOverlap");
+        auto* r = objects_.get(h);
+        if (!r || r->life != Life::Alive || r->attachment || !collision || !collision_ready ||
+            !Objects::is_kind_of(r->type, objects_.find_class("AI_Mgr")) || !physics_vector(r->dimensions) ||
+            r->dimensions.x <= 0 || r->dimensions.y <= 0 || r->dimensions.z <= 0)
+            return DE_INVALIDPARAMS;
+        if (!(r->state.m_Flags & FLAG_SOLID))
+            return DE_OK;
+        // The same bounded face-adjacent placement used during ground entry also
+        // runs after all world objects exist. Later source rows can overlap an
+        // earlier actor; this is initialization only, never runtime depenetration.
+        const auto ids = objects_.snapshot();
+        CollisionHit contact;
+        const auto origin = r->state.m_Pos;
+        const auto query = sweep_scene(h, origin, origin, r->dimensions, contact, ids);
+        if (query == CollisionQuery::Invalid)
+            return DE_ERROR;
+        if (query == CollisionQuery::Hit && contact.start_solid && contact.object)
+        {
+            const auto* other = objects_.get(contact.object);
+            if (other && (other->character_body || other->state.m_ObjectType == OT_MODEL || other->world_model))
+            {
+                const auto combined = vector_add(r->dimensions, other->dimensions);
+                const auto center = object_bounds_center(*other);
+                std::vector<DVector> candidates{{center.x - combined.x - .001f, origin.y, origin.z},
+                                                {center.x + combined.x + .001f, origin.y, origin.z},
+                                                {origin.x, origin.y, center.z - combined.z - .001f},
+                                                {origin.x, origin.y, center.z + combined.z + .001f}};
+                if (!other->character_body)
+                {
+                    candidates.push_back({origin.x, center.y + combined.y + .001f, origin.z});
+                    candidates.push_back({origin.x, center.y - combined.y - .001f, origin.z});
+                }
+                auto distance = [&](DVector p)
+                {
+                    const auto delta = vector_subtract(p, origin);
+                    return vector_dot(delta, delta);
+                };
+                std::stable_sort(candidates.begin(), candidates.end(),
+                                 [&](DVector a, DVector b) { return distance(a) < distance(b); });
+                const float limit = std::max({combined.x, combined.z, other->character_body ? 0.f : combined.y}) + .01f;
+                bool placed = false;
+                for (auto candidate : candidates)
+                {
+                    CollisionHit hit;
+                    const auto delta = vector_subtract(candidate, origin);
+                    // Shell interiors have no unique escape normal. Use the
+                    // nearest clear face-adjacent candidate, bounded by the
+                    // actor's dimensions rather than a potentially huge BSP.
+                    const bool shell_limit =
+                        other->world_model &&
+                        (std::hypot(delta.x, delta.z) > 2 * std::min(r->dimensions.x, r->dimensions.z) + .01f ||
+                         std::abs(delta.y) > r->dimensions.y + .01f);
+                    if (shell_limit || distance(candidate) > limit * limit ||
+                        sweep_scene(h, candidate, candidate, r->dimensions, hit, ids) != CollisionQuery::Miss ||
+                        sweep_scene(h, origin, candidate, r->dimensions, hit, ids, other->handle, .01,
+                                    StartOverlap::Leave) != CollisionQuery::Miss)
+                        continue;
+                    if (TeleportObject(h, &candidate) != DE_OK)
+                        return DE_ERROR;
+                    r->placement_nudge = vector_add(r->placement_nudge, vector_subtract(candidate, origin));
+                    ++r->placement_nudges;
+                    placed = true;
+                    break;
+                }
+                if (!placed)
+                    return DE_ERROR;
+            }
+        }
+        return DE_OK;
+    }
+
     DRESULT ServerAdapter::MoveObjectToGround(HOBJECT h)
     {
         trace_service("MoveObjectToGround");
@@ -324,70 +398,8 @@ namespace OpenBlood2
             // A refused nudge leaves the original MoveObject below to report the contact.
             ResolveInitialWorldOverlap(h);
         }
-        // Two authored Airship2 Fanatic3 entries share a spawn center. Separate only
-        // initially overlapping characters, without moving the older actor or changing
-        // their bodies. Four face-adjacent candidates, shortest first, are bounded by
-        // the two bodies' horizontal diameter; all geometry and the swept route must fit.
-        if (Objects::is_kind_of(r->type, objects_.find_class("AI_Mgr")))
-        {
-            const auto ids = objects_.snapshot();
-            CollisionHit contact;
-            const auto origin = r->state.m_Pos;
-            if (sweep_scene(h, origin, origin, r->dimensions, contact, ids) == CollisionQuery::Hit &&
-                contact.start_solid && contact.object)
-            {
-                const auto* other = objects_.get(contact.object);
-                if (other && (other->character_body || other->state.m_ObjectType == OT_MODEL || other->world_model))
-                {
-                    const auto combined = vector_add(r->dimensions, other->dimensions);
-                    const auto center = object_bounds_center(*other);
-                    std::vector<DVector> candidates{{center.x - combined.x - .001f, origin.y, origin.z},
-                                                    {center.x + combined.x + .001f, origin.y, origin.z},
-                                                    {origin.x, origin.y, center.z - combined.z - .001f},
-                                                    {origin.x, origin.y, center.z + combined.z + .001f}};
-                    if (!other->character_body)
-                    {
-                        candidates.push_back({origin.x, center.y + combined.y + .001f, origin.z});
-                        candidates.push_back({origin.x, center.y - combined.y - .001f, origin.z});
-                    }
-                    auto distance = [&](DVector p)
-                    {
-                        const auto delta = vector_subtract(p, origin);
-                        return vector_dot(delta, delta);
-                    };
-                    std::stable_sort(candidates.begin(), candidates.end(),
-                                     [&](DVector a, DVector b) { return distance(a) < distance(b); });
-                    const float limit =
-                        std::max({combined.x, combined.z, other->character_body ? 0.f : combined.y}) + .01f;
-                    bool placed = false;
-                    for (auto candidate : candidates)
-                    {
-                        CollisionHit hit;
-                        const auto delta = vector_subtract(candidate, origin);
-                        // Shell interiors have no unique escape normal. Use the
-                        // nearest clear face-adjacent candidate, bounded by the
-                        // actor's dimensions rather than a potentially huge BSP.
-                        const bool shell_limit =
-                            other->world_model &&
-                            (std::hypot(delta.x, delta.z) > 2 * std::min(r->dimensions.x, r->dimensions.z) + .01f ||
-                             std::abs(delta.y) > r->dimensions.y + .01f);
-                        if (shell_limit || distance(candidate) > limit * limit ||
-                            sweep_scene(h, candidate, candidate, r->dimensions, hit, ids) != CollisionQuery::Miss ||
-                            sweep_scene(h, origin, candidate, r->dimensions, hit, ids, other->handle, .01,
-                                        StartOverlap::Leave) != CollisionQuery::Miss)
-                            continue;
-                        if (TeleportObject(h, &candidate) != DE_OK)
-                            return DE_ERROR;
-                        r->placement_nudge = vector_add(r->placement_nudge, vector_subtract(candidate, origin));
-                        ++r->placement_nudges;
-                        placed = true;
-                        break;
-                    }
-                    if (!placed)
-                        return DE_ERROR;
-                }
-            }
-        }
+        if (Objects::is_kind_of(r->type, objects_.find_class("AI_Mgr")) && ResolveInitialActorOverlap(h) != DE_OK)
+            return DE_ERROR;
         auto from = r->state.m_Pos;
         auto to = from;
         to.y = -10000000.0f;

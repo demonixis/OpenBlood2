@@ -612,7 +612,10 @@ namespace OpenBlood2
                 return false;
             }
             next.first = false;
-            remaining -= stop - next.time;
+            // The rounded endpoint can be a few ULPs farther than remaining.
+            // Never carry a negative remainder into the next loop (e.g. a
+            // 300 ms clip stepped at 60 Hz). Incoming invalid clocks still fail.
+            remaining = std::max(0.0, remaining - (stop - next.time));
             next.time = stop;
             if (next.time < a.duration)
                 break;

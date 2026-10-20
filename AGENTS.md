@@ -1,5 +1,7 @@
 # Blood2 Project Instructions
 
+The [UndeadGideon continuation](Documentation/contracts/undead_gideon_contracts.md) adds the original boss, health/combat and jump/dodge rules. Preserve original landing/relaunch behavior, enabled impulses and real model-key fire. Completed-scene placement repeats the bounded initial separation; loop-clock roundoff clamps only internal remainder, never invalid inputs. Audit 17 passes 53/58; Ancient One/Tentacle and four CTF maps remain. M2 closure is unchanged.
+
 The [Undead Gideon weapon prerequisites](Documentation/contracts/gideon_weapons_contracts.md) add original spear/vomit, real trail/damage and typed timed player imprisonment with saved relative clocks. Preserve non-refreshing hits, strict expiry and independent movement gates. The End unchanged-dimensions exception now applies only inside a movement transaction; staged saved positions retain collision validation. All-level audit 16 remains 52/58; the boss classes and CTF behavior stay pending. M2 closure is unchanged.
 
 The [EnhancedGideon continuation](Documentation/contracts/enhanced_gideon_contracts.md) shares equivalent original Gideon algorithms while preserving its independent table, profile, health timing, close-facing and scripted no-fire/gravity/movement branches. Keep actual shots/effects distinct from intentional suppression. The complete-level audit now passes 52/58; UndeadGideon, AncientOne/Tentacle and CTF behavior remain. M2 closure is unchanged.

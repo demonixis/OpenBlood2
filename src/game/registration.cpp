@@ -74,6 +74,7 @@
 #include "game/original/Thief.h"
 #include "game/original/Trigger.h"
 #include "game/original/TripLaser.h"
+#include "game/original/UndeadGideon.h"
 #include "game/original/VolumeBrush.h"
 #include "game/original/WeaponPickups.h"
 #include "game/original/WorldModelDebris.h"
@@ -780,6 +781,11 @@ namespace OpenBlood2
             &ai_manager,
             construct_npc<Gideon, AI_Mgr::NPCType::Gideon>,
             {{"RandomHitPoints", 0.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Enhanced", false}}};
+        const ClassInfo undead_gideon{
+            "UndeadGideon",
+            &ai_manager,
+            construct_npc<UndeadGideon, AI_Mgr::NPCType::UndeadGideon>,
+            {{"RandomHitPoints", 50.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{70, 88, 70}}}};
         const ClassInfo enhanced_gideon{
             "EnhancedGideon",
             &ai_manager,
@@ -1302,48 +1308,49 @@ namespace OpenBlood2
                objects.register_class(skull_projectile) && objects.register_class(campaign_Thief) &&
                objects.register_class(campaign_Naga) && objects.register_class(campaign_ZealotAI) &&
                objects.register_class(cultist) && objects.register_class(civilian) && objects.register_class(gideon) &&
-               objects.register_class(enhanced_gideon) && objects.register_class(fanatic) &&
-               objects.register_class(prophet) && objects.register_class(bone_leech) &&
-               objects.register_class(drudge_lord) && objects.register_class(soul_drudge) &&
-               objects.register_class(shikari) && objects.register_class(mad_scientist) &&
-               objects.register_class(player) && objects.register_class(particle_system) &&
-               objects.register_class(polygrid) && objects.register_class(volume) && objects.register_class(water) &&
-               objects.register_class(blood) && objects.register_class(acid) && objects.register_class(ladder) &&
-               objects.register_class(conveyor) && objects.register_class(damage) &&
-               objects.register_class(minefield) && objects.register_class(freefall) &&
-               objects.register_class(trigger) && objects.register_class(key_pickup) &&
-               objects.register_class(pickup) && objects.register_class(item_pickup) &&
-               objects.register_class(item_weapon) && objects.register_class(proximity_pickup) &&
-               objects.register_class(remote_pickup) && objects.register_class(charged_pickup) &&
-               objects.register_class(medkit_pickup) && objects.register_class(flashlight_pickup) &&
-               objects.register_class(eye_pickup) && objects.register_class(goggles_pickup) &&
-               objects.register_class(binoculars_pickup) && objects.register_class(weapon_pickup) &&
-               objects.register_class(bugspray_pickup) && objects.register_class(beretta_pickup) &&
-               objects.register_class(assault_pickup) && objects.register_class(flare_pickup) &&
-               objects.register_class(tesla_pickup) && objects.register_class(voodoo_pickup) &&
-               objects.register_class(shotgun_pickup) && objects.register_class(singularity_pickup) &&
-               objects.register_class(mac10_pickup) && objects.register_class(campaign_HowitzerPU) &&
-               objects.register_class(campaign_NapalmCannonPU) && objects.register_class(campaign_DeathRayPU) &&
-               objects.register_class(campaign_TimeBombPU) && objects.register_class(sniper_pickup) &&
-               objects.register_class(minigun_pickup) && objects.register_class(ammo_pickup) &&
-               objects.register_class(powerup_pickup) && objects.register_class(health_base) &&
-               objects.register_class(armor_base) && objects.register_class(bullet_ammo) &&
-               objects.register_class(shell_ammo) && objects.register_class(bmg_ammo) &&
-               objects.register_class(flare_ammo) && objects.register_class(diebugdie_ammo) &&
-               objects.register_class(howitzer_ammo) && objects.register_class(fuel_ammo) &&
-               objects.register_class(battery_ammo) && objects.register_class(health_pickup) &&
-               objects.register_class(megahealth_pickup) && objects.register_class(enhancement_base) &&
-               objects.register_class(anger_pickup) && objects.register_class(revenant_pickup) &&
-               objects.register_class(stealth_pickup) && objects.register_class(willpower_pickup) &&
-               objects.register_class(ward_pickup) && objects.register_class(necroward_pickup) &&
-               objects.register_class(exit_trigger) && objects.register_class(objectives_trigger) &&
-               objects.register_class(conversation_trigger) && objects.register_class(big_trigger) &&
-               objects.register_class(toggle_trigger) && objects.register_class(door) &&
-               objects.register_class(rotating_door) && objects.register_class(destructable_brush) &&
-               objects.register_class(destructable_model) && objects.register_class(rotating_brush) &&
-               objects.register_class(rotating_model) && objects.register_class(world_debris) &&
-               objects.register_class(hand_model) && objects.register_class(gib) && objects.register_class(corpse) &&
-               objects.register_class(proximity) && objects.register_class(remote) && objects.register_class(grenade) &&
+               objects.register_class(enhanced_gideon) && objects.register_class(undead_gideon) &&
+               objects.register_class(fanatic) && objects.register_class(prophet) &&
+               objects.register_class(bone_leech) && objects.register_class(drudge_lord) &&
+               objects.register_class(soul_drudge) && objects.register_class(shikari) &&
+               objects.register_class(mad_scientist) && objects.register_class(player) &&
+               objects.register_class(particle_system) && objects.register_class(polygrid) &&
+               objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
+               objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
+               objects.register_class(damage) && objects.register_class(minefield) &&
+               objects.register_class(freefall) && objects.register_class(trigger) &&
+               objects.register_class(key_pickup) && objects.register_class(pickup) &&
+               objects.register_class(item_pickup) && objects.register_class(item_weapon) &&
+               objects.register_class(proximity_pickup) && objects.register_class(remote_pickup) &&
+               objects.register_class(charged_pickup) && objects.register_class(medkit_pickup) &&
+               objects.register_class(flashlight_pickup) && objects.register_class(eye_pickup) &&
+               objects.register_class(goggles_pickup) && objects.register_class(binoculars_pickup) &&
+               objects.register_class(weapon_pickup) && objects.register_class(bugspray_pickup) &&
+               objects.register_class(beretta_pickup) && objects.register_class(assault_pickup) &&
+               objects.register_class(flare_pickup) && objects.register_class(tesla_pickup) &&
+               objects.register_class(voodoo_pickup) && objects.register_class(shotgun_pickup) &&
+               objects.register_class(singularity_pickup) && objects.register_class(mac10_pickup) &&
+               objects.register_class(campaign_HowitzerPU) && objects.register_class(campaign_NapalmCannonPU) &&
+               objects.register_class(campaign_DeathRayPU) && objects.register_class(campaign_TimeBombPU) &&
+               objects.register_class(sniper_pickup) && objects.register_class(minigun_pickup) &&
+               objects.register_class(ammo_pickup) && objects.register_class(powerup_pickup) &&
+               objects.register_class(health_base) && objects.register_class(armor_base) &&
+               objects.register_class(bullet_ammo) && objects.register_class(shell_ammo) &&
+               objects.register_class(bmg_ammo) && objects.register_class(flare_ammo) &&
+               objects.register_class(diebugdie_ammo) && objects.register_class(howitzer_ammo) &&
+               objects.register_class(fuel_ammo) && objects.register_class(battery_ammo) &&
+               objects.register_class(health_pickup) && objects.register_class(megahealth_pickup) &&
+               objects.register_class(enhancement_base) && objects.register_class(anger_pickup) &&
+               objects.register_class(revenant_pickup) && objects.register_class(stealth_pickup) &&
+               objects.register_class(willpower_pickup) && objects.register_class(ward_pickup) &&
+               objects.register_class(necroward_pickup) && objects.register_class(exit_trigger) &&
+               objects.register_class(objectives_trigger) && objects.register_class(conversation_trigger) &&
+               objects.register_class(big_trigger) && objects.register_class(toggle_trigger) &&
+               objects.register_class(door) && objects.register_class(rotating_door) &&
+               objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
+               objects.register_class(rotating_brush) && objects.register_class(rotating_model) &&
+               objects.register_class(world_debris) && objects.register_class(hand_model) &&
+               objects.register_class(gib) && objects.register_class(corpse) && objects.register_class(proximity) &&
+               objects.register_class(remote) && objects.register_class(grenade) &&
                objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
                objects.register_class(tesla_projectile) && objects.register_class(tesla_bolt) &&
                objects.register_class(tesla_ball) && objects.register_class(napalm_projectile) &&
