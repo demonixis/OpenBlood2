@@ -1,5 +1,6 @@
 #include "engine/resources.h"
 #include "engine/formats/reader.h"
+#include "engine/sha256.h"
 #include <algorithm>
 #include <array>
 #include <fstream>
@@ -12,7 +13,8 @@ namespace OpenBlood2
     {
         constexpr std::size_t header_size = 168, max_metadata = 32 * 1024 * 1024;
         using Read = std::function<bool(std::uint32_t, std::size_t, std::vector<std::uint8_t>&)>;
-        bool index_rez(std::uint64_t length, const Read& read, std::vector<Resource>& output, std::string& error)
+        bool index_rez(std::uint64_t length, const Read& read, std::vector<Resource>& output, std::string& error,
+                       Sha256Digest* digest)
         {
             output.clear();
             error.clear();
@@ -24,6 +26,9 @@ namespace OpenBlood2
                 error = "REZ: invalid/truncated v1 header";
                 return false;
             }
+            // The directory digest covers the header, then every directory block in visit order.
+            Sha256 hash;
+            hash.update(header);
             Reader h(std::span<const std::uint8_t>(header).subspan(127));
             if (h.u32() != 1)
             {
@@ -53,6 +58,7 @@ namespace OpenBlood2
                 std::vector<std::uint8_t> data;
                 if (!read(offset, size, data))
                     return false;
+                hash.update(data);
                 Reader r(data);
                 while (r.good() && r.remaining())
                 {
@@ -102,6 +108,8 @@ namespace OpenBlood2
                 return false;
             }
             output = std::move(entries);
+            if (digest)
+                *digest = hash.finish();
             return true;
         }
         bool file_read(std::ifstream& file, std::uint32_t offset, std::size_t size, std::vector<std::uint8_t>& out)
@@ -146,7 +154,8 @@ namespace OpenBlood2
         }
         return true;
     }
-    bool read_rez(std::span<const std::uint8_t> bytes, std::vector<Resource>& entries, std::string& error)
+    bool read_rez(std::span<const std::uint8_t> bytes, std::vector<Resource>& entries, std::string& error,
+                  Sha256Digest* directory_digest)
     {
         return index_rez(
             bytes.size(),
@@ -157,9 +166,9 @@ namespace OpenBlood2
                 out.assign(bytes.begin() + off, bytes.begin() + off + n);
                 return true;
             },
-            entries, error);
+            entries, error, directory_digest);
     }
-    bool Resources::mount(const std::filesystem::path& path, std::string& error)
+    bool Resources::mount(const std::filesystem::path& path, std::string& error, MountRole role)
     {
         if (mounts_.size() >= 32)
         {
@@ -175,7 +184,9 @@ namespace OpenBlood2
             error = "REZ: cannot open " + path_text(path);
             return false;
         }
-        if (!index_rez(size, [&](auto off, auto n, auto& out) { return file_read(file, off, n, out); }, entries, error))
+        Sha256Digest digest{};
+        const auto read_range = [&](auto off, auto n, auto& out) { return file_read(file, off, n, out); };
+        if (!index_rez(size, read_range, entries, error, &digest))
             return false;
         // Only publish a complete validated index. Later mounts replace exact paths.
         for (auto& e : entries)
@@ -186,7 +197,7 @@ namespace OpenBlood2
                 e.overrides = found->second.overrides + 1;
             index_.insert_or_assign(e.path, e);
         }
-        mounts_.push_back({path, entries.size()});
+        mounts_.push_back({path, entries.size(), role, size, digest});
         return true;
     }
     bool Resources::mount_game(const Config& config, std::string& error)
@@ -291,7 +302,7 @@ namespace OpenBlood2
                     return false;
                 }
             }
-            if (!next.mount(canonical, error))
+            if (!next.mount(canonical, error, MountRole::Mod))
                 return false;
             mounted.push_back(std::move(canonical));
         }

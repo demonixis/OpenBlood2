@@ -1,4 +1,5 @@
 #include "game/menu_preferences.h"
+#include "engine/atomic_file.h"
 #include <SDL3/SDL.h>
 #include <algorithm>
 #include <array>
@@ -120,16 +121,6 @@ namespace OpenBlood2
             error = "Preferences out of range";
             return false;
         }
-        std::error_code ec;
-        std::filesystem::create_directories(path.parent_path(), ec);
-        if (ec)
-        {
-            error = "Cannot create preferences directory: " + ec.message();
-            return false;
-        }
-        // A unique sibling prevents partial readers and collisions between running instances.
-        const auto temp =
-            path.parent_path() / (path_text(path.filename()) + ".tmp-" + std::to_string(SDL_GetTicksNS()));
         const std::array<int, names.size()> values{2,
                                                    settings.sound,
                                                    settings.music,
@@ -139,18 +130,10 @@ namespace OpenBlood2
                                                    settings.invert_y,
                                                    settings.detail,
                                                    settings.pixel_lighting};
-        std::ofstream out(temp, std::ios::binary | std::ios::trunc);
+        std::string text;
         for (unsigned i = 0; i < values.size(); ++i)
-            out << names[i] << '=' << values[i] << '\n';
-        out.flush();
-        const bool written = bool(out);
-        out.close();
-        if (!written || out.fail() || !SDL_RenamePath(path_text(temp).c_str(), path_text(path).c_str()))
-        {
-            error = "Cannot atomically write preferences: " + std::string(SDL_GetError());
-            std::filesystem::remove(temp, ec);
-            return false;
-        }
-        return true;
+            text += std::string(names[i]) + '=' + std::to_string(values[i]) + '\n';
+        return write_file_atomic(
+            path, std::span(reinterpret_cast<const std::uint8_t*>(text.data()), text.size()), "preferences", error);
     }
 } // namespace OpenBlood2

@@ -1,7 +1,8 @@
 # Save and load
 
-Status: **design contract for roadmap task 3.3; nothing in it is implemented yet.**
-The Save and Load screens stay disabled until the lots below land. The
+Status: **design contract for roadmap task 3.3. Lot 2 (container and fingerprint) is
+implemented, see its [evidence](../implementation/reports/save_load_container.md); the other
+lots are pending.** The Save and Load screens stay disabled until the lots below land. The
 [audit](../implementation/save_load_audit/readme.md) is the evidence for every
 original rule cited here; its [source ledger](../implementation/sources/save_load_audit_sources.json)
 records the audited files. Read [level replacement](level_change_contracts.md),
@@ -26,7 +27,7 @@ Out of scope:
 - Multiplayer and CTF saves. The original disables the menu save item and the
   F5/F6 keys there; OpenBlood2 refuses all of them.
 - Saves in the demo edition (the original compiles them out; see
-  [open decisions](#open-decisions)).
+  [decisions](#decisions)).
 - Nightmares content.
 - Converting the existing NEW_LEVEL transfer to the save path before it is
   proven equivalent (lot 15).
@@ -229,15 +230,71 @@ behavior unless a departure is recorded.
 | Mismatch | Result |
 | --- | --- |
 | Container or section version newer than the build | Refused |
+| Any other container or section version | Refused; there is no migration before 1.0 (decision 6) |
 | World DAT digest differs from the mounted file | Refused; object records and BSP bindings depend on the exact DAT |
 | A class in the file is unregistered, or its payload version differs | Refused, naming the classes |
 | Edition differs | Refused |
-| Mount set or effective index differs (mods added, removed or changed) | Policy is [open decision 5](#open-decisions); the default is refusal with the difference shown |
+| Mount set or effective index differs (mods added, removed or changed) | Refused, listing every added, removed or changed archive (decision 5) |
 
 Directory-block digests reuse metadata the REZ reader already reads and bound.
 They do not detect a same-size in-place content change, which the
 [world contracts](world_contracts.md) already exclude. Whole-archive hashing is
 not required.
+
+All differences are reported together in one refusal, so the menu can show them.
+
+### Version-1 encodings
+
+Lot 2 implements the container in `src/engine/save_file.*` and the fingerprint in
+`src/engine/save_fingerprint.*`; both are engine code with no game dependency.
+
+- **Header.** 24 bytes: the 8-byte magic, `u32` container version, `u32` section
+  count (8, or 9 with `AUTO`) and `u64` total length, which must equal the file
+  size. The header has no CRC; every field is checked exactly.
+- **Tags** are their four ASCII bytes in file order; `END` is written `"END "`.
+- **CRC** is the standard reflected CRC-32 (zlib, check value `0xCBF43926`) over
+  the section's tag, version, length and payload.
+- **Read order.** For each section: known tag, expected position, length within the
+  section bound, length within the remaining bytes, CRC, then version. A version
+  edit therefore reads as a CRC failure unless the CRC was also recomputed.
+- **Section bounds.** META 4 KiB, FPRT 64 KiB, CONS 280,580 bytes (256 maximal
+  pairs), CLCK 16 KiB, OBJS the 64 MiB file bound, LINK and ATCH 16 MiB each,
+  AUTO 32 MiB, END 0. Lot 3 may tighten the opaque CLCK, OBJS, LINK and ATCH
+  payloads; lot 2 stores them as bounded bytes.
+- **Payloads are exact.** A section parser must consume its whole payload.
+- **META.** `u8` kind (0 slot, 1 quick, 2 level entry), `u8` slot (0–7 for a slot,
+  else 0), display name (1–255 bytes), `u64` UTC seconds, world path (a
+  normalized resource path, ≤ 1,024 bytes), world title (≤ 255), `u32` game type
+  (SINGLE, ACTION or CUSTOM only), `u32` character (0–3), `u32` difficulty (0–3),
+  version text (1–64 bytes), binary64 simulated seconds (finite, nonnegative).
+- **FPRT.** `u8` edition (0 retail, 1 demo); `u32` mount count (1–32) and per mount
+  `u8` role (0 base, 1 mod), normalized archive filename (never a host path), `u64`
+  archive size and the 32-byte directory digest; the 32-byte index and world
+  digests; `u32` class count (≤ 1,024) and per class its name (1–64 bytes,
+  strictly ascending byte order) and `u32` payload version (≥ 1); then the
+  32-byte class schema digest, which must match the list.
+- **CONS.** `u32` pair count, then name and value strings; names are unique and
+  keep file order.
+- **AUTO** holds the complete level-entry container bytes. Its META kind must be
+  level entry and it has no `AUTO`. A top-level level-entry file cannot carry one.
+- **Directory digest.** SHA-256 of the 168-byte REZ header followed by every
+  directory block in the reader's visit order, computed while indexing.
+- **Index digest.** SHA-256 of `u32` entry count, then per entry in path order:
+  `u32` path length, path, `u32` mount ordinal, `u32` offset, `u32` size. Host
+  paths never enter it.
+- **World digest.** SHA-256 of the DAT bytes read through the mounted index.
+- **Class schema digest.** SHA-256 of `u32` count, then per class `u32` name
+  length, name and `u32` payload version.
+- **Refusal categories.** Every failure carries one of: file error, bound,
+  truncated, format, version, CRC, section order or fingerprint, plus a message.
+  The menu shows them for unreadable slots.
+- **META quick read** reads the header and the META section only (at most
+  4,140 bytes from disk) and still checks the declared length against the file size.
+- **Atomic replacement.** `write_file_atomic` creates the parent directory, writes a
+  unique `<name>.tmp-<ticks>` sibling and renames it over the target; any failure
+  removes the temporary and keeps the previous file. Preferences use the same
+  helper with unchanged bytes and messages. Save files also opt in to removing
+  stale temporaries of the same file after a successful rename.
 
 ## Engine and game responsibilities
 

@@ -30,6 +30,13 @@ int test_menu_preferences(int argc, char** argv)
     CHECK(save_menu_preferences(path, settings, error));
     MenuSettings loaded;
     CHECK(load_menu_preferences(path, loaded, error) && loaded == settings);
+    {
+        // The shared atomic writer keeps the exact preference bytes.
+        std::ifstream in(path, std::ios::binary);
+        const std::string bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+        CHECK(bytes == "version=2\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
+                       "invert_y=1\ndetail=2\npixel_lighting=0\n");
+    }
     settings.sound = true;
     CHECK(save_menu_preferences(path, settings, error));
     CHECK(load_menu_preferences(path, loaded, error) && loaded == settings);
@@ -73,7 +80,10 @@ int test_menu_preferences(int argc, char** argv)
     invalid.sensitivity = 99;
     CHECK(!save_menu_preferences(path, invalid, error));
     CHECK(load_menu_preferences(path, loaded, error) && loaded == settings);
-    CHECK(!save_menu_preferences(path / "impossible.cfg", settings, error));
+    CHECK(!save_menu_preferences(path / "impossible.cfg", settings, error) &&
+          error.starts_with("Cannot create preferences directory: "));
+    for (const auto& entry : std::filesystem::directory_iterator(root))
+        CHECK(path_text(entry.path().filename()).find(".tmp-") == std::string::npos);
     MovementControls input;
     input.focused = input.enabled = input.mouse_captured = true;
     PlayerRotation angle;

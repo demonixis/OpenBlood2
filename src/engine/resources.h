@@ -1,5 +1,6 @@
 #pragma once
 #include "engine/config.h"
+#include "engine/sha256.h"
 #include <map>
 #include <span>
 
@@ -12,19 +13,29 @@ namespace OpenBlood2
         std::uint32_t offset = 0, size = 0;
         unsigned overrides = 0;
     };
+    enum class MountRole : std::uint8_t
+    {
+        Base = 0, // An edition archive mounted by mount_game, or any direct mount.
+        Mod = 1   // A data-only overlay archive.
+    };
     struct Mount
     {
         std::filesystem::path path;
         std::size_t entries = 0;
+        MountRole role = MountRole::Base;
+        std::uint64_t size = 0; // Archive size when indexed.
+        // SHA-256 of the 168-byte header and every directory block in visit order (save fingerprint).
+        Sha256Digest directory_digest{};
     };
     bool resource_path(std::string_view input, std::string& output);
     // REZ v1 index. The input is a whole synthetic archive in tests; production
     // uses bounded directory reads from disk without retaining the archive payload.
-    bool read_rez(std::span<const std::uint8_t> bytes, std::vector<Resource>& entries, std::string& error);
+    bool read_rez(std::span<const std::uint8_t> bytes, std::vector<Resource>& entries, std::string& error,
+                  Sha256Digest* directory_digest = nullptr);
     class Resources
     {
       public:
-        bool mount(const std::filesystem::path& path, std::string& error);
+        bool mount(const std::filesystem::path& path, std::string& error, MountRole role = MountRole::Base);
         bool mount_game(const Config& config, std::string& error);
         const Resource* find(std::string_view path) const;
         bool read(std::string_view path, std::vector<std::uint8_t>& bytes, std::string& error) const;

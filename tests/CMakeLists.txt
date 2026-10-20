@@ -38,6 +38,14 @@ foreach(case IN ITEMS membership callbacks churn)
     set_tests_properties(object_snapshots.${case} PROPERTIES LABELS "headless;objects" TIMEOUT 30)
 endforeach()
 
+add_executable(save_file_tests save_file_tests.cpp)
+target_link_libraries(save_file_tests PRIVATE engine)
+blood2_project_options(save_file_tests)
+foreach(case IN ITEMS digests golden roundtrip truncation bitflips bounds versions order fingerprint atomic fuzz)
+    add_test(NAME save_file.${case} COMMAND save_file_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/save-file")
+    set_tests_properties(save_file.${case} PROPERTIES LABELS "headless;save" TIMEOUT 60)
+endforeach()
+
 add_executable(config_tests config_tests.cpp)
 add_test(NAME cli.launcher_info COMMAND "${CMAKE_COMMAND}" "-DGAME=$<TARGET_FILE:blood2_app>"
     "-DROOT=${CMAKE_CURRENT_BINARY_DIR}/launcher-info" -P "${CMAKE_CURRENT_SOURCE_DIR}/launcher/info_test.cmake")

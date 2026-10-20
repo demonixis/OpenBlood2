@@ -9,6 +9,7 @@ accepted with open GPU reservation **M2-GPU-001**. M3 remains unaccepted.
 | Crypt / Bridge / Entrance / Lobby | [Contract](../contracts/later_levels_contracts.md) / [source ledger](sources/later_levels_sources.json) |
 | Per-world gaps and implementation batches | [Level gaps](level_gaps.md) |
 | Save/load audit (original classes, shells, LithTech engine, OpenBlood2 map) | [Audit](save_load_audit/readme.md) / [contract](../contracts/save_load_contracts.md) / [source ledger](sources/save_load_audit_sources.json) |
+| Save/load lot 2 (container and fingerprint) | [Report](reports/save_load_container.md) / [source ledger](sources/save_load_container_sources.json) |
 | Source selections, commits and hashes | [Source ledgers](sources/readme.md) |
 | M0 / M1 validation | [M0](reports/m0.md) / [M1](reports/m1.md) |
 | M2 criterion matrix and GPU reservation | [Acceptance](reports/m2_acceptance.md) |

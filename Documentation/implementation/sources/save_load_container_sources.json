@@ -1,0 +1,5 @@
+{
+  "description": "Save/load lot 2 (container and fingerprint). New OpenBlood2 engine code written from the save/load contract; no original or reference-tree code was read for it or imported. SHA-256 follows FIPS 180-4 and is checked against its published test vectors; the section CRC is SDL3's standard CRC-32.",
+  "root": "LithTech reference tree (lithtech/)",
+  "sources": []
+}

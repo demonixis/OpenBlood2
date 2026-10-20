@@ -22,6 +22,7 @@ Runtime test logs and measurements belong in the
 [dedicated evidence directory](../reports/evidence).
 
 - [Save/load audit](save_load_audit_sources.json): read-only audit of original and later-LithTech save/restore code; no import.
+- [Save/load container](save_load_container_sources.json): lot 2 container and fingerprint; new code, no original source read or imported.
 
 - [Original music asset preparation](m2_music_asset_sources.json)
 
