@@ -918,7 +918,12 @@ namespace
         bad = save;
         for (auto& variable : bad.image.console)
             if (variable.name == "GAME_GAMETYPE")
-                variable.value = "2"; // CTF.
+                variable.value = "2"; // CTF: refused by name (lot 13).
+        CHECK(refused(bad, "admission", "CTF saves cannot be loaded"));
+        bad = save;
+        for (auto& variable : bad.image.console)
+            if (variable.name == "GAME_GAMETYPE")
+                variable.value = "1"; // Bloodbath.
         CHECK(refused(bad, "admission", "full single-player save"));
         bad = save;
         bad.fingerprint.classes.clear();

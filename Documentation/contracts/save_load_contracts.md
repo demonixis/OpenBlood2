@@ -11,6 +11,9 @@ and candidate transaction) and 5 (player and client) are implemented; see their 
 [evidence](../implementation/reports/save_load_movers.md)) declares its 18 classes Original.
 Lot 7 (world logic, [evidence](../implementation/reports/save_load_world_logic.md)) declares its
 10 classes Original.
+Lot 13 (native state, [evidence](../implementation/reports/save_load_native.md)) checks the
+engine classes, sky and PolyGrid republication, VoiceMgr and CommLink across a load, and
+refuses CTF saves by name.
 Lot 6 (slots, Quick and Restart, menus, [evidence](../implementation/reports/save_load_slots.md))
 writes and reads the slot, quick and level-entry files and enables the Save and Load screens,
 F5/F6 and the death Load menu. `GameSession::save_game` and `load_game` save and load through a
@@ -1042,6 +1045,68 @@ blocks, and CameraObj. The 10 registered classes are Original with payload versi
 - **Expected re-save rewrites.** CameraObj only: the forced flags, the schedule (0.01 s active,
   none inactive) and, for a timed active camera, the deactivation time. Every other OBJS, LINK
   and ATCH byte of these classes is identical after a load.
+### Implemented native state (lot 13)
+
+Lot 13 covers the state that no original class saves: engine-implemented classes, the owner-bound
+sky and PolyGrid publications, the client voice and communication state, and the CTF path. It adds
+no payload and no class declaration.
+
+- **Engine-implemented classes.** Every 1998 engine class (`engineobjects.c`) is `CF_ALWAYSLOAD`
+  (Model, WorldModel, Container, Sprite, Sound, StartPoint, World, Brush, DemoSkyWorldModel,
+  SkyPointer, FogSphere) or editor-only `CF_NORUNTIME` (the lights, OutsideDef, FastApproxArea,
+  ProjectorSprite, RaySelecter). None is saved, so none needs a payload.
+  - The port registers BaseClass (NotSaved) and the seven runtime classes (AlwaysLoad).
+    WorldModel and FogSphere stay unregistered because no shipped world places them.
+  - Their `PRECREATE_SAVEGAME` refusals stay, with corrected comments. They are unreachable. The
+    fingerprint stage refuses an image holding such a record by name, because the class is not in
+    the build's Original schema (`class Sound is not registered`). `RestoreObjects` would also
+    refuse it by name before any precreate.
+  - Always-load objects created at runtime are never saved, as in the original: VolumeBrush
+    surface PolyGrids, the player's SmellHint trail and Naga's ceiling Model. References to them
+    read NULL.
+  - FlagObject and FlagStand stay NotSaved.
+- **Republication.** Neither the sky nor the PolyGrid service is saved. After a load:
+  - World PolyGrids come back with the always-load rows and publish from their own initial update.
+  - Each VolumeBrush recreates its surface in its Load (lot 8).
+  - Sky objects return with INSKY and their slot from the engine record, and the always-load
+    SkyPointer and DemoSkyWorldModel add theirs again.
+
+  The new `check_restored_publications` (`world_validation.cpp`) runs in `load_game`'s validation
+  stage and refuses the candidate, naming the problem, if any of these fails:
+  - every live sky object is registered once and holds at most one slot;
+  - every slot's object is registered;
+  - every published PolyGrid has exactly one instance;
+  - no two volumes share a surface;
+  - no PolyGrid exists beyond the authored rows and the volume surfaces.
+
+  The PolyGrid wave phases restart, as the original client's do.
+- **VoiceMgr.** The original keeps the client process across a load. `StartNewGame` calls
+  `VoiceMgr.Reset`, which clears the unique-line flags and the next play time; the server's
+  `PostStartWorld` stops the voice. `load_game` reproduces this when it promotes the candidate
+  (`CVoiceMgr::InheritAcrossLoad`):
+  - it copies the on/off state, the random generator and each group's last choice;
+  - the unique flags start clear;
+  - the next play time is the restored session's own, measured on the restored clock;
+  - no sound handle is carried over.
+
+  NEW_LEVEL keeps its `InheritHistory`, which also keeps the unique flags, as the original
+  `StartNewWorld` does.
+
+  This matches the original and is not a loss to fix: decision 4 does not list it. A unique
+  line (a first weapon-pickup reply) can therefore play again after a load, as in the original.
+- **CommLink.** The candidate client starts with an idle panel and no retained voice. A running
+  conversation is lost; its ConversationTrigger carries its own state (lot 7). The original client
+  kept drawing the previous game's panel over the restored world until the panel's own clock ran
+  out (the original never saves it). OpenBlood2 does not reproduce that artifact.
+- **CTF.** CTF saves stay refused, with a message that names CTF:
+  - `save_game` refuses a CTF game type (`CTF games cannot be saved (multiplayer, out of scope)`)
+    before the generic D12 check.
+  - It also refuses any live CTF state: a team flag registered in `g_ctf`, a FlagObject or
+    FlagStand, or a player on a team or carrying a flag. The message names the reason, and the
+    store is left unchanged.
+  - `load_game` refuses an image whose console holds the CTF game type at admission
+    (`CTF saves cannot be loaded`).
+  - The explicit local inspection of the four CTF maps is therefore never saveable.
 
 ## Restored and regenerated state
 
@@ -1053,6 +1118,7 @@ blocks, and CameraObj. The 10 registered classes are Original with payload versi
 | Client blob (objectives, music level, fade, wonky, blind, game type) | Restored through the player record, as the original |
 | Always-load world objects (start points, path points, keys, hints, WorldProperties, PolyGrid, ParticleSystem, SparksObj, LightFX, built-in Model/Sprite/Container/Sound/sky) | Recreated from the DAT in authored state; references to them read NULL |
 | Server voices, music transport | Never saved. Classes restart their own loops in Load or initial update; DAT `Sound` objects replay; music restarts at the saved level |
+| Client VoiceMgr and CommLink | Never saved. The unique-line flags and next play time reset as after the original `StartNewGame`; the on/off state, randomness and group choices continue; the communication panel starts idle ([lot 13](#implemented-native-state-lot-13)) |
 | Owner-bound effects (PolyGrid surfaces, particle streams, warp gates, lightning, object particles, light effects, camera views, sky) | Republished by the restored owner through the same publication path the original's saved effect message fed. Whether WarpGate keeps the original's lost visuals is open decision 4 |
 | Detached cosmetic effects (explosions, sparks, spurts, splats, fragments, gibs, flame/smoke, laser beams, weapon sprites) | Lost, as in the original |
 | HUD, crosshair, view weapons, MoveMgr prediction, zoom | Rebuilt: the player Load zeroes stat caches, the first update republishes, and ForcePos resets prediction |

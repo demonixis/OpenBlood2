@@ -4,9 +4,12 @@
 #include "game/original/ClientWarpGateSFX.h"
 #include "game/original/FlagObjects.h"
 #include "game/original/Minefield.h"
+#include "game/original/PolyGrid.h"
 #include "game/original/SkyObjects.h"
 #include "game/original/SparksObj.h"
+#include "game/original/VolumeBrush.h"
 #include "game/server_adapter.h"
+#include <map>
 #include <set>
 
 namespace OpenBlood2
@@ -267,6 +270,73 @@ namespace OpenBlood2
                     return false;
             }
         report.checked_textures = checked.size();
+        return true;
+    }
+    bool check_restored_publications(const GameSession& game, std::string& error)
+    {
+        error.clear();
+        const auto key = [](ObjectId id) { return std::pair{id.slot, id.generation}; };
+        const auto alive = [&](ObjectId id)
+        {
+            const auto* r = game.objects.get(id);
+            return r && r->life == Life::Alive;
+        };
+        // Sky: a restored object brings back INSKY and its slot from its engine record; the
+        // always-load SkyPointer and DemoSkyWorldModel add theirs again, which must not duplicate.
+        const auto& sky = game.server.sky;
+        std::set<std::pair<std::uint32_t, std::uint32_t>> registered, slotted;
+        for (auto id : sky.registered)
+            if (alive(id) && !registered.insert(key(id)).second)
+            {
+                error = "Sky object registered twice";
+                return false;
+            }
+        for (auto id : sky.objects)
+            if (id && alive(id) && (!registered.contains(key(id)) || !slotted.insert(key(id)).second))
+            {
+                error = "Sky slot object is unregistered or holds two slots";
+                return false;
+            }
+        // PolyGrid: world PolyGrids are always-load, VolumeBrush surfaces are recreated by the
+        // volume's Load (never saved), and each publishes exactly one surface.
+        std::map<HOBJECT, std::size_t> published;
+        for (const auto& instance : game.server.polygrids.active)
+            if (++published[instance.owner] > 1)
+            {
+                error = "PolyGrid published twice";
+                return false;
+            }
+        std::set<HOBJECT> surfaces;
+        std::size_t authored = 0, grids = 0;
+        for (const auto& row : game.world.objects)
+            authored += row.class_name == "PolyGrid";
+        for (auto id : game.objects.snapshot())
+            if (const auto* r = game.objects.get(id); r && r->life == Life::Alive)
+                if (const auto* volume = dynamic_cast<const VolumeBrush*>(r->game.get());
+                    volume && volume->surface_object && game.objects.get(volume->surface_object) &&
+                    game.objects.get(volume->surface_object)->life == Life::Alive &&
+                    !surfaces.insert(volume->surface_object).second)
+                {
+                    error = "Two volumes share one surface PolyGrid";
+                    return false;
+                }
+        for (auto id : game.objects.snapshot())
+        {
+            const auto* r = game.objects.get(id);
+            const auto* grid = r && r->life == Life::Alive ? dynamic_cast<const PolyGrid*>(r->game.get()) : nullptr;
+            if (!grid)
+                continue;
+            if (grid->effect && published[r->handle] != 1)
+            {
+                error = "PolyGrid " + std::string(r->state.m_Name) + " lost its published surface";
+                return false;
+            }
+            if (!surfaces.contains(r->handle) && ++grids > authored)
+            {
+                error = "PolyGrid without an authored row or an owning volume";
+                return false;
+            }
+        }
         return true;
     }
 } // namespace OpenBlood2

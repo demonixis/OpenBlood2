@@ -1,4 +1,5 @@
 #include "game/game_settings.h"
+#include "game/original/FlagObjects.h"
 #include "game/original_globals.h"
 #include "game/server_adapter.h"
 #include "game/world_validation.h"
@@ -29,6 +30,24 @@ namespace OpenBlood2
                     return out <= max;
                 }
             return false;
+        }
+        constexpr const char* ctf_refusal = "CTF games cannot be saved (multiplayer, out of scope)";
+        // The CTF state a save would lose: a flag of either team, a flag stand, or a player on a
+        // team or carrying a flag. FlagObject and FlagStand are NotSaved and never in a save.
+        bool ctf_state(GameSession& game, std::string& why)
+        {
+            if (g_ctf.flags[0] || g_ctf.flags[1])
+                why = "a team flag is in the world";
+            for (auto id : game.objects.snapshot())
+                if (const auto* r = game.objects.get(id); why.empty() && r && r->life == Life::Alive)
+                {
+                    if (dynamic_cast<const FlagObject*>(r->game.get()) || dynamic_cast<const FlagStand*>(r->game.get()))
+                        why = std::string("CTF object ") + r->state.m_Name;
+                    else if (const auto* p = dynamic_cast<const CPlayerObj*>(r->game.get());
+                             p && (p->ctf_team || p->m_hFlagObject || p->m_hFlagAttach))
+                        why = "a player is on a CTF team or carries a flag";
+                }
+            return !why.empty();
         }
         std::string joined(const std::set<std::string>& names)
         {
@@ -61,6 +80,8 @@ namespace OpenBlood2
         if (server.message_count() || objects.pending_count())
             return refuse("Live messages or deferred removals exist; save at a frame boundary");
         const float type = server.GetVarValueFloat(server.GetGameConVar("GAME_GAMETYPE"));
+        if (type == static_cast<float>(GAMETYPE_CTF))
+            return refuse(ctf_refusal);
         if (type < 0 || type > 9 || type != static_cast<float>(static_cast<unsigned>(type)) ||
             !single_player(static_cast<unsigned>(type)))
             return refuse("Saving is limited to single-player game types (D12)");
@@ -72,6 +93,10 @@ namespace OpenBlood2
             !server.IsObjectAlive(player->m_hObject) || player->m_bDead || player->m_damage.IsDead() ||
             !player->attributes_received)
             return refuse("A save requires the live local player in the world");
+        // CTF match state (the flags, their stands and a player's team or carried flag) is
+        // multiplayer state the original never saves: refuse it by name before the save list.
+        if (std::string why; ctf_state(*this, why))
+            return refuse(std::string(ctf_refusal) + ": " + why);
         // A live object of a saveable class without the original marking would be left out of
         // the shell's list and lost silently: refuse it by name instead.
         std::set<std::string> unmarked;
@@ -207,6 +232,8 @@ namespace OpenBlood2
         else if (!resource_path(save.world_path, normalized) || normalized != save.world_path ||
                  !normalized.starts_with("worlds/") || !normalized.ends_with(".dat"))
             error = "The save's world path is not a normalized world DAT";
+        else if (console_number(save.image, "GAME_GAMETYPE", 9, game_type) && game_type == GAMETYPE_CTF)
+            error = "CTF saves cannot be loaded (multiplayer, out of scope)";
         else if (!save.image.console_saved || save.image.param != 0 ||
                  !console_number(save.image, "GAME_GAMETYPE", 9, game_type) || !single_player(game_type) ||
                  !console_number(save.image, "GAME_DIFFICULTY", 3, difficulty))
@@ -284,6 +311,11 @@ namespace OpenBlood2
             stage = "validation";
             if (!check_world_initialization(*candidate, report, error))
                 return false;
+            if (!check_restored_publications(*candidate, error))
+            {
+                error = "Restored publications: " + error;
+                return false;
+            }
             for (auto id : candidate->objects.snapshot())
                 if (const auto* r = candidate->objects.get(id); r && r->life == Life::Alive)
                     if (const auto* ai = dynamic_cast<const AI_Mgr*>(r->game.get()); ai && ai->runtime_failed)
@@ -338,6 +370,7 @@ namespace OpenBlood2
             return rejected("audio");
         }
         // No fallible step remains. Replace ownership; never move a session or replay state.
+        candidate->client_shell.voice_manager.InheritAcrossLoad(source.client_shell.voice_manager);
         candidate->world_revision = source.world_revision + 1;
         current.reset();
         report.cleanup_complete = !ServerAdapter::active_ && !g_pServerDE && source_globals.empty();

@@ -30,6 +30,7 @@ Runtime test logs and measurements belong in the
 - [Save/load movers and brushes](save_load_movers_sources.json): lot 8 Save/Load bodies of doors, rotators, destructible brushes and models, debris, volumes, TripLaser and Tchernotronic.
 - [Save/load slots and menus](save_load_slots_sources.json): lot 6 slot, quick and Restart rules, Load/Save menu rows, F5/F6 and death to the Load menu.
 - [Save/load world logic](save_load_world_logic_sources.json): lot 7 Save/Load bodies of the triggers, Spawner, KeyFramer/KeyData and CameraObj.
+- [Save/load native state](save_load_native_sources.json): lot 13 engine class flags, PolyGrid/VolumeBrush surfaces, the VoiceMgr reset and CommLink on a load, and the multiplayer save guard.
 
 - [Original music asset preparation](m2_music_asset_sources.json)
 

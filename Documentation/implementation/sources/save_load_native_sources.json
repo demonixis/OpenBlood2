@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-20",
+  "scope": "Save/load lot 13: native state. Save support of the engine-implemented classes, sky and PolyGrid republication after a load, the VoiceMgr and CommLink client state across a load, and the CTF refusal path. No original code is imported; the publication check, CVoiceMgr::InheritAcrossLoad and the CTF refusals are OpenBlood2 code.",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/AppHeaders/engineobjects.c",
+      "source_sha256": "70730e7e8aa704de5c6ddfa40194227832260812f951a49fd76e7735b530f75f",
+      "purpose": "Class flags of every engine class: CF_ALWAYSLOAD for Model, WorldModel, Container, Sprite, Sound, StartPoint, World, Brush, DemoSkyWorldModel, SkyPointer and FogSphere (engineobjects.c:176-855); CF_NORUNTIME for the lights, OutsideDef, FastApproxArea, ProjectorSprite and RaySelecter."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PolyGrid.cpp",
+      "source_sha256": "d903561ac5a9efb94dd4c10526a54116f4bf476c0eb7ea1fe7433b430ef354b7",
+      "purpose": "PolyGrid is CF_ALWAYSLOAD (PolyGrid.cpp:39): runtime surfaces are never saved."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/VolumeBrush.cpp",
+      "source_sha256": "442cc81f7cd87c69882cc42028e62ad67e359e995cb7e47f7c4a0d2cb06709bb",
+      "purpose": "The Load tail recreating the surface PolyGrid (VolumeBrush.cpp:866), the basis of the exactly-once surface check."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "36a810c80ce87eb2304716e9e1dbaae25304c02c542019b0858c9dc99f2d1006",
+      "purpose": "StartNewGame (BloodClientShell.cpp:3910-3964) calling VoiceMgr Reset on every load and leaving m_CommLink untouched; the client process (and the voice manager's on/off state, random state and group choices) persisting across a load."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/VoiceMgr.cpp",
+      "source_sha256": "6846ac16b61864f7d0d2aa878daf2d44175fdcab0ceb3a0348a3a3278bfb5cc8",
+      "purpose": "Reset clearing the unique-play flags and the next play time (VoiceMgr.cpp:843-860), StopAll (VoiceMgr.cpp:814-830)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/CommLink.cpp",
+      "source_sha256": "3907152cd01520fe969676bd2f2224cb00f572ba4cb2e0fafd15365439774833",
+      "purpose": "CCommLink has no save or reset path; its panel runs on its own clock."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MainMenus.cpp",
+      "source_sha256": "4e52be34bfd90c547c1e9c26ab7d77711aa873b91b67bb99112621d3f0172091",
+      "purpose": "The Save menu item disabled in a multiplayer game (MainMenus.cpp:809)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/FlagObjects.cpp",
+      "source_sha256": "b6dd48f6603dd299eae5e178d99c36ea017bfffaf48ce705b3bbde4747bc1849",
+      "purpose": "FlagObject and FlagStand (FlagObjects.cpp:39, 483) have no save code and are never marked saveable."
+    }
+  ]
+}

@@ -6,7 +6,7 @@ DDWORD SkyObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
     if (message == MID_PRECREATE)
     {
         if (!data || reason == 3)
-            return 0; // Save restoration remains explicit.
+            return 0; // CF_ALWAYSLOAD: never saved; RestoreObjects refuses such a record by class name.
         auto& create = *static_cast<ObjectCreateStruct*>(data);
         create.m_ObjectType = pointer ? OT_NORMAL : OT_WORLDMODEL;
         if (reason == 1)

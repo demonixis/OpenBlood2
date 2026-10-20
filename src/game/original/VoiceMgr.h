@@ -30,6 +30,7 @@ class CVoiceMgr
     void Reset();
     void SetNextPlayTime(float delta);
     void InheritHistory(const CVoiceMgr&);
+    void InheritAcrossLoad(const CVoiceMgr&);
     bool PlayEventSound(HOBJECT player, int character, int event, bool external_camera);
     bool PlayUniqueSound(HOBJECT player, int character, int unique, bool external_camera);
     bool PlaySound(HOBJECT player, std::string_view resource, bool stream, float delay = .5f);

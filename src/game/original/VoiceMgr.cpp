@@ -91,6 +91,15 @@ void CVoiceMgr::InheritHistory(const CVoiceMgr& source)
             if (groups[c][e].sounds == source.groups[c][e].sounds)
                 groups[c][e].last = source.groups[c][e].last;
 }
+void CVoiceMgr::InheritAcrossLoad(const CVoiceMgr& source)
+{
+    // A saved-game load keeps the original client process: its on/off state, randomness and
+    // per-group last choices continue. StartNewGame's Reset ran before the load: the unique
+    // flags start cleared and the next play time is the restored session's own, against its
+    // restored clock (save_load_contracts lot 13). Values only; never a sound handle.
+    InheritHistory(source);
+    played = {};
+}
 bool CVoiceMgr::IsOkToPlaySound(bool external_camera)
 {
     reason.clear();
