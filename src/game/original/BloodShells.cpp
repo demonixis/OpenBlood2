@@ -922,6 +922,17 @@ bool CBloodClientShell::UpdateWeapons(CBloodServerShell& server, double seconds,
     if (const auto* owner = server.Player(client_);
         owner && (owner->camera_movement_blocked || (owner->m_InventoryMgr.eye && owner->m_InventoryMgr.eye->active)))
         input.primary = input.alternate = false;
+    if (input.all_hands)
+    {
+        // Original HandleFiring: primary wins over alternate; with dual weapons ("if we have
+        // duel weapons") alternate fire is primary fire. Both hands receive the same command.
+        input.alternate = !input.primary && input.alternate;
+        if (weapons[0].model && weapons[1].model && input.alternate)
+        {
+            input.primary = true;
+            input.alternate = false;
+        }
+    }
     for (auto& weapon : weapons)
     {
         weapon.binoculars_active = m_bBinocularsActive;

@@ -502,6 +502,7 @@ namespace OpenBlood2
                 const auto fire = input.controls.sample_fire(false);
                 shell.weapon_input.primary = fire.primary;
                 shell.weapon_input.alternate = fire.alternate;
+                shell.weapon_input.all_hands = true; // Original HandleFiring: both carried hands.
                 shell.use_down = input.controls.sample_use(false);
                 shell.medkit_down = input.controls.sample_medkit(false);
                 shell.flashlight_down = input.controls.sample_flashlight(false);

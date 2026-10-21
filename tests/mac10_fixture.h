@@ -103,4 +103,42 @@ namespace test_mac10
                 return false;
         return inv.CurrentWeapon()->shots == right && inv.CurrentWeapon(true)->shots == left;
     }
+    // Original HandleFiring: play input fires every carried hand, and with dual weapons the
+    // alternate button fires primary on both.
+    inline bool fire_both_hands(GameSession& g)
+    {
+        auto* p = g.server_shell.Player(g.local_client);
+        if (!p || !p->m_InventoryMgr.CurrentWeapon() || !p->m_InventoryMgr.CurrentWeapon(true))
+            return false;
+        auto& inv = p->m_InventoryMgr;
+        inv.SetAmmoCount(AMMO_BULLET, 200);
+        for (bool alt : {false, true})
+        {
+            g.client_shell.weapon_input = {};
+            for (unsigned i = 0; i < 100; ++i)
+                if (!g.step(.01))
+                    return false;
+            auto *right = inv.CurrentWeapon(), *left = inv.CurrentWeapon(true);
+            const auto right_before = right->shots, left_before = left->shots;
+            OpenBlood2::WeaponInput input;
+            input.primary = !alt;
+            input.alternate = alt;
+            input.all_hands = true;
+            g.client_shell.weapon_input = input;
+            for (unsigned i = 0; i < 180; ++i)
+                if (!g.step(.01))
+                    return false;
+            std::cout << "Mac10 both hands " << (alt ? "alternate" : "primary")
+                      << " right=" << right->shots - right_before << " left=" << left->shots - left_before << '\n';
+            if (right->shots - right_before < 2 || left->shots - left_before < 2 ||
+                right->last_shot.request.alternate || left->last_shot.request.alternate ||
+                right->last_shot.request.left || !left->last_shot.request.left)
+                return false;
+        }
+        g.client_shell.weapon_input = {};
+        for (unsigned i = 0; i < 100; ++i)
+            if (!g.step(.01))
+                return false;
+        return true;
+    }
 } // namespace test_mac10

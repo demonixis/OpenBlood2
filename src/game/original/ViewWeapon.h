@@ -9,6 +9,10 @@ namespace OpenBlood2
     struct WeaponInput
     {
         bool primary = false, alternate = false, left = false;
+        // Original HandleFiring (play input): every carried hand gets the command, and with
+        // two weapons alternate fire becomes primary. Otherwise only the `left` hand fires
+        // (diagnostic per-hand selection).
+        bool all_hands = false;
     };
 } // namespace OpenBlood2
 

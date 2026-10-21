@@ -177,6 +177,12 @@ Menu binding for its "Esc releases the mouse first" check; its Esc quit stays a 
 inspection shortcut. The menu frontend samples the time-bomb action as well (step 1
 fixed T, previously wired only in `--view-world`).
 
+## Fire and dual weapons
+
+Fire from the keyboard, mouse or gamepad reaches the view weapons with `all_hands`. This
+is the original HandleFiring rule: both carried hands fire together, and with two weapons
+the alternate trigger fires primary. See the [weapon contracts](weapon_contracts.md).
+
 ## Weapon cycling
 
 Next/previous weapon call `GameSession::cycle_weapon`. It applies the `command_weapon`

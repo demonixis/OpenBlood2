@@ -53,6 +53,7 @@ namespace
     {
         GameSession g;
         CHECK(test_mac10::setup(g, root) && test_mac10::equip(g) && test_mac10::fire_modes(g));
+        CHECK(test_mac10::fire_both_hands(g));
         auto* w = g.server_shell.Player(g.local_client)->m_InventoryMgr.CurrentWeapon();
         CHECK(w->data.m_bLoopAnim && w->data.m_bAltLoopAnim && !w->data.m_bSemiAuto);
         CHECK(g.leave_player() && g.server.audio.voices().empty());
@@ -242,7 +243,7 @@ namespace
                         std::cout << '\n';
                     }
             }
-            CHECK(test_mac10::fire_modes(g));
+            CHECK(test_mac10::fire_modes(g) && test_mac10::fire_both_hands(g));
             auto& inv = g.server_shell.Player(g.local_client)->m_InventoryMgr;
             CHECK(inv.CurrentWeapon()->m_hHandModel && inv.CurrentWeapon(true)->m_hHandModel);
             CHECK(g.unload_world() && g.server.audio.voices().empty() && g.objects.attachments().empty());

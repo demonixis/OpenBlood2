@@ -144,7 +144,8 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
         return false;
     };
     const float time = engine.GetTime();
-    const bool primary = input.primary && input.left == left, alternate = input.alternate && input.left == left;
+    const bool hand = input.all_hands || input.left == left;
+    const bool primary = input.primary && hand, alternate = input.alternate && hand;
     if (inventory_bomb(type) && state == WS_STOP_FIRING)
     {
         if (!PlayAnimation(stop_[0]))

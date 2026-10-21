@@ -127,8 +127,14 @@ spread divides by 2000 and the direction is normalized. An owned portable
 `minstd_rand` replaces process-global `srand/rand`. Identical requests reproduce
 identical shots in this implementation; **retail CRT random-bit parity is not
 established**. Idle/knife/seed randomness is local to each view. The inspection
-camera is the firing origin; legacy muzzle offsets, near-wall muzzle correction,
-view bob and automatic dual-hand alternation remain pending. The source server
+camera is the firing origin; legacy muzzle offsets, near-wall muzzle correction and
+view bob remain pending. Play input (`WeaponInput::all_hands`, set by the keyboard,
+mouse and gamepad) follows the original `CBloodClientShell::HandleFiring`:
+- primary wins over alternate;
+- with a right and a left view weapon, alternate fire becomes primary fire;
+- both hands receive the same command and fire on their own animation cadence.
+
+Inspector holds and tests without `all_hands` keep the diagnostic single-hand selection. The source server
 `Fire` computes a reload duration without enforcing it; cadence belongs to the
 client animation state machine. Direct server test messages intentionally do not
 add a second invented cooldown. This is local transport, not a multiplayer trust

@@ -672,6 +672,8 @@ namespace
             const auto fire_buttons = controls.sample_fire(text_editing);
             game->client_shell.weapon_input.primary |= fire_buttons.primary;
             game->client_shell.weapon_input.alternate |= fire_buttons.alternate;
+            // Play fire uses the original both-hands controller; inspector holds keep their hand.
+            game->client_shell.weapon_input.all_hands |= fire_buttons.primary || fire_buttons.alternate;
             if (!controls.focused && !smoke)
                 game->client_shell.weapon_input = {};
             game->client_shell.use_down = controls.sample_use(text_editing);
