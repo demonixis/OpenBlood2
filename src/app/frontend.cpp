@@ -1,6 +1,7 @@
 #include "app/frontend.h"
 #include "app/demo_menu_smoke.h"
 #include "app/demo_smoke.h"
+#include "app/gamepad_devices.h"
 #include "app/hud.h"
 #include "app/menu_input.h"
 #include "app/menu_renderer.h"
@@ -133,6 +134,7 @@ namespace OpenBlood2
         menu.error = menu_enabled ? preference_error : std::string{};
         auto stored_settings = menu.settings;
         MenuInput input;
+        GamepadDevices gamepads;
         input.demo_mode = config.demo && !menu_enabled;
         input.controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
         input.reset(menu, game->client_shell.m_bInWorld);
@@ -205,16 +207,17 @@ namespace OpenBlood2
                     done = true;
                     break;
                 }
+                gamepads.event(event);
                 if (!menu.error.empty())
                 {
                     if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST || event.type == SDL_EVENT_WINDOW_FOCUS_GAINED)
                         input.event(event, SDL_GetWindowID(runtime.window), menu, game->client_shell.m_bInWorld, false,
                                     BLOOD2_INSPECTOR && options.inspector, float(width), float(height));
                     ImGui_ImplSDL3_ProcessEvent(&event);
-                    if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat &&
-                        (input.controls.bindings.matches(event, InputAction::Menu) ||
-                         input.controls.bindings.matches(event, InputAction::MenuBack)))
-                        dismiss_error = true;
+                    for (const auto& edge : input.controls.track(event))
+                        dismiss_error |= edge.down && !edge.repeat &&
+                                         (input.controls.bindings.matches(edge, InputAction::Menu) ||
+                                          input.controls.bindings.matches(edge, InputAction::MenuBack));
                     continue;
                 }
                 auto* player = game->server_shell.Player(game->local_client);
@@ -222,6 +225,8 @@ namespace OpenBlood2
                 const bool forward = input.event(event, SDL_GetWindowID(runtime.window), menu,
                                                  game->client_shell.m_bInWorld, player && !player->m_damage.IsDead(),
                                                  BLOOD2_INSPECTOR && options.inspector, float(width), float(height));
+                if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED)
+                    gamepads.resync(input.controls);
                 if (old_inspector != input.inspector || old_menu != input.paused(menu))
                 {
                     neutralize_app_input(game->client_shell);
@@ -510,6 +515,10 @@ namespace OpenBlood2
                 if (const int slot = input.controls.sample_weapon_slot(false); slot >= 0)
                     if (!game->command_weapon(DBYTE(slot), error))
                         spdlog::info("Weapon selection: {}", error);
+                for (const bool next : {true, false})
+                    if (input.controls.sample_command(next ? InputAction::NextWeapon : InputAction::PrevWeapon, false))
+                        if (!game->cycle_weapon(next, error))
+                            spdlog::info("Weapon selection: {}", error);
                 input.controls.look(shell.rotation, delta, false, shell.m_bZoomView);
             }
             if (!input.paused(menu) && !paused_at_start)

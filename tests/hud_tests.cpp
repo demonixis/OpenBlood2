@@ -190,6 +190,16 @@ namespace
         CHECK(g.client_shell.stats.weapon_slots[0] == WEAP_MELEE &&
               g.client_shell.stats.weapon_slots[1] == WEAP_BERETTA);
         CHECK(g.command_weapon(0, error) && inv.m_nCurWeaponSlot == 0 && g.client_shell.weapons[0].type == WEAP_MELEE);
+        // Original COMMAND_NEXTWEAPON / COMMAND_PREVWEAPON wrap over the carried slots 0..9.
+        CHECK(g.cycle_weapon(true, error) && inv.m_nCurWeaponSlot == 1 &&
+              g.client_shell.weapons[0].type == WEAP_BERETTA);
+        CHECK(g.cycle_weapon(true, error) && inv.m_nCurWeaponSlot == 0 && g.client_shell.weapons[0].type == WEAP_MELEE);
+        CHECK(g.cycle_weapon(false, error) && inv.m_nCurWeaponSlot == 1);
+        CHECK(g.cycle_weapon(false, error) && inv.m_nCurWeaponSlot == 0);
+        CHECK(inv.CycleWeaponSlot(true) == DBYTE(1) && inv.CycleWeaponSlot(false) == DBYTE(1));
+        p->movement_blocked = true;
+        CHECK(!g.cycle_weapon(true, error) && inv.m_nCurWeaponSlot == 0);
+        p->movement_blocked = false;
         CHECK(p->UpdateStats(false) && g.pump_player_messages(error));
         CHECK(hud_state(g.client_shell.stats, true, false).stats.ammo_type == AMMO_NONE &&
               g.client_shell.stats.weapon_slot == 0);

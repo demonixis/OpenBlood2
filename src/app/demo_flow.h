@@ -45,32 +45,44 @@ namespace OpenBlood2
                 controls.event(e, window);
                 return inspector;
             }
-            if (!controls.focused)
-                return false;
-            if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat)
+            const bool gamepad = MovementControls::gamepad_event(e);
+            if (e.type == SDL_EVENT_GAMEPAD_REMOVED || !controls.focused)
             {
-                const auto key = e.key.scancode;
-                const auto& bindings = controls.bindings;
+                if (gamepad)
+                    controls.track(e);
+                return false;
+            }
+            const auto edges = controls.track(e);
+            const auto press = [&](InputAction action)
+            {
+                for (const auto& edge : edges)
+                    if (edge.down && !edge.repeat && controls.bindings.matches(edge, action))
+                        return true;
+                return false;
+            };
+            const bool key_press = e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat;
+            if (key_press || gamepad)
+            {
                 if (finished())
                 {
-                    quit |= key == SDL_SCANCODE_SPACE || bindings.matches(e, InputAction::Menu) ||
-                            bindings.matches(e, InputAction::MenuAccept) || bindings.matches(e, InputAction::MenuBack);
+                    quit |= (key_press && e.key.scancode == SDL_SCANCODE_SPACE) || press(InputAction::Menu) ||
+                            press(InputAction::MenuAccept) || press(InputAction::MenuBack);
                     return false;
                 }
-                if (key == SDL_SCANCODE_F10)
+                if (key_press && e.key.scancode == SDL_SCANCODE_F10)
                 {
                     if (inspector_available)
                         inspector = !inspector;
                     reset(controls, inspector, player);
                     return false;
                 }
-                if (bindings.matches(e, InputAction::Menu) && !inspector)
+                if (press(InputAction::Menu) && !inspector)
                 {
                     state = paused() ? State::Playing : State::Paused;
                     reset(controls, inspector, player);
                     return false;
                 }
-                if (!inspector && player && !alive && bindings.matches(e, InputAction::MenuAccept))
+                if (!inspector && player && !alive && press(InputAction::MenuAccept))
                 {
                     restart = true; // App-level fresh entry, not a source save/respawn operation.
                     return false;
@@ -87,7 +99,10 @@ namespace OpenBlood2
                     (e.key.scancode == SDL_SCANCODE_F1 || e.key.scancode == SDL_SCANCODE_F2 ||
                      e.key.scancode == SDL_SCANCODE_F3))
                     return false;
-                controls.event(e, window);
+                if (gamepad)
+                    controls.command_edges(edges, false);
+                else
+                    controls.event(e, window);
             }
             return false;
         }

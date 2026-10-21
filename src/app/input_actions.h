@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL3/SDL_events.h>
+#include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_scancode.h>
 #include <array>
@@ -19,12 +20,15 @@ namespace OpenBlood2
         StrafeLeft,
         StrafeRight,
         Run,
+        RunLatch,
         Jump,
         Crouch,
         TurnLeft,
         TurnRight,
         LookUp,
         LookDown,
+        LookHorizontal,
+        LookVertical,
         FirePrimary,
         FireAlternate,
         Use,
@@ -47,6 +51,11 @@ namespace OpenBlood2
         WeaponSlot8,
         WeaponSlot9,
         WeaponSlot10,
+        NextWeapon,
+        PrevWeapon,
+        NextItem,
+        PrevItem,
+        UseItem,
         Menu,
         MenuUp,
         MenuDown,
@@ -63,8 +72,10 @@ namespace OpenBlood2
     enum class InputActionKind : std::uint8_t
     {
         Hold,     // Level state; a held key resumes after focus returns (movement, look keys).
+        Latch,    // Down edge that keeps Run on until every movement action is released.
+        Analog,   // Signed axis value in [-1, 1] (gamepad look); keys and buttons never drive it.
         Press,    // Level state that must start with a fresh press while play accepts input.
-        Slot,     // Non-repeated down edge queued for the frame (weapon selection).
+        Command,  // Non-repeated down edge queued for the frame (weapon slots, cycling, items).
         Interface // Menu/system command; never consumed from the inspector or held for play.
     };
 
@@ -80,12 +91,15 @@ namespace OpenBlood2
         {"strafe_left", InputActionKind::Hold},
         {"strafe_right", InputActionKind::Hold},
         {"run", InputActionKind::Hold},
+        {"run_latch", InputActionKind::Latch},
         {"jump", InputActionKind::Hold},
         {"crouch", InputActionKind::Hold},
         {"turn_left", InputActionKind::Hold},
         {"turn_right", InputActionKind::Hold},
         {"look_up", InputActionKind::Hold},
         {"look_down", InputActionKind::Hold},
+        {"look_horizontal", InputActionKind::Analog},
+        {"look_vertical", InputActionKind::Analog},
         {"fire_primary", InputActionKind::Press},
         {"fire_alternate", InputActionKind::Press},
         {"use", InputActionKind::Press},
@@ -98,16 +112,21 @@ namespace OpenBlood2
         {"time_bomb", InputActionKind::Press},
         {"remote_bomb", InputActionKind::Press},
         {"detonate", InputActionKind::Press},
-        {"weapon_slot_1", InputActionKind::Slot},
-        {"weapon_slot_2", InputActionKind::Slot},
-        {"weapon_slot_3", InputActionKind::Slot},
-        {"weapon_slot_4", InputActionKind::Slot},
-        {"weapon_slot_5", InputActionKind::Slot},
-        {"weapon_slot_6", InputActionKind::Slot},
-        {"weapon_slot_7", InputActionKind::Slot},
-        {"weapon_slot_8", InputActionKind::Slot},
-        {"weapon_slot_9", InputActionKind::Slot},
-        {"weapon_slot_10", InputActionKind::Slot},
+        {"weapon_slot_1", InputActionKind::Command},
+        {"weapon_slot_2", InputActionKind::Command},
+        {"weapon_slot_3", InputActionKind::Command},
+        {"weapon_slot_4", InputActionKind::Command},
+        {"weapon_slot_5", InputActionKind::Command},
+        {"weapon_slot_6", InputActionKind::Command},
+        {"weapon_slot_7", InputActionKind::Command},
+        {"weapon_slot_8", InputActionKind::Command},
+        {"weapon_slot_9", InputActionKind::Command},
+        {"weapon_slot_10", InputActionKind::Command},
+        {"next_weapon", InputActionKind::Command},
+        {"prev_weapon", InputActionKind::Command},
+        {"next_item", InputActionKind::Command},
+        {"prev_item", InputActionKind::Command},
+        {"use_item", InputActionKind::Command},
         {"menu", InputActionKind::Interface},
         {"menu_up", InputActionKind::Interface},
         {"menu_down", InputActionKind::Interface},
@@ -132,8 +151,52 @@ namespace OpenBlood2
 
     enum class InputSource : std::uint8_t
     {
-        Key,        // SDL_Scancode: physical position (WASD on QWERTY is ZQSD on AZERTY).
-        MouseButton // SDL_BUTTON_LEFT..SDL_BUTTON_X2; play reads it only while the mouse is captured.
+        Key,                 // SDL_Scancode: physical position (WASD on QWERTY is ZQSD on AZERTY).
+        MouseButton,         // SDL_BUTTON_LEFT..SDL_BUTTON_X2; play reads it only while the mouse is captured.
+        GamepadButton,       // SDL_GamepadButton, from any open gamepad.
+        GamepadAxisPositive, // SDL_GamepadAxis: digital above +threshold; Analog reads the value.
+        GamepadAxisNegative  // SDL_GamepadAxis: digital below -threshold; Analog reads the negated value.
+    };
+    constexpr bool gamepad_axis(InputSource source)
+    {
+        return source == InputSource::GamepadAxisPositive || source == InputSource::GamepadAxisNegative;
+    }
+
+    // One digital transition of one source. Axis edges come from threshold crossings.
+    struct InputEdge
+    {
+        InputSource source = InputSource::Key;
+        int code = 0;
+        bool down = false, repeat = false;
+    };
+    // An axis moving from one side to the other leaves one direction and enters the other.
+    struct InputEdges
+    {
+        std::array<InputEdge, 2> edge{};
+        unsigned count = 0;
+        void push(const InputEdge& e)
+        {
+            if (count < edge.size())
+                edge[count++] = e;
+        }
+        const InputEdge* begin() const
+        {
+            return edge.data();
+        }
+        const InputEdge* end() const
+        {
+            return edge.data() + count;
+        }
+        // Stateless key and mouse-button events; gamepad edges come from MovementControls::track.
+        static InputEdges from(const SDL_Event& e)
+        {
+            InputEdges edges;
+            if (e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_KEY_UP)
+                edges.push({InputSource::Key, e.key.scancode, e.type == SDL_EVENT_KEY_DOWN, e.key.repeat});
+            if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN || e.type == SDL_EVENT_MOUSE_BUTTON_UP)
+                edges.push({InputSource::MouseButton, e.button.button, e.type == SDL_EVENT_MOUSE_BUTTON_DOWN, false});
+            return edges;
+        }
     };
 
     struct InputBinding
@@ -167,6 +230,11 @@ namespace OpenBlood2
                     return b.code > SDL_SCANCODE_UNKNOWN && b.code < SDL_SCANCODE_COUNT && !reserved_key(b.code);
                 case InputSource::MouseButton:
                     return b.code >= SDL_BUTTON_LEFT && b.code <= SDL_BUTTON_X2;
+                case InputSource::GamepadButton:
+                    return b.code >= 0 && b.code < SDL_GAMEPAD_BUTTON_COUNT;
+                case InputSource::GamepadAxisPositive:
+                case InputSource::GamepadAxisNegative:
+                    return b.code >= 0 && b.code < SDL_GAMEPAD_AXIS_COUNT;
             }
             return false;
         }
@@ -202,13 +270,16 @@ namespace OpenBlood2
                     return true;
             return false;
         }
+        bool matches(const InputEdge& e, InputAction action) const
+        {
+            return bound(e.source, e.code, action);
+        }
         // Key and mouse-button events only; window, focus and repeat checks stay with the caller.
         bool matches(const SDL_Event& e, InputAction action) const
         {
-            if (e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_KEY_UP)
-                return bound(InputSource::Key, e.key.scancode, action);
-            if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN || e.type == SDL_EVENT_MOUSE_BUTTON_UP)
-                return bound(InputSource::MouseButton, e.button.button, action);
+            for (const auto& edge : InputEdges::from(e))
+                if (matches(edge, action))
+                    return true;
             return false;
         }
 
@@ -261,6 +332,57 @@ namespace OpenBlood2
             key(SDL_SCANCODE_KP_ENTER, InputAction::MenuAccept);
             key(SDL_SCANCODE_F5, InputAction::QuickSave);
             key(SDL_SCANCODE_F6, InputAction::QuickLoad);
+            // Original defaults.cfg for the commands added with the gamepad layout:
+            // ' / ; next/previous weapon, [ / ] inventory left/right, Enter use inventory.
+            key(SDL_SCANCODE_APOSTROPHE, InputAction::NextWeapon);
+            key(SDL_SCANCODE_SEMICOLON, InputAction::PrevWeapon);
+            key(SDL_SCANCODE_LEFTBRACKET, InputAction::PrevItem);
+            key(SDL_SCANCODE_RIGHTBRACKET, InputAction::NextItem);
+            key(SDL_SCANCODE_RETURN, InputAction::UseItem);
+            return b;
+        }
+        // Console layout: left stick moves, right stick looks, L3 latches run, R3 crouches,
+        // triggers fire (right primary, left alternate), bumpers cycle weapons, Start menu,
+        // north (Y) jump, south (A) use and menu accept, east (B) menu back, west (X) use item,
+        // Back (Select) next item; the D-pad and left stick also navigate menus.
+        static void add_gamepad(InputBindings& b)
+        {
+            const auto button = [&b](SDL_GamepadButton code, InputAction action)
+            { b.add(InputSource::GamepadButton, code, action); };
+            const auto axis = [&b](SDL_GamepadAxis code, bool positive, InputAction action)
+            { b.add(positive ? InputSource::GamepadAxisPositive : InputSource::GamepadAxisNegative, code, action); };
+            axis(SDL_GAMEPAD_AXIS_LEFTY, false, InputAction::MoveForward);
+            axis(SDL_GAMEPAD_AXIS_LEFTY, true, InputAction::MoveBackward);
+            axis(SDL_GAMEPAD_AXIS_LEFTX, false, InputAction::StrafeLeft);
+            axis(SDL_GAMEPAD_AXIS_LEFTX, true, InputAction::StrafeRight);
+            axis(SDL_GAMEPAD_AXIS_RIGHTX, true, InputAction::LookHorizontal);
+            axis(SDL_GAMEPAD_AXIS_RIGHTY, true, InputAction::LookVertical);
+            button(SDL_GAMEPAD_BUTTON_LEFT_STICK, InputAction::RunLatch);
+            button(SDL_GAMEPAD_BUTTON_RIGHT_STICK, InputAction::Crouch);
+            axis(SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, true, InputAction::FirePrimary);
+            axis(SDL_GAMEPAD_AXIS_LEFT_TRIGGER, true, InputAction::FireAlternate);
+            button(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, InputAction::NextWeapon);
+            button(SDL_GAMEPAD_BUTTON_LEFT_SHOULDER, InputAction::PrevWeapon);
+            button(SDL_GAMEPAD_BUTTON_START, InputAction::Menu);
+            button(SDL_GAMEPAD_BUTTON_NORTH, InputAction::Jump);
+            button(SDL_GAMEPAD_BUTTON_SOUTH, InputAction::Use);
+            button(SDL_GAMEPAD_BUTTON_SOUTH, InputAction::MenuAccept);
+            button(SDL_GAMEPAD_BUTTON_EAST, InputAction::MenuBack);
+            button(SDL_GAMEPAD_BUTTON_WEST, InputAction::UseItem);
+            button(SDL_GAMEPAD_BUTTON_BACK, InputAction::NextItem);
+            button(SDL_GAMEPAD_BUTTON_DPAD_UP, InputAction::MenuUp);
+            button(SDL_GAMEPAD_BUTTON_DPAD_DOWN, InputAction::MenuDown);
+            button(SDL_GAMEPAD_BUTTON_DPAD_LEFT, InputAction::MenuLeft);
+            button(SDL_GAMEPAD_BUTTON_DPAD_RIGHT, InputAction::MenuRight);
+            axis(SDL_GAMEPAD_AXIS_LEFTY, false, InputAction::MenuUp);
+            axis(SDL_GAMEPAD_AXIS_LEFTY, true, InputAction::MenuDown);
+            axis(SDL_GAMEPAD_AXIS_LEFTX, false, InputAction::MenuLeft);
+            axis(SDL_GAMEPAD_AXIS_LEFTX, true, InputAction::MenuRight);
+        }
+        static InputBindings defaults()
+        {
+            auto b = keyboard_mouse();
+            add_gamepad(b);
             return b;
         }
     };

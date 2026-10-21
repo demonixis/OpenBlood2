@@ -604,6 +604,20 @@ namespace OpenBlood2
             return true;
         return select_weapon(slot, error);
     }
+    bool GameSession::cycle_weapon(bool next, std::string& error)
+    {
+        ServiceTraceScope trace_scope(server.trace_enabled);
+        error.clear();
+        auto* owner = server_shell.Player(local_client);
+        if (!client_shell.m_bInWorld || !owner || owner->m_bDead || owner->m_damage.IsDead() ||
+            owner->MovementBlocked() || owner->camera_movement_blocked)
+        {
+            error = "Weapon command blocked";
+            return false;
+        }
+        const auto slot = owner->m_InventoryMgr.CycleWeaponSlot(next);
+        return !slot || select_weapon(*slot, error); // CHWEAP_CURRENT: nothing else to select.
+    }
     bool GameSession::select_weapon(DBYTE slot, std::string& error)
     {
         ServiceTraceScope trace_scope(server.trace_enabled);

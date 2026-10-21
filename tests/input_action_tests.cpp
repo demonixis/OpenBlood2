@@ -41,6 +41,31 @@ namespace
         e.window.windowID = window;
         return e;
     }
+    SDL_Event pad_button(SDL_GamepadButton code, bool down, SDL_JoystickID id = 3)
+    {
+        SDL_Event e{};
+        e.type = down ? SDL_EVENT_GAMEPAD_BUTTON_DOWN : SDL_EVENT_GAMEPAD_BUTTON_UP;
+        e.gbutton.which = id;
+        e.gbutton.button = Uint8(code);
+        e.gbutton.down = down;
+        return e;
+    }
+    SDL_Event pad_axis(SDL_GamepadAxis axis, float value, SDL_JoystickID id = 3)
+    {
+        SDL_Event e{};
+        e.type = SDL_EVENT_GAMEPAD_AXIS_MOTION;
+        e.gaxis.which = id;
+        e.gaxis.axis = Uint8(axis);
+        e.gaxis.value = Sint16(value * 32767);
+        return e;
+    }
+    SDL_Event pad_removed(SDL_JoystickID id = 3)
+    {
+        SDL_Event e{};
+        e.type = SDL_EVENT_GAMEPAD_REMOVED;
+        e.gdevice.which = id;
+        return e;
+    }
     std::size_t count(const InputBindings& b, InputAction action)
     {
         std::size_t n = 0;
@@ -82,11 +107,14 @@ namespace
     bool defaults()
     {
         const auto b = InputBindings::keyboard_mouse();
-        for (const auto& entry : b.entries)
+        const auto all = InputBindings::defaults();
+        for (const auto& entry : all.entries)
             CHECK(InputBindings::valid(entry));
         for (std::size_t i = 0; i < input_action_count; ++i)
-            CHECK(InputAction(i) == InputAction::MenuBack || count(b, InputAction(i)) > 0);
-        CHECK(count(b, InputAction::MenuBack) == 0); // Esc already returns; MenuBack is for the gamepad lot.
+            CHECK(count(all, InputAction(i)) > 0);
+        for (const auto& entry : b.entries)
+            CHECK(entry.source == InputSource::Key || entry.source == InputSource::MouseButton);
+        CHECK(count(b, InputAction::MenuBack) == 0); // Esc already returns; MenuBack is the gamepad's B.
         const auto bound = [&b](SDL_Scancode code, InputAction action)
         { return b.bound(InputSource::Key, code, action); };
         CHECK(bound(SDL_SCANCODE_W, InputAction::MoveForward) && bound(SDL_SCANCODE_S, InputAction::MoveBackward) &&
@@ -102,6 +130,37 @@ namespace
         CHECK(bound(SDL_SCANCODE_ESCAPE, InputAction::Menu) && bound(SDL_SCANCODE_RETURN, InputAction::MenuAccept) &&
               bound(SDL_SCANCODE_KP_ENTER, InputAction::MenuAccept) && bound(SDL_SCANCODE_F5, InputAction::QuickSave) &&
               bound(SDL_SCANCODE_F6, InputAction::QuickLoad));
+        // Original defaults.cfg for the commands added with the gamepad layout.
+        CHECK(bound(SDL_SCANCODE_APOSTROPHE, InputAction::NextWeapon) &&
+              bound(SDL_SCANCODE_SEMICOLON, InputAction::PrevWeapon) &&
+              bound(SDL_SCANCODE_LEFTBRACKET, InputAction::PrevItem) &&
+              bound(SDL_SCANCODE_RIGHTBRACKET, InputAction::NextItem) &&
+              bound(SDL_SCANCODE_RETURN, InputAction::UseItem));
+        // The console layout requested for the gamepad.
+        const auto pad = [&all](SDL_GamepadButton code, InputAction action)
+        { return all.bound(InputSource::GamepadButton, code, action); };
+        const auto axis = [&all](SDL_GamepadAxis code, bool positive, InputAction action)
+        {
+            return all.bound(positive ? InputSource::GamepadAxisPositive : InputSource::GamepadAxisNegative, code,
+                             action);
+        };
+        CHECK(axis(SDL_GAMEPAD_AXIS_LEFTY, false, InputAction::MoveForward) &&
+              axis(SDL_GAMEPAD_AXIS_LEFTY, true, InputAction::MoveBackward) &&
+              axis(SDL_GAMEPAD_AXIS_LEFTX, false, InputAction::StrafeLeft) &&
+              axis(SDL_GAMEPAD_AXIS_LEFTX, true, InputAction::StrafeRight));
+        CHECK(axis(SDL_GAMEPAD_AXIS_RIGHTX, true, InputAction::LookHorizontal) &&
+              axis(SDL_GAMEPAD_AXIS_RIGHTY, true, InputAction::LookVertical));
+        CHECK(pad(SDL_GAMEPAD_BUTTON_LEFT_STICK, InputAction::RunLatch) &&
+              axis(SDL_GAMEPAD_AXIS_LEFT_TRIGGER, true, InputAction::FireAlternate) &&
+              axis(SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, true, InputAction::FirePrimary));
+        CHECK(pad(SDL_GAMEPAD_BUTTON_LEFT_SHOULDER, InputAction::PrevWeapon) &&
+              pad(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, InputAction::NextWeapon) &&
+              pad(SDL_GAMEPAD_BUTTON_START, InputAction::Menu));
+        CHECK(pad(SDL_GAMEPAD_BUTTON_NORTH, InputAction::Jump) && pad(SDL_GAMEPAD_BUTTON_SOUTH, InputAction::Use) &&
+              pad(SDL_GAMEPAD_BUTTON_SOUTH, InputAction::MenuAccept) &&
+              pad(SDL_GAMEPAD_BUTTON_EAST, InputAction::MenuBack) &&
+              pad(SDL_GAMEPAD_BUTTON_WEST, InputAction::UseItem) &&
+              pad(SDL_GAMEPAD_BUTTON_BACK, InputAction::NextItem));
         MovementControls c;
         c.event(focus(true), window);
         // Every play key of the previous fixed table is still consumed; interface keys are not.
@@ -113,8 +172,9 @@ namespace
               SDL_SCANCODE_SPACE,  SDL_SCANCODE_LEFT,  SDL_SCANCODE_RIGHT, SDL_SCANCODE_UP, SDL_SCANCODE_DOWN,
               SDL_SCANCODE_1,      SDL_SCANCODE_0,     SDL_SCANCODE_KP_5})
             CHECK(c.consumes(key(code, true), false));
-        for (const auto code : {SDL_SCANCODE_ESCAPE, SDL_SCANCODE_RETURN, SDL_SCANCODE_F5, SDL_SCANCODE_F6,
-                                SDL_SCANCODE_F1, SDL_SCANCODE_O, SDL_SCANCODE_Q})
+        CHECK(c.consumes(key(SDL_SCANCODE_RETURN, true), false)); // Now also original UseInventory.
+        for (const auto code :
+             {SDL_SCANCODE_ESCAPE, SDL_SCANCODE_F5, SDL_SCANCODE_F6, SDL_SCANCODE_F1, SDL_SCANCODE_O, SDL_SCANCODE_Q})
             CHECK(!c.consumes(key(code, true), false));
         for (int i = 0; i < 10; ++i)
         {
@@ -209,6 +269,198 @@ namespace
         return true;
     }
 
+    bool gamepad()
+    {
+        MovementControls c;
+        c.event(focus(true), window);
+        // Left stick: digital movement past the threshold, both directions of one axis.
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, -.4f), window);
+        CHECK(!c.sample(false).forward);
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, -.8f), window);
+        CHECK(c.sample(false).forward && !c.sample(false).backward && !c.sample(false).run);
+        // Diagonal: both axes past the threshold.
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFTX, .7f), window);
+        CHECK(c.sample(false).forward && c.sample(false).right);
+        // L3 latches run while any movement is held, then the latch ends.
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_LEFT_STICK, true), window);
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_LEFT_STICK, false), window);
+        CHECK(c.sample(false).run);
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFTX, 0), window);
+        CHECK(c.sample(false).run);
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, 1), window); // Through to backward: still moving.
+        CHECK(c.sample(false).backward && !c.sample(false).forward && c.sample(false).run);
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, 0), window);
+        CHECK(!c.sample(false).backward && !c.sample(false).run);
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, -1), window);
+        CHECK(c.sample(false).forward && !c.sample(false).run);
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_LEFT_STICK, true), window); // Releasing the stick ends it.
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, 0), window);
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_LEFT_STICK, false), window);
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, -1), window);
+        CHECK(!c.sample(false).run);
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, 0), window);
+        // Triggers fire like the F/G keys; Y jumps; R3 crouches.
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, .9f), window);
+        CHECK(c.sample_fire(false).primary && !c.sample_fire(false).alternate);
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFT_TRIGGER, .9f), window);
+        CHECK(c.sample_fire(false).alternate);
+        CHECK(!c.sample_fire(true).primary); // Text editing refuses and suppresses...
+        CHECK(!c.sample_fire(false).primary);
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, .2f), window); // ...until released.
+        CHECK(!c.sample_fire(false).primary);
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, 1), window);
+        CHECK(c.sample_fire(false).primary);
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, 0), window);
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFT_TRIGGER, 0), window);
+        CHECK(!c.sample_fire(false).primary && !c.sample_fire(false).alternate);
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_NORTH, true), window);
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_RIGHT_STICK, true), window);
+        CHECK(c.sample(false).jump && c.sample(false).crouch);
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_NORTH, false), window);
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_RIGHT_STICK, false), window);
+        // Bumpers, X and Back queue one command per press.
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, true), window);
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, true), window); // No new edge.
+        CHECK(c.sample_command(InputAction::NextWeapon, false) && !c.sample_command(InputAction::NextWeapon, false));
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, false), window);
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_LEFT_SHOULDER, true), window);
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_WEST, true), window);
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_BACK, true), window);
+        CHECK(!c.sample_command(InputAction::NextWeapon, false) && c.sample_command(InputAction::PrevWeapon, false) &&
+              c.sample_command(InputAction::UseItem, false) && c.sample_command(InputAction::NextItem, false));
+        for (const auto code : {SDL_GAMEPAD_BUTTON_LEFT_SHOULDER, SDL_GAMEPAD_BUTTON_WEST, SDL_GAMEPAD_BUTTON_BACK})
+            c.event(pad_button(code, false), window);
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, true), window);
+        CHECK(!c.sample_command(InputAction::NextWeapon, true)); // Text editing drops it.
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, false), window);
+        c.enabled = false;
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, true), window);
+        c.enabled = true;
+        CHECK(!c.sample_command(InputAction::NextWeapon, false)); // Not queued while disabled.
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, false), window);
+        // Right stick: analog look past the deadzone, squared, quartered when zoomed.
+        PlayerRotation r;
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_RIGHTX, .15f), window);
+        c.look(r, .1, false);
+        CHECK(r.yaw == 0);
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_RIGHTX, 1), window);
+        c.look(r, .1, false);
+        CHECK(std::abs(r.yaw - gamepad_yaw_speed * .1f) < .001f);
+        r = {};
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_RIGHTX, -.6f), window);
+        c.look(r, .1, true, true);
+        CHECK(r.yaw == 0); // Text editing.
+        c.look(r, .1, false, true);
+        CHECK(std::abs(r.yaw + .25f * gamepad_yaw_speed * .25f * .1f) < .001f); // ((.6-.2)/.8)^2 = .25.
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_RIGHTX, 0), window);
+        r = {};
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_RIGHTY, 1), window);
+        c.look(r, .1, false);
+        CHECK(std::abs(r.pitch - gamepad_pitch_speed * .1f) < .001f);
+        c.invert_y = true;
+        c.look(r, .1, false);
+        CHECK(std::abs(r.pitch) < .001f);
+        c.invert_y = false;
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_RIGHTY, 0), window);
+        // Several gamepads: OR of their sources; removal releases one.
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, -1, 3), window);
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, -1, 4), window);
+        c.event(pad_removed(3), window);
+        CHECK(c.sample(false).forward && c.gamepads.size() == 1);
+        c.event(pad_removed(4), window);
+        CHECK(!c.sample(false).forward && c.gamepads.empty());
+        for (SDL_JoystickID id = 1; id <= 20; ++id)
+            c.event(pad_button(SDL_GAMEPAD_BUTTON_SOUTH, true, id), window);
+        CHECK(c.gamepads.size() == max_gamepads);
+        for (SDL_JoystickID id = 1; id <= 20; ++id)
+            c.event(pad_removed(id), window);
+        // Player changes keep held movement but a held Press source needs a fresh press.
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, -1), window);
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_SOUTH, true), window);
+        c.player_changed(true);
+        CHECK(c.sample(false).forward && !c.sample_use(false));
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_SOUTH, false), window);
+        CHECK(!c.sample_use(false));
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_SOUTH, true), window);
+        CHECK(c.sample_use(false));
+        // Focus loss drops gamepad state and ignores background events; a poll restores it.
+        c.event(focus(false), window);
+        CHECK(c.gamepads.empty() && !c.sample(false).forward);
+        c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, -1), window);
+        CHECK(c.gamepads.empty());
+        c.event(focus(true), window);
+        GamepadState polled{3, {}, {}};
+        polled.axes[SDL_GAMEPAD_AXIS_LEFTY] = -1;
+        polled.buttons[SDL_GAMEPAD_BUTTON_SOUTH] = true;
+        c.set_gamepad(polled);
+        CHECK(c.sample(false).forward && !c.sample_use(false));
+        return true;
+    }
+
+    bool gamepad_menu()
+    {
+        Menu m;
+        MenuInput input;
+        input.controls.focused = true;
+        const auto send = [&](const SDL_Event& e) { return input.event(e, window, m, true, true, false, 640, 480); };
+        send(pad_button(SDL_GAMEPAD_BUTTON_START, true));
+        CHECK(m.active && m.page == MenuPage::Main && m.selected == 0);
+        send(pad_button(SDL_GAMEPAD_BUTTON_START, false));
+        send(pad_button(SDL_GAMEPAD_BUTTON_DPAD_DOWN, true));
+        const int first = m.selected;
+        CHECK(first != 0);
+        send(pad_button(SDL_GAMEPAD_BUTTON_DPAD_DOWN, false));
+        send(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, .6f)); // One step per threshold crossing.
+        send(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, .9f));
+        const int second = m.selected;
+        CHECK(second != first);
+        send(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, 0));
+        send(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, -.9f));
+        CHECK(m.selected == first);
+        send(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, 0));
+        m.selected = 0;
+        send(pad_button(SDL_GAMEPAD_BUTTON_SOUTH, true));
+        CHECK(m.page == MenuPage::Solo);
+        send(pad_button(SDL_GAMEPAD_BUTTON_SOUTH, false));
+        send(pad_button(SDL_GAMEPAD_BUTTON_EAST, true));
+        CHECK(m.active && m.page == MenuPage::Main);
+        send(pad_button(SDL_GAMEPAD_BUTTON_EAST, false));
+        // Start resumes; a trigger held into play needs a fresh press; B never opens the menu.
+        send(pad_axis(SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, 1));
+        send(pad_button(SDL_GAMEPAD_BUTTON_START, true));
+        CHECK(!m.active && input.controls.mouse_requested);
+        CHECK(!input.controls.sample_fire(false).primary);
+        send(pad_axis(SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, 0));
+        CHECK(!input.controls.sample_fire(false).primary);
+        send(pad_axis(SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, 1));
+        CHECK(input.controls.sample_fire(false).primary);
+        send(pad_axis(SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, 0));
+        send(pad_button(SDL_GAMEPAD_BUTTON_START, false));
+        send(pad_button(SDL_GAMEPAD_BUTTON_EAST, true));
+        CHECK(!m.active);
+        // Bumpers reach play through the menu input path.
+        send(pad_button(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, true));
+        CHECK(input.controls.sample_command(InputAction::NextWeapon, false));
+        // State changes while the menu is open are kept: no stuck stick after closing it.
+        send(pad_button(SDL_GAMEPAD_BUTTON_START, true));
+        send(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, -1));
+        CHECK(m.active && input.controls.held(InputAction::MoveForward));
+        send(pad_button(SDL_GAMEPAD_BUTTON_START, false));
+        send(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, 0));
+        CHECK(!input.controls.held(InputAction::MoveForward));
+        // Removal is processed even without focus.
+        send(pad_axis(SDL_GAMEPAD_AXIS_LEFTX, 1));
+        input.controls.focused = false;
+        send(pad_removed());
+        CHECK(input.controls.gamepads.empty());
+        // The credits screen leaves with B or Start.
+        input.controls.focused = true;
+        input.credits_screen = true;
+        send(pad_button(SDL_GAMEPAD_BUTTON_EAST, true));
+        CHECK(input.credits_exit);
+        return true;
+    }
+
     bool menu()
     {
         Menu m;
@@ -271,5 +523,9 @@ int main(int argc, char** argv)
         return remap() ? 0 : 1;
     if (mode == "menu")
         return menu() ? 0 : 1;
+    if (mode == "gamepad")
+        return gamepad() ? 0 : 1;
+    if (mode == "gamepad_menu")
+        return gamepad_menu() ? 0 : 1;
     return 2;
 }

@@ -635,3 +635,18 @@ InventoryResult CInventoryMgr::SelectNextWeapon()
         return InventoryResult::Current;
     return ChangeWeaponSlot(static_cast<DBYTE>(slot));
 }
+// The source resets an inventory-bomb current slot (10..12) to 0 before searching. When the
+// search then lands back on slot 0 it returns CHWEAP_CURRENT having silently set slot 0;
+// here that case is a real change to slot 0, so the hand models and client follow it.
+std::optional<DBYTE> CInventoryMgr::CycleWeaponSlot(bool next) const
+{
+    const unsigned start = m_nCurWeaponSlot >= 10 ? 0 : m_nCurWeaponSlot;
+    unsigned slot = next ? (start + 1) % 10 : (start + 9) % 10;
+    while (slot != start && !GetWeapon(slot))
+        slot = next ? (slot + 1) % 10 : (slot + 9) % 10;
+    if (slot != start)
+        return static_cast<DBYTE>(slot);
+    if (m_nCurWeaponSlot >= 10 && GetWeapon(0))
+        return DBYTE(0);
+    return std::nullopt;
+}

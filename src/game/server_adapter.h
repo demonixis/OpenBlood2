@@ -622,6 +622,8 @@ namespace OpenBlood2
 
         bool select_weapon(DBYTE slot, std::string& error);
         bool command_weapon(DBYTE slot, std::string& error);
+        // Original COMMAND_NEXTWEAPON / COMMAND_PREVWEAPON (same guard as command_weapon).
+        bool cycle_weapon(bool next, std::string& error);
         bool leave_player();
         bool pump_player_messages(std::string& error);
         bool unload_world();

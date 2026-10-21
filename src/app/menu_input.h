@@ -61,13 +61,28 @@ namespace OpenBlood2
             quick_save = quick_load = false;
             controls.player_changed(player && !menu.active && !credits_screen && !inspector);
         }
-        // Original promotion keys: Esc, Space or Enter; other devices use the menu actions.
-        bool dismisses_promotion(const SDL_Event& e) const
+        // Fresh (non-repeated) down edge of an action in this event.
+        bool pressed(const InputEdges& edges, InputAction action) const
         {
-            const auto& b = controls.bindings;
-            return (e.type == SDL_EVENT_KEY_DOWN && e.key.scancode == SDL_SCANCODE_SPACE) ||
-                   b.matches(e, InputAction::Menu) || b.matches(e, InputAction::MenuAccept) ||
-                   b.matches(e, InputAction::MenuBack);
+            for (const auto& edge : edges)
+                if (edge.down && !edge.repeat && controls.bindings.matches(edge, action))
+                    return true;
+            return false;
+        }
+        // Down edge including key repeats (menu navigation).
+        bool navigated(const InputEdges& edges, InputAction action) const
+        {
+            for (const auto& edge : edges)
+                if (edge.down && controls.bindings.matches(edge, action))
+                    return true;
+            return false;
+        }
+        // Original promotion keys: Esc, Space or Enter; other devices use the menu actions.
+        bool dismisses_promotion(const SDL_Event& e, const InputEdges& edges) const
+        {
+            return (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.scancode == SDL_SCANCODE_SPACE) ||
+                   pressed(edges, InputAction::Menu) || pressed(edges, InputAction::MenuAccept) ||
+                   pressed(edges, InputAction::MenuBack);
         }
         // True means the caller should forward this event to ImGui's inspector.
         bool event(const SDL_Event& e, SDL_WindowID window, Menu& menu, bool player, bool alive,
@@ -96,14 +111,20 @@ namespace OpenBlood2
                 controls.event(e, window);
                 return inspector;
             }
-            if (!controls.focused)
+            const bool gamepad = MovementControls::gamepad_event(e);
+            if (e.type == SDL_EVENT_GAMEPAD_REMOVED || !controls.focused)
+            {
+                if (gamepad)
+                    controls.track(e); // Removal releases its sources even while unfocused.
                 return false;
-            const auto& bindings = controls.bindings;
-            const bool pressed = e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat;
-            const auto press = [&](InputAction action) { return pressed && bindings.matches(e, action); };
+            }
+            // Gamepad state changes here, before any early return, so a menu or the
+            // inspector never leaves stale axes or buttons behind.
+            const auto edges = controls.track(e);
+            const auto press = [&](InputAction action) { return pressed(edges, action); };
             if (menu.promotion != MenuPromotion::None)
             {
-                if (pressed && dismisses_promotion(e))
+                if (dismisses_promotion(e, edges))
                 {
                     menu.dismiss_promotion();
                     reset(menu, player);
@@ -131,6 +152,23 @@ namespace OpenBlood2
                     else
                         credit_keys.push_back(vk);
                 }
+            // Other devices drive the roll through the menu actions' original keys.
+            if (gamepad && (roll_credits || credits_screen))
+            {
+                if (press(InputAction::Menu) || press(InputAction::MenuBack))
+                {
+                    if (credits_screen)
+                        credits_exit = true;
+                    else
+                        credit_keys.push_back(CREDITS_VK_ESCAPE);
+                }
+                if (press(InputAction::MenuAccept))
+                    credit_keys.push_back(CREDITS_VK_RETURN);
+                if (navigated(edges, InputAction::MenuUp))
+                    credit_keys.push_back(CREDITS_VK_UP);
+                if (navigated(edges, InputAction::MenuDown))
+                    credit_keys.push_back(CREDITS_VK_DOWN);
+            }
             if (credits_screen)
                 return false;
             if (press(InputAction::Menu) || (menu.active && press(InputAction::MenuBack)))
@@ -149,27 +187,24 @@ namespace OpenBlood2
             }
             if (menu.active)
             {
-                if (e.type == SDL_EVENT_KEY_DOWN)
+                if (e.type == SDL_EVENT_KEY_DOWN && menu.page == MenuPage::Quit && !e.key.repeat &&
+                    (e.key.scancode == SDL_SCANCODE_Y || e.key.scancode == SDL_SCANCODE_N))
                 {
-                    if (menu.page == MenuPage::Quit && !e.key.repeat &&
-                        (e.key.scancode == SDL_SCANCODE_Y || e.key.scancode == SDL_SCANCODE_N))
-                    {
-                        menu.selected = e.key.scancode == SDL_SCANCODE_Y ? 0 : 1;
-                        menu.activate();
-                        return false;
-                    }
-                    // Navigation repeats while held; activation needs a fresh press.
-                    if (bindings.matches(e, InputAction::MenuUp))
-                        menu.select(-1);
-                    if (bindings.matches(e, InputAction::MenuDown))
-                        menu.select(1);
-                    if (bindings.matches(e, InputAction::MenuLeft))
-                        menu.adjust(-1);
-                    if (bindings.matches(e, InputAction::MenuRight))
-                        menu.adjust(1);
-                    if (press(InputAction::MenuAccept))
-                        menu.activate();
+                    menu.selected = e.key.scancode == SDL_SCANCODE_Y ? 0 : 1;
+                    menu.activate();
+                    return false;
                 }
+                // Navigation repeats while a key is held; activation needs a fresh press.
+                if (navigated(edges, InputAction::MenuUp))
+                    menu.select(-1);
+                if (navigated(edges, InputAction::MenuDown))
+                    menu.select(1);
+                if (navigated(edges, InputAction::MenuLeft))
+                    menu.adjust(-1);
+                if (navigated(edges, InputAction::MenuRight))
+                    menu.adjust(1);
+                if (press(InputAction::MenuAccept))
+                    menu.activate();
                 if (e.type == SDL_EVENT_MOUSE_MOTION ||
                     ((e.type == SDL_EVENT_MOUSE_BUTTON_DOWN || e.type == SDL_EVENT_MOUSE_BUTTON_UP) &&
                      e.button.button == SDL_BUTTON_LEFT))
@@ -185,13 +220,18 @@ namespace OpenBlood2
             }
             // F5 quicksaves without pausing when in the world and alive; F6 quickloads in play,
             // dead or alive. The single-player check belongs to the save itself (D12).
-            const bool quick_save_key = bindings.matches(e, InputAction::QuickSave),
-                       quick_load_key = bindings.matches(e, InputAction::QuickLoad);
-            if (pressed && !menu.demo() && (quick_save_key || quick_load_key))
+            const auto& bindings = controls.bindings;
+            bool quick_save_key = false, quick_load_key = false;
+            for (const auto& edge : edges)
             {
-                if (quick_save_key && player && alive)
+                quick_save_key |= bindings.matches(edge, InputAction::QuickSave);
+                quick_load_key |= bindings.matches(edge, InputAction::QuickLoad);
+            }
+            if (!menu.demo() && (press(InputAction::QuickSave) || press(InputAction::QuickLoad)))
+            {
+                if (press(InputAction::QuickSave) && player && alive)
                     quick_save = true;
-                if (quick_load_key && player)
+                if (press(InputAction::QuickLoad) && player)
                     quick_load = true;
                 return false;
             }
@@ -202,7 +242,10 @@ namespace OpenBlood2
                 (e.key.scancode == SDL_SCANCODE_F1 || e.key.scancode == SDL_SCANCODE_F2 ||
                  e.key.scancode == SDL_SCANCODE_F3))
                 return false;
-            controls.event(e, window);
+            if (gamepad)
+                controls.command_edges(edges, false);
+            else
+                controls.event(e, window);
             return false;
         }
     };

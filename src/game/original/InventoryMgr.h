@@ -34,6 +34,9 @@ class CInventoryMgr : public Aggregate
     InventoryResult AddInventoryWeapon(DBYTE, DBYTE);
     InventoryResult SelectInventoryWeapon(DBYTE);
     InventoryResult SelectNextWeapon();
+    // Original SelectNextWeapon/SelectPrevWeapon search over slots 0..9, without changing
+    // state; nullopt is CHWEAP_CURRENT. See the definition for the bomb-slot difference.
+    std::optional<DBYTE> CycleWeaponSlot(bool next) const;
     InventoryResult SetActiveItem(DBYTE);
     void RemoveDeathItems();
     std::optional<CInvMedkit> medkit;

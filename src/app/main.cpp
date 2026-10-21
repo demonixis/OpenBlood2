@@ -1,6 +1,7 @@
 #include "ai_model_key_smoke.h"
 #include "app/bench.h"
 #include "app/frontend.h"
+#include "app/gamepad_devices.h"
 #include "app/hud.h"
 #include "app/movement_controls.h"
 #include "app/scene_presenter.h"
@@ -464,6 +465,7 @@ namespace
         bool weapons_fired = false, weapon_advanced_hidden = false;
         std::uint64_t hidden_weapon_shots = 0;
         OpenBlood2::MovementControls controls;
+        OpenBlood2::GamepadDevices gamepads;
         controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
         controls.mouse_requested = options.view_world && !smoke;
         std::string mouse_error;
@@ -489,16 +491,19 @@ namespace
             SDL_Event event{};
             while (SDL_PollEvent(&event))
             {
-                const bool escape_releases_mouse =
-                    event.type == SDL_EVENT_KEY_DOWN && event.key.windowID == SDL_GetWindowID(runtime.window) &&
-                    controls.bindings.matches(event, OpenBlood2::InputAction::Menu) &&
-                    (controls.mouse_requested || controls.mouse_captured);
+                const bool escape_releases_mouse = event.type == SDL_EVENT_KEY_DOWN &&
+                                                   event.key.windowID == SDL_GetWindowID(runtime.window) &&
+                                                   controls.bindings.matches(event, OpenBlood2::InputAction::Menu) &&
+                                                   (controls.mouse_requested || controls.mouse_captured);
+                gamepads.event(event);
 #if BLOOD2_INSPECTOR
                 controls.event(event, SDL_GetWindowID(runtime.window),
                                inspector_visible && !inspector.collapsed && ImGui::GetIO().WantTextInput);
 #else
                 controls.event(event, SDL_GetWindowID(runtime.window));
 #endif
+                if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED)
+                    gamepads.resync(controls);
                 if (options.movement_smoke &&
                     (event.type == SDL_EVENT_WINDOW_FOCUS_LOST || event.type == SDL_EVENT_WINDOW_FOCUS_GAINED))
                     spdlog::info("Movement smoke focus at frame {}: {}", frames, controls.focused);
@@ -685,6 +690,14 @@ namespace
                 if (!game->command_weapon(static_cast<DBYTE>(slot), selection_error))
                     spdlog::info("Weapon key {}: {}", (slot + 1) % 10, selection_error);
             }
+            for (const bool next : {true, false})
+                if (controls.sample_command(
+                        next ? OpenBlood2::InputAction::NextWeapon : OpenBlood2::InputAction::PrevWeapon, text_editing))
+                {
+                    std::string selection_error;
+                    if (!game->cycle_weapon(next, selection_error))
+                        spdlog::info("Weapon cycle: {}", selection_error);
+                }
             auto keyboard = controls.sample(text_editing);
             auto& movement = game->client_shell.movement_input;
             movement.forward |= keyboard.forward;
