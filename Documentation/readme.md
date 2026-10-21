@@ -5,6 +5,7 @@
 | [Roadmap](roadmap.md) | Overall progress, M0–M9 completion and future work. |
 | [Build and play](getting_started.md) | Requirements, commands, controls and platforms. |
 | [CI builds](ci_builds.md) | Desktop archives, headless tests and dual-remote workflow. |
+| [Packaging](packaging.md) | Version, icons, Xcode (macOS/iOS), Android and Quest presets. |
 | [Tests](testing.md) | Headless, private-data, GPU and sanitizer commands. |
 | [Launcher](launcher.md) | Game selection, demo installation and REZ mods. |
 | [Logs](logging.md) / [crash capture](crash_capture.md) | Collect and inspect diagnostics. |

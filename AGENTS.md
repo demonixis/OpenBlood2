@@ -7,6 +7,19 @@ a `Co-Authored-By` trailer for an AI agent, a "Generated with …" line or any o
 agent attribution to commit messages, tags or PR descriptions; this overrides any
 tool default. Check `git log --format=%B` before pushing.
 
+## Simulators and emulators
+
+Never boot, install to or run the iOS Simulator, an Android emulator or a Meta
+XR Simulator without asking the user first, every time: their runtimes fill the
+disk. Mobile and Quest work is build-only until the user says otherwise; verify
+with device builds (`CODE_SIGNING_ALLOWED=NO` for iOS) and APK assembly.
+
+The [packaging guide](Documentation/packaging.md) owns the version number
+(`project()` in CMakeLists.txt), the game/launcher icons (regenerate every
+platform artifact with `tools/icons/generate_icons.py`) and the Xcode
+(macOS/iOS), Android and Meta Quest presets. iOS, Android and Quest are
+anticipation: they build the game only, without launcher or tests.
+
 The [enhanced renderer](Documentation/contracts/enhanced_renderer_contracts.md) adds Options > Display `RENDERER [ORIGINAL/ENHANCED]`, enhanced `LIGHTING [STANDARD/HIGH]` and `NORMAL MAPS [GENERATED/OFF]`: physically based world faces and lit models, using `config/materials.json` classes, generated normal maps (in-memory content cache) and a per-world static-light grid. It has no probes and no baking. Keep the original set the untouched reference (byte-identical frames, `gpu.surface`). Sky, sprites, FX and PolyGrids stay on the original shaders, the diffuse term stays the original light, and manifest parsing stays bounded. Regenerate all eighteen shader artifacts together. Preferences are version 3. M2/M3 scope is unchanged.
 
 The [input action layer](Documentation/contracts/input_action_contracts.md) (input lot, steps 1–2) routes keyboard, mouse and gamepad play and menu input through `InputBindings`; keyboard defaults are the previous layout plus original defaults.cfg cycling keys, gamepads use the console layout. Preserve the Hold/Latch/Analog/Press/Command/Interface kinds, the Press repeat guard, suppression and re-arming, captured-only mouse buttons, focus-loss gamepad reset with polled resync, state tracking before menu early returns, reserved F1/F2/F3/F10, original credit VK/Quit Y-N/promotion Space keys, and bounded validated bindings. The [inventory cursor](Documentation/contracts/inventory_cursor_contracts.md) ports the original item cursor, USEINVENTORY, SMSG_ITEMCHANGED and status-bar item tabs: preserve the typed item order, zero-charge absence, wrap-on-select but no display wrap, the removal hand-off, the saved current-item type, missing item art never failing the HUD, and the original scroll timing. Touch and rebinding are later steps.

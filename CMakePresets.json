@@ -106,6 +106,80 @@
         "USE_LIBIDN2": false,
         "BLOOD2_LAUNCHER_TEST_GAME": ""
       }
+    },
+    {
+      "name": "xcode-macos",
+      "displayName": "Xcode project: macOS game and launcher bundles",
+      "generator": "Xcode",
+      "binaryDir": "${sourceDir}/build/xcode-macos",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "BUILD_TESTING": false,
+        "BLOOD2_BUILD_GAME": true,
+        "BLOOD2_BUILD_LAUNCHER": true,
+        "BLOOD2_INSPECTOR": false,
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "26.0"
+      }
+    },
+    {
+      "name": "xcode-ios",
+      "displayName": "Xcode project: iOS/iPadOS game (device)",
+      "generator": "Xcode",
+      "binaryDir": "${sourceDir}/build/xcode-ios",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "BUILD_TESTING": false,
+        "BLOOD2_BUILD_GAME": true,
+        "BLOOD2_BUILD_LAUNCHER": false,
+        "BLOOD2_INSPECTOR": false,
+        "CMAKE_SYSTEM_NAME": "iOS",
+        "CMAKE_OSX_SYSROOT": "iphoneos",
+        "CMAKE_OSX_ARCHITECTURES": "arm64",
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "26.0"
+      }
+    },
+    {
+      "name": "android-base",
+      "hidden": true,
+      "generator": "Ninja",
+      "toolchainFile": "$env{ANDROID_SDK_ROOT}/ndk/29.0.14206865/build/cmake/android.toolchain.cmake",
+      "cacheVariables": {
+        "BUILD_TESTING": false,
+        "BLOOD2_BUILD_GAME": true,
+        "BLOOD2_BUILD_LAUNCHER": false,
+        "BLOOD2_INSPECTOR": false,
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "ANDROID_ABI": "arm64-v8a",
+        "ANDROID_STL": "c++_static"
+      }
+    },
+    {
+      "name": "android",
+      "displayName": "Android phone/tablet APK (arm64)",
+      "inherits": "android-base",
+      "binaryDir": "${sourceDir}/build/android",
+      "cacheVariables": {
+        "ANDROID_PLATFORM": "android-29",
+        "BLOOD2_ANDROID_FLAVOR": "phone"
+      }
+    },
+    {
+      "name": "quest",
+      "displayName": "Meta Quest APK (2D panel app, arm64)",
+      "inherits": "android-base",
+      "binaryDir": "${sourceDir}/build/quest",
+      "cacheVariables": {
+        "ANDROID_PLATFORM": "android-32",
+        "BLOOD2_ANDROID_FLAVOR": "quest"
+      }
     }
   ],
   "buildPresets": [
@@ -140,6 +214,30 @@
     {
       "name": "ci-launcher-release",
       "configurePreset": "ci-launcher-release"
+    },
+    {
+      "name": "xcode-macos",
+      "configurePreset": "xcode-macos",
+      "configuration": "Release"
+    },
+    {
+      "name": "xcode-ios",
+      "configurePreset": "xcode-ios",
+      "configuration": "Release"
+    },
+    {
+      "name": "android",
+      "configurePreset": "android",
+      "targets": [
+        "blood2_apk"
+      ]
+    },
+    {
+      "name": "quest",
+      "configurePreset": "quest",
+      "targets": [
+        "blood2_apk"
+      ]
     }
   ],
   "testPresets": [

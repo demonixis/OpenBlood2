@@ -6,7 +6,17 @@ if(NOT PLATFORM MATCHES "^(linux-x64|windows-x64|macos-arm64)$")
 endif()
 get_filename_component(source "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 set(build "${source}/build/ci")
-set(name "OpenBlood2-${PLATFORM}")
+# project(VERSION) is the single version source (Documentation/packaging.md).
+file(STRINGS "${source}/CMakeLists.txt" project_line REGEX "^project\\(Blood2 VERSION ")
+string(REGEX REPLACE "^project\\(Blood2 VERSION ([0-9]+\\.[0-9]+\\.[0-9]+).*" "\\1" version "${project_line}")
+if(NOT version MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+$")
+  message(FATAL_ERROR "Cannot read the project version from CMakeLists.txt")
+endif()
+# A release tag must name exactly this version.
+if("$ENV{GITHUB_REF_TYPE}" STREQUAL "tag" AND NOT "$ENV{GITHUB_REF_NAME}" STREQUAL "v${version}")
+  message(FATAL_ERROR "Tag $ENV{GITHUB_REF_NAME} does not match project version ${version} (expected v${version})")
+endif()
+set(name "OpenBlood2-${version}-${PLATFORM}")
 set(package "${build}/dist/${name}")
 set(suffix "")
 if(CMAKE_HOST_WIN32)
@@ -56,7 +66,7 @@ if(CMAKE_HOST_APPLE)
 endif()
 execute_process(COMMAND git rev-parse HEAD WORKING_DIRECTORY "${source}"
   OUTPUT_VARIABLE revision OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
-file(WRITE "${package}/BUILD.txt" "OpenBlood2\nPlatform: ${PLATFORM}\nConfiguration: Release\nCommit: ${revision}\n")
+file(WRITE "${package}/BUILD.txt" "OpenBlood2 ${version}\nPlatform: ${PLATFORM}\nConfiguration: Release\nCommit: ${revision}\n")
 
 # Check the staged executables as well as the build-tree binaries.
 execute_process(COMMAND ${run_environment} "${package}/blood2${suffix}" --launcher-info

@@ -1,4 +1,5 @@
 #include "engine/runtime.h"
+#include "build_info.h"
 #include "engine/world_shaders.h"
 
 namespace OpenBlood2
@@ -6,7 +7,7 @@ namespace OpenBlood2
 
     bool Runtime::initialize(bool gpu_debug, std::string& error)
     {
-        SDL_SetAppMetadata("OpenBlood 2", "0.1.0", "org.blood2.reconstruction");
+        SDL_SetAppMetadata("OpenBlood 2", build::version, build::game_identifier);
         if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD))
         {
             error = SDL_GetError();

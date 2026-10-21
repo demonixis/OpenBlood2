@@ -10,3 +10,6 @@ crash.core.partial
 crash-executable
 
 .DS_Store
+/platform/android/.gradle/
+/platform/android/build/
+/platform/android/app/build/

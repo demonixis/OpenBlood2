@@ -9,7 +9,16 @@ set(launcher_cmake_args
     "-DBLOOD2_INSPECTOR:BOOL=OFF"
     "-DBLOOD2_GPU_TESTS:BOOL=OFF"
     "-DBLOOD2_SANITIZERS:BOOL=${BLOOD2_SANITIZERS}"
-    "-DBUILD_TESTING:BOOL=OFF")
+    "-DBUILD_TESTING:BOOL=OFF"
+    "-DBLOOD2_BUILD_NUMBER:STRING=${BLOOD2_BUILD_NUMBER}"
+    "-DBLOOD2_APPLE_BUNDLE:BOOL=${BLOOD2_APPLE_BUNDLE}"
+    "-DBLOOD2_APPLE_TEAM_ID:STRING=${BLOOD2_APPLE_TEAM_ID}")
+# Installed beside the game executable, or beside OpenBlood2.app for bundles.
+if(APPLE AND BLOOD2_APPLE_BUNDLE)
+    set(launcher_prefix "$<TARGET_BUNDLE_DIR:blood2_app>/..")
+else()
+    set(launcher_prefix "$<TARGET_FILE_DIR:blood2_app>")
+endif()
 set(launcher_forward_variables
     CMAKE_C_COMPILER CMAKE_CXX_COMPILER CMAKE_MAKE_PROGRAM CMAKE_TOOLCHAIN_FILE
     CMAKE_C_COMPILER_LAUNCHER CMAKE_CXX_COMPILER_LAUNCHER
@@ -45,7 +54,7 @@ ExternalProject_Add(blood2_launcher
     BUILD_COMMAND "${CMAKE_COMMAND}" --build <BINARY_DIR> --config "$<CONFIG>"
         --target blood2_launcher --parallel 2
     INSTALL_COMMAND "${CMAKE_COMMAND}" --install <BINARY_DIR> --config "$<CONFIG>"
-        --prefix "$<TARGET_FILE_DIR:blood2_app>" --component Launcher
+        --prefix "${launcher_prefix}" --component Launcher
     USES_TERMINAL_CONFIGURE TRUE
     USES_TERMINAL_BUILD TRUE
     USES_TERMINAL_INSTALL TRUE)

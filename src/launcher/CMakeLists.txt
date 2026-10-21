@@ -20,6 +20,7 @@ set_target_properties(blood2_launcher PROPERTIES OUTPUT_NAME blood2-launcher
 target_include_directories(blood2_launcher PRIVATE "${PROJECT_BINARY_DIR}/generated")
 target_link_libraries(blood2_launcher PRIVATE blood2_launcher_core imgui spdlog::spdlog)
 blood2_project_options(blood2_launcher)
+blood2_package_application(blood2_launcher LAUNCHER)
 
 if(BUILD_TESTING)
     add_subdirectory("${PROJECT_SOURCE_DIR}/tests/launcher" "${PROJECT_BINARY_DIR}/tests/launcher")
@@ -38,5 +39,5 @@ foreach(pair IN ITEMS "${launcher_curl_SOURCE_DIR}/COPYING|curl.txt" "${launcher
 endforeach()
 
 # The parent game build installs this component beside its own executable.
-install(TARGETS blood2_launcher RUNTIME DESTINATION . COMPONENT Launcher)
+install(TARGETS blood2_launcher RUNTIME DESTINATION . BUNDLE DESTINATION . COMPONENT Launcher)
 install(DIRECTORY "${PROJECT_BINARY_DIR}/licenses" DESTINATION . COMPONENT Launcher)

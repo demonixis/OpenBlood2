@@ -3,6 +3,9 @@
 namespace OpenBlood2::build
 {
     inline constexpr const char* version = "@PROJECT_VERSION@";
+    inline constexpr unsigned version_code = @BLOOD2_VERSION_CODE@;
+    inline constexpr const char* game_identifier = "@BLOOD2_GAME_IDENTIFIER@";
+    inline constexpr const char* launcher_identifier = "@BLOOD2_LAUNCHER_IDENTIFIER@";
     inline constexpr const char* revision = "@BLOOD2_BUILD_REVISION@";
     inline constexpr const char* configuration = "@CMAKE_BUILD_TYPE@";
     inline constexpr const char* compiler = "@CMAKE_CXX_COMPILER_ID@ @CMAKE_CXX_COMPILER_VERSION@";

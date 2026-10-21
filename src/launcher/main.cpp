@@ -196,7 +196,7 @@ namespace OpenBlood2::Launcher
         }
         bool initialize(float requested)
         {
-            SDL_SetAppMetadata("OpenBlood 2 Launcher", build::version, "org.openblood2.launcher");
+            SDL_SetAppMetadata("OpenBlood 2 Launcher", build::version, build::launcher_identifier);
             if (!SDL_Init(SDL_INIT_VIDEO))
                 return false;
             sdl = true;
@@ -432,12 +432,23 @@ namespace OpenBlood2::Launcher
         {
             const char* base = SDL_GetBasePath();
             if (base)
+            {
                 state.game = path_from_utf8(base) /
 #ifdef _WIN32
                              "blood2.exe";
 #else
                              "blood2";
 #endif
+#ifdef __APPLE__
+                // Bundled builds (Xcode presets) place OpenBlood2.app beside this bundle,
+                // whose base path is its Contents/Resources directory.
+                const auto bundled = (path_from_utf8(base) / "../../..").lexically_normal() /
+                                     "OpenBlood2.app/Contents/MacOS/OpenBlood2";
+                std::error_code ignored;
+                if (!std::filesystem::exists(state.game, ignored) && std::filesystem::exists(bundled, ignored))
+                    state.game = bundled;
+#endif
+            }
         }
         std::array<char, 4097> game{}, data{};
         assign(game, state.game);

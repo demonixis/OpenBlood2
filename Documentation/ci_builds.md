@@ -30,7 +30,8 @@ the repository's pinned hashes. Compiler outputs are not shared between runners.
 ## Get and use a build
 
 Open a successful Actions run and download the artifact for your platform.
-Extract the contained ZIP (Windows) or tar.gz (Linux/macOS), then run
+Extract the contained `OpenBlood2-<version>-<platform>` ZIP (Windows) or tar.gz
+(Linux/macOS; see [packaging](packaging.md) for versions and release tags), then run
 `blood2-launcher` (`blood2-launcher.exe` on Windows), or start the game directly:
 
 ```sh

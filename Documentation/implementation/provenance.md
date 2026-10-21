@@ -1,5 +1,15 @@
 # Source and Dependency Provenance
 
+## Packaging and platform presets
+
+The game/launcher icons are new project-owned artwork drawn procedurally by
+`tools/icons/generate_icons.py`; no original Blood II image is used. The Android
+packager compiles the pinned SDL archive's own `android-project` Java sources in
+place (nothing is copied). `platform/android/gradlew*` and `gradle-wrapper.jar`
+are the unmodified Gradle 9.6.0 wrapper (Apache-2.0), with the distribution
+checksum pinned in `gradle-wrapper.properties`; the Android Gradle Plugin 9.4.1 is
+downloaded by Gradle. See [packaging](../packaging.md).
+
 ## Crypt, Bridge, Entrance and Lobby
 
 Selected Behemoth, DrudgePriest, DeathShroud, TheHandAI, ParticleSystem and
