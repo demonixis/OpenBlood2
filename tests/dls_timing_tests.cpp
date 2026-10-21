@@ -137,7 +137,13 @@ namespace
         CHECK(sampler.advance(100, {}) && sampler.coalesced_messages == many.size() - 1 &&
               sampler.dispatched_messages == 1);
         // Runtime patch failure is not successful admission/playback. Consume it once and retain history.
+        // Program 99 is ambiguous (two instruments share its packed patch); a missing one is silent.
         sampler.clear();
+        for (int copy = 0; copy < 2; ++copy)
+        {
+            bank->instruments.push_back(bank->instruments[0]);
+            bank->instruments.back().program = 99;
+        }
         const DlsTimedMidi missing[] = {
             {1, 0xc4, 99, 0}, {1, 0x94, 60, 100}, {2, 0xc4, 0, 0}, {2, 0x94, 60, 100}, {4, 0x84, 60, 0}};
         CHECK(sampler.enqueue(bank, missing, 1, error));

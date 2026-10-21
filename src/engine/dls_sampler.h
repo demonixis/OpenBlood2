@@ -35,10 +35,17 @@ namespace OpenBlood2
     // Immutable reader-produced bank. key==128 inspects any key; notes require 0..127.
     // Exact patch/key first, then original percussion bank/program zero fallback.
     // Failure clears output. Ambiguous packed identifiers are refused, not ordered arbitrarily.
-    // `uncovered` (optional) is set when the patch names an unambiguous instrument but no region of
-    // it covers the key; the lookup still fails and the caller decides what that note means.
+    // Why a lookup of valid input found no instrument: no instrument has the patch (Missing), or one
+    // unambiguous instrument has it but no region covers the key (Uncovered). Invalid input and
+    // ambiguous patches leave None. The lookup still fails; the caller decides what the note means.
+    enum class DlsMiss : std::uint8_t
+    {
+        None,
+        Uncovered,
+        Missing
+    };
     bool find_dls_instrument(const DlsBank&, const DlsMidiChannel&, unsigned key, std::optional<std::size_t>&,
-                             std::string& error, bool* uncovered = nullptr);
+                             std::string& error, DlsMiss* miss = nullptr);
     struct DlsVoice
     {
         std::uint64_t id = 0, frames = 0, gate = 0, loops = 0;
@@ -58,11 +65,12 @@ namespace OpenBlood2
         double lfo_hz = 5, lfo_delay = .01, lfo_pitch = 0, lfo_gain = 0, envelope_pitch = 0;
         DlsEnvelope amplitude, pitch;
     };
-    // A routed note-on whose instrument has no region for its key (first occurrence per patch/key).
-    struct DlsUncoveredNote
+    // A received note-on played as silence (first occurrence per patch/key and kind).
+    struct DlsSilentNote
     {
         unsigned bank_msb = 0, bank_lsb = 0, program = 0, key = 0;
         bool percussion = false;
+        DlsMiss miss = DlsMiss::Uncovered;
         std::uint64_t frame = 0; // Sample clock of the first occurrence.
     };
     struct DlsTimedMidi
@@ -93,12 +101,14 @@ namespace OpenBlood2
         }
         std::uint64_t midi_received = 0, midi_rejected = 0, midi_released = 0, midi_choked = 0;
         std::uint64_t midi_unmatched_stops = 0;
-        // DLS Level 1: a note no region of its (existing, unambiguous) instrument covers sounds nothing.
-        // Received MIDI notes follow that rule and are counted; auditions and every other lookup
-        // failure stay explicit. Not confirmed against the installed MSynth.
-        static constexpr std::size_t max_uncovered_notes = 256;
-        std::uint64_t midi_uncovered_notes = 0;
-        std::vector<DlsUncoveredNote> uncovered_notes; // Distinct patch/key pairs, first occurrence first.
+        // Received MIDI notes never end the music over a routing gap. DLS Level 1: a note no region of
+        // its (existing, unambiguous) instrument covers sounds nothing. Replacement policy: a note whose
+        // bank/program names no instrument is silent too (the original synth's fallback, General MIDI
+        // or silence, is unconfirmed). Both are counted and each patch/key is logged once per world;
+        // auditions, ambiguous patches and invalid input stay explicit failures.
+        static constexpr std::size_t max_silent_notes = 256;
+        std::uint64_t midi_uncovered_notes = 0, midi_missing_notes = 0;
+        std::vector<DlsSilentNote> silent_notes; // Distinct patch/key/kind, first occurrence first.
         std::string last_midi_error;
         static constexpr std::size_t max_pending_midi = 65536;
         // Atomic batch admission. Original bank selects are submission-time latches;

@@ -250,8 +250,8 @@ namespace
         // the complete block once, and remains inspectable on subsequent steps.
         AudioMixer failed;
         CHECK(failed.music_loop.request(parts, 1, b, failed.instruments, .2, true, 1, error));
-        auto missing = bank();
-        missing->instruments.front().program = 10;
+        auto missing = bank(); // Ambiguous: a missing patch would be a silent note.
+        missing->instruments.push_back(missing->instruments.front());
         CHECK(failed.music_loop.request(other, 0, missing, failed.instruments, .2, false, 2, error));
         CHECK(!failed.advance(1, {}, {}) && failed.instruments.sample_clock() == 48000 && !failed.music_loop.active() &&
               !failed.music_loop.pending() && !failed.music_error.empty());
@@ -301,8 +301,10 @@ namespace
         const auto failure = audio.music_error;
         CHECK(audio.advance(.02, {}, {}) && audio.music_error == failure);
         audio.clear();
-        // A real receiver failure is not successful playback or an indefinitely retried event.
-        auto missing = std::make_shared<DlsBank>();
+        // A real receiver failure is not successful playback or an indefinitely retried event. An ambiguous
+        // patch stays one (a missing one is a silent note).
+        auto missing = bank();
+        missing->instruments.push_back(missing->instruments.front());
         CHECK(audio.music_loop.start(parts, 1, missing, audio.instruments, .2, error));
         CHECK(!audio.advance(.02, {}, {}));
         CHECK(!audio.music_loop.active() && !audio.music_error.empty() && audio.instruments.dispatch_failures);

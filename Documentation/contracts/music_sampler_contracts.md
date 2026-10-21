@@ -74,9 +74,11 @@ are separate from the original routed note-on snapshot. The mixer owns up to 32 
 sample/envelope finishes or the world is cleared. IDs are never reused within a
 sampler, including after clear; they are local to that mixer, not engine handles.
 A failure allocates no voice and changes no existing note. A received note whose instrument has no
-region for its key is silent and counted, not a failure (the DLS Level 1 rule; see
-[uncovered keys](music_routing_contracts.md), which supersedes the missing-key failure only for that
-case; the installed MSynth is not confirmed to behave the same way). Explicit-ID note-off
+region for its key (the DLS Level 1 rule), or whose bank/program names no instrument (a replacement
+policy), is silent and counted, not a failure; see
+[silent notes during live delivery](music_routing_contracts.md). That supersedes the missing-key and
+missing-program failures for received notes only; the original synth's fallback (General MIDI or
+silence) is unconfirmed. Explicit-ID note-off
 only shortens the gate; stale IDs fail. The immediate receiver owns 16 fixed channels
 and held note gates, but there is no voice stealing or dynamic channel allocator.
 

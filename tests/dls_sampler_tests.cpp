@@ -144,7 +144,8 @@ namespace
         CHECK(send(0x84, 60, 1) && sampler.midi_unmatched_stops == 1);
         CHECK(send(0xc4, 99, 0) && sampler.voices()[0].channel->program == 0);
         const auto count = sampler.voices().size();
-        CHECK(!send(0x94, 62, 100) && sampler.voices().size() == count); // Missing program.
+        // A missing program is a silent, counted note (replacement policy), not a failure.
+        CHECK(send(0x94, 62, 100) && sampler.voices().size() == count && sampler.midi_missing_notes == 1);
         CHECK(!send(0xb4, 64, 127) && !send(0xb4, 7, 128) && !send(0x74, 60, 100));
         CHECK(sampler.midi_channels()[4].controllers.volume == 0);
         CHECK(sampler.advance(48000 * 11, {}));
@@ -183,8 +184,9 @@ namespace
         CHECK(sampler.voices().back().instrument == 1 && sampler.voices().front().choke_frame);
         return true;
     }
-    // DLS Level 1: an existing, unambiguous instrument with no region for the key sounds nothing.
-    // Received notes are counted once per patch/key; auditions and every other lookup fail as before.
+    // DLS Level 1: an existing, unambiguous instrument with no region for the key sounds nothing; a
+    // patch with no instrument is silent too (replacement policy). Received notes are counted once per
+    // patch/key; auditions, ambiguous patches and invalid input fail as before.
     bool uncovered_key()
     {
         std::string error;
@@ -196,50 +198,60 @@ namespace
         regions[1].key_low = 60;
         regions[1].key_high = 127; // Keys 24-59 are a gap.
         std::optional<std::size_t> out;
-        bool uncovered = false;
-        CHECK(!find_dls_instrument(*bank, {}, 48, out, error, &uncovered) && uncovered && !out);
+        auto miss = DlsMiss::None;
+        CHECK(!find_dls_instrument(*bank, {}, 48, out, error, &miss) && miss == DlsMiss::Uncovered && !out);
         CHECK(error == "No DLS region covers this MIDI key");
-        CHECK(find_dls_instrument(*bank, {}, 60, out, error, &uncovered) && !uncovered && out == 0);
+        CHECK(find_dls_instrument(*bank, {}, 60, out, error, &miss) && miss == DlsMiss::None && out == 0);
         DlsMidiChannel missing{0, 0, 13, false, {}};
-        CHECK(!find_dls_instrument(*bank, missing, 48, out, error, &uncovered) && !uncovered);
+        CHECK(!find_dls_instrument(*bank, missing, 48, out, error, &miss) && miss == DlsMiss::Missing);
+        DlsMidiChannel invalid{128, 0, 0, false, {}};
+        CHECK(!find_dls_instrument(*bank, invalid, 48, out, error, &miss) && miss == DlsMiss::None);
         DlsSampler sampler;
         auto send = [&](unsigned status, unsigned first, unsigned second)
         { return sampler.receive(bank, std::uint8_t(status), std::uint8_t(first), std::uint8_t(second), 1, error); };
         CHECK(send(0x90, 48, 100) && sampler.voices().empty() && sampler.midi_uncovered_notes == 1);
-        CHECK(sampler.uncovered_notes.size() == 1 && sampler.uncovered_notes[0].key == 48 &&
-              sampler.uncovered_notes[0].program == 0 && sampler.uncovered_notes[0].frame == 0);
+        CHECK(sampler.silent_notes.size() == 1 && sampler.silent_notes[0].key == 48 &&
+              sampler.silent_notes[0].program == 0 && sampler.silent_notes[0].frame == 0 &&
+              sampler.silent_notes[0].miss == DlsMiss::Uncovered);
         CHECK(sampler.advance(100, {}) && send(0x90, 48, 90) && sampler.midi_uncovered_notes == 2);
-        CHECK(sampler.uncovered_notes.size() == 1 && send(0x91, 30, 100) && sampler.uncovered_notes.size() == 2);
-        CHECK(sampler.uncovered_notes[1].frame == 100 && sampler.midi_rejected == 0 && sampler.last_midi_error.empty());
+        CHECK(sampler.silent_notes.size() == 1 && send(0x91, 30, 100) && sampler.silent_notes.size() == 2);
+        CHECK(sampler.silent_notes[1].frame == 100 && sampler.midi_rejected == 0 && sampler.last_midi_error.empty());
         CHECK(send(0x80, 48, 0) && sampler.midi_unmatched_stops == 1); // Its stop finds no voice.
         CHECK(send(0x90, 60, 100) && sampler.voices().size() == 1);   // Covered keys still sound.
-        // A missing patch, an ambiguous patch and auditions stay explicit failures.
-        CHECK(send(0xc2, 13, 0) && !send(0x92, 48, 100) && sampler.midi_rejected == 1);
-        CHECK(error == "No DLS instrument for this MIDI patch/key");
+        // A missing program is silent and listed as such, once per patch/key.
+        CHECK(send(0xc2, 13, 0) && send(0x92, 48, 100) && send(0x92, 48, 100) && sampler.midi_missing_notes == 2);
+        CHECK(sampler.silent_notes.size() == 3 && sampler.silent_notes[2].miss == DlsMiss::Missing &&
+              sampler.silent_notes[2].program == 13 && sampler.midi_rejected == 0);
+        // An ambiguous patch and auditions stay explicit failures.
         bank->instruments.push_back(bank->instruments[0]);
         CHECK(!send(0x93, 48, 100) && error == "Ambiguous DLS packed patch or invalid instrument");
+        CHECK(sampler.midi_rejected == 1);
         bank->instruments.pop_back();
         CHECK(!sampler.play_channel(bank, {}, 48, 100, 1, 1, error) && error == "No DLS region covers this MIDI key");
+        CHECK(!sampler.play_channel(bank, missing, 48, 100, 1, 1, error) &&
+              error == "No DLS instrument for this MIDI patch/key");
         CHECK(sampler.midi_uncovered_notes == 3 && sampler.voices().size() == 1);
         sampler.clear();
-        CHECK(sampler.midi_uncovered_notes == 0 && sampler.uncovered_notes.empty());
+        CHECK(sampler.midi_uncovered_notes == 0 && sampler.midi_missing_notes == 0 && sampler.silent_notes.empty());
         return true;
     }
-    // Regression: Track1's program 13 has regions 0-11, 12-23 and 60-127, and the IMA music of
-    // Slaughter House and the Ancient One plays its key 48 about four seconds in. Both worlds must run
-    // past that note with no failure, and the note must be recorded as uncovered.
+    // Regressions: Track1's program 13 has regions 0-11, 12-23 and 60-127, and the IMA music of
+    // Slaughter House and the Ancient One plays its key 48 about four seconds in; the Ancient One's
+    // music later plays bank 0 program 1, which its bank (programs 2-16) lacks, about 44 seconds in.
+    // Both worlds must run past those notes with no failure, each note recorded as silent.
     bool uncovered_private(const std::filesystem::path& root)
     {
         std::string error;
         for (const char* world : {"11_slaughter_house", "25_ancientone"})
         {
+            const bool ancient = std::string_view(world) == "25_ancientone";
             auto game = std::make_unique<GameSession>();
             Config config;
             config.data_dir = root;
             CHECK(game->initialize() && game->resources.mount_game(config, error));
             CHECK(GameSession::start_new_game(game, world, 1, 0, error));
             game->server_shell.Player(game->local_client)->m_damage.m_bGodMode = true;
-            for (unsigned step = 0; step < 200; ++step)
+            for (unsigned step = 0; step < (ancient ? 1000u : 200u); ++step)
                 if (!game->step(.05))
                 {
                     for (const auto& line : game->step_errors())
@@ -249,12 +261,18 @@ namespace
                 }
             const auto& sampler = game->server.audio.instruments;
             CHECK(sampler.midi_rejected == 0 && sampler.dispatch_failures == 0 && sampler.midi_received > 0);
-            CHECK(std::any_of(sampler.uncovered_notes.begin(), sampler.uncovered_notes.end(),
-                              [](const auto& n) { return n.program == 13 && n.key == 48 && !n.percussion; }));
-            std::cout << world << ": 10 s with " << sampler.midi_received << " MIDI messages, "
-                      << sampler.midi_uncovered_notes << " silent uncovered-key notes:";
-            for (const auto& n : sampler.uncovered_notes)
-                std::cout << " program " << n.program << " key " << n.key;
+            const auto& notes = sampler.silent_notes;
+            CHECK(std::any_of(notes.begin(), notes.end(), [](const auto& n)
+                              { return n.program == 13 && n.key == 48 && n.miss == DlsMiss::Uncovered; }));
+            if (ancient)
+                CHECK(std::any_of(notes.begin(), notes.end(), [](const auto& n)
+                                  { return n.program == 1 && n.key == 60 && n.miss == DlsMiss::Missing; }));
+            std::cout << world << ": " << (ancient ? 50 : 10) << " s with " << sampler.midi_received
+                      << " MIDI messages, " << sampler.midi_uncovered_notes << " uncovered-key and "
+                      << sampler.midi_missing_notes << " missing-patch silent notes:";
+            for (const auto& n : notes)
+                std::cout << (n.miss == DlsMiss::Missing ? " missing" : " uncovered") << " program " << n.program
+                          << " key " << n.key;
             std::cout << '\n';
         }
         return true;
@@ -275,7 +293,9 @@ namespace
         CHECK(sampler.voices()[0].cursor == before[0].cursor && sampler.voices()[1].gate == before[1].gate);
         CHECK(send(0xb0, 0, 3) && send(0xb0, 32, 4));
         CHECK(sampler.midi_channels()[0].bank_msb == 3 && sampler.midi_channels()[0].bank_lsb == 4);
-        CHECK(!send(0x90, 60, 100) && !sampler.voices()[0].choke_frame);
+        // A bank with no instrument: a silent note (replacement policy) that chokes nothing.
+        CHECK(send(0x90, 60, 100) && !sampler.voices()[0].choke_frame && sampler.voices().size() == before.size() &&
+              sampler.midi_missing_notes == 1);
         sampler.clear();
         bank->instruments[0].regions[0].settings.unity_note = 60;
         for (unsigned i = 0; i < DlsSampler::max_voices; ++i)

@@ -1,4 +1,5 @@
 #include "engine/dls_sampler.h"
+#include <spdlog/spdlog.h>
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -249,12 +250,12 @@ namespace OpenBlood2
                (instrument.bank & 0x80000000);
     }
     bool find_dls_instrument(const DlsBank& bank, const DlsMidiChannel& channel, unsigned key,
-                             std::optional<std::size_t>& out, std::string& error, bool* uncovered)
+                             std::optional<std::size_t>& out, std::string& error, DlsMiss* miss)
     {
         out.reset();
         error.clear();
-        if (uncovered)
-            *uncovered = false;
+        if (miss)
+            *miss = DlsMiss::None;
         bool matched = false;
         if (key > 128 || channel.program > 127 || channel.bank_msb > 127 || channel.bank_lsb > 127 ||
             bank.instruments.size() > 256)
@@ -292,8 +293,8 @@ namespace OpenBlood2
                 }
             }
         }
-        if (matched && uncovered)
-            *uncovered = true;
+        if (miss)
+            *miss = matched ? DlsMiss::Uncovered : DlsMiss::Missing;
         error = matched ? "No DLS region covers this MIDI key" : "No DLS instrument for this MIDI patch/key";
         return false;
     }
@@ -421,23 +422,28 @@ namespace OpenBlood2
         }
         else if (kind == 0x90)
         {
-            // DLS Level 1: a note that no region of its instrument covers produces no sound. It is a
-            // received note, counted once per patch/key, never a voice or a failure.
+            // A routing gap never ends the music: an uncovered key (DLS Level 1) or an absent
+            // bank/program (replacement policy) is a received, silent note, counted and logged once per
+            // patch/key, never a voice or a failure.
             std::optional<std::size_t> instrument;
-            bool uncovered = false;
+            auto miss = DlsMiss::None;
             std::string lookup;
-            if (bank && !find_dls_instrument(*bank, next, first, instrument, lookup, &uncovered) && uncovered)
+            if (bank && !find_dls_instrument(*bank, next, first, instrument, lookup, &miss) && miss != DlsMiss::None)
             {
-                ++midi_uncovered_notes;
-                const bool seen = std::any_of(uncovered_notes.begin(), uncovered_notes.end(), [&](const auto& n)
+                ++(miss == DlsMiss::Uncovered ? midi_uncovered_notes : midi_missing_notes);
+                const bool seen = std::any_of(silent_notes.begin(), silent_notes.end(), [&](const auto& n)
                                               {
                                                   return n.bank_msb == next.bank_msb && n.bank_lsb == next.bank_lsb &&
                                                          n.program == next.program && n.key == first &&
-                                                         n.percussion == next.percussion;
+                                                         n.percussion == next.percussion && n.miss == miss;
                                               });
-                if (!seen && uncovered_notes.size() < max_uncovered_notes)
-                    uncovered_notes.push_back(
-                        {next.bank_msb, next.bank_lsb, next.program, first, next.percussion, sample_clock_});
+                if (!seen && silent_notes.size() < max_silent_notes)
+                {
+                    silent_notes.push_back(
+                        {next.bank_msb, next.bank_lsb, next.program, first, next.percussion, miss, sample_clock_});
+                    spdlog::warn("Music: silent note, {} (bank {}/{} program {}{} key {})", lookup, next.bank_msb,
+                                 next.bank_lsb, next.program, next.percussion ? " percussion" : "", first);
+                }
                 ++midi_received;
                 return true;
             }
@@ -618,8 +624,8 @@ namespace OpenBlood2
         midi_channels_.fill(DlsMidiChannel{});
         midi_channels_[9].percussion = true;
         midi_received = midi_rejected = midi_released = midi_choked = midi_unmatched_stops = 0;
-        midi_uncovered_notes = 0;
-        uncovered_notes.clear();
+        midi_uncovered_notes = midi_missing_notes = 0;
+        silent_notes.clear();
         last_midi_error.clear();
         started = completed = rejected = 0;
         controls_updated = controls_rejected = 0;
