@@ -106,14 +106,32 @@ adb install -r build/quest/android/gradle/app/outputs/apk/quest/debug/app-quest-
 adb logcat -s OpenBlood2
 ```
 
-Launched without arguments the APK opens the XR first-light scene (no game data
-needed). The headset must be worn, or its proximity sensor paused, for the session to
-reach FOCUSED; a Guardian dialog blocks immersive launches until the boundary is set.
+Game data goes in the headset's shared storage, as for other sideloaded VR ports:
+`/sdcard/openblood2/game` for the retail game (`BLOOD2.REZ` and the rest of the
+installation) and `/sdcard/openblood2/demo` for the 1998 demo (`B2Demo.rez`). Copy them
+over USB or with adb:
+
+```bash
+adb push /path/to/Blood2/. /sdcard/openblood2/game/
+```
+
+The app needs "all files access" to read them (Android hides files placed by other apps);
+it opens the system page on first launch. During development the permission can be
+granted directly:
+
+```bash
+adb shell appops set --uid org.openblood2.game MANAGE_EXTERNAL_STORAGE allow
+```
+
+Launched without arguments the APK enters `01_SubwayA` in stereo from the retail folder,
+else `Demo_01` from the demo folder, else the XR first-light scene. The headset must be
+worn, or its proximity sensor paused, for the session to reach FOCUSED; a Guardian dialog
+blocks immersive launches until the boundary is set.
 
 ## Scope
 
 iOS and Android phones are anticipation: they are verified to build, not to run.
 They have no data provisioning (the game still expects an external Blood II
-directory) and no tests run on them. The Quest APK runs the XR first light on a
-Quest 3; the game itself does not run in XR yet. Do not use a simulator or emulator
+directory) and no tests run on them. The Quest APK renders the game world in stereo
+on a Quest 3, without menus, HUD or controller input yet. Do not use a simulator or emulator
 for them without asking the user (see AGENTS.md).

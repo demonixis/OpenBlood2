@@ -71,6 +71,8 @@ namespace OpenBlood2
         bool exit_requested() const;
         XrPhase phase() const;
         void request_exit();
+        // True once after the runtime recentred the reference space (recalibrate head offsets).
+        bool take_recentre();
 
         // xrWaitFrame, xrBeginFrame, views and (when focused) controller poses.
         bool begin_frame(XrFrameInput&, std::string& error);

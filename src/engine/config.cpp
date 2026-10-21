@@ -209,6 +209,8 @@ namespace OpenBlood2
                 options.world_smoke = true;
             else if (arg == "--xr-test")
                 options.xr_test = true;
+            else if (arg == "--xr")
+                options.xr_world = true;
             else if (arg == "--gpu-smoke")
                 options.gpu_smoke = true;
             else if (arg == "--bench")

@@ -99,6 +99,37 @@ namespace
         CHECK(near(c[0] / c[3], 0) && near(c[1] / c[3], 0) && near(c[3], 2));
         return true;
     }
+    bool stereo()
+    {
+        // Eyes 64 mm apart at the calibrated reference: the game camera sits between them.
+        const std::array<Pose, 2> eyes{Pose{{-0.032f, 1.6f, 0}, {0, 0, 0, 1}}, Pose{{0.032f, 1.6f, 0}, {0, 0, 0, 1}}};
+        const Vec3 base{100, 50, -20};
+        auto s = stereo_camera(base, 0, eyes, {0, 1.6f, 0}, 45, 0.5f);
+        CHECK(near(s.head.position, base));
+        CHECK(near(s.eyes[0].position, {100 - 0.032f * 45, 50, -20}) &&
+              near(s.eyes[1].position, {100 + 0.032f * 45, 50, -20}));
+        // A game yaw of +90 degrees turns forward to +X and the eye baseline to -Z/+Z.
+        s = stereo_camera(base, 1.5707963f, eyes, {0, 1.6f, 0}, 45, 0.5f);
+        CHECK(near(basis(s.head.orientation).forward, {1, 0, 0}));
+        CHECK(near(s.eyes[0].position, {100, 50, -20 + 0.032f * 45}) &&
+              near(s.eyes[1].position, {100, 50, -20 - 0.032f * 45}));
+        // Standing up 0.1 m raises the eyes; leaning 2 m forward is clamped to 0.5 m.
+        std::array<Pose, 2> moved = eyes;
+        for (auto& e : moved)
+        {
+            e.position[1] += 0.1f;
+            e.position[2] -= 2;
+        }
+        s = stereo_camera(base, 0, moved, {0, 1.6f, 0}, 45, 0.5f);
+        CHECK(near(s.head.position, {100, 50 + 0.1f * 45, -20 + 0.5f * 45}));
+        // Head orientation composes under the game yaw: turning the head left from a +90 game yaw.
+        std::array<Pose, 2> turned = eyes;
+        for (auto& e : turned)
+            e.orientation = xr_yaw(1.5707963f);
+        s = stereo_camera(base, 1.5707963f, turned, {0, 1.6f, 0}, 45, 0.5f);
+        CHECK(near(basis(s.head.orientation).forward, {0, 0, 1}));
+        return true;
+    }
 } // namespace
 
 int main(int argc, char** argv)
@@ -107,6 +138,7 @@ int main(int argc, char** argv)
     const bool ok = test == "axes"         ? axes()
                     : test == "projection" ? projections()
                     : test == "eye_pose"   ? eye_pose()
+                    : test == "stereo"     ? stereo()
                                            : false;
     return ok ? 0 : 1;
 }

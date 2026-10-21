@@ -1,4 +1,4 @@
-# OpenXR runtime and first light (M8 lots 8.1–8.2)
+# OpenXR runtime, first light and stereo world (M8 lots 8.1–8.3)
 
 Implements the first two lots of the [OpenXR plan](../implementation/openxr_plan.md):
 an immersive Quest APK and an OpenXR session that draws a world-locked test scene.
@@ -60,6 +60,40 @@ No game world, HUD or menu is rendered in XR yet.
 - Every 5 s the log records frames per second, display period, CPU record time, the
   session phase and controller validity.
 
+## Stereo world (lot 8.3)
+
+- `blood2 --xr` (XR builds) and the Quest APK launched with game data enter the world
+  directly (`--world`, `Demo_01` for the demo) through the ordinary start point, with no
+  menu, HUD or controller input yet. Simulation and game audio run only while FOCUSED;
+  the step is the predicted display period, capped at 100 ms like `app_frame_delta`.
+- **Data folders.** The headset reads `/sdcard/openblood2/game` (retail, `BLOOD2.REZ`)
+  before `/sdcard/openblood2/demo` (`B2DEMO.REZ`); file names match case-insensitively.
+  Neither opens the first light. The Quest flavor declares `MANAGE_EXTERNAL_STORAGE`
+  (Android 11+ hides files that other apps or adb placed there); `Blood2Activity`
+  opens the system "all files access" page when it is missing. A demo/full choice in
+  the menu comes later.
+- **Camera.** The game camera (`client_shell.view`) contributes its position and yaw only;
+  the tracked head adds orientation (roll included) and an offset from a reference taken
+  at the first rendered frame, after a recentre and after NEW_LEVEL. The horizontal lean
+  is clamped to 0.5 m. World scale: the player's standing eye height above its feet
+  (`dims.y + eye_level`) maps to 1.6 m — 48.12 units/m for Caleb — with 45 as fallback.
+- **Presenter.** `camera_override` and `weapon_camera` give `update()` the head camera
+  (sprites face it; the sky, explosion sorting, shadow casters and view weapons follow
+  it). `record_eyes()` records one scene pass per eye into the layers of the XR
+  swapchain, sharing the frame's uploads and shadow tiles, with a two-layer depth array,
+  no letterbox and `view_scale` ignored. `WorldRecordTarget::eye` carries each eye's
+  asymmetric projection to every draw (sky and close draws included) and per-eye culling
+  (`ViewFrustum::asymmetric`). Close draws keep the reserved depth slice.
+- **Shaders.** `world.vert` and `skinned.vert` add `z·right.w` and `z·up.w`; both are zero
+  on desktop and for shadow tiles, so desktop frames do not change.
+- **Gamma.** The renderer's output is gamma-encoded. The sRGB swapchain is created with
+  `XR_SWAPCHAIN_USAGE_MUTABLE_FORMAT_BIT` and rendered through UNORM views, so the
+  compositor decodes it once and blending stays in gamma space as on desktop. The
+  format-list extension is chained when offered (the Quest 3 does not offer it). A
+  refused mutable swapchain falls back to plain sRGB with a warning. This needs the local
+  SDL patch `cmake/PatchSdlXrSwapchain.cmake` (hash-guarded; SDL otherwise overwrites the
+  explicit runtime format with the view format).
+
 ## Conversions
 
 `xr_math.h` converts OpenXR (right-handed, −Z forward, metres) to the engine
@@ -70,13 +104,17 @@ FOV gives the desktop projection.
 
 ## Verification
 
-- `xr.math_axes`, `xr.math_projection`, `xr.math_eye_pose` (headless).
+- `xr.math_axes`, `xr.math_projection`, `xr.math_eye_pose`, `xr.math_stereo` and
+  `platform.sdl_xr_swapchain_patch` (headless).
 - Regenerating the shaders leaves the eighteen existing artifacts byte-identical; the
   four line artifacts are new (SPIR-V and MSL).
-- Device evidence: see the [first-light report](../implementation/reports/xr_first_light.md).
+- Device evidence: the [first-light report](../implementation/reports/xr_first_light.md) and
+  the [stereo world report](../implementation/reports/xr_stereo_world.md).
 
 ## Not included yet
 
-Game rendering in XR, multiview, the UNORM render-target view for gamma-space
-output, gameplay and menu actions, haptics, HUD/menu layers, refresh-rate and
-performance settings, the data setup screen, PCVR presets.
+Multiview, gameplay and menu actions (the player cannot move or fire), haptics,
+HUD/menu layers, view weapons on the controllers (they follow the head), refresh-rate
+and performance settings, the data setup screen and demo download, PCVR presets.
+Shadow casters are still chosen with the 90° desktop frustum around the head, close
+models are lit from the game eye, and translucent sorting runs per eye.

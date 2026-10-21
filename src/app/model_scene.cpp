@@ -2,7 +2,8 @@
 #include <algorithm>
 namespace OpenBlood2
 {
-    bool update_explosion_model_scene(const GameSession& game, ModelView& scene, std::string& error)
+    bool update_explosion_model_scene(const GameSession& game, ModelView& scene, std::string& error,
+                                      const CameraView* view)
     {
         scene.begin_frame();
         for (const auto& fx : game.server.explosion_models.active)
@@ -35,7 +36,7 @@ namespace OpenBlood2
                 return false;
             scene.entries.back().laser_effect = fx.id;
         }
-        const auto& camera = game.client_shell.view;
+        const auto& camera = view ? *view : game.client_shell.view;
         const auto forward = rotate_vector(camera.rotation, {0, 0, 1});
         auto depth = [&](const WorldDraw& d)
         {
@@ -46,7 +47,7 @@ namespace OpenBlood2
                          [&](const auto& a, const auto& b) { return depth(a) > depth(b); });
         return true;
     }
-    bool update_model_scene(GameSession& game, ModelView& scene, std::string& error)
+    bool update_model_scene(GameSession& game, ModelView& scene, std::string& error, const ViewWeaponCamera* weapons)
     {
         scene.begin_frame();
         auto& client = game.client_shell;
@@ -94,8 +95,9 @@ namespace OpenBlood2
                 continue;
             const auto* definition = weapon_definition(weapon.type);
             NodePose pose;
-            if (!definition ||
-                !weapon.AdjustAngleAndSetPos(client.rotation.pitch, client.rotation.yaw, client.camera_position, pose))
+            const ViewWeaponCamera camera =
+                weapons ? *weapons : ViewWeaponCamera{client.rotation.pitch, client.rotation.yaw, client.camera_position};
+            if (!definition || !weapon.AdjustAngleAndSetPos(camera.pitch, camera.yaw, camera.eye, pose))
             {
                 error = "Original view-weapon placement failed";
                 return false;

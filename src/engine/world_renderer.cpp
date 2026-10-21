@@ -30,11 +30,29 @@ namespace OpenBlood2
                 near,
                 far};
     }
+    ViewFrustum eye_frustum(DVector eye, DRotation view, const EyeProjection& p, double near, double far)
+    {
+        auto f = view_frustum(eye, view, 1, near, far);
+        f.asymmetric = true;
+        f.tan_left = p.tan_left;
+        f.tan_right = p.tan_right;
+        f.tan_down = p.tan_down;
+        f.tan_up = p.tan_up;
+        return f;
+    }
     bool sphere_visible(const ViewFrustum& f, DVector center, double radius)
     {
         const DVector rel = vector_subtract(center, f.eye);
         auto dot = [](DVector a, DVector b) { return double(a.x) * b.x + double(a.y) * b.y + double(a.z) * b.z; };
         const double x = dot(rel, f.right), y = dot(rel, f.up), z = dot(rel, f.forward);
+        if (f.asymmetric)
+        {
+            // Each side plane passes through the eye at its tangent: x = t z (likewise y).
+            const auto margin = [radius](double t) { return -radius * std::sqrt(1 + t * t); };
+            return std::isfinite(radius) && z + radius >= f.near && z - radius <= f.far &&
+                   x - f.tan_left * z >= margin(f.tan_left) && f.tan_right * z - x >= margin(f.tan_right) &&
+                   y - f.tan_down * z >= margin(f.tan_down) && f.tan_up * z - y >= margin(f.tan_up);
+        }
         const double side = radius * std::sqrt(2.0), vertical = radius * std::sqrt(1 + f.aspect * f.aspect);
         return std::isfinite(radius) && z + radius >= f.near && z - radius <= f.far && z - x >= -side &&
                z + x >= -side && z - f.aspect * y >= -vertical && z + f.aspect * y >= -vertical;
@@ -336,7 +354,7 @@ namespace OpenBlood2
     }
     bool WorldRenderer::validate(const WorldMesh& mesh, std::span<const WorldDraw> draws, DVector eye, DRotation view,
                                  WorldPass world_pass, double surface_time, const PointLight& light, bool letterbox,
-                                 bool close_view, std::string& error)
+                                 bool close_view, std::string& error, const EyeProjection* eye_projection)
     {
         visible_.clear();
         alpha_order_.clear();
@@ -417,7 +435,7 @@ namespace OpenBlood2
             visible_.assign(draws.begin(), draws.end());
         else
         {
-            const auto frustum = view_frustum(eye, view, aspect);
+            const auto frustum = eye_projection ? eye_frustum(eye, view, *eye_projection) : view_frustum(eye, view, aspect);
             for (const auto& d : draws)
             {
                 if (in_frustum(mesh.ranges[d.range], d, frustum))
@@ -453,7 +471,8 @@ namespace OpenBlood2
             error = "Invalid world record target";
             return false;
         }
-        if (!validate(mesh, draws, eye, view, world_pass, surface_time, light, target.letterbox, close_view, error))
+        if (!validate(mesh, draws, eye, view, world_pass, surface_time, light, target.letterbox, close_view, error,
+                      target.eye))
             return false;
         encode(target, mesh, eye, view, world_pass, surface_time, light, close_view);
         return true;
@@ -557,7 +576,14 @@ namespace OpenBlood2
                 if (!r.count)
                     return;
                 world_view_uniform(eye, view, aspect, d, uniform);
-                if (!close_view)
+                if (target.eye)
+                {
+                    uniform.projection[0] = target.eye->scale_x;
+                    uniform.projection[1] = target.eye->scale_y;
+                    uniform.right[3] = target.eye->offset_x;
+                    uniform.up[3] = target.eye->offset_y;
+                }
+                else if (!close_view)
                 {
                     uniform.projection[0] *= target.view_scale;
                     uniform.projection[1] *= target.view_scale;

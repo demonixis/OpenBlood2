@@ -22,6 +22,10 @@ namespace OpenBlood2
         registry.release(shadow_atlas_);
         registry.release(shadow_depth_);
     }
+    const CameraView& ScenePresenter::camera(const GameSession& game) const
+    {
+        return camera_override ? *camera_override : game.client_shell.view;
+    }
     void ScenePresenter::select_shadow_casters(const GameSession& game)
     {
         shadow_casters.clear();
@@ -31,9 +35,9 @@ namespace OpenBlood2
         shadow_stats.available = available;
         if (!model_shadows)
             return;
-        const auto& camera = game.client_shell.view;
-        const auto eye = camera.position;
-        const auto frustum = view_frustum(eye, camera.rotation, shadow_aspect);
+        const auto& view = camera(game);
+        const auto eye = view.position;
+        const auto frustum = view_frustum(eye, view.rotation, shadow_aspect);
         struct Candidate
         {
             double distance = 0;
@@ -339,11 +343,11 @@ namespace OpenBlood2
         const auto started = SDL_GetTicksNS();
         if (!OpenBlood2::world_draws(world_mesh, game.objects, world_draws, world_renderer.stats, error))
             return fail("World draw bindings");
-        if (!game.server.sky.draws(game.world, world_mesh, game.objects, game.client_shell.view.position, sky_draws,
-                                   sky_eye, error))
+        const auto& view = camera(game);
+        if (!game.server.sky.draws(game.world, world_mesh, game.objects, view.position, sky_draws, sky_eye, error))
             return fail("Sky presentation");
         sky_order.clear();
-        if (!sky_sprite_scene.begin_frame(sky_eye, game.client_shell.view.rotation, error))
+        if (!sky_sprite_scene.begin_frame(sky_eye, view.rotation, error))
             return fail("Sky sprite camera");
         std::size_t world_index = 0;
         for (auto id : game.server.sky.objects)
@@ -374,18 +378,18 @@ namespace OpenBlood2
             }
         }
         const auto world_done = SDL_GetTicksNS();
-        if (!update_model_scene(game, model_scene, error))
+        if (!update_model_scene(game, model_scene, error, weapon_camera ? &*weapon_camera : nullptr))
             return fail("Model presentation");
         if (!model_lighting.apply(game, world_mesh, world_draws, model_scene, error))
             return fail("Model lighting");
         select_shadow_casters(game);
         model_renderer.per_pixel_lighting = per_pixel_lighting;
-        if (!update_explosion_model_scene(game, explosion_model_scene, error))
+        if (!update_explosion_model_scene(game, explosion_model_scene, error, camera_override ? &view : nullptr))
             return fail("Explosion model presentation");
         const auto models_done = SDL_GetTicksNS();
         if (!update_polygrid_scene(game, polygrid_scene, error))
             return fail("PolyGrid presentation");
-        if (!update_sprite_scene(game, sprite_scene, error))
+        if (!update_sprite_scene(game, sprite_scene, error, camera_override ? &view : nullptr))
             return fail("Sprite presentation");
         sprite_scene.batch();
         stats.world_ns = world_done - started;
@@ -396,22 +400,14 @@ namespace OpenBlood2
             sprite_revision != sprite_scene.revision || sky_sprite_revision != sky_sprite_scene.revision;
         return true;
     }
-    bool ScenePresenter::record(GameSession& game, SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target,
-                                SDL_GPUTextureFormat format, Uint32 width, Uint32 height, std::string& error)
+    bool ScenePresenter::prepare_frame(SDL_GPUCommandBuffer* commands, SDL_GPUTextureFormat format, Uint32 width,
+                                       Uint32 height, Uint32 layers, std::string& error)
     {
-        error.clear();
         auto fail = [&](const char* stage)
         {
             error = std::string(stage) + ": " + error;
             return false;
         };
-        const auto& view = game.client_shell.view;
-        const bool letterbox = view.object && view.settings.type == 1;
-        if (width && height > (letterbox ? 2 * (height / 6) : 0))
-            shadow_aspect = float(width) / float(height - (letterbox ? 2 * (height / 6) : 0)); // Next update().
-        const auto flashlight = game.client_shell.flashlight.Current(game.server);
-        const auto time = game.server.world_time();
-        const auto started = SDL_GetTicksNS();
         stats.passes = 0;
         for (auto* renderer : {&world_renderer.stats, &model_renderer.stats, &explosion_model_renderer.stats,
                                &polygrid_renderer.stats, &sprite_renderer.stats, &sky_sprite_renderer.stats})
@@ -440,15 +436,15 @@ namespace OpenBlood2
         if (!record_shadow_tiles(commands, error))
             return fail("Model shadow tiles");
         stats.passes = shadow_casters.empty() ? 0 : 1;
-        if (!registry.get(depth_) || depth_width_ != width || depth_height_ != height)
+        if (!registry.get(depth_) || depth_width_ != width || depth_height_ != height || depth_layers_ != layers)
         {
             SDL_GPUTextureCreateInfo info{};
-            info.type = SDL_GPU_TEXTURETYPE_2D;
+            info.type = layers > 1 ? SDL_GPU_TEXTURETYPE_2D_ARRAY : SDL_GPU_TEXTURETYPE_2D;
             info.format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
             info.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
             info.width = width;
             info.height = height;
-            info.layer_count_or_depth = 1;
+            info.layer_count_or_depth = layers;
             info.num_levels = 1;
             const auto next = registry.create_texture(info, error);
             if (!next)
@@ -457,20 +453,36 @@ namespace OpenBlood2
             depth_ = next;
             depth_width_ = width;
             depth_height_ = height;
+            depth_layers_ = layers;
         }
+        return true;
+    }
+    bool ScenePresenter::record_view(GameSession& game, SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target,
+                                     Uint32 layer, DVector eye, DRotation rotation, bool letterbox,
+                                     const EyeProjection* projection, std::string& error)
+    {
+        auto fail = [&](const char* stage)
+        {
+            error = std::string(stage) + ": " + error;
+            return false;
+        };
+        const auto flashlight = game.client_shell.flashlight.Current(game.server);
+        const auto time = game.server.world_time();
         SDL_GPUColorTargetInfo color{};
         color.texture = target;
+        color.layer_or_depth_plane = layer;
         color.clear_color = {.025f, .035f, .05f, 1};
         color.load_op = SDL_GPU_LOADOP_CLEAR;
         color.store_op = SDL_GPU_STOREOP_STORE;
         SDL_GPUDepthStencilTargetInfo depth{};
         depth.texture = registry.get(depth_);
+        depth.layer = static_cast<Uint8>(layer);
         depth.clear_depth = 1;
         depth.load_op = SDL_GPU_LOADOP_CLEAR;
         depth.store_op = SDL_GPU_STOREOP_DONT_CARE; // Nothing reads scene depth after this pass.
         depth.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
         depth.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
-        depth.cycle = true;
+        depth.cycle = layer == 0; // Later layers of the same frame keep the earlier layers' texture.
         auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, &depth);
         if (!pass)
         {
@@ -480,6 +492,7 @@ namespace OpenBlood2
         ++stats.passes;
         WorldRecordTarget scene{commands, pass, letterbox, view_model_depth, 1};
         scene.scene_color = game.client_shell.SceneLightScale();
+        scene.eye = projection;
         auto close = scene;
         close.letterbox = false;
         close.min_depth = 0;
@@ -504,7 +517,7 @@ namespace OpenBlood2
             const auto& draws = item.sprite ? sky_sprite_scene.draws : sky_draws;
             auto& renderer = item.sprite ? sky_sprite_renderer : world_renderer;
             if (!renderer.record(scene, mesh, std::span<const WorldDraw>(draws).subspan(item.index, 1), sky_eye,
-                                 view.rotation, error, WorldPass::Sky, time))
+                                 rotation, error, WorldPass::Sky, time))
             {
                 stage = "Sky viewport";
                 break;
@@ -520,37 +533,39 @@ namespace OpenBlood2
             SDL_EndGPURenderPass(pass);
             return fail(stage);
         }
-        if (!world_renderer.record(scene, world_mesh, world_draws, view.position, view.rotation, error,
+        if (!world_renderer.record(scene, world_mesh, world_draws, eye, rotation, error,
                                    sky_order.empty() ? WorldPass::Opaque : WorldPass::OpaqueWithSky, time, flashlight))
             stage = "World viewport";
-        else if (!model_renderer.record(scene, model_scene, model_scene.world_draws, view.position, view.rotation,
-                                        error, WorldPass::Opaque, flashlight))
+        else if (!model_renderer.record(scene, model_scene, model_scene.world_draws, eye, rotation, error,
+                                        WorldPass::Opaque, flashlight))
             stage = "Model viewport";
-        else if (world_mesh.blended &&
-                 !world_renderer.record(scene, world_mesh, world_draws, view.position, view.rotation, error,
-                                        WorldPass::Translucent, time, flashlight))
+        else if (world_mesh.blended && !world_renderer.record(scene, world_mesh, world_draws, eye, rotation, error,
+                                                              WorldPass::Translucent, time, flashlight))
             stage = "Transparent world viewport";
         else if (model_scene.mesh.blended &&
-                 !model_renderer.record(scene, model_scene, model_scene.world_draws, view.position, view.rotation,
-                                        error, WorldPass::Translucent, flashlight))
+                 !model_renderer.record(scene, model_scene, model_scene.world_draws, eye, rotation, error,
+                                        WorldPass::Translucent, flashlight))
             stage = "Transparent model viewport";
         else if (!explosion_model_scene.world_draws.empty() &&
-                 !explosion_model_renderer.record(scene, explosion_model_scene, explosion_model_scene.world_draws,
-                                                  view.position, view.rotation, error))
+                 !explosion_model_renderer.record(scene, explosion_model_scene, explosion_model_scene.world_draws, eye,
+                                                  rotation, error))
             stage = "Explosion model viewport";
-        else if (!polygrid_renderer.record(scene, polygrid_scene.mesh, polygrid_scene.draws, view.position,
-                                           view.rotation, error, WorldPass::Translucent))
+        else if (!polygrid_renderer.record(scene, polygrid_scene.mesh, polygrid_scene.draws, eye, rotation, error,
+                                           WorldPass::Translucent))
             stage = "PolyGrid viewport";
-        else if (!sprite_renderer.record(scene, sprite_scene.mesh, sprite_scene.batched_draws, view.position,
-                                         view.rotation, error))
+        else if (!sprite_renderer.record(scene, sprite_scene.mesh, sprite_scene.batched_draws, eye, rotation, error))
             stage = "Sprite viewport";
         else if (!model_scene.close_draws.empty() &&
-                 !model_renderer.record(close, model_scene, model_scene.close_draws, view.position, view.rotation,
-                                        error, WorldPass::Opaque, {}, true))
+                 !model_renderer.record(close, model_scene, model_scene.close_draws, eye, rotation, error,
+                                        WorldPass::Opaque, {}, true))
             stage = "Model viewport";
         SDL_EndGPURenderPass(pass);
         if (stage)
             return fail(stage);
+        return true;
+    }
+    void ScenePresenter::finish_frame(std::uint64_t started)
+    {
         stats.draw_calls = world_renderer.stats.draw_calls + model_renderer.stats.draw_calls +
                            explosion_model_renderer.stats.draw_calls + polygrid_renderer.stats.draw_calls +
                            sprite_renderer.stats.draw_calls + sky_sprite_renderer.stats.draw_calls;
@@ -559,6 +574,41 @@ namespace OpenBlood2
                        sprite_renderer.stats.culled + sky_sprite_renderer.stats.culled;
         stats.record_ns = SDL_GetTicksNS() - started;
         ++stats.frames;
+    }
+    bool ScenePresenter::record(GameSession& game, SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target,
+                                SDL_GPUTextureFormat format, Uint32 width, Uint32 height, std::string& error)
+    {
+        error.clear();
+        const auto& view = game.client_shell.view;
+        const bool letterbox = view.object && view.settings.type == 1;
+        if (width && height > (letterbox ? 2 * (height / 6) : 0))
+            shadow_aspect = float(width) / float(height - (letterbox ? 2 * (height / 6) : 0)); // Next update().
+        const auto started = SDL_GetTicksNS();
+        if (!prepare_frame(commands, format, width, height, 1, error) ||
+            !record_view(game, commands, target, 0, view.position, view.rotation, letterbox, nullptr, error))
+            return false;
+        finish_frame(started);
+        return true;
+    }
+    bool ScenePresenter::record_eyes(GameSession& game, SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target,
+                                     SDL_GPUTextureFormat format, Uint32 width, Uint32 height,
+                                     std::span<const StereoEye> eyes, std::string& error)
+    {
+        error.clear();
+        if (eyes.empty() || eyes.size() > 2 || !width || !height)
+        {
+            error = "World viewport: invalid XR eye views";
+            return false;
+        }
+        shadow_aspect = float(width) / float(height); // Next update().
+        const auto started = SDL_GetTicksNS();
+        if (!prepare_frame(commands, format, width, height, Uint32(eyes.size()), error))
+            return false;
+        for (std::size_t i = 0; i < eyes.size(); ++i)
+            if (!record_view(game, commands, target, Uint32(i), eyes[i].position, eyes[i].rotation, false,
+                             &eyes[i].projection, error))
+                return false;
+        finish_frame(started);
         return true;
     }
 } // namespace OpenBlood2

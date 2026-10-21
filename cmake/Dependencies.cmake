@@ -47,6 +47,8 @@ FetchContent_Declare(SDL3
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     PATCH_COMMAND "${CMAKE_COMMAND}" "-DSDL_SOURCE_DIR=<SOURCE_DIR>"
         -P "${CMAKE_CURRENT_LIST_DIR}/PatchSdlProperties.cmake"
+        COMMAND "${CMAKE_COMMAND}" "-DSDL_SOURCE_DIR=<SOURCE_DIR>"
+        -P "${CMAKE_CURRENT_LIST_DIR}/PatchSdlXrSwapchain.cmake"
     SYSTEM EXCLUDE_FROM_ALL)
 FetchContent_Declare(spdlog
     URL https://codeload.github.com/gabime/spdlog/tar.gz/${BLOOD2_SPDLOG_REVISION}

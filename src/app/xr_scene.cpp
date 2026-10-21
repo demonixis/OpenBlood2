@@ -1,11 +1,17 @@
 #include "app/xr_scene.h"
+#include "app/scene_presenter.h"
+#include "app/session_playback.h"
 #include "build_info.h"
 #include "engine/world_shaders.h"
 #include "engine/xr/xr_runtime.h"
+#include "game/server_adapter.h"
 #include <SDL3/SDL.h>
+#include <algorithm>
 #include <array>
 #include <chrono>
+#include <cmath>
 #include <cstddef>
+#include <filesystem>
 #include <spdlog/spdlog.h>
 #include <vector>
 
@@ -57,13 +63,13 @@ namespace OpenBlood2
             const auto close = [&v](Range& r, std::uint32_t first) {
                 r = {first, static_cast<std::uint32_t>(v.size()) - first};
             };
-            // Linear colours: the swapchain is sRGB.
+            // Gamma-encoded colours, like the renderer's (UNORM views of the sRGB swapchain).
             std::uint32_t first = begin();
             for (int i = -10; i <= 10; ++i)
             {
                 const float t = i * 0.5f;
                 const std::array<float, 4> color =
-                    i % 2 ? std::array<float, 4>{0.05f, 0.05f, 0.07f, 1} : std::array<float, 4>{0.16f, 0.16f, 0.2f, 1};
+                    i % 2 ? std::array<float, 4>{0.25f, 0.25f, 0.29f, 1} : std::array<float, 4>{0.44f, 0.44f, 0.49f, 1};
                 add_line(v, {t, 0, -5}, {t, 0, 5}, color);
                 add_line(v, {-5, 0, t}, {5, 0, t}, color);
             }
@@ -234,7 +240,7 @@ namespace OpenBlood2
                 target.layer_or_depth_plane = eye;
                 target.load_op = SDL_GPU_LOADOP_CLEAR;
                 target.store_op = SDL_GPU_STOREOP_STORE;
-                target.clear_color = {0.004f, 0.004f, 0.012f, 1};
+                target.clear_color = {0.05f, 0.05f, 0.1f, 1};
                 SDL_GPUDepthStencilTargetInfo depth{};
                 depth.texture = scene.depth;
                 depth.layer = static_cast<Uint8>(eye);
@@ -381,6 +387,309 @@ namespace OpenBlood2
             }
             if (!code)
                 spdlog::info("XR test: session ended");
+        }
+        SDL_Quit();
+        return code;
+    }
+    namespace
+    {
+        // Nominal user eye height: the original player's standing eye height maps to it.
+        constexpr float nominal_eye_height = 1.6f, fallback_units_per_meter = 45, max_lean = 0.5f;
+
+        DRotation engine_rotation(const xr::Quat& q)
+        {
+            return {DVector{q[0], q[1], q[2]}, q[3]};
+        }
+        xr::Vec3 vec(DVector v)
+        {
+            return {v.x, v.y, v.z};
+        }
+        DVector dvec(const xr::Vec3& v)
+        {
+            return {v[0], v[1], v[2]};
+        }
+        EyeProjection eye_projection(const xr::Fov& fov)
+        {
+            const auto p = xr::projection(fov);
+            return {p.scale_x,
+                    p.scale_y,
+                    p.offset_x,
+                    p.offset_y,
+                    std::tan(double(fov.left)),
+                    std::tan(double(fov.right)),
+                    std::tan(double(fov.down)),
+                    std::tan(double(fov.up))};
+        }
+        bool clear_eyes(SDL_GPUCommandBuffer* command, SDL_GPUTexture* color)
+        {
+            for (Uint32 eye = 0; eye < 2; ++eye)
+            {
+                SDL_GPUColorTargetInfo target{};
+                target.texture = color;
+                target.layer_or_depth_plane = eye;
+                target.load_op = SDL_GPU_LOADOP_CLEAR;
+                target.store_op = SDL_GPU_STOREOP_STORE;
+                target.clear_color = {0, 0, 0, 1};
+                SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(command, &target, 1, nullptr);
+                if (!pass)
+                    return false;
+                SDL_EndGPURenderPass(pass);
+            }
+            return true;
+        }
+        // World units per metre from the player's standing eye height above its feet.
+        float units_per_meter(GameSession& game)
+        {
+            DVector dims{};
+            const auto* player = game.server_shell.Player(game.local_client);
+            if (!player || !game.client_shell.player ||
+                game.server.GetObjectDims(game.client_shell.player, &dims) != DE_OK || dims.y <= 0)
+                return fallback_units_per_meter;
+            const float eye = dims.y + player->eye_level;
+            return eye > 0 && std::isfinite(eye) ? eye / nominal_eye_height : fallback_units_per_meter;
+        }
+        bool has_file(const std::filesystem::path& directory, std::string_view name)
+        {
+            std::error_code ec;
+            for (const auto& entry : std::filesystem::directory_iterator(directory, ec))
+            {
+                const auto file = entry.path().filename().string();
+                if (file.size() == name.size() &&
+                    std::equal(file.begin(), file.end(), name.begin(),
+                               [](char a, char b)
+                               { return std::toupper((unsigned char)a) == std::toupper((unsigned char)b); }))
+                    return entry.is_regular_file(ec);
+            }
+            return false;
+        }
+    } // namespace
+
+    void select_android_xr_data(Options& options)
+    {
+        const std::filesystem::path root = "/sdcard/openblood2";
+        if (has_file(root / "game", "BLOOD2.REZ"))
+        {
+            options.data_dir = root / "game";
+            options.demo = false;
+        }
+        else if (has_file(root / "demo", "B2DEMO.REZ"))
+        {
+            options.data_dir = root / "demo";
+            options.demo = true;
+            options.world = first_level(true);
+        }
+        else
+        {
+            std::error_code ec;
+            spdlog::warn("No game data in {0}/game or {0}/demo{1}; opening the XR first light", root.string(),
+                         std::filesystem::exists(root, ec) ? " (folder present: check the all-files access permission)"
+                                                           : "");
+            options.xr_test = true;
+            return;
+        }
+        options.xr_world = true;
+        spdlog::info("XR data: {} ({})", options.data_dir.string(), options.demo ? "demo" : "retail");
+    }
+
+    int run_xr_world(const Options& options, const Config& config)
+    {
+#ifdef NDEBUG
+        constexpr bool gpu_debug = false;
+#else
+        constexpr bool gpu_debug = true;
+#endif
+        SDL_SetHint(SDL_HINT_ANDROID_BLOCK_ON_PAUSE, "0");
+        SDL_SetAppMetadata("OpenBlood 2", build::version, build::game_identifier);
+        if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS))
+        {
+            spdlog::error("SDL_Init: {}", SDL_GetError());
+            return 7;
+        }
+        int code = 0;
+        {
+            std::string error;
+            XrRuntime xr;
+            auto game = std::make_unique<GameSession>();
+            std::unique_ptr<ScenePresenter> presenter;
+            if (!xr.create({gpu_debug}, error))
+            {
+                spdlog::error("XR world: {}", error);
+                code = 7;
+            }
+            else if (!game->resources.mount_game(config, error) || !game->initialize())
+            {
+                spdlog::error("XR world: {}", error.empty() ? "cannot initialize original game services" : error);
+                code = 5;
+            }
+            else
+            {
+                if (!game->server.audio.open_output(error))
+                    spdlog::warn("Game audio output: {}", error);
+                spdlog::info("Loading world: {} (XR direct entry)", options.world);
+                if (!game->request_world(options.world, error) || !game->run_world(error))
+                {
+                    spdlog::error("World load: {}", error);
+                    code = 6;
+                }
+                presenter = std::make_unique<ScenePresenter>(xr.device());
+                presenter->model_shadows = options.model_shadows;
+            }
+            using Clock = std::chrono::steady_clock;
+            auto window_start = Clock::now();
+            std::uint64_t frames = 0, rendered = 0;
+            double step_seconds = 0, update_seconds = 0, record_seconds = 0;
+            bool calibrated = false, audio_paused = false;
+            xr::Vec3 reference{};
+            float scale = fallback_units_per_meter;
+            while (!code && !xr.exit_requested())
+            {
+                SDL_Event event;
+                while (SDL_PollEvent(&event))
+                    if (event.type == SDL_EVENT_QUIT || event.type == SDL_EVENT_TERMINATING)
+                        xr.request_exit();
+                if (!xr.poll(error))
+                {
+                    spdlog::error("XR events: {}", error);
+                    code = 7;
+                    break;
+                }
+                if (xr.take_recentre())
+                    calibrated = false;
+                if (!xr.session_running())
+                {
+                    SDL_Delay(10);
+                    continue;
+                }
+                XrFrameInput frame;
+                if (!xr.begin_frame(frame, error))
+                {
+                    spdlog::error("XR frame: {}", error);
+                    code = 7;
+                    break;
+                }
+                // Simulation and game audio run only with input focus (the system menu pauses them).
+                if (audio_paused != !frame.focused && game->server.audio.pause_output(!frame.focused, error))
+                    audio_paused = !frame.focused;
+                auto start = Clock::now();
+                if (frame.focused)
+                {
+                    const double delta = app_frame_delta(double(frame.display_period) / 1e9);
+                    if (!step_app_session(*game, delta))
+                    {
+                        spdlog::error("Simulation failed: world={}, time={}", game->world_path, game->objects.time());
+                        for (const auto& diagnostic : game->step_errors())
+                            spdlog::error("{}", diagnostic);
+                        code = 4;
+                    }
+                    else if (const auto change = GameSession::process_level_change(game, error);
+                             change == LevelChangeResult::Committed)
+                    {
+                        spdlog::info("NEW_LEVEL committed: {} -> {}", game->level_change.source_world,
+                                     game->world_path);
+                        calibrated = false;
+                    }
+                    else if (change == LevelChangeResult::Rejected)
+                        spdlog::warn("Level change retained world: {}", error);
+                }
+                step_seconds += std::chrono::duration<double>(Clock::now() - start).count();
+                bool drawn = false;
+                if (!code && frame.should_render && frame.views_valid)
+                {
+                    const std::array<xr::Pose, 2> eyes{frame.eye_pose[0], frame.eye_pose[1]};
+                    if (!calibrated)
+                    {
+                        for (std::size_t i = 0; i < 3; ++i)
+                            reference[i] = (eyes[0].position[i] + eyes[1].position[i]) / 2;
+                        calibrated = true;
+                        scale = units_per_meter(*game);
+                        spdlog::info("XR calibration: {:.2f} units/m (player eye over a {:.2f} m user eye)", scale,
+                                     nominal_eye_height);
+                    }
+                    // The game camera supplies position and yaw; the tracked head supplies the rest.
+                    const auto& view = game->client_shell.view;
+                    const auto forward = rotate_vector(DVector{0, 0, 1}, view.rotation);
+                    const float yaw = std::atan2(forward.x, forward.z);
+                    const auto stereo = xr::stereo_camera(vec(view.position), yaw, eyes, reference, scale, max_lean);
+                    CameraView head = view;
+                    head.position = dvec(stereo.head.position);
+                    head.rotation = engine_rotation(stereo.head.orientation);
+                    const auto look = rotate_vector(DVector{0, 0, 1}, head.rotation);
+                    presenter->camera_override = head;
+                    presenter->weapon_camera = ViewWeaponCamera{-std::asin(std::clamp(look.y, -1.f, 1.f)),
+                                                                std::atan2(look.x, look.z), head.position};
+                    start = Clock::now();
+                    if (!presenter->update(*game, error))
+                    {
+                        spdlog::error("XR presentation: {}", error);
+                        code = 5;
+                    }
+                    update_seconds += std::chrono::duration<double>(Clock::now() - start).count();
+                    std::array<StereoEye, 2> views;
+                    for (std::size_t i = 0; i < 2; ++i)
+                        views[i] = {dvec(stereo.eyes[i].position), engine_rotation(stereo.eyes[i].orientation),
+                                    eye_projection(frame.eye_fov[i])};
+                    start = Clock::now();
+                    SDL_GPUCommandBuffer* command = code ? nullptr : SDL_AcquireGPUCommandBuffer(xr.device());
+                    SDL_GPUTexture* color = command ? xr.acquire_color(error) : nullptr;
+                    if (!code && !color)
+                    {
+                        if (command)
+                            SDL_CancelGPUCommandBuffer(command);
+                        spdlog::error("XR image: {}", error.empty() ? SDL_GetError() : error);
+                        code = 7;
+                    }
+                    else if (!code)
+                    {
+                        const bool ok = presenter->render_world
+                                            ? presenter->record_eyes(*game, command, color, xr.color_format(),
+                                                                     xr.width(), xr.height(), views, error)
+                                            : clear_eyes(command, color);
+                        if (!ok)
+                        {
+                            SDL_CancelGPUCommandBuffer(command);
+                            spdlog::error("XR record: {}", error.empty() ? SDL_GetError() : error);
+                            code = 5;
+                        }
+                        else if (!SDL_SubmitGPUCommandBuffer(command))
+                        {
+                            spdlog::error("XR submit: {}", SDL_GetError());
+                            code = 7;
+                        }
+                        else
+                            drawn = true;
+                    }
+                    record_seconds += std::chrono::duration<double>(Clock::now() - start).count();
+                }
+                if (!xr.end_frame(frame, drawn, error))
+                {
+                    spdlog::error("XR end frame: {}", error);
+                    code = 7;
+                    break;
+                }
+                ++frames;
+                rendered += drawn;
+                const double elapsed = std::chrono::duration<double>(Clock::now() - window_start).count();
+                if (elapsed >= 5)
+                {
+                    const auto& p = presenter->stats;
+                    spdlog::info("XR world: {:.1f} frames/s ({} rendered), step {:.2f} ms, update {:.2f} ms, record "
+                                 "{:.2f} ms, {} draw calls, {} culled, {} passes, phase {}",
+                                 frames / elapsed, rendered, frames ? step_seconds * 1e3 / frames : 0.0,
+                                 rendered ? update_seconds * 1e3 / rendered : 0.0,
+                                 rendered ? record_seconds * 1e3 / rendered : 0.0, p.draw_calls, p.culled, p.passes,
+                                 xr_phase_name(xr.phase()));
+                    window_start = Clock::now();
+                    frames = rendered = 0;
+                    step_seconds = update_seconds = record_seconds = 0;
+                }
+            }
+            // Presentation resources go before the device, the world before the session.
+            presenter.reset();
+            if (!game->world_path.empty() && !game->unload_world())
+                spdlog::warn("XR world: unload refused during callbacks");
+            game.reset();
+            if (!code)
+                spdlog::info("XR world: session ended");
         }
         SDL_Quit();
         return code;

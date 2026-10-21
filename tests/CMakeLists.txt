@@ -14,10 +14,17 @@ set_tests_properties(platform.sdl_properties_patch PROPERTIES LABELS "headless;p
 add_executable(xr_math_tests xr_math_tests.cpp)
 target_include_directories(xr_math_tests PRIVATE "${PROJECT_SOURCE_DIR}/src")
 blood2_project_options(xr_math_tests)
-foreach(case IN ITEMS axes projection eye_pose)
+foreach(case IN ITEMS axes projection eye_pose stereo)
     add_test(NAME xr.math_${case} COMMAND xr_math_tests ${case})
     set_tests_properties(xr.math_${case} PROPERTIES LABELS "headless;xr" TIMEOUT 10)
 endforeach()
+
+add_test(NAME platform.sdl_xr_swapchain_patch COMMAND "${CMAKE_COMMAND}"
+    "-DSDL_SOURCE_DIR=${sdl3_SOURCE_DIR}"
+    "-DPATCH=${PROJECT_SOURCE_DIR}/cmake/PatchSdlXrSwapchain.cmake"
+    "-DROOT=${CMAKE_CURRENT_BINARY_DIR}/sdl-xr-patch-fixtures"
+    -P "${CMAKE_CURRENT_SOURCE_DIR}/sdl_xr_swapchain_patch_test.cmake")
+set_tests_properties(platform.sdl_xr_swapchain_patch PROPERTIES LABELS "headless;platform;xr" TIMEOUT 20)
 
 add_executable(platform_lifetime_tests platform_lifetime_tests.cpp)
 target_link_libraries(platform_lifetime_tests PRIVATE SDL3::SDL3)

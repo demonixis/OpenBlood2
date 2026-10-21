@@ -3,9 +3,9 @@
 #include <cmath>
 namespace OpenBlood2
 {
-    bool update_sprite_scene(const GameSession& game, SpriteView& scene, std::string& error)
+    bool update_sprite_scene(const GameSession& game, SpriteView& scene, std::string& error, const CameraView* camera)
     {
-        const auto& view = game.client_shell.view;
+        const auto& view = camera ? *camera : game.client_shell.view;
         if (!scene.begin_frame(view.position, view.rotation, error))
             return false;
         for (auto id : game.objects.snapshot())

@@ -3,5 +3,6 @@
 #include "game/server_adapter.h"
 namespace OpenBlood2
 {
-    bool update_sprite_scene(const GameSession&, SpriteView&, std::string& error);
+    // camera: the presentation camera when it differs from the game view (XR head).
+    bool update_sprite_scene(const GameSession&, SpriteView&, std::string& error, const CameraView* camera = nullptr);
 }

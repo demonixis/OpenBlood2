@@ -3,10 +3,14 @@
 #include <algorithm>
 #include <cstring>
 #include <spdlog/spdlog.h>
+#include <utility>
 #include <vector>
 
-// SDL's vendored OpenXR 1.1 headers must precede SDL_openxr.h (separate block: not sorted).
+// SDL's vendored Vulkan and OpenXR headers; OpenXR must precede SDL_openxr.h (separate block).
+#include <vulkan/vulkan.h>
+#define XR_USE_GRAPHICS_API_VULKAN
 #include <openxr/openxr.h>
+#include <openxr/openxr_platform.h>
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_openxr.h>
@@ -132,7 +136,8 @@ namespace OpenBlood2
         PFN_xrGetDisplayRefreshRateFB get_refresh_rate = nullptr;
 
         bool loader_loaded = false;
-        bool local_floor_extension = false, refresh_rate_extension = false;
+        bool local_floor_extension = false, refresh_rate_extension = false, format_list_extension = false;
+        bool gamma_views = false; // sRGB images written through UNORM views (gamma-space output).
         SDL_GPUDevice* device = nullptr;
         XrInstance instance = XR_NULL_HANDLE;
         XrSystemId system = XR_NULL_SYSTEM_ID;
@@ -150,7 +155,7 @@ namespace OpenBlood2
         std::uint32_t width = 0, height = 0;
         bool image_acquired = false;
         XrPhase phase = XrPhase::None;
-        bool running = false, exit = false;
+        bool running = false, exit = false, recentred = false;
         std::string system_name;
 
         std::string result(XrResult code) const
@@ -254,7 +259,7 @@ namespace OpenBlood2
                                                                             : "LOCAL_FLOOR";
         return s.system_name + ", " + std::to_string(s.width) + "x" + std::to_string(s.height) + " per eye, " +
                std::to_string(s.image_count) + " images, format " + std::to_string(static_cast<int>(s.format)) +
-               ", space " + space;
+               (s.gamma_views ? " (UNORM views of sRGB images)" : "") + ", space " + space;
     }
 
     bool XrRuntime::create(const XrRuntimeSettings& settings, std::string& error)
@@ -307,8 +312,13 @@ namespace OpenBlood2
             extensions.push_back(XR_FB_DISPLAY_REFRESH_RATE_EXTENSION_NAME);
             s.refresh_rate_extension = true;
         }
-        spdlog::info("OpenXR: {} instance extensions listed; local floor {}, refresh rate {}", available.size(),
-                     s.local_floor_extension, s.refresh_rate_extension);
+        if (listed(XR_KHR_VULKAN_SWAPCHAIN_FORMAT_LIST_EXTENSION_NAME))
+        {
+            extensions.push_back(XR_KHR_VULKAN_SWAPCHAIN_FORMAT_LIST_EXTENSION_NAME);
+            s.format_list_extension = true;
+        }
+        spdlog::info("OpenXR: {} instance extensions listed; local floor {}, refresh rate {}, swapchain format list {}",
+                     available.size(), s.local_floor_extension, s.refresh_rate_extension, s.format_list_extension);
 
         const SDL_PropertiesID props = SDL_CreateProperties();
         SDL_SetBooleanProperty(props, SDL_PROP_GPU_DEVICE_CREATE_SHADERS_SPIRV_BOOLEAN, true);
@@ -492,16 +502,59 @@ namespace OpenBlood2
                 break;
             }
         SDL_free(formats);
-        auto swapchain_info = make<XrSwapchainCreateInfo>(XR_TYPE_SWAPCHAIN_CREATE_INFO);
-        swapchain_info.usageFlags = XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT | XR_SWAPCHAIN_USAGE_SAMPLED_BIT;
-        swapchain_info.sampleCount = 1;
-        swapchain_info.width = s.width;
-        swapchain_info.height = s.height;
-        swapchain_info.faceCount = 1;
-        swapchain_info.arraySize = 2;
-        swapchain_info.mipCount = 1;
-        if (!s.check(SDL_CreateGPUXRSwapchain(s.device, s.session, &swapchain_info, s.format, &s.swapchain, &s.images),
-                     "SDL_CreateGPUXRSwapchain", error))
+        // The renderer writes gamma-encoded values (as into the desktop UNORM swapchain) and the
+        // compositor reads sRGB images as encoded: keep the runtime's sRGB images but render through
+        // UNORM views. Mutable-format images allow the view (core usage bit; the format list
+        // narrows it where offered); the patched SDL keeps this explicit runtime format.
+        const SDL_GPUTextureFormat srgb = s.format;
+        const SDL_GPUTextureFormat unorm =
+            srgb == SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM_SRGB   ? SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM
+            : srgb == SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM_SRGB ? SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM
+                                                                : SDL_GPU_TEXTUREFORMAT_INVALID;
+        const bool rgba = srgb == SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM_SRGB;
+        const std::array<VkFormat, 2> view_formats{rgba ? VK_FORMAT_R8G8B8A8_SRGB : VK_FORMAT_B8G8R8A8_SRGB,
+                                                   rgba ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_B8G8R8A8_UNORM};
+        auto format_list =
+            make<XrVulkanSwapchainFormatListCreateInfoKHR>(XR_TYPE_VULKAN_SWAPCHAIN_FORMAT_LIST_CREATE_INFO_KHR);
+        format_list.viewFormatCount = static_cast<std::uint32_t>(view_formats.size());
+        format_list.viewFormats = view_formats.data();
+        const auto create_swapchain = [&](bool gamma_views)
+        {
+            auto info = make<XrSwapchainCreateInfo>(XR_TYPE_SWAPCHAIN_CREATE_INFO);
+            info.usageFlags = XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT | XR_SWAPCHAIN_USAGE_SAMPLED_BIT;
+            if (gamma_views)
+            {
+                info.usageFlags |= XR_SWAPCHAIN_USAGE_MUTABLE_FORMAT_BIT;
+                info.format = view_formats[0];
+                if (s.format_list_extension)
+                    info.next = &format_list;
+            }
+            info.sampleCount = 1;
+            info.width = s.width;
+            info.height = s.height;
+            info.faceCount = 1;
+            info.arraySize = 2;
+            info.mipCount = 1;
+            return SDL_CreateGPUXRSwapchain(s.device, s.session, &info, gamma_views ? unorm : srgb, &s.swapchain,
+                                            &s.images);
+        };
+        XrResult created = XR_ERROR_VALIDATION_FAILURE;
+        if (unorm != SDL_GPU_TEXTUREFORMAT_INVALID)
+        {
+            created = create_swapchain(true);
+            s.gamma_views = XR_SUCCEEDED(created);
+            if (!s.gamma_views)
+            {
+                spdlog::warn("OpenXR: mutable-format sRGB swapchain refused ({}); colours are encoded twice",
+                             s.result(created));
+                s.swapchain = XR_NULL_HANDLE;
+                s.images = nullptr;
+            }
+        }
+        if (!s.gamma_views)
+            created = create_swapchain(false);
+        s.format = s.gamma_views ? unorm : srgb;
+        if (!s.check(created, "SDL_CreateGPUXRSwapchain", error))
             return false;
         PFN_xrEnumerateSwapchainImages enumerate_images = nullptr;
         if (!s.load("xrEnumerateSwapchainImages", enumerate_images, error) ||
@@ -561,6 +614,7 @@ namespace OpenBlood2
                 }
                 case XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING:
                     spdlog::info("OpenXR reference space change pending (recentre)");
+                    s.recentred = true;
                     break;
                 case XR_TYPE_EVENT_DATA_INTERACTION_PROFILE_CHANGED:
                     for (std::size_t hand = 0; hand < 2; ++hand)
@@ -581,6 +635,10 @@ namespace OpenBlood2
         }
     }
 
+    bool XrRuntime::take_recentre()
+    {
+        return std::exchange(state_->recentred, false);
+    }
     void XrRuntime::request_exit()
     {
         auto& s = *state_;

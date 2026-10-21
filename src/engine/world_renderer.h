@@ -111,8 +111,19 @@ namespace OpenBlood2
     {
         DVector eye{}, right{}, up{}, forward{};
         double aspect = 1, near = 1, far = 65536;
+        // XR eyes: planes from tangent-space half angles instead of the 90-degree/aspect pair.
+        bool asymmetric = false;
+        double tan_left = -1, tan_right = 1, tan_down = -1, tan_up = 1;
     };
     ViewFrustum view_frustum(DVector eye, DRotation view, double aspect, double near = 1, double far = 65536);
+    // XR eye view: an asymmetric projection replacing the desktop {1, aspect} * view_scale terms
+    // (offsets go to the right/up w components, zero on desktop) and its culling tangents.
+    struct EyeProjection
+    {
+        float scale_x = 1, scale_y = 1, offset_x = 0, offset_y = 0;
+        double tan_left = -1, tan_right = 1, tan_down = -1, tan_up = 1;
+    };
+    ViewFrustum eye_frustum(DVector eye, DRotation view, const EyeProjection&, double near = 1, double far = 65536);
     bool sphere_visible(const ViewFrustum&, DVector center, double radius);
     // Every world/model/sprite/sky pipeline for one color format, created together
     // so no pipeline is compiled lazily during gameplay. One set may be shared by
@@ -166,6 +177,8 @@ namespace OpenBlood2
         SDL_GPUTexture* shadow_atlas = nullptr;
         const ShadowUniform* shadows = nullptr;
         DVector scene_color{1, 1, 1}; // Original SetGlobalLightScale, scene only.
+        // XR eye: every draw (sky and close included) uses this projection and its frustum.
+        const EyeProjection* eye = nullptr;
     };
     // Per-material enhanced parameters and normal maps of one renderer, parallel to its
     // material textures; resolved again when the materials or the SurfaceScene revision change.
@@ -264,7 +277,8 @@ namespace OpenBlood2
         }
         // Checks every input and selects visible_/alpha_order_ before any pass is begun.
         bool validate(const WorldMesh&, std::span<const WorldDraw>, DVector eye, DRotation view, WorldPass,
-                      double surface_time, const PointLight&, bool letterbox, bool close_view, std::string& error);
+                      double surface_time, const PointLight&, bool letterbox, bool close_view, std::string& error,
+                      const EyeProjection* eye_projection = nullptr);
         // Encodes the draws selected by the preceding successful validate().
         void encode(const WorldRecordTarget&, const WorldMesh&, DVector eye, DRotation view, WorldPass,
                     double surface_time, const PointLight&, bool close_view);

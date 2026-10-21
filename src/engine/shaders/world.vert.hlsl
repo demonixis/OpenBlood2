@@ -29,8 +29,9 @@ Output main(Input input)
         input.position + 2.0 * cross(q, cross(q, input.position) + quaternion.w * input.position) + translation.xyz;
     float3 relative = world - eye.xyz;
     float z = dot(relative, forward.xyz);
-    output.position = float4(dot(relative, right.xyz) * projection.x, dot(relative, up.xyz) * projection.y,
-                             z * projection.z + projection.w, z);
+    // right.w/up.w: asymmetric XR eye offsets (zero on desktop).
+    output.position = float4(dot(relative, right.xyz) * projection.x + z * right.w,
+                             dot(relative, up.xyz) * projection.y + z * up.w, z * projection.z + projection.w, z);
     output.worldPosition = world;
     output.faceColor = input.color;
     output.texCoord = input.uv + textureOffset.xy;

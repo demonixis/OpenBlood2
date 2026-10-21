@@ -1,8 +1,11 @@
 # OpenXR plan: Meta Quest first, PCVR on Linux last (M8)
 
 Drafted 2026-10-21 at `c09a9d1f`. Lots 8.1 and 8.2 have their first light on a
-Quest 3 ([report](reports/xr_first_light.md), [contract](../contracts/xr_runtime_contracts.md));
-the rest is not implemented. It turns
+Quest 3 ([report](reports/xr_first_light.md)) and lot 8.3 renders SubwayA in stereo at
+72 Hz ([report](reports/xr_stereo_world.md)); see the [contract](../contracts/xr_runtime_contracts.md).
+The rest is not implemented. Since then the data location is the shared
+`/sdcard/openblood2/{game,demo}` (user decision), and the Quest 3 offers no swapchain
+format list, so gamma-space output uses the core mutable-format bit. It turns
 roadmap M8 into ordered lots and fixes the design choices the user set:
 
 - Meta Quest is the priority; PCVR is tested last, on Linux.

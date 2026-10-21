@@ -66,6 +66,61 @@ namespace OpenBlood2::xr
         return {rotate(engine, {1, 0, 0}), rotate(engine, {0, 1, 0}), rotate(engine, {0, 0, 1})};
     }
 
+    // Hamilton product: rotate by b, then by a (same convention as the engine's multiply_rotation).
+    inline Quat mul(const Quat& a, const Quat& b)
+    {
+        return {a[3] * b[0] + b[3] * a[0] + a[1] * b[2] - a[2] * b[1],
+                a[3] * b[1] + b[3] * a[1] + a[2] * b[0] - a[0] * b[2],
+                a[3] * b[2] + b[3] * a[2] + a[0] * b[1] - a[1] * b[0],
+                a[3] * b[3] - a[0] * b[0] - a[1] * b[1] - a[2] * b[2]};
+    }
+
+    // Engine yaw rotation: forward (0, 0, 1) turns to (sin yaw, 0, cos yaw), as the original
+    // player pitch/yaw forward.
+    inline Quat yaw_rotation(float yaw)
+    {
+        return {0, std::sin(yaw / 2), 0, std::cos(yaw / 2)};
+    }
+
+    // The tracked eyes placed around a game camera, in engine world units. The game camera
+    // contributes its position and yaw only (no pitch or roll); the head offset is measured from
+    // the calibrated reference (OpenXR metres), its horizontal part clamped to max_lean metres.
+    struct StereoCamera
+    {
+        std::array<Pose, 2> eyes{};
+        Pose head{}; // Midpoint of the eyes, with the first eye's orientation.
+    };
+    inline StereoCamera stereo_camera(const Vec3& base, float base_yaw, const std::array<Pose, 2>& xr_eyes,
+                                      const Vec3& reference, float units_per_meter, float max_lean)
+    {
+        const Vec3 centre{(xr_eyes[0].position[0] + xr_eyes[1].position[0]) / 2,
+                          (xr_eyes[0].position[1] + xr_eyes[1].position[1]) / 2,
+                          (xr_eyes[0].position[2] + xr_eyes[1].position[2]) / 2};
+        Vec3 offset{centre[0] - reference[0], centre[1] - reference[1], centre[2] - reference[2]};
+        const float lean = std::sqrt(offset[0] * offset[0] + offset[2] * offset[2]);
+        if (lean > max_lean && lean > 0)
+        {
+            offset[0] *= max_lean / lean;
+            offset[2] *= max_lean / lean;
+        }
+        const Quat yaw = yaw_rotation(base_yaw);
+        StereoCamera out;
+        for (std::size_t i = 0; i < 2; ++i)
+        {
+            const Vec3 relative{offset[0] + xr_eyes[i].position[0] - centre[0],
+                                offset[1] + xr_eyes[i].position[1] - centre[1],
+                                offset[2] + xr_eyes[i].position[2] - centre[2]};
+            const Vec3 local = rotate(yaw, engine_position(relative, units_per_meter));
+            out.eyes[i].position = {base[0] + local[0], base[1] + local[1], base[2] + local[2]};
+            out.eyes[i].orientation = mul(yaw, engine_orientation(xr_eyes[i].orientation));
+        }
+        out.head.position = {(out.eyes[0].position[0] + out.eyes[1].position[0]) / 2,
+                             (out.eyes[0].position[1] + out.eyes[1].position[1]) / 2,
+                             (out.eyes[0].position[2] + out.eyes[1].position[2]) / 2};
+        out.head.orientation = out.eyes[0].orientation;
+        return out;
+    }
+
     // Clip x = view_x * scale_x + view_z * offset_x (likewise y), so NDC spans -1..1 from
     // the left/down tangent to the right/up tangent. Symmetric 90 degrees gives scale 1,
     // offset 0: the desktop projection.

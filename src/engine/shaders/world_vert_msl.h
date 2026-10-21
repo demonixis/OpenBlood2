@@ -50,7 +50,7 @@ vertex main0_out main0(main0_in in [[stage_in]], constant type_View& View [[buff
     out.out_var_TEXCOORD2 = _60;
     out.out_var_TEXCOORD3 = in.in_var_TEXCOORD3;
     out.out_var_TEXCOORD4 = in.in_var_TEXCOORD4 + (cross(View.quaternion.xyz, cross(View.quaternion.xyz, in.in_var_TEXCOORD4) + (in.in_var_TEXCOORD4 * View.quaternion.w)) * 2.0);
-    out.gl_Position = float4(dot(_64, View.right.xyz) * View.projection.x, dot(_64, View.up.xyz) * View.projection.y, (_68 * View.projection.z) + View.projection.w, _68);
+    out.gl_Position = float4((dot(_64, View.right.xyz) * View.projection.x) + (_68 * View.right.w), (dot(_64, View.up.xyz) * View.projection.y) + (_68 * View.up.w), (_68 * View.projection.z) + View.projection.w, _68);
     return out;
 }
 

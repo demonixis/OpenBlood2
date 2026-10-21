@@ -7,6 +7,8 @@
 #include "engine/model_renderer.h"
 #include "engine/surface_report.h"
 #include "engine/world_renderer.h"
+#include <optional>
+#include <span>
 
 namespace OpenBlood2
 {
@@ -31,6 +33,13 @@ namespace OpenBlood2
         // CPU wall time of the last update() stages and record(), in nanoseconds.
         std::uint64_t world_ns = 0, models_ns = 0, effects_ns = 0, record_ns = 0;
     };
+    // One XR eye: camera and asymmetric projection, recorded into colour layer `index` of the target.
+    struct StereoEye
+    {
+        DVector position{};
+        DRotation rotation{};
+        EyeProjection projection;
+    };
     // Read-only presentation snapshots and their GPU renderers, shared by the
     // application and the measurement tool. update() reads current checked session
     // state without advancing simulation; record() encodes one presented frame.
@@ -49,6 +58,14 @@ namespace OpenBlood2
         // Encodes the in-world viewport into target. Requires a successful update().
         bool record(GameSession&, SDL_GPUCommandBuffer*, SDL_GPUTexture* target, SDL_GPUTextureFormat, Uint32 width,
                     Uint32 height, std::string& error);
+        // XR: one scene pass per eye into layer i of a layered target, sharing this frame's uploads
+        // and shadow tiles. No letterbox; view_scale is ignored. Requires a successful update().
+        bool record_eyes(GameSession&, SDL_GPUCommandBuffer*, SDL_GPUTexture* target, SDL_GPUTextureFormat,
+                         Uint32 width, Uint32 height, std::span<const StereoEye> eyes, std::string& error);
+        // XR head camera for update() (sprites face it; the sky and shadow casters follow it) and
+        // the matching view-weapon placement. Empty: the game's camera, as on desktop.
+        std::optional<CameraView> camera_override;
+        std::optional<ViewWeaponCamera> weapon_camera;
 
         bool render_world = false;      // Entered player and loaded geometry at the last update().
         bool rebuilt = false;           // The last update() rebuilt or released world geometry.
@@ -82,7 +99,7 @@ namespace OpenBlood2
         // Resolved enhanced materials of the current world (roadmap 5.5), rebuilt when the world
         // or the material settings change; empty while the original renderer is selected.
         SurfaceReport material_report;
-        float shadow_aspect = 16.f / 9;  // Viewport aspect for caster culling; record() keeps it current.
+        float shadow_aspect = 16.f / 9; // Viewport aspect for caster culling; record() keeps it current.
         std::vector<ModelRenderer::ShadowCaster> shadow_casters;
         ShadowUniform shadow_uniform;
         ShadowStats shadow_stats;
@@ -102,6 +119,14 @@ namespace OpenBlood2
         PresentationStats stats;
 
       private:
+        const CameraView& camera(const GameSession&) const;
+        // Pipelines, renderer uploads, shadow tiles and a depth target with `layers` layers.
+        bool prepare_frame(SDL_GPUCommandBuffer*, SDL_GPUTextureFormat, Uint32 width, Uint32 height, Uint32 layers,
+                           std::string& error);
+        // One scene render pass into colour/depth layer `layer`.
+        bool record_view(GameSession&, SDL_GPUCommandBuffer*, SDL_GPUTexture* target, Uint32 layer, DVector eye,
+                         DRotation rotation, bool letterbox, const EyeProjection*, std::string& error);
+        void finish_frame(std::uint64_t started);
         void select_shadow_casters(const GameSession&);
         bool record_shadow_tiles(SDL_GPUCommandBuffer*, std::string& error);
         TextureHandle shadow_atlas_, shadow_depth_;
@@ -114,6 +139,6 @@ namespace OpenBlood2
         bool applied_normal_maps_ = false;
         std::uint64_t report_mesh_ = UINT64_MAX, report_surface_ = UINT64_MAX;
         TextureHandle depth_;
-        Uint32 depth_width_ = 0, depth_height_ = 0;
+        Uint32 depth_width_ = 0, depth_height_ = 0, depth_layers_ = 0;
     };
 } // namespace OpenBlood2
