@@ -35,9 +35,27 @@ namespace OpenBlood2
         return true;
     }
 
+    bool Runtime::initialize_window(std::string& error)
+    {
+        SDL_SetAppMetadata("OpenBlood 2", build::version, build::game_identifier);
+        if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD))
+        {
+            error = SDL_GetError();
+            return false;
+        }
+        sdl_initialized = true;
+        window = SDL_CreateWindow("OpenBlood 2", 1200, 780, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+        if (!window)
+        {
+            error = SDL_GetError();
+            return false;
+        }
+        return true;
+    }
+
     Runtime::~Runtime()
     {
-        if (gpu)
+        if (gpu && owns_gpu)
         {
             SDL_WaitForGPUIdle(gpu);
             if (window_claimed)

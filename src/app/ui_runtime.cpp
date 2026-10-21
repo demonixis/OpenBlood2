@@ -4,7 +4,7 @@
 #include <imgui_impl_sdlgpu3.h>
 namespace OpenBlood2
 {
-    bool UiRuntime::initialize(std::string& error)
+    bool UiRuntime::initialize(std::string& error, SDL_GPUTextureFormat target_format)
     {
         IMGUI_CHECKVERSION();
         if (!ImGui::CreateContext())
@@ -26,8 +26,9 @@ namespace OpenBlood2
         style.Colors[ImGuiCol_WindowBg] = ImVec4(0.075f, 0.085f, 0.10f, 0.98f);
         style.Colors[ImGuiCol_Header] = ImVec4(0.38f, 0.14f, 0.16f, 1.0f);
         style.Colors[ImGuiCol_TabSelected] = ImVec4(0.42f, 0.16f, 0.18f, 1.0f);
+        // An offscreen target (the XR UI canvas) has fixed pixels; only the window follows the display scale.
         const float scale = SDL_GetWindowDisplayScale(runtime.window);
-        if (scale > 0.0f)
+        if (scale > 0.0f && target_format == SDL_GPU_TEXTUREFORMAT_INVALID)
             style.FontScaleDpi = scale;
         platform = ImGui_ImplSDL3_InitForSDLGPU(runtime.window);
         if (!platform)
@@ -37,7 +38,9 @@ namespace OpenBlood2
         }
         ImGui_ImplSDLGPU3_InitInfo info{};
         info.Device = runtime.gpu;
-        info.ColorTargetFormat = SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window);
+        info.ColorTargetFormat = target_format != SDL_GPU_TEXTUREFORMAT_INVALID
+                                     ? target_format
+                                     : SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window);
         info.MSAASamples = SDL_GPU_SAMPLECOUNT_1;
         info.SwapchainComposition = SDL_GPU_SWAPCHAINCOMPOSITION_SDR;
         info.PresentMode = SDL_GPU_PRESENTMODE_VSYNC;

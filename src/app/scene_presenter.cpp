@@ -492,6 +492,8 @@ namespace OpenBlood2
         ++stats.passes;
         WorldRecordTarget scene{commands, pass, letterbox, view_model_depth, 1};
         scene.scene_color = game.client_shell.SceneLightScale();
+        if (scene_fade != 1)
+            scene.scene_color = vector_scale(scene.scene_color, scene_fade);
         scene.eye = projection;
         auto close = scene;
         close.letterbox = false;

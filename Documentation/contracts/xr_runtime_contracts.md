@@ -1,4 +1,4 @@
-# OpenXR runtime, stereo world and controllers (M8 lots 8.1–8.3, 8.5)
+# OpenXR runtime, stereo world, controllers, HUD and menus (M8 lots 8.1–8.3, 8.5, 8.6)
 
 Implements the first two lots of the [OpenXR plan](../implementation/openxr_plan.md):
 an immersive Quest APK and an OpenXR session that draws a world-locked test scene.
@@ -138,6 +138,39 @@ No game world, HUD or menu is rendered in XR yet.
   pass and depth range. A 30 ms haptic pulse marks every shot a hand's weapon actually fires
   (`CViewWeapon::shots`). View weapons follow the right aim pose until the arm IK lot.
 
+## HUD and menus (lot 8.6)
+
+- **The frontend in XR.** `--xr` runs the ordinary frontend (`run_frontend`) with an
+  `XrFrontend` (`src/app/xr_frontend.cpp`): menus, saves, preferences, credits, the demo end
+  and the simulation are the desktop ones. The Quest APK opens the main menu like a desktop
+  launch; `--xr --view-world` enters the world directly. The standalone XR world loop is gone.
+- **Device and window.** The OpenXR session owns the GPU device (`Runtime::set_device`); the SDL
+  window still carries input and ImGui's platform backend but is never presented.
+  `xrWaitFrame` paces the loop and the step is the predicted display period (capped at 100 ms);
+  an idle session only polls SDL for quit.
+- **UI canvas.** ImGui renders a fixed 640×480 canvas (the original layout: menu art 1:1,
+  `CNewStatusBar` at its original proportions) into one single-layer XR swapchain with the same
+  gamma handling as the eyes, composited as an `XrCompositionLayerQuad` 0.70 m wide
+  (about 50°) at 0.75 m:
+  - menu, credits screen and demo end: a world-locked opaque panel placed when it opens,
+    0.75 m ahead of the head, 5 cm below eye level, facing the user; the paused world stays
+    visible behind it (a dark clear with no world);
+  - in play: the head-locked HUD in VIEW space, alpha-blended (premultiplied by ImGui's blend).
+- **HUD content.** Status bar, credits roll text, save notice and error modal as on desktop.
+  XR hides the screen-centred crosshair (the controller laser and reticle aim instead), the
+  touch overlay and the inspector.
+- **Fades.** FADEIN/FADEOUT and death fades scale the projection layer with
+  `XR_KHR_composition_layer_color_scale_bias` (listed on Quest 3); without it,
+  `ScenePresenter::scene_fade` scales the scene light. The canvas is not faded, as on desktop.
+- **Menu input.** The controllers become a virtual gamepad (`xr_gamepad_id`) on the ordinary
+  gamepad path: left stick navigates, A accepts, B goes back, the menu button opens and
+  closes the menu (in play too). A button held across a change between menu and play waits
+  for its release. Session focus replaces window focus: losing it enters as a window focus
+  loss, which opens the in-world menu and pauses; SDL window focus events are ignored in XR.
+- **Diagnostics.** Every 360 frames the log records the canvas mode, whether the world was
+  drawn, menu state, ImGui vertices and scene draw calls. Meta's "metacam" screenshots omit
+  quad layers; use the `screencap` method (both raw eye images) to see the canvas.
+
 ## Conversions
 
 `xr_math.h` converts OpenXR (right-handed, −Z forward, metres) to the engine
@@ -159,8 +192,8 @@ FOV gives the desktop projection.
 
 ## Not included yet
 
-Multiview, menu actions and the VR options page (smooth turn, handedness, movement
-reference), the left-handed layout, weapon slots by number, HUD/menu layers, arm IK
+Multiview, the menu selection laser (8.7) and ImGui pointer input, the VR options page (smooth turn, handedness, movement
+reference), the left-handed layout, weapon slots by number, arm IK
 (view weapons follow the right aim pose rigidly), refresh-rate and performance settings,
 the data setup screen and demo download, PCVR presets and their profiles.
 Shadow casters are still chosen with the 90° desktop frustum around the head, close

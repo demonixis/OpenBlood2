@@ -16,6 +16,9 @@
 #if BLOOD2_INSPECTOR
 #include "app/inspector.h"
 #endif
+#if BLOOD2_XR
+#include "app/xr_frontend.h"
+#endif
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlgpu3.h>
@@ -38,13 +41,36 @@ namespace OpenBlood2
 #else
         constexpr bool gpu_debug = true;
 #endif
-        if (!runtime.initialize(gpu_debug, error))
+#if BLOOD2_XR
+        // --xr: the OpenXR session owns the device; the window only carries SDL input/ImGui and
+        // nothing is presented to it.
+        std::unique_ptr<XrFrontend> xr;
+        if (options.xr_world)
+        {
+            SDL_SetHint(SDL_HINT_ANDROID_BLOCK_ON_PAUSE, "0"); // OpenXR keeps polling while paused.
+            xr = std::make_unique<XrFrontend>();
+            if (!runtime.initialize_window(error) || !xr->create(gpu_debug, error))
+                return failed(3);
+            runtime.set_device(xr->device());
+        }
+        else
+#endif
+            if (!runtime.initialize(gpu_debug, error))
             return failed(3);
         spdlog::info("GPU device: {}", SDL_GetStringProperty(SDL_GetGPUDeviceProperties(runtime.gpu),
                                                              SDL_PROP_GPU_DEVICE_NAME_STRING, "unreported"));
         UiRuntime ui(runtime);
+#if BLOOD2_XR
+        if (!ui.initialize(error, xr ? xr->ui_format() : SDL_GPU_TEXTUREFORMAT_INVALID))
+#else
         if (!ui.initialize(error))
+#endif
             return failed(3);
+#if BLOOD2_XR
+        const bool xr_mode = xr != nullptr;
+#else
+        constexpr bool xr_mode = false;
+#endif
         Resources artwork;
         if (!artwork.mount_game(config, error))
             return failed(5);
@@ -154,6 +180,10 @@ namespace OpenBlood2
         GamepadDevices gamepads;
         input.demo_mode = config.demo && !menu_enabled;
         input.controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
+#if BLOOD2_XR
+        if (xr)
+            input.controls.focused = true; // Session focus replaces window focus.
+#endif
         input.reset(menu, game->client_shell.m_bInWorld);
         ObjectSelection selection;
         ScenePresenter presenter(runtime.gpu);
@@ -188,10 +218,33 @@ namespace OpenBlood2
         std::uint64_t reported_credits_failures = 0;
         while (!done && (!options.frame_limit || frames < options.frame_limit))
         {
+#if BLOOD2_XR
+            if (xr)
+            {
+                const auto begun = xr->begin(error);
+                if (begun == XrFrontend::Begin::Failed)
+                    return failed(3);
+                if (begun == XrFrontend::Begin::Exit)
+                    break;
+                if (begun == XrFrontend::Begin::Idle)
+                {
+                    SDL_Event idle;
+                    while (SDL_PollEvent(&idle))
+                        done |= idle.type == SDL_EVENT_QUIT || idle.type == SDL_EVENT_TERMINATING;
+                    SDL_Delay(10);
+                    continue;
+                }
+            }
+#endif
             const bool paused_at_start = input.paused(menu);
+            [[maybe_unused]] bool level_changed = false;
             const auto tick = SDL_GetTicksNS();
-            const double delta =
+            double delta =
                 options.menu_smoke || options.demo_smoke ? 1. / 60 : app_frame_delta(double(tick - previous) / 1e9);
+#if BLOOD2_XR
+            if (xr)
+                delta = xr->delta();
+#endif
             previous = tick;
             saves.sync(menu);
             saves.notice.advance(delta);
@@ -215,16 +268,14 @@ namespace OpenBlood2
             SDL_Event event;
             int width = 0, height = 0;
             SDL_GetWindowSize(runtime.window, &width, &height);
-            while (SDL_PollEvent(&event))
+            // One event through the menu/game input; false on a quit request.
+            const auto dispatch = [&](SDL_Event& event)
             {
                 if ((options.menu_smoke || options.demo_smoke) && MenuSmoke::unrelated(event))
-                    continue;
+                    return true;
                 if (event.type == SDL_EVENT_QUIT || (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED &&
                                                      event.window.windowID == SDL_GetWindowID(runtime.window)))
-                {
-                    done = true;
-                    break;
-                }
+                    return false;
                 gamepads.event(event);
                 if (!menu.error.empty())
                 {
@@ -236,7 +287,7 @@ namespace OpenBlood2
                         dismiss_error |= edge.down && !edge.repeat &&
                                          (input.controls.bindings.matches(edge, InputAction::Menu) ||
                                           input.controls.bindings.matches(edge, InputAction::MenuBack));
-                    continue;
+                    return true;
                 }
                 auto* player = game->server_shell.Player(game->local_client);
                 const bool old_inspector = input.inspector, old_menu = input.paused(menu);
@@ -260,7 +311,41 @@ namespace OpenBlood2
                                           event.type == SDL_EVENT_MOUSE_WHEEL;
                 if (forward || !device_input)
                     ImGui_ImplSDL3_ProcessEvent(&event);
+                return true;
+            };
+            while (SDL_PollEvent(&event))
+            {
+#if BLOOD2_XR
+                // The session's focus replaces the window's (the headset window flips at launch).
+                if (xr && (event.type == SDL_EVENT_WINDOW_FOCUS_LOST || event.type == SDL_EVENT_WINDOW_FOCUS_GAINED))
+                    continue;
+                done |= event.type == SDL_EVENT_TERMINATING;
+#endif
+                if (!dispatch(event))
+                {
+                    done = true;
+                    break;
+                }
             }
+#if BLOOD2_XR
+            if (xr && !done)
+            {
+                // Session focus changes and controller menu navigation enter as ordinary events.
+                std::vector<SDL_Event> synthetic;
+                if (const auto focus = xr->take_focus_change())
+                {
+                    SDL_Event e{};
+                    e.type = *focus ? SDL_EVENT_WINDOW_FOCUS_GAINED : SDL_EVENT_WINDOW_FOCUS_LOST;
+                    e.window.windowID = SDL_GetWindowID(runtime.window);
+                    synthetic.push_back(e);
+                }
+                const bool navigating = input.paused(menu) || !menu.error.empty() || input.demo.finished();
+                for (const auto& e : xr->menu_events(navigating))
+                    synthetic.push_back(e);
+                for (auto& e : synthetic)
+                    dispatch(e);
+            }
+#endif
             if (done || input.demo.quit)
                 break;
             {
@@ -520,7 +605,12 @@ namespace OpenBlood2
             }
             const bool blocked = input.paused(menu) || input.inspector;
             input.controls.enabled = !blocked;
-            if (!input.controls.sync_mouse(runtime.window, shell.m_bInWorld, blocked, error))
+#if BLOOD2_XR
+            if (xr)
+                xr->apply_controls(*game, !blocked && !menu.active); // Replaces the desktop sampling below.
+            else
+#endif
+                if (!input.controls.sync_mouse(runtime.window, shell.m_bInWorld, blocked, error))
             {
                 if (!menu_enabled)
                     return failed(4);
@@ -528,7 +618,7 @@ namespace OpenBlood2
                 menu.error = "Cannot capture mouse: " + error;
                 input.reset(menu, shell.m_bInWorld);
             }
-            if (!blocked && !menu.active)
+            if (!blocked && !menu.active && !xr_mode)
             {
                 shell.movement_input = input.controls.sample(false);
                 const auto fire = input.controls.sample_fire(false);
@@ -601,6 +691,7 @@ namespace OpenBlood2
                                  menu_enabled ? "return to menu" : "direct exit");
                 }
                 const auto change = GameSession::process_level_change(game, error);
+                level_changed = change == LevelChangeResult::Committed;
                 if (change == LevelChangeResult::Committed)
                 {
                     spdlog::info("NEW_LEVEL committed: {} -> {} / start {}", game->level_change.source_world,
@@ -629,6 +720,10 @@ namespace OpenBlood2
                     }
                 }
             }
+#if BLOOD2_XR
+            if (xr)
+                xr->after_step(*game, level_changed);
+#endif
             if (input.credits_screen)
                 game->client_shell.m_Credits.Update(static_cast<float>(delta)); // Original UpdateCredits.
             if (game->client_shell.credits_failures != reported_credits_failures)
@@ -637,10 +732,25 @@ namespace OpenBlood2
                 spdlog::warn("Credits roll: {}", game->client_shell.credits_error);
             }
             selection.refresh(game->objects);
-            if (!menu.active && !input.credits_screen && !input.demo.finished() && !presenter.update(*game, error))
-                return failed(5);
+            if (!menu.active && !input.credits_screen && !input.demo.finished())
+            {
+#if BLOOD2_XR
+                if (xr)
+                    xr->prepare(*game, presenter);
+#endif
+                if (!presenter.update(*game, error))
+                    return failed(5);
+            }
             ImGui_ImplSDLGPU3_NewFrame();
             ImGui_ImplSDL3_NewFrame();
+#if BLOOD2_XR
+            if (xr_mode)
+            {
+                // The XR UI canvas has fixed pixels, independent of the (unpresented) window.
+                ImGui::GetIO().DisplaySize = {float(XrFrontend::ui_width), float(XrFrontend::ui_height)};
+                ImGui::GetIO().DisplayFramebufferScale = {1, 1};
+            }
+#endif
             ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
             if (input.inspector)
                 ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
@@ -662,18 +772,20 @@ namespace OpenBlood2
                 // The original rolls credits inside Start3D/End3D, below fades and the status bar.
                 if (game->client_shell.m_bInWorld && game->client_shell.m_bRollCredits)
                     draw_credits(game->client_shell.m_Credits);
-                draw_screen_fade(game->client_shell.fade.Scale(), game->client_shell.m_bInWorld);
+                if (!xr_mode) // XR fades the scene, not the head-locked canvas.
+                    draw_screen_fade(game->client_shell.fade.Scale(), game->client_shell.m_bInWorld);
                 const auto& client = game->client_shell;
+                // XR aims with the controller (laser and reticle): no screen-centred crosshair.
                 auto state = hud_state(client.stats, client.m_bInWorld, client.view.object != nullptr,
-                                       client.death_camera.active, client.m_bShowCrosshair, client.m_nCrosshair,
-                                       client.ctf.team, client.ctf.flag_icon);
+                                       client.death_camera.active, client.m_bShowCrosshair && !xr_mode,
+                                       client.m_nCrosshair, client.ctf.team, client.ctf.flag_icon);
                 state.items = client.inventory_items;
                 state.item_messages = client.inventory_item_messages;
                 state.item_shows = client.inventory_show_requests;
                 state.time = float(game->objects.time());
                 if (!hud.draw(state, game->resources, error))
                     return failed(4);
-                if (input.touch.visible && client.m_bInWorld)
+                if (input.touch.visible && client.m_bInWorld && !xr_mode)
                     draw_touch_controls(input.touch);
                 if (saves.notice.visible())
                 {
@@ -708,11 +820,51 @@ namespace OpenBlood2
             inspector.saves = &saves.slots;
             inspector.save_notice = saves.notice.visible() ? saves.notice.text : std::string{};
             const bool was_visible = input.inspector;
-            inspector.draw(config, data, input.inspector, frames, *game, selection);
+            if (!xr_mode)
+                inspector.draw(config, data, input.inspector, frames, *game, selection);
             if (was_visible && !input.inspector)
                 input.reset(menu, game->client_shell.m_bInWorld);
 #endif
             ImGui::Render();
+#if BLOOD2_XR
+            if (xr)
+            {
+                // The paused world stays behind the menu panel; ImGui draws the canvas (menu or HUD).
+                const bool world = !input.credits_screen && !input.demo.finished() && game->client_shell.m_bInWorld;
+                const bool panel = menu.active || input.credits_screen || input.demo.finished();
+                const float scale = game->client_shell.fade.Scale();
+                const float fade =
+                    game->client_shell.m_bInWorld && std::isfinite(scale) ? std::clamp(scale, 0.f, 1.f) : 1;
+                const auto canvas = [&](SDL_GPUCommandBuffer* commands, SDL_GPUTexture* texture)
+                {
+                    ImGui_ImplSDLGPU3_PrepareDrawData(ImGui::GetDrawData(), commands);
+                    SDL_GPUColorTargetInfo color{};
+                    color.texture = texture;
+                    color.load_op = SDL_GPU_LOADOP_CLEAR;
+                    color.store_op = SDL_GPU_STOREOP_STORE;
+                    color.clear_color = {0, 0, 0, 0};
+                    auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, nullptr);
+                    if (!pass)
+                        return false;
+                    ImGui_ImplSDLGPU3_RenderDrawData(ImGui::GetDrawData(), commands, pass);
+                    SDL_EndGPURenderPass(pass);
+                    return true;
+                };
+                if (!xr->render(*game, presenter, world, panel, fade, canvas, error))
+                    return failed(3);
+                if (frames % 360 == 0)
+                {
+                    const auto* data = ImGui::GetDrawData();
+                    spdlog::info("XR frontend: frame {}, {} canvas, {} world, menu {}, {} UI vertices in {} lists, "
+                                 "{} draw calls, fade {:.2f}",
+                                 frames, panel ? "panel" : "HUD", world && presenter.render_world ? "with" : "without",
+                                 menu.active, data ? data->TotalVtxCount : 0, data ? data->CmdListsCount : 0,
+                                 presenter.stats.draw_calls, fade);
+                }
+                ++frames;
+                continue;
+            }
+#endif
             auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
             if (!commands)
             {

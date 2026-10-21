@@ -138,6 +138,74 @@ namespace OpenBlood2
         bool loader_loaded = false;
         bool local_floor_extension = false, refresh_rate_extension = false, format_list_extension = false;
         bool gamma_views = false; // sRGB images written through UNORM views (gamma-space output).
+        bool color_scale_extension = false;
+        SDL_GPUTextureFormat srgb = SDL_GPU_TEXTUREFORMAT_INVALID, unorm = SDL_GPU_TEXTUREFORMAT_INVALID;
+        std::array<VkFormat, 2> view_formats{};
+        PFN_xrEnumerateSwapchainImages enumerate_images = nullptr;
+        XrSpace view_space = XR_NULL_HANDLE;
+        // The UI quad: one single-layer swapchain placed per frame.
+        XrSwapchain quad_swapchain = XR_NULL_HANDLE;
+        SDL_GPUTexture** quad_images = nullptr;
+        std::uint32_t quad_count = 0, quad_width = 0, quad_height = 0;
+        bool quad_acquired = false;
+
+        XrResult create_swapchain(std::uint32_t width, std::uint32_t height, std::uint32_t layers,
+                                  XrSwapchain& swapchain_out, SDL_GPUTexture**& images_out)
+        {
+            auto format_list =
+                make<XrVulkanSwapchainFormatListCreateInfoKHR>(XR_TYPE_VULKAN_SWAPCHAIN_FORMAT_LIST_CREATE_INFO_KHR);
+            format_list.viewFormatCount = static_cast<std::uint32_t>(view_formats.size());
+            format_list.viewFormats = view_formats.data();
+            auto info = make<XrSwapchainCreateInfo>(XR_TYPE_SWAPCHAIN_CREATE_INFO);
+            info.usageFlags = XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT | XR_SWAPCHAIN_USAGE_SAMPLED_BIT;
+            if (gamma_views)
+            {
+                info.usageFlags |= XR_SWAPCHAIN_USAGE_MUTABLE_FORMAT_BIT;
+                info.format = view_formats[0];
+                if (format_list_extension)
+                    info.next = &format_list;
+            }
+            info.sampleCount = 1;
+            info.width = width;
+            info.height = height;
+            info.faceCount = 1;
+            info.arraySize = layers;
+            info.mipCount = 1;
+            return SDL_CreateGPUXRSwapchain(device, session, &info, gamma_views ? unorm : srgb, &swapchain_out,
+                                            &images_out);
+        }
+        SDL_GPUTexture* acquire(XrSwapchain chain, SDL_GPUTexture** textures, std::uint32_t count, bool& acquired,
+                                std::string& error)
+        {
+            if (acquired)
+            {
+                error = "OpenXR swapchain image already acquired";
+                return nullptr;
+            }
+            std::uint32_t index = 0;
+            auto acquire_info = make<XrSwapchainImageAcquireInfo>(XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO);
+            if (!check(acquire_image(chain, &acquire_info, &index), "xrAcquireSwapchainImage", error))
+                return nullptr;
+            acquired = true;
+            auto wait = make<XrSwapchainImageWaitInfo>(XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO);
+            wait.timeout = XR_INFINITE_DURATION;
+            if (!check(wait_image(chain, &wait), "xrWaitSwapchainImage", error) || index >= count)
+            {
+                if (error.empty())
+                    error = "OpenXR swapchain image index out of range";
+                return nullptr;
+            }
+            return textures[index];
+        }
+        bool release(XrSwapchain chain, bool& acquired, std::string& error)
+        {
+            if (!acquired)
+                return true;
+            // The frame's GPU work was submitted before this release.
+            auto release_info = make<XrSwapchainImageReleaseInfo>(XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO);
+            acquired = false;
+            return check(release_image(chain, &release_info), "xrReleaseSwapchainImage", error);
+        }
         SDL_GPUDevice* device = nullptr;
         XrInstance instance = XR_NULL_HANDLE;
         XrSystemId system = XR_NULL_SYSTEM_ID;
@@ -209,8 +277,12 @@ namespace OpenBlood2
         auto& s = *state_;
         if (s.device)
             SDL_WaitForGPUIdle(s.device);
+        if (s.quad_swapchain && s.device)
+            SDL_DestroyGPUXRSwapchain(s.device, s.quad_swapchain, s.quad_images);
         if (s.swapchain && s.device)
             SDL_DestroyGPUXRSwapchain(s.device, s.swapchain, s.images);
+        if (s.view_space)
+            s.destroy_space(s.view_space);
         for (auto space : s.grip_spaces)
             if (space)
                 s.destroy_space(space);
@@ -324,13 +396,21 @@ namespace OpenBlood2
             extensions.push_back(XR_FB_DISPLAY_REFRESH_RATE_EXTENSION_NAME);
             s.refresh_rate_extension = true;
         }
+        if (listed(XR_KHR_COMPOSITION_LAYER_COLOR_SCALE_BIAS_EXTENSION_NAME))
+        {
+            extensions.push_back(XR_KHR_COMPOSITION_LAYER_COLOR_SCALE_BIAS_EXTENSION_NAME);
+            s.color_scale_extension = true;
+        }
         if (listed(XR_KHR_VULKAN_SWAPCHAIN_FORMAT_LIST_EXTENSION_NAME))
         {
             extensions.push_back(XR_KHR_VULKAN_SWAPCHAIN_FORMAT_LIST_EXTENSION_NAME);
             s.format_list_extension = true;
         }
-        spdlog::info("OpenXR: {} instance extensions listed; local floor {}, refresh rate {}, swapchain format list {}",
-                     available.size(), s.local_floor_extension, s.refresh_rate_extension, s.format_list_extension);
+        spdlog::info(
+            "OpenXR: {} instance extensions listed; local floor {}, refresh rate {}, swapchain format list {}, "
+            "colour scale {}",
+            available.size(), s.local_floor_extension, s.refresh_rate_extension, s.format_list_extension,
+            s.color_scale_extension);
 
         const SDL_PropertiesID props = SDL_CreateProperties();
         SDL_SetBooleanProperty(props, SDL_PROP_GPU_DEVICE_CREATE_SHADERS_SPIRV_BOOLEAN, true);
@@ -576,51 +656,36 @@ namespace OpenBlood2
         const bool rgba = srgb == SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM_SRGB;
         const std::array<VkFormat, 2> view_formats{rgba ? VK_FORMAT_R8G8B8A8_SRGB : VK_FORMAT_B8G8R8A8_SRGB,
                                                    rgba ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_B8G8R8A8_UNORM};
-        auto format_list =
-            make<XrVulkanSwapchainFormatListCreateInfoKHR>(XR_TYPE_VULKAN_SWAPCHAIN_FORMAT_LIST_CREATE_INFO_KHR);
-        format_list.viewFormatCount = static_cast<std::uint32_t>(view_formats.size());
-        format_list.viewFormats = view_formats.data();
-        const auto create_swapchain = [&](bool gamma_views)
-        {
-            auto info = make<XrSwapchainCreateInfo>(XR_TYPE_SWAPCHAIN_CREATE_INFO);
-            info.usageFlags = XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT | XR_SWAPCHAIN_USAGE_SAMPLED_BIT;
-            if (gamma_views)
-            {
-                info.usageFlags |= XR_SWAPCHAIN_USAGE_MUTABLE_FORMAT_BIT;
-                info.format = view_formats[0];
-                if (s.format_list_extension)
-                    info.next = &format_list;
-            }
-            info.sampleCount = 1;
-            info.width = s.width;
-            info.height = s.height;
-            info.faceCount = 1;
-            info.arraySize = 2;
-            info.mipCount = 1;
-            return SDL_CreateGPUXRSwapchain(s.device, s.session, &info, gamma_views ? unorm : srgb, &s.swapchain,
-                                            &s.images);
-        };
+        s.srgb = srgb;
+        s.unorm = unorm;
+        s.view_formats = view_formats;
         XrResult created = XR_ERROR_VALIDATION_FAILURE;
         if (unorm != SDL_GPU_TEXTUREFORMAT_INVALID)
         {
-            created = create_swapchain(true);
-            s.gamma_views = XR_SUCCEEDED(created);
-            if (!s.gamma_views)
+            s.gamma_views = true;
+            created = s.create_swapchain(s.width, s.height, 2, s.swapchain, s.images);
+            if (XR_FAILED(created))
             {
                 spdlog::warn("OpenXR: mutable-format sRGB swapchain refused ({}); colours are encoded twice",
                              s.result(created));
+                s.gamma_views = false;
                 s.swapchain = XR_NULL_HANDLE;
                 s.images = nullptr;
             }
         }
         if (!s.gamma_views)
-            created = create_swapchain(false);
+            created = s.create_swapchain(s.width, s.height, 2, s.swapchain, s.images);
         s.format = s.gamma_views ? unorm : srgb;
         if (!s.check(created, "SDL_CreateGPUXRSwapchain", error))
             return false;
-        PFN_xrEnumerateSwapchainImages enumerate_images = nullptr;
-        if (!s.load("xrEnumerateSwapchainImages", enumerate_images, error) ||
-            !s.check(enumerate_images(s.swapchain, 0, &s.image_count, nullptr), "xrEnumerateSwapchainImages", error))
+        if (!s.load("xrEnumerateSwapchainImages", s.enumerate_images, error) ||
+            !s.check(s.enumerate_images(s.swapchain, 0, &s.image_count, nullptr), "xrEnumerateSwapchainImages", error))
+            return false;
+        // Head-locked compositor layers (the HUD) live in VIEW space.
+        auto view_info = make<XrReferenceSpaceCreateInfo>(XR_TYPE_REFERENCE_SPACE_CREATE_INFO);
+        view_info.referenceSpaceType = XR_REFERENCE_SPACE_TYPE_VIEW;
+        view_info.poseInReferenceSpace.orientation.w = 1;
+        if (!s.check(s.create_reference_space(s.session, &view_info, &s.view_space), "xrCreateReferenceSpace", error))
             return false;
         if (s.refresh_rate_extension)
         {
@@ -830,42 +895,50 @@ namespace OpenBlood2
     SDL_GPUTexture* XrRuntime::acquire_color(std::string& error)
     {
         auto& s = *state_;
-        if (s.image_acquired)
-        {
-            error = "OpenXR swapchain image already acquired";
-            return nullptr;
-        }
-        std::uint32_t index = 0;
-        auto acquire = make<XrSwapchainImageAcquireInfo>(XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO);
-        if (!s.check(s.acquire_image(s.swapchain, &acquire, &index), "xrAcquireSwapchainImage", error))
-            return nullptr;
-        s.image_acquired = true;
-        auto wait = make<XrSwapchainImageWaitInfo>(XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO);
-        wait.timeout = XR_INFINITE_DURATION;
-        if (!s.check(s.wait_image(s.swapchain, &wait), "xrWaitSwapchainImage", error) || index >= s.image_count)
-        {
-            if (error.empty())
-                error = "OpenXR swapchain image index out of range";
-            return nullptr;
-        }
-        return s.images[index];
+        return s.acquire(s.swapchain, s.images, s.image_count, s.image_acquired, error);
     }
 
-    bool XrRuntime::end_frame(const XrFrameInput& frame, bool rendered, std::string& error)
+    bool XrRuntime::create_quad(std::uint32_t width, std::uint32_t height, std::string& error)
     {
         auto& s = *state_;
-        if (s.image_acquired)
+        if (s.quad_swapchain || !width || !height)
         {
-            // The frame's GPU work was submitted before this release.
-            auto release = make<XrSwapchainImageReleaseInfo>(XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO);
-            s.image_acquired = false;
-            if (!s.check(s.release_image(s.swapchain, &release), "xrReleaseSwapchainImage", error))
-                return false;
+            error = "Invalid or repeated OpenXR quad creation";
+            return false;
         }
+        if (!s.check(s.create_swapchain(width, height, 1, s.quad_swapchain, s.quad_images), "SDL_CreateGPUXRSwapchain",
+                     error) ||
+            !s.check(s.enumerate_images(s.quad_swapchain, 0, &s.quad_count, nullptr), "xrEnumerateSwapchainImages",
+                     error))
+            return false;
+        s.quad_width = width;
+        s.quad_height = height;
+        return true;
+    }
+
+    SDL_GPUTexture* XrRuntime::acquire_quad(std::string& error)
+    {
+        auto& s = *state_;
+        if (!s.quad_swapchain)
+        {
+            error = "No OpenXR quad";
+            return nullptr;
+        }
+        return s.acquire(s.quad_swapchain, s.quad_images, s.quad_count, s.quad_acquired, error);
+    }
+
+    bool XrRuntime::end_frame(const XrFrameInput& frame, bool rendered, std::string& error, const XrQuadPlacement* quad,
+                              float fade)
+    {
+        auto& s = *state_;
+        const bool quad_drawn = s.quad_acquired;
+        if (!s.release(s.swapchain, s.image_acquired, error) || !s.release(s.quad_swapchain, s.quad_acquired, error))
+            return false;
         std::array<XrCompositionLayerProjectionView, 2> views{};
         auto projection = make<XrCompositionLayerProjection>(XR_TYPE_COMPOSITION_LAYER_PROJECTION);
-        const XrCompositionLayerBaseHeader* layers[] = {
-            reinterpret_cast<const XrCompositionLayerBaseHeader*>(&projection)};
+        auto scale = make<XrCompositionLayerColorScaleBiasKHR>(XR_TYPE_COMPOSITION_LAYER_COLOR_SCALE_BIAS_KHR);
+        auto panel = make<XrCompositionLayerQuad>(XR_TYPE_COMPOSITION_LAYER_QUAD);
+        std::array<const XrCompositionLayerBaseHeader*, 2> layers{};
         auto end = make<XrFrameEndInfo>(XR_TYPE_FRAME_END_INFO);
         end.displayTime = frame.display_time;
         end.environmentBlendMode = XR_ENVIRONMENT_BLEND_MODE_OPAQUE;
@@ -884,9 +957,32 @@ namespace OpenBlood2
             projection.space = s.space;
             projection.viewCount = 2;
             projection.views = views.data();
-            end.layerCount = 1;
-            end.layers = layers;
+            if (s.color_scale_extension && fade < 1)
+            {
+                const float f = std::clamp(fade, 0.f, 1.f);
+                scale.colorScale = {f, f, f, 1};
+                projection.next = &scale;
+            }
+            layers[end.layerCount++] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&projection);
+            if (quad && quad_drawn)
+            {
+                panel.layerFlags = quad->blend ? XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT : 0;
+                panel.space = quad->head_locked ? s.view_space : s.space;
+                panel.eyeVisibility = XR_EYE_VISIBILITY_BOTH;
+                panel.subImage.swapchain = s.quad_swapchain;
+                panel.subImage.imageRect = {
+                    {0, 0}, {static_cast<std::int32_t>(s.quad_width), static_cast<std::int32_t>(s.quad_height)}};
+                panel.pose = xr_pose(quad->pose);
+                panel.size = {quad->width, quad->height};
+                layers[end.layerCount++] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&panel);
+            }
+            end.layers = layers.data();
         }
         return s.check(s.end_frame(s.session, &end), "xrEndFrame", error);
+    }
+
+    bool XrRuntime::fades_in_compositor() const
+    {
+        return state_->color_scale_extension;
     }
 } // namespace OpenBlood2

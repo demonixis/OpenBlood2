@@ -9,7 +9,8 @@ namespace OpenBlood2
         ~UiRuntime();
         UiRuntime(const UiRuntime&) = delete;
         UiRuntime& operator=(const UiRuntime&) = delete;
-        bool initialize(std::string&);
+        // target_format: the colour format ImGui renders into; INVALID selects the window swapchain's.
+        bool initialize(std::string&, SDL_GPUTextureFormat target_format = SDL_GPU_TEXTUREFORMAT_INVALID);
         Runtime& runtime;
         bool context = false, platform = false, renderer = false;
     };

@@ -2,8 +2,11 @@
 
 Drafted 2026-10-21 at `c09a9d1f`. Lots 8.1 and 8.2 have their first light on a
 Quest 3 ([report](reports/xr_first_light.md)), lot 8.3 renders SubwayA in stereo at
-72 Hz ([report](reports/xr_stereo_world.md)) and lot 8.5 adds the controllers
-([report](reports/xr_controls.md)); see the [contract](../contracts/xr_runtime_contracts.md).
+72 Hz ([report](reports/xr_stereo_world.md)), lot 8.5 adds the controllers
+([report](reports/xr_controls.md)) and lot 8.6 the HUD and menus ([report](reports/xr_menus_hud.md));
+see the [contract](../contracts/xr_runtime_contracts.md). Lot 8.6 composites the menu panel as an
+OpenXR quad like the HUD, rather than drawing it in the eye buffer: it is sharper and shares
+one canvas; the 8.7 laser draws its cursor into the canvas and its beam up to the panel.
 The rest is not implemented. Since then the data location is the shared
 `/sdcard/openblood2/{game,demo}` (user decision), and the Quest 3 offers no swapchain
 format list, so gamma-space output uses the core mutable-format bit. It turns

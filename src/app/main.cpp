@@ -1784,7 +1784,8 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --view-world        Start directly in the original world; F10 inspector, Esc pause; "
                      "1..9/0 weapon slots, original HUD\n"
                      "  --xr-test           OpenXR first light: floor grid and controller boxes (XR builds)\n"
-                     "  --xr                Enter the world directly in an OpenXR session (XR builds)\n"
+                     "  --xr                Present the game in an OpenXR session: menus at 0.75 m, view-locked HUD,\n"
+                     "                      controllers (XR builds; add --view-world for direct entry)\n"
                      "  --viewport-smoke    GPU 3D depth view, movement and unload/reload checks\n"
                      "  --start-game        Validate original entry and one headless update; exits after checks\n"
                      "  --no-inspector      Disable normal F10 inspection (smokes retain their explicit policy)\n"
@@ -1852,15 +1853,13 @@ static int application_main(const OpenBlood2::Options& options)
     }
     if (!data.readme_version.empty())
         spdlog::info("Readme declares: {}", data.readme_version);
+#if !BLOOD2_XR
     if (options.xr_world)
     {
-#if BLOOD2_XR
-        return OpenBlood2::run_xr_world(options, config);
-#else
         spdlog::error("--xr requires a BLOOD2_XR build");
         return 2;
-#endif
     }
+#endif
     if (options.bench)
         return OpenBlood2::run_bench(options, config);
     if (options.check_data)
