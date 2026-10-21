@@ -134,6 +134,23 @@ namespace OpenBlood2
         menu.error = menu_enabled ? preference_error : std::string{};
         auto stored_settings = menu.settings;
         MenuInput input;
+        // controls.cfg beside the preferences, under the same smoke-run exclusion.
+        std::filesystem::path controls_file;
+        if (!options.menu_smoke && !options.demo_smoke)
+        {
+            std::string why;
+            if (!controls_path(controls_file, why) || !load_controls(controls_file, input.controls.bindings, why))
+            {
+                spdlog::warn("Controls: {}", why);
+                if (menu_enabled && menu.error.empty())
+                {
+                    menu.open(game->client_shell.m_bInWorld);
+                    menu.error = why;
+                }
+            }
+        }
+        auto stored_controls = input.controls.bindings.entries;
+        input.refresh_controls(menu);
         GamepadDevices gamepads;
         input.demo_mode = config.demo && !menu_enabled;
         input.controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
@@ -284,6 +301,11 @@ namespace OpenBlood2
             auto command = menu.take_command();
             if (command.action == MenuAction::Quit)
                 break;
+            if (command.action == MenuAction::RestoreControls)
+            {
+                restore_controls(input.controls.bindings);
+                input.refresh_controls(menu);
+            }
             if (command.action == MenuAction::Credits && game->client_shell.m_bInWorld)
             {
                 // Original MenuCredits in a game: the "lame" text-only GS_CREDITS screen.
@@ -417,6 +439,15 @@ namespace OpenBlood2
                 {
                     menu.error = error;
                     spdlog::error("Save preferences failed: {}", error);
+                }
+            }
+            if (stored_controls != input.controls.bindings.entries)
+            {
+                stored_controls = input.controls.bindings.entries;
+                if (!controls_file.empty() && !save_controls(controls_file, input.controls.bindings, error))
+                {
+                    menu.error = error;
+                    spdlog::error("Save controls failed: {}", error);
                 }
             }
             const auto& settings = menu.settings;
@@ -641,6 +672,8 @@ namespace OpenBlood2
                 state.time = float(game->objects.time());
                 if (!hud.draw(state, game->resources, error))
                     return failed(4);
+                if (input.touch.visible && client.m_bInWorld)
+                    draw_touch_controls(input.touch);
                 if (saves.notice.visible())
                 {
                     const auto& io = ImGui::GetIO();

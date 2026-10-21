@@ -614,12 +614,90 @@ namespace
         }
         return true;
     }
+    // The on-screen touch overlay: held controls are filled, the others outlined, and the
+    // floating stick drawn where its finger landed.
+    bool gpu_touch(const std::filesystem::path& root)
+    {
+        Runtime runtime;
+        std::string error;
+        CHECK(runtime.initialize(true, error));
+        UiRuntime ui(runtime);
+        CHECK(ui.initialize(error));
+        constexpr int width = 1200, height = 675;
+        Capture capture;
+        CHECK(capture.initialize(runtime.gpu, SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), width,
+                                 height));
+        TouchControls touch;
+        touch.visible = true;
+        touch.pressed[0] = true; // FIRE.
+        touch.stick_active = true;
+        touch.origin_x = .4f;
+        touch.origin_y = .6f;
+        touch.stick_x = .5f;
+        ImGui_ImplSDLGPU3_NewFrame();
+        ImGui_ImplSDL3_NewFrame();
+        ImGui::GetIO().DisplaySize = {float(width), float(height)};
+        ImGui::GetIO().DisplayFramebufferScale = {1, 1};
+        ImGui::NewFrame();
+        draw_touch_controls(touch);
+        ImGui::Render();
+        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
+        CHECK(commands);
+        ImGui_ImplSDLGPU3_PrepareDrawData(ImGui::GetDrawData(), commands);
+        SDL_GPUColorTargetInfo color{};
+        color.texture = capture.texture;
+        color.clear_color = {0, 0, 0, 1};
+        color.load_op = SDL_GPU_LOADOP_CLEAR;
+        color.store_op = SDL_GPU_STOREOP_STORE;
+        auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, nullptr);
+        CHECK(pass);
+        ImGui_ImplSDLGPU3_RenderDrawData(ImGui::GetDrawData(), commands, pass);
+        SDL_EndGPURenderPass(pass);
+        auto* copy = SDL_BeginGPUCopyPass(commands);
+        CHECK(copy);
+        SDL_GPUTextureRegion region{};
+        region.texture = capture.texture;
+        region.w = width;
+        region.h = height;
+        region.d = 1;
+        SDL_GPUTextureTransferInfo target{};
+        target.transfer_buffer = capture.transfer;
+        target.pixels_per_row = width;
+        target.rows_per_layer = height;
+        SDL_DownloadFromGPUTexture(copy, &region, &target);
+        SDL_EndGPUCopyPass(copy);
+        CHECK(SDL_SubmitGPUCommandBuffer(commands) && SDL_WaitForGPUIdle(runtime.gpu));
+        auto* data = static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
+        CHECK(data);
+        std::vector<std::uint8_t> pixels(data, data + width * height * 4);
+        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
+        const auto lit = [&](float x, float y)
+        {
+            const auto i = (std::size_t(y) * width + std::size_t(x)) * 4;
+            return pixels[i] + pixels[i + 1] + pixels[i + 2] > 0;
+        };
+        const float aspect = float(width) / height;
+        const auto inside = [&](std::size_t i)
+        {
+            const auto& c = touch_layout[i];
+            // Between the label and the outline, on the horizontal through the center.
+            return lit((TouchControls::center_x(c, aspect) - c.radius * .8f) * height, (1 - c.y) * height);
+        };
+        CHECK(inside(0) && !inside(1)); // Held FIRE is filled; ALT is not.
+        CHECK(lit(.4f * height, .6f * height) || lit((.4f + .5f * touch_stick_radius) * height, .6f * height));
+        CHECK(!lit(width / 2.f, 5)); // Nothing at the top center.
+        std::filesystem::create_directories(root);
+        CHECK(capture.save(path_text(root / "touch-controls.png").c_str()));
+        return true;
+    }
 } // namespace
 int main(int argc, char** argv)
 {
     if (argc != 3 && argc != 4)
         return 2;
     const std::string mode = argv[1];
+    if (mode == "gpu_touch")
+        return gpu_touch(argv[2]) ? 0 : 1;
     if (mode == "bitmaps")
         return bitmaps() ? 0 : 1;
     if (mode == "values")

@@ -168,6 +168,40 @@ namespace
         menu.take_command();
         menu.back();
         CHECK(menu.page == MenuPage::Options && !strcmp(menu.title(), "options.pcx"));
+        // CMenuControls: owner rows, no scroll wrap, Back cancels tracking before leaving.
+        CHECK(!menu.enabled(menu.items[2]));
+        menu.set_controls({{705, {}, "W", true}, {709, {}, {}, false}, {706, {}, {}, true}});
+        CHECK(menu.page == MenuPage::Options && menu.enabled(menu.items[2]));
+        menu.selected = 2;
+        menu.activate();
+        CHECK(menu.page == MenuPage::Controls && menu.small() && menu.items.size() == 4 &&
+              menu.items[0].command == int(MENU_CMD_CHANGE_CONTROL) && !menu.enabled(menu.items[1]) &&
+              menu.items[3].literal == "Restore Defaults" && !strcmp(menu.title(), "options.pcx"));
+        menu.select(-1);
+        CHECK(menu.selected == 0); // No wrap at the top.
+        menu.select(1);
+        CHECK(menu.selected == 2); // The disabled Strafe row is skipped.
+        menu.select(1);
+        menu.select(1);
+        CHECK(menu.selected == 3); // No wrap at the bottom.
+        menu.selected = 2;
+        menu.activate();
+        CHECK(menu.binding == 2);
+        menu.select(-1);
+        menu.adjust(1);
+        menu.activate();
+        CHECK(menu.selected == 2 && menu.binding == 2 && menu.take_command().action == MenuAction::None);
+        menu.set_controls({{705, {}, "W", true}, {709, {}, {}, false}, {706, {}, "S", true}});
+        CHECK(menu.page == MenuPage::Controls && menu.selected == 2 && menu.binding < 0);
+        menu.activate();
+        menu.back();
+        CHECK(menu.page == MenuPage::Controls && menu.binding < 0);
+        menu.selected = 3;
+        menu.activate();
+        CHECK(menu.take_command().action == MenuAction::RestoreControls);
+        menu.back();
+        CHECK(menu.page == MenuPage::Options);
+        menu.set_controls({});
         auto fit = MenuViewport::fit(1920, 1080);
         float x = 240, y = 0;
         CHECK(fit.point(x, y) && x == 0 && y == 0);
@@ -742,9 +776,30 @@ namespace
                       << '\n';
             std::filesystem::create_directories(output);
         }
+        menu.controls = control_menu_rows(InputBindings::defaults());
         for (unsigned page = 0; page <= unsigned(MenuPage::Quit); ++page)
         {
             menu.build(MenuPage(page));
+            if (menu.page == MenuPage::Controls)
+            {
+                // Every original action string resolves; the list scrolls inside its 280 pixels.
+                CHECK(menu.items.size() == control_rows.size() + 1);
+                menu.selected = int(menu.items.size()) - 1;
+                ++menu.revision;
+                CHECK(canvas.compose(menu, 0, error) && menu.first > 0);
+                for (std::size_t i = 0; i < menu.items.size(); ++i)
+                {
+                    const auto& item = menu.items[i];
+                    CHECK(!item.literal.empty() && item.rect.bottom <= 420);
+                    CHECK((item.rect.bottom > 0) == (int(i) >= menu.first && item.rect.top >= 140));
+                    std::cout << item.literal << " = "
+                              << (i < menu.controls.size() ? menu.controls[i].binding : std::string{}) << '\n';
+                }
+                menu.selected = 0;
+                menu.binding = 0;
+                ++menu.revision;
+                CHECK(canvas.compose(menu, 0, error) && menu.first == 0);
+            }
             CHECK(canvas.compose(menu, 0, error));
             const auto rev = canvas.revision;
             CHECK(canvas.compose(menu, 0, error) && canvas.revision == rev);

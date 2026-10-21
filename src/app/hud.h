@@ -1,4 +1,5 @@
 #pragma once
+#include "app/touch_controls.h"
 #include "engine/string_resources.h"
 #include "game/original/Credits.h"
 #include "game/original/NewStatusBar.h"
@@ -56,4 +57,6 @@ namespace OpenBlood2
     // The last drawn CCredit, centered in the 640x480 menu viewport. Replacement font:
     // Dear ImGui's embedded default instead of the original GDI Arial request.
     bool draw_credits(const CCredits&);
+    // The on-screen touch controls: outlined circles, filled while held, and the floating stick.
+    void draw_touch_controls(const TouchControls&);
 } // namespace OpenBlood2

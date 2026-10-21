@@ -1,4 +1,6 @@
 #include "app/menu_input.h"
+#include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <set>
 #include <string>
@@ -643,10 +645,289 @@ namespace
         CHECK(input.quick_load);
         return true;
     }
+    std::size_t row_of(InputAction action)
+    {
+        for (std::size_t i = 0; i < control_rows.size(); ++i)
+            if (control_rows[i].action == action)
+                return i;
+        return control_rows.size();
+    }
+    std::vector<InputBinding> sorted(std::vector<InputBinding> entries)
+    {
+        std::sort(entries.begin(), entries.end(),
+                  [](const InputBinding& a, const InputBinding& b)
+                  {
+                      return std::tuple(int(a.action), int(a.source), a.code) <
+                             std::tuple(int(b.action), int(b.source), b.code);
+                  });
+        return entries;
+    }
+
+    // CMenuControls through the real menu input path: tracking, replacement, cancel, ignored
+    // keys, unassign and restore.
+    bool rebind()
+    {
+        Menu m;
+        MenuInput input;
+        input.controls.focused = true;
+        const auto send = [&](const SDL_Event& e) { return input.event(e, window, m, false, true, false, 640, 480); };
+        const auto tap = [&](SDL_Scancode code)
+        {
+            send(key(code, true));
+            send(key(code, false));
+        };
+        m.open(false);
+        m.build(MenuPage::Options);
+        CHECK(!m.enabled(m.items[2])); // No rows from the owner yet.
+        input.refresh_controls(m);
+        CHECK(m.page == MenuPage::Options && m.items[2].command == int(MENU_CMD_CUSTOMIZE_CONTROLS) &&
+              m.enabled(m.items[2]));
+        m.selected = 2;
+        tap(SDL_SCANCODE_RETURN);
+        CHECK(m.page == MenuPage::Controls && m.items.size() == control_rows.size() + 1 && m.binding < 0);
+        const auto jump = int(row_of(InputAction::Jump)), use = int(row_of(InputAction::Use));
+        const auto fire = int(row_of(InputAction::FirePrimary)), item = int(row_of(InputAction::UseItem));
+        auto& bindings = input.controls.bindings;
+        // Enter shows "="; the next fresh key replaces the keyboard control of the row.
+        m.selected = jump;
+        tap(SDL_SCANCODE_RETURN);
+        CHECK(m.binding == jump);
+        send(key(SDL_SCANCODE_K, true, true)); // Repeats never bind.
+        CHECK(m.binding == jump);
+        tap(SDL_SCANCODE_K);
+        CHECK(m.binding < 0 && m.selected == jump && m.page == MenuPage::Controls);
+        CHECK(bindings.bound(InputSource::Key, SDL_SCANCODE_K, InputAction::Jump) &&
+              !bindings.bound(InputSource::Key, SDL_SCANCODE_SPACE, InputAction::Jump) &&
+              bindings.bound(InputSource::GamepadButton, SDL_GAMEPAD_BUTTON_NORTH, InputAction::Jump));
+        CHECK(m.controls[std::size_t(jump)].binding == "K or PAD Y");
+        // A control leaves its other rebindable action: E moves from Open to Jump.
+        tap(SDL_SCANCODE_RETURN);
+        tap(SDL_SCANCODE_E);
+        CHECK(bindings.bound(InputSource::Key, SDL_SCANCODE_E, InputAction::Jump) &&
+              !bindings.bound(InputSource::Key, SDL_SCANCODE_K, InputAction::Jump) &&
+              count(bindings, InputAction::Use) == 1);
+        CHECK(m.controls[std::size_t(use)].binding == "PAD A");
+        // Enter binds too: it leaves Use Inventory but stays the menu accept key.
+        tap(SDL_SCANCODE_RETURN);
+        tap(SDL_SCANCODE_RETURN);
+        CHECK(bindings.bound(InputSource::Key, SDL_SCANCODE_RETURN, InputAction::Jump) &&
+              !bindings.bound(InputSource::Key, SDL_SCANCODE_RETURN, InputAction::UseItem) &&
+              bindings.bound(InputSource::Key, SDL_SCANCODE_RETURN, InputAction::MenuAccept));
+        // Escape cancels and keeps the page; Tab, F5/F6 and reserved keys are ignored.
+        tap(SDL_SCANCODE_RETURN);
+        for (auto ignored : {SDL_SCANCODE_TAB, SDL_SCANCODE_F5, SDL_SCANCODE_F6, SDL_SCANCODE_F1, SDL_SCANCODE_F2})
+            tap(ignored);
+        CHECK(m.binding == jump);
+        tap(SDL_SCANCODE_ESCAPE);
+        CHECK(m.binding < 0 && m.active && m.page == MenuPage::Controls &&
+              bindings.bound(InputSource::Key, SDL_SCANCODE_RETURN, InputAction::Jump));
+        // Uncaptured mouse buttons bind while tracking (MBUTTON 4); touch clicks never do.
+        tap(SDL_SCANCODE_RETURN);
+        auto touch_click = button(SDL_BUTTON_LEFT, true);
+        touch_click.button.which = SDL_TOUCH_MOUSEID;
+        send(touch_click);
+        CHECK(m.binding == jump);
+        send(button(SDL_BUTTON_X1, true));
+        send(button(SDL_BUTTON_X1, false));
+        CHECK(m.binding < 0 && bindings.bound(InputSource::MouseButton, SDL_BUTTON_X1, InputAction::Jump) &&
+              m.controls[std::size_t(jump)].binding == "RETURN or MBUTTON 4 or PAD Y");
+        // A gamepad button replaces the gamepad control of Fire and leaves Use Inventory;
+        // Start (the Menu action) cancels.
+        m.selected = fire;
+        tap(SDL_SCANCODE_RETURN);
+        send(pad_button(SDL_GAMEPAD_BUTTON_START, true));
+        send(pad_button(SDL_GAMEPAD_BUTTON_START, false));
+        CHECK(m.binding < 0 && m.active);
+        tap(SDL_SCANCODE_RETURN);
+        send(pad_button(SDL_GAMEPAD_BUTTON_WEST, true));
+        send(pad_button(SDL_GAMEPAD_BUTTON_WEST, false));
+        CHECK(bindings.bound(InputSource::GamepadButton, SDL_GAMEPAD_BUTTON_WEST, InputAction::FirePrimary) &&
+              !bindings.bound(InputSource::GamepadAxisPositive, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER,
+                              InputAction::FirePrimary) &&
+              count(bindings, InputAction::UseItem) == 0 && m.controls[std::size_t(item)].binding.empty());
+        // Delete and Backspace unassign every device of the row.
+        tap(SDL_SCANCODE_DELETE);
+        CHECK(count(bindings, InputAction::FirePrimary) == 0 && m.controls[std::size_t(fire)].binding.empty());
+        m.selected = jump;
+        tap(SDL_SCANCODE_BACKSPACE);
+        CHECK(count(bindings, InputAction::Jump) == 0);
+        // Focus loss ends tracking.
+        tap(SDL_SCANCODE_RETURN);
+        CHECK(m.binding == jump);
+        send(focus(false));
+        send(focus(true));
+        CHECK(m.binding < 0);
+        // The replacement last row restores the defaults of every rebindable action.
+        m.selected = int(m.items.size()) - 1;
+        tap(SDL_SCANCODE_RETURN);
+        CHECK(m.take_command().action == MenuAction::RestoreControls);
+        restore_controls(bindings);
+        CHECK(sorted(bindings.entries) == sorted(InputBindings::defaults().entries));
+        // Bindings drive play: K jumps after rebinding and closing the menu.
+        CHECK(assign_control(bindings, InputAction::Jump, InputSource::Key, SDL_SCANCODE_K));
+        CHECK(!assign_control(bindings, InputAction::Menu, InputSource::Key, SDL_SCANCODE_K));   // Not rebindable.
+        CHECK(!assign_control(bindings, InputAction::Jump, InputSource::Key, SDL_SCANCODE_F10)); // Reserved.
+        m.close();
+        input.reset(m, true);
+        send(key(SDL_SCANCODE_K, true));
+        CHECK(input.controls.sample(false).jump);
+        send(key(SDL_SCANCODE_K, false));
+        send(key(SDL_SCANCODE_SPACE, true));
+        CHECK(!input.controls.sample(false).jump);
+        return true;
+    }
+
+    // On-screen controls: a virtual gamepad through the real menu input path.
+    bool touch_controls()
+    {
+        Menu m;
+        MenuInput input;
+        input.controls.focused = true;
+        input.controls.touch_screen = [](SDL_TouchID id) { return id == 5; };
+        constexpr float w = 1600, h = 900, aspect = w / h;
+        const auto send = [&](const SDL_Event& e) { return input.event(e, window, m, true, true, false, w, h); };
+        const auto at = [&](Uint32 type, SDL_FingerID id, float x, float y, SDL_TouchID touch = 5)
+        {
+            auto e = finger(type, id, x, 0, 0, touch);
+            e.tfinger.y = y;
+            return e;
+        };
+        const auto control = [&](const char* label)
+        {
+            for (const auto& c : touch_layout)
+                if (std::string_view(c.label) == label)
+                    return std::pair{TouchControls::center_x(c, aspect) / aspect, 1 - c.y};
+            return std::pair{-1.f, -1.f};
+        };
+        input.reset(m, true);
+        CHECK(!input.touch.visible);
+        // A held control is its gamepad source: FIRE is the right trigger.
+        const auto [fx, fy] = control("FIRE");
+        send(at(SDL_EVENT_FINGER_DOWN, 1, fx, fy));
+        CHECK(input.touch.visible && input.touch.pressed[0] && input.controls.sample_fire(false).primary);
+        CHECK(!input.controls.touch_finger);                // Not a camera drag.
+        send(at(SDL_EVENT_FINGER_MOTION, 1, fx - .2f, fy)); // Sliding off keeps it held.
+        CHECK(input.controls.sample_fire(false).primary);
+        send(at(SDL_EVENT_FINGER_UP, 1, fx, fy));
+        CHECK(!input.controls.sample_fire(false).primary && !input.touch.pressed[0]);
+        // The floating stick moves from where its finger landed; RUN latches run.
+        send(at(SDL_EVENT_FINGER_DOWN, 2, .25f, .6f));
+        CHECK(input.touch.stick_active && !input.controls.moving());
+        send(at(SDL_EVENT_FINGER_MOTION, 2, .25f, .6f - touch_stick_radius * .4f)); // Within the threshold.
+        CHECK(!input.controls.moving());
+        send(at(SDL_EVENT_FINGER_MOTION, 2, .25f + touch_stick_radius / aspect, .6f - touch_stick_radius));
+        auto move = input.controls.sample(false);
+        CHECK(move.forward && move.right && !move.run);
+        const auto [rx, ry] = control("RUN");
+        send(at(SDL_EVENT_FINGER_DOWN, 3, rx, ry));
+        send(at(SDL_EVENT_FINGER_UP, 3, rx, ry));
+        CHECK(input.controls.sample(false).run);
+        send(at(SDL_EVENT_FINGER_DOWN, 4, .3f, .3f)); // A second left finger is swallowed.
+        CHECK(!input.controls.touch_finger && input.touch.fingers.size() == 1);
+        send(at(SDL_EVENT_FINGER_UP, 2, .25f, .4f));
+        CHECK(!input.controls.moving() && !input.controls.sample(false).run && !input.touch.stick_active);
+        // Fingers away from the controls on the right half still drag the camera.
+        send(at(SDL_EVENT_FINGER_DOWN, 5, .6f, .5f));
+        CHECK(input.controls.touch_finger && *input.controls.touch_finger == 5);
+        send(at(SDL_EVENT_FINGER_UP, 5, .6f, .5f));
+        // Rebinding the gamepad layout applies: Fire on PAD Y makes JUMP fire.
+        CHECK(assign_control(input.controls.bindings, InputAction::FirePrimary, InputSource::GamepadButton,
+                             SDL_GAMEPAD_BUTTON_NORTH));
+        const auto [jx, jy] = control("JUMP");
+        send(at(SDL_EVENT_FINGER_DOWN, 6, jx, jy));
+        CHECK(input.controls.sample_fire(false).primary && !input.controls.sample(false).jump);
+        // MENU opens the menu: every control is released and the virtual pad forgotten.
+        const auto [mx, my] = control("MENU");
+        send(at(SDL_EVENT_FINGER_DOWN, 7, mx, my));
+        CHECK(m.active && input.touch.fingers.empty() && !input.controls.sample_fire(false).primary);
+        CHECK(std::none_of(input.controls.gamepads.begin(), input.controls.gamepads.end(),
+                           [](const GamepadState& pad) { return pad.id == touch_gamepad_id; }));
+        send(at(SDL_EVENT_FINGER_UP, 6, jx, jy));
+        send(at(SDL_EVENT_FINGER_UP, 7, mx, my));
+        send(at(SDL_EVENT_FINGER_DOWN, 8, fx, fy)); // Menus take touch as the emulated mouse.
+        CHECK(input.touch.fingers.empty());
+        send(at(SDL_EVENT_FINGER_UP, 8, fx, fy));
+        send(key(SDL_SCANCODE_ESCAPE, true));
+        send(key(SDL_SCANCODE_ESCAPE, false));
+        CHECK(!m.active && !input.touch.visible); // A key hides the controls.
+        // Trackpads and other windows never press controls; a held control needs play to start.
+        restore_controls(input.controls.bindings);
+        send(at(SDL_EVENT_FINGER_DOWN, 9, fx, fy, 6));
+        auto other = at(SDL_EVENT_FINGER_DOWN, 9, fx, fy);
+        other.tfinger.windowID = 99;
+        send(other);
+        CHECK(input.touch.fingers.empty() && !input.touch.visible);
+        input.controls.enabled = false;
+        send(at(SDL_EVENT_FINGER_DOWN, 10, fx, fy));
+        CHECK(input.touch.fingers.empty());
+        input.controls.enabled = true;
+        send(at(SDL_EVENT_FINGER_DOWN, 11, fx, fy));
+        CHECK(input.controls.sample_fire(false).primary);
+        send(focus(false)); // Focus loss releases everything.
+        CHECK(input.touch.fingers.empty() && !input.controls.sample_fire(false).primary);
+        return true;
+    }
+
+    bool controls_file(const std::filesystem::path& root)
+    {
+        std::error_code ec;
+        std::filesystem::create_directories(root, ec);
+        const auto path = root / "controls.cfg";
+        std::filesystem::remove(path, ec);
+        std::string error;
+        auto bindings = InputBindings::defaults();
+        CHECK(load_controls(path, bindings, error) && bindings.entries == InputBindings::defaults().entries);
+        CHECK(assign_control(bindings, InputAction::Jump, InputSource::MouseWheel, 0));
+        CHECK(assign_control(bindings, InputAction::Use, InputSource::GamepadAxisNegative, SDL_GAMEPAD_AXIS_RIGHTY));
+        clear_control(bindings, InputAction::Medkit);
+        CHECK(save_controls(path, bindings, error));
+        auto loaded = InputBindings::defaults();
+        CHECK(load_controls(path, loaded, error) && sorted(loaded.entries) == sorted(bindings.entries));
+        CHECK(count(loaded, InputAction::Medkit) == 0 && count(loaded, InputAction::Menu) > 0);
+        {
+            std::ifstream in(path);
+            std::string first;
+            std::getline(in, first);
+            CHECK(first == "version=1");
+        }
+        // Malformed files change nothing.
+        const auto refused = [&](const std::string& text)
+        {
+            {
+                std::ofstream out(path, std::ios::binary | std::ios::trunc);
+                out << text;
+            }
+            auto result = InputBindings::defaults();
+            const bool ok = load_controls(path, result, error);
+            return !ok && !error.empty() && result.entries == InputBindings::defaults().entries;
+        };
+        CHECK(refused("bind=jump key 44\n"));                               // No version.
+        CHECK(refused("version=2\nbind=jump key 44\n"));                    // Unknown version.
+        CHECK(refused("version=1\nbind=fly key 44\n"));                     // Unknown action.
+        CHECK(refused("version=1\nbind=menu key 41\n"));                    // Not rebindable.
+        CHECK(refused("version=1\nbind=jump keyboard 44\n"));               // Unknown source.
+        CHECK(refused("version=1\nbind=jump key 58\n"));                    // F1 is reserved.
+        CHECK(refused("version=1\nbind=jump key 44x\n"));                   // Trailing garbage.
+        CHECK(refused("version=1\nbind=jump mouse 9\n"));                   // Out of range.
+        CHECK(refused("version=1\nbind=jump key\n"));                       // Missing field.
+        CHECK(refused("version=1\n" + std::string(17 * 1024, '#') + "\n")); // Over 16 KiB.
+        // An empty file of the right version unassigns every rebindable action only.
+        {
+            std::ofstream out(path, std::ios::binary | std::ios::trunc);
+            out << "version=1\r\n# comment\n";
+        }
+        auto empty = InputBindings::defaults();
+        CHECK(load_controls(path, empty, error) && count(empty, InputAction::Jump) == 0 &&
+              count(empty, InputAction::MenuAccept) == count(InputBindings::defaults(), InputAction::MenuAccept));
+        std::filesystem::remove(path, ec);
+        return true;
+    }
 } // namespace
 
 int main(int argc, char** argv)
 {
+    if (argc == 3 && std::string(argv[1]) == "controls_file")
+        return controls_file(path_from_utf8(argv[2])) ? 0 : 1;
     if (argc != 2)
         return 2;
     const std::string mode = argv[1];
@@ -666,5 +947,9 @@ int main(int argc, char** argv)
         return touch() ? 0 : 1;
     if (mode == "gamepad_menu")
         return gamepad_menu() ? 0 : 1;
+    if (mode == "rebind")
+        return rebind() ? 0 : 1;
+    if (mode == "touch_controls")
+        return touch_controls() ? 0 : 1;
     return 2;
 }

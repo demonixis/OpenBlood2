@@ -34,6 +34,37 @@ namespace OpenBlood2
             IM_COL32(0, 0, 0, alpha));
         return true;
     }
+    void draw_touch_controls(const TouchControls& touch)
+    {
+        const auto* viewport = ImGui::GetMainViewport();
+        const float h = viewport->Size.y, aspect = h > 0 ? viewport->Size.x / h : 0;
+        if (aspect <= 0)
+            return;
+        auto* list = ImGui::GetForegroundDrawList();
+        auto* font = ImGui::GetFont();
+        const auto at = [&](float x, float y) { return ImVec2{viewport->Pos.x + x * h, viewport->Pos.y + y * h}; };
+        for (std::size_t i = 0; i < touch_layout.size(); ++i)
+        {
+            const auto& c = touch_layout[i];
+            const auto center = at(TouchControls::center_x(c, aspect), 1 - c.y);
+            const float radius = c.radius * h;
+            if (touch.pressed[i])
+                list->AddCircleFilled(center, radius, IM_COL32(255, 255, 255, 70));
+            list->AddCircle(center, radius, IM_COL32(255, 255, 255, 130), 0, std::max(1.f, h / 360));
+            const float size = std::max(8.f, radius * .45f);
+            const auto text = font->CalcTextSizeA(size, FLT_MAX, 0, c.label);
+            list->AddText(font, size, {center.x - text.x / 2, center.y - text.y / 2}, IM_COL32(255, 255, 255, 170),
+                          c.label);
+        }
+        if (touch.stick_active)
+        {
+            const auto origin = at(touch.origin_x, touch.origin_y);
+            list->AddCircle(origin, touch_stick_radius * h, IM_COL32(255, 255, 255, 110), 0, std::max(1.f, h / 360));
+            list->AddCircleFilled(at(touch.origin_x + touch.stick_x * touch_stick_radius,
+                                     touch.origin_y + touch.stick_y * touch_stick_radius),
+                                  touch_stick_radius * h * .4f, IM_COL32(255, 255, 255, 90));
+        }
+    }
     bool draw_credits(const CCredits& credits)
     {
         const auto& drawn = credits.drawn;

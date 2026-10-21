@@ -41,6 +41,9 @@ namespace OpenBlood2
         const char* background = "interface/mainmenus/background.pcx";
         const char* slider = "interface/mainmenus/SliderBar.pcx";
         const char* thumb = "interface/mainmenus/SliderTab.pcx";
+        // CMainMenus scroll arrows (CMenuBase::RenderArrows), drawn by the retail Controls page.
+        const char* up_arrow = "interface/mainmenus/UpArrow.pcx";
+        const char* down_arrow = "interface/mainmenus/DownArrow.pcx";
         int title_x = 82, title_y = 52, list_y = 140;
         const char* title(std::string_view semantic) const;
         const char* promotion(MenuPromotion) const;

@@ -14,11 +14,13 @@ device policy (capture, sensitivity, focus). **M2/M3 scope is unchanged.**
 - Step 1 added the action layer with the previous keyboard/mouse layout.
 - Step 2 adds gamepads, weapon cycling and the inventory commands.
 - Step 3 adds the touch camera drag.
+- Step 4 adds the original Controls page for rebinding, `controls.cfg` and the on-screen
+  touch controls.
 
 ## Actions and kinds
 
-Each action has a stable lowercase name (`move_forward`, `fire_primary`, ...) reserved
-for a future preference file, and one kind:
+Each action has a stable lowercase name (`move_forward`, `fire_primary`, ...), used by
+`controls.cfg`, and one kind:
 
 - **Hold**: movement, run, jump, crouch and the look keys. Level state; a key held across
   focus loss resumes on its next repeat event, as before.
@@ -168,7 +170,92 @@ Touch screens drag the camera (`MovementControls`, replacement policy):
   as pointer input.
 - Focus loss, player changes and disabled or text-editing frames drop the drag.
 
-There are no on-screen controls yet: movement, fire and menus need another device.
+## On-screen touch controls
+
+`TouchControls` (`src/app/touch_controls.h`) is a replacement virtual gamepad for direct touch
+screens; the original has no counterpart. Its fingers become ordinary gamepad events with the
+fixed joystick ID `touch_gamepad_id`, which then take the normal gamepad path. The console layout,
+its rebinding, the Press guard and the run latch therefore apply unchanged.
+
+| Control | Gamepad source |
+| --- | --- |
+| Floating stick (a finger landing in the left half, away from a button) | left stick, 0.12 window heights for full deflection |
+| FIRE / ALT | right / left trigger |
+| JUMP, DUCK, USE | north (Y), right stick press, south (A) |
+| WEAPON, ITEM, NEXT | right bumper, west (X), Back |
+| RUN | left stick press (the run latch) |
+| MENU | Start |
+
+- Positions and radii are in window-height units, anchored to the left or right edge and the
+  bottom; a finger within 1.25 radii presses a control.
+- A finger that lands on a control holds it until it lifts or is cancelled, even if it slides
+  off. The stick finger moves the stick from where it landed and returns it to rest on release.
+  A second left-half finger is swallowed. Fingers on the right half away from the controls keep
+  the camera drag above.
+- Fingers start controls only while play accepts input: a player in the world, focused, enabled,
+  no menu, credits screen or inspector. In menus, touches stay SDL's emulated mouse pointer.
+- Ownership changes (menu, inspector, focus loss, player change) forget every finger and drop the
+  virtual gamepad state without edges, so held sources need a fresh press.
+- The controls are drawn (outlined circles, filled while held, the stick at its finger) from the
+  first direct touch until a key, a real mouse click or a real gamepad button is used. Trackpads,
+  other windows and mouse-emulated touches never press them.
+
+## Rebinding: Options > Controls
+
+The original `CMenuControls` page is ported over the action layer; see the
+[menu contracts](menu_contracts.md#controls-cmenucontrols) for the page itself.
+`src/app/control_bindings.h` holds the row table and the binding rules.
+
+- **Rows.** The 42 original actions, in source order, with their cres.dll names: Weapon_0 is
+  slot 1 (key 1 in the installed defaults.cfg), Weapon_9 slot 10. Strafe, RunLock (the
+  always-run toggle), TurnAround, DropWeapon, Grab, Message, Taunt, MouseAimToggle and
+  Crosshair have no port and are disabled. Replacement rows follow for actions the original
+  menu did not list: Run Latch, Flashlight, Medkit, Binoculars, Night Goggles, The Eye, then
+  Restore Defaults.
+- **Rebindable actions** are the row actions. Menu, menu navigation, quick save/load and the
+  analog look axes keep their bindings.
+- **Assigning** (original `HandleDeviceTrack`). Enter on a row shows "=" and waits for the next
+  fresh down edge: a key, a mouse button (uncaptured too), a wheel tick, a gamepad button or a
+  gamepad axis crossing ±0.5. The control first leaves every other rebindable action, then the
+  row's action loses its control of the same device (keyboard; mouse buttons and wheel; gamepad),
+  then the control is bound. So each device keeps one control per action, as in the original.
+  A control may still serve a menu action: Enter bound to Jump stays the menu accept key.
+- **Not bound.** Any Menu source (Esc, Start) cancels the tracking. Tab (original), F5/F6
+  (quick save/load) and the reserved F1/F2/F3 are ignored and tracking continues; F10 toggles the
+  inspector, which ends tracking like every ownership change. Key repeats and touch-emulated
+  clicks never bind.
+- **Unassigning.** Delete (original) or Backspace (the Mac delete key) removes every control of
+  the selected row.
+- **Restore Defaults** returns every rebindable action to `InputBindings::defaults()`.
+- **Names.** Keys use SDL's name for the current keyboard layout (the original
+  ConvertKeyToCurrentKeyboard), uppercased; a non-ASCII name falls back to the scancode name.
+  Mouse buttons keep the original one-based DirectInput numbering (`MBUTTON 1` left, `2` right,
+  `3` middle, `4`/`5` side); the wheel is `MWHEEL UP/DOWN`. Gamepad controls are `PAD` plus the
+  console-layout name (`PAD A`, `PAD RB`, `PAD LS UP`, `PAD RT`) instead of the original `J` plus
+  a DirectInput name. Devices are joined with " or ", keyboard first.
+
+### controls.cfg
+
+The bindings persist in `controls.cfg`, beside `preferences.cfg` under
+`SDL_GetPrefPath("OpenBlood2", "Blood2")`, and replace the original console `rangebind` lines:
+
+```
+version=1
+bind=jump key 44
+bind=fire_primary mouse 1
+```
+
+- One `bind=<action> <source> <code>` line per binding of a rebindable action. Sources are
+  `key` (SDL scancode), `mouse`, `button`, `wheel`, `axis+` and `axis-`; codes are the SDL values
+  of the binding table. `#` lines and CR line ends are accepted.
+- Loading starts from the defaults and replaces every rebindable action with the file's lines,
+  so an action without a line is unassigned. Unknown versions, actions, sources or codes,
+  non-rebindable actions, refused (reserved or invalid) bindings, a missing version line and
+  files over 16 KiB are refused: the bindings stay unchanged and the menu shows the error.
+- The frontend writes the file atomically whenever the bindings change. Smoke runs never read
+  or write it. A missing file means the defaults.
+- The `--view-world` frontend and the demo use the same bindings; the headless diagnostic loop in
+  `main.cpp` keeps the defaults.
 
 ## Menu, demo and frontend routing
 
@@ -236,18 +323,32 @@ The headless `input_actions.*` tests cover:
 - the re-arming of held buttons on player change;
 - the touch drag: right half only, one owning finger, consumption, zoom, release,
   indirect/emulated/foreign-window touches, touch-emulated mouse events and the drop rules;
+- rebinding through the real menu path (`rebind`): tracking, same-device replacement, a
+  control leaving its other action, Enter keeping menu accept, Esc/Start cancel, ignored Tab,
+  F5/F6 and reserved keys, mouse and gamepad sources, touch clicks, Delete/Backspace, focus loss,
+  Restore Defaults and play after a rebind;
+- `controls.cfg` (`controls_file`): round trip, unassigned actions, every refusal leaving the
+  bindings unchanged, and comments/CR;
+- the on-screen controls (`touch_controls`): trigger and button sources, sliding off, the
+  floating stick and its threshold, the run latch, the swallowed second stick finger, the camera
+  drag beside them, rebinding applying to them, MENU releasing everything, menus, other devices
+  hiding them, trackpads, other windows, disabled play and focus loss;
 - gamepad menu navigation, accept and back, resume, the credits screen, and menu-time
   state.
 
-`hud.session` checks weapon cycling and its guard on a fixture player. All existing
-control, menu, demo and HUD tests keep passing.
+`hud.session` checks weapon cycling and its guard on a fixture player. `menus.state` checks the
+Controls page model, `menus.artwork` every original action string and the scrolled list with the
+real artwork, and `gpu.touch_controls` the drawn overlay. All existing control, menu, demo and HUD
+tests keep passing. No touch device was available: the on-screen controls are verified with
+synthetic SDL finger events and a GPU capture, not on a phone or tablet.
 
 The inventory commands (next/previous item, use item) drive the original item cursor and
 its status-bar tabs: see the [inventory cursor contracts](inventory_cursor_contracts.md).
 
 Not included yet:
 
-- On-screen touch controls (movement, fire, buttons).
 - VR controllers (they will reuse the gamepad layout).
 - Gamepad auto-repeat in menus.
-- A rebinding screen and persistence in preferences.
+- The original Keyboard (turn speed) and Joystick (axis configuration) pages, which stay
+  disabled.
+- Rebinding the menu and system keys, and a customizable on-screen layout.

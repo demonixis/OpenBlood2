@@ -82,8 +82,12 @@ start of the current level). After death, Use opens the Load menu. The demo has 
 Inventory actions require collection; release Shift before using them. Focus
 capture does not fire a shot. Text editing/focus loss suppress game input.
 F1/F2/F3 apply only to diagnostic smokes; see [input contracts](contracts/player_control_contracts.md).
-Audio/Mouse/Display preferences and saved games (`saves/retail/`) use SDL's OpenBlood2/Blood2
-user directory.
+These are the defaults. Options > Controls rebinds them (Enter, then the new key, button or
+gamepad control; Esc cancels; Delete or Backspace unassigns); see the
+[input action contracts](contracts/input_action_contracts.md). Gamepads use the console layout,
+and touch screens show on-screen controls with a floating stick on the left.
+Audio/Mouse/Display preferences, `controls.cfg` and saved games (`saves/retail/`) use SDL's
+OpenBlood2/Blood2 user directory.
 
 ## Platforms
 

@@ -37,7 +37,13 @@ namespace OpenBlood2
                                        {539, "Invert Y-Axis"}};
         constexpr unsigned common_ids[]{500, 501, 502, 505, 513, 514, 515, 516, 517, 518, 521, 522, 523,
                                         524, 525, 526, 527, 528, 532, 533, 534, 535, 536, 537, 538, 539};
-        constexpr unsigned retail_ids[]{504, 509, 510, 511, 512, 529, 530, 531, 540, 541, 547, 548, 561, 600};
+        constexpr unsigned retail_ids[]{504, 509, 510, 511, 512, 529, 530, 531, 540, 541, 547, 548, 561, 600,
+                                        // CMenuControls: g_nControlActionStringID (733/734 unused) and
+                                        // IDS_MENU_KEY_UNASSIGNED.
+                                        705, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715, 716, 717, 718,
+                                        719, 720, 721, 722, 723, 724, 725, 726, 727, 728, 729, 730, 731, 732,
+                                        735, 736, 737, 738, 739, 740, 741, 742, 743, 744, 745, 746, 747, 748,
+                                        749};
     } // namespace
     const MenuResources& menu_resources(MenuEdition edition)
     {

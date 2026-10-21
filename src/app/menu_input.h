@@ -1,6 +1,8 @@
 #pragma once
+#include "app/control_bindings.h"
 #include "app/demo_flow.h"
 #include "app/movement_controls.h"
+#include "app/touch_controls.h"
 #include "game/menu.h"
 #include "game/original/Credits.h"
 #include <vector>
@@ -10,6 +12,7 @@ namespace OpenBlood2
     struct MenuInput
     {
         MovementControls controls;
+        TouchControls touch; // On-screen virtual gamepad for direct touch screens.
         bool inspector = false;
         bool demo_mode = false;
         DemoFlow demo;
@@ -52,12 +55,20 @@ namespace OpenBlood2
         }
         void reset(Menu& menu, bool player)
         {
+            // Ownership changes release the on-screen controls without edges.
+            touch.release();
+            std::erase_if(controls.gamepads, [](const GamepadState& pad) { return pad.id == touch_gamepad_id; });
             if (demo_mode)
             {
                 demo.reset(controls, inspector, player);
                 return;
             }
             menu.cancel_pointer();
+            if (menu.binding >= 0)
+            {
+                menu.binding = -1; // Ownership changes end device tracking.
+                ++menu.revision;
+            }
             quick_save = quick_load = false;
             controls.player_changed(player && !menu.active && !credits_screen && !inspector);
         }
@@ -84,10 +95,70 @@ namespace OpenBlood2
                    pressed(edges, InputAction::Menu) || pressed(edges, InputAction::MenuAccept) ||
                    pressed(edges, InputAction::MenuBack);
         }
+        // The Controls rows follow the current bindings.
+        void refresh_controls(Menu& menu) const
+        {
+            menu.set_controls(control_menu_rows(controls.bindings));
+        }
+        // CMenuControls::HandleDeviceTrack while a row shows "=": the next fresh key, mouse
+        // button, wheel tick or gamepad button/axis edge binds it. Escape (any Menu source)
+        // cancels; Tab (as in the original) and the quick save/load keys are ignored, as are
+        // reserved keys; touch-emulated clicks never bind.
+        void track_control(const SDL_Event& e, SDL_WindowID window, const InputEdges& edges, Menu& menu)
+        {
+            if (((e.type == SDL_EVENT_MOUSE_BUTTON_DOWN || e.type == SDL_EVENT_MOUSE_BUTTON_UP) &&
+                 e.button.which == SDL_TOUCH_MOUSEID) ||
+                (e.type == SDL_EVENT_MOUSE_WHEEL && e.wheel.windowID != window))
+                return;
+            const auto& bindings = controls.bindings;
+            for (const auto& edge : edges)
+            {
+                if (!edge.down || edge.repeat)
+                    continue;
+                if (bindings.matches(edge, InputAction::Menu))
+                {
+                    menu.back();
+                    return;
+                }
+                if ((edge.source == InputSource::Key && edge.code == SDL_SCANCODE_TAB) ||
+                    bindings.matches(edge, InputAction::QuickSave) || bindings.matches(edge, InputAction::QuickLoad))
+                    continue;
+                const auto row = std::size_t(menu.binding);
+                if (row < control_rows.size() && control_rows[row].action &&
+                    assign_control(controls.bindings, *control_rows[row].action, edge.source, edge.code))
+                {
+                    menu.binding = -1;
+                    ++menu.revision;
+                    refresh_controls(menu);
+                    return;
+                }
+            }
+        }
         // True means the caller should forward this event to ImGui's inspector.
         bool event(const SDL_Event& e, SDL_WindowID window, Menu& menu, bool player, bool alive,
                    bool inspector_available, float width, float height)
         {
+            // Any other device hides the on-screen controls until the next touch.
+            if (e.type == SDL_EVENT_KEY_DOWN ||
+                (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && e.button.which != SDL_TOUCH_MOUSEID) ||
+                (e.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN && e.gbutton.which != touch_gamepad_id))
+                touch.visible = false;
+            // Direct-touch fingers on the on-screen controls become virtual gamepad events, which
+            // take the ordinary gamepad path below; other fingers keep the camera drag.
+            if ((e.type == SDL_EVENT_FINGER_DOWN || e.type == SDL_EVENT_FINGER_MOTION ||
+                 e.type == SDL_EVENT_FINGER_UP || e.type == SDL_EVENT_FINGER_CANCELED) &&
+                e.tfinger.windowID == window && e.tfinger.touchID != SDL_MOUSE_TOUCHID &&
+                controls.touch_screen(e.tfinger.touchID) && height > 0)
+            {
+                const bool play = player && controls.focused && controls.enabled && !paused(menu) && !inspector;
+                std::vector<SDL_Event> synthetic;
+                if (touch.event(e, width / height, play, synthetic))
+                {
+                    for (const auto& s : synthetic)
+                        event(s, window, menu, player, alive, inspector_available, width, height);
+                    return false;
+                }
+            }
             if (demo_mode)
                 return demo.event(e, window, controls, inspector, inspector_available, player, alive);
             if ((e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_KEY_UP) && e.key.windowID != window)
@@ -142,6 +213,11 @@ namespace OpenBlood2
             }
             if (inspector)
                 return true;
+            if (menu.active && menu.page == MenuPage::Controls && menu.binding >= 0)
+            {
+                track_control(e, window, edges, menu);
+                return false;
+            }
             // Original OnKeyDown: the roll sees every key down (repeats included) before the
             // menu/game; GS_CREDITS consumes keys, and Esc leaves it.
             if (e.type == SDL_EVENT_KEY_DOWN && (roll_credits || credits_screen))
@@ -192,6 +268,15 @@ namespace OpenBlood2
                 {
                     menu.selected = e.key.scancode == SDL_SCANCODE_Y ? 0 : 1;
                     menu.activate();
+                    return false;
+                }
+                // CMenuControls VK_DELETE unassigns the row; Backspace too (labelled delete on Macs).
+                if (e.type == SDL_EVENT_KEY_DOWN && menu.page == MenuPage::Controls &&
+                    (e.key.scancode == SDL_SCANCODE_DELETE || e.key.scancode == SDL_SCANCODE_BACKSPACE) &&
+                    std::size_t(menu.selected) < control_rows.size() && control_rows[menu.selected].action)
+                {
+                    clear_control(controls.bindings, *control_rows[menu.selected].action);
+                    refresh_controls(menu);
                     return false;
                 }
                 // Navigation repeats while a key is held; activation needs a fresh press.

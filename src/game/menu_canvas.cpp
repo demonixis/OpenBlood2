@@ -64,6 +64,11 @@ namespace OpenBlood2
         background_ = canvas.CreateSurfaceFromBitmap(assets.background);
         slider_ = canvas.CreateSurfaceFromBitmap(assets.slider);
         thumb_ = canvas.CreateSurfaceFromBitmap(assets.thumb);
+        if (!resources_.demo())
+        {
+            up_arrow_ = canvas.CreateSurfaceFromBitmap(assets.up_arrow);
+            down_arrow_ = canvas.CreateSurfaceFromBitmap(assets.down_arrow);
+        }
         for (const auto* key : {"mainmenu.pcx", "singleplayer.pcx", "options.pcx", "loadgame.pcx", "savegame.pcx"})
             if (const auto* path = assets.title(key))
                 titles_[key] = canvas.CreateSurfaceFromBitmap(path);
@@ -85,6 +90,77 @@ namespace OpenBlood2
         }
         surface = canvas.CreateSurface(640, 480);
         return surface != nullptr;
+    }
+    // CMenuControls rows: CLTGUIColumnTextCtrl columns (action 100 px right-justified, an 11 px
+    // buffer, "=" 20 px, then the bound controls) in the 280-pixel CLTGUIListCtrl at the options
+    // position, with the CMenuBase::RenderArrows up/down arrows centered on x = 298.
+    bool MenuCanvas::compose_controls(Menu& menu, std::string& error)
+    {
+        constexpr int left = 180, top = 140, height = 280, arrow_center = 298;
+        const auto unassigned = strings.strings.find(IDS_MENU_KEY_UNASSIGNED);
+        if (unassigned == strings.strings.end() || !up_arrow_ || !down_arrow_)
+        {
+            error = "Missing original controls menu resources";
+            return false;
+        }
+        const int row = int(small_.height), count = int(menu.items.size());
+        const int visible = std::max(1, height / std::max(1, row));
+        menu.selected = std::clamp(menu.selected, 0, std::max(0, count - 1));
+        menu.first = std::clamp(menu.first, std::max(0, menu.selected - visible + 1), menu.selected);
+        int y = top;
+        for (int i = 0; i < count; ++i)
+        {
+            auto& item = menu.items[i];
+            item.rect = {};
+            if (item.string_id)
+            {
+                const auto it = strings.strings.find(item.string_id);
+                if (it == strings.strings.end())
+                {
+                    error = "Missing original menu string " + std::to_string(item.string_id);
+                    return false;
+                }
+                item.literal = it->second;
+            }
+            if (i < menu.first || i >= menu.first + visible)
+                continue;
+            const bool control = item.command == int(MENU_CMD_CHANGE_CONTROL);
+            const int label = width(small_, item.literal);
+            const int x = control ? std::max(0, left + 100 - label) : left;
+            item.rect = {left, y, 625, y + row};
+            text(*surface, small_, item.literal, x, y);
+            if (control && i == menu.binding)
+                text(*surface, small_, "=", left + 111, y);
+            if (control && i < int(menu.controls.size()))
+            {
+                std::string value = menu.controls[i].binding;
+                if (value.empty())
+                    value = unassigned->second;
+                // The bound text stops at the canvas edge instead of overflowing it.
+                while (!value.empty() && left + 131 + width(small_, value) > 635)
+                    value.pop_back();
+                text(*surface, small_, value, left + 131, y);
+            }
+            if (i == menu.selected && menu.enabled(item))
+                text(*surface, small_, ">", left - 16, y);
+            if (!menu.enabled(item))
+                for (int py = item.rect.top; py < item.rect.bottom; ++py)
+                    for (int px = item.rect.left; px < item.rect.right; ++px)
+                        for (unsigned c = 0; c < 3; ++c)
+                            surface->rgba[(py * 640 + px) * 4 + c] /= 2;
+            y += row;
+        }
+        if (menu.first > 0)
+            canvas.DrawSurfaceToSurfaceTransparent(surface, up_arrow_, nullptr,
+                                                   arrow_center - int(up_arrow_->width) / 2,
+                                                   top - int(up_arrow_->height) - 8, hud_magenta);
+        if (menu.first + visible < count)
+            canvas.DrawSurfaceToSurfaceTransparent(surface, down_arrow_, nullptr,
+                                                   arrow_center - int(down_arrow_->width) / 2, top + height - 5,
+                                                   hud_magenta);
+        if (menu.audio_failed)
+            text(*surface, small_, "Menu audio unavailable - see log.", 180, 460);
+        return true;
     }
     bool MenuCanvas::compose(Menu& menu, double, std::string& error)
     {
@@ -121,6 +197,14 @@ namespace OpenBlood2
         }
         canvas.DrawSurfaceToSurfaceTransparent(surface, title->second, nullptr, assets.title_x, assets.title_y,
                                                hud_magenta);
+        if (menu.page == MenuPage::Controls)
+        {
+            if (!compose_controls(menu, error))
+                return false;
+            ++revision;
+            composed_ = menu.revision;
+            return true;
+        }
         int y = assets.list_y;
         if (menu.page == MenuPage::Quit)
         {

@@ -177,6 +177,32 @@ version 3, versions 1 and 2 load with the renderer defaults, and keys of a later
 are rejected. This supersedes the version 2 write statement above.
 
 
+## Controls (CMenuControls)
+
+Options > Controls is enabled in the retail edition (the demo has no action strings and keeps the
+row disabled). It ports the original `CMenuControls` page; the binding rules, the row-to-action
+mapping and `controls.cfg` are in the [input action contracts](input_action_contracts.md#rebinding-options--controls).
+
+- The owner supplies the rows (`Menu::set_controls`): the original action string ID or a
+  replacement literal, the bound controls as text and whether the row is enabled. Without rows
+  the Options entry stays disabled. A visible Controls or Options page is rebuilt, keeping its
+  selection and scroll position.
+- Layout follows the original columns at the options position (180, 140): the action name
+  right-justified in 100 pixels, an 11-pixel gap, a 20-pixel column that shows "=" while the row
+  waits for a control, then the controls, or the original `IDS_MENU_KEY_UNASSIGNED` text. The small
+  font, no spacing and no wrap at either end are the original's. Long text stops at the canvas
+  edge.
+- The list scrolls inside the original 280-pixel menu height and keeps the selection visible. The
+  original `UpArrow.pcx`/`DownArrow.pcx` are drawn centered on x = 298, above the list while rows
+  are hidden above and at its bottom while rows remain below (`CMenuBase::RenderArrows`).
+- Enter or a click on a row starts the tracking (`Menu::binding`); while it lasts, navigation,
+  adjustment, activation and the pointer do nothing. Back cancels it before leaving the page.
+  Restore Defaults emits `MenuAction::RestoreControls`.
+- Back returns to Options; the title is `options.pcx`.
+
+The retail menu strings now also require IDs 705–732, 735–748 and 749. The automated traversal
+passes over the Controls row on its way to Mouse.
+
 Normal `--demo` now uses the [demo menu and edition provider](demo_menu_contracts.md).
 The fixed-offset experiment remains removed. `--demo --view-world` retains the
 [menu-free direct route](demo_contracts.md); retail behavior stays shared and

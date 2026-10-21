@@ -6,6 +6,11 @@
 #include <utility>
 namespace OpenBlood2
 {
+    namespace
+    {
+        // Replacement command of the Controls page's last row (no original counterpart).
+        constexpr int MENU_CMD_RESTORE_CONTROLS = -2;
+    } // namespace
     void Menu::AddLargeTextItemOption(unsigned id, int command)
     {
         items.push_back({id, command, true, {}, -1, {}});
@@ -62,6 +67,8 @@ namespace OpenBlood2
         promotion_exit = false;
         items.clear();
         selected = 0;
+        first = 0;
+        binding = -1;
         pressed_ = -1;
         ++revision;
         switch (page)
@@ -128,6 +135,13 @@ namespace OpenBlood2
                 AddLargeTextItemOption(IDS_MENU_MOUSE_LOOKSPRING, -1);
                 AddLargeTextItemOption(IDS_MENU_MOUSE_USEWHEEL, -1);
                 break;
+            case MenuPage::Controls:
+                // CMenuControls::InitColumns: one MENU_CMD_CHANGE_CONTROL row per action, small font,
+                // no spacing, no wrap; the replacement RESTORE DEFAULTS row follows.
+                for (const auto& row : controls)
+                    items.push_back({row.string_id, int(MENU_CMD_CHANGE_CONTROL), row.enabled, row.literal, -1, {}});
+                items.push_back({0, MENU_CMD_RESTORE_CONTROLS, true, "Restore Defaults", -1, {}});
+                break;
             case MenuPage::Load:
                 // CMenuLoadGame::InitSavedGameSlots: "RESTART: %s", "QUICKLOAD: %s", then the slots.
                 items.push_back({IDS_MENU_LOADGAME_RESTART, int(MENU_CMD_LOAD_SAVE_GAME), saves.restart.loadable,
@@ -158,9 +172,11 @@ namespace OpenBlood2
                 case MENU_CMD_BLOODBATH:
                     item.enabled = demo();
                     break;
+                case MENU_CMD_CUSTOMIZE_CONTROLS:
+                    item.enabled = !demo() && !controls.empty(); // The demo has no action strings.
+                    break;
                 case -1:
                 case MENU_CMD_CUSTOM_LEVEL:
-                case MENU_CMD_CUSTOMIZE_CONTROLS:
                 case MENU_CMD_JOYSTICK:
                 case MENU_CMD_KEYBOARD:
                     item.enabled = false;
@@ -210,9 +226,25 @@ namespace OpenBlood2
         if (keep >= 0 && keep < int(items.size()) && enabled(items[keep]))
             selected = keep;
     }
+    void Menu::set_controls(std::vector<MenuControlRow> next)
+    {
+        if (controls == next)
+            return;
+        controls = std::move(next);
+        if (!active || (page != MenuPage::Controls && page != MenuPage::Options))
+            return;
+        const int keep = selected, top_row = first;
+        build(page);
+        if (keep >= 0 && keep < int(items.size()) && enabled(items[keep]))
+        {
+            selected = keep;
+            first = top_row;
+        }
+    }
     void Menu::close()
     {
         active = false;
+        binding = -1;
         promotion = MenuPromotion::None;
         promotion_exit = false;
         cancel_pointer();
@@ -232,6 +264,13 @@ namespace OpenBlood2
             return;
         }
         cue(MenuCue::Back);
+        if (binding >= 0)
+        {
+            // CMenuControls::HandleDeviceTrack: Escape cancels the binding and removes the "=".
+            binding = -1;
+            ++revision;
+            return;
+        }
         if (page == top)
         {
             // Original VK_ESCAPE on the top-level menu: MenuReturnToGame only in a world.
@@ -255,6 +294,7 @@ namespace OpenBlood2
             case MenuPage::Audio:
             case MenuPage::Mouse:
             case MenuPage::Display:
+            case MenuPage::Controls:
                 build(MenuPage::Options);
                 break;
             default:
@@ -264,11 +304,14 @@ namespace OpenBlood2
     }
     void Menu::select(int direction)
     {
-        if (!active || promotion != MenuPromotion::None || items.empty())
+        if (!active || promotion != MenuPromotion::None || items.empty() || binding >= 0)
             return;
         int next = selected;
         for (std::size_t i = 0; i < items.size(); ++i)
         {
+            // CMenuControls::Build: SetScrollWrap(DFALSE) stops at either end.
+            if (page == MenuPage::Controls && (direction < 0 ? next == 0 : next + 1 == int(items.size())))
+                return;
             next = (next + int(items.size()) + (direction < 0 ? -1 : 1)) % int(items.size());
             if (enabled(items[next]))
             {
@@ -290,7 +333,7 @@ namespace OpenBlood2
             return;
         }
         if (!active || promotion != MenuPromotion::None || selected < 0 || selected >= int(items.size()) ||
-            !enabled(items[selected]) || pending_.action == MenuAction::NewGame ||
+            !enabled(items[selected]) || binding >= 0 || pending_.action == MenuAction::NewGame ||
             pending_.action == MenuAction::Credits || pending_.action == MenuAction::Quit ||
             pending_.action == MenuAction::SaveGame || pending_.action == MenuAction::LoadGame)
             return;
@@ -389,6 +432,16 @@ namespace OpenBlood2
             case MENU_CMD_KILL_MESSAGEBOX:
                 build(MenuPage::Main);
                 break;
+            case MENU_CMD_CUSTOMIZE_CONTROLS:
+                build(MenuPage::Controls);
+                break;
+            case MENU_CMD_CHANGE_CONTROL: // CMenuControls::OnCommand: "=" and StartTrackingDevices.
+                binding = selected;
+                ++revision;
+                break;
+            case MENU_CMD_RESTORE_CONTROLS:
+                pending_.action = MenuAction::RestoreControls;
+                break;
             default:
                 break;
         }
@@ -396,7 +449,7 @@ namespace OpenBlood2
     void Menu::adjust(int direction)
     {
         if (!active || promotion != MenuPromotion::None || selected < 0 || selected >= int(items.size()) ||
-            !enabled(items[selected]))
+            !enabled(items[selected]) || binding >= 0)
             return;
         auto before = settings;
         switch (items[selected].setting)
@@ -450,7 +503,7 @@ namespace OpenBlood2
     }
     void Menu::pointer(float x, float y, bool press, bool release, bool motion)
     {
-        if (!active || promotion != MenuPromotion::None)
+        if (!active || promotion != MenuPromotion::None || binding >= 0)
             return;
         int hit = -1;
         for (std::size_t i = 0; i < items.size(); ++i)
@@ -504,7 +557,7 @@ namespace OpenBlood2
     bool Menu::small() const
     {
         return page == MenuPage::Audio || page == MenuPage::Mouse || page == MenuPage::Display ||
-               page == MenuPage::Save || page == MenuPage::Load || page == MenuPage::Quit;
+               page == MenuPage::Controls || page == MenuPage::Save || page == MenuPage::Load || page == MenuPage::Quit;
     }
     const char* Menu::title() const
     {
@@ -514,6 +567,7 @@ namespace OpenBlood2
             case MenuPage::Audio:
             case MenuPage::Mouse:
             case MenuPage::Display:
+            case MenuPage::Controls:
                 return "options.pcx";
             case MenuPage::Solo:
             case MenuPage::Character:

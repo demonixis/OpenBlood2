@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-21",
+  "scope": "Options > Controls: original CMenuControls rows, device tracking, unassign and scroll arrows over the input action layer, the controls.cfg persistence and the replacement on-screen touch controls; no LTGUI, console or DirectInput code imported",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MenuControls.cpp",
+      "source_sha256": "306f9a699f946ba61699532b0e4ae823867518e46a40c7949da27e75a9d28597",
+      "purpose": "g_pControlActionName/g_nControlActionStringID order (42 actions, screen size rows commented out), column widths 100/11/20/100 with the action right-justified, small font, no spacing or wrap, arrows at x 298; MENU_CMD_CHANGE_CONTROL shows '=' and tracks keyboard, mouse and joystick buttons; HandleDeviceTrack ignores Tab, cancels on Escape, unbinds the control from its other action, replaces the action's control of the same device and binds; VK_DELETE unassigns every device; SetControlText joins devices with ' or ', MBUTTON n one-based, IDS_MENU_KEY_UNASSIGNED when empty."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MenuBase.cpp",
+      "source_sha256": "c90d24601fd5d548b22f82cae4ff1984431a3e3a36c78416079cda657480b381",
+      "purpose": "RenderArrows: up arrow above the list (y - height - 8) when the start index is not zero, down arrow at list y + height - 5 while rows remain, centered on the UseArrows x, magenta transparency."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MainMenus.cpp",
+      "source_sha256": "4e52be34bfd90c547c1e9c26ab7d77711aa873b91b67bb99112621d3f0172091",
+      "purpose": "Options position (180, 140), menu height 280, UpArrow.pcx/DownArrow.pcx surfaces, the controls menu's Options parent."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MenuCommands.h",
+      "source_sha256": "36bb2da68f333db41d557d05140f97618ef7f58689e03ce46a843cc281909f5e",
+      "purpose": "MENU_CMD_CHANGE_CONTROL 800."
+    },
+    {
+      "source": "sources/lithtech/Blood2/Shared/ClientRes.h",
+      "source_sha256": "753b0f280eb27e771f274c4c73349585676ef1824d228c09142c67a4414a60fc",
+      "purpose": "IDS_MENU_ACTION_FORWARD..WEAPON9 (705-748) and IDS_MENU_KEY_UNASSIGNED (749); the strings themselves stay in the user's cres.dll."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "36a810c80ce87eb2304716e9e1dbaae25304c02c542019b0858c9dc99f2d1006",
+      "purpose": "COMMAND_RUNLOCK toggles CDATA_RUNLOCK (always run): distinct from the action layer's run latch, so the RunLock row stays disabled."
+    }
+  ],
+  "installed_data": "defaults.cfg binds Weapon_0..Weapon_9 to DIK 2..11 (keys 1..9, 0): Weapon_0 maps to weapon slot 1.",
+  "adaptations": [
+    "Rows map original actions onto the existing InputAction table; Strafe, RunLock, TurnAround, DropWeapon, Grab, Message, Taunt, MouseAimToggle and Crosshair have no port and are disabled.",
+    "Six replacement rows (Run Latch, Flashlight, Medkit, Binoculars, Night Goggles, The Eye) and a Restore Defaults row follow the original list.",
+    "Menu, menu navigation, quick save/load and analog look bindings are not rebindable; any Menu source (Esc, Start) cancels tracking and F5/F6 are ignored like Tab.",
+    "Backspace unassigns like Delete (the Mac delete key); gamepad controls are named PAD + console-layout names instead of J + DirectInput names; uncaptured mouse buttons and wheel ticks bind, touch-emulated clicks never do.",
+    "Bindings persist in controls.cfg (version 1, rebindable actions only) instead of the original console rangebind commands; a malformed file changes nothing.",
+    "On-screen touch controls are a replacement virtual gamepad with no original counterpart."
+  ]
+}

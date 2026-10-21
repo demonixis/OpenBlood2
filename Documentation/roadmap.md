@@ -1,7 +1,7 @@
 # Roadmap
 
-Reviewed on 2026-10-20; level-opening coverage reconciled with `9bfada1` and
-[audit 19](implementation/reports/evidence/all-levels-audit-19.log).
+Reviewed on 2026-10-21; level-opening coverage reconciled with `9bfada1` and
+[audit 19](implementation/reports/evidence/all-levels-audit-19.log), save/load with lot 14.
 Percentages are task estimates, not acceptance. Only the user accepts a milestone.
 
 ## Overall progress
@@ -10,9 +10,9 @@ Percentages are task estimates, not acceptance. Only the user accepts a mileston
 | --- | ---: | --- |
 | Mounted non-multiplayer worlds that open | 36 / 36 | Includes Ancient City, Ancient One, Credits, End and Drop; opening is not campaign traversal. |
 | All mounted worlds that open | 58 / 58 | Includes 22 multiplayer maps, inspected locally, with the four CTF maps. |
-| Beta-ready game (M0–M4) | **~88%** | Weighted milestones below. |
-| With the graphics upgrade (M0–M6) | ~78% | Adds optional PBR and post-processing. |
-| Whole roadmap (M0–M9) | **~58%** | Adds gamepad, Quest VR/Android and LAN. |
+| Beta-ready game (M0–M4) | **~90%** | Weighted milestones below. |
+| With the graphics upgrade (M0–M6) | ~80% | Adds optional PBR and post-processing. |
+| Whole roadmap (M0–M9) | **~59%** | Adds gamepad, Quest VR/Android and LAN. |
 
 Weights reflect estimated effort: M0 4, M1 6, M2 28, M3 14, M4 8, M5 7,
 M6 6, M7 3, M8 11, M9 13. Later work (M10+) is not counted.
@@ -32,11 +32,11 @@ accept M3 or provide network play.
 | M0 | 100% | Independent C++20 build, SDL_GPU, configuration, logs and inspector. |
 | M1 | 100% | Original-code integration: objects, typed services, callbacks and lifetime. |
 | M2 | 100% — closed with reservation | World readers, gameplay services and the selected SubwayA → CityHub session. |
-| M3 | ~55% — current | Every level playable, credits, save/load, then a public beta whose bug list validates the campaign. |
+| M3 | ~65% — current | Every level playable, credits, save/load, then a public beta whose bug list validates the campaign. |
 | M4 | ~85% | Original rendering on Vulkan (Linux, Windows) and Metal (macOS). D3D12 is not planned. |
 | M5 | ~65% | Optional PBR shader set with JSON texture/material bindings; the legacy set remains selectable. The [enhanced renderer](contracts/enhanced_renderer_contracts.md) covers 5.0, 5.1 (built-in manifest), 5.3 and 5.4; emissive and inspection remain. |
 | M6 | 0% | PBR-only post-processing: bloom from emissive maps, GTAO, SSR, tonemapping; AA for both sets. |
-| M7 | ~60% | Gamepad: action layer, rebinding, hotplug, menus; a parallel track, needed before M8. The [input actions](contracts/input_action_contracts.md) cover keyboard, mouse and gamepad (console layout, hot-plug, menus, weapon cycling) the original [inventory cursor](contracts/inventory_cursor_contracts.md) with its item tabs, and a touch camera drag; on-screen touch controls and rebinding remain. |
+| M7 | ~90% | Gamepad: action layer, rebinding, hotplug, menus; a parallel track, needed before M8. The [input actions](contracts/input_action_contracts.md) cover keyboard, mouse and gamepad (console layout, hot-plug, menus, weapon cycling), the original [inventory cursor](contracts/inventory_cursor_contracts.md) with its item tabs, a touch camera drag, the original Controls page with `controls.cfg`, and on-screen touch controls. Device testing on a touch screen, menu auto-repeat and the Keyboard/Joystick pages remain. |
 | M8 | 0% | VR on Meta Quest through OpenXR; also the Android gate. |
 | M9 | ~10% | LAN multiplayer: Bloodbath, CTF and Team on the original multiplayer maps. |
 

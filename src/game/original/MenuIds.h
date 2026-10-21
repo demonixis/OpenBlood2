@@ -43,6 +43,11 @@ inline constexpr unsigned IDS_MENU_LOADGAME_RESTART = 547;
 inline constexpr unsigned IDS_MENU_LOADGAME_QUICKLOAD = 548;
 inline constexpr unsigned IDS_MENU_MOUSE_USEWHEEL = 561;
 inline constexpr unsigned IDS_MENU_MESSAGE_QUIT = 600;
+// CMenuControls action names (IDS_MENU_ACTION_FORWARD..WEAPON9; 733/734, the screen size
+// actions, are commented out of the source table) and the unassigned key text.
+inline constexpr unsigned IDS_MENU_ACTION_FORWARD = 705;
+inline constexpr unsigned IDS_MENU_ACTION_WEAPON9 = 748;
+inline constexpr unsigned IDS_MENU_KEY_UNASSIGNED = 749;
 inline constexpr unsigned MENU_CMD_SINGLE_PLAYER = 0;
 inline constexpr unsigned MENU_CMD_BLOODBATH = 1;
 inline constexpr unsigned MENU_CMD_OPTIONS = 2;
@@ -70,3 +75,4 @@ inline constexpr unsigned MENU_CMD_START_GABRIELLA = 2001;
 inline constexpr unsigned MENU_CMD_START_ISHMAEL = 2002;
 inline constexpr unsigned MENU_CMD_START_OPHELIA = 2003;
 inline constexpr unsigned MENU_CMD_KILL_MESSAGEBOX = 3000;
+inline constexpr unsigned MENU_CMD_CHANGE_CONTROL = 800;

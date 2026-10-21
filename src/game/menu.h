@@ -17,6 +17,7 @@ namespace OpenBlood2
         Audio,
         Mouse,
         Display,
+        Controls,
         Save,
         Load,
         Quit
@@ -29,8 +30,9 @@ namespace OpenBlood2
         Credits, // Original MenuCredits: StartNewGame("Credits", CUSTOM, MEDIUM), or GS_CREDITS in a world.
         Quit,
         Settings,
-        SaveGame, // Original MenuSaveGame(slot): slot 0..7.
-        LoadGame  // Original MenuLoadGame(slot): SLOT_CURRENT (-2, Restart), SLOT_QUICK (-1) or 0..7.
+        SaveGame,       // Original MenuSaveGame(slot): slot 0..7.
+        LoadGame,       // Original MenuLoadGame(slot): SLOT_CURRENT (-2, Restart), SLOT_QUICK (-1) or 0..7.
+        RestoreControls // Replacement Controls row: the owner restores the default bindings.
     };
     enum class MenuCue
     {
@@ -60,6 +62,17 @@ namespace OpenBlood2
         std::array<MenuSaveRow, 8> slots;
         std::string unavailable; // Nonempty when saves cannot be used at all (shown on both pages).
         bool operator==(const MenuSaveSlots&) const = default;
+    };
+    // One CMenuControls row from the owner's bindings: the original action string (or a
+    // replacement literal) and the bound sources as text ("W or MBUTTON 1"). Empty text shows the
+    // original unassigned string; a disabled row is an original action without a port.
+    struct MenuControlRow
+    {
+        unsigned string_id = 0;
+        std::string literal;
+        std::string binding;
+        bool enabled = true;
+        bool operator==(const MenuControlRow&) const = default;
     };
     struct MenuSettings
     {
@@ -105,6 +118,13 @@ namespace OpenBlood2
         // Replaces the slot listing; a visible Save or Load page is rebuilt, keeping its selection.
         void set_saves(const MenuSaveSlots&);
         MenuSaveSlots saves;
+        // Replaces the Controls rows; a visible Controls page is rebuilt, keeping its selection.
+        void set_controls(std::vector<MenuControlRow>);
+        std::vector<MenuControlRow> controls;
+        // CMenuControls: the row tracking the next device input (its "=" column), or -1. The owner
+        // binds or cancels; Back cancels too.
+        int binding = -1;
+        int first = 0; // First displayed row of a scrolled list (CLTGUIListCtrl start index).
         void show_promotion(MenuPromotion, bool exit = false);
         void dismiss_promotion();
         void end_demo();
@@ -172,6 +192,9 @@ namespace OpenBlood2
         const HudSurface* background_ = nullptr;
         const HudSurface* slider_ = nullptr;
         const HudSurface* thumb_ = nullptr;
+        const HudSurface* up_arrow_ = nullptr;
+        const HudSurface* down_arrow_ = nullptr;
+        bool compose_controls(Menu&, std::string& error);
         std::map<std::string, const HudSurface*> titles_;
         std::map<MenuPromotion, const HudSurface*> promotions_;
         std::uint64_t composed_ = UINT64_MAX;
