@@ -96,6 +96,24 @@ namespace OpenBlood2
                 else if constexpr (std::is_same_v<T, VoiceEvent>)
                     return value.character >= 0 && value.character < 4 && value.event >= 0 &&
                            value.event < (value.group ? 12 : 9);
+                else if constexpr (std::is_same_v<T, InventoryItems>)
+                {
+                    // Item pictures are relative to interface/statusbar/items/ (keys use authored names).
+                    const auto valid_item = [](const std::optional<InventoryItemView>& item)
+                    {
+                        const auto name = [](const std::string& s, bool path)
+                        {
+                            return s.size() <= 100 && s.find('\0') == std::string::npos &&
+                                   (!path || (!s.empty() && s.front() != '/' && s.front() != '\\' &&
+                                              s.find(':') == std::string::npos && s.find("..") == std::string::npos));
+                        };
+                        return !item ||
+                               (item->type >= 1 && item->type <= 9 && name(item->icon, true) &&
+                                name(item->highlighted_icon, true) && name(item->name, false) &&
+                                (item->type == 6 ? !item->name_id : item->name_id >= 301 && item->name_id <= 308));
+                    };
+                    return valid_item(value.current) && valid_item(value.previous) && valid_item(value.next);
+                }
                 else if constexpr (std::is_same_v<T, InventoryAction>)
                     return value.type == 1 || value.type == 2 || value.type == 3 || value.type == 5;
                 else if constexpr (std::is_same_v<T, OrbView>)

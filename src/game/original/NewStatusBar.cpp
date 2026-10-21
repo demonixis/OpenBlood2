@@ -1,4 +1,5 @@
-// Selective original CNewStatusBar: InitStatTabs, AdjustRes, SetupTab, JustifySurface.
+// Selective original CNewStatusBar: InitStatTabs, InitInvTabs, AdjustRes, UpdateInv, DrawInvTabs,
+// SetupTab, JustifySurface.
 // Original locations/resources and composition order retained; typed surfaces replace the client ABI.
 #include "game/original/NewStatusBar.h"
 #include "game/original/WeaponDefs.h"
@@ -17,6 +18,8 @@ bool CNewStatusBar::Init()
         return false;
     InitStatTabs();
     initialized = canvas.error.empty();
+    if (initialized)
+        InitInvTabs();
     return initialized;
 }
 bool CNewStatusBar::Update(const OpenBlood2::PlayerStats& s, unsigned width, unsigned height)
@@ -87,6 +90,220 @@ void CNewStatusBar::AdjustRes(unsigned width, unsigned height)
 
     m_stAltAmmo.locX = m_stAmmo.locX + (m_stAmmo.sizeX / 2) - (m_stAltAmmo.sizeX / 2);
     m_stAltAmmo.locY = m_stAmmo.locY - m_stAltAmmo.sizeY - 3;
+
+    if (m_nStatLevel == STATTAB_LOW)
+        m_nInvLevel = INVTAB_INVISIBLE;
+
+    // Adjust the inventory items tabs
+    const int screen_height = int(m_nScreenHeight);
+    item_loc_x[1] = 0;
+    item_loc_y[1] = (screen_height / 2) - int(m_stItems[1].sizeY / 2);
+    item_loc_x[0] = -15;
+    item_loc_y[0] = item_loc_y[1] - int(m_stItems[1].sizeY);
+    item_loc_x[2] = -15;
+    item_loc_y[2] = item_loc_y[1] + int(m_stItems[1].sizeY);
+
+    // Adjust the current item tab locations to the new resolution
+    m_stCurrentItem.locX = 20;
+    m_stCurrentItem.locY = m_nScreenHeight - m_stHealth.sizeY - m_stCurrentItem.sizeY;
+
+    if (m_nStatLevel == STATTAB_HIGH)
+    {
+        m_nItemNameX = int(m_stItems[1].sizeX) + 10;
+        m_nItemNameY = (screen_height / 2) - int(stat_font.height / 2);
+    }
+    else
+    {
+        m_nItemNameX = int(m_stCurrentItem.locX + m_stCurrentItem.sizeX) + 10;
+        m_nItemNameY = int(m_stCurrentItem.locY + (m_stCurrentItem.sizeY / 2)) - int(stat_font.height / 2);
+    }
+}
+void CNewStatusBar::InitInvTabs()
+{
+    // The source creates these with the other tabs. Here a missing picture or font only
+    // disables the item tabs (item_error); the health/armor/ammo tabs stay required.
+    for (int i = 0; i < 3; i++)
+    {
+        m_stItems[i].sizeX = 75;
+        m_stItems[i].sizeY = 50;
+
+        m_stItems[i].hTab = canvas.CreateSurface(m_stItems[i].sizeX, m_stItems[i].sizeY);
+        m_stItems[i].hBorder = canvas.CreateSurfaceFromBitmap("interface/statusbar/border_inv.pcx");
+        m_stItems[i].hIcon = 0;
+        m_stItems[i].hBar = 0;
+
+        m_stItems[i].borderX = 0;
+        m_stItems[i].borderY = 4;
+        m_stItems[i].borderJ = STATTAB_JUST_NW;
+
+        m_stItems[i].iconX = 50;
+        m_stItems[i].iconY = 18;
+        m_stItems[i].iconJ = STATTAB_JUST_C;
+
+        m_stItems[i].valueX = 50;
+        m_stItems[i].valueY = 29;
+        m_stItems[i].valueJ = 1; // CF_JUSTIFY_CENTER
+        m_stItems[i].digits = 3;
+    }
+
+    m_stCurrentItem.sizeX = 50;
+    m_stCurrentItem.sizeY = 45;
+
+    m_stCurrentItem.hTab = canvas.CreateSurface(m_stCurrentItem.sizeX, m_stCurrentItem.sizeY);
+    m_stCurrentItem.hBorder = canvas.CreateSurfaceFromBitmap("interface/statusbar/border_current.pcx");
+    m_stCurrentItem.hIcon = 0;
+    m_stCurrentItem.hBar = 0;
+
+    m_stCurrentItem.borderX = 2;
+    m_stCurrentItem.borderY = 0;
+    m_stCurrentItem.borderJ = STATTAB_JUST_NW;
+
+    m_stCurrentItem.iconX = 25;
+    m_stCurrentItem.iconY = 14;
+    m_stCurrentItem.iconJ = STATTAB_JUST_C;
+
+    m_stCurrentItem.valueX = 25;
+    m_stCurrentItem.valueY = 25;
+    m_stCurrentItem.valueJ = 1; // CF_JUSTIFY_CENTER
+    m_stCurrentItem.digits = 3;
+
+    m_hItemName = canvas.CreateSurface(100, 14);
+    if (canvas.load_font("interface/statusbar/fonts/stat_font_1.pcx", "interface/statusbar/fonts/stat_font_1.fnt",
+                         stat_font))
+        stat_font.space_width = stat_font.height / 4;
+    inventory_ready = canvas.error.empty();
+    if (!inventory_ready)
+    {
+        item_error = canvas.error;
+        canvas.error.clear();
+    }
+    else if (m_hItemName)
+        canvas.FillRect(m_hItemName, nullptr, m_hTransColor);
+}
+void CNewStatusBar::UpdateInv(const OpenBlood2::InventoryItems& items, bool bShow, float time)
+{
+    if (!inventory_ready)
+        return;
+    const auto picture = [this](const std::string& name) -> OpenBlood2::HudSurface*
+    {
+        if (name.empty())
+            return nullptr;
+        const std::string path = "interface/statusbar/items/" + name;
+        auto* surface = canvas.CreateSurfaceFromBitmap(path.c_str());
+        if (!surface)
+        {
+            item_error = canvas.error;
+            canvas.error.clear();
+        }
+        return surface;
+    };
+
+    // Fill in the name of the current object
+    canvas.FillRect(m_hItemName, nullptr, m_hTransColor);
+    if (items.current && !items.current->name.empty())
+        stat_font.draw(*m_hItemName, items.current->name, 0, 0, 0);
+
+    // Currently selected item, the highlighted item in the inv tabs, previous and next
+    m_stCurrentItem.hIcon = items.current ? picture(items.current->icon) : nullptr;
+    m_stCurrentItem.value = items.current ? items.current->charges : 0;
+    m_stItems[1].hIcon = items.current ? picture(items.current->highlighted_icon) : nullptr;
+    m_stItems[1].value = m_stCurrentItem.value;
+    m_stItems[0].hIcon = items.previous ? picture(items.previous->icon) : nullptr;
+    m_stItems[0].value = items.previous ? items.previous->charges : 0;
+    m_stItems[2].hIcon = items.next ? picture(items.next->icon) : nullptr;
+    m_stItems[2].value = items.next ? items.next->charges : 0;
+
+    // Update the time so it stays on the screen for a while
+    switch (m_nInvLevel)
+    {
+        case INVTAB_INVISIBLE:
+            if (bShow)
+            {
+                m_nInvLevel = INVTAB_SCROLL_IN;
+                m_fInvUpdateTime = time;
+            }
+            break;
+
+        case INVTAB_SCROLL_IN:
+            break;
+
+        case INVTAB_STOPPED:
+            m_fInvUpdateTime = time;
+            break;
+
+        case INVTAB_SCROLL_OUT:
+            m_nInvLevel = INVTAB_SCROLL_IN;
+            m_fInvUpdateTime = time;
+            break;
+    }
+
+    // Setup the items tabs with the new information
+    for (int i = 0; i < 3; i++)
+        if (m_stItems[i].hIcon)
+            SetupTab(m_stItems[i], &stat_font, TAB_INC_HIGH);
+    // DrawStatTabs re-sets the current item tab every frame; its inputs only change here.
+    if (m_stCurrentItem.hIcon)
+        SetupTab(m_stCurrentItem, &stat_font, TAB_INC_HIGH);
+    ++revision;
+}
+CNewStatusBar::InventoryLayout CNewStatusBar::DrawInvTabs(float time)
+{
+    InventoryLayout layout;
+    if (!inventory_ready)
+        return layout;
+    const bool high = m_nStatLevel == STATTAB_HIGH; // m_bHighGraphics follows the same resolution test.
+    layout.current_item = m_stCurrentItem.hIcon != nullptr;
+    layout.name = layout.current_item && !high;
+    layout.name_x = m_nItemNameX;
+    layout.name_y = m_nItemNameY;
+    if (!m_nInvLevel || !high)
+        return layout;
+
+    // Handle the scrolling in and out of the inventory item tabs
+    switch (m_nInvLevel)
+    {
+        case INVTAB_SCROLL_IN:
+            if (time - m_fInvUpdateTime > INVTAB_SCROLL_TIME)
+            {
+                m_fInvScrollRatio = 1.0f;
+                m_nInvLevel = INVTAB_STOPPED;
+                m_fInvUpdateTime = time;
+            }
+            else
+                m_fInvScrollRatio = (time - m_fInvUpdateTime) / INVTAB_SCROLL_TIME;
+            break;
+
+        case INVTAB_STOPPED:
+            if (time - m_fInvUpdateTime > INVTAB_DISP_TIME)
+            {
+                m_nInvLevel = INVTAB_SCROLL_OUT;
+                m_fInvUpdateTime = time;
+            }
+            break;
+        case INVTAB_SCROLL_OUT:
+            if (time - m_fInvUpdateTime > INVTAB_SCROLL_TIME)
+            {
+                m_fInvScrollRatio = 0.0f;
+                m_nInvLevel = INVTAB_INVISIBLE;
+                m_fInvUpdateTime = time;
+            }
+            else
+                m_fInvScrollRatio = 1.0f - (time - m_fInvUpdateTime) / INVTAB_SCROLL_TIME;
+
+            break;
+    }
+
+    // Previous, current (with the item name) and next item, sliding in from the left edge
+    for (int i = 0; i < 3; i++)
+        if (m_stItems[i].hIcon)
+        {
+            layout.visible[i] = true;
+            layout.x[i] = int((item_loc_x[i] + int(m_stItems[i].sizeX)) * m_fInvScrollRatio) - int(m_stItems[i].sizeX);
+            layout.y[i] = item_loc_y[i];
+        }
+    if (layout.visible[1])
+        layout.name = true;
+    return layout;
 }
 bool CNewStatusBar::InitStatTabs()
 {

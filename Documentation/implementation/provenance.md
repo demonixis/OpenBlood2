@@ -1949,3 +1949,16 @@ handling and the NPC strength bound are replacement code. See the
 [contract](../contracts/save_load_contracts.md#implemented-bosses-and-special-enemies-lot-12),
 the [evidence](reports/save_load_bosses.md) and the
 [source ledger](sources/save_load_bosses_sources.json).
+
+## Input actions, gamepad and inventory cursor (2026-10-21)
+
+The input lot's action layer, gamepad layout, `GamepadDevices` and device policy are replacement code.
+Selective ports are `ObjectDLL/InventoryMgr.cpp` SelectNextWeapon/SelectPrevWeapon (as
+`CycleWeaponSlot`), SelectNextItem, SelectPrevItem, SelectItem, GetNextItem, GetPrevItem,
+GetItemCharges, UpdateClient and the RemoveItem cursor rule; `PlayerObj.cpp` OnCommandOn
+COMMAND_NEXTWEAPON/PREVWEAPON/NEXTINVENTORY/PREVINVENTORY/USEINVENTORY;
+`ClientShellDLL/BloodClientShell.cpp` SMSG_ITEMCHANGED; `NewStatusBar.cpp` InitInvTabs,
+the inventory part of AdjustRes, UpdateInv, DrawInvTabs and the current-item part of DrawStatTabs.
+The keyboard keys for the new commands come from the retail `defaults.cfg` bindings (read as data,
+not imported). See the [input](../contracts/input_action_contracts.md) and
+[inventory cursor](../contracts/inventory_cursor_contracts.md) contracts.

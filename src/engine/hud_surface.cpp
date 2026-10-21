@@ -111,12 +111,16 @@ namespace OpenBlood2
         for (unsigned char c : text)
             if (c >= 33 && c <= 126)
                 length += widths[c - 33];
+            else if (c == ' ')
+                length += space_width;
         if (justify == 1)
             x -= length / 2;
         if (justify == 2)
             x -= length;
         for (unsigned char c : text)
         {
+            if (c == ' ')
+                x += int(space_width);
             if (c < 33 || c > 126)
                 continue;
             const auto i = c - 33;

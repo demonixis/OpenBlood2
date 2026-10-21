@@ -207,8 +207,8 @@ The headless `input_actions.*` tests cover:
 `hud.session` checks weapon cycling and its guard on a fixture player. All existing
 control, menu, demo and HUD tests keep passing.
 
-The inventory commands (next/previous item, use item) are queued by the input layer.
-The original item cursor and its status-bar display are the next part of this step.
+The inventory commands (next/previous item, use item) drive the original item cursor and
+its status-bar tabs: see the [inventory cursor contracts](inventory_cursor_contracts.md).
 
 Not included yet:
 

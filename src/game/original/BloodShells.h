@@ -32,6 +32,8 @@ class CBloodServerShell
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerRotation&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerItemCommand&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerDetonate&);
+    bool OnMessage(HCLIENT, const OpenBlood2::PlayerItemCursor&);
+    bool OnMessage(HCLIENT, const OpenBlood2::PlayerUseInventory&);
     void Update(float);
     // Original SaveGame/RestoreGame over the in-memory logical store. The caller owns the
     // frame boundary and the candidate session (GameSession::save_game/load_game).
@@ -146,6 +148,9 @@ class CBloodClientShell
     bool time_bomb_down = false, time_bomb_was_down = false;
     bool proximity_down = false, proximity_was_down = false;
     bool remote_down = false, remote_was_down = false, detonate_down = false, detonate_was_down = false;
+    bool next_item_requested = false, prev_item_requested = false, use_item_requested = false;
+    OpenBlood2::InventoryItems inventory_items; // Latest SMSG_ITEMCHANGED values.
+    std::uint64_t inventory_show_requests = 0, inventory_item_messages = 0;
     std::uint64_t item_actions = 0, item_sounds = 0;
     OpenBlood2::SoundId item_voice = 0; // Checked inspection token, not owned.
     std::string item_audio_error;

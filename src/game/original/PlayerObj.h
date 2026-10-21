@@ -207,6 +207,11 @@ class CPlayerObj : public CBaseCharacter
     bool OnCommandUse();
     bool OnCommandAltFire();
     bool OnCommandItem(DBYTE);
+    bool OnCommandItemCursor(bool next);
+    bool OnCommandUseInventory();
+    // Original InventoryMgr::UpdateClient (SMSG_ITEMCHANGED) as a typed value, sent on change.
+    bool UpdateInventoryClient(bool force = false);
+    std::uint64_t inventory_item_messages = 0;
     bool command_run = false;
     bool movement_blocked = false, camera_movement_blocked = false;
     bool m_bImprisoned = false;
@@ -283,6 +288,7 @@ class CPlayerObj : public CBaseCharacter
     friend class AI_Mgr;
     DLink m_CabalLink{}, m_MonsterLink{};
     OpenBlood2::PlayerStats last_sent_stats_{-1, -1, -1};
+    std::optional<OpenBlood2::InventoryItems> last_sent_items_;
     std::minstd_rand idle_random_{1};
     float animation_start_ = 0;
     HCLIENT m_hClient = nullptr;

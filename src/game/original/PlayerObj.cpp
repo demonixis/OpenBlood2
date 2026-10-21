@@ -420,7 +420,8 @@ DBOOL CPlayerObj::Update(DVector*)
             ++activation_ping_failures;
     }
     // Original order: UpdateStats, then CheckPowerups.
-    if (!UpdateStats() || !CheckPowerups() || !CheckImprisonment() || !UpdateLandingSound() || !UpdateSmellTrail())
+    if (!UpdateStats() || !UpdateInventoryClient() || !CheckPowerups() || !CheckImprisonment() ||
+        !UpdateLandingSound() || !UpdateSmellTrail())
         return DFALSE;
     // Original Update handles the first death after stats and smell, before
     // aggregate update clears accumulated frame damage.
@@ -471,7 +472,7 @@ bool CPlayerObj::InitializeClientState()
     static constexpr float move[] = {220, 250, 280, 310, 330, 350};
     m_fMoveVel = move[m_nAttribSpeed - 1];
     m_fJumpVel = 600;
-    if (!UpdateClientPhysics() || !TeleportClientToServerPos() || !UpdateStats(true))
+    if (!UpdateClientPhysics() || !TeleportClientToServerPos() || !UpdateStats(true) || !UpdateInventoryClient(true))
         return false;
     m_bFirstUpdate = DFALSE;
     return true;

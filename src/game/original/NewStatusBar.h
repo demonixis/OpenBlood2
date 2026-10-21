@@ -29,6 +29,14 @@
 #define STATTAB_LOW_WIDTH 512
 #define STATTAB_LOW_HEIGHT 384
 
+#define INVTAB_DISP_TIME 5.0f
+#define INVTAB_SCROLL_TIME 0.15f
+
+#define INVTAB_INVISIBLE 0
+#define INVTAB_SCROLL_IN 1
+#define INVTAB_STOPPED 2
+#define INVTAB_SCROLL_OUT 3
+
 struct StatTab
 {
 
@@ -74,6 +82,27 @@ class CNewStatusBar
     const OpenBlood2::HudSurface* flag_icon = nullptr;
     DBYTE team_id = 0, flag_color = 0;
     bool Update(const OpenBlood2::PlayerStats&, unsigned width, unsigned height);
+    // Original UpdateInv for one SMSG_ITEMCHANGED (show: ITEMF_SHOWITEMS). Missing item
+    // pictures leave that tab empty, as CreateSurfaceFromBitmap's null did; see item_error.
+    void UpdateInv(const OpenBlood2::InventoryItems&, bool show, float time);
+    // Original DrawInvTabs scroll state at this time, then the tab screen positions.
+    struct InventoryLayout
+    {
+        std::array<bool, 3> visible{}; // Previous, current (with its name), next item tabs.
+        std::array<int, 3> x{}, y{};
+        bool current_item = false, name = false; // Persistent current-item tab; its name in low detail.
+        int name_x = 0, name_y = 0;
+    };
+    InventoryLayout DrawInvTabs(float time);
+    std::array<const StatTab*, 4> item_tabs() const
+    {
+        return {&m_stItems[0], &m_stItems[1], &m_stItems[2], &m_stCurrentItem};
+    }
+    const OpenBlood2::HudSurface* item_name() const
+    {
+        return m_hItemName;
+    }
+    std::string item_error; // Last item picture or name font failure; never fails the HUD.
     std::array<const StatTab*, 4> tabs() const
     {
         return {&m_stHealth, &m_stArmor, &m_stAmmo, &m_stAltAmmo};
@@ -87,11 +116,19 @@ class CNewStatusBar
 
   private:
     bool InitStatTabs();
+    void InitInvTabs();
     void AdjustRes(unsigned width, unsigned height);
     void SetupTab(StatTab&, const OpenBlood2::HudFont*, unsigned flags);
     void JustifySurface(const OpenBlood2::HudSurface*, unsigned just, unsigned& x, unsigned& y);
     StatTab m_stHealth{}, m_stArmor{}, m_stAmmo{}, m_stAltAmmo{};
-    OpenBlood2::HudFont big_numbers, small_numbers;
+    StatTab m_stItems[3]{}, m_stCurrentItem{};
+    std::array<int, 3> item_loc_x{}, item_loc_y{}; // Signed: the side tabs start at x = -15.
+    OpenBlood2::HudSurface* m_hItemName = nullptr;
+    int m_nItemNameX = 0, m_nItemNameY = 0;
+    unsigned m_nInvLevel = INVTAB_INVISIBLE;
+    float m_fInvUpdateTime = 0, m_fInvScrollRatio = 0;
+    bool inventory_ready = false;
+    OpenBlood2::HudFont big_numbers, small_numbers, stat_font;
     unsigned m_nScreenWidth = 0, m_nScreenHeight = 0, m_nStatLevel = STATTAB_HIGH;
     OpenBlood2::PlayerStats previous{};
     bool initialized = false, have_previous = false;

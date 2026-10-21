@@ -512,6 +512,9 @@ namespace OpenBlood2
                 shell.remote_down = input.controls.sample_remote(false);
                 shell.detonate_down = input.controls.sample_detonate(false);
                 shell.time_bomb_down = input.controls.sample_time_bomb(false);
+                shell.next_item_requested |= input.controls.sample_command(InputAction::NextItem, false);
+                shell.prev_item_requested |= input.controls.sample_command(InputAction::PrevItem, false);
+                shell.use_item_requested |= input.controls.sample_command(InputAction::UseItem, false);
                 if (const int slot = input.controls.sample_weapon_slot(false); slot >= 0)
                     if (!game->command_weapon(DBYTE(slot), error))
                         spdlog::info("Weapon selection: {}", error);
@@ -628,10 +631,14 @@ namespace OpenBlood2
                     draw_credits(game->client_shell.m_Credits);
                 draw_screen_fade(game->client_shell.fade.Scale(), game->client_shell.m_bInWorld);
                 const auto& client = game->client_shell;
-                if (!hud.draw(hud_state(client.stats, client.m_bInWorld, client.view.object != nullptr,
-                                        client.death_camera.active, client.m_bShowCrosshair, client.m_nCrosshair,
-                                        client.ctf.team, client.ctf.flag_icon),
-                              game->resources, error))
+                auto state = hud_state(client.stats, client.m_bInWorld, client.view.object != nullptr,
+                                       client.death_camera.active, client.m_bShowCrosshair, client.m_nCrosshair,
+                                       client.ctf.team, client.ctf.flag_icon);
+                state.items = client.inventory_items;
+                state.item_messages = client.inventory_item_messages;
+                state.item_shows = client.inventory_show_requests;
+                state.time = float(game->objects.time());
+                if (!hud.draw(state, game->resources, error))
                     return failed(4);
                 if (saves.notice.visible())
                 {

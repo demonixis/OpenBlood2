@@ -338,6 +338,8 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     time_bomb_down = time_bomb_was_down = false;
     proximity_down = proximity_was_down = false;
     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
+    next_item_requested = prev_item_requested = use_item_requested = false;
+    inventory_items = {};
     item_actions = item_sounds = item_voice = 0;
     item_audio_error.clear();
     fade = {};
@@ -482,6 +484,8 @@ void CBloodClientShell::OnExitWorld()
     time_bomb_down = time_bomb_was_down = false;
     proximity_down = proximity_was_down = false;
     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
+    next_item_requested = prev_item_requested = use_item_requested = false;
+    inventory_items = {};
     item_actions = item_sounds = item_voice = 0;
     item_audio_error.clear();
     fade = {};
@@ -636,6 +640,15 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     }
     else if (const auto* value = std::get_if<OpenBlood2::PlayerStats>(&event))
         stats = *value;
+    else if (const auto* value = std::get_if<OpenBlood2::InventoryItems>(&event))
+    {
+        // Original SMSG_ITEMCHANGED: keep the values; ITEMF_SHOWITEMS slides the tabs in.
+        inventory_items = *value;
+        inventory_items.show = false;
+        if (value->show)
+            ++inventory_show_requests;
+        ++inventory_item_messages;
+    }
     else if (const auto* value = std::get_if<OpenBlood2::CTFEvent>(&event))
         return HandleCTF(*value);
     else if (const auto* value = std::get_if<OpenBlood2::BossHealth>(&event))
@@ -809,6 +822,16 @@ bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerItemCo
     auto* owner = Player(client);
     return owner && owner->OnCommandItem(command.type);
 }
+bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerItemCursor& command)
+{
+    auto* owner = Player(client);
+    return owner && owner->OnCommandItemCursor(command.next);
+}
+bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerUseInventory&)
+{
+    auto* owner = Player(client);
+    return owner && owner->OnCommandUseInventory();
+}
 bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerDetonate&)
 {
     auto* owner = Player(client);
@@ -857,6 +880,13 @@ bool CBloodClientShell::UpdateUse(CBloodServerShell& server)
     medkit_was_down = medkit_down;
     if (item_pressed)
         server.OnMessage(client_, OpenBlood2::PlayerItemCommand{1});
+    // Queued one-shot inventory commands (one press each), in the original command order.
+    if (std::exchange(next_item_requested, false))
+        server.OnMessage(client_, OpenBlood2::PlayerItemCursor{true});
+    if (std::exchange(prev_item_requested, false))
+        server.OnMessage(client_, OpenBlood2::PlayerItemCursor{false});
+    if (std::exchange(use_item_requested, false))
+        server.OnMessage(client_, OpenBlood2::PlayerUseInventory{});
     const bool pressed = use_down && !use_was_down;
     use_was_down = use_down;
     if (pressed && creature)

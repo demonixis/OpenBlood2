@@ -22,6 +22,7 @@ namespace OpenBlood2
         unsigned height = 0;
         std::array<unsigned, 95> offsets{};
         std::array<unsigned, 94> widths{};
+        unsigned space_width = 0; // Text fonts: the menus' quarter-height adapter policy; numbers use none.
         bool read_widths(std::span<const std::uint8_t>, const HudSurface&, std::string&, unsigned terminal_overhang = 0);
         void draw(HudSurface&, std::string_view, int x, int y, unsigned justify) const;
     };

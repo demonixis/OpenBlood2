@@ -254,6 +254,84 @@ namespace
         CHECK(g.unload_world() && !g.server.string_count() && !g.server.message_count());
         return true;
     }
+    // Original item cursor (SelectNextItem/SelectPrevItem, USEINVENTORY, UpdateClient) on a
+    // fixture player, through the client command path and the typed SMSG_ITEMCHANGED value.
+    bool inventory(const std::filesystem::path& root)
+    {
+        GameSession g;
+        std::string error;
+        CHECK(test_player::setup(g, root) && g.enter_player(error));
+        auto* p = g.server_shell.Player(g.local_client);
+        auto& inv = p->m_InventoryMgr;
+        CHECK(g.pump_player_messages(error));
+        CHECK(inv.CarriedItems().empty() && !inv.GetCurrentItem());
+        inv.SelectNextItem();
+        auto view = inv.ItemView();
+        CHECK(!inv.GetCurrentItem() && !view.current && !view.next && !view.previous && !view.show);
+        CHECK(inv.AddItem(5, 1) == InventoryResult::Ok && inv.AddItem(1, 100) == InventoryResult::Ok);
+        auto items = inv.CarriedItems(); // Type order: medkit before binoculars.
+        CHECK(items.size() == 2 && items[0].type == 1 && items[1].type == 5);
+        // The original add-time rule leaves the cursor at the list head: nothing selected.
+        CHECK(!inv.GetCurrentItem());
+        view = inv.ItemView(); // No cursor: the head's neighbours, first and last.
+        CHECK(!view.current && view.next && view.next->type == 1 && view.previous && view.previous->type == 5);
+        CHECK(view.next->icon == "medkit.pcx" && view.next->name_id == 302 && view.next->charges == 100);
+        inv.SelectNextItem();
+        view = inv.ItemView();
+        CHECK(view.show && view.current && view.current->type == 1 && view.current->highlighted_icon == "medkit_h.pcx");
+        CHECK(view.next && view.next->type == 5 && !view.previous); // No wrap past the head for display.
+        CHECK(!inv.ItemView().show);                                // A one-shot request.
+        inv.SelectNextItem();
+        CHECK(inv.GetCurrentItem()->type == 5 && !inv.ItemView().next);
+        inv.SelectNextItem(); // Selection wraps.
+        CHECK(inv.GetCurrentItem()->type == 1);
+        inv.SelectPrevItem();
+        CHECK(inv.GetCurrentItem()->type == 5);
+        KeyItem key{"RedKey", "Red key", "key_red.pcx", "key_red_h.pcx", 2};
+        CHECK(inv.AddKey(key) == InventoryResult::Ok);
+        items = inv.CarriedItems();
+        CHECK(items.size() == 3 && items[2].type == 6 && items[2].key == "RedKey" && inv.GetItemCharges(items[2]) == 2);
+        view = inv.ItemView();
+        CHECK(view.next && view.next->type == 6 && view.next->name == "Red key" && !view.next->name_id);
+        // RemoveItem rule: the removed current item hands the cursor to the next one.
+        inv.binoculars.reset();
+        CHECK(inv.GetCurrentItem() && inv.GetCurrentItem()->type == 6);
+        CHECK(inv.QueryKey("RedKey") == InventoryResult::Ok && inv.GetCurrentItem()->type == 6);
+        CHECK(inv.QueryKey("RedKey") == InventoryResult::Ok);
+        CHECK(inv.GetCurrentItem() && inv.GetCurrentItem()->type == 1); // Wraps to the first.
+        inv.medkit->count = 0; // Zero charges: absent, as the original Update removes it.
+        CHECK(!inv.GetCurrentItem() && inv.CarriedItems().empty());
+        inv.medkit->count = 100;
+        CHECK(inv.AddItem(5, 1) == InventoryResult::Ok);
+        // Typed save keeps the current type; Load selects the first item of it.
+        inv.SelectItem(5);
+        InventoryState state;
+        CHECK(inv.Save(state, error) && state.current_item == 5);
+        // Client commands: one queued press each, through the original guards.
+        g.client_shell.next_item_requested = true;
+        CHECK(g.client_shell.UpdateUse(g.server_shell) && inv.GetCurrentItem()->type == 1);
+        CHECK(p->UpdateInventoryClient() && g.pump_player_messages(error));
+        const auto& client = g.client_shell;
+        CHECK(client.inventory_items.current && client.inventory_items.current->type == 1 &&
+              client.inventory_show_requests == 1 && !client.inventory_items.show);
+        const auto messages = client.inventory_item_messages;
+        CHECK(p->UpdateInventoryClient() && g.pump_player_messages(error) &&
+              client.inventory_item_messages == messages);
+        g.client_shell.prev_item_requested = true;
+        CHECK(g.client_shell.UpdateUse(g.server_shell) && inv.GetCurrentItem()->type == 5);
+        CHECK(!g.client_shell.prev_item_requested);
+        // USEINVENTORY activates the current item (binoculars toggle zoom on).
+        g.client_shell.use_item_requested = true;
+        CHECK(g.client_shell.UpdateUse(g.server_shell) && inv.binoculars->active);
+        CHECK(p->OnCommandUseInventory() && !inv.binoculars->active);
+        p->movement_blocked = true;
+        CHECK(!p->OnCommandItemCursor(true) && !p->OnCommandUseInventory() && inv.GetCurrentItem()->type == 5);
+        p->movement_blocked = false;
+        p->m_damage.m_bDead = DTRUE;
+        CHECK(!p->OnCommandItemCursor(true));
+        p->m_damage.m_bDead = DFALSE;
+        return true;
+    }
     bool private_data(const std::filesystem::path& root)
     {
         GameSession g;
@@ -306,6 +384,50 @@ namespace
         sample.weapon = WEAP_PROXIMITYBOMB;
         sample.weapon_slot = 10;
         CHECK(bar.Update(sample, 640, 480) && !tabs[2]->hIcon);
+        // Original UpdateInv/DrawInvTabs: real item art, 0.15 s slide, 5 s display.
+        CHECK(bar.item_error.empty());
+        InventoryItems shown;
+        shown.current = InventoryItemView{1, "medkit.pcx", "medkit_h.pcx", "Medkit", 302, 100};
+        shown.next = InventoryItemView{5, "binoculars.pcx", "binoculars_h.pcx", "", 304, 1};
+        bar.UpdateInv(shown, true, 10);
+        auto items = bar.item_tabs();
+        CHECK(!items[0]->hIcon && items[1]->hIcon && items[2]->hIcon && items[3]->hIcon && items[1]->value == 100);
+        CHECK(bar.item_error.empty() && bar.canvas.error.empty());
+        auto layout = bar.DrawInvTabs(10);
+        CHECK(!layout.visible[0] && layout.visible[1] && layout.visible[2] && layout.x[1] == -75 && layout.y[1] == 215);
+        CHECK(layout.current_item && layout.name && layout.y[2] == 265);
+        layout = bar.DrawInvTabs(10.075f);
+        CHECK(layout.x[1] > -40 && layout.x[1] < -36);
+        layout = bar.DrawInvTabs(10.2f);
+        CHECK(layout.x[1] == 0 && layout.x[2] == -15);
+        bar.UpdateInv(shown, false, 14); // Any message while stopped restarts the 5 s display.
+        CHECK(bar.DrawInvTabs(18.5f).x[1] == 0);
+        layout = bar.DrawInvTabs(19.1f); // Display over: scroll out from here.
+        CHECK(layout.visible[1] && layout.x[1] == 0);
+        layout = bar.DrawInvTabs(19.175f);
+        CHECK(layout.x[1] > -40 && layout.x[1] < -36);
+        bar.UpdateInv(shown, false, 19.2f); // A message while scrolling out scrolls back in.
+        CHECK(bar.DrawInvTabs(19.5f).x[1] == 0);
+        CHECK(bar.DrawInvTabs(24.6f).visible[1] && bar.DrawInvTabs(24.8f).visible[1] &&
+              !bar.DrawInvTabs(25).visible[1]);
+        CHECK(bar.DrawInvTabs(25).current_item && !bar.DrawInvTabs(25).name);
+        bool name_pixels = false;
+        for (std::size_t i = 0; i + 3 < bar.item_name()->rgba.size(); i += 4)
+            name_pixels |= !(bar.item_name()->rgba[i] == 255 && !bar.item_name()->rgba[i + 1] &&
+                             bar.item_name()->rgba[i + 2] == 255);
+        CHECK(name_pixels);
+        bar.UpdateInv(shown, false, 30); // No show request: stays hidden.
+        CHECK(!bar.DrawInvTabs(30).visible[1]);
+        CHECK(bar.Update(sample, 511, 384)); // Low detail: no tabs, the name beside the current item.
+        bar.UpdateInv(shown, true, 31);
+        layout = bar.DrawInvTabs(31);
+        CHECK(!layout.visible[1] && layout.current_item && layout.name && layout.name_x == 80);
+        CHECK(bar.Update(sample, 640, 480));
+        // A missing picture leaves its tab empty without failing the status bar.
+        shown.next->icon = "missing_item.pcx";
+        bar.UpdateInv(shown, true, 40);
+        CHECK(!bar.item_error.empty() && !items[2]->hIcon && bar.canvas.error.empty());
+        CHECK(bar.Update(sample, 640, 480));
         for (int cycle = 0; cycle < 3; ++cycle)
         {
             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error) && g.step(.016));
@@ -506,6 +628,8 @@ int main(int argc, char** argv)
         return input() ? 0 : 1;
     if (mode == "session")
         return session(argv[2]) ? 0 : 1;
+    if (mode == "inventory")
+        return inventory(argv[2]) ? 0 : 1;
     if (mode == "private")
         return private_data(argv[2]) ? 0 : 1;
     if (mode == "gpu_ctf")

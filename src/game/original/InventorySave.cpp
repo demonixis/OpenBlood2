@@ -3,6 +3,7 @@
 #include "InventoryMgr.h"
 #include "SaveFields.h"
 #include "SeeingEye.h"
+#include <algorithm>
 #include <cmath>
 #include <string>
 
@@ -12,7 +13,7 @@ namespace
     {
         // Players keep 1..6 (ValidateAttributes); the original NPC strengths are 5 and Gideon's 10.
         if (state.strength < 1 || state.strength > 10 || state.magic < 1 || state.magic > 6 ||
-            state.current_slot >= state.right.size() ||
+            state.current_slot >= state.right.size() || state.current_item > 9 ||
             (state.current_slot >= 10 && !state.right[state.current_slot]) || !std::isfinite(state.damage_multiplier) ||
             state.damage_multiplier < 0 || state.damage_multiplier > 1000 || state.keys.size() > 256 ||
             (state.goggles && (state.goggles->count > 100 || !std::isfinite(state.goggles->remaining) ||
@@ -102,6 +103,12 @@ bool CInventoryMgr::Save(OpenBlood2::InventoryState& output, std::string& error)
     state.eye = eye && eye->available;
     state.binoculars = binoculars.has_value();
     state.current_slot = m_nCurWeaponSlot;
+    if (current_item)
+    {
+        const auto items = CarriedItems();
+        if (std::find(items.begin(), items.end(), *current_item) != items.end())
+            state.current_item = current_item->type;
+    }
     state.damage_multiplier = damage_multiplier;
     if (!valid(state, error))
         return false;
@@ -203,6 +210,11 @@ bool CInventoryMgr::Load(const OpenBlood2::InventoryState& state, OpenBlood2::In
     m_nCurWeaponSlot = staged.m_nCurWeaponSlot;
     damage_multiplier = staged.damage_multiplier;
     requested_weapons = {}; // Initialization profile, not source saved weapons.
+    current_item.reset();
+    last_items_.clear();
+    show_items = false;
+    if (state.current_item)
+        SelectItem(state.current_item); // Original Load: SelectItem(dwCurItem) after the items.
     for (unsigned i = 0; i < state.right.size(); ++i)
         for (bool left : {false, true})
             if (auto* weapon = GetWeapon(i, left))
@@ -297,7 +309,7 @@ void CInventoryMgr::Save(HMESSAGEWRITE h, DDWORD)
     s->WriteToMessageDWord(h, state.current_slot);
     const auto* current = CurrentWeapon();
     s->WriteToMessageDWord(h, current ? current->data.m_nType : 0); // m_nCurWeapon.
-    s->WriteToMessageDWord(h, INV_NONE);                            // Current item: this port has no item cursor.
+    s->WriteToMessageDWord(h, state.current_item);                  // Current item type (INV_NONE without one).
     s->WriteToMessageDWord(h, 0);                                   // m_WeapCount: never set by the original.
     s->WriteToMessageFloat(h, state.damage_multiplier);
     s->WriteToMessageFloat(h, 1); // m_fFireRateMultiplier: the original default, unchanged here.
@@ -411,8 +423,9 @@ void CInventoryMgr::Load(HMESSAGEREAD h, DDWORD param)
     }
     const DDWORD slot = s->ReadFromMessageDWord(h);
     state.current_slot = static_cast<DBYTE>(slot < 0x100 ? slot : 0xFF); // Out of range: refused by the validator.
-    s->ReadFromMessageDWord(h); // m_nCurWeapon: derived from the restored slot.
-    s->ReadFromMessageDWord(h); // Current item: this port has no item cursor.
+    s->ReadFromMessageDWord(h);                             // m_nCurWeapon: derived from the restored slot.
+    const DDWORD current_item = s->ReadFromMessageDWord(h); // Original SelectItem: unknown types select nothing.
+    state.current_item = static_cast<DBYTE>(current_item <= 9 ? current_item : INV_NONE);
     s->ReadFromMessageDWord(h); // m_WeapCount: never initialized by the original.
     state.damage_multiplier = s->ReadFromMessageFloat(h);
     s->ReadFromMessageFloat(h); // m_fFireRateMultiplier and m_fMeleeMultiplier are unused here.

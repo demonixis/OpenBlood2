@@ -684,6 +684,12 @@ namespace
             game->client_shell.proximity_down = controls.sample_proximity(text_editing);
             game->client_shell.remote_down = controls.sample_remote(text_editing);
             game->client_shell.detonate_down = controls.sample_detonate(text_editing);
+            game->client_shell.next_item_requested |=
+                controls.sample_command(OpenBlood2::InputAction::NextItem, text_editing);
+            game->client_shell.prev_item_requested |=
+                controls.sample_command(OpenBlood2::InputAction::PrevItem, text_editing);
+            game->client_shell.use_item_requested |=
+                controls.sample_command(OpenBlood2::InputAction::UseItem, text_editing);
             if (const int slot = controls.sample_weapon_slot(text_editing); slot >= 0)
             {
                 std::string selection_error;
@@ -902,12 +908,15 @@ namespace
 #endif
             ImGui::NewFrame();
             OpenBlood2::draw_screen_fade(game->client_shell.fade.Scale(), game->client_shell.m_bInWorld);
-            if (!hud.draw(OpenBlood2::hud_state(game->client_shell.stats, game->client_shell.m_bInWorld,
-                                                game->client_shell.view.object != nullptr,
-                                                game->client_shell.death_camera.active,
-                                                game->client_shell.m_bShowCrosshair, game->client_shell.m_nCrosshair,
-                                                game->client_shell.ctf.team, game->client_shell.ctf.flag_icon),
-                          game->resources, error))
+            auto hud_values = OpenBlood2::hud_state(
+                game->client_shell.stats, game->client_shell.m_bInWorld, game->client_shell.view.object != nullptr,
+                game->client_shell.death_camera.active, game->client_shell.m_bShowCrosshair,
+                game->client_shell.m_nCrosshair, game->client_shell.ctf.team, game->client_shell.ctf.flag_icon);
+            hud_values.items = game->client_shell.inventory_items;
+            hud_values.item_messages = game->client_shell.inventory_item_messages;
+            hud_values.item_shows = game->client_shell.inventory_show_requests;
+            hud_values.time = float(game->objects.time());
+            if (!hud.draw(hud_values, game->resources, error))
             {
                 spdlog::error("Original HUD: {}", error);
                 return 4;

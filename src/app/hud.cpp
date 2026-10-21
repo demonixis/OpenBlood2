@@ -159,6 +159,34 @@ namespace OpenBlood2
                 if (!data[d] && !data[d + 1] && !data[d + 2])
                     data[d + 3] = 0;
             }
+        // Item tabs at 0/75/150, the current item at 225 and its name at 275 (draw() uses the same).
+        const auto tabs = status_->item_tabs();
+        if (tabs[0]->hTab && tabs[1]->hTab && tabs[2]->hTab && tabs[3]->hTab && status_->item_name())
+        {
+            unsigned item_offset = 0;
+            for (const auto* s :
+                 {tabs[0]->hTab, tabs[1]->hTab, tabs[2]->hTab, tabs[3]->hTab, static_cast<HudSurface*>(nullptr)})
+            {
+                if (!s)
+                    s = status_->item_name();
+                if (s->width > width - item_offset || s->height > height - items_y ||
+                    s->rgba.size() != std::size_t(s->width) * s->height * 4)
+                {
+                    SDL_UnmapGPUTransferBuffer(device_, transfer_);
+                    error = "Original item tab exceeds atlas bounds";
+                    return false;
+                }
+                for (unsigned y = 0; y < s->height; ++y)
+                    for (unsigned x = 0; x < s->width; ++x)
+                    {
+                        const auto from = (y * s->width + x) * 4, to = ((items_y + y) * width + item_offset + x) * 4;
+                        std::copy_n(s->rgba.data() + from, 4, data + to);
+                        if (data[to] == 255 && data[to + 1] == 0 && data[to + 2] == 255)
+                            data[to + 3] = 0;
+                    }
+                item_offset += s->width;
+            }
+        }
         for (auto [surface, slot] : {std::pair{status_->team_icon, team_x}, std::pair{status_->flag_icon, flag_x}})
         {
             if (!surface)
@@ -224,6 +252,8 @@ namespace OpenBlood2
             status_ = std::make_unique<CNewStatusBar>(resources);
             resources_ = &resources;
             uploaded_revision_ = UINT64_MAX;
+            item_messages_ = UINT64_MAX;
+            item_shows_ = h.item_shows;
             crosshair_ = nullptr;
             if (!status_->Init())
             {
@@ -248,6 +278,30 @@ namespace OpenBlood2
             error = status_->canvas.error.empty() ? "Invalid original HUD state" : status_->canvas.error;
             return false;
         }
+        if (h.item_messages != item_messages_)
+        {
+            // One original UpdateInv per SMSG_ITEMCHANGED; names resolve cres.dll IDS_ITEM_*.
+            auto items = h.items;
+            for (auto* item : {&items.current, &items.previous, &items.next})
+                if (*item && (*item)->name_id)
+                {
+                    if (!item_names_read_)
+                    {
+                        item_names_read_ = true;
+                        std::vector<std::uint8_t> bytes;
+                        std::string read_error;
+                        if (const auto* dll = resources.find("cres.dll");
+                            !dll || dll->size > 32 * 1024 * 1024 || !resources.read("cres.dll", bytes, read_error) ||
+                            !read_string_resources(bytes, item_names_, read_error))
+                            status_->item_error = read_error.empty() ? "cres.dll item names unavailable" : read_error;
+                    }
+                    const auto name = item_names_.strings.find((*item)->name_id);
+                    (*item)->name = name != item_names_.strings.end() ? name->second : std::string{};
+                }
+            status_->UpdateInv(items, h.item_shows != item_shows_, h.time);
+            item_messages_ = h.item_messages;
+            item_shows_ = h.item_shows;
+        }
         if (!status_->UpdateCTF(h.ctf_team, h.ctf_flag))
         {
             error = status_->canvas.error.empty() ? "Invalid CTF HUD state" : status_->canvas.error;
@@ -269,6 +323,26 @@ namespace OpenBlood2
             }
             offset += s.width;
             ++i;
+        }
+        if (h.visible)
+        {
+            // Original Draw: the current item tab with the stat tabs, then DrawInvTabs.
+            const auto layout = status_->DrawInvTabs(h.time);
+            const auto tabs = status_->item_tabs();
+            const auto image = [&](const HudSurface* s, unsigned atlas_x, float x, float y)
+            {
+                draw->AddImage((ImTextureID)(intptr_t)texture_, {viewport->Pos.x + x, viewport->Pos.y + y},
+                               {viewport->Pos.x + x + s->width, viewport->Pos.y + y + s->height},
+                               {float(atlas_x) / atlas_width, float(items_y) / atlas_height},
+                               {float(atlas_x + s->width) / atlas_width, float(items_y + s->height) / atlas_height});
+            };
+            if (layout.current_item)
+                image(tabs[3]->hTab, 225, float(tabs[3]->locX), float(tabs[3]->locY));
+            for (unsigned t = 0; t < 3; ++t)
+                if (layout.visible[t])
+                    image(tabs[t]->hTab, 75 * t, float(layout.x[t]), float(layout.y[t]));
+            if (layout.name)
+                image(status_->item_name(), 275, float(layout.name_x), float(layout.name_y));
         }
         if (h.visible && h.ctf_team)
         {

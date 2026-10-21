@@ -4,6 +4,7 @@
 #include "GameInvItems.h"
 #include "Weapon.h"
 #include "game/inventory_state.h"
+#include "game/player_messages.h"
 #include <array>
 #include <memory>
 #include <optional>
@@ -44,6 +45,27 @@ class CInventoryMgr : public Aggregate
     std::optional<CInvBinoculars> binoculars;
     std::optional<CInvNightGoggles> goggles;
     std::unique_ptr<CInvTheEye> eye;
+    // Original item list cursor (m_pCurItem, SelectNextItem/SelectPrevItem/SelectItem,
+    // GetNextItem/GetPrevItem, GetItemCharges, UpdateClient). The port keeps typed items
+    // rather than the pickup-ordered list: the order is medkit, flashlight, goggles, the
+    // Eye, binoculars, keys in pickup order, then proximity/remote/time bombs. Zero-charge
+    // items are absent, as the original Update removes them. A key is identified by name.
+    struct ItemRef
+    {
+        DBYTE type = 0;
+        std::string key;
+        bool operator==(const ItemRef&) const;
+    };
+    std::vector<ItemRef> CarriedItems() const;
+    DBYTE GetItemCharges(const ItemRef&) const;
+    std::optional<ItemRef> GetCurrentItem();
+    void SelectNextItem();
+    void SelectPrevItem();
+    void SelectItem(DBYTE type);
+    // UpdateClient's values: current, previous and next around the cursor, show request.
+    OpenBlood2::InventoryItems ItemView();
+    std::optional<ItemRef> current_item;
+    bool show_items = false; // m_bShowItems: set by a successful cycle, consumed by ItemView.
     InventoryResult AddKey(const OpenBlood2::KeyItem&);
     InventoryResult QueryKey(std::string_view);
     std::vector<OpenBlood2::KeyItem> keys;
@@ -90,6 +112,8 @@ class CInventoryMgr : public Aggregate
     std::uint64_t revision = 0;
 
   private:
+    void ReconcileItemCursor();
+    std::vector<ItemRef> last_items_; // The list the cursor was last checked against.
     std::array<std::unique_ptr<CWeapon>, inventory_weapon_slots> m_Weapons{}, m_LWeapons{};
     DDWORD EngineMessageFn(LPBASECLASS, DDWORD, void*, DFLOAT) override;
 };

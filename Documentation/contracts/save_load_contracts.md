@@ -776,8 +776,9 @@ NPCs and corpses reuse it.
     type order (medkit, flashlight, goggles, eye, binoculars, then keys in pickup order),
     and a load restores that order. The original writes pickup order.
   - Non-key items carry their original picture names but NULL item names: the port has no
-    server `FormatString`. The current item is written as `INV_NONE`: the port has no item
-    cursor.
+    server `FormatString`. The current item is written as its type, and Load selects the
+    first carried item of that type ([inventory cursor](inventory_cursor_contracts.md)).
+    Earlier saves wrote `INV_NONE`.
   - An unknown item type is refused; the original skips the item's data and desynchronizes.
     A thrown eye (a non-NULL SeeingEye reference) was refused until lot 9, which binds it.
   - The original does not save the eye level. The crouch state and eye level are derived

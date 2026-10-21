@@ -1,6 +1,8 @@
 #pragma once
 #include "basedefs_de.h"
 #include <array>
+#include <cstdint>
+#include <optional>
 #include <string>
 #include <variant>
 
@@ -36,6 +38,34 @@ namespace OpenBlood2
     {
         DBYTE type = 1;
         bool active = false;
+    };
+    // Original COMMAND_NEXTINVENTORY/PREVINVENTORY (client to server).
+    struct PlayerItemCursor
+    {
+        bool next = true;
+    };
+    // Original COMMAND_USEINVENTORY (client to server).
+    struct PlayerUseInventory
+    {
+    };
+    // One SMSG_ITEMCHANGED item: original picture names (interface/statusbar/items/),
+    // the cres.dll name resource (0 for keys) or a key's authored display name, and
+    // GetItemCharges.
+    struct InventoryItemView
+    {
+        DBYTE type = 0;
+        std::string icon, highlighted_icon, name;
+        std::uint32_t name_id = 0;
+        DBYTE charges = 0;
+        bool operator==(const InventoryItemView&) const = default;
+    };
+    // Original SMSG_ITEMCHANGED values: current, previous and next items around the
+    // cursor; show is ITEMF_SHOWITEMS (a one-shot request to slide the tabs in).
+    struct InventoryItems
+    {
+        std::optional<InventoryItemView> current, previous, next;
+        bool show = false;
+        bool operator==(const InventoryItems&) const = default;
     };
     // Original SMSG_ZOOMVIEW: zoom flag and crosshair override (0 keeps the current one).
     struct ZoomView
@@ -194,8 +224,8 @@ namespace OpenBlood2
         std::string next_world; // Empty represents the source null HSTRING.
         WorldExitType type = WorldExitType::World;
     };
-    using PlayerEvent =
-        std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats, MissionObjectives,
-                     WorldExit, BossHealth, Conversation, InventoryAction, ScreenFade, VoiceEvent, VoiceStop,
-                     PlayerDead, MusicCommand, ZoomView, SeeingEyeView, CreatureAttach, OrbView, CTFEvent>;
+    using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
+                                     MissionObjectives, WorldExit, BossHealth, Conversation, InventoryAction,
+                                     ScreenFade, VoiceEvent, VoiceStop, PlayerDead, MusicCommand, ZoomView,
+                                     SeeingEyeView, CreatureAttach, OrbView, CTFEvent, InventoryItems>;
 } // namespace OpenBlood2

@@ -81,6 +81,38 @@ bool CPlayerObj::OnCommandItem(DBYTE type)
     return m_InventoryMgr.SetActiveItem(type) == InventoryResult::Ok;
 }
 
+// Original OnCommandOn COMMAND_NEXTINVENTORY / COMMAND_PREVINVENTORY.
+bool CPlayerObj::OnCommandItemCursor(bool next)
+{
+    if (!g_pServerDE->IsObjectAlive(m_hObject) || m_bDead || m_damage.IsDead() || MovementBlocked() ||
+        camera_movement_blocked)
+        return false;
+    next ? m_InventoryMgr.SelectNextItem() : m_InventoryMgr.SelectPrevItem();
+    return true;
+}
+// Original OnCommandOn COMMAND_USEINVENTORY: no run-key exclusion, and an active Eye lets
+// the command through a movement block (it then uses the current item, whatever it is).
+bool CPlayerObj::OnCommandUseInventory()
+{
+    const bool eye_active = m_InventoryMgr.eye && m_InventoryMgr.eye->active;
+    if (!g_pServerDE->IsObjectAlive(m_hObject) || m_bDead || m_damage.IsDead() ||
+        (!eye_active && (MovementBlocked() || camera_movement_blocked)))
+        return false;
+    const auto item = m_InventoryMgr.GetCurrentItem();
+    return item && m_InventoryMgr.SetActiveItem(item->type) == InventoryResult::Ok;
+}
+bool CPlayerObj::UpdateInventoryClient(bool force)
+{
+    auto items = m_InventoryMgr.ItemView();
+    if (!force && !items.show && last_sent_items_ == items)
+        return true;
+    if (GetServerDE()->SendToClient(m_hClient, items) != DE_OK)
+        return false;
+    items.show = false; // A one-shot request, never part of the change comparison.
+    last_sent_items_ = std::move(items);
+    ++inventory_item_messages;
+    return true;
+}
 bool CPlayerObj::OnCommandAltFire()
 {
     auto* s = GetServerDE();

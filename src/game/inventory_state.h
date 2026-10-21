@@ -24,6 +24,7 @@ namespace OpenBlood2
         bool eye = false;                       // No cross-world object identity; restored in hand, inactive.
         bool binoculars = false; // Owned item; InvItem::Load always clears its active flag.
         DBYTE strength = 1, magic = 1, current_slot = 0;
+        DBYTE current_item = 0; // Original current-item type (0 none); Load selects the first of it.
         bool infinite_ammo = false;
         float damage_multiplier = 1;
     };

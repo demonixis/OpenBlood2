@@ -287,7 +287,8 @@ bool CPlayerObj::LoadFields(const OpenBlood2::PlayerState& state, std::string& e
     move_state = static_cast<MoveState>(state.move_state);
     original_values = state.carried;
     m_nLastHitPoints = m_nLastDamage = 0; // Original Load invalidates health/damage caches.
-    last_sent_stats_ = {0, 0, 0};         // Source invalidates its last-sent stat caches without changing actual stats.
+    last_sent_items_.reset();
+    last_sent_stats_ = {0, 0, 0}; // Source invalidates its last-sent stat caches without changing actual stats.
     restore_fields_loaded = true;
     restore_model_loaded = false;
     restore_engine_loaded = false;
