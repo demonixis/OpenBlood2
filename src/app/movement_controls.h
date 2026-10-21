@@ -1,4 +1,5 @@
 #pragma once
+#include "app/input_actions.h"
 #include "game/player_messages.h"
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_events.h>
@@ -11,12 +12,15 @@
 
 namespace OpenBlood2
 {
-    // Physical keys: WASD on QWERTY, ZQSD on AZERTY. Input state is cleared on
-    // focus loss; only events for this window participate. Also testable headless.
+    // Device state behind InputBindings (default: the keyboard/mouse layout listed there).
+    // Input state is cleared on focus loss; only events for this window participate.
+    // Also testable headless.
     struct MovementControls
     {
+        InputBindings bindings = InputBindings::keyboard_mouse();
         std::array<bool, SDL_SCANCODE_COUNT> keys{};
         int pending_weapon_slot = -1;
+        // Default number-key layout: 1..9 then 0, top row or keypad.
         static int weapon_slot(SDL_Scancode code)
         {
             if (code >= SDL_SCANCODE_1 && code <= SDL_SCANCODE_0)
@@ -30,13 +34,11 @@ namespace OpenBlood2
             const auto slot = std::exchange(pending_weapon_slot, -1);
             return focused && enabled && !text_editing ? slot : -1;
         }
-        bool focused = false, enabled = true, use_suppressed = false;
-        bool flashlight_suppressed = false;
-        bool medkit_suppressed = false, proximity_suppressed = false, time_bomb_suppressed = false,
-             remote_suppressed = false, detonate_suppressed = false, binoculars_suppressed = false,
-             goggles_suppressed = false, eye_suppressed = false;
+        bool focused = false, enabled = true;
+        // Press actions held since play last refused input (focus, inspector, text editing).
+        std::array<bool, input_action_count> suppressed{};
         bool mouse_requested = false, mouse_captured = false;
-        std::array<bool, 2> mouse_buttons{}, fire_suppressed{};
+        std::array<bool, SDL_BUTTON_X2> mouse_buttons{}; // Indexed by SDL button - 1.
         float mouse_x = 0, mouse_y = 0;
         float mouse_sensitivity = .0025f;
         bool invert_y = false;
@@ -44,12 +46,24 @@ namespace OpenBlood2
         {
             bool primary = false, alternate = false;
         };
+        // OR of every bound source; mouse buttons count only while captured.
+        bool held(InputAction action) const
+        {
+            for (const auto& b : bindings.entries)
+                if (b.action == action &&
+                    (b.source == InputSource::Key ? keys[unsigned(b.code)]
+                                                  : mouse_captured && mouse_buttons[unsigned(b.code - 1)]))
+                    return true;
+            return false;
+        }
         void release_mouse()
         {
             mouse_requested = false;
             mouse_buttons = {};
             mouse_x = mouse_y = 0;
-            fire_suppressed = {keys[SDL_SCANCODE_F], keys[SDL_SCANCODE_G]};
+            // A fire key held across the release may not start firing on its own.
+            for (const auto action : {InputAction::FirePrimary, InputAction::FireAlternate})
+                suppressed[std::size_t(action)] = held(action);
         }
         void request_play()
         {
@@ -60,9 +74,7 @@ namespace OpenBlood2
         {
             pending_weapon_slot = -1;
             keys = {};
-            flashlight_suppressed = false;
-            use_suppressed = medkit_suppressed = proximity_suppressed = time_bomb_suppressed = remote_suppressed =
-                detonate_suppressed = binoculars_suppressed = goggles_suppressed = eye_suppressed = false;
+            suppressed = {};
             release_mouse();
             if (play)
                 request_play();
@@ -97,39 +109,8 @@ namespace OpenBlood2
             if (!focused || !enabled || text_editing ||
                 (event.type != SDL_EVENT_KEY_DOWN && event.type != SDL_EVENT_KEY_UP))
                 return false;
-            if (weapon_slot(event.key.scancode) >= 0)
-                return true;
-            switch (event.key.scancode)
-            {
-                case SDL_SCANCODE_W:
-                case SDL_SCANCODE_A:
-                case SDL_SCANCODE_S:
-                case SDL_SCANCODE_D:
-                case SDL_SCANCODE_LSHIFT:
-                case SDL_SCANCODE_RSHIFT:
-                case SDL_SCANCODE_LCTRL:
-                case SDL_SCANCODE_RCTRL:
-                case SDL_SCANCODE_F:
-                case SDL_SCANCODE_G:
-                case SDL_SCANCODE_R:
-                case SDL_SCANCODE_B:
-                case SDL_SCANCODE_T:
-                case SDL_SCANCODE_P:
-                case SDL_SCANCODE_L:
-                case SDL_SCANCODE_H:
-                case SDL_SCANCODE_N:
-                case SDL_SCANCODE_I:
-                case SDL_SCANCODE_Z:
-                case SDL_SCANCODE_E:
-                case SDL_SCANCODE_SPACE:
-                case SDL_SCANCODE_LEFT:
-                case SDL_SCANCODE_RIGHT:
-                case SDL_SCANCODE_UP:
-                case SDL_SCANCODE_DOWN:
-                    return true;
-                default:
-                    return false;
-            }
+            return bindings.bound_if(InputSource::Key, event.key.scancode, [](InputAction action)
+                                     { return info(action).kind != InputActionKind::Interface; });
         }
         void event(const SDL_Event& event, SDL_WindowID window, bool text_editing = false)
         {
@@ -138,7 +119,7 @@ namespace OpenBlood2
                 focused = false;
                 pending_weapon_slot = -1;
                 keys = {};
-                flashlight_suppressed = false;
+                suppressed = {};
                 release_mouse();
             }
             if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED && event.window.windowID == window)
@@ -152,31 +133,32 @@ namespace OpenBlood2
                     mouse_y = std::clamp(mouse_y + event.motion.yrel, -10000.f, 10000.f);
                 }
                 if ((event.type == SDL_EVENT_MOUSE_BUTTON_DOWN || event.type == SDL_EVENT_MOUSE_BUTTON_UP) &&
-                    event.button.windowID == window)
-                {
-                    if (event.button.button == SDL_BUTTON_LEFT)
-                        mouse_buttons[0] = event.type == SDL_EVENT_MOUSE_BUTTON_DOWN;
-                    if (event.button.button == SDL_BUTTON_RIGHT)
-                        mouse_buttons[1] = event.type == SDL_EVENT_MOUSE_BUTTON_DOWN;
-                }
+                    event.button.windowID == window && event.button.button >= SDL_BUTTON_LEFT &&
+                    event.button.button <= SDL_BUTTON_X2)
+                    mouse_buttons[event.button.button - 1u] = event.type == SDL_EVENT_MOUSE_BUTTON_DOWN;
             }
             if ((event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP) && event.key.windowID == window)
             {
                 if (!focused && event.type == SDL_EVENT_KEY_DOWN)
                     return;
                 const int code = event.key.scancode;
-                if ((code == SDL_SCANCODE_L || code == SDL_SCANCODE_R || code == SDL_SCANCODE_B ||
-                     code == SDL_SCANCODE_T || code == SDL_SCANCODE_P || code == SDL_SCANCODE_H ||
-                     code == SDL_SCANCODE_E || code == SDL_SCANCODE_F || code == SDL_SCANCODE_G ||
-                     code == SDL_SCANCODE_Z || code == SDL_SCANCODE_N || code == SDL_SCANCODE_I) &&
-                    event.type == SDL_EVENT_KEY_DOWN && event.key.repeat && !keys[static_cast<unsigned>(code)])
-                    return; // A held key after focus loss is not a fresh USE press.
-                if (code > SDL_SCANCODE_UNKNOWN && code < SDL_SCANCODE_COUNT)
-                    keys[static_cast<unsigned>(code)] = event.type == SDL_EVENT_KEY_DOWN;
+                if (code <= SDL_SCANCODE_UNKNOWN || code >= SDL_SCANCODE_COUNT)
+                    return;
+                // A held key after focus loss is not a fresh USE/fire/item press.
+                if (event.type == SDL_EVENT_KEY_DOWN && event.key.repeat && !keys[unsigned(code)] &&
+                    bindings.bound_if(InputSource::Key, code,
+                                      [](InputAction action) { return info(action).kind == InputActionKind::Press; }))
+                    return;
+                keys[unsigned(code)] = event.type == SDL_EVENT_KEY_DOWN;
                 if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat)
                 {
-                    if (enabled && !text_editing && weapon_slot(event.key.scancode) >= 0)
-                        pending_weapon_slot = weapon_slot(event.key.scancode);
+                    if (enabled && !text_editing)
+                        for (const auto& b : bindings.entries)
+                            if (b.source == InputSource::Key && b.code == code && weapon_slot_index(b.action) >= 0)
+                            {
+                                pending_weapon_slot = weapon_slot_index(b.action);
+                                break;
+                            }
                     if (code == SDL_SCANCODE_F2)
                         enabled = !enabled;
                     if (code == SDL_SCANCODE_F3)
@@ -186,7 +168,8 @@ namespace OpenBlood2
                         else
                             request_play();
                     }
-                    if (code == SDL_SCANCODE_ESCAPE || (code == SDL_SCANCODE_F1 && (mouse_requested || mouse_captured)))
+                    if (bindings.bound(InputSource::Key, code, InputAction::Menu) ||
+                        (code == SDL_SCANCODE_F1 && (mouse_requested || mouse_captured)))
                         release_mouse();
                 }
             }
@@ -195,139 +178,68 @@ namespace OpenBlood2
         {
             if (!focused || !enabled || text_editing)
                 return {};
-            return {keys[SDL_SCANCODE_W],
-                    keys[SDL_SCANCODE_S],
-                    keys[SDL_SCANCODE_A],
-                    keys[SDL_SCANCODE_D],
-                    keys[SDL_SCANCODE_LSHIFT] || keys[SDL_SCANCODE_RSHIFT],
-                    keys[SDL_SCANCODE_SPACE],
-                    keys[SDL_SCANCODE_LCTRL] || keys[SDL_SCANCODE_RCTRL]};
+            return {held(InputAction::MoveForward), held(InputAction::MoveBackward), held(InputAction::StrafeLeft),
+                    held(InputAction::StrafeRight), held(InputAction::Run),          held(InputAction::Jump),
+                    held(InputAction::Crouch)};
+        }
+        // Press actions: held state, refused (and re-armed only by a release) while play refuses input.
+        bool sample_press(InputAction action, bool text_editing)
+        {
+            const bool down = held(action);
+            auto& refused = suppressed[std::size_t(action)];
+            if (!down)
+                refused = false;
+            if (!focused || !enabled || text_editing)
+            {
+                refused = down;
+                return false;
+            }
+            return down && !refused;
         }
         bool sample_remote(bool text_editing)
         {
-            if (!keys[SDL_SCANCODE_R])
-                remote_suppressed = false;
-            if (!focused || !enabled || text_editing)
-            {
-                remote_suppressed = keys[SDL_SCANCODE_R];
-                return false;
-            }
-            return keys[SDL_SCANCODE_R] && !remote_suppressed;
+            return sample_press(InputAction::RemoteBomb, text_editing);
         }
         bool sample_detonate(bool text_editing)
         {
-            if (!keys[SDL_SCANCODE_B])
-                detonate_suppressed = false;
-            if (!focused || !enabled || text_editing)
-            {
-                detonate_suppressed = keys[SDL_SCANCODE_B];
-                return false;
-            }
-            return keys[SDL_SCANCODE_B] && !detonate_suppressed;
+            return sample_press(InputAction::Detonate, text_editing);
         }
         bool sample_proximity(bool text_editing)
         {
-            if (!keys[SDL_SCANCODE_P])
-                proximity_suppressed = false;
-            if (!focused || !enabled || text_editing)
-            {
-                proximity_suppressed = keys[SDL_SCANCODE_P];
-                return false;
-            }
-            return keys[SDL_SCANCODE_P] && !proximity_suppressed;
+            return sample_press(InputAction::ProximityBomb, text_editing);
         }
         bool sample_time_bomb(bool text_editing)
         {
-            if (!keys[SDL_SCANCODE_T])
-                time_bomb_suppressed = false;
-            if (!focused || !enabled || text_editing)
-            {
-                time_bomb_suppressed = keys[SDL_SCANCODE_T];
-                return false;
-            }
-            return keys[SDL_SCANCODE_T] && !time_bomb_suppressed;
+            return sample_press(InputAction::TimeBomb, text_editing);
         }
         bool sample_flashlight(bool text_editing)
         {
-            if (!keys[SDL_SCANCODE_L])
-                flashlight_suppressed = false;
-            if (!focused || !enabled || text_editing)
-            {
-                flashlight_suppressed = keys[SDL_SCANCODE_L];
-                return false;
-            }
-            return keys[SDL_SCANCODE_L] && !flashlight_suppressed;
+            return sample_press(InputAction::Flashlight, text_editing);
         }
         bool sample_goggles(bool text_editing)
         {
-            if (!keys[SDL_SCANCODE_N])
-                goggles_suppressed = false;
-            if (!focused || !enabled || text_editing)
-            {
-                goggles_suppressed = keys[SDL_SCANCODE_N];
-                return false;
-            }
-            return keys[SDL_SCANCODE_N] && !goggles_suppressed;
+            return sample_press(InputAction::NightGoggles, text_editing);
         }
         bool sample_eye(bool text_editing)
         {
-            if (!keys[SDL_SCANCODE_I])
-                eye_suppressed = false;
-            if (!focused || !enabled || text_editing)
-            {
-                eye_suppressed = keys[SDL_SCANCODE_I];
-                return false;
-            }
-            return keys[SDL_SCANCODE_I] && !eye_suppressed;
+            return sample_press(InputAction::TheEye, text_editing);
         }
         bool sample_binoculars(bool text_editing)
         {
-            if (!keys[SDL_SCANCODE_Z])
-                binoculars_suppressed = false;
-            if (!focused || !enabled || text_editing)
-            {
-                binoculars_suppressed = keys[SDL_SCANCODE_Z];
-                return false;
-            }
-            return keys[SDL_SCANCODE_Z] && !binoculars_suppressed;
+            return sample_press(InputAction::Binoculars, text_editing);
         }
         bool sample_medkit(bool text_editing)
         {
-            if (!keys[SDL_SCANCODE_H])
-                medkit_suppressed = false;
-            if (!focused || !enabled || text_editing)
-            {
-                medkit_suppressed = keys[SDL_SCANCODE_H];
-                return false;
-            }
-            return keys[SDL_SCANCODE_H] && !medkit_suppressed;
+            return sample_press(InputAction::Medkit, text_editing);
         }
         bool sample_use(bool text_editing)
         {
-            if (!keys[SDL_SCANCODE_E])
-                use_suppressed = false;
-            if (!focused || !enabled || text_editing)
-            {
-                use_suppressed = keys[SDL_SCANCODE_E];
-                return false;
-            }
-            return keys[SDL_SCANCODE_E] && !use_suppressed;
+            return sample_press(InputAction::Use, text_editing);
         }
         FireButtons sample_fire(bool text_editing)
         {
-            const std::array<bool, 2> held{keys[SDL_SCANCODE_F] || (mouse_captured && mouse_buttons[0]),
-                                           keys[SDL_SCANCODE_G] || (mouse_captured && mouse_buttons[1])};
-            std::array<bool, 2> result{};
-            for (unsigned i = 0; i < 2; ++i)
-            {
-                if (!held[i])
-                    fire_suppressed[i] = false;
-                if (!focused || !enabled || text_editing)
-                    fire_suppressed[i] = held[i];
-                else
-                    result[i] = held[i] && !fire_suppressed[i];
-            }
-            return {result[0], result[1]};
+            const bool primary = sample_press(InputAction::FirePrimary, text_editing);
+            return {primary, sample_press(InputAction::FireAlternate, text_editing)};
         }
         // zoomed: original CBloodClientShell quarters mouse offsets while m_bZoomView (keys unchanged).
         void look(PlayerRotation& rotation, double seconds, bool text_editing, bool zoomed = false)
@@ -343,9 +255,10 @@ namespace OpenBlood2
                 rotation.yaw = std::remainder(rotation.yaw + dx * scale, 6.28318530718f);
                 rotation.pitch += dy * scale * (invert_y ? -1.f : 1.f);
             }
-            rotation.yaw += (int(keys[SDL_SCANCODE_RIGHT]) - int(keys[SDL_SCANCODE_LEFT])) * 2 * dt;
-            rotation.pitch = std::clamp(
-                rotation.pitch + (int(keys[SDL_SCANCODE_DOWN]) - int(keys[SDL_SCANCODE_UP])) * dt, -1.48f, 1.48f);
+            rotation.yaw += (int(held(InputAction::TurnRight)) - int(held(InputAction::TurnLeft))) * 2 * dt;
+            rotation.pitch =
+                std::clamp(rotation.pitch + (int(held(InputAction::LookDown)) - int(held(InputAction::LookUp))) * dt,
+                           -1.48f, 1.48f);
         }
     };
 } // namespace OpenBlood2

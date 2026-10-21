@@ -50,10 +50,11 @@ namespace OpenBlood2
             if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat)
             {
                 const auto key = e.key.scancode;
+                const auto& bindings = controls.bindings;
                 if (finished())
                 {
-                    quit |= key == SDL_SCANCODE_ESCAPE || key == SDL_SCANCODE_RETURN || key == SDL_SCANCODE_KP_ENTER ||
-                            key == SDL_SCANCODE_SPACE;
+                    quit |= key == SDL_SCANCODE_SPACE || bindings.matches(e, InputAction::Menu) ||
+                            bindings.matches(e, InputAction::MenuAccept) || bindings.matches(e, InputAction::MenuBack);
                     return false;
                 }
                 if (key == SDL_SCANCODE_F10)
@@ -63,13 +64,13 @@ namespace OpenBlood2
                     reset(controls, inspector, player);
                     return false;
                 }
-                if (key == SDL_SCANCODE_ESCAPE && !inspector)
+                if (bindings.matches(e, InputAction::Menu) && !inspector)
                 {
                     state = paused() ? State::Playing : State::Paused;
                     reset(controls, inspector, player);
                     return false;
                 }
-                if (!inspector && player && !alive && (key == SDL_SCANCODE_RETURN || key == SDL_SCANCODE_KP_ENTER))
+                if (!inspector && player && !alive && bindings.matches(e, InputAction::MenuAccept))
                 {
                     restart = true; // App-level fresh entry, not a source save/respawn operation.
                     return false;

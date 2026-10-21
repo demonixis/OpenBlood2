@@ -61,6 +61,14 @@ namespace OpenBlood2
             quick_save = quick_load = false;
             controls.player_changed(player && !menu.active && !credits_screen && !inspector);
         }
+        // Original promotion keys: Esc, Space or Enter; other devices use the menu actions.
+        bool dismisses_promotion(const SDL_Event& e) const
+        {
+            const auto& b = controls.bindings;
+            return (e.type == SDL_EVENT_KEY_DOWN && e.key.scancode == SDL_SCANCODE_SPACE) ||
+                   b.matches(e, InputAction::Menu) || b.matches(e, InputAction::MenuAccept) ||
+                   b.matches(e, InputAction::MenuBack);
+        }
         // True means the caller should forward this event to ImGui's inspector.
         bool event(const SDL_Event& e, SDL_WindowID window, Menu& menu, bool player, bool alive,
                    bool inspector_available, float width, float height)
@@ -90,11 +98,12 @@ namespace OpenBlood2
             }
             if (!controls.focused)
                 return false;
+            const auto& bindings = controls.bindings;
+            const bool pressed = e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat;
+            const auto press = [&](InputAction action) { return pressed && bindings.matches(e, action); };
             if (menu.promotion != MenuPromotion::None)
             {
-                if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat &&
-                    (e.key.scancode == SDL_SCANCODE_ESCAPE || e.key.scancode == SDL_SCANCODE_SPACE ||
-                     e.key.scancode == SDL_SCANCODE_RETURN || e.key.scancode == SDL_SCANCODE_KP_ENTER))
+                if (pressed && dismisses_promotion(e))
                 {
                     menu.dismiss_promotion();
                     reset(menu, player);
@@ -124,7 +133,7 @@ namespace OpenBlood2
                 }
             if (credits_screen)
                 return false;
-            if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.scancode == SDL_SCANCODE_ESCAPE)
+            if (press(InputAction::Menu) || (menu.active && press(InputAction::MenuBack)))
             {
                 if (menu.active)
                     menu.back();
@@ -133,8 +142,7 @@ namespace OpenBlood2
                 reset(menu, player);
                 return false;
             }
-            if (menu.demo() && !menu.active && player && !alive && e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat &&
-                (e.key.scancode == SDL_SCANCODE_RETURN || e.key.scancode == SDL_SCANCODE_KP_ENTER))
+            if (menu.demo() && !menu.active && player && !alive && press(InputAction::MenuAccept))
             {
                 demo.restart = true; // Shared owned retry hook; future checkpoint restore replaces the app handler.
                 return false;
@@ -150,28 +158,17 @@ namespace OpenBlood2
                         menu.activate();
                         return false;
                     }
-                    switch (e.key.scancode)
-                    {
-                        case SDL_SCANCODE_UP:
-                            menu.select(-1);
-                            break;
-                        case SDL_SCANCODE_DOWN:
-                            menu.select(1);
-                            break;
-                        case SDL_SCANCODE_LEFT:
-                            menu.adjust(-1);
-                            break;
-                        case SDL_SCANCODE_RIGHT:
-                            menu.adjust(1);
-                            break;
-                        case SDL_SCANCODE_RETURN:
-                        case SDL_SCANCODE_KP_ENTER:
-                            if (!e.key.repeat)
-                                menu.activate();
-                            break;
-                        default:
-                            break;
-                    }
+                    // Navigation repeats while held; activation needs a fresh press.
+                    if (bindings.matches(e, InputAction::MenuUp))
+                        menu.select(-1);
+                    if (bindings.matches(e, InputAction::MenuDown))
+                        menu.select(1);
+                    if (bindings.matches(e, InputAction::MenuLeft))
+                        menu.adjust(-1);
+                    if (bindings.matches(e, InputAction::MenuRight))
+                        menu.adjust(1);
+                    if (press(InputAction::MenuAccept))
+                        menu.activate();
                 }
                 if (e.type == SDL_EVENT_MOUSE_MOTION ||
                     ((e.type == SDL_EVENT_MOUSE_BUTTON_DOWN || e.type == SDL_EVENT_MOUSE_BUTTON_UP) &&
@@ -188,17 +185,17 @@ namespace OpenBlood2
             }
             // F5 quicksaves without pausing when in the world and alive; F6 quickloads in play,
             // dead or alive. The single-player check belongs to the save itself (D12).
-            if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && !menu.demo() &&
-                (e.key.scancode == SDL_SCANCODE_F5 || e.key.scancode == SDL_SCANCODE_F6))
+            const bool quick_save_key = bindings.matches(e, InputAction::QuickSave),
+                       quick_load_key = bindings.matches(e, InputAction::QuickLoad);
+            if (pressed && !menu.demo() && (quick_save_key || quick_load_key))
             {
-                if (e.key.scancode == SDL_SCANCODE_F5 && player && alive)
+                if (quick_save_key && player && alive)
                     quick_save = true;
-                if (e.key.scancode == SDL_SCANCODE_F6 && player)
+                if (quick_load_key && player)
                     quick_load = true;
                 return false;
             }
-            if ((e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_KEY_UP) &&
-                (e.key.scancode == SDL_SCANCODE_F5 || e.key.scancode == SDL_SCANCODE_F6))
+            if (quick_save_key || quick_load_key)
                 return false;
             // Diagnostic control shortcuts do not change interactive ownership.
             if ((e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_KEY_UP) &&

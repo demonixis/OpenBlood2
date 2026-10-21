@@ -212,7 +212,8 @@ namespace OpenBlood2
                                     BLOOD2_INSPECTOR && options.inspector, float(width), float(height));
                     ImGui_ImplSDL3_ProcessEvent(&event);
                     if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat &&
-                        event.key.scancode == SDL_SCANCODE_ESCAPE)
+                        (input.controls.bindings.matches(event, InputAction::Menu) ||
+                         input.controls.bindings.matches(event, InputAction::MenuBack)))
                         dismiss_error = true;
                     continue;
                 }
@@ -505,6 +506,7 @@ namespace OpenBlood2
                 shell.proximity_down = input.controls.sample_proximity(false);
                 shell.remote_down = input.controls.sample_remote(false);
                 shell.detonate_down = input.controls.sample_detonate(false);
+                shell.time_bomb_down = input.controls.sample_time_bomb(false);
                 if (const int slot = input.controls.sample_weapon_slot(false); slot >= 0)
                     if (!game->command_weapon(DBYTE(slot), error))
                         spdlog::info("Weapon selection: {}", error);

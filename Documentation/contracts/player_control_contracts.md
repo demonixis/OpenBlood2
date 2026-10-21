@@ -40,7 +40,8 @@ seconds. The explicit replacement device policy is .0025 radians per SDL relativ
 wrapped mouse yaw and pitch limited to [-1.48,1.48]. Finite deltas are bounded to 10,000
 units per accumulated axis; nonfinite events are ignored. Suppressed frames discard
 motion instead of replaying it. These bindings/sensitivity are not recovered retail
-configuration; rebinding, controller/touch/VR input and sensitivity UI remain pending.
+configuration. Keys and buttons now reach play through the [input action layer](input_action_contracts.md),
+whose default table is this layout; rebinding UI, controller/touch/VR input remain pending.
 
 Only events belonging to the app window change the state. Focus loss clears keys and
 mouse state; capture does not automatically return on focus gain. Disabled controls,

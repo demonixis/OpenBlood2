@@ -48,6 +48,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Player Locomotion Boundary](locomotion_contracts.md)
 - [Original MoveMgr Boundary](movement_contracts.md)
 - [Original Player Entry Boundary](player_contracts.md)
+- [Input actions and keyboard/mouse bindings](input_action_contracts.md)
 - [Keyboard fire and relative mouse controls](player_control_contracts.md)
 - [Named keep-alive player entry](player_keepalive_contracts.md)
 - [Player engine restoration and restored client association](player_restore_contracts.md)

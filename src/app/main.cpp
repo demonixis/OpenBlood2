@@ -491,7 +491,8 @@ namespace
             {
                 const bool escape_releases_mouse =
                     event.type == SDL_EVENT_KEY_DOWN && event.key.windowID == SDL_GetWindowID(runtime.window) &&
-                    event.key.scancode == SDL_SCANCODE_ESCAPE && (controls.mouse_requested || controls.mouse_captured);
+                    controls.bindings.matches(event, OpenBlood2::InputAction::Menu) &&
+                    (controls.mouse_requested || controls.mouse_captured);
 #if BLOOD2_INSPECTOR
                 controls.event(event, SDL_GetWindowID(runtime.window),
                                inspector_visible && !inspector.collapsed && ImGui::GetIO().WantTextInput);
