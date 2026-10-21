@@ -1,6 +1,7 @@
 #include "dls_scalar_reference.h"
 #include "engine/audio.h"
 #include "engine/dls_sampler.h"
+#include "engine/config.h"
 #include "game/server_adapter.h"
 #include <algorithm>
 #include <cmath>
@@ -180,6 +181,82 @@ namespace
         CHECK(send(0x94, 60, 100) && sampler.advance(480, {}));
         CHECK(send(0xc4, 1, 0) && send(0x94, 60, 100));
         CHECK(sampler.voices().back().instrument == 1 && sampler.voices().front().choke_frame);
+        return true;
+    }
+    // DLS Level 1: an existing, unambiguous instrument with no region for the key sounds nothing.
+    // Received notes are counted once per patch/key; auditions and every other lookup fail as before.
+    bool uncovered_key()
+    {
+        std::string error;
+        auto bank = fixture();
+        auto& regions = bank->instruments[0].regions;
+        regions[0].key_low = 0;
+        regions[0].key_high = 23;
+        regions.push_back(regions[0]);
+        regions[1].key_low = 60;
+        regions[1].key_high = 127; // Keys 24-59 are a gap.
+        std::optional<std::size_t> out;
+        bool uncovered = false;
+        CHECK(!find_dls_instrument(*bank, {}, 48, out, error, &uncovered) && uncovered && !out);
+        CHECK(error == "No DLS region covers this MIDI key");
+        CHECK(find_dls_instrument(*bank, {}, 60, out, error, &uncovered) && !uncovered && out == 0);
+        DlsMidiChannel missing{0, 0, 13, false, {}};
+        CHECK(!find_dls_instrument(*bank, missing, 48, out, error, &uncovered) && !uncovered);
+        DlsSampler sampler;
+        auto send = [&](unsigned status, unsigned first, unsigned second)
+        { return sampler.receive(bank, std::uint8_t(status), std::uint8_t(first), std::uint8_t(second), 1, error); };
+        CHECK(send(0x90, 48, 100) && sampler.voices().empty() && sampler.midi_uncovered_notes == 1);
+        CHECK(sampler.uncovered_notes.size() == 1 && sampler.uncovered_notes[0].key == 48 &&
+              sampler.uncovered_notes[0].program == 0 && sampler.uncovered_notes[0].frame == 0);
+        CHECK(sampler.advance(100, {}) && send(0x90, 48, 90) && sampler.midi_uncovered_notes == 2);
+        CHECK(sampler.uncovered_notes.size() == 1 && send(0x91, 30, 100) && sampler.uncovered_notes.size() == 2);
+        CHECK(sampler.uncovered_notes[1].frame == 100 && sampler.midi_rejected == 0 && sampler.last_midi_error.empty());
+        CHECK(send(0x80, 48, 0) && sampler.midi_unmatched_stops == 1); // Its stop finds no voice.
+        CHECK(send(0x90, 60, 100) && sampler.voices().size() == 1);   // Covered keys still sound.
+        // A missing patch, an ambiguous patch and auditions stay explicit failures.
+        CHECK(send(0xc2, 13, 0) && !send(0x92, 48, 100) && sampler.midi_rejected == 1);
+        CHECK(error == "No DLS instrument for this MIDI patch/key");
+        bank->instruments.push_back(bank->instruments[0]);
+        CHECK(!send(0x93, 48, 100) && error == "Ambiguous DLS packed patch or invalid instrument");
+        bank->instruments.pop_back();
+        CHECK(!sampler.play_channel(bank, {}, 48, 100, 1, 1, error) && error == "No DLS region covers this MIDI key");
+        CHECK(sampler.midi_uncovered_notes == 3 && sampler.voices().size() == 1);
+        sampler.clear();
+        CHECK(sampler.midi_uncovered_notes == 0 && sampler.uncovered_notes.empty());
+        return true;
+    }
+    // Regression: Track1's program 13 has regions 0-11, 12-23 and 60-127, and the IMA music of
+    // Slaughter House and the Ancient One plays its key 48 about four seconds in. Both worlds must run
+    // past that note with no failure, and the note must be recorded as uncovered.
+    bool uncovered_private(const std::filesystem::path& root)
+    {
+        std::string error;
+        for (const char* world : {"11_slaughter_house", "25_ancientone"})
+        {
+            auto game = std::make_unique<GameSession>();
+            Config config;
+            config.data_dir = root;
+            CHECK(game->initialize() && game->resources.mount_game(config, error));
+            CHECK(GameSession::start_new_game(game, world, 1, 0, error));
+            game->server_shell.Player(game->local_client)->m_damage.m_bGodMode = true;
+            for (unsigned step = 0; step < 200; ++step)
+                if (!game->step(.05))
+                {
+                    for (const auto& line : game->step_errors())
+                        std::cerr << line << '\n';
+                    std::cerr << world << ": step " << step << " failed\n";
+                    return false;
+                }
+            const auto& sampler = game->server.audio.instruments;
+            CHECK(sampler.midi_rejected == 0 && sampler.dispatch_failures == 0 && sampler.midi_received > 0);
+            CHECK(std::any_of(sampler.uncovered_notes.begin(), sampler.uncovered_notes.end(),
+                              [](const auto& n) { return n.program == 13 && n.key == 48 && !n.percussion; }));
+            std::cout << world << ": 10 s with " << sampler.midi_received << " MIDI messages, "
+                      << sampler.midi_uncovered_notes << " silent uncovered-key notes:";
+            for (const auto& n : sampler.uncovered_notes)
+                std::cout << " program " << n.program << " key " << n.key;
+            std::cout << '\n';
+        }
         return true;
     }
     bool midi_limits()
@@ -901,6 +978,8 @@ int main(int argc, char** argv)
                     : test == "midi_receiver"             ? midi_receiver()
                     : test == "midi_private" && argc == 3 ? midi_private(argv[2])
                     : test == "midi_limits"               ? midi_limits()
+                    : test == "uncovered_key"             ? uncovered_key()
+                    : test == "uncovered_private" && argc == 3 ? uncovered_private(argv[2])
                     : test == "pcm"                       ? pcm()
                     : test == "velocity_default"          ? velocity_default()
                     : test == "envelopes"                 ? envelopes()

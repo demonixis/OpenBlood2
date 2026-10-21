@@ -260,6 +260,13 @@ namespace OpenBlood2
                         (unsigned long long)sampler.midi_choked);
             if (!sampler.last_midi_error.empty())
                 ImGui::TextWrapped("MIDI failure: %s", sampler.last_midi_error.c_str());
+            // DLS Level 1: notes outside every region of their instrument sound nothing.
+            ImGui::Text("Silent uncovered-key notes: %llu (%zu distinct patch/key)",
+                        (unsigned long long)sampler.midi_uncovered_notes, sampler.uncovered_notes.size());
+            for (const auto& n : sampler.uncovered_notes)
+                ImGui::BulletText("bank %u/%u program %u%s key %u, first at frame %llu", n.bank_msb, n.bank_lsb,
+                                  n.program, n.percussion ? " (percussion)" : "", n.key,
+                                  (unsigned long long)n.frame);
             ImGui::Text("Scheduled MIDI: frame %llu | pending %zu/%zu | submitted %llu / refused batches %llu",
                         (unsigned long long)sampler.sample_clock(), sampler.pending_midi().size(),
                         DlsSampler::max_pending_midi, (unsigned long long)sampler.queued_messages,

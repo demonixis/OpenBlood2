@@ -249,10 +249,13 @@ namespace OpenBlood2
                (instrument.bank & 0x80000000);
     }
     bool find_dls_instrument(const DlsBank& bank, const DlsMidiChannel& channel, unsigned key,
-                             std::optional<std::size_t>& out, std::string& error)
+                             std::optional<std::size_t>& out, std::string& error, bool* uncovered)
     {
         out.reset();
         error.clear();
+        if (uncovered)
+            *uncovered = false;
+        bool matched = false;
         if (key > 128 || channel.program > 127 || channel.bank_msb > 127 || channel.bank_lsb > 127 ||
             bank.instruments.size() > 256)
         {
@@ -279,6 +282,7 @@ namespace OpenBlood2
             }
             if (candidate)
             {
+                matched = true;
                 const auto& regions = bank.instruments[*candidate].regions;
                 if (key == 128 || std::any_of(regions.begin(), regions.end(), [&](const auto& region)
                                               { return key >= region.key_low && key <= region.key_high; }))
@@ -288,7 +292,9 @@ namespace OpenBlood2
                 }
             }
         }
-        error = "No DLS instrument for this MIDI patch/key";
+        if (matched && uncovered)
+            *uncovered = true;
+        error = matched ? "No DLS region covers this MIDI key" : "No DLS instrument for this MIDI patch/key";
         return false;
     }
     std::uint64_t DlsSampler::play_channel(std::shared_ptr<const DlsBank> bank, const DlsMidiChannel& channel,
@@ -415,6 +421,26 @@ namespace OpenBlood2
         }
         else if (kind == 0x90)
         {
+            // DLS Level 1: a note that no region of its instrument covers produces no sound. It is a
+            // received note, counted once per patch/key, never a voice or a failure.
+            std::optional<std::size_t> instrument;
+            bool uncovered = false;
+            std::string lookup;
+            if (bank && !find_dls_instrument(*bank, next, first, instrument, lookup, &uncovered) && uncovered)
+            {
+                ++midi_uncovered_notes;
+                const bool seen = std::any_of(uncovered_notes.begin(), uncovered_notes.end(), [&](const auto& n)
+                                              {
+                                                  return n.bank_msb == next.bank_msb && n.bank_lsb == next.bank_lsb &&
+                                                         n.program == next.program && n.key == first &&
+                                                         n.percussion == next.percussion;
+                                              });
+                if (!seen && uncovered_notes.size() < max_uncovered_notes)
+                    uncovered_notes.push_back(
+                        {next.bank_msb, next.bank_lsb, next.program, first, next.percussion, sample_clock_});
+                ++midi_received;
+                return true;
+            }
             // Validate and allocate before changing older voices. Exhaustion/unsupported regions
             // explicitly fail rather than stealing voices or partly replacing existing notes.
             const auto id = play_channel(std::move(bank), next, first, second, 1, gain, error);
@@ -592,6 +618,8 @@ namespace OpenBlood2
         midi_channels_.fill(DlsMidiChannel{});
         midi_channels_[9].percussion = true;
         midi_received = midi_rejected = midi_released = midi_choked = midi_unmatched_stops = 0;
+        midi_uncovered_notes = 0;
+        uncovered_notes.clear();
         last_midi_error.clear();
         started = completed = rejected = 0;
         controls_updated = controls_rejected = 0;

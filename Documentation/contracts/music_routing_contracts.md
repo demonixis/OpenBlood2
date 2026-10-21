@@ -24,7 +24,20 @@ patch `0x80000000` for that key. There is no melodic bank-zero fallback. Velocit
 is checked separately by the existing sampler, after instrument selection; an
 unsupported graph or velocity region does not cause another instrument fallback.
 Key 128 is the original any-key lookup sentinel for inspection, never a playable
-note. Missing programs and keys remain explicit failures.
+note. Missing programs and ambiguous patches remain explicit failures.
+
+**Uncovered keys** (2026-10-21; supersedes "missing keys fail" for this one case only). When the
+patch names an existing, unambiguous instrument but none of its regions covers the key, a note
+received through the MIDI receiver (`DlsSampler::receive`, so the timed queue and the IMA
+transport) produces no sound. This is the DLS Level 1 rule: a note outside every region of its
+instrument is not played. The lookup still fails and reports "No DLS region covers this MIDI key";
+the receiver counts the note (`midi_uncovered_notes`), records each patch/key the first time it
+occurs (`uncovered_notes`, at most 256, with its sample frame), allocates no voice and fails
+nothing. Its later note-off is an unmatched stop. A missing patch, an ambiguous patch, a direct
+audition (`play_channel`) and every other failure stay explicit, as before. Track1's program 13
+(regions 0–11, 12–23 and 60–127) receives key 48 about four seconds into Slaughter House and the
+Ancient One; that note used to fail the step and end the game. The installed MSynth's behavior for
+an uncovered key has not been confirmed; the DLS rule is the reference.
 
 The public lookup takes a reader-produced immutable bank, with at most 256
 instruments and 4,096 regions per selected instrument. Output is cleared on any
