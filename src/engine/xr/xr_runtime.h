@@ -37,7 +37,7 @@ namespace OpenBlood2
         std::array<float, 2> move{}, right_stick{};
         float fire = 0, alt_fire = 0;
         bool use = false, use_item = false, jump = false, crouch = false, next_item = false, detonate = false,
-             run = false, flashlight = false, menu = false;
+             run = false, menu = false;
     };
 
     // One pure value per frame: everything presentation and input read from OpenXR.

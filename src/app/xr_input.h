@@ -96,6 +96,30 @@ namespace OpenBlood2::xr
         return true;
     }
 
+    // A ray (OpenXR frame, unit direction) against a quad facing +Z at `panel`, `width` x `height`
+    // metres: true when it reaches the front within the bounds, with the canvas UV (v downward).
+    inline bool panel_hit(const Pose& panel, float width, float height, const Vec3& origin, const Vec3& direction,
+                          std::array<float, 2>& uv, float& distance)
+    {
+        const auto dot = [](const Vec3& a, const Vec3& b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; };
+        const Vec3 normal = rotate(panel.orientation, {0, 0, 1});
+        const float facing = dot(direction, normal);
+        if (!std::isfinite(facing) || facing > -1e-4f)
+            return false; // Parallel, or reaching the back.
+        const Vec3 to{panel.position[0] - origin[0], panel.position[1] - origin[1], panel.position[2] - origin[2]};
+        const float t = dot(to, normal) / facing;
+        if (!std::isfinite(t) || t <= 0)
+            return false;
+        const Vec3 hit{origin[0] + direction[0] * t - panel.position[0],
+                       origin[1] + direction[1] * t - panel.position[1],
+                       origin[2] + direction[2] * t - panel.position[2]};
+        const Quat inverse{-panel.orientation[0], -panel.orientation[1], -panel.orientation[2], panel.orientation[3]};
+        const Vec3 local = rotate(inverse, hit);
+        uv = {local[0] / width + .5f, .5f - local[1] / height};
+        distance = t;
+        return uv[0] >= 0 && uv[0] <= 1 && uv[1] >= 0 && uv[1] <= 1;
+    }
+
     // Yaw of an engine orientation's forward axis, in the original convention.
     inline float forward_yaw(const Quat& q)
     {

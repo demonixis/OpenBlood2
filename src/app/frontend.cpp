@@ -268,6 +268,13 @@ namespace OpenBlood2
             SDL_Event event;
             int width = 0, height = 0;
             SDL_GetWindowSize(runtime.window, &width, &height);
+#if BLOOD2_XR
+            if (xr) // Pointer events arrive in canvas pixels.
+            {
+                width = int(XrFrontend::ui_width);
+                height = int(XrFrontend::ui_height);
+            }
+#endif
             // One event through the menu/game input; false on a quit request.
             const auto dispatch = [&](SDL_Event& event)
             {
@@ -342,8 +349,15 @@ namespace OpenBlood2
                 const bool navigating = input.paused(menu) || !menu.error.empty() || input.demo.finished();
                 for (const auto& e : xr->menu_events(navigating))
                     synthetic.push_back(e);
+                // The selection laser on the panel: mouse events in canvas pixels; a light pulse
+                // when it moves the selection.
+                for (const auto& e : xr->pointer_events(navigating, SDL_GetWindowID(runtime.window)))
+                    synthetic.push_back(e);
+                const auto hovered = std::pair{menu.page, menu.selected};
                 for (auto& e : synthetic)
                     dispatch(e);
+                if (xr->pointer() && menu.active && std::pair{menu.page, menu.selected} != hovered)
+                    xr->vibrate(xr->pointer_hand(), .25f, 8'000'000);
             }
 #endif
             if (done || input.demo.quit)
@@ -797,6 +811,16 @@ namespace OpenBlood2
                     draw->AddText(at, IM_COL32(255, 255, 255, 255), saves.notice.text.c_str());
                 }
             }
+#if BLOOD2_XR
+            if (xr && xr->pointer())
+            {
+                // The laser's cursor on the canvas.
+                const auto& at = *xr->pointer();
+                auto* draw = ImGui::GetForegroundDrawList();
+                draw->AddCircleFilled({at[0], at[1]}, 4, IM_COL32(230, 40, 25, 255));
+                draw->AddCircle({at[0], at[1]}, 6, IM_COL32(255, 255, 255, 200), 0, 1.5f);
+            }
+#endif
             if (!menu.error.empty())
             {
                 ImGui::OpenPopup("Unable to complete request");
@@ -855,11 +879,13 @@ namespace OpenBlood2
                 if (frames % 360 == 0)
                 {
                     const auto* data = ImGui::GetDrawData();
+                    const auto& hands = xr->frame().hands;
                     spdlog::info("XR frontend: frame {}, {} canvas, {} world, menu {}, {} UI vertices in {} lists, "
-                                 "{} draw calls, fade {:.2f}",
+                                 "{} draw calls, fade {:.2f}, controllers {}/{}, {} close models",
                                  frames, panel ? "panel" : "HUD", world && presenter.render_world ? "with" : "without",
                                  menu.active, data ? data->TotalVtxCount : 0, data ? data->CmdListsCount : 0,
-                                 presenter.stats.draw_calls, fade);
+                                 presenter.stats.draw_calls, fade, hands[0].grip_valid, hands[1].grip_valid,
+                                 presenter.model_scene.close_draws.size());
                 }
                 ++frames;
                 continue;

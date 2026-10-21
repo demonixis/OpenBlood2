@@ -378,7 +378,7 @@ namespace OpenBlood2
             }
         }
         const auto world_done = SDL_GetTicksNS();
-        if (!update_model_scene(game, model_scene, error, weapon_camera ? &*weapon_camera : nullptr))
+        if (!update_model_scene(game, model_scene, error, weapon_cameras ? &*weapon_cameras : nullptr))
             return fail("Model presentation");
         if (!model_lighting.apply(game, world_mesh, world_draws, model_scene, error))
             return fail("Model lighting");

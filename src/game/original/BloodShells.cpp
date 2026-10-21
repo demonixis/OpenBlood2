@@ -937,7 +937,8 @@ bool CBloodClientShell::UpdateWeapons(CBloodServerShell& server, double seconds,
     for (auto& weapon : weapons)
     {
         weapon.binoculars_active = m_bBinocularsActive;
-        if (!weapon.Update(server_, server, client_, input, camera_position, forward, seconds, error))
+        const DVector& direction = weapon.left && left_hand_forward ? *left_hand_forward : forward;
+        if (!weapon.Update(server_, server, client_, input, camera_position, direction, seconds, error))
             return false;
     }
     return true;

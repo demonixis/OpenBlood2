@@ -47,7 +47,8 @@ namespace OpenBlood2
                          [&](const auto& a, const auto& b) { return depth(a) > depth(b); });
         return true;
     }
-    bool update_model_scene(GameSession& game, ModelView& scene, std::string& error, const ViewWeaponCamera* weapons)
+    bool update_model_scene(GameSession& game, ModelView& scene, std::string& error,
+                            const std::array<ViewWeaponCamera, 2>* weapons)
     {
         scene.begin_frame();
         auto& client = game.client_shell;
@@ -95,8 +96,17 @@ namespace OpenBlood2
                 continue;
             const auto* definition = weapon_definition(weapon.type);
             NodePose pose;
-            const ViewWeaponCamera camera =
-                weapons ? *weapons : ViewWeaponCamera{client.rotation.pitch, client.rotation.yaw, client.camera_position};
+            auto camera = weapons
+                              ? (*weapons)[weapon.left ? 0 : 1]
+                              : ViewWeaponCamera{client.rotation.pitch, client.rotation.yaw, client.camera_position};
+            if (definition && camera.at_hand)
+            {
+                // The hand sits behind the muzzle flash: 60% of its depth, at its height and side.
+                const auto& flash = definition->m_vFlash;
+                const DVector hand{weapon.left ? -flash.x : flash.x, flash.y, flash.z * .6f};
+                camera.eye = vector_subtract(camera.eye,
+                                             rotate_vector(rotation_from_euler({camera.pitch, camera.yaw, 0}), hand));
+            }
             if (!definition || !weapon.AdjustAngleAndSetPos(camera.pitch, camera.yaw, camera.eye, pose))
             {
                 error = "Original view-weapon placement failed";

@@ -66,7 +66,7 @@ namespace OpenBlood2
         // XR head camera for update() (sprites face it; the sky and shadow casters follow it) and
         // the matching view-weapon placement. Empty: the game's camera, as on desktop.
         std::optional<CameraView> camera_override;
-        std::optional<ViewWeaponCamera> weapon_camera;
+        std::optional<std::array<ViewWeaponCamera, 2>> weapon_cameras; // {left, right}
         // XR without a compositor fade: screen fades scale the scene light (1 on desktop).
         float scene_fade = 1;
         // XR: recorded at the end of each eye's scene pass (controllers, laser, reticle).

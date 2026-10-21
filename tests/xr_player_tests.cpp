@@ -125,6 +125,10 @@ namespace
         f.hands[1].aim.orientation = {-std::sin(down / 2), 0, 0, std::cos(down / 2)};
         CHECK(play(g, p, f, 1));
         CHECK(g.client_shell.rotation.pitch > 0.3f);
+        // No left-hand weapon: the left hand never redirects fire.
+        f.hands[0].aim_valid = true;
+        f.hands[0].aim = {{-0.2f, 1.3f, -0.3f}, xr_yaw(quarter)};
+        CHECK(play(g, p, f, 1) && !g.client_shell.left_hand_forward);
         // The body yaw is not the aim: aiming right did not turn the body.
         const float body = p.body_yaw;
         f.hands[1].aim.orientation = xr_yaw(-quarter);

@@ -163,6 +163,9 @@ class CBloodClientShell
     // OpenBlood2 XR adaptation: the movement direction's yaw when it differs from the aim
     // (rotation.yaw, which the server reads for firing and USE). Empty on desktop.
     std::optional<float> locomotion_yaw;
+    // OpenBlood2 XR adaptation: the left-hand weapon's fire direction when the left controller
+    // aims it (dual weapons); empty on desktop, where both hands fire along rotation.
+    std::optional<DVector> left_hand_forward;
     bool SyncWeapons(OpenBlood2::ModelStore&, OpenBlood2::Resources&, CBloodServerShell&, std::string&);
     bool UpdateWeapons(CBloodServerShell&, double, std::string&);
     std::array<CViewWeapon, 2> weapons;

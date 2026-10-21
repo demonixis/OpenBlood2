@@ -1,4 +1,4 @@
-# OpenXR runtime, stereo world, controllers, HUD and menus (M8 lots 8.1–8.3, 8.5, 8.6)
+# OpenXR runtime, stereo world, controllers, HUD and menus (M8 lots 8.1–8.3, 8.5–8.7)
 
 Implements the first two lots of the [OpenXR plan](../implementation/openxr_plan.md):
 an immersive Quest APK and an OpenXR session that draws a world-locked test scene.
@@ -100,25 +100,30 @@ No game world, HUD or menu is rendered in XR yet.
   localized names) and the grip/aim poses, attached once. Suggested bindings:
   `oculus/touch_controller` (every Quest; the Quest 3 Touch Plus is served through it) and
   `khr/simple_controller` (fire, use, menu). States are read only while FOCUSED.
-- **Default layout (right-handed).**
+- **Default layout (right-handed, chosen by the user after the first worn test).**
 
-  | Control | Action |
-  | --- | --- |
-  | Left stick | Move, head-relative |
-  | Left stick click | Run toggle (full deflection also runs) |
-  | Left trigger / grip | Alternate fire / use item |
-  | X / Y | Next item / detonate |
-  | Left menu button | Menu (bound, unused until the menu lot) |
-  | Right stick X / Y | Snap turn 45° / next-previous weapon (dominant axis) |
-  | Right stick click | Flashlight |
-  | Right trigger / grip | Primary fire / use |
-  | A / B | Jump / crouch (held) |
+  | Control | Play | Menu |
+  | --- | --- | --- |
+  | Left stick | Move, head-relative | Navigate |
+  | Left stick click | Run toggle (full deflection also runs) | — |
+  | Left trigger | Alternate fire | Laser click (left hand) |
+  | Left grip | Detonate | — |
+  | X / Y | Next item / use item | — |
+  | Left menu button | Menu | Back / close |
+  | Right stick X / Y | Snap turn 45° / next-previous weapon (dominant axis) | — |
+  | Right stick click | Crouch (held) | — |
+  | Right trigger | Primary fire | Laser click (right hand) |
+  | A / B | Jump / use (doors, switches) | Accept / back |
 
+  The right grip is unbound; the flashlight and other items are reached through the
+  inventory cursor (X, Y), as on the console layout.
 - **Bridge.** `xr_apply_controls` (`src/app/xr_player.cpp`) writes the original client inputs:
   `movement_input`, `weapon_input` (trigger hysteresis 0.55/0.35, all hands), `use_down`,
-  `flashlight_down`, `detonate_down`, `next_item_requested`/`use_item_requested` on press edges
-  and `GameSession::cycle_weapon` once per stick deflection (0.75 to fire, 0.3 to re-arm).
-  Outside focus, before calibration or outside the world, every input is neutral.
+  `detonate_down`, `next_item_requested`/`use_item_requested` on press edges and
+  `GameSession::cycle_weapon` once per stick deflection (0.75 to fire, 0.3 to re-arm).
+  Outside focus, before calibration or outside the world, every input is neutral. When play
+  resumes (menu closed), buttons and triggers still held stay neutral until released, so the
+  press that closed the menu neither fires nor jumps; the sticks pass through.
 - **Locomotion.** `xr::locomotion` maps the stick to the nearest of the original eight flag
   combinations and folds the residual angle into `CBloodClientShell::locomotion_yaw`, the only
   change to original code: `UpdateMovement` passes it to `CMoveMgr` instead of
@@ -136,7 +141,16 @@ No game world, HUD or menu is rendered in XR yet.
   units), a red laser from the right aim pose to the target and a white reticle sized with
   distance, drawn by `LineRenderer` through `ScenePresenter::eye_overlay` in each eye's scene
   pass and depth range. A 30 ms haptic pulse marks every shot a hand's weapon actually fires
-  (`CViewWeapon::shots`). View weapons follow the right aim pose until the arm IK lot.
+  (`CViewWeapon::shots`).
+- **View weapons per hand.** Each hand's view model follows its own controller (the left one
+  for dual weapons): aimed along the aim pose, with the model's hand on the grip. The view
+  models are life-size (the Beretta's muzzle flash sits 28 units ahead of the eye), so the
+  camera eye is placed behind the grip by the weapon's hand point, taken as the flash offset
+  at 60% of its depth (`ViewWeaponCamera::at_hand`); the arm then reaches back toward the
+  user. An untracked controller falls back to the head. Rigid until the arm IK lot.
+- **Dual weapons aim per hand.** `CBloodClientShell::left_hand_forward` (XR adaptation, empty on
+  desktop) gives the left-hand weapon the left controller's converged direction in
+  `UpdateWeapons`; the left laser and reticle appear with a left-hand weapon.
 
 ## HUD and menus (lot 8.6)
 
@@ -153,8 +167,10 @@ No game world, HUD or menu is rendered in XR yet.
   gamma handling as the eyes, composited as an `XrCompositionLayerQuad` 0.70 m wide
   (about 50°) at 0.75 m:
   - menu, credits screen and demo end: a world-locked opaque panel placed when it opens,
-    0.75 m ahead of the head, 5 cm below eye level, facing the user; the paused world stays
-    visible behind it (a dark clear with no world);
+    0.75 m ahead of the head, its centre 10 cm below eye level, facing the user; placement
+    waits for input focus and is redone after a recentre (the first worn test found it too
+    high: poses taken before the startup recentre). The paused world stays visible behind
+    it (a dark clear with no world);
   - in play: the head-locked HUD in VIEW space, alpha-blended (premultiplied by ImGui's blend).
 - **HUD content.** Status bar, credits roll text, save notice and error modal as on desktop.
   XR hides the screen-centred crosshair (the controller laser and reticle aim instead), the
@@ -167,8 +183,16 @@ No game world, HUD or menu is rendered in XR yet.
   closes the menu (in play too). A button held across a change between menu and play waits
   for its release. Session focus replaces window focus: losing it enters as a window focus
   loss, which opens the in-world menu and pauses; SDL window focus events are ignored in XR.
+- **Selection laser (lot 8.7).** The pointing hand is the one whose trigger was pressed last
+  (right by default). Its aim ray meets the panel (`xr::panel_hit`) and becomes SDL mouse
+  events in canvas pixels on the ordinary pointer path (`Menu::pointer`: hover selects,
+  press and release on one item activate, sliders follow); the trigger is the left button,
+  a press starts only on the panel and its release always follows. ImGui gets the same
+  events (the error modal's button). A red beam runs from the controller to the panel (the
+  compositor draws the panel over its last part), a red-and-white cursor is drawn into the
+  canvas and an 8 ms pulse marks each selection change. Sticks and buttons still navigate.
 - **Diagnostics.** Every 360 frames the log records the canvas mode, whether the world was
-  drawn, menu state, ImGui vertices and scene draw calls. Meta's "metacam" screenshots omit
+  drawn, menu state, ImGui vertices, scene draw calls, controller tracking and close models. Meta's "metacam" screenshots omit
   quad layers; use the `screencap` method (both raw eye images) to see the canvas.
 
 ## Conversions
@@ -192,7 +216,7 @@ FOV gives the desktop projection.
 
 ## Not included yet
 
-Multiview, the menu selection laser (8.7) and ImGui pointer input, the VR options page (smooth turn, handedness, movement
+Multiview, the VR options page (smooth turn, handedness, movement
 reference), the left-handed layout, weapon slots by number, arm IK
 (view weapons follow the right aim pose rigidly), refresh-rate and performance settings,
 the data setup screen and demo download, PCVR presets and their profiles.

@@ -5,6 +5,7 @@
 #include "app/xr_player.h"
 #include "engine/xr/xr_runtime.h"
 #include <SDL3/SDL_events.h>
+#include <cstdint>
 #include <functional>
 #include <optional>
 #include <string>
@@ -57,11 +58,27 @@ namespace OpenBlood2
         // while `menu` is shown, the menu button always. A button held across a change of mode waits
         // for its release.
         std::vector<SDL_Event> menu_events(bool menu);
+        // The selection laser on the menu panel as mouse events in canvas pixels (motion, left
+        // button on the pointing hand's trigger), from the hand whose trigger was pressed last.
+        std::vector<SDL_Event> pointer_events(bool panel, SDL_WindowID window);
+        // Where the laser meets the canvas (pixels), for the cursor; empty off the panel.
+        const std::optional<std::array<float, 2>>& pointer() const
+        {
+            return pointer_;
+        }
+        std::size_t pointer_hand() const
+        {
+            return pointer_hand_;
+        }
+        void vibrate(std::size_t hand, float amplitude, std::int64_t nanoseconds)
+        {
+            xr_.vibrate(hand, amplitude, nanoseconds);
+        }
         // Gameplay controls into the client shell (replacing the desktop sampling) when `enabled`.
         void apply_controls(GameSession&, bool enabled);
         // After the step: haptic pulses for shots fired; a committed level change recalibrates.
         void after_step(const GameSession&, bool level_changed);
-        // Head camera, view weapon and controller overlay for the next presenter.update().
+        // Head camera and per-hand view-weapon cameras for the next presenter.update().
         void prepare(GameSession&, ScenePresenter&);
         // Records the eyes (the world when `world`, else a dark clear), then the UI canvas through `ui`
         // (cleared transparent), submits and ends the frame. The canvas is the world-locked menu panel
@@ -69,13 +86,22 @@ namespace OpenBlood2
         bool render(GameSession&, ScenePresenter&, bool world, bool panel, float fade,
                     const std::function<bool(SDL_GPUCommandBuffer*, SDL_GPUTexture*)>& ui, std::string& error);
 
+        ~XrFrontend();
+
       private:
         XrRuntime xr_;
+        SDL_GPUTexture* depth_ = nullptr; // Eye depth for the overlay when no world is drawn.
+        std::optional<std::array<float, 2>> pointer_;
+        std::size_t pointer_hand_ = 1;
+        bool pointer_down_ = false;
+        xr::PressEdge left_trigger_, right_trigger_;
         XrFrameInput frame_{};
         XrPlayer player_;
         std::unique_ptr<LineRenderer> lines_;
         std::vector<LineVertex> overlay_;
         bool calibrated_ = false, focused_ = false, panel_placed_ = false;
+        // Controls re-enabled (menu closed): buttons and triggers still held wait for release.
+        bool controls_enabled_ = false, resume_hold_ = false;
         std::optional<bool> focus_change_;
         xr::Vec3 reference_{};
         float scale_ = 45;
@@ -85,5 +111,7 @@ namespace OpenBlood2
         std::array<float, 2> sent_axes_{};
         std::array<bool, 3> sent_buttons_{}, blocked_{};
         void calibrate(GameSession&);
+        // Controller boxes plus the menu laser (panel) or the aim lasers and reticles (play).
+        void build_overlay(GameSession&, const XrTracking&, bool panel);
     };
 } // namespace OpenBlood2

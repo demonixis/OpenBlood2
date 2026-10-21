@@ -1,4 +1,5 @@
 #include "app/xr_player.h"
+#include <algorithm>
 #include <cmath>
 #include <spdlog/spdlog.h>
 #include <string>
@@ -91,7 +92,6 @@ namespace OpenBlood2
         shell.weapon_input.alternate = player.alt_fire.update(c.alt_fire);
         shell.weapon_input.all_hands = true; // Original HandleFiring: both carried hands.
         shell.use_down = c.use;
-        shell.flashlight_down = c.flashlight;
         shell.detonate_down = c.detonate;
         shell.next_item_requested |= player.next_item.update(c.next_item);
         shell.use_item_requested |= player.use_item.update(c.use_item);
@@ -114,5 +114,20 @@ namespace OpenBlood2
         }
         player.written_pitch = shell.rotation.pitch;
         player.written_yaw = shell.rotation.yaw;
+        // A left-hand weapon (dual weapons) fires toward the left controller's point.
+        shell.left_hand_forward.reset();
+        const bool left_weapon = std::any_of(shell.weapons.begin(), shell.weapons.end(),
+                                             [](const CViewWeapon& w) { return w.left && w.model; });
+        if (left_weapon && frame.hands[0].aim_valid)
+        {
+            const auto left = xr_aim_target(game, xr_world_pose(t, reference, units_per_meter, frame.hands[0].aim));
+            float left_pitch = 0, left_yaw = 0;
+            if (xr::aim_angles(vec(shell.camera_position), left, left_pitch, left_yaw))
+            {
+                const float cp = std::cos(left_pitch);
+                shell.left_hand_forward =
+                    DVector{std::sin(left_yaw) * cp, -std::sin(left_pitch), std::cos(left_yaw) * cp};
+            }
+        }
     }
 } // namespace OpenBlood2

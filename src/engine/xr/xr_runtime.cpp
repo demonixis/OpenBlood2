@@ -219,8 +219,7 @@ namespace OpenBlood2
             XrAction haptic = XR_NULL_HANDLE, move = XR_NULL_HANDLE, right_stick = XR_NULL_HANDLE,
                      fire = XR_NULL_HANDLE, alt_fire = XR_NULL_HANDLE, use = XR_NULL_HANDLE, use_item = XR_NULL_HANDLE,
                      jump = XR_NULL_HANDLE, crouch = XR_NULL_HANDLE, next_item = XR_NULL_HANDLE,
-                     detonate = XR_NULL_HANDLE, run = XR_NULL_HANDLE, flashlight = XR_NULL_HANDLE,
-                     menu = XR_NULL_HANDLE;
+                     detonate = XR_NULL_HANDLE, run = XR_NULL_HANDLE, menu = XR_NULL_HANDLE;
         } actions;
         PFN_xrGetActionStateBoolean get_boolean = nullptr;
         PFN_xrGetActionStateFloat get_float = nullptr;
@@ -531,14 +530,13 @@ namespace OpenBlood2
             !action("turn_weapon", "Turn / change weapon", XR_ACTION_TYPE_VECTOR2F_INPUT, false, a.right_stick) ||
             !action("fire", "Fire", XR_ACTION_TYPE_FLOAT_INPUT, false, a.fire) ||
             !action("alt_fire", "Alternate fire", XR_ACTION_TYPE_FLOAT_INPUT, false, a.alt_fire) ||
-            !action("use", "Use", boolean, false, a.use) ||
+            !action("use", "Use / back", boolean, false, a.use) ||
             !action("use_item", "Use item", boolean, false, a.use_item) ||
-            !action("jump", "Jump", boolean, false, a.jump) || !action("crouch", "Crouch", boolean, false, a.crouch) ||
+            !action("jump", "Jump / accept", boolean, false, a.jump) ||
+            !action("crouch", "Crouch", boolean, false, a.crouch) ||
             !action("next_item", "Next item", boolean, false, a.next_item) ||
             !action("detonate", "Detonate", boolean, false, a.detonate) ||
-            !action("run", "Run (toggle)", boolean, false, a.run) ||
-            !action("flashlight", "Flashlight", boolean, false, a.flashlight) ||
-            !action("menu", "Menu", boolean, false, a.menu))
+            !action("run", "Run (toggle)", boolean, false, a.run) || !action("menu", "Menu", boolean, false, a.menu))
             return false;
         const auto suggest =
             [&s, &error](const char* profile, std::initializer_list<std::pair<XrAction, const char*>> list)
@@ -552,7 +550,8 @@ namespace OpenBlood2
             suggested.suggestedBindings = bindings.data();
             return s.check(s.suggest_bindings(s.instance, &suggested), "xrSuggestInteractionProfileBindings", error);
         };
-        // Right-handed layout (see the OpenXR plan): weapon hand on the right.
+        // Right-handed layout (user-chosen, 2026-10-21): A jump/accept, B use/back, X next item,
+        // Y use item, left grip detonate, left/right stick click run/crouch; weapon hand on the right.
         if (!suggest("/interaction_profiles/oculus/touch_controller",
                      {{s.grip_action, "/user/hand/left/input/grip/pose"},
                       {s.grip_action, "/user/hand/right/input/grip/pose"},
@@ -564,14 +563,13 @@ namespace OpenBlood2
                       {a.right_stick, "/user/hand/right/input/thumbstick"},
                       {a.fire, "/user/hand/right/input/trigger/value"},
                       {a.alt_fire, "/user/hand/left/input/trigger/value"},
-                      {a.use, "/user/hand/right/input/squeeze/value"},
-                      {a.use_item, "/user/hand/left/input/squeeze/value"},
                       {a.jump, "/user/hand/right/input/a/click"},
-                      {a.crouch, "/user/hand/right/input/b/click"},
+                      {a.use, "/user/hand/right/input/b/click"},
                       {a.next_item, "/user/hand/left/input/x/click"},
-                      {a.detonate, "/user/hand/left/input/y/click"},
+                      {a.use_item, "/user/hand/left/input/y/click"},
+                      {a.detonate, "/user/hand/left/input/squeeze/value"},
                       {a.run, "/user/hand/left/input/thumbstick/click"},
-                      {a.flashlight, "/user/hand/right/input/thumbstick/click"},
+                      {a.crouch, "/user/hand/right/input/thumbstick/click"},
                       {a.menu, "/user/hand/left/input/menu/click"}}) ||
             !suggest("/interaction_profiles/khr/simple_controller",
                      {{s.grip_action, "/user/hand/left/input/grip/pose"},
@@ -870,7 +868,6 @@ namespace OpenBlood2
         c.next_item = boolean(a.next_item);
         c.detonate = boolean(a.detonate);
         c.run = boolean(a.run);
-        c.flashlight = boolean(a.flashlight);
         c.menu = boolean(a.menu);
         for (std::size_t hand = 0; hand < 2; ++hand)
         {

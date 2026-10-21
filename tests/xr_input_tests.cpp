@@ -19,6 +19,10 @@ namespace
         return std::fabs(a - b) <= epsilon;
     }
     constexpr float quarter = 1.5707963f;
+    Quat xr_yaw_quat(float radians)
+    {
+        return {0, std::sin(radians / 2), 0, std::cos(radians / 2)};
+    }
 
     bool sectors()
     {
@@ -93,6 +97,28 @@ namespace
         CHECK(near(p.position[2], 3, 1e-3f));
         return true;
     }
+    bool panel()
+    {
+        // A 0.7 x 0.525 m panel 0.75 m ahead (OpenXR -Z), facing the user.
+        const Pose quad{{0, 1.5f, -0.75f}, {0, 0, 0, 1}};
+        std::array<float, 2> uv{};
+        float distance = 0;
+        CHECK(panel_hit(quad, 0.7f, 0.525f, {0, 1.5f, 0}, {0, 0, -1}, uv, distance));
+        CHECK(near(uv[0], 0.5f) && near(uv[1], 0.5f) && near(distance, 0.75f));
+        // Toward the upper-left quarter: u and v below one half (v grows downward).
+        const float x = -0.175f, y = 0.13f, length = std::sqrt(x * x + y * y + 0.75f * 0.75f);
+        CHECK(panel_hit(quad, 0.7f, 0.525f, {0, 1.5f, 0}, {x / length, y / length, -0.75f / length}, uv, distance));
+        CHECK(near(uv[0], 0.25f, 1e-3f) && near(uv[1], 0.5f - 0.13f / 0.525f, 1e-3f));
+        // Outside the bounds, from behind, parallel or pointing away: no hit.
+        CHECK(!panel_hit(quad, 0.7f, 0.525f, {0, 1.5f, 0}, {0.8f, 0, -0.6f}, uv, distance));
+        CHECK(!panel_hit(quad, 0.7f, 0.525f, {0, 1.5f, -2}, {0, 0, 1}, uv, distance));
+        CHECK(!panel_hit(quad, 0.7f, 0.525f, {0, 1.5f, 0}, {1, 0, 0}, uv, distance));
+        CHECK(!panel_hit(quad, 0.7f, 0.525f, {0, 1.5f, 0}, {0, 0, 1}, uv, distance));
+        // A panel turned 90 degrees (yaw) to the user's left is hit looking left.
+        const Pose left{{-0.75f, 1.5f, 0}, xr_yaw_quat(quarter)};
+        CHECK(panel_hit(left, 0.7f, 0.525f, {0, 1.5f, 0}, {-1, 0, 0}, uv, distance) && near(uv[0], 0.5f));
+        return true;
+    }
 } // namespace
 
 int main(int argc, char** argv)
@@ -102,6 +128,7 @@ int main(int argc, char** argv)
                     : test == "edges" ? edges()
                     : test == "aim"   ? aim()
                     : test == "hands" ? hands()
+                    : test == "panel" ? panel()
                                       : false;
     return ok ? 0 : 1;
 }
