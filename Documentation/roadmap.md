@@ -37,7 +37,7 @@ accept M3 or provide network play.
 | M5 | ~85% | Optional PBR shader set with JSON texture/material bindings; the legacy set remains selectable. The [enhanced renderer](contracts/enhanced_renderer_contracts.md) covers 5.0, 5.1 (built-in manifest), 5.2 (emission), 5.3, 5.4 and 5.5 (material inspection); external maps, texture packs and Vulkan verification remain. |
 | M6 | 0% | PBR-only post-processing: bloom from emissive maps, GTAO, SSR, tonemapping; AA for both sets. |
 | M7 | ~90% | Gamepad: action layer, rebinding, hotplug, menus; a parallel track, needed before M8. The [input actions](contracts/input_action_contracts.md) cover keyboard, mouse and gamepad (console layout, hot-plug, menus, weapon cycling), the original [inventory cursor](contracts/inventory_cursor_contracts.md) with its item tabs, a touch camera drag, the original Controls page with `controls.cfg`, and on-screen touch controls. Device testing on a touch screen, menu auto-repeat and the Keyboard/Joystick pages remain. |
-| M8 | 0% | VR on Meta Quest through OpenXR; also the Android gate. |
+| M8 | 0% | VR through OpenXR: Meta Quest first, PCVR on Linux last; also the Android gate. The [OpenXR plan](implementation/openxr_plan.md) orders the lots. |
 | M9 | ~10% | LAN multiplayer: Bloodbath, CTF and Team on the original multiplayer maps. |
 
 The milestones after M4 were renumbered on 2026-10-20. Earlier reports use the
@@ -146,13 +146,28 @@ therefore either change the original look or be meaningless there. Only
 effects that keep the image's meaning stay available to both sets:
 anti-aliasing, and later render scaling and FSR1.
 
-## M8 — VR on Quest
+## M8 — VR on Quest, then PCVR
 
-- Android ARM64 build, APK packaging and installing the external game data on the device.
-- SDL_GPU on Vulkan under Android.
-- OpenXR session and stereo rendering at the headset's frame budget.
-- Tracked-controller actions on top of the M7 action layer.
-- Comfort locomotion, arm IK on the original rig, menus in VR, and pause/resume recovery.
+The [OpenXR plan](implementation/openxr_plan.md) holds the design and the lot
+details. The pinned SDL already creates OpenXR sessions and swapchains; multiview
+needs a small local Vulkan patch.
+
+| # | Task | Size |
+| --- | --- | --- |
+| 8.0 | Contract, view-weapon rig audit, world scale | S |
+| 8.1 | Build: OpenXR headers and loader, immersive Quest APK, Android data path | S–M |
+| 8.2 | OpenXR runtime core: session, spaces, swapchains, frame loop, lifecycle | M |
+| 8.3 | Stereo rendering (per-eye passes) and a desktop mock mode | M–L |
+| 8.4 | Multiview (local SDL patch, shader variants) | M |
+| 8.5 | Controllers: bindings, wireframe cubes, aim, locomotion, turning | M |
+| 8.6 | HUD locked to the view, menus 0.75 m in front | M |
+| 8.7 | Selection laser for menus | S |
+| 8.8 | Data setup screen and in-headset demo download | M |
+| 8.9 | View weapons on the controllers, arm IK | L |
+| 8.10 | Comfort: walls, cinematics, death camera, zoom | M |
+| 8.11 | Quest performance tuning and evidence | M |
+| 8.12 | PCVR on Linux | M |
+| 8.13 | Acceptance record | S |
 
 Main risk: the frame budget on a mobile GPU. The Quest version may need
 reduced settings, and PBR/post-processing are likely optional there.
