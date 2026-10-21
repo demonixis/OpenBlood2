@@ -10,6 +10,7 @@
 #include "ViewWeapon.h"
 #include "VoiceMgr.h"
 #include "game/session.h"
+#include <optional>
 
 // Original single-player entry branches adapted to the typed local boundary.
 // These shells intentionally have no menu/audio/save/network facades.
@@ -159,6 +160,9 @@ class CBloodClientShell
     CMusic music;
     CMoveMgr move_mgr;
     OpenBlood2::MovementInput movement_input;
+    // OpenBlood2 XR adaptation: the movement direction's yaw when it differs from the aim
+    // (rotation.yaw, which the server reads for firing and USE). Empty on desktop.
+    std::optional<float> locomotion_yaw;
     bool SyncWeapons(OpenBlood2::ModelStore&, OpenBlood2::Resources&, CBloodServerShell&, std::string&);
     bool UpdateWeapons(CBloodServerShell&, double, std::string&);
     std::array<CViewWeapon, 2> weapons;

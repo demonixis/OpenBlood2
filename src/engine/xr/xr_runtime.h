@@ -31,6 +31,15 @@ namespace OpenBlood2
         xr::Pose grip{}, aim{};
     };
 
+    // Gameplay action states (zero/false outside FOCUSED). Sticks: x right, y forward/up.
+    struct XrControls
+    {
+        std::array<float, 2> move{}, right_stick{};
+        float fire = 0, alt_fire = 0;
+        bool use = false, use_item = false, jump = false, crouch = false, next_item = false, detonate = false,
+             run = false, flashlight = false, menu = false;
+    };
+
     // One pure value per frame: everything presentation and input read from OpenXR.
     struct XrFrameInput
     {
@@ -39,6 +48,7 @@ namespace OpenBlood2
         std::array<xr::Pose, 2> eye_pose{};
         std::array<xr::Fov, 2> eye_fov{};
         std::array<XrHandState, 2> hands{}; // left, right
+        XrControls controls{};
     };
 
     struct XrRuntimeSettings
@@ -73,6 +83,8 @@ namespace OpenBlood2
         void request_exit();
         // True once after the runtime recentred the reference space (recalibrate head offsets).
         bool take_recentre();
+        // A haptic pulse on one hand (0 left, 1 right); ignored without input focus.
+        void vibrate(std::size_t hand, float amplitude, std::int64_t nanoseconds);
 
         // xrWaitFrame, xrBeginFrame, views and (when focused) controller poses.
         bool begin_frame(XrFrameInput&, std::string& error);

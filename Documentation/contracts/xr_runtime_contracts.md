@@ -1,4 +1,4 @@
-# OpenXR runtime, first light and stereo world (M8 lots 8.1–8.3)
+# OpenXR runtime, stereo world and controllers (M8 lots 8.1–8.3, 8.5)
 
 Implements the first two lots of the [OpenXR plan](../implementation/openxr_plan.md):
 an immersive Quest APK and an OpenXR session that draws a world-locked test scene.
@@ -94,6 +94,50 @@ No game world, HUD or menu is rendered in XR yet.
   SDL patch `cmake/PatchSdlXrSwapchain.cmake` (hash-guarded; SDL otherwise overwrites the
   explicit runtime format with the view format).
 
+## Controllers (lot 8.5)
+
+- **Actions.** One `gameplay` action set holds semantic actions (runtime-rebindable,
+  localized names) and the grip/aim poses, attached once. Suggested bindings:
+  `oculus/touch_controller` (every Quest; the Quest 3 Touch Plus is served through it) and
+  `khr/simple_controller` (fire, use, menu). States are read only while FOCUSED.
+- **Default layout (right-handed).**
+
+  | Control | Action |
+  | --- | --- |
+  | Left stick | Move, head-relative |
+  | Left stick click | Run toggle (full deflection also runs) |
+  | Left trigger / grip | Alternate fire / use item |
+  | X / Y | Next item / detonate |
+  | Left menu button | Menu (bound, unused until the menu lot) |
+  | Right stick X / Y | Snap turn 45° / next-previous weapon (dominant axis) |
+  | Right stick click | Flashlight |
+  | Right trigger / grip | Primary fire / use |
+  | A / B | Jump / crouch (held) |
+
+- **Bridge.** `xr_apply_controls` (`src/app/xr_player.cpp`) writes the original client inputs:
+  `movement_input`, `weapon_input` (trigger hysteresis 0.55/0.35, all hands), `use_down`,
+  `flashlight_down`, `detonate_down`, `next_item_requested`/`use_item_requested` on press edges
+  and `GameSession::cycle_weapon` once per stick deflection (0.75 to fire, 0.3 to re-arm).
+  Outside focus, before calibration or outside the world, every input is neutral.
+- **Locomotion.** `xr::locomotion` maps the stick to the nearest of the original eight flag
+  combinations and folds the residual angle into `CBloodClientShell::locomotion_yaw`, the only
+  change to original code: `UpdateMovement` passes it to `CMoveMgr` instead of
+  `rotation.yaw` when set (empty on desktop). Per-direction speeds, the diagonal quirk and the
+  animations stay original; the reference is the head's yaw.
+- **Turning and body yaw.** The tracking base yaw is the app's body yaw while the view is the
+  player's eye; snap turns add 45° to it. Server-driven rotations (start points, teleports,
+  restores) are adopted as the difference from the last written aim.
+- **Aim.** The right aim pose, placed in the world like the eyes (same lean shift), casts
+  `IntersectSegment` (player excluded, 8192 units). `rotation` becomes the angles from the
+  original fire origin (`camera_position`) to that point, pitch clamped to ±1.48, so shots,
+  USE and every server reader of `m_fPitch/m_fYaw` go where the controller points, with no
+  weapon-code change. Without a valid aim pose the head's forward is used.
+- **Feedback.** Wireframe boxes at both grips (cyan left, orange right, Touch-sized in world
+  units), a red laser from the right aim pose to the target and a white reticle sized with
+  distance, drawn by `LineRenderer` through `ScenePresenter::eye_overlay` in each eye's scene
+  pass and depth range. A 30 ms haptic pulse marks every shot a hand's weapon actually fires
+  (`CViewWeapon::shots`). View weapons follow the right aim pose until the arm IK lot.
+
 ## Conversions
 
 `xr_math.h` converts OpenXR (right-handed, −Z forward, metres) to the engine
@@ -104,8 +148,10 @@ FOV gives the desktop projection.
 
 ## Verification
 
-- `xr.math_axes`, `xr.math_projection`, `xr.math_eye_pose`, `xr.math_stereo` and
-  `platform.sdl_xr_swapchain_patch` (headless).
+- `xr.math_axes`, `xr.math_projection`, `xr.math_eye_pose`, `xr.math_stereo`,
+  `xr.input_sectors`, `xr.input_edges`, `xr.input_aim`, `xr.input_hands` and
+  `platform.sdl_xr_swapchain_patch` (headless); `xr.player_locomotion`, `xr.player_aim`,
+  `xr.player_turning` and `xr.player_buttons` drive the bridge in a synthetic world.
 - Regenerating the shaders leaves the eighteen existing artifacts byte-identical; the
   four line artifacts are new (SPIR-V and MSL).
 - Device evidence: the [first-light report](../implementation/reports/xr_first_light.md) and
@@ -113,8 +159,9 @@ FOV gives the desktop projection.
 
 ## Not included yet
 
-Multiview, gameplay and menu actions (the player cannot move or fire), haptics,
-HUD/menu layers, view weapons on the controllers (they follow the head), refresh-rate
-and performance settings, the data setup screen and demo download, PCVR presets.
+Multiview, menu actions and the VR options page (smooth turn, handedness, movement
+reference), the left-handed layout, weapon slots by number, HUD/menu layers, arm IK
+(view weapons follow the right aim pose rigidly), refresh-rate and performance settings,
+the data setup screen and demo download, PCVR presets and their profiles.
 Shadow casters are still chosen with the 90° desktop frustum around the head, close
 models are lit from the game eye, and translucent sorting runs per eye.

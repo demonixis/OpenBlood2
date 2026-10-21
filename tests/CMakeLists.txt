@@ -19,6 +19,23 @@ foreach(case IN ITEMS axes projection eye_pose stereo)
     set_tests_properties(xr.math_${case} PROPERTIES LABELS "headless;xr" TIMEOUT 10)
 endforeach()
 
+add_executable(xr_input_tests xr_input_tests.cpp)
+target_include_directories(xr_input_tests PRIVATE "${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/game/legacy")
+target_link_libraries(xr_input_tests PRIVATE SDL3::SDL3)
+blood2_project_options(xr_input_tests)
+foreach(case IN ITEMS sectors edges aim hands)
+    add_test(NAME xr.input_${case} COMMAND xr_input_tests ${case})
+    set_tests_properties(xr.input_${case} PROPERTIES LABELS "headless;xr" TIMEOUT 10)
+endforeach()
+
+add_executable(xr_player_tests xr_player_tests.cpp ../src/app/xr_player.cpp)
+target_link_libraries(xr_player_tests PRIVATE blood2_game spdlog::spdlog)
+blood2_project_options(xr_player_tests)
+foreach(case IN ITEMS locomotion aim turning buttons)
+    add_test(NAME xr.player_${case} COMMAND xr_player_tests ${case} "${CMAKE_CURRENT_BINARY_DIR}/xr-player-fixtures/${case}")
+    set_tests_properties(xr.player_${case} PROPERTIES LABELS "headless;xr" TIMEOUT 30)
+endforeach()
+
 add_test(NAME platform.sdl_xr_swapchain_patch COMMAND "${CMAKE_COMMAND}"
     "-DSDL_SOURCE_DIR=${sdl3_SOURCE_DIR}"
     "-DPATCH=${PROJECT_SOURCE_DIR}/cmake/PatchSdlXrSwapchain.cmake"

@@ -764,7 +764,8 @@ bool CBloodClientShell::UpdateMovement(CBloodServerShell& server, double seconds
         !server.OnMessage(client_, OpenBlood2::PlayerControls{{}, false, rotation.yaw}))
         return false;
     if (!owner->ApplyDoorPush() ||
-        !move_mgr.Update(server, voice_manager, view.object != nullptr, movement_input, rotation.yaw, seconds,
+        !move_mgr.Update(server, voice_manager, view.object != nullptr, movement_input,
+                         locomotion_yaw ? *locomotion_yaw : rotation.yaw, seconds,
                          !owner->m_damage.IsDead() && !owner->camera_movement_blocked && !owner->MovementBlocked(),
                          weapon_input.primary || weapon_input.alternate, rotation.pitch))
     {

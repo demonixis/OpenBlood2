@@ -7,6 +7,7 @@
 #include "engine/model_renderer.h"
 #include "engine/surface_report.h"
 #include "engine/world_renderer.h"
+#include <functional>
 #include <optional>
 #include <span>
 
@@ -66,6 +67,8 @@ namespace OpenBlood2
         // the matching view-weapon placement. Empty: the game's camera, as on desktop.
         std::optional<CameraView> camera_override;
         std::optional<ViewWeaponCamera> weapon_camera;
+        // XR: recorded at the end of each eye's scene pass (controllers, laser, reticle).
+        std::function<void(SDL_GPURenderPass*, SDL_GPUCommandBuffer*, std::size_t eye)> eye_overlay;
 
         bool render_world = false;      // Entered player and loaded geometry at the last update().
         bool rebuilt = false;           // The last update() rebuilt or released world geometry.

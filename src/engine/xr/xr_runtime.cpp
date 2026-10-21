@@ -146,6 +146,18 @@ namespace OpenBlood2
         XrReferenceSpaceType space_type = XR_REFERENCE_SPACE_TYPE_LOCAL;
         XrActionSet action_set = XR_NULL_HANDLE;
         XrAction grip_action = XR_NULL_HANDLE, aim_action = XR_NULL_HANDLE;
+        struct
+        {
+            XrAction haptic = XR_NULL_HANDLE, move = XR_NULL_HANDLE, right_stick = XR_NULL_HANDLE,
+                     fire = XR_NULL_HANDLE, alt_fire = XR_NULL_HANDLE, use = XR_NULL_HANDLE, use_item = XR_NULL_HANDLE,
+                     jump = XR_NULL_HANDLE, crouch = XR_NULL_HANDLE, next_item = XR_NULL_HANDLE,
+                     detonate = XR_NULL_HANDLE, run = XR_NULL_HANDLE, flashlight = XR_NULL_HANDLE,
+                     menu = XR_NULL_HANDLE;
+        } actions;
+        PFN_xrGetActionStateBoolean get_boolean = nullptr;
+        PFN_xrGetActionStateFloat get_float = nullptr;
+        PFN_xrGetActionStateVector2f get_vector = nullptr;
+        PFN_xrApplyHapticFeedback apply_haptic = nullptr;
         std::array<XrPath, 2> hand_paths{};
         std::array<XrSpace, 2> grip_spaces{}, aim_spaces{};
         XrSwapchain swapchain = XR_NULL_HANDLE;
@@ -365,7 +377,11 @@ namespace OpenBlood2
             !s.load("xrAttachSessionActionSets", s.attach_action_sets, error) ||
             !s.load("xrCreateActionSpace", s.create_action_space, error) ||
             !s.load("xrSyncActions", s.sync_actions, error) ||
-            !s.load("xrGetCurrentInteractionProfile", s.current_profile, error))
+            !s.load("xrGetCurrentInteractionProfile", s.current_profile, error) ||
+            !s.load("xrGetActionStateBoolean", s.get_boolean, error) ||
+            !s.load("xrGetActionStateFloat", s.get_float, error) ||
+            !s.load("xrGetActionStateVector2f", s.get_vector, error) ||
+            !s.load("xrApplyHapticFeedback", s.apply_haptic, error))
             return false;
         if (s.refresh_rate_extension && !s.load("xrGetDisplayRefreshRateFB", s.get_refresh_rate, error))
             return false;
@@ -407,41 +423,87 @@ namespace OpenBlood2
         if (!s.check(s.create_reference_space(s.session, &space_info, &s.space), "xrCreateReferenceSpace", error))
             return false;
 
-        // Controller poses. Later lots add the gameplay and menu actions to this one attach.
+        // Gameplay actions (semantic, runtime-rebindable) and the hand poses; the menu lot adds
+        // its action set to this one attach.
         auto set_info = make<XrActionSetCreateInfo>(XR_TYPE_ACTION_SET_CREATE_INFO);
-        std::strcpy(set_info.actionSetName, "controllers");
-        std::strcpy(set_info.localizedActionSetName, "Controllers");
+        std::strcpy(set_info.actionSetName, "gameplay");
+        std::strcpy(set_info.localizedActionSetName, "Gameplay");
         if (!s.check(s.create_action_set(s.instance, &set_info, &s.action_set), "xrCreateActionSet", error))
             return false;
         s.hand_paths = {s.path("/user/hand/left"), s.path("/user/hand/right")};
-        const auto pose_action = [&s, &error](const char* name, const char* label, XrAction& out)
+        const auto action =
+            [&s, &error](const char* name, const char* label, XrActionType type, bool per_hand, XrAction& out)
         {
             auto info = make<XrActionCreateInfo>(XR_TYPE_ACTION_CREATE_INFO);
             std::strcpy(info.actionName, name);
             std::strcpy(info.localizedActionName, label);
-            info.actionType = XR_ACTION_TYPE_POSE_INPUT;
-            info.countSubactionPaths = 2;
-            info.subactionPaths = s.hand_paths.data();
+            info.actionType = type;
+            info.countSubactionPaths = per_hand ? 2 : 0;
+            info.subactionPaths = per_hand ? s.hand_paths.data() : nullptr;
             return s.check(s.create_action(s.action_set, &info, &out), "xrCreateAction", error);
         };
-        if (!pose_action("grip_pose", "Hand grip", s.grip_action) || !pose_action("aim_pose", "Hand aim", s.aim_action))
+        auto& a = s.actions;
+        constexpr auto boolean = XR_ACTION_TYPE_BOOLEAN_INPUT;
+        if (!action("grip_pose", "Hand grip", XR_ACTION_TYPE_POSE_INPUT, true, s.grip_action) ||
+            !action("aim_pose", "Hand aim", XR_ACTION_TYPE_POSE_INPUT, true, s.aim_action) ||
+            !action("haptic", "Vibration", XR_ACTION_TYPE_VIBRATION_OUTPUT, true, a.haptic) ||
+            !action("move", "Move", XR_ACTION_TYPE_VECTOR2F_INPUT, false, a.move) ||
+            !action("turn_weapon", "Turn / change weapon", XR_ACTION_TYPE_VECTOR2F_INPUT, false, a.right_stick) ||
+            !action("fire", "Fire", XR_ACTION_TYPE_FLOAT_INPUT, false, a.fire) ||
+            !action("alt_fire", "Alternate fire", XR_ACTION_TYPE_FLOAT_INPUT, false, a.alt_fire) ||
+            !action("use", "Use", boolean, false, a.use) ||
+            !action("use_item", "Use item", boolean, false, a.use_item) ||
+            !action("jump", "Jump", boolean, false, a.jump) || !action("crouch", "Crouch", boolean, false, a.crouch) ||
+            !action("next_item", "Next item", boolean, false, a.next_item) ||
+            !action("detonate", "Detonate", boolean, false, a.detonate) ||
+            !action("run", "Run (toggle)", boolean, false, a.run) ||
+            !action("flashlight", "Flashlight", boolean, false, a.flashlight) ||
+            !action("menu", "Menu", boolean, false, a.menu))
             return false;
-        for (const char* profile :
-             {"/interaction_profiles/oculus/touch_controller", "/interaction_profiles/khr/simple_controller"})
+        const auto suggest =
+            [&s, &error](const char* profile, std::initializer_list<std::pair<XrAction, const char*>> list)
         {
-            const std::array<XrActionSuggestedBinding, 4> bindings{{
-                {s.grip_action, s.path("/user/hand/left/input/grip/pose")},
-                {s.grip_action, s.path("/user/hand/right/input/grip/pose")},
-                {s.aim_action, s.path("/user/hand/left/input/aim/pose")},
-                {s.aim_action, s.path("/user/hand/right/input/aim/pose")},
-            }};
+            std::vector<XrActionSuggestedBinding> bindings;
+            for (const auto& [bound, path] : list)
+                bindings.push_back({bound, s.path(path)});
             auto suggested = make<XrInteractionProfileSuggestedBinding>(XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING);
             suggested.interactionProfile = s.path(profile);
             suggested.countSuggestedBindings = static_cast<std::uint32_t>(bindings.size());
             suggested.suggestedBindings = bindings.data();
-            if (!s.check(s.suggest_bindings(s.instance, &suggested), "xrSuggestInteractionProfileBindings", error))
-                return false;
-        }
+            return s.check(s.suggest_bindings(s.instance, &suggested), "xrSuggestInteractionProfileBindings", error);
+        };
+        // Right-handed layout (see the OpenXR plan): weapon hand on the right.
+        if (!suggest("/interaction_profiles/oculus/touch_controller",
+                     {{s.grip_action, "/user/hand/left/input/grip/pose"},
+                      {s.grip_action, "/user/hand/right/input/grip/pose"},
+                      {s.aim_action, "/user/hand/left/input/aim/pose"},
+                      {s.aim_action, "/user/hand/right/input/aim/pose"},
+                      {a.haptic, "/user/hand/left/output/haptic"},
+                      {a.haptic, "/user/hand/right/output/haptic"},
+                      {a.move, "/user/hand/left/input/thumbstick"},
+                      {a.right_stick, "/user/hand/right/input/thumbstick"},
+                      {a.fire, "/user/hand/right/input/trigger/value"},
+                      {a.alt_fire, "/user/hand/left/input/trigger/value"},
+                      {a.use, "/user/hand/right/input/squeeze/value"},
+                      {a.use_item, "/user/hand/left/input/squeeze/value"},
+                      {a.jump, "/user/hand/right/input/a/click"},
+                      {a.crouch, "/user/hand/right/input/b/click"},
+                      {a.next_item, "/user/hand/left/input/x/click"},
+                      {a.detonate, "/user/hand/left/input/y/click"},
+                      {a.run, "/user/hand/left/input/thumbstick/click"},
+                      {a.flashlight, "/user/hand/right/input/thumbstick/click"},
+                      {a.menu, "/user/hand/left/input/menu/click"}}) ||
+            !suggest("/interaction_profiles/khr/simple_controller",
+                     {{s.grip_action, "/user/hand/left/input/grip/pose"},
+                      {s.grip_action, "/user/hand/right/input/grip/pose"},
+                      {s.aim_action, "/user/hand/left/input/aim/pose"},
+                      {s.aim_action, "/user/hand/right/input/aim/pose"},
+                      {a.haptic, "/user/hand/left/output/haptic"},
+                      {a.haptic, "/user/hand/right/output/haptic"},
+                      {a.fire, "/user/hand/right/input/select/click"},
+                      {a.use, "/user/hand/left/input/select/click"},
+                      {a.menu, "/user/hand/left/input/menu/click"}}))
+            return false;
         auto attach = make<XrSessionActionSetsAttachInfo>(XR_TYPE_SESSION_ACTION_SETS_ATTACH_INFO);
         attach.countActionSets = 1;
         attach.actionSets = &s.action_set;
@@ -635,6 +697,20 @@ namespace OpenBlood2
         }
     }
 
+    void XrRuntime::vibrate(std::size_t hand, float amplitude, std::int64_t nanoseconds)
+    {
+        auto& s = *state_;
+        if (hand > 1 || s.phase != XrPhase::Focused || !s.apply_haptic)
+            return;
+        auto info = make<XrHapticActionInfo>(XR_TYPE_HAPTIC_ACTION_INFO);
+        info.action = s.actions.haptic;
+        info.subactionPath = s.hand_paths[hand];
+        auto vibration = make<XrHapticVibration>(XR_TYPE_HAPTIC_VIBRATION);
+        vibration.duration = nanoseconds;
+        vibration.frequency = XR_FREQUENCY_UNSPECIFIED;
+        vibration.amplitude = std::clamp(amplitude, 0.f, 1.f);
+        s.apply_haptic(s.session, &info, reinterpret_cast<const XrHapticBaseHeader*>(&vibration));
+    }
     bool XrRuntime::take_recentre()
     {
         return std::exchange(state_->recentred, false);
@@ -693,6 +769,44 @@ namespace OpenBlood2
         sync.activeActionSets = &active;
         if (!s.check(s.sync_actions(s.session, &sync), "xrSyncActions", error))
             return false;
+        const auto boolean = [&s](XrAction action)
+        {
+            auto info = make<XrActionStateGetInfo>(XR_TYPE_ACTION_STATE_GET_INFO);
+            info.action = action;
+            auto state = make<XrActionStateBoolean>(XR_TYPE_ACTION_STATE_BOOLEAN);
+            return XR_SUCCEEDED(s.get_boolean(s.session, &info, &state)) && state.isActive && state.currentState;
+        };
+        const auto scalar = [&s](XrAction action)
+        {
+            auto info = make<XrActionStateGetInfo>(XR_TYPE_ACTION_STATE_GET_INFO);
+            info.action = action;
+            auto state = make<XrActionStateFloat>(XR_TYPE_ACTION_STATE_FLOAT);
+            return XR_SUCCEEDED(s.get_float(s.session, &info, &state)) && state.isActive ? state.currentState : 0.f;
+        };
+        const auto vector = [&s](XrAction action)
+        {
+            auto info = make<XrActionStateGetInfo>(XR_TYPE_ACTION_STATE_GET_INFO);
+            info.action = action;
+            auto state = make<XrActionStateVector2f>(XR_TYPE_ACTION_STATE_VECTOR2F);
+            return XR_SUCCEEDED(s.get_vector(s.session, &info, &state)) && state.isActive
+                       ? std::array<float, 2>{state.currentState.x, state.currentState.y}
+                       : std::array<float, 2>{};
+        };
+        auto& c = frame.controls;
+        const auto& a = s.actions;
+        c.move = vector(a.move);
+        c.right_stick = vector(a.right_stick);
+        c.fire = scalar(a.fire);
+        c.alt_fire = scalar(a.alt_fire);
+        c.use = boolean(a.use);
+        c.use_item = boolean(a.use_item);
+        c.jump = boolean(a.jump);
+        c.crouch = boolean(a.crouch);
+        c.next_item = boolean(a.next_item);
+        c.detonate = boolean(a.detonate);
+        c.run = boolean(a.run);
+        c.flashlight = boolean(a.flashlight);
+        c.menu = boolean(a.menu);
         for (std::size_t hand = 0; hand < 2; ++hand)
         {
             auto grip = make<XrSpaceLocation>(XR_TYPE_SPACE_LOCATION);

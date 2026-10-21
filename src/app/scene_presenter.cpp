@@ -559,6 +559,8 @@ namespace OpenBlood2
                  !model_renderer.record(close, model_scene, model_scene.close_draws, eye, rotation, error,
                                         WorldPass::Opaque, {}, true))
             stage = "Model viewport";
+        if (!stage && projection && eye_overlay)
+            eye_overlay(pass, commands, layer);
         SDL_EndGPURenderPass(pass);
         if (stage)
             return fail(stage);

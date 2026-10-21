@@ -6,7 +6,7 @@
 
 - [Original default crosshair](crosshair_contracts.md)
 
-- [OpenXR runtime, first light and stereo world (M8)](xr_runtime_contracts.md)
+- [OpenXR runtime, stereo world and controllers (M8)](xr_runtime_contracts.md)
 
 - [Original PCX player statistics HUD](original_hud_contracts.md)
 

@@ -82,13 +82,27 @@ namespace OpenBlood2::xr
         return {0, std::sin(yaw / 2), 0, std::cos(yaw / 2)};
     }
 
-    // The tracked eyes placed around a game camera, in engine world units. The game camera
-    // contributes its position and yaw only (no pitch or roll); the head offset is measured from
-    // the calibrated reference (OpenXR metres), its horizontal part clamped to max_lean metres.
+    // Any tracked pose (eyes, hands) placed around a game camera, in engine world units: the game
+    // camera contributes its position and yaw only, the pose its offset from the calibrated
+    // reference (OpenXR metres) minus the lean clamp's shift, and its orientation.
+    inline Pose tracked_pose(const Vec3& base, float base_yaw, const Vec3& reference, const Vec3& shift,
+                             float units_per_meter, const Pose& xr)
+    {
+        const Quat yaw = yaw_rotation(base_yaw);
+        const Vec3 relative{xr.position[0] - reference[0] - shift[0], xr.position[1] - reference[1] - shift[1],
+                            xr.position[2] - reference[2] - shift[2]};
+        const Vec3 local = rotate(yaw, engine_position(relative, units_per_meter));
+        return {{base[0] + local[0], base[1] + local[1], base[2] + local[2]},
+                mul(yaw, engine_orientation(xr.orientation))};
+    }
+
+    // The tracked eyes around a game camera. The head's horizontal offset from the reference is
+    // clamped to max_lean metres; `shift` is the part removed, to be applied to the hands too.
     struct StereoCamera
     {
         std::array<Pose, 2> eyes{};
         Pose head{}; // Midpoint of the eyes, with the first eye's orientation.
+        Vec3 shift{};
     };
     inline StereoCamera stereo_camera(const Vec3& base, float base_yaw, const std::array<Pose, 2>& xr_eyes,
                                       const Vec3& reference, float units_per_meter, float max_lean)
@@ -96,24 +110,13 @@ namespace OpenBlood2::xr
         const Vec3 centre{(xr_eyes[0].position[0] + xr_eyes[1].position[0]) / 2,
                           (xr_eyes[0].position[1] + xr_eyes[1].position[1]) / 2,
                           (xr_eyes[0].position[2] + xr_eyes[1].position[2]) / 2};
-        Vec3 offset{centre[0] - reference[0], centre[1] - reference[1], centre[2] - reference[2]};
-        const float lean = std::sqrt(offset[0] * offset[0] + offset[2] * offset[2]);
-        if (lean > max_lean && lean > 0)
-        {
-            offset[0] *= max_lean / lean;
-            offset[2] *= max_lean / lean;
-        }
-        const Quat yaw = yaw_rotation(base_yaw);
+        const float dx = centre[0] - reference[0], dz = centre[2] - reference[2];
+        const float lean = std::sqrt(dx * dx + dz * dz);
         StereoCamera out;
+        if (lean > max_lean && lean > 0)
+            out.shift = {dx * (1 - max_lean / lean), 0, dz * (1 - max_lean / lean)};
         for (std::size_t i = 0; i < 2; ++i)
-        {
-            const Vec3 relative{offset[0] + xr_eyes[i].position[0] - centre[0],
-                                offset[1] + xr_eyes[i].position[1] - centre[1],
-                                offset[2] + xr_eyes[i].position[2] - centre[2]};
-            const Vec3 local = rotate(yaw, engine_position(relative, units_per_meter));
-            out.eyes[i].position = {base[0] + local[0], base[1] + local[1], base[2] + local[2]};
-            out.eyes[i].orientation = mul(yaw, engine_orientation(xr_eyes[i].orientation));
-        }
+            out.eyes[i] = tracked_pose(base, base_yaw, reference, out.shift, units_per_meter, xr_eyes[i]);
         out.head.position = {(out.eyes[0].position[0] + out.eyes[1].position[0]) / 2,
                              (out.eyes[0].position[1] + out.eyes[1].position[1]) / 2,
                              (out.eyes[0].position[2] + out.eyes[1].position[2]) / 2};

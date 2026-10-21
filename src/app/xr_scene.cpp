@@ -1,6 +1,9 @@
 #include "app/xr_scene.h"
 #include "app/scene_presenter.h"
 #include "app/session_playback.h"
+#include "app/xr_input.h"
+#include "app/xr_lines.h"
+#include "app/xr_player.h"
 #include "build_info.h"
 #include "engine/world_shaders.h"
 #include "engine/xr/xr_runtime.h"
@@ -19,41 +22,17 @@ namespace OpenBlood2
 {
     namespace
     {
-        struct LineVertex
-        {
-            std::array<float, 3> position;
-            std::array<float, 4> color;
-        };
-        static_assert(sizeof(LineVertex) == 28);
-
         struct Range
         {
             std::uint32_t first = 0, count = 0;
         };
 
-        // Static geometry in metres: floor grid, origin axes, two unit boxes and a unit ray.
+        // Static first-light geometry in metres: floor grid, origin axes, two unit boxes and a unit ray.
         struct SceneGeometry
         {
             std::vector<LineVertex> vertices;
             Range grid, axes, left_box, right_box, ray;
         };
-
-        void add_line(std::vector<LineVertex>& v, std::array<float, 3> a, std::array<float, 3> b,
-                      std::array<float, 4> color)
-        {
-            v.push_back({a, color});
-            v.push_back({b, color});
-        }
-
-        void add_box(std::vector<LineVertex>& v, std::array<float, 4> color)
-        {
-            const std::array<std::array<float, 3>, 8> c{
-                {{-1, -1, -1}, {1, -1, -1}, {1, 1, -1}, {-1, 1, -1}, {-1, -1, 1}, {1, -1, 1}, {1, 1, 1}, {-1, 1, 1}}};
-            constexpr std::array<std::array<int, 2>, 12> edges{
-                {{0, 1}, {1, 2}, {2, 3}, {3, 0}, {4, 5}, {5, 6}, {6, 7}, {7, 4}, {0, 4}, {1, 5}, {2, 6}, {3, 7}}};
-            for (const auto& e : edges)
-                add_line(v, c[e[0]], c[e[1]], color);
-        }
 
         SceneGeometry scene_geometry()
         {
@@ -80,11 +59,11 @@ namespace OpenBlood2
             add_line(v, {0, 0.002f, 0}, {0, 0.002f, 1}, {0.1f, 0.2f, 1, 1});
             close(g.axes, first);
             first = begin();
-            add_box(v, {0.1f, 0.8f, 1, 1});
+            add_box(v, {}, {1, 1, 1}, {0.1f, 0.8f, 1, 1});
             add_line(v, {0, 0, 1}, {0, 0, 1.6f}, {0.1f, 0.8f, 1, 1});
             close(g.left_box, first);
             first = begin();
-            add_box(v, {1, 0.45f, 0.05f, 1});
+            add_box(v, {}, {1, 1, 1}, {1, 0.45f, 0.05f, 1});
             add_line(v, {0, 0, 1}, {0, 0, 1.6f}, {1, 0.45f, 0.05f, 1});
             close(g.right_box, first);
             first = begin();
@@ -96,10 +75,10 @@ namespace OpenBlood2
         struct GpuScene
         {
             SDL_GPUDevice* device = nullptr;
-            SDL_GPUGraphicsPipeline* pipeline = nullptr;
-            SDL_GPUBuffer* vertices = nullptr;
+            std::unique_ptr<LineRenderer> lines;
             SDL_GPUTexture* depth = nullptr;
             SDL_GPUTextureFormat depth_format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
+            bool uploaded = false;
 
             GpuScene() = default;
             GpuScene(const GpuScene&) = delete;
@@ -111,66 +90,19 @@ namespace OpenBlood2
                 SDL_WaitForGPUIdle(device);
                 if (depth)
                     SDL_ReleaseGPUTexture(device, depth);
-                if (vertices)
-                    SDL_ReleaseGPUBuffer(device, vertices);
-                if (pipeline)
-                    SDL_ReleaseGPUGraphicsPipeline(device, pipeline);
+                lines.reset();
             }
 
             bool create(SDL_GPUDevice* gpu, SDL_GPUTextureFormat color, std::uint32_t width, std::uint32_t height,
-                        const SceneGeometry& geometry, std::string& error)
+                        std::string& error)
             {
                 device = gpu;
-                const SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device);
-                SDL_GPUShaderCreateInfo vertex_info{}, fragment_info{};
-                if (!world_shader_info(WorldShader::LineVertex, formats, vertex_info) ||
-                    !world_shader_info(WorldShader::LineFragment, formats, fragment_info))
-                {
-                    error = "Line shaders unavailable for this GPU";
-                    return false;
-                }
-                SDL_GPUShader* vertex = SDL_CreateGPUShader(device, &vertex_info);
-                SDL_GPUShader* fragment = SDL_CreateGPUShader(device, &fragment_info);
                 if (!SDL_GPUTextureSupportsFormat(device, depth_format, SDL_GPU_TEXTURETYPE_2D_ARRAY,
                                                   SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET))
                     depth_format = SDL_GPU_TEXTUREFORMAT_D16_UNORM;
-                if (vertex && fragment)
-                {
-                    const SDL_GPUVertexBufferDescription buffer{0, sizeof(LineVertex), SDL_GPU_VERTEXINPUTRATE_VERTEX,
-                                                                0};
-                    const std::array<SDL_GPUVertexAttribute, 2> attributes{
-                        {{0, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3, 0},
-                         {1, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, offsetof(LineVertex, color)}}};
-                    SDL_GPUColorTargetDescription target{};
-                    target.format = color;
-                    SDL_GPUGraphicsPipelineCreateInfo info{};
-                    info.vertex_shader = vertex;
-                    info.fragment_shader = fragment;
-                    info.vertex_input_state.vertex_buffer_descriptions = &buffer;
-                    info.vertex_input_state.num_vertex_buffers = 1;
-                    info.vertex_input_state.vertex_attributes = attributes.data();
-                    info.vertex_input_state.num_vertex_attributes = static_cast<Uint32>(attributes.size());
-                    info.primitive_type = SDL_GPU_PRIMITIVETYPE_LINELIST;
-                    info.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
-                    info.depth_stencil_state.enable_depth_test = true;
-                    info.depth_stencil_state.enable_depth_write = true;
-                    info.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
-                    info.target_info.color_target_descriptions = &target;
-                    info.target_info.num_color_targets = 1;
-                    info.target_info.depth_stencil_format = depth_format;
-                    info.target_info.has_depth_stencil_target = true;
-                    pipeline = SDL_CreateGPUGraphicsPipeline(device, &info);
-                }
-                if (vertex)
-                    SDL_ReleaseGPUShader(device, vertex);
-                if (fragment)
-                    SDL_ReleaseGPUShader(device, fragment);
-                if (!pipeline)
-                {
-                    error = std::string("XR line pipeline: ") + SDL_GetError();
+                lines = std::make_unique<LineRenderer>(device);
+                if (!lines->prepare(color, depth_format, error))
                     return false;
-                }
-
                 SDL_GPUTextureCreateInfo depth_info{};
                 depth_info.type = SDL_GPU_TEXTURETYPE_2D_ARRAY;
                 depth_info.format = depth_format;
@@ -185,39 +117,6 @@ namespace OpenBlood2
                     error = std::string("XR depth array: ") + SDL_GetError();
                     return false;
                 }
-
-                const auto bytes = static_cast<Uint32>(geometry.vertices.size() * sizeof(LineVertex));
-                const SDL_GPUBufferCreateInfo buffer_info{SDL_GPU_BUFFERUSAGE_VERTEX, bytes, 0};
-                vertices = SDL_CreateGPUBuffer(device, &buffer_info);
-                const SDL_GPUTransferBufferCreateInfo transfer_info{SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD, bytes, 0};
-                SDL_GPUTransferBuffer* transfer =
-                    vertices ? SDL_CreateGPUTransferBuffer(device, &transfer_info) : nullptr;
-                void* mapped = transfer ? SDL_MapGPUTransferBuffer(device, transfer, false) : nullptr;
-                bool uploaded = false;
-                if (mapped)
-                {
-                    SDL_memcpy(mapped, geometry.vertices.data(), bytes);
-                    SDL_UnmapGPUTransferBuffer(device, transfer);
-                    SDL_GPUCommandBuffer* command = SDL_AcquireGPUCommandBuffer(device);
-                    SDL_GPUCopyPass* copy = command ? SDL_BeginGPUCopyPass(command) : nullptr;
-                    if (copy)
-                    {
-                        const SDL_GPUTransferBufferLocation source{transfer, 0};
-                        const SDL_GPUBufferRegion destination{vertices, 0, bytes};
-                        SDL_UploadToGPUBuffer(copy, &source, &destination, false);
-                        SDL_EndGPUCopyPass(copy);
-                        uploaded = SDL_SubmitGPUCommandBuffer(command);
-                    }
-                    else if (command)
-                        SDL_CancelGPUCommandBuffer(command);
-                }
-                if (transfer)
-                    SDL_ReleaseGPUTransferBuffer(device, transfer);
-                if (!uploaded)
-                {
-                    error = std::string("XR line geometry upload: ") + SDL_GetError();
-                    return false;
-                }
                 return true;
             }
         };
@@ -230,9 +129,19 @@ namespace OpenBlood2
             return u;
         }
 
-        bool record(SDL_GPUCommandBuffer* command, const GpuScene& scene, SDL_GPUTexture* color, std::uint32_t width,
+        bool record(SDL_GPUCommandBuffer* command, GpuScene& scene, SDL_GPUTexture* color, std::uint32_t width,
                     std::uint32_t height, const SceneGeometry& geometry, const XrFrameInput& frame, float floor)
         {
+            std::string error;
+            if (!scene.uploaded)
+            {
+                if (!scene.lines->upload(command, geometry.vertices, error))
+                {
+                    SDL_SetError("%s", error.c_str());
+                    return false;
+                }
+                scene.uploaded = true;
+            }
             for (std::uint32_t eye = 0; eye < 2; ++eye)
             {
                 SDL_GPUColorTargetInfo target{};
@@ -252,19 +161,11 @@ namespace OpenBlood2
                 SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(command, &target, 1, &depth);
                 if (!pass)
                     return false;
-                const SDL_GPUViewport viewport{0, 0, static_cast<float>(width), static_cast<float>(height), 0, 1};
-                SDL_SetGPUViewport(pass, &viewport);
-                SDL_BindGPUGraphicsPipeline(pass, scene.pipeline);
-                const SDL_GPUBufferBinding binding{scene.vertices, 0};
-                SDL_BindGPUVertexBuffers(pass, 0, &binding, 1);
                 // The scene is in metres: one engine unit per metre for this test.
                 const xr::LineUniform view =
                     xr::line_uniform(xr::engine_pose(frame.eye_pose[eye], 1), frame.eye_fov[eye], 0.05f, 100);
                 const auto draw = [&](const xr::LineUniform& u, const Range& range)
-                {
-                    SDL_PushGPUVertexUniformData(command, 0, &u, sizeof(u));
-                    SDL_DrawGPUPrimitives(pass, range.count, 1, range.first, 0);
-                };
+                { scene.lines->draw(pass, command, u, width, height, 0, 1, range.first, range.count); };
                 const xr::Pose floor_pose{{0, floor, 0}, {0, 0, 0, 1}};
                 draw(placed(view, floor_pose, {1, 1, 1}), geometry.grid);
                 draw(placed(view, floor_pose, {1, 1, 1}), geometry.axes);
@@ -306,7 +207,7 @@ namespace OpenBlood2
             GpuScene scene;
             const SceneGeometry geometry = scene_geometry();
             if (!xr.create({gpu_debug}, error) ||
-                !scene.create(xr.device(), xr.color_format(), xr.width(), xr.height(), geometry, error))
+                !scene.create(xr.device(), xr.color_format(), xr.width(), xr.height(), error))
             {
                 spdlog::error("XR test: {}", error);
                 code = 7;
@@ -394,7 +295,7 @@ namespace OpenBlood2
     namespace
     {
         // Nominal user eye height: the original player's standing eye height maps to it.
-        constexpr float nominal_eye_height = 1.6f, fallback_units_per_meter = 45, max_lean = 0.5f;
+        constexpr float nominal_eye_height = 1.6f, fallback_units_per_meter = 45;
 
         DRotation engine_rotation(const xr::Quat& q)
         {
@@ -541,6 +442,9 @@ namespace OpenBlood2
             bool calibrated = false, audio_paused = false;
             xr::Vec3 reference{};
             float scale = fallback_units_per_meter;
+            XrPlayer player;
+            LineRenderer lines(xr.device());
+            std::vector<LineVertex> lines_vertices;
             while (!code && !xr.exit_requested())
             {
                 SDL_Event event;
@@ -570,6 +474,24 @@ namespace OpenBlood2
                 // Simulation and game audio run only with input focus (the system menu pauses them).
                 if (audio_paused != !frame.focused && game->server.audio.pause_output(!frame.focused, error))
                     audio_paused = !frame.focused;
+                auto& shell = game->client_shell;
+                if (frame.views_valid && !calibrated)
+                {
+                    for (std::size_t i = 0; i < 3; ++i)
+                        reference[i] = (frame.eye_pose[0].position[i] + frame.eye_pose[1].position[i]) / 2;
+                    calibrated = true;
+                    scale = units_per_meter(*game);
+                    spdlog::info("XR calibration: {:.2f} units/m (player eye over a {:.2f} m user eye)", scale,
+                                 nominal_eye_height);
+                }
+                // Controls only with focus, a calibrated head and the player in the world.
+                shell.movement_input = {};
+                shell.weapon_input = {};
+                shell.use_down = shell.flashlight_down = shell.detonate_down = false;
+                shell.locomotion_yaw.reset();
+                if (frame.focused && calibrated && frame.views_valid && shell.m_bInWorld)
+                    xr_apply_controls(*game, player, frame, xr_tracking(*game, player, frame, reference, scale),
+                                      reference, scale);
                 auto start = Clock::now();
                 if (frame.focused)
                 {
@@ -587,36 +509,61 @@ namespace OpenBlood2
                         spdlog::info("NEW_LEVEL committed: {} -> {}", game->level_change.source_world,
                                      game->world_path);
                         calibrated = false;
+                        player = {};
                     }
                     else if (change == LevelChangeResult::Rejected)
                         spdlog::warn("Level change retained world: {}", error);
                 }
                 step_seconds += std::chrono::duration<double>(Clock::now() - start).count();
-                bool drawn = false;
-                if (!code && frame.should_render && frame.views_valid)
+                // A short pulse on the hand whose weapon actually fired.
+                for (std::size_t i = 0; i < game->client_shell.weapons.size(); ++i)
                 {
-                    const std::array<xr::Pose, 2> eyes{frame.eye_pose[0], frame.eye_pose[1]};
-                    if (!calibrated)
-                    {
-                        for (std::size_t i = 0; i < 3; ++i)
-                            reference[i] = (eyes[0].position[i] + eyes[1].position[i]) / 2;
-                        calibrated = true;
-                        scale = units_per_meter(*game);
-                        spdlog::info("XR calibration: {:.2f} units/m (player eye over a {:.2f} m user eye)", scale,
-                                     nominal_eye_height);
-                    }
-                    // The game camera supplies position and yaw; the tracked head supplies the rest.
-                    const auto& view = game->client_shell.view;
-                    const auto forward = rotate_vector(DVector{0, 0, 1}, view.rotation);
-                    const float yaw = std::atan2(forward.x, forward.z);
-                    const auto stereo = xr::stereo_camera(vec(view.position), yaw, eyes, reference, scale, max_lean);
-                    CameraView head = view;
-                    head.position = dvec(stereo.head.position);
-                    head.rotation = engine_rotation(stereo.head.orientation);
-                    const auto look = rotate_vector(DVector{0, 0, 1}, head.rotation);
+                    const auto& weapon = game->client_shell.weapons[i];
+                    if (weapon.shots > player.shots[i])
+                        xr.vibrate(weapon.left ? 0 : 1, .6f, 30'000'000);
+                    player.shots[i] = weapon.shots;
+                }
+                bool drawn = false;
+                if (!code && frame.should_render && frame.views_valid && calibrated)
+                {
+                    const auto t = xr_tracking(*game, player, frame, reference, scale);
+                    CameraView head = game->client_shell.view;
+                    head.position = dvec(t.stereo.head.position);
+                    head.rotation = engine_rotation(t.stereo.head.orientation);
                     presenter->camera_override = head;
-                    presenter->weapon_camera = ViewWeaponCamera{-std::asin(std::clamp(look.y, -1.f, 1.f)),
-                                                                std::atan2(look.x, look.z), head.position};
+                    // View weapons follow the right controller's aim until the arm IK lot.
+                    const auto& right = frame.hands[1];
+                    const xr::Pose weapon_pose =
+                        right.aim_valid ? xr_world_pose(t, reference, scale, right.aim) : t.stereo.head;
+                    const auto weapon_look = xr::rotate(weapon_pose.orientation, {0, 0, 1});
+                    presenter->weapon_camera =
+                        ViewWeaponCamera{-std::asin(std::clamp(weapon_look[1], -1.f, 1.f)),
+                                         std::atan2(weapon_look[0], weapon_look[2]), dvec(weapon_pose.position)};
+                    // Controller boxes, the aim laser and its reticle, in world units.
+                    lines_vertices.clear();
+                    for (std::size_t hand = 0; hand < 2; ++hand)
+                        if (frame.hands[hand].grip_valid)
+                            add_box(lines_vertices, xr_world_pose(t, reference, scale, frame.hands[hand].grip),
+                                    {0.03f * scale, 0.035f * scale, 0.065f * scale},
+                                    hand ? std::array<float, 4>{1, 0.45f, 0.05f, 1}
+                                         : std::array<float, 4>{0.1f, 0.8f, 1, 1});
+                    if (right.aim_valid && game->client_shell.m_bInWorld)
+                    {
+                        const auto aim = xr_world_pose(t, reference, scale, right.aim);
+                        const auto target = xr_aim_target(*game, aim);
+                        add_line(lines_vertices, aim.position, target, {0.9f, 0.15f, 0.1f, 1});
+                        const float dx = target[0] - t.stereo.head.position[0],
+                                    dy = target[1] - t.stereo.head.position[1],
+                                    dz = target[2] - t.stereo.head.position[2];
+                        const float size = std::max(0.5f, 0.012f * std::sqrt(dx * dx + dy * dy + dz * dz));
+                        const std::array<float, 4> white{1, 1, 1, 1};
+                        add_line(lines_vertices, {target[0] - size, target[1], target[2]},
+                                 {target[0] + size, target[1], target[2]}, white);
+                        add_line(lines_vertices, {target[0], target[1] - size, target[2]},
+                                 {target[0], target[1] + size, target[2]}, white);
+                        add_line(lines_vertices, {target[0], target[1], target[2] - size},
+                                 {target[0], target[1], target[2] + size}, white);
+                    }
                     start = Clock::now();
                     if (!presenter->update(*game, error))
                     {
@@ -626,7 +573,7 @@ namespace OpenBlood2
                     update_seconds += std::chrono::duration<double>(Clock::now() - start).count();
                     std::array<StereoEye, 2> views;
                     for (std::size_t i = 0; i < 2; ++i)
-                        views[i] = {dvec(stereo.eyes[i].position), engine_rotation(stereo.eyes[i].orientation),
+                        views[i] = {dvec(t.stereo.eyes[i].position), engine_rotation(t.stereo.eyes[i].orientation),
                                     eye_projection(frame.eye_fov[i])};
                     start = Clock::now();
                     SDL_GPUCommandBuffer* command = code ? nullptr : SDL_AcquireGPUCommandBuffer(xr.device());
@@ -640,10 +587,21 @@ namespace OpenBlood2
                     }
                     else if (!code)
                     {
-                        const bool ok = presenter->render_world
-                                            ? presenter->record_eyes(*game, command, color, xr.color_format(),
-                                                                     xr.width(), xr.height(), views, error)
-                                            : clear_eyes(command, color);
+                        const auto line_count = static_cast<std::uint32_t>(lines_vertices.size());
+                        presenter->eye_overlay =
+                            [&](SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* commands, std::size_t eye)
+                        {
+                            lines.draw(pass, commands,
+                                       xr::line_uniform(t.stereo.eyes[eye], frame.eye_fov[eye], 1, 65536), xr.width(),
+                                       xr.height(), ScenePresenter::view_model_depth, 1, 0, line_count);
+                        };
+                        const bool ok =
+                            lines.prepare(xr.color_format(), SDL_GPU_TEXTUREFORMAT_D32_FLOAT, error) &&
+                            lines.upload(command, lines_vertices, error) &&
+                            (presenter->render_world ? presenter->record_eyes(*game, command, color, xr.color_format(),
+                                                                              xr.width(), xr.height(), views, error)
+                                                     : clear_eyes(command, color));
+                        presenter->eye_overlay = nullptr;
                         if (!ok)
                         {
                             SDL_CancelGPUCommandBuffer(command);
