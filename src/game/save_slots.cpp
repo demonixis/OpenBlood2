@@ -398,6 +398,10 @@ namespace OpenBlood2
             ++report.level_entry_refusals;
             return false;
         };
+        // The snapshot belongs to the frame boundary after initialization: deferred removals that
+        // initialization left are finished first, as that boundary would.
+        if (game.objects.pending_count() && !game.objects.busy() && !game.objects.finish_frame())
+            return refused("Level-entry snapshot refused: the entry frame cannot be finished");
         GameSave save;
         std::string why;
         if (!game.save_game(save, why, SAVETYPE_AUTO))

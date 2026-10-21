@@ -238,3 +238,13 @@ No GPU, interactive or menu validation is specific to this lot.
 - The documented subclass losses are kept; the Tesla ball and Singularity end after a load.
 - The trail of a life-leech primary is republished with a new random scale.
 - The pickup display name is NULL: the port has no server `FormatString`.
+
+## Re-run on the restored data
+
+Re-run on 2026-10-21 (save/load lot 14), after the retail data was restored, on `019123b0` plus
+the two music commits, macOS, Apple clang 21. Dev and inspector-free Release, headless with private
+data: every save test passes; the only failures are the 7 known private-data content checks. Clang
+ASan/UBSan (`detect_leaks=0`) ran the private boss and enemy suites (gideon_*, enhanced_gideon,
+undead_gideon, ancient_one, naga, leech, later_levels, campaign_expansion) and every private save
+test of lots 5 to 13: all pass, with no sanitizer report. `save_pickups.private` takes 556 s under ASan, and `save_ai.worlds` 536 s; that
+sweep restores 54 of 58 worlds whole and refuses the 4 CTF maps by name.

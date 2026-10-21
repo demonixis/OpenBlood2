@@ -399,9 +399,16 @@ namespace
         SaveFlow flow;
         flow.slots = SaveSlots(fresh("restart"));
         std::string error;
-        // NEW_GAME: ClearSaveSlot(SLOT_CURRENT), then the level-entry snapshot.
+        // NEW_GAME: ClearSaveSlot(SLOT_CURRENT), then the level-entry snapshot. A removal that
+        // initialization left pending is finished first, as the entry's frame boundary would.
         health(*game) = 90;
+        const auto leftover = game->objects.create(game->objects.find_class("BaseClass"));
+        CHECK(leftover && game->objects.remove(leftover) && game->objects.pending_count() == 1);
+        std::string refused;
+        GameSave direct;
+        CHECK(!game->save_game(direct, refused) && contains(refused, "deferred removals"));
         CHECK(flow.level_entered(*game, true, error) && flow.slots.level_entry());
+        CHECK(game->objects.pending_count() == 0);
         const auto& current = flow.slots.info(SLOT_CURRENT);
         CHECK(current.state == SaveSlotInfo::State::Ready && current.meta.kind == SaveKind::LevelEntry &&
               current.meta.display_name == "player");

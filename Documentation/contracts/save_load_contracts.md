@@ -1,32 +1,25 @@
 # Save and load
 
-Status: **design contract for roadmap task 3.3. Lots 1 (save-message primitives), 2
-(container and fingerprint), 3 (engine records and the clock), 4 (restore-mode world
-and candidate transaction) and 5 (player and client) are implemented; see their evidence
-([lot 1](../implementation/reports/save_load_messages.md),
+Status: **roadmap task 3.3, complete (lot 14, 2026-10-21). Lots 1–14 are implemented; see their
+evidence ([lot 1](../implementation/reports/save_load_messages.md),
 [lot 2](../implementation/reports/save_load_container.md),
 [lot 3](../implementation/reports/save_load_records.md),
 [lot 4](../implementation/reports/save_load_session.md),
-[lot 5](../implementation/reports/save_load_player.md)). Lot 8 (movers and brushes,
-[evidence](../implementation/reports/save_load_movers.md)) declares its 18 classes Original.
-Lot 7 (world logic, [evidence](../implementation/reports/save_load_world_logic.md)) declares its
-10 classes Original.
-Lot 10 (effect publishers and audio emitters,
-[evidence](../implementation/reports/save_load_effects.md)) declares its 21 classes Original.
-Lot 9 (pickups and projectiles, [evidence](../implementation/reports/save_load_pickups.md))
-declares its 85 classes Original.
-Lot 13 (native state, [evidence](../implementation/reports/save_load_native.md)) checks the
-engine classes, sky and PolyGrid republication, VoiceMgr and CommLink across a load, and
-refuses CTF saves by name.
-Lot 11 (AI core, [evidence](../implementation/reports/save_load_ai.md)) declares the 17 AI_Mgr
-NPC classes and CCorpse Original, lot 12 (bosses and special enemies,
-[evidence](../implementation/reports/save_load_bosses.md)) the other 11 NPC classes. Lot 6 (slots, Quick and Restart, menus, [evidence](../implementation/reports/save_load_slots.md))
-writes and reads the slot, quick and level-entry files and enables the Save and Load screens,
-F5/F6 and the death Load menu. `GameSession::save_game` and `load_game` save and load through a
-candidate session, with the local player and its client blob. Every other original class is
-AlwaysLoad, NotSaved or Unsupported. Five worlds (06_airship1, 08_subwayb, credits, drop and end)
-now save and load whole; a save of any other world is still refused, naming its lot-9 or lot-12
-classes. The other lots are pending.** The
+[lot 5](../implementation/reports/save_load_player.md),
+[lot 6](../implementation/reports/save_load_slots.md),
+[lot 7](../implementation/reports/save_load_world_logic.md),
+[lot 8](../implementation/reports/save_load_movers.md),
+[lot 9](../implementation/reports/save_load_pickups.md),
+[lot 10](../implementation/reports/save_load_effects.md),
+[lot 11](../implementation/reports/save_load_ai.md),
+[lot 12](../implementation/reports/save_load_bosses.md),
+[lot 13](../implementation/reports/save_load_native.md),
+[lot 14](../implementation/reports/save_load_certification.md)). Every class the shipped worlds
+place is Original, AlwaysLoad or NotSaved. All 36 single-player worlds save and load whole at
+difficulties 0, 1 and 2, at entry and after combat, through the slot files that the Save and
+Load menus, F5/F6 and Restart use ([lot 14](#certified-whole-worlds-lot-14)). Multiplayer and CTF saves
+stay out of scope and are refused. Lot 15 (NEW_LEVEL on `SaveObjects`) is optional and not
+started.** The
 [audit](../implementation/save_load_audit/readme.md) is the evidence for every
 original rule cited here; its [source ledger](../implementation/sources/save_load_audit_sources.json)
 records the audited files. Read [level replacement](level_change_contracts.md),
@@ -884,6 +877,9 @@ frame boundary. The original rules are `LoadSave.cpp`, `MenuLoadGame.cpp`, `Menu
 - **Level-entry snapshot** (the `CMSG_AUTOSAVE` round trip). It is taken after a menu New Game,
   the Credits world, a NEW_LEVEL commit, an inspector level start and a direct `--view-world`
   entry, and only while `GAME_DOAUTOSAVE` is nonzero, so never after a restore.
+  - Deferred removals that initialization leaves (07_cathedral leaves one) are finished first, as
+    the next frame boundary would; a snapshot taken with one pending was refused
+    ([lot 14](#certified-whole-worlds-lot-14)).
   - `save_game` runs with `SAVETYPE_AUTO`: the request carries save type 0 and the image lands in
     the logical `Auto` store, as `Auto.sav` did.
   - The snapshot is kept in memory and written to `current.ob2sav`. New Game first removes both
@@ -1383,6 +1379,55 @@ payload version 1. Each block is written before AI_Mgr's (lot 11).
   running; the remaining blockers are lot 9's pickups and projectiles and lot 10's effect publishers
   and emitters (the evidence lists them per world).
 
+### Certified whole worlds (lot 14)
+
+The private certification runs every original rule above on the retail data, world by world
+(`tests/save_audit_tests.cpp`, `tests/train_session_tests.cpp`).
+
+- **Worlds.** The 36 single-player worlds are every mounted world outside `multi/`: 01_subwaya
+  to 25_ancientone (with 24b_arena), credits, drop and end. Multiplayer maps are out of scope (D12).
+- **Audit** (`save_audit.worlds`). Each world starts as a New Game at difficulty 1; the test also
+  runs at difficulties 0 and 2. The test sets the player's original CDestructable god-mode flag,
+  which is saved like any other field, so a hostile world cannot end the run early. Two cycles run:
+  - *entry*: the level-entry snapshot is taken as the application takes it, then the cycle runs.
+  - *combat*: the three nearest live non-boss NPCs take player-attributed damage, two lethal and one
+    wounding, and the world runs three seconds (corpses, drops, gibs, effects). Then the cycle runs.
+
+  Each cycle saves to slot 0 through the real files, reads the file back, loads it and compares the
+  live census of saved classes. It saves again: OBJS, LINK and ATCH must equal the file's apart from
+  the listed rewrites. It then runs 30 seconds (600 steps of 50 ms): every step must succeed, with no
+  NPC runtime failure and no unavailable service.
+- **Census.** Saved classes must match exactly. Always-load objects come back in their authored
+  state (rule 2), so their differences are reported but not failures: Keys a KeyFramer consumed
+  reappear, SkyPointers that removed themselves after binding return until their first update, and
+  the runtime SmellHint trail is lost.
+- **Restart after a load** (`save_audit.restart`, SubwayA). The level-entry snapshot is taken, then
+  a slot ten seconds later that carries it as AUTO. Loading the slot and then Restart, twice, puts
+  the player back at the entry position, and a save matches the entry image.
+- **Mid-route save** (`train_session.private_save`). The scripted SubwayA route saves at the
+  train's midpoint, round-trips the container bytes, loads and drives on to the authored exit and
+  NEW_LEVEL into CityHub, with health and ammunition kept.
+  - Handles are new after the load: wounded Cultists are carried by name, dead ones by count.
+  - Per-session inspection counters (messages, fire keys, music messages) start again with the
+    restored session and are summed across the load.
+  - `gpu.train_session_save` renders and reads back the restored game.
+- **Fixed here.**
+  - A level-entry snapshot is refused while a deferred removal from initialization is pending
+    (07_cathedral). The snapshot now finishes that frame first ([lot 6](#implemented-slots-quick-and-restart-lot-6)).
+  - `save_effects.private` now accepts lot 13's CTF refusal.
+  - Two music routing gaps ended 11_slaughter_house and 25_ancientone whether or not the game had
+    been saved: a key outside every region of Track1's program 13, and the missing program 1. A
+    received note in either case is now silent and counted, in two separate commits
+    ([routing contracts](music_routing_contracts.md)).
+- **Original loss kept.** The original creates an NPC's held weapon model only in
+  `CInventoryMgr`'s MID_UPDATE, and an inactive object receives none. An NPC that was deactivated at
+  the save therefore comes back unarmed until it wakes. One killed before it wakes drops nothing:
+  `DropCurrentWeapon` refuses it with `CHWEAP_NOTAVAIL`, silently, as the port does. Decision 4
+  does not list this loss, so it is preserved.
+- **Limits.** This certifies that saves restore equivalent engine records and run on healthily. It
+  is not retail parity, the combat is synthetic damage rather than play, and it does not exercise
+  every authored script.
+
 ## Restored and regenerated state
 
 | State | Treatment |
@@ -1399,6 +1444,7 @@ payload version 1. Each block is written before AI_Mgr's (lot 11).
 | HUD, crosshair, view weapons, MoveMgr prediction, zoom | Rebuilt: the player Load zeroes stat caches, the first update republishes, and ForcePos resets prediction |
 | Path manager, AI shared animation tables, container index, posed shells, collision | Rebuilt from restored objects and the DAT |
 | Runtime SmellHint trail, start-point name, cheats, unsaved per-class members | Lost, as in the original |
+| Held weapon models | Recreated by each NPC's first update after the load, as the original's `CInventoryMgr` MID_UPDATE does; a deactivated NPC stays unarmed until it wakes ([lot 14](#certified-whole-worlds-lot-14)) |
 | Inspection history, diagnostics, reports | Never saved; the new session starts empty |
 
 ## Failure policy

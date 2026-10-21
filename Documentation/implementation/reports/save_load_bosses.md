@@ -153,3 +153,15 @@ not run without the retail data. It must be re-run once the data is restored.
 
 Lots 9 and 10, then the certification of lot 14 (whole worlds, the SubwayA route, Restart, GPU
 readback). The player-continuation observations of lot 11's evidence still apply.
+
+## Re-run on the restored data
+
+Re-run on 2026-10-21 (save/load lot 14), after the retail data was restored, on `019123b0` plus
+the two music commits, macOS, Apple clang 21. Dev and inspector-free Release, headless with private
+data: every save test passes; the only failures are the 7 known private-data content checks. Clang
+ASan/UBSan (`detect_leaks=0`) ran the private boss and enemy suites (gideon_*, enhanced_gideon,
+undead_gideon, ancient_one, naga, leech, later_levels, campaign_expansion) and every private save
+test of lots 5 to 13: all pass, with no sanitizer report. `save_ai.worlds` (536 s under ASan) restores 54 of 58 worlds whole, including
+01_subwaya, 06_airship1, 08_subwayb, credits and end, which this report expected but could not
+verify; the 4 CTF maps are refused by lot 13. The whole-world certification of lot 14 then saves,
+loads and runs on all 36 single-player worlds ([evidence](save_load_certification.md)).

@@ -1972,3 +1972,13 @@ the inventory part of AdjustRes, UpdateInv, DrawInvTabs and the current-item par
 The keyboard keys for the new commands come from the retail `defaults.cfg` bindings (read as data,
 not imported). See the [input](../contracts/input_action_contracts.md) and
 [inventory cursor](../contracts/inventory_cursor_contracts.md) contracts.
+
+## Whole-world save certification (2026-10-21)
+
+Save/load lot 14 imports no original code. Its private audits are replacement test code. The one
+original rule it documents, an NPC's held weapon model created only by `CInventoryMgr::Update` and a
+silent `DropCurrentWeapon` refusal without one (`ObjectDLL/InventoryMgr.cpp`, `Weapon.cpp`), is
+already the port's behavior. See the
+[contract](../contracts/save_load_contracts.md#certified-whole-worlds-lot-14), the
+[evidence](reports/save_load_certification.md) and the
+[source ledger](sources/save_load_certification_sources.json).

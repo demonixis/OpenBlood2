@@ -213,3 +213,12 @@ No GPU, interactive or menu validation is specific to this lot.
 - A timed active camera restarts its full duration, as in the original.
 - Restored always-load targets of a finished path snap back to their authored pose, as in
   the original.
+
+## Re-run on the restored data
+
+Re-run on 2026-10-21 (save/load lot 14), after the retail data was restored, on `019123b0` plus
+the two music commits, macOS, Apple clang 21. Dev and inspector-free Release, headless with private
+data: every save test passes; the only failures are the 7 known private-data content checks. Clang
+ASan/UBSan (`detect_leaks=0`) ran the private boss and enemy suites (gideon_*, enhanced_gideon,
+undead_gideon, ancient_one, naga, leech, later_levels, campaign_expansion) and every private save
+test of lots 5 to 13: all pass, with no sanitizer report. `save_world_logic.private` takes 635 s under ASan.

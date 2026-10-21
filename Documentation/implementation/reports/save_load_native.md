@@ -191,3 +191,12 @@ blocking table above is from this rebased build):
 - The original's leftover CommLink panel after a load is not reproduced.
 - The GPU check compares presentation counts, not pixels: the image omits the classes of later
   lots, so the restored frame legitimately differs.
+
+## Re-run on the restored data
+
+Re-run on 2026-10-21 (save/load lot 14), after the retail data was restored, on `019123b0` plus
+the two music commits, macOS, Apple clang 21. Dev and inspector-free Release, headless with private
+data: every save test passes; the only failures are the 7 known private-data content checks. Clang
+ASan/UBSan (`detect_leaks=0`) ran the private boss and enemy suites (gideon_*, enhanced_gideon,
+undead_gideon, ancient_one, naga, leech, later_levels, campaign_expansion) and every private save
+test of lots 5 to 13: all pass, with no sanitizer report. `save_native.private` takes 1,014 s under ASan.

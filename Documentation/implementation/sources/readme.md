@@ -29,6 +29,7 @@ Runtime test logs and measurements belong in the
 - [Save/load player and client](save_load_player_sources.json): lot 5 CPlayerObj, CMovement, CInventoryMgr and CDestructable Save/Load, the client blob and the restored client; selective excerpts recorded in provenance.
 - [Save/load movers and brushes](save_load_movers_sources.json): lot 8 Save/Load bodies of doors, rotators, destructible brushes and models, debris, volumes, TripLaser and Tchernotronic.
 - [Save/load slots and menus](save_load_slots_sources.json): lot 6 slot, quick and Restart rules, Load/Save menu rows, F5/F6 and death to the Load menu.
+- [Save/load certification](save_load_certification_sources.json): lot 14 references for the kept original held-weapon loss.
 - [Save/load world logic](save_load_world_logic_sources.json): lot 7 Save/Load bodies of the triggers, Spawner, KeyFramer/KeyData and CameraObj.
 - [Save/load effects and emitters](save_load_effects_sources.json): lot 10 Save/Load bodies of SoundFX, RandomSoundFX, the light family, scene explosions, particle streams, lightning, warp gates and DetailSprite.
 - [Save/load native state](save_load_native_sources.json): lot 13 engine class flags, PolyGrid/VolumeBrush surfaces, the VoiceMgr reset and CommLink on a load, and the multiplayer save guard.

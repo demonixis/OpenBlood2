@@ -136,6 +136,17 @@ foreach(case layout roundtrip powers refusals character level_change)
     set_tests_properties(save_player.${case} PROPERTIES LABELS "headless;objects;save" TIMEOUT 120)
 endforeach()
 
+add_executable(save_audit_tests save_audit_tests.cpp)
+target_link_libraries(save_audit_tests PRIVATE blood2_game)
+blood2_project_options(save_audit_tests)
+if(BLOOD2_TEST_DATA_DIR)
+    # Lot 14: every single-player world at difficulty 1, and Restart after a load.
+    add_test(NAME save_audit.worlds COMMAND save_audit_tests worlds "${CMAKE_CURRENT_BINARY_DIR}/save-audit-worlds" "${BLOOD2_TEST_DATA_DIR}" 1)
+    set_tests_properties(save_audit.worlds PROPERTIES LABELS "private;headless;save" TIMEOUT 3600)
+    add_test(NAME save_audit.restart COMMAND save_audit_tests restart "${CMAKE_CURRENT_BINARY_DIR}/save-audit-restart" "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(save_audit.restart PROPERTIES LABELS "private;headless;save" TIMEOUT 600)
+endif()
+
 add_executable(save_slot_tests save_slot_tests.cpp)
 target_link_libraries(save_slot_tests PRIVATE blood2_game)
 blood2_project_options(save_slot_tests)
@@ -2290,10 +2301,18 @@ if(BLOOD2_TEST_DATA_DIR)
         add_test(NAME train_session.private_${rate} COMMAND train_session_tests "${BLOOD2_TEST_DATA_DIR}" ${rate})
         set_tests_properties(train_session.private_${rate} PROPERTIES LABELS "headless;train_session;private" TIMEOUT 240)
     endforeach()
+    # Save/load lot 14: the same route saved and loaded mid-level.
+    add_test(NAME train_session.private_save COMMAND train_session_tests "${BLOOD2_TEST_DATA_DIR}" 60 --save)
+    set_tests_properties(train_session.private_save PROPERTIES LABELS "headless;train_session;private;save" TIMEOUT 240)
     if(BLOOD2_GPU_TESTS)
         add_test(NAME gpu.train_session COMMAND train_session_tests "${BLOOD2_TEST_DATA_DIR}" 60
             "${CMAKE_CURRENT_BINARY_DIR}/train-session-gpu")
         set_tests_properties(gpu.train_session PROPERTIES LABELS "gpu;train_session;private" TIMEOUT 240
+            RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+        # Readback after a mid-route load: the middle and CityHub captures render the restored game.
+        add_test(NAME gpu.train_session_save COMMAND train_session_tests "${BLOOD2_TEST_DATA_DIR}" 60 --save
+            "${CMAKE_CURRENT_BINARY_DIR}/train-session-save-gpu")
+        set_tests_properties(gpu.train_session_save PROPERTIES LABELS "gpu;train_session;private;save" TIMEOUT 240
             RUN_SERIAL TRUE FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
     endif()
 endif()

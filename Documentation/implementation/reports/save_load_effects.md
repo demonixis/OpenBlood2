@@ -206,3 +206,13 @@ tree once the data is restored.
   `doors.catalog`, the known content failure.
 - Four existing tests were updated (see Findings); `save_session.declarations` lists the 21 new
   Original classes and no longer expects them in the refusal.
+
+## Re-run on the restored data
+
+Re-run on 2026-10-21 (save/load lot 14), after the retail data was restored, on `019123b0` plus
+the two music commits, macOS, Apple clang 21. Dev and inspector-free Release, headless with private
+data: every save test passes; the only failures are the 7 known private-data content checks. Clang
+ASan/UBSan (`detect_leaks=0`) ran the private boss and enemy suites (gideon_*, enhanced_gideon,
+undead_gideon, ancient_one, naga, leech, later_levels, campaign_expansion) and every private save
+test of lots 5 to 13: all pass, with no sanitizer report. `save_effects.private` passes in every build (831 s under ASan) after a test fix:
+it now accepts lot 13's CTF refusal on `multi/ctf_cabana`, as the other audits do.

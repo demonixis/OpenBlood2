@@ -864,10 +864,16 @@ namespace
             };
             std::cout << name << ": lot-10 objects " << list(lot10) << "; "
                       << (blocking.empty() ? "no blocking class" : "blocked by " + list(blocking)) << '\n';
+            GameSave save;
+            if (blocking.empty() && !game->save_game(save, error))
+            {
+                // Lot 13 refuses a CTF world by name: its team flags are multiplayer state.
+                CHECK(error.find("CTF games cannot be saved") != std::string::npos);
+                std::cout << "  whole save refused: CTF\n";
+                continue;
+            }
             if (blocking.empty())
             {
-                GameSave save;
-                CHECK(game->save_game(save, error));
                 SaveImage first = save.image;
                 for (unsigned cycle = 0; cycle < 2; ++cycle)
                 {
@@ -896,7 +902,7 @@ namespace
                 gates += game->server.IsObjectAlive(w.owner);
             SaveObjectsReport saved;
             CHECK(game->server.save_objects(current, covered, 0, save_flags, saved));
-            GameSave save{game->world_path, {}, *game->server.save_store.find(SaveStoreSlot::Current)};
+            save = {game->world_path, {}, *game->server.save_store.find(SaveStoreSlot::Current)};
             SaveError fingerprint;
             CHECK(
                 build_fingerprint(game->resources, save.world_path, save.image.classes, save.fingerprint, fingerprint));

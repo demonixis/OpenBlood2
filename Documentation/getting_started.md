@@ -58,7 +58,9 @@ for retail, Demo_01 for the demo. The retail intro locks movement/fire for about
 12 simulation seconds. Demo_01 continues to Demo_02; Enter after death restarts
 the current demo level with initial equipment. Demo EndGame returns through Info
 to Main; Quit shows Info before exit. Direct demo entry exits after the end image.
-Save/load slots remain unavailable; see the [demo retry/save hook](contracts/demo_contracts.md).
+Retail Single Player has the original Load and Save menus: eight slots, Quickload and Restart (the
+start of the current level). After death, Use opens the Load menu. The demo has no saves; see the
+[save contract](contracts/save_load_contracts.md) and the [demo retry hook](contracts/demo_contracts.md).
 
 ## Controls
 
@@ -74,12 +76,14 @@ Save/load slots remain unavailable; see the [demo retry/save hook](contracts/dem
 | TheEye | I: throw, then toggle camera; touch the landed eye to retrieve |
 | Attached BoneLeech | Tap E rapidly, or 25 presses at any pace |
 | Proximity / remote / time bombs | P / R / T; B detonates remote charges |
+| Quicksave / quickload | F5 / F6 (retail) |
 | Pause / inspector | Esc / F10 |
 
 Inventory actions require collection; release Shift before using them. Focus
 capture does not fire a shot. Text editing/focus loss suppress game input.
 F1/F2/F3 apply only to diagnostic smokes; see [input contracts](contracts/player_control_contracts.md).
-Audio/Mouse/Display preferences use SDL's OpenBlood2/Blood2 user directory.
+Audio/Mouse/Display preferences and saved games (`saves/retail/`) use SDL's OpenBlood2/Blood2
+user directory.
 
 ## Platforms
 

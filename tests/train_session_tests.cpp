@@ -7,6 +7,7 @@
 #include "game/original/AI_Mgr.h"
 #include "game/original/Door.h"
 #include "game/original/Trigger.h"
+#include "game/save_slots.h"
 #include <cmath>
 #include <map>
 #include <set>
@@ -75,9 +76,13 @@ namespace
     }
     // Inspect failures independently of attempted-service counts. Kept in the
     // route harness so acceptance cannot turn a positive counter into success.
-    bool check_inventory(const CInventoryMgr& inventory, std::string& error)
+    // `restored`: the owner came from a mid-route load. The original creates the held model only in
+    // CInventoryMgr's MID_UPDATE, and an inactive NPC gets none, so one killed before it woke has no
+    // weapon in hand and DropCurrentWeapon refuses silently (CHWEAP_NOTAVAIL), as in the original.
+    bool check_inventory(const CInventoryMgr& inventory, std::string& error, bool restored = false)
     {
-        CHECK(inventory.drop_error.empty());
+        error = restored && inventory.drop_error == "No live current held weapon" ? "" : inventory.drop_error;
+        CHECK(error.empty());
         for (unsigned slot = 0; slot < inventory_weapon_slots; ++slot)
             for (bool left : {false, true})
                 if (const auto* weapon = inventory.GetWeapon(slot, left))
@@ -227,7 +232,8 @@ namespace
         return true;
     }
 
-    bool traverse(const std::filesystem::path& root, unsigned hz, const std::filesystem::path& captures)
+    bool traverse(const std::filesystem::path& root, unsigned hz, const std::filesystem::path& captures,
+                  bool save_midway)
     {
         std::string error;
         Runtime runtime;
@@ -248,28 +254,32 @@ namespace
         auto game = std::make_unique<GameSession>();
         Config config;
         config.data_dir = root;
-        auto& g = *game;
-        if (!g.initialize() || !g.resources.mount_game(config, error) || !g.request_world("01_SubwayA", error) ||
-            !g.run_world(error) || !test_camera::complete_subway_intro(g))
+        GameSession* session = game.get(); // Replaced by a mid-route load.
+        if (!session->initialize() || !session->resources.mount_game(config, error) ||
+            !session->request_world("01_SubwayA", error) || !session->run_world(error) ||
+            !test_camera::complete_subway_intro(*session))
             return false;
-        for (const auto& entry : g.entries)
+        for (const auto& entry : session->entries)
             CHECK(entry.state != EntryState::Unsupported && entry.state != EntryState::Failed);
-        auto* p = g.server_shell.Player(g.local_client);
+        auto* p = session->server_shell.Player(session->local_client);
         CHECK(p);
-        const auto initial_position = g.objects.get(p->m_hObject)->state.m_Pos;
+        const auto initial_position = session->objects.get(p->m_hObject)->state.m_Pos;
         CHECK(initial_position.z < -3000);
         HOBJECT relay = nullptr;
-        for (auto id : g.objects.snapshot())
-            if (std::string_view(g.objects.get(id)->state.m_Name) == "Trigger2")
-                relay = g.objects.get(id)->handle;
-        auto* trigger = dynamic_cast<Trigger*>(g.server.HandleToObject(relay));
+        for (auto id : session->objects.snapshot())
+            if (std::string_view(session->objects.get(id)->state.m_Name) == "Trigger2")
+                relay = session->objects.get(id)->handle;
+        auto* trigger = dynamic_cast<Trigger*>(session->server.HandleToObject(relay));
         CHECK(trigger && trigger->activations == 0);
         std::set<HOBJECT> damaged, dead;
-        bool ammo_pickup = false, health_pickup = false, black = false, middle_captured = false;
+        bool ammo_pickup = false, health_pickup = false, black = false, middle_captured = false, saved = false;
+        std::size_t dead_before_save = 0;
+        // Inspection counters are per session: the restored session starts them again.
+        std::uint64_t music_messages_before = 0, music_received_before = 0, fire_keys_before = 0;
         if (gpu)
         {
-            CHECK(g.server.audio.open_output(error));
-            CHECK(capture_scene(g, runtime, captures / "start.png", error));
+            CHECK(session->server.audio.open_output(error));
+            CHECK(capture_scene(*session, runtime, captures / "start.png", error));
         }
         const auto id = gpu ? SDL_GetWindowID(runtime.window) : 8;
         MovementControls controls;
@@ -307,17 +317,69 @@ namespace
             event.key.down = down;
             return input(event);
         };
-        for (unsigned tick = 0; tick < 90 * hz && !g.pending_level_change; ++tick)
+        for (unsigned tick = 0; tick < 90 * hz && !session->pending_level_change; ++tick)
         {
+            if (save_midway && !saved && session->objects.get(p->m_hObject)->state.m_Pos.z > 0)
+            {
+                // Save/load lot 14: save mid-level, round-trip the container bytes, load, and continue
+                // the same route in the restored session. Handles are new after the load, so the
+                // wounded Cultists are carried by name and the dead ones by count.
+                saved = true;
+                CHECK(trigger->activations == 0);
+                std::set<std::string> wounded;
+                for (auto h : damaged)
+                    if (!dead.contains(h) && session->objects.get(h))
+                        wounded.insert(session->objects.get(h)->state.m_Name);
+                dead_before_save = dead.size();
+                music_messages_before = p->music_messages;
+                music_received_before = session->client_shell.music.received;
+                fire_keys_before = session->client_shell.weapons.front().fire_keys;
+                GameSave save, loaded;
+                CHECK(session->save_game(save, error));
+                SaveMeta meta;
+                meta.kind = SaveKind::Quick;
+                meta.display_name = "route";
+                meta.world_path = save.world_path;
+                meta.world_title = "route";
+                meta.version = "route";
+                SaveContainer container, decoded;
+                std::vector<std::uint8_t> bytes;
+                SaveError fault;
+                CHECK(save_container(save, meta, container, error) && encode_save(container, bytes, fault));
+                CHECK(decode_save(bytes, decoded, fault) && game_save_from(decoded, loaded, error));
+                if (!GameSession::load_game(game, loaded, error))
+                {
+                    std::cerr << "Mid-route load refused at " << game->game_load.stage << ": " << error << '\n';
+                    return false;
+                }
+                session = game.get();
+                p = session->server_shell.Player(session->local_client);
+                CHECK(p);
+                trigger = nullptr;
+                damaged.clear();
+                dead.clear();
+                for (auto object : session->objects.snapshot())
+                {
+                    const auto* record = session->objects.get(object);
+                    if (std::string_view(record->state.m_Name) == "Trigger2")
+                        trigger = dynamic_cast<Trigger*>(record->game.get());
+                    if (wounded.contains(record->state.m_Name) && dynamic_cast<const AI_Mgr*>(record->game.get()))
+                        damaged.insert(record->handle);
+                }
+                CHECK(trigger && trigger->activations == 0);
+                std::cout << "Saved and loaded mid-route at t=" << float(tick) / hz << " (" << bytes.size()
+                          << " bytes, " << session->game_load.records << " records); " << dead_before_save
+                          << " dead and " << damaged.size() << " wounded Cultists carried" << std::endl;
+            }
             const float old_ammo = p->m_InventoryMgr.GetAmmoCount(1), old_health = p->m_damage.m_fHitPoints;
             std::map<HOBJECT, float> health;
-            const auto position = g.objects.get(p->m_hObject)->state.m_Pos;
+            const auto position = session->objects.get(p->m_hObject)->state.m_Pos;
             HOBJECT target = nullptr;
             float closest = 1e20f;
             DVector aim{};
-            for (auto id : g.objects.snapshot())
+            for (auto id : session->objects.snapshot())
             {
-                const auto* record = g.objects.get(id);
+                const auto* record = session->objects.get(id);
                 const auto* ai = record ? dynamic_cast<const AI_Mgr*>(record->game.get()) : nullptr;
                 if (ai && ai->runtime_failed)
                 {
@@ -326,7 +388,7 @@ namespace
                 }
                 if (ai)
                 {
-                    CHECK(check_inventory(ai->m_InventoryMgr, error));
+                    CHECK(check_inventory(ai->m_InventoryMgr, error, ai->restored_loads > 0));
                     error = ai->ai_key_error + ai->gib_error + ai->death_error + ai->damage_reaction_error;
                     CHECK(error.empty() && !ai->key_failures && !ai->unavailable_keys);
                 }
@@ -340,15 +402,15 @@ namespace
                     continue;
                 DVector head;
                 DRotation rotation;
-                if (!g.server.GetModelNodeTransform(record->handle, "head", &head, &rotation))
+                if (!session->server.GetModelNodeTransform(record->handle, "head", &head, &rotation))
                     return false;
                 SegmentHit hit;
-                const auto delta = vector_subtract(head, g.client_shell.view.position);
+                const auto delta = vector_subtract(head, session->client_shell.view.position);
                 const auto distance = vector_dot(delta, delta);
                 if (distance < closest &&
-                    g.server.IntersectSegment(g.client_shell.view.position, head, p->m_hObject, hit, false,
-                                              SegmentObjects::SolidOrRayHit, SegmentFilter::IgnoreVolumes,
-                                              SegmentStart::SkipInterior) == SegmentResult::Hit &&
+                    session->server.IntersectSegment(session->client_shell.view.position, head, p->m_hObject, hit,
+                                                     false, SegmentObjects::SolidOrRayHit, SegmentFilter::IgnoreVolumes,
+                                                     SegmentStart::SkipInterior) == SegmentResult::Hit &&
                     hit.object == record->handle)
                 {
                     target = record->handle;
@@ -364,8 +426,8 @@ namespace
             SDL_Event motion{};
             motion.type = SDL_EVENT_MOUSE_MOTION;
             motion.motion.windowID = id;
-            motion.motion.xrel = std::remainder(yaw - g.client_shell.rotation.yaw, 6.28318530718f) / .0025f;
-            motion.motion.yrel = (pitch - g.client_shell.rotation.pitch) / .0025f;
+            motion.motion.xrel = std::remainder(yaw - session->client_shell.rotation.yaw, 6.28318530718f) / .0025f;
+            motion.motion.yrel = (pitch - session->client_shell.rotation.pitch) / .0025f;
             CHECK(input(motion));
             SDL_Event fire{};
             // Finish the 30 Hz dry-ammo probe through normal firing after the relay.
@@ -395,35 +457,35 @@ namespace
                 CHECK(controls.sync_mouse(runtime.window, true, false, error) && controls.mouse_captured);
             }
             const auto slot = controls.sample_weapon_slot(false);
-            if (slot >= 0 && !g.command_weapon(static_cast<DBYTE>(slot), error))
+            if (slot >= 0 && !session->command_weapon(static_cast<DBYTE>(slot), error))
                 return false;
-            controls.look(g.client_shell.rotation, dt, false);
+            controls.look(session->client_shell.rotation, dt, false);
             const auto buttons = controls.sample_fire(false);
-            g.client_shell.weapon_input = {buttons.primary, buttons.alternate, false};
-            g.client_shell.movement_input = controls.sample(false);
-            g.client_shell.use_down = controls.sample_use(false);
+            session->client_shell.weapon_input = {buttons.primary, buttons.alternate, false};
+            session->client_shell.movement_input = controls.sample(false);
+            session->client_shell.use_down = controls.sample_use(false);
             if (tick % (2 * hz) == 0)
                 std::cout << "Walk t=" << float(tick) / hz << " pos=" << position.x << ',' << position.y << ','
                           << position.z << " HP=" << p->m_damage.m_fHitPoints
                           << " ammo=" << p->m_InventoryMgr.GetAmmoCount(1)
-                          << " target=" << (target ? g.objects.get(target)->state.m_Name : "none") << std::endl;
-            if (!g.step(dt) || p->m_damage.IsDead())
+                          << " target=" << (target ? session->objects.get(target)->state.m_Name : "none") << std::endl;
+            if (!session->step(dt) || p->m_damage.IsDead())
             {
-                for (const auto& line : g.trace)
+                for (const auto& line : session->trace)
                     std::cerr << line << '\n';
                 std::cerr << "Step/death failure HP=" << p->m_damage.m_fHitPoints << '\n';
                 return false;
             }
             for (const auto& [handle, hp] : health)
             {
-                auto* record = g.objects.get(handle);
+                auto* record = session->objects.get(handle);
                 auto* ai = record ? dynamic_cast<AI_Mgr*>(record->game.get()) : nullptr;
                 if (ai && ai->m_damage.m_fHitPoints < hp && ai->m_damage.GetLastDamager() == p->m_hObject)
                     damaged.insert(handle);
                 if (damaged.contains(handle) && (!ai || ai->m_damage.IsDead()))
                     dead.insert(handle);
             }
-            CHECK(check_effects(g, audit, nullptr, error));
+            CHECK(check_effects(*session, audit, nullptr, error));
             CHECK(check_actor(*p, error));
             error = p->entry_error + p->locomotion_error + p->death_error + p->death_effect_error +
                     p->player_trigger_error + p->sound_error + p->smell_error;
@@ -431,53 +493,61 @@ namespace
                   !p->activation_ping_failures && !p->unavailable_sound_alerts);
             ammo_pickup |= p->m_InventoryMgr.GetAmmoCount(1) > old_ammo;
             health_pickup |= p->m_damage.m_fHitPoints > old_health;
-            black |= g.client_shell.fade.Scale() == 0;
+            black |= session->client_shell.fade.Scale() == 0;
             if (gpu && !middle_captured && position.z > 0)
             {
-                CHECK(capture_scene(g, runtime, captures / "middle.png", error));
+                CHECK(capture_scene(*session, runtime, captures / "middle.png", error));
                 middle_captured = true;
             }
         }
         std::cout << "Route summary: damaged=" << damaged.size() << " dead=" << dead.size()
                   << " ammoPickup=" << ammo_pickup << " healthPickup=" << health_pickup
                   << " relay=" << trigger->activations << " relayStart=" << trigger->delay_start
-                  << " fade=" << p->fade_messages << " time=" << g.server.GetTime() << '\n';
+                  << " fade=" << p->fade_messages << " time=" << session->server.GetTime() << '\n';
         for (const auto& slot : trigger->slots)
             std::cout << "Relay slot " << slot.target << " sent=" << slot.sent << " pending=" << slot.pending << '\n';
-        for (const auto& line : g.objects.diagnostics())
+        for (const auto& line : session->objects.diagnostics())
             std::cout << "Object diagnostic: " << line << '\n';
-        if (!g.pending_level_change)
-            for (const auto& [name, calls] : g.server.service_calls)
+        if (!session->pending_level_change)
+            for (const auto& [name, calls] : session->server.service_calls)
                 std::cout << "Failed route calls " << name << '=' << calls << '\n';
         const auto knife_shots = p->m_InventoryMgr.GetWeapon(0)->shots;
         // Source frame histories leave different dropped pickups on this fixed
         // route. Require real dry-ammo knife firing at 30 Hz and ammunition
         // collection at 60 Hz, without diagnostic ammo/stat grants. 120 Hz guards
         // high-refresh per-update emission (blood spurts); its pickups are not fixed.
-        CHECK(damaged.size() >= 4 && dead.size() >= 4 && health_pickup);
+        CHECK(!save_midway || saved);
+        CHECK(damaged.size() + dead_before_save >= 4 && dead.size() + dead_before_save >= 4 && health_pickup);
         CHECK(hz == 30 ? knife_shots > 0 : hz == 120 || ammo_pickup);
         CHECK(trigger->activations == 1 && trigger->last_sender == p->m_hObject && black);
         for (const auto& slot : trigger->slots)
             CHECK(slot.sent == 1);
-        CHECK(g.client_shell.weapons.front().fire_keys > 0 && p->fade_messages == 1);
-        CHECK(p->unsupported_triggers == 0 && p->music_messages == 1 && g.client_shell.music.received == 1 &&
-              g.client_shell.music.logical_level == 3 && g.client_shell.music.failures == 0 &&
-              g.server.audio.music_loop.active() && g.server.audio.music_loop.level() == 3 &&
-              g.server.audio.music_error.empty());
+        CHECK(session->client_shell.weapons.front().fire_keys + fire_keys_before > 0 && p->fade_messages == 1);
+        std::cout << "Music: player messages " << p->music_messages << ", received "
+                  << session->client_shell.music.received
+                  << ", level " << int(session->client_shell.music.logical_level) << ", loop "
+                  << session->server.audio.music_loop.active() << '/' << int(session->server.audio.music_loop.level())
+                  << '\n';
+        CHECK(p->unsupported_triggers == 0 && p->music_messages + music_messages_before == 1 &&
+              session->client_shell.music.received + music_received_before == 1 &&
+              session->client_shell.music.logical_level == 3 && session->client_shell.music.failures == 0 &&
+              session->server.audio.music_loop.active() && session->server.audio.music_loop.level() == 3 &&
+              session->server.audio.music_error.empty());
         CHECK(p->m_damage.apply_damage_physics && p->m_damage.last_impulse_ok);
         // The 30 Hz driver takes enemy hits; the 60 Hz route can finish unhurt.
         if (hz == 30)
             CHECK(p->m_damage.damage_impulses > 0);
         std::cout << "Player damage impulses=" << p->m_damage.damage_impulses << '\n';
-        CHECK(trace_services(g, audit, "SubwayA", error));
+        CHECK(trace_services(*session, audit, "SubwayA", error));
         const float health = p->m_damage.m_fHitPoints, ammo = p->m_InventoryMgr.GetAmmoCount(1);
-        const auto revision = g.world_revision;
+        const auto revision = session->world_revision;
         std::cout << "Completed train at " << hz << " Hz: " << damaged.size() << " damaged / " << dead.size()
                   << " dead authored Cultists, HP=" << health << " ammo=" << ammo << "\n";
-        std::cout << "Message lifetime: " << g.server.message_stats.created << " created, "
-                  << g.server.message_stats.released << " released, peak=" << g.server.message_stats.peak_live << '\n';
+        std::cout << "Message lifetime: " << session->server.message_stats.created << " created, "
+                  << session->server.message_stats.released
+                  << " released, peak=" << session->server.message_stats.peak_live << '\n';
         std::cout << "Knife FIRE_KEY shots=" << knife_shots << '\n';
-        if (!g.pending_level_change)
+        if (!session->pending_level_change)
             return false;
         std::cout << "Reached authored NEW_LEVEL from spawn\n";
         if (GameSession::process_level_change(game, error) != LevelChangeResult::Committed)
@@ -522,7 +592,10 @@ int main(int argc, char** argv)
     if (argc == 2 && std::string_view(argv[1]) == "audit")
         return audit_rejections() ? 0 : 1;
     const std::string_view rate = argc >= 3 ? argv[2] : "";
-    if (argc < 3 || argc > 4 || (rate != "30" && rate != "60" && rate != "120"))
+    if (argc < 3 || argc > 5 || (rate != "30" && rate != "60" && rate != "120"))
         return 2;
-    return traverse(argv[1], rate == "30" ? 30 : rate == "60" ? 60 : 120, argc == 4 ? argv[3] : "") ? 0 : 1;
+    // [--save] [captures]: the save variant saves and loads mid-route (save/load lot 14).
+    const bool save = argc >= 4 && std::string_view(argv[3]) == "--save";
+    const std::filesystem::path captures = argc == 5 ? argv[4] : argc == 4 && !save ? argv[3] : "";
+    return traverse(argv[1], rate == "30" ? 30 : rate == "60" ? 60 : 120, captures, save) ? 0 : 1;
 }

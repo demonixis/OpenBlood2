@@ -30,7 +30,8 @@ The launcher selects your installation or installs the demo. To launch directly:
 ```
 
 Normal launch opens the original menu; Esc pauses. Add `--view-world` for direct
-entry. Save/load is unavailable. Use `release` for an optimized build without the
+entry. Single Player saves and loads the original slots; F5 quicksaves, F6
+quickloads. Use `release` for an optimized build without the
 inspector, `debug` for debugging. See [setup and controls](Documentation/getting_started.md).
 
 ## CI builds

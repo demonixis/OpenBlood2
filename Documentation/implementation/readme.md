@@ -16,6 +16,7 @@ accepted with open GPU reservation **M2-GPU-001**. M3 remains unaccepted.
 | Save/load lot 5 (player and client) | [Report](reports/save_load_player.md) / [source ledger](sources/save_load_player_sources.json) |
 | Save/load lot 8 (movers and brushes) | [Report](reports/save_load_movers.md) / [source ledger](sources/save_load_movers_sources.json) |
 | Save/load lot 6 (slots, Quick and Restart, menus) | [Report](reports/save_load_slots.md) / [source ledger](sources/save_load_slots_sources.json) |
+| Save/load lot 14 (whole-world certification) | [Report](reports/save_load_certification.md) / [source ledger](sources/save_load_certification_sources.json) |
 | Save/load lot 7 (world logic) | [Report](reports/save_load_world_logic.md) / [source ledger](sources/save_load_world_logic_sources.json) |
 | Save/load lot 10 (effect publishers and audio emitters) | [Report](reports/save_load_effects.md) / [source ledger](sources/save_load_effects_sources.json) |
 | Save/load lot 13 (native state) | [Report](reports/save_load_native.md) / [source ledger](sources/save_load_native_sources.json) |
