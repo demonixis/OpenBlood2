@@ -36,7 +36,7 @@ accept M3 or provide network play.
 | M4 | ~85% | Original rendering on Vulkan (Linux, Windows) and Metal (macOS). D3D12 is not planned. |
 | M5 | ~65% | Optional PBR shader set with JSON texture/material bindings; the legacy set remains selectable. The [enhanced renderer](contracts/enhanced_renderer_contracts.md) covers 5.0, 5.1 (built-in manifest), 5.3 and 5.4; emissive and inspection remain. |
 | M6 | 0% | PBR-only post-processing: bloom from emissive maps, GTAO, SSR, tonemapping; AA for both sets. |
-| M7 | ~55% | Gamepad: action layer, rebinding, hotplug, menus; a parallel track, needed before M8. The [input actions](contracts/input_action_contracts.md) cover keyboard, mouse and gamepad (console layout, hot-plug, menus, weapon cycling) and the original [inventory cursor](contracts/inventory_cursor_contracts.md) with its item tabs; touch camera and rebinding remain. |
+| M7 | ~60% | Gamepad: action layer, rebinding, hotplug, menus; a parallel track, needed before M8. The [input actions](contracts/input_action_contracts.md) cover keyboard, mouse and gamepad (console layout, hot-plug, menus, weapon cycling) the original [inventory cursor](contracts/inventory_cursor_contracts.md) with its item tabs, and a touch camera drag; on-screen touch controls and rebinding remain. |
 | M8 | 0% | VR on Meta Quest through OpenXR; also the Android gate. |
 | M9 | ~10% | LAN multiplayer: Bloodbath, CTF and Team on the original multiplayer maps. |
 

@@ -1,4 +1,4 @@
-# Input actions (input lot: keyboard, mouse and gamepad)
+# Input actions (input lot: keyboard, mouse, gamepad and touch)
 
 Play and menu input go through a table of logical actions
 (`src/app/input_actions.h`). `MovementControls` keeps device state (keys, mouse
@@ -13,6 +13,7 @@ device policy (capture, sensitivity, focus). **M2/M3 scope is unchanged.**
 
 - Step 1 added the action layer with the previous keyboard/mouse layout.
 - Step 2 adds gamepads, weapon cycling and the inventory commands.
+- Step 3 adds the touch camera drag.
 
 ## Actions and kinds
 
@@ -150,6 +151,25 @@ the other. The state follows these rules:
   held when the menu closes moves the player at once; a held Press source needs a fresh
   press.
 
+## Touch camera
+
+Touch screens drag the camera (`MovementControls`, replacement policy):
+
+- The first finger that lands on the right half of the window (x ≥ 0.5) owns the drag,
+  while play is focused, enabled and not editing text. Other fingers are ignored until
+  it lifts or is cancelled; its travel before release is still applied.
+- Travel accumulates in window units and is consumed once by `look()`:
+  - 3 rad of yaw per window width and 1.5 rad of pitch per window height;
+  - shared vertical inversion, quartered while zoomed;
+  - no mouse capture needed.
+- Only direct touch screens count. A macOS trackpad's indirect touches and SDL's
+  mouse-emulated touches are ignored.
+- SDL's touch-emulated mouse events never look or fire in play; menus still receive them
+  as pointer input.
+- Focus loss, player changes and disabled or text-editing frames drop the drag.
+
+There are no on-screen controls yet: movement, fire and menus need another device.
+
 ## Menu, demo and frontend routing
 
 `MenuInput` keeps its original ordering and early returns. It reads input edges, so
@@ -214,6 +234,8 @@ The headless `input_actions.*` tests cover:
   suppression, command edges, analog look (deadzone, curve, zoom, inversion), several
   gamepads, removal, the eight-gamepad bound, focus loss and resync;
 - the re-arming of held buttons on player change;
+- the touch drag: right half only, one owning finger, consumption, zoom, release,
+  indirect/emulated/foreign-window touches, touch-emulated mouse events and the drop rules;
 - gamepad menu navigation, accept and back, resume, the credits screen, and menu-time
   state.
 
@@ -225,7 +247,7 @@ its status-bar tabs: see the [inventory cursor contracts](inventory_cursor_contr
 
 Not included yet:
 
-- Touch camera drag.
+- On-screen touch controls (movement, fire, buttons).
 - VR controllers (they will reuse the gamepad layout).
 - Gamepad auto-repeat in menus.
 - A rebinding screen and persistence in preferences.

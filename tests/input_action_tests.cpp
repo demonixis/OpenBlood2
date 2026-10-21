@@ -44,6 +44,19 @@ namespace
         e.wheel.direction = flipped ? SDL_MOUSEWHEEL_FLIPPED : SDL_MOUSEWHEEL_NORMAL;
         return e;
     }
+    SDL_Event finger(Uint32 type, SDL_FingerID id, float x, float dx = 0, float dy = 0, SDL_TouchID touch = 5)
+    {
+        SDL_Event e{};
+        e.type = type;
+        e.tfinger.windowID = window;
+        e.tfinger.touchID = touch;
+        e.tfinger.fingerID = id;
+        e.tfinger.x = x;
+        e.tfinger.y = .5f;
+        e.tfinger.dx = dx;
+        e.tfinger.dy = dy;
+        return e;
+    }
     SDL_Event focus(bool active)
     {
         SDL_Event e{};
@@ -427,14 +440,12 @@ namespace
         c.mouse_requested = c.mouse_captured = true; // Pure mapping test.
         CHECK(c.consumes(wheel(1), false));
         c.event(wheel(1), window);
-        CHECK(c.sample_command(InputAction::PrevWeapon, false) &&
-              !c.sample_command(InputAction::NextWeapon, false));
+        CHECK(c.sample_command(InputAction::PrevWeapon, false) && !c.sample_command(InputAction::NextWeapon, false));
         c.event(wheel(-3), window); // Several ticks in one event queue one command.
-        CHECK(c.sample_command(InputAction::NextWeapon, false) &&
-              !c.sample_command(InputAction::NextWeapon, false));
+        CHECK(c.sample_command(InputAction::NextWeapon, false) && !c.sample_command(InputAction::NextWeapon, false));
         c.event(wheel(1, true), window); // Natural scrolling: SDL reports flipped values.
         CHECK(c.sample_command(InputAction::NextWeapon, false));
-        c.event(wheel(0), window); // A sub-tick trackpad delta.
+        c.event(wheel(0), window);            // A sub-tick trackpad delta.
         c.event(wheel(1, false, 99), window); // Another window.
         CHECK(!c.sample_command(InputAction::NextWeapon, false) && !c.sample_command(InputAction::PrevWeapon, false));
         c.event(wheel(1), window, true); // Text editing drops it.
@@ -442,6 +453,82 @@ namespace
         c.bindings.clear(InputAction::PrevWeapon);
         c.event(wheel(1), window);
         CHECK(!c.sample_command(InputAction::PrevWeapon, false));
+        return true;
+    }
+
+    // Touch screens: a finger landing on the right half drags the camera.
+    bool touch()
+    {
+        MovementControls c;
+        c.touch_screen = [](SDL_TouchID id) { return id == 5; }; // 6 stands for a trackpad.
+        c.event(focus(true), window);
+        PlayerRotation r;
+        c.event(finger(SDL_EVENT_FINGER_DOWN, 1, .3f), window); // Left half: not the camera.
+        c.event(finger(SDL_EVENT_FINGER_MOTION, 1, .4f, .1f, .1f), window);
+        c.look(r, .01, false);
+        CHECK(r.yaw == 0 && r.pitch == 0);
+        c.event(finger(SDL_EVENT_FINGER_DOWN, 2, .7f), window);
+        c.event(finger(SDL_EVENT_FINGER_MOTION, 2, .75f, .05f, .02f), window);
+        c.event(finger(SDL_EVENT_FINGER_MOTION, 2, .8f, .05f, .02f), window);
+        c.event(finger(SDL_EVENT_FINGER_MOTION, 1, .5f, .3f, .3f), window); // Another finger.
+        c.look(r, .01, false);
+        CHECK(std::abs(r.yaw - .1f * touch_yaw_per_width) < .0001f &&
+              std::abs(r.pitch - .04f * touch_pitch_per_height) < .0001f);
+        c.look(r, .01, false); // Consumed once.
+        CHECK(std::abs(r.yaw - .1f * touch_yaw_per_width) < .0001f);
+        r = {};
+        c.event(finger(SDL_EVENT_FINGER_MOTION, 2, .8f, .04f, 0), window);
+        c.look(r, .01, false, true); // Zoom quarters it.
+        CHECK(std::abs(r.yaw - .01f * touch_yaw_per_width) < .0001f);
+        c.event(finger(SDL_EVENT_FINGER_DOWN, 3, .9f), window); // One camera finger at a time.
+        c.event(finger(SDL_EVENT_FINGER_MOTION, 3, .9f, .2f, 0), window);
+        r = {};
+        c.look(r, .01, false);
+        CHECK(r.yaw == 0);
+        c.event(finger(SDL_EVENT_FINGER_MOTION, 2, .8f, .02f, 0), window);
+        c.event(finger(SDL_EVENT_FINGER_UP, 2, .8f), window); // Travel before release still applies.
+        c.look(r, .01, false);
+        CHECK(std::abs(r.yaw - .02f * touch_yaw_per_width) < .0001f && !c.touch_finger);
+        // Trackpad (indirect) touches, mouse-emulated touches and other windows never look.
+        r = {};
+        c.event(finger(SDL_EVENT_FINGER_DOWN, 4, .9f, 0, 0, 6), window);
+        c.event(finger(SDL_EVENT_FINGER_DOWN, 4, .9f, 0, 0, SDL_MOUSE_TOUCHID), window);
+        auto other = finger(SDL_EVENT_FINGER_DOWN, 4, .9f);
+        other.tfinger.windowID = 99;
+        c.event(other, window);
+        CHECK(!c.touch_finger);
+        // Touch-synthesized mouse events neither look nor fire, even with the mouse captured.
+        c.mouse_requested = c.mouse_captured = true;
+        SDL_Event m{};
+        m.type = SDL_EVENT_MOUSE_MOTION;
+        m.motion.windowID = window;
+        m.motion.which = SDL_TOUCH_MOUSEID;
+        m.motion.xrel = 50;
+        c.event(m, window);
+        SDL_Event b{};
+        b.type = SDL_EVENT_MOUSE_BUTTON_DOWN;
+        b.button.windowID = window;
+        b.button.which = SDL_TOUCH_MOUSEID;
+        b.button.button = SDL_BUTTON_LEFT;
+        c.event(b, window);
+        c.look(r, .01, false);
+        CHECK(r.yaw == 0 && !c.sample_fire(false).primary);
+        c.mouse_requested = c.mouse_captured = false;
+        // Disabled, text editing, focus loss and player changes drop the drag.
+        c.event(finger(SDL_EVENT_FINGER_DOWN, 5, .9f), window);
+        c.event(finger(SDL_EVENT_FINGER_MOTION, 5, .9f, .1f, 0), window);
+        c.look(r, .01, true);
+        CHECK(r.yaw == 0);
+        c.event(finger(SDL_EVENT_FINGER_MOTION, 5, .9f, .1f, 0), window);
+        c.player_changed();
+        c.look(r, .01, false);
+        CHECK(r.yaw == 0 && !c.touch_finger);
+        c.event(finger(SDL_EVENT_FINGER_DOWN, 6, .9f), window);
+        c.event(focus(false), window);
+        CHECK(!c.touch_finger);
+        c.event(focus(true), window);
+        c.event(finger(SDL_EVENT_FINGER_DOWN, 7, .9f), window, true);
+        CHECK(!c.touch_finger); // Not while editing text.
         return true;
     }
 
@@ -575,6 +662,8 @@ int main(int argc, char** argv)
         return gamepad() ? 0 : 1;
     if (mode == "mouse_wheel")
         return mouse_wheel() ? 0 : 1;
+    if (mode == "touch")
+        return touch() ? 0 : 1;
     if (mode == "gamepad_menu")
         return gamepad_menu() ? 0 : 1;
     return 2;

@@ -5,9 +5,11 @@
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_mouse.h>
+#include <SDL3/SDL_touch.h>
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -20,6 +22,9 @@ namespace OpenBlood2
     inline constexpr float gamepad_yaw_speed = 3.5f;        // Radians per second at full deflection.
     inline constexpr float gamepad_pitch_speed = 2.5f;
     inline constexpr std::size_t max_gamepads = 8;
+    // Touch camera policy (replacement): a finger that lands on the right half of a touch
+    // screen drags the view; radians per full window width / height of finger travel.
+    inline constexpr float touch_yaw_per_width = 3.f, touch_pitch_per_height = 1.5f;
 
     struct GamepadState
     {
@@ -65,6 +70,19 @@ namespace OpenBlood2
         bool mouse_requested = false, mouse_captured = false;
         std::array<bool, SDL_BUTTON_X2> mouse_buttons{}; // Indexed by SDL button - 1.
         float mouse_x = 0, mouse_y = 0;
+        // Touch camera: the one finger that owns the drag and its accumulated travel
+        // (normalized window units), consumed once by look().
+        std::optional<SDL_FingerID> touch_finger;
+        float touch_x = 0, touch_y = 0;
+        // Direct touch screens only: a macOS trackpad reports indirect touches that must not
+        // turn the view. Replaceable for headless tests.
+        bool (*touch_screen)(SDL_TouchID) = [](SDL_TouchID id)
+        { return SDL_GetTouchDeviceType(id) == SDL_TOUCH_DEVICE_DIRECT; };
+        void release_touch()
+        {
+            touch_finger.reset();
+            touch_x = touch_y = 0;
+        }
         float mouse_sensitivity = .0025f;
         bool invert_y = false;
         struct FireButtons
@@ -265,6 +283,7 @@ namespace OpenBlood2
             keys = {};
             suppressed = {};
             release_mouse();
+            release_touch();
             rearm_presses();
             if (play)
                 request_play();
@@ -314,10 +333,37 @@ namespace OpenBlood2
                 gamepads.clear(); // Background gamepad events may be lost: never keep stale state.
                 suppressed = {};
                 release_mouse();
+                release_touch();
             }
             if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED && event.window.windowID == window)
                 focused = true;
-            if (focused && enabled && mouse_captured)
+            // Touch screens: the right-half finger drags the camera; others are ignored here.
+            if ((event.type == SDL_EVENT_FINGER_DOWN || event.type == SDL_EVENT_FINGER_MOTION ||
+                 event.type == SDL_EVENT_FINGER_UP || event.type == SDL_EVENT_FINGER_CANCELED) &&
+                event.tfinger.windowID == window && event.tfinger.touchID != SDL_MOUSE_TOUCHID)
+            {
+                const auto& f = event.tfinger;
+                if (event.type == SDL_EVENT_FINGER_DOWN && focused && enabled && !text_editing && !touch_finger &&
+                    std::isfinite(f.x) && f.x >= .5f && touch_screen(f.touchID))
+                    touch_finger = f.fingerID;
+                else if (touch_finger && *touch_finger == f.fingerID)
+                {
+                    if (event.type == SDL_EVENT_FINGER_MOTION && std::isfinite(f.dx) && std::isfinite(f.dy))
+                    {
+                        touch_x = std::clamp(touch_x + f.dx, -100.f, 100.f);
+                        touch_y = std::clamp(touch_y + f.dy, -100.f, 100.f);
+                    }
+                    if (event.type == SDL_EVENT_FINGER_UP || event.type == SDL_EVENT_FINGER_CANCELED)
+                        touch_finger.reset(); // Travel already accumulated is still applied once.
+                }
+                return;
+            }
+            // SDL also synthesizes mouse events from touches: in play they never look or fire.
+            const bool touch_mouse =
+                (event.type == SDL_EVENT_MOUSE_MOTION && event.motion.which == SDL_TOUCH_MOUSEID) ||
+                ((event.type == SDL_EVENT_MOUSE_BUTTON_DOWN || event.type == SDL_EVENT_MOUSE_BUTTON_UP) &&
+                 event.button.which == SDL_TOUCH_MOUSEID);
+            if (focused && enabled && mouse_captured && !touch_mouse)
             {
                 if (event.type == SDL_EVENT_MOUSE_MOTION && event.motion.windowID == window &&
                     std::isfinite(event.motion.xrel) && std::isfinite(event.motion.yrel))
@@ -445,8 +491,16 @@ namespace OpenBlood2
         void look(PlayerRotation& rotation, double seconds, bool text_editing, bool zoomed = false)
         {
             const float dx = std::exchange(mouse_x, 0), dy = std::exchange(mouse_y, 0);
+            const float tx = std::exchange(touch_x, 0), ty = std::exchange(touch_y, 0);
             if (!focused || !enabled || text_editing)
                 return;
+            // Touch drag: radians per window size of travel, quartered while zoomed, no capture needed.
+            if (tx || ty)
+            {
+                const float touch = zoomed ? .25f : 1.f;
+                rotation.yaw = std::remainder(rotation.yaw + tx * touch_yaw_per_width * touch, 6.28318530718f);
+                rotation.pitch += ty * touch_pitch_per_height * touch * (invert_y ? -1.f : 1.f);
+            }
             const auto dt = static_cast<float>(std::clamp(seconds, 0.0, 0.1));
             // Device mapping policy: radians per relative mouse unit, independent of frame duration.
             if (mouse_captured)
