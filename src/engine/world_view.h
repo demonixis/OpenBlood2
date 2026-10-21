@@ -75,6 +75,9 @@ namespace OpenBlood2
         std::size_t invisible = 0, degenerate = 0, transparent = 0, sky = 0, blended = 0;
         // Textured faces using baked per-vertex light, and textured faces drawn fully bright.
         std::size_t lit = 0, fullbright = 0;
+        // Fully bright faces (SURF_BRIGHT, or no baked light) per material, parallel to
+        // `materials`: the DAT's own emissive identification (enhanced renderer, roadmap 5.2).
+        std::vector<std::uint32_t> fullbright_faces;
         // Faces drawn with their stored lightmap, lightmap atlas pages (materials named
         // "lightmap page N"), packed texels and axes whose origin no candidate fitted.
         std::size_t lightmapped = 0, lightmap_pages = 0, lightmap_texels = 0, lightmap_unfitted = 0;

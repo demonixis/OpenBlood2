@@ -6,7 +6,8 @@ reference: its shaders, pipelines and pixel output are untouched, and switching 
 reproduces the original frame byte for byte (`gpu.surface`). Everything below is
 replacement rendering. The 1998 game has no material classes, normal maps or specular
 light, so no retail parity is claimed. Roadmap items 5.0, 5.1 (without external maps),
-5.3 and 5.4 are covered. 5.2 (emissive) and 5.5 (material inspection) remain open. The
+5.2 (emission), 5.3, 5.4 and 5.5 (material inspection) are covered. External maps and
+texture packs remain open. The
 [source ledger](../implementation/sources/enhanced_renderer_sources.json) lists the
 published techniques used.
 
@@ -82,6 +83,7 @@ On top of it:
   (`SURF_BRIGHT`, unlit) return the original output.
 - **Translucency.** Coverage rises to the reflected luminance, so highlights survive on
   nearly transparent glass. The output stays straight alpha for the existing blend.
+- **Emission.** See [Emission](#emission-52) below.
 
 There is no tangent stream. The tangent frame is the screen-derivative cotangent frame
 (Schüler). World faces use the plane normal, models their interpolated authored normal.
@@ -99,8 +101,9 @@ The built-in manifest is `config/materials.json`. CMake embeds it into
 
 Its contents:
 
-- **Classes.** `roughness` [0.02, 1], `metallic` [0, 1], `specular` (F0 scale, [0, 4])
-  and `normal` (generated relief strength, [0, 4]; 0 disables it).
+- **Classes.** `roughness` [0.02, 1], `metallic` [0, 1], `specular` (F0 scale, [0, 4]),
+  `normal` (generated relief strength, [0, 4]; 0 disables it), `emissive` (glow strength,
+  [0, 8]; default 0) and `emissive_threshold` (luminance, [0, 0.95]; default 0.5).
 - **Rules.** Ordered; the first match wins. `*` spans any run including `/`, `?` matches
   one character, matching is case-insensitive and `\` equals `/`. The matcher is
   iterative with single-star backtracking, so it is linear-bounded. Unlike the donor, it
@@ -115,13 +118,61 @@ catalogue. Retail world textures are grouped by color family (`textures/greys`, 
 result:
 
 - 3825 DTX in total;
-- 1859 world textures, of which 618 (33%) resolve to `default`;
+- 1859 world textures, of which 586 (32%) resolve to `default` and 54 to an emissive class;
 - the other 3825 − 1859 are skins, sprites and sky textures (classified only where a rule
   applies).
 
 Per-material parameters are resolved once per material when a renderer prepares it.
-They are pushed as fragment uniform slot 3 only when they change between batches. Slot
-2 carries the camera and the grid description and is pushed once per record.
+They are pushed as fragment uniform slot 3 (32 bytes: the material, then the emission
+strength and threshold) only when they change between batches. Slot 2 carries the camera
+and the grid description and is pushed once per record.
+
+## Emission (5.2)
+
+Emission has two sources. Both are identified, but only one adds light:
+
+- **The DAT's fully bright faces.** Textured faces drawn without lightmap or baked light
+  (`SURF_BRIGHT`, or no baked colors) are the original's own emissive surfaces.
+  `WorldMesh::fullbright_faces` counts them per material. The enhanced shaders already return
+  the original output for them, so nothing is added.
+- **Manifest emission.** In both enhanced shading paths (world and lit models), a class or
+  texture override with `emissive > 0` adds `albedo × emissive × ramp` to the diffuse body.
+  `ramp` rises linearly from 0 at the class's `emissive_threshold` luminance to 1 at white,
+  so only the bright parts of a lamp texture glow. The term ignores every light and shadow
+  but follows the scene light scale (`SetGlobalLightScale`), so fades still darken it. On
+  translucent faces it is weighted by coverage like the rest of the body. Unlit, flat and
+  `FLAG_NOLIGHT` models keep the original shading without emission.
+
+The built-in classes (replacement values):
+
+| Class | Emissive / threshold | Rules |
+|---|---|---|
+| `light` | 1.5 / 0.45 | `*flolite*`, `*smallight*`, `*lightbulb*`, `*baselite*`, `textures/*light*`, exit signs |
+| `neon` | 2.0 / 0.3 | `textures/*/fn*` (the retail neon signs), `*neon*` |
+| `screen` | 1.0 / 0.35 | `*monitor*`, `*tvbig*` |
+| `hazard` | 1.0 / 0.15 | `textures/*lava*`, `*magma*`, `*acid*`, `*toxic*` (the donor's hazard words; slime stays `wet`) |
+
+Animated (SPR) materials keep the `default` class, so animated monitors do not glow. The
+term is computed per pixel in the fragment shader and is the input that M6 bloom will
+read; it is not written to a separate target yet.
+
+## Material inspection (5.5)
+
+`surface_report` (`engine/surface_report.*`) lists every texture material of the current
+world mesh as the enhanced renderer resolves it. `ScenePresenter::material_report` rebuilds it
+when the world or the material settings change, and stays empty with the original renderer.
+
+- **Per material:** the class and the binding that decided it (the rule pattern, the texture
+  override path or `default`); roughness, metallic and F0 scale; the normal-map state; the
+  emission; and the fully bright DAT faces.
+- **Normal-map states:** generated, off (option), off (class strength 0), none (animated),
+  none (failed resource). They come from `normal_map_state`, the same rule
+  `SurfaceMaterials::refresh` applies, so inspection and rendering cannot disagree.
+- **Fallbacks:** materials on the `default` class, failed resources (the original magenta
+  marker, no enhanced shading), and texture overrides naming no mounted resource.
+
+The inspector's world section shows the report under "Enhanced materials", with filters for
+default-class rows and for emissive or fully bright rows.
 
 ## Light grid
 
@@ -179,8 +230,14 @@ eight files, about 280 KB of headers in total, and the build time is unchanged.
 
 ## Verification
 
-- `surface.glob`, `surface.manifest`, `surface.builtin`, `surface.normal_maps`,
-  `surface.light_grid` (headless) and `surface.retail` (private catalogue).
+- `surface.glob`, `surface.manifest` (emission keys, ranges, lookup bindings),
+  `surface.builtin` (emissive classes), `surface.normal_maps`, `surface.light_grid`,
+  `surface.report` (every report field over a synthetic mesh) and `surface.retail` (private
+  catalogue, at least 50 emissive world textures).
+- `gpu.surface` also checks the report on both worlds (fully bright faces match the mesh,
+  no unbound override). It renders the STANDARD frame again with every emissive value removed:
+  that frame is nowhere brighter. Emission lights 263 pixels at the CityHub start and 1040 in
+  SubwayA, where the train headlights glow.
 - `menu` and `menu_preferences`: the new rows and the version 3 migration.
 - `gpu.surface` on CityHub and SubwayA. The STANDARD and HIGH frames differ from the
   original by a mean of 2-6 levels per channel, with fewer than 1% of channels moving by
@@ -192,7 +249,8 @@ eight files, about 280 KB of headers in total, and the build time is unchanged.
     opens first, so no world loads.
   - The 7 private catalog/AI headless failures also fail at the base commit `a96c5b66`.
 - The original set's fragment artifacts are byte-identical. Only `world.vert` changed, to
-  pass the plane normal.
+  pass the plane normal. The emission change regenerated all eighteen artifacts; only the
+  eight enhanced ones differ.
 
 Native Vulkan execution of the new shaders has not been verified on Linux or Windows.
 Only Metal on Apple M5 was run.

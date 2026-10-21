@@ -9,6 +9,7 @@
 #include <SDL3/SDL.h>
 #include <cmath>
 #include <iostream>
+#include <regex>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
     do                                                                                                                 \
@@ -101,6 +102,37 @@ int main(int argc, char** argv)
         presenter.normal_maps = true;
         CHECK(frame(gpu, presenter, *game, capture, high, error));
         CHECK(presenter.normal_map_cache.stats.generated > 50);
+        // Material inspection follows the world and the settings (roadmap 5.5).
+        const auto report = presenter.material_report;
+        std::cout << world << ": report " << report.materials.size() << " materials, " << report.generated << " maps, "
+                  << report.fullbright_faces << "/" << presenter.world_mesh.fullbright << " bright faces, "
+                  << report.unbound_overrides.size() << " unbound\n";
+        CHECK(report.materials.size() > 40 && report.generated > 30 && report.unbound_overrides.empty() &&
+              report.fullbright_faces == presenter.world_mesh.fullbright);
+        // Emission only adds light (roadmap 5.2): the same frame with every emissive value removed
+        // from the manifest is nowhere brighter.
+        std::vector<Uint8> dark;
+        const std::string unlit =
+            std::regex_replace(std::string(builtin_surface_manifest()),
+                               std::regex(R"(, "emissive": [0-9.]+, "emissive_threshold": [0-9.]+)"), "");
+        CHECK(unlit.find("emissive\"") == std::string::npos && presenter.surface_manifest.parse(unlit, error));
+        presenter.shading = SurfaceShading::Standard;
+        presenter.normal_maps = false;
+        CHECK(frame(gpu, presenter, *game, capture, dark, error) && presenter.material_report.emissive == 0);
+        std::size_t glowing = 0;
+        for (std::size_t i = 0; i < dark.size(); i += 4)
+        {
+            bool brighter = false;
+            for (int c = 0; c < 3; ++c)
+            {
+                CHECK(int(standard[i + c]) + 1 >= int(dark[i + c]));
+                brighter |= standard[i + c] > dark[i + c] + 1;
+            }
+            glowing += brighter;
+        }
+        std::cout << world << ": " << report.emissive << " emissive materials, " << report.fullbright_faces
+                  << " fully bright faces, " << glowing << " pixels lit by emission\n";
+        CHECK(presenter.surface_manifest.parse_builtin(error));
         presenter.shading = SurfaceShading::Original;
         presenter.normal_maps = false;
         CHECK(frame(gpu, presenter, *game, capture, again, error));

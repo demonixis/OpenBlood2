@@ -5,6 +5,7 @@
 #include "app/sprite_scene.h"
 #include "engine/light_grid.h"
 #include "engine/model_renderer.h"
+#include "engine/surface_report.h"
 #include "engine/world_renderer.h"
 
 namespace OpenBlood2
@@ -78,6 +79,9 @@ namespace OpenBlood2
         NormalMapCache normal_map_cache;  // Survives world changes; generated maps are content-addressed.
         LightGrid light_grid;
         SurfaceStats surface_stats;
+        // Resolved enhanced materials of the current world (roadmap 5.5), rebuilt when the world
+        // or the material settings change; empty while the original renderer is selected.
+        SurfaceReport material_report;
         float shadow_aspect = 16.f / 9;  // Viewport aspect for caster culling; record() keeps it current.
         std::vector<ModelRenderer::ShadowCaster> shadow_casters;
         ShadowUniform shadow_uniform;
@@ -108,6 +112,7 @@ namespace OpenBlood2
         std::uint64_t grid_revision_ = UINT64_MAX;
         SurfaceShading applied_shading_ = SurfaceShading::Original;
         bool applied_normal_maps_ = false;
+        std::uint64_t report_mesh_ = UINT64_MAX, report_surface_ = UINT64_MAX;
         TextureHandle depth_;
         Uint32 depth_width_ = 0, depth_height_ = 0;
     };

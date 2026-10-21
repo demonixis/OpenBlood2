@@ -221,12 +221,17 @@ namespace OpenBlood2
                     class_name = value.text;
                     continue;
                 }
-                float* field = key == "roughness" ? &material.roughness
-                               : key == "metallic" ? &material.metallic
-                               : key == "specular" ? &material.specular
-                               : key == "normal"   ? &material.normal
-                                                   : nullptr;
-                const float maximum = key == "specular" || key == "normal" ? 4.f : 1.f;
+                float* field = key == "roughness"            ? &material.roughness
+                               : key == "metallic"           ? &material.metallic
+                               : key == "specular"           ? &material.specular
+                               : key == "normal"             ? &material.normal
+                               : key == "emissive"           ? &material.emissive
+                               : key == "emissive_threshold" ? &material.emissive_threshold
+                                                             : nullptr;
+                const float maximum = key == "specular" || key == "normal" ? 4.f
+                                      : key == "emissive"                  ? 8.f
+                                      : key == "emissive_threshold"        ? .95f
+                                                                           : 1.f;
                 const float minimum = key == "roughness" ? .02f : 0.f;
                 if (!field)
                     return error = "Material manifest: unknown key '" + key + "'", false;
@@ -394,16 +399,20 @@ namespace OpenBlood2
     }
     const SurfaceMaterial& SurfaceManifest::resolve(std::string_view path) const
     {
+        return *lookup(path).material;
+    }
+    SurfaceResolution SurfaceManifest::lookup(std::string_view path) const
+    {
         if (!textures_.empty())
         {
             const auto key = normalized(path);
-            for (const auto& exact : textures_)
-                if (exact.path == key)
-                    return exact.material;
+            for (std::size_t i = 0; i < textures_.size(); ++i)
+                if (textures_[i].path == key)
+                    return {&textures_[i].material, SurfaceSource::Texture, i};
         }
-        for (const auto& rule : rules_)
-            if (surface_glob(rule.pattern, path))
-                return classes_[rule.material];
-        return classes_[0];
+        for (std::size_t i = 0; i < rules_.size(); ++i)
+            if (surface_glob(rules_[i].pattern, path))
+                return {&classes_[rules_[i].material], SurfaceSource::Rule, i};
+        return {&classes_[0], SurfaceSource::Default, 0};
     }
 } // namespace OpenBlood2

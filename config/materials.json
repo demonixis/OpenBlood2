@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "comment": "Enhanced-renderer surface classes for the retail Blood II catalogue. Rules match the lowercase resource path ('*' spans directories); the first match wins. Replacement data: the original game has no material classes.",
+  "comment": "Enhanced-renderer surface classes for the retail Blood II catalogue. Rules match the lowercase resource path ('*' spans directories); the first match wins. emissive/emissive_threshold make bright texels glow (light, neon signs, screens, the donor's lava/hazard words). Replacement data: the original game has no material classes.",
   "classes": {
     "default": { "roughness": 0.8, "metallic": 0.0, "specular": 1.0, "normal": 1.0 },
     "matte": { "roughness": 0.95, "metallic": 0.0, "specular": 0.5, "normal": 0.6 },
@@ -18,7 +18,10 @@
     "character": { "roughness": 0.65, "metallic": 0.0, "specular": 0.8, "normal": 0.6 },
     "weapon": { "roughness": 0.4, "metallic": 0.6, "specular": 1.0, "normal": 0.6 },
     "item": { "roughness": 0.45, "metallic": 0.3, "specular": 1.0, "normal": 0.5 },
-    "light": { "roughness": 0.3, "metallic": 0.0, "specular": 1.0, "normal": 0.0 }
+    "light": { "roughness": 0.3, "metallic": 0.0, "specular": 1.0, "normal": 0.0, "emissive": 1.5, "emissive_threshold": 0.45 },
+    "neon": { "roughness": 0.3, "metallic": 0.0, "specular": 1.0, "normal": 0.0, "emissive": 2.0, "emissive_threshold": 0.3 },
+    "screen": { "roughness": 0.15, "metallic": 0.0, "specular": 1.2, "normal": 0.0, "emissive": 1.0, "emissive_threshold": 0.35 },
+    "hazard": { "roughness": 0.7, "metallic": 0.0, "specular": 0.8, "normal": 0.6, "emissive": 1.0, "emissive_threshold": 0.15 }
   },
   "rules": [
     { "match": "*sky*", "class": "matte" },
@@ -31,11 +34,21 @@
     { "match": "*steel*", "class": "metal_shiny" },
     { "match": "*cryo*", "class": "metal_shiny" },
     { "match": "*freezer*", "class": "metal_shiny" },
-    { "match": "*neon*", "class": "light" },
+    { "match": "textures/*/fn*", "class": "neon" },
+    { "match": "*neon*", "class": "neon" },
+    { "match": "*exitsign*", "class": "light" },
+    { "match": "*fireexit*", "class": "light" },
+    { "match": "*monitor*", "class": "screen" },
+    { "match": "*tvbig*", "class": "screen" },
+    { "match": "textures/*lava*", "class": "hazard" },
+    { "match": "textures/*magma*", "class": "hazard" },
+    { "match": "textures/*acid*", "class": "hazard" },
+    { "match": "textures/*toxic*", "class": "hazard" },
     { "match": "*flolite*", "class": "light" },
     { "match": "*smallight*", "class": "light" },
     { "match": "*lightbulb*", "class": "light" },
     { "match": "*baselite*", "class": "light" },
+    { "match": "textures/*light*", "class": "light" },
     { "match": "*rust*", "class": "metal_rough" },
     { "match": "*metal*", "class": "metal_rough" },
     { "match": "*mtl*", "class": "metal_rough" },

@@ -436,6 +436,12 @@ namespace OpenBlood2
                 const bool baked = material && !bright && !lightmap && polygon.colors.size() == polygon.points.size();
                 if (material && !lightmap)
                     ++(baked ? lit : fullbright);
+                if (material && !lightmap && !baked)
+                {
+                    if (fullbright_faces.size() < materials.size())
+                        fullbright_faces.resize(materials.size());
+                    ++fullbright_faces[material];
+                }
                 std::array<double, 2> uv_rate{};
                 if (material && effect_ids[polygon.surface] != UINT32_MAX)
                 {
@@ -527,6 +533,7 @@ namespace OpenBlood2
             bound_range(vertices, range);
             ranges.push_back(std::move(range));
         }
+        fullbright_faces.resize(materials.size());
         return true;
     }
     bool world_alpha_order(const WorldMesh& mesh, std::span<const WorldDraw> draws, DVector eye, DRotation view,

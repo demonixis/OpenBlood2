@@ -1,5 +1,6 @@
 #include "engine/world_renderer.h"
 #include "engine/collision.h"
+#include "engine/surface_report.h"
 #include "engine/world_shaders.h"
 #include <cmath>
 #include <cstring>
@@ -209,9 +210,10 @@ namespace OpenBlood2
             const auto& material = scene.manifest && texture ? scene.manifest->resolve(path) : fallback;
             SurfaceMaterialUniform uniform;
             uniform.material = {material.roughness, material.metallic, material.specular, 0};
+            uniform.emission = {material.emissive, material.emissive_threshold, 0, 0};
             TextureHandle normal;
             // Lightmap pages, the white slot, failed and animated (SPR) materials get no map.
-            if (scene.normal_maps && texture && material.normal > 0 && entry.error.empty() && entry.frames.empty())
+            if (normal_map_state(entry, material, scene.normal_maps != nullptr) == NormalMapState::Generated)
             {
                 const auto map = scene.normal_maps->get(entry.image, material.normal, error);
                 if (!map || !(normal = registry.derived_texture("normal", *map, error)))

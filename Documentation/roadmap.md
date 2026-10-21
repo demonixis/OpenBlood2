@@ -11,8 +11,8 @@ Percentages are task estimates, not acceptance. Only the user accepts a mileston
 | Mounted non-multiplayer worlds that open | 36 / 36 | Includes Ancient City, Ancient One, Credits, End and Drop; opening is not campaign traversal. |
 | All mounted worlds that open | 58 / 58 | Includes 22 multiplayer maps, inspected locally, with the four CTF maps. |
 | Beta-ready game (M0–M4) | **~90%** | Weighted milestones below. |
-| With the graphics upgrade (M0–M6) | ~80% | Adds optional PBR and post-processing. |
-| Whole roadmap (M0–M9) | **~59%** | Adds gamepad, Quest VR/Android and LAN. |
+| With the graphics upgrade (M0–M6) | ~82% | Adds optional PBR and post-processing. |
+| Whole roadmap (M0–M9) | **~61%** | Adds gamepad, Quest VR/Android and LAN. |
 
 Weights reflect estimated effort: M0 4, M1 6, M2 28, M3 14, M4 8, M5 7,
 M6 6, M7 3, M8 11, M9 13. Later work (M10+) is not counted.
@@ -34,7 +34,7 @@ accept M3 or provide network play.
 | M2 | 100% — closed with reservation | World readers, gameplay services and the selected SubwayA → CityHub session. |
 | M3 | ~65% — current | Every level playable, credits, save/load, then a public beta whose bug list validates the campaign. |
 | M4 | ~85% | Original rendering on Vulkan (Linux, Windows) and Metal (macOS). D3D12 is not planned. |
-| M5 | ~65% | Optional PBR shader set with JSON texture/material bindings; the legacy set remains selectable. The [enhanced renderer](contracts/enhanced_renderer_contracts.md) covers 5.0, 5.1 (built-in manifest), 5.3 and 5.4; emissive and inspection remain. |
+| M5 | ~85% | Optional PBR shader set with JSON texture/material bindings; the legacy set remains selectable. The [enhanced renderer](contracts/enhanced_renderer_contracts.md) covers 5.0, 5.1 (built-in manifest), 5.2 (emission), 5.3, 5.4 and 5.5 (material inspection); external maps, texture packs and Vulkan verification remain. |
 | M6 | 0% | PBR-only post-processing: bloom from emissive maps, GTAO, SSR, tonemapping; AA for both sets. |
 | M7 | ~90% | Gamepad: action layer, rebinding, hotplug, menus; a parallel track, needed before M8. The [input actions](contracts/input_action_contracts.md) cover keyboard, mouse and gamepad (console layout, hot-plug, menus, weapon cycling), the original [inventory cursor](contracts/inventory_cursor_contracts.md) with its item tabs, a touch camera drag, the original Controls page with `controls.cfg`, and on-screen touch controls. Device testing on a touch screen, menu auto-repeat and the Keyboard/Joystick pages remain. |
 | M8 | 0% | VR on Meta Quest through OpenXR; also the Android gate. |
@@ -113,15 +113,17 @@ dependency. What it actually provides:
 | 5.4 | Display option to switch between PBR and the legacy set. The legacy set is frozen as the original reference: it keeps its current pixel output, checked by the GPU readback tests, and takes no PBR inputs. |
 | 5.5 | Material inspection (resolved class, maps, emissive flag) and fallback reporting for missing or invalid bindings. |
 
-Status (2026-10-20, [contract](contracts/enhanced_renderer_contracts.md)):
+Status (2026-10-21, [contract](contracts/enhanced_renderer_contracts.md)):
 
 - **Done.** 5.0: the retail catalogue is measured by `surface.retail`, and the donor
-  patterns match nothing in it. 5.3 and 5.4: RENDERER/LIGHTING/NORMAL MAPS rows, and the
-  original set is byte-identical.
+  patterns match nothing in it. 5.2: the DAT's fully bright faces are counted per material,
+  and manifest emission (light, neon, screen and hazard classes) adds a light-independent
+  glow in the enhanced shaders, the input for M6 bloom. 5.3 and 5.4: RENDERER/LIGHTING/NORMAL
+  MAPS rows, and the original set is byte-identical. 5.5: the inspector's "Enhanced
+  materials" report (class, binding, maps, emission, fallbacks).
 - **Partial.** 5.1: versioned built-in manifest with rules and overrides; external maps
-  and texture packs are not loaded yet. Generated normal maps replace the
-  derivative-bump idea.
-- **Open.** 5.2 (emissive) and 5.5 (inspection).
+  (including emissive maps) and texture packs are not loaded yet. Generated normal maps
+  replace the derivative-bump idea.
 - **Not verified.** Vulkan execution, Linux and Windows.
 
 ## M6 — post-processing

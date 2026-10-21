@@ -675,6 +675,7 @@ namespace OpenBlood2
                                     }
                             ImGui::TreePop();
                         }
+                        draw_materials();
                         std::size_t decoded = 0, failed = 0;
                         for (std::size_t i = 1; i < world_mesh->materials.size(); ++i)
                             world_mesh->materials[i].error.empty() ? ++decoded : ++failed;

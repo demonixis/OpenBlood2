@@ -4,6 +4,7 @@
 // original look; GGX/Smith/Schlick specular comes from the static light objects (world: the
 // light grid; models: their four sources) and the radial light, and the baked light stands in
 // for the environment through an analytic split-sum approximation. No probe or baked data.
+// Manifest emission adds a light-independent glow to bright texels (the input of M6 bloom).
 // PBR_HIGH: eight grid lights and specular cavity. PBR_ALPHA: translucent output.
 // SDL_GPU fragment conventions: textures/samplers then storage buffers in space2, uniforms in space3.
 Texture2D<float4> albedo : register(t0, space2);
@@ -40,6 +41,7 @@ cbuffer Frame : register(b2, space3)
 cbuffer Material : register(b3, space3)
 {
     float4 material; // Roughness, metallic, F0 scale, flags (1 lit model, 2 normal map).
+    float4 emission; // Strength, luminance threshold.
 };
 struct Input
 {
@@ -142,6 +144,14 @@ float3 originalModelLight(Input input)
 float luminance(float3 c)
 {
     return dot(c, float3(0.299, 0.587, 0.114));
+}
+// Emission: texels above the class's luminance threshold glow with their own color, ramping
+// from the threshold to white, independent of any light.
+float3 emitted(float3 color)
+{
+    if (emission.x <= 0.0)
+        return float3(0.0, 0.0, 0.0);
+    return color * (emission.x * saturate((luminance(color) - emission.y) / max(1.0 - emission.y, 1e-3)));
 }
 float4 main(Input input) : SV_Target0
 {
@@ -273,7 +283,7 @@ float4 main(Input input) : SV_Target0
     float3 split = environmentBrdf(f0, roughness, nv);
     float3 white = environmentBrdf(float3(1.0, 1.0, 1.0), roughness, nv);
     float3 compensation = 1.0 + f0 * (1.0 / max(white, 0.05) - 1.0);
-    float3 body = baseColor * diffuse * bump * (1.0 - metallic) * sceneColor.rgb;
+    float3 body = (baseColor * diffuse * bump * (1.0 - metallic) + emitted(baseColor)) * sceneColor.rgb;
     float3 reflected = (diffuse * split + direct) * compensation * cavity * sceneColor.rgb;
 #ifdef PBR_ALPHA
     // Highlights survive on nearly transparent glass: coverage rises to carry them.

@@ -8,12 +8,26 @@ namespace OpenBlood2
 {
     // Physically based surface parameters of one texture for the enhanced renderer. Replacement
     // data: the original game has no material classes. specular scales the dielectric F0 (0.04);
-    // normal scales generated normal-map relief (0 disables it for this class).
+    // normal scales generated normal-map relief (0 disables it for this class). emissive is the
+    // glow strength of texels whose luminance exceeds emissive_threshold (0: no emission).
     struct SurfaceMaterial
     {
         std::string name = "default";
-        float roughness = .8f, metallic = 0, specular = 1, normal = 1;
+        float roughness = .8f, metallic = 0, specular = 1, normal = 1, emissive = 0, emissive_threshold = .5f;
         bool operator==(const SurfaceMaterial&) const = default;
+    };
+    // Where a path's material came from: an exact texture override, a rule, or the default.
+    enum class SurfaceSource : std::uint8_t
+    {
+        Default,
+        Rule,
+        Texture
+    };
+    struct SurfaceResolution
+    {
+        const SurfaceMaterial* material = nullptr;
+        SurfaceSource source = SurfaceSource::Default;
+        std::size_t index = 0; // Rule or texture override index.
     };
     // Case-insensitive wildcard match of a resource path: '*' spans any run (including '/'),
     // '?' one character; '\\' and '/' compare equal. Bounded backtracking.
@@ -33,6 +47,17 @@ namespace OpenBlood2
         bool parse_builtin(std::string& error);
         // Unmatched paths resolve to the "default" class.
         const SurfaceMaterial& resolve(std::string_view path) const;
+        // resolve() with the binding that decided it.
+        SurfaceResolution lookup(std::string_view path) const;
+        // The pattern of a rule, or the normalized path of a texture override, by lookup() index.
+        const std::string& rule_pattern(std::size_t index) const
+        {
+            return rules_[index].pattern;
+        }
+        const std::string& override_path(std::size_t index) const
+        {
+            return textures_[index].path;
+        }
         std::size_t classes() const
         {
             return classes_.size();

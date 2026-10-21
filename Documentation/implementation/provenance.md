@@ -1889,6 +1889,11 @@ patterns match the retail catalogue. The published shading techniques are listed
 [source ledger](sources/enhanced_renderer_sources.json). See the
 [contract](../contracts/enhanced_renderer_contracts.md).
 
+Emission and material inspection (2026-10-21, roadmap 5.2 and 5.5) add replacement
+`emissive`/`emissive_threshold` manifest values, a shader emission term, per-material counts of
+the DAT's fully bright faces and `engine/surface_report.*`. The hazard rules reuse the donor's
+lava/magma/acid/toxic words; no donor code is imported.
+
 ## Player and client save/load (2026-10-20)
 
 Save/load lot 5 adds selective ports of the original Save/Load bodies of

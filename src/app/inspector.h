@@ -5,6 +5,7 @@
 #include "engine/polygrid_view.h"
 #include "engine/runtime.h"
 #include "engine/sprite_view.h"
+#include "engine/surface_report.h"
 #include "engine/world_view.h"
 #include "game/save_slots.h"
 #include "game/server_adapter.h"
@@ -34,6 +35,8 @@ namespace OpenBlood2
         const GpuRegistryStats* gpu_resources = nullptr;
         const ModelLightingStats* model_lighting = nullptr;
         const ShadowStats* model_shadows = nullptr;
+        const SurfaceReport* materials = nullptr; // Enhanced renderer material inspection.
+        bool materials_defaults_only = false, materials_emissive_only = false;
         bool select_models = false;
         bool select_services = false;
         bool select_skeleton = false;
@@ -57,6 +60,7 @@ namespace OpenBlood2
         ObjectId sprite_selection{};
         void draw_sprites(GameSession&, ObjectSelection&);
         void draw_sparks(const GameSession&);
+        void draw_materials();
         void draw_blood_spurts(const GameSession&);
         void draw_blood_splats(const GameSession&);
         void draw_weapon_sprites(const GameSession&);

@@ -173,6 +173,7 @@ namespace OpenBlood2
         inspector.gpu_resources = &presenter.registry.stats;
         inspector.model_lighting = &presenter.model_lighting.stats;
         inspector.model_shadows = &presenter.shadow_stats;
+        inspector.materials = &presenter.material_report;
 #else
         (void)data;
 #endif

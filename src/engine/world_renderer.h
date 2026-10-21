@@ -64,8 +64,11 @@ namespace OpenBlood2
         // Roughness, metallic, dielectric F0 scale, flags: 1 lit model, 2 normal map,
         // 4 original shading (unlit/flat models).
         std::array<float, 4> material{.8f, 0, 1, 0};
+        // Emission strength and luminance threshold (SurfaceMaterial::emissive*); zero: none.
+        std::array<float, 4> emission{};
         bool operator==(const SurfaceMaterialUniform&) const = default;
     };
+    static_assert(sizeof(SurfaceMaterialUniform) == 32);
     // Enhanced-renderer state shared by the scene renderers that opt in (world faces and
     // lit models), owned by the presenter. Renderers resolve per-material parameters and
     // normal maps again whenever `revision` changes.

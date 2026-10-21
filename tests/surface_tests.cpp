@@ -2,6 +2,7 @@
 #include "engine/normal_maps.h"
 #include "engine/resources.h"
 #include "engine/surface_materials.h"
+#include "engine/surface_report.h"
 #include <cmath>
 #include <iostream>
 #include <map>
@@ -65,6 +66,65 @@ namespace
             CHECK(m.resolve("textures/grybrik.dtx").name == "stone");
         }
         CHECK(!m.parse(std::string(SurfaceManifest::byte_limit + 1, ' '), e));
+        // Emission: strength [0, 8] and threshold [0, 0.95], inherited by overrides.
+        CHECK(m.parse(R"({"version": 1, "classes": {"lamp": {"emissive": 2, "emissive_threshold": 0.4}},
+                         "rules": [{"match": "*lamp*", "class": "lamp"}],
+                         "textures": {"a/lampx.dtx": {"class": "lamp", "emissive": 0.5}}})",
+                      e));
+        CHECK(m.resolve("b/lamp.dtx").emissive == 2 && m.resolve("b/lamp.dtx").emissive_threshold == .4f);
+        CHECK(m.resolve("a/lampx.dtx").emissive == .5f && m.resolve("a/lampx.dtx").emissive_threshold == .4f);
+        CHECK(m.resolve("other.dtx").emissive == 0 && m.resolve("other.dtx").emissive_threshold == .5f);
+        for (const char* bad : {R"({"version": 1, "classes": {"a": {"emissive": 9}}})",
+                                R"({"version": 1, "classes": {"a": {"emissive": -1}}})",
+                                R"({"version": 1, "classes": {"a": {"emissive_threshold": 1}}})"})
+            CHECK(!m.parse(bad, e) && !e.empty() && m.resolve("b/lamp.dtx").emissive == 2);
+        // lookup() names the deciding binding.
+        auto found = m.lookup("A\\LampX.DTX");
+        CHECK(found.source == SurfaceSource::Texture && m.override_path(found.index) == "a/lampx.dtx");
+        found = m.lookup("b/lamp.dtx");
+        CHECK(found.source == SurfaceSource::Rule && m.rule_pattern(found.index) == "*lamp*");
+        found = m.lookup("other.dtx");
+        CHECK(found.source == SurfaceSource::Default && found.material->name == "default");
+        return true;
+    }
+    // Material inspection (roadmap 5.5) over a synthetic mesh.
+    bool report()
+    {
+        SurfaceManifest m;
+        std::string e;
+        CHECK(m.parse(R"({"version": 1, "classes": {"lamp": {"emissive": 2, "normal": 0}, "stone": {"normal": 1.5}},
+                         "rules": [{"match": "*lamp*", "class": "lamp"}, {"match": "*brik*", "class": "stone"}],
+                         "textures": {"textures/gone.dtx": {"class": "stone"}, "textures/odd.dtx": {"roughness": 0.2}}})",
+                      e));
+        WorldMesh mesh;
+        mesh.materials.push_back({});                         // The white slot.
+        mesh.materials.push_back({"textures/lamp1.dtx", {}}); // Rule, emissive, class without maps.
+        mesh.materials.push_back({"textures/brik2.dtx", {}}); // Rule, generated map.
+        mesh.materials.push_back({"textures/odd.dtx", {}});   // Override.
+        mesh.materials.push_back({"textures/plain.dtx", {}}); // Default.
+        mesh.materials.push_back({"textures/broken.dtx", "missing"});
+        mesh.materials.push_back({"sprites/fire.spr", {}});
+        mesh.materials.back().frames = {1, 2};
+        mesh.materials.push_back({"lightmap page 0", {}});
+        mesh.fullbright_faces = {0, 3, 0, 0, 2, 0, 0, 0};
+        const auto exists = [](std::string_view path) { return path != "textures/gone.dtx"; };
+        auto r = surface_report(m, mesh, true, exists);
+        CHECK(r.materials.size() == 6);
+        const auto& lamp = r.materials[0];
+        CHECK(lamp.material == 1 && lamp.source == SurfaceSource::Rule && lamp.binding == "*lamp*" && lamp.emissive() &&
+              lamp.normal_map == NormalMapState::ClassOff && lamp.fullbright_faces == 3);
+        CHECK(r.materials[1].normal_map == NormalMapState::Generated && r.materials[1].values.name == "stone");
+        CHECK(r.materials[2].source == SurfaceSource::Texture && r.materials[2].binding == "textures/odd.dtx" &&
+              r.materials[2].values.roughness == .2f);
+        CHECK(r.materials[3].source == SurfaceSource::Default && r.materials[3].fullbright_faces == 2);
+        CHECK(r.materials[4].normal_map == NormalMapState::Failed);
+        CHECK(r.materials[5].normal_map == NormalMapState::Animated && r.materials[5].values.name == "default");
+        CHECK(r.defaults == 3 && r.failed == 1 && r.emissive == 1 && r.generated == 3 && r.fullbright_materials == 2 &&
+              r.fullbright_faces == 5 && r.emissive_fullbright == 1 && r.classes["default"] == 4);
+        CHECK(r.unbound_overrides == std::vector<std::string>{"textures/gone.dtx"});
+        // Without normal maps (the option), no map is generated; without `exists` nothing is checked.
+        r = surface_report(m, mesh, false);
+        CHECK(r.generated == 0 && r.materials[1].normal_map == NormalMapState::Disabled && r.unbound_overrides.empty());
         return true;
     }
     bool builtin()
@@ -80,6 +140,19 @@ namespace
         CHECK(m.resolve("textures/greys/cratewood1.dtx").name == "wood");
         CHECK(m.resolve("skins/characters/caleb.dtx").name == "character");
         CHECK(m.resolve("textures/greys/unmatched.dtx").name == "default");
+        // Emissive classes (roadmap 5.2): lights, neon signs, screens and the donor's hazard words.
+        CHECK(m.resolve("textures/greys/flolite1.dtx").name == "light" &&
+              m.resolve("textures/greys/flolite1.dtx").emissive > 0);
+        CHECK(m.resolve("textures/greys/amberlight.dtx").name == "light");
+        CHECK(m.resolve("textures/reds/fnopen.dtx").name == "neon" &&
+              m.resolve("textures/blueyellow/fneon3.dtx").name == "neon");
+        CHECK(m.resolve("textures/greys/monitors.dtx").name == "screen" &&
+              m.resolve("textures/reds/tvbig.dtx").name == "screen");
+        CHECK(m.resolve("textures/blueyellow/exitsign1.dtx").name == "light");
+        CHECK(m.resolve("textures/x/lava1.dtx").name == "hazard" && m.resolve("textures/x/lava1.dtx").emissive > 0);
+        CHECK(m.resolve("textures/sky/lightning1.dtx").name == "matte"); // Sky first.
+        CHECK(m.resolve("skins/powerups/flashlight.dtx").emissive == 0);
+        CHECK(m.resolve("textures/greys/grybrik3.dtx").emissive == 0);
         return true;
     }
     Texture image(std::uint32_t w, std::uint32_t h, std::uint32_t mipmaps, auto shade)
@@ -184,7 +257,7 @@ namespace
         SurfaceManifest m;
         CHECK(m.parse_builtin(e));
         std::map<std::string, std::size_t> classes;
-        std::size_t textures = 0, world = 0, world_default = 0;
+        std::size_t textures = 0, world = 0, world_default = 0, world_emissive = 0;
         NormalMapCache cache;
         for (const auto& [path, resource] : resources.index())
         {
@@ -197,17 +270,19 @@ namespace
                 continue;
             ++world;
             world_default += material.name == "default";
+            world_emissive += material.emissive > 0;
             Texture t;
             if (!read_texture_resource(resources, path, t, e))
                 continue;
             CHECK(cache.get(t, material.normal > 0 ? material.normal : 1, e));
         }
-        std::cout << "DTX " << textures << ", world " << world << " (" << world_default << " default)\n";
+        std::cout << "DTX " << textures << ", world " << world << " (" << world_default << " default, "
+                  << world_emissive << " emissive)\n";
         for (const auto& [name, count] : classes)
             std::cout << "  " << name << ": " << count << '\n';
         std::cout << "Normal maps: " << cache.stats.generated << " in " << cache.stats.generation_ns / 1000000
                   << " ms, " << cache.stats.bytes / 1024 << " KiB\n";
-        CHECK(textures > 3000 && world > 1500 && world_default * 2 < world);
+        CHECK(textures > 3000 && world > 1500 && world_default * 2 < world && world_emissive >= 50);
         return true;
     }
 } // namespace
@@ -220,6 +295,7 @@ int main(int argc, char** argv)
             : c == "manifest"            ? manifest()
             : c == "builtin"             ? builtin()
             : c == "normal_maps"         ? normal_maps()
+            : c == "report"              ? report()
             : c == "light_grid"          ? light_grid()
             : c == "retail" && argc == 3 ? retail(argv[2])
                                          : false)

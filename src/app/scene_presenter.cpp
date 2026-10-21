@@ -235,7 +235,14 @@ namespace OpenBlood2
         const bool enhanced = shading != SurfaceShading::Original;
         world_renderer.surface = model_renderer.surface = enhanced ? &surface_scene_ : nullptr;
         if (!enhanced)
+        {
+            if (report_mesh_ != UINT64_MAX)
+            {
+                material_report = {};
+                report_mesh_ = UINT64_MAX;
+            }
             return true;
+        }
         if (!manifest_loaded_)
         {
             if (!surface_manifest.classes() || surface_manifest.rules() + surface_manifest.overrides() == 0)
@@ -250,6 +257,13 @@ namespace OpenBlood2
             ++surface_scene_.revision; // Renderers resolve materials and normal maps again.
             applied_shading_ = shading;
             applied_normal_maps_ = normal_maps;
+        }
+        if (report_mesh_ != mesh_revision || report_surface_ != surface_scene_.revision)
+        {
+            material_report = surface_report(surface_manifest, world_mesh, normal_maps, [&game](std::string_view path)
+                                             { return game.resources.find(path) != nullptr; });
+            report_mesh_ = mesh_revision;
+            report_surface_ = surface_scene_.revision;
         }
         if (grid_revision_ == mesh_revision && registry.get(surface_scene_.lights))
             return true;

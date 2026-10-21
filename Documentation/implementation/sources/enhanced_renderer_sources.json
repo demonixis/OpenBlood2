@@ -5,12 +5,20 @@
     {
       "file": "BLOOD2.REZ, BLOOD2P.REZ, BLOOD2P2.REZ (installed Blood II)",
       "purpose": "DTX catalogue (3825 textures) measured by surface.retail to write and check config/materials.json rules."
+    },
+    {
+      "file": "BLOOD2.REZ, BLOOD2P.REZ, BLOOD2P2.REZ (installed Blood II)",
+      "purpose": "2026-10-21: texture names for the emissive rules (fn* neon signs, flolite/smallight/baselite/amberlight lights, monitors, tvbig, exit signs): 54 world textures, the lightbulb1/2, neonmartini and tvbig model skins and 25 monitor sprite frames resolve to an emissive class (surface.retail)."
     }
   ],
   "design_references": [
     {
       "source": "NoMadEngine 6d91073 assets/blood2/config/materials.json",
       "purpose": "Inspiration for named material classes; its patterns match no retail path and its single-star matcher is not reproduced."
+    },
+    {
+      "source": "NoMadEngine 6d91073 nomadengine/src/renderer/resource_manager.cpp (TextureNameContains lava/magma/acid/slime/toxic, BrushType::Lava)",
+      "purpose": "The donor's lava/hazard words, adopted as the textures/ hazard rules (emission instead of the donor's specular imitation of glow; slime keeps the wet class). Retail matches one texture, textures/blueyellow/toxic.dtx."
     },
     {
       "source": "Walter, Marschner, Li, Torrance, 'Microfacet Models for Refraction through Rough Surfaces' (EGSR 2007)",
