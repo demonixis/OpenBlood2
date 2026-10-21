@@ -47,6 +47,9 @@ A binding is a source and an action. The sources are:
 
 - `Key`: an SDL scancode.
 - `MouseButton`: buttons 1–5.
+- `MouseWheel`: 0 (away from the user, up) or 1 (toward, down). Each wheel event with
+  whole ticks (SDL's accumulated `integer_y`, corrected for natural scrolling) gives one
+  down edge. Several ticks in one frame queue one command. The wheel has no held state.
 - `GamepadButton`: an SDL gamepad button.
 - `GamepadAxisPositive` / `GamepadAxisNegative`: an SDL gamepad axis, used in two ways:
   - Digital actions treat it as held beyond ±0.5.
@@ -58,8 +61,8 @@ The mapping is many-to-many:
 - One source may serve both a play action and a menu action: the arrows are look keys in
   play and menu navigation; south (A) is USE in play and accept in menus. The active
   context decides which one applies.
-- Mouse buttons count only while the mouse is captured: uncaptured clicks still belong
-  to the UI.
+- Mouse buttons and the wheel count only while the mouse is captured: uncaptured clicks
+  and scrolling still belong to the UI.
 
 `add` keeps a binding table bounded and checked:
 
@@ -86,7 +89,7 @@ The mapping is many-to-many:
 | Night goggles, the Eye | N, I |
 | Proximity, time, remote bomb, detonate | P, T, R, B |
 | Weapon slots 1–10 | 1–9, 0 and keypad 1–9, 0 |
-| Next / previous weapon | `'` / `;` (original defaults.cfg) |
+| Next / previous weapon | `'` / `;` (original defaults.cfg), mouse wheel down / up |
 | Previous / next item, use item | `[` / `]`, Enter (original InventoryLeft/Right, UseInventory) |
 | Menu (open/back, release mouse) | Esc |
 | Menu navigation / accept | arrows / Enter, keypad Enter |
@@ -110,6 +113,7 @@ original UseInventory key, so it is consumed by play like any other play key.
 | Menu back | east (B) |
 | Use item | west (X) |
 | Next item | Back (Select) |
+| Detonate remote bombs | D-pad up (in play; it still navigates menus) |
 | Menu (open/resume) | Start |
 | Menu navigation | D-pad or left stick |
 
@@ -125,8 +129,9 @@ The gamepad device policy is a set of replacement constants in
     offsets.
 - At most eight gamepads are tracked.
 
-Detonate, the Eye, flashlight and the other item hotkeys have no dedicated gamepad
-button. Items are reached through Next item and Use item.
+The Eye, flashlight and the other item hotkeys have no dedicated gamepad button. Items
+are reached through Next item and Use item. The wheel bindings are replacement defaults:
+the original configuration binds no wheel.
 
 ## Gamepad lifetime and state
 
@@ -196,6 +201,8 @@ The headless `input_actions.*` tests cover:
 - the table and binding validation;
 - the default keyboard, mouse and gamepad layouts, and the consumed keys;
 - remapping of Hold, Press, Command and look actions, and of mouse buttons;
+- mouse wheel ticks: capture-only, direction and natural scrolling, several ticks in one
+  event, other windows and text editing;
 - the Press repeat guard and fire re-arming;
 - gamepad digital thresholds, diagonals, the run latch, triggers with text-editing
   suppression, command edges, analog look (deadzone, curve, zoom, inversion), several

@@ -34,6 +34,16 @@ namespace
         e.button.down = down;
         return e;
     }
+    SDL_Event wheel(int ticks, bool flipped = false, SDL_WindowID id = window)
+    {
+        SDL_Event e{};
+        e.type = SDL_EVENT_MOUSE_WHEEL;
+        e.wheel.windowID = id;
+        e.wheel.y = float(ticks);
+        e.wheel.integer_y = ticks;
+        e.wheel.direction = flipped ? SDL_MOUSEWHEEL_FLIPPED : SDL_MOUSEWHEEL_NORMAL;
+        return e;
+    }
     SDL_Event focus(bool active)
     {
         SDL_Event e{};
@@ -90,6 +100,8 @@ namespace
             CHECK(!b.add(InputSource::Key, reserved, InputAction::Jump));
         CHECK(!b.add(InputSource::MouseButton, 0, InputAction::FirePrimary));
         CHECK(!b.add(InputSource::MouseButton, SDL_BUTTON_X2 + 1, InputAction::FirePrimary));
+        CHECK(!b.add(InputSource::MouseWheel, 2, InputAction::NextWeapon) &&
+              !b.add(InputSource::MouseWheel, -1, InputAction::NextWeapon));
         CHECK(!b.add(InputSource::Key, SDL_SCANCODE_O, InputAction::Count));
         CHECK(b.entries.empty());
         CHECK(b.add(InputSource::Key, SDL_SCANCODE_O, InputAction::Jump));
@@ -113,7 +125,10 @@ namespace
         for (std::size_t i = 0; i < input_action_count; ++i)
             CHECK(count(all, InputAction(i)) > 0);
         for (const auto& entry : b.entries)
-            CHECK(entry.source == InputSource::Key || entry.source == InputSource::MouseButton);
+            CHECK(entry.source == InputSource::Key || entry.source == InputSource::MouseButton ||
+                  entry.source == InputSource::MouseWheel);
+        CHECK(b.bound(InputSource::MouseWheel, 0, InputAction::PrevWeapon) &&
+              b.bound(InputSource::MouseWheel, 1, InputAction::NextWeapon));
         CHECK(count(b, InputAction::MenuBack) == 0); // Esc already returns; MenuBack is the gamepad's B.
         const auto bound = [&b](SDL_Scancode code, InputAction action)
         { return b.bound(InputSource::Key, code, action); };
@@ -160,7 +175,8 @@ namespace
               pad(SDL_GAMEPAD_BUTTON_SOUTH, InputAction::MenuAccept) &&
               pad(SDL_GAMEPAD_BUTTON_EAST, InputAction::MenuBack) &&
               pad(SDL_GAMEPAD_BUTTON_WEST, InputAction::UseItem) &&
-              pad(SDL_GAMEPAD_BUTTON_BACK, InputAction::NextItem));
+              pad(SDL_GAMEPAD_BUTTON_BACK, InputAction::NextItem) &&
+              pad(SDL_GAMEPAD_BUTTON_DPAD_UP, InputAction::Detonate));
         MovementControls c;
         c.event(focus(true), window);
         // Every play key of the previous fixed table is still consumed; interface keys are not.
@@ -313,6 +329,10 @@ namespace
         c.event(pad_axis(SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, 0), window);
         c.event(pad_axis(SDL_GAMEPAD_AXIS_LEFT_TRIGGER, 0), window);
         CHECK(!c.sample_fire(false).primary && !c.sample_fire(false).alternate);
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_DPAD_UP, true), window); // Detonate, a Press action.
+        CHECK(c.sample_detonate(false) && c.sample_detonate(false));
+        c.event(pad_button(SDL_GAMEPAD_BUTTON_DPAD_UP, false), window);
+        CHECK(!c.sample_detonate(false));
         c.event(pad_button(SDL_GAMEPAD_BUTTON_NORTH, true), window);
         c.event(pad_button(SDL_GAMEPAD_BUTTON_RIGHT_STICK, true), window);
         CHECK(c.sample(false).jump && c.sample(false).crouch);
@@ -394,6 +414,34 @@ namespace
         polled.buttons[SDL_GAMEPAD_BUTTON_SOUTH] = true;
         c.set_gamepad(polled);
         CHECK(c.sample(false).forward && !c.sample_use(false));
+        return true;
+    }
+
+    // Wheel ticks cycle weapons only while the mouse is captured (play owns it).
+    bool mouse_wheel()
+    {
+        MovementControls c;
+        c.event(focus(true), window);
+        c.event(wheel(1), window);
+        CHECK(!c.sample_command(InputAction::PrevWeapon, false) && !c.consumes(wheel(1), false));
+        c.mouse_requested = c.mouse_captured = true; // Pure mapping test.
+        CHECK(c.consumes(wheel(1), false));
+        c.event(wheel(1), window);
+        CHECK(c.sample_command(InputAction::PrevWeapon, false) &&
+              !c.sample_command(InputAction::NextWeapon, false));
+        c.event(wheel(-3), window); // Several ticks in one event queue one command.
+        CHECK(c.sample_command(InputAction::NextWeapon, false) &&
+              !c.sample_command(InputAction::NextWeapon, false));
+        c.event(wheel(1, true), window); // Natural scrolling: SDL reports flipped values.
+        CHECK(c.sample_command(InputAction::NextWeapon, false));
+        c.event(wheel(0), window); // A sub-tick trackpad delta.
+        c.event(wheel(1, false, 99), window); // Another window.
+        CHECK(!c.sample_command(InputAction::NextWeapon, false) && !c.sample_command(InputAction::PrevWeapon, false));
+        c.event(wheel(1), window, true); // Text editing drops it.
+        CHECK(!c.sample_command(InputAction::PrevWeapon, false));
+        c.bindings.clear(InputAction::PrevWeapon);
+        c.event(wheel(1), window);
+        CHECK(!c.sample_command(InputAction::PrevWeapon, false));
         return true;
     }
 
@@ -525,6 +573,8 @@ int main(int argc, char** argv)
         return menu() ? 0 : 1;
     if (mode == "gamepad")
         return gamepad() ? 0 : 1;
+    if (mode == "mouse_wheel")
+        return mouse_wheel() ? 0 : 1;
     if (mode == "gamepad_menu")
         return gamepad_menu() ? 0 : 1;
     return 2;

@@ -84,6 +84,8 @@ namespace OpenBlood2
                     return keys[unsigned(b.code)];
                 case InputSource::MouseButton:
                     return mouse_captured && mouse_buttons[unsigned(b.code - 1)];
+                case InputSource::MouseWheel:
+                    return false; // Ticks are edges only.
                 case InputSource::GamepadButton:
                     for (const auto& pad : gamepads)
                         if (pad.buttons[unsigned(b.code)])
@@ -292,7 +294,7 @@ namespace OpenBlood2
         bool consumes(const SDL_Event& event, bool text_editing) const
         {
             if (mouse_captured && (event.type == SDL_EVENT_MOUSE_MOTION || event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
-                                   event.type == SDL_EVENT_MOUSE_BUTTON_UP))
+                                   event.type == SDL_EVENT_MOUSE_BUTTON_UP || event.type == SDL_EVENT_MOUSE_WHEEL))
                 return true;
             if (!focused || !enabled || text_editing ||
                 (event.type != SDL_EVENT_KEY_DOWN && event.type != SDL_EVENT_KEY_UP))
@@ -330,6 +332,9 @@ namespace OpenBlood2
                     mouse_buttons[event.button.button - 1u] = event.type == SDL_EVENT_MOUSE_BUTTON_DOWN;
                     command_edges(InputEdges::from(event), text_editing);
                 }
+                // Like the buttons, the wheel belongs to play only while the mouse is captured.
+                if (event.type == SDL_EVENT_MOUSE_WHEEL && event.wheel.windowID == window)
+                    command_edges(InputEdges::from(event), text_editing);
             }
             if (gamepad_event(event))
             {

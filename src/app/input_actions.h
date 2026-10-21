@@ -154,6 +154,7 @@ namespace OpenBlood2
         Key,                 // SDL_Scancode: physical position (WASD on QWERTY is ZQSD on AZERTY).
         MouseButton,         // SDL_BUTTON_LEFT..SDL_BUTTON_X2; play reads it only while the mouse is captured.
         GamepadButton,       // SDL_GamepadButton, from any open gamepad.
+        MouseWheel,          // 0 = away from the user (up), 1 = toward (down); one down edge per tick.
         GamepadAxisPositive, // SDL_GamepadAxis: digital above +threshold; Analog reads the value.
         GamepadAxisNegative  // SDL_GamepadAxis: digital below -threshold; Analog reads the negated value.
     };
@@ -187,10 +188,17 @@ namespace OpenBlood2
         {
             return edge.data() + count;
         }
-        // Stateless key and mouse-button events; gamepad edges come from MovementControls::track.
+        // Stateless key, mouse-button and wheel events; gamepad edges come from MovementControls::track.
         static InputEdges from(const SDL_Event& e)
         {
             InputEdges edges;
+            if (e.type == SDL_EVENT_MOUSE_WHEEL)
+            {
+                // SDL accumulates trackpad deltas into whole ticks; several ticks queue one command.
+                const auto ticks = e.wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? -e.wheel.integer_y : e.wheel.integer_y;
+                if (ticks)
+                    edges.push({InputSource::MouseWheel, ticks > 0 ? 0 : 1, true, false});
+            }
             if (e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_KEY_UP)
                 edges.push({InputSource::Key, e.key.scancode, e.type == SDL_EVENT_KEY_DOWN, e.key.repeat});
             if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN || e.type == SDL_EVENT_MOUSE_BUTTON_UP)
@@ -232,6 +240,8 @@ namespace OpenBlood2
                     return b.code >= SDL_BUTTON_LEFT && b.code <= SDL_BUTTON_X2;
                 case InputSource::GamepadButton:
                     return b.code >= 0 && b.code < SDL_GAMEPAD_BUTTON_COUNT;
+                case InputSource::MouseWheel:
+                    return b.code == 0 || b.code == 1;
                 case InputSource::GamepadAxisPositive:
                 case InputSource::GamepadAxisNegative:
                     return b.code >= 0 && b.code < SDL_GAMEPAD_AXIS_COUNT;
@@ -307,6 +317,9 @@ namespace OpenBlood2
             key(SDL_SCANCODE_G, InputAction::FireAlternate);
             b.add(InputSource::MouseButton, SDL_BUTTON_LEFT, InputAction::FirePrimary);
             b.add(InputSource::MouseButton, SDL_BUTTON_RIGHT, InputAction::FireAlternate);
+            // Wheel up previous weapon, wheel down next (replacement; the original binds no wheel).
+            b.add(InputSource::MouseWheel, 0, InputAction::PrevWeapon);
+            b.add(InputSource::MouseWheel, 1, InputAction::NextWeapon);
             key(SDL_SCANCODE_E, InputAction::Use);
             key(SDL_SCANCODE_L, InputAction::Flashlight);
             key(SDL_SCANCODE_H, InputAction::Medkit);
@@ -344,7 +357,7 @@ namespace OpenBlood2
         // Console layout: left stick moves, right stick looks, L3 latches run, R3 crouches,
         // triggers fire (right primary, left alternate), bumpers cycle weapons, Start menu,
         // north (Y) jump, south (A) use and menu accept, east (B) menu back, west (X) use item,
-        // Back (Select) next item; the D-pad and left stick also navigate menus.
+        // Back (Select) next item, D-pad up detonate; the D-pad and left stick also navigate menus.
         static void add_gamepad(InputBindings& b)
         {
             const auto button = [&b](SDL_GamepadButton code, InputAction action)
@@ -370,6 +383,7 @@ namespace OpenBlood2
             button(SDL_GAMEPAD_BUTTON_EAST, InputAction::MenuBack);
             button(SDL_GAMEPAD_BUTTON_WEST, InputAction::UseItem);
             button(SDL_GAMEPAD_BUTTON_BACK, InputAction::NextItem);
+            button(SDL_GAMEPAD_BUTTON_DPAD_UP, InputAction::Detonate);
             button(SDL_GAMEPAD_BUTTON_DPAD_UP, InputAction::MenuUp);
             button(SDL_GAMEPAD_BUTTON_DPAD_DOWN, InputAction::MenuDown);
             button(SDL_GAMEPAD_BUTTON_DPAD_LEFT, InputAction::MenuLeft);
