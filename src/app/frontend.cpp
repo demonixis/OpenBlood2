@@ -880,12 +880,16 @@ namespace OpenBlood2
                 {
                     const auto* data = ImGui::GetDrawData();
                     const auto& hands = xr->frame().hands;
+                    std::string weapons;
+                    for (const auto& entry : presenter.model_scene.entries)
+                        if (entry.label.ends_with("view weapon"))
+                            weapons += " [" + entry.label + (entry.error.empty() ? "" : ": " + entry.error) + "]";
                     spdlog::info("XR frontend: frame {}, {} canvas, {} world, menu {}, {} UI vertices in {} lists, "
-                                 "{} draw calls, fade {:.2f}, controllers {}/{}, {} close models",
+                                 "{} draw calls, fade {:.2f}, controllers {}/{}, {} close models{}",
                                  frames, panel ? "panel" : "HUD", world && presenter.render_world ? "with" : "without",
                                  menu.active, data ? data->TotalVtxCount : 0, data ? data->CmdListsCount : 0,
                                  presenter.stats.draw_calls, fade, hands[0].grip_valid, hands[1].grip_valid,
-                                 presenter.model_scene.close_draws.size());
+                                 presenter.model_scene.close_draws.size(), weapons);
                 }
                 ++frames;
                 continue;

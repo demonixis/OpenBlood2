@@ -4,7 +4,8 @@ Drafted 2026-10-21 at `c09a9d1f`. Lots 8.1 and 8.2 have their first light on a
 Quest 3 ([report](reports/xr_first_light.md)), lot 8.3 renders SubwayA in stereo at
 72 Hz ([report](reports/xr_stereo_world.md)), lot 8.5 adds the controllers
 ([report](reports/xr_controls.md)), lot 8.6 the HUD and menus ([report](reports/xr_menus_hud.md)) and
-lot 8.7 the menu laser with the first playtest's fixes ([report](reports/xr_laser_playtest.md));
+lot 8.7 the menu laser with the first playtest's fixes ([report](reports/xr_laser_playtest.md))
+and lot 8.9 the view weapons on the controllers with arm IK ([report](reports/xr_arms.md));
 see the [contract](../contracts/xr_runtime_contracts.md). Lot 8.6 composites the menu panel as an
 OpenXR quad like the HUD, rather than drawing it in the eye buffer: it is sharper and shares
 one canvas; the 8.7 laser draws its cursor into the canvas and its beam up to the panel.
@@ -283,6 +284,15 @@ menu.
 
 Two-handed foregrip aiming and motion-driven melee are out of scope for v1: the left
 hand keeps its animation, and melee stays trigger-driven.
+
+**As built (lot 8.9).** The audit found the chains follow one naming rule (`lu_arm*` →
+`ll_arm*` → `d_null*` → hand mesh) and the models at about 1/8 scale, so there is no
+`config/xr_arms.json`: chains are discovered by name, the scale is one constant
+(0.17 m per model unit) and only the eleven two-handed models without a trigger hand need
+data, an audited grip table in `src/engine/view_arms.cpp`. The solve edits the composed
+model-space poses (rigid segment deltas), so no pose-edit API in `model.cpp` was needed.
+Cut geometry is handled by masking what the original camera framed out (a widened view
+cone) rather than per-model node lists. The muzzle-origin option is not built.
 
 ### Data setup screen and demo download
 

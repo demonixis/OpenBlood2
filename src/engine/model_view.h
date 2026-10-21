@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/arm_ik.h"
 #include "engine/world_view.h"
 namespace OpenBlood2
 {
@@ -67,12 +68,13 @@ namespace OpenBlood2
         void begin_frame();
         bool add(const Model*, const AnimationTrack&, std::string_view skin, NodePose, DVector scale, bool visible,
                  bool close, ObjectId, std::string_view label, const Resources&, std::string&,
-                 std::span<const std::uint8_t> hidden_nodes = {}, float alpha = 1, bool require_skin = false);
+                 std::span<const std::uint8_t> hidden_nodes = {}, float alpha = 1, bool require_skin = false,
+                 std::span<const ArmTarget> arms = {});
         // Only immutable, shared assets may reuse prepared geometry. Borrowed models are always sampled.
         bool add(const std::shared_ptr<const Model>&, const AnimationTrack&, std::string_view skin, NodePose,
                  DVector scale, bool visible, bool close, ObjectId, std::string_view label, const Resources&,
                  std::string&, std::span<const std::uint8_t> hidden_nodes = {}, float alpha = 1,
-                 bool require_skin = false);
+                 bool require_skin = false, std::span<const ArmTarget> arms = {});
         struct PreparationStats
         {
             std::size_t sampled = 0, reused = 0, uncached = 0, reused_vertices = 0;
@@ -113,7 +115,7 @@ namespace OpenBlood2
         bool add_impl(const Model*, const std::shared_ptr<const Model>*, const AnimationTrack&, std::string_view skin,
                       NodePose, DVector scale, bool visible, bool close, ObjectId, std::string_view label,
                       const Resources&, std::string&, std::span<const std::uint8_t> hidden_nodes, float alpha,
-                      bool require_skin);
+                      bool require_skin, std::span<const ArmTarget> arms);
         struct SkinLayout
         {
             std::weak_ptr<const Model> owner;
@@ -123,7 +125,8 @@ namespace OpenBlood2
         };
         bool add_skinned(const Model&, const std::shared_ptr<const Model>&, const AnimationTrack&, NodePose,
                          DVector scale, bool close, float alpha, std::uint32_t material,
-                         std::span<const std::uint8_t> hidden_nodes, ModelViewEntry&, std::string& error);
+                         std::span<const std::uint8_t> hidden_nodes, std::span<const ArmTarget> arms, ModelViewEntry&,
+                         std::string& error);
         std::map<const Model*, SkinLayout> layouts_;
         std::vector<NodePose> pose_;
         std::vector<DVector> deformed_;

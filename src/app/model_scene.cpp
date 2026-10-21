@@ -96,25 +96,39 @@ namespace OpenBlood2
                 continue;
             const auto* definition = weapon_definition(weapon.type);
             NodePose pose;
-            auto camera = weapons
-                              ? (*weapons)[weapon.left ? 0 : 1]
-                              : ViewWeaponCamera{client.rotation.pitch, client.rotation.yaw, client.camera_position};
-            if (definition && camera.at_hand)
+            const auto camera =
+                weapons ? (*weapons)[weapon.left ? 0 : 1]
+                        : ViewWeaponCamera{client.rotation.pitch, client.rotation.yaw, client.camera_position, {}, 1};
+            const bool visible = owner && !owner->m_damage.IsDead() && client.weapons_visible;
+            const auto* label = weapon.left ? "left view weapon" : "right view weapon";
+            if (definition && camera.arms)
             {
-                // The hand sits behind the muzzle flash: 60% of its depth, at its height and side.
-                const auto& flash = definition->m_vFlash;
-                const DVector hand{weapon.left ? -flash.x : flash.x, flash.y, flash.z * .6f};
-                camera.eye = vector_subtract(camera.eye,
-                                             rotate_vector(rotation_from_euler({camera.pitch, camera.yaw, 0}), hand));
+                const auto& offset = definition->m_vViewModelOffset;
+                ViewArmRig rig;
+                ViewArmPose held;
+                if (!rig_view_arms(*weapon.model, weapon.model_path, weapon.left, rig) ||
+                    !pose_view_arms(*weapon.model, weapon.animation, rig, *camera.arms,
+                                    {weapon.left ? -offset.x : offset.x, offset.y, offset.z}, held))
+                {
+                    error = "View-weapon arm placement failed";
+                    return false;
+                }
+                const auto s = camera.arms->scale;
+                if (!scene.add(weapon.model, weapon.animation, weapon.skin_path, held.model, {s, s, s}, visible, true,
+                               {}, label, game.resources, error, held.hidden, 1, false, held.targets))
+                    return false;
+                continue;
             }
             if (!definition || !weapon.AdjustAngleAndSetPos(camera.pitch, camera.yaw, camera.eye, pose))
             {
                 error = "Original view-weapon placement failed";
                 return false;
             }
-            if (!scene.add(weapon.model, weapon.animation, weapon.skin_path, pose, {1, 1, 1},
-                           owner && !owner->m_damage.IsDead() && client.weapons_visible, true, {},
-                           weapon.left ? "left view weapon" : "right view weapon", game.resources, error))
+            const auto s = camera.scale;
+            if (s != 1)
+                pose.position = vector_add(camera.eye, vector_scale(vector_subtract(pose.position, camera.eye), s));
+            if (!scene.add(weapon.model, weapon.animation, weapon.skin_path, pose, {s, s, s}, visible, true, {}, label,
+                           game.resources, error))
                 return false;
         }
         return true;

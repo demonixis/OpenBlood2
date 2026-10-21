@@ -47,23 +47,24 @@ namespace OpenBlood2
     bool ModelView::add(const Model* model, const AnimationTrack& track, std::string_view skin, NodePose pose,
                         DVector scale, bool visible, bool close, ObjectId object, std::string_view label,
                         const Resources& resources, std::string& error, std::span<const std::uint8_t> hidden_nodes,
-                        float alpha, bool require_skin)
+                        float alpha, bool require_skin, std::span<const ArmTarget> arms)
     {
         return add_impl(model, nullptr, track, skin, pose, scale, visible, close, object, label, resources, error,
-                        hidden_nodes, alpha, require_skin);
+                        hidden_nodes, alpha, require_skin, arms);
     }
     bool ModelView::add(const std::shared_ptr<const Model>& model, const AnimationTrack& track, std::string_view skin,
                         NodePose pose, DVector scale, bool visible, bool close, ObjectId object, std::string_view label,
                         const Resources& resources, std::string& error, std::span<const std::uint8_t> hidden_nodes,
-                        float alpha, bool require_skin)
+                        float alpha, bool require_skin, std::span<const ArmTarget> arms)
     {
         return add_impl(model.get(), &model, track, skin, pose, scale, visible, close, object, label, resources, error,
-                        hidden_nodes, alpha, require_skin);
+                        hidden_nodes, alpha, require_skin, arms);
     }
     bool ModelView::add_impl(const Model* model, const std::shared_ptr<const Model>* owner, const AnimationTrack& track,
                              std::string_view skin, NodePose pose, DVector scale, bool visible, bool close,
                              ObjectId object, std::string_view label, const Resources& resources, std::string& error,
-                             std::span<const std::uint8_t> hidden_nodes, float alpha, bool require_skin)
+                             std::span<const std::uint8_t> hidden_nodes, float alpha, bool require_skin,
+                             std::span<const ArmTarget> arms)
     {
         error.clear();
         auto fail = [&](const char* reason)
@@ -134,11 +135,17 @@ namespace OpenBlood2
                 entry.error = "GPU skinning requires a shared immutable model";
                 return true;
             }
-            if (!add_skinned(*model, *owner, track, pose, scale, close, alpha, material, hidden_nodes, entry, error))
+            if (!add_skinned(*model, *owner, track, pose, scale, close, alpha, material, hidden_nodes, arms, entry,
+                             error))
             {
                 begin_frame();
                 return false;
             }
+            return true;
+        }
+        if (!arms.empty())
+        {
+            entry.error = "Arm IK requires GPU skinning";
             return true;
         }
         WorldDraw draw{static_cast<std::uint32_t>(mesh.ranges.size()), pose.position, pose.rotation, alpha};
@@ -358,7 +365,7 @@ namespace OpenBlood2
     bool ModelView::add_skinned(const Model& model, const std::shared_ptr<const Model>& owner,
                                 const AnimationTrack& track, NodePose pose, DVector scale, bool close, float alpha,
                                 std::uint32_t material, std::span<const std::uint8_t> hidden_nodes,
-                                ModelViewEntry& entry, std::string& error)
+                                std::span<const ArmTarget> arms, ModelViewEntry& entry, std::string& error)
     {
         auto fail = [&](const char* reason)
         {
@@ -418,6 +425,11 @@ namespace OpenBlood2
         if (!sample_skin(model, track.animation, track.time, pose_, deformed_))
         {
             entry.error = "Model animation pose is unavailable";
+            return true;
+        }
+        if (!arms.empty() && !solve_arms(model, arms, pose_))
+        {
+            entry.error = "Invalid arm IK chain";
             return true;
         }
         if (pose_.size() * 2 > palette_limit - palette.size() ||

@@ -223,6 +223,7 @@ namespace OpenBlood2
         for (std::size_t i = 0; i < 3; ++i)
             reference_[i] = (frame_.eye_pose[0].position[i] + frame_.eye_pose[1].position[i]) / 2;
         calibrated_ = true;
+        body_yaw_.reset();
         scale_ = units_per_meter(game);
         spdlog::info("XR calibration: {:.2f} units/m (player eye over a {:.2f} m user eye)", scale_,
                      nominal_eye_height);
@@ -287,8 +288,10 @@ namespace OpenBlood2
         head.position = dvec(t.stereo.head.position);
         head.rotation = engine_rotation(t.stereo.head.orientation);
         presenter.camera_override = head;
-        // Each hand's view weapon at its controller: aimed along the aim pose, the model's hand on
-        // the grip (rigid until the arm IK lot); the head when a controller is not tracked.
+        // Each hand's view weapon at its controller: aimed along the aim pose, held at the grip,
+        // arms solved from the virtual shoulders; the head's original placement when a controller
+        // is not tracked.
+        const auto shoulders = xr_shoulders(t, scale_, body_yaw_);
         std::array<ViewWeaponCamera, 2> cameras{};
         for (std::size_t hand = 0; hand < 2; ++hand)
         {
@@ -296,9 +299,22 @@ namespace OpenBlood2
             const bool tracked = h.aim_valid && h.grip_valid;
             const auto aim = tracked ? xr_world_pose(t, reference_, scale_, h.aim) : t.stereo.head;
             const auto look = xr::rotate(aim.orientation, {0, 0, 1});
-            const auto at = tracked ? xr_world_pose(t, reference_, scale_, h.grip).position : t.stereo.head.position;
-            cameras[hand] = {-std::asin(std::clamp(look[1], -1.f, 1.f)), std::atan2(look[0], look[2]), dvec(at),
-                             tracked};
+            auto& camera = cameras[hand];
+            camera.pitch = -std::asin(std::clamp(look[1], -1.f, 1.f));
+            camera.yaw = std::atan2(look[0], look[2]);
+            camera.eye = dvec(t.stereo.head.position);
+            camera.scale = view_model_meters * scale_;
+            if (!tracked)
+                continue;
+            ViewArmPlacement arms;
+            arms.grip = {dvec(xr_world_pose(t, reference_, scale_, h.grip).position), engine_rotation(aim.orientation)};
+            arms.scale = view_model_meters * scale_;
+            for (std::size_t side = 0; side < 2; ++side)
+            {
+                arms.shoulders[side] = dvec(shoulders.shoulders[side]);
+                arms.poles[side] = dvec(shoulders.poles[side]);
+            }
+            camera.arms = arms;
         }
         presenter.weapon_cameras = cameras;
     }

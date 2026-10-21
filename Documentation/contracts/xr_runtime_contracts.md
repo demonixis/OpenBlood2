@@ -143,14 +143,57 @@ No game world, HUD or menu is rendered in XR yet.
   pass and depth range. A 30 ms haptic pulse marks every shot a hand's weapon actually fires
   (`CViewWeapon::shots`).
 - **View weapons per hand.** Each hand's view model follows its own controller (the left one
-  for dual weapons): aimed along the aim pose, with the model's hand on the grip. The view
-  models are life-size (the Beretta's muzzle flash sits 28 units ahead of the eye), so the
-  camera eye is placed behind the grip by the weapon's hand point, taken as the flash offset
-  at 60% of its depth (`ViewWeaponCamera::at_hand`); the arm then reaches back toward the
-  user. An untracked controller falls back to the head. Rigid until the arm IK lot.
+  for dual weapons); see Arms and view weapons below. An untracked controller falls back to
+  the original head placement, enlarged about the eye by the same scale
+  (`ViewWeaponCamera::scale`; 1 on desktop, where nothing changes).
 - **Dual weapons aim per hand.** `CBloodClientShell::left_hand_forward` (XR adaptation, empty on
   desktop) gives the left-hand weapon the left controller's converged direction in
   `UpdateWeapons`; the left laser and reticle appear with a left-hand weapon.
+
+## Arms and view weapons (lot 8.9)
+
+- **Scale.** The original view models are about 1/8 scale: the Beretta's hand is 0.9 units long
+  and the gun 1.3 (its muzzle flash, at 28 units, is ten times the geometry). XR draws them at
+  `view_model_meters` = 0.17 m per model unit (`scale = 0.17 × units_per_meter`): hand ~15 cm,
+  Beretta ~22 cm, forearm ~29 cm, upper arm ~24 cm. This replaces lot 8.7's life-size
+  assumption, which left the arm tiny and behind the controller.
+- **Rig.** `rig_view_arms` (`src/engine/view_arms.cpp`) finds every arm chain by the original
+  naming: an upper arm `lu_arm*`, its child `ll_arm*`, that one's child `d_null*` (the wrist)
+  and the hand mesh under the wrist. Numbers vary (`lu_arm2` is the right arm of the Beretta,
+  `lu_arm3` the left of the Mac-10); the side comes from the upper arm's rest x. The rest pose
+  is `static_model`, else `idle`, `fire`, then the first clip, at time zero.
+- **Grip.** The controller holds, in order: the hand of the chain on the model's own side (the
+  centre of the hand mesh's own rest vertices, not what it holds); for the eleven two-handed
+  models whose trigger hand is not modelled (M16, sniper rifle, minigun, Tesla cannon, death
+  ray, howitzer, napalm cannon, Singularity and the `lh_` M16, napalm and Tesla), an audited
+  rest grip measured on their side views; else the bounds centre (no original model needs
+  it). The model is turned to the aim pose (pitch, yaw and roll) and moved so the grip point
+  sits on the grip pose; animations (draw, fire, recoil) play relative to it.
+- **IK.** `solve_arms` (`src/engine/arm_ik.cpp`) runs in `ModelView::add_skinned` after
+  `sample_skin` and before the palette push. Each visible chain is re-routed from a virtual
+  shoulder to the wrist's animated position: the authored segment lengths, the elbow toward a
+  pole (down, outward, back), the authored hinge mapped onto the new bend plane, and the
+  shoulder sliding along the reach when the wrist is out of range or too close. The wrist and
+  everything under it (hand, gun) keep their animated poses; other nodes under a segment move
+  rigidly with it. Model-space composed poses are edited directly, so `model.cpp` is unchanged.
+  An invalid chain draws nothing and reports `Invalid arm IK chain`; the CPU skinning path has
+  no IK and reports `Arm IK requires GPU skinning` (the presenter always skins on the GPU).
+- **Virtual shoulders.** `xr_shoulders` (`src/app/xr_player.cpp`): a neck pivot 10 cm below and
+  9 cm behind the eyes in the head frame, shoulders ±17 cm across and 12 cm lower along a body
+  yaw that trails the head beyond a 45° dead zone. The body yaw is kept relative to the
+  tracking yaw, so snap turns carry it; looking straight up or down keeps it; calibration
+  resets it.
+- **Framed-out geometry.** The original camera sat at −offset (`m_vViewModelOffset`, mirrored
+  for the left hand) with a 90° field of view, and some parts were only hidden by that framing.
+  Anything beyond that view cone widened by 1.5 units (~25 cm) stays hidden through the
+  per-instance node mask: another chain whose hand lies wholly outside, and any node outside
+  the chains whose vertices all do. The held chain is always drawn. On retail data this hides
+  the Mac-10's and knife's spare left arms, the Singularity's lowered support arm and the M16's
+  grenade; stocks, grips and near-plane cuts stay.
+- **Kept from the original.** Two-handed support hands keep their animated place on the gun
+  (no foregrip tracking); secondary hands (Voodoo pin, BugSpray can, C4) stay where the
+  animation puts them relative to the held hand. Upper arms without geometry (death ray,
+  howitzer, napalm, Singularity, Tesla) leave the forearm starting at the elbow.
 
 ## HUD and menus (lot 8.6)
 
@@ -208,7 +251,13 @@ FOV gives the desktop projection.
 - `xr.math_axes`, `xr.math_projection`, `xr.math_eye_pose`, `xr.math_stereo`,
   `xr.input_sectors`, `xr.input_edges`, `xr.input_aim`, `xr.input_hands` and
   `platform.sdl_xr_swapchain_patch` (headless); `xr.player_locomotion`, `xr.player_aim`,
-  `xr.player_turning` and `xr.player_buttons` drive the bridge in a synthetic world.
+  `xr.player_turning` and `xr.player_buttons` drive the bridge in a synthetic world;
+  `xr.player_shoulders` checks the virtual shoulders and their dead zone.
+- `arm_ik.solve_reach`, `solve_pole`, `solve_clamp` and `solve_invalid` (lengths, rigid
+  segments, hinge, pole side, shoulder slide, atomic refusal); `arm_ik.rig`, `placement`,
+  `hiding` and `model_view` (chains, grips, anchor on the grip, framed-out masks, solved
+  palette, CPU refusal) on a synthetic weapon; `arm_ik.catalog` (private) rigs, poses and
+  solves all 26 installed view models at their definitions' offsets.
 - Regenerating the shaders leaves the eighteen existing artifacts byte-identical; the
   four line artifacts are new (SPIR-V and MSL).
 - Device evidence: the [first-light report](../implementation/reports/xr_first_light.md) and
@@ -217,8 +266,8 @@ FOV gives the desktop projection.
 ## Not included yet
 
 Multiview, the VR options page (smooth turn, handedness, movement
-reference), the left-handed layout, weapon slots by number, arm IK
-(view weapons follow the right aim pose rigidly), refresh-rate and performance settings,
+reference), the left-handed layout, weapon slots by number, two-handed foregrip tracking
+and motion melee, refresh-rate and performance settings,
 the data setup screen and demo download, PCVR presets and their profiles.
 Shadow casters are still chosen with the 90° desktop frustum around the head, close
 models are lit from the game eye, and translucent sorting runs per eye.

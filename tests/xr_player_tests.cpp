@@ -2,6 +2,7 @@
 #include "player_fixture.h"
 #include <cmath>
 #include <iostream>
+#include <optional>
 #include <string_view>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
@@ -190,6 +191,55 @@ namespace
         CHECK(!s.weapon_input.primary);
         return true;
     }
+    // Virtual shoulders: below and behind the head, across a body yaw with a 45-degree dead zone
+    // kept relative to the tracking yaw.
+    bool shoulders()
+    {
+        XrTracking t;
+        t.yaw = 0.3f;
+        t.stereo.head = {{10, 70, 5}, xr::yaw_rotation(0.3f)};
+        std::optional<float> body;
+        auto s = xr_shoulders(t, scale, body);
+        CHECK(body && near(*body, 0, 1e-5f));
+        const auto right = xr::rotate(xr::yaw_rotation(0.3f), {1, 0, 0});
+        const xr::Vec3 across{s.shoulders[1][0] - s.shoulders[0][0], s.shoulders[1][1] - s.shoulders[0][1],
+                              s.shoulders[1][2] - s.shoulders[0][2]};
+        CHECK(near(across[0] * right[0] + across[2] * right[2], .34f * scale, 1e-3f) && near(across[1], 0, 1e-4f));
+        // 22 cm below the eyes, 9 cm behind them.
+        const auto forward = xr::rotate(xr::yaw_rotation(0.3f), {0, 0, 1});
+        const float mid_y = (s.shoulders[0][1] + s.shoulders[1][1]) / 2;
+        const float mid_back = ((s.shoulders[0][0] + s.shoulders[1][0]) / 2 - 10) * forward[0] +
+                               ((s.shoulders[0][2] + s.shoulders[1][2]) / 2 - 5) * forward[2];
+        CHECK(near(mid_y, 70 - .22f * scale, 1e-3f) && near(mid_back, -.09f * scale, 1e-3f));
+        // Elbows: down, outward, back.
+        for (std::size_t side = 0; side < 2; ++side)
+        {
+            const auto& pole = s.poles[side];
+            const float out = (pole[0] * right[0] + pole[2] * right[2]) * (side ? 1.f : -1.f);
+            CHECK(pole[1] < -.9f && out > .4f && pole[0] * forward[0] + pole[2] * forward[2] < 0);
+        }
+        // Within the dead zone the body stays; beyond it it trails the head by 45 degrees.
+        t.stereo.head.orientation = xr::yaw_rotation(0.3f + 0.6f);
+        xr_shoulders(t, scale, body);
+        CHECK(near(*body, 0, 1e-5f));
+        t.stereo.head.orientation = xr::yaw_rotation(0.3f + 1.4f);
+        xr_shoulders(t, scale, body);
+        CHECK(near(*body, 1.4f - xr_body_dead_zone, 1e-4f));
+        t.stereo.head.orientation = xr::yaw_rotation(0.3f - 1.2f);
+        xr_shoulders(t, scale, body);
+        CHECK(near(*body, -1.2f + xr_body_dead_zone, 1e-4f));
+        // A snap turn moves the tracking yaw and the head together: the relative body yaw holds.
+        const float before = *body;
+        t.yaw += xr_snap_angle;
+        t.stereo.head.orientation = xr::yaw_rotation(t.yaw - 1.2f);
+        xr_shoulders(t, scale, body);
+        CHECK(near(*body, before, 1e-4f));
+        // Looking straight down keeps the body yaw.
+        t.stereo.head.orientation = xr::mul(xr::yaw_rotation(t.yaw + 1.f), xr::Quat{0.7071068f, 0, 0, 0.7071068f});
+        xr_shoulders(t, scale, body);
+        CHECK(near(*body, before, 1e-4f));
+        return true;
+    }
 } // namespace
 
 int main(int argc, char** argv)
@@ -198,10 +248,11 @@ int main(int argc, char** argv)
         return 2;
     const std::string_view test = argv[1];
     const std::filesystem::path root = argv[2];
-    const bool ok = test == "locomotion" ? locomotion(root)
-                    : test == "aim"      ? aim(root)
-                    : test == "turning"  ? turning(root)
-                    : test == "buttons"  ? buttons(root)
-                                         : false;
+    const bool ok = test == "locomotion"  ? locomotion(root)
+                    : test == "aim"       ? aim(root)
+                    : test == "turning"   ? turning(root)
+                    : test == "buttons"   ? buttons(root)
+                    : test == "shoulders" ? shoulders()
+                                          : false;
     return ok ? 0 : 1;
 }

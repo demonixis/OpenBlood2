@@ -43,6 +43,35 @@ namespace OpenBlood2
         return xr::tracked_pose(t.base, t.yaw, reference, t.stereo.shift, units_per_meter, tracked);
     }
 
+    XrShoulders xr_shoulders(const XrTracking& t, float units_per_meter, std::optional<float>& body_yaw)
+    {
+        const auto wrap = [](float a) { return std::remainder(a, 6.2831853f); };
+        const auto& head = t.stereo.head;
+        const auto forward = xr::rotate(head.orientation, {0, 0, 1});
+        if (std::hypot(forward[0], forward[2]) > .2f) // Looking straight up or down keeps the body.
+        {
+            const float relative = wrap(std::atan2(forward[0], forward[2]) - t.yaw);
+            if (!body_yaw)
+                body_yaw = relative;
+            const float lag = wrap(relative - *body_yaw);
+            if (std::abs(lag) > xr_body_dead_zone)
+                body_yaw = wrap(relative - std::copysign(xr_body_dead_zone, lag));
+        }
+        const auto yaw = xr::yaw_rotation(t.yaw + body_yaw.value_or(0));
+        const float m = units_per_meter;
+        const auto neck = xr::rotate(head.orientation, {0, -.10f * m, -.09f * m});
+        XrShoulders out;
+        for (std::size_t side = 0; side < 2; ++side)
+        {
+            const float sign = side ? 1.f : -1.f;
+            const auto across = xr::rotate(yaw, {sign * .17f * m, -.12f * m, 0});
+            for (std::size_t i = 0; i < 3; ++i)
+                out.shoulders[side][i] = head.position[i] + neck[i] + across[i];
+            out.poles[side] = xr::rotate(yaw, {sign * .45f, -1, -.35f});
+        }
+        return out;
+    }
+
     xr::Vec3 xr_aim_target(GameSession& game, const xr::Pose& aim)
     {
         const auto direction = xr::rotate(aim.orientation, {0, 0, 1});

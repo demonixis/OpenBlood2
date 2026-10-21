@@ -5,6 +5,7 @@
 #include "game/server_adapter.h"
 #include <array>
 #include <cstdint>
+#include <optional>
 
 // The XR player: tracked head and controllers mapped onto the original client inputs.
 namespace OpenBlood2
@@ -39,6 +40,15 @@ namespace OpenBlood2
                            const xr::Pose& tracked);
     // Where an aim pose points: the first solid hit along it (the player excluded), or the range end.
     xr::Vec3 xr_aim_target(GameSession&, const xr::Pose& aim);
+    // Virtual shoulders for the arm IK: a neck pivot below and behind the tracked head and
+    // shoulders across a body yaw that follows the head beyond a 45-degree dead zone. The body yaw
+    // is kept relative to the tracking yaw, so snap turns carry it. Elbows point down, out and back.
+    inline constexpr float xr_body_dead_zone = 0.78539816f;
+    struct XrShoulders
+    {
+        std::array<xr::Vec3, 2> shoulders{}, poles{}; // {left, right}, world.
+    };
+    XrShoulders xr_shoulders(const XrTracking&, float units_per_meter, std::optional<float>& body_yaw);
     // Controller state into the original client inputs (right-handed layout): head-relative
     // locomotion through CBloodClientShell::locomotion_yaw, snap turns, weapon cycling, items, and
     // converged aim (shots leave the eye toward the point the right controller designates).

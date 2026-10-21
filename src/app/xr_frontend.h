@@ -105,6 +105,7 @@ namespace OpenBlood2
         std::optional<bool> focus_change_;
         xr::Vec3 reference_{};
         float scale_ = 45;
+        std::optional<float> body_yaw_; // Arm IK body yaw relative to the tracking yaw.
         xr::Pose panel_pose_{};
         // Virtual pad: last sent axes and buttons; buttons blocked until released after a mode change.
         bool menu_mode_ = false;
