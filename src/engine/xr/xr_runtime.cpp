@@ -1,0 +1,720 @@
+#include "engine/xr/xr_runtime.h"
+#include "build_info.h"
+#include <algorithm>
+#include <cstring>
+#include <spdlog/spdlog.h>
+#include <vector>
+
+// SDL's vendored OpenXR 1.1 headers must precede SDL_openxr.h (separate block: not sorted).
+#include <openxr/openxr.h>
+
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_openxr.h>
+
+namespace OpenBlood2
+{
+    const char* xr_phase_name(XrPhase phase)
+    {
+        switch (phase)
+        {
+            case XrPhase::None:
+                return "none";
+            case XrPhase::Idle:
+                return "idle";
+            case XrPhase::Ready:
+                return "ready";
+            case XrPhase::Synchronized:
+                return "synchronized";
+            case XrPhase::Visible:
+                return "visible";
+            case XrPhase::Focused:
+                return "focused";
+            case XrPhase::Stopping:
+                return "stopping";
+            case XrPhase::LossPending:
+                return "loss pending";
+            case XrPhase::Exiting:
+                return "exiting";
+        }
+        return "unknown";
+    }
+
+    namespace
+    {
+        // Zero-initialised OpenXR structure with its type tag.
+        template <typename T> T make(XrStructureType type)
+        {
+            T value{};
+            value.type = type;
+            return value;
+        }
+        XrPhase phase_from(XrSessionState state)
+        {
+            switch (state)
+            {
+                case XR_SESSION_STATE_IDLE:
+                    return XrPhase::Idle;
+                case XR_SESSION_STATE_READY:
+                    return XrPhase::Ready;
+                case XR_SESSION_STATE_SYNCHRONIZED:
+                    return XrPhase::Synchronized;
+                case XR_SESSION_STATE_VISIBLE:
+                    return XrPhase::Visible;
+                case XR_SESSION_STATE_FOCUSED:
+                    return XrPhase::Focused;
+                case XR_SESSION_STATE_STOPPING:
+                    return XrPhase::Stopping;
+                case XR_SESSION_STATE_LOSS_PENDING:
+                    return XrPhase::LossPending;
+                case XR_SESSION_STATE_EXITING:
+                    return XrPhase::Exiting;
+                default:
+                    return XrPhase::None;
+            }
+        }
+        xr::Pose pose_from(const XrPosef& p)
+        {
+            return {{p.position.x, p.position.y, p.position.z},
+                    {p.orientation.x, p.orientation.y, p.orientation.z, p.orientation.w}};
+        }
+        xr::Fov fov_from(const XrFovf& f)
+        {
+            return {f.angleLeft, f.angleRight, f.angleUp, f.angleDown};
+        }
+        XrPosef xr_pose(const xr::Pose& p)
+        {
+            XrPosef out{};
+            out.orientation = {p.orientation[0], p.orientation[1], p.orientation[2], p.orientation[3]};
+            out.position = {p.position[0], p.position[1], p.position[2]};
+            return out;
+        }
+        XrFovf xr_fov(const xr::Fov& f)
+        {
+            return {f.left, f.right, f.up, f.down};
+        }
+        constexpr XrSpaceLocationFlags pose_valid =
+            XR_SPACE_LOCATION_ORIENTATION_VALID_BIT | XR_SPACE_LOCATION_POSITION_VALID_BIT;
+    } // namespace
+
+    struct XrRuntime::State
+    {
+        // Instance-level entry points, loaded through SDL's loader.
+        PFN_xrGetInstanceProcAddr get_proc = nullptr;
+        PFN_xrResultToString result_to_string = nullptr;
+        PFN_xrGetSystemProperties get_system_properties = nullptr;
+        PFN_xrEnumerateViewConfigurationViews enumerate_views = nullptr;
+        PFN_xrEnumerateReferenceSpaces enumerate_spaces = nullptr;
+        PFN_xrCreateReferenceSpace create_reference_space = nullptr;
+        PFN_xrDestroySpace destroy_space = nullptr;
+        PFN_xrDestroySession destroy_session = nullptr;
+        PFN_xrPollEvent poll_event = nullptr;
+        PFN_xrBeginSession begin_session = nullptr;
+        PFN_xrEndSession end_session = nullptr;
+        PFN_xrRequestExitSession request_exit_session = nullptr;
+        PFN_xrWaitFrame wait_frame = nullptr;
+        PFN_xrBeginFrame begin_frame = nullptr;
+        PFN_xrEndFrame end_frame = nullptr;
+        PFN_xrLocateViews locate_views = nullptr;
+        PFN_xrLocateSpace locate_space = nullptr;
+        PFN_xrAcquireSwapchainImage acquire_image = nullptr;
+        PFN_xrWaitSwapchainImage wait_image = nullptr;
+        PFN_xrReleaseSwapchainImage release_image = nullptr;
+        PFN_xrStringToPath string_to_path = nullptr;
+        PFN_xrPathToString path_to_string = nullptr;
+        PFN_xrCreateActionSet create_action_set = nullptr;
+        PFN_xrDestroyActionSet destroy_action_set = nullptr;
+        PFN_xrCreateAction create_action = nullptr;
+        PFN_xrSuggestInteractionProfileBindings suggest_bindings = nullptr;
+        PFN_xrAttachSessionActionSets attach_action_sets = nullptr;
+        PFN_xrCreateActionSpace create_action_space = nullptr;
+        PFN_xrSyncActions sync_actions = nullptr;
+        PFN_xrGetCurrentInteractionProfile current_profile = nullptr;
+        PFN_xrGetDisplayRefreshRateFB get_refresh_rate = nullptr;
+
+        bool loader_loaded = false;
+        bool local_floor_extension = false, refresh_rate_extension = false;
+        SDL_GPUDevice* device = nullptr;
+        XrInstance instance = XR_NULL_HANDLE;
+        XrSystemId system = XR_NULL_SYSTEM_ID;
+        XrSession session = XR_NULL_HANDLE;
+        XrSpace space = XR_NULL_HANDLE;
+        XrReferenceSpaceType space_type = XR_REFERENCE_SPACE_TYPE_LOCAL;
+        XrActionSet action_set = XR_NULL_HANDLE;
+        XrAction grip_action = XR_NULL_HANDLE, aim_action = XR_NULL_HANDLE;
+        std::array<XrPath, 2> hand_paths{};
+        std::array<XrSpace, 2> grip_spaces{}, aim_spaces{};
+        XrSwapchain swapchain = XR_NULL_HANDLE;
+        SDL_GPUTexture** images = nullptr;
+        std::uint32_t image_count = 0;
+        SDL_GPUTextureFormat format = SDL_GPU_TEXTUREFORMAT_INVALID;
+        std::uint32_t width = 0, height = 0;
+        bool image_acquired = false;
+        XrPhase phase = XrPhase::None;
+        bool running = false, exit = false;
+        std::string system_name;
+
+        std::string result(XrResult code) const
+        {
+            char text[XR_MAX_RESULT_STRING_SIZE] = {};
+            if (result_to_string && instance && XR_SUCCEEDED(result_to_string(instance, code, text)))
+                return text;
+            return "XrResult " + std::to_string(static_cast<int>(code));
+        }
+        bool check(XrResult code, const char* what, std::string& error) const
+        {
+            if (XR_SUCCEEDED(code))
+                return true;
+            error = std::string(what) + ": " + result(code);
+            return false;
+        }
+        template <typename T> bool load(const char* name, T& out, std::string& error)
+        {
+            if (XR_FAILED(get_proc(instance, name, reinterpret_cast<PFN_xrVoidFunction*>(&out))) || !out)
+            {
+                error = std::string("OpenXR entry point unavailable: ") + name;
+                return false;
+            }
+            return true;
+        }
+        XrPath path(const char* text)
+        {
+            XrPath out = XR_NULL_PATH;
+            if (XR_FAILED(string_to_path(instance, text, &out)))
+                return XR_NULL_PATH;
+            return out;
+        }
+    };
+
+    XrRuntime::XrRuntime() : state_(std::make_unique<State>()) {}
+
+    XrRuntime::~XrRuntime()
+    {
+        auto& s = *state_;
+        if (s.device)
+            SDL_WaitForGPUIdle(s.device);
+        if (s.swapchain && s.device)
+            SDL_DestroyGPUXRSwapchain(s.device, s.swapchain, s.images);
+        for (auto space : s.grip_spaces)
+            if (space)
+                s.destroy_space(space);
+        for (auto space : s.aim_spaces)
+            if (space)
+                s.destroy_space(space);
+        if (s.action_set)
+            s.destroy_action_set(s.action_set);
+        if (s.space)
+            s.destroy_space(s.space);
+        if (s.session)
+            s.destroy_session(s.session);
+        // SDL created the instance with the device and destroys it with the device.
+        if (s.device)
+            SDL_DestroyGPUDevice(s.device);
+        if (s.loader_loaded)
+            SDL_OpenXR_UnloadLibrary();
+    }
+
+    SDL_GPUDevice* XrRuntime::device() const
+    {
+        return state_->device;
+    }
+    SDL_GPUTextureFormat XrRuntime::color_format() const
+    {
+        return state_->format;
+    }
+    std::uint32_t XrRuntime::width() const
+    {
+        return state_->width;
+    }
+    std::uint32_t XrRuntime::height() const
+    {
+        return state_->height;
+    }
+    float XrRuntime::floor_height() const
+    {
+        return state_->space_type == XR_REFERENCE_SPACE_TYPE_LOCAL ? -1.6f : 0.0f;
+    }
+    bool XrRuntime::session_running() const
+    {
+        return state_->running;
+    }
+    bool XrRuntime::exit_requested() const
+    {
+        return state_->exit;
+    }
+    XrPhase XrRuntime::phase() const
+    {
+        return state_->phase;
+    }
+
+    std::string XrRuntime::description() const
+    {
+        const auto& s = *state_;
+        const char* space = s.space_type == XR_REFERENCE_SPACE_TYPE_STAGE   ? "STAGE"
+                            : s.space_type == XR_REFERENCE_SPACE_TYPE_LOCAL ? "LOCAL"
+                                                                            : "LOCAL_FLOOR";
+        return s.system_name + ", " + std::to_string(s.width) + "x" + std::to_string(s.height) + " per eye, " +
+               std::to_string(s.image_count) + " images, format " + std::to_string(static_cast<int>(s.format)) +
+               ", space " + space;
+    }
+
+    bool XrRuntime::create(const XrRuntimeSettings& settings, std::string& error)
+    {
+        auto& s = *state_;
+        if (s.device)
+        {
+            error = "OpenXR runtime already created";
+            return false;
+        }
+        // Optional extensions are enabled only when the runtime lists them.
+        if (!SDL_OpenXR_LoadLibrary())
+        {
+            error = std::string("OpenXR loader unavailable: ") + SDL_GetError();
+            return false;
+        }
+        s.loader_loaded = true;
+        s.get_proc = reinterpret_cast<PFN_xrGetInstanceProcAddr>(SDL_OpenXR_GetXrGetInstanceProcAddr());
+        PFN_xrEnumerateInstanceExtensionProperties enumerate_extensions = nullptr;
+        if (!s.get_proc ||
+            XR_FAILED(s.get_proc(XR_NULL_HANDLE, "xrEnumerateInstanceExtensionProperties",
+                                 reinterpret_cast<PFN_xrVoidFunction*>(&enumerate_extensions))) ||
+            !enumerate_extensions)
+        {
+            error = "OpenXR loader has no xrEnumerateInstanceExtensionProperties";
+            return false;
+        }
+        std::uint32_t count = 0;
+        std::vector<XrExtensionProperties> available;
+        if (XR_SUCCEEDED(enumerate_extensions(nullptr, 0, &count, nullptr)) && count)
+        {
+            available.resize(count, make<XrExtensionProperties>(XR_TYPE_EXTENSION_PROPERTIES));
+            if (XR_FAILED(enumerate_extensions(nullptr, count, &count, available.data())))
+                available.clear();
+        }
+        const auto listed = [&available](const char* name)
+        {
+            return std::any_of(available.begin(), available.end(),
+                               [name](const XrExtensionProperties& e)
+                               { return std::strcmp(e.extensionName, name) == 0; });
+        };
+        std::vector<const char*> extensions;
+        if (listed(XR_EXT_LOCAL_FLOOR_EXTENSION_NAME))
+        {
+            extensions.push_back(XR_EXT_LOCAL_FLOOR_EXTENSION_NAME);
+            s.local_floor_extension = true;
+        }
+        if (listed(XR_FB_DISPLAY_REFRESH_RATE_EXTENSION_NAME))
+        {
+            extensions.push_back(XR_FB_DISPLAY_REFRESH_RATE_EXTENSION_NAME);
+            s.refresh_rate_extension = true;
+        }
+        spdlog::info("OpenXR: {} instance extensions listed; local floor {}, refresh rate {}", available.size(),
+                     s.local_floor_extension, s.refresh_rate_extension);
+
+        const SDL_PropertiesID props = SDL_CreateProperties();
+        SDL_SetBooleanProperty(props, SDL_PROP_GPU_DEVICE_CREATE_SHADERS_SPIRV_BOOLEAN, true);
+        SDL_SetBooleanProperty(props, SDL_PROP_GPU_DEVICE_CREATE_DEBUGMODE_BOOLEAN, settings.gpu_debug);
+        SDL_SetStringProperty(props, SDL_PROP_GPU_DEVICE_CREATE_NAME_STRING, "vulkan");
+        SDL_SetBooleanProperty(props, SDL_PROP_GPU_DEVICE_CREATE_XR_ENABLE_BOOLEAN, true);
+        SDL_SetPointerProperty(props, SDL_PROP_GPU_DEVICE_CREATE_XR_INSTANCE_POINTER, &s.instance);
+        SDL_SetPointerProperty(props, SDL_PROP_GPU_DEVICE_CREATE_XR_SYSTEM_ID_POINTER, &s.system);
+        SDL_SetNumberProperty(props, SDL_PROP_GPU_DEVICE_CREATE_XR_VERSION_NUMBER, XR_API_VERSION_1_0);
+        SDL_SetNumberProperty(props, SDL_PROP_GPU_DEVICE_CREATE_XR_EXTENSION_COUNT_NUMBER,
+                              static_cast<Sint64>(extensions.size()));
+        SDL_SetPointerProperty(props, SDL_PROP_GPU_DEVICE_CREATE_XR_EXTENSION_NAMES_POINTER, extensions.data());
+        SDL_SetStringProperty(props, SDL_PROP_GPU_DEVICE_CREATE_XR_APPLICATION_NAME_STRING, "OpenBlood 2");
+        SDL_SetNumberProperty(props, SDL_PROP_GPU_DEVICE_CREATE_XR_APPLICATION_VERSION_NUMBER, build::version_code);
+        SDL_SetStringProperty(props, SDL_PROP_GPU_DEVICE_CREATE_XR_ENGINE_NAME_STRING, "OpenBlood2");
+        s.device = SDL_CreateGPUDeviceWithProperties(props);
+        SDL_DestroyProperties(props);
+        if (!s.device || !s.instance)
+        {
+            error = std::string("SDL_GPU OpenXR device: ") + SDL_GetError();
+            return false;
+        }
+
+        if (!s.load("xrResultToString", s.result_to_string, error) ||
+            !s.load("xrGetSystemProperties", s.get_system_properties, error) ||
+            !s.load("xrEnumerateViewConfigurationViews", s.enumerate_views, error) ||
+            !s.load("xrEnumerateReferenceSpaces", s.enumerate_spaces, error) ||
+            !s.load("xrCreateReferenceSpace", s.create_reference_space, error) ||
+            !s.load("xrDestroySpace", s.destroy_space, error) ||
+            !s.load("xrDestroySession", s.destroy_session, error) || !s.load("xrPollEvent", s.poll_event, error) ||
+            !s.load("xrBeginSession", s.begin_session, error) || !s.load("xrEndSession", s.end_session, error) ||
+            !s.load("xrRequestExitSession", s.request_exit_session, error) ||
+            !s.load("xrWaitFrame", s.wait_frame, error) || !s.load("xrBeginFrame", s.begin_frame, error) ||
+            !s.load("xrEndFrame", s.end_frame, error) || !s.load("xrLocateViews", s.locate_views, error) ||
+            !s.load("xrLocateSpace", s.locate_space, error) ||
+            !s.load("xrAcquireSwapchainImage", s.acquire_image, error) ||
+            !s.load("xrWaitSwapchainImage", s.wait_image, error) ||
+            !s.load("xrReleaseSwapchainImage", s.release_image, error) ||
+            !s.load("xrStringToPath", s.string_to_path, error) || !s.load("xrPathToString", s.path_to_string, error) ||
+            !s.load("xrCreateActionSet", s.create_action_set, error) ||
+            !s.load("xrDestroyActionSet", s.destroy_action_set, error) ||
+            !s.load("xrCreateAction", s.create_action, error) ||
+            !s.load("xrSuggestInteractionProfileBindings", s.suggest_bindings, error) ||
+            !s.load("xrAttachSessionActionSets", s.attach_action_sets, error) ||
+            !s.load("xrCreateActionSpace", s.create_action_space, error) ||
+            !s.load("xrSyncActions", s.sync_actions, error) ||
+            !s.load("xrGetCurrentInteractionProfile", s.current_profile, error))
+            return false;
+        if (s.refresh_rate_extension && !s.load("xrGetDisplayRefreshRateFB", s.get_refresh_rate, error))
+            return false;
+
+        auto system = make<XrSystemProperties>(XR_TYPE_SYSTEM_PROPERTIES);
+        if (!s.check(s.get_system_properties(s.instance, s.system, &system), "xrGetSystemProperties", error))
+            return false;
+        s.system_name = system.systemName;
+        spdlog::info("OpenXR system: {} (vendor {}), max swapchain {}x{}, orientation tracking {}, position "
+                     "tracking {}",
+                     system.systemName, system.vendorId, system.graphicsProperties.maxSwapchainImageWidth,
+                     system.graphicsProperties.maxSwapchainImageHeight,
+                     bool(system.trackingProperties.orientationTracking),
+                     bool(system.trackingProperties.positionTracking));
+
+        auto session_info = make<XrSessionCreateInfo>(XR_TYPE_SESSION_CREATE_INFO);
+        session_info.systemId = s.system;
+        if (!s.check(SDL_CreateGPUXRSession(s.device, &session_info, &s.session), "SDL_CreateGPUXRSession", error))
+            return false;
+
+        // Prefer a floor-level origin so the grid and the player height need no guess.
+        std::uint32_t space_count = 0;
+        std::vector<XrReferenceSpaceType> spaces;
+        if (XR_SUCCEEDED(s.enumerate_spaces(s.session, 0, &space_count, nullptr)) && space_count)
+        {
+            spaces.resize(space_count);
+            if (XR_FAILED(s.enumerate_spaces(s.session, space_count, &space_count, spaces.data())))
+                spaces.clear();
+        }
+        const auto offered = [&spaces](XrReferenceSpaceType type)
+        { return std::find(spaces.begin(), spaces.end(), type) != spaces.end(); };
+        s.space_type = s.local_floor_extension && offered(XR_REFERENCE_SPACE_TYPE_LOCAL_FLOOR_EXT)
+                           ? XR_REFERENCE_SPACE_TYPE_LOCAL_FLOOR_EXT
+                       : offered(XR_REFERENCE_SPACE_TYPE_STAGE) ? XR_REFERENCE_SPACE_TYPE_STAGE
+                                                                : XR_REFERENCE_SPACE_TYPE_LOCAL;
+        auto space_info = make<XrReferenceSpaceCreateInfo>(XR_TYPE_REFERENCE_SPACE_CREATE_INFO);
+        space_info.referenceSpaceType = s.space_type;
+        space_info.poseInReferenceSpace.orientation.w = 1;
+        if (!s.check(s.create_reference_space(s.session, &space_info, &s.space), "xrCreateReferenceSpace", error))
+            return false;
+
+        // Controller poses. Later lots add the gameplay and menu actions to this one attach.
+        auto set_info = make<XrActionSetCreateInfo>(XR_TYPE_ACTION_SET_CREATE_INFO);
+        std::strcpy(set_info.actionSetName, "controllers");
+        std::strcpy(set_info.localizedActionSetName, "Controllers");
+        if (!s.check(s.create_action_set(s.instance, &set_info, &s.action_set), "xrCreateActionSet", error))
+            return false;
+        s.hand_paths = {s.path("/user/hand/left"), s.path("/user/hand/right")};
+        const auto pose_action = [&s, &error](const char* name, const char* label, XrAction& out)
+        {
+            auto info = make<XrActionCreateInfo>(XR_TYPE_ACTION_CREATE_INFO);
+            std::strcpy(info.actionName, name);
+            std::strcpy(info.localizedActionName, label);
+            info.actionType = XR_ACTION_TYPE_POSE_INPUT;
+            info.countSubactionPaths = 2;
+            info.subactionPaths = s.hand_paths.data();
+            return s.check(s.create_action(s.action_set, &info, &out), "xrCreateAction", error);
+        };
+        if (!pose_action("grip_pose", "Hand grip", s.grip_action) || !pose_action("aim_pose", "Hand aim", s.aim_action))
+            return false;
+        for (const char* profile :
+             {"/interaction_profiles/oculus/touch_controller", "/interaction_profiles/khr/simple_controller"})
+        {
+            const std::array<XrActionSuggestedBinding, 4> bindings{{
+                {s.grip_action, s.path("/user/hand/left/input/grip/pose")},
+                {s.grip_action, s.path("/user/hand/right/input/grip/pose")},
+                {s.aim_action, s.path("/user/hand/left/input/aim/pose")},
+                {s.aim_action, s.path("/user/hand/right/input/aim/pose")},
+            }};
+            auto suggested = make<XrInteractionProfileSuggestedBinding>(XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING);
+            suggested.interactionProfile = s.path(profile);
+            suggested.countSuggestedBindings = static_cast<std::uint32_t>(bindings.size());
+            suggested.suggestedBindings = bindings.data();
+            if (!s.check(s.suggest_bindings(s.instance, &suggested), "xrSuggestInteractionProfileBindings", error))
+                return false;
+        }
+        auto attach = make<XrSessionActionSetsAttachInfo>(XR_TYPE_SESSION_ACTION_SETS_ATTACH_INFO);
+        attach.countActionSets = 1;
+        attach.actionSets = &s.action_set;
+        if (!s.check(s.attach_action_sets(s.session, &attach), "xrAttachSessionActionSets", error))
+            return false;
+        for (std::size_t hand = 0; hand < 2; ++hand)
+        {
+            auto info = make<XrActionSpaceCreateInfo>(XR_TYPE_ACTION_SPACE_CREATE_INFO);
+            info.subactionPath = s.hand_paths[hand];
+            info.poseInActionSpace.orientation.w = 1;
+            info.action = s.grip_action;
+            if (!s.check(s.create_action_space(s.session, &info, &s.grip_spaces[hand]), "xrCreateActionSpace", error))
+                return false;
+            info.action = s.aim_action;
+            if (!s.check(s.create_action_space(s.session, &info, &s.aim_spaces[hand]), "xrCreateActionSpace", error))
+                return false;
+        }
+
+        // One two-layer swapchain at the runtime's recommended per-eye size: layer = eye.
+        std::uint32_t view_count = 0;
+        if (!s.check(s.enumerate_views(s.instance, s.system, XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO, 0, &view_count,
+                                       nullptr),
+                     "xrEnumerateViewConfigurationViews", error))
+            return false;
+        if (view_count != 2)
+        {
+            error = "OpenXR stereo view configuration reports " + std::to_string(view_count) + " views";
+            return false;
+        }
+        std::array<XrViewConfigurationView, 2> views{};
+        views.fill(make<XrViewConfigurationView>(XR_TYPE_VIEW_CONFIGURATION_VIEW));
+        if (!s.check(s.enumerate_views(s.instance, s.system, XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO, 2, &view_count,
+                                       views.data()),
+                     "xrEnumerateViewConfigurationViews", error))
+            return false;
+        s.width = std::max(views[0].recommendedImageRectWidth, views[1].recommendedImageRectWidth);
+        s.height = std::max(views[0].recommendedImageRectHeight, views[1].recommendedImageRectHeight);
+        if (!s.width || !s.height || s.width > views[0].maxImageRectWidth || s.height > views[0].maxImageRectHeight)
+        {
+            error = "OpenXR recommended view size is invalid";
+            return false;
+        }
+        int format_count = 0;
+        SDL_GPUTextureFormat* formats = SDL_GetGPUXRSwapchainFormats(s.device, s.session, &format_count);
+        if (!formats || format_count <= 0)
+        {
+            SDL_free(formats);
+            error = std::string("No OpenXR swapchain formats: ") + SDL_GetError();
+            return false;
+        }
+        // An sRGB swapchain: the compositor treats UNORM images as linear.
+        s.format = formats[0];
+        for (int i = 0; i < format_count; ++i)
+            if (formats[i] == SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM_SRGB ||
+                formats[i] == SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM_SRGB)
+            {
+                s.format = formats[i];
+                break;
+            }
+        SDL_free(formats);
+        auto swapchain_info = make<XrSwapchainCreateInfo>(XR_TYPE_SWAPCHAIN_CREATE_INFO);
+        swapchain_info.usageFlags = XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT | XR_SWAPCHAIN_USAGE_SAMPLED_BIT;
+        swapchain_info.sampleCount = 1;
+        swapchain_info.width = s.width;
+        swapchain_info.height = s.height;
+        swapchain_info.faceCount = 1;
+        swapchain_info.arraySize = 2;
+        swapchain_info.mipCount = 1;
+        if (!s.check(SDL_CreateGPUXRSwapchain(s.device, s.session, &swapchain_info, s.format, &s.swapchain, &s.images),
+                     "SDL_CreateGPUXRSwapchain", error))
+            return false;
+        PFN_xrEnumerateSwapchainImages enumerate_images = nullptr;
+        if (!s.load("xrEnumerateSwapchainImages", enumerate_images, error) ||
+            !s.check(enumerate_images(s.swapchain, 0, &s.image_count, nullptr), "xrEnumerateSwapchainImages", error))
+            return false;
+        if (s.refresh_rate_extension)
+        {
+            float rate = 0;
+            if (XR_SUCCEEDED(s.get_refresh_rate(s.session, &rate)))
+                spdlog::info("OpenXR display refresh rate: {} Hz", rate);
+        }
+        spdlog::info("OpenXR session: {}", description());
+        return true;
+    }
+
+    bool XrRuntime::poll(std::string& error)
+    {
+        auto& s = *state_;
+        auto event = make<XrEventDataBuffer>(XR_TYPE_EVENT_DATA_BUFFER);
+        for (;;)
+        {
+            event = make<XrEventDataBuffer>(XR_TYPE_EVENT_DATA_BUFFER);
+            const XrResult polled = s.poll_event(s.instance, &event);
+            if (polled == XR_EVENT_UNAVAILABLE)
+                return true;
+            if (!s.check(polled, "xrPollEvent", error))
+                return false;
+            switch (event.type)
+            {
+                case XR_TYPE_EVENT_DATA_INSTANCE_LOSS_PENDING:
+                    spdlog::warn("OpenXR instance loss pending");
+                    s.exit = true;
+                    break;
+                case XR_TYPE_EVENT_DATA_SESSION_STATE_CHANGED:
+                {
+                    const auto& changed = reinterpret_cast<const XrEventDataSessionStateChanged&>(event);
+                    s.phase = phase_from(changed.state);
+                    spdlog::info("OpenXR session state: {}", xr_phase_name(s.phase));
+                    if (changed.state == XR_SESSION_STATE_READY)
+                    {
+                        auto begin = make<XrSessionBeginInfo>(XR_TYPE_SESSION_BEGIN_INFO);
+                        begin.primaryViewConfigurationType = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
+                        if (!s.check(s.begin_session(s.session, &begin), "xrBeginSession", error))
+                            return false;
+                        s.running = true;
+                    }
+                    else if (changed.state == XR_SESSION_STATE_STOPPING)
+                    {
+                        s.running = false;
+                        if (!s.check(s.end_session(s.session), "xrEndSession", error))
+                            return false;
+                    }
+                    else if (changed.state == XR_SESSION_STATE_EXITING ||
+                             changed.state == XR_SESSION_STATE_LOSS_PENDING)
+                        s.exit = true;
+                    break;
+                }
+                case XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING:
+                    spdlog::info("OpenXR reference space change pending (recentre)");
+                    break;
+                case XR_TYPE_EVENT_DATA_INTERACTION_PROFILE_CHANGED:
+                    for (std::size_t hand = 0; hand < 2; ++hand)
+                    {
+                        auto profile = make<XrInteractionProfileState>(XR_TYPE_INTERACTION_PROFILE_STATE);
+                        char text[XR_MAX_PATH_LENGTH] = {};
+                        std::uint32_t length = 0;
+                        if (XR_SUCCEEDED(s.current_profile(s.session, s.hand_paths[hand], &profile)) &&
+                            profile.interactionProfile != XR_NULL_PATH &&
+                            XR_SUCCEEDED(
+                                s.path_to_string(s.instance, profile.interactionProfile, sizeof(text), &length, text)))
+                            spdlog::info("OpenXR {} hand profile: {}", hand ? "right" : "left", text);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    void XrRuntime::request_exit()
+    {
+        auto& s = *state_;
+        if (s.running && XR_SUCCEEDED(s.request_exit_session(s.session)))
+            return;
+        s.exit = true;
+    }
+
+    bool XrRuntime::begin_frame(XrFrameInput& frame, std::string& error)
+    {
+        auto& s = *state_;
+        frame = {};
+        auto wait = make<XrFrameWaitInfo>(XR_TYPE_FRAME_WAIT_INFO);
+        auto state = make<XrFrameState>(XR_TYPE_FRAME_STATE);
+        if (!s.check(s.wait_frame(s.session, &wait, &state), "xrWaitFrame", error))
+            return false;
+        auto begin = make<XrFrameBeginInfo>(XR_TYPE_FRAME_BEGIN_INFO);
+        if (!s.check(s.begin_frame(s.session, &begin), "xrBeginFrame", error))
+            return false;
+        frame.display_time = state.predictedDisplayTime;
+        frame.display_period = state.predictedDisplayPeriod;
+        frame.should_render = state.shouldRender == XR_TRUE;
+        frame.focused = s.phase == XrPhase::Focused;
+        if (!frame.should_render)
+            return true;
+
+        auto locate = make<XrViewLocateInfo>(XR_TYPE_VIEW_LOCATE_INFO);
+        locate.viewConfigurationType = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
+        locate.displayTime = state.predictedDisplayTime;
+        locate.space = s.space;
+        auto view_state = make<XrViewState>(XR_TYPE_VIEW_STATE);
+        std::array<XrView, 2> views{};
+        views.fill(make<XrView>(XR_TYPE_VIEW));
+        std::uint32_t located = 0;
+        if (!s.check(s.locate_views(s.session, &locate, &view_state, 2, &located, views.data()), "xrLocateViews",
+                     error))
+            return false;
+        frame.views_valid = located == 2 && (view_state.viewStateFlags & pose_valid) == pose_valid;
+        for (std::size_t eye = 0; eye < 2 && frame.views_valid; ++eye)
+        {
+            frame.eye_pose[eye] = pose_from(views[eye].pose);
+            frame.eye_fov[eye] = fov_from(views[eye].fov);
+            frame.views_valid = xr::valid_fov(frame.eye_fov[eye]);
+        }
+
+        // Input is inactive outside FOCUSED (system menu): poses stay invalid, cubes hide.
+        if (!frame.focused)
+            return true;
+        XrActiveActionSet active{s.action_set, XR_NULL_PATH};
+        auto sync = make<XrActionsSyncInfo>(XR_TYPE_ACTIONS_SYNC_INFO);
+        sync.countActiveActionSets = 1;
+        sync.activeActionSets = &active;
+        if (!s.check(s.sync_actions(s.session, &sync), "xrSyncActions", error))
+            return false;
+        for (std::size_t hand = 0; hand < 2; ++hand)
+        {
+            auto grip = make<XrSpaceLocation>(XR_TYPE_SPACE_LOCATION);
+            if (XR_SUCCEEDED(s.locate_space(s.grip_spaces[hand], s.space, state.predictedDisplayTime, &grip)) &&
+                (grip.locationFlags & pose_valid) == pose_valid)
+            {
+                frame.hands[hand].grip_valid = true;
+                frame.hands[hand].grip = pose_from(grip.pose);
+            }
+            auto aim = make<XrSpaceLocation>(XR_TYPE_SPACE_LOCATION);
+            if (XR_SUCCEEDED(s.locate_space(s.aim_spaces[hand], s.space, state.predictedDisplayTime, &aim)) &&
+                (aim.locationFlags & pose_valid) == pose_valid)
+            {
+                frame.hands[hand].aim_valid = true;
+                frame.hands[hand].aim = pose_from(aim.pose);
+            }
+        }
+        return true;
+    }
+
+    SDL_GPUTexture* XrRuntime::acquire_color(std::string& error)
+    {
+        auto& s = *state_;
+        if (s.image_acquired)
+        {
+            error = "OpenXR swapchain image already acquired";
+            return nullptr;
+        }
+        std::uint32_t index = 0;
+        auto acquire = make<XrSwapchainImageAcquireInfo>(XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO);
+        if (!s.check(s.acquire_image(s.swapchain, &acquire, &index), "xrAcquireSwapchainImage", error))
+            return nullptr;
+        s.image_acquired = true;
+        auto wait = make<XrSwapchainImageWaitInfo>(XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO);
+        wait.timeout = XR_INFINITE_DURATION;
+        if (!s.check(s.wait_image(s.swapchain, &wait), "xrWaitSwapchainImage", error) || index >= s.image_count)
+        {
+            if (error.empty())
+                error = "OpenXR swapchain image index out of range";
+            return nullptr;
+        }
+        return s.images[index];
+    }
+
+    bool XrRuntime::end_frame(const XrFrameInput& frame, bool rendered, std::string& error)
+    {
+        auto& s = *state_;
+        if (s.image_acquired)
+        {
+            // The frame's GPU work was submitted before this release.
+            auto release = make<XrSwapchainImageReleaseInfo>(XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO);
+            s.image_acquired = false;
+            if (!s.check(s.release_image(s.swapchain, &release), "xrReleaseSwapchainImage", error))
+                return false;
+        }
+        std::array<XrCompositionLayerProjectionView, 2> views{};
+        auto projection = make<XrCompositionLayerProjection>(XR_TYPE_COMPOSITION_LAYER_PROJECTION);
+        const XrCompositionLayerBaseHeader* layers[] = {
+            reinterpret_cast<const XrCompositionLayerBaseHeader*>(&projection)};
+        auto end = make<XrFrameEndInfo>(XR_TYPE_FRAME_END_INFO);
+        end.displayTime = frame.display_time;
+        end.environmentBlendMode = XR_ENVIRONMENT_BLEND_MODE_OPAQUE;
+        if (rendered && frame.should_render && frame.views_valid)
+        {
+            for (std::size_t eye = 0; eye < 2; ++eye)
+            {
+                views[eye] = make<XrCompositionLayerProjectionView>(XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW);
+                views[eye].pose = xr_pose(frame.eye_pose[eye]);
+                views[eye].fov = xr_fov(frame.eye_fov[eye]);
+                views[eye].subImage.swapchain = s.swapchain;
+                views[eye].subImage.imageRect = {
+                    {0, 0}, {static_cast<std::int32_t>(s.width), static_cast<std::int32_t>(s.height)}};
+                views[eye].subImage.imageArrayIndex = static_cast<std::uint32_t>(eye);
+            }
+            projection.space = s.space;
+            projection.viewCount = 2;
+            projection.views = views.data();
+            end.layerCount = 1;
+            end.layers = layers;
+        }
+        return s.check(s.end_frame(s.session, &end), "xrEndFrame", error);
+    }
+} // namespace OpenBlood2

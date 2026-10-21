@@ -37,7 +37,7 @@ accept M3 or provide network play.
 | M5 | ~85% | Optional PBR shader set with JSON texture/material bindings; the legacy set remains selectable. The [enhanced renderer](contracts/enhanced_renderer_contracts.md) covers 5.0, 5.1 (built-in manifest), 5.2 (emission), 5.3, 5.4 and 5.5 (material inspection); external maps, texture packs and Vulkan verification remain. |
 | M6 | 0% | PBR-only post-processing: bloom from emissive maps, GTAO, SSR, tonemapping; AA for both sets. |
 | M7 | ~90% | Gamepad: action layer, rebinding, hotplug, menus; a parallel track, needed before M8. The [input actions](contracts/input_action_contracts.md) cover keyboard, mouse and gamepad (console layout, hot-plug, menus, weapon cycling), the original [inventory cursor](contracts/inventory_cursor_contracts.md) with its item tabs, a touch camera drag, the original Controls page with `controls.cfg`, and on-screen touch controls. Device testing on a touch screen, menu auto-repeat and the Keyboard/Joystick pages remain. |
-| M8 | 0% | VR through OpenXR: Meta Quest first, PCVR on Linux last; also the Android gate. The [OpenXR plan](implementation/openxr_plan.md) orders the lots. |
+| M8 | ~10% | VR through OpenXR: Meta Quest first, PCVR on Linux last; also the Android gate. The [OpenXR plan](implementation/openxr_plan.md) orders the lots; 8.1–8.2 reached [first light on a Quest 3](implementation/reports/xr_first_light.md). |
 | M9 | ~10% | LAN multiplayer: Bloodbath, CTF and Team on the original multiplayer maps. |
 
 The milestones after M4 were renumbered on 2026-10-20. Earlier reports use the
@@ -155,8 +155,8 @@ needs a small local Vulkan patch.
 | # | Task | Size |
 | --- | --- | --- |
 | 8.0 | Contract, view-weapon rig audit, world scale | S |
-| 8.1 | Build: OpenXR headers and loader, immersive Quest APK, Android data path | S–M |
-| 8.2 | OpenXR runtime core: session, spaces, swapchains, frame loop, lifecycle | M |
+| 8.1 | Build: OpenXR headers and loader, immersive Quest APK, Android data path | S–M — APK done; data path pending |
+| 8.2 | OpenXR runtime core: session, spaces, swapchains, frame loop, lifecycle | M — first light on Quest 3; controllers unverified |
 | 8.3 | Stereo rendering (per-eye passes) and a desktop mock mode | M–L |
 | 8.4 | Multiview (local SDL patch, shader variants) | M |
 | 8.5 | Controllers: bindings, wireframe cubes, aim, locomotion, turning | M |

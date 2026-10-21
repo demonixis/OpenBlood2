@@ -1,6 +1,8 @@
 # OpenXR plan: Meta Quest first, PCVR on Linux last (M8)
 
-Drafted 2026-10-21 at `c09a9d1f`. Nothing in this plan is implemented. It turns
+Drafted 2026-10-21 at `c09a9d1f`. Lots 8.1 and 8.2 have their first light on a
+Quest 3 ([report](reports/xr_first_light.md), [contract](../contracts/xr_runtime_contracts.md));
+the rest is not implemented. It turns
 roadmap M8 into ordered lots and fixes the design choices the user set:
 
 - Meta Quest is the priority; PCVR is tested last, on Linux.
@@ -317,7 +319,7 @@ hand keeps its animation, and melee stays trigger-driven.
 | # | Lot | Size | Depends on | Done when |
 | --- | --- | --- | --- | --- |
 | 8.0 | XR contract draft; PV rig audit and `xr_arms.json` schema; `units_per_meter`; Quest per-eye size and refresh baselines from the runtime | S | — | Contract and audit committed; scale measured on private data (Linux agent). |
-| 8.1 | Build and packaging. Pinned OpenXR-SDK headers. `BLOOD2_XR`. Immersive Quest flavor: VR category, `headtracking required=true`, `INTERNET`, release-manifest rules. Pinned Khronos `openxr_loader_for_android` AAR with Gradle verification. Fixed Android data path with edition inference, so data can be pushed for early device runs. | S–M | 8.0 | Quest APK builds; desktop frames and tests unchanged; packaging guide updated. |
+| 8.1 | Build and packaging. Pinned OpenXR-SDK headers. `BLOOD2_XR`. Immersive Quest flavor: VR category, `headtracking required=true`, `INTERNET`, release-manifest rules. Pinned Khronos `openxr_loader_for_android` AAR (exact version, SHA-256 recorded in the packaging guide). Fixed Android data path with edition inference, so data can be pushed for early device runs. | S–M | 8.0 | Quest APK builds; desktop frames and tests unchanged; packaging guide updated. |
 | 8.2 | XR runtime core: device with XR properties, session, spaces, swapchains, frame loop, events, session states, Android lifecycle, recenter, refresh rate, `XR_EXT_performance_settings`. First light: per-eye clear plus a head-locked test grid. | M | 8.1 | User confirms on Quest: stable tracking, pause and resume, system menu; logs clean. |
 | 8.3 | Stereo presentation, stage A: `StereoView`, asymmetric projection, union culling, depth array, sky at infinity, shared sorting, world-depth view weapon, listener on head, sRGB/UNORM view. Desktop `--xr-mock` (side-by-side window or offscreen) and `--bench --xr-mock`. | M–L | 8.2 | Desktop GPU readback still byte-identical; mock readback tests; SubwayA renders correctly in the headset. |
 | 8.4 | Multiview, stage B: local SDL patch, `MULTIVIEW` shader variants, runtime selection and fallback. Quest frame-time evidence (OVR Metrics or Perfetto) for both modes. | M | 8.3 | Identical images in both modes (mock readback on Linux Vulkan); measured CPU/GPU gain recorded. |

@@ -9,6 +9,7 @@ option(BLOOD2_BUILD_GAME "Build the existing game targets" ON)
 option(BLOOD2_BUILD_LAUNCHER "Build the launcher (with its own SDL configuration)" ON)
 
 option(BLOOD2_INSPECTOR "Build the in-game inspection UI" ON)
+option(BLOOD2_XR "Build OpenXR support (SDL_GPU sessions; the Quest preset enables it)" OFF)
 option(BLOOD2_GPU_TESTS "Register tests that open a real GPU window" OFF)
 option(BLOOD2_SANITIZERS "Enable ASan/UBSan on project code (Clang/GCC)" OFF)
 set(BLOOD2_TEST_DATA_DIR "" CACHE PATH "Optional private Blood II installation for tests")
@@ -44,6 +45,11 @@ set_source_files_properties(src/engine/crash_capture.cpp PROPERTIES
     COMPILE_DEFINITIONS "BLOOD2_CRASH_SANITIZED=$<BOOL:${BLOOD2_SANITIZERS}>")
 target_include_directories(engine PUBLIC src src/game/legacy PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
 target_link_libraries(engine PUBLIC SDL3::SDL3 blood2_startup PRIVATE spdlog::spdlog)
+if(BLOOD2_XR)
+    # SDL_GPU owns the OpenXR instance; the pinned SDL vendors the OpenXR 1.1 headers.
+    target_sources(engine PRIVATE src/engine/xr/xr_runtime.cpp)
+    target_include_directories(engine SYSTEM PRIVATE "${sdl3_SOURCE_DIR}/src/video/khronos")
+endif()
 
 add_library(blood2_game STATIC src/game/polygrids.cpp src/game/original/ScreenFade.cpp src/game/original/Credits.cpp src/game/original/PolyGrid.cpp src/game/original/PolyGridFX.cpp src/game/sparks.cpp src/game/original/SparksFX.cpp src/game/blood_spurts.cpp src/game/original/ParticleExplosionFX.cpp src/game/blood_splats.cpp src/game/original/BloodSplatFX.cpp src/game/original/ClientSplatFX.cpp src/game/original/RemoteBomb.cpp src/game/original/PlayerRemoteBombs.cpp src/game/original/BombExplosion.cpp src/game/original/ProximityBomb.cpp src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
     src/game/original/engineobjects.cpp
@@ -101,6 +107,10 @@ set_target_properties(blood2_app PROPERTIES OUTPUT_NAME blood2)
 target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
 target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog imgui)
 target_compile_definitions(blood2_app PRIVATE BLOOD2_INSPECTOR=$<BOOL:${BLOOD2_INSPECTOR}>)
+target_compile_definitions(blood2_app PRIVATE BLOOD2_XR=$<BOOL:${BLOOD2_XR}>)
+if(BLOOD2_XR)
+    target_sources(blood2_app PRIVATE src/app/xr_scene.cpp)
+endif()
 if(BLOOD2_INSPECTOR)
     target_sources(blood2_app PRIVATE src/app/inspector_paths.cpp src/app/inspector_skeleton.cpp src/app/inspector.cpp src/app/inspector_cameras.cpp src/app/inspector_keyframes.cpp src/app/inspector_lights.cpp src/app/inspector_cinematics.cpp src/app/inspector_random_sounds.cpp src/app/inspector_scene_explosions.cpp src/app/inspector_sprites.cpp src/app/inspector_world_sounds.cpp src/app/inspector_objectives.cpp src/app/inspector_pickups.cpp src/app/inspector_materials.cpp)
 endif()

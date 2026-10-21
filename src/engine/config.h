@@ -38,6 +38,7 @@ namespace OpenBlood2
         bool demo_smoke = false; // Dedicated two-level SDL traversal, never changes normal play.
         bool explicit_config = false;
         bool help = false;
+        bool xr_test = false; // OpenXR first light (BLOOD2_XR builds); needs no game data.
         bool check_data = false;
         bool inspector = true;
         bool gpu_smoke = false;

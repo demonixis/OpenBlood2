@@ -56,7 +56,7 @@ executables without an icon; pass `-DBLOOD2_APPLE_BUNDLE=ON` to bundle them.
 | `xcode-macos` | `build/xcode-macos/Blood2.xcodeproj` → `Release/OpenBlood2.app`, `OpenBlood2Launcher.app` | Inspector-free, no tests. The launcher keeps its own child Xcode project (`launcher/`) and finds the sibling game bundle. |
 | `xcode-ios` | `build/xcode-ios/Blood2.xcodeproj` → `OpenBlood2.app` (iPhone/iPad, arm64 device) | Game only. |
 | `android` | `build/android/android/gradle/app/outputs/apk/phone/` | arm64-v8a, minSdk 29, targetSdk 36. |
-| `quest` | `build/quest/android/gradle/app/outputs/apk/quest/` | Meta Horizon OS 2D panel app: minSdk 32, targetSdk 34, `supportedDevices`, no 6DoF requirement. |
+| `quest` | `build/quest/android/gradle/app/outputs/apk/quest/` | Immersive Meta Horizon OS OpenXR app (`BLOOD2_XR`): minSdk 32, targetSdk 34, `supportedDevices`, head tracking required, arm64 only, Khronos loader AAR. |
 
 One Xcode project cannot hold both platforms: SDL and the dependencies select
 Cocoa or UIKit while CMake configures, so macOS and iOS are two presets.
@@ -89,9 +89,31 @@ tree. The presets use RelWithDebInfo and produce debug-signed, installable APKs;
 `-DCMAKE_BUILD_TYPE=Release` selects the unsigned store variant until a signing
 configuration exists.
 
+## Quest (OpenXR)
+
+The `quest` flavor depends on `org.khronos.openxr:openxr_loader_for_android:1.1.63`
+(AAR SHA-256 `622419d2f6741c3443a3beb4779af0764318edd01830de967f24c741ebcded73`),
+matching the OpenXR headers vendored in the pinned SDL. SDL loads
+`libopenxr_loader.so`; the manifest overlay adds the VR launcher categories, head
+tracking, the Khronos broker permissions/queries and `com.oculus.vr.focusaware`.
+See the [OpenXR runtime contract](contracts/xr_runtime_contracts.md).
+
+```bash
+adb install -r build/quest/android/gradle/app/outputs/apk/quest/debug/app-quest-debug.apk
+```
+
+```bash
+adb logcat -s OpenBlood2
+```
+
+Launched without arguments the APK opens the XR first-light scene (no game data
+needed). The headset must be worn, or its proximity sensor paused, for the session to
+reach FOCUSED; a Guardian dialog blocks immersive launches until the boundary is set.
+
 ## Scope
 
-iOS, Android and Quest are anticipation: they are verified to build, not to run.
+iOS and Android phones are anticipation: they are verified to build, not to run.
 They have no data provisioning (the game still expects an external Blood II
-directory), touch controls or VR rendering, and no tests run on them. Do not use a
-simulator or emulator for them without asking the user (see AGENTS.md).
+directory) and no tests run on them. The Quest APK runs the XR first light on a
+Quest 3; the game itself does not run in XR yet. Do not use a simulator or emulator
+for them without asking the user (see AGENTS.md).

@@ -1,4 +1,8 @@
 #include "engine/world_shaders.h"
+#include "engine/shaders/line_frag.h"
+#include "engine/shaders/line_frag_msl.h"
+#include "engine/shaders/line_vert.h"
+#include "engine/shaders/line_vert_msl.h"
 #include "engine/shaders/pbr_alpha_frag.h"
 #include "engine/shaders/pbr_alpha_frag_msl.h"
 #include "engine/shaders/pbr_frag.h"
@@ -88,7 +92,17 @@ namespace OpenBlood2
             BLOOD2_PBR_SHADER(PbrHighFragment, pbr_high_frag)
             BLOOD2_PBR_SHADER(PbrAlphaFragment, pbr_alpha_frag)
             BLOOD2_PBR_SHADER(PbrHighAlphaFragment, pbr_high_alpha_frag)
+            BLOOD2_PBR_SHADER(LineFragment, line_frag)
 #undef BLOOD2_PBR_SHADER
+            case WorldShader::LineVertex:
+                info.stage = SDL_GPU_SHADERSTAGE_VERTEX;
+                info.code =
+                    spirv ? reinterpret_cast<const Uint8*>(line_vert) : reinterpret_cast<const Uint8*>(line_vert_msl);
+                info.code_size = spirv ? sizeof(line_vert) : sizeof(line_vert_msl) - 1;
+                info.num_uniform_buffers = line_vert_uniforms;
+                info.num_samplers = line_vert_samplers;
+                info.num_storage_buffers = line_vert_storage_buffers;
+                break;
             default:
                 info = {};
                 return false;

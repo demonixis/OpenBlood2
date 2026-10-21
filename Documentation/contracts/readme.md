@@ -6,6 +6,8 @@
 
 - [Original default crosshair](crosshair_contracts.md)
 
+- [OpenXR runtime and first light (M8)](xr_runtime_contracts.md)
+
 - [Original PCX player statistics HUD](original_hud_contracts.md)
 
 The [selected M2 acceptance contract](m2_acceptance_contracts.md) records closure with reservation M2-GPU-001, the tested scope, negative controls and the still-open GPU platform qualification.

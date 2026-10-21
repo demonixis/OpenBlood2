@@ -207,6 +207,8 @@ namespace OpenBlood2
                 options.crash_capture = false;
             else if (arg == "--world-smoke")
                 options.world_smoke = true;
+            else if (arg == "--xr-test")
+                options.xr_test = true;
             else if (arg == "--gpu-smoke")
                 options.gpu_smoke = true;
             else if (arg == "--bench")

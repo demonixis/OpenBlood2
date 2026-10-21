@@ -11,6 +11,9 @@
 #include <spdlog/pattern_formatter.h>
 #include <spdlog/sinks/base_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#ifdef __ANDROID__
+#include <spdlog/sinks/android_sink.h>
+#endif
 #include <spdlog/spdlog.h>
 #include <vector>
 
@@ -240,8 +243,14 @@ namespace OpenBlood2
             return false;
         }
         state_->previous = spdlog::default_logger();
+#ifdef __ANDROID__
+        // Android discards stdout; logcat is the console (tag OpenBlood2).
+        auto console = std::make_shared<spdlog::sinks::android_sink_mt>("OpenBlood2");
+        console->set_pattern("%v");
+#else
         auto console = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
         console->set_pattern("[%^%l%$] %v");
+#endif
         state_->logger = std::make_shared<spdlog::logger>("blood2", console);
         state_->logger->set_level(spdlog::level::from_str(std::string(settings.level)));
         spdlog::set_default_logger(state_->logger);

@@ -11,6 +11,14 @@ add_test(NAME platform.sdl_properties_patch COMMAND "${CMAKE_COMMAND}"
     -P "${CMAKE_CURRENT_SOURCE_DIR}/sdl_properties_patch_test.cmake")
 set_tests_properties(platform.sdl_properties_patch PROPERTIES LABELS "headless;platform" TIMEOUT 20)
 
+add_executable(xr_math_tests xr_math_tests.cpp)
+target_include_directories(xr_math_tests PRIVATE "${PROJECT_SOURCE_DIR}/src")
+blood2_project_options(xr_math_tests)
+foreach(case IN ITEMS axes projection eye_pose)
+    add_test(NAME xr.math_${case} COMMAND xr_math_tests ${case})
+    set_tests_properties(xr.math_${case} PROPERTIES LABELS "headless;xr" TIMEOUT 10)
+endforeach()
+
 add_executable(platform_lifetime_tests platform_lifetime_tests.cpp)
 target_link_libraries(platform_lifetime_tests PRIVATE SDL3::SDL3)
 blood2_project_options(platform_lifetime_tests)

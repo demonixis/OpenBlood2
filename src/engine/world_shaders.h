@@ -16,7 +16,10 @@ namespace OpenBlood2
         PbrFragment,
         PbrHighFragment,
         PbrAlphaFragment,
-        PbrHighAlphaFragment
+        PbrHighAlphaFragment,
+        // Unlit lines with an asymmetric projection (XR grid, controller boxes, laser).
+        LineVertex,
+        LineFragment
     };
     // Static owned bytecode/source and reflected resource counts. No device or
     // filesystem needed; MSL's generated entry point differs from SPIR-V's.

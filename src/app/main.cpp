@@ -32,6 +32,9 @@
 #include "startup/protocol.h"
 #include "trigger_smoke.h"
 #include "world_sound_smoke.h"
+#if BLOOD2_XR
+#include "app/xr_scene.h"
+#endif
 
 #include <SDL3/SDL_main.h>
 #include <algorithm>
@@ -1780,6 +1783,7 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --inspect-player    Exercise original shell/player entry headlessly; not playable\n"
                      "  --view-world        Start directly in the original world; F10 inspector, Esc pause; "
                      "1..9/0 weapon slots, original HUD\n"
+                     "  --xr-test           OpenXR first light: floor grid and controller boxes (XR builds)\n"
                      "  --viewport-smoke    GPU 3D depth view, movement and unload/reload checks\n"
                      "  --start-game        Validate original entry and one headless update; exits after checks\n"
                      "  --no-inspector      Disable normal F10 inspection (smokes retain their explicit policy)\n"
@@ -1820,6 +1824,15 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --launcher-info     Headless launcher capabilities (standalone, no config/logging)\n"
                      "  --help              Show this help\n";
         return 0;
+    }
+    if (options.xr_test)
+    {
+#if BLOOD2_XR
+        return OpenBlood2::run_xr_test(options);
+#else
+        spdlog::error("--xr-test requires a BLOOD2_XR build");
+        return 2;
+#endif
     }
     OpenBlood2::Config config;
     OpenBlood2::DataStatus data;
@@ -1937,6 +1950,12 @@ int main(int argc, char** argv)
     OpenBlood2::Options options;
     std::string error;
     const bool parsed = OpenBlood2::parse_options(args, options, error);
+#if BLOOD2_XR && defined(SDL_PLATFORM_ANDROID)
+    // The headset launches without arguments; until the data setup screen exists the
+    // immersive build opens the XR first-light scene.
+    if (args.empty())
+        options.xr_test = true;
+#endif
     OpenBlood2::LogSession logs;
     std::string log_error;
     const bool logging = logs.start({options.log_dir, options.log_level}, log_error);

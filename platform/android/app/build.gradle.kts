@@ -27,11 +27,15 @@ android {
         create("phone") {
             dimension = "device"
         }
-        // Horizon OS 2D panel app; Meta recommends min 32 / target 34.
+        // Immersive Horizon OS OpenXR app; Meta requires min 32 / target 34.
         create("quest") {
             dimension = "device"
             minSdk = 32
             targetSdk = 34
+            // The game is arm64 only; keep the loader AAR's other ABIs out of the APK.
+            ndk {
+                abiFilters += "arm64-v8a"
+            }
         }
     }
 
@@ -53,4 +57,10 @@ android {
             keepDebugSymbols += "**/libmain.so"
         }
     }
+}
+
+dependencies {
+    // Khronos OpenXR loader, dlopen'ed by SDL (libopenxr_loader.so). The version matches
+    // the OpenXR headers vendored in the pinned SDL; AAR SHA-256 in Documentation/packaging.md.
+    "questImplementation"("org.khronos.openxr:openxr_loader_for_android:1.1.63")
 }

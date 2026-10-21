@@ -173,12 +173,13 @@
     },
     {
       "name": "quest",
-      "displayName": "Meta Quest APK (2D panel app, arm64)",
+      "displayName": "Meta Quest immersive OpenXR APK (arm64)",
       "inherits": "android-base",
       "binaryDir": "${sourceDir}/build/quest",
       "cacheVariables": {
         "ANDROID_PLATFORM": "android-32",
-        "BLOOD2_ANDROID_FLAVOR": "quest"
+        "BLOOD2_ANDROID_FLAVOR": "quest",
+        "BLOOD2_XR": true
       }
     }
   ],

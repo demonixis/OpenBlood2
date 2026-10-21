@@ -1,18 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Merged over the main manifest for the Meta Quest flavor: a 2D panel app
-     (no 6DoF requirement). An immersive OpenXR build would add the
-     com.oculus.intent.category.VR category and require head tracking. -->
+<!-- Merged over the main manifest for the Meta Quest flavor: an immersive OpenXR app
+     (SDL_GPU on Vulkan, Khronos loader). See Documentation/packaging.md. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-feature android:name="android.hardware.vr.headtracking" android:required="false" android:version="1" />
+    <uses-feature android:name="android.hardware.vr.headtracking" android:required="true" android:version="1" />
 
-    <application>
+    <!-- Khronos runtime broker: lets the loader find the system OpenXR runtime. -->
+    <uses-permission android:name="org.khronos.openxr.permission.OPENXR" />
+    <uses-permission android:name="org.khronos.openxr.permission.OPENXR_SYSTEM" />
+    <queries>
+        <provider android:authorities="org.khronos.openxr.runtime_broker;org.khronos.openxr.system_runtime_broker" />
+        <intent>
+            <action android:name="org.khronos.openxr.OpenXRRuntimeService" />
+        </intent>
+        <intent>
+            <action android:name="org.khronos.openxr.OpenXRApiLayerService" />
+        </intent>
+    </queries>
+
+    <application android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" tools:replace="android:theme">
         <meta-data android:name="com.oculus.supportedDevices" android:value="quest2|questpro|quest3|quest3s" />
+        <meta-data android:name="com.oculus.vr.focusaware" android:value="true" />
         <activity
             android:name=".Blood2Activity"
+            android:label="@string/app_name"
+            android:exported="true"
+            android:launchMode="singleTask"
             android:excludeFromRecents="true"
+            android:resizeableActivity="false"
             android:screenOrientation="landscape"
-            tools:replace="android:screenOrientation" />
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+            android:configChanges="density|keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|uiMode"
+            tools:node="replace">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="com.oculus.intent.category.VR" />
+                <category android:name="org.khronos.openxr.intent.category.IMMERSIVE_HMD" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

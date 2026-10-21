@@ -19,7 +19,7 @@ set(pbr_high_frag_defines -DPBR_HIGH)
 set(pbr_alpha_frag_defines -DPBR_ALPHA)
 set(pbr_high_alpha_frag_defines -DPBR_HIGH -DPBR_ALPHA)
 foreach(shader world_vert skinned_vert world_frag sprite_frag shadow_frag pbr_frag pbr_high_frag pbr_alpha_frag
-        pbr_high_alpha_frag)
+        pbr_high_alpha_frag line_vert line_frag)
     string(REPLACE "_" "." filename "${shader}")
     set(defines)
     if(shader MATCHES "^pbr_")
