@@ -433,11 +433,14 @@ namespace
             auto table = std::make_shared<CAnim_Sound>();
             CHECK(table->SetAnimationIndexes(a->m_hObject) && a->InitStatics(table));
             const auto clip = table->m_nAnim_TAUNT[6];
+            const auto playing = r->animation.animation;
             const bool ok = a->MC_Taunt_Beg();
-            CHECK(ok == (clip < r->model->animations.size()));
-            std::cout << name << " TAUNT[6]=" << clip << " available=" << ok
-                      << " duration=" << (ok ? r->model->animations[clip].duration : 0) << '\n';
-            CHECK(!ok || (r->animation.animation == clip && r->velocity.x > 0));
+            // Original invalid-ordinal no-op: an absent clip keeps the current one playing.
+            const bool present = clip < r->model->animations.size();
+            CHECK(ok && a->animation_clip_retained == !present);
+            std::cout << name << " TAUNT[6]=" << clip << " available=" << present
+                      << " duration=" << (present ? r->model->animations[clip].duration : 0) << '\n';
+            CHECK(r->animation.animation == (present ? clip : playing) && r->velocity.x > 0);
             CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame());
         }
         return true;

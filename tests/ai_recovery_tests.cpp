@@ -645,13 +645,16 @@ namespace
                                   : cmd == 2 ? table->m_nAnim_CRAWL[TYPE_PISTOL]
                                              : table->m_nAnim_FIRE_CRAWL[TYPE_PISTOL];
                 a->m_bAnimating = false;
+                const auto playing = r->animation.animation;
                 const bool ok = cmd == 0   ? a->MC_Jump()
                                 : cmd == 1 ? a->MC_Crouch()
                                 : cmd == 2 ? a->MC_Crawl()
                                            : a->MC_Fire_Crawl();
-                CHECK(ok == (clip < r->model->animations.size()));
-                CHECK(!ok || r->animation.animation == clip);
-                std::cout << name << " command=" << cmd << " clip=" << clip << " available=" << ok << '\n';
+                // Original invalid-ordinal no-op: an absent clip keeps the current one playing.
+                const bool present = clip < r->model->animations.size();
+                CHECK(ok && a->animation_clip_retained == !present);
+                CHECK(r->animation.animation == (present ? clip : playing));
+                std::cout << name << " command=" << cmd << " clip=" << clip << " available=" << present << '\n';
             }
             CHECK(a->SetNewState(AI_Mgr::StateSearchSmell) && a->DispatchState() && a->smell_exit == 1);
             CHECK(g.objects.remove(a->m_hObject) && g.objects.finish_frame());
