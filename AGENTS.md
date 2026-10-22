@@ -262,7 +262,7 @@ The latest [pickup evidence](Documentation/implementation/reports/m2_pickups.md)
 eight original ammo pickups, four health/armor pickups and destruction SpawnObject.
 Read [pickup contracts](Documentation/contracts/pickup_contracts.md). Preserve checked typed acknowledgements,
 normal/bonus caps, dead-player guards, independent child lifetime, death-trigger
-ordering and deferred removal. Earlier blanket SpawnObject/pickup omissions are
+ordering and deferred removal. String-spawned pickups get the bounded initial world separation, and a pickup that still cannot move stops falling (recorded) instead of failing the session step. Earlier blanket SpawnObject/pickup omissions are
 superseded for this subset. Remaining inventory items, timed bonuses, old TypeAction
 schemas, audio/FX and full M2 gameplay remain pending.
 

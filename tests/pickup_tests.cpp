@@ -217,6 +217,49 @@ namespace
               AmmoPickup::m_dwNumPickups == 0);
         return true;
     }
+    // A drop spawned at its source's centre can start inside a wall (CityHub WardPU, SubwayA
+    // HealthPU): it is separated at spawn, and a pickup that still cannot move stops falling
+    // instead of failing the physics step.
+    bool embedded(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(setup(g, root));
+        std::string error;
+        auto wall = test_brush::box("world", {100, 0, -500}, {300, 200, 500});
+        for (auto& surface : wall.surfaces)
+            surface.flags = 1;
+        CHECK(g.collision.build(wall, error));
+        const DRotation rotation{};
+        auto probe = SpawnObject("WardPU", {-200, 100, 0}, rotation, {});
+        CHECK(probe && item(g, probe));
+        const auto half = g.objects.get(probe)->dimensions;
+        CHECK(half.x > 2 && g.objects.remove(probe) && g.objects.finish_frame());
+        // 1.7 units into the wall face: separated at spawn, then it falls normally.
+        auto shallow = SpawnObject("WardPU", {100 - half.x + 1.7f, 100, 0}, rotation, {0, 50, 0});
+        CHECK(shallow && item(g, shallow) && item(g, shallow)->error.empty());
+        auto* r = g.objects.get(shallow);
+        CollisionHit hit;
+        CHECK(r->placement_nudges == 1 && r->state.m_Pos.x <= 100 - half.x &&
+              g.collision.sweep(r->state.m_Pos, r->state.m_Pos, half, hit) == CollisionQuery::Miss);
+        const auto y = r->state.m_Pos.y;
+        CHECK(g.server.advance_physics(.1) && g.objects.get(shallow)->state.m_Pos.y != y &&
+              g.server.pickup_motion_stops == 0 && (g.server.GetObjectFlags(shallow) & FLAG_GRAVITY));
+        CHECK(g.objects.remove(shallow) && g.objects.finish_frame());
+        // Straddling a thin wall, deeper than the separation budget: refused at spawn; the
+        // physics step then stops its fall instead of failing.
+        auto slab = test_brush::box("world", {199, 0, -500}, {201, 200, 500});
+        for (auto& surface : slab.surfaces)
+            surface.flags = 1;
+        CHECK(g.collision.build(slab, error));
+        auto deep = SpawnObject("WardPU", {200, 100, 0}, rotation, {10, 0, 0});
+        CHECK(deep && !item(g, deep)->error.empty());
+        CHECK(g.server.advance_physics(.1) && g.server.IsObjectAlive(deep));
+        CHECK(g.server.pickup_motion_stops == 1 && !(g.server.GetObjectFlags(deep) & FLAG_GRAVITY) &&
+              item(g, deep)->error == "Cannot move out of geometry; gravity stopped");
+        CHECK(g.server.advance_physics(.1) && g.server.pickup_motion_stops == 1);
+        CHECK(touch(g, deep)); // Still collectible where it stopped.
+        return true;
+    }
     bool rejection(const std::filesystem::path& root)
     {
         GameSession g;
@@ -509,7 +552,7 @@ int main(int argc, char** argv)
     const std::map<std::string, std::function<bool(const std::filesystem::path&)>> tests = {
         {"defaults", defaults},   {"ammunition", ammunition}, {"statistics", statistics}, {"protocol", protocol},
         {"contact", contact},     {"spawning", spawning},     {"rejection", rejection},   {"callbacks", callbacks},
-        {"resources", resources}, {"catalog", catalog}};
+        {"resources", resources}, {"catalog", catalog},       {"embedded", embedded}};
     auto it = tests.find(argv[1]);
     return it != tests.end() && it->second(argv[2]) ? 0 : 1;
 }

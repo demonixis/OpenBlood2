@@ -405,6 +405,9 @@ namespace OpenBlood2
         bool collision_ready = false;
         // PingObjects cost (steady-clock ns and calls, adapter lifetime); diagnostic only.
         std::uint64_t activation_ping_ns = 0, activation_ping_calls = 0;
+        // Pickups whose physics move failed (inside geometry) and were separated or stopped
+        // instead of failing the step.
+        std::uint64_t pickup_motion_stops = 0;
         bool advance_models(double seconds);
         const auto& variables() const
         {
