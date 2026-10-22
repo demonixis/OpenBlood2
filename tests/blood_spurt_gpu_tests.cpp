@@ -102,9 +102,9 @@ int main(int argc, char** argv)
         }
         CHECK(g.server.blood_spurts.active.front().id > last);
         last = g.server.blood_spurts.active.back().id;
-        CHECK(update_sprite_scene(g, scene, error) && scene.entries.size() == 36);
+        CHECK(update_sprite_scene(g, scene, error) && scene.entries.size() == 3); // One entry per spurt.
         for (const auto& e : scene.entries)
-            CHECK(e.blood_spurt && e.error.empty());
+            CHECK(e.blood_spurt && e.error.empty() && e.particles == 12);
         const auto callbacks = g.server.blood_spurts.active.front().updates;
         CHECK(update_sprite_scene(g, scene, error) && g.server.blood_spurts.active.front().updates == callbacks);
         std::vector<std::uint8_t> pixels;

@@ -54,9 +54,7 @@ namespace OpenBlood2
         entries.back().particle_index = index;
         return true;
     }
-    bool SpriteView::add_frame(std::string_view path, unsigned frame, NodePose pose, DVector scale, DDWORD flags,
-                               ObjectId object, const Resources& resources, std::string& error, float alpha,
-                               DVector color, bool direct_extent)
+    SpriteViewEntry* SpriteView::begin_entry(ObjectId object, float alpha, std::string& error)
     {
         error.clear();
         if (!camera_valid_ || entries.size() >= max_entries)
@@ -67,31 +65,30 @@ namespace OpenBlood2
             batched_draws.clear();
             entries.clear();
             error = "Sprite camera unavailable or instance budget exceeded";
-            return false;
+            return nullptr;
         }
         entries.push_back({});
         auto& entry = entries.back();
         entry.object = object;
         entry.alpha = alpha;
         if (!std::isfinite(alpha) || alpha < 0 || alpha > 1)
-        {
             entry.error = "Invalid sprite alpha";
-            return true;
-        }
-        entry.frame = frame;
-        entry.visible = (flags & FLAG_VISIBLE) != 0;
-        entry.rotatable = (flags & FLAG_ROTATEABLESPRITE) != 0;
+        return &entry;
+    }
+    const SpriteView::Material* SpriteView::material(std::string_view path, SpriteViewEntry& entry,
+                                                     const Resources& resources, std::string& error)
+    {
         if (path.empty())
         {
             entry.error = "Sprite manifest/current frame unavailable";
-            return true;
+            return nullptr;
         }
         entry.frame_path = path;
         std::string key;
         if (!resource_path(entry.frame_path, key))
         {
             entry.error = "Invalid sprite frame path";
-            return true;
+            return nullptr;
         }
         auto found = materials_.find(key);
         if (found == materials_.end())
@@ -99,7 +96,7 @@ namespace OpenBlood2
             if (mesh.materials.size() >= 4097)
             {
                 error = "Sprite material count budget exceeded";
-                return false;
+                return nullptr;
             }
             WorldMaterial next;
             next.path = key;
@@ -107,7 +104,7 @@ namespace OpenBlood2
             if (next.image.rgba.size() > 128 * 1024 * 1024 - mesh.texture_bytes)
             {
                 error = "Sprite texture memory budget exceeded";
-                return false;
+                return nullptr;
             }
             Material material{static_cast<std::uint32_t>(mesh.materials.size())};
             for (std::size_t i = 3; i < next.image.rgba.size(); i += 4)
@@ -127,8 +124,25 @@ namespace OpenBlood2
         entry.height = texture.image.height;
         entry.zero_alpha = material.zero_alpha;
         entry.partial_alpha = material.partial_alpha;
+        return entry.error.empty() ? &material : nullptr;
+    }
+    bool SpriteView::add_frame(std::string_view path, unsigned frame, NodePose pose, DVector scale, DDWORD flags,
+                               ObjectId object, const Resources& resources, std::string& error, float alpha,
+                               DVector color, bool direct_extent)
+    {
+        auto* added = begin_entry(object, alpha, error);
+        if (!added)
+            return false;
+        auto& entry = *added;
         if (!entry.error.empty())
             return true;
+        entry.frame = frame;
+        entry.visible = (flags & FLAG_VISIBLE) != 0;
+        entry.rotatable = (flags & FLAG_ROTATEABLESPRITE) != 0;
+        const auto* found = this->material(path, entry, resources, error);
+        if (!found)
+            return error.empty();
+        const auto& material = *found;
         // Original SDK bits: glow, view bias, no-Z and sky need separate policies.
         // FLAG_SPRITECHROMAKEY is explicitly disabled in that SDK; do not key RGB.
         if (flags & ((1u << 5) | (1u << 6) | (1u << 7) | (1u << 12)))
@@ -177,6 +191,79 @@ namespace OpenBlood2
         entry.range = draw.range;
         mesh.ranges.push_back(std::move(range));
         draws.push_back(draw);
+        return true;
+    }
+    bool SpriteView::add_particle_system(std::string_view path, DVector origin, std::span<const Particle> particles,
+                                         float extent, float alpha, std::uint64_t system, const Resources& resources,
+                                         std::string& error)
+    {
+        auto* added = begin_entry({}, alpha, error);
+        if (!added)
+            return false;
+        auto& entry = *added;
+        entry.particle_system = system;
+        if (!entry.error.empty())
+            return true;
+        entry.visible = true;
+        const auto* found = material(path, entry, resources, error);
+        if (!found)
+            return error.empty();
+        if (!physics_vector(origin) || !std::isfinite(extent) || extent < 0 || extent > 1e6f)
+        {
+            entry.error = "Invalid sprite transform/scale";
+            return true;
+        }
+        // Valid particles back to front, as the per-particle path's depth sort would order them.
+        auto& order = order_;
+        order.clear();
+        DVector centre{};
+        std::size_t invalid = 0;
+        for (std::uint32_t i = 0; i < particles.size(); ++i)
+        {
+            const auto& p = particles[i];
+            const auto at = vector_add(origin, p.position);
+            if (!physics_vector(at) || !physics_vector(p.color) || p.color.x < 0 || p.color.x > 1 || p.color.y < 0 ||
+                p.color.y > 1 || p.color.z < 0 || p.color.z > 1)
+            {
+                ++invalid;
+                continue;
+            }
+            const DVector d{at.x - eye_.x, at.y - eye_.y, at.z - eye_.z};
+            order.push_back({double(d.x) * forward_.x + double(d.y) * forward_.y + double(d.z) * forward_.z, i});
+            centre = vector_add(centre, at);
+        }
+        if (invalid)
+            entry.error = std::to_string(invalid) + " invalid particle position/colour values skipped";
+        if (order.empty() || extent == 0)
+            return true;
+        centre = vector_scale(centre, 1.f / float(order.size()));
+        std::stable_sort(order.begin(), order.end(), [](const auto& a, const auto& b) { return a.first > b.first; });
+        // Camera-facing corners (the per-particle path's camera rotation), relative to the centre.
+        const auto right = vector_scale(rotate_vector({1, 0, 0}, camera_), extent);
+        const auto up = vector_scale(rotate_vector({0, 1, 0}, camera_), extent);
+        WorldRange range;
+        range.first = static_cast<std::uint32_t>(mesh.vertices.size());
+        range.count = std::uint32_t(order.size() * 6);
+        range.name = entry.frame_path;
+        range.batches.push_back({range.first, range.count, found->index});
+        mesh.vertices.reserve(mesh.vertices.size() + range.count);
+        for (const auto& [depth, i] : order)
+        {
+            (void)depth;
+            const auto& p = particles[i];
+            const auto at = vector_subtract(vector_add(origin, p.position), centre);
+            const WorldVertex corners[] = {{vector_add(vector_subtract(at, right), up), p.color, {0, 0}},
+                                           {vector_add(vector_add(at, right), up), p.color, {1, 0}},
+                                           {vector_subtract(vector_add(at, right), up), p.color, {1, 1}},
+                                           {vector_subtract(vector_subtract(at, right), up), p.color, {0, 1}}};
+            for (auto index : {0, 1, 2, 0, 2, 3})
+                mesh.vertices.push_back(corners[index]);
+        }
+        bound_range(mesh.vertices, range);
+        entry.range = static_cast<std::uint32_t>(mesh.ranges.size());
+        entry.particles = std::uint32_t(order.size());
+        mesh.ranges.push_back(std::move(range));
+        draws.push_back({entry.range, centre, {}, alpha});
         return true;
     }
     void SpriteView::sort()

@@ -52,6 +52,14 @@ drawn with an identity transform. Per-entry ranges, draws and entries remain the
 unchanged inspection snapshot; only the presenter submits `batched_draws`. Later
 LithTech builds world-space particle quads on the CPU in the same spirit.
 
+Blood spurts use `SpriteView::add_particle_system`: one entry (with its drawn particle
+count) and one camera-facing range per spurt, back to front inside the spurt and sorted
+against other draws by the spurt's centre. This replaces one entry, one string and one
+sorted draw per drop, which after a gib death reached 14,000+ drops and 9,000 draws per
+frame. Drops of different spurts no longer interleave in depth; they share one colour,
+so their blending does not depend on order. Other particle systems keep per-particle
+entries.
+
 Each PolyGrid surface is now one translucent batch ordered by its origin among other
 surfaces; its cells draw in lattice order. This supersedes the per-cell far-to-near
 sort of the [PolyGrid contracts](polygrid_contracts.md); later LithTech also submits

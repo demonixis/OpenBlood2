@@ -71,13 +71,16 @@ bool CParticleExplosionFX::Update(double now, double dt, ServerDE& server, std::
         return false;
     if (!emitting)
         return true;
-    // The source emits one burst per update with no engine cap, so drop counts
-    // grow with frame rate: 120+ Hz exceeds this replacement budget during a
-    // long flight. Skip the whole burst (no eviction, no RNG draws); the emitter
-    // still moves, impacts and fades. Cosmetic budgets never stop the session.
-    if (particles.size() + 12 > 2048 || available < 12)
+    // The source emits one burst per update with no engine cap, so drop counts grow with frame
+    // rate (14,000+ live drops after a gib death at 100 Hz, one sprite each). Replacement policy:
+    // the first update and then at most one update per emission_interval emit, sampling the
+    // emitter's whole path since the previous burst, so a 30 Hz run keeps the source behaviour.
+    const bool due = updates == 1 || now - last_emission >= emission_interval - 1e-6;
+    // A burst that does not fit the system or shared budget is skipped whole (no eviction, no RNG
+    // draws); the emitter still moves, impacts and fades. Cosmetic budgets never stop the session.
+    if (due && (particles.size() + 12 > 2048 || available < 12))
         ++capacity_skips;
-    else
+    else if (due)
     {
         // Original six samples, two drops each, BEFORE the emitter's current movement.
         const auto delta = vector_scale(vector_subtract(position, previous), 1.f / 6);
@@ -99,7 +102,8 @@ bool CParticleExplosionFX::Update(double now, double dt, ServerDE& server, std::
         }
         emitted += 12;
     }
-    last_emission = now;
+    if (due)
+        last_emission = now;
     if (vector_dot(velocity, velocity) < .01f)
         velocity = {};
     auto next = vector_add(position, vector_scale(velocity, float(dt)));
@@ -144,7 +148,8 @@ bool CParticleExplosionFX::Update(double now, double dt, ServerDE& server, std::
         error = "Blood-spurt motion exceeds bounds";
         return false;
     }
-    previous = position;
+    if (due)
+        previous = position; // The next burst samples the path from here.
     position = next;
     return true;
 }

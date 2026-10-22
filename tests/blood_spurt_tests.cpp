@@ -218,34 +218,45 @@ namespace
         CHECK(g.unload_world() && g.server.blood_spurts.reports.empty() && g.server.blood_splats.reports.empty());
         return true;
     }
-    // The source emits one burst per update, so a long flight at a high refresh
-    // rate exceeds the 2048-drop system budget. That must skip bursts without
-    // failing the session step or evicting drops (2 s at 240 Hz = 480 bursts).
+    // The source emits one burst per update, so drop counts grew with the refresh rate. The
+    // replacement emits at most one burst per 1/30 s: a 2 s flight emits the same 61 bursts at 30,
+    // 60 and 240 Hz, and its drops still follow the whole path (2 s at 240 Hz = 480 updates).
     bool high_rate(const std::filesystem::path& root)
     {
-        GameSession g;
-        CHECK(setup(g, root));
-        std::string error;
-        BloodSpurtSettings s;
-        s.position = {0, 1000, 0}; // Falls 400 units in its 2 s life: no floor impact.
-        s.lifetime = 2;
-        CHECK(g.server.PublishClientBloodSpurt(s, "high rate", true, error) && error.empty());
-        auto& effects = g.server.blood_spurts;
-        float last_y = effects.active.front().position.y;
-        for (int tick = 1; tick <= 480; ++tick)
+        for (const int hz : {30, 60, 240})
         {
-            CHECK(effects.advance(tick / 240., g.server) && effects.update_error.empty());
+            GameSession g;
+            CHECK(setup(g, root));
+            std::string error;
+            BloodSpurtSettings s;
+            s.position = {0, 1000, 0}; // Falls 400 units in its 2 s life: no floor impact.
+            s.lifetime = 2;
+            CHECK(g.server.PublishClientBloodSpurt(s, "high rate", true, error) && error.empty());
+            auto& effects = g.server.blood_spurts;
+            float last_y = effects.active.front().position.y;
+            for (int tick = 1; tick <= 2 * hz; ++tick)
+            {
+                CHECK(effects.advance(double(tick) / hz, g.server) && effects.update_error.empty());
+                const auto& fx = effects.active.front();
+                CHECK(fx.particles.size() <= 2048 && fx.emitting && fx.impacts == 0 && fx.position.y <= last_y);
+                last_y = fx.position.y;
+            }
             const auto& fx = effects.active.front();
-            CHECK(fx.particles.size() <= 2048 && fx.emitting && fx.impacts == 0 && fx.position.y <= last_y);
-            last_y = fx.position.y;
+            CHECK(fx.position.y < 700 && fx.emitted == 61 * 12 && fx.capacity_skips == 0 &&
+                  fx.updates == unsigned(2 * hz + 1));
+            // The last burst's drops span the path since the burst before it (1/30 s of fall).
+            float low = 1e9f, high = -1e9f;
+            for (std::size_t i = fx.particles.size() - 12; i < fx.particles.size(); ++i)
+            {
+                low = std::min(low, fx.particles[i].position.y);
+                high = std::max(high, fx.particles[i].position.y);
+            }
+            CHECK(high - low > 3);
+            CHECK(effects.advance(2.01, g.server) && effects.active.empty() && effects.expired == 1 && !effects.failed);
+            const auto& report = effects.reports.back();
+            CHECK(report.ended && report.error.empty() && report.emitted == 61 * 12 && report.capacity_skips == 0);
+            std::cout << "Spurt at " << hz << " Hz: " << report.emitted << " drops, no skipped burst\n";
         }
-        const auto& fx = effects.active.front();
-        CHECK(fx.position.y < 700 && fx.emitted == 2040 && fx.particles.size() == 2040 && fx.capacity_skips == 311);
-        CHECK(effects.advance(2.01, g.server) && effects.active.empty() && effects.expired == 1 && !effects.failed);
-        const auto& report = effects.reports.back();
-        CHECK(report.ended && report.error.empty() && report.emitted == 2040 && report.capacity_skips == 311);
-        std::cout << "High-rate spurt: " << report.emitted << " drops, " << report.capacity_skips
-                  << " skipped bursts, no failure\n";
         return true;
     }
     bool private_world(const char* root)
@@ -351,14 +362,15 @@ namespace
             }
             SpriteView view;
             CHECK(update_sprite_scene(g, view, error));
-            unsigned drops = 0;
+            unsigned drops = 0, systems = 0;
             for (const auto& e : view.entries)
                 if (e.blood_spurt)
                 {
-                    CHECK(e.error.empty() && e.width > 0);
-                    ++drops;
+                    CHECK(e.error.empty() && e.width > 0 && e.range != UINT32_MAX);
+                    drops += e.particles;
+                    ++systems;
                 }
-            CHECK(drops == 36);
+            CHECK(drops == 36 && systems == 3); // One entry and one draw per spurt.
             std::cout << "Private cycle " << cycle << ": original death/limb/fragment callers, peak " << peak
                       << ", emitter impacts " << impacts << ", splats " << g.server.blood_splats.active.size()
                       << ", three real drop textures\n";

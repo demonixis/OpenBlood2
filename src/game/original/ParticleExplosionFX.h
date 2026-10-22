@@ -27,4 +27,7 @@ class CParticleExplosionFX
     double start_time = 0, last_time = 0, last_emission = 0, next_update = 0;
     std::uint64_t id = 0, event = 0, updates = 0, emitted = 0, capacity_skips = 0, impacts = 0, splat_event = 0;
     std::string texture, error, splat_error, sound_resource, sound_error;
+    // Replacement policy: at most one burst per interval (the source era's 30 Hz) instead of one
+    // per update; see Update.
+    static constexpr double emission_interval = 1.0 / 30;
 };

@@ -48,13 +48,20 @@ clears all effects and histories; IDs are never reused. Preparation and inspecti
 never advance clocks. Reports retain ended/failed state and child-event identities.
 Sprites inspection shows current emitter pose, velocity, liquid state, particles,
 alpha, texture failures and history; weapons/limbs/fragments expose originating IDs.
+Presentation draws each spurt as one sprite entry and one range
+([render performance](render_performance_contracts.md)).
 
 Limits: 128 systems, 2048 particles/system, 16384 total, 64 retained reports,
 source labels100 bytes, textures1..3 (zero requests client selection), finite
 physics vectors, lifetime (0,10], fade [0,lifetime), update delta [0,1]. System
 and publication capacity failures are explicit, never silent eviction. The source
-emits one burst per update without an engine cap, so drop counts scale with frame
-rate: a long flight above ~100 Hz exceeds 2048. A whole 12-drop burst is checked
+emits one burst per update without an engine cap, so drop counts scaled with frame
+rate (14,000+ live drops for about 3.7 s after a gib death at 100 Hz, a multi-second
+slowdown on the Quest). Replacement policy: the first update and then at most one
+update per `CParticleExplosionFX::emission_interval` (1/30 s, the source era's frame
+rate) emit, the six samples spanning the emitter's whole path since the previous burst
+and the lifetimes its elapsed time; a 30 Hz run keeps the source behaviour and a
+2-second flight emits 61 bursts at 30, 60 or 240 Hz. A whole 12-drop burst is checked
 before insertion; one that does not fit the system or shared budget is skipped
 without RNG draws and counted as a budget skip (emitter and report inspection).
 The emitter still moves, impacts and fades, and the session step does not fail.
