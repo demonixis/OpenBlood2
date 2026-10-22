@@ -11,13 +11,15 @@ number. Everything else derives from it:
 | Windows `VERSIONINFO` | `x,y,z,build` |
 | Apple `CFBundleShortVersionString` / Android `versionName` | `x.y.z` |
 | Apple `CFBundleVersion` / Android `versionCode` | `x*1000000 + y*10000 + z*100 + build` |
-| CI archives | `OpenBlood2-x.y.z-<platform>` and `BUILD.txt` |
+| CI archives | `OpenBlood2-x.y.z-<platform>` and `BUILD.txt`; `OpenBlood2-x.y.z-<android/quest>-arm64.apk` |
 
 `BLOOD2_BUILD_NUMBER` (cache variable, 0–99, default 0) separates rebuilds of the
 same version for the stores. Minor and patch components must stay below 100.
 
-To release: bump `project(VERSION)`, commit, then push the tag `vx.y.z`. CI packaging
-refuses a tag that does not match the project version. Published releases:
+To release: bump `project(VERSION)`, commit, then push the tag `vx.y.z` to GitHub. CI
+packaging refuses a tag that does not match the project version; when every job passes,
+CI publishes the GitHub release with the desktop archives and the Android/Quest APKs
+([CI builds](ci_builds.md#releases)). Published releases:
 `v0.1.0` (Windows pre-release); `0.5.0` is planned once the current input and
 save/load work lands.
 

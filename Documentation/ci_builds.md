@@ -1,6 +1,6 @@
 # Continuous integration and downloadable builds
 
-[Desktop CI](https://github.com/demonixis/OpenBlood2/actions/workflows/ci.yml)
+[CI](https://github.com/demonixis/OpenBlood2/actions/workflows/ci.yml)
 runs on GitHub-hosted runners for pushes, pull requests and manual dispatches.
 GitLab remains the `origin` remote; GitHub is the `github` remote. No GitLab
 runner, personal access token or repository secret is needed by this workflow.
@@ -10,11 +10,15 @@ runner, personal access token or repository secret is needed by this workflow.
 | `OpenBlood2-windows-x64` | Windows Server 2025 | MSVC | x86-64 |
 | `OpenBlood2-linux-x64` | Ubuntu 24.04 | GCC | x86-64 |
 | `OpenBlood2-macos-arm64` | macOS 26 | Apple Clang (Xcode 26.6) | Apple Silicon |
+| `OpenBlood2-android-arm64` | Ubuntu 24.04 | NDK 29.0.14206865 Clang | arm64-v8a (phone/tablet APK) |
+| `OpenBlood2-quest-arm64` | Ubuntu 24.04 | NDK 29.0.14206865 Clang | arm64-v8a (Meta Quest OpenXR APK) |
 
 Every job builds the inspector-free Release game, then runs its synthetic headless
 CTest suite, including the setup screen's persistence and demo-installer checks.
 Missing tests are an error. GPU and private-data tests are
-excluded explicitly; these jobs do not certify graphical execution, campaign
+excluded explicitly. The Android and Quest jobs build the `android` and `quest`
+presets only (no tests, as everywhere for these platforms) and upload the
+debug-signed RelWithDebInfo APK as `OpenBlood2-<version>-<preset>-arm64.apk`. These jobs do not certify graphical execution, campaign
 traversal or the outstanding M2 GPU reservation.
 
 Failures remain failures, and the other platforms continue independently. Test
@@ -49,6 +53,23 @@ selects Xcode 26.6 and a macOS 26.0 deployment target.
 The pinned libcurl disables optional libidn2 discovery to avoid linking a developer
 machine's shared library. Packaging rejects non-system macOS dylibs and smoke-tests
 the staged Windows executables without the developer tool directories on `PATH`.
+
+## Releases
+
+Pushing a tag `vx.y.z` that matches `project(VERSION)` (see [packaging](packaging.md))
+runs every job, then the `release` job creates the GitHub release `vx.y.z` with
+generated notes and attaches the three desktop archives and the two APKs. A
+mismatched tag fails packaging, and any failed job prevents the release. `0.x`
+versions are published as pre-releases. Only this job has write permission.
+
+The APKs are signed with the runner's throwaway debug key, which changes on every
+run: installing a newer release over an older one fails with a signature mismatch,
+so uninstall the previous build first (game data in `/sdcard/openblood2` is kept).
+
+```sh
+git tag v0.3.0
+git push github v0.3.0
+```
 
 ## Push and reproduce
 
