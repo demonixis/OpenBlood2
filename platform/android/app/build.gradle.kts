@@ -11,11 +11,11 @@ fun blood2(name: String): String =
 layout.buildDirectory.set(file(blood2("buildDir") + "/app"))
 
 android {
-    namespace = "org.openblood2.game"
+    namespace = "net.demonixis.openblood2"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "org.openblood2.game"
+        applicationId = "net.demonixis.openblood2"
         minSdk = 29
         targetSdk = 36
         versionCode = blood2("versionCode").toInt()

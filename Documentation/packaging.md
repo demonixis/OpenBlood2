@@ -21,6 +21,14 @@ refuses a tag that does not match the project version. Published releases:
 `v0.1.0` (Windows pre-release); `0.5.0` is planned once the current input and
 save/load work lands.
 
+## Identifiers
+
+Every platform uses one application identifier, `net.demonixis.openblood2` (Apple
+`CFBundleIdentifier`, Android `applicationId`/`namespace` and Java package, SDL app
+metadata); the desktop launcher is `net.demonixis.openblood2.launcher`. Both are set in
+`cmake/Packaging.cmake`. An installed build with the former `org.openblood2.game`
+identifier is a separate app: uninstall it before installing the new one.
+
 ## Icons
 
 The game and the launcher have separate project-owned icons (no original Blood II
@@ -120,7 +128,7 @@ it opens the system page on first launch. During development the permission can 
 granted directly:
 
 ```bash
-adb shell appops set --uid org.openblood2.game MANAGE_EXTERNAL_STORAGE allow
+adb shell appops set --uid net.demonixis.openblood2 MANAGE_EXTERNAL_STORAGE allow
 ```
 
 Launched without arguments the APK opens the original main menu (a panel at 0.75 m) with the

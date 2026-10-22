@@ -1,4 +1,4 @@
-package org.openblood2.game;
+package net.demonixis.openblood2;
 
 import android.Manifest;
 import android.content.Intent;

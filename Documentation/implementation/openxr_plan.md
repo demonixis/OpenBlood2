@@ -298,7 +298,7 @@ cone) rather than per-model node lists. The muzzle-origin option is not built.
 
 - **Location on Quest.**
   - `SDL_GetAndroidExternalStoragePath()` gives
-    `/sdcard/Android/data/org.openblood2.game/files/`. Retail data goes in `Blood2/`
+    `/sdcard/Android/data/net.demonixis.openblood2/files/`. Retail data goes in `Blood2/`
     and the demo in `Demo/`. No storage permission is needed.
   - The path is reachable over USB (MTP, after the headset's file-access prompt) and
     with `adb push`.

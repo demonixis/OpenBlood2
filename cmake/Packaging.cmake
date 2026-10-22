@@ -13,8 +13,8 @@ foreach(part IN ITEMS MINOR PATCH)
 endforeach()
 # Monotonic integer for Android versionCode and Apple CFBundleVersion.
 math(EXPR BLOOD2_VERSION_CODE "${PROJECT_VERSION_MAJOR} * 1000000 + ${PROJECT_VERSION_MINOR} * 10000 + ${PROJECT_VERSION_PATCH} * 100 + ${BLOOD2_BUILD_NUMBER}")
-set(BLOOD2_GAME_IDENTIFIER org.openblood2.game)
-set(BLOOD2_LAUNCHER_IDENTIFIER org.openblood2.launcher)
+set(BLOOD2_GAME_IDENTIFIER net.demonixis.openblood2)
+set(BLOOD2_LAUNCHER_IDENTIFIER net.demonixis.openblood2.launcher)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
     set(BLOOD2_IOS TRUE)
