@@ -64,6 +64,9 @@ unresolved shell (`worlds/multi/bb_condemned.dat`, `Buildings`). The latter has 
 uses in a single connected component, so balanced winding is insufficient.
 The later [object contracts](object_contracts.md#retired-world-properties) supersede TypeAction rejection: the retired flag is accepted and never read.
 Duplicate names now bind the first model in file order ([duplicate-name rule](object_contracts.md#duplicate-bsp-names)).
+The later [box-world model admission](../implementation/reports/all_level_loading.md) creates BoxPhysics
+`Buildings` as a boundary-only mesh (one open, one shared edge): the catalog now creates 690 doors and
+rejects 12, all missing models.
 
 The brush catalog additionally recovers three `startfences` instances across the
 CityHub variants: 2,298 CDestructableBrush instances create, 157 reject, and all

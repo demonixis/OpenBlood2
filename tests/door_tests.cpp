@@ -301,7 +301,7 @@ namespace
         CHECK(g.initialize());
         std::string error;
         CHECK(g.resources.mount_game(Config{root, "private"}, error));
-        unsigned created = 0, rejected = 0, skipped = 0, self_triggers = 0, polygon = 0, compound = 0;
+        unsigned created = 0, rejected = 0, skipped = 0, self_triggers = 0, polygon = 0, compound = 0, boundary = 0;
         std::map<std::string, unsigned> failures;
         for (const auto& [path, resource] : g.resources.index())
         {
@@ -338,12 +338,6 @@ namespace
                         ++failures["ambiguous"];
                     else if (diagnostic.ends_with(": Missing named world model"))
                         ++failures["missing"];
-                    else if (diagnostic.find("Open or non-manifold container shell") != std::string::npos)
-                    {
-                        ++failures["shell"];
-                        CHECK(path == "worlds/multi/bb_condemned.dat" &&
-                              property_text(props.at("Name")) == "Buildings");
-                    }
                     else
                         CHECK(false); // A new failure must be investigated, not silently counted.
                     std::cout << path << " " << property_text(props.at("Name")) << " rejected: "
@@ -357,7 +351,16 @@ namespace
                     ++created;
                     self_triggers += d->self_trigger;
                     polygon += !d->box_physics;
-                    if (r->world_model->shared_edges)
+                    // BoxPhysics collides with its bounded box, so an open shell is admitted as a boundary-only mesh.
+                    if (r->world_model->boundary_only)
+                    {
+                        ++boundary;
+                        CHECK(d->box_physics && (r->world_model->open_edges || r->world_model->shared_edges) &&
+                              path == "worlds/multi/bb_condemned.dat" && r->state.m_Name == std::string("Buildings"));
+                        std::cout << path << " " << r->state.m_Name << ": boundary-only, " << r->world_model->open_edges
+                                  << " open / " << r->world_model->shared_edges << " shared edges\n";
+                    }
+                    else if (r->world_model->shared_edges)
                     {
                         ++compound;
                         CHECK(r->world_model->closed_components > 1);
@@ -370,12 +373,12 @@ namespace
             }
         }
         std::cout << "Door catalog: created=" << created << ", rejected=" << rejected << ", unreadable=" << skipped
-                  << ", SelfTrigger=" << self_triggers << ", polygon=" << polygon << "\n";
-        CHECK(created == 689 && rejected == 13 && skipped == 0 && self_triggers == 159 && polygon == 127 &&
-              compound == 16);
+                  << ", SelfTrigger=" << self_triggers << ", polygon=" << polygon << ", boundary-only=" << boundary
+                  << "\n";
+        CHECK(created == 690 && rejected == 12 && skipped == 0 && self_triggers == 159 && polygon == 127 &&
+              compound == 16 && boundary == 1);
         // Retired TypeAction rows are created; duplicate names bind the first model in file order.
-        CHECK(!failures.contains("schema") && !failures.contains("ambiguous") && failures["missing"] == 12 &&
-              failures["shell"] == 1);
+        CHECK(!failures.contains("schema") && !failures.contains("ambiguous") && failures["missing"] == 12);
         return true;
     }
     bool private_data(const std::filesystem::path& root)
