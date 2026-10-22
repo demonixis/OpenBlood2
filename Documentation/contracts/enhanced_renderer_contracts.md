@@ -153,8 +153,9 @@ The built-in classes (replacement values):
 | `hazard` | 1.0 / 0.15 | `textures/*lava*`, `*magma*`, `*acid*`, `*toxic*` (the donor's hazard words; slime stays `wet`) |
 
 Animated (SPR) materials keep the `default` class, so animated monitors do not glow. The
-term is computed per pixel in the fragment shader and is the input that M6 bloom will
-read; it is not written to a separate target yet.
+term is computed per pixel in the fragment shader. In bloom passes the `-DGLOW_TARGET`
+variants also write the linear light it adds to a second target, the only input of
+[bloom](post_processing_contracts.md#bloom).
 
 ## Material inspection (5.5)
 

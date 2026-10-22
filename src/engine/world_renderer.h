@@ -80,6 +80,9 @@ namespace OpenBlood2
         SurfaceFrameUniform frame;             // eye is filled per record.
         std::uint64_t revision = 0;
     };
+    // Bloom scene passes (post-processing): color target 1 holds the linear light that emission adds,
+    // premultiplied by coverage. Only the enhanced renderer writes it.
+    inline constexpr SDL_GPUTextureFormat scene_glow_format = SDL_GPU_TEXTUREFORMAT_R16G16B16A16_FLOAT;
     // Vertical model shadow tiles store caster world heights; uncovered texels keep the clear value.
     inline constexpr SDL_GPUTextureFormat shadow_tile_format = SDL_GPU_TEXTUREFORMAT_R32_FLOAT;
     inline constexpr float shadow_tile_clear = -1e30f;
@@ -127,7 +130,8 @@ namespace OpenBlood2
     bool sphere_visible(const ViewFrustum&, DVector center, double radius);
     // Every world/model/sprite/sky pipeline for one color format, created together
     // so no pipeline is compiled lazily during gameplay. One set may be shared by
-    // all renderers recording into the same scene pass.
+    // all renderers recording into the same scene pass. A glow set adds color target 1
+    // (scene_glow_format) to every scene pipeline; a multisampled set matches MSAA targets.
     class WorldPipelines
     {
       public:
@@ -138,9 +142,11 @@ namespace OpenBlood2
         }
         WorldPipelines(const WorldPipelines&) = delete;
         WorldPipelines& operator=(const WorldPipelines&) = delete;
-        // No-op when already prepared for this format and shading; failure releases every pipeline.
+        // No-op when already prepared for this format, shading, glow target and sample count;
+        // failure releases every pipeline. The format-only overload keeps the other choices.
         bool prepare(SDL_GPUTextureFormat, std::string& error);
         bool prepare(SDL_GPUTextureFormat, SurfaceShading, std::string& error);
+        bool prepare(SDL_GPUTextureFormat, SurfaceShading, bool glow, SDL_GPUSampleCount, std::string& error);
         SurfaceShading shading() const
         {
             return shading_;
@@ -153,6 +159,14 @@ namespace OpenBlood2
         {
             return format_;
         }
+        bool glow() const
+        {
+            return glow_;
+        }
+        SDL_GPUSampleCount samples() const
+        {
+            return samples_;
+        }
         std::uint64_t creations = 0; // Complete pipeline-set creations, for inspection.
 
       private:
@@ -161,6 +175,8 @@ namespace OpenBlood2
         std::array<SDL_GPUGraphicsPipeline*, static_cast<std::size_t>(WorldPipeline::Count)> pipelines_{};
         SDL_GPUTextureFormat format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
         SurfaceShading shading_ = SurfaceShading::Original;
+        bool glow_ = false;
+        SDL_GPUSampleCount samples_ = SDL_GPU_SAMPLECOUNT_1;
     };
     // Destination of record(): an already begun render pass whose color/depth
     // formats match the prepared pipelines. Depth range selects a viewport slice.

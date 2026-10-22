@@ -2105,6 +2105,13 @@ if(BLOOD2_GPU_TESTS)
         add_test(NAME gpu.surface COMMAND surface_gpu_tests "${BLOOD2_TEST_DATA_DIR}")
         set_tests_properties(gpu.surface PROPERTIES LABELS "gpu;private;surface" TIMEOUT 180 RUN_SERIAL TRUE
             ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+        add_executable(post_gpu_tests post_gpu_tests.cpp ../src/app/scene_presenter.cpp
+            ../src/app/model_lighting.cpp ../src/app/model_scene.cpp ../src/app/polygrid_scene.cpp ../src/app/sprite_scene.cpp)
+        target_link_libraries(post_gpu_tests PRIVATE blood2_game)
+        blood2_project_options(post_gpu_tests)
+        add_test(NAME gpu.post COMMAND post_gpu_tests "${BLOOD2_TEST_DATA_DIR}")
+        set_tests_properties(gpu.post PROPERTIES LABELS "gpu;private;surface" TIMEOUT 180 RUN_SERIAL TRUE
+            ENVIRONMENT "SDL_AUDIODRIVER=dummy")
         add_executable(save_native_gpu_tests save_native_gpu_tests.cpp ../src/app/scene_presenter.cpp
             ../src/app/model_lighting.cpp ../src/app/model_scene.cpp ../src/app/polygrid_scene.cpp ../src/app/sprite_scene.cpp)
         target_link_libraries(save_native_gpu_tests PRIVATE blood2_game)

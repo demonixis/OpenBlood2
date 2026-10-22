@@ -53,6 +53,10 @@ namespace OpenBlood2
         // 0 original, 1 enhanced standard, 2 enhanced high; generated normal maps.
         int renderer = 0;
         bool normal_maps = false;
+        // Post-processing for the same paths: anti-aliasing (0 off, 1 FXAA, 2 MSAA 2x, 3 MSAA 4x),
+        // and with the enhanced renderer, bloom and the tonemap (0 off, 1 neutral, 2 filmic).
+        int antialiasing = 0, tonemap = 1;
+        bool bloom = true;
         std::uint32_t bench_width = 1920, bench_height = 1080;
     };
 

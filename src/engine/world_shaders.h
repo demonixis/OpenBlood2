@@ -19,7 +19,21 @@ namespace OpenBlood2
         PbrHighAlphaFragment,
         // Unlit lines with an asymmetric projection (XR grid, controller boxes, laser).
         LineVertex,
-        LineFragment
+        LineFragment,
+        // Bloom scene passes (post-processing): the same shading plus the glow target 1.
+        OpaqueGlowFragment,
+        AlphaGlowFragment,
+        PbrGlowFragment,
+        PbrHighGlowFragment,
+        PbrAlphaGlowFragment,
+        PbrHighAlphaGlowFragment,
+        // Post-processing: a buffer-free full-target triangle, the bloom chain, the HDR composite
+        // and FXAA.
+        PostVertex,
+        BloomDownFragment,
+        BloomUpFragment,
+        CompositeFragment,
+        FxaaFragment
     };
     // Static owned bytecode/source and reflected resource counts. No device or
     // filesystem needed; MSL's generated entry point differs from SPIR-V's.

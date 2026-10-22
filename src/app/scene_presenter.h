@@ -5,6 +5,7 @@
 #include "app/sprite_scene.h"
 #include "engine/light_grid.h"
 #include "engine/model_renderer.h"
+#include "engine/post_process.h"
 #include "engine/surface_report.h"
 #include "engine/world_renderer.h"
 #include <functional>
@@ -46,6 +47,8 @@ namespace OpenBlood2
     // state without advancing simulation; record() encodes one presented frame.
     // All in-world presentation is recorded into one scene render pass sharing one
     // depth target and one pipeline set. View models use a separate near depth slice.
+    // On desktop, post-processing (MSAA, the enhanced HDR scene, bloom, tonemapping, FXAA)
+    // surrounds that pass; XR eyes keep the plain single-sampled pass.
     class ScenePresenter
     {
       public:
@@ -94,6 +97,8 @@ namespace OpenBlood2
         std::vector<WorldDraw> world_draws, sky_draws;
         DVector sky_eye{};
         GpuRegistry registry;     // Owns every presentation GPU resource; declared before its users.
+        PostProcess post_process; // Desktop record() only: targets and passes around the scene pass.
+        PostSettings post;        // Display settings for record(); bloom/tonemap need the enhanced renderer.
         WorldPipelines pipelines; // Declared before the renderers that borrow it.
         WorldRenderer world_renderer;
         ModelRenderer model_renderer, explosion_model_renderer; // GPU skinning of both model views.
@@ -139,12 +144,12 @@ namespace OpenBlood2
       private:
         const CameraView& camera(const GameSession&) const;
         // Pipelines, renderer uploads, shadow tiles and a depth target with `layers` layers.
-        bool prepare_depth(Uint32 width, Uint32 height, Uint32 layers, std::string& error);
+        bool prepare_depth(Uint32 width, Uint32 height, Uint32 layers, SDL_GPUSampleCount, std::string& error);
         bool prepare_frame(SDL_GPUCommandBuffer*, SDL_GPUTextureFormat, Uint32 width, Uint32 height, Uint32 layers,
-                           std::string& error);
-        // One scene render pass into colour/depth layer `layer`.
-        bool record_view(GameSession&, SDL_GPUCommandBuffer*, SDL_GPUTexture* target, Uint32 layer, DVector eye,
-                         DRotation rotation, bool letterbox, const EyeProjection*, std::string& error);
+                           bool glow, SDL_GPUSampleCount, std::string& error);
+        // One scene render pass into colour/depth layer `target.layer`.
+        bool record_view(GameSession&, SDL_GPUCommandBuffer*, const SceneTarget&, DVector eye, DRotation rotation,
+                         bool letterbox, const EyeProjection*, std::string& error);
         void finish_frame(std::uint64_t started);
         void select_shadow_casters(const GameSession&);
         bool record_shadow_tiles(SDL_GPUCommandBuffer*, std::string& error);
@@ -159,5 +164,6 @@ namespace OpenBlood2
         std::uint64_t report_mesh_ = UINT64_MAX, report_surface_ = UINT64_MAX;
         TextureHandle depth_;
         Uint32 depth_width_ = 0, depth_height_ = 0, depth_layers_ = 0;
+        SDL_GPUSampleCount depth_samples_ = SDL_GPU_SAMPLECOUNT_1;
     };
 } // namespace OpenBlood2

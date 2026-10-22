@@ -129,10 +129,28 @@ namespace
         menu.build(MenuPage::Options);
         CHECK(menu.items[0].command == int(MENU_CMD_DISPLAY) && menu.enabled(menu.items[0]) && menu.selected == 0);
         menu.activate();
-        CHECK(menu.page == MenuPage::Display && menu.items.size() == 4 && menu.small());
+        CHECK(menu.page == MenuPage::Display && menu.items.size() == 7 && menu.small());
         CHECK(menu.items[0].setting == 6 && menu.items[0].string_id == IDS_MENU_DISPLAY_DETAIL_HIGH &&
               menu.items[1].setting == 8 && !menu.items[1].string_id && menu.items[2].setting == 7 &&
               !menu.items[2].string_id && menu.items[3].setting == 9 && !menu.enabled(menu.items[3]));
+        // Post-processing: TONEMAP and BLOOM need the enhanced renderer; ANTI-ALIASING serves both.
+        CHECK(menu.items[4].setting == 19 && !menu.enabled(menu.items[4]) && menu.items[5].setting == 18 &&
+              !menu.enabled(menu.items[5]) && menu.items[6].setting == 17 && menu.enabled(menu.items[6]));
+        menu.selected = 6;
+        menu.activate();
+        CHECK(menu.settings.antialiasing == 1 && menu.take_command().action == MenuAction::Settings);
+        menu.adjust(1);
+        menu.adjust(1);
+        CHECK(menu.settings.antialiasing == 3);
+        menu.adjust(1);
+        CHECK(menu.settings.antialiasing == 0);
+        menu.adjust(-1);
+        CHECK(menu.settings.antialiasing == 3);
+        menu.adjust(1);
+        menu.selected = 4;
+        menu.activate(); // Disabled with the original renderer.
+        CHECK(menu.settings.tonemap == 1);
+        menu.take_command();
         menu.take_command();
         menu.selected = 0;
         menu.activate();
@@ -159,6 +177,20 @@ namespace
         menu.activate();
         CHECK(!menu.settings.normal_maps);
         menu.activate();
+        CHECK(menu.enabled(menu.items[4]) && menu.enabled(menu.items[5]));
+        menu.selected = 4;
+        menu.activate();
+        CHECK(menu.settings.tonemap == 2);
+        menu.adjust(1);
+        CHECK(menu.settings.tonemap == 0);
+        menu.adjust(-1);
+        menu.adjust(-1);
+        CHECK(menu.settings.tonemap == 1);
+        menu.selected = 5;
+        menu.activate();
+        CHECK(!menu.settings.bloom);
+        menu.activate();
+        CHECK(menu.settings.bloom);
         menu.selected = 1;
         menu.activate();
         CHECK(menu.settings.renderer == 0 && !menu.enabled(menu.items[3]) && menu.settings.quality == 1 &&

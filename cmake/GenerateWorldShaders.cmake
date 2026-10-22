@@ -12,19 +12,31 @@ file(MAKE_DIRECTORY "${OUTPUT_DIR}")
 # Temporary binaries/metadata never become distributable game assets.
 set(work "${OUTPUT_DIR}/.generation")
 file(MAKE_DIRECTORY "${work}")
-# Each entry: generated name, then the HLSL file stem; the enhanced (PBR) fragment variants
-# compile one source with defines.
-set(pbr_frag_defines)
+# Each entry is a generated name <stem>_<vert|frag> compiled from <stem>.<stage>.hlsl, unless
+# <name>_source names another file: the enhanced (PBR) fragment variants and the bloom (glow
+# target) variants compile one source with defines.
+set(pbr_frag_source pbr.frag)
+set(pbr_high_frag_source pbr.frag)
 set(pbr_high_frag_defines -DPBR_HIGH)
+set(pbr_alpha_frag_source pbr.frag)
 set(pbr_alpha_frag_defines -DPBR_ALPHA)
+set(pbr_high_alpha_frag_source pbr.frag)
 set(pbr_high_alpha_frag_defines -DPBR_HIGH -DPBR_ALPHA)
+foreach(variant world sprite pbr pbr_high pbr_alpha pbr_high_alpha)
+    if(DEFINED ${variant}_frag_source)
+        set(${variant}_glow_frag_source ${${variant}_frag_source})
+    else()
+        set(${variant}_glow_frag_source ${variant}.frag)
+    endif()
+    set(${variant}_glow_frag_defines ${${variant}_frag_defines} -DGLOW_TARGET)
+endforeach()
 foreach(shader world_vert skinned_vert world_frag sprite_frag shadow_frag pbr_frag pbr_high_frag pbr_alpha_frag
-        pbr_high_alpha_frag line_vert line_frag)
-    string(REPLACE "_" "." filename "${shader}")
-    set(defines)
-    if(shader MATCHES "^pbr_")
-        set(filename "pbr.frag")
-        set(defines ${${shader}_defines})
+        pbr_high_alpha_frag line_vert line_frag world_glow_frag sprite_glow_frag pbr_glow_frag pbr_high_glow_frag
+        pbr_alpha_glow_frag pbr_high_alpha_glow_frag post_vert bloom_down_frag bloom_up_frag composite_frag fxaa_frag)
+    string(REGEX REPLACE "_(vert|frag)$" ".\\1" filename "${shader}")
+    set(defines ${${shader}_defines})
+    if(DEFINED ${shader}_source)
+        set(filename "${${shader}_source}")
     endif()
     set(source "${shader_dir}/${filename}.hlsl")
     if(shader MATCHES "_vert$")

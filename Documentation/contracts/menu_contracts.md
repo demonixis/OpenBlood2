@@ -188,6 +188,12 @@ Options always ends with a replacement `CHEATS` row (after VR and SETUP) opening
 [Cheats page](cheat_contracts.md) (settings 14-16). `preferences.cfg` version 6 adds `cheats` and
 `god_mode`; writes produce version 6, which supersedes the version 5 statement above.
 
+[Post-processing](post_processing_contracts.md) adds `TONEMAP [OFF/NEUTRAL/FILMIC]` (setting 19)
+and `BLOOM [ON/OFF]` (18), both disabled with the original renderer, then
+`ANTI-ALIASING [OFF/FXAA/MSAA 2X/MSAA 4X]` (17) at the end of the Display page.
+`preferences.cfg` version 7 adds `antialiasing`, `bloom` and `tonemap`; writes produce version 7
+and older versions load the defaults (0, 1, 1), superseding the version 6 statement above.
+
 
 ## Controls (CMenuControls)
 

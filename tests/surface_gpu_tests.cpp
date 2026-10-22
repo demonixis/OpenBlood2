@@ -89,6 +89,7 @@ int main(int argc, char** argv)
         Capture capture;
         CHECK(capture.initialize(gpu, SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM, 960, 540));
         ScenePresenter presenter(gpu);
+        presenter.post = {Antialiasing::Off, false, Tonemap::Off}; // The shading alone (gpu.post covers the rest).
         std::vector<Uint8> original, standard, high, again;
         CHECK(frame(gpu, presenter, *game, capture, original, error));
         CHECK(presenter.pipelines.shading() == SurfaceShading::Original && !presenter.world_renderer.surface);

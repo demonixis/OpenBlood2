@@ -362,6 +362,7 @@ namespace OpenBlood2
             inspector.sprite_render = &presenter.sprite_renderer.stats;
             inspector.world_render = &presenter.world_renderer.stats;
             inspector.presentation = &presenter.stats;
+            inspector.post = &presenter.post_process.stats;
             inspector.gpu_resources = &presenter.registry.stats;
             inspector.model_lighting = &presenter.model_lighting.stats;
             inspector.model_shadows = &presenter.shadow_stats;
@@ -882,6 +883,8 @@ namespace OpenBlood2
                                     : settings.quality ? SurfaceShading::High
                                                        : SurfaceShading::Standard;
                 presenter.normal_maps = settings.normal_maps;
+                presenter.post = {Antialiasing(std::clamp(settings.antialiasing, 0, 3)), settings.bloom,
+                                  Tonemap(std::clamp(settings.tonemap, 0, 2))};
 #if BLOOD2_XR
                 if (xr)
                     xr->set_options({float(settings.vr_turn) * 0.017453293f, settings.vr_laser, settings.vr_crosshair,

@@ -77,6 +77,42 @@ int main()
             CHECK(world_shader_info(shader, formats, repeated) && repeated.code == owned &&
                   repeated.code_size == info.code_size);
         }
+    // Bloom scene variants keep their base shader's resources and add colour target 1; the
+    // post-processing passes draw a buffer-free triangle and sample one or two textures.
+    struct Expected
+    {
+        WorldShader shader;
+        unsigned samplers, uniforms, storage_buffers;
+        bool glow;
+    };
+    for (auto formats : {SDL_GPU_SHADERFORMAT_SPIRV, SDL_GPU_SHADERFORMAT_MSL})
+        for (const auto& expected : {Expected{WorldShader::OpaqueGlowFragment, 3, 2, 0, true},
+                                     Expected{WorldShader::AlphaGlowFragment, 3, 2, 0, true},
+                                     Expected{WorldShader::PbrGlowFragment, 4, 4, 2, true},
+                                     Expected{WorldShader::PbrHighGlowFragment, 4, 4, 2, true},
+                                     Expected{WorldShader::PbrAlphaGlowFragment, 4, 4, 2, true},
+                                     Expected{WorldShader::PbrHighAlphaGlowFragment, 4, 4, 2, true},
+                                     Expected{WorldShader::PostVertex, 0, 0, 0, false},
+                                     Expected{WorldShader::BloomDownFragment, 1, 1, 0, false},
+                                     Expected{WorldShader::BloomUpFragment, 1, 1, 0, false},
+                                     Expected{WorldShader::CompositeFragment, 2, 1, 0, false},
+                                     Expected{WorldShader::FxaaFragment, 1, 1, 0, false}})
+        {
+            const bool vertex = expected.shader == WorldShader::PostVertex;
+            CHECK(world_shader_info(expected.shader, formats, info));
+            CHECK(info.code && info.code_size > 128 && info.num_samplers == expected.samplers &&
+                  info.num_uniform_buffers == expected.uniforms &&
+                  info.num_storage_buffers == expected.storage_buffers && info.num_storage_textures == 0);
+            CHECK(info.stage == (vertex ? SDL_GPU_SHADERSTAGE_VERTEX : SDL_GPU_SHADERSTAGE_FRAGMENT));
+            if (formats == SDL_GPU_SHADERFORMAT_MSL)
+            {
+                const std::string_view source(reinterpret_cast<const char*>(info.code), info.code_size);
+                CHECK(source.find(vertex ? "vertex main0_out main0(" : "fragment main0_out main0(") != source.npos);
+                CHECK((source.find("[[color(1)]]") != source.npos) == expected.glow);
+                if (vertex)
+                    CHECK(source.find("[[vertex_id]]") != source.npos);
+            }
+        }
     for (SDL_GPUShaderFormat formats : std::array<SDL_GPUShaderFormat, 3>{
              SDL_GPU_SHADERFORMAT_INVALID, SDL_GPU_SHADERFORMAT_DXIL, SDL_GPU_SHADERFORMAT_METALLIB})
     {

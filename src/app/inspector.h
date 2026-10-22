@@ -15,6 +15,7 @@ class CNewStatusBar;
 namespace OpenBlood2
 {
     struct PresentationStats;
+    struct PostStats;
     struct GpuRegistryStats;
     struct ModelLightingStats;
     struct ShadowStats;
@@ -32,6 +33,7 @@ namespace OpenBlood2
         const WorldViewStats* sprite_render = nullptr;
         const WorldViewStats* world_render = nullptr;
         const PresentationStats* presentation = nullptr;
+        const PostStats* post = nullptr; // Desktop post-processing of the last recorded frame.
         const GpuRegistryStats* gpu_resources = nullptr;
         const ModelLightingStats* model_lighting = nullptr;
         const ShadowStats* model_shadows = nullptr;

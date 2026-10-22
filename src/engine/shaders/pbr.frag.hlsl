@@ -6,6 +6,7 @@
 // for the environment through an analytic split-sum approximation. No probe or baked data.
 // Manifest emission adds a light-independent glow to bright texels (the input of M6 bloom).
 // PBR_HIGH: eight grid lights and specular cavity. PBR_ALPHA: translucent output.
+// GLOW_TARGET (bloom passes): target 1 receives the linear light the emission adds.
 // SDL_GPU fragment conventions: textures/samplers then storage buffers in space2, uniforms in space3.
 Texture2D<float4> albedo : register(t0, space2);
 SamplerState albedoSampler : register(s0, space2);
@@ -153,7 +154,35 @@ float3 emitted(float3 color)
         return float3(0.0, 0.0, 0.0);
     return color * (emission.x * saturate((luminance(color) - emission.y) / max(1.0 - emission.y, 1e-3)));
 }
+#ifdef GLOW_TARGET
+struct Output
+{
+    float4 color : SV_Target0;
+    float4 glow : SV_Target1; // Linear glow, premultiplied by coverage (translucent faces).
+};
+Output shaded(float4 color, float4 glow)
+{
+    Output output;
+    output.color = color;
+    output.glow = glow;
+    return output;
+}
+float3 toLinear(float3 c)
+{
+    c = max(c, float3(0.0, 0.0, 0.0));
+    return lerp(pow((c + 0.055) / 1.055, 2.4), c / 12.92, step(c, 0.04045));
+}
+// The linear light that emission e adds to the display-space color c (c includes e).
+float3 linearGlow(float3 c, float3 e)
+{
+    return max(toLinear(c) - toLinear(c - e), float3(0.0, 0.0, 0.0));
+}
+#define SHADED(color, glow) shaded(color, glow)
+Output main(Input input)
+#else
+#define SHADED(color, glow) (color)
 float4 main(Input input) : SV_Target0
+#endif
 {
     float shadow = shadowAmount(input.worldPosition); // Before discard: screen derivatives.
     float3 dp1 = ddx(input.worldPosition), dp2 = ddy(input.worldPosition);
@@ -174,9 +203,12 @@ float4 main(Input input) : SV_Target0
                                                                        positionRadius.w)
                                   : float3(0.0, 0.0, 0.0);
 #ifdef PBR_ALPHA
-        return float4(texel.rgb * (light * (1.0 - shadow) + dynamicLight) * sceneColor.rgb, texel.a * modulation.x);
+        return SHADED(float4(texel.rgb * (light * (1.0 - shadow) + dynamicLight) * sceneColor.rgb,
+                             texel.a * modulation.x),
+                      float4(0.0, 0.0, 0.0, texel.a * modulation.x));
 #else
-        return float4(texel.rgb * (light * (1.0 - shadow) + dynamicLight) * sceneColor.rgb, 1.0);
+        return SHADED(float4(texel.rgb * (light * (1.0 - shadow) + dynamicLight) * sceneColor.rgb, 1.0),
+                      float4(0.0, 0.0, 0.0, 1.0));
 #endif
     }
     bool model = (flags & 1u) != 0u;
@@ -240,9 +272,10 @@ float4 main(Input input) : SV_Target0
         // SURF_BRIGHT and unlit faces carry no light information: original output.
         if (!lightmapped && all(input.faceColor >= 0.999))
 #ifdef PBR_ALPHA
-            return float4(texel.rgb * diffuse * sceneColor.rgb, texel.a * modulation.x);
+            return SHADED(float4(texel.rgb * diffuse * sceneColor.rgb, texel.a * modulation.x),
+                          float4(0.0, 0.0, 0.0, texel.a * modulation.x));
 #else
-            return float4(texel.rgb * diffuse * sceneColor.rgb, 1.0);
+            return SHADED(float4(texel.rgb * diffuse * sceneColor.rgb, 1.0), float4(0.0, 0.0, 0.0, 1.0));
 #endif
         float3 grid = (p - gridOrigin.xyz) * gridOrigin.w;
         int3 cell = int3(floor(grid));
@@ -289,8 +322,13 @@ float4 main(Input input) : SV_Target0
     // Highlights survive on nearly transparent glass: coverage rises to carry them.
     float coverage = texel.a * modulation.x;
     float outAlpha = saturate(max(coverage, luminance(reflected)));
-    return float4((body * coverage + reflected) / max(outAlpha, 1e-4), outAlpha);
+    float3 straight = (body * coverage + reflected) / max(outAlpha, 1e-4);
+    return SHADED(float4(straight, outAlpha),
+                  float4(linearGlow(straight, emitted(baseColor) * sceneColor.rgb * coverage / max(outAlpha, 1e-4)) *
+                             outAlpha,
+                         outAlpha));
 #else
-    return float4(body + reflected, 1.0);
+    return SHADED(float4(body + reflected, 1.0),
+                  float4(linearGlow(body + reflected, emitted(baseColor) * sceneColor.rgb), 1.0));
 #endif
 }

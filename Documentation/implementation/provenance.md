@@ -1894,6 +1894,15 @@ Emission and material inspection (2026-10-21, roadmap 5.2 and 5.5) add replaceme
 the DAT's fully bright faces and `engine/surface_report.*`. The hazard rules reuse the donor's
 lava/magma/acid/toxic words; no donor code is imported.
 
+## Post-processing (2026-10-22)
+
+The HDR scene, bloom chain, tonemaps, MSAA and FXAA (`engine/post_process.*`,
+`engine/shaders/{post.vert,bloom_down.frag,bloom_up.frag,composite.frag,fxaa.frag}.hlsl` and the
+`GLOW_TARGET` shader variants) are replacement code. The published techniques (Jimenez's bloom
+chain, Khronos PBR Neutral's shoulder, Hill's ACES fit, the FXAA 3.11 algorithm) are listed in the
+[source ledger](sources/post_processing_sources.json); FXAA is reimplemented from the algorithm and
+no source file is copied. See the [contract](../contracts/post_processing_contracts.md).
+
 ## Player and client save/load (2026-10-20)
 
 Save/load lot 5 adds selective ports of the original Save/Load bodies of

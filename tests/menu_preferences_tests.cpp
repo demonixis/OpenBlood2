@@ -34,9 +34,10 @@ int test_menu_preferences(int argc, char** argv)
         // The shared atomic writer keeps the exact preference bytes.
         std::ifstream in(path, std::ios::binary);
         const std::string bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        CHECK(bytes == "version=6\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
+        CHECK(bytes == "version=7\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
                        "invert_y=1\ndetail=2\npixel_lighting=0\nrenderer=0\nquality=0\nnormal_maps=1\n"
-                       "vr_turn=45\nvr_laser=1\nvr_crosshair=1\nvr_move_hand=0\ncheats=0\ngod_mode=0\n");
+                       "vr_turn=45\nvr_laser=1\nvr_crosshair=1\nvr_move_hand=0\ncheats=0\ngod_mode=0\n"
+                       "antialiasing=0\nbloom=1\ntonemap=1\n");
     }
     settings.sound = true;
     CHECK(save_menu_preferences(path, settings, error));
@@ -123,6 +124,34 @@ int test_menu_preferences(int argc, char** argv)
             out << v6 << "cheats=1\ngod_mode=1\n";
         }
         CHECK(load_menu_preferences(path, loaded, error) && loaded.cheats && loaded.god_mode);
+        // Version 7 adds the post-processing rows; version 6 files load their defaults (no
+        // anti-aliasing, bloom, neutral tonemap).
+        CHECK(loaded.antialiasing == 0 && loaded.bloom && loaded.tonemap == 1);
+        MenuSettings post;
+        post.antialiasing = 3;
+        post.bloom = false;
+        post.tonemap = 2;
+        CHECK(save_menu_preferences(path, post, error));
+        CHECK(load_menu_preferences(path, loaded, error) && loaded == post);
+        std::string v7 = v6 + "cheats=1\ngod_mode=1\n";
+        v7[8] = '7';
+        for (const auto& text :
+             {v6 + "cheats=1\ngod_mode=1\nantialiasing=1\nbloom=1\ntonemap=1\n",
+              v7 + "antialiasing=4\nbloom=1\ntonemap=1\n", v7 + "antialiasing=1\nbloom=2\ntonemap=1\n",
+              v7 + "antialiasing=1\nbloom=1\ntonemap=3\n", v7 + "antialiasing=1\nbloom=1\n"})
+        {
+            {
+                std::ofstream out(path);
+                out << text;
+            }
+            CHECK(!load_menu_preferences(path, loaded, error) && !error.empty());
+        }
+        {
+            std::ofstream out(path);
+            out << v7 << "antialiasing=1\nbloom=0\ntonemap=0\n";
+        }
+        CHECK(load_menu_preferences(path, loaded, error) && loaded.antialiasing == 1 && !loaded.bloom &&
+              loaded.tonemap == 0 && loaded.cheats);
     }
     for (const auto text : {"renderer=2\nquality=0\nnormal_maps=0\n", "renderer=0\nquality=0\nnormal_maps=2\n",
                             "renderer=0\nquality=0\n"})

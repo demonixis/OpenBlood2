@@ -11,19 +11,20 @@ namespace OpenBlood2
     {
         // Version 1 has the first seven keys; version 2 adds the display settings; version 3 adds
         // the renderer selection; version 4 the VR options; version 5 the VR movement reference;
-        // version 6 the cheat switch and god mode.
-        constexpr std::array<const char*, 18> names{
-            "version",  "sound",    "music",          "sound_volume", "music_volume", "sensitivity",
-            "invert_y", "detail",   "pixel_lighting", "renderer",     "quality",      "normal_maps",
-            "vr_turn",  "vr_laser", "vr_crosshair",   "vr_move_hand", "cheats",       "god_mode"};
-        constexpr std::array<std::size_t, 6> version_keys{7, 9, 12, 15, 16, 18};
+        // version 6 the cheat switch and god mode; version 7 the post-processing rows.
+        constexpr std::array<const char*, 21> names{
+            "version",      "sound",          "music",    "sound_volume", "music_volume", "sensitivity", "invert_y",
+            "detail",       "pixel_lighting", "renderer", "quality",      "normal_maps",  "vr_turn",     "vr_laser",
+            "vr_crosshair", "vr_move_hand",   "cheats",   "god_mode",     "antialiasing", "bloom",       "tonemap"};
+        constexpr std::array<std::size_t, 7> version_keys{7, 9, 12, 15, 16, 18, 21};
         bool valid(const MenuSettings& s)
         {
             const bool turn = s.vr_turn == 0 || s.vr_turn == 15 || s.vr_turn == 30 || s.vr_turn == 45 ||
                               s.vr_turn == 60 || s.vr_turn == 90;
             return s.sound_volume >= 0 && s.sound_volume <= 50 && s.music_volume >= 0 && s.music_volume <= 50 &&
                    s.sensitivity >= 100 && s.sensitivity <= 1500 && s.detail >= 0 && s.detail <= 2 &&
-                   (s.renderer == 0 || s.renderer == 1) && (s.quality == 0 || s.quality == 1) && turn;
+                   (s.renderer == 0 || s.renderer == 1) && (s.quality == 0 || s.quality == 1) && turn &&
+                   s.antialiasing >= 0 && s.antialiasing <= 3 && s.tonemap >= 0 && s.tonemap <= 2;
         }
     } // namespace
     bool menu_preferences_path(std::filesystem::path& output, std::string& error)
@@ -91,7 +92,7 @@ namespace OpenBlood2
         if (input.bad() || !known ||
             std::find(seen.begin(), seen.begin() + required, false) != seen.begin() + required ||
             std::find(seen.begin() + required, seen.end(), true) != seen.end() || !flag(1) || !flag(2) || !flag(6) ||
-            !flag(8) || !flag(11) || !flag(13) || !flag(14) || !flag(15) || !flag(16) || !flag(17))
+            !flag(8) || !flag(11) || !flag(13) || !flag(14) || !flag(15) || !flag(16) || !flag(17) || !flag(19))
         {
             error = "Incomplete or unsupported preferences";
             return false;
@@ -127,6 +128,12 @@ namespace OpenBlood2
             result.cheats = values[16];
             result.god_mode = values[17];
         }
+        if (required >= version_keys[6])
+        {
+            result.antialiasing = values[18];
+            result.bloom = values[19];
+            result.tonemap = values[20];
+        }
         if (!valid(result))
         {
             error = "Preferences out of range";
@@ -143,7 +150,7 @@ namespace OpenBlood2
             error = "Preferences out of range";
             return false;
         }
-        const std::array<int, names.size()> values{6,
+        const std::array<int, names.size()> values{7,
                                                    settings.sound,
                                                    settings.music,
                                                    settings.sound_volume,
@@ -160,7 +167,10 @@ namespace OpenBlood2
                                                    settings.vr_crosshair,
                                                    settings.vr_move_hand,
                                                    settings.cheats,
-                                                   settings.god_mode};
+                                                   settings.god_mode,
+                                                   settings.antialiasing,
+                                                   settings.bloom,
+                                                   settings.tonemap};
         std::string text;
         for (unsigned i = 0; i < values.size(); ++i)
             text += std::string(names[i]) + '=' + std::to_string(values[i]) + '\n';

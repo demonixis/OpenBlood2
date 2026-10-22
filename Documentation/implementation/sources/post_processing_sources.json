@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-22",
+  "scope": "Post-processing (roadmap M6, first increment): HDR scene, emission-driven bloom, tonemapping, MSAA and FXAA; no game, engine or renderer code imported",
+  "retail_evidence": [
+    {
+      "file": "BLOOD2.REZ, BLOOD2P.REZ, BLOOD2P2.REZ (installed Blood II)",
+      "purpose": "CityHub and SubwayA captures used to choose the bloom strength (1.5) and the filmic exposure (2.2), and checked by gpu.post."
+    }
+  ],
+  "design_references": [
+    {
+      "source": "Jimenez, 'Next Generation Post Processing in Call of Duty: Advanced Warfare' (SIGGRAPH 2014 Advances in Real-Time Rendering)",
+      "purpose": "13-tap downsample, Karis average on the first pass and 3x3 tent upsample of the bloom chain."
+    },
+    {
+      "source": "Karis, 'Tone mapping' (Graphic Rants blog, 2013)",
+      "purpose": "1 / (1 + luma) weighting of the first downsample against bright-texel flicker."
+    },
+    {
+      "source": "Khronos Group, 'Khronos PBR Neutral Tone Mapper' (2024, specification and sample code)",
+      "purpose": "Shoulder of the NEUTRAL tonemap: compression start 0.76, desaturation 0.15. The toe offset is not used."
+    },
+    {
+      "source": "Hill, BakingLab ACES.hlsl (MJP, 2016; fit of the ACES RRT and ODT by Stephen Hill)",
+      "purpose": "FILMIC tonemap: the RRT/ODT rational fit and its sRGB/working-space matrices."
+    },
+    {
+      "source": "Lottes, 'FXAA' (NVIDIA white paper, 2009-2011, FXAA 3.11 quality algorithm)",
+      "purpose": "Algorithm of the FXAA pass (local contrast, edge orientation, end search, subpixel blend), reimplemented; no FXAA source is copied."
+    },
+    {
+      "source": "IEC 61966-2-1 (sRGB)",
+      "purpose": "Transfer functions between the display-space scene and linear light."
+    }
+  ]
+}

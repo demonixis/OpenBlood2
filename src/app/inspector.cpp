@@ -578,6 +578,15 @@ namespace OpenBlood2
                                         presentation->world_ns / 1e6, presentation->models_ns / 1e6,
                                         presentation->effects_ns / 1e6, presentation->record_ns / 1e6);
                         }
+                        if (post)
+                        {
+                            static constexpr const char* tonemaps[]{"off", "neutral", "filmic"};
+                            ImGui::Text("Post-processing: %s scene, MSAA %ux (%ux requested), FXAA %s, bloom %s (%zu "
+                                        "levels), tonemap %s | %zu passes, %zu targets",
+                                        post->hdr ? "HDR" : "direct", post->samples, post->requested_samples,
+                                        post->fxaa ? "on" : "off", post->bloom ? "on" : "off", post->bloom_levels,
+                                        tonemaps[std::size_t(post->tonemap)], post->passes, post->targets);
+                        }
                         if (gpu_resources)
                             ImGui::Text("GPU registry: %zu textures (%zu bytes, %llu shared hits) / %zu buffers (%zu "
                                         "bytes) / %zu shared assets | %zu bytes staged last frame",

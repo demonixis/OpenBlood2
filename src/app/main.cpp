@@ -372,6 +372,8 @@ namespace
         presenter.per_pixel_lighting = options.pixel_lighting;
         presenter.shading = OpenBlood2::SurfaceShading(options.renderer);
         presenter.normal_maps = options.normal_maps;
+        presenter.post = {OpenBlood2::Antialiasing(options.antialiasing), options.bloom,
+                          OpenBlood2::Tonemap(options.tonemap)};
         const auto& world_mesh = presenter.world_mesh;
         const auto& world_renderer = presenter.world_renderer;
         const auto& model_scene = presenter.model_scene;
@@ -402,6 +404,7 @@ namespace
         inspector.sprite_render = &sprite_renderer.stats;
         inspector.world_render = &world_renderer.stats;
         inspector.presentation = &presenter.stats;
+        inspector.post = &presenter.post_process.stats;
         inspector.model_shadows = &presenter.shadow_stats;
         inspector.gpu_resources = &presenter.registry.stats;
         inspector.model_lighting = &presenter.model_lighting.stats;
@@ -1798,6 +1801,9 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --pixel-lighting    Light models per pixel (menu: Options > Display)\n"
                      "  --renderer MODE     original (default), standard or high enhanced shading (menu: Display)\n"
                      "  --normal-maps       Generate normal maps for the enhanced renderer (menu: Display)\n"
+                     "  --aa MODE           Anti-aliasing: off (default), fxaa, msaa2 or msaa4 (menu: Display)\n"
+                     "  --no-bloom          Enhanced renderer without bloom (menu: Display)\n"
+                     "  --tonemap MODE      Enhanced tonemap: off, neutral (default) or filmic (menu: Display)\n"
                      "  --capture FILE.png  Save the third GPU frame after UI layout has settled (bench: last frame)\n"
                      "  --menu-smoke        Selected-edition menu SDL traversal, isolated preferences/pause checks\n"
                      "  --demo-smoke        Menu-free demo SDL pause, authored exits and ending diagnostic\n"

@@ -94,6 +94,11 @@ namespace OpenBlood2
         // enhanced lighting quality (0 standard, 1 high) and generated normal maps.
         int renderer = 0, quality = 0;
         bool normal_maps = true;
+        // Replacement post-processing rows: anti-aliasing for both renderers (0 off, 1 FXAA,
+        // 2 MSAA 2X, 3 MSAA 4X); bloom and the tonemap (0 off, 1 neutral, 2 filmic) for the
+        // enhanced renderer only.
+        int antialiasing = 0, tonemap = 1;
+        bool bloom = true;
         // Replacement VR rows: the snap-turn step in degrees (15, 30, 45, 60 or 90; 0 turns
         // smoothly), the aim laser, the aim reticle, and movement relative to the right hand
         // instead of the head.
@@ -112,7 +117,7 @@ namespace OpenBlood2
         std::string literal;
         // Setting IDs: sound, volume, music, volume, sensitivity, invert Y, detail, lighting,
         // renderer, normal maps, VR turn, VR laser, VR crosshair, VR movement reference, cheats,
-        // god mode, cheat level.
+        // god mode, cheat level, anti-aliasing, bloom, tonemap.
         int setting = -1;
         HudRect rect{}, slider_rect{};
         std::string insertion; // FormatMessage %1!s! argument of the Load page's RESTART/QUICKLOAD strings.
@@ -180,7 +185,7 @@ namespace OpenBlood2
         bool enabled(const MenuItem& item) const
         {
             return item.enabled && !(item.setting == 1 && !settings.sound) && !(item.setting == 3 && !settings.music) &&
-                   !(item.setting == 9 && !settings.renderer) &&
+                   !((item.setting == 9 || item.setting == 18 || item.setting == 19) && !settings.renderer) &&
                    !(page == MenuPage::Cheats && item.setting != 14 && !settings.cheats);
         }
         bool small() const;

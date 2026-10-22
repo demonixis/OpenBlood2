@@ -1,6 +1,7 @@
 #include "engine/config.h"
 
 #include <algorithm>
+#include <array>
 #include <charconv>
 #include <fstream>
 #include <system_error>
@@ -230,6 +231,30 @@ namespace OpenBlood2
                     return false;
                 }
                 options.renderer = value == "original" ? 0 : value == "standard" ? 1 : 2;
+            }
+            else if (arg == "--aa")
+            {
+                const auto value = ++i < args.size() ? args[i] : std::string_view{};
+                constexpr std::array<std::string_view, 4> modes{"off", "fxaa", "msaa2", "msaa4"};
+                const auto it = std::find(modes.begin(), modes.end(), value);
+                if (it == modes.end())
+                {
+                    error = "--aa requires off, fxaa, msaa2 or msaa4";
+                    return false;
+                }
+                options.antialiasing = int(it - modes.begin());
+            }
+            else if (arg == "--no-bloom")
+                options.bloom = false;
+            else if (arg == "--tonemap")
+            {
+                const auto value = ++i < args.size() ? args[i] : std::string_view{};
+                if (value != "off" && value != "neutral" && value != "filmic")
+                {
+                    error = "--tonemap requires off, neutral or filmic";
+                    return false;
+                }
+                options.tonemap = value == "off" ? 0 : value == "neutral" ? 1 : 2;
             }
             else if (arg == "--bench-sweep")
                 options.bench = options.bench_sweep = true;

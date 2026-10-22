@@ -106,8 +106,27 @@ float3 illumination(Input input, float shadow)
                ? modulation.y * min(baked * (1.0 - shadow) + dynamicLight, float3(1.0, 1.0, 1.0))
                : (modulation.w > 0.5 ? modelLight(input) : input.faceColor) * (1.0 - shadow) + dynamicLight;
 }
+#ifdef GLOW_TARGET
+// Bloom passes (enhanced renderer): the original shading emits no glow, so an opaque face
+// clears the glow of what it hides.
+struct Output
+{
+    float4 color : SV_Target0;
+    float4 glow : SV_Target1;
+};
+Output main(Input input)
+{
+    float shadow = shadowAmount(input.worldPosition);
+    Output output;
+    output.color =
+        float4(albedo.Sample(albedoSampler, input.texCoord).rgb * illumination(input, shadow) * sceneColor.rgb, 1.0);
+    output.glow = float4(0.0, 0.0, 0.0, 1.0);
+    return output;
+}
+#else
 float4 main(Input input) : SV_Target0
 {
     float shadow = shadowAmount(input.worldPosition);
     return float4(albedo.Sample(albedoSampler, input.texCoord).rgb * illumination(input, shadow) * sceneColor.rgb, 1.0);
 }
+#endif

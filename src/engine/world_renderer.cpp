@@ -69,11 +69,17 @@ namespace OpenBlood2
     }
     bool WorldPipelines::prepare(SDL_GPUTextureFormat format, std::string& error)
     {
-        return prepare(format, pipelines_[0] ? shading_ : SurfaceShading::Original, error);
+        return pipelines_[0] ? prepare(format, shading_, glow_, samples_, error)
+                             : prepare(format, SurfaceShading::Original, error);
     }
     bool WorldPipelines::prepare(SDL_GPUTextureFormat format, SurfaceShading shading, std::string& error)
     {
-        if (format_ == format && shading_ == shading && pipelines_[0])
+        return prepare(format, shading, false, SDL_GPU_SAMPLECOUNT_1, error);
+    }
+    bool WorldPipelines::prepare(SDL_GPUTextureFormat format, SurfaceShading shading, bool glow,
+                                 SDL_GPUSampleCount samples, std::string& error)
+    {
+        if (format_ == format && shading_ == shading && glow_ == glow && samples_ == samples && pipelines_[0])
             return true;
         release();
         const bool enhanced = shading != SurfaceShading::Original;
@@ -81,16 +87,20 @@ namespace OpenBlood2
         SDL_GPUShaderCreateInfo vertex_info{}, skinned_info{}, opaque_info{}, alpha_info{}, shadow_info{},
             surface_info{}, surface_alpha_info{};
         const auto formats = SDL_GetGPUShaderFormats(device_);
+        const auto surface_kind = glow ? (high ? WorldShader::PbrHighGlowFragment : WorldShader::PbrGlowFragment)
+                                       : (high ? WorldShader::PbrHighFragment : WorldShader::PbrFragment);
+        const auto surface_alpha_kind =
+            glow ? (high ? WorldShader::PbrHighAlphaGlowFragment : WorldShader::PbrAlphaGlowFragment)
+                 : (high ? WorldShader::PbrHighAlphaFragment : WorldShader::PbrAlphaFragment);
         if (!world_shader_info(WorldShader::Vertex, formats, vertex_info) ||
             !world_shader_info(WorldShader::SkinnedVertex, formats, skinned_info) ||
-            !world_shader_info(WorldShader::OpaqueFragment, formats, opaque_info) ||
-            !world_shader_info(WorldShader::AlphaFragment, formats, alpha_info) ||
+            !world_shader_info(glow ? WorldShader::OpaqueGlowFragment : WorldShader::OpaqueFragment, formats,
+                               opaque_info) ||
+            !world_shader_info(glow ? WorldShader::AlphaGlowFragment : WorldShader::AlphaFragment, formats,
+                               alpha_info) ||
             !world_shader_info(WorldShader::ShadowFragment, formats, shadow_info) ||
-            (enhanced &&
-             (!world_shader_info(high ? WorldShader::PbrHighFragment : WorldShader::PbrFragment, formats,
-                                 surface_info) ||
-              !world_shader_info(high ? WorldShader::PbrHighAlphaFragment : WorldShader::PbrAlphaFragment, formats,
-                                 surface_alpha_info))))
+            (enhanced && (!world_shader_info(surface_kind, formats, surface_info) ||
+                          !world_shader_info(surface_alpha_kind, formats, surface_alpha_info))))
         {
             error = "No bundled world shader for this GPU backend (SPIR-V or MSL required)";
             return false;
@@ -156,7 +166,8 @@ namespace OpenBlood2
             const bool skin = kind == WorldPipeline::SkinnedOpaque || kind == WorldPipeline::SkinnedAlpha ||
                               kind == WorldPipeline::SkinnedSurfaceOpaque ||
                               kind == WorldPipeline::SkinnedSurfaceAlpha || caster;
-            SDL_GPUColorTargetDescription target{};
+            SDL_GPUColorTargetDescription targets[2]{};
+            auto& target = targets[0];
             target.format = caster ? shadow_tile_format : format;
             if (blend)
             {
@@ -167,6 +178,13 @@ namespace OpenBlood2
                 target.blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
                 target.blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
                 target.blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
+            }
+            // Glow (premultiplied): translucent draws add theirs and attenuate the glow behind.
+            targets[1].format = scene_glow_format;
+            if (blend)
+            {
+                targets[1].blend_state = target.blend_state;
+                targets[1].blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
             }
             SDL_GPUGraphicsPipelineCreateInfo create{};
             create.vertex_shader = skin ? skinned : vertex;
@@ -180,12 +198,12 @@ namespace OpenBlood2
             create.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
             create.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
             create.rasterizer_state.enable_depth_clip = true;
-            create.multisample_state.sample_count = SDL_GPU_SAMPLECOUNT_1;
+            create.multisample_state.sample_count = caster ? SDL_GPU_SAMPLECOUNT_1 : samples;
             create.depth_stencil_state.enable_depth_test = !sky;
             create.depth_stencil_state.enable_depth_write = !blend && !sky;
             create.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
-            create.target_info.color_target_descriptions = &target;
-            create.target_info.num_color_targets = 1;
+            create.target_info.color_target_descriptions = targets;
+            create.target_info.num_color_targets = glow && !caster ? 2 : 1;
             create.target_info.has_depth_stencil_target = true;
             create.target_info.depth_stencil_format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
             pipelines_[i] = SDL_CreateGPUGraphicsPipeline(device_, &create);
@@ -205,6 +223,8 @@ namespace OpenBlood2
         }
         format_ = format;
         shading_ = shading;
+        glow_ = glow;
+        samples_ = samples;
         ++creations;
         return true;
     }

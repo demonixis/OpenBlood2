@@ -119,3 +119,12 @@ also use uniform buffers 2 and 3. `world.vert` gains vertex attribute and varyin
 face-plane normal). Eighteen artifacts are now regenerated together. Every original
 fragment artifact is byte-identical after regeneration. Only Metal execution on Apple M5
 was verified.
+
+[Post-processing](post_processing_contracts.md) adds eleven shaders: `-DGLOW_TARGET` variants
+of `world.frag`, `sprite.frag` and the four PBR fragments (a second output, MSL `[[color(1)]]`),
+and `post.vert` (`SV_VertexID`, no inputs), `bloom_down.frag`, `bloom_up.frag`,
+`composite.frag` and `fxaa.frag` (one or two sampled textures, one uniform buffer). The
+generator maps `<stem>_<vert|frag>` to `<stem>.<stage>.hlsl` unless a `<name>_source` variable
+names a shared source. Forty-four artifacts, including the four XR line artifacts, are now
+regenerated together; the 22 earlier ones are byte-identical. Only Metal execution on Apple M5
+was verified.

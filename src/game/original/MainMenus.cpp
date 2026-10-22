@@ -142,12 +142,15 @@ namespace OpenBlood2
                 break;
             case MenuPage::Display:
                 // Source CMenuDisplay offers renderer, resolution and DETAIL LEVEL; SDL owns the first
-                // two. The renderer, lighting and normal-map rows are replacement options without
-                // original strings.
+                // two. The renderer, lighting, normal-map and post-processing rows are replacement
+                // options without original strings.
                 setting(IDS_MENU_DISPLAY_DETAIL_LOW + unsigned(std::clamp(settings.detail, 0, 2)), 6);
                 items.push_back({0, -1, true, {}, 8, {}});
                 items.push_back({0, -1, true, {}, 7, {}});
                 items.push_back({0, -1, true, {}, 9, {}});
+                items.push_back({0, -1, true, {}, 19, {}});
+                items.push_back({0, -1, true, {}, 18, {}});
+                items.push_back({0, -1, true, {}, 17, {}});
                 break;
             case MenuPage::Vr:
                 // Replacement rows, labelled like the Display page's replacement rows.
@@ -568,6 +571,15 @@ namespace OpenBlood2
                 break;
             case 9:
                 settings.normal_maps = !settings.normal_maps;
+                break;
+            case 17:
+                settings.antialiasing = (std::clamp(settings.antialiasing, 0, 3) + (direction < 0 ? 3 : 1)) % 4;
+                break;
+            case 18:
+                settings.bloom = !settings.bloom;
+                break;
+            case 19:
+                settings.tonemap = (std::clamp(settings.tonemap, 0, 2) + (direction < 0 ? 2 : 1)) % 3;
                 break;
             case 10:
             {

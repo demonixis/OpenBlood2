@@ -1,6 +1,7 @@
 #include "game/menu.h"
 #include "game/original/MenuIds.h"
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <cmath>
 
@@ -265,6 +266,20 @@ namespace OpenBlood2
                 label = item.literal = display.renderer ? "RENDERER [ENHANCED]" : "RENDERER [ORIGINAL]";
             else if (item.setting == 9)
                 label = item.literal = display.normal_maps ? "NORMAL MAPS [GENERATED]" : "NORMAL MAPS [OFF]";
+            else if (item.setting == 17)
+            {
+                static constexpr std::array<const char*, 4> modes{"ANTI-ALIASING [OFF]", "ANTI-ALIASING [FXAA]",
+                                                                  "ANTI-ALIASING [MSAA 2X]", "ANTI-ALIASING [MSAA 4X]"};
+                label = item.literal = modes[std::size_t(std::clamp(display.antialiasing, 0, 3))];
+            }
+            else if (item.setting == 18)
+                label = item.literal = display.bloom ? "BLOOM [ON]" : "BLOOM [OFF]";
+            else if (item.setting == 19)
+            {
+                static constexpr std::array<const char*, 3> modes{"TONEMAP [OFF]", "TONEMAP [NEUTRAL]",
+                                                                  "TONEMAP [FILMIC]"};
+                label = item.literal = modes[std::size_t(std::clamp(display.tonemap, 0, 2))];
+            }
             else if (item.setting == 10)
                 label = item.literal = display.vr_turn ? "TURN [SNAP " + std::to_string(display.vr_turn) + "]"
                                                        : std::string("TURN [SMOOTH]");

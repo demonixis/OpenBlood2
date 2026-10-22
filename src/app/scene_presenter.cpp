@@ -6,7 +6,8 @@
 namespace OpenBlood2
 {
     ScenePresenter::ScenePresenter(SDL_GPUDevice* device)
-        : registry(device), pipelines(device), world_renderer(DrawStyle::Opaque, pipelines, registry),
+        : registry(device), post_process(registry), pipelines(device),
+          world_renderer(DrawStyle::Opaque, pipelines, registry),
           model_renderer(DrawStyle::Opaque, pipelines, registry),
           explosion_model_renderer(DrawStyle::SpriteAlpha, pipelines, registry),
           hand_renderer(DrawStyle::Opaque, pipelines, registry),
@@ -404,7 +405,8 @@ namespace OpenBlood2
         return true;
     }
     bool ScenePresenter::prepare_frame(SDL_GPUCommandBuffer* commands, SDL_GPUTextureFormat format, Uint32 width,
-                                       Uint32 height, Uint32 layers, std::string& error)
+                                       Uint32 height, Uint32 layers, bool glow, SDL_GPUSampleCount samples,
+                                       std::string& error)
     {
         auto fail = [&](const char* stage)
         {
@@ -416,7 +418,7 @@ namespace OpenBlood2
              {&world_renderer.stats, &model_renderer.stats, &explosion_model_renderer.stats, &polygrid_renderer.stats,
               &sprite_renderer.stats, &sky_sprite_renderer.stats, &hand_renderer.stats})
             renderer->draw_calls = renderer->culled = 0;
-        if (!pipelines.prepare(format, shading, error))
+        if (!pipelines.prepare(format, shading, glow, samples, error))
             return fail("World pipelines");
         // Renderers stage uploads in the shared registry; one copy pass in the frame's
         // command buffer records them all before the scene pass.
@@ -442,13 +444,15 @@ namespace OpenBlood2
         if (!record_shadow_tiles(commands, error))
             return fail("Model shadow tiles");
         stats.passes = shadow_casters.empty() ? 0 : 1;
-        if (!prepare_depth(width, height, layers, error))
+        if (!prepare_depth(width, height, layers, samples, error))
             return fail("World viewport");
         return true;
     }
-    bool ScenePresenter::prepare_depth(Uint32 width, Uint32 height, Uint32 layers, std::string& error)
+    bool ScenePresenter::prepare_depth(Uint32 width, Uint32 height, Uint32 layers, SDL_GPUSampleCount samples,
+                                       std::string& error)
     {
-        if (registry.get(depth_) && depth_width_ == width && depth_height_ == height && depth_layers_ == layers)
+        if (registry.get(depth_) && depth_width_ == width && depth_height_ == height && depth_layers_ == layers &&
+            depth_samples_ == samples)
             return true;
         SDL_GPUTextureCreateInfo info{};
         info.type = layers > 1 ? SDL_GPU_TEXTURETYPE_2D_ARRAY : SDL_GPU_TEXTURETYPE_2D;
@@ -458,6 +462,7 @@ namespace OpenBlood2
         info.height = height;
         info.layer_count_or_depth = layers;
         info.num_levels = 1;
+        info.sample_count = samples;
         const auto next = registry.create_texture(info, error);
         if (!next)
             return false;
@@ -466,11 +471,12 @@ namespace OpenBlood2
         depth_width_ = width;
         depth_height_ = height;
         depth_layers_ = layers;
+        depth_samples_ = samples;
         return true;
     }
-    bool ScenePresenter::record_view(GameSession& game, SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target,
-                                     Uint32 layer, DVector eye, DRotation rotation, bool letterbox,
-                                     const EyeProjection* projection, std::string& error)
+    bool ScenePresenter::record_view(GameSession& game, SDL_GPUCommandBuffer* commands, const SceneTarget& target,
+                                     DVector eye, DRotation rotation, bool letterbox, const EyeProjection* projection,
+                                     std::string& error)
     {
         auto fail = [&](const char* stage)
         {
@@ -479,12 +485,19 @@ namespace OpenBlood2
         };
         const auto flashlight = game.client_shell.flashlight.Current(game.server);
         const auto time = game.server.world_time();
-        SDL_GPUColorTargetInfo color{};
-        color.texture = target;
-        color.layer_or_depth_plane = layer;
-        color.clear_color = {.025f, .035f, .05f, 1};
-        color.load_op = SDL_GPU_LOADOP_CLEAR;
-        color.store_op = SDL_GPU_STOREOP_STORE;
+        const auto layer = target.layer;
+        // Colour, then the glow target of bloom passes; multisampled targets resolve at the end.
+        SDL_GPUColorTargetInfo colors[2]{};
+        for (int i = 0; i < 2; ++i)
+        {
+            auto& color = colors[i];
+            color.texture = i ? target.glow : target.color;
+            color.resolve_texture = i ? target.glow_resolve : target.resolve;
+            color.layer_or_depth_plane = layer;
+            color.clear_color = i ? SDL_FColor{0, 0, 0, 0} : SDL_FColor{.025f, .035f, .05f, 1};
+            color.load_op = SDL_GPU_LOADOP_CLEAR;
+            color.store_op = color.resolve_texture ? SDL_GPU_STOREOP_RESOLVE : SDL_GPU_STOREOP_STORE;
+        }
         SDL_GPUDepthStencilTargetInfo depth{};
         depth.texture = registry.get(depth_);
         depth.layer = static_cast<Uint8>(layer);
@@ -494,7 +507,7 @@ namespace OpenBlood2
         depth.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
         depth.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
         depth.cycle = layer == 0; // Later layers of the same frame keep the earlier layers' texture.
-        auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, &depth);
+        auto* pass = SDL_BeginGPURenderPass(commands, colors, target.glow ? 2 : 1, &depth);
         if (!pass)
         {
             error = SDL_GetError();
@@ -600,9 +613,22 @@ namespace OpenBlood2
         if (width && height > (letterbox ? 2 * (height / 6) : 0))
             shadow_aspect = float(width) / float(height - (letterbox ? 2 * (height / 6) : 0)); // Next update().
         const auto started = SDL_GetTicksNS();
-        if (!prepare_frame(commands, format, width, height, 1, error) ||
-            !record_view(game, commands, target, 0, view.position, view.rotation, letterbox, nullptr, error))
+        if (!post_process.begin(format, width, height, shading != SurfaceShading::Original, post, error))
+        {
+            error = "Post-processing: " + error;
             return false;
+        }
+        if (!prepare_frame(commands, post_process.scene_format(), width, height, 1, post_process.glow(),
+                           post_process.sample_count(), error) ||
+            !record_view(game, commands, post_process.scene_target(target), view.position, view.rotation, letterbox,
+                         nullptr, error))
+            return false;
+        if (!post_process.finish(commands, target, error))
+        {
+            error = "Post-processing: " + error;
+            return false;
+        }
+        stats.passes += post_process.stats.passes;
         finish_frame(started);
         return true;
     }
@@ -618,12 +644,17 @@ namespace OpenBlood2
         }
         shadow_aspect = float(width) / float(height); // Next update().
         const auto started = SDL_GetTicksNS();
-        if (!prepare_frame(commands, format, width, height, Uint32(eyes.size()), error))
+        if (!prepare_frame(commands, format, width, height, Uint32(eyes.size()), false, SDL_GPU_SAMPLECOUNT_1, error))
             return false;
         for (std::size_t i = 0; i < eyes.size(); ++i)
-            if (!record_view(game, commands, target, Uint32(i), eyes[i].position, eyes[i].rotation, false,
-                             &eyes[i].projection, error))
+        {
+            SceneTarget eye_target;
+            eye_target.color = target;
+            eye_target.layer = Uint32(i);
+            if (!record_view(game, commands, eye_target, eyes[i].position, eyes[i].rotation, false, &eyes[i].projection,
+                             error))
                 return false;
+        }
         finish_frame(started);
         return true;
     }
@@ -651,7 +682,7 @@ namespace OpenBlood2
             return fail("Hand viewport");
         if (!registry.flush(commands, error))
             return fail("GPU uploads");
-        if (!prepare_depth(width, height, Uint32(eyes.size()), error))
+        if (!prepare_depth(width, height, Uint32(eyes.size()), SDL_GPU_SAMPLECOUNT_1, error))
             return fail("Hand viewport");
         for (std::size_t i = 0; i < eyes.size(); ++i)
         {
@@ -680,7 +711,7 @@ namespace OpenBlood2
     {
         error.clear();
         if (eyes.empty() || eyes.size() > 2 || !width || !height || !registry.get(depth_) || depth_width_ != width ||
-            depth_height_ != height || depth_layers_ != eyes.size())
+            depth_height_ != height || depth_layers_ != eyes.size() || depth_samples_ != SDL_GPU_SAMPLECOUNT_1)
         {
             error = "Overlay viewport: invalid XR eye views or unprepared frame";
             return false;
