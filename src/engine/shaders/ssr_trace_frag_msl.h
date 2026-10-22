@@ -14,6 +14,7 @@ struct type_Ssr
     float4 viewport;
     float4 size;
     float4 settings;
+    float4 extra;
 };
 
 struct main0_out
@@ -26,77 +27,77 @@ struct main0_in
     float2 in_var_TEXCOORD0 [[user(locn0)]];
 };
 
-fragment main0_out main0(main0_in in [[stage_in]], constant type_Ssr& Ssr [[buffer(0)]], texture2d<float> viewDepth [[texture(0)]], texture2d<float> specular [[texture(1)]], texture2d<float> scene [[texture(2)]], sampler depthSampler [[sampler(0)]], sampler specularSampler [[sampler(1)]], sampler sceneSampler [[sampler(2)]], float4 gl_FragCoord [[position]])
+fragment main0_out main0(main0_in in [[stage_in]], constant type_Ssr& Ssr [[buffer(0)]], texture2d<float> depthPyramid [[texture(0)]], texture2d<float> specular [[texture(1)]], texture2d<float> scene [[texture(2)]], sampler depthSampler [[sampler(0)]], sampler specularSampler [[sampler(1)]], sampler sceneSampler [[sampler(2)]], float4 gl_FragCoord [[position]])
 {
     main0_out out = {};
-    float4 _487;
+    float4 _497;
     do
     {
-        float4 _75 = viewDepth.sample(depthSampler, in.in_var_TEXCOORD0, level(0.0));
-        float _76 = _75.x;
-        float2 _81 = (floor(gl_FragCoord.xy) * 2.0) + float2(0.5);
-        float4 _87 = specular.sample(specularSampler, (_81 * Ssr.size.zw), level(0.0));
-        bool _96;
-        if ((isunordered(_76, 100000000.0) || _76 < 100000000.0))
+        float4 _73 = depthPyramid.sample(depthSampler, in.in_var_TEXCOORD0, level(0.0));
+        float _74 = _73.x;
+        float2 _79 = (floor(gl_FragCoord.xy) * 2.0) + float2(0.5);
+        float4 _85 = specular.sample(specularSampler, (_79 * Ssr.extra.xy), level(0.0));
+        bool _94;
+        if ((isunordered(_74, 100000000.0) || _74 < 100000000.0))
         {
-            _96 = dot(_87.xyz, float3(1.0)) <= 0.0;
+            _94 = dot(_85.xyz, float3(1.0)) <= 0.0;
         }
         else
         {
-            _96 = true;
+            _94 = true;
         }
-        bool _102;
-        if (!_96)
+        bool _100;
+        if (!_94)
         {
-            _102 = _87.w >= Ssr.settings.w;
+            _100 = _85.w >= Ssr.settings.w;
         }
         else
         {
-            _102 = true;
+            _100 = true;
         }
-        if (_102)
+        if (_100)
         {
-            _487 = float4(0.0);
+            _497 = float4(0.0);
             break;
         }
-        float _123 = ((((_81.x - Ssr.viewport.x) / Ssr.viewport.z) * 2.0) - 1.0) * _76;
-        float _127 = (1.0 - (((_81.y - Ssr.viewport.y) / Ssr.viewport.w) * 2.0)) * _76;
-        float3 _131 = float3(_123 / Ssr.projection.x, _127 / Ssr.projection.y, _76);
-        float2 _132 = gl_FragCoord.xy - float2(1.0, 0.0);
-        float4 _138 = viewDepth.sample(depthSampler, (_132 * Ssr.size.xy), level(0.0));
+        float _121 = ((((_79.x - Ssr.viewport.x) / Ssr.viewport.z) * 2.0) - 1.0) * _74;
+        float _125 = (1.0 - (((_79.y - Ssr.viewport.y) / Ssr.viewport.w) * 2.0)) * _74;
+        float3 _129 = float3(_121 / Ssr.projection.x, _125 / Ssr.projection.y, _74);
+        float2 _130 = gl_FragCoord.xy - float2(1.0, 0.0);
+        float4 _138 = depthPyramid.sample(depthSampler, (_130 * Ssr.size.xy), level(0.0));
         float _139 = _138.x;
-        float2 _142 = (floor(_132) * 2.0) + float2(0.5);
+        float2 _142 = (floor(_130) * 2.0) + float2(0.5);
         float2 _158 = gl_FragCoord.xy + float2(1.0, 0.0);
-        float4 _163 = viewDepth.sample(depthSampler, (_158 * Ssr.size.xy), level(0.0));
+        float4 _163 = depthPyramid.sample(depthSampler, (_158 * Ssr.size.xy), level(0.0));
         float _164 = _163.x;
         float2 _167 = (floor(_158) * 2.0) + float2(0.5);
         float2 _183 = gl_FragCoord.xy - float2(0.0, 1.0);
-        float4 _188 = viewDepth.sample(depthSampler, (_183 * Ssr.size.xy), level(0.0));
+        float4 _188 = depthPyramid.sample(depthSampler, (_183 * Ssr.size.xy), level(0.0));
         float _189 = _188.x;
         float2 _192 = (floor(_183) * 2.0) + float2(0.5);
         float2 _208 = gl_FragCoord.xy + float2(0.0, 1.0);
-        float4 _213 = viewDepth.sample(depthSampler, (_208 * Ssr.size.xy), level(0.0));
+        float4 _213 = depthPyramid.sample(depthSampler, (_208 * Ssr.size.xy), level(0.0));
         float _214 = _213.x;
         float2 _217 = (floor(_208) * 2.0) + float2(0.5);
         float3 _243;
-        if (abs(_164 - _76) < abs(_76 - _139))
+        if (abs(_164 - _74) < abs(_74 - _139))
         {
-            _243 = float3((((((_167.x - Ssr.viewport.x) / Ssr.viewport.z) * 2.0) - 1.0) * _164) / Ssr.projection.x, ((1.0 - (((_167.y - Ssr.viewport.y) / Ssr.viewport.w) * 2.0)) * _164) / Ssr.projection.y, _164) - _131;
+            _243 = float3((((((_167.x - Ssr.viewport.x) / Ssr.viewport.z) * 2.0) - 1.0) * _164) / Ssr.projection.x, ((1.0 - (((_167.y - Ssr.viewport.y) / Ssr.viewport.w) * 2.0)) * _164) / Ssr.projection.y, _164) - _129;
         }
         else
         {
-            _243 = _131 - float3((((((_142.x - Ssr.viewport.x) / Ssr.viewport.z) * 2.0) - 1.0) * _139) / Ssr.projection.x, ((1.0 - (((_142.y - Ssr.viewport.y) / Ssr.viewport.w) * 2.0)) * _139) / Ssr.projection.y, _139);
+            _243 = _129 - float3((((((_142.x - Ssr.viewport.x) / Ssr.viewport.z) * 2.0) - 1.0) * _139) / Ssr.projection.x, ((1.0 - (((_142.y - Ssr.viewport.y) / Ssr.viewport.w) * 2.0)) * _139) / Ssr.projection.y, _139);
         }
         float3 _254;
-        if (abs(_214 - _76) < abs(_76 - _189))
+        if (abs(_214 - _74) < abs(_74 - _189))
         {
-            _254 = float3((((((_217.x - Ssr.viewport.x) / Ssr.viewport.z) * 2.0) - 1.0) * _214) / Ssr.projection.x, ((1.0 - (((_217.y - Ssr.viewport.y) / Ssr.viewport.w) * 2.0)) * _214) / Ssr.projection.y, _214) - _131;
+            _254 = float3((((((_217.x - Ssr.viewport.x) / Ssr.viewport.z) * 2.0) - 1.0) * _214) / Ssr.projection.x, ((1.0 - (((_217.y - Ssr.viewport.y) / Ssr.viewport.w) * 2.0)) * _214) / Ssr.projection.y, _214) - _129;
         }
         else
         {
-            _254 = _131 - float3((((((_192.x - Ssr.viewport.x) / Ssr.viewport.z) * 2.0) - 1.0) * _189) / Ssr.projection.x, ((1.0 - (((_192.y - Ssr.viewport.y) / Ssr.viewport.w) * 2.0)) * _189) / Ssr.projection.y, _189);
+            _254 = _129 - float3((((((_192.x - Ssr.viewport.x) / Ssr.viewport.z) * 2.0) - 1.0) * _189) / Ssr.projection.x, ((1.0 - (((_192.y - Ssr.viewport.y) / Ssr.viewport.w) * 2.0)) * _189) / Ssr.projection.y, _189);
         }
-        float3 _256 = fast::normalize(-_131);
+        float3 _256 = fast::normalize(-_129);
         float3 _257 = cross(_243, _254);
         float3 _261 = _257 * rsqrt(precise::max(dot(_257, _257), 9.9999996826552253889678874634872e-21));
         float3 _267;
@@ -113,28 +114,29 @@ fragment main0_out main0(main0_in in [[stage_in]], constant type_Ssr& Ssr [[buff
         float _273 = fast::clamp(1.0 + (_270 * 2.5), 0.0, 1.0);
         if (_273 <= 0.0)
         {
-            _487 = float4(0.0);
+            _497 = float4(0.0);
             break;
         }
         float _286;
         if (_270 < 0.0)
         {
-            _286 = precise::min(Ssr.settings.x, (_76 - 2.0) / (-_270));
+            _286 = precise::min(Ssr.settings.x, (_74 - 2.0) / (-_270));
         }
         else
         {
             _286 = Ssr.settings.x;
         }
-        float3 _288 = _131 + (_269 * _286);
-        float2 _291 = float2(_123, _127) / float2(_76);
+        float3 _288 = _129 + (_269 * _286);
+        float2 _291 = float2(_121, _125) / float2(_74);
         float2 _303 = float2(Ssr.viewport.x + (((_291.x + 1.0) * 0.5) * Ssr.viewport.z), Ssr.viewport.y + (((1.0 - _291.y) * 0.5) * Ssr.viewport.w)) * 0.5;
         float _309 = _288.z;
         float2 _311 = float2(_288.x * Ssr.projection.x, _288.y * Ssr.projection.y) / float2(_309);
         float2 _324 = (float2(Ssr.viewport.x + (((_311.x + 1.0) * 0.5) * Ssr.viewport.z), Ssr.viewport.y + (((1.0 - _311.y) * 0.5) * Ssr.viewport.w)) * 0.5) - _303;
         float2 _328 = Ssr.viewport.xy * 0.5;
         float2 _331 = (Ssr.viewport.xy + Ssr.viewport.zw) * 0.5;
+        bool _334 = abs(_324.x) > 9.9999999747524270787835121154785e-07;
         float _348;
-        if (abs(_324.x) > 9.9999999747524270787835121154785e-07)
+        if (_334)
         {
             float _343;
             if (_324.x > 0.0)
@@ -151,8 +153,9 @@ fragment main0_out main0(main0_in in [[stage_in]], constant type_Ssr& Ssr [[buff
         {
             _348 = 1.0;
         }
+        bool _351 = abs(_324.y) > 9.9999999747524270787835121154785e-07;
         float _365;
-        if (abs(_324.y) > 9.9999999747524270787835121154785e-07)
+        if (_351)
         {
             float _360;
             if (_324.y > 0.0)
@@ -169,11 +172,11 @@ fragment main0_out main0(main0_in in [[stage_in]], constant type_Ssr& Ssr [[buff
         {
             _365 = _348;
         }
-        float _367 = length(_324) * _365;
+        float _366 = length(_324);
         bool _372;
         if ((isunordered(_365, 0.0) || _365 > 0.0))
         {
-            _372 = _367 < 2.0;
+            _372 = (_366 * _365) < 2.0;
         }
         else
         {
@@ -181,86 +184,92 @@ fragment main0_out main0(main0_in in [[stage_in]], constant type_Ssr& Ssr [[buff
         }
         if (_372)
         {
-            _487 = float4(0.0);
+            _497 = float4(0.0);
             break;
         }
-        float _375 = 1.0 / _76;
+        float _375 = 1.0 / _74;
         float _376 = 1.0 / _309;
-        uint _379 = uint(Ssr.settings.y);
-        float _383 = fract(52.98291778564453125 * fract(dot(gl_FragCoord.xy, float2(0.067110560834407806396484375, 0.005837149918079376220703125))));
-        float _384 = 1.5 / _367;
-        float _385 = _384 * _365;
-        float _391;
-        float _449;
-        uint _387 = 0u;
-        float _390 = _385;
+        float _381 = Ssr.extra.z - 1.0;
+        float2 _384 = float2(_334 ? _324.x : 9.9999999747524270787835121154785e-07, _351 ? _324.y : 9.9999999747524270787835121154785e-07);
+        float _385 = 0.00999999977648258209228515625 / _366;
+        float _386 = 1.5 / _366;
+        uint _389 = uint(Ssr.settings.y);
+        float _392;
+        float _395;
+        float _459;
+        float _391 = 0.0;
+        float _394 = _386;
+        uint _396 = 0u;
         for (;;)
         {
-            if (_387 < _379)
+            bool _404;
+            if (_396 < _389)
             {
-                _391 = precise::max((float(_387) + _383) / float(_379), _384) * _365;
-                float _400 = mix(_375, _376, _391);
-                float4 _408 = viewDepth.sample(depthSampler, ((_303 + (_324 * _391)) * Ssr.size.xy), level(0.0));
-                float _409 = _408.x;
-                float _410 = (1.0 / _400) - _409;
-                bool _415;
-                if (_409 < 100000000.0)
+                _404 = _394 < _365;
+            }
+            else
+            {
+                _404 = false;
+            }
+            if (_404)
+            {
+                float _406 = exp2(_391);
+                float2 _409 = float2(_406);
+                float2 _411 = floor((_303 + (_324 * _394)) / _409);
+                float2 _416 = (((_411 + step(float2(0.0), _384)) * _406) - _303) / _384;
+                float _421 = precise::min(precise::min(_416.x, _416.y), _365) + _385;
+                float _423 = 1.0 / mix(_375, _376, _394);
+                float _426 = 1.0 / mix(_375, _376, precise::min(_421, _365));
+                float4 _436 = depthPyramid.sample(depthSampler, ((_411 + float2(0.5)) / precise::max(floor(Ssr.size.zw / _409), float2(1.0))), level(_391));
+                float _437 = _436.x;
+                if (precise::max(_423, _426) < _437)
                 {
-                    _415 = _410 > 0.0;
+                    _392 = precise::min(_391 + 1.0, _381);
+                    _395 = _421;
                 }
                 else
                 {
-                    _415 = false;
-                }
-                bool _423;
-                if (_415)
-                {
-                    _423 = _410 < (Ssr.settings.z + (0.0199999995529651641845703125 / _400));
-                }
-                else
-                {
-                    _423 = false;
-                }
-                if (_423)
-                {
-                    float _430;
-                    _430 = _391;
-                    float _427 = _390;
-                    int _432 = 0;
-                    for (; _432 < 4; )
+                    bool _445 = _391 > 0.0;
+                    float _457;
+                    if (_445)
                     {
-                        float _437 = 0.5 * (_427 + _430);
-                        bool _448 = (1.0 / mix(_375, _376, _437)) > viewDepth.sample(depthSampler, ((_303 + (_324 * _437)) * Ssr.size.xy), level(0.0)).x;
-                        _427 = _448 ? _427 : _437;
-                        _430 = _448 ? _437 : _430;
-                        _432++;
-                        continue;
+                        _457 = _391 - 1.0;
                     }
-                    _449 = _430;
-                    break;
+                    else
+                    {
+                        if (precise::min(_423, _426) < ((_437 + Ssr.settings.z) + (0.0199999995529651641845703125 * _437)))
+                        {
+                            _459 = _394;
+                            break;
+                        }
+                        _457 = _391;
+                    }
+                    _392 = _457;
+                    _395 = _445 ? _394 : _421;
                 }
-                _387++;
-                _390 = _391;
+                _391 = _392;
+                _394 = _395;
+                _396++;
                 continue;
             }
             else
             {
-                _449 = -1.0;
+                _459 = -1.0;
                 break;
             }
         }
-        if (_449 < 0.0)
+        if (_459 < 0.0)
         {
-            _487 = float4(0.0);
+            _497 = float4(0.0);
             break;
         }
-        float2 _454 = _303 + (_324 * _449);
-        float2 _459 = ((((_454 * 2.0) - Ssr.viewport.xy) / Ssr.viewport.zw) * 2.0) - float2(1.0);
-        float _475 = (((1.0 - smoothstep(0.800000011920928955078125, 1.0, precise::max(abs(_459.x), abs(_459.y)))) * (1.0 - smoothstep(0.60000002384185791015625, 1.0, _449))) * (1.0 - smoothstep(Ssr.settings.w * 0.60000002384185791015625, Ssr.settings.w, _87.w))) * _273;
-        _487 = float4(scene.sample(sceneSampler, (_454 * Ssr.size.xy), level(0.0)).xyz * _475, _475);
+        float2 _464 = _303 + (_324 * _459);
+        float2 _469 = ((((_464 * 2.0) - Ssr.viewport.xy) / Ssr.viewport.zw) * 2.0) - float2(1.0);
+        float _485 = (((1.0 - smoothstep(0.800000011920928955078125, 1.0, precise::max(abs(_469.x), abs(_469.y)))) * (1.0 - smoothstep(0.60000002384185791015625, 1.0, _459))) * (1.0 - smoothstep(Ssr.settings.w * 0.60000002384185791015625, Ssr.settings.w, _85.w))) * _273;
+        _497 = float4(scene.sample(sceneSampler, (_464 * Ssr.size.xy), level(0.0)).xyz * _485, _485);
         break;
     } while(false);
-    out.out_var_SV_Target0 = _487;
+    out.out_var_SV_Target0 = _497;
     return out;
 }
 

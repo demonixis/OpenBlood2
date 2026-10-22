@@ -96,16 +96,19 @@ baked light does not resolve. It is replacement shading, tuned to stay subtle.
   uncovered (alpha blend `ZERO, ONE_MINUS_SRC_ALPHA`). Water and smoke therefore do not inherit the
   occlusion of the floor behind them.
 - **Half size.** A first pass converts the depth copy to linear view depth at half size, taking the
-  top-left pixel of each 2×2 block, so no depths are mixed (reflections share this buffer). GTAO
-  runs on it:
+  top-left pixel of each 2×2 block, so no depths are mixed. It also builds the
+  [depth pyramid](#depth-pyramid-hi-z) shared with reflections. GTAO runs on it:
   - per texel, a set of screen-space slices rotated by interleaved gradient noise;
   - on each side of a slice, the highest horizon within 48 world units (linear falloff over the
     outer 60%), its step distances squared and jittered;
   - the cosine-weighted visibility integrated analytically around the normal projected into the
     slice, the normal rebuilt from the nearer depth neighbours;
+  - taps read the pyramid level `floor(log2(distance)) − 2` (XeGTAO's depth mips), so far taps
+    stay in cache;
   - the result raised to the power 1.5.
-  LOW uses 2 slices × 4 steps per side, HIGH 4 × 6. The screen radius is bounded to 96 half-size
-  pixels, so near walls keep the taps local.
+  LOW uses 2 slices × 4 steps per side, HIGH 4 × 6. The screen radius is bounded to 256 half-size
+  pixels (96 before the pyramid, which cut part of the occlusion of very near walls). The minimum
+  depth slightly overstates distant thin occluders; no halo was visible on the captures.
 - **Blur and upsample.** A separable 9-tap blur (Gaussian weights cut by a 4% relative depth
   difference) runs across and down at half size. The composite then upsamples bilaterally: the four
   nearest texels in bilinear weights, divided by their relative depth difference to the pixel.
@@ -115,6 +118,21 @@ baked light does not resolve. It is replacement shading, tuned to stay subtle.
 - **Limits.** Screen-space only: occluders off screen or behind the first surface are unknown,
   thin foreground objects darken the wall behind them within the radius, and with MSAA the resolved
   depth copy averages depths along silhouettes.
+
+## Depth pyramid (Hi-Z)
+
+Occlusion and reflections share one minimum-depth pyramid (R32F, at most 7 levels). Level 0 is
+the half-size linear depth. Each following level keeps the nearest depth of its 2×2 children, plus
+the extra row or column when the previous size is odd, so every texel covers its whole footprint.
+
+- **Mip sizes.** They are the texture's own (halved, rounded down), so cell `k` of level `i` covers
+  level-0 texels `[k·2^i, (k+1)·2^i)`.
+- **No self-sampling.** A pass never samples the texture it renders into: each level is rendered to
+  two targets at once, its mip of the pyramid and a separate texture that the next level reads. On
+  Vulkan, a sampled view covers every mip of the texture, and SDL_GPU has disabled its check for
+  this case (SDL issue 13871).
+- **Cost.** About 0.1 ms at 1080p on Apple M5: occlusion HIGH went from 2.86 to 2.97 ms with the
+  pyramid and the wider screen radius.
 
 ## Screen-space reflections
 
@@ -128,14 +146,19 @@ light actually reflected, where the screen can supply it. Nothing is added twice
   The original shaders and the fully bright, unlit, flat and `FLAG_NOLIGHT` paths write a zero
   weight. Translucent draws do not write them, and the occlusion mask keeps their share of the
   pixel unreflected.
-- **Trace (half size).** On the shared half-size view depth:
+- **Trace (half size, Hi-Z).** On the depth pyramid:
   - the view ray is reflected about the normal rebuilt from the nearer depth neighbours;
-  - it is clipped to 1024 world units, the near plane and the scene viewport, then marched in
-    screen space: 16 (LOW) or 32 (HIGH) jittered steps, depth interpolated perspective-correctly
-    (McGuire and Mara 2014);
-  - a step that passes behind the depth by less than 12 units plus 2% of its depth is a hit,
-    refined by four bisections;
+  - it is clipped to 1024 world units, the near plane and the scene viewport;
+  - it is traversed cell by cell (Uludag 2014), with depth interpolated perspective-correctly along
+    the segment (McGuire and Mara 2014). A cell is skipped and the next one tested a level coarser
+    when the farthest point of the ray segment crossing it stays in front of its nearest depth;
+    otherwise the trace descends one level;
+  - at level 0, a segment that reaches the surface within 12 units plus 2% of its depth is a hit;
+    a segment entirely behind a thicker surface continues texel by texel;
+  - LOW allows 24 iterations, HIGH 48, enough to cross the screen;
   - the scene colour (display space, HDR) is read bilinearly at the hit.
+  The first version marched 16/32 linear steps with bisection: a long ray (floor to back wall)
+  advanced 10 to 15 texels per step and could miss thin objects.
   Only pixels with a weight and roughness below 0.5 trace. The confidence fades with roughness
   (from 0.3), at the screen edges, over the last 40% of the ray, and for rays turning back to the
   camera. The output is the light premultiplied by the confidence.
@@ -153,6 +176,8 @@ light actually reflected, where the screen can supply it. Nothing is added twice
   the gate bars.
 - **Limits.** Screen-space only: anything off screen, behind the first surface or in the view
   model slice is not reflected, and the ray uses the geometric normal (no normal-map detail).
+  Continuing texel by texel behind a thick surface spends iterations, so a ray passing behind a
+  large occluder may end before its true hit.
 
 ## Tonemaps
 
@@ -192,15 +217,17 @@ NEUTRAL was chosen as the default because it leaves the original look in place.
 
 ## Shaders
 
-Twenty-two shaders are added:
+Twenty-three shaders are added:
 
 - `world_aux_frag`, `sprite_aux_frag` and the four `pbr_*_aux_frag` variants (`-DAUX_TARGETS`,
   outputs 1 and 2), and their `*_aux_ssr_frag` versions (`-DREFLECTION_TARGETS` too, outputs 3
   and 4);
 - `post.vert` (a buffer-free triangle), `bloom_down.frag`, `bloom_up.frag`, `composite.frag`,
-  `fxaa.frag`, `ao_depth.frag`, `gtao.frag`, `ao_blur.frag`, `ssr_trace.frag` and `ssr_blur.frag`.
+  `fxaa.frag`, `ao_depth.frag` (two outputs: the half-size depth and pyramid level 0),
+  `hiz_down.frag` (two outputs: a level and its pyramid mip), `gtao.frag`, `ao_blur.frag`,
+  `ssr_trace.frag` and `ssr_blur.frag`.
 
-All 66 artifacts are regenerated together; the 22 earlier ones are byte-identical after
+All 68 artifacts are regenerated together; the 22 earlier ones are byte-identical after
 regeneration.
 
 ## Cost
@@ -215,19 +242,19 @@ Headless bench, 1920×1080, Apple M5 Metal, CityHub start, mean GPU completion w
 | Enhanced STANDARD, every effect off (direct) | 1.30 ms | 0 |
 | STANDARD, NEUTRAL only | 1.43 ms | 1 |
 | STANDARD, NEUTRAL and bloom | 1.94 ms | 12 (6 down, 5 up, composite) |
-| STANDARD, NEUTRAL, bloom and occlusion LOW | 2.47 ms | 16 (+ depth, GTAO, two blurs) |
-| STANDARD, NEUTRAL, bloom and occlusion HIGH | 2.86 ms | 16 |
-| STANDARD, defaults (+ reflections HIGH) | 3.38 ms | 19 (+ trace, two blurs) |
-| STANDARD, defaults with MSAA 4X | 3.51 ms | 19 |
-| STANDARD, defaults with FXAA | 3.76 ms | 20 |
-| HIGH, normal maps, FILMIC, every effect, MSAA 4X | 4.02 ms | 19 |
+| STANDARD, NEUTRAL, bloom and occlusion HIGH | 2.97 ms | 22 (+ depth, 6 pyramid levels, GTAO, two blurs) |
+| STANDARD, defaults (+ reflections HIGH) | 3.40 ms | 25 (+ trace, two blurs) |
+| STANDARD, defaults with MSAA 4X | 3.53 ms | 25 |
+| STANDARD, defaults with FXAA | 3.77 ms | 26 |
+| HIGH, normal maps, FILMIC, every effect, MSAA 4X | 4.10 ms | 25 |
 
 MSAA is cheap on the tile-based Apple GPU; desktop GPUs will pay more for the multisampled
 RGBA16F targets. The auxiliary targets cost bandwidth whenever bloom, occlusion or reflections are
 on. A first full-size GTAO cost about 4.4 ms (HIGH); half size, the half-size blur and the
-gathered upsample brought it below 1 ms. Reflections cost about 0.45 ms at either quality on
-CityHub and the office: most pixels are rough and stop before marching, so the two extra scene
-targets dominate.
+gathered upsample brought it to about 1 ms. Hi-Z reflections cost 0.41 ms on CityHub and
+about 0.6 ms in the office. Most pixels are rough and stop before tracing, so the two extra scene
+targets dominate. With every material glossy (the office, nearly every pixel tracing) they cost
+0.71 ms (LOW) and 0.85 ms (HIGH).
 
 ## Verification
 
@@ -245,6 +272,7 @@ targets dominate.
     mean below 8 levels;
   - reflections change the built-in frame by a mean below 2 levels, and more than 1% of the pixels
     once every material is glossy;
+  - occlusion and reflections build the full 7-level pyramid, with the matching passes and targets;
   - every effect together, with MSAA or FXAA, runs with the expected targets and passes;
   - the plain settings restore the direct frame and release every target.
 - `gpu.surface` measures the enhanced shading with post-processing off.

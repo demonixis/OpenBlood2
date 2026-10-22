@@ -3,6 +3,7 @@
 #include <array>
 #include <cstring>
 #include <iostream>
+#include <string>
 #include <string_view>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
@@ -83,31 +84,32 @@ int main()
     {
         WorldShader shader;
         unsigned samplers, uniforms, storage_buffers;
-        bool aux;
+        unsigned outputs; // Fragment colour outputs.
     };
     for (auto formats : {SDL_GPU_SHADERFORMAT_SPIRV, SDL_GPU_SHADERFORMAT_MSL})
-        for (const auto& expected : {Expected{WorldShader::OpaqueAuxFragment, 3, 2, 0, true},
-                                     Expected{WorldShader::AlphaAuxFragment, 3, 2, 0, true},
-                                     Expected{WorldShader::PbrAuxFragment, 4, 4, 2, true},
-                                     Expected{WorldShader::PbrHighAuxFragment, 4, 4, 2, true},
-                                     Expected{WorldShader::PbrAlphaAuxFragment, 4, 4, 2, true},
-                                     Expected{WorldShader::PbrHighAlphaAuxFragment, 4, 4, 2, true},
-                                     Expected{WorldShader::PostVertex, 0, 0, 0, false},
-                                     Expected{WorldShader::BloomDownFragment, 1, 1, 0, false},
-                                     Expected{WorldShader::BloomUpFragment, 1, 1, 0, false},
-                                     Expected{WorldShader::CompositeFragment, 9, 1, 0, false},
-                                     Expected{WorldShader::FxaaFragment, 1, 1, 0, false},
-                                     Expected{WorldShader::AoDepthFragment, 1, 1, 0, false},
-                                     Expected{WorldShader::GtaoFragment, 1, 1, 0, false},
-                                     Expected{WorldShader::AoBlurFragment, 2, 1, 0, false},
-                                     Expected{WorldShader::SsrTraceFragment, 3, 1, 0, false},
-                                     Expected{WorldShader::SsrBlurFragment, 3, 1, 0, false},
-                                     Expected{WorldShader::OpaqueAuxSsrFragment, 3, 2, 0, true},
-                                     Expected{WorldShader::AlphaAuxSsrFragment, 3, 2, 0, true},
-                                     Expected{WorldShader::PbrAuxSsrFragment, 4, 4, 2, true},
-                                     Expected{WorldShader::PbrHighAuxSsrFragment, 4, 4, 2, true},
-                                     Expected{WorldShader::PbrAlphaAuxSsrFragment, 4, 4, 2, true},
-                                     Expected{WorldShader::PbrHighAlphaAuxSsrFragment, 4, 4, 2, true}})
+        for (const auto& expected : {Expected{WorldShader::OpaqueAuxFragment, 3, 2, 0, 3},
+                                     Expected{WorldShader::AlphaAuxFragment, 3, 2, 0, 3},
+                                     Expected{WorldShader::PbrAuxFragment, 4, 4, 2, 3},
+                                     Expected{WorldShader::PbrHighAuxFragment, 4, 4, 2, 3},
+                                     Expected{WorldShader::PbrAlphaAuxFragment, 4, 4, 2, 3},
+                                     Expected{WorldShader::PbrHighAlphaAuxFragment, 4, 4, 2, 3},
+                                     Expected{WorldShader::PostVertex, 0, 0, 0, 0},
+                                     Expected{WorldShader::BloomDownFragment, 1, 1, 0, 1},
+                                     Expected{WorldShader::BloomUpFragment, 1, 1, 0, 1},
+                                     Expected{WorldShader::CompositeFragment, 9, 1, 0, 1},
+                                     Expected{WorldShader::FxaaFragment, 1, 1, 0, 1},
+                                     Expected{WorldShader::AoDepthFragment, 1, 1, 0, 2},
+                                     Expected{WorldShader::GtaoFragment, 1, 1, 0, 1},
+                                     Expected{WorldShader::AoBlurFragment, 2, 1, 0, 1},
+                                     Expected{WorldShader::SsrTraceFragment, 3, 1, 0, 1},
+                                     Expected{WorldShader::SsrBlurFragment, 3, 1, 0, 1},
+                                     Expected{WorldShader::HizDownFragment, 1, 1, 0, 2},
+                                     Expected{WorldShader::OpaqueAuxSsrFragment, 3, 2, 0, 5},
+                                     Expected{WorldShader::AlphaAuxSsrFragment, 3, 2, 0, 5},
+                                     Expected{WorldShader::PbrAuxSsrFragment, 4, 4, 2, 5},
+                                     Expected{WorldShader::PbrHighAuxSsrFragment, 4, 4, 2, 5},
+                                     Expected{WorldShader::PbrAlphaAuxSsrFragment, 4, 4, 2, 5},
+                                     Expected{WorldShader::PbrHighAlphaAuxSsrFragment, 4, 4, 2, 5}})
         {
             const bool vertex = expected.shader == WorldShader::PostVertex;
             CHECK(world_shader_info(expected.shader, formats, info));
@@ -119,11 +121,9 @@ int main()
             {
                 const std::string_view source(reinterpret_cast<const char*>(info.code), info.code_size);
                 CHECK(source.find(vertex ? "vertex main0_out main0(" : "fragment main0_out main0(") != source.npos);
-                const bool reflection = expected.shader >= WorldShader::OpaqueAuxSsrFragment &&
-                                        expected.shader <= WorldShader::PbrHighAlphaAuxSsrFragment;
-                CHECK((source.find("[[color(1)]]") != source.npos) == expected.aux &&
-                      (source.find("[[color(2)]]") != source.npos) == expected.aux &&
-                      (source.find("[[color(4)]]") != source.npos) == reflection);
+                const auto output = [&](unsigned i)
+                { return source.find("[[color(" + std::to_string(i) + ")]]") != source.npos; };
+                CHECK(vertex || (output(expected.outputs - 1) && !output(expected.outputs)));
                 if (vertex)
                     CHECK(source.find("[[vertex_id]]") != source.npos);
             }

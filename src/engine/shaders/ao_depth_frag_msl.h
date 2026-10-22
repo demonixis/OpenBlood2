@@ -17,32 +17,35 @@ struct type_Depth
 struct main0_out
 {
     float4 out_var_SV_Target0 [[color(0)]];
+    float4 out_var_SV_Target1 [[color(1)]];
 };
 
 fragment main0_out main0(constant type_Depth& Depth [[buffer(0)]], texture2d<float> depthCopy [[texture(0)]], sampler depthSampler [[sampler(0)]], float4 gl_FragCoord [[position]])
 {
     main0_out out = {};
-    float4 _50 = depthCopy.sample(depthSampler, (((floor(gl_FragCoord.xy) * 2.0) + float2(0.5)) * Depth.depthRange.xy), level(0.0));
-    float _51 = _50.x;
-    bool _58;
-    if ((isunordered(_51, Depth.depthRange.z) || _51 >= Depth.depthRange.z))
+    float4 _51 = depthCopy.sample(depthSampler, (((floor(gl_FragCoord.xy) * 2.0) + float2(0.5)) * Depth.depthRange.xy), level(0.0));
+    float _52 = _51.x;
+    bool _59;
+    if ((isunordered(_52, Depth.depthRange.z) || _52 >= Depth.depthRange.z))
     {
-        _58 = _51 >= 1.0;
+        _59 = _52 >= 1.0;
     }
     else
     {
-        _58 = true;
+        _59 = true;
     }
-    float _72;
-    if (_58)
+    float _73;
+    if (_59)
     {
-        _72 = 1000000000.0;
+        _73 = 1000000000.0;
     }
     else
     {
-        _72 = Depth.projection.w / (((_51 - Depth.depthRange.z) * Depth.depthRange.w) - Depth.projection.z);
+        _73 = Depth.projection.w / (((_52 - Depth.depthRange.z) * Depth.depthRange.w) - Depth.projection.z);
     }
-    out.out_var_SV_Target0 = float4(_72);
+    float4 _74 = float4(_73);
+    out.out_var_SV_Target0 = _74;
+    out.out_var_SV_Target1 = _74;
     return out;
 }
 

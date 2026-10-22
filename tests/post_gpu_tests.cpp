@@ -219,8 +219,11 @@ int main(int argc, char** argv)
         std::vector<Uint8> occluded, occluded_low, everything;
         presenter.post = {Antialiasing::Off, false, Tonemap::Neutral, AmbientOcclusion::High, Reflections::Off};
         CHECK(frame(gpu, presenter, *game, capture, occluded, error));
+        // The depth pass, the pyramid levels above 0, GTAO, two blurs and the composite; the pyramid
+        // and its separate levels add depth_levels targets.
         CHECK(stats.ambient_occlusion == AmbientOcclusion::High && presenter.pipelines.aux() && !stats.bloom &&
-              stats.passes == 5 && stats.targets == 6);
+              stats.depth_levels == PostProcess::depth_level_limit && stats.passes == 4 + stats.depth_levels &&
+              stats.targets == 6 + stats.depth_levels);
         const auto occlusion_difference = compare(neutral, occluded);
         CHECK(occlusion_difference.most_brighter <= 1 && occlusion_difference.darker > width * height / 50 &&
               occlusion_difference.mean < 8);
@@ -234,17 +237,18 @@ int main(int argc, char** argv)
         std::vector<Uint8> reflected, glossy, glossy_reflected;
         presenter.post = {Antialiasing::Off, false, Tonemap::Neutral, AmbientOcclusion::Off, Reflections::High};
         CHECK(frame(gpu, presenter, *game, capture, reflected, error));
-        CHECK(stats.reflections == Reflections::High && presenter.pipelines.reflections() && stats.passes == 5 &&
-              stats.targets == 8);
+        CHECK(stats.reflections == Reflections::High && presenter.pipelines.reflections() &&
+              stats.passes == 4 + stats.depth_levels && stats.targets == 8 + stats.depth_levels);
         const auto reflection_difference = compare(neutral, reflected);
         CHECK(reflection_difference.mean < 2 && reflection_difference.moved < .02);
         // Every effect at once.
         presenter.post = {Antialiasing::Msaa4, true, Tonemap::Filmic, AmbientOcclusion::High, Reflections::High};
         CHECK(frame(gpu, presenter, *game, capture, everything, error));
-        CHECK(stats.passes == 2 * stats.bloom_levels + 7 && stats.targets == (stats.samples > 1 ? 21u : 17u));
+        CHECK(stats.passes == 2 * stats.bloom_levels + 6 + stats.depth_levels &&
+              stats.targets == (stats.samples > 1 ? 21u : 17u) + stats.depth_levels);
         presenter.post.antialiasing = Antialiasing::Fxaa;
         CHECK(frame(gpu, presenter, *game, capture, everything, error));
-        CHECK(stats.passes == 2 * stats.bloom_levels + 8);
+        CHECK(stats.passes == 2 * stats.bloom_levels + 7 + stats.depth_levels);
         // With every material glossy, the reflections show.
         const std::string mirror = std::regex_replace(std::string(builtin_surface_manifest()),
                                                       std::regex(R"("roughness": [0-9.]+)"), "\"roughness\": 0.1");

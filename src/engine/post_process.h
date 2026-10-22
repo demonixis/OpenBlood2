@@ -73,7 +73,7 @@ namespace OpenBlood2
         AmbientOcclusion ambient_occlusion = AmbientOcclusion::Off;
         Reflections reflections = Reflections::Off;
         Uint32 samples = 1, requested_samples = 1; // MSAA: the device may support fewer.
-        std::size_t bloom_levels = 0, passes = 0, targets = 0;
+        std::size_t bloom_levels = 0, depth_levels = 0, passes = 0, targets = 0;
         std::uint64_t frames = 0;
     };
     inline constexpr SDL_GPUTextureFormat scene_hdr_format = SDL_GPU_TEXTUREFORMAT_R16G16B16A16_FLOAT;
@@ -120,26 +120,30 @@ namespace OpenBlood2
         // largest screen radius (half-size pixels) and slices/steps per side of LOW and HIGH.
         static constexpr float bloom_strength = 1.5f, filmic_exposure = 2.2f;
         static constexpr std::size_t bloom_level_limit = 6;
-        static constexpr float ao_radius = 48, ao_power = 1.5f, ao_screen_radius = 96;
+        static constexpr float ao_radius = 48, ao_power = 1.5f, ao_screen_radius = 256;
         static constexpr std::array<std::array<Uint32, 2>, 2> ao_samples{{{2, 4}, {4, 6}}};
         // Reflections: ray length and thickness (world units), roughness cutoff, blur radius at the
         // cutoff (half-size texels) and march steps of LOW and HIGH.
         static constexpr float ssr_distance = 1024, ssr_thickness = 12, ssr_cutoff = .5f, ssr_blur = 6;
-        static constexpr std::array<Uint32, 2> ssr_steps{16, 32};
+        static constexpr std::array<Uint32, 2> ssr_steps{24, 48}; // Hi-Z iterations.
+        // Levels of the minimum-depth pyramid (Hi-Z) shared by reflections and occlusion.
+        static constexpr std::size_t depth_level_limit = 7;
 
       private:
         bool prepare_pipelines(SDL_GPUTextureFormat output, std::string& error);
         bool target(TextureHandle&, SDL_GPUTextureFormat, Uint32 width, Uint32 height, SDL_GPUSampleCount,
                     std::string& error);
         void release_targets();
+        // One full-target triangle; `mirror` is an optional second target (a mip of the pyramid).
         bool draw(SDL_GPUCommandBuffer*, SDL_GPUTexture* target, bool load, SDL_GPUGraphicsPipeline*,
                   std::span<SDL_GPUTexture* const> sources, std::span<SDL_GPUSampler* const> samplers,
-                  const void* uniform, Uint32 uniform_bytes, std::string& error);
+                  const void* uniform, Uint32 uniform_bytes, std::string& error, SDL_GPUTexture* mirror = nullptr,
+                  Uint32 mirror_level = 0);
         GpuRegistry& registry_;
         SDL_GPUDevice* device_ = nullptr;
         SDL_GPUGraphicsPipeline *down_ = nullptr, *up_ = nullptr, *composite_ = nullptr, *fxaa_ = nullptr,
                                 *ao_depth_ = nullptr, *gtao_ = nullptr, *ao_blur_ = nullptr, *ssr_trace_ = nullptr,
-                                *ssr_blur_ = nullptr;
+                                *ssr_blur_ = nullptr, *hiz_down_ = nullptr;
         SDL_GPUTextureFormat pipeline_format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
         // Frame plan.
         SDL_GPUTextureFormat output_format_ = SDL_GPU_TEXTUREFORMAT_INVALID, scene_format_ = output_format_;
@@ -159,6 +163,12 @@ namespace OpenBlood2
         // Targets, kept while the plan and size stay the same.
         TextureHandle multisample_, scene_, multisample_glow_, glow_, multisample_depth_, depth_copy_, display_;
         TextureHandle view_depth_, occlusion_, occlusion_blur_; // Half size.
+        // Minimum-depth pyramid: one mipmapped texture for reading, and the levels above 0 as
+        // separate textures that each next level reads (a pass never samples what it writes).
+        TextureHandle depth_pyramid_;
+        std::array<TextureHandle, depth_level_limit> depth_levels_{};
+        std::array<std::array<Uint32, 2>, depth_level_limit> depth_level_sizes_{};
+        std::size_t depth_level_count_ = 0;
         TextureHandle multisample_specular_, specular_, multisample_environment_, environment_;
         TextureHandle reflection_, reflection_blur_; // Half size.
         std::array<TextureHandle, bloom_level_limit> levels_{};

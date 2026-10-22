@@ -159,6 +159,8 @@ Status (2026-10-22, [contract](contracts/post_processing_contracts.md)):
 - **Done (third increment).** Half-size screen-space reflections (REFLECTIONS [OFF/LOW/HIGH],
   preferences version 9) that replace the environment light of the enhanced specular instead of
   adding to it; visible on the manifest's glossy classes; about 0.45 ms at 1080p on Apple M5.
+- **Done.** A minimum-depth pyramid (Hi-Z) shared by GTAO (far taps from coarser levels, screen
+  radius 96 → 256) and SSR (hierarchical traversal instead of 32 linear steps).
 - **Remaining.** Post-processing in XR; glossier classes for polished retail floors if wanted.
 - **Not verified.** Vulkan execution, Linux and Windows.
 

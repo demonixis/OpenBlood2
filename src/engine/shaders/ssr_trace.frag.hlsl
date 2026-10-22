@@ -1,12 +1,14 @@
 // Screen-space reflections, half size: the view ray reflected about the normal rebuilt from
-// the linear depth is marched in screen space (perspective-correct depth, jittered steps) until
-// it passes behind the depth within a thickness, refined by bisection, and the HDR scene is
-// read at the hit. Output: reflected light premultiplied by its confidence, which fades with
+// the linear depth is traced in screen space through the minimum-depth pyramid (Hi-Z): a cell
+// whose nearest surface lies behind the whole ray segment crossing it is skipped and the next
+// cell is tested one level coarser; otherwise the trace descends, down to a level-0 texel where
+// a ray behind the surface by less than a thickness is a hit. Depth along the ray is
+// interpolated perspective-correctly (1/z). The HDR scene is read at the hit. Output: reflected light premultiplied by its confidence, which fades with
 // roughness, screen edges, the travelled share of the ray and rays turning back to the camera.
 // Pixels without specular weight, view models and the background reflect nothing.
 // SDL_GPU fragment conventions: textures/samplers in space2, uniform buffers in space3.
-Texture2D<float4> viewDepth : register(t0, space2); // Half-size linear depth (1e9: none).
-SamplerState depthSampler : register(s0, space2);  // Nearest, clamped.
+Texture2D<float4> depthPyramid : register(t0, space2); // Half-size min linear depth mips (1e9: none).
+SamplerState depthSampler : register(s0, space2);     // Nearest, clamped, nearest mip.
 Texture2D<float4> specular : register(t1, space2);  // Full size: weight, roughness.
 SamplerState specularSampler : register(s1, space2);
 Texture2D<float4> scene : register(t2, space2); // Full-size HDR scene, display space.
@@ -15,8 +17,9 @@ cbuffer Ssr : register(b0, space3)
 {
     float4 projection; // Scene x/y scales.
     float4 viewport;   // Scene viewport in full-size pixels: left, top, width, height.
-    float4 size;       // xy: 1 / half width and height; zw: 1 / full width and height.
-    float4 settings;   // Ray length (world units), steps, thickness (world units), roughness cutoff.
+    float4 size;       // xy: 1 / half width and height; zw: half width and height (level 0).
+    float4 settings;   // Ray length (world units), iterations, thickness (world units), roughness cutoff.
+    float4 extra;      // xy: 1 / full width and height; z: pyramid levels.
 };
 struct Input
 {
@@ -32,7 +35,13 @@ float3 viewPosition(float2 texel, float z)
 }
 float3 positionAt(float2 texel)
 {
-    return viewPosition(texel, viewDepth.SampleLevel(depthSampler, texel * size.xy, 0.0).r);
+    return viewPosition(texel, depthPyramid.SampleLevel(depthSampler, texel * size.xy, 0.0).r);
+}
+// Nearest depth of a pyramid cell (level-0 texels [cell * 2^level, (cell + 1) * 2^level)).
+float cellDepth(float2 cell, float level)
+{
+    float2 levelSize = max(floor(size.zw / exp2(level)), 1.0);
+    return depthPyramid.SampleLevel(depthSampler, (cell + 0.5) / levelSize, level).r;
 }
 // View-space point to continuous half-size texel coordinates.
 float2 project(float3 p)
@@ -47,8 +56,8 @@ float noise(float2 pixel)
 float4 main(Input input) : SV_Target0
 {
     float2 texel = input.position.xy;
-    float z = viewDepth.SampleLevel(depthSampler, input.uv, 0.0).r;
-    float4 weight = specular.SampleLevel(specularSampler, (floor(texel) * 2.0 + 0.5) * size.zw, 0.0);
+    float z = depthPyramid.SampleLevel(depthSampler, input.uv, 0.0).r;
+    float4 weight = specular.SampleLevel(specularSampler, (floor(texel) * 2.0 + 0.5) * extra.xy, 0.0);
     float cutoff = settings.w;
     if (z >= FAR || dot(weight.rgb, float3(1.0, 1.0, 1.0)) <= 0.0 || weight.a >= cutoff)
         return float4(0.0, 0.0, 0.0, 0.0);
@@ -84,32 +93,36 @@ float4 main(Input input) : SV_Target0
     if (tMax <= 0.0 || span < 2.0)
         return float4(0.0, 0.0, 0.0, 0.0);
     float inverse0 = 1.0 / p.z, inverse1 = 1.0 / end.z;
-    uint steps = uint(settings.y);
-    float jitter = noise(texel);
-    float previous = 1.5 / span * tMax, hit = -1.0;
-    for (uint i = 0u; i < steps; ++i)
+    float thickness = settings.z;
+    float maxLevel = extra.z - 1.0, level = 0.0;
+    float2 safe = float2(abs(d.x) > 1e-6 ? d.x : 1e-6, abs(d.y) > 1e-6 ? d.y : 1e-6);
+    float nudge = 0.01 / length(d); // Past a cell boundary, in segment units.
+    float t = 1.5 / length(d), hit = -1.0;
+    uint iterations = uint(settings.y);
+    for (uint i = 0u; i < iterations && t < tMax; ++i)
     {
-        float t = max((float(i) + jitter) / float(steps), 1.5 / span) * tMax;
-        float rayZ = 1.0 / lerp(inverse0, inverse1, t);
-        float sceneZ = viewDepth.SampleLevel(depthSampler, (s0 + d * t) * size.xy, 0.0).r;
-        float behind = rayZ - sceneZ;
-        if (sceneZ < FAR && behind > 0.0 && behind < settings.z + 0.02 * rayZ)
+        float scale = exp2(level);
+        float2 cell = floor((s0 + d * t) / scale);
+        float2 boundary = (cell + step(0.0, safe)) * scale;
+        float2 crossing = (boundary - s0) / safe;
+        float exit = min(min(crossing.x, crossing.y), tMax) + nudge;
+        float z0 = 1.0 / lerp(inverse0, inverse1, t), z1 = 1.0 / lerp(inverse0, inverse1, min(exit, tMax));
+        float surface = cellDepth(cell, level);
+        if (max(z0, z1) < surface)
         {
-            // Bisection between the last point in front and this one.
-            float a = previous, b = t;
-            for (int k = 0; k < 4; ++k)
-            {
-                float m = 0.5 * (a + b);
-                float mz = 1.0 / lerp(inverse0, inverse1, m);
-                if (mz > viewDepth.SampleLevel(depthSampler, (s0 + d * m) * size.xy, 0.0).r)
-                    b = m;
-                else
-                    a = m;
-            }
-            hit = b;
+            // The whole segment stays in front of the cell's nearest surface: skip it, look wider.
+            t = exit;
+            level = min(level + 1.0, maxLevel);
+        }
+        else if (level > 0.0)
+            level -= 1.0;
+        else if (min(z0, z1) < surface + thickness + 0.02 * surface)
+        {
+            hit = t; // The segment reaches the surface within the thickness.
             break;
         }
-        previous = t;
+        else
+            t = exit; // Entirely behind a thick surface: continue texel by texel.
     }
     if (hit < 0.0)
         return float4(0.0, 0.0, 0.0, 0.0);

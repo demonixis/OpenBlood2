@@ -1,6 +1,7 @@
 #include "engine/post_process.h"
 #include "engine/world_renderer.h"
 #include "engine/world_shaders.h"
+#include <algorithm>
 
 namespace OpenBlood2
 {
@@ -14,7 +15,8 @@ namespace OpenBlood2
     PostProcess::~PostProcess()
     {
         release_targets();
-        for (auto* pipeline : {down_, up_, composite_, fxaa_, ao_depth_, gtao_, ao_blur_, ssr_trace_, ssr_blur_})
+        for (auto* pipeline :
+             {down_, up_, composite_, fxaa_, ao_depth_, gtao_, ao_blur_, ssr_trace_, ssr_blur_, hiz_down_})
             if (pipeline)
                 SDL_ReleaseGPUGraphicsPipeline(device_, pipeline);
     }
@@ -23,7 +25,7 @@ namespace OpenBlood2
         if (pipeline_format_ == output && fxaa_)
             return true;
         for (auto** pipeline :
-             {&down_, &up_, &composite_, &fxaa_, &ao_depth_, &gtao_, &ao_blur_, &ssr_trace_, &ssr_blur_})
+             {&down_, &up_, &composite_, &fxaa_, &ao_depth_, &gtao_, &ao_blur_, &ssr_trace_, &ssr_blur_, &hiz_down_})
         {
             if (*pipeline)
                 SDL_ReleaseGPUGraphicsPipeline(device_, *pipeline);
@@ -32,7 +34,7 @@ namespace OpenBlood2
         pipeline_format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
         const auto formats = SDL_GetGPUShaderFormats(device_);
         SDL_GPUShaderCreateInfo vertex_info{}, down_info{}, up_info{}, composite_info{}, fxaa_info{}, depth_info{},
-            gtao_info{}, blur_info{}, trace_info{}, reflection_blur_info{};
+            gtao_info{}, blur_info{}, trace_info{}, reflection_blur_info{}, hiz_info{};
         if (!world_shader_info(WorldShader::PostVertex, formats, vertex_info) ||
             !world_shader_info(WorldShader::BloomDownFragment, formats, down_info) ||
             !world_shader_info(WorldShader::BloomUpFragment, formats, up_info) ||
@@ -42,7 +44,8 @@ namespace OpenBlood2
             !world_shader_info(WorldShader::GtaoFragment, formats, gtao_info) ||
             !world_shader_info(WorldShader::AoBlurFragment, formats, blur_info) ||
             !world_shader_info(WorldShader::SsrTraceFragment, formats, trace_info) ||
-            !world_shader_info(WorldShader::SsrBlurFragment, formats, reflection_blur_info))
+            !world_shader_info(WorldShader::SsrBlurFragment, formats, reflection_blur_info) ||
+            !world_shader_info(WorldShader::HizDownFragment, formats, hiz_info))
         {
             error = "No bundled post-processing shader for this GPU backend (SPIR-V or MSL required)";
             return false;
@@ -55,18 +58,21 @@ namespace OpenBlood2
             const SDL_GPUShaderCreateInfo* fragment;
             SDL_GPUTextureFormat format;
             bool additive;
+            bool mirrored = false; // A second target of the same format (a pyramid mip).
         };
         for (const auto& kind :
              {Kind{&down_, &down_info, bloom_format, false}, Kind{&up_, &up_info, bloom_format, true},
               Kind{&composite_, &composite_info, output, false}, Kind{&fxaa_, &fxaa_info, output, false},
-              Kind{&ao_depth_, &depth_info, view_depth_format, false},
+              Kind{&ao_depth_, &depth_info, view_depth_format, false, true},
+              Kind{&hiz_down_, &hiz_info, view_depth_format, false, true},
               Kind{&gtao_, &gtao_info, occlusion_format, false}, Kind{&ao_blur_, &blur_info, occlusion_format, false},
               Kind{&ssr_trace_, &trace_info, scene_reflection_format, false},
               Kind{&ssr_blur_, &reflection_blur_info, scene_reflection_format, false}})
         {
             auto* fragment = success ? SDL_CreateGPUShader(device_, kind.fragment) : nullptr;
-            SDL_GPUColorTargetDescription target{};
-            target.format = kind.format;
+            SDL_GPUColorTargetDescription targets[2]{};
+            auto& target = targets[0];
+            target.format = targets[1].format = kind.format;
             if (kind.additive)
             {
                 target.blend_state.enable_blend = true;
@@ -82,8 +88,8 @@ namespace OpenBlood2
             create.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
             create.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
             create.multisample_state.sample_count = SDL_GPU_SAMPLECOUNT_1;
-            create.target_info.color_target_descriptions = &target;
-            create.target_info.num_color_targets = 1;
+            create.target_info.color_target_descriptions = targets;
+            create.target_info.num_color_targets = kind.mirrored ? 2 : 1;
             if (fragment)
                 *kind.pipeline = SDL_CreateGPUGraphicsPipeline(device_, &create);
             success = success && fragment && *kind.pipeline;
@@ -124,10 +130,14 @@ namespace OpenBlood2
     }
     void PostProcess::release_targets()
     {
-        for (auto* handle : {&multisample_, &scene_, &multisample_glow_, &glow_, &multisample_depth_, &depth_copy_,
-                             &display_, &view_depth_, &occlusion_, &occlusion_blur_, &multisample_specular_, &specular_,
-                             &multisample_environment_, &environment_, &reflection_, &reflection_blur_})
+        for (auto* handle :
+             {&multisample_, &scene_, &multisample_glow_, &glow_, &multisample_depth_, &depth_copy_, &display_,
+              &view_depth_, &occlusion_, &occlusion_blur_, &multisample_specular_, &specular_,
+              &multisample_environment_, &environment_, &reflection_, &reflection_blur_, &depth_pyramid_})
             registry_.release(*handle);
+        for (auto& level : depth_levels_)
+            registry_.release(level);
+        depth_level_count_ = 0;
         for (auto& level : levels_)
             registry_.release(level);
         level_count_ = 0;
@@ -210,7 +220,31 @@ namespace OpenBlood2
                       target(depth_copy_, scene_depth_copy_format, width, height, SDL_GPU_SAMPLECOUNT_1, error);
         const Uint32 half_width = (width + 1) / 2, half_height = (height + 1) / 2;
         if (success && (ao || ssr))
+        {
             success = target(view_depth_, view_depth_format, half_width, half_height, SDL_GPU_SAMPLECOUNT_1, error);
+            // Pyramid mips follow the texture's own sizes (halved, rounded down).
+            Uint32 w = half_width, h = half_height;
+            while (depth_level_count_ < depth_level_limit && (depth_level_count_ == 0 || w > 1 || h > 1))
+            {
+                depth_level_sizes_[depth_level_count_++] = {w, h};
+                w = std::max(1u, w / 2);
+                h = std::max(1u, h / 2);
+            }
+            SDL_GPUTextureCreateInfo info{};
+            info.type = SDL_GPU_TEXTURETYPE_2D;
+            info.format = view_depth_format;
+            info.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;
+            info.width = half_width;
+            info.height = half_height;
+            info.layer_count_or_depth = 1;
+            info.num_levels = Uint32(depth_level_count_);
+            if (success && (depth_pyramid_ = registry_.create_texture(info, error)))
+                ++stats.targets;
+            success = success && depth_pyramid_;
+            for (std::size_t i = 1; success && i < depth_level_count_; ++i)
+                success = target(depth_levels_[i], view_depth_format, depth_level_sizes_[i][0],
+                                 depth_level_sizes_[i][1], SDL_GPU_SAMPLECOUNT_1, error);
+        }
         if (success && ao)
             success = target(occlusion_, occlusion_format, half_width, half_height, SDL_GPU_SAMPLECOUNT_1, error) &&
                       target(occlusion_blur_, occlusion_format, half_width, half_height, SDL_GPU_SAMPLECOUNT_1, error);
@@ -269,7 +303,7 @@ namespace OpenBlood2
     bool PostProcess::draw(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target, bool load,
                            SDL_GPUGraphicsPipeline* pipeline, std::span<SDL_GPUTexture* const> sources,
                            std::span<SDL_GPUSampler* const> samplers, const void* uniform, Uint32 uniform_bytes,
-                           std::string& error)
+                           std::string& error, SDL_GPUTexture* mirror, Uint32 mirror_level)
     {
         std::array<SDL_GPUTextureSamplerBinding, 9> bindings{};
         if (!target || sources.size() > bindings.size() || sources.size() != samplers.size())
@@ -286,11 +320,16 @@ namespace OpenBlood2
             }
             bindings[i] = {sources[i], samplers[i]};
         }
-        SDL_GPUColorTargetInfo color{};
-        color.texture = target;
-        color.load_op = load ? SDL_GPU_LOADOP_LOAD : SDL_GPU_LOADOP_DONT_CARE;
-        color.store_op = SDL_GPU_STOREOP_STORE;
-        auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, nullptr);
+        SDL_GPUColorTargetInfo colors[2]{};
+        colors[0].texture = target;
+        colors[1].texture = mirror;
+        colors[1].mip_level = mirror_level;
+        for (auto& color : colors)
+        {
+            color.load_op = load ? SDL_GPU_LOADOP_LOAD : SDL_GPU_LOADOP_DONT_CARE;
+            color.store_op = SDL_GPU_STOREOP_STORE;
+        }
+        auto* pass = SDL_BeginGPURenderPass(commands, colors, mirror ? 2 : 1, nullptr);
         if (!pass)
         {
             error = SDL_GetError();
@@ -309,6 +348,7 @@ namespace OpenBlood2
     {
         stats.passes = 0;
         stats.bloom_levels = bloom_ ? level_count_ : 0;
+        stats.depth_levels = ao_ || ssr_ ? depth_level_count_ : 0;
         ++stats.frames;
         if (!hdr_ && !fxaa_pass_)
             return true;
@@ -337,10 +377,23 @@ namespace OpenBlood2
                                              view.slice,
                                              1 / (1 - view.slice)};
             SDL_GPUTexture* const copy = registry_.get(depth_copy_);
+            auto* levels = registry_.get(depth_pyramid_);
             if (!draw(commands, linear_depth, false, ao_depth_, {&copy, 1}, {&nearest, 1}, depth.data(), sizeof(depth),
-                      error))
+                      error, levels, 0))
                 return false;
+            // The minimum-depth pyramid, each level from the previous level's own texture.
+            for (std::size_t i = 1; i < depth_level_count_; ++i)
+            {
+                const std::array<float, 4> sizes{float(depth_level_sizes_[i - 1][0]),
+                                                 float(depth_level_sizes_[i - 1][1]), float(depth_level_sizes_[i][0]),
+                                                 float(depth_level_sizes_[i][1])};
+                SDL_GPUTexture* const previous = registry_.get(i == 1 ? view_depth_ : depth_levels_[i - 1]);
+                if (!draw(commands, registry_.get(depth_levels_[i]), false, hiz_down_, {&previous, 1}, {&nearest, 1},
+                          sizes.data(), sizeof(sizes), error, levels, Uint32(i)))
+                    return false;
+            }
         }
+        SDL_GPUTexture* const pyramid = registry_.get(depth_pyramid_);
         if (ao_)
         {
             // Half-size occlusion, then the depth-aware blur across and down; the composite upsamples it.
@@ -356,12 +409,12 @@ namespace OpenBlood2
                                              1.f / float(half_width),
                                              1.f / float(half_height),
                                              ao_screen_radius,
-                                             0,
+                                             float(depth_level_count_),
                                              ao_radius,
                                              float(samples[0]),
                                              float(samples[1]),
                                              ao_power};
-            if (!draw(commands, registry_.get(occlusion_), false, gtao_, {&linear_depth, 1}, {&nearest, 1}, gtao.data(),
+            if (!draw(commands, registry_.get(occlusion_), false, gtao_, {&pyramid, 1}, {&nearest, 1}, gtao.data(),
                       sizeof(gtao), error))
                 return false;
             for (int axis = 0; axis < 2; ++axis)
@@ -380,7 +433,7 @@ namespace OpenBlood2
         {
             // Half-size ray march into the scene, then the roughness-wide blur across and down; the
             // composite upsamples it.
-            const std::array<float, 16> trace{view.projection[0],
+            const std::array<float, 20> trace{view.projection[0],
                                               view.projection[1],
                                               0,
                                               0,
@@ -390,13 +443,17 @@ namespace OpenBlood2
                                               view.height,
                                               1.f / float(half_width),
                                               1.f / float(half_height),
-                                              1.f / float(width_),
-                                              1.f / float(height_),
+                                              float(half_width),
+                                              float(half_height),
                                               ssr_distance,
                                               float(ssr_steps[reflections_ == Reflections::High]),
                                               ssr_thickness,
-                                              ssr_cutoff};
-            const std::array<SDL_GPUTexture*, 3> trace_sources{linear_depth, registry_.get(specular_), scene};
+                                              ssr_cutoff,
+                                              1.f / float(width_),
+                                              1.f / float(height_),
+                                              float(depth_level_count_),
+                                              0};
+            const std::array<SDL_GPUTexture*, 3> trace_sources{pyramid, registry_.get(specular_), scene};
             const std::array<SDL_GPUSampler*, 3> trace_samplers{nearest, nearest, linear};
             if (!draw(commands, registry_.get(reflection_), false, ssr_trace_, trace_sources, trace_samplers,
                       trace.data(), sizeof(trace), error))

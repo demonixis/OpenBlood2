@@ -120,13 +120,14 @@ face-plane normal). Eighteen artifacts are now regenerated together. Every origi
 fragment artifact is byte-identical after regeneration. Only Metal execution on Apple M5
 was verified.
 
-[Post-processing](post_processing_contracts.md) adds twenty-two shaders: `-DAUX_TARGETS` variants
+[Post-processing](post_processing_contracts.md) adds twenty-three shaders: `-DAUX_TARGETS` variants
 of `world.frag`, `sprite.frag` and the four PBR fragments (outputs 1 and 2, MSL `[[color(1)]]`
 and `[[color(2)]]`; the depth copy reads `SV_Position.z`) and their `-DREFLECTION_TARGETS`
 versions (outputs 3 and 4), and `post.vert` (`SV_VertexID`, no inputs), `bloom_down.frag`,
 `bloom_up.frag`, `composite.frag` (nine sampled textures, two read with `GatherRed`), `fxaa.frag`,
-`ao_depth.frag`, `gtao.frag`, `ao_blur.frag`, `ssr_trace.frag` and `ssr_blur.frag`. The
+`ao_depth.frag` and `hiz_down.frag` (two outputs each), `gtao.frag`, `ao_blur.frag`,
+`ssr_trace.frag` and `ssr_blur.frag`. The
 generator maps `<stem>_<vert|frag>` to `<stem>.<stage>.hlsl` unless a `<name>_source` variable
-names a shared source. Sixty-six artifacts, including the four XR line artifacts, are now
+names a shared source. Sixty-eight artifacts, including the four XR line artifacts, are now
 regenerated together; the 22 earlier ones are byte-identical. Only Metal execution on Apple M5
 was verified.

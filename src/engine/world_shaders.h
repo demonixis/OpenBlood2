@@ -47,7 +47,8 @@ namespace OpenBlood2
         GtaoFragment,
         AoBlurFragment,
         SsrTraceFragment,
-        SsrBlurFragment
+        SsrBlurFragment,
+        HizDownFragment // One level of the minimum-depth pyramid.
     };
     // Static owned bytecode/source and reflected resource counts. No device or
     // filesystem needed; MSL's generated entry point differs from SPIR-V's.

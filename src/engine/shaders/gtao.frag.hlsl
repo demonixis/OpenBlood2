@@ -3,16 +3,17 @@
 // pixel, a few screen-space slices rotated by interleaved gradient noise; on each side of a
 // slice the highest horizon within the world-space radius (with a linear falloff) bounds the
 // cosine-weighted visibility, integrated analytically around the normal projected into the
-// slice. The normal is rebuilt from the nearer depth neighbours. View models and the
-// background (depth 1e9) are not occluded and occlude nothing.
+// slice. The normal is rebuilt from the nearer depth neighbours. Taps far from the texel read a
+// coarser level of the minimum-depth pyramid, which keeps them in cache (XeGTAO's depth mips).
+// View models and the background (depth 1e9) are not occluded and occlude nothing.
 // SDL_GPU fragment conventions: textures/samplers in space2, uniform buffers in space3.
-Texture2D<float4> viewDepth : register(t0, space2);
-SamplerState depthSampler : register(s0, space2); // Nearest, clamped.
+Texture2D<float4> depthPyramid : register(t0, space2); // Half-size min linear depth mips.
+SamplerState depthSampler : register(s0, space2);     // Nearest, clamped, nearest mip.
 cbuffer Gtao : register(b0, space3)
 {
     float4 projection; // Scene x/y scales.
     float4 viewport;   // Scene viewport in full-size pixels: left, top, width, height.
-    float4 size;       // xy: 1 / half width and height; z: largest screen radius (half-size pixels).
+    float4 size;       // xy: 1 / half width and height; z: largest screen radius (half-size pixels); w: levels.
     float4 settings;   // Radius (world units), slices, steps per side, final power.
 };
 struct Input
@@ -29,9 +30,9 @@ float3 viewPosition(float2 texel, float z)
     float2 ndc = float2((pixel.x - viewport.x) / viewport.z * 2.0 - 1.0, 1.0 - (pixel.y - viewport.y) / viewport.w * 2.0);
     return float3(ndc.x * z / projection.x, ndc.y * z / projection.y, z);
 }
-float3 positionAt(float2 texel)
+float3 positionAt(float2 texel, float level)
 {
-    return viewPosition(texel, viewDepth.SampleLevel(depthSampler, texel * size.xy, 0.0).r);
+    return viewPosition(texel, depthPyramid.SampleLevel(depthSampler, texel * size.xy, level).r);
 }
 // Polynomial acos approximation (Eberly), as GTAO implementations use: max error about 1e-4.
 float fastAcos(float x)
@@ -47,12 +48,12 @@ float noise(float2 pixel)
 float4 main(Input input) : SV_Target0
 {
     float2 texel = input.position.xy;
-    float z = viewDepth.SampleLevel(depthSampler, input.uv, 0.0).r;
+    float z = depthPyramid.SampleLevel(depthSampler, input.uv, 0.0).r;
     if (z >= FAR)
         return float4(1.0, 1.0, 1.0, 1.0);
     float3 p = viewPosition(texel, z);
-    float3 left = positionAt(texel - float2(1.0, 0.0)), right = positionAt(texel + float2(1.0, 0.0));
-    float3 up = positionAt(texel - float2(0.0, 1.0)), down = positionAt(texel + float2(0.0, 1.0));
+    float3 left = positionAt(texel - float2(1.0, 0.0), 0.0), right = positionAt(texel + float2(1.0, 0.0), 0.0);
+    float3 up = positionAt(texel - float2(0.0, 1.0), 0.0), down = positionAt(texel + float2(0.0, 1.0), 0.0);
     float3 dx = abs(right.z - p.z) < abs(p.z - left.z) ? right - p : p - left;
     float3 dy = abs(down.z - p.z) < abs(p.z - up.z) ? down - p : p - up;
     float3 v = normalize(-p);
@@ -87,8 +88,10 @@ float4 main(Input input) : SV_Target0
         for (uint step = 0u; step < steps; ++step)
         {
             float s = (float(step) + stepNoise) / float(steps);
-            float2 offset = omega * (s * s * screenRadius + 1.0);
-            float3 delta0 = positionAt(texel + offset) - p, delta1 = positionAt(texel - offset) - p;
+            float reach = s * s * screenRadius + 1.0;
+            float2 offset = omega * reach;
+            float level = clamp(floor(log2(reach)) - 2.0, 0.0, size.w - 1.0);
+            float3 delta0 = positionAt(texel + offset, level) - p, delta1 = positionAt(texel - offset, level) - p;
             float distance0 = length(delta0), distance1 = length(delta1);
             float weight0 = saturate((radius - distance0) / (0.6 * radius));
             float weight1 = saturate((radius - distance1) / (0.6 * radius));

@@ -26,35 +26,35 @@ struct main0_in
     float2 in_var_TEXCOORD0 [[user(locn0)]];
 };
 
-fragment main0_out main0(main0_in in [[stage_in]], constant type_Gtao& Gtao [[buffer(0)]], texture2d<float> viewDepth [[texture(0)]], sampler depthSampler [[sampler(0)]], float4 gl_FragCoord [[position]])
+fragment main0_out main0(main0_in in [[stage_in]], constant type_Gtao& Gtao [[buffer(0)]], texture2d<float> depthPyramid [[texture(0)]], sampler depthSampler [[sampler(0)]], float4 gl_FragCoord [[position]])
 {
     main0_out out = {};
-    float4 _460;
+    float4 _467;
     do
     {
-        float4 _71 = viewDepth.sample(depthSampler, in.in_var_TEXCOORD0, level(0.0));
+        float4 _71 = depthPyramid.sample(depthSampler, in.in_var_TEXCOORD0, level(0.0));
         float _72 = _71.x;
         if (_72 >= 100000000.0)
         {
-            _460 = float4(1.0);
+            _467 = float4(1.0);
             break;
         }
         float2 _78 = (floor(gl_FragCoord.xy) * 2.0) + float2(0.5);
         float3 _105 = float3((((((_78.x - Gtao.viewport.x) / Gtao.viewport.z) * 2.0) - 1.0) * _72) / Gtao.projection.x, ((1.0 - (((_78.y - Gtao.viewport.y) / Gtao.viewport.w) * 2.0)) * _72) / Gtao.projection.y, _72);
         float2 _106 = gl_FragCoord.xy - float2(1.0, 0.0);
-        float4 _114 = viewDepth.sample(depthSampler, (_106 * Gtao.size.xy), level(0.0));
+        float4 _114 = depthPyramid.sample(depthSampler, (_106 * Gtao.size.xy), level(0.0));
         float _115 = _114.x;
         float2 _118 = (floor(_106) * 2.0) + float2(0.5);
         float2 _134 = gl_FragCoord.xy + float2(1.0, 0.0);
-        float4 _139 = viewDepth.sample(depthSampler, (_134 * Gtao.size.xy), level(0.0));
+        float4 _139 = depthPyramid.sample(depthSampler, (_134 * Gtao.size.xy), level(0.0));
         float _140 = _139.x;
         float2 _143 = (floor(_134) * 2.0) + float2(0.5);
         float2 _159 = gl_FragCoord.xy - float2(0.0, 1.0);
-        float4 _164 = viewDepth.sample(depthSampler, (_159 * Gtao.size.xy), level(0.0));
+        float4 _164 = depthPyramid.sample(depthSampler, (_159 * Gtao.size.xy), level(0.0));
         float _165 = _164.x;
         float2 _168 = (floor(_159) * 2.0) + float2(0.5);
         float2 _184 = gl_FragCoord.xy + float2(0.0, 1.0);
-        float4 _189 = viewDepth.sample(depthSampler, (_184 * Gtao.size.xy), level(0.0));
+        float4 _189 = depthPyramid.sample(depthSampler, (_184 * Gtao.size.xy), level(0.0));
         float _190 = _189.x;
         float2 _193 = (floor(_184) * 2.0) + float2(0.5);
         float3 _219;
@@ -90,7 +90,7 @@ fragment main0_out main0(main0_in in [[stage_in]], constant type_Gtao& Gtao [[bu
         float _252 = precise::min((((Gtao.settings.x * Gtao.projection.x) * 0.25) * Gtao.viewport.z) / _72, Gtao.size.z);
         if (_252 < 1.0)
         {
-            _460 = float4(1.0);
+            _467 = float4(1.0);
             break;
         }
         uint _258 = uint(Gtao.settings.y);
@@ -124,58 +124,60 @@ fragment main0_out main0(main0_in in [[stage_in]], constant type_Gtao& Gtao [[bu
             for (uint _324 = 0u; _324 < _261; )
             {
                 float _331 = (float(_324) + _270) / float(_261);
-                float2 _335 = _287 * (((_331 * _331) * _252) + 1.0);
-                float2 _336 = gl_FragCoord.xy + _335;
-                float4 _341 = viewDepth.sample(depthSampler, (_336 * Gtao.size.xy), level(0.0));
-                float _342 = _341.x;
-                float2 _345 = (floor(_336) * 2.0) + float2(0.5);
-                float3 _361 = float3((((((_345.x - Gtao.viewport.x) / Gtao.viewport.z) * 2.0) - 1.0) * _342) / Gtao.projection.x, ((1.0 - (((_345.y - Gtao.viewport.y) / Gtao.viewport.w) * 2.0)) * _342) / Gtao.projection.y, _342) - _105;
-                float2 _362 = gl_FragCoord.xy - _335;
-                float4 _367 = viewDepth.sample(depthSampler, (_362 * Gtao.size.xy), level(0.0));
-                float _368 = _367.x;
-                float2 _371 = (floor(_362) * 2.0) + float2(0.5);
-                float3 _387 = float3((((((_371.x - Gtao.viewport.x) / Gtao.viewport.z) * 2.0) - 1.0) * _368) / Gtao.projection.x, ((1.0 - (((_371.y - Gtao.viewport.y) / Gtao.viewport.w) * 2.0)) * _368) / Gtao.projection.y, _368) - _105;
-                float _388 = length(_361);
-                float _389 = length(_387);
-                float _391 = 0.60000002384185791015625 * Gtao.settings.x;
-                _319 = precise::max(_319, mix(_316, dot(_387, _232) / precise::max(_389, 9.9999997473787516355514526367188e-05), fast::clamp((Gtao.settings.x - _389) / _391, 0.0, 1.0)));
-                _322 = precise::max(_322, mix(_317, dot(_361, _232) / precise::max(_388, 9.9999997473787516355514526367188e-05), fast::clamp((Gtao.settings.x - _388) / _391, 0.0, 1.0)));
+                float _334 = ((_331 * _331) * _252) + 1.0;
+                float2 _335 = _287 * _334;
+                float _342 = fast::clamp(floor(log2(_334)) - 2.0, 0.0, Gtao.size.w - 1.0);
+                float2 _343 = gl_FragCoord.xy + _335;
+                float4 _348 = depthPyramid.sample(depthSampler, (_343 * Gtao.size.xy), level(_342));
+                float _349 = _348.x;
+                float2 _352 = (floor(_343) * 2.0) + float2(0.5);
+                float3 _368 = float3((((((_352.x - Gtao.viewport.x) / Gtao.viewport.z) * 2.0) - 1.0) * _349) / Gtao.projection.x, ((1.0 - (((_352.y - Gtao.viewport.y) / Gtao.viewport.w) * 2.0)) * _349) / Gtao.projection.y, _349) - _105;
+                float2 _369 = gl_FragCoord.xy - _335;
+                float4 _374 = depthPyramid.sample(depthSampler, (_369 * Gtao.size.xy), level(_342));
+                float _375 = _374.x;
+                float2 _378 = (floor(_369) * 2.0) + float2(0.5);
+                float3 _394 = float3((((((_378.x - Gtao.viewport.x) / Gtao.viewport.z) * 2.0) - 1.0) * _375) / Gtao.projection.x, ((1.0 - (((_378.y - Gtao.viewport.y) / Gtao.viewport.w) * 2.0)) * _375) / Gtao.projection.y, _375) - _105;
+                float _395 = length(_368);
+                float _396 = length(_394);
+                float _398 = 0.60000002384185791015625 * Gtao.settings.x;
+                _319 = precise::max(_319, mix(_316, dot(_394, _232) / precise::max(_396, 9.9999997473787516355514526367188e-05), fast::clamp((Gtao.settings.x - _396) / _398, 0.0, 1.0)));
+                _322 = precise::max(_322, mix(_317, dot(_368, _232) / precise::max(_395, 9.9999997473787516355514526367188e-05), fast::clamp((Gtao.settings.x - _395) / _398, 0.0, 1.0)));
                 _324++;
                 continue;
             }
-            float _405 = fast::clamp(_322, -1.0, 1.0);
-            float _406 = abs(_405);
-            float _411 = (((-0.15658299624919891357421875) * _406) + 1.57079637050628662109375) * sqrt(1.0 - _406);
-            float _417;
-            if (_405 >= 0.0)
+            float _412 = fast::clamp(_322, -1.0, 1.0);
+            float _413 = abs(_412);
+            float _418 = (((-0.15658299624919891357421875) * _413) + 1.57079637050628662109375) * sqrt(1.0 - _413);
+            float _424;
+            if (_412 >= 0.0)
             {
-                _417 = _411;
+                _424 = _418;
             }
             else
             {
-                _417 = 3.1415927410125732421875 - _411;
+                _424 = 3.1415927410125732421875 - _418;
             }
-            float _421 = fast::clamp(_319, -1.0, 1.0);
-            float _422 = abs(_421);
-            float _427 = (((-0.15658299624919891357421875) * _422) + 1.57079637050628662109375) * sqrt(1.0 - _422);
-            float _433;
-            if (_421 >= 0.0)
+            float _428 = fast::clamp(_319, -1.0, 1.0);
+            float _429 = abs(_428);
+            float _434 = (((-0.15658299624919891357421875) * _429) + 1.57079637050628662109375) * sqrt(1.0 - _429);
+            float _440;
+            if (_428 >= 0.0)
             {
-                _433 = _427;
+                _440 = _434;
             }
             else
             {
-                _433 = 3.1415927410125732421875 - _427;
+                _440 = 3.1415927410125732421875 - _434;
             }
-            float _439 = 2.0 * (_312 + precise::min(_417 - _312, 1.57079637050628662109375));
-            float _445 = 2.0 * (_312 + precise::max((-_433) - _312, -1.57079637050628662109375));
-            _273 = _272 + ((_298 * 0.25) * (((_302 + (_439 * _316)) - cos(_439 - _312)) + ((_302 + (_445 * _316)) - cos(_445 - _312))));
+            float _446 = 2.0 * (_312 + precise::min(_424 - _312, 1.57079637050628662109375));
+            float _452 = 2.0 * (_312 + precise::max((-_440) - _312, -1.57079637050628662109375));
+            _273 = _272 + ((_298 * 0.25) * (((_302 + (_446 * _316)) - cos(_446 - _312)) + ((_302 + (_452 * _316)) - cos(_452 - _312))));
         }
-        float _458 = powr(fast::clamp(_272 / float(_258), 0.0, 1.0), Gtao.settings.w);
-        _460 = float4(_458, _458, _458, 1.0);
+        float _465 = powr(fast::clamp(_272 / float(_258), 0.0, 1.0), Gtao.settings.w);
+        _467 = float4(_465, _465, _465, 1.0);
         break;
     } while(false);
-    out.out_var_SV_Target0 = _460;
+    out.out_var_SV_Target0 = _467;
     return out;
 }
 

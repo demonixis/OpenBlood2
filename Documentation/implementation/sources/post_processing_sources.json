@@ -63,6 +63,10 @@
     {
       "source": "McGuire, Mara, 'Efficient GPU Screen-Space Ray Tracing' (JCGT 3(4), 2014)",
       "purpose": "Screen-space march of the reflected ray with perspective-correct depth (1/z interpolation); the DDA itself is not reproduced (fixed jittered steps and bisection instead)."
+    },
+    {
+      "source": "Uludag, 'Hi-Z Screen-Space Cone-Traced Reflections' (GPU Pro 5, 2014)",
+      "purpose": "Minimum-depth pyramid and cell-by-cell hierarchical traversal of the reflected ray (skip in front, descend otherwise); the cone tracing is not reproduced."
     }
   ]
 }
