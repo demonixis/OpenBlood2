@@ -6,6 +6,12 @@
 > support-free rule below. Jump impulse and gravity are unchanged. See the
 > [diagnosis and traces](../implementation/reports/cityhub_jump.md).
 
+> Low-ceiling steps, 22 October 2026: the step lift no longer has to clear the
+> whole limit. A crouched body in a 64–68-unit duct has 8–12 units to spare for a
+> 14-unit limit, so any lip at a duct exit trapped the player (dropping in
+> worked, climbing out did not).
+> See the [diagnosis](../implementation/reports/low_ceiling_steps.md).
+
 > Extended by [character animation contracts](character_animation_contracts.md):
 > original CAnim_Sound tables now drive locomotion; current model node queries and
 > original sphere measurements are inspectable. AI/damage-localization callers
@@ -107,11 +113,18 @@ movement/velocity. Support is not required: later LithTech's `StairStep_Segment`
 steps onto any walkable face the body is not moving away from, so an airborne
 body at or past its jump apex steps up, while a rising body never does. A
 standing jump (90 units) thus reaches ledges up to 90 plus the step height.
-All three paths must clear, and landing must have a walkable normal and a
-positive rise within **half the current half-height** (21 units for retail
-standing Caleb, 14 while crouched). Over-height walls and low ceilings continue
-through ordinary collision/slide resolution. Descending steps uses gravity and
-normal landing; there is no snap down over a cliff.
+The step limit is **half the current half-height** (21 units for retail
+standing Caleb, 14 while crouched). The up path lifts the body by at most that
+limit and stops 0.001 below a ceiling: later LithTech lifts by the actual rise of
+the polygons under its lower band and collides the rest of the body normally, so
+only the actual step needs headroom. Requiring the whole limit to clear refused
+every step under a ceiling lower than 2.5 half-heights (70 units crouched, 105
+standing), which trapped crouched players behind any lip at a duct exit. The
+across and down paths must clear from the reached height, and landing must have
+a walkable normal and a positive rise within the limit. Over-height walls and
+steps taller than the headroom continue through ordinary collision/slide
+resolution. Descending steps uses gravity and normal landing; there is no snap
+down over a cliff.
 
 The half-height default is evidenced by later LithTech's `collision.cpp`; its
 solver and additional 0.5-unit tolerance were **not** imported. Blood II retail
@@ -132,9 +145,12 @@ collision box and eye. The Models panel remains a separate resource preview.
 Space jumps, arrows look, and F1 hides inspection. Panel buttons are held inputs.
 Focus loss and text editing suppress commands. Simulation also runs without ImGui.
 
-Eight synthetic cases cover ascending multiple box/triangle stairs, descending,
+Nine synthetic cases cover ascending multiple box/triangle stairs, descending,
 over-height/low-ceiling/disabled-flag/crouched/rising rejection, apex stepping,
-jumps onto a 100-unit ledge (and refusal at 115 units or under a ceiling), clearance,
+jumps onto a 100-unit ledge (and refusal at 115 units or under a ceiling),
+`locomotion.duct` (a crouched round trip through a 60-unit duct whose floor is
+6 units below the room, a standing 6-unit step under a 90-unit ceiling, and a
+10-unit lip refused in the duct), clearance,
 feet/eye consistency, reduced speed/jump, clip state/looping/keys, missing chains
 (current clip kept and restarted once; failure only without a valid current clip),
 exit/re-entry, Ctrl routing and speculative versus accepted touch callbacks.
@@ -142,6 +158,8 @@ The private case verifies actual Caleb dimensions/fallback clips and world
 movement. `locomotion.chosen` runs, jumps and lands as each of the four Chosen:
 Caleb/Ophelia resolve `jmp_rifle`, while Ishmael/Gabriella keep `run_rifle`.
 `locomotion.cityhub_ledge` reaches the 96-unit dumpster from the planter rim and
-keeps the flat 90-unit rise and the fence crossing. The strengthened GPU movement smoke checks SDL walk/run/jump/crouch,
+keeps the flat 90-unit rise and the fence crossing. `locomotion.low_ceilings`
+climbs a crouched 4-unit duct lip in 09_Abandoned_Buildings and a standing
+16-unit step under a 104-unit ceiling in 15_Crypt. The strengthened GPU movement smoke checks SDL walk/run/jump/crouch,
 hidden stance changes, live player pose and unload/re-entry. Other-platform, XR
 and retail executable feel comparisons have not been performed.

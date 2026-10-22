@@ -167,6 +167,49 @@ namespace
         }
         return true;
     }
+    // A low ceiling leaves less headroom than the step limit (13 crouched, 20.5
+    // standing): the body lifts only as far as the ceiling allows. A crouched
+    // body (52 high) in a 60-unit duct drops onto its 6-unit-lower floor, climbs
+    // back out, and stands on either side; a standing body steps under a 90-unit
+    // ceiling. A step taller than the headroom is still refused.
+    bool duct(const std::filesystem::path& root)
+    {
+        for (int mode = 0; mode < 3; ++mode)
+        {
+            GameSession game;
+            CHECK(enter(game, root));
+            auto& c = game.client_shell;
+            auto* player = game.server_shell.Player(game.local_client);
+            const float rise = mode == 2 ? 10 : 6, ceiling = mode == 1 ? 90 : 60;
+            CHECK(box(game, {32, rise / 2, 400}, {100, rise / 2, 100})); // room floor beyond z=300
+            CHECK(box(game, {32, ceiling + 5, 200}, {100, 5, 100}));     // ceiling over z=100..300
+            c.movement_input.forward = true;
+            c.movement_input.crouch = mode != 1;
+            CHECK(step(game, mode == 1 ? 90 : 180));
+            const auto& body = c.move_mgr.body;
+            if (mode == 2)
+            {
+                CHECK(c.position.z < 288.01 && std::abs(c.position.y - 26.001f) < .02 && body.stair_steps == 0);
+                continue;
+            }
+            const float half = mode == 1 ? 41 : 26;
+            CHECK(c.position.z > 320 && std::abs(c.position.y - rise - half - .001f) < .02 && c.move_mgr.m_bOnGround);
+            CHECK(body.stair_steps == 1 && std::abs(body.last_step_height - rise) < .01);
+            c.movement_input = {};
+            CHECK(step(game, 2));
+            CHECK(!player->crouched && body.dimensions.y == 41 && std::abs(c.position.y - rise - 41.001f) < .02);
+            if (mode == 1)
+                continue;
+            // Back through the duct: crouch, drop in, walk out the open end and stand.
+            c.movement_input.backward = c.movement_input.crouch = true;
+            CHECK(step(game, 180));
+            CHECK(c.position.z < 88 && std::abs(c.position.y - 26.001f) < .02 && player->crouched);
+            c.movement_input = {};
+            CHECK(step(game, 2));
+            CHECK(!player->crouched && body.dimensions.y == 41 && std::abs(c.position.y - 41.001f) < .02);
+        }
+        return true;
+    }
     bool crouch(const std::filesystem::path& root)
     {
         GameSession game;
@@ -574,6 +617,52 @@ namespace
         }
         return true;
     }
+    // Authored steps under low ceilings (reports/low_ceiling_steps.md): a 4-unit lip
+    // in a 68-unit Abandoned Buildings duct (crouched, 12 units of headroom for a
+    // 14-unit limit) and a 16-unit Crypt step under 104 units (standing, 20 for 21).
+    bool low_ceilings(const std::filesystem::path& root)
+    {
+        struct Case
+        {
+            const char* world;
+            DVector feet;
+            float yaw, rise;
+            bool crouch;
+        };
+        for (const auto& t : {Case{"09_Abandoned_Buildings", {-752, 956, 2700}, 0, 4, true},
+                              Case{"15_Crypt", {160, 16, -512}, 3.14159265f, 16, false}})
+        {
+            GameSession game;
+            CHECK(game.initialize());
+            Config config;
+            config.data_dir = root;
+            std::string error;
+            CHECK(game.resources.mount_game(config, error));
+            CHECK(game.request_world(t.world, error) && game.enter_player(error) && step(game));
+            auto& c = game.client_shell;
+            auto& mgr = c.move_mgr;
+            auto* p = game.server_shell.Player(game.local_client);
+            auto position = t.feet;
+            position.y += game.objects.get(c.player)->dimensions.y + .01f;
+            CHECK(game.server.TeleportObject(c.player, &position) == DE_OK && p->TeleportClientToServerPos() &&
+                  game.pump_player_messages(error));
+            MovementInput input{};
+            input.crouch = t.crouch;
+            for (int i = 0; i < 5; ++i)
+                CHECK(mgr.Update(game.server_shell, c.voice_manager, false, input, t.yaw, 1.0 / 60, true));
+            CHECK(p->crouched == t.crouch);
+            const auto steps = mgr.body.stair_steps;
+            input.forward = true;
+            for (int i = 0; i < 30; ++i)
+                CHECK(mgr.Update(game.server_shell, c.voice_manager, false, input, t.yaw, 1.0 / 60, true));
+            const float feet = mgr.body.position.y - mgr.body.dimensions.y;
+            std::cout << t.world << " feet " << t.feet.y << " -> " << feet << " steps " << mgr.body.stair_steps - steps
+                      << " last " << mgr.body.last_step_height << '\n';
+            CHECK(mgr.body.stair_steps > steps && std::abs(mgr.body.last_step_height - t.rise) < .05 &&
+                  feet > t.feet.y + t.rise - .01 && mgr.m_bOnGround);
+        }
+        return true;
+    }
 } // namespace
 int main(int argc, char** argv)
 {
@@ -591,6 +680,7 @@ int main(int argc, char** argv)
                     : name == "world_stairs"  ? stairs(root, true)
                     : name == "limits"        ? step_limits(root)
                     : name == "crouch"        ? crouch(root)
+                    : name == "duct"          ? duct(root)
                     : name == "animations"    ? animations(root)
                     : name == "lifetime"      ? lifetime(root)
                     : name == "contacts"      ? contacts(root)
@@ -599,6 +689,7 @@ int main(int argc, char** argv)
                     : name == "cityhub_roam"  ? cityhub_roam(root)
                     : name == "ledge"         ? ledge(root)
                     : name == "cityhub_ledge" ? cityhub_ledge(root)
+                    : name == "low_ceilings"  ? low_ceilings(root)
                                               : false;
     return ok ? 0 : 1;
 }

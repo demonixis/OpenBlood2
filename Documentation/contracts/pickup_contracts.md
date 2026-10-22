@@ -106,6 +106,16 @@ object. A spawned pickup has an independent lifetime, surviving parent removal
 and being reclaimed on world unload. It is not a SelfTrigger-style owned child.
 Resource failure is reported separately from successful object allocation.
 
+A string-created pickup starts at its source's centre, which can leave its box inside a
+wall or slope (a dying NPC's HealthPU against the SubwayA train wall, a WardPU on a
+CityHub slope 1.7 units deep). Replacement placement: after its dimensions are set,
+INITIALUPDATE applies the bounded `ResolveInitialWorldOverlap` used for authored
+overlaps; a refusal is recorded in the pickup's error. As a further replacement policy,
+a pickup whose physics move fails never fails the session step: it gets one more bounded
+separation and, if that changes nothing, stops falling where it is (gravity and velocity
+cleared, still collectible) with the failure recorded (`pickup_motion_stops`). Every
+other body keeps the strict start-penetration failure.
+
 ## String-created bouncing pickups
 
 ItemPickup and WeaponPickup set the original `m_bBounce`; ammo, health and ward

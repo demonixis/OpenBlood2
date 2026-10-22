@@ -1,4 +1,5 @@
 #include "engine/world_model.h"
+#include "game/original/PickupObject.h"
 #include "game/original/PolyGrid.h"
 #include "game/original/Projectile.h"
 #include "game/original/SeeingEye.h"
@@ -405,12 +406,19 @@ namespace OpenBlood2
                 const float height = r->dimensions.y * 0.5f;
                 auto up = position;
                 up.y += height + 0.002f;
+                // Lift only as far as the headroom allows. Later LithTech lifts by the
+                // actual step and collides the rest of the body normally; requiring the
+                // whole limit to clear refused every step under a low ceiling (a
+                // crouched body in a 64-unit duct has 8 units to spare, not 14).
+                CollisionHit probe, landing;
+                const auto lift = sweep_scene(h, position, up, r->dimensions, probe, ids, nullptr, allowed_penetration);
+                if (lift == CollisionQuery::Hit && !probe.start_solid)
+                    up.y = std::max(position.y, probe.point.y - 0.001f);
                 auto across = vector_add(up, {remaining.x, 0, remaining.z});
                 auto down = across;
                 down.y = position.y - 0.02f;
-                CollisionHit probe, landing;
-                if (sweep_scene(h, position, up, r->dimensions, probe, ids, nullptr, allowed_penetration) ==
-                        CollisionQuery::Miss &&
+                if (lift != CollisionQuery::Invalid && !(lift == CollisionQuery::Hit && probe.start_solid) &&
+                    up.y > position.y + 0.001f &&
                     sweep_scene(h, up, across, r->dimensions, probe, ids) == CollisionQuery::Miss &&
                     sweep_scene(h, across, down, r->dimensions, landing, ids) == CollisionQuery::Hit &&
                     !landing.start_solid && landing.normal.y >= 0.5f && landing.point.y > position.y + 0.001f &&
@@ -647,7 +655,24 @@ namespace OpenBlood2
                     destination.z == r->state.m_Pos.z)
                     continue;
                 if (MoveObject(r->handle, &destination) != DE_OK)
-                    return false;
+                {
+                    // Replacement policy: a touch-only pickup that cannot move (it starts inside
+                    // geometry) never fails the session step. It gets one bounded separation; if
+                    // that changes nothing it stops falling where it is, still collectible, and
+                    // the failure stays recorded. Every other body keeps the strict failure.
+                    auto* pickup = dynamic_cast<PickupObject*>(r->game.get());
+                    if (!pickup || r->life != Life::Alive)
+                        return false;
+                    const auto nudges = r->placement_nudges;
+                    if (ResolveInitialWorldOverlap(r->handle) != DE_OK || r->placement_nudges == nudges)
+                    {
+                        r->state.m_Flags &= ~FLAG_GRAVITY;
+                        r->velocity = r->acceleration = {};
+                        pickup->error = "Cannot move out of geometry; gravity stopped";
+                    }
+                    ++pickup_motion_stops;
+                    break;
+                }
             }
         }
         return objects_.finish_frame();

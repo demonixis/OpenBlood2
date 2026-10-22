@@ -73,6 +73,10 @@ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
             g_pServerDE->SetObjectDims(m_hObject, &dims);
             if (reason == INITIALUPDATE_WORLDFILE && g_pServerDE->MoveObjectToGround(m_hObject) != DE_OK)
                 error = "Initial pickup ground placement failed";
+            // Replacement placement: a runtime spawn (a dying NPC's drop) starts at its source's
+            // centre, possibly inside a wall or slope; separate it like an authored overlap.
+            if (reason == INITIALUPDATE_STRINGPROP && g_pServerDE->ResolveInitialWorldOverlap(m_hObject) == DE_ERROR)
+                error = "Spawned inside world geometry; bounded separation refused";
         }
         g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 3) | (1u << 10) |
                                                        (rotate_fx ? (1u << 4) : 0));
