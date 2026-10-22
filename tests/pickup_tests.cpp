@@ -495,7 +495,9 @@ namespace
         CHECK(counts["StealthPU"] == 14 && counts["InvulnerabilityPU"] == 13);
         // BugSpray, NightGoggles and TheEye add 25 authored pickups; Voodoo adds four.
         CHECK(counts["BugSprayPU"] == 3 && counts["NightGogglesPU"] == 10 && counts["TheEyePU"] == 12);
-        CHECK(worlds == 58 && created == 1904 && counts["AngerPU"] == 25 && counts["VoodooDollPU"] == 4 &&
+        // RevenantPU and LifeLeechPU add three authored pickups each.
+        CHECK(counts["RevenantPU"] == 3 && counts["LifeLeechPU"] == 3);
+        CHECK(worlds == 58 && created == 1910 && counts["AngerPU"] == 25 && counts["VoodooDollPU"] == 4 &&
               missing == 0 && rejected == 0 && spawns == 75);
         return true;
     }
