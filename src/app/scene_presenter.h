@@ -69,8 +69,15 @@ namespace OpenBlood2
         std::optional<std::array<ViewWeaponCamera, 2>> weapon_cameras; // {left, right}
         // XR without a compositor fade: screen fades scale the scene light (1 on desktop).
         float scene_fade = 1;
-        // XR: recorded at the end of each eye's scene pass (controllers, laser, reticle).
+        // XR: recorded at the end of each eye's scene pass (laser, reticle).
         std::function<void(SDL_GPURenderPass*, SDL_GPUCommandBuffer*, std::size_t eye)> eye_overlay;
+        // XR menus: hand models at the controllers (close draws, fully bright) replace the view
+        // weapons while draw_hands is set. Filled by the XR frontend before recording.
+        ModelView hand_scene;
+        bool draw_hands = false;
+        // XR without a world: a dark clear, then hand_scene and eye_overlay, one pass per eye.
+        bool record_hand_eyes(SDL_GPUCommandBuffer*, SDL_GPUTexture* target, SDL_GPUTextureFormat, Uint32 width,
+                              Uint32 height, std::span<const StereoEye> eyes, std::string& error);
 
         bool render_world = false;      // Entered player and loaded geometry at the last update().
         bool rebuilt = false;           // The last update() rebuilt or released world geometry.
@@ -85,6 +92,7 @@ namespace OpenBlood2
         WorldPipelines pipelines; // Declared before the renderers that borrow it.
         WorldRenderer world_renderer;
         ModelRenderer model_renderer, explosion_model_renderer; // GPU skinning of both model views.
+        ModelRenderer hand_renderer;                            // hand_scene (original shading).
         WorldRenderer polygrid_renderer, sprite_renderer, sky_sprite_renderer;
         ModelView model_scene, explosion_model_scene;
         ModelLighting model_lighting; // Static light objects shading model_scene instances.
@@ -126,6 +134,7 @@ namespace OpenBlood2
       private:
         const CameraView& camera(const GameSession&) const;
         // Pipelines, renderer uploads, shadow tiles and a depth target with `layers` layers.
+        bool prepare_depth(Uint32 width, Uint32 height, Uint32 layers, std::string& error);
         bool prepare_frame(SDL_GPUCommandBuffer*, SDL_GPUTextureFormat, Uint32 width, Uint32 height, Uint32 layers,
                            std::string& error);
         // One scene render pass into colour/depth layer `layer`.

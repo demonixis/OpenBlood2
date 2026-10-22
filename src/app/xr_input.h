@@ -60,16 +60,25 @@ namespace OpenBlood2::xr
         }
     };
 
-    // Analog trigger as a held button with hysteresis.
+    // Analog trigger or grip as a held button with hysteresis.
     struct TriggerButton
     {
         bool down = false;
-        bool update(float value)
+        bool update(float value, float press = .55f, float release = .35f)
         {
-            down = std::isfinite(value) && (down ? value > .35f : value > .55f);
+            down = std::isfinite(value) && (down ? value > release : value > press);
             return down;
         }
     };
+
+    // A stick axis for continuous control: zero inside the dead zone, then rescaled to reach
+    // +-1 at full deflection.
+    inline float stick_axis(float value, float deadzone = .2f)
+    {
+        if (!std::isfinite(value) || std::fabs(value) <= deadzone)
+            return 0;
+        return std::copysign(std::min(1.f, (std::fabs(value) - deadzone) / (1 - deadzone)), value);
+    }
 
     // Press edge of a boolean control.
     struct PressEdge

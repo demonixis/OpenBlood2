@@ -3,13 +3,17 @@
 #include "MenuIds.h"
 #include "game/menu.h"
 #include <algorithm>
+#include <array>
 #include <utility>
 namespace OpenBlood2
 {
     namespace
     {
-        // Replacement command of the Controls page's last row (no original counterpart).
-        constexpr int MENU_CMD_RESTORE_CONTROLS = -2;
+        // Replacement commands without original counterparts: the Controls page's last row and
+        // the Options page's VR row.
+        constexpr int MENU_CMD_RESTORE_CONTROLS = -2, MENU_CMD_VR = -3;
+        // VR turn steps in the order the row cycles them; 0 turns smoothly.
+        constexpr std::array<int, 6> vr_turns{15, 30, 45, 60, 90, 0};
     } // namespace
     void Menu::AddLargeTextItemOption(unsigned id, int command)
     {
@@ -108,6 +112,8 @@ namespace OpenBlood2
                 AddLargeTextItemOption(IDS_MENU_OPTIONS_MOUSE, MENU_CMD_MOUSE);
                 AddLargeTextItemOption(IDS_MENU_OPTIONS_JOYSTICK, MENU_CMD_JOYSTICK);
                 AddLargeTextItemOption(IDS_MENU_OPTIONS_KEYBOARD, MENU_CMD_KEYBOARD);
+                if (vr)
+                    items.push_back({0, MENU_CMD_VR, true, "VR", -1, {}});
                 break;
             case MenuPage::Audio:
                 setting(IDS_MENU_AUDIO_SOUND, 0);
@@ -124,6 +130,12 @@ namespace OpenBlood2
                 items.push_back({0, -1, true, {}, 8, {}});
                 items.push_back({0, -1, true, {}, 7, {}});
                 items.push_back({0, -1, true, {}, 9, {}});
+                break;
+            case MenuPage::Vr:
+                // Replacement rows, labelled like the Display page's replacement rows.
+                items.push_back({0, -1, true, {}, 10, {}});
+                items.push_back({0, -1, true, {}, 11, {}});
+                items.push_back({0, -1, true, {}, 12, {}});
                 break;
             case MenuPage::Mouse:
                 setting(IDS_MENU_MOUSE_SENSITIVITY, 4);
@@ -295,6 +307,7 @@ namespace OpenBlood2
             case MenuPage::Mouse:
             case MenuPage::Display:
             case MenuPage::Controls:
+            case MenuPage::Vr:
                 build(MenuPage::Options);
                 break;
             default:
@@ -442,6 +455,9 @@ namespace OpenBlood2
             case MENU_CMD_RESTORE_CONTROLS:
                 pending_.action = MenuAction::RestoreControls;
                 break;
+            case MENU_CMD_VR:
+                build(MenuPage::Vr);
+                break;
             default:
                 break;
         }
@@ -490,6 +506,20 @@ namespace OpenBlood2
                 break;
             case 9:
                 settings.normal_maps = !settings.normal_maps;
+                break;
+            case 10:
+            {
+                const auto at = std::find(vr_turns.begin(), vr_turns.end(), settings.vr_turn);
+                const int index = at == vr_turns.end() ? 2 : int(at - vr_turns.begin());
+                const int count = int(vr_turns.size());
+                settings.vr_turn = vr_turns[std::size_t((index + (direction < 0 ? count - 1 : 1)) % count)];
+                break;
+            }
+            case 11:
+                settings.vr_laser = !settings.vr_laser;
+                break;
+            case 12:
+                settings.vr_crosshair = !settings.vr_crosshair;
                 break;
             default:
                 return;
@@ -557,7 +587,8 @@ namespace OpenBlood2
     bool Menu::small() const
     {
         return page == MenuPage::Audio || page == MenuPage::Mouse || page == MenuPage::Display ||
-               page == MenuPage::Controls || page == MenuPage::Save || page == MenuPage::Load || page == MenuPage::Quit;
+               page == MenuPage::Controls || page == MenuPage::Vr || page == MenuPage::Save || page == MenuPage::Load ||
+               page == MenuPage::Quit;
     }
     const char* Menu::title() const
     {
@@ -568,6 +599,7 @@ namespace OpenBlood2
             case MenuPage::Mouse:
             case MenuPage::Display:
             case MenuPage::Controls:
+            case MenuPage::Vr:
                 return "options.pcx";
             case MenuPage::Solo:
             case MenuPage::Character:

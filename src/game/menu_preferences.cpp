@@ -10,16 +10,19 @@ namespace OpenBlood2
     namespace
     {
         // Version 1 has the first seven keys; version 2 adds the display settings; version 3 adds
-        // the renderer selection.
-        constexpr std::array<const char*, 12> names{
-            "version",  "sound",          "music",    "sound_volume", "music_volume", "sensitivity",
-            "invert_y", "detail",         "pixel_lighting", "renderer", "quality",     "normal_maps"};
-        constexpr std::array<std::size_t, 3> version_keys{7, 9, 12};
+        // the renderer selection; version 4 adds the VR options.
+        constexpr std::array<const char*, 15> names{"version",        "sound",       "music",       "sound_volume",
+                                                    "music_volume",   "sensitivity", "invert_y",    "detail",
+                                                    "pixel_lighting", "renderer",    "quality",     "normal_maps",
+                                                    "vr_turn",        "vr_laser",    "vr_crosshair"};
+        constexpr std::array<std::size_t, 4> version_keys{7, 9, 12, 15};
         bool valid(const MenuSettings& s)
         {
+            const bool turn = s.vr_turn == 0 || s.vr_turn == 15 || s.vr_turn == 30 || s.vr_turn == 45 ||
+                              s.vr_turn == 60 || s.vr_turn == 90;
             return s.sound_volume >= 0 && s.sound_volume <= 50 && s.music_volume >= 0 && s.music_volume <= 50 &&
                    s.sensitivity >= 100 && s.sensitivity <= 1500 && s.detail >= 0 && s.detail <= 2 &&
-                   (s.renderer == 0 || s.renderer == 1) && (s.quality == 0 || s.quality == 1);
+                   (s.renderer == 0 || s.renderer == 1) && (s.quality == 0 || s.quality == 1) && turn;
         }
     } // namespace
     bool menu_preferences_path(std::filesystem::path& output, std::string& error)
@@ -89,9 +92,10 @@ namespace OpenBlood2
         const bool known = values[0] >= 1 && values[0] <= int(version_keys.size());
         const std::size_t required = known ? version_keys[values[0] - 1] : 0;
         auto flag = [&](std::size_t key) { return key >= required || (values[key] >= 0 && values[key] <= 1); };
-        if (input.bad() || !known || std::find(seen.begin(), seen.begin() + required, false) != seen.begin() + required ||
+        if (input.bad() || !known ||
+            std::find(seen.begin(), seen.begin() + required, false) != seen.begin() + required ||
             std::find(seen.begin() + required, seen.end(), true) != seen.end() || !flag(1) || !flag(2) || !flag(6) ||
-            !flag(8) || !flag(11))
+            !flag(8) || !flag(11) || !flag(13) || !flag(14))
         {
             error = "Incomplete or unsupported preferences";
             return false;
@@ -114,6 +118,12 @@ namespace OpenBlood2
             result.quality = values[10];
             result.normal_maps = values[11];
         }
+        if (required >= version_keys[3])
+        {
+            result.vr_turn = values[12];
+            result.vr_laser = values[13];
+            result.vr_crosshair = values[14];
+        }
         if (!valid(result))
         {
             error = "Preferences out of range";
@@ -130,7 +140,7 @@ namespace OpenBlood2
             error = "Preferences out of range";
             return false;
         }
-        const std::array<int, names.size()> values{3,
+        const std::array<int, names.size()> values{4,
                                                    settings.sound,
                                                    settings.music,
                                                    settings.sound_volume,
@@ -141,7 +151,10 @@ namespace OpenBlood2
                                                    settings.pixel_lighting,
                                                    settings.renderer,
                                                    settings.quality,
-                                                   settings.normal_maps};
+                                                   settings.normal_maps,
+                                                   settings.vr_turn,
+                                                   settings.vr_laser,
+                                                   settings.vr_crosshair};
         std::string text;
         for (unsigned i = 0; i < values.size(); ++i)
             text += std::string(names[i]) + '=' + std::to_string(values[i]) + '\n';

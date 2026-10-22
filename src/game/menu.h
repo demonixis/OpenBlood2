@@ -18,6 +18,7 @@ namespace OpenBlood2
         Mouse,
         Display,
         Controls,
+        Vr, // Replacement Options > VR page (XR sessions only).
         Save,
         Load,
         Quit
@@ -87,6 +88,10 @@ namespace OpenBlood2
         // enhanced lighting quality (0 standard, 1 high) and generated normal maps.
         int renderer = 0, quality = 0;
         bool normal_maps = true;
+        // Replacement VR rows: the snap-turn step in degrees (15, 30, 45, 60 or 90; 0 turns
+        // smoothly), the aim laser and the aim reticle.
+        int vr_turn = 45;
+        bool vr_laser = true, vr_crosshair = true;
         bool operator==(const MenuSettings&) const = default;
     };
     struct MenuItem
@@ -96,7 +101,7 @@ namespace OpenBlood2
         bool enabled = true;
         std::string literal;
         // Setting IDs: sound, volume, music, volume, sensitivity, invert Y, detail, lighting,
-        // renderer, normal maps.
+        // renderer, normal maps, VR turn, VR laser, VR crosshair.
         int setting = -1;
         HudRect rect{}, slider_rect{};
         std::string insertion; // FormatMessage %1!s! argument of the Load page's RESTART/QUICKLOAD strings.
@@ -143,6 +148,7 @@ namespace OpenBlood2
         }
         MenuCommand take_command();
         bool active = false, in_world = false, alive = true;
+        bool vr = false;           // An XR session: Options offers the replacement VR page.
         bool audio_failed = false; // Nonmodal application-owned audio status.
         MenuPage page = MenuPage::Main, top = MenuPage::Main;
         std::vector<MenuItem> items;

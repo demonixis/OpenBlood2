@@ -176,6 +176,13 @@ the original renderer) after LIGHTING. With ENHANCED, the LIGHTING row cycles
 version 3, versions 1 and 2 load with the renderer defaults, and keys of a later version
 are rejected. This supersedes the version 2 write statement above.
 
+In an XR session (`Menu::vr`) Options ends with a replacement large-font `VR` row opening the
+replacement VR page (small font, `options.pcx`, Back returns to Options): `TURN [SNAP n/SMOOTH]`
+(setting 10), `AIM LASER [ON/OFF]` (11) and `CROSSHAIR [ON/OFF]` (12); see the
+[OpenXR contract](xr_runtime_contracts.md#hud-and-menus-lot-86). `preferences.cfg` version 4
+adds `vr_turn` (0, 15, 30, 45, 60 or 90), `vr_laser` and `vr_crosshair`; writes produce
+version 4 and versions 1–3 load the VR defaults (45, 1, 1).
+
 
 ## Controls (CMenuControls)
 

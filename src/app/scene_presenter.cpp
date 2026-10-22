@@ -9,11 +9,12 @@ namespace OpenBlood2
         : registry(device), pipelines(device), world_renderer(DrawStyle::Opaque, pipelines, registry),
           model_renderer(DrawStyle::Opaque, pipelines, registry),
           explosion_model_renderer(DrawStyle::SpriteAlpha, pipelines, registry),
+          hand_renderer(DrawStyle::Opaque, pipelines, registry),
           polygrid_renderer(DrawStyle::Opaque, pipelines, registry),
           sprite_renderer(DrawStyle::SpriteAlpha, pipelines, registry),
           sky_sprite_renderer(DrawStyle::Opaque, pipelines, registry)
     {
-        model_scene.gpu_skinning = explosion_model_scene.gpu_skinning = true;
+        model_scene.gpu_skinning = explosion_model_scene.gpu_skinning = hand_scene.gpu_skinning = true;
         world_renderer.receive_shadows = true;
     }
     ScenePresenter::~ScenePresenter()
@@ -326,6 +327,8 @@ namespace OpenBlood2
             sprite_renderer.clear_geometry();
             sky_sprite_scene.clear();
             sky_sprite_renderer.clear_geometry();
+            hand_scene.clear();
+            hand_renderer.clear_geometry();
             registry.clear_textures(); // Material textures belong to one world revision.
             world_mesh = {};
             world_draws.clear();
@@ -409,8 +412,9 @@ namespace OpenBlood2
             return false;
         };
         stats.passes = 0;
-        for (auto* renderer : {&world_renderer.stats, &model_renderer.stats, &explosion_model_renderer.stats,
-                               &polygrid_renderer.stats, &sprite_renderer.stats, &sky_sprite_renderer.stats})
+        for (auto* renderer :
+             {&world_renderer.stats, &model_renderer.stats, &explosion_model_renderer.stats, &polygrid_renderer.stats,
+              &sprite_renderer.stats, &sky_sprite_renderer.stats, &hand_renderer.stats})
             renderer->draw_calls = renderer->culled = 0;
         if (!pipelines.prepare(format, shading, error))
             return fail("World pipelines");
@@ -420,6 +424,8 @@ namespace OpenBlood2
             return fail("World viewport");
         if (!model_renderer.prepare(model_scene, format, width, height, error))
             return fail("Model viewport");
+        if (draw_hands && !hand_renderer.prepare(hand_scene, format, width, height, error))
+            return fail("Hand viewport");
         if (!explosion_model_scene.world_draws.empty() &&
             !explosion_model_renderer.prepare(explosion_model_scene, format, width, height, error))
             return fail("Explosion model viewport");
@@ -436,25 +442,30 @@ namespace OpenBlood2
         if (!record_shadow_tiles(commands, error))
             return fail("Model shadow tiles");
         stats.passes = shadow_casters.empty() ? 0 : 1;
-        if (!registry.get(depth_) || depth_width_ != width || depth_height_ != height || depth_layers_ != layers)
-        {
-            SDL_GPUTextureCreateInfo info{};
-            info.type = layers > 1 ? SDL_GPU_TEXTURETYPE_2D_ARRAY : SDL_GPU_TEXTURETYPE_2D;
-            info.format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
-            info.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
-            info.width = width;
-            info.height = height;
-            info.layer_count_or_depth = layers;
-            info.num_levels = 1;
-            const auto next = registry.create_texture(info, error);
-            if (!next)
-                return fail("World viewport");
-            registry.release(depth_);
-            depth_ = next;
-            depth_width_ = width;
-            depth_height_ = height;
-            depth_layers_ = layers;
-        }
+        if (!prepare_depth(width, height, layers, error))
+            return fail("World viewport");
+        return true;
+    }
+    bool ScenePresenter::prepare_depth(Uint32 width, Uint32 height, Uint32 layers, std::string& error)
+    {
+        if (registry.get(depth_) && depth_width_ == width && depth_height_ == height && depth_layers_ == layers)
+            return true;
+        SDL_GPUTextureCreateInfo info{};
+        info.type = layers > 1 ? SDL_GPU_TEXTURETYPE_2D_ARRAY : SDL_GPU_TEXTURETYPE_2D;
+        info.format = SDL_GPU_TEXTUREFORMAT_D32_FLOAT;
+        info.usage = SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET;
+        info.width = width;
+        info.height = height;
+        info.layer_count_or_depth = layers;
+        info.num_levels = 1;
+        const auto next = registry.create_texture(info, error);
+        if (!next)
+            return false;
+        registry.release(depth_);
+        depth_ = next;
+        depth_width_ = width;
+        depth_height_ = height;
+        depth_layers_ = layers;
         return true;
     }
     bool ScenePresenter::record_view(GameSession& game, SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target,
@@ -557,10 +568,13 @@ namespace OpenBlood2
             stage = "PolyGrid viewport";
         else if (!sprite_renderer.record(scene, sprite_scene.mesh, sprite_scene.batched_draws, eye, rotation, error))
             stage = "Sprite viewport";
-        else if (!model_scene.close_draws.empty() &&
-                 !model_renderer.record(close, model_scene, model_scene.close_draws, eye, rotation, error,
-                                        WorldPass::Opaque, {}, true))
-            stage = "Model viewport";
+        else if (draw_hands ? !hand_scene.close_draws.empty() &&
+                                  !hand_renderer.record(close, hand_scene, hand_scene.close_draws, eye, rotation, error,
+                                                        WorldPass::Opaque, {}, true)
+                            : !model_scene.close_draws.empty() &&
+                                  !model_renderer.record(close, model_scene, model_scene.close_draws, eye, rotation,
+                                                         error, WorldPass::Opaque, {}, true))
+            stage = draw_hands ? "Hand viewport" : "Model viewport";
         if (!stage && projection && eye_overlay)
             eye_overlay(pass, commands, layer);
         SDL_EndGPURenderPass(pass);
@@ -572,10 +586,11 @@ namespace OpenBlood2
     {
         stats.draw_calls = world_renderer.stats.draw_calls + model_renderer.stats.draw_calls +
                            explosion_model_renderer.stats.draw_calls + polygrid_renderer.stats.draw_calls +
-                           sprite_renderer.stats.draw_calls + sky_sprite_renderer.stats.draw_calls;
+                           sprite_renderer.stats.draw_calls + sky_sprite_renderer.stats.draw_calls +
+                           hand_renderer.stats.draw_calls;
         stats.culled = world_renderer.stats.culled + model_renderer.stats.culled +
                        explosion_model_renderer.stats.culled + polygrid_renderer.stats.culled +
-                       sprite_renderer.stats.culled + sky_sprite_renderer.stats.culled;
+                       sprite_renderer.stats.culled + sky_sprite_renderer.stats.culled + hand_renderer.stats.culled;
         stats.record_ns = SDL_GetTicksNS() - started;
         ++stats.frames;
     }
@@ -613,6 +628,75 @@ namespace OpenBlood2
                              &eyes[i].projection, error))
                 return false;
         finish_frame(started);
+        return true;
+    }
+    bool ScenePresenter::record_hand_eyes(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target,
+                                          SDL_GPUTextureFormat format, Uint32 width, Uint32 height,
+                                          std::span<const StereoEye> eyes, std::string& error)
+    {
+        error.clear();
+        if (eyes.empty() || eyes.size() > 2 || !width || !height)
+        {
+            error = "Hand viewport: invalid XR eye views";
+            return false;
+        }
+        auto fail = [&](const char* stage)
+        {
+            error = std::string(stage) + ": " + error;
+            return false;
+        };
+        const auto started = SDL_GetTicksNS();
+        hand_renderer.stats.draw_calls = hand_renderer.stats.culled = 0;
+        stats.passes = 0;
+        const bool hands = draw_hands && !hand_scene.close_draws.empty();
+        if (!pipelines.prepare(format, shading, error))
+            return fail("World pipelines");
+        if (hands && !hand_renderer.prepare(hand_scene, format, width, height, error))
+            return fail("Hand viewport");
+        if (!registry.flush(commands, error))
+            return fail("GPU uploads");
+        if (!prepare_depth(width, height, Uint32(eyes.size()), error))
+            return fail("Hand viewport");
+        for (std::size_t i = 0; i < eyes.size(); ++i)
+        {
+            SDL_GPUColorTargetInfo color{};
+            color.texture = target;
+            color.layer_or_depth_plane = Uint32(i);
+            color.clear_color = {0.02f, 0.02f, 0.03f, 1};
+            color.load_op = SDL_GPU_LOADOP_CLEAR;
+            color.store_op = SDL_GPU_STOREOP_STORE;
+            SDL_GPUDepthStencilTargetInfo depth{};
+            depth.texture = registry.get(depth_);
+            depth.layer = static_cast<Uint8>(i);
+            depth.clear_depth = 1;
+            depth.load_op = SDL_GPU_LOADOP_CLEAR;
+            depth.store_op = SDL_GPU_STOREOP_DONT_CARE;
+            depth.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
+            depth.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
+            depth.cycle = i == 0;
+            auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, &depth);
+            if (!pass)
+            {
+                error = SDL_GetError();
+                return fail("Hand viewport");
+            }
+            ++stats.passes;
+            // The view-model depth slice, as in the world, below the overlay's range.
+            WorldRecordTarget close{commands, pass, false, 0, view_model_depth};
+            close.eye = &eyes[i].projection;
+            const bool recorded =
+                !hands || hand_renderer.record(close, hand_scene, hand_scene.close_draws, eyes[i].position,
+                                               eyes[i].rotation, error, WorldPass::Opaque, {}, true);
+            if (recorded && eye_overlay)
+                eye_overlay(pass, commands, i);
+            SDL_EndGPURenderPass(pass);
+            if (!recorded)
+                return fail("Hand viewport");
+        }
+        stats.draw_calls = hand_renderer.stats.draw_calls;
+        stats.culled = hand_renderer.stats.culled;
+        stats.record_ns = SDL_GetTicksNS() - started;
+        ++stats.frames;
         return true;
     }
 } // namespace OpenBlood2

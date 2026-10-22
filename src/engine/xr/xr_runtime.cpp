@@ -218,8 +218,9 @@ namespace OpenBlood2
         {
             XrAction haptic = XR_NULL_HANDLE, move = XR_NULL_HANDLE, right_stick = XR_NULL_HANDLE,
                      fire = XR_NULL_HANDLE, alt_fire = XR_NULL_HANDLE, use = XR_NULL_HANDLE, use_item = XR_NULL_HANDLE,
-                     jump = XR_NULL_HANDLE, crouch = XR_NULL_HANDLE, next_item = XR_NULL_HANDLE,
-                     detonate = XR_NULL_HANDLE, run = XR_NULL_HANDLE, menu = XR_NULL_HANDLE;
+                     jump = XR_NULL_HANDLE, stick_jump = XR_NULL_HANDLE, crouch = XR_NULL_HANDLE,
+                     prev_item = XR_NULL_HANDLE, next_item = XR_NULL_HANDLE, detonate = XR_NULL_HANDLE,
+                     menu = XR_NULL_HANDLE;
         } actions;
         PFN_xrGetActionStateBoolean get_boolean = nullptr;
         PFN_xrGetActionStateFloat get_float = nullptr;
@@ -528,15 +529,17 @@ namespace OpenBlood2
             !action("haptic", "Vibration", XR_ACTION_TYPE_VIBRATION_OUTPUT, true, a.haptic) ||
             !action("move", "Move", XR_ACTION_TYPE_VECTOR2F_INPUT, false, a.move) ||
             !action("turn_weapon", "Turn / change weapon", XR_ACTION_TYPE_VECTOR2F_INPUT, false, a.right_stick) ||
-            !action("fire", "Fire", XR_ACTION_TYPE_FLOAT_INPUT, false, a.fire) ||
-            !action("alt_fire", "Alternate fire", XR_ACTION_TYPE_FLOAT_INPUT, false, a.alt_fire) ||
+            !action("fire", "Fire / accept", XR_ACTION_TYPE_FLOAT_INPUT, false, a.fire) ||
+            !action("alt_fire", "Alternate fire / back", XR_ACTION_TYPE_FLOAT_INPUT, false, a.alt_fire) ||
             !action("use", "Use / back", boolean, false, a.use) ||
-            !action("use_item", "Use item", boolean, false, a.use_item) ||
+            !action("use_item", "Use item", XR_ACTION_TYPE_FLOAT_INPUT, false, a.use_item) ||
             !action("jump", "Jump / accept", boolean, false, a.jump) ||
+            !action("stick_jump", "Jump", boolean, false, a.stick_jump) ||
             !action("crouch", "Crouch", boolean, false, a.crouch) ||
+            !action("prev_item", "Previous item", boolean, false, a.prev_item) ||
             !action("next_item", "Next item", boolean, false, a.next_item) ||
             !action("detonate", "Detonate", boolean, false, a.detonate) ||
-            !action("run", "Run (toggle)", boolean, false, a.run) || !action("menu", "Menu", boolean, false, a.menu))
+            !action("menu", "Menu", boolean, false, a.menu))
             return false;
         const auto suggest =
             [&s, &error](const char* profile, std::initializer_list<std::pair<XrAction, const char*>> list)
@@ -565,10 +568,11 @@ namespace OpenBlood2
                       {a.alt_fire, "/user/hand/left/input/trigger/value"},
                       {a.jump, "/user/hand/right/input/a/click"},
                       {a.use, "/user/hand/right/input/b/click"},
-                      {a.next_item, "/user/hand/left/input/x/click"},
-                      {a.use_item, "/user/hand/left/input/y/click"},
+                      {a.prev_item, "/user/hand/left/input/x/click"},
+                      {a.next_item, "/user/hand/left/input/y/click"},
+                      {a.use_item, "/user/hand/right/input/squeeze/value"},
                       {a.detonate, "/user/hand/left/input/squeeze/value"},
-                      {a.run, "/user/hand/left/input/thumbstick/click"},
+                      {a.stick_jump, "/user/hand/left/input/thumbstick/click"},
                       {a.crouch, "/user/hand/right/input/thumbstick/click"},
                       {a.menu, "/user/hand/left/input/menu/click"}}) ||
             !suggest("/interaction_profiles/khr/simple_controller",
@@ -823,7 +827,7 @@ namespace OpenBlood2
             frame.views_valid = xr::valid_fov(frame.eye_fov[eye]);
         }
 
-        // Input is inactive outside FOCUSED (system menu): poses stay invalid, cubes hide.
+        // Input is inactive outside FOCUSED (system menu): poses stay invalid, hands hide.
         if (!frame.focused)
             return true;
         XrActiveActionSet active{s.action_set, XR_NULL_PATH};
@@ -861,13 +865,14 @@ namespace OpenBlood2
         c.right_stick = vector(a.right_stick);
         c.fire = scalar(a.fire);
         c.alt_fire = scalar(a.alt_fire);
+        c.use_item = scalar(a.use_item);
         c.use = boolean(a.use);
-        c.use_item = boolean(a.use_item);
         c.jump = boolean(a.jump);
+        c.stick_jump = boolean(a.stick_jump);
         c.crouch = boolean(a.crouch);
+        c.prev_item = boolean(a.prev_item);
         c.next_item = boolean(a.next_item);
         c.detonate = boolean(a.detonate);
-        c.run = boolean(a.run);
         c.menu = boolean(a.menu);
         for (std::size_t hand = 0; hand < 2; ++hand)
         {

@@ -60,8 +60,16 @@ namespace
         StickEdge edge;
         CHECK(edge.update(0.5f) == 0 && edge.update(0.8f) == 1 && edge.update(1) == 0 && edge.update(0.5f) == 0);
         CHECK(edge.update(0.2f) == 0 && edge.update(-0.9f) == -1 && edge.update(NAN) == 0 && edge.update(-0.9f) == -1);
+        // The weapon threshold: 0.85 to fire.
+        CHECK(edge.update(0) == 0 && edge.update(0.84f, .85f) == 0 && edge.update(0.86f, .85f) == 1);
         TriggerButton trigger;
         CHECK(!trigger.update(0.5f) && trigger.update(0.6f) && trigger.update(0.4f) && !trigger.update(0.3f));
+        TriggerButton grip; // The right grip: 0.85 to press, 0.6 to release.
+        CHECK(!grip.update(0.8f, .85f, .6f) && grip.update(0.9f, .85f, .6f) && grip.update(0.7f, .85f, .6f) &&
+              !grip.update(0.5f, .85f, .6f));
+        // Smooth axes: zero in the dead zone, then rescaled to +-1.
+        CHECK(stick_axis(0.2f) == 0 && stick_axis(-0.1f) == 0 && near(stick_axis(0.6f), 0.5f) &&
+              near(stick_axis(-1), -1) && near(stick_axis(1.2f), 1) && stick_axis(NAN) == 0);
         PressEdge press;
         CHECK(press.update(true) && !press.update(true) && !press.update(false) && press.update(true));
         return true;

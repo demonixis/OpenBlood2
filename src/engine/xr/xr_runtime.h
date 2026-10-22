@@ -35,9 +35,10 @@ namespace OpenBlood2
     struct XrControls
     {
         std::array<float, 2> move{}, right_stick{};
-        float fire = 0, alt_fire = 0;
-        bool use = false, use_item = false, jump = false, crouch = false, next_item = false, detonate = false,
-             run = false, menu = false;
+        float fire = 0, alt_fire = 0, use_item = 0; // Triggers and the right grip.
+        // jump: A (jump / accept); stick_jump: the left stick click (play only).
+        bool use = false, jump = false, stick_jump = false, crouch = false, prev_item = false, next_item = false,
+             detonate = false, menu = false;
     };
 
     // One pure value per frame: everything presentation and input read from OpenXR.

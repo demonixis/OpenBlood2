@@ -77,6 +77,7 @@ namespace OpenBlood2
         // Keep the accepted menu-free diagnostic/direct route available independently.
         const bool menu_enabled = !config.demo || (!options.view_world && !options.demo_smoke);
         Menu menu(config.demo ? MenuEdition::Demo : MenuEdition::Retail);
+        menu.vr = xr_mode;
         std::filesystem::path preferences;
         std::string preference_error;
         if (!options.menu_smoke && !options.demo_smoke &&
@@ -346,18 +347,16 @@ namespace OpenBlood2
                     e.window.windowID = SDL_GetWindowID(runtime.window);
                     synthetic.push_back(e);
                 }
+                // The selection laser on the panel (mouse events in canvas pixels), then the virtual
+                // gamepad; a light pulse when the laser moves the selection.
                 const bool navigating = input.paused(menu) || !menu.error.empty() || input.demo.finished();
-                for (const auto& e : xr->menu_events(navigating))
-                    synthetic.push_back(e);
-                // The selection laser on the panel: mouse events in canvas pixels; a light pulse
-                // when it moves the selection.
-                for (const auto& e : xr->pointer_events(navigating, SDL_GetWindowID(runtime.window)))
+                for (const auto& e : xr->menu_events(navigating, SDL_GetWindowID(runtime.window)))
                     synthetic.push_back(e);
                 const auto hovered = std::pair{menu.page, menu.selected};
                 for (auto& e : synthetic)
                     dispatch(e);
                 if (xr->pointer() && menu.active && std::pair{menu.page, menu.selected} != hovered)
-                    xr->vibrate(xr->pointer_hand(), .25f, 8'000'000);
+                    xr->vibrate(XrFrontend::pointer_hand, .25f, 8'000'000);
             }
 #endif
             if (done || input.demo.quit)
@@ -570,6 +569,10 @@ namespace OpenBlood2
                                 : settings.quality ? SurfaceShading::High
                                                    : SurfaceShading::Standard;
             presenter.normal_maps = settings.normal_maps;
+#if BLOOD2_XR
+            if (xr)
+                xr->set_options({float(settings.vr_turn) * 0.017453293f, settings.vr_laser, settings.vr_crosshair});
+#endif
             if (menu_audio)
             {
                 menu_audio->focus(menu.active && menu.promotion == MenuPromotion::None);

@@ -202,6 +202,38 @@ namespace
         menu.back();
         CHECK(menu.page == MenuPage::Options);
         menu.set_controls({});
+        // XR sessions add the replacement VR page: the turn step cycles 15..90 degrees then smooth,
+        // the aim laser and crosshair toggle. Desktop Options has no VR row.
+        CHECK(menu.items.size() == 6);
+        menu.vr = true;
+        menu.build(MenuPage::Options);
+        CHECK(menu.items.size() == 7 && menu.items[6].literal == "VR" && menu.enabled(menu.items[6]));
+        menu.selected = 6;
+        menu.activate();
+        CHECK(menu.page == MenuPage::Vr && menu.small() && menu.items.size() == 3 &&
+              !strcmp(menu.title(), "options.pcx") && menu.items[0].setting == 10 && menu.items[1].setting == 11 &&
+              menu.items[2].setting == 12);
+        menu.selected = 0;
+        menu.activate();
+        CHECK(menu.settings.vr_turn == 60 && menu.take_command().action == MenuAction::Settings);
+        menu.adjust(1);
+        menu.adjust(1);
+        CHECK(menu.settings.vr_turn == 0);
+        menu.adjust(1);
+        CHECK(menu.settings.vr_turn == 15);
+        menu.adjust(-1);
+        CHECK(menu.settings.vr_turn == 0);
+        menu.selected = 1;
+        menu.activate();
+        menu.selected = 2;
+        menu.activate();
+        CHECK(!menu.settings.vr_laser && !menu.settings.vr_crosshair);
+        menu.back();
+        CHECK(menu.page == MenuPage::Options);
+        menu.vr = false;
+        menu.settings.vr_turn = 45;
+        menu.settings.vr_laser = menu.settings.vr_crosshair = true;
+        menu.take_command();
         auto fit = MenuViewport::fit(1920, 1080);
         float x = 240, y = 0;
         CHECK(fit.point(x, y) && x == 0 && y == 0);
@@ -777,6 +809,7 @@ namespace
             std::filesystem::create_directories(output);
         }
         menu.controls = control_menu_rows(InputBindings::defaults());
+        menu.vr = true; // The XR Options row and VR page fit the original canvas too.
         for (unsigned page = 0; page <= unsigned(MenuPage::Quit); ++page)
         {
             menu.build(MenuPage(page));

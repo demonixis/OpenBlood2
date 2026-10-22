@@ -86,7 +86,7 @@ namespace OpenBlood2
     }
 
     void xr_apply_controls(GameSession& game, XrPlayer& player, const XrFrameInput& frame, const XrTracking& t,
-                           const xr::Vec3& reference, float units_per_meter)
+                           const xr::Vec3& reference, float units_per_meter, double seconds)
     {
         auto& shell = game.client_shell;
         const auto& c = frame.controls;
@@ -98,11 +98,15 @@ namespace OpenBlood2
         }
         else if (shell.rotation.yaw != player.written_yaw)
             player.body_yaw += shell.rotation.yaw - player.written_yaw;
-        // Right stick: the dominant axis turns (snap) or cycles weapons.
+        // Right stick: the dominant axis turns (snap or smooth) or, pushed past 0.85, cycles weapons.
         const auto& right_stick = c.right_stick;
         const bool turning = std::fabs(right_stick[0]) >= std::fabs(right_stick[1]);
-        player.body_yaw += static_cast<float>(player.turn.update(turning ? right_stick[0] : 0)) * xr_snap_angle;
-        if (const int cycle = player.weapon.update(turning ? 0 : right_stick[1]))
+        const float turn = turning ? right_stick[0] : 0;
+        if (player.turn_step > 0)
+            player.body_yaw += static_cast<float>(player.turn.update(turn)) * player.turn_step;
+        else if (std::isfinite(seconds) && seconds > 0)
+            player.body_yaw += xr::stick_axis(turn) * xr_smooth_turn_speed * static_cast<float>(seconds);
+        if (const int cycle = player.weapon.update(turning ? 0 : right_stick[1], xr_weapon_deflection))
         {
             std::string why;
             if (!game.cycle_weapon(cycle > 0, why))
@@ -110,11 +114,8 @@ namespace OpenBlood2
         }
         // Head-relative locomotion; the aim stays the controller's.
         const auto move = xr::locomotion(c.move, xr::forward_yaw(t.stereo.head.orientation));
-        if (player.run.update(c.run))
-            player.run_latch = !player.run_latch;
-        shell.movement_input = move.input;
-        shell.movement_input.run = move.input.run || player.run_latch;
-        shell.movement_input.jump = c.jump;
+        shell.movement_input = move.input; // Full deflection runs.
+        shell.movement_input.jump = c.jump || c.stick_jump;
         shell.movement_input.crouch = c.crouch;
         shell.locomotion_yaw = move.yaw;
         shell.weapon_input.primary = player.fire.update(c.fire);
@@ -122,8 +123,10 @@ namespace OpenBlood2
         shell.weapon_input.all_hands = true; // Original HandleFiring: both carried hands.
         shell.use_down = c.use;
         shell.detonate_down = c.detonate;
+        shell.prev_item_requested |= player.prev_item.update(c.prev_item);
         shell.next_item_requested |= player.next_item.update(c.next_item);
-        shell.use_item_requested |= player.use_item.update(c.use_item);
+        shell.use_item_requested |=
+            player.use_item.update(player.grip.update(c.use_item, xr_grip_press, xr_grip_release));
         // Aim from the eye (the original fire origin) toward the controller's designated point.
         xr::Vec3 target;
         if (frame.hands[1].aim_valid)

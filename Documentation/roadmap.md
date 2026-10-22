@@ -159,7 +159,7 @@ needs a small local Vulkan patch.
 | 8.2 | OpenXR runtime core: session, spaces, swapchains, frame loop, lifecycle | M — done on Quest 3, controllers checked worn |
 | 8.3 | Stereo rendering (per-eye passes) and a desktop mock mode | M–L — stereo world done on Quest 3; mock mode pending |
 | 8.4 | Multiview (local SDL patch, shader variants) | M |
-| 8.5 | Controllers: bindings, wireframe cubes, aim, locomotion, turning | M — done; worn play test and VR options page pending |
+| 8.5 | Controllers: bindings, aim, locomotion, turning | M — done; second-playtest layout, menu hands and VR options page (turn, laser, crosshair) added; worn check pending |
 | 8.6 | HUD locked to the view, menus 0.75 m in front | M — done (compositor quads); worn check pending |
 | 8.7 | Selection laser for menus | S — done; worn check pending |
 | 8.8 | Data setup screen and in-headset demo download | M |

@@ -5,7 +5,9 @@ Quest 3 ([report](reports/xr_first_light.md)), lot 8.3 renders SubwayA in stereo
 72 Hz ([report](reports/xr_stereo_world.md)), lot 8.5 adds the controllers
 ([report](reports/xr_controls.md)), lot 8.6 the HUD and menus ([report](reports/xr_menus_hud.md)) and
 lot 8.7 the menu laser with the first playtest's fixes ([report](reports/xr_laser_playtest.md))
-and lot 8.9 the view weapons on the controllers with arm IK ([report](reports/xr_arms.md));
+and lot 8.9 the view weapons on the controllers with arm IK ([report](reports/xr_arms.md)); the
+second playtest replaced the controller cubes with menu hands, changed the Touch layout and added
+the first VR options (turn step or smooth, aim laser, crosshair);
 see the [contract](../contracts/xr_runtime_contracts.md). Lot 8.6 composites the menu panel as an
 OpenXR quad like the HUD, rather than drawing it in the eye buffer: it is sharper and shares
 one canvas; the 8.7 laser draws its cursor into the canvas and its beam up to the panel.

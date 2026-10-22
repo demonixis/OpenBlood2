@@ -253,6 +253,13 @@ namespace OpenBlood2
                 label = item.literal = display.renderer ? "RENDERER [ENHANCED]" : "RENDERER [ORIGINAL]";
             else if (item.setting == 9)
                 label = item.literal = display.normal_maps ? "NORMAL MAPS [GENERATED]" : "NORMAL MAPS [OFF]";
+            else if (item.setting == 10)
+                label = item.literal = display.vr_turn ? "TURN [SNAP " + std::to_string(display.vr_turn) + "]"
+                                                       : std::string("TURN [SMOOTH]");
+            else if (item.setting == 11)
+                label = item.literal = display.vr_laser ? "AIM LASER [ON]" : "AIM LASER [OFF]";
+            else if (item.setting == 12)
+                label = item.literal = display.vr_crosshair ? "CROSSHAIR [ON]" : "CROSSHAIR [OFF]";
             const bool enabled = menu.enabled(item);
             const auto& font = menu.small()              ? small_
                                : !enabled                ? disabled_

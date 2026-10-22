@@ -63,7 +63,7 @@ namespace
     {
         for (int i = 0; i < frames; ++i)
         {
-            xr_apply_controls(g, p, f, xr_tracking(g, p, f, reference, scale), reference, scale);
+            xr_apply_controls(g, p, f, xr_tracking(g, p, f, reference, scale), reference, scale, 1.0 / 60);
             CHECK(g.step(1.0 / 60));
         }
         return true;
@@ -94,13 +94,10 @@ namespace
         const DVector left = vector_subtract(g.client_shell.position, turned);
         const float leftward = -(left.x * std::cos(yaw) - left.z * std::sin(yaw));
         CHECK(leftward > 20 && g.client_shell.movement_input.run);
-        // A run latch keeps running at partial deflection.
+        // Running needs full deflection (no run toggle).
         f = frame_at();
-        f.controls.move = {0, 0.5f};
-        f.controls.run = true;
-        CHECK(play(g, p, f, 1));
-        f.controls.run = false;
-        CHECK(play(g, p, f, 1) && g.client_shell.movement_input.run && p.run_latch);
+        f.controls.move = {0, 0.8f};
+        CHECK(play(g, p, f, 1) && !g.client_shell.movement_input.run);
         return true;
     }
 
@@ -158,10 +155,32 @@ namespace
         const float before = p.body_yaw;
         g.client_shell.rotation.yaw += 1;
         CHECK(play(g, p, f, 1) && near(p.body_yaw - before, 1, 1e-4f));
-        // The vertical axis cycles weapons instead of turning.
-        f.controls.right_stick = {0.2f, 1};
+        // The vertical axis cycles weapons instead of turning, past 0.85 only.
+        f.controls.right_stick = {0.2f, 0.8f};
         const float held = p.body_yaw;
+        CHECK(play(g, p, f, 2) && near(p.body_yaw, held, 1e-6f) && p.weapon.armed);
+        f.controls.right_stick = {0.2f, 1};
         CHECK(play(g, p, f, 2) && near(p.body_yaw, held, 1e-6f) && !p.weapon.armed);
+        // Options > VR: another snap step.
+        f.controls.right_stick = {0, 0};
+        CHECK(play(g, p, f, 1));
+        p.turn_step = 1.5707963f;
+        const float stepped = p.body_yaw;
+        f.controls.right_stick = {-1, 0};
+        CHECK(play(g, p, f, 3) && near(p.body_yaw - stepped, -1.5707963f, 1e-5f));
+        // Smooth turning: proportional to deflection beyond the dead zone and to time.
+        p.turn_step = 0;
+        f.controls.right_stick = {0, 0};
+        CHECK(play(g, p, f, 1));
+        const float smooth = p.body_yaw;
+        f.controls.right_stick = {1, 0};
+        CHECK(play(g, p, f, 30) && near(p.body_yaw - smooth, xr_smooth_turn_speed * 0.5f, 1e-4f));
+        f.controls.right_stick = {-0.6f, 0};
+        const float back = p.body_yaw;
+        CHECK(play(g, p, f, 60) && near(p.body_yaw - back, -xr_smooth_turn_speed * 0.5f, 1e-4f));
+        f.controls.right_stick = {0.15f, 0}; // Inside the dead zone.
+        const float still = p.body_yaw;
+        CHECK(play(g, p, f, 10) && near(p.body_yaw, still, 1e-6f));
         return true;
     }
 
@@ -174,21 +193,49 @@ namespace
         f.controls.fire = 0.6f;
         f.controls.use = f.controls.jump = f.controls.crouch = true;
         auto t = xr_tracking(g, p, f, reference, scale);
-        xr_apply_controls(g, p, f, t, reference, scale);
+        const auto apply = [&] { xr_apply_controls(g, p, f, t, reference, scale, 1.0 / 60); };
+        apply();
         auto& s = g.client_shell;
         CHECK(s.weapon_input.primary && !s.weapon_input.alternate && s.weapon_input.all_hands && s.use_down);
         CHECK(s.movement_input.jump && s.movement_input.crouch);
+        // The left stick click jumps too.
+        f.controls.jump = false;
+        f.controls.stick_jump = true;
+        apply();
+        CHECK(s.movement_input.jump);
+        f.controls.stick_jump = false;
         f.controls.fire = 0.4f; // Hysteresis keeps the trigger held.
         f.controls.next_item = true;
+        s.next_item_requested = s.prev_item_requested = false;
+        apply();
+        CHECK(s.weapon_input.primary && s.next_item_requested && !s.prev_item_requested && !s.movement_input.jump);
         s.next_item_requested = false;
-        xr_apply_controls(g, p, f, t, reference, scale);
-        CHECK(s.weapon_input.primary && s.next_item_requested);
-        s.next_item_requested = false;
-        xr_apply_controls(g, p, f, t, reference, scale); // Held: no second request.
+        apply(); // Held: no second request.
         CHECK(!s.next_item_requested);
+        f.controls.next_item = false;
+        f.controls.prev_item = true;
+        apply();
+        CHECK(s.prev_item_requested && !s.next_item_requested);
         f.controls.fire = 0.2f;
-        xr_apply_controls(g, p, f, t, reference, scale);
+        apply();
         CHECK(!s.weapon_input.primary);
+        // The right grip uses the current item past 0.85, once per squeeze.
+        s.use_item_requested = false;
+        f.controls.use_item = 0.8f;
+        apply();
+        CHECK(!s.use_item_requested);
+        f.controls.use_item = 0.9f;
+        apply();
+        CHECK(s.use_item_requested);
+        s.use_item_requested = false;
+        f.controls.use_item = 0.7f;
+        apply();
+        CHECK(!s.use_item_requested);
+        f.controls.use_item = 0.5f;
+        apply();
+        f.controls.use_item = 0.95f;
+        apply();
+        CHECK(s.use_item_requested);
         return true;
     }
     // Virtual shoulders: below and behind the head, across a body yaw with a 45-degree dead zone

@@ -3,7 +3,9 @@
 #include "app/scene_presenter.h"
 #include "app/xr_lines.h"
 #include "app/xr_player.h"
+#include "engine/view_arms.h"
 #include "engine/xr/xr_runtime.h"
+#include "game/original/ViewWeapon.h"
 #include <SDL3/SDL_events.h>
 #include <cstdint>
 #include <functional>
@@ -54,21 +56,27 @@ namespace OpenBlood2
         double delta() const;
         // A session input-focus change since the last call (true: gained).
         std::optional<bool> take_focus_change();
-        // Controller menu navigation as virtual gamepad events: left stick, A (accept) and B (back)
-        // while `menu` is shown, the menu button always. A button held across a change of mode waits
-        // for its release.
-        std::vector<SDL_Event> menu_events(bool menu);
-        // The selection laser on the menu panel as mouse events in canvas pixels (motion, left
-        // button on the pointing hand's trigger), from the hand whose trigger was pressed last.
-        std::vector<SDL_Event> pointer_events(bool panel, SDL_WindowID window);
+        // Controller menu input while `menu` is shown: the right hand's selection laser on the panel
+        // as mouse events in canvas pixels (motion; the right trigger is the left button when it is
+        // pressed on the panel), then a virtual gamepad: left stick, A or the right trigger off the
+        // panel (accept), B or the left trigger (back), and the menu button in every mode. A button
+        // or trigger held across a change of mode waits for its release.
+        std::vector<SDL_Event> menu_events(bool menu, SDL_WindowID window);
         // Where the laser meets the canvas (pixels), for the cursor; empty off the panel.
         const std::optional<std::array<float, 2>>& pointer() const
         {
             return pointer_;
         }
-        std::size_t pointer_hand() const
+        static constexpr std::size_t pointer_hand = 1; // The right hand points.
+        // Options > VR, applied every frame.
+        struct Options
         {
-            return pointer_hand_;
+            float turn_step = xr_snap_angle; // Radians; zero turns smoothly.
+            bool laser = true, crosshair = true;
+        };
+        void set_options(const Options& options)
+        {
+            options_ = options;
         }
         void vibrate(std::size_t hand, float amplitude, std::int64_t nanoseconds)
         {
@@ -82,7 +90,8 @@ namespace OpenBlood2
         void prepare(GameSession&, ScenePresenter&);
         // Records the eyes (the world when `world`, else a dark clear), then the UI canvas through `ui`
         // (cleared transparent), submits and ends the frame. The canvas is the world-locked menu panel
-        // when `panel`, else the head-locked HUD. `fade` darkens the scene.
+        // when `panel`, else the head-locked HUD; the panel shows the hands (Beretta view models at
+        // the controllers) in place of the view weapons. `fade` darkens the scene.
         bool render(GameSession&, ScenePresenter&, bool world, bool panel, float fade,
                     const std::function<bool(SDL_GPUCommandBuffer*, SDL_GPUTexture*)>& ui, std::string& error);
 
@@ -90,11 +99,17 @@ namespace OpenBlood2
 
       private:
         XrRuntime xr_;
-        SDL_GPUTexture* depth_ = nullptr; // Eye depth for the overlay when no world is drawn.
         std::optional<std::array<float, 2>> pointer_;
-        std::size_t pointer_hand_ = 1;
-        bool pointer_down_ = false;
-        xr::PressEdge left_trigger_, right_trigger_;
+        // The right trigger's press in menus: a click on the panel, or accept off it.
+        enum class Press
+        {
+            None,
+            Mouse,
+            Pad
+        };
+        Press right_press_ = Press::None;
+        xr::TriggerButton left_trigger_, right_trigger_;
+        Options options_;
         XrFrameInput frame_{};
         XrPlayer player_;
         std::unique_ptr<LineRenderer> lines_;
@@ -107,12 +122,26 @@ namespace OpenBlood2
         float scale_ = 45;
         std::optional<float> body_yaw_; // Arm IK body yaw relative to the tracking yaw.
         xr::Pose panel_pose_{};
-        // Virtual pad: last sent axes and buttons; buttons blocked until released after a mode change.
+        // Virtual pad: last sent axes and buttons; sources (A, B, menu, right and left triggers)
+        // blocked until released after a mode change.
         bool menu_mode_ = false;
         std::array<float, 2> sent_axes_{};
-        std::array<bool, 3> sent_buttons_{}, blocked_{};
+        std::array<bool, 3> sent_buttons_{};
+        std::array<bool, 5> blocked_{};
+        // Menu hands {left, right}: the current character's Beretta view models, animated idle.
+        struct MenuHand
+        {
+            CViewWeapon weapon;
+            ViewArmRig rig;
+        };
+        std::array<MenuHand, 2> hands_;
+        int hands_character_ = -1;
+        bool hands_failed_ = false;
         void calibrate(GameSession&);
-        // Controller boxes plus the menu laser (panel) or the aim lasers and reticles (play).
+        // The menu laser (panel) or the enabled aim lasers and reticles (play).
         void build_overlay(GameSession&, const XrTracking&, bool panel);
+        // Fills presenter.hand_scene with the hands at the tracked controllers; a failure is logged
+        // once and leaves the hands out.
+        void build_hands(GameSession&, ScenePresenter&, const XrTracking&);
     };
 } // namespace OpenBlood2
