@@ -45,9 +45,15 @@ namespace OpenBlood2
     // (case-insensitive; a folder with both lists both).
     std::vector<Installation> folder_installations(const std::filesystem::path& directory);
     // Where this platform looks without being told: downloaded demos (user directory content/),
-    // the executable's folder (desktop), Documents and its folders (iOS) and /sdcard/openblood2
+    // the executable's folder and its Game folder (desktop), Documents and its folders (iOS) and /sdcard/openblood2
     // with its folders (Android).
     std::vector<std::filesystem::path> setup_search_folders(const std::filesystem::path& user_directory);
+    // The executable's folder and its Game folder (desktop; none on mobile).
+    std::vector<std::filesystem::path> executable_folders();
+    // A portable copy: the first playable installation in `folders`, the full game before the
+    // demo, with its enabled mods from `state`. Refusals of found installations go to `error`.
+    bool portable_ready(const SetupState&, const std::vector<std::filesystem::path>& folders, Config& config,
+                        std::string& error);
     // The folder downloaded demos are published in: user directory content/.
     std::filesystem::path setup_content_folder(const std::filesystem::path& user_directory);
 

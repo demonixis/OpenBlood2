@@ -298,9 +298,8 @@ namespace OpenBlood2
         if (const char* documents = SDL_GetUserFolder(SDL_FOLDER_DOCUMENTS))
             shared.push_back(path_from_utf8(documents));
 #else
-        // A portable copy placed in the game folder.
-        if (const char* base = SDL_GetBasePath())
-            roots.push_back(path_from_utf8(base));
+        for (auto& folder : executable_folders())
+            roots.push_back(std::move(folder));
 #endif
         for (const auto& folder : shared)
         {
@@ -310,6 +309,51 @@ namespace OpenBlood2
                     roots.push_back(it->path());
         }
         return roots;
+    }
+
+    std::vector<fs::path> executable_folders()
+    {
+#if defined(SDL_PLATFORM_ANDROID) || defined(SDL_PLATFORM_IOS)
+        return {};
+#else
+        // A portable copy placed in an installed game, or at the root of an extracted demo whose
+        // archives sit in Game/ (the Archive.org package's layout).
+        const char* base = SDL_GetBasePath();
+        if (!base)
+            return {};
+        const auto folder = path_from_utf8(base);
+        return {folder, folder / "Game"};
+#endif
+    }
+
+    bool portable_ready(const SetupState& state, const std::vector<fs::path>& folders, Config& config,
+                        std::string& error)
+    {
+        error.clear();
+        std::vector<Installation> found;
+        for (const auto& folder : folders)
+            for (auto& item : folder_installations(folder))
+                found.push_back(std::move(item));
+        // The full game before the demo when a folder holds both.
+        std::stable_partition(found.begin(), found.end(),
+                              [](const Installation& item) { return item.edition == Edition::Retail; });
+        for (const auto& item : found)
+        {
+            DataStatus status;
+            auto candidate = setup_config(state, item);
+            std::string why;
+            if (!inspect_data(candidate, status, why))
+            {
+                if (error.empty())
+                    error = path_text(item.directory) + ": " + why;
+                continue;
+            }
+            candidate.source = "executable folder";
+            config = std::move(candidate);
+            error.clear();
+            return true;
+        }
+        return false;
     }
 
     std::vector<SetupEntry> scan_setup(const SetupState& state, const fs::path& user,

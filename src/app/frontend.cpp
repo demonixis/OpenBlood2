@@ -1392,7 +1392,8 @@ namespace OpenBlood2
         SetupScreen setup;
         setup.font = ui.proportional;
         // A configuration from the command line, environment or blood2.local.ini skips the screen,
-        // and so does a stored choice that is still playable.
+        // and so does a game installed around the executable (a portable copy) or a stored choice
+        // that is still playable.
         std::optional<Config> next = configured;
         bool by_setup = !configured;
         if (!next)
@@ -1401,10 +1402,25 @@ namespace OpenBlood2
             SetupState state;
             std::filesystem::path file;
             std::string why;
-            if (setup_path(file, why) && load_setup(file, state, why) && setup_ready(state, stored, why))
-                next = std::move(stored);
-            else if (!why.empty())
+            const bool loaded = setup_path(file, why) && load_setup(file, state, why);
+            if (!loaded && !why.empty())
                 spdlog::info("Setup: {}", why);
+            if (!loaded)
+                state = {};
+            if (portable_ready(state, executable_folders(), stored, why))
+            {
+                spdlog::info("Setup: playing the installation beside the executable");
+                next = std::move(stored);
+            }
+            else
+            {
+                if (!why.empty())
+                    spdlog::info("Setup: executable folder: {}", why);
+                if (loaded && setup_ready(state, stored, why))
+                    next = std::move(stored);
+                else if (!why.empty())
+                    spdlog::info("Setup: {}", why);
+            }
         }
         std::string refusal;
         for (;;)

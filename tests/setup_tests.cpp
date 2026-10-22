@@ -116,6 +116,7 @@ namespace
     bool detect(const fs::path& root)
     {
         std::string error;
+        Config config_unused;
         const auto retail = root / "Retail", demo = root / "Demo", both = root / "Both", none = root / "None";
         for (const auto& folder : {retail, demo, both, none})
             fs::create_directories(folder);
@@ -154,6 +155,20 @@ namespace
             { return path_text(entry.installation.directory).find(".demo-install") != std::string::npos; }));
         CHECK(std::count_if(entries.begin(), entries.end(), [&](const SetupEntry& entry)
                             { return entry.installation == Installation{Edition::Retail, retail}; }) == 1);
+        // A portable copy plays the game installed around it: its folder or an extracted demo's
+        // Game folder, the full game first, with that installation's enabled mods.
+        const auto extracted = root / "Extracted";
+        fs::create_directories(extracted / "Game");
+        write(extracted / "Game" / "B2Demo.rez", rez());
+        CHECK(!portable_ready({}, {extracted}, config_unused, error));
+        CHECK(portable_ready({}, {extracted, extracted / "Game"}, config_unused, error) && config_unused.demo &&
+              config_unused.data_dir == extracted / "Game" && config_unused.source == "executable folder");
+        write(root / "mod.rez", rez(60));
+        SetupState modded;
+        modded.mods = {{{Edition::Retail, both}, root / "mod.rez", true}};
+        CHECK(portable_ready(modded, {both, both / "Game"}, config_unused, error) && !config_unused.demo &&
+              config_unused.data_dir == both && config_unused.overlays == std::vector{root / "mod.rez"});
+        CHECK(!portable_ready({}, {none, none / "Game"}, config_unused, error) && error.empty());
         // A stored selection is playable only while its data is.
         Config config;
         state.selected = Installation{Edition::Retail, retail};

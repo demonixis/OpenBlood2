@@ -10,6 +10,10 @@ not exist yet) in `app/setup_screen.{h,cpp}`, over the headless `app/game_setup.
 - A data folder from `--data-dir`, `BLOOD2_DATA_DIR` or `blood2.local.ini` skips it
   entirely (developer and test runs are unchanged). Tools and smokes without data still exit
   with code 2.
+- Otherwise a portable copy plays the game installed around it (desktop): the first playable
+  installation in the executable's folder or its `Game` folder (an extracted demo package),
+  the full game before the demo, with its enabled mods from `setup.cfg`. It wins over the
+  stored choice, which is not rewritten; a choice made in Options > SETUP lasts for the session.
 - Otherwise the stored choice in `setup.cfg` is used when `inspect_data` still accepts it; the
   screen opens only the first time or while that choice is missing or unplayable.
 - A choice the game cannot mount (missing archives, a refused mod) returns to the screen with
@@ -30,7 +34,7 @@ An installation is a folder and an edition: retail with `BLOOD2.REZ`, demo with 
 - folders the player added (desktop native folder picker, `SDL_DIALOG` on desktop only);
 - the running game's folder (from the menu);
 - detected folders: downloaded demos (`<user dir>/content/<install>/Game`), the executable's
-  folder (desktop), the app's Documents folder and its folders (iOS: Files app, Finder file
+  folder and its `Game` folder (desktop), the app's Documents folder and its folders (iOS: Files app, Finder file
   sharing), `/sdcard/openblood2` and its folders (Android phones and Quest; all-files access,
   requested by the "Allow file access" button).
 
