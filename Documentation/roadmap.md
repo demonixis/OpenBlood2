@@ -11,8 +11,8 @@ Percentages are task estimates, not acceptance. Only the user accepts a mileston
 | Mounted non-multiplayer worlds that open | 36 / 36 | Includes Ancient City, Ancient One, Credits, End and Drop; opening is not campaign traversal. |
 | All mounted worlds that open | 58 / 58 | Includes 22 multiplayer maps, inspected locally, with the four CTF maps. |
 | Beta-ready game (M0–M4) | **~90%** | Weighted milestones below. |
-| With the graphics upgrade (M0–M6) | ~86% | Adds optional PBR and post-processing. |
-| Whole roadmap (M0–M9) | **~64%** | Adds gamepad, Quest VR/Android and LAN. |
+| With the graphics upgrade (M0–M6) | ~88% | Adds optional PBR and post-processing. |
+| Whole roadmap (M0–M9) | **~65%** | Adds gamepad, Quest VR/Android and LAN. |
 
 Weights reflect estimated effort: M0 4, M1 6, M2 28, M3 14, M4 8, M5 7,
 M6 6, M7 3, M8 11, M9 13. Later work (M10+) is not counted.
@@ -35,7 +35,7 @@ accept M3 or provide network play.
 | M3 | ~65% — current | Every level playable, credits, save/load, then a public beta whose bug list validates the campaign. |
 | M4 | ~85% | Original rendering on Vulkan (Linux, Windows) and Metal (macOS). D3D12 is not planned. |
 | M5 | ~85% | Optional PBR shader set with JSON texture/material bindings; the legacy set remains selectable. The [enhanced renderer](contracts/enhanced_renderer_contracts.md) covers 5.0, 5.1 (built-in manifest), 5.2 (emission), 5.3, 5.4 and 5.5 (material inspection); external maps, texture packs and Vulkan verification remain. |
-| M6 | ~45% | PBR-only post-processing: bloom from emissive maps, GTAO, SSR, tonemapping; AA for both sets. The first [post-processing](contracts/post_processing_contracts.md) increment covers the HDR scene, emission-driven bloom, NEUTRAL/FILMIC tonemaps and MSAA/FXAA; GTAO, SSR and per-effect quality remain. |
+| M6 | ~70% | PBR-only post-processing: bloom from emissive maps, GTAO, SSR, tonemapping; AA for both sets. [Post-processing](contracts/post_processing_contracts.md) covers the HDR scene, emission-driven bloom, NEUTRAL/FILMIC tonemaps, MSAA/FXAA and half-size GTAO (LOW/HIGH); SSR remains. |
 | M7 | ~90% | Gamepad: action layer, rebinding, hotplug, menus; a parallel track, needed before M8. The [input actions](contracts/input_action_contracts.md) cover keyboard, mouse and gamepad (console layout, hot-plug, menus, weapon cycling), the original [inventory cursor](contracts/inventory_cursor_contracts.md) with its item tabs, a touch camera drag, the original Controls page with `controls.cfg`, and on-screen touch controls. Device testing on a touch screen, menu auto-repeat and the Keyboard/Joystick pages remain. |
 | M8 | ~55% | VR through OpenXR: Meta Quest first, PCVR on Linux last; also the Android gate. The [OpenXR plan](implementation/openxr_plan.md) orders the lots; 8.1–8.2 reached [first light on a Quest 3](implementation/reports/xr_first_light.md) 8.3 [renders SubwayA in stereo at 72 Hz](implementation/reports/xr_stereo_world.md) 8.5 adds [controller play](implementation/reports/xr_controls.md), 8.6 the [menus and HUD](implementation/reports/xr_menus_hud.md), 8.7 the [menu laser](implementation/reports/xr_laser_playtest.md) and 8.9 [arm IK](implementation/reports/xr_arms.md). |
 | M9 | ~10% | LAN multiplayer: Bloodbath, CTF and Team on the original multiplayer maps. |
@@ -153,7 +153,10 @@ Status (2026-10-22, [contract](contracts/post_processing_contracts.md)):
   shoulder, no toe)/FILMIC (Hill's ACES fit) tonemaps; MSAA 2x/4x and FXAA for both sets.
   Display rows TONEMAP, BLOOM and ANTI-ALIASING, preferences version 7. The original set
   keeps its frame with anti-aliasing off.
-- **Remaining.** GTAO, then SSR; a quality setting per effect; post-processing in XR.
+- **Done (second increment).** Half-size GTAO (AMBIENT OCCLUSION [OFF/LOW/HIGH], preferences
+  version 8) from a depth copy that survives MSAA, masked away from emission, translucent
+  surfaces and view models; under 1 ms at 1080p on Apple M5.
+- **Remaining.** SSR; post-processing in XR.
 - **Not verified.** Vulkan execution, Linux and Windows.
 
 ## M8 — VR on Quest, then PCVR

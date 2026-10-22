@@ -193,6 +193,8 @@ and `BLOOM [ON/OFF]` (18), both disabled with the original renderer, then
 `ANTI-ALIASING [OFF/FXAA/MSAA 2X/MSAA 4X]` (17) at the end of the Display page.
 `preferences.cfg` version 7 adds `antialiasing`, `bloom` and `tonemap`; writes produce version 7
 and older versions load the defaults (0, 1, 1), superseding the version 6 statement above.
+`AMBIENT OCCLUSION [OFF/LOW/HIGH]` (setting 20, disabled with the original renderer) follows
+BLOOM; `preferences.cfg` version 8 adds `ambient_occlusion` (default 2) and supersedes version 7.
 
 
 ## Controls (CMenuControls)

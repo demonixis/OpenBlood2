@@ -12,12 +12,18 @@ Texture2D<float4> bloom : register(t1, space2);
 SamplerState bloomSampler : register(s1, space2);
 Texture2D<float4> aux : register(t2, space2); // Glow (linear) and the occlusion mask, full size.
 SamplerState auxSampler : register(s2, space2);
-Texture2D<float4> occlusion : register(t3, space2);
+Texture2D<float4> occlusion : register(t3, space2); // Half size.
 SamplerState occlusionSampler : register(s3, space2);
+Texture2D<float4> viewDepth : register(t4, space2); // Half-size linear depth of the occlusion.
+SamplerState viewDepthSampler : register(s4, space2);
+Texture2D<float4> depthCopy : register(t5, space2); // Full-size window depth.
+SamplerState depthSampler : register(s5, space2);
 cbuffer Composite : register(b0, space3)
 {
     float4 settings;   // x: tonemap, y: bloom scale (0: none), z: filmic exposure, w: 1 with occlusion.
     float4 bloomTexel; // xy: bloom texel size.
+    float4 depthTerms; // Scene depth z/w terms (z_ndc = z + w / view depth), slice start, 1 / slice span.
+    float4 halfSize;   // Occlusion size in texels (xy) and its inverse (zw).
 };
 struct Input
 {
@@ -54,6 +60,26 @@ float3 filmic(float3 color)
     v = (v * (v + 0.0245786) - 0.000090537) / (v * (0.983729 * v + 0.4329510) + 0.238081);
     return mul(fromWorking, v);
 }
+// Depth-aware upsample of the half-size occlusion: bilinear weights of the four nearest texels,
+// each cut by its relative view-depth difference to this pixel. View models and the background
+// stay unoccluded.
+float upsampledOcclusion(float2 uv)
+{
+    float depth = depthCopy.SampleLevel(depthSampler, uv, 0.0).r;
+    if (depth < depthTerms.z || depth >= 1.0)
+        return 1.0;
+    float center = depthTerms.y / ((depth - depthTerms.z) * depthTerms.w - depthTerms.x);
+    float2 position = uv * halfSize.xy - 0.5;
+    float2 base = floor(position), f = position - base;
+    // Gather order: (0, 1), (1, 1), (1, 0), (0, 0) around the shared corner.
+    float2 corner = (base + 1.0) * halfSize.zw;
+    float4 z = viewDepth.GatherRed(viewDepthSampler, corner);
+    float4 ao = occlusion.GatherRed(occlusionSampler, corner);
+    float4 weight = float4((1.0 - f.x) * f.y, f.x * f.y, f.x * (1.0 - f.y), (1.0 - f.x) * (1.0 - f.y)) /
+                        (1e-3 + abs(z - center) / center) +
+                    1e-6;
+    return dot(ao, weight) / dot(weight, float4(1.0, 1.0, 1.0, 1.0));
+}
 float3 bloomTap(float2 uv, float2 offset)
 {
     return bloom.SampleLevel(bloomSampler, uv + offset * bloomTexel.xy, 0.0).rgb;
@@ -65,7 +91,7 @@ float4 main(Input input) : SV_Target0
     if (settings.w > 0.5)
     {
         float4 glow = aux.SampleLevel(auxSampler, input.uv, 0.0);
-        float ao = occlusion.SampleLevel(occlusionSampler, input.uv, 0.0).r;
+        float ao = upsampledOcclusion(input.uv);
         float3 lit = max(color - glow.rgb, float3(0.0, 0.0, 0.0));
         color += lit * (lerp(1.0, ao, saturate(glow.a)) - 1.0);
     }

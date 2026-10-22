@@ -99,11 +99,11 @@ namespace OpenBlood2
         bool finish(SDL_GPUCommandBuffer*, SDL_GPUTexture* output, const PostView&, std::string& error);
         PostStats stats;
         // Replacement policy: bloom strength over the whole chain, the coarsest level count, the
-        // filmic exposure (see the contract), and the occlusion radius (world units), final power
-        // and slices/steps per side of LOW and HIGH.
+        // filmic exposure (see the contract), and the occlusion radius (world units), final power,
+        // largest screen radius (half-size pixels) and slices/steps per side of LOW and HIGH.
         static constexpr float bloom_strength = 1.5f, filmic_exposure = 2.2f;
         static constexpr std::size_t bloom_level_limit = 6;
-        static constexpr float ao_radius = 48, ao_power = 1.5f;
+        static constexpr float ao_radius = 48, ao_power = 1.5f, ao_screen_radius = 96;
         static constexpr std::array<std::array<Uint32, 2>, 2> ao_samples{{{2, 4}, {4, 6}}};
 
       private:
@@ -117,7 +117,7 @@ namespace OpenBlood2
         GpuRegistry& registry_;
         SDL_GPUDevice* device_ = nullptr;
         SDL_GPUGraphicsPipeline *down_ = nullptr, *up_ = nullptr, *composite_ = nullptr, *fxaa_ = nullptr,
-                                *gtao_ = nullptr, *ao_blur_ = nullptr;
+                                *ao_depth_ = nullptr, *gtao_ = nullptr, *ao_blur_ = nullptr;
         SDL_GPUTextureFormat pipeline_format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
         // Frame plan.
         SDL_GPUTextureFormat output_format_ = SDL_GPU_TEXTUREFORMAT_INVALID, scene_format_ = output_format_;
@@ -135,7 +135,7 @@ namespace OpenBlood2
         } supported_; // Last MSAA support query.
         // Targets, kept while the plan and size stay the same.
         TextureHandle multisample_, scene_, multisample_glow_, glow_, multisample_depth_, depth_copy_, display_;
-        TextureHandle occlusion_, occlusion_blur_;
+        TextureHandle view_depth_, occlusion_, occlusion_blur_; // Half size.
         std::array<TextureHandle, bloom_level_limit> levels_{};
         std::array<std::array<Uint32, 2>, bloom_level_limit> level_sizes_{};
         std::size_t level_count_ = 0;

@@ -1,10 +1,14 @@
 {
   "date": "2026-10-22",
-  "scope": "Post-processing (roadmap M6, first increment): HDR scene, emission-driven bloom, tonemapping, MSAA and FXAA; no game, engine or renderer code imported",
+  "scope": "Post-processing (roadmap M6): HDR scene, emission-driven bloom, tonemapping, MSAA, FXAA and ground-truth ambient occlusion; no game, engine or renderer code imported",
   "retail_evidence": [
     {
       "file": "BLOOD2.REZ, BLOOD2P.REZ, BLOOD2P2.REZ (installed Blood II)",
       "purpose": "CityHub and SubwayA captures used to choose the bloom strength (1.5) and the filmic exposure (2.2), and checked by gpu.post."
+    },
+    {
+      "file": "BLOOD2.REZ, BLOOD2P.REZ, BLOOD2P2.REZ (installed Blood II)",
+      "purpose": "2026-10-22: CityHub, SubwayA and 03_Museum captures used to choose the occlusion radius (48 units), power (1.5) and LOW/HIGH sample counts, and checked by gpu.post."
     }
   ],
   "design_references": [
@@ -31,6 +35,26 @@
     {
       "source": "IEC 61966-2-1 (sRGB)",
       "purpose": "Transfer functions between the display-space scene and linear light."
+    },
+    {
+      "source": "Jimenez, Wu, Pesce, Jarabo, 'Practical Realtime Strategies for Accurate Indirect Occlusion' (SIGGRAPH 2016 course notes, Activision)",
+      "purpose": "GTAO: per-slice horizon search and the analytic cosine-weighted visibility integral around the normal projected into the slice."
+    },
+    {
+      "source": "Jimenez, 'Next Generation Post Processing in Call of Duty: Advanced Warfare' (SIGGRAPH 2014)",
+      "purpose": "Interleaved gradient noise for the slice rotation and step jitter."
+    },
+    {
+      "source": "Intel XeGTAO (GameTechDev, 2021, MIT) documentation",
+      "purpose": "Design reference only: squared step distribution, linear distance falloff, lowest-horizon initialisation and the polynomial acos; no source is copied."
+    },
+    {
+      "source": "Eberly, 'Fast Inverse Trigonometric Functions' (Geometric Tools)",
+      "purpose": "Polynomial acos approximation in the GTAO pass."
+    },
+    {
+      "source": "Kopf, Cohen, Lischinski, Uyttendaele, 'Joint Bilateral Upsampling' (SIGGRAPH 2007)",
+      "purpose": "Depth-aware upsample of the half-size occlusion in the composite."
     }
   ]
 }

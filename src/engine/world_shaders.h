@@ -35,6 +35,7 @@ namespace OpenBlood2
         BloomUpFragment,
         CompositeFragment,
         FxaaFragment,
+        AoDepthFragment,
         GtaoFragment,
         AoBlurFragment
     };

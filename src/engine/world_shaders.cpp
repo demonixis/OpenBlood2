@@ -1,6 +1,8 @@
 #include "engine/world_shaders.h"
 #include "engine/shaders/ao_blur_frag.h"
 #include "engine/shaders/ao_blur_frag_msl.h"
+#include "engine/shaders/ao_depth_frag.h"
+#include "engine/shaders/ao_depth_frag_msl.h"
 #include "engine/shaders/bloom_down_frag.h"
 #include "engine/shaders/bloom_down_frag_msl.h"
 #include "engine/shaders/bloom_up_frag.h"
@@ -129,8 +131,9 @@ namespace OpenBlood2
                 BLOOD2_FRAGMENT_SHADER(BloomUpFragment, bloom_up_frag)
                 BLOOD2_FRAGMENT_SHADER(CompositeFragment, composite_frag)
                 BLOOD2_FRAGMENT_SHADER(FxaaFragment, fxaa_frag)
-            BLOOD2_FRAGMENT_SHADER(GtaoFragment, gtao_frag)
-            BLOOD2_FRAGMENT_SHADER(AoBlurFragment, ao_blur_frag)
+                BLOOD2_FRAGMENT_SHADER(AoDepthFragment, ao_depth_frag)
+                BLOOD2_FRAGMENT_SHADER(GtaoFragment, gtao_frag)
+                BLOOD2_FRAGMENT_SHADER(AoBlurFragment, ao_blur_frag)
 #undef BLOOD2_FRAGMENT_SHADER
             case WorldShader::PostVertex:
                 info.stage = SDL_GPU_SHADERSTAGE_VERTEX;

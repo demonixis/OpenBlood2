@@ -34,10 +34,10 @@ int test_menu_preferences(int argc, char** argv)
         // The shared atomic writer keeps the exact preference bytes.
         std::ifstream in(path, std::ios::binary);
         const std::string bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        CHECK(bytes == "version=7\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
+        CHECK(bytes == "version=8\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
                        "invert_y=1\ndetail=2\npixel_lighting=0\nrenderer=0\nquality=0\nnormal_maps=1\n"
                        "vr_turn=45\nvr_laser=1\nvr_crosshair=1\nvr_move_hand=0\ncheats=0\ngod_mode=0\n"
-                       "antialiasing=0\nbloom=1\ntonemap=1\n");
+                       "antialiasing=0\nbloom=1\ntonemap=1\nambient_occlusion=2\n");
     }
     settings.sound = true;
     CHECK(save_menu_preferences(path, settings, error));
@@ -152,6 +152,24 @@ int test_menu_preferences(int argc, char** argv)
         }
         CHECK(load_menu_preferences(path, loaded, error) && loaded.antialiasing == 1 && !loaded.bloom &&
               loaded.tonemap == 0 && loaded.cheats);
+        // Version 8 adds ambient occlusion; version 7 files load it high.
+        CHECK(loaded.ambient_occlusion == 2);
+        std::string v8 = v7 + "antialiasing=1\nbloom=0\ntonemap=0\n";
+        v8[8] = '8';
+        for (const auto& text : {v7 + "antialiasing=1\nbloom=0\ntonemap=0\nambient_occlusion=1\n",
+                                 v8 + "ambient_occlusion=3\n", v8 + "ambient_occlusion=-1\n", v8})
+        {
+            {
+                std::ofstream out(path);
+                out << text;
+            }
+            CHECK(!load_menu_preferences(path, loaded, error) && !error.empty());
+        }
+        {
+            std::ofstream out(path);
+            out << v8 << "ambient_occlusion=0\n";
+        }
+        CHECK(load_menu_preferences(path, loaded, error) && loaded.ambient_occlusion == 0 && loaded.antialiasing == 1);
     }
     for (const auto text : {"renderer=2\nquality=0\nnormal_maps=0\n", "renderer=0\nquality=0\nnormal_maps=2\n",
                             "renderer=0\nquality=0\n"})

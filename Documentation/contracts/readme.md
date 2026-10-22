@@ -189,7 +189,7 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Static light objects and model lighting](static_light_contracts.md)
 - [FLAG_SHADOW model shadows](model_shadow_contracts.md)
 - [Enhanced renderer: physically based shading, materials, normal maps and light grid](enhanced_renderer_contracts.md)
-- [Post-processing: HDR scene, bloom, tonemapping, MSAA and FXAA](post_processing_contracts.md)
+- [Post-processing: HDR scene, bloom, tonemapping, MSAA, FXAA and GTAO](post_processing_contracts.md)
 - [Prepared ABC geometry and CPU sampling](model_preparation_contracts.md)
 - [Animated model presentation](model_view_contracts.md)
 - [Current budget continuation](object_particle_contracts.md)

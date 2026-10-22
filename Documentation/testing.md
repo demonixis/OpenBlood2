@@ -70,7 +70,7 @@ entry validation. See [startup contracts](contracts/session_start_contracts.md).
 
 The benchmark uses the presentation path without a window or mouse capture.
 Add `--capture FILE.png`, `--no-model-shadows` or `--pixel-lighting` as needed, and
-`--renderer`, `--normal-maps`, `--aa`, `--no-bloom` or `--tonemap` to time the
+`--renderer`, `--normal-maps`, `--aa`, `--no-bloom`, `--tonemap` or `--ao` to time the
 [enhanced renderer](contracts/enhanced_renderer_contracts.md) and
 [post-processing](contracts/post_processing_contracts.md).
 `--bench-audio` also renders the game mix offline, so streamed PCM reads happen

@@ -3,7 +3,8 @@
 // edge pixels, and FXAA leaves flat areas untouched. With the enhanced renderer, the neutral
 // tonemap keeps every value below its compression start and never brightens, bloom only adds
 // light and adds none without emission, and returning to the plain settings restores the frame
-// and releases the intermediate targets.
+// and releases the intermediate targets. Ambient occlusion only darkens, and only the
+// enhanced renderer's opaque, non-emissive light.
 #include "app/scene_presenter.h"
 #include "app/session_playback.h"
 #include "engine/capture.h"
@@ -107,7 +108,7 @@ int main(int argc, char** argv)
     CHECK(gpu);
     std::cout << "GPU=" << SDL_GetStringProperty(SDL_GetGPUDeviceProperties(gpu), SDL_PROP_GPU_DEVICE_NAME_STRING, "?")
               << " backend=" << SDL_GetGPUDeviceDriver(gpu) << '\n';
-    const PostSettings plain{Antialiasing::Off, false, Tonemap::Off};
+    const PostSettings plain{Antialiasing::Off, false, Tonemap::Off, AmbientOcclusion::Off};
     for (const char* world : {"02_CityHub", "01_SubwayA"})
     {
         Config config;
@@ -168,11 +169,11 @@ int main(int argc, char** argv)
         std::vector<Uint8> direct, neutral, bloom, filmic, combined, restored;
         presenter.post = plain;
         CHECK(frame(gpu, presenter, *game, capture, direct, error));
-        CHECK(!stats.hdr && stats.passes == 0 && stats.targets == 0 && !presenter.pipelines.glow());
+        CHECK(!stats.hdr && stats.passes == 0 && stats.targets == 0 && !presenter.pipelines.aux());
         presenter.post.tonemap = Tonemap::Neutral;
         CHECK(frame(gpu, presenter, *game, capture, neutral, error));
         CHECK(stats.hdr && !stats.bloom && stats.tonemap == Tonemap::Neutral && stats.passes == 1 &&
-              presenter.pipelines.format() == scene_hdr_format && !presenter.pipelines.glow());
+              presenter.pipelines.format() == scene_hdr_format && !presenter.pipelines.aux());
         // Neutral compresses only above 0.76 linear (about 225 in display values) and never brightens.
         // The HDR target does not clamp a translucent draw's colour before blending, so highlights
         // carried by enhanced translucent faces (coverage raised to the reflection) keep their
@@ -193,7 +194,7 @@ int main(int argc, char** argv)
         CHECK(unclamped < width * height / 100 && kept > width * height / 2);
         presenter.post.bloom = true;
         CHECK(frame(gpu, presenter, *game, capture, bloom, error));
-        CHECK(stats.bloom && presenter.pipelines.glow() && stats.bloom_levels == PostProcess::bloom_level_limit &&
+        CHECK(stats.bloom && presenter.pipelines.aux() && stats.bloom_levels == PostProcess::bloom_level_limit &&
               stats.passes == 2 * stats.bloom_levels);
         const auto levels = stats.bloom_levels;
         // Bloom only adds light.
@@ -203,16 +204,37 @@ int main(int argc, char** argv)
         CHECK(frame(gpu, presenter, *game, capture, filmic, error));
         const auto filmic_difference = compare(bloom, filmic);
         CHECK(stats.tonemap == Tonemap::Filmic && filmic_difference.mean > 1);
-        // Every effect at once: MSAA resolves both scene targets, FXAA follows the composite.
-        presenter.post = {Antialiasing::Msaa4, true, Tonemap::Neutral};
+        // MSAA resolves the three scene targets, FXAA follows the composite.
+        presenter.post = {Antialiasing::Msaa4, true, Tonemap::Neutral, AmbientOcclusion::Off};
         CHECK(frame(gpu, presenter, *game, capture, combined, error));
         CHECK((presenter.pipelines.samples() != SDL_GPU_SAMPLECOUNT_1) == (stats.samples > 1) &&
-              stats.targets == (stats.samples > 1 ? 10u : 8u));
+              stats.targets == (stats.samples > 1 ? 12u : 9u));
         const auto combined_difference = compare(bloom, combined);
         CHECK(combined_difference.mean < 1.5 && combined_difference.moved < .03);
         presenter.post.antialiasing = Antialiasing::Fxaa;
         CHECK(frame(gpu, presenter, *game, capture, combined, error));
         CHECK(stats.fxaa && stats.hdr && stats.passes == 2 * stats.bloom_levels + 1);
+        // Ambient occlusion only darkens, by a bounded amount, at both qualities.
+        std::vector<Uint8> occluded, occluded_low, everything;
+        presenter.post = {Antialiasing::Off, false, Tonemap::Neutral, AmbientOcclusion::High};
+        CHECK(frame(gpu, presenter, *game, capture, occluded, error));
+        CHECK(stats.ambient_occlusion == AmbientOcclusion::High && presenter.pipelines.aux() && !stats.bloom &&
+              stats.passes == 5 && stats.targets == 6);
+        const auto occlusion_difference = compare(neutral, occluded);
+        CHECK(occlusion_difference.most_brighter <= 1 && occlusion_difference.darker > width * height / 50 &&
+              occlusion_difference.mean < 8);
+        presenter.post.ambient_occlusion = AmbientOcclusion::Low;
+        CHECK(frame(gpu, presenter, *game, capture, occluded_low, error));
+        const auto low_difference = compare(neutral, occluded_low);
+        CHECK(stats.ambient_occlusion == AmbientOcclusion::Low && low_difference.most_brighter <= 1 &&
+              low_difference.darker > width * height / 50 && occluded_low != occluded);
+        // Every effect at once.
+        presenter.post = {Antialiasing::Msaa4, true, Tonemap::Filmic, AmbientOcclusion::High};
+        CHECK(frame(gpu, presenter, *game, capture, everything, error));
+        CHECK(stats.passes == 2 * stats.bloom_levels + 4 && stats.targets == (stats.samples > 1 ? 15u : 12u));
+        presenter.post.antialiasing = Antialiasing::Fxaa;
+        CHECK(frame(gpu, presenter, *game, capture, everything, error));
+        CHECK(stats.passes == 2 * stats.bloom_levels + 5);
         // Without emission the glow target stays empty: bloom adds nothing.
         const std::string unlit =
             std::regex_replace(std::string(builtin_surface_manifest()),
@@ -220,7 +242,7 @@ int main(int argc, char** argv)
         CHECK(unlit.find("emissive\"") == std::string::npos && presenter.surface_manifest.parse(unlit, error));
         presenter.normal_maps = true; // A settings change resolves the materials again.
         std::vector<Uint8> dark_neutral, dark_bloom;
-        presenter.post = {Antialiasing::Off, false, Tonemap::Neutral};
+        presenter.post = {Antialiasing::Off, false, Tonemap::Neutral, AmbientOcclusion::Off};
         CHECK(frame(gpu, presenter, *game, capture, dark_neutral, error));
         presenter.post.bloom = true;
         CHECK(frame(gpu, presenter, *game, capture, dark_bloom, error));
@@ -236,7 +258,8 @@ int main(int argc, char** argv)
         CHECK(frame(gpu, presenter, *game, capture, again, error) && again == original);
         std::cout << world << ": neutral kept " << kept << " pixels, compressed " << compressed << ", " << unclamped
                   << " unclamped translucent; bloom (" << bloom_difference << ", " << levels << " levels); filmic ("
-                  << filmic_difference << "); MSAA with bloom (" << combined_difference << ")\n";
+                  << filmic_difference << "); MSAA with bloom (" << combined_difference << "); occlusion high ("
+                  << occlusion_difference << "), low (" << low_difference << ")\n";
         game->unload_world();
     }
     SDL_DestroyGPUDevice(gpu);
