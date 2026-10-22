@@ -429,6 +429,8 @@ if(BLOOD2_TEST_DATA_DIR)
     set_tests_properties(locomotion.cityhub_ledge PROPERTIES LABELS "headless;locomotion;private" TIMEOUT 60)
     add_test(NAME locomotion.low_ceilings COMMAND locomotion_tests low_ceilings "${BLOOD2_TEST_DATA_DIR}")
     set_tests_properties(locomotion.low_ceilings PROPERTIES LABELS "headless;locomotion;private" TIMEOUT 60)
+    add_test(NAME locomotion.museum_duct COMMAND locomotion_tests museum_duct "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(locomotion.museum_duct PROPERTIES LABELS "headless;locomotion;private" TIMEOUT 60)
 endif()
 
 add_executable(container_tests container_tests.cpp)

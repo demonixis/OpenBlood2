@@ -9,7 +9,8 @@
 > Low-ceiling steps, 22 October 2026: the step lift no longer has to clear the
 > whole limit. A crouched body in a 64–68-unit duct has 8–12 units to spare for a
 > 14-unit limit, so any lip at a duct exit trapped the player (dropping in
-> worked, climbing out did not).
+> worked, climbing out did not). 03_Museum's duct ramp fits the crouched box
+> exactly and needs the [head skin](contact_overlap_contracts.md#head-skin).
 > See the [diagnosis](../implementation/reports/low_ceiling_steps.md).
 
 > Extended by [character animation contracts](character_animation_contracts.md):
@@ -160,6 +161,8 @@ Caleb/Ophelia resolve `jmp_rifle`, while Ishmael/Gabriella keep `run_rifle`.
 `locomotion.cityhub_ledge` reaches the 96-unit dumpster from the planter rim and
 keeps the flat 90-unit rise and the fence crossing. `locomotion.low_ceilings`
 climbs a crouched 4-unit duct lip in 09_Abandoned_Buildings and a standing
-16-unit step under a 104-unit ceiling in 15_Crypt. The strengthened GPU movement smoke checks SDL walk/run/jump/crouch,
+16-unit step under a 104-unit ceiling in 15_Crypt. `locomotion.museum_duct`
+crawls through 03_Museum's air duct, whose ramp fits the crouched box exactly
+(see the [head skin](contact_overlap_contracts.md#head-skin)), and back. The strengthened GPU movement smoke checks SDL walk/run/jump/crouch,
 hidden stance changes, live player pose and unload/re-entry. Other-platform, XR
 and retail executable feel comparisons have not been performed.

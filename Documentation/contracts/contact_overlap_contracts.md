@@ -33,7 +33,8 @@ including one against a CivilianAI box). Full lifting resets each tolerated face
 whenever it is contacted.
 
 Every other caller (resize, support, placement, movers, rotation, projectiles,
-world bodies) keeps the previous start-solid semantics. At equal fractions a
+world bodies) keeps the previous start-solid semantics, apart from the head skin
+below. At equal fractions a
 tolerated overlap loses the tie against any other contact, so it never masks a
 deeper start penetration. A world-model shell that contains the body center
 remains start-solid regardless of depth. Overlaps deeper than 0.01 still fail
@@ -48,6 +49,29 @@ stopping force and touch callbacks).
 `CollisionHit::allowed_overlap` marks such a contact. Each record counts the ones
 `MoveObject` acted on (`overlap_contacts`, `last_overlap_depth`). The Movement
 inspector shows both. Ignored overlaps (leaving or sliding) are not counted.
+
+## Head skin
+
+A solid `FLAG_STAIRSTEP` body (the player and stair-stepping NPCs) leaves the top
+0.01 units of its box, the same tolerance, out of its own queries: every
+`MoveObject` sweep (main, pushable clearance and the three stair probes), the
+`GetMovementState` support sweep and the `ResizeObject` placement check use a box
+whose top is 0.01 lower and whose feet are unchanged. Positions, dimensions,
+touch sweeps, other objects' sweeps against the body, rays and every other query
+keep the exact box, so pressing against a ceiling can leave the head up to 0.009
+inside it.
+
+Authored geometry can fit a body exactly. 03_Museum's air duct climbs a 1/3 ramp
+under a parallel ceiling 64 units above it (63.9996 in floats); the crouched box
+needs 56 plus 24/3 = 64. With the solver's 0.001 separation from both faces the
+slack is negative, so the crawl jammed where the ramp meets the flat duct
+ceiling and at the top of the ramp. Later LithTech does not collide a
+stair-stepping body as one rigid box either: its lower stair band only lifts
+onto walkable faces and the rest of the body is collided separately, so a
+squeezed body ends inside the floor. Keeping the feet exact preserves every
+landing, step and resting height; the skin only gives 0.01 at the top. This is
+replacement physics, not a trace of the 1998 executable. See the
+[duct report](../implementation/reports/low_ceiling_steps.md#03_museum-air-duct).
 
 ## Tests
 

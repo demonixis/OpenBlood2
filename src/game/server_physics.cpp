@@ -11,6 +11,19 @@
 
 namespace OpenBlood2
 {
+    namespace
+    {
+        // Head skin (contact_overlap_contracts.md): a solid stair-stepping body leaves
+        // the top 0.01 units of its box out of its own motion, support and resize
+        // queries; the feet stay exact. Returns how far the swept box's center and
+        // half-height drop for half-height `half`.
+        float head_skin(const ObjectRecord& r, float half)
+        {
+            constexpr float skin = 0.01f;
+            return (r.state.m_Flags & FLAG_STAIRSTEP) && (r.state.m_Flags & FLAG_SOLID) && half > skin ? skin * .5f
+                                                                                                         : 0.f;
+        }
+    } // namespace
     bool ServerAdapter::CollectObjectsTouchingSphere(DVector center, float radius, std::vector<HOBJECT>& output)
     {
         trace_service("CollectObjectsTouchingSphere");
@@ -95,8 +108,11 @@ namespace OpenBlood2
         // pushing other objects; a blocked clip keeps its position and clock.
         auto position = r->state.m_Pos;
         position.y += dimensions.y - r->dimensions.y;
+        const float skin = head_skin(*r, dimensions.y);
+        const DVector box{dimensions.x, dimensions.y - skin, dimensions.z}, center{position.x, position.y - skin,
+                                                                                    position.z};
         CollisionHit hit;
-        const auto query = sweep_scene(h, position, position, dimensions, hit, objects_.snapshot());
+        const auto query = sweep_scene(h, center, center, box, hit, objects_.snapshot());
         if (query == CollisionQuery::Invalid)
             return ResizeResult::Invalid;
         if (query == CollisionQuery::Hit)
@@ -159,11 +175,14 @@ namespace OpenBlood2
         // sliding along a wall or walking off a ledge. World support has a polygon
         // identity, not a fabricated HOBJECT. Motion away from the support plane
         // is airborne; positive Y alone can also mean walking uphill.
-        const auto center = object_bounds_center(*r);
+        const float skin = head_skin(*r, state.dimensions.y);
+        auto center = object_bounds_center(*r);
+        center.y -= skin;
         auto to = center;
         to.y -= 0.02f;
         CollisionHit nearest;
-        const auto query = sweep_scene(h, center, to, state.dimensions, nearest, objects_.snapshot());
+        const DVector box{state.dimensions.x, state.dimensions.y - skin, state.dimensions.z};
+        const auto query = sweep_scene(h, center, to, box, nearest, objects_.snapshot());
         if (query == CollisionQuery::Invalid)
             return false;
         const bool found = query == CollisionQuery::Hit;
@@ -269,6 +288,17 @@ namespace OpenBlood2
                               destination->y <= r->state.m_Pos.y + 0.001f;
         moving_ = true;
         const auto ids = objects_.snapshot();
+        // The body's own sweeps use the head-skinned box; points stay real centers.
+        const float skin = head_skin(*r, r->dimensions.y);
+        const DVector box{r->dimensions.x, r->dimensions.y - skin, r->dimensions.z}, lower{0, skin, 0};
+        auto sweep_body = [&](DVector from, DVector to, CollisionHit& hit, HOBJECT ignore_extra = nullptr,
+                              double allowed = 0, StartOverlap overlap = StartOverlap::Block)
+        {
+            const auto query = sweep_scene(h, vector_subtract(from, lower), vector_subtract(to, lower), box, hit, ids,
+                                           ignore_extra, allowed, overlap);
+            hit.point = vector_add(hit.point, lower);
+            return query;
+        };
         struct Contact
         {
             HOBJECT other = nullptr;
@@ -330,7 +360,7 @@ namespace OpenBlood2
             CollisionHit nearest;
             auto query =
                 (r->state.m_Flags & FLAG_SOLID)
-                    ? sweep_scene(h, position, end, r->dimensions, nearest, ids, nullptr, allowed_penetration, start)
+                    ? sweep_body(position, end, nearest, nullptr, allowed_penetration, start)
                     : ((r->state.m_Flags & FLAG_GRAVITY) && !(r->state.m_Flags & FLAG_GOTHRUWORLD)
                            ? collision->sweep(position, end, r->dimensions, nearest, allowed_penetration, start)
                            : CollisionQuery::Miss);
@@ -355,8 +385,7 @@ namespace OpenBlood2
                 const auto push = vector_scale(nearest.normal, into * float(1 - nearest.fraction) - .002f);
                 CollisionHit clearance;
                 auto actor_end = end;
-                auto clear = sweep_scene(h, position, actor_end, r->dimensions, clearance, ids, obstacle->handle,
-                                         allowed_penetration);
+                auto clear = sweep_body(position, actor_end, clearance, obstacle->handle, allowed_penetration);
                 MovementState flat_support;
                 const bool flatten = clear == CollisionQuery::Hit && !clearance.start_solid &&
                                      clearance.normal.y > .99999f && actor_end.y < position.y &&
@@ -368,8 +397,7 @@ namespace OpenBlood2
                     // Revalidate the complete horizontal path before pushing;
                     // otherwise successive grounded commands stick at the box.
                     actor_end.y = position.y;
-                    clear = sweep_scene(h, position, actor_end, r->dimensions, clearance, ids, obstacle->handle,
-                                        allowed_penetration);
+                    clear = sweep_body(position, actor_end, clearance, obstacle->handle, allowed_penetration);
                 }
                 const auto planned =
                     clear == CollisionQuery::Miss
@@ -411,7 +439,7 @@ namespace OpenBlood2
                 // whole limit to clear refused every step under a low ceiling (a
                 // crouched body in a 64-unit duct has 8 units to spare, not 14).
                 CollisionHit probe, landing;
-                const auto lift = sweep_scene(h, position, up, r->dimensions, probe, ids, nullptr, allowed_penetration);
+                const auto lift = sweep_body(position, up, probe, nullptr, allowed_penetration);
                 if (lift == CollisionQuery::Hit && !probe.start_solid)
                     up.y = std::max(position.y, probe.point.y - 0.001f);
                 auto across = vector_add(up, {remaining.x, 0, remaining.z});
@@ -419,8 +447,8 @@ namespace OpenBlood2
                 down.y = position.y - 0.02f;
                 if (lift != CollisionQuery::Invalid && !(lift == CollisionQuery::Hit && probe.start_solid) &&
                     up.y > position.y + 0.001f &&
-                    sweep_scene(h, up, across, r->dimensions, probe, ids) == CollisionQuery::Miss &&
-                    sweep_scene(h, across, down, r->dimensions, landing, ids) == CollisionQuery::Hit &&
+                    sweep_body(up, across, probe) == CollisionQuery::Miss &&
+                    sweep_body(across, down, landing) == CollisionQuery::Hit &&
                     !landing.start_solid && landing.normal.y >= 0.5f && landing.point.y > position.y + 0.001f &&
                     landing.point.y - position.y <= height + 0.001f)
                 {

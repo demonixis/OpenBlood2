@@ -663,6 +663,57 @@ namespace
         }
         return true;
     }
+    // 03_Museum's air duct behind the exterior vent (reports/low_ceiling_steps.md):
+    // after a 90-degree bend its floor climbs a 1/3 ramp from 544 to 576 under a
+    // parallel ceiling. The 64-unit vertical gap equals the crouched box's 56 plus
+    // 24/3, so the crouched player only passes through the head skin.
+    bool museum_duct(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(game.initialize());
+        Config config;
+        config.data_dir = root;
+        std::string error;
+        CHECK(game.resources.mount_game(config, error));
+        CHECK(game.request_world("03_Museum", error) && game.enter_player(error) && step(game));
+        auto& c = game.client_shell;
+        auto& mgr = c.move_mgr;
+        auto* p = game.server_shell.Player(game.local_client);
+        DVector position{640, 544 + game.objects.get(c.player)->dimensions.y + .01f, -1600};
+        CHECK(game.server.TeleportObject(c.player, &position) == DE_OK && p->TeleportClientToServerPos() &&
+              game.pump_player_messages(error));
+        MovementInput input{};
+        input.crouch = true;
+        auto feet = [&] { return mgr.body.position.y - mgr.body.dimensions.y; };
+        unsigned airborne = 0;
+        auto run = [&](float yaw, int frames)
+        {
+            for (int i = 0; i < frames; ++i)
+            {
+                if (!mgr.Update(game.server_shell, c.voice_manager, false, input, yaw, 1.0 / 60, true))
+                    return false;
+                airborne += !mgr.m_bOnGround;
+            }
+            return true;
+        };
+        CHECK(run(0, 10) && p->crouched);
+        input.forward = true;
+        CHECK(run(0, 120)); // North to the bend.
+        CHECK(mgr.body.position.z > -1390 && std::abs(feet() - 544.001f) < .01);
+        CHECK(run(-1.5707963f, 90)); // West through the bend and up the ramp.
+        std::cout << "duct ramp " << mgr.body.position.x << ',' << feet() << ',' << mgr.body.position.z
+                  << " overlaps " << mgr.body.overlap_contacts << '\n';
+        CHECK(mgr.body.position.x < 450 && std::abs(feet() - 576.001f) < .01);
+        CHECK(run(-1.5707963f, 330)); // Out of the duct, where Caleb stands again.
+        input = {};
+        CHECK(run(-1.5707963f, 2) && !p->crouched && mgr.body.dimensions.y == 42);
+        input.crouch = input.forward = true;
+        CHECK(run(1.5707963f, 460)); // And back down the ramp.
+        std::cout << "duct back " << mgr.body.position.x << ',' << feet() << ',' << mgr.body.position.z
+                  << " airborne frames " << airborne << '\n';
+        CHECK(mgr.body.position.x > 610 && std::abs(feet() - 544.001f) < .01);
+        return true;
+    }
 } // namespace
 int main(int argc, char** argv)
 {
@@ -690,6 +741,7 @@ int main(int argc, char** argv)
                     : name == "ledge"         ? ledge(root)
                     : name == "cityhub_ledge" ? cityhub_ledge(root)
                     : name == "low_ceilings"  ? low_ceilings(root)
+                    : name == "museum_duct"   ? museum_duct(root)
                                               : false;
     return ok ? 0 : 1;
 }

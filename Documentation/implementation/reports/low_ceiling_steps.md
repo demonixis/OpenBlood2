@@ -75,3 +75,35 @@ standing Caleb climbs the 16-unit step at (160, 16, -512) in 15_Crypt under a
 104-unit ceiling (20 units of headroom for a 21-unit limit).
 
 The other locomotion, ledge, stair and contact cases are unchanged.
+
+## 03_Museum air duct
+
+Later the same day the user located a duct that the change above did not open:
+at the start of 03_Museum the player blows up the exterior vent (`extvent3`,
+x 608–672, y 544–608, z −1824 to −1632) and crawls into the air duct behind it.
+After its 90° bend the crouched player could not go further.
+
+The duct runs north along z at floor 544 under a flat ceiling at 608, then turns
+west at z ≈ −1388. From x = 608 to x = 512 the floor (polygon 5339) climbs a 1/3
+ramp to 576 under a parallel ceiling (polygon 596); the measured vertical gap is
+63.9996 everywhere. Caleb's crouched box (24 wide, 56 high) needs 56 + 24/3 = 64
+on that slope: the duct was built to fit it exactly. With the solver's 0.001
+separation from the floor and the ceiling the slack is negative. Started in the
+middle of the ramp, the box still slid along it through tolerated start
+overlaps (80 acted contacts in 1 s), but it jammed at both ends of the ramp,
+where it has to pass under the line where the sloped ceiling meets the flat one
+(stopped at x = 596.003, contact normal (0, −1, 0), and at x = 523.997 coming
+back). It also lost its support there: the support sweep started inside the
+ceiling and reported the player airborne.
+
+The [head skin](../../contracts/contact_overlap_contracts.md#head-skin) leaves the
+top 0.01 units of a solid stair-stepping body out of its own motion, support and
+resize queries, which restores 0.0076 units of slack. The feet are exact, so
+resting, landing and step heights do not change.
+
+The private `locomotion.museum_duct` starts crouched in the duct at
+(640, 544, −1600) beyond the vent: it reaches the bend, climbs the ramp onto the
+576 floor (x < 450), crawls on to where Caleb can stand again (x ≈ −320), stands,
+crouches and crawls back down to the bend. Without the head skin it stops at
+x = 596.003. The only airborne frames are three at the top of the ramp, where
+the upward velocity carries the body half a unit over the crest.
