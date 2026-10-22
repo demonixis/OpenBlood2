@@ -47,8 +47,8 @@ namespace OpenBlood2
     // state without advancing simulation; record() encodes one presented frame.
     // All in-world presentation is recorded into one scene render pass sharing one
     // depth target and one pipeline set. View models use a separate near depth slice.
-    // On desktop, post-processing (MSAA, the enhanced HDR scene, ambient occlusion, bloom,
-    // tonemapping, FXAA) surrounds that pass; XR eyes keep the plain single-sampled pass.
+    // On desktop, post-processing (MSAA, the enhanced HDR scene, reflections, ambient occlusion,
+    // bloom, tonemapping, FXAA) surrounds that pass; XR eyes keep the plain single-sampled pass.
     class ScenePresenter
     {
       public:
@@ -146,7 +146,7 @@ namespace OpenBlood2
         // Pipelines, renderer uploads, shadow tiles and a depth target with `layers` layers.
         bool prepare_depth(Uint32 width, Uint32 height, Uint32 layers, SDL_GPUSampleCount, std::string& error);
         bool prepare_frame(SDL_GPUCommandBuffer*, SDL_GPUTextureFormat, Uint32 width, Uint32 height, Uint32 layers,
-                           bool aux, SDL_GPUSampleCount, std::string& error);
+                           bool aux, bool reflections, SDL_GPUSampleCount, std::string& error);
         // One scene render pass into colour/depth layer `target.layer`.
         bool record_view(GameSession&, SDL_GPUCommandBuffer*, const SceneTarget&, DVector eye, DRotation rotation,
                          bool letterbox, const EyeProjection*, std::string& error);
@@ -161,6 +161,7 @@ namespace OpenBlood2
         std::uint64_t grid_revision_ = UINT64_MAX;
         SurfaceShading applied_shading_ = SurfaceShading::Original;
         bool applied_normal_maps_ = false;
+        std::uint64_t applied_manifest_ = 0;
         std::uint64_t report_mesh_ = UINT64_MAX, report_surface_ = UINT64_MAX;
         TextureHandle depth_;
         Uint32 depth_width_ = 0, depth_height_ = 0, depth_layers_ = 0;

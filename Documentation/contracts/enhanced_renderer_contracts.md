@@ -156,7 +156,9 @@ Animated (SPR) materials keep the `default` class, so animated monitors do not g
 term is computed per pixel in the fragment shader. In post-processing passes the
 `-DAUX_TARGETS` variants also write the linear light it adds to a second target, the only input
 of [bloom](post_processing_contracts.md#bloom), which [ambient occlusion](post_processing_contracts.md#ambient-occlusion)
-also leaves undarkened.
+also leaves undarkened. The `-DREFLECTION_TARGETS` variants also write the environment specular
+weight and light that [screen-space reflections](post_processing_contracts.md#screen-space-reflections)
+replace.
 
 ## Material inspection (5.5)
 

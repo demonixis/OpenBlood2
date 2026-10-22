@@ -86,6 +86,9 @@ namespace OpenBlood2
     // multisampled scenes can resolve it.
     inline constexpr SDL_GPUTextureFormat scene_glow_format = SDL_GPU_TEXTUREFORMAT_R16G16B16A16_FLOAT;
     inline constexpr SDL_GPUTextureFormat scene_depth_copy_format = SDL_GPU_TEXTUREFORMAT_R32_FLOAT;
+    // Screen-space reflection scene passes add color target 3 (environment specular weight,
+    // roughness in alpha) and color target 4 (the environment light that weight multiplied).
+    inline constexpr SDL_GPUTextureFormat scene_reflection_format = SDL_GPU_TEXTUREFORMAT_R16G16B16A16_FLOAT;
     // Vertical model shadow tiles store caster world heights; uncovered texels keep the clear value.
     inline constexpr SDL_GPUTextureFormat shadow_tile_format = SDL_GPU_TEXTUREFORMAT_R32_FLOAT;
     inline constexpr float shadow_tile_clear = -1e30f;
@@ -134,8 +137,9 @@ namespace OpenBlood2
     // Every world/model/sprite/sky pipeline for one color format, created together
     // so no pipeline is compiled lazily during gameplay. One set may be shared by
     // all renderers recording into the same scene pass. An auxiliary set adds color targets 1
-    // (scene_glow_format) and 2 (scene_depth_copy_format) to every scene pipeline; a multisampled
-    // set matches MSAA targets.
+    // (scene_glow_format) and 2 (scene_depth_copy_format) to every scene pipeline, a reflection
+    // set targets 3 and 4 (scene_reflection_format) as well; a multisampled set matches MSAA
+    // targets.
     class WorldPipelines
     {
       public:
@@ -146,11 +150,13 @@ namespace OpenBlood2
         }
         WorldPipelines(const WorldPipelines&) = delete;
         WorldPipelines& operator=(const WorldPipelines&) = delete;
-        // No-op when already prepared for this format, shading, auxiliary targets and sample count;
-        // failure releases every pipeline. The format-only overload keeps the other choices.
+        // No-op when already prepared for this format, shading, auxiliary and reflection targets
+        // and sample count; failure releases every pipeline. The format-only overload keeps the
+        // other choices. Reflection targets require the auxiliary ones.
         bool prepare(SDL_GPUTextureFormat, std::string& error);
         bool prepare(SDL_GPUTextureFormat, SurfaceShading, std::string& error);
-        bool prepare(SDL_GPUTextureFormat, SurfaceShading, bool aux, SDL_GPUSampleCount, std::string& error);
+        bool prepare(SDL_GPUTextureFormat, SurfaceShading, bool aux, bool reflections, SDL_GPUSampleCount,
+                     std::string& error);
         SurfaceShading shading() const
         {
             return shading_;
@@ -167,6 +173,10 @@ namespace OpenBlood2
         {
             return aux_;
         }
+        bool reflections() const
+        {
+            return reflections_;
+        }
         SDL_GPUSampleCount samples() const
         {
             return samples_;
@@ -179,7 +189,7 @@ namespace OpenBlood2
         std::array<SDL_GPUGraphicsPipeline*, static_cast<std::size_t>(WorldPipeline::Count)> pipelines_{};
         SDL_GPUTextureFormat format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
         SurfaceShading shading_ = SurfaceShading::Original;
-        bool aux_ = false;
+        bool aux_ = false, reflections_ = false;
         SDL_GPUSampleCount samples_ = SDL_GPU_SAMPLECOUNT_1;
     };
     // Destination of record(): an already begun render pass whose color/depth

@@ -8,7 +8,9 @@
 // PBR_HIGH: eight grid lights and specular cavity. PBR_ALPHA: translucent output.
 // AUX_TARGETS (post-processing passes): target 1 receives the linear light the emission adds
 // and, in alpha, the share of the pixel that receives ambient occlusion; target 2 the window
-// depth (opaque pipelines only).
+// depth (opaque pipelines only). REFLECTION_TARGETS adds, for screen-space reflections, the
+// weight of the environment specular (target 3, roughness in alpha) and the environment light
+// it multiplied (target 4): the composite replaces that light by the reflected one.
 // SDL_GPU fragment conventions: textures/samplers then storage buffers in space2, uniforms in space3.
 Texture2D<float4> albedo : register(t0, space2);
 SamplerState albedoSampler : register(s0, space2);
@@ -165,14 +167,23 @@ struct Output
     float4 color : SV_Target0;
     float4 glow : SV_Target1; // Linear glow premultiplied by coverage; alpha: occlusion mask.
     float4 depth : SV_Target2;
+#ifdef REFLECTION_TARGETS
+    float4 specular : SV_Target3;
+    float4 environment : SV_Target4;
+#endif
 };
 static float windowDepth;
+static float4 reflectionWeight, reflectionLight; // Zero: the pixel reflects nothing.
 Output shaded(float4 color, float4 glow)
 {
     Output output;
     output.color = color;
     output.glow = glow;
     output.depth = float4(windowDepth, 0.0, 0.0, 0.0);
+#ifdef REFLECTION_TARGETS
+    output.specular = reflectionWeight;
+    output.environment = reflectionLight;
+#endif
     return output;
 }
 float3 toLinear(float3 c)
@@ -194,6 +205,8 @@ float4 main(Input input) : SV_Target0
 {
 #ifdef AUX_TARGETS
     windowDepth = input.position.z;
+    reflectionWeight = float4(0.0, 0.0, 0.0, 1.0);
+    reflectionLight = float4(0.0, 0.0, 0.0, 0.0);
 #endif
     float shadow = shadowAmount(input.worldPosition); // Before discard: screen derivatives.
     float3 dp1 = ddx(input.worldPosition), dp2 = ddy(input.worldPosition);
@@ -329,6 +342,11 @@ float4 main(Input input) : SV_Target0
     float3 compensation = 1.0 + f0 * (1.0 / max(white, 0.05) - 1.0);
     float3 body = (baseColor * diffuse * bump * (1.0 - metallic) + emitted(baseColor)) * sceneColor.rgb;
     float3 reflected = (diffuse * split + direct) * compensation * cavity * sceneColor.rgb;
+#ifdef AUX_TARGETS
+    // The environment specular is reflectionLight * reflectionWeight.
+    reflectionWeight = float4(split * compensation * cavity, roughness);
+    reflectionLight = float4(diffuse * sceneColor.rgb, 0.0);
+#endif
 #ifdef PBR_ALPHA
     // Highlights survive on nearly transparent glass: coverage rises to carry them.
     float coverage = texel.a * modulation.x;

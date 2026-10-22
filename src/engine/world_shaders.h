@@ -28,6 +28,14 @@ namespace OpenBlood2
         PbrHighAuxFragment,
         PbrAlphaAuxFragment,
         PbrHighAlphaAuxFragment,
+        // With screen-space reflections: also target 3 (environment specular weight, roughness)
+        // and target 4 (the environment light it multiplied).
+        OpaqueAuxSsrFragment,
+        AlphaAuxSsrFragment,
+        PbrAuxSsrFragment,
+        PbrHighAuxSsrFragment,
+        PbrAlphaAuxSsrFragment,
+        PbrHighAlphaAuxSsrFragment,
         // Post-processing: a buffer-free full-target triangle, the bloom chain, the HDR composite,
         // FXAA, ground-truth ambient occlusion and its depth-aware blur.
         PostVertex,
@@ -37,7 +45,9 @@ namespace OpenBlood2
         FxaaFragment,
         AoDepthFragment,
         GtaoFragment,
-        AoBlurFragment
+        AoBlurFragment,
+        SsrTraceFragment,
+        SsrBlurFragment
     };
     // Static owned bytecode/source and reflected resource counts. No device or
     // filesystem needed; MSL's generated entry point differs from SPIR-V's.

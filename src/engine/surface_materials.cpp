@@ -395,6 +395,7 @@ namespace OpenBlood2
         classes_ = std::move(classes);
         rules_ = std::move(rules);
         textures_ = std::move(textures);
+        ++revision_;
         return true;
     }
     const SurfaceMaterial& SurfaceManifest::resolve(std::string_view path) const

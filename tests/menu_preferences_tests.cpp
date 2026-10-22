@@ -34,10 +34,10 @@ int test_menu_preferences(int argc, char** argv)
         // The shared atomic writer keeps the exact preference bytes.
         std::ifstream in(path, std::ios::binary);
         const std::string bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        CHECK(bytes == "version=8\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
+        CHECK(bytes == "version=9\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
                        "invert_y=1\ndetail=2\npixel_lighting=0\nrenderer=0\nquality=0\nnormal_maps=1\n"
                        "vr_turn=45\nvr_laser=1\nvr_crosshair=1\nvr_move_hand=0\ncheats=0\ngod_mode=0\n"
-                       "antialiasing=0\nbloom=1\ntonemap=1\nambient_occlusion=2\n");
+                       "antialiasing=0\nbloom=1\ntonemap=1\nambient_occlusion=2\nreflections=2\n");
     }
     settings.sound = true;
     CHECK(save_menu_preferences(path, settings, error));
@@ -170,6 +170,23 @@ int test_menu_preferences(int argc, char** argv)
             out << v8 << "ambient_occlusion=0\n";
         }
         CHECK(load_menu_preferences(path, loaded, error) && loaded.ambient_occlusion == 0 && loaded.antialiasing == 1);
+        // Version 9 adds reflections; version 8 files load them high.
+        CHECK(loaded.reflections == 2);
+        std::string v9 = v8 + "ambient_occlusion=0\n";
+        v9[8] = '9';
+        for (const auto& text : {v8 + "ambient_occlusion=0\nreflections=1\n", v9 + "reflections=3\n", v9})
+        {
+            {
+                std::ofstream out(path);
+                out << text;
+            }
+            CHECK(!load_menu_preferences(path, loaded, error) && !error.empty());
+        }
+        {
+            std::ofstream out(path);
+            out << v9 << "reflections=1\n";
+        }
+        CHECK(load_menu_preferences(path, loaded, error) && loaded.reflections == 1 && loaded.ambient_occlusion == 0);
     }
     for (const auto text : {"renderer=2\nquality=0\nnormal_maps=0\n", "renderer=0\nquality=0\nnormal_maps=2\n",
                             "renderer=0\nquality=0\n"})

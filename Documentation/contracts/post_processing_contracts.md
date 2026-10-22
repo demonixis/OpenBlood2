@@ -1,19 +1,21 @@
 # Post-processing (M6)
 
-Options > Display adds four replacement rows after NORMAL MAPS:
+Options > Display adds five replacement rows after NORMAL MAPS:
 
 | Row (setting) | Values | Applies to |
 |---|---|---|
 | `TONEMAP` (19) | OFF / NEUTRAL / FILMIC | Enhanced renderer (disabled with ORIGINAL) |
 | `BLOOM` (18) | ON / OFF | Enhanced renderer (disabled with ORIGINAL) |
 | `AMBIENT OCCLUSION` (20) | OFF / LOW / HIGH | Enhanced renderer (disabled with ORIGINAL) |
+| `REFLECTIONS` (21) | OFF / LOW / HIGH | Enhanced renderer (disabled with ORIGINAL) |
 | `ANTI-ALIASING` (17) | OFF / FXAA / MSAA 2X / MSAA 4X | Both renderers |
 
-The defaults are anti-aliasing off, bloom on, the neutral tonemap and HIGH ambient occlusion.
-The original renderer therefore keeps its byte-identical frame by default; the enhanced renderer
-gets an HDR scene, ambient occlusion, bloom and the neutral tonemap. Everything here is
-replacement rendering: the 1998 game has no post-processing. The first increment covered the
-HDR target, bloom, tonemapping and anti-aliasing of roadmap M6; the second adds GTAO. SSR remains.
+The defaults are anti-aliasing off, bloom on, the neutral tonemap and HIGH ambient occlusion and
+reflections. The original renderer therefore keeps its byte-identical frame by default; the
+enhanced renderer gets an HDR scene, reflections, ambient occlusion, bloom and the neutral
+tonemap. Everything here is replacement rendering: the 1998 game has no post-processing. The
+increments covered the HDR target, bloom, tonemapping and anti-aliasing of roadmap M6, then GTAO,
+then screen-space reflections.
 The [source ledger](../implementation/sources/post_processing_sources.json) lists the published
 techniques.
 
@@ -28,32 +30,36 @@ afterwards, so no effect touches them.
 | Original, AA off; enhanced with every effect off | Output (swapchain) | Nothing: the frame of the earlier releases. |
 | MSAA only | Multisampled colour and depth, resolved into the output | Nothing |
 | FXAA, LDR scene | Intermediate in the output format | FXAA into the output |
-| Enhanced with bloom, a tonemap or ambient occlusion | RGBA16F scene, plus the auxiliary targets with bloom or occlusion | Occlusion, bloom chain, composite into the output (or into an intermediate for FXAA), FXAA |
+| Enhanced with bloom, a tonemap, occlusion or reflections | RGBA16F scene, plus the auxiliary targets with bloom, occlusion or reflections | Occlusion, reflections, bloom chain, composite into the output (or into an intermediate for FXAA), FXAA |
 
-- **Auxiliary targets.** With bloom or ambient occlusion every scene pipeline gets two more colour
-  targets: the glow (RGBA16F, alpha holds the occlusion mask, see [Bloom](#bloom) and
-  [Ambient occlusion](#ambient-occlusion)) and an R32F copy of the window depth.
+- **Auxiliary targets.** With bloom, ambient occlusion or reflections every scene pipeline gets two
+  more colour targets: the glow (RGBA16F, alpha holds the occlusion mask, see [Bloom](#bloom) and
+  [Ambient occlusion](#ambient-occlusion)) and an R32F copy of the window depth. Reflections add two
+  RGBA16F targets (see [Screen-space reflections](#screen-space-reflections)), five in all;
+  SDL_GPU accepts eight.
 - **MSAA.** Every multisampled colour attachment resolves with `SDL_GPU_STOREOP_RESOLVE` at the
   end of the scene pass. SDL_GPU cannot resolve or sample a multisampled depth buffer, which is why
   occlusion reads the depth copy instead. The sample count is the highest one up to the request
-  that the scene format, `D32_FLOAT` and (with auxiliary targets) the glow and depth-copy formats
-  all support; `PostStats` keeps both. The shadow-tile pass stays single-sampled.
+  that the scene format, `D32_FLOAT` and the auxiliary and reflection formats in use all support;
+  `PostStats` keeps both. The shadow-tile pass stays single-sampled.
 - **Targets.** Textures live in the presentation `GpuRegistry`. They are recreated when the
   output size or format or the plan changes, and all are released when the plan returns to the
-  direct pass. The post pipelines (bloom down/up, composite, FXAA, occlusion depth, GTAO, blur)
-  are created together for each output format, and the scene `WorldPipelines` are recreated with
-  the auxiliary targets and sample count, so nothing is compiled lazily.
+  direct pass. The post pipelines (bloom down/up, composite, FXAA, half-size depth, GTAO and its
+  blur, reflection trace and blur) are created together for each output format, and the scene
+  `WorldPipelines` are recreated with the auxiliary and reflection targets and sample count, so
+  nothing is compiled lazily.
 - **XR.** `record_eyes` keeps the single-sampled pass into the eye layers: post-processing is
   desktop only in this increment, and the settings are ignored in a headset session.
 
 ## HDR scene
 
-With the enhanced renderer and bloom, a tonemap or ambient occlusion, every scene pipeline (sky, sprites,
+With the enhanced renderer and bloom, a tonemap, ambient occlusion or reflections, every scene pipeline (sky, sprites,
 PolyGrids, models and world faces) draws into an RGBA16F target. Values stay in the renderer's
 display space but are no longer clamped, so specular highlights and emission above white
 survive until the composite. The composite decodes with the sRGB transfer function (extended
 above 1), applies ambient occlusion and adds bloom in linear light, tonemaps and encodes for the
-UNORM output.
+UNORM output; reflections are applied before the decode, in display space, where the shaders
+added the term they replace.
 
 A float target also stops clamping a translucent draw's colour before blending. Enhanced
 translucent faces raise their coverage to carry reflections, so their straight colour can exceed
@@ -90,7 +96,8 @@ baked light does not resolve. It is replacement shading, tuned to stay subtle.
   uncovered (alpha blend `ZERO, ONE_MINUS_SRC_ALPHA`). Water and smoke therefore do not inherit the
   occlusion of the floor behind them.
 - **Half size.** A first pass converts the depth copy to linear view depth at half size, taking the
-  top-left pixel of each 2×2 block, so no depths are mixed. GTAO runs on that buffer:
+  top-left pixel of each 2×2 block, so no depths are mixed (reflections share this buffer). GTAO
+  runs on it:
   - per texel, a set of screen-space slices rotated by interleaved gradient noise;
   - on each side of a slice, the highest horizon within 48 world units (linear falloff over the
     outer 60%), its step distances squared and jittered;
@@ -108,6 +115,44 @@ baked light does not resolve. It is replacement shading, tuned to stay subtle.
 - **Limits.** Screen-space only: occluders off screen or behind the first surface are unknown,
   thin foreground objects darken the wall behind them within the radius, and with MSAA the resolved
   depth copy averages depths along silhouettes.
+
+## Screen-space reflections
+
+The enhanced shaders light every surface with a uniform environment: the local baked light
+(`diffuse`) times the split-sum specular weight. Screen-space reflections replace that light by the
+light actually reflected, where the screen can supply it. Nothing is added twice.
+
+- **Inputs** (targets 3 and 4, opaque non-sky pipelines only, like the depth copy):
+  - the environment specular weight `split · compensation · cavity` (RGB), with roughness in alpha;
+  - the environment light it multiplied, `diffuse` times the scene light scale.
+  The original shaders and the fully bright, unlit, flat and `FLAG_NOLIGHT` paths write a zero
+  weight. Translucent draws do not write them, and the occlusion mask keeps their share of the
+  pixel unreflected.
+- **Trace (half size).** On the shared half-size view depth:
+  - the view ray is reflected about the normal rebuilt from the nearer depth neighbours;
+  - it is clipped to 1024 world units, the near plane and the scene viewport, then marched in
+    screen space: 16 (LOW) or 32 (HIGH) jittered steps, depth interpolated perspective-correctly
+    (McGuire and Mara 2014);
+  - a step that passes behind the depth by less than 12 units plus 2% of its depth is a hit,
+    refined by four bisections;
+  - the scene colour (display space, HDR) is read bilinearly at the hit.
+  Only pixels with a weight and roughness below 0.5 trace. The confidence fades with roughness
+  (from 0.3), at the screen edges, over the last 40% of the ray, and for rays turning back to the
+  camera. The output is the light premultiplied by the confidence.
+- **Blur.** A separable 7-tap blur runs across and down, spread up to 6 half-size texels with
+  roughness and cut by a 4% relative depth difference.
+- **Application.** The composite upsamples it like the occlusion: `c += mask · W · (L − a · E)`,
+  where `W` is the weight, `E` the environment light, and `L` and `a` the premultiplied reflection
+  and its confidence. View models are neither reflecting nor reflected.
+- **Content.** Only the manifest's glossy classes reflect visibly: tile and marble (0.35), wet,
+  shiny metal, glass, screens and plastic. Most retail floors and walls resolve to rough classes,
+  so the effect is local: the office's marble pillars and ceiling tiles, the 09_Abandoned_Buildings
+  panels. Dielectric reflectance is about 4% at normal incidence, so walls change little. Rough
+  surfaces darken slightly where the reflected scene is darker than the baked light that stood in
+  for it. With every class made glossy (a test manifest), the CityHub floor mirrors the NPC and
+  the gate bars.
+- **Limits.** Screen-space only: anything off screen, behind the first surface or in the view
+  model slice is not reflected, and the ray uses the geometric normal (no normal-map detail).
 
 ## Tonemaps
 
@@ -134,24 +179,28 @@ NEUTRAL was chosen as the default because it leaves the original look in place.
 ## Settings
 
 - `preferences.cfg` version 7 adds `antialiasing` (0-3), `bloom` (0/1) and `tonemap` (0-2);
-  version 8 adds `ambient_occlusion` (0-2). Older versions load the defaults (0, 1, 1, 2); writes
-  produce version 8.
+  version 8 adds `ambient_occlusion` (0-2), version 9 `reflections` (0-2). Older versions load
+  the defaults (0, 1, 1, 2, 2); writes produce version 9.
 - The bench and direct paths take `--aa off|fxaa|msaa2|msaa4`, `--no-bloom`,
-  `--tonemap off|neutral|filmic` and `--ao off|low|high`, with the same defaults.
+  `--tonemap off|neutral|filmic`, `--ao off|low|high` and `--ssr off|low|high`, with the same
+  defaults.
 - The inspector's world section and the bench log report the last frame's plan: direct or HDR
-  scene, MSAA samples (and the request), FXAA, bloom levels, tonemap, ambient occlusion, passes
-  and targets.
+  scene, MSAA samples (and the request), FXAA, bloom levels, tonemap, ambient occlusion,
+  reflections, passes and targets.
+- `ScenePresenter` resolves the enhanced materials again whenever `surface_manifest` is reparsed
+  (`SurfaceManifest::revision`), not only when a setting changes.
 
 ## Shaders
 
-Fourteen shaders are added:
+Twenty-two shaders are added:
 
 - `world_aux_frag`, `sprite_aux_frag` and the four `pbr_*_aux_frag` variants (`-DAUX_TARGETS`,
-  outputs 1 and 2);
+  outputs 1 and 2), and their `*_aux_ssr_frag` versions (`-DREFLECTION_TARGETS` too, outputs 3
+  and 4);
 - `post.vert` (a buffer-free triangle), `bloom_down.frag`, `bloom_up.frag`, `composite.frag`,
-  `fxaa.frag`, `ao_depth.frag`, `gtao.frag` and `ao_blur.frag`.
+  `fxaa.frag`, `ao_depth.frag`, `gtao.frag`, `ao_blur.frag`, `ssr_trace.frag` and `ssr_blur.frag`.
 
-All 50 artifacts are regenerated together; the 22 earlier ones are byte-identical after
+All 66 artifacts are regenerated together; the 22 earlier ones are byte-identical after
 regeneration.
 
 ## Cost
@@ -167,15 +216,18 @@ Headless bench, 1920×1080, Apple M5 Metal, CityHub start, mean GPU completion w
 | STANDARD, NEUTRAL only | 1.43 ms | 1 |
 | STANDARD, NEUTRAL and bloom | 1.94 ms | 12 (6 down, 5 up, composite) |
 | STANDARD, NEUTRAL, bloom and occlusion LOW | 2.47 ms | 16 (+ depth, GTAO, two blurs) |
-| STANDARD, defaults (occlusion HIGH) | 2.86 ms | 16 |
-| STANDARD, defaults with MSAA 4X | 3.00 ms | 16 |
-| STANDARD, defaults with FXAA | 3.34 ms | 17 |
-| HIGH, normal maps, FILMIC, bloom, occlusion HIGH, MSAA 4X | 3.60 ms | 16 |
+| STANDARD, NEUTRAL, bloom and occlusion HIGH | 2.86 ms | 16 |
+| STANDARD, defaults (+ reflections HIGH) | 3.38 ms | 19 (+ trace, two blurs) |
+| STANDARD, defaults with MSAA 4X | 3.51 ms | 19 |
+| STANDARD, defaults with FXAA | 3.76 ms | 20 |
+| HIGH, normal maps, FILMIC, every effect, MSAA 4X | 4.02 ms | 19 |
 
 MSAA is cheap on the tile-based Apple GPU; desktop GPUs will pay more for the multisampled
-RGBA16F targets. The auxiliary targets cost bandwidth whenever bloom or occlusion is on. A first
-full-size GTAO cost about 4.4 ms (HIGH); half size, the half-size blur and the gathered upsample
-brought it below 1 ms.
+RGBA16F targets. The auxiliary targets cost bandwidth whenever bloom, occlusion or reflections are
+on. A first full-size GTAO cost about 4.4 ms (HIGH); half size, the half-size blur and the
+gathered upsample brought it below 1 ms. Reflections cost about 0.45 ms at either quality on
+CityHub and the office: most pixels are rough and stop before marching, so the two extra scene
+targets dominate.
 
 ## Verification
 
@@ -189,16 +241,20 @@ brought it below 1 ms.
   - bloom never darkens, brightens the emissive areas, and adds nothing without emission;
   - FILMIC differs from NEUTRAL; MSAA with bloom and FXAA after the composite run with the expected
     targets and passes;
-  - ambient occlusion, at LOW and HIGH, never brightens, darkens more than 2% of the pixels by a
-    mean below 8 levels, and runs with bloom, FILMIC, MSAA and FXAA together;
+  - ambient occlusion, at LOW and HIGH, never brightens and darkens more than 2% of the pixels by a
+    mean below 8 levels;
+  - reflections change the built-in frame by a mean below 2 levels, and more than 1% of the pixels
+    once every material is glossy;
+  - every effect together, with MSAA or FXAA, runs with the expected targets and passes;
   - the plain settings restore the direct frame and release every target.
 - `gpu.surface` measures the enhanced shading with post-processing off.
-- `world_shaders.formats` (auxiliary and post shaders, resources, MSL `[[color(1)]]`,
-  `[[color(2)]]` and `[[vertex_id]]`), `menu` (the four rows, cycling, disabled rows) and
-  `menu_preferences` (versions 7 and 8, migration, ranges).
+- `world_shaders.formats` (auxiliary, reflection and post shaders, resources, MSL `[[color(1)]]`,
+  `[[color(2)]]`, `[[color(4)]]` and `[[vertex_id]]`), `menu` (the five rows, cycling, disabled
+  rows) and `menu_preferences` (versions 7-9, migration, ranges).
 - Not verified: Vulkan (Linux, Windows), MSAA support on other GPUs and the Quest.
 
 ## Remaining (M6)
 
-SSR, render scaling and FSR1 for both renderers, post-processing in XR, and bloom for the DAT's
-fully bright faces if the user wants it.
+Render scaling and FSR1 for both renderers, post-processing in XR, glossier material classes
+where the retail textures call for them (polished floors), and bloom for the DAT's fully bright
+faces if the user wants it.

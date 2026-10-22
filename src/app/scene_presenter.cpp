@@ -258,11 +258,13 @@ namespace OpenBlood2
         }
         surface_scene_.manifest = &surface_manifest;
         surface_scene_.normal_maps = normal_maps ? &normal_map_cache : nullptr;
-        if (applied_shading_ != shading || applied_normal_maps_ != normal_maps)
+        if (applied_shading_ != shading || applied_normal_maps_ != normal_maps ||
+            applied_manifest_ != surface_manifest.revision())
         {
             ++surface_scene_.revision; // Renderers resolve materials and normal maps again.
             applied_shading_ = shading;
             applied_normal_maps_ = normal_maps;
+            applied_manifest_ = surface_manifest.revision();
         }
         if (report_mesh_ != mesh_revision || report_surface_ != surface_scene_.revision)
         {
@@ -405,8 +407,8 @@ namespace OpenBlood2
         return true;
     }
     bool ScenePresenter::prepare_frame(SDL_GPUCommandBuffer* commands, SDL_GPUTextureFormat format, Uint32 width,
-                                       Uint32 height, Uint32 layers, bool aux, SDL_GPUSampleCount samples,
-                                       std::string& error)
+                                       Uint32 height, Uint32 layers, bool aux, bool reflections,
+                                       SDL_GPUSampleCount samples, std::string& error)
     {
         auto fail = [&](const char* stage)
         {
@@ -418,7 +420,7 @@ namespace OpenBlood2
              {&world_renderer.stats, &model_renderer.stats, &explosion_model_renderer.stats, &polygrid_renderer.stats,
               &sprite_renderer.stats, &sky_sprite_renderer.stats, &hand_renderer.stats})
             renderer->draw_calls = renderer->culled = 0;
-        if (!pipelines.prepare(format, shading, aux, samples, error))
+        if (!pipelines.prepare(format, shading, aux, reflections, samples, error))
             return fail("World pipelines");
         // Renderers stage uploads in the shared registry; one copy pass in the frame's
         // command buffer records them all before the scene pass.
@@ -486,18 +488,23 @@ namespace OpenBlood2
         const auto flashlight = game.client_shell.flashlight.Current(game.server);
         const auto time = game.server.world_time();
         const auto layer = target.layer;
-        // Colour, then the post-processing glow/occlusion mask and depth copy (cleared to the
-        // background depth); multisampled targets resolve at the end.
-        SDL_GPUColorTargetInfo colors[3]{};
-        for (int i = 0; i < 3; ++i)
+        // Colour, then the post-processing glow/occlusion mask, depth copy (cleared to the
+        // background depth) and reflection inputs; multisampled targets resolve at the end.
+        const std::array<SDL_GPUTexture*, 5> textures{target.color, target.glow, target.depth_copy, target.specular,
+                                                      target.environment};
+        const std::array<SDL_GPUTexture*, 5> resolves{target.resolve, target.glow_resolve, target.depth_copy_resolve,
+                                                      target.specular_resolve, target.environment_resolve};
+        const Uint32 count = target.specular ? 5 : target.glow ? 3 : 1;
+        SDL_GPUColorTargetInfo colors[5]{};
+        for (Uint32 i = 0; i < count; ++i)
         {
             auto& color = colors[i];
-            color.texture = i == 0 ? target.color : i == 1 ? target.glow : target.depth_copy;
-            color.resolve_texture = i == 0 ? target.resolve : i == 1 ? target.glow_resolve : target.depth_copy_resolve;
+            color.texture = textures[i];
+            color.resolve_texture = resolves[i];
             color.layer_or_depth_plane = layer;
-            color.clear_color = i == 0 ? SDL_FColor{.025f, .035f, .05f, 1}
-                                : i == 1 ? SDL_FColor{0, 0, 0, 0}
-                                         : SDL_FColor{1, 1, 1, 1};
+            color.clear_color = i == 0   ? SDL_FColor{.025f, .035f, .05f, 1}
+                                : i == 2 ? SDL_FColor{1, 1, 1, 1}
+                                         : SDL_FColor{0, 0, 0, 0};
             color.load_op = SDL_GPU_LOADOP_CLEAR;
             color.store_op = color.resolve_texture ? SDL_GPU_STOREOP_RESOLVE : SDL_GPU_STOREOP_STORE;
         }
@@ -510,7 +517,7 @@ namespace OpenBlood2
         depth.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
         depth.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
         depth.cycle = layer == 0; // Later layers of the same frame keep the earlier layers' texture.
-        auto* pass = SDL_BeginGPURenderPass(commands, colors, target.glow ? 3 : 1, &depth);
+        auto* pass = SDL_BeginGPURenderPass(commands, colors, count, &depth);
         if (!pass)
         {
             error = SDL_GetError();
@@ -622,7 +629,7 @@ namespace OpenBlood2
             return false;
         }
         if (!prepare_frame(commands, post_process.scene_format(), width, height, 1, post_process.aux(),
-                           post_process.sample_count(), error) ||
+                           post_process.reflections(), post_process.sample_count(), error) ||
             !record_view(game, commands, post_process.scene_target(target), view.position, view.rotation, letterbox,
                          nullptr, error))
             return false;
@@ -655,7 +662,8 @@ namespace OpenBlood2
         }
         shadow_aspect = float(width) / float(height); // Next update().
         const auto started = SDL_GetTicksNS();
-        if (!prepare_frame(commands, format, width, height, Uint32(eyes.size()), false, SDL_GPU_SAMPLECOUNT_1, error))
+        if (!prepare_frame(commands, format, width, height, Uint32(eyes.size()), false, false, SDL_GPU_SAMPLECOUNT_1,
+                           error))
             return false;
         for (std::size_t i = 0; i < eyes.size(); ++i)
         {

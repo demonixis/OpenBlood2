@@ -1,7 +1,9 @@
 // Final composite of the enhanced renderer's HDR scene. The scene holds display-space values
-// that may exceed 1 (specular, emission); they are decoded to linear light, ambient occlusion
-// darkens the part that is not emission (weighted by the opaque share of the pixel), the bloom
-// chain is added, and the result is tonemapped and encoded for the UNORM output.
+// that may exceed 1 (specular, emission). Screen-space reflections first replace the
+// environment light of the environment specular by the reflected light (weighted by the opaque
+// share of the pixel); the result is decoded to linear light, ambient occlusion darkens the part
+// that is not emission, the bloom chain is added, and the result is tonemapped and encoded for
+// the UNORM output.
 // Tonemaps (settings.x): 0 clamps like the original framebuffer; 1 neutral: the highlight
 // compression of Khronos PBR Neutral without its toe, so everything below 0.76 linear keeps its
 // value; 2 filmic: Hill's fit of the ACES RRT/ODT, exposed so mid-grey keeps its value.
@@ -18,10 +20,16 @@ Texture2D<float4> viewDepth : register(t4, space2); // Half-size linear depth of
 SamplerState viewDepthSampler : register(s4, space2);
 Texture2D<float4> depthCopy : register(t5, space2); // Full-size window depth.
 SamplerState depthSampler : register(s5, space2);
+Texture2D<float4> reflection : register(t6, space2); // Half size, premultiplied by confidence.
+SamplerState reflectionSampler : register(s6, space2);
+Texture2D<float4> specular : register(t7, space2); // Environment specular weight, roughness.
+SamplerState specularSampler : register(s7, space2);
+Texture2D<float4> environment : register(t8, space2); // Environment light of that specular.
+SamplerState environmentSampler : register(s8, space2);
 cbuffer Composite : register(b0, space3)
 {
     float4 settings;   // x: tonemap, y: bloom scale (0: none), z: filmic exposure, w: 1 with occlusion.
-    float4 bloomTexel; // xy: bloom texel size.
+    float4 bloomTexel; // xy: bloom texel size; z: 1 with reflections.
     float4 depthTerms; // Scene depth z/w terms (z_ndc = z + w / view depth), slice start, 1 / slice span.
     float4 halfSize;   // Occlusion size in texels (xy) and its inverse (zw).
 };
@@ -60,25 +68,24 @@ float3 filmic(float3 color)
     v = (v * (v + 0.0245786) - 0.000090537) / (v * (0.983729 * v + 0.4329510) + 0.238081);
     return mul(fromWorking, v);
 }
-// Depth-aware upsample of the half-size occlusion: bilinear weights of the four nearest texels,
-// each cut by its relative view-depth difference to this pixel. View models and the background
-// stay unoccluded.
-float upsampledOcclusion(float2 uv)
+// Depth-aware upsample of the half-size buffers: bilinear weights of the four nearest texels,
+// each cut by its relative view-depth difference to this pixel, normalised; zero for view
+// models and the background, which are neither occluded nor reflecting.
+float4 upsampleWeights(float2 uv, out float2 corner)
 {
-    float depth = depthCopy.SampleLevel(depthSampler, uv, 0.0).r;
-    if (depth < depthTerms.z || depth >= 1.0)
-        return 1.0;
-    float center = depthTerms.y / ((depth - depthTerms.z) * depthTerms.w - depthTerms.x);
     float2 position = uv * halfSize.xy - 0.5;
     float2 base = floor(position), f = position - base;
     // Gather order: (0, 1), (1, 1), (1, 0), (0, 0) around the shared corner.
-    float2 corner = (base + 1.0) * halfSize.zw;
+    corner = (base + 1.0) * halfSize.zw;
+    float depth = depthCopy.SampleLevel(depthSampler, uv, 0.0).r;
+    if (depth < depthTerms.z || depth >= 1.0)
+        return float4(0.0, 0.0, 0.0, 0.0);
+    float center = depthTerms.y / ((depth - depthTerms.z) * depthTerms.w - depthTerms.x);
     float4 z = viewDepth.GatherRed(viewDepthSampler, corner);
-    float4 ao = occlusion.GatherRed(occlusionSampler, corner);
     float4 weight = float4((1.0 - f.x) * f.y, f.x * f.y, f.x * (1.0 - f.y), (1.0 - f.x) * (1.0 - f.y)) /
                         (1e-3 + abs(z - center) / center) +
                     1e-6;
-    return dot(ao, weight) / dot(weight, float4(1.0, 1.0, 1.0, 1.0));
+    return weight / dot(weight, float4(1.0, 1.0, 1.0, 1.0));
 }
 float3 bloomTap(float2 uv, float2 offset)
 {
@@ -87,11 +94,33 @@ float3 bloomTap(float2 uv, float2 offset)
 float4 main(Input input) : SV_Target0
 {
     // Same size as the output, nearest filtering: each pixel reads its own scene texel.
-    float3 color = toLinear(scene.SampleLevel(sceneSampler, input.uv, 0.0).rgb);
+    float3 display = scene.SampleLevel(sceneSampler, input.uv, 0.0).rgb;
+    float4 glow = float4(0.0, 0.0, 0.0, 0.0);
+    float2 corner = float2(0.0, 0.0);
+    float4 upsample = float4(0.0, 0.0, 0.0, 0.0);
+    if (settings.w > 0.5 || bloomTexel.z > 0.5)
+    {
+        glow = aux.SampleLevel(auxSampler, input.uv, 0.0);
+        upsample = upsampleWeights(input.uv, corner);
+    }
+    if (bloomTexel.z > 0.5)
+    {
+        // Half-size texels in gather order.
+        float2 texel = halfSize.zw;
+        float4 reflected = reflection.SampleLevel(reflectionSampler, corner + float2(-0.5, 0.5) * texel, 0.0) * upsample.x +
+                           reflection.SampleLevel(reflectionSampler, corner + float2(0.5, 0.5) * texel, 0.0) * upsample.y +
+                           reflection.SampleLevel(reflectionSampler, corner + float2(0.5, -0.5) * texel, 0.0) * upsample.z +
+                           reflection.SampleLevel(reflectionSampler, corner + float2(-0.5, -0.5) * texel, 0.0) * upsample.w;
+        float3 weight = specular.SampleLevel(specularSampler, input.uv, 0.0).rgb;
+        float3 light = environment.SampleLevel(environmentSampler, input.uv, 0.0).rgb;
+        display += saturate(glow.a) * weight * (reflected.rgb - reflected.a * light);
+    }
+    float3 color = toLinear(display);
     if (settings.w > 0.5)
     {
-        float4 glow = aux.SampleLevel(auxSampler, input.uv, 0.0);
-        float ao = upsampledOcclusion(input.uv);
+        float ao = dot(upsample, float4(1.0, 1.0, 1.0, 1.0)) > 0.5
+                       ? dot(occlusion.GatherRed(occlusionSampler, corner), upsample)
+                       : 1.0;
         float3 lit = max(color - glow.rgb, float3(0.0, 0.0, 0.0));
         color += lit * (lerp(1.0, ao, saturate(glow.a)) - 1.0);
     }

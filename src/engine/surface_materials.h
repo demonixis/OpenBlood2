@@ -70,6 +70,11 @@ namespace OpenBlood2
         {
             return textures_.size();
         }
+        // Successful parses so far: users resolve their materials again when it changes.
+        std::uint64_t revision() const
+        {
+            return revision_;
+        }
         static constexpr std::size_t byte_limit = 64 * 1024, class_limit = 256, rule_limit = 1024;
 
       private:
@@ -86,6 +91,7 @@ namespace OpenBlood2
         std::vector<SurfaceMaterial> classes_{SurfaceMaterial{}};
         std::vector<Rule> rules_;
         std::vector<Exact> textures_;
+        std::uint64_t revision_ = 0;
     };
     // The text compiled into the binary.
     std::string_view builtin_surface_manifest();

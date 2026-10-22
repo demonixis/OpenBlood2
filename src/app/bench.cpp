@@ -107,7 +107,7 @@ namespace OpenBlood2
             presenter.shading = SurfaceShading(options.renderer);
             presenter.normal_maps = options.normal_maps;
             presenter.post = {Antialiasing(options.antialiasing), options.bloom, Tonemap(options.tonemap),
-                              AmbientOcclusion(options.ambient_occlusion)};
+                              AmbientOcclusion(options.ambient_occlusion), Reflections(options.reflections)};
             Capture capture;
             Series step, world, models, effects, record, gpu, total, draws, culled, pings, reads, read_counts;
             std::uint64_t ping_calls = 0;
@@ -231,10 +231,11 @@ namespace OpenBlood2
             static constexpr const char* tonemaps[]{"off", "neutral", "filmic"};
             static constexpr const char* occlusion[]{"off", "low", "high"};
             spdlog::info("Post-processing: {} scene, MSAA {}x ({}x requested), FXAA {}, bloom {} ({} levels), tonemap "
-                         "{}, ambient occlusion {}, {} passes, {} targets",
+                         "{}, ambient occlusion {}, reflections {}, {} passes, {} targets",
                          post.hdr ? "HDR" : "direct", post.samples, post.requested_samples, post.fxaa ? "on" : "off",
                          post.bloom ? "on" : "off", post.bloom_levels, tonemaps[std::size_t(post.tonemap)],
-                         occlusion[std::size_t(post.ambient_occlusion)], post.passes, post.targets);
+                         occlusion[std::size_t(post.ambient_occlusion)], occlusion[std::size_t(post.reflections)],
+                         post.passes, post.targets);
             const auto& lighting = presenter.model_lighting.stats;
             const auto& mesh = presenter.world_mesh;
             spdlog::info("Lightmaps: {} faces, {} pages, {} texels, {} unfitted origin axes", mesh.lightmapped,

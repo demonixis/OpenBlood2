@@ -112,12 +112,17 @@ float3 illumination(Input input, float shadow)
 #ifdef AUX_TARGETS
 // Post-processing passes (enhanced renderer): the original shading emits no glow, so an opaque
 // face clears the glow of what it hides, receives ambient occlusion (glow alpha 1) and copies
-// its window depth (target 2, written by opaque non-sky pipelines only).
+// its window depth (target 2, written by opaque non-sky pipelines only). With
+// REFLECTION_TARGETS it reflects nothing (zero specular weight and environment, targets 3-4).
 struct Output
 {
     float4 color : SV_Target0;
     float4 glow : SV_Target1;
     float4 depth : SV_Target2;
+#ifdef REFLECTION_TARGETS
+    float4 specular : SV_Target3;
+    float4 environment : SV_Target4;
+#endif
 };
 Output main(Input input)
 {
@@ -127,6 +132,10 @@ Output main(Input input)
         float4(albedo.Sample(albedoSampler, input.texCoord).rgb * illumination(input, shadow) * sceneColor.rgb, 1.0);
     output.glow = float4(0.0, 0.0, 0.0, 1.0);
     output.depth = float4(input.position.z, 0.0, 0.0, 0.0);
+#ifdef REFLECTION_TARGETS
+    output.specular = float4(0.0, 0.0, 0.0, 1.0);
+    output.environment = float4(0.0, 0.0, 0.0, 0.0);
+#endif
     return output;
 }
 #else

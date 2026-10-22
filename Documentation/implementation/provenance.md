@@ -1897,10 +1897,10 @@ lava/magma/acid/toxic words; no donor code is imported.
 ## Post-processing (2026-10-22)
 
 The HDR scene, bloom chain, tonemaps, MSAA, FXAA and GTAO (`engine/post_process.*`,
-`engine/shaders/{post.vert,bloom_down.frag,bloom_up.frag,composite.frag,fxaa.frag,ao_depth.frag,gtao.frag,ao_blur.frag}.hlsl`
-and the `AUX_TARGETS` shader variants) are replacement code. The published techniques (Jimenez's
+`engine/shaders/{post.vert,bloom_down.frag,bloom_up.frag,composite.frag,fxaa.frag,ao_depth.frag,gtao.frag,ao_blur.frag,ssr_trace.frag,ssr_blur.frag}.hlsl`
+and the `AUX_TARGETS`/`REFLECTION_TARGETS` shader variants) are replacement code. The published techniques (Jimenez's
 bloom chain and GTAO, Khronos PBR Neutral's shoulder, Hill's ACES fit, the FXAA 3.11 algorithm,
-joint bilateral upsampling) are listed in the [source ledger](sources/post_processing_sources.json);
+joint bilateral upsampling, McGuire and Mara's screen-space ray march) are listed in the [source ledger](sources/post_processing_sources.json);
 FXAA and GTAO are reimplemented from the publications and XeGTAO is a design reference only; no
 source file is copied. See the [contract](../contracts/post_processing_contracts.md).
 

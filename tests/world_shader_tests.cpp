@@ -95,11 +95,19 @@ int main()
                                      Expected{WorldShader::PostVertex, 0, 0, 0, false},
                                      Expected{WorldShader::BloomDownFragment, 1, 1, 0, false},
                                      Expected{WorldShader::BloomUpFragment, 1, 1, 0, false},
-                                     Expected{WorldShader::CompositeFragment, 6, 1, 0, false},
+                                     Expected{WorldShader::CompositeFragment, 9, 1, 0, false},
                                      Expected{WorldShader::FxaaFragment, 1, 1, 0, false},
                                      Expected{WorldShader::AoDepthFragment, 1, 1, 0, false},
                                      Expected{WorldShader::GtaoFragment, 1, 1, 0, false},
-                                     Expected{WorldShader::AoBlurFragment, 2, 1, 0, false}})
+                                     Expected{WorldShader::AoBlurFragment, 2, 1, 0, false},
+                                     Expected{WorldShader::SsrTraceFragment, 3, 1, 0, false},
+                                     Expected{WorldShader::SsrBlurFragment, 3, 1, 0, false},
+                                     Expected{WorldShader::OpaqueAuxSsrFragment, 3, 2, 0, true},
+                                     Expected{WorldShader::AlphaAuxSsrFragment, 3, 2, 0, true},
+                                     Expected{WorldShader::PbrAuxSsrFragment, 4, 4, 2, true},
+                                     Expected{WorldShader::PbrHighAuxSsrFragment, 4, 4, 2, true},
+                                     Expected{WorldShader::PbrAlphaAuxSsrFragment, 4, 4, 2, true},
+                                     Expected{WorldShader::PbrHighAlphaAuxSsrFragment, 4, 4, 2, true}})
         {
             const bool vertex = expected.shader == WorldShader::PostVertex;
             CHECK(world_shader_info(expected.shader, formats, info));
@@ -111,8 +119,11 @@ int main()
             {
                 const std::string_view source(reinterpret_cast<const char*>(info.code), info.code_size);
                 CHECK(source.find(vertex ? "vertex main0_out main0(" : "fragment main0_out main0(") != source.npos);
+                const bool reflection = expected.shader >= WorldShader::OpaqueAuxSsrFragment &&
+                                        expected.shader <= WorldShader::PbrHighAlphaAuxSsrFragment;
                 CHECK((source.find("[[color(1)]]") != source.npos) == expected.aux &&
-                      (source.find("[[color(2)]]") != source.npos) == expected.aux);
+                      (source.find("[[color(2)]]") != source.npos) == expected.aux &&
+                      (source.find("[[color(4)]]") != source.npos) == reflection);
                 if (vertex)
                     CHECK(source.find("[[vertex_id]]") != source.npos);
             }

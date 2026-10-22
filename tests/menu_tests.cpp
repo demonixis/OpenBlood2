@@ -129,7 +129,7 @@ namespace
         menu.build(MenuPage::Options);
         CHECK(menu.items[0].command == int(MENU_CMD_DISPLAY) && menu.enabled(menu.items[0]) && menu.selected == 0);
         menu.activate();
-        CHECK(menu.page == MenuPage::Display && menu.items.size() == 8 && menu.small());
+        CHECK(menu.page == MenuPage::Display && menu.items.size() == 9 && menu.small());
         CHECK(menu.items[0].setting == 6 && menu.items[0].string_id == IDS_MENU_DISPLAY_DETAIL_HIGH &&
               menu.items[1].setting == 8 && !menu.items[1].string_id && menu.items[2].setting == 7 &&
               !menu.items[2].string_id && menu.items[3].setting == 9 && !menu.enabled(menu.items[3]));
@@ -137,8 +137,9 @@ namespace
         // ANTI-ALIASING serves both.
         CHECK(menu.items[4].setting == 19 && !menu.enabled(menu.items[4]) && menu.items[5].setting == 18 &&
               !menu.enabled(menu.items[5]) && menu.items[6].setting == 20 && !menu.enabled(menu.items[6]) &&
-              menu.items[7].setting == 17 && menu.enabled(menu.items[7]));
-        menu.selected = 7;
+              menu.items[7].setting == 21 && !menu.enabled(menu.items[7]) && menu.items[8].setting == 17 &&
+              menu.enabled(menu.items[8]));
+        menu.selected = 8;
         menu.activate();
         CHECK(menu.settings.antialiasing == 1 && menu.take_command().action == MenuAction::Settings);
         menu.adjust(1);
@@ -202,6 +203,12 @@ namespace
         menu.adjust(-1);
         CHECK(menu.settings.ambient_occlusion == 1);
         menu.adjust(1);
+        CHECK(menu.enabled(menu.items[7]) && menu.settings.reflections == 2);
+        menu.selected = 7;
+        menu.activate();
+        CHECK(menu.settings.reflections == 0);
+        menu.adjust(-1);
+        CHECK(menu.settings.reflections == 2);
         menu.selected = 1;
         menu.activate();
         CHECK(menu.settings.renderer == 0 && !menu.enabled(menu.items[3]) && menu.settings.quality == 1 &&

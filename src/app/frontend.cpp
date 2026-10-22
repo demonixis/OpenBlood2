@@ -885,7 +885,8 @@ namespace OpenBlood2
                 presenter.normal_maps = settings.normal_maps;
                 presenter.post = {Antialiasing(std::clamp(settings.antialiasing, 0, 3)), settings.bloom,
                                   Tonemap(std::clamp(settings.tonemap, 0, 2)),
-                                  AmbientOcclusion(std::clamp(settings.ambient_occlusion, 0, 2))};
+                                  AmbientOcclusion(std::clamp(settings.ambient_occlusion, 0, 2)),
+                                  Reflections(std::clamp(settings.reflections, 0, 2))};
 #if BLOOD2_XR
                 if (xr)
                     xr->set_options({float(settings.vr_turn) * 0.017453293f, settings.vr_laser, settings.vr_crosshair,

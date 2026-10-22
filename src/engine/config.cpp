@@ -266,6 +266,16 @@ namespace OpenBlood2
                 }
                 options.ambient_occlusion = value == "off" ? 0 : value == "low" ? 1 : 2;
             }
+            else if (arg == "--ssr")
+            {
+                const auto value = ++i < args.size() ? args[i] : std::string_view{};
+                if (value != "off" && value != "low" && value != "high")
+                {
+                    error = "--ssr requires off, low or high";
+                    return false;
+                }
+                options.reflections = value == "off" ? 0 : value == "low" ? 1 : 2;
+            }
             else if (arg == "--bench-sweep")
                 options.bench = options.bench_sweep = true;
             else if (arg == "--bench-audio")

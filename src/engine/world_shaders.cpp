@@ -19,18 +19,26 @@
 #include "engine/shaders/line_vert_msl.h"
 #include "engine/shaders/pbr_alpha_aux_frag.h"
 #include "engine/shaders/pbr_alpha_aux_frag_msl.h"
+#include "engine/shaders/pbr_alpha_aux_ssr_frag.h"
+#include "engine/shaders/pbr_alpha_aux_ssr_frag_msl.h"
 #include "engine/shaders/pbr_alpha_frag.h"
 #include "engine/shaders/pbr_alpha_frag_msl.h"
 #include "engine/shaders/pbr_aux_frag.h"
 #include "engine/shaders/pbr_aux_frag_msl.h"
+#include "engine/shaders/pbr_aux_ssr_frag.h"
+#include "engine/shaders/pbr_aux_ssr_frag_msl.h"
 #include "engine/shaders/pbr_frag.h"
 #include "engine/shaders/pbr_frag_msl.h"
 #include "engine/shaders/pbr_high_alpha_aux_frag.h"
 #include "engine/shaders/pbr_high_alpha_aux_frag_msl.h"
+#include "engine/shaders/pbr_high_alpha_aux_ssr_frag.h"
+#include "engine/shaders/pbr_high_alpha_aux_ssr_frag_msl.h"
 #include "engine/shaders/pbr_high_alpha_frag.h"
 #include "engine/shaders/pbr_high_alpha_frag_msl.h"
 #include "engine/shaders/pbr_high_aux_frag.h"
 #include "engine/shaders/pbr_high_aux_frag_msl.h"
+#include "engine/shaders/pbr_high_aux_ssr_frag.h"
+#include "engine/shaders/pbr_high_aux_ssr_frag_msl.h"
 #include "engine/shaders/pbr_high_frag.h"
 #include "engine/shaders/pbr_high_frag_msl.h"
 #include "engine/shaders/post_vert.h"
@@ -41,10 +49,18 @@
 #include "engine/shaders/skinned_vert_msl.h"
 #include "engine/shaders/sprite_aux_frag.h"
 #include "engine/shaders/sprite_aux_frag_msl.h"
+#include "engine/shaders/sprite_aux_ssr_frag.h"
+#include "engine/shaders/sprite_aux_ssr_frag_msl.h"
 #include "engine/shaders/sprite_frag.h"
 #include "engine/shaders/sprite_frag_msl.h"
+#include "engine/shaders/ssr_blur_frag.h"
+#include "engine/shaders/ssr_blur_frag_msl.h"
+#include "engine/shaders/ssr_trace_frag.h"
+#include "engine/shaders/ssr_trace_frag_msl.h"
 #include "engine/shaders/world_aux_frag.h"
 #include "engine/shaders/world_aux_frag_msl.h"
+#include "engine/shaders/world_aux_ssr_frag.h"
+#include "engine/shaders/world_aux_ssr_frag_msl.h"
 #include "engine/shaders/world_frag.h"
 #include "engine/shaders/world_frag_msl.h"
 #include "engine/shaders/world_vert.h"
@@ -134,6 +150,14 @@ namespace OpenBlood2
                 BLOOD2_FRAGMENT_SHADER(AoDepthFragment, ao_depth_frag)
                 BLOOD2_FRAGMENT_SHADER(GtaoFragment, gtao_frag)
                 BLOOD2_FRAGMENT_SHADER(AoBlurFragment, ao_blur_frag)
+                BLOOD2_FRAGMENT_SHADER(SsrTraceFragment, ssr_trace_frag)
+                BLOOD2_FRAGMENT_SHADER(SsrBlurFragment, ssr_blur_frag)
+                BLOOD2_FRAGMENT_SHADER(OpaqueAuxSsrFragment, world_aux_ssr_frag)
+                BLOOD2_FRAGMENT_SHADER(AlphaAuxSsrFragment, sprite_aux_ssr_frag)
+                BLOOD2_FRAGMENT_SHADER(PbrAuxSsrFragment, pbr_aux_ssr_frag)
+                BLOOD2_FRAGMENT_SHADER(PbrHighAuxSsrFragment, pbr_high_aux_ssr_frag)
+                BLOOD2_FRAGMENT_SHADER(PbrAlphaAuxSsrFragment, pbr_alpha_aux_ssr_frag)
+                BLOOD2_FRAGMENT_SHADER(PbrHighAlphaAuxSsrFragment, pbr_high_alpha_aux_ssr_frag)
 #undef BLOOD2_FRAGMENT_SHADER
             case WorldShader::PostVertex:
                 info.stage = SDL_GPU_SHADERSTAGE_VERTEX;

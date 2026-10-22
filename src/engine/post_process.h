@@ -8,8 +8,9 @@
 namespace OpenBlood2
 {
     // Display post-processing (roadmap M6). Anti-aliasing applies to both renderers; the HDR
-    // scene, bloom, ambient occlusion and tonemapping apply to the enhanced renderer only, so the
-    // original renderer keeps its output unless anti-aliasing is selected.
+    // scene, bloom, ambient occlusion, screen-space reflections and tonemapping apply to the
+    // enhanced renderer only, so the original renderer keeps its output unless anti-aliasing is
+    // selected.
     enum class Antialiasing
     {
         Off,
@@ -29,12 +30,19 @@ namespace OpenBlood2
         Low,
         High
     };
+    enum class Reflections
+    {
+        Off,
+        Low,
+        High
+    };
     struct PostSettings
     {
         Antialiasing antialiasing = Antialiasing::Off;
         bool bloom = true;
         Tonemap tonemap = Tonemap::Neutral;
         AmbientOcclusion ambient_occlusion = AmbientOcclusion::High;
+        Reflections reflections = Reflections::High;
         bool operator==(const PostSettings&) const = default;
     };
     // Scene pass attachments of one frame, chosen by PostProcess::begin. Null resolve textures
@@ -44,6 +52,9 @@ namespace OpenBlood2
         SDL_GPUTexture *color = nullptr, *resolve = nullptr;
         SDL_GPUTexture *glow = nullptr, *glow_resolve = nullptr;
         SDL_GPUTexture *depth_copy = nullptr, *depth_copy_resolve = nullptr;
+        // Screen-space reflection inputs (environment specular weight and light); null without.
+        SDL_GPUTexture *specular = nullptr, *specular_resolve = nullptr;
+        SDL_GPUTexture *environment = nullptr, *environment_resolve = nullptr;
         Uint32 layer = 0;
     };
     // The scene projection of the frame, for ambient occlusion: x/y scales and depth terms of
@@ -60,6 +71,7 @@ namespace OpenBlood2
         bool hdr = false, bloom = false, fxaa = false;
         Tonemap tonemap = Tonemap::Off;
         AmbientOcclusion ambient_occlusion = AmbientOcclusion::Off;
+        Reflections reflections = Reflections::Off;
         Uint32 samples = 1, requested_samples = 1; // MSAA: the device may support fewer.
         std::size_t bloom_levels = 0, passes = 0, targets = 0;
         std::uint64_t frames = 0;
@@ -88,10 +100,15 @@ namespace OpenBlood2
         {
             return samples_;
         }
-        // The scene pass writes the auxiliary targets (bloom or ambient occlusion).
+        // The scene pass writes the auxiliary targets (bloom, ambient occlusion or reflections).
         bool aux() const
         {
             return aux_;
+        }
+        // The scene pass also writes the reflection inputs.
+        bool reflections() const
+        {
+            return ssr_;
         }
         // The scene pass attachments for this frame's output (valid after begin()).
         SceneTarget scene_target(SDL_GPUTexture* output) const;
@@ -105,6 +122,10 @@ namespace OpenBlood2
         static constexpr std::size_t bloom_level_limit = 6;
         static constexpr float ao_radius = 48, ao_power = 1.5f, ao_screen_radius = 96;
         static constexpr std::array<std::array<Uint32, 2>, 2> ao_samples{{{2, 4}, {4, 6}}};
+        // Reflections: ray length and thickness (world units), roughness cutoff, blur radius at the
+        // cutoff (half-size texels) and march steps of LOW and HIGH.
+        static constexpr float ssr_distance = 1024, ssr_thickness = 12, ssr_cutoff = .5f, ssr_blur = 6;
+        static constexpr std::array<Uint32, 2> ssr_steps{16, 32};
 
       private:
         bool prepare_pipelines(SDL_GPUTextureFormat output, std::string& error);
@@ -117,25 +138,29 @@ namespace OpenBlood2
         GpuRegistry& registry_;
         SDL_GPUDevice* device_ = nullptr;
         SDL_GPUGraphicsPipeline *down_ = nullptr, *up_ = nullptr, *composite_ = nullptr, *fxaa_ = nullptr,
-                                *ao_depth_ = nullptr, *gtao_ = nullptr, *ao_blur_ = nullptr;
+                                *ao_depth_ = nullptr, *gtao_ = nullptr, *ao_blur_ = nullptr, *ssr_trace_ = nullptr,
+                                *ssr_blur_ = nullptr;
         SDL_GPUTextureFormat pipeline_format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
         // Frame plan.
         SDL_GPUTextureFormat output_format_ = SDL_GPU_TEXTUREFORMAT_INVALID, scene_format_ = output_format_;
         SDL_GPUSampleCount samples_ = SDL_GPU_SAMPLECOUNT_1;
-        bool hdr_ = false, aux_ = false, bloom_ = false, ao_ = false, fxaa_pass_ = false;
+        bool hdr_ = false, aux_ = false, bloom_ = false, ao_ = false, ssr_ = false, fxaa_pass_ = false;
         Tonemap tonemap_ = Tonemap::Off;
         AmbientOcclusion ambient_occlusion_ = AmbientOcclusion::Off;
+        Reflections reflections_ = Reflections::Off;
         Uint32 width_ = 0, height_ = 0;
         struct
         {
             SDL_GPUTextureFormat format = SDL_GPU_TEXTUREFORMAT_INVALID;
             Uint32 requested = 0;
-            bool aux = false;
+            bool aux = false, reflections = false;
             SDL_GPUSampleCount samples = SDL_GPU_SAMPLECOUNT_1;
         } supported_; // Last MSAA support query.
         // Targets, kept while the plan and size stay the same.
         TextureHandle multisample_, scene_, multisample_glow_, glow_, multisample_depth_, depth_copy_, display_;
         TextureHandle view_depth_, occlusion_, occlusion_blur_; // Half size.
+        TextureHandle multisample_specular_, specular_, multisample_environment_, environment_;
+        TextureHandle reflection_, reflection_blur_; // Half size.
         std::array<TextureHandle, bloom_level_limit> levels_{};
         std::array<std::array<Uint32, 2>, bloom_level_limit> level_sizes_{};
         std::size_t level_count_ = 0;

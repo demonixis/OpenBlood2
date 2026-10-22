@@ -112,12 +112,16 @@ float3 illumination(Input input, float shadow)
 #ifdef AUX_TARGETS
 // Post-processing passes (enhanced renderer): no glow of its own; the coverage attenuates the
 // glow and the ambient-occlusion mask behind it (premultiplied blend). Translucent pipelines
-// do not write the depth copy.
+// do not write the depth copy or the reflection targets (REFLECTION_TARGETS, 3-4).
 struct Output
 {
     float4 color : SV_Target0;
     float4 glow : SV_Target1;
     float4 depth : SV_Target2;
+#ifdef REFLECTION_TARGETS
+    float4 specular : SV_Target3;
+    float4 environment : SV_Target4;
+#endif
 };
 Output main(Input input)
 {
@@ -129,6 +133,10 @@ Output main(Input input)
     output.color = float4(texel.rgb * illumination(input, shadow) * sceneColor.rgb, texel.a * modulation.x);
     output.glow = float4(0.0, 0.0, 0.0, output.color.a);
     output.depth = float4(input.position.z, 0.0, 0.0, 0.0);
+#ifdef REFLECTION_TARGETS
+    output.specular = float4(0.0, 0.0, 0.0, 1.0);
+    output.environment = float4(0.0, 0.0, 0.0, 0.0);
+#endif
     return output;
 }
 #else

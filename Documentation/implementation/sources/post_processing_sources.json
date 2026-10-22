@@ -1,6 +1,6 @@
 {
   "date": "2026-10-22",
-  "scope": "Post-processing (roadmap M6): HDR scene, emission-driven bloom, tonemapping, MSAA, FXAA and ground-truth ambient occlusion; no game, engine or renderer code imported",
+  "scope": "Post-processing (roadmap M6): HDR scene, emission-driven bloom, tonemapping, MSAA, FXAA, ground-truth ambient occlusion and screen-space reflections; no game, engine or renderer code imported",
   "retail_evidence": [
     {
       "file": "BLOOD2.REZ, BLOOD2P.REZ, BLOOD2P2.REZ (installed Blood II)",
@@ -9,6 +9,10 @@
     {
       "file": "BLOOD2.REZ, BLOOD2P.REZ, BLOOD2P2.REZ (installed Blood II)",
       "purpose": "2026-10-22: CityHub, SubwayA and 03_Museum captures used to choose the occlusion radius (48 units), power (1.5) and LOW/HIGH sample counts, and checked by gpu.post."
+    },
+    {
+      "file": "BLOOD2.REZ, BLOOD2P.REZ, BLOOD2P2.REZ (installed Blood II)",
+      "purpose": "2026-10-22: CityHub, 22_office and 09_Abandoned_Buildings captures for the reflection thickness, ray length and roughness cutoff; a test manifest with every class glossy checks the reflection geometry (gpu.post)."
     }
   ],
   "design_references": [
@@ -55,6 +59,10 @@
     {
       "source": "Kopf, Cohen, Lischinski, Uyttendaele, 'Joint Bilateral Upsampling' (SIGGRAPH 2007)",
       "purpose": "Depth-aware upsample of the half-size occlusion in the composite."
+    },
+    {
+      "source": "McGuire, Mara, 'Efficient GPU Screen-Space Ray Tracing' (JCGT 3(4), 2014)",
+      "purpose": "Screen-space march of the reflected ray with perspective-correct depth (1/z interpolation); the DDA itself is not reproduced (fixed jittered steps and bisection instead)."
     }
   ]
 }

@@ -195,6 +195,8 @@ and `BLOOM [ON/OFF]` (18), both disabled with the original renderer, then
 and older versions load the defaults (0, 1, 1), superseding the version 6 statement above.
 `AMBIENT OCCLUSION [OFF/LOW/HIGH]` (setting 20, disabled with the original renderer) follows
 BLOOM; `preferences.cfg` version 8 adds `ambient_occlusion` (default 2) and supersedes version 7.
+`REFLECTIONS [OFF/LOW/HIGH]` (setting 21, disabled with the original renderer) follows it;
+version 9 adds `reflections` (default 2) and supersedes version 8.
 
 
 ## Controls (CMenuControls)
