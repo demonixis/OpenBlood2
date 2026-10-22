@@ -93,6 +93,23 @@ tree. The presets use RelWithDebInfo and produce debug-signed, installable APKs;
 `-DCMAKE_BUILD_TYPE=Release` selects the unsigned store variant until a signing
 configuration exists.
 
+## Android phone/tablet
+
+Use the build preset (or name the target): `blood2_apk` is not part of `all`, so
+a plain `cmake --build build/android` or `ninja` only stages `libmain.so` under
+`build/android/android/jniLibs` and produces no APK.
+
+```bash
+cmake --preset android
+cmake --build --preset android       # or: cmake --build build/android --target blood2_apk
+```
+
+```bash
+adb install -r build/android/android/gradle/app/outputs/apk/phone/debug/app-phone-debug.apk
+```
+
+A Release configuration writes the unsigned APK under `apk/phone/release/` instead.
+
 ## Quest (OpenXR)
 
 The `quest` flavor depends on `org.khronos.openxr:openxr_loader_for_android:1.1.63`
