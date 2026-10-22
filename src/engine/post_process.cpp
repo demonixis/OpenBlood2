@@ -7,12 +7,13 @@ namespace OpenBlood2
     namespace
     {
         constexpr SDL_GPUTextureFormat bloom_format = SDL_GPU_TEXTUREFORMAT_R16G16B16A16_FLOAT;
+        constexpr SDL_GPUTextureFormat occlusion_format = SDL_GPU_TEXTUREFORMAT_R8_UNORM;
     } // namespace
     PostProcess::PostProcess(GpuRegistry& registry) : registry_(registry), device_(registry.device()) {}
     PostProcess::~PostProcess()
     {
         release_targets();
-        for (auto* pipeline : {down_, up_, composite_, fxaa_})
+        for (auto* pipeline : {down_, up_, composite_, fxaa_, gtao_, ao_blur_})
             if (pipeline)
                 SDL_ReleaseGPUGraphicsPipeline(device_, pipeline);
     }
@@ -20,7 +21,7 @@ namespace OpenBlood2
     {
         if (pipeline_format_ == output && fxaa_)
             return true;
-        for (auto** pipeline : {&down_, &up_, &composite_, &fxaa_})
+        for (auto** pipeline : {&down_, &up_, &composite_, &fxaa_, &gtao_, &ao_blur_})
         {
             if (*pipeline)
                 SDL_ReleaseGPUGraphicsPipeline(device_, *pipeline);
@@ -28,12 +29,15 @@ namespace OpenBlood2
         }
         pipeline_format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
         const auto formats = SDL_GetGPUShaderFormats(device_);
-        SDL_GPUShaderCreateInfo vertex_info{}, down_info{}, up_info{}, composite_info{}, fxaa_info{};
+        SDL_GPUShaderCreateInfo vertex_info{}, down_info{}, up_info{}, composite_info{}, fxaa_info{}, gtao_info{},
+            blur_info{};
         if (!world_shader_info(WorldShader::PostVertex, formats, vertex_info) ||
             !world_shader_info(WorldShader::BloomDownFragment, formats, down_info) ||
             !world_shader_info(WorldShader::BloomUpFragment, formats, up_info) ||
             !world_shader_info(WorldShader::CompositeFragment, formats, composite_info) ||
-            !world_shader_info(WorldShader::FxaaFragment, formats, fxaa_info))
+            !world_shader_info(WorldShader::FxaaFragment, formats, fxaa_info) ||
+            !world_shader_info(WorldShader::GtaoFragment, formats, gtao_info) ||
+            !world_shader_info(WorldShader::AoBlurFragment, formats, blur_info))
         {
             error = "No bundled post-processing shader for this GPU backend (SPIR-V or MSL required)";
             return false;
@@ -49,7 +53,8 @@ namespace OpenBlood2
         };
         for (const auto& kind :
              {Kind{&down_, &down_info, bloom_format, false}, Kind{&up_, &up_info, bloom_format, true},
-              Kind{&composite_, &composite_info, output, false}, Kind{&fxaa_, &fxaa_info, output, false}})
+              Kind{&composite_, &composite_info, output, false}, Kind{&fxaa_, &fxaa_info, output, false},
+              Kind{&gtao_, &gtao_info, occlusion_format, false}, Kind{&ao_blur_, &blur_info, occlusion_format, false}})
         {
             auto* fragment = success ? SDL_CreateGPUShader(device_, kind.fragment) : nullptr;
             SDL_GPUColorTargetDescription target{};
@@ -111,7 +116,8 @@ namespace OpenBlood2
     }
     void PostProcess::release_targets()
     {
-        for (auto* handle : {&multisample_, &scene_, &multisample_glow_, &glow_, &display_})
+        for (auto* handle : {&multisample_, &scene_, &multisample_glow_, &glow_, &multisample_depth_, &depth_copy_,
+                             &display_, &occlusion_, &occlusion_blur_})
             registry_.release(*handle);
         for (auto& level : levels_)
             registry_.release(level);
@@ -128,8 +134,10 @@ namespace OpenBlood2
         }
         if (!prepare_pipelines(output, error))
             return false;
-        const bool hdr = enhanced && (settings.bloom || settings.tonemap != Tonemap::Off);
+        const bool ao = enhanced && settings.ambient_occlusion != AmbientOcclusion::Off;
+        const bool hdr = enhanced && (settings.bloom || settings.tonemap != Tonemap::Off || ao);
         const bool bloom = enhanced && settings.bloom && width >= 4 && height >= 4;
+        const bool aux = bloom || ao;
         const bool fxaa = settings.antialiasing == Antialiasing::Fxaa;
         const auto scene_format = hdr ? scene_hdr_format : output;
         const Uint32 requested = settings.antialiasing == Antialiasing::Msaa4   ? 4
@@ -137,15 +145,16 @@ namespace OpenBlood2
                                                                                 : 1;
         // The highest supported count up to the request, for every multisampled attachment; queried
         // again only when the request or the formats change.
-        if (supported_.format != scene_format || supported_.requested != requested || supported_.glow != bloom)
+        if (supported_.format != scene_format || supported_.requested != requested || supported_.aux != aux)
         {
-            supported_ = {scene_format, requested, bloom, SDL_GPU_SAMPLECOUNT_1};
+            supported_ = {scene_format, requested, aux, SDL_GPU_SAMPLECOUNT_1};
             for (Uint32 count = requested; count > 1 && supported_.samples == SDL_GPU_SAMPLECOUNT_1; count /= 2)
             {
                 const auto candidate = count == 4 ? SDL_GPU_SAMPLECOUNT_4 : SDL_GPU_SAMPLECOUNT_2;
                 if (SDL_GPUTextureSupportsSampleCount(device_, scene_format, candidate) &&
                     SDL_GPUTextureSupportsSampleCount(device_, SDL_GPU_TEXTUREFORMAT_D32_FLOAT, candidate) &&
-                    (!bloom || SDL_GPUTextureSupportsSampleCount(device_, scene_glow_format, candidate)))
+                    (!aux || (SDL_GPUTextureSupportsSampleCount(device_, scene_glow_format, candidate) &&
+                              SDL_GPUTextureSupportsSampleCount(device_, scene_depth_copy_format, candidate))))
                     supported_.samples = candidate;
             }
         }
@@ -154,18 +163,22 @@ namespace OpenBlood2
         stats.bloom = bloom;
         stats.fxaa = fxaa;
         stats.tonemap = hdr ? settings.tonemap : Tonemap::Off;
+        stats.ambient_occlusion = ao ? settings.ambient_occlusion : AmbientOcclusion::Off;
+        ambient_occlusion_ = stats.ambient_occlusion;
         stats.requested_samples = requested;
         stats.samples = samples == SDL_GPU_SAMPLECOUNT_4 ? 4 : samples == SDL_GPU_SAMPLECOUNT_2 ? 2 : 1;
         tonemap_ = stats.tonemap;
         if (output == output_format_ && width == width_ && height == height_ && scene_format == scene_format_ &&
-            samples == samples_ && hdr == hdr_ && bloom == bloom_ && fxaa == fxaa_pass_)
+            samples == samples_ && hdr == hdr_ && bloom == bloom_ && ao == ao_ && fxaa == fxaa_pass_)
             return true;
         release_targets();
         output_format_ = output;
         scene_format_ = scene_format;
         samples_ = samples;
         hdr_ = hdr;
+        aux_ = aux;
         bloom_ = bloom;
+        ao_ = ao;
         fxaa_pass_ = fxaa;
         width_ = width;
         height_ = height;
@@ -174,11 +187,17 @@ namespace OpenBlood2
             (samples == SDL_GPU_SAMPLECOUNT_1 || target(multisample_, scene_format, width, height, samples, error)) &&
             (direct || target(scene_, scene_format, width, height, SDL_GPU_SAMPLECOUNT_1, error)) &&
             (!hdr || !fxaa || target(display_, output, width, height, SDL_GPU_SAMPLECOUNT_1, error));
+        if (success && aux)
+            success = (samples == SDL_GPU_SAMPLECOUNT_1 ||
+                       (target(multisample_glow_, scene_glow_format, width, height, samples, error) &&
+                        target(multisample_depth_, scene_depth_copy_format, width, height, samples, error))) &&
+                      target(glow_, scene_glow_format, width, height, SDL_GPU_SAMPLECOUNT_1, error) &&
+                      target(depth_copy_, scene_depth_copy_format, width, height, SDL_GPU_SAMPLECOUNT_1, error);
+        if (success && ao)
+            success = target(occlusion_, occlusion_format, width, height, SDL_GPU_SAMPLECOUNT_1, error) &&
+                      target(occlusion_blur_, occlusion_format, width, height, SDL_GPU_SAMPLECOUNT_1, error);
         if (success && bloom)
         {
-            success = (samples == SDL_GPU_SAMPLECOUNT_1 ||
-                       target(multisample_glow_, scene_glow_format, width, height, samples, error)) &&
-                      target(glow_, scene_glow_format, width, height, SDL_GPU_SAMPLECOUNT_1, error);
             // Half resolution first, then halving while both sides keep two texels.
             Uint32 w = (width + 1) / 2, h = (height + 1) / 2;
             for (; success && level_count_ < bloom_level_limit && w >= 2 && h >= 2; w = (w + 1) / 2, h = (h + 1) / 2)
@@ -203,10 +222,12 @@ namespace OpenBlood2
         const bool multisampled = samples_ != SDL_GPU_SAMPLECOUNT_1;
         result.color = multisampled ? registry_.get(multisample_) : single;
         result.resolve = multisampled ? single : nullptr;
-        if (bloom_)
+        if (aux_)
         {
             result.glow = registry_.get(multisampled ? multisample_glow_ : glow_);
             result.glow_resolve = multisampled ? registry_.get(glow_) : nullptr;
+            result.depth_copy = registry_.get(multisampled ? multisample_depth_ : depth_copy_);
+            result.depth_copy_resolve = multisampled ? registry_.get(depth_copy_) : nullptr;
         }
         return result;
     }
@@ -215,7 +236,7 @@ namespace OpenBlood2
                            std::span<SDL_GPUSampler* const> samplers, const void* uniform, Uint32 uniform_bytes,
                            std::string& error)
     {
-        std::array<SDL_GPUTextureSamplerBinding, 2> bindings{};
+        std::array<SDL_GPUTextureSamplerBinding, 4> bindings{};
         if (!target || sources.size() > bindings.size() || sources.size() != samplers.size())
         {
             error = "Post-processing pass without its textures";
@@ -248,7 +269,8 @@ namespace OpenBlood2
         ++stats.passes;
         return true;
     }
-    bool PostProcess::finish(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* output, std::string& error)
+    bool PostProcess::finish(SDL_GPUCommandBuffer* commands, SDL_GPUTexture* output, const PostView& view,
+                             std::string& error)
     {
         stats.passes = 0;
         stats.bloom_levels = bloom_ ? level_count_ : 0;
@@ -260,6 +282,59 @@ namespace OpenBlood2
         if (!nearest)
             return false;
         auto* scene = registry_.get(scene_);
+        if (ao_)
+        {
+            if (!(view.height > 0) || !(view.slice >= 0 && view.slice < 1) || !(view.projection[0] > 0) ||
+                !(view.projection[1] > 0))
+            {
+                error = "invalid ambient-occlusion view";
+                return false;
+            }
+            // Occlusion at full size, then the depth-aware blur across and down.
+            const auto& samples = ao_samples[ambient_occlusion_ == AmbientOcclusion::High];
+            const float slice_scale = 1 / (1 - view.slice);
+            const std::array<float, 16> gtao{view.projection[0],
+                                             view.projection[1],
+                                             view.projection[2],
+                                             view.projection[3],
+                                             0,
+                                             view.top,
+                                             float(width_),
+                                             view.height,
+                                             1.f / float(width_),
+                                             1.f / float(height_),
+                                             view.slice,
+                                             slice_scale,
+                                             ao_radius,
+                                             float(samples[0]),
+                                             float(samples[1]),
+                                             ao_power};
+            SDL_GPUTexture* const depth = registry_.get(depth_copy_);
+            if (!draw(commands, registry_.get(occlusion_), false, gtao_, {&depth, 1}, {&nearest, 1}, gtao.data(),
+                      sizeof(gtao), error))
+                return false;
+            for (int axis = 0; axis < 2; ++axis)
+            {
+                const std::array<float, 12> blur{axis ? 0 : 1.f / float(width_),
+                                                 axis ? 1.f / float(height_) : 0,
+                                                 0,
+                                                 0,
+                                                 view.projection[0],
+                                                 view.projection[1],
+                                                 view.projection[2],
+                                                 view.projection[3],
+                                                 0,
+                                                 0,
+                                                 view.slice,
+                                                 slice_scale};
+                const std::array<SDL_GPUTexture*, 2> sources{registry_.get(axis ? occlusion_blur_ : occlusion_),
+                                                             depth};
+                const std::array<SDL_GPUSampler*, 2> samplers{nearest, nearest};
+                if (!draw(commands, registry_.get(axis ? occlusion_ : occlusion_blur_), false, ao_blur_, sources,
+                          samplers, blur.data(), sizeof(blur), error))
+                    return false;
+            }
+        }
         if (bloom_)
         {
             // Downsample the glow into the chain, then add each coarser level into the finer one.
@@ -290,13 +365,15 @@ namespace OpenBlood2
             const std::array<float, 8> uniform{float(tonemap_),
                                                bloom,
                                                filmic_exposure,
-                                               0,
+                                               ao_ ? 1.f : 0.f,
                                                1.f / float(level_sizes_[0][0] ? level_sizes_[0][0] : 1),
                                                1.f / float(level_sizes_[0][1] ? level_sizes_[0][1] : 1),
                                                0,
                                                0};
-            const std::array<SDL_GPUTexture*, 2> sources{scene, bloom_ ? registry_.get(levels_[0]) : scene};
-            const std::array<SDL_GPUSampler*, 2> samplers{nearest, linear};
+            const std::array<SDL_GPUTexture*, 4> sources{scene, bloom_ ? registry_.get(levels_[0]) : scene,
+                                                         ao_ ? registry_.get(glow_) : scene,
+                                                         ao_ ? registry_.get(occlusion_) : scene};
+            const std::array<SDL_GPUSampler*, 4> samplers{nearest, linear, nearest, nearest};
             if (!draw(commands, display, false, composite_, sources, samplers, uniform.data(), sizeof(uniform), error))
                 return false;
         }

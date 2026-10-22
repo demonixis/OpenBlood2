@@ -150,6 +150,7 @@ namespace OpenBlood2
                 items.push_back({0, -1, true, {}, 9, {}});
                 items.push_back({0, -1, true, {}, 19, {}});
                 items.push_back({0, -1, true, {}, 18, {}});
+                items.push_back({0, -1, true, {}, 20, {}});
                 items.push_back({0, -1, true, {}, 17, {}});
                 break;
             case MenuPage::Vr:
@@ -580,6 +581,10 @@ namespace OpenBlood2
                 break;
             case 19:
                 settings.tonemap = (std::clamp(settings.tonemap, 0, 2) + (direction < 0 ? 2 : 1)) % 3;
+                break;
+            case 20:
+                settings.ambient_occlusion =
+                    (std::clamp(settings.ambient_occlusion, 0, 2) + (direction < 0 ? 2 : 1)) % 3;
                 break;
             case 10:
             {

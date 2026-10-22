@@ -655,7 +655,7 @@ namespace OpenBlood2
         out.right = packed(rotate_vector(DVector{1, 0, 0}, view));
         out.up = packed(rotate_vector(DVector{0, 1, 0}, view));
         out.forward = packed(rotate_vector(DVector{0, 0, 1}, view));
-        constexpr float near = 1, far = 65536;
+        constexpr float near = world_near, far = world_far;
         out.projection = {1, aspect, far / (far - near), -near * far / (far - near)};
         out.position = packed(draw.position);
         out.quaternion = {draw.rotation.m_Vec.x, draw.rotation.m_Vec.y, draw.rotation.m_Vec.z, draw.rotation.m_Spin};

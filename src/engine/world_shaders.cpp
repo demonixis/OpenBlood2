@@ -1,4 +1,6 @@
 #include "engine/world_shaders.h"
+#include "engine/shaders/ao_blur_frag.h"
+#include "engine/shaders/ao_blur_frag_msl.h"
 #include "engine/shaders/bloom_down_frag.h"
 #include "engine/shaders/bloom_down_frag_msl.h"
 #include "engine/shaders/bloom_up_frag.h"
@@ -7,40 +9,42 @@
 #include "engine/shaders/composite_frag_msl.h"
 #include "engine/shaders/fxaa_frag.h"
 #include "engine/shaders/fxaa_frag_msl.h"
+#include "engine/shaders/gtao_frag.h"
+#include "engine/shaders/gtao_frag_msl.h"
 #include "engine/shaders/line_frag.h"
 #include "engine/shaders/line_frag_msl.h"
 #include "engine/shaders/line_vert.h"
 #include "engine/shaders/line_vert_msl.h"
+#include "engine/shaders/pbr_alpha_aux_frag.h"
+#include "engine/shaders/pbr_alpha_aux_frag_msl.h"
 #include "engine/shaders/pbr_alpha_frag.h"
 #include "engine/shaders/pbr_alpha_frag_msl.h"
-#include "engine/shaders/pbr_alpha_glow_frag.h"
-#include "engine/shaders/pbr_alpha_glow_frag_msl.h"
+#include "engine/shaders/pbr_aux_frag.h"
+#include "engine/shaders/pbr_aux_frag_msl.h"
 #include "engine/shaders/pbr_frag.h"
 #include "engine/shaders/pbr_frag_msl.h"
-#include "engine/shaders/pbr_glow_frag.h"
-#include "engine/shaders/pbr_glow_frag_msl.h"
+#include "engine/shaders/pbr_high_alpha_aux_frag.h"
+#include "engine/shaders/pbr_high_alpha_aux_frag_msl.h"
 #include "engine/shaders/pbr_high_alpha_frag.h"
 #include "engine/shaders/pbr_high_alpha_frag_msl.h"
-#include "engine/shaders/pbr_high_alpha_glow_frag.h"
-#include "engine/shaders/pbr_high_alpha_glow_frag_msl.h"
+#include "engine/shaders/pbr_high_aux_frag.h"
+#include "engine/shaders/pbr_high_aux_frag_msl.h"
 #include "engine/shaders/pbr_high_frag.h"
 #include "engine/shaders/pbr_high_frag_msl.h"
-#include "engine/shaders/pbr_high_glow_frag.h"
-#include "engine/shaders/pbr_high_glow_frag_msl.h"
 #include "engine/shaders/post_vert.h"
 #include "engine/shaders/post_vert_msl.h"
 #include "engine/shaders/shadow_frag.h"
 #include "engine/shaders/shadow_frag_msl.h"
 #include "engine/shaders/skinned_vert.h"
 #include "engine/shaders/skinned_vert_msl.h"
+#include "engine/shaders/sprite_aux_frag.h"
+#include "engine/shaders/sprite_aux_frag_msl.h"
 #include "engine/shaders/sprite_frag.h"
 #include "engine/shaders/sprite_frag_msl.h"
-#include "engine/shaders/sprite_glow_frag.h"
-#include "engine/shaders/sprite_glow_frag_msl.h"
+#include "engine/shaders/world_aux_frag.h"
+#include "engine/shaders/world_aux_frag_msl.h"
 #include "engine/shaders/world_frag.h"
 #include "engine/shaders/world_frag_msl.h"
-#include "engine/shaders/world_glow_frag.h"
-#include "engine/shaders/world_glow_frag_msl.h"
 #include "engine/shaders/world_vert.h"
 #include "engine/shaders/world_vert_msl.h"
 
@@ -115,16 +119,18 @@ namespace OpenBlood2
                 BLOOD2_FRAGMENT_SHADER(PbrAlphaFragment, pbr_alpha_frag)
                 BLOOD2_FRAGMENT_SHADER(PbrHighAlphaFragment, pbr_high_alpha_frag)
                 BLOOD2_FRAGMENT_SHADER(LineFragment, line_frag)
-                BLOOD2_FRAGMENT_SHADER(OpaqueGlowFragment, world_glow_frag)
-                BLOOD2_FRAGMENT_SHADER(AlphaGlowFragment, sprite_glow_frag)
-                BLOOD2_FRAGMENT_SHADER(PbrGlowFragment, pbr_glow_frag)
-                BLOOD2_FRAGMENT_SHADER(PbrHighGlowFragment, pbr_high_glow_frag)
-                BLOOD2_FRAGMENT_SHADER(PbrAlphaGlowFragment, pbr_alpha_glow_frag)
-                BLOOD2_FRAGMENT_SHADER(PbrHighAlphaGlowFragment, pbr_high_alpha_glow_frag)
+                BLOOD2_FRAGMENT_SHADER(OpaqueAuxFragment, world_aux_frag)
+                BLOOD2_FRAGMENT_SHADER(AlphaAuxFragment, sprite_aux_frag)
+                BLOOD2_FRAGMENT_SHADER(PbrAuxFragment, pbr_aux_frag)
+                BLOOD2_FRAGMENT_SHADER(PbrHighAuxFragment, pbr_high_aux_frag)
+                BLOOD2_FRAGMENT_SHADER(PbrAlphaAuxFragment, pbr_alpha_aux_frag)
+                BLOOD2_FRAGMENT_SHADER(PbrHighAlphaAuxFragment, pbr_high_alpha_aux_frag)
                 BLOOD2_FRAGMENT_SHADER(BloomDownFragment, bloom_down_frag)
                 BLOOD2_FRAGMENT_SHADER(BloomUpFragment, bloom_up_frag)
                 BLOOD2_FRAGMENT_SHADER(CompositeFragment, composite_frag)
                 BLOOD2_FRAGMENT_SHADER(FxaaFragment, fxaa_frag)
+            BLOOD2_FRAGMENT_SHADER(GtaoFragment, gtao_frag)
+            BLOOD2_FRAGMENT_SHADER(AoBlurFragment, ao_blur_frag)
 #undef BLOOD2_FRAGMENT_SHADER
             case WorldShader::PostVertex:
                 info.stage = SDL_GPU_SHADERSTAGE_VERTEX;

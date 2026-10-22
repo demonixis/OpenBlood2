@@ -405,7 +405,7 @@ namespace OpenBlood2
         return true;
     }
     bool ScenePresenter::prepare_frame(SDL_GPUCommandBuffer* commands, SDL_GPUTextureFormat format, Uint32 width,
-                                       Uint32 height, Uint32 layers, bool glow, SDL_GPUSampleCount samples,
+                                       Uint32 height, Uint32 layers, bool aux, SDL_GPUSampleCount samples,
                                        std::string& error)
     {
         auto fail = [&](const char* stage)
@@ -418,7 +418,7 @@ namespace OpenBlood2
              {&world_renderer.stats, &model_renderer.stats, &explosion_model_renderer.stats, &polygrid_renderer.stats,
               &sprite_renderer.stats, &sky_sprite_renderer.stats, &hand_renderer.stats})
             renderer->draw_calls = renderer->culled = 0;
-        if (!pipelines.prepare(format, shading, glow, samples, error))
+        if (!pipelines.prepare(format, shading, aux, samples, error))
             return fail("World pipelines");
         // Renderers stage uploads in the shared registry; one copy pass in the frame's
         // command buffer records them all before the scene pass.
@@ -486,15 +486,18 @@ namespace OpenBlood2
         const auto flashlight = game.client_shell.flashlight.Current(game.server);
         const auto time = game.server.world_time();
         const auto layer = target.layer;
-        // Colour, then the glow target of bloom passes; multisampled targets resolve at the end.
-        SDL_GPUColorTargetInfo colors[2]{};
-        for (int i = 0; i < 2; ++i)
+        // Colour, then the post-processing glow/occlusion mask and depth copy (cleared to the
+        // background depth); multisampled targets resolve at the end.
+        SDL_GPUColorTargetInfo colors[3]{};
+        for (int i = 0; i < 3; ++i)
         {
             auto& color = colors[i];
-            color.texture = i ? target.glow : target.color;
-            color.resolve_texture = i ? target.glow_resolve : target.resolve;
+            color.texture = i == 0 ? target.color : i == 1 ? target.glow : target.depth_copy;
+            color.resolve_texture = i == 0 ? target.resolve : i == 1 ? target.glow_resolve : target.depth_copy_resolve;
             color.layer_or_depth_plane = layer;
-            color.clear_color = i ? SDL_FColor{0, 0, 0, 0} : SDL_FColor{.025f, .035f, .05f, 1};
+            color.clear_color = i == 0 ? SDL_FColor{.025f, .035f, .05f, 1}
+                                : i == 1 ? SDL_FColor{0, 0, 0, 0}
+                                         : SDL_FColor{1, 1, 1, 1};
             color.load_op = SDL_GPU_LOADOP_CLEAR;
             color.store_op = color.resolve_texture ? SDL_GPU_STOREOP_RESOLVE : SDL_GPU_STOREOP_STORE;
         }
@@ -507,7 +510,7 @@ namespace OpenBlood2
         depth.stencil_load_op = SDL_GPU_LOADOP_DONT_CARE;
         depth.stencil_store_op = SDL_GPU_STOREOP_DONT_CARE;
         depth.cycle = layer == 0; // Later layers of the same frame keep the earlier layers' texture.
-        auto* pass = SDL_BeginGPURenderPass(commands, colors, target.glow ? 2 : 1, &depth);
+        auto* pass = SDL_BeginGPURenderPass(commands, colors, target.glow ? 3 : 1, &depth);
         if (!pass)
         {
             error = SDL_GetError();
@@ -618,12 +621,20 @@ namespace OpenBlood2
             error = "Post-processing: " + error;
             return false;
         }
-        if (!prepare_frame(commands, post_process.scene_format(), width, height, 1, post_process.glow(),
+        if (!prepare_frame(commands, post_process.scene_format(), width, height, 1, post_process.aux(),
                            post_process.sample_count(), error) ||
             !record_view(game, commands, post_process.scene_target(target), view.position, view.rotation, letterbox,
                          nullptr, error))
             return false;
-        if (!post_process.finish(commands, target, error))
+        // The scene projection as world_view_uniform builds it, for ambient occlusion.
+        PostView post_view;
+        post_view.top = float(letterbox ? height / 6 : 0);
+        post_view.height = float(height) - 2 * post_view.top;
+        const float zoom = original_fov_scale(game.client_shell.ViewFovX());
+        post_view.projection = {zoom, zoom * float(width) / std::max(post_view.height, 1.f),
+                                world_far / (world_far - world_near), -world_near * world_far / (world_far - world_near)};
+        post_view.slice = view_model_depth;
+        if (!post_process.finish(commands, target, post_view, error))
         {
             error = "Post-processing: " + error;
             return false;

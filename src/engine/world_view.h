@@ -122,5 +122,7 @@ namespace OpenBlood2
     {
         std::array<float, 4> eye{}, right{}, up{}, forward{}, projection{}, position{}, quaternion{}, texture_offset{};
     };
+    // Near and far planes of the scene projection (view models and sky use their own near plane).
+    inline constexpr float world_near = 1, world_far = 65536;
     bool world_view_uniform(DVector eye, DRotation view, float aspect, const WorldDraw&, WorldViewUniform&);
 } // namespace OpenBlood2

@@ -1,6 +1,7 @@
 // Final composite of the enhanced renderer's HDR scene. The scene holds display-space values
-// that may exceed 1 (specular, emission); they are decoded to linear light, the bloom chain is
-// added, and the result is tonemapped and encoded for the UNORM output.
+// that may exceed 1 (specular, emission); they are decoded to linear light, ambient occlusion
+// darkens the part that is not emission (weighted by the opaque share of the pixel), the bloom
+// chain is added, and the result is tonemapped and encoded for the UNORM output.
 // Tonemaps (settings.x): 0 clamps like the original framebuffer; 1 neutral: the highlight
 // compression of Khronos PBR Neutral without its toe, so everything below 0.76 linear keeps its
 // value; 2 filmic: Hill's fit of the ACES RRT/ODT, exposed so mid-grey keeps its value.
@@ -9,9 +10,13 @@ Texture2D<float4> scene : register(t0, space2);
 SamplerState sceneSampler : register(s0, space2);
 Texture2D<float4> bloom : register(t1, space2);
 SamplerState bloomSampler : register(s1, space2);
+Texture2D<float4> aux : register(t2, space2); // Glow (linear) and the occlusion mask, full size.
+SamplerState auxSampler : register(s2, space2);
+Texture2D<float4> occlusion : register(t3, space2);
+SamplerState occlusionSampler : register(s3, space2);
 cbuffer Composite : register(b0, space3)
 {
-    float4 settings;   // x: tonemap, y: bloom scale (0: none), z: filmic exposure.
+    float4 settings;   // x: tonemap, y: bloom scale (0: none), z: filmic exposure, w: 1 with occlusion.
     float4 bloomTexel; // xy: bloom texel size.
 };
 struct Input
@@ -57,6 +62,13 @@ float4 main(Input input) : SV_Target0
 {
     // Same size as the output, nearest filtering: each pixel reads its own scene texel.
     float3 color = toLinear(scene.SampleLevel(sceneSampler, input.uv, 0.0).rgb);
+    if (settings.w > 0.5)
+    {
+        float4 glow = aux.SampleLevel(auxSampler, input.uv, 0.0);
+        float ao = occlusion.SampleLevel(occlusionSampler, input.uv, 0.0).r;
+        float3 lit = max(color - glow.rgb, float3(0.0, 0.0, 0.0));
+        color += lit * (lerp(1.0, ao, saturate(glow.a)) - 1.0);
+    }
     if (settings.y > 0.0)
     {
         float2 uv = input.uv;

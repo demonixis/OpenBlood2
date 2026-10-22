@@ -60,7 +60,11 @@ Pushing a tag `vx.y.z` that matches `project(VERSION)` (see [packaging](packagin
 runs every job, then the `release` job creates the GitHub release `vx.y.z` with
 generated notes and attaches the three desktop archives and the two APKs. A
 mismatched tag fails packaging, and any failed job prevents the release. `0.x`
-versions are published as pre-releases. Only this job has write permission.
+versions are published as pre-releases. If a release for the tag already exists
+(created by hand on GitHub), the job only uploads the builds to it. Only this job
+has write permission. The tag must reach the `github` remote: a tag pushed only to
+GitLab starts nothing, and a release created on GitHub for a tag whose commit CI
+has not built gets no files until that tag's run passes.
 
 The APKs are signed with the runner's throwaway debug key, which changes on every
 run: installing a newer release over an older one fails with a signature mismatch,

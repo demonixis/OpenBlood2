@@ -34,6 +34,9 @@ struct Input
     float3 worldPosition : TEXCOORD2;
     float2 lightmapCoord : TEXCOORD3; // Negative: no lightmap on this face.
     float3 worldNormal : TEXCOORD4;
+#ifdef AUX_TARGETS
+    float4 position : SV_Position;
+#endif
 };
 // Fraction of the baked light removed by model shadows on an upward-facing receiver:
 // 2x2 coverage of tile texels whose caster surface lies above this point, faded with the
@@ -106,13 +109,15 @@ float3 illumination(Input input, float shadow)
                ? modulation.y * min(baked * (1.0 - shadow) + dynamicLight, float3(1.0, 1.0, 1.0))
                : (modulation.w > 0.5 ? modelLight(input) : input.faceColor) * (1.0 - shadow) + dynamicLight;
 }
-#ifdef GLOW_TARGET
-// Bloom passes (enhanced renderer): no glow of its own; the coverage attenuates the glow
-// behind it (premultiplied blend).
+#ifdef AUX_TARGETS
+// Post-processing passes (enhanced renderer): no glow of its own; the coverage attenuates the
+// glow and the ambient-occlusion mask behind it (premultiplied blend). Translucent pipelines
+// do not write the depth copy.
 struct Output
 {
     float4 color : SV_Target0;
     float4 glow : SV_Target1;
+    float4 depth : SV_Target2;
 };
 Output main(Input input)
 {
@@ -123,6 +128,7 @@ Output main(Input input)
     Output output;
     output.color = float4(texel.rgb * illumination(input, shadow) * sceneColor.rgb, texel.a * modulation.x);
     output.glow = float4(0.0, 0.0, 0.0, output.color.a);
+    output.depth = float4(input.position.z, 0.0, 0.0, 0.0);
     return output;
 }
 #else

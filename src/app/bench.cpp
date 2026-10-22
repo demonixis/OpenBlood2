@@ -106,7 +106,8 @@ namespace OpenBlood2
             presenter.per_pixel_lighting = options.pixel_lighting;
             presenter.shading = SurfaceShading(options.renderer);
             presenter.normal_maps = options.normal_maps;
-            presenter.post = {Antialiasing(options.antialiasing), options.bloom, Tonemap(options.tonemap)};
+            presenter.post = {Antialiasing(options.antialiasing), options.bloom, Tonemap(options.tonemap),
+                              AmbientOcclusion(options.ambient_occlusion)};
             Capture capture;
             Series step, world, models, effects, record, gpu, total, draws, culled, pings, reads, read_counts;
             std::uint64_t ping_calls = 0;
@@ -228,11 +229,12 @@ namespace OpenBlood2
                 presenter.polygrid_scene.draws.size(), presenter.world_renderer.stats.triangles);
             const auto& post = presenter.post_process.stats;
             static constexpr const char* tonemaps[]{"off", "neutral", "filmic"};
+            static constexpr const char* occlusion[]{"off", "low", "high"};
             spdlog::info("Post-processing: {} scene, MSAA {}x ({}x requested), FXAA {}, bloom {} ({} levels), tonemap "
-                         "{}, {} passes, {} targets",
+                         "{}, ambient occlusion {}, {} passes, {} targets",
                          post.hdr ? "HDR" : "direct", post.samples, post.requested_samples, post.fxaa ? "on" : "off",
-                         post.bloom ? "on" : "off", post.bloom_levels, tonemaps[std::size_t(post.tonemap)], post.passes,
-                         post.targets);
+                         post.bloom ? "on" : "off", post.bloom_levels, tonemaps[std::size_t(post.tonemap)],
+                         occlusion[std::size_t(post.ambient_occlusion)], post.passes, post.targets);
             const auto& lighting = presenter.model_lighting.stats;
             const auto& mesh = presenter.world_mesh;
             spdlog::info("Lightmaps: {} faces, {} pages, {} texels, {} unfitted origin axes", mesh.lightmapped,

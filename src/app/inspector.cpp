@@ -581,11 +581,13 @@ namespace OpenBlood2
                         if (post)
                         {
                             static constexpr const char* tonemaps[]{"off", "neutral", "filmic"};
+                            static constexpr const char* occlusion[]{"off", "low", "high"};
                             ImGui::Text("Post-processing: %s scene, MSAA %ux (%ux requested), FXAA %s, bloom %s (%zu "
-                                        "levels), tonemap %s | %zu passes, %zu targets",
+                                        "levels), tonemap %s, ambient occlusion %s | %zu passes, %zu targets",
                                         post->hdr ? "HDR" : "direct", post->samples, post->requested_samples,
                                         post->fxaa ? "on" : "off", post->bloom ? "on" : "off", post->bloom_levels,
-                                        tonemaps[std::size_t(post->tonemap)], post->passes, post->targets);
+                                        tonemaps[std::size_t(post->tonemap)],
+                                        occlusion[std::size_t(post->ambient_occlusion)], post->passes, post->targets);
                         }
                         if (gpu_resources)
                             ImGui::Text("GPU registry: %zu textures (%zu bytes, %llu shared hits) / %zu buffers (%zu "

@@ -280,6 +280,12 @@ namespace OpenBlood2
                                                                   "TONEMAP [FILMIC]"};
                 label = item.literal = modes[std::size_t(std::clamp(display.tonemap, 0, 2))];
             }
+            else if (item.setting == 20)
+            {
+                static constexpr std::array<const char*, 3> modes{
+                    "AMBIENT OCCLUSION [OFF]", "AMBIENT OCCLUSION [LOW]", "AMBIENT OCCLUSION [HIGH]"};
+                label = item.literal = modes[std::size_t(std::clamp(display.ambient_occlusion, 0, 2))];
+            }
             else if (item.setting == 10)
                 label = item.literal = display.vr_turn ? "TURN [SNAP " + std::to_string(display.vr_turn) + "]"
                                                        : std::string("TURN [SMOOTH]");

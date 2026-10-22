@@ -216,6 +216,11 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: |
           ls -l dist
+          # A release drafted or published by hand for this tag keeps its text.
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$TAG" dist/* --repo "$GITHUB_REPOSITORY" --clobber
+            exit 0
+          fi
           # 0.x versions are pre-releases.
           prerelease=()
           case "$TAG" in v0.*) prerelease=(--prerelease) ;; esac

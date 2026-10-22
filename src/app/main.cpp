@@ -373,7 +373,8 @@ namespace
         presenter.shading = OpenBlood2::SurfaceShading(options.renderer);
         presenter.normal_maps = options.normal_maps;
         presenter.post = {OpenBlood2::Antialiasing(options.antialiasing), options.bloom,
-                          OpenBlood2::Tonemap(options.tonemap)};
+                          OpenBlood2::Tonemap(options.tonemap),
+                          OpenBlood2::AmbientOcclusion(options.ambient_occlusion)};
         const auto& world_mesh = presenter.world_mesh;
         const auto& world_renderer = presenter.world_renderer;
         const auto& model_scene = presenter.model_scene;
@@ -1804,6 +1805,7 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --aa MODE           Anti-aliasing: off (default), fxaa, msaa2 or msaa4 (menu: Display)\n"
                      "  --no-bloom          Enhanced renderer without bloom (menu: Display)\n"
                      "  --tonemap MODE      Enhanced tonemap: off, neutral (default) or filmic (menu: Display)\n"
+                     "  --ao MODE           Enhanced ambient occlusion: off, low or high (default) (menu: Display)\n"
                      "  --capture FILE.png  Save the third GPU frame after UI layout has settled (bench: last frame)\n"
                      "  --menu-smoke        Selected-edition menu SDL traversal, isolated preferences/pause checks\n"
                      "  --demo-smoke        Menu-free demo SDL pause, authored exits and ending diagnostic\n"

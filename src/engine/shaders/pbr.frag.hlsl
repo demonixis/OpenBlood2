@@ -6,7 +6,9 @@
 // for the environment through an analytic split-sum approximation. No probe or baked data.
 // Manifest emission adds a light-independent glow to bright texels (the input of M6 bloom).
 // PBR_HIGH: eight grid lights and specular cavity. PBR_ALPHA: translucent output.
-// GLOW_TARGET (bloom passes): target 1 receives the linear light the emission adds.
+// AUX_TARGETS (post-processing passes): target 1 receives the linear light the emission adds
+// and, in alpha, the share of the pixel that receives ambient occlusion; target 2 the window
+// depth (opaque pipelines only).
 // SDL_GPU fragment conventions: textures/samplers then storage buffers in space2, uniforms in space3.
 Texture2D<float4> albedo : register(t0, space2);
 SamplerState albedoSampler : register(s0, space2);
@@ -51,6 +53,9 @@ struct Input
     float3 worldPosition : TEXCOORD2;
     float2 lightmapCoord : TEXCOORD3;
     float3 worldNormal : TEXCOORD4;
+#ifdef AUX_TARGETS
+    float4 position : SV_Position;
+#endif
 };
 #ifdef PBR_HIGH
 #define GRID_LIGHTS 8u
@@ -154,17 +159,20 @@ float3 emitted(float3 color)
         return float3(0.0, 0.0, 0.0);
     return color * (emission.x * saturate((luminance(color) - emission.y) / max(1.0 - emission.y, 1e-3)));
 }
-#ifdef GLOW_TARGET
+#ifdef AUX_TARGETS
 struct Output
 {
     float4 color : SV_Target0;
-    float4 glow : SV_Target1; // Linear glow, premultiplied by coverage (translucent faces).
+    float4 glow : SV_Target1; // Linear glow premultiplied by coverage; alpha: occlusion mask.
+    float4 depth : SV_Target2;
 };
+static float windowDepth;
 Output shaded(float4 color, float4 glow)
 {
     Output output;
     output.color = color;
     output.glow = glow;
+    output.depth = float4(windowDepth, 0.0, 0.0, 0.0);
     return output;
 }
 float3 toLinear(float3 c)
@@ -184,6 +192,9 @@ Output main(Input input)
 float4 main(Input input) : SV_Target0
 #endif
 {
+#ifdef AUX_TARGETS
+    windowDepth = input.position.z;
+#endif
     float shadow = shadowAmount(input.worldPosition); // Before discard: screen derivatives.
     float3 dp1 = ddx(input.worldPosition), dp2 = ddy(input.worldPosition);
     float2 duv1 = ddx(input.texCoord), duv2 = ddy(input.texCoord);
@@ -208,7 +219,7 @@ float4 main(Input input) : SV_Target0
                       float4(0.0, 0.0, 0.0, texel.a * modulation.x));
 #else
         return SHADED(float4(texel.rgb * (light * (1.0 - shadow) + dynamicLight) * sceneColor.rgb, 1.0),
-                      float4(0.0, 0.0, 0.0, 1.0));
+                      float4(0.0, 0.0, 0.0, 0.0));
 #endif
     }
     bool model = (flags & 1u) != 0u;
@@ -275,7 +286,7 @@ float4 main(Input input) : SV_Target0
             return SHADED(float4(texel.rgb * diffuse * sceneColor.rgb, texel.a * modulation.x),
                           float4(0.0, 0.0, 0.0, texel.a * modulation.x));
 #else
-            return SHADED(float4(texel.rgb * diffuse * sceneColor.rgb, 1.0), float4(0.0, 0.0, 0.0, 1.0));
+            return SHADED(float4(texel.rgb * diffuse * sceneColor.rgb, 1.0), float4(0.0, 0.0, 0.0, 0.0));
 #endif
         float3 grid = (p - gridOrigin.xyz) * gridOrigin.w;
         int3 cell = int3(floor(grid));

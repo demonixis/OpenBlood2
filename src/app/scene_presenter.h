@@ -47,8 +47,8 @@ namespace OpenBlood2
     // state without advancing simulation; record() encodes one presented frame.
     // All in-world presentation is recorded into one scene render pass sharing one
     // depth target and one pipeline set. View models use a separate near depth slice.
-    // On desktop, post-processing (MSAA, the enhanced HDR scene, bloom, tonemapping, FXAA)
-    // surrounds that pass; XR eyes keep the plain single-sampled pass.
+    // On desktop, post-processing (MSAA, the enhanced HDR scene, ambient occlusion, bloom,
+    // tonemapping, FXAA) surrounds that pass; XR eyes keep the plain single-sampled pass.
     class ScenePresenter
     {
       public:
@@ -98,7 +98,7 @@ namespace OpenBlood2
         DVector sky_eye{};
         GpuRegistry registry;     // Owns every presentation GPU resource; declared before its users.
         PostProcess post_process; // Desktop record() only: targets and passes around the scene pass.
-        PostSettings post;        // Display settings for record(); bloom/tonemap need the enhanced renderer.
+        PostSettings post;        // Display settings for record(); all but AA need the enhanced renderer.
         WorldPipelines pipelines; // Declared before the renderers that borrow it.
         WorldRenderer world_renderer;
         ModelRenderer model_renderer, explosion_model_renderer; // GPU skinning of both model views.
@@ -146,7 +146,7 @@ namespace OpenBlood2
         // Pipelines, renderer uploads, shadow tiles and a depth target with `layers` layers.
         bool prepare_depth(Uint32 width, Uint32 height, Uint32 layers, SDL_GPUSampleCount, std::string& error);
         bool prepare_frame(SDL_GPUCommandBuffer*, SDL_GPUTextureFormat, Uint32 width, Uint32 height, Uint32 layers,
-                           bool glow, SDL_GPUSampleCount, std::string& error);
+                           bool aux, SDL_GPUSampleCount, std::string& error);
         // One scene render pass into colour/depth layer `target.layer`.
         bool record_view(GameSession&, SDL_GPUCommandBuffer*, const SceneTarget&, DVector eye, DRotation rotation,
                          bool letterbox, const EyeProjection*, std::string& error);
