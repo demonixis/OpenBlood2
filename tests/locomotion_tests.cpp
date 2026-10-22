@@ -361,10 +361,11 @@ namespace
                 DVector destination{32, 100, 120};
                 const auto dims = game.objects.get(player)->dimensions;
                 // Unchanged extents are accepted inside the move; an actual change is refused.
-                guarded = game.server.MoveObject(player, &destination) == DE_ERROR &&
-                          game.server.ResizeObject(player, dims) == ResizeResult::Resized &&
-                          game.server.ResizeObject(player, {dims.x, dims.y + 1, dims.z}) == ResizeResult::Invalid &&
-                          !game.unload_world();
+                guarded =
+                    game.server.MoveObject(player, &destination) == DE_ERROR &&
+                    game.server.ResizeObject(player, dims) == ResizeResult::Resized &&
+                    game.server.ResizeObject(player, {dims.x, dims.y + 1, dims.z}) == ResizeResult::InTransaction &&
+                    !game.unload_world();
                 game.objects.remove(player);
             };
             game.client_shell.movement_input.forward = true;

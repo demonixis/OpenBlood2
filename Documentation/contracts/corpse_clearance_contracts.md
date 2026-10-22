@@ -15,11 +15,13 @@ must still both be clear. This is replacement engine collision, not recovered
 retail SetObjectDims2 behavior.
 
 All existing bounds remain: 16 corrections per path, 128 visited alternatives,
-128 pending candidates, displacement budget of min(256, largest new half extent),
+128 pending candidates, net-displacement budget of min(256, largest new half extent),
 and unchanged collision tolerances. Position-plus-policy identifies repeated
-candidates because the swept-source requirement differs. No body shrink, hidden
-actor deletion, collision disable or successful placeholder replaces a failed
-transfer. Impossible fits still retain the failed source and deferred child cleanup.
+candidates because the swept-source requirement differs. No collision disable replaces
+a failed transfer. Impossible raw fits retry once with the contained box (min(death,
+living) per axis at the same feet); a transfer that still fails is recorded and the
+dead actor is hidden and removed as in the original
+([corpse contracts](corpse_contracts.md)).
 Original CreateCorpse clip choice, raw dimensions, scale, cached transform and foot
 offset remain unchanged. Generic sweeps and live-character resize are unchanged.
 

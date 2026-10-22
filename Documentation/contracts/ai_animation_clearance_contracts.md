@@ -86,8 +86,11 @@ validation, exactly equal dimensions now succeed without mutation or a collision
 sweep. Later LithTech ChangeObjectDimensions likewise checks for an unchanged
 shape before its collision work; this implementation deliberately uses exact
 component equality, with no tolerance-based resizing. Actual dimension changes
-remain rejected during a move, and missing collision/invalid dimensions still
-fail. No callbacks, position changes, penetration acceptance or animation aliases
+remain rejected during a move (`ResizeResult::InTransaction`, body unchanged), and
+missing collision/invalid dimensions still fail. `AI_Mgr::SetAnimation` treats
+InTransaction like Blocked and continues with the retained body, as the original ignores
+SetObjectDims2's result: a talk Trigger's synchronous `Script n;PlayAnimation talkN`
+(CityHub hank, cletus, drea) no longer suspends the civilian. Other callers still fail. No callbacks, position changes, penetration acceptance or animation aliases
 are added. The original script and its animation name remain unchanged.
 
 A synthetic touch callback checks both unchanged success and changed-size refusal

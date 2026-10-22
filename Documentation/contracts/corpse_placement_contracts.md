@@ -24,15 +24,17 @@ leaving the object untouched until success. Each overlapping triangle supplies a
 separating-axis correction only on a side that separated the clear source box.
 Using just the nearest side can push a wide corpse through a train floor/seat.
 Resolve in the existing deterministic BVH/polygon order. Add 0.001 units of clearance,
-allow at most 16 corrections and cap cumulative distance at the smaller of 256
-units and the largest new half dimension.
+allow at most 16 corrections and cap the net displacement from the requested position
+(not the sum of the corrections: a corner needs two perpendicular corrections whose sum
+can exceed the cap although the diagonal offset is shorter) at the smaller of 256 units
+and the largest new half dimension; the report's distance remains the sum.
 
 If that nearest-axis pass exhausts its budget, a bounded fallback tries the other
 separating axes of each actual blocking triangle. It retains only directions that
 separate the original clear source body. Up to 128 distinct candidates are tested
 with a fixed 128-entry pending stack; near-identical positions (below 1e-5 units
 per axis) are not revisited. Shorter corrections are explored first. Each path
-retains the same 16-correction and distance limits. The fallback adds no .001 skin:
+retains the same 16-correction and net-displacement limits. The fallback adds no .001 skin:
 exact contact already counts as nonpenetrating under the unchanged sweep contract.
 No extent or collision tolerance is reduced to obtain success. This handles both
 an exact-width corridor and a wide corpse needing a different separation around
@@ -57,8 +59,9 @@ integrator with the original dimensions and mass.
 ## Ownership and inspection
 
 A successful transfer copies the bounded placement report into CCorpse before the
-original NPC hide/removal branch. Failure removes the partial child deferred and
-retains the visible actor and failed report. A source disappearing later does not
+original NPC hide/removal branch. A blocked raw fit retries once with the contained
+box ([corpse contracts](corpse_contracts.md)). Failure removes the partial child deferred,
+keeps the failed report and still hides and removes the actor (original flow). A source disappearing later does not
 invalidate the independent corpse report. The report stores values, not borrowed
 geometry or actor pointers: outcome, anchor, requested/candidate position, cumulative
 distance, correction count, tested-candidate count, zero-margin fallback flag and

@@ -100,6 +100,9 @@ namespace
         ObjectCreateStruct eye;
         eye.m_Pos = {0, 60, -200};
         auto observer = g.objects.create(g.objects.find_class("BaseClass"), eye);
+        // A stationary target: pings now wake it (objects never block activation), but this test
+        // exercises the attacker.
+        g.server.SetObjectState(t->m_hObject, OBJSTATE_INACTIVE);
         CHECK(observer && a->SetTarget("victim") && a->SetNewState(AI_Mgr::StateAttackClose));
         CHECK(run(g, *a, *t, 900, observer));
         CHECK(a->claw_clips >= 1 && a->last_fire_clip >= 4 && a->last_fire_clip <= 6);
@@ -116,6 +119,9 @@ namespace
         ObjectCreateStruct eye;
         eye.m_Pos = {0, 60, -200};
         auto observer = g.objects.create(g.objects.find_class("BaseClass"), eye);
+        // A stationary target: pings now wake it (objects never block activation), but this test
+        // exercises the attacker.
+        g.server.SetObjectState(t->m_hObject, OBJSTATE_INACTIVE);
         // AttackFar within 0.75 x seeing distance spits (FIRE_STAND[0]) an Acid loogie.
         CHECK(observer && a->SetTarget("victim") && a->SetNewState(AI_Mgr::StateAttackFar));
         CHECK(run(g, *a, *t, 900, observer));

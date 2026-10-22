@@ -295,8 +295,7 @@ namespace OpenBlood2
         DRESULT detach(HATTACHMENT);
         DRESULT find_attachment(HOBJECT, HOBJECT, HATTACHMENT*) const;
         bool refresh_attachment(HOBJECT);
-        // changed (optional) is set when a child transform differs bitwise afterwards.
-        bool refresh_attachments(bool* changed = nullptr);
+        bool refresh_attachments();
         const std::map<HATTACHMENT, Attachment>& attachments() const
         {
             return attachments_;

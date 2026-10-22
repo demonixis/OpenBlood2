@@ -42,8 +42,14 @@ The sanity fallback draws a death clip if the selected clip precedes death[0].
 Visual scale is copied, but collision dimensions remain the raw death-clip
 user dimensions. Y placement subtracts `(oldDims.y - corpseDims.y) - 0.001`.
 This now uses the bounded atomic initial-placement service described above, not
-proven retail SetObjectDims2/collision parity. A failed setup removes the partial child deferred
-and retains the visible source; the unchecked original could hide it anyway.
+proven retail SetObjectDims2/collision parity. When the raw death box cannot fit (a corridor
+narrower than the death clip, or beyond the bounded search), the replacement retries once with
+a contained physical box, min(death, living) per axis at the same feet: it lies inside the
+clear living box, so it fits whenever the anchor was clear; the model, clip and visual scale
+are unchanged (`contained_corpses`, `corpse_fallback` keep the refused fit). A setup that still
+fails removes the partial child deferred, records the failure (`corpse_failures`, death_error,
+spawn report) and, like the original void CreateCorpse, still hides and removes the actor: a
+dead actor never remains a solid, visible blocker. This supersedes the former retained source.
 Spawn reports retain checked child identities and outcomes after source removal.
 
 ## Corpse services and lifetime

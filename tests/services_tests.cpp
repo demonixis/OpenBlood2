@@ -650,18 +650,22 @@ namespace
         p = w.place_body({2, 4, 0}, {1, 1, 1}, {2, 4, 0}, {2.0001f, 1, 1});
         CHECK(p.result == BodyPlacementResult::Blocked && !p.touching_fit);
         p = w.place_body({2, 4, 0}, {1, 1, 1}, {2, 4, 0}, {3, 1, 1});
-        CHECK(p.result == BodyPlacementResult::Blocked && p.corrections <= 16 && p.distance <= 3);
+        // The budget bounds the net offset from the request; the reported distance is the sum.
+        const auto offset = vector_subtract(p.candidate, {2, 4, 0});
+        CHECK(p.result == BodyPlacementResult::Blocked && p.corrections <= 16 &&
+              std::sqrt(vector_dot(offset, offset)) <= 3);
         CHECK(p.candidates <= 145);
-        // Short seat backs admit a wider corpse above them. The shortest X
-        // corrections oscillate; the source-side Y separation resolves both.
+        // Short seat backs admit a wider corpse above them. The X and Y corrections sum past the
+        // budget, but their net (diagonal) offset fits, so the first pass resolves both.
         auto seats = placement_corner(true);
         for (auto& point : seats.points)
             if (point.y == 100)
                 point.y = 2;
         CHECK(w.build(seats, error));
         p = w.place_body({2, 4, 0}, {1, 1, 1}, {2, 1, 0}, {3, 1, 1});
-        CHECK(p.result == BodyPlacementResult::Adjusted && p.touching_fit && p.candidate.y >= 3 &&
-              p.corrections <= 16 && p.distance <= 3 && p.candidates <= 145);
+        const auto seat_offset = vector_subtract(p.candidate, {2, 1, 0});
+        CHECK(p.result == BodyPlacementResult::Adjusted && p.candidate.y >= 3 && p.corrections <= 16 &&
+              std::sqrt(vector_dot(seat_offset, seat_offset)) <= 3 && p.candidates <= 145);
         CHECK(w.sweep(p.candidate, p.candidate, {3, 1, 1}, hit) == CollisionQuery::Miss);
         CHECK(w.sweep(p.anchor, p.candidate, {}, hit) == CollisionQuery::Miss);
         // A living body straddles the end of a narrow doorway. The wider corpse
@@ -676,8 +680,9 @@ namespace
         CHECK(w.build(doorway, error));
         const DVector source_half{3.01f, 4, 3.01f}, death_half{5, 2, 5};
         p = w.place_body({-4, 5, 1}, source_half, {-4, 2, 1}, death_half);
-        CHECK(p.result == BodyPlacementResult::Adjusted && p.source_sweep && p.candidate.z >= 3 && p.distance <= 5 &&
-              p.candidates <= 145);
+        const auto door_offset = vector_subtract(p.candidate, {-4, 2, 1});
+        CHECK(p.result == BodyPlacementResult::Adjusted && p.source_sweep && p.candidate.z >= 3 &&
+              std::sqrt(vector_dot(door_offset, door_offset)) <= 5 && p.candidates <= 145);
         CHECK(w.sweep(p.candidate, p.candidate, death_half, hit) == CollisionQuery::Miss);
         CHECK(w.sweep(p.anchor, p.candidate, {}, hit) == CollisionQuery::Miss);
         CHECK(w.sweep(p.anchor, vector_add(p.anchor, vector_subtract(p.candidate, p.requested)), source_half, hit) ==

@@ -3,6 +3,7 @@
 #include "Corpse.h"
 #include "Gib.h"
 #include "engine/collision.h"
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 
@@ -43,9 +44,11 @@ bool AI_Mgr::MC_Dead()
         ++death_starts; // Deliberately no NPC animation playback or Metacmd increment.
         return true;
     }
-    // Unlike the unchecked source, a failed transfer retains a visible actor.
+    // Original control flow: CreateCorpse is void and the actor is hidden and removed
+    // regardless. A failed transfer stays recorded (death_error, spawn report, counter)
+    // instead of suspending a solid, visible actor that can block the player.
     if (!CreateCorpse())
-        return false;
+        ++corpse_failures;
     s->SetObjectFlags(m_hObject, s->GetObjectFlags(m_hObject) & ~FLAG_VISIBLE);
     m_bRemoveMe = true;
     return true;
@@ -128,9 +131,24 @@ bool AI_Mgr::CreateCorpse()
     // Keep the original cached anchor, raw death dimensions and requested foot
     // position. The replacement engine fits this new nonsolid body locally without
     // changing dimensions, crossing a wall or accepting a penetrating source.
-    if (!configured || s->GetModelAnimation(h) != m_nCorpseType || s->GetModelLooping(h) ||
-        !s->ScaleObject(h, m_vScale) || s->SetObjectDims(h, &dims) != DE_OK ||
-        !s->PlaceNonSolidModel(h, position, state.m_Pos, m_vDims, corpse_placement))
+    bool placed = configured && s->GetModelAnimation(h) == m_nCorpseType && !s->GetModelLooping(h) &&
+                  s->ScaleObject(h, m_vScale) && s->SetObjectDims(h, &dims) == DE_OK &&
+                  s->PlaceNonSolidModel(h, position, state.m_Pos, m_vDims, corpse_placement);
+    if (!placed && configured && corpse_placement.result == BodyPlacementResult::Blocked)
+    {
+        // Replacement fallback: the raw death box cannot fit (corridor narrower than the
+        // death clip, or beyond the bounded search). Clamp the nonsolid corpse's physical
+        // box to the clear living box at the same feet; it is contained in that box, so the
+        // fit is guaranteed whenever the anchor was clear. The model and clip are unchanged.
+        corpse_fallback = corpse_placement;
+        DVector contained{std::min(dims.x, m_vDims.x), std::min(dims.y, m_vDims.y), std::min(dims.z, m_vDims.z)};
+        auto fallback = state.m_Pos;
+        fallback.y -= (m_vDims.y - contained.y) - .001f;
+        placed = s->SetObjectDims(h, &contained) == DE_OK &&
+                 s->PlaceNonSolidModel(h, fallback, state.m_Pos, m_vDims, corpse_placement);
+        contained_corpses += placed;
+    }
+    if (!placed)
     {
         report.position =
             corpse_placement.result == BodyPlacementResult::Unqueried ? position : corpse_placement.candidate;

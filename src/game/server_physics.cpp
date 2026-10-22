@@ -88,7 +88,7 @@ namespace OpenBlood2
             dimensions.z == r->dimensions.z)
             return ResizeResult::Resized;
         if (moving_)
-            return ResizeResult::Invalid;
+            return ResizeResult::InTransaction;
         // Local SetAnimation/ResetDims replacement. Preserve the feet and test
         // the entire requested shape before committing. No partial resize or
         // pushing other objects; a blocked clip keeps its position and clock.

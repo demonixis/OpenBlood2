@@ -1,3 +1,4 @@
+#include "engine/collision.h"
 #include "game/server_adapter.h"
 #include <chrono>
 #include <cmath>
@@ -62,20 +63,12 @@ namespace OpenBlood2
         auto* source = objects_.get(observer);
         if (!source || source->life != Life::Alive || !collision || !collision_ready)
             return false;
+        // Retail PingObjects walks the observer leaf's BSP visibility set: no range or field-of-view
+        // limit, and objects never occlude. Replacement: up to four primary-world segments between
+        // the observer's and the candidate's centres and box tops, the first clear one wins. World
+        // models (doors, props, train brushes) and characters never block activation.
         const auto from = source->state.m_Pos;
-        // Replacement visibility selection: checked center rays using the original
-        // AI glass/volume filter, independent of render/UI. This is not retail PVS.
-        // No callback runs between these rays, so the object filter is prepared once.
-        SegmentBatch batch;
-        prepare_segment_batch(observer, false, SegmentObjects::SolidOnly, SegmentFilter::AIVisibility, batch);
-        struct Active
-        {
-            SegmentBatch*& slot;
-            ~Active()
-            {
-                slot = nullptr;
-            }
-        } active{segment_batch_ = &batch};
+        const DVector from_top{from.x, from.y + source->dimensions.y, from.z};
         std::vector<ObjectId> visible;
         for (auto id : objects_.snapshot())
         {
@@ -83,26 +76,33 @@ namespace OpenBlood2
             if (!r || r->life != Life::Alive || !r->auto_deactivate || r->handle == observer ||
                 (r->activity != OBJSTATE_ACTIVE && r->activity != OBJSTATE_AUTODEACTIVATE_NOW))
                 continue;
-            SegmentHit hit;
-            auto result = IntersectSegment(from, r->state.m_Pos, observer, hit, false, SegmentObjects::SolidOnly,
-                                           SegmentFilter::AIVisibility);
+            const auto to = r->state.m_Pos;
+            const DVector to_top{to.x, to.y + r->dimensions.y, to.z};
             auto& probe = r->activation_probe;
             ++probe.checks;
             probe.time = objects_.time();
             probe.observer = source->id;
             probe.from = from;
-            probe.to = r->state.m_Pos;
-            const auto* blocker = objects_.get(hit.object);
-            probe.hit_object = blocker ? blocker->id : ObjectId{};
-            probe.polygon = hit.polygon;
-            probe.fraction = hit.fraction;
+            probe.to = to;
+            probe.hit_object = {};
             probe.refreshed = false;
-            probe.visibility = result == SegmentResult::Invalid       ? ActivationVisibility::Invalid
-                               : result == SegmentResult::Unavailable ? ActivationVisibility::Unavailable
-                               : result == SegmentResult::Miss || hit.object == r->handle
-                                   ? ActivationVisibility::Visible
-                                   : ActivationVisibility::Blocked;
-            if (result == SegmentResult::Invalid || result == SegmentResult::Unavailable)
+            const auto d = vector_subtract(to, from);
+            auto result = vector_dot(d, d) < 1e-12f ? CollisionQuery::Invalid : CollisionQuery::Hit;
+            CollisionHit first;
+            const std::pair<DVector, DVector> rays[]{{from, to}, {from_top, to}, {from, to_top}, {from_top, to_top}};
+            for (unsigned i = 0; i < 4 && result == CollisionQuery::Hit; ++i)
+            {
+                CollisionHit hit;
+                result = collision->sweep(rays[i].first, rays[i].second, {}, hit);
+                if (!i)
+                    first = hit;
+            }
+            probe.polygon = first.polygon;
+            probe.fraction = first.fraction;
+            probe.visibility = result == CollisionQuery::Invalid ? ActivationVisibility::Invalid
+                               : result == CollisionQuery::Miss  ? ActivationVisibility::Visible
+                                                                 : ActivationVisibility::Blocked;
+            if (result == CollisionQuery::Invalid)
                 return false; // No partial refresh on failed queries.
             if (probe.visibility == ActivationVisibility::Visible)
                 visible.push_back(id);

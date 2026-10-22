@@ -109,7 +109,10 @@ bool AI_Mgr::SetAnimation(DDWORD clip)
         // unavailable services still fail. See AI_ANIMATION_CLEARANCE_CONTRACTS.
         animation_requested_dims = dimensions;
         const auto result = server->ResizeObject(m_hObject, dimensions);
-        animation_blocked = result == ResizeResult::Blocked;
+        // A shape change requested from a contact callback (a touched Trigger's synchronous
+        // SCRIPT/PLAYANIMATION) is refused by the transaction but keeps the actual body, like
+        // an ordinary blocked resize: the original ignores SetObjectDims2's result.
+        animation_blocked = result == ResizeResult::Blocked || result == ResizeResult::InTransaction;
         if (result != ResizeResult::Resized && !animation_blocked)
             return StateFailure("AI animation resize unavailable or invalid");
         if (animation_blocked)

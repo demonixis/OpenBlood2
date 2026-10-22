@@ -113,7 +113,10 @@ namespace OpenBlood2
         Resized,
         Blocked,
         Invalid,
-        Unavailable
+        Unavailable,
+        // A valid shape change refused because a movement transaction (contact callback) owns
+        // the body. The body is unchanged, like Blocked; callers decide whether to continue.
+        InTransaction
     };
     struct PlayerControls
     {

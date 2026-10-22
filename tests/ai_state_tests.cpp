@@ -282,7 +282,7 @@ namespace
         g.objects.get(mover)->dimensions = {1, 1, 1};
         DVector destination{20, before.y, 0};
         CHECK(g.server.MoveObject(mover, &destination) == DE_OK);
-        CHECK(a->touches == 1 && a->unchanged == ResizeResult::Resized && a->changed == ResizeResult::Invalid);
+        CHECK(a->touches == 1 && a->unchanged == ResizeResult::Resized && a->changed == ResizeResult::InTransaction);
         CHECK(r->state.m_Pos.x == before.x && r->state.m_Pos.y == before.y && r->state.m_Pos.z == before.z);
         CHECK(r->dimensions.x == dims.x && r->dimensions.y == dims.y && r->dimensions.z == dims.z);
         // Missing collision and invalid extents still fail, even for a no-op.

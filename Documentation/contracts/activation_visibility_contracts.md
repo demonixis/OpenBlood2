@@ -15,23 +15,24 @@ after each 0.5-second deadline. AI_Update configures a three-second deactivation
 period and initially auto-deactivates; its existing sleep-gap desynchronization
 and pending update deadline remain unchanged.
 
-The port does not decode retail visibility/PVS data. Its existing center-ray
-estimate now uses SegmentFilter::AIVisibility, reusing the original CanSee
-IGNORE_LIQUID | IGNORE_GLASS object filter. This is a documented replacement-engine
-policy, not an assertion that retail PingObjects used these rays or this callback.
-It fixes the authored SubwayA camera-to-Gideon ray through nglass1.
+Retail PingObjects (disassembled from the retail Server.dll: the ServerDE entry calls a
+routine that finds the observer's BSP leaf and walks that leaf's compressed visibility
+bitstream) refreshes every object in a visible node: no range or field-of-view limit, no
+ray, and objects never occlude. The port does not decode the DAT visibility data. Its
+replacement tests up to four primary-world segments between the observer and the
+candidate (centre to centre, observer box top to centre, centre to candidate box top,
+top to top, box top = centre + dimensions.y) and the first clear one makes the candidate
+visible. Only baked primary-world polygons block (glass ones included); world models
+(doors, destructible brushes, train cars), props, characters and volumes never do. This
+replaces the earlier single SolidOnly center ray with CanSee's glass/volume filter,
+which any fence, prop or train brush on the line blocked, so that about half of the NPCs
+a player could see 1000 units away never woke and could be shot without reacting.
 
-Every VolumeBrush descendant is excluded. A CDestructableBrush is excluded only
-when Destructable is true and GetSurfaceType returns SURFTYPE_GLASS. CanDamage and
-FireThrough do not determine transparency. Indestructible glass, wooden FireThrough
-brushes, doors and primary-world glass polygons still block. The filter is based
-on original game properties, not decoded texture alpha or renderer visibility.
-
-Preserve SolidOnly candidate intersection, observer exclusion, actual primary
-world/world-model geometry and object bounds. A miss or hit on the candidate is
-visible. This differs deliberately from CanSee, which requires a target hit and
-can retry a head ray. No range/FOV, extra head ray, proximity activation or forced
-active state is added. Weapon/USE rays keep their existing filters.
+Damage and sound alerts still reach inactive actors (object messages bypass activity,
+as in the retail SendToObject) and still do not wake them, as in the original; the
+retail behaviour only looked different because everything visible was already awake.
+No range/FOV, proximity activation, wake-on-damage or forced active state is added.
+Weapon/USE rays and CanSee keep their existing filters.
 
 ## Atomic refresh and historical diagnostics
 
@@ -57,36 +58,21 @@ and labels absent identities as removed. It shows outcome, committed refresh,
 time, endpoints and hit details without issuing queries or advancing simulation.
 Blocked results and unqueried objects stay visible in inspection.
 
-## Prepared ping batches
+## Ping cost
 
-No callback, creation, removal, flag change or non-attachment motion happens
-between the rays of one PingObjects call. As a replacement cost policy it
-therefore prepares IntersectSegment's ray-independent object selection once per
-ping (flags, observer exclusion and the AIVisibility filter, in snapshot order)
-instead of once per ray. Each prepared record keeps conservative world bounds:
-the box query's center ± dimensions, or the world-model/container shape bounds
-at the object's offset, widened by 1 unit plus 1e-4 of the coordinate magnitude,
-far above every sweep tolerance. A ray outside them would miss and is skipped.
-Attachment children, records with invalid bounds and shapes whose offset ray
-endpoints leave the physics range are always swept, so Invalid refusals stay.
-The attachment refresh still precedes each ray until one refresh changes no
-child transform (bitwise); poses are then a fixed point, and the remaining
-refreshes of that ping are skipped.
-
-Results are identical: the world sweep, nearest-hit and tie rules, probe fields,
-Invalid/Unavailable aborts, atomic commit and one traced IntersectSegment per ray
-are unchanged. The 0.5-second cadence stays; rays are not spread across frames.
-`ai_runtime.ping_private` compares every probe of 40 pings each in SubwayA and
-CityHub (6600 rays) with an unprepared IntersectSegment. The adapter exposes
-`activation_ping_ns`/`activation_ping_calls` and swept/skipped prepared records;
-`--bench` reports the per-frame cost. Measurements are in the
-[hitch report](../implementation/reports/main_thread_hitches.md).
+The 0.5-second cadence stays; queries are not spread across frames. Each candidate costs
+at most four primary-world sweeps and no object scan, which replaces the earlier prepared
+IntersectSegment batch. The adapter exposes `activation_ping_ns`/`activation_ping_calls`;
+`--bench` reports the per-frame cost ([hitch report](../implementation/reports/main_thread_hitches.md)).
+`ai_runtime.ping_private` recomputes the four segments for every probe of 40 pings each
+in SubwayA and CityHub and checks the committed refreshes.
 
 ## Observable acceptance and limits
 
-Synthetic tests exercise destructible/indestructible glass, CanDamage=false,
-wood/door FireThrough, solid diagnostic Water/Ladder volumes, baked glass geometry,
-manual inactivity, invalid-ray batch rollback, unavailable collision and observer/
+Synthetic tests check that solid objects, destructible/indestructible glass,
+wood/door FireThrough and solid diagnostic Water/Ladder volumes never block, that a tall
+baked wall (glass included) blocks and a low one is cleared by the box-top segment, and
+cover manual inactivity, invalid-ray batch rollback, unavailable collision and observer/
 world removal. The ordinary solid ray still hits the same glass object.
 
 Three 13-second actual SubwayA runs retain the authored objects, scripts, cameras,

@@ -9,8 +9,13 @@ M5 after the kill-slowdown fixes; they weigh more on Quest 3 at 72–90 Hz:
   the main thread.
 
 Both changes are replacement-engine policies with identical results. See the
-[activation](../../contracts/activation_visibility_contracts.md#prepared-ping-batches)
+[activation](../../contracts/activation_visibility_contracts.md#ping-cost)
 and [stream](../../contracts/audio_stream_contracts.md) contracts.
+
+Superseded the same day for PingObjects: activation now follows the retail visibility
+set (objects never block), tested with up to four primary-world sweeps per candidate and
+no object scan, so the prepared IntersectSegment batch described below was removed. The
+stream measurements stand.
 
 ## Measurement
 

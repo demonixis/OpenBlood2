@@ -476,6 +476,14 @@ namespace OpenBlood2
         // A blocked search may try other source-side axes with the ordinary
         // touching policy; neither path shrinks the body or skips final checks.
         const double limit = std::min(256.f, std::max({half.x, half.y, half.z}));
+        // Bound the net offset from the requested position, not the summed corrections: a
+        // corner (two perpendicular faces) needs two axis corrections whose sum can exceed the
+        // limit although the diagonal offset is shorter. `distance` still reports the sum.
+        const auto net_displacement = [&](DVector from, DVector normal, double step)
+        {
+            const auto offset = vector_subtract(vector_add(from, vector_scale(normal, float(step))), requested);
+            return std::sqrt(double(vector_dot(offset, offset)));
+        };
         const PlacementAnchor reference{anchor, anchor_half};
         const auto solve = [&](double margin)
         {
@@ -507,7 +515,7 @@ namespace OpenBlood2
                     !physics_vector(contact.normal))
                     return candidate;
                 const auto distance = contact.penetration + margin;
-                if (attempt == 16 || candidate.distance + distance > limit)
+                if (attempt == 16 || net_displacement(candidate.candidate, contact.normal, distance) > limit)
                 {
                     candidate.result = BodyPlacementResult::Blocked;
                     return candidate;
@@ -577,7 +585,8 @@ namespace OpenBlood2
             // choices still require the original body to sweep through the offset.
             unsigned eligible = 0;
             for (unsigned i = 0; i < alternatives.count; ++i)
-                if (candidate.distance + alternatives.values[i].distance <= limit)
+                if (net_displacement(candidate.candidate, alternatives.values[i].normal,
+                                     alternatives.values[i].distance) <= limit)
                     alternatives.values[eligible++] = alternatives.values[i];
             for (unsigned i = std::min(eligible, max_candidates - count); i > 0; --i)
             {

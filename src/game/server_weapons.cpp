@@ -84,82 +84,12 @@ namespace OpenBlood2
                 return true;
             return fire_through && ((door && door->fire_through) || (brush && brush->fire_through));
         }
-        // Replacement broad phase: a segment outside these bounds widened by a margin far
-        // above every sweep tolerance cannot touch the geometry, so skipping it is a miss.
-        bool segment_reaches(DVector from, DVector to, DVector min, DVector max)
-        {
-            double enter = 0, leave = 1;
-            const auto axis = [&](double a, double b, double low, double high)
-            {
-                const double margin = 1 + 1e-4 * std::max(std::abs(low), std::abs(high));
-                low -= margin;
-                high += margin;
-                const double delta = b - a;
-                if (delta == 0)
-                    return a >= low && a <= high;
-                auto first = (low - a) / delta, last = (high - a) / delta;
-                if (first > last)
-                    std::swap(first, last);
-                enter = std::max(enter, first);
-                leave = std::min(leave, last);
-                return enter <= leave;
-            };
-            return axis(from.x, to.x, min.x, max.x) && axis(from.y, to.y, min.y, max.y) &&
-                   axis(from.z, to.z, min.z, max.z);
-        }
     } // namespace
-    void ServerAdapter::prepare_segment_batch(HOBJECT ignore, bool fire_through, SegmentObjects objects,
-                                              SegmentFilter filter, SegmentBatch& batch)
-    {
-        batch = {ignore, fire_through, objects, filter};
-        auto& blockers = batch.blockers;
-        const auto* owner = ignore ? objects_.get(ignore) : nullptr;
-        const auto* projectile = owner ? dynamic_cast<const CProjectile*>(owner->game.get()) : nullptr;
-        // Arguments IntersectSegment refuses as Invalid never reach the filter below.
-        if ((filter == SegmentFilter::IgnoreOwnerClass && !owner) ||
-            (filter == SegmentFilter::ProjectileContact && !projectile))
-            return;
-        for (auto id : objects_.snapshot())
-        {
-            const auto* record = objects_.get(id);
-            if (!record ||
-                segment_excludes(objects_, *record, ignore, owner, projectile, fire_through, objects, filter))
-                continue;
-            SegmentBlocker blocker{id};
-            const auto* shape = record->world_model ? record->world_model.get() : record->container().get();
-            if (record->attachment)
-                blocker.bounded = false; // Attachment poses refresh per query: always swept.
-            else if (!shape || (record->state.m_Flags & FLAG_BOXPHYSICS))
-            {
-                // sweep_box: only finite, nonnegative bounds can produce a Miss rather than Invalid.
-                const auto center = object_bounds_center(*record);
-                const auto half = record->dimensions;
-                blocker.bounded =
-                    physics_vector(center) && physics_vector(half) && half.x >= 0 && half.y >= 0 && half.z >= 0;
-                blocker.min = vector_subtract(center, half);
-                blocker.max = vector_add(center, half);
-            }
-            else
-            {
-                blocker.shape = true;
-                blocker.offset = vector_subtract(record->state.m_Pos, shape->origin);
-                blocker.min = vector_add(shape->min, blocker.offset);
-                blocker.max = vector_add(shape->max, blocker.offset);
-                blocker.bounded =
-                    physics_vector(blocker.offset) && physics_vector(blocker.min) && physics_vector(blocker.max);
-            }
-            blockers.push_back(blocker);
-        }
-    }
     SegmentResult ServerAdapter::IntersectSegment(DVector from, DVector to, HOBJECT ignore, SegmentHit& out,
                                                   bool fire_through, SegmentObjects objects, SegmentFilter filter,
                                                   SegmentStart start)
     {
         trace_service("IntersectSegment");
-        auto* batch = segment_batch_;
-        if (batch && (batch->ignore != ignore || batch->fire_through != fire_through || batch->objects != objects ||
-                      batch->filter != filter))
-            batch = nullptr;
         out = {};
         const auto* owner = ignore ? objects_.get(ignore) : nullptr;
         if ((filter != SegmentFilter::None && filter != SegmentFilter::AIVisibility &&
@@ -178,14 +108,8 @@ namespace OpenBlood2
             return SegmentResult::Invalid;
         if (!collision || !collision_ready)
             return SegmentResult::Unavailable;
-        if (!batch || !batch->attachments_settled)
-        {
-            bool changed = false;
-            if (!objects_.refresh_attachments(batch ? &changed : nullptr))
-                return SegmentResult::Invalid;
-            if (batch && !changed)
-                batch->attachments_settled = true;
-        }
+        if (!objects_.refresh_attachments())
+            return SegmentResult::Invalid;
         CollisionHit nearest;
         const auto world_result = collision->sweep(from, to, {}, nearest);
         if (world_result == CollisionQuery::Invalid)
@@ -210,35 +134,15 @@ namespace OpenBlood2
             }
             return true;
         };
-        if (!batch)
-            for (auto id : objects_.snapshot())
-            {
-                const auto* record = objects_.get(id);
-                if (!record ||
-                    segment_excludes(objects_, *record, ignore, owner, projectile, fire_through, objects, filter))
-                    continue;
-                if (!consider(*record))
-                    return SegmentResult::Invalid;
-            }
-        else
-            for (const auto& blocker : batch->blockers)
-            {
-                // A shape sweep refuses offset endpoints outside physics range; never skip that refusal.
-                if (blocker.bounded &&
-                    (!blocker.shape || (physics_vector(vector_subtract(from, blocker.offset)) &&
-                                        physics_vector(vector_subtract(to, blocker.offset)))) &&
-                    !segment_reaches(from, to, blocker.min, blocker.max))
-                {
-                    ++segment_blockers_skipped;
-                    continue;
-                }
-                const auto* record = objects_.get(blocker.id);
-                if (!record || record->life != Life::Alive)
-                    continue;
-                ++segment_blockers_swept;
-                if (!consider(*record))
-                    return SegmentResult::Invalid;
-            }
+        for (auto id : objects_.snapshot())
+        {
+            const auto* record = objects_.get(id);
+            if (!record ||
+                segment_excludes(objects_, *record, ignore, owner, projectile, fire_through, objects, filter))
+                continue;
+            if (!consider(*record))
+                return SegmentResult::Invalid;
+        }
         if (!found)
             return SegmentResult::Miss;
         out = {nearest.point, nearest.normal, nearest.object, nearest.polygon, nearest.fraction, nearest.texture_flags};

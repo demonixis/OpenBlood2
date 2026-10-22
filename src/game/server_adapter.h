@@ -228,7 +228,6 @@ namespace OpenBlood2
                                        SegmentObjects objects = SegmentObjects::SolidOnly,
                                        SegmentFilter filter = SegmentFilter::None,
                                        SegmentStart start = SegmentStart::IncludeInterior) override;
-        std::uint64_t segment_blockers_swept = 0, segment_blockers_skipped = 0; // Prepared PingObjects records.
         DRESULT WriteImmobilize(HMESSAGEWRITE, float seconds) override;
         bool ReadImmobilize(HMESSAGEREAD, float& seconds) override;
         DRESULT WriteDamage(HMESSAGEWRITE, const Damage&) override;
@@ -449,30 +448,6 @@ namespace OpenBlood2
                                                                     {"GAME_GAMETYPE", {"0"}}};
         void initialize_model_services();
         void initialize_physics_services();
-        // IntersectSegment's ray-independent object selection, prepared once for a batch of
-        // queries with no callback, creation, removal, flag or (non-attachment) motion between
-        // them (PingObjects). Snapshot order is kept; bounds skip only records a ray cannot reach.
-        struct SegmentBlocker
-        {
-            ObjectId id;
-            DVector min{}, max{}, offset{}; // Conservative world bounds; shape offset as sweep_object uses it.
-            bool bounded = false;           // False: always swept (attachment or invalid/unbounded geometry).
-            bool shape = false;             // World-model/container geometry (rays checked after the offset).
-        };
-        struct SegmentBatch
-        {
-            HOBJECT ignore = nullptr; // The IntersectSegment arguments the selection was prepared for.
-            bool fire_through = false;
-            SegmentObjects objects = SegmentObjects::SolidOnly;
-            SegmentFilter filter = SegmentFilter::None;
-            std::vector<SegmentBlocker> blockers;
-            // A successful attachment refresh changed no child transform: the poses are a fixed
-            // point, so the refreshes of the later queries in this batch would change nothing.
-            bool attachments_settled = false;
-        };
-        // Set only while PingObjects casts its rays; IntersectSegment uses it for matching arguments.
-        SegmentBatch* segment_batch_ = nullptr;
-        void prepare_segment_batch(HOBJECT ignore, bool fire_through, SegmentObjects, SegmentFilter, SegmentBatch&);
         CollisionQuery sweep_scene(HOBJECT, DVector, DVector, DVector, CollisionHit&, const std::vector<ObjectId>&,
                                    HOBJECT ignore_extra = nullptr, double allowed_penetration = 0,
                                    StartOverlap start = StartOverlap::Block);

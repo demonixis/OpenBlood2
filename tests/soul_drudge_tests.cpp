@@ -92,6 +92,9 @@ namespace
         eye.m_Pos = {0, 60, -200};
         auto observer = g.objects.create(g.objects.find_class("BaseClass"), eye);
         CHECK(observer);
+        // A stationary target: pings now wake it (objects never block activation), but this test
+        // exercises the attacker.
+        g.server.SetObjectState(victim, OBJSTATE_INACTIVE);
         // It runs in from 300 units, then swings within 75; damage comes from the clip's fire_key.
         for (int i = 0; i < 900 && g.server.IsObjectAlive(victim) && target->m_damage.m_fHitPoints == before; ++i)
         {

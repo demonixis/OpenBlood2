@@ -282,6 +282,7 @@ namespace
             }
             CHECK(encounters == 2);
             std::uint64_t blocks = 0, shots = 0;
+            ObjectId fallback{};
             for (auto id : ids)
             {
                 auto* r = g.objects.get(id);
@@ -293,12 +294,19 @@ namespace
                 CHECK(ai->RuntimeReady());
                 blocks += ai->animation_resize_blocks;
                 shots += ai->fire_shots;
+                if (ai->animation_resize_blocks || !fallback)
+                    fallback = id;
                 if (ai->animation_resize_blocks)
                     previous = id;
             }
+            // Since activation ignores objects (retail visibility sets) the Cultists wake earlier and
+            // this route may no longer block a resize; animation_clearance covers that path, and the
+            // death probe below then uses any Cultist.
+            if (!blocks)
+                previous = fallback;
             std::cout << "SubwayA relocation cycle " << cycle << ": " << blocks << " blocked resizes, " << shots
                       << " original AI shots; no suspended Cultist\n";
-            CHECK(blocks > 0 && shots > 0);
+            CHECK(shots > 0);
             auto* body = g.objects.get(previous);
             auto* victim = body ? dynamic_cast<AI_Mgr*>(body->game.get()) : nullptr;
             CHECK(victim);
@@ -371,9 +379,25 @@ namespace
         auto blocker = object(g, {0, 10, 25});
         CHECK(observer && h && blocker);
         CHECK(g.server.SetDeactivationTime(h, 3));
+        // Retail visibility sets ignore objects: a solid object on the ray does not block.
         g.server.SetObjectState(h, OBJSTATE_AUTODEACTIVATE_NOW);
-        CHECK(g.server.PingObjects(observer) && g.objects.get(h)->activation_pings == 0);
-        CHECK(g.objects.remove(blocker) && g.server.PingObjects(observer) && g.objects.get(h)->activation_pings == 1);
+        CHECK(g.server.PingObjects(observer) && g.objects.get(h)->activation_pings == 1 &&
+              !g.objects.get(h)->activation_probe.hit_object);
+        // Primary-world geometry does, unless one of the centre/box-top segments clears it.
+        std::string error;
+        const auto wall = [&](float top)
+        {
+            auto world = test_brush::box("world", {-20, 0, 22}, {20, top, 28});
+            for (auto& surface : world.surfaces)
+                surface.flags = 1;
+            return g.collision.build(world, error);
+        };
+        g.server.SetObjectState(h, OBJSTATE_AUTODEACTIVATE_NOW);
+        CHECK(wall(40) && g.server.PingObjects(observer) && g.objects.get(h)->activation_pings == 1 &&
+              g.objects.get(h)->activation_probe.visibility == ActivationVisibility::Blocked &&
+              g.objects.get(h)->activation_probe.polygon != UINT32_MAX);
+        CHECK(wall(11) && g.server.PingObjects(observer) && g.objects.get(h)->activation_pings == 2 &&
+              g.objects.get(h)->activation_probe.visibility == ActivationVisibility::Visible);
         auto pings = g.objects.get(h)->activation_pings;
         g.server.collision_ready = false;
         CHECK(!g.server.PingObjects(observer) && g.objects.get(h)->activation_pings == pings);
@@ -412,19 +436,19 @@ namespace
                    r->activation_probe.visibility ==
                        (visible ? ActivationVisibility::Visible : ActivationVisibility::Blocked) &&
                    r->activation_probe.refreshed == visible && r->activation_pings == before + unsigned(visible) &&
-                   r->activity == (visible ? OBJSTATE_ACTIVE : OBJSTATE_AUTODEACTIVATE_NOW);
+                   r->activity == (visible ? OBJSTATE_ACTIVE : OBJSTATE_AUTODEACTIVATE_NOW) &&
+                   !r->activation_probe.hit_object;
         };
-        CHECK(check(true)); // Source CanDamage does not define glass visibility.
+        // No object blocks activation, whatever CanSee's glass/volume filter would say.
+        CHECK(check(true));
         SegmentHit hit;
         CHECK(g.server.IntersectSegment({0, 10, 50}, {0, 10, 0}, observer, hit) == SegmentResult::Hit &&
               hit.object == h);
         glass->destructable = false;
-        CHECK(check(false) && r->activation_probe.hit_object == g.objects.get(h)->id);
+        CHECK(check(true));
         glass->destructable = true;
         glass->surface = SURFTYPE_WOOD;
         glass->fire_through = true;
-        CHECK(check(false)); // FireThrough is a separate weapon rule.
-        glass->surface = SURFTYPE_GLASS;
         CHECK(check(true));
         const auto checks = r->activation_probe.checks;
         g.server.SetObjectState(target, OBJSTATE_INACTIVE);
@@ -436,11 +460,11 @@ namespace
             h = activation_brush(g, type);
             CHECK(h);
             g.server.SetObjectFlags(h, g.server.GetObjectFlags(h) | FLAG_SOLID);
-            CHECK(check(true)); // Excludes every VolumeBrush subclass, even a solid diagnostic volume.
+            CHECK(check(true));
             CHECK(g.objects.remove(h) && g.objects.finish_frame());
         }
         h = activation_brush(g, "Door", {{"FireThrough", true}});
-        CHECK(h && check(false) && r->activation_probe.hit_object == g.objects.get(h)->id);
+        CHECK(h && check(true));
         CHECK(g.objects.remove(h) && g.objects.finish_frame());
         auto wall = test_brush::box("world", {-20, 0, 22}, {20, 40, 28});
         for (auto& surface : wall.surfaces)
@@ -450,7 +474,7 @@ namespace
         }
         std::string error;
         CHECK(g.collision.build(wall, error) && check(false));
-        CHECK(!r->activation_probe.hit_object && r->activation_probe.polygon != UINT32_MAX);
+        CHECK(r->activation_probe.polygon != UINT32_MAX);
         return true; // Object filtering never invents transparent baked world geometry.
     }
     bool visibility_atomic(const char*)
@@ -585,9 +609,11 @@ namespace
         g_hActiveCamera = nullptr;
         a->m_nState = AI_Mgr::StateDying;
         CHECK(a->AI_Update() && a->death_starts == 1 && !a->runtime_failed);
-        // This injected model has no resource filename; transfer must retain a failed visible actor.
-        CHECK(!a->AI_Update() && a->runtime_error.find("Corpse class/model filenames") != std::string::npos &&
-              !a->m_bRemoveMe);
+        // This injected model has no resource filename: the failed transfer is recorded and, as in
+        // the original, the actor is still hidden and removed (never a frozen solid blocker).
+        CHECK(a->AI_Update() && a->death_error.find("Corpse class/model filenames") != std::string::npos &&
+              a->m_bRemoveMe && a->corpse_failures == 1 && !a->runtime_failed &&
+              !(g.server.GetObjectFlags(a->m_hObject) & FLAG_VISIBLE));
         return true;
     }
     bool spatial(const char*)
@@ -931,8 +957,8 @@ namespace
         }
         return true;
     }
-    // The prepared PingObjects batch (filter once, bounds rejection, settled attachment
-    // refresh) records exactly what one IntersectSegment per candidate reports.
+    // Retail activation in real worlds: a candidate refreshes exactly when one of the four
+    // primary-world segments (centres and box tops) is clear; objects never block.
     bool ping_private(const char* root)
     {
         GameSession g;
@@ -942,7 +968,6 @@ namespace
         {
             CHECK(g.request_world(world, e) && g.enter_player(e));
             std::size_t rays = 0, visible = 0, blocked = 0;
-            const auto skipped = g.server.segment_blockers_skipped;
             for (int tick = 0; tick < 1200; ++tick)
             {
                 CHECK(g.step(1.0 / 60));
@@ -959,29 +984,33 @@ namespace
                         eligible.push_back(id);
                 }
                 CHECK(g.server.PingObjects(observer));
-                const auto from = g.objects.get(observer)->state.m_Pos;
+                const auto* source = g.objects.get(observer);
+                const auto from = source->state.m_Pos;
+                const DVector from_top{from.x, from.y + source->dimensions.y, from.z};
                 for (auto id : eligible)
                 {
                     const auto* r = g.objects.get(id);
                     const auto& probe = r->activation_probe;
-                    SegmentHit hit;
-                    const auto result =
-                        g.server.IntersectSegment(from, r->state.m_Pos, observer, hit, false, SegmentObjects::SolidOnly,
-                                                  SegmentFilter::AIVisibility);
-                    CHECK(result == SegmentResult::Hit || result == SegmentResult::Miss);
-                    const bool seen = result == SegmentResult::Miss || hit.object == r->handle;
-                    const auto* blocker = g.objects.get(hit.object);
+                    const auto to = r->state.m_Pos;
+                    const DVector to_top{to.x, to.y + r->dimensions.y, to.z};
+                    bool seen = false;
+                    for (const auto& [a, b] : {std::pair{from, to}, {from_top, to}, {from, to_top}, {from_top, to_top}})
+                    {
+                        CollisionHit hit;
+                        const auto query = g.collision.sweep(a, b, {}, hit);
+                        CHECK(query == CollisionQuery::Hit || query == CollisionQuery::Miss);
+                        if ((seen = query == CollisionQuery::Miss))
+                            break;
+                    }
                     CHECK(probe.visibility == (seen ? ActivationVisibility::Visible : ActivationVisibility::Blocked));
-                    CHECK(probe.refreshed == seen && probe.hit_object == (blocker ? blocker->id : ObjectId{}));
-                    CHECK(probe.polygon == hit.polygon && probe.fraction == hit.fraction &&
-                          probe.time == g.objects.time() && probe.observer == g.objects.get(observer)->id);
+                    CHECK(probe.refreshed == seen && !probe.hit_object && probe.time == g.objects.time() &&
+                          probe.observer == source->id);
                     ++rays;
                     ++(seen ? visible : blocked);
                 }
             }
-            std::cout << world << " rays=" << rays << " visible=" << visible << " blocked=" << blocked
-                      << " skipped=" << g.server.segment_blockers_skipped - skipped << '\n';
-            CHECK(rays > 400 && visible && blocked && g.server.segment_blockers_skipped > skipped);
+            std::cout << world << " candidates=" << rays << " visible=" << visible << " blocked=" << blocked << '\n';
+            CHECK(rays > 400 && visible && blocked);
             CHECK(g.unload_world());
         }
         return true;

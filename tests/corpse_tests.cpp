@@ -149,21 +149,31 @@ namespace
         auto h = a->m_hObject;
         CHECK(a->SetNewState(AI_Mgr::StateDying) && a->DispatchState());
         auto before = g.objects.snapshot().size();
+        // A failed transfer removes its partial child and is recorded; like the original void
+        // CreateCorpse, the actor is still hidden and marked for removal (each case restores it).
+        const auto failed = [&](std::uint64_t count)
+        {
+            const bool removed = a->m_bRemoveMe && !(g.server.GetObjectFlags(h) & FLAG_VISIBLE) &&
+                                 a->corpse_failures == count && a->corpses_created == 0 && !a->death_error.empty();
+            a->m_bRemoveMe = false;
+            g.server.SetObjectFlags(h, g.server.GetObjectFlags(h) | FLAG_VISIBLE);
+            return removed;
+        };
         a->m_vScale = {0, 1, 1};
-        CHECK(!a->DispatchState() && !a->m_bRemoveMe && (g.server.GetObjectFlags(h) & FLAG_VISIBLE));
-        CHECK(g.objects.finish_frame() && g.objects.snapshot().size() == before && a->corpses_created == 0);
+        CHECK(a->DispatchState() && failed(1));
+        CHECK(g.objects.finish_frame() && g.objects.snapshot().size() == before);
         a->m_vScale = {1, 1, 1};
+        // A penetrating anchor fails both the raw fit and the contained retry.
         DVector penetrating{0, 59, 0};
         CHECK(g.server.TeleportObject(h, &penetrating) == DE_OK && a->m_MoveObj.Update());
-        CHECK(!a->DispatchState() && !a->m_bRemoveMe && (g.server.GetObjectFlags(h) & FLAG_VISIBLE));
-        CHECK(g.objects.finish_frame() && g.objects.snapshot().size() == before && a->corpses_created == 0);
-        CHECK(!a->death_error.empty() && !a->last_corpse);
-        CHECK(a->corpse_placement.result == BodyPlacementResult::Blocked && a->corpse_placement.corrections == 0 &&
-              a->corpse_placement.anchor.y == 59);
+        CHECK(a->DispatchState() && failed(2) && !a->last_corpse && a->contained_corpses == 0);
+        CHECK(g.objects.finish_frame() && g.objects.snapshot().size() == before);
+        CHECK(a->corpse_fallback.result == BodyPlacementResult::Blocked && a->corpse_fallback.corrections == 0 &&
+              a->corpse_fallback.anchor.y == 59 && a->corpse_placement.result == BodyPlacementResult::Blocked);
         DVector clear{0, 60, 0};
         CHECK(g.server.TeleportObject(h, &clear) == DE_OK && a->m_MoveObj.Update());
         a->m_nCorpseType = 9999;
-        CHECK(!a->DispatchState() && g.objects.snapshot().size() == before);
+        CHECK(a->DispatchState() && failed(3) && g.objects.snapshot().size() == before);
         a->m_nCorpseType = 0;
         CHECK(a->CreateCorpse() && a->death_slot >= 0 && a->death_slot < 12);
         std::string model = "unchanged", skin = "unchanged";
