@@ -8,6 +8,7 @@ accepted with open GPU reservation **M2-GPU-001**. M3 remains unaccepted.
 | Original-code imports and adaptations | [Provenance](provenance.md) |
 | Crypt / Bridge / Entrance / Lobby | [Contract](../contracts/later_levels_contracts.md) / [source ledger](sources/later_levels_sources.json) |
 | Per-world gaps and implementation batches | [Level gaps](level_gaps.md) |
+| Dreamcast port study (exploratory, no milestone) | [Study](dreamcast_study.md) |
 | OpenXR plan (M8: Quest first, PCVR on Linux last) | [Plan](openxr_plan.md) / [first light](reports/xr_first_light.md) / [stereo world](reports/xr_stereo_world.md) / [controllers](reports/xr_controls.md) / [menus and HUD](reports/xr_menus_hud.md) / [laser and playtest](reports/xr_laser_playtest.md) / [contract](../contracts/xr_runtime_contracts.md) |
 | Save/load audit (original classes, shells, LithTech engine, OpenBlood2 map) | [Audit](save_load_audit/readme.md) / [contract](../contracts/save_load_contracts.md) / [source ledger](sources/save_load_audit_sources.json) |
 | Save/load lot 1 (save-message primitives) | [Report](reports/save_load_messages.md) / [source ledger](sources/save_load_messages_sources.json) |

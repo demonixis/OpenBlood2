@@ -214,3 +214,4 @@ master server and NAT traversal are out of scope.
 | Rendering extras | Baked GI/probes, reflection probes, render scaling and FSR1. |
 | Desktop release | Signed/notarized installers, sustained-play soak tests and measured optimization, continuing from the M3 beta. |
 | Shogo | Reassess after Blood II's campaign and engine contracts are established. |
+| Dreamcast | Exploratory: a native PowerVR2 scene backend in this repository, after the campaign. Memory (16 MB) is the main risk; see the [study](implementation/dreamcast_study.md). |
