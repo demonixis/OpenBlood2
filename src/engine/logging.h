@@ -10,7 +10,7 @@ namespace OpenBlood2
 {
     struct LogSettings
     {
-        std::filesystem::path directory; // Empty selects the SDL user directory / logs.
+        std::filesystem::path directory; // Empty selects user_directory() / logs.
         std::string_view level = "info";
         std::size_t file_bytes = 4 * 1024 * 1024;
         std::size_t completed_sessions = 10;

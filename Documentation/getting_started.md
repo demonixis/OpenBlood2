@@ -86,8 +86,11 @@ These are the defaults. Options > Controls rebinds them (Enter, then the new key
 gamepad control; Esc cancels; Delete or Backspace unassigns); see the
 [input action contracts](contracts/input_action_contracts.md). Gamepads use the console layout,
 and touch screens show on-screen controls with a floating stick on the left.
-Audio/Mouse/Display preferences, `controls.cfg` and saved games (`saves/retail/`) use SDL's
-OpenBlood2/Blood2 user directory.
+Audio/Mouse/Display preferences, `controls.cfg`, saved games (`saves/retail/`) and default
+[logs](logging.md) (`logs/`) use SDL's OpenBlood2/Blood2 user directory
+(`~/Library/Application Support/OpenBlood2/Blood2` on macOS, `%APPDATA%\OpenBlood2\Blood2` on
+Windows, `~/.local/share/OpenBlood2/Blood2` on Linux). A nonempty `BLOOD2_USER_DIR` environment
+variable replaces that directory, for example for a portable or throwaway profile.
 
 ## Platforms
 

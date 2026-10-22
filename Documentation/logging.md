@@ -6,7 +6,8 @@
 
 Every launch prints its `Log session:` directory. Default: SDL's
 `OpenBlood2/Blood2/logs`, normally `~/.local/share/OpenBlood2/Blood2/logs` on Linux
-(or `$XDG_DATA_HOME/OpenBlood2/Blood2/logs`). Keep the whole session plus reproduction steps.
+(or `$XDG_DATA_HOME/OpenBlood2/Blood2/logs`), or `$BLOOD2_USER_DIR/logs` when that variable
+is set ([user directory](getting_started.md#controls)). Keep the whole session plus reproduction steps.
 Levels: `trace`, `debug`, `info` (default), `warn`, `error`.
 
 | File | Meaning |

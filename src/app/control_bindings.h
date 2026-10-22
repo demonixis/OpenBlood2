@@ -2,9 +2,9 @@
 #include "app/input_actions.h"
 #include "engine/atomic_file.h"
 #include "engine/config.h"
+#include "engine/user_directory.h"
 #include "game/menu.h"
 #include "game/original/MenuIds.h"
-#include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL_keyboard.h>
 #include <array>
 #include <charconv>
@@ -215,14 +215,9 @@ namespace OpenBlood2
                                                                      "wheel", "axis+", "axis-"};
     inline bool controls_path(std::filesystem::path& output, std::string& error)
     {
-        auto* path = SDL_GetPrefPath("OpenBlood2", "Blood2");
-        if (!path)
-        {
-            error = SDL_GetError();
+        if (!user_directory(output, error))
             return false;
-        }
-        output = path_from_utf8(path) / "controls.cfg";
-        SDL_free(path);
+        output /= "controls.cfg";
         return true;
     }
     inline bool load_controls(const std::filesystem::path& path, InputBindings& output, std::string& error)

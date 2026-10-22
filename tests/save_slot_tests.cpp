@@ -5,6 +5,7 @@
 #include "game/original/MenuIds.h"
 #include "save_world_fixture.h"
 #include "scratch_dir.h"
+#include <SDL3/SDL_stdinc.h>
 #include <fstream>
 #include <iostream>
 
@@ -103,7 +104,11 @@ namespace
         std::filesystem::path dir;
         std::string error;
         CHECK(save_directory(dir, error) && dir.filename() == "retail" && dir.parent_path().filename() == "saves");
-        CHECK(path_text(dir.parent_path().parent_path()).find("Blood2") != std::string::npos);
+        // CTest gives every test its own BLOOD2_USER_DIR; without one, SDL's OpenBlood2/Blood2.
+        if (const char* user = SDL_getenv("BLOOD2_USER_DIR"); user && *user)
+            CHECK(dir.parent_path().parent_path() == std::filesystem::absolute(path_from_utf8(user)));
+        else
+            CHECK(path_text(dir.parent_path().parent_path()).find("Blood2") != std::string::npos);
         SaveSlots slots(fresh("naming"));
         CHECK(slots.path(3) == slots.directory() / "slot3.ob2sav");
         // ctime + 4: "Mmm dd hh:mm:ss" with a space-padded day.

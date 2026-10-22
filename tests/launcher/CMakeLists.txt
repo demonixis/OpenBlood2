@@ -1,3 +1,5 @@
+blood2_isolate_test_user_directories()
+
 add_executable(launcher_tests launcher_tests.cpp)
 target_link_libraries(launcher_tests PRIVATE blood2_launcher_core)
 blood2_project_options(launcher_tests)

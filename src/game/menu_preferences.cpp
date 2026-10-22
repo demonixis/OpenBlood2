@@ -1,6 +1,6 @@
 #include "game/menu_preferences.h"
 #include "engine/atomic_file.h"
-#include <SDL3/SDL.h>
+#include "engine/user_directory.h"
 #include <algorithm>
 #include <array>
 #include <charconv>
@@ -27,14 +27,9 @@ namespace OpenBlood2
     } // namespace
     bool menu_preferences_path(std::filesystem::path& output, std::string& error)
     {
-        auto* path = SDL_GetPrefPath("OpenBlood2", "Blood2");
-        if (!path)
-        {
-            error = SDL_GetError();
+        if (!user_directory(output, error))
             return false;
-        }
-        output = path_from_utf8(path) / "preferences.cfg";
-        SDL_free(path);
+        output /= "preferences.cfg";
         return true;
     }
     bool load_menu_preferences(const std::filesystem::path& path, MenuSettings& output, std::string& error)

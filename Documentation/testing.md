@@ -19,6 +19,13 @@ ctest --preset dev -L headless
 ctest --preset dev -L gpu
 ```
 
+CTest gives every test its own `BLOOD2_USER_DIR`, `build/dev/tests/user-dirs/<test>/`
+(`tests/launcher/user-dirs/` for launcher tests), so no test reads or writes the real
+preferences, `controls.cfg`, saves or logs in the user directory
+([`blood2_isolate_test_user_directories`](../cmake/ProjectOptions.cmake), called by each test
+directory). These directories persist between runs; delete them for a fresh profile. Running a
+test executable or `blood2` directly uses the real directory unless you set the variable.
+
 GPU checks require a real display; avoid concurrent interactive sessions and
 verify the selected GPU ([Linux selection](getting_started.md#platforms)).
 Captures go under `build/dev/tests/`. Demo checks use label `demo` and require

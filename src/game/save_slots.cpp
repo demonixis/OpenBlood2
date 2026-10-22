@@ -3,6 +3,7 @@
 #include "engine/atomic_file.h"
 #include "engine/config.h"
 #include "engine/save_objects.h"
+#include "engine/user_directory.h"
 #include "game/game_settings.h"
 #include "game/server_adapter.h"
 #include <SDL3/SDL.h>
@@ -100,14 +101,9 @@ namespace OpenBlood2
     }
     bool save_directory(std::filesystem::path& output, std::string& error)
     {
-        auto* path = SDL_GetPrefPath("OpenBlood2", "Blood2");
-        if (!path)
-        {
-            error = SDL_GetError();
+        if (!user_directory(output, error))
             return false;
-        }
-        output = path_from_utf8(path) / "saves" / "retail";
-        SDL_free(path);
+        output = output / "saves" / "retail";
         return true;
     }
     std::string save_timestamp(std::time_t time)

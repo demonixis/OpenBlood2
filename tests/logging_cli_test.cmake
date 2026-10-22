@@ -1,3 +1,6 @@
+if("$ENV{BLOOD2_USER_DIR}" STREQUAL "")
+    message(FATAL_ERROR "CTest must give every test its own BLOOD2_USER_DIR")
+endif()
 file(REMOVE_RECURSE "${ROOT}")
 file(MAKE_DIRECTORY "${ROOT}")
 foreach(case IN ITEMS metadata invalid missing_data)
@@ -68,4 +71,12 @@ execute_process(COMMAND "${APP}" --log-dir "${ROOT}/blocker" --config "${CONFIG}
 if(NOT "${result}" STREQUAL "0" OR NOT "${output}${errors}" MATCHES "File logging unavailable" OR
    NOT "${output}${errors}" MATCHES "Metadata only")
     message(FATAL_ERROR "Console fallback failed: ${result}\n${output}\n${errors}")
+endif()
+# Without --log-dir, logs go to BLOOD2_USER_DIR/logs instead of the SDL user directory.
+execute_process(COMMAND "${CMAKE_COMMAND}" -E env "BLOOD2_USER_DIR=${ROOT}/user é" "${APP}" --help
+    RESULT_VARIABLE result OUTPUT_QUIET ERROR_VARIABLE errors TIMEOUT 10)
+file(GLOB sessions "${ROOT}/user é/logs/session-*")
+list(LENGTH sessions count)
+if(NOT "${result}" STREQUAL "0" OR NOT count EQUAL 1)
+    message(FATAL_ERROR "BLOOD2_USER_DIR must hold the default log root: ${result}\n${errors}")
 endif()

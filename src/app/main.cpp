@@ -1770,7 +1770,7 @@ static int application_main(const OpenBlood2::Options& options)
         std::cout << "Open Blood II " << OpenBlood2::build::version
                   << " (M2 in progress)\n"
                      "  --config FILE       Configuration file (default: blood2.local.ini in working directory)\n"
-                     "  --log-dir DIR       Log root (default: SDL user directory / logs)\n"
+                     "  --log-dir DIR       Log root (default: user directory / logs; BLOOD2_USER_DIR overrides it)\n"
                      "  --log-level LEVEL   trace, debug, info (default), warn or error\n"
                      "  --no-crash-capture  Leave crash handling entirely to the OS/debugger\n"
                      "  --rez ABS_FILE      Add a data-only REZ mod; repeat in load order (max 24)\n"

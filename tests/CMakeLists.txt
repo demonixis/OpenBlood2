@@ -1,3 +1,5 @@
+blood2_isolate_test_user_directories()
+
 add_executable(sdl_properties_tests sdl_properties_tests.cpp)
 target_link_libraries(sdl_properties_tests PRIVATE SDL3::SDL3)
 blood2_project_options(sdl_properties_tests)

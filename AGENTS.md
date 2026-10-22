@@ -177,6 +177,7 @@ evidence bytes and update maintained links when moving documentation.
 - Read [Documentation/contracts/model_and_collision_contracts.md](Documentation/contracts/model_and_collision_contracts.md) before extending animation/physics. The Caleb inspection preview is not CPlayerObj; do not mark full session startup complete on that basis.
 - Keep commercial resources external. Local paths belong in ignored `blood2.local.ini`/`CMakeUserPresets.json` or command-line options.
 - Build/test with the presets in README. GPU tests need a real display and must be explicitly enabled. Report headless, private-data and graphics results separately.
+- Tests never touch the real user directory (preferences, `controls.cfg`, saves, logs): CTest gives each test its own `BLOOD2_USER_DIR` under the build tree. A new test directory calls `blood2_isolate_test_user_directories()`; new per-user files go through `user_directory()`.
 - Test the inspector-free Release build when changing application/platform lifetime or UI integration. Keep inspection data truthful; detected archives are not loaded resources.
 - Record selective imports in `Documentation/implementation/provenance.md`; preserve original reference trees.
 - Keep the original object and aggregate callback chain intact. Never replace `SetNextUpdate` with callback-return timing or destroy an object inside its callback. Run the object contract suite and Clang sanitizers for lifetime/dispatch changes.

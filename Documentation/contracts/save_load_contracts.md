@@ -846,7 +846,8 @@ frame boundary. The original rules are `LoadSave.cpp`, `MenuLoadGame.cpp`, `Menu
 `BloodClientShell.cpp` (`MenuSaveGame`, `MenuLoadGame`, `OnKeyDown`, `OnCommandOn`).
 
 - **Files** (decision 1). `SDL_GetPrefPath("OpenBlood2", "Blood2")/saves/retail/` holds
-  `slot0.ob2sav`–`slot7.ob2sav`, `quick.ob2sav` and `current.ob2sav`.
+  `slot0.ob2sav`–`slot7.ob2sav`, `quick.ob2sav` and `current.ob2sav`. A nonempty
+  `BLOOD2_USER_DIR` replaces that user directory (CTest sets one per test).
   - A slot or quick file is a full save: META (kind slot with its number, or quick), FPRT, CONS,
     CLCK, OBJS, LINK, ATCH and, when a level-entry snapshot exists, that snapshot as AUTO.
   - `current.ob2sav` is the level-entry snapshot itself: a top-level container of kind level

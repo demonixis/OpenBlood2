@@ -14,7 +14,7 @@
 // Slot, Quick and Restart files (save_load_contracts lot 6). Each original Save\SaveN,
 // Save\Quick and Save\Current directory becomes one self-contained container (D1):
 // slot0-slot7, quick and current (the level-entry snapshot Restart reads), all .ob2sav,
-// under SDL_GetPrefPath("OpenBlood2", "Blood2")/saves/retail/ (decision 1). The menu
+// under user_directory()/saves/retail/ (decision 1). The menu
 // reads only the header and META of each file.
 namespace OpenBlood2
 {
@@ -27,7 +27,7 @@ namespace OpenBlood2
     inline constexpr int SLOT_CURRENT = -2, SLOT_QUICK = -1, MAX_SAVESLOTS = 8;
     // "slot0.ob2sav" .. "slot7.ob2sav", "quick.ob2sav", "current.ob2sav"; empty for any other id.
     std::string save_slot_file(int slot);
-    // SDL_GetPrefPath("OpenBlood2", "Blood2")/saves/retail.
+    // user_directory()/saves/retail: SDL_GetPrefPath("OpenBlood2", "Blood2") or BLOOD2_USER_DIR.
     bool save_directory(std::filesystem::path& output, std::string& error);
     // ctime(&t) + 4, 15 characters ("Oct 20 14:05:09"), in local time: the original slot suffix.
     std::string save_timestamp(std::time_t);

@@ -1,6 +1,7 @@
 #include "engine/logging.h"
 #include "build_info.h"
 #include "engine/config.h"
+#include "engine/user_directory.h"
 
 #include <SDL3/SDL.h>
 #include <algorithm>
@@ -260,14 +261,13 @@ namespace OpenBlood2
         auto root = settings.directory;
         if (root.empty())
         {
-            char* pref = SDL_GetPrefPath("OpenBlood2", "Blood2");
-            if (!pref)
+            std::string why;
+            if (!user_directory(root, why))
             {
-                error = "Cannot locate log directory: " + std::string(SDL_GetError());
+                error = "Cannot locate log directory: " + why;
                 return false;
             }
-            root = path_from_utf8(pref) / "logs";
-            SDL_free(pref);
+            root /= "logs";
         }
         std::error_code ec;
         root = fs::absolute(root, ec);
