@@ -36,11 +36,10 @@ perception remains a visible state failure.
 - The model has only idle, talk, taunt (dance/beg/wave), two death and limb clips: no
   recoil or locomotion. The source `GetAnimIndex` leaves such an index invalid, and
   `AI_Mgr::SetAnimation` then keeps the current clip (the engine ignores the out-of-range
-  `SetModelAnimation`). The port keeps its documented AI rule instead: an absent clip is an
-  explicit failure. A nonlethal hit large enough to recoil therefore suspends the scientist
-  visibly (`AI animation model/clip unavailable`), after which it no longer reacts or dies.
-  Adopting the player locomotion's retained-clip rule for AI would lift this; it reverses
-  the explicit missing-clip contracts and is left as a separate decision.
+  `SetModelAnimation`). The later [invalid-ordinal continuation](ai_animation_clearance_contracts.md)
+  ports that no-op: a nonlethal hit large enough to recoil runs MC_Recoil on the retained
+  current clip, and the scientist keeps reacting instead of suspending. This supersedes the
+  earlier explicit missing-clip failure.
 - Without any monster, the original Enemies list falls back to the Cabal list, which holds
   the observer itself. In game the player belongs to both lists; tests without a player
   must create a monster first.

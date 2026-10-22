@@ -138,7 +138,8 @@ namespace
         auto observer = g.objects.create(g.objects.find_class("BaseClass"), eye);
         CHECK(observer);
         // Hits localize on the model despite its two "torso" nodes. madscientist.abc has no
-        // recoil clip: the recoil that follows enough damage is an explicit, visible failure.
+        // recoil clip: the original invalid-ordinal no-op keeps the current clip playing, so the
+        // recoil that follows enough damage runs without suspending the scientist.
         bool localized = false;
         for (int shot = 0; shot < 8 && !a->runtime_failed && !a->m_damage.IsDead(); ++shot)
         {
@@ -155,8 +156,8 @@ namespace
                 CHECK(step(g, 1.0 / 60) && g.server.IsObjectAlive(self));
             }
         }
-        CHECK(localized && a->runtime_failed &&
-              a->runtime_error.find("animation model/clip unavailable") != std::string::npos);
+        CHECK(localized && !a->runtime_failed && a->runtime_error.empty() && a->retained_clip_requests > 0);
+        CHECK(a->dispatched_state == AI_Mgr::StateRecoil && !a->m_damage.IsDead() && g.server.IsObjectAlive(self));
         CHECK(g.unload_world());
         return true;
     }

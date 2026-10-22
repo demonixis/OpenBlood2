@@ -345,7 +345,8 @@ bool ai(const std::filesystem::path& root)
     CHECK(g.server_shell.PostStartWorld() && g.enter_player(error));
     auto* player = g.server_shell.Player(g.local_client);
     // The installed Cultist has no original rifle/autorifle clip. Exercise the
-    // weapon service independently, then verify autonomous use fails explicitly.
+    // weapon service independently, then verify autonomous use keeps the current
+    // clip (original invalid-ordinal no-op) and still fires on the AI cadence.
     CHECK(a->SetTarget(g.server.GetObjectName(player->m_hObject)));
     auto* w = a->m_InventoryMgr.CurrentWeapon();
     CHECK(w && w->data.m_nType == 9);
@@ -358,8 +359,8 @@ bool ai(const std::filesystem::path& root)
         CHECK(g.step(1.0 / 60));
     std::cout << "M16 direct AI fire=" << before << " autonomous additional=" << a->fire_shots - before
               << " error=" << a->runtime_error << '\n';
-    CHECK(a->runtime_failed && a->runtime_error.find("animation model/clip unavailable") != std::string::npos &&
-          a->fire_shots == before);
+    CHECK(!a->runtime_failed && a->runtime_error.empty() && a->retained_clip_requests > 0 &&
+          a->animation_clip_retained && a->fire_shots > before);
     CHECK(g.server.GetAnimIndex(h, "fire_stand_rifle") == UINT32_MAX &&
           g.server.GetAnimIndex(h, "fire_stand_autorifle") == UINT32_MAX);
     CHECK(g.unload_world() && AI_Mgr::m_dwNumCabal == 0 && g.objects.attachments().empty());

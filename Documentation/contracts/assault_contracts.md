@@ -27,11 +27,13 @@ IDs 1, 2, 3 and 9; IDs between them are not implicitly accepted.
 
 The original case-sensitive ASSAULTR prefix and generic AI firing service are
 connected. The installed male Cultist lacks fire_stand_rifle and
-fire_stand_autorifle. Its original animation table cannot supply this action:
-automatic AI_Update reports a missing clip instead of silently substituting pistol
-animation. Direct original AI Fire with the M16 damages a player in a labelled
-arena; that service test does **not** establish autonomous M16 combat or add Fanatic/
-Prophet classes. Current authored CityHub NPC loadouts are unchanged.
+fire_stand_autorifle. Its original animation table cannot supply this action; no
+pistol animation is substituted. Since the [invalid-ordinal continuation](ai_animation_clearance_contracts.md),
+automatic AI_Update keeps the current clip (the original engine ignores the invalid
+index) and fires on the original AI cadence instead of reporting a missing clip.
+Direct original AI Fire with the M16 damages a player in a labelled arena; neither
+check establishes retail-looking M16 combat or adds Fanatic/Prophet classes.
+Current authored CityHub NPC loadouts are unchanged.
 
 ## Original grenade rules
 
