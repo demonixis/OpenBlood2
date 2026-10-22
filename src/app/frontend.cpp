@@ -1,4 +1,5 @@
 #include "app/frontend.h"
+#include "app/cheat_flow.h"
 #include "app/demo_menu_smoke.h"
 #include "app/demo_smoke.h"
 #include "app/gamepad_devices.h"
@@ -235,6 +236,9 @@ namespace OpenBlood2
                 spdlog::warn("{}", saves.slots.unavailable);
             }
             saves.sync(menu);
+            // Options > CHEATS: the LEVEL row's campaign worlds and the persisted god mode.
+            CheatFlow cheat_flow;
+            menu.set_levels(cheat_levels(artwork));
             // The level-entry snapshot after a NEW_GAME or NEW_LEVEL entry (original autosave).
             const auto level_entered = [&](GameSession& session, bool new_game)
             {
@@ -423,6 +427,7 @@ namespace OpenBlood2
 #endif
                 previous = tick;
                 saves.sync(menu);
+                cheat_flow.update(*game, menu);
                 saves.notice.advance(delta);
                 if (menu.active && !canvas->compose(menu, 0, error))
                     return failed(4);
@@ -596,6 +601,21 @@ namespace OpenBlood2
                 auto command = menu.take_command();
                 if (command.action == MenuAction::Quit)
                     break;
+                if (command.action == MenuAction::Cheat)
+                {
+                    const bool applied = cheat_flow.command(*game, menu, command);
+                    spdlog::info("Cheat {} {}: {}", command.cheat, applied ? "applied" : "refused", menu.cheat_status);
+                }
+                if (command.action == MenuAction::Warp)
+                {
+                    // A new game in the chosen world with the current character, at the current
+                    // difficulty (medium before any game).
+                    command.character = game->client_shell.entry_profile.character;
+                    command.difficulty =
+                        game->client_shell.m_bInWorld
+                            ? unsigned(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_DIFFICULTY")))
+                            : unsigned(DIFFICULTY_MEDIUM);
+                }
                 if (command.action == MenuAction::Setup)
                 {
                     std::string why;
@@ -642,16 +662,18 @@ namespace OpenBlood2
                 const auto start_world = [&](const MenuCommand& request)
                 {
                     const bool credits = request.action == MenuAction::Credits;
+                    const char* what = credits                              ? "Credits"
+                                       : request.action == MenuAction::Warp ? "Level warp"
+                                                                            : "New game";
                     const auto start = menu_world_start(*game, request, first_level(config.demo));
-                    spdlog::info("{} requested: world={}; character={}; difficulty={}; type={}",
-                                 credits ? "Credits" : "New game", start.world, int(start.character),
-                                 int(start.difficulty), int(start.game_type));
+                    spdlog::info("{} requested: world={}; character={}; difficulty={}; type={}", what, start.world,
+                                 int(start.character), int(start.difficulty), int(start.game_type));
                     // Execute the owned profile request outside SDL event dispatch.
                     const bool started = start_menu_world(game, start, error);
                     if (!started)
                     {
                         menu.error = error;
-                        spdlog::error("{} failed: {}", credits ? "Credits" : "New game", error);
+                        spdlog::error("{} failed: {}", what, error);
                     }
                     else
                     {
@@ -775,7 +797,8 @@ namespace OpenBlood2
                         spdlog::info("Loading screen waits for a key: {} (load screen ID {})",
                                      loading.screen.info().title, loading.screen.info().load_screen_id);
                 }
-                else if (command.action == MenuAction::NewGame || command.action == MenuAction::Credits)
+                else if (command.action == MenuAction::NewGame || command.action == MenuAction::Credits ||
+                         command.action == MenuAction::Warp)
                 {
                     const auto start = menu_world_start(*game, command, first_level(config.demo));
                     if (!show_loading(LoadingFlow::Request::MenuWorld, start.world ? start.world : "",

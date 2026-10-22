@@ -4,6 +4,8 @@
 
 - [Original menu frontend](menu_contracts.md)
 
+- [Cheats (Options > CHEATS)](cheat_contracts.md)
+
 - [Original loading screen and title splash](loading_screen_contracts.md)
 
 - [Original default crosshair](crosshair_contracts.md)

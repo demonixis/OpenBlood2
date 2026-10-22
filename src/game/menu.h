@@ -18,7 +18,8 @@ namespace OpenBlood2
         Mouse,
         Display,
         Controls,
-        Vr, // Replacement Options > VR page (XR sessions only).
+        Vr,     // Replacement Options > VR page (XR sessions only).
+        Cheats, // Replacement Options > CHEATS page.
         Save,
         Load,
         Quit
@@ -34,7 +35,9 @@ namespace OpenBlood2
         SaveGame,        // Original MenuSaveGame(slot): slot 0..7.
         LoadGame,        // Original MenuLoadGame(slot): SLOT_CURRENT (-2, Restart), SLOT_QUICK (-1) or 0..7.
         RestoreControls, // Replacement Controls row: the owner restores the default bindings.
-        Setup            // Replacement Options row: the owner shows the game data setup screen.
+        Setup,           // Replacement Options row: the owner shows the game data setup screen.
+        Cheat,           // Replacement Cheats row: the owner sends CMSG_CHEAT (MenuCommand::cheat).
+        Warp             // Replacement Cheats row: the owner starts a new game in MenuCommand::world.
     };
     enum class MenuCue
     {
@@ -47,7 +50,9 @@ namespace OpenBlood2
         MenuAction action = MenuAction::None;
         unsigned character = 0, difficulty = 1;
         bool story = true;
-        int slot = 0; // SaveGame/LoadGame only.
+        int slot = 0;      // SaveGame/LoadGame only.
+        int cheat = -1;    // Cheat only: the original CheatCodes value (game_settings.h).
+        std::string world; // Warp only: the world to start.
     };
     // The owner's slot listing (CSavedGameInfo): names as the original menus print them, and
     // whether a row can be activated. Load rows are enabled for readable and unreadable files, so
@@ -94,6 +99,9 @@ namespace OpenBlood2
         // instead of the head.
         int vr_turn = 45;
         bool vr_laser = true, vr_crosshair = true, vr_move_hand = false;
+        // Replacement Cheats rows: the master switch and god mode, which applies to the entered
+        // player only while the switch is on.
+        bool cheats = false, god_mode = false;
         bool operator==(const MenuSettings&) const = default;
     };
     struct MenuItem
@@ -103,10 +111,12 @@ namespace OpenBlood2
         bool enabled = true;
         std::string literal;
         // Setting IDs: sound, volume, music, volume, sensitivity, invert Y, detail, lighting,
-        // renderer, normal maps, VR turn, VR laser, VR crosshair, VR movement reference.
+        // renderer, normal maps, VR turn, VR laser, VR crosshair, VR movement reference, cheats,
+        // god mode, cheat level.
         int setting = -1;
         HudRect rect{}, slider_rect{};
         std::string insertion; // FormatMessage %1!s! argument of the Load page's RESTART/QUICKLOAD strings.
+        int cheat = -1;        // A Cheats action row's CheatCodes value.
     };
     // Typed service adapter for the selected original menu Build/OnCommand code.
     // No original client ABI or hidden dependency on ImGui/SDL input.
@@ -152,6 +162,11 @@ namespace OpenBlood2
         bool active = false, in_world = false, alive = true;
         bool vr = false;           // An XR session: Options offers the replacement VR page.
         bool setup = false;        // The owner offers Options > SETUP (the game data setup screen).
+        // The Cheats page's LEVEL row: the owner's campaign worlds and the displayed one.
+        void set_levels(std::vector<std::string>);
+        std::vector<std::string> levels;
+        int level = 0;
+        std::string cheat_status;  // The last cheat's original message line, shown on the Cheats page.
         bool audio_failed = false; // Nonmodal application-owned audio status.
         MenuPage page = MenuPage::Main, top = MenuPage::Main;
         std::vector<MenuItem> items;
@@ -165,7 +180,8 @@ namespace OpenBlood2
         bool enabled(const MenuItem& item) const
         {
             return item.enabled && !(item.setting == 1 && !settings.sound) && !(item.setting == 3 && !settings.music) &&
-                   !(item.setting == 9 && !settings.renderer);
+                   !(item.setting == 9 && !settings.renderer) &&
+                   !(page == MenuPage::Cheats && item.setting != 14 && !settings.cheats);
         }
         bool small() const;
         const char* title() const;

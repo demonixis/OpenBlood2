@@ -184,6 +184,10 @@ replacement VR page (small font, `options.pcx`, Back returns to Options): `TURN 
 `vr_crosshair`, version 5 `vr_move_hand`; writes produce version 5 and older versions load the
 VR defaults (45, 1, 1, 0).
 
+Options always ends with a replacement `CHEATS` row (after VR and SETUP) opening the
+[Cheats page](cheat_contracts.md) (settings 14-16). `preferences.cfg` version 6 adds `cheats` and
+`god_mode`; writes produce version 6, which supersedes the version 5 statement above.
+
 
 ## Controls (CMenuControls)
 

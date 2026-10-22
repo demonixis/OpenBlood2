@@ -209,6 +209,11 @@ class CPlayerObj : public CBaseCharacter
     bool OnCommandItem(DBYTE);
     bool OnCommandItemCursor(bool next);
     bool OnCommandUseInventory();
+    // Original ProcessCheat (PlayerObj.cpp:3398, CMSG_CHEAT): the branches the Options > CHEATS
+    // rows send, plus the replacement CHEAT_ALLKEYS. False when refused or unported.
+    bool ProcessCheat(DBYTE code, bool state);
+    std::uint64_t cheats_applied = 0, cheats_refused = 0;
+    unsigned cheat_keys_added = 0; // The last CHEAT_ALLKEYS result.
     // Original InventoryMgr::UpdateClient (SMSG_ITEMCHANGED) as a typed value, sent on change.
     bool UpdateInventoryClient(bool force = false);
     std::uint64_t inventory_item_messages = 0;

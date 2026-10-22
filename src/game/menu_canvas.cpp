@@ -1,6 +1,7 @@
 #include "game/menu.h"
 #include "game/original/MenuIds.h"
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 
 namespace OpenBlood2
@@ -218,11 +219,12 @@ namespace OpenBlood2
             y += small_.height + 12;
         }
         // Replacement rows can exceed the bounded list (the demo's 41-pixel font fits six): the
-        // large-font rows then share the list height evenly.
+        // large-font rows then share the list height evenly. The demo's glyph cells carry a
+        // margin, so its nine-row XR Options page (30 pixels per row) stays legible.
         const int rows = int(menu.items.size());
         const int large = int(normal_.height);
         const int step = !menu.small() && rows > 1 && y + rows * large > 425 ? (425 - y - large) / (rows - 1) : large;
-        if (step < large * 3 / 4)
+        if (step < large * 2 / 3)
         {
             error = "Original menu list exceeds bounded canvas";
             return false;
@@ -272,6 +274,19 @@ namespace OpenBlood2
                 label = item.literal = display.vr_crosshair ? "CROSSHAIR [ON]" : "CROSSHAIR [OFF]";
             else if (item.setting == 13)
                 label = item.literal = display.vr_move_hand ? "MOVE [RIGHT HAND]" : "MOVE [HEAD]";
+            else if (item.setting == 14)
+                label = item.literal = display.cheats ? "CHEATS [ON]" : "CHEATS [OFF]";
+            else if (item.setting == 15)
+                label = item.literal = display.god_mode ? "GOD MODE [ON]" : "GOD MODE [OFF]";
+            else if (item.setting == 16)
+            {
+                std::string world = menu.level >= 0 && menu.level < int(menu.levels.size())
+                                        ? menu.levels[std::size_t(menu.level)]
+                                        : std::string("NONE");
+                for (auto& c : world)
+                    c = char(std::toupper(static_cast<unsigned char>(c)));
+                label = item.literal = "LEVEL [" + world + "]";
+            }
             const bool enabled = menu.enabled(item);
             const auto& font = menu.small()              ? small_
                                : !enabled                ? disabled_
@@ -325,6 +340,13 @@ namespace OpenBlood2
         }
         if ((menu.page == MenuPage::Save || menu.page == MenuPage::Load) && !menu.saves.unavailable.empty())
             text(*surface, small_, menu.saves.unavailable, 180, 440);
+        if (menu.page == MenuPage::Cheats)
+            text(*surface, small_,
+                 !menu.cheat_status.empty() ? menu.cheat_status
+                 : menu.settings.cheats && !(menu.in_world && menu.alive)
+                     ? std::string("Grey cheats need a game in progress.")
+                     : std::string{},
+                 180, 440);
         if (menu.demo() &&
             (menu.page == MenuPage::Options || menu.page == MenuPage::Audio || menu.page == MenuPage::Mouse))
             text(*surface, small_, "Grey options are unavailable in OpenBlood2.", 180, 440);

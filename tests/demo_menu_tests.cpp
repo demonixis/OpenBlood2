@@ -106,7 +106,8 @@ namespace
                   request.difficulty == difficulty);
         }
         menu.build(MenuPage::Options);
-        CHECK(menu.items.size() == 6 && !menu.enabled(menu.items[2]) && menu.enabled(menu.items[3]));
+        CHECK(menu.items.size() == 7 && !menu.enabled(menu.items[2]) && menu.enabled(menu.items[3]) &&
+              menu.items[6].literal == "CHEATS" && menu.enabled(menu.items[6]));
         menu.select(1);
         menu.select(1);
         CHECK(menu.selected == 3);
@@ -197,16 +198,20 @@ namespace
         HudFont large;
         const auto& art = menu_resources(MenuEdition::Demo);
         CHECK(fonts.load_font(art.large_bitmaps[0], art.large_font, large, 1) && large.height == 41);
+        // The XR Options page (VR, SETUP and CHEATS rows) shares the list at two thirds of a row.
+        menu.vr = menu.setup = true;
         for (auto page : {MenuPage::Main, MenuPage::Solo, MenuPage::Difficulty, MenuPage::Options, MenuPage::Display,
-                          MenuPage::Audio, MenuPage::Mouse})
+                          MenuPage::Audio, MenuPage::Mouse, MenuPage::Vr, MenuPage::Cheats})
         {
             menu.build(page);
             CHECK(canvas.compose(menu, 0, error));
+            CHECK(page != MenuPage::Options || menu.items.size() == 9);
             for (const auto& item : menu.items)
             {
                 CHECK(item.rect.bottom <= 425 && item.rect.right <= 625);
                 if (!menu.small())
-                    CHECK(item.rect.bottom - item.rect.top == int(large.height));
+                    CHECK(item.rect.bottom - item.rect.top <= int(large.height) &&
+                          item.rect.bottom - item.rect.top >= int(large.height) * 2 / 3);
             }
             auto revision = canvas.revision;
             CHECK(canvas.compose(menu, 0, error) && canvas.revision == revision);
@@ -260,7 +265,7 @@ namespace
         CHECK(!missing_art.initialize(error));
         MenuAudio missing_audio(missing);
         CHECK(!missing_audio.validate_resources(error));
-        std::cout << "Demo menu: all seven pages, three exact promotions, edition isolation, all audio, "
+        std::cout << "Demo menu: all nine pages, three exact promotions, edition isolation, all audio, "
                      "corrupt/missing resources\n";
         return true;
     }

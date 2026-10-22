@@ -1,6 +1,7 @@
 // Selective original menu construction/navigation from ClientShellDLL/Menu*.cpp.
 // See Documentation/implementation/sources/original_menu_sources.json for provenance.
 #include "MenuIds.h"
+#include "game/game_settings.h"
 #include "game/menu.h"
 #include <algorithm>
 #include <array>
@@ -9,9 +10,23 @@ namespace OpenBlood2
 {
     namespace
     {
-        // Replacement commands without original counterparts: the Controls page's last row and
-        // the Options page's VR and SETUP rows.
-        constexpr int MENU_CMD_RESTORE_CONTROLS = -2, MENU_CMD_VR = -3, MENU_CMD_SETUP = -4;
+        // Replacement commands without original counterparts: the Controls page's last row, the
+        // Options page's VR, SETUP and CHEATS rows and the Cheats page's action rows.
+        constexpr int MENU_CMD_RESTORE_CONTROLS = -2, MENU_CMD_VR = -3, MENU_CMD_SETUP = -4, MENU_CMD_CHEATS = -5,
+                      MENU_CMD_CHEAT = -6, MENU_CMD_WARP = -7;
+        // The Cheats page's action rows: the original cheat each sends (CHEAT_ALLKEYS is the
+        // replacement key code) and its label.
+        struct CheatRow
+        {
+            int code;
+            const char* label;
+        };
+        constexpr std::array<CheatRow, 6> cheat_rows{{{CHEAT_KFA, "ALL WEAPONS"},
+                                                      {CHEAT_AMMO, "FULL AMMO"},
+                                                      {CHEAT_HEALTH, "FULL HEALTH"},
+                                                      {CHEAT_GIVEALLINV, "ALL ITEMS"},
+                                                      {CHEAT_ALLKEYS, "ALL KEYS"},
+                                                      {CHEAT_KILLALLAI, "KILL ALL ENEMIES"}}};
         // VR turn steps in the order the row cycles them; 0 turns smoothly.
         constexpr std::array<int, 6> vr_turns{15, 30, 45, 60, 90, 0};
     } // namespace
@@ -116,6 +131,7 @@ namespace OpenBlood2
                     items.push_back({0, MENU_CMD_VR, true, "VR", -1, {}});
                 if (setup)
                     items.push_back({0, MENU_CMD_SETUP, true, "SETUP", -1, {}});
+                items.push_back({0, MENU_CMD_CHEATS, true, "CHEATS", -1, {}});
                 break;
             case MenuPage::Audio:
                 setting(IDS_MENU_AUDIO_SOUND, 0);
@@ -139,6 +155,16 @@ namespace OpenBlood2
                 items.push_back({0, -1, true, {}, 11, {}});
                 items.push_back({0, -1, true, {}, 12, {}});
                 items.push_back({0, -1, true, {}, 13, {}});
+                break;
+            case MenuPage::Cheats:
+                // Replacement rows: the switch, god mode, the original cheats the menu sends, then
+                // the level choice and its warp.
+                items.push_back({0, -1, true, {}, 14, {}});
+                items.push_back({0, -1, true, {}, 15, {}});
+                for (const auto& row : cheat_rows)
+                    items.push_back({0, MENU_CMD_CHEAT, true, row.label, -1, {}, {}, {}, row.code});
+                items.push_back({0, -1, !levels.empty(), {}, 16, {}});
+                items.push_back({0, MENU_CMD_WARP, !levels.empty(), "GO TO LEVEL", -1, {}});
                 break;
             case MenuPage::Mouse:
                 setting(IDS_MENU_MOUSE_SENSITIVITY, 4);
@@ -197,6 +223,7 @@ namespace OpenBlood2
                     item.enabled = false;
                     break;
                 case MENU_CMD_SAVE_GAME_MENU:
+                case MENU_CMD_CHEAT: // Sent to the entered, living player.
                     item.enabled = in_world && alive;
                     break;
                 default:
@@ -240,6 +267,18 @@ namespace OpenBlood2
         build(page);
         if (keep >= 0 && keep < int(items.size()) && enabled(items[keep]))
             selected = keep;
+    }
+    void Menu::set_levels(std::vector<std::string> next)
+    {
+        levels = std::move(next);
+        level = levels.empty() ? 0 : std::clamp(level, 0, int(levels.size()) - 1);
+        if (active && page == MenuPage::Cheats)
+        {
+            const int keep = selected;
+            build(page);
+            if (keep >= 0 && keep < int(items.size()) && enabled(items[keep]))
+                selected = keep;
+        }
     }
     void Menu::set_controls(std::vector<MenuControlRow> next)
     {
@@ -311,6 +350,7 @@ namespace OpenBlood2
             case MenuPage::Display:
             case MenuPage::Controls:
             case MenuPage::Vr:
+            case MenuPage::Cheats:
                 build(MenuPage::Options);
                 break;
             default:
@@ -351,7 +391,8 @@ namespace OpenBlood2
         if (!active || promotion != MenuPromotion::None || selected < 0 || selected >= int(items.size()) ||
             !enabled(items[selected]) || binding >= 0 || pending_.action == MenuAction::NewGame ||
             pending_.action == MenuAction::Credits || pending_.action == MenuAction::Quit ||
-            pending_.action == MenuAction::SaveGame || pending_.action == MenuAction::LoadGame)
+            pending_.action == MenuAction::SaveGame || pending_.action == MenuAction::LoadGame ||
+            pending_.action == MenuAction::Warp)
             return;
         if (items[selected].setting >= 0)
         {
@@ -464,6 +505,21 @@ namespace OpenBlood2
             case MENU_CMD_SETUP:
                 pending_.action = MenuAction::Setup;
                 break;
+            case MENU_CMD_CHEATS:
+                cheat_status.clear();
+                build(MenuPage::Cheats);
+                break;
+            case MENU_CMD_CHEAT:
+                pending_.action = MenuAction::Cheat;
+                pending_.cheat = items[selected].cheat;
+                break;
+            case MENU_CMD_WARP:
+                if (level >= 0 && level < int(levels.size()))
+                {
+                    pending_.action = MenuAction::Warp;
+                    pending_.world = levels[std::size_t(level)];
+                }
+                break;
             default:
                 break;
         }
@@ -530,6 +586,23 @@ namespace OpenBlood2
             case 13:
                 settings.vr_move_hand = !settings.vr_move_hand;
                 break;
+            case 14:
+                settings.cheats = !settings.cheats;
+                break;
+            case 15:
+                settings.god_mode = !settings.god_mode;
+                break;
+            case 16:
+            {
+                // The displayed level is not a preference: only the page changes.
+                const int count = int(levels.size());
+                if (count < 2)
+                    return;
+                level = (std::clamp(level, 0, count - 1) + (direction < 0 ? count - 1 : 1)) % count;
+                cue(MenuCue::Select);
+                ++revision;
+                return;
+            }
             default:
                 return;
         }
@@ -596,8 +669,8 @@ namespace OpenBlood2
     bool Menu::small() const
     {
         return page == MenuPage::Audio || page == MenuPage::Mouse || page == MenuPage::Display ||
-               page == MenuPage::Controls || page == MenuPage::Vr || page == MenuPage::Save || page == MenuPage::Load ||
-               page == MenuPage::Quit;
+               page == MenuPage::Controls || page == MenuPage::Vr || page == MenuPage::Cheats ||
+               page == MenuPage::Save || page == MenuPage::Load || page == MenuPage::Quit;
     }
     const char* Menu::title() const
     {
@@ -609,6 +682,7 @@ namespace OpenBlood2
             case MenuPage::Display:
             case MenuPage::Controls:
             case MenuPage::Vr:
+            case MenuPage::Cheats:
                 return "options.pcx";
             case MenuPage::Solo:
             case MenuPage::Character:

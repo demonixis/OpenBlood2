@@ -35,6 +35,7 @@ class CBloodServerShell
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerDetonate&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerItemCursor&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerUseInventory&);
+    bool OnMessage(HCLIENT, const OpenBlood2::PlayerCheat&);
     void Update(float);
     // Original SaveGame/RestoreGame over the in-memory logical store. The caller owns the
     // frame boundary and the candidate session (GameSession::save_game/load_game).
@@ -118,6 +119,9 @@ class CBloodClientShell
     bool Update();
     bool UpdateMovement(CBloodServerShell&, double, std::string&);
     bool UpdateUse(CBloodServerShell&);
+    // Original CCheatMgr::SendCheatMessage (MessageMgr.cpp:1022): the application's Options >
+    // CHEATS rows send CMSG_CHEAT for the entered player. The server's ProcessCheat result.
+    bool SendCheatMessage(CBloodServerShell&, DBYTE code, bool state);
     bool use_down = false, use_was_down = false, alt_fire_was_down = false;
     // Original OnCommandOn(COMMAND_USE) while dead in GS_PLAYING: single player switches to
     // GS_MENU, pauses and opens the Load menu. The application owns the menu and consumes this.

@@ -1,3 +1,4 @@
+#include "app/cheat_flow.h"
 #include "app/menu_input.h"
 #include "app/menu_renderer.h"
 #include "app/session_playback.h"
@@ -5,6 +6,7 @@
 #include "camera_fixture.h"
 #include "engine/capture.h"
 #include "game/menu_audio.h"
+#include "game/original/AI_Mgr.h"
 #include "game/original/CharacterProfiles.h"
 #include "game/original/MenuIds.h"
 #include "game/server_adapter.h"
@@ -203,11 +205,12 @@ namespace
         CHECK(menu.page == MenuPage::Options);
         menu.set_controls({});
         // XR sessions add the replacement VR page: the turn step cycles 15..90 degrees then smooth,
-        // the aim laser and crosshair toggle. Desktop Options has no VR row.
-        CHECK(menu.items.size() == 6);
+        // the aim laser and crosshair toggle. Desktop Options has no VR row; CHEATS is always last.
+        CHECK(menu.items.size() == 7 && menu.items[6].literal == "CHEATS");
         menu.vr = true;
         menu.build(MenuPage::Options);
-        CHECK(menu.items.size() == 7 && menu.items[6].literal == "VR" && menu.enabled(menu.items[6]));
+        CHECK(menu.items.size() == 8 && menu.items[6].literal == "VR" && menu.enabled(menu.items[6]) &&
+              menu.items[7].literal == "CHEATS");
         menu.selected = 6;
         menu.activate();
         CHECK(menu.page == MenuPage::Vr && menu.small() && menu.items.size() == 4 &&
@@ -238,6 +241,65 @@ namespace
         menu.settings.vr_laser = menu.settings.vr_crosshair = true;
         menu.settings.vr_move_hand = false;
         menu.take_command();
+        // Replacement Options > CHEATS: the switch gates every other row; god mode is a preference;
+        // the action rows need a living player in a world; LEVEL cycles the owner's worlds and GO TO
+        // LEVEL requests a new game there.
+        menu.build(MenuPage::Options);
+        menu.selected = 6;
+        menu.activate();
+        CHECK(menu.page == MenuPage::Cheats && menu.small() && !strcmp(menu.title(), "options.pcx") &&
+              menu.items.size() == 10 && menu.items[0].setting == 14 && menu.items[1].setting == 15 &&
+              menu.items[2].cheat == CHEAT_KFA && menu.items[6].cheat == CHEAT_ALLKEYS &&
+              menu.items[7].cheat == CHEAT_KILLALLAI && menu.items[8].setting == 16 &&
+              menu.items[9].literal == "GO TO LEVEL");
+        for (std::size_t i = 1; i < menu.items.size(); ++i)
+            CHECK(!menu.enabled(menu.items[i]));
+        menu.select(1);
+        CHECK(menu.selected == 0);
+        menu.activate();
+        CHECK(menu.settings.cheats && menu.take_command().action == MenuAction::Settings);
+        CHECK(menu.enabled(menu.items[1]) && !menu.enabled(menu.items[2]) && !menu.enabled(menu.items[8]) &&
+              !menu.enabled(menu.items[9]));
+        menu.set_levels({"01_subwaya", "02_cityhub", "credits"});
+        CHECK(menu.page == MenuPage::Cheats && menu.enabled(menu.items[8]) && menu.enabled(menu.items[9]));
+        menu.selected = 1;
+        menu.activate();
+        CHECK(menu.settings.god_mode && menu.take_command().action == MenuAction::Settings);
+        menu.selected = 8;
+        menu.activate();
+        menu.adjust(-1);
+        menu.adjust(-1);
+        CHECK(menu.level == 2 && menu.take_command().action == MenuAction::None); // Not a preference.
+        menu.adjust(1);
+        CHECK(menu.level == 0);
+        menu.adjust(1);
+        menu.selected = 9;
+        menu.activate();
+        auto warp = menu.take_command();
+        CHECK(warp.action == MenuAction::Warp && warp.world == "02_cityhub");
+        menu.open(true, true);
+        menu.build(MenuPage::Cheats);
+        for (int i = 2; i < 8; ++i)
+            CHECK(menu.enabled(menu.items[i]));
+        menu.selected = 2;
+        menu.activate();
+        auto kfa = menu.take_command();
+        CHECK(kfa.action == MenuAction::Cheat && kfa.cheat == CHEAT_KFA);
+        menu.selected = 6;
+        menu.activate();
+        CHECK(menu.take_command().cheat == CHEAT_ALLKEYS);
+        menu.open(true, false);
+        menu.build(MenuPage::Cheats);
+        CHECK(!menu.enabled(menu.items[2]) && menu.enabled(menu.items[1]));
+        menu.back();
+        CHECK(menu.page == MenuPage::Options);
+        menu.build(MenuPage::Cheats);
+        menu.activate(); // The switch off greys the rows again and keeps god mode stored.
+        CHECK(!menu.settings.cheats && menu.settings.god_mode && !menu.enabled(menu.items[1]));
+        menu.settings.god_mode = false;
+        menu.set_levels({});
+        menu.take_command();
+        menu.open(false);
         auto fit = MenuViewport::fit(1920, 1080);
         float x = 240, y = 0;
         CHECK(fit.point(x, y) && x == 0 && y == 0);
@@ -395,6 +457,136 @@ namespace
         CHECK(game->client_shell.m_bInWorld && game->server.audio.has_output());
         audio.focus(false);
         CHECK(!audio.ambient);
+        return true;
+    }
+    // Options > CHEATS on the retail data: the original ProcessCheat branches through CMSG_CHEAT,
+    // the persisted god mode, ALL KEYS, the level list, the warp and the game-type refusal.
+    bool cheats(const std::filesystem::path& content)
+    {
+        std::string error;
+        Config config;
+        config.data_dir = content;
+        Resources resources;
+        CHECK(resources.mount_game(config, error));
+        Menu menu;
+        CheatFlow flow;
+        menu.set_levels(cheat_levels(resources));
+        CHECK(menu.levels.size() == 36 && menu.levels.front() == "01_subwaya" &&
+              std::find(menu.levels.begin(), menu.levels.end(), "24b_arena") != menu.levels.end() &&
+              std::find(menu.levels.begin(), menu.levels.end(), "credits") != menu.levels.end());
+        auto game = std::make_unique<GameSession>();
+        game->resources = resources;
+        CHECK(game->initialize());
+        CHECK(GameSession::start_new_game(game, "01_SubwayA", 2, 0, error));
+        CHECK(step_app_session(*game, 1. / 60));
+        menu.level = 5;
+        flow.update(*game, menu);
+        CHECK(menu.level == 0);
+        auto* player = game->server_shell.Player(game->local_client);
+        CHECK(player && !player->m_damage.m_bGodMode);
+        // God mode follows GOD MODE only while CHEATS is on, once per change.
+        menu.settings.god_mode = true;
+        flow.update(*game, menu);
+        CHECK(!player->m_damage.m_bGodMode && flow.sent == 0);
+        menu.settings.cheats = true;
+        flow.update(*game, menu);
+        flow.update(*game, menu);
+        CHECK(player->m_damage.m_bGodMode && menu.cheat_status == "You are a GOD." && flow.sent == 1);
+        menu.settings.cheats = false;
+        flow.update(*game, menu);
+        CHECK(!player->m_damage.m_bGodMode && menu.cheat_status == "God mode off. Help!" && flow.sent == 2);
+        // KFA: full ammo (strength column), then the source list into the ten slots; the slots
+        // fill before the minigun, napalm cannon and sniper rifle, as in the original.
+        auto& inventory = player->m_InventoryMgr;
+        MenuCommand request;
+        request.action = MenuAction::Cheat;
+        request.cheat = CHEAT_KFA;
+        CHECK(flow.command(*game, menu, request) && menu.cheat_status == "Monolith Rulez...");
+        for (unsigned slot = 0; slot < 10; ++slot)
+            CHECK(inventory.GetWeapon(slot));
+        for (DBYTE weapon : {WEAP_SHOTGUN, WEAP_ASSAULTRIFLE, WEAP_TESLACANNON, WEAP_DEATHRAY})
+            CHECK(inventory.HasWeapon(weapon));
+        CHECK(!inventory.HasWeapon(WEAP_SNIPERRIFLE));
+        for (DBYTE ammo = AMMO_BULLET; ammo <= AMMO_FOCUS; ++ammo)
+            CHECK(inventory.GetAmmoCount(ammo) == inventory.MaxAmmo(ammo));
+        CHECK(inventory.GetWeapon(10) && inventory.GetAmmoCount(10) == 10 && inventory.GetAmmoCount(12) == 10);
+        inventory.SetAmmoCount(AMMO_SHELL, 1);
+        request.cheat = CHEAT_AMMO;
+        CHECK(flow.command(*game, menu, request) &&
+              inventory.GetAmmoCount(AMMO_SHELL) == inventory.MaxAmmo(AMMO_SHELL));
+        // HEALTH (CDestructable::Reset), GIVEALLINV.
+        player->m_damage.m_fHitPoints = 7;
+        player->m_damage.m_fArmorPoints = 0;
+        request.cheat = CHEAT_HEALTH;
+        CHECK(flow.command(*game, menu, request) && menu.cheat_status == "You have full health.");
+        CHECK(player->m_damage.m_fHitPoints == player->m_damage.m_fMaxHitPoints &&
+              player->m_damage.m_fArmorPoints == player->m_damage.m_fMaxArmorPoints);
+        request.cheat = CHEAT_GIVEALLINV;
+        CHECK(flow.command(*game, menu, request));
+        CHECK(inventory.medkit && inventory.flashlight && inventory.goggles && inventory.eye && inventory.binoculars);
+        // ALL KEYS: the keys this world's pickups still offer, once.
+        const auto key = game->objects.create(game->objects.find_class("KeyPickup"), {}, Creation::World,
+                                              {{"Name", std::string("cheat_key")},
+                                               {"ObjectName", std::string("RedKey")},
+                                               {"UseCount", std::int32_t(1)},
+                                               {"Pos", DVector{0, 0, 0}},
+                                               {"ModelFile", std::string("models/characters/caleb.abc")},
+                                               {"ModelSkin", std::string("skins/characters/caleb1.dtx")}});
+        CHECK(key);
+        request.cheat = CHEAT_ALLKEYS;
+        CHECK(flow.command(*game, menu, request) && player->cheat_keys_added >= 1 &&
+              inventory.QueryKey("RedKey") == InventoryResult::Ok);
+        CHECK(flow.command(*game, menu, request) && player->cheat_keys_added == 1); // Used up, offered again.
+        CHECK(flow.command(*game, menu, request) && player->cheat_keys_added == 0 &&
+              menu.cheat_status == "No other key in this level.");
+        // KILLALLAI: every damageable NPC, active or asleep, receives the original KILL trigger.
+        std::vector<HOBJECT> npcs;
+        for (auto h = game->server.GetNextObject(nullptr); h; h = game->server.GetNextObject(h))
+            npcs.push_back(h);
+        for (auto h = game->server.GetNextInactiveObject(nullptr); h; h = game->server.GetNextInactiveObject(h))
+            npcs.push_back(h);
+        std::erase_if(npcs,
+                      [&](HOBJECT h)
+                      {
+                          const auto* ai = dynamic_cast<AI_Mgr*>(game->server.HandleToObject(h));
+                          return !ai || ai->m_damage.m_bDead || ai->m_damage.m_bGodMode || !ai->m_damage.can_damage;
+                      });
+        CHECK(!npcs.empty());
+        request.cheat = CHEAT_KILLALLAI;
+        CHECK(flow.command(*game, menu, request) && menu.cheat_status == "...Let Tchernobog sort'em out.");
+        for (int i = 0; i < 60; ++i)
+            CHECK(step_app_session(*game, 1. / 60));
+        for (auto h : npcs)
+            if (const auto* ai = dynamic_cast<AI_Mgr*>(game->server.HandleToObject(h)))
+                CHECK(ai->m_damage.m_bDead);
+        std::cout << "Cheats: " << npcs.size() << " NPCs killed; " << player->cheats_applied << " cheats applied\n";
+        // GO TO LEVEL: a new game at the current difficulty; LEVEL follows the world and god mode
+        // returns on the new player while the switch asks for it.
+        menu.settings.cheats = true;
+        request = {};
+        request.action = MenuAction::Warp;
+        request.world = "02_cityhub";
+        request.character = game->client_shell.entry_profile.character;
+        request.difficulty = unsigned(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_DIFFICULTY")));
+        CHECK(request.difficulty == 2);
+        const auto start = menu_world_start(*game, request, "01_SubwayA");
+        CHECK(start.game_type == GAMETYPE_SINGLE && start.difficulty == 2 && !strcmp(start.world, "02_cityhub"));
+        CHECK(start_menu_world(game, start, error) && game->world_path == "worlds/02_cityhub.dat");
+        CHECK(step_app_session(*game, 1. / 60));
+        flow.update(*game, menu);
+        player = game->server_shell.Player(game->local_client);
+        CHECK(menu.levels[std::size_t(menu.level)] == "02_cityhub" && player && player->m_damage.m_bGodMode);
+        // No cheats outside GAMETYPE_SINGLE (IsMultiplayerGame), and a refusal is not repeated.
+        CHECK(GameSession::start_new_game(game, "Credits", DIFFICULTY_MEDIUM, 0, error, false, GAMETYPE_CUSTOM));
+        const auto sent = flow.sent;
+        flow.update(*game, menu);
+        flow.update(*game, menu);
+        CHECK(flow.sent == sent + 1 && menu.cheat_status == "Cheats are unavailable in this game.");
+        request = {};
+        request.action = MenuAction::Cheat;
+        request.cheat = CHEAT_AMMO;
+        CHECK(!flow.command(*game, menu, request) &&
+              game->server_shell.Player(game->local_client)->cheats_refused == 2);
         return true;
     }
     std::span<const std::uint8_t> bytes(std::string_view text)
@@ -814,6 +1006,9 @@ namespace
         }
         menu.controls = control_menu_rows(InputBindings::defaults());
         menu.vr = true; // The XR Options row and VR page fit the original canvas too.
+        menu.setup = true;
+        menu.settings.cheats = true; // The Cheats page with its rows enabled and a level.
+        menu.set_levels({"01_subwaya"});
         for (unsigned page = 0; page <= unsigned(MenuPage::Quit); ++page)
         {
             menu.build(MenuPage(page));
@@ -899,6 +1094,8 @@ int main(int argc, char** argv)
         return credits(path_from_utf8(argv[2])) ? 0 : 1;
     if (mode == "session")
         return session(path_from_utf8(argv[2])) ? 0 : 1;
+    if (mode == "cheats")
+        return cheats(path_from_utf8(argv[2])) ? 0 : 1;
     return artwork(path_from_utf8(argv[2]), mode == "gpu", argc > 3 ? path_from_utf8(argv[3]) : std::filesystem::path{})
                ? 0
                : 1;

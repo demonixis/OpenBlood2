@@ -57,6 +57,9 @@ namespace OpenBlood2
     {
         if (command.action == MenuAction::Credits)
             return {"Credits", DIFFICULTY_MEDIUM, game.client_shell.entry_profile.character, GAMETYPE_CUSTOM};
+        // The replacement Cheats warp: the owner fills the character and difficulty.
+        if (command.action == MenuAction::Warp)
+            return {command.world.c_str(), DBYTE(command.difficulty), DBYTE(command.character), GAMETYPE_SINGLE};
         return {first_level, DBYTE(command.difficulty), DBYTE(command.story ? 0 : command.character),
                 GAMETYPE_SINGLE};
     }

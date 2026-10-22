@@ -2,6 +2,7 @@
 #include "trigger_helpers.h"
 #include "engine/objects.h"
 #include "game/legacy/cpp_engineobjects_de.h"
+#include <vector>
 inline constexpr DDWORD MID_TRIGGER = 1000;
 
 inline void SendTriggerMsgToObject(LPBASECLASS pSender, HOBJECT hObj, DBOOL bRemoveObject, HSTRING hMsg)
@@ -59,4 +60,37 @@ void SendTriggerMsgToObjects(LPBASECLASS pSender, HSTRING hName, HSTRING hMsg)
     }
 
     g_pServerDE->RelinquishList(pList);
+}
+
+void SendTriggerMsgToClass(LPBASECLASS pSender, HCLASS hClass, HSTRING hMsg)
+{
+    if (!g_pServerDE)
+        return;
+
+    DBOOL bRemoveObject = DFALSE;
+
+    char* pMsg = g_pServerDE->GetStringData(hMsg);
+
+    if (!pMsg || !hClass)
+        return;
+
+    // See if it's a remove trigger
+    if (!OpenBlood2::CaseLess{}(pMsg, "REMOVE") && !OpenBlood2::CaseLess{}("REMOVE", pMsg))
+    {
+        bRemoveObject = DTRUE;
+    }
+
+    // The source walks the active, then the inactive objects while sending. Collect them
+    // first: a trigger may create objects (corpses) or remove its receiver during the walk.
+    std::vector<HOBJECT> targets;
+    for (HOBJECT hObj = g_pServerDE->GetNextObject(DNULL); hObj; hObj = g_pServerDE->GetNextObject(hObj))
+        if (g_pServerDE->IsKindOf(g_pServerDE->GetObjectClass(hObj), hClass))
+            targets.push_back(hObj);
+    for (HOBJECT hObj = g_pServerDE->GetNextInactiveObject(DNULL); hObj;
+         hObj = g_pServerDE->GetNextInactiveObject(hObj))
+        if (g_pServerDE->IsKindOf(g_pServerDE->GetObjectClass(hObj), hClass))
+            targets.push_back(hObj);
+    for (HOBJECT hObj : targets)
+        if (g_pServerDE->IsObjectAlive(hObj))
+            SendTriggerMsgToObject(pSender, hObj, bRemoveObject, hMsg);
 }

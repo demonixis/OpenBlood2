@@ -2776,6 +2776,8 @@ endif()
 if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME menus.session COMMAND menu_tests session "${BLOOD2_TEST_DATA_DIR}")
     set_tests_properties(menus.session PROPERTIES LABELS "headless;private;menus" TIMEOUT 180 ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+    add_test(NAME menus.cheats COMMAND menu_tests cheats "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(menus.cheats PROPERTIES LABELS "headless;private;menus" TIMEOUT 180 ENVIRONMENT "SDL_AUDIODRIVER=dummy")
 endif()
 
 if(BLOOD2_TEST_DATA_DIR)

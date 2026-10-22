@@ -34,9 +34,9 @@ int test_menu_preferences(int argc, char** argv)
         // The shared atomic writer keeps the exact preference bytes.
         std::ifstream in(path, std::ios::binary);
         const std::string bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        CHECK(bytes == "version=5\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
+        CHECK(bytes == "version=6\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
                        "invert_y=1\ndetail=2\npixel_lighting=0\nrenderer=0\nquality=0\nnormal_maps=1\n"
-                       "vr_turn=45\nvr_laser=1\nvr_crosshair=1\nvr_move_hand=0\n");
+                       "vr_turn=45\nvr_laser=1\nvr_crosshair=1\nvr_move_hand=0\ncheats=0\ngod_mode=0\n");
     }
     settings.sound = true;
     CHECK(save_menu_preferences(path, settings, error));
@@ -83,7 +83,7 @@ int test_menu_preferences(int argc, char** argv)
                   "vr_crosshair=1\n";
         }
         CHECK(load_menu_preferences(path, loaded, error) && loaded.vr_turn == 30 && !loaded.vr_laser &&
-              !loaded.vr_move_hand);
+              !loaded.vr_move_hand && !loaded.cheats && !loaded.god_mode);
         vr.vr_turn = 20;
         CHECK(!save_menu_preferences(path, vr, error) && !error.empty());
         std::ofstream out(path);
@@ -92,6 +92,38 @@ int test_menu_preferences(int argc, char** argv)
                "vr_crosshair=1\n";
     }
     CHECK(!load_menu_preferences(path, loaded, error) && !error.empty());
+    {
+        // Version 6 adds the cheat switch and god mode; version 5 files load them off, and both are
+        // flags.
+        MenuSettings cheats;
+        cheats.cheats = cheats.god_mode = true;
+        CHECK(save_menu_preferences(path, cheats, error));
+        CHECK(load_menu_preferences(path, loaded, error) && loaded == cheats);
+        const std::string v5 = "version=5\nsound=1\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
+                               "invert_y=1\ndetail=1\npixel_lighting=0\nrenderer=1\nquality=1\nnormal_maps=0\n"
+                               "vr_turn=30\nvr_laser=0\nvr_crosshair=1\nvr_move_hand=1\n";
+        {
+            std::ofstream out(path);
+            out << v5;
+        }
+        CHECK(load_menu_preferences(path, loaded, error) && loaded.vr_move_hand && !loaded.cheats && !loaded.god_mode);
+        std::string v6 = v5;
+        v6[8] = '6';
+        // Version 5 with the new keys, an out-of-range flag, a missing key.
+        for (const auto& text : {v5 + "cheats=1\ngod_mode=0\n", v6 + "cheats=2\ngod_mode=0\n", v6 + "cheats=1\n"})
+        {
+            {
+                std::ofstream out(path);
+                out << text;
+            }
+            CHECK(!load_menu_preferences(path, loaded, error) && !error.empty());
+        }
+        {
+            std::ofstream out(path);
+            out << v6 << "cheats=1\ngod_mode=1\n";
+        }
+        CHECK(load_menu_preferences(path, loaded, error) && loaded.cheats && loaded.god_mode);
+    }
     for (const auto text : {"renderer=2\nquality=0\nnormal_maps=0\n", "renderer=0\nquality=0\nnormal_maps=2\n",
                             "renderer=0\nquality=0\n"})
     {

@@ -153,6 +153,25 @@ InventoryResult CInventoryMgr::AddAmmo(DBYTE type, float amount)
     ++revision;
     return InventoryResult::Ok;
 }
+void CInventoryMgr::SetFullAmmo()
+{
+    // The table columns of MaxAmmo: strength for AMMO_BULLET..AMMO_BATTERY, magic for AMMO_FOCUS.
+    for (DBYTE i = AMMO_BULLET; i <= AMMO_FOCUS; ++i)
+        m_fAmmo[i] = MaxAmmo(i);
+    ++revision;
+    // Add bombs (not in _DEMO). The source also calls AddItem for each type; this port's bomb
+    // items are the reserved slots AddInventoryWeapon fills, so there is no separate item list.
+    if (!IsDemoBuild())
+        for (DBYTE type = 7; type <= 9; ++type)
+            AddInventoryWeapon(type, 100);
+}
+bool CInventoryMgr::HasWeapon(DBYTE type) const
+{
+    for (const auto& weapon : m_Weapons)
+        if (weapon && weapon->data.m_nType == type)
+            return true;
+    return false;
+}
 InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
 {
     const auto* definition = weapon_definition(type);

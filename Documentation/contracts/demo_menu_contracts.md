@@ -65,7 +65,7 @@ equal glyph dimensions. See the [retake evidence](../implementation/reports/demo
 | Single Player | Caleb and Chosen only | Source `_DEMO` omits load/save/custom rows entirely |
 | Caleb | Genocide/Homicide/Suicide; normal initially selected | Existing transactional Caleb new-game request |
 | Chosen | `screens/modes.pcx` | Promotion, not playable character selection |
-| Options | Display, Audio, Controls, Mouse, Joystick, Keyboard | Controls/Joystick/Keyboard unavailable in OpenBlood2, visibly grey |
+| Options | Display, Audio, Controls, Mouse, Joystick, Keyboard, then the replacement VR (XR sessions), SETUP and CHEATS rows | Controls/Joystick/Keyboard unavailable in OpenBlood2, visibly grey; with more than six rows the 41-pixel rows share the list, down to two thirds of a row (nine rows in XR) |
 | Display | Existing detail and lighting controls | SDL renderer/resolution pages unimplemented; lighting is a reconstruction option |
 | Audio | Sound, volume, music, volume | Historical 16-bit output choice grey/unavailable |
 | Mouse | Sensitivity, Input [Normal], Invert Y-Axis | Three Build 108 rows; input-rate control grey/unavailable |

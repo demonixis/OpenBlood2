@@ -81,6 +81,9 @@ class CInventoryMgr : public Aggregate
     }
     InventoryResult AddAmmo(DBYTE, float);
     float MaxAmmo(DBYTE) const;
+    // Original SetFullAmmo (InventoryMgr.cpp:1276) and HasWeapon (InventoryMgr.cpp:1197).
+    void SetFullAmmo();
+    bool HasWeapon(DBYTE type) const;
     void SetStrength(DBYTE);
     void SetMagic(DBYTE);
     void ClearWeapons();

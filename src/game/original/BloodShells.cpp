@@ -833,6 +833,15 @@ bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerUseInv
     auto* owner = Player(client);
     return owner && owner->OnCommandUseInventory();
 }
+bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerCheat& cheat)
+{
+    auto* owner = Player(client);
+    return owner && owner->ProcessCheat(cheat.code, cheat.state);
+}
+bool CBloodClientShell::SendCheatMessage(CBloodServerShell& server, DBYTE code, bool state)
+{
+    return m_bInWorld && server.OnMessage(client_, OpenBlood2::PlayerCheat{code, state});
+}
 bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerDetonate&)
 {
     auto* owner = Player(client);

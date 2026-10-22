@@ -48,6 +48,12 @@ namespace OpenBlood2
     struct PlayerUseInventory
     {
     };
+    // Original CMSG_CHEAT (client to server): the CheatCodes byte and the toggle state.
+    struct PlayerCheat
+    {
+        DBYTE code = 0;
+        bool state = true;
+    };
     // One SMSG_ITEMCHANGED item: original picture names (interface/statusbar/items/),
     // the cres.dll name resource (0 for keys) or a key's authored display name, and
     // GetItemCharges.

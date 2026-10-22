@@ -186,7 +186,7 @@ M2 remains in progress. The [M2 input/target ledger](sources/m2_sources.json) an
 | --- | --- |
 | `ObjectDLL/GameStartPoint.{h,cpp}` | Whole original class. Replace registration with typed defaults; replace `_mbscpy` with bounded copying; include only the selected trigger helper declaration. Original property/name/trigger/lifetime logic retained. |
 | `ObjectDLL/pathpoint.{h,cpp}` | Whole original class, normalized include/file casing. Remove unused PathListData dependency; replace multibyte comparisons/copies with ASCII comparison and bounded copies; const string literals; initialize otherwise uninitialized inspector-visible fields; omit unused parameter name. Original scheduling, SMELL expiration, properties, model requests and dimensions retained. |
-| `ObjectDLL/Trigger.cpp` | Only `SendTriggerMsgToObject` and `SendTriggerMsgToObjects`, retaining list/message/removal flow. Replace `_mbsicmp` with ASCII case comparison; use original `MID_TRIGGER=1000`; no full Trigger class imported. |
+| `ObjectDLL/Trigger.cpp` | Only `SendTriggerMsgToObject` and `SendTriggerMsgToObjects`, retaining list/message/removal flow. Replace `_mbsicmp` with ASCII case comparison; use original `MID_TRIGGER=1000`; no full Trigger class imported. `SendTriggerMsgToClass` was added later for the cheats (see the 2026-10-22 cheats entry). |
 | `ClientShellDLL/BloodClientShell.cpp::StartNewWorld`, `ObjectDLL/BloodServerShell.cpp::LoadWorld`; `Shared/SharedDefs.h` | Selected CMSG_LOADWORLD command/read sequence adapted to a bounded owned local transport. This is an excerpt port, not complete shell integration or binary/network compatibility. The original UI/audio/save/restore/player paths remain absent; `run_world` returns failure. Unsafe filename handling is replaced by normalized resource lookup. |
 | `ObjectDLL/B2BaseClass.cpp` registration; `AppHeaders/engineobjects.c` | Add original `GameSettings` editor group marker to accepted properties; use exact `CF_NORUNTIME` classification for preprocessor lights/OutsideDef. No speculative runtime Light objects. |
 | `AppHeaders/server_de.h`, `basedefs_de.h`, `cpp_engineobjects_de.h` | Typed `GetNextObject`, `SetObjectDims`, `SetObjectUserFlags` subset and initialization macros; original StartPoint base was already retained by M1. Dimensions are storage, not an implemented collision solver. |
@@ -2018,3 +2018,15 @@ and curl 8.20.0 on Linux/Windows only, in `cmake/ContentDependencies.cmake`; Ope
 Linux system dependency of libcurl, Windows uses Schannel. Droid Sans is embedded unchanged from
 the ImGui pin (Apache 2.0, `licenses/`). No original code is imported. See the
 [contracts](../contracts/setup_screen_contracts.md).
+
+## Options > CHEATS (2026-10-22)
+
+`game/original/PlayerCheats.cpp` ports the `CHEAT_GOD`, `CHEAT_KFA`, `CHEAT_AMMO`,
+`CHEAT_HEALTH`, `CHEAT_KILLALLAI` and `CHEAT_GIVEALLINV` branches of `ObjectDLL/PlayerObj.cpp`
+`CPlayerObj::ProcessCheat` (the dead-player revival of `CHEAT_HEALTH` is refused, not ported);
+`CInventoryMgr::SetFullAmmo` and `HasWeapon` come from `ObjectDLL/InventoryMgr.cpp` (the bomb
+`AddItem` call has no counterpart), `SendTriggerMsgToClass` from `ObjectDLL/Trigger.cpp` (targets
+collected before sending), the `CheatCodes` enum from `Shared/SharedDefs.h` (without `_ADD_ON`), and
+the message lines of `app/cheat_flow.h` from `ClientShellDLL/MessageMgr.cpp` `CCheatMgr::Process`.
+The menu page, `CHEAT_ALLKEYS`, the level list and warp are replacement code; the typed
+`CCheatMgr::Check` codes are not imported. See the [contracts](../contracts/cheat_contracts.md).
