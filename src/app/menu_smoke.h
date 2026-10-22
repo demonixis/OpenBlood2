@@ -68,8 +68,15 @@ namespace OpenBlood2
                 event.window.data1 = int(device);
                 SDL_PushEvent(&event);
             }
-            if (frame == 4 && (!game.client_shell.m_bInWorld || menu.active || game.world_revision != 1))
-                return fail("new game request");
+            // The loading screen is presented before the load, then waits for a key (SubwayA's
+            // load screen ID pauses into GS_WAITING).
+            if (frame == 4 && (!input.loading_screen || input.loading_wait || game.client_shell.m_bInWorld))
+                return fail("loading screen before the new game");
+            if (frame == 5 && (!game.client_shell.m_bInWorld || menu.active || game.world_revision != 1 ||
+                               !input.loading_wait || !game.server.audio.paused()))
+                return fail("new game request and waiting screen");
+            if (frame == 6 && input.loading_screen)
+                return fail("waiting screen continue");
             if (frame == 11)
             {
                 if (!menu.active || !game.server.audio.paused())
@@ -139,6 +146,9 @@ namespace OpenBlood2
                     key(SDL_SCANCODE_RETURN);
                     key(SDL_SCANCODE_RETURN, true);
                     key(SDL_SCANCODE_RETURN);
+                    break;
+                case 5:
+                    key(SDL_SCANCODE_SPACE);
                     break;
                 case 10:
                     key(SDL_SCANCODE_ESCAPE);

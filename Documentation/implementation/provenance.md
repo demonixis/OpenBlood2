@@ -1993,3 +1993,14 @@ already the port's behavior. See the
 [contract](../contracts/save_load_contracts.md#certified-whole-worlds-lot-14), the
 [evidence](reports/save_load_certification.md) and the
 [source ledger](sources/save_load_certification_sources.json).
+
+## Loading screen and title splash (2026-10-22)
+
+`game/original/LoadingScreen.{h,cpp}` selectively ports `ClientShellDLL/BloodClientShell.cpp`
+`GetWorldTitle` and `DrawLoadingScreen` with `ClientShellDLL/LoadScreenData.cpp`
+(`g_LoadScreenData`, `g_LoadScreenMessages`); `app/loading_flow.h` and `app/frontend.cpp` follow
+the same file's `StartNewWorld`, `PreLoadWorld`, `PostUpdate`, `InitSinglePlayer` and `OnKeyDown`
+(`GS_WAITING`) branches, and `Splash.cpp` `Splash_Display` with `WinUtil.cpp` `TimedKeyWait` for
+the startup title. CoolFont `DrawFormat`/`DrawSolid` are replacement adapters (its source is
+unavailable). Strings and images are read from the installed data. See the
+[contracts](../contracts/loading_screen_contracts.md).

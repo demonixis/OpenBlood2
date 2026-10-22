@@ -3,6 +3,7 @@
 #include "app/demo_smoke.h"
 #include "app/gamepad_devices.h"
 #include "app/hud.h"
+#include "app/loading_flow.h"
 #include "app/menu_input.h"
 #include "app/menu_renderer.h"
 #include "app/menu_smoke.h"
@@ -116,7 +117,7 @@ namespace OpenBlood2
         };
         std::unique_ptr<MenuCanvas> canvas;
         std::unique_ptr<MenuAudio> menu_audio;
-        MenuRenderer menu_renderer(runtime.gpu);
+        MenuRenderer menu_renderer(runtime.gpu), title_renderer(runtime.gpu), loading_renderer(runtime.gpu);
         HudCanvas end_canvas(artwork);
         const HudSurface* end_screen = nullptr;
         if (menu_enabled)
@@ -188,6 +189,28 @@ namespace OpenBlood2
             input.controls.focused = true; // Session focus replaces window focus.
 #endif
         input.reset(menu, game->client_shell.m_bInWorld);
+        // The original loading screen (StartNewWorld) on normal menu launches; the menu-free demo,
+        // direct entry and inspector levels keep their immediate loads.
+        LoadingFlow loading(artwork);
+        // Original startup: title.pcx stretched to the screen for six seconds, or until Esc, Return
+        // or Space (no movies are played yet). Direct entry (runworld) and smokes skip it.
+        HudSurface title;
+        double title_remaining = 0;
+        if (menu_enabled && !options.view_world && !options.menu_smoke)
+        {
+            HudCanvas splash(artwork);
+            if (const auto* image = splash.CreateSurfaceFromBitmap("screens/title.pcx"))
+            {
+                title = {LoadingScreen::width, LoadingScreen::height,
+                         std::vector<std::uint8_t>(std::size_t(LoadingScreen::width) * LoadingScreen::height * 4)};
+                hud_scale(title, *image);
+                title_remaining = 6;
+                input.title_screen = true;
+                input.reset(menu, false);
+            }
+            else
+                spdlog::warn("Title screen: {}", splash.error);
+        }
         ObjectSelection selection;
         ScenePresenter presenter(runtime.gpu);
         presenter.model_shadows = options.model_shadows;
@@ -363,6 +386,19 @@ namespace OpenBlood2
 #endif
             if (done || input.demo.quit)
                 break;
+            if (input.title_screen && (title_remaining -= delta) <= 0)
+            {
+                input.title_screen = false;
+                input.reset(menu, false);
+            }
+            if (std::exchange(input.loading_continue, false) && loading.waiting)
+            {
+                // OnKeyDown in GS_WAITING: GS_PLAYING and PauseGame(FALSE).
+                loading.finish();
+                input.loading_screen = input.loading_wait = false;
+                input.reset(menu, game->client_shell.m_bInWorld);
+                previous = SDL_GetTicksNS();
+            }
             {
                 auto& credits = game->client_shell.m_Credits;
                 for (const int key : std::exchange(input.credit_keys, {}))
@@ -431,15 +467,17 @@ namespace OpenBlood2
                 }
                 previous = SDL_GetTicksNS();
             }
-            else if (command.action == MenuAction::NewGame || command.action == MenuAction::Credits)
+            // The world requests below load immediately, or after one presented loading screen.
+            const auto start_world = [&](const MenuCommand& request)
             {
-                const bool credits = command.action == MenuAction::Credits;
-                const auto start = menu_world_start(*game, command, first_level(config.demo));
+                const bool credits = request.action == MenuAction::Credits;
+                const auto start = menu_world_start(*game, request, first_level(config.demo));
                 spdlog::info("{} requested: world={}; character={}; difficulty={}; type={}",
                              credits ? "Credits" : "New game", start.world, int(start.character), int(start.difficulty),
                              int(start.game_type));
                 // Execute the owned profile request outside SDL event dispatch.
-                if (!start_menu_world(game, start, error))
+                const bool started = start_menu_world(game, start, error);
+                if (!started)
                 {
                     menu.error = error;
                     spdlog::error("{} failed: {}", credits ? "Credits" : "New game", error);
@@ -458,31 +496,33 @@ namespace OpenBlood2
                     input.reset(menu, true);
                 }
                 previous = SDL_GetTicksNS();
-            }
+                return started;
+            };
+            // Save/Load rows, F5 and F6: owned requests consumed here, at the frame boundary.
+            const auto loaded = [&](const char* what)
             {
-                // Save/Load rows, F5 and F6: owned requests consumed here, at the frame boundary.
-                const auto loaded = [&](const char* what)
-                {
-                    spdlog::info("{} loaded: {} ({} records)", what, game->world_path, game->game_load.records);
-                    menu.error.clear();
-                    reset_after_promotion(menu, input, selection, controlled, game->client_shell);
+                spdlog::info("{} loaded: {} ({} records)", what, game->world_path, game->game_load.records);
+                menu.error.clear();
+                reset_after_promotion(menu, input, selection, controlled, game->client_shell);
 #if BLOOD2_INSPECTOR
-                    inspector.forget_world();
+                inspector.forget_world();
 #endif
-                    previous = SDL_GetTicksNS();
-                };
-                const auto refused = [&](const char* what)
+                previous = SDL_GetTicksNS();
+            };
+            const auto refused = [&](const char* what)
+            {
+                spdlog::warn("{} refused: {}", what, error);
+                if (!menu.active) // Pause under the modal, as the menu does.
                 {
-                    spdlog::warn("{} refused: {}", what, error);
-                    if (!menu.active) // Pause under the modal, as the menu does.
-                    {
-                        auto* owner = game->server_shell.Player(game->local_client);
-                        menu.open(game->client_shell.m_bInWorld, owner && !owner->m_damage.IsDead());
-                        input.reset(menu, game->client_shell.m_bInWorld);
-                    }
-                    menu.error = error;
-                };
-                const auto outcome = saves.command(command, game, menu, error);
+                    auto* owner = game->server_shell.Player(game->local_client);
+                    menu.open(game->client_shell.m_bInWorld, owner && !owner->m_damage.IsDead());
+                    input.reset(menu, game->client_shell.m_bInWorld);
+                }
+                menu.error = error;
+            };
+            const auto load_slot = [&](const MenuCommand& request)
+            {
+                const auto outcome = saves.command(request, game, menu, error);
                 if (outcome == SaveFlow::Outcome::Saved)
                 {
                     spdlog::info("Saved game: {}", saves.slots.report.last_action);
@@ -491,23 +531,99 @@ namespace OpenBlood2
                 else if (outcome == SaveFlow::Outcome::Loaded)
                     loaded("Saved game");
                 else if (outcome == SaveFlow::Outcome::Failed)
-                    refused(command.action == MenuAction::SaveGame ? "Save" : "Load");
-                if (std::exchange(input.quick_save, false))
+                    refused(request.action == MenuAction::SaveGame ? "Save" : "Load");
+                return outcome == SaveFlow::Outcome::Loaded;
+            };
+            const auto quick_load = [&]
+            {
+                const auto quick = saves.quick_load(game, error);
+                if (quick == SaveFlow::Outcome::Loaded)
+                    loaded("Quickload");
+                else if (quick == SaveFlow::Outcome::Failed)
+                    refused("Quickload");
+                return quick == SaveFlow::Outcome::Loaded;
+            };
+            const auto change_level = [&]
+            {
+                const auto change = GameSession::process_level_change(game, error);
+                level_changed = change == LevelChangeResult::Committed;
+                if (change == LevelChangeResult::Committed)
                 {
-                    if (saves.quick_save(*game, error) == SaveFlow::Outcome::Saved)
-                        spdlog::info("Quicksave: {}", game->world_path);
-                    else
-                        refused("Quicksave");
+                    spdlog::info("NEW_LEVEL committed: {} -> {} / start {}", game->level_change.source_world,
+                                 game->world_path, game->level_change.selected_start);
+                    reset_after_promotion(menu, input, selection, controlled, game->client_shell);
+                    level_entered(*game, false);
+#if BLOOD2_INSPECTOR
+                    inspector.forget_world();
+#endif
+                    previous = SDL_GetTicksNS();
                 }
-                if (std::exchange(input.quick_load, false))
+                else if (change == LevelChangeResult::Rejected)
+                    spdlog::warn("Level change retained world: {}", error);
+                return level_changed;
+            };
+            // A saved world's loading screen, when the slot can be read at all.
+            const auto saved_world = [&](int slot) -> std::string
+            {
+                const auto& info = saves.slots.info(slot);
+                return info.state == SaveSlotInfo::State::Ready ? info.meta.world_path : std::string{};
+            };
+            const auto show_loading =
+                [&](LoadingFlow::Request kind, std::string_view world, bool action, const MenuCommand& request = {})
+            {
+                if (!menu_enabled || world.empty())
+                    return false;
+                if (!loading.begin(kind, requested_world(world), action, request))
                 {
-                    const auto quick = saves.quick_load(game, error);
-                    if (quick == SaveFlow::Outcome::Loaded)
-                        loaded("Quickload");
-                    else if (quick == SaveFlow::Outcome::Failed)
-                        refused("Quickload");
+                    spdlog::warn("Loading screen unavailable; loading without it: {}", loading.error);
+                    return false;
                 }
+                input.loading_screen = true;
+                input.loading_wait = false;
+                input.reset(menu, game->client_shell.m_bInWorld);
+                return true;
+            };
+            // The previous frame presented the loading screen (original PreLoadWorld): load now.
+            if (const auto request = loading.request; request != LoadingFlow::Request::None)
+            {
+                bool success = false;
+                if (request == LoadingFlow::Request::MenuWorld)
+                    success = start_world(loading.command);
+                else if (request == LoadingFlow::Request::SaveLoad)
+                    success = load_slot(loading.command);
+                else if (request == LoadingFlow::Request::QuickLoad)
+                    success = quick_load();
+                else
+                    success = change_level();
+                loading.loaded(success);
+                input.loading_screen = loading.visible();
+                input.loading_wait = loading.waiting;
+                input.loading_continue = false;
+                input.reset(menu, game->client_shell.m_bInWorld);
+                if (loading.waiting)
+                    spdlog::info("Loading screen waits for a key: {} (load screen ID {})", loading.screen.info().title,
+                                 loading.screen.info().load_screen_id);
             }
+            else if (command.action == MenuAction::NewGame || command.action == MenuAction::Credits)
+            {
+                const auto start = menu_world_start(*game, command, first_level(config.demo));
+                if (!show_loading(LoadingFlow::Request::MenuWorld, start.world ? start.world : "",
+                                  start.game_type == GAMETYPE_ACTION, command))
+                    start_world(command);
+            }
+            else if (command.action != MenuAction::LoadGame ||
+                     !show_loading(LoadingFlow::Request::SaveLoad, saved_world(command.slot), false, command))
+                load_slot(command);
+            if (std::exchange(input.quick_save, false))
+            {
+                if (saves.quick_save(*game, error) == SaveFlow::Outcome::Saved)
+                    spdlog::info("Quicksave: {}", game->world_path);
+                else
+                    refused("Quicksave");
+            }
+            if (std::exchange(input.quick_load, false) &&
+                !show_loading(LoadingFlow::Request::QuickLoad, saved_world(SLOT_QUICK), false))
+                quick_load();
 #if BLOOD2_INSPECTOR
             if (auto level = std::exchange(inspector.start_level_request, {}); !level.empty())
             {
@@ -578,10 +694,14 @@ namespace OpenBlood2
 #endif
             if (menu_audio)
             {
-                menu_audio->focus(menu.active && menu.promotion == MenuPromotion::None);
+                menu_audio->focus(menu.active && menu.promotion == MenuPromotion::None && !loading.visible() &&
+                                  !input.title_screen);
                 for (auto cue : menu.cues)
                     menu_audio->play(cue);
                 menu.cues.clear();
+                // DrawLoadingScreen in GS_WAITING: esc01.wav once.
+                if (loading.waiting && !std::exchange(loading.screen.played_waiting_sound, true))
+                    menu_audio->play(MenuCue::Back);
                 menu_audio->advance(delta);
                 if (menu_audio->error != reported_audio)
                 {
@@ -710,28 +830,21 @@ namespace OpenBlood2
                     spdlog::info("Demo completed: original EndGame / screens/info.pcx / {}",
                                  menu_enabled ? "return to menu" : "direct exit");
                 }
-                const auto change = GameSession::process_level_change(game, error);
-                level_changed = change == LevelChangeResult::Committed;
-                if (change == LevelChangeResult::Committed)
-                {
-                    spdlog::info("NEW_LEVEL committed: {} -> {} / start {}", game->level_change.source_world,
-                                 game->world_path, game->level_change.selected_start);
-                    reset_after_promotion(menu, input, selection, controlled, game->client_shell);
-                    level_entered(*game, false);
-#if BLOOD2_INSPECTOR
-                    inspector.forget_world();
-#endif
-                    previous = SDL_GetTicksNS();
-                }
-                else if (change == LevelChangeResult::Rejected)
-                    spdlog::warn("Level change retained world: {}", error);
+                // Original NEW_LEVEL StartNewWorld: the loading screen first, the commit next frame.
+                WorldRequest destination;
+                std::string ignored;
+                const bool action =
+                    int(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_GAMETYPE"))) == GAMETYPE_ACTION;
+                if (!game->pending_level_change ||
+                    !parse_world_request(game->pending_level_change->message, destination, ignored) ||
+                    !show_loading(LoadingFlow::Request::LevelChange, destination.filename, action))
+                    change_level();
                 // Original single-player death USE: GS_MENU, PauseGame and the Load menu (_DEMO: none here;
                 // the demo keeps its Enter retry).
                 if (std::exchange(game->client_shell.dead_use_menu, false) && menu_enabled && !menu.demo() &&
                     game->client_shell.m_bInWorld)
                 {
-                    const auto type =
-                        int(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_GAMETYPE")));
+                    const auto type = int(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_GAMETYPE")));
                     if (type == GAMETYPE_SINGLE || type == GAMETYPE_ACTION || type == GAMETYPE_CUSTOM)
                     {
                         menu.open_load(true, false);
@@ -752,7 +865,15 @@ namespace OpenBlood2
                 spdlog::warn("Credits roll: {}", game->client_shell.credits_error);
             }
             selection.refresh(game->objects);
-            if (!menu.active && !input.credits_screen && !input.demo.finished())
+            // A waiting loading screen still prepares the loaded world behind it.
+            const bool screen_shown = input.title_screen || loading.visible();
+            if (loading.waiting)
+            {
+                loading.clock += delta;
+                if (!loading.screen.draw(true, loading.clock, error))
+                    return failed(4);
+            }
+            if (!menu.active && !input.credits_screen && !input.demo.finished() && !input.title_screen)
             {
 #if BLOOD2_XR
                 if (xr)
@@ -778,6 +899,16 @@ namespace OpenBlood2
             if (input.demo.finished())
             {
                 if (!end_screen || !menu_renderer.draw_surface(*end_screen, 1, error))
+                    return failed(4);
+            }
+            else if (input.title_screen)
+            {
+                if (!title_renderer.draw_surface(title, 1, error))
+                    return failed(4);
+            }
+            else if (loading.visible())
+            {
+                if (!loading_renderer.draw_surface(loading.screen.surface(), loading.screen.revision(), error))
                     return failed(4);
             }
             else if (menu.active)
@@ -860,8 +991,9 @@ namespace OpenBlood2
             if (xr)
             {
                 // The paused world stays behind the menu panel; ImGui draws the canvas (menu or HUD).
-                const bool world = !input.credits_screen && !input.demo.finished() && game->client_shell.m_bInWorld;
-                const bool panel = menu.active || input.credits_screen || input.demo.finished();
+                const bool world =
+                    !input.credits_screen && !input.demo.finished() && !screen_shown && game->client_shell.m_bInWorld;
+                const bool panel = menu.active || input.credits_screen || input.demo.finished() || screen_shown;
                 const float scale = game->client_shell.fade.Scale();
                 const float fade =
                     game->client_shell.m_bInWorld && std::isfinite(scale) ? std::clamp(scale, 0.f, 1.f) : 1;
@@ -919,7 +1051,8 @@ namespace OpenBlood2
             const bool phase_capture =
                 (options.menu_smoke && config.demo && DemoMenuSmoke::capture(frames)) ||
                 (options.menu_smoke && !config.demo &&
-                 (frames == 8 || frames == 17 || frames == 23 || frames == 120 || frames == 208 || frames == 214)) ||
+                 (frames == 4 || frames == 8 || frames == 17 || frames == 23 || frames == 120 || frames == 208 ||
+                  frames == 214)) ||
                 (options.demo_smoke && (frames == 4 || frames == 14 || frames == 45 || frames == 62));
             const bool save = target && ((frames >= 2 && !captured) || phase_capture) && !options.capture_file.empty();
             if (save &&
@@ -932,8 +1065,8 @@ namespace OpenBlood2
             if (target)
             {
                 auto* color_target = save ? capture.texture : target;
-                const bool world =
-                    !menu.active && !input.credits_screen && !input.demo.finished() && presenter.render_world;
+                const bool world = !menu.active && !input.credits_screen && !input.demo.finished() && !screen_shown &&
+                                   presenter.render_world;
                 if (world &&
                     !presenter.record(*game, commands, color_target,
                                       SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), w, h, error))

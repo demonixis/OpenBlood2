@@ -78,7 +78,19 @@ namespace OpenBlood2
                     std::copy_n(src.rgba.begin() + s, 4, dst.rgba.begin() + d);
             }
     }
-    bool HudFont::read_widths(std::span<const std::uint8_t> b, const HudSurface& bitmap, std::string& error, unsigned terminal_overhang)
+    void hud_scale(HudSurface& dst, const HudSurface& src)
+    {
+        if (!src.width || !src.height)
+            return;
+        for (unsigned y = 0; y < dst.height; ++y)
+            for (unsigned x = 0; x < dst.width; ++x)
+            {
+                const auto s = (std::size_t(y * src.height / dst.height) * src.width + x * src.width / dst.width) * 4;
+                std::copy_n(src.rgba.begin() + s, 4, dst.rgba.begin() + (std::size_t(y) * dst.width + x) * 4);
+            }
+    }
+    bool HudFont::read_widths(std::span<const std::uint8_t> b, const HudSurface& bitmap, std::string& error,
+                              unsigned terminal_overhang)
     {
         *this = {};
         error = "FNT: expected height and 94 bounded little-endian glyph widths";
@@ -103,16 +115,22 @@ namespace OpenBlood2
         error.clear();
         return true;
     }
-    void HudFont::draw(HudSurface& dst, std::string_view text, int x, int y, unsigned justify) const
+    unsigned HudFont::text_width(std::string_view text) const
     {
-        if (!surface)
-            return;
         unsigned length = 0;
         for (unsigned char c : text)
             if (c >= 33 && c <= 126)
                 length += widths[c - 33];
             else if (c == ' ')
                 length += space_width;
+        return length;
+    }
+    void HudFont::draw_glyphs(HudSurface& dst, std::string_view text, int x, int y, unsigned justify,
+                              const std::uint32_t* rgb) const
+    {
+        if (!surface)
+            return;
+        const auto length = text_width(text);
         if (justify == 1)
             x -= length / 2;
         if (justify == 2)
@@ -125,8 +143,78 @@ namespace OpenBlood2
                 continue;
             const auto i = c - 33;
             HudRect rect{int(offsets[i]), 0, int(offsets[i + 1]), int(height)};
-            hud_blit(dst, *surface, &rect, x, y, true, hud_magenta);
+            if (!rgb)
+                hud_blit(dst, *surface, &rect, x, y, true, hud_magenta);
+            else
+                for (int sy = std::max(0, -y); sy < int(height) && y + sy < int(dst.height); ++sy)
+                    for (int sx = std::max(rect.left, rect.left - x);
+                         sx < rect.right && x + sx - rect.left < int(dst.width); ++sx)
+                    {
+                        const auto s = (sy * surface->width + sx) * 4;
+                        const auto key = (unsigned(surface->rgba[s]) << 16) | (unsigned(surface->rgba[s + 1]) << 8) |
+                                         surface->rgba[s + 2];
+                        if (key == hud_magenta)
+                            continue;
+                        const auto d = ((y + sy) * dst.width + x + sx - rect.left) * 4;
+                        dst.rgba[d] = std::uint8_t(*rgb >> 16);
+                        dst.rgba[d + 1] = std::uint8_t(*rgb >> 8);
+                        dst.rgba[d + 2] = std::uint8_t(*rgb);
+                        dst.rgba[d + 3] = 255;
+                    }
             x += widths[i];
+        }
+    }
+    void HudFont::draw(HudSurface& dst, std::string_view text, int x, int y, unsigned justify) const
+    {
+        draw_glyphs(dst, text, x, y, justify, nullptr);
+    }
+    void HudFont::draw_solid(HudSurface& dst, std::string_view text, int x, int y, unsigned justify,
+                             std::uint32_t rgb) const
+    {
+        draw_glyphs(dst, text, x, y, justify, &rgb);
+    }
+    void HudFont::draw_format(HudSurface& dst, std::string_view text, int x, int y, int width) const
+    {
+        if (!surface)
+            return;
+        int column = 0;
+        const auto tab = int(space_width * 4);
+        std::size_t at = 0;
+        while (at < text.size())
+        {
+            const char c = text[at];
+            if (c == '|')
+            {
+                column = 0;
+                y += int(height);
+                ++at;
+                continue;
+            }
+            if (c == '~')
+            {
+                column += tab;
+                ++at;
+                continue;
+            }
+            if (c == ' ')
+            {
+                if (column)
+                    column += int(space_width);
+                ++at;
+                continue;
+            }
+            const auto end = text.find_first_of(" |~", at);
+            const auto word = text.substr(at, end == std::string_view::npos ? text.size() - at : end - at);
+            const auto length = int(text_width(word));
+            // A word that would cross the width starts the next line (unless the line is empty).
+            if (column && column + length > width)
+            {
+                column = 0;
+                y += int(height);
+            }
+            draw(dst, word, x + column, y, 0);
+            column += length;
+            at += word.size();
         }
     }
     HudSurface* HudCanvas::CreateSurface(unsigned width, unsigned height)

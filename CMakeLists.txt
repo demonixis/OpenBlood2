@@ -93,6 +93,7 @@ target_sources(blood2_game PRIVATE src/game/original/Music.cpp src/game/music_ca
 target_sources(blood2_game PRIVATE src/game/save_slots.cpp)
 target_include_directories(blood2_game PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
 target_sources(blood2_game PRIVATE src/game/original/MainMenus.cpp src/game/menu_canvas.cpp src/game/menu_audio.cpp
+    src/game/original/LoadingScreen.cpp
     src/game/menu_preferences.cpp src/game/new_game.cpp src/game/menu_resources.cpp)
 target_link_libraries(blood2_game PUBLIC engine)
 

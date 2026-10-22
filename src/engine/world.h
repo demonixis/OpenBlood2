@@ -80,4 +80,10 @@ namespace OpenBlood2
     // Strict v56 structural reader. Output is empty on failure. Coordinates remain
     // in original units; no mirror, scene transform or guessed property scanning.
     bool read_world(std::span<const std::uint8_t> bytes, World& world, std::string& error);
+    // The DAT v56 header's world-info string alone, from a prefix of the file (the original
+    // GetWorldInfoString, which reads it without loading the world).
+    bool read_world_info(std::span<const std::uint8_t> prefix, std::string& info, std::string& error);
+    // The engine's Parse over a world-info string: commands end at ';', tokens are separated by
+    // whitespace and a quoted token keeps its spaces.
+    std::vector<std::vector<std::string>> world_info_commands(std::string_view info);
 } // namespace OpenBlood2

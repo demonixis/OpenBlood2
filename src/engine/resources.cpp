@@ -319,7 +319,8 @@ namespace OpenBlood2
         const auto it = index_.find(key);
         return it == index_.end() ? nullptr : &it->second;
     }
-    bool Resources::read(std::string_view path, std::vector<std::uint8_t>& bytes, std::string& error) const
+    bool Resources::read(std::string_view path, std::vector<std::uint8_t>& bytes, std::string& error,
+                         std::uint32_t limit) const
     {
         bytes.clear();
         error.clear();
@@ -342,7 +343,7 @@ namespace OpenBlood2
             return false;
         }
         std::ifstream file(entry->archive, std::ios::binary);
-        if (!file || !file_read(file, entry->offset, entry->size, bytes))
+        if (!file || !file_read(file, entry->offset, std::min(entry->size, limit), bytes))
         {
             bytes.clear();
             error = "Resource read failed";

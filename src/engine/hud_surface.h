@@ -23,8 +23,18 @@ namespace OpenBlood2
         std::array<unsigned, 95> offsets{};
         std::array<unsigned, 94> widths{};
         unsigned space_width = 0; // Text fonts: the menus' quarter-height adapter policy; numbers use none.
-        bool read_widths(std::span<const std::uint8_t>, const HudSurface&, std::string&, unsigned terminal_overhang = 0);
+        bool read_widths(std::span<const std::uint8_t>, const HudSurface&, std::string&,
+                         unsigned terminal_overhang = 0);
         void draw(HudSurface&, std::string_view, int x, int y, unsigned justify) const;
+        // CoolFont DrawSolid: every unkeyed glyph pixel takes `rgb` (0xRRGGBB).
+        void draw_solid(HudSurface&, std::string_view, int x, int y, unsigned justify, std::uint32_t rgb) const;
+        // CoolFont DrawFormat (its source is unavailable): left-justified words wrapped before
+        // `width` pixels; '|' breaks the line and '~' indents by four spaces.
+        void draw_format(HudSurface&, std::string_view, int x, int y, int width) const;
+        unsigned text_width(std::string_view) const;
+
+      private:
+        void draw_glyphs(HudSurface&, std::string_view, int x, int y, unsigned justify, const std::uint32_t* rgb) const;
     };
     // Typed CPU surface service; no legacy client ABI.
     class HudCanvas
@@ -51,5 +61,7 @@ namespace OpenBlood2
         std::vector<std::unique_ptr<HudSurface>> surfaces_;
     };
     void hud_blit(HudSurface&, const HudSurface&, const HudRect*, int x, int y, bool keyed, std::uint32_t key);
+    // ScaleSurfaceToSurface over whole surfaces: nearest-neighbour stretch of `src` onto `dst`.
+    void hud_scale(HudSurface& dst, const HudSurface& src);
     inline constexpr std::uint32_t hud_magenta = 0xff00ff;
 } // namespace OpenBlood2

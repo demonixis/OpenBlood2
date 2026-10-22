@@ -21,6 +21,11 @@ namespace OpenBlood2
         // Owner-set CBloodClientShell::m_bRollCredits: key downs also reach the roll.
         bool roll_credits = false;
         bool credits_exit = false;
+        // Original GS_LOADINGLEVEL/GS_WAITING: the loading screen pauses play; while waiting, the
+        // next fresh key continues (other devices: any button or tap).
+        bool loading_screen = false, loading_wait = false, loading_continue = false;
+        // Original startup title.pcx splash (Splash_Display, then TimedKeyWait on Esc, Return or Space).
+        bool title_screen = false;
         // Original F5/F6 (OnKeyDown, retail only): owned requests consumed at the frame boundary.
         bool quick_save = false, quick_load = false;
         std::vector<int> credit_keys; // Original VK codes for CCredits::HandleInput.
@@ -51,7 +56,7 @@ namespace OpenBlood2
         }
         bool paused(const Menu& menu) const
         {
-            return demo_mode ? demo.paused() : menu.active || credits_screen;
+            return demo_mode ? demo.paused() : menu.active || credits_screen || loading_screen || title_screen;
         }
         void reset(Menu& menu, bool player)
         {
@@ -70,7 +75,7 @@ namespace OpenBlood2
                 ++menu.revision;
             }
             quick_save = quick_load = false;
-            controls.player_changed(player && !menu.active && !credits_screen && !inspector);
+            controls.player_changed(player && !menu.active && !credits_screen && !loading_screen && !inspector);
         }
         // Fresh (non-repeated) down edge of an action in this event.
         bool pressed(const InputEdges& edges, InputAction action) const
@@ -172,7 +177,7 @@ namespace OpenBlood2
             {
                 controls.event(e, window);
                 menu.cancel_pointer();
-                if (player && !menu.active && !credits_screen && !inspector)
+                if (player && !menu.active && !credits_screen && !loading_screen && !inspector)
                     menu.open(true, alive);
                 reset(menu, player);
                 return inspector;
@@ -193,6 +198,20 @@ namespace OpenBlood2
             // inspector never leaves stale axes or buttons behind.
             const auto edges = controls.track(e);
             const auto press = [&](InputAction action) { return pressed(edges, action); };
+            const bool button = (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && e.button.windowID == window) ||
+                                e.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN;
+            if (title_screen)
+            {
+                if ((e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat &&
+                     (e.key.scancode == SDL_SCANCODE_ESCAPE || e.key.scancode == SDL_SCANCODE_RETURN ||
+                      e.key.scancode == SDL_SCANCODE_SPACE)) ||
+                    (e.type != SDL_EVENT_KEY_DOWN && button))
+                {
+                    title_screen = false;
+                    reset(menu, player);
+                }
+                return false;
+            }
             if (menu.promotion != MenuPromotion::None)
             {
                 if (dismisses_promotion(e, edges))
@@ -213,6 +232,11 @@ namespace OpenBlood2
             }
             if (inspector)
                 return true;
+            if (loading_screen)
+            {
+                loading_continue |= loading_wait && ((e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat) || button);
+                return false;
+            }
             if (menu.active && menu.page == MenuPage::Controls && menu.binding >= 0)
             {
                 track_control(e, window, edges, menu);

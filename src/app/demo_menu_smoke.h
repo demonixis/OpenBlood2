@@ -19,7 +19,7 @@ namespace OpenBlood2
                 return frame == 40;
             const auto p = phase(frame);
             return p == 2 || p == 4 || p == 10 || p == 15 || p == 19 || p == 23 || p == 27 || p == 32 || p == 54 ||
-                   p == 61 || p == 63 || p == 70;
+                   p == 61 || p == 63 || p == 72;
         }
         bool before(std::uint64_t frame, SDL_Window* window, GameSession& game, const Menu& menu, MenuInput& input,
                     const MenuAudio& audio, std::string& error)
@@ -96,8 +96,12 @@ namespace OpenBlood2
                 return fail("Prime Gibs promotion");
             if (p == 27 && menu.promotion != MenuPromotion::Modes)
                 return fail("Chosen promotion");
-            if (p == 31 && (!game.client_shell.m_bInWorld || menu.active || game.world_path != "worlds/demo_01.dat" ||
-                            game.server.GetVarValueFloat(game.server.GetGameConVar("GAME_DIFFICULTY")) != 2))
+            // Each StartNewWorld presents the loading screen, then the demo's load screen IDs wait.
+            if ((p == 31 || p == 54 || p == 67) && (!input.loading_screen || input.loading_wait))
+                return fail("loading screen before the load");
+            if (p == 32 && (!game.client_shell.m_bInWorld || menu.active || game.world_path != "worlds/demo_01.dat" ||
+                            game.server.GetVarValueFloat(game.server.GetGameConVar("GAME_DIFFICULTY")) != 2 ||
+                            !input.loading_wait))
                 return fail("hard Caleb new game");
             if (p == 43 && (menu.active || game.objects.time() != frozen_time))
                 return fail("resume catch-up");
@@ -108,7 +112,8 @@ namespace OpenBlood2
             if (p == 49 && (game.server_shell.Player(game.local_client)->m_bDead || game.world_revision < 2 ||
                             game.server.GetVarValueFloat(game.server.GetGameConVar("GAME_DIFFICULTY")) != 2))
                 return fail("Enter retry/difficulty");
-            if (p == 54 && (game.world_path != "worlds/demo_02.dat" || game.level_change.selected_start != "05_egress"))
+            if (p == 55 && (game.world_path != "worlds/demo_02.dat" ||
+                            game.level_change.selected_start != "05_egress" || !input.loading_wait))
                 return fail("authored NEW_LEVEL");
             if (p == 61 &&
                 (game.client_shell.m_bInWorld || !menu.active || menu.in_world ||
@@ -116,10 +121,11 @@ namespace OpenBlood2
                 return fail("EndGame unload/promotion");
             if (p == 63 && (!menu.active || menu.page != MenuPage::Main || menu.promotion != MenuPromotion::None))
                 return fail("EndGame returns to main menu");
-            if (p == 67 && (!game.client_shell.m_bInWorld || menu.active || game.world_path != "worlds/demo_01.dat" ||
-                            game.server.GetVarValueFloat(game.server.GetGameConVar("GAME_DIFFICULTY")) != 0))
+            if (p == 68 && (!game.client_shell.m_bInWorld || menu.active || game.world_path != "worlds/demo_01.dat" ||
+                            game.server.GetVarValueFloat(game.server.GetGameConVar("GAME_DIFFICULTY")) != 0 ||
+                            !input.loading_wait))
                 return fail("new game after ending");
-            if (p == 70)
+            if (p == 72)
             {
                 if (menu.promotion != MenuPromotion::Info || !menu.promotion_exit)
                     return fail("quit promotion");
@@ -205,6 +211,11 @@ namespace OpenBlood2
                     key(SDL_SCANCODE_RETURN);
                     key(SDL_SCANCODE_RETURN, true);
                     break;
+                case 32: // GS_WAITING: any key continues.
+                case 55:
+                case 68:
+                    key(SDL_SCANCODE_SPACE);
+                    break;
                 case 35:
                     key(SDL_SCANCODE_ESCAPE);
                     break;
@@ -270,20 +281,20 @@ namespace OpenBlood2
                     key(SDL_SCANCODE_UP);
                     key(SDL_SCANCODE_RETURN);
                     break;
-                case 68:
+                case 70:
                     key(SDL_SCANCODE_ESCAPE);
                     break;
-                case 69:
+                case 71:
                     key(SDL_SCANCODE_UP);
                     key(SDL_SCANCODE_RETURN);
                     break;
-                case 71:
+                case 73:
                     key(SDL_SCANCODE_SPACE);
                     break;
                 default:
                     break;
             }
-            return p <= 71 || fail("quit was not consumed");
+            return p <= 73 || fail("quit was not consumed");
         }
     };
 } // namespace OpenBlood2

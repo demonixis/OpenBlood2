@@ -38,7 +38,9 @@ namespace OpenBlood2
         bool mount(const std::filesystem::path& path, std::string& error, MountRole role = MountRole::Base);
         bool mount_game(const Config& config, std::string& error);
         const Resource* find(std::string_view path) const;
-        bool read(std::string_view path, std::vector<std::uint8_t>& bytes, std::string& error) const;
+        // At most `limit` leading bytes (a header read); the whole resource by default.
+        bool read(std::string_view path, std::vector<std::uint8_t>& bytes, std::string& error,
+                  std::uint32_t limit = UINT32_MAX) const;
         const auto& index() const
         {
             return index_;

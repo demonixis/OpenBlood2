@@ -4,6 +4,7 @@
 #include "engine/config.h"
 #include "engine/save_objects.h"
 #include "engine/user_directory.h"
+#include "engine/world.h"
 #include "game/game_settings.h"
 #include "game/server_adapter.h"
 #include <SDL3/SDL.h>
@@ -43,10 +44,12 @@ namespace OpenBlood2
         }
         bool iequal(std::string_view a, std::string_view b)
         {
-            return a.size() == b.size() &&
-                   std::equal(a.begin(), a.end(), b.begin(), [](char x, char y)
-                              { return std::tolower(static_cast<unsigned char>(x)) ==
-                                       std::tolower(static_cast<unsigned char>(y)); });
+            return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin(),
+                                                      [](char x, char y)
+                                                      {
+                                                          return std::tolower(static_cast<unsigned char>(x)) ==
+                                                                 std::tolower(static_cast<unsigned char>(y));
+                                                      });
         }
         unsigned console_unsigned(GameSession& game, const char* name)
         {
@@ -76,8 +79,7 @@ namespace OpenBlood2
             if (kind != SaveKind::LevelEntry)
             {
                 const auto suffix = " [" + save_timestamp(now) + "]";
-                meta.display_name =
-                    meta.display_name.substr(0, save_format::max_display_name - suffix.size()) + suffix;
+                meta.display_name = meta.display_name.substr(0, save_format::max_display_name - suffix.size()) + suffix;
             }
             if (meta.display_name.empty())
                 meta.display_name = "Untitled";
@@ -126,49 +128,12 @@ namespace OpenBlood2
     }
     std::string world_title(std::string_view info, std::string_view world_path)
     {
-        // The engine's Parse: commands end at ';', tokens are separated by spaces and a quoted
-        // token keeps its spaces. Every "worldname" match replaces the title, so the last wins.
+        // Every "worldname" match replaces the title, so the last wins.
         std::string title;
-        std::vector<std::string> tokens;
-        const auto finish = [&]
-        {
+        for (const auto& tokens : world_info_commands(info))
             for (std::size_t i = 0; i + 1 < tokens.size(); ++i)
                 if (iequal(tokens[i], "worldname"))
                     title = tokens[i + 1];
-            tokens.clear();
-        };
-        std::string token;
-        bool quoted = false, open = false;
-        for (const char c : info)
-        {
-            if (quoted)
-            {
-                if (c == '"')
-                    quoted = false;
-                else
-                    token += c;
-                continue;
-            }
-            if (c == '"')
-            {
-                quoted = open = true;
-                continue;
-            }
-            if (c == ';' || std::isspace(static_cast<unsigned char>(c)))
-            {
-                if (open)
-                    tokens.push_back(std::exchange(token, {}));
-                open = false;
-                if (c == ';')
-                    finish();
-                continue;
-            }
-            token += c;
-            open = true;
-        }
-        if (open)
-            tokens.push_back(token);
-        finish();
         if (title.empty())
         {
             // No title: the original uses the world file name it was given.

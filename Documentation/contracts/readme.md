@@ -4,6 +4,8 @@
 
 - [Original menu frontend](menu_contracts.md)
 
+- [Original loading screen and title splash](loading_screen_contracts.md)
+
 - [Original default crosshair](crosshair_contracts.md)
 
 - [OpenXR runtime, stereo world, controllers, HUD and menus (M8)](xr_runtime_contracts.md)

@@ -1,7 +1,9 @@
 #include "engine/world.h"
 #include "engine/formats/reader.h"
+#include <cctype>
 #include <limits>
 #include <set>
+#include <utility>
 
 namespace OpenBlood2
 {
@@ -293,6 +295,60 @@ namespace OpenBlood2
             return r.good() && file.good();
         }
     } // namespace
+    bool read_world_info(std::span<const std::uint8_t> prefix, std::string& info, std::string& error)
+    {
+        info.clear();
+        Reader r(prefix);
+        const auto version = r.u32();
+        r.u32();
+        r.u32();
+        const auto length = r.u32();
+        auto text = r.text(length, 65536);
+        if (!r.good() || version != 56)
+        {
+            error = "DAT v56: invalid/unsupported world-info header";
+            return false;
+        }
+        info = std::move(text);
+        error.clear();
+        return true;
+    }
+    std::vector<std::vector<std::string>> world_info_commands(std::string_view info)
+    {
+        std::vector<std::vector<std::string>> commands(1);
+        std::string token;
+        bool quoted = false, open = false;
+        for (const char c : info)
+        {
+            if (quoted)
+            {
+                if (c == '"')
+                    quoted = false;
+                else
+                    token += c;
+                continue;
+            }
+            if (c == '"')
+            {
+                quoted = open = true;
+                continue;
+            }
+            if (c == ';' || std::isspace(static_cast<unsigned char>(c)))
+            {
+                if (open)
+                    commands.back().push_back(std::exchange(token, {}));
+                open = false;
+                if (c == ';')
+                    commands.emplace_back();
+                continue;
+            }
+            token += c;
+            open = true;
+        }
+        if (open)
+            commands.back().push_back(token);
+        return commands;
+    }
     bool read_world(std::span<const std::uint8_t> bytes, World& world, std::string& error)
     {
         world = {};
