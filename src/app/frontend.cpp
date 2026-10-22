@@ -573,7 +573,8 @@ namespace OpenBlood2
             presenter.normal_maps = settings.normal_maps;
 #if BLOOD2_XR
             if (xr)
-                xr->set_options({float(settings.vr_turn) * 0.017453293f, settings.vr_laser, settings.vr_crosshair});
+                xr->set_options({float(settings.vr_turn) * 0.017453293f, settings.vr_laser, settings.vr_crosshair,
+                                 settings.vr_move_hand});
 #endif
             if (menu_audio)
             {

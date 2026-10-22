@@ -103,8 +103,13 @@ namespace OpenBlood2
         // One single-layer swapchain for UI (same colour handling as the eyes).
         bool create_quad(std::uint32_t width, std::uint32_t height, std::string& error);
         SDL_GPUTexture* acquire_quad(std::string& error);
+        // A second two-layer eye swapchain composited, alpha-blended, over the UI quad (the menu hands
+        // and laser): render eye i into layer i with a transparent clear.
+        bool create_overlay(std::string& error);
+        SDL_GPUTexture* acquire_overlay(std::string& error);
         // Releases the acquired images and ends the frame: the projection layer when rendered (scaled
-        // by `fade` where the compositor supports it), then the UI quad when it was acquired.
+        // by `fade` where the compositor supports it), the UI quad when it was acquired, then the
+        // overlay projection layer when it was acquired.
         bool end_frame(const XrFrameInput&, bool rendered, std::string& error, const XrQuadPlacement* quad = nullptr,
                        float fade = 1);
         // True when end_frame applies `fade` (XR_KHR_composition_layer_color_scale_bias).

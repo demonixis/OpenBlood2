@@ -71,13 +71,18 @@ namespace OpenBlood2
         float scene_fade = 1;
         // XR: recorded at the end of each eye's scene pass (laser, reticle).
         std::function<void(SDL_GPURenderPass*, SDL_GPUCommandBuffer*, std::size_t eye)> eye_overlay;
-        // XR menus: hand models at the controllers (close draws, fully bright) replace the view
-        // weapons while draw_hands is set. Filled by the XR frontend before recording.
+        // XR menus: hand models at the controllers (fully bright), drawn by record_overlay_eyes
+        // while draw_hands is set; the scene then omits the view weapons. Filled by the XR frontend
+        // before recording; record_eyes or record_empty_eyes prepares them.
         ModelView hand_scene;
         bool draw_hands = false;
-        // XR without a world: a dark clear, then hand_scene and eye_overlay, one pass per eye.
-        bool record_hand_eyes(SDL_GPUCommandBuffer*, SDL_GPUTexture* target, SDL_GPUTextureFormat, Uint32 width,
-                              Uint32 height, std::span<const StereoEye> eyes, std::string& error);
+        // XR without a world: prepares the frame (hands included) and clears each eye dark.
+        bool record_empty_eyes(SDL_GPUCommandBuffer*, SDL_GPUTexture* target, SDL_GPUTextureFormat, Uint32 width,
+                               Uint32 height, std::span<const StereoEye> eyes, std::string& error);
+        // XR overlay layer, after this frame's record_eyes or record_empty_eyes: a transparent clear,
+        // then hand_scene (view-model depth slice) and eye_overlay, one pass per eye.
+        bool record_overlay_eyes(SDL_GPUCommandBuffer*, SDL_GPUTexture* target, Uint32 width, Uint32 height,
+                                 std::span<const StereoEye> eyes, std::string& error);
 
         bool render_world = false;      // Entered player and loaded geometry at the last update().
         bool rebuilt = false;           // The last update() rebuilt or released world geometry.

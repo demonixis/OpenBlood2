@@ -136,6 +136,7 @@ namespace OpenBlood2
                 items.push_back({0, -1, true, {}, 10, {}});
                 items.push_back({0, -1, true, {}, 11, {}});
                 items.push_back({0, -1, true, {}, 12, {}});
+                items.push_back({0, -1, true, {}, 13, {}});
                 break;
             case MenuPage::Mouse:
                 setting(IDS_MENU_MOUSE_SENSITIVITY, 4);
@@ -520,6 +521,9 @@ namespace OpenBlood2
                 break;
             case 12:
                 settings.vr_crosshair = !settings.vr_crosshair;
+                break;
+            case 13:
+                settings.vr_move_hand = !settings.vr_move_hand;
                 break;
             default:
                 return;

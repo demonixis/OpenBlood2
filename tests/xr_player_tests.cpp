@@ -98,6 +98,16 @@ namespace
         f = frame_at();
         f.controls.move = {0, 0.8f};
         CHECK(play(g, p, f, 1) && !g.client_shell.movement_input.run);
+        // Options > VR MOVE [RIGHT HAND]: forward follows the right hand's yaw, not the head's.
+        p.hand_direction = true;
+        f.hands[1].aim_valid = true;
+        f.hands[1].aim = {{0.2f, 1.3f, -0.3f}, xr_yaw(-quarter)}; // Pointing a quarter turn right.
+        f.controls.move = {0, 1};
+        CHECK(play(g, p, f, 1) && g.client_shell.locomotion_yaw &&
+              near(wrap(*g.client_shell.locomotion_yaw - p.body_yaw - quarter), 0, 1e-3f));
+        // Pointing straight down falls back to the head.
+        f.hands[1].aim.orientation = {-std::sin(0.75f), 0, 0, std::cos(0.75f)};
+        CHECK(play(g, p, f, 1) && near(wrap(*g.client_shell.locomotion_yaw - p.body_yaw), 0, 1e-3f));
         return true;
     }
 
@@ -181,6 +191,18 @@ namespace
         f.controls.right_stick = {0.15f, 0}; // Inside the dead zone.
         const float still = p.body_yaw;
         CHECK(play(g, p, f, 10) && near(p.body_yaw, still, 1e-6f));
+        // A scripted camera keeps the player's rotation: no turning, no aim.
+        auto& shell = g.client_shell;
+        const auto camera = g.objects.create(g.objects.find_class("BaseClass"), {});
+        CHECK(camera);
+        shell.view.object = camera;
+        const float yaw = shell.rotation.yaw, pitch = shell.rotation.pitch, body = p.body_yaw;
+        f.controls.right_stick = {1, 0};
+        f.hands[1].aim_valid = true;
+        f.hands[1].aim = {{0.2f, 1.3f, -0.3f}, xr_yaw(-quarter)};
+        xr_apply_controls(g, p, f, xr_tracking(g, p, f, reference, scale), reference, scale, 1.0 / 60);
+        CHECK(near(p.body_yaw, body, 1e-6f) && shell.rotation.yaw == yaw && shell.rotation.pitch == pitch);
+        shell.view.object = nullptr;
         return true;
     }
 

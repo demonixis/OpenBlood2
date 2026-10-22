@@ -89,9 +89,10 @@ namespace OpenBlood2
         int renderer = 0, quality = 0;
         bool normal_maps = true;
         // Replacement VR rows: the snap-turn step in degrees (15, 30, 45, 60 or 90; 0 turns
-        // smoothly), the aim laser and the aim reticle.
+        // smoothly), the aim laser, the aim reticle, and movement relative to the right hand
+        // instead of the head.
         int vr_turn = 45;
-        bool vr_laser = true, vr_crosshair = true;
+        bool vr_laser = true, vr_crosshair = true, vr_move_hand = false;
         bool operator==(const MenuSettings&) const = default;
     };
     struct MenuItem
@@ -101,7 +102,7 @@ namespace OpenBlood2
         bool enabled = true;
         std::string literal;
         // Setting IDs: sound, volume, music, volume, sensitivity, invert Y, detail, lighting,
-        // renderer, normal maps, VR turn, VR laser, VR crosshair.
+        // renderer, normal maps, VR turn, VR laser, VR crosshair, VR movement reference.
         int setting = -1;
         HudRect rect{}, slider_rect{};
         std::string insertion; // FormatMessage %1!s! argument of the Load page's RESTART/QUICKLOAD strings.

@@ -98,8 +98,10 @@ namespace OpenBlood2
         }
         else if (shell.rotation.yaw != player.written_yaw)
             player.body_yaw += shell.rotation.yaw - player.written_yaw;
-        // Right stick: the dominant axis turns (snap or smooth) or, pushed past 0.85, cycles weapons.
-        const auto& right_stick = c.right_stick;
+        // Right stick: the dominant axis turns (snap or smooth) or, pushed past 0.85, cycles weapons;
+        // nothing during a scripted camera (its sticks re-arm on release as usual).
+        const bool cinematic = shell.view.object != nullptr;
+        const auto right_stick = cinematic ? std::array<float, 2>{} : c.right_stick;
         const bool turning = std::fabs(right_stick[0]) >= std::fabs(right_stick[1]);
         const float turn = turning ? right_stick[0] : 0;
         if (player.turn_step > 0)
@@ -112,8 +114,17 @@ namespace OpenBlood2
             if (!game.cycle_weapon(cycle > 0, why))
                 spdlog::info("Weapon selection: {}", why);
         }
-        // Head-relative locomotion; the aim stays the controller's.
-        const auto move = xr::locomotion(c.move, xr::forward_yaw(t.stereo.head.orientation));
+        // Head- or right-hand-relative locomotion (the head while the hand points up or down); the aim
+        // stays the controller's.
+        float reference_yaw = xr::forward_yaw(t.stereo.head.orientation);
+        if (player.hand_direction && frame.hands[1].aim_valid)
+        {
+            const auto hand = xr_world_pose(t, reference, units_per_meter, frame.hands[1].aim);
+            const auto forward = xr::rotate(hand.orientation, {0, 0, 1});
+            if (std::hypot(forward[0], forward[2]) > .2f)
+                reference_yaw = std::atan2(forward[0], forward[2]);
+        }
+        const auto move = xr::locomotion(c.move, reference_yaw);
         shell.movement_input = move.input; // Full deflection runs.
         shell.movement_input.jump = c.jump || c.stick_jump;
         shell.movement_input.crouch = c.crouch;
@@ -127,6 +138,12 @@ namespace OpenBlood2
         shell.next_item_requested |= player.next_item.update(c.next_item);
         shell.use_item_requested |=
             player.use_item.update(player.grip.update(c.use_item, xr_grip_press, xr_grip_release));
+        if (cinematic)
+        {
+            player.written_pitch = shell.rotation.pitch;
+            player.written_yaw = shell.rotation.yaw;
+            return;
+        }
         // Aim from the eye (the original fire origin) toward the controller's designated point.
         xr::Vec3 target;
         if (frame.hands[1].aim_valid)

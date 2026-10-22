@@ -69,7 +69,8 @@ namespace OpenBlood2
 
     bool XrFrontend::create(bool gpu_debug, std::string& error)
     {
-        if (!xr_.create({gpu_debug}, error) || !xr_.create_quad(ui_width, ui_height, error))
+        if (!xr_.create({gpu_debug}, error) || !xr_.create_quad(ui_width, ui_height, error) ||
+            !xr_.create_overlay(error))
             return false;
         lines_ = std::make_unique<LineRenderer>(xr_.device());
         return lines_->prepare(xr_.color_format(), SDL_GPU_TEXTUREFORMAT_D32_FLOAT, error);
@@ -244,6 +245,7 @@ namespace OpenBlood2
             }
         }
         player_.turn_step = options_.turn_step;
+        player_.hand_direction = options_.hand_direction;
         xr_apply_controls(game, player_, input, xr_tracking(game, player_, input, reference_, scale_), reference_,
                           scale_, delta());
     }
@@ -332,7 +334,10 @@ namespace OpenBlood2
                      xr_world_pose(t, reference_, scale_, end).position, red);
             return;
         }
-        if (!game.client_shell.m_bInWorld || (!options_.laser && !options_.crosshair))
+        // Nothing to aim with during scripted cameras and the death camera.
+        const auto& client = game.client_shell;
+        if (!client.m_bInWorld || client.view.object || client.death_camera.active ||
+            (!options_.laser && !options_.crosshair))
             return;
         // Play: the right laser always, the left one with a left-hand weapon (dual weapons).
         const bool dual = left_weapon(game);
@@ -477,6 +482,8 @@ namespace OpenBlood2
             SDL_GPUCommandBuffer* command = SDL_AcquireGPUCommandBuffer(xr_.device());
             SDL_GPUTexture* color = command ? xr_.acquire_color(error) : nullptr;
             SDL_GPUTexture* canvas = color ? xr_.acquire_quad(error) : nullptr;
+            // The menu hands and laser go to the overlay layer, composited over the panel.
+            SDL_GPUTexture* overlay = canvas && show_panel ? xr_.acquire_overlay(error) : nullptr;
             const auto abandon = [&]
             {
                 if (error.empty())
@@ -485,7 +492,7 @@ namespace OpenBlood2
                 xr_.end_frame(frame_, false, ignored);
                 return false;
             };
-            if (!canvas)
+            if (!canvas || (show_panel && !overlay))
             {
                 if (command)
                     SDL_CancelGPUCommandBuffer(command);
@@ -501,19 +508,26 @@ namespace OpenBlood2
                 views[i] = {dvec(t.stereo.eyes[i].position), engine_rotation(t.stereo.eyes[i].orientation),
                             eye_projection(frame_.eye_fov[i])};
             const auto count = static_cast<std::uint32_t>(overlay_.size());
-            presenter.eye_overlay = [&](SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* commands, std::size_t eye)
+            const auto lines = [&](SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* commands, std::size_t eye)
             {
                 lines_->draw(pass, commands, xr::line_uniform(t.stereo.eyes[eye], frame_.eye_fov[eye], 1, 65536),
                              xr_.width(), xr_.height(), ScenePresenter::view_model_depth, 1, 0, count);
             };
+            // Play: the aim laser in the scene. Menus: the scene (or a dark clear without a world),
+            // then the hands and the menu laser on the overlay layer above the panel.
+            presenter.eye_overlay = show_panel ? nullptr : std::function(lines);
             const bool scene = world && presenter.render_world;
-            // Without a world: a dark clear with the hands and the overlay (menu laser).
-            const bool ok = lines_->upload(command, overlay_, error) &&
-                            (scene ? presenter.record_eyes(game, command, color, xr_.color_format(), xr_.width(),
-                                                           xr_.height(), views, error)
-                                   : presenter.record_hand_eyes(command, color, xr_.color_format(), xr_.width(),
-                                                                xr_.height(), views, error)) &&
-                            ui(command, canvas);
+            bool ok = lines_->upload(command, overlay_, error) &&
+                      (scene ? presenter.record_eyes(game, command, color, xr_.color_format(), xr_.width(),
+                                                     xr_.height(), views, error)
+                             : presenter.record_empty_eyes(command, color, xr_.color_format(), xr_.width(),
+                                                           xr_.height(), views, error));
+            if (ok && show_panel)
+            {
+                presenter.eye_overlay = lines;
+                ok = presenter.record_overlay_eyes(command, overlay, xr_.width(), xr_.height(), views, error);
+            }
+            ok = ok && ui(command, canvas);
             presenter.eye_overlay = nullptr;
             if (!ok)
             {

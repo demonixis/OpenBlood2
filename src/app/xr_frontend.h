@@ -74,6 +74,7 @@ namespace OpenBlood2
         {
             float turn_step = xr_snap_angle; // Radians; zero turns smoothly.
             bool laser = true, crosshair = true;
+            bool hand_direction = false; // The left stick moves relative to the right hand, not the head.
         };
         void set_options(const Options& options)
         {

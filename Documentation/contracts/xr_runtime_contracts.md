@@ -132,21 +132,26 @@ No game world, HUD or menu is rendered in XR yet.
   combinations and folds the residual angle into `CBloodClientShell::locomotion_yaw`, the only
   change to original code: `UpdateMovement` passes it to `CMoveMgr` instead of
   `rotation.yaw` when set (empty on desktop). Per-direction speeds, the diagonal quirk and the
-  animations stay original; the reference is the head's yaw.
+  animations stay original; the reference is the head's yaw, or with Options > VR
+  `MOVE [RIGHT HAND]` the right aim pose's yaw (the head's while that hand points within about
+  78° of straight up or down).
 - **Turning and body yaw.** The tracking base yaw is the app's body yaw while the view is the
   player's eye; snap turns add the Options > VR step to it (15°, 30°, 45° by default, 60° or
   90°, one per deflection: 0.75 to fire, 0.3 to re-arm). Smooth turning adds
   `xr::stick_axis(x) × 120°/s` over the frame step: zero inside a 0.2 dead zone, then rescaled to reach full
   speed at full deflection. Server-driven rotations (start points, teleports, restores) are
-  adopted as the difference from the last written aim.
+  adopted as the difference from the last written aim. During a scripted camera
+  (`CBloodClientShell::view.object`) the right stick neither turns nor cycles weapons and the aim
+  is not written, so the player keeps the rotation the cutscene found.
 - **Aim.** The right aim pose, placed in the world like the eyes (same lean shift), casts
   `IntersectSegment` (player excluded, 8192 units). `rotation` becomes the angles from the
   original fire origin (`camera_position`) to that point, pitch clamped to ±1.48, so shots,
   USE and every server reader of `m_fPitch/m_fYaw` go where the controller points, with no
   weapon-code change. Without a valid aim pose the head's forward is used.
 - **Feedback.** A red laser from the right aim pose to the target and a white reticle sized
-  with distance (Options > VR AIM LASER and CROSSHAIR turn each off), drawn by `LineRenderer`
-  through `ScenePresenter::eye_overlay` in each eye's scene pass and depth range. The
+  with distance (Options > VR AIM LASER and CROSSHAIR turn each off; neither shows during a
+  scripted camera or the death camera), drawn by `LineRenderer` through
+  `ScenePresenter::eye_overlay` in each eye's scene pass and depth range. The
   controllers themselves are not drawn: the view weapons, or the menu hands, stand at them.
   A 30 ms haptic pulse marks every shot a hand's weapon actually fires (`CViewWeapon::shots`).
 - **View weapons per hand.** Each hand's view model follows its own controller (the left one
@@ -211,9 +216,12 @@ No game world, HUD or menu is rendered in XR yet.
   idle clip (else `static_model`) on the frame clock. `CViewWeapon::Create` loads them; nothing
   else of the weapon runs.
 - **Where.** `XrFrontend::build_hands` fills `ScenePresenter::hand_scene` and sets
-  `draw_hands`; the presenter then records `hand_renderer` in the view-model depth slice in place
-  of the paused world's frozen view weapons, or, with no world, `record_hand_eyes` clears each eye
-  and draws the hands and the laser. The hands are fully bright (no lighting service) with the
+  `draw_hands`. The paused world then omits its frozen view weapons (with no world,
+  `record_empty_eyes` clears each eye dark), and `record_overlay_eyes` draws the hands (view-model
+  depth slice) and the menu laser with a transparent clear into a second two-layer eye swapchain
+  (`XrRuntime::create_overlay`). `end_frame` submits it as a third, alpha-blended projection layer
+  after the menu quad, so hands and laser are never hidden by the panel. It is only acquired and
+  submitted while the panel is shown. The hands are fully bright (no lighting service) with the
   original shaders. A world revision clears their geometry and textures with the others. A load
   or placement failure is logged once and leaves the hands out; the menu still works.
 
@@ -261,9 +269,10 @@ No game world, HUD or menu is rendered in XR yet.
 - **Options > VR.** In an XR session (`Menu::vr`) Options ends with a replacement `VR` row
   opening three replacement rows, labelled like the Display page's: `TURN [SNAP n]` /
   `TURN [SMOOTH]` (cycling 15, 30, 45, 60, 90, smooth), `AIM LASER [ON/OFF]` and
-  `CROSSHAIR [ON/OFF]` (the 3D reticle). They persist in preferences version 4 (`vr_turn`
-  in degrees, 0 smooth, `vr_laser`, `vr_crosshair`; versions 1–3 load the defaults: 45°, on,
-  on) and reach `XrFrontend::set_options` every frame. Desktop menus have no VR row.
+  `CROSSHAIR [ON/OFF]` (the 3D reticle) and `MOVE [HEAD/RIGHT HAND]` (the locomotion
+  reference). They persist in preferences version 5 (`vr_turn` in degrees, 0 smooth,
+  `vr_laser`, `vr_crosshair`, `vr_move_hand`; older versions load the defaults: 45°, on, on,
+  head) and reach `XrFrontend::set_options` every frame. Desktop menus have no VR row.
 - **Diagnostics.** Every 360 frames the log records the canvas mode, whether the world was
   drawn, menu state, ImGui vertices, scene draw calls, controller tracking and close models. Meta's "metacam" screenshots omit
   quad layers; use the `screencap` method (both raw eye images) to see the canvas.
@@ -297,8 +306,7 @@ FOV gives the desktop projection.
 
 ## Not included yet
 
-Multiview, the remaining VR options (handedness, movement reference, smooth-turn speed,
-HUD distance), the left-handed layout, weapon slots by number, two-handed foregrip tracking
+Multiview, the remaining VR options (handedness, smooth-turn speed, HUD distance), the left-handed layout, weapon slots by number, two-handed foregrip tracking
 and motion melee, refresh-rate and performance settings,
 the data setup screen and demo download, PCVR presets and their profiles.
 Shadow casters are still chosen with the 90° desktop frustum around the head, close

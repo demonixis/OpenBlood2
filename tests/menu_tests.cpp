@@ -210,9 +210,9 @@ namespace
         CHECK(menu.items.size() == 7 && menu.items[6].literal == "VR" && menu.enabled(menu.items[6]));
         menu.selected = 6;
         menu.activate();
-        CHECK(menu.page == MenuPage::Vr && menu.small() && menu.items.size() == 3 &&
+        CHECK(menu.page == MenuPage::Vr && menu.small() && menu.items.size() == 4 &&
               !strcmp(menu.title(), "options.pcx") && menu.items[0].setting == 10 && menu.items[1].setting == 11 &&
-              menu.items[2].setting == 12);
+              menu.items[2].setting == 12 && menu.items[3].setting == 13);
         menu.selected = 0;
         menu.activate();
         CHECK(menu.settings.vr_turn == 60 && menu.take_command().action == MenuAction::Settings);
@@ -228,11 +228,15 @@ namespace
         menu.selected = 2;
         menu.activate();
         CHECK(!menu.settings.vr_laser && !menu.settings.vr_crosshair);
+        menu.selected = 3;
+        menu.activate();
+        CHECK(menu.settings.vr_move_hand);
         menu.back();
         CHECK(menu.page == MenuPage::Options);
         menu.vr = false;
         menu.settings.vr_turn = 45;
         menu.settings.vr_laser = menu.settings.vr_crosshair = true;
+        menu.settings.vr_move_hand = false;
         menu.take_command();
         auto fit = MenuViewport::fit(1920, 1080);
         float x = 240, y = 0;

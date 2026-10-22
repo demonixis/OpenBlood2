@@ -10,12 +10,12 @@ namespace OpenBlood2
     namespace
     {
         // Version 1 has the first seven keys; version 2 adds the display settings; version 3 adds
-        // the renderer selection; version 4 adds the VR options.
-        constexpr std::array<const char*, 15> names{"version",        "sound",       "music",       "sound_volume",
-                                                    "music_volume",   "sensitivity", "invert_y",    "detail",
-                                                    "pixel_lighting", "renderer",    "quality",     "normal_maps",
-                                                    "vr_turn",        "vr_laser",    "vr_crosshair"};
-        constexpr std::array<std::size_t, 4> version_keys{7, 9, 12, 15};
+        // the renderer selection; version 4 the VR options; version 5 the VR movement reference.
+        constexpr std::array<const char*, 16> names{"version",        "sound",       "music",        "sound_volume",
+                                                    "music_volume",   "sensitivity", "invert_y",     "detail",
+                                                    "pixel_lighting", "renderer",    "quality",      "normal_maps",
+                                                    "vr_turn",        "vr_laser",    "vr_crosshair", "vr_move_hand"};
+        constexpr std::array<std::size_t, 5> version_keys{7, 9, 12, 15, 16};
         bool valid(const MenuSettings& s)
         {
             const bool turn = s.vr_turn == 0 || s.vr_turn == 15 || s.vr_turn == 30 || s.vr_turn == 45 ||
@@ -95,7 +95,7 @@ namespace OpenBlood2
         if (input.bad() || !known ||
             std::find(seen.begin(), seen.begin() + required, false) != seen.begin() + required ||
             std::find(seen.begin() + required, seen.end(), true) != seen.end() || !flag(1) || !flag(2) || !flag(6) ||
-            !flag(8) || !flag(11) || !flag(13) || !flag(14))
+            !flag(8) || !flag(11) || !flag(13) || !flag(14) || !flag(15))
         {
             error = "Incomplete or unsupported preferences";
             return false;
@@ -124,6 +124,8 @@ namespace OpenBlood2
             result.vr_laser = values[13];
             result.vr_crosshair = values[14];
         }
+        if (required >= version_keys[4])
+            result.vr_move_hand = values[15];
         if (!valid(result))
         {
             error = "Preferences out of range";
@@ -140,7 +142,7 @@ namespace OpenBlood2
             error = "Preferences out of range";
             return false;
         }
-        const std::array<int, names.size()> values{4,
+        const std::array<int, names.size()> values{5,
                                                    settings.sound,
                                                    settings.music,
                                                    settings.sound_volume,
@@ -154,7 +156,8 @@ namespace OpenBlood2
                                                    settings.normal_maps,
                                                    settings.vr_turn,
                                                    settings.vr_laser,
-                                                   settings.vr_crosshair};
+                                                   settings.vr_crosshair,
+                                                   settings.vr_move_hand};
         std::string text;
         for (unsigned i = 0; i < values.size(); ++i)
             text += std::string(names[i]) + '=' + std::to_string(values[i]) + '\n';

@@ -148,6 +148,11 @@ namespace OpenBlood2
         SDL_GPUTexture** quad_images = nullptr;
         std::uint32_t quad_count = 0, quad_width = 0, quad_height = 0;
         bool quad_acquired = false;
+        // The overlay over the quad: a second eye-sized two-layer swapchain.
+        XrSwapchain overlay_swapchain = XR_NULL_HANDLE;
+        SDL_GPUTexture** overlay_images = nullptr;
+        std::uint32_t overlay_count = 0;
+        bool overlay_acquired = false;
 
         XrResult create_swapchain(std::uint32_t width, std::uint32_t height, std::uint32_t layers,
                                   XrSwapchain& swapchain_out, SDL_GPUTexture**& images_out)
@@ -277,6 +282,8 @@ namespace OpenBlood2
         auto& s = *state_;
         if (s.device)
             SDL_WaitForGPUIdle(s.device);
+        if (s.overlay_swapchain && s.device)
+            SDL_DestroyGPUXRSwapchain(s.device, s.overlay_swapchain, s.overlay_images);
         if (s.quad_swapchain && s.device)
             SDL_DestroyGPUXRSwapchain(s.device, s.quad_swapchain, s.quad_images);
         if (s.swapchain && s.device)
@@ -929,18 +936,45 @@ namespace OpenBlood2
         return s.acquire(s.quad_swapchain, s.quad_images, s.quad_count, s.quad_acquired, error);
     }
 
+    bool XrRuntime::create_overlay(std::string& error)
+    {
+        auto& s = *state_;
+        if (s.overlay_swapchain || !s.swapchain)
+        {
+            error = "Invalid or repeated OpenXR overlay creation";
+            return false;
+        }
+        return s.check(s.create_swapchain(s.width, s.height, 2, s.overlay_swapchain, s.overlay_images),
+                       "SDL_CreateGPUXRSwapchain", error) &&
+               s.check(s.enumerate_images(s.overlay_swapchain, 0, &s.overlay_count, nullptr),
+                       "xrEnumerateSwapchainImages", error);
+    }
+
+    SDL_GPUTexture* XrRuntime::acquire_overlay(std::string& error)
+    {
+        auto& s = *state_;
+        if (!s.overlay_swapchain)
+        {
+            error = "No OpenXR overlay";
+            return nullptr;
+        }
+        return s.acquire(s.overlay_swapchain, s.overlay_images, s.overlay_count, s.overlay_acquired, error);
+    }
+
     bool XrRuntime::end_frame(const XrFrameInput& frame, bool rendered, std::string& error, const XrQuadPlacement* quad,
                               float fade)
     {
         auto& s = *state_;
-        const bool quad_drawn = s.quad_acquired;
-        if (!s.release(s.swapchain, s.image_acquired, error) || !s.release(s.quad_swapchain, s.quad_acquired, error))
+        const bool quad_drawn = s.quad_acquired, overlay_drawn = s.overlay_acquired;
+        if (!s.release(s.swapchain, s.image_acquired, error) || !s.release(s.quad_swapchain, s.quad_acquired, error) ||
+            !s.release(s.overlay_swapchain, s.overlay_acquired, error))
             return false;
-        std::array<XrCompositionLayerProjectionView, 2> views{};
+        std::array<XrCompositionLayerProjectionView, 2> views{}, overlay_views{};
         auto projection = make<XrCompositionLayerProjection>(XR_TYPE_COMPOSITION_LAYER_PROJECTION);
+        auto overlay = make<XrCompositionLayerProjection>(XR_TYPE_COMPOSITION_LAYER_PROJECTION);
         auto scale = make<XrCompositionLayerColorScaleBiasKHR>(XR_TYPE_COMPOSITION_LAYER_COLOR_SCALE_BIAS_KHR);
         auto panel = make<XrCompositionLayerQuad>(XR_TYPE_COMPOSITION_LAYER_QUAD);
-        std::array<const XrCompositionLayerBaseHeader*, 2> layers{};
+        std::array<const XrCompositionLayerBaseHeader*, 3> layers{};
         auto end = make<XrFrameEndInfo>(XR_TYPE_FRAME_END_INFO);
         end.displayTime = frame.display_time;
         end.environmentBlendMode = XR_ENVIRONMENT_BLEND_MODE_OPAQUE;
@@ -977,6 +1011,17 @@ namespace OpenBlood2
                 panel.pose = xr_pose(quad->pose);
                 panel.size = {quad->width, quad->height};
                 layers[end.layerCount++] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&panel);
+            }
+            if (overlay_drawn)
+            {
+                overlay_views = views;
+                for (auto& view : overlay_views)
+                    view.subImage.swapchain = s.overlay_swapchain;
+                overlay.layerFlags = XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT;
+                overlay.space = s.space;
+                overlay.viewCount = 2;
+                overlay.views = overlay_views.data();
+                layers[end.layerCount++] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&overlay);
             }
             end.layers = layers.data();
         }

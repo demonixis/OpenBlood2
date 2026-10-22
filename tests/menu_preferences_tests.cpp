@@ -34,9 +34,9 @@ int test_menu_preferences(int argc, char** argv)
         // The shared atomic writer keeps the exact preference bytes.
         std::ifstream in(path, std::ios::binary);
         const std::string bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        CHECK(bytes == "version=4\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
+        CHECK(bytes == "version=5\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
                        "invert_y=1\ndetail=2\npixel_lighting=0\nrenderer=0\nquality=0\nnormal_maps=1\n"
-                       "vr_turn=45\nvr_laser=1\nvr_crosshair=1\n");
+                       "vr_turn=45\nvr_laser=1\nvr_crosshair=1\nvr_move_hand=0\n");
     }
     settings.sound = true;
     CHECK(save_menu_preferences(path, settings, error));
@@ -68,12 +68,22 @@ int test_menu_preferences(int argc, char** argv)
     CHECK(load_menu_preferences(path, loaded, error) && loaded.renderer == 1 && loaded.quality == 1 &&
           !loaded.normal_maps && loaded.vr_turn == 45 && loaded.vr_laser && loaded.vr_crosshair);
     {
-        // Version 4 adds the VR options; a turn step outside the offered values is refused.
+        // Version 4 adds the VR options, version 5 the movement reference; a turn step outside the
+        // offered values is refused.
         MenuSettings vr;
         vr.vr_turn = 0;
         vr.vr_laser = false;
+        vr.vr_move_hand = true;
         CHECK(save_menu_preferences(path, vr, error));
         CHECK(load_menu_preferences(path, loaded, error) && loaded == vr && loaded.vr_crosshair);
+        {
+            std::ofstream v4(path);
+            v4 << "version=4\nsound=1\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\ninvert_y=1\n"
+                  "detail=1\npixel_lighting=0\nrenderer=1\nquality=1\nnormal_maps=0\nvr_turn=30\nvr_laser=0\n"
+                  "vr_crosshair=1\n";
+        }
+        CHECK(load_menu_preferences(path, loaded, error) && loaded.vr_turn == 30 && !loaded.vr_laser &&
+              !loaded.vr_move_hand);
         vr.vr_turn = 20;
         CHECK(!save_menu_preferences(path, vr, error) && !error.empty());
         std::ofstream out(path);

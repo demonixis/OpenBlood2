@@ -22,8 +22,10 @@ namespace OpenBlood2
     {
         bool initialized = false;
         float body_yaw = 0, written_pitch = 0, written_yaw = 0;
-        // Options > VR: the snap-turn step in radians; zero turns smoothly.
+        // Options > VR: the snap-turn step in radians (zero turns smoothly), and whether the left
+        // stick moves relative to the right hand instead of the head.
         float turn_step = xr_snap_angle;
+        bool hand_direction = false;
         xr::PressEdge prev_item, next_item, use_item;
         xr::StickEdge turn, weapon;
         xr::TriggerButton fire, alt_fire, grip;
@@ -53,10 +55,11 @@ namespace OpenBlood2
         std::array<xr::Vec3, 2> shoulders{}, poles{}; // {left, right}, world.
     };
     XrShoulders xr_shoulders(const XrTracking&, float units_per_meter, std::optional<float>& body_yaw);
-    // Controller state into the original client inputs (right-handed layout): head-relative
+    // Controller state into the original client inputs (right-handed layout): head- or hand-relative
     // locomotion through CBloodClientShell::locomotion_yaw, snap or smooth turns over `seconds`,
     // weapon cycling, items, and converged aim (shots leave the eye toward the point the right
-    // controller designates).
+    // controller designates). A scripted camera (CBloodClientShell::view.object) keeps the player's
+    // rotation: no turning, weapon cycling or aim.
     void xr_apply_controls(GameSession&, XrPlayer&, const XrFrameInput&, const XrTracking&, const xr::Vec3& reference,
                            float units_per_meter, double seconds);
 } // namespace OpenBlood2

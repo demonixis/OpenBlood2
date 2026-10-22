@@ -260,6 +260,8 @@ namespace OpenBlood2
                 label = item.literal = display.vr_laser ? "AIM LASER [ON]" : "AIM LASER [OFF]";
             else if (item.setting == 12)
                 label = item.literal = display.vr_crosshair ? "CROSSHAIR [ON]" : "CROSSHAIR [OFF]";
+            else if (item.setting == 13)
+                label = item.literal = display.vr_move_hand ? "MOVE [RIGHT HAND]" : "MOVE [HEAD]";
             const bool enabled = menu.enabled(item);
             const auto& font = menu.small()              ? small_
                                : !enabled                ? disabled_
