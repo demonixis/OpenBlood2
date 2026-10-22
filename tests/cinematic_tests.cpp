@@ -320,8 +320,13 @@ namespace
         r.space = SoundSpace::Local;
         CHECK(g.server.PlayCinematicSound(h, r, error));
         CHECK(g.server.advance_audio(.01, {}, {}));
-        CHECK(g.server.audio.has_output() && g.server.audio.submitted_frames == 480 && g.server.audio.peak > .49f &&
-              g.server.audio.output_error.empty());
+        CHECK(g.server.audio.has_output() && g.server.audio.submitted_frames == 480 && !g.server.audio.lead_frames &&
+              g.server.audio.peak > .49f && g.server.audio.output_error.empty());
+        // The interactive lead fills a short device queue to 60 ms ahead of the 10 ms step.
+        g.server.audio.output_lead = AudioMixer::interactive_output_lead;
+        CHECK(g.server.advance_audio(.01, {}, {}));
+        CHECK(g.server.audio.lead_frames > 0 && g.server.audio.submitted_frames - 480 >= 2400 &&
+              g.server.audio.submitted_frames - 480 <= 2880 && g.server.audio.output_error.empty());
         CHECK(g.unload_world() && g.server.audio.voices().empty() && g.server.audio.submitted_frames == 0);
         return true;
     }

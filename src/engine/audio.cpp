@@ -298,8 +298,21 @@ namespace OpenBlood2
         if (paused_)
             return true;
         const double total = seconds * rate + remainder_;
-        const auto frames = std::uint64_t(std::floor(total + 1e-8));
+        auto frames = std::uint64_t(std::floor(total + 1e-8));
         remainder_ = std::max(0.0, total - double(frames));
+        if (output_ && output_lead > 0)
+        {
+            // Replacement policy: refill the device queue to the lead ahead of the step, so a
+            // frame longer than the queued audio does not starve the device.
+            const auto queued = SDL_GetAudioStreamQueued(output_);
+            const auto target = std::uint64_t(output_lead * rate);
+            const auto have = queued > 0 ? std::uint64_t(queued) / (2 * sizeof(float)) : 0;
+            if (queued >= 0 && have + frames < target)
+            {
+                lead_frames += target - have - frames;
+                frames = target - have;
+            }
+        }
         const bool rendering = inspect_pcm || output_;
         const auto count =
             rendering ? std::min<std::uint64_t>(frames, 12000) : 0; // 250 ms bounded mixer/output work after a stall.
@@ -515,6 +528,7 @@ namespace OpenBlood2
         destination.paused_ = paused_;
         destination.sound_gain_ = sound_gain_;
         destination.music_gain_ = music_gain_;
+        destination.output_lead = output_lead;
         output_ = nullptr;
         audio_initialized_ = false;
         return true;
@@ -531,7 +545,7 @@ namespace OpenBlood2
         mixed.clear();
         remainder_ = 0;
         peak = 0;
-        mixed_frames = submitted_frames = dropped_frames = 0;
+        mixed_frames = submitted_frames = dropped_frames = lead_frames = 0;
         output_error.clear();
         if (output_ && !SDL_ClearAudioStream(output_))
             output_error = SDL_GetError();

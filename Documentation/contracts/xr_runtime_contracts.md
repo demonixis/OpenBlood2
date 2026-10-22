@@ -65,7 +65,8 @@ No game world, HUD or menu is rendered in XR yet.
 - `blood2 --xr` (XR builds) and the Quest APK launched with game data enter the world
   directly (`--world`, `Demo_01` for the demo) through the ordinary start point, with no
   menu, HUD or controller input yet. Simulation and game audio run only while FOCUSED;
-  the step is the predicted display period, capped at 100 ms like `app_frame_delta`.
+  the step is the time between the last two predicted display times (the display period
+  on the first frame), capped at 100 ms like `app_frame_delta`.
 - **Data folders.** The headset reads `/sdcard/openblood2/game` (retail, `BLOOD2.REZ`)
   before `/sdcard/openblood2/demo` (`B2DEMO.REZ`); file names match case-insensitively.
   Neither opens the first light. The Quest flavor declares `MANAGE_EXTERNAL_STORAGE`
@@ -224,7 +225,9 @@ No game world, HUD or menu is rendered in XR yet.
   launch; `--xr --view-world` enters the world directly. The standalone XR world loop is gone.
 - **Device and window.** The OpenXR session owns the GPU device (`Runtime::set_device`); the SDL
   window still carries input and ImGui's platform backend but is never presented.
-  `xrWaitFrame` paces the loop and the step is the predicted display period (capped at 100 ms);
+  `xrWaitFrame` paces the loop and the step is the time between the last two predicted display
+  times, capped at 100 ms (a fixed display period ran slow frames in slow motion and left the
+  audio short, heard as a repeating chunk);
   an idle session only polls SDL for quit.
 - **UI canvas.** ImGui renders a fixed 640×480 canvas (the original layout: menu art 1:1,
   `CNewStatusBar` at its original proportions) into one single-layer XR swapchain with the same

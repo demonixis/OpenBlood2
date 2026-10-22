@@ -143,6 +143,8 @@ namespace OpenBlood2
         }
         if (!game->server.audio.open_output(error))
             spdlog::warn("Game audio output: {}", error);
+        // A frame longer than one step's audio must not starve the device (carried by output transfers).
+        game->server.audio.output_lead = AudioMixer::interactive_output_lead;
         if (options.view_world || options.demo_smoke)
         {
             spdlog::info("Loading world: {} (direct entry)", options.world);

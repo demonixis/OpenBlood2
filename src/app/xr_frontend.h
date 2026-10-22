@@ -52,7 +52,8 @@ namespace OpenBlood2
         {
             return frame_;
         }
-        // The frame's simulation step: the predicted display period, capped like app_frame_delta.
+        // The frame's simulation step: the time between the last two predicted display times (the
+        // display period on the first frame), capped like app_frame_delta.
         double delta() const;
         // A session input-focus change since the last call (true: gained).
         std::optional<bool> take_focus_change();
@@ -111,6 +112,7 @@ namespace OpenBlood2
         xr::TriggerButton left_trigger_, right_trigger_;
         Options options_;
         XrFrameInput frame_{};
+        std::int64_t previous_display_time_ = 0;
         XrPlayer player_;
         std::unique_ptr<LineRenderer> lines_;
         std::vector<LineVertex> overlay_;

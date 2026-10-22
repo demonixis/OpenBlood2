@@ -90,6 +90,7 @@ namespace OpenBlood2
             return Begin::Exit;
         if (!xr_.session_running())
             return Begin::Idle;
+        previous_display_time_ = frame_.display_time;
         if (!xr_.begin_frame(frame_, error))
             return Begin::Failed;
         if (frame_.focused != focused_)
@@ -102,7 +103,11 @@ namespace OpenBlood2
 
     double XrFrontend::delta() const
     {
-        return app_frame_delta(double(frame_.display_period) / 1e9);
+        // A frame that misses its display time advances by the frames it missed, so the simulation
+        // and the audio keep real time (a fixed display period ran them slow and starved audio).
+        const auto elapsed = frame_.display_time - previous_display_time_;
+        const bool measured = previous_display_time_ > 0 && elapsed > 0;
+        return app_frame_delta(double(measured ? elapsed : frame_.display_period) / 1e9);
     }
 
     std::optional<bool> XrFrontend::take_focus_change()

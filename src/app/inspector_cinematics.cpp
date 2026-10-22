@@ -12,9 +12,9 @@ namespace OpenBlood2
         ImGui::Text("Output: %s | voices %zu | cached clips %zu (%.1f MiB)",
                     audio.has_output() ? "SDL stream" : "offline clock", audio.voices().size(), audio.cached_clips(),
                     audio.cached_bytes() / 1048576.0);
-        ImGui::Text("PCM frames mixed / submitted / dropped: %llu / %llu / %llu",
+        ImGui::Text("PCM frames mixed / submitted / dropped / lead refill: %llu / %llu / %llu / %llu",
                     (unsigned long long)audio.mixed_frames, (unsigned long long)audio.submitted_frames,
-                    (unsigned long long)audio.dropped_frames);
+                    (unsigned long long)audio.dropped_frames, (unsigned long long)audio.lead_frames);
         ImGui::TextWrapped("Dry stereo output only: original reverb request is retained but not rendered. Spatial "
                            "gains are replacement linear attenuation/panning, without occlusion or Doppler.");
         if (!audio.output_error.empty())

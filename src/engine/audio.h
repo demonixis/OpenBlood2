@@ -102,7 +102,13 @@ namespace OpenBlood2
         std::string music_error;     // Durable transport/delivery failure; reset with the world or a new start.
         bool inspect_pcm = false;    // Headless simulation can advance exact sample cursors without rendering blocks.
         std::vector<float> mixed;
-        std::uint64_t mixed_frames = 0, submitted_frames = 0, dropped_frames = 0;
+        // Device output keeps at least `output_lead` seconds queued: frames mixed ahead of the
+        // simulation step to reach it are counted in lead_frames. Zero (the default) keeps exact
+        // sample stepping; the interactive frontend uses interactive_output_lead. Transferred with
+        // the output.
+        static constexpr double interactive_output_lead = 0.06;
+        double output_lead = 0;
+        std::uint64_t mixed_frames = 0, submitted_frames = 0, dropped_frames = 0, lead_frames = 0;
         float peak = 0;
         std::string output_error;
 

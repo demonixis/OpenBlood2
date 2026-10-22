@@ -78,7 +78,13 @@ also pending. Do not infer their availability from CinematicTrigger playback.
 
 Interactive application runs open SDL's default playback stream (48 kHz stereo
 float); failure is visible and leaves offline clocks operating. Each update renders
-at most 250 ms and records dropped frames beyond that bound. A queued backlog over
+at most 250 ms and records dropped frames beyond that bound. The interactive frontend
+sets `AudioMixer::output_lead` to 60 ms (carried by output transfers): with a device, an
+update whose step would leave less than the lead queued renders ahead to that level and
+counts the extra frames in `lead_frames` (replacement policy: a frame longer than the
+queued audio no longer starves the device; voices and music run up to that much ahead of
+the simulation clock). Smoke runs, tests and offline clocks keep a zero lead and exact
+sample stepping. A queued backlog over
 250 ms is cleared and counted. Stream errors are retained for inspection; submitted
 frames mean SDL accepted PCM, not proof that a person heard it. Headless and normal
 GPU tests are silent; the cinematic device/GPU tests use SDL's dummy driver.
