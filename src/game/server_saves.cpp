@@ -8,6 +8,7 @@
 #include <set>
 #include <sstream>
 #include <unordered_set>
+#include <utility>
 
 // Original SaveObjects/RestoreObjects over the in-memory logical store: engine records,
 // clock, creation-order save list, two-pass restore and save purity (save_load_contracts,

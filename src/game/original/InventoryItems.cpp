@@ -2,6 +2,7 @@
 // GetNextItem, GetPrevItem, GetItemCharges, the RemoveItem cursor rule and UpdateClient values.
 #include "InventoryMgr.h"
 #include <algorithm>
+#include <utility>
 
 namespace
 {

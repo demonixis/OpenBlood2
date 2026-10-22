@@ -2,6 +2,7 @@
 #include "app/session_playback.h"
 #include <algorithm>
 #include <cmath>
+#include <utility>
 #include <spdlog/spdlog.h>
 
 namespace OpenBlood2

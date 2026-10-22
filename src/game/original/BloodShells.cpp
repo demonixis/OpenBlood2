@@ -11,6 +11,7 @@
 #include <cctype>
 #include <climits>
 #include <cmath>
+#include <utility>
 
 void CBloodServerShell::PreStartWorld()
 {
