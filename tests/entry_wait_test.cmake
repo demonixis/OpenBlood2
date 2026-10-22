@@ -1,8 +1,10 @@
+# A normal launch opens the original menu: no world is loaded or advanced before
+# a player enters (New Game and --view-world enter the player before the first tick).
 execute_process(COMMAND "${APP}" --config "${CONFIG}" --data-dir "${DATA_DIR}" --frames 12 --capture "${CAPTURE}"
     RESULT_VARIABLE status OUTPUT_VARIABLE out ERROR_VARIABLE err)
 message("${out}${err}")
-if(NOT status EQUAL 0 OR NOT out MATCHES "Session playback: waiting=12 time=0 npc-ready=16 npc-failed=0 npc-updates=0")
-    message(FATAL_ERROR "Interactive world advanced before player entry: ${status}")
+if(NOT status EQUAL 0 OR NOT "${out}${err}" MATCHES "Frontend complete: 12 frames, world , ")
+    message(FATAL_ERROR "Normal launch loaded a world before player entry: ${status}")
 endif()
 if(out MATCHES "Validation Error|VUID-" OR err MATCHES "Validation Error|VUID-")
     message(FATAL_ERROR "GPU validation failed")

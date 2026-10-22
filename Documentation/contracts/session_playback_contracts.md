@@ -46,12 +46,16 @@ fresh interactive session; it does not repair an already failed diagnostic world
 The header shows waiting status and entry errors beside the entry button. Session
 shows ready/failed/active NPC counts; ready does not mean currently active or
 attacking. Existing Skeleton details retain runtime error, camera gate, target,
-activity/pings, weapon attempts and shots. The shutdown log records waiting frames,
+activity/pings, weapon attempts and shots. The GPU smoke-run shutdown log records waiting frames,
 simulation time, NPC readiness/failures and update totals. Reading these counters
 does not run AI or alter activation.
 
-A real application GPU check presents 12 pre-entry frames with time zero, all 15
-SubwayA NPCs ready, no failed actors and no AI_Update calls. A private regression
+Since the [original menu frontend](menu_contracts.md), a normal launch opens the menu
+and loads no world, and New Game or `--view-world` enters the player before the first
+tick; the waiting world remains reachable through the inspector's no-player reload.
+The application GPU check (`gpu.entry_wait`) therefore presents 12 menu frames and
+confirms that no world was loaded. It superseded a check of 12 pre-entry SubwayA frames
+with time zero, all NPCs ready, no failed actors and no AI_Update calls. A private regression
 waits 180 interactive frames, enters normally, runs the complete original intro,
 then places only the player at a labelled encounter inside the actual train.
 Authored NPC transforms, states, inventory, activation and targeting are untouched.
