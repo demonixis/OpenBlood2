@@ -46,6 +46,7 @@ namespace OpenBlood2
         bool world_smoke = false;
         // Headless offscreen presentation measurement; never opens a window.
         bool bench = false, bench_sweep = false;
+        bool bench_audio = false;    // Bench renders the game mix offline (streamed reads as with a device).
         bool model_shadows = true;   // FLAG_SHADOW model shadows (original high-detail MaxModelShadows).
         bool pixel_lighting = false; // Model light per pixel (the frontend uses the Display setting).
         // Renderer for the bench and direct paths (the frontend uses the Display settings):

@@ -1793,6 +1793,7 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --bench             Headless offscreen timing of --world presentation; no window\n"
                      "  --bench-size WxH    Bench render size (default 1920x1080); implies --bench\n"
                      "  --bench-sweep       Bench with a presentation-only 360-degree yaw sweep\n"
+                     "  --bench-audio       Bench also renders the game mix offline (no device)\n"
                      "  --no-model-shadows  Disable FLAG_SHADOW model shadows (original low/medium detail)\n"
                      "  --pixel-lighting    Light models per pixel (menu: Options > Display)\n"
                      "  --renderer MODE     original (default), standard or high enhanced shading (menu: Display)\n"

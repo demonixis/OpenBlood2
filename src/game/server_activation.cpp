@@ -1,4 +1,5 @@
 #include "game/server_adapter.h"
+#include <chrono>
 #include <cmath>
 namespace OpenBlood2
 {
@@ -46,12 +47,35 @@ namespace OpenBlood2
     {
         if (!trace_service("PingObjects"))
             return false;
+        struct Cost
+        {
+            ServerAdapter& server;
+            std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+            ~Cost()
+            {
+                server.activation_ping_ns += std::uint64_t(
+                    std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - begin)
+                        .count());
+                ++server.activation_ping_calls;
+            }
+        } cost{*this};
         auto* source = objects_.get(observer);
         if (!source || source->life != Life::Alive || !collision || !collision_ready)
             return false;
         const auto from = source->state.m_Pos;
         // Replacement visibility selection: checked center rays using the original
         // AI glass/volume filter, independent of render/UI. This is not retail PVS.
+        // No callback runs between these rays, so the object filter is prepared once.
+        SegmentBatch batch;
+        prepare_segment_batch(observer, false, SegmentObjects::SolidOnly, SegmentFilter::AIVisibility, batch);
+        struct Active
+        {
+            SegmentBatch*& slot;
+            ~Active()
+            {
+                slot = nullptr;
+            }
+        } active{segment_batch_ = &batch};
         std::vector<ObjectId> visible;
         for (auto id : objects_.snapshot())
         {

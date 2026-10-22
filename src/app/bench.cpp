@@ -107,12 +107,18 @@ namespace OpenBlood2
             presenter.shading = SurfaceShading(options.renderer);
             presenter.normal_maps = options.normal_maps;
             Capture capture;
-            Series step, world, models, effects, record, gpu, total, draws, culled;
+            Series step, world, models, effects, record, gpu, total, draws, culled, pings, reads, read_counts;
+            std::uint64_t ping_calls = 0;
+            // The game mix is otherwise skipped without a device; render it to time streamed reads.
+            game->server.audio.inspect_pcm = options.bench_audio;
             std::size_t passes = 0, max_draws = 0;
             const auto base = game->client_shell.view.rotation;
             for (unsigned frame = 0; frame < frames + warmup_frames; ++frame)
             {
                 const auto begin = SDL_GetTicksNS();
+                const auto ping_ns = game->server.activation_ping_ns, ping_count = game->server.activation_ping_calls;
+                const auto read_ns = game->server.audio.stream_read_ns(),
+                           read_count = game->server.audio.stream_reads();
                 if (!step_app_session(*game, 1.0 / 60))
                 {
                     spdlog::error("Bench simulation step failed at frame {}", frame);
@@ -172,6 +178,10 @@ namespace OpenBlood2
                 if (frame < warmup_frames)
                     continue;
                 step.add(milliseconds(begin, stepped));
+                pings.add(double(game->server.activation_ping_ns - ping_ns) / 1e6);
+                reads.add(double(game->server.audio.stream_read_ns() - read_ns) / 1e6);
+                ping_calls += game->server.activation_ping_calls - ping_count;
+                read_counts.add(double(game->server.audio.stream_reads() - read_count));
                 world.add(presenter.stats.world_ns / 1e6);
                 models.add(presenter.stats.models_ns / 1e6);
                 effects.add(presenter.stats.effects_ns / 1e6);
@@ -190,12 +200,21 @@ namespace OpenBlood2
             };
             spdlog::info("Bench {} (ms per frame):", game->world_path);
             row("simulation step", step);
+            row("  activation pings (PingObjects)", pings);
+            row("  streamed PCM reads", reads);
             row("world/sky draw lists", world);
             row("models (CPU pose/vertices)", models);
             row("polygrids/sprites/particles", effects);
             row("record (uploads/encode/submit)", record);
             row("GPU completion wait", gpu);
             row("total serialized frame", total);
+            const auto read_frames = std::count_if(read_counts.values.begin(), read_counts.values.end(),
+                                                   [](double count) { return count > 0; });
+            spdlog::info("Hitches: {} PingObjects calls ({:.3f} ms each); {:.0f} streamed PCM reads in {} frames, "
+                         "at most {:.0f} in one frame{}",
+                         ping_calls, ping_calls ? pings.mean() * pings.values.size() / ping_calls : 0,
+                         read_counts.mean() * read_counts.values.size(), read_frames, read_counts.percentile(1),
+                         options.bench_audio ? "" : " (mix not rendered: add --bench-audio)");
             spdlog::info(
                 "Counters: {:.0f} draw calls mean ({} max), {:.0f} culled draw records mean, {} render passes, "
                 "{} world draws, {} skinned model instances, {} skinned instance corners, {} staged upload "

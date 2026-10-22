@@ -1,5 +1,6 @@
 #include "engine/audio_stream.h"
 #include <algorithm>
+#include <chrono>
 #include <cstring>
 namespace OpenBlood2
 {
@@ -14,11 +15,12 @@ namespace OpenBlood2
             return u16(b, at) | (std::uint32_t(u16(b, at + 2)) << 16);
         }
     } // namespace
-    std::shared_ptr<PcmStream> PcmStream::open(const Resource& resource, std::string& error)
+    std::shared_ptr<PcmStream> PcmStream::open(const Resource& resource, std::string& error, std::size_t window_phase)
     {
         error.clear();
         auto stream = std::make_shared<PcmStream>();
         stream->source_ = resource;
+        stream->window_phase = window_phase % window_frames;
         if (resource.size < 12 || resource.size > 128 * 1024 * 1024)
         {
             error = "Streaming WAVE envelope exceeds 128 MiB or is truncated";
@@ -53,6 +55,17 @@ namespace OpenBlood2
     }
     bool PcmStream::read(std::uint64_t offset, std::span<std::uint8_t> bytes, std::string& out)
     {
+        struct Cost
+        {
+            std::uint64_t& total;
+            std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+            ~Cost()
+            {
+                total += std::uint64_t(
+                    std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - begin)
+                        .count());
+            }
+        } cost{read_ns};
         if (!validate(out))
             return false;
         if (offset > source_.size || bytes.size() > source_.size - offset)
@@ -167,9 +180,12 @@ namespace OpenBlood2
         {
             auto& w = windows_[next_window_];
             next_window_ ^= 1;
-            w.begin = (frame / window_frames) * window_frames;
+            const auto end = frame < window_phase
+                                 ? window_phase
+                                 : window_phase + ((frame - window_phase) / window_frames + 1) * window_frames;
+            w.begin = frame < window_phase ? 0 : end - window_frames;
             w.count = 0;
-            const auto count = std::min(window_frames, frames - w.begin);
+            const auto count = std::min(end, frames) - w.begin;
             if (!read(std::uint64_t(data_offset_) + w.begin * block_, std::span(w.bytes).first(count * block_), out))
                 return false;
             w.count = count;

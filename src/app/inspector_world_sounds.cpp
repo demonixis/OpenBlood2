@@ -1154,9 +1154,9 @@ namespace OpenBlood2
                                voice.cursor / voice.clip->rate, voice.clip->duration(), voice.clip->rate,
                                voice.clip->channels);
             if (const auto& stream = voice.clip->stream)
-                ImGui::Text("Disk PCM | buffers %zu KiB | read %llu bytes / %llu refills",
-                            PcmStream::buffer_bytes / 1024, (unsigned long long)stream->bytes_read,
-                            (unsigned long long)stream->refills);
+                ImGui::Text("Disk PCM | buffers %zu KiB | window phase %zu | read %llu bytes / %llu refills",
+                            PcmStream::buffer_bytes / 1024, stream->window_phase,
+                            (unsigned long long)stream->bytes_read, (unsigned long long)stream->refills);
             else
                 ImGui::TextUnformatted("Decoded whole clip");
             if (!voice.error.empty())

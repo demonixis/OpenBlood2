@@ -11,13 +11,19 @@ namespace OpenBlood2
     {
       public:
         static constexpr std::size_t window_frames = 4096, buffer_bytes = window_frames * 4 * 2;
-        static std::shared_ptr<PcmStream> open(const Resource&, std::string&);
+        // Windows start at phase + k * window_frames (the first spans [0, phase)). Distinct
+        // phases keep streams started together from refilling in the same mixer step.
+        static constexpr std::size_t phase(std::size_t serial)
+        {
+            return serial * 2531 % window_frames; // 2531 / 4096 ~ golden ratio: evenly spread.
+        }
+        static std::shared_ptr<PcmStream> open(const Resource&, std::string&, std::size_t window_phase = 0);
         bool sample(std::size_t frame, unsigned channel, float&, std::string&);
         bool validate(std::string&);
         unsigned rate = 0, channels = 0, bits = 0;
-        std::size_t frames = 0;
+        std::size_t frames = 0, window_phase = 0;
         bool loop_metadata = false;
-        std::uint64_t bytes_read = 0, reads = 0, refills = 0;
+        std::uint64_t bytes_read = 0, reads = 0, refills = 0, read_ns = 0; // read_ns: steady-clock read cost.
         std::string error;
 
       private:

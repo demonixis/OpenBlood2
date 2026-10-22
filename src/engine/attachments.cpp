@@ -1,6 +1,7 @@
 #include "engine/collision.h"
 #include "engine/objects.h"
 #include <cmath>
+#include <cstring>
 namespace OpenBlood2
 {
     DRESULT Objects::attach(HOBJECT parent, HOBJECT child, const char* node, const DVector* offset,
@@ -125,11 +126,19 @@ namespace OpenBlood2
         a.resolved = true;
         return true;
     }
-    bool Objects::refresh_attachments()
+    bool Objects::refresh_attachments(bool* changed)
     {
         bool ok = true;
         for (const auto& [id, a] : attachments_)
+        {
+            const auto* child = changed ? get(a.child) : nullptr;
+            const auto position = child ? child->state.m_Pos : DVector{};
+            const auto rotation = child ? child->state.m_Rotation : DRotation{};
             ok = refresh_attachment(a.child) && ok;
+            if (child && (std::memcmp(&position, &child->state.m_Pos, sizeof position) ||
+                          std::memcmp(&rotation, &child->state.m_Rotation, sizeof rotation)))
+                *changed = true;
+        }
         if (!ok)
             fail(ObjectError::InvalidProperty, "Attachment pose unavailable; last child transform retained");
         return ok;

@@ -224,9 +224,10 @@ namespace OpenBlood2
             error = "Streaming sound cache budget exceeded";
             return false;
         }
-        auto stream = PcmStream::open(*resource, error);
+        auto stream = PcmStream::open(*resource, error, PcmStream::phase(stream_serial_));
         if (!stream)
             return false;
+        ++stream_serial_;
         auto clip = std::make_shared<AudioClip>();
         clip->rate = stream->rate;
         clip->channels = stream->channels;
@@ -320,6 +321,7 @@ namespace OpenBlood2
         peak = 0;
         const auto right = rotate_vector({1, 0, 0}, rotation);
         bool stream_failed = false;
+        validated_.clear();
         for (auto& [id, v] : voices_)
         {
             (void)id;
@@ -330,10 +332,18 @@ namespace OpenBlood2
             }
             if (v.done)
                 continue;
-            if (v.clip->stream && !v.clip->stream->validate(v.error))
+            // Check each stream's archive extent once per advance; a latched failure still
+            // reaches every voice of that stream (its reads also check the extent).
+            const auto* stream = v.clip->stream.get();
+            if (stream &&
+                (!stream->error.empty() || std::find(validated_.begin(), validated_.end(), stream) == validated_.end()))
             {
-                stream_failed = true;
-                continue;
+                if (!v.clip->stream->validate(v.error))
+                {
+                    stream_failed = true;
+                    continue;
+                }
+                validated_.push_back(stream);
             }
             float gain = v.request.volume * sound_gain_, pan = 0;
             if (v.request.space != SoundSpace::Local)
@@ -541,6 +551,7 @@ namespace OpenBlood2
         instruments.clear();
         clips_.clear();
         streams_.clear();
+        stream_serial_ = 0;
         cached_bytes_ = 0;
         mixed.clear();
         remainder_ = 0;
@@ -549,6 +560,20 @@ namespace OpenBlood2
         output_error.clear();
         if (output_ && !SDL_ClearAudioStream(output_))
             output_error = SDL_GetError();
+    }
+    std::uint64_t AudioMixer::stream_read_ns() const
+    {
+        std::uint64_t total = 0;
+        for (const auto& [name, clip] : streams_)
+            total += clip->stream->read_ns;
+        return total;
+    }
+    std::uint64_t AudioMixer::stream_reads() const
+    {
+        std::uint64_t total = 0;
+        for (const auto& [name, clip] : streams_)
+            total += clip->stream->reads;
+        return total;
     }
     AudioMixer::~AudioMixer()
     {

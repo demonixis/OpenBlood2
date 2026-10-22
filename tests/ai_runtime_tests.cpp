@@ -931,6 +931,61 @@ namespace
         }
         return true;
     }
+    // The prepared PingObjects batch (filter once, bounds rejection, settled attachment
+    // refresh) records exactly what one IntersectSegment per candidate reports.
+    bool ping_private(const char* root)
+    {
+        GameSession g;
+        CHECK(setup(g, root));
+        std::string e;
+        for (const char* world : {"01_SubwayA", "02_CityHub"})
+        {
+            CHECK(g.request_world(world, e) && g.enter_player(e));
+            std::size_t rays = 0, visible = 0, blocked = 0;
+            const auto skipped = g.server.segment_blockers_skipped;
+            for (int tick = 0; tick < 1200; ++tick)
+            {
+                CHECK(g.step(1.0 / 60));
+                if (tick % 30)
+                    continue;
+                const auto observer =
+                    g.server.IsObjectAlive(g_hActiveCamera) ? g_hActiveCamera : HOBJECT(g.client_shell.player);
+                std::vector<ObjectId> eligible;
+                for (auto id : g.objects.snapshot())
+                {
+                    const auto* r = g.objects.get(id);
+                    if (r->life == Life::Alive && r->auto_deactivate && r->handle != observer &&
+                        (r->activity == OBJSTATE_ACTIVE || r->activity == OBJSTATE_AUTODEACTIVATE_NOW))
+                        eligible.push_back(id);
+                }
+                CHECK(g.server.PingObjects(observer));
+                const auto from = g.objects.get(observer)->state.m_Pos;
+                for (auto id : eligible)
+                {
+                    const auto* r = g.objects.get(id);
+                    const auto& probe = r->activation_probe;
+                    SegmentHit hit;
+                    const auto result =
+                        g.server.IntersectSegment(from, r->state.m_Pos, observer, hit, false, SegmentObjects::SolidOnly,
+                                                  SegmentFilter::AIVisibility);
+                    CHECK(result == SegmentResult::Hit || result == SegmentResult::Miss);
+                    const bool seen = result == SegmentResult::Miss || hit.object == r->handle;
+                    const auto* blocker = g.objects.get(hit.object);
+                    CHECK(probe.visibility == (seen ? ActivationVisibility::Visible : ActivationVisibility::Blocked));
+                    CHECK(probe.refreshed == seen && probe.hit_object == (blocker ? blocker->id : ObjectId{}));
+                    CHECK(probe.polygon == hit.polygon && probe.fraction == hit.fraction &&
+                          probe.time == g.objects.time() && probe.observer == g.objects.get(observer)->id);
+                    ++rays;
+                    ++(seen ? visible : blocked);
+                }
+            }
+            std::cout << world << " rays=" << rays << " visible=" << visible << " blocked=" << blocked
+                      << " skipped=" << g.server.segment_blockers_skipped - skipped << '\n';
+            CHECK(rays > 400 && visible && blocked && g.server.segment_blockers_skipped > skipped);
+            CHECK(g.unload_world());
+        }
+        return true;
+    }
 } // namespace
 int main(int argc, char** argv)
 {
@@ -955,6 +1010,7 @@ int main(int argc, char** argv)
                                                                         {"catalog", catalog},
                                                                         {"failures", failures},
                                                                         {"subway", subway},
+                                                                        {"ping_private", ping_private},
                                                                         {"sparse_weapons", sparse_weapons}};
     if (argc < 2)
         return 2;

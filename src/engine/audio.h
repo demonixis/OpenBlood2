@@ -95,6 +95,9 @@ namespace OpenBlood2
         {
             return cached_bytes_;
         }
+        // Summed PcmStream read cost/count of the cached streams (diagnostic only).
+        std::uint64_t stream_read_ns() const;
+        std::uint64_t stream_reads() const;
         bool advance(double, DVector listener, DRotation rotation);
         void clear();
         DlsSampler instruments;      // World-owned diagnostic notes share the sound output/clock.
@@ -115,6 +118,8 @@ namespace OpenBlood2
       private:
         std::map<std::string, std::shared_ptr<const AudioClip>> clips_;
         std::map<std::string, std::shared_ptr<const AudioClip>> streams_;
+        std::size_t stream_serial_ = 0;           // Window phase of the next stream (reset by clear).
+        std::vector<const PcmStream*> validated_; // Streams whose archive this advance already checked.
         bool load_stream(const Resources&, std::string_view, std::shared_ptr<const AudioClip>&, std::string&);
         std::map<SoundId, AudioVoice> voices_;
         std::size_t cached_bytes_ = 0;

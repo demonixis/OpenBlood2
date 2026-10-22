@@ -57,6 +57,31 @@ and labels absent identities as removed. It shows outcome, committed refresh,
 time, endpoints and hit details without issuing queries or advancing simulation.
 Blocked results and unqueried objects stay visible in inspection.
 
+## Prepared ping batches
+
+No callback, creation, removal, flag change or non-attachment motion happens
+between the rays of one PingObjects call. As a replacement cost policy it
+therefore prepares IntersectSegment's ray-independent object selection once per
+ping (flags, observer exclusion and the AIVisibility filter, in snapshot order)
+instead of once per ray. Each prepared record keeps conservative world bounds:
+the box query's center ± dimensions, or the world-model/container shape bounds
+at the object's offset, widened by 1 unit plus 1e-4 of the coordinate magnitude,
+far above every sweep tolerance. A ray outside them would miss and is skipped.
+Attachment children, records with invalid bounds and shapes whose offset ray
+endpoints leave the physics range are always swept, so Invalid refusals stay.
+The attachment refresh still precedes each ray until one refresh changes no
+child transform (bitwise); poses are then a fixed point, and the remaining
+refreshes of that ping are skipped.
+
+Results are identical: the world sweep, nearest-hit and tie rules, probe fields,
+Invalid/Unavailable aborts, atomic commit and one traced IntersectSegment per ray
+are unchanged. The 0.5-second cadence stays; rays are not spread across frames.
+`ai_runtime.ping_private` compares every probe of 40 pings each in SubwayA and
+CityHub (6600 rays) with an unprepared IntersectSegment. The adapter exposes
+`activation_ping_ns`/`activation_ping_calls` and swept/skipped prepared records;
+`--bench` reports the per-frame cost. Measurements are in the
+[hitch report](../implementation/reports/main_thread_hitches.md).
+
 ## Observable acceptance and limits
 
 Synthetic tests exercise destructible/indestructible glass, CanDamage=false,

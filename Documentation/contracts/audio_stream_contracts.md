@@ -25,13 +25,25 @@ padding/ranges, and compressed streams fail. MS/IMA ADPCM retain buffered suppor
 but are not silently decoded wholesale for a streaming request.
 
 Samples come from two 4096-frame windows, at most **32 KiB per cached stream**.
-A refill reads only its aligned PCM block. Two windows preserve interpolation
-across block and loop seams. Conversion is unsigned PCM8 / signed little-endian
-PCM16 to float; tests compare against the existing SDL buffered decoder.
-Resources shared by voices share immutable format metadata and this simulation-
-thread-only read cache; each voice still has an independent cursor/loop count.
-Inspection exposes actual bytes read and refill counts. Offline clocks need not
-read inaudible/unrendered samples; they still validate archive extent each advance.
+A refill reads only its PCM block, aligned to the stream's window phase. Two
+windows preserve interpolation across block and loop seams. Conversion is unsigned
+PCM8 / signed little-endian PCM16 to float; tests compare against the existing SDL
+buffered decoder. Resources shared by voices share immutable format metadata and
+this simulation-thread-only read cache; each voice still has an independent
+cursor/loop count. Inspection exposes actual bytes read, refill counts and the
+window phase. Offline clocks need not read inaudible/unrendered samples; they
+still validate archive extent each advance.
+
+Replacement read-timing policy: a mixer gives its n-th stream (counted from the
+world's first) the window phase n·2531 mod 4096, a golden-ratio spacing. Windows
+start at phase + k·4096 and the first spans [0, phase). Streams started together,
+such as CityHub's twelve 22050 Hz ambient streams (35 voices), then cross window
+boundaries in different mixer steps instead of all refilling every 186 ms. Samples,
+read sizes, the 32 KiB bound and the read count are unchanged; only the step that
+performs a read moves, and output is bit-identical. Each advance checks a stream's
+archive extent once, before its first voice, instead of once per voice. Every read
+still checks it, and a latched failure still reaches every voice of the stream.
+Measurements are in the [hitch report](../implementation/reports/main_thread_hitches.md).
 
 Buffered and streamed forms are distinct cache entries. Their combined limit is
 128 entries / 256 MiB (streams reserve their actual fixed windows), with the

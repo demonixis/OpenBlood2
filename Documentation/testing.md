@@ -68,5 +68,8 @@ entry validation. See [startup contracts](contracts/session_start_contracts.md).
 
 The benchmark uses the presentation path without a window or mouse capture.
 Add `--capture FILE.png`, `--no-model-shadows` or `--pixel-lighting` as needed.
+`--bench-audio` also renders the game mix offline, so streamed PCM reads happen
+as with a device; the activation-ping and streamed-read rows and the `Hitches`
+line report those periodic costs (see [hitch report](implementation/reports/main_thread_hitches.md)).
 Compare simulation/presentation/GPU times and draw/pass/culling counters; see
 [render performance](contracts/render_performance_contracts.md).

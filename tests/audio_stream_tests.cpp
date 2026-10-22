@@ -31,32 +31,35 @@ namespace
     }
     bool pcm(const std::filesystem::path& root)
     {
-        for (unsigned channels : {1u, 2u})
-            for (unsigned bits : {8u, 16u})
-            {
-                auto bytes = test_audio::wave(channels, bits, 44100, 20001);
-                for (size_t i = 44; i < bytes.size(); ++i)
-                    bytes[i] = std::uint8_t(i * 37 + 3);
-                auto resource = file(root, bytes);
-                std::string error;
-                auto stream = PcmStream::open(resource, error);
-                CHECK(stream && stream->frames == 20001 && stream->reads == 4);
-                CHECK(stream->bytes_read == 44 && !stream->refills); // Metadata only, never whole payload preload.
-                AudioClip full;
-                CHECK(read_wave(bytes, full, error));
-                for (auto frame : {4095u, 4096u, 20000u, 0u, 8191u, 8192u, 12505u})
-                    for (unsigned ch = 0; ch < channels; ++ch)
-                    {
-                        float value = 9;
-                        CHECK(stream->sample(frame, ch, value, error));
-                        CHECK(std::abs(value - full.samples[frame * channels + ch]) < 1e-6f);
-                    }
-                CHECK(stream->refills <= 7 &&
-                      stream->bytes_read <= 44 + 7 * PcmStream::window_frames * channels * (bits / 8));
-                float untouched = 42;
-                CHECK(!stream->sample(20001, 0, untouched, error) && untouched == 42);
-                CHECK(!stream->sample(0, channels, untouched, error));
-            }
+        // Phase 0, then the second stream's phase: windows [0, 2531), [2531, 6627), ...
+        CHECK(PcmStream::phase(0) == 0 && PcmStream::phase(1) == 2531 && PcmStream::phase(2) == 966);
+        for (std::size_t phase : {PcmStream::phase(0), PcmStream::phase(1)})
+            for (unsigned channels : {1u, 2u})
+                for (unsigned bits : {8u, 16u})
+                {
+                    auto bytes = test_audio::wave(channels, bits, 44100, 20001);
+                    for (size_t i = 44; i < bytes.size(); ++i)
+                        bytes[i] = std::uint8_t(i * 37 + 3);
+                    auto resource = file(root, bytes);
+                    std::string error;
+                    auto stream = PcmStream::open(resource, error, phase);
+                    CHECK(stream && stream->frames == 20001 && stream->reads == 4 && stream->window_phase == phase);
+                    CHECK(stream->bytes_read == 44 && !stream->refills); // Metadata only, never whole payload preload.
+                    AudioClip full;
+                    CHECK(read_wave(bytes, full, error));
+                    for (auto frame : {4095u, 4096u, 20000u, 0u, 8191u, 8192u, 12505u, 2530u, 2531u, 6626u, 6627u})
+                        for (unsigned ch = 0; ch < channels; ++ch)
+                        {
+                            float value = 9;
+                            CHECK(stream->sample(frame, ch, value, error));
+                            CHECK(std::abs(value - full.samples[frame * channels + ch]) < 1e-6f);
+                        }
+                    CHECK(stream->refills <= 11 &&
+                          stream->bytes_read <= 44 + 11 * PcmStream::window_frames * channels * (bits / 8));
+                    float untouched = 42;
+                    CHECK(!stream->sample(20001, 0, untouched, error) && untouched == 42);
+                    CHECK(!stream->sample(0, channels, untouched, error));
+                }
         return true;
     }
     bool malformed(const std::filesystem::path& root)
@@ -224,6 +227,92 @@ namespace
             }
         return true;
     }
+    // Streams started together refill at distinct phases, with output equal to buffered playback;
+    // one archive check per stream and advance still latches a failure on every voice sharing it.
+    bool phases(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(test_audio::setup(g, root));
+        test_player::Directory dir;
+        for (unsigned i = 0; i < 3; ++i)
+        {
+            auto bytes = test_audio::wave(1, 16, 22050, 30000 + i * 1000);
+            for (size_t b = 44; b < bytes.size(); ++b)
+                bytes[b] = std::uint8_t(b * (31 + i) + 7);
+            dir.files["phase" + std::to_string(i) + ".wav"] = bytes;
+        }
+        test_model::Writer w;
+        w.b.resize(168);
+        w.b[0] = w.b[62] = w.b[124] = 13;
+        w.b[1] = w.b[63] = w.b[125] = 10;
+        w.b[126] = 26;
+        w.patch(127, 1);
+        auto [off, size] = test_player::write_dir(w, dir);
+        w.patch(131, off);
+        w.patch(135, size);
+        const auto path = root / "phases.rez";
+        std::ofstream f(path, std::ios::binary);
+        f.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
+        f.close();
+        std::string error;
+        CHECK(g.resources.mount(path, error));
+        AudioMixer buffered, streamed;
+        buffered.inspect_pcm = streamed.inspect_pcm = true;
+        SoundRequest request;
+        request.loop = true;
+        request.space = SoundSpace::Ambient;
+        request.volume = .25f;
+        std::vector<SoundId> streams;
+        for (unsigned i = 0; i < 3; ++i)
+        {
+            request.resource = "phase" + std::to_string(i) + ".wav";
+            request.streaming = false;
+            CHECK(buffered.play(g.resources, nullptr, request, {}, error));
+            request.streaming = true;
+            streams.push_back(streamed.play(g.resources, nullptr, request, {}, error));
+            CHECK(streams.back() && streamed.get(streams.back())->clip->stream->window_phase == PcmStream::phase(i));
+        }
+        request.resource = "phase0.wav"; // A second voice shares the first stream and its reads.
+        CHECK(buffered.play(g.resources, nullptr, request, {}, error));
+        auto shared = streamed.play(g.resources, nullptr, request, {}, error);
+        CHECK(shared && streamed.get(shared)->clip == streamed.get(streams[0])->clip);
+        std::array<std::uint64_t, 3> refills{};
+        unsigned steps_with_refill = 0;
+        for (unsigned step = 0; step < 240; ++step)
+        {
+            CHECK(buffered.advance(1.0 / 60, {}, {}) && streamed.advance(1.0 / 60, {}, {}));
+            CHECK(buffered.mixed.size() == streamed.mixed.size() && !streamed.mixed.empty());
+            for (size_t i = 0; i < buffered.mixed.size(); ++i)
+                CHECK(std::abs(buffered.mixed[i] - streamed.mixed[i]) < 1e-6f);
+            unsigned refilled = 0;
+            for (unsigned i = 0; i < 3; ++i)
+            {
+                const auto now = streamed.get(streams[i])->clip->stream->refills;
+                refilled += now != refills[i];
+                refills[i] = now;
+            }
+            // Each stream's first window is read on the first step. Until the first loop wrap
+            // (30000 frames, step 81), phase-0 windows would refill all three in the same step.
+            if (!step)
+                CHECK(refilled == 3);
+            else if (step < 81)
+            {
+                CHECK(refilled <= 1);
+                steps_with_refill += refilled != 0;
+            }
+        }
+        CHECK(steps_with_refill >= 18 && refills[0] > 6 && refills[1] > 6 && refills[2] > 6);
+        const auto cursor = streamed.get(shared)->cursor;
+        std::error_code ec;
+        std::filesystem::resize_file(path, 0, ec);
+        CHECK(!ec && !streamed.advance(1.0 / 60, {}, {}) && streamed.mixed.empty());
+        for (auto id : {streams[0], streams[1], streams[2], shared})
+            CHECK(!streamed.get(id)->error.empty() && !streamed.get(id)->done);
+        CHECK(streamed.get(shared)->cursor == cursor && streamed.get(streams[0])->cursor == cursor);
+        streamed.clear();
+        CHECK(!streamed.cached_clips());
+        return true;
+    }
     bool truncation(const std::filesystem::path& root)
     {
         GameSession g;
@@ -310,8 +399,8 @@ int main(int argc, char** argv)
     if (argc != 3)
         return 2;
     const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
-        {"pcm", pcm},     {"malformed", malformed},   {"mixer", mixer},
-        {"seams", seams}, {"truncation", truncation}, {"city", city}};
+        {"pcm", pcm},   {"malformed", malformed}, {"mixer", mixer}, {"seams", seams}, {"truncation", truncation},
+        {"city", city}, {"phases", phases}};
     auto it = cases.find(argv[1]);
     return it != cases.end() && it->second(argv[2]) ? 0 : 1;
 }

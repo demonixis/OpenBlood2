@@ -8,6 +8,7 @@
 #include "game/original/SurfaceTypes.h"
 #include "game/original/VolumeBrush.h"
 #include "game/server_adapter.h"
+#include <algorithm>
 #include <cmath>
 
 namespace OpenBlood2
@@ -44,11 +45,121 @@ namespace OpenBlood2
         seconds = *m.immobilize;
         return true;
     }
+    namespace
+    {
+        // IntersectSegment's ray-independent object filter.
+        bool segment_excludes(const Objects& objects, const ObjectRecord& record, HOBJECT ignore,
+                              const ObjectRecord* owner, const CProjectile* projectile, bool fire_through,
+                              SegmentObjects which, SegmentFilter filter)
+        {
+            if (record.life != Life::Alive || record.handle == ignore ||
+                (which != SegmentObjects::All &&
+                 !(record.state.m_Flags &
+                   (which == SegmentObjects::SolidOrRayHit ? FLAG_SOLID | FLAG_RAYHIT : FLAG_SOLID))))
+                return true;
+            const auto* door = dynamic_cast<const Door*>(record.game.get());
+            const auto* brush = dynamic_cast<const CDestructableBrush*>(record.game.get());
+            // Original GlobalFilterFn, restricted to CanSee's two requested flags.
+            // IGNORE_LIQUID excludes every VolumeBrush subclass, not just liquids.
+            // Glass only passes when the object is a destructible brush. Baked
+            // world polygons, doors, CanDamage and FireThrough do not define this filter.
+            if ((filter == SegmentFilter::AIVisibility || filter == SegmentFilter::AIShot) &&
+                (dynamic_cast<const VolumeBrush*>(record.game.get()) ||
+                 (brush && brush->destructable && brush->GetSurfaceType() == SURFTYPE_GLASS)))
+                return true;
+            const auto* model = dynamic_cast<const CDestructableModel*>(record.game.get());
+            if (filter == SegmentFilter::AIShot && model && model->destructable)
+                return true;
+            if (filter == SegmentFilter::IgnoreVolumes && dynamic_cast<const VolumeBrush*>(record.game.get()))
+                return true;
+            if (filter == SegmentFilter::IgnoreCharacters && dynamic_cast<const CBaseCharacter*>(record.game.get()))
+                return true;
+            if (filter == SegmentFilter::IgnoreAncientTentacles &&
+                Objects::is_kind_of(record.type, objects.find_class("AncientOneTentacle")))
+                return true;
+            if (filter == SegmentFilter::IgnoreOwnerClass && Objects::is_kind_of(record.type, owner->type))
+                return true;
+            if (filter == SegmentFilter::ProjectileContact &&
+                (record.type == owner->type || record.handle == projectile->m_hFiredFrom))
+                return true;
+            return fire_through && ((door && door->fire_through) || (brush && brush->fire_through));
+        }
+        // Replacement broad phase: a segment outside these bounds widened by a margin far
+        // above every sweep tolerance cannot touch the geometry, so skipping it is a miss.
+        bool segment_reaches(DVector from, DVector to, DVector min, DVector max)
+        {
+            double enter = 0, leave = 1;
+            const auto axis = [&](double a, double b, double low, double high)
+            {
+                const double margin = 1 + 1e-4 * std::max(std::abs(low), std::abs(high));
+                low -= margin;
+                high += margin;
+                const double delta = b - a;
+                if (delta == 0)
+                    return a >= low && a <= high;
+                auto first = (low - a) / delta, last = (high - a) / delta;
+                if (first > last)
+                    std::swap(first, last);
+                enter = std::max(enter, first);
+                leave = std::min(leave, last);
+                return enter <= leave;
+            };
+            return axis(from.x, to.x, min.x, max.x) && axis(from.y, to.y, min.y, max.y) &&
+                   axis(from.z, to.z, min.z, max.z);
+        }
+    } // namespace
+    void ServerAdapter::prepare_segment_batch(HOBJECT ignore, bool fire_through, SegmentObjects objects,
+                                              SegmentFilter filter, SegmentBatch& batch)
+    {
+        batch = {ignore, fire_through, objects, filter};
+        auto& blockers = batch.blockers;
+        const auto* owner = ignore ? objects_.get(ignore) : nullptr;
+        const auto* projectile = owner ? dynamic_cast<const CProjectile*>(owner->game.get()) : nullptr;
+        // Arguments IntersectSegment refuses as Invalid never reach the filter below.
+        if ((filter == SegmentFilter::IgnoreOwnerClass && !owner) ||
+            (filter == SegmentFilter::ProjectileContact && !projectile))
+            return;
+        for (auto id : objects_.snapshot())
+        {
+            const auto* record = objects_.get(id);
+            if (!record ||
+                segment_excludes(objects_, *record, ignore, owner, projectile, fire_through, objects, filter))
+                continue;
+            SegmentBlocker blocker{id};
+            const auto* shape = record->world_model ? record->world_model.get() : record->container().get();
+            if (record->attachment)
+                blocker.bounded = false; // Attachment poses refresh per query: always swept.
+            else if (!shape || (record->state.m_Flags & FLAG_BOXPHYSICS))
+            {
+                // sweep_box: only finite, nonnegative bounds can produce a Miss rather than Invalid.
+                const auto center = object_bounds_center(*record);
+                const auto half = record->dimensions;
+                blocker.bounded =
+                    physics_vector(center) && physics_vector(half) && half.x >= 0 && half.y >= 0 && half.z >= 0;
+                blocker.min = vector_subtract(center, half);
+                blocker.max = vector_add(center, half);
+            }
+            else
+            {
+                blocker.shape = true;
+                blocker.offset = vector_subtract(record->state.m_Pos, shape->origin);
+                blocker.min = vector_add(shape->min, blocker.offset);
+                blocker.max = vector_add(shape->max, blocker.offset);
+                blocker.bounded =
+                    physics_vector(blocker.offset) && physics_vector(blocker.min) && physics_vector(blocker.max);
+            }
+            blockers.push_back(blocker);
+        }
+    }
     SegmentResult ServerAdapter::IntersectSegment(DVector from, DVector to, HOBJECT ignore, SegmentHit& out,
                                                   bool fire_through, SegmentObjects objects, SegmentFilter filter,
                                                   SegmentStart start)
     {
         trace_service("IntersectSegment");
+        auto* batch = segment_batch_;
+        if (batch && (batch->ignore != ignore || batch->fire_through != fire_through || batch->objects != objects ||
+                      batch->filter != filter))
+            batch = nullptr;
         out = {};
         const auto* owner = ignore ? objects_.get(ignore) : nullptr;
         if ((filter != SegmentFilter::None && filter != SegmentFilter::AIVisibility &&
@@ -67,64 +178,67 @@ namespace OpenBlood2
             return SegmentResult::Invalid;
         if (!collision || !collision_ready)
             return SegmentResult::Unavailable;
-        if (!objects_.refresh_attachments())
-            return SegmentResult::Invalid;
+        if (!batch || !batch->attachments_settled)
+        {
+            bool changed = false;
+            if (!objects_.refresh_attachments(batch ? &changed : nullptr))
+                return SegmentResult::Invalid;
+            if (batch && !changed)
+                batch->attachments_settled = true;
+        }
         CollisionHit nearest;
         const auto world_result = collision->sweep(from, to, {}, nearest);
         if (world_result == CollisionQuery::Invalid)
             return SegmentResult::Invalid;
         bool found = world_result == CollisionQuery::Hit;
-        for (auto id : objects_.snapshot())
+        const auto consider = [&](const ObjectRecord& record)
         {
-            const auto* record = objects_.get(id);
-            if (!record || record->life != Life::Alive || record->handle == ignore ||
-                (objects != SegmentObjects::All &&
-                 !(record->state.m_Flags &
-                   (objects == SegmentObjects::SolidOrRayHit ? FLAG_SOLID | FLAG_RAYHIT : FLAG_SOLID))))
-                continue;
-            const auto* door = dynamic_cast<const Door*>(record->game.get());
-            const auto* brush = dynamic_cast<const CDestructableBrush*>(record->game.get());
-            // Original GlobalFilterFn, restricted to CanSee's two requested flags.
-            // IGNORE_LIQUID excludes every VolumeBrush subclass, not just liquids.
-            // Glass only passes when the object is a destructible brush. Baked
-            // world polygons, doors, CanDamage and FireThrough do not define this filter.
-            if ((filter == SegmentFilter::AIVisibility || filter == SegmentFilter::AIShot) &&
-                (dynamic_cast<const VolumeBrush*>(record->game.get()) ||
-                 (brush && brush->destructable && brush->GetSurfaceType() == SURFTYPE_GLASS)))
-                continue;
-            const auto* model = dynamic_cast<const CDestructableModel*>(record->game.get());
-            if (filter == SegmentFilter::AIShot && model && model->destructable)
-                continue;
-            if (filter == SegmentFilter::IgnoreVolumes && dynamic_cast<const VolumeBrush*>(record->game.get()))
-                continue;
-            if (filter == SegmentFilter::IgnoreCharacters && dynamic_cast<const CBaseCharacter*>(record->game.get()))
-                continue;
-            if (filter == SegmentFilter::IgnoreAncientTentacles &&
-                Objects::is_kind_of(record->type, objects_.find_class("AncientOneTentacle")))
-                continue;
-            if (filter == SegmentFilter::IgnoreOwnerClass && Objects::is_kind_of(record->type, owner->type))
-                continue;
-            if (filter == SegmentFilter::ProjectileContact &&
-                (record->type == owner->type || record->handle == projectile->m_hFiredFrom))
-                continue;
-            if (fire_through && ((door && door->fire_through) || (brush && brush->fire_through)))
-                continue;
             CollisionHit hit;
-            const auto query = sweep_object(*record, from, to, {}, hit);
+            const auto query = sweep_object(record, from, to, {}, hit);
             if (query == CollisionQuery::Invalid)
-                return SegmentResult::Invalid;
+                return false;
             // USE follows entry-face rays: an enclosing body/sensor must not
             // mask all interactions. Later LithTech exposes interior hits as an
             // opt-in flag; ordinary USE does not request it.
             if ((objects == SegmentObjects::All || start == SegmentStart::SkipInterior) && hit.start_solid)
-                continue;
+                return true;
             if (query == CollisionQuery::Hit && (!found || hit.fraction < nearest.fraction))
             {
                 nearest = hit;
-                nearest.object = record->handle;
+                nearest.object = record.handle;
                 found = true;
             }
-        }
+            return true;
+        };
+        if (!batch)
+            for (auto id : objects_.snapshot())
+            {
+                const auto* record = objects_.get(id);
+                if (!record ||
+                    segment_excludes(objects_, *record, ignore, owner, projectile, fire_through, objects, filter))
+                    continue;
+                if (!consider(*record))
+                    return SegmentResult::Invalid;
+            }
+        else
+            for (const auto& blocker : batch->blockers)
+            {
+                // A shape sweep refuses offset endpoints outside physics range; never skip that refusal.
+                if (blocker.bounded &&
+                    (!blocker.shape || (physics_vector(vector_subtract(from, blocker.offset)) &&
+                                        physics_vector(vector_subtract(to, blocker.offset)))) &&
+                    !segment_reaches(from, to, blocker.min, blocker.max))
+                {
+                    ++segment_blockers_skipped;
+                    continue;
+                }
+                const auto* record = objects_.get(blocker.id);
+                if (!record || record->life != Life::Alive)
+                    continue;
+                ++segment_blockers_swept;
+                if (!consider(*record))
+                    return SegmentResult::Invalid;
+            }
         if (!found)
             return SegmentResult::Miss;
         out = {nearest.point, nearest.normal, nearest.object, nearest.polygon, nearest.fraction, nearest.texture_flags};

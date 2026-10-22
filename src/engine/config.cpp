@@ -233,6 +233,8 @@ namespace OpenBlood2
             }
             else if (arg == "--bench-sweep")
                 options.bench = options.bench_sweep = true;
+            else if (arg == "--bench-audio")
+                options.bench = options.bench_audio = true;
             else if (arg == "--bench-size")
             {
                 options.bench = true;
