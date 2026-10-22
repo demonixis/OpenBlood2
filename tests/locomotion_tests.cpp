@@ -114,17 +114,57 @@ namespace
             CHECK(step(game, 60));
             CHECK(c.position.z < 88.01 && c.move_mgr.body.stair_steps == 0);
         }
-        // An unsupported body cannot climb, even when the step is within the limit.
-        GameSession game;
-        CHECK(enter(game, root));
-        auto& c = game.client_shell;
-        CHECK(box(game, {32, 8, 125}, {100, 8, 25}));
-        DVector p{32, 46, 87}, velocity{0, 10, 100}, end{32, 46, 96};
-        CHECK(game.server.TeleportObject(c.player, &p) == DE_OK);
-        CHECK(game.server.SetVelocity(c.player, &velocity) == DE_OK);
-        CHECK(game.server.MoveObject(c.player, &end) == DE_OK);
-        CHECK(game.objects.get(c.player)->state.m_Pos.z < 88.01);
-        CHECK(game.objects.get(c.player)->stair_steps == 0);
+        // A rising body cannot climb, even when the step is within the limit;
+        // the same unsupported body steps up once it stops rising.
+        for (const float rise : {10.0f, 0.0f})
+        {
+            GameSession game;
+            CHECK(enter(game, root));
+            auto& c = game.client_shell;
+            CHECK(box(game, {32, 8, 125}, {100, 8, 25}));
+            DVector p{32, 46, 87}, velocity{0, rise, 100}, end{32, 46, 96};
+            CHECK(game.server.TeleportObject(c.player, &p) == DE_OK);
+            CHECK(game.server.SetVelocity(c.player, &velocity) == DE_OK);
+            CHECK(game.server.MoveObject(c.player, &end) == DE_OK);
+            const auto* r = game.objects.get(c.player);
+            if (rise > 0)
+                CHECK(r->state.m_Pos.z < 88.01 && r->stair_steps == 0);
+            else
+                CHECK(r->state.m_Pos.z > 95.9 && std::abs(r->state.m_Pos.y - 57.001f) < .01 && r->stair_steps == 1 &&
+                      r->grounded && r->velocity.y == 0);
+        }
+        return true;
+    }
+    // A standing jump rises 90 units. Past the apex the airborne step reaches
+    // ledges up to 90 + 20.5 (half of the 41-unit half-height); never into a ceiling.
+    bool ledge(const std::filesystem::path& root)
+    {
+        for (int mode = 0; mode < 3; ++mode)
+        {
+            GameSession game;
+            CHECK(enter(game, root));
+            auto& c = game.client_shell;
+            const float height = mode == 1 ? 115 : 100;
+            CHECK(box(game, {32, height / 2, 300}, {100, height / 2, 200}));
+            if (mode == 2)
+                CHECK(box(game, {32, 150, 300}, {100, 2, 200})); // 48 units of headroom on the ledge
+            c.movement_input.forward = c.movement_input.jump = true;
+            float peak = c.position.y;
+            for (int i = 0; i < 60; ++i)
+            {
+                CHECK(step(game));
+                if (c.position.z < 88.01)
+                    peak = std::max(peak, c.position.y);
+            }
+            CHECK(c.move_mgr.jumps == 1 && c.move_mgr.m_bOnGround && peak - 41 > 89 && peak - 41 < 91);
+            if (mode == 0)
+                CHECK(c.position.z > 100 && std::abs(c.position.y - 141.001f) < .02 &&
+                      c.move_mgr.body.stair_steps == 1 && c.move_mgr.body.last_step_height > 9 &&
+                      c.move_mgr.body.last_step_height < 20.5f);
+            else
+                CHECK(c.position.z < 88.01 && std::abs(c.position.y - 41.001f) < .02 &&
+                      c.move_mgr.body.stair_steps == 0);
+        }
         return true;
     }
     bool crouch(const std::filesystem::path& root)
@@ -486,6 +526,53 @@ namespace
             CHECK(roam_cityhub(root, seed, DBYTE(character), 30));
         return true;
     }
+    // The museum approach's authored dumpster route (reports/cityhub_jump.md):
+    // the planter rim to dumpster top is a 96-unit rise for a 90-unit jump.
+    // Movement alone is stepped at 60 Hz; other objects stay frozen.
+    bool cityhub_ledge(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(game.initialize());
+        Config config;
+        config.data_dir = root;
+        std::string error;
+        CHECK(game.resources.mount_game(config, error));
+        CHECK(game.request_world("02_CityHub", error) && game.enter_player(error) && step(game));
+        auto& c = game.client_shell;
+        auto& mgr = c.move_mgr;
+        auto* p = game.server_shell.Player(game.local_client);
+        // Flat reference, planter rim to dumpster (top Y=768), dumpster over the museum fence.
+        const DVector starts[] = {{1100, 682.002f, -2860}, {1000, 714.002f, -2688}, {1060, 810.002f, -2750}};
+        for (int index = 0; index < 3; ++index)
+        {
+            auto position = starts[index];
+            CHECK(game.server.TeleportObject(c.player, &position) == DE_OK && p->TeleportClientToServerPos() &&
+                  game.pump_player_messages(error));
+            MovementInput input{};
+            const float yaw = 3.14159265f;
+            for (int i = 0; i < 5; ++i)
+                CHECK(mgr.Update(game.server_shell, c.voice_manager, false, input, yaw, 1.0 / 60, true));
+            const float base = mgr.body.position.y - mgr.body.dimensions.y;
+            float peak = base;
+            input.jump = input.run = true;
+            input.forward = index > 0;
+            for (int i = 0; i < 45; ++i)
+            {
+                CHECK(mgr.Update(game.server_shell, c.voice_manager, false, input, yaw, 1.0 / 60, true));
+                peak = std::max(peak, mgr.body.position.y - mgr.body.dimensions.y);
+            }
+            const float end = mgr.body.position.y - mgr.body.dimensions.y;
+            std::cout << "start " << starts[index].z << " feet " << base << " -> " << end << " peak rise "
+                      << peak - base << " steps " << mgr.body.stair_steps << '\n';
+            if (index == 0)
+                CHECK(std::abs(peak - base - 90) < 1 && std::abs(end - base) < .01);
+            else if (index == 1)
+                CHECK(std::abs(end - 768) < .01 && mgr.m_bOnGround);
+            else
+                CHECK(mgr.body.position.z < -2800);
+        }
+        return true;
+    }
 } // namespace
 int main(int argc, char** argv)
 {
@@ -499,16 +586,18 @@ int main(int argc, char** argv)
         return 2;
     const std::string_view name = argv[1];
     const auto root = path_from_utf8(argv[2]);
-    const bool ok = name == "stairs"         ? stairs(root, false)
-                    : name == "world_stairs" ? stairs(root, true)
-                    : name == "limits"       ? step_limits(root)
-                    : name == "crouch"       ? crouch(root)
-                    : name == "animations"   ? animations(root)
-                    : name == "lifetime"     ? lifetime(root)
-                    : name == "contacts"     ? contacts(root)
-                    : name == "private"      ? private_world(root)
-                    : name == "chosen"       ? private_chosen(root)
-                    : name == "cityhub_roam" ? cityhub_roam(root)
-                                             : false;
+    const bool ok = name == "stairs"          ? stairs(root, false)
+                    : name == "world_stairs"  ? stairs(root, true)
+                    : name == "limits"        ? step_limits(root)
+                    : name == "crouch"        ? crouch(root)
+                    : name == "animations"    ? animations(root)
+                    : name == "lifetime"      ? lifetime(root)
+                    : name == "contacts"      ? contacts(root)
+                    : name == "private"       ? private_world(root)
+                    : name == "chosen"        ? private_chosen(root)
+                    : name == "cityhub_roam"  ? cityhub_roam(root)
+                    : name == "ledge"         ? ledge(root)
+                    : name == "cityhub_ledge" ? cityhub_ledge(root)
+                                              : false;
     return ok ? 0 : 1;
 }
