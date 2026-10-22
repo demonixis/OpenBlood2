@@ -129,8 +129,15 @@ namespace
               !victim->m_damage.last_damage.attacker);
         CHECK(!light->AllowsDamageAttribution(nullptr));
         light->sound = "Sounds\\Thunder.wav";
+        // The source query requests no interior hits: an enclosing solid body does not stop the bolt.
+        auto shell = g.objects.create(g.objects.find_class("BaseClass"), {});
+        DVector shell_dims{20, 20, 20};
+        CHECK(shell && g.server.SetObjectDims(shell, &shell_dims) == DE_OK);
+        g.objects.get(shell)->state.m_Flags = FLAG_SOLID;
         light->Fire(nullptr);
-        CHECK(!light->sound_error.empty());
+        CHECK(!light->sound_error.empty() && light->error.empty() && light->event);
+        CHECK(std::abs(light->bolt.destination.z - 100) < .001f);
+        CHECK(g.objects.remove(shell) && g.objects.finish_frame());
         WorldValidation report;
         CHECK(!check_world_initialization(g, report, error) &&
               error.starts_with("Lightning")); // No global missing-sound waiver.
@@ -158,6 +165,8 @@ namespace
                     {
                         emitter->Fire(nullptr);
                         ++total;
+                        if (!emitter->error.empty())
+                            std::cerr << world << ' ' << r->state.m_Name << ": " << emitter->error << '\n';
                         CHECK(emitter->event && emitter->error.empty());
                         if (!emitter->sound_error.empty())
                         {

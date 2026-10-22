@@ -13,7 +13,10 @@ update clears gravity, sets FORCECLIENTUPDATE/SAVEABLE and schedules .1-second
 updates. Case-sensitive FIRE prefixes cast 5000 units along the actual forward
 vector. The query includes solid objects and uses the original LiquidFilterFn
 exclusion of every VolumeBrush subclass; it retains the actual hit point or far
-endpoint. The bolt publishes before radius damage, followed by a detached sound
+endpoint. The source flags (INTERSECT_OBJECTS | IGNORE_NONSOLID) request no
+interior hits, so the ray uses the existing entry-face `SkipInterior` policy: the
+Ancient One's box, which encloses the 25_ancientone emitters, does not stop it.
+The bolt publishes before radius damage, followed by a detached sound
 at the source position, inner radius10%, MiscHigh priority2.
 
 Damage uses the existing original squared-distance falloff and no visibility

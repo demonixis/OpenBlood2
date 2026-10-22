@@ -78,8 +78,11 @@ void CClientLightningSFX::Fire(HOBJECT sender)
     }
     bolt.destination = vector_add(bolt.source, vector_scale(rotate_vector({0, 0, 1}, rotation), 5000));
     SegmentHit hit;
-    const auto result = s->IntersectSegment(bolt.source, bolt.destination, nullptr, hit, false,
-                                            SegmentObjects::SolidOnly, SegmentFilter::IgnoreVolumes);
+    // The source query (INTERSECT_OBJECTS | IGNORE_NONSOLID) requests no interior
+    // hits: an enclosing body, such as the Ancient One around its emitters, is skipped.
+    const auto result =
+        s->IntersectSegment(bolt.source, bolt.destination, nullptr, hit, false, SegmentObjects::SolidOnly,
+                            SegmentFilter::IgnoreVolumes, SegmentStart::SkipInterior);
     if (result != SegmentResult::Hit && result != SegmentResult::Miss)
     {
         error = "Lightning ray unavailable";
