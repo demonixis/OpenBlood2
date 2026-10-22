@@ -145,7 +145,8 @@ jobs:
           sudo apt-get install -y --no-install-recommends ninja-build
           # The runner image ships the SDK command-line tools and JDK 17.
           echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
-          yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+          # yes dies on SIGPIPE once sdkmanager exits; pipefail must not see it.
+          (yes || true) | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
           "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --install \
             "ndk;$ANDROID_NDK_VERSION" "platforms;android-36" > /dev/null
 
