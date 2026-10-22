@@ -2,12 +2,12 @@
 
 **M2 is closed with reservation M2-GPU-001**, authorized on 2026-10-18: [acceptance and closure record](../../implementation/reports/m2_acceptance.md). The selected functional session is accepted; the external NVIDIA/D-Bus GPU sanitizer failure remains an open platform qualification issue. M3 is next and is not yet accepted. The chronological entries below retain their original scope.
 
-The [default launcher build](../../implementation/reports/launcher_default_build.md) produces
+The [default launcher build](../launcher/report_launcher_default_build.md) produces
 OpenBlood 2 Launcher beside the game, using an isolated SDL configuration.
 
 The [SDL3 launcher plan](06_launcher.md) now records the user-requested compact
 menu, Game Settings, local data-mod toggles and demo installation. The
-[implemented continuation](../../implementation/reports/launcher_redesign.md) supersedes
+[implemented continuation](../launcher/report_launcher_redesign.md) supersedes
 the initial L0-L2 interface; graphical settings were cancelled and Nightmares
 remains separate. This does not accept M3.
 

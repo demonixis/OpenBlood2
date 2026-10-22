@@ -1,11 +1,14 @@
 #pragma once
-#include "launcher/state.h"
-#include <SDL3/SDL.h>
+#include <SDL3/SDL_thread.h>
 #include <atomic>
+#include <filesystem>
 #include <mutex>
 #include <optional>
+#include <string>
 
-namespace OpenBlood2::Launcher
+// The original 1998 demo from Archive.org, checked against its qualified package and installed in
+// the per-user content folder (setup_screen_contracts). No installer code is executed.
+namespace OpenBlood2
 {
     struct DemoPackage
     {
@@ -29,14 +32,15 @@ namespace OpenBlood2::Launcher
         std::atomic<InstallStage> stage{InstallStage::Checking};
         std::atomic<std::uint64_t> bytes{0}, total{0};
     };
-    bool file_sha256(const std::filesystem::path&, std::string&, std::string&, InstallProgress&);
-    // Qualified ZIP -> newly created destination, removed on any failure. No installer code is executed.
+    bool file_sha256(const std::filesystem::path&, std::string& digest, std::string& error, InstallProgress&);
+    // Qualified ZIP -> newly created destination, removed on any failure.
     bool extract_demo(const std::filesystem::path& zip, const std::filesystem::path& destination, const DemoPackage&,
                       InstallProgress&, std::string& error);
+    // https on port 443 of archive.org or one of its subdomains, without user information.
     bool demo_url_allowed(std::string_view url);
     struct InstallResult
     {
-        std::filesystem::path directory;
+        std::filesystem::path directory; // The installed Game folder.
         std::string error;
         bool success = false;
     };
@@ -44,8 +48,9 @@ namespace OpenBlood2::Launcher
     {
       public:
         ~DemoInstaller();
-        // Empty local_archive means the qualified Archive.org download, only on explicit user action.
-        bool start(const std::filesystem::path& storage, const std::filesystem::path& local_archive = {});
+        // `content` is the per-user content folder. Empty `local_archive` downloads the qualified
+        // Archive.org package, only on explicit player action.
+        bool start(const std::filesystem::path& content, const std::filesystem::path& local_archive = {});
         void cancel()
         {
             progress.cancel = true;
@@ -61,8 +66,8 @@ namespace OpenBlood2::Launcher
         static int SDLCALL execute(void*);
         void work(InstallResult&);
         SDL_Thread* thread_ = nullptr;
-        std::filesystem::path storage_, local_;
+        std::filesystem::path content_, local_;
         std::mutex mutex_;
         std::optional<InstallResult> result_;
     };
-} // namespace OpenBlood2::Launcher
+} // namespace OpenBlood2

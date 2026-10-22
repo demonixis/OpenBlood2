@@ -1,6 +1,6 @@
 # Service contracts
 
-- [Desktop launcher, data mods and demo installation](launcher_contracts.md)
+- [Game data setup screen, data mods and demo installation](setup_screen_contracts.md)
 
 - [Original menu frontend](menu_contracts.md)
 

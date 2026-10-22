@@ -19,11 +19,11 @@ set(SDL_INSTALL OFF CACHE BOOL "" FORCE)
 set(SDL_RENDER OFF CACHE BOOL "" FORCE)
 # Unused capture, desktop integration and file-output audio services.
 set(SDL_CAMERA OFF CACHE BOOL "" FORCE)
-# Native dialogs are isolated to launcher-only build trees.
-if(BLOOD2_BUILD_LAUNCHER AND NOT BLOOD2_BUILD_GAME)
-    set(SDL_DIALOG ON CACHE BOOL "" FORCE)
-else()
+# The setup screen's folder/file pickers on desktop; mobile pickers return content URIs, not paths.
+if(ANDROID OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
     set(SDL_DIALOG OFF CACHE BOOL "" FORCE)
+else()
+    set(SDL_DIALOG ON CACHE BOOL "" FORCE)
 endif()
 set(SDL_TRAY OFF CACHE BOOL "" FORCE)
 if(APPLE)
@@ -77,4 +77,11 @@ add_library(imgui STATIC
 target_include_directories(imgui SYSTEM PUBLIC
     "${imgui_source_SOURCE_DIR}" "${imgui_source_SOURCE_DIR}/backends")
 target_link_libraries(imgui PUBLIC SDL3::SDL3)
+# The setup screen's proportional font, Droid Sans from the same pinned archive, embedded at
+# configure time so no asset path is needed (licenses/DroidSans-Apache-2.0.txt).
+file(READ "${imgui_source_SOURCE_DIR}/misc/fonts/DroidSans.ttf" blood2_ui_font HEX)
+string(REGEX REPLACE "(..)" "0x\\1," blood2_ui_font "${blood2_ui_font}")
+file(WRITE "${PROJECT_BINARY_DIR}/generated/ui/ui_font.h"
+    "#pragma once\ninline const unsigned char ui_font[] = {${blood2_ui_font}};\n")
+target_include_directories(imgui PUBLIC "${PROJECT_BINARY_DIR}/generated/ui")
 

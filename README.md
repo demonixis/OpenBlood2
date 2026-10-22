@@ -12,24 +12,27 @@ macOS/Metal is user-confirmed; Windows graphical qualification, mobile and VR ar
 
 ## Build and run
 
-Install CMake 3.28+, Ninja, Git, a C++20 compiler, SDL platform development
-packages and OpenSSL development files. On Windows, use an x64 Visual Studio
-developer shell. The first configure downloads pinned dependencies.
+Install CMake 3.28+, Ninja, Git, a C++20 compiler and the SDL platform
+development packages (on Linux also OpenSSL development files). On Windows, use
+an x64 Visual Studio developer shell. The first configure downloads pinned
+dependencies.
 
 ```sh
 cmake --preset dev
 cmake --build --preset dev --parallel
-./build/dev/blood2-launcher
+./build/dev/blood2
 ```
 
-The launcher selects your installation or installs the demo. To launch directly:
+The first launch opens the setup screen: choose your Blood II folder, or download
+and install the free 1998 demo. Options > SETUP returns to it (edition, folders,
+data mods). To skip it:
 
 ```sh
 ./build/dev/blood2 --data-dir "/path/to/Blood II"
 ./build/dev/blood2 --demo --data-dir "/path/to/Blood2 Demo"
 ```
 
-Normal launch opens the original menu; Esc pauses. Add `--view-world` for direct
+Normal launch shows the original title screen and menu; Esc pauses. Add `--view-world` for direct
 entry. Single Player saves and loads the original slots; F5 quicksaves, F6
 quickloads. Use `release` for an optimized build without the
 inspector, `debug` for debugging. See [setup and controls](Documentation/getting_started.md).
@@ -38,7 +41,7 @@ inspector, `debug` for debugging. See [setup and controls](Documentation/getting
 
 [GitHub Actions](https://github.com/demonixis/OpenBlood2/actions/workflows/ci.yml)
 builds and tests Release versions for Windows x64, Linux x64 and macOS Apple
-Silicon. Each successful job provides a game + launcher archive; see
+Silicon. Each successful job provides a game archive; see
 [CI builds](Documentation/ci_builds.md) for downloads, test scope and pushing to both remotes.
 
 ## Contributing and license

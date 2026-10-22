@@ -411,8 +411,11 @@ namespace OpenBlood2
         return true;
     }
 
-    bool load_config(const Options& options, std::string_view environment_data_dir, Config& config, std::string& error)
+    bool load_config(const Options& options, std::string_view environment_data_dir, Config& config, std::string& error,
+                     bool* unconfigured)
     {
+        if (unconfigured)
+            *unconfigured = false;
         config = {};
         error.clear();
         config.demo = options.demo;
@@ -446,6 +449,8 @@ namespace OpenBlood2
         }
         if (config.data_dir.empty())
         {
+            if (unconfigured)
+                *unconfigured = true;
             error = "No Blood II data directory. Set --data-dir, BLOOD2_DATA_DIR or data_dir in blood2.local.ini.";
             return false;
         }

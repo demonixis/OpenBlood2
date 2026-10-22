@@ -86,7 +86,9 @@ namespace OpenBlood2
     std::string path_text(const std::filesystem::path& path);
     std::filesystem::path path_from_utf8(std::string_view text);
     bool parse_options(std::span<const std::string_view> args, Options& options, std::string& error);
-    bool load_config(const Options& options, std::string_view environment_data_dir, Config& config, std::string& error);
+    // `unconfigured` (when given) is set when the only failure is that no data directory is named.
+    bool load_config(const Options& options, std::string_view environment_data_dir, Config& config, std::string& error,
+                     bool* unconfigured = nullptr);
     // Checks file presence/readability only. Does not parse or mount an archive.
     bool inspect_data(const Config& config, DataStatus& data, std::string& error);
 

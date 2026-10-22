@@ -26,6 +26,8 @@ namespace OpenBlood2
         bool loading_screen = false, loading_wait = false, loading_continue = false;
         // Original startup title.pcx splash (Splash_Display, then TimedKeyWait on Esc, Return or Space).
         bool title_screen = false;
+        // Options > SETUP: the replacement setup screen over the paused menu owns all input.
+        bool setup_screen = false;
         // Original F5/F6 (OnKeyDown, retail only): owned requests consumed at the frame boundary.
         bool quick_save = false, quick_load = false;
         std::vector<int> credit_keys; // Original VK codes for CCredits::HandleInput.
@@ -56,7 +58,8 @@ namespace OpenBlood2
         }
         bool paused(const Menu& menu) const
         {
-            return demo_mode ? demo.paused() : menu.active || credits_screen || loading_screen || title_screen;
+            return demo_mode ? demo.paused()
+                             : menu.active || credits_screen || loading_screen || title_screen || setup_screen;
         }
         void reset(Menu& menu, bool player)
         {

@@ -19,9 +19,9 @@ ctest --preset dev -L headless
 ctest --preset dev -L gpu
 ```
 
-CTest gives every test its own `BLOOD2_USER_DIR`, `build/dev/tests/user-dirs/<test>/`
-(`tests/launcher/user-dirs/` for launcher tests), so no test reads or writes the real
-preferences, `controls.cfg`, saves or logs in the user directory
+CTest gives every test its own `BLOOD2_USER_DIR`, `build/dev/tests/user-dirs/<test>/`,
+so no test reads or writes the real preferences, `controls.cfg`, `setup.cfg`, saves or
+logs in the user directory
 ([`blood2_isolate_test_user_directories`](../cmake/ProjectOptions.cmake), called by each test
 directory). These directories persist between runs; delete them for a fresh profile. Running a
 test executable or `blood2` directly uses the real directory unless you set the variable.
@@ -31,7 +31,9 @@ verify the selected GPU ([Linux selection](getting_started.md#platforms)).
 Captures go under `build/dev/tests/`. Demo checks use label `demo` and require
 `-DBLOOD2_DEMO_DATA_DIR="/path/to/Blood2 Demo"`.
 Application/UI lifetime changes also need an inspector-free `release` build and
-relevant tests. Launcher checks are described in [launcher.md](launcher.md#checks).
+relevant tests. `setup.*` covers the [setup screen](contracts/setup_screen_contracts.md)'s
+persistence, detection and demo installation with synthetic data; the real Archive.org
+download is manual (`build/dev/tests/setup_tests download <scratch dir>`).
 
 ## Sanitizers
 

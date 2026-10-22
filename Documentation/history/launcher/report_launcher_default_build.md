@@ -1,6 +1,6 @@
 # Default launcher build and window names
 
-2026-10-19 continuation of the [compact launcher](launcher_redesign.md), from
+2026-10-19 continuation of the [compact launcher](report_launcher_redesign.md), from
 Blood2 baseline `86404e8`, implemented in Blood2 commit `2322e02`. The user requested a default launcher build with the
 game, a neighboring game executable by default, and the display names
 **OpenBlood 2 Launcher** and **OpenBlood 2**.

@@ -86,6 +86,13 @@ namespace OpenBlood2
             }
             if (frame > 11 && frame <= 207 && snapshot(game) != frozen_)
                 return fail("world/audio changed during menu pause");
+            // Options > SETUP opens the setup screen over the paused menu; Esc returns to Options.
+            if (frame == 30 && (menu.page != MenuPage::Main || input.setup_screen))
+                return fail("main menu before setup");
+            if (frame == 32 && !input.setup_screen)
+                return fail("Options > SETUP");
+            if (frame == 34 && (input.setup_screen || menu.page != MenuPage::Options))
+                return fail("setup screen Back");
             if (frame == 207)
             {
                 if (audio.mixer.mixed_frames <= ambient_frames_ + 48000 * 3)
@@ -113,6 +120,7 @@ namespace OpenBlood2
                 e.key.windowID = SDL_GetWindowID(window);
                 e.key.which = device;
                 e.key.scancode = code;
+                e.key.key = SDL_GetKeyFromScancode(code, SDL_KMOD_NONE, false); // Dear ImGui reads keycodes.
                 e.key.repeat = repeat;
                 SDL_PushEvent(&e);
                 e.type = SDL_EVENT_KEY_UP;
@@ -193,6 +201,19 @@ namespace OpenBlood2
                     break;
                 case 24:
                 case 25:
+                    key(SDL_SCANCODE_ESCAPE);
+                    break;
+                case 30:
+                    key(SDL_SCANCODE_DOWN);
+                    key(SDL_SCANCODE_RETURN);
+                    break;
+                case 31: // Display, Audio, Controls, Mouse, (disabled Joystick, Keyboard), SETUP.
+                    for (int i = 0; i < 4; ++i)
+                        key(SDL_SCANCODE_DOWN);
+                    key(SDL_SCANCODE_RETURN);
+                    break;
+                case 32:
+                case 35:
                     key(SDL_SCANCODE_ESCAPE);
                     break;
                 case 120:

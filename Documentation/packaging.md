@@ -7,7 +7,7 @@ number. Everything else derives from it:
 
 | Consumer | Value |
 | --- | --- |
-| `build_info.h` (`--help`, logs, launcher footer, saves, SDL metadata) | `x.y.z` |
+| `build_info.h` (`--help`, logs, setup screen, saves, SDL metadata) | `x.y.z` |
 | Windows `VERSIONINFO` | `x,y,z,build` |
 | Apple `CFBundleShortVersionString` / Android `versionName` | `x.y.z` |
 | Apple `CFBundleVersion` / Android `versionCode` | `x*1000000 + y*10000 + z*100 + build` |
@@ -25,15 +25,13 @@ save/load work lands.
 
 Every platform uses one application identifier, `net.demonixis.openblood2` (Apple
 `CFBundleIdentifier`, Android `applicationId`/`namespace` and Java package, SDL app
-metadata); the desktop launcher is `net.demonixis.openblood2.launcher`. Both are set in
-`cmake/Packaging.cmake`. An installed build with the former `org.openblood2.game`
+metadata), set in `cmake/Packaging.cmake`. An installed build with the former `org.openblood2.game`
 identifier is a separate app: uninstall it before installing the new one.
 
 ## Icons
 
-The game and the launcher have separate project-owned icons (no original Blood II
-artwork): a blood drop, plus a play badge for the launcher. One procedural design
-produces every platform format:
+The game has a project-owned icon (no original Blood II artwork): a blood drop. One
+procedural design produces every platform format:
 
 ```bash
 python3 tools/icons/generate_icons.py
@@ -45,11 +43,9 @@ It needs only the Python standard library and rewrites, under `platform/`:
 (foreground mipmaps, background colour, monochrome layer). Regenerate them all
 together; never edit an output by hand.
 
-Mobile targets build only the game, so only desktop platforms use the launcher icon.
-
 | Platform | Where the icon goes |
 | --- | --- |
-| Windows | `platform/windows/application.rc.in`, compiled into both executables (also the SDL window icon). |
+| Windows | `platform/windows/application.rc.in`, compiled into the executable (also the SDL window icon). |
 | macOS | `.icns` in the `.app` bundle; bundles are built by the Xcode preset (`BLOOD2_APPLE_BUNDLE`). |
 | iOS | `Assets.xcassets` compiled by Xcode (`ASSETCATALOG_COMPILER_APPICON_NAME`). |
 | Android / Quest | `platform/android/app/src/main/res`. |
@@ -61,7 +57,7 @@ executables without an icon; pass `-DBLOOD2_APPLE_BUNDLE=ON` to bundle them.
 
 | Preset | Output | Notes |
 | --- | --- | --- |
-| `xcode-macos` | `build/xcode-macos/Blood2.xcodeproj` → `Release/OpenBlood2.app`, `OpenBlood2Launcher.app` | Inspector-free, no tests. The launcher keeps its own child Xcode project (`launcher/`) and finds the sibling game bundle. |
+| `xcode-macos` | `build/xcode-macos/Blood2.xcodeproj` → `Release/OpenBlood2.app` | Inspector-free, no tests. |
 | `xcode-ios` | `build/xcode-ios/Blood2.xcodeproj` → `OpenBlood2.app` (iPhone/iPad, arm64 device) | Game only. |
 | `android` | `build/android/android/gradle/app/outputs/apk/phone/` | arm64-v8a, minSdk 29, targetSdk 36. |
 | `quest` | `build/quest/android/gradle/app/outputs/apk/quest/` | Immersive Meta Horizon OS OpenXR app (`BLOOD2_XR`): minSdk 32, targetSdk 34, `supportedDevices`, head tracking required, arm64 only, Khronos loader AAR. |
@@ -114,32 +110,35 @@ adb install -r build/quest/android/gradle/app/outputs/apk/quest/debug/app-quest-
 adb logcat -s OpenBlood2
 ```
 
-Game data goes in the headset's shared storage, as for other sideloaded VR ports:
-`/sdcard/openblood2/game` for the retail game (`BLOOD2.REZ` and the rest of the
-installation) and `/sdcard/openblood2/demo` for the 1998 demo (`B2Demo.rez`). Copy them
-over USB or with adb:
+On Android phones and the Quest, game data goes in the shared storage, as for other
+sideloaded ports: `/sdcard/openblood2/game` for the retail game (`BLOOD2.REZ` and the rest
+of the installation) and `/sdcard/openblood2/demo` for the 1998 demo (`B2Demo.rez`); any
+other folder directly under `/sdcard/openblood2` is found too. Copy them over USB or with
+adb, or let the [setup screen](contracts/setup_screen_contracts.md) download the demo into
+the app's own storage:
 
 ```bash
 adb push /path/to/Blood2/. /sdcard/openblood2/game/
 ```
 
 The app needs "all files access" to read them (Android hides files placed by other apps);
-it opens the system page on first launch. During development the permission can be
-granted directly:
+the setup screen's "Allow file access" button opens the system page. During development the
+permission can be granted directly:
 
 ```bash
 adb shell appops set --uid net.demonixis.openblood2 MANAGE_EXTERNAL_STORAGE allow
 ```
 
-Launched without arguments the APK opens the original main menu (a panel at 0.75 m) with the
-retail folder's data, else the demo folder's, else the XR first-light scene. The headset must be
+Launched without arguments the APK opens the setup screen (a panel at 0.75 m) until a playable
+folder is chosen, then the original title and main menu with that choice. The headset must be
 worn, or its proximity sensor paused, for the session to reach FOCUSED; a Guardian dialog
 blocks immersive launches until the boundary is set.
 
 ## Scope
 
-iOS and Android phones are anticipation: they are verified to build, not to run.
-They have no data provisioning (the game still expects an external Blood II
-directory) and no tests run on them. The Quest APK plays the game on a Quest 3 with
+iOS and Android phones are anticipation: they are verified to build, not to run, and no
+tests run on them. Their data comes from the setup screen: the shared folders above on
+Android, the app's Documents folder on iOS (Files app or Finder file sharing), or the
+demo download. The Quest APK plays the game on a Quest 3 with
 the original menus, HUD and Touch controllers; a worn play test is still pending. Do not use a simulator or emulator
 for them without asking the user (see AGENTS.md).

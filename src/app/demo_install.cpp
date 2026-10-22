@@ -1,14 +1,17 @@
-#include "launcher/demo_install.h"
+#include "app/demo_install.h"
+#include "app/game_setup.h"
+#include "app/https_download.h"
 #include "engine/resources.h"
-#include "launcher/content.h"
+#include "engine/sha256.h"
+#include <SDL3/SDL_iostream.h>
+#include <SDL3/SDL_stdinc.h>
+#include <SDL3/SDL_timer.h>
 #include <algorithm>
 #include <array>
-#include <curl/curl.h>
 #include <miniz.h>
-#include <openssl/evp.h>
 #include <set>
 
-namespace OpenBlood2::Launcher
+namespace OpenBlood2
 {
     namespace fs = std::filesystem;
     namespace
@@ -67,94 +70,49 @@ namespace OpenBlood2::Launcher
             writer.progress->bytes += count;
             return count;
         }
-        size_t http_write(char* bytes, size_t size, size_t count, void* opaque)
-        {
-            auto& writer = *static_cast<Writer*>(opaque);
-            if (size && count > (writer.limit - writer.written) / size)
-                return 0;
-            return zip_write(opaque, writer.written, bytes, size * count);
-        }
-        int http_progress(void* opaque, curl_off_t, curl_off_t, curl_off_t, curl_off_t)
-        {
-            return static_cast<InstallProgress*>(opaque)->cancel ? 1 : 0;
-        }
         bool download(const fs::path& file, InstallProgress& progress, std::string& error)
         {
-            // Thread-safe one-time global initialization, before easy handles exist.
-            struct CurlRuntime
-            {
-                CURLcode result = curl_global_init(CURL_GLOBAL_DEFAULT);
-                ~CurlRuntime()
-                {
-                    if (result == CURLE_OK)
-                        curl_global_cleanup();
-                }
-            };
-            static CurlRuntime runtime;
-            if (runtime.result != CURLE_OK)
-                return failure(error, "Cannot initialize HTTPS download");
             std::string url = download_url;
+            progress.total = demo_package().bytes;
             for (unsigned redirects = 0; redirects <= 5; ++redirects)
             {
                 if (!demo_url_allowed(url))
                     return failure(error, "Demo redirect left the approved Archive.org host");
-                Io io{SDL_IOFromFile(path_text(file).c_str(), "wb")};
-                if (!io.value)
-                    return failure(error, "Cannot create demo download: " + std::string(SDL_GetError()));
-                auto* curl = curl_easy_init();
-                if (!curl)
-                    return failure(error, "Cannot create HTTPS download");
                 progress.bytes = 0;
-                progress.total = demo_package().bytes;
-                Writer writer{io.value, &progress, 0, demo_package().bytes};
-                char details[CURL_ERROR_SIZE]{};
-                curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-                curl_easy_setopt(curl, CURLOPT_PROTOCOLS_STR, "https");
-                curl_easy_setopt(curl, CURLOPT_REDIR_PROTOCOLS_STR, "https");
-                curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 0L);
-                curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
-                curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
-#ifdef _WIN32
-                curl_easy_setopt(curl, CURLOPT_SSL_OPTIONS, long(CURLSSLOPT_NATIVE_CA));
-#endif
-                curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 15L);
-                curl_easy_setopt(curl, CURLOPT_TIMEOUT, 600L);
-                curl_easy_setopt(curl, CURLOPT_LOW_SPEED_LIMIT, 1024L);
-                curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, 30L);
-                curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
-                curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
-                curl_easy_setopt(curl, CURLOPT_MAXFILESIZE_LARGE, curl_off_t(demo_package().bytes));
-                curl_easy_setopt(curl, CURLOPT_USERAGENT, "OpenBlood2-Launcher/1");
-                curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, http_write);
-                curl_easy_setopt(curl, CURLOPT_WRITEDATA, &writer);
-                curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-                curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, http_progress);
-                curl_easy_setopt(curl, CURLOPT_XFERINFODATA, &progress);
-                curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, details);
-                const auto result = curl_easy_perform(curl);
-                long response = 0;
-                curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response);
-                char* next = nullptr;
-                curl_easy_getinfo(curl, CURLINFO_REDIRECT_URL, &next);
-                std::string redirect = next ? next : "";
-                curl_easy_cleanup(curl);
-                if (!io.close())
-                    return failure(error, "Cannot finish demo download");
-                if (progress.cancel)
-                    return failure(error, "Installation cancelled");
-                if (result != CURLE_OK)
-                    return failure(error, "Demo download failed: " +
-                                              std::string(details[0] ? details : curl_easy_strerror(result)));
-                if (response >= 300 && response < 400 && !redirect.empty())
+                HttpsResponse response;
+                if (!https_get(
+                        url, file, demo_package().bytes,
+                        [&](std::uint64_t bytes)
+                        {
+                            progress.bytes = bytes;
+                            return !progress.cancel;
+                        },
+                        response, error))
+                    return progress.cancel ? failure(error, "Installation cancelled") : false;
+                if (response.status >= 300 && response.status < 400 && !response.location.empty())
                 {
-                    url = std::move(redirect);
+                    url = std::move(response.location);
                     continue;
                 }
-                if (response != 200 || writer.written != demo_package().bytes)
+                if (response.status != 200 || response.bytes != demo_package().bytes)
                     return failure(error, "Demo server returned an unexpected response or file length");
                 return true;
             }
             return failure(error, "Too many demo download redirects");
+        }
+        // The installed data, as the game will mount it.
+        bool validate_demo(const fs::path& directory, std::string& error)
+        {
+            Config config;
+            config.data_dir = directory;
+            config.demo = true;
+            DataStatus status;
+            Resources resources;
+            if (!inspect_data(config, status, error) || !resources.mount_game(config, error))
+                return false;
+            if (resources.index().empty())
+                return failure(error, "The installed demo has no resources");
+            return true;
         }
         bool unpack(const fs::path& file, const fs::path& destination, InstallProgress& progress, std::string& error)
         {
@@ -188,7 +146,7 @@ namespace OpenBlood2::Launcher
                 std::array<char, 1025> path{};
                 const auto length = mz_zip_reader_get_filename(&zip.value, i, path.data(), path.size());
                 if (!mz_zip_reader_file_stat(&zip.value, i, &stat) || !length || length > path.size() ||
-                    length != SDL_strlen(path.data()) + 1 || !valid_text(path.data(), 1024))
+                    length != SDL_strlen(path.data()) + 1 || !valid_setup_text(path.data(), 1024))
                     return failure(error, "Invalid or overlong ZIP entry name");
                 std::string original(path.data());
                 std::replace(original.begin(), original.end(), '\\', '/');
@@ -264,27 +222,23 @@ namespace OpenBlood2::Launcher
                                          "e410ce2944210c776c7407a79e01cfa031c782132f68407cd0871379c5e7218c"};
         return package;
     }
-    bool demo_url_allowed(std::string_view text)
+    bool demo_url_allowed(std::string_view url)
     {
-        auto* url = curl_url();
-        if (!url)
+        constexpr std::string_view scheme = "https://";
+        if (url.size() > 4096 || url.substr(0, scheme.size()) != scheme)
             return false;
-        bool ok = curl_url_set(url, CURLUPART_URL, std::string(text).c_str(), 0) == CURLUE_OK;
-        char *scheme = nullptr, *host = nullptr, *user = nullptr, *port = nullptr;
-        ok = ok && curl_url_get(url, CURLUPART_SCHEME, &scheme, 0) == CURLUE_OK &&
-             curl_url_get(url, CURLUPART_HOST, &host, 0) == CURLUE_OK;
-        curl_url_get(url, CURLUPART_USER, &user, 0);
-        curl_url_get(url, CURLUPART_PORT, &port, 0);
-        const std::string_view name = host ? host : "";
-        ok = ok && std::string_view(scheme ? scheme : "") == "https" &&
-             (name == "archive.org" || name.ends_with(".archive.org")) && !user &&
-             (!port || std::string_view(port) == "443");
-        curl_free(scheme);
-        curl_free(host);
-        curl_free(user);
-        curl_free(port);
-        curl_url_cleanup(url);
-        return ok;
+        auto authority = url.substr(scheme.size());
+        authority = authority.substr(0, authority.find_first_of("/?#"));
+        if (authority.empty() || authority.find('@') != authority.npos || authority.find('[') != authority.npos)
+            return false;
+        std::string host(authority.substr(0, authority.find(':')));
+        if (const auto colon = authority.find(':'); colon != authority.npos && authority.substr(colon + 1) != "443")
+            return false;
+        std::transform(host.begin(), host.end(), host.begin(),
+                       [](unsigned char c) { return char(c >= 'A' && c <= 'Z' ? c + 32 : c); });
+        if (host.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789.-") != host.npos)
+            return false;
+        return host == "archive.org" || (host.size() > 12 && host.ends_with(".archive.org"));
     }
     bool file_sha256(const fs::path& path, std::string& digest, std::string& error, InstallProgress& progress)
     {
@@ -292,31 +246,20 @@ namespace OpenBlood2::Launcher
         const auto size = io.value ? SDL_GetIOSize(io.value) : -1;
         if (size < 0 || std::uint64_t(size) > expanded_limit)
             return failure(error, "Cannot read bounded package file");
-        auto* hash = EVP_MD_CTX_new();
-        if (!hash)
-            return failure(error, "Cannot create SHA-256 verifier");
-        bool ok = EVP_DigestInit_ex(hash, EVP_sha256(), nullptr) == 1;
+        Sha256 hash;
+        bool ok = true;
         std::array<unsigned char, 65536> buffer{};
         std::uint64_t bytes = 0;
         while (ok && bytes < std::uint64_t(size))
         {
             const auto n = SDL_ReadIO(io.value, buffer.data(), std::min<std::uint64_t>(buffer.size(), size - bytes));
-            ok = n && !progress.cancel && EVP_DigestUpdate(hash, buffer.data(), n) == 1;
+            ok = n && !progress.cancel;
+            hash.update(std::span(buffer.data(), n));
             bytes += n;
         }
-        unsigned char out[EVP_MAX_MD_SIZE]{};
-        unsigned length = 0;
-        ok = ok && !progress.cancel && EVP_DigestFinal_ex(hash, out, &length) == 1 && length == 32;
-        EVP_MD_CTX_free(hash);
-        if (!ok)
+        if (!ok || progress.cancel)
             return failure(error, progress.cancel ? "Installation cancelled" : "Cannot verify package SHA-256");
-        digest.clear();
-        constexpr char hex[] = "0123456789abcdef";
-        for (unsigned i = 0; i < length; ++i)
-        {
-            digest += hex[out[i] >> 4];
-            digest += hex[out[i] & 15];
-        }
+        digest = digest_text(hash.finish());
         return true;
     }
     bool extract_demo(const fs::path& zip, const fs::path& destination, const DemoPackage& package,
@@ -341,9 +284,8 @@ namespace OpenBlood2::Launcher
             ok = file_sha256(destination / "B2Demo.rez", hash, error, progress);
             if (ok && hash != package.rez_sha256)
                 ok = failure(error, "Extracted demo REZ checksum mismatch");
-            ContentSummary summary;
             if (ok)
-                ok = validate_content({Edition::Demo, destination}, summary, error);
+                ok = validate_demo(destination, error);
             if (ok && progress.cancel)
                 ok = failure(error, "Installation cancelled");
         }
@@ -357,11 +299,11 @@ namespace OpenBlood2::Launcher
         if (thread_)
             SDL_WaitThread(thread_, nullptr);
     }
-    bool DemoInstaller::start(const fs::path& storage, const fs::path& local)
+    bool DemoInstaller::start(const fs::path& content, const fs::path& local)
     {
-        if (pending() || !storage.is_absolute() || (!local.empty() && !local.is_absolute()))
+        if (pending() || !content.is_absolute() || (!local.empty() && !local.is_absolute()))
             return false;
-        storage_ = storage;
+        content_ = content;
         local_ = local;
         progress.cancel = false;
         progress.bytes = 0;
@@ -382,7 +324,7 @@ namespace OpenBlood2::Launcher
     void DemoInstaller::work(InstallResult& result)
     {
         std::error_code ec;
-        const auto parent = storage_ / "content";
+        const auto& parent = content_;
         fs::create_directories(parent, ec);
         if (ec)
         {
@@ -467,4 +409,4 @@ namespace OpenBlood2::Launcher
         thread_ = nullptr;
         return true;
     }
-} // namespace OpenBlood2::Launcher
+} // namespace OpenBlood2

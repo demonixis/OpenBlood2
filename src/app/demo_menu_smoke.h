@@ -18,8 +18,8 @@ namespace OpenBlood2
             if (frame >= 36 && frame < 216)
                 return frame == 40;
             const auto p = phase(frame);
-            return p == 2 || p == 4 || p == 10 || p == 15 || p == 19 || p == 23 || p == 27 || p == 32 || p == 54 ||
-                   p == 61 || p == 63 || p == 72;
+            return p == 2 || p == 4 || p == 8 || p == 10 || p == 15 || p == 19 || p == 23 || p == 27 || p == 32 ||
+                   p == 54 || p == 61 || p == 63 || p == 72;
         }
         bool before(std::uint64_t frame, SDL_Window* window, GameSession& game, const Menu& menu, MenuInput& input,
                     const MenuAudio& audio, std::string& error)

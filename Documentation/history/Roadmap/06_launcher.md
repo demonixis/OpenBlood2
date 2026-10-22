@@ -1,13 +1,13 @@
 # SDL3 launcher implementation plan
 
-The [default-build continuation](../../implementation/reports/launcher_default_build.md)
+The [default-build continuation](../launcher/report_launcher_default_build.md)
 also includes the launcher in normal game builds, preserving separate SDL
 configurations and placing the two executables beside one another.
 
 **Scope revision, 2026-10-19:** the user replaced the initial interface with a
 compact desktop menu (Play, Game Settings, Mods, Quit), requested demo download
 and automatic installation/selection, and cancelled the graphical settings
-panel. This [implemented continuation](../../implementation/reports/launcher_redesign.md)
+panel. This [implemented continuation](../launcher/report_launcher_redesign.md)
 adds ordered data-only REZ toggles and the qualified Archive.org v1.0 ZIP.
 Nightmares remains separate. The detailed L0-L7 proposal below records the
 initial plan; L3 graphics editing is cancelled, L4's profile-manifest design is
@@ -16,7 +16,7 @@ implementation documented in the current contracts. M2/M3 decisions are unchange
 
 
 Date: 2026-10-19. L0 through L2 are implemented with the Linux verification scope
-recorded in [launcher validation](../../implementation/reports/launcher.md). L3 through L7
+recorded in [launcher validation](../launcher/report_launcher.md). L3 through L7
 and the later display extension remain planned.
 
 Build a small C++20 desktop launcher using SDL3, SDL_GPU and Dear ImGui. It will
@@ -423,7 +423,7 @@ lifetime work. Select NVIDIA for GPU tests on this developer machine and record
 the actual device; never embed that choice in production.
 
 The following launcher-only presets were introduced by L1. Run from `Blood2/`;
-see [launcher setup](../../launcher.md) for the separately built game
+see [launcher setup](../launcher/launcher.md) for the separately built game
 path and private/GPU test configuration.
 
 ```sh

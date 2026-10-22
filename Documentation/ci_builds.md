@@ -11,15 +11,11 @@ runner, personal access token or repository secret is needed by this workflow.
 | `OpenBlood2-linux-x64` | Ubuntu 24.04 | GCC | x86-64 |
 | `OpenBlood2-macos-arm64` | macOS 26 | Apple Clang (Xcode 26.6) | Apple Silicon |
 
-Every job builds the inspector-free Release game and launcher, then runs their
-synthetic headless CTest suites, including the launcher/game information protocol.
-The separate launcher build enables its tests, which the default combined build's
-child tree disables. Missing tests are an error. GPU and private-data tests are
+Every job builds the inspector-free Release game, then runs its synthetic headless
+CTest suite, including the setup screen's persistence and demo-installer checks.
+Missing tests are an error. GPU and private-data tests are
 excluded explicitly; these jobs do not certify graphical execution, campaign
 traversal or the outstanding M2 GPU reservation.
-
-Launcher fixture files use binary streams to preserve explicit UTF-8/LF bytes on
-Windows as well as Unix; subprocess and persistence checks compare those bytes.
 
 Failures remain failures, and the other platforms continue independently. Test
 reports (JUnit), CTest logs and CMake diagnostics are uploaded even after failure.
@@ -32,24 +28,25 @@ the repository's pinned hashes. Compiler outputs are not shared between runners.
 Open a successful Actions run and download the artifact for your platform.
 Extract the contained `OpenBlood2-<version>-<platform>` ZIP (Windows) or tar.gz
 (Linux/macOS; see [packaging](packaging.md) for versions and release tags), then run
-`blood2-launcher` (`blood2-launcher.exe` on Windows), or start the game directly:
+`blood2` (`blood2.exe` on Windows): its setup screen finds or installs the game data. Or
+start it on a folder directly:
 
 ```sh
 ./blood2 --data-dir "/path/to/Blood II"
 ```
 
-Keep both executables in the same directory. The archive includes dependency
-notices, an example configuration and the exact source commit in `BUILD.txt`.
-It contains no commercial game data or demo; supply your own installation or
-use the launcher's demo installer. OpenSSL is linked statically; Windows archives
-also carry the MSVC runtime DLLs. Linux needs an Ubuntu 24.04-compatible glibc and
+The archive includes dependency notices (`licenses/`), an example configuration and
+the exact source commit in `BUILD.txt`. It contains no commercial game data or demo;
+supply your own installation or use the setup screen's demo installer. Linux links
+OpenSSL (for libcurl) from the system; Windows uses Schannel and macOS NSURLSession.
+Windows archives also carry the MSVC runtime DLLs. Linux needs an Ubuntu 24.04-compatible glibc and
 system graphics/audio drivers. Windows needs a Vulkan-capable graphics driver.
 The macOS build requires macOS 26 or newer, targets Apple Silicon and uses Metal; it is not an Intel or
 universal binary. These are unsigned development builds, without macOS notarization.
 The current floating-point `std::from_chars` calls require macOS 26's libc++;
 selecting a newer Xcode on a macOS 15 runner is not sufficient. CI explicitly
 selects Xcode 26.6 and a macOS 26.0 deployment target.
-The CI launcher disables optional libidn2 discovery to avoid linking a developer
+The pinned libcurl disables optional libidn2 discovery to avoid linking a developer
 machine's shared library. Packaging rejects non-system macOS dylibs and smoke-tests
 the staged Windows executables without the developer tool directories on `PATH`.
 
@@ -74,13 +71,7 @@ platform dependencies described in [getting started](getting_started.md):
 cmake --preset ci-release
 cmake --build --preset ci-release --parallel 3
 ctest --preset ci-release
-cmake --preset ci-launcher-release
-cmake --build --preset ci-launcher-release --parallel 3
-ctest --preset ci-launcher-release
 ```
 
-On Windows, use an x64 Visual Studio developer shell. Supply `OPENSSL_ROOT_DIR`
-as a CMake cache variable when necessary; the launcher CI preset requires static
-OpenSSL libraries. CI additionally sets `BLOOD2_LAUNCHER_TEST_GAME` to the absolute
-path of the built game to enable its integration check. The CI presets use
+On Windows, use an x64 Visual Studio developer shell. The CI presets use
 `build/ci/` and leave ordinary development presets and private data paths alone.

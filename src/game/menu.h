@@ -31,9 +31,10 @@ namespace OpenBlood2
         Credits, // Original MenuCredits: StartNewGame("Credits", CUSTOM, MEDIUM), or GS_CREDITS in a world.
         Quit,
         Settings,
-        SaveGame,       // Original MenuSaveGame(slot): slot 0..7.
-        LoadGame,       // Original MenuLoadGame(slot): SLOT_CURRENT (-2, Restart), SLOT_QUICK (-1) or 0..7.
-        RestoreControls // Replacement Controls row: the owner restores the default bindings.
+        SaveGame,        // Original MenuSaveGame(slot): slot 0..7.
+        LoadGame,        // Original MenuLoadGame(slot): SLOT_CURRENT (-2, Restart), SLOT_QUICK (-1) or 0..7.
+        RestoreControls, // Replacement Controls row: the owner restores the default bindings.
+        Setup            // Replacement Options row: the owner shows the game data setup screen.
     };
     enum class MenuCue
     {
@@ -150,6 +151,7 @@ namespace OpenBlood2
         MenuCommand take_command();
         bool active = false, in_world = false, alive = true;
         bool vr = false;           // An XR session: Options offers the replacement VR page.
+        bool setup = false;        // The owner offers Options > SETUP (the game data setup screen).
         bool audio_failed = false; // Nonmodal application-owned audio status.
         MenuPage page = MenuPage::Main, top = MenuPage::Main;
         std::vector<MenuItem> items;

@@ -1,6 +1,6 @@
 # Desktop launcher contracts
 
-The 2026-10-19 [compact launcher continuation](../implementation/reports/launcher_redesign.md)
+The 2026-10-19 [compact launcher continuation](report_launcher_redesign.md)
 supersedes the initial L0-L2 interface and the future graphics/profile/installer
 sections below. The main menu and separate Game Settings/Mods panels are now
 implemented. The requested graphical settings panel is cancelled. Nightmares,
@@ -34,13 +34,13 @@ against `SDL_GetBasePath()`. Never infer a neighboring preset or use the working
 directory to locate the executable. A missing/incompatible executable leaves
 Play unavailable. Display names are OpenBlood 2 Launcher and OpenBlood 2; the
 protocol's `game=OpenBlood2` and existing preference paths do not change.
-See [build validation](../implementation/reports/launcher_default_build.md).
+See [build validation](report_launcher_default_build.md).
 
 ## L0 baseline and shared boundary
 
 Baseline: Blood2 `8fcbf35`, with gameplay/code unchanged from `d149d325`.
 The unchanged development config, menu preference, demo flow/rules and demo-menu
-manifest/flow tests pass 12/12; [raw evidence](../implementation/reports/evidence/launcher-l0-baseline.log).
+manifest/flow tests pass 12/12; [raw evidence](evidence/launcher-l0-baseline.log).
 SDL revision remains `6defbc0129b5ba90bab3f6c67bbc1e9329e24ff1`, ImGui
 `c1aaac65e896a45f81f47a4d68f9959e0f86c859`; archive hashes and the SDL patch
 remain in `cmake/Dependencies.cmake`.

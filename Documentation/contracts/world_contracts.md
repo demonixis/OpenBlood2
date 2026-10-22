@@ -1,6 +1,7 @@
 # Resource, World and Session Contracts
 
-The [launcher data-mod continuation](launcher_contracts.md#data-mods) extends
+The data-mod continuation (first built for the [archived launcher](../history/launcher/launcher_contracts.md#data-mods),
+now driven by the [setup screen](setup_screen_contracts.md)) extends
 `mount_game` with explicitly ordered `--rez` overlays after the unchanged stock
 archive order. Whole-mount rollback and resource ownership are preserved;
 Nightmares and code mods remain excluded.

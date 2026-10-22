@@ -162,7 +162,7 @@ needs a small local Vulkan patch.
 | 8.5 | Controllers: bindings, aim, locomotion, turning | M — done; second-playtest layout, menu hands and VR options page (turn, laser, crosshair) added; worn check pending |
 | 8.6 | HUD locked to the view, menus 0.75 m in front | M — done (compositor quads); worn check pending |
 | 8.7 | Selection laser for menus | S — done; worn check pending |
-| 8.8 | Data setup screen and in-headset demo download | M |
+| 8.8 | Data setup screen and in-headset demo download | M — superseded by the cross-platform [setup screen](contracts/setup_screen_contracts.md) (`/sdcard/openblood2`, Java HTTPS); headset check pending |
 | 8.9 | View weapons on the controllers, arm IK | L — done; worn check pending |
 | 8.10 | Comfort: walls, cinematics, death camera, zoom | M |
 | 8.11 | Quest performance tuning and evidence | M |

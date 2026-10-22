@@ -1,14 +1,14 @@
 # SDL3 launcher implementation and validation
 
-The [compact launcher continuation](launcher_redesign.md) supersedes the interface
+The [compact launcher continuation](report_launcher_redesign.md) supersedes the interface
 and adds qualified demo delivery and REZ data mods. Graphical settings were
 cancelled by the user. The L0-L2 evidence below remains a historical record.
 
 
 Date: 2026-10-19. Authorized scope: L0 through L2 of the
-[launcher plan](../../history/Roadmap/06_launcher.md). Nightmares remains separate. This work
+[launcher plan](../Roadmap/06_launcher.md). Nightmares remains separate. This work
 does not reopen M2, resolve M2-GPU-001, accept M3 or change the game's graphics
-stack. [Contracts](../../contracts/launcher_contracts.md) define the
+stack. [Contracts](launcher_contracts.md) define the
 shared boundary and versioned schemas.
 
 ## L0 baseline
@@ -134,7 +134,7 @@ installation checks pass again, 3/3, against that exact revision
 
 ## Reproduction and remaining scope
 
-Follow [launcher setup](../../launcher.md) for build/run commands.
+Follow [launcher setup](launcher.md) for build/run commands.
 Headless tests use the launcher presets and `-L headless`; GPU checks use `-L gpu`
 after opt-in configuration. Game regressions select `config.*`,
 `cli.launcher_info`, `menus.preferences`, `world.rez_structure`,

@@ -34,9 +34,8 @@ namespace OpenBlood2
             SceneGeometry g;
             auto& v = g.vertices;
             const auto begin = [&v] { return static_cast<std::uint32_t>(v.size()); };
-            const auto close = [&v](Range& r, std::uint32_t first) {
-                r = {first, static_cast<std::uint32_t>(v.size()) - first};
-            };
+            const auto close = [&v](Range& r, std::uint32_t first)
+            { r = {first, static_cast<std::uint32_t>(v.size()) - first}; };
             // Gamma-encoded colours, like the renderer's (UNORM views of the sRGB swapchain).
             std::uint32_t first = begin();
             for (int i = -10; i <= 10; ++i)
@@ -286,50 +285,6 @@ namespace OpenBlood2
         }
         SDL_Quit();
         return code;
-    }
-    namespace
-    {
-        bool has_file(const std::filesystem::path& directory, std::string_view name)
-        {
-            std::error_code ec;
-            for (const auto& entry : std::filesystem::directory_iterator(directory, ec))
-            {
-                const auto file = entry.path().filename().string();
-                if (file.size() == name.size() &&
-                    std::equal(file.begin(), file.end(), name.begin(),
-                               [](char a, char b)
-                               { return std::toupper((unsigned char)a) == std::toupper((unsigned char)b); }))
-                    return entry.is_regular_file(ec);
-            }
-            return false;
-        }
-    } // namespace
-
-    void select_android_xr_data(Options& options)
-    {
-        const std::filesystem::path root = "/sdcard/openblood2";
-        if (has_file(root / "game", "BLOOD2.REZ"))
-        {
-            options.data_dir = root / "game";
-            options.demo = false;
-        }
-        else if (has_file(root / "demo", "B2DEMO.REZ"))
-        {
-            options.data_dir = root / "demo";
-            options.demo = true;
-            options.world = first_level(true);
-        }
-        else
-        {
-            std::error_code ec;
-            spdlog::warn("No game data in {0}/game or {0}/demo{1}; opening the XR first light", root.string(),
-                         std::filesystem::exists(root, ec) ? " (folder present: check the all-files access permission)"
-                                                           : "");
-            options.xr_test = true;
-            return;
-        }
-        options.xr_world = true;
-        spdlog::info("XR data: {} ({})", options.data_dir.string(), options.demo ? "demo" : "retail");
     }
 
 } // namespace OpenBlood2

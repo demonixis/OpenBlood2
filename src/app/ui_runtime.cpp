@@ -1,4 +1,5 @@
 #include "app/ui_runtime.h"
+#include "ui_font.h"
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlgpu3.h>
@@ -15,6 +16,12 @@ namespace OpenBlood2
         context = true;
         auto& io = ImGui::GetIO();
         io.IniFilename = nullptr;
+        // The default font stays the HUD/inspector font; the setup screen pushes Droid Sans.
+        io.Fonts->AddFontDefault();
+        ImFontConfig embedded;
+        embedded.FontDataOwnedByAtlas = false;
+        proportional =
+            io.Fonts->AddFontFromMemoryTTF(const_cast<unsigned char*>(ui_font), int(sizeof ui_font), 0.0f, &embedded);
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         ImGui::StyleColorsDark();
         auto& style = ImGui::GetStyle();

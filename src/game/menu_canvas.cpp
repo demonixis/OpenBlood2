@@ -217,6 +217,16 @@ namespace OpenBlood2
             text(*surface, small_, it->second, 180, y);
             y += small_.height + 12;
         }
+        // Replacement rows can exceed the bounded list (the demo's 41-pixel font fits six): the
+        // large-font rows then share the list height evenly.
+        const int rows = int(menu.items.size());
+        const int large = int(normal_.height);
+        const int step = !menu.small() && rows > 1 && y + rows * large > 425 ? (425 - y - large) / (rows - 1) : large;
+        if (step < large * 3 / 4)
+        {
+            error = "Original menu list exceeds bounded canvas";
+            return false;
+        }
         for (std::size_t i = 0; i < menu.items.size(); ++i)
         {
             auto& item = menu.items[i];
@@ -267,7 +277,7 @@ namespace OpenBlood2
                                : !enabled                ? disabled_
                                : int(i) == menu.selected ? selected_
                                                          : normal_;
-            item.rect = {180, y, std::min(625, 180 + width(font, label)), y + int(font.height)};
+            item.rect = {180, y, std::min(625, 180 + width(font, label)), y + std::min(int(font.height), step)};
             if (item.setting >= 0)
                 item.rect.right = 500;
             if (y + int(font.height) > 425)
@@ -311,7 +321,7 @@ namespace OpenBlood2
                         for (unsigned c = 0; c < 3; ++c)
                             surface->rgba[(py * 640 + px) * 4 + c] /= 2;
             }
-            y += font.height + (menu.small() ? 5 : 0);
+            y += menu.small() ? font.height + 5 : step;
         }
         if ((menu.page == MenuPage::Save || menu.page == MenuPage::Load) && !menu.saves.unavailable.empty())
             text(*surface, small_, menu.saves.unavailable, 180, 440);

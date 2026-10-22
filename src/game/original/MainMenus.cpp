@@ -10,8 +10,8 @@ namespace OpenBlood2
     namespace
     {
         // Replacement commands without original counterparts: the Controls page's last row and
-        // the Options page's VR row.
-        constexpr int MENU_CMD_RESTORE_CONTROLS = -2, MENU_CMD_VR = -3;
+        // the Options page's VR and SETUP rows.
+        constexpr int MENU_CMD_RESTORE_CONTROLS = -2, MENU_CMD_VR = -3, MENU_CMD_SETUP = -4;
         // VR turn steps in the order the row cycles them; 0 turns smoothly.
         constexpr std::array<int, 6> vr_turns{15, 30, 45, 60, 90, 0};
     } // namespace
@@ -114,6 +114,8 @@ namespace OpenBlood2
                 AddLargeTextItemOption(IDS_MENU_OPTIONS_KEYBOARD, MENU_CMD_KEYBOARD);
                 if (vr)
                     items.push_back({0, MENU_CMD_VR, true, "VR", -1, {}});
+                if (setup)
+                    items.push_back({0, MENU_CMD_SETUP, true, "SETUP", -1, {}});
                 break;
             case MenuPage::Audio:
                 setting(IDS_MENU_AUDIO_SOUND, 0);
@@ -458,6 +460,9 @@ namespace OpenBlood2
                 break;
             case MENU_CMD_VR:
                 build(MenuPage::Vr);
+                break;
+            case MENU_CMD_SETUP:
+                pending_.action = MenuAction::Setup;
                 break;
             default:
                 break;

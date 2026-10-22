@@ -67,26 +67,13 @@ jobs:
           # Floating-point std::from_chars needs the macOS 26 libc++ runtime.
           echo 'DEVELOPER_DIR=/Applications/Xcode_26.6.app/Contents/Developer' >> "$GITHUB_ENV"
           echo 'MACOSX_DEPLOYMENT_TARGET=26.0' >> "$GITHUB_ENV"
-          brew install ninja openssl@3
-          echo "OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)" >> "$GITHUB_ENV"
-          echo "OPENSSL_LICENSE=$(brew --prefix openssl@3)/LICENSE.txt" >> "$GITHUB_ENV"
-
-      - name: Locate Windows OpenSSL
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $root = "$env:ProgramFiles/OpenSSL"
-          if (!(Test-Path "$root/include/openssl/ssl.h")) { throw "OpenSSL development files are missing" }
-          "OPENSSL_ROOT_DIR=$root" >> $env:GITHUB_ENV
-          $license = Get-ChildItem $root -File | Where-Object Name -Match '^licen[cs]e(\.txt)?$' | Select-Object -First 1
-          if (!$license) { throw "OpenSSL license is missing" }
-          "OPENSSL_LICENSE=$($license.FullName)" >> $env:GITHUB_ENV
+          brew install ninja
 
       - name: Cache pinned dependency archives
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .cache/downloads
-          key: sources-${{ runner.os }}-${{ hashFiles('cmake/Dependencies.cmake', 'cmake/LauncherDependencies.cmake') }}
+          key: sources-${{ runner.os }}-${{ hashFiles('cmake/Dependencies.cmake', 'cmake/ContentDependencies.cmake') }}
           restore-keys: sources-${{ runner.os }}-
 
       - name: Configure game
@@ -98,30 +85,6 @@ jobs:
       - name: Test game (headless, synthetic data)
         id: game-tests
         run: ctest --preset ci-release --output-junit "$GITHUB_WORKSPACE/build/ci/game/game-tests.xml"
-
-      # The default parent build disables launcher tests in its child tree.
-      # An independent preset exercises them and keeps SDL configurations isolated.
-      - name: Configure launcher
-        if: ${{ !cancelled() && steps.game-tests.outcome != 'skipped' }}
-        run: |
-          args=()
-          if [[ -n "${OPENSSL_ROOT_DIR:-}" ]]; then
-            args+=("-DOPENSSL_ROOT_DIR=$OPENSSL_ROOT_DIR")
-          fi
-          if [[ "$RUNNER_OS" == macOS ]]; then
-            args+=(-DCURL_CA_BUNDLE=/etc/ssl/cert.pem -DCURL_CA_PATH=none)
-          fi
-          cmake --preset ci-launcher-release \
-            "-DBLOOD2_LAUNCHER_TEST_GAME=$GITHUB_WORKSPACE/build/ci/game/blood2${{ matrix.suffix }}" \
-            "${args[@]}"
-
-      - name: Build launcher and tests
-        if: ${{ !cancelled() && steps.game-tests.outcome != 'skipped' }}
-        run: cmake --build --preset ci-launcher-release
-
-      - name: Test launcher (headless, synthetic data)
-        if: ${{ !cancelled() && steps.game-tests.outcome != 'skipped' }}
-        run: ctest --preset ci-launcher-release --output-junit "$GITHUB_WORKSPACE/build/ci/launcher/launcher-tests.xml"
 
       - name: Package executables and notices
         env:

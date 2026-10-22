@@ -8,9 +8,9 @@ Outputs are checked in; run it again after changing the design:
     python3 tools/icons/generate_icons.py
 
 Writes:
-  platform/icons/{blood2,blood2-launcher}.png                 512 px previews
-  platform/windows/{blood2,blood2-launcher}.ico               16..256 px
-  platform/apple/macos/{blood2,blood2-launcher}.icns          16..1024 px
+  platform/icons/blood2.png                                   512 px preview
+  platform/windows/blood2.ico                                 16..256 px
+  platform/apple/macos/blood2.icns                            16..1024 px
   platform/apple/ios/Assets.xcassets/AppIcon.appiconset/      1024 px, opaque
   platform/android/app/src/main/res/mipmap-*/                 adaptive foreground
 """
@@ -80,22 +80,6 @@ class Drop:
         return mix(DROP_TOP, DROP_BOTTOM, clamp((y - top) / (bottom - top)))
 
 
-def triangle_distance(x, y, points):
-    """Signed distance to a convex counter-clockwise triangle."""
-    best = float("inf")
-    inside = True
-    for i in range(3):
-        ax, ay = points[i]
-        bx, by = points[(i + 1) % 3]
-        ex, ey = bx - ax, by - ay
-        wx, wy = x - ax, y - ay
-        t = clamp((wx * ex + wy * ey) / (ex * ex + ey * ey))
-        best = min(best, math.hypot(wx - ex * t, wy - ey * t))
-        if ex * wy - ey * wx < 0.0:
-            inside = False
-    return -best if inside else best
-
-
 def blend(dst, colour, alpha):
     a = alpha + dst[3] * (1.0 - alpha)
     if a <= 0.0:
@@ -104,7 +88,7 @@ def blend(dst, colour, alpha):
     return (*rgb, a)
 
 
-def render(size, plate, drop, badge, background):
+def render(size, plate, drop, background):
     """Render RGBA rows. plate: (half, radius) of the rounded square or None
     for a full-bleed tile; background: draw the dark plate/tile."""
     pixel = 1.0 / size
@@ -138,16 +122,6 @@ def render(size, plate, drop, badge, background):
                 hx, hy = drop.cx - drop.r * 0.38, drop.cy - drop.r * 0.30
                 glint = math.hypot((x - hx) / 0.55, (y - hy) / 1.0) - drop.r * 0.20
                 out = blend(out, (255, 236, 236), body * 0.55 * coverage(glint, pixel * 2.0))
-            if badge:
-                bx, by, br = badge
-                ring = math.hypot(x - bx, y - by) - br
-                out = blend(out, (24, 2, 2), coverage(ring - 0.012, pixel))
-                out = blend(out, BONE, coverage(ring, pixel))
-                s = br * 0.48
-                play = [(bx - s * 0.62, by - s), (bx - s * 0.62, by + s), (bx + s, by)]
-                # Counter-clockwise in y-down coordinates.
-                play = [play[0], play[2], play[1]]
-                out = blend(out, DROP_BOTTOM, coverage(triangle_distance(x, y, play), pixel))
             row += bytes((round(out[0]), round(out[1]), round(out[2]), round(out[3] * 255)))
         rows.append(row)
     return rows
@@ -230,21 +204,18 @@ def write(path, data):
 
 def main():
     game_drop = Drop(0.5, 0.585, 0.215, 0.43)
-    launcher_drop = Drop(0.45, 0.545, 0.19, 0.38)
-    launcher_badge = (0.675, 0.675, 0.13)
     # macOS grid: an 824 px plate in a 1024 px canvas; Windows reuses it.
     plate = (0.4023, 0.0898 * 2)
 
-    for name, drop, badge in (("blood2", game_drop, None), ("blood2-launcher", launcher_drop, launcher_badge)):
-        master = render(MASTER, plate, drop, badge, True)
-        sizes = {s: png(downsample(master, s)) for s in (16, 24, 32, 48, 64, 128, 256, 512, 1024)}
-        write(PLATFORM / "icons" / f"{name}.png", sizes[512])
-        write(PLATFORM / "windows" / f"{name}.ico", ico({s: sizes[s] for s in (16, 24, 32, 48, 64, 128, 256)}))
-        write(PLATFORM / "apple" / "macos" / f"{name}.icns", icns(sizes))
+    master = render(MASTER, plate, game_drop, True)
+    sizes = {s: png(downsample(master, s)) for s in (16, 24, 32, 48, 64, 128, 256, 512, 1024)}
+    write(PLATFORM / "icons" / "blood2.png", sizes[512])
+    write(PLATFORM / "windows" / "blood2.ico", ico({s: sizes[s] for s in (16, 24, 32, 48, 64, 128, 256)}))
+    write(PLATFORM / "apple" / "macos" / "blood2.icns", icns(sizes))
 
     # iOS masks the corners itself and rejects transparency: full bleed, opaque.
     catalog = PLATFORM / "apple" / "ios" / "Assets.xcassets"
-    ios = render(MASTER, None, game_drop, None, True)
+    ios = render(MASTER, None, game_drop, True)
     write(catalog / "AppIcon.appiconset" / "AppIcon-1024.png", png(opaque(ios), 3))
     write(catalog / "Contents.json", (json.dumps({"info": {"author": "xcode", "version": 1}}, indent=2) + "\n").encode())
     write(catalog / "AppIcon.appiconset" / "Contents.json", (json.dumps({
@@ -253,7 +224,7 @@ def main():
 
     # Android adaptive icon: 108 dp foreground, content inside the 66 dp safe circle.
     res = PLATFORM / "android" / "app" / "src" / "main" / "res"
-    foreground = render(MASTER, None, Drop(0.5, 0.56, 0.135, 0.27), None, False)
+    foreground = render(MASTER, None, Drop(0.5, 0.56, 0.135, 0.27), False)
     for density, size in (("mdpi", 108), ("hdpi", 162), ("xhdpi", 216), ("xxhdpi", 324), ("xxxhdpi", 432)):
         write(res / f"mipmap-{density}" / "ic_launcher_foreground.png", png(downsample(foreground, size)))
     write(res / "values" / "ic_launcher_background.xml",

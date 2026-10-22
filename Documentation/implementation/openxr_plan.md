@@ -41,7 +41,7 @@ continuation-sized change.
 | Camera and aim | `client_shell.view` (`CameraView`) feeds the presenter. `shell.rotation` drives movement yaw, fire direction (origin at the eye), USE, the view-weapon pose, the listener and server readers of `m_fPitch/m_fYaw` (flashlight, TheEye, Orb, DeathRay, Voodoo). | Head, aim and locomotion directions must be separated. |
 | Input | The [action layer](../contracts/input_action_contracts.md) has Hold/Latch/Analog/Press/Command/Interface kinds. Touch controls inject a virtual gamepad (`touch_gamepad_id`). The contract lists VR controllers as remaining. | XR plugs into the action layer and adds poses. |
 | Menus | `Menu::pointer(x, y, press, release, motion)` already hit-tests items and sliders in 640×480 canvas coordinates ([MainMenus.cpp:504-556](../../src/game/original/MainMenus.cpp)). | A laser only has to produce canvas coordinates. |
-| Data | Data comes from `blood2.local.ini`, `BLOOD2_DATA_DIR` or `--data-dir`. Missing data exits with code 2, and Android has no provisioning. The launcher downloads the [qualified demo](../contracts/launcher_contracts.md#qualified-demo-delivery): Archive.org ZIP, SHA-256, bounded miniz extraction. | Quest needs an in-headset setup screen that reuses the launcher's qualification. |
+| Data | Data comes from `blood2.local.ini`, `BLOOD2_DATA_DIR` or `--data-dir`. Missing data exits with code 2, and Android has no provisioning. The launcher downloads the [qualified demo](../history/launcher/launcher_contracts.md#qualified-demo-delivery): Archive.org ZIP, SHA-256, bounded miniz extraction. | Quest needs an in-headset setup screen that reuses the launcher's qualification. |
 | Quest build | The `quest` preset builds a 2D panel APK: no `com.oculus.intent.category.VR`, `headtracking required=false`, no OpenXR loader. | The flavor becomes immersive. |
 | View weapons | `*_pv.abc` / `lh_*_pv.abc` carry the hands and arms, reskinned per character. Node transforms are composed on the CPU before the GPU palette push ([model_view.cpp:418-458](../../src/engine/model_view.cpp)). No PV node names are documented. | IK can edit poses before the push, but the PV rigs must be audited first. |
 
@@ -298,6 +298,11 @@ cone) rather than per-model node lists. The muzzle-origin option is not built.
 
 ### Data setup screen and demo download
 
+Superseded (2026-10-22) by the cross-platform [setup screen](../contracts/setup_screen_contracts.md),
+which replaced the launcher: the shared `/sdcard/openblood2` folders stay the Quest location,
+the screen is a full-canvas ImGui page with the same laser, and the demo download uses a Java
+`HttpsURLConnection` transport on Android. The plan below is the original intent.
+
 - **Location on Quest.**
   - `SDL_GetAndroidExternalStoragePath()` gives
     `/sdcard/Android/data/net.demonixis.openblood2/files/`. Retail data goes in `Blood2/`
@@ -391,4 +396,4 @@ Keyboard/Joystick pages) do not block this work.
   settings.
 - Movement is head-relative and turning is a 45° snap; aim comes from the right
   controller.
-- The demo source is the launcher's qualified Archive.org package.
+- The demo source is the setup screen's qualified Archive.org package.

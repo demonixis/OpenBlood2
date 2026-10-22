@@ -2,7 +2,7 @@
 
 ## Packaging and platform presets
 
-The game/launcher icons are new project-owned artwork drawn procedurally by
+The game icon is new project-owned artwork drawn procedurally by
 `tools/icons/generate_icons.py`; no original Blood II image is used. The Android
 packager compiles the pinned SDL archive's own `android-project` Java sources in
 place (nothing is copied). `platform/android/gradlew*` and `gradle-wrapper.jar`
@@ -28,9 +28,9 @@ launcher project is available and no historical DLL ABI or game object code is
 imported. The standalone capability branch precedes game configuration, logging
 and SDL initialization. Dependency revisions/archive hashes, the SDL patch and
 game renderer/shaders are preserved. Native dialogs are enabled only in separate
-launcher build trees. See [contracts](../contracts/launcher_contracts.md),
-[source baseline](sources/launcher_sources.json) and
-[validation](reports/launcher.md). Nightmares,
+launcher build trees. See [contracts](../history/launcher/launcher_contracts.md),
+[source baseline](../history/launcher/sources/launcher_sources.json) and
+[validation](../history/launcher/report_launcher.md). Nightmares,
 preference editing, mods and demo installation remain outside this increment.
 
 ## Original crosshair
@@ -1557,7 +1557,7 @@ and [validation](reports/demo_retakes.md).
 
 ## Compact desktop launcher (2026-10-19)
 
-The [launcher continuation](reports/launcher_redesign.md)
+The [launcher continuation](../history/launcher/report_launcher_redesign.md)
 adds project-owned compact panels, qualified Archive.org ZIP installation and
 ordered REZ data mods. The bounded PE/DIB artwork reader follows the section/RVA
 validation approach already used by `engine/string_resources.cpp`, while adding
@@ -2004,3 +2004,17 @@ the same file's `StartNewWorld`, `PreLoadWorld`, `PostUpdate`, `InitSinglePlayer
 the startup title. CoolFont `DrawFormat`/`DrawSolid` are replacement adapters (its source is
 unavailable). Strings and images are read from the installed data. See the
 [contracts](../contracts/loading_screen_contracts.md).
+
+## Setup screen replacing the launcher (2026-10-22)
+
+The standalone launcher, its process protocol, presets and icon were removed; its documents
+are archived under [history/launcher](../history/launcher/launcher.md). `app/demo_install.cpp`
+keeps the launcher's project-owned qualified-demo installer (package constants, staging, bounded
+miniz extraction, publication) with the engine's portable SHA-256 in place of OpenSSL and a
+project-owned URL policy in place of `curl_url`. `app/game_setup.cpp` merges the launcher's state
+and mod persistence into `setup.cfg`. The HTTPS transports (`https_download_{curl,apple,android}`
+and `Blood2Activity.httpsGet`) and the setup UI are replacement code. Pins: miniz 3.1.1 everywhere
+and curl 8.20.0 on Linux/Windows only, in `cmake/ContentDependencies.cmake`; OpenSSL remains a
+Linux system dependency of libcurl, Windows uses Schannel. Droid Sans is embedded unchanged from
+the ImGui pin (Apache 2.0, `licenses/`). No original code is imported. See the
+[contracts](../contracts/setup_screen_contracts.md).

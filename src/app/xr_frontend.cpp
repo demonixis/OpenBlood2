@@ -501,7 +501,7 @@ namespace OpenBlood2
             const auto t = xr_tracking(game, player_, frame_, reference_, scale_);
             build_overlay(game, t, show_panel);
             presenter.draw_hands = false;
-            if (show_panel)
+            if (show_panel && menu_hands)
                 build_hands(game, presenter, t);
             std::array<StereoEye, 2> views;
             for (std::size_t i = 0; i < 2; ++i)

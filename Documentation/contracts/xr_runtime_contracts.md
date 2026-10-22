@@ -308,6 +308,8 @@ FOV gives the desktop projection.
 
 Multiview, the remaining VR options (handedness, smooth-turn speed, HUD distance), the left-handed layout, weapon slots by number, two-handed foregrip tracking
 and motion melee, refresh-rate and performance settings,
-the data setup screen and demo download, PCVR presets and their profiles.
+PCVR presets and their profiles. The [setup screen](setup_screen_contracts.md) is the
+headset's first screen without a stored choice (panel at 0.75 m, laser as mouse, no menu
+hands); it is build-verified only in the headset.
 Shadow casters are still chosen with the 90° desktop frustum around the head, close
 models are lit from the game eye, and translucent sorting runs per eye.

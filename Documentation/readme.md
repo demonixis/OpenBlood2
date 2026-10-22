@@ -7,7 +7,7 @@
 | [CI builds](ci_builds.md) | Desktop archives, headless tests and dual-remote workflow. |
 | [Packaging](packaging.md) | Version, icons, Xcode (macOS/iOS), Android and Quest presets. |
 | [Tests](testing.md) | Headless, private-data, GPU and sanitizer commands. |
-| [Launcher](launcher.md) | Game selection, demo installation and REZ mods. |
+| [Setup screen](contracts/setup_screen_contracts.md) | Game data selection, demo installation and REZ mods. |
 | [Logs](logging.md) / [crash capture](crash_capture.md) | Collect and inspect diagnostics. |
 | [Architecture](architecture.md) | Targets, ownership and engine/game boundaries. |
 | [Contributing](contributing.md) | Source reuse, conventions and verification. |

@@ -15,10 +15,12 @@ disk. Mobile and Quest work is build-only until the user says otherwise; verify
 with device builds (`CODE_SIGNING_ALLOWED=NO` for iOS) and APK assembly.
 
 The [packaging guide](Documentation/packaging.md) owns the version number
-(`project()` in CMakeLists.txt), the game/launcher icons (regenerate every
+(`project()` in CMakeLists.txt), the game icon (regenerate every
 platform artifact with `tools/icons/generate_icons.py`) and the Xcode
 (macOS/iOS), Android and Meta Quest presets. iOS, Android and Quest are
-anticipation: they build the game only, without launcher or tests.
+anticipation: they build the game only, without tests.
+
+The [setup screen](Documentation/contracts/setup_screen_contracts.md) replaced the standalone launcher (removed; its documents are archived under `Documentation/history/launcher/`). Without `--data-dir`, `BLOOD2_DATA_DIR` or `blood2.local.ini` the game uses the playable choice stored in `setup.cfg`, else opens the screen: detected/added installations (retail or demo), the qualified Archive.org demo download and per-installation data-only REZ mods; Options > SETUP reopens it and a new choice restarts the game in-process. Preserve the explicit-configuration bypass, strict bounded `setup.cfg`, never-followed validated redirects, the platform HTTPS transports (libcurl on Linux/Windows, NSURLSession on Apple, HttpsURLConnection on Android; OpenSSL only on Linux), SHA-256 and bounded miniz checks, staging with atomic publication and `/sdcard/openblood2` with all-files access on Android.
 
 The [enhanced renderer](Documentation/contracts/enhanced_renderer_contracts.md) adds Options > Display `RENDERER [ORIGINAL/ENHANCED]`, enhanced `LIGHTING [STANDARD/HIGH]` and `NORMAL MAPS [GENERATED/OFF]`: physically based world faces and lit models, using `config/materials.json` classes, generated normal maps (in-memory content cache) and a per-world static-light grid. It has no probes and no baking. Keep the original set the untouched reference (byte-identical frames, `gpu.surface`). Sky, sprites, FX and PolyGrids stay on the original shaders, the diffuse term stays the original light, and manifest parsing stays bounded. Emission (5.2) adds a light-independent glow from the manifest's `emissive`/`emissive_threshold` classes and counts the DAT's fully bright faces per material; `surface_report` (5.5) feeds the inspector's "Enhanced materials" with the same normal-map rule as the renderer. Preserve emission only adding light, the original output on fully bright faces, the default class for SPR materials and the 32-byte material push. Regenerate all shader artifacts together (the eighteen renderer artifacts plus the four XR line artifacts). Preferences are version 5 (the VR options). M2/M3 scope is unchanged.
 

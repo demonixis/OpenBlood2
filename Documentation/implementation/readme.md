@@ -29,7 +29,7 @@ accepted with open GPU reservation **M2-GPU-001**. M3 remains unaccepted.
 | M0 / M1 validation | [M0](reports/m0.md) / [M1](reports/m1.md) |
 | M2 criterion matrix and GPU reservation | [Acceptance](reports/m2_acceptance.md) |
 | Menus / HUD / crosshair | [Menus](reports/original_menus.md) / [HUD](reports/original_hud.md) / [crosshair](reports/crosshair.md) |
-| Demo / launcher | [Demo](reports/demo_playable.md) / [launcher](reports/launcher_redesign.md) |
+| Demo / setup | [Demo](reports/demo_playable.md) / [setup screen](../contracts/setup_screen_contracts.md) ([archived launcher](../history/launcher/report_launcher_redesign.md)) |
 | Increment reports | [reports/](reports) |
 | Raw logs, measurements, patches and ledgers | [reports/evidence/](reports/evidence) |
 

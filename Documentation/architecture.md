@@ -5,18 +5,19 @@ references, not build dependencies. [CMakeLists.txt](../CMakeLists.txt) defines:
 
 | Target / directory | Responsibility |
 | --- | --- |
-| `blood2_startup` | Config/REZ readers and launcher capability protocol. |
+| `blood2_startup` | Config/REZ readers. |
 | `engine` / [src/engine](../src/engine) | Resources, objects, collision, animation, audio and SDL_GPU. |
 | `blood2_game` / [src/game](../src/game) | Session ownership, typed messages and service adapters. |
 | [src/game/original](../src/game/original) | Selective original shells, objects, AI, weapons and effects. |
 | [src/game/legacy](../src/game/legacy) | Source interface declarations; no retail DLL ABI. |
 | `blood2_app` / [src/app](../src/app) | Input, application loop, presentation, HUD and inspector. Produces `blood2`. |
-| `blood2_launcher` / [src/launcher](../src/launcher) | Installation, demo delivery, REZ mods and game process tracking. |
 | [tests](../tests) / [cmake](../cmake) | Verification / pinned dependencies and build tooling. |
 
 `blood2_app` → `blood2_game` → `engine` → `blood2_startup`.
-The launcher shares startup readers but builds its SDL UI in an isolated child
-tree. Default builds install both executables together; see [launcher](launcher.md).
+`blood2_app` also holds the [setup screen](contracts/setup_screen_contracts.md): game data
+selection, mods and the demo download (miniz, and the platform's HTTPS stack: libcurl on
+Linux/Windows, NSURLSession on Apple, HttpsURLConnection on Android). The former standalone
+launcher is [archived](history/launcher/launcher.md).
 
 ## Ownership
 

@@ -29,7 +29,6 @@
 #include "random_sound_smoke.h"
 #include "scene_explosion_smoke.h"
 #include "sprite_smoke.h"
-#include "startup/protocol.h"
 #include "trigger_smoke.h"
 #include "world_sound_smoke.h"
 #if BLOOD2_XR
@@ -1824,7 +1823,6 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --containers-smoke  GPU liquid/air inspection; pass --world 02_CityHub\n"
                      "  --movement-smoke    GPU SDL movement, jump/landing, hidden simulation and reload\n"
                      "  --skeleton-smoke    Same lifecycle with original animation/node inspection\n"
-                     "  --launcher-info     Headless launcher capabilities (standalone, no config/logging)\n"
                      "  --help              Show this help\n";
         return 0;
     }
@@ -1840,8 +1838,29 @@ static int application_main(const OpenBlood2::Options& options)
     OpenBlood2::Config config;
     OpenBlood2::DataStatus data;
     const char* environment = std::getenv("BLOOD2_DATA_DIR");
-    if (!OpenBlood2::load_config(options, environment ? environment : "", config, error) ||
-        !OpenBlood2::inspect_data(config, data, error))
+    bool unconfigured = false;
+    if (!OpenBlood2::load_config(options, environment ? environment : "", config, error, &unconfigured))
+    {
+        // An ordinary launch without data opens the setup screen; tools and smokes need data.
+        const bool tool = options.check_data || options.inspect_world || options.start_game || options.bench ||
+                          options.gpu_smoke || options.world_smoke || options.menu_smoke || options.demo_smoke ||
+                          options.view_world;
+        if (unconfigured && !tool)
+        {
+#if !BLOOD2_XR
+            if (options.xr_world)
+            {
+                spdlog::error("--xr requires a BLOOD2_XR build");
+                return 2;
+            }
+#endif
+            spdlog::info("No data directory configured: setup.cfg or the setup screen chooses the game data");
+            return OpenBlood2::run_frontend(options, std::nullopt);
+        }
+        spdlog::error("{}", error);
+        return 2;
+    }
+    if (!OpenBlood2::inspect_data(config, data, error))
     {
         spdlog::error("{}", error);
         return 2;
@@ -1933,25 +1952,12 @@ static int application_main(const OpenBlood2::Options& options)
         return 0;
     }
     if (!options.gpu_smoke && !options.world_smoke)
-        return OpenBlood2::run_frontend(options, config, data);
+        return OpenBlood2::run_frontend(options, config);
     return run(options, config, data);
 }
 
 int main(int argc, char** argv)
 {
-    for (int i = 1; i < argc; ++i)
-    {
-        if (std::string_view(argv[i]) == "--launcher-info")
-        {
-            if (argc != 2)
-            {
-                std::cerr << "--launcher-info must be used alone\n";
-                return 2;
-            }
-            std::cout << OpenBlood2::launcher_info();
-            return std::cout ? 0 : 2;
-        }
-    }
     if (const int helper = OpenBlood2::dispatch_crash_helper(argc, argv); helper >= 0)
         return helper;
     std::vector<std::string_view> args;
@@ -1975,10 +1981,10 @@ int main(int argc, char** argv)
             spdlog::warn("{}", log_error);
     }
 #if BLOOD2_XR && defined(SDL_PLATFORM_ANDROID)
-    // The headset launches without arguments: play from the shared data folders, or show the
-    // XR first light when none holds a game (until the data setup screen exists).
+    // The headset launches without arguments into an OpenXR session; the setup screen (or its
+    // stored choice) finds the game data in the shared /sdcard/openblood2 folders.
     if (parsed && args.empty())
-        OpenBlood2::select_android_xr_data(options);
+        options.xr_world = true;
 #endif
     spdlog::info("Requested world={}; demo={}; config={}; inspector={}; view={}; bench={}; headless={}; frames={}",
                  options.world, options.demo, OpenBlood2::path_text(options.config_file),

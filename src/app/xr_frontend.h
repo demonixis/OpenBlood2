@@ -69,6 +69,7 @@ namespace OpenBlood2
             return pointer_;
         }
         static constexpr std::size_t pointer_hand = 1; // The right hand points.
+        bool menu_hands = true; // The panel's Beretta hands; off on the setup screen (no game data).
         // Options > VR, applied every frame.
         struct Options
         {

@@ -6,10 +6,6 @@
 
     <uses-feature android:name="android.hardware.vr.headtracking" android:required="true" android:version="1" />
 
-    <!-- Game data lives in the shared /sdcard/openblood2/{game,demo} folders (like other
-         sideloaded VR ports); Android 11+ reads files placed there only with all-files access. -->
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
-
     <!-- Khronos runtime broker: lets the loader find the system OpenXR runtime. -->
     <uses-permission android:name="org.khronos.openxr.permission.OPENXR" />
     <uses-permission android:name="org.khronos.openxr.permission.OPENXR_SYSTEM" />

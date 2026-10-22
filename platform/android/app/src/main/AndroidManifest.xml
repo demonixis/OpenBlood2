@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto">
 
     <!-- SDL_GPU renders through Vulkan on Android. -->
@@ -11,6 +12,12 @@
     <uses-feature android:name="android.hardware.type.pc" android:required="false" />
 
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- The setup screen downloads the free demo from Archive.org. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Game data lives in the shared /sdcard/openblood2/{game,demo} folders (like other
+         sideloaded ports); Android 11+ reads files placed there only with all-files access,
+         which the setup screen requests. -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
 
     <application
         android:label="@string/app_name"

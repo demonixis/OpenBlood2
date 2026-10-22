@@ -18,7 +18,7 @@ campaign compatibility. Errors link to logs; invalid installs cannot be launched
 
 ## Build and checks
 
-Requirements and normal presets: [build guide](getting_started.md). OpenSSL
+Requirements and normal presets: [build guide](../../getting_started.md). OpenSSL
 headers/libraries are required; pinned curl/miniz are fetched for the launcher.
 Its child build isolates native-dialog SDL options from the game's SDL build.
 `-DBLOOD2_BUILD_LAUNCHER=OFF` builds the game alone.
@@ -51,4 +51,4 @@ cancelled installs keep the selected installation; crashes may leave unreference
 
 The sibling game path is the default; `--game ABS_PATH` overrides it. Startup uses
 `--launcher-info` and absolute `--rez` arguments without a shell. See
-[contracts](contracts/launcher_contracts.md) and [validation](implementation/reports/launcher_redesign.md).
+[contracts](launcher_contracts.md) and [validation](report_launcher_redesign.md).

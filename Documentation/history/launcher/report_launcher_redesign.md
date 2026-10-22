@@ -1,6 +1,6 @@
 # Compact launcher, demo delivery and REZ mods
 
-The later [default-build continuation](launcher_default_build.md) builds both
+The later [default-build continuation](report_launcher_default_build.md) builds both
 executables together, uses only sibling executable discovery by default and
 updates the window names. The implementation and test records below retain
 their original scope.
@@ -17,9 +17,9 @@ ordinary controls. A proportional font replaces the inspector-style default.
 Technical executable selection is under Game Settings > Advanced. Existing game
 SDL flags, pins, shaders and scene renderers have no diff.
 
-[Usage](../../launcher.md),
-[contracts](../../contracts/launcher_contracts.md),
-[source/dependency ledger](../sources/launcher_redesign_sources.json).
+[Usage](launcher.md),
+[contracts](launcher_contracts.md),
+[source/dependency ledger](sources/launcher_redesign_sources.json).
 
 ## Implemented behavior
 

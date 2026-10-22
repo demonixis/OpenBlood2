@@ -1,8 +1,9 @@
 # Build and play
 
 Run commands from `Blood2/`. Requirements: CMake 3.28+, Ninja, Git, a C++20
-compiler, SDL platform development dependencies and OpenSSL development files
-for the launcher. The first configure downloads [pinned dependencies](../cmake/Dependencies.cmake).
+compiler and SDL platform development dependencies; Linux also needs OpenSSL
+development files (the setup screen's demo download). The first configure downloads
+[pinned dependencies](../cmake/Dependencies.cmake) and [content dependencies](../cmake/ContentDependencies.cmake).
 Commercial game data stays outside the repository.
 
 ## Build
@@ -10,7 +11,7 @@ Commercial game data stays outside the repository.
 ```sh
 cmake --preset dev
 cmake --build --preset dev --parallel
-./build/dev/blood2-launcher
+./build/dev/blood2
 ```
 
 | Preset | Use |
@@ -19,15 +20,14 @@ cmake --build --preset dev --parallel
 | `debug` | Unoptimized build with inspector. |
 | `release` | Optimized build without inspector. |
 
-All three build the game and launcher. Configure with `-DBLOOD2_BUILD_LAUNCHER=OFF`
-for the game alone. See [launcher](launcher.md) and [tests](testing.md).
+See [tests](testing.md).
 
 ## Windows build
 
 Install Visual Studio/Build Tools with **Desktop development with C++** and the
 Windows SDK. Run the presets in an **x64 Native Tools Command Prompt** or x64
 Developer PowerShell; Ninja gets its architecture from that shell, without `-A`.
-Use `.exe` executable paths. Supply `-DOPENSSL_ROOT_DIR=...` if needed.
+Use `.exe` executable paths. HTTPS uses Windows' own TLS (Schannel); no OpenSSL is needed.
 
 If CMake cached a missing compiler, enter the developer shell and reconfigure
 with `cmake --preset dev --fresh`. If an old SDL extraction fails patch hashing,
@@ -41,7 +41,10 @@ ctest --test-dir build/windows-clean -L headless --output-on-failure
 
 ## Content and launch
 
-Select an installation in the launcher, or launch directly:
+Without a configured data folder the game opens its [setup screen](contracts/setup_screen_contracts.md):
+pick a detected or added Blood II folder (retail or demo), download the free demo,
+enable data mods, then Play. The choice is remembered in `setup.cfg`; Options > SETUP
+changes it. A data folder given on the command line skips the screen:
 
 ```sh
 ./build/dev/blood2 --data-dir "/path/to/Blood II"
@@ -53,7 +56,8 @@ Content path priority: `--data-dir`, `BLOOD2_DATA_DIR`, then ignored
 `blood2.local.ini` ([example](../config/blood2.example.ini)). Config-relative paths
 use that config's directory.
 
-Normal launch opens the original menu. `--view-world` enters directly: SubwayA
+Normal launch shows the original title screen, then the menu; every load shows
+the original [loading screen](contracts/loading_screen_contracts.md). `--view-world` enters directly: SubwayA
 for retail, Demo_01 for the demo. The retail intro locks movement/fire for about
 12 simulation seconds. Demo_01 continues to Demo_02; Enter after death restarts
 the current demo level with initial equipment. Demo EndGame returns through Info

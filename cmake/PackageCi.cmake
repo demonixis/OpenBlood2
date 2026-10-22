@@ -26,22 +26,22 @@ if(EXISTS "${package}")
   message(FATAL_ERROR "Package directory already exists: ${package}; remove it before repackaging")
 endif()
 file(MAKE_DIRECTORY "${package}")
-execute_process(COMMAND "${CMAKE_COMMAND}" --install "${build}/launcher"
-  --prefix "${package}" --component Launcher COMMAND_ERROR_IS_FATAL ANY)
-file(COPY "${build}/game/blood2${suffix}" "${source}/LICENSE" DESTINATION "${package}")
+# Third-party notices staged by the game build (cmake/ContentDependencies.cmake).
+file(COPY "${build}/game/blood2${suffix}" "${source}/LICENSE" "${build}/game/licenses" DESTINATION "${package}")
 file(COPY "${source}/Documentation/ci_builds.md" DESTINATION "${package}")
 file(COPY "${source}/Documentation/implementation/provenance.md" DESTINATION "${package}/Documentation/implementation")
 file(COPY "${source}/config/blood2.example.ini" DESTINATION "${package}/config")
-if(NOT EXISTS "$ENV{OPENSSL_LICENSE}")
-  message(FATAL_ERROR "Set OPENSSL_LICENSE to the installed OpenSSL license file")
-endif()
-file(COPY_FILE "$ENV{OPENSSL_LICENSE}" "${package}/licenses/OpenSSL.txt")
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+  # Only Linux links OpenSSL (libcurl's TLS); Windows uses Schannel, Apple NSURLSession.
+  if(NOT EXISTS "$ENV{OPENSSL_LICENSE}")
+    message(FATAL_ERROR "Set OPENSSL_LICENSE to the installed OpenSSL license file")
+  endif()
+  file(COPY_FILE "$ENV{OPENSSL_LICENSE}" "${package}/licenses/OpenSSL.txt")
   # Debian's copyright file references the full license at this path.
   file(COPY /usr/share/common-licenses/Apache-2.0 DESTINATION "${package}/licenses")
 endif()
 if(CMAKE_HOST_WIN32)
-  # Both project code and the hosted OpenSSL static libraries use the MSVC DLL CRT.
+  # Project code uses the MSVC DLL CRT.
   file(TO_CMAKE_PATH "$ENV{VCToolsRedistDir}" redist)
   file(GLOB runtime "${redist}/x64/Microsoft.VC*.CRT/*.dll")
   if(NOT runtime)
@@ -52,7 +52,7 @@ if(CMAKE_HOST_WIN32)
   set(run_environment "${CMAKE_COMMAND}" -E env "PATH=$ENV{SystemRoot}/System32")
 endif()
 if(CMAKE_HOST_APPLE)
-  foreach(executable IN ITEMS blood2 blood2-launcher)
+  foreach(executable IN ITEMS blood2)
     execute_process(COMMAND otool -L "${package}/${executable}"
       OUTPUT_VARIABLE linked COMMAND_ERROR_IS_FATAL ANY)
     string(REGEX MATCHALL "\n[ \t]+[^\n]+" dependencies "${linked}")
@@ -69,9 +69,7 @@ execute_process(COMMAND git rev-parse HEAD WORKING_DIRECTORY "${source}"
 file(WRITE "${package}/BUILD.txt" "OpenBlood2 ${version}\nPlatform: ${PLATFORM}\nConfiguration: Release\nCommit: ${revision}\n")
 
 # Check the staged executables as well as the build-tree binaries.
-execute_process(COMMAND ${run_environment} "${package}/blood2${suffix}" --launcher-info
-  WORKING_DIRECTORY "${package}" COMMAND_ERROR_IS_FATAL ANY)
-execute_process(COMMAND ${run_environment} "${package}/blood2-launcher${suffix}" --help
+execute_process(COMMAND ${run_environment} "${package}/blood2${suffix}" --help
   WORKING_DIRECTORY "${package}" COMMAND_ERROR_IS_FATAL ANY)
 if(CMAKE_HOST_WIN32)
   execute_process(COMMAND "${CMAKE_COMMAND}" -E tar cf "${name}.zip" --format=zip "${name}"
