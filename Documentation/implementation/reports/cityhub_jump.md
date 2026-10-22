@@ -1,9 +1,36 @@
 # CityHub museum approach: jump diagnosis
 
+## Resolution, 22 October 2026
+
+The user reported short jumps as general across levels, not specific to one
+place. A re-check against the original sources found no jump multiplier:
+client and server both use `DEFAULT_JUMPVEL` 600 (`m_fJumpMultiplier` is sent
+in `PSTATE_SPEEDS` but never read by the client), the worlds supply gravity
+-2000, the original jump/air-drag branches match `CMoveMgr::UpdateMotion`, and
+later LithTech's `CalcMotion` integrates `v*dt + a*dt²/2` like the replacement.
+The 90-unit rise is therefore faithful.
+
+The systematic difference is stair stepping. Later LithTech's
+`StairStep_Segment` (`runtime/shared/src/collision.cpp`) has no support test:
+it lifts the body onto any walkable face in its lower band that the velocity is
+not moving away from (`vel . n <= 0`). The replacement solver additionally
+required walkable support, so airborne bodies never stepped. That gate is
+removed; the no-upward-velocity condition is kept, matching `vel . n <= 0` for
+a floor. A standing jump now reaches ledges up to 90 units plus the step height
+(about 110 for Caleb) once past its apex. Jump impulse and gravity are unchanged.
+
+`locomotion.ledge` covers a 100-unit ledge (reached), a 115-unit ledge and a
+ceiling over the ledge (both refused); `locomotion.limits` adds apex stepping
+beside the existing rising refusal. The private `locomotion.cityhub_ledge`
+replays the three cases below on the installed world. The 1998 engine binary
+was not traced; later LithTech remains the reference, as for the step height.
+
+## Original investigation
+
 18 October 2026. Investigation of the user's report that Caleb cannot finish
-level 2 because of the jumps before the museum. **The production defect remains
-open.** The experiment below is not an integrated or regression-tested fix.
-It does not reopen M2, resolve M2-GPU-001, or accept M3.
+level 2 because of the jumps before the museum. At the time, **the production
+defect remained open**; the experiment below was not integrated (see the
+resolution above). It does not reopen M2, resolve M2-GPU-001, or accept M3.
 
 ## Reproduction
 

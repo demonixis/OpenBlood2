@@ -260,10 +260,11 @@ namespace OpenBlood2
             return MoveWorldModel(h, *destination) == MoverResult::Moved ? DE_OK : DE_ERROR;
         if (r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL)
             return unsupported("Moving this object type");
-        MovementState support;
+        // Later LithTech's StairStep_Segment has no support test: it steps onto any
+        // walkable face the body is not moving away from. Airborne bodies at or past
+        // their jump apex therefore step up too; rising bodies never do.
         const bool can_step = !(r->state.m_Flags & FLAG_NOSLIDING) && (r->state.m_Flags & FLAG_STAIRSTEP) &&
-                              (r->state.m_Flags & FLAG_SOLID) && GetMovementState(h, support) && support.standing &&
-                              support.ground_normal.y >= 0.5f && r->velocity.y <= 0.01f &&
+                              (r->state.m_Flags & FLAG_SOLID) && r->velocity.y <= 0.01f &&
                               destination->y <= r->state.m_Pos.y + 0.001f;
         moving_ = true;
         const auto ids = objects_.snapshot();

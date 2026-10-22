@@ -1,10 +1,10 @@
 # Player Locomotion Boundary
 
-> Known traversal defect, 18 October 2026: the grounded-only stair restriction
-> blocks Caleb's 96-unit planter-to-dumpster jump on CityHub's museum approach;
-> the unobstructed jump rises 90 units. An isolated airborne-step experiment
-> clears that obstacle without changing jump/gravity, but is not integrated or
-> regression-tested. See the [diagnosis and traces](../implementation/reports/cityhub_jump.md).
+> Airborne stepping, 22 October 2026: the grounded-only stair restriction that
+> blocked Caleb's 96-unit planter-to-dumpster jump on CityHub's museum approach
+> (the unobstructed jump rises 90 units) is replaced by later LithTech's
+> support-free rule below. Jump impulse and gravity are unchanged. See the
+> [diagnosis and traces](../implementation/reports/cityhub_jump.md).
 
 > Extended by [character animation contracts](character_animation_contracts.md):
 > original CAnim_Sound tables now drive locomotion; current model node queries and
@@ -18,7 +18,7 @@
 
 This extends [movement_contracts.md](movement_contracts.md). The local shared
 CPlayerObj now selects original locomotion clips, resizes against collision,
-crouches, and uses grounded stair stepping. M2 remains incomplete. Source ranges
+crouches, and uses stair stepping. M2 remains incomplete. Source ranges
 and hashes are in [m2_locomotion_sources.json](../implementation/sources/m2_locomotion_sources.json); execution
 results are in [m2_locomotion.md](../implementation/reports/m2_locomotion.md).
 
@@ -102,8 +102,11 @@ claimed. Leaving/re-entering clears input, crouch state and manager handles.
 Blood II's SDK supplies `FLAG_STAIRSTEP` but not its complete implementation.
 The new engine implements a bounded **up / horizontal / down** sweep against
 the same primary-world triangles and solid boxes used by normal movement.
-Eligibility requires the flag, a solid body, walkable support, horizontal motion,
-and no upward movement/velocity. Unsupported/jumping players cannot step up.
+Eligibility requires the flag, a solid body, horizontal motion, and no upward
+movement/velocity. Support is not required: later LithTech's `StairStep_Segment`
+steps onto any walkable face the body is not moving away from, so an airborne
+body at or past its jump apex steps up, while a rising body never does. A
+standing jump (90 units) thus reaches ledges up to 90 plus the step height.
 All three paths must clear, and landing must have a walkable normal and a
 positive rise within **half the current half-height** (21 units for retail
 standing Caleb, 14 while crouched). Over-height walls and low ceilings continue
@@ -129,13 +132,16 @@ collision box and eye. The Models panel remains a separate resource preview.
 Space jumps, arrows look, and F1 hides inspection. Panel buttons are held inputs.
 Focus loss and text editing suppress commands. Simulation also runs without ImGui.
 
-Seven synthetic cases cover ascending multiple box/triangle stairs, descending,
-over-height/low-ceiling/disabled-flag/crouched/airborne rejection, clearance,
+Eight synthetic cases cover ascending multiple box/triangle stairs, descending,
+over-height/low-ceiling/disabled-flag/crouched/rising rejection, apex stepping,
+jumps onto a 100-unit ledge (and refusal at 115 units or under a ceiling), clearance,
 feet/eye consistency, reduced speed/jump, clip state/looping/keys, missing chains
 (current clip kept and restarted once; failure only without a valid current clip),
 exit/re-entry, Ctrl routing and speculative versus accepted touch callbacks.
 The private case verifies actual Caleb dimensions/fallback clips and world
 movement. `locomotion.chosen` runs, jumps and lands as each of the four Chosen:
-Caleb/Ophelia resolve `jmp_rifle`, while Ishmael/Gabriella keep `run_rifle`. The strengthened GPU movement smoke checks SDL walk/run/jump/crouch,
+Caleb/Ophelia resolve `jmp_rifle`, while Ishmael/Gabriella keep `run_rifle`.
+`locomotion.cityhub_ledge` reaches the 96-unit dumpster from the planter rim and
+keeps the flat 90-unit rise and the fence crossing. The strengthened GPU movement smoke checks SDL walk/run/jump/crouch,
 hidden stance changes, live player pose and unload/re-entry. Other-platform, XR
 and retail executable feel comparisons have not been performed.
