@@ -20,7 +20,7 @@ To release: bump `project(VERSION)`, commit, then push the tag `vx.y.z` to GitHu
 packaging refuses a tag that does not match the project version; when every job passes,
 CI publishes the GitHub release with the desktop archives and the Android/Quest APKs
 ([CI builds](ci_builds.md#releases)). Published releases:
-`v0.1.0` (Windows pre-release); `0.5.0` is planned once the current input and
+`v0.1.0` (Windows pre-release); `v0.3.0` is a tag on a commit that does not build (no release); `0.5.0` is planned once the current input and
 save/load work lands.
 
 ## Identifiers

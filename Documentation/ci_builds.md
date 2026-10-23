@@ -71,8 +71,8 @@ run: installing a newer release over an older one fails with a signature mismatc
 so uninstall the previous build first (game data in `/sdcard/openblood2` is kept).
 
 ```sh
-git tag v0.3.0
-git push github v0.3.0
+git tag v0.3.1
+git push github v0.3.1
 ```
 
 ## Push and reproduce
