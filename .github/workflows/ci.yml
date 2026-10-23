@@ -170,7 +170,8 @@ jobs:
           restore-keys: gradle-
 
       - name: Configure game
-        run: cmake --preset ${{ matrix.preset }}
+        # Distributed APKs drop the debug info; the symbols are uploaded separately.
+        run: cmake --preset ${{ matrix.preset }} -DBLOOD2_ANDROID_STRIP=ON
 
       - name: Build APK
         run: cmake --build --preset ${{ matrix.preset }}
@@ -197,6 +198,16 @@ jobs:
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
+
+      # Unstripped libmain.so for crash symbolication (ndk-stack); kept out of
+      # releases, whose download pattern matches only OpenBlood2-* artifacts.
+      - name: Upload native symbols
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: symbols-${{ matrix.preset }}-arm64-${{ github.sha }}
+          path: build/${{ matrix.preset }}/android/symbols
+          if-no-files-found: error
+          retention-days: 90
 
   release:
     name: GitHub release

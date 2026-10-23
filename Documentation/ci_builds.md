@@ -18,7 +18,10 @@ CTest suite, including the setup screen's persistence and demo-installer checks.
 Missing tests are an error. GPU and private-data tests are
 excluded explicitly. The Android and Quest jobs build the `android` and `quest`
 presets only (no tests, as everywhere for these platforms) and upload the
-debug-signed RelWithDebInfo APK as `OpenBlood2-<version>-<preset>-arm64.apk`. These jobs do not certify graphical execution, campaign
+debug-signed RelWithDebInfo APK as `OpenBlood2-<version>-<preset>-arm64.apk`,
+with `libmain.so` stripped of debug info (`BLOOD2_ANDROID_STRIP`). The unstripped
+library is a separate `symbols-<preset>-arm64` artifact kept 90 days, for
+symbolicating crashes with `ndk-stack`; it is not attached to releases. These jobs do not certify graphical execution, campaign
 traversal or the outstanding M2 GPU reservation.
 
 Failures remain failures, and the other platforms continue independently. Test

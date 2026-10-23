@@ -99,6 +99,11 @@ tree. The presets use RelWithDebInfo and produce debug-signed, installable APKs;
 `-DCMAKE_BUILD_TYPE=Release` selects the unsigned store variant until a signing
 configuration exists.
 
+Local APKs keep the full debug info in `libmain.so` (about 90 MB of the ~100 MB
+APK) for on-device crash diagnosis. `-DBLOOD2_ANDROID_STRIP=ON` packages a
+`--strip-debug` copy instead (about 16 MB APK) and keeps the unstripped library in
+`android/symbols/<abi>/` for `ndk-stack`; CI builds its APKs this way.
+
 ## Android phone/tablet
 
 Use the build preset (or name the target): `blood2_apk` is not part of `all`, so

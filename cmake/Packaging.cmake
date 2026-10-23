@@ -116,11 +116,23 @@ function(blood2_android_package target)
     if(NOT BLOOD2_ANDROID_FLAVOR MATCHES "^(phone|quest)$")
         message(FATAL_ERROR "BLOOD2_ANDROID_FLAVOR must be phone or quest")
     endif()
+    # Distributed APKs (CI) strip the ~90 MB of debug info; local builds keep it for
+    # on-device crash diagnosis. The unstripped library stays under android/symbols.
+    option(BLOOD2_ANDROID_STRIP "Strip debug info from the packaged libmain.so" OFF)
     set(jni "${PROJECT_BINARY_DIR}/android/jniLibs")
-    add_custom_command(TARGET ${target} POST_BUILD
-        COMMAND "${CMAKE_COMMAND}" -E make_directory "${jni}/${ANDROID_ABI}"
-        COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:${target}>" "${jni}/${ANDROID_ABI}/libmain.so"
-        VERBATIM)
+    if(BLOOD2_ANDROID_STRIP)
+        set(symbols "${PROJECT_BINARY_DIR}/android/symbols")
+        add_custom_command(TARGET ${target} POST_BUILD
+            COMMAND "${CMAKE_COMMAND}" -E make_directory "${jni}/${ANDROID_ABI}" "${symbols}/${ANDROID_ABI}"
+            COMMAND "${CMAKE_COMMAND}" -E copy "$<TARGET_FILE:${target}>" "${symbols}/${ANDROID_ABI}/libmain.so"
+            COMMAND "${CMAKE_STRIP}" --strip-debug -o "${jni}/${ANDROID_ABI}/libmain.so" "$<TARGET_FILE:${target}>"
+            VERBATIM)
+    else()
+        add_custom_command(TARGET ${target} POST_BUILD
+            COMMAND "${CMAKE_COMMAND}" -E make_directory "${jni}/${ANDROID_ABI}"
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:${target}>" "${jni}/${ANDROID_ABI}/libmain.so"
+            VERBATIM)
+    endif()
 
     # The checked-in wrapper pins Gradle (and its checksum) for the pinned plugin.
     if(CMAKE_HOST_WIN32)
