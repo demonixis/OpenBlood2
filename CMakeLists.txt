@@ -1,4 +1,10 @@
 cmake_minimum_required(VERSION 3.28)
+# FetchContent populates in-process, without a sub-build. With the Xcode generator
+# the sub-build is a nested xcodebuild: when Product > Archive regenerates the
+# project, it inherits the archive environment and re-extracts sources being compiled.
+if(POLICY CMP0168)
+    cmake_policy(SET CMP0168 NEW)
+endif()
 project(Blood2 VERSION 0.3.1 LANGUAGES C CXX)
 if(APPLE)
     enable_language(OBJCXX) # The setup screen's NSURLSession download.
