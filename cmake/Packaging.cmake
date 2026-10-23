@@ -29,6 +29,12 @@ if(BLOOD2_IOS AND NOT BLOOD2_APPLE_BUNDLE)
     message(FATAL_ERROR "iOS builds require BLOOD2_APPLE_BUNDLE")
 endif()
 
+if(BLOOD2_APPLE_BUNDLE)
+    # Xcode Archive installs only the app (see blood2_package_application), so
+    # Organizer sees an application archive rather than a generic one.
+    set(CMAKE_XCODE_ATTRIBUTE_SKIP_INSTALL YES)
+endif()
+
 set(blood2_platform_dir "${PROJECT_SOURCE_DIR}/platform")
 
 # SDLActivity loads the Android game as libmain.so; other platforms build executables.
@@ -63,7 +69,9 @@ function(blood2_package_application target)
             OUTPUT_NAME ${BLOOD2_PLIST_EXECUTABLE}
             XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER ${BLOOD2_PLIST_IDENTIFIER}
             XCODE_ATTRIBUTE_MARKETING_VERSION ${PROJECT_VERSION}
-            XCODE_ATTRIBUTE_CURRENT_PROJECT_VERSION ${BLOOD2_VERSION_CODE})
+            XCODE_ATTRIBUTE_CURRENT_PROJECT_VERSION ${BLOOD2_VERSION_CODE}
+            XCODE_ATTRIBUTE_SKIP_INSTALL NO
+            XCODE_ATTRIBUTE_INSTALL_PATH /Applications)
         if(BLOOD2_APPLE_TEAM_ID)
             set_target_properties(${target} PROPERTIES
                 XCODE_ATTRIBUTE_DEVELOPMENT_TEAM ${BLOOD2_APPLE_TEAM_ID}

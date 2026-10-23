@@ -74,6 +74,10 @@ cmake --preset xcode-ios
 cmake --build --preset xcode-ios
 ```
 
+Product > Archive (or `xcodebuild -scheme blood2_app archive`) installs only the app
+under `/Applications` in the archive; the libraries skip installation, so Organizer
+lists an application archive.
+
 Signing is disabled unless `BLOOD2_APPLE_TEAM_ID` is set (for example in an ignored
 `CMakeUserPresets.json`); set it to run on a device. Both Apple presets target
 version 26.0, required by the floating-point `std::from_chars` calls.
