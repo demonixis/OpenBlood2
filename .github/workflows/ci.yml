@@ -97,7 +97,10 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: OpenBlood2-${{ matrix.platform }}-${{ github.sha }}
-          path: build/ci/dist/OpenBlood2-*.*
+          # The archive only: the staged directory name also contains dots.
+          path: |
+            build/ci/dist/OpenBlood2-*.zip
+            build/ci/dist/OpenBlood2-*.tar.gz
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
@@ -216,13 +219,16 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: |
           ls -l dist
+          # Attach regular files only (archives and APKs).
+          files=()
+          for f in dist/*; do if [ -f "$f" ]; then files+=("$f"); fi; done
           # A release drafted or published by hand for this tag keeps its text.
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
-            gh release upload "$TAG" dist/* --repo "$GITHUB_REPOSITORY" --clobber
+            gh release upload "$TAG" "${files[@]}" --repo "$GITHUB_REPOSITORY" --clobber
             exit 0
           fi
           # 0.x versions are pre-releases.
           prerelease=()
           case "$TAG" in v0.*) prerelease=(--prerelease) ;; esac
-          gh release create "$TAG" dist/* --repo "$GITHUB_REPOSITORY" \
+          gh release create "$TAG" "${files[@]}" --repo "$GITHUB_REPOSITORY" \
             --title "OpenBlood2 ${TAG#v}" --generate-notes "${prerelease[@]}"
