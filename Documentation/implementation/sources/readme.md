@@ -21,6 +21,7 @@ hashes merely because an implementation file or its documentation links changed.
 Runtime test logs and measurements belong in the
 [dedicated evidence directory](../reports/evidence).
 
+- [VFX inventory](vfx_inventory_sources.json): beta lot 3, original weapon/environment callers and recipes compared with the port; no import.
 - [Save/load audit](save_load_audit_sources.json): read-only audit of original and later-LithTech save/restore code; no import.
 - [Save-message primitives](save_load_messages_sources.json): lot 1 CSBase declarations and Save/Load call patterns; no implementation imported.
 - [Save/load container](save_load_container_sources.json): lot 2 container and fingerprint; new code, no original source read or imported.

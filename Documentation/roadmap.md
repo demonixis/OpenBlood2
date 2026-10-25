@@ -1,6 +1,6 @@
 # Roadmap
 
-Reviewed on 2026-10-25 (beta VFX lots 1–2); level-opening coverage reconciled with `9bfada1` and
+Reviewed on 2026-10-25 (beta VFX lots 1–3); level-opening coverage reconciled with `9bfada1` and
 [audit 19](implementation/reports/evidence/all-levels-audit-19.log), save/load with lot 14.
 Percentages are task estimates, not acceptance. Only the user accepts a milestone.
 
@@ -99,7 +99,19 @@ renderer remains the reference and stays selectable after M5.
 | --- | --- | --- |
 | 1 | Wood, metal and glass destruction fragments: original resources, launch, scale, transparency, bounce sounds and eviction/fade | Implemented; [contract and verification](contracts/destruction_debris_contracts.md). Applies to CDebris callers on destructible models and brushes. Other materials and explosion components remain separate. |
 | 2 | Sawed-off shotgun (weapon 4): compare primary/alternate fire against the original, complete missing casing/muzzle/impact components | Implemented: original single/double muzzle flashes, barrel/reload animation, secondary casings/smoke, material marks/fragments and liquids; [contract and verification](contracts/shotgun_contracts.md#original-vfx-completion-lot-2-2026-10-25). Engine collision/clipping/pool adaptations remain explicit. |
-| 3 | Inventory of remaining weapon/environment VFX, separating missing implementation, partial effects and absent original resources | Pending. |
+| 3 | Inventory of remaining weapon/environment VFX, separating missing implementation, partial effects and absent original resources | Done: [source audit](implementation/reports/vfx_inventory.md), including all 32 base explosion recipes, connected callers and conditional legacy emitters. Source coverage is not visual parity. |
+| 4 | Shared ballistic presentation: authored muzzle flashes, casings, tracers, marks/fragments and liquid effects for ordinary bullet weapons | **Proposed next / P1.** Reuse lot 2 with per-weapon/ammo rules; preserve Minigun's original empty impact path. Broadest visible benefit, including dual weapons. |
+| 5 | Flare gun: primary/secondary trails and fizzle/burst/fragment effects (13–15) | Proposed / P1. Preserve the alternate parent's originally disabled trail; illumination stays separate. |
+| 6 | Tesla: primary impact (7), alternate beam and ball arcs; connect Drudge lightning through the same service | Proposed / P1. World lightning already exists; weapon callers remain unconnected. |
+| 7 | Explosive weapons: Howitzer impacts (9–11), Napalm alternate (5) and missing projectile smoke connections | Proposed / P2. Preserve working grenade/bomb and Napalm primary effects. |
+| 8 | Remaining energy/boss/environment recipes: Singularity, Death Ray, enemy trails/impacts, Naga and Spawner rift | Proposed / P2. Split by weapon/caller for implementation and verification; no replacement generic explosions. |
+| 9 | Remaining destruction materials and evidenced environment emitters | Proposed / P2 for stone/plastic/terrain and CDebris flesh; P3 for Rain/legacy emitters until an exercised level/caller is identified. |
+| 10 | M4 rendering dependencies: realtime FX illumination, underwater fog, global translucent ordering and clipped marks | Separate proposed work requiring renderer coordination. Do not confuse evaluated light states with illumination or include this in small recipe lots. |
+
+Lots 4–10 are recommendations, not started. P1 restores frequent weapon feedback;
+P2 completes less common weapon/boss/destruction effects; P3 requires evidence of
+campaign use. Each implementation lot needs source-parameter checks and matched
+original/port visual scenarios; the inventory itself changes no runtime behavior.
 
 These lots restore original presentation. They do not reopen M2 or replace M3's
 player-driven campaign/endgame acceptance. The reported Museum crash takes priority

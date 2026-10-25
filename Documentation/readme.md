@@ -12,6 +12,7 @@
 | [Architecture](architecture.md) | Targets, ownership and engine/game boundaries. |
 | [Contributing](contributing.md) | Source reuse, conventions and verification. |
 | [Server-class coverage](contracts/class_coverage.md) | Missing original registrations, replacements and Museum investigation. |
+| [Remaining original VFX](implementation/reports/vfx_inventory.md) | Weapon/environment gaps, existing components and source evidence; delivery order in the roadmap. |
 | [Contracts](contracts/readme.md) | Detailed subsystem rules and limitations. |
 | [Implementation records](implementation/readme.md) | Provenance, level gaps, reports and test evidence. |
 | [Historical studies](history/readme.md) | Earlier workspace inventory, audits and plans. |

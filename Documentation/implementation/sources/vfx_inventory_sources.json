@@ -1,0 +1,107 @@
+{
+  "date": "2026-10-25",
+  "scope": "Beta VFX lot 3: read-only inventory, no original code imported",
+  "port_baseline": "42e737e95edb8c97575cc2bcb94b8945b62833bf",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/Shared/SFXMsgIds.h",
+      "source_sha256": "e0e28f7049fa53550f0d1aa6b64632d90d141520c68878db2191d835c31d0d2f",
+      "purpose": "Base explosion/object/weapon effect IDs; add-on boundary."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Weapon.cpp",
+      "source_sha256": "f045ec970e4b61fd5ad23c629f0123c54aa42196f9490e0ff19ccf485ed5c5fb",
+      "purpose": "Active material, ammo, first-contact and tracer selection."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/GameWeapons.cpp",
+      "source_sha256": "979f6e82b231714dd18209fcb8fcfce949c6e4b5235c618c5150bd5c0be332a2",
+      "purpose": "Weapon-specific effect callers and intentional Minigun impact no-op."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/GameProjectiles.cpp",
+      "source_sha256": "f0f732be5d373324ef2071690fc43317a908aad5d5bade18f59c9e9ccfbcb9fe",
+      "purpose": "Projectile trails, impact recipes and original disabled branches."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/ViewWeapon.cpp",
+      "source_sha256": "8dc314214889f387a89baf44a0689c0a4be9f466e5c9b33a7453db5a547cb529",
+      "purpose": "First-person muzzle sprite creation and model keys."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/GameWeapons.cpp",
+      "source_sha256": "b40ef0a2a20ef908fe87efd0e99b237fc8c18e5974f8504839f45e97c123ee55",
+      "purpose": "Weapon presentation overrides and commented-out charge sprites."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/WeaponFX.cpp",
+      "source_sha256": "4cd80dfbf5f400950854b45db3cd7907b9369e2cd8c31f90bd797b59b4b517b1",
+      "purpose": "Casings, marks, fragments, tracers, smoke, bubbles and liquid composition."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/ExplosionFX.cpp",
+      "source_sha256": "f96624581765705810ebe60a9c58ffa796ff5a751c6713d5219ddd139fc487c0",
+      "purpose": "All base high-detail explosion component recipes; lower-detail branches remain a separate parity check."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/ObjectFX.cpp",
+      "source_sha256": "8890db6c5125ca1716685f8e1dff34da686a9c773d7dea1f91450137ecec800b",
+      "purpose": "Object-bound particle recipes and scaling."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/LightningFX.cpp",
+      "source_sha256": "29fbd9c45c94c6d53fce553b96b28a9bb0e7701c04382e7c374f909b87fd48fc",
+      "purpose": "Shared lightning shapes and segments."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/SFXMgr.cpp",
+      "source_sha256": "fac5fa907b3ec5b547b798c46dd3d3d5371486104f91245b65d363b6653a1e74",
+      "purpose": "Effect dispatch and component family distinction."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/gibfx.cpp",
+      "source_sha256": "c3e2752fccb49960c8ffaf2c1d4e58672214e66e1b1253fd2f2212b95329962a",
+      "purpose": "Original destruction material branches."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Spawner.cpp",
+      "source_sha256": "9b42ecccd37302dcfe53db45fad529adca65ecc61f9963b49f595eb88e802ffd",
+      "purpose": "CreateRiftEffect actively publishes EXP_RIFT_1."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/NagaCeilingDebris.cpp",
+      "source_sha256": "d1e99473d3ec73bc1c62efdeb1bc9d9278adbadb3b891732d4e5123d1449b781",
+      "purpose": "Falling rock explosion caller."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Rain.cpp",
+      "source_sha256": "2347f91d80f43278ecf62f5528da4722c4381ce5bb465613c50c60180528a7aa",
+      "purpose": "Original rain publisher; mounted campaign use not established."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PickupObject.cpp",
+      "source_sha256": "7f75a9fcbc23aabe64cb1ce21f02d63cce2b38110e5d98c8a60e94f0a4ebb43c",
+      "purpose": "Optional rotation and SFX_POWERUP publication."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/PickupObjectFX.cpp",
+      "source_sha256": "3ec6816b1fd6f6cfe87d935f3abc56520cad4bb43d23f9c830d80e51956d7f86",
+      "purpose": "Conditional rotation, not a universal pickup particle halo."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ClientSplashSFX.cpp",
+      "source_sha256": "4f1bcfd292cca4838b090c40892a0fccc3b8dc1f1e74133567c78a4e67b4b518",
+      "purpose": "Generic splash publisher distinct from typed weapon replacements."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ClientTracer.cpp",
+      "source_sha256": "f26a38dd3fc957eecc5b8d27fd7530b2c4aa8d39209f3d593a0c2fd075ae4784",
+      "purpose": "Generic tracer publisher."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/ClientCastLineSFX.cpp",
+      "source_sha256": "dcb64c0e73be8d792110b6abc612e6aaafe38b565bba4e4a228e20517f2faf2e",
+      "purpose": "Generic cast-line publisher."
+    }
+  ]
+}
