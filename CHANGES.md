@@ -4,6 +4,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- M16 grenade simulation failure when a living enemy overlaps it before its first bounce.
+
 ## [0.4.0] - 2026-10-25
 
 ### Added

@@ -205,6 +205,39 @@ namespace
         CHECK(g.unload_world());
         return true;
     }
+    bool overlapping_contact(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(test_assault::setup(g, root));
+        auto* first = victim(g, {300, 100, 330});
+        auto* second = victim(g, {315, 100, 330});
+        CHECK(first && second);
+        auto* p = test_assault::grenade(g, {300, 100, 300}, {0, 0, 1}, 1000);
+        CHECK(p && p->AdvanceFlight(.01) && !p->contacted);
+        const auto h = p->m_hObject;
+        const auto position = g.objects.get(h)->state.m_Pos;
+        // The grenade is nonsolid: an actor can enter it during ordinary physics,
+        // before the projectile phase. Both bodies now overlap the grenade.
+        g.objects.get(first->m_hObject)->state.m_Pos = vector_add(position, {0, 0, 5});
+        g.objects.get(second->m_hObject)->state.m_Pos = vector_add(position, {5, 0, 5});
+        CHECK(p->AdvanceFlight(.010798292) && !p->failed && p->m_bExplode && p->bounces_left == 5);
+        CHECK(p->m_hHitObject == first->m_hObject && p->contacts == 1 && first->touches == 1 && second->touches == 0);
+        const auto after = g.objects.get(h)->state.m_Pos;
+        CHECK(after.x == position.x && after.y == position.y && after.z == position.z);
+        CHECK(g.step(.01) && !g.objects.get(h));
+        CHECK(first->m_damage.m_fHitPoints < 1000 && second->m_damage.m_fHitPoints < 1000);
+        CHECK(g.server.projectile_reports.back().explosions == 2);
+        // The same first-contact rule applies to a shot born inside an actor;
+        // removal in its touch callback must end the flight without another touch.
+        p = test_assault::grenade(g, g.objects.get(first->m_hObject)->state.m_Pos);
+        CHECK(p);
+        const auto removed = p->m_hObject;
+        first->remove_on_touch = removed;
+        CHECK(p->AdvanceFlight(.1) && first->touches == 2 && second->touches == 0);
+        CHECK(g.objects.finish_frame() && !g.objects.get(removed));
+        CHECK(g.unload_world());
+        return true;
+    }
     bool rules(const std::filesystem::path& root)
     {
         GameSession g;
@@ -283,6 +316,16 @@ namespace
         h = p->m_hObject;
         c->remove_on_touch = h;
         CHECK(p->AdvanceFlight(.2) && c->touches == 1 && g.objects.finish_frame() && !g.objects.get(h));
+        // An embedded world box is still invalid even with a live actor nearby.
+        auto wall = test_brush::box("embedded", {299, 99, 299}, {301, 101, 301});
+        for (auto& surface : wall.surfaces)
+            surface.flags = 1;
+        std::string error;
+        CHECK(g.collision.build(wall, error));
+        g.objects.get(c->m_hObject)->state.m_Pos = {300, 100, 300};
+        p = test_assault::grenade(g, {300, 100, 300});
+        CHECK(p && !p->AdvanceFlight(.01) && p->failed && !p->m_bExplode && c->touches == 1);
+        CHECK(g.objects.diagnostics().back().find("Model projectile sweep failed: CGrenade") != std::string::npos);
         CHECK(g.unload_world() && g.objects.snapshot().empty());
         return true;
     }
@@ -421,6 +464,64 @@ bool restore(const std::filesystem::path& root)
     CHECK(g.unload_world());
     return true;
 }
+bool downtown(const std::filesystem::path& root)
+{
+    auto game = std::make_unique<GameSession>();
+    CHECK(game->initialize());
+    Config config;
+    config.data_dir = root;
+    std::string error;
+    CHECK(game->resources.mount_game(config, error));
+    CHECK(GameSession::start_new_game(game, "13_downtown", 1, 0, error, true));
+    auto& g = *game;
+    CHECK(test_assault::equip(g));
+    auto* player = g.server_shell.Player(g.local_client);
+    player->m_damage.m_bGodMode = true;
+    unsigned shots = 0;
+    for (unsigned frame = 0; frame < 1000; ++frame)
+    {
+        if (frame < 200 && frame % 100 == 0)
+        {
+            const auto* body = g.objects.get(player->m_hObject);
+            DVector eye = body->state.m_Pos;
+            eye.y += player->eye_level;
+            DVector direction{};
+            float nearest = 1e12f;
+            for (auto id : g.objects.snapshot())
+                if (const auto* r = g.objects.get(id))
+                    if (const auto* ai = dynamic_cast<AI_Mgr*>(r->game.get()); ai && !ai->m_damage.IsDead())
+                    {
+                        auto delta = vector_subtract(r->state.m_Pos, eye);
+                        const auto distance = vector_dot(delta, delta);
+                        if (distance > 1 && distance < nearest)
+                        {
+                            nearest = distance;
+                            direction = vector_scale(delta, 1 / std::sqrt(distance));
+                        }
+                    }
+            if (nearest < 1e12f)
+            {
+                player->m_InventoryMgr.SetAmmoCount(5, 100);
+                WeaponFire shot{eye, direction, 42, 9, true};
+                CHECK(g.server_shell.OnMessage(g.local_client, shot) == FireResult::Fired);
+                ++shots;
+            }
+        }
+        if (!g.step(.01))
+        {
+            for (const auto& failure : g.step_errors())
+                std::cerr << failure << '\n';
+            std::cerr << "Downtown frame=" << frame << " shots=" << shots << '\n';
+            return false;
+        }
+    }
+    CHECK(shots == 2);
+    CHECK(std::count_if(g.server.projectile_reports.begin(), g.server.projectile_reports.end(),
+                        [](const auto& report) { return report.grenade && report.outcome == "exploded"; }) >= 2);
+    CHECK(g.run_world(error));
+    std::cout << "Downtown alternate M16 shots=" << shots << '\n';
+    return g.unload_world();
+}
 bool private_game(const std::filesystem::path& root)
 {
     GameSession g;
@@ -478,20 +579,23 @@ int main(int argc, char** argv)
 {
     if (argc != 3)
         return 2;
-    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{{"key_bounds", key_bounds},
-                                                                                         {"modes", modes},
-                                                                                         {"damage", damage},
-                                                                                         {"motion", motion},
-                                                                                         {"bounce", bounce},
-                                                                                         {"contacts", contacts},
-                                                                                         {"rules", rules},
-                                                                                         {"lifetime", lifetime},
-                                                                                         {"failure", failure},
-                                                                                         {"drop", drop},
-                                                                                         {"collect", collect},
-                                                                                         {"restore", restore},
-                                                                                         {"ai", ai},
-                                                                                         {"private", private_game}};
+    const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
+        {"key_bounds", key_bounds},
+        {"modes", modes},
+        {"damage", damage},
+        {"motion", motion},
+        {"bounce", bounce},
+        {"contacts", contacts},
+        {"overlapping_contact", overlapping_contact},
+        {"rules", rules},
+        {"lifetime", lifetime},
+        {"failure", failure},
+        {"drop", drop},
+        {"collect", collect},
+        {"restore", restore},
+        {"ai", ai},
+        {"private", private_game},
+        {"downtown", downtown}};
     auto it = cases.find(argv[1]);
     return it != cases.end() && it->second(argv[2]) ? 0 : 1;
 }

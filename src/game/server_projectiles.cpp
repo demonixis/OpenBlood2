@@ -6,6 +6,8 @@
 #include "game/server_adapter.h"
 #include <algorithm>
 #include <cmath>
+#include <iomanip>
+#include <sstream>
 namespace OpenBlood2
 {
     bool ServerAdapter::AdvanceModelProjectile(HOBJECT h, double seconds)
@@ -17,7 +19,8 @@ namespace OpenBlood2
         auto* bomb = dynamic_cast<CProximityBomb*>(grenade);
         auto* remote = dynamic_cast<CRemoteBomb*>(grenade);
         auto* eye = dynamic_cast<SeeingEye*>(grenade);
-        if (!dynamic_cast<CGrenade*>(grenade) && !bomb && !remote && !eye)
+        auto* assault = dynamic_cast<CGrenade*>(grenade);
+        if (!assault && !bomb && !remote && !eye)
             return false;
         if (!grenade || !grenade->configured || moving_ || objects_.busy() || !collision || !collision_ready ||
             !std::isfinite(seconds) || seconds <= 0 || seconds > .5 || record->attachment ||
@@ -86,9 +89,31 @@ namespace OpenBlood2
             CollisionHit hit;
             const auto query =
                 sweep_scene(h, record->state.m_Pos, destination, record->dimensions, hit, ids, grenade->m_hFiredFrom);
-            if (query == CollisionQuery::Invalid || (query == CollisionQuery::Hit && hit.start_solid) ||
+            // Nonsolid grenades can be overtaken by a character during the preceding
+            // body phase. The source's first live-character touch explodes even when
+            // the boxes already overlap. Deliver that contact at the current position;
+            // never turn this into a generic embedded-world escape or a later bounce.
+            auto* character = hit.object ? dynamic_cast<CBaseCharacter*>(HandleToObject(hit.object)) : nullptr;
+            const bool overlapping_impact = query == CollisionQuery::Hit && hit.start_solid && assault &&
+                                            assault->bounces_left == 5 && character && !character->m_damage.IsDead();
+            if (query == CollisionQuery::Invalid ||
+                (query == CollisionQuery::Hit && hit.start_solid && !overlapping_impact) ||
                 !physics_vector(destination) || !physics_vector(velocity))
+            {
+                std::ostringstream reason;
+                reason << std::setprecision(9) << "Model projectile sweep failed: " << record->type->name
+                       << " query=" << static_cast<int>(query) << " step=" << step << " dt=" << dt << " position=("
+                       << record->state.m_Pos.x << ',' << record->state.m_Pos.y << ',' << record->state.m_Pos.z
+                       << ") velocity=(" << velocity.x << ',' << velocity.y << ',' << velocity.z
+                       << ") start_solid=" << hit.start_solid << " penetration=" << hit.penetration
+                       << " polygon=" << hit.polygon;
+                if (assault)
+                    reason << " bounces_left=" << assault->bounces_left;
+                if (const auto* obstacle = objects_.get(hit.object))
+                    reason << " obstacle=" << obstacle->type->name << '/' << obstacle->state.m_Name;
+                objects_.fail(ObjectError::Unsupported, reason.str());
                 return false;
+            }
             record->grounded = resting;
             record->contact_normal = resting ? support.normal : DVector{};
             record->contact_object = resting ? support.object : nullptr;
@@ -97,7 +122,8 @@ namespace OpenBlood2
             {
                 // Commit one box segment per bounded substep, then run the original
                 // callback on post-projection velocity. No fabricated bounce impulse.
-                record->state.m_Pos = vector_add(hit.point, vector_scale(hit.normal, .001f));
+                if (!overlapping_impact)
+                    record->state.m_Pos = vector_add(hit.point, vector_scale(hit.normal, .001f));
                 const auto into = vector_dot(velocity, hit.normal);
                 if (into < 0)
                     velocity = vector_subtract(velocity, vector_scale(hit.normal, into));

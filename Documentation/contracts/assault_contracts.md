@@ -80,6 +80,15 @@ CProjectile instances, so this model has exactly one integrator. Container
 physics uses the existing original volume callbacks. Velocity/pose inputs,
 resource presence, embedded starts, unavailable queries and recursive motion fail.
 
+The [2026-10-25 contact correction](../implementation/reports/downtown_grenade_contact.md)
+admits one embedded-start case: an unbounced CGrenade touching a living character.
+The nonsolid grenade can be overtaken during the preceding actor phase, or start
+inside that actor. Deliver the source first-character contact at the unchanged
+position, then let the scheduled Update perform its two original explosion passes.
+This does not admit embedded world geometry, dead characters or post-bounce overlaps,
+and does not change bombs or SeeingEye. Failed sweeps now name the obstacle and
+record the position, velocity, penetration, polygon and remaining bounce count.
+
 Air displacement uses v*dt + a*dt²/2; ground support projects inward acceleration
 and uses the existing exponential friction policy with source coefficient 18.
 Contact projects inward velocity before the original bounce calculation; no

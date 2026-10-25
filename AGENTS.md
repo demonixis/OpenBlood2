@@ -1,5 +1,12 @@
 # Blood2 Project Instructions
 
+The [grenade contact correction](Documentation/implementation/reports/downtown_grenade_contact.md)
+allows an unbounced CGrenade's embedded start only against a living character,
+delivering the original contact without moving the grenade. Preserve deferred
+double explosion, callback removal, other embedded-start refusals and detailed
+sweep diagnostics. The exact Downtown encounter and VFX stress-pool failure
+remain unverified/open respectively.
+
 The [2026-10-25 tester corrections](Documentation/implementation/reports/tester_feedback_2026_10_25.md)
 allow mutually GOTHRUWORLD kinematic brushes to rotate past one another while
 preserving other rotation blockers, suppress scripted/death-camera player look
