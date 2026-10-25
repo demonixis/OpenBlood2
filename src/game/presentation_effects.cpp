@@ -14,13 +14,6 @@ namespace OpenBlood2
     SceneEffects gather_scene_effects(const GameSession& game, DVector eye, DRotation view)
     {
         SceneEffects out;
-        struct Candidate
-        {
-            PointLight light;
-            float weight;
-            DDWORD flags;
-        };
-        std::vector<Candidate> lights;
         auto add = [&](DVector position, DVector color, float radius, DDWORD flags = 0)
         {
             if (!(radius > 0) || radius > 1e7f || !std::isfinite(radius) || !physics_vector(position) ||
@@ -37,10 +30,7 @@ namespace OpenBlood2
             }
             if (flags & (1u << 3))
                 ++out.shadow_lights_unshadowed;
-            const auto d = vector_subtract(position, eye);
-            lights.push_back({{position, color, radius},
-                              brightness * radius * radius / std::max(radius * radius, vector_dot(d, d)),
-                              flags});
+            out.lights.push_back({{position, color, radius}, flags});
         };
         for (const auto& light : game.server.light_effects)
             if (light.visible)
@@ -84,19 +74,6 @@ namespace OpenBlood2
                 add(position, {1, .75f, 0}, 100);
             else if (dynamic_cast<const CGroundStrikeProjectile*>(projectile))
                 add(position, {1, .75f, 0}, 150);
-        }
-        // A deterministic bounded selection; ties retain source/creation order.
-        std::stable_sort(lights.begin(), lights.end(),
-                         [](const auto& a, const auto& b) { return a.weight > b.weight; });
-        out.light_candidates = lights.size();
-        const auto count = std::min(lights.size(), SceneEffectsUniform::light_limit);
-        out.light_dropped = lights.size() - count;
-        out.uniform.light_info[0] = float(count);
-        for (std::size_t i = 0; i < count; ++i)
-        {
-            const auto& l = lights[i].light;
-            out.uniform.positions[i] = {l.position.x, l.position.y, l.position.z, l.radius};
-            out.uniform.colors[i] = {l.color.x, l.color.y, l.color.z, float(lights[i].flags)};
         }
         auto fog = [&](float near, float far, DVector color)
         {

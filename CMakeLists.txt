@@ -148,4 +148,4 @@ endif()
 
 target_sources(blood2_game PRIVATE src/game/presentation_effects.cpp)
 
-target_sources(engine PRIVATE src/engine/mark_clip.cpp)
+target_sources(engine PRIVATE src/engine/mark_clip.cpp src/engine/scene_effects.cpp)

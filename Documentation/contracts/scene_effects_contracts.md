@@ -14,10 +14,28 @@ existing color, Tesla 100 blue (.65,.65,1), Napalm and Howitzer fragments 100 or
 (1,.75,0), GroundStrike 150 orange. Source Init-before-Setup behavior of EnergyBlast
 is retained; no speculative Zealot light is added after initialization.
 
-Sixteen candidates per view are selected by color brightness times squared radius,
-divided by the larger of squared radius and squared eye distance. Stable ties retain
-source/creation order. The inspector exposes selected, candidate and dropped counts.
-`OnlyLightWorldFlag` masks the light on model submissions; `DontLightBackfacingFlag`
+The [per-receiver forward continuation](../implementation/reports/forward_effect_lights.md)
+replaces the initial 16-light camera selection. The CPU snapshot retains every live
+candidate in source/creation order. Each GPU-skinned model instance selects from its
+posed, scaled bounds. World geometry selects per material batch, including individual
+translucent faces, rather than one list for the entire level. Batch bounds are computed
+when vertices are uploaded and reused during rendering; moving brushes transform the
+light into their local bounds. Existing geometry batching and draw order are preserved.
+
+The per-receiver limit is **12 on Android/Quest and iOS, 32 on desktop**, enforced before
+upload. Spheres outside the receiver's oriented bounds are rejected. Remaining lights
+are ranked by `max(R,G,B) * (1 - distanceToBounds / radius)`, an upper bound on their
+radial diffuse contribution. Stable ties retain source order. Selection has no eye
+position/orientation input, so both eyes use the same lights for the same receiver.
+A fixed-size insertion list avoids per-draw allocations and sorting the whole pool.
+An unavailable bound is conservative; it never becomes a fabricated point receiver.
+Material batches spanning disconnected geometry can retain lights in their bounding
+box's empty space; spatially splitting such batches remains separate work.
+
+The inspector shows the live pool, platform budget, receiver count, selected/dropped
+references and peak selected count. Drops are **per-receiver references**, not lights
+removed globally. The existing flashlight and static-light paths keep their own rules.
+`OnlyLightWorldFlag` excludes a light before ranking model submissions; `DontLightBackfacingFlag`
 rejects back-facing geometry. Fog-only lights are excluded and counted as unsupported.
 Effect-light shadow requests are reported as unshadowed; the existing independent model
 shadow pass is unchanged. The legacy `SolidLightFlag` optimization uses the same radial
@@ -26,8 +44,9 @@ remain in their existing game services. Projectile impact/failure/removal remove
 implicit light on the next snapshot.
 
 The original shaders add these lights through the existing radial diffuse attenuation;
-enhanced materials also use their direct specular response. The 864-byte fragment
-uniform includes a 576-byte effect tail. No active lights and no fog keep the former
+enhanced materials also use their direct specular response. The 1376-byte fragment
+uniform includes a 1088-byte effect tail. Its 32-slot ABI is shared by all shader backends;
+the counted shader loop visits at most 12 entries on mobile and 32 on desktop. No active lights and no fog keep the former
 pixel output. Close-view weapons, sky and sprite/FX illumination keep their separate
 policies; sprites can receive fog but never get lit by the new point lights. HUD and
 menus still render after the scene. XR uses the same scene code without post-processing.

@@ -16,7 +16,7 @@ cbuffer Light : register(b0, space3)
     float4 modelSources[12];
     float4 sceneColor;
     float4 effectInfo;
-    float4 effectPositions[16], effectColors[16];
+    float4 effectPositions[32], effectColors[32];
     float4 fogColor, fogEyeNear, fogForwardFar;
 
 };
@@ -49,7 +49,7 @@ struct Input
 float3 effectLight(float3 p, float3 normal)
 {
     float3 sum = float3(0.0,0.0,0.0);
-    for (uint i=0u;i<min(uint(effectInfo.x),16u);++i)
+    for (uint i=0u;i<min(uint(effectInfo.x),32u);++i)
     {
         float3 delta = effectPositions[i].xyz-p;
         if ((uint(effectColors[i].w)&64u)!=0u && dot(normal,delta)<=0.0) continue;

@@ -1,0 +1,13 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/sanitize
+    Start 1027: presentation_effects.state
+1/2 Test #1027: presentation_effects.state .......   Passed    0.64 sec
+    Start 1028: scene_effects.selection
+2/2 Test #1028: scene_effects.selection ..........   Passed    0.27 sec
+
+100% tests passed out of 2
+
+Label Time Summary:
+effects     =   0.90 sec*proc (2 tests)
+headless    =   0.90 sec*proc (2 tests)
+
+Total Test time (real) =   0.91 sec

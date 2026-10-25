@@ -5,6 +5,7 @@ accepted with open GPU reservation **M2-GPU-001**. M3 remains unaccepted.
 
 | Record | Location |
 | --- | --- |
+| Forward FX light selection per receiver | [Report](reports/forward_effect_lights.md) / [contract](../contracts/scene_effects_contracts.md#lights); 12 mobile / 32 desktop |
 | Scene effect rendering (lot 10) | [Report](reports/scene_effects.md) / [contract](../contracts/scene_effects_contracts.md) / [source ledger](sources/scene_effect_sources.json) |
 | Remaining destruction materials (lot 9) | [Report](reports/remaining_debris.md) / [contract](../contracts/destruction_debris_contracts.md#remaining-materials--lot-9-2026-10-25) |
 | Energy/boss/rift VFX (lot 8) | [Report](reports/energy_effects.md) / [contract](../contracts/energy_effects_contracts.md) |

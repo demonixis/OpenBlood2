@@ -8,15 +8,17 @@ namespace OpenBlood2
     void Inspector::draw_lights(GameSession& game, ObjectSelection& selection)
     {
         ImGui::TextWrapped("Original ClientLightFX / CLightFX state. Dynamic point lights follow their source objects; "
-                           "up to 16 effect lights illuminate world/models per view. DirLight spots and the "
+                           "effect lights are sorted per object/batch (12 mobile, 32 desktop). DirLight spots and the "
                            "implicit main light are separate pending systems.");
         ImGui::Text("%zu evaluated client lights / session time %.3f", game.server.light_effects.size(),
                     game.server.GetTime());
         if (scene_effects)
         {
-            ImGui::Text("Scene FX: %.0f selected / %zu candidates / %zu beyond budget",
-                        scene_effects->uniform.light_info[0], scene_effects->light_candidates,
-                        scene_effects->light_dropped);
+            ImGui::Text("Scene FX: %zu live lights / %zu per receiver", scene_effects->lights.size(),
+                        scene_effects->light_budget);
+            const auto& selection = scene_effects->selection;
+            ImGui::Text("%zu receivers / %zu selected references / %zu dropped / peak %zu", selection.receivers,
+                        selection.selected, selection.dropped, selection.max_selected);
             ImGui::Text("Unimplemented: %zu fog lights / %zu effect-light shadow requests",
                         scene_effects->fog_lights_unsupported, scene_effects->shadow_lights_unshadowed);
             ImGui::Text("Scene fog: %s", scene_effects->invalid_fog            ? "invalid authored interval"

@@ -80,6 +80,11 @@ per-eye ordering with sprite slice batching, checked convex clipping and origina
 reuse. Fog lights, effect-light shadows and SkyFog remain explicit limits. Regenerate
 all 72 shader artifacts together; keep the no-effect reference frames and post-processing
 contracts green. The source mark-ray and stateless fog adaptations are documented.
+The forward continuation selects lights per GPU model instance and world material batch:
+12 on Android/Quest/iOS, 32 on desktop, with no camera-wide truncation. Preserve sphere/
+bounds rejection, stable contribution ranking, world-only filtering before model selection,
+immutable upload-time world bounds, the shared 32-slot shader ABI and per-receiver counters.
+
 
 ## Commit attribution
 

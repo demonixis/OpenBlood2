@@ -1,0 +1,13 @@
+main.cpp 0 
+inspector.cpp 0 /Users/yann/projects/lithtech/openblood2/src/app/inspector.cpp:2550:13: warning: use of bitwise '|' with boolean operands [-Wbitwise-instead-of-logical]
+ 2550 |         if (ImGui::SliderAngle("Inspection yaw", &aim.yaw, -180, 180) |
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                                       ||
+ 2551 |             ImGui::SliderAngle("Inspection pitch", &aim.pitch, -85, 85))
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/yann/projects/lithtech/openblood2/src/app/inspector.cpp:2550:13: note: cast one or both operands to int to silence this warning
+1 warning generated.
+
+inspector_lights.cpp 0 
+inspector_scene_explosions.cpp 0 
+inspector_sprites.cpp 0 

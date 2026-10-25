@@ -1,0 +1,1 @@
+[1/1] cd /Users/yann/projects/lithtech/openblood2/build/shader-tools && /opt/homebrew/bin/cmake -DSHADERCROSS=/Users/yann/projects/lithtech/openblood2/build/shader-tools/_deps/shadercross-build/shadercross -P /Users/yann/projects/lithtech/openblood2/cmake/GenerateWorldShaders.cmake

@@ -560,7 +560,7 @@ namespace OpenBlood2
         if (scene_fade != 1)
             scene.scene_color = vector_scale(scene.scene_color, scene_fade);
         scene.eye = projection;
-        scene.effects = &effects.uniform;
+        scene.effects = &effects;
         auto close = scene;
         close.letterbox = false;
         close.min_depth = 0;

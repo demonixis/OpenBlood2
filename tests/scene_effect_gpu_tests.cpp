@@ -1,5 +1,6 @@
 #include "engine/capture.h"
 #include "engine/mark_clip.h"
+#include "engine/model_renderer.h"
 #include "engine/runtime.h"
 #include "engine/transparency.h"
 #include "engine/world_renderer.h"
@@ -85,22 +86,19 @@ int main()
         auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, &depth);
         CHECK(pass);
         WorldRecordTarget target{commands, pass};
-        SceneEffectsUniform fx;
+        SceneEffects fx;
         if (mode != 0 && mode != 6)
         {
-            fx.light_info[0] = 2;
-            fx.positions[0] = fx.positions[1] = {0, 0, 5, 2};
-            fx.colors[0] = {.2f, 0, 0, 0};
-            fx.colors[1] = {0, .3f, 0, 0};
+            fx.lights = {{{{0, 0, 5}, {.2f, 0, 0}, 2}, 0}, {{{0, 0, 5}, {0, .3f, 0}, 2}, 0}};
         }
         if (mode == 2 || mode == 3 || mode == 4)
         {
-            fx.fog_color = {0, 0, 1, 1};
-            fx.fog_eye_near = {0, 0, 0, 0};
-            fx.fog_forward_far = {0, 0, 1, 10};
+            fx.uniform.fog_color = {0, 0, 1, 1};
+            fx.uniform.fog_eye_near = {0, 0, 0, 0};
+            fx.uniform.fog_forward_far = {0, 0, 1, 10};
         }
         if (mode == 7)
-            fx.colors[0][3] = fx.colors[1][3] = 64;
+            fx.lights[0].flags = fx.lights[1].flags = 64;
         if (mode != 0)
             target.effects = &fx;
         auto& r = mode == 4 || mode == 5 ? sprites : renderer;
@@ -192,5 +190,80 @@ int main()
     SDL_EndGPURenderPass(pass);
     CHECK(download(runtime.gpu, commands, capture, pixels));
     CHECK(pixels[(120 * 320 + 100) * 4] == 51 && pixels[(120 * 320 + 220) * 4] == 0);
+    // One static world range has two spatially separate material batches. Neither
+    // receiver may lose its light to the other receiver's >32 live candidates.
+    WorldMesh receivers;
+    for (float x : {-3.f, 3.f})
+        for (auto vertex : quad().vertices)
+        {
+            vertex.position.x = vertex.position.x / 5 + x;
+            vertex.position.y /= 5;
+            receivers.vertices.push_back(vertex);
+        }
+    receivers.ranges.push_back(
+        {0, 12, {}, "two world batches", {{0, 6, 0, false, {-3, 0, 5}}, {6, 6, 0, false, {3, 0, 5}}}});
+    CHECK(renderer.prepare(receivers, 4, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240, error));
+    GpuRegistry registry(runtime.gpu);
+    WorldPipelines pipelines(runtime.gpu);
+    ModelRenderer models(DrawStyle::Opaque, pipelines, registry);
+    auto asset = std::make_shared<Model>();
+    asset->nodes.push_back({});
+    for (auto vertex : quad().vertices)
+        asset->vertices.push_back({{vertex.position.x / 5, vertex.position.y / 5, 0}, {0, 0, -1}, 0});
+    asset->faces.push_back({{}, {0, 1, 2}, {0, 0, -1}});
+    asset->faces.push_back({{}, {3, 4, 5}, {0, 0, -1}});
+    ModelView instances;
+    instances.gpu_skinning = true;
+    instances.palette = {{0, 0, 0, 1}, {0, 0, 0, 0}};
+    for (float x : {-3.f, 3.f})
+    {
+        SkinnedInstance instance;
+        instance.model = asset.get();
+        instance.owner = asset;
+        instance.min = {-1, -1, 0};
+        instance.max = {1, 1, 0};
+        instance.bounded = true;
+        instance.center = {x, 0, 5};
+        instance.light.ambient = {.2f, .2f, .2f};
+        instances.world_draws.push_back({static_cast<std::uint32_t>(instances.instances.size()), {x, 0, 5}, {}});
+        instances.instances.push_back(instance);
+    }
+    CHECK(models.prepare(instances, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240, error) &&
+          registry.flush(nullptr, error));
+    for (bool model : {false, true})
+        for (auto budget : {mobile_effect_lights, desktop_effect_lights})
+        {
+            SceneEffects effects;
+            effects.light_budget = budget;
+            // World-only lights are stronger but cannot consume the model's budget.
+            if (model)
+                for (unsigned i = 0; i < 40; ++i)
+                    effects.lights.push_back({{{-3, 0, 5}, {0, 0, 1}, 1}, 32});
+            for (unsigned i = 0; i < 40; ++i)
+                effects.lights.push_back({{{-3, 0, 5}, {.01f, 0, 0}, 1}, 0});
+            effects.lights.push_back({{{3, 0, 5}, {0, .4f, 0}, 1}, 0});
+            commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
+            CHECK(commands);
+            pass = SDL_BeginGPURenderPass(commands, &color, 1, &depth);
+            CHECK(pass);
+            target = {commands, pass};
+            target.effects = &effects;
+            if (model)
+                CHECK(models.record(target, instances, instances.world_draws, {}, {}, error));
+            else
+                CHECK(renderer.record(target, receivers, std::span(&draw, 1), {}, {}, error));
+            SDL_EndGPURenderPass(pass);
+            CHECK(download(runtime.gpu, commands, capture, pixels));
+            const auto left = (120 * 320 + 64) * 4, right = (120 * 320 + 256) * 4;
+            const double radial = 1 - std::sqrt(2.) / 64;
+            CHECK(std::abs(int(pixels[left]) - int(std::lround(255 * (.2 + budget * .01 * radial)))) <= 2);
+            CHECK(pixels[left + 1] == 51 && pixels[left + 2] == 51);
+            CHECK(pixels[right] == 51 &&
+                  std::abs(int(pixels[right + 1]) - int(std::lround(255 * (.2 + .4 * radial)))) <= 2);
+            CHECK(effects.selection.receivers == 2 && effects.selection.selected == budget + 1 &&
+                  effects.selection.max_selected == budget && effects.selection.dropped == 40 - budget);
+            std::cout << (model ? "Models" : "World batches") << ": " << budget
+                      << " per receiver, distant light retained\n";
+        }
     return 0;
 }

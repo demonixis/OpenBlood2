@@ -63,3 +63,10 @@ remain separate. Existing model shadows are preserved. GPU probes and source rec
 coverage do not replace matched captures from the original executable or a full
 campaign walkthrough. Conditional P3 Rain/legacy emitters remain unpromoted without
 an evidenced live caller. M2 remains closed with M2-GPU-001; M3 remains unaccepted.
+
+## Forward continuation
+
+The subsequent [per-receiver forward light selection](forward_effect_lights.md)
+replaces this report's initial 16-light camera-wide budget with 12 mobile / 32 desktop
+lights selected independently for every model instance and world material batch.
+The evidence above retains its original scope and bytes.

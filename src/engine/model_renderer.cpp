@@ -283,12 +283,11 @@ namespace OpenBlood2
             fragment.scene_color = {target.scene_color.x, target.scene_color.y, target.scene_color.z, 1};
             if (target.effects && !close_view)
             {
-                fragment.effects = *target.effects;
-                for (auto& color : fragment.effects.colors)
-                    if (static_cast<unsigned>(color[3]) & (1u << 5))
-                        color = {}; // FLAG_ONLYLIGHTWORLD.
-                if (!illuminate)
-                    fragment.effects.light_info = {};
+                if (illuminate)
+                    select_effect_lights(*target.effects, {instance.min, instance.max, instance.bounded}, d.position,
+                                         d.rotation, true, fragment.effects);
+                else
+                    fragment.effects = target.effects->uniform;
             }
 
             const bool pixel_light = per_pixel_lighting || shaded;

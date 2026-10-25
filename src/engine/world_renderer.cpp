@@ -325,6 +325,7 @@ namespace OpenBlood2
         stats.culled = 0;
         alpha_order_.clear();
         visible_.clear();
+        effect_bounds_.clear();
     }
     bool WorldRenderer::prepare(const WorldMesh& mesh, std::uint64_t revision, SDL_GPUTextureFormat format,
                                 Uint32 width, Uint32 height, std::string& error, bool dynamic,
@@ -393,6 +394,29 @@ namespace OpenBlood2
         {
             error = "GPU vertex budget exceeded";
             return false;
+        }
+        effect_bounds_.clear();
+        if (style_ == DrawStyle::Opaque)
+        {
+            auto bounds = [&](std::uint32_t first, std::uint32_t count)
+            {
+                const auto key = (std::uint64_t(first) << 32) | count;
+                if (effect_bounds_.contains(key))
+                    return;
+                WorldRange range;
+                range.first = first;
+                range.count = count;
+                bound_range(mesh.vertices, range);
+                effect_bounds_.emplace(key, EffectLightBounds{range.min, range.max, range.bounded});
+            };
+            for (const auto& range : mesh.ranges)
+            {
+                if (range.batches.empty())
+                    bounds(range.first, range.count);
+                else
+                    for (const auto& batch : range.batches)
+                        bounds(batch.first, batch.count);
+            }
         }
         const auto bytes = static_cast<Uint32>(mesh.vertices.size() * sizeof(WorldVertex));
         return !bytes || (registry_->reserve(vertices_, SDL_GPU_BUFFERUSAGE_VERTEX, bytes, error) &&
@@ -669,20 +693,22 @@ namespace OpenBlood2
                 FragmentLightUniform fragment;
                 fragment.scene_color = {target.scene_color.x, target.scene_color.y, target.scene_color.z, 1};
                 if (target.effects && !close_view && !sky)
-                {
-                    fragment.effects = *target.effects;
-                    if (!illuminate)
-                        fragment.effects.light_info = {};
-                }
+                    fragment.effects = target.effects->uniform;
 
                 fragment.modulation = {d.alpha, world_saturate_scale, receive ? 1.f : 0.f, 0};
                 fragment.position_radius = {light.position.x, light.position.y, light.position.z,
                                             illuminate ? light.radius : 0};
                 fragment.light_color = {light.color.x, light.color.y, light.color.z, 0};
-                SDL_PushGPUFragmentUniformData(target.commands, 0, &fragment, sizeof(fragment));
                 auto batch = [&](std::uint32_t first, std::uint32_t count, std::uint32_t material,
                                  std::array<double, 2> rate, std::uint32_t lightmap)
                 {
+                    if (target.effects && illuminate)
+                    {
+                        const auto found = effect_bounds_.find((std::uint64_t(first) << 32) | count);
+                        const auto bounds = found != effect_bounds_.end() ? found->second : EffectLightBounds{};
+                        select_effect_lights(*target.effects, bounds, d.position, d.rotation, false, fragment.effects);
+                    }
+                    SDL_PushGPUFragmentUniformData(target.commands, 0, &fragment, sizeof(fragment));
                     if (d.vertex_count)
                     {
                         first = d.first_vertex;

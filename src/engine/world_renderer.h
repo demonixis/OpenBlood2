@@ -7,6 +7,7 @@
 #include "engine/surface_materials.h"
 #include "engine/world_view.h"
 #include <SDL3/SDL_gpu.h>
+#include <unordered_map>
 
 namespace OpenBlood2
 {
@@ -105,7 +106,7 @@ namespace OpenBlood2
         std::array<float, 4> scene_color{1, 1, 1, 1};
         SceneEffectsUniform effects;
     };
-    static_assert(sizeof(FragmentLightUniform) == 864);
+    static_assert(sizeof(FragmentLightUniform) == 1376);
     // Fragment uniform slot 1 of both world fragment shaders (std140), pushed once per record.
     struct ShadowUniform
     {
@@ -211,7 +212,7 @@ namespace OpenBlood2
         DVector scene_color{1, 1, 1}; // Original SetGlobalLightScale, scene only.
         // XR eye: every draw (sky and close included) uses this projection and its frustum.
         const EyeProjection* eye = nullptr;
-        const SceneEffectsUniform* effects = nullptr;
+        const SceneEffects* effects = nullptr;
     };
     // Per-material enhanced parameters and normal maps of one renderer, parallel to its
     // material textures; resolved again when the materials or the SurfaceScene revision change.
@@ -296,6 +297,8 @@ namespace OpenBlood2
         std::vector<WorldAlphaBatch> alpha_order_;
         std::vector<WorldDraw> visible_;
         BufferHandle vertices_;
+        // Bounds per immutable uploaded material batch (key: first vertex/count).
+        std::unordered_map<std::uint64_t, EffectLightBounds> effect_bounds_;
         bool upload_vertices(const WorldMesh&, std::string&);
         TextureHandle depth_;
         std::vector<TextureHandle> textures_;

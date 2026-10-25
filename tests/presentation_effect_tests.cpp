@@ -33,23 +33,23 @@ int main()
         game.server.light_effects.push_back(light);
     }
     auto lights = gather_scene_effects(game, {}, {});
-    CHECK(lights.light_candidates == 20 && lights.light_dropped == 4 && lights.uniform.light_info[0] == 16);
-    CHECK(lights.uniform.positions[0][0] == 0 && lights.uniform.positions[0][3] == 100);
-    CHECK(lights.uniform.colors[0][1] == .5f);
+    CHECK(lights.lights.size() == 20 && lights.uniform.light_info[0] == 0);
+    CHECK(lights.lights[0].light.position.x == 0 && lights.lights[0].light.radius == 100);
+    CHECK(lights.lights[0].light.color.y == .5f);
     game.server.light_effects[0].visible = false;
     lights = gather_scene_effects(game, {}, {});
-    CHECK(lights.light_candidates == 19 && lights.uniform.positions[0][0] == 100);
+    CHECK(lights.lights.size() == 19 && lights.lights[0].light.position.x == 100);
     game.server.light_effects[1].settings.flags = 128;
     game.server.light_effects[2].settings.flags = 8 | 32 | 64;
     lights = gather_scene_effects(game, {}, {});
-    CHECK(lights.light_candidates == 18 && lights.fog_lights_unsupported == 1 && lights.shadow_lights_unshadowed == 1);
-    CHECK(lights.uniform.colors[0][3] == 104);
+    CHECK(lights.lights.size() == 18 && lights.fog_lights_unsupported == 1 && lights.shadow_lights_unshadowed == 1);
+    CHECK(lights.lights[0].flags == 104);
     game.server.light_effects.clear();
     std::string error;
     CHECK(game.server.explosion_lights.publish(25, {}, {0, 1, 0}, "test", 0, error) && error.empty());
-    CHECK(gather_scene_effects(game, {}, {}).light_candidates == 1);
+    CHECK(gather_scene_effects(game, {}, {}).lights.size() == 1);
     CHECK(game.server.explosion_lights.advance(1));
-    CHECK(gather_scene_effects(game, {}, {}).light_candidates == 0);
+    CHECK(gather_scene_effects(game, {}, {}).lights.empty());
     game.world.models.push_back(test_brush::box("water", {-100, -100, -100}, {100, 100, 100}));
     auto handle = game.objects.create(game.objects.find_class("Water"), {}, Creation::World,
                                       {{"Name", std::string("water")},
@@ -104,10 +104,10 @@ int main()
     projectile->failed = false;
     record->state.m_Pos = {50, 60, 70};
     auto owner_light = gather_scene_effects(game, {}, {});
-    CHECK(owner_light.light_candidates == 1 && owner_light.uniform.positions[0][0] == 50 &&
-          owner_light.uniform.positions[0][3] == 100);
+    CHECK(owner_light.lights.size() == 1 && owner_light.lights[0].light.position.x == 50 &&
+          owner_light.lights[0].light.radius == 100);
     projectile->exploded = true;
-    CHECK(!gather_scene_effects(game, {}, {}).light_candidates);
+    CHECK(gather_scene_effects(game, {}, {}).lights.empty());
     CHECK(game.unload_world());
 
     // A mark straddling a polygon edge keeps its original UVs and plane bias.

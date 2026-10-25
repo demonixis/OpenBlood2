@@ -1,0 +1,37 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/release
+      Start  576: gpu.model_skinning
+ 1/10 Test  #576: gpu.model_skinning ...............   Passed    0.47 sec
+      Start  579: gpu.model_skinning_private
+ 2/10 Test  #579: gpu.model_skinning_private .......   Passed    3.28 sec
+      Start  879: gpu.world_alpha
+ 3/10 Test  #879: gpu.world_alpha ..................   Passed    0.41 sec
+      Start  880: gpu.world_alpha_private
+ 4/10 Test  #880: gpu.world_alpha_private ..........   Passed    0.25 sec
+      Start 1044: world_shaders.formats
+ 5/10 Test #1044: world_shaders.formats ............   Passed    0.26 sec
+      Start 1103: gpu.model_shadows
+ 6/10 Test #1103: gpu.model_shadows ................   Passed    0.90 sec
+      Start 1104: gpu.surface
+ 7/10 Test #1104: gpu.surface ......................   Passed    1.49 sec
+      Start 1105: gpu.post
+ 8/10 Test #1105: gpu.post .........................   Passed    2.12 sec
+      Start 1108: gpu.flashlight
+ 9/10 Test #1108: gpu.flashlight ...................   Passed    0.47 sec
+      Start 1534: gpu.shotgun_effects
+10/10 Test #1534: gpu.shotgun_effects ..............   Passed    0.83 sec
+
+100% tests passed out of 10
+
+Label Time Summary:
+effects           =   0.83 sec*proc (1 test)
+flashlight        =   0.47 sec*proc (1 test)
+gpu               =  10.23 sec*proc (9 tests)
+headless          =   0.26 sec*proc (1 test)
+model_view        =   3.76 sec*proc (2 tests)
+private           =   8.87 sec*proc (6 tests)
+shaders           =   0.26 sec*proc (1 test)
+surface           =   3.61 sec*proc (2 tests)
+world_lighting    =   0.90 sec*proc (1 test)
+world_view        =   0.92 sec*proc (3 tests)
+
+Total Test time (real) =  10.51 sec
