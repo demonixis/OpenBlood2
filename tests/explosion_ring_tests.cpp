@@ -148,7 +148,7 @@ namespace
             CHECK(random() == expected());
         }
         std::minstd_rand random(1);
-        CHECK(!original_explosion_rings(24, {}, {0, 1, 0}, random, out, error) && out.empty());
+        CHECK(!original_explosion_rings(255, {}, {0, 1, 0}, random, out, error) && out.empty());
         CHECK(!original_explosion_rings(3, {}, {}, random, out, error) && out.empty());
         return true;
     }

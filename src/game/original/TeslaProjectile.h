@@ -84,16 +84,18 @@ class CTeslaBallProjectile final : public CProjectile
 class CShikariLoogieProjectile final : public CProjectile
 {
   public:
+    std::uint64_t trail = 0;
     CShikariLoogieProjectile() : CProjectile(OT_NORMAL)
     {
         filename = "Sprites\\napalmprime.spr";
         skin = nullptr;
         damage_type = OpenBlood2::DamageType::Acid;
-        trail_error = "OBJFX_BUGSPRAY_1 trail (scale 0.25, SCALELIFETIME) unavailable";
         flags |= FLAG_FORCECLIENTUPDATE;
     }
 
   protected:
+    bool InitialUpdate() override;
+    std::string LoadBlock(const ProjectileBlock&) override;
     bool Update() override;
     void AddExplosion(DVector, DVector) override;
 };

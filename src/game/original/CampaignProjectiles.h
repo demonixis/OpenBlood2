@@ -64,9 +64,13 @@ class NagaCeilingDebris final : public BaseClass
 class CGroundStrikeProjectile final : public CProjectile
 {
   public:
+    std::uint64_t trail = 0;
     CGroundStrikeProjectile();
+    std::string light_error;
 
   protected:
+    bool InitialUpdate() override;
+    std::string LoadBlock(const ProjectileBlock&) override;
     bool Update() override;
     void AddExplosion(DVector, DVector) override {} // Source disables explosion FX.
 };
@@ -148,7 +152,8 @@ class CNapalmFireball final : public CProjectile
     bool Update() override;
     void AddExplosion(DVector, DVector) override;
 };
-void PublishCampaignExplosion(HOBJECT, DVector, DVector, unsigned, const char* = nullptr, float = 1000);
+OpenBlood2::SceneExplosionReport PublishCampaignExplosion(HOBJECT, DVector, DVector, unsigned, const char* = nullptr,
+                                                          float = 1000);
 
 class CSkullProjectile final : public CProjectile
 {

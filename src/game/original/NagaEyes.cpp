@@ -1,5 +1,6 @@
 // Original GameWeapons.cpp CNagaEyes::FireVector and IgnoreTypeFilterFn.
 #include "B2BaseClass.h"
+#include "CampaignProjectiles.h"
 #include "Weapon.h"
 #include "server_de.h"
 using namespace OpenBlood2;
@@ -26,9 +27,8 @@ FireResult CNagaEyes::FireVector()
     if (beam_collision == SegmentResult::Hit)
         beam_end = beam_hit.point;
     beam = server->PublishLaserBeam(m_hOwner, last_shot.request.position, beam_end, beam_error);
-    // Original sends EXP_NAGA_EYE_BEAM at vDest, with vDest again as normal,
-    // even on a miss. Preserve the request in inspection; do not replace it with
-    // a different explosion or silently claim the unported composite succeeded.
-    explosion_error = "EXP_NAGA_EYE_BEAM composite unavailable (position and normal are both beam endpoint)";
+    // Original passes the endpoint twice, even on a miss; preserve that normal quirk.
+    auto effect = PublishCampaignExplosion(m_hOwner, beam_end, beam_end, 28);
+    explosion_error = effect.model_error + effect.flame_error + effect.light_error;
     return CWeapon::FireVector(); // Visual failures never suppress original vector damage.
 }

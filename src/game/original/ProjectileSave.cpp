@@ -346,3 +346,27 @@ std::string CHowitzerAltFrag::LoadBlock(const ProjectileBlock& b)
     trail = g_pServerDE->PublishObjectParticles(m_hObject, 1, trail_error);
     return {};
 }
+
+std::string CEnergyBlastProjectile::LoadBlock(const ProjectileBlock& b)
+{
+    if (auto failure = CProjectile::LoadBlock(b); !failure.empty())
+        return failure;
+    trail = g_pServerDE->PublishObjectParticles(m_hObject, 4, trail_error, .5f);
+    return {};
+}
+
+std::string CGroundStrikeProjectile::LoadBlock(const ProjectileBlock& b)
+{
+    if (auto failure = CProjectile::LoadBlock(b); !failure.empty())
+        return failure;
+    trail = g_pServerDE->PublishObjectParticles(m_hObject, 27, trail_error, .5f);
+    return {};
+}
+
+std::string CShikariLoogieProjectile::LoadBlock(const ProjectileBlock& b)
+{
+    if (auto failure = CProjectile::LoadBlock(b); !failure.empty())
+        return failure;
+    trail = g_pServerDE->PublishObjectParticles(m_hObject, 31, trail_error, .25f);
+    return {};
+}

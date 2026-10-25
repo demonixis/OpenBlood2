@@ -71,8 +71,9 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_ran
         return Init(type, owner, failure);
     failure.clear();
     *this = {};
-    if ((type != 6 && type != 8 && type != 3 && type != 18 && type != 19 && type != 36 && type != 21 && type != 24 &&
-         type != 31 && type != 32 && type != 33 && (type < 12 || type > 17)) ||
+    if ((type != 9 && type != 37 && type != 38 && type != 39 && type != 6 && type != 8 && type != 3 && type != 4 &&
+         type != 27 && type != 18 && type != 19 && type != 36 && type != 21 && type != 24 && type != 31 && type != 32 &&
+         type != 33 && (type < 12 || type > 17)) ||
         !owner)
     {
         failure = "Unsupported object particle recipe or absent parent";
@@ -80,6 +81,32 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_ran
     }
     recipe = type;
     parent = owner;
+    if (type == 9 || type == 37 || type == 38 || type == 39)
+    {
+        gravity = type == 39 ? -250 : 0;
+        flags = type == 37 || type == 38 ? 0x20 : 0;
+        radius = type == 9 ? 1500 : type == 37 ? 4000 : type == 38 ? 1000 : 750;
+        position_radius = type == 9 ? draw(random, 75, 100) : type == 39 ? 15.f : 2.5f;
+        ramp_down = type == 9 ? .35f : .25f;
+        duration = type == 39 ? .75f : 1.5f;
+        add_delay = type == 9 ? .1f : duration;
+        authored_count = type == 9 ? 12 : type == 38 ? 32 : 24;
+        density = type == 37 || type == 38 ? 2.5f : 0;
+        requested_alpha = type == 9 ? 1.f : type == 37 ? .1f : .5f;
+        min_life = type == 9 ? .25f : type == 37 ? .85f : type == 38 ? 1.f : .5f;
+        max_life = type == 9 ? .5f : type == 37 ? .85f : type == 38 ? 1.f : .75f;
+        min_color = type == 9 ? DVector{192, 0, 192} : type == 39 ? DVector{0, 0, 196} : DVector{0, 196, 0};
+        max_color = type == 9 ? DVector{255, 128, 255} : type == 37 ? DVector{64, 255, 64} : DVector{255, 255, 255};
+        if (type == 9)
+            rotations = {draw(random, 0, .01f), draw(random, 0, .015f), draw(random, 0, .01f)};
+        else if (type != 39)
+            rotations = {0, 0, draw(random, -.01f, .01f)};
+        texture = type == 9    ? "SpriteTextures\\Lensflare32_1.dtx"
+                  : type == 37 ? "SpriteTextures\\smoke64_2.dtx"
+                               : "SpriteTextures\\Lensflare_1.dtx";
+        initialized_ = true;
+        return true;
+    }
     if (type == 6 || type == 8)
     {
         // Original OBJFX_SPARKS_1/3: filled sphere, MOVINGSOURCE but no MOVINGSTREAM.
@@ -100,7 +127,7 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_ran
         initialized_ = true;
         return true;
     }
-    if (type == 3)
+    if (type == 3 || type == 4 || type == 27)
     {
         radius = 200;
         position_radius = 6;
@@ -115,6 +142,27 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_ran
         max_color = {255, 255, 0};
         flags = 0x0f;
         texture = "SpriteTextures\\Firepart64.dtx";
+        if (type == 4)
+        {
+            radius = 250;
+            min_color = {0, 0, 255};
+            max_color = {255, 255, 255};
+            texture = "SpriteTextures\\Lensflare32_1.dtx";
+        }
+        if (type == 27)
+        {
+            ramp_down = .25f;
+            radius = 2000;
+            position_radius = 12.5f;
+            gravity = 25;
+            authored_count = 12;
+            density = 5;
+            requested_alpha = .25f;
+            min_life = .2f;
+            max_life = .4f;
+            min_color = {255, 0, 0};
+            texture = "SpriteTextures\\flames1_09.dtx";
+        }
         initialized_ = true;
         return true;
     }
@@ -225,6 +273,8 @@ bool CObjectParticleFX::CreateObject(const Resources& resources, NodePose pose, 
 }
 bool CObjectParticleFX::AddParticles(std::minstd_rand& random, std::size_t budget)
 {
+    if (recipe == 37 || recipe == 38)
+        return AddPowerRingParticles(random, budget);
     if (recipe >= 12 && recipe <= 17)
         return AddCylinderParticles(random, budget);
     if (recipe != 1 && recipe != 34)
@@ -320,7 +370,8 @@ bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t 
 {
     const auto delta = vector_subtract(last_position, position);
     const float distance = std::sqrt(vector_dot(delta, delta));
-    const float samples = (recipe == 2 || recipe == 3 || recipe == 21 || recipe == 31 || recipe == 32 || recipe == 33)
+    const float samples = (recipe == 2 || (recipe == 3 || recipe == 4 || recipe == 27) || recipe == 21 ||
+                           recipe == 31 || recipe == 32 || recipe == 33)
                               ? distance / (density * radius / 1000.f)
                               : 1.f;
     if (!std::isfinite(samples) || samples > 2048)
@@ -346,33 +397,39 @@ bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t 
         auto right = rotate_vector(basis, {1, 0, 0});
         const auto forward = rotate_vector(basis, {0, 0, 1});
         around(basis, forward, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
-        if (recipe == 2 || recipe == 6 || recipe == 8 || recipe == 3 || recipe == 19 || recipe == 21 || recipe == 24 ||
-            recipe == 31 || recipe == 32 || recipe == 33)
+        if (recipe == 2 || recipe == 6 || recipe == 8 || (recipe == 3 || recipe == 4 || recipe == 27) || recipe == 9 ||
+            recipe == 39 || recipe == 19 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32 ||
+            recipe == 33)
             around(basis, right, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
         right = vector_scale(right, 1 / std::sqrt(vector_dot(right, right)));
         const float speed = draw(random,
-                                 recipe == 6                      ? 25.f
+                                 recipe == 9                      ? -125.f
+                                 : recipe == 39                   ? 100.f
+                                 : recipe == 6                    ? 25.f
                                  : recipe == 8                    ? 50.f
                                  : (recipe == 31 || recipe == 33) ? -5.f
                                                                   : 0.f,
-                                 recipe == 6                      ? 50.f
+                                 recipe == 9                      ? -175.f
+                                 : recipe == 39                   ? 300.f
+                                 : recipe == 6                    ? 50.f
                                  : recipe == 8                    ? 75.f
                                  : (recipe == 31 || recipe == 33) ? 5.f
                                  : recipe == 21 || recipe == 24   ? 25.f
                                                                 : 0.f); // Original zero-speed draw still consumes RNG.
         float comet_distance = 0;
-        auto start = vector_scale(right, recipe == 2 || recipe == 6 || recipe == 8 || recipe == 3 || recipe == 21 ||
+        auto start = vector_scale(right, recipe == 2 || recipe == 6 || recipe == 8 ||
+                                                 (recipe == 3 || recipe == 4 || recipe == 27) || recipe == 21 ||
                                                  recipe == 24 || recipe == 31 || recipe == 32 || recipe == 33
                                              ? (comet_distance = draw(random, 0, position_radius))
                                              : position_radius);
-        if (recipe == 2 || recipe == 6 || recipe == 8 || recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 ||
-            recipe == 32 || recipe == 33)
+        if (recipe == 2 || recipe == 6 || recipe == 8 || (recipe == 3 || recipe == 4 || recipe == 27) || recipe == 21 ||
+            recipe == 24 || recipe == 31 || recipe == 32 || recipe == 33)
             start = vector_add(
                 start, vector_add(vector_subtract(position, origin), vector_scale(step, float(i / authored_count))));
         const auto color = vector_scale(
             vector_add(min_color, vector_scale(vector_subtract(max_color, min_color), draw(random, 0, 1))), 1 / 255.f);
         particles.push_back({start, vector_scale(right, speed),
-                             (recipe == 2 || recipe == 3)
+                             (recipe == 2 || (recipe == 3 || recipe == 4 || recipe == 27))
                                  ? max_life - (max_life - min_life) * (comet_distance / position_radius)
                                  : draw(random, min_life, max_life),
                              color});
@@ -414,14 +471,14 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
         if (duration < elapsed)
             return false;
     }
-    else if (recipe == 6 || recipe == 8 || recipe == 1 || recipe == 2 || recipe == 34 || recipe == 3 || recipe == 31 ||
-             recipe == 32 || recipe == 33)
+    else if (recipe == 6 || recipe == 8 || recipe == 1 || recipe == 2 || recipe == 34 ||
+             (recipe == 3 || recipe == 4 || recipe == 27) || recipe == 31 || recipe == 32 || recipe == 33)
     {
         const auto difference = vector_subtract(owner->position, last_object_position);
         if (difference.x == 0 && difference.y == 0 && difference.z == 0)
         {
             moving = false;
-            duration = elapsed + max_life + ((recipe == 6 || recipe == 8) ? ramp_down : 0.f);
+            duration = elapsed + max_life + ((recipe == 6 || recipe == 8 || recipe == 27) ? ramp_down : 0.f);
         } // Never resumes in single player; only sparks request an alpha ramp.
         last_object_position = owner->position;
     }
@@ -432,8 +489,8 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
         // ALIGNROTATION affects emission, not the fixed smoke system transform.
         source_rotation = owner->rotation;
     }
-    else if (recipe == 2 || recipe == 6 || recipe == 8 || recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 ||
-             recipe == 32 || recipe == 33)
+    else if (recipe == 2 || recipe == 6 || recipe == 8 || (recipe == 3 || recipe == 4 || recipe == 27) ||
+             recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32 || recipe == 33)
     {
         if (moving)
             position = owner->position;
@@ -449,7 +506,7 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
             error = "Object particle offset exceeds bounds";
             return false;
         }
-        source_rotation = system_rotation;
+        source_rotation = (flags & 0x20) ? owner->rotation : system_rotation;
         // Later-engine EulerRotate reference: recalculate each local axis in XYZ order.
         if (rotations.x)
             around(source_rotation, rotate_vector(source_rotation, {1, 0, 0}), rotations.x * std::numbers::pi_v<float>);
@@ -478,5 +535,34 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
         ++bursts;
         last_position = position;
     }
+    return true;
+}
+
+bool CObjectParticleFX::AddPowerRingParticles(std::minstd_rand& random, std::size_t budget)
+{
+    if (particles.size() > budget || authored_count > budget - particles.size())
+    {
+        error = "Power-ring particle capacity exceeded";
+        return false;
+    }
+    // ALIGNROTATION: local forward is +Z; world orientation belongs to the system.
+    auto up = rotate_vector(source_rotation, {0, 1, 0});
+    DVector right{up.y, -up.x, 0};
+    const float length = std::sqrt(vector_dot(right, right));
+    right = length > 1e-6f ? vector_scale(right, 1 / length) : DVector{1, 0, 0};
+    for (unsigned i = 0; i < authored_count; ++i)
+    {
+        const auto previous = right;
+        const float angle = 2 * std::numbers::pi_v<float> / authored_count;
+        right = {previous.x * std::cos(angle) - previous.y * std::sin(angle),
+                 previous.x * std::sin(angle) + previous.y * std::cos(angle), 0};
+        auto velocity = vector_scale(previous, recipe == 37 ? 150.f : 85.f);
+        velocity.z = 450;
+        const auto color = vector_scale(
+            vector_add(min_color, vector_scale(vector_subtract(max_color, min_color), draw(random, 0, 1))), 1 / 255.f);
+        particles.push_back(
+            {vector_scale(previous, position_radius), velocity, draw(random, min_life, max_life), color});
+    }
+    emitted += authored_count;
     return true;
 }

@@ -15,13 +15,12 @@ namespace OpenBlood2
             return 0;
         }
         ExplosionFragmentReport report{next_event_++, type, std::string(source), {}, {}, {}, {}};
-        if (!physics_vector(pos) || !physics_vector(normal) || vector_dot(normal, normal) < 1e-12f ||
-            (type > 11 && type != 21))
+        if (!physics_vector(pos) || !physics_vector(normal) || vector_dot(normal, normal) < 1e-12f || type > 31)
         {
             report.error = "Invalid explosion or unavailable fragment recipe";
             ++failed;
         }
-        else if (type == 3 || type == 9 || type == 21)
+        else if (type == 3 || type == 9 || type == 21 || type == 29 || type == 30)
         {
             normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
             auto draw = [&](float lo, float hi)
@@ -30,9 +29,13 @@ namespace OpenBlood2
                                 float(std::minstd_rand::max() - std::minstd_rand::min());
             };
             // Original loop draws a NEW bound at every condition, not one count.
-            for (unsigned i = 0;
-                 (type == 21 ? i < 10
-                             : i < (type == 9 ? 5 : 2) + (random_() - std::minstd_rand::min()) % (type == 9 ? 6 : 4));
+            for (unsigned i = 0; (type == 21 ? i < 10
+                                             : i < (type == 30                ? 3
+                                                    : type == 9 || type == 29 ? 5
+                                                                              : 2) +
+                                                       (random_() - std::minstd_rand::min()) % (type == 30  ? 3
+                                                                                                : type == 9 ? 6
+                                                                                                            : 4));
                  ++i)
             {
                 ExplosionFragSettings s;
@@ -51,6 +54,20 @@ namespace OpenBlood2
                 s.skin = "Skins\\Gibs\\gibmetal3.dtx";
                 s.spread = type == 21 ? draw(2, 15) : draw(40, type == 9 ? 80.f : 60.f);
                 s.velocity = type == 21 ? draw(3, 6) : draw(20, 40);
+                if (type == 29 || type == 30)
+                {
+                    if (type == 30)
+                        s.model =
+                            "models\\gibs\\stone\\gib" + std::to_string(6 + (random_() - random_.min()) % 4) + ".abc";
+                    s.scale = type == 29 ? DVector{draw(2, 5), draw(2, 5), draw(2, 3)}
+                                         : DVector{draw(1, 2), draw(1, 2), draw(1, 2)};
+                    s.rotate_max = {.5f, .5f, .5f};
+                    s.bounce = type == 30 ? .5f : .25f;
+                    s.duration = 5;
+                    s.trail_type = 0;
+                    s.spread = draw(40, 80);
+                    s.velocity = type == 30 ? draw(15, 30) : draw(20, 40);
+                }
                 CExplosionFragFX fx;
                 std::string failure;
                 if (active.size() >= 128 || next_id_ == UINT64_MAX)
@@ -61,7 +78,10 @@ namespace OpenBlood2
                     fx.event = report.id;
                     CObjectParticleFX trail;
                     std::string trail_failure;
-                    if (trails.size() >= 128 || next_trail_ == UINT64_MAX)
+                    if (!fx.settings.trail_type)
+                    {
+                    } // Source Naga fragments do not emit a trail.
+                    else if (trails.size() >= 128 || next_trail_ == UINT64_MAX)
                         trail_failure = "Smoke-trail system capacity exceeded";
                     else if (trail.Init(fx.settings.trail_type, fx.id, trail_failure) &&
                              trail.CreateObject(resources, {fx.position, fx.rotation}, now, trail_failure))

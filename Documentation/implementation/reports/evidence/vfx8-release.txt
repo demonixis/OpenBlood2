@@ -1,0 +1,143 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/release
+      Start  126: save_pickups.private
+      Start  827: explosion_fragments.private
+      Start  834: object_particles.private
+      Start  841: explosion_flames.private
+      Start  819: explosion_rings.private
+      Start 1533: energy_effects.recipes
+ 1/60 Test #1533: energy_effects.recipes ...........   Passed    0.35 sec
+      Start 1129: singularity.weapon
+ 2/60 Test #1129: singularity.weapon ...............   Passed    0.05 sec
+      Start 1131: singularity.ai
+ 3/60 Test #1131: singularity.ai ...................   Passed    0.03 sec
+      Start 1534: energy_effects.particles
+ 4/60 Test #1534: energy_effects.particles .........   Passed    0.02 sec
+      Start  881: naga.weapon
+ 5/60 Test  #881: naga.weapon ......................   Passed    0.02 sec
+      Start 1130: singularity.pickup
+ 6/60 Test #1130: singularity.pickup ...............   Passed    0.02 sec
+      Start 1338: spawner.properties
+ 7/60 Test #1338: spawner.properties ...............   Passed    0.02 sec
+      Start 1341: spawner.spawn
+ 8/60 Test #1341: spawner.spawn ....................   Passed    0.01 sec
+      Start  882: naga.failures
+ 9/60 Test  #882: naga.failures ....................   Passed    0.01 sec
+      Start  886: naga.private
+10/60 Test  #841: explosion_flames.private .........   Passed    0.84 sec
+      Start  883: naga.clocks
+11/60 Test  #883: naga.clocks ......................   Passed    0.01 sec
+      Start  884: naga.lifetime
+12/60 Test  #884: naga.lifetime ....................   Passed    0.01 sec
+      Start  813: explosion_lights.private
+13/60 Test  #886: naga.private .....................   Passed    0.38 sec
+      Start  798: explosion_sprites.formulas
+14/60 Test  #798: explosion_sprites.formulas .......   Passed    0.02 sec
+      Start  809: explosion_lights.lifecycle
+15/60 Test  #809: explosion_lights.lifecycle .......   Passed    0.01 sec
+      Start  802: explosion_models.formulas
+16/60 Test  #802: explosion_models.formulas ........   Passed    0.02 sec
+      Start  806: explosion_models.private
+17/60 Test  #819: explosion_rings.private ..........   Passed    1.02 sec
+      Start  885: naga.ai
+18/60 Test  #885: naga.ai ..........................   Passed    0.01 sec
+      Start  801: explosion_sprites.private
+19/60 Test  #806: explosion_models.private .........   Passed    0.20 sec
+      Start  799: explosion_sprites.failures
+20/60 Test  #799: explosion_sprites.failures .......   Passed    0.01 sec
+      Start  811: explosion_lights.failures
+21/60 Test  #811: explosion_lights.failures ........   Passed    0.01 sec
+      Start  810: explosion_lights.recipes
+22/60 Test  #810: explosion_lights.recipes .........   Passed    0.01 sec
+      Start  803: explosion_models.recipes
+23/60 Test  #801: explosion_sprites.private ........   Passed    0.18 sec
+      Start  824: explosion_fragments.recipes
+24/60 Test  #803: explosion_models.recipes .........   Passed    0.01 sec
+      Start  816: explosion_rings.recipes
+25/60 Test  #816: explosion_rings.recipes ..........   Passed    0.01 sec
+      Start  822: explosion_fragments.lifecycle
+26/60 Test  #824: explosion_fragments.recipes ......   Passed    0.01 sec
+      Start  814: explosion_rings.motion
+27/60 Test  #822: explosion_fragments.lifecycle ....   Passed    0.01 sec
+      Start  837: explosion_flames.zones
+28/60 Test  #814: explosion_rings.motion ...........   Passed    0.01 sec
+      Start  830: object_particles.emission
+29/60 Test  #837: explosion_flames.zones ...........   Passed    0.01 sec
+      Start 1342: spawner.private
+30/60 Test  #830: object_particles.emission ........   Passed    0.01 sec
+      Start 1339: spawner.commands
+31/60 Test #1339: spawner.commands .................   Passed    0.01 sec
+      Start 1340: spawner.respawn
+32/60 Test #1340: spawner.respawn ..................   Passed    0.02 sec
+      Start  120: save_pickups.pickups
+33/60 Test  #120: save_pickups.pickups .............   Passed    0.02 sec
+      Start  124: save_pickups.family
+34/60 Test #1342: spawner.private ..................   Passed    0.07 sec
+      Start  122: save_pickups.bombs
+35/60 Test  #124: save_pickups.family ..............   Passed    0.03 sec
+      Start  825: explosion_fragments.failures
+36/60 Test  #825: explosion_fragments.failures .....   Passed    0.01 sec
+      Start  815: explosion_rings.lifecycle
+37/60 Test  #122: save_pickups.bombs ...............   Passed    0.03 sec
+      Start  805: explosion_models.session
+38/60 Test  #815: explosion_rings.lifecycle ........   Passed    0.01 sec
+      Start  817: explosion_rings.failures
+39/60 Test  #805: explosion_models.session .........   Passed    0.01 sec
+      Start  812: explosion_lights.session
+40/60 Test  #817: explosion_rings.failures .........   Passed    0.01 sec
+      Start  840: explosion_flames.session
+41/60 Test  #812: explosion_lights.session .........   Passed    0.01 sec
+      Start  826: explosion_fragments.session
+42/60 Test  #840: explosion_flames.session .........   Passed    0.01 sec
+      Start  839: explosion_flames.failures
+43/60 Test  #826: explosion_fragments.session ......   Passed    0.01 sec
+      Start  831: object_particles.stopping
+44/60 Test  #839: explosion_flames.failures ........   Passed    0.01 sec
+      Start  838: explosion_flames.lifecycle
+45/60 Test  #831: object_particles.stopping ........   Passed    0.01 sec
+      Start  823: explosion_fragments.collision
+46/60 Test  #838: explosion_flames.lifecycle .......   Passed    0.01 sec
+      Start  818: explosion_rings.session
+47/60 Test  #823: explosion_fragments.collision ....   Passed    0.01 sec
+      Start  800: explosion_sprites.session
+48/60 Test  #818: explosion_rings.session ..........   Passed    0.01 sec
+      Start  832: object_particles.failures
+49/60 Test  #800: explosion_sprites.session ........   Passed    0.01 sec
+      Start  804: explosion_models.failures
+50/60 Test  #832: object_particles.failures ........   Passed    0.01 sec
+      Start  833: object_particles.session
+51/60 Test  #804: explosion_models.failures ........   Passed    0.01 sec
+      Start  125: save_pickups.refusals
+52/60 Test  #833: object_particles.session .........   Passed    0.01 sec
+      Start  123: save_pickups.eye
+53/60 Test  #125: save_pickups.refusals ............   Passed    0.02 sec
+      Start  121: save_pickups.rewrites
+54/60 Test  #123: save_pickups.eye .................   Passed    0.01 sec
+55/60 Test  #121: save_pickups.rewrites ............   Passed    0.01 sec
+56/60 Test  #813: explosion_lights.private .........   Passed    0.64 sec
+57/60 Test  #827: explosion_fragments.private ......   Passed    1.86 sec
+58/60 Test  #834: object_particles.private .........   Passed    2.07 sec
+59/60 Test  #126: save_pickups.private .............   Passed   19.04 sec
+      Start 1535: gpu.energy_effects
+60/60 Test #1535: gpu.energy_effects ...............   Passed    0.53 sec
+
+100% tests passed out of 60
+
+Label Time Summary:
+explosion_flames       =   0.88 sec*proc (5 tests)
+explosion_fragments    =   1.92 sec*proc (6 tests)
+explosion_lights       =   0.68 sec*proc (5 tests)
+explosion_models       =   0.25 sec*proc (5 tests)
+explosion_rings        =   1.07 sec*proc (6 tests)
+explosion_sprites      =   0.22 sec*proc (4 tests)
+gpu                    =   0.53 sec*proc (1 test)
+headless               =  27.34 sec*proc (59 tests)
+naga                   =   0.45 sec*proc (6 tests)
+object_particles       =   2.11 sec*proc (5 tests)
+objects                =   0.12 sec*proc (6 tests)
+private                =  27.29 sec*proc (16 tests)
+save                   =  19.16 sec*proc (7 tests)
+singularity            =   0.10 sec*proc (3 tests)
+spawner                =   0.13 sec*proc (5 tests)
+weapons                =   0.91 sec*proc (3 tests)
+
+Total Test time (real) =  19.60 sec

@@ -100,8 +100,8 @@ namespace
         const auto restored = make(g, {}, Creation::Restore);
         CHECK(restored && !g.objects.get(restored)->scheduled);
         // Original GenericProp/szSpawn hold MAX_GP_STRING_LEN (200) bytes; 24_AncientCity authors 141.
-        const std::string padded = "HealthPU Name " + std::string(80, 'x') + ";PickupTriggerTarget " +
-                                   std::string(40, 'y');
+        const std::string padded =
+            "HealthPU Name " + std::string(80, 'x') + ";PickupTriggerTarget " + std::string(40, 'y');
         CHECK(padded.size() > 140 && make(g, {{"SpawnObject", padded}}) && g.server.ValidateSpawnObject(padded));
         CHECK(!make(g, {{"SpawnObject", padded + ";PickupTriggerMessage " + std::string(40, 'z')}}));
         // Retired editor flag on older DAT rows: accepted on every class, never read or defaulted.
@@ -206,7 +206,7 @@ namespace
         CHECK(send(g, nullptr, bad, "TRIGGER"));
         const auto& failed = g.server.spawn_reports.back();
         CHECK(!failed.child && failed.outcome.starts_with("Failed: unsupported spawn class"));
-        CHECK(failed.outcome.find("rift explosion FX unavailable") != std::string::npos);
+        CHECK(failed.outcome.find("rift FX:") != std::string::npos);
         CHECK(failed.outcome.find("sound failed") != std::string::npos);
         CHECK(get(g, bad)->rift_unavailable == 1 && get(g, bad)->spawn_failures == 1 && !get(g, bad)->error.empty());
         // Properties in the spawn string are validated before creation.

@@ -14,6 +14,7 @@ class CSingularityProjectile final : public CProjectile
     OpenBlood2::SegmentResult ray = OpenBlood2::SegmentResult::Unavailable;
     bool skipped_shooter = false;
     std::uint64_t pulls = 0, swallowed = 0, damage_messages = 0, object_fx_unavailable = 0;
+    std::string object_fx_error;
     OpenBlood2::SceneExplosionReport effect;
     bool AdvanceFlight(double) override
     {

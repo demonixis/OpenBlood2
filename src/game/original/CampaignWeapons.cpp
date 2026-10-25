@@ -77,7 +77,30 @@ void CDeathRay::BeginFire(bool alternate)
         return;
     }
     const auto forward = rotate_vector(rotation_from_euler({player->m_fPitch, player->m_fYaw, 0}), {0, 0, 1});
-    effect_error = "OBJFX_DEATHRAY_RING_1/2 rotating emitter unavailable";
+    effect_error.clear();
+    DVector emitter_position = from;
+    emitter_position.y += player->eye_level;
+    const auto emitter_rotation = rotation_from_euler({player->m_fPitch, player->m_fYaw, 0});
+    if (!s->IsObjectAlive(ring_anchor))
+    {
+        ObjectCreateStruct create;
+        create.m_ObjectType = OT_NORMAL;
+        create.m_Flags = FLAG_FORCECLIENTUPDATE;
+        auto* object = s->CreateObject(s->GetClass("BaseClass"), &create);
+        ring_anchor = object ? object->m_hObject : nullptr;
+    }
+    if (ring_anchor && s->TeleportObject(ring_anchor, &emitter_position) == DE_OK &&
+        s->SetObjectRotation(ring_anchor, &emitter_rotation) == DE_OK)
+    {
+        const DVector offset{data.m_vFlash.y, data.m_vFlash.x, data.m_vFlash.z};
+        std::string failure;
+        s->PublishObjectParticles(ring_anchor, 37, effect_error, 1, offset);
+        s->PublishObjectParticles(ring_anchor, 38, failure, 1, offset);
+        if (!failure.empty())
+            effect_error += failure;
+    }
+    else
+        effect_error = "DeathRay ring anchor unavailable";
     std::vector<HOBJECT> snapshot;
     auto& head = CDestructable::m_DestructableHead;
     for (auto* link = head.m_pNext; link && link != &head; link = link->m_pNext)
@@ -157,4 +180,10 @@ FireResult CDrudgeLightning::FireVector()
     else
         effect_error = "Drudge lightning visual ray unavailable";
     return CWeapon::FireVector(); // The source's separate damage ray keeps the ordinary filters.
+}
+
+CDeathRay::~CDeathRay()
+{
+    if (ring_anchor)
+        g_pServerDE->RemoveObject(ring_anchor);
 }

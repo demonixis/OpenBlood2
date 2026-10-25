@@ -14,9 +14,34 @@ namespace OpenBlood2
             error = "Explosion requires a finite position and nonzero normal";
             return false;
         }
-        if (type <= 7 || (type >= 9 && type <= 11))
+        if (type <= 7 || (type >= 9 && type <= 11) || (type >= 13 && type <= 25) || type == 27 ||
+            (type >= 29 && type <= 31))
             return true;
-        if (type == 26)
+        if (type == 12)
+        {
+            ExplosionFlameSettings s;
+            s.normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
+            s.position = vector_add(pos, vector_scale(s.normal, 20));
+            s.colors = {{{1, 128.f / 255, 128.f / 255}, {1, 1, 1}, {1, 1, 0}}};
+            s.lifetimes = {.35f, .65f, 1};
+            s.life_offsets = {.15f, .25f, .35f};
+            s.ramp_up = 1;
+            s.duration = 8;
+            s.ramp_down = 2;
+            s.count = 2;
+            s.radius = 4000;
+            s.position_radius = 12;
+            s.gravity = 50;
+            s.velocity = 0;
+            s.delay = .25f;
+            s.alpha = .75f;
+            s.fade = 0;
+            s.ramp_flags = 0;
+            s.texture = "SpriteTextures\\flames1_09.dtx";
+            out.push_back(s);
+            return true;
+        }
+        if (type == 26 || type == 28)
         {
             const auto n = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
             ExplosionFlameSettings s;
@@ -26,10 +51,10 @@ namespace OpenBlood2
             s.lifetimes = {.7f, .85f, 1};
             s.life_offsets = {.15f, .25f, .35f};
             s.ramp_up = 0;
-            s.duration = 1.25f;
+            s.duration = type == 28 ? 1.f : 1.25f;
             s.ramp_down = .25f;
-            s.count = 3;
-            s.radius = 2500;
+            s.count = type == 28 ? 2 : 3;
+            s.radius = type == 28 ? 1500 : 2500;
             s.position_radius = 7.5f;
             s.gravity = 200;
             s.delay = .1f;

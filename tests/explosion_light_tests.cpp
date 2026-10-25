@@ -90,7 +90,7 @@ namespace
             CHECK(out[1].radius1 == (type == 0 || type == 6 ? 50 : type == 1 ? 75 : 100));
             CHECK(near(out[1].color1.x, .2f) && near(out[1].color2.x, .5f));
         }
-        CHECK(!original_explosion_lights(24, {}, {0, 1, 0}, out, error) && out.empty() && !error.empty());
+        CHECK(!original_explosion_lights(255, {}, {0, 1, 0}, out, error) && out.empty() && !error.empty());
         CHECK(!original_explosion_lights(3, {}, {}, out, error) && out.empty());
         return true;
     }
@@ -142,7 +142,7 @@ namespace
         CHECK(!fx.Update(std::numeric_limits<double>::infinity()));
         ExplosionLights lights;
         CHECK(!lights.publish(3, {}, {0, 1, 0}, std::string("a\0b", 3), 0, error) && lights.reports.empty());
-        CHECK(lights.publish(24, {}, {0, 1, 0}, "bad", 0, error) && !error.empty() && lights.failed == 1);
+        CHECK(lights.publish(255, {}, {0, 1, 0}, "bad", 0, error) && !error.empty() && lights.failed == 1);
         CHECK(lights.publish(3, {}, {0, 1, 0}, "bad clock", -1, error) && !error.empty() && lights.failed == 3);
         lights.clear();
         for (unsigned i = 0; i < 127; ++i)

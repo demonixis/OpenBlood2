@@ -1071,7 +1071,15 @@ namespace OpenBlood2
                             }
                             if (const auto* leech = dynamic_cast<const CLeechAltProjectile*>(projectile))
                                 ImGui::Text("Leech alternate: pushes %llu", (unsigned long long)leech->pushes);
-                            ImGui::TextWrapped("Pending: %s", projectile->trail_error.c_str());
+                            if (const auto* energy = dynamic_cast<const CEnergyBlastProjectile*>(projectile))
+                                ImGui::Text("Energy trail: %llu", (unsigned long long)energy->trail);
+                            if (const auto* ground = dynamic_cast<const CGroundStrikeProjectile*>(projectile))
+                                ImGui::Text("Ground trail: %llu / %s", (unsigned long long)ground->trail,
+                                            ground->light_error.c_str());
+                            if (const auto* spit = dynamic_cast<const CShikariLoogieProjectile*>(projectile))
+                                ImGui::Text("Shikari trail: %llu", (unsigned long long)spit->trail);
+                            if (!projectile->trail_error.empty())
+                                ImGui::TextWrapped("Trail: %s", projectile->trail_error.c_str());
                             if (!projectile->error.empty())
                                 ImGui::TextWrapped("Failure: %s", projectile->error.c_str());
                         }

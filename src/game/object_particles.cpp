@@ -1,10 +1,11 @@
 #include "game/object_particles.h"
+#include "engine/collision.h"
 #include <algorithm>
 #include <cmath>
 namespace OpenBlood2
 {
     std::uint64_t ObjectParticles::publish(HOBJECT owner, unsigned recipe, ServerDE& server, const Resources* resources,
-                                           double now, std::string& error, float lifetime_scale)
+                                           double now, std::string& error, float lifetime_scale, DVector offset)
     {
         error.clear();
         ObjectParticleReport report;
@@ -18,10 +19,13 @@ namespace OpenBlood2
             if (!resources || server.GetObjectPos(owner, &pose.position) != DE_OK ||
                 server.GetObjectRotation(owner, &pose.rotation) != DE_OK)
                 error = "Object particle resources/pose unavailable";
+            else if (!physics_vector(offset) || ((offset.x || offset.y || offset.z) && recipe != 37 && recipe != 38))
+                error = "Unsupported object particle offset";
             else if (!std::isfinite(lifetime_scale) || lifetime_scale < .25f || lifetime_scale > 2 ||
-                     (recipe != 3 && lifetime_scale != 1))
+                     (recipe != 3 && recipe != 4 && recipe != 27 && recipe != 31 && lifetime_scale != 1))
                 error = "Unsupported object particle lifetime scale";
-            else if (recipe != 1 && recipe != 2 && recipe != 6 && recipe != 8 && recipe != 3 && recipe != 18 &&
+            else if (recipe != 9 && recipe != 37 && recipe != 38 && recipe != 39 && recipe != 1 && recipe != 2 &&
+                     recipe != 6 && recipe != 8 && recipe != 3 && recipe != 4 && recipe != 27 && recipe != 18 &&
                      recipe != 19 && recipe != 36 && recipe != 21 && recipe != 24 && recipe != 31 && recipe != 32 &&
                      recipe != 33 && (recipe < 12 || recipe > 17))
                 error = "Object-bound particle recipe unavailable";
@@ -32,6 +36,8 @@ namespace OpenBlood2
                 CObjectParticleFX fx;
                 if (fx.Init(recipe, next_id_, random_, error))
                 {
+                    if (recipe == 37 || recipe == 38)
+                        fx.offset = offset;
                     fx.min_life *= lifetime_scale;
                     fx.max_life *= lifetime_scale;
                 }

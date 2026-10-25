@@ -68,6 +68,8 @@ class CDeathRay final : public CWeapon
 {
   public:
     CDeathRay() : CWeapon(WEAP_DEATHRAY) {}
+    ~CDeathRay() override;
+    HOBJECT ring_anchor = nullptr;
     void BeginFire(bool) override;
     std::string area_error, effect_error;
     unsigned area_deliveries = 0;

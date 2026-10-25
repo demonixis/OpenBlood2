@@ -18,6 +18,8 @@ namespace OpenBlood2
             error = "Explosion requires a finite position and nonzero normal";
             return false;
         }
+        if (type == 12 || (type >= 18 && type <= 28))
+            return true; // No sprite in these source composites.
         const float length = std::sqrt(vector_dot(normal, normal));
         normal = {normal.x / length, normal.y / length, normal.z / length}; // Original CExplosionFX::Init.
         auto add = [&](float offset, float first, float last, float duration, float alpha, DBYTE wave, DBYTE align,
@@ -37,6 +39,20 @@ namespace OpenBlood2
             s.resource = path;
             out.push_back(std::move(s));
         };
+        if (type == 29 || type == 30 || type == 31)
+        {
+            if (type == 31)
+                add(0, .5f, 4, 1.25f, .5f, 1, 1, "Sprites\\ripple.spr");
+            add(type == 30 ? 10.f : 25.f, type == 31 ? .1f : .25f,
+                type == 29   ? 1.5f
+                : type == 30 ? 1.75f
+                             : 3.5f,
+                type == 29   ? 5.f
+                : type == 30 ? 2.5f
+                             : 3.5f,
+                .85f, 1, 0, "Sprites\\smokepuff2.spr");
+            return true;
+        }
         if (type <= 3)
         {
             const float fire = type == 0 ? .25f : type == 2 ? .75f : .5f;

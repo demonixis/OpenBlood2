@@ -14,6 +14,48 @@ namespace OpenBlood2
             error = "Explosion requires a finite position and nonzero normal";
             return false;
         }
+        if (type == 21 || type == 26 || type == 30 || type == 31)
+            return true;
+        if (type == 18 || type == 23 || type == 24 || type == 25 || type == 28 || type == 29)
+        {
+            ExplosionLightSettings s;
+            const auto n = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
+            s.position = vector_add(position, vector_scale(n, type == 18 ? 15.f : type == 29 ? 10.f : 0.f));
+            s.color1 = type == 18                 ? DVector{.5f, 0, .5f}
+                       : type == 24 || type == 28 ? DVector{1, 0, 0}
+                       : type == 29               ? DVector{1, .75f, 0}
+                                                  : DVector{0, 1, 0};
+            s.color2 = type == 18                 ? DVector{.25f, 0, .25f}
+                       : type == 24               ? DVector{.5f, 0, 0}
+                       : type == 28 || type == 29 ? DVector{.5f, .5f, .5f}
+                                                  : DVector{0, .5f, 0};
+            s.duration = type == 18 ? 7.f : type == 23 || type == 24 ? 3.f : type == 29 ? 1.25f : .75f;
+            s.radius1 = type == 18 || type == 23 ? 300.f
+                        : type == 24             ? 500.f
+                        : type == 25             ? 50.f
+                        : type == 28             ? 75.f
+                                                 : 125.f;
+            s.radius2 = type == 18 ? 10.f : type == 29 ? 0.f : 15.f;
+            out.push_back(s);
+            return true;
+        }
+        if (type == 12)
+        {
+            ExplosionLightSettings s;
+            s.position = vector_add(position, vector_scale(normal, 10 / std::sqrt(vector_dot(normal, normal))));
+            s.color1 = {1, .75f, 0};
+            s.color2 = {1, .5f, 0};
+            s.duration = 11;
+            s.radius1 = 200;
+            s.radius2 = 0;
+            out.push_back(s);
+            s.color1 = {.2f, .2f, .2f};
+            s.color2 = {.5f, .5f, .5f};
+            s.duration = 35;
+            s.radius1 = 75; // Source writes Radius1 twice.
+            out.push_back(s);
+            return true;
+        }
         if (type == 7)
         {
             ExplosionLightSettings s;
@@ -46,13 +88,14 @@ namespace OpenBlood2
             }
             return true;
         }
-        if (type == 16 || type == 17 || type == 22)
+        if (type == 16 || type == 17 || type == 19 || type == 22)
         {
             ExplosionLightSettings s;
             s.position = vector_add(
-                position, vector_scale(normal, (type == 16 ? 10.f : 15.f) /
-                                                   (type == 22 ? 1.f : std::sqrt(vector_dot(normal, normal)))));
-            s.color1 = s.color2 = type == 22 ? DVector{1, 0, 0} : DVector{1, 1, 0};
+                position,
+                vector_scale(normal, (type == 16 ? 10.f : 15.f) /
+                                         ((type == 19 || type == 22) ? 1.f : std::sqrt(vector_dot(normal, normal)))));
+            s.color1 = s.color2 = type == 19 ? DVector{0, 0, 1} : type == 22 ? DVector{1, 0, 0} : DVector{1, 1, 0};
             s.duration = 1;
             s.radius1 = type == 16 ? 75.f : 300.f;
             s.radius2 = type == 16 ? 0.f : 150.f;

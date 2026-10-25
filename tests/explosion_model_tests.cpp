@@ -123,7 +123,7 @@ namespace
             CHECK(s->waveform <= 2 && s->fade == 1 && s->random_rotation == 1 && near(s->alpha, .75f));
             CHECK(s->model.has_value() == (type == 8));
         }
-        CHECK(!original_explosion_model(24, {}, {0, 1, 0}, random, s, error) && !s && !error.empty());
+        CHECK(!original_explosion_model(255, {}, {0, 1, 0}, random, s, error) && !s && !error.empty());
         CHECK(!original_explosion_model(3, {}, {}, random, s, error));
         return true;
     }

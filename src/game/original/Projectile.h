@@ -77,6 +77,7 @@ class CProjectile : public BaseClass
 class CEnergyBlastProjectile final : public CProjectile
 {
   public:
+    std::uint64_t trail = 0;
     bool divine = false;
     CEnergyBlastProjectile()
     {
@@ -85,6 +86,7 @@ class CEnergyBlastProjectile final : public CProjectile
     }
 
   protected:
+    std::string LoadBlock(const ProjectileBlock&) override;
     bool InitialUpdate() override;
     bool Update() override;
     void AddExplosion(DVector, DVector) override;

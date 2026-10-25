@@ -325,9 +325,7 @@ bool CProjectile::AddImpact(DVector position)
 
 bool CEnergyBlastProjectile::InitialUpdate()
 {
-    // Source CreateObject delivers INITIALUPDATE before weapon Setup; the default
-    // non-Zealot branch selects FIRETRAIL_2, half lifetime, no light.
-    trail_error = "OBJFX_FIRETRAIL_2 (scale 0.5, SCALELIFETIME) unavailable";
+    trail = g_pServerDE->PublishObjectParticles(m_hObject, 4, trail_error, .5f);
     return CProjectile::InitialUpdate();
 }
 bool CEnergyBlastProjectile::Update()

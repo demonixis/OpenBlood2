@@ -58,6 +58,13 @@ fragment counts, strict smoke stop lifetime, fixed origin and one trail per rest
 owner. The user confirmed renderer optimizations are integrated here on 2026-10-25;
 the historical coordination hold below is satisfied for the requested VFX lot 10.
 
+The [energy/boss/rift VFX lot 8](Documentation/contracts/energy_effects_contracts.md)
+restores composites 12/18/19/23–25/28–31, enemy trails and Death Ray/Singularity particles.
+Preserve source-absent component no-ops, second-model Z rotation, source Naga endpoint
+normal, half/quarter trail lifetimes and restore republication, reversed absorption
+speed bounds, per-weapon Death Ray anchor ownership and the absolute emission clock.
+No new saved payload or camera shake; geometry illumination stays with lot 10.
+
 ## Commit attribution
 
 Commits and pull requests carry only the user's identity (demonixis). Never add

@@ -218,3 +218,9 @@ void CShikariLoogieProjectile::AddExplosion(DVector, DVector)
     // m_bExplosion is false in the source, so AddImpact never calls this override (its
     // EXP_FLAME_SMALL placeholder and impact.wav are unreachable). Nothing to publish.
 }
+
+bool CShikariLoogieProjectile::InitialUpdate()
+{
+    trail = g_pServerDE->PublishObjectParticles(m_hObject, 31, trail_error, .25f);
+    return CProjectile::InitialUpdate();
+}

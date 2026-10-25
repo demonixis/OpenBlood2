@@ -172,7 +172,7 @@ namespace
         for (unsigned type : {0u, 1u, 2u, 6u, 8u})
             CHECK(manager.publish(type, {}, {0, 1, 0}, "no branch", g.models, g.resources, 0, error) && error.empty() &&
                   manager.reports.back().fragments.empty());
-        CHECK(manager.publish(24, {}, {0, 1, 0}, "unsupported", g.models, g.resources, 0, error) && !error.empty());
+        CHECK(manager.publish(255, {}, {0, 1, 0}, "unsupported", g.models, g.resources, 0, error) && !error.empty());
         // Explicit random x/y/z ordering, then pitch/yaw/roll.
         ExplosionFragSettings s;
         s.random_direction = true;

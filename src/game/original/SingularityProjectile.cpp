@@ -70,10 +70,10 @@ bool CSingularityProjectile::Update()
                 s->MoveObject(target, &center);
                 if (!is_character)
                 {
-                    // The source also sends SFX_OBJECTFX_ID / OBJFX_SINGULARITY_1 at the hole.
                     s->RemoveObject(target);
                     ++swallowed;
-                    ++object_fx_unavailable;
+                    if (!s->PublishObjectParticles(m_hObject, 9, object_fx_error) || !object_fx_error.empty())
+                        ++object_fx_unavailable;
                 }
                 else
                     Damage(target, m_fDamage * 2, position);

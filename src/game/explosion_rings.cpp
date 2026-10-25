@@ -14,7 +14,47 @@ namespace OpenBlood2
             error = "Explosion requires a finite position and nonzero normal";
             return false;
         }
-        if (type == 5 || type == 6 || type == 8 || type == 10)
+        if (type == 18 || type == 23 || type == 24 || type == 29 || type == 31)
+        {
+            auto draw = [&](float lo, float hi)
+            { return lo + (hi - lo) * float(random() - random.min()) / float(random.max() - random.min()); };
+            ExplosionRingSettings s;
+            s.position = pos;
+            s.normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
+            s.alpha = .75f;
+            s.fade = 1;
+            s.align = 1;
+            if (type == 29 || type == 31)
+            {
+                s.color = {1, .9f, .75f};
+                s.radius = type == 29 ? 6000 : 8000;
+                s.position_radius = 10;
+                s.velocity = draw(100, type == 29 ? 125.f : 150.f);
+                s.gravity = draw(25, 50);
+                s.count = type == 29 ? 24 : 32;
+                s.duration = type == 29 ? 1.25f : 1.75f;
+                s.texture = "SpriteTextures\\Smoke32_4.dtx";
+            }
+            else
+            {
+                s.color = type == 18   ? DVector{.5f, 0, .65f}
+                          : type == 23 ? DVector{0, .75f, 0}
+                                       : DVector{.85f, .25f, .25f};
+                s.radius = type == 18 ? 12000 : type == 23 ? 18000 : 24000;
+                s.position_radius = type == 18 ? 50 : type == 23 ? 150 : 750;
+                s.velocity = type == 18 ? 50 : 0;
+                s.count = type == 18 ? 24 : type == 23 ? 18 : 32;
+                s.duration = type == 18 ? 5.5f : 2.75f;
+                s.rotation = -.01f;
+                s.rotate = 1;
+                s.fade = type == 18 ? 1 : 5;
+                s.texture = "SpriteTextures\\smoke64_2.dtx";
+            }
+            out.push_back(s);
+            return true;
+        }
+        if (type == 5 || type == 6 || type == 8 || type == 10 || type == 12 || type == 14 || type == 15 || type == 16 ||
+            type == 20 || type == 21 || type == 25 || type == 26 || type == 28 || type == 30)
             return true; // No ring branch in these high-detail recipes.
         if (type == 9 || type == 11)
         {
@@ -102,13 +142,13 @@ namespace OpenBlood2
             out.push_back(s);
             return true;
         }
-        if (type == 17 || type == 22)
+        if (type == 17 || type == 19 || type == 22)
         {
-            const auto n = type == 22 ? normal : vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
+            const auto n = type != 17 ? normal : vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
             ExplosionRingSettings s;
             s.position = vector_add(pos, vector_scale(n, 30));
             s.normal = n;
-            s.color = type == 22 ? DVector{1, 0, 0} : DVector{1, .85f, 0};
+            s.color = type == 19 ? DVector{0, 0, 1} : type == 22 ? DVector{1, 0, 0} : DVector{1, .85f, 0};
             s.radius = 7500;
             s.position_radius = 25;
             s.velocity = 1000;

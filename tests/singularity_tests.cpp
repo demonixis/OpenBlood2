@@ -122,7 +122,8 @@ namespace
                 CHECK(g.server.PingObjects(observer));
             CHECK(step(g, .1));
         }
-        CHECK(hole->swallowed == 1 && !g.server.IsObjectAlive(crate) && hole->object_fx_unavailable == 1);
+        CHECK(hole->swallowed == 1 && !g.server.IsObjectAlive(crate) && hole->object_fx_unavailable == 0 &&
+              hole->object_fx_error.empty());
         DVector now;
         CHECK(g.server.IsObjectAlive(victim->m_hObject) && g.server.GetObjectPos(victim->m_hObject, &now) == DE_OK);
         std::cout << "pulls=" << hole->pulls << " damage=" << hole->damage_messages << " moved=" << now.z - start.z

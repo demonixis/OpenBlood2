@@ -29,7 +29,8 @@ bool CVomitProjectile::Update()
         return Fail("Vomit projectile scale unavailable");
     return CProjectile::Update();
 }
-void PublishCampaignExplosion(HOBJECT source, DVector p, DVector n, unsigned type, const char* sound, float radius)
+OpenBlood2::SceneExplosionReport PublishCampaignExplosion(HOBJECT source, DVector p, DVector n, unsigned type,
+                                                          const char* sound, float radius)
 {
     auto* s = g_pServerDE;
     SceneExplosionReport r;
@@ -53,6 +54,7 @@ void PublishCampaignExplosion(HOBJECT source, DVector p, DVector n, unsigned typ
         r.voice = s->PlayDetachedSound(source, request, p, r.sound_error);
     }
     s->RecordSceneExplosion(r);
+    return r;
 }
 bool PublishDivineShockball(HOBJECT source, DVector p, DVector n, SceneExplosionReport& r, const char* sound)
 {
@@ -255,7 +257,7 @@ CGroundStrikeProjectile::CGroundStrikeProjectile() : CProjectile(OT_NORMAL)
     filename = "Sprites\\napalmprime.spr";
     skin = nullptr;
     damage_type = DamageType::Normal;
-    trail_error = "OBJFX_GROUNDFLAME_2 (0.5 SCALELIFETIME) and AddLight unavailable";
+    light_error = "AddLight illumination unavailable";
 }
 bool CGroundStrikeProjectile::Update()
 {
@@ -771,4 +773,10 @@ void CSkullProjectile::HandleContact(const SegmentHit& hit)
 void CSkullProjectile::AddExplosion(DVector p, DVector n)
 {
     PublishCampaignExplosion(m_hObject, p, n, 14, "Sounds\\Weapons\\howitzer\\impact.wav", 750);
+}
+
+bool CGroundStrikeProjectile::InitialUpdate()
+{
+    trail = g_pServerDE->PublishObjectParticles(m_hObject, 27, trail_error, .5f);
+    return CProjectile::InitialUpdate();
 }

@@ -1,7 +1,8 @@
+#include "CampaignProjectiles.h"
 // Selected original ObjectDLL/Spawner.cpp class; the global helper lives in
 // spawn_object.cpp. See spawner_contracts.md.
-#include "Spawner.h"
 #include "SaveFields.h"
+#include "Spawner.h"
 #include "engine/collision.h"
 #include "game/key_messages.h"
 #include "game/pickup_messages.h"
@@ -173,9 +174,13 @@ bool Spawner::SpawnObject(HOBJECT sender)
     last_child = report.child;
     if (m_bCreateRiftEffect)
     {
-        // SFX_EXPLOSIONFX_ID / EXP_RIFT_1 has no client effect implementation yet.
-        ++rift_unavailable;
-        report.outcome += "; rift explosion FX unavailable";
+        const auto effect =
+            PublishCampaignExplosion(m_hObject, report.position, rotate_vector(rotation, {0, 0, 1}), 23);
+        if (!effect.model_error.empty() || !effect.ring_error.empty() || !effect.light_error.empty())
+        {
+            ++rift_unavailable;
+            report.outcome += "; rift FX: " + effect.model_error + effect.ring_error + effect.light_error;
+        }
     }
     if (!m_hstrSound.empty() && posed)
     {

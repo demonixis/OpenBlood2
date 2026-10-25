@@ -1,6 +1,6 @@
 # Roadmap
 
-Reviewed on 2026-10-25 (beta VFX lots 1–7); level-opening coverage reconciled with `9bfada1` and
+Reviewed on 2026-10-25 (beta VFX lots 1–8); level-opening coverage reconciled with `9bfada1` and
 [audit 19](implementation/reports/evidence/all-levels-audit-19.log), save/load with lot 14.
 Percentages are task estimates, not acceptance. Only the user accepts a milestone.
 
@@ -104,11 +104,11 @@ renderer remains the reference and stays selectable after M5.
 | 5 | Flare gun: primary/secondary trails and fizzle/burst/fragment effects (13–15) | Implemented; [contract and verification](contracts/flare_contracts.md#original-vfx-completion--lot-5-2026-10-25). Primary/fragment trails, impacts 13–15 and restore republication; alternate parent remains trail-free. Illumination stays separate. |
 | 6 | Tesla: primary impact (7), alternate beam and ball arcs; connect Drudge lightning through the same service | Implemented; [contract and verification](contracts/tesla_contracts.md#original-vfx-completion--lot-6-2026-10-25). Impact 7 and actual Tesla/Drudge lightning, with separate visual/damage rays and original forms. Illumination stays separate. |
 | 7 | Explosive weapons: Howitzer impacts (9–11), Napalm alternate (5) and missing projectile smoke connections | Implemented; [contract and verification](contracts/explosive_effects_contracts.md). Impacts 5/9/10/11, Napalm smoke and M16-grenade/Howitzer fragment trails; existing damage, grenade/bomb and Napalm primary effects preserved. |
-| 8 | Remaining energy/boss/environment recipes: Singularity, Death Ray, enemy trails/impacts, Naga and Spawner rift | Proposed / P2. Split by weapon/caller for implementation and verification; no replacement generic explosions. |
+| 8 | Remaining energy/boss/environment recipes: Singularity, Death Ray, enemy trails/impacts, Naga and Spawner rift | Implemented; [contract and verification](contracts/energy_effects_contracts.md). Source composites 12/18/19/23–25/28–31, enemy trails, Singularity absorption and Death Ray rings/electricity; restored trails republished once. Rift 24 has no established live caller. |
 | 9 | Remaining destruction materials and evidenced environment emitters | Proposed / P2 for stone/plastic/terrain and CDebris flesh; P3 for Rain/legacy emitters until an exercised level/caller is identified. |
 | 10 | M4 rendering dependencies: realtime FX illumination, underwater fog, global translucent ordering and clipped marks | Authorized; renderer synchronization confirmed by the user. Queued after the recipe lots. Evaluated light states are not geometry illumination. |
 
-The user authorized the continuation on 2026-10-25; lots 4–7 are implemented and lots 8–10
+The user authorized the continuation on 2026-10-25; lots 4–8 are implemented and lots 9–10
 remain to execute in order, with renderer synchronization confirmed by the user for lot 10. P1 restores frequent weapon feedback;
 P2 completes less common weapon/boss/destruction effects; P3 requires evidence of
 campaign use. Each implementation lot needs source-parameter checks and matched
