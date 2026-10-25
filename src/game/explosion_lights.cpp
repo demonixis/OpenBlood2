@@ -14,6 +14,26 @@ namespace OpenBlood2
             error = "Explosion requires a finite position and nonzero normal";
             return false;
         }
+        if (type >= 13 && type <= 15)
+        {
+            ExplosionLightSettings s;
+            s.position = vector_add(position, vector_scale(normal, 10 / std::sqrt(vector_dot(normal, normal))));
+            s.color1 = {1, .5f, 0};
+            s.color2 = {1, 1, 1};
+            s.duration = type == 13 ? 1.25f : type == 14 ? .75f : 1.f;
+            s.radius1 = type == 13 ? 100.f : type == 14 ? 150.f : 75.f;
+            s.radius2 = 0;
+            out.push_back(s);
+            if (type == 13)
+            {
+                s.color1 = {.2f, .2f, .2f};
+                s.color2 = {.5f, .5f, .5f};
+                s.duration = 25;
+                s.radius1 = s.radius2 = 50;
+                out.push_back(s);
+            }
+            return true;
+        }
         if (type == 16 || type == 17 || type == 22)
         {
             ExplosionLightSettings s;

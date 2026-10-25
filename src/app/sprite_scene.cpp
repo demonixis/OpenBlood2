@@ -225,7 +225,10 @@ namespace OpenBlood2
             for (unsigned i = 0; i < fx.particles.size(); ++i)
             {
                 const auto& particle = fx.particles[i];
-                const auto position = vector_add(fx.position, rotate_vector(fx.system_rotation, particle.position));
+                // MOVINGSOURCE keeps the particle-system transform at its creation origin;
+                // particle positions already include the owner's displacement.
+                const auto origin = (fx.flags & 0x04) ? fx.origin : fx.position;
+                const auto position = vector_add(origin, rotate_vector(fx.system_rotation, particle.position));
                 if (!scene.add_particle(fx.texture, position, fx.radius / 640.f, particle.color, fx.alpha, fx.id, i,
                                         game.resources, error))
                     return false;

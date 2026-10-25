@@ -1021,6 +1021,12 @@ namespace OpenBlood2
                                 if (!flare->sound_error.empty())
                                     ImGui::TextWrapped("Loop: %s", flare->sound_error.c_str());
                             }
+                            if (const auto* flare = dynamic_cast<const CFlareProjectile*>(projectile))
+                                ImGui::TextWrapped("Trail %llu / %s", (unsigned long long)flare->trail,
+                                                   flare->light_error.c_str());
+                            if (const auto* flare = dynamic_cast<const CFlareBurstProjectile*>(projectile))
+                                ImGui::TextWrapped("Fragment trail %llu / %s", (unsigned long long)flare->trail,
+                                                   flare->light_error.c_str());
                             if (const auto* flare = dynamic_cast<const CFlareAltProjectile*>(projectile))
                                 ImGui::Text(
                                     "Alternate flare: cached velocity %s / emitted children %u / effect type %u",

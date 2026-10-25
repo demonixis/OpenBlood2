@@ -21,8 +21,9 @@ namespace OpenBlood2
             else if (!std::isfinite(lifetime_scale) || lifetime_scale < .25f || lifetime_scale > 2 ||
                      (recipe != 3 && lifetime_scale != 1))
                 error = "Unsupported object particle lifetime scale";
-            else if (recipe != 3 && recipe != 18 && recipe != 19 && recipe != 36 && recipe != 21 && recipe != 24 &&
-                     recipe != 31 && recipe != 32 && recipe != 33 && (recipe < 12 || recipe > 17))
+            else if (recipe != 6 && recipe != 8 && recipe != 3 && recipe != 18 && recipe != 19 && recipe != 36 &&
+                     recipe != 21 && recipe != 24 && recipe != 31 && recipe != 32 && recipe != 33 &&
+                     (recipe < 12 || recipe > 17))
                 error = "Object-bound particle recipe unavailable";
             else if (active.size() >= 128 || next_id_ == UINT64_MAX)
                 error = "Object particle system capacity exhausted";

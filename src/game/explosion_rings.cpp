@@ -16,6 +16,24 @@ namespace OpenBlood2
         }
         if (type == 6 || type == 8)
             return true; // No ring branch in these high-detail recipes.
+        if (type == 13)
+        {
+            ExplosionRingSettings s;
+            s.normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
+            s.position = vector_add(pos, vector_scale(s.normal, 15));
+            s.color = {1, .75f, 0};
+            s.radius = 2500;
+            s.position_radius = 0;
+            s.velocity = 50;
+            s.count = 8;
+            s.duration = .5f + .5f * float(random() - random.min()) / float(random.max() - random.min());
+            s.alpha = 1;
+            s.fade = 1;
+            s.align = 1;
+            s.texture = "SpriteTextures\\lensflare_1.dtx";
+            out.push_back(s);
+            return true;
+        }
         if (type == 4)
         {
             ExplosionRingSettings s;

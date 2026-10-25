@@ -61,6 +61,86 @@ namespace
             r->dimensions = {2, 2, 2};
         return dynamic_cast<Target*>(g.server.HandleToObject(h));
     }
+    bool effects(const std::filesystem::path& root, bool retail = false)
+    {
+        GameSession g;
+        std::string error;
+        if (retail)
+        {
+            Config c;
+            c.data_dir = root;
+            CHECK(g.initialize() && g.resources.mount_game(c, error));
+        }
+        else
+            CHECK(test_flare::setup(g, root));
+        for (unsigned recipe : {6u, 8u})
+        {
+            CObjectParticleFX fx;
+            std::minstd_rand rng(17);
+            NodePose pose{{100, 20, 30}, {}};
+            CHECK(fx.Init(recipe, 1, rng, error) && fx.CreateObject(g.resources, pose, 0, error));
+            CHECK(fx.Update(0, &pose, rng) && fx.particles.empty());
+            pose.position.x += .01f; // No stream-density threshold for these recipes.
+            CHECK(fx.Update(.02, &pose, rng) && fx.emitted == (recipe == 6 ? 4 : 2));
+            const auto first = fx.particles.front();
+            CHECK(first.velocity.x >= (recipe == 6 ? 25 : 50) && first.velocity.x <= (recipe == 6 ? 50 : 75));
+            CHECK(first.velocity.y == 0 && first.velocity.z == 0); // Axes cached BEFORE random rotations.
+            CHECK(first.color.x == first.color.y && first.color.z == 0 && first.color.x >= 192.f / 255);
+            CHECK(first.lifetime >= .5f && first.lifetime <= .75f && fx.origin.x == 100);
+            CHECK(fx.Update(.2, &pose, rng) && !fx.moving && near(fx.duration, 1.2f));
+            pose.position.x = 999;
+            CHECK(fx.Update(1.075, &pose, rng) && near(fx.alpha, .5f) && near(fx.position.x, 100.01f));
+            CHECK(fx.Update(double(fx.duration), &pose, rng) && fx.alpha == 0);
+            CHECK(!fx.Update(double(fx.duration) + .01, &pose, rng) && fx.error.empty());
+            CHECK(fx.Init(recipe, 1, rng, error) && fx.CreateObject(g.resources, {}, 0, error));
+            CHECK(fx.Update(0, &pose, rng));
+            auto before = rng;
+            CHECK(!fx.Update(.02, &pose, rng, 1) && !fx.error.empty() && fx.particles.empty() && rng == before);
+        }
+        std::vector<ExplosionSpriteSettings> sprites;
+        std::vector<ExplosionLightSettings> lights;
+        std::vector<ExplosionRingSettings> rings;
+        std::string unavailable;
+        std::minstd_rand rng(1);
+        for (unsigned type : {13u, 14u, 15u})
+        {
+            CHECK(original_explosion_sprites(type, {}, {0, 2, 0}, sprites, unavailable, error));
+            CHECK(sprites.size() == (type == 15 ? 2 : 1));
+            CHECK(original_explosion_lights(type, {}, {0, 2, 0}, lights, error));
+            CHECK(lights.size() == (type == 13 ? 2 : 1) && lights[0].position.y == 10);
+            if (type == 13)
+            {
+                CHECK(lights[1].radius1 == 50 && lights[1].radius2 == 50 && lights[1].duration == 25);
+                CHECK(original_explosion_rings(type, {}, {0, 2, 0}, rng, rings, error));
+                CHECK(rings.size() == 1 && rings[0].position.y == 15 && rings[0].count == 8 &&
+                      rings[0].duration >= .5f && rings[0].duration <= 1 && rings[0].velocity == 50);
+            }
+            CHECK(g.server.explosion_sprites.publish(type, {}, {0, 1, 0}, "flare effects", g.sprites, 0, error) &&
+                  error.empty());
+            CHECK(g.server.explosion_lights.publish(type, {}, {0, 1, 0}, "flare effects", 0, error) && error.empty());
+        }
+        CHECK(g.server.explosion_rings.publish(13, {}, {0, 1, 0}, "fizzle", g.resources, 0, error) && error.empty());
+        auto* owner = test_energy::actor(g, {0, 50, -100});
+        CHECK(owner);
+        auto* primary = test_flare::projectile(g, owner->m_hObject, {0, 50, 0});
+        auto* secondary = test_flare::projectile<CFlareAltProjectile>(g, owner->m_hObject, {100, 50, 0});
+        auto* fragment = test_flare::projectile<CFlareBurstProjectile>(g, owner->m_hObject, {200, 50, 0});
+        CHECK(primary && secondary && fragment && fragment->SetColor({1, .25f, 0}));
+        CHECK(primary->trail && fragment->trail && primary->trail_error.empty() && fragment->trail_error.empty());
+        CHECK(g.server.object_particles.active.size() == 2); // Secondary parent deliberately has no trail.
+        const auto ph = primary->m_hObject, fh = fragment->m_hObject;
+        primary->Explode();
+        fragment->Explode();
+        CHECK(g.objects.finish_frame());
+        for (const auto& report : g.server.scene_explosions)
+            CHECK(report.sprite_event && report.light_event && report.sprite_error.empty() &&
+                  report.light_error.empty() && report.ring_error.empty() && !report.model_event &&
+                  !report.flame_event && !report.fragment_event);
+        CHECK(g.objects.remove(ph) && g.objects.remove(fh) && g.objects.finish_frame());
+        CHECK(g.server.object_particles.advance(.1, g.server) && g.server.object_particles.active.empty());
+        CHECK(g.unload_world() && g.server.explosion_sprites.active.empty() && g.server.explosion_rings.active.empty());
+        return true;
+    }
     bool primary(const std::filesystem::path& root)
     {
         GameSession g;
@@ -460,9 +540,17 @@ int main(int argc, char** argv)
     if (argc != 3)
         return 2;
     const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
-        {"primary", primary},   {"alternate", alternate},  {"lifetime", lifetime},
-        {"weapon", weapon},     {"collect", collect},      {"drop", drop},
-        {"failures", failures}, {"private", private_data}, {"ai", ai}};
+        {"effects", [](const auto& p) { return effects(p); }},
+        {"effects_private", [](const auto& p) { return effects(p, true); }},
+        {"primary", primary},
+        {"alternate", alternate},
+        {"lifetime", lifetime},
+        {"weapon", weapon},
+        {"collect", collect},
+        {"drop", drop},
+        {"failures", failures},
+        {"private", private_data},
+        {"ai", ai}};
     auto it = cases.find(argv[1]);
     return it != cases.end() && it->second(argv[2]) ? 0 : 1;
 }

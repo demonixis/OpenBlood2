@@ -8,6 +8,7 @@ accepted with open GPU reservation **M2-GPU-001**. M3 remains unaccepted.
 | Original-code imports and adaptations | [Provenance](provenance.md) |
 | Crypt / Bridge / Entrance / Lobby | [Contract](../contracts/later_levels_contracts.md) / [source ledger](sources/later_levels_sources.json) |
 | Per-world gaps and implementation batches | [Level gaps](level_gaps.md) |
+| Flare VFX (lot 5) | [Report](reports/flare_effects.md) / [contract](../contracts/flare_contracts.md#original-vfx-completion--lot-5-2026-10-25) / [source ledger](sources/flare_effect_sources.json) |
 | Shared ballistic VFX (lot 4) | [Report](reports/ballistic_effects.md) / [contract](../contracts/ballistic_effects_contracts.md) / [source ledger](sources/ballistic_effect_sources.json) |
 | Remaining original weapon/environment VFX (beta lot 3) | [Inventory](reports/vfx_inventory.md) / [source ledger](sources/vfx_inventory_sources.json); priorities live in the [roadmap](../roadmap.md#original-vfx-completion-beta-feedback-m37--m4). |
 | Dreamcast port study (exploratory, no milestone) | [Study](dreamcast_study.md) |

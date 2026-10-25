@@ -61,8 +61,8 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_ran
         return Init(type, owner, failure);
     failure.clear();
     *this = {};
-    if ((type != 3 && type != 18 && type != 19 && type != 36 && type != 21 && type != 24 && type != 31 && type != 32 &&
-         type != 33 && (type < 12 || type > 17)) ||
+    if ((type != 6 && type != 8 && type != 3 && type != 18 && type != 19 && type != 36 && type != 21 && type != 24 &&
+         type != 31 && type != 32 && type != 33 && (type < 12 || type > 17)) ||
         !owner)
     {
         failure = "Unsupported object particle recipe or absent parent";
@@ -70,6 +70,26 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_ran
     }
     recipe = type;
     parent = owner;
+    if (type == 6 || type == 8)
+    {
+        // Original OBJFX_SPARKS_1/3: filled sphere, MOVINGSOURCE but no MOVINGSTREAM.
+        radius = type == 6 ? 350.f : 400.f;
+        position_radius = 5;
+        gravity = -250;
+        ramp_down = .25f;
+        add_delay = .01f;
+        authored_count = type == 6 ? 4 : 2;
+        density = 2.5f;
+        requested_alpha = 1;
+        min_life = .5f;
+        max_life = .75f;
+        min_color = {192, 192, 0};
+        max_color = {255, 255, 0};
+        flags = 0x07;
+        texture = "SpriteTextures\\Lensflare32_1.dtx";
+        initialized_ = true;
+        return true;
+    }
     if (type == 3)
     {
         radius = 200;
@@ -316,19 +336,27 @@ bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t 
         auto right = rotate_vector(basis, {1, 0, 0});
         const auto forward = rotate_vector(basis, {0, 0, 1});
         around(basis, forward, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
-        if (recipe == 3 || recipe == 19 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32 || recipe == 33)
+        if (recipe == 6 || recipe == 8 || recipe == 3 || recipe == 19 || recipe == 21 || recipe == 24 || recipe == 31 ||
+            recipe == 32 || recipe == 33)
             around(basis, right, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
         right = vector_scale(right, 1 / std::sqrt(vector_dot(right, right)));
-        const float speed = draw(random, (recipe == 31 || recipe == 33) ? -5.f : 0.f,
-                                 (recipe == 31 || recipe == 33) ? 5.f
-                                 : recipe == 21 || recipe == 24 ? 25.f
+        const float speed = draw(random,
+                                 recipe == 6                      ? 25.f
+                                 : recipe == 8                    ? 50.f
+                                 : (recipe == 31 || recipe == 33) ? -5.f
+                                                                  : 0.f,
+                                 recipe == 6                      ? 50.f
+                                 : recipe == 8                    ? 75.f
+                                 : (recipe == 31 || recipe == 33) ? 5.f
+                                 : recipe == 21 || recipe == 24   ? 25.f
                                                                 : 0.f); // Original zero-speed draw still consumes RNG.
         float comet_distance = 0;
-        auto start = vector_scale(right, recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32 ||
-                                                 recipe == 33
+        auto start = vector_scale(right, recipe == 6 || recipe == 8 || recipe == 3 || recipe == 21 || recipe == 24 ||
+                                                 recipe == 31 || recipe == 32 || recipe == 33
                                              ? (comet_distance = draw(random, 0, position_radius))
                                              : position_radius);
-        if (recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32 || recipe == 33)
+        if (recipe == 6 || recipe == 8 || recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32 ||
+            recipe == 33)
             start = vector_add(
                 start, vector_add(vector_subtract(position, origin), vector_scale(step, float(i / authored_count))));
         const auto color = vector_scale(
@@ -375,14 +403,15 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
         if (duration < elapsed)
             return false;
     }
-    else if (recipe == 1 || recipe == 34 || recipe == 3 || recipe == 31 || recipe == 32 || recipe == 33)
+    else if (recipe == 6 || recipe == 8 || recipe == 1 || recipe == 34 || recipe == 3 || recipe == 31 || recipe == 32 ||
+             recipe == 33)
     {
         const auto difference = vector_subtract(owner->position, last_object_position);
         if (difference.x == 0 && difference.y == 0 && difference.z == 0)
         {
             moving = false;
-            duration = elapsed + max_life;
-        } // Zero ramp-down time; never resumes in single player.
+            duration = elapsed + max_life + ((recipe == 6 || recipe == 8) ? ramp_down : 0.f);
+        } // Never resumes in single player; only sparks request an alpha ramp.
         last_object_position = owner->position;
     }
     if (recipe == 1 || recipe == 34)
@@ -392,12 +421,13 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
         // ALIGNROTATION affects emission, not the fixed smoke system transform.
         source_rotation = owner->rotation;
     }
-    else if (recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32 || recipe == 33)
+    else if (recipe == 6 || recipe == 8 || recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 ||
+             recipe == 32 || recipe == 33)
     {
         if (moving)
             position = owner->position;
-        // Both recipes use MOVINGSOURCE; smoke also streams backward between samples.
-        // Neither recipe enables alpha ramp flags: authored alpha remains unused.
+        // MOVINGSOURCE keeps the system fixed; stream recipes interpolate backward.
+        // Only sparks enable the alpha ramp evaluated below.
     }
     else
     {
@@ -418,6 +448,13 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
             around(source_rotation, rotate_vector(source_rotation, {0, 0, 1}), rotations.z * std::numbers::pi_v<float>);
         system_rotation = source_rotation;
         ramping = elapsed >= duration - ramp_down;
+        ramp_ratio = ramping ? std::max(0.f, (duration - elapsed) / ramp_down) : 1.f;
+        if (ramping)
+            alpha = requested_alpha * ramp_ratio;
+    }
+    if (recipe == 6 || recipe == 8)
+    {
+        ramping = duration && elapsed >= duration - ramp_down;
         ramp_ratio = ramping ? std::max(0.f, (duration - elapsed) / ramp_down) : 1.f;
         if (ramping)
             alpha = requested_alpha * ramp_ratio;

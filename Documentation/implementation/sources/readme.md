@@ -57,3 +57,5 @@ Runtime test logs and measurements belong in the
 - [M2 acceptance](m2_acceptance_sources.json): original missing-zero sound selection, inspection provenance and stronger selected-session checks; no graphics-stack change.
 
 - [Crypt, Bridge, Entrance and Lobby sources](later_levels_sources.json): four original enemies, Minigun, particle systems and bounded authored-data adaptations.
+
+- [Flare effects](flare_effect_sources.json): lot 5, primary/fragment trails, fizzle/burst/fragment composites and original fixed emission origin.

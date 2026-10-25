@@ -23,11 +23,9 @@ namespace
         r.position = position;
         r.normal = normal;
         r.type = type;
-        r.model_event = g_pServerDE->PublishExplosionModels(owner, type, position, normal, r.model_error);
         r.sprite_event = g_pServerDE->PublishExplosionSprites(owner, type, position, normal, r.sprite_error);
-        r.ring_event = g_pServerDE->PublishExplosionRings(owner, type, position, normal, r.ring_error);
-        r.fragment_event = g_pServerDE->PublishExplosionFragments(owner, type, position, normal, r.fragment_error);
-        r.flame_event = g_pServerDE->PublishExplosionFlames(owner, type, position, normal, r.flame_error);
+        if (type == 13)
+            r.ring_event = g_pServerDE->PublishExplosionRings(owner, type, position, normal, r.ring_error);
         r.light_event = g_pServerDE->PublishExplosionLights(owner, type, position, normal, r.light_error);
         SoundRequest request;
         r.sound = request.resource = "Sounds\\Weapons\\flare\\impact.wav";
@@ -45,7 +43,7 @@ CFlareProjectile::CFlareProjectile()
     damage_type = DamageType::Fire;
     color_ready = choose_color(color);
     track_start = g_pServerDE->GetTime();
-    trail_error = "OBJFX_SPARKS_1 and owner light (radius 200) unavailable";
+    light_error = "Owner light (radius 200) illumination unavailable";
 }
 CFlareProjectile::~CFlareProjectile()
 {
@@ -59,7 +57,10 @@ void CFlareProjectile::StopSound()
 }
 bool CFlareProjectile::InitialUpdate()
 {
-    return color_ready && CProjectile::InitialUpdate() && g_pServerDE->ScaleObject(m_hObject, {});
+    if (!color_ready || !CProjectile::InitialUpdate() || !g_pServerDE->ScaleObject(m_hObject, {}))
+        return false;
+    trail = g_pServerDE->PublishObjectParticles(m_hObject, 6, trail_error);
+    return true;
 }
 bool CFlareProjectile::AdvanceFlight(double seconds)
 {
@@ -261,11 +262,14 @@ CFlareBurstProjectile::CFlareBurstProjectile()
     filename = "Sprites\\lensflare32.spr";
     skin = nullptr;
     m_damage.m_bGodMode = true;
-    trail_error = "OBJFX_SPARKS_3 and owner light (radius 75) unavailable";
+    light_error = "Owner light (radius 75) illumination unavailable";
 }
 bool CFlareBurstProjectile::InitialUpdate()
 {
-    return CProjectile::InitialUpdate() && g_pServerDE->ScaleObject(m_hObject, {});
+    if (!CProjectile::InitialUpdate() || !g_pServerDE->ScaleObject(m_hObject, {}))
+        return false;
+    trail = g_pServerDE->PublishObjectParticles(m_hObject, 8, trail_error);
+    return true;
 }
 bool CFlareBurstProjectile::SetColor(DVector value)
 {

@@ -13,6 +13,49 @@ using namespace OpenBlood2;
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)
+namespace
+{
+    bool render(Runtime& runtime, WorldRenderer& renderer, SpriteView& scene, DVector eye, DRotation camera,
+                Capture& capture, std::vector<std::uint8_t>& pixels, std::string& error)
+    {
+        if ((!capture.texture && !capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 480)) ||
+            !renderer.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 640, 480, error, true))
+            return false;
+        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
+        if (!commands)
+            return false;
+        if (!renderer.draw(commands, capture.texture, scene.mesh, scene.draws, eye, camera, false, error))
+        {
+            SDL_SubmitGPUCommandBuffer(commands);
+            return false;
+        }
+        auto* copy = SDL_BeginGPUCopyPass(commands);
+        if (!copy)
+        {
+            SDL_SubmitGPUCommandBuffer(commands);
+            return false;
+        }
+        SDL_GPUTextureRegion region{};
+        region.texture = capture.texture;
+        region.w = 640;
+        region.h = 480;
+        region.d = 1;
+        SDL_GPUTextureTransferInfo target{};
+        target.transfer_buffer = capture.transfer;
+        target.pixels_per_row = 640;
+        target.rows_per_layer = 480;
+        SDL_DownloadFromGPUTexture(copy, &region, &target);
+        SDL_EndGPUCopyPass(copy);
+        if (!SDL_SubmitGPUCommandBuffer(commands) || !SDL_WaitForGPUIdle(runtime.gpu))
+            return false;
+        auto* data = static_cast<const std::uint8_t*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
+        if (!data)
+            return false;
+        pixels.assign(data, data + 640 * 480 * 4);
+        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
+        return true;
+    }
+} // namespace
 int main(int argc, char** argv)
 {
     if (argc != 2 && argc != 3)
@@ -107,6 +150,62 @@ int main(int argc, char** argv)
     }
     CHECK(game.objects.remove(h) && game.objects.finish_frame());
     CHECK(update_sprite_scene(game, scene, error) && scene.entries.empty());
+    // Exercise the real scene assembly, texture decode and GPU path for both trails and all three impacts.
+    game.server.object_particles.clear();
+    CameraView camera;
+    camera.position = {0, 50, 0};
+    for (unsigned recipe : {6u, 8u, 13u, 14u, 15u})
+    {
+        game.server.object_particles.clear();
+        game.server.explosion_sprites.clear();
+        game.server.explosion_rings.clear();
+        if (recipe < 13)
+        {
+            CObjectParticleFX fx;
+            std::minstd_rand random(1);
+            NodePose pose{{-20, 50, 50}, {}};
+            CHECK(fx.Init(recipe, recipe, random, error) && fx.CreateObject(game.resources, pose, 0, error));
+            CHECK(fx.Update(0, &pose, random));
+            pose.position.x = 0;
+            CHECK(fx.Update(.02, &pose, random));
+            const auto expected = vector_add(fx.origin, fx.particles.front().position);
+            game.server.object_particles.active.push_back({owner->m_hObject, std::move(fx)});
+            CHECK(update_sprite_scene(game, scene, error, &camera));
+            // A moved source must not apply its displacement a second time in scene assembly.
+            const auto draw = std::find_if(scene.draws.begin(), scene.draws.end(),
+                                           [&](const auto& d) { return d.range == scene.entries.front().range; });
+            CHECK(draw != scene.draws.end() && std::abs(draw->position.x - expected.x) < .01f);
+        }
+        else
+        {
+            CHECK(game.server.explosion_sprites.publish(recipe, {0, 50, 100}, {0, 0, -1}, "flare GPU", game.sprites, 0,
+                                                        error) &&
+                  error.empty());
+            CHECK(game.server.explosion_sprites.advance(.1));
+            if (recipe == 13)
+            {
+                CHECK(game.server.explosion_rings.publish(recipe, {0, 50, 100}, {0, 0, -1}, "fizzle GPU",
+                                                          game.resources, 0, error) &&
+                      error.empty());
+                CHECK(game.server.explosion_rings.advance(.1));
+            }
+            CHECK(update_sprite_scene(game, scene, error, &camera));
+        }
+        CHECK(!scene.draws.empty());
+        for (const auto& entry : scene.entries)
+            CHECK(entry.error.empty());
+        Capture capture;
+        std::vector<std::uint8_t> pixels;
+        CHECK(render(runtime, renderer, scene, camera.position, {}, capture, pixels, error));
+        unsigned ink = 0;
+        for (unsigned i = 0; i < 640 * 480; ++i)
+            if (pixels[i * 4] != 6 || pixels[i * 4 + 1] != 9 || pixels[i * 4 + 2] != 13)
+                ++ink;
+        CHECK(ink > 0 && ink < 640 * 480);
+        CHECK(capture.save((std::filesystem::path(argv[1]) / ("effect-" + std::to_string(recipe) + ".png")).c_str()));
+        std::cout << "Flare effect " << recipe << ": " << scene.draws.size() << " draws, " << ink
+                  << " covered pixels\n";
+    }
     renderer.clear_geometry();
     CHECK(game.unload_world());
     return 0;

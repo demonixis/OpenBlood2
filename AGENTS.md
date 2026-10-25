@@ -39,6 +39,12 @@ normal, stay stationary for a strict .1 seconds and use three gradient hardware 
 The shared engine line renderer keeps XR defaults and masks translucent depth/reflection
 writes while attenuating glow/AO. Regenerate all 72 shader artifacts together.
 
+The [flare VFX lot 5](Documentation/contracts/flare_contracts.md#original-vfx-completion--lot-5-2026-10-25)
+connects primary/fragment sparks and composites 13–15. Preserve the disabled alternate
+parent trail, fixed MOVINGSOURCE creation origin, stop duration including .25 s ramp,
+source FRAG-before-BURST order and one trail per restored owner. Owner-light illumination
+remains unavailable; original high-detail recipes do not certify raster parity.
+
 ## Commit attribution
 
 Commits and pull requests carry only the user's identity (demonixis). Never add

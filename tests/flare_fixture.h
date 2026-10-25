@@ -7,6 +7,12 @@ namespace test_flare
     using namespace OpenBlood2;
     inline bool mount(GameSession& g, const std::filesystem::path& root)
     {
+        std::string error;
+        if (!test_naga::mount(g.resources, root, error))
+            return false;
+        std::vector<std::uint8_t> texture;
+        if (!g.resources.read("alpha.dtx", texture, error))
+            return false;
         test_player::Directory dir;
         test_model::Writer sprite;
         for (auto n : {1u, 15u, 1u, 1u, 0u})
@@ -14,7 +20,10 @@ namespace test_flare
         std::string frame = "alpha.dtx";
         sprite.u16(frame.size());
         sprite.b.insert(sprite.b.end(), frame.begin(), frame.end());
-        dir.children["sprites"].files["lensflare32.spr"] = sprite.b;
+        for (auto name : {"lensflare32.spr", "smokepuff2.spr", "debrisimp.spr", "explodesmall.spr"})
+            dir.children["sprites"].files[name] = sprite.b;
+        for (auto name : {"lensflare32_1.dtx", "lensflare_1.dtx"})
+            dir.children["spritetextures"].files[name] = texture;
         for (auto name : {"flarepistol_pv.abc", "lh_flarepistol_pv.abc"})
             dir.children["models"].children["weapons"].files[name] = test_model::abc(true).b;
         dir.children["models"].children["powerups"].files["flarepistol_pu.abc"] = test_model::abc(true).b;
@@ -35,8 +44,7 @@ namespace test_flare
         std::ofstream out(file, std::ios::binary);
         out.write(reinterpret_cast<const char*>(w.b.data()), w.b.size());
         out.close();
-        std::string error;
-        return test_naga::mount(g.resources, root, error) && g.resources.mount(file, error);
+        return g.resources.mount(file, error);
     }
     inline bool setup(GameSession& g, const std::filesystem::path& root)
     {

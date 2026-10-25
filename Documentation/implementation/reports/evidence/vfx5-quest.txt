@@ -1,0 +1,262 @@
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+-- Could NOT find LibUSB (missing: LibUSB_LIBRARY LibUSB_INCLUDE_PATH) (found version "LibUSB_VERSION-NOTFOUND")
+-- 
+-- SDL3 was configured with the following options:
+-- 
+-- Platform: Android-1
+-- 64-bit:   TRUE
+-- Compiler: /opt/homebrew/share/android-commandlinetools/ndk/29.0.14206865/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang
+-- Revision: SDL-3.5.0-v0.3.1-11-gf49815f8
+-- Vendor:   
+-- 
+-- Subsystems:
+--   Audio:        ON
+--   Video:        ON
+--   GPU:          ON
+--   Render:       OFF
+--   Camera:       OFF
+--   Joystick:     ON
+--   Haptic:       ON
+--   Hidapi:       ON
+--   Power:        ON
+--   Sensor:       ON
+--   Dialog:       OFF
+--   Tray:         OFF
+--   Notification: OFF
+-- 
+-- Options:
+--   SDL_ALSA                    (Wanted: OFF): OFF
+--   SDL_ALSA_SHARED             (Wanted: OFF): OFF
+--   SDL_ALTIVEC                 (Wanted: OFF): OFF
+--   SDL_ARMNEON                 (Wanted: ON): ON
+--   SDL_ARMSVE2                 (Wanted: ON): ON
+--   SDL_ASAN                    (Wanted: OFF): OFF
+--   SDL_ASSEMBLY                (Wanted: ON): ON
+--   SDL_ASSERTIONS              (Wanted: auto): auto
+--   SDL_AVX                     (Wanted: OFF): OFF
+--   SDL_AVX2                    (Wanted: OFF): OFF
+--   SDL_AVX512F                 (Wanted: OFF): OFF
+--   SDL_BACKGROUNDING_SIGNAL    (Wanted: OFF): OFF
+--   SDL_CCACHE                  (Wanted: OFF): OFF
+--   SDL_CLANG_TIDY              (Wanted: OFF): OFF
+--   SDL_CLOCK_GETTIME           (Wanted: ON): ON
+--   SDL_COCOA                   (Wanted: OFF): OFF
+--   SDL_DBUS                    (Wanted: OFF): OFF
+--   SDL_DEPS_SHARED             (Wanted: ON): OFF
+--   SDL_DIRECTX                 (Wanted: OFF): OFF
+--   SDL_DISKAUDIO               (Wanted: OFF): OFF
+--   SDL_DLOPEN_NOTES            (Wanted: OFF): OFF
+--   SDL_DUMMYAUDIO              (Wanted: ON): ON
+--   SDL_DUMMYCAMERA             (Wanted: OFF): OFF
+--   SDL_DUMMYVIDEO              (Wanted: ON): ON
+--   SDL_EXAMPLES                (Wanted: OFF): OFF
+--   SDL_EXAMPLES_LINK_SHARED    (Wanted: OFF): OFF
+--   SDL_FOREGROUNDING_SIGNAL    (Wanted: OFF): OFF
+--   SDL_FRIBIDI                 (Wanted: OFF): OFF
+--   SDL_FRIBIDI_SHARED          (Wanted: OFF): OFF
+--   SDL_GCC_ATOMICS             (Wanted: ON): ON
+--   SDL_GPU_OPENXR              (Wanted: ON): ON
+--   SDL_HIDAPI                  (Wanted: ON): ON
+--   SDL_HIDAPI_JOYSTICK         (Wanted: ON): ON
+--   SDL_HIDAPI_LIBUSB           (Wanted: ON): OFF
+--   SDL_HIDAPI_LIBUSB_SHARED    (Wanted: ON): OFF
+--   SDL_IBUS                    (Wanted: OFF): OFF
+--   SDL_INSTALL                 (Wanted: OFF): OFF
+--   SDL_INSTALL_TESTS           (Wanted: OFF): OFF
+--   SDL_JACK                    (Wanted: OFF): OFF
+--   SDL_JACK_SHARED             (Wanted: OFF): OFF
+--   SDL_KMSDRM                  (Wanted: OFF): OFF
+--   SDL_KMSDRM_SHARED           (Wanted: OFF): OFF
+--   SDL_LASX                    (Wanted: OFF): OFF
+--   SDL_LEAN_AND_MEAN           (Wanted: OFF): OFF
+--   SDL_LIBC                    (Wanted: ON): ON
+--   SDL_LIBICONV                (Wanted: OFF): OFF
+--   SDL_LIBTHAI                 (Wanted: OFF): OFF
+--   SDL_LIBTHAI_SHARED          (Wanted: OFF): OFF
+--   SDL_LIBUDEV                 (Wanted: OFF): OFF
+--   SDL_LIBUDEV_SHARED          (Wanted: OFF): OFF
+--   SDL_LIBURING                (Wanted: OFF): OFF
+--   SDL_LSX                     (Wanted: OFF): OFF
+--   SDL_METAL                   (Wanted: OFF): OFF
+--   SDL_MMX                     (Wanted: OFF): OFF
+--   SDL_OFFSCREEN               (Wanted: ON): ON
+--   SDL_OPENGL                  (Wanted: ON): OFF
+--   SDL_OPENGLES                (Wanted: ON): ON
+--   SDL_OPENVR                  (Wanted: OFF): OFF
+--   SDL_OSS                     (Wanted: OFF): OFF
+--   SDL_PIPEWIRE                (Wanted: OFF): OFF
+--   SDL_PIPEWIRE_SHARED         (Wanted: OFF): OFF
+--   SDL_PTHREADS                (Wanted: ON): ON
+--   SDL_PTHREADS_SEM            (Wanted: ON): ON
+--   SDL_PULSEAUDIO              (Wanted: OFF): OFF
+--   SDL_PULSEAUDIO_SHARED       (Wanted: OFF): OFF
+--   SDL_RENDER_D3D              (Wanted: OFF): OFF
+--   SDL_RENDER_D3D11            (Wanted: OFF): OFF
+--   SDL_RENDER_D3D12            (Wanted: OFF): OFF
+--   SDL_RENDER_GPU              (Wanted: OFF): OFF
+--   SDL_RENDER_METAL            (Wanted: OFF): OFF
+--   SDL_RENDER_VULKAN           (Wanted: OFF): OFF
+--   SDL_ROCKCHIP                (Wanted: OFF): OFF
+--   SDL_RPATH                   (Wanted: OFF): OFF
+--   SDL_RPI                     (Wanted: OFF): OFF
+--   SDL_SNDIO                   (Wanted: OFF): OFF
+--   SDL_SNDIO_SHARED            (Wanted: OFF): OFF
+--   SDL_SSE                     (Wanted: OFF): OFF
+--   SDL_SSE2                    (Wanted: OFF): OFF
+--   SDL_SSE3                    (Wanted: OFF): OFF
+--   SDL_SSE4_1                  (Wanted: OFF): OFF
+--   SDL_SSE4_2                  (Wanted: OFF): OFF
+--   SDL_SYSTEM_ICONV            (Wanted: ON): ON
+--   SDL_TESTS                   (Wanted: OFF): OFF
+--   SDL_TESTS_LINK_SHARED       (Wanted: OFF): OFF
+--   SDL_UNINSTALL               (Wanted: OFF): OFF
+--   SDL_VIRTUAL_JOYSTICK        (Wanted: ON): ON
+--   SDL_VIVANTE                 (Wanted: OFF): OFF
+--   SDL_VULKAN                  (Wanted: ON): ON
+--   SDL_WASAPI                  (Wanted: OFF): OFF
+--   SDL_WAYLAND                 (Wanted: OFF): OFF
+--   SDL_WAYLAND_LIBDECOR        (Wanted: OFF): OFF
+--   SDL_WAYLAND_LIBDECOR_SHARED (Wanted: OFF): OFF
+--   SDL_WAYLAND_SHARED          (Wanted: OFF): OFF
+--   SDL_X11                     (Wanted: OFF): OFF
+--   SDL_X11_SHARED              (Wanted: OFF): OFF
+--   SDL_X11_XCURSOR             (Wanted: OFF): OFF
+--   SDL_X11_XDBE                (Wanted: OFF): OFF
+--   SDL_X11_XFIXES              (Wanted: OFF): OFF
+--   SDL_X11_XINPUT              (Wanted: OFF): OFF
+--   SDL_X11_XRANDR              (Wanted: OFF): OFF
+--   SDL_X11_XSCRNSAVER          (Wanted: OFF): OFF
+--   SDL_X11_XSHAPE              (Wanted: OFF): OFF
+--   SDL_X11_XSYNC               (Wanted: OFF): OFF
+--   SDL_X11_XTEST               (Wanted: OFF): OFF
+--   SDL_XINPUT                  (Wanted: OFF): OFF
+-- 
+--  Build Shared Library: OFF
+--  Build Static Library: ON
+-- 
+-- Enabled backends:
+--   Video drivers: android dummy offscreen
+--   Render drivers: ogl_es ogl_es2
+--   GPU drivers: openxr vulkan
+--   Audio drivers: aaudio dummy opensles
+--   Joystick drivers: android hidapi virtual
+--   Camera drivers: dummy
+-- 
+-- If something was not detected, although the libraries
+-- were installed, then make sure you have set the
+-- CMAKE_C_FLAGS and CMAKE_PREFIX_PATH CMake variables correctly.
+-- 
+-- Build spdlog: 1.15.3
+-- Build type: RelWithDebInfo
+-- Configuring done (0.3s)
+-- Generating done (0.1s)
+-- Build files have been written to: /Users/yann/projects/lithtech/openblood2/build/quest
+[0/4] Re-checking globbed directories...
+[1/395] Generating CXX dyndep file _deps/sdl3-build/CMakeFiles/SDL3-static.dir/CXX.dd
+[2/394] Generating CXX dyndep file CMakeFiles/blood2_startup.dir/CXX.dd
+[3/390] Scanning /Users/yann/projects/lithtech/openblood2/src/engine/runtime.cpp for CXX dependencies
+[4/390] Scanning /Users/yann/projects/lithtech/openblood2/src/game/original/Projectile.cpp for CXX dependencies
+[5/390] Scanning /Users/yann/projects/lithtech/openblood2/src/game/original/FlareProjectile.cpp for CXX dependencies
+[6/390] Scanning /Users/yann/projects/lithtech/openblood2/src/game/object_particles.cpp for CXX dependencies
+[7/390] Scanning /Users/yann/projects/lithtech/openblood2/src/engine/logging.cpp for CXX dependencies
+[8/390] Scanning /Users/yann/projects/lithtech/openblood2/src/game/original/ObjectParticleFX.cpp for CXX dependencies
+[9/390] Scanning /Users/yann/projects/lithtech/openblood2/src/game/explosion_rings.cpp for CXX dependencies
+[10/390] Scanning /Users/yann/projects/lithtech/openblood2/src/engine/xr/xr_runtime.cpp for CXX dependencies
+[11/390] Generating CXX dyndep file CMakeFiles/imgui.dir/CXX.dd
+[12/383] Generating CXX dyndep file CMakeFiles/engine.dir/CXX.dd
+[13/322] Scanning /Users/yann/projects/lithtech/openblood2/src/game/explosion_lights.cpp for CXX dependencies
+[14/322] Scanning /Users/yann/projects/lithtech/openblood2/src/game/explosion_sprites.cpp for CXX dependencies
+[15/322] Scanning /Users/yann/projects/lithtech/openblood2/src/game/original/ProjectileSave.cpp for CXX dependencies
+[16/322] Scanning /Users/yann/projects/lithtech/openblood2/src/game/save_slots.cpp for CXX dependencies
+[17/322] Scanning /Users/yann/projects/lithtech/openblood2/src/app/ui_runtime.cpp for CXX dependencies
+[18/322] Scanning /Users/yann/projects/lithtech/openblood2/src/game/registration.cpp for CXX dependencies
+[19/322] Generating CXX dyndep file CMakeFiles/blood2_game.dir/CXX.dd
+[20/81] Scanning /Users/yann/projects/lithtech/openblood2/src/app/sprite_scene.cpp for CXX dependencies
+[21/81] Scanning /Users/yann/projects/lithtech/openblood2/src/app/setup_screen.cpp for CXX dependencies
+[22/81] Building C object _deps/sdl3-build/CMakeFiles/SDL3-static.dir/src/SDL.c.o
+[23/81] Scanning /Users/yann/projects/lithtech/openblood2/src/app/main.cpp for CXX dependencies
+[24/81] Scanning /Users/yann/projects/lithtech/openblood2/src/app/xr_scene.cpp for CXX dependencies
+[25/81] Linking CXX static library _deps/sdl3-build/libSDL3.a
+[26/81] Building CXX object CMakeFiles/engine.dir/src/engine/runtime.cpp.o
+[27/81] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/FlareProjectile.cpp.o
+[28/81] Building CXX object CMakeFiles/blood2_game.dir/src/game/object_particles.cpp.o
+[29/81] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/Projectile.cpp.o
+[30/81] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ObjectParticleFX.cpp.o
+[31/81] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_lights.cpp.o
+[32/81] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[33/51] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_rings.cpp.o
+[34/51] Building CXX object CMakeFiles/engine.dir/src/engine/logging.cpp.o
+[35/51] Building CXX object CMakeFiles/engine.dir/src/engine/xr/xr_runtime.cpp.o
+[36/51] Linking CXX static library libengine.a
+[37/51] Building CXX object CMakeFiles/blood2_app.dir/src/app/ui_runtime.cpp.o
+[38/51] Building CXX object CMakeFiles/blood2_game.dir/src/game/original/ProjectileSave.cpp.o
+[39/51] Building CXX object CMakeFiles/blood2_game.dir/src/game/explosion_sprites.cpp.o
+[40/51] Building CXX object CMakeFiles/blood2_app.dir/src/app/xr_scene.cpp.o
+[41/51] Building CXX object CMakeFiles/blood2_app.dir/src/app/sprite_scene.cpp.o
+[42/51] Building CXX object CMakeFiles/blood2_app.dir/src/app/setup_screen.cpp.o
+/Users/yann/projects/lithtech/openblood2/src/app/setup_screen.cpp:268:55: warning: unused parameter 'window' [-Wunused-parameter]
+  268 |     SetupScreen::Result SetupScreen::draw(SDL_Window* window)
+      |                                                       ^
+1 warning generated.
+[43/51] Building CXX object CMakeFiles/blood2_game.dir/src/game/save_slots.cpp.o
+[44/51] Building CXX object CMakeFiles/blood2_app.dir/src/app/main.cpp.o
+[45/51] Building CXX object CMakeFiles/blood2_game.dir/src/game/registration.cpp.o
+[46/51] Linking CXX static library libblood2_game.a
+[47/51] Linking CXX shared library libmain.so
+[47/51] Assembling the quest Debug APK
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.6.0/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :app
+WARNING: The option setting 'android.useAndroidX=false' is deprecated.
+The current default is 'true'.
+It will be removed in version 10.0 of the Android Gradle plugin.
+Add android.sync.suppressAgpWarnings=UNSUPPORTED_PROJECT_OPTION_USE to the gradle.properties file to suppress this warning.
+
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preQuestDebugBuild UP-TO-DATE
+> Task :app:mergeQuestDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateQuestDebugResources UP-TO-DATE
+> Task :app:packageQuestDebugResources UP-TO-DATE
+> Task :app:processQuestDebugNavigationResources UP-TO-DATE
+> Task :app:parseQuestDebugLocalResources UP-TO-DATE
+> Task :app:generateQuestDebugRFile UP-TO-DATE
+> Task :app:compileQuestDebugKotlin NO-SOURCE
+> Task :app:javaPreCompileQuestDebug UP-TO-DATE
+> Task :app:compileQuestDebugJavaWithJavac UP-TO-DATE
+> Task :app:generateQuestDebugAssets UP-TO-DATE
+> Task :app:mergeQuestDebugAssets UP-TO-DATE
+> Task :app:compressQuestDebugAssets UP-TO-DATE
+> Task :app:generateQuestDebugGlobalSynthetics UP-TO-DATE
+> Task :app:checkQuestDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarQuestDebugFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexQuestDebug UP-TO-DATE
+> Task :app:mergeLibDexQuestDebug UP-TO-DATE
+> Task :app:checkQuestDebugAarMetadata UP-TO-DATE
+> Task :app:mapQuestDebugSourceSetPaths UP-TO-DATE
+> Task :app:compileQuestDebugNavigationResources UP-TO-DATE
+> Task :app:mergeQuestDebugResources UP-TO-DATE
+> Task :app:createQuestDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksQuestDebug UP-TO-DATE
+> Task :app:processQuestDebugMainManifest UP-TO-DATE
+> Task :app:processQuestDebugManifest UP-TO-DATE
+> Task :app:processQuestDebugManifestForPackage UP-TO-DATE
+> Task :app:processQuestDebugResources UP-TO-DATE
+> Task :app:dexBuilderQuestDebug UP-TO-DATE
+> Task :app:mergeProjectDexQuestDebug UP-TO-DATE
+> Task :app:processQuestDebugJavaRes NO-SOURCE
+> Task :app:mergeQuestDebugJavaResource UP-TO-DATE
+> Task :app:mergeQuestDebugJniLibFolders
+> Task :app:validateSigningQuestDebug UP-TO-DATE
+> Task :app:writeQuestDebugAppMetadata UP-TO-DATE
+> Task :app:writeQuestDebugSigningConfigVersions UP-TO-DATE
+> Task :app:mergeQuestDebugNativeLibs
+> Task :app:stripQuestDebugDebugSymbols
+> Task :app:packageQuestDebug
+> Task :app:createQuestDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleQuestDebug
+
+BUILD SUCCESSFUL in 6s
+35 actionable tasks: 4 executed, 31 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.6.0/userguide/configuration_cache_enabling.html

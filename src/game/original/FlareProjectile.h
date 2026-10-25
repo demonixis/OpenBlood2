@@ -6,6 +6,8 @@ class CFlareProjectile final : public CProjectile
   public:
     CFlareProjectile();
     ~CFlareProjectile() override;
+    std::uint64_t trail = 0;
+    std::string light_error;
     bool AdvanceFlight(double) override;
     void HandleContact(const OpenBlood2::SegmentHit&) override;
     DVector color{}, offset{};
@@ -20,6 +22,7 @@ class CFlareProjectile final : public CProjectile
     bool Update() override;
     void AddExplosion(DVector, DVector) override;
     void StopSound();
+    std::string LoadBlock(const ProjectileBlock&) override;
 };
 class CFlareAltProjectile final : public CProjectile
 {
@@ -39,6 +42,8 @@ class CFlareBurstProjectile final : public CProjectile
 {
   public:
     CFlareBurstProjectile();
+    std::uint64_t trail = 0;
+    std::string light_error;
     DVector color{};
     bool color_ready = false;
     bool SetColor(DVector);

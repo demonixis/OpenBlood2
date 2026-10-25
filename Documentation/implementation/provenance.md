@@ -2078,3 +2078,12 @@ bounded client pools and collision/render adaptations; [hashes](sources/ballisti
 pin the donors. The previous 68 shader artifacts remain unchanged after full regeneration;
 four new line auxiliary artifacts preserve glow/AO and reflection contracts. No asset
 import, new dependency, saved class or milestone acceptance.
+
+## Flare VFX (2026-10-25)
+
+[Source ledger](sources/flare_effect_sources.json), [contract](../contracts/flare_contracts.md#original-vfx-completion--lot-5-2026-10-25)
+and [verification](reports/flare_effects.md). Ports original high-detail sparks recipes
+6/8 and explosion composites 13–15 into the existing stores. Preserves the disabled
+alternate-parent trail, stop/ramp behavior and FRAG-before-BURST selection. Corrects
+MOVINGSOURCE scene translation for shared bound effects; no source/art edits or new
+save bytes. Owner-light illumination stays unavailable.

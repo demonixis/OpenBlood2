@@ -317,6 +317,12 @@ std::string CSkullProjectile::LoadBlock(const ProjectileBlock& b)
     g_pServerDE->PublishObjectParticles(m_hObject, 3, trail_error);
     return {};
 }
+std::string CFlareProjectile::LoadBlock(const ProjectileBlock& b)
+{
+    CProjectile::LoadBlock(b);
+    trail = g_pServerDE->PublishObjectParticles(m_hObject, 6, trail_error);
+    return {};
+}
 std::string CFlareBurstProjectile::LoadBlock(const ProjectileBlock& b)
 {
     // The original leaves m_vColor uninitialized on a restore; the port keeps the engine colour
@@ -324,5 +330,6 @@ std::string CFlareBurstProjectile::LoadBlock(const ProjectileBlock& b)
     CProjectile::LoadBlock(b);
     float alpha = 1;
     color_ready = g_pServerDE->GetObjectColor(m_hObject, color, alpha);
+    trail = g_pServerDE->PublishObjectParticles(m_hObject, 8, trail_error);
     return {};
 }

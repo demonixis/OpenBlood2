@@ -537,7 +537,13 @@ namespace
         }
         // A flare fragment keeps the colour its last update set (the original reads it unset).
         auto* fragment = named<CFlareBurstProjectile>(h, "burst");
-        CHECK(fragment && fragment->color_ready && fragment->color.y == .25f);
+        CHECK(fragment && fragment->color_ready && fragment->color.y == .25f && fragment->trail &&
+              fragment->trail_error.empty());
+        auto* flare = named<CFlareProjectile>(h, "CFlareProjectile");
+        CHECK(flare && flare->trail && flare->trail_error.empty());
+        for (auto* p : {static_cast<CProjectile*>(fragment), static_cast<CProjectile*>(flare)})
+            CHECK(std::count_if(h.server.object_particles.active.begin(), h.server.object_particles.active.end(),
+                                [&](const auto& fx) { return fx.owner == p->m_hObject; }) == 1);
         GameSave again;
         CHECK(save(h, again));
         CHECK(same_records(saved, again, "family re-save"));
