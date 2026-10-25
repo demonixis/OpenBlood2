@@ -27,10 +27,12 @@ namespace
     {
         // Deliberately narrow source-format guard, not a C++ parser. A declaration
         // syntax change must update this guard, never silently omit a service.
+        // Parameters may use an empty braced default (PublishObjectParticles).
         const auto header = read(root / "src/game/legacy/server_de.h");
         CHECK(!header.empty());
         std::set<std::string> declared, listed, traced;
-        for (const auto& pattern : {R"(virtual\s+[^;{}]*?\b(\w+)\s*\([^;{}]*?\)\s*=\s*0;)", R"(\(\*(\w+)\))"})
+        for (const auto& pattern :
+             {R"(virtual\s+[^;{}]*?\b(\w+)\s*\((?:[^;{}]|\{\s*\})*?\)\s*=\s*0;)", R"(\(\*(\w+)\))"})
         {
             std::regex expression(pattern);
             for (std::sregex_iterator i(header.begin(), header.end(), expression), end; i != end; ++i)

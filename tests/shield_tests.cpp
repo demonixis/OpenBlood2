@@ -127,7 +127,7 @@ namespace
         auto h = g.objects.create(g.objects.find_class("BaseClass"));
         CHECK(h);
         CHECK(!g.server.PublishObjectParticles(nullptr, 19, error) && !error.empty());
-        CHECK(!g.server.PublishObjectParticles(h, 1, error) && !error.empty());
+        CHECK(!g.server.PublishObjectParticles(h, std::numeric_limits<unsigned>::max(), error) && !error.empty());
         auto& manager = g.server.object_particles;
         for (unsigned i = 0; i < 128; ++i)
             CHECK(g.server.PublishObjectParticles(h, 19, error));

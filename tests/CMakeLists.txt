@@ -3359,7 +3359,7 @@ if(BLOOD2_GPU_TESTS)
 endif()
 
 add_executable(effect_light_selection_tests effect_light_selection_tests.cpp)
-target_link_libraries(effect_light_selection_tests PRIVATE engine)
+target_link_libraries(effect_light_selection_tests PRIVATE blood2_game)
 blood2_project_options(effect_light_selection_tests)
 add_test(NAME scene_effects.selection COMMAND effect_light_selection_tests)
 set_tests_properties(scene_effects.selection PROPERTIES LABELS "headless;effects")

@@ -103,3 +103,13 @@ ctest --preset ci-release
 
 On Windows, use an x64 Visual Studio developer shell. The CI presets use
 `build/ci/` and leave ordinary development presets and private data paths alone.
+
+The VFX test corrections for [run 40209369654](https://github.com/demonixis/OpenBlood2/actions/runs/40209369654)
+retain the complete test selection: `shield.failures` rejects an invalid recipe ID
+(recipe 1 is now implemented), `coverage.catalog` recognizes empty braced parameter
+defaults, and `effect_light_selection_tests` links `blood2_game` for the legacy
+`BaseClass` callbacks required by GCC. No test is disabled and game behavior is unchanged.
+Local validation (2026-10-25): rebuilt the macOS Release targets; all 1,029 tests
+passed with `ctest --test-dir build/release -L headless -LE 'gpu|private'
+--no-tests=error --timeout 120 --parallel 2 --output-on-failure` (47.70 s).
+The corrected Linux link still needs confirmation on the GCC runner.
