@@ -32,6 +32,22 @@ namespace OpenBlood2
             output = std::move(s);
             return true;
         }
+        if (type == 7)
+        {
+            ExplosionModelSettings s;
+            s.position = position;
+            s.normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
+            s.scale1 = {20, 20, 20};
+            s.scale2 = {100, 100, 100};
+            s.duration = .5f;
+            s.alpha = .99f;
+            s.waveform = 1;
+            s.fade = 1;
+            s.random_rotation = 1;
+            s.skin = "Skins\\Explosions\\eballsmall.dtx";
+            output = std::move(s);
+            return true;
+        }
         if (type == 20)
         {
             ExplosionModelSettings s;

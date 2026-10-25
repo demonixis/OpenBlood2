@@ -207,7 +207,8 @@ namespace
             if (state == AI_Mgr::StateAttackClose)
             {
                 auto* lightning = dynamic_cast<CDrudgeLightning*>(gun);
-                CHECK(lightning && gun->last_shot.result == FireResult::Fired && !lightning->effect_error.empty());
+                CHECK(lightning && gun->last_shot.result == FireResult::Fired && lightning->lightning &&
+                      lightning->effect_error.empty());
             }
             else
                 CHECK(gun->data.m_nType == WEAP_DRUDGE_FIREBALL && gun->projectile);

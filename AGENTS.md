@@ -45,6 +45,12 @@ parent trail, fixed MOVINGSOURCE creation origin, stop duration including .25 s 
 source FRAG-before-BURST order and one trail per restored owner. Owner-light illumination
 remains unavailable; original high-detail recipes do not certify raster parity.
 
+The [Tesla/Drudge VFX lot 6](Documentation/contracts/tesla_contracts.md#original-vfx-completion--lot-6-2026-10-25)
+adds impact 7 and actual alternate/ball/Drudge lightning. Preserve independent visual
+and damage rays, thin-to-thin weapon beams versus wide-to-thin ball arcs, detached
+lifetime, no gameplay suppression on cosmetic failure and the source alternate counter.
+Impact 7 also serves EnergyBlast; illumination and remaining enemy trails stay separate.
+
 ## Commit attribution
 
 Commits and pull requests carry only the user's identity (demonixis). Never add

@@ -1,0 +1,20 @@
+tesla_tests weapon
+later_level_tests priest
+lightning_tests formulas
+lightning_tests emitter
+Authored thunder resource present: 0
+lightning_tests catalog
+20_powerstation KABOOM effect=1 sound=Sounds\Thunder.wav error=Missing or oversized sound resource
+21_laboratory lightning2 effect=3 sound=Sounds\Events\zap3.wav error=
+24b_arena Lightning1 effect=4 sound=Sounds\Ambient\Lightning2.wav error=
+24b_arena Lightning1 effect=5 sound=Sounds\Ambient\Lightning2.wav error=
+24b_arena Lightning1 effect=6 sound=Sounds\Ambient\Lightning2.wav error=
+25_ancientone Lightning1 effect=7 sound=Sounds\Thunder.wav error=Missing or oversized sound resource
+25_ancientone Lightning2 effect=8 sound=Sounds\Thunder.wav error=Missing or oversized sound resource
+25_ancientone Lightning3 effect=9 sound=Sounds\Thunder.wav error=Missing or oversized sound resource
+25_ancientone Lightning4 effect=10 sound=Sounds\Thunder.wav error=Missing or oversized sound resource
+25_ancientone Lightning5 effect=11 sound=Sounds\Thunder.wav error=Missing or oversized sound resource
+energy_tests private
+Private loop 0: SPR SpriteTextures\yellowflare2.dtx, primary and Tesla impact WAV, radius deliveries 7, isolated rehearsal retains projectile.
+Private loop 1: SPR SpriteTextures\yellowflare2.dtx, primary and Tesla impact WAV, radius deliveries 7, isolated rehearsal retains projectile.
+Private loop 2: SPR SpriteTextures\yellowflare2.dtx, primary and Tesla impact WAV, radius deliveries 7, isolated rehearsal retains projectile.

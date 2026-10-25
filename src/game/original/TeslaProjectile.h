@@ -62,7 +62,8 @@ class CTeslaBallProjectile final : public CProjectile
     bool armed = false;
     float attract_radius = 100, arm_time = 0, last_fire_time = 0;
     HOBJECT last_target = nullptr; // Identity only (source m_hLastObj), never dereferenced.
-    std::uint64_t bolts = 0, lightning_unavailable = 0;
+    std::uint64_t bolts = 0, lightning_count = 0, lightning = 0;
+    std::string lightning_error;
     OpenBlood2::RadiusDamageReport last_bolt;
     OpenBlood2::SceneExplosionReport effect;
     std::string sound_error;

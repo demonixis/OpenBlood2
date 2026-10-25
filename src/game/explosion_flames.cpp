@@ -14,7 +14,7 @@ namespace OpenBlood2
             error = "Explosion requires a finite position and nonzero normal";
             return false;
         }
-        if (type <= 4 || type == 6)
+        if (type <= 4 || type == 6 || type == 7)
             return true;
         if (type == 26)
         {

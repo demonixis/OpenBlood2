@@ -5,6 +5,7 @@
 #include "engine/container.h"
 #include "engine/world_model.h"
 #include "game/original/AI_Mgr.h"
+#include "game/original/CampaignWeapons.h"
 #include "game/original/ClientLightFX.h"
 #include "game/original/DestructableModel.h"
 #include "game/original/Door.h"
@@ -24,6 +25,7 @@
 #include "game/original/RotatingDoor.h"
 #include "game/original/RotatingModel.h"
 #include "game/original/SoundFX.h"
+#include "game/original/TeslaProjectile.h"
 #include "game/original/Trigger.h"
 #include "game/original/VolumeBrush.h"
 #include "game/original/WorldModelDebris.h"
@@ -1009,6 +1011,14 @@ namespace OpenBlood2
                                             grenade->pitch_velocity, grenade->yaw_velocity);
                                 if (!grenade->sound_error.empty())
                                     ImGui::TextWrapped("Audio: %s", grenade->sound_error.c_str());
+                            }
+                            if (const auto* ball = dynamic_cast<const CTeslaBallProjectile*>(projectile))
+                            {
+                                ImGui::Text("Tesla ball: %llu damage arcs / %llu visual arcs / last effect %llu",
+                                            (unsigned long long)ball->bolts, (unsigned long long)ball->lightning_count,
+                                            (unsigned long long)ball->lightning);
+                                if (!ball->lightning_error.empty())
+                                    ImGui::TextWrapped("%s", ball->lightning_error.c_str());
                             }
                             if (const auto* flare = dynamic_cast<const CFlareProjectile*>(projectile))
                             {
@@ -2284,6 +2294,19 @@ namespace OpenBlood2
                         BaseClass::GetServerDE()->IsObjectAlive(weapon.projectile) ? "yes" : "no");
             if (!weapon.projectile_error.empty())
                 ImGui::TextWrapped("Projectile: %s", weapon.projectile_error.c_str());
+        }
+        if (const auto* tesla = dynamic_cast<const CTeslaCannon*>(&weapon))
+        {
+            ImGui::Text("Tesla alternate count %u / lightning %llu", tesla->numAltFires,
+                        (unsigned long long)tesla->lightning);
+            if (!tesla->lightning_error.empty())
+                ImGui::TextWrapped("%s", tesla->lightning_error.c_str());
+        }
+        if (const auto* drudge = dynamic_cast<const CDrudgeLightning*>(&weapon))
+        {
+            ImGui::Text("Drudge lightning %llu", (unsigned long long)drudge->lightning);
+            if (!drudge->effect_error.empty())
+                ImGui::TextWrapped("%s", drudge->effect_error.c_str());
         }
         if (const auto* shield = dynamic_cast<const CGideonShield*>(&weapon))
         {

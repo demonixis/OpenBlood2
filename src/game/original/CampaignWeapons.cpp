@@ -1,6 +1,7 @@
 // Selected original GameWeapons.cpp; primary shared paths remain CWeapon.
 #include "CampaignWeapons.h"
 #include "InventoryMgr.h"
+#include "LightningFX.h"
 #include "PlayerObj.h"
 #include "engine/collision.h"
 #include <cmath>
@@ -140,14 +141,18 @@ void CDeathRay::BeginFire(bool alternate)
 
 FireResult CDrudgeLightning::FireVector()
 {
+    lightning = 0;
+    effect_error.clear();
     auto* s = g_pServerDE;
+    if (!s || !firing || !s->IsObjectAlive(m_hOwner))
+        return last_shot.result = FireResult::Invalid;
     SegmentHit hit;
     const auto q = s->IntersectSegment(last_shot.request.position, last_shot.end, nullptr, hit, false,
                                        SegmentObjects::SolidOnly, SegmentFilter::None, SegmentStart::SkipInterior);
     if (q == SegmentResult::Hit || q == SegmentResult::Miss)
     {
         lightning_end = q == SegmentResult::Hit ? hit.point : last_shot.end;
-        effect_error = "SFX_LIGHTNING boxed/thin/high-segment renderer unavailable";
+        lightning = s->PublishLightning(m_hOwner, {last_shot.request.position, lightning_end, 2, 3, 2}, effect_error);
     }
     else
         effect_error = "Drudge lightning visual ray unavailable";

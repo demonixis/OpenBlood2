@@ -84,6 +84,7 @@ class CDrudgeLightning final : public CWeapon
     CDrudgeLightning() : CWeapon(WEAP_DRUDGE_LIGHTNING) {}
     FireResult FireVector() override;
     DVector lightning_end{};
+    std::uint64_t lightning = 0;
     std::string effect_error;
 };
 

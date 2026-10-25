@@ -246,7 +246,9 @@ class CTeslaCannon final : public CWeapon
   public:
     CTeslaCannon() : CWeapon(WEAP_TESLACANNON) {}
     DDWORD numAltFires = 0;
-    std::uint64_t lightning_unavailable = 0;
+    std::uint64_t lightning = 0;
+    DVector lightning_end{};
+    std::string lightning_error;
     void BeginFire(bool alternate) override;
     FireResult FireProjectile() override;
 };

@@ -93,10 +93,29 @@ namespace
         for (int i = 0; i < 60 && g.server.IsObjectAlive(cannon->projectile); ++i)
             CHECK(step(g, 1.0 / 60));
         CHECK(!g.server.IsObjectAlive(cannon->projectile) && g.server.scene_explosions.size() == explosions + 1);
-        CHECK(g.server.scene_explosions.back().type == 7);
+        const auto& impact = g.server.scene_explosions.back();
+        CHECK(impact.type == 7 && impact.model_event && impact.sprite_event && impact.ring_event && impact.light_event);
+        CHECK(impact.model_error.empty() && impact.sprite_error.empty() && impact.ring_error.empty() &&
+              impact.light_error.empty());
+        CHECK(!impact.fragment_event && !impact.flame_event && impact.fragment_error.empty() &&
+              impact.flame_error.empty());
+        CHECK(g.server.explosion_models.active.back().settings.scale1.x == 20 &&
+              g.server.explosion_models.active.back().settings.scale2.x == 100);
+        const auto& sprite = g.server.explosion_sprites.active.back().settings;
+        CHECK(sprite.align == 2 && sprite.duration == 1 && sprite.scale1.x >= .25f && sprite.scale1.x <= .5f &&
+              sprite.scale1.y >= .25f && sprite.scale1.y <= .5f && sprite.scale2.x >= .5f && sprite.scale2.x <= .75f);
+        const auto& ring = g.server.explosion_rings.active.back();
+        CHECK(ring.particles.empty() && ring.settings.count == 24 && ring.settings.delay == .15f &&
+              ring.settings.rotate == 2 && ring.settings.velocity >= 150 && ring.settings.velocity <= 250);
         // Alternate: shots 1 and 3 are bolts, shot 2 is the ball.
-        CHECK(fire(g, *shooter, aim, true) && cannon->numAltFires == 1 && cannon->lightning_unavailable == 1);
+        CHECK(fire(g, *shooter, aim, true) && cannon->numAltFires == 1 && cannon->lightning &&
+              cannon->lightning_error.empty());
         CHECK(dynamic_cast<CTeslaBoltProjectile*>(g.server.HandleToObject(cannon->projectile)));
+        CHECK(g.server.lightning.reports.back().settings.shape == 2 &&
+              g.server.lightning.reports.back().settings.form == 3 &&
+              g.server.lightning.reports.back().settings.type == 2 &&
+              !g.server.lightning.active.back().segments.empty());
+        CHECK(cannon->lightning_end.z < cannon->last_shot.end.z); // Visual ray ends at first solid target.
         CHECK(step(g, .01) && !g.server.IsObjectAlive(cannon->projectile));
         CHECK(fire(g, *shooter, aim, true) && cannon->numAltFires == 2);
         auto ball_handle = cannon->projectile;
@@ -110,15 +129,22 @@ namespace
         for (int i = 0; i < 40 && g.server.IsObjectAlive(ball_handle); ++i)
         {
             bolts = ball->bolts;
-            lightning = ball->lightning_unavailable;
+            lightning = ball->lightning_count;
+            CHECK(ball->lightning_error.empty());
+            if (ball->lightning)
+                CHECK(g.server.lightning.reports.back().settings.form == 1);
             CHECK(step(g, .1));
         }
         CHECK(!g.server.IsObjectAlive(ball_handle) && bolts >= 1 && lightning == bolts);
         CHECK(fire(g, *shooter, aim, true) && cannon->numAltFires == 3 &&
               dynamic_cast<CTeslaBoltProjectile*>(g.server.HandleToObject(cannon->projectile)));
+        // A miss still emits the full-range visual beam and creates the ordinary projectile.
+        CHECK(fire(g, *shooter, {3000, 500, 0}, true) && cannon->lightning && cannon->lightning_error.empty());
+        CHECK(vector_dot(vector_subtract(cannon->lightning_end, cannon->last_shot.end),
+                         vector_subtract(cannon->lightning_end, cannon->last_shot.end)) < .01f);
         // Dry alternate fire still advances the source counter.
         shooter->m_InventoryMgr.SetAmmoCount(AMMO_BATTERY, 0);
-        CHECK(!fire(g, *shooter, aim, true) && cannon->numAltFires == 4);
+        CHECK(!fire(g, *shooter, aim, true) && cannon->numAltFires == 5);
         CHECK(g.unload_world());
         return true;
     }

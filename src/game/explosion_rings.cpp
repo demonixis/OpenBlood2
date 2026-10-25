@@ -16,6 +16,29 @@ namespace OpenBlood2
         }
         if (type == 6 || type == 8)
             return true; // No ring branch in these high-detail recipes.
+        if (type == 7)
+        {
+            auto draw = [&](float lo, float hi)
+            { return lo + (hi - lo) * float(random() - random.min()) / float(random.max() - random.min()); };
+            ExplosionRingSettings s;
+            s.normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
+            s.position = vector_add(pos, vector_scale(s.normal, 10));
+            s.color = {.5f, .5f, 1};
+            s.radius = 4000;
+            s.position_radius = 10;
+            s.velocity = draw(150, 250);
+            s.count = 24;
+            s.duration = .75f;
+            s.rotation = draw(-.08f, .08f);
+            s.alpha = .5f;
+            s.delay = .15f;
+            s.fade = 1;
+            s.rotate = 2;
+            s.align = 1;
+            s.texture = "SpriteTextures\\Smoke32_1.dtx";
+            out.push_back(s);
+            return true;
+        }
         if (type == 13)
         {
             ExplosionRingSettings s;

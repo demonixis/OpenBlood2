@@ -59,3 +59,5 @@ Runtime test logs and measurements belong in the
 - [Crypt, Bridge, Entrance and Lobby sources](later_levels_sources.json): four original enemies, Minigun, particle systems and bounded authored-data adaptations.
 
 - [Flare effects](flare_effect_sources.json): lot 5, primary/fragment trails, fizzle/burst/fragment composites and original fixed emission origin.
+
+- [Tesla/Drudge effects](tesla_effect_sources.json): lot 6, primary impact and actual weapon/ball lightning publishers.

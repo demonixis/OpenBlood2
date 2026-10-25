@@ -1,0 +1,43 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/release
+      Start  889: energy.weapon
+ 1/14 Test  #889: energy.weapon ....................   Passed    0.27 sec
+      Start  890: energy.filters
+ 2/14 Test  #890: energy.filters ...................   Passed    0.01 sec
+      Start  891: energy.lifetime
+ 3/14 Test  #891: energy.lifetime ..................   Passed    0.01 sec
+      Start  892: energy.callbacks
+ 4/14 Test  #892: energy.callbacks .................   Passed    0.01 sec
+      Start  893: energy.failures
+ 5/14 Test  #893: energy.failures ..................   Passed    0.01 sec
+      Start  894: energy.ai
+ 6/14 Test  #894: energy.ai ........................   Passed    0.01 sec
+      Start  895: energy.private
+ 7/14 Test  #895: energy.private ...................   Passed    0.20 sec
+      Start 1119: gpu.tesla_effects
+ 8/14 Test #1119: gpu.tesla_effects ................   Passed    0.43 sec
+      Start 1120: tesla.weapon
+ 9/14 Test #1120: tesla.weapon .....................   Passed    0.22 sec
+      Start 1402: later_levels.priest
+10/14 Test #1402: later_levels.priest ..............   Passed    0.23 sec
+      Start 1411: lightning.formulas
+11/14 Test #1411: lightning.formulas ...............   Passed    0.23 sec
+      Start 1412: lightning.emitter
+12/14 Test #1412: lightning.emitter ................   Passed    0.01 sec
+      Start 1413: lightning.catalog
+13/14 Test #1413: lightning.catalog ................   Passed    0.15 sec
+      Start 1414: gpu.lightning
+14/14 Test #1414: gpu.lightning ....................   Passed    0.39 sec
+
+100% tests passed out of 14
+
+Label Time Summary:
+campaign        =   0.23 sec*proc (1 test)
+energy          =   0.51 sec*proc (7 tests)
+gpu             =   0.82 sec*proc (2 tests)
+headless        =   1.35 sec*proc (12 tests)
+lightning       =   0.78 sec*proc (4 tests)
+private         =   0.85 sec*proc (3 tests)
+private-data    =   1.01 sec*proc (5 tests)
+tesla           =   0.65 sec*proc (2 tests)
+
+Total Test time (real) =   2.19 sec

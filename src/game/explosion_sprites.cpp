@@ -8,7 +8,7 @@ namespace OpenBlood2
 {
     bool original_explosion_sprites(DDWORD type, DVector position, DVector normal,
                                     std::vector<ExplosionSpriteSettings>& out, std::string& unavailable,
-                                    std::string& error)
+                                    std::string& error, std::minstd_rand* random)
     {
         out.clear();
         unavailable.clear();
@@ -83,6 +83,19 @@ namespace OpenBlood2
             add(20, .25f, 1.5f, 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
             unavailable = "light illumination";
         }
+        else if (type == 7)
+        {
+            // Independent X/Y scale draws, before the random align=2 roll.
+            std::minstd_rand fallback(1);
+            auto& rng = random ? *random : fallback;
+            auto draw = [&](float lo, float hi)
+            { return lo + (hi - lo) * float(rng() - rng.min()) / float(rng.max() - rng.min()); };
+            add(0, 0, 0, 1, 1, 0, 2, "Sprites\\TeslaImp.spr");
+            auto& s = out.back();
+            s.scale1 = {draw(.25f, .5f), draw(.25f, .5f), 0};
+            s.scale2 = {draw(.5f, .75f), draw(.5f, .75f), 0};
+            unavailable = "light illumination";
+        }
         else if (type == 8)
         {
             add(30, .1f, .75f, 3, .75f, 0, 0, "Sprites\\TesAltLoop.spr");
@@ -111,7 +124,7 @@ namespace OpenBlood2
         report.source = source;
         std::minstd_rand random(report.id); // Portable per-event cosmetic stream.
         std::vector<ExplosionSpriteSettings> settings;
-        if (original_explosion_sprites(type, pos, normal, settings, report.unavailable, report.error))
+        if (original_explosion_sprites(type, pos, normal, settings, report.unavailable, report.error, &random))
             for (const auto& setting : settings)
             {
                 if (active.size() >= 256 || next_id_ == UINT64_MAX)

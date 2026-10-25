@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-25",
+  "scope": "Beta VFX lot 6: Tesla impact and lightning callers",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/GameWeapons.cpp",
+      "source_sha256": "979f6e82b231714dd18209fcb8fcfce949c6e4b5235c618c5150bd5c0be332a2",
+      "purpose": "Tesla alternate and Drudge visual ray, endpoints and lightning form before ordinary damage/projectile paths."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/GameProjectiles.cpp",
+      "source_sha256": "f0f732be5d373324ef2071690fc43317a908aad5d5bade18f59c9e9ccfbcb9fe",
+      "purpose": "Tesla primary/ball effect selection and ball attraction lightning before damage."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/ExplosionFX.cpp",
+      "source_sha256": "f96624581765705810ebe60a9c58ffa796ff5a751c6713d5219ddd139fc487c0",
+      "purpose": "High-detail Tesla primary impact 7 and existing alternate 8."
+    },
+    {
+      "source": "sources/lithtech/Blood2/Shared/SFXMsgIds.h",
+      "source_sha256": "e0e28f7049fa53550f0d1aa6b64632d90d141520c68878db2191d835c31d0d2f",
+      "purpose": "Original boxed, thin-to-thin, wide-to-thin and high-segment IDs."
+    }
+  ]
+}

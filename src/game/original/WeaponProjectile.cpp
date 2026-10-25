@@ -1,5 +1,6 @@
 #include "InventoryMgr.h"
 #include "LaserBeamFX.h"
+#include "LightningFX.h"
 #include "OrbProjectile.h"
 #include "Projectile.h"
 #include "Weapon.h"
@@ -47,9 +48,25 @@ void CTeslaCannon::BeginFire(bool alternate)
 }
 FireResult CTeslaCannon::FireProjectile()
 {
-    // The alternate shot's SFX_LIGHTNING_ID beam to the first solid hit is client-only.
+    lightning = 0;
+    lightning_error.clear();
+    auto* server = BaseClass::GetServerDE();
+    if (!server || !firing || !server->IsObjectAlive(m_hOwner))
+        return last_shot.result = FireResult::Invalid;
     if (last_shot.request.alternate)
-        ++lightning_unavailable;
+    {
+        const auto from = last_shot.request.position;
+        SegmentHit hit;
+        const auto query = server->IntersectSegment(from, last_shot.end, nullptr, hit, false, SegmentObjects::SolidOnly,
+                                                    SegmentFilter::None, SegmentStart::SkipInterior);
+        if (query == SegmentResult::Hit || query == SegmentResult::Miss)
+        {
+            lightning_end = query == SegmentResult::Hit ? hit.point : last_shot.end;
+            lightning = server->PublishLightning(m_hOwner, {from, lightning_end, 2, 3, 2}, lightning_error);
+        }
+        else
+            lightning_error = "Tesla alternate visual ray unavailable";
+    }
     return CWeapon::FireProjectile();
 }
 FireResult CSingularity::FireProjectile()

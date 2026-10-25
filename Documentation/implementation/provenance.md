@@ -2087,3 +2087,12 @@ and [verification](reports/flare_effects.md). Ports original high-detail sparks 
 alternate-parent trail, stop/ramp behavior and FRAG-before-BURST selection. Corrects
 MOVINGSOURCE scene translation for shared bound effects; no source/art edits or new
 save bytes. Owner-light illumination stays unavailable.
+
+## Tesla/Drudge VFX (2026-10-25)
+
+[Source ledger](sources/tesla_effect_sources.json), [contract](../contracts/tesla_contracts.md#original-vfx-completion--lot-6-2026-10-25)
+and [verification](reports/tesla_effects.md). Ports the original high-detail impact 7;
+connects Tesla alternate/ball and Drudge lightning to the existing detached service.
+Preserves separate visual and damage rays, per-caller form, no damage suppression on
+cosmetic failures and the source alternate counter. Existing energy callers share type 7.
+No assets, save payloads or gameplay parameters change; light illumination stays separate.

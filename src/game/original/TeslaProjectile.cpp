@@ -1,6 +1,7 @@
 // Selected original ObjectDLL/GameProjectiles.cpp CTeslaProjectile, CTeslaBoltProjectile
 // and CTeslaBallProjectile. See tesla_contracts.md.
 #include "TeslaProjectile.h"
+#include "LightningFX.h"
 #include "engine/collision.h"
 #include "radius_damage.h"
 #include <cmath>
@@ -20,9 +21,10 @@ namespace
         r.type = type;
         r.model_event = s->PublishExplosionModels(owner, type, position, normal, r.model_error);
         r.sprite_event = s->PublishExplosionSprites(owner, type, position, normal, r.sprite_error);
-        r.ring_event = s->PublishExplosionRings(owner, type, position, normal, r.ring_error);
-        r.fragment_event = s->PublishExplosionFragments(owner, type, position, normal, r.fragment_error);
-        r.flame_event = s->PublishExplosionFlames(owner, type, position, normal, r.flame_error);
+        if (type == 7)
+            r.ring_event = s->PublishExplosionRings(owner, type, position, normal, r.ring_error);
+        else
+            r.flame_event = s->PublishExplosionFlames(owner, type, position, normal, r.flame_error);
         r.light_event = s->PublishExplosionLights(owner, type, position, normal, r.light_error);
         SoundRequest request;
         r.sound = request.resource = sound;
@@ -89,8 +91,7 @@ void CTeslaProjectile::AddExplosion(DVector position, DVector normal)
         g_pServerDE->KillSound(flight_sound);
         flight_sound = 0;
     }
-    publish(m_hObject, effect, 7 /* EXP_TESLA_PRIMARY */, position, normal, "Sounds\\Weapons\\Tesla\\impact.wav",
-            750);
+    publish(m_hObject, effect, 7 /* EXP_TESLA_PRIMARY */, position, normal, "Sounds\\Weapons\\Tesla\\impact.wav", 750);
 }
 bool CTeslaBoltProjectile::Update()
 {
@@ -151,8 +152,8 @@ bool CTeslaBallProjectile::Update()
         error = "Projectile damage traversal interrupted or unavailable";
     m_hHitObject = nullptr;
     DVector zero{};
-    if (s->IsObjectAlive(m_hObject) && (s->SetVelocity(m_hObject, &zero) != DE_OK ||
-                                        s->SetAcceleration(m_hObject, &zero) != DE_OK))
+    if (s->IsObjectAlive(m_hObject) &&
+        (s->SetVelocity(m_hObject, &zero) != DE_OK || s->SetAcceleration(m_hObject, &zero) != DE_OK))
         return Fail("Tesla ball stop rejected");
     return !failed;
 }
@@ -179,7 +180,9 @@ void CTeslaBallProjectile::FireBolt()
         const auto d = vector_subtract(at, position);
         if (vector_dot(d, d) > attract_radius * attract_radius || target == last_target)
             continue;
-        ++lightning_unavailable; // SFX_LIGHTNING_ID (boxed, wide-to-thin, high segment) is client-only.
+        lightning = s->PublishLightning(m_hObject, {position, at, 2, 1, 2}, lightning_error);
+        if (lightning)
+            ++lightning_count;
         last_bolt = DamageObjectsInRadius(m_hFiredFrom, this, at, bolt_radius, bolt_damage, DamageType::Electric);
         int variant = 0;
         if (s->RandomInt(0, 2, variant))
@@ -199,8 +202,7 @@ void CTeslaBallProjectile::FireBolt()
 }
 void CTeslaBallProjectile::AddExplosion(DVector position, DVector normal)
 {
-    publish(m_hObject, effect, 8 /* EXP_TESLA_ALT */, position, normal, "Sounds\\Weapons\\Tesla\\altimpact.wav",
-            2000);
+    publish(m_hObject, effect, 8 /* EXP_TESLA_ALT */, position, normal, "Sounds\\Weapons\\Tesla\\altimpact.wav", 2000);
 }
 bool CShikariLoogieProjectile::Update()
 {

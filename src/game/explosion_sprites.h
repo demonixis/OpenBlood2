@@ -1,11 +1,12 @@
 #pragma once
 #include "game/original/ExplosionSpriteFX.h"
+#include <random>
 namespace OpenBlood2
 {
     // Selected original CExplosionFX detail >=2 sprite branches, not the full composite.
     bool original_explosion_sprites(DDWORD type, DVector position, DVector normal,
-                                    std::vector<ExplosionSpriteSettings>&, std::string& unavailable,
-                                    std::string& error);
+                                    std::vector<ExplosionSpriteSettings>&, std::string& unavailable, std::string& error,
+                                    std::minstd_rand* random = nullptr);
     struct ExplosionSpriteReport
     {
         std::uint64_t id = 0;
