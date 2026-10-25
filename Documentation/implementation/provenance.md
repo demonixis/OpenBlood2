@@ -2068,3 +2068,13 @@ normal-aligned mark quads and tracked-hand placement are explicit engine adaptat
 See the [source ledger](sources/shotgun_effect_sources.json),
 [contract](../contracts/shotgun_contracts.md#original-vfx-completion-lot-2-2026-10-25)
 and [report](reports/shotgun_effects.md).
+
+## Shared ballistic VFX (2026-10-25)
+
+Lot 4 extends the selected original weapon-effect routines to bullet/BMG callers and
+ports CTracerFX selection/geometry/timing over the existing hardware-line renderer.
+The [contract](../contracts/ballistic_effects_contracts.md) separates source quirks from
+bounded client pools and collision/render adaptations; [hashes](sources/ballistic_effect_sources.json)
+pin the donors. The previous 68 shader artifacts remain unchanged after full regeneration;
+four new line auxiliary artifacts preserve glow/AO and reflection contracts. No asset
+import, new dependency, saved class or milestone acceptance.

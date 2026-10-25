@@ -4,6 +4,7 @@
 #include "app/polygrid_scene.h"
 #include "app/sprite_scene.h"
 #include "engine/light_grid.h"
+#include "engine/line_renderer.h"
 #include "engine/model_renderer.h"
 #include "engine/post_process.h"
 #include "engine/surface_report.h"
@@ -99,6 +100,9 @@ namespace OpenBlood2
         GpuRegistry registry;     // Owns every presentation GPU resource; declared before its users.
         PostProcess post_process; // Desktop record() only: targets and passes around the scene pass.
         PostSettings post;        // Display settings for record(); all but AA need the enhanced renderer.
+        LineRenderer ballistic_lines;
+        std::vector<LineVertex> ballistic_vertices;
+        unsigned ballistic_draws = 0;
         WorldPipelines pipelines; // Declared before the renderers that borrow it.
         WorldRenderer world_renderer;
         ModelRenderer model_renderer, explosion_model_renderer; // GPU skinning of both model views.

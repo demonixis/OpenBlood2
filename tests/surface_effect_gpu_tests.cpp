@@ -70,7 +70,9 @@ int main(int argc, char** argv)
                        {x, y, 2},
                        {x + .8f, y + .8f, 2},
                        {x, y + .8f, 2}})
-            mesh.vertices.push_back({p, {1, 1, 1}, {.125f, .125f}});
+            // Texel centre: exact colour under both the original nearest sampler and
+            // the current trilinear/anisotropic repeat sampler. Pan still shifts one texel.
+            mesh.vertices.push_back({p, {1, 1, 1}, {.25f, .25f}});
         mesh.ranges[0].batches.push_back({first,
                                           6,
                                           0,

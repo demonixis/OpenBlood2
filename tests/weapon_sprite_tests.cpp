@@ -239,7 +239,7 @@ namespace
               FireResult::Fired);
         auto* w = p->m_InventoryMgr.GetWeapon(1);
         CHECK(w->impacts.size() == 1 && w->impacts[0].effect.sprite_event && w->impacts[0].effect.sprite_error.empty());
-        CHECK(g.server.weapon_sprites.started == 2 && g.server.weapon_sprites.failed == 0);
+        CHECK(g.server.weapon_sprites.started == 3 && g.server.weapon_sprites.failed == 0);
         CHECK(near(g.server.weapon_sprites.smoke.front().position.z, pos.z + 40 - 4.25f));
         CHECK(near(g.server.weapon_sprites.flashes.front().settings.position.z, pos.z + 40 - 2.25f));
         CHECK(g.step(.1));
@@ -247,14 +247,15 @@ namespace
         SpriteView view;
         for (int i = 0; i < 3; ++i)
         {
-            CHECK(update_sprite_scene(g, view, error) && view.draws.size() == 2);
+            CHECK(update_sprite_scene(g, view, error) && view.draws.size() == 3);
             CHECK(g.server.weapon_sprites.smoke.front().updates == updates);
         }
-        CHECK(near(view.mesh.vertices.back().color.y, .8f));
-        CHECK(g.leave_player() && g.server.weapon_sprites.smoke.size() == 1 && g.step(.1) &&
+        CHECK(std::any_of(view.mesh.vertices.begin(), view.mesh.vertices.end(),
+                          [](const auto& v) { return near(v.color.y, .8f); }));
+        CHECK(g.leave_player() && g.server.weapon_sprites.smoke.size() == 2 && g.step(.1) &&
               g.server.weapon_sprites.flashes.empty());
-        CHECK(g.step(.5) && g.step(.5) && g.server.weapon_sprites.smoke.empty() &&
-              g.server.weapon_sprites.expired == 2);
+        CHECK(g.step(.5) && g.step(.5) && g.step(.5) && g.server.weapon_sprites.smoke.empty() &&
+              g.server.weapon_sprites.expired == 3);
         CHECK(g.unload_world() && g.server.weapon_sprites.reports.empty() && g.server.string_count() == 0 &&
               g.server.message_count() == 0);
         return true;

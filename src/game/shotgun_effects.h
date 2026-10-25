@@ -3,6 +3,7 @@
 #include "engine/particles.h"
 #include "engine/sprite.h"
 #include "game/original/SurfaceTypes.h"
+#include "game/original/WeaponDefs.h"
 #include <random>
 class ServerDE;
 namespace OpenBlood2
@@ -13,6 +14,7 @@ namespace OpenBlood2
         DVector source{}, destination{}, forward{}, normal{}, color1{}, color2{};
         SurfaceType surface = SURFTYPE_UNKNOWN;
         bool eject = false, left = false;
+        DBYTE ammo = AMMO_SHELL;
     };
     struct ShotgunCasing
     {
@@ -26,6 +28,8 @@ namespace OpenBlood2
         bool liquid = false, resting = false, visible = false;
         std::uint64_t id = 0, impacts = 0;
         std::string error, sound_error;
+        std::string model_path = "Models/Ammo/sshell.abc", skin_path = "Skins/Ammo/sshell.dtx";
+        float scale = 2.25f;
     };
     enum class ShotgunSpriteKind
     {
@@ -53,11 +57,17 @@ namespace OpenBlood2
         std::uint64_t id = 0;
         std::string error;
     };
+    struct BallisticTracer
+    {
+        DVector center{}, forward{}, right{};
+        double expires = 0;
+        std::uint64_t id = 0;
+    };
     struct ShotgunEffectReport
     {
         std::uint64_t id = 0;
         ShotgunEffectSettings settings;
-        unsigned casings = 0, fragments = 0, marks = 0, splashes = 0, bubbles = 0;
+        unsigned casings = 0, fragments = 0, marks = 0, splashes = 0, bubbles = 0, tracers = 0;
         std::uint64_t smoke = 0;
         std::string error;
     };
@@ -69,6 +79,7 @@ namespace OpenBlood2
         void advance(double, ServerDE&);
         void clear();
         std::vector<ShotgunCasing> casings;
+        std::vector<BallisticTracer> tracers;
         std::vector<ShotgunSprite> sprites;
         std::vector<ShotgunSplash> splashes;
         std::vector<ShotgunEffectReport> reports;

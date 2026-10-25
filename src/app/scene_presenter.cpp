@@ -6,7 +6,7 @@
 namespace OpenBlood2
 {
     ScenePresenter::ScenePresenter(SDL_GPUDevice* device)
-        : registry(device), post_process(registry), pipelines(device),
+        : registry(device), post_process(registry), ballistic_lines(device), pipelines(device),
           world_renderer(DrawStyle::Opaque, pipelines, registry),
           model_renderer(DrawStyle::Opaque, pipelines, registry),
           explosion_model_renderer(DrawStyle::SpriteAlpha, pipelines, registry),
@@ -314,6 +314,17 @@ namespace OpenBlood2
             error = std::string(stage) + ": " + error;
             return false;
         };
+        ballistic_vertices.clear();
+        const auto tracer_color = vector_scale(game.client_shell.SceneLightScale(), scene_fade);
+        for (const auto& tracer : game.server.shotgun_effects.tracers)
+            for (float offset : {0.f, .05f, -.05f})
+            {
+                const auto center = vector_add(tracer.center, vector_scale(tracer.right, offset));
+                const auto a = vector_subtract(center, vector_scale(tracer.forward, 50));
+                const auto b = vector_add(center, vector_scale(tracer.forward, 50));
+                ballistic_vertices.push_back({{a.x, a.y, a.z}, {tracer_color.x, .8f * tracer_color.y, 0, .1f}});
+                ballistic_vertices.push_back({{b.x, b.y, b.z}, {tracer_color.x, 0, 0, .9f}});
+            }
         rebuilt = mesh_revision != game.world_revision || built_lightmaps_ != lightmaps;
         const auto model_revision = model_scene.revision, effect_revision = explosion_model_scene.revision,
                    sprite_revision = sprite_scene.revision, sky_sprite_revision = sky_sprite_scene.revision;
@@ -417,12 +428,21 @@ namespace OpenBlood2
             return false;
         };
         stats.passes = 0;
+        ballistic_draws = 0;
         for (auto* renderer :
              {&world_renderer.stats, &model_renderer.stats, &explosion_model_renderer.stats, &polygrid_renderer.stats,
               &sprite_renderer.stats, &sky_sprite_renderer.stats, &hand_renderer.stats})
             renderer->draw_calls = renderer->culled = 0;
         if (!pipelines.prepare(format, shading, aux, reflections, samples, error))
             return fail("World pipelines");
+        if (!ballistic_vertices.empty() &&
+            (!ballistic_lines.prepare(format, SDL_GPU_TEXTUREFORMAT_D32_FLOAT, error, samples,
+                                      reflections ? 5
+                                      : aux       ? 3
+                                                  : 1,
+                                      true) ||
+             !ballistic_lines.upload(commands, ballistic_vertices, error)))
+            return fail("Ballistic tracers");
         // Renderers stage uploads in the shared registry; one copy pass in the frame's
         // command buffer records them all before the scene pass.
         if (!world_renderer.prepare(world_mesh, mesh_revision, format, width, height, error))
@@ -592,9 +612,39 @@ namespace OpenBlood2
             stage = "PolyGrid viewport";
         else if (!sprite_renderer.record(scene, sprite_scene.mesh, sprite_scene.batched_draws, eye, rotation, error))
             stage = "Sprite viewport";
-        else if (!draw_hands && !model_scene.close_draws.empty() &&
-                 !model_renderer.record(close, model_scene, model_scene.close_draws, eye, rotation, error,
-                                        WorldPass::Opaque, {}, true))
+        if (!stage && !ballistic_vertices.empty())
+        {
+            const Uint32 top = letterbox ? depth_height_ / 6 : 0;
+            WorldViewUniform world;
+            if (!world_view_uniform(eye, rotation, float(depth_width_) / float(depth_height_ - 2 * top), {}, world))
+                stage = "Tracer camera";
+            else
+            {
+                xr::LineUniform uniform;
+                uniform.eye = world.eye;
+                uniform.right = world.right;
+                uniform.up = world.up;
+                uniform.forward = world.forward;
+                uniform.projection = world.projection;
+                if (projection)
+                {
+                    uniform.projection[0] = projection->scale_x;
+                    uniform.projection[1] = projection->scale_y;
+                    uniform.projection_offset = {projection->offset_x, projection->offset_y, 0, 0};
+                }
+                else
+                {
+                    uniform.projection[0] *= scene.view_scale;
+                    uniform.projection[1] *= scene.view_scale;
+                }
+                ballistic_lines.draw(pass, commands, uniform, depth_width_, depth_height_ - 2 * top, view_model_depth,
+                                     1, 0, ballistic_lines.uploaded(), top);
+                ++ballistic_draws;
+            }
+        }
+        if (!stage && !draw_hands && !model_scene.close_draws.empty() &&
+            !model_renderer.record(close, model_scene, model_scene.close_draws, eye, rotation, error, WorldPass::Opaque,
+                                   {}, true))
             stage = "Model viewport";
         if (!stage && projection && eye_overlay)
             eye_overlay(pass, commands, layer);
@@ -608,7 +658,7 @@ namespace OpenBlood2
         stats.draw_calls = world_renderer.stats.draw_calls + model_renderer.stats.draw_calls +
                            explosion_model_renderer.stats.draw_calls + polygrid_renderer.stats.draw_calls +
                            sprite_renderer.stats.draw_calls + sky_sprite_renderer.stats.draw_calls +
-                           hand_renderer.stats.draw_calls;
+                           hand_renderer.stats.draw_calls + ballistic_draws;
         stats.culled = world_renderer.stats.culled + model_renderer.stats.culled +
                        explosion_model_renderer.stats.culled + polygrid_renderer.stats.culled +
                        sprite_renderer.stats.culled + sky_sprite_renderer.stats.culled + hand_renderer.stats.culled;

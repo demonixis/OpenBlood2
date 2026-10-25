@@ -78,6 +78,18 @@ int main()
             CHECK(world_shader_info(shader, formats, repeated) && repeated.code == owned &&
                   repeated.code_size == info.code_size);
         }
+    for (auto kind : {WorldShader::LineFragment, WorldShader::LineAuxFragment, WorldShader::LineAuxSsrFragment})
+        for (auto format : {SDL_GPU_SHADERFORMAT_SPIRV, SDL_GPU_SHADERFORMAT_MSL})
+        {
+            CHECK(world_shader_info(kind, format, info));
+            CHECK(info.num_samplers == 0 && info.num_uniform_buffers == 0 && info.num_storage_buffers == 0);
+            if (format == SDL_GPU_SHADERFORMAT_MSL)
+            {
+                const std::string_view text(reinterpret_cast<const char*>(info.code), info.code_size);
+                CHECK((text.find("[[color(1)]]") != text.npos) == (kind != WorldShader::LineFragment));
+                CHECK((text.find("[[color(4)]]") != text.npos) == (kind == WorldShader::LineAuxSsrFragment));
+            }
+        }
     // Post-processing scene variants keep their base shader's resources and add colour targets 1
     // and 2; the post-processing passes draw a buffer-free triangle and sample up to four textures.
     struct Expected

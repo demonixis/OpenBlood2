@@ -44,7 +44,7 @@ blood2_project_options(blood2_startup)
 
 add_library(engine STATIC src/engine/world_lights.cpp src/engine/world_shade.cpp src/engine/gpu_registry.cpp src/engine/model_renderer.cpp src/engine/hud_surface.cpp src/engine/polygrid_view.cpp src/engine/sky.cpp src/engine/particles.cpp src/engine/sprite_view.cpp src/engine/model_view.cpp src/engine/texture.cpp src/engine/world_view.cpp src/engine/world_renderer.cpp src/engine/world_shaders.cpp src/engine/post_process.cpp src/engine/surface_materials.cpp src/engine/surface_report.cpp src/engine/normal_maps.cpp src/engine/light_grid.cpp src/engine/attachments.cpp src/engine/object_pose.cpp src/engine/runtime.cpp src/engine/capture.cpp src/engine/objects.cpp src/engine/world.cpp)
 target_sources(engine PRIVATE src/engine/sprite.cpp src/engine/audio.cpp src/engine/audio_stream.cpp src/engine/music_asset.cpp src/engine/ima_style.cpp src/engine/ima_curve.cpp src/engine/ima_curve_event.cpp src/engine/ima_variation.cpp src/engine/ima_note_event.cpp src/engine/ima_note_pitch.cpp src/engine/ima_harmony.cpp src/engine/ima_selection.cpp src/engine/ima_cursor.cpp src/engine/ima_band.cpp src/engine/ima_section.cpp src/engine/ima_clock.cpp src/engine/ima_program.cpp src/engine/ima_playlist.cpp src/engine/ima_transport.cpp src/engine/ima_timeline.cpp src/engine/dls_bank.cpp src/engine/dls_sampler.cpp src/engine/dls_midi_queue.cpp src/engine/string_resources.cpp src/engine/model.cpp src/engine/arm_ik.cpp src/engine/view_arms.cpp src/engine/model_store.cpp)
-target_sources(engine PRIVATE src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp src/engine/logging.cpp src/engine/crash_capture.cpp)
+target_sources(engine PRIVATE src/engine/line_renderer.cpp src/engine/collision.cpp src/engine/container.cpp src/engine/world_model.cpp src/engine/logging.cpp src/engine/crash_capture.cpp)
 target_sources(engine PRIVATE src/engine/atomic_file.cpp src/engine/save_file.cpp src/engine/save_fingerprint.cpp src/engine/save_objects.cpp)
 set_source_files_properties(src/engine/crash_capture.cpp PROPERTIES
     COMPILE_DEFINITIONS "BLOOD2_CRASH_SANITIZED=$<BOOL:${BLOOD2_SANITIZERS}>")
@@ -129,7 +129,7 @@ target_link_libraries(blood2_app PRIVATE blood2_game spdlog::spdlog imgui)
 target_compile_definitions(blood2_app PRIVATE BLOOD2_INSPECTOR=$<BOOL:${BLOOD2_INSPECTOR}>)
 target_compile_definitions(blood2_app PRIVATE BLOOD2_XR=$<BOOL:${BLOOD2_XR}>)
 if(BLOOD2_XR)
-    target_sources(blood2_app PRIVATE src/app/xr_scene.cpp src/app/xr_lines.cpp src/app/xr_player.cpp
+    target_sources(blood2_app PRIVATE src/app/xr_scene.cpp src/app/xr_player.cpp
                                       src/app/xr_frontend.cpp)
 endif()
 if(BLOOD2_INSPECTOR)

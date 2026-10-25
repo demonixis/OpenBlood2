@@ -1,7 +1,7 @@
 #pragma once
 
 #include "app/scene_presenter.h"
-#include "app/xr_lines.h"
+#include "engine/line_renderer.h"
 #include "app/xr_player.h"
 #include "engine/view_arms.h"
 #include "engine/xr/xr_runtime.h"

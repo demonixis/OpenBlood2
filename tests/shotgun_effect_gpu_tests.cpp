@@ -1,4 +1,5 @@
 #include "app/model_scene.h"
+#include "app/scene_presenter.h"
 #include "app/sprite_scene.h"
 #include "camera_fixture.h"
 #include "engine/capture.h"
@@ -62,6 +63,45 @@ namespace
             return false;
         pixels.assign(data, data + 400 * 300 * 4);
         SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
+        return true;
+    }
+    bool frame(SDL_GPUDevice* gpu, ScenePresenter& presenter, GameSession& game, Capture& capture,
+               std::vector<Uint8>& pixels, std::string& error)
+    {
+        if (!presenter.update(game, error) || !presenter.render_world)
+            return false;
+        // Isolate the hardware tracer while retaining the real scene pass and post-processing.
+        presenter.sky_order.clear();
+        presenter.sky_draws.clear();
+        presenter.world_draws.clear();
+        presenter.explosion_model_scene.world_draws.clear();
+        presenter.model_scene.world_draws.clear();
+        presenter.model_scene.close_draws.clear();
+        presenter.sprite_scene.batched_draws.clear();
+        presenter.polygrid_scene.draws.clear();
+        auto* commands = SDL_AcquireGPUCommandBuffer(gpu);
+        if (!commands || !presenter.record(game, commands, capture.texture, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM,
+                                           capture.width, capture.height, error))
+            return false;
+        auto* copy = SDL_BeginGPUCopyPass(commands);
+        SDL_GPUTextureRegion source{};
+        source.texture = capture.texture;
+        source.w = capture.width;
+        source.h = capture.height;
+        source.d = 1;
+        SDL_GPUTextureTransferInfo destination{};
+        destination.transfer_buffer = capture.transfer;
+        destination.pixels_per_row = capture.width;
+        destination.rows_per_layer = capture.height;
+        SDL_DownloadFromGPUTexture(copy, &source, &destination);
+        SDL_EndGPUCopyPass(copy);
+        if (!SDL_SubmitGPUCommandBuffer(commands) || !SDL_WaitForGPUIdle(gpu))
+            return false;
+        auto* bytes = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(gpu, capture.transfer, false));
+        if (!bytes)
+            return false;
+        pixels.assign(bytes, bytes + std::size_t(capture.width) * capture.height * 4);
+        SDL_UnmapGPUTransferBuffer(gpu, capture.transfer);
         return true;
     }
 } // namespace
@@ -169,6 +209,36 @@ int main(int argc, char** argv)
     CHECK(capture.save((std::filesystem::path(argv[1]) / "casings.png").string().c_str()));
     CHECK(pixels != baseline);
     CHECK(capture.save((std::filesystem::path(argv[1]) / "casings.png").string().c_str()));
+    for (bool left : {false, true})
+    {
+        CHECK(weapon.Create(WEAP_BERETTA, left, game.models, game.resources, error));
+        CHECK(weapon.flash_error.empty() && weapon.flashes[0]);
+        weapon.flash_visible = 1;
+        CHECK(update_sprite_scene(game, scene, error));
+        CHECK(render(runtime, renderer, scene.mesh, scene.revision, scene.draws, {}, {}, capture, pixels, error));
+        CHECK(pixels != baseline);
+        weapon.flash_visible = 0;
+    }
+    ScenePresenter presenter(runtime.gpu);
+    presenter.model_shadows = false;
+    game.client_shell.weapons_visible = false;
+    for (int mode = 0; mode < 4; ++mode)
+    {
+        presenter.shading = mode < 2 ? SurfaceShading::Original : SurfaceShading::Standard;
+        presenter.post.antialiasing = mode & 1 ? Antialiasing::Msaa4 : Antialiasing::Off;
+        presenter.post.reflections = mode == 2 ? Reflections::Off : Reflections::High;
+        game.server.shotgun_effects.tracers.clear();
+        CHECK(frame(runtime.gpu, presenter, game, capture, baseline, error));
+        game.server.shotgun_effects.tracers.push_back({{0, 0, 100}, {1, 0, 0}, {0, 1, 0}, 100, 1});
+        CHECK(frame(runtime.gpu, presenter, game, capture, pixels, error));
+        unsigned changed = 0;
+        for (std::size_t i = 0; i < pixels.size(); i += 4)
+            changed += pixels[i] != baseline[i] || pixels[i + 1] != baseline[i + 1] || pixels[i + 2] != baseline[i + 2];
+        CHECK(changed > 20);
+        CHECK(presenter.ballistic_vertices.size() == 6 && presenter.ballistic_lines.uploaded() == 6);
+        std::cout << "Tracer mode " << mode << ": " << changed << " changed pixels\n";
+        CHECK(capture.save((std::filesystem::path(argv[1]) / ("tracer-" + std::to_string(mode) + ".png")).c_str()));
+    }
     CHECK(game.unload_world());
     return 0;
 }

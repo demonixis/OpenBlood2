@@ -82,7 +82,11 @@ class CWeapon
     float CheckAmmo(bool alternate = false) const;
     FireResult Fire(const OpenBlood2::WeaponFire&);
     // Subclass Fire() prologue, called on every accepted Fire request before ammo checks.
-    virtual void BeginFire(bool /*alternate*/) {}
+    virtual void BeginFire(bool /*alternate*/)
+    {
+        eject_pending = data.m_nAmmoType == AMMO_BULLET || data.m_nAmmoType == AMMO_SHELL;
+    }
+    bool eject_pending = false;
     virtual const char* FireSound(bool alternate) const;
     virtual FireResult FireProjectile();
     HOBJECT projectile = nullptr;               // Checked independent runtime child, never owning.
@@ -197,7 +201,6 @@ class CShotgun final : public CWeapon
     {
         eject_pending = alternate;
     }
-    bool eject_pending = false;
 };
 class COrb final : public CWeapon
 {

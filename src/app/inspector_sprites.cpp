@@ -232,22 +232,23 @@ namespace OpenBlood2
         ImGui::Text("Active: %zu flashes / %zu smoke | started %llu / expired %llu / failed %llu",
                     effects.flashes.size(), effects.smoke.size(), (unsigned long long)effects.started,
                     (unsigned long long)effects.expired, (unsigned long long)effects.failed);
-        ImGui::TextWrapped("Shared wood/stone impact sprites; shotgun completion includes muzzle flashes, casings, "
+        ImGui::TextWrapped("Shared ballistic effects include authored muzzle flashes, casings, tracers, "
                            "marks, fragments and liquids.");
         const auto& shotgun = game.server.shotgun_effects;
-        ImGui::Text("Shotgun: %zu casings / %zu marks-fragments-ripples / %zu splashes | failures %llu",
-                    shotgun.casings.size(), shotgun.sprites.size(), shotgun.splashes.size(),
-                    (unsigned long long)shotgun.failed);
+        ImGui::Text(
+            "Ballistic effects: %zu casings / %zu marks-fragments-ripples / %zu splashes / %zu tracers | failures %llu",
+            shotgun.casings.size(), shotgun.sprites.size(), shotgun.splashes.size(), shotgun.tracers.size(),
+            (unsigned long long)shotgun.failed);
         if (!shotgun.update_error.empty())
             ImGui::TextWrapped("%s", shotgun.update_error.c_str());
         for (const auto& report : shotgun.reports)
             if (!report.error.empty())
-                ImGui::TextWrapped("Shotgun event %llu: %s", (unsigned long long)report.id, report.error.c_str());
+                ImGui::TextWrapped("Ballistic event %llu: %s", (unsigned long long)report.id, report.error.c_str());
         for (const auto& casing : shotgun.casings)
             if (!casing.sound_error.empty())
                 ImGui::TextWrapped("Casing %llu: %s", (unsigned long long)casing.id, casing.sound_error.c_str());
         for (const auto& weapon : game.client_shell.weapons)
-            if (weapon.type == WEAP_SHOTGUN)
+            if (weapon.model)
             {
                 ImGui::Text("Muzzle mode %u | second barrel %s", weapon.flash_visible,
                             weapon.second_barrel ? "yes" : "no");

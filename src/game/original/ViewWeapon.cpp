@@ -99,12 +99,13 @@ bool CViewWeapon::Create(DBYTE weapon, bool left_hand, ModelStore& models, Resou
         stop_[1] = stop_[0];
     }
     original_fire_ = fire_[0];
-    if (type == WEAP_SHOTGUN)
     {
         SpriteStore sprites(resources);
         const char* paths[]{definition->m_szFlashSprite, definition->m_szAltFlashSprite};
         for (unsigned i = 0; i < 2; ++i)
         {
+            if (!paths[i] || !paths[i][0])
+                continue;
             std::string failure;
             if (sprites.load(paths[i], flashes[i], failure))
                 for (const auto& frame : flashes[i]->frames)
@@ -190,7 +191,7 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
             ++shots;
             last_shot_time_ = engine.GetTime();
             last_alt_ = alternate;
-            if (type == WEAP_SHOTGUN && flashes[alternate])
+            if (flashes[alternate])
             {
                 flash_visible = alternate ? 2 : 1;
                 flash_started = engine.GetTime();

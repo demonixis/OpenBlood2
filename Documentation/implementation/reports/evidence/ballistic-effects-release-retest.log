@@ -1,0 +1,19 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/release
+    Start  862: weapon_sprites.session
+1/3 Test  #862: weapon_sprites.session ...........   Passed    0.30 sec
+    Start 1040: gpu.surface_effect
+2/3 Test #1040: gpu.surface_effect ...............   Passed    0.48 sec
+    Start 1041: gpu.surface_effect_private
+3/3 Test #1041: gpu.surface_effect_private .......   Passed    0.44 sec
+
+100% tests passed out of 3
+
+Label Time Summary:
+gpu               =   0.92 sec*proc (2 tests)
+headless          =   0.30 sec*proc (1 test)
+private           =   0.44 sec*proc (1 test)
+surface_effect    =   0.92 sec*proc (2 tests)
+weapon_sprites    =   0.30 sec*proc (1 test)
+world_view        =   0.92 sec*proc (2 tests)
+
+Total Test time (real) =   1.24 sec

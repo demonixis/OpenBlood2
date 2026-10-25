@@ -25,7 +25,7 @@ class CWeaponFX
     bool CreateSparks(ServerDE&, HOBJECT, DVector normal, float damage, bool melee, std::minstd_rand&);
     bool SelectBloodSpurt(float damage, std::minstd_rand&);
     bool CreateBloodSpurt(ServerDE&, HOBJECT, DVector normal, float damage, std::minstd_rand&);
-    bool CreateSprites(ServerDE&, HOBJECT, DVector normal, std::minstd_rand&, bool shotgun = false);
+    bool CreateSprites(ServerDE&, HOBJECT, DVector normal, std::minstd_rand&, bool ballistic_bubbles = false);
     bool PlayImpactSound(ServerDE&, HOBJECT source, std::minstd_rand&);
     std::string GetImpactSound(std::minstd_rand&) const;
 };

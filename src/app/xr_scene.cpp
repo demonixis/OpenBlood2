@@ -1,5 +1,5 @@
 #include "app/xr_scene.h"
-#include "app/xr_lines.h"
+#include "engine/line_renderer.h"
 #include "build_info.h"
 #include "engine/xr/xr_runtime.h"
 #include <SDL3/SDL.h>

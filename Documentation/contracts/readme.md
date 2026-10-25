@@ -268,3 +268,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Cathedral, Sewage and Slaughter House](cathedral_sewage_slaughter_contracts.md): Thief/Naga/Zealot, campaign weapons, resource omissions, sky and DLS compatibility.
 
 - [Crypt, Bridge, Entrance and Lobby](later_levels_contracts.md): Behemoth, Priest, Shroud, TheHand, Minigun, generic particles and authored-data boundaries.
+
+- [Shared ballistic effects](ballistic_effects_contracts.md): original bullet/shell/BMG effects, flashes and tracers (beta lot 4).

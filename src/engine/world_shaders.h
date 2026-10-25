@@ -10,7 +10,7 @@ namespace OpenBlood2
         Vertex,
         OpaqueFragment,
         AlphaFragment,
-        SkinnedVertex, // Rigid ABC node palette and packed deformation from storage buffers.
+        SkinnedVertex,  // Rigid ABC node palette and packed deformation from storage buffers.
         ShadowFragment, // Caster height for vertical model shadow tiles.
         // Enhanced renderer (physically based): standard/high quality, opaque/translucent.
         PbrFragment,
@@ -20,6 +20,8 @@ namespace OpenBlood2
         // Unlit lines with an asymmetric projection (XR grid, controller boxes, laser).
         LineVertex,
         LineFragment,
+        LineAuxFragment,
+        LineAuxSsrFragment,
         // Post-processing scene passes: the same shading plus target 1 (glow, occlusion mask) and
         // target 2 (window depth copy).
         OpaqueAuxFragment,

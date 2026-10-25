@@ -76,8 +76,8 @@ namespace OpenBlood2
         if (!physics_vector(s.source) || !physics_vector(s.destination) || !physics_vector(s.forward) ||
             !physics_vector(s.normal) || vector_dot(s.forward, s.forward) < 1e-12f ||
             vector_dot(s.normal, s.normal) < 1e-12f || !color(s.color1) || !color(s.color2) || !std::isfinite(now) ||
-            now < 0)
-            error = "Invalid shotgun effect payload";
+            now < 0 || (s.ammo != AMMO_BULLET && s.ammo != AMMO_SHELL && s.ammo != AMMO_BMG))
+            error = "Invalid ballistic effect payload";
         else
         {
             const auto normal = unit(s.normal), forward = unit(s.forward);
@@ -98,7 +98,7 @@ namespace OpenBlood2
                 b.direction = vector_scale(normal, 15);
                 b.color1 = {125, 125, 255};
                 b.color2 = {180, 180, 255};
-                b.count = 1;
+                b.count = s.ammo == AMMO_SHELL ? 1 : 4;
                 b.duration = 1.25f;
                 b.emission_radius = .05f;
                 b.radius = 600;
@@ -121,22 +121,34 @@ namespace OpenBlood2
                     smoke.normal = normal;
                     smoke.gravity = {random(-.5f, .5f), random(-.25f, .75f), random(-.5f, .5f)};
                     smoke.resource = "Sprites/smokepuff" + std::to_string(integer(1, 3)) + ".spr";
-                    smoke.duration = 1;
-                    smoke.alpha = .25f;
-                    smoke.scale1 = {.04f, .04f, 0};
+                    smoke.duration = s.ammo == AMMO_SHELL ? 1 : 1.5f;
+                    smoke.alpha = s.ammo == AMMO_SHELL ? .25f : .5f;
+                    const float first = s.ammo == AMMO_SHELL ? .04f : .05f;
+                    smoke.scale1 = {first, first, 0};
                     smoke.scale2 = {.25f, .25f, 0};
                     smoke.fade = smoke.move = true;
                     smoke.velocity = vector_scale(unit(vector_subtract(vector_scale(direction, 2), forward)), 3);
                     smoke.deceleration = vector_scale(forward, -.07f);
+                    if (s.ammo != AMMO_SHELL)
+                    {
+                        smoke.velocity = vector_scale(forward, 2);
+                        smoke.deceleration = vector_scale(direction, -.035f);
+                    }
                     std::string e;
                     report.smoke = server.PublishWeaponSprites(owner, ws, e);
                     failure(e);
                 }
                 DRotation eject_rotation;
                 align_rotation(direction, {0, 1, 0}, eject_rotation);
-                for (unsigned i = 0; i < 2; ++i)
+                for (unsigned i = 0; i < (s.ammo == AMMO_SHELL ? 2u : s.ammo == AMMO_BULLET ? 1u : 0u); ++i)
                 {
                     ShotgunCasing c;
+                    if (s.ammo == AMMO_BULLET)
+                    {
+                        c.model_path = "Models/Ammo/bshell.abc";
+                        c.skin_path = "Skins/Ammo/bshell.dtx";
+                        c.scale = 1.5f;
+                    }
                     c.id = next_id_++;
                     c.position = s.source;
                     c.last_time = now;
@@ -151,8 +163,7 @@ namespace OpenBlood2
                     c.pitch_velocity = random(-4 * std::numbers::pi_v<float>, 4 * std::numbers::pi_v<float>);
                     c.yaw_velocity = random(-4 * std::numbers::pi_v<float>, 4 * std::numbers::pi_v<float>);
                     std::string e;
-                    if (containers && models.load("Models/Ammo/sshell.abc", c.model, e) &&
-                        texture(resources, "Skins/Ammo/sshell.dtx", e))
+                    if (containers && models.load(c.model_path, c.model, e) && texture(resources, c.skin_path, e))
                     {
                         c.animation.animation = 0;
                         if (casings.size() == 100)
@@ -162,6 +173,34 @@ namespace OpenBlood2
                     }
                     failure(e);
                 }
+            }
+            if (s.eject && s.ammo == AMMO_BULLET)
+            {
+                // CTracerFX uses the impact-normal rotation, not the velocity/damage direction.
+                // It is stationary for .1 s; its supplied velocity is never applied.
+                const auto cast = vector_add(s.source, vector_scale(normal, 50));
+                SegmentHit hit;
+                const auto result = server.CastWorldRay(cast, normal, hit);
+                if (result == SegmentResult::Hit)
+                {
+                    const auto delta = vector_subtract(hit.point, s.source);
+                    const float distance = std::sqrt(vector_dot(delta, delta)) - 50;
+                    if (distance >= 50)
+                    {
+                        BallisticTracer tracer;
+                        tracer.center = vector_add(cast, vector_scale(normal, 50 + random(0, distance)));
+                        tracer.forward = normal;
+                        tracer.right = right;
+                        tracer.expires = now + .1;
+                        tracer.id = next_id_++;
+                        if (tracers.size() == 64)
+                            tracers.erase(tracers.begin());
+                        tracers.push_back(tracer);
+                        ++report.tracers;
+                    }
+                }
+                else if (result != SegmentResult::Miss)
+                    failure("Tracer world ray unavailable");
             }
             auto add_sprite = [&](ShotgunSprite fx)
             {
@@ -213,6 +252,8 @@ namespace OpenBlood2
                 fx.position = s.destination;
                 fx.rotation = rotation;
                 fx.color = {.1f, .1f, .1f};
+                const float mark_scale = s.ammo == AMMO_BULLET ? .05f : .035f;
+                fx.scale = {mark_scale, mark_scale, mark_scale};
                 std::string suffix;
                 switch (s.surface)
                 {
@@ -305,6 +346,7 @@ namespace OpenBlood2
     }
     void ShotgunEffects::advance(double now, ServerDE& server)
     {
+        std::erase_if(tracers, [&](const auto& t) { return now > t.expires; });
         auto valid_time = [&](double last) { return std::isfinite(now) && now >= last && now - last <= 1; };
         for (auto& c : casings)
         {
@@ -435,6 +477,7 @@ namespace OpenBlood2
     void ShotgunEffects::clear()
     {
         casings.clear();
+        tracers.clear();
         sprites.clear();
         splashes.clear();
         reports.clear();

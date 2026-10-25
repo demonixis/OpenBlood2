@@ -15,6 +15,10 @@
 #include "engine/shaders/gtao_frag_msl.h"
 #include "engine/shaders/hiz_down_frag.h"
 #include "engine/shaders/hiz_down_frag_msl.h"
+#include "engine/shaders/line_aux_frag.h"
+#include "engine/shaders/line_aux_frag_msl.h"
+#include "engine/shaders/line_aux_ssr_frag.h"
+#include "engine/shaders/line_aux_ssr_frag_msl.h"
 #include "engine/shaders/line_frag.h"
 #include "engine/shaders/line_frag_msl.h"
 #include "engine/shaders/line_vert.h"
@@ -139,6 +143,8 @@ namespace OpenBlood2
                 BLOOD2_FRAGMENT_SHADER(PbrAlphaFragment, pbr_alpha_frag)
                 BLOOD2_FRAGMENT_SHADER(PbrHighAlphaFragment, pbr_high_alpha_frag)
                 BLOOD2_FRAGMENT_SHADER(LineFragment, line_frag)
+                BLOOD2_FRAGMENT_SHADER(LineAuxFragment, line_aux_frag)
+                BLOOD2_FRAGMENT_SHADER(LineAuxSsrFragment, line_aux_ssr_frag)
                 BLOOD2_FRAGMENT_SHADER(OpaqueAuxFragment, world_aux_frag)
                 BLOOD2_FRAGMENT_SHADER(AlphaAuxFragment, sprite_aux_frag)
                 BLOOD2_FRAGMENT_SHADER(PbrAuxFragment, pbr_aux_frag)

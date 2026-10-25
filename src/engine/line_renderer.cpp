@@ -1,4 +1,4 @@
-#include "app/xr_lines.h"
+#include "engine/line_renderer.h"
 #include "engine/world_shaders.h"
 #include <SDL3/SDL.h>
 #include <algorithm>
@@ -46,9 +46,16 @@ namespace OpenBlood2
             SDL_ReleaseGPUGraphicsPipeline(device_, pipeline_);
     }
 
-    bool LineRenderer::prepare(SDL_GPUTextureFormat color, SDL_GPUTextureFormat depth, std::string& error)
+    bool LineRenderer::prepare(SDL_GPUTextureFormat color, SDL_GPUTextureFormat depth, std::string& error,
+                               SDL_GPUSampleCount samples, unsigned targets, bool blend)
     {
-        if (pipeline_ && color == color_ && depth == depth_)
+        if (targets != 1 && targets != 3 && targets != 5)
+        {
+            error = "Invalid line render target count";
+            return false;
+        }
+        if (pipeline_ && color == color_ && depth == depth_ && samples == samples_ && targets == targets_ &&
+            blend == blend_)
             return true;
         if (pipeline_)
         {
@@ -58,7 +65,10 @@ namespace OpenBlood2
         const SDL_GPUShaderFormat formats = SDL_GetGPUShaderFormats(device_);
         SDL_GPUShaderCreateInfo vertex_info{}, fragment_info{};
         if (!world_shader_info(WorldShader::LineVertex, formats, vertex_info) ||
-            !world_shader_info(WorldShader::LineFragment, formats, fragment_info))
+            !world_shader_info(targets == 5   ? WorldShader::LineAuxSsrFragment
+                               : targets == 3 ? WorldShader::LineAuxFragment
+                                              : WorldShader::LineFragment,
+                               formats, fragment_info))
         {
             error = "Line shaders unavailable for this GPU";
             return false;
@@ -71,8 +81,28 @@ namespace OpenBlood2
             const std::array<SDL_GPUVertexAttribute, 2> attributes{
                 {{0, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3, 0},
                  {1, 0, SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4, offsetof(LineVertex, color)}}};
-            SDL_GPUColorTargetDescription target{};
-            target.format = color;
+            std::array<SDL_GPUColorTargetDescription, 5> target{};
+            for (unsigned i = 0; i < targets; ++i)
+            {
+                target[i].format = i == 0   ? color
+                                   : i == 2 ? SDL_GPU_TEXTUREFORMAT_R32_FLOAT
+                                            : SDL_GPU_TEXTUREFORMAT_R16G16B16A16_FLOAT;
+                target[i].blend_state.enable_color_write_mask = i != 0;
+                target[i].blend_state.color_write_mask = 0;
+            }
+            target[0].blend_state.enable_blend = blend;
+            target[0].blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+            target[0].blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+            target[0].blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
+            target[0].blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+            target[0].blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+            target[0].blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
+            if (targets > 1)
+            {
+                target[1].blend_state = target[0].blend_state;
+                target[1].blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+                target[1].blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ZERO;
+            }
             SDL_GPUGraphicsPipelineCreateInfo info{};
             info.vertex_shader = vertex;
             info.fragment_shader = fragment;
@@ -83,10 +113,11 @@ namespace OpenBlood2
             info.primitive_type = SDL_GPU_PRIMITIVETYPE_LINELIST;
             info.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
             info.depth_stencil_state.enable_depth_test = true;
-            info.depth_stencil_state.enable_depth_write = true;
+            info.depth_stencil_state.enable_depth_write = !blend;
             info.depth_stencil_state.compare_op = SDL_GPU_COMPAREOP_LESS;
-            info.target_info.color_target_descriptions = &target;
-            info.target_info.num_color_targets = 1;
+            info.multisample_state.sample_count = samples;
+            info.target_info.color_target_descriptions = target.data();
+            info.target_info.num_color_targets = targets;
             info.target_info.depth_stencil_format = depth;
             info.target_info.has_depth_stencil_target = true;
             pipeline_ = SDL_CreateGPUGraphicsPipeline(device_, &info);
@@ -100,6 +131,9 @@ namespace OpenBlood2
             error = std::string("Line pipeline: ") + SDL_GetError();
             return false;
         }
+        samples_ = samples;
+        targets_ = targets;
+        blend_ = blend;
         color_ = color;
         depth_ = depth;
         return true;
@@ -158,11 +192,11 @@ namespace OpenBlood2
 
     void LineRenderer::draw(SDL_GPURenderPass* pass, SDL_GPUCommandBuffer* commands, const xr::LineUniform& uniform,
                             Uint32 width, Uint32 height, float min_depth, float max_depth, std::uint32_t first,
-                            std::uint32_t count) const
+                            std::uint32_t count, Uint32 top) const
     {
         if (!pipeline_ || !buffer_ || !count || first > uploaded_ || count > uploaded_ - first)
             return;
-        const SDL_GPUViewport viewport{0,         0,        static_cast<float>(width), static_cast<float>(height),
+        const SDL_GPUViewport viewport{0,         float(top), static_cast<float>(width), static_cast<float>(height),
                                        min_depth, max_depth};
         SDL_SetGPUViewport(pass, &viewport);
         SDL_BindGPUGraphicsPipeline(pass, pipeline_);

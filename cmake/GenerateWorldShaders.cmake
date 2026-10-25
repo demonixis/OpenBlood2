@@ -22,7 +22,7 @@ set(pbr_alpha_frag_source pbr.frag)
 set(pbr_alpha_frag_defines -DPBR_ALPHA)
 set(pbr_high_alpha_frag_source pbr.frag)
 set(pbr_high_alpha_frag_defines -DPBR_HIGH -DPBR_ALPHA)
-foreach(variant world sprite pbr pbr_high pbr_alpha pbr_high_alpha)
+foreach(variant line world sprite pbr pbr_high pbr_alpha pbr_high_alpha)
     if(DEFINED ${variant}_frag_source)
         set(${variant}_aux_frag_source ${${variant}_frag_source})
     else()
@@ -33,7 +33,7 @@ foreach(variant world sprite pbr pbr_high pbr_alpha pbr_high_alpha)
     set(${variant}_aux_ssr_frag_defines ${${variant}_aux_frag_defines} -DREFLECTION_TARGETS)
 endforeach()
 foreach(shader world_vert skinned_vert world_frag sprite_frag shadow_frag pbr_frag pbr_high_frag pbr_alpha_frag
-        pbr_high_alpha_frag line_vert line_frag world_aux_frag sprite_aux_frag pbr_aux_frag pbr_high_aux_frag
+        pbr_high_alpha_frag line_vert line_frag line_aux_frag line_aux_ssr_frag world_aux_frag sprite_aux_frag pbr_aux_frag pbr_high_aux_frag
         pbr_alpha_aux_frag pbr_high_alpha_aux_frag post_vert bloom_down_frag bloom_up_frag composite_frag fxaa_frag
         ao_depth_frag gtao_frag ao_blur_frag world_aux_ssr_frag sprite_aux_ssr_frag pbr_aux_ssr_frag pbr_high_aux_ssr_frag
         pbr_alpha_aux_ssr_frag pbr_high_alpha_aux_ssr_frag ssr_trace_frag ssr_blur_frag hiz_down_frag)

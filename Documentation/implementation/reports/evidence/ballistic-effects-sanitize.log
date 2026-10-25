@@ -1,0 +1,40 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/sanitize
+      Start  183: weapons.inventory
+ 1/14 Test  #183: weapons.inventory ................   Passed    0.82 sec
+      Start  184: weapons.segments
+ 2/14 Test  #184: weapons.segments .................   Passed    0.08 sec
+      Start  185: weapons.firing
+ 3/14 Test  #185: weapons.firing ...................   Passed    0.08 sec
+      Start  186: weapons.melee
+ 4/14 Test  #186: weapons.melee ....................   Passed    0.08 sec
+      Start  187: weapons.damage
+ 5/14 Test  #187: weapons.damage ...................   Passed    0.08 sec
+      Start  188: weapons.animation
+ 6/14 Test  #188: weapons.animation ................   Passed    0.18 sec
+      Start  189: weapons.lifetime
+ 7/14 Test  #189: weapons.lifetime .................   Passed    0.09 sec
+      Start  190: weapons.rollback
+ 8/14 Test  #190: weapons.rollback .................   Passed    0.08 sec
+      Start  807: world_shaders.formats
+ 9/14 Test  #807: world_shaders.formats ............   Passed    0.27 sec
+      Start 1019: shotgun_effects.recipes
+10/14 Test #1019: shotgun_effects.recipes ..........   Passed    0.71 sec
+      Start 1020: shotgun_effects.ballistics
+11/14 Test #1020: shotgun_effects.ballistics .......   Passed    0.10 sec
+      Start 1021: shotgun_effects.lifecycle
+12/14 Test #1021: shotgun_effects.lifecycle ........   Passed    0.11 sec
+      Start 1022: shotgun_effects.liquids
+13/14 Test #1022: shotgun_effects.liquids ..........   Passed    0.09 sec
+      Start 1023: shotgun_effects.failures
+14/14 Test #1023: shotgun_effects.failures .........   Passed    0.08 sec
+
+100% tests passed out of 14
+
+Label Time Summary:
+effects       =   1.08 sec*proc (5 tests)
+headless      =   2.84 sec*proc (14 tests)
+shaders       =   0.27 sec*proc (1 test)
+weapons       =   1.48 sec*proc (8 tests)
+world_view    =   0.27 sec*proc (1 test)
+
+Total Test time (real) =   2.86 sec

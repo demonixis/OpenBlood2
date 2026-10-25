@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-25",
+  "scope": "Beta VFX lot 4: shared ballistic presentation and authored muzzle flashes",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Weapon.cpp",
+      "source_sha256": "f045ec970e4b61fd5ad23c629f0123c54aa42196f9490e0ff19ccf485ed5c5fb",
+      "purpose": "UpdateWeaponFX first-contact ejection and FireSpread ammo selection."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/GameWeapons.cpp",
+      "source_sha256": "979f6e82b231714dd18209fcb8fcfce949c6e4b5235c618c5150bd5c0be332a2",
+      "purpose": "Shotgun ejection override and Minigun empty AddImpact."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/WeaponFX.cpp",
+      "source_sha256": "4cd80dfbf5f400950854b45db3cd7907b9369e2cd8c31f90bd797b59b4b517b1",
+      "purpose": "Bullet/shell/BMG smoke, casing, mark, bubbles and tracer composition."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/ShellCasingFX.cpp",
+      "source_sha256": "ebfcd41e2aa21a47aab93ec7f5b4a7e41cff8e6ace477f432926418c081b15ad",
+      "purpose": "Ammo-specific model, skin and scale; shared launch/bounce rules."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/TracerFX.cpp",
+      "source_sha256": "acc30ccc6204061363742bc20c843d8c5cc00082d6cded8befbcbdfa6b716b8f",
+      "purpose": "Impact-normal CastRay, random centre, three stationary lines and strict expiry."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/ViewWeapon.cpp",
+      "source_sha256": "8dc314214889f387a89baf44a0689c0a4be9f466e5c9b33a7453db5a547cb529",
+      "purpose": "Authored primary/alternate flash loading, placement and lifetime."
+    },
+    {
+      "source": "sources/lithtech/Blood2/Shared/WeaponDefs.cpp",
+      "source_sha256": "7693d587a88491eb5499847efcc7cc3d0a81b14bf17dcaa0f63a979f9e394a9d",
+      "purpose": "Weapon-specific muzzle assets, scale and duration."
+    }
+  ]
+}

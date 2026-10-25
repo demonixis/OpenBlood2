@@ -99,9 +99,9 @@ namespace OpenBlood2
         }
         for (const auto& fx : game.server.shotgun_effects.casings)
         {
-            if (!scene.add(fx.model, fx.animation, "Skins/Ammo/sshell.dtx", {fx.position, fx.rotation},
-                           {2.25f, 2.25f, 2.25f}, fx.visible, false, {}, "Models/Ammo/sshell.abc", game.resources,
-                           error, {}, 1, true))
+            if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.position, fx.rotation},
+                           {fx.scale, fx.scale, fx.scale}, fx.visible, false, {}, fx.model_path, game.resources, error,
+                           {}, 1, true))
                 return false;
         }
         const auto* owner = game.server_shell.Player(game.local_client);

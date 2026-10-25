@@ -46,10 +46,8 @@ FireResult CWeapon::FireVector()
         impact.stopping_surface = impact.surface;
         bool damage = false, alert_before = false, alert_after = false;
         // UpdateWeaponFX consumes this bit even when a fire-through/non-liquid volume suppresses AddImpact.
-        auto* shotgun = dynamic_cast<CShotgun*>(this);
-        const bool eject = shotgun && shotgun->eject_pending;
-        if (shotgun)
-            shotgun->eject_pending = false;
+        const bool eject = eject_pending;
+        eject_pending = false;
         if (auto* volume = dynamic_cast<VolumeBrush*>(object))
         {
             impact.branch = WeaponImpactBranch::Volume;
@@ -96,7 +94,7 @@ FireResult CWeapon::FireVector()
             impact.effect.m_eSurfaceType = static_cast<SurfaceType>(static_cast<DBYTE>(impact.surface));
             impact.effect.m_vDestPos = vector_add(impact.hit.point, vector_scale(impact.hit.normal, 1.25f));
             impact.effect.SelectBloodSpurt(last_shot.damage, impact_random);
-            impact.effect.CreateSprites(*server, m_hOwner, impact.hit.normal, impact_random, shotgun != nullptr);
+            impact.effect.CreateSprites(*server, m_hOwner, impact.hit.normal, impact_random, marks);
             impact.effect.CreateSparks(*server, m_hOwner, impact.hit.normal, last_shot.damage,
                                        data.m_nType == WEAP_MELEE, impact_random);
             if (!impact.effect.PlayImpactSound(*server, m_hOwner, impact_random))
@@ -104,7 +102,7 @@ FireResult CWeapon::FireVector()
             if (impact.effect.sound)
                 ++impact_sounds;
             impact.effect.CreateBloodSpurt(*server, m_hOwner, impact.hit.normal, last_shot.damage, impact_random);
-            if (shotgun)
+            if (marks)
             {
                 ShotgunEffectSettings fx;
                 fx.source = from;
@@ -113,6 +111,7 @@ FireResult CWeapon::FireVector()
                 fx.forward = direction;
                 fx.surface = impact.effect.m_eSurfaceType;
                 fx.eject = eject;
+                fx.ammo = GetAmmoType(last_shot.request.alternate);
                 fx.left = last_shot.request.left;
                 if (const auto* volume = dynamic_cast<VolumeBrush*>(object))
                 {

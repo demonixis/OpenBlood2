@@ -1,0 +1,168 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/release
+      Start  215: weapons.inventory
+ 1/66 Test  #215: weapons.inventory ................   Passed    0.25 sec
+      Start  216: weapons.segments
+ 2/66 Test  #216: weapons.segments .................   Passed    0.01 sec
+      Start  217: weapons.firing
+ 3/66 Test  #217: weapons.firing ...................   Passed    0.01 sec
+      Start  218: weapons.melee
+ 4/66 Test  #218: weapons.melee ....................   Passed    0.01 sec
+      Start  219: weapons.damage
+ 5/66 Test  #219: weapons.damage ...................   Passed    0.01 sec
+      Start  220: weapons.animation
+ 6/66 Test  #220: weapons.animation ................   Passed    0.01 sec
+      Start  221: weapons.lifetime
+ 7/66 Test  #221: weapons.lifetime .................   Passed    0.01 sec
+      Start  222: weapons.rollback
+ 8/66 Test  #222: weapons.rollback .................   Passed    0.01 sec
+      Start  223: weapons.private
+ 9/66 Test  #223: weapons.private ..................   Passed    2.21 sec
+      Start  735: weapon_drops.collect
+10/66 Test  #735: weapon_drops.collect .............   Passed    0.28 sec
+      Start  736: weapon_drops.protocol
+11/66 Test  #736: weapon_drops.protocol ............   Passed    0.01 sec
+      Start  737: weapon_drops.drop
+12/66 Test  #737: weapon_drops.drop ................   Passed    0.01 sec
+      Start  738: weapon_drops.falling
+13/66 Test  #738: weapon_drops.falling .............   Passed    0.01 sec
+      Start  739: weapon_drops.guards
+14/66 Test  #739: weapon_drops.guards ..............   Passed    0.01 sec
+      Start  740: weapon_drops.failures
+15/66 Test  #740: weapon_drops.failures ............   Passed    0.01 sec
+      Start  741: weapon_drops.nosliding
+16/66 Test  #741: weapon_drops.nosliding ...........   Passed    0.01 sec
+      Start  742: weapon_drops.callback
+17/66 Test  #742: weapon_drops.callback ............   Passed    0.01 sec
+      Start  743: weapon_drops.missing_pickup
+18/66 Test  #743: weapon_drops.missing_pickup ......   Passed    0.01 sec
+      Start  744: weapon_drops.catalog
+19/66 Test  #744: weapon_drops.catalog .............   Passed    0.01 sec
+      Start  844: weapon_audio.voices
+20/66 Test  #844: weapon_audio.voices ..............   Passed    0.32 sec
+      Start  845: weapon_audio.hearing
+21/66 Test  #845: weapon_audio.hearing .............   Passed    0.01 sec
+      Start  846: weapon_audio.failures
+22/66 Test  #846: weapon_audio.failures ............   Passed    0.01 sec
+      Start  847: weapon_audio.callbacks
+23/66 Test  #847: weapon_audio.callbacks ...........   Passed    0.01 sec
+      Start  848: weapon_audio.lifetime
+24/66 Test  #848: weapon_audio.lifetime ............   Passed    0.01 sec
+      Start  849: weapon_audio.private
+25/66 Test  #849: weapon_audio.private .............   Passed    0.09 sec
+      Start  850: weapon_impacts.selection
+26/66 Test  #850: weapon_impacts.selection .........   Passed    0.31 sec
+      Start  851: weapon_impacts.world
+27/66 Test  #851: weapon_impacts.world .............   Passed    0.01 sec
+      Start  852: weapon_impacts.brushes
+28/66 Test  #852: weapon_impacts.brushes ...........   Passed    0.01 sec
+      Start  853: weapon_impacts.volumes
+29/66 Test  #853: weapon_impacts.volumes ...........   Passed    0.01 sec
+      Start  854: weapon_impacts.hearing
+30/66 Test  #854: weapon_impacts.hearing ...........   Passed    0.01 sec
+      Start  855: weapon_impacts.limits
+31/66 Test  #855: weapon_impacts.limits ............   Passed    0.01 sec
+      Start  856: weapon_impacts.private
+32/66 Test  #856: weapon_impacts.private ...........   Passed    0.67 sec
+      Start  857: weapon_sprites.formulas
+33/66 Test  #857: weapon_sprites.formulas ..........   Passed    0.39 sec
+      Start  858: weapon_sprites.delay
+34/66 Test  #858: weapon_sprites.delay .............   Passed    0.02 sec
+      Start  859: weapon_sprites.failures
+35/66 Test  #859: weapon_sprites.failures ..........   Passed    0.01 sec
+      Start  860: weapon_sprites.selection
+36/66 Test  #860: weapon_sprites.selection .........   Passed    0.01 sec
+      Start  861: weapon_sprites.containers
+37/66 Test  #861: weapon_sprites.containers ........   Passed    0.01 sec
+      Start  862: weapon_sprites.session
+38/66 Test  #862: weapon_sprites.session ...........***Failed    0.01 sec
+session:242: g.server.weapon_sprites.started == 2 && g.server.weapon_sprites.failed == 0
+
+      Start  863: weapon_sprites.private
+39/66 Test  #863: weapon_sprites.private ...........   Passed    0.23 sec
+      Start  975: mac10.collect
+40/66 Test  #975: mac10.collect ....................   Passed    0.30 sec
+      Start  976: mac10.automatic
+41/66 Test  #976: mac10.automatic ..................   Passed    0.04 sec
+      Start  977: mac10.damage
+42/66 Test  #977: mac10.damage .....................   Passed    0.01 sec
+      Start  978: mac10.restore
+43/66 Test  #978: mac10.restore ....................   Passed    0.01 sec
+      Start  979: mac10.drop
+44/66 Test  #979: mac10.drop .......................   Passed    0.01 sec
+      Start  980: mac10.private
+45/66 Test  #980: mac10.private ....................   Passed    1.93 sec
+      Start  981: mac10.ai
+46/66 Test  #981: mac10.ai .........................   Passed    0.03 sec
+      Start 1040: gpu.surface_effect
+47/66 Test #1040: gpu.surface_effect ...............***Failed    0.45 sec
+GPU device: Apple M5
+105: pixel(left, top, 0) == 255 && pixel(left, bottom, 0) == 255  
+
+      Start 1041: gpu.surface_effect_private
+48/66 Test #1041: gpu.surface_effect_private .......***Failed    0.15 sec
+GPU device: Apple M5
+105: pixel(left, top, 0) == 255 && pixel(left, bottom, 0) == 255  
+
+      Start 1042: world_shaders.formats
+49/66 Test #1042: world_shaders.formats ............   Passed    0.23 sec
+      Start 1102: gpu.surface
+50/66 Test #1102: gpu.surface ......................   Passed    1.12 sec
+      Start 1103: gpu.post
+51/66 Test #1103: gpu.post .........................   Passed    1.11 sec
+      Start 1118: shotgun.weapon
+52/66 Test #1118: shotgun.weapon ...................   Passed    0.31 sec
+      Start 1119: shotgun.pickup
+53/66 Test #1119: shotgun.pickup ...................   Passed    0.02 sec
+      Start 1120: shotgun.ai
+54/66 Test #1120: shotgun.ai .......................   Passed    0.03 sec
+      Start 1121: shotgun.player
+55/66 Test #1121: shotgun.player ...................   Passed    0.44 sec
+      Start 1514: destruction_debris.recipes
+56/66 Test #1514: destruction_debris.recipes .......   Passed    0.30 sec
+      Start 1515: destruction_debris.motion
+57/66 Test #1515: destruction_debris.motion ........   Passed    0.02 sec
+      Start 1516: destruction_debris.destruction
+58/66 Test #1516: destruction_debris.destruction ...   Passed    0.01 sec
+      Start 1517: destruction_debris.retail
+59/66 Test #1517: destruction_debris.retail ........   Passed    1.65 sec
+      Start 1519: shotgun_effects.recipes
+60/66 Test #1519: shotgun_effects.recipes ..........   Passed    0.29 sec
+      Start 1520: shotgun_effects.ballistics
+61/66 Test #1520: shotgun_effects.ballistics .......   Passed    0.01 sec
+      Start 1521: shotgun_effects.lifecycle
+62/66 Test #1521: shotgun_effects.lifecycle ........   Passed    0.02 sec
+      Start 1522: shotgun_effects.liquids
+63/66 Test #1522: shotgun_effects.liquids ..........   Passed    0.01 sec
+      Start 1523: shotgun_effects.failures
+64/66 Test #1523: shotgun_effects.failures .........   Passed    0.01 sec
+      Start 1524: shotgun_effects.retail
+65/66 Test #1524: shotgun_effects.retail ...........   Passed    0.81 sec
+      Start 1525: gpu.shotgun_effects
+66/66 Test #1525: gpu.shotgun_effects ..............   Passed    0.93 sec
+
+95% tests passed, 3 tests failed out of 66
+
+Label Time Summary:
+effects           =   4.06 sec*proc (11 tests)
+gpu               =   3.75 sec*proc (5 tests)
+headless          =  11.49 sec*proc (61 tests)
+mac10             =   2.32 sec*proc (7 tests)
+private           =  11.73 sec*proc (17 tests)
+shaders           =   0.23 sec*proc (1 test)
+shotgun           =   0.80 sec*proc (4 tests)
+surface           =   2.23 sec*proc (2 tests)
+surface_effect    =   0.60 sec*proc (2 tests)
+weapon_audio      =   0.45 sec*proc (6 tests)
+weapon_drops      =   0.34 sec*proc (10 tests)
+weapon_impacts    =   1.02 sec*proc (7 tests)
+weapon_sprites    =   0.68 sec*proc (7 tests)
+weapons           =   2.51 sec*proc (9 tests)
+world_view        =   0.83 sec*proc (3 tests)
+
+Total Test time (real) =  15.29 sec
+
+The following tests FAILED:
+	862 - weapon_sprites.session (Failed)                   headless weapon_sprites
+	1040 - gpu.surface_effect (Failed)                       gpu surface_effect world_view
+	1041 - gpu.surface_effect_private (Failed)               gpu private surface_effect world_view
+Errors while running CTest

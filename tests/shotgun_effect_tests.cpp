@@ -17,6 +17,10 @@ using namespace OpenBlood2;
     } while (false)
 namespace
 {
+    struct BallisticWeapon : CWeapon
+    {
+        explicit BallisticWeapon(DBYTE type) : CWeapon(type) {}
+    };
     struct SaveProbe : B2BaseClass
     {
         DDWORD EngineMessageFn(DDWORD id, void*, DFLOAT) override
@@ -43,6 +47,9 @@ namespace
         if (!missing)
             dir.children["models"].children["ammo"].files["sshell.abc"] = model;
         dir.children["skins"].children["ammo"].files["sshell.dtx"] = skin;
+        if (!missing)
+            dir.children["models"].children["ammo"].files["bshell.abc"] = model;
+        dir.children["skins"].children["ammo"].files["bshell.dtx"] = skin;
         dir.children["spritetextures"].files["drop32_1.dtx"] = skin;
         dir.children["spritetextures"].children["particles"].files["particlebubble.dtx"] = skin;
         for (const auto* name : {"blthole", "blthole2", "blthole3", "blthole4", "blthole5", "woodsplint1",
@@ -139,6 +146,85 @@ namespace
         CHECK(!g.server.save_object_payload(saved, 0, {}, bytes, report) && fx.started == before);
         return true;
     }
+    bool ballistics(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(setup(g, root));
+        std::string error;
+        auto owner = g.objects.create(g.objects.find_class("BaseClass"), {});
+        auto& fx = g.server.shotgun_effects;
+        auto s = recipe();
+        s.ammo = AMMO_BULLET;
+        s.eject = true;
+        s.source = {0, 200, 0};
+        s.normal = {0, -1, 0}; // The original tracer ray follows the normal, not the shot.
+        CHECK(publish(g, s, owner));
+        CHECK(fx.casings.size() == 1 && fx.casings[0].scale == 1.5f &&
+              fx.casings[0].skin_path == "Skins/Ammo/bshell.dtx");
+        CHECK(fx.sprites[0].scale.x == .05f && fx.reports.back().tracers == 1);
+        const auto tracer = fx.tracers[0];
+        CHECK(tracer.forward.y == -1 && tracer.forward.z == 0 && tracer.expires == .1);
+        const auto& smoke = g.server.weapon_sprites.reports.back().settings.smoke;
+        CHECK(smoke && smoke->duration == 1.5f && smoke->alpha == .5f && smoke->scale1.x == .05f &&
+              smoke->velocity.z == 2);
+        fx.advance(.1, g.server);
+        CHECK(fx.tracers.size() == 1 && fx.tracers[0].center.y == tracer.center.y);
+        fx.advance(.101, g.server);
+        CHECK(fx.tracers.empty());
+        fx.clear();
+        s.source.y = 80; // Ray hit too close: deliberately no tracer.
+        CHECK(publish(g, s, owner));
+        CHECK(fx.tracers.empty());
+        fx.clear();
+        s.ammo = AMMO_BMG;
+        s.eject = false;
+        CHECK(publish(g, s, owner));
+        CHECK(fx.casings.empty() && fx.tracers.empty() && fx.reports.back().smoke == 0 &&
+              fx.sprites[0].scale.x == .035f);
+        for (auto type : {WEAP_BERETTA, WEAP_SUBMACHINEGUN, WEAP_ASSAULTRIFLE, WEAP_SNIPERRIFLE, WEAP_MINIGUN})
+        {
+            BallisticWeapon weapon(type);
+            weapon.BeginFire(false);
+            CHECK(weapon.eject_pending == (weapon.data.m_nAmmoType == AMMO_BULLET));
+        }
+        CHECK(g.enter_player(error));
+        auto* player = g.server_shell.Player(g.local_client);
+        auto& inventory = player->m_InventoryMgr;
+        for (auto type : {WEAP_BERETTA, WEAP_SUBMACHINEGUN, WEAP_ASSAULTRIFLE, WEAP_SNIPERRIFLE, WEAP_MINIGUN})
+            for (bool left : {false, true})
+            {
+                fx.clear();
+                BallisticWeapon gun(type);
+                gun.Init(player->m_hObject, &inventory, left);
+                inventory.SetAmmoCount(gun.GetAmmoType(), 100);
+                WeaponFire request{{500, 300, 0}, {0, -1, 0}, 42, type, false, left};
+                CHECK(gun.Fire(request) == FireResult::Fired);
+                const bool effects = type != WEAP_MINIGUN;
+                CHECK(!fx.reports.empty() == effects);
+                CHECK(fx.casings.size() == unsigned(effects && gun.GetAmmoType() == AMMO_BULLET));
+                if (effects)
+                {
+                    CHECK(fx.reports[0].settings.eject == (gun.GetAmmoType() == AMMO_BULLET));
+                    CHECK(fx.reports[0].settings.left == left);
+                }
+                fx.clear();
+                BallisticWeapon miss(type);
+                miss.Init(player->m_hObject, &inventory, left);
+                request.direction = {0, 1, 0};
+                CHECK(miss.Fire(request) == FireResult::Fired && fx.reports.empty());
+            }
+        s.ammo = AMMO_BULLET;
+        s.eject = true;
+        s.normal = {0, 0, -1};
+        g.world.models.push_back(test_brush::box("water", {-20, 50, -20}, {20, 110, 120}));
+        CHECK(g.objects.create(g.objects.find_class("Water"), {}, Creation::World,
+                               {{"Name", std::string("water")}, {"ShowSurface", false}}));
+        CHECK(publish(g, s, owner));
+        CHECK(fx.reports.back().bubbles == 2 && g.server.sparks.reports.back().settings.count == 4);
+        g.server.reset_world_time();
+        CHECK(fx.casings.empty() && fx.tracers.empty());
+        return true;
+    }
     bool lifecycle(const std::filesystem::path& root)
     {
         GameSession g;
@@ -208,7 +294,7 @@ namespace
         CHECK(g.server.PublishShotgunEffects(owner, s, error) && !error.empty());
         CHECK(g.server.shotgun_effects.casings.empty() && g.server.shotgun_effects.reports.back().fragments > 0);
         s.normal = {};
-        CHECK(g.server.PublishShotgunEffects(owner, s, error) && error == "Invalid shotgun effect payload");
+        CHECK(g.server.PublishShotgunEffects(owner, s, error) && error == "Invalid ballistic effect payload");
         CHECK(g.server.shotgun_effects.failed == 2);
         return true;
     }
@@ -221,6 +307,18 @@ namespace
         std::string error;
         CHECK(g.resources.mount_game(cfg, error));
         CHECK(g.request_world("01_subwaya", error) && g.enter_player(error) && test_camera::complete_subway_intro(g));
+        for (auto type : {WEAP_BERETTA, WEAP_SUBMACHINEGUN, WEAP_SNIPERRIFLE, WEAP_ASSAULTRIFLE, WEAP_MINIGUN})
+            for (bool left : {false, true})
+            {
+                const auto* data = weapon_definition(type);
+                if (left && (!data->m_szLeftViewModelFilename || !data->m_szLeftViewModelFilename[0]))
+                    continue;
+                CViewWeapon check;
+                CHECK(check.Create(type, left, g.models, g.resources, error));
+                CHECK(check.flash_error.empty());
+                CHECK(bool(check.flashes[0]) == bool(data->m_szFlashSprite && data->m_szFlashSprite[0]));
+                CHECK(bool(check.flashes[1]) == bool(data->m_szAltFlashSprite && data->m_szAltFlashSprite[0]));
+            }
         auto* player = g.server_shell.Player(g.local_client);
         auto& inv = player->m_InventoryMgr;
         CHECK(inv.ObtainWeapon(WEAP_SHOTGUN, 3) == InventoryResult::Ok);
@@ -306,12 +404,13 @@ int main(int argc, char** argv)
     if (argc != 3)
         return 2;
     std::string mode = argv[1];
-    return (mode == "recipes"     ? recipes(argv[2])
-            : mode == "lifecycle" ? lifecycle(argv[2])
-            : mode == "liquids"   ? liquids(argv[2])
-            : mode == "failures"  ? failures(argv[2])
-            : mode == "retail"    ? retail(argv[2])
-                                  : false)
+    return (mode == "recipes"      ? recipes(argv[2])
+            : mode == "ballistics" ? ballistics(argv[2])
+            : mode == "lifecycle"  ? lifecycle(argv[2])
+            : mode == "liquids"    ? liquids(argv[2])
+            : mode == "failures"   ? failures(argv[2])
+            : mode == "retail"     ? retail(argv[2])
+                                   : false)
                ? 0
                : 1;
 }
