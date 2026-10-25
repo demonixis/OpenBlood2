@@ -5,10 +5,13 @@
 #include "game/original/ExitTrigger.h"
 #include "game/original/Fanatic.h"
 #include "game/original/NewStatusBar.h"
+#include "game/original/RotatingBrush.h"
 #include "game/original/Spawner.h"
+#include "game/original/Trigger.h"
 #include "game/original/WeaponPickups.h"
 #include "game/server_adapter.h"
 #include "player_fixture.h"
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 using namespace OpenBlood2;
@@ -155,6 +158,127 @@ namespace
                     std::cerr << message << '\n';
                 return false;
             }
+        return true;
+    }
+    bool computer_doors(const char* root)
+    {
+        std::string error;
+        GameSession g;
+        CHECK(load(g, root, "Demo_01") && advance(g, 60));
+        auto named = [&](std::string_view name) -> ObjectRecord*
+        {
+            for (auto id : g.objects.snapshot())
+                if (auto* r = g.objects.get(id); r && std::string_view(r->state.m_Name) == name)
+                    return r;
+            return nullptr;
+        };
+        auto* p = g.server_shell.Player(g.local_client);
+        CHECK(p);
+        // Labelled placement on a checked primary-world floor near the computer.
+        // An arbitrary teleport into this channel can be outside playable geometry.
+        const auto dimensions = g.objects.get(p->m_hObject)->dimensions;
+        DVector at{-1336, 2048 + dimensions.y + .01f, -1088};
+        CollisionHit clear;
+        CHECK(g.collision.sweep(at, at, dimensions, clear) == CollisionQuery::Miss);
+        CHECK(g.server.TeleportObject(p->m_hObject, &at) == DE_OK && advance(g, 1));
+        MovementState standing;
+        CHECK(g.server.GetMovementState(p->m_hObject, standing) && standing.standing);
+        const auto activate = [&](const char* name)
+        {
+            auto* r = named(name);
+            if (!r)
+                return false;
+            auto text = g.server.CreateString("TRIGGER");
+            auto message = g.server.StartMessageToObject(p, r->handle, 1000);
+            const bool sent = message && g.server.WriteToMessageHString(message, text) == DE_OK &&
+                              g.server.EndMessage(message) == DE_OK;
+            g.server.FreeString(text);
+            return sent;
+        };
+        CHECK(activate("sawbladetrigger") && advance(g, 1));
+        CHECK(g.client_shell.view.object && named("cam2") && g.client_shell.view.object == named("cam2")->handle);
+        CHECK(advance(g, 360));
+        CHECK(!g.client_shell.view.object && !p->camera_movement_blocked && !p->MovementBlocked());
+        auto* fan = named("sawblade1") ? dynamic_cast<RotatingBrush*>(named("sawblade1")->game.get()) : nullptr;
+        CHECK(fan && fan->rotating.state == Rotating::Off);
+        for (unsigned cycle = 0; cycle < 3; ++cycle)
+        {
+            CHECK(activate("2TempDoor1TriggerLeftUp") && activate("2TempDoor2TriggerLeftUp"));
+            for (const char* name : {"2TempDoor1", "2TempDoor2"})
+            {
+                auto* r = named(name);
+                auto* d = r ? dynamic_cast<Door*>(r->game.get()) : nullptr;
+                CHECK(d && d->state == Door::Opening);
+            }
+            for (unsigned frame = 0; frame < 1000; ++frame)
+                CHECK(g.step(.010132542));
+            for (const char* name : {"2TempDoor1", "2TempDoor2", "2TempDoor1Glass", "2TempDoor2Glass"})
+            {
+                auto* r = named(name);
+                auto* d = r ? dynamic_cast<Door*>(r->game.get()) : nullptr;
+                if (d)
+                    std::cout << name << " cycle=" << cycle << " state=" << d->state << " moves=" << r->mover_moves
+                              << " blocks=" << r->mover_blocks << '\n';
+                CHECK(d && d->state == Door::Closed && r->mover_moves && !r->mover_blocks);
+            }
+        }
+        CHECK(p->m_damage.m_fHitPoints > 0 && g.step_errors().empty());
+        std::cout << "Authored ventilation computer: fan stopped, camera released, paired sliding doors and glass "
+                     "complete three cycles\n";
+        return true;
+    }
+    bool door_cycles(const char* root)
+    {
+        std::string error;
+        GameSession g;
+        CHECK(load(g, root, "Demo_01"));
+        // Retain the actual entry omission: it must not become a later step failure.
+        CHECK(std::any_of(g.entries.begin(), g.entries.end(), [](const auto& e)
+                          { return e.state == EntryState::MissingWorldModel && e.detail.starts_with("SecScreen:"); }));
+        for (unsigned frame = 0; frame < 13000; ++frame)
+        {
+            if (!g.step(.010132542))
+            {
+                for (const auto& why : g.step_errors())
+                    std::cerr << why << '\n';
+                CHECK(false);
+            }
+        }
+        CHECK(g.objects.time() > 131 && g.step_errors().empty());
+        // Labelled delivery to the four authored unlocked self-triggers, not a traversal
+        // or a bypass of the locked rotdoor3. Require three real open/close cycles.
+        for (unsigned cycle = 0; cycle < 3; ++cycle)
+        {
+            std::vector<std::pair<ObjectId, std::uint64_t>> receivers;
+            for (auto id : g.objects.snapshot())
+                if (auto* r = g.objects.get(id); r)
+                    if (auto* d = dynamic_cast<Door*>(r->game.get()); d && d->trigger)
+                    {
+                        const std::string_view name(r->state.m_Name);
+                        if (name != "rotdoor1" && name != "rotdoor2" && name != "rotdoor4" && name != "rotdoor5")
+                            continue;
+                        auto* t = dynamic_cast<Trigger*>(g.server.HandleToObject(d->trigger));
+                        CHECK(t && t->active && !t->locked && d->state == Door::Closed);
+                        receivers.emplace_back(id, r->mover_moves);
+                        auto text = g.server.CreateString("TRIGGER");
+                        auto message = g.server.StartMessageToObject(g.server.HandleToObject(g.client_shell.player),
+                                                                     d->trigger, 1000);
+                        CHECK(message && g.server.WriteToMessageHString(message, text) == DE_OK &&
+                              g.server.EndMessage(message) == DE_OK);
+                        g.server.FreeString(text);
+                        CHECK(d->state == Door::Opening);
+                    }
+            CHECK(receivers.size() == 4 && advance(g, 600));
+            for (const auto& [id, moves] : receivers)
+            {
+                auto* r = g.objects.get(id);
+                auto* d = r ? dynamic_cast<Door*>(r->game.get()) : nullptr;
+                auto* t = d ? dynamic_cast<Trigger*>(g.server.HandleToObject(d->trigger)) : nullptr;
+                CHECK(d && t && d->state == Door::Closed && t->active && r->mover_moves > moves && !r->mover_blocks);
+            }
+        }
+        std::cout << "Demo_01: 131s idle with reported delta; four authored unlocked doors complete three cycles; "
+                     "SecScreen remains an entry omission, no global door stop reproduced\n";
         return true;
     }
     bool spawned_overlap(const char* root)
@@ -445,6 +569,10 @@ int main(int argc, char** argv)
     if (argc < 2)
         return 2;
     const std::string mode = argv[1];
+    if (mode == "computer_doors" && argc == 3)
+        return computer_doors(argv[2]) ? 0 : 1;
+    if (mode == "door_cycles" && argc == 3)
+        return door_cycles(argv[2]) ? 0 : 1;
     if (mode == "spawned_overlap" && argc == 3)
         return spawned_overlap(argv[2]) ? 0 : 1;
     if (mode == "flow")

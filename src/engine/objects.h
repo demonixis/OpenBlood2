@@ -319,6 +319,10 @@ namespace OpenBlood2
         {
             return diagnostics_;
         }
+        std::uint64_t failure_count() const
+        {
+            return failure_count_;
+        }
         bool fail(ObjectError error, std::string detail);
         // Reason for the precreate refusal in progress; ignored outside precreate, first reason kept.
         void note_rejection(std::string_view reason);
@@ -341,6 +345,7 @@ namespace OpenBlood2
         std::vector<HOBJECT> pending_;
         std::vector<std::pair<HOBJECT, HOBJECT>> links_;
         std::vector<std::string> diagnostics_;
+        std::uint64_t failure_count_ = 0;
         std::string rejection_;
         bool precreating_ = false;
         ObjectError error_ = ObjectError::None;

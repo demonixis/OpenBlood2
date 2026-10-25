@@ -34,6 +34,12 @@ Museum's reported crash remains unreproduced; the
 [class coverage inventory](contracts/class_coverage.md) distinguishes absent ports
 from replacement services. This does not expand milestone acceptance.
 
+The [Demo_01 computer/door correction](implementation/reports/demo_computer_doors.md)
+fixes adjacent sliding leaves refusing exact closed-endpoint contact after the
+ventilation sequence. Frame-specific failure diagnostics replace misleading startup
+history in the crash log. The reported 93-second simulation stop remains unconfirmed;
+the checked sequence and repeated door cycles are not a full demo traversal.
+
 ## Milestones
 
 | Milestone | Completion | Scope |

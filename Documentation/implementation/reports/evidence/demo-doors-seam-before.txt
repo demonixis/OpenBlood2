@@ -1,0 +1,17 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/release
+    Start 284: doors.seam
+1/1 Test #284: doors.seam .......................***Failed    0.27 sec
+seam:70: l->state == Door::Closed && r->state == Door::Closed
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+doors       =   0.27 sec*proc (1 test)
+headless    =   0.27 sec*proc (1 test)
+
+Total Test time (real) =   0.29 sec
+
+The following tests FAILED:
+	284 - doors.seam (Failed)                               doors headless
+Errors while running CTest

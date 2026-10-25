@@ -53,6 +53,33 @@ namespace
             CHECK(g.step(dt));
         return true;
     }
+    bool seam(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(test_player::setup(g, root));
+        auto left = door(g, {{"MoveDir", DVector{-1, 0, 0}}}, {-20, 10, -10}, {0, 30, 10});
+        auto right = door(g, {}, {0, 10, -10}, {20, 30, 10});
+        CHECK(left && right);
+        auto* l = dynamic_cast<Door*>(g.objects.get(left)->game.get());
+        auto* r = dynamic_cast<Door*>(g.objects.get(right)->game.get());
+        for (unsigned i = 0; i < 3; ++i)
+        {
+            CHECK(trigger(g, left, "TRIGGER") && trigger(g, right, "TRIGGER") && steps(g, 40));
+            CHECK(l->state == Door::Open && r->state == Door::Open);
+            CHECK(trigger(g, left, "TRIGGERCLOSE") && trigger(g, right, "TRIGGERCLOSE") && steps(g, 40));
+            CHECK(l->state == Door::Closed && r->state == Door::Closed);
+        }
+        const auto before = g.objects.get(right)->state.m_Pos;
+        CHECK(g.server.MoveWorldModel(right, vector_add(before, {-1, 0, 0})) == MoverResult::Blocked);
+        CHECK(g.objects.get(right)->state.m_Pos.x == before.x);
+        // Still reject a move which crosses the entire other leaf and finishes clear.
+        CHECK(g.server.MoveWorldModel(right, vector_add(before, {-100, 0, 0})) == MoverResult::Blocked);
+        CHECK(g.objects.get(right)->state.m_Pos.x == before.x);
+        CHECK(g.server.MoveWorldModel(right, vector_add(before, {1, 0, 0})) == MoverResult::Moved);
+        std::cout
+            << "Adjacent door leaves: exact endpoint contact, three cycles, separation and no penetration/tunnelling\n";
+        return true;
+    }
     bool state(const std::filesystem::path& root)
     {
         GameSession g;
@@ -439,8 +466,9 @@ int main(int argc, char** argv)
     if (argc != 3)
         return 2;
     const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
-        {"state", state},   {"options", options},   {"geometry", geometry},    {"pushing", pushing},
-        {"riders", riders}, {"lifetime", lifetime}, {"private", private_data}, {"catalog", catalog}};
+        {"seam", seam},         {"state", state},          {"options", options},
+        {"geometry", geometry}, {"pushing", pushing},      {"riders", riders},
+        {"lifetime", lifetime}, {"private", private_data}, {"catalog", catalog}};
     auto it = cases.find(argv[1]);
     return it == cases.end() ? 2 : it->second(path_from_utf8(argv[2])) ? 0 : 1;
 }

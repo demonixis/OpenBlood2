@@ -1,0 +1,21 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/release
+    Start 1370: demo.computer_doors
+1/1 Test #1370: demo.computer_doors ..............***Failed    2.37 sec
+Existing source omission Demo_01 #674 CDestructableBrush / SecScreen: SecScreen: Missing named world model; engine rejected creation before initial update; world loading continues
+2TempDoor1 cycle=0 state=1 moves=126 blocks=0
+2TempDoor2 cycle=0 state=2 moves=125 blocks=677
+computer_doors:219: d && d->state == Door::Closed && r->mover_moves && !r->mover_blocks | 
+
+
+0% tests passed, 1 tests failed out of 1
+
+Label Time Summary:
+demo        =   2.37 sec*proc (1 test)
+headless    =   2.37 sec*proc (1 test)
+private     =   2.37 sec*proc (1 test)
+
+Total Test time (real) =   2.39 sec
+
+The following tests FAILED:
+	1370 - demo.computer_doors (Failed)                      demo headless private
+Errors while running CTest

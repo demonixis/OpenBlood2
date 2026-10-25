@@ -34,6 +34,25 @@ namespace
         CHECK(step_app_session(g, app_frame_delta(2, true), true) && std::abs(g.objects.time() - 2.32) < 1e-9);
         CHECK(!step_app_session(g, app_frame_delta(-1)) && std::abs(g.objects.time() - 2.32) < 1e-9);
         CHECK(!step_app_session(g, app_frame_delta(std::numeric_limits<double>::quiet_NaN())));
+        // A full diagnostic ring retains startup history, but a failed frame reports only
+        // new failures. Filling the ring must not defeat this boundary by keeping size 32.
+        for (unsigned i = 0; i < 40; ++i)
+            g.objects.fail(ObjectError::MissingWorldModel, "SecScreen: historical entry omission");
+        g.trace.push_back("Historical startup trace");
+        const auto body = g.objects.create(g.objects.find_class("BaseClass"));
+        CHECK(body);
+        g.objects.get(body)->velocity = {1, 0, 0};
+        CHECK(!g.step(.01)); // Motion without a collision world must still fail.
+        const auto failures = g.step_errors();
+        CHECK(std::any_of(failures.begin(), failures.end(),
+                          [](const auto& s) { return s.find("physics") != std::string::npos; }));
+        CHECK(std::none_of(
+            failures.begin(), failures.end(), [](const auto& s)
+            { return s.find("SecScreen") != std::string::npos || s.find("Historical") != std::string::npos; }));
+        CHECK(g.objects.remove(body) && g.objects.finish_frame() && g.step(0));
+        CHECK(g.step_errors().empty());
+        CHECK(g.objects.diagnostics().size() == 32); // History remains available to inspection.
+
         return true;
     }
     bool npcs_ready(GameSession& g, bool untouched)

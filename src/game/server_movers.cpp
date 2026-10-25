@@ -61,8 +61,14 @@ namespace OpenBlood2
                     // Other movers are immovable in this bounded solver. A
                     // conservative swept bound avoids tunnelling mesh pairs.
                     const auto center = object_bounds_center(*mover);
-                    if (sweep_object(*body, center, vector_add(center, delta), mover->dimensions, contact) !=
-                        CollisionQuery::Miss)
+                    const auto query =
+                        sweep_object(*body, center, vector_add(center, delta), mover->dimensions, contact);
+                    if (query == CollisionQuery::Invalid)
+                        return MoverResult::Invalid;
+                    // Adjacent leaves must be able to meet at their closed endpoints.
+                    // Reject initial penetration and every contact before the endpoint;
+                    // exact end contact is not a move through the other brush.
+                    if (query == CollisionQuery::Hit && (contact.start_solid || contact.fraction < 1))
                         return blocked(body->handle);
                     continue;
                 }

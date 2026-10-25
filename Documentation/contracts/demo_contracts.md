@@ -27,6 +27,14 @@ retail `05_CDM` and `05_CDMB`, not byte-identical retail levels. Validate them
 separately. The existing missing-BSP policy and source-row diagnostics remain;
 there is no new demo-specific object omission or placeholder pickup.
 
+The [computer/door continuation](../implementation/reports/demo_computer_doors.md)
+tests Demo_01's authored `sawbladetrigger`, camera release and subsequent paired-door
+cycles. It fixes endpoint contact in the shared mover solver, without changing the
+computer's messages. Runtime failures now report the failing simulation stage and
+new object/session diagnostics from that frame; the historical `SecScreen` omission
+stays in entry/inspection history. The separately reported 93-second crash remains
+unreproduced on a validated playable placement.
+
 ## Removal of the old experiment
 
 Phase 1 removed the fixed-offset `demo_menu_strings` reader, its build entry,

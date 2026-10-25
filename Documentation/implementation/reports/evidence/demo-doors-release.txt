@@ -1,0 +1,146 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/release
+      Start 1369: demo.door_cycles
+      Start 1370: demo.computer_doors
+ 1/64 Test #1370: demo.computer_doors ..............   Passed    5.07 sec
+      Start 1366: demo.worlds
+ 2/64 Test #1366: demo.worlds ......................   Passed    1.09 sec
+      Start  878: session_playback.private
+ 3/64 Test  #878: session_playback.private .........   Passed    1.14 sec
+      Start  318: interaction.city_laundry
+ 4/64 Test  #318: interaction.city_laundry .........   Passed    1.11 sec
+      Start 1368: demo.spawned_overlap
+ 5/64 Test #1368: demo.spawned_overlap .............   Passed    0.53 sec
+      Start  317: interaction.catalog
+ 6/64 Test  #317: interaction.catalog ..............   Passed    0.33 sec
+      Start  285: doors.catalog
+ 7/64 Test  #285: doors.catalog ....................   Passed    0.58 sec
+      Start  306: triggers.catalog
+ 8/64 Test  #306: triggers.catalog .................   Passed    0.59 sec
+      Start  297: triggers.schedule
+ 9/64 Test  #297: triggers.schedule ................   Passed    0.01 sec
+      Start  284: doors.seam
+10/64 Test  #284: doors.seam .......................   Passed    0.00 sec
+      Start  877: session_playback.policy
+11/64 Test  #877: session_playback.policy ..........   Passed    0.00 sec
+      Start   21: objects.builtin_model
+12/64 Test   #21: objects.builtin_model ............   Passed    0.28 sec
+      Start  308: interaction.use
+13/64 Test  #308: interaction.use ..................   Passed    0.01 sec
+      Start   22: objects.original_objects
+14/64 Test   #22: objects.original_objects .........   Passed    0.00 sec
+      Start  279: doors.options
+15/64 Test  #279: doors.options ....................   Passed    0.00 sec
+      Start  278: doors.state
+16/64 Test  #278: doors.state ......................   Passed    0.00 sec
+      Start  305: triggers.private
+17/64 Test  #305: triggers.private .................   Passed    0.12 sec
+      Start 1364: demo.flow
+18/64 Test #1364: demo.flow ........................   Passed    0.00 sec
+      Start   23: objects.nested_creation
+19/64 Test   #23: objects.nested_creation ..........   Passed    0.00 sec
+      Start  310: interaction.keys
+20/64 Test  #310: interaction.keys .................   Passed    0.01 sec
+      Start  309: interaction.input
+21/64 Test  #309: interaction.input ................   Passed    0.00 sec
+      Start  311: interaction.state
+22/64 Test  #311: interaction.state ................   Passed    0.00 sec
+      Start  286: doors.private
+23/64 Test  #286: doors.private ....................   Passed    0.07 sec
+      Start  314: interaction.blocking
+24/64 Test  #314: interaction.blocking .............   Passed    0.01 sec
+      Start   31: objects.message_churn
+25/64 Test   #31: objects.message_churn ............   Passed    0.04 sec
+      Start   32: objects.message_limit
+26/64 Test   #32: objects.message_limit ............   Passed    0.01 sec
+      Start 1367: demo.weapon
+27/64 Test #1367: demo.weapon ......................   Passed    0.02 sec
+      Start  301: triggers.doors
+28/64 Test  #301: triggers.doors ...................   Passed    0.01 sec
+      Start  282: doors.riders
+29/64 Test  #282: doors.riders .....................   Passed    0.01 sec
+      Start   24: objects.reasons_properties
+30/64 Test   #24: objects.reasons_properties .......   Passed    0.00 sec
+      Start  298: triggers.toggle
+31/64 Test  #298: triggers.toggle ..................   Passed    0.00 sec
+      Start   33: objects.unsupported_teardown
+32/64 Test   #33: objects.unsupported_teardown .....   Passed    0.01 sec
+      Start  302: triggers.touch
+33/64 Test  #302: triggers.touch ...................   Passed    0.00 sec
+      Start  300: triggers.keys
+34/64 Test  #300: triggers.keys ....................   Passed    0.00 sec
+      Start  303: triggers.lifetime
+35/64 Test  #303: triggers.lifetime ................   Passed    0.00 sec
+      Start  281: doors.pushing
+36/64 Test  #281: doors.pushing ....................   Passed    0.00 sec
+      Start   28: objects.handles_selection
+37/64 Test   #28: objects.handles_selection ........   Passed    0.00 sec
+      Start   34: objects.creation_failures
+38/64 Test   #34: objects.creation_failures ........   Passed    0.00 sec
+      Start  299: triggers.filters
+39/64 Test  #299: triggers.filters .................   Passed    0.00 sec
+      Start  280: doors.geometry
+40/64 Test  #280: doors.geometry ...................   Passed    0.00 sec
+      Start   29: objects.links_lists
+41/64 Test   #29: objects.links_lists ..............   Passed    0.00 sec
+      Start   30: objects.messages_strings
+42/64 Test   #30: objects.messages_strings .........   Passed    0.00 sec
+      Start  283: doors.lifetime
+43/64 Test  #283: doors.lifetime ...................   Passed    0.00 sec
+      Start   25: objects.scheduling
+44/64 Test   #25: objects.scheduling ...............   Passed    0.00 sec
+      Start   26: objects.deferred_removal
+45/64 Test   #26: objects.deferred_removal .........   Passed    0.00 sec
+      Start  304: triggers.protocol
+46/64 Test  #304: triggers.protocol ................   Passed    0.00 sec
+      Start 1365: demo.rules
+47/64 Test #1365: demo.rules .......................   Passed    0.00 sec
+      Start  312: interaction.geometry
+48/64 Test  #312: interaction.geometry .............   Passed    0.00 sec
+      Start  313: interaction.transport
+49/64 Test  #313: interaction.transport ............   Passed    0.00 sec
+      Start  316: interaction.player_push
+50/64 Test  #316: interaction.player_push ..........   Passed    0.00 sec
+      Start  315: interaction.lifetime
+51/64 Test  #315: interaction.lifetime .............   Passed    0.00 sec
+      Start   27: objects.aggregate_dispatch
+52/64 Test   #27: objects.aggregate_dispatch .......   Passed    0.00 sec
+      Start  406: worldpaths.translation
+53/64 Test  #406: worldpaths.translation ...........   Passed    0.28 sec
+      Start  407: worldpaths.world_block
+54/64 Test  #407: worldpaths.world_block ...........   Passed    0.00 sec
+      Start  408: worldpaths.riders
+55/64 Test  #408: worldpaths.riders ................   Passed    0.00 sec
+      Start  409: worldpaths.push_block
+56/64 Test  #409: worldpaths.push_block ............   Passed    0.00 sec
+      Start  410: worldpaths.lifetime
+57/64 Test  #410: worldpaths.lifetime ..............   Passed    0.00 sec
+      Start  411: worldpaths.validation
+58/64 Test  #411: worldpaths.validation ............   Passed    0.00 sec
+      Start  412: worldpaths.player
+59/64 Test  #412: worldpaths.player ................   Passed    0.01 sec
+      Start  413: worldpaths.timeline
+60/64 Test  #413: worldpaths.timeline ..............   Passed    0.00 sec
+      Start  414: worldpaths.subway
+61/64 Test  #414: worldpaths.subway ................   Passed    0.19 sec
+      Start 1186: train_session.private_60
+62/64 Test #1186: train_session.private_60 .........   Passed    2.47 sec
+      Start 1188: train_session.private_save
+63/64 Test #1188: train_session.private_save .......   Passed    1.98 sec
+64/64 Test #1369: demo.door_cycles .................   Passed   22.52 sec
+
+100% tests passed out of 64
+
+Label Time Summary:
+demo                =  29.23 sec*proc (7 tests)
+doors               =   0.68 sec*proc (9 tests)
+headless            =  38.61 sec*proc (64 tests)
+interaction         =   1.48 sec*proc (11 tests)
+objects             =   0.38 sec*proc (14 tests)
+private             =  37.79 sec*proc (15 tests)
+save                =   1.98 sec*proc (1 test)
+session_playback    =   1.14 sec*proc (2 tests)
+train_session       =   4.44 sec*proc (2 tests)
+triggers            =   0.75 sec*proc (10 tests)
+worldpaths          =   0.50 sec*proc (9 tests)
+
+Total Test time (real) =  22.54 sec

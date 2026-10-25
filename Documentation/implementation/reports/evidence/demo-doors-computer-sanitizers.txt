@@ -1,0 +1,14 @@
+Existing source omission Demo_01 #674 CDestructableBrush / SecScreen: SecScreen: Missing named world model; engine rejected creation before initial update; world loading continues
+2TempDoor1 cycle=0 state=1 moves=126 blocks=0
+2TempDoor2 cycle=0 state=1 moves=126 blocks=0
+2TempDoor1Glass cycle=0 state=1 moves=126 blocks=0
+2TempDoor2Glass cycle=0 state=1 moves=126 blocks=0
+2TempDoor1 cycle=1 state=1 moves=252 blocks=0
+2TempDoor2 cycle=1 state=1 moves=252 blocks=0
+2TempDoor1Glass cycle=1 state=1 moves=252 blocks=0
+2TempDoor2Glass cycle=1 state=1 moves=252 blocks=0
+2TempDoor1 cycle=2 state=1 moves=378 blocks=0
+2TempDoor2 cycle=2 state=1 moves=378 blocks=0
+2TempDoor1Glass cycle=2 state=1 moves=378 blocks=0
+2TempDoor2Glass cycle=2 state=1 moves=378 blocks=0
+Authored ventilation computer: fan stopped, camera released, paired sliding doors and glass complete three cycles

@@ -86,6 +86,14 @@ bounds rejection, stable contribution ranking, world-only filtering before model
 immutable upload-time world bounds, the shared 32-slot shader ABI and per-receiver counters.
 
 
+The [Demo_01 computer/door continuation](Documentation/implementation/reports/demo_computer_doors.md)
+allows translating world-model leaves to meet at exact sweep fraction 1. Preserve
+initial-penetration and pre-endpoint collision refusals, atomic moves and unchanged
+authored computer/trigger messages. Runtime crash diagnostics report only the current
+frame's new object/session failures, with the stage and failing physics/projectile
+owner; keep startup omissions in inspection history. The reported 93-second crash
+is not certified fixed by the door regression.
+
 ## Commit attribution
 
 Commits and pull requests carry only the user's identity (demonixis). Never add

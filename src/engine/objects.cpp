@@ -281,6 +281,7 @@ namespace OpenBlood2
     bool Objects::fail(ObjectError error, std::string detail)
     {
         error_ = error;
+        ++failure_count_;
         if (diagnostics_.size() == 32)
             diagnostics_.erase(diagnostics_.begin());
         diagnostics_.push_back(std::move(detail));

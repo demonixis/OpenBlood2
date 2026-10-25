@@ -781,6 +781,15 @@ namespace OpenBlood2
     }
     bool GameSession::step(double seconds)
     {
+        frame_failures.clear();
+        frame_object_failure_begin = objects.failure_count();
+        frame_trace_begin = trace.size();
+        const auto checked = [this](const char* stage, bool success)
+        {
+            if (!success)
+                frame_failures.emplace_back(std::string("Simulation stage failed: ") + stage);
+            return success;
+        };
         // Shell and original-object updates do not depend on inspector visibility.
         if (!std::isfinite(seconds) || seconds < 0 || seconds > 60)
             return objects.fail(ObjectError::InvalidTime, "Invalid session delta");
@@ -794,9 +803,11 @@ namespace OpenBlood2
             client_shell.view.object && client_shell.view.settings.listener
                 ? client_shell.view.rotation
                 : rotation_from_euler({client_shell.rotation.pitch, client_shell.rotation.yaw, 0});
-        bool ok = server.advance_audio(seconds, listener, listener_rotation) && objects.advance(seconds) &&
-                  server.advance_physics(seconds) && server.advance_projectiles(seconds) &&
-                  server.advance_models(seconds);
+        bool ok = checked("audio", server.advance_audio(seconds, listener, listener_rotation)) &&
+                  checked("object updates", objects.advance(seconds)) &&
+                  checked("physics", server.advance_physics(seconds)) &&
+                  checked("projectiles", server.advance_projectiles(seconds)) &&
+                  checked("models", server.advance_models(seconds));
         if (local_client)
         {
             if (!server.GetClientUserData(local_client))
@@ -826,10 +837,10 @@ namespace OpenBlood2
             }
         }
         if (seconds > 0)
-            ok = server.damage_containers() && ok;
-        ok = objects.finish_frame() && ok;
-        ok = objects.refresh_attachments() && ok;
-        ok = server.advance_lights() && ok;
+            ok = checked("server.damage_containers", server.damage_containers()) && ok;
+        ok = checked("objects.finish_frame", objects.finish_frame()) && ok;
+        ok = checked("objects.refresh_attachments", objects.refresh_attachments()) && ok;
+        ok = checked("server.advance_lights", server.advance_lights()) && ok;
         auto* flash_owner = server_shell.Player(local_client);
         const auto* flash_item = flash_owner ? flash_owner->m_InventoryMgr.flashlight.get() : nullptr;
         ok = (!flash_item || flash_item->update_ok) && ok;
@@ -838,26 +849,28 @@ namespace OpenBlood2
         ok = client_shell.flashlight.Update(server, flash_item ? flash_item->light : nullptr,
                                             flash_owner ? flash_owner->m_hObject : nullptr) &&
              ok;
-        ok = server.explosion_sprites.advance(objects.time()) && ok;
-        ok = server.blood_splats.advance(objects.time()) && ok;
-        ok = server.weapon_sprites.advance(objects.time()) && ok;
-        ok = server.explosion_models.advance(objects.time()) && ok;
-        ok = server.laser_beams.advance(objects.time()) && ok;
-        ok = server.explosion_lights.advance(objects.time()) && ok;
-        ok = server.explosion_rings.advance(objects.time()) && ok;
-        ok = server.explosion_flames.advance(objects.time()) && ok;
-        ok = server.flesh_gibs.advance(objects.time(), server) && ok;
+        ok = checked("server.explosion_sprites.advance", server.explosion_sprites.advance(objects.time())) && ok;
+        ok = checked("server.blood_splats.advance", server.blood_splats.advance(objects.time())) && ok;
+        ok = checked("server.weapon_sprites.advance", server.weapon_sprites.advance(objects.time())) && ok;
+        ok = checked("server.explosion_models.advance", server.explosion_models.advance(objects.time())) && ok;
+        ok = checked("server.laser_beams.advance", server.laser_beams.advance(objects.time())) && ok;
+        ok = checked("server.explosion_lights.advance", server.explosion_lights.advance(objects.time())) && ok;
+        ok = checked("server.explosion_rings.advance", server.explosion_rings.advance(objects.time())) && ok;
+        ok = checked("server.explosion_flames.advance", server.explosion_flames.advance(objects.time())) && ok;
+        ok = checked("server.flesh_gibs.advance", server.flesh_gibs.advance(objects.time(), server)) && ok;
         // Cosmetic failures stay inspectable without stopping campaign simulation.
         server.destruction_debris.advance(objects.time(), server);
         server.shotgun_effects.advance(objects.time(), server);
-        ok = server.sparks.advance(objects.time()) && ok;
-        ok = server.lightning.advance(objects.time()) && ok;
-        ok = server.warp_gates.advance(objects.time(), server) && ok;
-        ok = server.blood_spurts.advance(objects.time(), server) && ok;
-        ok = server.explosion_fragments.advance(objects.time(), server) && ok;
-        ok = server.object_particles.advance(objects.time(), server) && ok;
-        ok = server.particle_streams.advance(objects.time(), server) && ok;
-        ok = server.polygrids.advance(objects.time(), server) && ok;
+        ok = checked("server.sparks.advance", server.sparks.advance(objects.time())) && ok;
+        ok = checked("server.lightning.advance", server.lightning.advance(objects.time())) && ok;
+        ok = checked("server.warp_gates.advance", server.warp_gates.advance(objects.time(), server)) && ok;
+        ok = checked("server.blood_spurts.advance", server.blood_spurts.advance(objects.time(), server)) && ok;
+        ok =
+            checked("server.explosion_fragments.advance", server.explosion_fragments.advance(objects.time(), server)) &&
+            ok;
+        ok = checked("server.object_particles.advance", server.object_particles.advance(objects.time(), server)) && ok;
+        ok = checked("server.particle_streams.advance", server.particle_streams.advance(objects.time(), server)) && ok;
+        ok = checked("server.polygrids.advance", server.polygrids.advance(objects.time(), server)) && ok;
         if (ok && preview_model && preview_playing &&
             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))
             preview_playing = false;
@@ -866,12 +879,19 @@ namespace OpenBlood2
     }
     std::vector<std::string> GameSession::step_errors()
     {
-        std::vector<std::string> out;
+        std::vector<std::string> out = frame_failures;
         const auto add = [&out](std::string_view label, const std::string& error)
         {
             if (!error.empty())
                 out.push_back(std::string(label) + ": " + error);
         };
+        const auto& diagnostics = objects.diagnostics();
+        const auto count =
+            std::min<std::uint64_t>(diagnostics.size(), objects.failure_count() - frame_object_failure_begin);
+        for (std::size_t i = diagnostics.size() - count; i < diagnostics.size(); ++i)
+            add("Object", diagnostics[i]);
+        for (std::size_t i = frame_trace_begin; i < trace.size(); ++i)
+            add("Session", trace[i]);
         add("Audio output", server.audio.output_error);
         add("Music", server.audio.music_error);
         add("Explosion sprites", server.explosion_sprites.update_error);

@@ -566,6 +566,9 @@ namespace OpenBlood2
         std::vector<WorldEntry> entries;
         std::vector<ResourceUse> resource_uses;
         std::vector<std::string> trace;
+        std::vector<std::string> frame_failures; // Current step only; never world-entry omissions.
+        std::uint64_t frame_object_failure_begin = 0;
+        std::size_t frame_trace_begin = 0;
         std::string world_path;
         std::uint64_t world_revision = 0; // Changes on teardown; diagnostic geometry edits must also increment it.
         // Inspection resource, not a CPlayerObj or a replacement player controller.

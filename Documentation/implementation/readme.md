@@ -5,6 +5,7 @@ accepted with open GPU reservation **M2-GPU-001**. M3 remains unaccepted.
 
 | Record | Location |
 | --- | --- |
+| Demo_01 ventilation computer, door seams and failure diagnostics | [Report](reports/demo_computer_doors.md) / [door contract](../contracts/door_contracts.md#replacement-translation-solver) |
 | Forward FX light selection per receiver | [Report](reports/forward_effect_lights.md) / [contract](../contracts/scene_effects_contracts.md#lights); 12 mobile / 32 desktop |
 | Scene effect rendering (lot 10) | [Report](reports/scene_effects.md) / [contract](../contracts/scene_effects_contracts.md) / [source ledger](sources/scene_effect_sources.json) |
 | Remaining destruction materials (lot 9) | [Report](reports/remaining_debris.md) / [contract](../contracts/destruction_debris_contracts.md#remaining-materials--lot-9-2026-10-25) |

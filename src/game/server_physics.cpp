@@ -682,7 +682,7 @@ namespace OpenBlood2
                 if (destination.x == r->state.m_Pos.x && destination.y == r->state.m_Pos.y &&
                     destination.z == r->state.m_Pos.z)
                     continue;
-                if (MoveObject(r->handle, &destination) != DE_OK)
+                if (const auto moved = MoveObject(r->handle, &destination); moved != DE_OK)
                 {
                     // Replacement policy: a touch-only pickup that cannot move (it starts inside
                     // geometry) never fails the session step. It gets one bounded separation; if
@@ -690,7 +690,11 @@ namespace OpenBlood2
                     // the failure stays recorded. Every other body keeps the strict failure.
                     auto* pickup = dynamic_cast<PickupObject*>(r->game.get());
                     if (!pickup || r->life != Life::Alive)
-                        return false;
+                        return objects_.fail(ObjectError::Unsupported,
+                                             "Physics MoveObject failed: " + r->type->name + " / " + r->state.m_Name +
+                                                 " at " + std::to_string(r->state.m_Pos.x) + "," +
+                                                 std::to_string(r->state.m_Pos.y) + "," +
+                                                 std::to_string(r->state.m_Pos.z) + " result=" + std::to_string(moved));
                     const auto nudges = r->placement_nudges;
                     if (ResolveInitialWorldOverlap(r->handle) != DE_OK || r->placement_nudges == nudges)
                     {

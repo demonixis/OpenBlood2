@@ -85,6 +85,14 @@ outside this increment.
 
 This is new engine code, not recovered Blood II physics.
 
+The [Demo_01 computer/door regression](../implementation/reports/demo_computer_doors.md)
+now permits **exact endpoint contact** between translating world models. An adjacent
+leaf may meet its closed counterpart at sweep fraction 1; initial penetration and
+every contact before the endpoint still block the whole transaction. Invalid queries
+remain explicit failures. No geometric epsilon, clipping through another leaf or
+change to the original Door/Trigger state machines is introduced. This fixes the
+paired CDM doors remaining in Closing just short of their authored endpoints.
+
 - Door's original GOTHRUWORLD lets it slide into a wall pocket. Other translating
   world-model callers without that flag return Unavailable.
 - Continuous relative sweeps detect solid bodies crossed by a translating door,

@@ -1,0 +1,18 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/sanitize
+    Start 233: doors.pushing
+    Start 234: doors.riders
+1/4 Test #233: doors.pushing ....................   Passed    0.66 sec
+    Start 236: doors.seam
+2/4 Test #234: doors.riders .....................   Passed    0.67 sec
+    Start 689: session_playback.policy
+3/4 Test #236: doors.seam .......................   Passed    0.08 sec
+4/4 Test #689: session_playback.policy ..........   Passed    0.58 sec
+
+100% tests passed out of 4
+
+Label Time Summary:
+doors               =   1.41 sec*proc (3 tests)
+headless            =   1.99 sec*proc (4 tests)
+session_playback    =   0.58 sec*proc (1 test)
+
+Total Test time (real) =   1.26 sec

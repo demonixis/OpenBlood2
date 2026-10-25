@@ -1071,10 +1071,6 @@ namespace OpenBlood2
                     {
                         spdlog::error("Simulation failed: world={}, frame={}, delta={}, time={}", game->world_path,
                                       frames, delta, game->objects.time());
-                        for (const auto& diagnostic : game->objects.diagnostics())
-                            spdlog::error("Object: {}", diagnostic);
-                        for (const auto& diagnostic : game->trace)
-                            spdlog::error("Session: {}", diagnostic);
                         for (const auto& diagnostic : game->step_errors())
                             spdlog::error("{}", diagnostic);
                         error = "Simulation step failed";

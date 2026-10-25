@@ -153,7 +153,11 @@ namespace OpenBlood2
             if (projectile)
             {
                 const bool was_contact = projectile->contacted;
-                ok = projectile->AdvanceFlight(seconds) && ok;
+                if (!projectile->AdvanceFlight(seconds))
+                    ok =
+                        objects_.fail(ObjectError::Unsupported,
+                                      "Projectile flight failed: " + record->type->name + " / " + record->state.m_Name +
+                                          ": " + (projectile->error.empty() ? "no detail" : projectile->error));
                 const auto* target = objects_.get(projectile->m_hHitObject);
                 if (!dynamic_cast<CGrenade*>(projectile) && !dynamic_cast<CProximityBomb*>(projectile) &&
                     !dynamic_cast<CRemoteBomb*>(projectile) && !dynamic_cast<SeeingEye*>(projectile) && !was_contact &&
