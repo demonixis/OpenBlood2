@@ -2040,3 +2040,12 @@ collected before sending), the `CheatCodes` enum from `Shared/SharedDefs.h` (wit
 the message lines of `app/cheat_flow.h` from `ClientShellDLL/MessageMgr.cpp` `CCheatMgr::Process`.
 The menu page, `CHEAT_ALLKEYS`, the level list and warp are replacement code; the typed
 `CCheatMgr::Check` codes are not imported. See the [contracts](../contracts/cheat_contracts.md).
+
+## Additional original controls (2026-10-25)
+
+The nine previously disabled rows now follow the original client command/mouse branches,
+MoveMgr acceleration, PlayerObj Grab/Taunt/drop requests, InventoryMgr drops and the
+single-player message echo. SDL text ownership, typed dispatch, HUD text and preference
+persistence are portable replacements. Fresh-press TurnAround/Message and local-only
+text behavior are explicit departures in the [contract](../contracts/input_action_contracts.md#additional-original-controls-2026-10-25).
+See the [source ledger](sources/control_actions_sources.json) and [validation](reports/control_actions.md).

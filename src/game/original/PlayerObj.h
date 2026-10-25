@@ -205,6 +205,10 @@ class CPlayerObj : public CBaseCharacter
     bool locomotion_clip_retained = false;
     std::uint64_t animation_changes = 0, blocked_resizes = 0, retained_clip_requests = 0;
     bool OnCommandUse();
+    bool OnControlAction(const OpenBlood2::PlayerControlAction&);
+    std::uint64_t grab_commands = 0, grab_moves = 0, taunt_commands = 0;
+    HOBJECT grab_target = nullptr; // Diagnostic handle, revalidated on every use.
+    std::string control_error;
     bool OnCommandAltFire();
     bool OnCommandItem(DBYTE);
     bool OnCommandItemCursor(bool next);

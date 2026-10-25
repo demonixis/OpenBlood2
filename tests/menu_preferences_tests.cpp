@@ -35,12 +35,13 @@ int test_menu_preferences(int argc, char** argv)
         // The shared atomic writer keeps the exact preference bytes.
         std::ifstream in(path, std::ios::binary);
         const std::string bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        CHECK(bytes == "version=10\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
+        CHECK(bytes == "version=11\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
                        "invert_y=1\ndetail=2\npixel_lighting=0\nrenderer=0\nquality=0\nnormal_maps=1\n"
                        "vr_turn=45\nvr_laser=1\nvr_crosshair=1\nvr_move_hand=0\ncheats=0\ngod_mode=0\n"
                        "antialiasing=0\nbloom=1\ntonemap=1\nambient_occlusion=2\nreflections=2\n"
                        "fullscreen=0\nfullscreen_mode=0\nresolution_width=0\nresolution_height=0\nvsync=1\n"
-                       "fps_limit=0\nvr_refresh_rate=0\nvr_render_scale=100\n");
+                       "fps_limit=0\nvr_refresh_rate=0\nvr_render_scale=100\n"
+                       "run_lock=0\nmouse_look=1\ncrosshair=1\ncrosshair_number=1\n");
     }
     {
         MenuSettings video;
@@ -89,6 +90,27 @@ int test_menu_preferences(int argc, char** argv)
             output << bytes.substr(0, end);
         }
         CHECK(!load_menu_preferences(path, loaded, error) && loaded == MenuSettings{});
+    }
+    {
+        MenuSettings controls;
+        controls.run_lock = true;
+        controls.mouse_look = controls.crosshair = false;
+        controls.crosshair_number = 41;
+        CHECK(save_menu_preferences(path, controls, error));
+        CHECK(load_menu_preferences(path, loaded, error) && loaded == controls);
+        controls.crosshair_number = 42;
+        CHECK(!save_menu_preferences(path, controls, error));
+        CHECK(load_menu_preferences(path, loaded, error) && loaded.crosshair_number == 41);
+        CHECK(save_menu_preferences(path, MenuSettings{}, error));
+        std::ifstream input(path);
+        std::string old((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
+        old.resize(old.find("run_lock="));
+        old.replace(0, 10, "version=10");
+        {
+            std::ofstream output(path);
+            output << old;
+        }
+        CHECK(load_menu_preferences(path, loaded, error) && loaded == MenuSettings{});
     }
     settings.sound = true;
     CHECK(save_menu_preferences(path, settings, error));

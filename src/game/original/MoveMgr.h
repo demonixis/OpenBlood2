@@ -39,6 +39,7 @@ class CMoveMgr
     }
 
   private:
+    OpenBlood2::MovementInput input_;
     void UpdateControlFlags(const OpenBlood2::MovementInput&, bool);
     void UpdateOnGround();
     void UpdateMotion(float yaw, float pitch, CVoiceMgr&, int character, bool external_camera);

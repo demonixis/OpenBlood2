@@ -4,7 +4,7 @@ Play and menu input go through a table of logical actions
 (`src/app/input_actions.h`). `MovementControls` keeps device state (keys, mouse
 buttons, relative motion, gamepads). It derives the existing game-facing flags from
 `InputBindings`: `MovementInput`, `use_down`, item flags, weapon slots and rotation.
-Game rules, the original shell, MoveMgr and weapon state machines are unchanged.
+The original shell and MoveMgr receive typed commands; weapon state machines retain their rules.
 This is a replacement application layer: the action list, the gamepad layout and the
 gamepad device policy do not come from the retail configuration. The keyboard defaults
 for the commands added with the gamepad step come from the original `defaults.cfg`.
@@ -16,6 +16,7 @@ device policy (capture, sensitivity, focus). **M2/M3 scope is unchanged.**
 - Step 3 adds the touch camera drag.
 - Step 4 adds the original Controls page for rebinding, `controls.cfg` and the on-screen
   touch controls.
+- The 2026-10-25 continuation implements the nine previously disabled original action rows.
 
 ## Actions and kinds
 
@@ -200,6 +201,46 @@ its rebinding, the Press guard and the run latch therefore apply unchanged.
   first direct touch until a key, a real mouse click or a real gamepad button is used. Trackpads,
   other windows and mouse-emulated touches never press them.
 
+## Additional original controls (2026-10-25)
+
+All nine actions use the same rebinding, capture, focus and suppression rules as existing
+controls. No default key is added. Their stable `controls.cfg` identifiers are:
+
+| Original row | Identifier | Behavior |
+| --- | --- | --- |
+| Strafe | `strafe` | Held modifier: turn arrows and mouse X move sideways instead of turning. |
+| RunLock | `run_lock` | Fresh press toggles persistent auto-run; distinct from Run Latch. Held Run still runs when auto-run is off. |
+| TurnAround | `turn_around` | One 180-degree turn at the original 15 radians/second, cancelled by camera/input suppression. |
+| DropWeapon | `drop_weapon` | Drop the current idle single-player weapon, left hand first for dual weapons. Refuse melee, busy weapons and invalid hand models without failing the frame. |
+| Grab | `grab` | Held, eye ray of 82 units: move an object marked MOVEABLE by the player's accepted displacement through ordinary collision. It is not a general object pickup. |
+| Message | `message` | Open an ASCII editor (79 bytes). Enter echoes locally in solo play; Esc cancels, Backspace deletes, Home clears. No network delivery or cheat parsing. |
+| Taunt | `taunt` | Held original VME_TAUNT request, with the existing VoiceMgr cooldown. |
+| MouseAimToggle | `mouse_aim` | Hold to enable mouse pitch when permanent Mouse Look is off; the original implementation uses held state despite the row's name. |
+| Crosshair | `crosshair` | Toggle visibility; Shift plus the binding cycles the 42 original crosshairs. Refused while zoomed, preserving the zoom overlay. |
+
+Options > Mouse enables the existing retail Mouse Look row. Without permanent or held
+mouse aim, mouse Y supplies the original forward/back acceleration. Mouse movement remains
+inside MoveMgr's integration, capped with the original coefficients; default mouse-look
+movement is unchanged. Look Spring remains unavailable and does not recenter the view.
+
+DropWeapon reuses the checked held-model-to-world-drop ownership path, including landing,
+pickup conversion and carried ammo; the client resynchronizes both view models before drawing.
+Grab/Taunt/DropWeapon refuse dead, movement-blocked and scripted-camera players. Inspector
+counters expose grab queries/moves, taunts, drops and the latest control refusal.
+
+The message editor owns SDL text input and suppresses play input until it closes. Ownership
+changes discard typed/held commands and touch contacts. The HUD keeps up to four local lines
+for five game seconds and auto-run/drop notices for three. Preferences version 11 persists
+`run_lock`, `mouse_look`, `crosshair`, `crosshair_number` (0–41); older versions migrate to
+false, true, true, 1. No save payload changes. These preferences also apply after session loads.
+
+Portable departures: TurnAround requires a fresh press rather than repeating while held;
+Message opens on press rather than release and uses SDL text events, with a simple HUD text
+line replacing CInputLine's surfaces. Grab excludes the player's own collider and uses the
+existing checked movement service. Multiplayer/chat networking remains outside scope.
+See the [source ledger](../implementation/sources/control_actions_sources.json) and
+[validation report](../implementation/reports/control_actions.md).
+
 ## Rebinding: Options > Controls
 
 The original `CMenuControls` page is ported over the action layer; see the
@@ -209,9 +250,9 @@ The original `CMenuControls` page is ported over the action layer; see the
 - **Rows.** The 42 original actions, in source order, with their cres.dll names: Weapon_0 is
   slot 1 (key 1 in the installed defaults.cfg), Weapon_9 slot 10. Strafe, RunLock (the
   always-run toggle), TurnAround, DropWeapon, Grab, Message, Taunt, MouseAimToggle and
-  Crosshair have no port and are disabled, with `NOT IMPLEMENTED` in the binding column.
-  Functional rows with no binding remain enabled and can be assigned normally; they alone
-  use the original unassigned label. Replacement rows follow for actions the original
+  Crosshair are implemented and assignable. These nine additions start unbound, preserving
+  the existing keyboard/gamepad defaults and saved bindings; empty rows use the original
+  unassigned label. Replacement rows follow for actions the original
   menu did not list: Run Latch, Flashlight, Medkit, Binoculars, Night Goggles, The Eye, then
   Restore Defaults.
 - **Rebindable actions** are the row actions. Menu, menu navigation, quick save/load and the

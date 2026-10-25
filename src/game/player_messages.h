@@ -27,6 +27,20 @@ namespace OpenBlood2
     struct PlayerAltFire
     {
     };
+    struct PlayerControlAction
+    {
+        enum Kind
+        {
+            DropWeapon,
+            Grab,
+            Taunt
+        } kind;
+        DVector displacement{}; // Grab: the player's accepted movement this frame.
+    };
+    struct PlayerText
+    {
+        std::string text; // Bounded local CMSG_PLAYERMESSAGE / SMSG_CONSOLEMESSAGE_ALL.
+    };
     struct PlayerDetonate
     {
     };
@@ -113,6 +127,8 @@ namespace OpenBlood2
     struct MovementInput
     {
         bool forward = false, backward = false, left = false, right = false, run = false, jump = false, crouch = false;
+        bool mouse_move = false;
+        float mouse_forward = 0, mouse_strafe = 0; // Original scaled relative mouse acceleration, before clamping.
     };
     enum class ResizeResult
     {
@@ -236,5 +252,5 @@ namespace OpenBlood2
     using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
                                      MissionObjectives, WorldExit, BossHealth, Conversation, InventoryAction,
                                      ScreenFade, VoiceEvent, VoiceStop, PlayerDead, MusicCommand, ZoomView,
-                                     SeeingEyeView, CreatureAttach, OrbView, CTFEvent, InventoryItems>;
+                                     SeeingEyeView, CreatureAttach, OrbView, CTFEvent, InventoryItems, PlayerText>;
 } // namespace OpenBlood2

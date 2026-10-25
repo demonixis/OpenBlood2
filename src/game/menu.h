@@ -117,6 +117,8 @@ namespace OpenBlood2
         // Replacement Cheats rows: the master switch and god mode, which applies to the entered
         // player only while the switch is on.
         bool cheats = false, god_mode = false;
+        bool run_lock = false, mouse_look = true, crosshair = true;
+        int crosshair_number = 1; // Original Shift+Crosshair cycle, 0..41 (zoom overrides are temporary).
         bool fullscreen = false, vsync = true;
         int fullscreen_mode = 0;                         // 0 desktop borderless, 1 exclusive.
         int resolution_width = 0, resolution_height = 0; // 0/0: default window / desktop mode.

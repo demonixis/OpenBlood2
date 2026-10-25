@@ -1,5 +1,6 @@
 #include "ai_model_key_smoke.h"
 #include "app/bench.h"
+#include "app/control_actions.h"
 #include "app/frontend.h"
 #include "app/gamepad_devices.h"
 #include "app/hud.h"
@@ -41,8 +42,8 @@
 #include <cstdlib>
 #include <iostream>
 #include <map>
-#include <utility>
 #include <spdlog/spdlog.h>
+#include <utility>
 #include <vector>
 
 #if BLOOD2_INSPECTOR
@@ -713,6 +714,7 @@ namespace
                     if (!game->cycle_weapon(next, selection_error))
                         spdlog::info("Weapon cycle: {}", selection_error);
                 }
+            apply_control_actions(controls, game->client_shell, text_editing);
             auto keyboard = controls.sample(text_editing);
             auto& movement = game->client_shell.movement_input;
             movement.forward |= keyboard.forward;
@@ -722,6 +724,9 @@ namespace
             movement.run |= keyboard.run;
             movement.jump |= keyboard.jump;
             movement.crouch |= keyboard.crouch;
+            movement.mouse_move = keyboard.mouse_move;
+            movement.mouse_forward = keyboard.mouse_forward;
+            movement.mouse_strafe = keyboard.mouse_strafe;
             if (!controls.focused && !smoke)
                 movement = {};
             controls.look(game->client_shell.rotation, delta, text_editing || !game->client_shell.player_look_allowed(),

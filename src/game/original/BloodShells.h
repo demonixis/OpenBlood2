@@ -28,6 +28,8 @@ class CBloodServerShell
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerMove&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerControls&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerUse&);
+    bool OnMessage(HCLIENT, const OpenBlood2::PlayerControlAction&);
+    bool OnMessage(HCLIENT, const OpenBlood2::PlayerText&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerAltFire&);
     bool OnMessage(HCLIENT, const OpenBlood2::CreatureResponse&);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerRotation&);
@@ -119,6 +121,16 @@ class CBloodClientShell
     bool Update();
     bool UpdateMovement(CBloodServerShell&, double, std::string&);
     bool UpdateUse(CBloodServerShell&);
+    bool grab_down = false, taunt_down = false, drop_weapon_requested = false;
+    std::string control_notice;
+    std::vector<std::string> chat_lines; // Bounded local console-message history.
+    std::uint64_t message_revision = 0;
+    double messages_until = 0, control_notice_until = 0;
+    void SetControlNotice(std::string text)
+    {
+        control_notice = std::move(text);
+        control_notice_until = server_.GetTime() + 3;
+    }
     // Original CCheatMgr::SendCheatMessage (MessageMgr.cpp:1022): the application's Options >
     // CHEATS rows send CMSG_CHEAT for the entered player. The server's ProcessCheat result.
     bool SendCheatMessage(CBloodServerShell&, DBYTE code, bool state);

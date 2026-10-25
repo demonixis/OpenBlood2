@@ -138,7 +138,8 @@ namespace
         for (const auto& entry : all.entries)
             CHECK(InputBindings::valid(entry));
         for (std::size_t i = 0; i < input_action_count; ++i)
-            CHECK(count(all, InputAction(i)) > 0);
+            CHECK(InputAction(i) < InputAction::Strafe ? count(all, InputAction(i)) > 0
+                                                       : count(all, InputAction(i)) == 0);
         for (const auto& entry : b.entries)
             CHECK(entry.source == InputSource::Key || entry.source == InputSource::MouseButton ||
                   entry.source == InputSource::MouseWheel);
@@ -758,6 +759,20 @@ namespace
         tap(SDL_SCANCODE_J);
         CHECK(m.binding < 0 && bindings.bound(InputSource::Key, SDL_SCANCODE_J, InputAction::Jump) &&
               m.controls[std::size_t(jump)].binding == "J");
+        // Every newly ported row starts unassigned but binds through the same real menu path.
+        for (const auto action : {InputAction::Strafe, InputAction::RunLock, InputAction::TurnAround,
+                                  InputAction::DropWeapon, InputAction::Grab, InputAction::Message, InputAction::Taunt,
+                                  InputAction::MouseAim, InputAction::Crosshair})
+        {
+            const auto row = row_of(action);
+            CHECK(row < control_rows.size() && m.controls[row].enabled && m.controls[row].binding.empty());
+            m.selected = int(row);
+            tap(SDL_SCANCODE_RETURN);
+            CHECK(m.binding == int(row));
+            tap(SDL_SCANCODE_K);
+            CHECK(m.binding < 0 && bindings.bound(InputSource::Key, SDL_SCANCODE_K, action));
+        }
+        m.selected = jump;
         // Focus loss ends tracking.
         tap(SDL_SCANCODE_RETURN);
         CHECK(m.binding == jump);

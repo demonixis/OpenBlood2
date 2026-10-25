@@ -376,15 +376,17 @@ namespace OpenBlood2
             text(*surface, font, label, 180, y);
             if (menu.small() && int(i) == menu.selected && enabled)
                 text(*surface, small_, ">", 164, y);
-            if (item.setting >= 0 && item.setting <= 5) // Detail/lighting rows carry their value in the label.
+            if ((item.setting >= 0 && item.setting <= 5) ||
+                item.setting == 29) // Detail/lighting rows carry their value in the label.
             {
                 const auto& settings = menu.settings;
-                const bool toggle = item.setting == 0 || item.setting == 2 || item.setting == 5;
+                const bool toggle = item.setting == 0 || item.setting == 2 || item.setting == 5 || item.setting == 29;
                 if (toggle)
                 {
-                    const bool on = item.setting == 0   ? settings.sound
-                                    : item.setting == 2 ? settings.music
-                                                        : settings.invert_y;
+                    const bool on = item.setting == 0    ? settings.sound
+                                    : item.setting == 2  ? settings.music
+                                    : item.setting == 29 ? settings.mouse_look
+                                                         : settings.invert_y;
                     text(*surface, small_, on ? "On" : "Off", 440, y);
                 }
                 else

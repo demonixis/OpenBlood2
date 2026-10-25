@@ -89,7 +89,8 @@ menu maximum is half of the full synth level (measured installed-soundtrack peak
 0.33..0.89 there, one Cabal cruising transient 1.15 clipped). Mouse sensitivity
 retains 100..1500 with step 20. Default 150 maps exactly to the previous 0.0025 radians per SDL relative
 unit; inversion affects mouse pitch only. Mouse slider release maps through the
-same drawn thumb travel as hit testing. Unsupported controls remain disabled.
+same drawn thumb travel as hit testing. The retail Mouse Look switch is enabled; Look Spring
+and Use Wheel remain disabled. See the [additional controls](input_action_contracts.md#additional-original-controls-2026-10-25).
 
 Settings are application-owned and applied to both mixers and every replacement
 session. Music and SFX gains apply before final clipping. At default gains the old
@@ -240,6 +241,9 @@ transactional. Headset display behavior is specified in the
 
 See the [implementation and validation report](../implementation/reports/display_options.md).
 
+
+Preferences **version 11** adds auto-run, permanent mouse look, crosshair visibility and
+crosshair number (0–41). Versions 1–10 remain readable with defaults false/true/true/1.
 
 ## Controls (CMenuControls)
 

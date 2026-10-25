@@ -17,8 +17,6 @@ namespace OpenBlood2
 {
     // One Controls row: an original CMenuControls action (string ID) mapped onto the action
     // layer, or a replacement row (literal) for an action the original reached another way.
-    // Original actions without a port (Strafe, RunLock, TurnAround, DropWeapon, Grab, Message,
-    // Taunt, MouseAimToggle, Crosshair) stay visible and disabled.
     struct ControlRow
     {
         unsigned string_id;
@@ -26,34 +24,34 @@ namespace OpenBlood2
         std::optional<InputAction> action;
     };
     inline constexpr std::array<ControlRow, 48> control_rows{{
-        {705, {}, InputAction::MoveForward},   // Forward
-        {706, {}, InputAction::MoveBackward},  // Backward
-        {707, {}, InputAction::TurnLeft},      // Left
-        {708, {}, InputAction::TurnRight},     // Right
-        {709, {}, std::nullopt},               // Strafe (modifier, not ported)
-        {710, {}, InputAction::StrafeLeft},    // StrafeLeft
-        {711, {}, InputAction::StrafeRight},   // StrafeRight
-        {712, {}, InputAction::Run},           // Run
-        {713, {}, std::nullopt},               // RunLock (always-run toggle, not ported)
-        {714, {}, InputAction::Jump},          // Jump
-        {715, {}, InputAction::Crouch},        // Duck
-        {716, {}, std::nullopt},               // TurnAround
+        {705, {}, InputAction::MoveForward},  // Forward
+        {706, {}, InputAction::MoveBackward}, // Backward
+        {707, {}, InputAction::TurnLeft},     // Left
+        {708, {}, InputAction::TurnRight},    // Right
+        {709, {}, InputAction::Strafe},
+        {710, {}, InputAction::StrafeLeft},  // StrafeLeft
+        {711, {}, InputAction::StrafeRight}, // StrafeRight
+        {712, {}, InputAction::Run},         // Run
+        {713, {}, InputAction::RunLock},
+        {714, {}, InputAction::Jump},   // Jump
+        {715, {}, InputAction::Crouch}, // Duck
+        {716, {}, InputAction::TurnAround},
         {717, {}, InputAction::FirePrimary},   // Fire
         {718, {}, InputAction::FireAlternate}, // AltFire
         {719, {}, InputAction::NextWeapon},    // NextWeapon
         {720, {}, InputAction::PrevWeapon},    // PrevWeapon
-        {721, {}, std::nullopt},               // DropWeapon
-        {722, {}, InputAction::Use},           // Open
-        {723, {}, InputAction::PrevItem},      // InventoryLeft
-        {724, {}, InputAction::NextItem},      // InventoryRight
-        {725, {}, InputAction::UseItem},       // UseInventory
-        {726, {}, std::nullopt},               // Grab
-        {727, {}, std::nullopt},               // Message
-        {728, {}, std::nullopt},               // Taunt
-        {729, {}, InputAction::LookUp},        // LookUp
-        {730, {}, InputAction::LookDown},      // LookDown
-        {731, {}, std::nullopt},               // MouseAimToggle
-        {732, {}, std::nullopt},               // Crosshair
+        {721, {}, InputAction::DropWeapon},
+        {722, {}, InputAction::Use},      // Open
+        {723, {}, InputAction::PrevItem}, // InventoryLeft
+        {724, {}, InputAction::NextItem}, // InventoryRight
+        {725, {}, InputAction::UseItem},  // UseInventory
+        {726, {}, InputAction::Grab},
+        {727, {}, InputAction::Message},
+        {728, {}, InputAction::Taunt},
+        {729, {}, InputAction::LookUp},   // LookUp
+        {730, {}, InputAction::LookDown}, // LookDown
+        {731, {}, InputAction::MouseAim},
+        {732, {}, InputAction::Crosshair},
         {735, {}, InputAction::ProximityBomb}, // Proximities
         {736, {}, InputAction::RemoteBomb},    // Remotes
         {737, {}, InputAction::TimeBomb},      // Time

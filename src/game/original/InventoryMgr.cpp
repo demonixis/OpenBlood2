@@ -453,7 +453,7 @@ bool CInventoryMgr::FindBestWeapon(float distance, CWeapon*& alternative) const
     return true;
 }
 
-// Original DropCurrentWeapon: selected single-player NPC branch.
+// Original DropCurrentWeapon: single-player, left hand first. Client checks view-weapon idle before dispatch.
 InventoryResult CInventoryMgr::DropCurrentWeapon()
 {
     ++drop_attempts;
@@ -469,11 +469,6 @@ InventoryResult CInventoryMgr::DropCurrentWeapon()
     if (!server || !server->IsObjectAlive(m_hOwner) || !current || !server->IsObjectAlive(current->m_hHandModel))
     {
         drop_error = "No live current held weapon";
-        return InventoryResult::NotAvailable;
-    }
-    if (m_hClient)
-    {
-        drop_error = "Player drop input and view-weapon state synchronization unavailable";
         return InventoryResult::NotAvailable;
     }
     // Source NPC Fire returns to REST. A nested callback may not delete its weapon.

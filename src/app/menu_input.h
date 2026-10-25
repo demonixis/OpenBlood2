@@ -1,6 +1,7 @@
 #pragma once
 #include "app/control_bindings.h"
 #include "app/demo_flow.h"
+#include "app/message_input.h"
 #include "app/movement_controls.h"
 #include "app/touch_controls.h"
 #include "game/menu.h"
@@ -12,6 +13,7 @@ namespace OpenBlood2
     struct MenuInput
     {
         MovementControls controls;
+        MessageInput message;
         TouchControls touch; // On-screen virtual gamepad for direct touch screens.
         bool inspector = false;
         bool demo_mode = false;
@@ -63,6 +65,8 @@ namespace OpenBlood2
         }
         void reset(Menu& menu, bool player)
         {
+            message.cancel();
+            message.submitted.reset();
             // Ownership changes release the on-screen controls without edges.
             touch.release();
             std::erase_if(controls.gamepads, [](const GamepadState& pad) { return pad.id == touch_gamepad_id; });
@@ -174,6 +178,8 @@ namespace OpenBlood2
             if ((e.type == SDL_EVENT_MOUSE_BUTTON_DOWN || e.type == SDL_EVENT_MOUSE_BUTTON_UP) &&
                 e.button.windowID != window)
                 return false;
+            if (e.type == SDL_EVENT_TEXT_INPUT && e.text.windowID != window)
+                return false;
             if (e.type == SDL_EVENT_MOUSE_MOTION && e.motion.windowID != window)
                 return false;
             if (e.type == SDL_EVENT_WINDOW_FOCUS_LOST && e.window.windowID == window)
@@ -274,6 +280,23 @@ namespace OpenBlood2
             }
             if (credits_screen)
                 return false;
+            if (message.active)
+            {
+                controls.event(e, window, true); // Track releases; no play commands from typed keys.
+                if (gamepad && (press(InputAction::Menu) || press(InputAction::MenuBack)))
+                    message.cancel();
+                else
+                    message.event(e);
+                if (!message.active)
+                    controls.player_changed(player);
+                return false;
+            }
+            if (!menu.active && player && press(InputAction::Message))
+            {
+                reset(menu, false);
+                message.open();
+                return false;
+            }
             if (press(InputAction::Menu) || (menu.active && press(InputAction::MenuBack)))
             {
                 if (menu.active)

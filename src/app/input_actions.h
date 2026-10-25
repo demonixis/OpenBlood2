@@ -65,6 +65,15 @@ namespace OpenBlood2
         MenuBack,
         QuickSave,
         QuickLoad,
+        Strafe,
+        RunLock,
+        TurnAround,
+        DropWeapon,
+        Grab,
+        Message,
+        Taunt,
+        MouseAim,
+        Crosshair,
         Count
     };
     inline constexpr std::size_t input_action_count = std::size_t(InputAction::Count);
@@ -136,6 +145,15 @@ namespace OpenBlood2
         {"menu_back", InputActionKind::Interface},
         {"quick_save", InputActionKind::Interface},
         {"quick_load", InputActionKind::Interface},
+        {"strafe", InputActionKind::Hold},
+        {"run_lock", InputActionKind::Command},
+        {"turn_around", InputActionKind::Command},
+        {"drop_weapon", InputActionKind::Command},
+        {"grab", InputActionKind::Press},
+        {"message", InputActionKind::Interface},
+        {"taunt", InputActionKind::Press},
+        {"mouse_aim", InputActionKind::Hold},
+        {"crosshair", InputActionKind::Command},
     }};
 
     constexpr const InputActionInfo& info(InputAction action)

@@ -184,7 +184,8 @@ namespace
         CHECK(inv.CurrentWeapon()->ShowHandModel(true) && inv.DropCurrentWeapon() == InventoryResult::NotAvailable);
         auto& pi = g.server_shell.Player(g.local_client)->m_InventoryMgr;
         CHECK(pi.UpdateHandModels() &&
-              pi.DropCurrentWeapon() == InventoryResult::NotAvailable); // Explicit client-state boundary.
+              pi.DropCurrentWeapon() ==
+                  InventoryResult::Ok); // Player input now synchronizes the views before the next draw.
         return true;
     }
     bool failures(const std::filesystem::path& path)

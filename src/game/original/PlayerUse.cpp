@@ -135,3 +135,49 @@ bool CPlayerObj::OnCommandAltFire()
     SetZoomMode(!m_bZoomView, 99);
     return true;
 }
+
+// Original PlayerObj::GrabObject / DoTaunt / OnCommandOn(COMMAND_DROPWEAPON).
+bool CPlayerObj::OnControlAction(const PlayerControlAction& action)
+{
+    control_error.clear();
+    auto* s = GetServerDE();
+    if (!s->IsObjectAlive(m_hObject) || m_bDead || m_damage.IsDead() || MovementBlocked() || camera_movement_blocked)
+        return false;
+    if (action.kind == PlayerControlAction::DropWeapon)
+    {
+        const auto result = m_InventoryMgr.DropCurrentWeapon();
+        control_error = m_InventoryMgr.drop_error;
+        return result == InventoryResult::Ok;
+    }
+    if (action.kind == PlayerControlAction::Taunt)
+    {
+        ++taunt_commands;
+        return PlayVoiceGroupEventOnClient(10, true); // VME_TAUNT; VoiceMgr owns playback cooldowns.
+    }
+    if (action.kind != PlayerControlAction::Grab || !physics_vector(action.displacement))
+        return false;
+    ++grab_commands;
+    grab_target = nullptr;
+    DVector from;
+    if (s->GetObjectPos(m_hObject, &from) != DE_OK)
+        return false;
+    from.y += eye_level;
+    const auto forward = rotate_vector(rotation_from_euler({m_fPitch, m_fYaw, 0}), {0, 0, 1});
+    SegmentHit hit;
+    const auto result = s->IntersectSegment(from, vector_add(from, vector_scale(forward, 82)), m_hObject, hit, false,
+                                            SegmentObjects::All);
+    if (result != SegmentResult::Hit || !hit.object || !(s->GetObjectUserFlags(hit.object) & (1u << 4)))
+        return result != SegmentResult::Invalid && result != SegmentResult::Unavailable;
+    grab_target = hit.object;
+    DVector target;
+    if (s->GetObjectPos(hit.object, &target) != DE_OK)
+        return false;
+    target = vector_add(target, action.displacement);
+    if (s->MoveObject(hit.object, &target) != DE_OK)
+    {
+        control_error = "Grab movement refused by collision";
+        return false;
+    }
+    ++grab_moves;
+    return true;
+}

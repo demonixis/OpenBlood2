@@ -12,6 +12,7 @@ namespace OpenBlood2
     {
         shell.movement_input = {};
         shell.weapon_input = {};
+        shell.grab_down = shell.taunt_down = shell.drop_weapon_requested = false;
         shell.use_down = shell.use_was_down = false;
         shell.medkit_down = shell.medkit_was_down = false;
         shell.flashlight_down = shell.flashlight_was_down = false;
@@ -52,19 +53,16 @@ namespace OpenBlood2
     // MenuCredits (outside a world) is StartNewGame("Credits", GAMETYPE_CUSTOM, DIFFICULTY_MEDIUM)
     // with the current configured character: it never calls SetCharacterInfo, so the last
     // entered profile (Caleb before any game) is kept.
-    inline MenuWorldStart menu_world_start(const GameSession& game, const MenuCommand& command,
-                                           const char* first_level)
+    inline MenuWorldStart menu_world_start(const GameSession& game, const MenuCommand& command, const char* first_level)
     {
         if (command.action == MenuAction::Credits)
             return {"Credits", DIFFICULTY_MEDIUM, game.client_shell.entry_profile.character, GAMETYPE_CUSTOM};
         // The replacement Cheats warp: the owner fills the character and difficulty.
         if (command.action == MenuAction::Warp)
             return {command.world.c_str(), DBYTE(command.difficulty), DBYTE(command.character), GAMETYPE_SINGLE};
-        return {first_level, DBYTE(command.difficulty), DBYTE(command.story ? 0 : command.character),
-                GAMETYPE_SINGLE};
+        return {first_level, DBYTE(command.difficulty), DBYTE(command.story ? 0 : command.character), GAMETYPE_SINGLE};
     }
-    inline bool start_menu_world(std::unique_ptr<GameSession>& game, const MenuWorldStart& start,
-                                 std::string& error)
+    inline bool start_menu_world(std::unique_ptr<GameSession>& game, const MenuWorldStart& start, std::string& error)
     {
         return GameSession::start_new_game(game, start.world ? start.world : "", start.difficulty, start.character,
                                            error, false, start.game_type);

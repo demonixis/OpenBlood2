@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-25",
+  "scope": "Nine previously disabled control actions, through existing typed input, movement, weapon-drop and voice paths. Reference sources and commercial assets are not modified.",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/BloodClientShell.cpp",
+      "source_sha256": "36a810c80ce87eb2304716e9e1dbaae25304c02c542019b0858c9dc99f2d1006",
+      "purpose": "OnCommandOn/Off, UpdateCameraRotation and mouse input: RunLock, Strafe, TurnAround, Crosshair, held MouseAim and view-weapon idle admission."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MoveMgr.cpp",
+      "source_sha256": "6ee27c2976a08bbb732dc9cff39725e31975b4aaee392cee9331eced7a026a83",
+      "purpose": "UpdateControlFlags/UpdateMotion: held run lock, strafe-turn keys, mouse acceleration factors and clamp order."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MenuMouse.cpp",
+      "source_sha256": "e240f6b3bc5fd5c82cab82638993af895114e5358ca27a8334be7814a23d5251",
+      "purpose": "Permanent MouseLook menu setting; retail row order."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MessageMgr.cpp",
+      "source_sha256": "625f7bb5374dca914ac37fa456786954395d583338e4a61d4260da1bc6c13056",
+      "purpose": "CInputLine: 80-byte buffer, ASCII editing, Enter/Escape/Home/Backspace and message submission."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/PlayerObj.cpp",
+      "source_sha256": "93056622f9f083f11447a471ecae6f115b7dc3937daf7d251d2396724f3d2003",
+      "purpose": "GrabObject eye ray (82), MOVEABLE gate, player displacement; DoTaunt VME_TAUNT; drop command and single-player text formatting."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/InventoryMgr.cpp",
+      "source_sha256": "aab29291e988ac7c3e1424f41076b5c0adc6243cd60198ea2cc6381d402d0e53",
+      "purpose": "DropCurrentWeapon single-player admission, live hand models, melee refusal, left-before-right detach and dropped-model ownership."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/VoiceMgr.cpp",
+      "source_sha256": "6846ac16b61864f7d0d2aa878daf2d44175fdcab0ceb3a0348a3a3278bfb5cc8",
+      "purpose": "PlayEvent category cooldowns and original voice-group selection."
+    }
+  ],
+  "adaptations": [
+    "Fresh-press TurnAround (one half-turn, no held retrigger), and Message on press rather than release.",
+    "SDL text events, 79 printable ASCII bytes, local single-player echo only; no multiplayer substitutions, network transport or cheat parser. Four transient HUD lines replace source surfaces.",
+    "Grab excludes its own player and uses the checked engine movement service.",
+    "No default bindings are added; all nine rows are assignable. Preferences version 11 stores auto-run, permanent mouse look and crosshair choices.",
+    "Existing player-drop synchronization and typed command routes replace original untyped messages. No weapon state machine, save payload or asset changes."
+  ]
+}

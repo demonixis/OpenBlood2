@@ -5,6 +5,7 @@
 #include "ClientCrosshair.h"
 #include "MenuIds.h"
 #include "SaveFields.h"
+#include "engine/collision.h"
 #include "engine/string_resources.h"
 #include "game/game_settings.h"
 #include <algorithm>
@@ -340,6 +341,10 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     proximity_down = proximity_was_down = false;
     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
     next_item_requested = prev_item_requested = use_item_requested = false;
+    grab_down = taunt_down = drop_weapon_requested = false;
+    control_notice.clear();
+    chat_lines.clear();
+    message_revision = 0;
     inventory_items = {};
     item_actions = item_sounds = item_voice = 0;
     item_audio_error.clear();
@@ -486,6 +491,10 @@ void CBloodClientShell::OnExitWorld()
     proximity_down = proximity_was_down = false;
     remote_down = remote_was_down = detonate_down = detonate_was_down = false;
     next_item_requested = prev_item_requested = use_item_requested = false;
+    grab_down = taunt_down = drop_weapon_requested = false;
+    control_notice.clear();
+    chat_lines.clear();
+    message_revision = 0;
     inventory_items = {};
     item_actions = item_sounds = item_voice = 0;
     item_audio_error.clear();
@@ -511,6 +520,18 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
 {
     if (!m_bInWorld || server_.GetClientUserData(client_) != player)
         return false;
+    if (const auto* line = std::get_if<OpenBlood2::PlayerText>(&event))
+    {
+        if (line->text.size() > 80)
+            return false;
+        if (chat_lines.size() == 4)
+            chat_lines.erase(chat_lines.begin());
+        chat_lines.push_back(line->text);
+        messages_until = server_.GetTime() + 5;
+        ++message_revision;
+        return true;
+    }
+
     ++messages;
     if (std::holds_alternative<OpenBlood2::PlayerInitRequest>(event))
         return InitSinglePlayer(server);
@@ -741,6 +762,11 @@ void CBloodClientShell::UpdateRollCredits(double seconds)
 }
 bool CBloodClientShell::Update()
 {
+    if (server_.GetTime() >= messages_until)
+        chat_lines.clear();
+    if (server_.GetTime() >= control_notice_until)
+        control_notice.clear();
+
     if (!m_bInWorld || server_.GetClientUserData(client_) != player)
         return false;
     ++updates;
@@ -759,6 +785,9 @@ bool CBloodClientShell::Update()
 bool CBloodClientShell::UpdateMovement(CBloodServerShell& server, double seconds, std::string& error)
 {
     auto* owner = server.Player(client_);
+    DVector previous;
+    if (!owner || server_.GetObjectPos(owner->m_hObject, &previous) != DE_OK)
+        return false;
     if (!owner || !server.OnMessage(client_, rotation) || !UpdateCameraSelection())
         return false;
     if ((owner->camera_movement_blocked || owner->MovementBlocked()) && !owner->m_damage.IsDead() &&
@@ -774,6 +803,25 @@ bool CBloodClientShell::UpdateMovement(CBloodServerShell& server, double seconds
         if (owner && !owner->locomotion_error.empty())
             error += ": " + owner->locomotion_error;
         return false;
+    }
+    if (grab_down)
+    {
+        DVector current;
+        if (server_.GetObjectPos(player, &current) == DE_OK)
+            server.OnMessage(client_, OpenBlood2::PlayerControlAction{OpenBlood2::PlayerControlAction::Grab,
+                                                                      OpenBlood2::vector_subtract(current, previous)});
+    }
+    if (taunt_down)
+        server.OnMessage(client_, OpenBlood2::PlayerControlAction{OpenBlood2::PlayerControlAction::Taunt});
+    if (std::exchange(drop_weapon_requested, false))
+    {
+        control_notice.clear();
+        const auto idle = [](const CViewWeapon& w) { return !w.model || w.state == WS_REST || w.state == WS_IDLE; };
+        if (!idle(weapons[0]) || !idle(weapons[1]))
+            SetControlNotice("Weapon is busy");
+        else if (!server.OnMessage(client_,
+                                   OpenBlood2::PlayerControlAction{OpenBlood2::PlayerControlAction::DropWeapon}))
+            SetControlNotice(owner->control_error.empty() ? "Cannot drop weapon now" : owner->control_error);
     }
     return true;
 }
@@ -1080,4 +1128,21 @@ bool CBloodClientShell::HandleCTF(const OpenBlood2::CTFEvent& event)
             ctf.error = "Original CTF string resource unavailable";
     }
     return true;
+}
+
+bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerControlAction& action)
+{
+    auto* player = Player(client);
+    return player && player->OnControlAction(action);
+}
+bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerText& message)
+{
+    // Original CMSG_PLAYERMESSAGE single-player branch: prefix ':' and echo locally.
+    if (!Player(client) || message.text.empty() || message.text.size() > 79 ||
+        server_.GetVarValueFloat(server_.GetGameConVar("GAME_GAMETYPE")) != float(GAMETYPE_SINGLE))
+        return false;
+    for (unsigned char c : message.text)
+        if (c < 32 || c > 126)
+            return false;
+    return server_.SendToClient(client, OpenBlood2::PlayerText{":" + message.text}) == DE_OK;
 }

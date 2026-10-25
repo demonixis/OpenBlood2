@@ -180,7 +180,7 @@ namespace OpenBlood2
                 setting(IDS_MENU_MOUSE_INVERT_YAXIS, 5);
                 if (demo())
                     break; // Build 108 constructs three mouse rows; later source adds more.
-                AddLargeTextItemOption(IDS_MENU_MOUSE_MOUSELOOK, -1);
+                setting(IDS_MENU_MOUSE_MOUSELOOK, 29);
                 AddLargeTextItemOption(IDS_MENU_MOUSE_LOOKSPRING, -1);
                 AddLargeTextItemOption(IDS_MENU_MOUSE_USEWHEEL, -1);
                 break;
@@ -581,6 +581,9 @@ namespace OpenBlood2
                 break;
             case 4:
                 settings.sensitivity = std::clamp(settings.sensitivity + direction * 20, 100, 1500);
+                break;
+            case 29:
+                settings.mouse_look = !settings.mouse_look;
                 break;
             case 5:
                 settings.invert_y = !settings.invert_y;

@@ -436,6 +436,16 @@ namespace
             CHECK(v && v->cursor > 0 && v->clip->stream && v->request.streaming);
         }
         vm.StopAll();
+        const auto taunt_starts = vm.starts;
+        CHECK(g.server_shell.OnMessage(g.local_client, PlayerControlAction{PlayerControlAction::Taunt}));
+        CHECK(g.pump_player_messages(error) && vm.starts == taunt_starts + 1);
+        CHECK(vm.last_resource.find("/taunt/") != std::string::npos);
+        CHECK(g.server.advance_audio(.01, {}, {}));
+        const auto* taunt_voice = g.server.audio.get(vm.voice);
+        CHECK(taunt_voice && taunt_voice->cursor > 0 && taunt_voice->request.streaming);
+        CHECK(g.server_shell.OnMessage(g.local_client, PlayerControlAction{PlayerControlAction::Taunt}));
+        CHECK(g.pump_player_messages(error) && vm.starts == taunt_starts + 1); // Held taunts respect cooldown.
+        vm.StopAll();
         CHECK(vm.PlayEventSound(g.client_shell.player, 0, 9, false));
         const auto voice = vm.voice;
         const auto last = vm.groups[0][9].last;

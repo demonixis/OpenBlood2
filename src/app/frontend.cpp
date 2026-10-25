@@ -1,5 +1,6 @@
 #include "app/frontend.h"
 #include "app/cheat_flow.h"
+#include "app/control_actions.h"
 #include "app/demo_menu_smoke.h"
 #include "app/demo_smoke.h"
 #include "app/display_options.h"
@@ -320,6 +321,23 @@ namespace OpenBlood2
 #endif
             auto stored_settings = menu.settings;
             MenuInput input;
+            bool message_text_input = false;
+            const auto sync_message_input = [&]
+            {
+                if (input.message.active == message_text_input)
+                    return;
+                if (input.message.active)
+                {
+                    if (!SDL_StartTextInput(runtime.window))
+                    {
+                        game->client_shell.SetControlNotice("Text input unavailable");
+                        input.message.cancel();
+                    }
+                }
+                else
+                    SDL_StopTextInput(runtime.window);
+                message_text_input = input.message.active;
+            };
             // controls.cfg beside the preferences, under the same smoke-run exclusion.
             std::filesystem::path controls_file;
             if (!options.menu_smoke && !options.demo_smoke)
@@ -505,6 +523,7 @@ namespace OpenBlood2
                         return true;
                     }
                     auto* player = game->server_shell.Player(game->local_client);
+                    const bool old_message = input.message.active;
                     const bool old_inspector = input.inspector, old_menu = input.paused(menu);
                     const bool forward =
                         input.event(event, SDL_GetWindowID(runtime.window), menu, game->client_shell.m_bInWorld,
@@ -512,7 +531,9 @@ namespace OpenBlood2
                                     float(width), float(height));
                     if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED)
                         gamepads.resync(input.controls);
-                    if (old_inspector != input.inspector || old_menu != input.paused(menu))
+                    sync_message_input();
+                    if (old_message != input.message.active || old_inspector != input.inspector ||
+                        old_menu != input.paused(menu))
                     {
                         neutralize_app_input(game->client_shell);
                         ImGui::GetIO().ClearEventsQueue();
@@ -964,8 +985,13 @@ namespace OpenBlood2
                 if (!game->server.audio.pause_output(input.paused(menu), error))
                     return failed(4);
                 auto& shell = game->client_shell;
-                if (input.paused(menu) || input.inspector)
+                if (input.paused(menu) || input.inspector || input.message.active)
                     neutralize_app_input(shell);
+                if (input.message.submitted)
+                {
+                    game->server_shell.OnMessage(game->local_client, PlayerText{std::move(*input.message.submitted)});
+                    input.message.submitted.reset();
+                }
                 shell.movement_input = {};
                 shell.weapon_input = {};
                 shell.goggles_down = shell.eye_down = shell.binoculars_down = shell.use_down = shell.medkit_down =
@@ -990,7 +1016,9 @@ namespace OpenBlood2
                     controlled = id;
                     input.reset(menu, bool(id));
                 }
-                const bool blocked = input.paused(menu) || input.inspector;
+                // World/menu resets can cancel the editor outside SDL event dispatch.
+                sync_message_input();
+                const bool blocked = input.paused(menu) || input.inspector || input.message.active;
                 input.controls.enabled = !blocked;
 #if BLOOD2_XR
                 if (xr)
@@ -1007,6 +1035,7 @@ namespace OpenBlood2
                 }
                 if (!blocked && !menu.active && !xr_mode)
                 {
+                    apply_control_actions(input.controls, shell, false, &menu.settings);
                     shell.movement_input = input.controls.sample(false);
                     const auto fire = input.controls.sample_fire(false);
                     shell.weapon_input.primary = fire.primary;
@@ -1190,7 +1219,24 @@ namespace OpenBlood2
                     state.time = float(game->objects.time());
                     if (!hud.draw(state, game->resources, error))
                         return failed(4);
-                    if (input.touch.visible && client.m_bInWorld && !xr_mode)
+                    if (input.message.active || !client.chat_lines.empty() || !client.control_notice.empty())
+                    {
+                        auto* draw = ImGui::GetForegroundDrawList();
+                        float y = 12;
+                        const auto line = [&](const std::string& text)
+                        {
+                            draw->AddText({13, y + 1}, IM_COL32(0, 0, 0, 255), text.c_str());
+                            draw->AddText({12, y}, IM_COL32(255, 255, 255, 255), text.c_str());
+                            y += ImGui::GetTextLineHeightWithSpacing();
+                        };
+                        for (const auto& text : client.chat_lines)
+                            line(text);
+                        if (!client.control_notice.empty())
+                            line(client.control_notice);
+                        if (input.message.active)
+                            line("Say: " + input.message.text + "_");
+                    }
+                    if (input.touch.visible && client.m_bInWorld && !xr_mode && !input.message.active)
                         draw_touch_controls(input.touch);
                     if (saves.notice.visible())
                     {

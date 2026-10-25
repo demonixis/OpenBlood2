@@ -3253,3 +3253,11 @@ if(BLOOD2_GPU_TESTS)
     set_tests_properties(gpu.display_options PROPERTIES LABELS "gpu;menus" TIMEOUT 90 RUN_SERIAL TRUE
         FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
 endif()
+
+add_executable(control_actions_tests control_actions_tests.cpp)
+target_link_libraries(control_actions_tests PRIVATE blood2_game)
+blood2_project_options(control_actions_tests)
+foreach(case IN ITEMS movement crosshair message gameplay)
+    add_test(NAME control_actions.${case} COMMAND control_actions_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/control-action-fixtures/${case}")
+    set_tests_properties(control_actions.${case} PROPERTIES LABELS "headless;input_actions" TIMEOUT 30)
+endforeach()

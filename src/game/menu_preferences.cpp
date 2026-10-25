@@ -12,8 +12,8 @@ namespace OpenBlood2
         // Version 1 has the first seven keys; version 2 adds the display settings; version 3 adds
         // the renderer selection; version 4 the VR options; version 5 the VR movement reference;
         // version 6 the cheat switch and god mode; version 7 the post-processing rows; version 8
-        // ambient occlusion; version 9 screen-space reflections; version 10 window/pacing and XR display.
-        constexpr std::array<const char*, 31> names{"version",
+        // ambient occlusion; version 9 reflections; version 10 display; version 11 control toggles.
+        constexpr std::array<const char*, 35> names{"version",
                                                     "sound",
                                                     "music",
                                                     "sound_volume",
@@ -43,8 +43,12 @@ namespace OpenBlood2
                                                     "vsync",
                                                     "fps_limit",
                                                     "vr_refresh_rate",
-                                                    "vr_render_scale"};
-        constexpr std::array<std::size_t, 10> version_keys{7, 9, 12, 15, 16, 18, 21, 22, 23, 31};
+                                                    "vr_render_scale",
+                                                    "run_lock",
+                                                    "mouse_look",
+                                                    "crosshair",
+                                                    "crosshair_number"};
+        constexpr std::array<std::size_t, 11> version_keys{7, 9, 12, 15, 16, 18, 21, 22, 23, 31, 35};
         bool valid(const MenuSettings& s)
         {
             const bool turn = s.vr_turn == 0 || s.vr_turn == 15 || s.vr_turn == 30 || s.vr_turn == 45 ||
@@ -60,7 +64,8 @@ namespace OpenBlood2
                      s.resolution_height <= 16384)) &&
                    (s.fps_limit == 0 || (s.fps_limit >= 30 && s.fps_limit <= 1000)) &&
                    (s.vr_refresh_rate == 0 || (s.vr_refresh_rate >= 30000 && s.vr_refresh_rate <= 1000000)) &&
-                   s.vr_render_scale >= 50 && s.vr_render_scale <= 100 && s.vr_render_scale % 10 == 0;
+                   s.vr_render_scale >= 50 && s.vr_render_scale <= 100 && s.vr_render_scale % 10 == 0 &&
+                   s.crosshair_number >= 0 && s.crosshair_number <= 41;
         }
     } // namespace
     bool menu_preferences_path(std::filesystem::path& output, std::string& error)
@@ -129,7 +134,7 @@ namespace OpenBlood2
             std::find(seen.begin(), seen.begin() + required, false) != seen.begin() + required ||
             std::find(seen.begin() + required, seen.end(), true) != seen.end() || !flag(1) || !flag(2) || !flag(6) ||
             !flag(8) || !flag(11) || !flag(13) || !flag(14) || !flag(15) || !flag(16) || !flag(17) || !flag(19) ||
-            !flag(23) || !flag(27))
+            !flag(23) || !flag(27) || !flag(31) || !flag(32) || !flag(33))
         {
             error = "Incomplete or unsupported preferences";
             return false;
@@ -186,6 +191,13 @@ namespace OpenBlood2
             result.vr_refresh_rate = values[29];
             result.vr_render_scale = values[30];
         }
+        if (required >= version_keys[10])
+        {
+            result.run_lock = values[31];
+            result.mouse_look = values[32];
+            result.crosshair = values[33];
+            result.crosshair_number = values[34];
+        }
         if (!valid(result))
         {
             error = "Preferences out of range";
@@ -202,7 +214,7 @@ namespace OpenBlood2
             error = "Preferences out of range";
             return false;
         }
-        const std::array<int, names.size()> values{10,
+        const std::array<int, names.size()> values{11,
                                                    settings.sound,
                                                    settings.music,
                                                    settings.sound_volume,
@@ -232,7 +244,11 @@ namespace OpenBlood2
                                                    settings.vsync,
                                                    settings.fps_limit,
                                                    settings.vr_refresh_rate,
-                                                   settings.vr_render_scale};
+                                                   settings.vr_render_scale,
+                                                   settings.run_lock,
+                                                   settings.mouse_look,
+                                                   settings.crosshair,
+                                                   settings.crosshair_number};
         std::string text;
         for (unsigned i = 0; i < values.size(); ++i)
             text += std::string(names[i]) + '=' + std::to_string(values[i]) + '\n';

@@ -82,6 +82,7 @@ bool CMoveMgr::OnServerForcePos(const PlayerPosition& value)
 }
 void CMoveMgr::UpdateControlFlags(const MovementInput& input, bool can_move)
 {
+    input_ = can_move ? input : MovementInput{};
     m_dwLastControlFlags = m_dwControlFlags;
     m_dwControlFlags = 0;
     if (!can_move)
@@ -190,7 +191,8 @@ void CMoveMgr::UpdateMotion(float yaw, float pitch, CVoiceMgr& voices, int chara
     const auto land_velocity = physics.move_speed * ((m_dwControlFlags & run) ? 1.5f : 1.0f) *
                                ((((m_dwControlFlags & crouch) || m_bForcedCrouch) && !free_movement) ? .5f : 1.0f);
     const auto max_velocity = m_bBodyInLiquid ? m_fSwimVel : m_bBodyOnLadder ? m_fLadderVel : land_velocity;
-    const auto max_acceleration = max_velocity * drag * (m_bBodyOnLadder ? .5f : 1.0f);
+    const auto max_acceleration =
+        max_velocity * drag * (m_bBodyOnLadder ? .5f : 1.0f) * (input_.mouse_move ? 2.f : 1.f);
     if (!m_bBodyInLiquid)
         m_bSwimmingJump = false;
     const auto speed = magnitude(body.velocity);
@@ -206,9 +208,15 @@ void CMoveMgr::UpdateMotion(float yaw, float pitch, CVoiceMgr& voices, int chara
     const DVector front{std::sin(yaw) * cp, (free_movement || in_liquid) ? -std::sin(pitch) : 0.0f, std::cos(yaw) * cp};
     const DVector right{std::cos(yaw), 0, -std::sin(yaw)};
     const auto forward_accel =
-        ((m_dwControlFlags & forward) ? max_acceleration : 0) - ((m_dwControlFlags & backward) ? max_acceleration : 0);
-    const auto strafe_accel = ((m_dwControlFlags & strafe_right) ? max_acceleration : 0) -
-                              ((m_dwControlFlags & strafe_left) ? max_acceleration : 0);
+        max_acceleration *
+        std::clamp((float(bool(m_dwControlFlags & forward)) - float(bool(m_dwControlFlags & backward))) /
+                           (input_.mouse_move ? 2.f : 1.f) +
+                       input_.mouse_forward,
+                   -1.f, 1.f);
+    const auto strafe_accel =
+        max_acceleration * std::clamp(float(bool(m_dwControlFlags & strafe_right)) -
+                                          float(bool(m_dwControlFlags & strafe_left)) + input_.mouse_strafe,
+                                      -1.f, 1.f);
     body.acceleration = vector_add(body.acceleration,
                                    vector_add(vector_scale(front, forward_accel), vector_scale(right, strafe_accel)));
     bool steep = false;
@@ -330,8 +338,15 @@ bool CMoveMgr::Update(CBloodServerShell& shell, CVoiceMgr& voices, bool external
     if (!ready() || !std::isfinite(seconds) || seconds < 0 || seconds > 60 || !std::isfinite(yaw) ||
         !std::isfinite(pitch) || server_->GetClientUserData(client_) != object_)
         return false;
+    if (!std::isfinite(input.mouse_forward) || !std::isfinite(input.mouse_strafe))
+        return false;
     UpdateControlFlags(input, can_move);
-    if (can_move && !shell.OnMessage(client_, PlayerControls{input, firing, yaw}))
+    auto animation = input;
+    animation.forward |= input.mouse_forward > 0;
+    animation.backward |= input.mouse_forward < 0;
+    animation.right |= input.mouse_strafe > 0;
+    animation.left |= input.mouse_strafe < 0;
+    if (can_move && !shell.OnMessage(client_, PlayerControls{animation, firing, yaw}))
         return false;
     auto* player = shell.Player(client_);
     if (!player)

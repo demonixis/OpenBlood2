@@ -41,7 +41,9 @@ namespace OpenBlood2
                 return e.key.which != device;
             if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN || e.type == SDL_EVENT_MOUSE_BUTTON_UP)
                 return e.button.which != device;
-            if (e.type == SDL_EVENT_MOUSE_MOTION || e.type == SDL_EVENT_MOUSE_WHEEL || e.type == SDL_EVENT_TEXT_INPUT)
+            if (e.type == SDL_EVENT_TEXT_INPUT)
+                return e.text.timestamp != device;
+            if (e.type == SDL_EVENT_MOUSE_MOTION || e.type == SDL_EVENT_MOUSE_WHEEL)
                 return true;
             if (e.type == SDL_EVENT_WINDOW_FOCUS_GAINED || e.type == SDL_EVENT_WINDOW_FOCUS_LOST)
                 return e.window.data1 != int(device);
@@ -109,9 +111,20 @@ namespace OpenBlood2
                     return fail("resume/inspector clock");
                 live_time_ = game.objects.time();
             }
-            if (frame == 215 && menu.page != MenuPage::Quit)
+            if (frame == 213 && (!input.message.active || !SDL_TextInputActive(window) || menu.active))
+                return fail("message editor ownership");
+            if (frame == 214 && input.message.text != "Control test")
+                return fail("SDL message text");
+            if (frame == 215 &&
+                (input.message.active || SDL_TextInputActive(window) || game.client_shell.chat_lines.empty() ||
+                 game.client_shell.chat_lines.back() != ":Control test"))
+                return fail("local message delivery and text input release");
+            if (frame == 217 &&
+                (!menu.settings.run_lock || menu.settings.crosshair || game.client_shell.m_bShowCrosshair))
+                return fail("control commands through the frontend");
+            if (frame == 220 && menu.page != MenuPage::Quit)
                 return fail("quit confirmation");
-            if (frame > 216)
+            if (frame > 221)
                 return fail("quit not executed");
             auto key = [&](SDL_Scancode code, bool repeat = false)
             {
@@ -230,20 +243,47 @@ namespace OpenBlood2
                     key(SDL_SCANCODE_F10);
                     break;
                 case 212:
-                    key(SDL_SCANCODE_ESCAPE);
+                    if (!assign_control(input.controls.bindings, InputAction::Message, InputSource::Key,
+                                        SDL_SCANCODE_T) ||
+                        !assign_control(input.controls.bindings, InputAction::RunLock, InputSource::Key,
+                                        SDL_SCANCODE_R) ||
+                        !assign_control(input.controls.bindings, InputAction::Crosshair, InputSource::Key,
+                                        SDL_SCANCODE_H))
+                        return fail("control command bindings");
+                    key(SDL_SCANCODE_T);
                     break;
-                case 213: // Options, the enabled in-world Credits row, Quit.
-                    key(SDL_SCANCODE_DOWN);
-                    key(SDL_SCANCODE_DOWN);
-                    key(SDL_SCANCODE_DOWN);
+                case 213:
+                {
+                    SDL_Event text{};
+                    text.type = SDL_EVENT_TEXT_INPUT;
+                    text.text.timestamp = device;
+                    text.text.windowID = SDL_GetWindowID(window);
+                    text.text.text = "Control test";
+                    SDL_PushEvent(&text);
                     break;
+                }
                 case 214:
                     key(SDL_SCANCODE_RETURN);
                     break;
-                case 215:
+                case 216:
+                    key(SDL_SCANCODE_R);
+                    key(SDL_SCANCODE_H);
+                    break;
+                case 217:
+                    key(SDL_SCANCODE_ESCAPE);
+                    break;
+                case 218: // Options, the enabled in-world Credits row, Quit.
+                    key(SDL_SCANCODE_DOWN);
+                    key(SDL_SCANCODE_DOWN);
+                    key(SDL_SCANCODE_DOWN);
+                    break;
+                case 219:
+                    key(SDL_SCANCODE_RETURN);
+                    break;
+                case 220:
                     key(SDL_SCANCODE_UP);
                     break;
-                case 216:
+                case 221:
                     key(SDL_SCANCODE_RETURN);
                     confirmed = true;
                     break;

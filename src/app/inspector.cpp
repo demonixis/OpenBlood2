@@ -1767,6 +1767,14 @@ namespace OpenBlood2
             ImGui::Text("USE (E with F2 controls): %llu commands / %llu messages | door refused %s",
                         static_cast<unsigned long long>(player->use_commands),
                         static_cast<unsigned long long>(player->use_messages), player->use_door_refused ? "yes" : "no");
+            ImGui::Text("Grab: %llu commands / %llu moves | Taunts: %llu | Drops: %llu/%llu",
+                        static_cast<unsigned long long>(player->grab_commands),
+                        static_cast<unsigned long long>(player->grab_moves),
+                        static_cast<unsigned long long>(player->taunt_commands),
+                        static_cast<unsigned long long>(player->m_InventoryMgr.drops),
+                        static_cast<unsigned long long>(player->m_InventoryMgr.drop_attempts));
+            if (!player->control_error.empty())
+                ImGui::TextWrapped("Control: %s", player->control_error.c_str());
             if (ImGui::TreeNode("Original player death"))
             {
                 const auto& death = client.death_camera;

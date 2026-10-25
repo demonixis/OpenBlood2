@@ -44,7 +44,8 @@ namespace OpenBlood2
         std::vector<GamepadState> gamepads; // At most max_gamepads, in first-event order.
         int pending_weapon_slot = -1;
         std::array<bool, input_action_count> pending{}; // Command actions queued for the frame.
-        bool run_latched = false;
+        bool run_latched = false, run_lock = false, mouse_look = true;
+        float turn_remaining = 0;
         // Default number-key layout: 1..9 then 0, top row or keypad.
         static int weapon_slot(SDL_Scancode code)
         {
@@ -280,6 +281,7 @@ namespace OpenBlood2
             pending_weapon_slot = -1;
             pending = {};
             run_latched = false;
+            turn_remaining = 0;
             keys = {};
             suppressed = {};
             release_mouse();
@@ -329,6 +331,7 @@ namespace OpenBlood2
                 pending_weapon_slot = -1;
                 pending = {};
                 run_latched = false;
+                turn_remaining = 0;
                 keys = {};
                 gamepads.clear(); // Background gamepad events may be lost: never keep stale state.
                 suppressed = {};
@@ -423,10 +426,21 @@ namespace OpenBlood2
         {
             if (!focused || !enabled || text_editing)
                 return {};
-            return {
-                held(InputAction::MoveForward), held(InputAction::MoveBackward),       held(InputAction::StrafeLeft),
-                held(InputAction::StrafeRight), held(InputAction::Run) || run_latched, held(InputAction::Jump),
-                held(InputAction::Crouch)};
+            const bool strafe = held(InputAction::Strafe);
+            MovementInput result{held(InputAction::MoveForward),
+                                 held(InputAction::MoveBackward),
+                                 held(InputAction::StrafeLeft) || (strafe && held(InputAction::TurnLeft)),
+                                 held(InputAction::StrafeRight) || (strafe && held(InputAction::TurnRight)),
+                                 held(InputAction::Run) || run_latched || run_lock,
+                                 held(InputAction::Jump),
+                                 held(InputAction::Crouch)};
+            if (mouse_captured)
+            {
+                result.mouse_move = !mouse_look && !held(InputAction::MouseAim);
+                result.mouse_forward = result.mouse_move ? -mouse_y * mouse_sensitivity * 10.f : 0;
+                result.mouse_strafe = strafe ? mouse_x * mouse_sensitivity * 4.f : 0;
+            }
+            return result;
         }
         // Press actions: held state, refused (and re-armed only by a release) while play refuses input.
         bool sample_press(InputAction action, bool text_editing)
@@ -492,8 +506,17 @@ namespace OpenBlood2
         {
             const float dx = std::exchange(mouse_x, 0), dy = std::exchange(mouse_y, 0);
             const float tx = std::exchange(touch_x, 0), ty = std::exchange(touch_y, 0);
+            const bool turn = sample_command(InputAction::TurnAround, text_editing);
             if (!focused || !enabled || text_editing)
+            {
+                turn_remaining = 0;
                 return;
+            }
+            if (turn && turn_remaining == 0)
+                turn_remaining = 3.14159265359f;
+            const float spin = std::min(turn_remaining, float(std::clamp(seconds, 0.0, .1)) * 15.f);
+            rotation.yaw = std::remainder(rotation.yaw + spin, 6.28318530718f);
+            turn_remaining -= spin;
             // Touch drag: radians per window size of travel, quartered while zoomed, no capture needed.
             if (tx || ty)
             {
@@ -506,8 +529,10 @@ namespace OpenBlood2
             if (mouse_captured)
             {
                 const float scale = zoomed ? mouse_sensitivity / 4 : mouse_sensitivity;
-                rotation.yaw = std::remainder(rotation.yaw + dx * scale, 6.28318530718f);
-                rotation.pitch += dy * scale * (invert_y ? -1.f : 1.f);
+                if (!held(InputAction::Strafe))
+                    rotation.yaw = std::remainder(rotation.yaw + dx * scale, 6.28318530718f);
+                if (mouse_look || held(InputAction::MouseAim))
+                    rotation.pitch += dy * scale * (invert_y ? -1.f : 1.f);
             }
             // Gamepad look: radians per second, quartered while zoomed like mouse offsets.
             const float stick = zoomed ? .25f : 1.f;
@@ -515,7 +540,8 @@ namespace OpenBlood2
                 rotation.yaw = std::remainder(rotation.yaw + x * gamepad_yaw_speed * stick * dt, 6.28318530718f);
             rotation.pitch +=
                 analog(InputAction::LookVertical) * gamepad_pitch_speed * stick * dt * (invert_y ? -1.f : 1.f);
-            rotation.yaw += (int(held(InputAction::TurnRight)) - int(held(InputAction::TurnLeft))) * 2 * dt;
+            if (!held(InputAction::Strafe))
+                rotation.yaw += (int(held(InputAction::TurnRight)) - int(held(InputAction::TurnLeft))) * 2 * dt;
             rotation.pitch =
                 std::clamp(rotation.pitch + (int(held(InputAction::LookDown)) - int(held(InputAction::LookUp))) * dt,
                            -1.48f, 1.48f);
