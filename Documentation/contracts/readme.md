@@ -270,3 +270,5 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Crypt, Bridge, Entrance and Lobby](later_levels_contracts.md): Behemoth, Priest, Shroud, TheHand, Minigun, generic particles and authored-data boundaries.
 
 - [Shared ballistic effects](ballistic_effects_contracts.md): original bullet/shell/BMG effects, flashes and tracers (beta lot 4).
+
+- [Original explosive weapon effects (lot 7)](explosive_effects_contracts.md)

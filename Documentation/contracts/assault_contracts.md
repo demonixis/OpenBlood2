@@ -67,9 +67,8 @@ while each pass still uses the existing checked radius snapshot/falloff and sour
 shooter attribution. Removal can interrupt deliveries. Original AddExplosion uses
 world-up and EXP_GRENADE (3), with the actual detached c4/explosion_1 WAV. Each
 available component is published separately; missing components are not reported
-as a complete effect. Source screen shake and object-bound SMOKETRAIL_1 remain
-explicitly unavailable. The fragment recipe with the same number is not silently
-used as a replacement trail.
+as a complete effect. Source screen shake remains unavailable. [VFX lot 7](explosive_effects_contracts.md)
+now connects the original owner-bound SMOKETRAIL_1, including its restore publication.
 
 ## Replacement gravity/collision boundary
 
@@ -103,7 +102,7 @@ pose or a silently repaired animation. Rendering samples the actual model.
 
 Weapons shows separate primary/alternate ammo pools and diagnostic M16/charge
 grants at the existing frame boundary. Objects shows grenade fuse, motion, spin,
-remaining bounces, contacts, live loop and missing trail. Diagnostics retains
+remaining bounces, contacts, live loop and trail failures. Diagnostics retains
 terminal pass/delivery counts. Both the selected view weapon and world model
 inspection expose invalid-key-bound warnings. Reading or rendering advances no
 clocks. Hidden objects, deferred removal and unload/reload retain the existing

@@ -1,6 +1,6 @@
 # Roadmap
 
-Reviewed on 2026-10-25 (beta VFX lots 1–6); level-opening coverage reconciled with `9bfada1` and
+Reviewed on 2026-10-25 (beta VFX lots 1–7); level-opening coverage reconciled with `9bfada1` and
 [audit 19](implementation/reports/evidence/all-levels-audit-19.log), save/load with lot 14.
 Percentages are task estimates, not acceptance. Only the user accepts a milestone.
 
@@ -82,7 +82,7 @@ progress, and every one is recorded.
 | 3.4 | Campaign chaining: every authored NEW_LEVEL/EndEpisode in order, with KeepAlive inventory and stats | SubwayA → CityHub has a scripted test. The user has played the rest without a recorded result. |
 | 3.5 | Bosses and endgame: Gideon, EnhancedGideon, UndeadGideon, AncientOne, End script, credits | Original-source ports, focused behavior tests and world opening pass; a complete player-driven endgame remains unverified. |
 | 3.6 | Beta build: CI archives for the three platforms, logs and crash capture, a bug report channel | CI archives, logs and crash capture exist. |
-| 3.7 | Beta bug triage and fixes, each fix with a regression test; retest the existing reports (post-transition stutter, idle Cultists, frozen corpses, NPC placement) | In progress: Discord tester fixes, all nine control actions, destruction VFX lot 1 (wood/metal/glass), shotgun VFX lot 2 shared ballistic VFX lot 4, flare VFX lot 5 and Tesla/Drudge VFX lot 6 implemented. Museum crash remains unreproduced; full campaign retest remains. |
+| 3.7 | Beta bug triage and fixes, each fix with a regression test; retest the existing reports (post-transition stutter, idle Cultists, frozen corpses, NPC placement) | In progress: Discord tester fixes, all nine control actions, destruction VFX lot 1 (wood/metal/glass), shotgun VFX lot 2 shared ballistic VFX lot 4, flare VFX lot 5 Tesla/Drudge VFX lot 6 and explosive weapon VFX lot 7 implemented. Museum crash remains unreproduced; full campaign retest remains. |
 | 3.8 | M3 acceptance record for the user's decision | Not started. |
 
 ## M4 — original rendering
@@ -103,13 +103,13 @@ renderer remains the reference and stays selectable after M5.
 | 4 | Shared ballistic presentation: authored muzzle flashes, casings, tracers, marks/fragments and liquid effects for ordinary bullet weapons | Implemented; [contract and verification](contracts/ballistic_effects_contracts.md). Per-ammo rules, dual hands, original tracer normal-ray quirk and Minigun's empty impact path preserved. Clipping/collision/lighting boundaries remain explicit. |
 | 5 | Flare gun: primary/secondary trails and fizzle/burst/fragment effects (13–15) | Implemented; [contract and verification](contracts/flare_contracts.md#original-vfx-completion--lot-5-2026-10-25). Primary/fragment trails, impacts 13–15 and restore republication; alternate parent remains trail-free. Illumination stays separate. |
 | 6 | Tesla: primary impact (7), alternate beam and ball arcs; connect Drudge lightning through the same service | Implemented; [contract and verification](contracts/tesla_contracts.md#original-vfx-completion--lot-6-2026-10-25). Impact 7 and actual Tesla/Drudge lightning, with separate visual/damage rays and original forms. Illumination stays separate. |
-| 7 | Explosive weapons: Howitzer impacts (9–11), Napalm alternate (5) and missing projectile smoke connections | Proposed / P2. Preserve working grenade/bomb and Napalm primary effects. |
+| 7 | Explosive weapons: Howitzer impacts (9–11), Napalm alternate (5) and missing projectile smoke connections | Implemented; [contract and verification](contracts/explosive_effects_contracts.md). Impacts 5/9/10/11, Napalm smoke and M16-grenade/Howitzer fragment trails; existing damage, grenade/bomb and Napalm primary effects preserved. |
 | 8 | Remaining energy/boss/environment recipes: Singularity, Death Ray, enemy trails/impacts, Naga and Spawner rift | Proposed / P2. Split by weapon/caller for implementation and verification; no replacement generic explosions. |
 | 9 | Remaining destruction materials and evidenced environment emitters | Proposed / P2 for stone/plastic/terrain and CDebris flesh; P3 for Rain/legacy emitters until an exercised level/caller is identified. |
-| 10 | M4 rendering dependencies: realtime FX illumination, underwater fog, global translucent ordering and clipped marks | Separate proposed work requiring renderer coordination. Do not confuse evaluated light states with illumination or include this in small recipe lots. |
+| 10 | M4 rendering dependencies: realtime FX illumination, underwater fog, global translucent ordering and clipped marks | Authorized; renderer synchronization confirmed by the user. Queued after the recipe lots. Evaluated light states are not geometry illumination. |
 
-The user authorized the continuation on 2026-10-25; lots 4–6 are implemented and lots 7–10
-remain to execute in order, with lot 10 subject to renderer coordination. P1 restores frequent weapon feedback;
+The user authorized the continuation on 2026-10-25; lots 4–7 are implemented and lots 8–10
+remain to execute in order, with renderer synchronization confirmed by the user for lot 10. P1 restores frequent weapon feedback;
 P2 completes less common weapon/boss/destruction effects; P3 requires evidence of
 campaign use. Each implementation lot needs source-parameter checks and matched
 original/port visual scenarios; the inventory itself changes no runtime behavior.

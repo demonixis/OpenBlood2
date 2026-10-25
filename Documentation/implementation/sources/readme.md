@@ -61,3 +61,5 @@ Runtime test logs and measurements belong in the
 - [Flare effects](flare_effect_sources.json): lot 5, primary/fragment trails, fizzle/burst/fragment composites and original fixed emission origin.
 
 - [Tesla/Drudge effects](tesla_effect_sources.json): lot 6, primary impact and actual weapon/ball lightning publishers.
+
+- [Explosive weapon effects](explosive_effect_sources.json): lot 7, impacts 5/9/10/11 and grenade/Napalm/Howitzer smoke.

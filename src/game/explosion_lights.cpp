@@ -87,7 +87,7 @@ namespace OpenBlood2
             out.push_back(s);
             return true;
         }
-        if (type > 4 && type != 6 && type != 8)
+        if (type > 6 && type != 8 && (type < 9 || type > 11))
         {
             error = "Explosion light recipe is unavailable";
             return false;
@@ -108,14 +108,17 @@ namespace OpenBlood2
         }
         s.color1 = {1, .5f, 0};
         s.color2 = {1, 1, 1};
-        s.duration = 1.25f;
-        s.radius1 = type == 4 ? 300.f : type == 0 || type == 6 ? 150.f : type == 1 ? 200.f : 250.f;
+        s.duration = type == 11 ? 1.75f : 1.25f;
+        s.radius1 = type == 4 || type == 5                 ? 300.f
+                    : type == 0 || type == 6 || type == 11 ? 150.f
+                    : type == 1                            ? 200.f
+                                                           : 250.f;
         s.radius2 = 0;
         out.push_back(s);
         s.color1 = {.2f, .2f, .2f};
         s.color2 = {.5f, .5f, .5f};
         s.duration = 25;
-        s.radius1 = type == 0 || type == 6 ? 50.f : type == 1 ? 75.f : 100.f;
+        s.radius1 = type == 0 || type == 6 ? 50.f : type == 1 || type == 11 ? 75.f : 100.f;
         // Source writes Radius1 twice: Radius2 remains zero from the preceding flash.
         out.push_back(s);
         return true;

@@ -24,7 +24,6 @@ bool CGrenade::InitialUpdate()
 {
     if (!CProjectile::InitialUpdate())
         return false;
-    // The existing type-1 fragment trail is not a general object-bound trail.
     trail = g_pServerDE->PublishObjectParticles(m_hObject, 1, trail_error);
     return true;
 }

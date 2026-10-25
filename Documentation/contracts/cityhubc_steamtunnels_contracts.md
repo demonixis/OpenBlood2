@@ -51,8 +51,8 @@ then replaces X/Z with cached forward as in the source. Its projectile is
 gravity, starts at zero scale, becomes 0.25 after 0.01 s, plays the original
 750-radius loop and publishes EXP_NAPALM_PRIMARY with the 2000-radius impact sound.
 The shared projectile owns flight, shooter unlink, radius-300 damage and deferred
-removal. Projectile light and smoke trail remain explicitly unavailable; existing
-explosion components retain their individual success/failure reports.
+removal. Projectile-light illumination remains unavailable; [VFX lot 7](explosive_effects_contracts.md)
+now connects the original smoke trail. Explosion components retain individual success/failure reports.
 
 `BugSprayPU`, `TheEyePU` and `NightGogglesPU` preserve original resource names,
 display IDs, item/weapon IDs and amounts. TheEyePU is also accepted by destruction

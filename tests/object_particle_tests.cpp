@@ -100,7 +100,7 @@ namespace
         CObjectParticleFX t;
         NodePose p;
         std::minstd_rand random(1);
-        CHECK(!t.Init(2, 1, e) && !t.Init(1, 0, e) && !t.CreateObject(r, p, 0, e) && !t.Update(0, &p, random));
+        CHECK(!t.Init(99, 1, e) && !t.Init(1, 0, e) && !t.CreateObject(r, p, 0, e) && !t.Update(0, &p, random));
         CHECK(t.Init(1, 1, e));
         Resources missing;
         CHECK(!t.CreateObject(missing, p, 0, e));

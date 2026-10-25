@@ -1,0 +1,103 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/release
+      Start  120: save_pickups.pickups
+ 1/29 Test  #120: save_pickups.pickups .............   Passed    0.25 sec
+      Start  121: save_pickups.rewrites
+ 2/29 Test  #121: save_pickups.rewrites ............   Passed    0.01 sec
+      Start  122: save_pickups.bombs
+ 3/29 Test  #122: save_pickups.bombs ...............   Passed    0.02 sec
+      Start  123: save_pickups.eye
+ 4/29 Test  #123: save_pickups.eye .................   Passed    0.01 sec
+      Start  124: save_pickups.family
+ 5/29 Test  #124: save_pickups.family ..............   Passed    0.02 sec
+      Start  125: save_pickups.refusals
+ 6/29 Test  #125: save_pickups.refusals ............   Passed    0.01 sec
+      Start  830: object_particles.emission
+ 7/29 Test  #830: object_particles.emission ........   Passed    0.22 sec
+      Start  831: object_particles.stopping
+ 8/29 Test  #831: object_particles.stopping ........   Passed    0.01 sec
+      Start  832: object_particles.failures
+ 9/29 Test  #832: object_particles.failures ........   Passed    0.01 sec
+      Start  833: object_particles.session
+10/29 Test  #833: object_particles.session .........   Passed    0.01 sec
+      Start  834: object_particles.private
+11/29 Test  #834: object_particles.private .........   Passed    0.54 sec
+      Start 1005: assault.key_bounds
+12/29 Test #1005: assault.key_bounds ...............   Passed    0.22 sec
+      Start 1006: assault.modes
+13/29 Test #1006: assault.modes ....................   Passed    0.02 sec
+      Start 1007: assault.damage
+14/29 Test #1007: assault.damage ...................   Passed    0.01 sec
+      Start 1008: assault.motion
+15/29 Test #1008: assault.motion ...................   Passed    0.01 sec
+      Start 1009: assault.bounce
+16/29 Test #1009: assault.bounce ...................   Passed    0.01 sec
+      Start 1010: assault.contacts
+17/29 Test #1010: assault.contacts .................   Passed    0.01 sec
+      Start 1011: assault.rules
+18/29 Test #1011: assault.rules ....................   Passed    0.01 sec
+      Start 1012: assault.lifetime
+19/29 Test #1012: assault.lifetime .................   Passed    0.01 sec
+      Start 1013: assault.failure
+20/29 Test #1013: assault.failure ..................   Passed    0.01 sec
+      Start 1014: assault.drop
+21/29 Test #1014: assault.drop .....................   Passed    0.01 sec
+      Start 1015: assault.collect
+22/29 Test #1015: assault.collect ..................   Passed    0.01 sec
+      Start 1016: assault.restore
+23/29 Test #1016: assault.restore ..................   Passed    0.01 sec
+      Start 1017: assault.ai
+24/29 Test #1017: assault.ai .......................   Passed    0.02 sec
+      Start 1018: assault.private
+25/29 Test #1018: assault.private ..................   Passed    0.13 sec
+      Start 1120: explosive_effects.recipes
+26/29 Test #1120: explosive_effects.recipes ........   Passed    0.23 sec
+      Start 1121: explosive_effects.smoke
+27/29 Test #1121: explosive_effects.smoke ..........***Failed    0.02 sec
+smoke:99: fx.Update(.05, &pose, rng) && fx.particles.size() == 80
+
+      Start 1122: explosive_effects.callers
+28/29 Test #1122: explosive_effects.callers ........***Failed    0.03 sec
+callers:148: dynamic_cast<CHowitzerAltFrag*>(child) && child->m_fDamage == 15 && child->m_nRadius == 100 && child->trail_error.empty()
+
+      Start 1344: fanatic_prophet.howitzer
+29/29 Test #1344: fanatic_prophet.howitzer .........   Passed    0.22 sec
+
+93% tests passed, 2 tests failed out of 29
+
+Label Time Summary:
+assault             =   0.46 sec*proc (14 tests)
+fanatic_prophet     =   0.22 sec*proc (1 test)
+headless            =   2.07 sec*proc (29 tests)
+object_particles    =   0.79 sec*proc (5 tests)
+objects             =   0.32 sec*proc (6 tests)
+private             =   0.97 sec*proc (6 tests)
+save                =   0.32 sec*proc (6 tests)
+weapons             =   0.28 sec*proc (3 tests)
+
+Total Test time (real) =   2.09 sec
+
+The following tests FAILED:
+	1121 - explosive_effects.smoke (Failed)                  headless private weapons
+	1122 - explosive_effects.callers (Failed)                headless private weapons
+Errors while running CTest
+
+Corrected fixture probes and new GPU coverage:
+Test project /Users/yann/projects/lithtech/openblood2/build/release
+    Start 1120: gpu.explosive_effects
+1/4 Test #1120: gpu.explosive_effects ............   Passed    0.46 sec
+    Start 1121: explosive_effects.recipes
+2/4 Test #1121: explosive_effects.recipes ........   Passed    0.23 sec
+    Start 1122: explosive_effects.smoke
+3/4 Test #1122: explosive_effects.smoke ..........   Passed    0.02 sec
+    Start 1123: explosive_effects.callers
+4/4 Test #1123: explosive_effects.callers ........   Passed    0.04 sec
+
+100% tests passed out of 4
+
+Label Time Summary:
+gpu         =   0.46 sec*proc (1 test)
+headless    =   0.29 sec*proc (3 tests)
+private     =   0.75 sec*proc (4 tests)
+weapons     =   0.75 sec*proc (4 tests)
+
+Total Test time (real) =   0.77 sec

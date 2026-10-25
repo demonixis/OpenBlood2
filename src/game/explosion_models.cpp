@@ -32,6 +32,28 @@ namespace OpenBlood2
             output = std::move(s);
             return true;
         }
+        if (type == 5 || (type >= 9 && type <= 11))
+        {
+            ExplosionModelSettings s;
+            s.normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
+            s.position = vector_add(position, vector_scale(s.normal, type == 11 ? 15.f : 10.f));
+            const float first = type == 5 ? 25.f : type == 11 ? 10.f : 50.f;
+            const float last = type == 5 ? 250.f : type == 11 ? 150.f : 400.f;
+            s.scale1 = {first, first, first};
+            s.scale2 = {last, last, last};
+            s.duration = type == 5 ? 1.f : .5f;
+            s.alpha = type == 5 ? .5f : .75f;
+            s.waveform = type == 11 ? (random() - random.min()) % 3 : 1;
+            s.fade = 1;
+            s.random_rotation = 1;
+            if (type == 5)
+            {
+                s.model = "Models\\Explosions\\Exp_sphere_2.abc";
+                s.skin = "Skins\\Explosions\\Explosion.dtx";
+            }
+            output = std::move(s);
+            return true;
+        }
         if (type == 7)
         {
             ExplosionModelSettings s;

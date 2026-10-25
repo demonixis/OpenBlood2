@@ -34,7 +34,10 @@ CNapalmProjectile::~CNapalmProjectile()
 }
 bool CNapalmProjectile::InitialUpdate()
 {
-    return CProjectile::InitialUpdate() && g_pServerDE->ScaleObject(m_hObject, {});
+    if (!CProjectile::InitialUpdate() || !g_pServerDE->ScaleObject(m_hObject, {}))
+        return false;
+    smoke = g_pServerDE->PublishObjectParticles(m_hObject, 2, smoke_error);
+    return true;
 }
 bool CNapalmProjectile::Update()
 {

@@ -30,12 +30,22 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::string& fa
 {
     failure.clear();
     *this = {};
-    if ((type != 1 && type != 34) || !owner)
+    if ((type != 1 && type != 2 && type != 34) || !owner)
     {
         failure = "Unsupported object particle recipe or absent parent";
         return false;
     }
     recipe = type;
+    if (type == 2)
+    {
+        radius = 1200;
+        position_radius = 12.5f;
+        add_delay = .05f;
+        authored_count = 8;
+        density = 3.5f;
+        min_life = .15f;
+        max_life = .35f;
+    }
     if (type == 34)
     {
         radius = 200;
@@ -57,7 +67,7 @@ bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::string& fa
 }
 bool CObjectParticleFX::Init(unsigned type, std::uint64_t owner, std::minstd_rand& random, std::string& failure)
 {
-    if (type == 1 || type == 34)
+    if (type == 1 || type == 2 || type == 34)
         return Init(type, owner, failure);
     failure.clear();
     *this = {};
@@ -310,7 +320,7 @@ bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t 
 {
     const auto delta = vector_subtract(last_position, position);
     const float distance = std::sqrt(vector_dot(delta, delta));
-    const float samples = (recipe == 3 || recipe == 21 || recipe == 31 || recipe == 32 || recipe == 33)
+    const float samples = (recipe == 2 || recipe == 3 || recipe == 21 || recipe == 31 || recipe == 32 || recipe == 33)
                               ? distance / (density * radius / 1000.f)
                               : 1.f;
     if (!std::isfinite(samples) || samples > 2048)
@@ -336,8 +346,8 @@ bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t 
         auto right = rotate_vector(basis, {1, 0, 0});
         const auto forward = rotate_vector(basis, {0, 0, 1});
         around(basis, forward, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
-        if (recipe == 6 || recipe == 8 || recipe == 3 || recipe == 19 || recipe == 21 || recipe == 24 || recipe == 31 ||
-            recipe == 32 || recipe == 33)
+        if (recipe == 2 || recipe == 6 || recipe == 8 || recipe == 3 || recipe == 19 || recipe == 21 || recipe == 24 ||
+            recipe == 31 || recipe == 32 || recipe == 33)
             around(basis, right, draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>));
         right = vector_scale(right, 1 / std::sqrt(vector_dot(right, right)));
         const float speed = draw(random,
@@ -351,19 +361,20 @@ bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t 
                                  : recipe == 21 || recipe == 24   ? 25.f
                                                                 : 0.f); // Original zero-speed draw still consumes RNG.
         float comet_distance = 0;
-        auto start = vector_scale(right, recipe == 6 || recipe == 8 || recipe == 3 || recipe == 21 || recipe == 24 ||
-                                                 recipe == 31 || recipe == 32 || recipe == 33
+        auto start = vector_scale(right, recipe == 2 || recipe == 6 || recipe == 8 || recipe == 3 || recipe == 21 ||
+                                                 recipe == 24 || recipe == 31 || recipe == 32 || recipe == 33
                                              ? (comet_distance = draw(random, 0, position_radius))
                                              : position_radius);
-        if (recipe == 6 || recipe == 8 || recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 || recipe == 32 ||
-            recipe == 33)
+        if (recipe == 2 || recipe == 6 || recipe == 8 || recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 ||
+            recipe == 32 || recipe == 33)
             start = vector_add(
                 start, vector_add(vector_subtract(position, origin), vector_scale(step, float(i / authored_count))));
         const auto color = vector_scale(
             vector_add(min_color, vector_scale(vector_subtract(max_color, min_color), draw(random, 0, 1))), 1 / 255.f);
         particles.push_back({start, vector_scale(right, speed),
-                             recipe == 3 ? max_life - (max_life - min_life) * (comet_distance / position_radius)
-                                         : draw(random, min_life, max_life),
+                             (recipe == 2 || recipe == 3)
+                                 ? max_life - (max_life - min_life) * (comet_distance / position_radius)
+                                 : draw(random, min_life, max_life),
                              color});
     }
     emitted += count;
@@ -403,8 +414,8 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
         if (duration < elapsed)
             return false;
     }
-    else if (recipe == 6 || recipe == 8 || recipe == 1 || recipe == 34 || recipe == 3 || recipe == 31 || recipe == 32 ||
-             recipe == 33)
+    else if (recipe == 6 || recipe == 8 || recipe == 1 || recipe == 2 || recipe == 34 || recipe == 3 || recipe == 31 ||
+             recipe == 32 || recipe == 33)
     {
         const auto difference = vector_subtract(owner->position, last_object_position);
         if (difference.x == 0 && difference.y == 0 && difference.z == 0)
@@ -414,14 +425,14 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
         } // Never resumes in single player; only sparks request an alpha ramp.
         last_object_position = owner->position;
     }
-    if (recipe == 1 || recipe == 34)
+    if (recipe == 1 || recipe == 2 || recipe == 34)
     {
         if (moving)
             position = owner->position;
         // ALIGNROTATION affects emission, not the fixed smoke system transform.
         source_rotation = owner->rotation;
     }
-    else if (recipe == 6 || recipe == 8 || recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 ||
+    else if (recipe == 2 || recipe == 6 || recipe == 8 || recipe == 3 || recipe == 21 || recipe == 24 || recipe == 31 ||
              recipe == 32 || recipe == 33)
     {
         if (moving)

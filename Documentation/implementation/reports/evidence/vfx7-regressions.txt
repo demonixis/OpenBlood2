@@ -1,0 +1,95 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/release
+      Start  120: save_pickups.pickups
+ 1/38 Test  #120: save_pickups.pickups .............   Passed    0.02 sec
+      Start  121: save_pickups.rewrites
+ 2/38 Test  #121: save_pickups.rewrites ............   Passed    0.01 sec
+      Start  122: save_pickups.bombs
+ 3/38 Test  #122: save_pickups.bombs ...............   Passed    0.01 sec
+      Start  123: save_pickups.eye
+ 4/38 Test  #123: save_pickups.eye .................   Passed    0.01 sec
+      Start  124: save_pickups.family
+ 5/38 Test  #124: save_pickups.family ..............   Passed    0.02 sec
+      Start  125: save_pickups.refusals
+ 6/38 Test  #125: save_pickups.refusals ............   Passed    0.01 sec
+      Start  798: explosion_sprites.formulas
+ 7/38 Test  #798: explosion_sprites.formulas .......   Passed    0.21 sec
+      Start  799: explosion_sprites.failures
+ 8/38 Test  #799: explosion_sprites.failures .......   Passed    0.00 sec
+      Start  800: explosion_sprites.session
+ 9/38 Test  #800: explosion_sprites.session ........   Passed    0.00 sec
+      Start  801: explosion_sprites.private
+10/38 Test  #801: explosion_sprites.private ........   Passed    0.11 sec
+      Start  802: explosion_models.formulas
+11/38 Test  #802: explosion_models.formulas ........   Passed    0.19 sec
+      Start  803: explosion_models.recipes
+12/38 Test  #803: explosion_models.recipes .........   Passed    0.00 sec
+      Start  804: explosion_models.failures
+13/38 Test  #804: explosion_models.failures ........   Passed    0.00 sec
+      Start  805: explosion_models.session
+14/38 Test  #805: explosion_models.session .........   Passed    0.01 sec
+      Start  806: explosion_models.private
+15/38 Test  #806: explosion_models.private .........   Passed    0.09 sec
+      Start  809: explosion_lights.lifecycle
+16/38 Test  #809: explosion_lights.lifecycle .......   Passed    0.20 sec
+      Start  810: explosion_lights.recipes
+17/38 Test  #810: explosion_lights.recipes .........   Passed    0.00 sec
+      Start  811: explosion_lights.failures
+18/38 Test  #811: explosion_lights.failures ........   Passed    0.00 sec
+      Start  812: explosion_lights.session
+19/38 Test  #812: explosion_lights.session .........   Passed    0.01 sec
+      Start  813: explosion_lights.private
+20/38 Test  #813: explosion_lights.private .........   Passed    0.19 sec
+      Start  814: explosion_rings.motion
+21/38 Test  #814: explosion_rings.motion ...........   Passed    0.20 sec
+      Start  815: explosion_rings.lifecycle
+22/38 Test  #815: explosion_rings.lifecycle ........   Passed    0.01 sec
+      Start  816: explosion_rings.recipes
+23/38 Test  #816: explosion_rings.recipes ..........   Passed    0.00 sec
+      Start  817: explosion_rings.failures
+24/38 Test  #817: explosion_rings.failures .........   Passed    0.00 sec
+      Start  818: explosion_rings.session
+25/38 Test  #818: explosion_rings.session ..........   Passed    0.01 sec
+      Start  819: explosion_rings.private
+26/38 Test  #819: explosion_rings.private ..........   Passed    0.24 sec
+      Start  822: explosion_fragments.lifecycle
+27/38 Test  #822: explosion_fragments.lifecycle ....   Passed    0.20 sec
+      Start  823: explosion_fragments.collision
+28/38 Test  #823: explosion_fragments.collision ....   Passed    0.01 sec
+      Start  824: explosion_fragments.recipes
+29/38 Test  #824: explosion_fragments.recipes ......   Passed    0.01 sec
+      Start  825: explosion_fragments.failures
+30/38 Test  #825: explosion_fragments.failures .....   Passed    0.01 sec
+      Start  826: explosion_fragments.session
+31/38 Test  #826: explosion_fragments.session ......   Passed    0.01 sec
+      Start  827: explosion_fragments.private
+32/38 Test  #827: explosion_fragments.private ......   Passed    0.44 sec
+      Start  837: explosion_flames.zones
+33/38 Test  #837: explosion_flames.zones ...........   Passed    0.19 sec
+      Start  838: explosion_flames.lifecycle
+34/38 Test  #838: explosion_flames.lifecycle .......   Passed    0.01 sec
+      Start  839: explosion_flames.failures
+35/38 Test  #839: explosion_flames.failures ........   Passed    0.01 sec
+      Start  840: explosion_flames.session
+36/38 Test  #840: explosion_flames.session .........   Passed    0.01 sec
+      Start  841: explosion_flames.private
+37/38 Test  #841: explosion_flames.private .........   Passed    0.26 sec
+      Start 1357: campaign_entry.actors
+38/38 Test #1357: campaign_entry.actors ............   Passed    0.27 sec
+
+100% tests passed out of 38
+
+Label Time Summary:
+campaign_entry         =   0.27 sec*proc (1 test)
+explosion_flames       =   0.47 sec*proc (5 tests)
+explosion_fragments    =   0.67 sec*proc (6 tests)
+explosion_lights       =   0.40 sec*proc (5 tests)
+explosion_models       =   0.29 sec*proc (5 tests)
+explosion_rings        =   0.46 sec*proc (6 tests)
+explosion_sprites      =   0.33 sec*proc (4 tests)
+headless               =   2.96 sec*proc (38 tests)
+objects                =   0.07 sec*proc (6 tests)
+private                =   1.33 sec*proc (6 tests)
+private-data           =   0.27 sec*proc (1 test)
+save                   =   0.07 sec*proc (6 tests)
+
+Total Test time (real) =   2.99 sec

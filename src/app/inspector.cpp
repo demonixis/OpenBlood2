@@ -5,6 +5,7 @@
 #include "engine/container.h"
 #include "engine/world_model.h"
 #include "game/original/AI_Mgr.h"
+#include "game/original/CampaignProjectiles.h"
 #include "game/original/CampaignWeapons.h"
 #include "game/original/ClientLightFX.h"
 #include "game/original/DestructableModel.h"
@@ -1012,6 +1013,12 @@ namespace OpenBlood2
                                 if (!grenade->sound_error.empty())
                                     ImGui::TextWrapped("Audio: %s", grenade->sound_error.c_str());
                             }
+                            if (const auto* napalm = dynamic_cast<const CNapalmProjectile*>(projectile))
+                                ImGui::TextWrapped("Napalm smoke %llu: %s / %s", (unsigned long long)napalm->smoke,
+                                                   napalm->smoke_error.c_str(), napalm->light_error.c_str());
+                            if (const auto* fragment = dynamic_cast<const CHowitzerAltFrag*>(projectile))
+                                ImGui::TextWrapped("Howitzer trail %llu: %s", (unsigned long long)fragment->trail,
+                                                   fragment->light_error.c_str());
                             if (const auto* ball = dynamic_cast<const CTeslaBallProjectile*>(projectile))
                             {
                                 ImGui::Text("Tesla ball: %llu damage arcs / %llu visual arcs / last effect %llu",

@@ -333,3 +333,16 @@ std::string CFlareBurstProjectile::LoadBlock(const ProjectileBlock& b)
     trail = g_pServerDE->PublishObjectParticles(m_hObject, 8, trail_error);
     return {};
 }
+
+std::string CNapalmProjectile::LoadBlock(const ProjectileBlock& b)
+{
+    CProjectile::LoadBlock(b);
+    smoke = g_pServerDE->PublishObjectParticles(m_hObject, 2, smoke_error);
+    return {};
+}
+std::string CHowitzerAltFrag::LoadBlock(const ProjectileBlock& b)
+{
+    CProjectile::LoadBlock(b);
+    trail = g_pServerDE->PublishObjectParticles(m_hObject, 1, trail_error);
+    return {};
+}

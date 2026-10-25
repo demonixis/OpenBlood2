@@ -15,11 +15,13 @@ class CNapalmProjectile : public CProjectile
     ~CNapalmProjectile() override;
     OpenBlood2::SoundId flight_sound = 0;
     OpenBlood2::SceneExplosionReport effect;
-    std::string smoke_error = "OBJFX_SMOKETRAIL_2 unavailable";
+    std::uint64_t smoke = 0;
+    std::string smoke_error;
     std::string light_error = "AddLight(100, 1, .75, 0) projectile light unavailable", sound_error;
 
   protected:
     bool InitialUpdate() override;
     bool Update() override;
     void AddExplosion(DVector, DVector) override;
+    std::string LoadBlock(const ProjectileBlock&) override;
 };

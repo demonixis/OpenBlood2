@@ -2096,3 +2096,12 @@ connects Tesla alternate/ball and Drudge lightning to the existing detached serv
 Preserves separate visual and damage rays, per-caller form, no damage suppression on
 cosmetic failures and the source alternate counter. Existing energy callers share type 7.
 No assets, save payloads or gameplay parameters change; light illumination stays separate.
+
+## Explosive weapon VFX (2026-10-25)
+
+[Source ledger](sources/explosive_effect_sources.json), [contract](../contracts/explosive_effects_contracts.md)
+and [verification](reports/explosive_effects.md). Ports high-detail impacts 5/9/10/11;
+connects owner-bound smoke recipes 1/2 to grenade, Napalm and Howitzer fragments,
+including restore republication. Preserves separate damaging/cosmetic children,
+source random loop bounds, no unused zero-distance division and original light-state
+assignment quirks. No assets or save bytes change; illumination remains separate.

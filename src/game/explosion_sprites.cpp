@@ -54,6 +54,24 @@ namespace OpenBlood2
             add(25, .5f, 2.5f, 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
             unavailable = "light illumination";
         }
+        else if (type == 5 || (type >= 9 && type <= 11))
+        {
+            if (type == 5)
+                add(20, .4f, .4f, 1.5f, 1, 0, 0, "Sprites\\fireball2.spr");
+            else
+                add(type == 11 ? 15.f : 25.f, type == 11 ? .15f : .5f, type == 11 ? .5f : .75f, 1.5f, 1, 0, 0,
+                    "Sprites\\howitzerexp.spr");
+            if (type == 10)
+            {
+                std::minstd_rand fallback(1);
+                auto& rng = random ? *random : fallback;
+                auto draw = [&]() { return .6f + .3f * float(rng() - rng.min()) / float(rng.max() - rng.min()); };
+                out.back().scale2 = {draw(), draw(), 0};
+            }
+            if (type != 11)
+                add(25, .5f, 2.5f, 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
+            unavailable = "light illumination";
+        }
         else if (type >= 13 && type <= 15)
         {
             if (type == 14)

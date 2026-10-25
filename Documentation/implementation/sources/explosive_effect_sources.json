@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-25",
+  "scope": "Beta VFX lot 7: explosive weapons and projectile smoke",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/GameProjectiles.cpp",
+      "source_sha256": "f0f732be5d373324ef2071690fc43317a908aad5d5bade18f59c9e9ccfbcb9fe",
+      "purpose": "Howitzer impacts/children, grenade and Napalm smoke requests; unchanged damaging child rules."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/ExplosionFX.cpp",
+      "source_sha256": "f96624581765705810ebe60a9c58ffa796ff5a751c6713d5219ddd139fc487c0",
+      "purpose": "High-detail Napalm alternate and Howitzer primary/alternate/mini composites 5,9,10,11."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/ObjectFX.cpp",
+      "source_sha256": "8890db6c5125ca1716685f8e1dff34da686a9c773d7dea1f91450137ecec800b",
+      "purpose": "Smoke recipes 1/2, location and comet-tail emission, alignment and strict stop lifetime."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/ObjectFX.h",
+      "source_sha256": "23c3e43ba51a7166b278a740fb13d89276df95c2a9d4d0fdcc49b55c6c325c9c",
+      "purpose": "Original ALL flags and emitter defaults."
+    }
+  ]
+}

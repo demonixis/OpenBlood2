@@ -472,11 +472,13 @@ CHowitzerAltFrag::CHowitzerAltFrag()
     filename = "Sprites\\howitzerball.spr";
     skin = nullptr;
     m_damage.m_bGodMode = true;
-    trail_error = "Howitzer AddLight and OBJFX_SMOKETRAIL_1 unavailable";
 }
 bool CHowitzerAltFrag::InitialUpdate()
 {
-    return CProjectile::InitialUpdate() && g_pServerDE->ScaleObject(m_hObject, {.15f, .15f, 0});
+    if (!CProjectile::InitialUpdate() || !g_pServerDE->ScaleObject(m_hObject, {.15f, .15f, 0}))
+        return false;
+    trail = g_pServerDE->PublishObjectParticles(m_hObject, 1, trail_error);
+    return true;
 }
 bool CHowitzerAltFrag::Update()
 {

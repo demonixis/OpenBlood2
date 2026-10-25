@@ -14,8 +14,33 @@ namespace OpenBlood2
             error = "Explosion requires a finite position and nonzero normal";
             return false;
         }
-        if (type == 6 || type == 8)
+        if (type == 5 || type == 6 || type == 8 || type == 10)
             return true; // No ring branch in these high-detail recipes.
+        if (type == 9 || type == 11)
+        {
+            ExplosionRingSettings s;
+            s.normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
+            s.position = vector_add(pos, vector_scale(s.normal, type == 9 ? 15.f : 10.f));
+            s.color = type == 9 ? DVector{1, 1, .5f} : DVector{1, 1, 1};
+            s.radius = type == 9 ? 4000.f : 8000.f;
+            s.position_radius = type == 9 ? 10.f : 5.f;
+            s.velocity = type == 9 ? 300.f : 60.f;
+            s.count = type == 9 ? 32 : 12;
+            s.duration = type == 9 ? .5f : 1.5f;
+            s.alpha = type == 9 ? 1.f : .65f;
+            s.delay = type == 9 ? .15f : 0;
+            s.fade = 1;
+            s.align = 1;
+            s.texture = type == 9 ? "SpriteTextures\\lightn32.dtx" : "SpriteTextures\\Smoke64_4.dtx";
+            out.push_back(s);
+            if (type == 9)
+            {
+                s.delay = .3f;
+                s.radius = 5000;
+                out.push_back(s);
+            }
+            return true;
+        }
         if (type == 7)
         {
             auto draw = [&](float lo, float hi)

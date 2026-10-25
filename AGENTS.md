@@ -51,6 +51,13 @@ and damage rays, thin-to-thin weapon beams versus wide-to-thin ball arcs, detach
 lifetime, no gameplay suppression on cosmetic failure and the source alternate counter.
 Impact 7 also serves EnergyBlast; illumination and remaining enemy trails stay separate.
 
+The [explosive weapon VFX lot 7](Documentation/contracts/explosive_effects_contracts.md)
+adds impacts 5/9/10/11 and smoke for grenades, Napalm and Howitzer fragments. Preserve
+source delayed-ring increments, cosmetic versus damaging children, redraw-per-loop
+fragment counts, strict smoke stop lifetime, fixed origin and one trail per restored
+owner. The user confirmed renderer optimizations are integrated here on 2026-10-25;
+the historical coordination hold below is satisfied for the requested VFX lot 10.
+
 ## Commit attribution
 
 Commits and pull requests carry only the user's identity (demonixis). Never add

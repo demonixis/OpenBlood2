@@ -121,11 +121,14 @@ class CHowitzerAltFrag final : public CProjectile
 {
   public:
     CHowitzerAltFrag();
+    std::uint64_t trail = 0;
+    std::string light_error = "Howitzer fragment owner light illumination unavailable";
 
   protected:
     bool InitialUpdate() override;
     bool Update() override;
     void AddExplosion(DVector, DVector) override;
+    std::string LoadBlock(const ProjectileBlock&) override;
 };
 class CNapalmAltProjectile final : public CNapalmProjectile
 {

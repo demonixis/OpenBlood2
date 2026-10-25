@@ -16,12 +16,12 @@ namespace OpenBlood2
         }
         ExplosionFragmentReport report{next_event_++, type, std::string(source), {}, {}, {}, {}};
         if (!physics_vector(pos) || !physics_vector(normal) || vector_dot(normal, normal) < 1e-12f ||
-            (type > 4 && type != 6 && type != 7 && type != 8 && type != 21))
+            (type > 11 && type != 21))
         {
             report.error = "Invalid explosion or unavailable fragment recipe";
             ++failed;
         }
-        else if (type == 3 || type == 21)
+        else if (type == 3 || type == 9 || type == 21)
         {
             normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
             auto draw = [&](float lo, float hi)
@@ -30,12 +30,17 @@ namespace OpenBlood2
                                 float(std::minstd_rand::max() - std::minstd_rand::min());
             };
             // Original loop draws a NEW bound at every condition, not one count.
-            for (unsigned i = 0; (type == 21 ? i < 10 : i < 2 + (random_() - std::minstd_rand::min()) % 4); ++i)
+            for (unsigned i = 0;
+                 (type == 21 ? i < 10
+                             : i < (type == 9 ? 5 : 2) + (random_() - std::minstd_rand::min()) % (type == 9 ? 6 : 4));
+                 ++i)
             {
                 ExplosionFragSettings s;
                 s.position = pos;
                 s.normal = normal;
-                s.scale = type == 21 ? DVector{.25f, .25f, .25f} : DVector{1, 1, 1};
+                s.scale = type == 21  ? DVector{.25f, .25f, .25f}
+                          : type == 9 ? DVector{.75f, .75f, 1}
+                                      : DVector{1, 1, 1};
                 s.rotate_max = {1, 1, 1};
                 s.bounce = type == 21 ? .5f : .25f;
                 s.duration = type == 21 ? 7 : 10;
@@ -44,7 +49,7 @@ namespace OpenBlood2
                 s.trail_type = type == 21 ? 34 : 1;
                 s.model = "Models\\Gibs\\gibmetal2.abc";
                 s.skin = "Skins\\Gibs\\gibmetal3.dtx";
-                s.spread = type == 21 ? draw(2, 15) : draw(40, 60);
+                s.spread = type == 21 ? draw(2, 15) : draw(40, type == 9 ? 80.f : 60.f);
                 s.velocity = type == 21 ? draw(3, 6) : draw(20, 40);
                 CExplosionFragFX fx;
                 std::string failure;
