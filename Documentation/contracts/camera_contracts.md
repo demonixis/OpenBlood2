@@ -1,3 +1,39 @@
+# Desktop third-person camera (2026-10-25)
+
+C toggles the local first/third-person selection on a fresh press. The action is
+rebindable as **Third Person** in Options > Controls (`third_person`). Menus,
+text entry, focus loss and input ownership use the existing command guards.
+New worlds, player exit and loads reset to first person; no saved payload or
+persistent camera preference is added. XR rejects the toggle and clears the
+selection, including if it was set before XR input runs.
+
+The chase camera shows the actual animated player and attached held weapons,
+while the first-person weapon models and their muzzle sprites are hidden.
+Their animation/FIRE_KEY simulation continues. Player eye position, aim angles,
+movement, shot origins, audio listener and server camera flags are unchanged.
+The usual HUD and chosen crosshair remain visible, respecting the user's
+crosshair visibility setting. The camera faces the eye's first solid/ray-hit
+target up to 10,000 units away (the player weapon filter, without spread), so
+the centred reticle represents the unspread aim line. Projectile drop, weapon
+range and spread still apply normally.
+
+This is project-owned presentation based on the original `PlayerCamera.cpp`
+chase obstruction pattern, not a retail multiplayer camera parity claim. The
+replacement boom is 150 units back and 20 up from the eye, rotated with player
+pitch/yaw. Five bounded rays (centre and four ±4-unit corners) select the shortest
+travel with a two-unit margin, including solid moving objects and world brushes.
+Volumes and the player are excluded; non-solid held models do not obstruct it. This is a sampled
+clearance envelope, not a swept camera volume. Below 20 units of room the view
+returns temporarily to first person to avoid drawing inside the head. Query
+failures remain explicit through the client blocker.
+
+Scripted cameras, death, Eye and Orb keep priority. C is ignored while they own
+the view. Zoom temporarily restores the first-person presentation; the selected
+chase view resumes after zoom or a special camera ends. Scripted/death look
+suppression and Eye/Orb player aiming remain unchanged.
+
+Verification is recorded in [the implementation report](../implementation/reports/third_person_camera.md).
+
 # Original scripted cameras
 
 The desktop frontend and diagnostic viewport suppress player look while a scripted

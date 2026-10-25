@@ -1019,6 +1019,7 @@ namespace OpenBlood2
                 }
                 // World/menu resets can cancel the editor outside SDL event dispatch.
                 sync_message_input();
+                shell.xr_view = xr_mode;
                 const bool blocked = input.paused(menu) || input.inspector || input.message.active;
                 input.controls.enabled = !blocked;
 #if BLOOD2_XR

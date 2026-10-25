@@ -192,6 +192,10 @@ class CBloodClientShell
     OpenBlood2::CameraView view;
     DVector listener_position{};
     bool player_visible = false, weapons_visible = true;
+    // Local presentation only: never serialized or sent as player rotation/shot origin.
+    bool third_person = false, third_person_active = false, xr_view = false;
+    bool ToggleThirdPerson();
+    bool UpdateThirdPersonCamera();
     CPlayerDeathCamera death_camera;
     std::uint64_t death_notifications = 0;
     bool UpdateCameraSelection();

@@ -1,5 +1,10 @@
 # Blood2 Project Instructions
 
+The [desktop third-person camera](Documentation/contracts/camera_contracts.md) adds a rebindable C toggle,
+actual player/held models and centred aim convergence. Preserve unchanged eye/shot/movement state,
+special-camera priority, temporary first-person zoom/tight-space fallback and the XR refusal.
+Controls version 2 migrates old files without stealing a custom C binding; no camera save payload.
+
 The [grenade contact correction](Documentation/implementation/reports/downtown_grenade_contact.md)
 allows an unbounced CGrenade's embedded start only against a living character,
 delivering the original contact without moving the grenade. Preserve deferred

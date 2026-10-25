@@ -74,6 +74,7 @@ namespace OpenBlood2
         Taunt,
         MouseAim,
         Crosshair,
+        ThirdPerson,
         Count
     };
     inline constexpr std::size_t input_action_count = std::size_t(InputAction::Count);
@@ -154,6 +155,7 @@ namespace OpenBlood2
         {"taunt", InputActionKind::Press},
         {"mouse_aim", InputActionKind::Hold},
         {"crosshair", InputActionKind::Command},
+        {"third_person", InputActionKind::Command},
     }};
 
     constexpr const InputActionInfo& info(InputAction action)
@@ -338,6 +340,7 @@ namespace OpenBlood2
             // Wheel up previous weapon, wheel down next (replacement; the original binds no wheel).
             b.add(InputSource::MouseWheel, 0, InputAction::PrevWeapon);
             b.add(InputSource::MouseWheel, 1, InputAction::NextWeapon);
+            key(SDL_SCANCODE_C, InputAction::ThirdPerson);
             key(SDL_SCANCODE_E, InputAction::Use);
             key(SDL_SCANCODE_L, InputAction::Flashlight);
             key(SDL_SCANCODE_H, InputAction::Medkit);

@@ -1,0 +1,77 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/release
+      Start   12: xr.player_locomotion
+ 1/31 Test   #12: xr.player_locomotion .............   Passed    0.27 sec
+      Start   13: xr.player_aim
+ 2/31 Test   #13: xr.player_aim ....................   Passed    0.01 sec
+      Start   14: xr.player_turning
+ 3/31 Test   #14: xr.player_turning ................   Passed    0.01 sec
+      Start   15: xr.player_buttons
+ 4/31 Test   #15: xr.player_buttons ................   Passed    0.01 sec
+      Start   16: xr.player_shoulders
+ 5/31 Test   #16: xr.player_shoulders ..............   Passed    0.01 sec
+      Start  371: cameras.defaults
+ 6/31 Test  #371: cameras.defaults .................   Passed    0.23 sec
+      Start  372: cameras.timing
+ 7/31 Test  #372: cameras.timing ...................   Passed    0.01 sec
+      Start  373: cameras.links
+ 8/31 Test  #373: cameras.links ....................   Passed    0.01 sec
+      Start  374: cameras.selection
+ 9/31 Test  #374: cameras.selection ................   Passed    0.01 sec
+      Start  375: cameras.player
+10/31 Test  #375: cameras.player ...................   Passed    0.01 sec
+      Start  376: cameras.validation
+11/31 Test  #376: cameras.validation ...............   Passed    0.01 sec
+      Start  377: cameras.third_person
+12/31 Test  #377: cameras.third_person .............   Passed    0.01 sec
+      Start 1172: hud.values
+13/31 Test #1172: hud.values .......................   Passed    0.24 sec
+      Start 1174: hud.session
+14/31 Test #1174: hud.session ......................   Passed    0.01 sec
+      Start 1327: menus.state
+15/31 Test #1327: menus.state ......................   Passed    0.23 sec
+      Start 1503: input_actions.table
+16/31 Test #1503: input_actions.table ..............   Passed    0.08 sec
+      Start 1504: input_actions.defaults
+17/31 Test #1504: input_actions.defaults ...........   Passed    0.01 sec
+      Start 1505: input_actions.remap
+18/31 Test #1505: input_actions.remap ..............   Passed    0.01 sec
+      Start 1506: input_actions.menu
+19/31 Test #1506: input_actions.menu ...............   Passed    0.01 sec
+      Start 1507: input_actions.gamepad
+20/31 Test #1507: input_actions.gamepad ............   Passed    0.01 sec
+      Start 1508: input_actions.gamepad_menu
+21/31 Test #1508: input_actions.gamepad_menu .......   Passed    0.01 sec
+      Start 1509: input_actions.mouse_wheel
+22/31 Test #1509: input_actions.mouse_wheel ........   Passed    0.00 sec
+      Start 1510: input_actions.touch
+23/31 Test #1510: input_actions.touch ..............   Passed    0.00 sec
+      Start 1511: input_actions.rebind
+24/31 Test #1511: input_actions.rebind .............   Passed    0.00 sec
+      Start 1512: input_actions.touch_controls
+25/31 Test #1512: input_actions.touch_controls .....   Passed    0.00 sec
+      Start 1513: input_actions.controls_file
+26/31 Test #1513: input_actions.controls_file ......   Passed    0.01 sec
+      Start 1523: control_actions.movement
+27/31 Test #1523: control_actions.movement .........   Passed    0.24 sec
+      Start 1524: control_actions.crosshair
+28/31 Test #1524: control_actions.crosshair ........   Passed    0.01 sec
+      Start 1525: control_actions.message
+29/31 Test #1525: control_actions.message ..........   Passed    0.01 sec
+      Start 1526: control_actions.gameplay
+30/31 Test #1526: control_actions.gameplay .........   Passed    0.01 sec
+      Start 1547: gpu.third_person
+31/31 Test #1547: gpu.third_person .................   Passed    0.76 sec
+
+100% tests passed out of 31
+
+Label Time Summary:
+cameras          =   1.04 sec*proc (8 tests)
+gpu              =   0.76 sec*proc (1 test)
+headless         =   1.49 sec*proc (30 tests)
+hud              =   0.26 sec*proc (2 tests)
+input_actions    =   0.41 sec*proc (15 tests)
+menus            =   0.23 sec*proc (1 test)
+private          =   0.76 sec*proc (1 test)
+xr               =   0.31 sec*proc (5 tests)
+
+Total Test time (real) =   2.28 sec

@@ -98,6 +98,7 @@ The mapping is many-to-many:
 | Menu (open/back, release mouse) | Esc |
 | Menu navigation / accept | arrows / Enter, keypad Enter |
 | Quick save / load | F5 / F6 |
+| First / third person (outside VR) | C |
 
 Enter keeps its menu meaning (accept, demo death retry). In play it is now also the
 original UseInventory key, so it is consumed by play like any other play key.
@@ -253,7 +254,7 @@ The original `CMenuControls` page is ported over the action layer; see the
   Crosshair are implemented and assignable. These nine additions start unbound, preserving
   the existing keyboard/gamepad defaults and saved bindings; empty rows use the original
   unassigned label. Replacement rows follow for actions the original
-  menu did not list: Run Latch, Flashlight, Medkit, Binoculars, Night Goggles, The Eye, then
+  menu did not list: Run Latch, Flashlight, Medkit, Binoculars, Night Goggles, The Eye, Third Person, then
   Restore Defaults.
 - **Rebindable actions** are the row actions. Menu, menu navigation, quick save/load and the
   analog look axes keep their bindings.
@@ -283,7 +284,7 @@ The bindings persist in `controls.cfg`, beside `preferences.cfg` under
 `SDL_GetPrefPath("OpenBlood2", "Blood2")`, and replace the original console `rangebind` lines:
 
 ```
-version=1
+version=2
 bind=jump key 44
 bind=fire_primary mouse 1
 ```
@@ -295,6 +296,10 @@ bind=fire_primary mouse 1
   so an action without a line is unassigned. Unknown versions, actions, sources or codes,
   non-rebindable actions, refused (reserved or invalid) bindings, a missing version line and
   files over 16 KiB are refused: the bindings stay unchanged and the menu shows the error.
+- Version 2 adds the `third_person` row. Version 1 files still load: C is added for
+  that action only if no saved action already uses C and no third-person binding
+  is present. Version 2 can leave Third Person unassigned. Other absent rows stay
+  unassigned; the nine original additional controls retain their unbound defaults.
 - The frontend writes the file atomically whenever the bindings change. Smoke runs never read
   or write it. A missing file means the defaults.
 - The `--view-world` frontend and the demo use the same bindings; the headless diagnostic loop in

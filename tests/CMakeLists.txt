@@ -639,7 +639,7 @@ endif()
 add_executable(camera_tests camera_tests.cpp)
 target_link_libraries(camera_tests PRIVATE blood2_game)
 blood2_project_options(camera_tests)
-foreach(case IN ITEMS defaults timing links selection player validation)
+foreach(case IN ITEMS defaults timing links selection player validation third_person)
     add_test(NAME cameras.${case} COMMAND camera_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/camera-fixtures/${case}")
     set_tests_properties(cameras.${case} PROPERTIES LABELS "headless;cameras" TIMEOUT 30)
 endforeach()
@@ -3363,3 +3363,15 @@ target_link_libraries(effect_light_selection_tests PRIVATE blood2_game)
 blood2_project_options(effect_light_selection_tests)
 add_test(NAME scene_effects.selection COMMAND effect_light_selection_tests)
 set_tests_properties(scene_effects.selection PROPERTIES LABELS "headless;effects")
+
+if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
+    add_executable(third_person_gpu_tests third_person_gpu_tests.cpp ../src/app/scene_presenter.cpp
+        ../src/app/hud.cpp ../src/app/ui_runtime.cpp
+        ../src/app/model_lighting.cpp ../src/app/model_scene.cpp ../src/app/polygrid_scene.cpp ../src/app/sprite_scene.cpp)
+    target_link_libraries(third_person_gpu_tests PRIVATE blood2_game imgui)
+    blood2_project_options(third_person_gpu_tests)
+    add_test(NAME gpu.third_person COMMAND third_person_gpu_tests "${BLOOD2_TEST_DATA_DIR}"
+        "${CMAKE_CURRENT_BINARY_DIR}/third-person-gpu")
+    set_tests_properties(gpu.third_person PROPERTIES LABELS "gpu;private;cameras" TIMEOUT 120 RUN_SERIAL TRUE
+        ENVIRONMENT "SDL_AUDIODRIVER=dummy" FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+endif()

@@ -1,7 +1,8 @@
-#include "app/movement_controls.h"
+#include "app/control_actions.h"
 #include "camera_fixture.h"
 #include "game/game_settings.h"
 #include "game/original/CameraObj.h"
+#include "game/original/ClientCrosshair.h"
 #include "player_fixture.h"
 #include <functional>
 #include <limits>
@@ -43,6 +44,134 @@ namespace
         auto sent = g.server.EndMessage(m);
         g.server.FreeString(text);
         return written == DE_OK && sent == DE_OK;
+    }
+    bool third_person(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(test_player::setup(g, root));
+        std::string error;
+        CHECK(g.enter_player(error));
+        for (int i = 0; i < 100; ++i)
+            CHECK(g.step(.01));
+        auto& shell = g.client_shell;
+        auto* p = g.server_shell.Player(g.local_client);
+        CHECK(p && !shell.third_person && close(shell.view.position, shell.camera_position));
+        MovementControls controls;
+        controls.focused = controls.enabled = controls.mouse_captured = true;
+        const auto key = [&](bool down, bool repeat = false, bool blocked = false)
+        {
+            SDL_Event e{};
+            e.type = down ? SDL_EVENT_KEY_DOWN : SDL_EVENT_KEY_UP;
+            e.key.windowID = 1;
+            e.key.scancode = SDL_SCANCODE_C;
+            e.key.repeat = repeat;
+            controls.event(e, 1);
+            apply_control_actions(controls, shell, blocked);
+        };
+        const auto eye = shell.camera_position;
+        const auto aim_rotation = shell.rotation;
+        const auto initial_rotation = shell.view.rotation;
+        key(true);
+        CHECK(shell.third_person && shell.UpdateCameraSelection());
+        CHECK(shell.third_person_active && shell.player_visible && !shell.weapons_visible && !shell.view.object);
+        CHECK(!p->camera_movement_blocked && shell.player_look_allowed());
+        CHECK(close(shell.camera_position, eye) && shell.rotation.yaw == aim_rotation.yaw &&
+              shell.rotation.pitch == aim_rotation.pitch);
+        CHECK(original_crosshair_visible(shell.m_bInWorld, shell.view.object != nullptr, shell.death_camera.active));
+        const auto requested = vector_add(eye, rotate_vector(initial_rotation, {0, 20, -150}));
+        CHECK(close(shell.view.position, requested));
+        key(true, true);
+        CHECK(shell.third_person); // OS repeat cannot toggle twice.
+        key(false);
+        key(true, false, true);
+        CHECK(shell.third_person); // Suppressed input cannot toggle.
+        key(false);
+        // A solid box behind the player retracts the boom without moving the body.
+        ObjectCreateStruct object;
+        object.m_Pos = vector_add(eye, rotate_vector(initial_rotation, {0, 10, -75}));
+        object.m_Flags = FLAG_SOLID;
+        auto obstacle = g.objects.create(g.objects.find_class("BaseClass"), object, Creation::Runtime, {});
+        DVector dims{10, 10, 10};
+        CHECK(obstacle && g.server.SetObjectDims(obstacle, &dims) == DE_OK && shell.UpdateCameraSelection());
+        const auto retracted = vector_subtract(shell.view.position, eye);
+        CHECK(vector_dot(retracted, retracted) < 75 * 75 && shell.third_person_active);
+        CHECK(close(shell.camera_position, eye));
+        auto tight = vector_add(eye, rotate_vector(initial_rotation, {0, 1, -12}));
+        CHECK(g.server.TeleportObject(obstacle, &tight) == DE_OK && shell.UpdateCameraSelection());
+        CHECK(shell.third_person && !shell.third_person_active && !shell.player_visible && shell.weapons_visible &&
+              close(shell.view.position, eye));
+        CHECK(g.objects.remove(obstacle) && g.objects.finish_frame() && shell.UpdateCameraSelection());
+        CHECK(close(shell.view.position, requested));
+        // The screen centre points to the same near target as the eye ray.
+        const auto forward = rotate_vector(initial_rotation, {0, 0, 1});
+        object.m_Pos = vector_add(eye, vector_scale(forward, 200));
+        auto target = g.objects.create(g.objects.find_class("BaseClass"), object, Creation::Runtime, {});
+        CHECK(target && g.server.SetObjectDims(target, &dims) == DE_OK && shell.UpdateCameraSelection());
+        SegmentHit hit;
+        CHECK(g.server.IntersectSegment(eye, vector_add(eye, vector_scale(forward, 10000)), shell.player, hit, false,
+                                        SegmentObjects::SolidOrRayHit, SegmentFilter::IgnoreVolumes,
+                                        SegmentStart::SkipInterior) == SegmentResult::Hit &&
+              hit.object == target);
+        auto to_hit = vector_subtract(hit.point, shell.view.position);
+        to_hit = vector_scale(to_hit, 1 / std::sqrt(vector_dot(to_hit, to_hit)));
+        CHECK(close(rotate_vector(shell.view.rotation, {0, 0, 1}), to_hit));
+        CHECK(g.objects.remove(target) && g.objects.finish_frame());
+        for (float pitch : {-.6f, .6f})
+        {
+            shell.rotation.pitch = pitch;
+            CHECK(shell.UpdateCameraSelection() && shell.third_person_active);
+            const auto boom = vector_subtract(shell.view.position, shell.camera_position);
+            CHECK(std::abs(vector_dot(boom, boom) - (150 * 150 + 20 * 20)) < .1f);
+            CHECK(shell.rotation.pitch == pitch);
+        }
+        shell.rotation.pitch = aim_rotation.pitch;
+        const auto body_before = shell.position;
+        shell.movement_input.forward = true;
+        for (int i = 0; i < 10; ++i)
+            CHECK(g.step(.01));
+        shell.movement_input.forward = false;
+        CHECK(!close(shell.position, body_before) && shell.third_person_active && !p->camera_movement_blocked);
+        // Hidden first-person weapons still run their real FIRE_KEY path.
+        const auto shots = shell.weapons[0].shots;
+        shell.weapon_input.primary = true;
+        for (int i = 0; i < 100 && shell.weapons[0].shots == shots; ++i)
+            CHECK(g.step(.01));
+        CHECK(shell.weapons[0].shots > shots && shell.weapons[0].last_result == FireResult::Fired);
+        shell.weapon_input.primary = false;
+        shell.m_bZoomView = true;
+        CHECK(shell.UpdateCameraSelection() && !shell.third_person_active && shell.third_person &&
+              shell.weapons_visible);
+        shell.m_bZoomView = false;
+        CHECK(shell.UpdateCameraSelection() && shell.third_person_active);
+        auto scripted = create(g, {{"StartActive", true}, {"HidePlayer", true}});
+        CHECK(scripted && shell.UpdateCameraSelection() && !shell.third_person_active && shell.view.object == scripted);
+        CHECK(!shell.ToggleThirdPerson() && shell.third_person && !shell.player_look_allowed());
+        CHECK(command(g, scripted, "OFF"));
+        shell.seeing_eye = scripted;
+        CHECK(shell.UpdateCameraSelection() && !shell.third_person_active && shell.player_look_allowed());
+        shell.seeing_eye = nullptr;
+        shell.orb_view = scripted;
+        CHECK(shell.UpdateCameraSelection() && !shell.third_person_active && shell.player_look_allowed());
+        shell.orb_view = nullptr;
+        shell.death_camera.active = true;
+        shell.death_camera.start = g.server.GetTime();
+        CHECK(shell.UpdateCameraSelection() && !shell.third_person_active && !shell.ToggleThirdPerson());
+        shell.death_camera.active = false;
+        CHECK(shell.UpdateCameraSelection() && shell.third_person_active);
+        key(true);
+        CHECK(!shell.third_person && shell.UpdateCameraSelection() &&
+              close(shell.view.position, shell.camera_position));
+        CHECK(!shell.player_visible && shell.weapons_visible);
+        key(false);
+        key(true);
+        shell.xr_view = true;
+        CHECK(shell.UpdateCameraSelection() && !shell.third_person_active && !shell.third_person);
+        CHECK(!shell.ToggleThirdPerson() && close(shell.view.position, shell.camera_position));
+        shell.xr_view = false;
+        CHECK(shell.ToggleThirdPerson() && shell.third_person);
+        CHECK(g.leave_player() && !shell.third_person && !shell.third_person_active);
+        CHECK(g.enter_player(error) && !shell.third_person);
+        return true;
     }
     bool defaults(const std::filesystem::path&)
     {
@@ -344,8 +473,8 @@ int main(int argc, char** argv)
     if (argc != 3)
         return 2;
     const std::map<std::string, std::function<bool(const std::filesystem::path&)>> tests = {
-        {"defaults", defaults}, {"timing", timing},         {"links", links},    {"selection", selection},
-        {"player", player},     {"validation", validation}, {"catalog", catalog}};
+        {"third_person", third_person}, {"defaults", defaults}, {"timing", timing},         {"links", links},
+        {"selection", selection},       {"player", player},     {"validation", validation}, {"catalog", catalog}};
     auto it = tests.find(argv[1]);
     return it != tests.end() && it->second(argv[2]) ? 0 : 1;
 }

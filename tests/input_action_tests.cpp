@@ -138,8 +138,9 @@ namespace
         for (const auto& entry : all.entries)
             CHECK(InputBindings::valid(entry));
         for (std::size_t i = 0; i < input_action_count; ++i)
-            CHECK(InputAction(i) < InputAction::Strafe ? count(all, InputAction(i)) > 0
-                                                       : count(all, InputAction(i)) == 0);
+            CHECK((InputAction(i) < InputAction::Strafe || InputAction(i) == InputAction::ThirdPerson)
+                      ? count(all, InputAction(i)) > 0
+                      : count(all, InputAction(i)) == 0);
         for (const auto& entry : b.entries)
             CHECK(entry.source == InputSource::Key || entry.source == InputSource::MouseButton ||
                   entry.source == InputSource::MouseWheel);
@@ -910,7 +911,7 @@ namespace
             std::ifstream in(path);
             std::string first;
             std::getline(in, first);
-            CHECK(first == "version=1");
+            CHECK(first == "version=2");
         }
         // Malformed files change nothing.
         const auto refused = [&](const std::string& text)
@@ -924,7 +925,7 @@ namespace
             return !ok && !error.empty() && result.entries == InputBindings::defaults().entries;
         };
         CHECK(refused("bind=jump key 44\n"));                               // No version.
-        CHECK(refused("version=2\nbind=jump key 44\n"));                    // Unknown version.
+        CHECK(refused("version=3\nbind=jump key 44\n"));                    // Unknown version.
         CHECK(refused("version=1\nbind=fly key 44\n"));                     // Unknown action.
         CHECK(refused("version=1\nbind=menu key 41\n"));                    // Not rebindable.
         CHECK(refused("version=1\nbind=jump keyboard 44\n"));               // Unknown source.
@@ -933,10 +934,27 @@ namespace
         CHECK(refused("version=1\nbind=jump mouse 9\n"));                   // Out of range.
         CHECK(refused("version=1\nbind=jump key\n"));                       // Missing field.
         CHECK(refused("version=1\n" + std::string(17 * 1024, '#') + "\n")); // Over 16 KiB.
+        // Legacy files acquire C without stealing a custom C binding.
+        for (const bool occupied : {false, true})
+        {
+            {
+                std::ofstream out(path);
+                out << "version=1\n";
+                if (occupied)
+                    out << "bind=jump key 6\n";
+            }
+            auto legacy = InputBindings::defaults();
+            CHECK(load_controls(path, legacy, error));
+            CHECK(legacy.bound(InputSource::Key, SDL_SCANCODE_C, InputAction::ThirdPerson) == !occupied);
+            CHECK(legacy.bound(InputSource::Key, SDL_SCANCODE_C, InputAction::Jump) == occupied);
+        }
+        clear_control(bindings, InputAction::ThirdPerson);
+        CHECK(save_controls(path, bindings, error));
+        CHECK(load_controls(path, loaded, error) && count(loaded, InputAction::ThirdPerson) == 0);
         // An empty file of the right version unassigns every rebindable action only.
         {
             std::ofstream out(path, std::ios::binary | std::ios::trunc);
-            out << "version=1\r\n# comment\n";
+            out << "version=2\r\n# comment\n";
         }
         auto empty = InputBindings::defaults();
         CHECK(load_controls(path, empty, error) && count(empty, InputAction::Jump) == 0 &&

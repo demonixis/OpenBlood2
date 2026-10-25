@@ -28,7 +28,8 @@ accept M3 or provide network play.
 The [2026-10-25 tester corrections](implementation/reports/tester_feedback_2026_10_25.md)
 cover CityHub's laundromat doors, cutscene look and texture
 filtering. The [additional controls](implementation/reports/control_actions.md) now implement
-all nine previously disabled action rows. The [destruction-debris lot](contracts/destruction_debris_contracts.md)
+all nine previously disabled action rows. The [desktop chase camera](contracts/camera_contracts.md)
+adds an optional C toggle with the crosshair retained, disabled in VR. The [destruction-debris lot](contracts/destruction_debris_contracts.md)
 connects original wood, metal and glass fragments, their motion and impact sounds.
 Museum's reported crash remains unreproduced; the
 [class coverage inventory](contracts/class_coverage.md) distinguishes absent ports

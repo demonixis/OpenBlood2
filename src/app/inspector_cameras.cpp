@@ -79,7 +79,9 @@ namespace OpenBlood2
         const auto& client = game.client_shell;
         const auto* viewed = game.objects.get(client.view.object);
         const auto* listener = game.objects.get(g_hActiveCamera);
-        ImGui::TextWrapped("Client camera: %s", viewed ? viewed->state.m_Name : "player eye");
+        ImGui::TextWrapped("Client camera: %s", viewed                       ? viewed->state.m_Name
+                                                : client.third_person_active ? "third person"
+                                                                             : "player eye");
         ImGui::TextWrapped("Server active listener camera: %s",
                            listener && listener->life == Life::Alive ? listener->state.m_Name : "none");
         ImGui::Text("View %.1f %.1f %.1f", client.view.position.x, client.view.position.y, client.view.position.z);

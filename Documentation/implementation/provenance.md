@@ -1,5 +1,15 @@
 # Source and Dependency Provenance
 
+## Desktop third-person camera
+
+The local chase view is project-owned code using existing typed segment queries,
+model visibility and HUD paths. The original `Blood2/ClientShellDLL/PlayerCamera.cpp`
+(`FindOptimalCameraPosition`) and `BloodClientShell.cpp` (`Set3rdPersonCamera`)
+were consulted for the chase/obstruction and player-versus-view-weapon split.
+No original function was newly imported. The framing, eye anchoring, pitch orbit,
+five-ray clearance, instant toggle, zoom suspension and reticle convergence are
+explicit replacement choices; see [camera contracts](../contracts/camera_contracts.md).
+
 ## Packaging and platform presets
 
 The game icon is new project-owned artwork drawn procedurally by

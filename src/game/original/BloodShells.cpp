@@ -315,6 +315,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     listener_position = {};
     player_visible = false;
     weapons_visible = true;
+    third_person = third_person_active = false;
     death_camera = {};
     death_notifications = 0;
     rotation = {};
@@ -465,6 +466,7 @@ void CBloodClientShell::OnExitWorld()
     listener_position = {};
     player_visible = false;
     weapons_visible = true;
+    third_person = third_person_active = false;
     death_camera = {};
     death_notifications = 0;
     rotation = {};
@@ -1034,6 +1036,9 @@ bool CBloodClientShell::UpdateCameraSelection()
     auto* owner = dynamic_cast<CPlayerObj*>(server_.HandleToObject(player));
     if (!owner || server_.GetClientUserData(client_) != player)
         return false;
+    third_person_active = false;
+    if (xr_view)
+        third_person = false;
     view = server_.GetCameraView();
     if (seeing_eye && server_.IsObjectAlive(seeing_eye) && !owner->m_damage.IsDead())
     {
@@ -1069,9 +1074,76 @@ bool CBloodClientShell::UpdateCameraSelection()
             view.position = death_camera.position;
             view.rotation = death_camera.rotation;
         }
+        else if (third_person && !xr_view && !m_bZoomView && !owner->m_damage.IsDead())
+        {
+            if (!UpdateThirdPersonCamera())
+                return false;
+            player_visible = third_person_active;
+            weapons_visible = !third_person_active;
+        }
     }
     listener_position = view.object && view.settings.listener ? view.position : position;
     return true;
+}
+
+// OpenBlood2 desktop chase view, following the original PlayerCamera chase-query
+// pattern. Wider eye-relative framing and aim convergence keep the body below the reticle.
+bool CBloodClientShell::ToggleThirdPerson()
+{
+    const auto* owner = dynamic_cast<CPlayerObj*>(server_.HandleToObject(player));
+    if (xr_view || !m_bInWorld || !owner || owner->m_damage.IsDead() || death_camera.active || view.object)
+        return false;
+    third_person = !third_person;
+    SetControlNotice(third_person ? "Third person" : "First person");
+    return true;
+}
+
+bool CBloodClientShell::UpdateThirdPersonCamera()
+{
+    using namespace OpenBlood2;
+    const auto forward = rotate_vector(view.rotation, {0, 0, 1});
+    const auto boom = rotate_vector(view.rotation, {0, 20, -150});
+    const auto requested = vector_add(camera_position, boom);
+    // Center and four near-plane corners share the shortest travel. This bounded
+    // clearance envelope also retracts for moving brushes, without moving the player.
+    float fraction = 1;
+    for (const auto offset : std::array<DVector, 5>{{{}, {-4, -4, 0}, {4, -4, 0}, {-4, 4, 0}, {4, 4, 0}}})
+    {
+        const auto clearance = rotate_vector(view.rotation, offset);
+        SegmentHit hit;
+        const auto result =
+            server_.IntersectSegment(vector_add(camera_position, clearance), vector_add(requested, clearance), player,
+                                     hit, false, SegmentObjects::SolidOnly, SegmentFilter::IgnoreVolumes);
+        if (result == SegmentResult::Invalid || result == SegmentResult::Unavailable)
+        {
+            blocker = "Third-person camera obstruction query failed";
+            return false;
+        }
+        if (result == SegmentResult::Hit)
+            fraction = std::min(fraction, std::max(0.f, float(hit.fraction) - 2.f / std::sqrt(vector_dot(boom, boom))));
+    }
+    // In a tight corner return to the eye rather than drawing inside the head.
+    // Keep the selection so the chase view returns when there is room again.
+    if (fraction * std::sqrt(vector_dot(boom, boom)) < 20)
+        return true;
+    third_person_active = true;
+    view.position = vector_add(camera_position, vector_scale(boom, fraction));
+    // Use the same eye ray/filter as player FireSpread, without spread or random
+    // draws. Only the view turns toward this target: gameplay still fires from the eye.
+    auto aim = vector_add(camera_position, vector_scale(forward, 10000));
+    SegmentHit hit;
+    const auto result =
+        server_.IntersectSegment(camera_position, aim, player, hit, false, SegmentObjects::SolidOrRayHit,
+                                 SegmentFilter::IgnoreVolumes, SegmentStart::SkipInterior);
+    if (result == SegmentResult::Invalid || result == SegmentResult::Unavailable)
+    {
+        blocker = "Third-person camera aim query failed";
+        return false;
+    }
+    if (result == SegmentResult::Hit)
+        aim = hit.point;
+    const auto direction = vector_subtract(aim, view.position);
+    return vector_dot(direction, direction) < 1e-12f || server_.AlignRotation(view.rotation, direction) == DE_OK;
 }
 
 // Original SMSG_*THEFLAG / NEEDYOURFLAG local client branches.

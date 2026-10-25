@@ -216,7 +216,10 @@ namespace
         f.controls.use = f.controls.jump = f.controls.crouch = true;
         auto t = xr_tracking(g, p, f, reference, scale);
         const auto apply = [&] { xr_apply_controls(g, p, f, t, reference, scale, 1.0 / 60); };
+        g.client_shell.third_person = g.client_shell.third_person_active = true;
         apply();
+        CHECK(g.client_shell.xr_view && !g.client_shell.third_person && !g.client_shell.third_person_active &&
+              !g.client_shell.ToggleThirdPerson());
         auto& s = g.client_shell;
         CHECK(s.weapon_input.primary && !s.weapon_input.alternate && s.weapon_input.all_hands && s.use_down);
         CHECK(s.movement_input.jump && s.movement_input.crouch);

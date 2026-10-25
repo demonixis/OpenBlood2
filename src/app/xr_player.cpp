@@ -89,6 +89,8 @@ namespace OpenBlood2
                            const xr::Vec3& reference, float units_per_meter, double seconds)
     {
         auto& shell = game.client_shell;
+        shell.xr_view = true;
+        shell.third_person = shell.third_person_active = false;
         const auto& c = frame.controls;
         // Adopt server-driven turns (start points, teleports, restores) into the body yaw.
         if (!player.initialized)

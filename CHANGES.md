@@ -4,6 +4,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Rebindable first/third-person camera toggle (C), with obstacle clearance and the crosshair retained; disabled in VR.
+
 ### Fixed
 
 - M16 grenade simulation failure when a living enemy overlaps it before its first bounce.

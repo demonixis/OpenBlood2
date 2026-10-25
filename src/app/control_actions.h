@@ -17,6 +17,8 @@ namespace OpenBlood2
             shell.m_bCrosshairOriginallyOn = settings->crosshair;
             shell.m_nCrosshairOriginalNum = DBYTE(settings->crosshair_number);
         }
+        if (controls.sample_command(InputAction::ThirdPerson, blocked))
+            shell.ToggleThirdPerson();
         if (controls.sample_command(InputAction::RunLock, blocked))
         {
             controls.run_lock = !controls.run_lock;

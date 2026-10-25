@@ -23,7 +23,7 @@ namespace OpenBlood2
         std::string_view literal;
         std::optional<InputAction> action;
     };
-    inline constexpr std::array<ControlRow, 48> control_rows{{
+    inline constexpr std::array<ControlRow, 49> control_rows{{
         {705, {}, InputAction::MoveForward},  // Forward
         {706, {}, InputAction::MoveBackward}, // Backward
         {707, {}, InputAction::TurnLeft},     // Left
@@ -73,6 +73,7 @@ namespace OpenBlood2
         {0, "Binoculars", InputAction::Binoculars},
         {0, "Night Goggles", InputAction::NightGoggles},
         {0, "The Eye", InputAction::TheEye},
+        {0, "Third Person", InputAction::ThirdPerson},
     }};
 
     // Actions the Controls page rebinds; menu/system and analog look bindings stay fixed.
@@ -206,7 +207,7 @@ namespace OpenBlood2
         return rows;
     }
 
-    // controls.cfg beside preferences.cfg: "version=1" then one "bind=<action> <source> <code>"
+    // controls.cfg beside preferences.cfg: "version=2" (reads version 1 too) then one "bind=<action> <source> <code>"
     // line per rebindable binding. Loading starts from the defaults, replaces every rebindable
     // action with the file's lines (an absent action is unassigned) and changes nothing on error.
     inline constexpr std::array<const char*, 6> control_source_names{"key",   "mouse", "button",
@@ -244,7 +245,7 @@ namespace OpenBlood2
         }
         auto result = output;
         std::erase_if(result.entries, [](const InputBinding& b) { return rebindable(b.action); });
-        bool version = false;
+        int version = 0;
         std::string line;
         while (std::getline(input, line))
         {
@@ -252,9 +253,9 @@ namespace OpenBlood2
                 line.pop_back();
             if (line.empty() || line.front() == '#')
                 continue;
-            if (line == "version=1" && !version)
+            if ((line == "version=1" || line == "version=2") && !version)
             {
-                version = true;
+                version = line.back() - '0';
                 continue;
             }
             const auto fail = [&](const char* why)
@@ -263,7 +264,7 @@ namespace OpenBlood2
                 return false;
             };
             if (!version || !line.starts_with("bind="))
-                return fail("expected version=1 then bind lines");
+                return fail("expected version=1/2 then bind lines");
             const std::string_view rest = std::string_view(line).substr(5);
             const auto a = rest.find(' '), b = a == rest.npos ? rest.npos : rest.find(' ', a + 1);
             if (b == rest.npos)
@@ -288,13 +289,22 @@ namespace OpenBlood2
             error = "Incomplete controls";
             return false;
         }
+        // Version 1 predates Third Person. Add C only if an existing custom binding
+        // does not own it; version 2 can explicitly leave the new action unassigned.
+        if (version == 1 && std::none_of(result.entries.begin(), result.entries.end(),
+                                         [](const InputBinding& b)
+                                         {
+                                             return b.action == InputAction::ThirdPerson ||
+                                                    (b.source == InputSource::Key && b.code == SDL_SCANCODE_C);
+                                         }))
+            result.add(InputSource::Key, SDL_SCANCODE_C, InputAction::ThirdPerson);
         output = std::move(result);
         return true;
     }
     inline bool save_controls(const std::filesystem::path& path, const InputBindings& bindings, std::string& error)
     {
         error.clear();
-        std::string text = "version=1\n";
+        std::string text = "version=2\n";
         for (const auto& b : bindings.entries)
             if (rebindable(b.action))
                 text += std::string("bind=") + std::string(info(b.action).name) + ' ' +
