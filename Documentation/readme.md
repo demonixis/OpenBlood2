@@ -3,6 +3,7 @@
 | Document | Use |
 | --- | --- |
 | [Roadmap](roadmap.md) | Overall progress, M0–M9 completion and future work. |
+| [Homebrew roadmap](roadmap_homebrew.md) | Exploratory console/handheld/headset port study (no milestone). |
 | [Build and play](getting_started.md) | Requirements, commands, controls and platforms. |
 | [CI builds](ci_builds.md) | Desktop archives, headless tests and dual-remote workflow. |
 | [Packaging](packaging.md) | Version, icons, Xcode (macOS/iOS), Android and Quest presets. |

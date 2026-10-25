@@ -270,3 +270,4 @@ master server and NAT traversal are out of scope.
 | Desktop release | Signed/notarized installers, sustained-play soak tests and measured optimization, continuing from the M3 beta. |
 | Shogo | Reassess after Blood II's campaign and engine contracts are established. |
 | Dreamcast | Exploratory: a native PowerVR2 scene backend in this repository, after the campaign. Memory (16 MB) is the main risk; see the [study](implementation/dreamcast_study.md). |
+| Homebrew consoles | Exploratory, no milestone: Steam Frame, R36S, Switch, PS Vita, PS3, PSP and Dreamcast ranked by cost, with shared lots (scene backend, GLES 3, Cg, big-endian CI); see the [homebrew roadmap](roadmap_homebrew.md). |
