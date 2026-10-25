@@ -1,0 +1,23 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/release
+    Start 1521: destruction_debris.recipes
+1/6 Test #1521: destruction_debris.recipes .......   Passed    0.26 sec
+    Start 1522: destruction_debris.motion
+2/6 Test #1522: destruction_debris.motion ........   Passed    0.02 sec
+    Start 1523: destruction_debris.destruction
+3/6 Test #1523: destruction_debris.destruction ...   Passed    0.01 sec
+    Start 1524: destruction_debris.remaining
+4/6 Test #1524: destruction_debris.remaining .....   Passed    0.02 sec
+    Start 1525: destruction_debris.retail
+5/6 Test #1525: destruction_debris.retail ........   Passed    0.83 sec
+    Start 1526: gpu.destruction_debris
+6/6 Test #1526: gpu.destruction_debris ...........   Passed    0.18 sec
+
+100% tests passed out of 6
+
+Label Time Summary:
+effects     =   1.32 sec*proc (6 tests)
+gpu         =   0.18 sec*proc (1 test)
+headless    =   1.13 sec*proc (5 tests)
+private     =   1.01 sec*proc (2 tests)
+
+Total Test time (real) =   1.33 sec

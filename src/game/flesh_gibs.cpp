@@ -34,12 +34,12 @@ namespace OpenBlood2
     {
         return publish_impl(nullptr, effect.position, effect.velocity, effect.dimensions, effect.scale,
                             detail == 0 ? effect.amount / 2 : effect.amount, server, models, resources, now, error,
-                            &effect);
+                            &effect, detail);
     }
     std::uint64_t FleshGibs::publish_impl(HOBJECT owner, DVector pos, DVector dir, DVector dims, float scale,
                                           unsigned count, ServerDE& server, ModelStore& models,
                                           const Resources& resources, double now, std::string& error,
-                                          const DebrisEffect* debris)
+                                          const DebrisEffect* debris, int detail)
     {
         error.clear();
         const unsigned surface = debris ? (debris->flags & 0xff) * 10 : 100;
@@ -59,7 +59,8 @@ namespace OpenBlood2
             scale > 100 || (!debris && (count > 64 || active.size() + count * 2 > 256)) || count > 255 ||
             !std::isfinite(now) || now < 0 || report.source.size() > 100)
             error = "Invalid client-gib request or capacity exhausted";
-        else if (debris && surface != 20 && surface != 30 && surface != 50)
+        else if (debris && surface != 10 && surface != 20 && surface != 30 && surface != 40 && surface != 50 &&
+                 surface != 70 && surface != 90 && surface != 100 && surface != 200)
             error = "Destruction debris material not implemented: " + std::to_string(surface);
         else if (custom && (debris->model.empty() || debris->texture.empty() || debris->model.size() > 100 ||
                             debris->texture.size() > 100 || debris->sound.size() > 100))
@@ -67,8 +68,8 @@ namespace OpenBlood2
         else
         {
             // Selected high detail: the source's (DBYTE)1.5 is exactly one.
-            if (!debris && integer(random_, 0, 99) < 20)
-                count *= 2;
+            if (surface == 100 && detail == 2 && integer(random_, 0, 99) < 20)
+                count = DBYTE(count * 2); // Original message count is a byte, including wrap.
             report.id = next_event_++;
             report.adjusted = count;
             for (unsigned i = 0; i < count; ++i)
@@ -110,19 +111,24 @@ namespace OpenBlood2
                 {
                     // B2_LITE NRES limits model and sound choices to 1..3 for every material.
                     const int model = integer(random_, 1, 3);
-                    g.bounces = debris ? 1 : (integer(random_, 0, 4) == 4 ? 1 : 0);
+                    g.bounces = surface == 100 ? (integer(random_, 0, 4) == 4 ? 1 : 0)
+                                : surface == 10 || surface == 70 || surface == 90 ? 2
+                                                                                  : 1;
                     const int sound = integer(random_, 1, 3);
-                    const std::string material = surface == 50   ? "glass"
-                                                 : surface == 30 ? "wood"
-                                                 : surface == 20 ? "metal"
-                                                                 : "flesh";
+                    const std::string material = surface == 50    ? "glass"
+                                                 : surface == 30  ? "wood"
+                                                 : surface == 10  ? "stone"
+                                                 : surface == 70  ? "terrain"
+                                                 : surface == 90  ? "plastic"
+                                                 : surface == 100 ? "flesh"
+                                                                  : "metal";
                     g.model_path = "models/gibs/" + material + "/gib" + std::to_string(model) + ".abc";
                     g.skin_path = "skins/gibs/" + material + "/gib" + std::to_string(model) + ".dtx";
                     g.sound_path = "sounds/gibs/" + material + "/gib_impact" + std::to_string(sound) + ".wav";
-                    if (!debris || surface == 50)
-                        g.scale = {draw(random_, debris ? .5f : .8f, debris ? 1.25f : 1.35f) * scale,
-                                   draw(random_, debris ? .5f : .8f, debris ? 1.25f : 1.35f) * scale,
-                                   draw(random_, debris ? .5f : .8f, debris ? 1.25f : 1.35f) * scale};
+                    if (surface == 100 || surface == 50 || surface == 10 || surface == 70 || surface == 90)
+                        g.scale = {draw(random_, surface == 100 ? .8f : .5f, surface == 100 ? 1.35f : 1.25f) * scale,
+                                   draw(random_, surface == 100 ? .8f : .5f, surface == 100 ? 1.35f : 1.25f) * scale,
+                                   draw(random_, surface == 100 ? .8f : .5f, surface == 100 ? 1.35f : 1.25f) * scale};
                     else
                         g.scale = {scale, scale, scale};
                 }

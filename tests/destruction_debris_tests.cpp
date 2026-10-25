@@ -24,7 +24,7 @@ namespace
         CHECK(test_blood_splat::mount(g.resources, root, error));
         CHECK(g.resources.read("alpha.dtx", skin, error));
         test_player::Directory dir;
-        for (const auto material : {"wood", "metal", "glass"})
+        for (const auto material : {"wood", "metal", "glass", "stone", "plastic", "terrain", "flesh"})
             for (int i = 1; i <= 3; ++i)
             {
                 const auto name = "gib" + std::to_string(i);
@@ -114,7 +114,7 @@ namespace
         custom.model = "missing.abc";
         g.server.RecordDebrisEffect(custom);
         CHECK(fx.active.empty() && !g.server.debris_effects.back().error.empty());
-        g.server.RecordDebrisEffect(request(10));
+        g.server.RecordDebrisEffect(request(999));
         CHECK(fx.active.empty() && !g.server.debris_effects.back().error.empty());
         auto invalid = request(30);
         invalid.scale = std::numeric_limits<float>::quiet_NaN();
@@ -163,6 +163,59 @@ namespace
         CHECK(fx.active.empty() && fx.reports.empty());
         return true;
     }
+    bool remaining(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(setup(g, root));
+        auto& fx = g.server.destruction_debris;
+        for (unsigned surface : {10u, 70u, 90u, 100u, 40u, 200u})
+        {
+            fx.clear();
+            g.server.debris_detail = 1;
+            g.server.RecordDebrisEffect(request(surface));
+            CHECK(g.server.debris_effects.back().error.empty() && fx.active.size() == 10);
+            for (const auto& f : fx.active)
+            {
+                CHECK(!f.blood && !f.spurt_event && !f.splat_event); // CDebris never sets TRAIL_BLOOD, even for flesh.
+                CHECK(f.bounces == (surface == 100 ? f.bounces : surface == 40 || surface == 200 ? 1 : 2));
+                if (surface == 100)
+                    CHECK(f.bounces == 0 || f.bounces == 1);
+                if (surface == 40 || surface == 200)
+                    CHECK(f.scale.x == 2 && f.model_path.find("metal") != std::string::npos);
+                else
+                    CHECK(f.scale.x >= (surface == 100 ? 1.6f : 1.f) && f.scale.x <= (surface == 100 ? 2.7f : 2.5f));
+            }
+            for (unsigned frame = 1; frame < 500; ++frame)
+            {
+                CHECK(fx.advance(frame * .01, g.server));
+                CHECK(g.server.advance_audio(.01, {}, {}));
+            }
+            for (const auto& f : fx.active)
+            {
+                if (!f.error.empty() || !f.sound_error.empty())
+                    std::cerr << surface << ": " << f.error << f.sound_error << "\n";
+                CHECK(f.error.empty() && f.sound_error.empty());
+            }
+        }
+        fx.clear();
+        g.server.debris_detail = 0;
+        g.server.RecordDebrisEffect(request(100, 11));
+        CHECK(fx.active.size() == 5);
+        fx.clear();
+        g.server.debris_detail = 2;
+        bool doubled = false, ordinary = false;
+        for (unsigned attempt = 0; attempt < 40; ++attempt)
+        {
+            g.server.RecordDebrisEffect(request(100, 10));
+            auto count = fx.reports.back().adjusted;
+            CHECK(count == 10 || count == 20);
+            doubled |= count == 20;
+            ordinary |= count == 10;
+        }
+        CHECK(doubled && ordinary && fx.active.size() == 130);
+        CHECK(g.server.blood_spurts.active.empty() && g.server.blood_splats.active.empty());
+        return true;
+    }
     bool destruction(const std::filesystem::path& root)
     {
         GameSession g;
@@ -198,6 +251,17 @@ namespace
         config.data_dir = root;
         std::string error;
         CHECK(g.initialize() && g.resources.mount_game(config, error) && g.request_world("02_cityhub", error));
+        for (unsigned surface : {10u, 70u, 90u, 100u, 40u, 200u})
+        {
+            g.server.RecordDebrisEffect(request(surface, 24));
+            const auto& report = g.server.debris_effects.back();
+            if (!report.error.empty())
+                std::cerr << surface << ": " << report.error << "\n";
+            CHECK(report.error.empty() && report.event);
+            for (const auto& fragment : g.server.destruction_debris.active)
+                CHECK(g.resources.find(fragment.sound_path));
+            g.server.destruction_debris.clear();
+        }
         unsigned covered = 0;
         for (const auto material : {1u, 2u, 5u})
         {
@@ -232,7 +296,8 @@ namespace
                     const auto& report = g.server.debris_effects[i];
                     const auto surface = (report.flags & 255) * 10;
                     std::cout << "  material " << surface << " / " << report.error << '\n';
-                    if (surface == 20 || surface == 30 || surface == 50)
+                    if (surface == 10 || surface == 20 || surface == 30 || surface == 40 || surface == 50 ||
+                        surface == 70 || surface == 90 || surface == 100 || surface == 200)
                         CHECK(report.error.empty() && report.event);
                     else
                         CHECK(!report.error.empty());
@@ -258,7 +323,8 @@ int main(int argc, char** argv)
         return 2;
     std::string name = argv[1];
     const std::filesystem::path root = argv[2];
-    return (name == "recipes"       ? recipes(root)
+    return (name == "remaining"     ? remaining(root)
+            : name == "recipes"     ? recipes(root)
             : name == "motion"      ? motion(root)
             : name == "destruction" ? destruction(root)
                                     : name == "retail" && retail(root))

@@ -29,7 +29,7 @@ namespace OpenBlood2
         float scale = 1;
         unsigned requested = 0, adjusted = 0, created = 0;
         std::string source, error;
-        std::string unavailable = "Stone/plastic/terrain debris and recursive templates remain unavailable";
+        std::string unavailable = "Recursive legacy gib templates remain unavailable";
     };
     class FleshGibs
     {
@@ -46,7 +46,8 @@ namespace OpenBlood2
 
       private:
         std::uint64_t publish_impl(HOBJECT, DVector, DVector, DVector, float, unsigned, ServerDE&, ModelStore&,
-                                   const Resources&, double, std::string&, const DebrisEffect* = nullptr);
+                                   const Resources&, double, std::string&, const DebrisEffect* = nullptr,
+                                   int detail = 2);
         std::minstd_rand random_{1};
         std::uint64_t next_id_ = 1, next_event_ = 1;
     };

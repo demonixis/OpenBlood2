@@ -1,0 +1,21 @@
+{
+  "scope": "VFX lot 9; original material and byte-count rules",
+  "files": [
+    {
+      "path": "ClientShellDLL/gibfx.cpp",
+      "sha256": "c3e2752fccb49960c8ffaf2c1d4e58672214e66e1b1253fd2f2212b95329962a"
+    },
+    {
+      "path": "ClientShellDLL/SFXMgr.cpp",
+      "sha256": "fac5fa907b3ec5b547b798c46dd3d3d5371486104f91245b65d363b6653a1e74"
+    },
+    {
+      "path": "ObjectDLL/Debris.cpp",
+      "sha256": "cccf3b6458c84e39ec8b12b7b0bb5708b3f0ba08ba9fdf0fde8c87a7a9de6ca8"
+    },
+    {
+      "path": "ObjectDLL/ClientGibFX.cpp",
+      "sha256": "3a1252b111b230c2a60b5bdcd23f26e9ed3fa93359b8f03ec8e85d03ae25ef4f"
+    }
+  ]
+}

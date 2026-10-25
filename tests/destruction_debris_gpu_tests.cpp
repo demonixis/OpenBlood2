@@ -87,7 +87,7 @@ int main(int argc, char** argv)
     std::filesystem::create_directories(argv[1]);
     Capture capture;
     std::vector<std::uint8_t> pixels, again;
-    for (auto surface : {20u, 30u, 50u})
+    for (auto surface : {10u, 20u, 30u, 50u, 70u, 90u, 100u, 40u, 200u})
     {
         DebrisEffect event;
         event.source = "GPU destruction";

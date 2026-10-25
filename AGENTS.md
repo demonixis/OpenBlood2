@@ -65,6 +65,13 @@ normal, half/quarter trail lifetimes and restore republication, reversed absorpt
 speed bounds, per-weapon Death Ray anchor ownership and the absolute emission clock.
 No new saved payload or camera shake; geometry illumination stays with lot 10.
 
+The [remaining destruction materials, VFX lot 9](Documentation/contracts/destruction_debris_contracts.md#remaining-materials--lot-9-2026-10-25)
+add stone/plastic/terrain/flesh and the original metal default for liquid/energy.
+Preserve material scale/bounce rules, B2_LITE resources, LOW half-count, HIGH flesh's
+20% byte-count doubling, and CDebris never setting TRAIL_BLOOD even for flesh.
+Character blood effects and the separate bounded destruction pool stay unchanged.
+Rain/legacy emitters still require an evidenced live caller before promotion from P3.
+
 ## Commit attribution
 
 Commits and pull requests carry only the user's identity (demonixis). Never add

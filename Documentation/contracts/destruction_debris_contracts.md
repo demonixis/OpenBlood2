@@ -64,3 +64,25 @@ additional destruction explosion components, bullet surface fragments, weapon ca
 muzzle effects are outside this lot. Existing flesh/blood effects remain supported on their
 previous callers. Full retail visual parity and campaign traversal are not claimed; M2 stays
 closed with M2-GPU-001 and milestone acceptance is unchanged.
+
+## Remaining materials — lot 9 (2026-10-25)
+
+Supersedes the material omissions above. Stone (10), terrain (70) and plastic (90)
+now select their original B2_LITE model/skin/sound variants 1–3, randomize each scale
+axis in 0.5–1.25 and start with two bounces. Flesh (100) uses 0.8–1.35 and the original
+0/1 bounce draw. Liquid (200) and energy (40) deliberately use the original switch's
+metal default, with uniform scale and one bounce; no invented liquid chunks or sparks.
+Custom resources keep the prior unscaled custom path.
+
+CDebris does **not** set TRAIL_BLOOD, even for flesh. These fragments therefore emit
+neither launch blood nor impact splats. The existing character-gib caller still does.
+LOW halves the byte count for all materials; HIGH flesh has the original 20% double
+chance and byte wrap (the other branch multiplies by `(DBYTE)1.5`, hence by one).
+MEDIUM keeps the requested amount. Separate pools, independent cosmetic RNG, finite
+collision adaptations, oldest-slot eviction and saved field bodies are unchanged.
+
+[Verification](../implementation/reports/remaining_debris.md) covers synthetic material
+and lifetime checks, actual retail resources and GPU images. Rain and the generic legacy
+emitters remain conditional P3: the inventory has no exercised mounted-level caller for
+them. No speculative replacement class or asset is added. Recursive gib templates and
+original-executable visual parity remain outside this material lot.
