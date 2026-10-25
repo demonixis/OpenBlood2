@@ -724,7 +724,8 @@ namespace
             movement.crouch |= keyboard.crouch;
             if (!controls.focused && !smoke)
                 movement = {};
-            controls.look(game->client_shell.rotation, delta, text_editing, game->client_shell.m_bZoomView);
+            controls.look(game->client_shell.rotation, delta, text_editing || !game->client_shell.player_look_allowed(),
+                          game->client_shell.m_bZoomView);
             if (options.movement_smoke)
             {
                 if (frames == 45 || frames == 100 || frames == 170 || frames == 185)

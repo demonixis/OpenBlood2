@@ -148,7 +148,9 @@ namespace OpenBlood2
             if (control && i < int(menu.controls.size()))
             {
                 std::string value = menu.controls[i].binding;
-                if (value.empty())
+                if (!menu.controls[i].enabled)
+                    value = "NOT IMPLEMENTED";
+                else if (value.empty())
                     value = unassigned->second;
                 // The bound text stops at the canvas edge instead of overflowing it.
                 while (!value.empty() && left + 131 + width(small_, value) > 635)

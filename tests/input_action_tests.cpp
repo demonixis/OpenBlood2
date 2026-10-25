@@ -751,6 +751,13 @@ namespace
         m.selected = jump;
         tap(SDL_SCANCODE_BACKSPACE);
         CHECK(count(bindings, InputAction::Jump) == 0);
+        // An empty functional row stays selectable and accepts a fresh assignment.
+        CHECK(m.controls[std::size_t(jump)].enabled && m.controls[std::size_t(jump)].binding.empty());
+        tap(SDL_SCANCODE_RETURN);
+        CHECK(m.binding == jump);
+        tap(SDL_SCANCODE_J);
+        CHECK(m.binding < 0 && bindings.bound(InputSource::Key, SDL_SCANCODE_J, InputAction::Jump) &&
+              m.controls[std::size_t(jump)].binding == "J");
         // Focus loss ends tracking.
         tap(SDL_SCANCODE_RETURN);
         CHECK(m.binding == jump);

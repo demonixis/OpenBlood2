@@ -294,6 +294,17 @@ namespace
         CHECK(g.server.RotateWorldModel(h, {}) == MoverResult::Invalid);
         CHECK(g.objects.finish_frame());
         CHECK(g.objects.snapshot().size() == 2); // start + body
+        CHECK(g.objects.clear());
+        h = door(g);
+        auto neighbour = door(g, {}, {0, 20, -4}, {40, 80, -2});
+        CHECK(h && neighbour);
+        auto* fixed = g.objects.get(neighbour);
+        fixed->state.m_Flags &= ~FLAG_GOTHRUWORLD;
+        const RotationMove turn{{}, {0, .1f, 0}, {0, 50, 0}, {0, 50, 0}};
+        CHECK(g.server.RotateWorldModel(h, turn) == MoverResult::Blocked);
+        CHECK(g.objects.get(h)->mover_blocker == neighbour);
+        fixed->state.m_Flags |= FLAG_GOTHRUWORLD;
+        CHECK(g.server.RotateWorldModel(h, turn) == MoverResult::Moved);
         return true;
     }
     bool lifetime(const std::filesystem::path& root)
@@ -345,6 +356,39 @@ namespace
         CHECK(g.objects.engine_message(p->m_hObject, MID_TOUCHNOTIFY, h));
         CHECK(!p->door_push_pending);
         CHECK(g.unload_world());
+        return true;
+    }
+    bool city_laundry(const std::filesystem::path& root)
+    {
+        // Tester's CityHub screenshot: the two doormetal5 leaves below the laundromat sign.
+        // Each must open independently through the player's USE, beside its closed neighbour.
+        for (int side = 0; side < 2; ++side)
+        {
+            GameSession g;
+            std::string error;
+            CHECK(g.initialize() && g.resources.mount_game(Config{root, "private"}, error));
+            CHECK(g.request_world("02_cityhub", error) && g.run_world(error));
+            auto* p = g.server_shell.Player(g.local_client);
+            CHECK(p);
+            const auto name = side ? "laundrodoor2" : "laundrodoor1";
+            ObjectRecord* record = nullptr;
+            for (auto id : g.objects.snapshot())
+                if (std::string_view(g.objects.get(id)->state.m_Name) == name)
+                    record = g.objects.get(id);
+            CHECK(record);
+            auto* d = dynamic_cast<RotatingDoor*>(record->game.get());
+            CHECK(d && d->self_trigger && !d->locked && d->state == Door::Closed);
+            DVector position{1480, 460, side ? 480.f : 416.f};
+            CHECK(g.server.TeleportObject(p->m_hObject, &position) == DE_OK);
+            CHECK(g.server_shell.OnMessage(g.local_client, PlayerUse{{0, pi / 2}}));
+            CHECK(p->use_hit.object == d->trigger && d->triggers == 1);
+            for (int i = 0; i < 120 && d->state != Door::Open; ++i)
+                CHECK(g.step(1. / 60));
+            CHECK(d->state == Door::Open && record->mover_moves > 0 && record->mover_blocks == 0);
+            for (int i = 0; i < 360 && d->state != Door::Closed; ++i)
+                CHECK(g.step(1. / 60));
+            CHECK(d->state == Door::Closed && record->mover_blocks == 0);
+        }
         return true;
     }
     bool catalog(const std::filesystem::path& root)
@@ -426,11 +470,17 @@ int main(int argc, char** argv)
     if (argc != 3)
         return 2;
     const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
-        {"use", use},           {"input", input},
-        {"keys", keys},         {"state", state},
-        {"geometry", geometry}, {"transport", transport},
-        {"blocking", blocking}, {"catalog", catalog},
-        {"lifetime", lifetime}, {"player_push", player_push}};
+        {"use", use},
+        {"input", input},
+        {"keys", keys},
+        {"state", state},
+        {"geometry", geometry},
+        {"transport", transport},
+        {"blocking", blocking},
+        {"catalog", catalog},
+        {"lifetime", lifetime},
+        {"player_push", player_push},
+        {"city_laundry", city_laundry}};
     auto it = cases.find(argv[1]);
     return it == cases.end() ? 2 : it->second(path_from_utf8(argv[2])) ? 0 : 1;
 }

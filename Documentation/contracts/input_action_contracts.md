@@ -209,7 +209,9 @@ The original `CMenuControls` page is ported over the action layer; see the
 - **Rows.** The 42 original actions, in source order, with their cres.dll names: Weapon_0 is
   slot 1 (key 1 in the installed defaults.cfg), Weapon_9 slot 10. Strafe, RunLock (the
   always-run toggle), TurnAround, DropWeapon, Grab, Message, Taunt, MouseAimToggle and
-  Crosshair have no port and are disabled. Replacement rows follow for actions the original
+  Crosshair have no port and are disabled, with `NOT IMPLEMENTED` in the binding column.
+  Functional rows with no binding remain enabled and can be assigned normally; they alone
+  use the original unassigned label. Replacement rows follow for actions the original
   menu did not list: Run Latch, Flashlight, Medkit, Binoculars, Night Goggles, The Eye, then
   Restore Defaults.
 - **Rebindable actions** are the row actions. Menu, menu navigation, quick save/load and the

@@ -25,6 +25,12 @@ FlagStand now have original-source ports and focused behavior tests. All 58
 worlds also passed the inspector-free Release GPU opening sweep. This does not
 accept M3 or provide network play.
 
+The [2026-10-25 tester corrections](implementation/reports/tester_feedback_2026_10_25.md)
+cover CityHub's laundromat doors, cutscene look, unbound-control labeling and texture
+filtering. Museum's reported crash remains unreproduced; the
+[class coverage inventory](contracts/class_coverage.md) distinguishes absent ports
+from replacement services. This does not expand milestone acceptance.
+
 ## Milestones
 
 | Milestone | Completion | Scope |

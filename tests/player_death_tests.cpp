@@ -113,6 +113,7 @@ namespace
         CHECK(g.step(.01) && p->m_bDead && p->deaths == 1 && p->death_messages == 1);
         CHECK(p->death_voice_event == 8 && !p->death_corpses && !p->death_gibs && p->death_error.empty());
         CHECK(g.client_shell.death_camera.active && !g.client_shell.weapons_visible);
+        CHECK(!g.client_shell.player_look_allowed());
         CHECK(!p->Respawn());
         PlayerState fields;
         std::string error;

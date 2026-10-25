@@ -249,7 +249,16 @@ namespace OpenBlood2
             SDL_GPUSamplerCreateInfo info{};
             info.min_filter = info.mag_filter = SDL_GPU_FILTER_NEAREST;
             info.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_NEAREST;
-            info.max_lod = 1000; // Authored DTX levels; point sampling within each level.
+            info.max_lod = 1000; // Keep the complete authored DTX mip chain.
+            if (!clamp)
+            {
+                // Isotropic point filtering loses skin/wall detail at grazing angles.
+                // Sprite/FX atlases retain their clamped point sampler.
+                info.min_filter = info.mag_filter = SDL_GPU_FILTER_LINEAR;
+                info.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR;
+                info.enable_anisotropy = true;
+                info.max_anisotropy = 8;
+            }
             info.address_mode_u = info.address_mode_v = info.address_mode_w =
                 clamp ? SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE : SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
             sampler = SDL_CreateGPUSampler(device_, &info);

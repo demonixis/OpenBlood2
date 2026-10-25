@@ -1033,7 +1033,7 @@ namespace OpenBlood2
                                                           false))
                             if (!game->cycle_weapon(next, error))
                                 spdlog::info("Weapon selection: {}", error);
-                    input.controls.look(shell.rotation, delta, false, shell.m_bZoomView);
+                    input.controls.look(shell.rotation, delta, !shell.player_look_allowed(), shell.m_bZoomView);
                 }
                 if (!input.paused(menu) && !paused_at_start)
                 {

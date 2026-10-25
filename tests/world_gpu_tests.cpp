@@ -145,12 +145,15 @@ int main(int argc, char** argv)
         auto rgb = [&](int x, int y, int r, int g, int b)
         {
             const auto* p = pixels + (y * 320 + x) * 4;
-            return p[0] == r && p[1] == g && p[2] == b && p[3] == 255;
+            return std::abs(int(p[0]) - r) <= 7 && std::abs(int(p[1]) - g) <= 7 && std::abs(int(p[2]) - b) <= 7 &&
+                   p[3] == 255;
         };
-        const bool correct = rgb(90, 50, 255, 0, cycle ? 255 : 0) && rgb(130, 50, 0, 255, 0) &&
-                             rgb(170, 50, 255, 0, cycle ? 255 : 0) && rgb(210, 50, 0, 255, 0) &&
-                             rgb(90, 90, 0, 0, 255) && rgb(130, 90, 255, 255, 255) &&
-                             rgb(90, 130, 255, 0, cycle ? 255 : 0);
+        // Texel centres retain their colors (half-pixel raster offset); boundaries
+        // interpolate instead of selecting a coarse point-sampled block.
+        const bool correct = rgb(100, 60, 255, 0, cycle ? 255 : 0) && rgb(140, 60, 0, 255, 0) &&
+                             rgb(180, 60, 255, 0, cycle ? 255 : 0) && rgb(220, 60, 0, 255, 0) &&
+                             rgb(100, 100, 0, 0, 255) && rgb(140, 100, 255, 255, 255) &&
+                             rgb(100, 140, 255, 0, cycle ? 255 : 0) && rgb(120, 60, 128, 128, cycle ? 128 : 0);
         SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
         if (argc == 2)
             CHECK(capture.save((std::string(argv[1]) + ".textures.png").c_str()));
@@ -161,7 +164,54 @@ int main(int argc, char** argv)
         CHECK(!error.empty());
         renderer.clear_geometry();
     }
+    {
+        // An 8:1 texel footprint must retain the fine mip detail along its short
+        // axis. Isotropic sampling selects the red coarse levels instead.
+        WorldMesh mesh;
+        Texture texture;
+        texture.width = texture.height = 256;
+        texture.mipmaps = 4;
+        for (unsigned level = 0; level < 4; ++level)
+        {
+            auto& bytes = level ? texture.mip_rgba : texture.rgba;
+            const unsigned side = 256 >> level;
+            for (unsigned i = 0; i < side * side; ++i)
+                bytes.insert(bytes.end(),
+                             {std::uint8_t(level < 2 ? 0 : 255), std::uint8_t(level < 2 ? 255 : 0), 0, 255});
+        }
+        mesh.materials.push_back({"anisotropic", "", std::move(texture)});
+        mesh.vertices = {{{-1, 1, 2}, {1, 1, 1}, {0, 0}}, {{1, 1, 2}, {1, 1, 1}, {1, 0}},
+                         {{1, -1, 2}, {1, 1, 1}, {1, 8}}, {{-1, 1, 2}, {1, 1, 1}, {0, 0}},
+                         {{1, -1, 2}, {1, 1, 1}, {1, 8}}, {{-1, -1, 2}, {1, 1, 1}, {0, 8}}};
+        mesh.ranges.push_back({0, 6, {}, "anisotropic", {{0, 6, 0}}});
+        WorldDraw draw;
+        Capture capture;
+        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240));
+        CHECK(renderer.prepare(mesh, 200, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240, error));
+        auto* cmd = SDL_AcquireGPUCommandBuffer(runtime.gpu);
+        CHECK(cmd && renderer.draw(cmd, capture.texture, mesh, std::span(&draw, 1), {}, {}, false, error));
+        auto* copy = SDL_BeginGPUCopyPass(cmd);
+        CHECK(copy);
+        SDL_GPUTextureRegion region{};
+        region.texture = capture.texture;
+        region.w = 320;
+        region.h = 240;
+        region.d = 1;
+        SDL_GPUTextureTransferInfo target{};
+        target.transfer_buffer = capture.transfer;
+        target.pixels_per_row = 320;
+        target.rows_per_layer = 240;
+        SDL_DownloadFromGPUTexture(copy, &region, &target);
+        SDL_EndGPUCopyPass(copy);
+        CHECK(SDL_SubmitGPUCommandBuffer(cmd) && SDL_WaitForGPUIdle(runtime.gpu));
+        auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
+        CHECK(pixels);
+        const auto* center = pixels + (120 * 320 + 160) * 4;
+        const bool fine = center[0] < 32 && center[1] > 223 && center[2] == 0;
+        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
+        CHECK(fine);
+    }
     std::cout << "GPU readback: depth occlusion, opposite winding, near clipping, +X/+Y orientation, camera/object "
-                 "transforms, resize, textured repeat/row orientation/opaque sampling and reupload pass\n";
+                 "transforms, resize, texture interpolation/repeat, anisotropic mip detail and reupload pass\n";
     return 0;
 }

@@ -1,3 +1,4 @@
+#include "app/movement_controls.h"
 #include "camera_fixture.h"
 #include "game/game_settings.h"
 #include "game/original/CameraObj.h"
@@ -187,9 +188,40 @@ namespace
         CHECK(close(g.client_shell.view.position, {300, 150, 300}) &&
               close(g.client_shell.listener_position, {300, 150, 300}));
         CHECK(g.client_shell.view.object == h && g.client_shell.view.settings.type == 1 && c->tracking_updates > 0);
+        MovementControls controls;
+        controls.focused = controls.enabled = controls.mouse_captured = true;
+        auto& shell = g.client_shell;
+        const auto rotation = shell.rotation;
+        CHECK(!shell.player_look_allowed());
+        controls.mouse_x = 50;
+        controls.touch_y = .1f;
+        SDL_Event turn{};
+        turn.type = SDL_EVENT_KEY_DOWN;
+        turn.key.windowID = 1;
+        turn.key.scancode = SDL_SCANCODE_RIGHT;
+        controls.event(turn, 1);
+        SDL_Event stick{};
+        stick.type = SDL_EVENT_GAMEPAD_AXIS_MOTION;
+        stick.gaxis.which = 5;
+        stick.gaxis.axis = SDL_GAMEPAD_AXIS_RIGHTX;
+        stick.gaxis.value = 32767;
+        controls.event(stick, 1);
+        controls.look(shell.rotation, .016, !shell.player_look_allowed());
+        CHECK(shell.rotation.yaw == rotation.yaw && shell.rotation.pitch == rotation.pitch && controls.mouse_x == 0 &&
+              controls.touch_y == 0);
+        turn.type = SDL_EVENT_KEY_UP;
+        controls.event(turn, 1);
+        stick.gaxis.value = 0;
+        controls.event(stick, 1);
         WeaponFire shot;
         CHECK(p->HandleWeaponFireMessage(shot) == FireResult::Blocked);
         CHECK(command(g, h, "OFF") && g.step(.016) && !p->camera_movement_blocked && !g.client_shell.view.object);
+        CHECK(shell.player_look_allowed());
+        controls.look(shell.rotation, .016, !shell.player_look_allowed());
+        CHECK(shell.rotation.yaw == rotation.yaw && shell.rotation.pitch == rotation.pitch);
+        controls.mouse_x = 50;
+        controls.look(shell.rotation, .016, !shell.player_look_allowed());
+        CHECK(shell.rotation.yaw != rotation.yaw);
         for (int i = 0; i < 20; ++i)
             CHECK(g.step(.016));
         CHECK(!close(from, g.client_shell.position, 1) && g.client_shell.weapons_visible);
@@ -199,6 +231,7 @@ namespace
             CHECK(g.step(.016));
         CHECK(g.client_shell.view.object == movable && !p->camera_movement_blocked &&
               !close(from, g.client_shell.position, 1));
+        CHECK(!shell.player_look_allowed()); // Movement permission does not grant camera control.
         CHECK(close(g.client_shell.listener_position, g.client_shell.position) && g.client_shell.player_visible);
         CHECK(g.objects.remove(movable) && g.step(.016) && !g.client_shell.view.object);
         CHECK(g.leave_player() && !g.client_shell.view.object && g.client_shell.weapons_visible);

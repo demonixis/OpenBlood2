@@ -1,5 +1,12 @@
 # Original scripted cameras
 
+The desktop frontend and diagnostic viewport suppress player look while a scripted
+camera or the death camera owns the view. Mouse/touch deltas are consumed while
+suppressed; keyboard and gamepad look cannot rotate the body, including cameras
+with AllowPlayerMovement. Movement permission itself is unchanged. The Eye and
+Orb remain player-aimed remote views and retain look input. See the
+[tester feedback verification](../implementation/reports/tester_feedback_2026_10_25.md).
+
 > Extended by [activation visibility contracts](activation_visibility_contracts.md): replacement player/camera pings now reuse the original glass/volume object filter, with atomic refresh, checked inspection and authored Gideon intro acceptance. This is not retail PVS; M2 remains incomplete.
 
 

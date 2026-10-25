@@ -256,3 +256,18 @@ The [baked lighting continuation](baked_lighting_contracts.md) adds model light 
 The [lightmap continuation](lightmap_contracts.md) splits opaque batches by lightmap page (CityHub: 238 → 296 draw calls) and adds one bilinear texture read per world pixel. CityHub at 3440x1440 measures 1.74 ms per frame (GPU 0.58 ms).
 
 The [model shadow continuation](model_shadow_contracts.md) adds an optional render pass before the scene pass for the shadow tile atlas; scenes without visible casters keep one pass. CityHub at 3440x1440 measures 0.79 ms GPU with 5 casters, against 0.61 ms without shadows.
+
+
+## Texture filtering correction (2026-10-25)
+
+Repeat-addressed scene textures (world, skins, view weapons) now use bilinear
+within-level sampling, linear mip interpolation and 8x anisotropy. The shared
+sampler previously used nearest filtering with isotropic mip selection, which
+lost grazing-angle Beretta detail even though the full 256x256 skin and all four
+stored levels were uploaded. No LOD bias, mip removal, resampling or asset edit
+is applied. Clamped sprite/FX sampling, UI fonts/art and lightmap/normal samplers
+are unchanged. Both ORIGINAL and ENHANCED use the corrected diffuse sampler;
+this deliberately changes their texture sampling against earlier captures, while
+the two shader sets and their equivalence when effects are disabled are preserved.
+No shader artifact regeneration is needed. Metal is verified; Windows/Vulkan
+appearance and headset performance need testing on those devices.

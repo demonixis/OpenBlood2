@@ -132,6 +132,7 @@ namespace
         // The server blocks a committed FIRE_KEY before its camera message is pumped.
         CHECK(p.HandleWeaponFireMessage({c.camera_position, {0, 0, 1}, 2, WEAP_BERETTA}) == FireResult::Blocked);
         CHECK(pump(g) && c.seeing_eye == h && c.eye_loop && c.view.object == h);
+        CHECK(c.player_look_allowed());
         CHECK(!c.weapons_visible && c.player_visible && p.camera_movement_blocked);
         const auto ammo = p.m_InventoryMgr.GetAmmoCount(AMMO_BULLET);
         c.weapon_input.primary = true;

@@ -183,6 +183,12 @@ class CBloodClientShell
     CPlayerDeathCamera death_camera;
     std::uint64_t death_notifications = 0;
     bool UpdateCameraSelection();
+    // Scripted/death cameras own the view. The Eye and Orb are player-aimed remote views.
+    bool player_look_allowed() const
+    {
+        return !death_camera.active && (!view.object || view.object == seeing_eye || view.object == orb_view);
+    }
+
     OpenBlood2::PlayerRotation rotation;
     OpenBlood2::PlayerPhysics physics;
     OpenBlood2::PlayerStats stats;

@@ -544,6 +544,8 @@ endforeach()
 if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME interaction.catalog COMMAND interaction_tests catalog "${BLOOD2_TEST_DATA_DIR}")
     set_tests_properties(interaction.catalog PROPERTIES LABELS "headless;private;interaction" TIMEOUT 90)
+    add_test(NAME interaction.city_laundry COMMAND interaction_tests city_laundry "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(interaction.city_laundry PROPERTIES LABELS "headless;private;interaction" TIMEOUT 60)
 endif()
 
 if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)

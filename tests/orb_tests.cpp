@@ -163,6 +163,7 @@ namespace
         auto h = p->m_hObject;
         CHECK(g.pump_player_messages(error) && c.orb_view == h && c.view.object == h &&
               player->camera_movement_blocked);
+        CHECK(c.player_look_allowed());
         CHECK(c.player_visible && !c.weapons_visible && std::abs(c.ViewFovX() - original_fov_normal * 1.5f) < .001f);
         CHECK(g.server_shell.OnMessage(g.local_client, PlayerRotation{.2f, .7f}));
         CHECK(g.objects.advance(.002) && player->orb_object == h);

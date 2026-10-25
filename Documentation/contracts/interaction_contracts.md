@@ -114,7 +114,12 @@ contact blocks the entire request.
 
 Each proposed body path is checked against primary geometry and other old scene
 positions; staged body positions are also checked against each other. Other
-world models remain immovable, using conservative bounds. GOTHRUWORLD lets the
+world models remain immovable, using conservative bounds, except for a pair of
+kinematic brushes that both carry GOTHRUWORLD. Such brushes do not block each
+other's rotation envelope (CityHub's adjacent laundromat leaves); free debris,
+ordinary bodies and fixed brushes without the flag remain checked. This follows
+the world-bypass intent of the original door flags; it is not a general mesh-pair
+collision solver. GOTHRUWORLD lets the
 door enter its wall pocket. No chain pushing, crushing damage, mass/impulse
 solver or retail blocking priorities are claimed. Conservative envelopes can
 push slightly early or reject otherwise feasible moves.

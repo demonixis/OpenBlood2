@@ -1,5 +1,13 @@
 # Blood2 Project Instructions
 
+The [2026-10-25 tester corrections](Documentation/implementation/reports/tester_feedback_2026_10_25.md)
+allow mutually GOTHRUWORLD kinematic brushes to rotate past one another while
+preserving other rotation blockers, suppress scripted/death-camera player look
+(except player-aimed Eye/Orb), label disabled control rows NOT IMPLEMENTED, and
+use trilinear 8x anisotropic filtering for repeat scene textures. Clamped sprite/FX
+and UI sampling stay unchanged. The [class inventory](Documentation/contracts/class_coverage.md)
+is not a diagnosis of the unreproduced Museum crash.
+
 ## Commit attribution
 
 Commits and pull requests carry only the user's identity (demonixis). Never add

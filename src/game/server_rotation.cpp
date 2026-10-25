@@ -78,6 +78,12 @@ namespace OpenBlood2
                 auto* body = objects_.get(id);
                 if (!body || body->life != Life::Alive || body == mover || !(body->state.m_Flags & FLAG_SOLID))
                     continue;
+                // Authored doors carry GOTHRUWORLD: adjacent kinematic leaves may
+                // cross each other's brush envelope while turning at a shared seam.
+                // Keep normal bodies, fixed brushes and free debris in the solver.
+                if (body->world_model && !body->world_body && !mover->world_body &&
+                    (mover->state.m_Flags & FLAG_GOTHRUWORLD) && (body->state.m_Flags & FLAG_GOTHRUWORLD))
+                    continue;
                 MovementState support;
                 const bool rider = !body->world_model && !(body->state.m_Flags & FLAG_DONTFOLLOWSTANDING) &&
                                    GetMovementState(body->handle, support) && support.standing &&
