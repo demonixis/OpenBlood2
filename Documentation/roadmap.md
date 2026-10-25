@@ -1,6 +1,6 @@
 # Roadmap
 
-Reviewed on 2026-10-22 (M6); level-opening coverage reconciled with `9bfada1` and
+Reviewed on 2026-10-25 (beta VFX lot 1); level-opening coverage reconciled with `9bfada1` and
 [audit 19](implementation/reports/evidence/all-levels-audit-19.log), save/load with lot 14.
 Percentages are task estimates, not acceptance. Only the user accepts a milestone.
 
@@ -26,8 +26,11 @@ worlds also passed the inspector-free Release GPU opening sweep. This does not
 accept M3 or provide network play.
 
 The [2026-10-25 tester corrections](implementation/reports/tester_feedback_2026_10_25.md)
-cover CityHub's laundromat doors, cutscene look, unbound-control labeling and texture
-filtering. Museum's reported crash remains unreproduced; the
+cover CityHub's laundromat doors, cutscene look and texture
+filtering. The [additional controls](implementation/reports/control_actions.md) now implement
+all nine previously disabled action rows. The [destruction-debris lot](contracts/destruction_debris_contracts.md)
+connects original wood, metal and glass fragments, their motion and impact sounds.
+Museum's reported crash remains unreproduced; the
 [class coverage inventory](contracts/class_coverage.md) distinguishes absent ports
 from replacement services. This does not expand milestone acceptance.
 
@@ -79,7 +82,7 @@ progress, and every one is recorded.
 | 3.4 | Campaign chaining: every authored NEW_LEVEL/EndEpisode in order, with KeepAlive inventory and stats | SubwayA → CityHub has a scripted test. The user has played the rest without a recorded result. |
 | 3.5 | Bosses and endgame: Gideon, EnhancedGideon, UndeadGideon, AncientOne, End script, credits | Original-source ports, focused behavior tests and world opening pass; a complete player-driven endgame remains unverified. |
 | 3.6 | Beta build: CI archives for the three platforms, logs and crash capture, a bug report channel | CI archives, logs and crash capture exist. |
-| 3.7 | Beta bug triage and fixes, each fix with a regression test; retest the existing reports (post-transition stutter, idle Cultists, frozen corpses, NPC placement) | Waits on 3.6. |
+| 3.7 | Beta bug triage and fixes, each fix with a regression test; retest the existing reports (post-transition stutter, idle Cultists, frozen corpses, NPC placement) | In progress: Discord tester fixes, all nine control actions, and destruction VFX lot 1 (wood/metal/glass) implemented. Museum crash remains unreproduced; full campaign retest remains. |
 | 3.8 | M3 acceptance record for the user's decision | Not started. |
 
 ## M4 — original rendering
@@ -89,6 +92,18 @@ briefly on Windows. D3D12/DXIL is dropped. The work left is broader Windows
 testing, plus any gaps the beta finds. Known gaps include underwater fog,
 global translucent ordering and realtime light illumination. The original
 renderer remains the reference and stays selectable after M5.
+
+### Original VFX completion (beta feedback, M3.7 / M4)
+
+| Lot | Scope | Status |
+| --- | --- | --- |
+| 1 | Wood, metal and glass destruction fragments: original resources, launch, scale, transparency, bounce sounds and eviction/fade | Implemented; [contract and verification](contracts/destruction_debris_contracts.md). Applies to CDebris callers on destructible models and brushes. Other materials and explosion components remain separate. |
+| 2 | Sawed-off shotgun (weapon 4): compare primary/alternate fire against the original, complete missing casing/muzzle/impact components | Next proposed lot; not started. |
+| 3 | Inventory of remaining weapon/environment VFX, separating missing implementation, partial effects and absent original resources | Pending. |
+
+These lots restore original presentation. They do not reopen M2 or replace M3's
+player-driven campaign/endgame acceptance. The reported Museum crash takes priority
+when a reproducible route, save or log becomes available.
 
 ## M5 — optional PBR
 

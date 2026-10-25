@@ -29,6 +29,14 @@ namespace OpenBlood2
                            fx.model_path, game.resources, error))
                 return false;
         }
+        for (const auto& fx : game.server.destruction_debris.active)
+        {
+            if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale, true, false, {},
+                           fx.model_path, game.resources, error, {}, fx.alpha, true))
+                return false;
+            if (fx.alpha < 1)
+                scene.mark_translucent(scene.entries.size() - 1);
+        }
         for (const auto& fx : game.server.laser_beams.active)
         {
             if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale, fx.updates != 0,

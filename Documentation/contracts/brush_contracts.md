@@ -1,5 +1,9 @@
 # Rotating and destructible world-model brushes
 
+> [Destruction VFX lot 1](destruction_debris_contracts.md) now renders the CDebris wood,
+> metal and glass requests with original launch/scale/alpha, motion and impact sounds.
+> Earlier generic-debris omissions remain historical for this subset only.
+
 > [World-model debris](world_debris_contracts.md) now connects the selected original
 > fragment activation/lifecycle with bounded replacement motion. Earlier blanket
 > WorldModelDebris omissions below are historical; full retail physics remains open.

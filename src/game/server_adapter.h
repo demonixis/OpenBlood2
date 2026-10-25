@@ -142,7 +142,8 @@ namespace OpenBlood2
         ExplosionRings explosion_rings;
         ExplosionFlames explosion_flames;
         std::uint64_t PublishExplosionFlames(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
-        FleshGibs flesh_gibs;
+        FleshGibs flesh_gibs, destruction_debris;
+        int debris_detail = 2;
         std::uint64_t PublishFleshGibs(HOBJECT, DVector, DVector, DVector, float, unsigned, std::string&) override;
         ExplosionFragments explosion_fragments;
         std::uint64_t PublishExplosionFragments(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
@@ -204,6 +205,7 @@ namespace OpenBlood2
             explosion_flames.clear();
             explosion_fragments.clear();
             flesh_gibs.clear();
+            destruction_debris.clear();
             spawn_reports.clear();
             pickup_reports.clear();
             camera_effects.clear();
@@ -377,8 +379,8 @@ namespace OpenBlood2
         bool restore_image_state(SaveStoreSlot, bool restore_time, std::string& error);
         static bool save_store_slot(std::string_view file, SaveStoreSlot&);
         SaveClock save_clock() const;
-        SaveStore save_store;                // Survives world unload; never cleared by reset_world_time.
-        SaveObjectsReport last_save;          // Owned inspection values of the latest call.
+        SaveStore save_store;        // Survives world unload; never cleared by reset_world_time.
+        SaveObjectsReport last_save; // Owned inspection values of the latest call.
         RestoreObjectsReport last_restore;
         std::uint64_t saves = 0, restores = 0; // Successful calls, adapter lifetime.
         HMESSAGEWRITE StartMessageToObject(LPBASECLASS, HOBJECT, DDWORD) override;
@@ -428,9 +430,9 @@ namespace OpenBlood2
             std::vector<std::uint8_t> bytes;
             std::size_t cursor = 0;
             bool bad = false, routed = false, borrowed = false;
-            bool reader = false;              // Owned nested reader; released only by EndHMessageRead.
-            std::deque<std::string> strings;  // ReadFromMessageString results, stable until release.
-            std::string failure;              // First latched failure.
+            bool reader = false;             // Owned nested reader; released only by EndHMessageRead.
+            std::deque<std::string> strings; // ReadFromMessageString results, stable until release.
+            std::string failure;             // First latched failure.
             HOBJECT sender = nullptr, receiver = nullptr;
             DDWORD id = 0;
             std::optional<float> immobilize;
@@ -448,7 +450,7 @@ namespace OpenBlood2
         std::vector<std::unique_ptr<ClientHandle>> client_tokens_;
         std::unordered_map<HCLIENT, Client> clients_;
         std::map<std::string, ::ConsoleVariable, CaseLess> variables_{{"GAME_DIFFICULTY", {"1"}},
-                                                                    {"GAME_GAMETYPE", {"0"}}};
+                                                                      {"GAME_GAMETYPE", {"0"}}};
         void initialize_model_services();
         void initialize_physics_services();
         CollisionQuery sweep_scene(HOBJECT, DVector, DVector, DVector, CollisionHit&, const std::vector<ObjectId>&,

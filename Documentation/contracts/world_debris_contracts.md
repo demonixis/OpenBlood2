@@ -1,5 +1,9 @@
 # Original world-model debris
 
+> [Destruction VFX lot 1](destruction_debris_contracts.md) now renders the CDebris wood,
+> metal and glass requests with original launch/scale/alpha, motion and impact sounds.
+> Earlier generic-debris omissions remain historical for this subset only.
+
 This extends [brush destruction](brush_contracts.md), [box motion](pushable_contracts.md)
 and [rotation](interaction_contracts.md). Read the [source ledger](../implementation/sources/m2_world_debris_sources.json)
 and [implementation evidence](../implementation/reports/m2_world_debris.md).

@@ -49,6 +49,8 @@ namespace OpenBlood2
         float scale = 1;
         DBYTE amount = 10;
         std::string model, texture, sound;
+        std::uint64_t event = 0;
+        std::string error;
     };
     struct ExplosionEffect
     {

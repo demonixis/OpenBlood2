@@ -2049,3 +2049,11 @@ single-player message echo. SDL text ownership, typed dispatch, HUD text and pre
 persistence are portable replacements. Fresh-press TurnAround/Message and local-only
 text behavior are explicit departures in the [contract](../contracts/input_action_contracts.md#additional-original-controls-2026-10-25).
 See the [source ledger](sources/control_actions_sources.json) and [validation](reports/control_actions.md).
+
+## Destruction VFX lot 1 (2026-10-25)
+
+CDebris wood/metal/glass requests now execute the corresponding original CGibFX recipe,
+SFXMgr detail-count rule and oldest-slot terminating fade. Shared existing client physics
+and model rendering are reused; the destruction pool is isolated from flesh/blood effects.
+See the [source ledger](sources/destruction_debris_sources.json),
+[contract](../contracts/destruction_debris_contracts.md) and [report](reports/destruction_debris.md).

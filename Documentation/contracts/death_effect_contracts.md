@@ -1,5 +1,9 @@
 # Original burning deaths and dismemberment
 
+> [Destruction VFX lot 1](destruction_debris_contracts.md) now renders the CDebris wood,
+> metal and glass requests with original launch/scale/alpha, motion and impact sounds.
+> Earlier generic-debris omissions remain historical for this subset only.
+
 Selected original AI_Mgr, CCorpse, AI_Shared, CGib, CGibFX and ObjectFX paths now
 execute with typed objects, owned audio, visible models/particles and inspection.
 See [source hashes](../implementation/sources/m2_death_effects_sources.json) and

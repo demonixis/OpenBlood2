@@ -3312,7 +3312,7 @@ namespace OpenBlood2
                 {
                     ImGui::TextWrapped("%s: %s (%s)", label, path.c_str(),
                                        path.empty()                ? "not authored"
-                                       : game.resources.find(path) ? "indexed, not loaded"
+                                       : game.resources.find(path) ? "indexed"
                                                                    : "MISSING");
                 };
                 resource("Model", b->debris.model);
@@ -3357,7 +3357,7 @@ namespace OpenBlood2
                 ImGui::PopID();
             }
         }
-        if (ImGui::TreeNode("Debris FX requests (latest 64; not rendered)"))
+        if (ImGui::TreeNode("Destruction debris (wood, metal, glass; latest 64 requests)"))
         {
             for (const auto& event : game.server.debris_effects)
             {
@@ -3365,10 +3365,40 @@ namespace OpenBlood2
                             unsigned(event.amount), event.scale);
                 ImGui::Text("Velocity %.1f %.1f %.1f | dims %.1f %.1f %.1f", event.velocity.x, event.velocity.y,
                             event.velocity.z, event.dimensions.x, event.dimensions.y, event.dimensions.z);
+                ImGui::Text("Client event %llu", static_cast<unsigned long long>(event.event));
+                if (!event.error.empty())
+                    ImGui::TextWrapped("%s", event.error.c_str());
                 for (const auto* path : {&event.model, &event.texture, &event.sound})
                     if (!path->empty())
                         ImGui::TextWrapped("%s (%s)", path->c_str(),
-                                           game.resources.find(*path) ? "indexed, not loaded" : "MISSING");
+                                           game.resources.find(*path) ? "indexed" : "MISSING");
+            }
+            ImGui::TreePop();
+        }
+        if (ImGui::TreeNode("Live destruction fragments"))
+        {
+            const auto& debris = game.server.destruction_debris;
+            ImGui::Text("%zu models (80 live + 50 fading maximum)", debris.active.size());
+            for (const auto& fragment : debris.active)
+            {
+                ImGui::PushID(static_cast<int>(fragment.id));
+                if (ImGui::TreeNode("fragment", "%llu: %s", static_cast<unsigned long long>(fragment.id),
+                                    fragment.model_path.c_str()))
+                {
+                    ImGui::Text("Position %.1f %.1f %.1f | velocity %.1f %.1f %.1f", fragment.position.x,
+                                fragment.position.y, fragment.position.z, fragment.velocity.x, fragment.velocity.y,
+                                fragment.velocity.z);
+                    ImGui::Text("Alpha %.3f | rest %s | fade %u | impacts %llu", fragment.alpha,
+                                fragment.resting ? "yes" : "no", fragment.fade_updates,
+                                static_cast<unsigned long long>(fragment.impacts));
+                    ImGui::TextWrapped("Skin %s | sound %s", fragment.skin_path.c_str(), fragment.sound_path.c_str());
+                    if (!fragment.error.empty())
+                        ImGui::TextWrapped("Motion: %s", fragment.error.c_str());
+                    if (!fragment.sound_error.empty())
+                        ImGui::TextWrapped("Audio: %s", fragment.sound_error.c_str());
+                    ImGui::TreePop();
+                }
+                ImGui::PopID();
             }
             ImGui::TreePop();
         }

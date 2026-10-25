@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-25",
+  "scope": "CDebris wood, metal and glass visual continuation; external commercial model/texture/audio assets remain external.",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Debris.cpp",
+      "source_sha256": "cccf3b6458c84e39ec8b12b7b0bb5708b3f0ba08ba9fdf0fde8c87a7a9de6ca8",
+      "purpose": "Material emission order, mutable launch direction, amount and custom strings; existing port kept unchanged."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/GibFX.cpp",
+      "source_sha256": "c3e2752fccb49960c8ffaf2c1d4e58672214e66e1b1253fd2f2212b95329962a",
+      "purpose": "Init/CreateObject/Update: wood/metal/glass recipes, scale and alpha, bounce sound and 150-update fade."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/GibFX.h",
+      "source_sha256": "ed1455a091a7a253dee7f11072fa3376c1e4733df50f39b33b753f9c97bcc563",
+      "purpose": "Type/size/custom flags and initial state."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/client_physics.cpp",
+      "source_sha256": "90a859cc5f384ce5e146d7fadaf95c56332d931c7adb89340dae6aadc3956825",
+      "purpose": "InitMovingObject reset, gravity/liquid sampling, endpoint integration and bounce damping (existing shared implementation)."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/SFXMgr.cpp",
+      "source_sha256": "fac5fa907b3ec5b547b798c46dd3d3d5371486104f91245b65d363b6653a1e74",
+      "purpose": "SFX_GIB_ID LOW count halving; only flesh doubles at HIGH; dynamic slot 5 capacity 80 and terminating list routing."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/SpecialFXList.cpp",
+      "source_sha256": "4be9cd8850704d4fe6afdffbd300de7af0f08a8b694f0b167e1baf79946eb02c",
+      "purpose": "Oldest-slot replacement and bounded ownership."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/SpecialFX.h",
+      "source_sha256": "9dbbf6f73a3b2ad566e94718be6e8466254600df9d62b4dba7c140ffe65b2010",
+      "purpose": "Default update delta 0.001 seconds."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/SFXMgr.h",
+      "source_sha256": "cd9e08425af324a5d6f22b53064ee251e7ac423095e3183e60f3aa3265b4554d",
+      "purpose": "Terminating list capacity STATIC_LIST_SIZE 50."
+    },
+    {
+      "source": "sources/lithtech/Blood2/Shared/SharedDefs.h",
+      "source_sha256": "24c3d2752c18bf884afa0f376a129e68d0885b13da93410253e69db46d549423",
+      "purpose": "Patched retail B2_LITE NRES(x)=3."
+    }
+  ],
+  "adaptations": [
+    "Reuse shared portable client-gib integration with independent destruction RNG and model pool.",
+    "80 live and 50 terminating slots are isolated from flesh/blood effects, rather than one shared cross-effect original list.",
+    "Finite input/resource validation; incomplete custom paths refuse explicitly. Failed cosmetics remain inspectable without stopping gameplay.",
+    "Existing finite primary-world segment collision and no outside-world classification; no ordinary-object or moving-brush collisions.",
+    "No change to damage, original saved fields, dependency stack or shader artifacts."
+  ]
+}

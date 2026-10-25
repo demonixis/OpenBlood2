@@ -1,5 +1,9 @@
 # Original destructible models
 
+> [Destruction VFX lot 1](destruction_debris_contracts.md) now renders the CDebris wood,
+> metal and glass requests with original launch/scale/alpha, motion and impact sounds.
+> Earlier generic-debris omissions remain historical for this subset only.
+
 > [Compound-shell validation and ground queries](compound_shell_contracts.md) preserve polygon gaps and offset authored-box bounds during initial ground placement. Original model rules remain unchanged.
 
 `CDestructableModel` is a selective direct port of original

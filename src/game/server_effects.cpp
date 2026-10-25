@@ -247,13 +247,20 @@ namespace OpenBlood2
     }
     void ServerAdapter::RecordDebrisEffect(const DebrisEffect& effect)
     {
-        trace_service("RecordDebrisEffect");
+        if (!trace_service("RecordDebrisEffect"))
+            return;
         if (!physics_vector(effect.position) || !physics_vector(effect.velocity) ||
             !physics_vector(effect.dimensions) || !std::isfinite(effect.scale))
             return;
         if (debris_effects.size() == 64)
             debris_effects.erase(debris_effects.begin());
-        debris_effects.push_back(effect);
+        auto report = effect;
+        if (client_resources && objects_.models)
+            report.event = destruction_debris.publish_debris(effect, debris_detail, *this, *objects_.models,
+                                                             *client_resources, objects_.time(), report.error);
+        else
+            report.error = "Destruction debris resources unavailable";
+        debris_effects.push_back(std::move(report));
     }
     void ServerAdapter::RecordExplosionEffect(const ExplosionEffect& effect)
     {

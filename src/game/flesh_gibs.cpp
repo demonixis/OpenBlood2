@@ -1,6 +1,7 @@
-// Original ClientShellDLL/gibfx.cpp and client_physics.cpp, flesh-only selection.
+// Original ClientShellDLL/gibfx.cpp and client_physics.cpp, flesh and selected destruction materials.
 #include "game/flesh_gibs.h"
 #include "engine/collision.h"
+#include "engine/texture.h"
 #include "game/legacy/server_de.h"
 #include "game/original/BloodSplatFX.h"
 #include "game/original/ParticleExplosionFX.h"
@@ -25,29 +26,57 @@ namespace OpenBlood2
                                      ServerDE& server, ModelStore& models, const Resources& resources, double now,
                                      std::string& error)
     {
+        return publish_impl(owner, pos, dir, dims, scale, count, server, models, resources, now, error);
+    }
+    std::uint64_t FleshGibs::publish_debris(const DebrisEffect& effect, int detail, ServerDE& server,
+                                            ModelStore& models, const Resources& resources, double now,
+                                            std::string& error)
+    {
+        return publish_impl(nullptr, effect.position, effect.velocity, effect.dimensions, effect.scale,
+                            detail == 0 ? effect.amount / 2 : effect.amount, server, models, resources, now, error,
+                            &effect);
+    }
+    std::uint64_t FleshGibs::publish_impl(HOBJECT owner, DVector pos, DVector dir, DVector dims, float scale,
+                                          unsigned count, ServerDE& server, ModelStore& models,
+                                          const Resources& resources, double now, std::string& error,
+                                          const DebrisEffect* debris)
+    {
         error.clear();
+        const unsigned surface = debris ? (debris->flags & 0xff) * 10 : 100;
+        const bool custom = debris && (debris->flags & 0x4000);
         FleshGibReport report;
-        if (const auto* name = server.GetObjectName(owner))
+        if (debris)
+            report.source = debris->source;
+        else if (const auto* name = server.GetObjectName(owner))
             report.source = name;
         report.position = pos;
         report.velocity = dir;
         report.dimensions = dims;
         report.scale = scale;
-        report.requested = count;
-        if (!server.IsObjectAlive(owner) || !physics_vector(pos) || !physics_vector(dir) || !physics_vector(dims) ||
-            dims.x < 0 || dims.y < 0 || dims.z < 0 || !std::isfinite(scale) || scale <= 0 || scale > 100 ||
-            count > 64 || active.size() + count * 2 > 256 || !std::isfinite(now) || now < 0)
-            error = "Invalid flesh-gib request or capacity exhausted";
+        report.requested = debris ? debris->amount : count;
+        if ((!debris && !server.IsObjectAlive(owner)) || !physics_vector(pos) || !physics_vector(dir) ||
+            !physics_vector(dims) || dims.x < 0 || dims.y < 0 || dims.z < 0 || !std::isfinite(scale) || scale <= 0 ||
+            scale > 100 || (!debris && (count > 64 || active.size() + count * 2 > 256)) || count > 255 ||
+            !std::isfinite(now) || now < 0 || report.source.size() > 100)
+            error = "Invalid client-gib request or capacity exhausted";
+        else if (debris && surface != 20 && surface != 30 && surface != 50)
+            error = "Destruction debris material not implemented: " + std::to_string(surface);
+        else if (custom && (debris->model.empty() || debris->texture.empty() || debris->model.size() > 100 ||
+                            debris->texture.size() > 100 || debris->sound.size() > 100))
+            error = "Custom destruction debris requires bounded model and skin paths";
         else
         {
             // Selected high detail: the source's (DBYTE)1.5 is exactly one.
-            if (integer(random_, 0, 99) < 20)
+            if (!debris && integer(random_, 0, 99) < 20)
                 count *= 2;
             report.id = next_event_++;
             report.adjusted = count;
             for (unsigned i = 0; i < count; ++i)
             {
                 FleshGib g;
+                g.blood = !debris;
+                g.surface = surface;
+                g.alpha = surface == 50 ? .4f : 1.f;
                 g.position = pos;
                 g.last_time = now;
                 const auto half = vector_scale(dims, .8f);
@@ -56,7 +85,7 @@ namespace OpenBlood2
                 if (half.z)
                     g.position.z += draw(random_, -half.z, half.z);
                 if (half.y)
-                    g.position.y += draw(random_, -half.y / 2, half.y);
+                    g.position.y += draw(random_, surface == 50 ? -half.y : -half.y / 2, half.y);
                 const float speed = std::sqrt(vector_dot(dir, dir));
                 auto forward =
                     speed > 0 ? vector_scale(dir, 1 / speed) : DVector{0, 1, 0}; // finite zero-speed adaptation
@@ -69,20 +98,48 @@ namespace OpenBlood2
                 auto right = rotate_vector(basis, {1, 0, 0}), up = rotate_vector(basis, {0, 1, 0});
                 g.angular_velocity = {draw(random_, -2 * std::numbers::pi_v<float>, 2 * std::numbers::pi_v<float>),
                                       draw(random_, -2 * std::numbers::pi_v<float>, 2 * std::numbers::pi_v<float>), 0};
-                // B2_LITE NRES limits model and sound choices to 1..3.
-                const int model = integer(random_, 1, 3);
-                g.bounces = integer(random_, 0, 4) == 4 ? 1 : 0;
-                const int sound = integer(random_, 1, 3);
-                g.model_path = "models/gibs/flesh/gib" + std::to_string(model) + ".abc";
-                g.skin_path = "skins/gibs/flesh/gib" + std::to_string(model) + ".dtx";
-                g.sound_path = "sounds/gibs/flesh/gib_impact" + std::to_string(sound) + ".wav";
-                g.scale = {draw(random_, .8f, 1.35f) * scale, draw(random_, .8f, 1.35f) * scale,
-                           draw(random_, .8f, 1.35f) * scale};
+                if (custom)
+                {
+                    // Original custom branch skips both scale randomization and the authored multiplier.
+                    g.model_path = debris->model;
+                    g.skin_path = debris->texture;
+                    g.sound_path = debris->sound;
+                    g.bounces = 1;
+                }
+                else
+                {
+                    // B2_LITE NRES limits model and sound choices to 1..3 for every material.
+                    const int model = integer(random_, 1, 3);
+                    g.bounces = debris ? 1 : (integer(random_, 0, 4) == 4 ? 1 : 0);
+                    const int sound = integer(random_, 1, 3);
+                    const std::string material = surface == 50   ? "glass"
+                                                 : surface == 30 ? "wood"
+                                                 : surface == 20 ? "metal"
+                                                                 : "flesh";
+                    g.model_path = "models/gibs/" + material + "/gib" + std::to_string(model) + ".abc";
+                    g.skin_path = "skins/gibs/" + material + "/gib" + std::to_string(model) + ".dtx";
+                    g.sound_path = "sounds/gibs/" + material + "/gib_impact" + std::to_string(sound) + ".wav";
+                    if (!debris || surface == 50)
+                        g.scale = {draw(random_, debris ? .5f : .8f, debris ? 1.25f : 1.35f) * scale,
+                                   draw(random_, debris ? .5f : .8f, debris ? 1.25f : 1.35f) * scale,
+                                   draw(random_, debris ? .5f : .8f, debris ? 1.25f : 1.35f) * scale};
+                    else
+                        g.scale = {scale, scale, scale};
+                }
                 if (!models.load(g.model_path, g.model, error) || !resources.find(g.skin_path))
                 {
                     if (error.empty())
-                        error = "Flesh-gib skin not indexed";
+                        error = "Client-gib skin not indexed: " + g.skin_path;
                     break;
+                }
+                if (debris)
+                {
+                    Texture image;
+                    if (!read_texture_resource(resources, g.skin_path, image, error))
+                    {
+                        error = g.skin_path + ": " + error;
+                        break;
+                    }
                 }
                 if (std::abs(forward.y) >= .95f)
                 {
@@ -103,8 +160,8 @@ namespace OpenBlood2
                     up = {0, 1, 0};
                 }
                 const auto lo = vector_scale(vector_add(right, up), -speed);
-                const auto hi =
-                    vector_add(vector_scale(forward, 4 * speed), vector_scale(vector_add(right, up), speed));
+                const auto hi = vector_add(vector_scale(forward, (surface == 50 ? 2 : 4) * speed),
+                                           vector_scale(vector_add(right, up), speed));
                 g.velocity = {draw(random_, lo.x, hi.x), draw(random_, lo.y, hi.y), draw(random_, lo.z, hi.z)};
                 ContainerCode code = CC_NOTHING;
                 if (!server.GetPointContainerCode(g.position, code))
@@ -113,12 +170,28 @@ namespace OpenBlood2
                     break;
                 }
                 g.liquid = IsLiquid(code);
-                BloodSpurtSettings spurt;
-                spurt.position = g.position;
-                spurt.min_velocity = spurt.max_velocity = vector_scale(g.velocity, .6f);
-                spurt.texture = integer(random_, 1, 3);
-                g.spurt_event = server.PublishClientBloodSpurt(spurt, "flesh fragment launch", true, g.spurt_error);
+                if (g.blood)
+                {
+                    BloodSpurtSettings spurt;
+                    spurt.position = g.position;
+                    spurt.min_velocity = spurt.max_velocity = vector_scale(g.velocity, .6f);
+                    spurt.texture = integer(random_, 1, 3);
+                    g.spurt_event = server.PublishClientBloodSpurt(spurt, "flesh fragment launch", true, g.spurt_error);
+                }
                 g.id = next_id_++;
+                if (debris)
+                {
+                    // Original oldest-slot replacement and 150-update terminating fade.
+                    if (std::count_if(active.begin(), active.end(), [](const auto& f) { return !f.fading; }) >= 80)
+                    {
+                        auto oldest =
+                            std::find_if(active.begin(), active.end(), [](const auto& f) { return !f.fading; });
+                        oldest->fading = true;
+                    }
+                    if (std::count_if(active.begin(), active.end(), [](const auto& f) { return f.fading; }) > 50)
+                        active.erase(
+                            std::find_if(active.begin(), active.end(), [](const auto& f) { return f.fading; }));
+                }
                 active.push_back(std::move(g));
                 ++report.created;
             }
@@ -147,7 +220,14 @@ namespace OpenBlood2
                 ok = false;
                 continue;
             }
+            if (!g.blood && dt < .001)
+                continue;
             g.last_time = now;
+            if (g.fading)
+            {
+                g.alpha = 1.f - float(g.fade_updates++) / 150.f;
+                continue;
+            }
             std::vector<std::uint32_t> keys;
             if (!advance_animation(*g.model, g.animation, dt, keys, g.error))
             {
@@ -163,9 +243,8 @@ namespace OpenBlood2
             g.velocity.y -= float(dt) * (g.liquid ? 250.f : 500.f);
             SegmentHit hit;
             const auto delta = vector_subtract(next, g.position);
-            const auto result = vector_dot(delta, delta) < 1e-12f
-                                    ? SegmentResult::Miss
-                                    : server.IntersectWorldSegment(g.position, next, hit);
+            const auto result = vector_dot(delta, delta) < 1e-12f ? SegmentResult::Miss
+                                                                  : server.IntersectWorldSegment(g.position, next, hit);
             if (result != SegmentResult::Hit && result != SegmentResult::Miss)
             {
                 g.error = "Flesh-gib world collision unavailable";
@@ -196,17 +275,21 @@ namespace OpenBlood2
                 request.outer_radius = 750;
                 request.inner_radius = 75;
                 std::string sound_error;
-                server.PlayClientSound(request, next, sound_error);
+                if (!g.sound_path.empty())
+                    server.PlayClientSound(request, next, sound_error);
                 g.sound_error = sound_error;
-                BloodSplatSettings splat;
-                splat.resource = "sprites/blood" + std::to_string(integer(random_, 1, 3)) + ".spr";
-                splat.position = next;
-                splat.scale = .14f + draw(random_, -.1f, .1f);
-                splat.grow_scale = hit.normal.y >= .5f ? .01f : 0;
-                if (align_rotation(hit.normal, hit.normal, splat.rotation))
-                    g.splat_event = server.PublishClientBloodSplat(splat, "flesh fragment impact", g.splat_error);
-                else
-                    g.splat_error = "Invalid flesh-fragment impact normal";
+                if (g.blood)
+                {
+                    BloodSplatSettings splat;
+                    splat.resource = "sprites/blood" + std::to_string(integer(random_, 1, 3)) + ".spr";
+                    splat.position = next;
+                    splat.scale = .14f + draw(random_, -.1f, .1f);
+                    splat.grow_scale = hit.normal.y >= .5f ? .01f : 0;
+                    if (align_rotation(hit.normal, hit.normal, splat.rotation))
+                        g.splat_event = server.PublishClientBloodSplat(splat, "flesh fragment impact", g.splat_error);
+                    else
+                        g.splat_error = "Invalid flesh-fragment impact normal";
+                }
                 g.angular_velocity = {draw(random_, -2 * std::numbers::pi_v<float>, 2 * std::numbers::pi_v<float>),
                                       draw(random_, -2 * std::numbers::pi_v<float>, 2 * std::numbers::pi_v<float>), 0};
             }
@@ -223,6 +306,7 @@ namespace OpenBlood2
             }
             g.position = next;
         }
+        std::erase_if(active, [](const auto& g) { return g.fading && g.fade_updates > 150; });
         if (!ok)
             update_error = "Flesh-gib update failed; inspect individual fragment";
         return ok;

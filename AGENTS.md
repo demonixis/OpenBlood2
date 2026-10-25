@@ -15,6 +15,14 @@ weapon drops, VoiceMgr taunt cooldown and local-only bounded Message editor. Pre
 version 11 persists auto-run/mouse-look/crosshair choices. SDL text entry owns and releases
 play input; scripted/death cameras still suppress turning. No network chat is implemented.
 
+The [destruction VFX lot 1](Documentation/contracts/destruction_debris_contracts.md)
+connects CDebris wood/metal/glass to independent client fragments. Preserve material-order
+velocity negation, LOW half-count, glass's reduced forward launch/0.4 alpha/random scale,
+uniform wood/metal scale, custom scale 1, B2_LITE variants, no blood, collision/impact
+sounds and oldest-slot 150-update fade (80 live + 50 terminating, separate from flesh).
+Cosmetic failures stay visible without failing play; unload/load clears the client pool.
+Other materials/weapon FX remain separate. No new saved classes or M2 acceptance changes.
+
 ## Commit attribution
 
 Commits and pull requests carry only the user's identity (demonixis). Never add
