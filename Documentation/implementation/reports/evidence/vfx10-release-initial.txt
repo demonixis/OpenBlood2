@@ -1,0 +1,89 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/release
+      Start  793: sprite_view.geometry
+ 1/27 Test  #793: sprite_view.geometry .............   Passed    0.41 sec
+      Start  794: sprite_view.failures
+ 2/27 Test  #794: sprite_view.failures .............   Passed    0.01 sec
+      Start  795: sprite_view.subway
+ 3/27 Test  #795: sprite_view.subway ...............   Passed    0.12 sec
+      Start  798: explosion_sprites.formulas
+ 4/27 Test  #798: explosion_sprites.formulas .......***Failed    0.21 sec
+formulas:86: parts.size() == (type == 8 ? 1u : 2u) && !missing.empty()
+
+      Start  799: explosion_sprites.failures
+ 5/27 Test  #799: explosion_sprites.failures .......   Passed    0.01 sec
+      Start  800: explosion_sprites.session
+ 6/27 Test  #800: explosion_sprites.session ........   Passed    0.01 sec
+      Start  801: explosion_sprites.private
+ 7/27 Test  #801: explosion_sprites.private ........   Passed    0.12 sec
+      Start  879: gpu.world_alpha
+ 8/27 Test  #879: gpu.world_alpha ..................***Failed    0.79 sec
+cycle=0 pixel=120,80 got=3,126,126
+127: ok  
+
+      Start  880: gpu.world_alpha_private
+ 9/27 Test  #880: gpu.world_alpha_private ..........***Failed    0.22 sec
+cycle=0 pixel=120,80 got=3,126,126
+127: ok  
+
+      Start 1044: world_shaders.formats
+10/27 Test #1044: world_shaders.formats ............   Passed    0.18 sec
+      Start 1103: gpu.model_shadows
+11/27 Test #1103: gpu.model_shadows ................   Passed    0.90 sec
+      Start 1104: gpu.surface
+12/27 Test #1104: gpu.surface ......................   Passed    1.50 sec
+      Start 1105: gpu.post
+13/27 Test #1105: gpu.post .........................   Passed    2.78 sec
+      Start 1108: gpu.flashlight
+14/27 Test #1108: gpu.flashlight ...................   Passed    0.53 sec
+      Start 1188: gpu.train_session
+15/27 Test #1188: gpu.train_session ................   Passed    4.36 sec
+      Start 1189: gpu.train_session_save
+16/27 Test #1189: gpu.train_session_save ...........   Passed    3.66 sec
+      Start 1527: shotgun_effects.recipes
+17/27 Test #1527: shotgun_effects.recipes ..........   Passed    0.22 sec
+      Start 1528: shotgun_effects.ballistics
+18/27 Test #1528: shotgun_effects.ballistics .......   Passed    0.01 sec
+      Start 1529: shotgun_effects.lifecycle
+19/27 Test #1529: shotgun_effects.lifecycle ........   Passed    0.02 sec
+      Start 1530: shotgun_effects.liquids
+20/27 Test #1530: shotgun_effects.liquids ..........   Passed    0.01 sec
+      Start 1531: shotgun_effects.failures
+21/27 Test #1531: shotgun_effects.failures .........   Passed    0.01 sec
+      Start 1532: shotgun_effects.clipping
+22/27 Test #1532: shotgun_effects.clipping .........   Passed    0.01 sec
+      Start 1533: shotgun_effects.retail
+23/27 Test #1533: shotgun_effects.retail ...........   Passed    0.80 sec
+      Start 1534: gpu.shotgun_effects
+24/27 Test #1534: gpu.shotgun_effects ..............   Passed    1.00 sec
+      Start 1537: gpu.energy_effects
+25/27 Test #1537: gpu.energy_effects ...............   Passed    0.47 sec
+      Start 1538: presentation_effects.state
+26/27 Test #1538: presentation_effects.state .......   Passed    0.22 sec
+      Start 1539: gpu.scene_effects
+27/27 Test #1539: gpu.scene_effects ................   Passed    0.37 sec
+
+89% tests passed, 3 tests failed out of 27
+
+Label Time Summary:
+effects              =   2.68 sec*proc (10 tests)
+explosion_sprites    =   0.35 sec*proc (4 tests)
+flashlight           =   0.53 sec*proc (1 test)
+gpu                  =  16.58 sec*proc (11 tests)
+headless             =   2.38 sec*proc (16 tests)
+private              =  15.92 sec*proc (11 tests)
+save                 =   3.66 sec*proc (1 test)
+shaders              =   0.18 sec*proc (1 test)
+sprite_view          =   0.54 sec*proc (3 tests)
+surface              =   4.28 sec*proc (2 tests)
+train_session        =   8.02 sec*proc (2 tests)
+weapons              =   0.47 sec*proc (1 test)
+world_lighting       =   0.90 sec*proc (1 test)
+world_view           =   1.18 sec*proc (3 tests)
+
+Total Test time (real) =  18.98 sec
+
+The following tests FAILED:
+	798 - explosion_sprites.formulas (Failed)               explosion_sprites headless
+	879 - gpu.world_alpha (Failed)                          gpu world_view
+	880 - gpu.world_alpha_private (Failed)                  gpu private world_view
+Errors while running CTest

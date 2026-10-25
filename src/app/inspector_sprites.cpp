@@ -33,7 +33,7 @@ namespace OpenBlood2
                 ImGui::Text("Bolt %llu | segments %zu | alpha %.3f", (unsigned long long)bolt.id, bolt.segments.size(),
                             bolt.alpha);
                 for (const auto& light : bolt.lights)
-                    ImGui::Text("Point light %.1f %.1f %.1f | radius %.1f (illumination unavailable)",
+                    ImGui::Text("Point light %.1f %.1f %.1f | radius %.1f (scene light candidate)",
                                 light.settings.position.x, light.settings.position.y, light.settings.position.z,
                                 light.radius);
             }

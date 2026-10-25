@@ -145,3 +145,7 @@ blood2_package_application(blood2_app)
 if(BUILD_TESTING)
     add_subdirectory(tests)
 endif()
+
+target_sources(blood2_game PRIVATE src/game/presentation_effects.cpp)
+
+target_sources(engine PRIVATE src/engine/mark_clip.cpp)

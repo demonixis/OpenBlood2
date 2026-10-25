@@ -72,6 +72,15 @@ Preserve material scale/bounce rules, B2_LITE resources, LOW half-count, HIGH fl
 Character blood effects and the separate bounded destruction pool stay unchanged.
 Rain/legacy emitters still require an evidenced live caller before promotion from P3.
 
+The [scene rendering VFX lot 10](Documentation/contracts/scene_effects_contracts.md)
+connects bounded dynamic FX lights, volume/world fog, a shared translucent queue and
+polygon-clipped ballistic marks. Preserve source light flags, the inspector's dropped/
+unsupported-light counts, no game RNG/server-record/save changes, view-model/sky isolation,
+per-eye ordering with sprite slice batching, checked convex clipping and original mark
+reuse. Fog lights, effect-light shadows and SkyFog remain explicit limits. Regenerate
+all 72 shader artifacts together; keep the no-effect reference frames and post-processing
+contracts green. The source mark-ray and stateless fog adaptations are documented.
+
 ## Commit attribution
 
 Commits and pull requests carry only the user's identity (demonixis). Never add

@@ -15,7 +15,7 @@ class CTeslaProjectile final : public CProjectile
     ~CTeslaProjectile() override;
     OpenBlood2::SoundId flight_sound = 0;
     OpenBlood2::SceneExplosionReport effect;
-    std::string light_error = "AddLight(100, .65, .65, 1) projectile light unavailable", sound_error;
+    std::string light_error, sound_error;
 
   protected:
     bool Update() override;

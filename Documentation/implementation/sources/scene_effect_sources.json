@@ -1,0 +1,45 @@
+{
+  "scope": "VFX lot 10; source light recipes, fog selection and mark clipping intent; renderer adaptations documented separately",
+  "files": [
+    {
+      "path": "ClientShellDLL/LightFX.cpp",
+      "sha256": "32bf8d056b37391f19422d0d8b7c443caf400eea1f7be01c476082fc3095ab10"
+    },
+    {
+      "path": "ClientShellDLL/ExplosionFX.cpp",
+      "sha256": "f96624581765705810ebe60a9c58ffa796ff5a751c6713d5219ddd139fc487c0"
+    },
+    {
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "36a810c80ce87eb2304716e9e1dbaae25304c02c542019b0858c9dc99f2d1006"
+    },
+    {
+      "path": "ClientShellDLL/MarkSFX.cpp",
+      "sha256": "9c2473dd5384dd999b6af9f49ff147aeb0e0158c9a9cc4534a0582a25c6172ce"
+    },
+    {
+      "path": "ClientShellDLL/WeaponFX.cpp",
+      "sha256": "4cd80dfbf5f400950854b45db3cd7907b9369e2cd8c31f90bd797b59b4b517b1"
+    },
+    {
+      "path": "ObjectDLL/GameProjectiles.cpp",
+      "sha256": "f0f732be5d373324ef2071690fc43317a908aad5d5bade18f59c9e9ccfbcb9fe"
+    },
+    {
+      "path": "ObjectDLL/Projectile.cpp",
+      "sha256": "27bfe497aa58e263e544c3aaf70b044de9d04190d80ee1d7b5c5aaf9f54190d7"
+    },
+    {
+      "path": "ObjectDLL/ClientLightFX.cpp",
+      "sha256": "4610ac78791d766785dbcfe4d8893ce74d5474e408f45606b2a4a2cbe095b2cb"
+    },
+    {
+      "path": "ObjectDLL/VolumeBrush.cpp",
+      "sha256": "442cc81f7cd87c69882cc42028e62ad67e359e995cb7e47f7c4a0d2cb06709bb"
+    },
+    {
+      "path": "AppHeaders/basetypes_de.h",
+      "sha256": "9447597d4d3d893572d0e74929352e9ffd742a7520aaf2d3f3c37ff4598fe4cb"
+    }
+  ]
+}

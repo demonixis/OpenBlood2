@@ -15,6 +15,7 @@ namespace OpenBlood2
         SurfaceType surface = SURFTYPE_UNKNOWN;
         bool eject = false, left = false;
         DBYTE ammo = AMMO_SHELL;
+        std::vector<DVector> clip_polygon; // Copied world-space BSP ring; no retained object handle.
     };
     struct ShotgunCasing
     {
@@ -48,6 +49,7 @@ namespace OpenBlood2
         double start = -1, last_time = 0;
         std::uint64_t id = 0;
         std::string resource;
+        std::vector<DVector> clip_polygon;
     };
     struct ShotgunSplash
     {

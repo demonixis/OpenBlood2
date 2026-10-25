@@ -15,6 +15,10 @@ cbuffer Light : register(b0, space3)
     float4 modelAmbient, modelColor;
     float4 modelSources[12];
     float4 sceneColor;
+    float4 effectInfo;
+    float4 effectPositions[16], effectColors[16];
+    float4 fogColor, fogEyeNear, fogForwardFar;
+
 };
 // Model shadows, pushed once per record. Per caster: tile (u0, v0, size, box top), footprint at
 // the top (min x, min z, 1/size x, 1/size z), (feet, bias, slope x, slope z): a point projects
@@ -41,6 +45,27 @@ struct Input
 // Fraction of the baked light removed by model shadows on an upward-facing receiver:
 // 2x2 coverage of tile texels whose caster surface lies above this point, faded with the
 // distance below the caster's feet. Only receivers (modulation.z > 0) evaluate it.
+// Client FX lights share the existing radial attenuation; zero count preserves the baseline.
+float3 effectLight(float3 p, float3 normal)
+{
+    float3 sum = float3(0.0,0.0,0.0);
+    for (uint i=0u;i<min(uint(effectInfo.x),16u);++i)
+    {
+        float3 delta = effectPositions[i].xyz-p;
+        if ((uint(effectColors[i].w)&64u)!=0u && dot(normal,delta)<=0.0) continue;
+        sum += effectColors[i].rgb * saturate(1.0-length(delta)/effectPositions[i].w);
+    }
+    return sum;
+}
+float fogAmount(float3 p)
+{
+    return fogColor.w > 0.0 ? saturate((dot(p-fogEyeNear.xyz,fogForwardFar.xyz)-fogEyeNear.w)/(fogForwardFar.w-fogEyeNear.w)) : 0.0;
+}
+float4 fogged(float4 color, float3 p)
+{
+    if (fogColor.w > 0.0) color.rgb = lerp(color.rgb,fogColor.rgb,fogAmount(p));
+    return color;
+}
 float shadowAmount(float3 p)
 {
     if (modulation.z <= 0.0 || shadowInfo.x < 1.0)
@@ -104,6 +129,7 @@ float3 illumination(Input input, float shadow)
                        ? max(0.0, 1.0 - distance(input.worldPosition, positionRadius.xyz) / positionRadius.w)
                        : 0.0;
     float3 dynamicLight = lightColor.xyz * radial;
+    if (effectInfo.x > 0.0) dynamicLight += effectLight(input.worldPosition,input.worldNormal);
     float3 baked = lightmap.SampleLevel(lightmapSampler, max(input.lightmapCoord, float2(0.0, 0.0)), 0.0).rgb;
     return input.lightmapCoord.x >= 0.0
                ? modulation.y * min(baked * (1.0 - shadow) + dynamicLight, float3(1.0, 1.0, 1.0))
@@ -131,6 +157,7 @@ Output main(Input input)
         discard;
     Output output;
     output.color = float4(texel.rgb * illumination(input, shadow) * sceneColor.rgb, texel.a * modulation.x);
+    output.color = fogged(output.color, input.worldPosition);
     output.glow = float4(0.0, 0.0, 0.0, output.color.a);
     output.depth = float4(input.position.z, 0.0, 0.0, 0.0);
 #ifdef REFLECTION_TARGETS
@@ -146,6 +173,6 @@ float4 main(Input input) : SV_Target0
     float4 texel = albedo.Sample(albedoSampler, input.texCoord);
     if (texel.a == 0.0)
         discard;
-    return float4(texel.rgb * illumination(input, shadow) * sceneColor.rgb, texel.a * modulation.x);
+    return fogged(float4(texel.rgb * illumination(input, shadow) * sceneColor.rgb, texel.a * modulation.x),input.worldPosition);
 }
 #endif

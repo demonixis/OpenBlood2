@@ -73,7 +73,9 @@ namespace OpenBlood2
                 error += message;
             }
         };
-        if (!physics_vector(s.source) || !physics_vector(s.destination) || !physics_vector(s.forward) ||
+        if (s.clip_polygon.size() > 512 ||
+            std::any_of(s.clip_polygon.begin(), s.clip_polygon.end(), [](auto p) { return !physics_vector(p); }) ||
+            !physics_vector(s.source) || !physics_vector(s.destination) || !physics_vector(s.forward) ||
             !physics_vector(s.normal) || vector_dot(s.forward, s.forward) < 1e-12f ||
             vector_dot(s.normal, s.normal) < 1e-12f || !color(s.color1) || !color(s.color2) || !std::isfinite(now) ||
             now < 0 || (s.ammo != AMMO_BULLET && s.ammo != AMMO_SHELL && s.ammo != AMMO_BMG))
@@ -251,6 +253,7 @@ namespace OpenBlood2
                 ShotgunSprite fx;
                 fx.position = s.destination;
                 fx.rotation = rotation;
+                fx.clip_polygon = s.clip_polygon;
                 fx.color = {.1f, .1f, .1f};
                 const float mark_scale = s.ammo == AMMO_BULLET ? .05f : .035f;
                 fx.scale = {mark_scale, mark_scale, mark_scale};

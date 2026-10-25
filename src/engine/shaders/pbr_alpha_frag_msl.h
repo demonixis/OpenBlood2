@@ -27,6 +27,12 @@ struct type_Light
     float4 modelColor;
     float4 modelSources[12];
     float4 sceneColor;
+    float4 effectInfo;
+    float4 effectPositions[16];
+    float4 effectColors[16];
+    float4 fogColor;
+    float4 fogEyeNear;
+    float4 fogForwardFar;
 };
 
 struct type_Shadows
@@ -68,446 +74,586 @@ struct main0_in
 fragment main0_out main0(main0_in in [[stage_in]], constant type_Light& Light [[buffer(0)]], constant type_Shadows& Shadows [[buffer(1)]], constant type_Frame& Frame [[buffer(2)]], constant type_Material& Material [[buffer(3)]], const device type_StructuredBuffer_v4float& gridLights [[buffer(4)]], const device type_StructuredBuffer_uint& gridCells [[buffer(5)]], texture2d<float> albedo [[texture(0)]], texture2d<float> lightmap [[texture(1)]], texture2d<float> shadowAtlas [[texture(2)]], texture2d<float> normalMap [[texture(3)]], sampler albedoSampler [[sampler(0)]], sampler lightmapSampler [[sampler(1)]], sampler shadowSampler [[sampler(2)]], sampler normalSampler [[sampler(3)]])
 {
     main0_out out = {};
-    float4 _959;
+    float4 _1195;
     do
     {
-        float _295;
+        float _304;
         do
         {
-            bool _142;
+            bool _151;
             if ((isunordered(Light.modulation.z, 0.0) || Light.modulation.z > 0.0))
             {
-                _142 = Shadows.shadowInfo.x < 1.0;
+                _151 = Shadows.shadowInfo.x < 1.0;
             }
             else
             {
-                _142 = true;
+                _151 = true;
             }
-            if (_142)
+            if (_151)
             {
-                _295 = 0.0;
+                _304 = 0.0;
                 break;
             }
-            float3 _145 = dfdx(in.in_var_TEXCOORD2);
-            float3 _146 = dfdy(in.in_var_TEXCOORD2);
-            float3 _147 = cross(_145, _146);
-            float3 _151 = _147 * rsqrt(precise::max(dot(_147, _147), 9.9999996826552253889678874634872e-21));
-            float3 _161;
-            if (dot(_151, Shadows.shadowEye.xyz - in.in_var_TEXCOORD2) < 0.0)
+            float3 _154 = dfdx(in.in_var_TEXCOORD2);
+            float3 _155 = dfdy(in.in_var_TEXCOORD2);
+            float3 _156 = cross(_154, _155);
+            float3 _160 = _156 * rsqrt(precise::max(dot(_156, _156), 9.9999996826552253889678874634872e-21));
+            float3 _170;
+            if (dot(_160, Shadows.shadowEye.xyz - in.in_var_TEXCOORD2) < 0.0)
             {
-                _161 = -_151;
+                _170 = -_160;
             }
             else
             {
-                _161 = _151;
+                _170 = _160;
             }
-            float _165 = fast::clamp((_161.y - 0.25) * 2.0, 0.0, 1.0);
-            bool _174;
-            if ((isunordered(_165, 0.0) || _165 > 0.0))
+            float _174 = fast::clamp((_170.y - 0.25) * 2.0, 0.0, 1.0);
+            bool _183;
+            if ((isunordered(_174, 0.0) || _174 > 0.0))
             {
-                _174 = in.in_var_TEXCOORD2.y > Shadows.shadowHeight.x;
-            }
-            else
-            {
-                _174 = true;
-            }
-            bool _184;
-            if (!_174)
-            {
-                _184 = any(in.in_var_TEXCOORD2.xz < Shadows.shadowBounds.xy);
+                _183 = in.in_var_TEXCOORD2.y > Shadows.shadowHeight.x;
             }
             else
             {
-                _184 = true;
+                _183 = true;
             }
-            bool _194;
-            if (!_184)
+            bool _193;
+            if (!_183)
             {
-                _194 = any(in.in_var_TEXCOORD2.xz > Shadows.shadowBounds.zw);
+                _193 = any(in.in_var_TEXCOORD2.xz < Shadows.shadowBounds.xy);
             }
             else
             {
-                _194 = true;
+                _193 = true;
             }
-            if (_194)
+            bool _203;
+            if (!_193)
             {
-                _295 = 0.0;
+                _203 = any(in.in_var_TEXCOORD2.xz > Shadows.shadowBounds.zw);
+            }
+            else
+            {
+                _203 = true;
+            }
+            if (_203)
+            {
+                _304 = 0.0;
                 break;
             }
-            uint _200 = min(uint(Shadows.shadowInfo.x), 32u);
-            float _202;
-            _202 = 0.0;
-            float _203;
-            for (uint _205 = 0u; _205 < _200; _202 = _203, _205++)
+            uint _209 = min(uint(Shadows.shadowInfo.x), 32u);
+            float _211;
+            _211 = 0.0;
+            float _212;
+            for (uint _214 = 0u; _214 < _209; _211 = _212, _214++)
             {
-                uint _210 = _205 * 3u;
-                uint _213 = _210 + 1u;
-                uint _216 = _210 + 2u;
-                float2 _230 = ((in.in_var_TEXCOORD2.xz + (Shadows.casters[_216].zw * (in.in_var_TEXCOORD2.y - Shadows.casters[_210].w))) - Shadows.casters[_213].xy) * Shadows.casters[_213].zw;
-                float _237 = fast::clamp(1.0 - ((Shadows.casters[_216].x - in.in_var_TEXCOORD2.y) / Shadows.shadowInfo.z), 0.0, 1.0);
-                bool _245;
-                if (!any(_230 < float2(0.0)))
+                uint _219 = _214 * 3u;
+                uint _222 = _219 + 1u;
+                uint _225 = _219 + 2u;
+                float2 _239 = ((in.in_var_TEXCOORD2.xz + (Shadows.casters[_225].zw * (in.in_var_TEXCOORD2.y - Shadows.casters[_219].w))) - Shadows.casters[_222].xy) * Shadows.casters[_222].zw;
+                float _246 = fast::clamp(1.0 - ((Shadows.casters[_225].x - in.in_var_TEXCOORD2.y) / Shadows.shadowInfo.z), 0.0, 1.0);
+                bool _254;
+                if (!any(_239 < float2(0.0)))
                 {
-                    _245 = any(_230 > float2(1.0));
+                    _254 = any(_239 > float2(1.0));
                 }
                 else
                 {
-                    _245 = true;
+                    _254 = true;
                 }
-                bool _250;
-                if (!_245)
+                bool _259;
+                if (!_254)
                 {
-                    _250 = _237 <= 0.0;
+                    _259 = _246 <= 0.0;
                 }
                 else
                 {
-                    _250 = true;
+                    _259 = true;
                 }
-                if (_250)
+                if (_259)
                 {
-                    _203 = _202;
+                    _212 = _211;
                     continue;
                 }
-                float2 _260 = Shadows.casters[_210].xy + (float2(_230.x, 1.0 - _230.y) * Shadows.casters[_210].z);
-                float _262;
-                _262 = 0.0;
-                for (uint _265 = 0u; _265 < 4u; )
+                float2 _269 = Shadows.casters[_219].xy + (float2(_239.x, 1.0 - _239.y) * Shadows.casters[_219].z);
+                float _271;
+                _271 = 0.0;
+                for (uint _274 = 0u; _274 < 4u; )
                 {
-                    _262 += (((shadowAtlas.sample(shadowSampler, (_260 + (float2(((_265 & 1u) != 0u) ? 0.5 : (-0.5), ((_265 & 2u) != 0u) ? 0.5 : (-0.5)) * Shadows.shadowInfo.w)), level(0.0)).x - in.in_var_TEXCOORD2.y) > Shadows.casters[_216].y) ? 0.25 : 0.0);
-                    _265++;
+                    _271 += (((shadowAtlas.sample(shadowSampler, (_269 + (float2(((_274 & 1u) != 0u) ? 0.5 : (-0.5), ((_274 & 2u) != 0u) ? 0.5 : (-0.5)) * Shadows.shadowInfo.w)), level(0.0)).x - in.in_var_TEXCOORD2.y) > Shadows.casters[_225].y) ? 0.25 : 0.0);
+                    _274++;
                     continue;
                 }
-                _203 = precise::max(_202, _262 * _237);
+                _212 = precise::max(_211, _271 * _246);
             }
-            _295 = (_202 * _165) * Shadows.shadowInfo.y;
+            _304 = (_211 * _174) * Shadows.shadowInfo.y;
             break;
         } while(false);
-        float3 _296 = dfdx(in.in_var_TEXCOORD2);
-        float3 _297 = dfdy(in.in_var_TEXCOORD2);
-        float2 _298 = dfdx(in.in_var_TEXCOORD1);
-        float2 _299 = dfdy(in.in_var_TEXCOORD1);
-        float4 _303 = albedo.sample(albedoSampler, in.in_var_TEXCOORD1);
-        float4 _307 = normalMap.sample(normalSampler, in.in_var_TEXCOORD1);
-        float _308 = _303.w;
-        if (_308 == 0.0)
+        float3 _305 = dfdx(in.in_var_TEXCOORD2);
+        float3 _306 = dfdy(in.in_var_TEXCOORD2);
+        float2 _307 = dfdx(in.in_var_TEXCOORD1);
+        float2 _308 = dfdy(in.in_var_TEXCOORD1);
+        float4 _312 = albedo.sample(albedoSampler, in.in_var_TEXCOORD1);
+        float4 _316 = normalMap.sample(normalSampler, in.in_var_TEXCOORD1);
+        float _317 = _312.w;
+        if (_317 == 0.0)
         {
             discard_fragment();
         }
-        uint _314 = uint(Material.material.w);
-        if ((_314 & 4u) != 0u)
+        uint _323 = uint(Material.material.w);
+        if ((_323 & 4u) != 0u)
         {
-            float3 _391;
+            float3 _400;
             if (Light.modulation.w > 0.5)
             {
-                float3 _328 = in.in_var_TEXCOORD4 * rsqrt(precise::max(dot(in.in_var_TEXCOORD4, in.in_var_TEXCOORD4), 9.9999999600419720025001879548654e-13));
-                uint _335 = min(uint(Light.modelAmbient.w), 4u);
-                float3 _337;
-                _337 = Light.modelAmbient.xyz;
-                float3 _338;
-                for (uint _340 = 0u; _340 < _335; _337 = _338, _340++)
+                float3 _337 = in.in_var_TEXCOORD4 * rsqrt(precise::max(dot(in.in_var_TEXCOORD4, in.in_var_TEXCOORD4), 9.9999999600419720025001879548654e-13));
+                uint _344 = min(uint(Light.modelAmbient.w), 4u);
+                float3 _346;
+                _346 = Light.modelAmbient.xyz;
+                float3 _347;
+                for (uint _349 = 0u; _349 < _344; _346 = _347, _349++)
                 {
-                    uint _345 = _340 * 3u;
-                    uint _348 = _345 + 1u;
-                    float3 _356 = Light.modelSources[_345].xyz - in.in_var_TEXCOORD2;
-                    float _358 = precise::max(length(_356), 9.9999997473787516355514526367188e-05);
-                    float3 _360 = _356 / float3(_358);
-                    float _376;
-                    if (Light.modelSources[_348].w >= (-1.0))
+                    uint _354 = _349 * 3u;
+                    uint _357 = _354 + 1u;
+                    float3 _365 = Light.modelSources[_354].xyz - in.in_var_TEXCOORD2;
+                    float _367 = precise::max(length(_365), 9.9999997473787516355514526367188e-05);
+                    float3 _369 = _365 / float3(_367);
+                    float _385;
+                    if (Light.modelSources[_357].w >= (-1.0))
                     {
-                        _376 = fast::clamp((dot(-_360, Light.modelSources[_345 + 2u].xyz) - Light.modelSources[_348].w) / (1.0 - Light.modelSources[_348].w), 0.0, 1.0);
+                        _385 = fast::clamp((dot(-_369, Light.modelSources[_354 + 2u].xyz) - Light.modelSources[_357].w) / (1.0 - Light.modelSources[_357].w), 0.0, 1.0);
                     }
                     else
                     {
-                        _376 = 1.0;
+                        _385 = 1.0;
                     }
-                    _338 = _337 + ((Light.modelSources[_348].xyz * (fast::clamp(1.0 - (_358 / Light.modelSources[_345].w), 0.0, 1.0) * _376)) * precise::max(0.0, dot(_328, _360)));
+                    _347 = _346 + ((Light.modelSources[_357].xyz * (fast::clamp(1.0 - (_367 / Light.modelSources[_354].w), 0.0, 1.0) * _385)) * precise::max(0.0, dot(_337, _369)));
                 }
-                _391 = (Light.modelColor.xyz * precise::min(_337, float3(1.0))) * Light.modelColor.w;
+                _400 = (Light.modelColor.xyz * precise::min(_346, float3(1.0))) * Light.modelColor.w;
             }
             else
             {
-                _391 = in.in_var_TEXCOORD0;
+                _400 = in.in_var_TEXCOORD0;
             }
-            float3 _409;
+            float3 _418;
             if (Light.positionRadius.w > 0.0)
             {
-                _409 = Light.lightColor.xyz * precise::max(0.0, 1.0 - (distance(in.in_var_TEXCOORD2, Light.positionRadius.xyz) / Light.positionRadius.w));
+                _418 = Light.lightColor.xyz * precise::max(0.0, 1.0 - (distance(in.in_var_TEXCOORD2, Light.positionRadius.xyz) / Light.positionRadius.w));
             }
             else
             {
-                _409 = float3(0.0);
+                _418 = float3(0.0);
             }
-            _959 = float4((_303.xyz * ((_391 * (1.0 - _295)) + _409)) * Light.sceneColor.xyz, _308 * Light.modulation.x);
-            break;
-        }
-        float3 _432 = fast::normalize(Frame.frameEye.xyz - in.in_var_TEXCOORD2);
-        float3 _436 = in.in_var_TEXCOORD4 * rsqrt(precise::max(dot(in.in_var_TEXCOORD4, in.in_var_TEXCOORD4), 9.9999999600419720025001879548654e-13));
-        float3 _442;
-        if (dot(_436, _432) < 0.0)
-        {
-            _442 = -_436;
-        }
-        else
-        {
-            _442 = _436;
-        }
-        float3 _478;
-        if ((_314 & 2u) != 0u)
-        {
-            float3 _447 = cross(_297, _442);
-            float3 _448 = cross(_442, _296);
-            float3 _453 = (_447 * _298.x) + (_448 * _299.x);
-            float3 _458 = (_447 * _298.y) + (_448 * _299.y);
-            float _463 = rsqrt(precise::max(precise::max(dot(_453, _453), dot(_458, _458)), 1.0000000031710768509710513471353e-30));
-            float3 _466 = (_307.xyz * 2.0) - float3(1.0);
-            _478 = fast::normalize(((_453 * (_466.x * _463)) + (_458 * (_466.y * _463))) + (_442 * _466.z));
-        }
-        else
-        {
-            _478 = _442;
-        }
-        float _483 = Material.material.x * Material.material.x;
-        float3 _484 = _303.xyz;
-        float3 _489 = mix(float3(0.039999999105930328369140625) * Material.material.z, _484, float3(Material.material.y));
-        float _491 = precise::max(dot(_478, _432), 9.9999997473787516355514526367188e-05);
-        float _505;
-        if (Light.positionRadius.w > 0.0)
-        {
-            _505 = precise::max(0.0, 1.0 - (distance(in.in_var_TEXCOORD2, Light.positionRadius.xyz) / Light.positionRadius.w));
-        }
-        else
-        {
-            _505 = 0.0;
-        }
-        float3 _509 = Light.lightColor.xyz * _505;
-        float3 _555;
-        if (_505 > 0.0)
-        {
-            float3 _517 = fast::normalize(Light.positionRadius.xyz - in.in_var_TEXCOORD2);
-            float3 _553;
-            do
+            float3 _463;
+            if (Light.effectInfo.x > 0.0)
             {
-                float _521 = fast::clamp(dot(_478, _517), 0.0, 1.0);
-                if (_521 <= 0.0)
+                float3 _425;
+                _425 = float3(0.0);
+                float3 _426;
+                for (uint _428 = 0u; _428 < min(uint(Light.effectInfo.x), 16u); _425 = _426, _428++)
                 {
-                    _553 = float3(0.0);
-                    break;
+                    float3 _438 = Light.effectPositions[_428].xyz - in.in_var_TEXCOORD2;
+                    bool _448;
+                    if ((uint(Light.effectColors[_428].w) & 64u) != 0u)
+                    {
+                        _448 = dot(in.in_var_TEXCOORD4, _438) <= 0.0;
+                    }
+                    else
+                    {
+                        _448 = false;
+                    }
+                    if (_448)
+                    {
+                        _426 = _425;
+                        continue;
+                    }
+                    _426 = _425 + (Light.effectColors[_428].xyz * fast::clamp(1.0 - (length(_438) / Light.effectPositions[_428].w), 0.0, 1.0));
                 }
-                float3 _526 = fast::normalize(_432 + _517);
-                float _528 = fast::clamp(dot(_478, _526), 0.0, 1.0);
-                float _531 = _483 * _483;
-                float _535 = ((_528 * _528) * (_531 - 1.0)) + 1.0;
-                _553 = ((_489 + ((float3(1.0) - _489) * powr(1.0 - fast::clamp(dot(_432, _526), 0.0, 1.0), 5.0))) * ((_531 / ((3.1415927410125732421875 * _535) * _535)) * (0.5 / mix((2.0 * _521) * _491, _521 + _491, _483)))) * (3.1415927410125732421875 * _521);
-                break;
-            } while(false);
-            _555 = _509 * _553;
-        }
-        else
-        {
-            _555 = float3(0.0);
-        }
-        float3 _884;
-        float _885;
-        float3 _886;
-        if ((_314 & 1u) != 0u)
-        {
-            uint _565 = min(uint(Light.modelAmbient.w), 4u);
-            float3 _567;
-            float3 _570;
-            _567 = _555;
-            _570 = Light.modelAmbient.xyz;
-            float3 _568;
-            float3 _571;
-            for (uint _572 = 0u; _572 < _565; _567 = _568, _570 = _571, _572++)
+                _463 = _418 + _425;
+            }
+            else
             {
-                uint _577 = _572 * 3u;
-                uint _580 = _577 + 1u;
-                float3 _588 = Light.modelSources[_577].xyz - in.in_var_TEXCOORD2;
-                float _590 = precise::max(length(_588), 9.9999997473787516355514526367188e-05);
-                float3 _592 = _588 / float3(_590);
-                float _608;
-                if (Light.modelSources[_580].w >= (-1.0))
+                _463 = _418;
+            }
+            float4 _479 = float4((_312.xyz * ((_400 * (1.0 - _304)) + _463)) * Light.sceneColor.xyz, _317 * Light.modulation.x);
+            bool _482 = Light.fogColor.w > 0.0;
+            float4 _512;
+            if (_482)
+            {
+                float _508;
+                if (_482)
                 {
-                    _608 = fast::clamp((dot(-_592, Light.modelSources[_577 + 2u].xyz) - Light.modelSources[_580].w) / (1.0 - Light.modelSources[_580].w), 0.0, 1.0);
+                    _508 = fast::clamp((dot(in.in_var_TEXCOORD2 - Light.fogEyeNear.xyz, Light.fogForwardFar.xyz) - Light.fogEyeNear.w) / (Light.fogForwardFar.w - Light.fogEyeNear.w), 0.0, 1.0);
                 }
                 else
                 {
-                    _608 = 1.0;
+                    _508 = 0.0;
                 }
-                float3 _611 = Light.modelSources[_580].xyz * (fast::clamp(1.0 - (_590 / Light.modelSources[_577].w), 0.0, 1.0) * _608);
-                float _612 = dot(_478, _592);
-                _571 = _570 + (_611 * precise::max(0.0, _612));
-                float3 _652;
-                do
-                {
-                    float _620 = fast::clamp(_612, 0.0, 1.0);
-                    if (_620 <= 0.0)
-                    {
-                        _652 = float3(0.0);
-                        break;
-                    }
-                    float3 _625 = fast::normalize(_432 + _592);
-                    float _627 = fast::clamp(dot(_478, _625), 0.0, 1.0);
-                    float _630 = _483 * _483;
-                    float _634 = ((_627 * _627) * (_630 - 1.0)) + 1.0;
-                    _652 = ((_489 + ((float3(1.0) - _489) * powr(1.0 - fast::clamp(dot(_432, _625), 0.0, 1.0), 5.0))) * ((_630 / ((3.1415927410125732421875 * _634) * _634)) * (0.5 / mix((2.0 * _620) * _491, _620 + _491, _483)))) * (3.1415927410125732421875 * _620);
-                    break;
-                } while(false);
-                _568 = _567 + ((_611 * Light.modelColor.w) * _652);
+                float3 _510 = mix(_479.xyz, Light.fogColor.xyz, float3(_508));
+                _512 = float4(_510.x, _510.y, _510.z, _479.w);
             }
-            _884 = _567;
-            _885 = 1.0;
-            _886 = (((Light.modelColor.xyz * precise::min(_570, float3(1.0))) * Light.modelColor.w) * (1.0 - _295)) + _509;
+            else
+            {
+                _512 = _479;
+            }
+            _1195 = _512;
+            break;
+        }
+        float3 _519 = fast::normalize(Frame.frameEye.xyz - in.in_var_TEXCOORD2);
+        float3 _523 = in.in_var_TEXCOORD4 * rsqrt(precise::max(dot(in.in_var_TEXCOORD4, in.in_var_TEXCOORD4), 9.9999999600419720025001879548654e-13));
+        float3 _529;
+        if (dot(_523, _519) < 0.0)
+        {
+            _529 = -_523;
         }
         else
         {
-            bool _667 = in.in_var_TEXCOORD3.x >= 0.0;
-            float3 _677;
-            if (_667)
+            _529 = _523;
+        }
+        float3 _565;
+        if ((_323 & 2u) != 0u)
+        {
+            float3 _534 = cross(_306, _529);
+            float3 _535 = cross(_529, _305);
+            float3 _540 = (_534 * _307.x) + (_535 * _308.x);
+            float3 _545 = (_534 * _307.y) + (_535 * _308.y);
+            float _550 = rsqrt(precise::max(precise::max(dot(_540, _540), dot(_545, _545)), 1.0000000031710768509710513471353e-30));
+            float3 _553 = (_316.xyz * 2.0) - float3(1.0);
+            _565 = fast::normalize(((_540 * (_553.x * _550)) + (_545 * (_553.y * _550))) + (_529 * _553.z));
+        }
+        else
+        {
+            _565 = _529;
+        }
+        float _570 = Material.material.x * Material.material.x;
+        float3 _571 = _312.xyz;
+        float3 _576 = mix(float3(0.039999999105930328369140625) * Material.material.z, _571, float3(Material.material.y));
+        float _578 = precise::max(dot(_565, _519), 9.9999997473787516355514526367188e-05);
+        float _592;
+        if (Light.positionRadius.w > 0.0)
+        {
+            _592 = precise::max(0.0, 1.0 - (distance(in.in_var_TEXCOORD2, Light.positionRadius.xyz) / Light.positionRadius.w));
+        }
+        else
+        {
+            _592 = 0.0;
+        }
+        float3 _596 = Light.lightColor.xyz * _592;
+        float3 _642;
+        if (_592 > 0.0)
+        {
+            float3 _604 = fast::normalize(Light.positionRadius.xyz - in.in_var_TEXCOORD2);
+            float3 _640;
+            do
             {
-                _677 = lightmap.sample(lightmapSampler, precise::max(in.in_var_TEXCOORD3, float2(0.0)), level(0.0)).xyz;
-            }
-            else
-            {
-                _677 = in.in_var_TEXCOORD0;
-            }
-            float3 _691;
-            if (_667)
-            {
-                _691 = precise::min((_677 * (1.0 - _295)) + _509, float3(1.0)) * Light.modulation.y;
-            }
-            else
-            {
-                _691 = (_677 * (1.0 - _295)) + _509;
-            }
-            bool _697;
-            if (!_667)
-            {
-                _697 = all(in.in_var_TEXCOORD0 >= float3(0.999000012874603271484375));
-            }
-            else
-            {
-                _697 = false;
-            }
-            if (_697)
-            {
-                _959 = float4((_484 * _691) * Light.sceneColor.xyz, _308 * Light.modulation.x);
-                break;
-            }
-            int3 _720 = int3(floor((in.in_var_TEXCOORD2 - Frame.gridOrigin.xyz) * Frame.gridOrigin.w));
-            bool _731;
-            if (all(_720 >= int3(0)))
-            {
-                _731 = all(_720 < int3(Frame.gridSize.xyz));
-            }
-            else
-            {
-                _731 = false;
-            }
-            float _852;
-            float3 _853;
-            float _854;
-            if (_731)
-            {
-                uint _747 = (((uint(_720.z) * Frame.gridSize.y) + uint(_720.y)) * Frame.gridSize.x) + uint(_720.x);
-                uint _753 = Frame.gridSize.w + (gridCells._m0[_747] >> 4u);
-                uint _755 = min((gridCells._m0[_747] & 15u), 4u);
-                float _757;
-                float3 _760;
-                float _762;
-                _757 = 0.0;
-                _760 = float3(0.0);
-                _762 = 0.0;
-                float _758;
-                float3 _761;
-                float _763;
-                for (uint _764 = 0u; _764 < _755; _757 = _758, _760 = _761, _762 = _763, _764++)
+                float _608 = fast::clamp(dot(_565, _604), 0.0, 1.0);
+                if (_608 <= 0.0)
                 {
-                    uint _772 = gridCells._m0[_753 + _764] * 3u;
-                    uint _775 = _772 + 1u;
-                    float3 _783 = gridLights._m0[_772].xyz - in.in_var_TEXCOORD2;
-                    float _785 = precise::max(length(_783), 9.9999997473787516355514526367188e-05);
-                    float3 _787 = _783 / float3(_785);
-                    float _803;
-                    if (gridLights._m0[_775].w >= (-1.0))
+                    _640 = float3(0.0);
+                    break;
+                }
+                float3 _613 = fast::normalize(_519 + _604);
+                float _615 = fast::clamp(dot(_565, _613), 0.0, 1.0);
+                float _618 = _570 * _570;
+                float _622 = ((_615 * _615) * (_618 - 1.0)) + 1.0;
+                _640 = ((_576 + ((float3(1.0) - _576) * powr(1.0 - fast::clamp(dot(_519, _613), 0.0, 1.0), 5.0))) * ((_618 / ((3.1415927410125732421875 * _622) * _622)) * (0.5 / mix((2.0 * _608) * _578, _608 + _578, _570)))) * (3.1415927410125732421875 * _608);
+                break;
+            } while(false);
+            _642 = _596 * _640;
+        }
+        else
+        {
+            _642 = float3(0.0);
+        }
+        float3 _644;
+        float3 _647;
+        _644 = _642;
+        _647 = _596;
+        float3 _645;
+        float3 _648;
+        for (uint _649 = 0u; _649 < min(uint(Light.effectInfo.x), 16u); _644 = _645, _647 = _648, _649++)
+        {
+            float3 _661 = Light.effectPositions[_649].xyz - in.in_var_TEXCOORD2;
+            bool _671;
+            if ((uint(Light.effectColors[_649].w) & 64u) != 0u)
+            {
+                _671 = dot(in.in_var_TEXCOORD4, _661) <= 0.0;
+            }
+            else
+            {
+                _671 = false;
+            }
+            if (_671)
+            {
+                _645 = _644;
+                _648 = _647;
+                continue;
+            }
+            float _675 = precise::max(length(_661), 9.9999997473787516355514526367188e-05);
+            float3 _684 = Light.effectColors[_649].xyz * fast::clamp(1.0 - (_675 / Light.effectPositions[_649].w), 0.0, 1.0);
+            float3 _687 = _661 / float3(_675);
+            float3 _723;
+            do
+            {
+                float _691 = fast::clamp(dot(_565, _687), 0.0, 1.0);
+                if (_691 <= 0.0)
+                {
+                    _723 = float3(0.0);
+                    break;
+                }
+                float3 _696 = fast::normalize(_519 + _687);
+                float _698 = fast::clamp(dot(_565, _696), 0.0, 1.0);
+                float _701 = _570 * _570;
+                float _705 = ((_698 * _698) * (_701 - 1.0)) + 1.0;
+                _723 = ((_576 + ((float3(1.0) - _576) * powr(1.0 - fast::clamp(dot(_519, _696), 0.0, 1.0), 5.0))) * ((_701 / ((3.1415927410125732421875 * _705) * _705)) * (0.5 / mix((2.0 * _691) * _578, _691 + _578, _570)))) * (3.1415927410125732421875 * _691);
+                break;
+            } while(false);
+            _645 = _644 + (_684 * _723);
+            _648 = _647 + _684;
+        }
+        float3 _1087;
+        float _1088;
+        float3 _1089;
+        if ((_323 & 1u) != 0u)
+        {
+            uint _735 = min(uint(Light.modelAmbient.w), 4u);
+            float3 _737;
+            float3 _740;
+            _737 = _644;
+            _740 = Light.modelAmbient.xyz;
+            float3 _738;
+            float3 _741;
+            for (uint _742 = 0u; _742 < _735; _737 = _738, _740 = _741, _742++)
+            {
+                uint _747 = _742 * 3u;
+                uint _750 = _747 + 1u;
+                float3 _758 = Light.modelSources[_747].xyz - in.in_var_TEXCOORD2;
+                float _760 = precise::max(length(_758), 9.9999997473787516355514526367188e-05);
+                float3 _762 = _758 / float3(_760);
+                float _778;
+                if (Light.modelSources[_750].w >= (-1.0))
+                {
+                    _778 = fast::clamp((dot(-_762, Light.modelSources[_747 + 2u].xyz) - Light.modelSources[_750].w) / (1.0 - Light.modelSources[_750].w), 0.0, 1.0);
+                }
+                else
+                {
+                    _778 = 1.0;
+                }
+                float3 _781 = Light.modelSources[_750].xyz * (fast::clamp(1.0 - (_760 / Light.modelSources[_747].w), 0.0, 1.0) * _778);
+                float _782 = dot(_565, _762);
+                _741 = _740 + (_781 * precise::max(0.0, _782));
+                float3 _822;
+                do
+                {
+                    float _790 = fast::clamp(_782, 0.0, 1.0);
+                    if (_790 <= 0.0)
                     {
-                        _803 = fast::clamp((dot(-_787, gridLights._m0[_772 + 2u].xyz) - gridLights._m0[_775].w) / (1.0 - gridLights._m0[_775].w), 0.0, 1.0);
+                        _822 = float3(0.0);
+                        break;
+                    }
+                    float3 _795 = fast::normalize(_519 + _762);
+                    float _797 = fast::clamp(dot(_565, _795), 0.0, 1.0);
+                    float _800 = _570 * _570;
+                    float _804 = ((_797 * _797) * (_800 - 1.0)) + 1.0;
+                    _822 = ((_576 + ((float3(1.0) - _576) * powr(1.0 - fast::clamp(dot(_519, _795), 0.0, 1.0), 5.0))) * ((_800 / ((3.1415927410125732421875 * _804) * _804)) * (0.5 / mix((2.0 * _790) * _578, _790 + _578, _570)))) * (3.1415927410125732421875 * _790);
+                    break;
+                } while(false);
+                _738 = _737 + ((_781 * Light.modelColor.w) * _822);
+            }
+            _1087 = _737;
+            _1088 = 1.0;
+            _1089 = (((Light.modelColor.xyz * precise::min(_740, float3(1.0))) * Light.modelColor.w) * (1.0 - _304)) + _647;
+        }
+        else
+        {
+            bool _837 = in.in_var_TEXCOORD3.x >= 0.0;
+            float3 _847;
+            if (_837)
+            {
+                _847 = lightmap.sample(lightmapSampler, precise::max(in.in_var_TEXCOORD3, float2(0.0)), level(0.0)).xyz;
+            }
+            else
+            {
+                _847 = in.in_var_TEXCOORD0;
+            }
+            float3 _861;
+            if (_837)
+            {
+                _861 = precise::min((_847 * (1.0 - _304)) + _647, float3(1.0)) * Light.modulation.y;
+            }
+            else
+            {
+                _861 = (_847 * (1.0 - _304)) + _647;
+            }
+            bool _867;
+            if (!_837)
+            {
+                _867 = all(in.in_var_TEXCOORD0 >= float3(0.999000012874603271484375));
+            }
+            else
+            {
+                _867 = false;
+            }
+            if (_867)
+            {
+                float4 _881 = float4((_571 * _861) * Light.sceneColor.xyz, _317 * Light.modulation.x);
+                bool _884 = Light.fogColor.w > 0.0;
+                float4 _914;
+                if (_884)
+                {
+                    float _910;
+                    if (_884)
+                    {
+                        _910 = fast::clamp((dot(in.in_var_TEXCOORD2 - Light.fogEyeNear.xyz, Light.fogForwardFar.xyz) - Light.fogEyeNear.w) / (Light.fogForwardFar.w - Light.fogEyeNear.w), 0.0, 1.0);
                     }
                     else
                     {
-                        _803 = 1.0;
+                        _910 = 0.0;
                     }
-                    float3 _806 = gridLights._m0[_775].xyz * (fast::clamp(1.0 - (_785 / gridLights._m0[_772].w), 0.0, 1.0) * _803);
-                    float _808 = precise::max(0.0, dot(_442, _787));
-                    float _809 = dot(_806, float3(0.2989999949932098388671875, 0.58700001239776611328125, 0.114000000059604644775390625));
-                    _763 = _762 + (_809 * (_667 ? _808 : 1.0));
-                    float _812 = dot(_478, _787);
-                    _758 = _757 + (_809 * (precise::max(0.0, _812) - _808));
-                    float3 _850;
+                    float3 _912 = mix(_881.xyz, Light.fogColor.xyz, float3(_910));
+                    _914 = float4(_912.x, _912.y, _912.z, _881.w);
+                }
+                else
+                {
+                    _914 = _881;
+                }
+                _1195 = _914;
+                break;
+            }
+            int3 _923 = int3(floor((in.in_var_TEXCOORD2 - Frame.gridOrigin.xyz) * Frame.gridOrigin.w));
+            bool _934;
+            if (all(_923 >= int3(0)))
+            {
+                _934 = all(_923 < int3(Frame.gridSize.xyz));
+            }
+            else
+            {
+                _934 = false;
+            }
+            float _1055;
+            float3 _1056;
+            float _1057;
+            if (_934)
+            {
+                uint _950 = (((uint(_923.z) * Frame.gridSize.y) + uint(_923.y)) * Frame.gridSize.x) + uint(_923.x);
+                uint _956 = Frame.gridSize.w + (gridCells._m0[_950] >> 4u);
+                uint _958 = min((gridCells._m0[_950] & 15u), 4u);
+                float _960;
+                float3 _963;
+                float _965;
+                _960 = 0.0;
+                _963 = float3(0.0);
+                _965 = 0.0;
+                float _961;
+                float3 _964;
+                float _966;
+                for (uint _967 = 0u; _967 < _958; _960 = _961, _963 = _964, _965 = _966, _967++)
+                {
+                    uint _975 = gridCells._m0[_956 + _967] * 3u;
+                    uint _978 = _975 + 1u;
+                    float3 _986 = gridLights._m0[_975].xyz - in.in_var_TEXCOORD2;
+                    float _988 = precise::max(length(_986), 9.9999997473787516355514526367188e-05);
+                    float3 _990 = _986 / float3(_988);
+                    float _1006;
+                    if (gridLights._m0[_978].w >= (-1.0))
+                    {
+                        _1006 = fast::clamp((dot(-_990, gridLights._m0[_975 + 2u].xyz) - gridLights._m0[_978].w) / (1.0 - gridLights._m0[_978].w), 0.0, 1.0);
+                    }
+                    else
+                    {
+                        _1006 = 1.0;
+                    }
+                    float3 _1009 = gridLights._m0[_978].xyz * (fast::clamp(1.0 - (_988 / gridLights._m0[_975].w), 0.0, 1.0) * _1006);
+                    float _1011 = precise::max(0.0, dot(_529, _990));
+                    float _1012 = dot(_1009, float3(0.2989999949932098388671875, 0.58700001239776611328125, 0.114000000059604644775390625));
+                    _966 = _965 + (_1012 * (_837 ? _1011 : 1.0));
+                    float _1015 = dot(_565, _990);
+                    _961 = _960 + (_1012 * (precise::max(0.0, _1015) - _1011));
+                    float3 _1053;
                     do
                     {
-                        float _818 = fast::clamp(_812, 0.0, 1.0);
-                        if (_818 <= 0.0)
+                        float _1021 = fast::clamp(_1015, 0.0, 1.0);
+                        if (_1021 <= 0.0)
                         {
-                            _850 = float3(0.0);
+                            _1053 = float3(0.0);
                             break;
                         }
-                        float3 _823 = fast::normalize(_432 + _787);
-                        float _825 = fast::clamp(dot(_478, _823), 0.0, 1.0);
-                        float _828 = _483 * _483;
-                        float _832 = ((_825 * _825) * (_828 - 1.0)) + 1.0;
-                        _850 = ((_489 + ((float3(1.0) - _489) * powr(1.0 - fast::clamp(dot(_432, _823), 0.0, 1.0), 5.0))) * ((_828 / ((3.1415927410125732421875 * _832) * _832)) * (0.5 / mix((2.0 * _818) * _491, _818 + _491, _483)))) * (3.1415927410125732421875 * _818);
+                        float3 _1026 = fast::normalize(_519 + _990);
+                        float _1028 = fast::clamp(dot(_565, _1026), 0.0, 1.0);
+                        float _1031 = _570 * _570;
+                        float _1035 = ((_1028 * _1028) * (_1031 - 1.0)) + 1.0;
+                        _1053 = ((_576 + ((float3(1.0) - _576) * powr(1.0 - fast::clamp(dot(_519, _1026), 0.0, 1.0), 5.0))) * ((_1031 / ((3.1415927410125732421875 * _1035) * _1035)) * (0.5 / mix((2.0 * _1021) * _578, _1021 + _578, _570)))) * (3.1415927410125732421875 * _1021);
                         break;
                     } while(false);
-                    _761 = _760 + (_806 * _850);
+                    _964 = _963 + (_1009 * _1053);
                 }
-                _852 = _757;
-                _853 = _760;
-                _854 = _762;
+                _1055 = _960;
+                _1056 = _963;
+                _1057 = _965;
             }
             else
             {
-                _852 = 0.0;
-                _853 = float3(0.0);
-                _854 = 0.0;
+                _1055 = 0.0;
+                _1056 = float3(0.0);
+                _1057 = 0.0;
             }
-            float _855 = dot(_677, float3(0.2989999949932098388671875, 0.58700001239776611328125, 0.114000000059604644775390625));
-            float _862;
-            if (_854 > 9.9999997473787516355514526367188e-05)
+            float _1058 = dot(_847, float3(0.2989999949932098388671875, 0.58700001239776611328125, 0.114000000059604644775390625));
+            float _1065;
+            if (_1057 > 9.9999997473787516355514526367188e-05)
             {
-                _862 = fast::clamp(_855 / _854, 0.0, 1.0);
+                _1065 = fast::clamp(_1058 / _1057, 0.0, 1.0);
             }
             else
             {
-                _862 = 1.0;
+                _1065 = 1.0;
             }
-            _884 = _555 + (_853 * ((2.0 * _862) * (1.0 - _295)));
-            _885 = fast::clamp((1.0 + ((_852 * _862) / precise::max(_855, 0.0500000007450580596923828125))) + ((fast::clamp(1.0 - ((_854 * _862) / precise::max(_855, 9.9999997473787516355514526367188e-05)), 0.0, 1.0) * 0.5) * (_478.y - _442.y)), 0.25, 2.0);
-            _886 = _691;
+            _1087 = _644 + (_1056 * ((2.0 * _1065) * (1.0 - _304)));
+            _1088 = fast::clamp((1.0 + ((_1055 * _1065) / precise::max(_1058, 0.0500000007450580596923828125))) + ((fast::clamp(1.0 - ((_1057 * _1065) / precise::max(_1058, 9.9999997473787516355514526367188e-05)), 0.0, 1.0) * 0.5) * (_565.y - _529.y)), 0.25, 2.0);
+            _1089 = _861;
         }
-        float4 _888 = (float4(-1.0, -0.0274999998509883880615234375, -0.572000026702880859375, 0.02199999988079071044921875) * Material.material.x) + float4(1.0, 0.0425000004470348358154296875, 1.03999996185302734375, -0.039999999105930328369140625);
-        float _889 = _888.x;
-        float2 _899 = (float2(-1.03999996185302734375, 1.03999996185302734375) * ((precise::min(_889 * _889, exp2((-9.27999973297119140625) * _491)) * _889) + _888.y)) + _888.zw;
-        float _900 = _899.x;
-        float3 _903 = float3(_899.y);
-        float3 _933;
+        float4 _1091 = (float4(-1.0, -0.0274999998509883880615234375, -0.572000026702880859375, 0.02199999988079071044921875) * Material.material.x) + float4(1.0, 0.0425000004470348358154296875, 1.03999996185302734375, -0.039999999105930328369140625);
+        float _1092 = _1091.x;
+        float2 _1102 = (float2(-1.03999996185302734375, 1.03999996185302734375) * ((precise::min(_1092 * _1092, exp2((-9.27999973297119140625) * _578)) * _1092) + _1091.y)) + _1091.zw;
+        float _1103 = _1102.x;
+        float3 _1106 = float3(_1102.y);
+        float3 _1136;
         do
         {
             if (Material.emission.x <= 0.0)
             {
-                _933 = float3(0.0);
+                _1136 = float3(0.0);
                 break;
             }
-            _933 = _484 * (Material.emission.x * fast::clamp((dot(_484, float3(0.2989999949932098388671875, 0.58700001239776611328125, 0.114000000059604644775390625)) - Material.emission.y) / precise::max(1.0 - Material.emission.y, 0.001000000047497451305389404296875), 0.0, 1.0));
+            _1136 = _571 * (Material.emission.x * fast::clamp((dot(_571, float3(0.2989999949932098388671875, 0.58700001239776611328125, 0.114000000059604644775390625)) - Material.emission.y) / precise::max(1.0 - Material.emission.y, 0.001000000047497451305389404296875), 0.0, 1.0));
             break;
         } while(false);
-        float3 _943 = ((((_886 * ((_489 * _900) + _903)) + _884) * (float3(1.0) + (_489 * ((float3(1.0) / precise::max((float3(1.0) * _900) + _903, float3(0.0500000007450580596923828125))) - float3(1.0))))) * 1.0) * Light.sceneColor.xyz;
-        float _946 = _308 * Light.modulation.x;
-        float _949 = fast::clamp(precise::max(_946, dot(_943, float3(0.2989999949932098388671875, 0.58700001239776611328125, 0.114000000059604644775390625))), 0.0, 1.0);
-        _959 = float4((((((((_484 * _886) * _885) * (1.0 - Material.material.y)) + _933) * Light.sceneColor.xyz) * _946) + _943) / float3(precise::max(_949, 9.9999997473787516355514526367188e-05)), _949);
+        float3 _1146 = ((((_1089 * ((_576 * _1103) + _1106)) + _1087) * (float3(1.0) + (_576 * ((float3(1.0) / precise::max((float3(1.0) * _1103) + _1106, float3(0.0500000007450580596923828125))) - float3(1.0))))) * 1.0) * Light.sceneColor.xyz;
+        float _1149 = _317 * Light.modulation.x;
+        float _1152 = fast::clamp(precise::max(_1149, dot(_1146, float3(0.2989999949932098388671875, 0.58700001239776611328125, 0.114000000059604644775390625))), 0.0, 1.0);
+        float4 _1161 = float4((((((((_571 * _1089) * _1088) * (1.0 - Material.material.y)) + _1136) * Light.sceneColor.xyz) * _1149) + _1146) / float3(precise::max(_1152, 9.9999997473787516355514526367188e-05)), _1152);
+        bool _1164 = Light.fogColor.w > 0.0;
+        float4 _1194;
+        if (_1164)
+        {
+            float _1190;
+            if (_1164)
+            {
+                _1190 = fast::clamp((dot(in.in_var_TEXCOORD2 - Light.fogEyeNear.xyz, Light.fogForwardFar.xyz) - Light.fogEyeNear.w) / (Light.fogForwardFar.w - Light.fogEyeNear.w), 0.0, 1.0);
+            }
+            else
+            {
+                _1190 = 0.0;
+            }
+            float3 _1192 = mix(_1161.xyz, Light.fogColor.xyz, float3(_1190));
+            _1194 = float4(_1192.x, _1192.y, _1192.z, _1161.w);
+        }
+        else
+        {
+            _1194 = _1161;
+        }
+        _1195 = _1194;
         break;
     } while(false);
-    out.out_var_SV_Target0 = _959;
+    out.out_var_SV_Target0 = _1195;
     return out;
 }
 

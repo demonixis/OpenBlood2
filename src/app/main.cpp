@@ -408,6 +408,7 @@ namespace
         inspector.presentation = &presenter.stats;
         inspector.post = &presenter.post_process.stats;
         inspector.model_shadows = &presenter.shadow_stats;
+        inspector.scene_effects = &presenter.effects;
         inspector.gpu_resources = &presenter.registry.stats;
         inspector.model_lighting = &presenter.model_lighting.stats;
         if (options.keepalive_smoke)
@@ -1698,7 +1699,7 @@ namespace
                                    "collision/model resources restored, preview animation advanced while hidden");
             if (options.lights_smoke)
                 spdlog::info("LIGHTS smoke: 12 authored SubwayA point lights follow original keyframes while UI hidden "
-                             "and after reload; evaluated radius/color checked; world illumination unavailable");
+                             "and after reload; evaluated radius/color checked; scene illumination tested separately");
             if (options.scene_explosions_smoke)
                 spdlog::info(
                     "SCENE EXPLOSIONS smoke: original trigger/removal, null-damager guard and detached SDL "

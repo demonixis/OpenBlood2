@@ -126,7 +126,7 @@ class CHowitzerAltFrag final : public CProjectile
   public:
     CHowitzerAltFrag();
     std::uint64_t trail = 0;
-    std::string light_error = "Howitzer fragment owner light illumination unavailable";
+    std::string light_error;
 
   protected:
     bool InitialUpdate() override;

@@ -1,5 +1,6 @@
 #include "engine/sprite_view.h"
 #include "engine/collision.h"
+#include "engine/mark_clip.h"
 #include <algorithm>
 #include <cmath>
 namespace OpenBlood2
@@ -12,6 +13,7 @@ namespace OpenBlood2
         materials_.clear();
         draws.clear();
         batched_draws.clear();
+        batch_slices.clear();
         entries.clear();
         camera_valid_ = false;
         ++revision;
@@ -23,6 +25,7 @@ namespace OpenBlood2
         mesh.ranges.clear();
         draws.clear();
         batched_draws.clear();
+        batch_slices.clear();
         entries.clear();
         WorldViewUniform uniform;
         camera_valid_ = world_view_uniform(eye, camera, 1, {}, uniform);
@@ -63,6 +66,7 @@ namespace OpenBlood2
             mesh.ranges.clear();
             draws.clear();
             batched_draws.clear();
+            batch_slices.clear();
             entries.clear();
             error = "Sprite camera unavailable or instance budget exceeded";
             return nullptr;
@@ -266,6 +270,36 @@ namespace OpenBlood2
         draws.push_back({entry.range, centre, {}, alpha});
         return true;
     }
+    bool SpriteView::clip_last(std::span<const DVector> polygon, std::string& error)
+    {
+        if (entries.empty() || entries.back().range == UINT32_MAX)
+            return true;
+        auto& entry = entries.back();
+        auto& range = mesh.ranges[entry.range];
+        if (draws.empty() || draws.back().range != entry.range || range.count != 6 ||
+            std::size_t(range.first) + range.count != mesh.vertices.size())
+        {
+            error = "Mark clipping must follow sprite creation";
+            return false;
+        }
+        std::vector<WorldVertex> clipped;
+        if (!clip_mark(std::span<const WorldVertex>(mesh.vertices).subspan(range.first, range.count), draws.back(),
+                       polygon, clipped, entry.error))
+        {
+            // Invalid cosmetic geometry stays explicit and invisible, never aborts play.
+            clipped.clear();
+        }
+        mesh.vertices.resize(range.first);
+        mesh.vertices.insert(mesh.vertices.end(), clipped.begin(), clipped.end());
+        range.count = range.batches.front().count = static_cast<std::uint32_t>(clipped.size());
+        bound_range(mesh.vertices, range);
+        if (clipped.empty())
+        {
+            entry.visible = false;
+            draws.pop_back();
+        }
+        return true;
+    }
     void SpriteView::sort()
     {
         auto depth = [&](const WorldDraw& draw)
@@ -278,6 +312,7 @@ namespace OpenBlood2
     void SpriteView::batch()
     {
         batched_draws.clear();
+        batch_slices.clear();
         const auto first_batch = mesh.ranges.size();
         for (const auto& draw : draws)
         {
@@ -293,6 +328,11 @@ namespace OpenBlood2
                 mesh.ranges.push_back(std::move(range));
             }
             auto& range = mesh.ranges[batched_draws.back().range];
+            auto slice = batched_draws.back();
+            slice.batch = 0;
+            slice.first_vertex = static_cast<std::uint32_t>(mesh.vertices.size());
+            slice.vertex_count = count;
+            batch_slices.push_back(slice);
             for (std::uint32_t i = source; i < source + count; ++i)
             {
                 auto vertex = mesh.vertices[i];

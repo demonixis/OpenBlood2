@@ -8,7 +8,8 @@ namespace OpenBlood2
         ImGui::TextWrapped(
             "Original CClientExplosionSFX emitters. The original null damager suppresses all damage. "
             "Spatial WAV playback and selected original sprite/model components are implemented. Composite "
-            "surface illumination remains unavailable. Fragment/ring/flame/light state "
+            "point lights illuminate world/models through the bounded scene light selection. Fragment/ring/flame/light "
+            "state "
             "is shown "
             "below.");
         ImGui::Text("Audio: %s | active voices %zu | submitted frames %llu",
@@ -310,7 +311,7 @@ namespace OpenBlood2
             for (const auto& r : lights.reports)
                 ImGui::TextWrapped("Event %llu / type %u / %s / %zu lights: %s", (unsigned long long)r.id, r.type,
                                    r.source.c_str(), r.lights.size(),
-                                   r.error.empty() ? "created; illumination unavailable" : r.error.c_str());
+                                   r.error.empty() ? "created; scene light candidate" : r.error.c_str());
         ImGui::Separator();
         const auto& spells = game.server.object_particles;
         if (ImGui::TreeNode("Original shield / powerup particles"))

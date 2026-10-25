@@ -452,8 +452,32 @@ namespace OpenBlood2
                 return false;
             }
             const auto& r = mesh.ranges[d.range];
-            for (const auto& b : r.batches)
+            if (d.batch != UINT32_MAX && d.batch >= r.batches.size())
             {
+                error = "Invalid selected world batch";
+                return false;
+            }
+            if (d.vertex_count)
+            {
+                if (d.batch == UINT32_MAX || d.vertex_count % 3)
+                {
+                    error = "Invalid transparent vertex slice";
+                    return false;
+                }
+                const auto& b = r.batches[d.batch];
+                if (d.first_vertex < b.first || (d.first_vertex - b.first) % 3 ||
+                    d.first_vertex > std::size_t(b.first) + b.count ||
+                    d.vertex_count > std::size_t(b.first) + b.count - d.first_vertex)
+                {
+                    error = "Transparent vertex slice exceeds material batch";
+                    return false;
+                }
+            }
+            const auto begin = d.batch == UINT32_MAX ? 0u : d.batch;
+            const auto end = d.batch == UINT32_MAX ? r.batches.size() : std::size_t(d.batch) + 1;
+            for (auto index = begin; index < end; ++index)
+            {
+                const auto& b = r.batches[index];
                 std::uint32_t image = 0;
                 if (!world_material_frame(mesh, b.material, surface_time, image) || image >= textures_.size() ||
                     !registry_->get(textures_[image]) || b.lightmap >= textures_.size() ||
@@ -481,7 +505,8 @@ namespace OpenBlood2
             visible_.assign(draws.begin(), draws.end());
         else
         {
-            const auto frustum = eye_projection ? eye_frustum(eye, view, *eye_projection) : view_frustum(eye, view, aspect);
+            const auto frustum =
+                eye_projection ? eye_frustum(eye, view, *eye_projection) : view_frustum(eye, view, aspect);
             for (const auto& d : draws)
             {
                 if (in_frustum(mesh.ranges[d.range], d, frustum))
@@ -643,6 +668,13 @@ namespace OpenBlood2
                 const bool illuminate = !sky && style_ == DrawStyle::Opaque && !close_view;
                 FragmentLightUniform fragment;
                 fragment.scene_color = {target.scene_color.x, target.scene_color.y, target.scene_color.z, 1};
+                if (target.effects && !close_view && !sky)
+                {
+                    fragment.effects = *target.effects;
+                    if (!illuminate)
+                        fragment.effects.light_info = {};
+                }
+
                 fragment.modulation = {d.alpha, world_saturate_scale, receive ? 1.f : 0.f, 0};
                 fragment.position_radius = {light.position.x, light.position.y, light.position.z,
                                             illuminate ? light.radius : 0};
@@ -651,6 +683,11 @@ namespace OpenBlood2
                 auto batch = [&](std::uint32_t first, std::uint32_t count, std::uint32_t material,
                                  std::array<double, 2> rate, std::uint32_t lightmap)
                 {
+                    if (d.vertex_count)
+                    {
+                        first = d.first_vertex;
+                        count = d.vertex_count;
+                    }
                     world_texture_offset(rate, surface_time, uniform.texture_offset);
                     if (!has_pushed || std::memcmp(&pushed, &uniform, sizeof(uniform)) != 0)
                     {
@@ -708,8 +745,11 @@ namespace OpenBlood2
                     batch(r.first, r.count, 0, {}, 0);
                 }
                 else
-                    for (const auto& b : r.batches)
+                    for (std::size_t index = 0; index < r.batches.size(); ++index)
                     {
+                        if (d.batch != UINT32_MAX && d.batch != index)
+                            continue;
+                        const auto& b = r.batches[index];
                         if (sky)
                         {
                             bind(pipelines_->get(b.translucent ? WorldPipeline::SkyAlpha : WorldPipeline::Sky));

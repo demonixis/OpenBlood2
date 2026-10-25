@@ -83,7 +83,7 @@ namespace
         for (unsigned type : {0u, 1u, 2u, 3u, 6u, 8u})
         {
             CHECK(original_explosion_sprites(type, {10, 20, 30}, {0, 2, 0}, parts, missing, error));
-            CHECK(parts.size() == (type == 8 ? 1u : 2u) && !missing.empty());
+            CHECK(parts.size() == (type == 8 ? 1u : 2u) && missing.empty());
             CHECK(near(parts[0].position.y, type == 6 ? 20.f : type == 8 ? 50.f : 45.f));
             CHECK(near(parts[0].duration, type == 6 ? .5f : type == 8 ? 3.f : 1.5f));
             CHECK(parts[0].align == (type == 6 ? 1 : 0));
@@ -136,7 +136,7 @@ namespace
         ExplosionSprites effects;
         CHECK(effects.publish(1, {}, {0, 2, 0}, "partial", store, 0, error));
         CHECK(effects.active.size() == 1 && effects.started == 1 && effects.failed == 1 && !error.empty());
-        CHECK(effects.reports.back().sprites.size() == 1 && effects.reports.back().unavailable == "light illumination");
+        CHECK(effects.reports.back().sprites.size() == 1 && effects.reports.back().unavailable.empty());
         CHECK(effects.publish(255, {}, {0, 1, 0}, "unsupported", store, 0, error) && !error.empty());
         CHECK(effects.publish(1, {}, {}, "zero normal", store, 0, error) && !error.empty());
         const auto old_id = effects.active.front().id;

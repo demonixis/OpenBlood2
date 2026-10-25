@@ -141,3 +141,11 @@ scenario in the original and port on desktop; exercise the existing XR path
 without introducing screen-space camera shake. Gameplay damage and cosmetic RNG
 must remain independent. Low/medium detail and renderer limits must be explicitly
 accepted or left open rather than hidden by a “complete effects” label.
+
+## Implementation continuation (2026-10-25)
+
+The baseline inventory above remains historical. Lots 4–10 have subsequently been
+implemented; the [current roadmap](../../roadmap.md#original-vfx-completion-beta-feedback-m37--m4)
+and [lot 10 rendering contract](../../contracts/scene_effects_contracts.md) own the
+updated status, explicit adaptations and remaining qualification. Conditional P3
+emitters and absent original resources are not silently promoted to complete.

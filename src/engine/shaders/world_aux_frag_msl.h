@@ -17,6 +17,12 @@ struct type_Light
     float4 modelColor;
     float4 modelSources[12];
     float4 sceneColor;
+    float4 effectInfo;
+    float4 effectPositions[16];
+    float4 effectColors[16];
+    float4 fogColor;
+    float4 fogEyeNear;
+    float4 fogForwardFar;
 };
 
 struct type_Shadows
@@ -47,170 +53,222 @@ struct main0_in
 fragment main0_out main0(main0_in in [[stage_in]], constant type_Light& Light [[buffer(0)]], constant type_Shadows& Shadows [[buffer(1)]], texture2d<float> albedo [[texture(0)]], texture2d<float> lightmap [[texture(1)]], texture2d<float> shadowAtlas [[texture(2)]], sampler albedoSampler [[sampler(0)]], sampler lightmapSampler [[sampler(1)]], sampler shadowSampler [[sampler(2)]], float4 gl_FragCoord [[position]])
 {
     main0_out out = {};
-    float _247;
+    float _258;
     do
     {
-        bool _94;
+        bool _105;
         if ((isunordered(Light.modulation.z, 0.0) || Light.modulation.z > 0.0))
         {
-            _94 = Shadows.shadowInfo.x < 1.0;
+            _105 = Shadows.shadowInfo.x < 1.0;
         }
         else
         {
-            _94 = true;
+            _105 = true;
         }
-        if (_94)
+        if (_105)
         {
-            _247 = 0.0;
+            _258 = 0.0;
             break;
         }
-        float3 _97 = dfdx(in.in_var_TEXCOORD2);
-        float3 _98 = dfdy(in.in_var_TEXCOORD2);
-        float3 _99 = cross(_97, _98);
-        float3 _103 = _99 * rsqrt(precise::max(dot(_99, _99), 9.9999996826552253889678874634872e-21));
-        float3 _113;
-        if (dot(_103, Shadows.shadowEye.xyz - in.in_var_TEXCOORD2) < 0.0)
+        float3 _108 = dfdx(in.in_var_TEXCOORD2);
+        float3 _109 = dfdy(in.in_var_TEXCOORD2);
+        float3 _110 = cross(_108, _109);
+        float3 _114 = _110 * rsqrt(precise::max(dot(_110, _110), 9.9999996826552253889678874634872e-21));
+        float3 _124;
+        if (dot(_114, Shadows.shadowEye.xyz - in.in_var_TEXCOORD2) < 0.0)
         {
-            _113 = -_103;
+            _124 = -_114;
         }
         else
         {
-            _113 = _103;
+            _124 = _114;
         }
-        float _117 = fast::clamp((_113.y - 0.25) * 2.0, 0.0, 1.0);
-        bool _126;
-        if ((isunordered(_117, 0.0) || _117 > 0.0))
+        float _128 = fast::clamp((_124.y - 0.25) * 2.0, 0.0, 1.0);
+        bool _137;
+        if ((isunordered(_128, 0.0) || _128 > 0.0))
         {
-            _126 = in.in_var_TEXCOORD2.y > Shadows.shadowHeight.x;
-        }
-        else
-        {
-            _126 = true;
-        }
-        bool _136;
-        if (!_126)
-        {
-            _136 = any(in.in_var_TEXCOORD2.xz < Shadows.shadowBounds.xy);
+            _137 = in.in_var_TEXCOORD2.y > Shadows.shadowHeight.x;
         }
         else
         {
-            _136 = true;
+            _137 = true;
         }
-        bool _146;
-        if (!_136)
+        bool _147;
+        if (!_137)
         {
-            _146 = any(in.in_var_TEXCOORD2.xz > Shadows.shadowBounds.zw);
+            _147 = any(in.in_var_TEXCOORD2.xz < Shadows.shadowBounds.xy);
         }
         else
         {
-            _146 = true;
+            _147 = true;
         }
-        if (_146)
+        bool _157;
+        if (!_147)
         {
-            _247 = 0.0;
+            _157 = any(in.in_var_TEXCOORD2.xz > Shadows.shadowBounds.zw);
+        }
+        else
+        {
+            _157 = true;
+        }
+        if (_157)
+        {
+            _258 = 0.0;
             break;
         }
-        uint _152 = min(uint(Shadows.shadowInfo.x), 32u);
-        float _154;
-        _154 = 0.0;
-        float _155;
-        for (uint _157 = 0u; _157 < _152; _154 = _155, _157++)
+        uint _163 = min(uint(Shadows.shadowInfo.x), 32u);
+        float _165;
+        _165 = 0.0;
+        float _166;
+        for (uint _168 = 0u; _168 < _163; _165 = _166, _168++)
         {
-            uint _162 = _157 * 3u;
-            uint _165 = _162 + 1u;
-            uint _168 = _162 + 2u;
-            float2 _182 = ((in.in_var_TEXCOORD2.xz + (Shadows.casters[_168].zw * (in.in_var_TEXCOORD2.y - Shadows.casters[_162].w))) - Shadows.casters[_165].xy) * Shadows.casters[_165].zw;
-            float _189 = fast::clamp(1.0 - ((Shadows.casters[_168].x - in.in_var_TEXCOORD2.y) / Shadows.shadowInfo.z), 0.0, 1.0);
-            bool _197;
-            if (!any(_182 < float2(0.0)))
+            uint _173 = _168 * 3u;
+            uint _176 = _173 + 1u;
+            uint _179 = _173 + 2u;
+            float2 _193 = ((in.in_var_TEXCOORD2.xz + (Shadows.casters[_179].zw * (in.in_var_TEXCOORD2.y - Shadows.casters[_173].w))) - Shadows.casters[_176].xy) * Shadows.casters[_176].zw;
+            float _200 = fast::clamp(1.0 - ((Shadows.casters[_179].x - in.in_var_TEXCOORD2.y) / Shadows.shadowInfo.z), 0.0, 1.0);
+            bool _208;
+            if (!any(_193 < float2(0.0)))
             {
-                _197 = any(_182 > float2(1.0));
+                _208 = any(_193 > float2(1.0));
             }
             else
             {
-                _197 = true;
+                _208 = true;
             }
-            bool _202;
-            if (!_197)
+            bool _213;
+            if (!_208)
             {
-                _202 = _189 <= 0.0;
+                _213 = _200 <= 0.0;
             }
             else
             {
-                _202 = true;
+                _213 = true;
             }
-            if (_202)
+            if (_213)
             {
-                _155 = _154;
+                _166 = _165;
                 continue;
             }
-            float2 _212 = Shadows.casters[_162].xy + (float2(_182.x, 1.0 - _182.y) * Shadows.casters[_162].z);
-            float _214;
-            _214 = 0.0;
-            for (uint _217 = 0u; _217 < 4u; )
+            float2 _223 = Shadows.casters[_173].xy + (float2(_193.x, 1.0 - _193.y) * Shadows.casters[_173].z);
+            float _225;
+            _225 = 0.0;
+            for (uint _228 = 0u; _228 < 4u; )
             {
-                _214 += (((shadowAtlas.sample(shadowSampler, (_212 + (float2(((_217 & 1u) != 0u) ? 0.5 : (-0.5), ((_217 & 2u) != 0u) ? 0.5 : (-0.5)) * Shadows.shadowInfo.w)), level(0.0)).x - in.in_var_TEXCOORD2.y) > Shadows.casters[_168].y) ? 0.25 : 0.0);
-                _217++;
+                _225 += (((shadowAtlas.sample(shadowSampler, (_223 + (float2(((_228 & 1u) != 0u) ? 0.5 : (-0.5), ((_228 & 2u) != 0u) ? 0.5 : (-0.5)) * Shadows.shadowInfo.w)), level(0.0)).x - in.in_var_TEXCOORD2.y) > Shadows.casters[_179].y) ? 0.25 : 0.0);
+                _228++;
                 continue;
             }
-            _155 = precise::max(_154, _214 * _189);
+            _166 = precise::max(_165, _225 * _200);
         }
-        _247 = (_154 * _117) * Shadows.shadowInfo.y;
+        _258 = (_165 * _128) * Shadows.shadowInfo.y;
         break;
     } while(false);
-    float4 _251 = albedo.sample(albedoSampler, in.in_var_TEXCOORD1);
-    float _266;
+    float4 _262 = albedo.sample(albedoSampler, in.in_var_TEXCOORD1);
+    float _277;
     if (Light.positionRadius.w > 0.0)
     {
-        _266 = precise::max(0.0, 1.0 - (distance(in.in_var_TEXCOORD2, Light.positionRadius.xyz) / Light.positionRadius.w));
+        _277 = precise::max(0.0, 1.0 - (distance(in.in_var_TEXCOORD2, Light.positionRadius.xyz) / Light.positionRadius.w));
     }
     else
     {
-        _266 = 0.0;
+        _277 = 0.0;
     }
-    float3 _270 = Light.lightColor.xyz * _266;
-    float3 _368;
+    float3 _281 = Light.lightColor.xyz * _277;
+    float3 _326;
+    if (Light.effectInfo.x > 0.0)
+    {
+        float3 _288;
+        _288 = float3(0.0);
+        float3 _289;
+        for (uint _291 = 0u; _291 < min(uint(Light.effectInfo.x), 16u); _288 = _289, _291++)
+        {
+            float3 _301 = Light.effectPositions[_291].xyz - in.in_var_TEXCOORD2;
+            bool _311;
+            if ((uint(Light.effectColors[_291].w) & 64u) != 0u)
+            {
+                _311 = dot(in.in_var_TEXCOORD4, _301) <= 0.0;
+            }
+            else
+            {
+                _311 = false;
+            }
+            if (_311)
+            {
+                _289 = _288;
+                continue;
+            }
+            _289 = _288 + (Light.effectColors[_291].xyz * fast::clamp(1.0 - (length(_301) / Light.effectPositions[_291].w), 0.0, 1.0));
+        }
+        _326 = _281 + _288;
+    }
+    else
+    {
+        _326 = _281;
+    }
+    float3 _424;
     if (in.in_var_TEXCOORD3.x >= 0.0)
     {
-        _368 = precise::min((lightmap.sample(lightmapSampler, precise::max(in.in_var_TEXCOORD3, float2(0.0)), level(0.0)).xyz * (1.0 - _247)) + _270, float3(1.0)) * Light.modulation.y;
+        _424 = precise::min((lightmap.sample(lightmapSampler, precise::max(in.in_var_TEXCOORD3, float2(0.0)), level(0.0)).xyz * (1.0 - _258)) + _326, float3(1.0)) * Light.modulation.y;
     }
     else
     {
-        float3 _364;
+        float3 _420;
         if (Light.modulation.w > 0.5)
         {
-            float3 _299 = in.in_var_TEXCOORD4 * rsqrt(precise::max(dot(in.in_var_TEXCOORD4, in.in_var_TEXCOORD4), 9.9999999600419720025001879548654e-13));
-            uint _306 = min(uint(Light.modelAmbient.w), 4u);
-            float3 _308;
-            _308 = Light.modelAmbient.xyz;
-            float3 _309;
-            for (uint _311 = 0u; _311 < _306; _308 = _309, _311++)
+            float3 _355 = in.in_var_TEXCOORD4 * rsqrt(precise::max(dot(in.in_var_TEXCOORD4, in.in_var_TEXCOORD4), 9.9999999600419720025001879548654e-13));
+            uint _362 = min(uint(Light.modelAmbient.w), 4u);
+            float3 _364;
+            _364 = Light.modelAmbient.xyz;
+            float3 _365;
+            for (uint _367 = 0u; _367 < _362; _364 = _365, _367++)
             {
-                uint _316 = _311 * 3u;
-                float3 _320 = Light.modelSources[_316].xyz - in.in_var_TEXCOORD2;
-                float _322 = precise::max(length(_320), 9.9999997473787516355514526367188e-05);
-                float3 _324 = _320 / float3(_322);
-                uint _330 = _316 + 1u;
-                float _347;
-                if (Light.modelSources[_330].w >= (-1.0))
+                uint _372 = _367 * 3u;
+                float3 _376 = Light.modelSources[_372].xyz - in.in_var_TEXCOORD2;
+                float _378 = precise::max(length(_376), 9.9999997473787516355514526367188e-05);
+                float3 _380 = _376 / float3(_378);
+                uint _386 = _372 + 1u;
+                float _403;
+                if (Light.modelSources[_386].w >= (-1.0))
                 {
-                    _347 = fast::clamp((dot(-_324, Light.modelSources[_316 + 2u].xyz) - Light.modelSources[_330].w) / (1.0 - Light.modelSources[_330].w), 0.0, 1.0);
+                    _403 = fast::clamp((dot(-_380, Light.modelSources[_372 + 2u].xyz) - Light.modelSources[_386].w) / (1.0 - Light.modelSources[_386].w), 0.0, 1.0);
                 }
                 else
                 {
-                    _347 = 1.0;
+                    _403 = 1.0;
                 }
-                _309 = _308 + (Light.modelSources[_330].xyz * ((fast::clamp(1.0 - (_322 / Light.modelSources[_316].w), 0.0, 1.0) * _347) * precise::max(0.0, dot(_299, _324))));
+                _365 = _364 + (Light.modelSources[_386].xyz * ((fast::clamp(1.0 - (_378 / Light.modelSources[_372].w), 0.0, 1.0) * _403) * precise::max(0.0, dot(_355, _380))));
             }
-            _364 = (Light.modelColor.xyz * precise::min(_308, float3(1.0))) * Light.modelColor.w;
+            _420 = (Light.modelColor.xyz * precise::min(_364, float3(1.0))) * Light.modelColor.w;
         }
         else
         {
-            _364 = in.in_var_TEXCOORD0;
+            _420 = in.in_var_TEXCOORD0;
         }
-        _368 = (_364 * (1.0 - _247)) + _270;
+        _424 = (_420 * (1.0 - _258)) + _326;
     }
-    out.out_var_SV_Target0 = float4((_251.xyz * _368) * Light.sceneColor.xyz, 1.0);
+    float4 _433 = float4((_262.xyz * _424) * Light.sceneColor.xyz, 1.0);
+    bool _436 = Light.fogColor.w > 0.0;
+    float4 _466;
+    if (_436)
+    {
+        float _462;
+        if (_436)
+        {
+            _462 = fast::clamp((dot(in.in_var_TEXCOORD2 - Light.fogEyeNear.xyz, Light.fogForwardFar.xyz) - Light.fogEyeNear.w) / (Light.fogForwardFar.w - Light.fogEyeNear.w), 0.0, 1.0);
+        }
+        else
+        {
+            _462 = 0.0;
+        }
+        float3 _464 = mix(_433.xyz, Light.fogColor.xyz, float3(_462));
+        _466 = float4(_464.x, _464.y, _464.z, _433.w);
+    }
+    else
+    {
+        _466 = _433;
+    }
+    out.out_var_SV_Target0 = _466;
     out.out_var_SV_Target1 = float4(0.0, 0.0, 0.0, 1.0);
     out.out_var_SV_Target2 = float4(gl_FragCoord.z, 0.0, 0.0, 0.0);
     return out;

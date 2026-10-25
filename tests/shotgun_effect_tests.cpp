@@ -97,6 +97,46 @@ namespace
         CHECK(error.empty());
         return true;
     }
+    bool clipping(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(setup(g, root));
+        auto owner = g.objects.create(g.objects.find_class("BaseClass"), {});
+        CHECK(owner);
+        std::string error;
+        g.world.models.clear();
+        g.world.models.push_back({});
+        test_brush::face(g.world.models[0],
+                         {{-10, 60, 101.25f}, {0, 60, 101.25f}, {0, 100, 101.25f}, {-10, 100, 101.25f}}, {0, 0, -1});
+        g.world.models[0].surfaces[0].flags = 1;
+        CHECK(g.collision.build(g.world.models[0], error));
+        g.server.collision_ready = true;
+        auto settings = recipe();
+        settings.destination.x = -.2f;
+        CHECK(publish(g, settings, owner));
+        auto& fx = g.server.shotgun_effects;
+        CHECK(fx.reports.back().settings.clip_polygon.size() == 4);
+        CHECK(fx.sprites.front().clip_polygon.size() == 4);
+        fx.advance(.1, g.server);
+        const auto& mark = fx.sprites.front();
+        SpriteView view;
+        CHECK(view.begin_frame({0, 80, 0}, {}, error));
+        CHECK(view.add(mark.sprite.get(), mark.track, {mark.position, mark.rotation}, mark.scale,
+                       FLAG_VISIBLE | FLAG_ROTATEABLESPRITE, {}, g.resources, error, mark.alpha, mark.color));
+        CHECK(view.clip_last(mark.clip_polygon, error));
+        CHECK(!view.draws.empty() && !view.mesh.vertices.empty());
+        for (auto vertex : view.mesh.vertices)
+        {
+            const auto world = vector_add(mark.position, rotate_vector(vertex.position, mark.rotation));
+            CHECK(world.x <= .0001f && std::abs(world.z - 100) < .001f);
+        }
+        view.sort();
+        view.batch();
+        CHECK(view.batch_slices.size() == 1 && view.batch_slices[0].vertex_count == view.mesh.ranges[0].count);
+        CHECK(g.unload_world());
+        CHECK(fx.sprites.empty());
+        return true;
+    }
     bool recipes(const std::filesystem::path& root)
     {
         GameSession g;
@@ -405,6 +445,7 @@ int main(int argc, char** argv)
         return 2;
     std::string mode = argv[1];
     return (mode == "recipes"      ? recipes(argv[2])
+            : mode == "clipping"   ? clipping(argv[2])
             : mode == "ballistics" ? ballistics(argv[2])
             : mode == "lifecycle"  ? lifecycle(argv[2])
             : mode == "liquids"    ? liquids(argv[2])

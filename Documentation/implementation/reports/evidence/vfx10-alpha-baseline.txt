@@ -1,0 +1,4 @@
+Original 35122a8a shaders, same current CPU draw path: exit 1
+cycle=0 pixel=120,80 got=3,126,126
+127: ok  
+

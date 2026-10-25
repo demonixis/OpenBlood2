@@ -211,7 +211,7 @@ namespace OpenBlood2
                     continue;
                 }
             }
-            const DVector delta = vector_subtract(d.position, eye);
+            const DVector delta = vector_subtract(instance.center, eye);
             visible_.push_back({i, double(delta.x) * frustum.forward.x + double(delta.y) * frustum.forward.y +
                                        double(delta.z) * frustum.forward.z});
         }
@@ -221,11 +221,11 @@ namespace OpenBlood2
         SDL_GPUViewport viewport{0, float(top), float(width_), float(height), target.min_depth, target.max_depth};
         SDL_SetGPUViewport(target.pass, &viewport);
         const bool blended = translucent || style_ == DrawStyle::SpriteAlpha;
-        SDL_BindGPUGraphicsPipeline(
-            target.pass, pipelines_->get(shaded    ? (blended ? WorldPipeline::SkinnedSurfaceAlpha
-                                                              : WorldPipeline::SkinnedSurfaceOpaque)
-                                         : blended ? WorldPipeline::SkinnedAlpha
-                                                   : WorldPipeline::SkinnedOpaque));
+        SDL_BindGPUGraphicsPipeline(target.pass,
+                                    pipelines_->get(shaded    ? (blended ? WorldPipeline::SkinnedSurfaceAlpha
+                                                                         : WorldPipeline::SkinnedSurfaceOpaque)
+                                                    : blended ? WorldPipeline::SkinnedAlpha
+                                                              : WorldPipeline::SkinnedOpaque));
         SDL_GPUBuffer* storage[] = {registry_->get(palette_), registry_->get(deformation_)};
         SDL_BindGPUVertexStorageBuffers(target.pass, 0, storage, 2);
         if (shaded)
@@ -281,6 +281,16 @@ namespace OpenBlood2
             SDL_PushGPUVertexUniformData(target.commands, 0, &skinned, sizeof(skinned));
             FragmentLightUniform fragment;
             fragment.scene_color = {target.scene_color.x, target.scene_color.y, target.scene_color.z, 1};
+            if (target.effects && !close_view)
+            {
+                fragment.effects = *target.effects;
+                for (auto& color : fragment.effects.colors)
+                    if (static_cast<unsigned>(color[3]) & (1u << 5))
+                        color = {}; // FLAG_ONLYLIGHTWORLD.
+                if (!illuminate)
+                    fragment.effects.light_info = {};
+            }
+
             const bool pixel_light = per_pixel_lighting || shaded;
             fragment.modulation = {d.alpha, 0, 0, pixel_light ? 1.f : 0.f};
             fragment.position_radius = {light.position.x, light.position.y, light.position.z,

@@ -61,3 +61,10 @@ separate bounded pools and camera-origin player firing remain explicit adaptatio
 Live realtime lighting is not supplied by a sprite or line. Shader/dependency pins,
 commercial assets and the original reference sources remain unchanged. M2 stays closed
 with M2-GPU-001; this does not certify M3 traversal or pixel-identical retail presentation.
+
+## Rendering continuation — VFX lot 10
+
+[Scene effect rendering](scene_effects_contracts.md) supersedes the earlier pending
+geometry illumination, global transparency and mark-clipping boundaries where applicable.
+Recipe/lifetime/resource rules above are unchanged; renderer limits and adaptations
+are documented in that continuation.

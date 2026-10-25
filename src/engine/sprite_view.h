@@ -40,6 +40,8 @@ namespace OpenBlood2
         // Particles with invalid positions or colours are skipped and reported in the entry error.
         bool add_particle_system(std::string_view texture, DVector origin, std::span<const Particle>, float half_extent,
                                  float alpha, std::uint64_t system, const Resources&, std::string&);
+        // Immediately after add(): clip the last visible mark, leaving its inspection entry.
+        bool clip_last(std::span<const DVector>, std::string& error);
         void sort();
         // Submission batches after sort(): consecutive draws sharing a texture and opacity are
         // appended as one world-space range with an identity transform, keeping their order.
@@ -47,6 +49,9 @@ namespace OpenBlood2
         void batch();
         WorldMesh mesh;
         std::vector<WorldDraw> draws, batched_draws;
+        // One slice per original draw, into the uploaded world-space batches. The global
+        // queue can split/rejoin consecutive slices without rebuilding or reuploading vertices.
+        std::vector<WorldDraw> batch_slices;
         std::vector<SpriteViewEntry> entries;
         std::uint64_t revision = 0;
 

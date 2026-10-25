@@ -13,7 +13,7 @@ class CLeechPrimeProjectile final : public CProjectile
     OpenBlood2::SoundId flight_sound = 0;
     std::uint64_t trail = 0;
     OpenBlood2::SceneExplosionReport effect;
-    std::string sound_error, light_error = "Projectile AddLight(100) illumination unavailable";
+    std::string sound_error, light_error;
 
   protected:
     bool InitialUpdate() override;

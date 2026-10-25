@@ -143,6 +143,7 @@ namespace OpenBlood2
             std::size_t index = 0;
         };
         std::vector<SkyDraw> sky_order; // Interleaved authored slots, never distance sorted.
+        SceneEffects effects;
         PresentationStats stats;
 
       private:

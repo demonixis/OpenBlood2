@@ -43,7 +43,6 @@ CFlareProjectile::CFlareProjectile()
     damage_type = DamageType::Fire;
     color_ready = choose_color(color);
     track_start = g_pServerDE->GetTime();
-    light_error = "Owner light (radius 200) illumination unavailable";
 }
 CFlareProjectile::~CFlareProjectile()
 {
@@ -262,7 +261,6 @@ CFlareBurstProjectile::CFlareBurstProjectile()
     filename = "Sprites\\lensflare32.spr";
     skin = nullptr;
     m_damage.m_bGodMode = true;
-    light_error = "Owner light (radius 75) illumination unavailable";
 }
 bool CFlareBurstProjectile::InitialUpdate()
 {

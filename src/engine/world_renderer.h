@@ -2,8 +2,9 @@
 #include "engine/gpu_registry.h"
 #include "engine/model_view.h"
 #include "engine/normal_maps.h"
-#include "engine/surface_materials.h"
 #include "engine/point_light.h"
+#include "engine/scene_effects.h"
+#include "engine/surface_materials.h"
 #include "engine/world_view.h"
 #include <SDL3/SDL_gpu.h>
 
@@ -102,8 +103,9 @@ namespace OpenBlood2
         std::array<float, 4> modulation{}, position_radius{}, light_color{}, model_ambient{}, model_color{};
         std::array<std::array<float, 4>, 12> model_sources{};
         std::array<float, 4> scene_color{1, 1, 1, 1};
+        SceneEffectsUniform effects;
     };
-    static_assert(sizeof(FragmentLightUniform) == 288);
+    static_assert(sizeof(FragmentLightUniform) == 864);
     // Fragment uniform slot 1 of both world fragment shaders (std140), pushed once per record.
     struct ShadowUniform
     {
@@ -209,6 +211,7 @@ namespace OpenBlood2
         DVector scene_color{1, 1, 1}; // Original SetGlobalLightScale, scene only.
         // XR eye: every draw (sky and close included) uses this projection and its frustum.
         const EyeProjection* eye = nullptr;
+        const SceneEffectsUniform* effects = nullptr;
     };
     // Per-material enhanced parameters and normal maps of one renderer, parallel to its
     // material textures; resolved again when the materials or the SurfaceScene revision change.

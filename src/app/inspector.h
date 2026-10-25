@@ -19,6 +19,7 @@ namespace OpenBlood2
     struct GpuRegistryStats;
     struct ModelLightingStats;
     struct ShadowStats;
+    struct SceneEffects;
 
     struct Inspector
     {
@@ -37,6 +38,7 @@ namespace OpenBlood2
         const GpuRegistryStats* gpu_resources = nullptr;
         const ModelLightingStats* model_lighting = nullptr;
         const ShadowStats* model_shadows = nullptr;
+        const SceneEffects* scene_effects = nullptr;
         const SurfaceReport* materials = nullptr; // Enhanced renderer material inspection.
         bool materials_defaults_only = false, materials_emissive_only = false;
         bool select_models = false;

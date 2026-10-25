@@ -1,0 +1,20 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/release
+    Start 1103: gpu.model_shadows
+1/4 Test #1103: gpu.model_shadows ................   Passed    0.69 sec
+    Start 1104: gpu.surface
+2/4 Test #1104: gpu.surface ......................   Passed    0.86 sec
+    Start 1105: gpu.post
+3/4 Test #1105: gpu.post .........................   Passed    0.92 sec
+    Start 1534: gpu.shotgun_effects
+4/4 Test #1534: gpu.shotgun_effects ..............   Passed    0.73 sec
+
+100% tests passed out of 4
+
+Label Time Summary:
+effects           =   0.73 sec*proc (1 test)
+gpu               =   3.20 sec*proc (4 tests)
+private           =   3.20 sec*proc (4 tests)
+surface           =   1.78 sec*proc (2 tests)
+world_lighting    =   0.69 sec*proc (1 test)
+
+Total Test time (real) =   3.22 sec

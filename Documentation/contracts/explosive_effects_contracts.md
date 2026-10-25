@@ -57,3 +57,10 @@ Existing Howitzer rays/child damage, eight Napalm fireballs, grenade/bomb collis
 and timers, primary Napalm's three-model impact and fragment damage are unchanged.
 Portable cosmetic RNG, replacement collision/rasterization and high-detail-only scope
 remain explicit. This does not reopen M2 or certify M3 campaign completion.
+
+## Rendering continuation — VFX lot 10
+
+[Scene effect rendering](scene_effects_contracts.md) supersedes the earlier pending
+geometry illumination, global transparency and mark-clipping boundaries where applicable.
+Recipe/lifetime/resource rules above are unchanged; renderer limits and adaptations
+are documented in that continuation.

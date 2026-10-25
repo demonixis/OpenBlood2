@@ -30,6 +30,24 @@ namespace
             mesh.vertices.push_back(v);
         mesh.ranges.push_back({first, 6, {}, "quad", {{first, 6, material, alpha, {0, 0, z}}}});
     }
+    // Independent repeat-addressed bilinear texel oracle. Scene samplers switched
+    // from nearest to bilinear/anisotropic filtering in the texture-sharpness fix.
+    std::array<double, 4> bilinear(const Texture& texture, double u, double v)
+    {
+        const auto x = static_cast<int>(std::floor(u - .5)), y = static_cast<int>(std::floor(v - .5));
+        const double fx = u - .5 - x, fy = v - .5 - y;
+        auto wrap = [](int n, int extent) { return (n % extent + extent) % extent; };
+        std::array<double, 4> result{};
+        for (int dy = 0; dy < 2; ++dy)
+            for (int dx = 0; dx < 2; ++dx)
+            {
+                const auto at = (wrap(y + dy, texture.height) * texture.width + wrap(x + dx, texture.width)) * 4;
+                const double weight = (dx ? fx : 1 - fx) * (dy ? fy : 1 - fy);
+                for (unsigned c = 0; c < 4; ++c)
+                    result[c] += texture.rgba[at + c] * weight;
+            }
+        return result;
+    }
     bool readback(SDL_GPUDevice* gpu, SDL_GPUCommandBuffer* cmd, Capture& c)
     {
         auto* copy = SDL_BeginGPUCopyPass(cmd);
@@ -115,13 +133,23 @@ int main(int argc, char** argv)
                           << ',' << int(p[2]) << '\n';
             return ok;
         };
+        auto pane = [&](int x, int y)
+        {
+            const double u = (x + .5 - w * .25) / (w * .5), v = (y + .5 - (h * .5 - w * .25)) / (w * .5);
+            const auto texel = bilinear(mesh.materials[1].image, u * 2, v * 2);
+            const double alpha = texel[3] / 255;
+            const double background[3] = {cycle == 1 ? 255. : 0., cycle == 1 ? 255. : 128., cycle == 1 ? 0. : 127.};
+            int expected[3];
+            for (unsigned c = 0; c < 3; ++c)
+                expected[c] = int(std::lround(texel[c] * alpha + background[c] * (1 - alpha)));
+            return rgb(x, y, expected[0], expected[1], expected[2]);
+        };
         bool ok = false;
         if (cycle == 2 || cycle == 3)
             ok = rgb(w * 3 / 8, h / 2 - w / 8, 255, 255, 0) && rgb(w * 5 / 8, h / 2 + w / 8, 255, 255, 0);
         else
-            ok = rgb(w * 3 / 8, h / 2 - w / 8, cycle == 1 ? 255 : 0, cycle == 1 ? 255 : 128, cycle == 1 ? 0 : 127) &&
-                 rgb(w * 5 / 8, h / 2 - w / 8, cycle == 1 ? 255 : 128, cycle == 1 ? 127 : 64, cycle == 1 ? 0 : 63) &&
-                 rgb(w * 3 / 8, h / 2 + w / 8, 255, 0, 0) && rgb(w * 5 / 8, h / 2 + w / 8, 0, 0, 0);
+            ok = pane(w * 3 / 8, h / 2 - w / 8) && pane(w * 5 / 8, h / 2 - w / 8) && pane(w * 3 / 8, h / 2 + w / 8) &&
+                 pane(w * 5 / 8, h / 2 + w / 8);
         SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
         CHECK(capture.save((std::string(argv[1]) + "-" + std::to_string(cycle) + ".png").c_str()));
         CHECK(ok);
@@ -193,10 +221,7 @@ int main(int argc, char** argv)
                                              vector_add(real.ranges[it->range].pivot, {0, -.4f, .4f}));
             const auto delta = vector_subtract(authored, surface->origin);
             const auto& texture = real.materials[batch.material].image;
-            auto wrap = [](int value, int extent) { return (value % extent + extent) % extent; };
-            const auto tx = wrap(int(std::floor(vector_dot(delta, surface->u))), texture.width);
-            const auto ty = wrap(int(std::floor(vector_dot(delta, surface->v))), texture.height);
-            const auto* texel = texture.rgba.data() + (ty * texture.width + tx) * 4;
+            const auto texel = bilinear(texture, vector_dot(delta, surface->u), vector_dot(delta, surface->v));
             const auto* actual = pixels + (120 * 320 + 160) * 4;
             const float clear[3] = {.025f, .035f, .05f};
             // The flat-shaded pane carries one baked light on every corner (128 in SubwayA).

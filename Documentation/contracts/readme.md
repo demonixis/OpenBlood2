@@ -272,3 +272,6 @@ For everyday setup and contribution guidance, return to the [developer index](..
 - [Shared ballistic effects](ballistic_effects_contracts.md): original bullet/shell/BMG effects, flashes and tracers (beta lot 4).
 
 - [Original explosive weapon effects (lot 7)](explosive_effects_contracts.md)
+
+- [Energy, boss and rift effects](energy_effects_contracts.md): original composites and particles (beta lot 8).
+- [Scene effect rendering](scene_effects_contracts.md): dynamic lights, fog, transparency and clipped marks (beta lot 10).

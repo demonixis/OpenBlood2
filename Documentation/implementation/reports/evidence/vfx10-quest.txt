@@ -1,0 +1,61 @@
+[0/2] Re-checking globbed directories...
+[1/40] Scanning /Users/yann/projects/lithtech/openblood2/src/app/scene_presenter.cpp for CXX dependencies
+[2/40] Generating CXX dyndep file CMakeFiles/blood2_app.dir/CXX.dd
+[3/6] Building CXX object CMakeFiles/blood2_app.dir/src/app/scene_presenter.cpp.o
+[4/6] Linking CXX shared library libmain.so
+[4/6] Assembling the quest Debug APK
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.6.0/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :app
+WARNING: The option setting 'android.useAndroidX=false' is deprecated.
+The current default is 'true'.
+It will be removed in version 10.0 of the Android Gradle plugin.
+Add android.sync.suppressAgpWarnings=UNSUPPORTED_PROJECT_OPTION_USE to the gradle.properties file to suppress this warning.
+
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preQuestDebugBuild UP-TO-DATE
+> Task :app:mergeQuestDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateQuestDebugResources UP-TO-DATE
+> Task :app:packageQuestDebugResources UP-TO-DATE
+> Task :app:processQuestDebugNavigationResources UP-TO-DATE
+> Task :app:parseQuestDebugLocalResources UP-TO-DATE
+> Task :app:generateQuestDebugRFile UP-TO-DATE
+> Task :app:compileQuestDebugKotlin NO-SOURCE
+> Task :app:javaPreCompileQuestDebug UP-TO-DATE
+> Task :app:compileQuestDebugJavaWithJavac UP-TO-DATE
+> Task :app:generateQuestDebugAssets UP-TO-DATE
+> Task :app:mergeQuestDebugAssets UP-TO-DATE
+> Task :app:compressQuestDebugAssets UP-TO-DATE
+> Task :app:generateQuestDebugGlobalSynthetics UP-TO-DATE
+> Task :app:checkQuestDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarQuestDebugFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexQuestDebug UP-TO-DATE
+> Task :app:mergeLibDexQuestDebug UP-TO-DATE
+> Task :app:checkQuestDebugAarMetadata UP-TO-DATE
+> Task :app:mapQuestDebugSourceSetPaths UP-TO-DATE
+> Task :app:compileQuestDebugNavigationResources UP-TO-DATE
+> Task :app:mergeQuestDebugResources UP-TO-DATE
+> Task :app:createQuestDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksQuestDebug UP-TO-DATE
+> Task :app:processQuestDebugMainManifest UP-TO-DATE
+> Task :app:processQuestDebugManifest UP-TO-DATE
+> Task :app:processQuestDebugManifestForPackage UP-TO-DATE
+> Task :app:processQuestDebugResources UP-TO-DATE
+> Task :app:dexBuilderQuestDebug UP-TO-DATE
+> Task :app:mergeProjectDexQuestDebug UP-TO-DATE
+> Task :app:processQuestDebugJavaRes NO-SOURCE
+> Task :app:mergeQuestDebugJavaResource UP-TO-DATE
+> Task :app:mergeQuestDebugJniLibFolders
+> Task :app:validateSigningQuestDebug UP-TO-DATE
+> Task :app:writeQuestDebugAppMetadata UP-TO-DATE
+> Task :app:writeQuestDebugSigningConfigVersions UP-TO-DATE
+> Task :app:mergeQuestDebugNativeLibs
+> Task :app:stripQuestDebugDebugSymbols
+> Task :app:packageQuestDebug
+> Task :app:createQuestDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleQuestDebug
+
+BUILD SUCCESSFUL in 4s
+35 actionable tasks: 4 executed, 31 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.6.0/userguide/configuration_cache_enabling.html

@@ -93,6 +93,9 @@ namespace OpenBlood2
         DVector position{};
         DRotation rotation;
         float alpha = 1; // Alpha passes only; opaque passes retain their existing policy.
+        // Optional face and vertex slice for globally interleaved transparency. Zero count
+        // selects the complete batch; slices never cross a material boundary.
+        std::uint32_t batch = UINT32_MAX, first_vertex = 0, vertex_count = 0;
     };
     struct WorldViewStats
     {

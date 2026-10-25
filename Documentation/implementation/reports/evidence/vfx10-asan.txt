@@ -1,0 +1,28 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/sanitize
+    Start  636: sprite_view.geometry
+1/9 Test  #636: sprite_view.geometry .............   Passed    0.67 sec
+    Start  637: sprite_view.failures
+2/9 Test  #637: sprite_view.failures .............   Passed    0.23 sec
+    Start 1021: shotgun_effects.recipes
+3/9 Test #1021: shotgun_effects.recipes ..........   Passed    0.70 sec
+    Start 1022: shotgun_effects.ballistics
+4/9 Test #1022: shotgun_effects.ballistics .......   Passed    0.17 sec
+    Start 1023: shotgun_effects.lifecycle
+5/9 Test #1023: shotgun_effects.lifecycle ........   Passed    0.18 sec
+    Start 1024: shotgun_effects.liquids
+6/9 Test #1024: shotgun_effects.liquids ..........   Passed    0.14 sec
+    Start 1025: shotgun_effects.failures
+7/9 Test #1025: shotgun_effects.failures .........   Passed    0.13 sec
+    Start 1026: shotgun_effects.clipping
+8/9 Test #1026: shotgun_effects.clipping .........   Passed    0.13 sec
+    Start 1027: presentation_effects.state
+9/9 Test #1027: presentation_effects.state .......   Passed    0.66 sec
+
+100% tests passed out of 9
+
+Label Time Summary:
+effects        =   2.11 sec*proc (7 tests)
+headless       =   3.02 sec*proc (9 tests)
+sprite_view    =   0.90 sec*proc (2 tests)
+
+Total Test time (real) =   3.04 sec

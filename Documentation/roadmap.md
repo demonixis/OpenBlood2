@@ -1,6 +1,6 @@
 # Roadmap
 
-Reviewed on 2026-10-25 (beta VFX lots 1–9); level-opening coverage reconciled with `9bfada1` and
+Reviewed on 2026-10-25 (beta VFX lots 1–10); level-opening coverage reconciled with `9bfada1` and
 [audit 19](implementation/reports/evidence/all-levels-audit-19.log), save/load with lot 14.
 Percentages are task estimates, not acceptance. Only the user accepts a milestone.
 
@@ -82,15 +82,16 @@ progress, and every one is recorded.
 | 3.4 | Campaign chaining: every authored NEW_LEVEL/EndEpisode in order, with KeepAlive inventory and stats | SubwayA → CityHub has a scripted test. The user has played the rest without a recorded result. |
 | 3.5 | Bosses and endgame: Gideon, EnhancedGideon, UndeadGideon, AncientOne, End script, credits | Original-source ports, focused behavior tests and world opening pass; a complete player-driven endgame remains unverified. |
 | 3.6 | Beta build: CI archives for the three platforms, logs and crash capture, a bug report channel | CI archives, logs and crash capture exist. |
-| 3.7 | Beta bug triage and fixes, each fix with a regression test; retest the existing reports (post-transition stutter, idle Cultists, frozen corpses, NPC placement) | In progress: Discord tester fixes, all nine control actions, destruction VFX lot 1 (wood/metal/glass), shotgun VFX lot 2 shared ballistic VFX lot 4, flare VFX lot 5 Tesla/Drudge VFX lot 6 and explosive weapon VFX lot 7 implemented. Museum crash remains unreproduced; full campaign retest remains. |
+| 3.7 | Beta bug triage and fixes, each fix with a regression test; retest the existing reports (post-transition stutter, idle Cultists, frozen corpses, NPC placement) | In progress: Discord tester fixes, all nine control actions and VFX lots 1–10 implemented (details below). Museum crash remains unreproduced; full campaign retest remains. |
 | 3.8 | M3 acceptance record for the user's decision | Not started. |
 
 ## M4 — original rendering
 
 Metal has been tested extensively on macOS, Vulkan on Fedora 44, and Vulkan
 briefly on Windows. D3D12/DXIL is dropped. The work left is broader Windows
-testing, plus any gaps the beta finds. Known gaps include underwater fog,
-global translucent ordering and realtime light illumination. The original
+testing, plus any gaps the beta finds. VFX lot 10 implements scene light illumination,
+volume/world fog and global translucent ordering. Fog lights, FX-light shadows, SkyFog
+and matched original-executable visual qualification remain explicit limits. The original
 renderer remains the reference and stays selectable after M5.
 
 ### Original VFX completion (beta feedback, M3.7 / M4)
@@ -106,9 +107,9 @@ renderer remains the reference and stays selectable after M5.
 | 7 | Explosive weapons: Howitzer impacts (9–11), Napalm alternate (5) and missing projectile smoke connections | Implemented; [contract and verification](contracts/explosive_effects_contracts.md). Impacts 5/9/10/11, Napalm smoke and M16-grenade/Howitzer fragment trails; existing damage, grenade/bomb and Napalm primary effects preserved. |
 | 8 | Remaining energy/boss/environment recipes: Singularity, Death Ray, enemy trails/impacts, Naga and Spawner rift | Implemented; [contract and verification](contracts/energy_effects_contracts.md). Source composites 12/18/19/23–25/28–31, enemy trails, Singularity absorption and Death Ray rings/electricity; restored trails republished once. Rift 24 has no established live caller. |
 | 9 | Remaining destruction materials and evidenced environment emitters | Implemented: stone/plastic/terrain/flesh and original metal fallback for liquid/energy; [verification](implementation/reports/remaining_debris.md). Rain/legacy emitters remain conditional P3 until an exercised level/caller is identified. |
-| 10 | M4 rendering dependencies: realtime FX illumination, underwater fog, global translucent ordering and clipped marks | Authorized; renderer synchronization confirmed by the user. Queued after the recipe lots. Evaluated light states are not geometry illumination. |
+| 10 | M4 rendering dependencies: realtime FX illumination, underwater fog, global translucent ordering and clipped marks | Implemented; [contract and verification](contracts/scene_effects_contracts.md). Bounded dynamic lights, volume/world fog, interleaved transparent families and polygon-clipped marks; source flags and explicit renderer adaptations. Fog lights, FX shadows and exact original raster parity remain separate. |
 
-The user authorized the continuation on 2026-10-25; lots 4–9 are implemented; lot 10 remains to execute, with renderer synchronization confirmed by the user for lot 10. P1 restores frequent weapon feedback;
+The user authorized the continuation on 2026-10-25; lots 4–10 are implemented, after the user's renderer synchronization confirmation for lot 10. P1 restores frequent weapon feedback;
 P2 completes less common weapon/boss/destruction effects; P3 requires evidence of
 campaign use. Each implementation lot needs source-parameter checks and matched
 original/port visual scenarios; the inventory itself changes no runtime behavior.

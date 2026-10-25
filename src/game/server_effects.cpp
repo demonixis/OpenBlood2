@@ -154,7 +154,46 @@ namespace OpenBlood2
             error = "Shotgun effect source/resources unavailable";
             return 0;
         }
-        return shotgun_effects.publish(source, settings, *objects_.models, *objects_.sprites, *client_resources,
+        auto clipped = settings;
+        clipped.clip_polygon.clear();
+        // Original CMarkSFX asks ClipSprite for the surface immediately behind the mark.
+        // Use the actual mark position (the source accidentally reuses its list-loop vPos)
+        // and cross the port's 1.25-unit impact bias. No game random draw or damage query.
+        SegmentHit hit;
+        if (objects_.world &&
+            IntersectSegment(settings.destination,
+                             vector_subtract(settings.destination, vector_scale(settings.normal, 3)), source, hit,
+                             false, SegmentObjects::All) == SegmentResult::Hit &&
+            hit.polygon != UINT32_MAX)
+        {
+            const auto* object = hit.object ? objects_.get(hit.object) : nullptr;
+            const auto model_index = object ? object->world_model_index : 0u;
+            if ((!hit.object || (object && object->life == Life::Alive)) && model_index < objects_.world->models.size())
+            {
+                const auto& model = objects_.world->models[model_index];
+                if (hit.polygon < model.polygons.size())
+                {
+                    const auto& polygon = model.polygons[hit.polygon];
+                    const auto count = polygon.base_points == UINT16_MAX ? polygon.points.size() : polygon.base_points;
+                    if (count >= 3 && count <= 512 && count <= polygon.points.size())
+                        for (std::size_t i = 0; i < count; ++i)
+                        {
+                            if (polygon.points[i] >= model.points.size())
+                            {
+                                clipped.clip_polygon.clear();
+                                break;
+                            }
+                            auto point = model.points[polygon.points[i]];
+                            if (object)
+                                point = vector_add(
+                                    object->state.m_Pos,
+                                    rotate_vector(vector_subtract(point, model.translation), object->state.m_Rotation));
+                            clipped.clip_polygon.push_back(point);
+                        }
+                }
+            }
+        }
+        return shotgun_effects.publish(source, clipped, *objects_.models, *objects_.sprites, *client_resources,
                                        objects_.time(), *this, error);
     }
     std::uint64_t ServerAdapter::PublishWeaponSprites(HOBJECT source, const WeaponSpriteSettings& settings,

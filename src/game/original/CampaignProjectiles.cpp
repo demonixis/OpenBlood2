@@ -257,7 +257,6 @@ CGroundStrikeProjectile::CGroundStrikeProjectile() : CProjectile(OT_NORMAL)
     filename = "Sprites\\napalmprime.spr";
     skin = nullptr;
     damage_type = DamageType::Normal;
-    light_error = "AddLight illumination unavailable";
 }
 bool CGroundStrikeProjectile::Update()
 {

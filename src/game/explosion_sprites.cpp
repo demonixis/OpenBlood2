@@ -62,13 +62,11 @@ namespace OpenBlood2
                 : type == 1 ? 2.f
                             : 2.5f,
                 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
-            unavailable = "light illumination";
         }
         else if (type == 4)
         {
             add(30, .75f, .75f, 1.5f, 1, 0, 0, "Sprites\\napalm.spr");
             add(25, .5f, 2.5f, 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
-            unavailable = "light illumination";
         }
         else if (type == 5 || (type >= 9 && type <= 11))
         {
@@ -86,7 +84,6 @@ namespace OpenBlood2
             }
             if (type != 11)
                 add(25, .5f, 2.5f, 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
-            unavailable = "light illumination";
         }
         else if (type >= 13 && type <= 15)
         {
@@ -98,7 +95,6 @@ namespace OpenBlood2
                     add(10, .25f, .75f, .5f, .75f, 0, 0, "Sprites\\explodesmall.spr");
                 add(15, .25f, 1, 3, .85f, 1, 0, "Sprites\\smokepuff2.spr");
             }
-            unavailable = "light illumination";
         }
         else if (type == 16 || type == 17)
         {
@@ -109,13 +105,11 @@ namespace OpenBlood2
             }
             else
                 add(0, .25f, 1.5f, .75f, 1, 1, 2, "Sprites\\explode128.spr");
-            unavailable = "light illumination";
         }
         else if (type == 6)
         {
             add(0, .25f, .25f, .5f, 1, 0, 1, "Sprites\\debrisimp.spr");
             add(20, .25f, 1.5f, 5, .85f, 1, 0, "Sprites\\smokepuff2.spr");
-            unavailable = "light illumination";
         }
         else if (type == 7)
         {
@@ -128,12 +122,10 @@ namespace OpenBlood2
             auto& s = out.back();
             s.scale1 = {draw(.25f, .5f), draw(.25f, .5f), 0};
             s.scale2 = {draw(.5f, .75f), draw(.5f, .75f), 0};
-            unavailable = "light illumination";
         }
         else if (type == 8)
         {
             add(30, .1f, .75f, 3, .75f, 0, 0, "Sprites\\TesAltLoop.spr");
-            unavailable = "light illumination";
         }
         else
         {

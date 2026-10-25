@@ -1,4 +1,5 @@
 #include "app/inspector.h"
+#include "engine/scene_effects.h"
 #include "game/original/ClientLightFX.h"
 #include <algorithm>
 #include <imgui.h>
@@ -7,10 +8,21 @@ namespace OpenBlood2
     void Inspector::draw_lights(GameSession& game, ObjectSelection& selection)
     {
         ImGui::TextWrapped("Original ClientLightFX / CLightFX state. Dynamic point lights follow their source objects; "
-                           "world illumination, shadows and fog rendering remain unavailable. DirLight spots and the "
+                           "up to 16 effect lights illuminate world/models per view. DirLight spots and the "
                            "implicit main light are separate pending systems.");
         ImGui::Text("%zu evaluated client lights / session time %.3f", game.server.light_effects.size(),
                     game.server.GetTime());
+        if (scene_effects)
+        {
+            ImGui::Text("Scene FX: %.0f selected / %zu candidates / %zu beyond budget",
+                        scene_effects->uniform.light_info[0], scene_effects->light_candidates,
+                        scene_effects->light_dropped);
+            ImGui::Text("Unimplemented: %zu fog lights / %zu effect-light shadow requests",
+                        scene_effects->fog_lights_unsupported, scene_effects->shadow_lights_unshadowed);
+            ImGui::Text("Scene fog: %s", scene_effects->invalid_fog            ? "invalid authored interval"
+                                         : scene_effects->uniform.fog_color[3] ? "active"
+                                                                               : "off");
+        }
         if (!ImGui::BeginTable("Light inspection", 2, ImGuiTableFlags_Resizable))
             return;
         ImGui::TableSetupColumn("Sources", ImGuiTableColumnFlags_WidthFixed, 245);

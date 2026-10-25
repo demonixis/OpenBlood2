@@ -556,10 +556,14 @@ namespace OpenBlood2
             if (d.range >= mesh.ranges.size() || !physics_vector(d.position) || !valid_rotation(d.rotation))
                 return fail();
             const auto& range = mesh.ranges[d.range];
-            for (std::size_t j = 0; j < range.batches.size(); ++j)
+            if (d.batch != UINT32_MAX && d.batch >= range.batches.size())
+                return fail();
+            const auto begin = d.batch == UINT32_MAX ? 0u : d.batch;
+            const auto end = d.batch == UINT32_MAX ? range.batches.size() : std::size_t(d.batch) + 1;
+            for (auto j = begin; j < end; ++j)
             {
                 const auto& b = range.batches[j];
-                if (!b.translucent)
+                if (!b.translucent || (d.batch != UINT32_MAX && d.batch != j))
                     continue;
                 if (!b.count || b.count % 3 || b.first < range.first || b.first > mesh.vertices.size() ||
                     b.count > mesh.vertices.size() - b.first || b.first > std::size_t(range.first) + range.count ||

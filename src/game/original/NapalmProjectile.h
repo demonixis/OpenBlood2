@@ -17,7 +17,7 @@ class CNapalmProjectile : public CProjectile
     OpenBlood2::SceneExplosionReport effect;
     std::uint64_t smoke = 0;
     std::string smoke_error;
-    std::string light_error = "AddLight(100, 1, .75, 0) projectile light unavailable", sound_error;
+    std::string light_error, sound_error;
 
   protected:
     bool InitialUpdate() override;

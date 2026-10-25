@@ -1,5 +1,7 @@
 #include "app/scene_presenter.h"
+#include "engine/transparency.h"
 #include "game/original/ClientCrosshair.h"
+#include "game/presentation_effects.h"
 #include <SDL3/SDL_timer.h>
 #include <algorithm>
 
@@ -507,6 +509,11 @@ namespace OpenBlood2
             return false;
         };
         const auto flashlight = game.client_shell.flashlight.Current(game.server);
+        effects = gather_scene_effects(game, eye, rotation);
+        // XR's fallback fade must also black out fog when no compositor fade layer exists.
+        if (scene_fade != 1)
+            for (unsigned channel = 0; channel < 3; ++channel)
+                effects.uniform.fog_color[channel] *= scene_fade;
         const auto time = game.server.world_time();
         const auto layer = target.layer;
         // Colour, then the post-processing glow/occlusion mask, depth copy (cleared to the
@@ -526,6 +533,9 @@ namespace OpenBlood2
             color.clear_color = i == 0   ? SDL_FColor{.025f, .035f, .05f, 1}
                                 : i == 2 ? SDL_FColor{1, 1, 1, 1}
                                          : SDL_FColor{0, 0, 0, 0};
+            if (i == 0 && effects.uniform.fog_color[3] != 0)
+                color.clear_color = {effects.uniform.fog_color[0], effects.uniform.fog_color[1],
+                                     effects.uniform.fog_color[2], 1};
             color.load_op = SDL_GPU_LOADOP_CLEAR;
             color.store_op = color.resolve_texture ? SDL_GPU_STOREOP_RESOLVE : SDL_GPU_STOREOP_STORE;
         }
@@ -550,6 +560,7 @@ namespace OpenBlood2
         if (scene_fade != 1)
             scene.scene_color = vector_scale(scene.scene_color, scene_fade);
         scene.eye = projection;
+        scene.effects = &effects.uniform;
         auto close = scene;
         close.letterbox = false;
         close.min_depth = 0;
@@ -562,8 +573,8 @@ namespace OpenBlood2
             scene.shadow_atlas = registry.get(shadow_atlas_);
             scene.shadows = &shadow_uniform;
         }
-        // Same order as the former separate passes: sky, opaque world/models, sorted
-        // world/model alpha, explosion models, PolyGrids, sprites, then view models.
+        // Sky and opaque depth first; one far-to-near queue interleaves translucent
+        // world faces, models, effects, PolyGrids and sprites before view models.
         const char* stage = nullptr;
         std::size_t sky_world_batches = 0, sky_sprite_batches = 0;
         const auto world_sky_frames = world_renderer.stats.sky_frames;
@@ -596,22 +607,93 @@ namespace OpenBlood2
         else if (!model_renderer.record(scene, model_scene, model_scene.world_draws, eye, rotation, error,
                                         WorldPass::Opaque, flashlight))
             stage = "Model viewport";
-        else if (world_mesh.blended && !world_renderer.record(scene, world_mesh, world_draws, eye, rotation, error,
-                                                              WorldPass::Translucent, time, flashlight))
-            stage = "Transparent world viewport";
-        else if (model_scene.mesh.blended &&
-                 !model_renderer.record(scene, model_scene, model_scene.world_draws, eye, rotation, error,
-                                        WorldPass::Translucent, flashlight))
-            stage = "Transparent model viewport";
-        else if (!explosion_model_scene.world_draws.empty() &&
-                 !explosion_model_renderer.record(scene, explosion_model_scene, explosion_model_scene.world_draws, eye,
-                                                  rotation, error))
-            stage = "Explosion model viewport";
-        else if (!polygrid_renderer.record(scene, polygrid_scene.mesh, polygrid_scene.draws, eye, rotation, error,
-                                           WorldPass::Translucent))
-            stage = "PolyGrid viewport";
-        else if (!sprite_renderer.record(scene, sprite_scene.mesh, sprite_scene.batched_draws, eye, rotation, error))
-            stage = "Sprite viewport";
+        if (!stage)
+        {
+            std::vector<TransparentDraw> ordered;
+            std::vector<WorldAlphaBatch> faces;
+            const auto forward = rotate_vector({0, 0, 1}, rotation);
+            auto append = [&](TransparentKind kind, const WorldDraw& draw, DVector center)
+            {
+                const auto delta = vector_subtract(center, eye);
+                ordered.push_back(
+                    {kind, draw,
+                     double(delta.x) * forward.x + double(delta.y) * forward.y + double(delta.z) * forward.z});
+            };
+            auto world_alpha = [&](TransparentKind kind, const WorldMesh& mesh, const std::vector<WorldDraw>& draws)
+            {
+                if (!world_alpha_order(mesh, draws, eye, rotation, faces, error))
+                    return false;
+                for (const auto& face : faces)
+                {
+                    auto draw = draws[face.draw];
+                    draw.batch = static_cast<std::uint32_t>(face.batch);
+                    ordered.push_back({kind, draw, face.depth});
+                }
+                return true;
+            };
+            if (!world_alpha(TransparentKind::World, world_mesh, world_draws) ||
+                !world_alpha(TransparentKind::PolyGrid, polygrid_scene.mesh, polygrid_scene.draws))
+                stage = "Transparent face order";
+            for (const auto& draw : model_scene.world_draws)
+            {
+                if (draw.range >= model_scene.instances.size())
+                {
+                    stage = "Invalid transparent model";
+                    break;
+                }
+                if (model_scene.instances[draw.range].translucent)
+                    append(TransparentKind::Model, draw, model_scene.instances[draw.range].center);
+            }
+            for (const auto& draw : explosion_model_scene.world_draws)
+            {
+                if (draw.range >= explosion_model_scene.instances.size())
+                {
+                    stage = "Invalid transparent effect model";
+                    break;
+                }
+                append(TransparentKind::Explosion, draw, explosion_model_scene.instances[draw.range].center);
+            }
+            if (sprite_scene.batch_slices.size() != sprite_scene.draws.size())
+                stage = "Invalid sprite batch slices";
+            else
+                for (std::size_t i = 0; i < sprite_scene.draws.size(); ++i)
+                    append(TransparentKind::Sprite, sprite_scene.batch_slices[i], sprite_scene.draws[i].position);
+            sort_transparency(ordered);
+            std::vector<WorldDraw> run;
+            for (std::size_t i = 0; !stage && i < ordered.size();)
+            {
+                run.clear();
+                const auto kind = ordered[i].kind;
+                do
+                {
+                    run.push_back(ordered[i++].draw);
+                } while (i < ordered.size() && ordered[i].kind == kind);
+                bool ok = false;
+                switch (kind)
+                {
+                    case TransparentKind::World:
+                        ok = world_renderer.record(scene, world_mesh, run, eye, rotation, error, WorldPass::Translucent,
+                                                   time, flashlight);
+                        break;
+                    case TransparentKind::Model:
+                        ok = model_renderer.record(scene, model_scene, run, eye, rotation, error,
+                                                   WorldPass::Translucent, flashlight);
+                        break;
+                    case TransparentKind::Explosion:
+                        ok = explosion_model_renderer.record(scene, explosion_model_scene, run, eye, rotation, error);
+                        break;
+                    case TransparentKind::PolyGrid:
+                        ok = polygrid_renderer.record(scene, polygrid_scene.mesh, run, eye, rotation, error,
+                                                      WorldPass::Translucent);
+                        break;
+                    case TransparentKind::Sprite:
+                        ok = sprite_renderer.record(scene, sprite_scene.mesh, run, eye, rotation, error);
+                        break;
+                }
+                if (!ok)
+                    stage = "Transparent scene viewport";
+            }
+        }
         if (!stage && !ballistic_vertices.empty())
         {
             const Uint32 top = letterbox ? depth_height_ / 6 : 0;

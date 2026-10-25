@@ -234,6 +234,22 @@ int main(int argc, char** argv)
         CHECK(stereo_frame(gpu, presenter, *game, 320, 320, stereo_again, error));
         CHECK(stereo_original == stereo_again);
         std::cout << world << ": XR 50% subrect equals native size in both layers; 100% restores identical pixels\n";
+        // The non-compositor XR fade also blacks out active fog in both layers.
+        // Move only the presentation camera outside local volumes so the world fog wins.
+        game->client_shell.view.position = {0, 100000, 0};
+        game->server.SetGameConVar("FogEnable", "1");
+        game->server.SetGameConVar("FogNearZ", "0");
+        game->server.SetGameConVar("FogFarZ", "1000");
+        game->server.SetGameConVar("FogR", "200");
+        game->server.SetGameConVar("FogG", "50");
+        game->server.SetGameConVar("FogB", "20");
+        presenter.scene_fade = 0;
+        CHECK(stereo_frame(gpu, presenter, *game, 160, 160, stereo_again, error));
+        CHECK(presenter.effects.uniform.fog_color[3] == 1);
+        for (std::size_t pixel = 0; pixel < stereo_again.size(); pixel += 4)
+            CHECK(stereo_again[pixel] == 0 && stereo_again[pixel + 1] == 0 && stereo_again[pixel + 2] == 0);
+        presenter.scene_fade = 1;
+        std::cout << world << ": XR fallback fade blacks out fog in both layers\n";
         game->unload_world();
     }
     SDL_DestroyGPUDevice(gpu);

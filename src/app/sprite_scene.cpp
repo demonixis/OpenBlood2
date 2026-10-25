@@ -166,11 +166,16 @@ namespace OpenBlood2
                     return false;
             }
         for (const auto& fx : game.server.shotgun_effects.sprites)
+        {
             if (!scene.add(fx.sprite.get(), fx.track, {fx.position, fx.rotation}, fx.scale,
                            FLAG_VISIBLE | FLAG_ROTATEABLESPRITE |
                                (fx.kind == ShotgunSpriteKind::Mark ? 0 : FLAG_SPRITECHROMAKEY),
                            {}, game.resources, error, fx.alpha, fx.color))
                 return false;
+            if (fx.kind == ShotgunSpriteKind::Mark && !fx.clip_polygon.empty() &&
+                !scene.clip_last(fx.clip_polygon, error))
+                return false;
+        }
         for (const auto& fx : game.server.shotgun_effects.splashes)
             if (!scene.add_particle_system("SpriteTextures/drop32_1.dtx", fx.position, fx.particles, 100.f / 640, 1,
                                            fx.id, game.resources, error))

@@ -28,6 +28,10 @@ cbuffer Light : register(b0, space3)
     float4 modelAmbient, modelColor;
     float4 modelSources[12];
     float4 sceneColor;
+    float4 effectInfo;
+    float4 effectPositions[16], effectColors[16];
+    float4 fogColor, fogEyeNear, fogForwardFar;
+
 };
 cbuffer Shadows : register(b1, space3)
 {
@@ -67,6 +71,27 @@ struct Input
 static const float PI = 3.14159265;
 static const float SATURATE = 2.0; // Shipped "Saturate": N.L light terms are doubled.
 
+// Client FX lights share the existing radial attenuation; zero count preserves the baseline.
+float3 effectLight(float3 p, float3 normal)
+{
+    float3 sum = float3(0.0,0.0,0.0);
+    for (uint i=0u;i<min(uint(effectInfo.x),16u);++i)
+    {
+        float3 delta = effectPositions[i].xyz-p;
+        if ((uint(effectColors[i].w)&64u)!=0u && dot(normal,delta)<=0.0) continue;
+        sum += effectColors[i].rgb * saturate(1.0-length(delta)/effectPositions[i].w);
+    }
+    return sum;
+}
+float fogAmount(float3 p)
+{
+    return fogColor.w > 0.0 ? saturate((dot(p-fogEyeNear.xyz,fogForwardFar.xyz)-fogEyeNear.w)/(fogForwardFar.w-fogEyeNear.w)) : 0.0;
+}
+float4 fogged(float4 color, float3 p)
+{
+    if (fogColor.w > 0.0) color.rgb = lerp(color.rgb,fogColor.rgb,fogAmount(p));
+    return color;
+}
 float shadowAmount(float3 p)
 {
     if (modulation.z <= 0.0 || shadowInfo.x < 1.0)
@@ -174,14 +199,14 @@ struct Output
 };
 static float windowDepth;
 static float4 reflectionWeight, reflectionLight; // Zero: the pixel reflects nothing.
-Output shaded(float4 color, float4 glow)
+Output shaded(float4 color, float4 glow, float transmission)
 {
     Output output;
     output.color = color;
     output.glow = glow;
     output.depth = float4(windowDepth, 0.0, 0.0, 0.0);
 #ifdef REFLECTION_TARGETS
-    output.specular = reflectionWeight;
+    output.specular = float4(reflectionWeight.rgb * transmission, reflectionWeight.a);
     output.environment = reflectionLight;
 #endif
     return output;
@@ -196,10 +221,10 @@ float3 linearGlow(float3 c, float3 e)
 {
     return max(toLinear(c) - toLinear(c - e), float3(0.0, 0.0, 0.0));
 }
-#define SHADED(color, glow) shaded(color, glow)
+#define SHADED(color, glow) shaded(fogged(color,input.worldPosition), (glow)*float4(1.0-fogAmount(input.worldPosition),1.0-fogAmount(input.worldPosition),1.0-fogAmount(input.worldPosition),1.0), 1.0-fogAmount(input.worldPosition))
 Output main(Input input)
 #else
-#define SHADED(color, glow) (color)
+#define SHADED(color, glow) fogged(color,input.worldPosition)
 float4 main(Input input) : SV_Target0
 #endif
 {
@@ -226,6 +251,7 @@ float4 main(Input input) : SV_Target0
                                   ? lightColor.xyz * max(0.0, 1.0 - distance(input.worldPosition, positionRadius.xyz) /
                                                                        positionRadius.w)
                                   : float3(0.0, 0.0, 0.0);
+        if (effectInfo.x > 0.0) dynamicLight += effectLight(input.worldPosition,input.worldNormal);
 #ifdef PBR_ALPHA
         return SHADED(float4(texel.rgb * (light * (1.0 - shadow) + dynamicLight) * sceneColor.rgb,
                              texel.a * modulation.x),
@@ -269,6 +295,16 @@ float4 main(Input input) : SV_Target0
     float3 direct = float3(0.0, 0.0, 0.0);
     if (radial > 0.0)
         direct += dynamicLight * specular(n, v, normalize(positionRadius.xyz - p), f0, alpha);
+    for (uint fx=0u;fx<min(uint(effectInfo.x),16u);++fx)
+    {
+        float3 delta = effectPositions[fx].xyz-p;
+        if ((uint(effectColors[fx].w)&64u)!=0u && dot(input.worldNormal,delta)<=0.0) continue;
+        float len = max(length(delta),1e-4);
+        float3 term = effectColors[fx].rgb*saturate(1.0-len/effectPositions[fx].w);
+        dynamicLight += term;
+        direct += term*specular(n,v,delta/len,f0,alpha);
+    }
+
     float3 diffuse;
     float bump = 1.0;
     if (model)

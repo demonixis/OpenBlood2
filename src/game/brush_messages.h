@@ -38,7 +38,7 @@ namespace OpenBlood2
         std::string model_error;
         std::uint64_t sprite_event = 0;
         std::string sprite_error;
-        // Selected components execute; illumination and complete composite remain unavailable.
+        // Selected components execute; scene presentation selects their bounded point lights.
         bool client_fx_available = false;
     };
     struct DebrisEffect
