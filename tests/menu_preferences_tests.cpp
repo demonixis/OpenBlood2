@@ -2,6 +2,7 @@
 #include "engine/audio.h"
 #include "game/menu_preferences.h"
 #include <cmath>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 using namespace OpenBlood2;
@@ -34,10 +35,60 @@ int test_menu_preferences(int argc, char** argv)
         // The shared atomic writer keeps the exact preference bytes.
         std::ifstream in(path, std::ios::binary);
         const std::string bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        CHECK(bytes == "version=9\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
+        CHECK(bytes == "version=10\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
                        "invert_y=1\ndetail=2\npixel_lighting=0\nrenderer=0\nquality=0\nnormal_maps=1\n"
                        "vr_turn=45\nvr_laser=1\nvr_crosshair=1\nvr_move_hand=0\ncheats=0\ngod_mode=0\n"
-                       "antialiasing=0\nbloom=1\ntonemap=1\nambient_occlusion=2\nreflections=2\n");
+                       "antialiasing=0\nbloom=1\ntonemap=1\nambient_occlusion=2\nreflections=2\n"
+                       "fullscreen=0\nfullscreen_mode=0\nresolution_width=0\nresolution_height=0\nvsync=1\n"
+                       "fps_limit=0\nvr_refresh_rate=0\nvr_render_scale=100\n");
+    }
+    {
+        MenuSettings video;
+        video.fullscreen = true;
+        video.fullscreen_mode = 1;
+        video.resolution_width = 1920;
+        video.resolution_height = 1080;
+        video.vsync = false;
+        video.fps_limit = 144;
+        video.vr_refresh_rate = 90000;
+        video.vr_render_scale = 70;
+        CHECK(save_menu_preferences(path, video, error));
+        CHECK(load_menu_preferences(path, loaded, error) && loaded == video);
+        std::ifstream input(path);
+        const std::string bytes((std::istreambuf_iterator<char>(input)), {});
+        input.close();
+        for (const auto& replacement : {std::pair{"fullscreen=1", "fullscreen=2"},
+                                        {"fullscreen_mode=1", "fullscreen_mode=2"},
+                                        {"resolution_width=1920", "resolution_width=0"},
+                                        {"resolution_height=1080", "resolution_height=999999"},
+                                        {"vsync=0", "vsync=-1"},
+                                        {"fps_limit=144", "fps_limit=1"},
+                                        {"vr_refresh_rate=90000", "vr_refresh_rate=-1"},
+                                        {"vr_render_scale=70", "vr_render_scale=101"},
+                                        {"vr_render_scale=70", "vr_render_scale=75"}})
+        {
+            auto bad = bytes;
+            bad.replace(bad.find(replacement.first), std::strlen(replacement.first), replacement.second);
+            {
+                std::ofstream output(path);
+                output << bad;
+            }
+            CHECK(!load_menu_preferences(path, loaded, error) && loaded == video);
+        }
+        // A pre-video version loads defaults; v10 cannot omit its new keys.
+        const auto end = bytes.find("fullscreen=");
+        auto v9 = bytes.substr(0, end);
+        v9.replace(0, 10, "version=9");
+        {
+            std::ofstream output(path);
+            output << v9;
+        }
+        CHECK(load_menu_preferences(path, loaded, error) && loaded == MenuSettings{});
+        {
+            std::ofstream output(path);
+            output << bytes.substr(0, end);
+        }
+        CHECK(!load_menu_preferences(path, loaded, error) && loaded == MenuSettings{});
     }
     settings.sound = true;
     CHECK(save_menu_preferences(path, settings, error));

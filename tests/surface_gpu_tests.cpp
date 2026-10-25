@@ -52,6 +52,79 @@ namespace
         SDL_UnmapGPUTransferBuffer(gpu, capture.transfer);
         return true;
     }
+    // The XR render scale uses a smaller depth/viewport and submitted subrect in a fixed-size
+    // two-layer colour image. Compare that subrect with a natively smaller target, for both eyes.
+    bool stereo_frame(SDL_GPUDevice* gpu, ScenePresenter& presenter, GameSession& game, Uint32 allocation,
+                      Uint32 extent, std::vector<Uint8>& pixels, std::string& error)
+    {
+        SDL_GPUTextureCreateInfo info{};
+        info.type = SDL_GPU_TEXTURETYPE_2D_ARRAY;
+        info.format = SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM;
+        info.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET;
+        info.width = info.height = allocation;
+        info.layer_count_or_depth = 2;
+        info.num_levels = 1;
+        auto* texture = SDL_CreateGPUTexture(gpu, &info);
+        SDL_GPUTransferBufferCreateInfo transfer_info{};
+        transfer_info.usage = SDL_GPU_TRANSFERBUFFERUSAGE_DOWNLOAD;
+        transfer_info.size = extent * extent * 4 * 2;
+        auto* transfer = SDL_CreateGPUTransferBuffer(gpu, &transfer_info);
+        auto cleanup = [&]
+        {
+            if (transfer)
+                SDL_ReleaseGPUTransferBuffer(gpu, transfer);
+            if (texture)
+                SDL_ReleaseGPUTexture(gpu, texture);
+        };
+        if (!texture || !transfer || !presenter.update(game, error))
+        {
+            cleanup();
+            return false;
+        }
+        std::array<StereoEye, 2> eyes;
+        for (std::size_t i = 0; i < eyes.size(); ++i)
+        {
+            eyes[i].position = game.client_shell.view.position;
+            eyes[i].position.x += i == 0 ? -1.5f : 1.5f;
+            eyes[i].rotation = game.client_shell.view.rotation;
+        }
+        auto* commands = SDL_AcquireGPUCommandBuffer(gpu);
+        if (!commands || !presenter.record_eyes(game, commands, texture, info.format, extent, extent, eyes, error))
+        {
+            if (commands)
+                SDL_CancelGPUCommandBuffer(commands);
+            cleanup();
+            return false;
+        }
+        auto* copy = SDL_BeginGPUCopyPass(commands);
+        for (Uint32 layer = 0; layer < 2; ++layer)
+        {
+            SDL_GPUTextureRegion source{};
+            source.texture = texture;
+            source.layer = layer;
+            source.w = source.h = extent;
+            source.d = 1;
+            SDL_GPUTextureTransferInfo destination{};
+            destination.transfer_buffer = transfer;
+            destination.offset = layer * extent * extent * 4;
+            destination.pixels_per_row = destination.rows_per_layer = extent;
+            SDL_DownloadFromGPUTexture(copy, &source, &destination);
+        }
+        SDL_EndGPUCopyPass(copy);
+        if (!SDL_SubmitGPUCommandBuffer(commands) || !SDL_WaitForGPUIdle(gpu))
+        {
+            cleanup();
+            return false;
+        }
+        auto* bytes = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(gpu, transfer, false));
+        if (bytes)
+        {
+            pixels.assign(bytes, bytes + transfer_info.size);
+            SDL_UnmapGPUTransferBuffer(gpu, transfer);
+        }
+        cleanup();
+        return bytes != nullptr;
+    }
     // Mean absolute channel difference and the share of channels that moved by more than 64.
     void compare(const std::vector<Uint8>& a, const std::vector<Uint8>& b, double& mean, double& large)
     {
@@ -153,6 +226,14 @@ int main(int argc, char** argv)
         CHECK(standard_mean < 12 && high_mean < 12 && standard_large < .02 && high_large < .02);
         // The original renderer remains the untouched reference.
         CHECK(again == original);
+        std::vector<Uint8> stereo_original, scaled, native, stereo_again;
+        CHECK(stereo_frame(gpu, presenter, *game, 320, 320, stereo_original, error));
+        CHECK(stereo_frame(gpu, presenter, *game, 320, 160, scaled, error));
+        CHECK(stereo_frame(gpu, presenter, *game, 160, 160, native, error));
+        CHECK(scaled == native);
+        CHECK(stereo_frame(gpu, presenter, *game, 320, 320, stereo_again, error));
+        CHECK(stereo_original == stereo_again);
+        std::cout << world << ": XR 50% subrect equals native size in both layers; 100% restores identical pixels\n";
         game->unload_world();
     }
     SDL_DestroyGPUDevice(gpu);

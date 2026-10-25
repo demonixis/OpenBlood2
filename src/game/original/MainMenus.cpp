@@ -141,9 +141,8 @@ namespace OpenBlood2
                 setting(IDS_MENU_AUDIO_MUSIC_VOLUME, 3);
                 break;
             case MenuPage::Display:
-                // Source CMenuDisplay offers renderer, resolution and DETAIL LEVEL; SDL owns the first
-                // two. The renderer, lighting, normal-map and post-processing rows are replacement
-                // options without original strings.
+                // Source CMenuDisplay offers renderer, resolution and DETAIL LEVEL. Additional
+                // graphics and SDL window/pacing rows are replacement options without original strings.
                 setting(IDS_MENU_DISPLAY_DETAIL_LOW + unsigned(std::clamp(settings.detail, 0, 2)), 6);
                 items.push_back({0, -1, true, {}, 8, {}});
                 items.push_back({0, -1, true, {}, 7, {}});
@@ -153,6 +152,8 @@ namespace OpenBlood2
                 items.push_back({0, -1, true, {}, 20, {}});
                 items.push_back({0, -1, true, {}, 21, {}});
                 items.push_back({0, -1, true, {}, 17, {}});
+                for (int id = 22; id <= 26; ++id)
+                    items.push_back({0, -1, true, {}, id, {}});
                 break;
             case MenuPage::Vr:
                 // Replacement rows, labelled like the Display page's replacement rows.
@@ -160,6 +161,8 @@ namespace OpenBlood2
                 items.push_back({0, -1, true, {}, 11, {}});
                 items.push_back({0, -1, true, {}, 12, {}});
                 items.push_back({0, -1, true, {}, 13, {}});
+                items.push_back({0, -1, true, {}, 27, {}});
+                items.push_back({0, -1, true, {}, 28, {}});
                 break;
             case MenuPage::Cheats:
                 // Replacement rows: the switch, god mode, the original cheats the menu sends, then
@@ -190,18 +193,34 @@ namespace OpenBlood2
                 break;
             case MenuPage::Load:
                 // CMenuLoadGame::InitSavedGameSlots: "RESTART: %s", "QUICKLOAD: %s", then the slots.
-                items.push_back({IDS_MENU_LOADGAME_RESTART, int(MENU_CMD_LOAD_SAVE_GAME), saves.restart.loadable,
-                                 {}, -1, {}, {}, saves.restart.name});
-                items.push_back({IDS_MENU_LOADGAME_QUICKLOAD, int(MENU_CMD_LOAD_SAVE_GAME), saves.quick.loadable,
-                                 {}, -1, {}, {}, saves.quick.name});
+                items.push_back({IDS_MENU_LOADGAME_RESTART,
+                                 int(MENU_CMD_LOAD_SAVE_GAME),
+                                 saves.restart.loadable,
+                                 {},
+                                 -1,
+                                 {},
+                                 {},
+                                 saves.restart.name});
+                items.push_back({IDS_MENU_LOADGAME_QUICKLOAD,
+                                 int(MENU_CMD_LOAD_SAVE_GAME),
+                                 saves.quick.loadable,
+                                 {},
+                                 -1,
+                                 {},
+                                 {},
+                                 saves.quick.name});
                 for (const auto& slot : saves.slots)
                     items.push_back({0, int(MENU_CMD_LOAD_SAVE_GAME), slot.loadable, slot.name, -1, {}});
                 break;
             case MenuPage::Save:
                 // CMenuSaveGame::InitSavedGameSlots: the eight slot names; any slot may be overwritten.
                 for (const auto& slot : saves.slots)
-                    items.push_back({0, int(MENU_CMD_SAVE_GAME), in_world && alive && saves.unavailable.empty(),
-                                     slot.name, -1, {}});
+                    items.push_back({0,
+                                     int(MENU_CMD_SAVE_GAME),
+                                     in_world && alive && saves.unavailable.empty(),
+                                     slot.name,
+                                     -1,
+                                     {}});
                 break;
             case MenuPage::Quit:
                 items.push_back({0, int(MENU_CMD_EXIT), true, "Yes", -1, {}});
@@ -535,6 +554,15 @@ namespace OpenBlood2
             !enabled(items[selected]) || binding >= 0)
             return;
         auto before = settings;
+        const auto cycle = [direction](const auto& values, auto value)
+        {
+            if (values.empty())
+                return value;
+            const auto at = std::find(values.begin(), values.end(), value);
+            const int index = at == values.end() ? 0 : int(at - values.begin());
+            const int count = int(values.size());
+            return values[std::size_t((index + (direction < 0 ? count - 1 : 1)) % count)];
+        };
         switch (items[selected].setting)
         {
             case 0:
@@ -589,6 +617,32 @@ namespace OpenBlood2
                 break;
             case 21:
                 settings.reflections = (std::clamp(settings.reflections, 0, 2) + (direction < 0 ? 2 : 1)) % 3;
+                break;
+            case 22:
+                settings.fullscreen = !settings.fullscreen;
+                break;
+            case 23:
+                settings.fullscreen_mode = !settings.fullscreen_mode;
+                break;
+            case 24:
+            {
+                const auto size =
+                    cycle(video.resolutions, std::array{settings.resolution_width, settings.resolution_height});
+                settings.resolution_width = size[0];
+                settings.resolution_height = size[1];
+                break;
+            }
+            case 25:
+                settings.vsync = !settings.vsync;
+                break;
+            case 26:
+                settings.fps_limit = cycle(video.frame_limits, settings.fps_limit);
+                break;
+            case 27:
+                settings.vr_refresh_rate = cycle(video.refresh_rates, settings.vr_refresh_rate);
+                break;
+            case 28:
+                settings.vr_render_scale = 50 + (settings.vr_render_scale - 50 + (direction < 0 ? 50 : 10)) % 60;
                 break;
             case 10:
             {

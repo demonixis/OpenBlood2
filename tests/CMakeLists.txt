@@ -3241,3 +3241,13 @@ foreach(case state detect installer)
     add_test(NAME setup.${case} COMMAND setup_tests ${case} "${CMAKE_CURRENT_BINARY_DIR}/setup-${case}")
     set_tests_properties(setup.${case} PROPERTIES LABELS "headless;setup" TIMEOUT 30)
 endforeach()
+
+# Window/swapchain transitions require a real display, but no commercial artwork.
+if(BLOOD2_GPU_TESTS)
+    add_executable(display_options_tests display_options_tests.cpp ../src/app/display_options.cpp)
+    target_link_libraries(display_options_tests PRIVATE blood2_game)
+    blood2_project_options(display_options_tests)
+    add_test(NAME gpu.display_options COMMAND display_options_tests)
+    set_tests_properties(gpu.display_options PROPERTIES LABELS "gpu;menus" TIMEOUT 90 RUN_SERIAL TRUE
+        FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+endif()

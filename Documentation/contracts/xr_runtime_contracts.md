@@ -25,8 +25,8 @@ No game world, HUD or menu is rendered in XR yet.
 - SDL_GPU creates the OpenXR instance (`SDL_PROP_GPU_DEVICE_CREATE_XR_*`, Vulkan only)
   and destroys it with the device. The runtime requests API 1.0.
 - Optional instance extensions are enabled only when the loader lists them:
-  `XR_EXT_local_floor` and `XR_FB_display_refresh_rate` (refresh rate is logged, not
-  changed).
+  `XR_EXT_local_floor` and `XR_FB_display_refresh_rate` (refresh rate is logged and
+  selectable through the headset display options below).
 - Reference space preference: `LOCAL_FLOOR`, then `STAGE`, then `LOCAL` with a nominal
   floor at −1.6 m.
 - One action set (`controllers`) holds the grip and aim pose actions for both hands,
@@ -313,3 +313,35 @@ headset's first screen without a stored choice (panel at 0.75 m, laser as mouse,
 hands); it is build-verified only in the headset.
 Shadow casters are still chosen with the 90° desktop frustum around the head, close
 models are lit from the game eye, and translucent sorting runs per eye.
+
+
+## Headset display options
+
+Options > VR adds `REFRESH RATE [AUTO/<rate> HZ]` (setting 27) and
+`RENDER SCALE [50%–100%]` (28), persisted in preferences version 10.
+
+- Refresh choices come exclusively from `xrEnumerateDisplayRefreshRatesFB`, bounded
+  at 64 entries and checked for finite 30–1000 Hz values. Without the optional
+  `XR_FB_display_refresh_rate` extension or usable rates, the row is unavailable.
+  AUTO passes 0 to `xrRequestDisplayRefreshRateFB`; explicit choices pass the exact
+  enumerated float, with millihertz used only for persistence/menu identity. An
+  unavailable saved rate or rejected request reports an error and retains the
+  previous preference (AUTO at startup).
+- The request is advisory: the runtime can keep another rate. The page separately
+  displays the actual current refresh, initialized through `xrGetDisplayRefreshRateFB`
+  and updated by `XrEventDataDisplayRefreshRateChangedFB`. Fractional rates are shown
+  without truncating them to an integer. Simulation still follows predicted display
+  times and never uses the desktop FPS cap.
+- Render scale cycles 50, 60, 70, 80, 90, 100 percent of the recommended **width and
+  height**, rounded down to whole pixels. The scene and hand/laser overlay render into
+  smaller viewports with matching depth arrays; their projection subimages submit
+  exactly these extents. The compositor scales them to the view. Eye swapchains retain
+  their recommended allocation, avoiding recreation or acquired-image lifetime changes.
+  At 50%, the shaded area is approximately one quarter of 100%; swapchain memory does
+  not shrink. There is no supersampling above 100% or dynamic resolution policy.
+- The independent 640×480 menu/HUD quad keeps its original resolution and placement.
+  100% preserves the prior eye extents. Submission still precedes image release, gamma
+  views and layer-per-eye semantics are unchanged, and no post-processing is introduced.
+
+The [display report](../implementation/reports/display_options.md) distinguishes desktop
+GPU checks and the Quest build from headset runtime qualification.

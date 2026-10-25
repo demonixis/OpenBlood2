@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace OpenBlood2
 {
@@ -81,6 +82,12 @@ namespace OpenBlood2
         SDL_GPUTextureFormat color_format() const;
         std::uint32_t width() const;
         std::uint32_t height() const;
+        // Supported display rates in millihertz; empty when the optional extension is unavailable.
+        std::vector<int> refresh_rates() const;
+        int refresh_rate() const;
+        bool request_refresh_rate(int millihertz, std::string& error);
+        // Change only the submitted eye subrect; swapchains stay at their recommended allocation.
+        void set_render_scale(int percent);
         // Floor height in the reference space: 0 for LOCAL_FLOOR/STAGE, a nominal -1.6 m for LOCAL.
         float floor_height() const;
         std::string description() const;

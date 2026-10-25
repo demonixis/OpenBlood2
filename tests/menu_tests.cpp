@@ -129,7 +129,7 @@ namespace
         menu.build(MenuPage::Options);
         CHECK(menu.items[0].command == int(MENU_CMD_DISPLAY) && menu.enabled(menu.items[0]) && menu.selected == 0);
         menu.activate();
-        CHECK(menu.page == MenuPage::Display && menu.items.size() == 9 && menu.small());
+        CHECK(menu.page == MenuPage::Display && menu.items.size() == 14 && menu.small());
         CHECK(menu.items[0].setting == 6 && menu.items[0].string_id == IDS_MENU_DISPLAY_DETAIL_HIGH &&
               menu.items[1].setting == 8 && !menu.items[1].string_id && menu.items[2].setting == 7 &&
               !menu.items[2].string_id && menu.items[3].setting == 9 && !menu.enabled(menu.items[3]));
@@ -216,6 +216,43 @@ namespace
         menu.selected = 3;
         menu.activate(); // Disabled with the original renderer.
         CHECK(menu.settings.normal_maps);
+        // Window settings are independent of renderer quality and use owner-supplied capabilities.
+        CHECK(!menu.enabled(menu.items[9]) && !menu.enabled(menu.items[12]));
+        menu.video.window = menu.video.vsync_off = true;
+        menu.video.resolutions = {{0, 0}, {1280, 720}, {1920, 1080}};
+        menu.video.frame_limits = {30, 60, 120, 144, 240, 0};
+        menu.selected = 9;
+        menu.activate();
+        CHECK(menu.settings.fullscreen && menu.enabled(menu.items[10]) && !menu.enabled(menu.items[11]));
+        menu.selected = 10;
+        menu.activate();
+        CHECK(menu.settings.fullscreen_mode == 1 && menu.enabled(menu.items[11]));
+        menu.selected = 11;
+        menu.adjust(1);
+        CHECK(menu.settings.resolution_width == 1280 && menu.settings.resolution_height == 720);
+        menu.adjust(-1);
+        CHECK(menu.settings.resolution_width == 0 && menu.settings.resolution_height == 0);
+        menu.selected = 12;
+        menu.activate();
+        CHECK(!menu.settings.vsync);
+        menu.selected = 13;
+        menu.adjust(-1);
+        CHECK(menu.settings.fps_limit == 240);
+        menu.adjust(-1);
+        CHECK(menu.settings.fps_limit == 144);
+        menu.adjust(1);
+        menu.adjust(1);
+        CHECK(menu.settings.fps_limit == 0);
+        menu.vr = true;
+        for (int i = 9; i < 14; ++i)
+            CHECK(!menu.enabled(menu.items[i]));
+        menu.selected = 13;
+        menu.adjust(1);
+        CHECK(menu.settings.fps_limit == 0);
+        menu.vr = false;
+        menu.settings.fullscreen = false;
+        menu.settings.fullscreen_mode = 0;
+        menu.settings.vsync = true;
         menu.settings.quality = 0;
         menu.take_command();
         menu.back();
@@ -263,7 +300,7 @@ namespace
               menu.items[7].literal == "CHEATS");
         menu.selected = 6;
         menu.activate();
-        CHECK(menu.page == MenuPage::Vr && menu.small() && menu.items.size() == 4 &&
+        CHECK(menu.page == MenuPage::Vr && menu.small() && menu.items.size() == 6 &&
               !strcmp(menu.title(), "options.pcx") && menu.items[0].setting == 10 && menu.items[1].setting == 11 &&
               menu.items[2].setting == 12 && menu.items[3].setting == 13);
         menu.selected = 0;
@@ -284,6 +321,23 @@ namespace
         menu.selected = 3;
         menu.activate();
         CHECK(menu.settings.vr_move_hand);
+        menu.selected = 4;
+        CHECK(!menu.enabled(menu.items[4]));
+        menu.adjust(1);
+        CHECK(menu.settings.vr_refresh_rate == 0);
+        menu.video.refresh_rates = {0, 72000, 90000, 120000};
+        menu.adjust(1);
+        CHECK(menu.settings.vr_refresh_rate == 72000);
+        menu.adjust(-1);
+        CHECK(menu.settings.vr_refresh_rate == 0);
+        menu.adjust(-1);
+        CHECK(menu.settings.vr_refresh_rate == 120000);
+        menu.settings.vr_refresh_rate = 0;
+        menu.selected = 5;
+        menu.adjust(1);
+        CHECK(menu.settings.vr_render_scale == 50);
+        menu.adjust(-1);
+        CHECK(menu.settings.vr_render_scale == 100);
         menu.back();
         CHECK(menu.page == MenuPage::Options);
         menu.vr = false;
@@ -1056,6 +1110,8 @@ namespace
         }
         menu.controls = control_menu_rows(InputBindings::defaults());
         menu.vr = true; // The XR Options row and VR page fit the original canvas too.
+        menu.video.refresh_rates = {0, 72000, 90000, 120000};
+        menu.video.current_refresh_rate = 72000; // Synthetic capabilities, no headset claim.
         menu.setup = true;
         menu.settings.cheats = true; // The Cheats page with its rows enabled and a level.
         menu.set_levels({"01_subwaya"});
@@ -1081,6 +1137,21 @@ namespace
                 menu.binding = 0;
                 ++menu.revision;
                 CHECK(canvas.compose(menu, 0, error) && menu.first == 0);
+            }
+            if (menu.page == MenuPage::Display)
+            {
+                menu.video.window = menu.video.vsync_off = true;
+                menu.vr = false;
+                for (std::size_t row = 0; row < menu.items.size(); ++row)
+                {
+                    menu.selected = int(row);
+                    ++menu.revision;
+                    CHECK(canvas.compose(menu, 0, error));
+                    CHECK(menu.items[row].rect.bottom > menu.items[row].rect.top && menu.items[row].rect.bottom <= 425);
+                    for (int i = 0; i < menu.first; ++i)
+                        CHECK(menu.items[std::size_t(i)].rect.bottom == 0);
+                }
+                menu.vr = true;
             }
             CHECK(canvas.compose(menu, 0, error));
             const auto rev = canvas.revision;
@@ -1122,6 +1193,22 @@ namespace
             CHECK(SDL_SubmitGPUCommandBuffer(commands));
             CHECK(capture.save(path_text(output / ("menu-" + std::to_string(page) + ".png")).c_str()));
         }
+        menu.build(MenuPage::Vr);
+        menu.settings.vr_refresh_rate = 59940;
+        menu.video.refresh_rates = {0, 59940};
+        menu.video.current_refresh_rate = 59940;
+        ++menu.revision;
+        CHECK(canvas.compose(menu, 0, error) && menu.items[4].literal == "REFRESH RATE [59.94 HZ]");
+        // Long settings lists scroll with the edition's actual bitmap font height.
+        menu.build(MenuPage::Display);
+        menu.items.resize(40, menu.items.back());
+        menu.selected = 39;
+        ++menu.revision;
+        CHECK(canvas.compose(menu, 0, error) && menu.first > 0);
+        CHECK(menu.items.front().rect.bottom == 0 && menu.items.back().rect.bottom > 0);
+        menu.selected = 0;
+        ++menu.revision;
+        CHECK(canvas.compose(menu, 0, error) && menu.first == 0 && menu.items.back().rect.bottom == 0);
         return true;
     }
 } // namespace

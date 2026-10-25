@@ -1,6 +1,7 @@
 #include "engine/xr/xr_runtime.h"
 #include "build_info.h"
 #include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <spdlog/spdlog.h>
 #include <utility>
@@ -134,6 +135,11 @@ namespace OpenBlood2
         PFN_xrSyncActions sync_actions = nullptr;
         PFN_xrGetCurrentInteractionProfile current_profile = nullptr;
         PFN_xrGetDisplayRefreshRateFB get_refresh_rate = nullptr;
+        PFN_xrEnumerateDisplayRefreshRatesFB enumerate_refresh_rates = nullptr;
+        PFN_xrRequestDisplayRefreshRateFB request_refresh_rate = nullptr;
+        std::vector<float> refresh_rates;
+        float current_refresh_rate = 0;
+        int render_scale = 100;
 
         bool loader_loaded = false;
         bool local_floor_extension = false, refresh_rate_extension = false, format_list_extension = false;
@@ -319,11 +325,52 @@ namespace OpenBlood2
     }
     std::uint32_t XrRuntime::width() const
     {
-        return state_->width;
+        return state_->width * unsigned(state_->render_scale) / 100;
     }
     std::uint32_t XrRuntime::height() const
     {
-        return state_->height;
+        return state_->height * unsigned(state_->render_scale) / 100;
+    }
+    std::vector<int> XrRuntime::refresh_rates() const
+    {
+        std::vector<int> result;
+        for (float rate : state_->refresh_rates)
+            result.push_back(int(std::lround(rate * 1000)));
+        std::sort(result.begin(), result.end());
+        result.erase(std::unique(result.begin(), result.end()), result.end());
+        return result;
+    }
+    int XrRuntime::refresh_rate() const
+    {
+        return int(std::lround(state_->current_refresh_rate * 1000));
+    }
+    bool XrRuntime::request_refresh_rate(int millihertz, std::string& error)
+    {
+        auto& s = *state_;
+        if (!s.request_refresh_rate || s.refresh_rates.empty())
+        {
+            if (!millihertz)
+                return true;
+            error = "Display refresh rate control is unavailable on this OpenXR runtime.";
+            return false;
+        }
+        float requested = 0;
+        if (millihertz)
+        {
+            const auto at = std::find_if(s.refresh_rates.begin(), s.refresh_rates.end(),
+                                         [=](float rate) { return int(std::lround(rate * 1000)) == millihertz; });
+            if (at == s.refresh_rates.end())
+            {
+                error = "This refresh rate is unavailable on the current headset.";
+                return false;
+            }
+            requested = *at; // Pass the runtime's exact enumerated value, never a rounded reconstruction.
+        }
+        return s.check(s.request_refresh_rate(s.session, requested), "xrRequestDisplayRefreshRateFB", error);
+    }
+    void XrRuntime::set_render_scale(int percent)
+    {
+        state_->render_scale = std::clamp(percent, 50, 100);
     }
     float XrRuntime::floor_height() const
     {
@@ -388,8 +435,7 @@ namespace OpenBlood2
         }
         const auto listed = [&available](const char* name)
         {
-            return std::any_of(available.begin(), available.end(),
-                               [name](const XrExtensionProperties& e)
+            return std::any_of(available.begin(), available.end(), [name](const XrExtensionProperties& e)
                                { return std::strcmp(e.extensionName, name) == 0; });
         };
         std::vector<const char*> extensions;
@@ -470,7 +516,10 @@ namespace OpenBlood2
             !s.load("xrGetActionStateVector2f", s.get_vector, error) ||
             !s.load("xrApplyHapticFeedback", s.apply_haptic, error))
             return false;
-        if (s.refresh_rate_extension && !s.load("xrGetDisplayRefreshRateFB", s.get_refresh_rate, error))
+        if (s.refresh_rate_extension &&
+            (!s.load("xrGetDisplayRefreshRateFB", s.get_refresh_rate, error) ||
+             !s.load("xrEnumerateDisplayRefreshRatesFB", s.enumerate_refresh_rates, error) ||
+             !s.load("xrRequestDisplayRefreshRateFB", s.request_refresh_rate, error)))
             return false;
 
         auto system = make<XrSystemProperties>(XR_TYPE_SYSTEM_PROPERTIES);
@@ -698,9 +747,26 @@ namespace OpenBlood2
             return false;
         if (s.refresh_rate_extension)
         {
+            std::uint32_t count = 0;
+            if (XR_SUCCEEDED(s.enumerate_refresh_rates(s.session, 0, &count, nullptr)) && count > 0 && count <= 64)
+            {
+                s.refresh_rates.resize(count);
+                const auto result = s.enumerate_refresh_rates(s.session, count, &count, s.refresh_rates.data());
+                if (XR_FAILED(result) || count > s.refresh_rates.size())
+                    s.refresh_rates.clear();
+                else
+                {
+                    s.refresh_rates.resize(count);
+                    std::erase_if(s.refresh_rates,
+                                  [](float rate) { return !std::isfinite(rate) || rate < 30 || rate > 1000; });
+                }
+            }
             float rate = 0;
-            if (XR_SUCCEEDED(s.get_refresh_rate(s.session, &rate)))
+            if (XR_SUCCEEDED(s.get_refresh_rate(s.session, &rate)) && std::isfinite(rate) && rate >= 30 && rate <= 1000)
+            {
+                s.current_refresh_rate = rate;
                 spdlog::info("OpenXR display refresh rate: {} Hz", rate);
+            }
         }
         spdlog::info("OpenXR session: {}", description());
         return true;
@@ -718,6 +784,13 @@ namespace OpenBlood2
                 return true;
             if (!s.check(polled, "xrPollEvent", error))
                 return false;
+            if (event.type == XR_TYPE_EVENT_DATA_DISPLAY_REFRESH_RATE_CHANGED_FB)
+            {
+                const auto rate =
+                    reinterpret_cast<const XrEventDataDisplayRefreshRateChangedFB*>(&event)->toDisplayRefreshRate;
+                if (std::isfinite(rate) && rate >= 30 && rate <= 1000)
+                    s.current_refresh_rate = rate;
+            }
             switch (event.type)
             {
                 case XR_TYPE_EVENT_DATA_INSTANCE_LOSS_PENDING:
@@ -987,7 +1060,7 @@ namespace OpenBlood2
                 views[eye].fov = xr_fov(frame.eye_fov[eye]);
                 views[eye].subImage.swapchain = s.swapchain;
                 views[eye].subImage.imageRect = {
-                    {0, 0}, {static_cast<std::int32_t>(s.width), static_cast<std::int32_t>(s.height)}};
+                    {0, 0}, {static_cast<std::int32_t>(width()), static_cast<std::int32_t>(height())}};
                 views[eye].subImage.imageArrayIndex = static_cast<std::uint32_t>(eye);
             }
             projection.space = s.space;

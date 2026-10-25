@@ -81,6 +81,15 @@ namespace OpenBlood2
         bool enabled = true;
         bool operator==(const MenuControlRow&) const = default;
     };
+    struct MenuVideoCapabilities
+    {
+        bool window = false, vsync_off = false;
+        std::vector<std::array<int, 2>> resolutions{{0, 0}};
+        std::vector<int> frame_limits{30, 60, 120, 240, 0};
+        // Millihertz preserves fractional runtime rates without floats in preferences.
+        std::vector<int> refresh_rates{0};
+        int current_refresh_rate = 0;
+    };
     struct MenuSettings
     {
         bool sound = true, music = true, invert_y = false;
@@ -108,6 +117,13 @@ namespace OpenBlood2
         // Replacement Cheats rows: the master switch and god mode, which applies to the entered
         // player only while the switch is on.
         bool cheats = false, god_mode = false;
+        bool fullscreen = false, vsync = true;
+        int fullscreen_mode = 0;                         // 0 desktop borderless, 1 exclusive.
+        int resolution_width = 0, resolution_height = 0; // 0/0: default window / desktop mode.
+        int fps_limit = 0;                               // Software ceiling; zero leaves pacing to presentation.
+        int vr_refresh_rate = 0;                         // Millihertz; zero asks the runtime to choose.
+        int vr_render_scale = 100;                       // Percentage of recommended eye dimensions (50..100, step 10).
+
         bool operator==(const MenuSettings&) const = default;
     };
     struct MenuItem
@@ -118,7 +134,8 @@ namespace OpenBlood2
         std::string literal;
         // Setting IDs: sound, volume, music, volume, sensitivity, invert Y, detail, lighting,
         // renderer, normal maps, VR turn, VR laser, VR crosshair, VR movement reference, cheats,
-        // god mode, cheat level, anti-aliasing, bloom, tonemap, ambient occlusion, reflections.
+        // god mode, cheat level, anti-aliasing, bloom, tonemap, ambient occlusion, reflections,
+        // fullscreen, fullscreen mode, resolution, vsync, frame limit, VR refresh rate, VR render scale.
         int setting = -1;
         HudRect rect{}, slider_rect{};
         std::string insertion; // FormatMessage %1!s! argument of the Load page's RESTART/QUICKLOAD strings.
@@ -166,8 +183,8 @@ namespace OpenBlood2
         }
         MenuCommand take_command();
         bool active = false, in_world = false, alive = true;
-        bool vr = false;           // An XR session: Options offers the replacement VR page.
-        bool setup = false;        // The owner offers Options > SETUP (the game data setup screen).
+        bool vr = false;    // An XR session: Options offers the replacement VR page.
+        bool setup = false; // The owner offers Options > SETUP (the game data setup screen).
         // The Cheats page's LEVEL row: the owner's campaign worlds and the displayed one.
         void set_levels(std::vector<std::string>);
         std::vector<std::string> levels;
@@ -178,6 +195,7 @@ namespace OpenBlood2
         std::vector<MenuItem> items;
         std::vector<MenuCue> cues;
         MenuSettings settings;
+        MenuVideoCapabilities video;
         std::string error;
         int selected = 0;
         unsigned character = 0;
@@ -186,7 +204,12 @@ namespace OpenBlood2
         bool enabled(const MenuItem& item) const
         {
             return item.enabled && !(item.setting == 1 && !settings.sound) && !(item.setting == 3 && !settings.music) &&
-                   !((item.setting == 9 || item.setting >= 18) && !settings.renderer) &&
+                   !((item.setting == 9 || (item.setting >= 18 && item.setting <= 21)) && !settings.renderer) &&
+                   !((item.setting >= 22 && item.setting <= 24) && (!video.window || vr)) &&
+                   !(item.setting == 23 && !settings.fullscreen) &&
+                   !(item.setting == 24 && settings.fullscreen && settings.fullscreen_mode == 0) &&
+                   !(item.setting == 25 && (vr || !video.vsync_off)) && !(item.setting == 26 && vr) &&
+                   !(item.setting == 27 && video.refresh_rates.size() < 2) &&
                    !(page == MenuPage::Cheats && item.setting != 14 && !settings.cheats);
         }
         bool small() const;

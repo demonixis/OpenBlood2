@@ -213,6 +213,13 @@ namespace
                     CHECK(item.rect.bottom - item.rect.top <= int(large.height) &&
                           item.rect.bottom - item.rect.top >= int(large.height) * 2 / 3);
             }
+            if (page == MenuPage::Display)
+            {
+                menu.selected = int(menu.items.size()) - 1;
+                ++menu.revision;
+                CHECK(canvas.compose(menu, 0, error));
+                CHECK(menu.items.back().rect.bottom > 0);
+            }
             auto revision = canvas.revision;
             CHECK(canvas.compose(menu, 0, error) && canvas.revision == revision);
         }

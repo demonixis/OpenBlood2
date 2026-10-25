@@ -39,6 +39,22 @@ namespace OpenBlood2
         {
             return xr_.color_format();
         }
+        std::vector<int> refresh_rates() const
+        {
+            return xr_.refresh_rates();
+        }
+        int refresh_rate() const
+        {
+            return xr_.refresh_rate();
+        }
+        bool request_refresh_rate(int rate, std::string& error)
+        {
+            return xr_.request_refresh_rate(rate, error);
+        }
+        void set_render_scale(int percent)
+        {
+            xr_.set_render_scale(percent);
+        }
         enum class Begin
         {
             Frame,

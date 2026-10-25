@@ -199,6 +199,48 @@ BLOOM; `preferences.cfg` version 8 adds `ambient_occlusion` (default 2) and supe
 version 9 adds `reflections` (default 2) and supersedes version 8.
 
 
+## Window, frame pacing and headset display options
+
+The replacement Display rows (settings 22–26) add `FULLSCREEN [ON/OFF]`,
+`FULLSCREEN MODE [BORDERLESS/EXCLUSIVE]`, `RESOLUTION`, `VSYNC [ON/OFF]` and
+`FRAME LIMIT`. Enter, left/right and pointer activation cycle the choices. They
+are independent of ORIGINAL/ENHANCED. Window controls are unavailable on Android,
+iOS and in XR; VSync and frame limits are unavailable in XR, whose compositor owns
+pacing. Exclusive mode is selectable only with fullscreen enabled; borderless
+fullscreen uses the desktop resolution and disables the resolution row.
+
+`DisplayOptions` enumerates SDL's current display modes (bounded at 4096), deduplicates
+resolutions in **drawable pixels**, and re-enumerates when the window changes display.
+High-density modes and window coordinates are converted explicitly. DEFAULT restores
+the 1200×780 logical window, or chooses an enumerated mode with the desktop's pixel
+size in exclusive fullscreen. For a chosen exclusive resolution, the highest listed
+refresh rate is used. Unsupported exclusive resolutions fail explicitly.
+VSync OFF is offered only when the claimed GPU window supports IMMEDIATE presentation.
+The FPS list always includes 30, 60, 120, 240 and UNLIMITED, plus the display's listed
+rates rounded to integral FPS. These are software ceilings, not promises of throughput;
+VSync can impose a lower ceiling. UNLIMITED removes only the software delay.
+
+Window/swapchain changes occur before frame acquisition, with SDL synchronization and
+fullscreen-state verification. A failed change restores the previous window preferences
+and attempts to restore the actual mode; a failed restoration is reported too. Preferences
+are saved after application, so a refused change is not recorded as successful. Frame pacing
+waits only for the unused portion of the current frame's budget, without catch-up or changing
+the measured simulation delta. Diagnostic smoke clocks are unchanged.
+
+Small-font pages scroll when necessary at their original row spacing; hidden rows have no
+pointer rectangle, and selection keeps its row visible. Retail and demo use their own font
+metrics. No new commercial artwork or shader artifacts are needed.
+
+`preferences.cfg` **version 10** adds `fullscreen`, `fullscreen_mode`, `resolution_width`,
+`resolution_height`, `vsync`, `fps_limit`, `vr_refresh_rate` and `vr_render_scale`. Versions
+1–9 remain readable with windowed/default resolution, VSync ON, no software ceiling,
+automatic headset refresh and 100% render scale. Values remain bounded and parsing remains
+transactional. Headset display behavior is specified in the
+[OpenXR contract](xr_runtime_contracts.md#headset-display-options).
+
+See the [implementation and validation report](../implementation/reports/display_options.md).
+
+
 ## Controls (CMenuControls)
 
 Options > Controls is enabled in the retail edition (the demo has no action strings and keeps the

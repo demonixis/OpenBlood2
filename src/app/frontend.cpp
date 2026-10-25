@@ -2,6 +2,7 @@
 #include "app/cheat_flow.h"
 #include "app/demo_menu_smoke.h"
 #include "app/demo_smoke.h"
+#include "app/display_options.h"
 #include "app/gamepad_devices.h"
 #include "app/hud.h"
 #include "app/loading_flow.h"
@@ -298,6 +299,25 @@ namespace OpenBlood2
             if (menu_enabled && !preference_error.empty())
                 menu.open(game->client_shell.m_bInWorld);
             menu.error = menu_enabled ? preference_error : std::string{};
+            DisplayOptions display_options(runtime);
+            if (!display_options.apply(menu, error))
+                menu.error = error;
+#if BLOOD2_XR
+            int applied_refresh_rate = 0;
+            if (xr)
+            {
+                menu.video.refresh_rates = xr->refresh_rates();
+                menu.video.refresh_rates.insert(menu.video.refresh_rates.begin(), 0);
+                if (!xr->request_refresh_rate(menu.settings.vr_refresh_rate, error))
+                {
+                    menu.error = error;
+                    menu.settings.vr_refresh_rate = 0;
+                }
+                applied_refresh_rate = menu.settings.vr_refresh_rate;
+                xr->set_render_scale(menu.settings.vr_render_scale);
+                menu.video.current_refresh_rate = xr->refresh_rate();
+            }
+#endif
             auto stored_settings = menu.settings;
             MenuInput input;
             // controls.cfg beside the preferences, under the same smoke-run exclusion.
@@ -844,6 +864,33 @@ namespace OpenBlood2
                     previous = SDL_GetTicksNS();
                 }
 #endif
+                if (!display_options.apply(menu, error))
+                {
+                    menu.error = error;
+                    spdlog::warn("{}", error);
+                }
+#if BLOOD2_XR
+                if (xr)
+                {
+                    if (applied_refresh_rate != menu.settings.vr_refresh_rate)
+                    {
+                        if (!xr->request_refresh_rate(menu.settings.vr_refresh_rate, error))
+                        {
+                            menu.error = error;
+                            menu.settings.vr_refresh_rate = applied_refresh_rate;
+                            ++menu.revision;
+                        }
+                        else
+                            applied_refresh_rate = menu.settings.vr_refresh_rate;
+                    }
+                    xr->set_render_scale(menu.settings.vr_render_scale);
+                    if (menu.video.current_refresh_rate != xr->refresh_rate())
+                    {
+                        menu.video.current_refresh_rate = xr->refresh_rate();
+                        ++menu.revision;
+                    }
+                }
+#endif
                 if (stored_settings != menu.settings)
                 {
                     stored_settings = menu.settings;
@@ -1323,6 +1370,8 @@ namespace OpenBlood2
                     }
                     captured = true;
                 }
+                if (!options.menu_smoke && !options.demo_smoke)
+                    DisplayOptions::pace(tick, menu.settings.fps_limit);
                 ++frames;
                 if (!target)
                     SDL_Delay(10);

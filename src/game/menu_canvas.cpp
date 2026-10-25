@@ -9,6 +9,18 @@ namespace OpenBlood2
 {
     namespace
     {
+        std::string refresh_label(int millihertz)
+        {
+            auto result = std::to_string(millihertz / 1000);
+            if (millihertz % 1000)
+            {
+                auto fraction = std::to_string(1000 + millihertz % 1000).substr(1);
+                while (fraction.back() == '0')
+                    fraction.pop_back();
+                result += "." + fraction;
+            }
+            return result + " HZ";
+        }
         // CoolFont's implementation was distributed only as a library. Glyph
         // widths are authored; a quarter-height space is the explicit adapter policy.
         int width(const HudFont& font, std::string_view text)
@@ -230,9 +242,18 @@ namespace OpenBlood2
             error = "Original menu list exceeds bounded canvas";
             return false;
         }
+        const int visible = menu.small() ? std::max(1, (425 - y) / (int(small_.height) + 5)) : rows;
+        if (menu.small())
+            menu.first = std::clamp(menu.first, std::max(0, menu.selected - visible + 1), menu.selected);
+        else
+            menu.first = 0;
         for (std::size_t i = 0; i < menu.items.size(); ++i)
         {
             auto& item = menu.items[i];
+            item.rect = {};
+            item.slider_rect = {};
+            if (int(i) < menu.first || int(i) >= menu.first + visible)
+                continue;
             std::string label = item.literal;
             if (item.string_id)
             {
@@ -282,8 +303,8 @@ namespace OpenBlood2
             }
             else if (item.setting == 20)
             {
-                static constexpr std::array<const char*, 3> modes{
-                    "AMBIENT OCCLUSION [OFF]", "AMBIENT OCCLUSION [LOW]", "AMBIENT OCCLUSION [HIGH]"};
+                static constexpr std::array<const char*, 3> modes{"AMBIENT OCCLUSION [OFF]", "AMBIENT OCCLUSION [LOW]",
+                                                                  "AMBIENT OCCLUSION [HIGH]"};
                 label = item.literal = modes[std::size_t(std::clamp(display.ambient_occlusion, 0, 2))];
             }
             else if (item.setting == 21)
@@ -314,6 +335,29 @@ namespace OpenBlood2
                     c = char(std::toupper(static_cast<unsigned char>(c)));
                 label = item.literal = "LEVEL [" + world + "]";
             }
+            if (item.setting == 22)
+                label = item.literal = display.fullscreen ? "FULLSCREEN [ON]" : "FULLSCREEN [OFF]";
+            if (item.setting == 23)
+                label = item.literal =
+                    display.fullscreen_mode ? "FULLSCREEN MODE [EXCLUSIVE]" : "FULLSCREEN MODE [BORDERLESS]";
+            if (item.setting == 24)
+                label = item.literal = display.fullscreen && !display.fullscreen_mode ? "RESOLUTION [DESKTOP]"
+                                       : display.resolution_width
+                                           ? "RESOLUTION [" + std::to_string(display.resolution_width) + " X " +
+                                                 std::to_string(display.resolution_height) + "]"
+                                           : "RESOLUTION [DEFAULT]";
+            if (item.setting == 25)
+                label = item.literal = display.vsync ? "VSYNC [ON]" : "VSYNC [OFF]";
+            if (item.setting == 26)
+                label = item.literal = display.fps_limit ? "FRAME LIMIT [" + std::to_string(display.fps_limit) + " FPS]"
+                                                         : "FRAME LIMIT [UNLIMITED]";
+            if (item.setting == 27)
+                label = item.literal = menu.video.refresh_rates.size() < 2 ? "REFRESH RATE [UNAVAILABLE]"
+                                       : display.vr_refresh_rate
+                                           ? "REFRESH RATE [" + refresh_label(display.vr_refresh_rate) + "]"
+                                           : "REFRESH RATE [AUTO]";
+            if (item.setting == 28)
+                label = item.literal = "RENDER SCALE [" + std::to_string(display.vr_render_scale) + "%]";
             const bool enabled = menu.enabled(item);
             const auto& font = menu.small()              ? small_
                                : !enabled                ? disabled_
@@ -365,6 +409,14 @@ namespace OpenBlood2
             }
             y += menu.small() ? font.height + 5 : step;
         }
+        if (menu.first > 0 && up_arrow_)
+            canvas.DrawSurfaceToSurfaceTransparent(surface, up_arrow_, nullptr, 298 - int(up_arrow_->width) / 2,
+                                                   assets.list_y - int(up_arrow_->height) - 8, hud_magenta);
+        if (menu.first + visible < rows && down_arrow_)
+            canvas.DrawSurfaceToSurfaceTransparent(surface, down_arrow_, nullptr, 298 - int(down_arrow_->width) / 2,
+                                                   426, hud_magenta);
+        if (menu.page == MenuPage::Vr && menu.video.current_refresh_rate)
+            text(*surface, small_, "CURRENT REFRESH: " + refresh_label(menu.video.current_refresh_rate), 180, 440);
         if ((menu.page == MenuPage::Save || menu.page == MenuPage::Load) && !menu.saves.unavailable.empty())
             text(*surface, small_, menu.saves.unavailable, 180, 440);
         if (menu.page == MenuPage::Cheats)

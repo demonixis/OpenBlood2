@@ -164,6 +164,10 @@ Status (2026-10-22, [contract](contracts/post_processing_contracts.md)):
 - **Remaining.** Post-processing in XR; glossier classes for polished retail floors if wanted.
 - **Not verified.** Vulkan execution, Linux and Windows.
 
+The separately requested [display options](contracts/menu_contracts.md#window-frame-pacing-and-headset-display-options)
+add fullscreen modes, pixel resolution, VSync, FPS ceilings, headset refresh selection and
+50–100% eye render scale (preferences v10). This does not change milestone acceptance.
+
 ## M8 — VR on Quest, then PCVR
 
 The [OpenXR plan](implementation/openxr_plan.md) holds the design and the lot
