@@ -143,6 +143,19 @@ namespace OpenBlood2
         return laser_beams.publish(from, to, GetObjectName(source), *objects_.models, *client_resources,
                                    objects_.time(), error, type);
     }
+    std::uint64_t ServerAdapter::PublishShotgunEffects(HOBJECT source, const ShotgunEffectSettings& settings,
+                                                       std::string& error)
+    {
+        if (!trace_service("PublishShotgunEffects"))
+            return 0;
+        if (!IsObjectAlive(source) || !objects_.models || !objects_.sprites || !client_resources)
+        {
+            error = "Shotgun effect source/resources unavailable";
+            return 0;
+        }
+        return shotgun_effects.publish(source, settings, *objects_.models, *objects_.sprites, *client_resources,
+                                       objects_.time(), *this, error);
+    }
     std::uint64_t ServerAdapter::PublishWeaponSprites(HOBJECT source, const WeaponSpriteSettings& settings,
                                                       std::string& error)
     {

@@ -1,6 +1,7 @@
 #pragma once
 #include "Weapon.h"
 #include "engine/model_store.h"
+#include "engine/sprite.h"
 #include <random>
 class ServerDE;
 class CBloodServerShell;
@@ -26,6 +27,14 @@ class CViewWeapon
                 std::string&);
     // Selected original placement, with the unimplemented bob inputs held at zero.
     bool AdjustAngleAndSetPos(float pitch, float yaw, DVector eye, OpenBlood2::NodePose&) const;
+    // Local muzzle flash: source lifetime, separate authored primary/alternate sprites.
+    std::array<std::shared_ptr<const OpenBlood2::Sprite>, 2> flashes;
+    std::array<OpenBlood2::SpriteTrack, 2> flash_tracks;
+    unsigned flash_visible = 0;
+    double flash_started = 0;
+    std::string flash_error, animation_sound_error;
+    bool second_barrel = false;
+    DVector FlashOffset(bool original_projection) const;
     DBYTE type = 0, character = 0;
     std::string model_path, skin_path;
     bool left = false;
@@ -46,7 +55,8 @@ class CViewWeapon
     std::array<std::uint32_t, 2> start_{UINT32_MAX, UINT32_MAX}, fire_{UINT32_MAX, UINT32_MAX},
         stop_{UINT32_MAX, UINT32_MAX};
     float last_shot_time_ = 0, idle_start_ = 0, idle_delay_ = 20;
-    bool last_alt_ = false, last_firing_ = false;
+    bool last_alt_ = false, last_firing_ = false, switch_barrels_ = false;
+    std::uint32_t original_fire_ = UINT32_MAX;
     DBYTE next_seed_ = 2;
     std::minstd_rand random_{1};
     OpenBlood2::Resources* resources_ = nullptr;

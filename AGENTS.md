@@ -23,6 +23,14 @@ sounds and oldest-slot 150-update fade (80 live + 50 terminating, separate from 
 Cosmetic failures stay visible without failing play; unload/load clears the client pool.
 Other materials/weapon FX remain separate. No new saved classes or M2 acceptance changes.
 
+The [shotgun VFX lot 2](Documentation/contracts/shotgun_contracts.md#original-vfx-completion-lot-2-2026-10-25)
+adds original primary/alternate muzzle sprites, barrel alternation/reload sounds, secondary-only
+casings/muzzle smoke and material marks/fragments/liquid effects. Preserve first-contact ejection-bit
+consumption even on suppressed impacts, exactly two secondary casings, no casing/smoke on complete
+misses, primary semantics for the second barrel, independent cosmetic randomness, source per-update
+fragment motion, fixed marks and bounded client-only lifetime. XR flashes follow the tracked muzzle.
+No gameplay damage/save payload changes; collision/clipping/pool adaptations remain explicit.
+
 ## Commit attribution
 
 Commits and pull requests carry only the user's identity (demonixis). Never add

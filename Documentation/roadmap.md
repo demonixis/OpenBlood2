@@ -1,6 +1,6 @@
 # Roadmap
 
-Reviewed on 2026-10-25 (beta VFX lot 1); level-opening coverage reconciled with `9bfada1` and
+Reviewed on 2026-10-25 (beta VFX lots 1–2); level-opening coverage reconciled with `9bfada1` and
 [audit 19](implementation/reports/evidence/all-levels-audit-19.log), save/load with lot 14.
 Percentages are task estimates, not acceptance. Only the user accepts a milestone.
 
@@ -82,7 +82,7 @@ progress, and every one is recorded.
 | 3.4 | Campaign chaining: every authored NEW_LEVEL/EndEpisode in order, with KeepAlive inventory and stats | SubwayA → CityHub has a scripted test. The user has played the rest without a recorded result. |
 | 3.5 | Bosses and endgame: Gideon, EnhancedGideon, UndeadGideon, AncientOne, End script, credits | Original-source ports, focused behavior tests and world opening pass; a complete player-driven endgame remains unverified. |
 | 3.6 | Beta build: CI archives for the three platforms, logs and crash capture, a bug report channel | CI archives, logs and crash capture exist. |
-| 3.7 | Beta bug triage and fixes, each fix with a regression test; retest the existing reports (post-transition stutter, idle Cultists, frozen corpses, NPC placement) | In progress: Discord tester fixes, all nine control actions, and destruction VFX lot 1 (wood/metal/glass) implemented. Museum crash remains unreproduced; full campaign retest remains. |
+| 3.7 | Beta bug triage and fixes, each fix with a regression test; retest the existing reports (post-transition stutter, idle Cultists, frozen corpses, NPC placement) | In progress: Discord tester fixes, all nine control actions, destruction VFX lot 1 (wood/metal/glass), and shotgun VFX lot 2 implemented. Museum crash remains unreproduced; full campaign retest remains. |
 | 3.8 | M3 acceptance record for the user's decision | Not started. |
 
 ## M4 — original rendering
@@ -98,7 +98,7 @@ renderer remains the reference and stays selectable after M5.
 | Lot | Scope | Status |
 | --- | --- | --- |
 | 1 | Wood, metal and glass destruction fragments: original resources, launch, scale, transparency, bounce sounds and eviction/fade | Implemented; [contract and verification](contracts/destruction_debris_contracts.md). Applies to CDebris callers on destructible models and brushes. Other materials and explosion components remain separate. |
-| 2 | Sawed-off shotgun (weapon 4): compare primary/alternate fire against the original, complete missing casing/muzzle/impact components | Next proposed lot; not started. |
+| 2 | Sawed-off shotgun (weapon 4): compare primary/alternate fire against the original, complete missing casing/muzzle/impact components | Implemented: original single/double muzzle flashes, barrel/reload animation, secondary casings/smoke, material marks/fragments and liquids; [contract and verification](contracts/shotgun_contracts.md#original-vfx-completion-lot-2-2026-10-25). Engine collision/clipping/pool adaptations remain explicit. |
 | 3 | Inventory of remaining weapon/environment VFX, separating missing implementation, partial effects and absent original resources | Pending. |
 
 These lots restore original presentation. They do not reopen M2 or replace M3's

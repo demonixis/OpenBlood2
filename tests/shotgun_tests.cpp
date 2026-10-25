@@ -91,6 +91,7 @@ namespace
         float before = victim->m_damage.m_fHitPoints;
         CHECK(fire(g, *shooter, aim, false) == FireResult::Fired && gun->last_pellets == 16);
         CHECK(shooter->m_InventoryMgr.GetAmmoCount(AMMO_SHELL) == 2);
+        CHECK(g.server.shotgun_effects.casings.empty());
         const float pellet = gun->last_shot.damage;
         CHECK(pellet >= 4 && pellet <= 6);
         const float primary_loss = before - victim->m_damage.m_fHitPoints;
@@ -111,6 +112,11 @@ namespace
         CHECK(gun->last_shot.damage >= 8 && gun->last_shot.damage <= 12 &&
               before - victim->m_damage.m_fHitPoints > gun->last_shot.damage * 1.5f);
         CHECK(fire(g, *shooter, aim, false) == FireResult::Dry);
+        CHECK(g.server.shotgun_effects.casings.size() == 2); // once per discharge, not per pellet.
+        const auto events = g.server.shotgun_effects.started;
+        shooter->m_InventoryMgr.SetAmmoCount(AMMO_SHELL, 2);
+        CHECK(fire(g, *shooter, {0, 10000, 0}, true) == FireResult::Fired && gun->impacts.empty());
+        CHECK(g.server.shotgun_effects.started == events); // complete miss: source sends no composite FX.
         CHECK(g.unload_world());
         return true;
     }

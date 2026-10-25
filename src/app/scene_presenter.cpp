@@ -289,8 +289,8 @@ namespace OpenBlood2
         if (!registry.reserve(surface_scene_.lights, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, light_bytes, error) ||
             !registry.reserve(surface_scene_.cells, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, cell_bytes, error) ||
             !registry.stage(surface_scene_.lights,
-                            light_grid.lights.empty() ? no_light.data() : light_grid.lights.data()->data(),
-                            light_bytes, true, error) ||
+                            light_grid.lights.empty() ? no_light.data() : light_grid.lights.data()->data(), light_bytes,
+                            true, error) ||
             !registry.stage(surface_scene_.cells, light_grid.cells.data(), cell_bytes, true, error))
             return false;
         auto& frame = surface_scene_.frame;
@@ -395,7 +395,8 @@ namespace OpenBlood2
         const auto models_done = SDL_GetTicksNS();
         if (!update_polygrid_scene(game, polygrid_scene, error))
             return fail("PolyGrid presentation");
-        if (!update_sprite_scene(game, sprite_scene, error, camera_override ? &view : nullptr))
+        if (!update_sprite_scene(game, sprite_scene, error, camera_override ? &view : nullptr,
+                                 weapon_cameras ? &*weapon_cameras : nullptr))
             return fail("Sprite presentation");
         sprite_scene.batch();
         stats.world_ns = world_done - started;
@@ -639,7 +640,8 @@ namespace OpenBlood2
         post_view.height = float(height) - 2 * post_view.top;
         const float zoom = original_fov_scale(game.client_shell.ViewFovX());
         post_view.projection = {zoom, zoom * float(width) / std::max(post_view.height, 1.f),
-                                world_far / (world_far - world_near), -world_near * world_far / (world_far - world_near)};
+                                world_far / (world_far - world_near),
+                                -world_near * world_far / (world_far - world_near)};
         post_view.slice = view_model_depth;
         if (!post_process.finish(commands, target, post_view, error))
         {

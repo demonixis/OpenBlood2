@@ -20,10 +20,12 @@ class CWeaponFX
     std::uint64_t spark_event = 0;
     bool sparks_requested = false, sparks_big = false;
     std::string spark_error;
+    std::uint64_t shotgun_event = 0;
+    std::string shotgun_error;
     bool CreateSparks(ServerDE&, HOBJECT, DVector normal, float damage, bool melee, std::minstd_rand&);
     bool SelectBloodSpurt(float damage, std::minstd_rand&);
     bool CreateBloodSpurt(ServerDE&, HOBJECT, DVector normal, float damage, std::minstd_rand&);
-    bool CreateSprites(ServerDE&, HOBJECT, DVector normal, std::minstd_rand&);
+    bool CreateSprites(ServerDE&, HOBJECT, DVector normal, std::minstd_rand&, bool shotgun = false);
     bool PlayImpactSound(ServerDE&, HOBJECT source, std::minstd_rand&);
     std::string GetImpactSound(std::minstd_rand&) const;
 };

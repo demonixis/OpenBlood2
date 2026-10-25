@@ -1,0 +1,125 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/release
+      Start  223: weapons.private
+      Start  856: weapon_impacts.private
+      Start 1517: destruction_debris.retail
+      Start 1523: shotgun_effects.retail
+      Start  863: weapon_sprites.private
+      Start 1121: shotgun.player
+ 1/54 Test  #863: weapon_sprites.private ...........   Passed    0.55 sec
+      Start  795: sprite_view.subway
+ 2/54 Test #1121: shotgun.player ...................   Passed    0.80 sec
+      Start  215: weapons.inventory
+ 3/54 Test  #215: weapons.inventory ................   Passed    0.01 sec
+      Start  217: weapons.firing
+ 4/54 Test  #217: weapons.firing ...................   Passed    0.01 sec
+      Start  216: weapons.segments
+ 5/54 Test  #216: weapons.segments .................   Passed    0.01 sec
+      Start 1520: shotgun_effects.lifecycle
+ 6/54 Test #1520: shotgun_effects.lifecycle ........   Passed    0.02 sec
+      Start  794: sprite_view.failures
+ 7/54 Test  #794: sprite_view.failures .............   Passed    0.02 sec
+      Start  857: weapon_sprites.formulas
+ 8/54 Test  #857: weapon_sprites.formulas ..........   Passed    0.01 sec
+      Start 1515: destruction_debris.motion
+ 9/54 Test #1515: destruction_debris.motion ........   Passed    0.01 sec
+      Start  793: sprite_view.geometry
+10/54 Test  #793: sprite_view.geometry .............   Passed    0.01 sec
+      Start 1519: shotgun_effects.recipes
+11/54 Test #1519: shotgun_effects.recipes ..........   Passed    0.01 sec
+      Start  850: weapon_impacts.selection
+12/54 Test  #850: weapon_impacts.selection .........   Passed    0.01 sec
+      Start 1514: destruction_debris.recipes
+13/54 Test #1514: destruction_debris.recipes .......   Passed    0.01 sec
+      Start 1516: destruction_debris.destruction
+14/54 Test #1516: destruction_debris.destruction ...   Passed    0.01 sec
+      Start 1521: shotgun_effects.liquids
+15/54 Test  #795: sprite_view.subway ...............   Passed    0.39 sec
+      Start 1118: shotgun.weapon
+16/54 Test #1521: shotgun_effects.liquids ..........   Passed    0.01 sec
+      Start 1120: shotgun.ai
+17/54 Test #1118: shotgun.weapon ...................   Passed    0.02 sec
+      Start 1119: shotgun.pickup
+18/54 Test #1120: shotgun.ai .......................   Passed    0.02 sec
+      Start 1522: shotgun_effects.failures
+19/54 Test #1522: shotgun_effects.failures .........   Passed    0.01 sec
+      Start  854: weapon_impacts.hearing
+20/54 Test #1119: shotgun.pickup ...................   Passed    0.02 sec
+      Start  860: weapon_sprites.selection
+21/54 Test  #854: weapon_impacts.hearing ...........   Passed    0.01 sec
+      Start  220: weapons.animation
+22/54 Test  #860: weapon_sprites.selection .........   Passed    0.01 sec
+      Start  853: weapon_impacts.volumes
+23/54 Test  #853: weapon_impacts.volumes ...........   Passed    0.01 sec
+      Start  861: weapon_sprites.containers
+24/54 Test  #220: weapons.animation ................   Passed    0.01 sec
+      Start  852: weapon_impacts.brushes
+25/54 Test  #861: weapon_sprites.containers ........   Passed    0.01 sec
+      Start  221: weapons.lifetime
+26/54 Test  #852: weapon_impacts.brushes ...........   Passed    0.01 sec
+      Start  851: weapon_impacts.world
+27/54 Test  #221: weapons.lifetime .................   Passed    0.01 sec
+      Start  858: weapon_sprites.delay
+28/54 Test  #851: weapon_impacts.world .............   Passed    0.01 sec
+      Start  862: weapon_sprites.session
+29/54 Test  #858: weapon_sprites.delay .............   Passed    0.01 sec
+      Start  219: weapons.damage
+30/54 Test  #862: weapon_sprites.session ...........   Passed    0.01 sec
+      Start  218: weapons.melee
+31/54 Test  #219: weapons.damage ...................   Passed    0.01 sec
+      Start  855: weapon_impacts.limits
+32/54 Test  #218: weapons.melee ....................   Passed    0.01 sec
+      Start  859: weapon_sprites.failures
+33/54 Test #1523: shotgun_effects.retail ...........   Passed    1.05 sec
+      Start  222: weapons.rollback
+34/54 Test  #859: weapon_sprites.failures ..........   Passed    0.01 sec
+      Start   21: objects.builtin_model
+35/54 Test  #855: weapon_impacts.limits ............   Passed    0.02 sec
+      Start   22: objects.original_objects
+36/54 Test  #222: weapons.rollback .................   Passed    0.01 sec
+      Start   23: objects.nested_creation
+37/54 Test   #23: objects.nested_creation ..........   Passed    0.27 sec
+      Start   24: objects.reasons_properties
+38/54 Test   #21: objects.builtin_model ............   Passed    0.28 sec
+39/54 Test   #22: objects.original_objects .........   Passed    0.27 sec
+      Start   25: objects.scheduling
+      Start   26: objects.deferred_removal
+40/54 Test   #26: objects.deferred_removal .........   Passed    0.01 sec
+      Start   27: objects.aggregate_dispatch
+41/54 Test   #25: objects.scheduling ...............   Passed    0.01 sec
+      Start   28: objects.handles_selection
+42/54 Test   #24: objects.reasons_properties .......   Passed    0.01 sec
+      Start   29: objects.links_lists
+43/54 Test   #27: objects.aggregate_dispatch .......   Passed    0.01 sec
+      Start   30: objects.messages_strings
+44/54 Test   #28: objects.handles_selection ........   Passed    0.01 sec
+45/54 Test   #29: objects.links_lists ..............   Passed    0.01 sec
+      Start   31: objects.message_churn
+      Start   32: objects.message_limit
+46/54 Test   #30: objects.messages_strings .........   Passed    0.01 sec
+      Start   33: objects.unsupported_teardown
+47/54 Test   #33: objects.unsupported_teardown .....   Passed    0.01 sec
+      Start   34: objects.creation_failures
+48/54 Test   #32: objects.message_limit ............   Passed    0.02 sec
+49/54 Test   #34: objects.creation_failures ........   Passed    0.01 sec
+50/54 Test #1517: destruction_debris.retail ........   Passed    1.42 sec
+51/54 Test   #31: objects.message_churn ............   Passed    0.08 sec
+52/54 Test  #856: weapon_impacts.private ...........   Passed    1.45 sec
+53/54 Test  #223: weapons.private ..................   Passed    3.37 sec
+      Start 1524: gpu.shotgun_effects
+54/54 Test #1524: gpu.shotgun_effects ..............   Passed    0.79 sec
+
+100% tests passed out of 54
+
+Label Time Summary:
+effects           =   3.34 sec*proc (10 tests)
+gpu               =   0.79 sec*proc (1 test)
+headless          =  10.40 sec*proc (53 tests)
+objects           =   1.01 sec*proc (14 tests)
+private           =   9.87 sec*proc (11 tests)
+shotgun           =   0.86 sec*proc (4 tests)
+sprite_view       =   0.41 sec*proc (3 tests)
+weapon_impacts    =   1.51 sec*proc (7 tests)
+weapon_sprites    =   0.61 sec*proc (7 tests)
+weapons           =   3.45 sec*proc (9 tests)
+
+Total Test time (real) =   4.17 sec

@@ -232,8 +232,30 @@ namespace OpenBlood2
         ImGui::Text("Active: %zu flashes / %zu smoke | started %llu / expired %llu / failed %llu",
                     effects.flashes.size(), effects.smoke.size(), (unsigned long long)effects.started,
                     (unsigned long long)effects.expired, (unsigned long long)effects.failed);
-        ImGui::TextWrapped("Wood/stone bullet impacts only. Bubbles, marks, sparks, fragments and other composite "
-                           "effects remain unavailable.");
+        ImGui::TextWrapped("Shared wood/stone impact sprites; shotgun completion includes muzzle flashes, casings, "
+                           "marks, fragments and liquids.");
+        const auto& shotgun = game.server.shotgun_effects;
+        ImGui::Text("Shotgun: %zu casings / %zu marks-fragments-ripples / %zu splashes | failures %llu",
+                    shotgun.casings.size(), shotgun.sprites.size(), shotgun.splashes.size(),
+                    (unsigned long long)shotgun.failed);
+        if (!shotgun.update_error.empty())
+            ImGui::TextWrapped("%s", shotgun.update_error.c_str());
+        for (const auto& report : shotgun.reports)
+            if (!report.error.empty())
+                ImGui::TextWrapped("Shotgun event %llu: %s", (unsigned long long)report.id, report.error.c_str());
+        for (const auto& casing : shotgun.casings)
+            if (!casing.sound_error.empty())
+                ImGui::TextWrapped("Casing %llu: %s", (unsigned long long)casing.id, casing.sound_error.c_str());
+        for (const auto& weapon : game.client_shell.weapons)
+            if (weapon.type == WEAP_SHOTGUN)
+            {
+                ImGui::Text("Muzzle mode %u | second barrel %s", weapon.flash_visible,
+                            weapon.second_barrel ? "yes" : "no");
+                if (!weapon.flash_error.empty())
+                    ImGui::TextWrapped("%s", weapon.flash_error.c_str());
+                if (!weapon.animation_sound_error.empty())
+                    ImGui::TextWrapped("%s", weapon.animation_sound_error.c_str());
+            }
         if (!effects.update_error.empty())
             ImGui::TextWrapped("Update failure: %s", effects.update_error.c_str());
         auto presentation = [&](std::uint64_t id)

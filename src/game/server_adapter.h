@@ -27,6 +27,7 @@
 #include "game/save_message.h"
 #include "game/service_coverage.h"
 #include "game/session.h"
+#include "game/shotgun_effects.h"
 #include "game/sparks.h"
 #include "game/warp_gates.h"
 #include "game/weapon_sprites.h"
@@ -123,6 +124,8 @@ namespace OpenBlood2
         std::uint64_t PublishBloodSpurt(HOBJECT, const BloodSpurtSettings&, std::string&) override;
         BloodSplats blood_splats;
         std::uint64_t PublishBloodSplat(HOBJECT, const BloodSplatSettings&, std::string&) override;
+        ShotgunEffects shotgun_effects;
+        std::uint64_t PublishShotgunEffects(HOBJECT, const ShotgunEffectSettings&, std::string&) override;
         WeaponSprites weapon_sprites;
         std::uint64_t PublishWeaponSprites(HOBJECT, const WeaponSpriteSettings&, std::string&) override;
         ExplosionModels explosion_models;
@@ -194,6 +197,7 @@ namespace OpenBlood2
             blood_spurts.clear();
             blood_splats.clear();
             weapon_sprites.clear();
+            shotgun_effects.clear();
             explosion_models.clear();
             laser_beams.clear();
             object_particles.clear();

@@ -3,7 +3,8 @@
 #include <cmath>
 namespace OpenBlood2
 {
-    bool update_sprite_scene(const GameSession& game, SpriteView& scene, std::string& error, const CameraView* camera)
+    bool update_sprite_scene(const GameSession& game, SpriteView& scene, std::string& error, const CameraView* camera,
+                             const std::array<ViewWeaponCamera, 2>* weapons)
     {
         const auto& view = camera ? *camera : game.client_shell.view;
         if (!scene.begin_frame(view.position, view.rotation, error))
@@ -103,6 +104,77 @@ namespace OpenBlood2
                 return false;
             scene.entries.back().blood_splat = fx.id;
         }
+        const auto& client = game.client_shell;
+        const auto* record = game.objects.get(client.player);
+        const auto* player = record ? dynamic_cast<const CPlayerObj*>(record->game.get()) : nullptr;
+        if (client.weapons_visible && player && !player->m_damage.IsDead())
+            for (const auto& weapon : client.weapons)
+            {
+                if (!weapon.flash_visible || !weapon.model)
+                    continue;
+                const auto mode = weapon.flash_visible - 1;
+                const auto* definition = weapon_definition(weapon.type);
+                const auto placement =
+                    weapons
+                        ? (*weapons)[weapon.left ? 0 : 1]
+                        : ViewWeaponCamera{client.rotation.pitch, client.rotation.yaw, client.camera_position, {}, 1};
+                NodePose pose;
+                float scale = placement.scale;
+                if (placement.arms)
+                {
+                    ViewArmRig rig;
+                    ViewArmPose held;
+                    const auto offset = definition->m_vViewModelOffset;
+                    if (!rig_view_arms(*weapon.model, weapon.model_path, weapon.left, rig) ||
+                        !pose_view_arms(*weapon.model, weapon.animation, rig, *placement.arms,
+                                        {weapon.left ? -offset.x : offset.x, offset.y, offset.z}, held))
+                    {
+                        error = "Muzzle flash arm placement failed";
+                        return false;
+                    }
+                    pose = held.model;
+                    scale = placement.arms->scale;
+                }
+                else
+                {
+                    if (!weapon.AdjustAngleAndSetPos(placement.pitch, placement.yaw, placement.eye, pose))
+                        return false;
+                    pose.position =
+                        vector_add(placement.eye, vector_scale(vector_subtract(pose.position, placement.eye), scale));
+                }
+                pose.position =
+                    vector_add(pose.position,
+                               rotate_vector(pose.rotation, vector_scale(weapon.FlashOffset(!placement.arms), scale)));
+                // Desktop x10 flash projection needs the authored .19 scale; at a real XR muzzle
+                // undo that magnification before applying the model's world scale.
+                float size = definition->m_fFlashScale * scale * (placement.arms ? .1f : 1.f);
+                // FLAG_SPRITEBIAS: camera-directed -20-unit bias with size preserved (drawsprite).
+                // Tracked XR weapons use their physical muzzle instead of desktop projection/bias.
+                if (!placement.arms)
+                {
+                    const auto relative = vector_subtract(pose.position, view.position);
+                    const float z = vector_dot(relative, rotate_vector(view.rotation, {0, 0, 1}));
+                    if (z > world_near)
+                    {
+                        const float factor = std::max(world_near, z - 20.f) / z;
+                        pose.position = vector_add(view.position, vector_scale(relative, factor));
+                        size *= factor;
+                    }
+                }
+                if (!scene.add(weapon.flashes[mode].get(), weapon.flash_tracks[mode], pose, {size, size, size},
+                               FLAG_VISIBLE | FLAG_NOLIGHT, {}, game.resources, error))
+                    return false;
+            }
+        for (const auto& fx : game.server.shotgun_effects.sprites)
+            if (!scene.add(fx.sprite.get(), fx.track, {fx.position, fx.rotation}, fx.scale,
+                           FLAG_VISIBLE | FLAG_ROTATEABLESPRITE |
+                               (fx.kind == ShotgunSpriteKind::Mark ? 0 : FLAG_SPRITECHROMAKEY),
+                           {}, game.resources, error, fx.alpha, fx.color))
+                return false;
+        for (const auto& fx : game.server.shotgun_effects.splashes)
+            if (!scene.add_particle_system("SpriteTextures/drop32_1.dtx", fx.position, fx.particles, 100.f / 640, 1,
+                                           fx.id, game.resources, error))
+                return false;
         for (const auto& fx : game.server.weapon_sprites.flashes)
         {
             if (!scene.add(fx.sprite.get(), fx.track, {fx.settings.position, fx.rotation}, fx.scale, fx.flags, {},

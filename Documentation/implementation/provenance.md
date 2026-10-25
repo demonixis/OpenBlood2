@@ -2057,3 +2057,14 @@ SFXMgr detail-count rule and oldest-slot terminating fade. Shared existing clien
 and model rendering are reused; the destruction pool is isolated from flesh/blood effects.
 See the [source ledger](sources/destruction_debris_sources.json),
 [contract](../contracts/destruction_debris_contracts.md) and [report](reports/destruction_debris.md).
+
+## Shotgun VFX lot 2 (2026-10-25)
+
+Selected original CShotgun client/server rules and WeaponFX recipes now publish independent
+casings, surface fragments, marks, liquid drops/ripples and bubbles; CViewWeapon renders the
+authored single/double flashes and plays reload keys. Existing damage/spread and shared
+impact smoke/sparks/blood remain in place. The bounded pools, primary-world casing collision,
+normal-aligned mark quads and tracked-hand placement are explicit engine adaptations.
+See the [source ledger](sources/shotgun_effect_sources.json),
+[contract](../contracts/shotgun_contracts.md#original-vfx-completion-lot-2-2026-10-25)
+and [report](reports/shotgun_effects.md).

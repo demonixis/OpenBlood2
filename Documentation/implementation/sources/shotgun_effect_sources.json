@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-25",
+  "scope": "Beta VFX lot 2: original sawed-off shotgun presentation",
+  "references": [
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/GameWeapons.cpp",
+      "source_sha256": "979f6e82b231714dd18209fcb8fcfce949c6e4b5235c618c5150bd5c0be332a2",
+      "purpose": "CShotgun::Fire alternate-only ejection bit."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ObjectDLL/Weapon.cpp",
+      "source_sha256": "f045ec970e4b61fd5ad23c629f0123c54aa42196f9490e0ff19ccf485ed5c5fb",
+      "purpose": "UpdateWeaponFX, FireVector, AddImpact ordering and one-shot flags."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/GameWeapons.cpp",
+      "source_sha256": "b40ef0a2a20ef908fe87efd0e99b237fc8c18e5974f8504839f45e97c123ee55",
+      "purpose": "CShotgun::UpdateFiringState barrel animation switching and alternate-to-primary."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/ViewWeapon.cpp",
+      "source_sha256": "8dc314214889f387a89baf44a0689c0a4be9f466e5c9b33a7453db5a547cb529",
+      "purpose": "CreateFlash, muzzle-node placement, flash timer and SOUND_KEY playback."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/WeaponFX.cpp",
+      "source_sha256": "4cd80dfbf5f400950854b45db3cd7907b9369e2cd8c31f90bd797b59b4b517b1",
+      "purpose": "Muzzle smoke, casings, material marks/fragments, bubbles, splashes and ripples."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/ShellCasingFX.cpp",
+      "source_sha256": "ebfcd41e2aa21a47aab93ec7f5b4a7e41cff8e6ace477f432926418c081b15ad",
+      "purpose": "Shell model/skin/scale, velocities, half gravity, bounces/audio and strict 20s expiry."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/SurfaceFragmentFX.cpp",
+      "source_sha256": "661dfc5880c3f6601b84501454608bacce7a3e5b8975e2840f31a783a561da05",
+      "purpose": "Original splinter/chip selection and per-update movement/rotation."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/MarkSFX.cpp",
+      "source_sha256": "9c2473dd5384dd999b6af9f49ff147aeb0e0158c9a9cc4534a0582a25c6172ce",
+      "purpose": "Material mark creation, nearest-region reuse, fixed pose and color."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/SplashFX.cpp",
+      "source_sha256": "9b0ef03630b55e4eea09e0ad58ad4a3661b6699447868cad6516d64822788850",
+      "purpose": "Four-particle emission, colors, gravity and spray duration."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/RippleFX.cpp",
+      "source_sha256": "18697e93748ce70a78dcaffbf6f0ede8e0abcd42887fda9ce5a9becb3a1a1d92",
+      "purpose": "Aligned fixed-scale ripple lifecycle."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/client_physics.cpp",
+      "source_sha256": "90a859cc5f384ce5e146d7fadaf95c56332d931c7adb89340dae6aadc3956825",
+      "purpose": "Client gravity, integration and collision response."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/SFXMgr.cpp",
+      "source_sha256": "fac5fa907b3ec5b547b798c46dd3d3d5371486104f91245b65d363b6653a1e74",
+      "purpose": "Dynamic-list capacities and update routing."
+    },
+    {
+      "source": "sources/lithtech/Blood2/ClientShellDLL/SpecialFX.h",
+      "source_sha256": "9dbbf6f73a3b2ad566e94718be6e8466254600df9d62b4dba7c140ffe65b2010",
+      "purpose": "Default effect update interval."
+    },
+    {
+      "source": "sources/lithtech/Blood2/Shared/WeaponDefs.cpp",
+      "source_sha256": "7693d587a88491eb5499847efcc7cc3d0a81b14bf17dcaa0f63a979f9e394a9d",
+      "purpose": "Shotgun primary/alternate definitions and flash settings."
+    },
+    {
+      "source": "sources/lithtech/runtime/render_a/src/sys/d3d/drawsprite.cpp",
+      "source_sha256": "05c4a1982b2c84242d414924c8a1229b102d8584e92b95acee239430f558dea4",
+      "purpose": "Later-engine corroboration of -20-unit FLAG_SPRITEBIAS, near clamp and preserved projected size."
+    }
+  ]
+}

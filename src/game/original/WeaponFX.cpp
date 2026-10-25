@@ -68,7 +68,7 @@ bool CWeaponFX::PlayImpactSound(ServerDE& server, HOBJECT source, std::minstd_ra
 }
 
 // Original Weapon::UpdateWeaponFX selection; WeaponFX::CreateObject/CreateFlash/CreateSmoke recipes.
-bool CWeaponFX::CreateSprites(ServerDE& server, HOBJECT source, DVector normal, std::minstd_rand& random)
+bool CWeaponFX::CreateSprites(ServerDE& server, HOBJECT source, DVector normal, std::minstd_rand& random, bool shotgun)
 {
     sprite_event = 0;
     sprite_error.clear();
@@ -84,6 +84,8 @@ bool CWeaponFX::CreateSprites(ServerDE& server, HOBJECT source, DVector normal, 
     }
     normal = OpenBlood2::vector_scale(normal, 1 / std::sqrt(OpenBlood2::vector_dot(normal, normal)));
     OpenBlood2::WeaponSpriteSettings settings;
+    if (IsLiquid(code) && shotgun)
+        return true; // ShotgunEffects publishes the original AMMO_SHELL bubble recipe.
     if (IsLiquid(code))
         settings.bubbles_unavailable = true; // Flash suppressed; original smoke substitutes SparkFX bubbles.
     else

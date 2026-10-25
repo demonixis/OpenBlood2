@@ -1,6 +1,7 @@
 #pragma once
 namespace OpenBlood2
 {
+    struct ShotgunEffectSettings;
     struct LightningSettings;
     struct WarpGateSettings;
 } // namespace OpenBlood2
@@ -155,6 +156,7 @@ class ServerDE : public CSBase
     virtual std::uint64_t PublishExplosionRings(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
     virtual std::uint64_t PublishExplosionLights(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
     virtual std::uint64_t PublishExplosionModels(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
+    virtual std::uint64_t PublishShotgunEffects(HOBJECT, const OpenBlood2::ShotgunEffectSettings&, std::string&) = 0;
     virtual std::uint64_t PublishWeaponSprites(HOBJECT, const OpenBlood2::WeaponSpriteSettings&, std::string&) = 0;
     virtual std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
     virtual void RecordSceneExplosion(const OpenBlood2::SceneExplosionReport&) = 0;

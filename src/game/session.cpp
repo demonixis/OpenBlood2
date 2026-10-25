@@ -849,6 +849,7 @@ namespace OpenBlood2
         ok = server.flesh_gibs.advance(objects.time(), server) && ok;
         // Cosmetic failures stay inspectable without stopping campaign simulation.
         server.destruction_debris.advance(objects.time(), server);
+        server.shotgun_effects.advance(objects.time(), server);
         ok = server.sparks.advance(objects.time()) && ok;
         ok = server.lightning.advance(objects.time()) && ok;
         ok = server.warp_gates.advance(objects.time(), server) && ok;

@@ -1,0 +1,76 @@
+Test project /Users/yann/projects/lithtech/openblood2/build/sanitize
+      Start   18: objects.builtin_model
+      Start   19: objects.original_objects
+      Start   20: objects.nested_creation
+ 1/32 Test   #18: objects.builtin_model ............   Passed    0.68 sec
+      Start   21: objects.reasons_properties
+ 2/32 Test   #19: objects.original_objects .........   Passed    0.68 sec
+ 3/32 Test   #20: objects.nested_creation ..........   Passed    0.68 sec
+      Start   22: objects.scheduling
+      Start   23: objects.deferred_removal
+ 4/32 Test   #22: objects.scheduling ...............   Passed    0.09 sec
+      Start   24: objects.aggregate_dispatch
+ 5/32 Test   #23: objects.deferred_removal .........   Passed    0.09 sec
+      Start   25: objects.handles_selection
+ 6/32 Test   #21: objects.reasons_properties .......   Passed    0.10 sec
+      Start   26: objects.links_lists
+ 7/32 Test   #24: objects.aggregate_dispatch .......   Passed    0.09 sec
+      Start   27: objects.messages_strings
+ 8/32 Test   #25: objects.handles_selection ........   Passed    0.09 sec
+      Start   28: objects.message_churn
+ 9/32 Test   #26: objects.links_lists ..............   Passed    0.09 sec
+      Start   29: objects.message_limit
+10/32 Test   #27: objects.messages_strings .........   Passed    0.10 sec
+      Start   30: objects.unsupported_teardown
+11/32 Test   #30: objects.unsupported_teardown .....   Passed    0.14 sec
+      Start   31: objects.creation_failures
+12/32 Test   #29: objects.message_limit ............   Passed    0.33 sec
+      Start  183: weapons.inventory
+13/32 Test   #31: objects.creation_failures ........   Passed    0.11 sec
+      Start  184: weapons.segments
+14/32 Test  #184: weapons.segments .................   Passed    0.65 sec
+      Start  185: weapons.firing
+15/32 Test  #183: weapons.inventory ................   Passed    0.67 sec
+      Start  186: weapons.melee
+16/32 Test  #186: weapons.melee ....................   Passed    0.11 sec
+      Start  187: weapons.damage
+17/32 Test  #185: weapons.firing ...................   Passed    0.11 sec
+      Start  188: weapons.animation
+18/32 Test  #187: weapons.damage ...................   Passed    0.11 sec
+      Start  189: weapons.lifetime
+19/32 Test  #189: weapons.lifetime .................   Passed    0.13 sec
+      Start  190: weapons.rollback
+20/32 Test  #188: weapons.animation ................   Passed    0.27 sec
+      Start  678: weapon_sprites.formulas
+21/32 Test  #190: weapons.rollback .................   Passed    0.12 sec
+      Start  679: weapon_sprites.delay
+22/32 Test  #678: weapon_sprites.formulas ..........   Passed    0.68 sec
+      Start  680: weapon_sprites.failures
+23/32 Test  #679: weapon_sprites.delay .............   Passed    0.60 sec
+      Start  681: weapon_sprites.selection
+24/32 Test  #680: weapon_sprites.failures ..........   Passed    0.12 sec
+      Start  682: weapon_sprites.containers
+25/32 Test  #681: weapon_sprites.selection .........   Passed    0.13 sec
+      Start  683: weapon_sprites.session
+26/32 Test  #683: weapon_sprites.session ...........   Passed    0.12 sec
+      Start 1019: shotgun_effects.recipes
+27/32 Test  #682: weapon_sprites.containers ........   Passed    0.13 sec
+      Start 1020: shotgun_effects.lifecycle
+28/32 Test #1019: shotgun_effects.recipes ..........   Passed    0.71 sec
+      Start 1021: shotgun_effects.liquids
+29/32 Test #1020: shotgun_effects.lifecycle ........   Passed    0.72 sec
+      Start 1022: shotgun_effects.failures
+30/32 Test #1021: shotgun_effects.liquids ..........   Passed    0.13 sec
+31/32 Test #1022: shotgun_effects.failures .........   Passed    0.11 sec
+32/32 Test   #28: objects.message_churn ............   Passed    3.94 sec
+
+100% tests passed out of 32
+
+Label Time Summary:
+effects           =   1.67 sec*proc (4 tests)
+headless          =  12.80 sec*proc (32 tests)
+objects           =   7.19 sec*proc (14 tests)
+weapon_sprites    =   1.77 sec*proc (6 tests)
+weapons           =   2.17 sec*proc (8 tests)
+
+Total Test time (real) =   4.82 sec

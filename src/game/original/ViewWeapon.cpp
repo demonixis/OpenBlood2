@@ -3,6 +3,7 @@
 #include "CharacterProfiles.h"
 #include "engine/collision.h"
 #include "engine/model_commands.h"
+#include "engine/texture.h"
 #include <cmath>
 
 using namespace OpenBlood2;
@@ -17,6 +18,28 @@ bool CViewWeapon::AdjustAngleAndSetPos(float pitch, float yaw, DVector eye, Node
                          data->m_vViewModelOffset.z};
     out.position = vector_add(eye, rotate_vector(out.rotation, offset));
     return physics_vector(out.position);
+}
+DVector CViewWeapon::FlashOffset(bool original_projection) const
+{
+    const auto* data = weapon_definition(type);
+    if (!model || !data)
+        return {};
+    DVector fallback{data->m_vFlash.x, data->m_vFlash.y, data->m_vFlash.z};
+    if (left)
+        fallback.x = -fallback.x;
+    std::size_t index = 0;
+    while (index < model->nodes.size() && model->nodes[index].name != "muzzle")
+        ++index;
+    NodePose node;
+    if (index < model->nodes.size() && sample_node_pose(*model, animation.animation, animation.time, index, node))
+    {
+        if (!original_projection)
+            return node.position;
+        const auto offset = DVector{left ? -data->m_vViewModelOffset.x : data->m_vViewModelOffset.x,
+                                    data->m_vViewModelOffset.y, data->m_vViewModelOffset.z};
+        return vector_scale(vector_add(node.position, offset), 10);
+    }
+    return original_projection ? fallback : vector_scale(fallback, .1f);
 }
 bool CViewWeapon::Create(DBYTE weapon, bool left_hand, ModelStore& models, Resources& resources, std::string& error,
                          DBYTE profile_id)
@@ -75,6 +98,30 @@ bool CViewWeapon::Create(DBYTE weapon, bool left_hand, ModelStore& models, Resou
         fire_[1] = fire_[0];
         stop_[1] = stop_[0];
     }
+    original_fire_ = fire_[0];
+    if (type == WEAP_SHOTGUN)
+    {
+        SpriteStore sprites(resources);
+        const char* paths[]{definition->m_szFlashSprite, definition->m_szAltFlashSprite};
+        for (unsigned i = 0; i < 2; ++i)
+        {
+            std::string failure;
+            if (sprites.load(paths[i], flashes[i], failure))
+                for (const auto& frame : flashes[i]->frames)
+                {
+                    Texture image;
+                    if (!read_texture_resource(resources, frame, image, failure))
+                        break;
+                }
+            if (!failure.empty())
+            {
+                flashes[i].reset();
+                if (!flash_error.empty())
+                    flash_error += "; ";
+                flash_error += failure;
+            }
+        }
+    }
     animation.animation = no_animation;
     animation.looping = false;
     state = WS_DRAW;
@@ -101,7 +148,16 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
         return true;
     auto* player = server.Player(client);
     if (!player || player->m_damage.IsDead())
+    {
+        flash_visible = 0;
         return true;
+    }
+    for (unsigned i = 0; i < 2; ++i)
+        if (flashes[i])
+            advance_sprite(*flashes[i], flash_tracks[i], seconds);
+    if (flash_visible && engine.GetTime() >= flash_started + weapon_definition(type)->m_fFlashDuration &&
+        engine.GetTime() >= flash_started + seconds + .05)
+        flash_visible = 0;
     auto* weapon = player->m_InventoryMgr.CurrentWeapon(left);
     if (!weapon || weapon->data.m_nType != type)
     {
@@ -134,6 +190,11 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
             ++shots;
             last_shot_time_ = engine.GetTime();
             last_alt_ = alternate;
+            if (type == WEAP_SHOTGUN && flashes[alternate])
+            {
+                flash_visible = alternate ? 2 : 1;
+                flash_started = engine.GetTime();
+            }
             pending_sound = alternate ? data.m_szAltFireSound : data.m_szFireSound;
             sound_indexed = resources_->find(pending_sound) != nullptr;
             return true;
@@ -145,7 +206,25 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
     };
     const float time = engine.GetTime();
     const bool hand = input.all_hands || input.left == left;
-    const bool primary = input.primary && hand, alternate = input.alternate && hand;
+    bool primary = input.primary && hand, alternate = input.alternate && hand;
+    // Original client CShotgun::UpdateFiringState: the second barrel uses alt_fire's reload
+    // animation, but is still a primary shot (one shell and primary damage/flash/sound).
+    if (type == WEAP_SHOTGUN)
+    {
+        if (state == WS_REST && switch_barrels_)
+        {
+            switch_barrels_ = false;
+            second_barrel = !second_barrel;
+            fire_[0] = fire_[0] == fire_[1] ? original_fire_ : fire_[1];
+        }
+        else if (state == WS_FIRING && !switch_barrels_)
+            switch_barrels_ = true;
+        if (second_barrel && alternate)
+        {
+            primary = true;
+            alternate = false;
+        }
+    }
     if (inventory_bomb(type) && state == WS_STOP_FIRING)
     {
         if (!PlayAnimation(stop_[0]))
@@ -326,6 +405,21 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
                 {
                     pending_sound = "Sounds\\Weapons\\" + command[++i];
                     sound_indexed = resources_->find(pending_sound) != nullptr;
+                    if (type == WEAP_SHOTGUN)
+                    {
+                        SoundRequest sound;
+                        // The retail shotgun key contains doubled backslashes. LithTech accepts
+                        // them; collapse separators here, retaining the audio service's path checks.
+                        for (char c : pending_sound)
+                        {
+                            if (c == '\\')
+                                c = '/';
+                            if (c != '/' || sound.resource.empty() || sound.resource.back() != '/')
+                                sound.resource += c;
+                        }
+                        sound.space = SoundSpace::Local;
+                        engine.PlayLocalSound(player->m_hObject, sound, animation_sound_error);
+                    }
                 }
             }
     }

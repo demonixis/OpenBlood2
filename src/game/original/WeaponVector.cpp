@@ -6,6 +6,7 @@
 #include "VolumeBrush.h"
 #include "Weapon.h"
 #include "engine/collision.h"
+#include "game/shotgun_effects.h"
 using namespace OpenBlood2;
 FireResult CWeapon::FireVector()
 {
@@ -44,6 +45,11 @@ FireResult CWeapon::FireVector()
         impact.surface = h ? server->GetObjectUserFlags(h) >> 24 : impact.hit.texture_flags;
         impact.stopping_surface = impact.surface;
         bool damage = false, alert_before = false, alert_after = false;
+        // UpdateWeaponFX consumes this bit even when a fire-through/non-liquid volume suppresses AddImpact.
+        auto* shotgun = dynamic_cast<CShotgun*>(this);
+        const bool eject = shotgun && shotgun->eject_pending;
+        if (shotgun)
+            shotgun->eject_pending = false;
         if (auto* volume = dynamic_cast<VolumeBrush*>(object))
         {
             impact.branch = WeaponImpactBranch::Volume;
@@ -90,7 +96,7 @@ FireResult CWeapon::FireVector()
             impact.effect.m_eSurfaceType = static_cast<SurfaceType>(static_cast<DBYTE>(impact.surface));
             impact.effect.m_vDestPos = vector_add(impact.hit.point, vector_scale(impact.hit.normal, 1.25f));
             impact.effect.SelectBloodSpurt(last_shot.damage, impact_random);
-            impact.effect.CreateSprites(*server, m_hOwner, impact.hit.normal, impact_random);
+            impact.effect.CreateSprites(*server, m_hOwner, impact.hit.normal, impact_random, shotgun != nullptr);
             impact.effect.CreateSparks(*server, m_hOwner, impact.hit.normal, last_shot.damage,
                                        data.m_nType == WEAP_MELEE, impact_random);
             if (!impact.effect.PlayImpactSound(*server, m_hOwner, impact_random))
@@ -98,7 +104,24 @@ FireResult CWeapon::FireVector()
             if (impact.effect.sound)
                 ++impact_sounds;
             impact.effect.CreateBloodSpurt(*server, m_hOwner, impact.hit.normal, last_shot.damage, impact_random);
-            // Remaining composite visuals/marks are unavailable; creation failures do not cancel damage/audio.
+            if (shotgun)
+            {
+                ShotgunEffectSettings fx;
+                fx.source = from;
+                fx.destination = impact.effect.m_vDestPos;
+                fx.normal = impact.hit.normal;
+                fx.forward = direction;
+                fx.surface = impact.effect.m_eSurfaceType;
+                fx.eject = eject;
+                fx.left = last_shot.request.left;
+                if (const auto* volume = dynamic_cast<VolumeBrush*>(object))
+                {
+                    fx.color1 = volume->surface.color1;
+                    fx.color2 = volume->surface.color2;
+                }
+                impact.effect.shotgun_event = server->PublishShotgunEffects(m_hOwner, fx, impact.effect.shotgun_error);
+            }
+            // Cosmetic failures never cancel damage/audio.
         }
         auto alert = [&]
         {

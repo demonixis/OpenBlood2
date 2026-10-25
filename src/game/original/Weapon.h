@@ -188,12 +188,16 @@ class CSniperRifle final : public CWeapon
   public:
     CSniperRifle() : CWeapon(WEAP_SNIPERRIFLE) {}
 };
-// Original CShotgun::Fire only selects shell ejection (a client effect not ported) before
-// CWeapon::Fire, whose FireSpread casts its sixteen vectors.
+// Original CShotgun::Fire selects shell ejection before the sixteen-vector FireSpread.
 class CShotgun final : public CWeapon
 {
   public:
     CShotgun() : CWeapon(WEAP_SHOTGUN) {}
+    void BeginFire(bool alternate) override
+    {
+        eject_pending = alternate;
+    }
+    bool eject_pending = false;
 };
 class COrb final : public CWeapon
 {
