@@ -39,7 +39,8 @@ The [2026-10-26 tester corrections](implementation/reports/tester_feedback_2026_
 under Gideon's last hologram), add Hor+ widescreen projection, black letterbox bars,
 filtered sprites, escalator fog, gravity-free resize and `cres.dll` data mods. Next:
 decode the DAT leaf visibility lists for retail activation (CityHub's idle Gideon,
-Train Station guards), then Chosen (ACTION) mode; Nightmares stays a separate port
+Train Station guards); Chosen games now start the original ACTION type without cut
+scenes ([menu contracts](contracts/menu_contracts.md#chosen-games-gametype_action)); Nightmares stays a separate port
 (scoped in the [Nightmares plan](implementation/nightmares_plan.md), awaiting decisions).
 
 The [Demo_01 computer/door correction](implementation/reports/demo_computer_doors.md)

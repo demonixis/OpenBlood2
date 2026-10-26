@@ -18,6 +18,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- Single Player > Chosen now plays without cut scenes, as in the original game.
+- Cheats, weapon drops and player death in custom levels such as the Credits world.
 - M16 grenade simulation failure when a living enemy overlaps it before its first bounce.
 - Museum crash after Gideon's last hologram, when enemies spawn into the skylight glass.
 - Fog-coloured instead of black letterbox bars during cutscenes.

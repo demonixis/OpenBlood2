@@ -83,6 +83,32 @@ plus new classes (Nightmare, Gremlin, RetroCultist, Prophet variants, Flayer, Co
 Shotgun); the original source's `_ADD_ON` branches cover it. It remains refused with
 an explicit message. Supporting it is a separate port.
 
+## Chosen mode without cut scenes (fixed)
+
+The report: choosing a character through Single Player > CHOSEN should disable all cut
+scenes. The original `CMenuDifficulty::StartGame` starts `GAMETYPE_ACTION`; the port
+started every menu game as `GAMETYPE_SINGLE`.
+
+- The audit of the `!= GAMETYPE_SINGLE`/`IsMultiplayerGame` branches found two views.
+  `B2BaseClass::GetGameType` reads the `GAME_GAMETYPE` console variable, which holds
+  ACTION. The server shell's `GetGameType`/`IsMultiplayerGame` read `m_GameInfo.m_byType`,
+  copied from the engine's NetGame: every local start is `STARTGAME_NORMAL` with a zeroed
+  request, so it stays `NGT_SINGLE`. The multiplayer player init, random start points,
+  respawn ammo, corpse/gib timers and pickup removal are therefore never taken by a
+  Chosen game; the client's `IsMultiplayerGame` (game mode) is false too.
+- Chosen requests `GAMETYPE_ACTION` for all four characters. `InitialUpdate` removes the
+  `TypeActionMode=false` objects: on 01_SubwayA both intro cameras and the four cinematic
+  triggers, so play starts with free movement and no active camera.
+- `ServerDE::net_game_type` models the NetGame type; the ported server-shell branches read
+  it instead of the console variable. This also makes custom games (Credits) single player
+  there, as in the original: cheats, weapon drops and death no longer refuse.
+- Action-only rules: locked/unlocked triggers print `Locked!`/`Unlocked!`
+  (`IDS_GENERAL_LOCKED`/`UNLOCKED` from `cres.dll`) instead of their sounds; objectives
+  stay hidden and the loading screen shows no bumper text (already ported).
+- NEW_LEVEL sends the client's type and keeps the source's; Chosen saves keep theirs.
+- `chosen_mode.requests`, private `chosen_mode.subway` and `chosen_mode.continuation`
+  ([menu contracts](../../contracts/menu_contracts.md#chosen-games-gametype_action)).
+
 ## Not fixed in this increment
 
 - **Activation visibility.** The CityHub intro shows Gideon in his initial
@@ -92,11 +118,6 @@ an explicit message. Supporting it is a separate port.
   uses the DAT leaf visibility lists, whose compression is not decoded. Our
   four-segment ray stand-in is blocked by the walls in both places. The fix is
   decoding those lists, which needs Server.dll analysis.
-- **Chosen mode.** Single Player > CHOSEN is `GAMETYPE_ACTION`. `TypeActionMode=false`
-  objects (cameras, cinematic and conversation triggers) are rejected, so there are no
-  cut scenes. Action mode counts as multiplayer in many original branches (player
-  init, start points, corpses, damage), which need a per-site audit before it can be
-  enabled. The port still starts every menu game as `GAMETYPE_SINGLE`.
 - **Idle before activation** matches the original: inactive objects get neither
   updates nor model animation. The visible difference comes from the same activation
   stand-in.
@@ -110,3 +131,7 @@ sprite pixel tests (exact texels of the 4×2 fixture) now opt into
 blends the red/black column edge. `explosion_flames.private` expected the pre-lot-10
 "light illumination" gap and now expects none. `gpu.viewport`, `gpu.polygrid` and
 `gpu.inventory_use` already fail on `a50bd918` without these changes and remain open.
+
+Chosen mode: `release` preset on macOS/Metal with private data and GPU tests, 1551
+tests; the same three GPU tests fail, the three `chosen_mode` tests and the updated
+`trigger_audio.failures`, `menus.cheats` and `menus.credits` pass.
