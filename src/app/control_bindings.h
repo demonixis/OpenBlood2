@@ -6,6 +6,7 @@
 #include "game/menu.h"
 #include "game/original/MenuIds.h"
 #include <SDL3/SDL_keyboard.h>
+#include <algorithm>
 #include <array>
 #include <charconv>
 #include <filesystem>
