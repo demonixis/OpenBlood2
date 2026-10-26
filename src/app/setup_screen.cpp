@@ -23,7 +23,9 @@ namespace OpenBlood2
         const ImVec4 accent{0.80f, 0.12f, 0.10f, 1}, dim{0.62f, 0.60f, 0.58f, 1}, failure{0.95f, 0.35f, 0.30f, 1};
         const char* edition_label(Edition edition)
         {
-            return edition == Edition::Demo ? "Blood II demo (1998, two levels)" : "Blood II: The Chosen";
+            return edition == Edition::Demo         ? "Blood II demo (1998, two levels)"
+                   : edition == Edition::Nightmares ? "Blood II: The Nightmare Levels (expansion levels not ported yet)"
+                                                    : "Blood II: The Chosen";
         }
         const char* instructions()
         {
@@ -104,7 +106,10 @@ namespace OpenBlood2
         from_game_ = running != nullptr;
         running_.clear();
         if (running)
-            running_.push_back({running->demo ? Edition::Demo : Edition::Retail, running->data_dir});
+            running_.push_back({running->demo         ? Edition::Demo
+                                : running->nightmares ? Edition::Nightmares
+                                                      : Edition::Retail,
+                                running->data_dir});
         message.clear();
         if (!user_directory(user_, error) || !setup_path(file_, error))
             return false;

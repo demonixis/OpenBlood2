@@ -28,8 +28,9 @@ not exist yet) in `app/setup_screen.{h,cpp}`, over the headless `app/game_setup.
 
 ## Installations
 
-An installation is a folder and an edition: retail with `BLOOD2.REZ`, demo with `B2DEMO.REZ`
-(case-insensitive; a folder with both lists both). The list merges, without duplicates:
+An installation is a folder and an edition: retail with `BLOOD2.REZ`, Nightmares with
+`BLOOD2.REZ` and `BLOOD2NM.REZ` ([edition contracts](nightmares_edition_contracts.md); listed after
+retail, levels not ported yet), demo with `B2DEMO.REZ` (case-insensitive; a folder may list all). The list merges, without duplicates:
 
 - folders the player added (desktop native folder picker, `SDL_DIALOG` on desktop only);
 - the running game's folder (from the menu);
@@ -54,8 +55,8 @@ are made; CTest runs use an isolated user directory.
 ## Mods
 
 Data-only REZ overlays per installation, mounted after the stock archives in list order
-(later entries win), with `Resources::mount_game`'s existing checks (no code, no Nightmares,
-no duplicates). A root `cres.dll` is accepted (0.5.0): it is only read as string/bitmap
+(later entries win), with `Resources::mount_game`'s existing checks (no code, no Nightmares
+archive as a mod — it is an edition —, no duplicates). A root `cres.dll` is accepted (0.5.0): it is only read as string/bitmap
 resources by the bounded PE reader and never executed, and a mod's copy replaces the
 stock strings. Any other `.dll`, `.exe` or `.lto` (`object.lto`) still refuses the mod. Up, Down, Remove and the checkbox edit the list. `.rez` files in the
 installation's `mods` folder (any case) are listed automatically, disabled; desktop also adds

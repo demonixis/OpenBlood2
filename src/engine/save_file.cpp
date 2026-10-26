@@ -250,7 +250,8 @@ namespace OpenBlood2
         {
             const auto bad = [&](SaveFault fault, const std::string& text)
             { return fail(error, fault, "FPRT: " + text); };
-            if (f.edition != SaveEdition::Retail && f.edition != SaveEdition::Demo)
+            if (f.edition != SaveEdition::Retail && f.edition != SaveEdition::Demo &&
+                f.edition != SaveEdition::Nightmares)
                 return bad(SaveFault::Format, "unknown edition");
             if (f.mounts.empty() || f.mounts.size() > F::max_mounts)
                 return bad(SaveFault::Bound, "mount count must be 1.." + std::to_string(F::max_mounts));

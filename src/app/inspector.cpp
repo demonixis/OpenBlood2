@@ -1154,8 +1154,9 @@ namespace OpenBlood2
                             else
                                 ImGui::TextUnformatted("-");
                             ImGui::TableNextColumn();
-                            ImGui::TextUnformatted(!archive.present                  ? "Absent (optional)"
-                                                   : archive.name == "BLOOD2NM.REZ"  ? "Expansion excluded"
+                            ImGui::TextUnformatted(!archive.present ? "Absent (optional)"
+                                                   : archive.name == "BLOOD2NM.REZ" && !game.resources.nightmares()
+                                                       ? "Expansion excluded (retail edition)"
                                                    : game.resources.mounts().empty() ? "Detected; not mounted"
                                                                                      : "Mounted (see Resources)");
                         }

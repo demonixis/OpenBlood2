@@ -22,7 +22,8 @@ namespace OpenBlood2
         // Services a MID_SAVEOBJECT callback may use: the message primitives, strings and
         // read-only queries. Everything else, including unknown names, fails the save.
         // Strictly ascending; save_objects.purity checks the order and the catalogue.
-        constexpr std::array<std::string_view, 84> pure_services{
+        constexpr std::array<std::string_view, 85> pure_services{
+            "AddonBuild",
             "AlignRotation",
             "CompareStringsUpper",
             "CopyString",

@@ -101,11 +101,11 @@ namespace OpenBlood2
             return "slot" + std::to_string(slot) + ".ob2sav";
         return {};
     }
-    bool save_directory(std::filesystem::path& output, std::string& error)
+    bool save_directory(std::filesystem::path& output, std::string& error, bool nightmares)
     {
         if (!user_directory(output, error))
             return false;
-        output = output / "saves" / "retail";
+        output = output / "saves" / (nightmares ? "nightmares" : "retail");
         return true;
     }
     std::string save_timestamp(std::time_t time)

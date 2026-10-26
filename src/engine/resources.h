@@ -62,11 +62,22 @@ namespace OpenBlood2
         {
             demo_ = demo;
         }
+        // The Nightmares edition (--nightmares): the retail set plus BLOOD2NM.REZ. Its OBJECT.LTO,
+        // CSHELL.DLL and SRES.DLL are indexed like any base resource and never loaded or executed.
+        bool nightmares() const
+        {
+            return nightmares_;
+        }
+        void set_nightmares(bool nightmares)
+        {
+            nightmares_ = nightmares;
+        }
 
       private:
         std::map<std::string, Resource> index_;
         std::vector<Mount> mounts_;
         std::filesystem::path content_root_; // Set only by a successful mount_game; loose music remains external.
         bool demo_ = false;
+        bool nightmares_ = false;
     };
 } // namespace OpenBlood2

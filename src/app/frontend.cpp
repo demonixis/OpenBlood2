@@ -221,7 +221,10 @@ namespace OpenBlood2
             }
             if (by_setup)
                 spdlog::info("Game data from setup.cfg: {} ({}, {} mods)", path_text(config.data_dir),
-                             config.demo ? "demo" : "retail", config.overlays.size());
+                             config.demo         ? "demo"
+                             : config.nightmares ? "nightmares"
+                                                 : "retail",
+                             config.overlays.size());
             // Keep the accepted menu-free diagnostic/direct route available independently.
             const bool menu_enabled = !config.demo || (!options.view_world && !options.demo_smoke);
             Menu menu(config.demo ? MenuEdition::Demo : MenuEdition::Retail);
@@ -239,7 +242,7 @@ namespace OpenBlood2
                 saves.slots.unavailable = "The demo edition has no saved games.";
             else if (options.menu_smoke || options.demo_smoke)
                 saves.slots.unavailable = "Saved games are disabled in diagnostic runs.";
-            else if (std::filesystem::path directory; save_directory(directory, error))
+            else if (std::filesystem::path directory; save_directory(directory, error, config.nightmares))
             {
                 saves.slots = SaveSlots(directory);
                 saves.slots.refresh();

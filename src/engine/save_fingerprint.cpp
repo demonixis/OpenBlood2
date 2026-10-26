@@ -12,7 +12,7 @@ namespace OpenBlood2
         }
         const char* edition_name(SaveEdition edition)
         {
-            return edition == SaveEdition::Demo ? "demo" : "retail";
+            return edition == SaveEdition::Demo ? "demo" : edition == SaveEdition::Nightmares ? "nightmares" : "retail";
         }
         const char* role_name(MountRole role)
         {
@@ -51,7 +51,9 @@ namespace OpenBlood2
     {
         error = {};
         SaveFingerprint result;
-        result.edition = resources.demo() ? SaveEdition::Demo : SaveEdition::Retail;
+        result.edition = resources.demo()         ? SaveEdition::Demo
+                         : resources.nightmares() ? SaveEdition::Nightmares
+                                                  : SaveEdition::Retail;
         if (resources.mounts().empty() || resources.mounts().size() > save_format::max_mounts)
         {
             error = {SaveFault::Bound, "Fingerprint needs 1.." + std::to_string(save_format::max_mounts) + " mounts"};

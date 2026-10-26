@@ -234,16 +234,29 @@ namespace OpenBlood2
             return false;
         }
         static constexpr std::array<const char*, 4> full{"blood2.rez", "sound.rez", "blood2p.rez", "blood2p2.rez"};
+        // The original add-on order (Blood2Serv CoolServ.cpp _ADDON): after every patch, before user REZ.
+        static constexpr std::array<const char*, 6> nightmares{"blood2.rez",   "sound.rez",    "blood2p.rez",
+                                                               "blood2p2.rez", "blood2nm.rez", "blood2nm2.rez"};
         static constexpr std::array<const char*, 1> demo{"b2demo.rez"};
-        const auto archives = config.demo ? std::span<const char* const>(demo) : std::span<const char* const>(full);
+        const auto archives = config.demo         ? std::span<const char* const>(demo)
+                              : config.nightmares ? std::span<const char* const>(nightmares)
+                                                  : std::span<const char* const>(full);
+        if (config.demo && config.nightmares)
+        {
+            error = "The demo and Nightmares editions are exclusive";
+            return false;
+        }
         for (const char* name : archives)
         {
             const auto found = files.find(name);
             if (found == files.end())
             {
-                if (name == archives.front()) // The first archive is required.
+                // The first archive is required, and BLOOD2NM.REZ in the Nightmares edition.
+                if (name == archives.front() || std::string_view(name) == "blood2nm.rez")
                 {
-                    error = config.demo ? "Missing B2DEMO.REZ" : "Missing BLOOD2.REZ";
+                    error = config.demo                ? "Missing B2DEMO.REZ"
+                            : name == archives.front() ? "Missing BLOOD2.REZ"
+                                                       : "Missing BLOOD2NM.REZ";
                     return false;
                 }
             }
@@ -271,11 +284,13 @@ namespace OpenBlood2
             std::string name;
             auto canonical = std::filesystem::canonical(overlay, ec);
             if (ec || !overlay.is_absolute() || !resource_path(path_text(canonical.filename()), name) ||
-                !name.ends_with(".rez") || name == "blood2nm.rez")
+                !name.ends_with(".rez") || name == "blood2nm.rez" || name == "blood2nm2.rez")
             {
-                error = name == "blood2nm.rez" ? "The Nightmares expansion needs its own game code and is not "
-                                                 "supported yet"
-                                               : "Mod must be a data-only REZ archive";
+                // The expansion carries its own game code: it is an edition (--nightmares), never a mod.
+                error = name == "blood2nm.rez" || name == "blood2nm2.rez"
+                            ? "The Nightmares expansion is an edition, not a mod: choose the Nightmares entry or "
+                              "use --nightmares"
+                            : "Mod must be a data-only REZ archive";
                 return false;
             }
             for (const auto& previous : mounted)
@@ -314,6 +329,7 @@ namespace OpenBlood2
         }
         next.content_root_ = config.data_dir;
         next.demo_ = config.demo;
+        next.nightmares_ = config.nightmares;
         *this = std::move(next);
         return true;
     }

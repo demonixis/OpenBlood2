@@ -10,12 +10,14 @@ namespace OpenBlood2
     enum class Edition : std::uint8_t
     {
         Retail,
-        Demo
+        Demo,
+        Nightmares // Retail data plus BLOOD2NM.REZ (nightmares_plan.md).
     };
     struct Installation
     {
         Edition edition = Edition::Retail;
-        std::filesystem::path directory; // Absolute; holds BLOOD2.REZ (retail) or B2DEMO.REZ (demo).
+        // Absolute; holds BLOOD2.REZ (retail; also BLOOD2NM.REZ for Nightmares) or B2DEMO.REZ (demo).
+        std::filesystem::path directory;
         bool operator==(const Installation&) const = default;
     };
     struct SetupMod
@@ -41,8 +43,8 @@ namespace OpenBlood2
     bool load_setup(const std::filesystem::path&, SetupState&, std::string& error);
     bool save_setup(const std::filesystem::path&, const SetupState&, std::string& error);
 
-    // Installations in one folder: retail when it holds BLOOD2.REZ, demo when it holds B2DEMO.REZ
-    // (case-insensitive; a folder with both lists both).
+    // Installations in one folder: retail when it holds BLOOD2.REZ, Nightmares when it also holds
+    // BLOOD2NM.REZ, demo when it holds B2DEMO.REZ (case-insensitive; in that order).
     std::vector<Installation> folder_installations(const std::filesystem::path& directory);
     // Where this platform looks without being told: downloaded demos (user directory content/),
     // the executable's folder and its Game folder (desktop), Documents and its folders (iOS) and /sdcard/openblood2

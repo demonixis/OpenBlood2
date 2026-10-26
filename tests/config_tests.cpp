@@ -1,9 +1,9 @@
 #include "engine/config.h"
 
+#include "scratch_dir.h"
 #include <array>
 #include <fstream>
 #include <iostream>
-#include "scratch_dir.h"
 
 namespace fs = std::filesystem;
 using namespace OpenBlood2;
@@ -218,6 +218,46 @@ namespace
         return true;
     }
 
+    // The Nightmares edition (nightmares_plan.md): the retail set plus a required BLOOD2NM.REZ and an
+    // optional BLOOD2NM2.REZ; it is exclusive with the demo and never inferred from the folder.
+    bool nightmares(const fs::path& root)
+    {
+        Options options;
+        std::string error;
+        const std::array<std::string_view, 1> plain{"--nightmares"};
+        CHECK(parse_options(plain, options, error) && options.nightmares && !options.demo &&
+              options.world == first_level(false));
+        const std::array<std::string_view, 2> both{"--demo", "--nightmares"};
+        CHECK(!parse_options(both, options, error) && error == "--demo and --nightmares select different editions");
+        const std::array<std::string_view, 0> none{};
+        CHECK(parse_options(none, options, error) && !options.nightmares);
+
+        options.config_file = root / "absent.ini";
+        options.data_dir = root;
+        options.nightmares = true;
+        Config config;
+        CHECK(load_config(options, "", config, error) && config.nightmares && !config.demo);
+        DataStatus data;
+        CHECK(write(root / "BLOOD2.REZ", "synthetic full metadata"));
+        CHECK(!inspect_data(config, data, error));
+        CHECK(error.find("BLOOD2NM.REZ is missing") != std::string::npos &&
+              error.find("Nightmares expansion is not installed") != std::string::npos);
+        CHECK(write(root / "Blood2NM.rez", "synthetic expansion metadata"));
+        CHECK(inspect_data(config, data, error));
+        CHECK(data.archives.size() == 6 && data.archives[4].name == "BLOOD2NM.REZ" && data.archives[4].required &&
+              data.archives[4].present && data.archives[5].name == "BLOOD2NM2.REZ" && !data.archives[5].required &&
+              !data.archives[5].present);
+        // Retail lists the expansion as optional information only.
+        config.nightmares = false;
+        CHECK(inspect_data(config, data, error) && data.archives.size() == 5 && !data.archives[4].required &&
+              data.archives[4].present);
+        std::error_code ec;
+        CHECK(fs::remove(root / "BLOOD2.REZ", ec) && !ec);
+        config.nightmares = true;
+        CHECK(!inspect_data(config, data, error) && error.find("BLOOD2.REZ is missing") != std::string::npos);
+        return true;
+    }
+
     bool case_lookup(const fs::path& root)
     {
         Config config{root, "test"};
@@ -260,6 +300,8 @@ int main(int argc, char** argv)
         test = case_lookup;
     else if (name == "demo")
         test = demo;
+    else if (name == "nightmares")
+        test = nightmares;
     if (!test)
         return 2;
     std::error_code ec;

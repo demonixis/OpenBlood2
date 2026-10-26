@@ -434,6 +434,38 @@ namespace
         CHECK(!editions.mount_game(config, error) && error == "Mods with game code are unsupported: cshell.dll");
         config.overlays = {mods / "object.rez"};
         CHECK(!editions.mount_game(config, error) && error == "Mods with game code are unsupported: object.lto");
+        // Nightmares: the retail set then BLOOD2NM.REZ, whose game code is indexed (never run) and wins
+        // over every patch, as in the original add-on order. It is never accepted as a mod.
+        const auto nm_root = std::filesystem::absolute(root / "nightmares");
+        std::filesystem::create_directories(nm_root, ec);
+        CHECK(!ec && save(nm_root / "BLOOD2.REZ", rez({1}, "object", 0x4C544F).data));
+        CHECK(save(nm_root / "BLOOD2P2.REZ", rez({2}, "object", 0x4C544F).data));
+        CHECK(save(nm_root / "Blood2NM.rez", rez({3}, "object", 0x4C544F).data));
+        Config nm{nm_root, "test"};
+        nm.nightmares = true;
+        Resources expansion;
+        CHECK(expansion.mount_game(nm, error) && expansion.nightmares() && !expansion.demo() &&
+              expansion.mounts().size() == 3 && expansion.mounts()[2].path.filename() == "Blood2NM.rez" &&
+              expansion.mounts()[2].role == MountRole::Base);
+        CHECK(expansion.find("object.lto")->archive.filename() == "Blood2NM.rez" &&
+              expansion.find("object.lto")->overrides == 2);
+        nm.nightmares = false;
+        CHECK(expansion.mount_game(nm, error) && !expansion.nightmares() && expansion.mounts().size() == 2 &&
+              expansion.find("object.lto")->archive.filename() == "BLOOD2P2.REZ");
+        nm.nightmares = true;
+        nm.demo = true;
+        CHECK(!expansion.mount_game(nm, error) && error == "The demo and Nightmares editions are exclusive" &&
+              !expansion.nightmares());
+        nm.demo = false;
+        for (const bool edition : {false, true})
+        {
+            nm.nightmares = edition;
+            nm.overlays = {nm_root / "Blood2NM.rez"};
+            CHECK(!expansion.mount_game(nm, error) && error.starts_with("The Nightmares expansion is an edition"));
+        }
+        nm.overlays.clear();
+        CHECK(std::filesystem::remove(nm_root / "Blood2NM.rez", ec) && !ec);
+        CHECK(!expansion.mount_game(nm, error) && error == "Missing BLOOD2NM.REZ");
         return true;
     }
     bool world_properties()

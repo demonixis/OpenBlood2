@@ -76,6 +76,18 @@ namespace
         auto config = setup_config(saved, retail);
         CHECK(config.data_dir == retail.directory && !config.demo && config.overlays == std::vector{root / "a.rez"});
         CHECK(setup_config(saved, demo).demo && setup_config(saved, demo).overlays.size() == 1);
+        // The Nightmares edition of the same folder is its own entry with its own mods.
+        const Installation expansion{Edition::Nightmares, retail.directory};
+        auto editions = saved;
+        editions.selected = expansion;
+        editions.added.push_back(expansion);
+        editions.mods.push_back({expansion, root / "a.rez", false});
+        CHECK(save_setup(file, editions, error));
+        CHECK(load_setup(file, loaded, error) && loaded == editions);
+        CHECK(read(file).starts_with("version=1\nselected.edition=nightmares\n"));
+        const auto nightmares = setup_config(editions, expansion);
+        CHECK(nightmares.nightmares && !nightmares.demo && nightmares.overlays.empty() &&
+              !setup_config(editions, retail).nightmares);
         // Strict reading: unknown, duplicate, incomplete, relative, control characters, future versions.
         const auto refused = [&](std::string_view text)
         {
@@ -127,6 +139,25 @@ namespace
         CHECK((folder_installations(retail) == std::vector<Installation>{{Edition::Retail, retail}}));
         CHECK((folder_installations(demo) == std::vector<Installation>{{Edition::Demo, demo}}));
         CHECK(folder_installations(both).size() == 2 && folder_installations(none).empty());
+        // The expansion installs into The Chosen's folder: both entries, The Chosen first; an
+        // expansion archive alone is not an installation.
+        const auto expansion = root / "Expansion", orphan = root / "Orphan";
+        fs::create_directories(expansion);
+        fs::create_directories(orphan);
+        write(expansion / "BLOOD2.REZ", rez());
+        write(expansion / "Blood2NM.rez", rez());
+        write(orphan / "BLOOD2NM.REZ", rez());
+        CHECK((folder_installations(expansion) ==
+               std::vector<Installation>{{Edition::Retail, expansion}, {Edition::Nightmares, expansion}}));
+        CHECK(folder_installations(orphan).empty());
+        CHECK(portable_ready({}, {expansion}, config_unused, error) && !config_unused.nightmares &&
+              config_unused.data_dir == expansion);
+        Config chosen;
+        SetupState expansion_state;
+        expansion_state.selected = Installation{Edition::Nightmares, expansion};
+        CHECK(setup_ready(expansion_state, chosen, error) && chosen.nightmares && chosen.data_dir == expansion);
+        expansion_state.selected = Installation{Edition::Nightmares, retail};
+        CHECK(!setup_ready(expansion_state, chosen, error) && error.find("BLOOD2NM.REZ") != std::string::npos);
         // Downloaded demos are found in the user directory's content/<install>/Game.
         const auto user = root / "user";
         const auto downloaded = setup_content_folder(user) / "Blood2Demo-1.0-1" / "Game";

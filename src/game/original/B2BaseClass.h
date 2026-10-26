@@ -21,6 +21,11 @@ inline bool IsDemoBuild()
 {
     return g_pServerDE && g_pServerDE->DemoBuild();
 }
+// Runtime replacement for the original compile-time _ADD_ON/_ADDON build (--nightmares).
+inline bool IsAddonBuild()
+{
+    return g_pServerDE && g_pServerDE->AddonBuild();
+}
 
 #define OPT_FLAG_EASY 1
 #define OPT_FLAG_MED 2

@@ -106,6 +106,18 @@ namespace
         CHECK(inv.ObtainWeapon(WEAP_MELEE) == InventoryResult::AlreadyHave);
         CHECK(inv.ObtainWeapon(35) == InventoryResult::NotAvailable && // Nightmare bite: no original WeaponData.
               inv.ObtainWeapon(1, 99) == InventoryResult::Invalid);
+        // Superset numbering (nightmares_plan.md): retail numbers unchanged, the four add-on weapons
+        // appended after the inventory bombs, still without data; the original's
+        // `<= WEAP_LASTPLAYERWEAPON` test becomes a predicate covering the two add-on player weapons.
+        static_assert(WEAP_MELEE == 17 && WEAP_SHIKARI_CLAW == 18 && WEAP_SKULL == 48 && WEAP_PROXIMITYBOMB == 49 &&
+                      WEAP_TIMEBOMB == 51 && WEAP_COMBATSHOTGUN == 52 && WEAP_FLAYER == 53 && WEAP_GREMLIN_ROCK == 54 &&
+                      WEAP_NIGHTMARE_FIREBALLS == 55);
+        for (const DBYTE type : {WEAP_COMBATSHOTGUN, WEAP_FLAYER, WEAP_GREMLIN_ROCK, WEAP_NIGHTMARE_FIREBALLS})
+            CHECK(!weapon_definition(type) && inv.ObtainWeapon(type) == InventoryResult::NotAvailable);
+        CHECK(IsPlayerWeaponType(WEAP_BERETTA) && IsPlayerWeaponType(WEAP_MELEE) &&
+              IsPlayerWeaponType(WEAP_COMBATSHOTGUN) && IsPlayerWeaponType(WEAP_FLAYER) &&
+              !IsPlayerWeaponType(WEAP_SHIKARI_CLAW) && !IsPlayerWeaponType(WEAP_PROXIMITYBOMB) &&
+              !IsPlayerWeaponType(WEAP_GREMLIN_ROCK) && !IsPlayerWeaponType(WEAP_NIGHTMARE_FIREBALLS));
         CHECK(inv.ChangeWeaponSlot(99) == InventoryResult::NotAvailable && inv.m_nCurWeaponSlot == 1);
         std::string error;
         CHECK(game.select_weapon(0, error) && inv.m_nCurWeaponSlot == 0 && game.client_shell.weapons[0].type == 17);

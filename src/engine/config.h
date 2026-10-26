@@ -22,6 +22,7 @@ namespace OpenBlood2
         std::uint32_t frame_limit = 0;
         std::string world = "01_SubwayA"; // Demo_01 with --demo unless --world is given.
         bool demo = false;                // Original two-level demo layout (B2DEMO.REZ).
+        bool nightmares = false;          // Retail data plus the Nightmares expansion (BLOOD2NM.REZ).
         bool inspect_world = false;
         bool inspect_player = false;
         bool player_smoke = false, restore_smoke = false, keepalive_smoke = false;
@@ -66,6 +67,8 @@ namespace OpenBlood2
         std::filesystem::path data_dir;
         std::string source;
         bool demo = false; // Selects the demo archive set; never inferred from directory contents.
+        // Selects the retail set plus BLOOD2NM.REZ (nightmares_plan.md); never inferred either.
+        bool nightmares = false;
         std::vector<std::filesystem::path> overlays{};
     };
     // Original first single-player level: ClientShellDLL sFirstLevel (_DEMO "Demo_01").

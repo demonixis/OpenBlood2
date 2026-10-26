@@ -1790,6 +1790,8 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --data-dir DIR      External Blood II directory; overrides BLOOD2_DATA_DIR and config\n"
                      "  --demo              The data directory is the original 1998 demo (B2Demo.rez); "
                      "normal launch opens its menu, first world Demo_01\n"
+                     "  --nightmares        Also mount the Nightmares expansion (BLOOD2NM.REZ) as its own edition; "
+                     "its levels are not ported yet\n"
                      "  --check-data        Check file metadata without opening a window or parsing archives\n"
                      "  --world NAME        World resource (default: 01_SubwayA, Demo_01 with --demo)\n"
                      "  --inspect-world     Parse/mount/create original subset headlessly; does not run a game\n"
@@ -2005,8 +2007,9 @@ int main(int argc, char** argv)
     if (parsed && args.empty())
         options.xr_world = true;
 #endif
-    spdlog::info("Requested world={}; demo={}; config={}; inspector={}; view={}; bench={}; headless={}; frames={}",
-                 options.world, options.demo, OpenBlood2::path_text(options.config_file),
+    spdlog::info("Requested world={}; demo={}; nightmares={}; config={}; inspector={}; view={}; bench={}; headless={}; "
+                 "frames={}",
+                 options.world, options.demo, options.nightmares, OpenBlood2::path_text(options.config_file),
                  bool(BLOOD2_INSPECTOR) && options.inspector, options.view_world, options.bench,
                  options.check_data || options.inspect_world || options.start_game, options.frame_limit);
     int result = 2;

@@ -21,6 +21,17 @@ inline constexpr DBYTE AMMO_HOWITZER = 6, AMMO_ROCKET = 6, AMMO_FUEL = 7, AMMO_T
 inline constexpr int IDS_WEAPON_HOWITZER = 356, IDS_WEAPON_NAPALM = 358, IDS_WEAPON_DEATHRAY = 362,
                      IDS_WEAPON_TIME = 367;
 inline constexpr DBYTE AMMO_PROXIMITYBOMB = 10, AMMO_REMOTEBOMB = 11;
+// Nightmares (_ADD_ON) weapons in superset numbering: appended after the retail inventory weapons
+// so every retail number stays unchanged. The 1999 add-on build instead numbers them 18, 19 and
+// WEAP_LASTPLAYERWEAPON + 32/+33 and shifts the later ones (nightmares_plan.md, decision 1).
+// Their data and behaviour are not ported yet; weapon_definition() has no entry for them.
+inline constexpr DBYTE WEAP_COMBATSHOTGUN = 52, WEAP_FLAYER = 53, WEAP_GREMLIN_ROCK = 54, WEAP_NIGHTMARE_FIREBALLS = 55;
+// The original `type <= WEAP_LASTPLAYERWEAPON` test (WEAP_NONE included, as in the source),
+// which also covers the two add-on player weapons in the add-on build.
+inline constexpr bool IsPlayerWeaponType(DBYTE type)
+{
+    return type <= WEAP_MELEE || type == WEAP_COMBATSHOTGUN || type == WEAP_FLAYER;
+}
 inline constexpr bool inventory_bomb(DBYTE type)
 {
     return type == WEAP_PROXIMITYBOMB || type == WEAP_REMOTEBOMB || type == WEAP_TIMEBOMB;

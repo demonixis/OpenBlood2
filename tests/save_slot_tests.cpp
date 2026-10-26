@@ -104,6 +104,8 @@ namespace
         std::filesystem::path dir;
         std::string error;
         CHECK(save_directory(dir, error) && dir.filename() == "retail" && dir.parent_path().filename() == "saves");
+        std::filesystem::path expansion;
+        CHECK(save_directory(expansion, error, true) && expansion == dir.parent_path() / "nightmares");
         // CTest gives every test its own BLOOD2_USER_DIR; without one, SDL's OpenBlood2/Blood2.
         if (const char* user = SDL_getenv("BLOOD2_USER_DIR"); user && *user)
             CHECK(dir.parent_path().parent_path() == std::filesystem::absolute(path_from_utf8(user)));

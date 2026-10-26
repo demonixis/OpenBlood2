@@ -414,7 +414,7 @@ namespace
             },
             [](auto& s) { s.fingerprint.mounts[0].name = "dir/blood2.rez"; },
             [](auto& s) { s.fingerprint.mounts[0].role = MountRole(2); },
-            [](auto& s) { s.fingerprint.edition = SaveEdition(2); },
+            [](auto& s) { s.fingerprint.edition = SaveEdition(3); },
             [](auto& s) { std::swap(s.fingerprint.classes[0], s.fingerprint.classes[1]); },
             [](auto& s) { s.fingerprint.classes[1].name = s.fingerprint.classes[0].name; },
             [](auto& s) { s.fingerprint.classes[0].payload_version = 0; },
@@ -730,6 +730,15 @@ namespace
         CHECK(mount(demo, {{"BLOOD2.REZ", MountRole::Base}}));
         demo.set_demo(true);
         CHECK(build_fingerprint(demo, "test.dat", classes, current, error) && current.edition == SaveEdition::Demo);
+        // So is the Nightmares edition, and it never matches a retail save.
+        Resources expansion;
+        CHECK(mount(expansion, {{"BLOOD2.REZ", MountRole::Base}}));
+        expansion.set_nightmares(true);
+        CHECK(build_fingerprint(expansion, "test.dat", classes, current, error) &&
+              current.edition == SaveEdition::Nightmares);
+        auto nightmares = saved;
+        nightmares.edition = SaveEdition::Nightmares;
+        CHECK(refused(nightmares, registered, {"edition retail, installed nightmares"}));
         // The index digest names its mount ordinal: the same entries from another archive differ.
         Sha256Digest one{}, two{};
         CHECK(resource_index_digest(r, one, text));

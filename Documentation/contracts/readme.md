@@ -2,6 +2,8 @@
 
 - [Game data setup screen, data mods and demo installation](setup_screen_contracts.md)
 
+- [Nightmares edition: selection, mount order, add-on switch and weapon numbering](nightmares_edition_contracts.md)
+
 - [Original menu frontend](menu_contracts.md)
 
 - [Cheats (Options > CHEATS)](cheat_contracts.md)

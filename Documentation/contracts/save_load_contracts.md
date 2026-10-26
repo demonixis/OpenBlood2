@@ -436,7 +436,7 @@ Lot 2 implements the container in `src/engine/save_file.*` and the fingerprint i
   normalized resource path, ≤ 1,024 bytes), world title (≤ 255), `u32` game type
   (SINGLE, ACTION or CUSTOM only), `u32` character (0–3), `u32` difficulty (0–3),
   version text (1–64 bytes), binary64 simulated seconds (finite, nonnegative).
-- **FPRT.** `u8` edition (0 retail, 1 demo); `u32` mount count (1–32) and per mount
+- **FPRT.** `u8` edition (0 retail, 1 demo, 2 [Nightmares](nightmares_edition_contracts.md)); `u32` mount count (1–32) and per mount
   `u8` role (0 base, 1 mod), normalized archive filename (never a host path), `u64`
   archive size and the 32-byte directory digest; the 32-byte index and world
   digests; `u32` class count (≤ 1,024) and per class its name (1–64 bytes,
@@ -845,7 +845,8 @@ connects them to the menus, F5/F6 and death; the frontend consumes its requests 
 frame boundary. The original rules are `LoadSave.cpp`, `MenuLoadGame.cpp`, `MenuSaveGame.cpp` and
 `BloodClientShell.cpp` (`MenuSaveGame`, `MenuLoadGame`, `OnKeyDown`, `OnCommandOn`).
 
-- **Files** (decision 1). `SDL_GetPrefPath("OpenBlood2", "Blood2")/saves/retail/` holds
+- **Files** (decision 1). `SDL_GetPrefPath("OpenBlood2", "Blood2")/saves/retail/` (`saves/nightmares/`
+  for the Nightmares edition) holds
   `slot0.ob2sav`–`slot7.ob2sav`, `quick.ob2sav` and `current.ob2sav`. A nonempty
   `BLOOD2_USER_DIR` replaces that user directory (CTest sets one per test).
   - A slot or quick file is a full save: META (kind slot with its number, or quick), FPRT, CONS,

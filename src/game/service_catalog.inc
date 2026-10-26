@@ -1,6 +1,7 @@
 // Reviewed bounded ServerDE surface. Keep in sync with legacy/server_de.h.
 BLOOD2_SERVICE(AddObjectToList, Bounded, Interface)
 BLOOD2_SERVICE(AddSkyObject, Bounded, Interface)
+BLOOD2_SERVICE(AddonBuild, Bounded, Interface)
 BLOOD2_SERVICE(AdvanceModelProjectile, Bounded, Interface)
 BLOOD2_SERVICE(AlignRotation, Bounded, Interface)
 BLOOD2_SERVICE(BreakInterObjectLink, Bounded, Interface)

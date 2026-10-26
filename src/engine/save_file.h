@@ -84,7 +84,8 @@ namespace OpenBlood2
     enum class SaveEdition : std::uint8_t
     {
         Retail = 0,
-        Demo = 1
+        Demo = 1,
+        Nightmares = 2 // Retail plus BLOOD2NM.REZ; never loads across editions (NGHTMARE.TXT).
     };
     struct SaveMount
     {

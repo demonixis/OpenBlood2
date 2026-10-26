@@ -104,6 +104,8 @@ namespace OpenBlood2
                 options.menu_smoke = true;
             else if (arg == "--demo")
                 options.demo = true;
+            else if (arg == "--nightmares")
+                options.nightmares = true;
             else if (arg == "--demo-smoke")
                 options.demo_smoke = true;
             else if (arg == "--help" || arg == "-h")
@@ -389,6 +391,11 @@ namespace OpenBlood2
             options.keyframes_smoke || options.worldpaths_smoke || options.lights_smoke || options.cinematics_smoke ||
             options.random_sounds_smoke || options.world_sounds_smoke || options.sprites_smoke ||
             options.scene_explosions_smoke;
+        if (options.demo && options.nightmares)
+        {
+            error = "--demo and --nightmares select different editions";
+            return false;
+        }
         if (options.demo && content_smoke)
         {
             error = "--demo supports normal launch, --view-world, --check-data, --inspect-world, --inspect-player, "
@@ -464,6 +471,7 @@ namespace OpenBlood2
         config = {};
         error.clear();
         config.demo = options.demo;
+        config.nightmares = options.nightmares;
         config.overlays = options.overlays;
         std::error_code ec;
         const bool exists = fs::exists(options.config_file, ec);
@@ -515,6 +523,9 @@ namespace OpenBlood2
         // The 1998 demo ships every resource in one archive (B2Demo.rez).
         if (config.demo)
             data.archives = {{"B2DEMO.REZ", true}};
+        else if (config.nightmares) // The original launcher's add-on set; BLOOD2NM2.REZ is optional.
+            data.archives = {{"BLOOD2.REZ", true}, {"SOUND.REZ"},          {"BLOOD2P.REZ"},
+                             {"BLOOD2P2.REZ"},     {"BLOOD2NM.REZ", true}, {"BLOOD2NM2.REZ"}};
         else
             data.archives = {{"BLOOD2.REZ", true}, {"SOUND.REZ"}, {"BLOOD2P.REZ"}, {"BLOOD2P2.REZ"}, {"BLOOD2NM.REZ"}};
         bool other_edition = false;
@@ -576,6 +587,13 @@ namespace OpenBlood2
                                      : "; this looks like the original demo: add --demo";
             return false;
         }
+        for (const auto& archive : data.archives)
+            if (archive.required && !archive.present)
+            {
+                error = "Required archive " + archive.name + " is missing from " + path_text(config.data_dir) +
+                        "; the Nightmares expansion is not installed there";
+                return false;
+            }
         // Version is informational: the readme is not proof of the executable version.
         if (!readme.empty())
         {

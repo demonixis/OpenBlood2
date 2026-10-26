@@ -182,6 +182,11 @@ namespace OpenBlood2
             trace_service("DemoBuild");
             return client_resources && client_resources->demo();
         }
+        bool AddonBuild() override
+        {
+            trace_service("AddonBuild");
+            return client_resources && client_resources->nightmares();
+        }
         void reset_world_time()
         {
             audio.clear();

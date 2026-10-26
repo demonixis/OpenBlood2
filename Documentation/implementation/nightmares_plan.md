@@ -1,8 +1,9 @@
 # Nightmares expansion plan
 
-Status: **plan only** (2026-10-26). No gameplay code has been written. `Resources::mount_game`
-still refuses `blood2nm.rez` as a mod with its explicit message, and that refusal stays for the
-mod path whatever is decided below. Every lot needs the user's go-ahead (see
+Status (2026-10-26): decision 1 is **superset numbering** (user, 2026-10-26) and lot **N1** is
+implemented ([edition contracts](../contracts/nightmares_edition_contracts.md)): the edition,
+mount order, `IsAddonBuild()`, save edition and numbering, without expansion behaviour.
+`blood2nm.rez` stays refused as a mod. Every later lot needs the user's go-ahead (see
 [open decisions](#open-decisions)).
 
 Blood II: The Nightmare Levels ("Nightmares", version 1.0.233) is Monolith's official
@@ -210,8 +211,8 @@ and demo regressions (unchanged frames, saves, cheat codes and audits) are re-ru
 
 | Lot | Scope | Tests |
 | --- | --- | --- |
-| **N1 Edition and mount** | `Edition::Nightmares`, `--nightmares`, setup detection, mount order, edition-base code exception, `IsAddonBuild`, save edition, inspector rows; agreed weapon-numbering scheme in `WeaponDefs` without new weapons | synthetic REZ mount order/override and still-refused mod path; `setup.cfg` round trip and refusal of unknown editions; fingerprint separation; retail numbering unchanged; real-data: mount + `--inspect-world` for all 13 `WORLDS_AO` DATs listing exactly the new classes above as unsupported |
-| **N2 Frontend and world paths** | NIGHTMARES row, difficulty mode, `MenuNewNightmaresGame`, unprefixed `WORLDS_AO` loads, bumper, `_AO` title/background, `CREDITS_AO`, END credits roll, custom-level list | menu traversal smoke to `CALEB1_CC_C` entry; loading-screen/credits unit tests; retail menu snapshots unchanged |
+| **N1 Edition and mount** | `Edition::Nightmares`, `--nightmares`, setup detection, mount order, edition-base code exception, `IsAddonBuild`, save edition, inspector rows; agreed weapon-numbering scheme in `WeaponDefs` without new weapons | synthetic REZ mount order/override and still-refused mod path; `setup.cfg` round trip and refusal of unknown editions; fingerprint separation; retail numbering unchanged; real data (done): `--nightmares --inspect-world` of 01_SubwayA identical to retail apart from the extra mount (8,489 = 7,446 + 1,047 − 4 overridden root files) |
+| **N2 Frontend and world paths** | NIGHTMARES row, difficulty mode, `MenuNewNightmaresGame`, unprefixed `WORLDS_AO` loads, bumper, `_AO` title/background, `CREDITS_AO`, END credits roll, custom-level list | `--inspect-world` for all 13 `WORLDS_AO` DATs (needs the unprefixed path branch) listing exactly the new classes above as unsupported; menu traversal smoke to `CALEB1_CC_C` entry; loading-screen/credits unit tests; retail menu snapshots unchanged |
 | **N3 Character chain** | `DoLevelChangeCharacterCheck`, keep-alive tweak, `CMSG_RESETPLAYERINVENTORY`, restore/ENDBOSS exceptions, Behemoth `IsAddon` HP | synthetic NEW_LEVEL chain (attributes, empty inventory, ENDBOSS keeps inventory, a save load does not reset); real-data exit relay Caleb1→Ophelia |
 | **N8 Robe/sorority enemies** (before N4 so Caleb1/2 start) | robe Cultist model, shared table, RetroCultist sounds, Load; sorority cache | table/sound-root tests; Caleb1 and Caleb2 entry + 30 s at three difficulties |
 | **N4 Combat Shotgun** | weapon, gas grenade + wonky damage, three detail recipes, green smoke, pickup, cheat, AI `COMBAT`, status icon | weapon-data and ammo tests, grenade timing/damage, pickup acknowledgement, AI string mapping per edition (retail keeps Beretta), effect recipes |
@@ -226,7 +227,7 @@ replaced, while N4–N7 are each confined to one or two worlds.
 
 ## Open decisions
 
-1. **Weapon numbering.** (a) *Superset*: keep every retail number and append the four add-on
+1. **Weapon numbering** — decided: (a), implemented in N1. (a) *Superset*: keep every retail number and append the four add-on
    weapons (and their cheats) after the current table, replacing the original's range tests
    with explicit predicates; retail saves and tests stay untouched, but add-on numbers differ
    from the 1999 build (they never leave the process except in our own saves). (b) *Per

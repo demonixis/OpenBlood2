@@ -19,19 +19,20 @@ namespace OpenBlood2
         constexpr std::uint64_t file_limit = 64 * 1024;
         const char* edition_name(Edition edition)
         {
-            return edition == Edition::Demo ? "demo" : "retail";
+            return edition == Edition::Demo ? "demo" : edition == Edition::Nightmares ? "nightmares" : "retail";
         }
         bool edition_from(std::string_view text, Edition& edition)
         {
-            if (text != "demo" && text != "retail")
+            if (text != "demo" && text != "retail" && text != "nightmares")
                 return false;
-            edition = text == "demo" ? Edition::Demo : Edition::Retail;
+            edition = text == "demo" ? Edition::Demo : text == "nightmares" ? Edition::Nightmares : Edition::Retail;
             return true;
         }
         bool valid_installation(const Installation& item)
         {
             return item.directory.is_absolute() && valid_setup_text(path_text(item.directory), 4096) &&
-                   (item.edition == Edition::Retail || item.edition == Edition::Demo);
+                   (item.edition == Edition::Retail || item.edition == Edition::Demo ||
+                    item.edition == Edition::Nightmares);
         }
         bool validate(const SetupState& state, std::string& error)
         {
@@ -258,18 +259,21 @@ namespace OpenBlood2
 
     std::vector<Installation> folder_installations(const fs::path& directory)
     {
-        bool retail = false, demo = false;
+        bool retail = false, nightmares = false, demo = false;
         std::error_code ec;
         for (auto it = fs::directory_iterator(directory, ec); !ec && it != fs::directory_iterator{}; it.increment(ec))
         {
             const auto name = lower(path_text(it->path().filename()));
             retail |= name == "blood2.rez";
+            nightmares |= name == "blood2nm.rez";
             demo |= name == "b2demo.rez";
         }
         std::vector<Installation> result;
         const auto absolute = fs::absolute(directory, ec).lexically_normal();
         if (retail)
             result.push_back({Edition::Retail, absolute});
+        if (retail && nightmares) // The expansion installs into The Chosen's folder.
+            result.push_back({Edition::Nightmares, absolute});
         if (demo)
             result.push_back({Edition::Demo, absolute});
         return result;
@@ -334,7 +338,7 @@ namespace OpenBlood2
         for (const auto& folder : folders)
             for (auto& item : folder_installations(folder))
                 found.push_back(std::move(item));
-        // The full game before the demo when a folder holds both.
+        // The Chosen first (then Nightmares), the full game before the demo when a folder holds both.
         std::stable_partition(found.begin(), found.end(),
                               [](const Installation& item) { return item.edition == Edition::Retail; });
         for (const auto& item : found)
@@ -391,6 +395,7 @@ namespace OpenBlood2
         Config config;
         config.data_dir = item.directory;
         config.demo = item.edition == Edition::Demo;
+        config.nightmares = item.edition == Edition::Nightmares;
         config.source = "setup.cfg";
         for (const auto& mod : state.mods)
             if (mod.enabled && mod.installation == item)

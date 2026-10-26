@@ -41,8 +41,8 @@ filtered sprites, escalator fog, gravity-free resize and `cres.dll` data mods.
 [Activation](contracts/activation_visibility_contracts.md) now walks the decoded DAT leaf
 visibility lists (CityHub's idle Gideon, Train Station guards). Chosen games now start
 the original ACTION type without cut scenes ([menu contracts](contracts/menu_contracts.md#chosen-games-gametype_action)).
-Next: door portals for activation; Nightmares stays a separate port (scoped in the
-[Nightmares plan](implementation/nightmares_plan.md), awaiting decisions).
+Next: door portals for activation; Nightmares stays a separate port (see the
+[Nightmares plan](implementation/nightmares_plan.md); lot N1, the edition and mount, is done).
 
 The [Demo_01 computer/door correction](implementation/reports/demo_computer_doors.md)
 fixes adjacent sliding leaves refusing exact closed-endpoint contact after the

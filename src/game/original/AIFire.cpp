@@ -277,7 +277,7 @@ bool AI_Mgr::MC_BestWeapon()
         if (!candidate)
         {
             auto* current = m_InventoryMgr.CurrentWeapon();
-            if (current && current->data.m_nType <= WEAP_MELEE &&
+            if (current && IsPlayerWeaponType(current->data.m_nType) &&
                 m_InventoryMgr.GetAmmoCount(current->data.m_nAmmoType) <= 0)
                 return SetNewState(StateFindAmmo);
             if (Metacmd == std::numeric_limits<int>::max())

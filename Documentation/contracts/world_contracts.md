@@ -4,7 +4,7 @@ The data-mod continuation (first built for the [archived launcher](../history/la
 now driven by the [setup screen](setup_screen_contracts.md)) extends
 `mount_game` with explicitly ordered `--rez` overlays after the unchanged stock
 archive order. Whole-mount rollback and resource ownership are preserved;
-Nightmares and code mods remain excluded.
+Code mods remain excluded; Nightmares is an [edition](nightmares_edition_contracts.md), never a mod.
 
 
 Historical unconditional RunWorld refusal below is superseded by [checked session startup](session_start_contracts.md).
@@ -54,7 +54,7 @@ M2 is **in progress**, with bounded resource/world inspection and a partial orig
 
 `engine/resources.cpp` indexes the original little-endian, 168-byte REZ v1 header and directory records. It reads bounded directory blocks, not entire retail archives. Resource payloads are read on demand. Directory names and filenames are normalized using ASCII case folding and slash conversion. Absolute paths, drive prefixes, empty components, `.` and `..` are rejected. There is no basename/suffix fallback.
 
-Mount order is `BLOOD2.REZ`, optional `SOUND.REZ`, optional `BLOOD2P.REZ`, optional `BLOOD2P2.REZ`. A later exact path replaces an earlier entry and retains its override count. `BLOOD2NM.REZ` is excluded. Each mount and a complete `mount_game` are published only after validation. Duplicate normalized paths within an archive, invalid record kinds/ranges, overlapping/repeated nonempty directory blocks and excessive budgets reject the archive. Empty directories may share offset zero. File keys are bounded and skipped according to the original record layout.
+Mount order is `BLOOD2.REZ`, optional `SOUND.REZ`, optional `BLOOD2P.REZ`, optional `BLOOD2P2.REZ`. A later exact path replaces an earlier entry and retains its override count. `BLOOD2NM.REZ` is excluded from retail; the [Nightmares edition](nightmares_edition_contracts.md) appends it and optional `BLOOD2NM2.REZ` after `BLOOD2P2.REZ`. Each mount and a complete `mount_game` are published only after validation. Duplicate normalized paths within an archive, invalid record kinds/ranges, overlapping/repeated nonempty directory blocks and excessive budgets reject the archive. Empty directories may share offset zero. File keys are bounded and skipped according to the original record layout.
 
 Limits: 32 mounts, directory depth 32, 16,384 directories, 100,000 files per archive, 32 MiB directory metadata per archive, 1,024-byte normalized paths, 255-byte components, 4,096-byte comments and 4,096 keys per entry. A resource read is limited to 128 MiB. The backing file is reopened and its range checked for each read; changing a mounted archive is unsupported. No claim of authenticity or same-size change detection is made.
 
