@@ -24,7 +24,10 @@ namespace OpenBlood2
         MissingWorldModel,   // Engine creation rejected; source row retained, no runtime instance.
         AbsentOriginalClass, // Named, source-audited retired class; never a registered class.
         MissingResource,     // Known invalid authored references retained without a runtime instance.
-        SavedState,          // Restore mode: not CF_ALWAYSLOAD; the object comes from the save or is gone.
+        // A reviewed row whose authored Pos is non-finite (the original creates it there): retained
+        // without a runtime instance, e.g. duplicate ambient SoundFX with an undefined distance.
+        InvalidAuthoredPosition,
+        SavedState, // Restore mode: not CF_ALWAYSLOAD; the object comes from the save or is gone.
         Failed
     };
     const char* entry_state_name(EntryState state);

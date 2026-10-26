@@ -17,6 +17,21 @@
 
 namespace OpenBlood2
 {
+    namespace
+    {
+        // An ObjectivesTrigger that only activates by message (TouchActivate false): Trigger::ObjectTouch
+        // ignores touches, so its position only matters for its sounds' origin.
+        bool message_only_trigger(const WorldObject& source)
+        {
+            if (source.class_name != "ObjectivesTrigger")
+                return false;
+            for (const auto& p : source.properties)
+                if (!CaseLess{}(p.name, "TouchActivate") && !CaseLess{}("TouchActivate", p.name))
+                    if (const auto* touch = std::get_if<bool>(&p.value))
+                        return !*touch;
+            return false; // The source default is TRUE.
+        }
+    } // namespace
     const char* entry_state_name(EntryState s)
     {
         switch (s)
@@ -39,6 +54,8 @@ namespace OpenBlood2
                 return "Omitted: absent original class";
             case EntryState::MissingResource:
                 return "Omitted: missing authored resource";
+            case EntryState::InvalidAuthoredPosition:
+                return "Omitted: non-finite authored position";
             case EntryState::SavedState:
                 return "Restored from the save";
             case EntryState::Failed:
@@ -142,11 +159,21 @@ namespace OpenBlood2
                 entry.state = EntryState::AbsentOriginalClass;
                 entry.detail = "No original base-game class registration; loader skips this source row";
             }
-            else if (source.invalid_editor_position)
+            else if (source.invalid_editor_position && !message_only_trigger(source))
             {
-                // The original creates it at the non-finite position; no replacement pose is invented.
-                entry.state = EntryState::Failed;
-                entry.detail = "Non-finite authored Pos retained; the runtime object is not created";
+                // The original creates these at the non-finite position. An ambient SoundFX has an
+                // undefined listener distance there: an explicit omission (OPHELIA_CC_O duplicates
+                // SoundFX18 four times at a valid position). Other classes stay unreviewed failures.
+                if (source.class_name == "SoundFX")
+                {
+                    entry.state = EntryState::InvalidAuthoredPosition;
+                    entry.detail = "Non-finite authored Pos: ambient emitter omitted (undefined distance)";
+                }
+                else
+                {
+                    entry.state = EntryState::Failed;
+                    entry.detail = "Non-finite authored Pos retained; the runtime object is not created";
+                }
             }
             else if (auto type = objects.find_class(source.class_name);
                      type && restore && save_support(type) != SaveSupport::AlwaysLoad)
@@ -161,6 +188,12 @@ namespace OpenBlood2
                 Properties props;
                 for (const auto& p : source.properties)
                     props.emplace(p.name, p.value);
+                // Adaptation for a message-only trigger with a non-finite authored Pos
+                // (CALEB1_CC_C object1): its position only places the unused touch volume and its
+                // sounds' origin, so it is created at the world origin.
+                const bool origin_adaptation = source.invalid_editor_position;
+                if (auto pos = props.find("Pos"); origin_adaptation && pos != props.end())
+                    pos->second = DVector{0, 0, 0};
                 auto text = [&](const char* key) -> std::string_view
                 {
                     const auto* p = source.find(key);
@@ -192,6 +225,9 @@ namespace OpenBlood2
                     {
                         entry.object = r->id;
                         entry.state = EntryState::Created;
+                        if (origin_adaptation)
+                            entry.detail = "Non-finite authored Pos replaced by the world origin (message-only "
+                                           "trigger adaptation)";
                     }
                 }
                 else if (const auto* sound = r ? dynamic_cast<const Sound*>(r->game.get()) : nullptr)

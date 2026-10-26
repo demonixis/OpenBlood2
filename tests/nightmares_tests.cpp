@@ -9,6 +9,7 @@
 #include "game/original/Credits.h"
 #include "game/original/LoadingScreen.h"
 #include "game/original/MenuIds.h"
+#include "game/original/ObjectivesTrigger.h"
 #include "game/weapon_messages.h"
 #include <iostream>
 #include <map>
@@ -179,8 +180,7 @@ namespace
         // Known not-created entries, each explicit.
         const auto known_failure = [](std::string_view detail)
         {
-            return detail.find("Non-finite authored Pos") != detail.npos ||
-                   detail.find("Chrome environment mapping") != detail.npos ||
+            return detail.find("Chrome environment mapping") != detail.npos ||
                    detail.find("scorch1.dtx") != detail.npos;
         };
         for (const auto& [name, expected] : unported)
@@ -198,6 +198,7 @@ namespace
                                           ".dat");
             std::set<std::string> found;
             std::map<std::string, unsigned> failed;
+            unsigned invalid_positions = 0, origin_triggers = 0;
             CHECK(game->entries.size() == game->world.objects.size());
             for (std::size_t i = 0; i < game->entries.size(); ++i)
             {
@@ -205,6 +206,16 @@ namespace
                 const auto& cls = game->world.objects[i].class_name;
                 if (entry.state == EntryState::Unsupported)
                     found.insert(cls);
+                else if (entry.state == EntryState::InvalidAuthoredPosition)
+                {
+                    CHECK(cls == "SoundFX");
+                    ++invalid_positions;
+                }
+                else if (entry.state == EntryState::Created && entry.detail.find("world origin") != entry.detail.npos)
+                {
+                    CHECK(cls == "ObjectivesTrigger");
+                    ++origin_triggers;
+                }
                 else if (entry.state == EntryState::Failed)
                 {
                     CHECK(known_failure(entry.detail));
@@ -212,6 +223,8 @@ namespace
                 }
             }
             CHECK(found == expected);
+            CHECK(invalid_positions == (name == "ophelia_cc_o" ? 4u : 0u));
+            CHECK(origin_triggers == (name == "caleb1_cc_c" ? 1u : 0u));
             std::cout << world << ": " << game->entries.size() << " entries";
             for (const auto& [cls, count] : failed)
                 std::cout << ", " << count << " " << cls << " not created";
@@ -249,16 +262,41 @@ namespace
         // Saving in a nightmare level is refused until the add-on classes save (lot N9).
         GameSave save;
         CHECK(!game->save_game(save, error) && error.find("Nightmares levels") != error.npos);
-        // The menu's new game reaches CALEB1_CC_C, whose startup still refuses its NaN-positioned
-        // ObjectivesTrigger.
+        // The menu's new game starts CALEB1_CC_C. Its message-only ObjectivesTrigger sits at the
+        // world origin and still delivers the "Ice Cold" objective through a trigger relay.
         MenuCommand command;
         command.action = MenuAction::NewGame;
         command.nightmares = true;
         command.story = false;
         command.difficulty = DIFFICULTY_MEDIUM;
-        const bool started = start_menu_world(game, menu_world_start(*game, command, "01_SubwayA"), error);
-        std::cout << "Nightmares new game: " << (started ? "started" : error) << "\n";
-        CHECK(!started && error.find("1 failed entries") != error.npos);
+        CHECK(start_menu_world(game, menu_world_start(*game, command, "01_SubwayA"), error));
+        CHECK(game->world_path == "worlds_ao/caleb1_cc_c.dat" && game->client_shell.m_bInWorld);
+        ObjectivesTrigger* ice = nullptr;
+        for (auto id : game->objects.snapshot())
+            if (auto* t = dynamic_cast<ObjectivesTrigger*>(game->objects.get(id)->game.get());
+                t && t->objectives.title == "Ice Cold")
+                ice = t;
+        CHECK(ice && !ice->touch_activate && ice->relay_activate);
+        DVector origin{1, 1, 1};
+        CHECK(game->server.GetObjectPos(ice->m_hObject, &origin) == DE_OK && origin.x == 0 && origin.y == 0 &&
+              origin.z == 0);
+        auto relay = game->objects.create(game->objects.find_class("Trigger"), {}, Creation::World);
+        auto trigger_text = game->server.CreateString("TRIGGER");
+        auto message = game->server.StartMessageToObject(game->server.HandleToObject(relay), ice->m_hObject, 1000);
+        CHECK(message && game->server.WriteToMessageHString(message, trigger_text) == DE_OK &&
+              game->server.EndMessage(message) == DE_OK);
+        game->server.FreeString(trigger_text);
+        CHECK(ice->deliveries == 1 && game->pump_player_messages(error) &&
+              game->client_shell.objectives.title == "Ice Cold");
+        for (int frame = 0; frame < 1800; ++frame)
+            CHECK(game->step(1.0 / 60));
+        CHECK(game->frame_failures.empty() && game->client_shell.m_bInWorld);
+        std::cout << "CALEB1_CC_C: started, objective delivered, 30 s simulated\n";
+        // OPHELIA_CC_O omits its NaN ambient copies but still waits for GremlinAI/FlayerPU (lots N5/N6)
+        // and its DetailSprite authored with a .dtx texture.
+        CHECK(!GameSession::start_new_game(game, "worlds_ao\\ophelia_cc_o", DIFFICULTY_MEDIUM, 1, error));
+        std::cout << "OPHELIA_CC_O: " << error << "\n";
+        CHECK(error.find("10 unsupported") != error.npos && error.find("1 failed entries") != error.npos);
         // Lot N8: CALEB2_CC_C starts with its 28 robe Cultists on the RetroCultist table (the
         // oldschool model's body-damage policy) and simulates 30 seconds without NPC failures.
         CHECK(GameSession::start_new_game(game, "worlds_ao\\caleb2_cc_c", DIFFICULTY_MEDIUM, 0, error));

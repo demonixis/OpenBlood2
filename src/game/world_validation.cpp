@@ -73,8 +73,9 @@ namespace OpenBlood2
                     row.name = *name;
             report.unknown += row.state == EntryState::Unsupported;
             report.failed += row.state == EntryState::Failed;
-            report.omitted += row.state == EntryState::MissingWorldModel ||
-                              row.state == EntryState::AbsentOriginalClass || row.state == EntryState::MissingResource;
+            report.omitted +=
+                row.state == EntryState::MissingWorldModel || row.state == EntryState::AbsentOriginalClass ||
+                row.state == EntryState::MissingResource || row.state == EntryState::InvalidAuthoredPosition;
             report.entries.push_back(std::move(row));
         }
         if (!game.client_shell.ctf.error.empty())

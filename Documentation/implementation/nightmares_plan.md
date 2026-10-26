@@ -4,9 +4,9 @@ Status (2026-10-26): decision 1 is **superset numbering** (user, 2026-10-26). Lo
 edition, mount order, `IsAddonBuild()`, save edition and numbering) and **N2** (NIGHTMARES row and
 new game, `WORLDS_AO` paths, add-on art, CREDITS_AO and the END roll, inspection of all 13
 worlds) are implemented ([edition contracts](../contracts/nightmares_edition_contracts.md)).
-Lot **N8** (robe Cultists) is implemented too: CALEB2_CC_C starts. Two proposals below await a
-decision: the NaN-positioned rows that still block CALEB1_CC_C and OPHELIA_CC_O, and corpses of
-headless models.
+Lot **N8** (robe Cultists) is implemented too, and the NaN-row proposal below was applied
+(user, 2026-10-26): CALEB1_CC_C and CALEB2_CC_C start. OPHELIA_CC_O still needs N5/N6 and a
+DetailSprite DTX texture. The headless-corpse proposal awaits a decision.
 `blood2nm.rez` stays refused as a mod. Every later lot needs the user's go-ahead (see
 [open decisions](#open-decisions)).
 
@@ -246,7 +246,7 @@ replaced, while N4–N7 are each confined to one or two worlds.
 
 ## Proposals after N8 (2026-10-26)
 
-**NaN-positioned rows** (x = NaN in the DAT, created there by the original):
+**NaN-positioned rows** (x = NaN in the DAT, created there by the original) — applied 2026-10-26:
 
 - CALEB1_CC_C `object1` is an ObjectivesTrigger with `TouchActivate 0`, activated only by
   `Trigger10`'s message. Its position matters only for its touch volume (unused) and the 3D origin
@@ -258,6 +258,10 @@ replaced, while N4–N7 are each confined to one or two worlds.
   the four valid copies still play. Proposal: report the NaN copies as explicit omissions (like
   `fallengrills`), not failures, so the world starts.
 - Any other class with a non-finite `Pos` stays a not-created failure until reviewed.
+
+**DetailSprite with a DTX texture**: OPHELIA_CC_O's `DetailSprite0` names
+`spritetextures\scorch1.dtx`; LithTech sprites can use a single texture. Supporting a one-frame
+DTX sprite in DetailSprite is the remaining non-class blocker of that world.
 
 **Corpses of headless models**: let `CCorpse` accept a model without a head node with hit-sphere
 localization unavailable (limb loss skipped, saved spheres zero), the same body policy as the

@@ -103,6 +103,7 @@ namespace OpenBlood2
                         break;
                     case EntryState::AbsentOriginalClass:
                     case EntryState::MissingResource:
+                    case EntryState::InvalidAuthoredPosition:
                     case EntryState::MissingWorldModel:
                         ++next.omitted;
                         break;

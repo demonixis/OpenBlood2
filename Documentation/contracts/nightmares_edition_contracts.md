@@ -92,11 +92,18 @@ before lot N2's original path branch.
   menu and in-world credits and the END roll; there is no `INTRO_AO` (the intro roll is not
   ported). `WORLDS_AO\END` (and the absent `WORLDS_AO\CREDITS`) roll the credits over the world.
 - **Non-finite authored positions.** The DAT reader now retains a non-finite `Pos` vector for any
-  class (formerly only editor lights) as `invalid_editor_position`; a runtime class with one is a
-  `Failed` entry ("Non-finite authored Pos retained; the runtime object is not created"), never a
-  guessed pose. This affects CALEB1_CC_C's ObjectivesTrigger `object1` and four OPHELIA_CC_O
-  `SoundFX18` rows (x = NaN); the original creates them at that position. Other non-finite
-  vectors still refuse the world.
+  class (formerly only editor lights) as `invalid_editor_position`, never exposed as a pose; the
+  original creates such objects at that position. Other non-finite vectors still refuse the world.
+  The session decides per reviewed class (user decision, 2026-10-26):
+  - an ObjectivesTrigger with `TouchActivate` false (message only: `Trigger::ObjectTouch` ignores
+    touches) is created at the world origin, recorded as "Non-finite authored Pos replaced by the
+    world origin (message-only trigger adaptation)". Its position only places the unused touch box
+    and the origin of its sounds (CALEB1_CC_C `object1`: `Sounds\Thunder.wav`, absent from every
+    archive); a player USE ray at the origin could still activate it, as at any position;
+  - a SoundFX is an explicit omission (`EntryState::InvalidAuthoredPosition`, "Omitted:
+    non-finite authored position"): an ambient emitter at a NaN position has an undefined listener
+    distance, and OPHELIA_CC_O keeps the four valid copies of the same `SoundFX18`;
+  - any other class stays a `Failed` entry until reviewed.
 
 Real data (2026-10-26): `nightmares.installed` inspects all 13 `WORLDS_AO` DATs. Unported
 classes are exactly `FlayerPU`, `GremlinAI` (Ophelia), `FlayerPU` (Ishmael), `CombatShotgunPU`,
@@ -132,5 +139,9 @@ entries. Headless: `nightmares.paths`, `nightmares.menu`, `nightmares.strings`.
 
 Real data: all 19 (Caleb1) and 28 (Caleb2) robe Cultists are created. CALEB2_CC_C starts, runs
 30 s with all 28 healthy on the RetroCultist table, and an awake one takes torso body damage and
-dies (no corpse, no frame failure). CALEB1_CC_C still refuses its start on the NaN-positioned
-ObjectivesTrigger alone.
+dies (no corpse, no frame failure). With the position rules above, CALEB1_CC_C starts too: the
+menu's Nightmares new game enters it, `object1` sits at the origin and still delivers the "Ice
+Cold" objective through a trigger relay, and 30 s simulate without frame failures. OPHELIA_CC_O
+omits its four NaN copies but still refuses its start on 10 unported entries (9 GremlinAI, a
+FlayerPU; lots N5/N6) and one DetailSprite authored with `spritetextures\scorch1.dtx`, a DTX
+rather than an SPR (present in BLOOD2.REZ; DTX sprites are not supported by DetailSprite yet).
