@@ -70,6 +70,7 @@ int main(int argc, char** argv)
                                        "unreported")
               << " | backend " << SDL_GetGPUDeviceDriver(runtime.gpu) << "\n";
     WorldRenderer renderer(runtime.gpu, DrawStyle::SpriteAlpha);
+    renderer.point_sprites = true; // Exact texel colours of the 4x2 fixture.
     Capture capture;
     SpriteView scene;
     Resources resources;

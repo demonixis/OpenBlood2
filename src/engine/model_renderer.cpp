@@ -59,7 +59,8 @@ namespace OpenBlood2
         height_ = height;
         if (revision_ != view.revision)
         {
-            if (!(sampler_ = registry_->sampler(style_ == DrawStyle::SpriteAlpha, error)) ||
+            if (!(sampler_ = (style_ == DrawStyle::SpriteAlpha ? registry_->sprite_sampler(error)
+                                                               : registry_->sampler(false, error))) ||
                 !(lightmap_sampler_ = registry_->lightmap_sampler(error)) ||
                 !(shadow_sampler_ = registry_->sampler(true, error)) ||
                 !registry_->refresh_textures(view.mesh.materials, textures_, texture_paths_, error))

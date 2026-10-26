@@ -64,12 +64,17 @@ namespace OpenBlood2
         TextureHandle create_texture(const SDL_GPUTextureCreateInfo&, std::string& error);
         SDL_GPUTexture* get(TextureHandle) const;
         void release(TextureHandle&);
-        // Nearest filtering with point mip selection over authored DTX levels.
+        // Repeating: trilinear 8x anisotropic scene textures. Clamped: nearest filtering with
+        // point mip selection (shadow atlas and post-processing taps).
         SDL_GPUSampler* sampler(bool clamp, std::string& error);
         // Bilinear, clamped, single level: lightmap pages (texels sit on the light grid).
         SDL_GPUSampler* lightmap_sampler(std::string& error);
         // Trilinear, repeating: generated normal maps (enhanced renderer).
         SDL_GPUSampler* normal_sampler(std::string& error);
+        // Trilinear, clamped: sprite and FX textures (one texture per DTX, so nothing bleeds).
+        // The original Direct3D renderer filtered them bilinearly; point sampling made
+        // muzzle flashes and blood pools blocky.
+        SDL_GPUSampler* sprite_sampler(std::string& error);
 
         BufferHandle create_buffer(SDL_GPUBufferUsageFlags, Uint32 bytes, std::string& error);
         // Replaces the buffer with a larger one when needed; contents are not preserved.
@@ -144,7 +149,7 @@ namespace OpenBlood2
         std::vector<std::uint32_t> free_buffers_;
         std::unordered_map<std::string, TextureHandle> content_; // key + content hash -> texture
         std::map<const void*, SharedSlot> shared_;
-        std::array<SDL_GPUSampler*, 4> samplers_{}; // Repeat, clamp, lightmap, normal map.
+        std::array<SDL_GPUSampler*, 5> samplers_{}; // Repeat, clamp, lightmap, normal map, sprite.
         std::vector<std::uint8_t> staging_;
         std::vector<BufferCopy> buffer_copies_;
         std::vector<TextureCopy> texture_copies_;

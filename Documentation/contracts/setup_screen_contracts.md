@@ -55,7 +55,9 @@ are made; CTest runs use an isolated user directory.
 
 Data-only REZ overlays per installation, mounted after the stock archives in list order
 (later entries win), with `Resources::mount_game`'s existing checks (no code, no Nightmares,
-no duplicates). Up, Down, Remove and the checkbox edit the list. `.rez` files in the
+no duplicates). A root `cres.dll` is accepted (0.5.0): it is only read as string/bitmap
+resources by the bounded PE reader and never executed, and a mod's copy replaces the
+stock strings. Any other `.dll`, `.exe` or `.lto` (`object.lto`) still refuses the mod. Up, Down, Remove and the checkbox edit the list. `.rez` files in the
 installation's `mods` folder (any case) are listed automatically, disabled; desktop also adds
 any file through a native picker.
 

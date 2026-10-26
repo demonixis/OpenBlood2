@@ -71,8 +71,8 @@ int main()
     game.server.SetGameConVar("FogR", "255");
     CHECK(gather_scene_effects(game, {0, 0, 200}, {}).uniform.fog_color[0] == 1);
     CHECK(gather_scene_effects(game, {}, {}).uniform.fog_color[0] == 64.f / 255);
-    brush->fog = false;
-    CHECK(!gather_scene_effects(game, {}, {}).uniform.fog_color[3]);
+    brush->fog = false; // A fog-off volume keeps the world fog (escalator departure).
+    CHECK(gather_scene_effects(game, {}, {}).uniform.fog_color[0] == 1);
     brush->fog = true;
     game.server.SetGameConVar("FogEnable", "0");
     brush->fog_far = -30;

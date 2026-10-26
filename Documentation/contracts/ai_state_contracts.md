@@ -89,8 +89,10 @@ when the user-dimension query fails remains. The initial cached clip is 999 and
 dimensions are (1,1,1). Animation ownership remains exclusive to the actor; callers
 replacing a model must rebuild its shared table and reset the cached animation.
 
-The old SetObjectDims2 is replaced explicitly by the existing **atomic,
-foot-anchored ResizeObject**. This checks primary geometry/live solids and returns
+The old SetObjectDims2 is replaced explicitly by the existing **atomic
+ResizeObject**: foot-anchored for gravity bodies and the player, centre-kept for
+bodies without FLAG_GRAVITY (2026-10-26; the original kept the centre, so a hovering
+Gideon no longer rises or sinks with each clip size). This checks primary geometry/live solids and returns
 Blocked/Invalid/Unavailable without changing shape, position or clip. It does not
 recreate the old engine's partial resize/pushing behavior. A repeated cached clip
 only resets and performs no clearance query. This replacement is shared with the

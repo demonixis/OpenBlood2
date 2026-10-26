@@ -421,6 +421,19 @@ namespace
         CHECK(std::filesystem::remove(demo_root / "B2Demo.rez", ec) && !ec);
         config.demo = true;
         CHECK(!editions.mount_game(config, error) && error == "Missing B2DEMO.REZ" && editions.find("full.dat"));
+        // Data mods may replace the resource-only cres.dll (read, never executed); code stays refused.
+        config.demo = false;
+        const auto mods = std::filesystem::absolute(demo_root);
+        CHECK(save(mods / "strings.rez", rez({6}, "cres", 0x444C4C).data));
+        CHECK(save(mods / "shell.rez", rez({7}, "cshell", 0x444C4C).data));
+        CHECK(save(mods / "object.rez", rez({8}, "object", 0x4C544F).data));
+        config.overlays = {mods / "strings.rez"};
+        CHECK(editions.mount_game(config, error) && editions.find("cres.dll") &&
+              editions.find("cres.dll")->archive == mods / "strings.rez");
+        config.overlays = {mods / "shell.rez"};
+        CHECK(!editions.mount_game(config, error) && error == "Mods with game code are unsupported: cshell.dll");
+        config.overlays = {mods / "object.rez"};
+        CHECK(!editions.mount_game(config, error) && error == "Mods with game code are unsupported: object.lto");
         return true;
     }
     bool world_properties()

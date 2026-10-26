@@ -253,7 +253,6 @@ namespace OpenBlood2
             if (!clamp)
             {
                 // Isotropic point filtering loses skin/wall detail at grazing angles.
-                // Sprite/FX atlases retain their clamped point sampler.
                 info.min_filter = info.mag_filter = SDL_GPU_FILTER_LINEAR;
                 info.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR;
                 info.enable_anisotropy = true;
@@ -277,6 +276,22 @@ namespace OpenBlood2
             info.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR;
             info.max_lod = 1000;
             info.address_mode_u = info.address_mode_v = info.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_REPEAT;
+            sampler = SDL_CreateGPUSampler(device_, &info);
+            if (!sampler)
+                error = SDL_GetError();
+        }
+        return sampler;
+    }
+    SDL_GPUSampler* GpuRegistry::sprite_sampler(std::string& error)
+    {
+        auto*& sampler = samplers_[4];
+        if (!sampler)
+        {
+            SDL_GPUSamplerCreateInfo info{};
+            info.min_filter = info.mag_filter = SDL_GPU_FILTER_LINEAR;
+            info.mipmap_mode = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR;
+            info.max_lod = 1000;
+            info.address_mode_u = info.address_mode_v = info.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
             sampler = SDL_CreateGPUSampler(device_, &info);
             if (!sampler)
                 error = SDL_GetError();

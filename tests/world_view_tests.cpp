@@ -81,7 +81,12 @@ namespace
         WorldViewUniform u;
         WorldDraw d;
         CHECK(world_view_uniform({10, 20, 30}, {}, 2, d, u));
-        CHECK(u.eye[0] == 10 && u.right[0] == 1 && u.up[1] == 1 && u.forward[2] == 1 && u.projection[1] == 2);
+        // Wider than 4:3 keeps the 4:3 vertical field (Hor+); 4:3 and narrower keep 90 degrees across.
+        CHECK(u.eye[0] == 10 && u.right[0] == 1 && u.up[1] == 1 && u.forward[2] == 1 &&
+              std::abs(u.projection[0] - 2.f / 3) < 1e-6f && std::abs(u.projection[1] - 4.f / 3) < 1e-6f);
+        CHECK(world_view_uniform({}, {}, 4.f / 3, d, u) && u.projection[0] == 1 &&
+              std::abs(u.projection[1] - 4.f / 3) < 1e-6f);
+        CHECK(world_view_uniform({}, {}, 1, d, u) && u.projection[0] == 1 && u.projection[1] == 1);
         CHECK(std::abs(u.projection[2] + u.projection[3]) < 1e-6);
         CHECK(std::abs((65536 * u.projection[2] + u.projection[3]) / 65536 - 1) < 1e-6);
         auto q = rotation_from_euler({0, 1.57079632679f, 0});

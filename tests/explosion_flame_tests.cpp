@@ -270,7 +270,8 @@ namespace
             const auto& report = g.server.scene_explosions.back();
             CHECK(report.flame_error.empty() && report.sprite_error.empty() && report.model_error.empty() &&
                   report.light_error.empty());
-            CHECK(g.server.explosion_sprites.reports.back().unavailable == "light illumination");
+            // Scene effects lot 10 made explosion lights illuminate; nothing is reported unavailable.
+            CHECK(g.server.explosion_sprites.reports.back().unavailable.empty());
             unsigned peak = 0;
             std::uint64_t bursts = 0;
             double dt = cycle == 0 ? .02 : cycle == 1 ? 1. / 60 : .05;

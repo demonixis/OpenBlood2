@@ -65,6 +65,7 @@ int main(int argc, char** argv)
     std::string error;
     CHECK(runtime.initialize(true, error));
     WorldRenderer renderer(runtime.gpu, DrawStyle::SpriteAlpha);
+    renderer.point_sprites = true; // Exact texel colours of the 4x2 fixture.
     Resources resources;
     SpriteView scene;
     Capture capture;

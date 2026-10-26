@@ -127,5 +127,16 @@ namespace OpenBlood2
     };
     // Near and far planes of the scene projection (view models and sky use their own near plane).
     inline constexpr float world_near = 1, world_far = 65536;
+    // Horizontal projection scale (1 = 90 degrees) for a viewport aspect. The original
+    // stretched a fixed 90 x 72 degree view to any resolution; square pixels with a fixed
+    // 90-degree width cut the view (and the bottom of the view weapon) on wide screens.
+    // Wider than 4:3 keeps the 4:3 vertical field and widens the horizontal one (Hor+);
+    // narrower keeps 90 degrees across. Unchanged at 4:3.
+    inline float horizontal_projection_scale(float aspect)
+    {
+        constexpr float reference = 4.f / 3.f;
+        return aspect > reference ? reference / aspect : 1.f;
+    }
+    // projection = {s, s * aspect, ...} with s = horizontal_projection_scale(aspect).
     bool world_view_uniform(DVector eye, DRotation view, float aspect, const WorldDraw&, WorldViewUniform&);
 } // namespace OpenBlood2

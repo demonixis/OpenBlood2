@@ -248,6 +248,9 @@ namespace OpenBlood2
             if (const auto* body = game.objects.get(a.m_hObject); body && body->placement_nudges)
                 ImGui::Text("Authored overlap nudge %.3f %.3f %.3f (replacement placement)", body->placement_nudge.x,
                             body->placement_nudge.y, body->placement_nudge.z);
+            if (const auto* body = game.objects.get(a.m_hObject); body && body->brush_start_passes)
+                ImGui::Text("Moves out of a started-inside world model: %llu (replacement physics)",
+                            (unsigned long long)body->brush_start_passes);
             if (!a.runtime_error.empty())
                 ImGui::TextWrapped("Failure: %s", a.runtime_error.c_str());
         }

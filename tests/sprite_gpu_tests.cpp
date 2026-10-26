@@ -51,6 +51,7 @@ int main(int argc, char** argv)
     Runtime runtime;
     CHECK(runtime.initialize(true, error));
     WorldRenderer world(runtime.gpu), sprites(runtime.gpu, DrawStyle::SpriteAlpha), overlay(runtime.gpu);
+    sprites.point_sprites = true; // Exact texel colours; the shipped sampler is checked below.
     auto background = quad(4, {0, 0, 1});
     auto after = quad(2.5f, {1, 1, 0});
     WorldDraw draw;
@@ -111,6 +112,35 @@ int main(int argc, char** argv)
         CHECK(valid);
         CHECK(sprites.stats.uploads == (frame >= 4 ? 2 : 1));
         CHECK(capture.save((std::filesystem::path(argv[1]) / "alpha.png").c_str()));
+    }
+    {
+        // The shipped sampler is trilinear (the original Direct3D renderer filtered sprites):
+        // the edge between the opaque red and opaque black columns blends instead of stepping.
+        WorldRenderer filtered(runtime.gpu, DrawStyle::SpriteAlpha);
+        Capture capture;
+        CHECK(capture.initialize(runtime.gpu, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240));
+        CHECK(scene.begin_frame({}, {}, error));
+        CHECK(scene.add(&sprite, {}, {{0, 0, 2.f}, {}}, {.25f, .5f, 1}, FLAG_VISIBLE | FLAG_SPRITECHROMAKEY, {},
+                        resources, error));
+        CHECK(world.prepare(background, 1, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240, error));
+        CHECK(
+            filtered.prepare(scene.mesh, scene.revision, SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM, 320, 240, error, true));
+        auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
+        CHECK(commands);
+        CHECK(world.draw(commands, capture.texture, background, std::span(&draw, 1), {}, {}, false, error));
+        CHECK(filtered.draw(commands, capture.texture, scene.mesh, scene.draws, {}, {}, false, error, DrawLoad::Load,
+                            world.depth_target()));
+        CHECK(download(runtime.gpu, commands, capture));
+        auto* pixels = static_cast<const Uint8*>(SDL_MapGPUTransferBuffer(runtime.gpu, capture.transfer, false));
+        CHECK(pixels);
+        unsigned blended = 0;
+        for (unsigned x = 320 * 9 / 16; x < 320 * 11 / 16; ++x)
+        {
+            const auto* pixel = pixels + (120 * 320 + x) * 4;
+            blended += pixel[0] > 40 && pixel[0] < 215 && pixel[1] < 8 && pixel[2] < 8;
+        }
+        SDL_UnmapGPUTransferBuffer(runtime.gpu, capture.transfer);
+        CHECK(blended > 2);
     }
     std::cout << "Pixels: zero/partial/opaque/opaque-black DTX alpha, per-instance opacity, overlap sort, world "
                  "occlusion, no depth writes, "

@@ -111,12 +111,14 @@ namespace OpenBlood2
             if (!r || r->life != Life::Alive || !r->container() || !r->container()->contains(eye))
                 continue;
             const auto* brush = dynamic_cast<const VolumeBrush*>(r->game.get());
-            if (brush && (r->user_flags & FLAG_VISIBLE))
+            // Departure: the original ran "FogEnable 0" for a visible fog-off volume, so
+            // CityHub's escalator Conveyors switched the world fog off abruptly underfoot.
+            // A fog-off volume now keeps the current fog; fog-on volumes still replace it.
+            if (brush && (r->user_flags & FLAG_VISIBLE) && brush->fog)
             {
                 out.uniform.fog_color = {};
                 out.invalid_fog = false;
-                if (brush->fog)
-                    fog(brush->fog_near, brush->fog_far, brush->fog_color);
+                fog(brush->fog_near, brush->fog_far, brush->fog_color);
             }
             break;
         }

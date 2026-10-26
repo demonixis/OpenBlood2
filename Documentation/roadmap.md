@@ -31,9 +31,15 @@ filtering. The [additional controls](implementation/reports/control_actions.md) 
 all nine previously disabled action rows. The [desktop chase camera](contracts/camera_contracts.md)
 adds an optional C toggle with the crosshair retained, disabled in VR. The [destruction-debris lot](contracts/destruction_debris_contracts.md)
 connects original wood, metal and glass fragments, their motion and impact sounds.
-Museum's reported crash remains unreproduced; the
-[class coverage inventory](contracts/class_coverage.md) distinguishes absent ports
+The [class coverage inventory](contracts/class_coverage.md) distinguishes absent ports
 from replacement services. This does not expand milestone acceptance.
+
+The [2026-10-26 tester corrections](implementation/reports/tester_feedback_2026_10_26.md)
+(0.5.0) reproduce and fix the Museum crash (Fanatics spawned into the skylight glass
+under Gideon's last hologram), add Hor+ widescreen projection, black letterbox bars,
+filtered sprites, escalator fog, gravity-free resize and `cres.dll` data mods. Next:
+decode the DAT leaf visibility lists for retail activation (CityHub's idle Gideon,
+Train Station guards), then Chosen (ACTION) mode; Nightmares stays a separate port.
 
 The [Demo_01 computer/door correction](implementation/reports/demo_computer_doors.md)
 fixes adjacent sliding leaves refusing exact closed-endpoint contact after the

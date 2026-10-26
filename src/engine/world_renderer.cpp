@@ -53,9 +53,11 @@ namespace OpenBlood2
                    x - f.tan_left * z >= margin(f.tan_left) && f.tan_right * z - x >= margin(f.tan_right) &&
                    y - f.tan_down * z >= margin(f.tan_down) && f.tan_up * z - y >= margin(f.tan_up);
         }
-        const double side = radius * std::sqrt(2.0), vertical = radius * std::sqrt(1 + f.aspect * f.aspect);
-        return std::isfinite(radius) && z + radius >= f.near && z - radius <= f.far && z - x >= -side &&
-               z + x >= -side && z - f.aspect * y >= -vertical && z + f.aspect * y >= -vertical;
+        // Side planes x = +-h z and y = +-v z (horizontal_projection_scale's field).
+        const double h = 1.0 / horizontal_projection_scale(float(f.aspect)), v = h / f.aspect;
+        const double side = radius * std::sqrt(1 + h * h), vertical = radius * std::sqrt(1 + v * v);
+        return std::isfinite(radius) && z + radius >= f.near && z - radius <= f.far && h * z - x >= -side &&
+               h * z + x >= -side && v * z - y >= -vertical && v * z + y >= -vertical;
     }
     void WorldPipelines::release()
     {
@@ -370,7 +372,9 @@ namespace OpenBlood2
             clear_geometry();
             textures_ = std::move(handles);
             texture_paths_ = std::move(paths);
-            if (!(sampler_ = registry_->sampler(style_ == DrawStyle::SpriteAlpha, error)) ||
+            if (!(sampler_ = (style_ == DrawStyle::SpriteAlpha
+                                  ? (point_sprites ? registry_->sampler(true, error) : registry_->sprite_sampler(error))
+                                  : registry_->sampler(false, error))) ||
                 !(lightmap_sampler_ = registry_->lightmap_sampler(error)) ||
                 !(shadow_sampler_ = registry_->sampler(true, error)) || !upload_vertices(mesh, error) ||
                 !registry_->refresh_textures(mesh.materials, textures_, texture_paths_, error) || !textures_[0] ||

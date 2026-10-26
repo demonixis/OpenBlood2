@@ -34,6 +34,25 @@ namespace OpenBlood2
             IM_COL32(0, 0, 0, alpha));
         return true;
     }
+    bool draw_letterbox(bool letterbox)
+    {
+        if (!letterbox)
+            return false;
+        // The scene pass clears to the fog colour; the original letterbox rows are black. Cover
+        // the presenter's integer height / 6 pixel rows (ScenePresenter::record) in UI units.
+        const auto& io = ImGui::GetIO();
+        const auto* viewport = ImGui::GetMainViewport();
+        const float density = io.DisplayFramebufferScale.y > 0 ? io.DisplayFramebufferScale.y : 1.f;
+        const float pixels = std::round(viewport->Size.y * density);
+        const float bar = std::floor(pixels / 6) / density;
+        if (!(bar > 0))
+            return false;
+        auto* list = ImGui::GetBackgroundDrawList();
+        const ImVec2 min = viewport->Pos, max{viewport->Pos.x + viewport->Size.x, viewport->Pos.y + viewport->Size.y};
+        list->AddRectFilled(min, {max.x, min.y + bar}, IM_COL32(0, 0, 0, 255));
+        list->AddRectFilled({min.x, max.y - bar}, max, IM_COL32(0, 0, 0, 255));
+        return true;
+    }
     void draw_touch_controls(const TouchControls& touch)
     {
         const auto* viewport = ImGui::GetMainViewport();

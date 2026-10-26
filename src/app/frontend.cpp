@@ -16,6 +16,7 @@
 #include "app/setup_screen.h"
 #include "app/ui_runtime.h"
 #include "engine/capture.h"
+#include "engine/user_directory.h"
 #include "game/menu_audio.h"
 #include "game/menu_preferences.h"
 #if BLOOD2_INSPECTOR
@@ -183,9 +184,21 @@ namespace OpenBlood2
                      std::string& refusal)
         {
             std::string error;
+            // Ordinary play reports a fatal stop in a dialog; it used to close without any message.
+            const bool interactive = !options.menu_smoke && !options.demo_smoke && options.capture_file.empty() &&
+                                     !options.frame_limit && !xr;
             auto failed = [&](int code)
             {
                 spdlog::error("Frontend: {}", error);
+                if (interactive)
+                {
+                    std::filesystem::path logs;
+                    std::string ignored;
+                    const auto where = user_directory(logs, ignored) ? path_text(logs / "logs") : "the user directory";
+                    const auto text = "OpenBlood2 stopped: " + error + "\n\nThe session log in " + where +
+                                      " has the details. Please include it when reporting this problem.";
+                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "OpenBlood2", text.c_str(), runtime.window);
+                }
                 return code;
             };
 #if BLOOD2_XR
@@ -1072,9 +1085,14 @@ namespace OpenBlood2
                     {
                         spdlog::error("Simulation failed: world={}, frame={}, delta={}, time={}", game->world_path,
                                       frames, delta, game->objects.time());
+                        error = "Simulation step failed in " + game->world_path;
+                        unsigned shown = 0;
                         for (const auto& diagnostic : game->step_errors())
+                        {
                             spdlog::error("{}", diagnostic);
-                        error = "Simulation step failed";
+                            if (shown++ < 3)
+                                error += "\n" + diagnostic;
+                        }
                         return failed(4);
                     }
                     if (std::exchange(game->client_shell.world_exit.demo_end_pending, false))
@@ -1204,9 +1222,13 @@ namespace OpenBlood2
                     // The original rolls credits inside Start3D/End3D, below fades and the status bar.
                     if (game->client_shell.m_bInWorld && game->client_shell.m_bRollCredits)
                         draw_credits(game->client_shell.m_Credits);
-                    if (!xr_mode) // XR fades the scene, not the head-locked canvas.
-                        draw_screen_fade(game->client_shell.fade.Scale(), game->client_shell.m_bInWorld);
                     const auto& client = game->client_shell;
+                    if (!xr_mode) // XR has no letterbox and fades the scene, not the head-locked canvas.
+                    {
+                        draw_letterbox(client.m_bInWorld && presenter.render_world && client.view.object &&
+                                       client.view.settings.type == 1);
+                        draw_screen_fade(client.fade.Scale(), client.m_bInWorld);
+                    }
                     // XR aims with the controller (laser and reticle): no screen-centred crosshair.
                     auto state = hud_state(client.stats, client.m_bInWorld, client.view.object != nullptr,
                                            client.death_camera.active, client.m_bShowCrosshair && !xr_mode,

@@ -273,7 +273,9 @@ namespace OpenBlood2
             if (ec || !overlay.is_absolute() || !resource_path(path_text(canonical.filename()), name) ||
                 !name.ends_with(".rez") || name == "blood2nm.rez")
             {
-                error = "Mod must be a data-only REZ archive; Nightmares is unsupported";
+                error = name == "blood2nm.rez" ? "The Nightmares expansion needs its own game code and is not "
+                                                 "supported yet"
+                                               : "Mod must be a data-only REZ archive";
                 return false;
             }
             for (const auto& previous : mounted)
@@ -296,7 +298,11 @@ namespace OpenBlood2
             for (const auto& [key, resource] : check.index())
             {
                 (void)resource;
-                if (key.ends_with(".dll") || key.ends_with(".exe"))
+                // A root cres.dll only carries string/bitmap resources, read through the bounded
+                // PE resource reader and never executed (B2K5 replaces it). Code stays refused.
+                if (key == "cres.dll")
+                    continue;
+                if (key.ends_with(".dll") || key.ends_with(".exe") || key.ends_with(".lto"))
                 {
                     error = "Mods with game code are unsupported: " + key;
                     return false;

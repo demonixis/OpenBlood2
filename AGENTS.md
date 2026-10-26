@@ -16,9 +16,18 @@ The [2026-10-25 tester corrections](Documentation/implementation/reports/tester_
 allow mutually GOTHRUWORLD kinematic brushes to rotate past one another while
 preserving other rotation blockers, suppress scripted/death-camera player look
 (except player-aimed Eye/Orb), and
-use trilinear 8x anisotropic filtering for repeat scene textures. Clamped sprite/FX
-and UI sampling stay unchanged. The [class inventory](Documentation/contracts/class_coverage.md)
+use trilinear 8x anisotropic filtering for repeat scene textures. Sprite/FX textures
+use a trilinear clamped sampler (0.5.0 tester corrections); UI sampling stays unchanged. The [class inventory](Documentation/contracts/class_coverage.md)
 is not a diagnosis of the unreproduced Museum crash.
+
+The [2026-10-26 tester corrections](Documentation/implementation/reports/tester_feedback_2026_10_26.md)
+(version 0.5.0) let a body move out of another object's world model it starts inside
+(Museum skylight spawns; primary world, characters and a second model still refuse),
+show fatal frontend errors in a dialog, use Hor+ projection anchored on 4:3
+(`horizontal_projection_scale`, unchanged at 4:3), draw black letterbox bars, keep
+world fog in fog-off volumes, keep the centre when resizing gravity-free bodies and
+accept a mod's resource-only `cres.dll`. Activation visibility (undecoded DAT
+visibility lists), Chosen/ACTION mode and Nightmares remain open.
 
 The [additional original controls](Documentation/contracts/input_action_contracts.md#additional-original-controls-2026-10-25)
 now implement all nine formerly disabled rows. Preserve their initially unbound defaults,

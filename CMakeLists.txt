@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.28)
 if(POLICY CMP0168)
     cmake_policy(SET CMP0168 NEW)
 endif()
-project(Blood2 VERSION 0.4.0 LANGUAGES C CXX)
+project(Blood2 VERSION 0.5.0 LANGUAGES C CXX)
 if(APPLE)
     enable_language(OBJCXX) # The setup screen's NSURLSession download.
 endif()

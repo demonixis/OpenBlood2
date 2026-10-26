@@ -54,8 +54,11 @@ menus still render after the scene. XR uses the same scene code without post-pro
 ## Fog
 
 The first containing volume wins, including a hidden volume preventing a later one
-from taking precedence. A visible VolumeBrush overrides world fog, even when its own
-fog switch is off. Outside it, the stored `FogEnable`, `FogNearZ`, `FogFarZ`, `FogR/G/B`
+from taking precedence. A visible VolumeBrush with its own fog replaces world fog.
+Departure (2026-10-26): the original also turned the fog off inside a visible fog-off
+volume, so CityHub's escalator `Conveyor` volumes switched its teal world fog off
+underfoot, which testers reported as a shading bug. A fog-off volume now keeps the
+current fog. Outside it, the stored `FogEnable`, `FogNearZ`, `FogFarZ`, `FogR/G/B`
 values resume. Parameters truncate to integers as the original client console writes
 did; color is clamped to 0–255 and an invalid/empty interval is explicitly refused.
 The linear factor uses view-forward depth, not radial distance. Each view evaluates

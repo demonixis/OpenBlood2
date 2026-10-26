@@ -224,6 +224,7 @@ namespace
         auto* a = actor(g);
         CHECK(a);
         auto* r = g.objects.get(a->m_hObject);
+        r->state.m_Flags |= FLAG_GRAVITY; // Grounded actors keep their feet.
         a->m_vScale = {2, 2, 2};
         CHECK(a->SetAnimation(1));
         CHECK(near(r->dimensions.y, 8) && near(r->state.m_Pos.y, 12) && near(a->m_vDims.y, 8));
@@ -262,6 +263,11 @@ namespace
         a->m_vScale = {3, 3, 3};
         CHECK(a->SetAnimation(3) && !a->animation_blocked && near(r->dimensions.y, 12));
         CHECK(near(r->state.m_Pos.y, before.y + 4) && a->animation_resize_blocks == 1);
+        // Without FLAG_GRAVITY (Gideon hovers) the original SetObjectDims2 keeps the centre.
+        r->state.m_Flags &= ~FLAG_GRAVITY;
+        const auto centre = r->state.m_Pos;
+        a->m_vScale = {2, 2, 2};
+        CHECK(a->SetAnimation(1) && near(r->dimensions.y, 8) && near(r->state.m_Pos.y, centre.y));
         return true;
     }
     bool resize_callback(const char*)

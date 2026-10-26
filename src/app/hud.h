@@ -54,6 +54,8 @@ namespace OpenBlood2
         bool upload(std::string& error);
     };
     bool draw_screen_fade(float scale, bool in_world);
+    // Black rows over a letterbox camera's top and bottom sixth (the scene clears to the fog colour).
+    bool draw_letterbox(bool letterbox);
     // The last drawn CCredit, centered in the 640x480 menu viewport. Replacement font:
     // Dear ImGui's embedded default instead of the original GDI Arial request.
     bool draw_credits(const CCredits&);

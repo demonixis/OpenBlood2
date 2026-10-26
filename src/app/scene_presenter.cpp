@@ -770,9 +770,9 @@ namespace OpenBlood2
         PostView post_view;
         post_view.top = float(letterbox ? height / 6 : 0);
         post_view.height = float(height) - 2 * post_view.top;
-        const float zoom = original_fov_scale(game.client_shell.ViewFovX());
-        post_view.projection = {zoom, zoom * float(width) / std::max(post_view.height, 1.f),
-                                world_far / (world_far - world_near),
+        const float aspect = float(width) / std::max(post_view.height, 1.f);
+        const float zoom = original_fov_scale(game.client_shell.ViewFovX()) * horizontal_projection_scale(aspect);
+        post_view.projection = {zoom, zoom * aspect, world_far / (world_far - world_near),
                                 -world_near * world_far / (world_far - world_near)};
         post_view.slice = view_model_depth;
         if (!post_process.finish(commands, target, post_view, error))

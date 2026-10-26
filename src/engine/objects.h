@@ -144,6 +144,8 @@ namespace OpenBlood2
         std::uint64_t stair_attempts = 0, stair_steps = 0, overlap_contacts = 0;
         // Initially overlapped faces a MoveObject did not go deeper into.
         std::uint64_t start_departures = 0;
+        // Moves that passed out of another object's world model (brush, mover) they started inside.
+        std::uint64_t brush_start_passes = 0;
         // Bounded initial placement corrections (world faces or overlapping characters).
         DVector placement_nudge{};
         std::uint32_t placement_nudges = 0;
@@ -205,8 +207,8 @@ namespace OpenBlood2
     struct RestoreCreation
     {
         bool scheduled = false;
-        double remaining = 0;     // Seconds; zero for an overdue deadline.
-        DRotation basis{};        // World models: authored basis the base shell is built with.
+        double remaining = 0; // Seconds; zero for an overdue deadline.
+        DRotation basis{};    // World models: authored basis the base shell is built with.
     };
 
     class Objects

@@ -7,10 +7,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 - Rebindable first/third-person camera toggle (C), with obstacle clearance and the crosshair retained; disabled in VR.
+- Error dialog naming the cause and the log folder when the game has to stop, instead of closing silently.
+
+### Changed
+
+- Widescreen view keeps the 4:3 vertical field of view and widens the horizontal one, so the view weapon is no longer cut off.
+- Smooth filtering for sprites and effects (muzzle flashes, blood pools).
+- Data mods may replace `cres.dll` (read as resources, never run).
+- CityHub escalators no longer switch the world fog off underfoot.
 
 ### Fixed
 
 - M16 grenade simulation failure when a living enemy overlaps it before its first bounce.
+- Museum crash after Gideon's last hologram, when enemies spawn into the skylight glass.
+- Fog-coloured instead of black letterbox bars during cutscenes.
+- Hovering characters such as Gideon drifting up or down when their animation changes size.
 
 ## [0.4.0] - 2026-10-25
 

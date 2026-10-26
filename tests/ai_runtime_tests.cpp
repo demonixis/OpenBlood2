@@ -235,7 +235,7 @@ namespace
               near(a->animation_requested_dims.y, 8));
         CHECK(g.objects.remove(ceiling) && g.objects.finish_frame());
         CHECK(a->SetAnimation(0) && a->SetAnimation(1) && near(r->dimensions.y, 8));
-        CHECK(near(r->state.m_Pos.y, position.y + 6));
+        CHECK(near(r->state.m_Pos.y, position.y)); // No FLAG_GRAVITY: the centre stays (SetObjectDims2).
         CHECK(g.objects.remove(h) && !a->SetAnimation(0));
         CHECK(g.objects.finish_frame() && !g.objects.get(h));
         return true;

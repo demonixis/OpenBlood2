@@ -265,8 +265,12 @@ within-level sampling, linear mip interpolation and 8x anisotropy. The shared
 sampler previously used nearest filtering with isotropic mip selection, which
 lost grazing-angle Beretta detail even though the full 256x256 skin and all four
 stored levels were uploaded. No LOD bias, mip removal, resampling or asset edit
-is applied. Clamped sprite/FX sampling, UI fonts/art and lightmap/normal samplers
-are unchanged. Both ORIGINAL and ENHANCED use the corrected diffuse sampler;
+is applied. UI fonts/art and lightmap/normal samplers are unchanged. Sprite/FX
+textures (the `SpriteAlpha` world and model passes) moved on 2026-10-26 from the
+clamped point sampler to their own trilinear clamped sampler, as the original
+Direct3D renderer filtered them; testers reported blocky muzzle flashes and blood
+pools. Each DTX is its own texture, so clamping keeps neighbouring frames from
+bleeding. The shadow atlas and post-processing taps keep the clamped point sampler. Both ORIGINAL and ENHANCED use the corrected diffuse sampler;
 this deliberately changes their texture sampling against earlier captures, while
 the two shader sets and their equivalence when effects are disabled are preserved.
 No shader artifact regeneration is needed. Metal is verified; Windows/Vulkan

@@ -252,6 +252,9 @@ namespace OpenBlood2
         {
         }
         ~WorldRenderer();
+        // SpriteAlpha only: nearest texels instead of the trilinear sprite sampler. Set before
+        // the first prepare(); pixel tests that check exact texel colours use it.
+        bool point_sprites = false;
         WorldRenderer(const WorldRenderer&) = delete;
         WorldRenderer& operator=(const WorldRenderer&) = delete;
         // Stages geometry/material uploads in the registry. An owned registry is flushed into

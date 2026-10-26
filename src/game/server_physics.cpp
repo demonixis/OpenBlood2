@@ -21,7 +21,7 @@ namespace OpenBlood2
         {
             constexpr float skin = 0.01f;
             return (r.state.m_Flags & FLAG_STAIRSTEP) && (r.state.m_Flags & FLAG_SOLID) && half > skin ? skin * .5f
-                                                                                                         : 0.f;
+                                                                                                       : 0.f;
         }
     } // namespace
     bool ServerAdapter::CollectObjectsTouchingSphere(DVector center, float radius, std::vector<HOBJECT>& output)
@@ -106,11 +106,17 @@ namespace OpenBlood2
         // Local SetAnimation/ResetDims replacement. Preserve the feet and test
         // the entire requested shape before committing. No partial resize or
         // pushing other objects; a blocked clip keeps its position and clock.
+        // The original SetObjectDims2 keeps the centre (later LithTech
+        // ChangeObjectDimensions); gravity bodies and the player settle back onto
+        // the same feet, so the foot anchor is equivalent for them. Bodies without
+        // FLAG_GRAVITY (Gideon, Zealot, Thief...) never resettle and keep the centre,
+        // otherwise every clip change moved a hovering boss up or down.
         auto position = r->state.m_Pos;
-        position.y += dimensions.y - r->dimensions.y;
+        if ((r->state.m_Flags & FLAG_GRAVITY) || r->client_movement)
+            position.y += dimensions.y - r->dimensions.y;
         const float skin = head_skin(*r, dimensions.y);
-        const DVector box{dimensions.x, dimensions.y - skin, dimensions.z}, center{position.x, position.y - skin,
-                                                                                    position.z};
+        const DVector box{dimensions.x, dimensions.y - skin, dimensions.z},
+            center{position.x, position.y - skin, position.z};
         CollisionHit hit;
         const auto query = sweep_scene(h, center, center, box, hit, objects_.snapshot());
         if (query == CollisionQuery::Invalid)
@@ -354,13 +360,15 @@ namespace OpenBlood2
         // (pickup, debris) may also slide along an authored overlap while settling.
         // See contact_overlap_contracts.md and collision_traversal_contracts.md.
         const auto start = (r->state.m_Flags & FLAG_SOLID) ? StartOverlap::Leave : StartOverlap::LeaveOrSlide;
+        // Another object's world model the body starts inside (see below).
+        HOBJECT passed = nullptr;
         for (unsigned iteration = 0; iteration < 4; ++iteration)
         {
             auto end = vector_add(position, remaining);
             CollisionHit nearest;
             auto query =
                 (r->state.m_Flags & FLAG_SOLID)
-                    ? sweep_body(position, end, nearest, nullptr, allowed_penetration, start)
+                    ? sweep_body(position, end, nearest, passed, allowed_penetration, start)
                     : ((r->state.m_Flags & FLAG_GRAVITY) && !(r->state.m_Flags & FLAG_GOTHRUWORLD)
                            ? collision->sweep(position, end, r->dimensions, nearest, allowed_penetration, start)
                            : CollisionQuery::Miss);
@@ -377,6 +385,16 @@ namespace OpenBlood2
                 r->last_overlap_depth = static_cast<float>(nearest.penetration);
             }
             auto* obstacle = found ? objects_.get(nearest.object) : nullptr;
+            // Replacement policy: a body created or left inside another object's world model
+            // (03_Museum's Trigger3 spawns Fanatics into the skylight glass it destroys at the
+            // same instant) moves through that model instead of failing the simulation. The
+            // primary world, characters and a second overlapping model still refuse.
+            if (found && nearest.start_solid && !passed && obstacle && obstacle->world_model && obstacle != r)
+            {
+                passed = obstacle->handle;
+                ++r->brush_start_passes;
+                continue;
+            }
             if (found && !nearest.start_solid && std::abs(nearest.normal.y) < .01f && obstacle &&
                 (obstacle->world_body || obstacle->model_body) && obstacle->body_properties.pushable &&
                 r->blocking_priority > obstacle->blocking_priority)
@@ -446,10 +464,9 @@ namespace OpenBlood2
                 auto down = across;
                 down.y = position.y - 0.02f;
                 if (lift != CollisionQuery::Invalid && !(lift == CollisionQuery::Hit && probe.start_solid) &&
-                    up.y > position.y + 0.001f &&
-                    sweep_body(up, across, probe) == CollisionQuery::Miss &&
-                    sweep_body(across, down, landing) == CollisionQuery::Hit &&
-                    !landing.start_solid && landing.normal.y >= 0.5f && landing.point.y > position.y + 0.001f &&
+                    up.y > position.y + 0.001f && sweep_body(up, across, probe) == CollisionQuery::Miss &&
+                    sweep_body(across, down, landing) == CollisionQuery::Hit && !landing.start_solid &&
+                    landing.normal.y >= 0.5f && landing.point.y > position.y + 0.001f &&
                     landing.point.y - position.y <= height + 0.001f)
                 {
                     for (auto id : ids)
