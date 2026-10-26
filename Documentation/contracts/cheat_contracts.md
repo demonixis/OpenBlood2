@@ -36,9 +36,11 @@ both off. The demo offers the same rows; see the [demo menu](demo_menu_contracts
 
 - `CMSG_CHEAT` is the typed `PlayerCheat{code, state}`; `CBloodClientShell::SendCheatMessage`
   sends it only while in a world, and `CBloodServerShell` gives it to the client's player.
-- No cheat applies unless `GAME_GAMETYPE` is `GAMETYPE_SINGLE` (the source `IsMultiplayerGame`
-  test): action mode and the custom Credits game refuse. A refused god-mode request is not resent
-  for the same player and state.
+- No cheat applies in a network game: the source `IsMultiplayerGame` test reads the server shell's
+  NetGame type (`ServerDE::net_game_type`), which every local game leaves single player. Story,
+  Chosen (`GAMETYPE_ACTION`) and custom games, Credits included, accept cheats like the original
+  (the client's Cheats menu also follows the network game mode). A refused god-mode request is not
+  resent for the same player and state.
 - KFA keeps the source order: `SetFullAmmo`, then for each of Beretta, submachine gun, shotgun,
   assault rifle, life leech, Tesla cannon, orb, voodoo doll, death ray, minigun, napalm cannon and
   sniper rifle not yet held (`HasWeapon`, right hand only), `ObtainWeapon` into the first free slot
@@ -70,9 +72,10 @@ both off. The demo offers the same rows; see the [demo menu](demo_menu_contracts
 - The LEVEL list is every mounted `worlds/*.dat` outside `worlds/multi/`, in file order: the 36
   single-player worlds of the retail data, Demo_01 and Demo_02 in the demo. The row follows the
   current world.
-- GO TO LEVEL is a new game (`GAMETYPE_SINGLE`) with the current character, at the current
-  difficulty (medium outside a world), through the ordinary loading screen. It does not carry the
+- GO TO LEVEL is a new game (`GAMETYPE_SINGLE`, or `GAMETYPE_ACTION` from inside a Chosen game)
+  with the current character, at the current difficulty (medium outside a world), through the ordinary loading screen. It does not carry the
   inventory across (the original demo-only `SUPERZUG` used a NEW_LEVEL load).
 
 Tests: `menus.state` (page, gating, preferences flow), `menus.preferences` (version 6) and the
-private `menus.cheats` (each branch on SubwayA, the warp to CityHub, the Credits refusal).
+private `menus.cheats` (each branch on SubwayA, the warp to CityHub, Credits accepting cheats and a
+synthetic network type refusing them).

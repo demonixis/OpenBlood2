@@ -680,8 +680,15 @@ namespace
         flow.update(*game, menu);
         player = game->server_shell.Player(game->local_client);
         CHECK(menu.levels[std::size_t(menu.level)] == "02_cityhub" && player && player->m_damage.m_bGodMode);
-        // No cheats outside GAMETYPE_SINGLE (IsMultiplayerGame), and a refusal is not repeated.
+        // Cheats follow the server shell's NetGame type (IsMultiplayerGame): a local custom game
+        // allows them like story and Chosen games.
         CHECK(GameSession::start_new_game(game, "Credits", DIFFICULTY_MEDIUM, 0, error, false, GAMETYPE_CUSTOM));
+        flow.update(*game, menu);
+        player = game->server_shell.Player(game->local_client);
+        CHECK(player && player->m_damage.m_bGodMode && player->cheats_refused == 0);
+        // A network type refuses them (synthetic NetGame type), and a refusal is not repeated.
+        CHECK(GameSession::start_new_game(game, "Credits", DIFFICULTY_MEDIUM, 0, error, false, GAMETYPE_CUSTOM));
+        game->server.set_game_settings(DIFFICULTY_MEDIUM, GAMETYPE_BLOODBATH);
         const auto sent = flow.sent;
         flow.update(*game, menu);
         flow.update(*game, menu);
@@ -1001,8 +1008,10 @@ namespace
         CHECK(!start_menu_world(game, start, error) && !error.empty() && game.get() == previous);
         WorldMessage message;
         WorldRequest request;
-        CHECK(original_world_request("Credits", GAMETYPE_CUSTOM, LOADTYPE_NEW_LEVEL, 1, message));
+        CHECK(original_world_request("Credits", GAMETYPE_BLOODBATH, LOADTYPE_NEW_GAME, 1, message));
         CHECK(!parse_world_request(message, request, error));
+        CHECK(original_world_request("Credits", GAMETYPE_CUSTOM, LOADTYPE_NEW_LEVEL, 1, message));
+        CHECK(parse_world_request(message, request, error)); // StartNewWorld(m_nGameType, NEW_LEVEL).
         CHECK(original_world_request("Credits", GAMETYPE_CUSTOM, LOADTYPE_NEW_GAME, 1, message));
         CHECK(parse_world_request(message, request, error) && request.filename == "worlds/credits.dat");
         CHECK(start_menu_world(game, menu_world_start(*game, command, "01_SubwayA"), error));

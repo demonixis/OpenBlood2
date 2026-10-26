@@ -1,4 +1,5 @@
 #include "game/server_adapter.h"
+#include "game/game_settings.h"
 #include <algorithm>
 #include <charconv>
 #include <cmath>
@@ -483,6 +484,8 @@ namespace OpenBlood2
         }
         variables_["GAME_DIFFICULTY"].text = std::to_string(difficulty);
         variables_["GAME_GAMETYPE"].text = std::to_string(type);
+        // Only a network start carries a NetGame (see ServerDE::net_game_type).
+        net_game_type = local_game_type(type) ? 0 : static_cast<DBYTE>(type);
     }
     DRESULT ServerAdapter::SetGlobalForce(DVector* v)
     {

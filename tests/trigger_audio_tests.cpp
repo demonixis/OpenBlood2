@@ -161,9 +161,11 @@ namespace
         t->locked = true;
         t->unlocked_sound = "cue.wav";
         CHECK(send(g, h, "UNLOCK", nullptr) && !t->locked && t->sound_failures == 3 && !t->last_voice);
+        // Action mode shows IDS_GENERAL_UNLOCKED on g_pPlayerObj's console instead of the sound;
+        // without a local player nothing is shown or played (chosen_mode.continuation).
         g.server.set_game_settings(1, GAMETYPE_ACTION);
         CHECK(send(g, h, "LOCK", sender) && send(g, h, "UNLOCK", sender) && !t->locked);
-        CHECK(t->sound_failures == 4 && t->sound_error.find("Action-mode") != std::string::npos);
+        CHECK(t->sound_failures == 3 && t->sound_error.empty() && !t->console_feedback);
         CHECK(g.server.audio.voices().empty() && !t->sound_starts);
         g.server.set_game_settings(1, GAMETYPE_SINGLE);
         t->sound_radius = 100;
@@ -174,7 +176,7 @@ namespace
         }
         t->SetActive(true);
         CHECK(send(g, h, "TRIGGER", sender) && !t->active && !t->last_voice);
-        CHECK(t->sound_starts == 128 && t->sound_failures == 5 && g.server.audio.voices().size() == 128);
+        CHECK(t->sound_starts == 128 && t->sound_failures == 4 && g.server.audio.voices().size() == 128);
         CHECK(g.unload_world() && g.server.audio.voices().empty());
         return true;
     }

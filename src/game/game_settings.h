@@ -13,6 +13,13 @@ enum GameType
     GAMETYPE_ACTION,
     GAMETYPE_CUSTOM
 };
+// The game types the original client starts locally (STARTGAME_NORMAL, no NetGame): story
+// single player, Single Player > CHOSEN (CMenuDifficulty::StartGame) and custom levels. The
+// server shell treats all three as single player (ServerDE::net_game_type); saves accept them.
+constexpr bool local_game_type(unsigned type)
+{
+    return type == GAMETYPE_SINGLE || type == GAMETYPE_ACTION || type == GAMETYPE_CUSTOM;
+}
 enum SaveType
 {
     SAVETYPE_AUTO = 0,

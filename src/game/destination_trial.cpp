@@ -1,3 +1,4 @@
+#include "game/game_settings.h"
 #include "game/original/AI_Mgr.h"
 #include "game/original/AmmoPickups.h"
 #include "game/original/CameraObj.h"
@@ -38,16 +39,19 @@ namespace OpenBlood2
         if (!parse_world_request(message, request, error) || !capture_player(player, error))
             return fail();
         next.destination = request.filename;
-        // NEW_LEVEL preserves the current difficulty, unlike a fresh-game request.
+        // NEW_LEVEL preserves the current difficulty and game type, unlike a fresh-game request.
         const float difficulty = server.GetVarValueFloat(server.GetGameConVar("GAME_DIFFICULTY"));
-        if (!std::isfinite(difficulty) || difficulty < 0 || difficulty > 3 || std::floor(difficulty) != difficulty)
+        const float game_type = server.GetVarValueFloat(server.GetGameConVar("GAME_GAMETYPE"));
+        if (!std::isfinite(difficulty) || difficulty < 0 || difficulty > 3 || std::floor(difficulty) != difficulty ||
+            !std::isfinite(game_type) || game_type < 0 || std::floor(game_type) != game_type ||
+            !local_game_type(static_cast<unsigned>(game_type)))
         {
-            error = "Invalid current difficulty for destination rehearsal";
+            error = "Invalid current difficulty or game type for destination rehearsal";
             return fail();
         }
         WorldMessage fresh;
-        if (!original_world_request(request.filename.c_str(), 0, LOADTYPE_NEW_GAME, static_cast<DBYTE>(difficulty),
-                                    fresh))
+        if (!original_world_request(request.filename.c_str(), static_cast<DBYTE>(game_type), LOADTYPE_NEW_GAME,
+                                    static_cast<DBYTE>(difficulty), fresh))
         {
             error = "Invalid normalized destination request";
             return fail();

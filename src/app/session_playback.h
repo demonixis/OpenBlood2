@@ -52,15 +52,26 @@ namespace OpenBlood2
     // Original MenuNewGame/MenuCredits world requests for a NewGame/Credits menu command.
     // MenuCredits (outside a world) is StartNewGame("Credits", GAMETYPE_CUSTOM, DIFFICULTY_MEDIUM)
     // with the current configured character: it never calls SetCharacterInfo, so the last
-    // entered profile (Caleb before any game) is kept.
+    // entered profile (Caleb before any game) is kept. Single Player > STORY is GAMETYPE_SINGLE
+    // as Caleb; Single Player > CHOSEN is CMenuDifficulty::StartGame's GAMETYPE_ACTION for every
+    // character, Caleb included, whose TypeActionMode=false objects (cut scenes) never start.
     inline MenuWorldStart menu_world_start(const GameSession& game, const MenuCommand& command, const char* first_level)
     {
         if (command.action == MenuAction::Credits)
             return {"Credits", DIFFICULTY_MEDIUM, game.client_shell.entry_profile.character, GAMETYPE_CUSTOM};
-        // The replacement Cheats warp: the owner fills the character and difficulty.
+        // The replacement Cheats warp: the owner fills the character and difficulty; a warp from
+        // inside a Chosen game stays a Chosen game.
         if (command.action == MenuAction::Warp)
-            return {command.world.c_str(), DBYTE(command.difficulty), DBYTE(command.character), GAMETYPE_SINGLE};
-        return {first_level, DBYTE(command.difficulty), DBYTE(command.story ? 0 : command.character), GAMETYPE_SINGLE};
+        {
+            const bool action =
+                game.client_shell.m_bInWorld &&
+                game.server.GetVarValueFloat(game.server.GetGameConVar("GAME_GAMETYPE")) == float(GAMETYPE_ACTION);
+            return {command.world.c_str(), DBYTE(command.difficulty), DBYTE(command.character),
+                    DBYTE(action ? GAMETYPE_ACTION : GAMETYPE_SINGLE)};
+        }
+        if (command.story)
+            return {first_level, DBYTE(command.difficulty), 0, GAMETYPE_SINGLE};
+        return {first_level, DBYTE(command.difficulty), DBYTE(command.character), GAMETYPE_ACTION};
     }
     inline bool start_menu_world(std::unique_ptr<GameSession>& game, const MenuWorldStart& start, std::string& error)
     {

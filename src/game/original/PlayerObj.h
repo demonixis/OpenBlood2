@@ -117,6 +117,9 @@ class CPlayerObj : public CBaseCharacter
     bool PlayVoiceUniqueEventOnClient(int event);
     void PlayWeaponVoiceSoundOnClient(int weapon);
     static CPlayerObj* LocalVoicePlayer(); // Checked replacement for the source single-player global.
+    // Original SendConsoleMessage: SMSG_CONSOLEMESSAGE, CSPrint2 into the client's message lines.
+    bool SendConsoleMessage(const std::string& text);
+    std::uint64_t console_messages = 0;
     void UpdateDamageVoice();
     std::uint32_t m_nLastHitPoints = 0, m_nLastDamage = 0;
     int damage_voice_roll = -1, damage_voice_event = -1;

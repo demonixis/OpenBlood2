@@ -175,7 +175,7 @@ DDWORD CGib::EngineMessageFn(DDWORD msg, void* data, DFLOAT reason)
                 error = "CGib kickable dimensions unavailable";
         }
         s->SetObjectUserFlags(m_hObject, s->GetObjectUserFlags(m_hObject) | (surface << 24));
-        if (GetGameType() != GAMETYPE_SINGLE)
+        if (s->IsMultiplayerGame())
             remove_time = s->GetTime() + 29.9f;
         s->SetNextUpdate(m_hObject, .1f);
     }
@@ -260,7 +260,7 @@ bool CGib::Update()
             angles.x = snap(angles.x);
         if (axis == 3)
             angles.z = snap(angles.z);
-        s->SetNextUpdate(m_hObject, GetGameType() != GAMETYPE_SINGLE ? .01f : 0.f);
+        s->SetNextUpdate(m_hObject, s->IsMultiplayerGame() ? .01f : 0.f);
     }
     else
     {

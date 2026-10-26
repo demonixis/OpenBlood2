@@ -8,7 +8,7 @@
 bool CPlayerObj::PlayVoiceGroupEventOnClient(int event, bool single_player_only)
 {
     auto* server = GetServerDE();
-    if (single_player_only && server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) != GAMETYPE_SINGLE)
+    if (single_player_only && server->IsMultiplayerGame())
         return false;
     const bool sent = server->SendToClient(m_hClient, OpenBlood2::VoiceEvent{true, m_nCharacter, event}) == DE_OK;
     if (sent)
@@ -20,7 +20,7 @@ bool CPlayerObj::PlayVoiceGroupEventOnClient(int event, bool single_player_only)
 bool CPlayerObj::PlayVoiceUniqueEventOnClient(int event)
 {
     auto* server = GetServerDE();
-    if (server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) != GAMETYPE_SINGLE)
+    if (server->IsMultiplayerGame())
         return false;
     const bool sent = server->SendToClient(m_hClient, OpenBlood2::VoiceEvent{false, m_nCharacter, event}) == DE_OK;
     if (sent)
@@ -32,7 +32,7 @@ bool CPlayerObj::PlayVoiceUniqueEventOnClient(int event)
 void CPlayerObj::PlayWeaponVoiceSoundOnClient(int weapon)
 {
     auto* server = GetServerDE();
-    if (server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) != GAMETYPE_SINGLE)
+    if (server->IsMultiplayerGame())
         return;
     int unique = -1;
     switch (weapon)
@@ -69,6 +69,14 @@ void CPlayerObj::PlayWeaponVoiceSoundOnClient(int weapon)
         PlayVoiceGroupEventOnClient(9, true);
 }
 
+bool CPlayerObj::SendConsoleMessage(const std::string& text)
+{
+    // The typed local line replaces the msgbuf copy; the client bounds it like CSPrint2's lines.
+    if (GetServerDE()->SendToClient(m_hClient, OpenBlood2::PlayerText{text}) != DE_OK)
+        return false;
+    ++console_messages;
+    return true;
+}
 CPlayerObj* CPlayerObj::LocalVoicePlayer()
 {
     auto* server = GetServerDE();

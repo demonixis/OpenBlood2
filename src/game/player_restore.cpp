@@ -17,9 +17,8 @@ namespace OpenBlood2
             };
             if (s.world.empty() || game.world_path.empty() ||
                 (mode == PlayerRestoreMode::SavedPosition && s.world != game.world_path) ||
-                !game.server.collision_ready || !game.server_shell.world_started ||
-                game.server.GetVarValueFloat(game.server.GetGameConVar("GAME_GAMETYPE")) != 0)
-                return fail("Player restoration requires a loaded single-player world; saved-position mode also "
+                !game.server.collision_ready || !game.server_shell.world_started || game.server.IsMultiplayerGame())
+                return fail("Player restoration requires a loaded local-game world; saved-position mode also "
                             "requires the same world");
             if (s.name.size() > 100 || s.name.find('\0') != std::string::npos)
                 return fail("Invalid saved player object name");

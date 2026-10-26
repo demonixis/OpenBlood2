@@ -123,8 +123,7 @@ DDWORD WeaponPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
     auto result = PickupObject::EngineMessageFn(message, data, reason);
     if (message == MID_INITIALUPDATE)
     {
-        if (g_pServerDE->GetVarValueFloat(g_pServerDE->GetGameConVar("GAME_GAMETYPE")) !=
-            static_cast<float>(GAMETYPE_SINGLE))
+        if (g_pServerDE->IsMultiplayerGame())
             g_pServerDE->RemoveObject(m_hObject);
         else
             g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 7));

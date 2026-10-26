@@ -19,17 +19,15 @@ namespace OpenBlood2
         output = {};
         error.clear();
         std::string normalized;
-        const bool custom = request.game_type == GAMETYPE_CUSTOM && request.load_type == LOADTYPE_NEW_GAME;
-        // A restore keeps the saved single-player game type (save_load_contracts "Scope").
-        const bool restore = request.load_type == LOADTYPE_RESTORESAVE &&
-                             (request.game_type == GAMETYPE_SINGLE || request.game_type == GAMETYPE_ACTION ||
-                              request.game_type == GAMETYPE_CUSTOM);
-        if ((request.game_type != GAMETYPE_SINGLE && !custom && !restore) || request.difficulty > 3 ||
-            (request.load_type != LOADTYPE_NEW_GAME && request.load_type != LOADTYPE_NEW_LEVEL && !restore) ||
+        // Local game types only: story, Chosen (action) and custom; a restore keeps the saved one
+        // (save_load_contracts "Scope").
+        if (!local_game_type(request.game_type) || request.difficulty > 3 ||
+            (request.load_type != LOADTYPE_NEW_GAME && request.load_type != LOADTYPE_NEW_LEVEL &&
+             request.load_type != LOADTYPE_RESTORESAVE) ||
             !resource_path(request.filename, normalized) || normalized != request.filename ||
             !normalized.starts_with("worlds/") || !normalized.ends_with(".dat"))
         {
-            error = "World preparation requires a normalized single-player or custom NEW_GAME request";
+            error = "World preparation requires a normalized local-game NEW_GAME, NEW_LEVEL or restore request";
             return false;
         }
         PreparedWorld next;

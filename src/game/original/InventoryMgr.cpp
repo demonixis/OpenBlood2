@@ -459,8 +459,7 @@ InventoryResult CInventoryMgr::DropCurrentWeapon()
     ++drop_attempts;
     drop_error.clear();
     auto* server = BaseClass::GetServerDE();
-    if (server &&
-        server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) != static_cast<float>(GAMETYPE_SINGLE))
+    if (server && server->IsMultiplayerGame()) // Server shell GetGameType() != GAMETYPE_SINGLE.
     {
         drop_error = "Original weapon drops require single-player mode";
         return InventoryResult::NotAvailable;

@@ -34,8 +34,7 @@ void CPlayerObj::ProcessTriggerMsg(HMESSAGEREAD read, HOBJECT sender)
     else if (OpenBlood2::same_name(token, "sound"))
     {
         // strtok(NULL, "") preserves the suffix after exactly one consumed space.
-        if (server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) != GAMETYPE_SINGLE ||
-            end == std::string::npos || end + 1 == last_player_trigger.size())
+        if (server->IsMultiplayerGame() || end == std::string::npos || end + 1 == last_player_trigger.size())
             return;
         ++trigger_sound_requests;
         if (server->SendToClient(m_hClient, OpenBlood2::VoiceStop{}) == DE_OK)
@@ -134,8 +133,7 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
                            InventoryResult::Ok;
             else if (message == OpenBlood2::add_weapon_message)
             {
-                if (server->GetVarValueFloat(server->GetGameConVar("GAME_GAMETYPE")) !=
-                    static_cast<float>(GAMETYPE_SINGLE))
+                if (server->IsMultiplayerGame()) // Server shell GetGameType() != GAMETYPE_SINGLE.
                     return CBaseCharacter::ObjectMessageFn(sender, message, read);
                 auto result = m_InventoryMgr.ObtainWeapon(pickup.type);
                 if (result == InventoryResult::Ok)
