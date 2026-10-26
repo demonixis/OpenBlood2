@@ -1550,6 +1550,16 @@ namespace OpenBlood2
                     spdlog::info("Setup: {}", why);
             }
         }
+        // --nightmares also applies to a stored or portable choice (an explicit data folder already
+        // takes it through load_config); a refusal keeps the choice and says why.
+        const auto nightmares = [&](Config& config)
+        {
+            std::string why;
+            if (options.nightmares && !config.nightmares && !prefer_nightmares(config, why))
+                spdlog::warn("--nightmares ignored: {}", why);
+        };
+        if (next && by_setup)
+            nightmares(*next);
         std::string refusal;
         for (;;)
         {
@@ -1566,6 +1576,7 @@ namespace OpenBlood2
                 if (result != SetupScreen::Result::Play)
                     return failed(3);
                 next = setup.config();
+                nightmares(*next);
             }
             Config chosen;
             const int code = run_game(options, *next, runtime, ui, session, setup, by_setup, chosen, refusal);

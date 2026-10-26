@@ -29,8 +29,13 @@ not exist yet) in `app/setup_screen.{h,cpp}`, over the headless `app/game_setup.
 ## Installations
 
 An installation is a folder and an edition: retail with `BLOOD2.REZ`, Nightmares with
-`BLOOD2.REZ` and `BLOOD2NM.REZ` ([edition contracts](nightmares_edition_contracts.md); listed after
-retail, levels not ported yet), demo with `B2DEMO.REZ` (case-insensitive; a folder may list all). The list merges, without duplicates:
+`BLOOD2.REZ` and `BLOOD2NM.REZ` ([edition contracts](nightmares_edition_contracts.md)), demo with
+`B2DEMO.REZ` (case-insensitive). The Nightmares edition is not a row of its own: like the original
+launcher's "Launch Nightmares" box, it is a checkbox under its folder's The Chosen row (unchecked
+unless chosen), offered for every listed retail folder holding `BLOOD2NM.REZ` (detected, added or
+running). Checking it selects the Nightmares installation; it shares the folder's retail mods. An
+only playable installation is preselected as The Chosen, never as Nightmares. A portable copy keeps a
+stored Nightmares choice for its folder. The list merges, without duplicates:
 
 - folders the player added (desktop native folder picker, `SDL_DIALOG` on desktop only);
 - the running game's folder (from the menu);

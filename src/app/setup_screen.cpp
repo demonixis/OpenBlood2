@@ -132,13 +132,14 @@ namespace OpenBlood2
     {
         entries_ = scan_setup(state_, user_, running_);
         for (const auto& entry : entries_)
-            add_mods(entry.installation);
-        // The only playable installation is selected for the player.
+            if (entry.installation.edition != Edition::Nightmares) // It shares the retail mods.
+                add_mods(entry.installation);
+        // The only playable installation is selected for the player (The Chosen, never its box).
         if (!state_.selected)
         {
             const SetupEntry* only = nullptr;
             for (const auto& entry : entries_)
-                if (entry.error.empty())
+                if (entry.error.empty() && entry.installation.edition != Edition::Nightmares)
                     only = only ? nullptr : &entry;
             if (only)
                 state_.selected = only->installation;
@@ -241,7 +242,7 @@ namespace OpenBlood2
         {
             if (!state_.selected || state_.mods.size() >= max_setup_mods)
                 return;
-            state_.mods.push_back({*state_.selected, fs::absolute(chosen).lexically_normal(), true});
+            state_.mods.push_back({mod_owner(*state_.selected), fs::absolute(chosen).lexically_normal(), true});
             if (!save(error))
             {
                 state_.mods.pop_back();
@@ -312,14 +313,29 @@ namespace OpenBlood2
         const SetupEntry* chosen = nullptr;
         if (entries_.empty())
             ImGui::TextColored(dim, "No Blood II data found yet.");
+        // The Nightmares edition of a folder is the original launcher's "Launch Nightmares" box under
+        // its retail entry, not a row of its own.
+        const auto expansion = [&](const fs::path& directory) -> const SetupEntry*
+        {
+            for (const auto& entry : entries_)
+                if (entry.installation == Installation{Edition::Nightmares, directory})
+                    return &entry;
+            return nullptr;
+        };
         for (std::size_t i = 0; i < entries_.size(); ++i)
         {
             const auto& entry = entries_[i];
+            if (entry.installation.edition == Edition::Nightmares)
+                continue;
             ImGui::PushID(int(i));
             const bool playable = entry.error.empty();
-            const bool selected = state_.selected && *state_.selected == entry.installation;
+            const auto* nightmares =
+                entry.installation.edition == Edition::Retail ? expansion(entry.installation.directory) : nullptr;
+            const bool nightmares_selected =
+                nightmares && state_.selected && *state_.selected == nightmares->installation;
+            const bool selected = (state_.selected && *state_.selected == entry.installation) || nightmares_selected;
             if (selected && playable)
-                chosen = &entry;
+                chosen = nightmares_selected ? (nightmares->error.empty() ? nightmares : nullptr) : &entry;
             ImGui::BeginDisabled(!playable);
             if (ImGui::RadioButton(edition_label(entry.installation.edition), selected && playable) && !selected)
             {
@@ -349,6 +365,26 @@ namespace OpenBlood2
             if (!playable)
                 ImGui::TextColored(failure, "%s", entry.error.c_str());
             ImGui::PopTextWrapPos();
+            if (nightmares && playable)
+            {
+                bool launch = nightmares_selected;
+                ImGui::BeginDisabled(!nightmares->error.empty());
+                if (ImGui::Checkbox("Launch Nightmares", &launch))
+                {
+                    state_.selected = launch ? nightmares->installation : entry.installation;
+                    if (!save(error))
+                        message = error;
+                }
+                ImGui::EndDisabled();
+                ImGui::PushTextWrapPos(0);
+                if (!nightmares->error.empty())
+                    ImGui::TextColored(failure, "%s", nightmares->error.c_str());
+                else
+                    ImGui::TextColored(dim, "The Nightmare Levels expansion (BLOOD2NM.REZ): Single Player > "
+                                            "NIGHTMARES, with The Chosen still available. Its levels are in "
+                                            "progress; saves are kept apart.");
+                ImGui::PopTextWrapPos();
+            }
             ImGui::Unindent(em * 1.6f);
             ImGui::PopID();
         }
@@ -413,7 +449,7 @@ namespace OpenBlood2
             for (std::size_t i = 0; i < state_.mods.size(); ++i)
             {
                 auto& mod = state_.mods[i];
-                if (mod.installation != *state_.selected)
+                if (mod.installation != mod_owner(*state_.selected))
                     continue;
                 ++rows;
                 ImGui::PushID(int(1000 + i));

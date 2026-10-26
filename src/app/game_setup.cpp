@@ -338,9 +338,13 @@ namespace OpenBlood2
         for (const auto& folder : folders)
             for (auto& item : folder_installations(folder))
                 found.push_back(std::move(item));
-        // The Chosen first (then Nightmares), the full game before the demo when a folder holds both.
+        // The Chosen first (then Nightmares), the full game before the demo when a folder holds both;
+        // the stored choice first when it is one of them (the setup screen's Nightmares box).
         std::stable_partition(found.begin(), found.end(),
                               [](const Installation& item) { return item.edition == Edition::Retail; });
+        if (state.selected)
+            std::stable_partition(found.begin(), found.end(),
+                                  [&](const Installation& item) { return item == *state.selected; });
         for (const auto& item : found)
         {
             DataStatus status;
@@ -377,19 +381,52 @@ namespace OpenBlood2
                 entry.error = "Unreadable game data";
             entries.push_back(std::move(entry));
         };
+        // Every listed retail folder that also holds BLOOD2NM.REZ offers its Nightmares edition (the
+        // setup screen's "Launch Nightmares" box), however the folder was found.
+        // A Nightmares choice (stored or running) also lists its retail row, which carries the box.
+        const auto add_with_expansion = [&](const Installation& item, bool added)
+        {
+            if (item.edition == Edition::Nightmares)
+                add(mod_owner(item), false);
+            add(item, added);
+            if (item.edition != Edition::Demo)
+                for (const auto& found : folder_installations(item.directory))
+                    if (found.edition == Edition::Nightmares)
+                        add(found, false);
+        };
         for (const auto& item : state.added)
-            add(item, true);
+            add_with_expansion(item, true);
         for (const auto& item : extra)
-            add(item, false);
+            add_with_expansion(item, false);
         for (const auto& folder : setup_search_folders(user))
             for (const auto& item : folder_installations(folder))
                 add(item, false);
         // A selection that vanished stays listed with its refusal.
         if (state.selected)
-            add(*state.selected, false);
+            add_with_expansion(*state.selected, false);
         return entries;
     }
 
+    Installation mod_owner(const Installation& item)
+    {
+        return item.edition == Edition::Nightmares ? Installation{Edition::Retail, item.directory} : item;
+    }
+    bool prefer_nightmares(Config& config, std::string& error)
+    {
+        error.clear();
+        if (config.demo)
+        {
+            error = "--nightmares needs the full game, not the demo";
+            return false;
+        }
+        auto candidate = config;
+        candidate.nightmares = true;
+        DataStatus status;
+        if (!inspect_data(candidate, status, error))
+            return false;
+        config = std::move(candidate);
+        return true;
+    }
     Config setup_config(const SetupState& state, const Installation& item)
     {
         Config config;
@@ -398,7 +435,7 @@ namespace OpenBlood2
         config.nightmares = item.edition == Edition::Nightmares;
         config.source = "setup.cfg";
         for (const auto& mod : state.mods)
-            if (mod.enabled && mod.installation == item)
+            if (mod.enabled && mod.installation == mod_owner(item))
                 config.overlays.push_back(mod.archive);
         return config;
     }

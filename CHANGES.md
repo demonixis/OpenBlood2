@@ -8,7 +8,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Rebindable first/third-person camera toggle (C), with obstacle clearance and the crosshair retained; disabled in VR.
 - Error dialog naming the cause and the log folder when the game has to stop, instead of closing silently.
-- Blood II: The Nightmare Levels can be selected as an edition (setup screen or `--nightmares`), with its title, menu background, Single Player > NIGHTMARES row, level loading screens, credits and the robed cultists; its levels are not fully playable yet.
+- Blood II: The Nightmare Levels can be selected with the setup screen's "Launch Nightmares" box (Options > SETUP) or `--nightmares`, with its title, menu background, Single Player > NIGHTMARES row, level loading screens, credits and the robed cultists; its levels are not fully playable yet.
 
 ### Changed
 
