@@ -33,6 +33,9 @@ namespace OpenBlood2
         std::uint16_t texture = 0;
         std::uint32_t plane = 0, flags = 0;
         std::uint16_t texture_flags = 0; // Serialized v56 surface material, not render flags.
+        // First byte after the flags: retail Server.dll leaves nodes whose polygon has a nonzero
+        // value out of the visibility tree its leaf lists are encoded against.
+        std::uint8_t visibility_skip = 0;
         bool has_effect = false;
         std::string effect_name, effect_parameters; // Raw DAT metadata, including unsupported effects.
     };
@@ -52,6 +55,29 @@ namespace OpenBlood2
         std::uint8_t lightmap_width = 0, lightmap_height = 0;
         std::uint32_t lightmap_offset = 0;
     };
+    // v56 BSP node: plane, splitting polygon, owned leaf and the two sides (retail sides[0] is the
+    // back half-space, chosen when the signed distance is below -0.0001).
+    struct BspNode
+    {
+        static constexpr std::int32_t inside = -1, outside = -2;
+        std::uint32_t plane = 0, polygon = 0;
+        std::uint16_t leaf = UINT16_MAX; // UINT16_MAX: no leaf.
+        std::array<std::int32_t, 2> sides{inside, inside};
+    };
+    // One compressed leaf visibility list (a bitstream over the retail visibility tree).
+    // The first list of a leaf is unconditional; later ones apply only through an open portal.
+    struct LeafVisibilityList
+    {
+        std::uint16_t portal = UINT16_MAX;
+        std::uint32_t offset = 0, size = 0; // Into WorldModel::visibility.
+    };
+    struct BspLeaf
+    {
+        // Lists after resolving the original "uses the lists of leaf N" record at load time:
+        // a reference to a later (or the same) leaf copies its still-empty lists, as retail does.
+        std::uint32_t first_list = 0, lists = 0;
+        std::uint16_t shared = UINT16_MAX; // Raw share record; UINT16_MAX when the leaf owns its lists.
+    };
     struct WorldModel
     {
         std::string name;
@@ -66,7 +92,12 @@ namespace OpenBlood2
         // against the polygon extents. lightmaps is false when no unique block validates.
         bool lightmaps = false;
         std::vector<std::uint16_t> lightmap_texels;
-        std::size_t opaque_bytes = 0; // Undecoded tail before the lightmap block (grid/visibility data).
+        std::size_t opaque_bytes = 0; // Undecoded tail before the lightmap block (after the root node).
+        std::vector<BspNode> bsp_nodes;
+        std::int32_t root_node = BspNode::outside;
+        std::vector<BspLeaf> bsp_leaves;
+        std::vector<LeafVisibilityList> visibility_lists;
+        std::vector<std::uint8_t> visibility; // Concatenated raw list bytes.
     };
     struct World
     {

@@ -68,3 +68,30 @@ M2 remains incomplete. The tested intro does not establish complete boss combat/
 death parity, retail PVS activation, safe NEW_LEVEL or all required services/FX.
 The previous [Gideon lifecycle report](m2_gideon_runtime.md) remains historical
 evidence of the two-update stall; this continuation fixes that bounded case.
+
+## Leaf visibility continuation (2026-10-26)
+
+Tester reports on 0.4.0 (CityHub's intro Gideon waiting in `run_knife1`, the Train
+Station guards `pride`/`wrath` ignoring `Trigger10`) traced to sleeping actors: the
+segment stand-in was blocked by walls retail sees through. The DAT leaf lists, the
+visibility tree, object insertion and the bitstream walk were recovered from the retail
+Server.dll ([contracts](../../contracts/activation_visibility_contracts.md)); the
+segments now apply only to worlds without lists.
+
+- `visibility.private`: all 58 mounted worlds decode; every list consumes exactly its
+  bytes (12_Train_Station: 1513 leaves, 1447 lists, 51,589 bytes, 2678 tree nodes).
+  Reading the root node required skipping the cell grid that follows the points.
+- `visibility.train_station`: from `Trigger10`, every segment to both guards is walled;
+  with the lists they wake (12 pings, observer leaf 1509) and run 415 and 160 units out
+  of the cubby within 6 s. With the lists cleared neither is pinged nor moves.
+- `visibility.cityhub`: from the north ramp (-384,110,2872) a wall blocks every segment
+  to Gideon; the lists wake him, and 5 s into `gidtrigger`'s `Wait 15` he plays idle
+  clip 31. With the lists cleared he waits in clip 0 (`run_knife1`), the report.
+- `ai_runtime.ping_private` now recomputes each committed SubwayA/CityHub probe from the
+  lists. `screen_fade.private` checks the authored 7 s/14 s boundaries with 1 ms of float
+  tolerance (the relay is now reached on another tick); `train_session.private_save` no
+  longer requires an ammunition pickup on its mid-route save variant, whose woken Cultist
+  set differs. Both routes still complete the authored relay, fade and exit.
+
+Door portals are not modelled, so portal lists never apply; the tree-object selection per
+class is assumed, not traced. M2 remains incomplete.

@@ -37,9 +37,10 @@ from replacement services. This does not expand milestone acceptance.
 The [2026-10-26 tester corrections](implementation/reports/tester_feedback_2026_10_26.md)
 (0.5.0) reproduce and fix the Museum crash (Fanatics spawned into the skylight glass
 under Gideon's last hologram), add Hor+ widescreen projection, black letterbox bars,
-filtered sprites, escalator fog, gravity-free resize and `cres.dll` data mods. Next:
-decode the DAT leaf visibility lists for retail activation (CityHub's idle Gideon,
-Train Station guards), then Chosen (ACTION) mode; Nightmares stays a separate port.
+filtered sprites, escalator fog, gravity-free resize and `cres.dll` data mods.
+[Activation](contracts/activation_visibility_contracts.md) now walks the decoded DAT leaf
+visibility lists (CityHub's idle Gideon, Train Station guards). Next: Chosen (ACTION)
+mode; door portals for activation; Nightmares stays a separate port.
 
 The [Demo_01 computer/door correction](implementation/reports/demo_computer_doors.md)
 fixes adjacent sliding leaves refusing exact closed-endpoint contact after the

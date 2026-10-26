@@ -85,20 +85,22 @@ an explicit message. Supporting it is a separate port.
 
 ## Not fixed in this increment
 
-- **Activation visibility.** The CityHub intro shows Gideon in his initial
-  `run_knife1` clip (clip 0, from `SetAnimation(0)`) during the 15 s `Wait`. The two
-  Train Station guards (`pride`, `wrath`; `Trigger10` scripts) also stay put until
-  seen. In both cases the actor is asleep and only `PingObjects` wakes it. Retail
-  uses the DAT leaf visibility lists, whose compression is not decoded. Our
-  four-segment ray stand-in is blocked by the walls in both places. The fix is
-  decoding those lists, which needs Server.dll analysis.
+- **Activation visibility** (fixed afterwards). The CityHub intro showed Gideon in his
+  initial `run_knife1` clip (clip 0, from `SetAnimation(0)`) during the 15 s `Wait`, and
+  the two Train Station guards (`pride`, `wrath`; `Trigger10` scripts) stayed put until
+  seen: both actors slept, and the four-segment stand-in for `PingObjects` was blocked by
+  walls. The DAT leaf lists are now decoded from the retail Server.dll layout and walked
+  as retail does ([contracts](../../contracts/activation_visibility_contracts.md)).
+  `visibility.train_station` and `visibility.cityhub` reproduce both reports with the
+  lists cleared and pass with them. Door portals are not modelled, so lists behind
+  portals never apply.
 - **Chosen mode.** Single Player > CHOSEN is `GAMETYPE_ACTION`. `TypeActionMode=false`
   objects (cameras, cinematic and conversation triggers) are rejected, so there are no
   cut scenes. Action mode counts as multiplayer in many original branches (player
   init, start points, corpses, damage), which need a per-site audit before it can be
   enabled. The port still starts every menu game as `GAMETYPE_SINGLE`.
 - **Idle before activation** matches the original: inactive objects get neither
-  updates nor model animation. The visible difference comes from the same activation
+  updates nor model animation. The visible difference came from the same activation
   stand-in.
 - Item lighting, cutscene and movement-weight remarks have no reproducible detail yet.
 

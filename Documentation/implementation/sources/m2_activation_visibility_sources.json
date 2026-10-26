@@ -21,10 +21,18 @@
       "path": "sources/blood2/ObjectDLL/ObjectUtilities.cpp",
       "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3",
       "use": "GlobalFilterFn volume/glass rules (412-483)"
+    },
+    {
+      "path": "external retail Server.dll (Blood II 1.0 install, not copied)",
+      "sha256": "4f56e6d9729c1b07e387eb9e5b1dd06344c53dd543071df7baa543ddd95ccfa5",
+      "use": "Disassembled only: BSP leaf/list, node, surface and grid loader (0x10005fe0-0x10006d0e); visibility tree builder (0x100078d4-0x10007a40); object tree insertion (0x10008287-0x1000835c); point-to-leaf descent (0x1001d0b5); ServerDE sm_IterateVisList, PingObjects and the list bitstream walk (0x1002830a-0x10028366, 0x100284c9, 0x1002b8cf-0x1002bc5b)"
     }
   ],
   "adaptations": [
-    "Reuse original AI glass/volume object filter for replacement PingObjects center rays; not recovered retail PVS or Ping implementation.",
+    "PingObjects walks the decoded retail leaf visibility lists of the root BSP; worlds without a tree or lists keep the four primary-world segments (replacement, synthetic geometry only).",
+    "Every pinged object is assumed to be linked into the visibility tree by the traced retail insertion rule; the per-class selection of tree objects was not traced.",
+    "Leaf lists behind portals are decoded but never applied: portal flags (Door SetPortalState) are not modelled and default closed.",
+    "Bounded decode: a list needing bits past its own bytes, or a BSP node reached twice, fails world preparation instead of reading the next list as retail would.",
     "Preserve manual inactivity, original player cadence/observer, AI deactivation deadlines and atomic refresh.",
     "Bounded per-object historical query diagnostics with checked IDs and separate committed refresh flag; read-only inspector.",
     "Authored SubwayA script/camera acceptance without forced targets, state, health, timings or edited assets."

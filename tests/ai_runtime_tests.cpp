@@ -957,8 +957,8 @@ namespace
         }
         return true;
     }
-    // Retail activation in real worlds: a candidate refreshes exactly when one of the four
-    // primary-world segments (centres and box tops) is clear; objects never block.
+    // Retail activation in real worlds: the observer's BSP leaf and its decoded visibility list
+    // decide every refresh; recompute each committed probe from the same lists.
     bool ping_private(const char* root)
     {
         GameSession g;
@@ -966,8 +966,8 @@ namespace
         std::string e;
         for (const char* world : {"01_SubwayA", "02_CityHub"})
         {
-            CHECK(g.request_world(world, e) && g.enter_player(e));
-            std::size_t rays = 0, visible = 0, blocked = 0;
+            CHECK(g.request_world(world, e) && g.enter_player(e) && g.visibility.available());
+            std::size_t candidates = 0, visible = 0, hidden = 0;
             for (int tick = 0; tick < 1200; ++tick)
             {
                 CHECK(g.step(1.0 / 60));
@@ -976,42 +976,39 @@ namespace
                 const auto observer =
                     g.server.IsObjectAlive(g_hActiveCamera) ? g_hActiveCamera : HOBJECT(g.client_shell.player);
                 std::vector<ObjectId> eligible;
+                std::vector<VisibilitySphere> spheres;
                 for (auto id : g.objects.snapshot())
                 {
                     const auto* r = g.objects.get(id);
                     if (r->life == Life::Alive && r->auto_deactivate && r->handle != observer &&
                         (r->activity == OBJSTATE_ACTIVE || r->activity == OBJSTATE_AUTODEACTIVATE_NOW))
+                    {
                         eligible.push_back(id);
+                        const auto d = r->dimensions;
+                        spheres.push_back({r->state.m_Pos, std::sqrt(vector_dot(d, d)) + .5f});
+                    }
                 }
                 CHECK(g.server.PingObjects(observer));
                 const auto* source = g.objects.get(observer);
-                const auto from = source->state.m_Pos;
-                const DVector from_top{from.x, from.y + source->dimensions.y, from.z};
-                for (auto id : eligible)
+                const auto leaf = g.visibility.find_leaf(source->state.m_Pos);
+                std::vector<bool> seen(eligible.size());
+                CHECK(leaf == UINT32_MAX || g.visibility.query(leaf, spheres, seen));
+                for (std::size_t i = 0; i < eligible.size(); ++i)
                 {
-                    const auto* r = g.objects.get(id);
-                    const auto& probe = r->activation_probe;
-                    const auto to = r->state.m_Pos;
-                    const DVector to_top{to.x, to.y + r->dimensions.y, to.z};
-                    bool seen = false;
-                    for (const auto& [a, b] : {std::pair{from, to}, {from_top, to}, {from, to_top}, {from_top, to_top}})
-                    {
-                        CollisionHit hit;
-                        const auto query = g.collision.sweep(a, b, {}, hit);
-                        CHECK(query == CollisionQuery::Hit || query == CollisionQuery::Miss);
-                        if ((seen = query == CollisionQuery::Miss))
-                            break;
-                    }
-                    CHECK(probe.visibility == (seen ? ActivationVisibility::Visible : ActivationVisibility::Blocked));
-                    CHECK(probe.refreshed == seen && !probe.hit_object && probe.time == g.objects.time() &&
+                    const auto& probe = g.objects.get(eligible[i])->activation_probe;
+                    CHECK(probe.leaf_visibility && probe.observer_leaf == leaf);
+                    CHECK(probe.visibility ==
+                          (seen[i] ? ActivationVisibility::Visible : ActivationVisibility::Blocked));
+                    CHECK(probe.refreshed == seen[i] && !probe.hit_object && probe.time == g.objects.time() &&
                           probe.observer == source->id);
-                    ++rays;
-                    ++(seen ? visible : blocked);
+                    ++candidates;
+                    ++(seen[i] ? visible : hidden);
                 }
             }
-            std::cout << world << " candidates=" << rays << " visible=" << visible << " blocked=" << blocked << '\n';
-            CHECK(rays > 400 && visible && blocked);
-            CHECK(g.unload_world());
+            std::cout << world << " candidates=" << candidates << " visible=" << visible << " hidden=" << hidden
+                      << '\n';
+            CHECK(candidates > 400 && visible && hidden);
+            CHECK(g.unload_world() && !g.visibility.available());
         }
         return true;
     }

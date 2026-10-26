@@ -26,8 +26,8 @@ The [2026-10-26 tester corrections](Documentation/implementation/reports/tester_
 show fatal frontend errors in a dialog, use Hor+ projection anchored on 4:3
 (`horizontal_projection_scale`, unchanged at 4:3), draw black letterbox bars, keep
 world fog in fog-off volumes, keep the centre when resizing gravity-free bodies and
-accept a mod's resource-only `cres.dll`. Activation visibility (undecoded DAT
-visibility lists), Chosen/ACTION mode and Nightmares remain open.
+accept a mod's resource-only `cres.dll`. Activation now walks the decoded DAT leaf
+visibility lists (see the NPC activation paragraph); Chosen/ACTION mode and Nightmares remain open.
 
 The [additional original controls](Documentation/contracts/input_action_contracts.md#additional-original-controls-2026-10-25)
 now implement all nine formerly disabled rows. Preserve their initially unbound defaults,
@@ -814,7 +814,7 @@ The [Gideon attack continuation](Documentation/implementation/reports/m2_gideon_
 
 The [Gideon lifecycle continuation](Documentation/implementation/reports/m2_gideon_runtime.md) registers original initialization/AI_Update and typed boss-health delivery. Read [contracts](Documentation/contracts/gideon_runtime_contracts.md). Preserve pre-base health capture, repeated nonzero-ratio publication, gravity removal after base initialization, one accepted typed damage application and subclass-before-base reaction order. All five shared table owners participate in destination rehearsal isolation. Original HUD, complete encounter/death parity, required FX and safe NEW_LEVEL remain incomplete; M2 stays open.
 
-The [NPC activation correction](Documentation/implementation/reports/m2_activation_visibility.md) completes Gideon's authored intro script; activation pings follow the retail visibility set (disassembled Server.dll): no range/FOV and objects never block, approximated by up to four primary-world segments (centres and box tops). Read [contracts](Documentation/contracts/activation_visibility_contracts.md). Preserve manual inactivity, strict original ping cadence, atomic refresh, no wake-on-damage and checked historical inspection. The segments are not decoded PVS; complete encounters, safe NEW_LEVEL and M2 remain open.
+The [NPC activation correction](Documentation/implementation/reports/m2_activation_visibility.md) completes Gideon's authored intro script; activation pings walk the retail leaf visibility lists of the root BSP (`WorldVisibility`, decoded from the disassembled Server.dll): observer leaf by BSP descent, objects linked into the visibility tree by their sphere, no ray/range/FOV and objects never block. Read [contracts](Documentation/contracts/activation_visibility_contracts.md). Preserve manual inactivity, strict original ping cadence, atomic refresh, no wake-on-damage, bounded decode failing world preparation and checked historical inspection. Worlds without lists keep the four-segment stand-in; portal lists never apply (door portals unmodelled). Complete encounters, safe NEW_LEVEL and M2 remain open.
 
 The [corpse placement correction](Documentation/implementation/reports/m2_corpse_placement.md) preserves original raw death dimensions and fits the new body locally against primary-world geometry. Read [contracts](Documentation/contracts/corpse_placement_contracts.md). Preserve the clear cached anchor, same-side corrections, bounded net displacement/work, final box/center-path validation, the contained-box retry and deferred failure cleanup. Reports retain actual attempted/committed state without advancing simulation. This is replacement triangle collision, not retail depenetration; safe NEW_LEVEL, required services and M2 remain open.
 

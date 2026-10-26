@@ -191,19 +191,35 @@ namespace OpenBlood2
             }
             for (std::uint32_t i = 0; i < leaves && r.good(); ++i)
             {
+                BspLeaf leaf;
                 auto count = r.u16();
                 if (count == 65535)
                 {
-                    const auto shared = r.u16();
-                    r.require(shared < leaves);
+                    leaf.shared = r.u16();
+                    r.require(leaf.shared < leaves);
+                    // Retail copies the referenced leaf's lists as loaded so far (zeroed when later).
+                    if (leaf.shared < i)
+                    {
+                        leaf.first_list = out.bsp_leaves[leaf.shared].first_list;
+                        leaf.lists = out.bsp_leaves[leaf.shared].lists;
+                    }
                 }
                 else
+                {
+                    leaf.first_list = static_cast<std::uint32_t>(out.visibility_lists.size());
+                    leaf.lists = count;
                     for (unsigned j = 0; j < count && r.good(); ++j)
                     {
-                        r.u16();
-                        const auto bytes = r.u16();
-                        r.skip(bytes);
+                        LeafVisibilityList list;
+                        list.portal = r.u16();
+                        list.size = r.u16();
+                        list.offset = static_cast<std::uint32_t>(out.visibility.size());
+                        const auto bytes = r.take(list.size);
+                        out.visibility.insert(out.visibility.end(), bytes.begin(), bytes.end());
+                        out.visibility_lists.push_back(list);
                     }
+                }
+                out.bsp_leaves.push_back(leaf);
                 count = r.u16();
                 r.skip(std::size_t(count) * 4 + 4);
             }
@@ -226,7 +242,8 @@ namespace OpenBlood2
                 s.texture = r.u16();
                 s.plane = r.u32();
                 s.flags = r.u32();
-                r.u32();
+                s.visibility_skip = r.u8();
+                r.skip(3);
                 const auto effect = r.u8();
                 if (effect == 1)
                 {
@@ -269,12 +286,32 @@ namespace OpenBlood2
                 }
                 out.polygons.push_back(std::move(p));
             }
-            // Node/visibility payloads are bounded, never traversed. Their graph and
-            // collision semantics are not claimed by this reader.
+            // Nodes (retail Server.dll order): plane, polygon, leaf, two sides (-1 inside, -2 outside),
+            // then a bounding centre and radius that are not used here. Collision does not use them.
             out.nodes = nodes;
             out.leaves = leaves;
             out.portals = portals;
-            r.skip(std::size_t(nodes) * 34);
+            if (nodes > r.remaining() / 34)
+                return false;
+            auto side = [&](std::uint32_t raw)
+            {
+                const auto value = static_cast<std::int32_t>(raw);
+                r.require(value == BspNode::inside || value == BspNode::outside || (value >= 0 && raw < nodes));
+                return value;
+            };
+            for (std::uint32_t i = 0; i < nodes && r.good(); ++i)
+            {
+                BspNode node;
+                node.plane = r.u32();
+                node.polygon = r.u32();
+                node.leaf = r.u16();
+                node.sides = {side(r.u32()), side(r.u32())};
+                r.skip(16);
+                if (!r.require(node.plane < planes && node.polygon < polygons &&
+                               (node.leaf == UINT16_MAX || node.leaf < leaves)))
+                    return false;
+                out.bsp_nodes.push_back(node);
+            }
             for (std::uint32_t i = 0; i < portals && r.good(); ++i)
             {
                 r.string();
@@ -289,6 +326,24 @@ namespace OpenBlood2
                 out.points.push_back(r.vec());
             if (!r.good())
                 return false;
+            // Retail Server.dll then reads a cell grid (three u32 dimensions, two vectors, then per
+            // cell u16 count, u16 and count * 6 bytes), not used here, and the root node index.
+            // A BSP without nodes (synthetic geometry) has no tree to root; its tail stays opaque.
+            if (nodes)
+            {
+                const std::uint64_t gx = r.u32(), gy = r.u32(), gz = r.u32();
+                if (!r.good() || (gx && gy && gz && gx * gy * gz > r.remaining() / 4) || !r.skip(24))
+                    return false;
+                for (std::uint64_t i = 0, cells = gx * gy * gz; i < cells && r.good(); ++i)
+                {
+                    const auto count = r.u16();
+                    r.u16();
+                    r.skip(std::size_t(count) * 6);
+                }
+                out.root_node = side(r.u32());
+                if (!r.good())
+                    return false;
+            }
             const auto tail = r.take(r.remaining());
             out.opaque_bytes = tail.size();
             read_lightmaps(tail, out);

@@ -225,17 +225,27 @@ namespace OpenBlood2
             {
                 const auto* observer = game.objects.get(ping.observer);
                 const auto* blocker = game.objects.get(ping.hit_object);
-                ImGui::Text("Observer %s | hit %s | polygon %u | fraction %.3f",
-                            observer ? observer->state.m_Name : "removed",
-                            blocker           ? blocker->state.m_Name
-                            : ping.hit_object ? "removed"
-                                              : "world / none",
-                            ping.polygon, ping.fraction);
+                if (ping.leaf_visibility)
+                {
+                    if (ping.observer_leaf == UINT32_MAX)
+                        ImGui::Text("Observer %s | leaf lists | observer in no leaf",
+                                    observer ? observer->state.m_Name : "removed");
+                    else
+                        ImGui::Text("Observer %s | leaf lists | observer leaf %u",
+                                    observer ? observer->state.m_Name : "removed", ping.observer_leaf);
+                }
+                else
+                    ImGui::Text("Observer %s | segments | hit %s | polygon %u | fraction %.3f",
+                                observer ? observer->state.m_Name : "removed",
+                                blocker           ? blocker->state.m_Name
+                                : ping.hit_object ? "removed"
+                                                  : "world / none",
+                                ping.polygon, ping.fraction);
                 ImGui::Text("Ray %.1f %.1f %.1f -> %.1f %.1f %.1f", ping.from.x, ping.from.y, ping.from.z, ping.to.x,
                             ping.to.y, ping.to.z);
             }
-            ImGui::TextWrapped(
-                "Activation uses center rays with the original AI glass/volume filter; retail PVS is not implemented.");
+            ImGui::TextWrapped("Activation uses the decoded retail leaf visibility lists; worlds without them use four "
+                               "primary-world segments.");
             ImGui::Text("State %d | phase %d | targeted %s | target losses %llu", a.m_nState, a.Metacmd,
                         a.m_bHasTargeted ? "yes" : "no", (unsigned long long)a.runtime_target_losses);
             ImGui::Text("HP %.2f / %.2f | damage factor %.3f", a.m_damage.m_fHitPoints, a.m_damage.m_fMaxHitPoints,

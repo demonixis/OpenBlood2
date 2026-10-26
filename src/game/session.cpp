@@ -95,6 +95,7 @@ namespace OpenBlood2
             return false;
         }
         collision = std::move(next.collision);
+        visibility = std::move(next.visibility);
         server.collision_ready = true;
         server.service_calls.clear();
         server.unavailable_history.clear();
@@ -761,6 +762,7 @@ namespace OpenBlood2
         models.clear();
         sprites.clear();
         collision.clear();
+        visibility.clear();
         server.collision_ready = false;
         server.gravity = {0, -2000, 0};
         preview_model.reset();

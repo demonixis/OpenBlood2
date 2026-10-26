@@ -63,49 +63,93 @@ namespace OpenBlood2
         auto* source = objects_.get(observer);
         if (!source || source->life != Life::Alive || !collision || !collision_ready)
             return false;
-        // Retail PingObjects walks the observer leaf's BSP visibility set: no range or field-of-view
-        // limit, and objects never occlude. Replacement: up to four primary-world segments between
-        // the observer's and the candidate's centres and box tops, the first clear one wins. World
-        // models (doors, props, train brushes) and characters never block activation.
         const auto from = source->state.m_Pos;
-        const DVector from_top{from.x, from.y + source->dimensions.y, from.z};
-        std::vector<ObjectId> visible;
+        std::vector<ObjectId> candidates, visible;
         for (auto id : objects_.snapshot())
         {
             auto* r = objects_.get(id);
-            if (!r || r->life != Life::Alive || !r->auto_deactivate || r->handle == observer ||
-                (r->activity != OBJSTATE_ACTIVE && r->activity != OBJSTATE_AUTODEACTIVATE_NOW))
-                continue;
-            const auto to = r->state.m_Pos;
-            const DVector to_top{to.x, to.y + r->dimensions.y, to.z};
-            auto& probe = r->activation_probe;
+            if (r && r->life == Life::Alive && r->auto_deactivate && r->handle != observer &&
+                (r->activity == OBJSTATE_ACTIVE || r->activity == OBJSTATE_AUTODEACTIVATE_NOW))
+                candidates.push_back(id);
+        }
+        auto begin_probe = [&](ObjectRecord& r, bool leaf, std::uint32_t observer_leaf)
+        {
+            auto& probe = r.activation_probe;
             ++probe.checks;
             probe.time = objects_.time();
             probe.observer = source->id;
             probe.from = from;
-            probe.to = to;
+            probe.to = r.state.m_Pos;
             probe.hit_object = {};
+            probe.polygon = UINT32_MAX;
+            probe.fraction = 1;
             probe.refreshed = false;
-            const auto d = vector_subtract(to, from);
-            auto result = vector_dot(d, d) < 1e-12f ? CollisionQuery::Invalid : CollisionQuery::Hit;
-            CollisionHit first;
-            const std::pair<DVector, DVector> rays[]{{from, to}, {from_top, to}, {from, to_top}, {from_top, to_top}};
-            for (unsigned i = 0; i < 4 && result == CollisionQuery::Hit; ++i)
+            probe.leaf_visibility = leaf;
+            probe.observer_leaf = observer_leaf;
+            return &probe;
+        };
+        if (visibility && visibility->available())
+        {
+            // Retail PingObjects: the observer's BSP leaf, then its decoded visibility list over
+            // the objects' tree placement. No range, field of view, ray or object occlusion; an
+            // observer in no leaf pings nothing.
+            const auto leaf = visibility->find_leaf(from);
+            std::vector<VisibilitySphere> spheres;
+            for (auto id : candidates)
             {
-                CollisionHit hit;
-                result = collision->sweep(rays[i].first, rays[i].second, {}, hit);
-                if (!i)
-                    first = hit;
+                const auto* r = objects_.get(id);
+                const auto d = r->dimensions;
+                spheres.push_back({r->state.m_Pos, std::sqrt(vector_dot(d, d)) + 0.5f});
             }
-            probe.polygon = first.polygon;
-            probe.fraction = first.fraction;
-            probe.visibility = result == CollisionQuery::Invalid ? ActivationVisibility::Invalid
-                               : result == CollisionQuery::Miss  ? ActivationVisibility::Visible
-                                                                 : ActivationVisibility::Blocked;
-            if (result == CollisionQuery::Invalid)
+            std::vector<bool> seen(candidates.size());
+            if (leaf != UINT32_MAX && !visibility->query(leaf, spheres, seen))
+            {
+                for (auto id : candidates)
+                    begin_probe(*objects_.get(id), true, leaf)->visibility = ActivationVisibility::Invalid;
                 return false; // No partial refresh on failed queries.
-            if (probe.visibility == ActivationVisibility::Visible)
-                visible.push_back(id);
+            }
+            for (std::size_t i = 0; i < candidates.size(); ++i)
+            {
+                begin_probe(*objects_.get(candidates[i]), true, leaf)->visibility =
+                    seen[i] ? ActivationVisibility::Visible : ActivationVisibility::Blocked;
+                if (seen[i])
+                    visible.push_back(candidates[i]);
+            }
+        }
+        else
+        {
+            // Worlds without decoded lists (synthetic geometry): up to four primary-world segments
+            // between the observer's and the candidate's centres and box tops, the first clear one
+            // wins. World models (doors, props, train brushes) and characters never block.
+            const DVector from_top{from.x, from.y + source->dimensions.y, from.z};
+            for (auto id : candidates)
+            {
+                auto* r = objects_.get(id);
+                const auto to = r->state.m_Pos;
+                const DVector to_top{to.x, to.y + r->dimensions.y, to.z};
+                auto& probe = *begin_probe(*r, false, UINT32_MAX);
+                const auto d = vector_subtract(to, from);
+                auto result = vector_dot(d, d) < 1e-12f ? CollisionQuery::Invalid : CollisionQuery::Hit;
+                CollisionHit first;
+                const std::pair<DVector, DVector> rays[]{
+                    {from, to}, {from_top, to}, {from, to_top}, {from_top, to_top}};
+                for (unsigned i = 0; i < 4 && result == CollisionQuery::Hit; ++i)
+                {
+                    CollisionHit hit;
+                    result = collision->sweep(rays[i].first, rays[i].second, {}, hit);
+                    if (!i)
+                        first = hit;
+                }
+                probe.polygon = first.polygon;
+                probe.fraction = first.fraction;
+                probe.visibility = result == CollisionQuery::Invalid ? ActivationVisibility::Invalid
+                                   : result == CollisionQuery::Miss  ? ActivationVisibility::Visible
+                                                                     : ActivationVisibility::Blocked;
+                if (result == CollisionQuery::Invalid)
+                    return false; // No partial refresh on failed queries.
+                if (probe.visibility == ActivationVisibility::Visible)
+                    visible.push_back(id);
+            }
         }
         for (auto id : visible)
         {

@@ -208,11 +208,11 @@ namespace
                     large_scene_prepared = true;
                 }
                 const auto elapsed = g.server.GetTime() - began;
-                if (elapsed < 7)
+                if (elapsed < 7 - 1e-3f) // Float clock subtraction may land the authored 7 s just below 7.
                     CHECK(!g.client_shell.fade.messages);
                 faded |= g.client_shell.fade.messages == 1 && g.client_shell.fade.Scale() < 1;
                 black |= g.client_shell.fade.Scale() == 0;
-                if (elapsed < 14)
+                if (elapsed < 14 - 1e-3f)
                     CHECK(!g.pending_level_change);
             }
             std::cout << "Trail peaks: " << peak_trail << " per system, " << peak_total << " total\n";

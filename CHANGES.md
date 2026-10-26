@@ -22,6 +22,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Museum crash after Gideon's last hologram, when enemies spawn into the skylight glass.
 - Fog-coloured instead of black letterbox bars during cutscenes.
 - Hovering characters such as Gideon drifting up or down when their animation changes size.
+- Enemies behind walls now wake as in the original (level visibility data), so scripted guards react to triggers and Gideon idles in the CityHub intro.
 
 ## [0.4.0] - 2026-10-25
 

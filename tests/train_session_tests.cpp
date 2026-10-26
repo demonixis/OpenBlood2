@@ -515,10 +515,12 @@ namespace
         // Source frame histories leave different dropped pickups on this fixed
         // route. Require real dry-ammo knife firing at 30 Hz and ammunition
         // collection at 60 Hz, without diagnostic ammo/stat grants. 120 Hz guards
-        // high-refresh per-update emission (blood spurts); its pickups are not fixed.
+        // high-refresh per-update emission (blood spurts); its pickups are not fixed. Neither are
+        // those of the mid-route save variant, whose leaf-list activation wakes a different set of
+        // Cultists before the save than the plain 60 Hz run.
         CHECK(!save_midway || saved);
         CHECK(damaged.size() + dead_before_save >= 4 && dead.size() + dead_before_save >= 4 && health_pickup);
-        CHECK(hz == 30 ? knife_shots > 0 : hz == 120 || ammo_pickup);
+        CHECK(hz == 30 ? knife_shots > 0 : hz == 120 || save_midway || ammo_pickup);
         CHECK(trigger->activations == 1 && trigger->last_sender == p->m_hObject && black);
         for (const auto& slot : trigger->slots)
             CHECK(slot.sent == 1);

@@ -122,6 +122,10 @@ namespace OpenBlood2
         ObjectId observer, hit_object;
         DVector from{}, to{};
         std::uint32_t polygon = UINT32_MAX;
+        // Leaf visibility answered (decoded retail lists) instead of the segment replacement;
+        // observer_leaf is the observer's BSP leaf then (UINT32_MAX: none, nothing is pinged).
+        bool leaf_visibility = false;
+        std::uint32_t observer_leaf = UINT32_MAX;
         ActivationVisibility visibility = ActivationVisibility::Unqueried;
         bool refreshed = false; // Visibility alone is not a committed batch refresh.
     };

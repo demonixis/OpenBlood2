@@ -5,6 +5,7 @@
 #include "engine/save_objects.h"
 #include "engine/sky.h"
 #include "engine/string_resources.h"
+#include "engine/visibility.h"
 #include "game/blood_splats.h"
 #include "game/blood_spurts.h"
 #include "game/explosion_flames.h"
@@ -410,6 +411,8 @@ namespace OpenBlood2
         std::vector<ProjectileReport> projectile_reports;
         CollisionWorld* collision = nullptr;
         bool collision_ready = false;
+        // Decoded root-BSP leaf visibility of the loaded world (PingObjects); empty when absent.
+        const WorldVisibility* visibility = nullptr;
         // PingObjects cost (steady-clock ns and calls, adapter lifetime); diagnostic only.
         std::uint64_t activation_ping_ns = 0, activation_ping_calls = 0;
         // Pickups whose physics move failed (inside geometry) and were separated or stopped
@@ -556,6 +559,7 @@ namespace OpenBlood2
         ModelStore models{resources};
         SpriteStore sprites{resources};
         CollisionWorld collision;
+        WorldVisibility visibility;
         Objects objects;
         ServerAdapter server{objects};
         CBloodServerShell server_shell{server};
@@ -652,6 +656,7 @@ namespace OpenBlood2
             objects.sprites = &sprites;
             objects.world = &world;
             server.collision = &collision;
+            server.visibility = &visibility;
             server.client_resources = &resources;
             server.ai_paths = &server_shell.paths;
             server.session_shell = &server_shell;

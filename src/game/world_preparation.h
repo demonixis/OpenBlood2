@@ -1,5 +1,6 @@
 #pragma once
 #include "engine/collision.h"
+#include "engine/visibility.h"
 #include "game/session.h"
 namespace OpenBlood2
 {
@@ -8,6 +9,7 @@ namespace OpenBlood2
     {
         World world;
         CollisionWorld collision;
+        WorldVisibility visibility;
     };
     bool prepare_world(const WorldRequest&, const Resources&, PreparedWorld&, std::string&);
     bool editor_only_world_class(std::string_view);

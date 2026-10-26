@@ -41,7 +41,8 @@ namespace OpenBlood2
             error = "World has no primary collision model";
             return false;
         }
-        if (!next.collision.build(next.world.models.front(), error))
+        if (!next.collision.build(next.world.models.front(), error) ||
+            !next.visibility.build(next.world.models.front(), error))
             return false;
         output = std::move(next);
         return true;

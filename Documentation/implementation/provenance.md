@@ -996,6 +996,8 @@ The [production Gideon continuation](reports/m2_gideon_runtime.md) adds original
 
 See [contracts](../contracts/activation_visibility_contracts.md) and [source ledger](sources/m2_activation_visibility_sources.json). The original ServerDE activation contract and player/AI scheduling are retained. Existing original CanSee glass/volume filtering is reused for replacement PingObjects center rays after diagnosing SubwayA nglass1; no retail PVS implementation is claimed. Added bounded historical inspection and authored-script/lifetime regressions. No reference source, commercial resource or dependency revision was changed.
 
+The 2026-10-26 continuation replaces the segment stand-in with the retail leaf visibility lists. Their layout, the visibility tree, object insertion and the bitstream walk were established by disassembling the installed retail Server.dll (hash in the ledger; not executed, no bytes copied) and checked against all 58 mounted worlds. The segments remain only for worlds without lists.
+
 ## Initial corpse placement
 
 The [source ledger](sources/m2_corpse_placement_sources.json) records original CreateCorpse/CCorpse references. Cached transforms, raw death dimensions, scale and foot offset remain source-driven. [Bounded initial placement](../contracts/corpse_placement_contracts.md) is new replacement-engine SAT clearance, not imported or recovered retail physics. No reference file or commercial asset was changed.
