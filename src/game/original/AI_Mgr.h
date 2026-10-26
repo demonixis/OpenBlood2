@@ -132,8 +132,9 @@ class AI_Mgr : public CBaseCharacter
     static void ResetRuntimeTables();
     // Shared class/gender tables: Cultist m/f, Civilian m/f, Gideon, Fanatic, Prophet, SoulDrudge, Shikari,
     // MadScientist, BoneLeech, DrudgeLord, Thief, Naga, Zealot, Behemoth, Priest, Shroud, Hand, Caleb,
-    // Gabriella/REV, Ophelia/REV and Ishmael/REV (six independent original static tables).
-    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 30>;
+    // Gabriella/REV, Ophelia/REV and Ishmael/REV (six independent original static tables), Ancient
+    // One/Tentacle and the add-on robe Cultist (CultistAI::m_Robe_Anim_Sound, slot 30).
+    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 31>;
     // Original WeaponStrToInt prefixes; false for a matched family not integrated here.
     static bool WeaponStrToInt(std::string_view, DBYTE&);
     static void ExchangeRuntimeTables(RuntimeTables&);

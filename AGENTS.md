@@ -149,7 +149,9 @@ unchanged retail behaviour and superset weapon numbering (add-on weapons 52–55
 range tests). Lot N2 adds the NIGHTMARES row/new game, `WORLDS_AO` names kept as given (add-on
 only), the `_ao` title/background/bumper and CREDITS_AO; preserve retail's `Worlds\` prefix, the
 refused `WORLDS_AO` saves and non-finite authored `Pos` rows as uncreated entries (never a guessed
-pose). The character chain and add-on classes are later lots.
+pose). Lot N8 adds robe Cultists (oldschool model, RetroCultist table slot 30, body-damage
+policy); preserve the source male-table order and the retail robe-to-male reset. Robe corpses
+and the NaN rows await a decision. The character chain and add-on classes are later lots.
 
 The [setup screen](Documentation/contracts/setup_screen_contracts.md) replaced the standalone launcher (removed; its documents are archived under `Documentation/history/launcher/`). Without `--data-dir`, `BLOOD2_DATA_DIR` or `blood2.local.ini` the game uses the playable choice stored in `setup.cfg`, else opens the screen: detected/added installations (retail or demo), the qualified Archive.org demo download and per-installation data-only REZ mods; Options > SETUP reopens it and a new choice restarts the game in-process. Preserve the explicit-configuration bypass, strict bounded `setup.cfg`, never-followed validated redirects, the platform HTTPS transports (libcurl on Linux/Windows, NSURLSession on Apple, HttpsURLConnection on Android; OpenSSL only on Linux), SHA-256 and bounded miniz checks, staging with atomic publication and `/sdcard/openblood2` with all-files access on Android.
 

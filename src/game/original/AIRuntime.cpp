@@ -79,12 +79,13 @@ namespace
                : type == T::BoneLeech || type == T::Thief || type == T::TheHand ? 125
                                                                                 : 250;
     }
-    // Shipped nonhumanoid models without head/neck nodes use the explicit body-damage policy.
-    bool body_hits(AI_Mgr::NPCType type)
+    // Shipped nonhumanoid models without head/neck nodes use the explicit body-damage policy, as
+    // does the add-on robe Cultist's oldschool model (torso and limbs only, no head/neck/pelvis).
+    bool body_hits(AI_Mgr::NPCType type, bool robe = false)
     {
         using T = AI_Mgr::NPCType;
         return type == T::AncientOne || type == T::AncientOneTentacle || type == T::BoneLeech || type == T::Thief ||
-               type == T::TheHand || type == T::DeathShroud || type == T::Naga;
+               type == T::TheHand || type == T::DeathShroud || type == T::Naga || (type == T::Cultist && robe);
     }
 } // namespace
 bool AI_Mgr::WeaponStrToInt(std::string_view name, DBYTE& id)
@@ -559,7 +560,17 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
     else if (npc_type == NPCType::Cultist)
     {
         if (npc_robe)
-            return RuntimeFailure("Add-on robe Cultist initialization is not integrated");
+        {
+            // Original PostPropRead (not conditional in either build): the add-on oldschool model,
+            // forced male, no skin draw. The retail InitialUpdate then clears the robe flag.
+            npc_male = true;
+            model = "Models_ao/Enemies_ao/oldschool.abc";
+            skin = "Skins_ao/Enemies_ao/oldschool.dtx";
+            state->m_ObjectType = OT_MODEL;
+            SAFE_STRCPY(state->m_Filename, model.c_str());
+            SAFE_STRCPY(state->m_SkinName, skin.c_str());
+            return true;
+        }
         if (npc_clown)
             npc_male = true;
         if (!s->RandomInt(1, 3, variant))
@@ -649,12 +660,11 @@ bool AI_Mgr::InitializeSharedTable(std::string& error)
         {
             if (!value.SetAnimationIndexes(m_hObject))
                 return false;
-            if (npc_type == NPCType::AncientOne || npc_type == NPCType::AncientOneTentacle ||
-                npc_type == NPCType::BoneLeech || npc_type == NPCType::Thief || npc_type == NPCType::TheHand ||
-                npc_type == NPCType::DeathShroud || npc_type == NPCType::Naga)
+            if (body_hits(npc_type, npc_robe))
             {
-                // These shipped nonhumanoid models have no head/neck. The donor reads uninitialized
-                // head coordinates here. Keep localization unavailable; use the
+                // These shipped nonhumanoid models (and the robe Cultist's oldschool model, whichever
+                // table it builds first) have no head/neck. The donor reads uninitialized head
+                // coordinates here. Keep localization unavailable; use the
                 // explicit body-damage policy below instead of fabricated spheres.
                 value.hit_sphere_error = "Nonhumanoid model has no head node; body damage policy";
             }
@@ -676,6 +686,34 @@ bool AI_Mgr::InitializeSharedTable(std::string& error)
         // copying/killing its independently owned voice (no callbacks in these queries).
         return prepare(*tables[slot]);
     };
+    if (npc_type == NPCType::Cultist)
+    {
+        // CultistAI::InitialUpdate/Load: the male table from the first male or clown instance (a
+        // robe Cultist is male, so the first one may build it from the oldschool model, as in the
+        // original), the add-on robe table independently, the female table from a plain female;
+        // then the robe table binds robe Cultists and the male table the other males.
+        if ((npc_male || npc_clown) && !initialize_table(0, !tables[0], "sounds/enemies/m_cultist"))
+        {
+            error = "NPC male animation table initialization failed: " + table_error;
+            return false;
+        }
+        if (npc_robe && !initialize_table(30, !tables[30], "sounds_ao/enemies/RetroCultist"))
+        {
+            error = "NPC robe animation table initialization failed: " + table_error;
+            return false;
+        }
+        if (!npc_male && !npc_clown && !npc_robe && !initialize_table(1, !tables[1], "sounds/enemies/f_cultist"))
+        {
+            error = "NPC female animation table initialization failed: " + table_error;
+            return false;
+        }
+        if (!InitStatics(tables[(npc_male || npc_clown) && !npc_robe ? 0 : npc_robe ? 30 : 1]))
+        {
+            error = "NPC shared animation table unavailable";
+            return false;
+        }
+        return true;
+    }
     if (npc_type == NPCType::Civilian)
     {
         // Preserve BOTH independent source branches, including female LabTech.
@@ -735,6 +773,13 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     auto* s = GetServerDE();
     if (runtime_initialized || !s->IsObjectAlive(m_hObject))
         return RuntimeFailure("Invalid or repeated NPC initialization");
+    // CultistAI::InitialUpdate, retail build only: a robe Cultist becomes a plain male (its
+    // oldschool model, chosen by PostPropRead, stays).
+    if (npc_type == NPCType::Cultist && npc_robe && !IsAddonBuild())
+    {
+        npc_robe = false;
+        npc_male = true;
+    }
     std::string table_error;
     if (!InitializeSharedTable(table_error))
         return RuntimeFailure(table_error);
@@ -840,7 +885,7 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         npc_type != NPCType::EnhancedGideon && s->ResolveInitialWorldOverlap(m_hObject) != DE_OK)
         return RuntimeFailure("NPC spawned world-overlap placement failed");
     m_fLastUpdate = s->GetTime();
-    m_damage.ai_body_hits = body_hits(npc_type);
+    m_damage.ai_body_hits = body_hits(npc_type, npc_robe);
     m_damage.ai_hit_localization = !m_damage.ai_body_hits;
     runtime_initialized = true;
     return true;
@@ -865,7 +910,7 @@ bool AI_Mgr::RestoreInitialize()
     if (!m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))
         return RuntimeFailure("NPC aggregates unavailable");
     m_fAIMass = type_mass(npc_type); // Constructor values; the saved body keeps the engine mass.
-    m_damage.ai_body_hits = body_hits(npc_type);
+    m_damage.ai_body_hits = body_hits(npc_type, npc_robe);
     m_damage.ai_hit_localization = !m_damage.ai_body_hits;
     runtime_initialized = true;
     return true;

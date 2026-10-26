@@ -69,19 +69,23 @@ void CultistAI::LoadSubclass(HMESSAGEREAD h)
             c = char(c - 'a' + 'A');
     const bool clown = skin.find("M_CULTIST4") != skin.npos || skin.find("M_CULTIST5") != skin.npos ||
                        skin.find("M_CULTIST6") != skin.npos;
-    if (skin.find("OLDSCHOOL") != skin.npos)
+    // _ADDON: the robe flag comes from the oldschool skin (the retail Load never sets it).
+    const bool robe = IsAddonBuild() && skin.find("OLDSCHOOL") != skin.npos;
+    if ((clown || robe) && !male)
     {
-        s->RejectPayload(h, "CultistAI Load: add-on robe Cultist initialization is not integrated");
-        return;
-    }
-    if (clown && !male)
-    {
-        s->RejectPayload(h, "CultistAI Load: a clown skin always carries the male flag");
+        s->RejectPayload(h, "CultistAI Load: a clown or robe skin always carries the male flag");
         return;
     }
     npc_male = male;
     npc_clown = clown;
+    npc_robe = robe;
     std::string error;
     if (!InitializeSharedTable(error))
         s->RejectPayload(h, "CultistAI Load: " + error);
+    else if (robe)
+    {
+        // RestoreInitialize ran before the skin was known: the oldschool model's body-damage policy.
+        m_damage.ai_body_hits = true;
+        m_damage.ai_hit_localization = false;
+    }
 }

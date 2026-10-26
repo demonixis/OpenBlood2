@@ -4,8 +4,9 @@ Status (2026-10-26): decision 1 is **superset numbering** (user, 2026-10-26). Lo
 edition, mount order, `IsAddonBuild()`, save edition and numbering) and **N2** (NIGHTMARES row and
 new game, `WORLDS_AO` paths, add-on art, CREDITS_AO and the END roll, inspection of all 13
 worlds) are implemented ([edition contracts](../contracts/nightmares_edition_contracts.md)).
-New finding: CALEB1_CC_C's ObjectivesTrigger and four OPHELIA_CC_O SoundFX have NaN authored
-positions and are not created; they must be resolved (with N8) before Caleb1/Ophelia can start.
+Lot **N8** (robe Cultists) is implemented too: CALEB2_CC_C starts. Two proposals below await a
+decision: the NaN-positioned rows that still block CALEB1_CC_C and OPHELIA_CC_O, and corpses of
+headless models.
 `blood2nm.rez` stays refused as a mod. Every later lot needs the user's go-ahead (see
 [open decisions](#open-decisions)).
 
@@ -242,3 +243,24 @@ replaced, while N4–N7 are each confined to one or two worlds.
 3. Whether to accept the absent `BLOOD2NM2.REZ` silently (recommended, as the original does)
    and whether `--nightmares` is wanted beside the setup screen entry.
 4. Multiplayer content (N10) stays out of scope until network play is requested.
+
+## Proposals after N8 (2026-10-26)
+
+**NaN-positioned rows** (x = NaN in the DAT, created there by the original):
+
+- CALEB1_CC_C `object1` is an ObjectivesTrigger with `TouchActivate 0`, activated only by
+  `Trigger10`'s message. Its position matters only for its touch volume (unused) and the 3D origin
+  of `Sounds\Thunder.wav` (absent from every archive). Proposal: create it at the world origin
+  with the touch volume never queried, recorded as a "non-finite authored Pos replaced for a
+  message-only trigger" adaptation, so the "Ice Cold" objective still appears.
+- OPHELIA_CC_O has eight `SoundFX18` rows (the same looping ambient, `nighttime2.wav`, 500/300
+  radii); four are NaN, four are valid. A NaN listener distance is undefined in the original, and
+  the four valid copies still play. Proposal: report the NaN copies as explicit omissions (like
+  `fallengrills`), not failures, so the world starts.
+- Any other class with a non-finite `Pos` stays a not-created failure until reviewed.
+
+**Corpses of headless models**: let `CCorpse` accept a model without a head node with hit-sphere
+localization unavailable (limb loss skipped, saved spheres zero), the same body policy as the
+living actor. This also gives retail Thief, Naga, BoneLeech, DeathShroud, TheHand and Ancient One
+corpses where today they vanish, so it changes retail deaths and the certified whole-world saves;
+the save audit would need re-running.

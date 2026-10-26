@@ -5,9 +5,11 @@
 #include "engine/string_resources.h"
 #include "game/game_settings.h"
 #include "game/menu_resources.h"
+#include "game/original/AI_Mgr.h"
 #include "game/original/Credits.h"
 #include "game/original/LoadingScreen.h"
 #include "game/original/MenuIds.h"
+#include "game/weapon_messages.h"
 #include <iostream>
 #include <map>
 #include <set>
@@ -174,11 +176,10 @@ namespace
             {"multi_ao\\bb_grayskull", {}},
             {"multi_ao\\soc_kickthehead1", {"SoccerBall", "SoccerGoal"}},
             {"multi_ao\\soc_kickthehead2", {"SoccerBall", "SoccerGoal"}}};
-        // Known not-created entries, each explicit (robe Cultists are lot N8).
+        // Known not-created entries, each explicit.
         const auto known_failure = [](std::string_view detail)
         {
-            return detail.find("Add-on robe Cultist") != detail.npos ||
-                   detail.find("Non-finite authored Pos") != detail.npos ||
+            return detail.find("Non-finite authored Pos") != detail.npos ||
                    detail.find("Chrome environment mapping") != detail.npos ||
                    detail.find("scorch1.dtx") != detail.npos;
         };
@@ -248,8 +249,8 @@ namespace
         // Saving in a nightmare level is refused until the add-on classes save (lot N9).
         GameSave save;
         CHECK(!game->save_game(save, error) && error.find("Nightmares levels") != error.npos);
-        // The menu's new game reaches CALEB1_CC_C, whose startup still refuses its 19 robe Cultists
-        // (lot N8) and the NaN-positioned ObjectivesTrigger.
+        // The menu's new game reaches CALEB1_CC_C, whose startup still refuses its NaN-positioned
+        // ObjectivesTrigger.
         MenuCommand command;
         command.action = MenuAction::NewGame;
         command.nightmares = true;
@@ -257,7 +258,61 @@ namespace
         command.difficulty = DIFFICULTY_MEDIUM;
         const bool started = start_menu_world(game, menu_world_start(*game, command, "01_SubwayA"), error);
         std::cout << "Nightmares new game: " << (started ? "started" : error) << "\n";
-        CHECK(!started && error.find("20 failed entries") != error.npos);
+        CHECK(!started && error.find("1 failed entries") != error.npos);
+        // Lot N8: CALEB2_CC_C starts with its 28 robe Cultists on the RetroCultist table (the
+        // oldschool model's body-damage policy) and simulates 30 seconds without NPC failures.
+        CHECK(GameSession::start_new_game(game, "worlds_ao\\caleb2_cc_c", DIFFICULTY_MEDIUM, 0, error));
+        for (int frame = 0; frame < 1800; ++frame)
+            CHECK(game->step(1.0 / 60));
+        unsigned robes = 0;
+        for (auto id : game->objects.snapshot())
+            if (const auto* ai = dynamic_cast<const AI_Mgr*>(game->objects.get(id)->game.get());
+                ai && ai->npc_type == AI_Mgr::NPCType::Cultist && ai->npc_robe)
+            {
+                CHECK(ai->RuntimeReady() && ai->npc_male && ai->AnimSound() &&
+                      ai->AnimSound()->GetSoundRoot() == "sounds_ao/enemies/RetroCultist" &&
+                      ai->m_damage.ai_body_hits && !ai->m_damage.ai_hit_localization);
+                ++robes;
+            }
+        std::cout << "CALEB2_CC_C: " << robes << " robe Cultists alive after 30 s\n";
+        CHECK(robes > 0 && robes <= 28 && game->client_shell.m_bInWorld);
+        // A robe Cultist takes body damage (torso reaction, no head localization) and dies. An awake
+        // one: dormant NPCs (outside the player's visibility) do not update, as in the original.
+        AI_Mgr* victim = nullptr;
+        for (auto id : game->objects.snapshot())
+            if (auto* ai = dynamic_cast<AI_Mgr*>(game->objects.get(id)->game.get());
+                ai && ai->npc_robe && !ai->m_damage.IsDead() && game->objects.get(id)->activity == OBJSTATE_ACTIVE)
+                victim = ai;
+        CHECK(victim);
+        const auto send = [&](float amount, DamageType type)
+        {
+            DVector position{};
+            CHECK(game->server.GetObjectPos(victim->m_hObject, &position) == DE_OK);
+            auto m = game->server.StartMessageToObject(victim, victim->m_hObject, damage_message);
+            return m && game->server.WriteDamage(m, {{0, 0, 1}, position, amount, type, victim->m_hObject}) == DE_OK &&
+                   game->server.EndMessage(m) == DE_OK;
+        };
+        CHECK(send(5, DamageType::Normal) && !victim->runtime_failed && victim->m_damage.node_hit == 2);
+        CHECK(send(1000, DamageType::Normal) && victim->m_damage.IsDead() && !victim->runtime_failed);
+        const auto victim_id = game->objects.get(victim->m_hObject)->id;
+        std::uint64_t death_starts = 0, corpse_failures = 0;
+        std::string death_error;
+        for (int frame = 0; frame < 600; ++frame)
+        {
+            CHECK(game->step(1.0 / 60));
+            if (const auto* r = game->objects.get(victim_id); r && r->game.get() == victim)
+            {
+                death_starts = victim->death_starts;
+                corpse_failures = victim->corpse_failures;
+                death_error = victim->death_error;
+            }
+        }
+        // Known gap: CCorpse needs a head node for its own hit spheres, so the oldschool corpse is
+        // refused; the original flow still hides and removes the actor (nightmares_plan.md).
+        std::cout << "Robe Cultist death: " << death_starts << " start(s), " << corpse_failures
+                  << " corpse failure(s): " << death_error << "\n";
+        CHECK(death_starts == 1 && corpse_failures == 1 && death_error.starts_with("Corpse setup failed") &&
+              !game->objects.get(victim_id) && game->frame_failures.empty());
         return true;
     }
 } // namespace
