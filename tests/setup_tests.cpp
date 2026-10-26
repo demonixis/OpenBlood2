@@ -85,9 +85,11 @@ namespace
         CHECK(save_setup(file, editions, error));
         CHECK(load_setup(file, loaded, error) && loaded == editions);
         CHECK(read(file).starts_with("version=1\nselected.edition=nightmares\n"));
+        // Its "Launch Nightmares" box shares the folder's retail mods (the launcher's custom REZ list).
         const auto nightmares = setup_config(editions, expansion);
-        CHECK(nightmares.nightmares && !nightmares.demo && nightmares.overlays.empty() &&
+        CHECK(nightmares.nightmares && !nightmares.demo && nightmares.overlays == std::vector{root / "a.rez"} &&
               !setup_config(editions, retail).nightmares);
+        CHECK(mod_owner(expansion) == retail && mod_owner(retail) == retail && mod_owner(demo) == demo);
         // Strict reading: unknown, duplicate, incomplete, relative, control characters, future versions.
         const auto refused = [&](std::string_view text)
         {
@@ -152,6 +154,33 @@ namespace
         CHECK(folder_installations(orphan).empty());
         CHECK(portable_ready({}, {expansion}, config_unused, error) && !config_unused.nightmares &&
               config_unused.data_dir == expansion);
+        // A portable copy keeps a stored "Launch Nightmares" choice for that folder.
+        SetupState launch;
+        launch.selected = Installation{Edition::Nightmares, expansion};
+        CHECK(portable_ready(launch, {expansion}, config_unused, error) && config_unused.nightmares);
+        // --nightmares over a stored or portable choice: only where BLOOD2NM.REZ is installed.
+        Config plain{expansion, "test"};
+        CHECK(prefer_nightmares(plain, error) && plain.nightmares && plain.data_dir == expansion);
+        Config without{retail, "test"};
+        CHECK(!prefer_nightmares(without, error) && !without.nightmares &&
+              error.find("BLOOD2NM.REZ") != std::string::npos);
+        // However the folder was found (added as retail only, or a stored Nightmares choice), the
+        // scan lists its retail row and the Nightmares box's entry.
+        for (const auto& item :
+             {Installation{Edition::Retail, expansion}, Installation{Edition::Nightmares, expansion}})
+        {
+            SetupState listed;
+            listed.added = {item};
+            const auto rows = scan_setup(listed, root / "user", {});
+            const auto has = [&](Edition edition)
+            {
+                return std::any_of(rows.begin(), rows.end(), [&](const SetupEntry& e)
+                                   { return e.installation == Installation{edition, expansion} && e.error.empty(); });
+            };
+            CHECK(has(Edition::Retail) && has(Edition::Nightmares));
+        }
+        Config trial{demo, "test", true};
+        CHECK(!prefer_nightmares(trial, error) && !trial.nightmares && error.find("demo") != std::string::npos);
         Config chosen;
         SetupState expansion_state;
         expansion_state.selected = Installation{Edition::Nightmares, expansion};

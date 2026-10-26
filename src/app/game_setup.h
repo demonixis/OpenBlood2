@@ -70,8 +70,14 @@ namespace OpenBlood2
     // with inspect_data.
     std::vector<SetupEntry> scan_setup(const SetupState&, const std::filesystem::path& user_directory,
                                        const std::vector<Installation>& extra = {});
+    // The installation whose mods an installation uses: the Nightmares edition shares its folder's
+    // retail mods (the original launcher's custom REZ list does not depend on its Nightmares box).
+    Installation mod_owner(const Installation&);
     // The game configuration of an installation and its enabled mods, in order.
     Config setup_config(const SetupState&, const Installation&);
+    // --nightmares over a stored or portable choice: the retail installation's Nightmares edition,
+    // when that folder holds BLOOD2NM.REZ. False (config unchanged) with the refusal otherwise.
+    bool prefer_nightmares(Config&, std::string& error);
     // The selected installation when it is still playable.
     bool setup_ready(const SetupState&, Config& config, std::string& error);
     // Android: whether the shared folders are readable (all-files access); true elsewhere.

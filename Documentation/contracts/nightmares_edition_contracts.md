@@ -8,12 +8,15 @@ are lots N3–N9; The Chosen plays as before in this edition.
 
 ## Selection
 
-- `--nightmares` (exclusive with `--demo`), `Config::nightmares`, and the setup screen's
-  `nightmares` edition (`setup.cfg` `selected.edition`, `added.N.edition`, `mod.N.edition`).
-  The edition is never inferred from the folder's content.
-- A folder holding `BLOOD2.REZ` lists The Chosen; holding `BLOOD2NM.REZ` too, it also lists
-  "Blood II: The Nightmare Levels" (after The Chosen). `BLOOD2NM.REZ` alone is no installation.
-  A portable copy still prefers The Chosen. Mods are recorded per edition, as for the demo.
+- The setup screen's "Launch Nightmares" checkbox under The Chosen (stored as the `nightmares`
+  edition in `setup.cfg`; Options > SETUP reopens it), or `--nightmares` (exclusive with `--demo`).
+  `--nightmares` applies to an explicit data folder through `load_config` and, since 2026-10-26, to
+  a stored or portable choice too (`prefer_nightmares`; a folder without `BLOOD2NM.REZ` keeps The
+  Chosen with a warning). The edition is never inferred from the folder's content.
+- A folder holding `BLOOD2.REZ` lists The Chosen; holding `BLOOD2NM.REZ` too, its row carries the
+  "Launch Nightmares" box. `BLOOD2NM.REZ` alone is no installation. A portable copy prefers The
+  Chosen unless the stored choice is that folder's Nightmares edition. The Nightmares edition
+  shares its folder's retail mods (`mod_owner`).
 - `inspect_data` requires `BLOOD2.REZ` and `BLOOD2NM.REZ` and lists `BLOOD2NM2.REZ` as optional
   (the original launcher and server name it; it is not shipped). Retail keeps listing
   `BLOOD2NM.REZ` as information only; the inspector marks it excluded there.

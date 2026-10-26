@@ -142,7 +142,8 @@ platform artifact with `tools/icons/generate_icons.py`) and the Xcode
 anticipation: they build the game only, without tests.
 
 The [Nightmares edition](Documentation/contracts/nightmares_edition_contracts.md) (lot N1 of the
-[Nightmares plan](Documentation/implementation/nightmares_plan.md)) mounts `BLOOD2NM.REZ` (optional
+[Nightmares plan](Documentation/implementation/nightmares_plan.md); chosen with the setup screen's
+"Launch Nightmares" box under The Chosen, or `--nightmares`) mounts `BLOOD2NM.REZ` (optional
 `BLOOD2NM2.REZ`) after the retail patches and gives `IsAddonBuild()`, `saves/nightmares/` and
 fingerprint edition 2. Preserve the never-a-mod refusal, indexed-never-executed code files,
 unchanged retail behaviour and superset weapon numbering (add-on weapons 52–55; predicates, not
