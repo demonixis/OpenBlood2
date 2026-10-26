@@ -22,7 +22,11 @@ namespace OpenBlood2
     {
       public:
         explicit SpriteStore(Resources& resources) : resources_(resources) {}
-        bool load(std::string_view, std::shared_ptr<const Sprite>&, std::string&);
+        // `sprite_object`: an OT_SPRITE's filename. The reference LithTech LoadSprite parses any
+        // file as an SPR (spr_Create, whatever its extension); a non-SPR resource whose header
+        // reads as zero frames (a DTX: resource type 0) is then a valid empty sprite with no
+        // current frame. Other callers, and SPR files, keep the strict reader.
+        bool load(std::string_view, std::shared_ptr<const Sprite>&, std::string&, bool sprite_object = false);
         void clear()
         {
             cache_.clear();

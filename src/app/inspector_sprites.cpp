@@ -140,8 +140,13 @@ namespace OpenBlood2
             ImGui::Text("Current frame present: %d", r->sprite_track.has_frame);
             ImGui::Text("Transparent %d / translucent %d / color key 0x%x", s.transparent, s.translucent, s.color_key);
             ImGui::TextWrapped("Manifest: %s", r->state.m_Filename);
-            const auto& path = s.frames[r->sprite_track.frame];
-            ImGui::TextWrapped("Frame: %s [%s]", path.c_str(), game.resources.find(path) ? "indexed" : "missing");
+            if (r->sprite_track.frame < s.frames.size())
+            {
+                const auto& path = s.frames[r->sprite_track.frame];
+                ImGui::TextWrapped("Frame: %s [%s]", path.c_str(), game.resources.find(path) ? "indexed" : "missing");
+            }
+            else
+                ImGui::TextUnformatted("Frame: none (empty sprite, as the reference spr_Create reads it)");
             if (sprite_view)
                 for (const auto& entry : sprite_view->entries)
                     if (entry.object == r->id)

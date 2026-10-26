@@ -40,6 +40,17 @@ namespace
         dir.files["missing.spr"] = spr(1, 10, "absent.dtx");
         dir.files["bad.spr"] = {0, 1, 2};
         dir.files["frame.dtx"] = {0}; // Presence only, no decoder is claimed.
+        // A version -2 DTX header as the reference spr_Create reads it: 0 frames, rate 0xfffffffe.
+        const auto header = [](std::uint32_t count, std::uint32_t rate)
+        {
+            test_model::Writer w;
+            for (std::uint32_t v : {count, rate, 0x800080u, 4u, 10u, 0u, 0u, 0u})
+                w.u32(v);
+            return w.b;
+        };
+        dir.files["empty.dtx"] = header(0, 0xfffffffeu);
+        dir.files["counted.dtx"] = header(1, 0xfffffffeu);
+        dir.files["zerorate.dtx"] = header(0, 0);
         test_model::Writer w;
         w.b.resize(168);
         w.b[0] = w.b[62] = w.b[124] = 13;
@@ -288,6 +299,36 @@ namespace
         CHECK(g.server.string_count() == 0 && g.server.message_count() == 0 && g.server.list_count() == 0);
         return true;
     }
+    // An OT_SPRITE whose file is not an SPR: the reference LithTech LoadSprite parses it as one
+    // (spr_Create); a DTX reads as zero frames, a valid empty sprite with no current frame
+    // (OPHELIA_CC_O DetailSprite0, spritetextures\scorch1.dtx). Other counts and rate 0 refuse;
+    // non-object sprite callers keep the strict SPR reader.
+    bool empty_dtx(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(setup(g, root));
+        auto h = make(g, {{"Filename", std::string("empty.dtx")}});
+        CHECK(h && get(g, h) && get(g, h)->error.empty());
+        const auto& sprite = g.objects.get(h)->sprite;
+        CHECK(sprite && sprite->frames.empty() && sprite->fps == 0xfffffffeu && sprite->transparent &&
+              sprite->translucent && sprite->color_key == 10);
+        SpriteTrack track;
+        CHECK(advance_sprite(*sprite, track, .5) && !track.has_frame);
+        for (int i = 0; i < 30; ++i)
+            CHECK(g.step(1.0 / 30));
+        CHECK(g.objects.get(h) && !g.objects.get(h)->sprite_track.has_frame);
+        for (auto name : {"counted.dtx", "zerorate.dtx", "frame.dtx"})
+        {
+            CHECK(!make(g, {{"Filename", std::string(name)}}));
+            CHECK(g.objects.finish_frame());
+        }
+        std::shared_ptr<const Sprite> strict;
+        std::string error;
+        CHECK(!g.sprites.load("empty.dtx", strict, error) && error.find("non-SPR") != error.npos && !strict);
+        CHECK(g.sprites.load("empty.dtx", strict, error, true) && strict && strict->frames.empty());
+        CHECK(g.sprites.load("sprite.spr", strict, error, true) && strict->frames.size() == 3); // SPR unchanged.
+        return true;
+    }
     bool catalog(const std::filesystem::path& root)
     {
         GameSession g;
@@ -414,8 +455,9 @@ int main(int argc, char** argv)
     if (argc != 3)
         return 2;
     const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
-        {"reader", reader}, {"clock", clock_test},  {"properties", properties}, {"placement", placement},
-        {"ray", ray},       {"failures", failures}, {"catalog", catalog},       {"subway", subway}};
+        {"reader", reader},       {"clock", clock_test}, {"properties", properties},
+        {"placement", placement}, {"ray", ray},          {"failures", failures},
+        {"catalog", catalog},     {"subway", subway},    {"empty_dtx", empty_dtx}};
     auto it = cases.find(argv[1]);
     return it != cases.end() && it->second(argv[2]) ? 0 : 1;
 }

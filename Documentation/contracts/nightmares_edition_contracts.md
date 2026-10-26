@@ -142,6 +142,6 @@ Real data: all 19 (Caleb1) and 28 (Caleb2) robe Cultists are created. CALEB2_CC_
 dies (no corpse, no frame failure). With the position rules above, CALEB1_CC_C starts too: the
 menu's Nightmares new game enters it, `object1` sits at the origin and still delivers the "Ice
 Cold" objective through a trigger relay, and 30 s simulate without frame failures. OPHELIA_CC_O
-omits its four NaN copies but still refuses its start on 10 unported entries (9 GremlinAI, a
-FlayerPU; lots N5/N6) and one DetailSprite authored with `spritetextures\scorch1.dtx`, a DTX
-rather than an SPR (present in BLOOD2.REZ; DTX sprites are not supported by DetailSprite yet).
+omits its four NaN copies and creates its DetailSprite authored with `spritetextures\scorch1.dtx`
+as the empty sprite the reference engine reads it as ([sprite contracts](sprite_contracts.md#non-spr-sprite-object-files));
+its start now refuses only on 10 unported entries (9 GremlinAI, a FlayerPU; lots N5/N6).

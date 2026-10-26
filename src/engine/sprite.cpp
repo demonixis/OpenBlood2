@@ -41,9 +41,14 @@ namespace OpenBlood2
     }
     bool advance_sprite(const Sprite& s, SpriteTrack& track, double seconds)
     {
-        if (!std::isfinite(seconds) || seconds < 0 || seconds > 60 || s.fps == 0 || s.frames.empty() ||
-            s.frames.size() > 4096 || !std::isfinite(track.milliseconds) || track.milliseconds < 0)
+        if (!std::isfinite(seconds) || seconds < 0 || seconds > 60 || s.fps == 0 || s.frames.size() > 4096 ||
+            !std::isfinite(track.milliseconds) || track.milliseconds < 0)
             return false;
+        if (s.frames.empty())
+        {
+            track.has_frame = false; // Zero frames: zero animation length, no current frame.
+            return true;
+        }
         // Later LithTech SPR clock uses integer milliseconds per frame. Fractional
         // milliseconds are retained here across simulation ticks, independent of UI.
         const auto period = 1000 / s.fps;
@@ -58,12 +63,36 @@ namespace OpenBlood2
         track.frame = static_cast<unsigned>(track.milliseconds / period);
         return true;
     }
-    bool SpriteStore::load(std::string_view path, std::shared_ptr<const Sprite>& out, std::string& error)
+    bool SpriteStore::load(std::string_view path, std::shared_ptr<const Sprite>& out, std::string& error,
+                           bool sprite_object)
     {
         out.reset();
         error.clear();
         const auto* resource = resources_.find(path);
         std::string canonical;
+        if (sprite_object && resource && resource_path(path, canonical) && !canonical.ends_with(".spr") &&
+            resource->size <= 1024 * 1024)
+        {
+            // spr_Create over a non-SPR file: the header fields are read as they are. Only the
+            // zero-frame case is accepted (no frame name is read); any other count is refused.
+            std::vector<std::uint8_t> bytes;
+            if (!resources_.read(path, bytes, error, 20))
+                return false;
+            Reader r(bytes);
+            const auto count = r.u32(), rate = r.u32(), transparent = r.u32(), translucent = r.u32(), key = r.u32();
+            if (!r.good() || count != 0 || rate == 0)
+            {
+                error = "Non-SPR sprite resource does not read as an empty SPR: " + std::string(path);
+                return false;
+            }
+            auto empty = std::make_shared<Sprite>();
+            empty->fps = rate;
+            empty->transparent = std::uint8_t(transparent) != 0; // SpriteAnim::m_bKeyed is a uint8.
+            empty->translucent = std::uint8_t(translucent) != 0;
+            empty->color_key = key;
+            out = std::move(empty);
+            return true;
+        }
         if (!resource || !resource_path(path, canonical) || !canonical.ends_with(".spr") ||
             resource->size > 1024 * 1024)
         {

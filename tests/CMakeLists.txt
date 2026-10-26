@@ -791,7 +791,7 @@ add_executable(sprite_tests sprite_tests.cpp)
 target_link_libraries(sprite_tests PRIVATE blood2_game)
 blood2_project_options(sprite_tests)
 
-foreach(case reader clock properties placement ray failures)
+foreach(case reader clock properties placement ray failures empty_dtx)
     add_test(NAME sprites.${case} COMMAND sprite_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/sprite-fixtures/${case}")
     set_tests_properties(sprites.${case} PROPERTIES LABELS "headless;sprites" TIMEOUT 30)
 endforeach()

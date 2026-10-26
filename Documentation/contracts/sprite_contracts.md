@@ -114,3 +114,18 @@ objects stop drawing, PolyGrids have no sprite texture, and world materials reta
 the initial frame. FPS zero still fails instead of reproducing division by zero.
 These rules do not alter commercial files or fabricate an animation speed.
 Client.exe SHA-256: `edf7442f26dcbef72c3b69b4560d0fa41d6c9dafa45e603fb12bd32fe6eb2dd7`.
+
+## Non-SPR sprite object files
+
+The reference LithTech `LoadSprite` (`runtime/client/src/setupobject.cpp`) parses an
+OT_SPRITE's file as an SPR through `spr_Create`, whatever its extension. A version −2 DTX then
+reads as frame count 0 (its resource type), frame rate 0xfffffffe and further header words as
+the flags and color key: a valid sprite with no frame, which draws nothing. `SpriteStore::load`
+reproduces this for OT_SPRITE files only (`sprite_object`): a non-`.spr` resource whose first
+five words read as zero frames with a nonzero rate becomes an empty `Sprite` (flags as the
+source's `uint8` truncation, color key raw); `advance_sprite` keeps it without a current frame.
+Any other count (frame names would be read from texture data) and rate 0 (a division by zero in
+the source) refuse. SPR files, and every caller that is not an OT_SPRITE (FX, view weapons,
+PolyGrids, splats), keep the strict SPR reader. Case: OPHELIA_CC_O `DetailSprite0`
+(`spritetextures\scorch1.dtx`, user decision 2026-10-26: no invented one-frame decal); the retail
+SteamTunnels blood-splat DTX rows name absent files and stay missing resources.

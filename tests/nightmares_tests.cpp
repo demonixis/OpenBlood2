@@ -179,10 +179,7 @@ namespace
             {"multi_ao\\soc_kickthehead2", {"SoccerBall", "SoccerGoal"}}};
         // Known not-created entries, each explicit.
         const auto known_failure = [](std::string_view detail)
-        {
-            return detail.find("Chrome environment mapping") != detail.npos ||
-                   detail.find("scorch1.dtx") != detail.npos;
-        };
+        { return detail.find("Chrome environment mapping") != detail.npos; };
         for (const auto& [name, expected] : unported)
         {
             const auto world = "worlds_ao\\" + name;
@@ -292,11 +289,11 @@ namespace
             CHECK(game->step(1.0 / 60));
         CHECK(game->frame_failures.empty() && game->client_shell.m_bInWorld);
         std::cout << "CALEB1_CC_C: started, objective delivered, 30 s simulated\n";
-        // OPHELIA_CC_O omits its NaN ambient copies but still waits for GremlinAI/FlayerPU (lots N5/N6)
-        // and its DetailSprite authored with a .dtx texture.
+        // OPHELIA_CC_O omits its NaN ambient copies and creates its .dtx DetailSprite empty (the
+        // reference spr_Create reading), but still waits for GremlinAI/FlayerPU (lots N5/N6).
         CHECK(!GameSession::start_new_game(game, "worlds_ao\\ophelia_cc_o", DIFFICULTY_MEDIUM, 1, error));
         std::cout << "OPHELIA_CC_O: " << error << "\n";
-        CHECK(error.find("10 unsupported") != error.npos && error.find("1 failed entries") != error.npos);
+        CHECK(error.find("10 unsupported") != error.npos && error.find(" 0 failed entries") != error.npos);
         // Lot N8: CALEB2_CC_C starts with its 28 robe Cultists on the RetroCultist table (the
         // oldschool model's body-damage policy) and simulates 30 seconds without NPC failures.
         CHECK(GameSession::start_new_game(game, "worlds_ao\\caleb2_cc_c", DIFFICULTY_MEDIUM, 0, error));

@@ -5,8 +5,9 @@ edition, mount order, `IsAddonBuild()`, save edition and numbering) and **N2** (
 new game, `WORLDS_AO` paths, add-on art, CREDITS_AO and the END roll, inspection of all 13
 worlds) are implemented ([edition contracts](../contracts/nightmares_edition_contracts.md)).
 Lot **N8** (robe Cultists) is implemented too, and the NaN-row proposal below was applied
-(user, 2026-10-26): CALEB1_CC_C and CALEB2_CC_C start. OPHELIA_CC_O still needs N5/N6 and a
-DetailSprite DTX texture. The headless-corpse proposal awaits a decision.
+(user, 2026-10-26): CALEB1_CC_C and CALEB2_CC_C start. OPHELIA_CC_O's DTX DetailSprite is now an
+empty sprite as the reference engine reads it; that world only needs N5/N6. The headless-corpse
+proposal awaits a decision.
 `blood2nm.rez` stays refused as a mod. Every later lot needs the user's go-ahead (see
 [open decisions](#open-decisions)).
 
@@ -259,9 +260,9 @@ replaced, while N4–N7 are each confined to one or two worlds.
   `fallengrills`), not failures, so the world starts.
 - Any other class with a non-finite `Pos` stays a not-created failure until reviewed.
 
-**DetailSprite with a DTX texture**: OPHELIA_CC_O's `DetailSprite0` names
-`spritetextures\scorch1.dtx`; LithTech sprites can use a single texture. Supporting a one-frame
-DTX sprite in DetailSprite is the remaining non-class blocker of that world.
+**DetailSprite with a DTX texture** — resolved 2026-10-26: the earlier "one-frame texture" premise
+was wrong. The reference LithTech `LoadSprite` reads any file as an SPR, so `scorch1.dtx` reads as
+zero frames; OpenBlood2 now creates it as that empty sprite (no decal drawn).
 
 **Corpses of headless models**: let `CCorpse` accept a model without a head node with hit-sphere
 localization unavailable (limb loss skipped, saved spheres zero), the same body policy as the
