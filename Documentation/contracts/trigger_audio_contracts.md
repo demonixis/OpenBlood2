@@ -41,9 +41,15 @@ stage and does not depend on the inspector.
 Empty names make no playback request. Missing WAVs, invalid radii, absent senders
 and exhausted limits produce no placeholder voice. The original activation or
 unlock still proceeds; inspection retains starts, failures and the last error.
-The supported local session is single-player. Action mode's original localized
-console feedback is unavailable and explicitly refuses lock audio instead of
-substituting a sound. Generic multiplayer behavior is not certified.
+In a Chosen game (`GAMETYPE_ACTION`, `B2BaseClass::GetGameType`), the original
+replaces the locked and unlocked sounds with `FormatString(IDS_GENERAL_LOCKED)` (268)
+and `IDS_GENERAL_UNLOCKED` (269) sent to `g_pPlayerObj`'s console (Trigger.cpp:802,
+921). The port reads them from `cres.dll` (`GetClientResourceString`) and sends them
+to the checked local player (`CPlayerObj::SendConsoleMessage`, a `PlayerText` line in
+the client's message lines). Only an authored sound triggers the line, no sound plays,
+and without a local player nothing happens, like the original's null-player test. A
+missing string or a refused delivery leaves `sound_error`; `console_feedback` counts
+delivered lines. Generic multiplayer behavior is not certified.
 
 The Triggers inspector displays all three configured paths, request/start/failure
 counts, the last speaker/radius/priority and the resolved decoded voice/cursor.
@@ -58,7 +64,7 @@ Music and the full M2 acceptance gate remain open.
 Synthetic behavioral checks exercise activation thresholds, touch/message paths,
 all three trigger classes, overlap, following transforms, actual mixed PCM,
 player denial, sender-based UNLOCK, silent key responses, inactive commands,
-missing resources, zero radius, absent sender, Action-mode refusal, hidden updates,
+missing resources, zero radius, absent sender, Action mode without a player, hidden updates,
 owner deletion, stale identities and unload. Private checks use three CDM sensors (including a door-owned SelfTrigger) over
 two world lifetimes through explicit diagnostic lock/denial commands, not a level
 walkthrough. The NVIDIA train trigger smoke borrows a CDM denial cue explicitly,

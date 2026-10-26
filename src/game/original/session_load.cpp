@@ -50,14 +50,14 @@ namespace OpenBlood2
             error = "Malformed CMSG_LOADWORLD";
             return false;
         }
-        // GAMETYPE_CUSTOM is the original single-player custom-level type (MenuCredits,
-        // custom levels); only its fresh NEW_GAME entry is supported.
-        const bool custom = next.game_type == GAMETYPE_CUSTOM && next.load_type == LOADTYPE_NEW_GAME;
-        if ((next.game_type != GAMETYPE_SINGLE && !custom) ||
+        // The local game types: story single player, Single Player > CHOSEN's GAMETYPE_ACTION and
+        // the custom-level GAMETYPE_CUSTOM (MenuCredits). NEW_LEVEL carries the client's current
+        // type; the server keeps the NEW_GAME settings either way (LoadWorld's SetGameInfo).
+        if (!local_game_type(next.game_type) ||
             (next.load_type != LOADTYPE_NEW_GAME && next.load_type != LOADTYPE_NEW_LEVEL) || next.difficulty > 3)
         {
-            error = "Only single-player NEW_GAME/NEW_LEVEL and custom NEW_GAME syntax is supported; "
-                    "saves/multiplayer are unimplemented";
+            error = "Only local-game NEW_GAME/NEW_LEVEL syntax is supported; saves use their own path and "
+                    "multiplayer is unimplemented";
             return false;
         }
         // Keep the original Worlds prefix, but reject traversal instead of stripping

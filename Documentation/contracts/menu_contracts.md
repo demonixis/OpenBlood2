@@ -78,7 +78,51 @@ and startup preflight consume the same identities. Player state/engine validatio
 accepts all four default profiles; restored attributes and stats are never reset.
 Existing NEW_LEVEL carries difficulty and captured character. Character death uses
 the selected model/voice and existing original corpse/gib rules. Addon/multiplayer
-skins and full Action rules remain outside scope; Chosen uses the existing solo game.
+skins remain outside scope. Chosen starts the original action game type (next
+section).
+
+## Chosen games (GAMETYPE_ACTION)
+
+Single Player > STORY is `MenuNewGame(d, CHARACTER_CALEB, GAMETYPE_SINGLE)`. Single
+Player > CHOSEN, then a character (Caleb included) and a difficulty, is
+`CMenuDifficulty::StartGame`'s `MenuNewGame(d, character, GAMETYPE_ACTION)`.
+`menu_world_start` maps the command's `story` flag to these two requests; a Cheats
+warp from inside a Chosen game stays a Chosen game.
+
+- **Two game-type views.** `LoadWorld` stores the request type in the `GAME_GAMETYPE`
+  console variable (`SetGameInfo`, NEW_GAME only). `B2BaseClass::GetGameType` reads it,
+  so `InitialUpdate` removes objects whose `TypeActionMode` is false: every
+  `CameraObj`, `CinematicTrigger` and `ConversationTrigger`, and the authored triggers
+  and sounds that set it. The world plays without cut scenes; startup reports these
+  entries as "Original filter". The server shell's own `GetGameType`/`IsMultiplayerGame`
+  read `m_GameInfo.m_byType`, copied from the engine's NetGame. Every local start
+  (story, Chosen, custom levels, Credits, loads) is `STARTGAME_NORMAL` with a zeroed
+  request, so that type stays `NGT_SINGLE`. `ServerDE::net_game_type` models it
+  (`set_game_settings` sets it only for network types) and the ported server-shell
+  branches read it: weapon/item pickups, `MID_ADDWEAPON`, the `sound` player trigger,
+  voice events, cheats, weapon drops, corpse and gib timers, single-player death,
+  keep-alive restoration and `CMSG_PLAYERMESSAGE`. Player entry, respawn and falling
+  damage port only their single-player paths (`SMSG_PLAYERINIT_SINGLEPLAYER`, named
+  start point, autosave request, default ammo), which the original takes here too. A
+  Chosen game therefore plays these exactly like a story game.
+- **Action-only rules.** Locked/unlocked triggers print `IDS_GENERAL_LOCKED` (268) and
+  `IDS_GENERAL_UNLOCKED` (269) from `cres.dll` on the local player's message lines instead
+  of playing their sounds (Trigger.cpp:802, 921; [trigger audio](trigger_audio_contracts.md)).
+  The client's `m_nGameType` hides objectives (`SMSG_OBJECTIVES`) and the loading screen
+  draws no bumper text ([loading screen](loading_screen_contracts.md)).
+- **NEW_LEVEL** sends the client's current type (`StartNewWorld(m_nGameType, NEW_LEVEL)`);
+  the destination keeps the source's `GAME_GAMETYPE` and difficulty, as the server only
+  sets them on NEW_GAME. Request parsing, world preparation, player entry and keep-alive
+  restoration accept the three local types.
+- **Saves.** The original `MenuSaveGame` only refuses a client in a network game, and
+  `MenuLoadGame` restores `SINGLE`, `ACTION` and `CUSTOM` saves with their type. Chosen
+  saves are ordinary saves: their console holds `GAME_GAMETYPE` 8 and a load keeps it.
+
+Tests: `chosen_mode.requests` (menu commands for the four characters, request syntax and
+both game-type views), private `chosen_mode.subway` (Caleb and Ophelia reach SubwayA with
+every intro camera filtered, no active camera and free movement; the story game keeps
+camera1) and `chosen_mode.continuation` (lock feedback from the installed strings, a
+cheat, save/load and an exit to CityHub keeping the type).
 
 ## UI-M4 preferences and audio
 
@@ -286,12 +330,10 @@ the last entered game (Caleb before any game). `menu_world_start` and
 `start_menu_world` in `app/session_playback.h` hold this mapping for the frontend
 and the headless test.
 
-- `GAMETYPE_CUSTOM` is the original single-player custom-level type. It is accepted
-  only for a fresh NEW_GAME request, through request parsing, world preparation and
-  player entry. The existing `!= GAMETYPE_SINGLE` branches of ported original code
-  now see it as the original did. NEW_LEVEL, saves and multiplayer types still
-  refuse explicitly. Guards that refuse non-single modes (player death, NPC weapon
-  drops, player restoration) remain explicit failures in this mode.
+- `GAMETYPE_CUSTOM` is the original single-player custom-level type, a local type
+  like Chosen's `GAMETYPE_ACTION` (see Chosen games above): the server shell's
+  NetGame type stays single player, so player death, weapon drops and restoration
+  behave as in a story game. Multiplayer types still refuse explicitly.
 - The same transactional `start_new_game` is used: a refused request keeps the
   current session, and the error is shown on the menu.
 - `CBloodClientShell::m_bRollCredits` follows the original PreLoadWorld test (END or

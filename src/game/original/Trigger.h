@@ -24,6 +24,7 @@ class Trigger : public B2BaseClass
     std::uint32_t activation_count = 1, current_activation = 0;
     std::uint64_t activations = 0, rejected = 0, key_queries = 0, sound_requests = 0;
     std::uint64_t sound_starts = 0, sound_failures = 0;
+    std::uint64_t console_feedback = 0; // Action-mode lock/unlock lines delivered instead of sounds.
     OpenBlood2::SoundId last_voice = 0; // Non-owning history; attached one-shots release automatically.
     HOBJECT last_sound_owner = nullptr;
     float last_sound_radius = 0;
@@ -47,7 +48,7 @@ class Trigger : public B2BaseClass
     bool ValidateSender(HOBJECT);
     void Activate(HOBJECT, bool touch);
     void Update();
-    void Sound(const std::string&, HOBJECT owner, float radius, DBYTE priority);
+    void Sound(const std::string&, HOBJECT owner, float radius, DBYTE priority, std::uint32_t action_string = 0);
     bool activating_ = false;
     HOBJECT querying_ = nullptr;
 };

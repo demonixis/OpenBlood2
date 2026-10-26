@@ -11,11 +11,10 @@ namespace OpenBlood2
         error.clear();
         if (!current || current->objects.busy() || ServerAdapter::active_ != &current->server ||
             g_pServerDE != &current->server || !current->server.bound_ || !character_profile(character) ||
-            difficulty > 2 || (game_type != GAMETYPE_SINGLE && game_type != GAMETYPE_CUSTOM) || world.empty() ||
-            world.size() > 255 || world.find('\0') != world.npos ||
-            current->world_revision == std::numeric_limits<std::uint64_t>::max())
+            difficulty > 2 || !local_game_type(game_type) || world.empty() || world.size() > 255 ||
+            world.find('\0') != world.npos || current->world_revision == std::numeric_limits<std::uint64_t>::max())
         {
-            error = "New game requires an active idle owner, supported solo profile and single/custom game type";
+            error = "New game requires an active idle owner, supported solo profile and single/action/custom game type";
             return false;
         }
         WorldMessage request;

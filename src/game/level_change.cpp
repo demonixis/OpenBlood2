@@ -1,3 +1,4 @@
+#include "game/game_settings.h"
 #include "game/original_globals.h"
 #include "game/server_adapter.h"
 #include "game/world_validation.h"
@@ -72,16 +73,21 @@ namespace OpenBlood2
         if (!source.capture_player(saved, error))
             return rejected();
         report.player_captured = true;
+        // The server keeps its NEW_GAME settings across NEW_LEVEL (LoadWorld's SetGameInfo runs
+        // only for LOADTYPE_NEW_GAME), so the destination takes the source's, not the message's.
         const float difficulty = source.server.GetVarValueFloat(source.server.GetGameConVar("GAME_DIFFICULTY"));
+        const float game_type = source.server.GetVarValueFloat(source.server.GetGameConVar("GAME_GAMETYPE"));
         if (!std::isfinite(difficulty) || difficulty < 0 || difficulty > 3 || std::floor(difficulty) != difficulty ||
+            !std::isfinite(game_type) || game_type < 0 || std::floor(game_type) != game_type ||
+            !local_game_type(static_cast<unsigned>(game_type)) ||
             source.world_revision == std::numeric_limits<std::uint64_t>::max())
         {
-            error = "Invalid current difficulty or exhausted world revision";
+            error = "Invalid current difficulty or game type, or exhausted world revision";
             return rejected();
         }
         WorldMessage fresh;
-        if (!original_world_request(request.filename.c_str(), 0, LOADTYPE_NEW_GAME, static_cast<DBYTE>(difficulty),
-                                    fresh))
+        if (!original_world_request(request.filename.c_str(), static_cast<DBYTE>(game_type), LOADTYPE_NEW_GAME,
+                                    static_cast<DBYTE>(difficulty), fresh))
         {
             error = "Invalid normalized level request";
             return rejected();

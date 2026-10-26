@@ -33,8 +33,7 @@ void CPlayerObj::HandleDeath()
     bool unported_power = false;
     for (int i = 0; i < PU_MAXTYPES; ++i)
         unported_power |= m_bPowerupActivated[i] && i != PU_INVISIBLE && i != PU_INVULNERABLE && i != PU_TRIPLEDAMAGE;
-    if (s->GetVarValueFloat(s->GetGameConVar("GAME_GAMETYPE")) != 0 || !OpenBlood2::character_profile(m_nCharacter) ||
-        unported_power)
+    if (s->IsMultiplayerGame() || !OpenBlood2::character_profile(m_nCharacter) || unported_power)
     {
         death_error = "Multiplayer and active unported timed-power death are unavailable";
         return;

@@ -209,6 +209,15 @@ class ServerDE : public CSBase
     virtual DRESULT SendConversation(const OpenBlood2::Conversation&) = 0;
     virtual DRESULT SendObjectives(const OpenBlood2::MissionObjectives&) = 0;
     virtual bool GetClientResourceString(std::uint32_t, std::string&) = 0;
+    // The engine GetGameInfo NetGame type the original server shell copies into m_GameInfo
+    // (CBloodServerShell::GetGameType/IsMultiplayerGame). Local games (single, Chosen action,
+    // custom) start STARTGAME_NORMAL without a NetGame, so it stays NGT_SINGLE (0) while the
+    // GAME_GAMETYPE console variable (B2BaseClass::GetGameType) holds their actual type.
+    DBYTE net_game_type = 0;
+    DBOOL IsMultiplayerGame() const
+    {
+        return net_game_type != 0;
+    }
     virtual DRESULT SendToClient(HCLIENT, const OpenBlood2::PlayerEvent&) = 0;
     virtual bool GetModelFilenames(HOBJECT, std::string&, std::string&) = 0;
     virtual DRESULT SetModelFilenames(HOBJECT, const char*, const char*) = 0;

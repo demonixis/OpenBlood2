@@ -13,10 +13,6 @@ namespace OpenBlood2
 {
     namespace
     {
-        bool single_player(unsigned type)
-        {
-            return type == GAMETYPE_SINGLE || type == GAMETYPE_ACTION || type == GAMETYPE_CUSTOM;
-        }
         // A saved console number: decimal digits only, no sign or spaces, at most `max`.
         bool console_number(const SaveImage& image, std::string_view name, unsigned max, unsigned& out)
         {
@@ -83,7 +79,7 @@ namespace OpenBlood2
         if (type == static_cast<float>(GAMETYPE_CTF))
             return refuse(ctf_refusal);
         if (type < 0 || type > 9 || type != static_cast<float>(static_cast<unsigned>(type)) ||
-            !single_player(static_cast<unsigned>(type)))
+            !local_game_type(static_cast<unsigned>(type)))
             return refuse("Saving is limited to single-player game types (D12)");
         if (resources.demo())
             return refuse("The demo edition has no saves (decision 7)");
@@ -129,8 +125,7 @@ namespace OpenBlood2
         player->ClearClientSaveData(); // A refused save never consumed it.
         if (!saved)
             return refuse("SaveObjects: " + server.last_save.error);
-        next.image =
-            *server.save_store.find(save_type == SAVETYPE_AUTO ? SaveStoreSlot::Auto : SaveStoreSlot::Current);
+        next.image = *server.save_store.find(save_type == SAVETYPE_AUTO ? SaveStoreSlot::Auto : SaveStoreSlot::Current);
         // SaveObjects wrote the schema of the classes present: unique, ascending and versioned.
         next.fingerprint.classes = next.image.classes;
         next.fingerprint.class_schema = class_schema_digest(next.fingerprint.classes);
@@ -235,7 +230,7 @@ namespace OpenBlood2
         else if (console_number(save.image, "GAME_GAMETYPE", 9, game_type) && game_type == GAMETYPE_CTF)
             error = "CTF saves cannot be loaded (multiplayer, out of scope)";
         else if (!save.image.console_saved || save.image.param != 0 ||
-                 !console_number(save.image, "GAME_GAMETYPE", 9, game_type) || !single_player(game_type) ||
+                 !console_number(save.image, "GAME_GAMETYPE", 9, game_type) || !local_game_type(game_type) ||
                  !console_number(save.image, "GAME_DIFFICULTY", 3, difficulty))
             error = "The save is not a full single-player save with its console (D12)";
         else if (save.fingerprint.classes != save.image.classes)

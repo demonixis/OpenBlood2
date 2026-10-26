@@ -639,11 +639,15 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
         }
         if (world_exit.demo_end_pending)
             return true;
-        // StartNewWorld's default difficulty is EASY (0); NEW_LEVEL does not
-        // replace the server's difficulty/game settings. Audio/menu teardown and
-        // loaded-state mutation wait for an accepted transfer in this port.
-        world_exit.pending = OpenBlood2::original_world_request(value->next_world.c_str(), 0,
-                                                                OpenBlood2::LOADTYPE_NEW_LEVEL, 0, world_exit.load);
+        // StartNewWorld(m_nGameType, NEW_LEVEL) with the default difficulty EASY (0); NEW_LEVEL
+        // does not replace the server's difficulty/game settings. The client's m_nGameType is
+        // its last StartNewWorld type, which GAME_GAMETYPE mirrors in a local game. Audio/menu
+        // teardown and loaded-state mutation wait for an accepted transfer in this port.
+        const float game_type = server_.GetVarValueFloat(server_.GetGameConVar("GAME_GAMETYPE"));
+        world_exit.pending =
+            game_type >= 0 && game_type <= 9 &&
+            OpenBlood2::original_world_request(value->next_world.c_str(), static_cast<DBYTE>(game_type),
+                                               OpenBlood2::LOADTYPE_NEW_LEVEL, 0, world_exit.load);
         if (!world_exit.pending)
             world_exit.error = "Invalid data in CBloodClientShell::HandleExitWorld";
         return true; // A refused exit must not disconnect an intact player.
@@ -1211,7 +1215,7 @@ bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerText& 
 {
     // Original CMSG_PLAYERMESSAGE single-player branch: prefix ':' and echo locally.
     if (!Player(client) || message.text.empty() || message.text.size() > 79 ||
-        server_.GetVarValueFloat(server_.GetGameConVar("GAME_GAMETYPE")) != float(GAMETYPE_SINGLE))
+        server_.IsMultiplayerGame()) // Server shell GetGameType() != GAMETYPE_SINGLE.
         return false;
     for (unsigned char c : message.text)
         if (c < 32 || c > 126)

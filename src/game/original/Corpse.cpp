@@ -171,7 +171,7 @@ bool CCorpse::Update()
             else if (pool_result != SegmentResult::Miss && pool_result != SegmentResult::Hit)
                 pool_error = "Corpse blood-pool ray unavailable";
         }
-        const bool multiplayer = GetGameType() != GAMETYPE_SINGLE;
+        const bool multiplayer = s->IsMultiplayerGame();
         if (multiplayer)
             remove_time = now + 30.f - .1f;
         s->SetNextUpdate(m_hObject, burn_attachment ? .1f : multiplayer ? 30.f : 0.f);

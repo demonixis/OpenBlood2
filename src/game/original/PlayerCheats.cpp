@@ -18,8 +18,8 @@ bool CPlayerObj::ProcessCheat(DBYTE nCheatCode, bool bState)
         return false;
     };
 
-    // No cheats in multiplayer (IsMultiplayerGame: any type other than GAMETYPE_SINGLE).
-    if (pServerDE->GetVarValueFloat(pServerDE->GetGameConVar("GAME_GAMETYPE")) != float(GAMETYPE_SINGLE))
+    // No cheats in multiplayer: the server shell NetGame type, so Chosen (action) games allow them.
+    if (pServerDE->IsMultiplayerGame())
         return refuse();
 
     switch (nCheatCode)

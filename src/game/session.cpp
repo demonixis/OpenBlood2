@@ -515,9 +515,9 @@ namespace OpenBlood2
             return false;
         }
         if (const auto type = server.GetVarValueFloat(server.GetGameConVar("GAME_GAMETYPE"));
-            type != float(GAMETYPE_SINGLE) && type != float(GAMETYPE_CUSTOM))
+            type != float(GAMETYPE_SINGLE) && type != float(GAMETYPE_ACTION) && type != float(GAMETYPE_CUSTOM))
         {
-            error = "Player entry supports fresh single-player and custom sessions only";
+            error = "Player entry supports fresh single-player, action and custom sessions only";
             return false;
         }
         // Preflight before creating original objects. Keep inspection usable on

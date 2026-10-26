@@ -1,4 +1,5 @@
 #include "Trigger.h"
+#include "PlayerObj.h"
 #include "SaveFields.h"
 #include "engine/collision.h"
 #include "game/game_settings.h"
@@ -59,7 +60,7 @@ bool Trigger::ReadProp()
     }
     return true;
 }
-void Trigger::Sound(const std::string& name, HOBJECT owner, float radius, DBYTE priority)
+void Trigger::Sound(const std::string& name, HOBJECT owner, float radius, DBYTE priority, std::uint32_t action_string)
 {
     last_sound = name;
     last_sound_owner = owner;
@@ -70,24 +71,34 @@ void Trigger::Sound(const std::string& name, HOBJECT owner, float radius, DBYTE 
     if (name.empty())
         return;
     ++sound_requests;
-    // Original Action mode uses localized console feedback for lock sounds.
-    // That mode has no supported local player session; do not substitute audio.
-    if (priority == 2 && GetGameType() == GAMETYPE_ACTION)
-        sound_error = "Action-mode localized lock feedback is unavailable";
-    else
+    // Original Action mode (GAME_GAMETYPE, Single Player > CHOSEN) replaces the lock and unlock
+    // sounds with FormatString(IDS_GENERAL_LOCKED/UNLOCKED) on g_pPlayerObj's console. Without a
+    // local player nothing is shown or played; a missing string stays visible.
+    if (action_string && GetGameType() == GAMETYPE_ACTION)
     {
-        SoundRequest request;
-        request.resource = name;
-        request.speaker = owner;
-        request.space = SoundSpace::Spatial;
-        request.inner_radius = radius * .1f;
-        request.outer_radius = radius;
-        request.volume = 1;
-        request.priority = priority;
-        request.reverb_requested = true;
-        // Original PlaySoundFromObject defaults: attached, no loop or retained handle.
-        last_voice = g_pServerDE->PlayCharacterSound(owner, request, false, sound_error);
+        auto* player = CPlayerObj::LocalVoicePlayer();
+        std::string text;
+        if (!player)
+            return;
+        if (!g_pServerDE->GetClientResourceString(action_string, text))
+            sound_error = "Action-mode lock feedback string " + std::to_string(action_string) + " is unavailable";
+        else if (!player->SendConsoleMessage(text))
+            sound_error = "Action-mode lock feedback could not reach the client";
+        else
+            ++console_feedback;
+        return;
     }
+    SoundRequest request;
+    request.resource = name;
+    request.speaker = owner;
+    request.space = SoundSpace::Spatial;
+    request.inner_radius = radius * .1f;
+    request.outer_radius = radius;
+    request.volume = 1;
+    request.priority = priority;
+    request.reverb_requested = true;
+    // Original PlaySoundFromObject defaults: attached, no loop or retained handle.
+    last_voice = g_pServerDE->PlayCharacterSound(owner, request, false, sound_error);
     if (last_voice)
         ++sound_starts;
     else
@@ -121,7 +132,7 @@ bool Trigger::ValidateSender(HOBJECT sender)
             }
             accepted = !locked;
             if (locked)
-                Sound(locked_sound, sender, 200, 2); // MISC_HIGH, attached to the denied player.
+                Sound(locked_sound, sender, 200, 2, 268); // MISC_HIGH on the denied player; IDS_GENERAL_LOCKED.
         }
     }
     else if (g_pServerDE->IsKindOf(type, g_pServerDE->GetClass("CBaseCharacter")))
@@ -281,7 +292,7 @@ DDWORD Trigger::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD rea
         else if (same_name(command, "UNLOCK"))
         {
             if (locked)
-                Sound(unlocked_sound, sender, 200, 2); // The command sender, not necessarily a player.
+                Sound(unlocked_sound, sender, 200, 2, 269); // The command sender; IDS_GENERAL_UNLOCKED.
             locked = false;
             g_pServerDE->SetNextUpdate(m_hObject, 0);
         }
