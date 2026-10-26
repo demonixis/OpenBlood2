@@ -139,7 +139,8 @@ bool AI_Mgr::Fire(bool alternate)
         weapon->data.m_nType != WEAP_MELEE && weapon->data.m_nType != WEAP_NAGA_EYEBEAM &&
         weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST && weapon->data.m_nType != WEAP_GIDEON_WIND &&
         weapon->data.m_nType != WEAP_GIDEON_SHIELD && weapon->data.m_nType != WEAP_SOUL_HOOK &&
-        weapon->data.m_nType != WEAP_DRUDGE_FIREBALL)
+        weapon->data.m_nType != WEAP_DRUDGE_FIREBALL &&
+        weapon->data.m_nType != WEAP_GREMLIN_ROCK) // _ADD_ON rocks: the default r_gun/body branch.
         return fail(FireResult::Unavailable, "AI weapon-specific aiming is not integrated");
     DRotation rotation;
     const bool ancient_beam = weapon->data.m_nType == WEAP_ANCIENTONE_BEAM;

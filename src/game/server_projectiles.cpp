@@ -1,3 +1,4 @@
+#include "game/original/AddonProjectiles.h"
 #include "game/original/Grenade.h"
 #include "game/original/Projectile.h"
 #include "game/original/ProximityBomb.h"
@@ -20,7 +21,8 @@ namespace OpenBlood2
         auto* remote = dynamic_cast<CRemoteBomb*>(grenade);
         auto* eye = dynamic_cast<SeeingEye*>(grenade);
         auto* assault = dynamic_cast<CGrenade*>(grenade);
-        if (!assault && !bomb && !remote && !eye)
+        auto* rock = dynamic_cast<CRockProjectile*>(grenade); // _ADD_ON (lot N6).
+        if (!assault && !bomb && !remote && !eye && !rock)
             return false;
         if (!grenade || !grenade->configured || moving_ || objects_.busy() || !collision || !collision_ready ||
             !std::isfinite(seconds) || seconds <= 0 || seconds > .5 || record->attachment ||
@@ -94,8 +96,11 @@ namespace OpenBlood2
             // the boxes already overlap. Deliver that contact at the current position;
             // never turn this into a generic embedded-world escape or a later bounce.
             auto* character = hit.object ? dynamic_cast<CBaseCharacter*>(HandleToObject(hit.object)) : nullptr;
-            const bool overlapping_impact = query == CollisionQuery::Hit && hit.start_solid && assault &&
-                                            assault->bounces_left == 5 && character && !character->m_damage.IsDead();
+            // The same first-contact rule covers an unbounced Gremlin rock (its touch damages).
+            const bool overlapping_impact =
+                query == CollisionQuery::Hit && hit.start_solid &&
+                ((assault && assault->bounces_left == 5) || (rock && rock->bounces_left == 5)) && character &&
+                !character->m_damage.IsDead();
             if (query == CollisionQuery::Invalid ||
                 (query == CollisionQuery::Hit && hit.start_solid && !overlapping_impact) ||
                 !physics_vector(destination) || !physics_vector(velocity))
@@ -109,6 +114,8 @@ namespace OpenBlood2
                        << " polygon=" << hit.polygon;
                 if (assault)
                     reason << " bounces_left=" << assault->bounces_left;
+                if (rock)
+                    reason << " bounces_left=" << rock->bounces_left;
                 if (const auto* obstacle = objects_.get(hit.object))
                     reason << " obstacle=" << obstacle->type->name << '/' << obstacle->state.m_Name;
                 objects_.fail(ObjectError::Unsupported, reason.str());
@@ -137,6 +144,8 @@ namespace OpenBlood2
                 grenade->contacted = true;
                 if (auto* g = dynamic_cast<CGrenade*>(grenade))
                     ++g->contacts;
+                if (rock)
+                    ++rock->contacts;
                 if (bomb)
                     ++bomb->contacts;
                 if (remote)

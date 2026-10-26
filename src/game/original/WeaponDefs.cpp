@@ -2860,6 +2860,65 @@ namespace
             nullptr,                            // Icon for status bar
             nullptr,                            // Highlighted icon for status bar
         },
+        // The Gremlin's Rocks (_ADD_ON; superset ID 54)
+        {
+            "Models\\Weapons\\knifec_pv.abc",         // Model
+            "Models\\Weapons\\knifec_pv.abc",         // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",        // Skin
+            "Models_ao\\Powerups_ao\\rock1_pu.abc",   // Model
+            "Skins_ao\\Powerups_ao\\rock1_pu.dtx",    // Skin
+            WEAP_GREMLIN_ROCK,                       // Type
+            TYPE_MELEE,                              // Fire type
+            AMMO_NONE,                               // Ammo type
+            1,                                       // Ammo Use
+            1,                                       // Alt Ammo Use
+            10.0f,                                   // Min Damage
+            20.0f,                                   // Max Damage
+            10.0f,                                   // Min Alt damage
+            20.0f,                                   // Max Alt damage
+            1.0f,                                    // Reload time
+            1.0f,                                    // Alt reload time
+            {50.0f, 50.0f},                          // Spread
+            {50.0f, 50.0f},                          // Alt Spread
+            1000.0f,                                 // Projectile Velocity
+            1000.0f,                                 // Alt Projectile Velocity
+            3500.0f,                                 // Range
+            3500.0f,                                 // Alt Range
+            1,                                       // Shots per fire
+            1,                                       // Alt Shots per fire
+            1,                                       // Strength or Magic required
+            0,                                       // Two-handed Strength or Magic required
+            0,                                       // Damage Radius (projectiles)
+            0,                                       // Alt Damage Radius (projectiles)
+            DFALSE,                                  // Alt fire zoom
+            DFALSE,                                  // Semi-auto
+            "",                                      // Fire sound
+            "",                                      // Alt Fire sound
+            "",                                      // Empty weapon sound
+            "",                                      // Alt Empty weapon sound
+            "CRockProjectile",                       // Projectile class
+            "CRockProjectile",                       // Alt Projectile class
+            0,                                       // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                      // Muzzle Flash color
+            "Gremlin Rocks",                         // Name
+            0,                                       // Name ID (resource)
+            "",                                      // flash sprite name
+            "",                                      // alt flash Sprite name
+            0.0f,                                    // Flash duration
+            0.0f,                                    // Flash scale
+            {0.0f, 0.0f, 0.0f},                      // 3rd person gun offset
+            {0.0f, -0.5f, 2.4f},                     // Gun Offset
+            {0.0f, 0.0f, 0.0f},                      // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                   // Recoil
+            {0.0f, -5.0f, 20.0f},                    // Flash position
+            0.625f,                                  // Eject interval
+            0.0f,                                    // View kick
+            DFALSE,                                  // View kick is Cumulative
+            DFALSE,                                  // Animation looping
+            DFALSE,                                  // Alt anim looping
+            nullptr,                                 // Icon for status bar
+            nullptr,                                 // Highlighted icon for status bar
+        },
     };
 }
 const WeaponData* weapon_definition(DBYTE type)

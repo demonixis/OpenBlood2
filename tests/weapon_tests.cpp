@@ -112,8 +112,14 @@ namespace
         static_assert(WEAP_MELEE == 17 && WEAP_SHIKARI_CLAW == 18 && WEAP_SKULL == 48 && WEAP_PROXIMITYBOMB == 49 &&
                       WEAP_TIMEBOMB == 51 && WEAP_COMBATSHOTGUN == 52 && WEAP_FLAYER == 53 && WEAP_GREMLIN_ROCK == 54 &&
                       WEAP_NIGHTMARE_FIREBALLS == 55);
-        for (const DBYTE type : {WEAP_COMBATSHOTGUN, WEAP_FLAYER, WEAP_GREMLIN_ROCK, WEAP_NIGHTMARE_FIREBALLS})
+        for (const DBYTE type : {WEAP_COMBATSHOTGUN, WEAP_FLAYER, WEAP_NIGHTMARE_FIREBALLS})
             CHECK(!weapon_definition(type) && inv.ObtainWeapon(type) == InventoryResult::NotAvailable);
+        // Lot N6: the Gremlin's rocks carry the original data (TYPE_MELEE with a projectile class).
+        const auto* rocks = weapon_definition(WEAP_GREMLIN_ROCK);
+        CHECK(rocks && rocks->m_nFireType == TYPE_MELEE && rocks->m_nAmmoType == AMMO_NONE &&
+              rocks->m_fMinDamage == 10 && rocks->m_fMaxDamage == 20 && rocks->m_fProjVelocity == 1000 &&
+              std::string_view(rocks->m_szProjectileClass) == "CRockProjectile" &&
+              std::string_view(rocks->m_szAltProjectileClass) == "CRockProjectile");
         CHECK(IsPlayerWeaponType(WEAP_BERETTA) && IsPlayerWeaponType(WEAP_MELEE) &&
               IsPlayerWeaponType(WEAP_COMBATSHOTGUN) && IsPlayerWeaponType(WEAP_FLAYER) &&
               !IsPlayerWeaponType(WEAP_SHIKARI_CLAW) && !IsPlayerWeaponType(WEAP_PROXIMITYBOMB) &&

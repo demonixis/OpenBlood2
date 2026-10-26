@@ -18,8 +18,8 @@ namespace
         bool supported;
     };
     // Original AI_Mgr::WeaponStrToInt order (AI_Mgr.cpp:377-663). The _ADD_ON
-    // COMBAT/FLAYER/ROCK/NIGHTMARE_FIREBALL branches are absent: the patched retail
-    // object.lto contains no FLAYER literal (only BLOOD2NM does).
+    // COMBAT/FLAYER/ROCK/NIGHTMARE_FIREBALL branches exist only in the add-on build (BLOOD2NM's
+    // object.lto); WeaponStrToInt checks the ported ones (ROCK) against IsAddonBuild().
     constexpr WeaponPrefix weapon_prefixes[]{{"BERET", WEAP_BERETTA, true},
                                              {"SHOTG", WEAP_SHOTGUN, true}, // "SHOTGU" compared on 5 bytes.
                                              {"SNIPE", WEAP_SNIPERRIFLE, true},
@@ -90,12 +90,19 @@ namespace
 } // namespace
 bool AI_Mgr::WeaponStrToInt(std::string_view name, DBYTE& id)
 {
+    // _ADD_ON (AI_Mgr.cpp:650): "ROCK", compared on four bytes, after every base-game name.
+    const bool rock = IsAddonBuild() && name.starts_with("ROCK");
     for (const auto& entry : weapon_prefixes)
         if (name.starts_with(entry.prefix))
         {
             id = entry.id;
             return entry.supported; // Never substitute Beretta for a matched, missing family.
         }
+    if (rock)
+    {
+        id = WEAP_GREMLIN_ROCK;
+        return true;
+    }
     id = WEAP_BERETTA; // Source default for a name matching no compiled branch (e.g. COMBAT).
     return true;
 }
@@ -169,6 +176,22 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
         npc_armor = 50;
         npc_weapons[0] = "SHIKARI_CLAW";
         npc_weapons[1] = "SHIKARI_SPIT";
+    }
+    if (type == NPCType::Gremlin)
+    {
+        // Original GremlinAI constructor (_ADD_ON).
+        m_fHearingDist = 2000;
+        m_fSensingDist = 300;
+        m_fSmellingDist = 1200;
+        m_fSeeingDist = 700;
+        m_fWalkSpeed = m_fRollSpeed = 320;
+        m_fRunSpeed = m_fJumpSpeed = 640;
+        m_dwFlags = 0x202; // FLAG_JUMP | FLAG_NOAMMOCOLLECT.
+        m_bCabal = false;
+        npc_hp = 65;
+        npc_armor = 0;
+        npc_weapons[0] = "SHIKARI_CLAW";
+        npc_weapons[1] = "ROCK";
     }
     if (type == NPCType::BoneLeech || type == NPCType::DrudgeLord)
     {
@@ -395,6 +418,9 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
     if (!configure_error.empty())
         return RuntimeFailure(configure_error);
     auto* s = GetServerDE();
+    // The class exists only in the add-on build's object.lto.
+    if (npc_type == NPCType::Gremlin && !IsAddonBuild())
+        return RuntimeFailure("GremlinAI is an add-on class (Nightmares edition only)");
     if (npc_type == NPCType::SoulDrudge)
     {
         // Original SoulDrudge constructor draw, before any property (AIWeapon1 still overrides it).
@@ -548,6 +574,11 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
         model = "Models/Enemies/Shikari.abc";
         skin = "Skins/Enemies/Shikari.dtx";
     }
+    else if (npc_type == NPCType::Gremlin)
+    {
+        model = "Models_ao/Enemies_ao/Gremlin.abc";
+        skin = "Skins_ao/Enemies_ao/Gremlin.dtx";
+    }
     else if (npc_type == NPCType::SoulDrudge)
     {
         // Original PostPropRead: one of three skins on the shared model.
@@ -622,7 +653,8 @@ bool AI_Mgr::InitializeSharedTable(std::string& error)
         return false;
     }
     const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
-    const auto group = npc_type == NPCType::AncientOne           ? 28
+    const auto group = npc_type == NPCType::Gremlin              ? 31
+                       : npc_type == NPCType::AncientOne         ? 28
                        : npc_type == NPCType::AncientOneTentacle ? 29
                        : npc_type == NPCType::UndeadGideon       ? 27
                        : npc_type == NPCType::EnhancedGideon     ? 26
@@ -752,6 +784,7 @@ bool AI_Mgr::InitializeSharedTable(std::string& error)
                  : npc_type == NPCType::Prophet            ? "sounds/enemies/Prophet"
                  : npc_type == NPCType::SoulDrudge         ? "sounds/enemies/souldrudge"
                  : npc_type == NPCType::Shikari            ? "sounds/enemies/shikari"
+                 : npc_type == NPCType::Gremlin            ? "sounds_ao/enemies/Gremlin"
                  : npc_type == NPCType::MadScientist       ? "sounds/enemies/madscientist"
                  : male_group                              ? "sounds/enemies/m_cultist"
                                                            : "sounds/enemies/f_cultist"))

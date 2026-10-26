@@ -5,6 +5,7 @@
 #include "Projectile.h"
 #include "Weapon.h"
 #include "engine/collision.h"
+#include <cmath>
 using namespace OpenBlood2;
 FireResult CWeapon::FireProjectile()
 {
@@ -28,9 +29,9 @@ FireResult CWeapon::FireProjectile()
         return last_shot.result = FireResult::Unavailable;
     }
     if (!instance->Setup(last_shot.direction, data.m_nType, last_shot.damage * m_pInventoryMgr->damage_multiplier,
-                         inventory_bomb(data.m_nType)
-                             ? (alt ? data.m_fAltProjVelocity : last_shot.request.projectile_speed)
-                             : (alt ? data.m_fAltProjVelocity : data.m_fProjVelocity),
+                         inventory_bomb(data.m_nType) ? (alt ? data.m_fAltProjVelocity : last_shot.request.projectile_speed)
+                         : projectile_speed >= 0     ? projectile_speed
+                                                     : (alt ? data.m_fAltProjVelocity : data.m_fProjVelocity),
                          alt ? data.m_nAltDamageRadius : data.m_nDamageRadius, m_hOwner))
     {
         projectile_error = instance->error;
@@ -38,6 +39,28 @@ FireResult CWeapon::FireProjectile()
     }
     projectile = instance->m_hObject;
     return last_shot.result = FireResult::Fired;
+}
+FireResult CGremlinRock::FireProjectile()
+{
+    auto* server = BaseClass::GetServerDE();
+    if (!server || !firing || !server->IsObjectAlive(m_hOwner))
+        return last_shot.result = FireResult::Invalid;
+    float speed = 0;
+    if (!server->RandomFloat(500, 1000, speed))
+    {
+        projectile_error = "Gremlin rock speed RNG unavailable";
+        return last_shot.result = FireResult::Unavailable;
+    }
+    projectile_speed = speed; // m_fProjVelocity = m_fAltProjVelocity.
+    const auto biased = vector_add(last_shot.direction, {0, 1 - (speed - 500) / 1000, 0});
+    const auto length = std::sqrt(vector_dot(biased, biased));
+    if (!std::isfinite(length) || length <= 0)
+    {
+        projectile_error = "Gremlin rock direction degenerate";
+        return last_shot.result = FireResult::Unavailable;
+    }
+    last_shot.direction = vector_scale(biased, 1 / length);
+    return CWeapon::FireProjectile();
 }
 void CTeslaCannon::BeginFire(bool alternate)
 {

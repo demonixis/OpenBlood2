@@ -91,6 +91,9 @@ class CWeapon
     virtual FireResult FireProjectile();
     HOBJECT projectile = nullptr;               // Checked independent runtime child, never owning.
     const char* alt_projectile_class = nullptr; // Source m_szAltProjectileClass override.
+    // A subclass's m_fProjVelocity/m_fAltProjVelocity written before CWeapon::FireProjectile
+    // (CGremlinRock); negative uses the definition's velocities.
+    float projectile_speed = -1;
     std::string projectile_error;
     virtual FireResult FireVector();
     std::vector<WeaponImpact> impacts; // Latest validated shot attempt, bounded to 64 contacts.
@@ -299,6 +302,14 @@ class CShikariClaw final : public CWeapon
         const char* chosen = alternate ? alt_sound : fire_sound;
         return chosen ? chosen : CWeapon::FireSound(alternate);
     }
+};
+// Original CGremlinRock (_ADD_ON): each shot draws a speed in [500, 1000] for both fire modes,
+// adds a world-up bias of 1 - (speed - 500) / 1000 to the fire direction and normalizes it.
+class CGremlinRock final : public CWeapon
+{
+  public:
+    CGremlinRock() : CWeapon(WEAP_GREMLIN_ROCK) {}
+    FireResult FireProjectile() override;
 };
 // Original CShikariSpit: an Acid loogie projectile with gravity removed.
 class CShikariSpit final : public CWeapon

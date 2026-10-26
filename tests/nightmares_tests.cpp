@@ -165,9 +165,9 @@ namespace
         std::string error;
         const std::map<std::string, std::set<std::string>> unported{
             {"caleb1_cc_c", {}},
-            {"ophelia_cc_o", {"FlayerPU", "GremlinAI"}},
+            {"ophelia_cc_o", {"FlayerPU"}},
             {"ishmael_cc_i", {"FlayerPU"}},
-            {"gabby_cc_g", {"CombatShotgunPU", "GremlinAI"}},
+            {"gabby_cc_g", {"CombatShotgunPU"}},
             {"caleb2_cc_c", {}},
             {"endboss_cc_c", {"Nightmare"}},
             {"end", {}},
@@ -195,7 +195,7 @@ namespace
                                           ".dat");
             std::set<std::string> found;
             std::map<std::string, unsigned> failed;
-            unsigned invalid_positions = 0, origin_triggers = 0;
+            unsigned invalid_positions = 0, origin_triggers = 0, gremlins = 0;
             CHECK(game->entries.size() == game->world.objects.size());
             for (std::size_t i = 0; i < game->entries.size(); ++i)
             {
@@ -203,6 +203,8 @@ namespace
                 const auto& cls = game->world.objects[i].class_name;
                 if (entry.state == EntryState::Unsupported)
                     found.insert(cls);
+                else if (entry.state == EntryState::Created && cls == "GremlinAI")
+                    ++gremlins; // Lot N6.
                 else if (entry.state == EntryState::InvalidAuthoredPosition)
                 {
                     CHECK(cls == "SoundFX");
@@ -222,6 +224,7 @@ namespace
             CHECK(found == expected);
             CHECK(invalid_positions == (name == "ophelia_cc_o" ? 4u : 0u));
             CHECK(origin_triggers == (name == "caleb1_cc_c" ? 1u : 0u));
+            CHECK(gremlins == (name == "ophelia_cc_o" ? 9u : name == "gabby_cc_g" ? 12u : 0u));
             std::cout << world << ": " << game->entries.size() << " entries";
             for (const auto& [cls, count] : failed)
                 std::cout << ", " << count << " " << cls << " not created";
@@ -289,11 +292,11 @@ namespace
             CHECK(game->step(1.0 / 60));
         CHECK(game->frame_failures.empty() && game->client_shell.m_bInWorld);
         std::cout << "CALEB1_CC_C: started, objective delivered, 30 s simulated\n";
-        // OPHELIA_CC_O omits its NaN ambient copies and creates its .dtx DetailSprite empty (the
-        // reference spr_Create reading), but still waits for GremlinAI/FlayerPU (lots N5/N6).
+        // OPHELIA_CC_O omits its NaN ambient copies, creates its .dtx DetailSprite empty (the
+        // reference spr_Create reading) and its nine Gremlins (lot N6), but still waits for FlayerPU (N5).
         CHECK(!GameSession::start_new_game(game, "worlds_ao\\ophelia_cc_o", DIFFICULTY_MEDIUM, 1, error));
         std::cout << "OPHELIA_CC_O: " << error << "\n";
-        CHECK(error.find("10 unsupported") != error.npos && error.find(" 0 failed entries") != error.npos);
+        CHECK(error.find(" 1 unsupported") != error.npos && error.find(" 0 failed entries") != error.npos);
         // Lot N8: CALEB2_CC_C starts with its 28 robe Cultists on the RetroCultist table (the
         // oldschool model's body-damage policy) and simulates 30 seconds without NPC failures.
         CHECK(GameSession::start_new_game(game, "worlds_ao\\caleb2_cc_c", DIFFICULTY_MEDIUM, 0, error));

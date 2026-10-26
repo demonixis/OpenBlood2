@@ -1,4 +1,4 @@
-# Nightmares edition contracts (lots N1, N2, N8)
+# Nightmares edition contracts (lots N1, N2, N6, N8)
 
 Lot N1 of the [Nightmares plan](../implementation/nightmares_plan.md): the expansion becomes a
 selectable **edition** beside retail and the demo. It mounts the expansion archive and exposes the
@@ -52,8 +52,8 @@ loading still requires a `worlds/` DAT path.
 Every retail weapon, ammo, cheat and save number is unchanged. The four add-on weapons are
 appended after the inventory bombs: `WEAP_COMBATSHOTGUN 52`, `WEAP_FLAYER 53`,
 `WEAP_GREMLIN_ROCK 54`, `WEAP_NIGHTMARE_FIREBALLS 55` (the 1999 build numbers them 18, 19,
-`WEAP_LASTPLAYERWEAPON + 32/+33` and shifts the others). They have no `WeaponData` yet, so they
-cannot be obtained. The original `type <= WEAP_LASTPLAYERWEAPON` test is
+`WEAP_LASTPLAYERWEAPON + 32/+33` and shifts the others). Only the rocks have `WeaponData` (lot N6);
+the other three cannot be obtained yet. The original `type <= WEAP_LASTPLAYERWEAPON` test is
 `IsPlayerWeaponType` (WEAP_NONE included, as in the source; it also covers the two add-on player
 weapons), used by the AI weapon-switch ammo check. Add-on cheats will be appended to the cheat
 codes with their weapons (lot N4).
@@ -145,3 +145,47 @@ Cold" objective through a trigger relay, and 30 s simulate without frame failure
 omits its four NaN copies and creates its DetailSprite authored with `spritetextures\scorch1.dtx`
 as the empty sprite the reference engine reads it as ([sprite contracts](sprite_contracts.md#non-spr-sprite-object-files));
 its start now refuses only on 10 unported entries (9 GremlinAI, a FlayerPU; lots N5/N6).
+
+## Lot N6: Gremlins and their rocks
+
+- **GremlinAI** (`Gremlin.cpp`, registered with RandomHitPoints 10, AIState and hidden Dims
+  19×30×24). Constructor values: hearing 2000, sensing 300, smelling 1200, seeing 700, walk/roll
+  320, run/jump 640, FLAG_JUMP | FLAG_NOAMMOCOLLECT, not Cabal, 65 HP, `SHIKARI_CLAW` and `ROCK`.
+  Model `Models_ao\Enemies_ao\Gremlin.abc`, shared table slot 31 (`RuntimeTables` is 32 slots) with
+  sound root `sounds_ao\enemies\Gremlin`; standard hit spheres (the model has `head`/`neck`, other
+  names use the predecessor fallback). Creation is refused outside the add-on build ("GremlinAI is
+  an add-on class (Nightmares edition only)"), as the class exists only in BLOOD2NM's object.lto.
+- **States.** Like ShikariAI with the source's differences: ComputeState has no height test
+  (SIGHT ≤ .75 attacks from afar; the smell test reads the argument); AttackClose/AttackFar go
+  straight to ComputeState without a target (no exception for a jump in flight); AttackFar opens
+  with an `IsRandomChance(40)` Bold taunt (`RandomInt(0, 99) < 40`, then waiting for the clip), then
+  fire/compute/walk, then compute/jump (IsLedge only when the earlier tests fail)/advance, and
+  otherwise ComputeState; MC_Fire_Stand throws rocks for AttackFar, guard or a target above and
+  higher than the body, else claws, always with `FIRE_STAND[4]` (no draw), and restores the claw when
+  the clip ends; Dodge, GuardLocation and Special1 (eating) match Shikari. A taller target such as a
+  Cultist counts as above the body, so it draws rocks even at close range.
+- **Rocks** (`CGremlinRock`, `WEAP_GREMLIN_ROCK` 54: TYPE_MELEE, 10–20 damage, projectile and
+  alternate `CRockProjectile`). Each shot draws a speed in [500, 1000] (`RandomFloat`) for both fire
+  modes (`CWeapon::projectile_speed`), adds a world-up bias of `1 − (v − 500)/1000` to the direction
+  and normalizes it. `AI_Mgr::WeaponStrToInt` maps `ROCK` (four bytes) only in the add-on build (the
+  retail build keeps the source default Beretta); AI aiming uses the source `default` branch
+  (`r_gun`, else the body position and forward: the Gremlin has no `r_gun`).
+- **CRockProjectile** (`AddonProjectiles.{h,cpp}`): a gravity `rock1_pu` model flown by the shared
+  model-projectile service (the grenade's first-contact overlap rule also covers an unbounced rock).
+  Its contact replaces the base explosion: a touched character takes `m_fDamage × bounces_left / 5`
+  (DAMAGE_TYPE_NORMAL, the shooter responsible); a world polygon reflects 0.3 of the normal velocity,
+  halves it and draws new spins; any other contact stops it; each counted contact plays
+  `Sounds\Bounce\basketball.wav` (500/50, priority 1) and uses one of five bounces. It never
+  explodes, fades over its last 1.5 s and is removed at 6.5 s. As for the grenade, the replacement
+  solver has already removed the inward velocity before the callback, so a floor landing counts one
+  bounce and slides instead of rebounding (no invented restitution).
+- **Saves.** `GremlinAI` and `CRockProjectile` are declared Unsupported until the add-on save lot
+  (N9); WORLDS_AO saves are refused anyway.
+
+Tests: `weapon` (rock data), `gremlin.configuration` (constructor values, model, table, ROCK
+mapping, ComputeState), `gremlin.claw` (a same-height target clawed), `gremlin.rock` (a far target:
+rock clip, 791-unit speed and upward unit direction, floor contact, bounce sound, fade and removal
+at 6.5 s; a direct unbounced hit deals its full 15 damage), `gremlin.retail` (no GremlinAI, ROCK is
+the Beretta). Real data: OPHELIA_CC_O creates its 9 Gremlins and GABBY_CC_G its 12; OPHELIA now
+waits only for its FlayerPU (lot N5) and GABBY for its CombatShotgunPU (lot N4). Neither world can
+start yet, so the throw is verified on a synthetic floor with the real assets, not in those worlds.

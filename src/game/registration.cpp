@@ -34,6 +34,7 @@
 #include "game/original/GameStartPoint.h"
 #include "game/original/Gib.h"
 #include "game/original/Gideon.h"
+#include "game/original/AddonProjectiles.h"
 #include "game/original/Grenade.h"
 #include "game/original/HandWeaponModel.h"
 #include "game/original/IshmaelAI.h"
@@ -62,6 +63,7 @@
 #include "game/original/RotatingDoor.h"
 #include "game/original/RotatingModel.h"
 #include "game/original/SeeingEye.h"
+#include "game/original/GremlinAI.h"
 #include "game/original/ShikariAI.h"
 #include "game/original/SingularityProjectile.h"
 #include "game/original/SkyObjects.h"
@@ -187,6 +189,9 @@ namespace OpenBlood2
                                                 SaveSupport::Original,    1};
         const ClassInfo napalm_projectile{"CNapalmProjectile",   &base, construct<CNapalmProjectile>, {},
                                           SaveSupport::Original, 1};
+        // _ADD_ON CRockProjectile (BEGIN_CLASS CF_HIDDEN): Unsupported until the add-on save lot (N9).
+        const ClassInfo rock_projectile{"CRockProjectile", &base, construct<CRockProjectile>, {},
+                                        SaveSupport::Unsupported};
         const ClassInfo loogie{"CShikariLoogieProjectile", &base, construct<CShikariLoogieProjectile>, {},
                                SaveSupport::Original,      1};
         const ClassInfo orb_prime{"COrbProjectile", &base, construct<COrbProjectile>, {}, SaveSupport::Original, 1};
@@ -882,6 +887,14 @@ namespace OpenBlood2
             {{"RandomHitPoints", 50.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{21, 36, 18}}},
             SaveSupport::Original,
             1};
+        // _ADD_ON BEGIN_CLASS(GremlinAI): RandomHitPoints 10, AIState and hidden Dims. Creation is
+        // refused outside the Nightmares edition; Unsupported for saves until lot N9.
+        const ClassInfo gremlin{
+            "GremlinAI",
+            &ai_manager,
+            construct_npc<GremlinAI, AI_Mgr::NPCType::Gremlin>,
+            {{"RandomHitPoints", 10.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{19, 30, 24}}},
+            SaveSupport::Unsupported};
         // Original BEGIN_CLASS(ShikariAI): RandomHitPoints, AIState and hidden Dims only.
         const ClassInfo shikari{
             "ShikariAI",
@@ -1585,6 +1598,7 @@ namespace OpenBlood2
                objects.register_class(fanatic) && objects.register_class(prophet) &&
                objects.register_class(bone_leech) && objects.register_class(drudge_lord) &&
                objects.register_class(soul_drudge) && objects.register_class(shikari) &&
+               objects.register_class(gremlin) &&
                objects.register_class(mad_scientist) && objects.register_class(player) &&
                objects.register_class(particle_system) && objects.register_class(polygrid) &&
                objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
@@ -1629,6 +1643,7 @@ namespace OpenBlood2
                objects.register_class(tesla_ball) && objects.register_class(napalm_projectile) &&
                objects.register_class(seeing_eye) && objects.register_class(bugspray_projectile) &&
                objects.register_class(bugspray_alt_projectile) && objects.register_class(loogie) &&
+               objects.register_class(rock_projectile) &&
                objects.register_class(orb_prime) && objects.register_class(orb_alt) &&
                objects.register_class(orb_pickup) && objects.register_class(leech_prime) &&
                objects.register_class(leech_alt) && objects.register_class(leech_pickup) &&

@@ -308,6 +308,8 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         weapon = std::make_unique<CShikariClaw>();
     else if (type == WEAP_SHIKARI_SPIT)
         weapon = std::make_unique<CShikariSpit>();
+    else if (type == WEAP_GREMLIN_ROCK)
+        weapon = std::make_unique<CGremlinRock>();
     else if (type == WEAP_SOUL_CROWBAR || type == WEAP_SOUL_AXE || type == WEAP_SOUL_PIPE)
         weapon = std::make_unique<CSoulWeapon>(type);
     else if (type == WEAP_SOUL_HOOK)

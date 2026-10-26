@@ -6,8 +6,9 @@ new game, `WORLDS_AO` paths, add-on art, CREDITS_AO and the END roll, inspection
 worlds) are implemented ([edition contracts](../contracts/nightmares_edition_contracts.md)).
 Lot **N8** (robe Cultists) is implemented too, and the NaN-row proposal below was applied
 (user, 2026-10-26): CALEB1_CC_C and CALEB2_CC_C start. OPHELIA_CC_O's DTX DetailSprite is now an
-empty sprite as the reference engine reads it; that world only needs N5/N6. The headless-corpse
-proposal awaits a decision.
+empty sprite as the reference engine reads it. Lot **N6** (GremlinAI, rocks) is implemented:
+OPHELIA_CC_O now waits only for N5 (FlayerPU) and GABBY_CC_G for N4 (CombatShotgunPU). The
+headless-corpse proposal awaits a decision.
 `blood2nm.rez` stays refused as a mod. Every later lot needs the user's go-ahead (see
 [open decisions](#open-decisions)).
 
