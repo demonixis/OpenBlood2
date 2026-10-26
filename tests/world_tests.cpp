@@ -499,14 +499,16 @@ namespace
                     vector.vec(f, 192, -960);
                     auto source = object(cls, {prop(key, 1, vector)});
                     auto file = dat(false, false, false, false, 0, nullptr, 1, &source);
-                    const bool editor = std::string_view(cls) != "GameStartPoint" && std::string_view(key) == "Pos";
+                    // Any class's non-finite Pos is retained as invalid metadata (the session does not
+                    // create such a runtime entry); other vectors still refuse the world.
+                    const bool editor = std::string_view(key) == "Pos";
                     const bool invalid = !std::isfinite(f);
                     CHECK(read_world(file.data, w, error) == (!invalid || editor));
                     if (!invalid || editor)
                     {
                         CHECK(w.objects[0].invalid_editor_position == (editor && invalid));
                         CHECK(bool(w.objects[0].find(key)) == !(editor && invalid));
-                        if (editor && invalid)
+                        if (editor && invalid && std::string_view(cls) != "GameStartPoint")
                         {
                             CHECK(!std::isfinite(std::get<DVector>(w.objects[0].properties[0].value).x));
                             std::vector<StaticLight> lights;

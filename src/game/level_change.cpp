@@ -16,7 +16,7 @@ namespace OpenBlood2
             error = "Level change requires the active session outside callbacks";
             return false;
         }
-        if (!parse_world_request(message, request, error))
+        if (!parse_world_request(message, request, error, resources.nightmares()))
             return false;
         if (request.load_type != LOADTYPE_NEW_LEVEL || start.size() > 100 || start.find('\0') != start.npos)
         {
@@ -61,7 +61,7 @@ namespace OpenBlood2
         };
         WorldRequest request;
         PlayerRestoreState saved;
-        if (!parse_world_request(pending.message, request, error))
+        if (!parse_world_request(pending.message, request, error, source.resources.nightmares()))
             return rejected();
         if (request.load_type != LOADTYPE_NEW_LEVEL || pending.start.size() > 100 ||
             pending.start.find('\0') != pending.start.npos)

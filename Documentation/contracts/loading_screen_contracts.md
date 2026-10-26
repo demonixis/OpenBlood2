@@ -16,7 +16,8 @@ Without a title the name given to `StartNewWorld` is used. Under `_DEMO` every
 contains `DEMO_02`, else `\screens\loading1.pcx`. The header is read without
 loading the world (`read_world_info` over a bounded prefix, the original
 `GetWorldInfoString`); a missing world keeps the fallback title and the load
-itself reports the failure.
+itself reports the failure. In the [Nightmares edition](nightmares_edition_contracts.md#lot-n2-frontend-and-world-paths)
+a `WORLDS_AO` name is read as given and always shows `Screens_ao\Bumper.pcx`.
 
 ## Drawing
 
@@ -67,7 +68,8 @@ the load proceeds without it.
 
 ## Title splash
 
-On normal menu launches the original `Splash_Display("\screens\title.pcx")` is shown,
+On normal menu launches the original `Splash_Display("\screens\title.pcx")` (Nightmares:
+`\screens_ao\title.pcx`) is shown,
 stretched to the screen, for six seconds or until Esc, Return or Space (mouse,
 gamepad and tap adapters as above), then the main menu opens. The retail
 introduction movies (`Monolith.smk`, `Gti.smk`, `Intro.smk`, played before the

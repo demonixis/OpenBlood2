@@ -6,6 +6,8 @@
 #include "engine/formats/reader.h"
 #include "game/game_settings.h"
 #include "game/session.h"
+#include <algorithm>
+#include <cctype>
 
 namespace OpenBlood2
 {
@@ -35,7 +37,29 @@ namespace OpenBlood2
         message.WriteToMessageByte(nDifficulty); // Difficulty level
         return true;
     }
-    bool parse_world_request(const WorldMessage& message, WorldRequest& request, std::string& error)
+    bool addon_world_name(std::string_view name)
+    {
+        constexpr std::string_view marker = "WORLDS_AO";
+        for (std::size_t i = 0; i + marker.size() <= name.size(); ++i)
+            if (std::equal(marker.begin(), marker.end(), name.begin() + i,
+                           [](char a, char b) { return a == std::toupper(static_cast<unsigned char>(b)); }))
+                return true;
+        return false;
+    }
+    bool world_resource_path(std::string_view name, bool addon, std::string& path)
+    {
+        path.clear();
+        // Keep the original Worlds prefix, but reject traversal instead of stripping
+        // arbitrary input or using unchecked _mbscpy/_mbscat into MAX_PATH.
+        if (!resource_path(name, path))
+            return false;
+        if (!path.starts_with("worlds/") && !(addon && addon_world_name(path)))
+            path = "worlds/" + path;
+        if (!path.ends_with(".dat"))
+            path += ".dat";
+        return true;
+    }
+    bool parse_world_request(const WorldMessage& message, WorldRequest& request, std::string& error, bool addon)
     {
         request = {};
         Reader reader(message.bytes);
@@ -60,28 +84,22 @@ namespace OpenBlood2
                     "multiplayer is unimplemented";
             return false;
         }
-        // Keep the original Worlds prefix, but reject traversal instead of stripping
-        // arbitrary input or using unchecked _mbscpy/_mbscat into MAX_PATH.
         std::string path;
-        if (!resource_path(next.filename, path))
+        if (!world_resource_path(next.filename, addon, path))
         {
             error = "Invalid world path";
             return false;
         }
-        if (!path.starts_with("worlds/"))
-            path = "worlds/" + path;
-        if (!path.ends_with(".dat"))
-            path += ".dat";
         next.filename = std::move(path);
         request = std::move(next);
         error.clear();
         return true;
     }
-    bool decode_world_request(const WorldMessage& message, WorldRequest& request, std::string& error)
+    bool decode_world_request(const WorldMessage& message, WorldRequest& request, std::string& error, bool addon)
     {
         request = {};
         WorldRequest next;
-        if (!parse_world_request(message, next, error))
+        if (!parse_world_request(message, next, error, addon))
             return false;
         if (next.load_type == LOADTYPE_NEW_LEVEL)
         {

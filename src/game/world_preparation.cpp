@@ -25,7 +25,8 @@ namespace OpenBlood2
             (request.load_type != LOADTYPE_NEW_GAME && request.load_type != LOADTYPE_NEW_LEVEL &&
              request.load_type != LOADTYPE_RESTORESAVE) ||
             !resource_path(request.filename, normalized) || normalized != request.filename ||
-            !normalized.starts_with("worlds/") || !normalized.ends_with(".dat"))
+            !(normalized.starts_with("worlds/") || (resources.nightmares() && normalized.starts_with("worlds_ao/"))) ||
+            !normalized.ends_with(".dat"))
         {
             error = "World preparation requires a normalized local-game NEW_GAME, NEW_LEVEL or restore request";
             return false;
@@ -88,7 +89,7 @@ namespace OpenBlood2
         }
         next.requested_start = start;
         WorldRequest request;
-        if (!parse_world_request(message, request, error))
+        if (!parse_world_request(message, request, error, resources.nightmares()))
             return failed();
         next.destination = request.filename;
         PreparedWorld prepared;

@@ -1,10 +1,10 @@
-# Nightmares edition contracts (lot N1)
+# Nightmares edition contracts (lots N1–N2)
 
 Lot N1 of the [Nightmares plan](../implementation/nightmares_plan.md): the expansion becomes a
 selectable **edition** beside retail and the demo. It mounts the expansion archive and exposes the
-runtime switch the later lots port the original `_ADD_ON`/`_ADDON` branches behind. It adds no
-expansion behaviour: the NIGHTMARES menu row, the `WORLDS_AO` campaign, the character chain and
-the new classes are lots N2–N9. With the edition selected, the game plays The Chosen as before.
+runtime switch the later lots port the original `_ADD_ON`/`_ADDON` branches behind. Lot N2
+(below) adds the frontend and `WORLDS_AO` world paths. The character chain and the new classes
+are lots N3–N9; The Chosen plays as before in this edition.
 
 ## Selection
 
@@ -43,7 +43,9 @@ unchanged.
 Fingerprint edition `2` (`nightmares`, after retail `0` and demo `1`), so Nightmares and retail
 saves never load across editions (the expansion readme declares them incompatible); the extra
 mount is a second, independent difference. Files go to `saves/nightmares/` beside
-`saves/retail/`. Loading still requires a `worlds/` DAT path: `WORLDS_AO` saves are lot N9.
+`saves/retail/`. Saving inside a `WORLDS_AO` level is refused ("Saving in the Nightmares levels
+is not supported yet", the level-entry snapshot included) until the add-on classes save (lot N9);
+loading still requires a `worlds/` DAT path.
 
 ## Weapon numbering (decision 1: superset)
 
@@ -66,3 +68,41 @@ editions), `save_slots` (directory) and `weapon` (numbering and predicate). Real
 apart from the extra mount (8,489 resources in 5 mounts versus 7,446 in 4: 1,047 added, four root
 files overridden); `--rez BLOOD2NM.REZ` is refused. `WORLDS_AO` worlds cannot be requested
 before lot N2's original path branch.
+
+## Lot N2: frontend and world paths
+
+- **World paths** (`world_resource_path`, `addon_world_name`). The original `_ADDON`
+  `LoadWorld`/`GetWorldTitle`: in the add-on build a name containing `WORLDS_AO` (any case,
+  anywhere) is used as given, only `.dat` added; every other name keeps the `Worlds\` prefix.
+  Retail never treats it specially (`worlds/worlds_ao/…`, which does not exist). The request
+  parser, NEW_LEVEL queue/commit, destination inspection and rehearsal and the loading screen
+  all take the edition; world preparation accepts `worlds_ao/` DATs only in this edition.
+- **NIGHTMARES row** (`MenuSinglePlayer.cpp` `_ADDON`): first Single Player row,
+  `IDS_MENU_SINGLEPLAYER_NIGHTMARES` (549, present in every `cres.dll`) and command 105. It opens
+  the difficulty page in Nightmares mode (`SetNightmaresMode`, which clears story mode; story
+  mode and the Chosen character page clear it again); Back returns to Single Player. A
+  difficulty emits `MenuCommand::nightmares`, which `menu_world_start` turns into
+  `MenuNewNightmaresGame`: `worlds_ao\caleb1_cc_c`, Caleb, `GAMETYPE_SINGLE`. The add-on menu
+  strings require 549.
+- **Art.** Title splash `screens_ao\title.pcx`; every menu page's background
+  `interface_ao\background.pcx` (`MainMenus`/`MenuBase`); a `WORLDS_AO` level's loading screen is
+  always `Screens_ao\Bumper.pcx`, whatever the DAT names, with its title and load-screen ID
+  unchanged. The movie skip is moot (movies are not played).
+- **Credits.** The add-on reads `TEXT/CREDITS_AO` (33 entries, versus 87 for `CREDITS`) for the
+  menu and in-world credits and the END roll; there is no `INTRO_AO` (the intro roll is not
+  ported). `WORLDS_AO\END` (and the absent `WORLDS_AO\CREDITS`) roll the credits over the world.
+- **Non-finite authored positions.** The DAT reader now retains a non-finite `Pos` vector for any
+  class (formerly only editor lights) as `invalid_editor_position`; a runtime class with one is a
+  `Failed` entry ("Non-finite authored Pos retained; the runtime object is not created"), never a
+  guessed pose. This affects CALEB1_CC_C's ObjectivesTrigger `object1` and four OPHELIA_CC_O
+  `SoundFX18` rows (x = NaN); the original creates them at that position. Other non-finite
+  vectors still refuse the world.
+
+Real data (2026-10-26): `nightmares.installed` inspects all 13 `WORLDS_AO` DATs. Unported
+classes are exactly `FlayerPU`, `GremlinAI` (Ophelia), `FlayerPU` (Ishmael), `CombatShotgunPU`,
+`GremlinAI` (Gabby), `Nightmare` (EndBoss) and `SoccerBall`/`SoccerGoal` (the two SOC maps).
+Not-created entries: 19 + 28 robe Cultists (Caleb1/Caleb2, lot N8), the NaN-positioned rows
+above, three chrome `CDestructableModel` (Gabby, the existing environment-map limit) and one
+`DetailSprite` whose `spritetextures\scorch1.dtx` is not an SPR (Ophelia). END starts and rolls
+CREDITS_AO; the menu's Nightmares new game reaches CALEB1_CC_C and is refused on its 20 failed
+entries. Headless: `nightmares.paths`, `nightmares.menu`, `nightmares.strings`.

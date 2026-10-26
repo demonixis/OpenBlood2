@@ -36,7 +36,7 @@ namespace OpenBlood2
         next.requested_start = start;
         WorldRequest request;
         PlayerRestoreState player;
-        if (!parse_world_request(message, request, error) || !capture_player(player, error))
+        if (!parse_world_request(message, request, error, resources.nightmares()) || !capture_player(player, error))
             return fail();
         next.destination = request.filename;
         // NEW_LEVEL preserves the current difficulty and game type, unlike a fresh-game request.

@@ -31,10 +31,11 @@ namespace OpenBlood2
                     out.value = p.string();
                     break;
                 case 1:
-                    if ((object.class_name == "Light" || object.class_name == "DirLight") && out.name == "Pos")
+                    if (out.name == "Pos")
                     {
-                        // 16_bridge contains NaN positions on two preprocessor lights. These are
-                        // already baked into the BSP; never turn their invalid metadata into a light/pose.
+                        // 16_bridge contains NaN positions on two preprocessor lights (already baked into
+                        // the BSP), and the Nightmares levels on runtime objects (CALEB1_CC_C's
+                        // ObjectivesTrigger, OPHELIA_CC_O's SoundFX18). Retain them, never as a pose.
                         const DVector v{std::bit_cast<float>(p.u32()), std::bit_cast<float>(p.u32()),
                                         std::bit_cast<float>(p.u32())};
                         out.value = v;

@@ -64,7 +64,7 @@ namespace OpenBlood2
     {
         if (surface)
             return true;
-        const auto& assets = menu_resources(resources_.demo() ? MenuEdition::Demo : MenuEdition::Retail);
+        const auto& assets = menu_resources(menu_edition(resources_));
         if (!load_menu_strings(resources_, strings, error))
             return false;
         if (!canvas.load_font(assets.small_bitmap, assets.small_font, small_) ||
@@ -180,7 +180,7 @@ namespace OpenBlood2
     }
     bool MenuCanvas::compose(Menu& menu, double, std::string& error)
     {
-        if (menu.demo() != resources_.demo())
+        if (menu.edition() != menu_edition(resources_))
         {
             error = "Menu/controller resource edition mismatch";
             return false;
@@ -203,7 +203,7 @@ namespace OpenBlood2
             composed_ = menu.revision;
             return true;
         }
-        const auto& assets = menu_resources(resources_.demo() ? MenuEdition::Demo : MenuEdition::Retail);
+        const auto& assets = menu_resources(menu_edition(resources_));
         canvas.DrawSurfaceToSurface(surface, background_, nullptr, 0, 0);
         const auto title = titles_.find(menu.title());
         if (title == titles_.end() || !title->second)

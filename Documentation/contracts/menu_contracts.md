@@ -87,7 +87,8 @@ Single Player > STORY is `MenuNewGame(d, CHARACTER_CALEB, GAMETYPE_SINGLE)`. Sin
 Player > CHOSEN, then a character (Caleb included) and a difficulty, is
 `CMenuDifficulty::StartGame`'s `MenuNewGame(d, character, GAMETYPE_ACTION)`.
 `menu_world_start` maps the command's `story` flag to these two requests; a Cheats
-warp from inside a Chosen game stays a Chosen game.
+warp from inside a Chosen game stays a Chosen game. The Nightmares edition adds the first
+NIGHTMARES row and `MenuNewNightmaresGame` ([edition contracts](nightmares_edition_contracts.md#lot-n2-frontend-and-world-paths)).
 
 - **Two game-type views.** `LoadWorld` stores the request type in the `GAME_GAMETYPE`
   console variable (`SetGameInfo`, NEW_GAME only). `B2BaseClass::GetGameType` reads it,

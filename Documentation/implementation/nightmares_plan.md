@@ -1,8 +1,11 @@
 # Nightmares expansion plan
 
-Status (2026-10-26): decision 1 is **superset numbering** (user, 2026-10-26) and lot **N1** is
-implemented ([edition contracts](../contracts/nightmares_edition_contracts.md)): the edition,
-mount order, `IsAddonBuild()`, save edition and numbering, without expansion behaviour.
+Status (2026-10-26): decision 1 is **superset numbering** (user, 2026-10-26). Lots **N1** (the
+edition, mount order, `IsAddonBuild()`, save edition and numbering) and **N2** (NIGHTMARES row and
+new game, `WORLDS_AO` paths, add-on art, CREDITS_AO and the END roll, inspection of all 13
+worlds) are implemented ([edition contracts](../contracts/nightmares_edition_contracts.md)).
+New finding: CALEB1_CC_C's ObjectivesTrigger and four OPHELIA_CC_O SoundFX have NaN authored
+positions and are not created; they must be resolved (with N8) before Caleb1/Ophelia can start.
 `blood2nm.rez` stays refused as a mod. Every later lot needs the user's go-ahead (see
 [open decisions](#open-decisions)).
 

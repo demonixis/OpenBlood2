@@ -65,7 +65,7 @@ namespace OpenBlood2
             return objects.fail(ObjectError::Busy, error);
         }
         WorldRequest request;
-        return decode_world_request(message, request, error) && load_request(request, error);
+        return decode_world_request(message, request, error, resources.nightmares()) && load_request(request, error);
     }
     bool GameSession::load_saved_world(const WorldRequest& request, std::string& error)
     {
@@ -141,6 +141,12 @@ namespace OpenBlood2
             {
                 entry.state = EntryState::AbsentOriginalClass;
                 entry.detail = "No original base-game class registration; loader skips this source row";
+            }
+            else if (source.invalid_editor_position)
+            {
+                // The original creates it at the non-finite position; no replacement pose is invented.
+                entry.state = EntryState::Failed;
+                entry.detail = "Non-finite authored Pos retained; the runtime object is not created";
             }
             else if (auto type = objects.find_class(source.class_name);
                      type && restore && save_support(type) != SaveSupport::AlwaysLoad)

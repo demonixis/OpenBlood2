@@ -227,7 +227,9 @@ namespace OpenBlood2
                              config.overlays.size());
             // Keep the accepted menu-free diagnostic/direct route available independently.
             const bool menu_enabled = !config.demo || (!options.view_world && !options.demo_smoke);
-            Menu menu(config.demo ? MenuEdition::Demo : MenuEdition::Retail);
+            Menu menu(config.demo         ? MenuEdition::Demo
+                      : config.nightmares ? MenuEdition::Nightmares
+                                          : MenuEdition::Retail);
             menu.vr = xr_mode;
             menu.setup = true;
             std::filesystem::path preferences;
@@ -389,7 +391,9 @@ namespace OpenBlood2
             if (menu_enabled && !options.view_world && !options.menu_smoke)
             {
                 HudCanvas splash(artwork);
-                if (const auto* image = splash.CreateSurfaceFromBitmap("screens/title.pcx"))
+                // _ADDON Splash_Display: the add-on title.
+                if (const auto* image = splash.CreateSurfaceFromBitmap(config.nightmares ? "screens_ao/title.pcx"
+                                                                                         : "screens/title.pcx"))
                 {
                     title = {LoadingScreen::width, LoadingScreen::height,
                              std::vector<std::uint8_t>(std::size_t(LoadingScreen::width) * LoadingScreen::height * 4)};
@@ -1133,7 +1137,8 @@ namespace OpenBlood2
                         int(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_GAMETYPE"))) ==
                         GAMETYPE_ACTION;
                     if (!game->pending_level_change ||
-                        !parse_world_request(game->pending_level_change->message, destination, ignored) ||
+                        !parse_world_request(game->pending_level_change->message, destination, ignored,
+                                             game->resources.nightmares()) ||
                         !show_loading(LoadingFlow::Request::LevelChange, destination.filename, action))
                         change_level();
                     // Original single-player death USE: GS_MENU, PauseGame and the Load menu (_DEMO: none here;

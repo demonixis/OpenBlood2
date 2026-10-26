@@ -303,7 +303,9 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
                 world.erase(0, 7);
             if (world.ends_with(".dat"))
                 world.resize(world.size() - 4);
-            m_bRollCredits = world == "end" || world == "credits";
+            m_bRollCredits = world == "end" || world == "credits" ||
+                             // _ADDON: the expansion's END world (CREDITS is absent from its archive).
+                             (resources_.nightmares() && (world == "worlds_ao/end" || world == "worlds_ao/credits"));
         }
     m_Credits.Term();
     m_bFirstUpdate = true;
@@ -717,7 +719,9 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
 }
 bool CBloodClientShell::InitCredits(bool clear_screen, std::string& error)
 {
-    // CreditsWin_GetTextBuffer: FindResource(cres_hinstance, "CREDITS", "TEXT"), read as data.
+    // CreditsWin_GetTextBuffer: FindResource(cres_hinstance, "CREDITS", "TEXT"), read as data;
+    // "CREDITS_AO" in the add-on build (Credits.cpp _ADDON; the intro roll is not ported).
+    const char* name = resources_.nightmares() ? "CREDITS_AO" : "CREDITS";
     std::vector<std::uint8_t> dll, text;
     error.clear();
     const auto* resource = resources_.find("cres.dll");
@@ -726,7 +730,7 @@ bool CBloodClientShell::InitCredits(bool clear_screen, std::string& error)
     else if (resource->size > 32 * 1024 * 1024)
         error = "Credits: cres.dll exceeds the 32 MiB resource reader limit";
     else if (resources_.read("cres.dll", dll, error))
-        OpenBlood2::read_named_resource(dll, "TEXT", "CREDITS", text, error);
+        OpenBlood2::read_named_resource(dll, "TEXT", name, text, error);
     std::string parse_error;
     // An unavailable resource still leaves an inited, empty roll, like the original.
     const bool parsed = m_Credits.Init(text, CM_CREDITS, clear_screen, 640, &parse_error);
@@ -742,7 +746,7 @@ bool CBloodClientShell::InitCredits(bool clear_screen, std::string& error)
     else
         m_Credits.error = error;
     if (error.empty() && !parsed)
-        error = "Credits: TEXT/CREDITS could not be parsed";
+        error = std::string("Credits: TEXT/") + name + " could not be parsed";
     if (!error.empty())
     {
         credits_error = error;

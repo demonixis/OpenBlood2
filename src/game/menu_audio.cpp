@@ -3,7 +3,7 @@ namespace OpenBlood2
 {
     bool MenuAudio::validate_resources(std::string& failure)
     {
-        const auto& assets = menu_resources(resources_.demo() ? MenuEdition::Demo : MenuEdition::Retail);
+        const auto& assets = menu_resources(menu_edition(resources_));
         // Validate through the real bounded decoder/cache, without output or retained voices.
         const auto load = [&](const char* name, bool stream)
         {
@@ -83,7 +83,7 @@ namespace OpenBlood2
         if (active)
         {
             random_state = random_state * 1664525u + 1013904223u;
-            const auto& assets = menu_resources(resources_.demo() ? MenuEdition::Demo : MenuEdition::Retail);
+            const auto& assets = menu_resources(menu_edition(resources_));
             ambient = start(assets.ambience[random_state >> 30], true);
         }
         else if (ambient)
@@ -94,7 +94,7 @@ namespace OpenBlood2
     }
     void MenuAudio::play(MenuCue cue)
     {
-        const auto& assets = menu_resources(resources_.demo() ? MenuEdition::Demo : MenuEdition::Retail);
+        const auto& assets = menu_resources(menu_edition(resources_));
         start(assets.cues[cue == MenuCue::Select ? 0 : cue == MenuCue::Enter ? 1 : 2], false);
     }
     bool MenuAudio::advance(double seconds)

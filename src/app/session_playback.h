@@ -44,6 +44,8 @@ namespace OpenBlood2
         return game.step(seconds);
     }
 
+    // ClientShellDLL MenuNewNightmaresGame sFirstLevel (_ADDON).
+    inline constexpr const char* nightmares_first_level = "worlds_ao\\caleb1_cc_c";
     struct MenuWorldStart
     {
         const char* world = nullptr;
@@ -69,6 +71,9 @@ namespace OpenBlood2
             return {command.world.c_str(), DBYTE(command.difficulty), DBYTE(command.character),
                     DBYTE(action ? GAMETYPE_ACTION : GAMETYPE_SINGLE)};
         }
+        // _ADDON MenuNewNightmaresGame: Caleb in worlds_ao\caleb1_cc_c, a SINGLE game.
+        if (command.nightmares)
+            return {nightmares_first_level, DBYTE(command.difficulty), 0, GAMETYPE_SINGLE};
         if (command.story)
             return {first_level, DBYTE(command.difficulty), 0, GAMETYPE_SINGLE};
         return {first_level, DBYTE(command.difficulty), DBYTE(command.character), GAMETYPE_ACTION};

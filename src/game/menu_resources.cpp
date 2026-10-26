@@ -59,7 +59,15 @@ namespace OpenBlood2
                                         {"ambient02.wav", "ambient02.wav", "ambient04.wav", "ambient04.wav"},
                                         {"select01.wav", "enter01.wav", "esc01.wav"},
                                         {"screens/bloodbath.pcx", "screens/info.pcx", "screens/modes.pcx"}};
-        return edition == MenuEdition::Demo ? demo : retail;
+        // _ADDON MainMenus/MenuBase: the add-on background behind every page.
+        static const MenuResources nightmares = []
+        {
+            auto value = retail;
+            value.edition = MenuEdition::Nightmares;
+            value.background = "interface_ao/background.pcx";
+            return value;
+        }();
+        return edition == MenuEdition::Demo ? demo : edition == MenuEdition::Nightmares ? nightmares : retail;
     }
     const char* MenuResources::title(std::string_view semantic) const
     {
@@ -101,7 +109,7 @@ namespace OpenBlood2
         for (auto id : retail_ids)
             if (!require(id))
                 return false;
-        return true;
+        return edition != MenuEdition::Nightmares || require(IDS_MENU_SINGLEPLAYER_NIGHTMARES);
     }
     bool make_demo_menu_strings(std::span<const MenuText> text, StringResources& out, std::string& error)
     {
@@ -137,7 +145,7 @@ namespace OpenBlood2
             return false;
         }
         if (!resources.read("cres.dll", bytes, error) || !read_string_resources(bytes, candidate, error) ||
-            !validate_menu_strings(MenuEdition::Retail, candidate, error))
+            !validate_menu_strings(menu_edition(resources), candidate, error))
             return false;
         out = std::move(candidate);
         return true;

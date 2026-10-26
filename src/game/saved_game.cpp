@@ -71,6 +71,9 @@ namespace OpenBlood2
             return refuse("A save requires the bound session outside callbacks");
         if (world_path.empty() || !server.collision_ready)
             return refuse("No world is loaded");
+        // Nightmares levels need the add-on classes' Save/Load bodies (nightmares_plan.md lot N9).
+        if (world_path.starts_with("worlds_ao/"))
+            return refuse("Saving in the Nightmares levels is not supported yet");
         if (pending_level_change)
             return refuse("A level change is pending");
         if (server.message_count() || objects.pending_count())

@@ -50,9 +50,10 @@ namespace OpenBlood2
         MenuAction action = MenuAction::None;
         unsigned character = 0, difficulty = 1;
         bool story = true;
-        int slot = 0;      // SaveGame/LoadGame only.
-        int cheat = -1;    // Cheat only: the original CheatCodes value (game_settings.h).
-        std::string world; // Warp only: the world to start.
+        bool nightmares = false; // NewGame only: MenuNewNightmaresGame (story is then false).
+        int slot = 0;            // SaveGame/LoadGame only.
+        int cheat = -1;          // Cheat only: the original CheatCodes value (game_settings.h).
+        std::string world;       // Warp only: the world to start.
     };
     // The owner's slot listing (CSavedGameInfo): names as the original menus print them, and
     // whether a row can be activated. Load rows are enabled for readable and unreadable files, so
@@ -153,6 +154,15 @@ namespace OpenBlood2
         {
             return edition_ == MenuEdition::Demo;
         }
+        // The original _ADDON build: Single Player offers NIGHTMARES (Nightmares edition).
+        bool addon() const
+        {
+            return edition_ == MenuEdition::Nightmares;
+        }
+        MenuEdition edition() const
+        {
+            return edition_;
+        }
         void open(bool in_world, bool alive = true);
         // Original single-player death USE: SetCurrentMenu(MENU_ID_LOAD_GAME, MENU_ID_LOAD_GAME), so
         // the Load page is the top level and Esc returns to the game.
@@ -202,6 +212,7 @@ namespace OpenBlood2
         int selected = 0;
         unsigned character = 0;
         bool story = true;
+        bool nightmares = false; // CMenuDifficulty::m_bNightmares (SetNightmaresMode).
         std::uint64_t revision = 0;
         bool enabled(const MenuItem& item) const
         {

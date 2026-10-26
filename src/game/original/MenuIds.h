@@ -21,6 +21,8 @@ inline constexpr unsigned IDS_MENU_OPTIONS_MOUSE = 524;
 inline constexpr unsigned IDS_MENU_OPTIONS_JOYSTICK = 525;
 inline constexpr unsigned IDS_MENU_OPTIONS_KEYBOARD = 526;
 inline constexpr unsigned IDS_MENU_SINGLEPLAYER_CALEB = 527;
+inline constexpr unsigned IDS_MENU_SINGLEPLAYER_NIGHTMARES = 549; // _ADDON
+
 inline constexpr unsigned IDS_MENU_SINGLEPLAYER_CHOSEN = 528;
 inline constexpr unsigned IDS_MENU_SINGLEPLAYER_LOADGAME = 529;
 inline constexpr unsigned IDS_MENU_SINGLEPLAYER_SAVEGAME = 530;
@@ -55,6 +57,7 @@ inline constexpr unsigned MENU_CMD_CREDITS = 4;
 inline constexpr unsigned MENU_CMD_QUIT = 5;
 inline constexpr unsigned MENU_CMD_EXIT = 6;
 inline constexpr unsigned MENU_CMD_START_STORY = 100;
+inline constexpr unsigned MENU_CMD_START_NIGHTMARES = 105; // _ADDON MenuCommands.h
 inline constexpr unsigned MENU_CMD_START_ACTION = 101;
 inline constexpr unsigned MENU_CMD_LOAD_GAME_MENU = 102;
 inline constexpr unsigned MENU_CMD_SAVE_GAME_MENU = 103;

@@ -10,7 +10,8 @@ namespace OpenBlood2
     enum class MenuEdition
     {
         Retail,
-        Demo
+        Demo,
+        Nightmares // Retail menus plus the _ADDON NIGHTMARES row and interface_ao background.
     };
     enum class MenuPromotion
     {
@@ -49,6 +50,13 @@ namespace OpenBlood2
         const char* promotion(MenuPromotion) const;
     };
     const MenuResources& menu_resources(MenuEdition);
+    // The menu edition of the mounted content edition.
+    inline MenuEdition menu_edition(const Resources& resources)
+    {
+        return resources.demo()         ? MenuEdition::Demo
+               : resources.nightmares() ? MenuEdition::Nightmares
+                                        : MenuEdition::Retail;
+    }
     bool load_menu_strings(const Resources&, StringResources&, std::string& error);
     // Shared validation also permits negative tests without corrupting a commercial DLL.
     bool validate_menu_strings(MenuEdition, const StringResources&, std::string& error);

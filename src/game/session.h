@@ -62,7 +62,15 @@ namespace OpenBlood2
     // complete client shell. See original/session_load.cpp and the provenance ledger.
     bool original_world_request(const char* world, DBYTE game_type, DBYTE load_type, DBYTE difficulty,
                                 WorldMessage& message);
+    // The world DAT a StartNewWorld/LoadWorld name designates: "Worlds\\<name>.dat", except that the
+    // add-on build (`addon`, the Nightmares edition) keeps a name containing WORLDS_AO as given,
+    // adding only ".dat" (original _ADDON GetWorldTitle/LoadWorld). False for traversal or bad input.
+    bool world_resource_path(std::string_view name, bool addon, std::string& path);
+    // Original _ADDON test: the name designates an add-on level (contains WORLDS_AO, any case).
+    bool addon_world_name(std::string_view name);
     // Parses NEW_GAME/NEW_LEVEL syntax only; this never authorizes a world replacement.
-    bool parse_world_request(const WorldMessage& message, WorldRequest& request, std::string& error);
-    bool decode_world_request(const WorldMessage& message, WorldRequest& request, std::string& error);
+    bool parse_world_request(const WorldMessage& message, WorldRequest& request, std::string& error,
+                             bool addon = false);
+    bool decode_world_request(const WorldMessage& message, WorldRequest& request, std::string& error,
+                              bool addon = false);
 } // namespace OpenBlood2

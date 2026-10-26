@@ -3,6 +3,7 @@
 // screen surface is the 640x480 reference canvas; CoolFont is the HudFont adapter.
 #include "game/original/LoadingScreen.h"
 #include "engine/world.h"
+#include "game/session.h"
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
@@ -80,18 +81,18 @@ namespace OpenBlood2
         // GetWorldInfoString reads the header alone; a missing world keeps the fallback title
         // (the load itself then reports it).
         std::string path, info;
-        if (resource_path(world, path))
+        if (world_resource_path(world, resources_.nightmares(), path))
         {
-            if (!path.starts_with("worlds/"))
-                path = "worlds/" + path;
-            if (!path.ends_with(".dat"))
-                path += ".dat";
             std::vector<std::uint8_t> header;
             std::string ignored;
             if (resources_.find(path) && resources_.read(path, header, ignored, 16 + 65536))
                 read_world_info(header, info, ignored);
         }
         info_ = world_load_info(info, world, demo);
+        // _ADDON StartNewWorld: a nightmare level always shows the add-on bumper, whatever the DAT
+        // names (its load-screen ID still applies).
+        if (resources_.nightmares() && addon_world_name(world))
+            info_.load_screen = "Screens_ao\\Bumper.pcx";
         if (info_.load_screen_id > max_load_screen_id)
         {
             error = "Load screen ID " + std::to_string(info_.load_screen_id) + " exceeds the original table";

@@ -16,7 +16,8 @@ namespace OpenBlood2
         std::string class_name;
         std::vector<WorldProperty> properties;
         const PropertyValue* find(std::string_view name) const;
-        // Retain malformed baked-light metadata without exposing it as a usable pose.
+        // A non-finite authored Pos, retained without exposing it as a usable pose: baked-light
+        // metadata for editor lights, an uncreated runtime entry otherwise (session).
         bool invalid_editor_position = false;
     };
     struct Plane

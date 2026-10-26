@@ -10,7 +10,7 @@ accepted with open GPU reservation **M2-GPU-001**. M3 remains unaccepted.
 | Scene effect rendering (lot 10) | [Report](reports/scene_effects.md) / [contract](../contracts/scene_effects_contracts.md) / [source ledger](sources/scene_effect_sources.json) |
 | Remaining destruction materials (lot 9) | [Report](reports/remaining_debris.md) / [contract](../contracts/destruction_debris_contracts.md#remaining-materials--lot-9-2026-10-25) |
 | Energy/boss/rift VFX (lot 8) | [Report](reports/energy_effects.md) / [contract](../contracts/energy_effects_contracts.md) |
-| Nightmares expansion (lot N1: edition and mount) | [Plan](nightmares_plan.md) / [edition contract](../contracts/nightmares_edition_contracts.md) |
+| Nightmares expansion (lots N1–N2: edition, mount, menu and world paths) | [Plan](nightmares_plan.md) / [edition contract](../contracts/nightmares_edition_contracts.md) |
 | Original-code imports and adaptations | [Provenance](provenance.md) |
 | Crypt / Bridge / Entrance / Lobby | [Contract](../contracts/later_levels_contracts.md) / [source ledger](sources/later_levels_sources.json) |
 | Per-world gaps and implementation batches | [Level gaps](level_gaps.md) |

@@ -100,6 +100,8 @@ namespace OpenBlood2
                 AddLargeTextItemOption(IDS_MENU_MAIN_QUIT, MENU_CMD_QUIT);
                 break;
             case MenuPage::Solo:
+                if (addon()) // MenuSinglePlayer.cpp _ADDON: the first row.
+                    AddLargeTextItemOption(IDS_MENU_SINGLEPLAYER_NIGHTMARES, MENU_CMD_START_NIGHTMARES);
                 AddLargeTextItemOption(IDS_MENU_SINGLEPLAYER_CALEB, MENU_CMD_START_STORY);
                 AddLargeTextItemOption(IDS_MENU_SINGLEPLAYER_CHOSEN, MENU_CMD_START_ACTION);
                 if (demo())
@@ -367,7 +369,7 @@ namespace OpenBlood2
                 build(MenuPage::Main);
                 break;
             case MenuPage::Difficulty:
-                build(story ? MenuPage::Solo : MenuPage::Character);
+                build(story || nightmares ? MenuPage::Solo : MenuPage::Character);
                 break;
             case MenuPage::Audio:
             case MenuPage::Mouse:
@@ -433,8 +435,15 @@ namespace OpenBlood2
             case MENU_CMD_OPTIONS:
                 build(MenuPage::Options);
                 break;
-            case MENU_CMD_START_STORY:
+            case MENU_CMD_START_NIGHTMARES: // SetNightmaresMode(TRUE): story mode off.
+                nightmares = true;
+                story = false;
+                character = 0;
+                build(MenuPage::Difficulty);
+                break;
+            case MENU_CMD_START_STORY: // SetStoryMode(TRUE) clears the Nightmares mode.
                 story = true;
+                nightmares = false;
                 character = 0;
                 build(MenuPage::Difficulty);
                 break;
@@ -455,6 +464,7 @@ namespace OpenBlood2
                     break;
                 }
                 story = false;
+                nightmares = false; // The character page's SetStoryMode(FALSE).
                 build(MenuPage::Character);
                 break;
             case MENU_CMD_START_CALEB:
@@ -476,7 +486,8 @@ namespace OpenBlood2
             case MENU_CMD_DIFFICULTY_EASY:
             case MENU_CMD_DIFFICULTY_MEDIUM:
             case MENU_CMD_DIFFICULTY_HARD:
-                pending_ = {MenuAction::NewGame, character, unsigned(command - MENU_CMD_DIFFICULTY_EASY), story};
+                pending_ = {MenuAction::NewGame, character, unsigned(command - MENU_CMD_DIFFICULTY_EASY), story,
+                            nightmares};
                 break;
             case MENU_CMD_AUDIO:
                 build(MenuPage::Audio);
