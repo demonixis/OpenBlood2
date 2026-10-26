@@ -396,6 +396,33 @@ namespace
         }
         return true;
     }
+    // Nightmares intro (worlds_ao\\caleb1_cc_c): the seated Chosen are gravity CDestructableModels
+    // whose automatic box covers their seat. The original MoveObjectToGround only lowers a
+    // model; the replacement initial separation used to raise three of them 26-29 units.
+    bool campfire(const char* root)
+    {
+        GameSession g;
+        CHECK(g.initialize());
+        Config config;
+        config.data_dir = root;
+        config.nightmares = true;
+        std::string error;
+        CHECK(g.resources.mount_game(config, error) && g.request_world("worlds_ao/caleb1_cc_c", error));
+        for (int i = 0; i < 120; ++i)
+            CHECK(g.step(1.0 / 60));
+        unsigned seated = 0;
+        for (auto id : g.objects.snapshot())
+        {
+            const auto* r = g.objects.get(id);
+            if (!r || std::string_view(r->state.m_Filename).find("_sitting.abc") == std::string_view::npos)
+                continue;
+            const auto authored = std::get<DVector>(r->properties.at("Pos"));
+            CHECK(r->placement_nudges == 0 && std::abs(r->state.m_Pos.y - authored.y) < .01f);
+            ++seated;
+        }
+        CHECK(seated == 4);
+        return true;
+    }
 } // namespace
 int main(int argc, char** argv)
 {
@@ -413,6 +440,7 @@ int main(int argc, char** argv)
                     : test == "filters"    ? filters(argv[2])
                     : test == "audio"      ? audio(argv[2])
                     : test == "city"       ? city(argv[2])
+                    : test == "campfire"   ? campfire(argv[2])
                                            : false;
     return ok ? 0 : 1;
 }

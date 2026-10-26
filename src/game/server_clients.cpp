@@ -429,7 +429,12 @@ namespace OpenBlood2
         const auto below = DVector{r->state.m_Pos.x, r->state.m_Pos.y - 1, r->state.m_Pos.z};
         // Only when the descent itself starts blocked: overlaps it leaves (a ceiling) keep the
         // ordinary path, which lowers the body out of them.
-        if ((r->state.m_Flags & (FLAG_SOLID | FLAG_GRAVITY)) && physics_vector(r->dimensions) &&
+        // Not for CDestructableModel: its automatic box is the whole model (a seated character
+        // covers its seat), and the original helper never raised one. The Nightmares campfire
+        // Chosen rose 26-29 units above their seats; such a model keeps its authored pose and
+        // stops falling in advance_physics instead.
+        const bool decoration = Objects::is_kind_of(r->type, objects_.find_class("CDestructableModel"));
+        if (!decoration && (r->state.m_Flags & (FLAG_SOLID | FLAG_GRAVITY)) && physics_vector(r->dimensions) &&
             collision->sweep(r->state.m_Pos, below, r->dimensions, descent, 0.01, StartOverlap::Leave) ==
                 CollisionQuery::Hit &&
             descent.start_solid)

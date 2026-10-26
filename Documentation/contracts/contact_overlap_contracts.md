@@ -109,6 +109,14 @@ nothing moves and the following MoveObject still names the overlap. Objects othe
 the primary world are not nudged. The record keeps `placement_nudge`/`placement_nudges`,
 shown in the NPC runtime panel.
 
+`CDestructableModel` is excluded (2026-10-26). Its automatic box is the whole model:
+the Nightmares intro's seated Chosen (`caleb_sitting.abc` etc. in `caleb1_cc_c`) cover
+their seats, and the nudge raised the three gravity ones 26–29 units. The original
+helper only lowers, so such a model keeps its authored pose. If its gravity move
+then fails, `advance_physics` stops its gravity, as it does for pickups, and counts it
+in `ServerAdapter::model_motion_stops` instead of failing the step.
+`destructable_models.campfire` checks the four seated models.
+
 03_Museum's Cultist "pud" is authored 2.86 units into a wall; the original one-sided BSP
 planes let it settle, while this sweep cannot start inside a solid body. A thin polygon
 separates towards its nearer side. This is a bounded replacement placement policy, not

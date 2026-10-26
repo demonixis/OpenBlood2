@@ -73,6 +73,15 @@ hover (64 units over the floor in CityHub and the Museum) and the Museum hologra
 `hologid3` (an authored, gravity-free CDestructableModel) are original data and stay
 as authored.
 
+## Seated Chosen in the Nightmares intro
+
+In `worlds_ao\caleb1_cc_c`, Caleb, Gabriella and Ishmael sat 26–29 units above their
+seats; Ophelia did not. All four are `CDestructableModel`s whose automatic box covers
+the seat. The three with Gravity got the replacement initial-overlap nudge, while the
+original `MoveObjectToGround` only lowers along a ray. Ophelia has no Gravity and was
+never moved. Destructible models are no longer nudged and keep their authored pose (see
+[contact overlap contracts](../../contracts/contact_overlap_contracts.md#authored-placement-nudge)).
+
 ## Data mods
 
 A root `cres.dll` in a data-only REZ mod is accepted. It is only read as string and

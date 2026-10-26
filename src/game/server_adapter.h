@@ -423,6 +423,8 @@ namespace OpenBlood2
         // Pickups whose physics move failed (inside geometry) and were separated or stopped
         // instead of failing the step.
         std::uint64_t pickup_motion_stops = 0;
+        // Gravity CDestructableModels that could not leave their authored overlap and stopped falling.
+        std::uint64_t model_motion_stops = 0;
         bool advance_models(double seconds);
         const auto& variables() const
         {

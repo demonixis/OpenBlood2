@@ -706,6 +706,17 @@ namespace OpenBlood2
                     // that changes nothing it stops falling where it is, still collectible, and
                     // the failure stays recorded. Every other body keeps the strict failure.
                     auto* pickup = dynamic_cast<PickupObject*>(r->game.get());
+                    // Same policy for a gravity CDestructableModel authored overlapping geometry
+                    // (MoveObjectToGround keeps its pose): it stays where it was placed, as the
+                    // original's downward-only helper left it. No separation is attempted.
+                    if (!pickup && r->life == Life::Alive &&
+                        Objects::is_kind_of(r->type, objects_.find_class("CDestructableModel")))
+                    {
+                        r->state.m_Flags &= ~FLAG_GRAVITY;
+                        r->velocity = r->acceleration = {};
+                        ++model_motion_stops;
+                        break;
+                    }
                     if (!pickup || r->life != Life::Alive)
                         return objects_.fail(ObjectError::Unsupported,
                                              "Physics MoveObject failed: " + r->type->name + " / " + r->state.m_Name +

@@ -1761,6 +1761,8 @@ endforeach()
 if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME destructable_models.city COMMAND destructable_model_tests city "${BLOOD2_TEST_DATA_DIR}")
     set_tests_properties(destructable_models.city PROPERTIES LABELS "headless;private;destructable_models" TIMEOUT 90)
+    add_test(NAME destructable_models.campfire COMMAND destructable_model_tests campfire "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(destructable_models.campfire PROPERTIES LABELS "headless;private;destructable_models" TIMEOUT 90)
 endif()
 
 if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
