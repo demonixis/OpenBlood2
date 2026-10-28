@@ -34,6 +34,10 @@ connects original wood, metal and glass fragments, their motion and impact sound
 The [class coverage inventory](contracts/class_coverage.md) distinguishes absent ports
 from replacement services. This does not expand milestone acceptance.
 
+The [2026-10-27 correction](implementation/reports/tester_feedback_2026_10_27.md) stops
+objects authored over the void (02_CityHubB's `startcrate`) from failing the session after
+100 s: original `FLAG_REMOVEIFOUTSIDE` removal and a hold for other lost bodies.
+
 The [2026-10-26 tester corrections](implementation/reports/tester_feedback_2026_10_26.md)
 (0.5.0) reproduce and fix the Museum crash (Fanatics spawned into the skylight glass
 under Gideon's last hologram), add Hor+ widescreen projection, black letterbox bars,

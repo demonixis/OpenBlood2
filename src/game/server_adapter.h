@@ -425,6 +425,9 @@ namespace OpenBlood2
         std::uint64_t pickup_motion_stops = 0;
         // Gravity CDestructableModels that could not leave their authored overlap and stopped falling.
         std::uint64_t model_motion_stops = 0;
+        // Physics steps skipped for bodies lost outside the padded world box (02_CityHubB's
+        // startcrate), and FLAG_REMOVEIFOUTSIDE objects removed there.
+        std::uint64_t outside_world_holds = 0, outside_world_removals = 0;
         bool advance_models(double seconds);
         const auto& variables() const
         {
@@ -495,6 +498,7 @@ namespace OpenBlood2
         void commit_world_body(const BodyPlan&);
         void dispatch_world_body(const BodyPlan&, const std::vector<ObjectId>&);
         DRESULT move_world_body(ObjectRecord&, DVector);
+        bool outside_world(DVector) const;
         bool moving_ = false;
         bool models_advancing_ = false, physics_advancing_ = false;
         std::vector<std::unique_ptr<StringHandle>> string_tokens_;

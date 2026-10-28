@@ -12,6 +12,12 @@ double explosion, callback removal, other embedded-start refusals and detailed
 sweep diagnostics. The exact Downtown encounter and VFX stress-pool failure
 remain unverified/open respectively.
 
+The [2026-10-27 correction](Documentation/implementation/reports/tester_feedback_2026_10_27.md)
+removes `FLAG_REMOVEIFOUTSIDE` objects a move leaves beyond the DAT extents padded by 100
+and holds other bodies lost there (CityHubB/C, Abandoned Buildings, Train Station leftovers
+over the void) instead of failing at the 1e7 coordinate limit. Preserve no removal without
+a move, the hold only while nothing points back, and untouched flags/velocity/saves.
+
 The [2026-10-25 tester corrections](Documentation/implementation/reports/tester_feedback_2026_10_25.md)
 allow mutually GOTHRUWORLD kinematic brushes to rotate past one another while
 preserving other rotation blockers, suppress scripted/death-camera player look

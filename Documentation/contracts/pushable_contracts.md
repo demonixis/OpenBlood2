@@ -73,6 +73,12 @@ Hidden bodies still simulate; inactive bodies do not. These are replacement
 engine choices, informed by later-generation LithTech motion code, **not verified
 retail Blood II physics**. No code from that later engine is linked.
 
+Bodies leaving the world follow the [2026-10-27 correction](../implementation/reports/tester_feedback_2026_10_27.md):
+`FLAG_REMOVEIFOUTSIDE` objects are removed once a move leaves them beyond the DAT
+extents padded by 100 (later LithTech `IsOutsideWorld`); other bodies already out
+there are held while nothing in their motion points back (replacement policy for the
+original's endless fall). Neither changes flags, velocity or saved state.
+
 A body sweep checks the primary world and live solid objects. Up to four sliding
 legs remove inward velocity. Initial penetration blocks the entire move and zeros
 velocity; the object remains inspectable. No depenetration, crushing, restitution,

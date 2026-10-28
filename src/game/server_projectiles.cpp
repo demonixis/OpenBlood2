@@ -199,6 +199,13 @@ namespace OpenBlood2
                     projectile->contacted && record->life == Life::Alive && target && target->life == Life::Alive &&
                     (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
                     objects_.engine_message(target->handle, MID_TOUCHNOTIFY, record->handle);
+                // Original UpdateObjectPhysics: removed once its flight leaves the world.
+                if (record->life == Life::Alive && (record->state.m_Flags & FLAG_REMOVEIFOUTSIDE) &&
+                    outside_world(record->state.m_Pos))
+                {
+                    ok = objects_.remove(record->handle) && ok;
+                    ++outside_world_removals;
+                }
             }
         }
         return ok;

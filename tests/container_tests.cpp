@@ -426,6 +426,54 @@ namespace
         CHECK(std::abs(record->velocity.x - 101) < .001); // Source endpoint quirk.
         return true;
     }
+    // 02_CityHubB authors crates, models and pickups over the void: they fall out of the world
+    // forever in the original. Bodies lost below the padded world box are held instead of
+    // integrated until their coordinates leave the engine's range (a session failure after ~100 s);
+    // FLAG_REMOVEIFOUTSIDE objects are removed once a move leaves them outside.
+    bool outside_world(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(test_player::setup(game, root));
+        game.world.models.resize(1);
+        game.world.min = {-1000, -100, -1000};
+        game.world.max = {1000, 500, 1000};
+        auto create = [&](DVector at, DDWORD flags, DVector velocity)
+        {
+            ObjectCreateStruct create;
+            create.m_Pos = at;
+            create.m_Flags = flags;
+            auto h = game.objects.create(game.objects.find_class("BaseClass"), create);
+            DVector dims{1, 1, 1};
+            if (h && (game.server.SetObjectDims(h, &dims) != DE_OK || game.server.SetVelocity(h, &velocity) != DE_OK))
+                return HOBJECT{};
+            return h;
+        };
+        const auto lost = create({0, -150, 0}, FLAG_GRAVITY, {}),
+                   removable = create({500, -150, 500}, FLAG_GRAVITY | FLAG_REMOVEIFOUTSIDE, {}),
+                   parked = create({0, -500, 500}, FLAG_REMOVEIFOUTSIDE, {}),
+                   rising = create({-500, -1000, -500}, FLAG_GRAVITY, {0, 3000, 0});
+        CHECK(lost && removable && parked && rising);
+        for (int i = 0; i < 3; ++i)
+            CHECK(game.server.advance_physics(.1) && game.objects.finish_frame());
+        // Removed once its move crossed the padded floor; never moved, the parked one stays.
+        CHECK(!game.objects.get(removable) && game.server.outside_world_removals == 1 && game.objects.get(parked));
+        auto* r = game.objects.get(lost);
+        CHECK(r && r->state.m_Pos.y < -200 && r->state.m_Pos.y > -300);
+        // Moving back toward the world is never held.
+        CHECK(game.objects.get(rising)->state.m_Pos.y > -1000 + 200);
+        const auto held = r->state.m_Pos;
+        const auto holds = game.server.outside_world_holds;
+        for (int i = 0; i < 1200; ++i) // Two minutes: the original fall would reach -1.4e7.
+            CHECK(game.server.advance_physics(.1));
+        CHECK(game.objects.get(lost) == r && r->state.m_Pos.x == held.x && r->state.m_Pos.y == held.y &&
+              r->state.m_Pos.z == held.z && (r->state.m_Flags & FLAG_GRAVITY) &&
+              game.server.outside_world_holds >= holds + 1200);
+        // Placed back inside the world, it falls again.
+        DVector inside{0, -150, 0};
+        CHECK(game.server.TeleportObject(lost, &inside) == DE_OK && game.server.advance_physics(.1) &&
+              r->state.m_Pos.y < -150);
+        return true;
+    }
     bool swimming(const std::filesystem::path& root)
     {
         GameSession game;
@@ -987,6 +1035,7 @@ int main(int argc, char** argv)
         {"index_lifetime", index_lifetime},
         {"index_callbacks", index_callbacks},
         {"physics", physics},
+        {"outside_world", outside_world},
         {"swimming", swimming},
         {"surface", surface},
         {"ladders", ladders},

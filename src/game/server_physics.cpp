@@ -607,6 +607,15 @@ namespace OpenBlood2
         }
         return DE_OK;
     }
+    // Later LithTech CWorldServerBSP::IsOutsideWorld: outside the DAT world extents padded by 100.
+    bool ServerAdapter::outside_world(DVector p) const
+    {
+        const auto* world = objects_.world;
+        if (!world || world->models.empty() || !collision_ready)
+            return false;
+        return p.x < world->min.x - 100 || p.y < world->min.y - 100 || p.z < world->min.z - 100 ||
+               p.x > world->max.x + 100 || p.y > world->max.y + 100 || p.z > world->max.z + 100;
+    }
     bool ServerAdapter::advance_physics(double seconds)
     {
         if (physics_advancing_ || objects_.busy())
@@ -641,6 +650,28 @@ namespace OpenBlood2
                 continue;
             if (seconds > 0.5)
                 return objects_.fail(ObjectError::InvalidTime, "Physics catch-up exceeds 0.5 seconds");
+            // Replacement policy: the original keeps integrating a body lost outside the world
+            // (02_CityHubB's startcrate is authored over the void) until its coordinates leave
+            // the engine's range. Hold it while nothing in its motion points back toward the
+            // world; it has nothing to touch out there. A script can still move it back.
+            if (outside_world(r->state.m_Pos) && !(r->state.m_Flags & FLAG_REMOVEIFOUTSIDE))
+            {
+                const auto* world = objects_.world;
+                const auto pull = vector_add(r->acceleration, r->state.m_Flags & FLAG_GRAVITY ? gravity : DVector{});
+                const float p[3]{r->state.m_Pos.x, r->state.m_Pos.y, r->state.m_Pos.z},
+                    v[3]{r->velocity.x, r->velocity.y, r->velocity.z}, a[3]{pull.x, pull.y, pull.z},
+                    lo[3]{world->min.x - 100, world->min.y - 100, world->min.z - 100},
+                    hi[3]{world->max.x + 100, world->max.y + 100, world->max.z + 100};
+                bool returning = false;
+                for (int axis = 0; axis < 3; ++axis)
+                    returning |= (p[axis] < lo[axis] && (v[axis] > 0 || a[axis] > 0)) ||
+                                 (p[axis] > hi[axis] && (v[axis] < 0 || a[axis] < 0));
+                if (!returning && !containers.total)
+                {
+                    ++outside_world_holds;
+                    continue;
+                }
+            }
             const auto steps = static_cast<unsigned>(std::max(1.0, std::ceil(seconds * 120)));
             const auto dt = static_cast<float>(seconds / steps);
             for (unsigned i = 0; i < steps && r->life == Life::Alive; ++i)
@@ -731,6 +762,15 @@ namespace OpenBlood2
                         pickup->error = "Cannot move out of geometry; gravity stopped";
                     }
                     ++pickup_motion_stops;
+                    break;
+                }
+                // Original UpdateObjectPhysics: removed once a move leaves it outside the world.
+                if (r->life == Life::Alive && (r->state.m_Flags & FLAG_REMOVEIFOUTSIDE) &&
+                    outside_world(r->state.m_Pos))
+                {
+                    if (!objects_.remove(r->handle))
+                        return false;
+                    ++outside_world_removals;
                     break;
                 }
             }
