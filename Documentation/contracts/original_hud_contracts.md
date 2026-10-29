@@ -77,8 +77,9 @@ and dimensions, including while the HUD is camera-hidden.
 
 ## Explicit limits
 
-This replaces the demonstration **statistics HUD**. Inventory scrolling, weapon-list
-toggle, objective page/skull, power/air/throw/boss bars, communication portraits/text
+This replaces the demonstration **statistics HUD**. Inventory scrolling (see the
+[inventory cursor](inventory_cursor_contracts.md)) and the weapon list (below) were
+connected later. The objective page/skull, power/air/throw/boss bars, communication portraits/text
 and multiplayer/team displays from the remaining original UI classes are not
 connected by this continuation. The inspector's boss bar remains diagnostic.
 Menus, UI scaling preferences, original executable pixel-for-pixel comparison,
@@ -89,6 +90,21 @@ Windows/macOS/mobile execution and full-game UI acceptance remain unverified.
 The shipped Build 108 demo lacks `weapons/raidcanister.pcx`. Its explicit HUD variant
 keeps the secondary ammunition number without that decorative icon. Other required
 art remains strict; retail composition is unchanged. See [demo contracts](demo_contracts.md).
+
+## Weapon tabs (F1, 0.5.1)
+
+Issue #5. `InitWeaponTabs`, the weapon part of `AdjustRes`, `UpdateWeap`/
+`UpdateCurrentWeap`, `ToggleWeapons` and `DrawWeaponTabs` are imported. Ten 150x25
+tabs (`border_weapon.pcx`, slot numbers 1-10 right-justified in the small numbers)
+stack around the vertical centre at the right edge and slide in or out over 0.25 s,
+in high detail only, with no display timeout. Each slot shows its weapon's
+`m_szStatusIcon`, the current slot its `m_szStatusIconH` when it has one; a reserved
+inventory slot (>= 10) keeps the previous highlight. The original shell toggles them
+with VK_F1 without Shift; the menu frontend does the same in play, before its
+diagnostic F1/F2/F3 guard (F1 stays the inspector key in the `--view-world`
+inspection loop). A new world hides them, as `Reset` did. Missing weapon art leaves
+a tab empty and is reported in `weapon_error`, never failing the HUD. The tabs
+occupy a third atlas row (1024x256).
 
 ## CTF inspection icons
 

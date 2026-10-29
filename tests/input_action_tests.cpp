@@ -645,6 +645,16 @@ namespace
         CHECK(input.quick_save && !input.quick_load);
         send(SDL_SCANCODE_F6);
         CHECK(input.quick_load);
+        // Original F1 (no Shift) toggles the weapon tabs in play; never a binding or the menu.
+        CHECK(!input.weapon_tabs);
+        send(SDL_SCANCODE_F1, true);
+        CHECK(!input.weapon_tabs);
+        auto shifted = key(SDL_SCANCODE_F1, true);
+        shifted.key.mod = SDL_KMOD_LSHIFT;
+        input.event(shifted, window, m, true, true, false, 640, 480);
+        CHECK(!input.weapon_tabs);
+        send(SDL_SCANCODE_F1);
+        CHECK(input.weapon_tabs && !m.active && input.controls.mouse_requested);
         return true;
     }
     std::size_t row_of(InputAction action)

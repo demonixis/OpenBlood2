@@ -265,7 +265,9 @@ namespace
               a->m_damage.GetLastDamager() == p->m_hObject);
         auto noncharacter = object(g, "BaseClass", {0, 10, 20});
         CHECK(noncharacter && damage(g, a, noncharacter));
-        CHECK(a->ComputeStimuli() == -1 && !a->m_damage.GetLastDamager() && a->GetTarget() == p->m_hObject);
+        // Original cleared the non-character but kept casting it (UB): resolved as no stimulus.
+        CHECK(a->ComputeStimuli() == 0 && !a->m_damage.GetLastDamager() && a->GetTarget() == p->m_hObject);
+        CHECK(a->ignored_damagers == 1 && a->perception_failures == 0);
         p->m_damage.m_bDead = false;
         CHECK(damage(g, a, p->m_hObject) && g.objects.remove(p->m_hObject));
         CHECK(!a->m_damage.GetLastDamager() && g.objects.finish_frame() && !a->GetTarget());

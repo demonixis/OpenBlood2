@@ -99,8 +99,13 @@ A remembered character attacker bypasses range/FOV/faction/visibility checks and
 preserves earlier stimulus strengths. Successful acquisition clears the memory.
 A dead attacker returns none while retaining the old target and memory, as in source.
 The source clears a non-character attacker but then still casts it to CBaseCharacter;
-we clear it and return explicit failure instead. Self-target link acquisition also
-rejects under existing contracts. No unsafe C-style character cast is introduced.
+we clear it and return no stimulus, like the dead-attacker branch (the
+[2026-10-28 correction](../implementation/reports/tester_feedback_2026_10_28.md)
+supersedes the former explicit failure, which froze NPCs hurt by damage volumes).
+A self-inflicted attacker (own explosion, Minefield) and an own-list fallback that
+selects the actor itself resolve the same way instead of targeting the actor; the
+checked link still never links an object to itself. `ignored_damagers` counts these
+cases. No unsafe C-style character cast is introduced.
 
 ChooseOpportunityTarget preserves its current-weapon guard, clears strengths/target
 only after that guard, and runs sight-only selection. It retains the same strength,

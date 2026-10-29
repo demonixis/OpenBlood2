@@ -37,6 +37,14 @@
 #define INVTAB_STOPPED 2
 #define INVTAB_SCROLL_OUT 3
 
+#define WEAPTAB_SLOTS 10
+#define WEAPTAB_SCROLL_TIME 0.25f
+
+#define WEAPTAB_INVISIBLE 0
+#define WEAPTAB_SCROLL_IN 1
+#define WEAPTAB_STOPPED 2
+#define WEAPTAB_SCROLL_OUT 3
+
 struct StatTab
 {
 
@@ -103,6 +111,26 @@ class CNewStatusBar
         return m_hItemName;
     }
     std::string item_error; // Last item picture or name font failure; never fails the HUD.
+    // Original ToggleWeapons (shell F1) and DrawWeaponTabs: the ten weapon slots slide in from the
+    // right edge, high graphics only. Missing artwork leaves a slot empty (weapon_error).
+    void ToggleWeapons(float time);
+    void ResetWeapons(); // Original Reset on a level change: m_nWeapLevel = 0.
+    struct WeaponLayout
+    {
+        bool visible = false;
+        int x = 0;
+        std::array<int, WEAPTAB_SLOTS> y{};
+    };
+    WeaponLayout DrawWeaponTabs(float time);
+    const StatTab& weapon_tab(unsigned slot) const
+    {
+        return m_stWeapons[slot];
+    }
+    unsigned weapon_level() const
+    {
+        return m_nWeapLevel;
+    }
+    std::string weapon_error;
     std::array<const StatTab*, 4> tabs() const
     {
         return {&m_stHealth, &m_stArmor, &m_stAmmo, &m_stAltAmmo};
@@ -117,6 +145,8 @@ class CNewStatusBar
   private:
     bool InitStatTabs();
     void InitInvTabs();
+    void InitWeaponTabs();
+    void UpdateWeapons(const OpenBlood2::PlayerStats&);
     void AdjustRes(unsigned width, unsigned height);
     void SetupTab(StatTab&, const OpenBlood2::HudFont*, unsigned flags);
     void JustifySurface(const OpenBlood2::HudSurface*, unsigned just, unsigned& x, unsigned& y);
@@ -128,6 +158,11 @@ class CNewStatusBar
     unsigned m_nInvLevel = INVTAB_INVISIBLE;
     float m_fInvUpdateTime = 0, m_fInvScrollRatio = 0;
     bool inventory_ready = false;
+    StatTab m_stWeapons[WEAPTAB_SLOTS]{};
+    unsigned m_nCurrentWeapon = 0;
+    unsigned m_nWeapLevel = WEAPTAB_INVISIBLE;
+    float m_fWeapUpdateTime = 0, m_fWeapScrollRatio = 0;
+    bool weapons_ready = false;
     OpenBlood2::HudFont big_numbers, small_numbers, stat_font;
     unsigned m_nScreenWidth = 0, m_nScreenHeight = 0, m_nStatLevel = STATTAB_HIGH;
     OpenBlood2::PlayerStats previous{};

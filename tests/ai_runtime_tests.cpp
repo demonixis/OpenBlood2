@@ -574,6 +574,31 @@ namespace
         CHECK(!a->AI_Update() && a->runtime_failed && a->runtime_error.find("not a character") != std::string::npos);
         return true;
     }
+    // Tester report 2026-10-28 (Steam Tunnels/CDM): valve damage volumes and an actor's own
+    // explosion became last damagers; the checked target link refused them and froze the NPC.
+    bool damagers(const char*)
+    {
+        GameSession g;
+        CHECK(setup(g));
+        auto* a = actor(g);
+        CHECK(a);
+        auto brush = object(g, {0, 10, 30}, "valve");
+        CHECK(brush);
+        a->m_damage.RestoreLastDamager(brush);
+        CHECK(a->ComputeStimuli() == 0 && !a->GetTarget() && !a->m_damage.GetLastDamager());
+        a->m_damage.RestoreLastDamager(a->m_hObject);
+        CHECK(a->ComputeStimuli() == 0 && !a->GetTarget() && !a->m_damage.GetLastDamager());
+        CHECK(a->ignored_damagers == 2 && a->perception_failures == 0);
+        // A real character damager is still pursued.
+        auto h = object(g, {0, 10, 50}, "attacker", "CBaseCharacter");
+        auto* c = h ? dynamic_cast<CBaseCharacter*>(g.server.HandleToObject(h)) : nullptr;
+        CHECK(c);
+        c->m_damage.Init(h);
+        c->m_damage.SetHitPoints(100);
+        a->m_damage.RestoreLastDamager(h);
+        CHECK(a->ComputeStimuli() == 1 && a->GetTarget() == h && a->ignored_damagers == 2);
+        return true;
+    }
     bool tracking(const char*)
     {
         GameSession g;
@@ -1029,6 +1054,7 @@ int main(int argc, char** argv)
                                                                         {"lifetime", lifetime},
                                                                         {"targets", targets},
                                                                         {"tracking", tracking},
+                                                                        {"damagers", damagers},
                                                                         {"camera", camera},
                                                                         {"spatial", spatial},
                                                                         {"triggers", triggers},

@@ -307,8 +307,10 @@ namespace
         for (int mode : {1, 2, 3})
         {
             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error) && !g.objects.get(old));
-            auto* a = script_actor(g, {0, 10000, 0});
-            auto* enemy = script_actor(g, {0, 10000, 400}, false);
+            // Free air above SubwayA's geometry (y <= 512) yet inside its extents padded by 100:
+            // farther out, the outside-world hold (tester_feedback_2026_10_27) stops the walk.
+            auto* a = script_actor(g, {0, 600, 0});
+            auto* enemy = script_actor(g, {0, 600, 400}, false);
             CHECK(a && enemy && armed(a));
             enemy->m_damage.m_fHitPoints = enemy->m_damage.m_fMaxHitPoints = 10000;
             g.objects.get(enemy->m_hObject)->dimensions = {60, 100, 30};
@@ -317,7 +319,7 @@ namespace
             auto table = std::make_shared<CAnim_Sound>();
             CHECK(table->SetAnimationIndexes(a->m_hObject) && table->SetSoundRoot("sounds/enemies/m_cultist") &&
                   a->InitStatics(table));
-            a->m_vTargetPos = {0, 10000, 400};
+            a->m_vTargetPos = {0, 600, 400};
             a->m_fWalkSpeed = 20;
             a->m_fRunSpeed = 40;
             a->scheduled = true;

@@ -233,11 +233,15 @@ int AI_Mgr::ComputeStimuli()
     if (next)
     {
         from_damage = true;
-        // Original cleared this handle but still cast the non-character below (UB).
-        if (!dynamic_cast<CBaseCharacter*>(server->HandleToObject(next)))
+        // Original cleared this handle but still cast the non-character below (UB):
+        // damage volumes (CityHubC/Steam Tunnels valves) and brushes are such damagers.
+        // Self-inflicted damage (own explosions, Minefield) would target the actor
+        // itself. Both resolve like the source dead-target branch: no stimulus.
+        if (next == m_hObject || !dynamic_cast<CBaseCharacter*>(server->HandleToObject(next)))
         {
             m_damage.ClearLastDamager();
-            return PerceptionFailure("Last damager is not a character; unsafe original cast rejected");
+            ++ignored_damagers;
+            return 0;
         }
         kind = 1;
     }
@@ -293,6 +297,8 @@ int AI_Mgr::ComputeStimuli()
                 return PerceptionFailure("Selected target is not a character");
             if (character->m_damage.IsDead())
                 return 0; // No next-nearest retry; damage memory retained.
+            if (next == m_hObject)
+                return 0; // Enemy-list fallback to the actor's own list (no opposite faction).
             if (!SetNewTarget(next))
                 return PerceptionFailure("Target link acquisition failed");
         }
@@ -353,8 +359,8 @@ bool AI_Mgr::ChooseOpportunityTarget()
         PerceptionFailure("Opportunity target is not a character");
         return false;
     }
-    if (character->m_damage.IsDead())
-        return false;
+    if (character->m_damage.IsDead() || next == m_hObject)
+        return false; // Own-list fallback never targets the actor itself.
     if (!SetNewTarget(next))
     {
         PerceptionFailure("Opportunity link acquisition failed");

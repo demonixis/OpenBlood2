@@ -428,6 +428,40 @@ namespace
         bar.UpdateInv(shown, true, 40);
         CHECK(!bar.item_error.empty() && !items[2]->hIcon && bar.canvas.error.empty());
         CHECK(bar.Update(sample, 640, 480));
+        // Original weapon tabs (issue #5, F1): real art, highlighted current slot, 0.25 s slide
+        // from the right edge, hidden in low detail and on a level change.
+        sample.weapon = WEAP_BERETTA;
+        sample.weapon_slot = 1;
+        sample.weapon_slots = {WEAP_MELEE, WEAP_BERETTA, WEAP_SHOTGUN};
+        CHECK(bar.Update(sample, 640, 480) && bar.weapon_error.empty());
+        CHECK(bar.weapon_tab(0).hIcon && bar.weapon_tab(1).hIcon && bar.weapon_tab(2).hIcon &&
+              !bar.weapon_tab(3).hIcon && bar.weapon_tab(9).value == 10);
+        CHECK(bar.weapon_tab(0).locX == 490 && bar.weapon_tab(0).locY == 115 && bar.weapon_tab(9).locY == 340);
+        const auto highlighted = bar.weapon_tab(1).hTab->rgba;
+        sample.weapon_slot = 2;
+        sample.weapon = WEAP_SHOTGUN;
+        CHECK(bar.Update(sample, 640, 480) && bar.weapon_tab(1).hTab->rgba != highlighted);
+        sample.weapon_slot = 10; // A reserved inventory slot keeps the previous highlight.
+        const auto kept = bar.weapon_tab(2).hTab->rgba;
+        CHECK(bar.Update(sample, 640, 480) && bar.weapon_tab(2).hTab->rgba == kept);
+        CHECK(!bar.DrawWeaponTabs(50).visible);
+        bar.ToggleWeapons(50);
+        auto weapons = bar.DrawWeaponTabs(50);
+        CHECK(weapons.visible && weapons.x == 640 && weapons.y[0] == 115);
+        weapons = bar.DrawWeaponTabs(50.125f);
+        CHECK(weapons.x > 560 && weapons.x < 570);
+        bar.ToggleWeapons(50.2f); // Ignored while scrolling in.
+        CHECK(bar.DrawWeaponTabs(50.3f).x == 490 && bar.weapon_level() == WEAPTAB_STOPPED);
+        CHECK(bar.DrawWeaponTabs(90).x == 490); // No display timeout.
+        bar.ToggleWeapons(90);
+        CHECK(bar.DrawWeaponTabs(90.2f).visible && !bar.DrawWeaponTabs(90.3f).visible);
+        bar.ToggleWeapons(91);
+        CHECK(bar.Update(sample, 511, 384) && !bar.DrawWeaponTabs(92).visible);
+        CHECK(bar.Update(sample, 640, 480) && bar.DrawWeaponTabs(92).visible);
+        bar.ResetWeapons();
+        CHECK(!bar.DrawWeaponTabs(93).visible);
+        sample.weapon_slots = {};
+        CHECK(bar.Update(sample, 640, 480) && !bar.weapon_tab(1).hIcon);
         for (int cycle = 0; cycle < 3; ++cycle)
         {
             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error) && g.step(.016));

@@ -1,5 +1,5 @@
-// Selective original CNewStatusBar: InitStatTabs, InitInvTabs, AdjustRes, UpdateInv, DrawInvTabs,
-// SetupTab, JustifySurface.
+// Selective original CNewStatusBar: InitStatTabs, InitInvTabs, InitWeaponTabs, AdjustRes, UpdateInv,
+// UpdateWeap/UpdateCurrentWeap, ToggleWeapons, DrawInvTabs, DrawWeaponTabs, SetupTab, JustifySurface.
 // Original locations/resources and composition order retained; typed surfaces replace the client ABI.
 #include "game/original/NewStatusBar.h"
 #include "game/original/WeaponDefs.h"
@@ -19,7 +19,10 @@ bool CNewStatusBar::Init()
     InitStatTabs();
     initialized = canvas.error.empty();
     if (initialized)
+    {
         InitInvTabs();
+        InitWeaponTabs();
+    }
     return initialized;
 }
 bool CNewStatusBar::Update(const OpenBlood2::PlayerStats& s, unsigned width, unsigned height)
@@ -52,6 +55,8 @@ bool CNewStatusBar::Update(const OpenBlood2::PlayerStats& s, unsigned width, uns
     SetupTab(m_stArmor, &big_numbers, include);
     SetupTab(m_stAmmo, &big_numbers, include);
     SetupTab(m_stAltAmmo, &small_numbers, include);
+    if (!have_previous || previous.weapon_slots != s.weapon_slots || previous.weapon_slot != s.weapon_slot)
+        UpdateWeapons(s);
     previous = s;
     have_previous = true;
     ++revision;
@@ -93,6 +98,15 @@ void CNewStatusBar::AdjustRes(unsigned width, unsigned height)
 
     if (m_nStatLevel == STATTAB_LOW)
         m_nInvLevel = INVTAB_INVISIBLE;
+
+    // Adjust the weapon tabs: ten slots stacked around the vertical centre at the right edge
+    unsigned offset = (m_nScreenHeight / 2) - (m_stWeapons[0].sizeY * 5);
+    for (int i = 0; i < WEAPTAB_SLOTS; i++)
+    {
+        m_stWeapons[i].locX = m_nScreenWidth - m_stWeapons[i].sizeX;
+        m_stWeapons[i].locY = offset;
+        offset += m_stWeapons[i].sizeY;
+    }
 
     // Adjust the inventory items tabs
     const int screen_height = int(m_nScreenHeight);
@@ -179,6 +193,127 @@ void CNewStatusBar::InitInvTabs()
     }
     else if (m_hItemName)
         canvas.FillRect(m_hItemName, nullptr, m_hTransColor);
+}
+void CNewStatusBar::InitWeaponTabs()
+{
+    for (int i = 0; i < WEAPTAB_SLOTS; i++)
+    {
+        m_stWeapons[i].sizeX = 150;
+        m_stWeapons[i].sizeY = 25;
+
+        m_stWeapons[i].hTab = canvas.CreateSurface(m_stWeapons[i].sizeX, m_stWeapons[i].sizeY);
+        m_stWeapons[i].hBorder = canvas.CreateSurfaceFromBitmap("interface/statusbar/border_weapon.pcx");
+        m_stWeapons[i].hIcon = 0;
+        m_stWeapons[i].hBar = 0;
+
+        m_stWeapons[i].borderX = 122;
+        m_stWeapons[i].borderY = 3;
+        m_stWeapons[i].borderJ = STATTAB_JUST_NW;
+
+        m_stWeapons[i].iconX = 125;
+        m_stWeapons[i].iconY = 4;
+        m_stWeapons[i].iconJ = STATTAB_JUST_NE;
+
+        m_stWeapons[i].value = i + 1;
+        m_stWeapons[i].valueX = 150;
+        m_stWeapons[i].valueY = 0;
+        m_stWeapons[i].valueJ = 2; // CF_JUSTIFY_RIGHT
+        m_stWeapons[i].digits = 2;
+    }
+    weapons_ready = canvas.error.empty();
+    if (!weapons_ready)
+    {
+        weapon_error = canvas.error;
+        canvas.error.clear();
+        return;
+    }
+    for (auto& tab : m_stWeapons)
+        SetupTab(tab, &small_numbers, TAB_INC_HIGH);
+}
+void CNewStatusBar::UpdateWeapons(const OpenBlood2::PlayerStats& s)
+{
+    if (!weapons_ready)
+        return;
+    // Source UpdateCurrentWeap: a reserved inventory slot keeps the previous highlight.
+    if (s.weapon_slot < WEAPTAB_SLOTS)
+        m_nCurrentWeapon = s.weapon_slot;
+    for (unsigned i = 0; i < WEAPTAB_SLOTS; i++)
+    {
+        // UpdateWeap's normal picture; the current slot uses the highlighted one when it exists.
+        const auto* weapon = s.weapon_slots[i] ? weapon_definition(s.weapon_slots[i]) : nullptr;
+        const char* picture = nullptr;
+        if (weapon)
+            picture =
+                i == m_nCurrentWeapon && weapon->m_szStatusIconH ? weapon->m_szStatusIconH : weapon->m_szStatusIcon;
+        m_stWeapons[i].hIcon = picture && *picture ? canvas.CreateSurfaceFromBitmap(picture) : nullptr;
+        if (picture && *picture && !m_stWeapons[i].hIcon)
+        {
+            weapon_error = canvas.error;
+            canvas.error.clear();
+        }
+        SetupTab(m_stWeapons[i], &small_numbers, TAB_INC_HIGH);
+    }
+}
+void CNewStatusBar::ToggleWeapons(float time)
+{
+    if (m_nWeapLevel == WEAPTAB_INVISIBLE)
+    {
+        m_nWeapLevel = WEAPTAB_SCROLL_IN;
+        m_fWeapUpdateTime = time;
+    }
+    else if (m_nWeapLevel == WEAPTAB_STOPPED)
+    {
+        m_nWeapLevel = WEAPTAB_SCROLL_OUT;
+        m_fWeapUpdateTime = time;
+    }
+}
+void CNewStatusBar::ResetWeapons()
+{
+    m_nWeapLevel = WEAPTAB_INVISIBLE;
+    m_fWeapScrollRatio = 0;
+}
+CNewStatusBar::WeaponLayout CNewStatusBar::DrawWeaponTabs(float time)
+{
+    WeaponLayout layout;
+    // Draw: if(m_nWeapLevel && m_bHighGraphics) DrawWeaponTabs();
+    if (!weapons_ready || !m_nWeapLevel || m_nStatLevel != STATTAB_HIGH)
+        return layout;
+
+    // Handle the scrolling in and out of the weapon tabs
+    switch (m_nWeapLevel)
+    {
+        case WEAPTAB_SCROLL_IN:
+            if (time - m_fWeapUpdateTime > WEAPTAB_SCROLL_TIME)
+            {
+                m_fWeapScrollRatio = 1.0f;
+                m_nWeapLevel = WEAPTAB_STOPPED;
+                m_fWeapUpdateTime = time;
+            }
+            else
+                m_fWeapScrollRatio = (time - m_fWeapUpdateTime) / WEAPTAB_SCROLL_TIME;
+            break;
+
+        case WEAPTAB_STOPPED:
+            break;
+
+        case WEAPTAB_SCROLL_OUT:
+            if (time - m_fWeapUpdateTime > WEAPTAB_SCROLL_TIME)
+            {
+                m_fWeapScrollRatio = 0.0f;
+                m_nWeapLevel = WEAPTAB_INVISIBLE;
+                m_fWeapUpdateTime = time;
+            }
+            else
+                m_fWeapScrollRatio = 1.0f - (time - m_fWeapUpdateTime) / WEAPTAB_SCROLL_TIME;
+
+            break;
+    }
+
+    layout.visible = m_nWeapLevel != WEAPTAB_INVISIBLE; // The final scroll-out frame is off screen.
+    layout.x = int(unsigned(m_stWeapons[0].sizeX - (m_stWeapons[0].sizeX * m_fWeapScrollRatio)) + m_stWeapons[0].locX);
+    for (int i = 0; i < WEAPTAB_SLOTS; i++)
+        layout.y[i] = int(m_stWeapons[i].locY);
+    return layout;
 }
 void CNewStatusBar::UpdateInv(const OpenBlood2::InventoryItems& items, bool bShow, float time)
 {

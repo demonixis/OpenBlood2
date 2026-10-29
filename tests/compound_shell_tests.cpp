@@ -192,6 +192,12 @@ namespace
         CHECK(r->state.m_Pos.x == 21 && r->world_model->closed_components == 2);
         CHECK(sweep_object(*r, {26, 2, 2}, {26, 2, 10}, {}, hit) == CollisionQuery::Hit);
         CHECK(sweep_object(*r, {6, 2, 2}, {6, 2, 10}, {}, hit) == CollisionQuery::Miss);
+        // A domain-edge segment (CastRay) leaves the domain in the displaced frame: only
+        // its part over the shape is swept, with the fraction remapped (tester 0.5.0 log).
+        CHECK(sweep_object(*r, {-1e7f, 2, 6}, {26, 2, 6}, {}, hit) == CollisionQuery::Hit);
+        CHECK(hit.point.x > 15 && hit.point.x < 26 && std::abs(-1e7 + hit.fraction * (26 + 1e7) - hit.point.x) < 2);
+        CHECK(sweep_object(*r, {-1e7f, 50, 6}, {26, 50, 6}, {}, hit) == CollisionQuery::Miss);
+        CHECK(sweep_object(*r, {26, 2, 6}, {1e7f, 2, 6}, {}, hit) != CollisionQuery::Invalid);
         CHECK(g.objects.remove(h) && g.objects.finish_frame() && !g.objects.get(id));
         CHECK(retained->contains({2, 2, 2})); // Value-owned geometry survives its original source object.
         CHECK(g.unload_world() && g.server.string_count() == 0 && g.server.message_count() == 0);

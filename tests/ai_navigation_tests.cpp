@@ -161,7 +161,8 @@ namespace
         CHECK(!m.ClearToPoint(start, end, dims, hit) && m.outcome == CMovement::Outcome::Unavailable);
         g.server.collision_ready = true;
         CHECK(m.ClearToPoint(start, end, dims, hit) && m.error.empty() && m.rays == 2);
-        CHECK(!m.ClearToPoint(start, start, dims, hit) && m.outcome == CMovement::Outcome::Invalid);
+        // A coincident destination is clear: the source's zero-length side segments cannot hit.
+        CHECK(m.ClearToPoint(start, start, dims, hit) && m.outcome == CMovement::Outcome::Clear && m.rays == 0);
         CHECK(m.ClearToPoint(start, {0, 100, 0}, dims, hit)); // SDK AlignRotation supplies a perpendicular up.
         CHECK(m.alignment_fallbacks == 1 && same(m.alignment_right, {-1, 0, 0}));
         CHECK(!m.ClearToPoint(start, end, {-1, 2, 1}, hit));
@@ -186,7 +187,7 @@ namespace
         CHECK(near(vector_dot(m.alignment_direction, m.alignment_right), 0));
         CHECK(near(vector_dot(m.alignment_right, m.alignment_right), 1));
         CHECK(m.ClearToPoint(position, {0, 10, 100}, dims, hit) && m.alignment_fallbacks == 3);
-        CHECK(!m.ClearToPoint(position, position, dims, hit) && m.outcome == CMovement::Outcome::Invalid);
+        CHECK(m.ClearToPoint(position, position, dims, hit) && m.outcome == CMovement::Outcome::Clear);
         CHECK(!m.ClearToPoint(position, {NAN, 10, 0}, dims, hit) && m.outcome == CMovement::Outcome::Invalid);
         CHECK(m.alignment_fallbacks == 3);
         // Local up can also point along Z. This exercises the second reference

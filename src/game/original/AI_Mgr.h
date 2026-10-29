@@ -179,6 +179,7 @@ class AI_Mgr : public CBaseCharacter
     OpenBlood2::AIFindReport find;
     std::array<OpenBlood2::AIFindReport, 3> stimulus_queries;
     std::uint64_t perception_calls = 0, perception_failures = 0;
+    std::uint64_t ignored_damagers = 0; // Self or non-character last damagers resolved as no stimulus.
     int stimulus = 0;
     bool from_damage = false;
     std::string perception_error;

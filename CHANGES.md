@@ -2,7 +2,17 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [0.6.0] - XXX
+## [0.5.1] - 2026-10-29
+
+### Added
+
+- The original weapon list on the right of the status bar, shown and hidden with F1 ([#5](https://github.com/demonixis/OpenBlood2/issues/5)).
+
+### Fixed
+
+- The game no longer stops about 100 seconds after entering Condemned Tenement (CityHubB) when its start crate, or a pickup or body in CityHubB/C, Abandoned Buildings or the Train Station, falls out of the level ([#6](https://github.com/demonixis/OpenBlood2/issues/6)).
+- Enemies no longer freeze, become unkillable and block saving after being hurt by the Steam Tunnels valves, other damage volumes or their own explosions ([#7](https://github.com/demonixis/OpenBlood2/issues/7)).
+- Enemies no longer freeze while planning a route past a moved door or platform, or from inside an obstacle (Steam Tunnels, Center for Disease Management) ([#7](https://github.com/demonixis/OpenBlood2/issues/7)).
 
 ## [0.5.0] - 2026-10-25
 

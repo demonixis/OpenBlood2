@@ -1190,7 +1190,7 @@ add_executable(ai_runtime_tests ai_runtime_tests.cpp)
 target_link_libraries(ai_runtime_tests PRIVATE blood2_game)
 blood2_project_options(ai_runtime_tests)
 
-foreach(case IN ITEMS ammo_receive ammo_search activation animation_clearance visibility visibility_filter visibility_atomic lifetime targets tracking camera spatial triggers body missing)
+foreach(case IN ITEMS ammo_receive ammo_search activation animation_clearance visibility visibility_filter visibility_atomic lifetime targets tracking damagers camera spatial triggers body missing)
     add_test(NAME ai_runtime.${case} COMMAND ai_runtime_tests "${case}")
     set_tests_properties(ai_runtime.${case} PROPERTIES LABELS "headless;ai_runtime" TIMEOUT 30)
 endforeach()

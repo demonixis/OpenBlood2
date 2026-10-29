@@ -46,6 +46,8 @@ same preflight preservation applies to invalid coordinates/owner/sample. After
 preflight it clears the route, reads dimensions and uses the cached position.
 ClearToPoint constructs right/forward from direction and cached up. Its width is
 `sqrt(dims.x² + dims.z²) + 0.1`. It checks the right side first, then the left.
+A destination coinciding with the start is clear without a ray: the source's
+zero-length side segments cannot hit (2026-10-28 correction).
 **There is no center ray, swept body, vertical/head clearance or floor test.** A
 thin central obstruction can pass this original test; success is not proof that
 an actor can physically traverse the route.
@@ -82,6 +84,12 @@ first boundary of ±10 million units. It queries primary geometry plus live soli
 objects with the existing closest-hit implementation. CastWorldRay stays primary-only;
 both share endpoint construction. Invalid input, missing collision, hit and miss
 remain distinct. No arbitrary navigation range or invented hit is supplied.
+A clipped endpoint on the domain edge may leave the domain in a displaced world
+model's or container's local frame; `sweep_object` then sweeps only the part inside
+that shape's bounds padded by the swept half and remaps the fraction, rather than
+refusing the whole query (2026-10-28 correction; the former refusal froze NPCs
+next to moved doors and platforms). An obstruction reported without a usable normal
+(a ray starting inside it) is an ordinary `Blocked` plan refusal, not a failure.
 
 Zero/invalid direction or up, nonfinite/out-of-domain points or direction vectors and negative dimensions
 fail. Valid parallel axes use the [original AlignRotation fallback](ai_alignment_contracts.md),

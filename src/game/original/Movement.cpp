@@ -215,6 +215,10 @@ bool CMovement::clear_to_point(DVector start, DVector destination, DVector dimen
         dimensions.x < 0 || dimensions.y < 0 || dimensions.z < 0)
         return fail(Outcome::Invalid, "Invalid movement clearance request");
     DVector f, r;
+    // A coincident destination leaves nothing to cross: the source's zero-length side
+    // segments cannot hit, so the point is clear.
+    if (vector_dot(vector_subtract(destination, start), vector_subtract(destination, start)) < 1e-12f)
+        return true;
     if (!frame_axes(vector_subtract(destination, start), f, r))
         return fail(Outcome::Invalid, "Movement clearance direction/up is degenerate");
     const float width = std::hypot(dimensions.x, dimensions.z) + .1f;
@@ -232,8 +236,10 @@ bool CMovement::clear_to_point(DVector start, DVector destination, DVector dimen
 bool CMovement::shortest_turn(DVector start, DVector& facing, float step, DVector& out)
 {
     DVector f, r;
+    // An obstruction reported without a normal (the ray started inside it) gives no
+    // side to search: an ordinary planning refusal, never an actor failure.
     if (!frame_axes(facing, f, r))
-        return fail(Outcome::Invalid, "Obstacle normal/up is degenerate");
+        return fail(Outcome::Blocked, "Obstacle normal is degenerate");
     const auto left = vector_scale(r, -1);
     SegmentHit hit;
     float left_distance = 0, right_distance = 0;

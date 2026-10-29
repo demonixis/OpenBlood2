@@ -1245,6 +1245,9 @@ namespace OpenBlood2
                     state.item_messages = client.inventory_item_messages;
                     state.item_shows = client.inventory_show_requests;
                     state.time = float(game->objects.time());
+                    state.world_revision = game->world_revision;
+                    if (std::exchange(input.weapon_tabs, false))
+                        hud.toggle_weapons(state.time);
                     if (!hud.draw(state, game->resources, error))
                         return failed(4);
                     if (input.message.active || !client.chat_lines.empty() || !client.control_notice.empty())

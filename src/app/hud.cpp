@@ -237,6 +237,27 @@ namespace OpenBlood2
                 item_offset += s->width;
             }
         }
+        for (unsigned slot = 0; slot < WEAPTAB_SLOTS; ++slot)
+        {
+            const auto* s = status_->weapon_tab(slot).hTab;
+            if (!s)
+                break;
+            const unsigned x0 = (slot % 5) * 150, y0 = weapons_y + (slot / 5) * 25;
+            if (s->width > 150 || s->height > 25 || s->rgba.size() != std::size_t(s->width) * s->height * 4)
+            {
+                SDL_UnmapGPUTransferBuffer(device_, transfer_);
+                error = "Original weapon tab exceeds atlas bounds";
+                return false;
+            }
+            for (unsigned y = 0; y < s->height; ++y)
+                for (unsigned x = 0; x < s->width; ++x)
+                {
+                    const auto from = (y * s->width + x) * 4, to = ((y0 + y) * width + x0 + x) * 4;
+                    std::copy_n(s->rgba.data() + from, 4, data + to);
+                    if (data[to] == 255 && data[to + 1] == 0 && data[to + 2] == 255)
+                        data[to + 3] = 0;
+                }
+        }
         for (auto [surface, slot] : {std::pair{status_->team_icon, team_x}, std::pair{status_->flag_icon, flag_x}})
         {
             if (!surface)
@@ -352,6 +373,11 @@ namespace OpenBlood2
             item_messages_ = h.item_messages;
             item_shows_ = h.item_shows;
         }
+        if (h.world_revision != world_revision_)
+        {
+            status_->ResetWeapons();
+            world_revision_ = h.world_revision;
+        }
         if (!status_->UpdateCTF(h.ctf_team, h.ctf_flag))
         {
             error = status_->canvas.error.empty() ? "Invalid CTF HUD state" : status_->canvas.error;
@@ -393,6 +419,19 @@ namespace OpenBlood2
                     image(tabs[t]->hTab, 75 * t, float(layout.x[t]), float(layout.y[t]));
             if (layout.name)
                 image(status_->item_name(), 275, float(layout.name_x), float(layout.name_y));
+            // Then DrawWeaponTabs: every slot's tab at the same sliding x.
+            const auto weapons = status_->DrawWeaponTabs(h.time);
+            for (unsigned slot = 0; weapons.visible && slot < WEAPTAB_SLOTS; ++slot)
+            {
+                const auto* s = status_->weapon_tab(slot).hTab;
+                if (!s)
+                    break;
+                const unsigned x0 = (slot % 5) * 150, y0 = weapons_y + (slot / 5) * 25;
+                const ImVec2 p{viewport->Pos.x + weapons.x, viewport->Pos.y + weapons.y[slot]};
+                draw->AddImage((ImTextureID)(intptr_t)texture_, p, {p.x + s->width, p.y + s->height},
+                               {float(x0) / atlas_width, float(y0) / atlas_height},
+                               {float(x0 + s->width) / atlas_width, float(y0 + s->height) / atlas_height});
+            }
         }
         if (h.visible && h.ctf_team)
         {

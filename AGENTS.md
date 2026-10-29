@@ -12,6 +12,13 @@ double explosion, callback removal, other embedded-start refusals and detailed
 sweep diagnostics. The exact Downtown encounter and VFX stress-pool failure
 remain unverified/open respectively.
 
+The [2026-10-28 corrections](Documentation/implementation/reports/tester_feedback_2026_10_28.md)
+(0.5.1) resolve self/non-character last damagers and own-list self selection as no stimulus,
+sweep only the in-bounds part of a domain-edge segment against a displaced world model or
+container, and make a normal-less obstacle a `Blocked` plan. The original F1 (no Shift) weapon
+tabs slide in from the right edge in high detail. Preserve unchanged in-domain sweeps, the
+self-link refusal and F1 as the inspector key in the inspection loop.
+
 The [2026-10-27 correction](Documentation/implementation/reports/tester_feedback_2026_10_27.md)
 removes `FLAG_REMOVEIFOUTSIDE` objects a move leaves beyond the DAT extents padded by 100
 and holds other bodies lost there (CityHubB/C, Abandoned Buildings, Train Station leftovers

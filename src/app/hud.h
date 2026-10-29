@@ -18,6 +18,8 @@ namespace OpenBlood2
         InventoryItems items;
         std::uint64_t item_messages = 0, item_shows = 0;
         float time = 0;
+        // A new world hides the weapon tabs (original CNewStatusBar::Reset).
+        std::uint64_t world_revision = 0;
     };
     HudState hud_state(const PlayerStats&, bool in_world, bool external_camera, bool dead = false,
                        bool show_crosshair = true, DBYTE crosshair = 1, DBYTE ctf_team = 0, DBYTE ctf_flag = 0);
@@ -29,6 +31,12 @@ namespace OpenBlood2
         HudRenderer(const HudRenderer&) = delete;
         HudRenderer& operator=(const HudRenderer&) = delete;
         bool draw(const HudState&, const Resources&, std::string& error);
+        // Original shell F1 (without Shift): CNewStatusBar::ToggleWeapons.
+        void toggle_weapons(float time)
+        {
+            if (status_)
+                status_->ToggleWeapons(time);
+        }
         const CNewStatusBar* status_bar() const
         {
             return status_.get();
@@ -36,9 +44,10 @@ namespace OpenBlood2
 
       private:
         // The crosshair slot fits the widest original zoom cursor (crosshair98, 97x41).
-        // The second row holds the three item tabs, the current item tab and the item name.
-        static constexpr unsigned atlas_width = 1024, atlas_height = 192, crosshair_x = 656, team_x = 768, flag_x = 896,
-                                  items_y = 128;
+        // The second row holds the three item tabs, the current item tab and the item name;
+        // the third the ten weapon tabs, five per line.
+        static constexpr unsigned atlas_width = 1024, atlas_height = 256, crosshair_x = 656, team_x = 768, flag_x = 896,
+                                  items_y = 128, weapons_y = 192;
         const HudSurface* crosshair_ = nullptr;
         DBYTE crosshair_number_ = 0;
         SDL_GPUDevice* device_ = nullptr;
@@ -47,7 +56,7 @@ namespace OpenBlood2
         std::unique_ptr<CNewStatusBar> status_;
         const Resources* resources_ = nullptr;
         std::uint64_t uploaded_revision_ = 0;
-        std::uint64_t item_messages_ = UINT64_MAX, item_shows_ = 0;
+        std::uint64_t item_messages_ = UINT64_MAX, item_shows_ = 0, world_revision_ = 0;
         // cres.dll IDS_ITEM_* names, read once on first need; failure leaves names empty.
         StringResources item_names_;
         bool item_names_read_ = false;
