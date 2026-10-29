@@ -2,7 +2,11 @@ function(blood2_project_options target)
     if(MSVC)
         target_compile_options(${target} PRIVATE /W4 /permissive- /utf-8)
         target_compile_options(${target} PRIVATE "$<$<CONFIG:Release>:/Zi>")
-        target_link_options(${target} PRIVATE "$<$<CONFIG:Release>:/DEBUG>")
+        # Test directories set BLOOD2_LINK_PDB OFF: a full PDB per test program (each carries
+        # blood2_game's debug information) filled the Windows CI runner's disk.
+        if(NOT DEFINED BLOOD2_LINK_PDB OR BLOOD2_LINK_PDB)
+            target_link_options(${target} PRIVATE "$<$<CONFIG:Release>:/DEBUG>")
+        endif()
     else()
         target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic)
         # Retain source locations for post-mortem diagnosis without changing Release optimization.

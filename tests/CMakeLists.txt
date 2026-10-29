@@ -1,4 +1,6 @@
 blood2_isolate_test_user_directories()
+# Release test programs link without PDBs on MSVC (see blood2_project_options).
+set(BLOOD2_LINK_PDB OFF)
 
 add_executable(sdl_properties_tests sdl_properties_tests.cpp)
 target_link_libraries(sdl_properties_tests PRIVATE SDL3::SDL3)
