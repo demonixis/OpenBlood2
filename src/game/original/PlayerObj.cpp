@@ -365,6 +365,9 @@ bool CPlayerObj::TeleportClientToServerPos()
         return true;
     OpenBlood2::PlayerPosition position;
     GetServerDE()->GetObjectPos(m_hObject, &position.position);
+    if (movement_revision == UINT64_MAX)
+        return false;
+    ++movement_revision;
     position.move_code = ++m_byClientMoveCode;
     return GetServerDE()->SendToClient(m_hClient, position) == DE_OK;
 }
@@ -394,8 +397,8 @@ bool CPlayerObj::HandlePlayerPositionMessage(const OpenBlood2::PlayerMove& move)
     if (!server->GetMovementState(m_hObject, state))
         return false;
     // The original handler accepts the client's on-ground bit and enforces a
-    // prediction leash. Here one local body resolves collisions once, so use
-    // the resulting support and never teleport through a rejected collision.
+    // prediction leash. The server validates the client's integrated destination
+    // without integrating time again, and never teleports through a rejected collision.
     m_bOnGround = state.standing && state.ground_normal.y >= 0.5f;
     m_eLastSurface = static_cast<SurfaceType>(move.surface);
     ++movement_messages;

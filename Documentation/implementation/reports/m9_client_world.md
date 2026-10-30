@@ -71,6 +71,11 @@ finding. Its sanitizer-only CTest timeout is now 60 seconds; the full repeated
 
 ## Remaining separation
 
+The [next local movement lot](m9_local_movement.md) now separates the CMoveMgr
+body and immediate prediction/correction path. The remaining list below records
+the boundary at this first presentation lot; independent collision/services and
+network gameplay remain pending.
+
 This is the first object-presentation lot, not completion of the replica stage.
 `GameSession` still owns the original client shell and server services together;
 the dedicated wrapper still contains shared CPU storage. Remaining work includes:

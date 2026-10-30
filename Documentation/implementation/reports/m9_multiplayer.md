@@ -11,7 +11,7 @@ M9 is in progress and unaccepted. M2-GPU-001 and M3 remain independent.
 | Session | GameSession owns one ServerAdapter, server shell, client shell and local_client | Separate simulation and replica ownership; retain one bound original server per process |
 | Admission | server_clients.cpp rejects a second connection; init routes to OnSinglePlayerInit | Checked N-player admission and original multiplayer init |
 | Renderer | Object models/sprites, model lighting/shadows and world/sky bindings now consume ClientWorld; presentation_effects, camera and FX remain coupled | Complete the remaining per-client presentation extraction |
-| Movement | MoveMgr reads and moves the shared authoritative player; client_movement skips server physics | Independent client body; one checked server integration between uploads |
+| Movement | Local CMoveMgr value body, speculative collision and immediate server correction; queries/stance still use the live local server through LocalMovement | Independent collision replica; delayed reports and checked server advancement between uploads |
 | Audio | ServerAdapter owns mixer; IsSoundDone/GetSoundDuration affect rules | Logical server voices and client playback, preserving RNG and deadlines |
 | Effects | GameSession::step advances server and client pools together | Separate source events/persistent descriptors from local cosmetic pools |
 | Cameras | local selection reads original objects and can modify Eye rotation | Per-client view plus checked owner commands |
@@ -28,7 +28,7 @@ M9 is in progress and unaccepted. M2-GPU-001 and M3 remain independent.
 | Contract and dependency audit | Written | Static inspection; no network gameplay qualification |
 | ENet and bounded transport | Foundation implemented | Real loopback UDP, three channels, 16 peers, reconnect identities and queue bounds; no gameplay wire schema yet |
 | Dedicated separation and logical services | Build/zero-client foundation implemented | Separate server preset, logical audio test, 22 mounted maps × 180 ticks; shared CPU/client storage remains transitional |
-| Replica and solo loopback | First object-presentation lot implemented; full separation pending | [Local replica report](m9_client_world.md) |
+| Replica and solo loopback | Object presentation and local movement body separated; independent collision/services still pending | [Local replica](m9_client_world.md), [local movement](m9_local_movement.md) |
 | Network sessions and Bloodbath | Pending | — |
 | Team and CTF | Pending | — |
 | UI, LAN discovery and qualification | Pending | — |

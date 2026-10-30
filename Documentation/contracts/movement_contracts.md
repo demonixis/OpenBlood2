@@ -54,28 +54,37 @@ come from `Shared/SharedMovement.h`; slope projection follows
 The shell owns `CMoveMgr` and a device-independent `MovementInput`. Entry binds
 the checked client/player association before receiving owned physics and
 force-position messages. `OnServerForcePos` tracks the original byte move code
-and clears velocity/acceleration; byte wrap is intentional. Exit clears all
-manager handles, command state and counters.
+and clears velocity/acceleration; byte wrap is intentional. Exit clears the
+local association, command state and counters.
 
 Each session step dispatches due server/object updates, generic physics and
 model keys, pumps server messages, advances MoveMgr, updates the inspection
 camera, and then advances view weapons. Movement therefore feeds the same-frame
 camera and firing origin. Movement continues without ImGui and with it hidden.
 
-For the local session, **one player body** replaces the original duplicated
-client physics model and server character. Association marks that record as
-client-integrated; generic physics skips it. Each movement substep sends a
-typed `PlayerMove` through `CBloodServerShell::OnMessage` to
-`CPlayerObj::HandlePlayerPositionMessage`, which calls the real collision-aware
-`MoveObject` once. It never teleports through an obstacle to satisfy a leash.
-No fake `ClientDE` table, client-only registry object or ECS was added.
+The [M9 local movement lot](multiplayer_contracts.md#local-movement-separation)
+supersedes the initial shared-body adaptation. `ClientSession::movement` owns a
+value body with generation-checked support IDs; `CMoveMgr::body` refers to that
+client storage. `LocalMovement` alone binds original handles and delivers typed
+commands, environment/stance values, jump voice requests and corrections.
 
-The move code must match, and every position/velocity/acceleration must be finite
-and within the engine's coordinate bounds. Unknown, disconnected or pending
-players reject messages. Typed velocity retains floats instead of legacy short
-packet compression. This is an in-process trusted boundary, not an authenticated
-network protocol, prediction/reconciliation system or multiplayer anti-cheat.
-The original network leash is unnecessary with a shared body and is not ported.
+Each substep integrates the client body once, predicts collision without gameplay
+callbacks, then immediately submits the **pre-collision** destination/velocity to
+`CPlayerObj::HandlePlayerPositionMessage`. The server resolves collision and commits
+contacts/pushes once, without integrating time again. Generic physics still skips
+the associated server player. Its resolved state, including callback impulses,
+replaces the client body before the next substep. A failed prediction leaves the
+client pose unchanged and remains visible; the bounded command still reaches the
+authoritative resolver so its existing failure diagnostics/contact ordering survive.
+There is no leash teleport through a refused collision.
+
+The envelope checks world epoch, object generation, monotonically increasing local
+sequence and a non-saved 64-bit force-position revision. The source byte move code
+still wraps intentionally. Pending, disconnected, invalid, duplicate, modified or
+old-world/old-force commands cannot be submitted. Position/velocity/acceleration
+retain bounded floats. This is an immediate trusted local boundary, not a wire
+codec or multiplayer anti-cheat. Delayed 0.14-second reports, server advancement
+between uploads and a collision scene built from a network replica remain pending.
 
 `GetMovementState` returns values and checked contact identities. A fresh **0.02
 unit** downward box sweep checks support against the primary solid world and

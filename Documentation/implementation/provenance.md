@@ -1,5 +1,17 @@
 # Source and Dependency Provenance
 
+## M9 local movement separation
+
+The existing selective `CMoveMgr` algorithms from `1e2bd7b8` are preserved; only
+body ownership and service routing change. `LocalMovement`, value motion state,
+report identities and the shared solver's speculative mode are project-owned
+engine adaptations. Original `MoveMgr::MoveLocalSolidObject/WritePositionInfo`
+and `CPlayerObj::HandlePlayerPositionMessage` remain the behavior references;
+the original collision-bypassing leash is not imported. See the
+[source ledger](sources/m9_local_movement_sources.json),
+[contract](../contracts/multiplayer_contracts.md#local-movement-separation) and
+[report](reports/m9_local_movement.md). No new dependency or save payload.
+
 ## M9 local object replica
 
 `ClientSession`/`ClientWorld` and immediate local frame publication are project-owned

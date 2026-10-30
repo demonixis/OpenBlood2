@@ -1,7 +1,6 @@
 // Original movement/control/container branches, adapted to typed local services.
 // Source attribution and deliberate differences: Documentation/implementation/sources/m2_movement_sources.json.
 #include "MoveMgr.h"
-#include "BloodShells.h"
 #include "engine/collision.h"
 #include <algorithm>
 #include <cmath>
@@ -34,26 +33,37 @@ namespace
 } // namespace
 using namespace OpenBlood2;
 
-bool CMoveMgr::Init(ServerDE& server, HCLIENT client)
+bool CMoveMgr::Init(HCLIENT client)
 {
     Term();
-    auto object = server.GetClientUserData(client);
-    if (!object || !server.GetMovementState(object, body))
-        return false;
-    server_ = &server;
-    client_ = client;
-    object_ = object;
-    return true;
+    return movement_.bind(client);
 }
 void CMoveMgr::Term()
 {
-    *this = CMoveMgr{};
+    movement_.clear();
+    physics = {};
+    input_ = {};
+    m_dwControlFlags = m_dwLastControlFlags = 0;
+    m_ClientMoveCode = 0;
+    m_eLastSurface = SURFTYPE_UNKNOWN;
+    m_bOnGround = m_bLastJumpCommand = m_bFalling = m_bForcedCrouch = false;
+    containers = {};
+    m_bBodyInLiquid = m_bBodyOnLadder = m_bBodyOnConveyor = m_bSwimmingOnSurface = false;
+    m_bCanSwimJump = m_bSwimmingJump = false;
+    m_bUseGravity = true;
+    m_eLastContainerCode = CC_NOTHING;
+    m_fSwimVel = 175;
+    m_fLadderVel = 400;
+    m_fVelMagnitude = m_FrameTime = 0;
+    discarded_time = 0;
+    updates = substeps = jumps = landings = jump_voice_requests = jump_voice_starts = 0;
+    configured_ = positioned_ = false;
 }
 bool CMoveMgr::OnPhysicsUpdate(const PlayerPhysics& value)
 {
-    if (!server_ || server_->GetClientUserData(client_) != object_ || !physics_vector(value.gravity) ||
-        !std::isfinite(value.move_speed) || value.move_speed < 0 || value.move_speed > 10000 ||
-        !std::isfinite(value.jump_speed) || value.jump_speed < 0 || value.jump_speed > 10000)
+    if (!movement_.valid() || !physics_vector(value.gravity) || !std::isfinite(value.move_speed) ||
+        value.move_speed < 0 || value.move_speed > 10000 || !std::isfinite(value.jump_speed) || value.jump_speed < 0 ||
+        value.jump_speed > 10000)
         return false;
     physics = value;
     configured_ = true;
@@ -61,13 +71,7 @@ bool CMoveMgr::OnPhysicsUpdate(const PlayerPhysics& value)
 }
 bool CMoveMgr::OnServerForcePos(const PlayerPosition& value)
 {
-    if (!server_ || server_->GetClientUserData(client_) != object_ || !physics_vector(value.position))
-        return false;
-    // The server already teleported the shared body. Reset motion as the
-    // original force-position handler does, without replaying a second teleport.
-    DVector zero;
-    if (server_->SetVelocity(object_, &zero) != DE_OK || server_->SetAcceleration(object_, &zero) != DE_OK ||
-        !server_->GetMovementState(object_, body))
+    if (!movement_.force_position(value))
         return false;
     m_ClientMoveCode = value.move_code;
     positioned_ = true;
@@ -267,7 +271,7 @@ void CMoveMgr::UpdateMotion(float yaw, float pitch, CVoiceMgr& voices, int chara
                 body.velocity.y += physics.jump_speed * (m_bForcedCrouch ? .75f : 1.0f);
                 // Original client VME_JUMP: only this ground branch, never swimming/ladder ascent.
                 ++jump_voice_requests;
-                jump_voice_starts += voices.PlayEventSound(object_, character, 11, external_camera);
+                jump_voice_starts += movement_.jump_voice(voices, character, external_camera);
                 m_bLastJumpCommand = true;
                 m_bOnGround = false;
                 ++jumps;
@@ -321,9 +325,9 @@ bool CMoveMgr::MoveLocalSolidObject(CBloodServerShell& shell)
                                    vector_scale(acceleration, 0.5f * m_FrameTime * m_FrameTime));
     const auto velocity = vector_add(body.velocity, vector_scale(acceleration, m_FrameTime));
     const bool was_air = !m_bOnGround;
-    if (!shell.OnMessage(client_, WritePositionInfo(vector_add(body.position, offset), velocity)))
-        return false;
-    if (!server_->GetMovementState(object_, body))
+    LocalMoveReport report;
+    if (!movement_.predict(WritePositionInfo(vector_add(body.position, offset), velocity), report) ||
+        !movement_.submit(shell, report))
         return false;
     m_bOnGround = body.standing && body.ground_normal.y >= 0.5f;
     m_bFalling = !m_bOnGround;
@@ -336,7 +340,7 @@ bool CMoveMgr::Update(CBloodServerShell& shell, CVoiceMgr& voices, bool external
                       float yaw, double seconds, bool can_move, bool firing, float pitch)
 {
     if (!ready() || !std::isfinite(seconds) || seconds < 0 || seconds > 60 || !std::isfinite(yaw) ||
-        !std::isfinite(pitch) || server_->GetClientUserData(client_) != object_)
+        !std::isfinite(pitch) || !movement_.valid())
         return false;
     if (!std::isfinite(input.mouse_forward) || !std::isfinite(input.mouse_strafe))
         return false;
@@ -346,34 +350,27 @@ bool CMoveMgr::Update(CBloodServerShell& shell, CVoiceMgr& voices, bool external
     animation.backward |= input.mouse_forward < 0;
     animation.right |= input.mouse_strafe > 0;
     animation.left |= input.mouse_strafe < 0;
-    if (can_move && !shell.OnMessage(client_, PlayerControls{animation, firing, yaw}))
+    if (!movement_.controls(shell, PlayerControls{animation, firing, yaw}, can_move, m_bForcedCrouch))
         return false;
-    auto* player = shell.Player(client_);
-    if (!player)
-        return false;
-    m_bForcedCrouch = player->crouched;
     ++updates;
     // Original Update caps a frame at 0.1s. Track discarded time explicitly.
     const auto duration = std::min(seconds, 0.1);
     discarded_time += seconds - duration;
     if (duration == 0)
-        return server_->GetMovementState(object_, body);
+        return movement_.synchronize();
     const auto count = static_cast<unsigned>(std::max(1.0, std::ceil(duration * 120)));
     m_FrameTime = static_cast<float>(duration / count);
     for (unsigned i = 0; i < count; ++i)
     {
-        if (!server_->GetMovementState(object_, body))
+        if (!movement_.synchronize())
             return false;
-        if (!player->UpdateContainerState())
+        int character = 0;
+        if (!movement_.environment(shell, containers, character))
             return false;
-        containers = player->containers;
-        UpdateMotion(yaw, pitch, voices, player->m_nCharacter, external_camera);
+        UpdateMotion(yaw, pitch, voices, character, external_camera);
         if (!MoveLocalSolidObject(shell))
             return false;
         ++substeps;
     }
-    if (!player->UpdateAirLevel(static_cast<float>(duration)))
-        return false;
-    containers = player->containers;
-    return true;
+    return movement_.finish(shell, static_cast<float>(duration), containers);
 }

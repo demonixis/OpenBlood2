@@ -1,23 +1,25 @@
 #pragma once
 #include "SurfaceTypes.h"
-#include "server_de.h"
+#include "game/local_movement.h"
 
 class CBloodServerShell;
 class CVoiceMgr;
 // Selected locomotion/container branches of original ClientShellDLL/MoveMgr.
-// One checked local player body replaces the legacy client/server duplicate.
+// CMoveMgr integrates a client-owned value body. LocalMovement delivers the
+// prediction and the immediate authoritative correction without double integration.
 // See movement_contracts.md and locomotion_contracts.md for the source selections and physics adaptations.
 class CMoveMgr
 {
   public:
-    bool Init(ServerDE&, HCLIENT);
+    explicit CMoveMgr(OpenBlood2::LocalMovement& movement) : body(movement.body()), movement_(movement) {}
+    bool Init(HCLIENT);
     void Term();
     bool OnPhysicsUpdate(const OpenBlood2::PlayerPhysics&);
     bool OnServerForcePos(const OpenBlood2::PlayerPosition&);
     bool Update(CBloodServerShell&, CVoiceMgr&, bool external_camera, const OpenBlood2::MovementInput&, float yaw,
                 double seconds, bool can_move, bool firing = false, float pitch = 0);
     OpenBlood2::PlayerMove WritePositionInfo(DVector destination, DVector velocity) const;
-    OpenBlood2::MovementState body;
+    OpenBlood2::ClientMotionState& body;
     OpenBlood2::PlayerPhysics physics;
     DDWORD m_dwControlFlags = 0, m_dwLastControlFlags = 0;
     DBYTE m_ClientMoveCode = 0;
@@ -35,7 +37,7 @@ class CMoveMgr
     std::uint64_t jump_voice_requests = 0, jump_voice_starts = 0;
     bool ready() const
     {
-        return server_ && configured_ && positioned_;
+        return movement_.valid() && configured_ && positioned_;
     }
 
   private:
@@ -47,8 +49,6 @@ class CMoveMgr
     void UpdateOnLadder(const OpenBlood2::ContainerInfo&);
     void UpdateOnConveyor(const OpenBlood2::ContainerInfo&);
     bool MoveLocalSolidObject(CBloodServerShell&);
-    ServerDE* server_ = nullptr;
-    HCLIENT client_ = nullptr;
-    HOBJECT object_ = nullptr;
+    OpenBlood2::LocalMovement& movement_;
     bool configured_ = false, positioned_ = false;
 };

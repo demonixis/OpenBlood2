@@ -267,6 +267,8 @@ class CPlayerObj : public CBaseCharacter
     std::uint64_t movement_messages = 0;
     std::uint64_t protected_volume_hits = 0;
     DBYTE m_byClientMoveCode = 0;
+    // Local-session identity, never saved. Reject an old command even after byte wrap.
+    std::uint64_t movement_revision = 0;
     bool m_bOnGround = false;
     std::string entry_error;
     float m_fYaw = 0, m_fPitch = 0, m_fMoveVel = 0, m_fJumpVel = 600;

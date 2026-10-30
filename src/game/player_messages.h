@@ -1,5 +1,6 @@
 #pragma once
 #include "basedefs_de.h"
+#include "engine/movement_state.h"
 #include <array>
 #include <cstdint>
 #include <optional>
@@ -146,15 +147,9 @@ namespace OpenBlood2
         bool firing = false;
         float yaw = 0;
     };
-    struct MovementState
+    struct MovementState : MovementValues
     {
-        DVector position{}, velocity{}, acceleration{}, dimensions{}, ground_normal{};
-        bool standing = false;
-        std::uint32_t ground_surface = 0;
-        std::uint64_t stair_attempts = 0, stair_steps = 0, overlap_contacts = 0, start_departures = 0;
-        float last_step_height = 0, last_overlap_depth = 0;
         HOBJECT ground_object = nullptr;
-        std::uint32_t ground_polygon = UINT32_MAX;
     };
     struct PlayerMove
     {

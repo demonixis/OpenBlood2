@@ -1,10 +1,11 @@
 #pragma once
+#include "client/movement.h"
 #include "client/world.h"
 
 namespace OpenBlood2
 {
     // First separation step: local replica admission/lifetime, independent of GameSession
-    // and the original server globals. Movement, FX and the original shell migrate later.
+    // and the original server globals. FX and the original shell migrate later.
     class ClientSession
     {
       public:
@@ -15,5 +16,6 @@ namespace OpenBlood2
             return world.apply(std::move(frame), error);
         }
         ClientWorld world;
+        ClientMovement movement;
     };
 } // namespace OpenBlood2

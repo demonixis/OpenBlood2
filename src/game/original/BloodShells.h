@@ -91,8 +91,10 @@ class CBloodClientShell
 {
   public:
     explicit CBloodClientShell(ServerDE& server, const OpenBlood2::Resources& resources,
-                               OpenBlood2::MusicCatalog& catalog, OpenBlood2::AudioMixer& audio)
-        : voice_manager(server), resources_(resources), server_(server), music_catalog_(catalog), audio_(audio)
+                               OpenBlood2::MusicCatalog& catalog, OpenBlood2::AudioMixer& audio,
+                               OpenBlood2::LocalMovement& movement)
+        : voice_manager(server), move_mgr(movement), resources_(resources), server_(server), music_catalog_(catalog),
+          audio_(audio)
     {
     }
     bool StartNewWorld(const char*, OpenBlood2::WorldMessage&);

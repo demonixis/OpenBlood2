@@ -280,7 +280,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     const auto* owner = dynamic_cast<const CPlayerObj*>(server_.HandleToObject(object));
     if (!object || m_bInWorld || !owner || restored != owner->restore_engine_loaded)
         return false;
-    if (!move_mgr.Init(server_, client))
+    if (!move_mgr.Init(client))
         return false;
     music.EnterWorld(music_catalog_, audio_);
     voice_manager.Init(resources_);

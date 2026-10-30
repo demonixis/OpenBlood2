@@ -147,7 +147,7 @@ namespace
         DVector position{0, 96.001f, 0};
         CHECK(game.server.TeleportObject(client.player, &position) == DE_OK);
         CHECK(steps(game, 2));
-        CHECK(client.move_mgr.m_bOnGround && client.move_mgr.body.ground_object == platform);
+        CHECK(client.move_mgr.m_bOnGround && client.move_mgr.body.ground_object == game.objects.get(platform)->id);
         CHECK(game.objects.remove(platform) && game.objects.finish_frame());
         CHECK(steps(game, 2));
         CHECK(!client.move_mgr.m_bOnGround && client.move_mgr.body.velocity.y < 0);

@@ -80,7 +80,16 @@ namespace
         CHECK(client.receive(std::move(next), error));
         CHECK(!client.world.get(reference) && client.world.get(ObjectId{2, 8}));
         CHECK(!client.world.begin(epoch) && client.world.frame().sequence == 2);
+        client.movement.owner = reference;
+        client.movement.body.position = {1, 2, 3};
+        client.movement.body.ground_object = object.id;
+        client.movement.predictions = 9;
+        auto detached = client.movement;
+        detached.body.position.x = 100;
+        CHECK(client.movement.body.position.x == 1);
         client.reset_local_world();
+        CHECK(!client.movement.owner.object && !client.movement.body.ground_object &&
+              client.movement.body.position.x == 0 && client.movement.predictions == 0);
         CHECK(client.world.frame().objects.empty() && !client.world.get(reference));
         next = accepted;
         next.world = client.world.frame().world;

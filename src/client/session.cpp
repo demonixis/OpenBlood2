@@ -11,6 +11,7 @@ namespace OpenBlood2
     void ClientSession::reset_local_world()
     {
         // Separate candidate sessions (save/NEW_LEVEL) must never reuse a world's identity.
+        movement = {};
         static std::atomic<std::uint64_t> next{1};
         const auto epoch = next.fetch_add(1, std::memory_order_relaxed);
         if (!world.begin(epoch))

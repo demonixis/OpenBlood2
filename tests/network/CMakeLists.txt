@@ -79,3 +79,11 @@ if(BLOOD2_SANITIZERS)
     # Debug + ASan/UBSan exercises 150k nested message transactions (~21 s locally).
     set_tests_properties(objects.message_churn PROPERTIES TIMEOUT 60)
 endif()
+
+add_executable(network_movement_local_tests movement_local_tests.cpp)
+target_link_libraries(network_movement_local_tests PRIVATE blood2_game)
+blood2_project_options(network_movement_local_tests)
+foreach(case IN ITEMS separation contacts pushing stale collision lifetime)
+    add_test(NAME network.movement_${case} COMMAND network_movement_local_tests ${case} "${CMAKE_CURRENT_BINARY_DIR}/movement-${case}")
+    set_tests_properties(network.movement_${case} PROPERTIES LABELS "headless;network;movement" TIMEOUT 30)
+endforeach()

@@ -1,0 +1,76 @@
+{
+  "scope": "M9 local solo client/server movement separation",
+  "baseline": "1e2bd7b8",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "1e2bd7b8",
+      "path": "src/game/original/MoveMgr.cpp",
+      "sha256": "827f8bf37ecfc3a16dbc37616659671499e3c238457ece76de6ccc4b02e17882"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "1e2bd7b8",
+      "path": "src/game/original/MoveMgr.h",
+      "sha256": "eb7f06f6912a3affeaa7222b4f08cafcf674ddb1bc347e5d9977cc1419bb1ca3"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "1e2bd7b8",
+      "path": "src/game/original/PlayerObj.cpp",
+      "sha256": "e82588e3ede76e0cff1e65648797a0a290e259faaffda2fca964b45387cfea00"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "1e2bd7b8",
+      "path": "src/game/server_physics.cpp",
+      "sha256": "f3791aa915efff4735910f0150e813683c82fe0fb6447fa22d8714b3c1a07fb8"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "1e2bd7b8",
+      "path": "src/game/server_world_bodies.cpp",
+      "sha256": "d4634f1b4f4d5b281b1424aad8992fe2b0f8bf2c53f7db141ccf4ac7bd49b9fc"
+    },
+    {
+      "repository": "sources/blood2",
+      "path": "ClientShellDLL/MoveMgr.cpp",
+      "reviewed_lines": [
+        [
+          1196,
+          1230
+        ],
+        [
+          1588,
+          1626
+        ]
+      ],
+      "sha256": "8b60f379f4e4733be7b80092e19e6daad36f53cf55cc0dc2c360187c0873452a"
+    },
+    {
+      "repository": "sources/blood2",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "reviewed_lines": [
+        [
+          6459,
+          6538
+        ]
+      ],
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    }
+  ],
+  "adaptations": [
+    "ClientSession-owned value body and checked local bridge; no ObjectDLL instance in client state",
+    "Shared collision resolver runs speculatively without committing world-body plans or callbacks",
+    "CMoveMgr arithmetic and solo substep ordering retained; server validates integrated destination without another integration",
+    "Immediate authoritative correction preserves callback impulses and source failure diagnostics",
+    "World/object/force revision and monotonic sequence protect local reports; source byte code still wraps",
+    "No save payload changes or dependency imports"
+  ],
+  "remaining": [
+    "Collision scene independent of live server registry",
+    "Delayed 0.14 s multiplayer reports and server advancement between reports",
+    "Gameplay wire protocol, remote admission and 60/20 Hz multiplayer timing",
+    "Independent environment, animation, voice, camera and HUD services"
+  ]
+}

@@ -159,9 +159,16 @@ namespace OpenBlood2
     bool ServerAdapter::GetMovementState(HOBJECT h, MovementState& state)
     {
         trace_service("GetMovementState");
-        state = {};
         const auto* r = objects_.get(h);
-        if (!r || r->life != Life::Alive || r->attachment || !collision || !collision_ready)
+        state = {};
+        return r && movement_state(*r, state);
+    }
+    bool ServerAdapter::movement_state(const ObjectRecord& record, MovementState& state)
+    {
+        state = {};
+        const auto* r = &record;
+        const auto h = r->handle;
+        if (r->life != Life::Alive || r->attachment || !collision || !collision_ready)
             return false;
         state.position = r->state.m_Pos;
         state.velocity = r->velocity;
@@ -286,6 +293,54 @@ namespace OpenBlood2
             return MoveWorldModel(h, *destination) == MoverResult::Moved ? DE_OK : DE_ERROR;
         if (r->state.m_ObjectType != OT_NORMAL && r->state.m_ObjectType != OT_MODEL)
             return unsupported("Moving this object type");
+        return resolve_object_motion(*r, *destination, false);
+    }
+    bool ServerAdapter::PredictPlayerMovement(HOBJECT h, const ClientMotionState& state, const PlayerMove& move,
+                                              ClientMotionState& result)
+    {
+        result = {};
+        const auto* source = objects_.get(h);
+        if (!source || source->life != Life::Alive || !source->client_movement || source->attachment ||
+            source->world_model || source->world_body || source->model_body || !collision || !collision_ready ||
+            moving_ || !physics_vector(state.position) || !physics_vector(state.dimensions) || state.dimensions.x < 0 ||
+            state.dimensions.y < 0 || state.dimensions.z < 0 || !physics_vector(move.position) ||
+            !physics_vector(move.velocity) || !physics_vector(move.acceleration))
+            return false;
+        // A scratch collision body, with no original instance, model callbacks or
+        // lifetime ownership. Only this copy may change during prediction.
+        ObjectRecord scratch;
+        scratch.handle = h;
+        scratch.id = source->id;
+        scratch.life = Life::Alive;
+        scratch.state = source->state;
+        scratch.state.m_Pos = state.position;
+        scratch.dimensions = state.dimensions;
+        scratch.velocity = move.velocity;
+        scratch.acceleration = move.acceleration;
+        scratch.character_body = source->character_body;
+        scratch.body_properties = source->body_properties;
+        scratch.stair_attempts = state.stair_attempts;
+        scratch.stair_steps = state.stair_steps;
+        scratch.start_departures = state.start_departures;
+        scratch.overlap_contacts = state.overlap_contacts;
+        scratch.last_step_height = state.last_step_height;
+        scratch.last_overlap_depth = state.last_overlap_depth;
+        MovementState support;
+        if (!movement_state(scratch, support))
+            return false;
+        scratch.blocking_priority = support.standing ? 50 : 40;
+        if (resolve_object_motion(scratch, move.position, true) != DE_OK || !movement_state(scratch, support))
+            return false;
+        static_cast<MovementValues&>(result) = support;
+        if (const auto* ground = objects_.get(support.ground_object); ground && ground->life == Life::Alive)
+            result.ground_object = ground->id;
+        return true;
+    }
+    DRESULT ServerAdapter::resolve_object_motion(ObjectRecord& record, DVector target, bool prediction)
+    {
+        auto* r = &record;
+        const auto h = r->handle;
+        const auto* destination = &target;
         // Later LithTech's StairStep_Segment has no support test: it steps onto any
         // walkable face the body is not moving away from. Airborne bodies at or past
         // their jump apex therefore step up too; rising bodies never do.
@@ -407,7 +462,7 @@ namespace OpenBlood2
                 MovementState flat_support;
                 const bool flatten = clear == CollisionQuery::Hit && !clearance.start_solid &&
                                      clearance.normal.y > .99999f && actor_end.y < position.y &&
-                                     GetMovementState(h, flat_support) && flat_support.standing &&
+                                     movement_state(*r, flat_support) && flat_support.standing &&
                                      flat_support.ground_normal.y > .99999f;
                 if (flatten)
                 {
@@ -545,52 +600,55 @@ namespace OpenBlood2
                 break;
         }
         r->state.m_Pos = position;
-        if (pushed.body)
+        if (pushed.body && !prediction)
         {
             commit_world_body(pushed);
             ++pushed.body->body_pushes;
             dispatch_world_body(pushed, ids);
         }
-        for (const auto& [slot, contact] : touched)
-        {
-            const auto other = contact.other;
-            auto* target = objects_.get(other);
-            if (r->life != Life::Alive)
-                break;
-            if (other && (!target || target->life != Life::Alive))
-                continue;
-            const float force = std::sqrt(vector_dot(contact.force, contact.force));
-            // Final positions are committed, but source callbacks see velocity
-            // before the stopping impulse. Apply it afterwards, preserving any
-            // callback velocity delta and keeping all removal deferred.
-            if (r->state.m_Flags & FLAG_TOUCH_NOTIFY)
+        if (!prediction)
+            for (const auto& [slot, contact] : touched)
             {
-                const auto before_callback = r->velocity;
-                if (objects_.engine_message(h, MID_TOUCHNOTIFY, other, force) && force > 0)
+                const auto other = contact.other;
+                auto* target = objects_.get(other);
+                if (r->life != Life::Alive)
+                    break;
+                if (other && (!target || target->life != Life::Alive))
+                    continue;
+                const float force = std::sqrt(vector_dot(contact.force, contact.force));
+                // Final positions are committed, but source callbacks see velocity
+                // before the stopping impulse. Apply it afterwards, preserving any
+                // callback velocity delta and keeping all removal deferred.
+                if (r->state.m_Flags & FLAG_TOUCH_NOTIFY)
                 {
-                    r->last_impact_force = force;
-                    r->last_impact_velocity = before_callback;
-                    ++r->impact_notifications;
+                    const auto before_callback = r->velocity;
+                    if (objects_.engine_message(h, MID_TOUCHNOTIFY, other, force) && force > 0)
+                    {
+                        r->last_impact_force = force;
+                        r->last_impact_velocity = before_callback;
+                        ++r->impact_notifications;
+                    }
+                }
+                if (target && r->life == Life::Alive && target->life == Life::Alive &&
+                    (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
+                {
+                    const float reciprocal = contact.world ? force : -force;
+                    const auto before_callback = target->velocity;
+                    if (objects_.engine_message(other, MID_TOUCHNOTIFY, h, reciprocal) && force > 0)
+                    {
+                        target->last_impact_force = reciprocal;
+                        target->last_impact_velocity = before_callback;
+                        ++target->impact_notifications;
+                    }
                 }
             }
-            if (target && r->life == Life::Alive && target->life == Life::Alive &&
-                (target->state.m_Flags & FLAG_TOUCH_NOTIFY))
-            {
-                const float reciprocal = contact.world ? force : -force;
-                const auto before_callback = target->velocity;
-                if (objects_.engine_message(other, MID_TOUCHNOTIFY, h, reciprocal) && force > 0)
-                {
-                    target->last_impact_force = reciprocal;
-                    target->last_impact_velocity = before_callback;
-                    ++target->impact_notifications;
-                }
-            }
-        }
         if (r->life == Life::Alive)
             r->velocity = vector_add(velocity, vector_subtract(r->velocity, incoming_velocity));
         moving_ = false;
         if (blocked_start)
         {
+            if (prediction)
+                return DE_ERROR;
             const auto* other = objects_.get(start_contact.object);
             std::ostringstream detail;
             detail << "MoveObject starts penetrating geometry; depenetration is not implemented: " << r->type->name

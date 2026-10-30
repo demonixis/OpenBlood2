@@ -261,7 +261,9 @@ ENet upstream pinned by commit/hash, IPv4, 16 players and UDP 27888. The
 [foundation report](implementation/reports/m9_multiplayer.md) records the current
 headless build, bounded transport, full-content fingerprint and zero-client
 world tests. The [first local replica lot](implementation/reports/m9_client_world.md)
-feeds object presentation from `ClientWorld`. **Full client separation, player
+feeds object presentation from `ClientWorld`. The [local movement lot](implementation/reports/m9_local_movement.md)
+adds a separate CMoveMgr body, callback-free prediction and immediate server correction
+without double integration. **Full client separation, player
 admission and network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client

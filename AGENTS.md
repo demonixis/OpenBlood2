@@ -8,8 +8,12 @@ and zero-client simulation of all 22 multiplayer maps. The
 [local replica lot](Documentation/implementation/reports/m9_client_world.md) now
 feeds model/sprite/world/sky presentation, model lighting and shadow flags from
 passive ClientWorld frames. Preserve world epochs, atomic frame replacement and
-independent consumer linkage. Movement, FX, camera/HUD/audio extraction, admission
-and network gameplay remain pending. Preserve solo clocks, source pickup rules,
+independent consumer linkage. The [local movement lot](Documentation/implementation/reports/m9_local_movement.md)
+now gives CMoveMgr a client-owned body with callback-free collision prediction and
+immediate authoritative correction. Preserve one integration, server-only contacts
+and pushes, world/object/force identities and solo substep ordering. Independent
+collision replicas, FX, camera/HUD/audio extraction, admission and network gameplay
+remain pending. Preserve solo clocks, source pickup rules,
 immutable GPU references, existing PBR work and independent M2-GPU-001/M3 gates.
 
 The [desktop third-person camera](Documentation/contracts/camera_contracts.md) adds a rebindable C toggle,

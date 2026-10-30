@@ -2019,6 +2019,15 @@ namespace OpenBlood2
             ImGui::TextWrapped("%s", player->locomotion_error.c_str());
         if (ImGui::CollapsingHeader("Motion details"))
         {
+            const auto& local = game.client_session.movement;
+            ImGui::Text("Client predictions %llu / acknowledgements %llu / refusals %llu",
+                        static_cast<unsigned long long>(local.predictions),
+                        static_cast<unsigned long long>(local.acknowledgements),
+                        static_cast<unsigned long long>(local.rejected));
+            ImGui::Text("Unresolved predictions %llu", static_cast<unsigned long long>(local.prediction_failures));
+            ImGui::Text("Movement world %llu | object %u:%u",
+                        static_cast<unsigned long long>(local.owner.world), local.owner.object.slot,
+                        local.owner.object.generation);
             ImGui::Text("Gravity  %.0f  %.0f  %.0f", move.physics.gravity.x, move.physics.gravity.y,
                         move.physics.gravity.z);
             ImGui::Text("Walk %.0f | Run %.0f | Jump %.0f", move.physics.move_speed, move.physics.move_speed * 1.5f,

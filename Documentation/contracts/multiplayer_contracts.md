@@ -169,3 +169,40 @@ Movement, original client-shell ownership, HUD/inventory/camera reads, FX pools,
 dynamic lights/fog and logical sound versus device playback still require
 separation. This lot does not enable a remote client, admission or host play.
 See the [local replica report](../implementation/reports/m9_client_world.md).
+
+
+## Local movement separation
+
+The solo local continuation gives `ClientSession` a `ClientMovement` value body;
+`CMoveMgr` retains its existing control, gravity, drag, liquid/ladder/conveyor and
+jump math. The local bridge copies server stance/environment/support and external
+corrections in the same order as the shared-body baseline, at every existing
+substep. The frame cap (0.1 s), substeps (at most 1/120 s), pause behavior and solo
+clocks are unchanged. No multiplayer 60 Hz clock is applied to solo.
+
+Prediction reuses the collision solver on a scratch body without an ObjectDLL
+instance. It can calculate a potential push but never commits it or invokes touch,
+damage, pickup, animation or RNG callbacks. Only the authoritative player handler
+commits the raw integrated command, using the same collision path and pre-stop
+callback velocity. The server does not add velocity*dt again; its generic physics
+continues to skip that associated player. The immediate acknowledgement copies
+resolved velocity/pose/support, including gameplay impulses. A failed speculative
+query is counted and leaves the local pose unchanged; server validation still owns
+failure diagnostics and partial/deferred contact semantics.
+
+`LocalMoveReport` contains world+object identity, force revision, sequence and
+`PlayerMove` values, never handles. Only the exact outstanding report may be
+submitted, once. Sequence does not restart on a rebind; world reset invalidates the
+owner. The original force-position byte keeps wrapping, with an additional
+non-saved 64-bit server revision preventing acceptance after a full byte cycle.
+Exit clears the body and counters. Restore and NEW_LEVEL establish new world/client
+identities; no save layout changes. Inspection shows predictions, acknowledgements,
+refusals, unresolved predictions and the owning world/object.
+
+This is still a **local collision-query bridge**: static collision and obstacle
+queries read the live server scene synchronously, and environment/animation/audio
+requests still use original server services through that bridge. It is not an
+independent remote movement client. The second collision pass is extra CPU work,
+not a second time integration. Replicated collision scenes, 0.14 s multiplayer
+uploads, authoritative advancement between them, interpolation, admission and
+network gameplay are later lots. See [verification](../implementation/reports/m9_local_movement.md).

@@ -18,6 +18,7 @@
 #include "game/flesh_gibs.h"
 #include "game/laser_beams.h"
 #include "game/lightning.h"
+#include "game/local_movement.h"
 #include "game/music_catalog.h"
 #include "game/object_particles.h"
 #include "game/original/BloodShells.h"
@@ -235,6 +236,7 @@ namespace OpenBlood2
         bool PlaceNonSolidModel(HOBJECT, DVector requested, DVector anchor, DVector anchor_half,
                                 BodyPlacement&) override;
         bool GetMovementState(HOBJECT, MovementState&) override;
+        bool PredictPlayerMovement(HOBJECT, const ClientMotionState&, const PlayerMove&, ClientMotionState&);
         SegmentResult CastRay(DVector, DVector, SegmentHit&, HOBJECT ignore = nullptr) override;
         SegmentResult CastWorldRay(DVector from, DVector direction, SegmentHit&) override;
         SegmentResult IntersectWorldSegment(DVector from, DVector to, SegmentHit&) override;
@@ -472,6 +474,8 @@ namespace OpenBlood2
                                                                       {"GAME_GAMETYPE", {"0"}}};
         void initialize_model_services();
         void initialize_physics_services();
+        bool movement_state(const ObjectRecord&, MovementState&);
+        DRESULT resolve_object_motion(ObjectRecord&, DVector destination, bool prediction);
         CollisionQuery sweep_scene(HOBJECT, DVector, DVector, DVector, CollisionHit&, const std::vector<ObjectId>&,
                                    HOBJECT ignore_extra = nullptr, double allowed_penetration = 0,
                                    StartOverlap start = StartOverlap::Block);
@@ -577,7 +581,8 @@ namespace OpenBlood2
         ServerAdapter server{objects};
         CBloodServerShell server_shell{server};
         MusicCatalog music_catalog;
-        CBloodClientShell client_shell{server, resources, music_catalog, server.audio};
+        LocalMovement local_movement{server, objects, client_session};
+        CBloodClientShell client_shell{server, resources, music_catalog, server.audio, local_movement};
         HCLIENT local_client = nullptr;
         World world;
         std::vector<WorldEntry> entries;
