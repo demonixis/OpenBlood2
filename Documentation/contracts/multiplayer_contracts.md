@@ -707,7 +707,7 @@ messages and their remote handling still need their own wire path.
 ## Collision and environment on the wire
 
 The [collision transport continuation](../implementation/reports/m9_collision_transport.md)
-uses protocol version 5. Object baselines/reliable patches now carry pointer-free
+introduced protocol version 5, superseded by version 6 below. Object baselines/reliable patches carry pointer-free
 collision metadata: shape binding/basis, original VolumeBrush classification,
 optional container code/current/gravity/viscosity/Hidden, priority, dynamic/pushable
 flags and the Seeing Eye owner exclusion. Collider position/type/flags/attachment
@@ -761,3 +761,30 @@ report transport, server velocity advancement, correction/acknowledgement handli
 and remote voice playback remain pending. The future receiver must qualify force
 positions by full revision before calling the internal typed force service; an
 eight-bit move code alone never proves freshness across lives or teleports.
+
+## Movement reports and authoritative advancement
+
+The [movement transport continuation](../implementation/reports/m9_movement_transport.md)
+uses protocol 6 for 98-byte reliable setup, 104-byte unreliable client reports and
+106-byte unreliable ACKs, with a 256-byte decode limit. Validate the admitted
+peer/player, world, object generation, full force generation, byte code and report
+sequence. Coalesce to one pending report per player/tick; ignore stale/duplicate
+reports without refreshing liveness. A peer cannot command another player.
+
+Network force generation tracks both original player forces and engine pose
+discontinuities. Either invalidates pending reports and ACKs, even when the byte
+code wraps or the engine teleport has no original player message. Keep this
+network identity separate from solo force codes and saved game state.
+
+Keep remote movement in the server player stage before container damage/cleanup.
+The report tick commits its already integrated destination through collision.
+Only intervening ticks advance received velocity, using two swept substeps at
+60 Hz, without another gravity/acceleration or command integration. Retain original
+animation/clearance controls each tick, server air, door pushes and held models.
+After 30 ticks without a report, hold velocity and neutralize stale controls until
+the next report. This half-second extrapolation limit is a documented adaptation.
+
+Capture ACK motion at receipt, before subsequent velocity advance; repeat it at
+20 Hz. Publish setup/stance/force changes reliably. A force during report contacts
+invalidates that old report's ACK. Client setup/correction reception, complete
+private event delivery and interactive remote gameplay remain subsequent work.

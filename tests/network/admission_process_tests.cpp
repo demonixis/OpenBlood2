@@ -4,6 +4,7 @@
 #include "engine/world.h"
 #include "net/admission.h"
 #include "net/content.h"
+#include "net/movement.h"
 #include "net/transport.h"
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_process.h>
@@ -88,7 +89,15 @@ namespace
             }
             else
             {
-                if (event.channel == Channel::State)
+                if (is_movement_packet(event.bytes))
+                {
+                    MovementMessage message;
+                    CHECK(event.channel == Channel::Control &&
+                          decode_movement(event.bytes, message) == DecodeMovement::Ok);
+                    const auto* setup = std::get_if<MovementSetup>(&message);
+                    CHECK(setup && joined && setup->owner.world == world && setup->owner.object == own_object);
+                }
+                else if (event.channel == Channel::State)
                 {
                     WorldState state;
                     CHECK(decode_world_state(event.bytes, state));

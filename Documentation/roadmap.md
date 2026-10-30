@@ -308,7 +308,9 @@ independent client replicas with bounded interpolation and reliable teleport rev
 reconstructs client-owned geometry and volume properties from the admitted DAT.
 [Independent CMoveMgr](implementation/reports/m9_movement_services.md) now runs
 against replica collision and prepares original-cadence reports without server linkage.
-**Private player events and command delivery, full client separation, Team profiles and playable network gameplay remain pending.**
+[Movement transport](implementation/reports/m9_movement_transport.md) now delivers
+private setup/report/ACK values and checked server velocity advancement without double integration.
+**Client correction, complete private events/commands, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client
 shell runs its own movement (CMoveMgr) and effects. The engine copies object

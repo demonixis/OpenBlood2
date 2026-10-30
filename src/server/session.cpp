@@ -109,7 +109,11 @@ namespace OpenBlood2
         }
         const auto id = record->id;
         const auto connection = next_player_++;
-        players_.push_back({connection, client, id});
+        Player connected{};
+        connected.id = connection;
+        connected.client = client;
+        connected.object = id;
+        players_.push_back(std::move(connected));
         joined = {world_id_, connection, id};
         return true;
     }
@@ -168,9 +172,10 @@ namespace OpenBlood2
             error = "Server world is not started";
             return false;
         }
-        if (!game_.step_server(ServerClock::step))
+        if (!game_.step_server(ServerClock::step, [&](double seconds) { return advance_players(seconds, error); }))
         {
-            error = "Server simulation failed";
+            if (error.empty())
+                error = "Server simulation failed";
             for (const auto& detail : game_.step_errors())
                 error += "\n" + detail;
             return false;

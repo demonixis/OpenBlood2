@@ -39,6 +39,7 @@
 #include "game/world_preparation.h"
 #include <array>
 #include <deque>
+#include <functional>
 #include <optional>
 #include <random>
 #include <span>
@@ -675,7 +676,7 @@ namespace OpenBlood2
         std::string audio_replica_error;
         bool step(double seconds);
         // Server clock only: no local MoveMgr, view weapons, camera or cosmetic pool updates.
-        bool step_server(double seconds);
+        bool step_server(double seconds, const std::function<bool(double)>& players = {});
         // Labelled durable subsystem errors for logging a failed step; many
         // update paths report through these fields, not object diagnostics.
         std::vector<std::string> step_errors();
@@ -695,7 +696,7 @@ namespace OpenBlood2
         HOBJECT create_example(std::string_view class_name);
 
       private:
-        bool step_impl(double seconds, bool client);
+        bool step_impl(double seconds, bool client, const std::function<bool(double)>& players = {});
         // Storage of the last replaced object frame; only string/vector capacity is reused.
         ClientWorldFrame object_scratch_;
     };

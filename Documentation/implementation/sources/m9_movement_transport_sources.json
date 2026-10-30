@@ -1,0 +1,104 @@
+{
+  "scope": "Private movement setup/reports/acknowledgements and once-integrated server velocity advancement",
+  "baseline": "d5bda522b755e2ca89f3cf3c416ae81f5968d8e6",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "d5bda522b755e2ca89f3cf3c416ae81f5968d8e6",
+      "path": "src/game/original/PlayerObj.cpp",
+      "sha256": "3dc3cbf3248b42ca39f34b836c56e4feb2ee848cbffedf7edda80b1934659cce"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "d5bda522b755e2ca89f3cf3c416ae81f5968d8e6",
+      "path": "src/game/original/PlayerLocomotion.cpp",
+      "sha256": "999be4585af0dd92101f50aaab7bc27c410da785ca32c830ff69e7f38882f866"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "d5bda522b755e2ca89f3cf3c416ae81f5968d8e6",
+      "path": "src/game/original/PlayerContainers.cpp",
+      "sha256": "35f00eb3a1edd399ca956224934a1015e05d943ad9d968286e7a268e36f217d2"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "d5bda522b755e2ca89f3cf3c416ae81f5968d8e6",
+      "path": "src/game/original/PlayerUse.cpp",
+      "sha256": "3b97b53294d5c1ce5a141eb43095b5f74232566001d76896cdb3a0e9f0e7e5dc"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "d5bda522b755e2ca89f3cf3c416ae81f5968d8e6",
+      "path": "src/game/session.cpp",
+      "sha256": "65de8d4fc25729215d6df7b704667674c385876342ec35e8bae2b31043c67942"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "d5bda522b755e2ca89f3cf3c416ae81f5968d8e6",
+      "path": "src/game/server_physics.cpp",
+      "sha256": "a0773f15614e7d122b205e8c9ffaa15f320c21c05832b19508309858a4ef75de"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "d5bda522b755e2ca89f3cf3c416ae81f5968d8e6",
+      "path": "src/game/server_clients.cpp",
+      "sha256": "622af9668e1094a79f42238fb351da77b9c080790f33d8fc8ed9db56927a8141"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "d5bda522b755e2ca89f3cf3c416ae81f5968d8e6",
+      "path": "src/server/session.cpp",
+      "sha256": "81d7021abc683820258a7ce08f7c3f4d2ff6c5bf8dbacb54a8e35e031a06191f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "d5bda522b755e2ca89f3cf3c416ae81f5968d8e6",
+      "path": "src/server/network.cpp",
+      "sha256": "335e5ebff243676c4d67398aa137d74f7c9ab3e5b14aad43508dec6d53b25eb9"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "d5bda522b755e2ca89f3cf3c416ae81f5968d8e6",
+      "path": "src/client/replica_movement.cpp",
+      "sha256": "7a3e60a041b71ab9d1eafd4a25eea391b002e8b547b1ad5297dee02c20fe7435"
+    },
+    {
+      "repository": "sources/blood2",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "reviewed_lines": [
+        [
+          1475,
+          1700
+        ],
+        [
+          6459,
+          6538
+        ]
+      ],
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "repository": "sources/blood2",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "reviewed_lines": [
+        [
+          1751,
+          1758
+        ],
+        [
+          1899,
+          1905
+        ]
+      ],
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    }
+  ],
+  "adaptations": [
+    "Protocol v6 adds fixed explicit little-endian setup98/report104/ack106-byte messages, each bounded to256bytes.",
+    "Server receives at most one coalesced report per player/tick, checks world/player/object/full force identities and monotonically increasing sequence.",
+    "A report tick uses the original collision-checked destination without another integration; intervening ticks advance velocity with two swept substeps, no CMoveMgr commands/gravity/acceleration integration.",
+    "Source animation/clearance retains controls each60Hz tick. Neutralize expired controls and hold velocity after30ticks without a report; explicit bounded extrapolation policy.",
+    "Network force generation observes both original player movement_revision and engine pose_revision, without mutating solo force codes or gameplay teleport paths.",
+    "ACK motion is captured at report acceptance, not from later extrapolated poses; wire client correction and complete private event/audio/effect delivery remain subsequent work."
+  ]
+}

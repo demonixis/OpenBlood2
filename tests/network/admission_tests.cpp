@@ -30,6 +30,8 @@ namespace
         std::array<Transport, 16> clients;
         std::array<PeerId, 16> peers{};
         std::array<Joined, 16> joined{};
+        std::array<MovementSetup, 16> movement_setups;
+        std::array<std::optional<MovementAck>, 16> movement_acks;
         ServerNetwork::Clock::time_point now = ServerNetwork::Clock::now();
         std::string error;
         bool start(const char* path)
@@ -154,6 +156,30 @@ namespace
         bool update(unsigned index, const Event& event)
         {
             CHECK(event.kind == EventKind::Received);
+            if (is_movement_packet(event.bytes))
+            {
+                MovementMessage message;
+                CHECK(decode_movement(event.bytes, message) == DecodeMovement::Ok);
+                CHECK(std::visit(
+                    [&](const auto& v)
+                    {
+                        return v.owner.world == joined[index].world && v.owner.player == joined[index].player &&
+                               v.owner.object == joined[index].object;
+                    },
+                    message));
+                if (const auto* setup = std::get_if<MovementSetup>(&message))
+                {
+                    CHECK(event.channel == Channel::Control);
+                    movement_setups[index] = *setup;
+                }
+                else
+                {
+                    const auto* ack = std::get_if<MovementAck>(&message);
+                    CHECK(event.channel == Channel::State && ack);
+                    movement_acks[index] = *ack;
+                }
+                return true;
+            }
             if (event.channel == Channel::State)
             {
                 WorldState state;
@@ -341,8 +367,73 @@ namespace
                   << f.server.state_drops << " queue drops\n";
         return true;
     }
+    bool movement(const char* path)
+    {
+        Fixture f;
+        auto& error = f.error;
+        CHECK(f.start(path));
+        for (unsigned i = 0; i < 2; ++i)
+            CHECK(f.connect(i) && f.offer(i) && f.join(i));
+        const auto progress = [&]()
+        {
+            CHECK(f.session.tick(error));
+            f.now += std::chrono::microseconds(16667);
+            CHECK(f.server.pump(f.now, error));
+            for (unsigned i = 0; i < 2; ++i)
+                for (unsigned n = 0; n < 64; ++n)
+                {
+                    Event event;
+                    const auto result = f.clients[i].poll(event, 1, error);
+                    CHECK(result != PollResult::Failed);
+                    if (result == PollResult::Idle)
+                        break;
+                    CHECK(f.update(i, event));
+                }
+            return true;
+        };
+        for (unsigned i = 0; i < 10; ++i)
+            CHECK(progress());
+        CHECK(f.movement_setups[0].sequence && f.movement_setups[1].sequence);
+        const auto* first = f.session.game().objects.get(f.joined[0].object);
+        const auto* second = f.session.game().objects.get(f.joined[1].object);
+        CHECK(first && second);
+        const auto other_position = second->state.m_Pos;
+        MovementReport report;
+        report.owner = f.movement_setups[0].owner;
+        report.sequence = 1;
+        report.move.move_code = f.movement_setups[0].code;
+        report.move.position = first->state.m_Pos;
+        report.move.position.x += 1;
+        const auto send = [&](const MovementReport& value)
+        {
+            std::vector<std::uint8_t> bytes;
+            CHECK(encode_movement(value, bytes));
+            CHECK(f.clients[0].send(f.peers[0], Channel::State, bytes, error));
+            f.clients[0].flush();
+            return true;
+        };
+        CHECK(send(report));
+        for (unsigned i = 0; i < 60 && !f.movement_acks[0]; ++i)
+            CHECK(progress());
+        CHECK(f.movement_acks[0] && f.movement_acks[0]->sequence == 1 && !f.movement_acks[1]);
+        CHECK(f.session.movement_reports == 1 && std::abs(first->state.m_Pos.x - report.move.position.x) < .01f);
+        CHECK(second->state.m_Pos.x == other_position.x && second->state.m_Pos.z == other_position.z);
+        CHECK(send(report));
+        for (unsigned i = 0; i < 5; ++i)
+            CHECK(progress());
+        CHECK(f.session.movement_reports == 1 && f.session.movement_ignored >= 1);
+        report.owner.player = f.joined[1].player;
+        CHECK(send(report) && f.rejected(0, Reject::Player));
+        CHECK(f.session.player_count() == 1 && f.server.peer_count() == 1);
+        CHECK(f.server.close() && !f.session.player_count());
+        std::cout << "Two ENet peers: private movement setup, received movement/ACK, duplicate refusal and owner "
+                     "isolation passed\n";
+        return true;
+    }
 } // namespace
 int main(int argc, char** argv)
 {
+    if (argc == 3 && std::string_view(argv[2]) == "--movement")
+        return movement(argv[1]) ? 0 : 1;
     return argc == 2 && run(argv[1]) ? 0 : 1;
 }

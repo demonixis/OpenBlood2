@@ -45,6 +45,7 @@ namespace OpenBlood2
             Clock::time_point deadline, heartbeat;
             Net::WorldSnapshot previous;
             std::uint64_t publish_at = 0;
+            std::uint64_t movement_setup = 0;
         };
         ServerSession& session_;
         Net::Transport transport_;
@@ -55,5 +56,6 @@ namespace OpenBlood2
         bool remove(std::size_t index, std::uint32_t reason, bool disconnect, std::string& error);
         bool receive(std::size_t index, const Net::Event&, Clock::time_point, std::string& error);
         bool send(Net::PeerId, const Net::AdmissionMessage&, std::string& error);
+        bool send_movement(Net::PeerId, const Net::MovementMessage&, Net::Channel, std::string& error);
     };
 } // namespace OpenBlood2

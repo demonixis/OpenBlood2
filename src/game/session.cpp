@@ -840,11 +840,11 @@ namespace OpenBlood2
     {
         return step_impl(seconds, true);
     }
-    bool GameSession::step_server(double seconds)
+    bool GameSession::step_server(double seconds, const std::function<bool(double)>& players)
     {
-        return step_impl(seconds, false);
+        return step_impl(seconds, false, players);
     }
-    bool GameSession::step_impl(double seconds, bool client)
+    bool GameSession::step_impl(double seconds, bool client, const std::function<bool(double)>& players)
     {
         frame_failures.clear();
         frame_object_failure_begin = objects.failure_count();
@@ -902,6 +902,8 @@ namespace OpenBlood2
                 }
             }
         }
+        if (!client && players)
+            ok = checked("remote players", players(seconds)) && ok;
         if (seconds > 0)
             ok = checked("server.damage_containers", server.damage_containers()) && ok;
         ok = checked("objects.finish_frame", objects.finish_frame()) && ok;

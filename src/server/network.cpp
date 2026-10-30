@@ -58,9 +58,40 @@ namespace OpenBlood2
         peers_.erase(peers_.begin() + static_cast<std::ptrdiff_t>(index));
         return true;
     }
+    bool ServerNetwork::send_movement(Net::PeerId peer, const Net::MovementMessage& message, Net::Channel channel,
+                                      std::string& error)
+    {
+        std::vector<std::uint8_t> bytes;
+        if (!Net::encode_movement(message, bytes))
+        {
+            error = "Invalid server movement publication";
+            return false;
+        }
+        return transport_.send(peer, channel, bytes, error);
+    }
     bool ServerNetwork::receive(std::size_t index, const Net::Event& event, Clock::time_point now, std::string& error)
     {
         const auto reject = [&](Net::Reject reason) { return remove(index, std::uint32_t(reason), true, error); };
+        if (Net::is_movement_packet(event.bytes))
+        {
+            auto& peer = peers_[index];
+            if (peer.phase != Phase::Joined || event.channel != Net::Channel::State)
+                return reject(Net::Reject::Order);
+            Net::MovementMessage value;
+            const auto decoded = Net::decode_movement(event.bytes, value);
+            if (decoded != Net::DecodeMovement::Ok)
+                return reject(decoded == Net::DecodeMovement::Protocol ? Net::Reject::Protocol
+                                                                       : Net::Reject::Malformed);
+            const auto* report = std::get_if<Net::MovementReport>(&value);
+            if (!report)
+                return reject(Net::Reject::Order);
+            const auto result = session_.queue_movement(peer.player, *report);
+            if (result == ServerSession::MoveResult::Invalid)
+                return reject(Net::Reject::Player);
+            if (result == ServerSession::MoveResult::Queued)
+                peer.deadline = now + 15s;
+            return true;
+        }
         if (event.channel != Net::Channel::Control)
             return reject(Net::Reject::Order);
         Net::AdmissionMessage message;
@@ -197,6 +228,19 @@ namespace OpenBlood2
                     return false;
                 continue;
             }
+            if (peer.phase == Phase::Joined)
+            {
+                Net::MovementSetup setup;
+                if (!session_.movement_setup(peer.player, setup, error) ||
+                    (setup.sequence != peer.movement_setup &&
+                     !send_movement(peer.peer, setup, Net::Channel::Control, error)))
+                {
+                    if (!remove(i, std::uint32_t(Net::Reject::Player), true, error))
+                        return false;
+                    continue;
+                }
+                peer.movement_setup = setup.sequence;
+            }
             if (peer.phase == Phase::Joined && now >= peer.heartbeat)
             {
                 if (!send(peer.peer, Net::Heartbeat{session_.world_id()}, error))
@@ -243,6 +287,24 @@ namespace OpenBlood2
                 }
                 if (changed)
                     peer.previous = std::move(snapshot);
+                std::optional<Net::MovementAck> ack;
+                if (!session_.movement_ack(peer.player, ack))
+                {
+                    if (!remove(i, std::uint32_t(Net::Reject::Player), true, error))
+                        return false;
+                    continue;
+                }
+                if (ack)
+                {
+                    std::vector<std::uint8_t> packet;
+                    if (!Net::encode_movement(*ack, packet))
+                    {
+                        if (!remove(i, std::uint32_t(Net::Reject::Player), true, error))
+                            return false;
+                        continue;
+                    }
+                    states.push_back(std::move(packet));
+                }
                 Net::PeerStats stats;
                 std::size_t bytes = 0;
                 for (const auto& packet : states)

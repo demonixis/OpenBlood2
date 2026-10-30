@@ -1,5 +1,5 @@
 #pragma once
-#include "basedefs_de.h"
+#include "game/legacy/basedefs_de.h"
 #include "client/hud_values.h"
 #include "engine/movement_state.h"
 #include <array>
