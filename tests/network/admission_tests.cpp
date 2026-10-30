@@ -1,6 +1,8 @@
+#include "client/network_world.h"
 #include "game/game_settings.h"
 #include "server/network.h"
 #include <iostream>
+#include <optional>
 
 using namespace OpenBlood2;
 using namespace OpenBlood2::Net;
@@ -19,6 +21,12 @@ namespace
     {
         ServerSession session;
         ServerNetwork server{session};
+        Resources resources;
+        ModelStore models{resources};
+        SpriteStore sprites{resources};
+        World geometry;
+        std::array<NetworkWorldReceiver, 16> replicas;
+        std::array<std::optional<BaselineReceiver>, 16> receivers;
         std::array<Transport, 16> clients;
         std::array<PeerId, 16> peers{};
         std::array<Joined, 16> joined{};
@@ -29,6 +37,9 @@ namespace
             Config config;
             config.data_dir = path;
             CHECK(session.start(config, "multi/bb_crypt", GAMETYPE_BLOODBATH, error));
+            CHECK(resources.mount_game(config, error));
+            std::vector<std::uint8_t> bytes;
+            CHECK(resources.read(session.game().world_path, bytes, error) && read_world(bytes, geometry, error));
             CHECK(server.listen("127.0.0.1", 0, 16, error));
             return true;
         }
@@ -92,12 +103,14 @@ namespace
             CHECK(offer && offer->world == session.world_id() && offer->path == session.game().world_path);
             return true;
         }
-        bool join(unsigned index)
+        bool join(unsigned index, bool acknowledge = true)
         {
             JoinProfile profile;
             profile.name = "Player " + std::to_string(index);
             CHECK(send(index, Ready{session.world_id(), profile}));
-            BaselineReceiver baseline(session.world_id());
+            receivers[index].emplace(session.world_id());
+            replicas[index] = {};
+            CHECK(replicas[index].begin(session.world_id()));
             WorldSnapshot snapshot;
             bool accepted = false, loaded = false;
             while (!accepted || !loaded)
@@ -107,7 +120,7 @@ namespace
                 if (event.channel == Channel::Baseline)
                 {
                     CHECK(!loaded);
-                    const auto status = baseline.receive(event.bytes, snapshot);
+                    const auto status = receivers[index]->receive(event.bytes, snapshot);
                     CHECK(status != BaselineResult::Refused);
                     loaded = status == BaselineResult::Complete;
                 }
@@ -123,6 +136,38 @@ namespace
             CHECK(joined[index].world == session.world_id() && session.game().objects.get(joined[index].object));
             CHECK(snapshot.player == joined[index].object && snapshot.player_alive && !snapshot.objects.empty());
             CHECK(snapshot.time == session.game().server.world_time());
+            CHECK(replicas[index].receive(snapshot, geometry, models, sprites, error));
+            if (acknowledge)
+            {
+                CHECK(send(index, BaselineReady{snapshot.world, snapshot.sequence}));
+                Event event;
+                CHECK(wait(index, event, EventKind::Received));
+                AdmissionMessage message;
+                CHECK(event.channel == Channel::Control &&
+                      decode_admission(event.bytes, message) == DecodeAdmission::Ok &&
+                      std::holds_alternative<Heartbeat>(message));
+            }
+            return true;
+        }
+        bool update(unsigned index, const Event& event)
+        {
+            CHECK(event.kind == EventKind::Received);
+            if (event.channel == Channel::Baseline)
+            {
+                WorldUpdate update;
+                CHECK(receivers[index]);
+                const auto status = receivers[index]->receive(event.bytes, update);
+                CHECK(status != BaselineResult::Refused);
+                if (status == BaselineResult::Complete)
+                    CHECK(replicas[index].receive(update, geometry, models, sprites, error));
+            }
+            else
+            {
+                AdmissionMessage message;
+                CHECK(decode_admission(event.bytes, message) == DecodeAdmission::Ok &&
+                      std::holds_alternative<Heartbeat>(message));
+                CHECK(send(index, Heartbeat{session.world_id()}));
+            }
             return true;
         }
         bool rejected(unsigned index, Reject reason)
@@ -170,6 +215,28 @@ namespace
         CHECK(f.rejected(0, Reject::Order));
         CHECK(!f.session.player_count() && f.session.game().objects.snapshot().size() == initial);
 
+        // Only the exact, resolved baseline opens continuous publication.
+        for (unsigned wrong_field = 0; wrong_field < 2; ++wrong_field)
+        {
+            CHECK(f.connect(0));
+            CHECK(f.offer(0));
+            CHECK(f.join(0, false));
+            auto ready = BaselineReady{f.session.world_id(), f.replicas[0].membership_sequence()};
+            if (wrong_field)
+                ++ready.sequence;
+            else
+                ++ready.world;
+            CHECK(f.send(0, ready));
+            CHECK(f.rejected(0, Reject::World));
+            CHECK(!f.session.player_count());
+        }
+        CHECK(f.connect(0));
+        CHECK(f.offer(0));
+        CHECK(f.join(0));
+        CHECK(f.send(0, BaselineReady{f.session.world_id(), f.replicas[0].membership_sequence()}));
+        CHECK(f.rejected(0, Reject::Order));
+        CHECK(!f.session.player_count());
+
         // Monotonic timeout policies are independent of the simulation/ENet wall clocks.
         CHECK(f.connect(0));
         f.now += std::chrono::seconds(5);
@@ -178,6 +245,12 @@ namespace
         CHECK(f.offer(0));
         f.now += std::chrono::seconds(30);
         CHECK(f.rejected(0, Reject::Timeout));
+        CHECK(f.connect(0));
+        CHECK(f.offer(0));
+        CHECK(f.join(0, false));
+        f.now += std::chrono::seconds(30);
+        CHECK(f.rejected(0, Reject::Timeout));
+        CHECK(!f.session.player_count());
         CHECK(f.connect(0));
         CHECK(f.offer(0));
         CHECK(f.join(0));
@@ -209,10 +282,7 @@ namespace
                 CHECK(status != PollResult::Failed);
                 if (status == PollResult::Event && event.kind == EventKind::Received)
                 {
-                    AdmissionMessage message;
-                    CHECK(decode_admission(event.bytes, message) == DecodeAdmission::Ok);
-                    CHECK(std::holds_alternative<Heartbeat>(message));
-                    CHECK(f.send(i, Heartbeat{f.session.world_id()}));
+                    CHECK(f.update(i, event));
                 }
                 CHECK(f.session.game().objects.get(f.joined[i].object));
             }
@@ -226,12 +296,35 @@ namespace
         CHECK(f.offer(0));
         CHECK(f.join(0));
         CHECK(f.joined[0].player != old.player && f.joined[0].object != old.object);
+        for (unsigned tick = 0; tick < 6; ++tick)
+        {
+            CHECK(f.session.tick(error));
+            f.now += std::chrono::milliseconds(16);
+            CHECK(f.server.pump(f.now, error));
+            for (unsigned i = 0; i < 16; ++i)
+                for (unsigned events = 0; events < 8; ++events)
+                {
+                    Event event;
+                    const auto status = f.clients[i].poll(event, 1, error);
+                    CHECK(status != PollResult::Failed);
+                    if (status == PollResult::Idle)
+                        break;
+                    CHECK(f.update(i, event));
+                }
+        }
+        CHECK(f.server.membership_updates >= 15);
+        for (unsigned i = 0; i < 16; ++i)
+        {
+            CHECK(!f.replicas[i].world().get(old.object));
+            for (const auto& player : f.joined)
+                CHECK(f.replicas[i].world().get(player.object));
+        }
         CHECK(f.server.close());
         CHECK(f.session.player_count() == 0 && f.session.game().server.client_count() == 0);
         for (const auto& player : f.joined)
             CHECK(!f.session.game().objects.get(player.object));
         CHECK(!f.session.game().server.client_audio && f.session.game().client_session.audio.mixer.voices().empty());
-        std::cout << "Verified admission gates, 3 monotonic timeout phases, 16 ENet peers / 180 ticks, "
+        std::cout << "Verified admission gates, 4 monotonic timeout phases, 16 ENet peers / 186 ticks, "
                      "duplicate/reconnect and clean shutdown\n";
         return true;
     }

@@ -25,6 +25,7 @@ namespace OpenBlood2
             return peers_.size();
         }
         std::uint64_t admitted = 0, departed = 0, rejected = 0, timed_out = 0;
+        std::uint64_t membership_updates = 0;
         std::string last_rejection;
 
       private:
@@ -32,6 +33,7 @@ namespace OpenBlood2
         {
             Hello,
             Loading,
+            Baseline,
             Joined
         };
         struct Peer
@@ -40,6 +42,8 @@ namespace OpenBlood2
             Phase phase = Phase::Hello;
             std::uint64_t player = 0;
             Clock::time_point deadline, heartbeat;
+            Net::WorldSnapshot previous;
+            std::uint64_t publish_at = 0;
         };
         ServerSession& session_;
         Net::Transport transport_;

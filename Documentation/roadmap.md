@@ -300,7 +300,9 @@ complete content hash and loaded-world generation before creating an original
 Bloodbath player. It owns join/departure/timeout cleanup and bounded heartbeats.
 [Initial network world snapshots](implementation/reports/m9_world_baseline.md) now
 rebuild object presentation with independently loaded client assets at admission.
-**Continuous replication, full client separation, Team profiles and playable network gameplay remain pending.**
+[Continuous object membership](implementation/reports/m9_world_membership.md) now
+replicates creations, metadata changes and removals after a checked baseline ACK.
+**Unreliable poses, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client
 shell runs its own movement (CMoveMgr) and effects. The engine copies object
@@ -309,8 +311,8 @@ client. Object presentation, movement geometry/environment, cameras, HUD and aud
 local client-owned replicas. Visual effects and lights/fog now use owned client presentation snapshots; their legacy
 production/update services and remaining client-shell services still use the local server adapter. Typed client
 messages still exist as in-process gameplay values only. The new ENet wrapper
-now delivers admission and the initial object frame. Continuous updates and
-private gameplay events remain to connect.
+now delivers admission, the initial object frame and reliable membership changes.
+Unreliable poses and private gameplay events remain to connect.
 
 Original references are available. These include the multiplayer branches in
 PlayerObj, BloodServerShell, the pickups and B2BaseClass, as well as FlagObjects,

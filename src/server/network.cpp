@@ -34,7 +34,7 @@ namespace OpenBlood2
     }
     bool ServerNetwork::remove(std::size_t index, std::uint32_t reason, bool disconnect, std::string& error)
     {
-        const auto peer = peers_[index];
+        const auto& peer = peers_[index];
         if (peer.player && !session_.leave(peer.player))
         {
             error = "Cannot detach departed original player";
@@ -113,9 +113,24 @@ namespace OpenBlood2
             for (const auto& bytes : chunks)
                 if (!transport_.send(peer.peer, Net::Channel::Baseline, bytes, error))
                     return reject(Net::Reject::Capacity);
+            peer.phase = Phase::Baseline;
+            peer.previous = std::move(snapshot);
+            peer.deadline = now + 30s;
+            return true;
+        }
+        if (peer.phase == Phase::Baseline)
+        {
+            const auto* ready = std::get_if<Net::BaselineReady>(&message);
+            if (!ready)
+                return reject(Net::Reject::Order);
+            if (ready->world != session_.world_id() || ready->sequence != peer.previous.sequence)
+                return reject(Net::Reject::World);
             peer.phase = Phase::Joined;
             peer.deadline = now + 15s;
             peer.heartbeat = now + 1s;
+            peer.publish_at = session_.ticks() + 3;
+            if (!send(peer.peer, Net::Heartbeat{session_.world_id()}, error))
+                return reject(Net::Reject::Capacity);
             return true;
         }
         const auto* heartbeat = std::get_if<Net::Heartbeat>(&message);
@@ -153,7 +168,7 @@ namespace OpenBlood2
                 if (found != peers_.end() || peers_.size() >= capacity_)
                     transport_.disconnect(event.peer, std::uint32_t(Net::Reject::Capacity));
                 else
-                    peers_.push_back({event.peer, Phase::Hello, 0, now + 5s, {}});
+                    peers_.push_back({event.peer, Phase::Hello, 0, now + 5s, {}, {}, 0});
             }
             else if (found != peers_.end())
             {
@@ -190,6 +205,36 @@ namespace OpenBlood2
                     continue;
                 }
                 peer.heartbeat = now + 1s;
+            }
+            if (peer.phase == Phase::Joined && session_.ticks() >= peer.publish_at)
+            {
+                Net::WorldSnapshot snapshot;
+                Net::WorldPatch patch;
+                bool changed = false;
+                if (!session_.snapshot(peer.player, snapshot, error) ||
+                    !Net::make_world_patch(peer.previous, snapshot, patch, changed))
+                {
+                    if (!remove(i, std::uint32_t(Net::Reject::World), true, error))
+                        return false;
+                    continue;
+                }
+                if (changed)
+                {
+                    std::vector<std::vector<std::uint8_t>> chunks;
+                    bool sent = Net::encode_patch_chunks(patch, chunks);
+                    for (const auto& bytes : chunks)
+                        if (sent)
+                            sent = transport_.send(peer.peer, Net::Channel::Baseline, bytes, error);
+                    if (!sent)
+                    {
+                        if (!remove(i, std::uint32_t(Net::Reject::Capacity), true, error))
+                            return false;
+                        continue;
+                    }
+                    peer.previous = std::move(snapshot);
+                    ++membership_updates;
+                }
+                peer.publish_at = session_.ticks() + 3;
             }
             ++i;
         }

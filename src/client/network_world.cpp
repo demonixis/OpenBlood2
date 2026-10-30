@@ -1,4 +1,5 @@
 #include "client/network_world.h"
+#include <algorithm>
 
 namespace OpenBlood2
 {
@@ -57,5 +58,117 @@ namespace OpenBlood2
             }
         }
         return world.apply(std::move(frame), error);
+    }
+    bool NetworkWorldReceiver::begin(std::uint64_t world)
+    {
+        if (!world_.begin(world))
+            return false;
+        generations_.clear();
+        membership_sequence_ = 0;
+        return true;
+    }
+    bool NetworkWorldReceiver::receive(const Net::WorldUpdate& update, const World& geometry, ModelStore& models,
+                                       SpriteStore& sprites, std::string& error)
+    {
+        error.clear();
+        Net::WorldSnapshot next;
+        if (const auto* baseline = std::get_if<Net::WorldSnapshot>(&update))
+        {
+            if (membership_sequence_)
+            {
+                error = "Duplicate initial world baseline";
+                return false;
+            }
+            next = *baseline;
+        }
+        else
+        {
+            const auto& patch = std::get<Net::WorldPatch>(update);
+            if (!membership_sequence_ || patch.base != membership_sequence_ || patch.values.sequence <= patch.base ||
+                patch.values.world != world_.frame().world || patch.values.time < world_.frame().time ||
+                !Net::valid_snapshot(patch.values) || patch.removed.size() > ClientWorld::object_limit)
+            {
+                error = "Stale or invalid world patch base";
+                return false;
+            }
+            ObjectId previous;
+            for (auto id : patch.removed)
+            {
+                if (!world_.get(id) || (previous && previous.slot >= id.slot))
+                {
+                    error = "World patch removes an unknown or unordered generation";
+                    return false;
+                }
+                previous = id;
+            }
+            next = patch.values;
+            next.objects.clear();
+            auto current = Net::snapshot_values(world_.frame());
+            const auto& incoming = patch.values.objects;
+            std::size_t left = 0, right = 0, removed = 0;
+            while (left < current.objects.size() || right < incoming.size())
+            {
+                if (left < current.objects.size() && removed < patch.removed.size() &&
+                    current.objects[left].id == patch.removed[removed])
+                {
+                    ++left;
+                    ++removed;
+                    continue;
+                }
+                if (right == incoming.size() ||
+                    (left < current.objects.size() && current.objects[left].id.slot < incoming[right].id.slot))
+                    next.objects.push_back(std::move(current.objects[left++]));
+                else
+                {
+                    const auto& object = incoming[right++];
+                    const bool replacing =
+                        left < current.objects.size() && current.objects[left].id.slot == object.id.slot;
+                    if (replacing && current.objects[left].id != object.id)
+                    {
+                        error = "World patch replaces a generation without removing it";
+                        return false;
+                    }
+                    const auto highest = object.id.slot < generations_.size() ? generations_[object.id.slot] : 0;
+                    if (!replacing && object.id.generation <= highest)
+                    {
+                        error = "World patch resurrects a retired generation";
+                        return false;
+                    }
+                    if (replacing)
+                        ++left;
+                    next.objects.push_back(object);
+                }
+                if (next.objects.size() > ClientWorld::object_limit)
+                {
+                    error = "World patch exceeds object budget";
+                    return false;
+                }
+            }
+        }
+        if ((next.player_alive && !next.player) ||
+            (next.player && !std::any_of(next.objects.begin(), next.objects.end(),
+                                         [&](const auto& object) { return object.id == next.player; })))
+        {
+            error = "World update has no matching recipient player";
+            return false;
+        }
+        // Bound the resulting world too; small deltas cannot grow an unbounded
+        // resource graph. Validation precedes asset resolution or replica mutation.
+        std::vector<std::uint8_t> checked;
+        if (!Net::encode_world_snapshot(next, checked))
+        {
+            error = "World patch result exceeds snapshot bounds";
+            return false;
+        }
+        if (!receive_network_world(next, geometry, models, sprites, world_, error))
+            return false;
+        for (const auto& object : next.objects)
+        {
+            if (generations_.size() <= object.id.slot)
+                generations_.resize(object.id.slot + 1);
+            generations_[object.id.slot] = object.id.generation;
+        }
+        membership_sequence_ = next.sequence;
+        return true;
     }
 } // namespace OpenBlood2

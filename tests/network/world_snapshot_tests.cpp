@@ -140,6 +140,36 @@ namespace
                 CHECK(encode_world_snapshot(out, again) && again == fuzz);
         }
         std::cout << "Snapshot values, every truncation, atomic bounds, ordered chunks and 25000 mutations\n";
+        auto after = source;
+        after.sequence++;
+        after.objects.erase(after.objects.begin());
+        after.objects[0].flags ^= FLAG_VISIBLE;
+        WorldPatch patch;
+        bool changed = false;
+        CHECK(make_world_patch(source, after, patch, changed) && changed);
+        CHECK(encode_world_patch(patch, bytes));
+        WorldPatch decoded;
+        CHECK(decode_world_patch(bytes, decoded));
+        CHECK(encode_world_patch(decoded, again) && again == bytes);
+        for (std::size_t size = 0; size < bytes.size(); ++size)
+        {
+            decoded.base = 99;
+            CHECK(!decode_world_patch(std::span(bytes).first(size), decoded) && decoded.base == 99);
+        }
+        CHECK(encode_patch_chunks(patch, chunks));
+        BaselineReceiver patch_receiver(source.world);
+        WorldUpdate update;
+        for (const auto& chunk : chunks)
+            CHECK(patch_receiver.receive(chunk, update) != BaselineResult::Refused);
+        CHECK(std::holds_alternative<WorldPatch>(update) && std::get<WorldPatch>(update).base == source.sequence);
+        for (unsigned i = 0; i < 10000; ++i)
+        {
+            auto fuzz = bytes;
+            fuzz[rng() % fuzz.size()] ^= std::uint8_t(rng());
+            if (decode_world_patch(fuzz, decoded))
+                CHECK(encode_world_patch(decoded, again) && again == fuzz);
+        }
+        std::cout << "Reliable membership diff, patch round trip/truncations and 10000 mutations\n";
         return true;
     }
 } // namespace

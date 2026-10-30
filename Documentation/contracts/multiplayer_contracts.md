@@ -597,7 +597,7 @@ and respawn, match rules, LAN discovery and platform qualification remain open.
 ## Initial world snapshot over ENet
 
 The [initial snapshot continuation](../implementation/reports/m9_world_baseline.md)
-uses protocol version 2; version 1 admission-only peers are now refused. After
+introduced protocol version 2, superseded by version 3 below. After
 Joined, the server sends one complete observable object snapshot on reliable
 Baseline. Control and Baseline may arrive in either order; a client waits for
 both and verifies its addressed player before activating the received world.
@@ -631,3 +631,35 @@ This is one initial frame at each admission, including after the world has
 advanced. Existing connected clients do not yet receive subsequent joins, poses
 or destructions. Twenty-Hz publication/interpolation, private events, remote
 movement/combat and playable host/client operation remain pending.
+
+
+## Continuous reliable object membership
+
+The [membership continuation](../implementation/reports/m9_world_membership.md)
+uses protocol version 3. After receiving Joined and resolving the initial frame,
+the client sends `BaselineReady(world, sequence)`. Only an exact match enables
+continuous publication. The baseline phase has its own 30-second deadline;
+a wrong world/sequence or duplicate acknowledgement closes that admission and
+removes its player. Independent channel ordering remains supported.
+
+Every three successful server ticks, each admitted peer compares the current
+world against its last reliable membership. A patch carries its exact predecessor
+sequence, full frame headers, removed identities and new/changed metadata records.
+Metadata includes resource bindings, visibility/user flags, hidden nodes,
+attachments and world-model bindings. Pose/scale/color/alpha and animation/sprite
+tracks accompany creations/metadata changes but do not by themselves trigger a
+reliable patch; continuous poses belong to the separate State channel. Missed
+publication opportunities coalesce to the latest world, without a catch-up burst.
+
+Patches use the same ordered reliable chunk assembly and 1 MiB aggregate limit.
+The receiver validates removals against live generations, requires an explicit
+removal before replacing a slot, and remembers the highest admitted generation
+per slot for the entire world. Removed generations cannot be reintroduced, even
+after several updates. A failed asset binding does not retire or admit identities.
+The resulting full world must also fit the snapshot budget. Missing recipient
+players, stale bases/worlds, unknown removals and malformed records fail atomically.
+No replica executes gameplay callbacks or takes ownership of server objects.
+
+Existing clients now observe arrivals, departures and metadata changes. Unreliable
+20 Hz poses/interpolation, collision/environment, private gameplay/audio/effect
+messages and interactive movement/combat still require their wire paths.

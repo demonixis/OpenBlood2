@@ -33,7 +33,7 @@ int main(int argc, char** argv)
         const std::string_view arg = argv[i];
         if (arg == "--help")
         {
-            std::cout << "OpenBlood2 dedicated server (M9: Bloodbath initial replication; gameplay updates pending)\n"
+            std::cout << "OpenBlood2 dedicated server (M9: Bloodbath object membership; movement/combat pending)\n"
                       << "  --data-dir PATH  External retail installation (or BLOOD2_DATA_DIR)\n"
                       << "  --world NAME     Retail multi/bb_* or multi/ctf_* map\n"
                       << "  --mode MODE      bloodbath, team, ctf\n"
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
     std::signal(SIGTERM, stop);
     std::cout << "Server simulation: " << session.game().world_path << ", UDP " << network.port() << ", data "
               << digest_text(session.fingerprint())
-              << "\nBloodbath admission and initial world replication enabled; gameplay updates are pending.\n"
+              << "\nBloodbath admission and object membership replication enabled; movement/combat are pending.\n"
               << std::flush;
     ServerClock clock;
     auto previous = std::chrono::steady_clock::now();
@@ -138,6 +138,7 @@ int main(int argc, char** argv)
         return 6;
     std::cout << "Server stopped: ticks=" << ticks_done << ", discarded_ticks=" << clock.discarded_ticks()
               << ", admitted=" << network.admitted << ", departed=" << network.departed
-              << ", rejected=" << network.rejected << ", timed_out=" << network.timed_out << '\n';
+              << ", rejected=" << network.rejected << ", timed_out=" << network.timed_out
+              << ", membership_updates=" << network.membership_updates << '\n';
     return 0;
 }

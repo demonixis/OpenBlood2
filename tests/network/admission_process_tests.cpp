@@ -7,6 +7,7 @@
 #include "net/transport.h"
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_process.h>
+#include <algorithm>
 #include <charconv>
 #include <chrono>
 #include <iostream>
@@ -27,7 +28,7 @@ using Clock = std::chrono::steady_clock;
     } while (false)
 namespace
 {
-    bool client(const char* port_text, const char* data)
+    bool client(const char* port_text, const char* data, bool observer)
     {
         std::string error;
         unsigned port = 0;
@@ -40,10 +41,13 @@ namespace
         ModelStore models(resources);
         SpriteStore sprites(resources);
         World loaded;
-        ClientWorld replica;
+        NetworkWorldReceiver receiver;
+        const auto& replica = receiver.world();
         std::optional<BaselineReceiver> baseline;
         WorldSnapshot snapshot;
         ObjectId own_object;
+        ObjectId other_player;
+        bool saw_arrival = false, saw_departure = false;
         Sha256Digest digest;
         CHECK(resources.mount_game(config, error) && content_fingerprint(resources, digest, error));
         Transport transport;
@@ -55,7 +59,7 @@ namespace
             std::vector<std::uint8_t> bytes;
             return encode_admission(message, bytes) && transport.send(peer, Channel::Control, bytes, error);
         };
-        const auto deadline = Clock::now() + std::chrono::seconds(8);
+        const auto deadline = Clock::now() + std::chrono::seconds(18);
         Clock::time_point leave_at;
         std::uint64_t world = 0;
         bool hello = false, ready = false, joined = false, leaving = false, assembled = false, replicated = false;
@@ -63,6 +67,9 @@ namespace
         {
             if (joined && replicated && !leaving && Clock::now() >= leave_at)
             {
+                CHECK(!observer || (saw_arrival && saw_departure));
+                if (observer)
+                    std::cout << "Observed remote player creation and departure\n" << std::flush;
                 CHECK(transport.disconnect(peer, 0));
                 leaving = true;
             }
@@ -82,10 +89,41 @@ namespace
             {
                 if (event.channel == Channel::Baseline)
                 {
-                    CHECK(ready && baseline && !assembled);
-                    const auto result = baseline->receive(event.bytes, snapshot);
+                    CHECK(ready && baseline);
+                    WorldUpdate update;
+                    const auto result = baseline->receive(event.bytes, update);
                     CHECK(result != BaselineResult::Refused);
-                    assembled = result == BaselineResult::Complete;
+                    if (result == BaselineResult::Complete)
+                    {
+                        if (const auto* initial = std::get_if<WorldSnapshot>(&update))
+                        {
+                            CHECK(!assembled);
+                            snapshot = *initial;
+                            assembled = true;
+                        }
+                        else
+                        {
+                            CHECK(replicated);
+                            const auto& patch = std::get<WorldPatch>(update);
+                            ObjectId arriving;
+                            for (const auto& object : patch.values.objects)
+                            {
+                                std::string name;
+                                if (object.id != own_object && !replica.get(object.id) && object.type == OT_MODEL &&
+                                    resource_path(object.filename, name) && name == "models/characters/caleb.abc")
+                                    arriving = object.id;
+                            }
+                            const bool departed = std::find(patch.removed.begin(), patch.removed.end(), other_player) !=
+                                                  patch.removed.end();
+                            CHECK(receiver.receive(update, loaded, models, sprites, error));
+                            if (arriving)
+                            {
+                                other_player = arriving;
+                                saw_arrival = true;
+                            }
+                            saw_departure |= departed;
+                        }
+                    }
                 }
                 else
                 {
@@ -97,7 +135,7 @@ namespace
                         std::vector<std::uint8_t> bytes;
                         CHECK(resources.read(offer->path, bytes, error) && read_world(bytes, loaded, error));
                         world = offer->world;
-                        CHECK(replica.begin(world));
+                        CHECK(receiver.begin(world));
                         baseline.emplace(world);
                         CHECK(send(Ready{world, {}}));
                         ready = true;
@@ -119,14 +157,14 @@ namespace
                 }
                 if (joined && assembled && !replicated)
                 {
-                    CHECK(snapshot.player == own_object &&
-                          receive_network_world(snapshot, loaded, models, sprites, replica, error));
+                    CHECK(snapshot.player == own_object && receiver.receive(snapshot, loaded, models, sprites, error));
                     CHECK(replica.get(own_object) && replica.get(own_object)->model);
                     ModelView scene;
                     CHECK(append_client_models(replica, true, scene, resources, error));
                     CHECK(!scene.entries.empty());
                     replicated = true;
-                    leave_at = Clock::now() + std::chrono::milliseconds(1500);
+                    CHECK(send(BaselineReady{world, snapshot.sequence}));
+                    leave_at = Clock::now() + std::chrono::seconds(observer ? 6 : 1);
                     std::cout << "Replicated " << replica.frame().objects.size() << " objects, " << scene.entries.size()
                               << " model entries in world " << world
                               << " after independent hash, DAT and model decode\n"
@@ -174,7 +212,7 @@ namespace
         std::string error;
         Process host;
         const char* args[]{server,   "--data-dir", data,     "--world", "multi/bb_crypt", "--mode", "bloodbath",
-                           "--bind", "127.0.0.1",  "--port", "0",       "--ticks",        "600",    nullptr};
+                           "--bind", "127.0.0.1",  "--port", "0",       "--ticks",        "900",    nullptr};
         host.handle = SDL_CreateProcess(args, true);
         error = SDL_GetError();
         CHECK(host.handle);
@@ -203,18 +241,30 @@ namespace
         }
         CHECK(!port.empty());
         Process clients[2];
-        const char* child_args[]{self, "--peer", port.c_str(), data, nullptr};
-        for (auto& peer : clients)
+        for (unsigned i = 0; i < 2; ++i)
         {
-            peer.handle = SDL_CreateProcess(child_args, true);
+            if (i)
+            {
+                deadline = Clock::now() + std::chrono::seconds(15);
+                while (clients[0].output.find("Replicated ") == std::string::npos && Clock::now() < deadline)
+                {
+                    CHECK(clients[0].read());
+                    int code = 0;
+                    CHECK(!SDL_WaitProcess(clients[0].handle, false, &code));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                }
+                CHECK(clients[0].output.find("Replicated ") != std::string::npos);
+            }
+            const char* child_args[]{self, "--peer", port.c_str(), data, i ? "visitor" : "observer", nullptr};
+            clients[i].handle = SDL_CreateProcess(child_args, true);
             error = SDL_GetError();
-            CHECK(peer.handle);
+            CHECK(clients[i].handle);
         }
         bool finished[2]{};
         int codes[2]{};
         bool host_done = false;
         int host_code = 0;
-        deadline = Clock::now() + std::chrono::seconds(20);
+        deadline = Clock::now() + std::chrono::seconds(25);
         while (Clock::now() < deadline && (!finished[0] || !finished[1] || !host_done))
         {
             CHECK(host.read());
@@ -236,12 +286,13 @@ namespace
         CHECK(host.output.find("admitted=2, departed=2, rejected=0, timed_out=0") != std::string::npos);
         CHECK(clients[0].output.find("Replicated ") != std::string::npos &&
               clients[1].output.find("Replicated ") != std::string::npos);
+        CHECK(clients[0].output.find("Observed remote player creation and departure") != std::string::npos);
         return true;
     }
 } // namespace
 int main(int argc, char** argv)
 {
-    if (argc == 4 && std::string_view(argv[1]) == "--peer")
-        return client(argv[2], argv[3]) ? 0 : 1;
+    if (argc == 5 && std::string_view(argv[1]) == "--peer")
+        return client(argv[2], argv[3], std::string_view(argv[4]) == "observer") ? 0 : 1;
     return argc == 3 && parent(argv[0], argv[1], argv[2]) ? 0 : 1;
 }

@@ -16,7 +16,8 @@ namespace OpenBlood2::Net
             WorldOffer,
             Ready,
             Joined,
-            Heartbeat
+            Heartbeat,
+            BaselineReady
         };
         bool valid(const WorldOffer& v)
         {
@@ -44,6 +45,8 @@ namespace OpenBlood2::Net
                         return v.world && valid_profile(v.profile);
                     else if constexpr (std::is_same_v<T, Joined>)
                         return v.world && v.player && v.object.slot < 65536 && v.object.generation;
+                    else if constexpr (std::is_same_v<T, BaselineReady>)
+                        return v.world && v.sequence;
                     else
                         return v.world != 0;
                 },
@@ -104,10 +107,16 @@ namespace OpenBlood2::Net
                     writer.u32(v.object.slot);
                     writer.u32(v.object.generation);
                 }
-                else
+                else if constexpr (std::is_same_v<T, Heartbeat>)
                 {
                     writer.u8(std::uint8_t(Kind::Heartbeat));
                     writer.u64(v.world);
+                }
+                else
+                {
+                    writer.u8(std::uint8_t(Kind::BaselineReady));
+                    writer.u64(v.world);
+                    writer.u64(v.sequence);
                 }
             },
             message);
@@ -172,6 +181,9 @@ namespace OpenBlood2::Net
             }
             case Kind::Heartbeat:
                 next = Heartbeat{reader.u64()};
+                break;
+            case Kind::BaselineReady:
+                next = BaselineReady{reader.u64(), reader.u64()};
                 break;
             default:
                 return DecodeAdmission::Malformed;

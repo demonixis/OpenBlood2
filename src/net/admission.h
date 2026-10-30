@@ -9,7 +9,7 @@
 
 namespace OpenBlood2::Net
 {
-    inline constexpr std::uint16_t protocol_version = 2;
+    inline constexpr std::uint16_t protocol_version = 3;
     inline constexpr std::size_t admission_packet_limit = 256;
     enum class Edition : std::uint8_t
     {
@@ -70,7 +70,12 @@ namespace OpenBlood2::Net
         std::uint64_t world = 0;
         bool operator==(const Heartbeat&) const = default;
     };
-    using AdmissionMessage = std::variant<Hello, WorldOffer, Ready, Joined, Heartbeat>;
+    struct BaselineReady
+    {
+        std::uint64_t world = 0, sequence = 0;
+        bool operator==(const BaselineReady&) const = default;
+    };
+    using AdmissionMessage = std::variant<Hello, WorldOffer, Ready, Joined, Heartbeat, BaselineReady>;
     enum class DecodeAdmission
     {
         Ok,

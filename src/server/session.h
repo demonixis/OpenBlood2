@@ -18,6 +18,10 @@ namespace OpenBlood2
         ~ServerSession();
         bool start(const Config&, std::string_view world, unsigned mode, std::string& error);
         bool tick(std::string& error);
+        std::uint64_t ticks() const
+        {
+            return ticks_;
+        }
         // Trusted local call after the endpoint's protocol/content/loading gates.
         bool join(const Net::JoinProfile&, Net::Joined&, std::string& error);
         bool snapshot(std::uint64_t player, Net::WorldSnapshot&, std::string& error);
@@ -64,6 +68,7 @@ namespace OpenBlood2
         };
         std::vector<Player> players_;
         std::uint64_t world_id_ = 0, next_player_ = 1, next_snapshot_ = 1;
+        std::uint64_t ticks_ = 0;
         unsigned mode_ = 0;
     };
 } // namespace OpenBlood2

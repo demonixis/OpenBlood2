@@ -47,7 +47,7 @@ add_library(blood2_startup STATIC src/engine/config.cpp src/engine/resources.cpp
 target_include_directories(blood2_startup PUBLIC src)
 blood2_project_options(blood2_startup)
 
-add_library(blood2_net STATIC src/net/transport.cpp src/net/content.cpp src/net/admission.cpp src/net/world_snapshot.cpp)
+add_library(blood2_net STATIC src/net/transport.cpp src/net/content.cpp src/net/admission.cpp src/net/world_snapshot.cpp src/net/world_patch.cpp)
 target_include_directories(blood2_net PUBLIC src)
 target_link_libraries(blood2_net PUBLIC blood2_startup PRIVATE enet)
 blood2_project_options(blood2_net)

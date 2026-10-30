@@ -20,12 +20,13 @@ namespace
         Hello hello;
         for (unsigned i = 0; i < hello.content.size(); ++i)
             hello.content[i] = std::uint8_t(i);
-        const std::array<AdmissionMessage, 5> messages{
-            hello, WorldOffer{0x123456789abcdef0ull, 1, 16, "worlds/multi/bb_crypt.dat"}, Ready{2, {}},
-            Joined{3, 4, {65535, 9}}, Heartbeat{10}};
+        const std::array<AdmissionMessage, 6> messages{
+            hello,         WorldOffer{0x123456789abcdef0ull, 1, 16, "worlds/multi/bb_crypt.dat"},
+            Ready{2, {}},  Joined{3, 4, {65535, 9}},
+            Heartbeat{10}, BaselineReady{10, 20}};
         std::vector<std::uint8_t> bytes;
         CHECK(encode_admission(hello, bytes));
-        std::vector<std::uint8_t> golden{0x42, 0x32, 0x4d, 0x39, 2, 0, 1, 0};
+        std::vector<std::uint8_t> golden{0x42, 0x32, 0x4d, 0x39, 3, 0, 1, 0};
         for (unsigned i = 0; i < 32; ++i)
             golden.push_back(std::uint8_t(i));
         CHECK(bytes == golden);

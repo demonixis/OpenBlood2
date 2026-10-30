@@ -185,6 +185,7 @@ namespace OpenBlood2
                     warnings_.push_back("Server NPC " + std::string(object->state.m_Name) + " suspended: " +
                                         ai->runtime_error);
                 }
+        ++ticks_;
         return true;
     }
 } // namespace OpenBlood2

@@ -1,0 +1,36 @@
+{
+  "scope": "Reliable world membership, baseline acknowledgement and retired identities",
+  "baseline": "f38eae26",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "f38eae26923f9b6c54f20f58a957eefeca6203f1",
+      "path": "src/server/network.cpp",
+      "sha256": "6233b7cf12e29f7ca6b828fa721993a67878c7822334039bb6c6ba910bd05283"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "f38eae26923f9b6c54f20f58a957eefeca6203f1",
+      "path": "src/client/network_world.cpp",
+      "sha256": "2e7f481325a55c93dc7d6c1f727aac2d6173cadc27cc3595147f103299c59d76"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "f38eae26923f9b6c54f20f58a957eefeca6203f1",
+      "path": "src/net/world_snapshot.cpp",
+      "sha256": "fa128f710e14316dd43008e17621aade773c3d8315953eaa80011c284213e30e"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "f38eae26923f9b6c54f20f58a957eefeca6203f1",
+      "path": "src/client/world.cpp",
+      "sha256": "3331a76f411c5cf81892cc8a114aab82a0b6dd72c6a26772dddc9260c29b7adb"
+    }
+  ],
+  "adaptations": [
+    "Replacement network protocol version 3; no new original game algorithm or commercial asset import.",
+    "Exact-baseline ACK before continuous publication; reliable patches compare metadata every three successful 60 Hz server ticks.",
+    "Per-world generation history, explicit slot retirement, atomic resource validation and 1 MiB result bound.",
+    "Independent client probe observes another real process joining and departing; poses, movement/combat and graphical host/client remain subsequent work."
+  ]
+}

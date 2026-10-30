@@ -331,14 +331,21 @@ namespace OpenBlood2::Net
         std::vector<std::uint8_t> bytes;
         if (!encode_world_snapshot(s, bytes))
             return false;
+        return encode_world_chunks(s.world, s.sequence, bytes, out);
+    }
+    bool encode_world_chunks(std::uint64_t world, std::uint64_t sequence, std::span<const std::uint8_t> bytes,
+                             std::vector<std::vector<std::uint8_t>>& out)
+    {
+        if (!world || !sequence || bytes.empty() || bytes.size() > world_snapshot_limit)
+            return false;
         std::vector<std::vector<std::uint8_t>> chunks;
         for (std::size_t offset = 0; offset < bytes.size(); offset += chunk_data)
         {
             Writer w(packet_limit(Channel::Baseline));
             w.u32(chunk_magic);
             w.u16(protocol_version);
-            w.u64(s.world);
-            w.u64(s.sequence);
+            w.u64(world);
+            w.u64(sequence);
             w.u32(std::uint32_t(bytes.size()));
             w.u32(std::uint32_t(offset));
             w.raw(std::span(bytes).subspan(offset, std::min(chunk_data, bytes.size() - offset)));
@@ -350,6 +357,18 @@ namespace OpenBlood2::Net
         return true;
     }
     BaselineResult BaselineReceiver::receive(std::span<const std::uint8_t> bytes, WorldSnapshot& out)
+    {
+        WorldUpdate update;
+        const auto status = receive(bytes, update);
+        if (status != BaselineResult::Complete)
+            return status;
+        auto* snapshot = std::get_if<WorldSnapshot>(&update);
+        if (!snapshot)
+            return BaselineResult::Refused;
+        out = std::move(*snapshot);
+        return BaselineResult::Complete;
+    }
+    BaselineResult BaselineReceiver::receive(std::span<const std::uint8_t> bytes, WorldUpdate& out)
     {
         if (bytes.size() <= chunk_header || bytes.size() > packet_limit(Channel::Baseline))
             return BaselineResult::Refused;
@@ -375,8 +394,21 @@ namespace OpenBlood2::Net
         bytes_.insert(bytes_.end(), data.begin(), data.end());
         if (bytes_.size() < total)
             return BaselineResult::Pending;
-        WorldSnapshot result;
-        if (!decode_world_snapshot(bytes_, result) || result.world != world || result.sequence != sequence)
+        WorldUpdate result;
+        WorldSnapshot snapshot;
+        WorldPatch patch;
+        bool valid = false;
+        if (decode_world_snapshot(bytes_, snapshot))
+        {
+            valid = snapshot.world == world && snapshot.sequence == sequence;
+            result = std::move(snapshot);
+        }
+        else if (decode_world_patch(bytes_, patch))
+        {
+            valid = patch.values.world == world && patch.values.sequence == sequence;
+            result = std::move(patch);
+        }
+        if (!valid)
         {
             bytes_.clear();
             sequence_ = 0;
