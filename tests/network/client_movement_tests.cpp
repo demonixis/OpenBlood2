@@ -1,0 +1,319 @@
+#include "../brush_fixture.h"
+#include "client/network_movement.h"
+#include "game/original/MoveMgr.h"
+#include <cmath>
+#include <iostream>
+#include <limits>
+#include <type_traits>
+using namespace OpenBlood2;
+using Reception = NetworkMovement::Reception;
+#define CHECK(x)                                                                                                       \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (!(x))                                                                                                      \
+        {                                                                                                              \
+            std::cerr << __func__ << ':' << __LINE__ << ": " #x "\n";                                                  \
+            return false;                                                                                              \
+        }                                                                                                              \
+    } while (false)
+namespace
+{
+    struct Fixture
+    {
+        ClientCollisionWorld collision;
+        NetworkMovement client{collision};
+        Net::MovementSetup initial;
+        std::string error;
+        ClientObjectId owner{7, {0, 1}};
+        bool step(std::optional<Net::MovementReport>& report, MovementInput input = {})
+        {
+            return client.update(input, 0, -.4f, 1. / 60, true, false, false, report, error);
+        }
+        Net::MovementAck ack(const Net::MovementReport& report) const
+        {
+            return {report.owner, report.sequence, client.setup().sequence, report.move,
+                    client.movement().body.dimensions};
+        }
+        bool box(DVector position, DVector dimensions)
+        {
+            auto frame = collision.frame();
+            ++frame.sequence;
+            ClientCollider obstacle;
+            obstacle.id = {10, 1};
+            obstacle.position = position;
+            obstacle.dimensions = dimensions;
+            obstacle.flags = FLAG_SOLID;
+            frame.objects.push_back(obstacle);
+            return collision.apply(std::move(frame), error);
+        }
+        bool setup(ContainerCode code = CC_NOTHING)
+        {
+            auto geometry = std::make_shared<CollisionWorld>();
+            auto floor = test_brush::box("floor", {-3000, -20, -3000}, {3000, 0, 3000});
+            for (auto& surface : floor.surfaces)
+                surface.flags = 1;
+            std::string error;
+            CHECK(geometry->build(floor, error));
+            CHECK(collision.begin(owner.world));
+            ClientCollisionFrame frame;
+            frame.world = owner.world;
+            frame.sequence = 1;
+            frame.primary = geometry;
+            ClientCollider player;
+            player.id = owner.object;
+            player.type = OT_MODEL;
+            player.position = {0, 41.001f, 0};
+            player.dimensions = {16, 41, 16};
+            player.flags = FLAG_SOLID | FLAG_STAIRSTEP;
+            frame.objects.push_back(player);
+            if (code != CC_NOTHING)
+            {
+                ClientCollider volume;
+                volume.id = {1, 1};
+                volume.type = OT_CONTAINER;
+                volume.container = volume.volume_brush = true;
+                auto shape = std::make_shared<ContainerShape>();
+                CHECK(shape->build(test_brush::box("volume", {-2000, 0, -2000}, {2000, 1000, 2000}), {}, error));
+                volume.shape = shape;
+                volume.position = shape->origin;
+                volume.dimensions = {2000, 500, 2000};
+                volume.environment =
+                    ContainerEnvironment{code, code == CC_CONVEYOR ? DVector{100, 0, 0} : DVector{}, -200, 0, false};
+                frame.objects.push_back(volume);
+            }
+            CHECK(collision.apply(std::move(frame), error));
+            initial = {{7, 1, owner.object, 300},
+                       1,
+                       44,
+                       0,
+                       false,
+                       true,
+                       34,
+                       player.position,
+                       player.dimensions,
+                       {0, -1000, 0},
+                       280,
+                       600};
+            CHECK(client.begin({7, 1, owner.object}));
+            CHECK(client.receive(initial, error) == Reception::Applied);
+            return true;
+        }
+    };
+    bool same(DVector a, DVector b)
+    {
+        return a.x == b.x && a.y == b.y && a.z == b.z;
+    }
+    bool equal(const NetworkMovement& a, const NetworkMovement& b)
+    {
+        const auto& x = a.movement().body;
+        const auto& y = b.movement().body;
+        return same(x.position, y.position) && same(x.velocity, y.velocity) && same(x.acceleration, y.acceleration) &&
+               a.manager().substeps == b.manager().substeps && a.manager().updates == b.manager().updates &&
+               a.manager().jumps == b.manager().jumps && a.manager().landings == b.manager().landings;
+    }
+    bool immediate()
+    {
+        Fixture f;
+        CHECK(f.setup());
+        MovementInput input;
+        input.forward = true;
+        std::optional<Net::MovementReport> report;
+        unsigned count = 0;
+        for (unsigned i = 0; i < 60; ++i)
+        {
+            CHECK(f.step(report, input));
+            if (report)
+            {
+                const auto before = f.client.movement().body;
+                CHECK(f.client.receive(f.ack(*report), f.error) == Reception::Applied);
+                CHECK(same(before.position, f.client.movement().body.position));
+                CHECK(same(before.velocity, f.client.movement().body.velocity));
+                ++count;
+            }
+        }
+        CHECK(count == 7 && f.client.manager().substeps == 120 && f.client.movement().predictions == 120);
+        CHECK(f.client.movement().acknowledgements == count && f.client.corrections == count && !f.client.replays);
+        CHECK(f.client.movement().body.position.z > 250 && f.collision.get(f.owner.object)->position.z == 0);
+        return true;
+    }
+    bool delayed(ContainerCode code)
+    {
+        Fixture a, b, c;
+        CHECK(a.setup(code) && b.setup(code) && c.setup(code));
+        MovementInput input;
+        input.forward = true;
+        std::optional<Net::MovementReport> ra, rb, rc;
+        CHECK(a.step(ra, input) && b.step(rb, input) && c.step(rc, input));
+        CHECK(ra && rb && rc);
+        auto first = a.ack(*ra);
+        first.accepted.position.z -= .2f;
+        first.accepted.velocity.x += 30;
+        CHECK(b.client.receive(first, b.error) == Reception::Applied);
+        for (int i = 1; i < 10; ++i)
+            CHECK(a.step(ra, input) && b.step(rb, input) && c.step(rc, input));
+        CHECK(ra && ra->sequence == 2);
+        const auto second = a.ack(*ra);
+        CHECK(c.client.receive(second, c.error) == Reception::Applied);
+        CHECK(a.client.receive(first, a.error) == Reception::Applied);
+        CHECK(equal(a.client, b.client));
+        CHECK(a.client.replays == 9 && a.client.manager().substeps == 20);
+        for (int i = 10; i < 20; ++i)
+            CHECK(a.step(ra, input) && c.step(rc, input));
+        CHECK(a.client.receive(second, a.error) == Reception::Applied);
+        CHECK(equal(a.client, c.client));
+        CHECK(a.client.replays == 19 && a.client.movement().acknowledgements == 2);
+        CHECK(a.client.receive(first, a.error) == Reception::Ignored);
+        CHECK(a.client.receive(second, a.error) == Reception::Ignored);
+        auto invalid = second;
+        invalid.sequence = 10000;
+        CHECK(a.client.receive(invalid, a.error) == Reception::Refused && equal(a.client, c.client));
+        return true;
+    }
+    bool forces_and_stances()
+    {
+        Fixture f;
+        CHECK(f.setup());
+        std::optional<Net::MovementReport> report;
+        CHECK(f.step(report) && report);
+        const auto old = f.ack(*report);
+        auto setup = f.initial;
+        ++setup.sequence;
+        ++setup.owner.force_revision;
+        ++setup.code;
+        setup.position.z = 100;
+        CHECK(f.client.receive(setup, f.error) == Reception::Applied);
+        CHECK(f.client.manager().updates == 1 && f.client.manager().substeps == 2);
+        CHECK(same(f.client.movement().body.position, setup.position) && same(f.client.movement().body.velocity, {}));
+        CHECK(f.client.receive(old, f.error) == Reception::Ignored);
+        CHECK(f.step(report) && report && report->sequence == 2 && report->move.move_code == setup.code);
+        ++setup.sequence;
+        setup.owner.force_revision += 256; // Byte-code wrap cannot revive old reports.
+        CHECK(f.client.receive(setup, f.error) == Reception::Applied);
+        CHECK(f.client.receive(old, f.error) == Reception::Ignored);
+        auto invalid = setup;
+        ++invalid.sequence;
+        ++invalid.code;
+        CHECK(f.client.receive(invalid, f.error) == Reception::Refused);
+        invalid = setup;
+        invalid.position.x = std::numeric_limits<float>::quiet_NaN();
+        CHECK(f.client.receive(invalid, f.error) == Reception::Refused);
+        const auto foot = f.client.movement().body.position.y - 41;
+        ++setup.sequence;
+        setup.dimensions.y = 20;
+        setup.eye_level = 12;
+        setup.crouched = true;
+        CHECK(f.client.receive(setup, f.error) == Reception::Applied);
+        CHECK(std::abs(f.client.movement().body.position.y - 20 - foot) < .0001f);
+        CHECK(f.box({0, 60, 100}, {30, 10, 30}));
+        ++setup.sequence;
+        setup.dimensions.y = 41;
+        setup.eye_level = 34;
+        setup.crouched = false;
+        CHECK(f.client.receive(setup, f.error) == Reception::Applied);
+        CHECK(f.client.movement().body.dimensions.y == 20); // Growth would enter the ceiling.
+        CHECK(f.step(report) && report);
+        auto ack = f.ack(*report);
+        ack.accepted.position = {100, 41.001f, 100};
+        ack.dimensions.y = 41;
+        CHECK(f.client.receive(ack, f.error) == Reception::Applied);
+        CHECK(f.client.movement().body.dimensions.y == 41 &&
+              same(f.client.movement().body.position, ack.accepted.position));
+        return true;
+    }
+    bool failures_and_ordering()
+    {
+        Fixture f;
+        CHECK(f.setup());
+        MovementInput input;
+        input.forward = true;
+        std::optional<Net::MovementReport> report;
+        CHECK(f.step(report, input) && report);
+        auto ack = f.ack(*report);
+        CHECK(f.step(report, input));
+        const auto before = f.client.movement().body;
+        const auto steps = f.client.manager().substeps;
+        ack.accepted.position.x = 100;
+        CHECK(f.box({100, 41, ack.accepted.position.z}, {10, 30, 10}));
+        CHECK(f.client.receive(ack, f.error) == Reception::Deferred);
+        CHECK(same(before.position, f.client.movement().body.position) && f.client.manager().substeps == steps);
+        CHECK(!f.client.corrections && !f.client.movement().acknowledgements);
+        auto frame = f.collision.frame();
+        ++frame.sequence;
+        frame.objects.pop_back();
+        CHECK(f.collision.apply(std::move(frame), f.error));
+        CHECK(f.client.receive(ack, f.error) == Reception::Applied && f.client.replays == 1);
+        // Reliable setup and unreliable ACK may cross. Identical constraints
+        // keep useful report history; changing constraints retires it.
+        for (int i = 2; i < 10; ++i)
+            CHECK(f.step(report, input));
+        CHECK(report);
+        ack = f.ack(*report);
+        ++ack.setup_sequence;
+        CHECK(f.client.receive(ack, f.error) == Reception::Deferred);
+        auto setup = f.client.setup();
+        ++setup.sequence;
+        CHECK(f.client.receive(setup, f.error) == Reception::Applied);
+        CHECK(f.step(report, input) && f.client.corrections == 2);
+        const auto position = f.client.movement().body.position;
+        const auto updates = f.client.manager().updates;
+        input.mouse_forward = std::numeric_limits<float>::infinity();
+        CHECK(!f.step(report, input) && !report && same(position, f.client.movement().body.position));
+        CHECK(f.client.manager().updates == updates);
+        // A partially attempted collision step is rolled back on failure.
+        CHECK(f.box(position, {10, 30, 10}));
+        CHECK(!f.step(report, {}) && !report && same(position, f.client.movement().body.position));
+        CHECK(f.client.manager().updates == updates);
+        return true;
+    }
+    bool immediate_obstruction()
+    {
+        Fixture f;
+        CHECK(f.setup());
+        std::optional<Net::MovementReport> report;
+        CHECK(f.step(report) && report);
+        auto ack = f.ack(*report);
+        ack.accepted.position.x = 100;
+        CHECK(f.box(ack.accepted.position, {10, 30, 10}));
+        CHECK(f.client.receive(ack, f.error) == Reception::Deferred);
+        CHECK(f.client.movement().body.position.x == 0 && !f.client.corrections);
+        auto frame = f.collision.frame();
+        ++frame.sequence;
+        frame.objects.pop_back();
+        CHECK(f.collision.apply(std::move(frame), f.error));
+        CHECK(f.client.receive(ack, f.error) == Reception::Applied && !f.client.replays);
+        return true;
+    }
+    bool bounded_history()
+    {
+        Fixture f;
+        CHECK(f.setup());
+        std::optional<Net::MovementReport> report;
+        CHECK(f.step(report) && report);
+        const auto old = f.ack(*report);
+        for (int i = 1; i < 600; ++i)
+            CHECK(f.step(report));
+        CHECK(f.client.receive(old, f.error) == Reception::Ignored);
+        auto frame = f.collision.frame();
+        ++frame.sequence;
+        frame.objects.clear();
+        CHECK(f.collision.apply(std::move(frame), f.error));
+        CHECK(!f.client.ready() && !f.step(report));
+        auto setup = f.initial;
+        ++setup.sequence;
+        CHECK(f.client.receive(setup, f.error) == Reception::Deferred);
+        setup.owner.world = 6;
+        CHECK(f.client.receive(setup, f.error) == Reception::Ignored);
+        return true;
+    }
+} // namespace
+int main()
+{
+    if (!immediate() || !forces_and_stances() || !failures_and_ordering() || !immediate_obstruction() ||
+        !bounded_history())
+        return 1;
+    for (auto code : {CC_NOTHING, CC_WATER, CC_LADDER, CC_CONVEYOR})
+        if (!delayed(code))
+            return 1;
+    std::cout << "Independent CMoveMgr: immediate/delayed ACKs, four environments, force/stance, rollback and bounds "
+                 "passed\n";
+}

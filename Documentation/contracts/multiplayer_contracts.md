@@ -788,3 +788,28 @@ Capture ACK motion at receipt, before subsequent velocity advance; repeat it at
 20 Hz. Publish setup/stance/force changes reliably. A force during report contacts
 invalidates that old report's ACK. Client setup/correction reception, complete
 private event delivery and interactive remote gameplay remain subsequent work.
+
+
+## Independent setup and client reconciliation
+
+The [client movement continuation](../implementation/reports/m9_movement_client.md)
+feeds reliable setup and receipt-time ACKs to server-independent CMoveMgr. Keep
+its original arithmetic and the immediate solo path unchanged. Force changes
+snap once through the existing force service, preserve accumulated logical
+counters and invalidate previous report history using the full force generation.
+
+Keep ordinary prediction independent of replicated server poses. Resize stance
+with checked foot anchoring; a delayed blocked growth retains the prior body
+until an authoritative ACK supplies the matching pose/dimensions. An ACK restores
+its report checkpoint and replays only later client frames against owned current
+collision. Update later checkpoints, without replaying report clocks, audio,
+server callbacks, air or damage. Logical counts advance once; expose replay work
+separately. Failed replay/prediction must not leave partially advanced state.
+
+Bound history to 512 frames/32 reports and one future-setup ACK. Refuse unsent
+current sequences/wrong codes; ignore retired/duplicate/stale owner/force ACKs.
+Changed physics/stance retires old history; unchanged newer setup retains it.
+Defer corrections embedded in current collision without consuming the ACK,
+including corrections with no later frame to replay. Keep unavailable-owner
+setup deferred and invalid values refused. The separate-process loopback test
+is actual movement transport, not interactive gameplay or degraded combat.

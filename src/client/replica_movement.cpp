@@ -3,6 +3,25 @@
 
 namespace OpenBlood2
 {
+    bool ReplicaMovement::restore_prediction(const Prediction& value)
+    {
+        if (!valid() || value.state.owner != state.owner)
+            return false;
+        state = value.state;
+        controls_ = value.controls;
+        surface_ = value.surface;
+        return true;
+    }
+    bool ReplicaMovement::stance(int character, float eye_level, bool crouched)
+    {
+        if (!valid() || character < 0 || character > 3 || !std::isfinite(eye_level) || eye_level < 0 ||
+            eye_level > 1000)
+            return false;
+        character_ = character;
+        eye_level_ = eye_level;
+        crouched_ = crouched;
+        return true;
+    }
     void ReplicaMovement::clear()
     {
         state = {};

@@ -65,6 +65,9 @@ namespace OpenBlood2
                                 SegmentObjects = SegmentObjects::SolidOnly, bool ignore_volumes = false,
                                 SegmentStart = SegmentStart::IncludeInterior) const;
         bool support(ClientObjectId owner, ClientMotionState&) const;
+        // Player stance keeps its feet, like the authoritative ResizeObject.
+        // Miss means resized, Hit means blocked; failure leaves output unchanged.
+        CollisionQuery resize(ClientObjectId, const ClientMotionState&, DVector dimensions, ClientMotionState&) const;
         bool environment(ClientObjectId owner, const ClientMotionState&, DVector head, ClientContainerState&) const;
         // Destination/velocity have already been integrated by CMoveMgr.
         bool predict(ClientObjectId, const ClientMotionState&, DVector destination, DVector velocity,

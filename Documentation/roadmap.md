@@ -310,7 +310,9 @@ reconstructs client-owned geometry and volume properties from the admitted DAT.
 against replica collision and prepares original-cadence reports without server linkage.
 [Movement transport](implementation/reports/m9_movement_transport.md) now delivers
 private setup/report/ACK values and checked server velocity advancement without double integration.
-**Client correction, complete private events/commands, full client separation, Team profiles and playable network gameplay remain pending.**
+[Client correction](implementation/reports/m9_movement_client.md) now applies private setup/ACKs,
+replays bounded CMoveMgr history and drives two independent ENet client processes.
+**Complete private events/commands, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client
 shell runs its own movement (CMoveMgr) and effects. The engine copies object

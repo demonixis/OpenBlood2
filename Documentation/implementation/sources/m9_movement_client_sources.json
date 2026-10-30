@@ -1,0 +1,64 @@
+{
+  "scope": "Server-independent CMoveMgr setup, bounded receipt-time correction and client replay",
+  "baseline": "edc30d8411b776b08c9acf540e1ce0c46c06ec4f",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "edc30d8411b776b08c9acf540e1ce0c46c06ec4f",
+      "path": "src/game/original/MoveMgr.cpp",
+      "sha256": "9c8db79c791e4cf461ce375730b4d734c2130ac7a4f8def2d7cfe0056e6e9a74"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "edc30d8411b776b08c9acf540e1ce0c46c06ec4f",
+      "path": "src/game/original/MoveMgr.h",
+      "sha256": "3cef7be73f79f00945e6326804406f004722b7439a9fea6233bf138da00127d9"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "edc30d8411b776b08c9acf540e1ce0c46c06ec4f",
+      "path": "src/game/local_movement.cpp",
+      "sha256": "6841c8812a5f208af4ccaf75cd59afbe231bd423ae1793c6945d6bbe61feed9f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "edc30d8411b776b08c9acf540e1ce0c46c06ec4f",
+      "path": "src/client/replica_movement.cpp",
+      "sha256": "7a3e60a041b71ab9d1eafd4a25eea391b002e8b547b1ad5297dee02c20fe7435"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "edc30d8411b776b08c9acf540e1ce0c46c06ec4f",
+      "path": "src/client/collision.cpp",
+      "sha256": "7a084738b3e3ecc22727c16c37c497b5f7177411c36498a609bdc339205379f5"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "edc30d8411b776b08c9acf540e1ce0c46c06ec4f",
+      "path": "src/server/player_movement.cpp",
+      "sha256": "abb418140e0403e7a7ee281a61bb3b2de3d68a2eb3803d591dce071ed403ec67"
+    },
+    {
+      "repository": "sources/blood2",
+      "path": "ClientShellDLL/MoveMgr.cpp",
+      "sha256": "8b60f379f4e4733be7b80092e19e6daad36f53cf55cc0dc2c360187c0873452a"
+    },
+    {
+      "repository": "sources/blood2",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "repository": "sources/blood2",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    }
+  ],
+  "adaptations": [
+    "Value-only CMoveMgr checkpoints; no movement arithmetic change.",
+    "Full owner/force/setup/report identities replace original implicit handle/message association.",
+    "Receipt-time ACK replay uses current independent collision with 512 frame/32 report bounds.",
+    "Collision-checked foot-anchored client stance; blocked growth waits for authoritative correction.",
+    "Callback-free replay, unchanged solo path and server movement stage."
+  ]
+}

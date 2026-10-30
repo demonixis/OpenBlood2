@@ -7,17 +7,10 @@
 // LocalMovement preserves immediate solo correction; ReplicaMovement uses only
 // client collision and prepares periodic reports without a server dependency.
 // See movement_contracts.md and locomotion_contracts.md for the source selections and physics adaptations.
-class CMoveMgr
+// Owned prediction state. Network correction can restore this state and replay
+// only later client frames; no service, original object or callback is copied.
+struct CMoveMgrValues
 {
-  public:
-    explicit CMoveMgr(OpenBlood2::MovementServices& movement) : body(movement.body()), movement_(movement) {}
-    void Term();
-    bool OnPhysicsUpdate(const OpenBlood2::PlayerPhysics&);
-    bool OnServerForcePos(const OpenBlood2::PlayerPosition&);
-    bool Update(bool external_camera, const OpenBlood2::MovementInput&, float yaw, double seconds, bool can_move,
-                bool firing = false, float pitch = 0);
-    OpenBlood2::PlayerMove WritePositionInfo(DVector destination, DVector velocity) const;
-    OpenBlood2::ClientMotionState& body;
     OpenBlood2::PlayerPhysics physics;
     DDWORD m_dwControlFlags = 0, m_dwLastControlFlags = 0;
     DBYTE m_ClientMoveCode = 0;
@@ -36,6 +29,26 @@ class CMoveMgr
     double discarded_time = 0;
     std::uint64_t updates = 0, substeps = 0, jumps = 0, landings = 0;
     std::uint64_t jump_voice_requests = 0, jump_voice_starts = 0;
+};
+struct CMoveMgrCheckpoint
+{
+    CMoveMgrValues values;
+    OpenBlood2::MovementInput input;
+    bool configured = false, positioned = false;
+};
+class CMoveMgr : public CMoveMgrValues
+{
+  public:
+    explicit CMoveMgr(OpenBlood2::MovementServices& movement) : body(movement.body()), movement_(movement) {}
+    void Term();
+    CMoveMgrCheckpoint checkpoint() const;
+    void restore(const CMoveMgrCheckpoint&);
+    bool OnPhysicsUpdate(const OpenBlood2::PlayerPhysics&);
+    bool OnServerForcePos(const OpenBlood2::PlayerPosition&);
+    bool Update(bool external_camera, const OpenBlood2::MovementInput&, float yaw, double seconds, bool can_move,
+                bool firing = false, float pitch = 0);
+    OpenBlood2::PlayerMove WritePositionInfo(DVector destination, DVector velocity) const;
+    OpenBlood2::ClientMotionState& body;
     bool ready() const
     {
         return movement_.valid() && configured_ && positioned_;

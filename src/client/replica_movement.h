@@ -40,6 +40,18 @@ namespace OpenBlood2
         // Called once per real client frame, separately from capped physics time.
         // Original 0.14 s countdown, first-frame publication, no catch-up burst.
         bool report(double seconds, std::optional<ReplicaMoveReport>&);
+        struct Prediction
+        {
+            ClientMovement state;
+            PlayerControls controls;
+            DBYTE surface = 0;
+        };
+        Prediction prediction() const
+        {
+            return {state, controls_, surface_};
+        }
+        bool restore_prediction(const Prediction&);
+        bool stance(int character, float eye_level, bool crouched);
 
       private:
         const ClientCollisionWorld& collision_;

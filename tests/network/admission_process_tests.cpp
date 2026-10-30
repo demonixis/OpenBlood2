@@ -1,3 +1,4 @@
+#include "client/network_movement.h"
 #include "client/network_world.h"
 #include "client/object_scene.h"
 #include "engine/resources.h"
@@ -29,7 +30,7 @@ using Clock = std::chrono::steady_clock;
     } while (false)
 namespace
 {
-    bool client(const char* port_text, const char* data, bool observer)
+    bool client(const char* port_text, const char* data, bool observer, bool drive)
     {
         std::string error;
         unsigned port = 0;
@@ -44,6 +45,12 @@ namespace
         World loaded;
         NetworkWorldReceiver receiver;
         const auto& replica = receiver.world();
+        NetworkMovement movement(receiver.collision());
+        std::optional<MovementSetup> pending_setup;
+        Clock::time_point next_step;
+        unsigned moves_sent = 0;
+        bool displaced = false;
+        DVector initial_position;
         std::optional<BaselineReceiver> baseline;
         WorldSnapshot snapshot;
         ObjectId own_object;
@@ -67,9 +74,33 @@ namespace
         bool hello = false, ready = false, joined = false, leaving = false, assembled = false, replicated = false;
         while (Clock::now() < deadline)
         {
+            if (drive && !leaving && movement.ready() && Clock::now() >= next_step)
+            {
+                MovementInput input;
+                input.forward = true;
+                std::optional<MovementReport> report;
+                CHECK(movement.update(input, 0, 0, 1. / 60, true, false, false, report, error));
+                next_step += std::chrono::duration_cast<Clock::duration>(std::chrono::duration<double>(1. / 60));
+                const auto delta = vector_subtract(movement.movement().body.position, initial_position);
+                displaced |= vector_dot(delta, delta) > 1;
+                if (report)
+                {
+                    std::vector<std::uint8_t> bytes;
+                    CHECK(encode_movement(*report, bytes) && transport.send(peer, Channel::State, bytes, error));
+                    ++moves_sent;
+                }
+            }
             if (joined && replicated && !leaving && Clock::now() >= leave_at)
             {
                 CHECK(states_received && (!observer || (saw_arrival && saw_departure)));
+                if (drive)
+                {
+                    CHECK(movement.ready() && displaced && moves_sent >= 4 && movement.corrections >= 3);
+                    std::cout << "Predicted movement: reports=" << moves_sent
+                              << ", corrections=" << movement.corrections << ", replayed_frames=" << movement.replays
+                              << ", substeps=" << movement.manager().substeps << "\n"
+                              << std::flush;
+                }
                 if (observer)
                     std::cout << "Observed remote player creation and departure\n" << std::flush;
                 CHECK(transport.disconnect(peer, 0));
@@ -92,10 +123,20 @@ namespace
                 if (is_movement_packet(event.bytes))
                 {
                     MovementMessage message;
-                    CHECK(event.channel == Channel::Control &&
-                          decode_movement(event.bytes, message) == DecodeMovement::Ok);
-                    const auto* setup = std::get_if<MovementSetup>(&message);
-                    CHECK(setup && joined && setup->owner.world == world && setup->owner.object == own_object);
+                    CHECK(decode_movement(event.bytes, message) == DecodeMovement::Ok);
+                    if (const auto* setup = std::get_if<MovementSetup>(&message))
+                    {
+                        CHECK(event.channel == Channel::Control && joined && setup->owner.world == world &&
+                              setup->owner.object == own_object);
+                        if (drive)
+                            pending_setup = *setup;
+                    }
+                    else
+                    {
+                        const auto* ack = std::get_if<MovementAck>(&message);
+                        CHECK(drive && event.channel == Channel::State && ack);
+                        CHECK(movement.receive(*ack, error) != NetworkMovement::Reception::Refused);
+                    }
                 }
                 else if (event.channel == Channel::State)
                 {
@@ -169,6 +210,7 @@ namespace
                         CHECK(ready && !joined && accepted->world == world);
                         joined = true;
                         own_object = accepted->object;
+                        CHECK(movement.begin(*accepted));
                     }
                     else if (const auto* pulse = std::get_if<Heartbeat>(&message))
                     {
@@ -194,6 +236,19 @@ namespace
                               << " model entries in world " << world
                               << " after independent hash, DAT and model decode\n"
                               << std::flush;
+                }
+                if (pending_setup && replicated)
+                {
+                    const bool first = !movement.ready();
+                    const auto result = movement.receive(*pending_setup, error);
+                    CHECK(result != NetworkMovement::Reception::Refused);
+                    if (result != NetworkMovement::Reception::Deferred)
+                        pending_setup.reset();
+                    if (first && movement.ready())
+                    {
+                        next_step = Clock::now();
+                        initial_position = movement.movement().body.position;
+                    }
                 }
             }
         }
@@ -232,7 +287,7 @@ namespace
             return SDL_GetIOStatus(stream) != SDL_IO_STATUS_ERROR;
         }
     };
-    bool parent(const char* self, const char* server, const char* data)
+    bool parent(const char* self, const char* server, const char* data, bool drive)
     {
         std::string error;
         Process host;
@@ -280,7 +335,9 @@ namespace
                 }
                 CHECK(clients[0].output.find("Replicated ") != std::string::npos);
             }
-            const char* child_args[]{self, "--peer", port.c_str(), data, i ? "visitor" : "observer", nullptr};
+            const char* child_args[]{
+                self,   "--peer", port.c_str(), data, i ? "visitor" : "observer", drive ? "movement" : "passive",
+                nullptr};
             clients[i].handle = SDL_CreateProcess(child_args, true);
             error = SDL_GetError();
             CHECK(clients[i].handle);
@@ -317,7 +374,10 @@ namespace
 } // namespace
 int main(int argc, char** argv)
 {
-    if (argc == 5 && std::string_view(argv[1]) == "--peer")
-        return client(argv[2], argv[3], std::string_view(argv[4]) == "observer") ? 0 : 1;
-    return argc == 3 && parent(argv[0], argv[1], argv[2]) ? 0 : 1;
+    if (argc == 6 && std::string_view(argv[1]) == "--peer")
+        return client(argv[2], argv[3], std::string_view(argv[4]) == "observer",
+                      std::string_view(argv[5]) == "movement")
+                   ? 0
+                   : 1;
+    return (argc == 3 || argc == 4) && parent(argv[0], argv[1], argv[2], argc == 4) ? 0 : 1;
 }

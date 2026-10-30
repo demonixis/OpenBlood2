@@ -37,6 +37,17 @@ namespace
 } // namespace
 using namespace OpenBlood2;
 
+CMoveMgrCheckpoint CMoveMgr::checkpoint() const
+{
+    return {static_cast<const CMoveMgrValues&>(*this), input_, configured_, positioned_};
+}
+void CMoveMgr::restore(const CMoveMgrCheckpoint& state)
+{
+    static_cast<CMoveMgrValues&>(*this) = state.values;
+    input_ = state.input;
+    configured_ = state.configured;
+    positioned_ = state.positioned;
+}
 void CMoveMgr::Term()
 {
     movement_.clear();

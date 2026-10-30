@@ -156,6 +156,30 @@ namespace OpenBlood2
         nearest.departed = departed;
         return result;
     }
+    CollisionQuery ClientCollisionWorld::resize(ClientObjectId owner, const ClientMotionState& input, DVector size,
+                                                ClientMotionState& out) const
+    {
+        const auto* object = get(owner.object);
+        if (owner.world != frame_.world || !object || object->attached || object->shape || object->dynamic ||
+            (object->type != OT_MODEL && object->type != OT_NORMAL) || !dimensions(size) ||
+            !dimensions(input.dimensions) || !physics_vector(input.position) || !physics_vector(input.velocity) ||
+            !physics_vector(input.acceleration))
+            return CollisionQuery::Invalid;
+        auto next = input;
+        next.position.y += size.y - input.dimensions.y;
+        next.dimensions = size;
+        const auto skin = head_skin(object->flags, size.y);
+        auto center = next.position;
+        center.y -= skin;
+        ClientCollisionHit hit;
+        const auto query = sweep(owner, center, center, {size.x, size.y - skin, size.z}, hit);
+        if (query != CollisionQuery::Miss)
+            return query;
+        if (!support(owner, next))
+            return CollisionQuery::Invalid;
+        out = next;
+        return CollisionQuery::Miss;
+    }
     bool ClientCollisionWorld::support(ClientObjectId owner, ClientMotionState& state) const
     {
         const auto* object = get(owner.object);
