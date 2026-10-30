@@ -13,6 +13,7 @@ namespace OpenBlood2
     ServerSession::~ServerSession()
     {
         clear_players();
+        game_.server.remote_event_sink = {};
     }
     bool ServerSession::start(const Config& config, std::string_view name, unsigned mode, std::string& error)
     {
@@ -62,6 +63,8 @@ namespace OpenBlood2
             return false;
         }
         mode_ = mode;
+        game_.server.remote_event_sink = [this](HCLIENT client, const PlayerEvent& event)
+        { return capture_event(client, event); };
         started_ = true;
         return true;
     }
@@ -80,6 +83,11 @@ namespace OpenBlood2
             error = "No available original client connection";
             return false;
         }
+        const auto connection = next_player_++;
+        Player connected{};
+        connected.id = connection;
+        connected.client = client;
+        players_.push_back(std::move(connected));
         PlayerInit init;
         init.name = profile.name;
         init.character = profile.character;
@@ -105,15 +113,11 @@ namespace OpenBlood2
             game_.server_shell.OnClientExitWorld(client);
             game_.objects.finish_frame();
             game_.server.disconnect_client(client);
+            players_.pop_back();
             return false;
         }
         const auto id = record->id;
-        const auto connection = next_player_++;
-        Player connected{};
-        connected.id = connection;
-        connected.client = client;
-        connected.object = id;
-        players_.push_back(std::move(connected));
+        players_.back().object = id;
         joined = {world_id_, connection, id};
         return true;
     }

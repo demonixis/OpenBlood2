@@ -244,6 +244,9 @@ namespace OpenBlood2
         bool ReadImmobilize(HMESSAGEREAD, float& seconds) override;
         DRESULT WriteDamage(HMESSAGEWRITE, const Damage&) override;
         bool ReadDamage(HMESSAGEREAD, Damage&) override;
+        // Optional dedicated/host endpoint. Capture pointer-bearing events at
+        // emission, before deferred destruction can retire their checked IDs.
+        std::function<DRESULT(HCLIENT, const PlayerEvent&)> remote_event_sink;
         HCLIENT connect_client();
         bool disconnect_client(HCLIENT);
         bool take_client_events(HCLIENT, std::vector<PlayerEvent>&);
@@ -471,6 +474,7 @@ namespace OpenBlood2
         std::unordered_map<HCLIENT, Client> clients_;
         std::map<std::string, ::ConsoleVariable, CaseLess> variables_{{"GAME_DIFFICULTY", {"1"}},
                                                                       {"GAME_GAMETYPE", {"0"}}};
+        DRESULT broadcast_client_event(const PlayerEvent&);
         void initialize_model_services();
         void initialize_physics_services();
         bool movement_state(const ObjectRecord&, MovementState&);

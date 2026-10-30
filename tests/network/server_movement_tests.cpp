@@ -78,15 +78,16 @@ namespace
         for (unsigned i = 0; i < 35; ++i)
             CHECK(session.tick(error));
         CHECK(session.movement_holds > 0 && near(object->velocity, {}));
-        // Inject original force messages and drain their local queue in this
-        // fixture only. A full byte wrap must never admit the previous revision.
+        // Inject original force messages; their movement setup subsumes the
+        // legacy payload without growing the private event queue. A full byte wrap must never admit the previous
+        // revision.
         auto* player = dynamic_cast<CPlayerObj*>(object->game.get());
         CHECK(player);
         auto& adapter = const_cast<ServerAdapter&>(session.game().server);
-        std::vector<PlayerEvent> events;
+        std::vector<Net::PrivateEvent> events;
         for (unsigned i = 0; i < 256; ++i)
         {
-            CHECK(adapter.take_client_events(player->GetClient(), events));
+            CHECK(session.take_private_events(joined.player, events, error));
             CHECK(player->TeleportClientToServerPos());
         }
         CHECK(player->m_byClientMoveCode == setup.code);

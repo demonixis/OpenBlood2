@@ -139,6 +139,8 @@ namespace OpenBlood2
             event);
         if (!valid)
             return DE_INVALIDPARAMS;
+        if (remote_event_sink)
+            return remote_event_sink(client, event);
         auto& events = clients_.at(client).events;
         if (events.size() >= 256)
             return DE_ERROR;
@@ -151,13 +153,24 @@ namespace OpenBlood2
             return DE_ERROR;
         if (!std::isfinite(value.fraction))
             return DE_INVALIDPARAMS;
+        return broadcast_client_event(value);
+    }
+    DRESULT ServerAdapter::broadcast_client_event(const PlayerEvent& value)
+    {
+        bool any = false;
+        DRESULT result = DE_OK;
         for (const auto& [client, state] : clients_)
         {
             (void)state;
-            if (GetClientUserData(client))
-                return SendToClient(client, value);
+            if (!GetClientUserData(client))
+                continue;
+            any = true;
+            const auto sent = SendToClient(client, value);
+            // A saturated recipient must not suppress delivery to other players.
+            if (result == DE_OK && sent != DE_OK)
+                result = sent;
         }
-        return DE_NOTFOUND;
+        return any ? result : DE_NOTFOUND;
     }
     bool ServerAdapter::take_client_events(HCLIENT client, std::vector<PlayerEvent>& events)
     {

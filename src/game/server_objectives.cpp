@@ -5,26 +5,14 @@ namespace OpenBlood2
     {
         if (!trace_service("SendConversation"))
             return DE_ERROR;
-        for (const auto& [client, state] : clients_)
-        {
-            (void)state;
-            if (GetClientUserData(client))
-                return SendToClient(client, value);
-        }
-        return DE_NOTFOUND;
+        return broadcast_client_event(value);
     }
     DRESULT ServerAdapter::SendObjectives(const MissionObjectives& value)
     {
         if (!trace_service("SendObjectives"))
             return DE_ERROR;
-        // Original null-client broadcast, bounded to the supported local client.
-        for (const auto& [client, state] : clients_)
-        {
-            (void)state;
-            if (GetClientUserData(client))
-                return SendToClient(client, value);
-        }
-        return DE_NOTFOUND;
+        // Original null-client broadcast reaches every associated player.
+        return broadcast_client_event(value);
     }
     void ServerAdapter::load_client_strings()
     {

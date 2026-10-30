@@ -813,3 +813,25 @@ Defer corrections embedded in current collision without consuming the ACK,
 including corrections with no later frame to replay. Keep unavailable-owner
 setup deferred and invalid values refused. The separate-process loopback test
 is actual movement transport, not interactive gameplay or degraded combat.
+
+
+## Reliable private player events
+
+The [private event continuation](../implementation/reports/m9_private_events.md)
+uses protocol 7, 20 pointer-free tags and a 2,048-byte packet bound on reliable
+Control. Capture pointer-bearing Eye/Orb/creature/CTF identities synchronously at
+server emission, before deferred destruction retires their checked handles.
+Never serialize an address or resolve a retired handle by dereferencing it.
+
+Preserve per-player order, owner/world/object generation, increasing sequence and
+source tick, with 256-event queues on each side and the existing transport byte
+budget. Refuse malformed values, sequence gaps and overflow explicitly. Duplicate
+or other-owner events cannot update the HUD or repeat ITEMF_SHOWITEMS. Consumers
+must drain the bounded client inbox; received audio/camera events are not yet a
+claim of completed remote playback/selection.
+
+Admission subsumes PlayerInitRequest; reliable movement setup subsumes legacy
+physics/force messages. Do not repeat those operations from this event channel.
+Preserve original one-recipient Bloodbath startup and all-recipient null-client
+conversation/objective/boss-health broadcasts; attempt remaining recipients after
+one failure. Keep the solo event path, RNG, logical audio and mode filters intact.

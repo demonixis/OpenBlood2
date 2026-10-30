@@ -1,3 +1,4 @@
+#include "client/network_player_events.h"
 #include "client/network_world.h"
 #include "game/game_settings.h"
 #include "server/network.h"
@@ -26,6 +27,7 @@ namespace
         SpriteStore sprites{resources};
         World geometry;
         std::array<NetworkWorldReceiver, 16> replicas;
+        std::array<NetworkPlayerEvents, 16> inboxes;
         std::array<std::optional<BaselineReceiver>, 16> receivers;
         std::array<Transport, 16> clients;
         std::array<PeerId, 16> peers{};
@@ -132,6 +134,7 @@ namespace
                     CHECK(decode_admission(event.bytes, message) == DecodeAdmission::Ok);
                     CHECK(!accepted && std::holds_alternative<Joined>(message));
                     joined[index] = std::get<Joined>(message);
+                    CHECK(inboxes[index].begin(joined[index]));
                     accepted = true;
                 }
             }
@@ -156,6 +159,16 @@ namespace
         bool update(unsigned index, const Event& event)
         {
             CHECK(event.kind == EventKind::Received);
+            if (is_private_packet(event.bytes))
+            {
+                PrivateEvent message;
+                CHECK(event.channel == Channel::Control && decode_private(event.bytes, message) == DecodePrivate::Ok);
+                CHECK(inboxes[index].receive(message, error) == NetworkPlayerEvents::Reception::Applied);
+                std::vector<PrivateEvent> delivered;
+                inboxes[index].take(delivered);
+                CHECK(delivered.size() == 1 && delivered.front().owner == joined[index]);
+                return true;
+            }
             if (is_movement_packet(event.bytes))
             {
                 MovementMessage message;
@@ -394,6 +407,8 @@ namespace
         for (unsigned i = 0; i < 10; ++i)
             CHECK(progress());
         CHECK(f.movement_setups[0].sequence && f.movement_setups[1].sequence);
+        CHECK(f.inboxes[0].sequence() && f.inboxes[1].sequence());
+        CHECK(f.inboxes[0].hud().stats.health > 0 && f.inboxes[1].hud().stats.health > 0);
         const auto* first = f.session.game().objects.get(f.joined[0].object);
         const auto* second = f.session.game().objects.get(f.joined[1].object);
         CHECK(first && second);

@@ -240,6 +240,22 @@ namespace OpenBlood2
                     continue;
                 }
                 peer.movement_setup = setup.sequence;
+                std::vector<Net::PrivateEvent> events;
+                bool sent = session_.take_private_events(peer.player, events, error);
+                for (const auto& event : events)
+                {
+                    if (!sent)
+                        break;
+                    std::vector<std::uint8_t> bytes;
+                    sent = Net::encode_private(event, bytes) &&
+                           transport_.send(peer.peer, Net::Channel::Control, bytes, error);
+                }
+                if (!sent)
+                {
+                    if (!remove(i, std::uint32_t(Net::Reject::Capacity), true, error))
+                        return false;
+                    continue;
+                }
             }
             if (peer.phase == Phase::Joined && now >= peer.heartbeat)
             {

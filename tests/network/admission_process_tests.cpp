@@ -1,4 +1,5 @@
 #include "client/network_movement.h"
+#include "client/network_player_events.h"
 #include "client/network_world.h"
 #include "client/object_scene.h"
 #include "engine/resources.h"
@@ -46,6 +47,8 @@ namespace
         NetworkWorldReceiver receiver;
         const auto& replica = receiver.world();
         NetworkMovement movement(receiver.collision());
+        NetworkPlayerEvents inbox;
+        unsigned startup_announcements = 0;
         std::optional<MovementSetup> pending_setup;
         Clock::time_point next_step;
         unsigned moves_sent = 0;
@@ -93,6 +96,10 @@ namespace
             if (joined && replicated && !leaving && Clock::now() >= leave_at)
             {
                 CHECK(states_received && (!observer || (saw_arrival && saw_departure)));
+                CHECK(inbox.sequence() && inbox.hud().stats.health > 0 && startup_announcements == 1);
+                std::cout << "Private events=" << inbox.sequence() << ", health=" << inbox.hud().stats.health
+                          << ", startup_announcements=" << startup_announcements << "\n"
+                          << std::flush;
                 if (drive)
                 {
                     CHECK(movement.ready() && displaced && moves_sent >= 4 && movement.corrections >= 3);
@@ -120,7 +127,18 @@ namespace
             }
             else
             {
-                if (is_movement_packet(event.bytes))
+                if (is_private_packet(event.bytes))
+                {
+                    PrivateEvent message;
+                    CHECK(event.channel == Channel::Control &&
+                          decode_private(event.bytes, message) == DecodePrivate::Ok);
+                    CHECK(inbox.receive(message, error) == NetworkPlayerEvents::Reception::Applied);
+                    std::vector<PrivateEvent> delivered;
+                    inbox.take(delivered);
+                    for (const auto& value : delivered)
+                        startup_announcements += std::holds_alternative<BloodbathStart>(value.value);
+                }
+                else if (is_movement_packet(event.bytes))
                 {
                     MovementMessage message;
                     CHECK(decode_movement(event.bytes, message) == DecodeMovement::Ok);
@@ -210,7 +228,7 @@ namespace
                         CHECK(ready && !joined && accepted->world == world);
                         joined = true;
                         own_object = accepted->object;
-                        CHECK(movement.begin(*accepted));
+                        CHECK(movement.begin(*accepted) && inbox.begin(*accepted));
                     }
                     else if (const auto* pulse = std::get_if<Heartbeat>(&message))
                     {

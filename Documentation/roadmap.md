@@ -312,7 +312,9 @@ against replica collision and prepares original-cadence reports without server l
 private setup/report/ACK values and checked server velocity advancement without double integration.
 [Client correction](implementation/reports/m9_movement_client.md) now applies private setup/ACKs,
 replays bounded CMoveMgr history and drives two independent ENet client processes.
-**Complete private events/commands, full client separation, Team profiles and playable network gameplay remain pending.**
+[Private player events](implementation/reports/m9_private_events.md) now reach bounded client inboxes;
+HUD/items apply independently and original null-client broadcasts reach every player.
+**Remaining private presentation consumers/commands, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client
 shell runs its own movement (CMoveMgr) and effects. The engine copies object
