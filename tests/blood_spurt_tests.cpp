@@ -101,7 +101,8 @@ namespace
                 ++played;
             }
         }
-        CHECK(absent > 0 && played > 0 && g.server.audio.voices().size() == played);
+        CHECK(absent > 0 && played > 0 && g.client_session.audio.mixer.voices().size() == played &&
+              g.server.audio.voices().empty());
         CHECK(effects.advance(1.0, g.server) && effects.advance(1.8, g.server) && effects.advance(2.101, g.server) &&
               effects.active.empty());
         unsigned retained = 0;

@@ -107,7 +107,9 @@ namespace
             CHECK(!g.server.IsObjectAlive(smoke));
             std::cout << type << " burned: particles=" << peak << " smoke start=" << smoke_start
                       << " independent corpse complete\n";
-            CHECK(g.unload_world() && g.server.audio.voices().empty() && g.objects.attachments().empty());
+            CHECK(g.unload_world() &&
+                  (g.server.audio.voices().empty() && g.client_session.audio.mixer.voices().empty()) &&
+                  g.objects.attachments().empty());
         }
         return true;
     }
@@ -147,13 +149,14 @@ namespace
                 impacts += f.impacts;
             }
             CHECK(impacts > 0);
-            CHECK(g.server.audio.voices().empty());
+            CHECK((g.server.audio.voices().empty() && g.client_session.audio.mixer.voices().empty()));
             for (int i = 0; i < 100; ++i)
                 CHECK(step(g, .02));
             unsigned settled_impacts = 0;
             for (const auto& f : g.server.flesh_gibs.active)
                 settled_impacts += f.impacts;
-            CHECK(settled_impacts == impacts && g.server.audio.voices().empty());
+            CHECK(settled_impacts == impacts &&
+                  (g.server.audio.voices().empty() && g.client_session.audio.mixer.voices().empty()));
             const auto id = g.server.flesh_gibs.active.back().id;
             std::string error;
             CHECK(!g.server.PublishFleshGibs(nullptr, {}, {}, {1, 1, 1}, 1, 2, error) && !error.empty());
@@ -293,7 +296,8 @@ namespace
             CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()) &&
                   g.server.object_particles.active.empty());
             CHECK(g.advance_audio(.01, {}, {}));
-            CHECK(g.unload_world() && g.server.audio.voices().empty());
+            CHECK(g.unload_world() &&
+                  (g.server.audio.voices().empty() && g.client_session.audio.mixer.voices().empty()));
         }
         return true;
     }

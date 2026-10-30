@@ -252,6 +252,7 @@ namespace OpenBlood2
         HOBJECT GetClientUserData(HCLIENT) override;
         DRESULT SetClientUserData(HCLIENT, HOBJECT) override;
         const Resources* client_resources = nullptr;
+        ClientAudio* client_audio = nullptr; // Immediate local cosmetic publication only.
         StringResources client_strings;
         std::string client_strings_error;
         bool client_strings_attempted = false;
@@ -682,6 +683,7 @@ namespace OpenBlood2
             server.collision = &collision;
             server.visibility = &visibility;
             server.client_resources = &resources;
+            server.client_audio = &client_session.audio;
             server.ai_paths = &server_shell.paths;
             server.session_shell = &server_shell;
             return server.bind() && register_original_classes(objects);

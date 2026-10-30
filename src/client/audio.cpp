@@ -6,6 +6,45 @@
 #include <set>
 namespace OpenBlood2
 {
+    SoundId ClientAudio::play_effect(const Resources& resources, const SoundParameters& parameters, DVector position,
+                                     std::string& error)
+    {
+        error.clear();
+        // Independent of server allocations, and never reused after a world/session reset.
+        static SoundId next_effect = client_sound_id_begin;
+        AudioVoice voice;
+        SoundRequest request;
+        static_cast<SoundParameters&>(request) = parameters;
+        if (!frame_.world)
+            error = "Client cosmetic sound has no world";
+        else if (parameters.loop || parameters.streaming || parameters.space != SoundSpace::Spatial)
+            error = "Client sound requires a buffered spatial one-shot";
+        else if (mixer.voices_.size() >= 128 || next_effect == std::numeric_limits<SoundId>::max())
+            error = "Client cosmetic sound capacity exhausted";
+        else if (!mixer.prepare_voice(resources, request, position, voice, error))
+        {
+            ++effects_failed;
+            return 0;
+        }
+        if (!error.empty())
+        {
+            ++effects_failed;
+            return 0;
+        }
+        const auto id = next_effect++;
+        voice.id = id;
+        voice.world_owned = voice.auto_remove = true;
+        mixer.voices_.emplace(id, std::move(voice));
+        ++effects_started;
+        return id;
+    }
+    bool ClientAudio::advance(double seconds, DVector listener, DRotation rotation)
+    {
+        const bool ok = mixer.advance(seconds, listener, rotation);
+        std::erase_if(mixer.voices_, [](const auto& pair)
+                      { return pair.first >= client_sound_id_begin && pair.second.auto_remove && pair.second.done; });
+        return ok;
+    }
     const ClientSound* ClientAudio::descriptor(SoundId id) const
     {
         const auto found = std::find_if(frame_.sounds.begin(), frame_.sounds.end(),
@@ -20,6 +59,7 @@ namespace OpenBlood2
         frame_ = {};
         frame_.world = world;
         high_id_ = 0;
+        effects_started = effects_failed = effects_displaced = 0;
         return true;
     }
     bool ClientAudio::receive(ClientAudioFrame&& next, const Resources& resources, std::string& error)
@@ -38,7 +78,7 @@ namespace OpenBlood2
         // Validate identities and immutable descriptor values before loading any new resources.
         for (const auto& sound : next.sounds)
         {
-            if (!sound.id || sound.id == std::numeric_limits<SoundId>::max() || !ids.insert(sound.id).second ||
+            if (!sound.id || sound.id >= client_sound_id_begin || !ids.insert(sound.id).second ||
                 !identity(sound.owner) || !identity(sound.speaker) || !physics_vector(sound.position) ||
                 !std::isfinite(sound.cursor) || sound.cursor < 0 || !sound.frames ||
                 sound.frames > 128u * 1024 * 1024 || sound.cursor > double(sound.frames) || sound.rate < 8000 ||
@@ -86,7 +126,16 @@ namespace OpenBlood2
                 prepared.emplace(sound.id, std::move(voice));
             }
         // Admission is atomic for voices/frame identity. Existing voice addresses stay stable.
-        std::erase_if(mixer.voices_, [&](const auto& pair) { return !ids.contains(pair.first); });
+        std::erase_if(mixer.voices_, [&](const auto& pair)
+                      { return pair.first < client_sound_id_begin && !ids.contains(pair.first); });
+        // A local cosmetic burst cannot prevent admission of authoritative logical audio.
+        // Keep the existing 128-voice mixer bound; displace the oldest local one-shots first.
+        auto excess = mixer.voices_.size() + prepared.size() > 128 ? mixer.voices_.size() + prepared.size() - 128 : 0;
+        for (auto it = mixer.voices_.lower_bound(client_sound_id_begin); excess && it != mixer.voices_.end(); --excess)
+        {
+            it = mixer.voices_.erase(it);
+            ++effects_displaced;
+        }
         mixer.voices_.merge(prepared);
         for (const auto& sound : next.sounds)
         {

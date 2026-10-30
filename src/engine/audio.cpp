@@ -273,7 +273,7 @@ namespace OpenBlood2
                                 DVector position, std::string& error)
     {
         error.clear();
-        if (voices_.size() >= 128 || !next_sound || next_sound == std::numeric_limits<SoundId>::max())
+        if (voices_.size() >= 128 || !next_sound || next_sound >= client_sound_id_begin)
         {
             error = "Invalid or over-limit sound request";
             return 0;

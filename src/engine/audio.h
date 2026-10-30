@@ -9,6 +9,8 @@ namespace OpenBlood2
 {
     class PcmStream;
     using SoundId = std::uint64_t;
+    // Replicated logical sounds and client-only cosmetic sounds have disjoint identities.
+    inline constexpr SoundId client_sound_id_begin = SoundId{1} << 63;
     struct AudioClip
     {
         unsigned rate = 0, channels = 0, encoding = 0;

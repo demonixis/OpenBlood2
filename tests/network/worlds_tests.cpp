@@ -28,6 +28,12 @@ int main(int argc, char** argv)
         bool ok = session.start(config, path, ctf ? GAMETYPE_CTF : GAMETYPE_BLOODBATH, error);
         for (unsigned tick = 0; ok && tick < 180; ++tick)
             ok = session.tick(error);
+        if (ok && (session.game().server.client_audio ||
+                   !session.game().client_session.audio.mixer.voices().empty()))
+        {
+            error = "Dedicated session retained a cosmetic audio receiver/voice";
+            ok = false;
+        }
         passed += ok;
         std::cout << (ok ? "PASS " : "FAIL ") << path << " zero clients / 180 ticks";
         if (!ok)

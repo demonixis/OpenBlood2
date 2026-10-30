@@ -1,0 +1,53 @@
+{
+  "scope": "Client cosmetic impact playback, independent of server logical audio",
+  "baseline": "70379d4a",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "70379d4a",
+      "path": "src/engine/audio.cpp",
+      "sha256": "f97cdfcb7e0cb7adac8694b5431595b94fe31e43feee044c5033755aa34b7662"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "70379d4a",
+      "path": "src/client/audio.cpp",
+      "sha256": "70ede0ef3bc9b03c906f2e9cb26ea4737aa356b6b598ef0c409939340cd949c0"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "70379d4a",
+      "path": "src/game/server_audio.cpp",
+      "sha256": "f51e22ff4269710afd1e81d5e24c881ec2ff22e61b11f9d8a9a3a4345c98fb11"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "70379d4a",
+      "path": "src/game/local_audio.cpp",
+      "sha256": "7e0d60495a76fa6487e392dca0ee20a3e45fdf5337aba485c4fd149367fbcc06"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "70379d4a",
+      "path": "src/game/flesh_gibs.cpp",
+      "sha256": "5bc87d057c1016966de6469f5f2afd1d3b66629d4b65f40abb9b4113e1904721"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "70379d4a",
+      "path": "src/game/shotgun_effects.cpp",
+      "sha256": "f9022081f8f0a7ffbf8da0ca79b3264d1b644be1d8ec92fd74e2f39c4c6d997e"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "70379d4a",
+      "path": "src/game/original/ParticleExplosionFX.cpp",
+      "sha256": "e7077cbfc8ef8fab2ef5fc683530965c3aab1e8e1f755d2abc1b20bdb7162e67"
+    }
+  ],
+  "adaptations": [
+    "Partition logical and client cosmetic SoundId namespaces; preserve existing sample math and source requests.",
+    "Keep the 128-voice mixer bound; displace oldest local cosmetic voices when logical descriptors require capacity.",
+    "Dedicated ServerSession has no cosmetic audio receiver. Immediate local publishers remain transitional."
+  ]
+}

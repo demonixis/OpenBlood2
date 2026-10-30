@@ -47,7 +47,7 @@ namespace OpenBlood2
         server.prepare_audio();
         std::string error;
         const bool published = publish_client_audio(error);
-        const bool played = published && client_session.audio.mixer.advance(seconds, listener, rotation);
+        const bool played = published && client_session.audio.advance(seconds, listener, rotation);
         const bool simulated = server.advance_prepared_audio(seconds);
         const bool synchronized = publish_client_audio(error);
         if (!error.empty())

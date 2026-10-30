@@ -30,7 +30,7 @@ namespace
         // Finite floor, ceiling and wall, with no ordinary objects involved.
         world.points = {{-4000, 0, -4000},   {4000, 0, -4000},   {4000, 0, 4000},   {-4000, 0, 4000},
                         {-4000, 200, -4000}, {4000, 200, -4000}, {4000, 200, 4000}, {-4000, 200, 4000},
-                        {200, 0, -4000},    {200, 200, -4000},  {200, 200, 4000},  {200, 0, 4000}};
+                        {200, 0, -4000},     {200, 200, -4000},  {200, 200, 4000},  {200, 0, 4000}};
         for (auto& point : world.points)
             point = vector_add(point, origin);
         world.surfaces.resize(1);
@@ -93,7 +93,7 @@ namespace
             CHECK(fragment(g, vector_add(origin, {0, 100, 0}), {20, -10, 0}));
             CHECK(g.server.flesh_gibs.advance(.01, g.server));
             const auto& moving = g.server.flesh_gibs.active.front();
-            CHECK(moving.impacts == 0 && moving.splat_event == 0 && g.server.audio.voices().empty() &&
+            CHECK(moving.impacts == 0 && moving.splat_event == 0 && g.client_session.audio.mixer.voices().empty() &&
                   g.server.blood_splats.active.empty());
             CHECK(near(moving.position.x, origin.x + .2f) && near(moving.position.y, origin.y + 99.9f));
             g.server.flesh_gibs.clear();
@@ -102,24 +102,26 @@ namespace
             const auto& wall = g.server.flesh_gibs.active.front();
             CHECK(wall.impacts == 1 && !wall.resting && near(wall.position.x, origin.x + 199.7f) &&
                   wall.velocity.x < 0 && wall.error.empty() && wall.sound_error.empty() && wall.splat_event);
-            CHECK(g.server.audio.voices().size() == 1 && g.server.blood_splats.active.size() == 1);
+            CHECK(g.client_session.audio.mixer.voices().size() == 1 && g.server.blood_splats.active.size() == 1);
             g.server.flesh_gibs.clear();
-            g.server.audio.clear();
+            g.client_session.audio.mixer.clear();
             g.server.blood_splats.clear();
             CHECK(fragment(g, vector_add(origin, {0, 1, 0}), {0, -200, 0}));
             CHECK(g.server.flesh_gibs.advance(.01, g.server));
             const auto& floor = g.server.flesh_gibs.active.front();
             CHECK(floor.impacts == 1 && floor.resting && near(floor.position.y, origin.y + .3f) &&
                   floor.error.empty() && floor.sound_error.empty() && floor.splat_event);
-            CHECK(g.server.audio.voices().size() == 1);
-            const auto sound = g.server.audio.voices().begin()->first;
-            CHECK(!g.server.audio.get(sound)->request.loop && g.server.audio.get(sound)->auto_remove);
+            CHECK(g.client_session.audio.mixer.voices().size() == 1);
+            const auto sound = g.client_session.audio.mixer.voices().begin()->first;
+            CHECK(sound >= client_sound_id_begin && g.server.audio.voices().empty());
+            CHECK(!g.client_session.audio.mixer.get(sound)->request.loop &&
+                  g.client_session.audio.mixer.get(sound)->auto_remove);
             for (unsigned frame = 2; frame <= 201; ++frame)
             {
                 CHECK(g.server.flesh_gibs.advance(frame * .01, g.server));
                 CHECK(g.advance_audio(.01, origin, {}));
             }
-            CHECK(floor.impacts == 1 && g.server.audio.voices().empty() &&
+            CHECK(floor.impacts == 1 && g.client_session.audio.mixer.voices().empty() &&
                   g.server.blood_splats.active.size() == 1);
         }
         return true;
@@ -137,10 +139,11 @@ namespace
             CHECK(g.advance_audio(.01, {}, {}));
         }
         const auto& f = g.server.flesh_gibs.active.front();
-        std::cout << "Falling fragment: impacts=" << f.impacts << ", voices=" << g.server.audio.voices().size()
+        std::cout << "Falling fragment: impacts=" << f.impacts
+                  << ", voices=" << g.client_session.audio.mixer.voices().size()
                   << ", splats=" << g.server.blood_splats.active.size() << '\n';
-        CHECK(f.impacts == 0 && f.position.y < 100 && f.position.y > 90 && g.server.audio.voices().empty() &&
-              g.server.blood_splats.active.empty());
+        CHECK(f.impacts == 0 && f.position.y < 100 && f.position.y > 90 &&
+              g.client_session.audio.mixer.voices().empty() && g.server.blood_splats.active.empty());
         return true;
     }
     bool particles(const std::filesystem::path& root)
@@ -158,7 +161,7 @@ namespace
             CHECK(distant.CreateObject(settings, g.resources, g.server, 0, random, error));
             CHECK(distant.Update(.01, .01, g.server, random, 16384));
             CHECK(distant.impacts == 0 && distant.emitting && distant.splat_event == 0 &&
-                  g.server.audio.voices().empty() && g.server.blood_splats.active.empty());
+                  g.client_session.audio.mixer.voices().empty() && g.server.blood_splats.active.empty());
             CHECK(near(distant.position.y, origin.y + 99.9f));
             settings.position = vector_add(origin, {0, 1, 0});
             settings.min_velocity = settings.max_velocity = {0, -200, 0};
@@ -166,13 +169,13 @@ namespace
             CHECK(floor.CreateObject(settings, g.resources, g.server, 0, random, error));
             CHECK(floor.Update(.01, .01, g.server, random, 16384));
             CHECK(floor.impacts == 1 && !floor.emitting && floor.splat_event && floor.sound_error.empty() &&
-                  near(floor.position.y, origin.y + .3f) && g.server.audio.voices().size() == 1);
+                  near(floor.position.y, origin.y + .3f) && g.client_session.audio.mixer.voices().size() == 1);
             for (unsigned frame = 2; frame <= 101; ++frame)
             {
                 CHECK(floor.Update(frame * .01, .01, g.server, random, 16384));
                 CHECK(g.advance_audio(.01, origin, {}));
             }
-            CHECK(floor.impacts == 1 && g.server.audio.voices().empty() &&
+            CHECK(floor.impacts == 1 && g.client_session.audio.mixer.voices().empty() &&
                   g.server.blood_splats.active.size() == 1);
         }
         return true;
@@ -186,7 +189,7 @@ int main(int argc, char** argv)
     return (mode == "query"       ? query(argv[2])
             : mode == "fragments" ? fragments(argv[2])
             : mode == "ceiling"   ? ceiling(argv[2])
-                                   : mode == "particles" && particles(argv[2]))
+                                  : mode == "particles" && particles(argv[2]))
                ? 0
                : 1;
 }

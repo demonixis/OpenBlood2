@@ -437,3 +437,24 @@ gates, missing-owner removal, warp child/ramp rules and light phase/visibility.
 Restore rollback and duplicate-publication checks resolve the same identities.
 Moving cosmetic collision/audio and flashlight services remain a separate step;
 this boundary is not a network codec or late-join implementation.
+
+## Client cosmetic sound ownership
+
+The [effect audio continuation](../implementation/reports/m9_effect_audio.md) routes
+fragment, blood-drop and casing impacts to ClientAudio. They are buffered spatial
+one-shots with no server owner or speaker; their completion and removal belong to
+the client. They never consume logical voice capacity, sound IDs or server clocks.
+The dedicated explicitly has no local cosmetic receiver, including during immediate
+effect creation. Absence or resource failure remains an inspectable cosmetic error.
+
+Logical IDs use the lower 63 bits; local cosmetics use the upper namespace, never
+reused across worlds. Replicated descriptors cannot claim cosmetic IDs. Accepted
+frames preserve cosmetic cursors while replacing logical membership. Keep the
+128-voice mixer bound; logical admission displaces the oldest local one-shots when
+necessary. Expose started, refused and displaced counts. Invalid frames cannot
+displace voices. Original request selection, attenuation, interpolation, sample
+stepping and separate cosmetic RNG remain unchanged. Mixed ordering is logical
+voices followed by cosmetic voices; arbitrary interleaved historical sums are not
+claimed bit-identical. Movement integration, server completion and save payloads
+are unchanged. The legacy effect publisher still forwards locally; remote events
+and the remaining moving-effect services are separate work.

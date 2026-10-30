@@ -137,7 +137,8 @@ namespace
         f.velocity = {0, -100, 0};
         CHECK(fx.advance(.02, g.server));
         CHECK(f.impacts == 1 && f.bounces == 0 && !f.resting && f.sound_error.empty());
-        CHECK(g.server.audio.voices().size() == 1 && g.server.blood_splats.active.empty());
+        CHECK(g.client_session.audio.mixer.voices().size() == 1 && g.server.audio.voices().empty() &&
+              g.server.blood_splats.active.empty());
         for (int i = 3; i < 100; ++i)
         {
             CHECK(fx.advance(i * .01, g.server));

@@ -28,6 +28,9 @@ namespace OpenBlood2
             error = "Cannot bind original server objects";
             return false;
         }
+        // No local presentation receiver in a dedicated process. Immediate effect
+        // creation can request impact sounds before the client-only update phase.
+        game_.server.client_audio = nullptr;
         if (!game_.resources.mount_game(config, error) ||
             !Net::content_fingerprint(game_.resources, fingerprint_, error) || !game_.load_request(request, error))
             return false;

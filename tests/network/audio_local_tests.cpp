@@ -58,6 +58,11 @@ namespace
               g.server.audio.get(world));
         CHECK(g.server.KillSound(world) && g.advance_audio(0, {}, {}));
         CHECK(!g.client_session.audio.mixer.get(world));
+        g.server.client_audio = nullptr; // Dedicated-style absence of a presentation receiver.
+        r = {};
+        r.resource = "cue.wav";
+        CHECK(!g.server.PlayClientSound(r, {}, error) && !error.empty());
+        CHECK(g.server.audio.voices().empty() && g.client_session.audio.mixer.voices().empty());
         CHECK(g.unload_world());
         copy = frame;
         CHECK(!g.client_session.audio.receive(std::move(copy), g.resources, error));

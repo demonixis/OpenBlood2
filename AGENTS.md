@@ -46,6 +46,11 @@ now updates particles, streams, PolyGrids, WarpGates and CLightFX from ClientWor
 Keep world/object generation checks, creation-time attachment refresh, original
 visibility/emission rules and checked restore cleanup. Remaining moving FX and
 flashlight collision, cosmetic audio and child publications still need extraction.
+The [cosmetic effect audio continuation](Documentation/implementation/reports/m9_effect_audio.md)
+now plays fragment, blood-drop and casing impacts in ClientAudio only. Keep separate
+sound identities, source requests/sample math, local completion, bounded voice
+admission and logical-voice priority. The dedicated has no cosmetic receiver.
+Moving effect queries and child publications remain to extract.
 Preserve solo clocks, source pickup rules,
 immutable GPU references, existing PBR work and independent M2-GPU-001/M3 gates.
 

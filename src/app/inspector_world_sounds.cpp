@@ -1111,6 +1111,10 @@ namespace OpenBlood2
             ImGui::TreePop();
         }
         const auto& audio = game.client_session.audio.mixer;
+        const auto& playback = game.client_session.audio;
+        ImGui::Text("Client cosmetic sounds: %llu started / %llu refused / %llu displaced by logical audio",
+                    (unsigned long long)playback.effects_started, (unsigned long long)playback.effects_failed,
+                    (unsigned long long)playback.effects_displaced);
         ImGui::TextWrapped("Original Sound starts an unattached loop and removes its source object. "
                            "Playback belongs to this world until unload. No activation commands are added.");
         ImGui::Text("Output: %s | cached %.2f MiB | submitted %llu frames | dropped %llu",

@@ -25,6 +25,9 @@ namespace OpenBlood2
       public:
         bool begin(std::uint64_t world);
         bool receive(ClientAudioFrame&&, const Resources&, std::string& error);
+        SoundId play_effect(const Resources&, const SoundParameters&, DVector, std::string& error);
+        bool advance(double seconds, DVector listener, DRotation rotation);
+        std::uint64_t effects_started = 0, effects_failed = 0, effects_displaced = 0;
         const ClientAudioFrame& frame() const
         {
             return frame_;

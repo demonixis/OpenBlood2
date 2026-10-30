@@ -279,7 +279,9 @@ the [runtime continuation](implementation/reports/m9_effect_queries.md) now owns
 original pools on the client and makes fragment collision updates independent.
 [Owner-bound effects](implementation/reports/m9_effect_owners.md) now update from
 world-qualified ClientWorld identities and copied owner values. Remaining moving
-FX collision/audio, child publication and flashlight services still use the immediate local adapter.
+FX collision, child publication and flashlight services still use the immediate local adapter.
+[Cosmetic impact audio](implementation/reports/m9_effect_audio.md) now plays only on the client,
+without consuming server voices or sound identities.
 **Full client separation, player
 admission and network gameplay remain pending.**
 
