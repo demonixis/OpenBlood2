@@ -96,22 +96,25 @@ namespace OpenBlood2
         crouched = player->crouched;
         return true;
     }
-    bool LocalMovement::environment(CBloodServerShell& shell, ContainerState& state, int& character)
+    bool LocalMovement::environment(CBloodServerShell& shell, ClientContainerState& state, int& character)
     {
         auto* player = valid() ? shell.Player(connection_) : nullptr;
-        if (!player || !player->UpdateContainerState())
+        if (!player || !publish_collision())
             return false;
-        state = player->containers;
+        auto head = client_.movement.body.position;
+        head.y += player->eye_level;
         character = player->m_nCharacter;
-        return true;
+        return client_.collision.environment(client_.movement.owner, client_.movement.body, head, state);
     }
-    bool LocalMovement::finish(CBloodServerShell& shell, float seconds, ContainerState& state)
+    bool LocalMovement::finish(CBloodServerShell& shell, float seconds, ClientContainerState& state)
     {
-        auto* player = valid() ? shell.Player(connection_) : nullptr;
-        if (!player || !player->UpdateAirLevel(seconds))
+        // Capture membership before the authoritative air/damage update, which
+        // can change the player's life. Client queries never run gameplay callbacks.
+        int character = 0;
+        if (!environment(shell, state, character))
             return false;
-        state = player->containers;
-        return true;
+        auto* player = shell.Player(connection_);
+        return player && player->UpdateAirLevel(seconds);
     }
     bool LocalMovement::jump_voice(CVoiceMgr& voices, int character, bool external_camera)
     {
@@ -164,6 +167,12 @@ namespace OpenBlood2
             value.dynamic = object->world_body || object->model_body;
             value.pushable = object->body_properties.pushable;
             value.priority = object->blocking_priority;
+            if (value.container)
+            {
+                ContainerInfo info;
+                if (container_info(*object, info))
+                    value.environment = {info.code, info.current, info.gravity, info.viscosity, info.hidden};
+            }
             if (const auto* eye = dynamic_cast<const SeeingEye*>(object->game.get()); eye && !eye->dropped)
                 if (const auto* owner = objects_.get(eye->m_hFiredFrom); owner && owner->life == Life::Alive)
                     value.ignored_by = owner->id;

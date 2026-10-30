@@ -265,6 +265,9 @@ feeds object presentation from `ClientWorld`. The [local movement lot](implement
 adds a separate CMoveMgr body, callback-free prediction and immediate server correction
 without double integration. Its [collision replica](implementation/reports/m9_client_collision.md)
 now owns primary/posed geometry and collider snapshots for independent prediction.
+The [environment replica](implementation/reports/m9_client_environment.md) supplies
+liquid/ladder/conveyor membership without server callbacks; solo CMoveMgr math and
+authoritative air/damage remain unchanged.
 **Full client separation, player
 admission and network gameplay remain pending.**
 

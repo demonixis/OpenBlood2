@@ -15,7 +15,11 @@ and pushes, world/object/force identities and solo substep ordering. The
 [client collision lot](Documentation/implementation/reports/m9_client_collision.md)
 now predicts against owned geometry and collider snapshots, independently of the
 server registry. Preserve copied geometry lifetime, atomic membership, source
-collision arithmetic and exactly-once authoritative contacts. Environment, FX,
+collision arithmetic and exactly-once authoritative contacts. The
+[client environment lot](Documentation/implementation/reports/m9_client_environment.md)
+now derives liquid/ladder/conveyor membership from copied shapes and values.
+Preserve four-entry slot order, hidden/zero-code head masking, source CMoveMgr math
+and server-only air/damage; client queries never run volume callbacks. FX,
 camera/HUD/audio extraction, admission and network gameplay remain pending.
 Preserve solo clocks, source pickup rules,
 immutable GPU references, existing PBR work and independent M2-GPU-001/M3 gates.

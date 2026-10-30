@@ -26,7 +26,7 @@ class CMoveMgr
     SurfaceType m_eLastSurface = SURFTYPE_UNKNOWN;
     bool m_bOnGround = false, m_bLastJumpCommand = false, m_bFalling = false;
     bool m_bForcedCrouch = false;
-    OpenBlood2::ContainerState containers;
+    OpenBlood2::ClientContainerState containers;
     bool m_bBodyInLiquid = false, m_bBodyOnLadder = false, m_bBodyOnConveyor = false, m_bSwimmingOnSurface = false;
     bool m_bCanSwimJump = false, m_bSwimmingJump = false, m_bUseGravity = true;
     ContainerCode m_eLastContainerCode = CC_NOTHING;
@@ -45,9 +45,9 @@ class CMoveMgr
     void UpdateControlFlags(const OpenBlood2::MovementInput&, bool);
     void UpdateOnGround();
     void UpdateMotion(float yaw, float pitch, CVoiceMgr&, int character, bool external_camera);
-    void UpdateInLiquid(const OpenBlood2::ContainerInfo&);
-    void UpdateOnLadder(const OpenBlood2::ContainerInfo&);
-    void UpdateOnConveyor(const OpenBlood2::ContainerInfo&);
+    void UpdateInLiquid(const OpenBlood2::ClientContainerInfo&);
+    void UpdateOnLadder(const OpenBlood2::ClientContainerInfo&);
+    void UpdateOnConveyor(const OpenBlood2::ClientContainerInfo&);
     bool MoveLocalSolidObject(CBloodServerShell&);
     OpenBlood2::LocalMovement& movement_;
     bool configured_ = false, positioned_ = false;

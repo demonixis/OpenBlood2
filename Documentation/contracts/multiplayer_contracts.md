@@ -245,3 +245,46 @@ services. Environment, stance and audio exchanges remain local original services
 this lot does not replicate volume rules, resize decisions, camera rays or weapon
 rays. Network delivery, geometry resource admission and delayed multiplayer timing
 remain pending. See [verification](../implementation/reports/m9_client_collision.md).
+
+## Client environment replica
+
+The local collision frame now also carries optional `ContainerEnvironment` values
+(code, current, gravity, viscosity and Hidden) for recognized containers. Geometry
+and values are admitted atomically with the existing world/sequence/object checks.
+Non-finite values, invalid current vectors or viscosity outside 0..1 reject the
+whole frame. A built-in Container retains its full unsigned 16-bit code, including
+zero and otherwise inert unknown values, and zero current/gravity/viscosity.
+Absence of environment metadata means an unrecognized container, not code zero.
+The publisher shares the authoritative value extractor with `GetContainers`.
+
+`ClientCollisionWorld::environment` derives body and head membership solely from
+copied geometry and values. It takes a world-qualified player ID, a client body and
+a head point. Results contain generation-qualified IDs, never original handles.
+Volumes retain registry slot order, including hidden/inactive entries; every body
+overlap counts, only the first four are returned. The first head overlap wins even
+if hidden or code zero. Hidden masks its head code without losing the volume ID or
+properties. Shapes already contain the world pose; DAT translation is not applied
+again. Concave membership uses the existing exact container geometry routines.
+
+CMoveMgr owns `ClientContainerState`; its liquid, ladder and conveyor algorithms
+change only their argument types. Hidden-first category consumption, previous-step
+swim/ladder speeds, additive currents, surface-swim gates and FreeFall classification
+are unchanged. No client viscosity rule is invented. Client queries never execute
+`MID_AFFECTPHYSICS`, damage, air, callbacks, RNG or time integration.
+
+The immediate bridge publishes fresh frames before environment queries and before
+collision predictions; immutable shape copies are reused. It supplies character and
+eye-offset values from the local player. Final client membership is sampled before
+`UpdateAirLevel`, which still refreshes authoritative membership and applies air /
+suffocation once per capped frame. Landing keeps its own authoritative query.
+Server volume physics and damage are unchanged; their intentional conveyor/Hidden
+and grounded-character differences from CMoveMgr remain intact. No server membership
+list is copied to CMoveMgr. One integration and immediate collision correction remain.
+
+The Containers inspector identifies client membership alongside authoritative air,
+health, volume callbacks and membership counters. This is still local transport;
+full snapshots are published synchronously, and geometry allocation is cached, not
+network-encoded. Stance, profile/eye offsets, camera/fog/weapon point queries and
+other presentation exchanges remain local services. This lot neither adds delayed
+multiplayer timing nor qualifies network play. See the
+[environment verification](../implementation/reports/m9_client_environment.md).

@@ -2763,8 +2763,11 @@ namespace OpenBlood2
             "Space: up/jump | Ctrl: down/crouch | Shift: faster | Arrows: look. Hidden volumes stay listed.");
         if (player)
         {
-            const auto& state = player->containers;
             const auto& move = game.client_shell.move_mgr;
+            const auto& state = move.containers;
+            ImGui::Text("Client environment frame %llu | server body %zu / %zu, head %u",
+                        static_cast<unsigned long long>(game.client_session.collision.frame().sequence),
+                        player->containers.count, player->containers.total, unsigned(player->containers.head.code));
             ImGui::Text("Air %.1f / 100 | head code %u", player->m_fAirLevel, unsigned(state.head.code));
             ImGui::Text("Body %zu / %zu | liquid %s | ladder %s | conveyor %s | gravity %s", state.count, state.total,
                         move.m_bBodyInLiquid ? "yes" : "no", move.m_bBodyOnLadder ? "yes" : "no",
@@ -2779,7 +2782,7 @@ namespace OpenBlood2
             {
                 for (std::size_t i = 0; i < state.count; ++i)
                     if (const auto* r = game.objects.get(state.body[i].object))
-                        ImGui::TextDisabled("Body[%zu] %s / code %u / %s", i, r->state.m_Name,
+                        ImGui::TextDisabled("Client body[%zu] %s / code %u / %s", i, r->state.m_Name,
                                             unsigned(state.body[i].code), state.body[i].hidden ? "hidden" : "active");
                 auto position = game.client_shell.position;
                 float coordinates[]{position.x, position.y, position.z};

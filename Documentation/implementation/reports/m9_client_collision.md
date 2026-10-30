@@ -70,3 +70,7 @@ These are Linux reconstruction checks with synthetic and external retail data,
 not retail-engine trajectory equivalence, whole-campaign acceptance, multiplayer
 qualification or cross-platform proof. No save layout, gameplay random draw,
 shader, material rule or PBR resource was changed.
+
+The following [environment lot](m9_client_environment.md) extends this owned scene
+with passive container descriptors and client body/head queries. Its verification
+is separate from the historical results above.

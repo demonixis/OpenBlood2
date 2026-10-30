@@ -1,5 +1,12 @@
 # Source and Dependency Provenance
 
+The M9 client environment lot reuses the existing posed container geometry and
+source membership order; CMoveMgr's numeric movement rules are unchanged. Server
+metadata extraction is shared with the publisher, and the client has a handle-free
+membership result. See the [source ledger](sources/m9_client_environment_sources.json),
+[contract](../contracts/multiplayer_contracts.md#client-environment-replica) and
+[report](reports/m9_client_environment.md). No new dependency or save payload.
+
 ## M9 client collision replica
 
 `ClientCollisionWorld` and the local geometry/collider publisher are project-owned

@@ -147,3 +147,12 @@ Retail 03_Museum (44) and 05_CDM (1, `officepool`) author code 0.
 
 The separately requested [Minefield continuation](minefield_contracts.md) supersedes
 the Minefield omission above; other historical omissions keep their stated scope.
+
+## M9 local client membership
+
+The [client environment replica](multiplayer_contracts.md#client-environment-replica)
+now supplies CMoveMgr's body/head overlaps from independently owned shapes and
+value descriptors. Its four-entry cap, hidden/zero-code first head, slot order and
+source movement arithmetic remain unchanged. Server air, landing and damage keep
+authoritative queries; client queries cannot execute volume rules. See
+[verification](../implementation/reports/m9_client_environment.md).

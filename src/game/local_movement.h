@@ -31,8 +31,8 @@ namespace OpenBlood2
         bool synchronize();
         bool force_position(const PlayerPosition&);
         bool controls(CBloodServerShell&, const PlayerControls&, bool send, bool& crouched);
-        bool environment(CBloodServerShell&, ContainerState&, int& character);
-        bool finish(CBloodServerShell&, float seconds, ContainerState&);
+        bool environment(CBloodServerShell&, ClientContainerState&, int& character);
+        bool finish(CBloodServerShell&, float seconds, ClientContainerState&);
         bool jump_voice(CVoiceMgr&, int character, bool external_camera);
         bool publish_collision();
         std::string collision_error;

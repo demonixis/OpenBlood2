@@ -7,25 +7,22 @@
 
 namespace OpenBlood2
 {
-    namespace
+    // VolumeBrush supplies its full info. The engine's built-in Container has only its
+    // code: the original player sends zero gravity/current and Hidden false for it.
+    bool container_info(const ObjectRecord& r, ContainerInfo& info)
     {
-        // VolumeBrush supplies its full info. The engine's built-in Container has only its
-        // code: the original player sends zero gravity/current and Hidden false for it.
-        bool container_info(const ObjectRecord& r, ContainerInfo& info)
+        if (const auto* brush = dynamic_cast<const VolumeBrush*>(r.game.get()))
         {
-            if (const auto* brush = dynamic_cast<const VolumeBrush*>(r.game.get()))
-            {
-                info = brush->info;
-                return true;
-            }
-            if (const auto* container = dynamic_cast<const BuiltinContainer*>(r.game.get()))
-            {
-                info = {r.handle, static_cast<ContainerCode>(container->code), {}, 0, 0, false};
-                return true;
-            }
-            return false;
+            info = brush->info;
+            return true;
         }
-    } // namespace
+        if (const auto* container = dynamic_cast<const BuiltinContainer*>(r.game.get()))
+        {
+            info = {r.handle, static_cast<ContainerCode>(container->code), {}, 0, 0, false};
+            return true;
+        }
+        return false;
+    }
     bool ServerAdapter::GetPointContainerCode(DVector point, ContainerCode& code, bool visible_only)
     {
         trace_service("GetPointContainerCode");

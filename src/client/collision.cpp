@@ -67,6 +67,17 @@ namespace OpenBlood2
                     error = "Invalid client collider geometry";
                     break;
                 }
+                if (object.environment)
+                {
+                    const auto& environment = *object.environment;
+                    if (!object.container || !object.shape || !physics_vector(environment.current) ||
+                        !std::isfinite(environment.gravity) || !std::isfinite(environment.viscosity) ||
+                        environment.viscosity < 0 || environment.viscosity > 1)
+                    {
+                        error = "Invalid client container environment";
+                        break;
+                    }
+                }
                 previous = object.id;
             }
         }

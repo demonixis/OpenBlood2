@@ -119,7 +119,7 @@ void CMoveMgr::UpdateOnGround()
         body.velocity = {0, -magnitude(body.velocity), 0};
     }
 }
-void CMoveMgr::UpdateInLiquid(const ContainerInfo& info)
+void CMoveMgr::UpdateInLiquid(const ClientContainerInfo& info)
 {
     if (info.hidden || (!IsLiquid(containers.head.code) && m_bOnGround))
         return;
@@ -140,7 +140,7 @@ void CMoveMgr::UpdateInLiquid(const ContainerInfo& info)
     else
         body.acceleration.y += info.gravity;
 }
-void CMoveMgr::UpdateOnLadder(const ContainerInfo& info)
+void CMoveMgr::UpdateOnLadder(const ClientContainerInfo& info)
 {
     if (info.hidden)
         return;
@@ -150,7 +150,7 @@ void CMoveMgr::UpdateOnLadder(const ContainerInfo& info)
         body.velocity = vector_scale(body.velocity, std::max(0.0f, speed - m_FrameTime * (m_fLadderVel / .2f)) / speed);
     m_bUseGravity = false;
 }
-void CMoveMgr::UpdateOnConveyor(const ContainerInfo& info)
+void CMoveMgr::UpdateOnConveyor(const ClientContainerInfo& info)
 {
     if (info.hidden)
         return;

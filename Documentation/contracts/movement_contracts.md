@@ -169,3 +169,9 @@ superseded only for this boundary; dedicated mover/body/projectile forces, retai
 physics parity and the M2 gate remain open.
 
 The [player damage-impulse continuation](player_impulse_contracts.md) now enables original damage velocity for the shared player body. Self hits remain excluded, ordinary drag/caps/collision consume the delta once, and original restoration clears motion. Earlier player-impulse omissions are superseded only for this boundary.
+
+The subsequent [M9 environment replica](multiplayer_contracts.md#client-environment-replica)
+replaces server-list copying with client geometry queries for liquid, ladder and
+conveyor movement. CMoveMgr changes only its container value types; frame caps,
+substeps and single integration remain unchanged. Authoritative air/damage and
+landing refresh membership independently.

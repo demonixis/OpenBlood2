@@ -1,0 +1,88 @@
+{
+  "scope": "M9 independent local client environment replica",
+  "baseline": "804e76ee",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "804e76ee",
+      "path": "src/game/server_containers.cpp",
+      "sha256": "90102e67e04ab686bf9629f10d04b5ca4feec7fec88205cc1cd7adf6f4c0d127"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "804e76ee",
+      "path": "src/game/original/MoveMgr.cpp",
+      "sha256": "f6897c6c95d4e0cc7b1294818fb067a45a8173d87fada616b649aed5794fab9f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "804e76ee",
+      "path": "src/game/original/PlayerContainers.cpp",
+      "sha256": "35f00eb3a1edd399ca956224934a1015e05d943ad9d968286e7a268e36f217d2"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "804e76ee",
+      "path": "src/game/original/PlayerLanding.cpp",
+      "sha256": "b2f4d95b255b4d6075b7e5197dfc90ec57fb76adf755f50483b80678548d9a75"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "804e76ee",
+      "path": "src/game/original/VolumeBrush.cpp",
+      "sha256": "cd65a69c5a8a7cc309b80506ca92e59fbbaabf73a2d97a203b3ed013262f1606"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "804e76ee",
+      "path": "src/game/original/engineobjects.cpp",
+      "sha256": "2333e3bdf1a91a664d3a3965f9d86b5434604ccee083badd580bf2d4e9acf585"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "804e76ee",
+      "path": "src/engine/container.cpp",
+      "sha256": "133c85eb8b830fc22c920639e947679a8f9e1fb4ef45a6c40d7edccf7754ddee"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/MoveMgr.cpp",
+      "sha256": "8b60f379f4e4733be7b80092e19e6daad36f53cf55cc0dc2c360187c0873452a"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/VolumeBrush.cpp",
+      "sha256": "ef2392f8e42f9f8185e94d0712a91c96c3a1dc89f5615ef00ff4f31bcfb6a94f"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Shared/ContainerCodes.h",
+      "sha256": "e06bd4c2b5a9a4b32c1883f9e3f59bb1ffe419d7eb4232a2a3f6570c400fce64"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "AppHeaders/engineobjects.c",
+      "sha256": "d728dd9128a5cbb7425dc8787605dc0b9e2fc7c3137cce42ec97c1a62c4f9876"
+    }
+  ],
+  "adaptations": [
+    "Optional pointer-free volume descriptors in atomic client collision frames",
+    "Shared authoritative descriptor extractor; independent client body/head geometry queries",
+    "CMoveMgr changes only container types; final membership precedes server air/damage",
+    "No new save fields, dependency, time integration or client gameplay callbacks"
+  ],
+  "remaining": [
+    "Network environment/geometry codec and delayed session timing",
+    "Stance, profile/eye offsets, camera/fog/weapon point queries and remaining presentation extraction"
+  ]
+}

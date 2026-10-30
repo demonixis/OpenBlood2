@@ -1,13 +1,16 @@
 #pragma once
-#include "client/movement.h"
+#include "client/environment.h"
 #include "engine/container.h"
 #include <memory>
+#include <optional>
 #include <vector>
 namespace OpenBlood2
 {
     struct ClientCollider
     {
         ObjectId id, ignored_by;
+        // Absence is distinct from a recognized built-in Container with code zero.
+        std::optional<ContainerEnvironment> environment;
         DVector position{}, dimensions{}, velocity{}, acceleration{};
         std::uint32_t flags = 0, user_flags = 0;
         std::uint16_t type = 0;
@@ -47,6 +50,7 @@ namespace OpenBlood2
         CollisionQuery sweep(ClientObjectId ignore, DVector from, DVector to, DVector half, ClientCollisionHit&,
                              ObjectId extra = {}, double allowed = 0, StartOverlap start = StartOverlap::Block) const;
         bool support(ClientObjectId owner, ClientMotionState&) const;
+        bool environment(ClientObjectId owner, const ClientMotionState&, DVector head, ClientContainerState&) const;
         // Destination/velocity have already been integrated by CMoveMgr.
         bool predict(ClientObjectId, const ClientMotionState&, DVector destination, DVector velocity,
                      DVector acceleration, ClientMotionState& result) const;
