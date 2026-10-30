@@ -4,6 +4,7 @@
 #include "camera_fixture.h"
 #include "game/original/VolumeBrush.h"
 #include "weapon_sprite_fixture.h"
+#include <algorithm>
 #include <limits>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \

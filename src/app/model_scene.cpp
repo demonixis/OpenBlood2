@@ -1,50 +1,21 @@
 #include "app/model_scene.h"
+#include "client/effect_scene.h"
 #include "client/object_scene.h"
 #include <algorithm>
 namespace OpenBlood2
 {
-    bool update_explosion_model_scene(const GameSession& game, ModelView& scene, std::string& error,
+    bool update_explosion_model_scene(GameSession& game, ModelView& scene, std::string& error,
                                       const ClientCameraView* view)
     {
+        return game.publish_client_world(error) &&
+               update_explosion_model_scene(game, game.client_session.effects, scene, error, view);
+    }
+    bool update_explosion_model_scene(const GameSession& game, const ClientEffects& effects, ModelView& scene,
+                                      std::string& error, const ClientCameraView* view)
+    {
         scene.begin_frame();
-        for (const auto& fx : game.server.explosion_models.active)
-        {
-            const bool visible = fx.scale.x > 0 && fx.scale.y > 0 && fx.scale.z > 0;
-            if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.settings.position, fx.rotation}, fx.scale, visible,
-                           false, {}, fx.model_path, game.resources, error, {}, fx.alpha, true))
-                return false;
-            scene.entries.back().client_effect = fx.id;
-        }
-        for (const auto& fx : game.server.explosion_fragments.active)
-        {
-            const auto scale = fx.settings.scale;
-            if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.position, fx.rotation}, scale,
-                           scale.x > 0 && scale.y > 0 && scale.z > 0, false, {}, fx.model_path, game.resources, error,
-                           {}, fx.alpha, true))
-                return false;
-            scene.entries.back().fragment_effect = fx.id;
-        }
-        for (const auto& fx : game.server.flesh_gibs.active)
-        {
-            if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale, true, false, {},
-                           fx.model_path, game.resources, error))
-                return false;
-        }
-        for (const auto& fx : game.server.destruction_debris.active)
-        {
-            if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale, true, false, {},
-                           fx.model_path, game.resources, error, {}, fx.alpha, true))
-                return false;
-            if (fx.alpha < 1)
-                scene.mark_translucent(scene.entries.size() - 1);
-        }
-        for (const auto& fx : game.server.laser_beams.active)
-        {
-            if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.position, fx.rotation}, fx.scale, fx.updates != 0,
-                           false, {}, "Original laser beam", game.resources, error, {}, fx.alpha, true))
-                return false;
-            scene.entries.back().laser_effect = fx.id;
-        }
+        if (!append_effect_models(effects, scene, false, game.resources, error))
+            return false;
         const auto& camera = view ? *view : game.client_shell.view;
         const auto forward = rotate_vector(camera.rotation, {0, 0, 1});
         auto depth = [&](const WorldDraw& d)
@@ -69,13 +40,8 @@ namespace OpenBlood2
         const auto& client = game.client_shell;
         if (!append_client_models(world, client.player_visible, scene, game.resources, error))
             return false;
-        for (const auto& fx : game.server.shotgun_effects.casings)
-        {
-            if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.position, fx.rotation},
-                           {fx.scale, fx.scale, fx.scale}, fx.visible, false, {}, fx.model_path, game.resources, error,
-                           {}, 1, true))
-                return false;
-        }
+        if (!append_effect_models(game.client_session.effects, scene, true, game.resources, error))
+            return false;
         for (const auto& weapon : client.weapons)
         {
             if (!weapon.model)

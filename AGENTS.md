@@ -30,6 +30,12 @@ Preserve sample clocks, source ownership and RNG, bounded pointer-free audio fra
 independent stream readers and output transfer. Device lead must never advance server
 completion. Legacy client FX/VoiceMgr entry points, remaining shell extraction,
 admission and network gameplay remain pending.
+The [client effects presentation lot](Documentation/implementation/reports/m9_client_effects.md)
+now feeds sprites/particles, models, marks, surfaces, tracers and lights/fog from
+owned client snapshots. Preserve render order, independent array/shape lifetime,
+per-eye fog/warp behavior and immutable GPU references. Legacy effect producers,
+updates and collision/audio queries still use the local game adapter; their
+runtime/event extraction remains separate from this presentation boundary.
 Preserve solo clocks, source pickup rules,
 immutable GPU references, existing PBR work and independent M2-GPU-001/M3 gates.
 

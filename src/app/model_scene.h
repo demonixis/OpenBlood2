@@ -17,8 +17,9 @@ namespace OpenBlood2
         float scale = 1;
     };
     // camera: the presentation camera when it differs from the game view (XR head).
-    bool update_explosion_model_scene(const GameSession&, ModelView&, std::string&,
-                                      const ClientCameraView* camera = nullptr);
+    bool update_explosion_model_scene(const GameSession&, const ClientEffects&, ModelView&, std::string&,
+                                      const ClientCameraView* = nullptr);
+    bool update_explosion_model_scene(GameSession&, ModelView&, std::string&, const ClientCameraView* camera = nullptr);
     // weapons: {left hand, right hand} cameras replacing the client's pitch/yaw/eye (XR).
     bool update_model_scene(GameSession&, ModelView&, std::string&,
                             const std::array<ViewWeaponCamera, 2>* weapons = nullptr);

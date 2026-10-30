@@ -827,6 +827,8 @@ namespace OpenBlood2
         ++world_revision;
         client_session.reset_local_world();
         audio_replica_error.clear();
+        local_effects.clear();
+        effects_replica_error.clear();
         world_path.clear();
         trace.clear();
         state = SessionState::Empty;
@@ -962,6 +964,7 @@ namespace OpenBlood2
         for (std::size_t i = frame_trace_begin; i < trace.size(); ++i)
             add("Session", trace[i]);
         add("Audio replica", audio_replica_error);
+        add("Effects replica", effects_replica_error);
         add("Audio output", client_session.audio.mixer.output_error);
         add("Music", client_session.audio.mixer.music_error);
         add("Explosion sprites", server.explosion_sprites.update_error);

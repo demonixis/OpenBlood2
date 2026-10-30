@@ -1,8 +1,8 @@
 #pragma once
-#include "engine/scene_effects.h"
+#include "client/effect_scene.h"
 namespace OpenBlood2
 {
     class GameSession;
-    // Read-only presentation snapshot; does not advance simulation, lights or particles.
-    SceneEffects gather_scene_effects(const GameSession&, DVector eye, DRotation view);
+    // Standalone local helper: publishes before invoking the independent client consumer.
+    SceneEffects gather_scene_effects(GameSession&, DVector eye, DRotation view);
 } // namespace OpenBlood2

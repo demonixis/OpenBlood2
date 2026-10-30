@@ -139,6 +139,8 @@ int main(int argc, char** argv)
               fx.Update(10, &pose, rng));
         pose.position.x = 50;
         CHECK(fx.Update(10.101, &pose, rng) && !fx.particles.empty());
+        // Direct fixture insertion supplies the identity normally allocated by the publisher.
+        fx.id = recipe;
         g.server.object_particles.active.push_back({owner, std::move(fx)});
         CHECK(update_explosion_model_scene(g, models, error) && update_sprite_scene(g, scene, error));
         for (const auto& entry : scene.entries)

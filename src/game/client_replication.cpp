@@ -85,6 +85,13 @@ namespace OpenBlood2
             frame.polygrids.push_back({fx.effect.id, identity(fx.owner)});
         for (const auto& fx : server.particle_streams.active)
             frame.particle_streams.push_back({fx.effect.id, identity(fx.owner)});
-        return client_session.receive(std::move(frame), error);
+        if (!client_session.receive(std::move(frame), error))
+            return false;
+        if (!local_effects.publish(*this, client_session.effects, effects_replica_error))
+        {
+            error = effects_replica_error;
+            return false;
+        }
+        return true;
     }
 } // namespace OpenBlood2

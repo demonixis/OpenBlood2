@@ -1,5 +1,12 @@
 # Source and Dependency Provenance
 
+The M9 [local effects presentation lot](reports/m9_client_effects.md) copies evaluated
+visual state at the existing publication boundary and extracts the unchanged scene
+consumption/fog arithmetic into independent client consumers. Legacy effect recipes,
+updates, collision/audio services and source RNGs remain unchanged. The
+[source ledger](sources/m9_client_effects_sources.json) distinguishes that boundary
+from the future remote-client event/runtime extraction.
+
 The M9 [local client audio lot](reports/m9_client_audio.md) extracts the existing
 WAV/voice/sample-clock kernel into server `AudioTimeline` and a client mixer,
 without reimplementing original sound callers or mixing arithmetic. Playback

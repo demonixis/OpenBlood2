@@ -12,6 +12,14 @@ namespace OpenBlood2
                            "implicit main light are separate pending systems.");
         ImGui::Text("%zu evaluated client lights / session time %.3f", game.server.light_effects.size(),
                     game.server.GetTime());
+        const auto& replica = game.client_session.effects.frame();
+        ImGui::Text("Client FX world %llu / frame %llu: %zu billboard groups / %zu models / %zu surfaces",
+                    static_cast<unsigned long long>(replica.world), static_cast<unsigned long long>(replica.sequence),
+                    replica.billboards.size(), replica.models.size(), replica.polygrids.size());
+        ImGui::Text("Fog shapes: %zu live / %llu copied", replica.volumes.size(),
+                    static_cast<unsigned long long>(game.local_effects.shape_copies));
+        if (!game.effects_replica_error.empty())
+            ImGui::TextWrapped("FX publication: %s", game.effects_replica_error.c_str());
         if (scene_effects)
         {
             ImGui::Text("Scene FX: %zu live lights / %zu per receiver", scene_effects->lights.size(),

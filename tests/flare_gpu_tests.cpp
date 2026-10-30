@@ -169,6 +169,8 @@ int main(int argc, char** argv)
             CHECK(fx.Update(0, &pose, random));
             pose.position.x = 0;
             CHECK(fx.Update(.02, &pose, random));
+            // This fixture bypasses ObjectParticles::publish, which normally assigns the identity.
+            fx.id = recipe;
             const auto expected = vector_add(fx.origin, fx.particles.front().position);
             game.server.object_particles.active.push_back({owner->m_hObject, std::move(fx)});
             CHECK(update_sprite_scene(game, scene, error, &camera));

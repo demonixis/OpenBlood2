@@ -1,0 +1,113 @@
+{
+  "scope": "M9 passive local visual-effects presentation replica",
+  "baseline": "a82b7855",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "a82b7855",
+      "path": "src/app/sprite_scene.cpp",
+      "sha256": "cf22cf7aa0e0e509f9d6c1a7837267008187b24f0f0fb9679bd97be36262c187"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a82b7855",
+      "path": "src/app/model_scene.cpp",
+      "sha256": "ba0635d45be9bd2b9a9a454b1fdc575266cf900acb4048677539cb0548b0c668"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a82b7855",
+      "path": "src/app/polygrid_scene.cpp",
+      "sha256": "f647223195d35b7ec287ef11f858f35e6de1d0b892370017278808472e6da645"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a82b7855",
+      "path": "src/app/scene_presenter.cpp",
+      "sha256": "e55e509b136614d1eb4f31adb2430a9c5ad863f89c5081e9d83fbccfda4b4e1f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a82b7855",
+      "path": "src/game/presentation_effects.cpp",
+      "sha256": "8b5b958f148a2bedec407dceaee246a878947170dc9d7be1cf375c7c518b6d6a"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a82b7855",
+      "path": "src/game/client_replication.cpp",
+      "sha256": "7363c8e541d52b8594bb54e014f5d34677b0b00c9b7d74ccb3afdd59e0929407"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a82b7855",
+      "path": "src/game/session.cpp",
+      "sha256": "98b497de7a83bdd4bf59365be87c8bd8b3c4d4378fb3d84741a4254bae33c827"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a82b7855",
+      "path": "src/client/world.cpp",
+      "sha256": "3331a76f411c5cf81892cc8a114aab82a0b6dd72c6a26772dddc9260c29b7adb"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a82b7855",
+      "path": "src/game/local_movement.cpp",
+      "sha256": "c4d323d0b5a25547a36e7f8a38dbda5cebf305c77655c9d70fd4520f0d0681ee"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/SFXMgr.cpp",
+      "sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ExplosionFX.cpp",
+      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/PolyGridFX.cpp",
+      "sha256": "d61ca839ab78861c585ed705694acf79b369f2339a1e210f83ab037794b35ea1"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ParticleStreamFX.cpp",
+      "sha256": "3ee43cbf08fda7abc3697cd9b6b8811f3fed9bde7bd82cd3af5d3556007404c0"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a82b7855",
+      "path": "src/game/original/Flashlight.cpp",
+      "sha256": "a54538d89744ee84830c2a832d4b32252daea878b1aff2db4368f0d5a089023f"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/FlashlightFX.cpp",
+      "sha256": "f623447fbe64461b421b404a88fb259cdc998e600f14121f350a32dc325192db"
+    }
+  ],
+  "adaptations": [
+    "Copy evaluated effect values at existing world-presentation publication; retain source update order and all original recipes",
+    "Client-owned particle/surface arrays and cached deep copies of posed fog volumes; immutable decoded models/sprites shared locally",
+    "Extract existing renderer consumption and per-eye fog arithmetic into engine-core-only client functions",
+    "Preserve billboard insertion around view-weapon muzzle, source family order, inspection tags and geometry/shader contracts"
+  ],
+  "remaining": [
+    "Legacy effect producers, their collision/audio queries and advancing runtime pools still use the local game adapter",
+    "Typed network effect events, remote simulation, late-join playback and separate effect resource resolution",
+    "View-weapon shell extraction; LAN and native multi-platform hardware qualification"
+  ]
+}

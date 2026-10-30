@@ -374,3 +374,35 @@ This is an immediate local boundary. The legacy client FX/VoiceMgr entry points,
 per-recipient sound delivery, wire codec, delayed synchronization and network
 qualification remain pending. Separate caches retain existing bounds and add local
 memory/CPU work; a server duration-only reader is not introduced.
+
+
+## Local client visual effects
+
+The [effects presentation lot](../implementation/reports/m9_client_effects.md)
+adds `ClientSession::effects`. `publish_client_world` also publishes complete,
+world-qualified effect values before scene consumers run. The standalone client
+consumers cover sprites/particles, models/casings, clipped marks, PolyGrids,
+tracers, flashlight/dynamic/projectile lights and per-eye world/volume fog. They retain no
+original object/effect instance or GPU resource. Particle/surface/mark data is
+copied; immutable model/sprite assets are shared locally, and posed fog volumes
+are deep-copied into a client-owned cache. Publication does not step any subsystem.
+
+Preserve effect family/creation order, muzzle insertion, whole-system blood/splash
+batching, visibility, per-entry diagnostics, mark clipping, source light flags and
+existing platform light budgets. The first containing volume still masks later
+ones even when hidden; visible fog-off volumes retain world fog. Unaligned negative
+warp sprites and fog orientation remain per-eye computations, including XR.
+
+Receivers refuse old worlds/sequences, backwards/invalid clocks, duplicate or invalid
+family-qualified IDs, invalid poses and excessive aggregate counts atomically.
+Unload clears the accepted frame and geometry cache; absent effects disappear on
+replacement. Retained frames remain usable after source teardown. This local frame
+is not an untrusted wire decoder; network asset resolution and full field validation
+remain ahead of network admission.
+
+The legacy producers, advancing pools and their collision/audio queries still run
+through the local game adapter. Their recipes, clocks, callback order and separate
+cosmetic RNGs are unchanged. Moving these runtimes to an independent remote client
+requires a later event/service boundary; this delivery separates every scene consumer
+without claiming that additional migration. Server logical audio, solo pause,
+CMoveMgr single integration and saved payloads are unchanged.

@@ -273,6 +273,9 @@ death/chase rays and HUD state/clock to client ownership, keeping server permiss
 The [local audio lot](implementation/reports/m9_client_audio.md) separates logical server
 voices from independent client playback, music, caches and SDL output. Device queue
 lead no longer changes authoritative sound completion.
+The [local effects presentation lot](implementation/reports/m9_client_effects.md)
+feeds every scene-effect consumer, including lights/fog, from owned client snapshots;
+legacy effect production/update services remain in the immediate local adapter.
 **Full client separation, player
 admission and network gameplay remain pending.**
 
@@ -280,8 +283,8 @@ Original model: the authoritative server runs the ObjectDLL objects. The client
 shell runs its own movement (CMoveMgr) and effects. The engine copies object
 state to every client. OpenBlood2 runs one session in one process with one
 client. Object presentation, movement geometry/environment, cameras, HUD and audio now use
-local client-owned replicas. Remaining FX, dynamic lights/fog and client-shell
-services still read server state directly. Typed client
+local client-owned replicas. Visual effects and lights/fog now use owned client presentation snapshots; their legacy
+production/update services and remaining client-shell services still use the local server adapter. Typed client
 messages still exist as in-process gameplay values only. The new ENet wrapper
 has no gameplay protocol connected to those values yet.
 

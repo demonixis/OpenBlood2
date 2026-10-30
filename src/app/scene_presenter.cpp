@@ -322,7 +322,7 @@ namespace OpenBlood2
         const auto& replica = game.client_session.world;
         ballistic_vertices.clear();
         const auto tracer_color = vector_scale(game.client_shell.SceneLightScale(), scene_fade);
-        for (const auto& tracer : game.server.shotgun_effects.tracers)
+        for (const auto& tracer : game.client_session.effects.frame().tracers)
             for (float offset : {0.f, .05f, -.05f})
             {
                 const auto center = vector_add(tracer.center, vector_scale(tracer.right, offset));
@@ -411,7 +411,8 @@ namespace OpenBlood2
             return fail("Model lighting");
         select_shadow_casters(game);
         model_renderer.per_pixel_lighting = per_pixel_lighting;
-        if (!update_explosion_model_scene(game, explosion_model_scene, error, camera_override ? &view : nullptr))
+        if (!update_explosion_model_scene(game, game.client_session.effects, explosion_model_scene, error,
+                                          camera_override ? &view : nullptr))
             return fail("Explosion model presentation");
         const auto models_done = SDL_GetTicksNS();
         if (!update_polygrid_scene(game, replica, polygrid_scene, error))
@@ -516,13 +517,13 @@ namespace OpenBlood2
             error = std::string(stage) + ": " + error;
             return false;
         };
-        const auto flashlight = game.client_shell.flashlight.Current(game.server);
-        effects = gather_scene_effects(game, eye, rotation);
+        const auto flashlight = game.client_session.effects.frame().flashlight;
+        effects = gather_scene_effects(game.client_session.effects, eye, rotation);
         // XR's fallback fade must also black out fog when no compositor fade layer exists.
         if (scene_fade != 1)
             for (unsigned channel = 0; channel < 3; ++channel)
                 effects.uniform.fog_color[channel] *= scene_fade;
-        const auto time = game.server.world_time();
+        const auto time = game.client_session.world.frame().time;
         const auto layer = target.layer;
         // Colour, then the post-processing glow/occlusion mask, depth copy (cleared to the
         // background depth) and reflection inputs; multisampled targets resolve at the end.

@@ -2,6 +2,7 @@
 #include "brush_fixture.h"
 #include "game/original/VolumeBrush.h"
 #include "weapon_sprite_fixture.h"
+#include <algorithm>
 #include <cmath>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \

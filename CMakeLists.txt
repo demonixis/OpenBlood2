@@ -73,7 +73,7 @@ add_library(blood2_game STATIC src/game/polygrids.cpp src/game/original/ScreenFa
     src/game/original/trigger_helpers.cpp
     src/game/original/session_load.cpp
     src/game/client_replication.cpp
-    src/game/local_movement.cpp src/game/local_presentation.cpp src/game/local_audio.cpp
+    src/game/local_movement.cpp src/game/local_presentation.cpp src/game/local_audio.cpp src/game/local_effects.cpp
     src/game/session.cpp
     src/game/world_validation.cpp
     src/game/player_restore.cpp
