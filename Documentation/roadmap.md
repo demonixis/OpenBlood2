@@ -304,7 +304,9 @@ rebuild object presentation with independently loaded client assets at admission
 replicates creations, metadata changes and removals after a checked baseline ACK.
 [Absolute poses at 20 Hz](implementation/reports/m9_world_state.md) now update
 independent client replicas with bounded interpolation and reliable teleport revisions.
-**Collision/environment and private-event delivery, full client separation, Team profiles and playable network gameplay remain pending.**
+[Wire collision/environment](implementation/reports/m9_collision_transport.md) now
+reconstructs client-owned geometry and volume properties from the admitted DAT.
+**Private player events and command delivery, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client
 shell runs its own movement (CMoveMgr) and effects. The engine copies object
@@ -314,8 +316,8 @@ local client-owned replicas. Visual effects and lights/fog now use owned client 
 production/update services and remaining client-shell services still use the local server adapter. Typed client
 messages still exist as in-process gameplay values only. The new ENet wrapper
 now delivers admission, the initial object frame and reliable membership changes.
-Absolute poses now use the State channel; collision/environment and private
-gameplay events remain to connect.
+Absolute poses and collision motion now use State; reliable membership carries
+volume properties. Private gameplay events and commands remain to connect.
 
 Original references are available. These include the multiplayer branches in
 PlayerObj, BloodServerShell, the pickups and B2BaseClass, as well as FlagObjects,

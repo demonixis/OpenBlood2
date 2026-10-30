@@ -137,6 +137,8 @@ namespace
             CHECK(snapshot.player == joined[index].object && snapshot.player_alive && !snapshot.objects.empty());
             CHECK(snapshot.time == session.game().server.world_time());
             CHECK(replicas[index].receive(snapshot, geometry, models, sprites, error));
+            CHECK(replicas[index].collision().get(joined[index].object));
+            CHECK(replicas[index].collision().frame().sequence == replicas[index].world().frame().sequence);
             if (acknowledge)
             {
                 CHECK(send(index, BaselineReady{snapshot.world, snapshot.sequence}));

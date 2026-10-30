@@ -1,5 +1,6 @@
 #include "net/admission.h"
 #include "net/codec.h"
+#include "net/collision_codec.h"
 #include "net/world_snapshot.h"
 #include <algorithm>
 
@@ -33,7 +34,8 @@ namespace OpenBlood2::Net
                    a.user_flags == b.user_flags && a.filename == b.filename && a.skin == b.skin &&
                    a.has_model == b.has_model && a.has_sprite == b.has_sprite && a.hidden_nodes == b.hidden_nodes &&
                    a.parent == b.parent && a.attached == b.attached && a.attachment_resolved == b.attachment_resolved &&
-                   a.world_model_index == b.world_model_index && a.world_model_bound == b.world_model_bound;
+                   a.world_model_index == b.world_model_index && a.world_model_bound == b.world_model_bound &&
+                   same_collision_metadata(a.collision, b.collision);
         }
         bool valid_patch(const WorldPatch& p)
         {

@@ -1,6 +1,7 @@
 #include "net/world_state.h"
 #include "net/admission.h"
 #include "net/codec.h"
+#include "net/collision_codec.h"
 #include "net/transport.h"
 #include <algorithm>
 
@@ -9,12 +10,12 @@ namespace OpenBlood2::Net
     namespace
     {
         constexpr std::uint32_t magic = 0x534d3242;
-        constexpr std::size_t header_bytes = 40, motion_bytes = 108;
+        constexpr std::size_t header_bytes = 40, motion_bytes = 156;
         static_assert(header_bytes + state_objects_per_packet * motion_bytes <= packet_limit(Channel::State));
         template <class T> ObjectMotion values(const T& object)
         {
-            return {object.id,    object.pose_revision, object.pose,      object.scale,
-                    object.color, object.alpha,         object.animation, object.sprite_track};
+            return {object.id,    object.pose_revision, object.pose,         object.scale,           object.color,
+                    object.alpha, object.animation,     object.sprite_track, object.collision.motion};
         }
         bool bounded(double value, double limit)
         {
@@ -57,6 +58,8 @@ namespace OpenBlood2::Net
         object.alpha = m.alpha;
         object.animation = m.animation;
         object.sprite_track = m.sprite_track;
+        if (object.collision.enabled)
+            object.collision.motion = m.collision;
     }
     bool valid_state(const WorldState& state)
     {
@@ -73,7 +76,8 @@ namespace OpenBlood2::Net
                 (previous && previous.slot >= m.id.slot) || !vector(m.pose.position) || !bounded(norm, 1.001) ||
                 norm < .999 || !vector(m.scale) || !vector(m.color) || !bounded(m.alpha, 1) || m.alpha < 0 ||
                 !bounded(m.animation.time, 1e12) || m.animation.time < 0 ||
-                !bounded(m.sprite_track.milliseconds, 1e12) || m.sprite_track.milliseconds < 0)
+                !bounded(m.sprite_track.milliseconds, 1e12) || m.sprite_track.milliseconds < 0 ||
+                !valid_collision_motion(m.collision))
                 return false;
             previous = m.id;
         }
@@ -111,6 +115,7 @@ namespace OpenBlood2::Net
             w.f64(m.sprite_track.milliseconds);
             w.u32(m.sprite_track.frame);
             w.u8(m.sprite_track.has_frame);
+            write_collision_motion(w, m.collision);
         }
         if (!w.good())
             return false;
@@ -154,6 +159,7 @@ namespace OpenBlood2::Net
             m.sprite_track.frame = r.u32();
             if (!read_bool(r, m.sprite_track.has_frame))
                 return false;
+            m.collision = read_collision_motion(r);
             state.objects.push_back(m);
         }
         if (!r.done() || !valid_state(state))

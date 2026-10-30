@@ -1,0 +1,73 @@
+{
+  "scope": "Collision/environment wire values and independent DAT reconstruction",
+  "baseline": "3a17ff8e",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "3a17ff8ea491b0f9509ddf67525aaad253d8c771",
+      "path": "src/game/local_movement.cpp",
+      "sha256": "c4d323d0b5a25547a36e7f8a38dbda5cebf305c77655c9d70fd4520f0d0681ee"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "3a17ff8ea491b0f9509ddf67525aaad253d8c771",
+      "path": "src/game/server_containers.cpp",
+      "sha256": "02cc4a6799f9ea0023d6fc25a6191055d3f2c73bd3ea5437fe7f928ecdb8c024"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "3a17ff8ea491b0f9509ddf67525aaad253d8c771",
+      "path": "src/engine/objects.cpp",
+      "sha256": "6f773cd17e4b0b40662bebf37d8bfc1c05abc3f88f4d0ddda5c9269a6d5c08ea"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "3a17ff8ea491b0f9509ddf67525aaad253d8c771",
+      "path": "src/game/server_rotation.cpp",
+      "sha256": "0efff3f5291fb352b35b0e5e3d1c2ebf3176034f151040f9778eeb77d8f794e5"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "3a17ff8ea491b0f9509ddf67525aaad253d8c771",
+      "path": "src/engine/container.cpp",
+      "sha256": "133c85eb8b830fc22c920639e947679a8f9e1fb4ef45a6c40d7edccf7754ddee"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "3a17ff8ea491b0f9509ddf67525aaad253d8c771",
+      "path": "src/client/collision.cpp",
+      "sha256": "7a084738b3e3ecc22727c16c37c497b5f7177411c36498a609bdc339205379f5"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "3a17ff8ea491b0f9509ddf67525aaad253d8c771",
+      "path": "src/client/environment.cpp",
+      "sha256": "f2c911dc7e39485521c0a5f5b1fa073d8cc8c729c02222febad0399962218d87"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "3a17ff8ea491b0f9509ddf67525aaad253d8c771",
+      "path": "src/client/segment.cpp",
+      "sha256": "f867c23211b7f67175cc7d7a56a8169625dccc1fbdb0eefc8ef294d32a617db0"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "3a17ff8ea491b0f9509ddf67525aaad253d8c771",
+      "path": "src/client/network_world.cpp",
+      "sha256": "2251acdefbb5e175226daa99c114f70f243d56cce2d61417b1928769ec7bab91"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "3a17ff8ea491b0f9509ddf67525aaad253d8c771",
+      "path": "src/net/world_state.cpp",
+      "sha256": "3f97f752b8242343956a8cbb4f256857b9c32607bdcdfabafcfc53126f490362"
+    }
+  ],
+  "adaptations": [
+    "Protocol version5 adds collision metadata and four dynamic vectors; State records156bytes, seven records per1132byte packet.",
+    "Extract existing local collider/environment reads without changing callback, query, timing, RNG or CMoveMgr behavior. Solo presentation opts out of the extra wire capture.",
+    "Client reconstructs primary and shape geometry from independently mounted/decoded DAT; existing ContainerShape build and basis-relative transform arithmetic preserved, including actual shape origin and transformed status.",
+    "Object/physics candidate frames commit together; invalid geometry or bindings cannot advance accepted histories.",
+    "No new game algorithm or commercial asset import; original collision/container movement rules remain at the prior ported boundaries."
+  ]
+}

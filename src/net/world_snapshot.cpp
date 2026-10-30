@@ -2,6 +2,7 @@
 #include "engine/resources.h"
 #include "net/admission.h"
 #include "net/codec.h"
+#include "net/collision_codec.h"
 #include "net/transport.h"
 #include <algorithm>
 #include <cmath>
@@ -13,7 +14,7 @@ namespace OpenBlood2::Net
         constexpr std::uint32_t magic = 0x574d3242, chunk_magic = 0x424d3242;
         constexpr std::size_t chunk_header = 30;
         constexpr std::size_t chunk_data = packet_limit(Channel::Baseline) - chunk_header;
-        constexpr std::size_t minimum_object_bytes = 141;
+        constexpr std::size_t minimum_object_bytes = 142;
         bool bounded(double v, double limit = 1e7)
         {
             return std::isfinite(v) && std::abs(v) <= limit;
@@ -57,6 +58,7 @@ namespace OpenBlood2::Net
             to.attachment_resolved = from.attachment_resolved;
             to.world_model_index = from.world_model_index;
             to.world_model_bound = from.world_model_bound;
+            to.collision = from.collision;
         }
         template <class To, class From> void copy_frame(To& to, const From& from)
         {
@@ -184,6 +186,11 @@ namespace OpenBlood2::Net
                                          o.world_model_index >= 65536)) ||
                 !bounded(o.animation.time, 1e12) || o.animation.time < 0 ||
                 !bounded(o.sprite_track.milliseconds, 1e12) || o.sprite_track.milliseconds < 0 ||
+                !valid_collision_values(o.collision) ||
+                (o.collision.enabled &&
+                 (o.collision.world_model != o.world_model_bound || o.collision.container != (o.type == OT_CONTAINER) ||
+                  (o.collision.world_model && o.type != OT_WORLDMODEL) ||
+                  (o.collision.container && (!o.world_model_index || o.world_model_index >= 65536)))) ||
                 o.hidden_nodes.size() > 256 ||
                 !std::all_of(o.hidden_nodes.begin(), o.hidden_nodes.end(), [](auto n) { return n <= 1; }))
                 return false;
@@ -247,6 +254,7 @@ namespace OpenBlood2::Net
             w.u8(o.attachment_resolved);
             w.u32(o.world_model_index);
             w.u8(o.world_model_bound);
+            write_collision_values(w, o.collision);
         }
         write_effects(w, s.polygrids);
         write_effects(w, s.particle_streams);
@@ -321,6 +329,8 @@ namespace OpenBlood2::Net
                 return false;
             o.world_model_index = r.u32();
             if (!read_bool(r, o.world_model_bound))
+                return false;
+            if (!read_collision_values(r, o.collision))
                 return false;
             s.objects.push_back(std::move(o));
         }

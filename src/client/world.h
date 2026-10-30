@@ -1,4 +1,5 @@
 #pragma once
+#include "client/collision_values.h"
 #include "engine/model.h"
 #include "engine/object_id.h"
 #include "engine/sprite.h"
@@ -35,6 +36,7 @@ namespace OpenBlood2
         bool attached = false, attachment_resolved = false;
         std::uint32_t world_model_index = UINT32_MAX;
         bool world_model_bound = false;
+        ClientCollisionValues collision;
     };
     struct ClientSky
     {

@@ -16,6 +16,7 @@
 | [Initial network world](implementation/reports/m9_world_baseline.md) | Bounded ENet object baseline, independently resolved client assets and all-map verification. |
 | [Network object membership](implementation/reports/m9_world_membership.md) | Reliable creation/removal, metadata updates, baseline ACK and retired-generation checks. |
 | [Network poses and interpolation](implementation/reports/m9_world_state.md) | Absolute 20 Hz poses, bounded per-object history and reliable teleport revisions. |
+| [Network collision/environment](implementation/reports/m9_collision_transport.md) | Client-owned DAT geometry, volume properties and atomic object/collision reception. |
 | [Network admission](implementation/reports/m9_admission.md) | Bounded ENet handshake, full-content gate and original player lifetime; gameplay replication pending. |
 | [Bloodbath player profiles](implementation/reports/m9_player_profiles.md) | Original skins, entry ammo and private startup announcement; fresh internal entry only. |
 | [Server player connections](implementation/reports/m9_player_connections.md) | 16 checked connections, private ownership and original Bloodbath marker selection; wire admission pending. |

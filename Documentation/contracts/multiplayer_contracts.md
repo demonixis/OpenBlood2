@@ -667,8 +667,8 @@ messages and interactive movement/combat still require their wire paths.
 
 ## Twenty-Hz absolute poses and remote interpolation
 
-The [state continuation](../implementation/reports/m9_world_state.md) uses protocol
-version 4. Every three successful 60 Hz ticks, after reliable membership changes,
+The [state continuation](../implementation/reports/m9_world_state.md) introduced
+protocol version 4, superseded by version 5 below. Every three successful 60 Hz ticks, after reliable membership changes,
 the server sends absolute poses on the unreliable sequenced State channel. Each
 packet contains a world, membership revision, server sequence/time and at most ten
 object states. Its maximum encoded size is 1,120 bytes, below the 1,200-byte
@@ -702,3 +702,41 @@ object's interpolation history. Repeated same-position calls do not create a
 revision. This adds no new teleport/collision path and changes no saved gameplay
 payload or RNG draw. Replicated gameplay teleports snap; private movement-force
 messages and their remote handling still need their own wire path.
+
+
+## Collision and environment on the wire
+
+The [collision transport continuation](../implementation/reports/m9_collision_transport.md)
+uses protocol version 5. Object baselines/reliable patches now carry pointer-free
+collision metadata: shape binding/basis, original VolumeBrush classification,
+optional container code/current/gravity/viscosity/Hidden, priority, dynamic/pushable
+flags and the Seeing Eye owner exclusion. Collider position/type/flags/attachment
+reuse the object record. Dimensions, velocity, acceleration and the posed shape's
+origin accompany State packets, now **seven records / 1,132 bytes maximum**.
+Container codes preserve the full unsigned 16-bit range, including inert unknowns.
+
+The read-only extractor is shared with local collision publication. Solo object
+presentation does not opt into these additional wire values; its collision copy
+and CMoveMgr substep ordering remain unchanged. Environment capture performs no
+volume callback, damage, air update or random draw.
+
+The client builds primary collision and bound shapes from its own admitted DAT.
+It owns the decoded model data and caches independent authored/posed shapes by
+world, object generation, model index/basis and pose. Containers use strict closed
+shell validation; world models retain the existing triangulated boundary policy.
+A transformed world model reproduces the server's basis-relative rotation at the
+actual posed shape origin. Straight translation retains the shape and applies
+position minus shape origin during queries. This avoids a second DAT translation
+and preserves world-model rotation/translation arithmetic.
+
+Object and collision frames commit together only after all resource/geometry
+checks pass. Bad DAT bindings, impossible collision classifications and invalid
+shape origins cannot advance either frame or the object's accepted State sequence.
+Collision uses the raw replicated poses, independently of presentation interpolation.
+Membership and per-object State ordering remain generation-qualified; no replica
+runs authoritative contacts, pushes, damage or another movement integration.
+Retained frames keep primary and shaped geometry after source/world teardown.
+
+Private player/movement messages and the actual network CMoveMgr command bridge
+remain next. The all-map geometry checks and process probes do not qualify
+interactive movement/combat, degraded-network collision behavior or human LAN play.

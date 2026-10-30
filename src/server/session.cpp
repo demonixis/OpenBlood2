@@ -134,7 +134,7 @@ namespace OpenBlood2
         frame.sequence = next_snapshot_;
         frame.player = found->object;
         frame.player_alive = !owner->m_damage.IsDead();
-        if (!capture_client_objects(game_, frame, error))
+        if (!capture_client_objects(game_, frame, error, true))
             return false;
         out = Net::snapshot_values(frame);
         ++next_snapshot_;

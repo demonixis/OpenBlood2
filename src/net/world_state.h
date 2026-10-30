@@ -12,6 +12,7 @@ namespace OpenBlood2::Net
         float alpha = 1;
         AnimationTrack animation;
         SpriteTrack sprite_track;
+        CollisionMotion collision;
     };
     // Independently usable packets, no unreliable whole-world assembly. Every
     // record is absolute and qualified by the last reliable membership revision.
@@ -21,7 +22,7 @@ namespace OpenBlood2::Net
         double time = 0;
         std::vector<ObjectMotion> objects;
     };
-    inline constexpr std::size_t state_objects_per_packet = 10;
+    inline constexpr std::size_t state_objects_per_packet = 7;
     ObjectMotion motion_values(const ObjectState&);
     ObjectMotion motion_values(const ClientObject&);
     void apply_motion(const ObjectMotion&, ClientObject&);

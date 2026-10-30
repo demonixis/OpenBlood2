@@ -1,5 +1,5 @@
 #pragma once
-#include "basedefs_de.h"
+#include "game/legacy/basedefs_de.h"
 
 // Original Shared/ContainerCodes.h values, including FreeFall's liquid classification.
 enum ContainerCode : D_WORD

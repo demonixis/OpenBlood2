@@ -45,8 +45,12 @@ namespace OpenBlood2
                                                 [](const auto& object, auto slot) { return object.id.slot < slot; });
             Net::apply_motion(*motion, *found);
         }
-        if (!world_.apply(std::move(frame), error))
+        auto candidate = world_;
+        if (!candidate.apply(std::move(frame), error))
             return StateResult::Refused;
+        if (collision_.active() && !collision_.receive(candidate, error))
+            return StateResult::Refused;
+        world_ = std::move(candidate);
         for (const auto* motion : accepted)
         {
             auto& history = histories_[motion->id.slot];

@@ -1,4 +1,5 @@
 #pragma once
+#include "client/network_collision.h"
 #include "engine/model_store.h"
 #include "engine/world.h"
 #include "net/world_snapshot.h"
@@ -33,9 +34,14 @@ namespace OpenBlood2
         {
             return membership_sequence_;
         }
+        const ClientCollisionWorld& collision() const
+        {
+            return collision_.world();
+        }
 
       private:
         ClientWorld world_;
+        NetworkCollisionReceiver collision_;
         std::vector<std::uint32_t> generations_;
         std::uint64_t membership_sequence_ = 0;
         double membership_time_ = 0;

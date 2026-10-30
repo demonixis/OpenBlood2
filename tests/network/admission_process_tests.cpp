@@ -173,6 +173,7 @@ namespace
                 if (joined && assembled && !replicated)
                 {
                     CHECK(snapshot.player == own_object && receiver.receive(snapshot, loaded, models, sprites, error));
+                    CHECK(receiver.collision().get(own_object) && receiver.collision().frame().primary);
                     CHECK(replica.get(own_object) && replica.get(own_object)->model);
                     ModelView scene;
                     CHECK(append_client_models(replica, true, scene, resources, error));

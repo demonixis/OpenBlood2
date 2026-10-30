@@ -1,11 +1,44 @@
 #include "game/client_replication.h"
+#include "game/original/SeeingEye.h"
+#include "game/original/VolumeBrush.h"
 #include "game/server_adapter.h"
 #include <charconv>
 #include <cmath>
 
 namespace OpenBlood2
 {
-    bool capture_client_objects(GameSession& game, ClientWorldFrame& frame, std::string& error)
+    ClientCollisionValues capture_collision_values(const ObjectRecord& object, const Objects& objects)
+    {
+        ClientCollisionValues value;
+        value.enabled = true;
+        value.motion.dimensions = object.dimensions;
+        value.motion.velocity = object.velocity;
+        value.motion.acceleration = object.acceleration;
+        value.world_model = bool(object.world_model);
+        value.container = bool(object.container());
+        value.volume_brush = dynamic_cast<const VolumeBrush*>(object.game.get()) != nullptr;
+        value.dynamic = object.world_body || object.model_body;
+        value.pushable = object.body_properties.pushable;
+        value.priority = object.blocking_priority;
+        const auto& shape = object.world_model ? object.world_model : object.container();
+        if (shape)
+        {
+            value.motion.shape_origin = shape->origin;
+            value.basis = object.world_model ? object.world_model_basis : object.state.m_Rotation;
+            value.shape_transformed = object.world_model && object.world_model != object.world_model_base;
+        }
+        if (value.container)
+        {
+            ContainerInfo info;
+            if (container_info(object, info))
+                value.environment = {info.code, info.current, info.gravity, info.viscosity, info.hidden};
+        }
+        if (const auto* eye = dynamic_cast<const SeeingEye*>(object.game.get()); eye && !eye->dropped)
+            if (const auto* owner = objects.get(eye->m_hFiredFrom); owner && owner->life == Life::Alive)
+                value.ignored_by = owner->id;
+        return value;
+    }
+    bool capture_client_objects(GameSession& game, ClientWorldFrame& frame, std::string& error, bool collision)
     {
         auto& objects = game.objects;
         auto& server = game.server;
@@ -74,6 +107,8 @@ namespace OpenBlood2
             }
             out.world_model_index = r->world_model_index;
             out.world_model_bound = bool(r->world_model);
+            if (collision)
+                out.collision = capture_collision_values(*r, objects);
         }
         frame.objects.resize(count);
         const auto& sky = server.sky;

@@ -46,7 +46,7 @@ namespace OpenBlood2
                     return false;
                 }
             }
-            if (object.world_model_bound)
+            if (object.world_model_bound || (object.collision.enabled && object.collision.container))
             {
                 const auto index = object.world_model_index;
                 if (index >= geometry.models.size() || CaseLess{}(geometry.models[index].name, object.filename) ||
@@ -64,6 +64,7 @@ namespace OpenBlood2
         if (!world_.begin(world))
             return false;
         generations_.clear();
+        collision_ = {};
         histories_.clear();
         membership_sequence_ = 0;
         membership_time_ = 0;
@@ -166,8 +167,16 @@ namespace OpenBlood2
         // ClientWorld publication counts accepted packets, independently of the
         // server's sequence (one State sequence may span multiple datagrams).
         next.sequence = world_.frame().sequence + 1;
-        if (!receive_network_world(next, geometry, models, sprites, world_, error))
+        auto candidate = world_;
+        if (!receive_network_world(next, geometry, models, sprites, candidate, error))
             return false;
+        if (!collision_.active() && std::any_of(next.objects.begin(), next.objects.end(),
+                                                [](const auto& object) { return object.collision.enabled; }))
+            if (!collision_.begin(next.world, geometry, error))
+                return false;
+        if (collision_.active() && !collision_.receive(candidate, error))
+            return false;
+        world_ = std::move(candidate);
         for (const auto& object : next.objects)
         {
             if (generations_.size() <= object.id.slot)

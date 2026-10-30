@@ -95,8 +95,8 @@ namespace
             initial.objects.push_back(object);
         }
         std::vector<std::vector<std::uint8_t>> packets;
-        CHECK(encode_state_packets(initial, 10, packets) && packets.size() == 3);
-        CHECK(packets[0].size() == 1120 && packets[2].size() == 580);
+        CHECK(encode_state_packets(initial, 10, packets) && packets.size() == 4);
+        CHECK(packets[0].size() == 1132 && packets[3].size() == 664);
         for (const auto& packet : packets)
         {
             CHECK(packet.size() <= packet_limit(Channel::State));
