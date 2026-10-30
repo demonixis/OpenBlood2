@@ -137,13 +137,13 @@ namespace OpenBlood2
         auto& music = game.music_catalog;
         if (ImGui::CollapsingHeader("Music playback", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            auto& sampler = game.server.audio.instruments;
+            auto& sampler = game.client_session.audio.mixer.instruments;
             ImGui::TextWrapped("Authored music audition, gain 20%%, explicit seed 1 per section. "
                                "Prepared once, played by the shared audio clock while the inspector is hidden. "
                                "Repeats reuse prepared variations. Live original MUSIC commands share this stream; "
                                "diagnostic auditions override it.");
             const auto& live = game.client_shell.music;
-            const auto& current = game.server.audio.music_loop;
+            const auto& current = game.client_session.audio.mixer.music_loop;
             ImGui::Text(
                 "Game music: logical %u | last transport level %u (%s) | requests %llu / accepted %llu / failed %llu",
                 unsigned(live.logical_level), unsigned(current.level()), current.active() ? "active" : "stopped",
@@ -167,23 +167,24 @@ namespace OpenBlood2
             static int from_level = 0, to_level = 3;
             ImGui::Combo("Preview from level", &from_level, "Silence\0Ambient\0Cruising\0Harddriving\0");
             ImGui::Combo("Preview requested level", &to_level, "Silence\0Ambient\0Cruising\0Harddriving\0");
-            ImGui::BeginDisabled(game.server.audio.music_loop.active());
+            ImGui::BeginDisabled(game.client_session.audio.mixer.music_loop.active());
             if (ImGui::Button("Audition transition + playlist once (20% gain)"))
                 music.play_level_once(std::uint8_t(from_level), std::uint8_t(to_level), sampler);
             if (ImGui::Button("Audition transition once + repeating playlist (20% gain)"))
-                music.play_level_loop(std::uint8_t(from_level), std::uint8_t(to_level), game.server.audio);
+                music.play_level_loop(std::uint8_t(from_level), std::uint8_t(to_level),
+                                      game.client_session.audio.mixer);
             ImGui::EndDisabled();
-            const auto& transport = game.server.audio.music_loop;
+            const auto& transport = game.client_session.audio.mixer.music_loop;
             if (transport.passes_submitted())
                 ImGui::Text(
                     "Repeat transport %s | passes submitted %llu | next admission frame %llu | template events %zu",
                     transport.active() ? "running" : "stopped", (unsigned long long)transport.passes_submitted(),
                     (unsigned long long)transport.next_submission(), transport.template_events());
-            if (!game.server.audio.music_error.empty())
-                ImGui::TextWrapped("Repeat transport failed: %s", game.server.audio.music_error.c_str());
+            if (!game.client_session.audio.mixer.music_error.empty())
+                ImGui::TextWrapped("Repeat transport failed: %s", game.client_session.audio.mixer.music_error.c_str());
             if (ImGui::Button("Stop all instrument audio"))
             {
-                game.server.audio.music_loop.stop(sampler);
+                game.client_session.audio.mixer.music_loop.stop(sampler);
                 music.audition_stopped = true;
             }
             if (!music.audition_error.empty())
@@ -239,7 +240,7 @@ namespace OpenBlood2
         }
         if (ImGui::TreeNodeEx("DLS instruments, samples and diagnostic notes", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            auto& sampler = game.server.audio.instruments;
+            auto& sampler = game.client_session.audio.mixer.instruments;
             ImGui::TextWrapped(
                 "Audition creates a one-second note at the region midpoint, velocity 100, gain 20%%. "
                 "This is a sample/envelope diagnostic, not original music playback. Unsupported "
@@ -706,8 +707,8 @@ namespace OpenBlood2
                 draw_section_selection(asset);
                 if (ImGui::Button("Play this section once (20% gain)"))
                 {
-                    if (!game.server.audio.music_loop.active())
-                        music.play_section(asset.filename, game.server.audio.instruments);
+                    if (!game.client_session.audio.mixer.music_loop.active())
+                        music.play_section(asset.filename, game.client_session.audio.mixer.instruments);
                     else
                         music.audition_error = "Stop repeating music before starting a finite section";
                 }
@@ -847,7 +848,7 @@ namespace OpenBlood2
                                     if (!regions.empty() && ImGui::SmallButton("Audition channel"))
                                     {
                                         const auto& region = regions.front();
-                                        game.server.audio.instruments.play_channel(
+                                        game.client_session.audio.mixer.instruments.play_channel(
                                             asset.band_bank, channel, (region.key_low + region.key_high) / 2,
                                             std::clamp(100U, unsigned(region.velocity_low),
                                                        unsigned(region.velocity_high)),
@@ -856,7 +857,7 @@ namespace OpenBlood2
                                     if (asset.section && !regions.empty() &&
                                         ImGui::SmallButton("Schedule quarter note (section tempo)"))
                                     {
-                                        auto& receiver = game.server.audio.instruments;
+                                        auto& receiver = game.client_session.audio.mixer.instruments;
                                         ImaClock clock;
                                         const ImaTempo tempo{0, asset.section->tempo, asset.section->tempo_fraction};
                                         std::array<ImaTimedMidiMessage, 7> messages;
@@ -878,7 +879,7 @@ namespace OpenBlood2
                                     }
                                     if (!regions.empty() && ImGui::SmallButton("Hold channel note (manual MIDI)"))
                                     {
-                                        auto& receiver = game.server.audio.instruments;
+                                        auto& receiver = game.client_session.audio.mixer.instruments;
                                         bool ready = true;
                                         for (unsigned j = 0; j < 5 && ready; ++j)
                                         {
@@ -1109,7 +1110,7 @@ namespace OpenBlood2
             }
             ImGui::TreePop();
         }
-        const auto& audio = game.server.audio;
+        const auto& audio = game.client_session.audio.mixer;
         ImGui::TextWrapped("Original Sound starts an unattached loop and removes its source object. "
                            "Playback belongs to this world until unload. No activation commands are added.");
         ImGui::Text("Output: %s | cached %.2f MiB | submitted %llu frames | dropped %llu",

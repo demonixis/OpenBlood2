@@ -157,8 +157,8 @@ namespace OpenBlood2
         out = std::move(value);
         return true;
     }
-    bool AudioMixer::load(const Resources& resources, std::string_view path, std::shared_ptr<const AudioClip>& out,
-                          std::string& error)
+    bool AudioTimeline::load(const Resources& resources, std::string_view path, std::shared_ptr<const AudioClip>& out,
+                             std::string& error)
     {
         std::string name;
         if (!resource_path(path, name))
@@ -197,8 +197,8 @@ namespace OpenBlood2
         out = std::move(clip);
         return true;
     }
-    bool AudioMixer::load_stream(const Resources& resources, std::string_view path,
-                                 std::shared_ptr<const AudioClip>& out, std::string& error)
+    bool AudioTimeline::load_stream(const Resources& resources, std::string_view path,
+                                    std::shared_ptr<const AudioClip>& out, std::string& error)
     {
         std::string name;
         if (!resource_path(path, name))
@@ -240,12 +240,11 @@ namespace OpenBlood2
         out = std::move(clip);
         return true;
     }
-    SoundId AudioMixer::play(const Resources& resources, HOBJECT owner, const SoundRequest& request, DVector position,
-                             std::string& error)
+    bool AudioTimeline::prepare_voice(const Resources& resources, const SoundRequest& request, DVector position,
+                                      AudioVoice& voice, std::string& error)
     {
         error.clear();
-        if (voices_.size() >= 128 || !next_sound || next_sound == std::numeric_limits<SoundId>::max() ||
-            !physics_vector(position) || !std::isfinite(request.volume) || request.volume < 0 || request.volume > 1 ||
+        if (!physics_vector(position) || !std::isfinite(request.volume) || request.volume < 0 || request.volume > 1 ||
             !std::isfinite(request.inner_radius) || !std::isfinite(request.outer_radius) || request.inner_radius < 0 ||
             request.outer_radius <= 0 || request.inner_radius > 1e6f || request.outer_radius > 1e6f ||
             request.resource.size() > 100 ||
@@ -253,72 +252,73 @@ namespace OpenBlood2
              request.space != SoundSpace::Spatial))
         {
             error = "Invalid or over-limit sound request";
-            return 0;
+            return false;
         }
         std::shared_ptr<const AudioClip> clip;
         if (!(request.streaming ? load_stream(resources, request.resource, clip, error)
                                 : load(resources, request.resource, clip, error)))
-            return 0;
+            return false;
         if (request.loop && clip->loop_metadata)
         {
             error = "WAVE region-loop metadata is not supported; refusing whole-clip substitution";
-            return 0;
+            return false;
         }
-        const auto id = next_sound++;
-        AudioVoice voice;
-        voice.id = id;
-        voice.owner = owner;
+        voice = {};
         voice.request = request;
         voice.clip = std::move(clip);
         voice.position = position;
+        return true;
+    }
+    SoundId AudioTimeline::play(const Resources& resources, HOBJECT owner, const SoundRequest& request,
+                                DVector position, std::string& error)
+    {
+        error.clear();
+        if (voices_.size() >= 128 || !next_sound || next_sound == std::numeric_limits<SoundId>::max())
+        {
+            error = "Invalid or over-limit sound request";
+            return 0;
+        }
+        AudioVoice voice;
+        if (!prepare_voice(resources, request, position, voice, error))
+            return 0;
+        const auto id = next_sound++;
+        voice.id = id;
+        voice.owner = owner;
         voices_.emplace(id, std::move(voice));
         return id;
     }
-    const AudioVoice* AudioMixer::get(SoundId id) const
+    const AudioVoice* AudioTimeline::get(SoundId id) const
     {
         auto it = voices_.find(id);
         return it == voices_.end() ? nullptr : &it->second;
     }
-    AudioVoice* AudioMixer::get(SoundId id)
+    AudioVoice* AudioTimeline::get(SoundId id)
     {
         auto it = voices_.find(id);
         return it == voices_.end() ? nullptr : &it->second;
     }
-    bool AudioMixer::kill(SoundId id)
+    bool AudioTimeline::kill(SoundId id)
     {
         return voices_.erase(id) != 0;
     }
-    bool AudioMixer::advance(double seconds, DVector listener, DRotation rotation)
+    bool AudioTimeline::step_frames(double seconds, std::uint64_t& frames)
     {
-        if (!std::isfinite(seconds) || seconds < 0 || seconds > 60 || !physics_vector(listener) ||
-            !physics_vector(rotation.m_Vec) || !std::isfinite(rotation.m_Spin))
+        if (!std::isfinite(seconds) || seconds < 0 || seconds > 60)
             return false;
-        const float norm = vector_dot(rotation.m_Vec, rotation.m_Vec) + rotation.m_Spin * rotation.m_Spin;
-        if (!std::isfinite(norm) || std::abs(norm - 1) > 0.001f)
-            return false;
-        if (paused_)
-            return true;
         const double total = seconds * rate + remainder_;
-        auto frames = std::uint64_t(std::floor(total + 1e-8));
+        frames = std::uint64_t(std::floor(total + 1e-8));
         remainder_ = std::max(0.0, total - double(frames));
-        if (output_ && output_lead > 0)
-        {
-            // Replacement policy: refill the device queue to the lead ahead of the step, so a
-            // frame longer than the queued audio does not starve the device.
-            const auto queued = SDL_GetAudioStreamQueued(output_);
-            const auto target = std::uint64_t(output_lead * rate);
-            const auto have = queued > 0 ? std::uint64_t(queued) / (2 * sizeof(float)) : 0;
-            if (queued >= 0 && have + frames < target)
-            {
-                lead_frames += target - have - frames;
-                frames = target - have;
-            }
-        }
-        const bool rendering = inspect_pcm || output_;
-        const auto count =
-            rendering ? std::min<std::uint64_t>(frames, 12000) : 0; // 250 ms bounded mixer/output work after a stall.
-        mixed.assign(count * 2, 0);
-        peak = 0;
+        return true;
+    }
+    bool AudioTimeline::advance(double seconds)
+    {
+        std::uint64_t frames = 0;
+        return step_frames(seconds, frames) && process_voices(frames, {}, {}, {}, 1);
+    }
+    bool AudioTimeline::process_voices(std::uint64_t frames, DVector listener, DRotation rotation,
+                                       std::span<float> mixed, float sound_gain)
+    {
+        const auto count = mixed.size() / 2;
         const auto right = rotate_vector({1, 0, 0}, rotation);
         bool stream_failed = false;
         validated_.clear();
@@ -345,7 +345,7 @@ namespace OpenBlood2
                 }
                 validated_.push_back(stream);
             }
-            float gain = v.request.volume * sound_gain_, pan = 0;
+            float gain = v.request.volume * sound_gain, pan = 0;
             if (v.request.space != SoundSpace::Local)
             {
                 const auto direction = vector_subtract(v.position, listener);
@@ -410,6 +410,40 @@ namespace OpenBlood2
                 v.done = v.cursor >= clip.frames();
             }
         }
+        return !stream_failed;
+    }
+    bool AudioMixer::advance(double seconds, DVector listener, DRotation rotation)
+    {
+        if (!std::isfinite(seconds) || seconds < 0 || seconds > 60 || !physics_vector(listener) ||
+            !physics_vector(rotation.m_Vec) || !std::isfinite(rotation.m_Spin))
+            return false;
+        const float norm = vector_dot(rotation.m_Vec, rotation.m_Vec) + rotation.m_Spin * rotation.m_Spin;
+        if (!std::isfinite(norm) || std::abs(norm - 1) > 0.001f)
+            return false;
+        if (paused_)
+            return true;
+        std::uint64_t frames = 0;
+        if (!step_frames(seconds, frames))
+            return false;
+        if (output_ && output_lead > 0)
+        {
+            // Replacement policy: refill the device queue to the lead ahead of the step, so a
+            // frame longer than the queued audio does not starve the device.
+            const auto queued = SDL_GetAudioStreamQueued(output_);
+            const auto target = std::uint64_t(output_lead * rate);
+            const auto have = queued > 0 ? std::uint64_t(queued) / (2 * sizeof(float)) : 0;
+            if (queued >= 0 && have + frames < target)
+            {
+                lead_frames += target - have - frames;
+                frames = target - have;
+            }
+        }
+        const bool rendering = inspect_pcm || output_;
+        const auto count =
+            rendering ? std::min<std::uint64_t>(frames, 12000) : 0; // 250 ms bounded mixer/output work after a stall.
+        mixed.assign(count * 2, 0);
+        peak = 0;
+        const bool stream_failed = !process_voices(frames, listener, rotation, mixed, sound_gain_);
         std::string instrument_error;
         const bool music_was_active = music_loop.active() || music_loop.pending();
         if (music_gain_ != 1)
@@ -543,32 +577,37 @@ namespace OpenBlood2
         audio_initialized_ = false;
         return true;
     }
-    void AudioMixer::clear()
+    void AudioTimeline::clear()
     {
         voices_.clear();
-        music_loop = {};
-        music_error.clear();
-        instruments.clear();
         clips_.clear();
         streams_.clear();
         stream_serial_ = 0;
         cached_bytes_ = 0;
-        mixed.clear();
         remainder_ = 0;
+        validated_.clear();
+    }
+    void AudioMixer::clear()
+    {
+        AudioTimeline::clear();
+        music_loop = {};
+        music_error.clear();
+        instruments.clear();
+        mixed.clear();
         peak = 0;
         mixed_frames = submitted_frames = dropped_frames = lead_frames = 0;
         output_error.clear();
         if (output_ && !SDL_ClearAudioStream(output_))
             output_error = SDL_GetError();
     }
-    std::uint64_t AudioMixer::stream_read_ns() const
+    std::uint64_t AudioTimeline::stream_read_ns() const
     {
         std::uint64_t total = 0;
         for (const auto& [name, clip] : streams_)
             total += clip->stream->read_ns;
         return total;
     }
-    std::uint64_t AudioMixer::stream_reads() const
+    std::uint64_t AudioTimeline::stream_reads() const
     {
         std::uint64_t total = 0;
         for (const auto& [name, clip] : streams_)

@@ -593,7 +593,7 @@ namespace OpenBlood2
             local_client && server_shell.OnClientEnterWorld(local_client) && client_shell.OnEnterWorld(local_client);
         if (ok)
             ok = pump_player_messages(error) && client_shell.Update() &&
-                 client_shell.SyncWeapons(models, resources, server_shell, error);
+                 client_shell.SyncWeapons(models, resources, server_shell, error) && publish_client_audio(error);
         if (!ok)
         {
             if (error.empty())
@@ -777,9 +777,10 @@ namespace OpenBlood2
             return reject();
         if (!check_actors())
             return false;
-        if (client_shell.music.failures || !server.audio.music_error.empty())
+        if (client_shell.music.failures || !client_session.audio.mixer.music_error.empty())
         {
-            error = "Original client music failed: " + client_shell.music.error + " " + server.audio.music_error;
+            error = "Original client music failed: " + client_shell.music.error + " " +
+                    client_session.audio.mixer.music_error;
             return reject();
         }
         state = SessionState::Ready;
@@ -825,6 +826,7 @@ namespace OpenBlood2
         world = {};
         ++world_revision;
         client_session.reset_local_world();
+        audio_replica_error.clear();
         world_path.clear();
         trace.clear();
         state = SessionState::Empty;
@@ -863,7 +865,8 @@ namespace OpenBlood2
             client_shell.view.object && client_shell.view.settings.listener
                 ? client_shell.view.rotation
                 : rotation_from_euler({client_shell.rotation.pitch, client_shell.rotation.yaw, 0});
-        bool ok = checked("audio", server.advance_audio(seconds, listener, listener_rotation)) &&
+        bool ok = checked("audio", (client ? advance_audio(seconds, listener, listener_rotation)
+                                           : server.advance_audio(seconds))) &&
                   checked("object updates", objects.advance(seconds)) &&
                   checked("physics", server.advance_physics(seconds)) &&
                   checked("projectiles", server.advance_projectiles(seconds)) &&
@@ -939,6 +942,7 @@ namespace OpenBlood2
         if (ok && preview_model && preview_playing &&
             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))
             preview_playing = false;
+        ok = checked("client audio publication", publish_client_audio(audio_replica_error)) && ok;
         server.trace_enabled = was_tracing;
         return ok;
     }
@@ -957,8 +961,9 @@ namespace OpenBlood2
             add("Object", diagnostics[i]);
         for (std::size_t i = frame_trace_begin; i < trace.size(); ++i)
             add("Session", trace[i]);
-        add("Audio output", server.audio.output_error);
-        add("Music", server.audio.music_error);
+        add("Audio replica", audio_replica_error);
+        add("Audio output", client_session.audio.mixer.output_error);
+        add("Music", client_session.audio.mixer.music_error);
         add("Explosion sprites", server.explosion_sprites.update_error);
         add("Blood splats", server.blood_splats.update_error);
         add("Weapon sprites", server.weapon_sprites.update_error);

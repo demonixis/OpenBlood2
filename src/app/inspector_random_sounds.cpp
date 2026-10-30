@@ -5,7 +5,7 @@ namespace OpenBlood2
 {
     void Inspector::draw_random_sounds(GameSession& game, ObjectSelection& selection)
     {
-        auto& audio = game.server.audio;
+        auto& audio = game.client_session.audio.mixer;
         ImGui::TextWrapped(
             "Original RandomSoundFX: intervals replace the previous voice. OFF cancels the next start, "
             "but lets the current sound finish. Ambient uses distance without panning; positional audio is dry 3D.");

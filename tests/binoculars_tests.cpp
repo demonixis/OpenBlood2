@@ -204,7 +204,7 @@ namespace
         cfg.data_dir = root;
         std::string e;
         CHECK(g.resources.mount_game(cfg, e));
-        g.server.audio.inspect_pcm = true;
+        g.client_session.audio.mixer.inspect_pcm = true;
         CHECK(g.request_world("01_subwaya", e) && g.enter_player(e) && g.pump_player_messages(e));
         auto& p = player(g);
         auto pickup_pos = g.client_shell.position;

@@ -117,3 +117,13 @@ timeout. `Objects::snapshot` now reserves its slot-count capacity before gatheri
 IDs, avoiding repeated vector growth without changing membership/order or callback
 lifetime. The unchanged scenario and 90-second limit pass after this allocation-only
 correction; full regression evidence includes the original two timeout attempts.
+
+## M9 local audio separation
+
+The [client audio lot](../implementation/reports/m9_client_audio.md) moves PCM,
+listener mixing, music and SDL output to `ClientSession::audio`. Original cinematic
+sequencing still uses server `AudioTimeline` completion/duration and source handles.
+Device queue lead no longer advances those authoritative clocks; zero-lead solo
+arithmetic is unchanged. Client sound descriptors contain checked identities and
+values, with independent clip/stream lifetime. The inspector shows logical and
+playback cursors separately.

@@ -150,7 +150,7 @@ namespace OpenBlood2
                                                         : "started");
             ImGui::Text("Fixed position %.1f %.1f %.1f | radii 30 / 300 | priority 2 / reverb requested (dry)",
                         v.position.x, v.position.y, v.position.z);
-            if (const auto* voice = game.server.audio.get(v.voice))
+            if (const auto* voice = game.client_session.audio.mixer.get(v.voice))
                 ImGui::Text("Decoded frames %llu / %llu | gains %.3f %.3f", (unsigned long long)voice->cursor,
                             (unsigned long long)voice->clip->frames(), voice->left, voice->right);
             else if (v.voice)

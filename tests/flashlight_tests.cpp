@@ -303,7 +303,7 @@ namespace
         cfg.data_dir = root;
         std::string e;
         CHECK(g.resources.mount_game(cfg, e));
-        g.server.audio.inspect_pcm = true;
+        g.client_session.audio.mixer.inspect_pcm = true;
         for (unsigned cycle = 0; cycle < 2; ++cycle)
         {
             CHECK(g.request_world("02_cityhub", e));
@@ -332,10 +332,10 @@ namespace
                 auto* v = g.server.audio.get(voice);
                 CHECK(v && v->clip && v->request.space == SoundSpace::Local && v->request.priority == 4 &&
                       v->world_owned);
-                CHECK(g.server.audio.advance(.1, {}, {}));
-                CHECK(g.server.audio.peak > 0);
+                CHECK(g.advance_audio(.1, {}, {}));
+                CHECK(g.client_session.audio.mixer.peak > 0);
                 std::cout << "Flashlight cycle=" << cycle << " active=" << p.m_InventoryMgr.flashlight->active
-                          << " frames=" << v->clip->frames() << " peak=" << g.server.audio.peak << '\n';
+                          << " frames=" << v->clip->frames() << " peak=" << g.client_session.audio.mixer.peak << '\n';
             }
             CHECK(g.client_shell.item_actions == 2 && g.client_shell.item_sounds == 2);
             auto child = p.m_InventoryMgr.flashlight->light;

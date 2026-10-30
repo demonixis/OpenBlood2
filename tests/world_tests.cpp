@@ -1347,7 +1347,7 @@ namespace
         CHECK(transition_images(game, root));
         CHECK(game.request_world("trial1", error));
         // The fixture authors no music (a silent no-op); a controlled music failure must still reject entry.
-        game.server.audio.music_error = "synthetic music failure";
+        game.client_session.audio.mixer.music_error = "synthetic music failure";
         CHECK(!game.run_world(error) && error.find("music failed") != error.npos && game.startup.player_entered &&
               !game.client_shell.m_bInWorld && !game.local_client && game.server.client_count() == 0 &&
               game.startup.checked_textures > 0);

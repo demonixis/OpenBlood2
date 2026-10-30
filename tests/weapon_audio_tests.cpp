@@ -41,7 +41,7 @@ namespace
         }
         std::string error;
         CHECK(game.enter_player(error));
-        game.server.audio.inspect_pcm = true;
+        game.client_session.audio.mixer.inspect_pcm = true;
         return true;
     }
     WeaponFire shot(GameSession& g, DBYTE type = WEAP_BERETTA, bool alt = false)
@@ -126,8 +126,8 @@ namespace
         CHECK(g.server.GetSoundDuration(voice->id, duration) && std::abs(duration - .1f) < 1e-6f);
         CHECK(!g.server.GetSoundDuration(0, duration) && duration == 0);
         g.objects.get(player->m_hObject)->state.m_Pos.x += 3;
-        CHECK(g.server.advance_audio(.11, g.client_shell.position, {}));
-        CHECK(g.server.audio.peak > 0 && g.server.audio.get(w->fire_sounds[0])->done);
+        CHECK(g.advance_audio(.11, g.client_shell.position, {}));
+        CHECK(g.client_session.audio.mixer.peak > 0 && g.server.audio.get(w->fire_sounds[0])->done);
         CHECK(g.server.audio.get(w->fire_sounds[0])->position.x == g.objects.get(player->m_hObject)->state.m_Pos.x);
         std::string error;
         CHECK(g.select_weapon(0, error) && g.step(.016)); // Inactive inventory slot still gets original sound cleanup.
@@ -257,8 +257,8 @@ namespace
                               << " rate=" << voice->clip->rate << " priority=" << unsigned(voice->request.priority)
                               << '\n';
                 }
-            g.server.audio.inspect_pcm = true;
-            CHECK(g.server.advance_audio(.1, g.client_shell.position, {}) && g.server.audio.peak > 0);
+            g.client_session.audio.mixer.inspect_pcm = true;
+            CHECK(g.advance_audio(.1, g.client_shell.position, {}) && g.client_session.audio.mixer.peak > 0);
             CHECK(g.unload_world() && g.server.audio.voices().empty() && g.objects.snapshot().empty());
         }
         return true;

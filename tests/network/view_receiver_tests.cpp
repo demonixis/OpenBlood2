@@ -156,7 +156,13 @@ namespace
         CHECK(hud.visible && hud.crosshair_visible && hud.stats.health == 75);
         CHECK(!hud_state(stats, true, true).visible && !hud_state(stats, true, true).crosshair_visible);
         CHECK(hud_state(stats, true, false, true).visible && !hud_state(stats, true, false, true).crosshair_visible);
-        auto detached = client;
+        ClientSession detached;
+        detached.camera = client.camera;
+        detached.collision = client.collision;
+        detached.hud = client.hud;
+        detached.world = client.world;
+        detached.time = client.time;
+        detached.movement = client.movement;
         client.camera.xr_view = true;
         client.reset_local_world();
         CHECK(!client.hud.owner().object && !client.camera.frame().player.object && client.camera.xr_view);

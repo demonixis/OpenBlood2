@@ -870,10 +870,10 @@ namespace OpenBlood2
                 if (!ai->ai_key_error.empty())
                     ImGui::TextWrapped("%s", ai->ai_key_error.c_str());
                 ImGui::TextWrapped("Sound: %s", ai->ai_sound_resource.c_str());
-                if (const auto* voice = anim ? game.server.audio.get(anim->m_hVoxSound) : nullptr)
+                if (const auto* voice = anim ? game.client_session.audio.mixer.get(anim->m_hVoxSound) : nullptr)
                     ImGui::Text("Shared voice %s | %.3f / %.3f s | owner matches: %s", voice->done ? "done" : "playing",
                                 voice->cursor / voice->clip->rate, voice->clip->duration(),
-                                voice->owner == r->handle ? "yes" : "no");
+                                game.client_session.audio.owner(voice->id) == r->id ? "yes" : "no");
                 ImGui::Text("Variant %d (source B2_LITE: 1..3) | chance draw %d", ai->selected_variant,
                             ai->chance_roll);
                 ImGui::Text("Suppressed: camera %llu / script %llu / chance %llu / shared voice %llu",
@@ -913,7 +913,7 @@ namespace OpenBlood2
                     ImGui::TextWrapped("%s", anim->sound_error.c_str());
                 auto voice = [&](SoundId id)
                 {
-                    const auto* v = game.server.audio.get(id);
+                    const auto* v = game.client_session.audio.mixer.get(id);
                     if (!v)
                     {
                         ImGui::Text("Voice %llu: none / released", (unsigned long long)id);

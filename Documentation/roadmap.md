@@ -270,14 +270,18 @@ liquid/ladder/conveyor membership without server callbacks; solo CMoveMgr math a
 authoritative air/damage remain unchanged. The
 [local camera/HUD lot](implementation/reports/m9_client_view.md) moves view selection,
 death/chase rays and HUD state/clock to client ownership, keeping server permissions.
+The [local audio lot](implementation/reports/m9_client_audio.md) separates logical server
+voices from independent client playback, music, caches and SDL output. Device queue
+lead no longer changes authoritative sound completion.
 **Full client separation, player
 admission and network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client
 shell runs its own movement (CMoveMgr) and effects. The engine copies object
 state to every client. OpenBlood2 runs one session in one process with one
-client. Object presentation now uses a passive local replica; HUD, cameras,
-dynamic lights/fog and audio still read server state directly. Typed client
+client. Object presentation, movement geometry/environment, cameras, HUD and audio now use
+local client-owned replicas. Remaining FX, dynamic lights/fog and client-shell
+services still read server state directly. Typed client
 messages still exist as in-process gameplay values only. The new ENet wrapper
 has no gameplay protocol connected to those values yet.
 

@@ -30,7 +30,7 @@ int main(int argc, char** argv)
     config.data_dir = argv[1];
     CHECK(game->initialize() && game->resources.mount_game(config, error));
     CHECK(game->request_world("01_SubwayA", error) && game->enter_player(error));
-    CHECK(game->server.audio.open_output(error));
+    CHECK(game->client_session.audio.mixer.open_output(error));
     WorldMesh mesh;
     ModelView scene;
     WorldRenderer world(runtime.gpu), models(runtime.gpu);
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
     for (unsigned cycle = 0; cycle < 4; ++cycle)
     {
         CHECK(game->step(1. / 60));
-        CHECK(game->server.audio.has_output() && game->server.audio.submitted_frames > 0);
+        CHECK(game->client_session.audio.mixer.has_output() && game->client_session.audio.mixer.submitted_frames > 0);
         CHECK(game->world_revision != revision);
         revision = game->world_revision;
         // Same cache invalidation boundary used by the application; no retained
@@ -110,7 +110,7 @@ int main(int argc, char** argv)
               game->pump_player_messages(error));
         CHECK(GameSession::process_level_change(game, error) == LevelChangeResult::Rejected);
         CHECK(game.get() == before && game->client_shell.player == old_player && game->world_revision == revision);
-        CHECK(!error.empty() && game->level_change.source_retained && game->server.audio.has_output());
+        CHECK(!error.empty() && game->level_change.source_retained && game->client_session.audio.mixer.has_output());
         const bool city = cycle % 2 == 0;
         CHECK(game->server.SendWorldExit({city ? "02_CityHub" : "01_SubwayA"}, city ? "01_egressa" : "start") ==
                   DE_OK &&
@@ -123,7 +123,8 @@ int main(int argc, char** argv)
         // "start" must preserve the original fallback, unlike City's named entry.
         CHECK(game->level_change.selected_start == (city ? "01_egressa" : "noname"));
         CHECK(game->level_change.start_fallback == !city);
-        CHECK(game.get() != before && game->client_shell.player != old_player && game->server.audio.has_output());
+        CHECK(game.get() != before && game->client_shell.player != old_player &&
+              game->client_session.audio.mixer.has_output());
         CHECK(game->level_change.cleanup_complete && game->level_change.health == 37 &&
               game->level_change.armor == 23 && game->level_change.bullets == 1234);
         CHECK(game->client_shell.world_exit.completed == cycle + 1 &&

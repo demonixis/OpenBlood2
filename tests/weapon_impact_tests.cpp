@@ -52,7 +52,7 @@ namespace
         }
         std::string error;
         CHECK(g.enter_player(error));
-        g.server.audio.inspect_pcm = true;
+        g.client_session.audio.mixer.inspect_pcm = true;
         return true;
     }
     WeaponFire shot(GameSession& g, DBYTE type = WEAP_BERETTA)
@@ -179,7 +179,7 @@ namespace
         CHECK(voice && voice->auto_remove && voice->world_owned && voice->clip->frames() == 800);
         CHECK(voice->request.outer_radius == 500 && voice->request.inner_radius == 50 && voice->request.priority == 0);
         CHECK(std::abs(voice->position.z - (contact.hit.point.z - 1.25f)) < .001f);
-        CHECK(g.server.advance_audio(.05, shot(g).position, {}) && g.server.audio.peak > 0);
+        CHECK(g.advance_audio(.05, shot(g).position, {}) && g.client_session.audio.mixer.peak > 0);
         std::string error;
         CHECK(g.select_weapon(0, error));
         CHECK(g.server_shell.OnMessage(g.local_client, shot(g, WEAP_MELEE)) == FireResult::Fired);
@@ -302,7 +302,7 @@ namespace
             if (action != 1)
                 CHECK(g.leave_player());
             CHECK(g.objects.finish_frame() && g.server.audio.get(sound));
-            CHECK(g.server.advance_audio(.11, {}, {}) && !g.server.audio.get(sound));
+            CHECK(g.advance_audio(.11, {}, {}) && !g.server.audio.get(sound));
             CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.string_count());
         }
         // Character hits use flesh audio but never dispatch impact hearing.
@@ -374,8 +374,8 @@ namespace
                 std::cout << fx.resource << " frames=" << voice->clip->frames() << " rate=" << voice->clip->rate
                           << '\n';
             }
-            g.server.audio.inspect_pcm = true;
-            CHECK(g.server.advance_audio(.05, fire.position, {}) && g.server.audio.peak > 0);
+            g.client_session.audio.mixer.inspect_pcm = true;
+            CHECK(g.advance_audio(.05, fire.position, {}) && g.client_session.audio.mixer.peak > 0);
             CHECK(g.leave_player() && g.server.audio.get(tail));
             CHECK(g.unload_world() && g.server.audio.voices().empty() && g.objects.snapshot().empty() &&
                   !g.server.string_count());

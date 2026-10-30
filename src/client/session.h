@@ -1,4 +1,5 @@
 #pragma once
+#include "client/audio.h"
 #include "client/camera.h"
 #include "client/hud.h"
 #include "client/movement.h"
@@ -18,6 +19,7 @@ namespace OpenBlood2
             return world.apply(std::move(frame), error);
         }
         float time = 0; // Immediate local clock publication, separate from world-relative time.
+        ClientAudio audio;
         ClientCamera camera;
         ClientHud hud;
         ClientWorld world;

@@ -59,7 +59,7 @@ namespace OpenBlood2
     class ServerAdapter final : public ServerDE
     {
       public:
-        AudioMixer audio;
+        AudioTimeline audio;
         SoundId PlayCharacterSound(HOBJECT, const SoundRequest&, bool retain, std::string&) override;
         SoundId PlayCinematicSound(HOBJECT, const SoundRequest&, std::string&) override;
         SoundId PlayLocalSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) override;
@@ -71,7 +71,9 @@ namespace OpenBlood2
         bool IsSoundDone(SoundId, bool&) override;
         bool KillSound(SoundId) override;
         bool GetSoundDuration(SoundId, float&) override;
-        bool advance_audio(double, DVector, DRotation);
+        void prepare_audio();
+        bool advance_prepared_audio(double);
+        bool advance_audio(double);
         explicit ServerAdapter(Objects& objects);
         ~ServerAdapter() override;
         ServerAdapter(const ServerAdapter&) = delete;
@@ -582,7 +584,7 @@ namespace OpenBlood2
         MusicCatalog music_catalog;
         LocalMovement local_movement{server, objects, client_session};
         LocalPresentation local_presentation{server, objects, client_session, local_movement};
-        CBloodClientShell client_shell{server,         resources,          music_catalog, server.audio,
+        CBloodClientShell client_shell{server,         resources,          music_catalog, client_session.audio.mixer,
                                        local_movement, local_presentation, client_session};
         HCLIENT local_client = nullptr;
         World world;
@@ -667,6 +669,9 @@ namespace OpenBlood2
         bool unload_world();
         // Immediate local delivery at the presentation boundary, also used by inspection.
         bool publish_client_world(std::string& error);
+        bool publish_client_audio(std::string& error);
+        bool advance_audio(double, DVector, DRotation);
+        std::string audio_replica_error;
         bool step(double seconds);
         // Server clock only: no local MoveMgr, view weapons, camera or cosmetic pool updates.
         bool step_server(double seconds);

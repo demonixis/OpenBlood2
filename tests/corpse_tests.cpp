@@ -236,10 +236,10 @@ namespace
         CHECK(key("[play_sound:cue][sound_random:99]") && c->last_sound != first &&
               g.server.audio.voices().size() == 2);
         CHECK(!key("[play_sound:cue][sound_radius:+-1]") && !key("[play_sound:missing]") && !c->sound_error.empty());
-        CHECK(g.server.advance_audio(.2, {}, {}) && g.server.audio.voices().empty());
+        CHECK(g.advance_audio(.2, {}, {}) && g.server.audio.voices().empty());
         CHECK(key("[play_sound:cue]"));
         auto id = c->last_sound;
-        CHECK(g.objects.remove(c->m_hObject) && g.objects.finish_frame() && g.server.advance_audio(.01, {}, {}) &&
+        CHECK(g.objects.remove(c->m_hObject) && g.objects.finish_frame() && g.advance_audio(.01, {}, {}) &&
               !g.server.audio.get(id));
         return true;
     }
@@ -367,7 +367,7 @@ namespace
                 for (int frame = 0; frame < 600 && !c->animation_done; ++frame)
                 {
                     CHECK(g.server.advance_models(.02) && g.server.advance_physics(.02) && g.objects.advance(.02) &&
-                          g.server.advance_audio(.02, {}, {}));
+                          g.advance_audio(.02, {}, {}));
                     animated |= g.objects.get(child)->animation.time > 0;
                 }
                 CHECK(animated && c->animation_done && c->initialized && c->error.empty() && c->sound_starts > 0 &&
@@ -375,7 +375,7 @@ namespace
                 std::cout << type << " cycle " << cycle << ": source removed; corpse clip "
                           << g.server.GetModelAnimation(child) << ", sound starts " << c->sound_starts
                           << ", pool request " << c->pool_requested << '\n';
-                CHECK(g.objects.clear() && g.server.advance_audio(.01, {}, {}) && g.server.audio.voices().empty() &&
+                CHECK(g.objects.clear() && g.advance_audio(.01, {}, {}) && g.server.audio.voices().empty() &&
                       g.objects.attachments().empty() && !g.server.message_count());
             }
         return true;

@@ -65,16 +65,17 @@ namespace OpenBlood2
         const auto* f = r ? dynamic_cast<const KeyFramer*>(r->game.get()) : nullptr;
         if (game.world_path == "worlds/12_train_station.dat")
         {
-            const auto* voice = f ? game.server.audio.get(f->sound_voice) : nullptr;
+            const auto* voice = f ? game.client_session.audio.mixer.get(f->sound_voice) : nullptr;
             if (!f || !f->initialized || f->targets.size() != 1 || !voice || !voice->clip || !voice->clip->frames() ||
-                !f->sound_starts || f->sound_failures || voice->request.speaker != f->targets[0].object ||
-                !game.server.IsObjectAlive(voice->owner) || voice->cursor <= 0 || !voice->request.loop ||
+                !f->sound_starts || f->sound_failures ||
+                game.client_session.audio.speaker(voice->id) != game.objects.get(f->targets[0].object)->id ||
+                !game.client_session.audio.owner(voice->id) || voice->cursor <= 0 || !voice->request.loop ||
                 voice->request.outer_radius != 6000 || voice->request.inner_radius != 600 ||
-                !game.server.audio.has_output() || !game.server.audio.submitted_frames ||
-                !game.server.audio.output_error.empty())
+                !game.client_session.audio.mixer.has_output() || !game.client_session.audio.mixer.submitted_frames ||
+                !game.client_session.audio.mixer.output_error.empty())
                 return false;
             spdlog::info("Authored key audio: {} frames={}, cursor={}, submitted={}, attached=true", f->last_sound,
-                         voice->clip->frames(), voice->cursor, game.server.audio.submitted_frames);
+                         voice->clip->frames(), voice->cursor, game.client_session.audio.mixer.submitted_frames);
             return true;
         }
         if (!f || !f->initialized || f->keys.size() != (world_path ? 3 : 2) || f->targets.size() != 1 || !f->active ||

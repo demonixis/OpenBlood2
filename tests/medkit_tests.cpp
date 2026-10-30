@@ -281,7 +281,7 @@ namespace
         cfg.data_dir = root;
         std::string e;
         CHECK(g.resources.mount_game(cfg, e));
-        g.server.audio.inspect_pcm = true;
+        g.client_session.audio.mixer.inspect_pcm = true;
         for (unsigned cycle = 0; cycle < 2; ++cycle)
         {
             CHECK(g.request_world("02_cityhub", e));
@@ -318,12 +318,12 @@ namespace
             CHECK(v->clip && v->clip->frames() == 45312);
             CHECK(std::any_of(v->clip->samples.begin(), v->clip->samples.end(),
                               [](float sample) { return std::abs(sample) > .01f; }));
-            CHECK(g.server.audio.advance(.1, {}, {}));
+            CHECK(g.advance_audio(.1, {}, {}));
             std::cout << "Medkit cycle=" << cycle << " charges=" << int(p.m_InventoryMgr.medkit->count)
-                      << " frames=" << v->clip->frames() << " peak=" << g.server.audio.peak << "\n";
-            CHECK(g.server.audio.peak > 0);
+                      << " frames=" << v->clip->frames() << " peak=" << g.client_session.audio.mixer.peak << "\n";
+            CHECK(g.client_session.audio.mixer.peak > 0);
             CHECK(g.leave_player() && g.server.audio.get(voice));
-            CHECK(g.server.advance_audio(10, {}, {}));
+            CHECK(g.advance_audio(10, {}, {}));
             CHECK(!g.server.audio.get(voice));
             CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.message_count() &&
                   !g.server.string_count());

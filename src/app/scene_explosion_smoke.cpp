@@ -69,10 +69,10 @@ namespace OpenBlood2
             if (fx.event != report.sprite_event || !fx.sprite || !fx.updates || fx.track.milliseconds <= 0 ||
                 fx.alpha >= fx.settings.alpha || !fx.error.empty())
                 return false;
-        const auto* v = g.server.audio.get(report.voice);
+        const auto* v = g.client_session.audio.mixer.get(report.voice);
         return report.targets.null_damager && !report.targets.cancelled && report.targets.delivered == 0 &&
                !report.client_fx_available && report.sound_error.empty() && v && v->world_owned && v->auto_remove &&
-               v->cursor > 0 && v->clip->duration() > 0 && g.server.audio.has_output() &&
-               g.server.audio.submitted_frames > 0 && g.server.audio.output_error.empty();
+               v->cursor > 0 && v->clip->duration() > 0 && g.client_session.audio.mixer.has_output() &&
+               g.client_session.audio.mixer.submitted_frames > 0 && g.client_session.audio.mixer.output_error.empty();
     }
 } // namespace OpenBlood2

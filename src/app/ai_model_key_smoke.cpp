@@ -528,11 +528,12 @@ namespace OpenBlood2
         const auto* r = g.objects.get(id);
         const auto* ai = r ? dynamic_cast<const AI_Mgr*>(r->game.get()) : nullptr;
         const auto* table = ai ? ai->AnimSound() : nullptr;
-        const auto* voice = table ? g.server.audio.get(table->m_hVoxSound) : nullptr;
+        const auto* voice = table ? g.client_session.audio.mixer.get(table->m_hVoxSound) : nullptr;
         std::string resource;
         return voice && resource_path(voice->request.resource, resource) && ai && ai->model_keys >= minimum_keys &&
                ai->audio_starts > 0 && ai->key_failures == 0 && ai->camera_suppressed == 0 && voice &&
-               voice->cursor > 0 && voice->owner == r->handle && resource.starts_with("sounds/enemies/m_cultist/") &&
-               g.server.audio.submitted_frames > 0 && g.server.audio.output_error.empty();
+               voice->cursor > 0 && g.client_session.audio.owner(voice->id) == r->id &&
+               resource.starts_with("sounds/enemies/m_cultist/") && g.client_session.audio.mixer.submitted_frames > 0 &&
+               g.client_session.audio.mixer.output_error.empty();
     }
 } // namespace OpenBlood2

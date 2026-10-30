@@ -13,10 +13,11 @@ namespace OpenBlood2
             "is shown "
             "below.");
         ImGui::Text("Audio: %s | active voices %zu | submitted frames %llu",
-                    game.server.audio.has_output() ? "SDL stream" : "offline clock", game.server.audio.voices().size(),
-                    (unsigned long long)game.server.audio.submitted_frames);
-        if (!game.server.audio.output_error.empty())
-            ImGui::TextWrapped("%s", game.server.audio.output_error.c_str());
+                    game.client_session.audio.mixer.has_output() ? "SDL stream" : "offline clock",
+                    game.client_session.audio.mixer.voices().size(),
+                    (unsigned long long)game.client_session.audio.mixer.submitted_frames);
+        if (!game.client_session.audio.mixer.output_error.empty())
+            ImGui::TextWrapped("%s", game.client_session.audio.mixer.output_error.c_str());
         if (ImGui::CollapsingHeader("Authored sources / failures / removed instances"))
             for (size_t i = 0; i < game.entries.size(); ++i)
                 if (game.world.objects[i].class_name == "CClientExplosionSFX")
@@ -483,7 +484,7 @@ namespace OpenBlood2
                     ImGui::TextWrapped("%s", r.model_error.c_str());
                 if (!r.sprite_error.empty())
                     ImGui::TextWrapped("%s", r.sprite_error.c_str());
-                if (const auto* v = game.server.audio.get(r.voice))
+                if (const auto* v = game.client_session.audio.mixer.get(r.voice))
                 {
                     ImGui::Text("Voice %llu: %.3f / %.3f s | %u Hz / %u channels", (unsigned long long)v->id,
                                 v->cursor / v->clip->rate, v->clip->duration(), v->clip->rate, v->clip->channels);

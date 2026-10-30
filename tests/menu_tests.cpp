@@ -525,7 +525,7 @@ namespace
         auto game = std::make_unique<GameSession>();
         game->resources = resources;
         CHECK(game->initialize());
-        CHECK(game->server.audio.open_output(error));
+        CHECK(game->client_session.audio.mixer.open_output(error));
         CHECK(GameSession::start_new_game(game, "01_SubwayA", 1, 0, error));
         CHECK(game->client_shell.m_bInWorld);
         CHECK(step_app_session(*game, 1. / 60));
@@ -544,21 +544,21 @@ namespace
         const auto time = game->objects.time();
         CHECK(!GameSession::start_new_game(game, "missing-menu-world", 1, 0, error));
         CHECK(game.get() == previous && game->client_shell.player == player && game->objects.time() == time);
-        const auto mixed = game->server.audio.mixed_frames;
+        const auto mixed = game->client_session.audio.mixer.mixed_frames;
         const auto ambient_cursor = audio.mixer.get(audio.ambient)->cursor;
-        CHECK(game->server.audio.pause_output(true, error));
+        CHECK(game->client_session.audio.mixer.pause_output(true, error));
         for (int i = 0; i < 180; ++i)
         {
             CHECK(audio.advance(1. / 60));
-            CHECK(game->server.audio.advance(1. / 60, {}, {}));
+            CHECK(game->advance_audio(1. / 60, {}, {}));
         }
-        CHECK(game->objects.time() == time && game->server.audio.mixed_frames == mixed);
+        CHECK(game->objects.time() == time && game->client_session.audio.mixer.mixed_frames == mixed);
         CHECK(audio.mixer.get(audio.ambient)->cursor != ambient_cursor);
-        CHECK(game->server.audio.pause_output(false, error));
+        CHECK(game->client_session.audio.mixer.pause_output(false, error));
         CHECK(step_app_session(*game, 1. / 60));
         CHECK(game->objects.time() > time && game->objects.time() < time + .02);
         CHECK(GameSession::start_new_game(game, "01_SubwayA", 1, 0, error));
-        CHECK(game->client_shell.m_bInWorld && game->server.audio.has_output());
+        CHECK(game->client_shell.m_bInWorld && game->client_session.audio.mixer.has_output());
         audio.focus(false);
         CHECK(!audio.ambient);
         return true;

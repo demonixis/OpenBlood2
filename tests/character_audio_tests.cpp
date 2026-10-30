@@ -91,7 +91,7 @@ namespace
               v->request.priority == 3 && v->request.reverb_requested);
         CHECK(!a.PlayVoice(h, "missing.wav", 500, 100) && a.m_hVoxSound == first && a.voice_busy == 1 &&
               a.sound_attempts == 1);
-        CHECK(g.server.advance_audio(.1, {}, {}));
+        CHECK(g.advance_audio(.1, {}, {}));
         bool done = false;
         CHECK(g.server.IsSoundDone(first, done) && done);
         a.SetSilent(DTRUE);
@@ -100,7 +100,7 @@ namespace
         CHECK(second != first && !g.server.audio.get(first));
         CHECK(g.server.KillSound(second));
         CHECK(a.PlayVoice(h, "cue.wav", 500, 100)); // Failed completion lookup permits retry.
-        CHECK(g.server.advance_audio(.1, {}, {}));
+        CHECK(g.advance_audio(.1, {}, {}));
         CHECK(!a.PlayVoice(h, "missing.wav", 500, 100) && !a.m_hVoxSound && a.sound_starts == 3 &&
               a.sound_failures == 1 && !a.sound_error.empty());
         CHECK(a.PlayVoice(h, "cue.wav", 500, 100));
@@ -119,14 +119,14 @@ namespace
             saved = a.m_hVoxSound;
             CHECK(a.PlaySound(h, "cue.wav", 500, 100) == 0 && a.sound_starts == 2);
             CHECK(g.server.audio.voices().size() == 2);
-            g.server.audio.inspect_pcm = true;
+            g.client_session.audio.mixer.inspect_pcm = true;
             auto* r = g.objects.get(h);
             r->state.m_Pos = {25, 0, 0};
             r->activity = OBJSTATE_INACTIVE;
-            CHECK(g.server.advance_audio(.05, {}, {}));
+            CHECK(g.advance_audio(.05, {}, {}));
             const auto* v = g.server.audio.get(saved);
-            CHECK(v && v->position.x == 25 && v->right > v->left && g.server.audio.peak > 0);
-            CHECK(g.server.advance_audio(.05, {}, {}));
+            CHECK(v && v->position.x == 25 && v->right > v->left && g.client_session.audio.mixer.peak > 0);
+            CHECK(g.advance_audio(.05, {}, {}));
             CHECK(g.server.audio.voices().size() == 1);
         }
         CHECK(!g.server.audio.get(saved));
@@ -135,7 +135,7 @@ namespace
         saved = a.m_hVoxSound;
         g.server.RemoveObject(h);
         CHECK(!a.PlayVoice(h, "cue.wav", 500, 100));
-        CHECK(g.server.advance_audio(0, {}, {}));
+        CHECK(g.advance_audio(0, {}, {}));
         CHECK(!g.server.audio.get(saved));
         CHECK(g.objects.finish_frame());
         CHECK(!a.PlayVoice(h, "cue.wav", 500, 100));
@@ -171,7 +171,7 @@ namespace
         for (int i = 0; i < 128; ++i)
             CHECK(g.server.PlayCharacterSound(h, r, false, error));
         CHECK(!a.PlayVoice(h, "cue.wav", 500, 100));
-        CHECK(g.server.advance_audio(.1, {}, {}));
+        CHECK(g.advance_audio(.1, {}, {}));
         CHECK(g.server.audio.voices().empty());
         CHECK(a.PlayVoice(h, "cue.wav", 500, 100));
         return true;
@@ -197,7 +197,7 @@ namespace
         auto id = p->m_hCurSound;
         const auto* v = g.server.audio.get(id);
         CHECK(v && v->request.volume == 1 && v->request.inner_radius == 100 && v->request.priority == 4);
-        CHECK(g.server.advance_audio(.1, {}, {}));
+        CHECK(g.advance_audio(.1, {}, {}));
         p->UpdateSound();
         CHECK(!p->m_hCurSound && !g.server.audio.get(id));
         DVector velocity{0, 50, 0};
@@ -463,14 +463,14 @@ namespace
             CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
             auto* p = g.server_shell.Player(g.local_client);
             CHECK(test_camera::complete_subway_intro(g));
-            g.server.audio.inspect_pcm = true;
+            g.client_session.audio.mixer.inspect_pcm = true;
             g.client_shell.movement_input.forward = true;
             bool heard = false;
             for (unsigned frame = 0; frame < 120; ++frame)
             {
                 CHECK(g.step(1. / 60));
                 const auto* voice = g.server.audio.get(p->m_hCurSound);
-                if (voice && voice->cursor > 0 && g.server.audio.peak > 0)
+                if (voice && voice->cursor > 0 && g.client_session.audio.mixer.peak > 0)
                 {
                     heard = true;
                     old = p->m_hCurSound;

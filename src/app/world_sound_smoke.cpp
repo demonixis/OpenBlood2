@@ -17,12 +17,14 @@ namespace OpenBlood2
             spdlog::error("World sound smoke failed at {}:{}", where.file_name(), where.line());
             spdlog::error("Music state: inworld={} active={} pending={} level={} switches={} logical={} accepted={} "
                           "received={} failures={} client-error={} audio-error={} queued={}",
-                          g.client_shell.m_bInWorld, g.server.audio.music_loop.active(),
-                          g.server.audio.music_loop.pending(), unsigned(g.server.audio.music_loop.level()),
-                          g.server.audio.music_loop.switches(), unsigned(g.client_shell.music.logical_level),
-                          g.client_shell.music.accepted, g.client_shell.music.received, g.client_shell.music.failures,
-                          g.client_shell.music.error, g.server.audio.music_error,
-                          g.server.audio.instruments.queued_messages);
+                          g.client_shell.m_bInWorld, g.client_session.audio.mixer.music_loop.active(),
+                          g.client_session.audio.mixer.music_loop.pending(),
+                          unsigned(g.client_session.audio.mixer.music_loop.level()),
+                          g.client_session.audio.mixer.music_loop.switches(),
+                          unsigned(g.client_shell.music.logical_level), g.client_shell.music.accepted,
+                          g.client_shell.music.received, g.client_shell.music.failures, g.client_shell.music.error,
+                          g.client_session.audio.mixer.music_error,
+                          g.client_session.audio.mixer.instruments.queued_messages);
             return false;
         };
         // The world-owned music data exists independently of inspector visibility/reload.
@@ -30,10 +32,11 @@ namespace OpenBlood2
         // World entry starts SilenceList; the authored startup trigger has already
         // requested level 3 by this frame. Both requests must reach real playback.
         if (!g.client_shell.m_bInWorld || !g.server_shell.Player(g.local_client) ||
-            !g.server.audio.music_loop.active() || g.server.audio.music_loop.pending() ||
-            g.server.audio.music_loop.level() != 3 || g.server.audio.music_loop.switches() != 2 ||
-            g.client_shell.music.logical_level != 3 || g.client_shell.music.accepted != 2 ||
-            g.client_shell.music.received != 1 || g.client_shell.music.failures || !g.server.audio.music_error.empty())
+            !g.client_session.audio.mixer.music_loop.active() || g.client_session.audio.mixer.music_loop.pending() ||
+            g.client_session.audio.mixer.music_loop.level() != 3 ||
+            g.client_session.audio.mixer.music_loop.switches() != 2 || g.client_shell.music.logical_level != 3 ||
+            g.client_shell.music.accepted != 2 || g.client_shell.music.received != 1 || g.client_shell.music.failures ||
+            !g.client_session.audio.mixer.music_error.empty())
             return fail();
         if (!music.audition_file.empty() || !music.audition.events.empty() || music.playlist_request ||
             !music.playlist_files.empty() || !music.playlist_audition.events.empty() || !music.error.empty() ||
@@ -42,10 +45,10 @@ namespace OpenBlood2
             !music.assets.front().bank_error.empty())
             return fail();
         // Explicitly suspend the live list for the existing diagnostic auditions.
-        const auto initial_clock = g.server.audio.instruments.sample_clock();
-        g.server.audio.music_loop.stop(g.server.audio.instruments);
-        if (g.server.audio.instruments.sample_clock() != initial_clock ||
-            !g.server.audio.instruments.pending_midi().empty())
+        const auto initial_clock = g.client_session.audio.mixer.instruments.sample_clock();
+        g.client_session.audio.mixer.music_loop.stop(g.client_session.audio.mixer.instruments);
+        if (g.client_session.audio.mixer.instruments.sample_clock() != initial_clock ||
+            !g.client_session.audio.mixer.instruments.pending_midi().empty())
             return fail();
         std::size_t pattern_notes = 0, band_count = 0, section_count = 0, curves = 0, curve_points = 0,
                     curve_events = 0;
@@ -194,7 +197,7 @@ namespace OpenBlood2
             !bank.waves[8].settings || bank.waves[8].settings->loop_in_bounds)
             return fail();
         // An explicit diagnostic note, not a MUSIC/playlist success. It shares the real SDL stream.
-        auto& sampler = g.server.audio.instruments;
+        auto& sampler = g.client_session.audio.mixer.instruments;
         if (sampler.queued_messages != 4358 || sampler.sample_clock() >= DlsSampler::rate || !sampler.started ||
             !sampler.pending_midi().empty() || sampler.dispatch_failures)
             return fail(); // Exactly fresh SilenceList + authored Harddriving admission; no old-world note.
@@ -229,15 +232,15 @@ namespace OpenBlood2
         if (!routed_note || sampler.voices().back().controllers != channel.controllers ||
             !sampler.voices().back().channel)
             return fail();
-        const auto before_note = g.server.audio.submitted_frames;
-        if (!g.server.advance_audio(.02, {}, {}) || sampler.voices().size() != 2 || sampler.voices()[0].frames != 960 ||
-            sampler.voices()[1].frames != 960 || g.server.audio.submitted_frames <= before_note)
+        const auto before_note = g.client_session.audio.mixer.submitted_frames;
+        if (!g.advance_audio(.02, {}, {}) || sampler.voices().size() != 2 || sampler.voices()[0].frames != 960 ||
+            sampler.voices()[1].frames != 960 || g.client_session.audio.mixer.submitted_frames <= before_note)
             return fail();
         auto controls = channel.controllers;
         if (!apply_dls_controller(controls, 0xb4, 7, 0, note_error) ||
             !apply_dls_controller(controls, 0xb4, 10, 127, note_error) ||
             !apply_dls_controller(controls, 0xe4, 127, 127, note_error) ||
-            !sampler.set_controllers(routed_note, controls, note_error) || !g.server.advance_audio(.01, {}, {}) ||
+            !sampler.set_controllers(routed_note, controls, note_error) || !g.advance_audio(.01, {}, {}) ||
             sampler.voices().size() != 2 || sampler.voices()[1].frames != 1440 || sampler.voices()[1].gain != 0 ||
             sampler.voices()[1].controllers != controls ||
             sampler.voices()[1].channel->controllers != channel.controllers ||
@@ -245,7 +248,7 @@ namespace OpenBlood2
             sampler.controls_updated - startup_controls != 2 || sampler.controls_rejected || !sampler.release(note) ||
             !sampler.release(routed_note))
             return fail();
-        if (!g.server.advance_audio(4, {}, {}) || !sampler.voices().empty() || sampler.completed == 0)
+        if (!g.advance_audio(4, {}, {}) || !sampler.voices().empty() || sampler.completed == 0)
             return fail();
         // Immediate MIDI diagnostic: actual selected band setup, held notes, channel controls and note-off.
         for (const auto& m : routed->band_setup)
@@ -254,20 +257,18 @@ namespace OpenBlood2
         const auto midi_key = std::uint8_t((routed_region.key_low + routed_region.key_high) / 2);
         // This actual Cabal region explicitly allows same-key overlap; verify its authored rule.
         if (routed_region.options != 1 || !sampler.receive(routed->band_bank, 0x94, midi_key, 100, .2, note_error) ||
-            !g.server.advance_audio(.02, {}, {}) || sampler.voices().size() != 1 ||
-            sampler.voices()[0].midi_channel != 4 || !sampler.receive({}, 0xb4, 7, 0, .2, note_error) ||
-            sampler.voices()[0].gain != 0 ||
+            !g.advance_audio(.02, {}, {}) || sampler.voices().size() != 1 || sampler.voices()[0].midi_channel != 4 ||
+            !sampler.receive({}, 0xb4, 7, 0, .2, note_error) || sampler.voices()[0].gain != 0 ||
             !sampler.receive({}, 0xb4, 7, std::uint8_t(channel.controllers.volume), .2, note_error))
             return fail();
         const auto older_note = sampler.voices()[0].id;
         if (!sampler.receive(routed->band_bank, 0x94, midi_key, 100, .2, note_error) ||
-            sampler.midi_choked != startup_choked || !g.server.advance_audio(.02, {}, {}) ||
-            sampler.voices().size() != 2 || !sampler.receive({}, 0x84, midi_key, 100, .2, note_error) ||
-            !g.server.advance_audio(.001, {}, {}) || sampler.voices().size() != 1 ||
-            sampler.voices()[0].id != older_note || !sampler.receive({}, 0x84, midi_key, 100, .2, note_error) ||
-            !g.server.advance_audio(4, {}, {}) || !sampler.voices().empty() || sampler.midi_rejected ||
-            sampler.midi_received - startup_midi != 86 || sampler.midi_released - startup_released != 2 ||
-            sampler.midi_unmatched_stops != startup_unmatched)
+            sampler.midi_choked != startup_choked || !g.advance_audio(.02, {}, {}) || sampler.voices().size() != 2 ||
+            !sampler.receive({}, 0x84, midi_key, 100, .2, note_error) || !g.advance_audio(.001, {}, {}) ||
+            sampler.voices().size() != 1 || sampler.voices()[0].id != older_note ||
+            !sampler.receive({}, 0x84, midi_key, 100, .2, note_error) || !g.advance_audio(4, {}, {}) ||
+            !sampler.voices().empty() || sampler.midi_rejected || sampler.midi_received - startup_midi != 86 ||
+            sampler.midi_released - startup_released != 2 || sampler.midi_unmatched_stops != startup_unmatched)
             return fail();
         // Original tempo conversion reaches actual audio output, also hidden and after reload.
         // Source band/tempo are real; this short phrase is synthetic, not a MUSIC playlist.
@@ -290,7 +291,7 @@ namespace OpenBlood2
         scheduled.push_back({4, 0xb4, 7, 0});
         scheduled.push_back({6, 0xb4, 7, std::uint8_t(channel.controllers.volume)});
         auto advance_to = [&](std::uint64_t frame)
-        { return g.server.advance_audio(double(frame - sampler.sample_clock()) / DlsSampler::rate, {}, {}); };
+        { return g.advance_audio(double(frame - sampler.sample_clock()) / DlsSampler::rate, {}, {}); };
         if (!sampler.enqueue_ima(routed->band_bank, clock, scheduled, .2, note_error) || !sampler.voices().empty() ||
             !advance_to(boundaries[0] - 1) || !sampler.voices().empty() || !advance_to(boundaries[0] + 1) ||
             sampler.voices().size() != 1 || sampler.voices()[0].frames != 1 || !advance_to(boundaries[1]) ||
@@ -305,16 +306,16 @@ namespace OpenBlood2
         if (!music.play_section("a2.sec", sampler) || music.audition.notes == 0)
             return fail();
         while (sampler.sample_clock() <= music.audition_end + DlsSampler::rate * 4)
-            if (!g.server.advance_audio(.02, {}, {}))
+            if (!g.advance_audio(.02, {}, {}))
                 return fail();
         for (const auto& v : sampler.voices())
             if (v.gate == UINT64_MAX || v.amplitude.release > 20)
                 return fail();
-        if (!g.server.advance_audio(21, {}, {}) || !sampler.pending_midi().empty() || !sampler.voices().empty() ||
+        if (!g.advance_audio(21, {}, {}) || !sampler.pending_midi().empty() || !sampler.voices().empty() ||
             sampler.dispatch_failures || sampler.started <= started_before)
             return fail();
         // Cancellation drops future notes without rewinding the shared audio clock.
-        if (!music.play_section("a2.sec", sampler) || !g.server.advance_audio(.02, {}, {}))
+        if (!music.play_section("a2.sec", sampler) || !g.advance_audio(.02, {}, {}))
             return fail();
         const auto cancel_frame = sampler.sample_clock();
         sampler.silence();
@@ -331,28 +332,28 @@ namespace OpenBlood2
         for (const auto& part : music.playlist_audition.parts)
             playlist_notes += part.notes;
         while (sampler.sample_clock() <= music.audition_end + DlsSampler::rate * 4)
-            if (!g.server.advance_audio(.02, {}, {}))
+            if (!g.advance_audio(.02, {}, {}))
                 return fail();
         for (const auto& voice : sampler.voices())
             if (voice.gate == UINT64_MAX || voice.amplitude.release > 20)
                 return fail();
-        if (!g.server.advance_audio(21, {}, {}) || !sampler.pending_midi().empty() || !sampler.voices().empty() ||
+        if (!g.advance_audio(21, {}, {}) || !sampler.pending_midi().empty() || !sampler.voices().empty() ||
             sampler.dispatch_failures || sampler.started - playlist_started != playlist_notes)
             return fail();
         // Transition once, then three playlist passes on the normal audio clock.
         // Repeats retain prepared variations; live MUSIC switching is not claimed.
-        if (!music.play_level_loop(0, 3, g.server.audio))
+        if (!music.play_level_loop(0, 3, g.client_session.audio.mixer))
             return fail();
-        auto& loop = g.server.audio.music_loop;
+        auto& loop = g.client_session.audio.mixer.music_loop;
         std::uint64_t loop_end;
         if (!loop.sample(loop.first_end_tick() + 2 * loop.loop_ticks(), loop_end, note_error))
             return fail();
         while (sampler.sample_clock() < loop_end)
-            if (!g.server.advance_audio(
+            if (!g.advance_audio(
                     double(std::min<std::uint64_t>(960, loop_end - sampler.sample_clock())) / DlsSampler::rate, {}, {}))
                 return fail();
         if (!loop.active() || loop.passes_submitted() < 3 || sampler.dispatch_failures ||
-            !g.server.audio.music_error.empty())
+            !g.client_session.audio.mixer.music_error.empty())
             return fail();
         const auto stop_frame = sampler.sample_clock();
         loop.stop(sampler);
@@ -362,22 +363,22 @@ namespace OpenBlood2
         for (const auto& e : g.entries)
             if (e.state == EntryState::WorldSound)
             {
-                const auto* v = g.server.audio.get(e.sound);
+                const auto* v = g.client_session.audio.mixer.get(e.sound);
                 if (!v || !v->world_owned || !v->request.loop || v->done || v->cursor <= 0 ||
-                    v->clip->frames() != 198623 || v->clip->rate != 22050 || g.objects.get(v->owner) ||
-                    v->request.space != SoundSpace::Ambient)
+                    v->clip->frames() != 198623 || v->clip->rate != 22050 ||
+                    g.objects.get(g.client_session.audio.owner(v->id)) || v->request.space != SoundSpace::Ambient)
                     return fail();
                 ++count;
             }
-        if (count != 4 || !g.server.audio.has_output() || !g.server.audio.submitted_frames ||
-            !g.server.audio.output_error.empty())
+        if (count != 4 || !g.client_session.audio.mixer.has_output() ||
+            !g.client_session.audio.mixer.submitted_frames || !g.client_session.audio.mixer.output_error.empty())
             return fail();
         // Labelled SoundFX probe with an actual decoded SubwayA asset; runs while UI is hidden and after reload.
         std::string resource;
         for (const auto& entry : g.entries)
             if (entry.state == EntryState::WorldSound)
             {
-                resource = g.server.audio.get(entry.sound)->request.resource;
+                resource = g.client_session.audio.mixer.get(entry.sound)->request.resource;
                 break;
             }
         auto h = g.objects.create(g.objects.find_class("SoundFX"), {}, Creation::World,
@@ -400,12 +401,15 @@ namespace OpenBlood2
         if (!command("ON") || !sound->sound || sound->state != SoundFX::On)
             return fail();
         const auto voice = sound->sound;
-        const auto submitted = g.server.audio.submitted_frames;
-        if (!g.server.advance_audio(.02, {}, {}) || g.server.audio.submitted_frames <= submitted ||
-            !g.server.audio.get(voice) || g.server.audio.get(voice)->cursor <= 0 ||
-            !g.server.audio.get(voice)->request.loop || !g.server.audio.get(voice)->clip->stream ||
-            !g.server.audio.get(voice)->clip->stream->refills || !g.server.audio.get(voice)->clip->samples.empty() ||
-            !command("OFF") || sound->state != SoundFX::Off || g.server.audio.get(voice) || !g.objects.remove(h))
+        const auto submitted = g.client_session.audio.mixer.submitted_frames;
+        if (!g.advance_audio(.02, {}, {}) || g.client_session.audio.mixer.submitted_frames <= submitted ||
+            !g.client_session.audio.mixer.get(voice) || g.client_session.audio.mixer.get(voice)->cursor <= 0 ||
+            !g.client_session.audio.mixer.get(voice)->request.loop ||
+            !g.client_session.audio.mixer.get(voice)->clip->stream ||
+            !g.client_session.audio.mixer.get(voice)->clip->stream->refills ||
+            !g.client_session.audio.mixer.get(voice)->clip->samples.empty() || !command("OFF") ||
+            !g.publish_client_audio(note_error) || sound->state != SoundFX::Off ||
+            g.client_session.audio.mixer.get(voice) || !g.objects.remove(h))
             return fail();
         g.objects.finish_frame();
         // Exercise actual player trigger -> owned client message -> live transport,
@@ -422,12 +426,12 @@ namespace OpenBlood2
             return ok && g.pump_player_messages(note_error);
         };
         if (!music_command("MUSIC LEVEL 0") || !music_command("MUSIC LEVEL 3") || loop.level() != 3 || loop.pending() ||
-            !g.server.advance_audio(.1, {}, {}) || !music_command("MUSIC LEVEL 1") || !loop.pending())
+            !g.advance_audio(.1, {}, {}) || !music_command("MUSIC LEVEL 1") || !loop.pending())
             return fail();
         const auto boundary = loop.switch_frame();
         while (sampler.sample_clock() < boundary)
-            if (!g.server.advance_audio(double(std::min<std::uint64_t>(960, boundary - sampler.sample_clock())) / 48000,
-                                        {}, {}))
+            if (!g.advance_audio(double(std::min<std::uint64_t>(960, boundary - sampler.sample_clock())) / 48000, {},
+                                 {}))
                 return fail();
         if (loop.level() != 1 || loop.pending() || !g.client_shell.music.error.empty() ||
             !music_command("MUSIC LEVEL 3") || !loop.pending() || g.client_shell.music.received != 5)
@@ -438,7 +442,7 @@ namespace OpenBlood2
         // Leave a live stream, pending replacement and future note for unload checks.
         const auto pending = sampler.pending_midi().size();
         const DlsTimedMidi future[] = {{sampler.sample_clock() + DlsSampler::rate * 60, 0x94, midi_key, 100}};
-        return !g.objects.get(h) && g.server.audio.output_error.empty() &&
+        return !g.objects.get(h) && g.client_session.audio.mixer.output_error.empty() &&
                sampler.enqueue(routed->band_bank, future, .2, note_error) &&
                sampler.pending_midi().size() == pending + 1;
     }

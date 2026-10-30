@@ -1,5 +1,13 @@
 # Source and Dependency Provenance
 
+The M9 [local client audio lot](reports/m9_client_audio.md) extracts the existing
+WAV/voice/sample-clock kernel into server `AudioTimeline` and a client mixer,
+without reimplementing original sound callers or mixing arithmetic. Playback
+receives copied bounded descriptors and owns separate assets/streams, music and
+SDL output. Device lead no longer advances logical completion; this adaptation
+and remaining legacy client request services are explicit. See the
+[source ledger](sources/m9_client_audio_sources.json).
+
 The M9 local camera/HUD lot preserves original death/chase arithmetic and status
 presentation while moving pose/descriptor reception, geometry-only rays and HUD
 ownership/clock into the client. Orientation math is extracted without arithmetic

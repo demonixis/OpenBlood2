@@ -22,9 +22,10 @@ namespace OpenBlood2
     {
         const auto* r = g.objects.get(selected);
         const auto* c = r ? dynamic_cast<const RandomSoundFX*>(r->game.get()) : nullptr;
-        const auto* v = c ? g.server.audio.get(c->sound) : nullptr;
+        const auto* v = c ? g.client_session.audio.mixer.get(c->sound) : nullptr;
         return c && c->attempts == 1 && !c->failures && v && v->cursor > 0 && !v->request.speaker &&
-               v->request.space != SoundSpace::Local && v->clip->duration() > 0 && g.server.audio.has_output() &&
-               g.server.audio.submitted_frames > 0 && g.server.audio.output_error.empty();
+               v->request.space != SoundSpace::Local && v->clip->duration() > 0 &&
+               g.client_session.audio.mixer.has_output() && g.client_session.audio.mixer.submitted_frames > 0 &&
+               g.client_session.audio.mixer.output_error.empty();
     }
 } // namespace OpenBlood2

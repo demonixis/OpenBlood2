@@ -61,24 +61,26 @@ namespace
         CHECK(h);
         auto id = get(g, h)->sound;
         CHECK(id && g.objects.finish_frame());
-        g.server.audio.inspect_pcm = true;
-        CHECK(g.server.advance_audio(.25, {}, {}));
+        g.client_session.audio.mixer.inspect_pcm = true;
+        CHECK(g.advance_audio(.25, {}, {}));
         auto* v = g.server.audio.get(id);
         CHECK(v && !v->done && v->world_owned && v->loops == 2 && std::abs(v->cursor - 400) < 1e-6);
-        CHECK(g.server.audio.mixed.size() == 24000 && std::abs(g.server.audio.peak - .5f) < 1e-6);
-        for (float f : g.server.audio.mixed)
+        CHECK(g.client_session.audio.mixer.mixed.size() == 24000 &&
+              std::abs(g.client_session.audio.mixer.peak - .5f) < 1e-6);
+        for (float f : g.client_session.audio.mixer.mixed)
             CHECK(std::abs(f - .5f) < 1e-6); // No silent frames at either wrap.
-        CHECK(g.server.advance_audio(60, {}, {}));
+        CHECK(g.advance_audio(60, {}, {}));
         CHECK(v->loops == 602 && std::abs(v->cursor - 400) < 1e-6);
-        CHECK(g.server.audio.mixed_frames == 24000 && g.server.audio.dropped_frames == 2868000);
-        CHECK(g.server.advance_audio(.05, {}, {}));
+        CHECK(g.client_session.audio.mixer.mixed_frames == 24000 &&
+              g.client_session.audio.mixer.dropped_frames == 2868000);
+        CHECK(g.advance_audio(.05, {}, {}));
         CHECK(v->loops == 603 && v->cursor == 0 && !v->done);
         bool done = true;
         CHECK(g.server.IsSoundDone(id, done) && !done);
-        g.server.audio.inspect_pcm = false;
-        CHECK(g.server.advance_audio(1, {}, {}));
+        g.client_session.audio.mixer.inspect_pcm = false;
+        CHECK(g.advance_audio(1, {}, {}));
         CHECK(v->loops == 613 && v->cursor == 0);
-        CHECK(!g.server.advance_audio(61, {}, {}));
+        CHECK(!g.advance_audio(61, {}, {}));
         CHECK(v->loops == 613 && v->cursor == 0);
         return true;
     }
@@ -86,40 +88,43 @@ namespace
     {
         GameSession g;
         CHECK(test_audio::setup(g, root));
-        auto h = make(g, {{"Filename", std::string("cue.wav")}});
-        auto id = get(g, h)->sound;
-        CHECK(id && g.objects.finish_frame());
+        AudioMixer mixer;
+        SoundRequest request;
+        request.resource = "cue.wav";
+        request.space = SoundSpace::Ambient;
+        request.loop = true;
+        std::string error;
+        auto id = mixer.play(g.resources, nullptr, request, {}, error);
+        CHECK(id);
         // Mutate only a private synthetic clip to make the last-to-first interpolation observable.
-        auto* v = g.server.audio.get(id);
+        auto* v = mixer.get(id);
         auto clip = std::make_shared<AudioClip>();
         clip->rate = 8000;
         clip->channels = 2;
         clip->samples = {0, 1, 1, 0};
         v->clip = clip;
-        g.server.audio.inspect_pcm = true;
-        CHECK(g.server.advance_audio(1.0 / 48000, {}, {}));
-        CHECK(g.server.audio.mixed[0] == 0 && g.server.audio.mixed[1] == 1);
-        CHECK(g.server.advance_audio(8.0 / 48000, {}, {}));
+        mixer.inspect_pcm = true;
+        CHECK(mixer.advance(1.0 / 48000, {}, {}));
+        CHECK(mixer.mixed[0] == 0 && mixer.mixed[1] == 1);
+        CHECK(mixer.advance(8.0 / 48000, {}, {}));
         // Last produced cursor 8/6=1.333: interpolate frame 1 toward frame 0 across the loop seam.
-        CHECK(std::abs(g.server.audio.mixed[14] - 2.0f / 3) < 1e-6 &&
-              std::abs(g.server.audio.mixed[15] - 1.0f / 3) < 1e-6);
+        CHECK(std::abs(mixer.mixed[14] - 2.0f / 3) < 1e-6 && std::abs(mixer.mixed[15] - 1.0f / 3) < 1e-6);
         CHECK(v->loops == 0 && std::abs(v->cursor - 1.5) < 1e-6);
-        CHECK(g.server.advance_audio(3.0 / 48000, {}, {}));
+        CHECK(mixer.advance(3.0 / 48000, {}, {}));
         CHECK(v->loops == 1 && v->cursor == 0);
-        CHECK(g.unload_world());
+        mixer.clear();
         // A one-frame loop remains valid and never indexes outside its sole sample.
-        h = make(g, {{"Filename", std::string("cue.wav")}});
-        id = get(g, h)->sound;
-        CHECK(id && g.objects.finish_frame());
-        v = g.server.audio.get(id);
+        id = mixer.play(g.resources, nullptr, request, {}, error);
+        CHECK(id);
+        v = mixer.get(id);
         clip = std::make_shared<AudioClip>();
         clip->rate = 96000;
         clip->channels = 1;
         clip->samples = {.25f};
         v->clip = clip;
-        CHECK(g.server.advance_audio(.001, {}, {}));
-        CHECK(v->loops == 96 && v->cursor == 0 && g.server.audio.mixed.size() == 96);
-        for (float f : g.server.audio.mixed)
+        CHECK(mixer.advance(.001, {}, {}));
+        CHECK(v->loops == 96 && v->cursor == 0 && mixer.mixed.size() == 96);
+        for (float f : mixer.mixed)
             CHECK(f == .25f);
         return true;
     }
@@ -138,10 +143,10 @@ namespace
             auto id = get(g, h)->sound;
             CHECK(id > last && !g.server.audio.get(last));
             last = id;
-            CHECK(g.objects.finish_frame() && !g.objects.get(h) && g.server.advance_audio(.35, {}, {}));
-            const auto* v = g.server.audio.get(id);
+            CHECK(g.objects.finish_frame() && !g.objects.get(h) && g.advance_audio(.35, {}, {}));
+            const auto* v = g.client_session.audio.mixer.get(id);
             CHECK(v && v->loops == 3 && v->position.x == 75 && v->left == .25f && v->right == .25f);
-            CHECK(g.server.advance_audio(.1, {}, {{0, 1, 0}, 0}) && v->left == .25f && v->right == .25f);
+            CHECK(g.advance_audio(.1, {}, {{0, 1, 0}, 0}) && v->left == .25f && v->right == .25f);
             SoundRequest r;
             r.resource = "cue.wav";
             r.loop = true;
@@ -151,7 +156,7 @@ namespace
             CHECK(owner);
             auto owned = g.server.PlaySoundAt(owner, r, {}, error);
             CHECK(owned);
-            CHECK(g.objects.remove(owner) && g.server.advance_audio(.1, {}, {}));
+            CHECK(g.objects.remove(owner) && g.advance_audio(.1, {}, {}));
             CHECK(!g.server.audio.get(owned) && g.server.audio.get(id) && g.objects.finish_frame());
             CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.audio.cached_clips() &&
                   !g.server.KillSound(id));
@@ -172,8 +177,8 @@ namespace
         CHECK(g.objects.finish_frame());
         for (float distance : {0.f, 100.f, 150.f, 200.f, 200.01f, 300.f})
         {
-            CHECK(g.server.advance_audio(.01, {distance, 0, 0}, {}));
-            const auto* voice = g.server.audio.get(sound);
+            CHECK(g.advance_audio(.01, {distance, 0, 0}, {}));
+            const auto* voice = g.client_session.audio.mixer.get(sound);
             const float expected = distance <= 200 ? 1.f : 0.f;
             CHECK(voice && voice->left == expected && voice->right == expected);
         }
@@ -386,22 +391,22 @@ namespace
                   g.server.audio.cached_clips() == 1);
             CHECK(g.enter_player(error) && g.objects.snapshot().size() == 230 && g.step(1.0 / 60));
             // Advance actual sample clocks across a full retail clip without adding unrelated physics work.
-            CHECK(g.server.advance_audio(20, {}, {}));
+            CHECK(g.advance_audio(20, {}, {}));
             for (auto id : ids)
             {
                 const auto* v = g.server.audio.get(id);
                 CHECK(v && !v->done && v->loops == 2 && v->cursor > 0);
             }
-            g.server.audio.inspect_pcm = true;
+            g.client_session.audio.mixer.inspect_pcm = true;
             const auto pos = g.server.audio.get(ids.front())->position;
-            CHECK(g.server.advance_audio(.02, pos, {}) && g.server.audio.peak > 0 &&
-                  g.server.audio.mixed_frames == 960);
+            CHECK(g.advance_audio(.02, pos, {}) && g.client_session.audio.mixer.peak > 0 &&
+                  g.client_session.audio.mixer.mixed_frames == 960);
             CHECK(g.run_world(error) && error.empty() && g.state == SessionState::Ready);
             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
                   !g.server.audio.cached_clips());
             for (auto id : ids)
                 CHECK(!g.server.audio.get(id));
-            g.server.audio.inspect_pcm = false;
+            g.client_session.audio.mixer.inspect_pcm = false;
             std::cout << "cycle=" << cycle
                       << " 4 world loops survived source removal, wrapped twice, produced PCM and unloaded\n";
         }

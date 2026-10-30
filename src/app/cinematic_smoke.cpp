@@ -46,11 +46,11 @@ namespace OpenBlood2
         auto& manager = g.client_shell.voice_manager;
         const auto prior_starts = manager.starts;
         if (!g.objects.advance(.01) || !g.client_shell.OnMessage(VoiceEvent{false, 0, 0}, g.server_shell) ||
-            !manager.voice || manager.starts != prior_starts + 1 || !g.server.advance_audio(.01, {}, {}))
+            !manager.voice || manager.starts != prior_starts + 1 || !g.advance_audio(.01, {}, {}))
             return false;
         const auto prior_voice = manager.voice;
-        const auto* prior = g.server.audio.get(prior_voice);
-        if (!prior || !prior->clip->stream || !prior->cursor || !g.server.audio.submitted_frames)
+        const auto* prior = g.client_session.audio.mixer.get(prior_voice);
+        if (!prior || !prior->clip->stream || !prior->cursor || !g.client_session.audio.mixer.submitted_frames)
             return false;
         auto h = g.objects.create(g.objects.find_class("ConversationTrigger"), {}, Creation::World,
                                   {{"Name", std::string("Diagnostic conversation (retail WAV)")}, {"WaveFile", file}});
@@ -64,7 +64,8 @@ namespace OpenBlood2
         if (!ok || !g.pump_player_messages(error) || !g.objects.advance(.25))
             return false;
         g.client_shell.communication.Update(g.server, g.client_shell.player, g.client_shell.voice_manager);
-        return g.client_shell.communication.voice != 0 && !manager.voice && !g.server.audio.get(prior_voice);
+        return g.client_shell.communication.voice != 0 && !manager.voice &&
+               !g.client_session.audio.mixer.get(prior_voice);
     }
     bool check_cinematic_smoke(GameSession& g, ObjectId selected)
     {
@@ -72,20 +73,21 @@ namespace OpenBlood2
         if (const auto* conversation = r ? dynamic_cast<const ConversationTrigger*>(r->game.get()) : nullptr)
         {
             const auto& comm = g.client_shell.communication;
-            const auto* voice = g.server.audio.get(comm.voice);
+            const auto* voice = g.client_session.audio.mixer.get(comm.voice);
             return conversation->queued == 1 && conversation->current == 1 && !conversation->unmapped &&
                    g.client_shell.voice_manager.starts > 0 && g.client_shell.voice_manager.played[0][0] &&
                    !g.client_shell.voice_manager.voice && !g.client_shell.voice_manager.failures &&
                    comm.received == 1 && comm.started == 1 && !comm.busy && !comm.sound_failures &&
                    comm.message.text == "Bring it on!" && voice && voice->cursor > 0 &&
                    voice->request.space == SoundSpace::Local && !voice->request.streaming &&
-                   g.server.audio.has_output() && g.server.audio.submitted_frames > 0 &&
-                   g.server.audio.output_error.empty();
+                   g.client_session.audio.mixer.has_output() && g.client_session.audio.mixer.submitted_frames > 0 &&
+                   g.client_session.audio.mixer.output_error.empty();
         }
         const auto* c = r ? dynamic_cast<const CinematicTrigger*>(r->game.get()) : nullptr;
-        const auto* v = c ? g.server.audio.get(c->sound) : nullptr;
+        const auto* v = c ? g.client_session.audio.mixer.get(c->sound) : nullptr;
         return c && c->starts == 1 && !c->failures && c->current == 0 && v && !v->done && v->cursor > 0 &&
-               v->request.space == SoundSpace::Local && v->clip->duration() > .2 && g.server.audio.has_output() &&
-               g.server.audio.submitted_frames > 0 && g.server.audio.output_error.empty();
+               v->request.space == SoundSpace::Local && v->clip->duration() > .2 &&
+               g.client_session.audio.mixer.has_output() && g.client_session.audio.mixer.submitted_frames > 0 &&
+               g.client_session.audio.mixer.output_error.empty();
     }
 } // namespace OpenBlood2

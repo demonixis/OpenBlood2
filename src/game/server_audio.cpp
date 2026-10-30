@@ -163,7 +163,7 @@ namespace OpenBlood2
             return false;
         return audio.kill(id);
     }
-    bool ServerAdapter::advance_audio(double seconds, DVector listener, DRotation rotation)
+    void ServerAdapter::prepare_audio()
     {
         std::vector<SoundId> removed;
         for (const auto& [id, entry] : audio.voices())
@@ -184,8 +184,16 @@ namespace OpenBlood2
         }
         for (auto id : removed)
             audio.kill(id);
-        const bool ok = audio.advance(seconds, listener, rotation);
-        removed.clear();
+    }
+    bool ServerAdapter::advance_audio(double seconds)
+    {
+        prepare_audio();
+        return advance_prepared_audio(seconds);
+    }
+    bool ServerAdapter::advance_prepared_audio(double seconds)
+    {
+        const bool ok = audio.advance(seconds);
+        std::vector<SoundId> removed;
         for (const auto& [id, entry] : audio.voices())
             if (entry.auto_remove && entry.done)
                 removed.push_back(id);

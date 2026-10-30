@@ -150,15 +150,16 @@ namespace
         r.resource = "cue.wav";
         r.space = SoundSpace::Local;
         std::string error;
-        g.server.audio.inspect_pcm = true;
+        g.client_session.audio.mixer.inspect_pcm = true;
         auto id = g.server.PlayCinematicSound(h, r, error);
         CHECK(id && g.server.audio.cached_clips() == 1);
         bool done = true;
         CHECK(g.server.IsSoundDone(id, done) && !done);
-        CHECK(g.server.audio.advance(.05, {}, {}));
-        CHECK(g.server.audio.mixed.size() == 4800 && std::abs(g.server.audio.peak - .5f) < .005f);
+        CHECK(g.advance_audio(.05, {}, {}));
+        CHECK(g.client_session.audio.mixer.mixed.size() == 4800 &&
+              std::abs(g.client_session.audio.mixer.peak - .5f) < .005f);
         CHECK(g.server.IsSoundDone(id, done) && !done);
-        CHECK(g.server.audio.advance(.05, {}, {}));
+        CHECK(g.advance_audio(.05, {}, {}));
         CHECK(g.server.IsSoundDone(id, done) && done);
         CHECK(g.server.KillSound(id) && !g.server.KillSound(id) && !g.server.IsSoundDone(id, done));
         auto next = g.server.PlayCinematicSound(h, r, error);
@@ -186,20 +187,20 @@ namespace
         std::string error;
         auto id = g.server.PlayCinematicSound(h, r, error);
         CHECK(id);
-        g.server.audio.inspect_pcm = true;
-        CHECK(g.server.advance_audio(.01, {}, {}));
-        auto* v = g.server.audio.get(id);
+        g.client_session.audio.mixer.inspect_pcm = true;
+        CHECK(g.advance_audio(.01, {}, {}));
+        auto* v = g.client_session.audio.mixer.get(id);
         CHECK(v && v->left == 0 && v->right > .66f && v->right < .67f);
         DVector pos{-500, 0, 0};
         CHECK(g.server.TeleportObject(speaker, &pos) == DE_OK);
-        CHECK(g.server.advance_audio(.01, {}, {}));
+        CHECK(g.advance_audio(.01, {}, {}));
         CHECK(v->right == 0 && v->left > .66f && v->position.x == -500);
-        CHECK(g.server.advance_audio(.01, {}, rotation_from_euler({0, 3.14159265f, 0})));
+        CHECK(g.advance_audio(.01, {}, rotation_from_euler({0, 3.14159265f, 0})));
         CHECK(v->right > .66f && v->left < .001f);
-        CHECK(g.server.advance_audio(.01, {-500, 0, 0}, {}));
+        CHECK(g.advance_audio(.01, {-500, 0, 0}, {}));
         CHECK(std::abs(v->left - .7071067f) < .001f);
         CHECK(g.objects.remove(speaker));
-        CHECK(g.server.advance_audio(.01, {}, {}));
+        CHECK(g.advance_audio(.01, {}, {}));
         CHECK(v->done && v->speaker_lost);
         CHECK(g.objects.finish_frame() && g.unload_world() && g.server.audio.voices().empty());
         return true;
@@ -300,11 +301,11 @@ namespace
         CHECK(!g.server.PlayCinematicSound(h, r, error) && g.server.audio.voices().size() == 128);
         for (auto id : ids)
             CHECK(g.server.KillSound(id));
-        CHECK(g.server.audio.advance(1, {}, {}) && g.server.audio.mixed.empty());
-        g.server.audio.inspect_pcm = true;
-        CHECK(g.server.audio.advance(1, {}, {}) && g.server.audio.mixed.size() == 24000 &&
-              g.server.audio.dropped_frames == 36000);
-        CHECK(!g.server.audio.advance(NAN, {}, {}));
+        CHECK(g.advance_audio(1, {}, {}) && g.client_session.audio.mixer.mixed.empty());
+        g.client_session.audio.mixer.inspect_pcm = true;
+        CHECK(g.advance_audio(1, {}, {}) && g.client_session.audio.mixer.mixed.size() == 24000 &&
+              g.client_session.audio.mixer.dropped_frames == 36000);
+        CHECK(!g.advance_audio(NAN, {}, {}));
         return true;
     }
     bool device(const std::filesystem::path& root)
@@ -313,21 +314,25 @@ namespace
         CHECK(setup(g, root));
         CHECK(SDL_SetHint(SDL_HINT_AUDIO_DRIVER, "dummy"));
         std::string error;
-        CHECK(g.server.audio.open_output(error));
+        CHECK(g.client_session.audio.mixer.open_output(error));
         auto h = cine(g);
         SoundRequest r;
         r.resource = "cue.wav";
         r.space = SoundSpace::Local;
         CHECK(g.server.PlayCinematicSound(h, r, error));
-        CHECK(g.server.advance_audio(.01, {}, {}));
-        CHECK(g.server.audio.has_output() && g.server.audio.submitted_frames == 480 && !g.server.audio.lead_frames &&
-              g.server.audio.peak > .49f && g.server.audio.output_error.empty());
+        CHECK(g.advance_audio(.01, {}, {}));
+        CHECK(g.client_session.audio.mixer.has_output() && g.client_session.audio.mixer.submitted_frames == 480 &&
+              !g.client_session.audio.mixer.lead_frames && g.client_session.audio.mixer.peak > .49f &&
+              g.client_session.audio.mixer.output_error.empty());
         // The interactive lead fills a short device queue to 60 ms ahead of the 10 ms step.
-        g.server.audio.output_lead = AudioMixer::interactive_output_lead;
-        CHECK(g.server.advance_audio(.01, {}, {}));
-        CHECK(g.server.audio.lead_frames > 0 && g.server.audio.submitted_frames - 480 >= 2400 &&
-              g.server.audio.submitted_frames - 480 <= 2880 && g.server.audio.output_error.empty());
-        CHECK(g.unload_world() && g.server.audio.voices().empty() && g.server.audio.submitted_frames == 0);
+        g.client_session.audio.mixer.output_lead = AudioMixer::interactive_output_lead;
+        CHECK(g.advance_audio(.01, {}, {}));
+        CHECK(g.client_session.audio.mixer.lead_frames > 0 &&
+              g.client_session.audio.mixer.submitted_frames - 480 >= 2400 &&
+              g.client_session.audio.mixer.submitted_frames - 480 <= 2880 &&
+              g.client_session.audio.mixer.output_error.empty());
+        CHECK(g.unload_world() && g.server.audio.voices().empty() &&
+              g.client_session.audio.mixer.submitted_frames == 0);
         return true;
     }
     bool subway(const std::filesystem::path& root)
@@ -362,16 +367,16 @@ namespace
             CHECK(v && v->request.space == SoundSpace::Local && v->clip->duration() > 0);
             std::cout << "cycle=" << cycle << " cue=" << v->request.resource << " rate=" << v->clip->rate
                       << " frames=" << v->clip->frames() << " duration=" << v->clip->duration() << '\n';
-            g.server.audio.inspect_pcm = true;
+            g.client_session.audio.mixer.inspect_pcm = true;
             for (unsigned i = 0; i < 6; ++i)
                 CHECK(g.step(1.0 / 60));
             v = g.server.audio.get(id);
-            CHECK(v && v->cursor > 0 && g.server.audio.mixed_frames == 4800 && g.objects.snapshot().size() == 232 &&
-                  g.objects.attachments().size() == 11);
+            CHECK(v && v->cursor > 0 && g.client_session.audio.mixer.mixed_frames == 4800 &&
+                  g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11);
             CHECK(g.unload_world() && g.objects.snapshot().empty() && g.server.audio.voices().empty() &&
                   !g.server.audio.cached_clips() && !g.server.audio.get(id) && !g.server.message_count() &&
                   !g.server.list_count() && !g.server.string_count());
-            g.server.audio.inspect_pcm = false;
+            g.client_session.audio.mixer.inspect_pcm = false;
         }
         // Run the two authored crash cues to completion in isolation, preserving their exact DAT properties.
         std::vector<std::uint8_t> bytes;

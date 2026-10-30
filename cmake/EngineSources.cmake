@@ -5,6 +5,7 @@ add_library(engine_core STATIC
     src/client/collision.cpp
     src/client/environment.cpp
     src/client/segment.cpp
+    src/client/audio.cpp
     src/client/camera.cpp
     src/client/hud.cpp
     src/game/original/PlayerDeathCamera.cpp

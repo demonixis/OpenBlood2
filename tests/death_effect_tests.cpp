@@ -52,7 +52,7 @@ namespace
         CHECK(g.server.advance_models(dt) && g.server.advance_physics(dt) && g.objects.advance(dt));
         CHECK(g.server.object_particles.advance(g.objects.time(), g.server));
         CHECK(g.server.flesh_gibs.advance(g.objects.time(), g.server));
-        CHECK(g.server.advance_audio(dt, {}, {}));
+        CHECK(g.advance_audio(dt, {}, {}));
         return true;
     }
     bool hit(GameSession& g, HOBJECT owner, Damage damage)
@@ -291,7 +291,7 @@ namespace
             CHECK(!g.server.IsObjectAlive(fire) && g.objects.attachments().empty());
             CHECK(g.server.object_particles.advance(g.objects.time(), g.server) &&
                   g.server.object_particles.active.empty());
-            CHECK(g.server.advance_audio(.01, {}, {}));
+            CHECK(g.advance_audio(.01, {}, {}));
             CHECK(g.unload_world() && g.server.audio.voices().empty());
         }
         return true;

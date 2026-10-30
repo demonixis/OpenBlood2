@@ -24,7 +24,12 @@ and server-only air/damage; client queries never run volume callbacks. The
 owns camera descriptors, death/chase geometry queries, HUD values and presentation
 clock on the client. Preserve source camera priority/math, generation-qualified
 views, addressed HUD events and server-derived movement gates/Eye commands.
-Audio/FX and remaining shell extraction, admission and network gameplay remain pending.
+The [client audio lot](Documentation/implementation/reports/m9_client_audio.md) now
+separates server logical voices from client playback, music and SDL output.
+Preserve sample clocks, source ownership and RNG, bounded pointer-free audio frames,
+independent stream readers and output transfer. Device lead must never advance server
+completion. Legacy client FX/VoiceMgr entry points, remaining shell extraction,
+admission and network gameplay remain pending.
 Preserve solo clocks, source pickup rules,
 immutable GPU references, existing PBR work and independent M2-GPU-001/M3 gates.
 

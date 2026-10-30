@@ -112,7 +112,7 @@ namespace
     {
         GameSession g;
         CHECK(test_audio::setup(g, root));
-        g.server.audio.inspect_pcm = true;
+        g.client_session.audio.mixer.inspect_pcm = true;
         auto speaker = target(g);
         CHECK(key(g, 0, 0, "cue.wav", true) && key(g, 1, 10, ""));
         auto h = path(g);
@@ -123,10 +123,10 @@ namespace
         CHECK(command(g, h, "OFF"));
         DVector moved{40, 100, 0};
         CHECK(g.server.MoveObject(speaker, &moved) == DE_OK);
-        CHECK(g.server.advance_audio(.02, moved, {}) && g.server.audio.peak > 0);
+        CHECK(g.advance_audio(.02, moved, {}) && g.client_session.audio.mixer.peak > 0);
         CHECK(g.server.audio.get(first)->position.x == 40 && g.server.audio.get(first)->cursor > 0);
         CHECK(g.objects.remove(speaker) && g.objects.finish_frame() && f->targets.empty());
-        CHECK(g.server.advance_audio(.02, {}, {}) && !g.server.audio.get(first));
+        CHECK(g.advance_audio(.02, {}, {}) && !g.server.audio.get(first));
         CHECK(g.objects.remove(h) && g.objects.finish_frame()); // Stale retained ID safe at destruction.
         CHECK(g.unload_world());
         speaker = target(g);

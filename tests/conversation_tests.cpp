@@ -135,7 +135,7 @@ namespace
         const auto* voice = g.server.audio.get(id);
         CHECK(voice && voice->request.space == SoundSpace::Local && !voice->request.streaming &&
               !voice->request.reverb_requested && voice->request.priority == 2);
-        CHECK(g.server.advance_audio(.1, {}, {}));
+        CHECK(g.advance_audio(.1, {}, {}));
         CHECK(g.server.audio.get(id)->done);
         CHECK(g.objects.advance(2.5));
         c.Update(g.server, g.client_shell.player, g.client_shell.voice_manager);
@@ -237,7 +237,7 @@ namespace
     bool private_game(const std::filesystem::path& root)
     {
         GameSession g;
-        g.server.audio.inspect_pcm = true;
+        g.client_session.audio.mixer.inspect_pcm = true;
         CHECK(g.initialize());
         std::string error;
         Config cfg;
@@ -293,10 +293,10 @@ namespace
             CHECK(id && g.server.audio.get(id)->clip->frames() == 25930);
             const auto& samples = g.server.audio.get(id)->clip->samples;
             CHECK(std::any_of(samples.begin(), samples.end(), [](float v) { return std::abs(v) > .1f; }));
-            CHECK(g.server.audio.advance(.25, {}, {}) && g.server.audio.peak > 0);
+            CHECK(g.advance_audio(.25, {}, {}) && g.client_session.audio.mixer.peak > 0);
             CHECK(g.objects.remove(probe->m_hObject) && g.objects.finish_frame() && g.server.audio.get(id));
             std::cout << "Diagnostic real voice " << file << " frames=" << g.server.audio.get(id)->clip->frames()
-                      << " peak=" << g.server.audio.peak << '\n';
+                      << " peak=" << g.client_session.audio.mixer.peak << '\n';
             CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.message_count());
         }
         return true;

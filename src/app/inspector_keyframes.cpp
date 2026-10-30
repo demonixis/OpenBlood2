@@ -64,7 +64,7 @@ namespace OpenBlood2
                 ImGui::Text("Last attempt target %s / radius %.1f / loop %d / retained voice %llu",
                             speaker ? speaker->state.m_Name : "none/removed", f->sound_radius, f->sound_loop,
                             (unsigned long long)f->sound_voice);
-                if (const auto* voice = game.server.audio.get(f->sound_voice))
+                if (const auto* voice = game.client_session.audio.mixer.get(f->sound_voice))
                 {
                     ImGui::Text("Decoded frames %llu / cursor %.1f / loops %llu / done %d",
                                 (unsigned long long)(voice->clip ? voice->clip->frames() : 0), voice->cursor,

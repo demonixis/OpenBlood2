@@ -158,7 +158,7 @@ namespace OpenBlood2
         ServerAdapter::active_ = &source.server;
         g_pServerDE = &source.server;
         source.server.bound_ = true;
-        if (!source.server.audio.transfer_output_to(destination->server.audio, error))
+        if (!source.client_session.audio.mixer.transfer_output_to(destination->client_session.audio.mixer, error))
         {
             source_globals.exchange();
             source.server.bound_ = false;

@@ -14,8 +14,9 @@ namespace OpenBlood2
         std::uint64_t ambient_frames_ = 0;
         static std::vector<double> snapshot(const GameSession& game)
         {
-            std::vector<double> result{game.objects.time(), double(game.server.audio.instruments.sample_clock()),
-                                       double(game.server.audio.mixed_frames)};
+            std::vector<double> result{game.objects.time(),
+                                       double(game.client_session.audio.mixer.instruments.sample_clock()),
+                                       double(game.client_session.audio.mixer.mixed_frames)};
             for (const auto id : game.objects.snapshot())
             {
                 const auto* r = game.objects.get(id);
@@ -25,7 +26,7 @@ namespace OpenBlood2
                                r->velocity.x, r->velocity.y, r->velocity.z, r->animation.time,
                                double(r->animation.revision), r->due, double(r->updates)});
             }
-            for (const auto& [id, voice] : game.server.audio.voices())
+            for (const auto& [id, voice] : game.client_session.audio.mixer.voices())
                 result.insert(result.end(), {double(id), voice.cursor, double(voice.loops)});
             for (const auto& weapon : game.client_shell.weapons)
                 result.push_back(weapon.animation.time);
@@ -75,13 +76,13 @@ namespace OpenBlood2
             if (frame == 4 && (!input.loading_screen || input.loading_wait || game.client_shell.m_bInWorld))
                 return fail("loading screen before the new game");
             if (frame == 5 && (!game.client_shell.m_bInWorld || menu.active || game.world_revision != 1 ||
-                               !input.loading_wait || !game.server.audio.paused()))
+                               !input.loading_wait || !game.client_session.audio.mixer.paused()))
                 return fail("new game request and waiting screen");
             if (frame == 6 && input.loading_screen)
                 return fail("waiting screen continue");
             if (frame == 11)
             {
-                if (!menu.active || !game.server.audio.paused())
+                if (!menu.active || !game.client_session.audio.mixer.paused())
                     return fail("pause admission");
                 frozen_ = snapshot(game);
                 ambient_frames_ = audio.mixer.mixed_frames;

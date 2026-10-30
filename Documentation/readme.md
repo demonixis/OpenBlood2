@@ -12,6 +12,7 @@
 | [Logs](logging.md) / [crash capture](crash_capture.md) | Collect and inspect diagnostics. |
 | [Architecture](architecture.md) | Targets, ownership and engine/game boundaries. |
 | [Client cameras and HUD](implementation/reports/m9_client_view.md) | M9 independent camera selection/rays, client HUD ownership and local verification. |
+| [Client audio](implementation/reports/m9_client_audio.md) | M9 logical server voices, independent client playback and local verification. |
 | [Client environment replica](implementation/reports/m9_client_environment.md) | M9 local liquid/ladder/conveyor membership, independent geometry queries and solo verification. |
 | [Client collision replica](implementation/reports/m9_client_collision.md) | M9 owned collision scene and independent prediction; solo validation and remaining services. |
 | [Local client movement](implementation/reports/m9_local_movement.md) | M9 separate CMoveMgr body, speculative collision and immediate server correction; solo verification. |

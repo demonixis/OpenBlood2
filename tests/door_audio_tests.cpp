@@ -69,7 +69,7 @@ namespace
     {
         GameSession g;
         CHECK(test_audio::setup(g, root));
-        g.server.audio.inspect_pcm = true;
+        g.client_session.audio.mixer.inspect_pcm = true;
         for (const auto* type : {"Door", "RotatingDoor"})
         {
             auto h = create(g, type);
@@ -79,7 +79,7 @@ namespace
             CHECK(d->state == Door::Opening && d->sound_requests == 1 && voice(g, *d, true));
             const auto opening = d->loop_voice;
             CHECK(step(g, 4) && g.server.audio.get(opening)->loops > 0);
-            CHECK(g.server.advance_audio(.01, g.objects.get(h)->state.m_Pos, {}) && g.server.audio.peak > 0);
+            CHECK(g.advance_audio(.01, g.objects.get(h)->state.m_Pos, {}) && g.client_session.audio.mixer.peak > 0);
             const auto* attached = g.server.audio.get(opening);
             CHECK(attached->position.x == g.objects.get(h)->state.m_Pos.x);
             CHECK(step(g, 100) && d->state == Door::Open && !d->loop_voice && !g.server.audio.get(opening));
@@ -139,7 +139,7 @@ namespace
         CHECK(d->state == Door::Open && voice(g, *d, false));
         const auto one_shot = d->last_voice;
         CHECK(g.objects.remove(h) && g.objects.finish_frame());
-        CHECK(g.server.advance_audio(.01, {}, {}) && !g.server.audio.get(one_shot));
+        CHECK(g.advance_audio(.01, {}, {}) && !g.server.audio.get(one_shot));
         CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.audio.cached_clips());
         CHECK(!g.server.string_count() && !g.server.message_count());
         return true;

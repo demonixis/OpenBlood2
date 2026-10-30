@@ -20,7 +20,7 @@ namespace
     {
         GameSession game;
         CHECK(test_audio::setup(game, root));
-        CHECK(!game.local_client && !game.client_shell.m_bInWorld && !game.server.audio.has_output());
+        CHECK(!game.local_client && !game.client_shell.m_bInWorld && !game.client_session.audio.mixer.has_output());
         auto owner = game.objects.create(game.objects.find_class("Key"), {});
         CHECK(owner);
         SoundRequest request;
@@ -38,8 +38,8 @@ namespace
             CHECK(game.step_server(ServerClock::step));
         CHECK(game.objects.time() > .19 && game.objects.time() < .21);
         CHECK(game.server.IsSoundDone(id, done) && done);
-        CHECK(game.server.audio.mixed.empty() && game.server.audio.submitted_frames == 0);
-        CHECK(!game.server.audio.has_output() && !game.local_client && !game.client_shell.m_bInWorld);
+        CHECK(game.client_session.audio.mixer.mixed.empty() && game.client_session.audio.mixer.submitted_frames == 0);
+        CHECK(!game.client_session.audio.mixer.has_output() && !game.local_client && !game.client_shell.m_bInWorld);
         CHECK(game.client_shell.move_mgr.updates == client_updates);
         CHECK(!game.step_server(-1));
         CHECK(game.objects.time() > .19 && game.objects.time() < .21);

@@ -87,25 +87,25 @@ namespace OpenBlood2
         spdlog::info("NPC ammunition smoke: original collection={}, bullets={}", ai->ammo_collections,
                      ai->m_InventoryMgr.GetAmmoCount(1));
         // Source-independent sound must survive removal of both participants.
-        if (!g.objects.remove(npc))
+        if (!g.objects.remove(npc) || !g.publish_client_audio(error))
             return false;
         for (const auto& report : g.server.pickup_reports)
         {
-            const auto* voice = g.server.audio.get(report.voice);
+            const auto* voice = g.client_session.audio.mixer.get(report.voice);
             if (!report.voice || !report.sound_error.empty() || !voice || !voice->world_owned || !voice->auto_remove ||
                 voice->request.speaker || voice->request.inner_radius != 30 || voice->request.outer_radius != 300 ||
-                g.server.IsObjectAlive(voice->owner))
+                bool(g.client_session.audio.owner(voice->id)))
                 return false;
         }
         // Run the normal sample clock after source removal, while the inspector is hidden.
-        if (!g.server.advance_audio(.02, pos, {}))
+        if (!g.advance_audio(.02, pos, {}))
             return false;
         for (const auto& report : g.server.pickup_reports)
-            if (const auto* voice = g.server.audio.get(report.voice); !voice || !voice->cursor)
+            if (const auto* voice = g.client_session.audio.mixer.get(report.voice); !voice || !voice->cursor)
                 return false;
-        return g.server.audio.has_output() && g.server.audio.submitted_frames > 0 &&
-               g.server.audio.output_error.empty() && player->m_damage.m_fHitPoints == 100 &&
+        return g.client_session.audio.mixer.has_output() && g.client_session.audio.mixer.submitted_frames > 0 &&
+               g.client_session.audio.mixer.output_error.empty() && player->m_damage.m_fHitPoints == 100 &&
                player->m_InventoryMgr.medkit->count == 25 && g.client_shell.item_sounds == 1 &&
-               g.server.audio.get(g.client_shell.item_voice) && g.server.pickup_reports.size() == 4;
+               g.client_session.audio.mixer.get(g.client_shell.item_voice) && g.server.pickup_reports.size() == 4;
     }
 } // namespace OpenBlood2

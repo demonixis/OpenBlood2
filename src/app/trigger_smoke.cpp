@@ -97,7 +97,7 @@ namespace OpenBlood2
         if (!t || t->sound_starts != 1 || t->sound_failures)
             return false;
         denial_voice = t->last_voice;
-        if (!g.server.audio.get(denial_voice) || !command(g, r->handle, "TRIGGER"))
+        if (!g.client_session.audio.mixer.get(denial_voice) || !command(g, r->handle, "TRIGGER"))
             return false;
         auto* player = g.server_shell.Player(g.local_client);
         return t->activations == 1 && t->key_queries == 2 && !t->locked && !t->active && player &&
@@ -105,14 +105,16 @@ namespace OpenBlood2
     }
     bool check_trigger_audio_smoke(GameSession& g, SoundId denial_voice)
     {
-        const auto* voice = g.server.audio.get(denial_voice);
+        const auto* voice = g.client_session.audio.mixer.get(denial_voice);
         const bool ok = voice && voice->clip && voice->clip->frames() && voice->cursor > 0 &&
-                        voice->owner == g.client_shell.player && voice->request.speaker == g.client_shell.player &&
+                        g.client_session.audio.owner(voice->id) == g.objects.get(g.client_shell.player)->id &&
+                        g.client_session.audio.speaker(voice->id) == g.objects.get(g.client_shell.player)->id &&
                         voice->request.inner_radius == 20 && voice->request.outer_radius == 200 &&
                         voice->request.priority == 2 && voice->auto_remove && !voice->request.loop &&
-                        g.server.audio.submitted_frames > 0 && g.server.audio.output_error.empty();
+                        g.client_session.audio.mixer.submitted_frames > 0 &&
+                        g.client_session.audio.mixer.output_error.empty();
         spdlog::info("Trigger denial audio hidden: voice={}, cursor={}, submitted frames={}, attached player={}",
-                     denial_voice, voice ? voice->cursor : 0, g.server.audio.submitted_frames, ok);
+                     denial_voice, voice ? voice->cursor : 0, g.client_session.audio.mixer.submitted_frames, ok);
         return ok;
     }
 } // namespace OpenBlood2

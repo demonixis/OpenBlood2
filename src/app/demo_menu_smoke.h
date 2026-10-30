@@ -61,16 +61,17 @@ namespace OpenBlood2
             }
             if (frame == 36)
             {
-                if (!menu.active || !game.server.audio.paused() || input.controls.mouse_requested)
+                if (!menu.active || !game.client_session.audio.mixer.paused() || input.controls.mouse_requested)
                     return fail("pause admission");
                 frozen_time = game.objects.time();
-                frozen_audio = game.server.audio.mixed_frames;
+                frozen_audio = game.client_session.audio.mixer.mixed_frames;
                 menu_audio = audio.mixer.mixed_frames;
                 frozen_focus = game.server_shell.Player(game.local_client)->m_InventoryMgr.GetAmmoCount(AMMO_FOCUS);
             }
             if (frame > 36 && frame <= 216)
             {
-                if (game.objects.time() != frozen_time || game.server.audio.mixed_frames != frozen_audio ||
+                if (game.objects.time() != frozen_time ||
+                    game.client_session.audio.mixer.mixed_frames != frozen_audio ||
                     game.server_shell.Player(game.local_client)->m_InventoryMgr.GetAmmoCount(AMMO_FOCUS) !=
                         frozen_focus)
                     return fail("paused simulation/audio/Focus changed");
@@ -115,9 +116,9 @@ namespace OpenBlood2
             if (p == 55 && (game.world_path != "worlds/demo_02.dat" ||
                             game.level_change.selected_start != "05_egress" || !input.loading_wait))
                 return fail("authored NEW_LEVEL");
-            if (p == 61 &&
-                (game.client_shell.m_bInWorld || !menu.active || menu.in_world ||
-                 menu.promotion != MenuPromotion::Info || menu.promotion_exit || !game.server.audio.paused()))
+            if (p == 61 && (game.client_shell.m_bInWorld || !menu.active || menu.in_world ||
+                            menu.promotion != MenuPromotion::Info || menu.promotion_exit ||
+                            !game.client_session.audio.mixer.paused()))
                 return fail("EndGame unload/promotion");
             if (p == 63 && (!menu.active || menu.page != MenuPage::Main || menu.promotion != MenuPromotion::None))
                 return fail("EndGame returns to main menu");

@@ -259,7 +259,7 @@ namespace
                     std::cerr << world << ": step " << step << " failed\n";
                     return false;
                 }
-            const auto& sampler = game->server.audio.instruments;
+            const auto& sampler = game->client_session.audio.mixer.instruments;
             CHECK(sampler.midi_rejected == 0 && sampler.dispatch_failures == 0 && sampler.midi_received > 0);
             const auto& notes = sampler.silent_notes;
             CHECK(std::any_of(notes.begin(), notes.end(), [](const auto& n)
@@ -557,7 +557,7 @@ namespace
         a.clear();
         // World ownership releases PCM even if a note was still held. Output transfer never transfers notes.
         GameSession world;
-        auto& mixer = world.server.audio;
+        auto& mixer = world.client_session.audio.mixer;
         AudioMixer destination;
         std::weak_ptr<const DlsBank> weak = bank;
         b.clear();

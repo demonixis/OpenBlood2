@@ -36,7 +36,7 @@ namespace
         out.close();
         std::string error;
         CHECK(g.resources.mount(root / "audio.rez", error) && g.enter_player(error));
-        g.server.audio.inspect_pcm = true;
+        g.client_session.audio.mixer.inspect_pcm = true;
         return true;
     }
     HOBJECT create(GameSession& g, const char* type = "BulletAmmoPU", Properties props = {})
@@ -86,15 +86,15 @@ namespace
               report.value->amount == 100 && report.key.empty() && report.position.y == pos.y && voice(g, report));
         CHECK(!touch(g, h) && g.server.pickup_reports.size() == 1 && g.server.audio.voices().size() == 1);
         CHECK(g.objects.finish_frame() && !g.objects.get(h) && g.server.audio.get(report.voice));
-        CHECK(g.server.advance_audio(.01, pos, {}) && g.server.audio.peak > 0);
+        CHECK(g.advance_audio(.01, pos, {}) && g.client_session.audio.mixer.peak > 0);
         CHECK(g.server.audio.get(report.voice)->cursor > 0);
         auto key = create(g, "KeyPickup");
         CHECK(key && touch(g, key) && !g.server.IsObjectAlive(key) && g.server.pickup_reports.size() == 2);
         const auto& kr = g.server.pickup_reports.back();
         CHECK(!kr.value && kr.key == "RedKey" && kr.sound == "sounds\\powerups\\inventory1.wav" && voice(g, kr));
         CHECK(g.objects.remove(p->m_hObject) && g.objects.finish_frame());
-        CHECK(g.server.advance_audio(.02, pos, {}) && g.server.audio.get(report.voice));
-        CHECK(g.server.advance_audio(1, pos, {}) && g.server.audio.voices().empty());
+        CHECK(g.advance_audio(.02, pos, {}) && g.server.audio.get(report.voice));
+        CHECK(g.advance_audio(1, pos, {}) && g.server.audio.voices().empty());
         CHECK(g.server.pickup_reports.size() == 2 && g.unload_world() && g.server.pickup_reports.empty() &&
               g.server.audio.cached_clips() == 0 && g.server.message_count() == 0);
         return true;
@@ -125,14 +125,14 @@ namespace
         p->m_InventoryMgr.SetAmmoCount(1, 0);
         CHECK(h && touch(g, h) && !g.server.IsObjectAlive(h));
         CHECK(!g.server.pickup_reports.back().voice && !g.server.pickup_reports.back().sound_error.empty());
-        CHECK(g.server.audio.voices().size() == 128 && g.server.advance_audio(1, {}, {}));
+        CHECK(g.server.audio.voices().size() == 128 && g.advance_audio(1, {}, {}));
         CHECK(g.server.audio.voices().empty());
         for (unsigned i = 0; i < 35; ++i)
         {
             p->m_InventoryMgr.SetAmmoCount(1, 0);
             h = create(g);
             CHECK(h && touch(g, h) && voice(g, g.server.pickup_reports.back()) && g.objects.finish_frame());
-            CHECK(g.server.advance_audio(1, {}, {}) && g.server.audio.voices().empty());
+            CHECK(g.advance_audio(1, {}, {}) && g.server.audio.voices().empty());
         }
         CHECK(g.server.pickup_reports.size() == 32 && g.unload_world() && g.server.pickup_reports.empty());
         return true;
@@ -175,7 +175,7 @@ namespace
         };
         CHECK(touch(g, h) && calls == 1 && ordered && g.server.pickup_reports.size() == 1);
         const auto id = g.server.pickup_reports.back().voice;
-        CHECK(g.objects.finish_frame() && g.server.advance_audio(.05, {200, 0, 200}, {}) && g.server.audio.get(id));
+        CHECK(g.objects.finish_frame() && g.advance_audio(.05, {200, 0, 200}, {}) && g.server.audio.get(id));
         CHECK(g.unload_world() && !g.server.audio.get(id) && !g.server.string_count() && !g.server.message_count());
         return true;
     }
@@ -185,7 +185,7 @@ namespace
         std::string error;
         CHECK(g.initialize() && g.resources.mount_game(Config{root, "private"}, error));
         CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
-        g.server.audio.inspect_pcm = true;
+        g.client_session.audio.mixer.inspect_pcm = true;
         auto* p = g.server_shell.Player(g.local_client);
         std::set<std::string> sounds;
         for (const char* type :
@@ -207,7 +207,8 @@ namespace
             std::string normalized;
             CHECK(resource_path(r.sound, normalized));
             sounds.insert(normalized);
-            CHECK(g.objects.finish_frame() && g.server.advance_audio(.02, r.position, {}) && g.server.audio.peak > 0);
+            CHECK(g.objects.finish_frame() && g.advance_audio(.02, r.position, {}) &&
+                  g.client_session.audio.mixer.peak > 0);
             const auto* v = g.server.audio.get(r.voice);
             CHECK(v && v->cursor > 0);
             std::cout << type << " -> " << r.sound << " frames=" << v->clip->frames() << " cursor=" << v->cursor

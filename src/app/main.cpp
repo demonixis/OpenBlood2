@@ -101,7 +101,7 @@ namespace
              options.world_sounds_smoke || options.random_sounds_smoke || options.weapons_smoke ||
              options.pickups_smoke || options.doors_smoke || options.triggers_smoke || options.keyframes_smoke ||
              (!options.gpu_smoke && !options.world_smoke)) &&
-            !game->server.audio.open_output(error))
+            !game->client_session.audio.mixer.open_output(error))
         {
             spdlog::warn("Audio output unavailable; cue clocks remain offline: {}", error);
             if (options.skeleton_smoke || options.scene_explosions_smoke || options.cinematics_smoke ||
@@ -853,11 +853,13 @@ namespace
                 if (player && record)
                 {
                     if (options.skeleton_smoke && !inspector_visible)
-                        if (const auto* voice = game->server.audio.get(player->m_hCurSound))
-                            character_audio_hidden |=
-                                voice->cursor > 0 && voice->request.speaker == player->m_hObject &&
-                                voice->request.resource.starts_with("sounds/player/footsteps/") &&
-                                game->server.audio.submitted_frames > 0 && game->server.audio.output_error.empty();
+                        if (const auto* voice = game->client_session.audio.mixer.get(player->m_hCurSound))
+                            character_audio_hidden |= voice->cursor > 0 &&
+                                                      game->client_session.audio.speaker(voice->id) ==
+                                                          game->objects.get(player->m_hObject)->id &&
+                                                      voice->request.resource.starts_with("sounds/player/footsteps/") &&
+                                                      game->client_session.audio.mixer.submitted_frames > 0 &&
+                                                      game->client_session.audio.mixer.output_error.empty();
                     saw_walk |= player->move_state == CPlayerObj::MoveState::Walk;
                     saw_run |= player->move_state == CPlayerObj::MoveState::Run;
                     saw_jump |= player->move_state == CPlayerObj::MoveState::Jump;
@@ -1198,18 +1200,18 @@ namespace
                     {
                         const auto* record = game->objects.get(smoke_door);
                         const auto* door = dynamic_cast<const Door*>(record->game.get());
-                        const auto* voice = game->server.audio.get(door->last_voice);
+                        const auto* voice = game->client_session.audio.mixer.get(door->last_voice);
                         door_sound_hidden = door->sound_starts > 0 && !door->sound_failures && voice &&
-                                            voice->request.speaker == record->handle && voice->cursor > 0 &&
-                                            voice->position.x == sampled_door_position.x &&
+                                            game->client_session.audio.speaker(voice->id) == record->id &&
+                                            voice->cursor > 0 && voice->position.x == sampled_door_position.x &&
                                             voice->position.y == sampled_door_position.y &&
                                             voice->position.z == sampled_door_position.z &&
-                                            game->server.audio.submitted_frames > 0 &&
-                                            game->server.audio.output_error.empty();
+                                            game->client_session.audio.mixer.submitted_frames > 0 &&
+                                            game->client_session.audio.mixer.output_error.empty();
                         spdlog::info("Door audio hidden: starts={}, failures={}, cursor={}, submitted frames={}, "
                                      "sampled attachment verified={}",
                                      door->sound_starts, door->sound_failures, voice ? voice->cursor : 0,
-                                     game->server.audio.submitted_frames, door_sound_hidden);
+                                     game->client_session.audio.mixer.submitted_frames, door_sound_hidden);
                     }
                 }
                 if (options.interaction_smoke && (frames == hide_frame || frames == show_frame - 1))
@@ -1325,7 +1327,8 @@ namespace
                                     inv.GetWeapon(0)->sounds_played == inv.GetWeapon(0)->shots &&
                                     !inv.GetWeapon(1)->sound_failures && !inv.GetWeapon(0)->sound_failures &&
                                     inv.GetWeapon(1)->impact_sounds > 0 && !inv.GetWeapon(1)->impact_sound_failures &&
-                                    game->server.audio.has_output() && game->server.audio.submitted_frames > 0;
+                                    game->client_session.audio.mixer.has_output() &&
+                                    game->client_session.audio.mixer.submitted_frames > 0;
                     spdlog::info("Weapon impacts: contacts={}, sounds={}, failures={}, hidden={}",
                                  inv.GetWeapon(1)->impact_contacts, inv.GetWeapon(1)->impact_sounds,
                                  inv.GetWeapon(1)->impact_sound_failures, weapon_advanced_hidden);
@@ -1555,16 +1558,17 @@ namespace
                 {
                     if (!game->step(1.0 / 60))
                         return 4;
-                    if (const auto* voice = game->server.audio.get(player->m_hCurSound))
+                    if (const auto* voice = game->client_session.audio.mixer.get(player->m_hCurSound))
                         character_audio_reentered = voice->cursor > 0 && player->sound_starts > 0 &&
-                                                    game->server.audio.submitted_frames > 0 &&
-                                                    game->server.audio.output_error.empty();
+                                                    game->client_session.audio.mixer.submitted_frames > 0 &&
+                                                    game->client_session.audio.mixer.output_error.empty();
                 }
                 game->client_shell.movement_input = {};
                 game->client_shell.weapon_input = {};
                 spdlog::info("Character audio: hidden={}, reentered={}, starts={}, surface={}, submitted={}",
                              character_audio_hidden, character_audio_reentered, player ? player->sound_starts : 0,
-                             player ? int(player->m_eLastSurface) : -1, game->server.audio.submitted_frames);
+                             player ? int(player->m_eLastSurface) : -1,
+                             game->client_session.audio.mixer.submitted_frames);
             }
             const bool paths_reentered =
                 !path_smoke ||

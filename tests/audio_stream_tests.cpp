@@ -153,25 +153,26 @@ namespace
         CHECK(streamed->clip->frames() == 8000 && streamed->clip->duration() == 1);
         CHECK(g.server.audio.cached_clips() == 2 &&
               g.server.audio.cached_bytes() == 8000 * 4 + PcmStream::buffer_bytes);
-        g.server.audio.inspect_pcm = true;
+        g.client_session.audio.mixer.inspect_pcm = true;
         for (auto dt : {.25, .25, .25, .25, .03, 1.2, 60.0})
         {
-            CHECK(g.server.advance_audio(dt, {}, {}));
+            CHECK(g.advance_audio(dt, {}, {}));
             CHECK(buffered->cursor == streamed->cursor && buffered->loops == streamed->loops && !streamed->done);
-            for (auto v : g.server.audio.mixed)
+            for (auto v : g.client_session.audio.mixer.mixed)
                 CHECK(std::abs(v - 1) < 1e-6f); // Two equal half-scale sources at every seam.
         }
         std::weak_ptr<PcmStream> lifetime = streamed->clip->stream;
-        CHECK(streamed->clip->stream->refills == 2); // Both windows retain this whole short fixture.
+        CHECK(streamed->clip->stream->refills == 0); // Server validates metadata without reading PCM windows.
+        CHECK(g.client_session.audio.mixer.get(b)->clip->stream->refills == 2); // Client retains both windows.
         request.loop = false;
         auto c = g.server.PlaySoundAt(owner, request, {}, error);
         CHECK(c);
         CHECK(g.server.audio.get(c)->clip == streamed->clip);
-        g.server.audio.inspect_pcm = false;
-        CHECK(g.server.advance_audio(1.1, {}, {}));
+        g.client_session.audio.mixer.inspect_pcm = false;
+        CHECK(g.advance_audio(1.1, {}, {}));
         bool done = false;
         CHECK(g.server.IsSoundDone(c, done) && done);
-        CHECK(g.objects.remove(owner) && g.server.advance_audio(0, {}, {}));
+        CHECK(g.objects.remove(owner) && g.advance_audio(0, {}, {}));
         g.objects.finish_frame();
         CHECK(g.server.audio.voices().empty() && !lifetime.expired() && g.unload_world() &&
               !g.server.audio.cached_bytes() && lifetime.expired());
@@ -326,22 +327,22 @@ namespace
         std::string error;
         auto id = g.server.PlaySoundAt(owner, request, {}, error);
         CHECK(id);
-        g.server.audio.inspect_pcm = true;
-        CHECK(g.server.advance_audio(.02, {}, {}));
+        g.client_session.audio.mixer.inspect_pcm = true;
+        CHECK(g.advance_audio(.02, {}, {}));
         auto* v = g.server.audio.get(id);
         auto cursor = v->cursor;
         std::error_code ec;
         std::filesystem::resize_file(root / "sound.rez", 0, ec);
         CHECK(!ec);
-        CHECK(!g.server.advance_audio(.02, {}, {}));
-        CHECK(v->cursor == cursor && !v->error.empty() && !v->done && g.server.audio.mixed.empty() &&
-              !g.server.audio.output_error.empty());
+        CHECK(!g.advance_audio(.02, {}, {}));
+        CHECK(v->cursor == cursor && !v->error.empty() && !v->done && g.client_session.audio.mixer.mixed.empty() &&
+              !g.client_session.audio.mixer.output_error.empty());
         bool done = true;
         CHECK(!g.server.IsSoundDone(id, done) && done);
         CHECK(!g.server.PlaySoundAt(owner, request, {}, error));
         CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.audio.cached_clips() &&
-              g.server.audio.output_error.empty());
-        CHECK(g.server.advance_audio(.02, {}, {}) && g.server.audio.output_error.empty());
+              g.client_session.audio.mixer.output_error.empty());
+        CHECK(g.advance_audio(.02, {}, {}) && g.client_session.audio.mixer.output_error.empty());
         return true;
     }
     bool city(const std::filesystem::path& root)
@@ -378,11 +379,16 @@ namespace
                     ++streams;
                     CHECK(v.clip->stream && v.clip->samples.empty());
                 }
-            g.server.audio.inspect_pcm = true;
-            CHECK(g.server.advance_audio(.2, {}, {}));
+            g.client_session.audio.mixer.inspect_pcm = true;
+            CHECK(g.advance_audio(.2, {}, {}));
             for (auto& [id, v] : g.server.audio.voices())
                 if (v.request.streaming)
-                    CHECK(v.clip->stream->refills > 0 && v.error.empty());
+                {
+                    const auto* playback = g.client_session.audio.mixer.get(id);
+                    CHECK(v.clip->stream->refills == 0 && v.error.empty());
+                    CHECK(playback && playback->clip->stream != v.clip->stream && playback->clip->stream->refills > 0 &&
+                          playback->error.empty());
+                }
             std::cout << "city created=" << created << " transferred=" << transferred << " unknown=" << unknown
                       << " failed=" << failed << " SoundFX=" << fx << " active=" << fx_voices << " streams=" << streams
                       << " cached_bytes=" << g.server.audio.cached_bytes() << '\n';

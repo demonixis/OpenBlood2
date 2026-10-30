@@ -881,7 +881,7 @@ namespace OpenBlood2
                             ImGui::Text("Commands %llu | starts %llu | failures %llu",
                                         (unsigned long long)sound->commands, (unsigned long long)sound->attempts,
                                         (unsigned long long)sound->failures);
-                            if (const auto* voice = game.server.audio.get(sound->sound))
+                            if (const auto* voice = game.client_session.audio.mixer.get(sound->sound))
                             {
                                 ImGui::Text("Voice %llu | %s | loop %s | %.3f / %.3f s | fixed %.1f %.1f %.1f",
                                             (unsigned long long)voice->id,
@@ -1045,7 +1045,7 @@ namespace OpenBlood2
                                             flare->ticks);
                                 ImGui::Text("World offset %.2f %.2f %.2f / loop voice %llu (%s)", flare->offset.x,
                                             flare->offset.y, flare->offset.z, (unsigned long long)flare->sound,
-                                            game.server.audio.get(flare->sound) ? "resolved" : "absent");
+                                            game.client_session.audio.mixer.get(flare->sound) ? "resolved" : "absent");
                                 if (!flare->sound_error.empty())
                                     ImGui::TextWrapped("Loop: %s", flare->sound_error.c_str());
                             }
@@ -1873,7 +1873,7 @@ namespace OpenBlood2
             if (ImGui::TreeNode("Original player voices"))
             {
                 const auto& vm = client.voice_manager;
-                const auto* sound = game.server.audio.get(vm.voice);
+                const auto* sound = game.client_session.audio.mixer.get(vm.voice);
                 ImGui::Text("Requests %llu | starts %llu | refused %llu | failures %llu | stops %llu",
                             (unsigned long long)vm.requests, (unsigned long long)vm.starts,
                             (unsigned long long)vm.refused, (unsigned long long)vm.failures,
@@ -2414,7 +2414,7 @@ namespace OpenBlood2
                                     impact.continued ? "continue" : "stop"))
                 {
                     const auto* object = game.objects.get(impact.hit.object);
-                    const auto* voice = game.server.audio.get(impact.effect.sound);
+                    const auto* voice = game.client_session.audio.mixer.get(impact.effect.sound);
                     ImGui::TextWrapped("Target: %s | stopping material %u | damage delivered %s",
                                        object ? object->state.m_Name
                                               : (impact.hit.object ? "removed" : "primary world"),
@@ -2468,7 +2468,7 @@ namespace OpenBlood2
         for (unsigned i = 0; i < weapon.fire_sounds.size(); ++i)
         {
             const auto id = weapon.fire_sounds[i];
-            const auto* voice = game.server.audio.get(id);
+            const auto* voice = game.client_session.audio.mixer.get(id);
             ImGui::TextWrapped("Slot %u: %llu / %s / expected end %.3f", i, (unsigned long long)id,
                                voice ? (voice->done ? "complete" : "playing") : (id ? "unresolved" : "empty"),
                                weapon.fire_sound_ends[i]);
@@ -3078,7 +3078,7 @@ namespace OpenBlood2
                         (unsigned long long)d->sound_starts, (unsigned long long)d->sound_failures);
             ImGui::Text("Retained loop %llu | last voice %llu", (unsigned long long)d->loop_voice,
                         (unsigned long long)d->last_voice);
-            if (const auto* voice = game.server.audio.get(d->last_voice))
+            if (const auto* voice = game.client_session.audio.mixer.get(d->last_voice))
                 ImGui::Text("Decoded frames %zu | cursor %.1f | wraps %llu | position %.1f %.1f %.1f",
                             static_cast<std::size_t>(voice->clip->frames()), voice->cursor,
                             (unsigned long long)voice->loops, voice->position.x, voice->position.y, voice->position.z);
@@ -3211,7 +3211,7 @@ namespace OpenBlood2
             ImGui::Text("Attachment: %s | radius %.1f | priority %u | voice %llu",
                         sound_owner && sound_owner->life == Life::Alive ? sound_owner->state.m_Name : "absent",
                         t->last_sound_radius, unsigned(t->last_sound_priority), (unsigned long long)t->last_voice);
-            if (const auto* voice = game.server.audio.get(t->last_voice))
+            if (const auto* voice = game.client_session.audio.mixer.get(t->last_voice))
                 ImGui::Text("Decoded frames %zu | cursor %.1f | sampled position %.1f %.1f %.1f",
                             static_cast<std::size_t>(voice->clip->frames()), voice->cursor, voice->position.x,
                             voice->position.y, voice->position.z);

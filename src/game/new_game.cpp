@@ -61,7 +61,7 @@ namespace OpenBlood2
         destination_globals.exchange();
         destination->server.bound_ = false;
         restore_source();
-        if (!source.server.audio.transfer_output_to(destination->server.audio, error))
+        if (!source.client_session.audio.mixer.transfer_output_to(destination->client_session.audio.mixer, error))
         {
             source_globals.exchange();
             source.server.bound_ = false;

@@ -298,10 +298,10 @@ namespace OpenBlood2
                 error = "Cannot initialize original game services";
                 return failed(4);
             }
-            if (!game->server.audio.open_output(error))
+            if (!game->client_session.audio.mixer.open_output(error))
                 spdlog::warn("Game audio output: {}", error);
             // A frame longer than one step's audio must not starve the device (carried by output transfers).
-            game->server.audio.output_lead = AudioMixer::interactive_output_lead;
+            game->client_session.audio.mixer.output_lead = AudioMixer::interactive_output_lead;
             if (options.view_world || options.demo_smoke)
             {
                 spdlog::info("Loading world: {} (direct entry)", options.world);
@@ -638,7 +638,7 @@ namespace OpenBlood2
                     }
                 }
                 // Freeze queued game output before any potentially slow preparation.
-                if (!game->server.audio.pause_output(input.paused(menu), error))
+                if (!game->client_session.audio.mixer.pause_output(input.paused(menu), error))
                     return failed(4);
                 if (std::exchange(input.demo.restart, false))
                 {
@@ -955,7 +955,7 @@ namespace OpenBlood2
                 const float sound_gain = settings.sound ? settings.sound_volume / 50.f : 0;
                 // Original SetMusicVolume takes 0..100 (100 = full); the original menu slider stops at 50.
                 const float music_gain = settings.music ? settings.music_volume / 100.f : 0;
-                if (!game->server.audio.set_gains(sound_gain, music_gain) ||
+                if (!game->client_session.audio.mixer.set_gains(sound_gain, music_gain) ||
                     (menu_audio && !menu_audio->mixer.set_gains(sound_gain, music_gain)))
                 {
                     error = "Cannot apply audio preferences";
@@ -1003,7 +1003,7 @@ namespace OpenBlood2
                         }
                     }
                 }
-                if (!game->server.audio.pause_output(input.paused(menu), error))
+                if (!game->client_session.audio.mixer.pause_output(input.paused(menu), error))
                     return failed(4);
                 auto& shell = game->client_shell;
                 if (input.paused(menu) || input.inspector || input.message.active)
@@ -1026,7 +1026,7 @@ namespace OpenBlood2
                     menu.close();
                     input.inspector = false;
                     input.reset(menu, true);
-                    if (!game->server.audio.pause_output(false, error))
+                    if (!game->client_session.audio.mixer.pause_output(false, error))
                         return failed(4);
                 }
 #endif
@@ -1125,7 +1125,7 @@ namespace OpenBlood2
                         input.inspector = false;
                         input.reset(menu, false);
                         neutralize_app_input(game->client_shell);
-                        if (!game->server.audio.pause_output(true, error))
+                        if (!game->client_session.audio.mixer.pause_output(true, error))
                             return failed(4);
                         spdlog::info("Demo completed: original EndGame / screens/info.pcx / {}",
                                      menu_enabled ? "return to menu" : "direct exit");

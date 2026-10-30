@@ -50,15 +50,16 @@ namespace OpenBlood2
                 key(SDL_SCANCODE_ESCAPE);
             if (frame == 7)
             {
-                if (!input.demo.paused() || !game.server.audio.paused())
+                if (!input.demo.paused() || !game.client_session.audio.mixer.paused())
                     return fail("pause admission");
                 frozen_time = game.objects.time();
-                frozen_audio = game.server.audio.mixed_frames;
+                frozen_audio = game.client_session.audio.mixer.mixed_frames;
                 frozen_focus = game.server_shell.Player(game.local_client)->m_InventoryMgr.GetAmmoCount(AMMO_FOCUS);
             }
             if (frame >= 8 && frame <= 15)
             {
-                if (game.objects.time() != frozen_time || game.server.audio.mixed_frames != frozen_audio ||
+                if (game.objects.time() != frozen_time ||
+                    game.client_session.audio.mixer.mixed_frames != frozen_audio ||
                     game.server_shell.Player(game.local_client)->m_InventoryMgr.GetAmmoCount(AMMO_FOCUS) !=
                         frozen_focus)
                     return fail("simulation/audio/Focus advanced in pause or on resume frame");
@@ -127,7 +128,7 @@ namespace OpenBlood2
                 return fail("second-world transfer");
             if (frame == 61)
             {
-                if (!input.demo.finished() || game.client_shell.m_bInWorld || !game.server.audio.paused())
+                if (!input.demo.finished() || game.client_shell.m_bInWorld || !game.client_session.audio.mixer.paused())
                     return fail("terminal ownership/audio");
                 confirmed = true;
             }

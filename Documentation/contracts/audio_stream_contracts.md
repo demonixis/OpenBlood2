@@ -104,3 +104,14 @@ rewrite commercial data. Private sampled PCM is compared with SDL decoding.
 GPU Sound uses real streamed SubwayA PCM through original SoundFX, with hidden UI,
 unload/reload and inspector-free Release. Full level playthrough, audible listening,
 retail mixing parity, safe NEW_LEVEL and actual M2 acceptance remain open.
+
+## M9 client/server ownership
+
+The [local audio separation](../implementation/reports/m9_client_audio.md) now keeps
+logical server cursors/extent checks in `AudioTimeline` and actual PCM playback in
+a client `AudioMixer`. The same reader/stepping arithmetic is reused, with separate
+cached assets and stream readers. Client read errors cannot latch into server
+metadata. The server reads no PCM windows during clock-only advancement. Interactive
+queue lead affects only the client; original server completion no longer follows
+device refill lead. Existing stream bounds, failures and resource immutability
+requirements continue to apply independently to both sides.

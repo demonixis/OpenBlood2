@@ -169,8 +169,8 @@ namespace
         }
         const auto& client = g.client_shell;
         // client.blocker is a historical scope note, not a failure result.
-        error = client.objectives_error + client.item_audio_error + client.world_exit.error + s.audio.music_error +
-                s.audio.output_error;
+        error = client.objectives_error + client.item_audio_error + client.world_exit.error +
+                g.client_session.audio.mixer.music_error + g.client_session.audio.mixer.output_error;
         CHECK(error.empty() && !client.voice_manager.failures && !client.communication.sound_failures &&
               !client.music.failures);
         if (phase)
@@ -278,7 +278,7 @@ namespace
         std::uint64_t music_messages_before = 0, music_received_before = 0, fire_keys_before = 0;
         if (gpu)
         {
-            CHECK(session->server.audio.open_output(error));
+            CHECK(session->client_session.audio.mixer.open_output(error));
             CHECK(capture_scene(*session, runtime, captures / "start.png", error));
         }
         const auto id = gpu ? SDL_GetWindowID(runtime.window) : 8;
@@ -526,15 +526,16 @@ namespace
             CHECK(slot.sent == 1);
         CHECK(session->client_shell.weapons.front().fire_keys + fire_keys_before > 0 && p->fade_messages == 1);
         std::cout << "Music: player messages " << p->music_messages << ", received "
-                  << session->client_shell.music.received
-                  << ", level " << int(session->client_shell.music.logical_level) << ", loop "
-                  << session->server.audio.music_loop.active() << '/' << int(session->server.audio.music_loop.level())
-                  << '\n';
+                  << session->client_shell.music.received << ", level "
+                  << int(session->client_shell.music.logical_level) << ", loop "
+                  << session->client_session.audio.mixer.music_loop.active() << '/'
+                  << int(session->client_session.audio.mixer.music_loop.level()) << '\n';
         CHECK(p->unsupported_triggers == 0 && p->music_messages + music_messages_before == 1 &&
               session->client_shell.music.received + music_received_before == 1 &&
               session->client_shell.music.logical_level == 3 && session->client_shell.music.failures == 0 &&
-              session->server.audio.music_loop.active() && session->server.audio.music_loop.level() == 3 &&
-              session->server.audio.music_error.empty());
+              session->client_session.audio.mixer.music_loop.active() &&
+              session->client_session.audio.mixer.music_loop.level() == 3 &&
+              session->client_session.audio.mixer.music_error.empty());
         CHECK(p->m_damage.apply_damage_physics && p->m_damage.last_impulse_ok);
         // The 30 Hz driver takes enemy hits; the 60 Hz route can finish unhurt.
         if (hz == 30)
@@ -578,7 +579,8 @@ namespace
         }
         if (gpu)
         {
-            CHECK(game->server.audio.has_output() && game->server.audio.submitted_frames > 0);
+            CHECK(game->client_session.audio.mixer.has_output() &&
+                  game->client_session.audio.mixer.submitted_frames > 0);
             CHECK(capture_scene(*game, runtime, captures / "cityhub.png", error));
         }
         CHECK(trace_services(*game, audit, "CityHub", error));

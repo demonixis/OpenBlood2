@@ -6,9 +6,15 @@ namespace OpenBlood2
 {
     void Inspector::draw_cinematics(GameSession& game, ObjectSelection& selection)
     {
-        auto& audio = game.server.audio;
+        auto& audio = game.client_session.audio.mixer;
         ImGui::TextWrapped("Original CinematicTrigger sequences: cue message precedes sound; decoded sample completion "
                            "advances the next delay. TRIGGER rearms cue 1's delay without resetting playback.");
+        const auto& frame = game.client_session.audio.frame();
+        ImGui::Text("Client audio world %llu / frame %llu | server logical voices %zu",
+                    static_cast<unsigned long long>(frame.world), static_cast<unsigned long long>(frame.sequence),
+                    game.server.audio.voices().size());
+        if (!game.audio_replica_error.empty())
+            ImGui::TextWrapped("Audio publication failed: %s", game.audio_replica_error.c_str());
         ImGui::Text("Output: %s | voices %zu | cached clips %zu (%.1f MiB)",
                     audio.has_output() ? "SDL stream" : "offline clock", audio.voices().size(), audio.cached_clips(),
                     audio.cached_bytes() / 1048576.0);
@@ -103,13 +109,16 @@ namespace OpenBlood2
         if (const auto* v = audio.get(c->sound))
         {
             ImGui::Separator();
-            ImGui::Text("Voice %llu | %s | %s", (unsigned long long)v->id,
+            if (const auto* logical = game.server.audio.get(c->sound))
+                ImGui::Text("Server logical %.3f s / %s", logical->cursor / logical->clip->rate,
+                            logical->done ? "done" : "playing");
+            ImGui::Text("Client voice %llu | %s | %s", (unsigned long long)v->id,
                         v->request.space == SoundSpace::Local ? "local" : "attached 3D", v->done ? "done" : "playing");
             ImGui::Text("WAV encoding %u | %u Hz / %u channels | %.3f / %.3f s", v->clip->encoding, v->clip->rate,
                         v->clip->channels, v->cursor / v->clip->rate, v->clip->duration());
             ImGui::Text("Gains L/R %.3f / %.3f | radii %.0f / %.0f | speaker lost %s", v->left, v->right,
                         v->request.inner_radius, v->request.outer_radius, v->speaker_lost ? "yes" : "no");
-            const auto* speaker = game.objects.get(v->request.speaker);
+            const auto* speaker = game.objects.get(game.client_session.audio.speaker(v->id));
             ImGui::Text("Speaker %s | position %.1f %.1f %.1f", speaker ? speaker->state.m_Name : "none", v->position.x,
                         v->position.y, v->position.z);
         }

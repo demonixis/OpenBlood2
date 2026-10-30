@@ -1,0 +1,108 @@
+{
+  "scope": "M9 independent local client audio and authoritative logical voice clock",
+  "baseline": "99bdfbae",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "99bdfbae",
+      "path": "src/engine/audio.h",
+      "sha256": "1b045d33ae6b7d2c585b06b0752457ac11513cbe637548a4cbce4a0076c45903"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "99bdfbae",
+      "path": "src/engine/audio.cpp",
+      "sha256": "4bc1f33d57a074304bb0625d623954e7fe22b314abe535b111227e76d51d6251"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "99bdfbae",
+      "path": "src/engine/audio_stream.cpp",
+      "sha256": "49ccf9909dcae9615824fd7484c628b3fd324325561a170988382132ee201f29"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "99bdfbae",
+      "path": "src/game/server_audio.cpp",
+      "sha256": "e9881e3477c0be76009e83f1bb90d99fd559a8323cde7352fc14806cdd9060d0"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "99bdfbae",
+      "path": "src/game/server_adapter.h",
+      "sha256": "b0ff42a53f79928adb84b205bf999a2718f266fe2adc86187088f1b3841360ef"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "99bdfbae",
+      "path": "src/game/session.cpp",
+      "sha256": "ccb71e3a7746368f1541b186b200b2321576e3391f8f8eac033340ae7d81f475"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "99bdfbae",
+      "path": "src/game/original/Music.cpp",
+      "sha256": "e89d1002e5d20be799212dbf7d65663b2a177675b9cbf815709bebdea1cddf7b"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "99bdfbae",
+      "path": "src/game/original/Sound.cpp",
+      "sha256": "3b0300c9d4df5f0b4a6934f043b1d2e2a5f05f6c92ab92a7b65e8534b64e1893"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "99bdfbae",
+      "path": "src/game/new_game.cpp",
+      "sha256": "1c43fd2ff7ae06778a4da6538496f4428a4fcd0c8caee76ed3ddebc0ffa55bfc"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "99bdfbae",
+      "path": "src/game/level_change.cpp",
+      "sha256": "1a6199557385fb559d713afb8e3c242e76733cecb47accf5e239d493c002d7d8"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "99bdfbae",
+      "path": "src/game/saved_game.cpp",
+      "sha256": "9688c5b8acda8a71419664055978fd03d6e879cbe87d56d94757b9ba53c05bcb"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/CinematicTrigger.cpp",
+      "sha256": "9cdfcc8740afae0dbb0ab3b9ffcc9d770df72234a090a157c6d893d1867a05af"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/SoundFX.cpp",
+      "sha256": "0e9115b1a3d8fc3ff85298dd99c9d3c09c12d1a5fa8ed8aa9d231cfe766bf5ce"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/VoiceMgr.cpp",
+      "sha256": "298aa4746f65fa5ef6b830ffc91dd1794d7f701f1437de090a62d8b3c5c9cc75"
+    }
+  ],
+  "adaptations": [
+    "Extract shared resource/voice/48 kHz stepping into AudioTimeline without device/PCM/music state",
+    "Client-owned mixer/cache/stream readers and pointer-free world-qualified sound descriptors",
+    "Keep numeric voice order, sample stepping/resampling/attenuation and original server ownership/IsSoundDone/GetSoundDuration",
+    "Separate device queue lead from authoritative completion; no client pause/gain/error/device in step_server",
+    "Route frontend gains/pause, original music, inspector and session output transfer to client ownership"
+  ],
+  "remaining": [
+    "Original client FX and VoiceMgr requests still enter the local server service; multi-recipient sound admission pending",
+    "Network audio wire schema, delayed synchronization and remote sessions",
+    "Native platform and audible-device/hardware qualification"
+  ]
+}

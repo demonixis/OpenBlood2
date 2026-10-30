@@ -113,7 +113,7 @@ namespace
         const auto* v = g.server.audio.get(id);
         CHECK(v && v->request.streaming && v->clip->stream && v->request.priority == 5 && !v->request.reverb_requested);
         CHECK(!vm.PlayEventSound(player, 0, 9, true) && vm.reason == "busy");
-        CHECK(g.server.advance_audio(.1, {}, {}) && g.server.audio.get(id)->done);
+        CHECK(g.advance_audio(.1, {}, {}) && g.server.audio.get(id)->done);
         CHECK(g.objects.advance(vm.next_play_time - g.objects.time()));
         CHECK(!vm.PlayEventSound(player, 0, 9, false) && vm.reason == "cooldown");
         CHECK(g.objects.advance(.01) && vm.PlayEventSound(player, 0, 9, false));
@@ -130,7 +130,7 @@ namespace
         vm.on = true;
         id = vm.voice;
         CHECK(g.objects.remove(player) && g.objects.finish_frame());
-        CHECK(g.server.advance_audio(.01, {}, {}) && !g.server.audio.get(id));
+        CHECK(g.advance_audio(.01, {}, {}) && !g.server.audio.get(id));
         CHECK(!vm.PlayUniqueSound(player, 0, 2, false) && !vm.played[0][2] && !vm.error.empty());
         CHECK(g.unload_world() && !vm.voice && g.server.audio.voices().empty());
         return true;
@@ -250,7 +250,7 @@ namespace
         CHECK(p->m_nLastHitPoints == 69 && p->m_nLastDamage == 31 && p->damage_voice_checks == 1 &&
               p->damage_voice_requests == 1 && p->damage_voice_event == 2 && vm.starts == 1);
         CHECK(vm.last_resource == "sounds/chosen/caleb/pain/a.wav");
-        CHECK(g.server.advance_audio(.01, {}, {}) && g.server.audio.get(vm.voice)->cursor > 0);
+        CHECK(g.advance_audio(.01, {}, {}) && g.server.audio.get(vm.voice)->cursor > 0);
         CHECK(p->UpdateStats(true) && g.pump_player_messages(error) && p->damage_voice_checks == 1);
         // Same-frame healing back to the previous integer health cancels the net-loss branch.
         CHECK(damage(g, h, 1, DamageType::Normal, h));
@@ -379,7 +379,7 @@ namespace
                       starts + unsigned(expected != 0)); // Big-gib precedes kill; busy suppresses the latter.
                 if (expected)
                 {
-                    CHECK(g.server.advance_audio(.01, {}, {}));
+                    CHECK(g.advance_audio(.01, {}, {}));
                     const auto* voice = g.server.audio.get(vm.voice);
                     CHECK(voice && voice->cursor > 0 && voice->request.streaming && voice->clip->stream);
                     CHECK(vm.last_resource.find(gib_reply ? "/biggib/" : "/kill/") != std::string::npos);
@@ -431,7 +431,7 @@ namespace
                 continue; // Two confirmed absent authored references, never marked played.
             }
             CHECK(started);
-            CHECK(g.server.advance_audio(.01, {}, {}));
+            CHECK(g.advance_audio(.01, {}, {}));
             const auto* v = g.server.audio.get(vm.voice);
             CHECK(v && v->cursor > 0 && v->clip->stream && v->request.streaming);
         }
@@ -440,7 +440,7 @@ namespace
         CHECK(g.server_shell.OnMessage(g.local_client, PlayerControlAction{PlayerControlAction::Taunt}));
         CHECK(g.pump_player_messages(error) && vm.starts == taunt_starts + 1);
         CHECK(vm.last_resource.find("/taunt/") != std::string::npos);
-        CHECK(g.server.advance_audio(.01, {}, {}));
+        CHECK(g.advance_audio(.01, {}, {}));
         const auto* taunt_voice = g.server.audio.get(vm.voice);
         CHECK(taunt_voice && taunt_voice->cursor > 0 && taunt_voice->request.streaming);
         CHECK(g.server_shell.OnMessage(g.local_client, PlayerControlAction{PlayerControlAction::Taunt}));

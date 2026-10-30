@@ -338,3 +338,39 @@ extraction. Legacy handle events for inventory/audio, authoritative animation/st
 weapon/FX paths, remaining presentation and admission/network gameplay stay pending.
 The [camera/HUD report](../implementation/reports/m9_client_view.md) records the
 Linux checks and the limits of this lot.
+
+## Local client audio
+
+The [audio lot](../implementation/reports/m9_client_audio.md) separates authoritative
+`AudioTimeline` voices from `ClientSession::audio` playback. Server sound services
+keep real resource validation, sample-derived durations, explicit stops, completion,
+stream failures and original ownership. The server timeline has no device, PCM
+buffer, gain/pause setting or music transport. `step_server` never advances or
+consults the client mixer.
+
+The local publisher copies complete frames with world/sequence, monotonic sound IDs,
+generation-qualified owner/speaker provenance and resource/playback values. No
+original handles or asset pointers cross into the frame. The receiver bounds counts
+and values, checks local asset metadata, refuses duplicate/retired identities and
+replaces accepted membership atomically. Playback has its own buffered clips and
+stream readers. Existing voices keep their playback cursor through repeat snapshots;
+late voices start at the supplied logical cursor. Client playback failure cannot
+poison the server's reader or another client.
+
+Retain original voice order, fractional 48 kHz stepping, interpolation and source
+owner/speaker/removal rules. Publish new voices without advancing them, and preserve
+the preceding completed listener pose. Keep menu and game mixers independent.
+Client output, gain/pause and original music move together on new-game/load/NEW_LEVEL
+promotion; world caches do not. Inspect server completion separately from client
+cursor/PCM/gains.
+
+The 60 ms interactive output lead is presentation-only. It no longer advances server
+completion early. This is an explicit correction of prior device-dependent logical
+cursor advancement; zero-lead/offline solo stepping is unchanged. Solo pause gates
+both timelines, whereas dedicated advancement ignores client pause/output entirely.
+CMoveMgr, physics integration, source random draws and PBR files remain unchanged.
+
+This is an immediate local boundary. The legacy client FX/VoiceMgr entry points,
+per-recipient sound delivery, wire codec, delayed synchronization and network
+qualification remain pending. Separate caches retain existing bounds and add local
+memory/CPU work; a server duration-only reader is not introduced.

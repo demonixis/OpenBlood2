@@ -64,7 +64,7 @@ namespace
     {
         GameSession g;
         CHECK(test_audio::setup(g, root));
-        g.server.audio.inspect_pcm = true;
+        g.client_session.audio.mixer.inspect_pcm = true;
         const auto sender = body(g);
         for (const auto* type : {"Trigger", "BigTrigger", "ToggleTrigger"})
         {
@@ -79,10 +79,9 @@ namespace
             CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, sender) && t->sound_starts == 2);
             CHECK(g.server.audio.get(first)); // Unretained requests overlap, even for the same clip.
             g.objects.get(h)->state.m_Pos = {200, 100, 0};
-            CHECK(g.server.advance_audio(.01, {200, 100, 0}, {}) && g.server.audio.peak > 0);
+            CHECK(g.advance_audio(.01, {200, 100, 0}, {}) && g.client_session.audio.mixer.peak > 0);
             CHECK(g.server.audio.get(first)->position.x == 200 && g.server.audio.get(t->last_voice)->cursor > 0);
-            CHECK(g.server.advance_audio(1.1, {}, {}) && !g.server.audio.get(first) &&
-                  !g.server.audio.get(t->last_voice));
+            CHECK(g.advance_audio(1.1, {}, {}) && !g.server.audio.get(first) && !g.server.audio.get(t->last_voice));
             CHECK(g.objects.remove(h) && g.objects.finish_frame());
         }
         return true;
@@ -128,12 +127,12 @@ namespace
         CHECK(send(g, h, "TRIGGER", sender) && voice(g, *t, h, 750, 1));
         const auto activation_voice = t->last_voice;
         g.objects.get(h)->state.m_Flags &= ~FLAG_VISIBLE;
-        CHECK(g.server.advance_audio(.02, {}, {}) && g.server.audio.get(activation_voice)->cursor > 0);
+        CHECK(g.advance_audio(.02, {}, {}) && g.server.audio.get(activation_voice)->cursor > 0);
         CHECK(g.objects.remove(h) && g.objects.finish_frame());
-        CHECK(g.server.advance_audio(.01, {}, {}) && !g.server.audio.get(activation_voice));
+        CHECK(g.advance_audio(.01, {}, {}) && !g.server.audio.get(activation_voice));
         CHECK(g.server.audio.get(unlocked)); // Speaker is the sender, not the deleted trigger.
         CHECK(g.objects.remove(sender) && g.objects.finish_frame());
-        CHECK(g.server.advance_audio(.01, {}, {}) && !g.server.audio.get(unlocked));
+        CHECK(g.advance_audio(.01, {}, {}) && !g.server.audio.get(unlocked));
         auto next = create(g);
         CHECK(send(g, next, "TRIGGER", next) && get(g, next)->last_voice > activation_voice);
         CHECK(!g.server.KillSound(activation_voice) && g.server.audio.get(get(g, next)->last_voice));
@@ -203,7 +202,7 @@ namespace
                 previous = t->last_voice;
                 std::cout << "Authored trigger " << r->state.m_Name << ": " << t->last_sound
                           << " frames=" << g.server.audio.get(previous)->clip->frames() << '\n';
-                CHECK(g.server.advance_audio(.01, g.objects.get(g.client_shell.player)->state.m_Pos, {}));
+                CHECK(g.advance_audio(.01, g.objects.get(g.client_shell.player)->state.m_Pos, {}));
                 CHECK(g.server.audio.get(previous)->cursor > 0);
                 ++checked;
             }

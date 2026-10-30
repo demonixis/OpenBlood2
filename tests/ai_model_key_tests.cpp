@@ -93,7 +93,7 @@ namespace
         const auto& v = g.server.audio.voices().begin()->second;
         CHECK(v.owner == ai->m_hObject && v.auto_remove && !v.world_owned && v.request.outer_radius == 500 &&
               v.request.inner_radius == 50 && v.request.volume == .7f && v.request.priority == 3);
-        CHECK(g.server.advance_audio(.1, {}, {}));
+        CHECK(g.advance_audio(.1, {}, {}));
         CHECK(g.server.audio.voices().empty());
         CHECK(key(g, ai, "[play_sound:cue.wav]"));
         CHECK(ai->audio_starts == 2 && ai->ai_sound_resource == "ai\\cue.wav.wav");
@@ -206,12 +206,12 @@ namespace
         CHECK(two->audio_starts == 1); // Nonvoice is not serialized.
         CHECK(g.objects.remove(one->m_hObject) && g.objects.finish_frame());
         CHECK(!weak.expired());
-        CHECK(g.server.advance_audio(0, {}, {}));
+        CHECK(g.advance_audio(0, {}, {}));
         CHECK(!g.server.audio.get(id));
         CHECK(key(g, two, "[play_sound:cue][sound_voice:1]"));
         CHECK(two->audio_starts == 2);
         CHECK(g.objects.remove(two->m_hObject) && g.objects.finish_frame() && weak.expired());
-        CHECK(g.server.advance_audio(0, {}, {}));
+        CHECK(g.advance_audio(0, {}, {}));
         CHECK(g.server.audio.voices().empty());
         return true;
     }
@@ -263,13 +263,13 @@ namespace
         CHECK(g.server.advance_models(0) && ai->model_keys == 0);
         r->activity = OBJSTATE_ACTIVE;
         CHECK(g.server.advance_models(0) && ai->model_keys == 2 && ai->audio_starts == 2 && ai->motion_keys == 1);
-        CHECK(g.server.advance_audio(.05, {}, {}));
+        CHECK(g.advance_audio(.05, {}, {}));
         CHECK(g.server.audio.get(ai->AnimSound()->m_hVoxSound)->cursor > 0);
         CHECK(m->animations[0].keys[0].text.ends_with("[sound_voice:1]"));
         const auto h = ai->m_hObject;
         CHECK(g.objects.remove(h));
         CHECK(!g.objects.engine_message(h, MID_MODELSTRINGKEY, nullptr));
-        CHECK(g.server.advance_audio(0, {}, {}));
+        CHECK(g.advance_audio(0, {}, {}));
         CHECK(g.server.audio.voices().empty());
         CHECK(g.objects.finish_frame());
         return true;
@@ -322,7 +322,7 @@ namespace
                 if (ai->key_outcome == AIKeyOutcome::PlaybackFailed)
                     std::cout << profile.model << " missing " << ai->ai_sound_resource << " " << ai->ai_key_error
                               << "\n";
-                CHECK(g.server.advance_audio(10, {}, {}));
+                CHECK(g.advance_audio(10, {}, {}));
             }
             std::cout << profile.model << " keys=" << ai->model_keys << " sound_keys=" << ai->audio_keys
                       << " starts=" << ai->audio_starts << " busy=" << ai->busy_voices << " no_target=" << ai->no_target
@@ -338,7 +338,7 @@ namespace
             failures += ai->key_failures;
             const auto h = ai->m_hObject;
             CHECK(g.objects.remove(h) && g.objects.finish_frame());
-            CHECK(g.server.advance_audio(0, {}, {}));
+            CHECK(g.advance_audio(0, {}, {}));
         }
         std::cout << "TOTAL keys=" << keys << " starts=" << starts << " failures=" << failures << "\n";
         CHECK(keys == 147 && sounds == 140 && starts == 140 && failures == 1 && absent_targets == 6 &&
@@ -365,7 +365,7 @@ namespace
             CHECK(key(g, ai, "[play_sound:idle][sound_random:4][sound_voice:1]"));
             if (ai->audio_starts != 1)
                 std::cerr << ai->ai_sound_resource << " " << ai->ai_key_error << "\n";
-            CHECK(ai->audio_starts == 1 && g.server.advance_audio(.1, {}, {}));
+            CHECK(ai->audio_starts == 1 && g.advance_audio(.1, {}, {}));
             CHECK(g.server.audio.get(ai->AnimSound()->m_hVoxSound)->cursor > 0);
             CHECK(g.unload_world() && g.server.audio.voices().empty() && g.server.string_count() == 0 &&
                   g.server.message_count() == 0);

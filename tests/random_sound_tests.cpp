@@ -160,17 +160,17 @@ namespace
         CHECK(h && trigger(g, h, "ON") && g.step(.101));
         auto* c = get(g, h);
         auto id = c->sound;
-        g.server.audio.inspect_pcm = true;
-        CHECK(g.server.advance_audio(.01, {}, {}));
-        auto* v = g.server.audio.get(id);
+        g.client_session.audio.mixer.inspect_pcm = true;
+        CHECK(g.advance_audio(.01, {}, {}));
+        auto* v = g.client_session.audio.mixer.get(id);
         CHECK(v && v->request.space == SoundSpace::Ambient && !v->request.reverb_requested && !v->request.speaker);
-        CHECK(std::abs(v->left - .25f) < .0001 && v->left == v->right && std::abs(g.server.audio.peak - .125f) < .001);
-        CHECK(g.server.advance_audio(.01, {}, {{0, 1, 0}, 0}) && v->left == v->right &&
-              std::abs(v->left - .25f) < .0001);
+        CHECK(std::abs(v->left - .25f) < .0001 && v->left == v->right &&
+              std::abs(g.client_session.audio.mixer.peak - .125f) < .001);
+        CHECK(g.advance_audio(.01, {}, {{0, 1, 0}, 0}) && v->left == v->right && std::abs(v->left - .25f) < .0001);
         DVector moved{};
-        CHECK(g.server.TeleportObject(h, &moved) == DE_OK && g.server.advance_audio(.01, {}, {}));
+        CHECK(g.server.TeleportObject(h, &moved) == DE_OK && g.advance_audio(.01, {}, {}));
         CHECK(v->position.x == 75); // Fixed random position does not follow emitter after start.
-        CHECK(g.server.advance_audio(.01, {-30, 0, 0}, {}) && v->left == 0 && v->right == 0);
+        CHECK(g.advance_audio(.01, {-30, 0, 0}, {}) && v->left == 0 && v->right == 0);
         CHECK(g.server.KillSound(id));
         SoundRequest r;
         r.resource = "long.wav";
@@ -179,10 +179,10 @@ namespace
         std::string error;
         id = g.server.PlaySoundAt(h, r, {75, 0, 0}, error);
         CHECK(id);
-        CHECK(g.server.advance_audio(.01, {}, {}));
-        v = g.server.audio.get(id);
+        CHECK(g.advance_audio(.01, {}, {}));
+        v = g.client_session.audio.mixer.get(id);
         CHECK(v && v->left == 0 && std::abs(v->right - .5f) < .0001);
-        CHECK(g.server.advance_audio(.01, {}, {{0, 1, 0}, 0}) && std::abs(v->left - .5f) < .0001 && v->right == 0);
+        CHECK(g.advance_audio(.01, {}, {{0, 1, 0}, 0}) && std::abs(v->left - .5f) < .0001 && v->right == 0);
         r.speaker = h;
         CHECK(!g.server.PlaySoundAt(h, r, {}, error));
         r.speaker = nullptr;
@@ -194,19 +194,19 @@ namespace
         r.space = SoundSpace::Ambient;
         r.inner_radius = r.outer_radius = 75;
         id = g.server.PlaySoundAt(h, r, {75, 0, 0}, error);
-        CHECK(id && g.server.advance_audio(.01, {}, {}));
-        v = g.server.audio.get(id);
+        CHECK(id && g.advance_audio(.01, {}, {}));
+        v = g.client_session.audio.mixer.get(id);
         CHECK(v && std::abs(v->left - 1) < .0001 && v->left == v->right);
-        CHECK(g.server.advance_audio(.01, {-1, 0, 0}, {}) && v->left == 0 && v->right == 0);
+        CHECK(g.advance_audio(.01, {-1, 0, 0}, {}) && v->left == 0 && v->right == 0);
         r.inner_radius = r.outer_radius = 0;
         CHECK(!g.server.PlaySoundAt(h, r, {}, error));
         r.inner_radius = 80;
         r.outer_radius = 75;
         id = g.server.PlaySoundAt(h, r, {80, 0, 0}, error);
-        CHECK(id && g.server.advance_audio(.01, {}, {}));
-        v = g.server.audio.get(id);
+        CHECK(id && g.advance_audio(.01, {}, {}));
+        v = g.client_session.audio.mixer.get(id);
         CHECK(v && v->left == 1 && v->right == 1);
-        CHECK(g.server.advance_audio(.01, {-1, 0, 0}, {}) && v->left == 0 && v->right == 0);
+        CHECK(g.advance_audio(.01, {-1, 0, 0}, {}) && v->left == 0 && v->right == 0);
         return true;
     }
     bool lifetime(const std::filesystem::path& root)
@@ -217,7 +217,7 @@ namespace
         CHECK(h && trigger(g, h, "ON") && g.step(.101));
         auto id = get(g, h)->sound;
         CHECK(id);
-        CHECK(g.objects.remove(h) && g.server.advance_audio(.01, {}, {}));
+        CHECK(g.objects.remove(h) && g.advance_audio(.01, {}, {}));
         CHECK(!g.server.audio.get(id) && g.objects.finish_frame() && !g.objects.get(h));
         h = make(g, sequence_props());
         CHECK(h && trigger(g, h, "ON") && g.step(.101));
@@ -356,7 +356,7 @@ namespace
                 CHECK(trigger(g, h, "ON"));
             }
             CHECK(g.step(.101));
-            g.server.audio.inspect_pcm = true;
+            g.client_session.audio.mixer.inspect_pcm = true;
             for (auto h : targets)
             {
                 auto* c = get(g, h);
@@ -367,12 +367,12 @@ namespace
                 std::cout << "cycle=" << cycle << " name=" << g.objects.get(h)->state.m_Name
                           << " sound=" << v->request.resource << '\n';
             }
-            CHECK(g.step(.05) && g.server.audio.mixed_frames == 2400 && g.objects.snapshot().size() == 232 &&
-                  g.objects.attachments().size() == 11);
+            CHECK(g.step(.05) && g.client_session.audio.mixer.mixed_frames == 2400 &&
+                  g.objects.snapshot().size() == 232 && g.objects.attachments().size() == 11);
             CHECK(g.unload_world() && g.server.audio.voices().empty() && !g.server.audio.cached_clips() &&
                   !g.server.audio.get(last) && g.objects.snapshot().empty() && !g.server.message_count() &&
                   !g.server.string_count() && !g.server.list_count());
-            g.server.audio.inspect_pcm = false;
+            g.client_session.audio.mixer.inspect_pcm = false;
         }
         return true;
     }

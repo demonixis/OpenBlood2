@@ -330,8 +330,10 @@ namespace OpenBlood2
                 error = "A restored object requested a level change";
             else if (candidate->server.message_count())
                 error = "Live messages remain after the restore";
-            else if (candidate->client_shell.music.failures || !candidate->server.audio.music_error.empty())
-                error = "Music: " + candidate->client_shell.music.error + " " + candidate->server.audio.music_error;
+            else if (candidate->client_shell.music.failures ||
+                     !candidate->client_session.audio.mixer.music_error.empty())
+                error = "Music: " + candidate->client_shell.music.error + " " +
+                        candidate->client_session.audio.mixer.music_error;
             if (!error.empty() || !check_world_presentation(*candidate, report, error))
                 return false;
             candidate->state = SessionState::Ready;
@@ -354,7 +356,7 @@ namespace OpenBlood2
         candidate_globals.exchange();
         candidate->server.bound_ = false;
         resume_source();
-        if (!source.server.audio.transfer_output_to(candidate->server.audio, error))
+        if (!source.client_session.audio.mixer.transfer_output_to(candidate->client_session.audio.mixer, error))
         {
             source_globals.exchange();
             source.server.bound_ = false;

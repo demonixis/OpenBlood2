@@ -107,11 +107,10 @@ namespace
         auto first = s->sound;
         auto* v = g.server.audio.get(first);
         CHECK(v && !v->request.loop && v->request.reverb_requested && !v->request.speaker && !v->world_owned);
-        CHECK(g.server.advance_audio(.05, {}, {}) && v->right > v->left && v->request.volume == .5f);
+        CHECK(g.advance_audio(.05, {}, {}) && v->right > v->left && v->request.volume == .5f);
         DVector moved{0, 0, 300};
         CHECK(g.server.TeleportObject(h, &moved) == DE_OK);
-        CHECK(g.server.advance_audio(.05, {}, {}) && v->position.x == 300 &&
-              v->position.z == 0); // Sampled, not attached.
+        CHECK(g.advance_audio(.05, {}, {}) && v->position.x == 300 && v->position.z == 0); // Sampled, not attached.
         CHECK(g.step(1.001) && s->state == SoundFX::RampDown && s->sound != first && !g.server.audio.get(first));
         CHECK(g.step(.101) && s->state == SoundFX::Off && !s->sound);
         p = props();

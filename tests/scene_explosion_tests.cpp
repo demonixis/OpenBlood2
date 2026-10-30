@@ -208,7 +208,7 @@ namespace
             CHECK(command(g, e->m_hObject, "TRIGGER") && e->voice);
         CHECK(g.server.audio.voices().size() == 128 && g.server.scene_explosions.size() == 32);
         CHECK(command(g, e->m_hObject, "TRIGGER") && !e->voice && !e->sound_error.empty());
-        CHECK(g.server.advance_audio(.11, {}, {}) && g.server.audio.voices().empty());
+        CHECK(g.advance_audio(.11, {}, {}) && g.server.audio.voices().empty());
         CHECK(command(g, e->m_hObject, "TRIGGER") && e->voice); // Completed one-shots free capacity.
         SoundRequest q;
         q.resource = "cue.wav";

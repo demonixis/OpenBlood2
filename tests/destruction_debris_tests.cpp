@@ -2,6 +2,7 @@
 #include "blood_spurt_fixture.h"
 #include "game/original/DestructableBrush.h"
 #include "game/original/DestructableModel.h"
+#include <algorithm>
 #include <limits>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
@@ -140,7 +141,7 @@ namespace
         for (int i = 3; i < 100; ++i)
         {
             CHECK(fx.advance(i * .01, g.server));
-            CHECK(g.server.advance_audio(.01, {}, {}));
+            CHECK(g.advance_audio(.01, {}, {}));
         }
         CHECK(f.resting && f.impacts == 2 && f.bounces == -1 && f.error.empty());
         const auto pos = f.position;
@@ -188,7 +189,7 @@ namespace
             for (unsigned frame = 1; frame < 500; ++frame)
             {
                 CHECK(fx.advance(frame * .01, g.server));
-                CHECK(g.server.advance_audio(.01, {}, {}));
+                CHECK(g.advance_audio(.01, {}, {}));
             }
             for (const auto& f : fx.active)
             {

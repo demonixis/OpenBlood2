@@ -1,8 +1,8 @@
 #pragma once
-#include "basedefs_de.h"
 #include "engine/dls_sampler.h"
 #include "engine/ima_transport.h"
 #include "engine/resources.h"
+#include "engine/sound_types.h"
 #include <SDL3/SDL_audio.h>
 #include <memory>
 namespace OpenBlood2
@@ -26,22 +26,9 @@ namespace OpenBlood2
         }
     };
     bool read_wave(std::span<const std::uint8_t>, AudioClip&, std::string&);
-    enum class SoundSpace
+    struct SoundRequest : SoundParameters
     {
-        Local,
-        Ambient,
-        Spatial
-    };
-    struct SoundRequest
-    {
-        std::string resource;
-        HOBJECT speaker = nullptr;
-        SoundSpace space = SoundSpace::Spatial;
-        float inner_radius = 250, outer_radius = 1000, volume = 1;
-        bool loop = false;
-        bool streaming = false;       // Bounded disk-backed PCM, using the same local simulation clock.
-        DBYTE priority = 0;           // Authored intent; priority arbitration is unavailable.
-        bool reverb_requested = true; // Original cinematic flag; dry output currently only.
+        HOBJECT speaker = nullptr; // Original server service only; never in client frames.
     };
     struct AudioVoice
     {
@@ -58,7 +45,53 @@ namespace OpenBlood2
         std::uint64_t loops = 0;
         std::string error; // A failed stream is not successful sound completion.
     };
-    class AudioMixer
+    // Resource/voice/sample-clock services only: no output device, PCM mix or music transport.
+    class AudioTimeline
+    {
+      public:
+        AudioTimeline() = default;
+        AudioTimeline(const AudioTimeline&) = delete;
+        AudioTimeline& operator=(const AudioTimeline&) = delete;
+        static constexpr unsigned rate = 48000;
+        bool load(const Resources&, std::string_view, std::shared_ptr<const AudioClip>&, std::string&);
+        bool prepare_voice(const Resources&, const SoundRequest&, DVector, AudioVoice&, std::string&);
+        SoundId play(const Resources&, HOBJECT owner, const SoundRequest&, DVector, std::string&);
+        bool kill(SoundId);
+        const AudioVoice* get(SoundId) const;
+        AudioVoice* get(SoundId);
+        const auto& voices() const
+        {
+            return voices_;
+        }
+        std::size_t cached_clips() const
+        {
+            return clips_.size() + streams_.size();
+        }
+        std::size_t cached_bytes() const
+        {
+            return cached_bytes_;
+        }
+        std::uint64_t stream_read_ns() const;
+        std::uint64_t stream_reads() const;
+        bool advance(double seconds);
+        void clear();
+
+      protected:
+        bool step_frames(double seconds, std::uint64_t& frames);
+        bool process_voices(std::uint64_t frames, DVector, DRotation, std::span<float> pcm, float gain);
+
+      private:
+        friend class ClientAudio;
+        std::map<std::string, std::shared_ptr<const AudioClip>> clips_;
+        std::map<std::string, std::shared_ptr<const AudioClip>> streams_;
+        std::size_t stream_serial_ = 0;
+        std::vector<const PcmStream*> validated_;
+        bool load_stream(const Resources&, std::string_view, std::shared_ptr<const AudioClip>&, std::string&);
+        std::map<SoundId, AudioVoice> voices_;
+        std::size_t cached_bytes_ = 0;
+        double remainder_ = 0;
+    };
+    class AudioMixer : public AudioTimeline
     {
       public:
         static constexpr unsigned rate = 48000;
@@ -78,26 +111,6 @@ namespace OpenBlood2
         {
             return output_ != nullptr;
         }
-        bool load(const Resources&, std::string_view, std::shared_ptr<const AudioClip>&, std::string&);
-        SoundId play(const Resources&, HOBJECT owner, const SoundRequest&, DVector, std::string&);
-        bool kill(SoundId);
-        const AudioVoice* get(SoundId) const;
-        AudioVoice* get(SoundId);
-        const auto& voices() const
-        {
-            return voices_;
-        }
-        std::size_t cached_clips() const
-        {
-            return clips_.size() + streams_.size();
-        }
-        std::size_t cached_bytes() const
-        {
-            return cached_bytes_;
-        }
-        // Summed PcmStream read cost/count of the cached streams (diagnostic only).
-        std::uint64_t stream_read_ns() const;
-        std::uint64_t stream_reads() const;
         bool advance(double, DVector listener, DRotation rotation);
         void clear();
         DlsSampler instruments;      // World-owned diagnostic notes share the sound output/clock.
@@ -116,14 +129,6 @@ namespace OpenBlood2
         std::string output_error;
 
       private:
-        std::map<std::string, std::shared_ptr<const AudioClip>> clips_;
-        std::map<std::string, std::shared_ptr<const AudioClip>> streams_;
-        std::size_t stream_serial_ = 0;           // Window phase of the next stream (reset by clear).
-        std::vector<const PcmStream*> validated_; // Streams whose archive this advance already checked.
-        bool load_stream(const Resources&, std::string_view, std::shared_ptr<const AudioClip>&, std::string&);
-        std::map<SoundId, AudioVoice> voices_;
-        std::size_t cached_bytes_ = 0;
-        double remainder_ = 0;
         SDL_AudioStream* output_ = nullptr;
         bool audio_initialized_ = false;
         bool paused_ = false;

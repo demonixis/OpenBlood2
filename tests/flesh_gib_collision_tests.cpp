@@ -117,7 +117,7 @@ namespace
             for (unsigned frame = 2; frame <= 201; ++frame)
             {
                 CHECK(g.server.flesh_gibs.advance(frame * .01, g.server));
-                CHECK(g.server.advance_audio(.01, origin, {}));
+                CHECK(g.advance_audio(.01, origin, {}));
             }
             CHECK(floor.impacts == 1 && g.server.audio.voices().empty() &&
                   g.server.blood_splats.active.size() == 1);
@@ -134,7 +134,7 @@ namespace
         for (unsigned frame = 1; frame <= 12; ++frame)
         {
             CHECK(g.server.flesh_gibs.advance(frame * .01, g.server));
-            CHECK(g.server.advance_audio(.01, {}, {}));
+            CHECK(g.advance_audio(.01, {}, {}));
         }
         const auto& f = g.server.flesh_gibs.active.front();
         std::cout << "Falling fragment: impacts=" << f.impacts << ", voices=" << g.server.audio.voices().size()
@@ -170,7 +170,7 @@ namespace
             for (unsigned frame = 2; frame <= 101; ++frame)
             {
                 CHECK(floor.Update(frame * .01, .01, g.server, random, 16384));
-                CHECK(g.server.advance_audio(.01, origin, {}));
+                CHECK(g.advance_audio(.01, origin, {}));
             }
             CHECK(floor.impacts == 1 && g.server.audio.voices().empty() &&
                   g.server.blood_splats.active.size() == 1);

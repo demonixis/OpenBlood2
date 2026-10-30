@@ -96,7 +96,12 @@ namespace
             CHECK(g.server.service_calls == calls && same(position, player->state.m_Pos) &&
                   same(velocity, player->velocity));
             CHECK(g.server_shell.Player(g.local_client)->movement_messages == reports);
-            detached = g.client_session;
+            detached.camera = g.client_session.camera;
+            detached.collision = g.client_session.collision;
+            detached.hud = g.client_session.hud;
+            detached.world = g.client_session.world;
+            detached.time = g.client_session.time;
+            detached.movement = g.client_session.movement;
             CHECK(g.unload_world());
         }
         std::string error;

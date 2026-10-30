@@ -1057,14 +1057,14 @@ namespace
         CHECK(refused(save, "validation", "unavailable services"));
         // Promotion: the audio output transfer is the last step that can fail.
         CHECK(SDL_SetHint(SDL_HINT_AUDIO_DRIVER, "dummy"));
-        CHECK(game->server.audio.open_output(error));
-        hooks.loaded = [](HOBJECT)
-        {
-            std::string why;
-            static_cast<ServerAdapter*>(g_pServerDE)->audio.open_output(why);
-        };
-        CHECK(refused(save, "audio", "separate offline destination"));
-        CHECK(game->server.audio.has_output());
+        CHECK(game->client_session.audio.mixer.open_output(error));
+        // A server restore callback can no longer reach a candidate's client device.
+        // Verify the final transfer primitive's refusal without reintroducing that coupling.
+        AudioMixer occupied;
+        CHECK(occupied.open_output(error));
+        CHECK(!game->client_session.audio.mixer.transfer_output_to(occupied, error) &&
+              error.find("separate offline destination") != std::string::npos && occupied.has_output());
+        CHECK(game->client_session.audio.mixer.has_output());
         // Worlds whose own checks refuse: an unported row and a missing world texture.
         for (auto [world, message] : {std::pair{"unported", "1 unsupported classes"}, std::pair{"bare", "absent.dtx"}})
         {
@@ -1073,8 +1073,8 @@ namespace
         }
         // Each refusal destroyed its candidate; a final load still commits and keeps the output.
         CHECK(saved_world(game, save));
-        CHECK(game->server.audio.open_output(error));
-        CHECK(load(game, save, error) && game->server.audio.has_output());
+        CHECK(game->client_session.audio.mixer.open_output(error));
+        CHECK(load(game, save, error) && game->client_session.audio.mixer.has_output());
         CHECK(game->game_load.rejected == 0 && game->game_load.committed == 1);
         return true;
     }

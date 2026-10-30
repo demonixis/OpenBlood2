@@ -92,7 +92,8 @@ namespace
         player->m_bDead = false;
         CHECK(send(g, "MUSIC LEVEL 1"));
         CHECK(g.leave_player()); // Queued value must not reach a later player/client.
-        CHECK(music.received == 0 && !g.server.audio.music_loop.active() && !g.server.audio.music_loop.pending());
+        CHECK(music.received == 0 && !g.client_session.audio.mixer.music_loop.active() &&
+              !g.client_session.audio.mixer.music_loop.pending());
         CHECK(g.enter_player(error) && music.received == 0 && music.logical_level == 0);
         CHECK(g.unload_world());
         std::cout
@@ -108,12 +109,12 @@ namespace
         CHECK(g.initialize() && g.resources.mount_game(config, error) && g.request_world("01_SubwayA", error) &&
               g.enter_player(error));
         auto& music = g.client_shell.music;
-        auto& audio = g.server.audio;
+        auto& audio = g.client_session.audio.mixer;
         audio.inspect_pcm = true;
         CHECK(music.accepted >= 1 && music.error.empty() && audio.music_loop.active());
         CHECK(send(g, "MUSIC LEVEL 3") && g.pump_player_messages(error));
         CHECK(music.logical_level == 3 && audio.music_loop.level() == 3 && !audio.music_loop.pending());
-        CHECK(g.server.advance_audio(.1, {}, {}));
+        CHECK(g.advance_audio(.1, {}, {}));
         CHECK(std::any_of(audio.mixed.begin(), audio.mixed.end(), [](float v) { return v != 0; }));
         CHECK(send(g, "MUSIC LEVEL 1") && g.pump_player_messages(error));
         CHECK(audio.music_loop.pending() && audio.music_loop.level() == 3 && music.logical_level == 1);
@@ -121,7 +122,7 @@ namespace
         while (audio.instruments.sample_clock() < boundary)
         {
             const auto frames = std::min<std::uint64_t>(4800, boundary - audio.instruments.sample_clock());
-            CHECK(g.server.advance_audio(double(frames) / 48000, {}, {}));
+            CHECK(g.advance_audio(double(frames) / 48000, {}, {}));
         }
         CHECK(audio.music_loop.level() == 1 && !audio.music_loop.pending() && audio.music_error.empty());
         const auto committed = audio.music_loop.switches();
@@ -130,7 +131,7 @@ namespace
               g.pump_player_messages(error)); // Logical silence -> immediate, while audible level remains ambient.
         CHECK(music.logical_level == 2 && audio.music_loop.level() == 2 && !audio.music_loop.pending());
         CHECK(audio.music_loop.switches() == committed + 1);
-        CHECK(g.server.advance_audio(.1, {}, {}) && !audio.instruments.dispatch_failures);
+        CHECK(g.advance_audio(.1, {}, {}) && !audio.instruments.dispatch_failures);
         CHECK(send(g, "MUSIC LEVEL 1") && g.pump_player_messages(error) && audio.music_loop.pending());
         std::cout << "SubwayA live music: received " << music.received << "; accepted " << music.accepted
                   << "; committed " << audio.music_loop.switches() << "; first boundary " << boundary
