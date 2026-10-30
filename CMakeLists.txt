@@ -73,7 +73,7 @@ add_library(blood2_game STATIC src/game/polygrids.cpp src/game/original/ScreenFa
     src/game/original/trigger_helpers.cpp
     src/game/original/session_load.cpp
     src/game/client_replication.cpp
-    src/game/local_movement.cpp
+    src/game/local_movement.cpp src/game/local_presentation.cpp
     src/game/session.cpp
     src/game/world_validation.cpp
     src/game/player_restore.cpp
@@ -83,8 +83,8 @@ add_library(blood2_game STATIC src/game/polygrids.cpp src/game/original/ScreenFa
     src/game/server_messages.cpp
     src/game/server_saves.cpp
     src/game/service_coverage.cpp)
-target_sources(blood2_game PRIVATE src/game/original/ClientCrosshair.cpp src/game/original/NewStatusBar.cpp src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp src/game/original/SoundFX.cpp)
-target_sources(blood2_game PRIVATE src/game/original/PlayerLanding.cpp src/game/original/PlayerDeath.cpp src/game/original/PlayerDeathCamera.cpp)
+target_sources(blood2_game PRIVATE src/game/original/NewStatusBar.cpp src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp src/game/original/SoundFX.cpp)
+target_sources(blood2_game PRIVATE src/game/original/PlayerLanding.cpp src/game/original/PlayerDeath.cpp)
 target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/LightFX.cpp src/game/original/ClientLightFX.cpp)
 target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
 target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/original/ConversationTrigger.cpp src/game/original/ConversationStrings.cpp src/game/original/CommLink.cpp src/game/original/VoiceMgr.cpp src/game/original/PlayerVoice.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
@@ -100,7 +100,7 @@ target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/origin
     src/game/original/CivilianAI.cpp
     src/game/original/CultistAI.cpp src/game/original/Gideon.cpp src/game/original/EnhancedGideon.cpp src/game/original/UndeadGideon.cpp src/game/original/AncientOne.cpp src/game/original/AncientWeapons.cpp src/game/original/FlagObjects.cpp src/game/original/PlayerFlags.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
 target_sources(blood2_game PRIVATE src/game/server_exits.cpp src/game/original/ExitTrigger.cpp src/game/server_clients.cpp src/game/original/PlayerImprison.cpp src/game/original/PlayerObj.cpp src/game/original/PlayerSave.cpp src/game/original/CharacterNodes.cpp src/game/original/BloodShells.cpp)
-target_sources(blood2_game PRIVATE src/game/server_weapons.cpp src/game/original/WeaponDefs.cpp
+target_sources(blood2_game PRIVATE src/game/server_weapons.cpp
     src/game/original/InventoryMgr.cpp src/game/original/InventoryItems.cpp src/game/original/InventorySave.cpp src/game/original/Weapon.cpp src/game/original/Voodoo.cpp src/game/original/WeaponSound.cpp src/game/original/WeaponVector.cpp src/game/original/WeaponFX.cpp src/game/original/ViewWeapon.cpp)
 target_sources(blood2_game PRIVATE src/game/original/Music.cpp src/game/music_catalog.cpp)
 target_sources(blood2_game PRIVATE src/game/save_slots.cpp)

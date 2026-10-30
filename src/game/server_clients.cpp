@@ -82,38 +82,14 @@ namespace OpenBlood2
                 else if constexpr (std::is_same_v<T, PlayerPosition>)
                     return physics_vector(value.position);
                 else if constexpr (std::is_same_v<T, PlayerStats>)
-                    return std::isfinite(value.max_health) && value.max_health >= 0 && std::isfinite(value.max_armor) &&
-                           value.max_armor >= 0 && std::isfinite(value.health) && std::isfinite(value.armor) &&
-                           std::isfinite(value.bullets) && std::isfinite(value.ammo) && value.ammo >= 0 &&
-                           std::isfinite(value.alternate_ammo) && value.alternate_ammo >= 0 &&
-                           value.weapon_slot < inventory_weapon_slots && value.ammo_type < 13 &&
-                           value.alternate_ammo_type < 13 && (!value.weapon || weapon_definition(value.weapon)) &&
-                           std::all_of(
-                               value.weapon_slots.begin(), value.weapon_slots.end(),
-                               [](DBYTE type) { return !type || weapon_definition(type); });
+                    return valid_hud_stats(value);
                 else if constexpr (std::is_same_v<T, MusicCommand>)
                     return valid_music_command(value);
                 else if constexpr (std::is_same_v<T, VoiceEvent>)
                     return value.character >= 0 && value.character < 4 && value.event >= 0 &&
                            value.event < (value.group ? 12 : 9);
                 else if constexpr (std::is_same_v<T, InventoryItems>)
-                {
-                    // Item pictures are relative to interface/statusbar/items/ (keys use authored names).
-                    const auto valid_item = [](const std::optional<InventoryItemView>& item)
-                    {
-                        const auto name = [](const std::string& s, bool path)
-                        {
-                            return s.size() <= 100 && s.find('\0') == std::string::npos &&
-                                   (!path || (!s.empty() && s.front() != '/' && s.front() != '\\' &&
-                                              s.find(':') == std::string::npos && s.find("..") == std::string::npos));
-                        };
-                        return !item ||
-                               (item->type >= 1 && item->type <= 9 && name(item->icon, true) &&
-                                name(item->highlighted_icon, true) && name(item->name, false) &&
-                                (item->type == 6 ? !item->name_id : item->name_id >= 301 && item->name_id <= 308));
-                    };
-                    return valid_item(value.current) && valid_item(value.previous) && valid_item(value.next);
-                }
+                    return valid_hud_items(value);
                 else if constexpr (std::is_same_v<T, InventoryAction>)
                     return value.type == 1 || value.type == 2 || value.type == 3 || value.type == 5;
                 else if constexpr (std::is_same_v<T, OrbView>)

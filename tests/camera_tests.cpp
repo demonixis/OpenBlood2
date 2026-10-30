@@ -77,7 +77,7 @@ namespace
         CHECK(!p->camera_movement_blocked && shell.player_look_allowed());
         CHECK(close(shell.camera_position, eye) && shell.rotation.yaw == aim_rotation.yaw &&
               shell.rotation.pitch == aim_rotation.pitch);
-        CHECK(original_crosshair_visible(shell.m_bInWorld, shell.view.object != nullptr, shell.death_camera.active));
+        CHECK(original_crosshair_visible(shell.m_bInWorld, bool(shell.view.object), shell.death_camera.active));
         const auto requested = vector_add(eye, rotate_vector(initial_rotation, {0, 20, -150}));
         CHECK(close(shell.view.position, requested));
         key(true, true);
@@ -144,14 +144,19 @@ namespace
         shell.m_bZoomView = false;
         CHECK(shell.UpdateCameraSelection() && shell.third_person_active);
         auto scripted = create(g, {{"StartActive", true}, {"HidePlayer", true}});
-        CHECK(scripted && shell.UpdateCameraSelection() && !shell.third_person_active && shell.view.object == scripted);
+        CHECK(scripted && shell.UpdateCameraSelection() && !shell.third_person_active &&
+              shell.view.object == g.objects.get(scripted)->id);
         CHECK(!shell.ToggleThirdPerson() && shell.third_person && !shell.player_look_allowed());
         CHECK(command(g, scripted, "OFF"));
+        // The client publisher now checks remote-view type and ownership. A scripted
+        // camera cannot impersonate an Eye/Orb (real owned remotes have separate tests).
         shell.seeing_eye = scripted;
-        CHECK(shell.UpdateCameraSelection() && !shell.third_person_active && shell.player_look_allowed());
+        CHECK(shell.UpdateCameraSelection() && shell.third_person_active && !shell.view.object &&
+              shell.player_look_allowed());
         shell.seeing_eye = nullptr;
         shell.orb_view = scripted;
-        CHECK(shell.UpdateCameraSelection() && !shell.third_person_active && shell.player_look_allowed());
+        CHECK(shell.UpdateCameraSelection() && shell.third_person_active && !shell.view.object &&
+              shell.player_look_allowed());
         shell.orb_view = nullptr;
         shell.death_camera.active = true;
         shell.death_camera.start = g.server.GetTime();
@@ -316,7 +321,8 @@ namespace
               !g.client_shell.player_visible);
         CHECK(close(g.client_shell.view.position, {300, 150, 300}) &&
               close(g.client_shell.listener_position, {300, 150, 300}));
-        CHECK(g.client_shell.view.object == h && g.client_shell.view.settings.type == 1 && c->tracking_updates > 0);
+        CHECK(g.client_shell.view.object == g.objects.get(h)->id && g.client_shell.view.settings.type == 1 &&
+              c->tracking_updates > 0);
         MovementControls controls;
         controls.focused = controls.enabled = controls.mouse_captured = true;
         auto& shell = g.client_shell;
@@ -358,7 +364,7 @@ namespace
         from = g.client_shell.position;
         for (int i = 0; i < 20; ++i)
             CHECK(g.step(.016));
-        CHECK(g.client_shell.view.object == movable && !p->camera_movement_blocked &&
+        CHECK(g.client_shell.view.object == g.objects.get(movable)->id && !p->camera_movement_blocked &&
               !close(from, g.client_shell.position, 1));
         CHECK(!shell.player_look_allowed()); // Movement permission does not grant camera control.
         CHECK(close(g.client_shell.listener_position, g.client_shell.position) && g.client_shell.player_visible);

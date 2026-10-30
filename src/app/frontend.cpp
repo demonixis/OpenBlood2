@@ -1238,14 +1238,7 @@ namespace OpenBlood2
                         draw_screen_fade(client.fade.Scale(), client.m_bInWorld);
                     }
                     // XR aims with the controller (laser and reticle): no screen-centred crosshair.
-                    auto state = hud_state(client.stats, client.m_bInWorld, client.view.object != nullptr,
-                                           client.death_camera.active, client.m_bShowCrosshair && !xr_mode,
-                                           client.m_nCrosshair, client.ctf.team, client.ctf.flag_icon);
-                    state.items = client.inventory_items;
-                    state.item_messages = client.inventory_item_messages;
-                    state.item_shows = client.inventory_show_requests;
-                    state.time = float(game->objects.time());
-                    state.world_revision = game->world_revision;
+                    auto state = client.HudSnapshot(xr_mode);
                     if (std::exchange(input.weapon_tabs, false))
                         hud.toggle_weapons(state.time);
                     if (!hud.draw(state, game->resources, error))

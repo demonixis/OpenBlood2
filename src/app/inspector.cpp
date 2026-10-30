@@ -1738,6 +1738,11 @@ namespace OpenBlood2
                     static_cast<unsigned long long>(game.client_shell.messages),
                     static_cast<unsigned long long>(game.client_shell.updates));
         const auto& hud = game.client_shell.stats;
+        const auto hud_owner = game.client_session.hud.owner();
+        ImGui::Text("Client HUD world %llu / owner %u:%u / message %llu | clock %.3f",
+                    static_cast<unsigned long long>(hud_owner.world), hud_owner.object.slot,
+                    hud_owner.object.generation, static_cast<unsigned long long>(game.client_session.hud.sequence()),
+                    game.client_session.time);
         ImGui::Text("HUD snapshot: HP %.1f | armor %.1f | weapon %u / slot %u", hud.health, hud.armor, hud.weapon,
                     hud.weapon_slot);
         ImGui::Text("Ammo %.1f (type %u) | alternate %.1f (type %u) | external camera %s", hud.ammo, hud.ammo_type,

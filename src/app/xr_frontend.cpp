@@ -275,7 +275,7 @@ namespace OpenBlood2
         if (!calibrated_ && game.client_shell.m_bInWorld)
             calibrate(game);
         const auto t = xr_tracking(game, player_, frame_, reference_, scale_);
-        CameraView head = game.client_shell.view;
+        ClientCameraView head = game.client_shell.view;
         head.position = dvec(t.stereo.head.position);
         head.rotation = engine_rotation(t.stereo.head.orientation);
         presenter.camera_override = head;

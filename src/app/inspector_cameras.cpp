@@ -77,6 +77,15 @@ namespace OpenBlood2
             }
         ImGui::TableNextColumn();
         const auto& client = game.client_shell;
+        const auto& frame = game.client_session.camera.frame();
+        ImGui::Text("Client camera world %llu / frame %llu | descriptors %zu",
+                    static_cast<unsigned long long>(frame.world), static_cast<unsigned long long>(frame.sequence),
+                    frame.cameras.size());
+        ImGui::Text("Camera commands accepted %llu / rejected %llu",
+                    static_cast<unsigned long long>(game.local_presentation.accepted_commands),
+                    static_cast<unsigned long long>(game.local_presentation.rejected_commands));
+        if (!game.local_presentation.error.empty())
+            ImGui::TextWrapped("%s", game.local_presentation.error.c_str());
         const auto* viewed = game.objects.get(client.view.object);
         const auto* listener = game.objects.get(g_hActiveCamera);
         ImGui::TextWrapped("Client camera: %s", viewed                       ? viewed->state.m_Name

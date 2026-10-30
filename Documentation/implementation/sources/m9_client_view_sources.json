@@ -1,0 +1,115 @@
+{
+  "scope": "M9 independent local client cameras and HUD",
+  "baseline": "e14bd081",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "e14bd081",
+      "path": "src/game/original/BloodShells.cpp",
+      "sha256": "0b0f8573e7cfad7d418dcf450bd418b9f524731821cfc9a6444d9514d6aa79a8"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e14bd081",
+      "path": "src/game/original/PlayerDeathCamera.cpp",
+      "sha256": "a63a428b717f5e097c808ab1c6b927baab1315625b721ec07e5972b08987329a"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e14bd081",
+      "path": "src/game/server_cameras.cpp",
+      "sha256": "d09a79ca67fb4a424de888027d2cb2748328fec0dfd8885608c9617fa9b4ca0d"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e14bd081",
+      "path": "src/game/server_weapons.cpp",
+      "sha256": "910dc9f48b1d32984c2bc4005ff4446eb4db9de10d2c0390f968f3b162d7d138"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e14bd081",
+      "path": "src/game/server_clients.cpp",
+      "sha256": "9984b5c1bbe0455b89a8fb0550f39c982415e6707127083940f485158a5bc68a"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e14bd081",
+      "path": "src/engine/object_pose.cpp",
+      "sha256": "22616763a941d01c85699da649e85eb68598f860339cf4ac1a5a8037922104e7"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e14bd081",
+      "path": "src/app/hud.cpp",
+      "sha256": "f454433b0b1b0d4e344740add3bef327cadec6b71e09f0bb77ff8c6afdde289f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e14bd081",
+      "path": "src/game/original/WeaponDefs.cpp",
+      "sha256": "6b9b5441deb7754d1ad75b200f18d585dbc39324127d6ac5218c22159ea1264d"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e14bd081",
+      "path": "src/game/original/ClientCrosshair.cpp",
+      "sha256": "2e6043daf386c375ffce247c96ea1a82127fe10c0bd15007b89ac686068b6183"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/PlayerCamera.cpp",
+      "sha256": "0315517beaaf85540d9810899fb312be4ae5ba78aae30cc9c1f38f4a2ca105f0"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/NewStatusBar.cpp",
+      "sha256": "c4dee3b2502db56a1a85b94a55c64fca9ddab0a1e69421858b27aeac02e324f5"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/CameraObj.cpp",
+      "sha256": "5255f0d0efe9ba67b081f5ea8684d8ed60cf94c8f23caaad8c186c21718756ec"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e14bd081",
+      "path": "src/game/player_messages.h",
+      "sha256": "538a7bf65b70a7592f63ca0aa78edd33ae6dbfbf4d684b51ef131e076ee71f5f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e14bd081",
+      "path": "src/game/camera_messages.h",
+      "sha256": "d683e187e237b02886e86cea525d781150279c3e94831825d102e5ead4e0e054"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e14bd081",
+      "path": "src/game/weapon_messages.h",
+      "sha256": "5c99b092aa1f58fed52fda80ba7de767aa2aedcc4b11fac2e943a88c317ed848"
+    }
+  ],
+  "adaptations": [
+    "Client-owned camera/HUD state, world/object/sequence admission and local clock publication",
+    "Copied camera descriptors and pure collision rays replace original client server reads",
+    "Preserve death/chase math and numeric orientation helpers, separate helpers from ObjectRecord lookup",
+    "Authoritative local camera permission/Eye command validation",
+    "Reuse complete stats/inventory validation, including 13 inventory slots versus 10 displayed slots",
+    "Move passive source weapon catalog/crosshair helpers to CPU client linkage"
+  ],
+  "remaining": [
+    "Network wire codecs, delayed sessions and multiplayer admission",
+    "Remaining client shell, weapon, inventory/audio and FX extraction",
+    "Native Windows/macOS/mobile/Quest and human LAN qualification"
+  ]
+}

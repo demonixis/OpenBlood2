@@ -102,7 +102,7 @@ namespace OpenBlood2
             player.body_yaw += shell.rotation.yaw - player.written_yaw;
         // Right stick: the dominant axis turns (snap or smooth) or, pushed past 0.85, cycles weapons;
         // nothing during a scripted camera (its sticks re-arm on release as usual).
-        const bool cinematic = shell.view.object != nullptr;
+        const bool cinematic = bool(shell.view.object);
         const auto right_stick = cinematic ? std::array<float, 2>{} : c.right_stick;
         const bool turning = std::fabs(right_stick[0]) >= std::fabs(right_stick[1]);
         const float turn = turning ? right_stick[0] : 0;

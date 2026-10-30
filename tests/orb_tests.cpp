@@ -161,7 +161,7 @@ namespace
         auto* p = dynamic_cast<COrbAltProjectile*>(g.server.HandleToObject(weapon->projectile));
         CHECK(p);
         auto h = p->m_hObject;
-        CHECK(g.pump_player_messages(error) && c.orb_view == h && c.view.object == h &&
+        CHECK(g.pump_player_messages(error) && c.orb_view == h && c.view.object == g.objects.get(h)->id &&
               player->camera_movement_blocked);
         CHECK(c.player_look_allowed());
         CHECK(c.player_visible && !c.weapons_visible && std::abs(c.ViewFovX() - original_fov_normal * 1.5f) < .001f);

@@ -4,14 +4,14 @@
 #include <cmath>
 namespace OpenBlood2
 {
-    bool update_sprite_scene(GameSession& game, SpriteView& scene, std::string& error, const CameraView* camera,
+    bool update_sprite_scene(GameSession& game, SpriteView& scene, std::string& error, const ClientCameraView* camera,
                              const std::array<ViewWeaponCamera, 2>* weapons)
     {
         return game.publish_client_world(error) &&
                update_sprite_scene(game, game.client_session.world, scene, error, camera, weapons);
     }
     bool update_sprite_scene(const GameSession& game, const ClientWorld& world, SpriteView& scene, std::string& error,
-                             const CameraView* camera, const std::array<ViewWeaponCamera, 2>* weapons)
+                             const ClientCameraView* camera, const std::array<ViewWeaponCamera, 2>* weapons)
     {
         const auto& view = camera ? *camera : game.client_shell.view;
         if (!scene.begin_frame(view.position, view.rotation, error))

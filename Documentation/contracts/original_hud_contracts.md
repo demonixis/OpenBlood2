@@ -113,3 +113,12 @@ flag PCX presentation at native top-right positions. Its atlas is now 1024x128;
 exact magenta transparency and existing stat/crosshair composition remain.
 This supersedes the blanket team-display omission only for these two icons;
 network scoreboards and the original console overlay remain unavailable.
+
+## M9 client ownership
+
+The [local camera/HUD lot](multiplayer_contracts.md#local-client-cameras-and-hud)
+puts stats and inventory values in `ClientSession::hud`, checks event owner/world/
+sequence and reuses the authoritative field validation. Both frontends consume
+`HudSnapshot` with the client clock and world identity; CNewStatusBar artwork,
+layout, counters, crosshair and numeric rules are unchanged. Other original client
+notices remain in the client shell. See [verification](../implementation/reports/m9_client_view.md).

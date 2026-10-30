@@ -486,6 +486,7 @@ namespace OpenBlood2
     }
     bool GameSession::pump_player_messages(std::string& error)
     {
+        local_presentation.sync_clock();
         ServiceTraceScope trace_scope(server.trace_enabled);
         if (objects.busy())
         {

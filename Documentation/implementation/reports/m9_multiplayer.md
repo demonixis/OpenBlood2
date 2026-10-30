@@ -14,7 +14,7 @@ M9 is in progress and unaccepted. M2-GPU-001 and M3 remain independent.
 | Movement | Local CMoveMgr body and owned collision replica, immediate authoritative correction; environment now queries copied geometry/values, stance remains a local service | Remaining services; delayed reports and checked server advancement between uploads |
 | Audio | ServerAdapter owns mixer; IsSoundDone/GetSoundDuration affect rules | Logical server voices and client playback, preserving RNG and deadlines |
 | Effects | GameSession::step advances server and client pools together | Separate source events/persistent descriptors from local cosmetic pools |
-| Cameras | local selection reads original objects and can modify Eye rotation | Per-client view plus checked owner commands |
+| Cameras/HUD | Client-owned descriptors, ray queries, view state, HUD values/clock; checked local permissions/Eye commands | Network delivery; remaining inventory/audio/FX and client-shell extraction |
 | Activation | Player updates call PingObjects with a visibility observer | All live players contribute independently of presentation |
 | Frontend | waiting_for_player and menu/focus gates suppress session advancement | Keep zero-client dedicated and multiplayer host running |
 | Gameplay | Multiplayer death/init/respawn/frags and pickup respawn are omitted | Port source branches; reuse existing local CTF objects without claiming network coverage |
@@ -28,7 +28,7 @@ M9 is in progress and unaccepted. M2-GPU-001 and M3 remain independent.
 | Contract and dependency audit | Written | Static inspection; no network gameplay qualification |
 | ENet and bounded transport | Foundation implemented | Real loopback UDP, three channels, 16 peers, reconnect identities and queue bounds; no gameplay wire schema yet |
 | Dedicated separation and logical services | Build/zero-client foundation implemented | Separate server preset, logical audio test, 22 mounted maps × 180 ticks; shared CPU/client storage remains transitional |
-| Replica and solo loopback | Object presentation, movement body, collision and environment replicas separated; remaining services/network pending | [Local replica](m9_client_world.md), [movement](m9_local_movement.md), [collision](m9_client_collision.md), [environment](m9_client_environment.md) |
+| Replica and solo loopback | Object presentation, movement body, collision/environment, cameras and HUD separated locally; remaining services/network pending | [Local replica](m9_client_world.md), [movement](m9_local_movement.md), [collision](m9_client_collision.md), [environment](m9_client_environment.md), [cameras/HUD](m9_client_view.md) |
 | Network sessions and Bloodbath | Pending | — |
 | Team and CTF | Pending | — |
 | UI, LAN discovery and qualification | Pending | — |

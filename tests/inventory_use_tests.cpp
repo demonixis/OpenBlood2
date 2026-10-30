@@ -131,7 +131,7 @@ namespace
         CHECK(p.OnCommandItem(4));
         // The server blocks a committed FIRE_KEY before its camera message is pumped.
         CHECK(p.HandleWeaponFireMessage({c.camera_position, {0, 0, 1}, 2, WEAP_BERETTA}) == FireResult::Blocked);
-        CHECK(pump(g) && c.seeing_eye == h && c.eye_loop && c.view.object == h);
+        CHECK(pump(g) && c.seeing_eye == h && c.eye_loop && c.view.object == g.objects.get(h)->id);
         CHECK(c.player_look_allowed());
         CHECK(!c.weapons_visible && c.player_visible && p.camera_movement_blocked);
         const auto ammo = p.m_InventoryMgr.GetAmmoCount(AMMO_BULLET);
@@ -139,7 +139,7 @@ namespace
         c.movement_input.forward = true;
         c.rotation = {.2f, .6f};
         CHECK(step(g));
-        CHECK(p.m_InventoryMgr.GetAmmoCount(AMMO_BULLET) == ammo && c.view.object == h);
+        CHECK(p.m_InventoryMgr.GetAmmoCount(AMMO_BULLET) == ammo && c.view.object == g.objects.get(h)->id);
         DRotation rotation;
         CHECK(g.server.GetObjectRotation(h, &rotation) == DE_OK && std::abs(rotation.m_Vec.y) > .1f);
         CHECK(item(g, 4) && !c.seeing_eye && !c.eye_loop && !p.camera_movement_blocked);

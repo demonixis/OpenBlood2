@@ -384,7 +384,8 @@ namespace
                                                              f->time / (f->keys[1].time - f->keys[0].time)));
             expected = vector_add(expected, f->targets[0].offset);
             CHECK(close(expected, g.objects.get(camera)->state.m_Pos));
-            CHECK(g.client_shell.view.object == camera && close(expected, g.client_shell.view.position));
+            CHECK(g.client_shell.view.object == g.objects.get(camera)->id &&
+                  close(expected, g.client_shell.view.position));
             bool second = false;
             for (int i = 0; i < 1800 && g.client_shell.view.object; ++i)
             {

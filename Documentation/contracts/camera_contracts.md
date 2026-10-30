@@ -169,3 +169,12 @@ rasterization: existing player/scripted cameras now drive depth-tested geometry 
 letterbox presentation. Materials, lighting, models/FX and complete M2 remain open.
 
 The [single-player death continuation](player_death_contracts.md) supersedes the missing selected Caleb death/corpse/gib and client death-camera paths above. Active powers, multiplayer death and whole-world/dead-player restoration remain unavailable. M2 is still incomplete.
+
+## M9 independent local camera consumer
+
+The [M9 camera/HUD boundary](multiplayer_contracts.md#local-client-cameras-and-hud)
+now replaces client server-pose/ray access with owned camera descriptors and collision
+copies. Scripted, Eye/Orb, death and chase ordering and numeric camera math remain
+unchanged. The server validates camera commands and derives gameplay gates itself;
+client selection cannot mutate original objects. Renderer/XR view identities are
+generation-qualified. See [verification](../implementation/reports/m9_client_view.md).

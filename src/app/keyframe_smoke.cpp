@@ -82,7 +82,7 @@ namespace OpenBlood2
             f->unresolved_messages != 0) // The authored Gideon recipient is now instantiated.
             return false;
         const auto* target = game.objects.get(f->targets[0].object);
-        if (!target || (!world_path && game.client_shell.view.object != target->handle))
+        if (!target || (!world_path && game.client_shell.view.object != target->id))
             return false;
         const auto& a = f->keys[0];
         const auto& b = f->keys[1];

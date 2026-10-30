@@ -27,7 +27,7 @@ namespace OpenBlood2
         registry.release(shadow_atlas_);
         registry.release(shadow_depth_);
     }
-    const CameraView& ScenePresenter::camera(const GameSession& game) const
+    const ClientCameraView& ScenePresenter::camera(const GameSession& game) const
     {
         return camera_override ? *camera_override : game.client_shell.view;
     }

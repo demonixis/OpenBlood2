@@ -288,3 +288,53 @@ network-encoded. Stance, profile/eye offsets, camera/fog/weapon point queries an
 other presentation exchanges remain local services. This lot neither adds delayed
 multiplayer timing nor qualifies network play. See the
 [environment verification](../implementation/reports/m9_client_environment.md).
+
+## Local client cameras and HUD
+
+`ClientSession` now owns camera state, death/chase state, stats, inventory tabs and
+the local presentation clock. `CBloodClientShell` retains references to that owned
+state for its original event handlers; it no longer reads server poses or performs
+server rays to select/render a camera. `ClientCameraView` contains an `ObjectId`,
+not an original handle. World-qualified frame admission rejects old sequence/world,
+invalid identity/pose/clock, duplicate camera slots, invalid camera type and more
+than 4,096 descriptors before replacing the accepted camera frame.
+
+`LocalPresentation` publishes player pose/eye height/alive state, checked owned Eye
+and Orb targets, and all live camera descriptors in original creation order. The
+client preserves first-active scripted selection, Eye then Orb override while alive,
+scripted-camera priority over the received death camera, normal/chase/zoom/XR gates,
+listener versus player-body position, player/weapon visibility and look suppression.
+Published settings remain initialization-time settings, including the original
+listener workaround; the source global active listener remains independent.
+
+Death and chase use `ClientCollisionWorld::intersect` on copied geometry. It retains
+primary-world ties, slot-order object ties, solid/ray-hit modes, object-only interior
+skipping and the original VolumeBrush exclusion (built-in Container is distinct).
+Attached collider poses are refreshed at publication and remain eligible for rays.
+The five chase clearance rays, two-unit margin, 20-unit fallback, 10,000-unit aim
+convergence and original death orbit/one-second transition math are unchanged.
+Orientation math is separated from ObjectRecord node lookup so passive camera/HUD
+consumers link without the original object dispatcher.
+
+The server still owns permissions and Eye rotation. A local command contains only
+world/object identity, frame sequence and finite bounded aim; wrong owners, stale
+worlds, reused sequences and changed camera selections fail. The bridge derives
+movement/USE/fire permission again from authoritative cameras and checked remote
+ownership; a client-rendered view cannot clear that gate. No camera command moves
+or integrates the player. Existing CMoveMgr substeps, collision correction, voice
+and already-started weapon animation timing remain unchanged.
+
+Stats and inventory events enter `ClientHud` with the associated world/object and a
+monotonic local sequence. Server and receiver share the existing validation rules.
+Stale/duplicate events cannot replay ITEMF_SHOWITEMS or partially replace accepted
+data. Entry/departure/world reset clear ownership and values; diagnostic counters
+remain monotonic, as before. Original PCX/FNT layout, maxima, alternate ammo,
+weapon/item tabs, CTF icons, crosshair and external/death/XR gates are unchanged.
+Both application paths now use `HudSnapshot`, with the client clock and world
+identity; no HUD renderer reads Objects time. Menus retain the existing pause clock.
+
+This is an immediate solo bridge, not a network codec or complete client shell
+extraction. Legacy handle events for inventory/audio, authoritative animation/stance,
+weapon/FX paths, remaining presentation and admission/network gameplay stay pending.
+The [camera/HUD report](../implementation/reports/m9_client_view.md) records the
+Linux checks and the limits of this lot.

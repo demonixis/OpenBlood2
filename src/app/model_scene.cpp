@@ -4,7 +4,7 @@
 namespace OpenBlood2
 {
     bool update_explosion_model_scene(const GameSession& game, ModelView& scene, std::string& error,
-                                      const CameraView* view)
+                                      const ClientCameraView* view)
     {
         scene.begin_frame();
         for (const auto& fx : game.server.explosion_models.active)

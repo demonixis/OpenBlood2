@@ -195,14 +195,14 @@ namespace
         auto& shell = g.client_shell;
         const auto camera = g.objects.create(g.objects.find_class("BaseClass"), {});
         CHECK(camera);
-        shell.view.object = camera;
+        shell.view.object = g.objects.get(camera)->id;
         const float yaw = shell.rotation.yaw, pitch = shell.rotation.pitch, body = p.body_yaw;
         f.controls.right_stick = {1, 0};
         f.hands[1].aim_valid = true;
         f.hands[1].aim = {{0.2f, 1.3f, -0.3f}, xr_yaw(-quarter)};
         xr_apply_controls(g, p, f, xr_tracking(g, p, f, reference, scale), reference, scale, 1.0 / 60);
         CHECK(near(p.body_yaw, body, 1e-6f) && shell.rotation.yaw == yaw && shell.rotation.pitch == pitch);
-        shell.view.object = nullptr;
+        shell.view.object = {};
         return true;
     }
 

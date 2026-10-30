@@ -291,6 +291,8 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     client_ = client;
     player = object;
     m_bInWorld = true;
+    if (!presentation_.bind(client))
+        return false;
     m_bRollCredits = false;
     if (const auto var = server_.GetGameConVar("GAME_WORLDNAME"))
         if (const auto* value = server_.GetVarValueString(var))
@@ -447,6 +449,8 @@ bool CBloodClientShell::LoadClientData(HMESSAGEREAD hMsg, std::string& error)
 }
 void CBloodClientShell::OnExitWorld()
 {
+    client_view_.hud.unbind();
+    client_view_.camera.forget_owner();
     music.ExitWorld(audio_);
     voice_manager.StopAll();
     weapons = {};
@@ -522,6 +526,7 @@ bool CBloodClientShell::InitSinglePlayer(CBloodServerShell& server)
 }
 bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodServerShell& server)
 {
+    presentation_.sync_clock();
     if (!m_bInWorld || server_.GetClientUserData(client_) != player)
         return false;
     if (const auto* line = std::get_if<OpenBlood2::PlayerText>(&event))
@@ -531,7 +536,7 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
         if (chat_lines.size() == 4)
             chat_lines.erase(chat_lines.begin());
         chat_lines.push_back(line->text);
-        messages_until = server_.GetTime() + 5;
+        messages_until = client_view_.time + 5;
         ++message_revision;
         return true;
     }
@@ -551,7 +556,7 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     }
     if (std::holds_alternative<OpenBlood2::PlayerDead>(event))
     {
-        death_camera.Begin(server_.GetTime());
+        death_camera.Begin(client_view_.time);
         ++death_notifications;
         weapons_visible = false;
         return true;
@@ -559,9 +564,9 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     if (const auto* value = std::get_if<OpenBlood2::VoiceEvent>(&event))
     {
         if (value->group)
-            voice_manager.PlayEventSound(player, value->character, value->event, view.object != nullptr);
+            voice_manager.PlayEventSound(player, value->character, value->event, bool(view.object));
         else
-            voice_manager.PlayUniqueSound(player, value->character, value->event, view.object != nullptr);
+            voice_manager.PlayUniqueSound(player, value->character, value->event, bool(view.object));
         return true; // Delivery is distinct from gated or failed cosmetic playback.
     }
     if (const auto* value = std::get_if<OpenBlood2::ScreenFade>(&event))
@@ -669,16 +674,9 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
         physics = *value;
     }
     else if (const auto* value = std::get_if<OpenBlood2::PlayerStats>(&event))
-        stats = *value;
+        return presentation_.deliver(client_, *value);
     else if (const auto* value = std::get_if<OpenBlood2::InventoryItems>(&event))
-    {
-        // Original SMSG_ITEMCHANGED: keep the values; ITEMF_SHOWITEMS slides the tabs in.
-        inventory_items = *value;
-        inventory_items.show = false;
-        if (value->show)
-            ++inventory_show_requests;
-        ++inventory_item_messages;
-    }
+        return presentation_.deliver(client_, *value);
     else if (const auto* value = std::get_if<OpenBlood2::CTFEvent>(&event))
         return HandleCTF(*value);
     else if (const auto* value = std::get_if<OpenBlood2::BossHealth>(&event))
@@ -772,21 +770,21 @@ void CBloodClientShell::UpdateRollCredits(double seconds)
 }
 bool CBloodClientShell::Update()
 {
-    if (server_.GetTime() >= messages_until)
+    presentation_.sync_clock();
+    if (client_view_.time >= messages_until)
         chat_lines.clear();
-    if (server_.GetTime() >= control_notice_until)
+    if (client_view_.time >= control_notice_until)
         control_notice.clear();
 
     if (!m_bInWorld || server_.GetClientUserData(client_) != player)
         return false;
     ++updates;
     communication.Update(server_, player, voice_manager);
-    server_.GetObjectPos(player, &position);
-    const auto* owner = dynamic_cast<CPlayerObj*>(server_.HandleToObject(player));
-    if (!owner)
+    if (!presentation_.publish(client_, seeing_eye, orb_view))
         return false;
+    position = client_view_.camera.frame().player.position;
     camera_position = position;
-    camera_position.y += owner->eye_level;
+    camera_position.y += client_view_.camera.frame().eye_level;
     if (!UpdateCameraSelection() || !UpdateInventoryEffects())
         return false;
     m_bFirstUpdate = false;
@@ -804,7 +802,7 @@ bool CBloodClientShell::UpdateMovement(CBloodServerShell& server, double seconds
         !server.OnMessage(client_, OpenBlood2::PlayerControls{{}, false, rotation.yaw}))
         return false;
     if (!owner->ApplyDoorPush() ||
-        !move_mgr.Update(server, voice_manager, view.object != nullptr, movement_input,
+        !move_mgr.Update(server, voice_manager, bool(view.object), movement_input,
                          locomotion_yaw ? *locomotion_yaw : rotation.yaw, seconds,
                          !owner->m_damage.IsDead() && !owner->camera_movement_blocked && !owner->MovementBlocked(),
                          weapon_input.primary || weapon_input.alternate, rotation.pitch))
@@ -1032,7 +1030,7 @@ bool CBloodClientShell::UpdateZoom(double seconds)
 float CBloodClientShell::ViewFovX() const
 {
     // Original Orb camera overrides the stored zoom with default +45 degrees.
-    if (view.object && view.object == orb_view)
+    if (view.object && client_view_.camera.kind == OpenBlood2::ClientCameraKind::Orb)
         return OpenBlood2::original_fov_normal * 1.5f;
     // Letterbox cameras use the default FOV; other views use the current value.
     if ((view.object && view.settings.type == 1) || !m_fovX)
@@ -1041,117 +1039,37 @@ float CBloodClientShell::ViewFovX() const
 }
 bool CBloodClientShell::UpdateCameraSelection()
 {
-    auto* owner = dynamic_cast<CPlayerObj*>(server_.HandleToObject(player));
-    if (!owner || server_.GetClientUserData(client_) != player)
+    if (!presentation_.publish(client_, seeing_eye, orb_view) ||
+        !client_view_.camera.select(client_view_.collision, rotation.pitch, rotation.yaw, m_bZoomView, blocker))
         return false;
-    third_person_active = false;
-    if (xr_view)
-        third_person = false;
-    view = server_.GetCameraView();
-    if (seeing_eye && server_.IsObjectAlive(seeing_eye) && !owner->m_damage.IsDead())
-    {
-        view.object = seeing_eye;
-        view.settings = {0, false, false, true};
-        server_.GetObjectPos(seeing_eye, &view.position);
-        view.rotation = OpenBlood2::rotation_from_euler({rotation.pitch, rotation.yaw, 0});
-        server_.SetObjectRotation(seeing_eye, &view.rotation);
-    }
-    else if (orb_view && server_.IsObjectAlive(orb_view) && !owner->m_damage.IsDead())
-    {
-        view.object = orb_view;
-        view.settings = {0, false, false, true};
-        if (server_.GetObjectPos(orb_view, &view.position) != DE_OK)
-            return false;
-        view.rotation = OpenBlood2::rotation_from_euler({rotation.pitch, rotation.yaw, 0});
-    }
-    owner->camera_movement_blocked = view.object && !view.settings.player_movement;
-    player_visible = view.object && !view.settings.hide_player && !death_camera.active;
-    weapons_visible = !view.object && !death_camera.active;
-    if (!view.object)
-    {
-        view.position = camera_position;
-        view.rotation.m_Vec = {}; // Build the same player pitch/yaw orientation.
-        const float cp = std::cos(rotation.pitch);
-        const DVector forward{std::sin(rotation.yaw) * cp, -std::sin(rotation.pitch), std::cos(rotation.yaw) * cp};
-        if (server_.AlignRotation(view.rotation, forward) != DE_OK)
-            return false;
-        if (death_camera.active)
-        {
-            if (!death_camera.Update(server_, player, camera_position))
-                return false;
-            view.position = death_camera.position;
-            view.rotation = death_camera.rotation;
-        }
-        else if (third_person && !xr_view && !m_bZoomView && !owner->m_damage.IsDead())
-        {
-            if (!UpdateThirdPersonCamera())
-                return false;
-            player_visible = third_person_active;
-            weapons_visible = !third_person_active;
-        }
-    }
-    listener_position = view.object && view.settings.listener ? view.position : position;
-    return true;
+    const auto& frame = client_view_.camera.frame();
+    return presentation_.commit(client_, {{frame.world, frame.player.object}, frame.sequence, rotation});
 }
-
-// OpenBlood2 desktop chase view, following the original PlayerCamera chase-query
-// pattern. Wider eye-relative framing and aim convergence keep the body below the reticle.
 bool CBloodClientShell::ToggleThirdPerson()
 {
-    const auto* owner = dynamic_cast<CPlayerObj*>(server_.HandleToObject(player));
-    if (xr_view || !m_bInWorld || !owner || owner->m_damage.IsDead() || death_camera.active || view.object)
+    if (!m_bInWorld || !presentation_.publish(client_, seeing_eye, orb_view) ||
+        !client_view_.camera.can_toggle(m_bInWorld))
         return false;
     third_person = !third_person;
     SetControlNotice(third_person ? "Third person" : "First person");
     return true;
 }
-
 bool CBloodClientShell::UpdateThirdPersonCamera()
 {
-    using namespace OpenBlood2;
-    const auto forward = rotate_vector(view.rotation, {0, 0, 1});
-    const auto boom = rotate_vector(view.rotation, {0, 20, -150});
-    const auto requested = vector_add(camera_position, boom);
-    // Center and four near-plane corners share the shortest travel. This bounded
-    // clearance envelope also retracts for moving brushes, without moving the player.
-    float fraction = 1;
-    for (const auto offset : std::array<DVector, 5>{{{}, {-4, -4, 0}, {4, -4, 0}, {-4, 4, 0}, {4, 4, 0}}})
-    {
-        const auto clearance = rotate_vector(view.rotation, offset);
-        SegmentHit hit;
-        const auto result =
-            server_.IntersectSegment(vector_add(camera_position, clearance), vector_add(requested, clearance), player,
-                                     hit, false, SegmentObjects::SolidOnly, SegmentFilter::IgnoreVolumes);
-        if (result == SegmentResult::Invalid || result == SegmentResult::Unavailable)
-        {
-            blocker = "Third-person camera obstruction query failed";
-            return false;
-        }
-        if (result == SegmentResult::Hit)
-            fraction = std::min(fraction, std::max(0.f, float(hit.fraction) - 2.f / std::sqrt(vector_dot(boom, boom))));
-    }
-    // In a tight corner return to the eye rather than drawing inside the head.
-    // Keep the selection so the chase view returns when there is room again.
-    if (fraction * std::sqrt(vector_dot(boom, boom)) < 20)
-        return true;
-    third_person_active = true;
-    view.position = vector_add(camera_position, vector_scale(boom, fraction));
-    // Use the same eye ray/filter as player FireSpread, without spread or random
-    // draws. Only the view turns toward this target: gameplay still fires from the eye.
-    auto aim = vector_add(camera_position, vector_scale(forward, 10000));
-    SegmentHit hit;
-    const auto result =
-        server_.IntersectSegment(camera_position, aim, player, hit, false, SegmentObjects::SolidOrRayHit,
-                                 SegmentFilter::IgnoreVolumes, SegmentStart::SkipInterior);
-    if (result == SegmentResult::Invalid || result == SegmentResult::Unavailable)
-    {
-        blocker = "Third-person camera aim query failed";
-        return false;
-    }
-    if (result == SegmentResult::Hit)
-        aim = hit.point;
-    const auto direction = vector_subtract(aim, view.position);
-    return vector_dot(direction, direction) < 1e-12f || server_.AlignRotation(view.rotation, direction) == DE_OK;
+    return client_view_.camera.chase(client_view_.collision, blocker);
+}
+OpenBlood2::HudState CBloodClientShell::HudSnapshot(bool suppress_crosshair) const
+{
+    const auto owner = client_view_.hud.owner();
+    auto state = OpenBlood2::hud_state(
+        stats, m_bInWorld && owner.object && owner.world == client_view_.world.frame().world, bool(view.object),
+        death_camera.active, m_bShowCrosshair && !suppress_crosshair, m_nCrosshair, ctf.team, ctf.flag_icon);
+    state.items = inventory_items;
+    state.item_messages = inventory_item_messages;
+    state.item_shows = inventory_show_requests;
+    state.time = client_view_.time;
+    state.world_revision = client_view_.world.frame().world;
+    return state;
 }
 
 // Original SMSG_*THEFLAG / NEEDYOURFLAG local client branches.

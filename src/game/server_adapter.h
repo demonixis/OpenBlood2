@@ -581,7 +581,9 @@ namespace OpenBlood2
         CBloodServerShell server_shell{server};
         MusicCatalog music_catalog;
         LocalMovement local_movement{server, objects, client_session};
-        CBloodClientShell client_shell{server, resources, music_catalog, server.audio, local_movement};
+        LocalPresentation local_presentation{server, objects, client_session, local_movement};
+        CBloodClientShell client_shell{server,         resources,          music_catalog, server.audio,
+                                       local_movement, local_presentation, client_session};
         HCLIENT local_client = nullptr;
         World world;
         std::vector<WorldEntry> entries;

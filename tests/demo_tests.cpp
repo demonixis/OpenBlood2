@@ -196,7 +196,7 @@ namespace
             return sent;
         };
         CHECK(activate("sawbladetrigger") && advance(g, 1));
-        CHECK(g.client_shell.view.object && named("cam2") && g.client_shell.view.object == named("cam2")->handle);
+        CHECK(g.client_shell.view.object && named("cam2") && g.client_shell.view.object == named("cam2")->id);
         CHECK(advance(g, 360));
         CHECK(!g.client_shell.view.object && !p->camera_movement_blocked && !p->MovementBlocked());
         auto* fan = named("sawblade1") ? dynamic_cast<RotatingBrush*>(named("sawblade1")->game.get()) : nullptr;

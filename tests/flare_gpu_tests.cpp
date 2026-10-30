@@ -3,6 +3,7 @@
 #include "engine/runtime.h"
 #include "engine/world_renderer.h"
 #include "flare_fixture.h"
+#include <algorithm>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
     do                                                                                                                 \
@@ -152,7 +153,7 @@ int main(int argc, char** argv)
     CHECK(update_sprite_scene(game, scene, error) && scene.entries.empty());
     // Exercise the real scene assembly, texture decode and GPU path for both trails and all three impacts.
     game.server.object_particles.clear();
-    CameraView camera;
+    ClientCameraView camera;
     camera.position = {0, 50, 0};
     for (unsigned recipe : {6u, 8u, 13u, 14u, 15u})
     {

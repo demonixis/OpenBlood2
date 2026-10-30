@@ -30,7 +30,7 @@ namespace OpenBlood2
         const auto* c = r ? dynamic_cast<const CameraObj*>(r->game.get()) : nullptr;
         const auto* player = g.server_shell.Player(g.local_client);
         if (!c || !player || !c->tracking_updates || !c->tracking_error.empty() ||
-            g.client_shell.view.object != r->handle || !player->camera_movement_blocked)
+            g.client_shell.view.object != r->id || !player->camera_movement_blocked)
             return false;
         const auto delta = vector_subtract(g.client_shell.view.position, r->state.m_Pos);
         return vector_dot(delta, delta) < .0001f && !g.client_shell.weapons_visible && !c->published.listener;

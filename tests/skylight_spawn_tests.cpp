@@ -43,7 +43,7 @@ namespace
                     std::cerr << line << '\n';
                 return false;
             }
-            camera |= g.client_shell.view.object != nullptr;
+            camera |= bool(g.client_shell.view.object);
         }
         unsigned fanatics = 0, passes = 0;
         for (auto id : g.objects.snapshot())

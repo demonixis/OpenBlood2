@@ -1,6 +1,7 @@
 #pragma once
 #include "client/environment.h"
 #include "engine/container.h"
+#include "engine/segment_types.h"
 #include <memory>
 #include <optional>
 #include <vector>
@@ -11,6 +12,7 @@ namespace OpenBlood2
         ObjectId id, ignored_by;
         // Absence is distinct from a recognized built-in Container with code zero.
         std::optional<ContainerEnvironment> environment;
+        bool volume_brush = false; // Original ray filter excludes VolumeBrush, not built-in Container.
         DVector position{}, dimensions{}, velocity{}, acceleration{};
         std::uint32_t flags = 0, user_flags = 0;
         std::uint16_t type = 0;
@@ -25,6 +27,14 @@ namespace OpenBlood2
         std::uint64_t world = 0, sequence = 0;
         std::shared_ptr<const CollisionWorld> primary;
         std::vector<ClientCollider> objects;
+    };
+    struct ClientSegmentHit
+    {
+        DVector point{}, normal{};
+        ObjectId object;
+        std::uint32_t polygon = UINT32_MAX;
+        double fraction = 1;
+        std::uint16_t texture_flags = 0;
     };
     struct ClientCollisionHit
     {
@@ -49,6 +59,9 @@ namespace OpenBlood2
         const ClientCollider* get(ObjectId) const;
         CollisionQuery sweep(ClientObjectId ignore, DVector from, DVector to, DVector half, ClientCollisionHit&,
                              ObjectId extra = {}, double allowed = 0, StartOverlap start = StartOverlap::Block) const;
+        SegmentResult intersect(DVector from, DVector to, ClientObjectId ignore, ClientSegmentHit&,
+                                SegmentObjects = SegmentObjects::SolidOnly, bool ignore_volumes = false,
+                                SegmentStart = SegmentStart::IncludeInterior) const;
         bool support(ClientObjectId owner, ClientMotionState&) const;
         bool environment(ClientObjectId owner, const ClientMotionState&, DVector head, ClientContainerState&) const;
         // Destination/velocity have already been integrated by CMoveMgr.

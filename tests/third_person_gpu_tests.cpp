@@ -34,9 +34,7 @@ namespace
         ImGui::GetIO().DisplayFramebufferScale = {1, 1};
         ImGui::NewFrame();
         const auto& c = game.client_shell;
-        if (!hud.draw(hud_state(c.stats, c.m_bInWorld, c.view.object != nullptr, c.death_camera.active,
-                                c.m_bShowCrosshair, c.m_nCrosshair),
-                      game.resources, error))
+        if (!hud.draw(c.HudSnapshot(), game.resources, error))
             return false;
         ImGui::Render();
         auto* commands = SDL_AcquireGPUCommandBuffer(gpu);
@@ -139,7 +137,7 @@ int main(int argc, char** argv)
             }
         }
         CHECK(body && held && c.m_bShowCrosshair &&
-              original_crosshair_visible(c.m_bInWorld, c.view.object != nullptr, c.death_camera.active));
+              original_crosshair_visible(c.m_bInWorld, bool(c.view.object), c.death_camera.active));
         // No simulation step between captures: toggling back must recover exactly the original frame.
         toggle();
         CHECK(!c.third_person && c.UpdateCameraSelection());

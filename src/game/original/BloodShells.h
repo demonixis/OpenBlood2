@@ -9,6 +9,7 @@
 #include "ScreenFade.h"
 #include "ViewWeapon.h"
 #include "VoiceMgr.h"
+#include "game/local_presentation.h"
 #include "game/session.h"
 #include <optional>
 
@@ -92,9 +93,16 @@ class CBloodClientShell
   public:
     explicit CBloodClientShell(ServerDE& server, const OpenBlood2::Resources& resources,
                                OpenBlood2::MusicCatalog& catalog, OpenBlood2::AudioMixer& audio,
-                               OpenBlood2::LocalMovement& movement)
-        : voice_manager(server), move_mgr(movement), resources_(resources), server_(server), music_catalog_(catalog),
-          audio_(audio)
+                               OpenBlood2::LocalMovement& movement, OpenBlood2::LocalPresentation& presentation,
+                               OpenBlood2::ClientSession& client)
+        : inventory_items(client.hud.items), inventory_show_requests(client.hud.item_shows),
+          inventory_item_messages(client.hud.item_messages), voice_manager(server), move_mgr(movement),
+          position(client.camera.position), camera_position(client.camera.camera_position), view(client.camera.view),
+          listener_position(client.camera.listener_position), player_visible(client.camera.player_visible),
+          weapons_visible(client.camera.weapons_visible), third_person(client.camera.third_person),
+          third_person_active(client.camera.third_person_active), xr_view(client.camera.xr_view),
+          death_camera(client.camera.death), stats(client.hud.stats), resources_(resources), server_(server),
+          music_catalog_(catalog), audio_(audio), presentation_(presentation), client_view_(client)
     {
     }
     bool StartNewWorld(const char*, OpenBlood2::WorldMessage&);
@@ -131,7 +139,7 @@ class CBloodClientShell
     void SetControlNotice(std::string text)
     {
         control_notice = std::move(text);
-        control_notice_until = server_.GetTime() + 3;
+        control_notice_until = client_view_.time + 3;
     }
     // Original CCheatMgr::SendCheatMessage (MessageMgr.cpp:1022): the application's Options >
     // CHEATS rows send CMSG_CHEAT for the entered player. The server's ProcessCheat result.
@@ -168,8 +176,9 @@ class CBloodClientShell
     bool proximity_down = false, proximity_was_down = false;
     bool remote_down = false, remote_was_down = false, detonate_down = false, detonate_was_down = false;
     bool next_item_requested = false, prev_item_requested = false, use_item_requested = false;
-    OpenBlood2::InventoryItems inventory_items; // Latest SMSG_ITEMCHANGED values.
-    std::uint64_t inventory_show_requests = 0, inventory_item_messages = 0;
+    OpenBlood2::InventoryItems& inventory_items; // Latest SMSG_ITEMCHANGED values.
+    std::uint64_t& inventory_show_requests;
+    std::uint64_t& inventory_item_messages;
     std::uint64_t item_actions = 0, item_sounds = 0;
     OpenBlood2::SoundId item_voice = 0; // Checked inspection token, not owned.
     std::string item_audio_error;
@@ -190,26 +199,31 @@ class CBloodClientShell
     OpenBlood2::WeaponInput weapon_input;
     bool m_bInWorld = false, m_bFirstWorld = true, m_bFirstUpdate = true;
     HOBJECT player = nullptr;
-    DVector position{}, camera_position{};
-    OpenBlood2::CameraView view;
-    DVector listener_position{};
-    bool player_visible = false, weapons_visible = true;
+    DVector& position;
+    DVector& camera_position;
+    OpenBlood2::ClientCameraView& view;
+    DVector& listener_position;
+    bool& player_visible;
+    bool& weapons_visible;
     // Local presentation only: never serialized or sent as player rotation/shot origin.
-    bool third_person = false, third_person_active = false, xr_view = false;
+    bool& third_person;
+    bool& third_person_active;
+    bool& xr_view;
     bool ToggleThirdPerson();
     bool UpdateThirdPersonCamera();
-    CPlayerDeathCamera death_camera;
+    CPlayerDeathCamera& death_camera;
     std::uint64_t death_notifications = 0;
     bool UpdateCameraSelection();
+    OpenBlood2::HudState HudSnapshot(bool suppress_crosshair = false) const;
     // Scripted/death cameras own the view. The Eye and Orb are player-aimed remote views.
     bool player_look_allowed() const
     {
-        return !death_camera.active && (!view.object || view.object == seeing_eye || view.object == orb_view);
+        return client_view_.camera.look_allowed();
     }
 
     OpenBlood2::PlayerRotation rotation;
     OpenBlood2::PlayerPhysics physics;
-    OpenBlood2::PlayerStats stats;
+    OpenBlood2::PlayerStats& stats;
     std::uint64_t messages = 0, updates = 0;
     std::string blocker;
     struct ExitStatus
@@ -248,4 +262,6 @@ class CBloodClientShell
     ServerDE& server_;
     OpenBlood2::MusicCatalog& music_catalog_;
     OpenBlood2::AudioMixer& audio_;
+    OpenBlood2::LocalPresentation& presentation_;
+    OpenBlood2::ClientSession& client_view_;
 };

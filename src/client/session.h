@@ -1,5 +1,6 @@
 #pragma once
-#include "client/collision.h"
+#include "client/camera.h"
+#include "client/hud.h"
 #include "client/movement.h"
 #include "client/world.h"
 
@@ -16,6 +17,9 @@ namespace OpenBlood2
         {
             return world.apply(std::move(frame), error);
         }
+        float time = 0; // Immediate local clock publication, separate from world-relative time.
+        ClientCamera camera;
+        ClientHud hud;
         ClientWorld world;
         ClientMovement movement;
         ClientCollisionWorld collision;

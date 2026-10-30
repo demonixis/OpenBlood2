@@ -1,5 +1,6 @@
 #include "game/local_movement.h"
 #include "game/original/SeeingEye.h"
+#include "game/original/VolumeBrush.h"
 #include "game/server_adapter.h"
 
 namespace OpenBlood2
@@ -164,6 +165,7 @@ namespace OpenBlood2
             value.attached = object->attachment != 0;
             value.world_model = bool(object->world_model);
             value.container = bool(object->container());
+            value.volume_brush = dynamic_cast<const VolumeBrush*>(object->game.get()) != nullptr;
             value.dynamic = object->world_body || object->model_body;
             value.pushable = object->body_properties.pushable;
             value.priority = object->blocking_priority;

@@ -1,5 +1,13 @@
 # Source and Dependency Provenance
 
+The M9 local camera/HUD lot preserves original death/chase arithmetic and status
+presentation while moving pose/descriptor reception, geometry-only rays and HUD
+ownership/clock into the client. Orientation math is extracted without arithmetic
+changes from the ObjectRecord node adapter; the static weapon catalog and original
+crosshair helpers join the CPU client target. See [sources](sources/m9_client_view_sources.json),
+[contract](../contracts/multiplayer_contracts.md#local-client-cameras-and-hud) and
+[verification](reports/m9_client_view.md). No dependency or save layout changes.
+
 The M9 client environment lot reuses the existing posed container geometry and
 source membership order; CMoveMgr's numeric movement rules are unchanged. Server
 metadata extraction is shared with the publisher, and the client has a handle-free

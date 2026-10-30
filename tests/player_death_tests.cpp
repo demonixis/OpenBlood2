@@ -59,16 +59,26 @@ namespace
         CHECK(g.server.GetObjectPos(h, &body) == DE_OK);
         const auto eye = vector_add(body, {0, 36, 0});
         CPlayerDeathCamera c;
+        const auto identity = g.objects.get(h)->id;
+        auto update = [&]()
+        {
+            if (!g.local_movement.publish_collision())
+                return false;
+            const auto* target = g.objects.get(h);
+            return c.Update(g.client_session.collision, {g.client_session.world.frame().world, identity},
+                            target ? target->state.m_Pos : body, target ? target->state.m_Rotation : DRotation{},
+                            g.server.GetTime(), eye);
+        };
         c.Begin(g.server.GetTime());
-        CHECK(c.Update(g.server, h, eye) && c.fraction == 0 && close(c.position, eye));
+        CHECK(update() && c.fraction == 0 && close(c.position, eye));
         // Repeated Begin cannot restart an active orbit, even when the message is duplicated.
         CHECK(g.objects.advance(.5));
         c.Begin(g.server.GetTime());
-        CHECK(c.Update(g.server, h, eye) && std::abs(c.angle - .4f) < .00001f && c.fraction == .5f);
+        CHECK(update() && std::abs(c.angle - .4f) < .00001f && c.fraction == .5f);
         CHECK(close(c.position, vector_add(eye, vector_scale(vector_subtract(c.requested, eye), .5f))));
         auto yaw = rotation_from_euler({0, .7f, 0});
         CHECK(g.server.SetObjectRotation(h, &yaw) == DE_OK);
-        CHECK(g.objects.advance(.5) && c.Update(g.server, h, eye));
+        CHECK(g.objects.advance(.5) && update());
         // Original world components are transformed by the target basis a second time.
         const auto expected = vector_add(body, {-108 * std::sin(2 * .7f + .8f), 65, -108 * std::cos(2 * .7f + .8f)});
         CHECK(close(c.requested, expected) && close(c.position, expected));
@@ -82,11 +92,11 @@ namespace
         auto obstacle = g.objects.create(g.objects.find_class("BaseClass"), wall);
         DVector dims{10, 50, 10};
         CHECK(obstacle && g.server.SetObjectDims(obstacle, &dims) == DE_OK);
-        CHECK(c.Update(g.server, h, eye) && c.result == SegmentResult::Hit && c.hit.object == obstacle);
+        CHECK(update() && c.result == SegmentResult::Hit && c.hit.object == g.objects.get(obstacle)->id);
         CHECK(close(c.position, vector_add(c.hit.point, c.hit.normal)));
         const auto fixed = c.position;
-        CHECK(c.Update(g.server, h, eye) && close(c.position, fixed));
-        CHECK(g.objects.remove(h) && !c.Update(g.server, h, eye) && !c.error.empty());
+        CHECK(update() && close(c.position, fixed));
+        CHECK(g.objects.remove(h) && !update() && !c.error.empty());
         CHECK(g.unload_world());
         return true;
     }

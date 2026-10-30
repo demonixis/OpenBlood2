@@ -69,7 +69,7 @@ namespace OpenBlood2
                          Uint32 width, Uint32 height, std::span<const StereoEye> eyes, std::string& error);
         // XR head camera for update() (sprites face it; the sky and shadow casters follow it) and
         // the matching view-weapon placement. Empty: the game's camera, as on desktop.
-        std::optional<CameraView> camera_override;
+        std::optional<ClientCameraView> camera_override;
         std::optional<std::array<ViewWeaponCamera, 2>> weapon_cameras; // {left, right}
         // XR without a compositor fade: screen fades scale the scene light (1 on desktop).
         float scene_fade = 1;
@@ -148,7 +148,7 @@ namespace OpenBlood2
 
       private:
         std::uint64_t client_world_epoch_ = 0;
-        const CameraView& camera(const GameSession&) const;
+        const ClientCameraView& camera(const GameSession&) const;
         // Pipelines, renderer uploads, shadow tiles and a depth target with `layers` layers.
         bool prepare_depth(Uint32 width, Uint32 height, Uint32 layers, SDL_GPUSampleCount, std::string& error);
         bool prepare_frame(SDL_GPUCommandBuffer*, SDL_GPUTextureFormat, Uint32 width, Uint32 height, Uint32 layers,

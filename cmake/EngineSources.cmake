@@ -4,6 +4,12 @@ add_library(engine_core STATIC
     src/client/world.cpp
     src/client/collision.cpp
     src/client/environment.cpp
+    src/client/segment.cpp
+    src/client/camera.cpp
+    src/client/hud.cpp
+    src/game/original/PlayerDeathCamera.cpp
+    src/game/original/WeaponDefs.cpp
+    src/game/original/ClientCrosshair.cpp
     src/engine/shape_collision.cpp
     src/client/session.cpp
     src/client/world_view.cpp
@@ -26,6 +32,7 @@ add_library(engine_core STATIC
     src/engine/light_grid.cpp
     src/engine/attachments.cpp
     src/engine/object_pose.cpp
+    src/engine/rotation_math.cpp
     src/engine/objects.cpp
     src/engine/world.cpp
     src/engine/sprite.cpp

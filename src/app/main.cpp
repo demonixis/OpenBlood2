@@ -926,14 +926,7 @@ namespace
             OpenBlood2::draw_letterbox(game->client_shell.m_bInWorld && game->client_shell.view.object &&
                                        game->client_shell.view.settings.type == 1);
             OpenBlood2::draw_screen_fade(game->client_shell.fade.Scale(), game->client_shell.m_bInWorld);
-            auto hud_values = OpenBlood2::hud_state(
-                game->client_shell.stats, game->client_shell.m_bInWorld, game->client_shell.view.object != nullptr,
-                game->client_shell.death_camera.active, game->client_shell.m_bShowCrosshair,
-                game->client_shell.m_nCrosshair, game->client_shell.ctf.team, game->client_shell.ctf.flag_icon);
-            hud_values.items = game->client_shell.inventory_items;
-            hud_values.item_messages = game->client_shell.inventory_item_messages;
-            hud_values.item_shows = game->client_shell.inventory_show_requests;
-            hud_values.time = float(game->objects.time());
+            auto hud_values = game->client_shell.HudSnapshot();
             if (!hud.draw(hud_values, game->resources, error))
             {
                 spdlog::error("Original HUD: {}", error);

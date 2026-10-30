@@ -267,7 +267,9 @@ without double integration. Its [collision replica](implementation/reports/m9_cl
 now owns primary/posed geometry and collider snapshots for independent prediction.
 The [environment replica](implementation/reports/m9_client_environment.md) supplies
 liquid/ladder/conveyor membership without server callbacks; solo CMoveMgr math and
-authoritative air/damage remain unchanged.
+authoritative air/damage remain unchanged. The
+[local camera/HUD lot](implementation/reports/m9_client_view.md) moves view selection,
+death/chase rays and HUD state/clock to client ownership, keeping server permissions.
 **Full client separation, player
 admission and network gameplay remain pending.**
 
