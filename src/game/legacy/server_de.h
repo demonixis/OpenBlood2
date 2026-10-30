@@ -172,6 +172,8 @@ class ServerDE : public CSBase, public OpenBlood2::EffectQueries
     virtual bool GetContainers(HOBJECT, DVector head, OpenBlood2::ContainerState&) = 0;
     virtual OpenBlood2::ResizeResult ResizeObject(HOBJECT, DVector dimensions) = 0;
     virtual DRESULT ResolveInitialWorldOverlap(HOBJECT) = 0;
+    // Initial NPC placement or multiplayer player spawn only; no runtime solver.
+    virtual DRESULT ResolveInitialActorOverlap(HOBJECT) = 0;
     virtual bool PlaceNonSolidModel(HOBJECT, DVector requested, DVector anchor, DVector anchor_half,
                                     OpenBlood2::BodyPlacement&) = 0;
     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;

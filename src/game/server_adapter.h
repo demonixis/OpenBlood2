@@ -228,7 +228,7 @@ namespace OpenBlood2
         }
         ResizeResult ResizeObject(HOBJECT, DVector dimensions) override;
         DRESULT ResolveInitialWorldOverlap(HOBJECT) override;
-        DRESULT ResolveInitialActorOverlap(HOBJECT); // Engine world-finalization phase, not a runtime solver.
+        DRESULT ResolveInitialActorOverlap(HOBJECT) override; // Initial placement only, not a runtime solver.
         bool PlaceNonSolidModel(HOBJECT, DVector requested, DVector anchor, DVector anchor_half,
                                 BodyPlacement&) override;
         bool GetMovementState(HOBJECT, MovementState&) override;

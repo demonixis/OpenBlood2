@@ -552,3 +552,44 @@ This is fresh Bloodbath entry only. Team assignment/forced skins, configurable
 healing, dead respawn/slow death and the delayed spawn voice are subsequent lots.
 Team/CTF profile requests are explicitly refused meanwhile. Wire admission stays
 closed. See [profile verification](../implementation/reports/m9_player_profiles.md).
+
+## ENet Bloodbath admission
+
+The [admission continuation](../implementation/reports/m9_admission.md) opens
+Bloodbath entry through a bounded, portable protocol. Version 1 uses explicit
+little-endian fields and five Control messages, each at most 256 bytes. Decode
+into a temporary value and validate the complete packet before committing it.
+Names, profile values, mounted map paths, player/object identities and world
+generations have explicit limits; no pointer or content payload is transmitted.
+
+Hello validates protocol, retail edition and complete mounted-content SHA-256.
+WorldOffer names the current approved map and world generation. Ready carries
+that generation and the profile after the client loads its own map. Only then
+may ServerSession create/initialize the original player and return Joined.
+Wrong ordering, channels, duplicate init, malformed values or stale generations
+disconnect that peer. Team/CTF admission remains refused until their rules port.
+
+One network owner drives at most 64 incoming events per pump, over the existing
+16-peer and transport queue bounds. Monotonic wall deadlines are 5 seconds for
+Hello, 30 seconds for loading and 15 seconds for joined-client liveness; joined
+peers exchange one-second heartbeats. Expiry precedes accepting a late packet.
+Backwards pump time fails without mutating the connection registry. Departure,
+timeout and shutdown detach original players before freeing their connections.
+A reconnect always gets fresh player and generation-qualified object identities.
+The console keeps its existing 60 Hz / six-tick catch-up policy.
+
+An occupied multiplayer start now uses the existing bounded initial actor
+separation. This is an explicit replacement-physics adaptation: original code
+teleports to its chosen marker and ignores MoveObjectToGround's return. Preserve
+that one marker draw and all solo behavior. Try only four face-adjacent horizontal
+positions around the overlapping player, nearest first; validate the full
+endpoint and swept route against primary/world-model geometry and other bodies.
+Only the initial overlapping player is omitted from the escape sweep. Do not
+move any existing player. If all four exits are blocked, refuse entry with an
+explicit error and remove its newly created objects. There is no extra random
+draw, marker retry, origin fallback or runtime collision exception.
+
+This step admits original players and validates process isolation; it does not
+yet deliver their gameplay events, world snapshots or movement. Private event
+queues keep their existing bounds. Interactive host/client gameplay, slow death
+and respawn, match rules, LAN discovery and platform qualification remain open.

@@ -3,9 +3,16 @@
 #include "game/game_settings.h"
 #include "game/original/AI_Mgr.h"
 #include "game/world_validation.h"
+#include "net/transport.h"
+#include <algorithm>
+#include <atomic>
 
 namespace OpenBlood2
 {
+    ServerSession::~ServerSession()
+    {
+        clear_players();
+    }
     bool ServerSession::start(const Config& config, std::string_view name, unsigned mode, std::string& error)
     {
         error.clear();
@@ -42,7 +49,87 @@ namespace OpenBlood2
                     error += "\n" + entry.class_name + " " + entry.name + ": " + entry.detail;
             return false;
         }
+        static std::atomic<std::uint64_t> next_world{1};
+        auto next = next_world.load(std::memory_order_relaxed);
+        while (next && !next_world.compare_exchange_weak(next, next + 1, std::memory_order_relaxed))
+        {
+        }
+        world_id_ = next;
+        if (!world_id_)
+        {
+            error = "Server world identity exhausted";
+            return false;
+        }
+        mode_ = mode;
         started_ = true;
+        return true;
+    }
+    bool ServerSession::join(const Net::JoinProfile& profile, Net::Joined& joined, std::string& error)
+    {
+        error.clear();
+        if (!started_ || mode_ != GAMETYPE_BLOODBATH || !Net::valid_profile(profile) || !next_player_ ||
+            players_.size() >= Net::max_players || game_.objects.busy())
+        {
+            error = "Invalid or unavailable Bloodbath player admission";
+            return false;
+        }
+        const auto client = game_.server.connect_client();
+        if (!client)
+        {
+            error = "No available original client connection";
+            return false;
+        }
+        PlayerInit init;
+        init.name = profile.name;
+        init.character = profile.character;
+        init.skin = profile.skin;
+        init.strength = profile.attributes[0];
+        init.speed = profile.attributes[1];
+        init.resistance = profile.attributes[2];
+        init.magic = profile.attributes[3];
+        init.weapons = profile.weapons;
+        const auto failures = game_.objects.failure_count();
+        auto* player = game_.server_shell.OnClientEnterWorld(client, &error);
+        const auto object = player ? player->m_hObject : nullptr;
+        const bool initialized = player && game_.server_shell.OnMessage(client, init);
+        const auto* record = game_.objects.get(object);
+        if (!initialized || !record || record->life != Life::Alive)
+        {
+            if (error.empty())
+                error = record && record->life == Life::Alive && !player->entry_error.empty()
+                            ? player->entry_error
+                            : "Original player initialization failed";
+            if (game_.objects.failure_count() != failures && !game_.objects.diagnostics().empty())
+                error += ": " + game_.objects.diagnostics().back();
+            game_.server_shell.OnClientExitWorld(client);
+            game_.objects.finish_frame();
+            game_.server.disconnect_client(client);
+            return false;
+        }
+        const auto id = record->id;
+        const auto connection = next_player_++;
+        players_.push_back({connection, client, id});
+        joined = {world_id_, connection, id};
+        return true;
+    }
+    bool ServerSession::leave(std::uint64_t player)
+    {
+        const auto found =
+            std::find_if(players_.begin(), players_.end(), [&](const auto& p) { return p.id == player; });
+        if (found == players_.end() || game_.objects.busy())
+            return false;
+        const auto client = found->client;
+        game_.server_shell.OnClientExitWorld(client);
+        if (!game_.objects.finish_frame() || !game_.server.disconnect_client(client))
+            return false;
+        players_.erase(found);
+        return true;
+    }
+    bool ServerSession::clear_players()
+    {
+        while (!players_.empty())
+            if (!leave(players_.back().id))
+                return false;
         return true;
     }
     bool ServerSession::tick(std::string& error)

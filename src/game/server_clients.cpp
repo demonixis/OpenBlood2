@@ -317,9 +317,11 @@ namespace OpenBlood2
     {
         trace_service("ResolveInitialActorOverlap");
         auto* r = objects_.get(h);
+        const bool player =
+            r && network_game_type(net_game_type) && Objects::is_kind_of(r->type, objects_.find_class("CPlayerObj"));
         if (!r || r->life != Life::Alive || r->attachment || !collision || !collision_ready ||
-            !Objects::is_kind_of(r->type, objects_.find_class("AI_Mgr")) || !physics_vector(r->dimensions) ||
-            r->dimensions.x <= 0 || r->dimensions.y <= 0 || r->dimensions.z <= 0)
+            (!player && !Objects::is_kind_of(r->type, objects_.find_class("AI_Mgr"))) ||
+            !physics_vector(r->dimensions) || r->dimensions.x <= 0 || r->dimensions.y <= 0 || r->dimensions.z <= 0)
             return DE_INVALIDPARAMS;
         if (!(r->state.m_Flags & FLAG_SOLID))
             return DE_OK;
@@ -335,6 +337,11 @@ namespace OpenBlood2
         if (query == CollisionQuery::Hit && contact.start_solid && contact.object)
         {
             const auto* other = objects_.get(contact.object);
+            // Multiplayer start markers may already contain a player. Reuse the
+            // bounded horizontal separation, never ignore a world/model obstacle
+            // or select another random marker. This is entry placement only.
+            if (player && (!other || !Objects::is_kind_of(other->type, objects_.find_class("CPlayerObj"))))
+                return DE_ERROR;
             if (other && (other->character_body || other->state.m_ObjectType == OT_MODEL || other->world_model))
             {
                 const auto combined = vector_add(r->dimensions, other->dimensions);

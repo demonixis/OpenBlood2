@@ -423,6 +423,11 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name, bool inspection_start)
     if (!server->IsObjectAlive(m_hObject) || server->TeleportObject(m_hObject, &position) != DE_OK ||
         server->SendToClient(m_hClient, OpenBlood2::PlayerRotation{m_fPitch, m_fYaw}) != DE_OK)
         return false;
+    if (network_game_type(server->net_game_type) && server->ResolveInitialActorOverlap(m_hObject) != DE_OK)
+    {
+        entry_error = "Occupied multiplayer start has no clear bounded placement";
+        return false;
+    }
     if (server->MoveObjectToGround(m_hObject) != DE_OK)
     {
         entry_error = "Start point has no supported ground collision";

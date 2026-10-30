@@ -13,6 +13,7 @@
 | [Architecture](architecture.md) | Targets, ownership and engine/game boundaries. |
 | [Client cameras and HUD](implementation/reports/m9_client_view.md) | M9 independent camera selection/rays, client HUD ownership and local verification. |
 | [Client audio](implementation/reports/m9_client_audio.md) | M9 logical server voices, independent client playback and local verification. |
+| [Network admission](implementation/reports/m9_admission.md) | Bounded ENet handshake, full-content gate and original player lifetime; gameplay replication pending. |
 | [Bloodbath player profiles](implementation/reports/m9_player_profiles.md) | Original skins, entry ammo and private startup announcement; fresh internal entry only. |
 | [Server player connections](implementation/reports/m9_player_connections.md) | 16 checked connections, private ownership and original Bloodbath marker selection; wire admission pending. |
 | [Client flashlight replica](implementation/reports/m9_flashlight.md) | Copied poses, generation-safe lifetime and independent client rays; unchanged battery rules. |
@@ -25,7 +26,7 @@
 | [Client collision replica](implementation/reports/m9_client_collision.md) | M9 owned collision scene and independent prediction; solo validation and remaining services. |
 | [Local client movement](implementation/reports/m9_local_movement.md) | M9 separate CMoveMgr body, speculative collision and immediate server correction; solo verification. |
 | [Local client replica](implementation/reports/m9_client_world.md) | M9 object presentation through ClientWorld; remaining client/server dependencies and validation. |
-| [Dedicated server foundation](dedicated_server.md) | Headless build and zero-client simulation; M9 player admission remains pending. |
+| [Dedicated server foundation](dedicated_server.md) | Headless build, zero-client simulation and Bloodbath admission; gameplay replication remains pending. |
 | [Contributing](contributing.md) | Source reuse, conventions and verification. |
 | [Server-class coverage](contracts/class_coverage.md) | Missing original registrations, replacements and Museum investigation. |
 | [Remaining original VFX](implementation/reports/vfx_inventory.md) | Weapon/environment gaps, existing components and source evidence; delivery order in the roadmap. |

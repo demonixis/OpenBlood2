@@ -22,7 +22,7 @@ class CBloodServerShell
     explicit CBloodServerShell(ServerDE& server) : paths(server), server_(server) {}
     void PreStartWorld();
     bool PostStartWorld();
-    CPlayerObj* OnClientEnterWorld(HCLIENT);
+    CPlayerObj* OnClientEnterWorld(HCLIENT, std::string* error = nullptr);
     CPlayerObj* OnRestoredClientEnterWorld(HCLIENT, HOBJECT, const char* start_name = nullptr);
     void OnClientExitWorld(HCLIENT);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerInit&);
@@ -85,7 +85,7 @@ class CBloodServerShell
     std::uint64_t updates = 0;
 
   private:
-    CPlayerObj* CreatePlayer(HCLIENT);
+    CPlayerObj* CreatePlayer(HCLIENT, std::string* error);
     bool RespawnPlayer(CPlayerObj*, HCLIENT);
     ServerDE& server_;
 };

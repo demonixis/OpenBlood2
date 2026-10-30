@@ -1,0 +1,62 @@
+{
+  "scope": "ENet retail Bloodbath admission, original player lifetime and checked occupied start placement",
+  "baseline": "f48e889f",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "f48e889fd74cfbc9e0734114493c6e1cad7a360c",
+      "path": "src/game/original/BloodShells.cpp",
+      "sha256": "931541d3a4b72082d5e65b965638c26b568177a53a970bc1b8c85735bd769864"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "f48e889fd74cfbc9e0734114493c6e1cad7a360c",
+      "path": "src/game/original/PlayerObj.cpp",
+      "sha256": "8cc9689c1537b8634bbef9af7bb39ceace1f2ce0da00458b6ae7ae145dcb7426"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "f48e889fd74cfbc9e0734114493c6e1cad7a360c",
+      "path": "src/game/server_clients.cpp",
+      "sha256": "65acf1e4b76b753281d2cc006c8c8827a1fd8813cc79f3d88f2f2516d075dc35"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "f48e889fd74cfbc9e0734114493c6e1cad7a360c",
+      "path": "src/net/transport.cpp",
+      "sha256": "13c2acb1f1a70b7f4cfd2192ff225a52ca11542c01a8fdadf5e96e65c43a8c68"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    }
+  ],
+  "adaptations": [
+    "New portable protocol: explicit little-endian schema, 256-byte admission bound, atomic decoding and protocol/edition/full-content gates before player creation.",
+    "Hello / WorldOffer / Ready / Joined / Heartbeat phases carry only values and world/object generations. No retail wire compatibility or content download.",
+    "Monotonic 5/30/15-second deadlines, 64 receive events per pump, 16-peer bound, original entry/exit ownership and fresh reconnect identities.",
+    "Occupied multiplayer marker: preserve exactly one original ordinal draw, then reuse bounded four-face horizontal actor separation. Validate the full endpoint and path against the world and all other bodies; only the initial overlapping player is omitted from the escape sweep. No additional marker selection, runtime depenetration or solo change. Fully blocked local placement is refused.",
+    "Original GoToStartPoint ignores the helper return; the reconstruction keeps checked admission and explicit error propagation before destroying failed players. This placement adaptation is not verified retail physics.",
+    "The graphical client, gameplay snapshots/events, remote movement/combat and Team/CTF admission remain subsequent lots."
+  ]
+}

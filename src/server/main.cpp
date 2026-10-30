@@ -1,5 +1,6 @@
 #include "game/game_settings.h"
 #include "net/transport.h"
+#include "server/network.h"
 #include "server/session.h"
 #include <charconv>
 #include <chrono>
@@ -32,7 +33,7 @@ int main(int argc, char** argv)
         const std::string_view arg = argv[i];
         if (arg == "--help")
         {
-            std::cout << "OpenBlood2 dedicated server (M9 foundation; player admission is not available yet)\n"
+            std::cout << "OpenBlood2 dedicated server (M9: Bloodbath admission; gameplay replication pending)\n"
                       << "  --data-dir PATH  External retail installation (or BLOOD2_DATA_DIR)\n"
                       << "  --world NAME     Retail multi/bb_* or multi/ctf_* map\n"
                       << "  --mode MODE      bloodbath, team, ctf\n"
@@ -94,16 +95,17 @@ int main(int argc, char** argv)
         std::cerr << error << '\n';
         return 5;
     }
-    Net::Transport transport;
-    if (!transport.listen(address, std::uint16_t(port), capacity, error))
+    ServerNetwork network(session);
+    if (!network.listen(address, std::uint16_t(port), capacity, error))
     {
         std::cerr << error << '\n';
         return 5;
     }
     std::signal(SIGINT, stop);
     std::signal(SIGTERM, stop);
-    std::cout << "Server simulation: " << session.game().world_path << ", UDP " << transport.port() << ", data "
-              << digest_text(session.fingerprint()) << "\nPlayer admission is not available in this M9 foundation.\n"
+    std::cout << "Server simulation: " << session.game().world_path << ", UDP " << network.port() << ", data "
+              << digest_text(session.fingerprint())
+              << "\nBloodbath admission enabled; gameplay replication is pending.\n"
               << std::flush;
     ServerClock clock;
     auto previous = std::chrono::steady_clock::now();
@@ -125,25 +127,17 @@ int main(int argc, char** argv)
             for (const auto& warning : session.take_warnings())
                 std::cerr << warning << '\n';
         }
-        // Bound service work so a peer cannot starve simulation. Until the replica
-        // and multiplayer initialization land, explicitly reject game admission.
-        for (unsigned i = 0; i < 64; ++i)
+        if (!network.pump(std::chrono::steady_clock::now(), error))
         {
-            Net::Event event;
-            const auto status = transport.poll(event, 0, error);
-            if (status == Net::PollResult::Failed)
-            {
-                std::cerr << error << '\n';
-                return 6;
-            }
-            if (status == Net::PollResult::Idle)
-                break;
-            if (event.kind == Net::EventKind::Connected)
-                transport.disconnect(event.peer, 2);
+            std::cerr << error << '\n';
+            return 6;
         }
-        transport.flush();
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
-    std::cout << "Server stopped: ticks=" << ticks_done << ", discarded_ticks=" << clock.discarded_ticks() << '\n';
+    if (!network.close())
+        return 6;
+    std::cout << "Server stopped: ticks=" << ticks_done << ", discarded_ticks=" << clock.discarded_ticks()
+              << ", admitted=" << network.admitted << ", departed=" << network.departed
+              << ", rejected=" << network.rejected << ", timed_out=" << network.timed_out << '\n';
     return 0;
 }

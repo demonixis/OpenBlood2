@@ -103,6 +103,66 @@ namespace
         return true;
     }
 
+    bool bloodbath_overlap(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(test_player::setup(game, root));
+        game.server.net_game_type = GAMETYPE_BLOODBATH;
+        std::vector<HCLIENT> clients;
+        std::vector<DVector> positions;
+        for (unsigned i = 0; i < 5; ++i)
+        {
+            auto client = game.server.connect_client();
+            CHECK(client);
+            clients.push_back(client);
+            std::minstd_rand expected(game.server.save_clock().generator);
+            std::uniform_int_distribution<int>(0, 0)(expected);
+            auto* player = game.server_shell.OnClientEnterWorld(client);
+            CHECK(player);
+            CHECK(std::minstd_rand(game.server.save_clock().generator) == expected);
+            const auto* record = game.objects.get(player->m_hObject);
+            CHECK(record && record->placement_nudges == (i ? 1 : 0));
+            CHECK(std::abs(record->state.m_Pos.y - 41.001f) < .01f);
+            const auto delta = vector_subtract(record->state.m_Pos, DVector{32, 100, 64});
+            CHECK(std::hypot(delta.x, delta.z) <= 24.01f);
+            for (const auto previous : positions)
+                CHECK(std::abs(previous.x - record->state.m_Pos.x) >= 24 ||
+                      std::abs(previous.z - record->state.m_Pos.z) >= 24);
+            positions.push_back(record->state.m_Pos);
+        }
+        // All four nearby exits are occupied: fail without another marker draw,
+        // crossing another body, moving existing players or leaking new children.
+        const auto count = game.objects.snapshot().size();
+        auto client = game.server.connect_client();
+        CHECK(client);
+        std::minstd_rand expected(game.server.save_clock().generator);
+        std::uniform_int_distribution<int>(0, 0)(expected);
+        std::string error;
+        CHECK(!game.server_shell.OnClientEnterWorld(client, &error));
+        CHECK(error == "Occupied multiplayer start has no clear bounded placement");
+        CHECK(std::minstd_rand(game.server.save_clock().generator) == expected);
+        CHECK(game.objects.finish_frame() && game.server.disconnect_client(client));
+        CHECK(game.objects.snapshot().size() == count);
+        for (unsigned i = 0; i < clients.size(); ++i)
+        {
+            const auto* record = game.objects.get(game.server_shell.Player(clients[i])->m_hObject);
+            CHECK(record && record->state.m_Pos.x == positions[i].x && record->state.m_Pos.y == positions[i].y &&
+                  record->state.m_Pos.z == positions[i].z);
+        }
+        // The placement service does not expand the solo policy.
+        game.server.net_game_type = GAMETYPE_SINGLE;
+        CHECK(game.server.ResolveInitialActorOverlap(game.server_shell.Player(clients[0])->m_hObject) ==
+              DE_INVALIDPARAMS);
+        game.server.net_game_type = GAMETYPE_BLOODBATH;
+        for (auto joined : clients)
+        {
+            game.server_shell.OnClientExitWorld(joined);
+            CHECK(game.objects.finish_frame() && game.server.disconnect_client(joined));
+        }
+        CHECK(game.unload_world());
+        return true;
+    }
+
     bool bloodbath_starts(const std::filesystem::path& root)
     {
         GameSession game;
@@ -166,9 +226,10 @@ int main(int argc, char** argv)
     if (argc != 3)
         return 2;
     const std::string name = argv[1];
-    return (name == "capacity"    ? capacity(argv[2])
-            : name == "ownership" ? ownership(argv[2])
-                                  : name == "bloodbath_starts" && bloodbath_starts(argv[2]))
+    return (name == "capacity"            ? capacity(argv[2])
+            : name == "ownership"         ? ownership(argv[2])
+            : name == "bloodbath_overlap" ? bloodbath_overlap(argv[2])
+                                          : name == "bloodbath_starts" && bloodbath_starts(argv[2]))
                ? 0
                : 1;
 }

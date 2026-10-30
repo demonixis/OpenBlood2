@@ -155,16 +155,22 @@ bool CBloodServerShell::CapturePlayerFields(HCLIENT client)
     ++capture.captures;
     return true;
 }
-CPlayerObj* CBloodServerShell::CreatePlayer(HCLIENT client)
+CPlayerObj* CBloodServerShell::CreatePlayer(HCLIENT client, std::string* error)
 {
     ObjectCreateStruct state; // Original zero position, identity rotation, no flags.
     auto type = server_.GetClass("CPlayerObj");
     auto* player = type ? dynamic_cast<CPlayerObj*>(server_.CreateObject(type, &state)) : nullptr;
     if (!player)
+    {
+        if (error)
+            *error = "Original player object creation failed";
         return nullptr;
+    }
     player->SetClient(client);
     if (server_.SetClientUserData(client, player->m_hObject) != DE_OK || !player->Respawn())
     {
+        if (error)
+            *error = player->entry_error.empty() ? "Original player association/reset failed" : player->entry_error;
         player->DropFlag(false);
         player->SetClient(nullptr);
         server_.SetClientUserData(client, nullptr);
@@ -187,13 +193,21 @@ bool CBloodServerShell::RespawnPlayer(CPlayerObj* player, HCLIENT client)
     server_.SetGameConVar("GAME_GOTOSTARTPOINT", "1");
     return true;
 }
-CPlayerObj* CBloodServerShell::OnClientEnterWorld(HCLIENT client)
+CPlayerObj* CBloodServerShell::OnClientEnterWorld(HCLIENT client, std::string* error)
 {
+    if (error)
+        error->clear();
     if (!world_started || !client || Player(client))
+    {
+        if (error)
+            *error = "Invalid original player entry state";
         return nullptr;
-    auto* player = CreatePlayer(client);
+    }
+    auto* player = CreatePlayer(client, error);
     if (!player || !RespawnPlayer(player, client))
     {
+        if (error && player)
+            *error = player->entry_error.empty() ? "Original player start-point entry failed" : player->entry_error;
         OnClientExitWorld(client);
         return nullptr;
     }

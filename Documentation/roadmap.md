@@ -295,7 +295,10 @@ The [server connection lot](implementation/reports/m9_player_connections.md) now
 16 checked internal connections and original Bloodbath marker selection.
 [Fresh Bloodbath profiles](implementation/reports/m9_player_profiles.md) now use original
 skins, entry ammo and private startup announcements.
-**Full client separation, Team profiles, wire admission and network gameplay remain pending.**
+[ENet admission](implementation/reports/m9_admission.md) now checks protocol, edition,
+complete content hash and loaded-world generation before creating an original
+Bloodbath player. It owns join/departure/timeout cleanup and bounded heartbeats.
+**Full client separation, Team profiles and network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client
 shell runs its own movement (CMoveMgr) and effects. The engine copies object
