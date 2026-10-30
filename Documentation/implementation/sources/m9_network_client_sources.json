@@ -1,0 +1,67 @@
+{
+  "scope": "Independent client endpoint, monotonic mapped presentation time and existing CMoveMgr transport integration",
+  "baseline": "36be746db3403011c888ff7d5a23b78e4e23fd91",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "36be746db3403011c888ff7d5a23b78e4e23fd91",
+      "path": "tests/network/admission_process_tests.cpp",
+      "sha256": "144eee4d691ad73bf2661da0eb86647a17444216326a43751889b93b46126272"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "36be746db3403011c888ff7d5a23b78e4e23fd91",
+      "path": "src/client/network_movement.cpp",
+      "sha256": "5889e25f1c29f1ec39d177ad15844ad019e3c1c48c476e8bcce8b8ae26d8f67b"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "36be746db3403011c888ff7d5a23b78e4e23fd91",
+      "path": "src/client/network_world.cpp",
+      "sha256": "c3b01050c35f3c8314cd46e9db3757a1939a33afc367b4a2e61e76d797e6483a"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "36be746db3403011c888ff7d5a23b78e4e23fd91",
+      "path": "src/client/network_state.cpp",
+      "sha256": "dfc84ae82607273192be581f876a780305b2e09bfa8041e7b2467d0778f51b11"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "36be746db3403011c888ff7d5a23b78e4e23fd91",
+      "path": "src/client/network_camera.cpp",
+      "sha256": "6fbe2b86a25dc4e8198e7d4449d506846aa3df0b387bfa5079a64033f04bb3f5"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "36be746db3403011c888ff7d5a23b78e4e23fd91",
+      "path": "src/client/network_player_events.cpp",
+      "sha256": "94f219194c0dcf827a583da7485105e5132b541cf8b5c9f8f0989828a10a68e3"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "36be746db3403011c888ff7d5a23b78e4e23fd91",
+      "path": "src/server/network.cpp",
+      "sha256": "15c9b0fda3907fc3aec442e3c8debd0b1c2271f7394a07784e2244f3e404e9fe"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "36be746db3403011c888ff7d5a23b78e4e23fd91",
+      "path": "src/server/clock.h",
+      "sha256": "95694168e891519dda037a30c2ef1101604fa17c1bc352864c5931c329a59180"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "36be746db3403011c888ff7d5a23b78e4e23fd91",
+      "path": "src/app/movement_controls.h",
+      "sha256": "2016f3de3801c9ab1166518316e3a769f89745066c5c8c3adc481d563e02d624"
+    }
+  ],
+  "adaptations": [
+    "Promote the proven process-client admission/replication/movement/private-event path into NetworkClient.",
+    "Bound receive work, keep protocol/phase/owner/channel checks and explicit connection failures.",
+    "Map newer server timestamps and half RTT to monotonic presentation time, bounded to 250ms lead with 100ms remote interpolation delay.",
+    "Retain original CMoveMgr cadence, fixed 60Hz client steps and six-step catchup with discarded-tick accounting.",
+    "Preserve server-free client ownership; graphical frontend, weapon runtime, remote audio/FX consumers and full combat remain separate work."
+  ]
+}

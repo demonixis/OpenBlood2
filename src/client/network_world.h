@@ -23,7 +23,8 @@ namespace OpenBlood2
         bool begin(std::uint64_t world);
         bool receive(const Net::WorldUpdate&, const World&, ModelStore&, SpriteStore&, std::string& error);
         StateResult receive(const Net::WorldState&, std::string& error);
-        // Caller supplies the delayed server clock. No prediction, extrapolation,
+        // Caller supplies the delayed server clock, also copied into the returned frame.
+        // Authoritative reception time is unchanged. No prediction, extrapolation,
         // model keys or game callbacks; the predicted player's state is left alone.
         bool sample(double server_time, ObjectId predicted, ClientWorld&, std::string& error) const;
         const ClientWorld& world() const

@@ -318,6 +318,8 @@ HUD/items apply independently and original null-client broadcasts reach every pl
 view selection and server movement/look gates without client-selected permissions.
 [Independent scene inputs](implementation/reports/m9_scene_inputs.md) now feed the existing renderer
 without GameSession, including client weapon visuals and checked GPU world ownership.
+[NetworkClient](implementation/reports/m9_network_client.md) now integrates admission, replication,
+CMoveMgr, private HUD and camera under a bounded, server-independent endpoint and mapped clock.
 **Remaining private presentation consumers/commands, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client

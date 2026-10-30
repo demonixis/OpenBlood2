@@ -1,14 +1,8 @@
-#include "client/network_camera.h"
-#include "client/network_movement.h"
-#include "client/network_player_events.h"
-#include "client/network_world.h"
+#include "client/network_client.h"
 #include "client/object_scene.h"
 #include "engine/resources.h"
 #include "engine/world.h"
 #include "net/admission.h"
-#include "net/content.h"
-#include "net/movement.h"
-#include "net/transport.h"
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_process.h>
 #include <algorithm>
@@ -41,259 +35,85 @@ namespace
         CHECK(parsed.ec == std::errc{} && parsed.ptr == end && port && port <= 65535);
         Config config;
         config.data_dir = path_from_utf8(data);
-        Resources resources;
-        ModelStore models(resources);
-        SpriteStore sprites(resources);
-        World loaded;
-        NetworkWorldReceiver receiver;
-        const auto& replica = receiver.world();
-        NetworkMovement movement(receiver.collision());
-        NetworkPlayerEvents inbox;
-        NetworkCamera camera;
-        unsigned camera_frames = 0;
-        unsigned startup_announcements = 0;
-        std::optional<MovementSetup> pending_setup;
-        Clock::time_point next_step;
-        unsigned moves_sent = 0;
-        bool displaced = false;
-        DVector initial_position;
-        std::optional<BaselineReceiver> baseline;
-        WorldSnapshot snapshot;
-        ObjectId own_object;
-        ObjectId other_player;
-        bool saw_arrival = false, saw_departure = false;
-        unsigned states_received = 0;
-        Sha256Digest digest;
-        CHECK(resources.mount_game(config, error) && content_fingerprint(resources, digest, error));
-        Transport transport;
-        CHECK(transport.open_client(error));
-        const auto peer = transport.connect("127.0.0.1", std::uint16_t(port), error);
-        CHECK(peer);
-        const auto send = [&](const AdmissionMessage& message)
-        {
-            std::vector<std::uint8_t> bytes;
-            return encode_admission(message, bytes) && transport.send(peer, Channel::Control, bytes, error);
-        };
+        NetworkClient client;
+        CHECK(client.connect(config, "127.0.0.1", std::uint16_t(port), {}, Clock::now(), error));
         const auto deadline = Clock::now() + std::chrono::seconds(18);
         Clock::time_point leave_at;
-        std::uint64_t world = 0;
-        bool hello = false, ready = false, joined = false, leaving = false, assembled = false, replicated = false;
-        const auto update_camera = [&]()
-        {
-            if (!movement.ready())
-                return true;
-            const auto result =
-                camera.update(replica, receiver.collision(), movement.movement(), movement.setup().owner.force_revision,
-                              0, 0, false, replica.frame().time, error);
-            CHECK(result != NetworkCamera::Reception::Refused);
-            camera_frames += result == NetworkCamera::Reception::Applied;
-            return true;
-        };
+        bool announced = false, leaving = false, saw_arrival = false, saw_departure = false, displaced = false;
+        unsigned startup = 0, camera_frames = 0;
+        DVector initial;
+        ObjectId other_player;
         while (Clock::now() < deadline)
         {
-            if (drive && !leaving && movement.ready() && Clock::now() >= next_step)
+            MovementInput input;
+            input.forward = drive && !leaving;
+            CHECK(client.update(Clock::now(), input, !leaving, error));
+            std::vector<PrivateEvent> events;
+            client.take_events(events);
+            for (const auto& value : events)
+                startup += std::holds_alternative<BloodbathStart>(value.value);
+            if (client.phase() == NetworkClient::Phase::Closed)
+                return announced && leaving && client.reason() == "Disconnected";
+            if (client.ready())
             {
-                MovementInput input;
-                input.forward = true;
-                std::optional<MovementReport> report;
-                CHECK(movement.update(input, 0, 0, 1. / 60, true, false, false, report, error));
-                next_step += std::chrono::duration_cast<Clock::duration>(std::chrono::duration<double>(1. / 60));
-                const auto delta = vector_subtract(movement.movement().body.position, initial_position);
-                displaced |= vector_dot(delta, delta) > 1;
-                if (report)
+                const auto& world = client.receiver().world();
+                if (!announced)
                 {
-                    std::vector<std::uint8_t> bytes;
-                    CHECK(encode_movement(*report, bytes) && transport.send(peer, Channel::State, bytes, error));
-                    ++moves_sent;
-                }
-            }
-            CHECK(update_camera());
-            if (joined && replicated && !leaving && Clock::now() >= leave_at)
-            {
-                CHECK(states_received && (!observer || (saw_arrival && saw_departure)));
-                CHECK(inbox.sequence() && inbox.hud().stats.health > 0 && startup_announcements == 1);
-                CHECK(camera.ready() && camera_frames && camera.camera().kind == ClientCameraKind::FirstPerson);
-                CHECK(camera.camera().position.x == movement.movement().body.position.x);
-                std::cout << "Camera frames=" << camera_frames << ", predicted eye height="
-                          << camera.camera().view.position.y - movement.movement().body.position.y << "\n"
-                          << std::flush;
-                std::cout << "Private events=" << inbox.sequence() << ", health=" << inbox.hud().stats.health
-                          << ", startup_announcements=" << startup_announcements << "\n"
-                          << std::flush;
-                if (drive)
-                {
-                    CHECK(movement.ready() && displaced && moves_sent >= 4 && movement.corrections >= 3);
-                    std::cout << "Predicted movement: reports=" << moves_sent
-                              << ", corrections=" << movement.corrections << ", replayed_frames=" << movement.replays
-                              << ", substeps=" << movement.manager().substeps << "\n"
-                              << std::flush;
-                }
-                if (observer)
-                    std::cout << "Observed remote player creation and departure\n" << std::flush;
-                CHECK(transport.disconnect(peer, 0));
-                leaving = true;
-            }
-            Event event;
-            const auto status = transport.poll(event, 5, error);
-            CHECK(status != PollResult::Failed);
-            if (status == PollResult::Idle)
-                continue;
-            if (event.kind == EventKind::Disconnected)
-                return joined && replicated && leaving && event.reason == 0;
-            if (event.kind == EventKind::Connected)
-            {
-                CHECK(!hello && send(Hello{Edition::Retail, digest}));
-                hello = true;
-            }
-            else
-            {
-                if (is_private_packet(event.bytes))
-                {
-                    PrivateEvent message;
-                    CHECK(event.channel == Channel::Control &&
-                          decode_private(event.bytes, message) == DecodePrivate::Ok);
-                    CHECK(inbox.receive(message, error) == NetworkPlayerEvents::Reception::Applied);
-                    std::vector<PrivateEvent> delivered;
-                    inbox.take(delivered);
-                    for (const auto& value : delivered)
-                    {
-                        startup_announcements += std::holds_alternative<BloodbathStart>(value.value);
-                        CHECK(camera.receive(value, error) != NetworkCamera::Reception::Refused);
-                    }
-                }
-                else if (is_movement_packet(event.bytes))
-                {
-                    MovementMessage message;
-                    CHECK(decode_movement(event.bytes, message) == DecodeMovement::Ok);
-                    if (const auto* setup = std::get_if<MovementSetup>(&message))
-                    {
-                        CHECK(event.channel == Channel::Control && joined && setup->owner.world == world &&
-                              setup->owner.object == own_object);
-                        pending_setup = *setup;
-                    }
-                    else
-                    {
-                        const auto* ack = std::get_if<MovementAck>(&message);
-                        CHECK(drive && event.channel == Channel::State && ack);
-                        CHECK(movement.receive(*ack, error) != NetworkMovement::Reception::Refused);
-                    }
-                }
-                else if (event.channel == Channel::State)
-                {
-                    WorldState state;
-                    CHECK(decode_world_state(event.bytes, state));
-                    const auto applied = receiver.receive(state, error);
-                    CHECK(applied != NetworkWorldReceiver::StateResult::Refused);
-                    if (applied == NetworkWorldReceiver::StateResult::Applied)
-                    {
-                        ++states_received;
-                        ClientWorld displayed;
-                        CHECK(receiver.sample(std::max(0.0, replica.frame().time - .1), own_object, displayed, error));
-                        CHECK(displayed.get(own_object));
-                    }
-                }
-                else if (event.channel == Channel::Baseline)
-                {
-                    CHECK(ready && baseline);
-                    WorldUpdate update;
-                    const auto result = baseline->receive(event.bytes, update);
-                    CHECK(result != BaselineResult::Refused);
-                    if (result == BaselineResult::Complete)
-                    {
-                        if (const auto* initial = std::get_if<WorldSnapshot>(&update))
-                        {
-                            CHECK(!assembled);
-                            snapshot = *initial;
-                            assembled = true;
-                        }
-                        else
-                        {
-                            CHECK(replicated);
-                            const auto& patch = std::get<WorldPatch>(update);
-                            ObjectId arriving;
-                            for (const auto& object : patch.values.objects)
-                            {
-                                std::string name;
-                                if (object.id != own_object && !replica.get(object.id) && object.type == OT_MODEL &&
-                                    resource_path(object.filename, name) && name == "models/characters/caleb.abc")
-                                    arriving = object.id;
-                            }
-                            const bool departed = std::find(patch.removed.begin(), patch.removed.end(), other_player) !=
-                                                  patch.removed.end();
-                            CHECK(receiver.receive(update, loaded, models, sprites, error));
-                            if (arriving)
-                            {
-                                other_player = arriving;
-                                saw_arrival = true;
-                            }
-                            saw_departure |= departed;
-                        }
-                    }
-                }
-                else
-                {
-                    AdmissionMessage message;
-                    CHECK(decode_admission(event.bytes, message) == DecodeAdmission::Ok);
-                    if (const auto* offer = std::get_if<WorldOffer>(&message))
-                    {
-                        CHECK(hello && !ready);
-                        std::vector<std::uint8_t> bytes;
-                        CHECK(resources.read(offer->path, bytes, error) && read_world(bytes, loaded, error));
-                        world = offer->world;
-                        CHECK(receiver.begin(world));
-                        baseline.emplace(world);
-                        CHECK(send(Ready{world, {}}));
-                        ready = true;
-                    }
-                    else if (const auto* accepted = std::get_if<Joined>(&message))
-                    {
-                        CHECK(ready && !joined && accepted->world == world);
-                        joined = true;
-                        own_object = accepted->object;
-                        CHECK(movement.begin(*accepted) && inbox.begin(*accepted) && camera.begin(*accepted));
-                    }
-                    else if (const auto* pulse = std::get_if<Heartbeat>(&message))
-                    {
-                        CHECK(joined && pulse->world == world);
-                        if (!leaving)
-                            CHECK(send(*pulse));
-                    }
-                    else
-                        CHECK(false);
-                }
-                if (joined && assembled && !replicated)
-                {
-                    CHECK(snapshot.player == own_object && receiver.receive(snapshot, loaded, models, sprites, error));
-                    CHECK(receiver.collision().get(own_object) && receiver.collision().frame().primary);
-                    CHECK(replica.get(own_object) && replica.get(own_object)->model);
                     ModelView scene;
-                    CHECK(append_client_models(replica, true, scene, resources, error));
-                    CHECK(!scene.entries.empty());
-                    replicated = true;
-                    CHECK(send(BaselineReady{world, snapshot.sequence}));
-                    leave_at = Clock::now() + std::chrono::seconds(observer ? 6 : 1);
-                    std::cout << "Replicated " << replica.frame().objects.size() << " objects, " << scene.entries.size()
-                              << " model entries in world " << world
-                              << " after independent hash, DAT and model decode\n"
+                    CHECK(append_client_models(world, true, scene, client.resources(), error));
+                    CHECK(!scene.entries.empty() && client.receiver().collision().frame().primary);
+                    std::cout << "Replicated " << world.frame().objects.size() << " objects, " << scene.entries.size()
+                              << " model entries through NetworkClient in world " << client.joined().world << "\n"
                               << std::flush;
+                    announced = true;
+                    initial = client.movement().movement().body.position;
+                    leave_at = Clock::now() + std::chrono::seconds(observer ? 6 : 1);
                 }
-                if (pending_setup && replicated)
+                for (const auto& object : world.frame().objects)
                 {
-                    const bool first = !movement.ready();
-                    const auto result = movement.receive(*pending_setup, error);
-                    CHECK(result != NetworkMovement::Reception::Refused);
-                    if (result != NetworkMovement::Reception::Deferred)
-                        pending_setup.reset();
-                    if (first && movement.ready())
+                    std::string name;
+                    if (object.id != client.joined().object && resource_path(object.filename, name) &&
+                        name == "models/characters/caleb.abc")
                     {
-                        next_step = Clock::now();
-                        initial_position = movement.movement().body.position;
+                        other_player = object.id;
+                        saw_arrival = true;
                     }
                 }
-                CHECK(update_camera());
+                if (other_player && !world.get(other_player))
+                    saw_departure = true;
+                const auto delta = vector_subtract(client.movement().movement().body.position, initial);
+                displaced |= vector_dot(delta, delta) > 1;
+                ++camera_frames;
+                CHECK(client.camera().position.x == client.movement().movement().body.position.x);
+                if (!leaving && Clock::now() >= leave_at)
+                {
+                    CHECK(client.state_packets && (!observer || (saw_arrival && saw_departure)));
+                    CHECK(client.event_sequence() && client.hud().stats.health > 0 && startup == 1);
+                    CHECK(client.camera().kind == ClientCameraKind::FirstPerson && camera_frames);
+                    std::cout << "Camera frames=" << camera_frames << ", predicted eye height="
+                              << client.camera().view.position.y - client.movement().movement().body.position.y
+                              << ", mapped clock=" << client.time() << "\n";
+                    std::cout << "Private events=" << client.event_sequence()
+                              << ", health=" << client.hud().stats.health << ", startup_announcements=" << startup
+                              << "\n";
+                    if (drive)
+                    {
+                        CHECK(displaced && client.reports >= 4 && client.movement().corrections >= 3);
+                        std::cout << "Predicted movement: reports=" << client.reports
+                                  << ", corrections=" << client.movement().corrections
+                                  << ", replayed_frames=" << client.movement().replays
+                                  << ", substeps=" << client.movement().manager().substeps << "\n";
+                    }
+                    if (observer)
+                        std::cout << "Observed remote player creation and departure\n";
+                    std::cout << std::flush;
+                    CHECK(client.disconnect(Clock::now()));
+                    leaving = true;
+                }
             }
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
-        error = "Child client protocol deadline";
+        error = "NetworkClient process deadline";
         CHECK(false);
     }
     struct Process

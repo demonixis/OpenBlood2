@@ -98,6 +98,7 @@ namespace OpenBlood2
             return false;
         }
         auto frame = world_.frame();
+        frame.time = time; // Presentation clock only; authoritative reception time remains untouched.
         for (auto& object : frame.objects)
         {
             if (object.id == predicted || (predicted && object.parent == predicted) ||

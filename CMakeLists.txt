@@ -58,7 +58,7 @@ add_library(blood2_client_movement STATIC src/game/original/MoveMgr.cpp src/clie
 target_link_libraries(blood2_client_movement PUBLIC engine_core)
 blood2_project_options(blood2_client_movement)
 
-add_library(blood2_client_network STATIC src/client/network_world.cpp src/client/network_state.cpp src/client/network_collision.cpp src/client/network_movement.cpp src/client/network_player_events.cpp src/client/network_camera.cpp)
+add_library(blood2_client_network STATIC src/client/network_client.cpp src/client/network_world.cpp src/client/network_state.cpp src/client/network_collision.cpp src/client/network_movement.cpp src/client/network_player_events.cpp src/client/network_camera.cpp)
 target_link_libraries(blood2_client_network PUBLIC engine_core blood2_net blood2_client_movement)
 blood2_project_options(blood2_client_network)
 

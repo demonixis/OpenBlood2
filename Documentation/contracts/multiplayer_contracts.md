@@ -875,3 +875,19 @@ values sampled by that bridge and immutable GPU references. Reject mixed effect
 worlds and recording against a different prepared world/revision. GPU resources
 remain world-owned by ScenePresenter; ClientScene is not a serializable protocol.
 The server-only build excludes the GPU bridge.
+
+
+## Reusable network client and presentation clock
+
+The [client endpoint continuation](../implementation/reports/m9_network_client.md)
+owns admission, local content, replica/collision, CMoveMgr prediction, private HUD
+and camera without a server session. Preserve one admission per endpoint lifetime,
+cross-channel baseline ordering, phase/owner/channel checks, bounded pumps/inbox
+and explicit deadlines/rejections. Do not process a duplicate private event again.
+
+Keep the original report cadence and one client integration, 60 Hz client steps,
+six-step catchup and discarded-tick accounting. Newer server stamps alone reanchor
+the monotonic mapped clock, with bounded lead during silence. Sample remote poses
+100 ms behind it, without changing authoritative reception time. Presentation
+callers drain typed events; pending audio/FX/weapon consumers and interactive
+host/join remain subsequent work, not implicitly supplied by this endpoint.

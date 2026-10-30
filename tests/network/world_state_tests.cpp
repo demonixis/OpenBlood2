@@ -135,6 +135,7 @@ namespace
         CHECK(receiver.receive(state, error_) == Status::Applied);
         ClientWorld displayed;
         CHECK(receiver.sample(1.025, {0, 1}, displayed, error_));
+        CHECK(displayed.frame().time == 1.025 && receiver.world().frame().time == 1.05);
         CHECK(std::abs(displayed.get(ObjectId{1, 1})->pose.position.x - 5) < 1e-4);
         CHECK(displayed.get(ObjectId{0, 1})->pose.position.x == 10);
         CHECK(std::abs(displayed.get(ObjectId{1, 1})->pose.rotation.m_Spin) == 1);
