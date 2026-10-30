@@ -1,6 +1,7 @@
 #include "engine/capture.h"
 #include "engine/runtime.h"
 #include "engine/world_renderer.h"
+#include "flashlight_replica_fixture.h"
 #include "game/server_adapter.h"
 #include <algorithm>
 #include <cmath>
@@ -134,8 +135,8 @@ int main(int argc, char** argv)
             CHECK(f.ActivateItem());
             p->m_fPitch = 1.57079632679f;
             p->m_fYaw = 0;
-            CHECK(f.Update() && g.client_shell.flashlight.Update(g.server, f.light, p->m_hObject));
-            auto light = g.client_shell.flashlight.Current(g.server);
+            CHECK(f.Update() && test_flashlight_replica::update(g, f.light, p->m_hObject));
+            auto light = test_flashlight_replica::current(g);
             CHECK(light.radius > 0);
             WorldMesh mesh;
             CHECK(mesh.build(g.world, error, &g.resources));
@@ -173,8 +174,8 @@ int main(int argc, char** argv)
                       << '\n';
             CHECK(brighter > 1000 && !darker);
             auto old = f.light;
-            CHECK(g.leave_player() && !g.server.IsObjectAlive(old) &&
-                  g.client_shell.flashlight.Current(g.server).radius == 0 && g.unload_world());
+            CHECK(g.leave_player() && !g.server.IsObjectAlive(old) && test_flashlight_replica::current(g).radius == 0 &&
+                  g.unload_world());
             renderer.clear_geometry();
         }
     }

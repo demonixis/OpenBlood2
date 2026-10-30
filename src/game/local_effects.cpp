@@ -24,11 +24,7 @@ namespace OpenBlood2
         frame.time = game.server.world_time();
         const auto& server = game.client_effects;
         const auto& flashlight = game.client_shell.flashlight;
-        const auto* source = game.objects.get(flashlight.source);
-        const auto* owner = game.objects.get(flashlight.owner);
-        if (flashlight.visible && source && source->life == Life::Alive && owner && owner->life == Life::Alive &&
-            (source->user_flags & 1u))
-            frame.flashlight = flashlight.light;
+        frame.flashlight = flashlight.Current(game.client_session.world);
         auto sprite = [&](EffectKind kind, std::uint64_t id, std::shared_ptr<const Sprite> asset, SpriteTrack track,
                           NodePose pose, DVector scale, DDWORD flags, float alpha = 1,
                           DVector color = DVector{1, 1, 1}) -> EffectSprite&

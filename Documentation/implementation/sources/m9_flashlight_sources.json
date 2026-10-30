@@ -1,0 +1,47 @@
+{
+  "scope": "Client flashlight identities, pose and ray queries; unchanged server inventory rules",
+  "baseline": "8fc5bd63",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "8fc5bd63",
+      "path": "src/game/original/Flashlight.cpp",
+      "sha256": "a54538d89744ee84830c2a832d4b32252daea878b1aff2db4368f0d5a089023f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "8fc5bd63",
+      "path": "src/game/original/Flashlight.h",
+      "sha256": "5396d419650d3093425d370fce2de522a5c60942dfef92fbff1ffa7d0ca10643"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "8fc5bd63",
+      "path": "src/game/session.cpp",
+      "sha256": "6b9d68091416257ca54427a0194931cf6de6fec78be67fcdbcb4b80762376445"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "8fc5bd63",
+      "path": "src/game/local_effects.cpp",
+      "sha256": "d9c9ab3a16724e4c09c2dcf759a3321dcbef7e1d8804a15343f256d930cefda1"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/FlashlightFX.cpp",
+      "sha256": "f623447fbe64461b421b404a88fb259cdc998e600f14121f350a32dc325192db"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/GameInvItems.cpp",
+      "sha256": "b2a72cdf5bd9e23ec496c6f6af3ed5bd4449e3b84d8cc088c33c1e1bbe081ee8"
+    }
+  ],
+  "adaptations": [
+    "Extract CFlashlightFX into independently linked client library.",
+    "Read world-qualified source/owner from ClientWorld and cast in the client collision scene, excluding the player body.",
+    "Preserve distance/radius/intensity and source failed point-shade fallback; retain explicit invalid/unavailable ray refusal."
+  ]
+}

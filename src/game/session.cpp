@@ -906,11 +906,14 @@ namespace OpenBlood2
             ok = checked("server.damage_containers", server.damage_containers()) && ok;
         ok = checked("objects.finish_frame", objects.finish_frame()) && ok;
         ok = checked("objects.refresh_attachments", objects.refresh_attachments()) && ok;
+        auto* flash_owner = client ? server_shell.Player(local_client) : nullptr;
+        const auto* flash_item = flash_owner ? flash_owner->m_InventoryMgr.flashlight.get() : nullptr;
         // Owner-bound effects consume a stable object frame, never the authoritative registry.
         std::string owner_error;
         const bool need_owners =
             !client_effects.light_effects.empty() ||
-            (client && (!client_effects.warp_gates.active.empty() || !client_effects.object_particles.active.empty() ||
+            (client && ((flash_item && flash_item->light) || !client_effects.warp_gates.active.empty() ||
+                        !client_effects.object_particles.active.empty() ||
                         !client_effects.particle_streams.active.empty() || !client_effects.polygrids.active.empty()));
         const bool owners_ready = !need_owners || publish_client_objects(owner_error);
         if (!owners_ready)
@@ -925,13 +928,18 @@ namespace OpenBlood2
             server.trace_enabled = was_tracing;
             return ok;
         }
-        auto* flash_owner = server_shell.Player(local_client);
-        const auto* flash_item = flash_owner ? flash_owner->m_InventoryMgr.flashlight.get() : nullptr;
         ok = (!flash_item || flash_item->update_ok) && ok;
         if (flash_owner && flash_owner->m_InventoryMgr.goggles)
             ok = flash_owner->m_InventoryMgr.goggles->error.empty() && ok;
-        ok = client_shell.flashlight.Update(server, flash_item ? flash_item->light : nullptr,
-                                            flash_owner ? flash_owner->m_hObject : nullptr) &&
+        const auto flash_source = server.effect_reference(flash_item ? flash_item->light : nullptr);
+        const auto flash_character = server.effect_reference(flash_owner ? flash_owner->m_hObject : nullptr);
+        // Share the stable scene with later moving FX if the flashlight needs a ray.
+        const auto* flash_object = owners_ready ? client_session.world.get(flash_source) : nullptr;
+        const bool flash_geometry = flash_object && (flash_object->user_flags & 1u);
+        const bool flash_geometry_ready = !flash_geometry || local_movement.publish_collision();
+        ok = client_shell.flashlight.Update(client_session.world,
+                                            owners_ready && flash_geometry_ready ? &client_session.collision : nullptr,
+                                            flash_source, flash_character) &&
              ok;
         ok = checked("server.explosion_sprites.advance", server.explosion_sprites.advance(objects.time())) && ok;
         ok = checked("server.blood_splats.advance", server.blood_splats.advance(objects.time())) && ok;
@@ -947,7 +955,8 @@ namespace OpenBlood2
             !client_effects.flesh_gibs.active.empty() || !client_effects.destruction_debris.active.empty() ||
             !client_effects.shotgun_effects.casings.empty() || !client_effects.blood_spurts.active.empty() ||
             !client_effects.explosion_fragments.active.empty();
-        const bool geometry_ready = !moving || local_movement.publish_collision();
+        const bool geometry_ready =
+            flash_geometry ? flash_geometry_ready : (!moving || local_movement.publish_collision());
         ClientEffectQueries effect_queries(geometry_ready ? &client_session.collision : nullptr);
         EffectServices effect_services{effect_queries,        client_effects, &resources,           &sprites,
                                        &client_session.audio, objects.time(), server.GetFrameTime()};

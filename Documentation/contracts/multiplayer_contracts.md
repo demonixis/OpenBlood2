@@ -475,3 +475,16 @@ busy registry. No effect retains those services. Client updates use the replica
 exclusively; unavailable geometry remains explicit, with existing cosmetic failure
 policy. Flashlight extraction, creation event delivery and remote qualification
 remain subsequent work. No new network acceptance is implied.
+
+## Client flashlight
+
+The [flashlight continuation](../implementation/reports/m9_flashlight.md) moves
+CFlashlightFX into the independent client library. Source and owner use world/object
+generations; pose/visibility come from ClientWorld, with rays in copied collision
+and the player body excluded. Preserve body origin, source light math, failed shade
+fallback, miss/hide/removal and invalid/unavailable-query refusal. Current lighting
+must not query the authoritative registry or advance state. Server inventory,
+battery and source-child rules remain unchanged. The local effect phase shares
+one stable collision publication with later moving cosmetics. Stale worlds or
+object generations cannot relight an effect. Trusted local frame validation is
+not a complete wire decoder. Network creation/events remain separate.

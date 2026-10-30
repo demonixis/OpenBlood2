@@ -48,8 +48,8 @@ namespace
                                            {"FogFarZ", 100.f},
                                            {"FogColor", DVector{64, 128, 255}}});
             CHECK(water);
-            g.client_shell.flashlight.source = water;
-            g.client_shell.flashlight.owner = owner;
+            g.client_shell.flashlight.source = g.server.effect_reference(water);
+            g.client_shell.flashlight.owner = g.server.effect_reference(owner);
             g.client_shell.flashlight.visible = true;
             g.client_shell.flashlight.light = {{1, 2, 3}, {.8f, .8f, .8f}, 70};
             CHECK(g.publish_client_world(error));

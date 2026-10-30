@@ -64,6 +64,7 @@ endif()
 
 # Original cosmetic runtimes link independently of the authoritative game classes.
 add_library(blood2_client_effects STATIC
+    src/client/flashlight.cpp
     src/client/effect_services.cpp
     src/client/original_effects.cpp
     src/game/polygrids.cpp

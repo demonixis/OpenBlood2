@@ -56,6 +56,11 @@ now updates flesh/destruction fragments, casings and blood emitters through clie
 geometry and typed client child/audio outputs. Keep source clocks, pool/RNG order,
 primary-only collision quirks and synchronous creation results. Immediate creation
 queries still use the local bridge; flashlight and network events remain pending.
+The [client flashlight continuation](Documentation/implementation/reports/m9_flashlight.md)
+now casts from replica poses into client collision and keeps world-qualified owner
+identities. Preserve server battery/child rules, source body origin and light math,
+player exclusion, stale-owner hiding and invalid-ray refusal. Cosmetic runtimes
+are independently linked; immediate creation bridges and network delivery remain.
 Preserve solo clocks, source pickup rules,
 immutable GPU references, existing PBR work and independent M2-GPU-001/M3 gates.
 

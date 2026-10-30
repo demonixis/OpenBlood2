@@ -209,3 +209,9 @@ target_link_libraries(network_effect_services_tests PRIVATE blood2_client_effect
 blood2_project_options(network_effect_services_tests)
 add_test(NAME network.effect_services COMMAND network_effect_services_tests "${CMAKE_CURRENT_BINARY_DIR}/effect-services")
 set_tests_properties(network.effect_services PROPERTIES LABELS "headless;network;effects" TIMEOUT 30)
+
+add_executable(network_flashlight_tests flashlight_tests.cpp)
+target_link_libraries(network_flashlight_tests PRIVATE blood2_client_effects)
+blood2_project_options(network_flashlight_tests)
+add_test(NAME network.flashlight COMMAND network_flashlight_tests)
+set_tests_properties(network.flashlight PROPERTIES LABELS "headless;network;effects" TIMEOUT 30)

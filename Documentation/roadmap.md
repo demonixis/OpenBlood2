@@ -280,8 +280,9 @@ original pools on the client and makes fragment collision updates independent.
 [Owner-bound effects](implementation/reports/m9_effect_owners.md) now update from
 world-qualified ClientWorld identities and copied owner values.
 [Moving FX services](implementation/reports/m9_effect_services.md) now use client
-geometry and typed child outputs. Immediate creation queries and flashlight services
-still use the local adapter.
+geometry and typed child outputs. The [flashlight](implementation/reports/m9_flashlight.md)
+also uses replica owners/poses and client rays. Immediate creation queries still use
+the local adapter; remote effect events remain pending.
 [Cosmetic impact audio](implementation/reports/m9_effect_audio.md) now plays only on the client,
 without consuming server voices or sound identities.
 **Full client separation, player

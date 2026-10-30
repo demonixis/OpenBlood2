@@ -1,4 +1,5 @@
 #include "app/movement_controls.h"
+#include "flashlight_replica_fixture.h"
 #include "game/original/ItemPickups.h"
 #include "player_fixture.h"
 #include <functional>
@@ -126,34 +127,37 @@ namespace
         CHECK(g.server.TeleportObject(p.m_hObject, &pos) == DE_OK);
         p.m_fPitch = 1.57079632679f;
         p.m_fYaw = 0;
-        CHECK(f.Update() && fx.Update(g.server, f.light, p.m_hObject));
+        CHECK(f.Update() && test_flashlight_replica::update(g, f.light, p.m_hObject));
         CHECK(fx.visible && fx.result == SegmentResult::Hit && !fx.hit.object && std::abs(fx.distance - 100) < .01f);
         CHECK(std::abs(fx.light.radius - 40) < .01f && std::abs(fx.light.color.x - .95f) < .001f);
-        CHECK(std::abs(fx.shade_position.y - 100) < .01f && !fx.shade_available && fx.Current(g.server).radius > 0);
+        CHECK(std::abs(fx.shade_position.y - 100) < .01f && !fx.shade_available &&
+              test_flashlight_replica::current(g).radius > 0);
         // Current player pitch, source body origin; the authoritative body is excluded from the client ray.
         CHECK(std::abs(g.objects.get(f.light)->state.m_Pos.y - 100) < .01f);
         p.m_fPitch = -1.57079632679f;
-        CHECK(f.Update() && fx.Update(g.server, f.light, p.m_hObject) && !fx.visible);
+        CHECK(f.Update() && test_flashlight_replica::update(g, f.light, p.m_hObject) && !fx.visible);
         p.m_fPitch = 1.57079632679f;
         DVector near{0, 2, 0};
         CHECK(g.server.TeleportObject(p.m_hObject, &near) == DE_OK && f.Update() &&
-              fx.Update(g.server, f.light, p.m_hObject));
+              test_flashlight_replica::update(g, f.light, p.m_hObject));
         CHECK(fx.visible && fx.distance == 10 && fx.light.radius == 4);
         DVector far{0, 2000, 0};
         CHECK(g.server.TeleportObject(p.m_hObject, &far) == DE_OK && f.Update() &&
-              fx.Update(g.server, f.light, p.m_hObject));
+              test_flashlight_replica::update(g, f.light, p.m_hObject));
         CHECK(fx.visible && std::abs(fx.light.color.x - 132.f / 255) < .0001f &&
               std::abs(fx.light.radius - 800) < .01f);
-        CHECK(f.ActivateItem() && fx.Current(g.server).radius == 0 && fx.Update(g.server, f.light, p.m_hObject) &&
-              !fx.visible);
+        CHECK(f.ActivateItem() && test_flashlight_replica::current(g).radius == 0 &&
+              test_flashlight_replica::update(g, f.light, p.m_hObject) && !fx.visible);
         CHECK(f.ActivateItem());
         g.server.collision_ready = false;
-        CHECK(!fx.Update(g.server, f.light, p.m_hObject) && fx.result == SegmentResult::Unavailable &&
-              fx.Current(g.server).radius == 0 && !fx.error.empty());
+        CHECK(!test_flashlight_replica::update(g, f.light, p.m_hObject) && fx.result == SegmentResult::Unavailable &&
+              test_flashlight_replica::current(g).radius == 0 && !fx.error.empty());
         g.server.collision_ready = true;
         auto* child = g.objects.get(f.light);
         child->state.m_Pos.x = std::numeric_limits<float>::quiet_NaN();
-        CHECK(!fx.Update(g.server, f.light, p.m_hObject) && fx.result == SegmentResult::Invalid);
+        // The trusted local object frame retains the malformed fixture pose;
+        // the client ray must reject it exactly as the former server ray did.
+        CHECK(!test_flashlight_replica::update(g, f.light, p.m_hObject) && fx.result == SegmentResult::Invalid);
         return true;
     }
     bool restore(const std::filesystem::path& root)
@@ -218,9 +222,10 @@ namespace
             auto& fx = g.client_shell.flashlight;
             CHECK(f.ActivateItem());
             p.m_fPitch = 1.57079632679f;
-            CHECK(f.Update() && fx.Update(g.server, f.light, p.m_hObject) && fx.visible);
+            CHECK(f.Update() && test_flashlight_replica::update(g, f.light, p.m_hObject) && fx.visible);
             auto child = f.light;
-            CHECK(g.objects.remove(child) && fx.Current(g.server).radius == 0 && !f.Update() && !f.error.empty());
+            CHECK(g.objects.remove(child) && test_flashlight_replica::current(g).radius == 0 && !f.Update() &&
+                  !f.error.empty());
             CHECK(!f.ActivateItem() && g.objects.finish_frame());
             CHECK(g.leave_player() && !g.objects.get(child) && g.unload_world());
             CHECK(g.server.audio.voices().empty() && !g.server.message_count() && !g.server.string_count());
@@ -251,7 +256,7 @@ namespace
             CHECK(g.step(.01));
         CHECK(f.remaining < before - .9f && f.remaining > before - 1.1f && f.updates >= 100);
         const auto time = f.remaining;
-        g.client_shell.flashlight.Current(g.server);
+        test_flashlight_replica::current(g);
         CHECK(f.remaining == time);
         CHECK(g.objects.remove(f.light) && !g.step(.01) && !f.update_ok && !f.error.empty());
         return true;
