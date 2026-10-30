@@ -857,3 +857,21 @@ death retains the original Begin guard. Wait for a delayed presentation clock to
 reach a future death tick, refuse backwards/invalid time, and clear old death
 state on an authoritative alive transition/force. Production clock mapping and
 interactive presentation remain separate; keep the immediate solo path unchanged.
+
+
+## Client scene inputs and GPU ownership
+
+The [independent scene continuation](../implementation/reports/m9_scene_inputs.md)
+makes ScenePresenter/model/sprite/PolyGrid/light consumers accept borrowed
+ClientScene data: locally decoded DAT/resources, ClientWorld/ClientEffects,
+client camera/settings and client-owned view-weapon visuals. Do not reintroduce
+GameSession or a server adapter into these consumers. Preserve original weapon
+placement/muzzle arithmetic, handed/XR transforms and draw order; network firing
+remains a separate extraction from the inherited CViewWeapon runtime.
+
+Keep solo publication in the compatibility bridge, once for ScenePresenter and
+once when an individual helper is used directly. Preserve original clock-derived
+values sampled by that bridge and immutable GPU references. Reject mixed effect
+worlds and recording against a different prepared world/revision. GPU resources
+remain world-owned by ScenePresenter; ClientScene is not a serializable protocol.
+The server-only build excludes the GPU bridge.

@@ -18,6 +18,7 @@
 | [Network poses and interpolation](implementation/reports/m9_world_state.md) | Absolute 20 Hz poses, bounded per-object history and reliable teleport revisions. |
 | [Network collision/environment](implementation/reports/m9_collision_transport.md) | Client-owned DAT geometry, volume properties and atomic object/collision reception. |
 | [Independent client movement](implementation/reports/m9_movement_services.md) | Server-independent CMoveMgr, replica prediction and original report cadence. |
+| [Independent scene inputs](implementation/reports/m9_scene_inputs.md) | Server-free renderer inputs, original weapon visuals and world-owned GPU presentation. |
 | [Network camera state](implementation/reports/m9_camera_transport.md) | Reliable selection, replica/predicted views and authoritative camera movement/look gates. |
 | [Private player events](implementation/reports/m9_private_events.md) | Reliable pointer-free event delivery, independent HUD inbox and corrected broadcasts. |
 | [Client movement correction](implementation/reports/m9_movement_client.md) | Independent setup/ACK receiver, bounded CMoveMgr replay and moving separate-process clients. |

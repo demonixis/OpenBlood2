@@ -67,6 +67,12 @@ namespace OpenBlood2
         // and shadow tiles. No letterbox; view_scale is ignored. Requires a successful update().
         bool record_eyes(GameSession&, SDL_GPUCommandBuffer*, SDL_GPUTexture* target, SDL_GPUTextureFormat,
                          Uint32 width, Uint32 height, std::span<const StereoEye> eyes, std::string& error);
+        // Independent remote/local client entrypoints, with no authoritative session access.
+        bool update(const ClientScene&, std::string& error);
+        bool record(const ClientScene&, SDL_GPUCommandBuffer*, SDL_GPUTexture*, SDL_GPUTextureFormat, Uint32 width,
+                    Uint32 height, std::string& error);
+        bool record_eyes(const ClientScene&, SDL_GPUCommandBuffer*, SDL_GPUTexture*, SDL_GPUTextureFormat, Uint32 width,
+                         Uint32 height, std::span<const StereoEye>, std::string& error);
         // XR head camera for update() (sprites face it; the sky and shadow casters follow it) and
         // the matching view-weapon placement. Empty: the game's camera, as on desktop.
         std::optional<ClientCameraView> camera_override;
@@ -150,20 +156,21 @@ namespace OpenBlood2
 
       private:
         std::uint64_t client_world_epoch_ = 0;
-        const ClientCameraView& camera(const GameSession&) const;
+        const ClientCameraView& camera(const ClientScene&) const;
+        bool valid_frame(const ClientScene&, std::string& error) const;
         // Pipelines, renderer uploads, shadow tiles and a depth target with `layers` layers.
         bool prepare_depth(Uint32 width, Uint32 height, Uint32 layers, SDL_GPUSampleCount, std::string& error);
         bool prepare_frame(SDL_GPUCommandBuffer*, SDL_GPUTextureFormat, Uint32 width, Uint32 height, Uint32 layers,
                            bool aux, bool reflections, SDL_GPUSampleCount, std::string& error);
         // One scene render pass into colour/depth layer `target.layer`.
-        bool record_view(GameSession&, SDL_GPUCommandBuffer*, const SceneTarget&, DVector eye, DRotation rotation,
+        bool record_view(const ClientScene&, SDL_GPUCommandBuffer*, const SceneTarget&, DVector eye, DRotation rotation,
                          bool letterbox, const EyeProjection*, std::string& error);
         void finish_frame(std::uint64_t started);
-        void select_shadow_casters(const GameSession&);
+        void select_shadow_casters(const ClientScene&);
         bool record_shadow_tiles(SDL_GPUCommandBuffer*, std::string& error);
         TextureHandle shadow_atlas_, shadow_depth_;
         bool built_lightmaps_ = true;
-        bool prepare_surface(GameSession&, std::string& error);
+        bool prepare_surface(const ClientScene&, std::string& error);
         SurfaceScene surface_scene_;
         bool manifest_loaded_ = false;
         std::uint64_t grid_revision_ = UINT64_MAX;

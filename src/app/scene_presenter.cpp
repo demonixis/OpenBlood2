@@ -1,8 +1,8 @@
 #include "app/scene_presenter.h"
+#include "client/effect_scene.h"
 #include "client/world_view.h"
 #include "engine/transparency.h"
 #include "game/original/ClientCrosshair.h"
-#include "game/presentation_effects.h"
 #include <SDL3/SDL_timer.h>
 #include <algorithm>
 
@@ -28,11 +28,21 @@ namespace OpenBlood2
         registry.release(shadow_atlas_);
         registry.release(shadow_depth_);
     }
-    const ClientCameraView& ScenePresenter::camera(const GameSession& game) const
+    const ClientCameraView& ScenePresenter::camera(const ClientScene& source) const
     {
-        return camera_override ? *camera_override : game.client_shell.view;
+        return camera_override ? *camera_override : source.view;
     }
-    void ScenePresenter::select_shadow_casters(const GameSession& game)
+    bool ScenePresenter::valid_frame(const ClientScene& source, std::string& error) const
+    {
+        if (source.world.frame().world != client_world_epoch_ || source.world_revision != mesh_revision ||
+            source.effects.frame().world != client_world_epoch_)
+        {
+            error = "Client scene does not match prepared GPU world";
+            return false;
+        }
+        return true;
+    }
+    void ScenePresenter::select_shadow_casters(const ClientScene& source)
     {
         shadow_casters.clear();
         shadow_uniform = {};
@@ -41,11 +51,11 @@ namespace OpenBlood2
         shadow_stats.available = available;
         if (!model_shadows)
             return;
-        const auto& view = camera(game);
+        const auto& view = camera(source);
         const auto eye = view.position;
         const auto frustum =
             view_frustum(eye, view.rotation, shadow_aspect, world_near, world_far,
-                         original_fov_scale(presented_fov_x(game.client_shell.ViewFovX(), field_of_view)));
+                         original_fov_scale(presented_fov_x(source.fov_x, field_of_view)));
         struct Candidate
         {
             double distance = 0;
@@ -63,7 +73,7 @@ namespace OpenBlood2
             for (const auto& entry : model_scene.entries)
                 if (entry.range == draw.range && !entry.close && entry.object)
                 {
-                    record = game.client_session.world.get(entry.object);
+                    record = source.world.get(entry.object);
                     break;
                 }
             // FLAG_REALLYCLOSE (bit 6 for models in basetypes_de.h) draws at the eye; no shadow.
@@ -242,7 +252,7 @@ namespace OpenBlood2
         SDL_EndGPURenderPass(pass);
         return recorded;
     }
-    bool ScenePresenter::prepare_surface(GameSession& game, std::string& error)
+    bool ScenePresenter::prepare_surface(const ClientScene& source, std::string& error)
     {
         const bool enhanced = shading != SurfaceShading::Original;
         world_renderer.surface = model_renderer.surface = enhanced ? &surface_scene_ : nullptr;
@@ -274,8 +284,8 @@ namespace OpenBlood2
         }
         if (report_mesh_ != mesh_revision || report_surface_ != surface_scene_.revision)
         {
-            material_report = surface_report(surface_manifest, world_mesh, normal_maps, [&game](std::string_view path)
-                                             { return game.resources.find(path) != nullptr; });
+            material_report = surface_report(surface_manifest, world_mesh, normal_maps, [&source](std::string_view path)
+                                             { return source.resources.find(path) != nullptr; });
             report_mesh_ = mesh_revision;
             report_surface_ = surface_scene_.revision;
         }
@@ -284,7 +294,7 @@ namespace OpenBlood2
         const auto started = SDL_GetTicksNS();
         std::vector<StaticLight> lights;
         StaticLightStats light_stats;
-        if (!game.world_path.empty() && !world_static_lights(game.world, lights, light_stats, error))
+        if (!source.world_path.empty() && !world_static_lights(source.geometry, lights, light_stats, error))
             return false;
         if (!build_light_grid(lights, light_grid, error))
             return false;
@@ -312,7 +322,7 @@ namespace OpenBlood2
         surface_stats.grid_build_ns = SDL_GetTicksNS() - started;
         return true;
     }
-    bool ScenePresenter::update(GameSession& game, std::string& error)
+    bool ScenePresenter::update(const ClientScene& source, std::string& error)
     {
         error.clear();
         auto fail = [&](const char* stage)
@@ -320,12 +330,15 @@ namespace OpenBlood2
             error = std::string(stage) + ": " + error;
             return false;
         };
-        if (!game.publish_client_world(error))
-            return fail("Local client world");
-        const auto& replica = game.client_session.world;
+        if (source.world.frame().world != source.effects.frame().world)
+        {
+            error = "Client scene world/effects identity mismatch";
+            return false;
+        }
+        const auto& replica = source.world;
         ballistic_vertices.clear();
-        const auto tracer_color = vector_scale(game.client_shell.SceneLightScale(), scene_fade);
-        for (const auto& tracer : game.client_session.effects.frame().tracers)
+        const auto tracer_color = vector_scale(source.light_scale, scene_fade);
+        for (const auto& tracer : source.effects.frame().tracers)
             for (float offset : {0.f, .05f, -.05f})
             {
                 const auto center = vector_add(tracer.center, vector_scale(tracer.right, offset));
@@ -334,7 +347,7 @@ namespace OpenBlood2
                 ballistic_vertices.push_back({{a.x, a.y, a.z}, {tracer_color.x, .8f * tracer_color.y, 0, .1f}});
                 ballistic_vertices.push_back({{b.x, b.y, b.z}, {tracer_color.x, 0, 0, .9f}});
             }
-        rebuilt = client_world_epoch_ != replica.frame().world || mesh_revision != game.world_revision ||
+        rebuilt = client_world_epoch_ != replica.frame().world || mesh_revision != source.world_revision ||
                   built_lightmaps_ != lightmaps;
         const auto model_revision = model_scene.revision, effect_revision = explosion_model_scene.revision,
                    sprite_revision = sprite_scene.revision, sky_sprite_revision = sky_sprite_scene.revision;
@@ -357,24 +370,24 @@ namespace OpenBlood2
             world_mesh = {};
             world_draws.clear();
             model_lighting.clear();
-            if (!game.world_path.empty() && !world_mesh.build(game.world, error, &game.resources, lightmaps))
+            if (!source.world_path.empty() && !world_mesh.build(source.geometry, error, &source.resources, lightmaps))
                 return fail("World mesh");
             built_lightmaps_ = lightmaps;
-            if (!model_lighting.build(world_mesh, game.world, error))
+            if (!model_lighting.build(world_mesh, source.geometry, error))
                 return fail("Model lighting");
-            mesh_revision = game.world_revision;
+            mesh_revision = source.world_revision;
             client_world_epoch_ = replica.frame().world;
             grid_revision_ = UINT64_MAX;
             report_mesh_ = UINT64_MAX;
         }
-        if (!prepare_surface(game, error))
+        if (!prepare_surface(source, error))
             return fail("Enhanced renderer");
-        render_world = game.client_shell.m_bInWorld && !world_mesh.ranges.empty();
+        render_world = source.in_world && !world_mesh.ranges.empty();
         const auto started = SDL_GetTicksNS();
         if (!OpenBlood2::world_draws(world_mesh, replica, world_draws, world_renderer.stats, error))
             return fail("World draw bindings");
-        const auto& view = camera(game);
-        if (!client_sky_draws(game.world, world_mesh, replica, view.position, sky_draws, sky_eye, error))
+        const auto& view = camera(source);
+        if (!client_sky_draws(source.geometry, world_mesh, replica, view.position, sky_draws, sky_eye, error))
             return fail("Sky presentation");
         sky_order.clear();
         if (!sky_sprite_scene.begin_frame(sky_eye, view.rotation, error))
@@ -392,7 +405,7 @@ namespace OpenBlood2
             }
             const auto before = sky_sprite_scene.draws.size();
             if (!sky_sprite_scene.add(r->sprite.get(), r->sprite_track, {r->pose.position, r->pose.rotation}, r->scale,
-                                      r->flags & ~FLAG_SKYOBJECT, id, game.resources, error, r->alpha, r->color))
+                                      r->flags & ~FLAG_SKYOBJECT, id, source.resources, error, r->alpha, r->color))
                 return fail("Sky sprite");
             if (!sky_sprite_scene.entries.back().error.empty())
             {
@@ -407,20 +420,19 @@ namespace OpenBlood2
             }
         }
         const auto world_done = SDL_GetTicksNS();
-        if (!update_model_scene(game, replica, model_scene, error, weapon_cameras ? &*weapon_cameras : nullptr))
+        if (!update_model_scene(source, model_scene, error, weapon_cameras ? &*weapon_cameras : nullptr))
             return fail("Model presentation");
-        if (!model_lighting.apply(replica, game.client_shell.view.position, game.client_shell.night_goggles, world_mesh,
-                                  world_draws, model_scene, error))
+        if (!model_lighting.apply(replica, source.view.position, source.night_goggles, world_mesh, world_draws,
+                                  model_scene, error))
             return fail("Model lighting");
-        select_shadow_casters(game);
+        select_shadow_casters(source);
         model_renderer.per_pixel_lighting = per_pixel_lighting;
-        if (!update_explosion_model_scene(game, game.client_session.effects, explosion_model_scene, error,
-                                          camera_override ? &view : nullptr))
+        if (!update_explosion_model_scene(source, explosion_model_scene, error, camera_override ? &view : nullptr))
             return fail("Explosion model presentation");
         const auto models_done = SDL_GetTicksNS();
-        if (!update_polygrid_scene(game, replica, polygrid_scene, error))
+        if (!update_polygrid_scene(source, polygrid_scene, error))
             return fail("PolyGrid presentation");
-        if (!update_sprite_scene(game, replica, sprite_scene, error, camera_override ? &view : nullptr,
+        if (!update_sprite_scene(source, sprite_scene, error, camera_override ? &view : nullptr,
                                  weapon_cameras ? &*weapon_cameras : nullptr))
             return fail("Sprite presentation");
         sprite_scene.batch();
@@ -511,27 +523,27 @@ namespace OpenBlood2
         depth_samples_ = samples;
         return true;
     }
-    bool ScenePresenter::record_view(GameSession& game, SDL_GPUCommandBuffer* commands, const SceneTarget& target,
-                                     DVector eye, DRotation rotation, bool letterbox, const EyeProjection* projection,
-                                     std::string& error)
+    bool ScenePresenter::record_view(const ClientScene& source, SDL_GPUCommandBuffer* commands,
+                                     const SceneTarget& target, DVector eye, DRotation rotation, bool letterbox,
+                                     const EyeProjection* projection, std::string& error)
     {
         auto fail = [&](const char* stage)
         {
             error = std::string(stage) + ": " + error;
             return false;
         };
-        const auto flashlight = game.client_session.effects.frame().flashlight;
-        effects = gather_scene_effects(game.client_session.effects, eye, rotation);
+        const auto flashlight = source.effects.frame().flashlight;
+        effects = gather_scene_effects(source.effects, eye, rotation);
         world_far = effects.far_z > 0 ? effects.far_z : world_default_far;
         // The original global light scale (night goggles, Seeing Eye, blindness, underwater tint)
         // tints the whole scene: the shaders fog after the scene colour, so the fog and clear
         // colours carry it too. XR's fallback fade must also black out fog when no compositor
         // fade layer exists.
-        const auto light_scale = vector_scale(game.client_shell.SceneLightScale(), scene_fade);
+        const auto light_scale = vector_scale(source.light_scale, scene_fade);
         const float light[3]{light_scale.x, light_scale.y, light_scale.z};
         for (unsigned channel = 0; channel < 3; ++channel)
             effects.uniform.fog_color[channel] *= light[channel];
-        const auto time = game.client_session.world.frame().time;
+        const auto time = source.world.frame().time;
         const auto layer = target.layer;
         // Colour, then the post-processing glow/occlusion mask, depth copy (cleared to the
         // background depth) and reflection inputs; multisampled targets resolve at the end.
@@ -582,7 +594,7 @@ namespace OpenBlood2
         close.max_depth = view_model_depth;
         close.shadow_atlas = nullptr;
         close.shadows = nullptr;
-        scene.view_scale = original_fov_scale(presented_fov_x(game.client_shell.ViewFovX(), field_of_view));
+        scene.view_scale = original_fov_scale(presented_fov_x(source.fov_x, field_of_view));
         if (!shadow_casters.empty())
         {
             scene.shadow_atlas = registry.get(shadow_atlas_);
@@ -762,11 +774,13 @@ namespace OpenBlood2
         stats.record_ns = SDL_GetTicksNS() - started;
         ++stats.frames;
     }
-    bool ScenePresenter::record(GameSession& game, SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target,
+    bool ScenePresenter::record(const ClientScene& source, SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target,
                                 SDL_GPUTextureFormat format, Uint32 width, Uint32 height, std::string& error)
     {
         error.clear();
-        const auto& view = game.client_shell.view;
+        if (!valid_frame(source, error))
+            return false;
+        const auto& view = source.view;
         const bool letterbox = view.object && view.settings.type == 1;
         if (width && height > (letterbox ? 2 * (height / 6) : 0))
             shadow_aspect = float(width) / float(height - (letterbox ? 2 * (height / 6) : 0)); // Next update().
@@ -778,7 +792,7 @@ namespace OpenBlood2
         }
         if (!prepare_frame(commands, post_process.scene_format(), width, height, 1, post_process.aux(),
                            post_process.reflections(), post_process.sample_count(), error) ||
-            !record_view(game, commands, post_process.scene_target(target), view.position, view.rotation, letterbox,
+            !record_view(source, commands, post_process.scene_target(target), view.position, view.rotation, letterbox,
                          nullptr, error))
             return false;
         // The scene projection as world_view_uniform builds it, for ambient occlusion.
@@ -786,8 +800,8 @@ namespace OpenBlood2
         post_view.top = float(letterbox ? height / 6 : 0);
         post_view.height = float(height) - 2 * post_view.top;
         const float aspect = float(width) / std::max(post_view.height, 1.f);
-        const float zoom = original_fov_scale(presented_fov_x(game.client_shell.ViewFovX(), field_of_view)) *
-                           horizontal_projection_scale(aspect);
+        const float zoom =
+            original_fov_scale(presented_fov_x(source.fov_x, field_of_view)) * horizontal_projection_scale(aspect);
         post_view.projection = {zoom, zoom * aspect, world_far / (world_far - world_near),
                                 -world_near * world_far / (world_far - world_near)};
         post_view.slice = view_model_depth;
@@ -800,11 +814,13 @@ namespace OpenBlood2
         finish_frame(started);
         return true;
     }
-    bool ScenePresenter::record_eyes(GameSession& game, SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target,
+    bool ScenePresenter::record_eyes(const ClientScene& source, SDL_GPUCommandBuffer* commands, SDL_GPUTexture* target,
                                      SDL_GPUTextureFormat format, Uint32 width, Uint32 height,
                                      std::span<const StereoEye> eyes, std::string& error)
     {
         error.clear();
+        if (!valid_frame(source, error))
+            return false;
         if (eyes.empty() || eyes.size() > 2 || !width || !height)
         {
             error = "World viewport: invalid XR eye views";
@@ -820,8 +836,8 @@ namespace OpenBlood2
             SceneTarget eye_target;
             eye_target.color = target;
             eye_target.layer = Uint32(i);
-            if (!record_view(game, commands, eye_target, eyes[i].position, eyes[i].rotation, false, &eyes[i].projection,
-                             error))
+            if (!record_view(source, commands, eye_target, eyes[i].position, eyes[i].rotation, false,
+                             &eyes[i].projection, error))
                 return false;
         }
         finish_frame(started);

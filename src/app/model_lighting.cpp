@@ -1,9 +1,10 @@
 #include "app/model_lighting.h"
+#include "client/world.h"
 #include "engine/collision.h"
-#include "game/server_adapter.h"
 #include <algorithm>
 #include <cctype>
 #include <charconv>
+#include <cmath>
 
 namespace OpenBlood2
 {
@@ -113,12 +114,6 @@ namespace OpenBlood2
                 out.remainder = vector_add(out.remainder, ranked_[k].value);
         }
         ++stats.sampled;
-    }
-    bool ModelLighting::apply(GameSession& game, const WorldMesh& mesh, std::span<const WorldDraw> draws,
-                              ModelView& scene, std::string& error)
-    {
-        return game.publish_client_world(error) && apply(game.client_session.world, game.client_shell.view.position,
-                                                         game.client_shell.night_goggles, mesh, draws, scene, error);
     }
     bool ModelLighting::apply(const ClientWorld& world, DVector eye, bool night_goggles, const WorldMesh& mesh,
                               std::span<const WorldDraw> draws, ModelView& scene, std::string& error)

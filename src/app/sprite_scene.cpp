@@ -1,38 +1,46 @@
 #include "app/sprite_scene.h"
 #include "client/effect_scene.h"
 #include "client/object_scene.h"
+#include "game/original/WeaponDefs.h"
 #include <algorithm>
 #include <cmath>
 namespace OpenBlood2
 {
-    bool update_sprite_scene(GameSession& game, SpriteView& scene, std::string& error, const ClientCameraView* camera,
-                             const std::array<ViewWeaponCamera, 2>* weapons)
-    {
-        return game.publish_client_world(error) &&
-               update_sprite_scene(game, game.client_session.world, scene, error, camera, weapons);
-    }
-    bool update_sprite_scene(const GameSession& game, const ClientWorld& world, SpriteView& scene, std::string& error,
+    bool update_sprite_scene(const ClientScene& source, SpriteView& scene, std::string& error,
                              const ClientCameraView* camera, const std::array<ViewWeaponCamera, 2>* weapons)
     {
-        const auto& view = camera ? *camera : game.client_shell.view;
+        if (source.world.frame().world != source.effects.frame().world)
+        {
+            error = "Client scene world/effects identity mismatch";
+            return false;
+        }
+        const auto& world = source.world;
+        const auto& view = camera ? *camera : source.view;
         if (!scene.begin_frame(view.position, view.rotation, error))
             return false;
-        if (!append_client_sprites(world, scene, game.resources, error))
+        if (!append_client_sprites(world, scene, source.resources, error))
             return false;
-        if (!append_effect_sprites(game.client_session.effects, scene, view.rotation, true, game.resources, error))
+        if (!append_effect_sprites(source.effects, scene, view.rotation, true, source.resources, error))
             return false;
-        const auto& client = game.client_shell;
+        const auto& client = source;
         if (client.weapons_visible && world.frame().player_alive)
-            for (const auto& weapon : client.weapons)
+            for (const auto* visual : client.weapons)
             {
+                if (!visual)
+                    continue;
+                const auto& weapon = *visual;
                 if (!weapon.flash_visible || !weapon.model)
                     continue;
                 const auto mode = weapon.flash_visible - 1;
                 const auto* definition = weapon_definition(weapon.type);
-                const auto placement =
-                    weapons
-                        ? (*weapons)[weapon.left ? 0 : 1]
-                        : ViewWeaponCamera{client.rotation.pitch, client.rotation.yaw, client.camera_position, {}, 1};
+                const auto placement = weapons
+                                           ? (*weapons)[weapon.left ? 0 : 1]
+                                           : ViewWeaponCamera{client.pitch, client.yaw, client.camera_position, {}, 1};
+                if (!definition || mode >= weapon.flashes.size())
+                {
+                    error = "Invalid client muzzle flash state";
+                    return false;
+                }
                 NodePose pose;
                 float scale = placement.scale;
                 if (placement.arms)
@@ -77,10 +85,10 @@ namespace OpenBlood2
                     }
                 }
                 if (!scene.add(weapon.flashes[mode].get(), weapon.flash_tracks[mode], pose, {size, size, size},
-                               FLAG_VISIBLE | FLAG_NOLIGHT, {}, game.resources, error))
+                               FLAG_VISIBLE | FLAG_NOLIGHT, {}, source.resources, error))
                     return false;
             }
-        if (!append_effect_sprites(game.client_session.effects, scene, view.rotation, false, game.resources, error))
+        if (!append_effect_sprites(source.effects, scene, view.rotation, false, source.resources, error))
             return false;
         scene.sort();
         return true;

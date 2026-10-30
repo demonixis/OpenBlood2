@@ -1,0 +1,71 @@
+{
+  "scope": "Server-independent scene presentation and original view-weapon visual state",
+  "baseline": "a8a5225413b2153549edeb7ce3d5ab4074a00c37",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "a8a5225413b2153549edeb7ce3d5ab4074a00c37",
+      "path": "src/app/scene_presenter.cpp",
+      "sha256": "9f27e5b3a0273743bc7dfa193ca9abad9dadf0a76230ec7b5d21f742b47bd5d4"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a8a5225413b2153549edeb7ce3d5ab4074a00c37",
+      "path": "src/app/model_scene.cpp",
+      "sha256": "9bb3aa9c914186c9f27cb673fa57d30e6683506fd7d4661b1bd4db36971f1033"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a8a5225413b2153549edeb7ce3d5ab4074a00c37",
+      "path": "src/app/sprite_scene.cpp",
+      "sha256": "5f56b7b600080b3b470f4bc2157c712c3d0b503ba314ba99e754352bf8d38408"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a8a5225413b2153549edeb7ce3d5ab4074a00c37",
+      "path": "src/app/polygrid_scene.cpp",
+      "sha256": "200a40e57b34936b48b22542f4a39824079da24a5d3d9cfd06a6481beb30c412"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a8a5225413b2153549edeb7ce3d5ab4074a00c37",
+      "path": "src/app/model_lighting.cpp",
+      "sha256": "d0cb927dce4d124b1423bc7b3b2ff2e86cefd9a5aaef157603a9f0015be0ad6a"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a8a5225413b2153549edeb7ce3d5ab4074a00c37",
+      "path": "src/game/original/ViewWeapon.cpp",
+      "sha256": "1dec0413b5c87210b77d587bd04ba3870731dc8ba2adaf768d5cb9343ebc4f8c"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a8a5225413b2153549edeb7ce3d5ab4074a00c37",
+      "path": "src/game/original/ViewWeapon.h",
+      "sha256": "339707628db2c6aa9e44b491bcc4f215d863d8057ff7816db74c85daa9803594"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a8a5225413b2153549edeb7ce3d5ab4074a00c37",
+      "path": "src/game/original/WeaponDefs.cpp",
+      "sha256": "6b9b5441deb7754d1ad75b200f18d585dbc39324127d6ac5218c22159ea1264d"
+    },
+    {
+      "repository": "sources/blood2",
+      "path": "ClientShellDLL/ViewWeapon.cpp",
+      "sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9"
+    },
+    {
+      "repository": "sources/blood2",
+      "path": "ClientShellDLL/PlayerCamera.cpp",
+      "sha256": "0315517beaaf85540d9810899fb312be4ae5ba78aae30cc9c1f38f4a2ca105f0"
+    }
+  ],
+  "adaptations": [
+    "Borrowed ClientScene local content/replica/effects/camera inputs; no game adapter in consumers.",
+    "Separate compatibility archive members retain original solo update/record entrypoints and publish order.",
+    "Move original AdjustAngleAndSetPos/FlashOffset arithmetic unchanged into ClientWeaponView; original weapon runtime inherits its visual state.",
+    "Retain draw ordering, light scopes, GPU world ownership, Original/Enhanced/post-processing/XR behavior.",
+    "Refuse independently supplied invalid muzzle-flash index/type before indexing arrays."
+  ]
+}

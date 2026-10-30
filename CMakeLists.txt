@@ -126,6 +126,8 @@ add_library(blood2_game STATIC src/game/original/ScreenFade.cpp src/game/origina
     src/game/original/session_load.cpp
     src/game/server_effect_queries.cpp
     src/game/client_replication.cpp
+    src/game/local_scene.cpp src/game/local_scene_model.cpp src/game/local_scene_sprite.cpp
+    src/game/local_scene_polygrid.cpp src/game/local_scene_lighting.cpp
     src/game/local_movement.cpp src/game/local_presentation.cpp src/game/local_audio.cpp src/game/local_effects.cpp
     src/game/session.cpp
     src/game/world_validation.cpp
@@ -160,6 +162,7 @@ target_sources(blood2_game PRIVATE src/game/save_slots.cpp)
 target_include_directories(blood2_game PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
 target_sources(blood2_game PRIVATE src/game/menu_resources.cpp)
 if(BLOOD2_BUILD_CLIENT)
+    target_sources(blood2_game PRIVATE src/game/local_scene_presenter.cpp)
     add_library(blood2_frontend STATIC src/game/original/MainMenus.cpp src/game/menu_canvas.cpp src/game/menu_audio.cpp
         src/game/original/LoadingScreen.cpp
         src/game/menu_preferences.cpp src/game/new_game.cpp)

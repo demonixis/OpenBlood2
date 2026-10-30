@@ -316,6 +316,8 @@ replays bounded CMoveMgr history and drives two independent ENet client processe
 HUD/items apply independently and original null-client broadcasts reach every player.
 [Network camera state](implementation/reports/m9_camera_transport.md) now drives original replica-based
 view selection and server movement/look gates without client-selected permissions.
+[Independent scene inputs](implementation/reports/m9_scene_inputs.md) now feed the existing renderer
+without GameSession, including client weapon visuals and checked GPU world ownership.
 **Remaining private presentation consumers/commands, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client

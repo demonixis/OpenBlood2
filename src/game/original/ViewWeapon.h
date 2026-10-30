@@ -1,7 +1,6 @@
 #pragma once
 #include "Weapon.h"
-#include "engine/model_store.h"
-#include "engine/sprite.h"
+#include "client/weapon_view.h"
 #include <random>
 class ServerDE;
 class CBloodServerShell;
@@ -19,27 +18,16 @@ namespace OpenBlood2
 
 // Selected CViewWeapon client animation/firing path, backed by an owned ABC
 // track instead of a legacy local renderer object. No server HOBJECT is forged.
-class CViewWeapon
+class CViewWeapon : public OpenBlood2::ClientWeaponView
 {
   public:
     bool Create(DBYTE, bool, OpenBlood2::ModelStore&, OpenBlood2::Resources&, std::string&, DBYTE character = 0);
     bool Update(ServerDE&, CBloodServerShell&, HCLIENT, const OpenBlood2::WeaponInput&, DVector, DVector, double,
                 std::string&);
-    // Selected original placement, with the unimplemented bob inputs held at zero.
-    bool AdjustAngleAndSetPos(float pitch, float yaw, DVector eye, OpenBlood2::NodePose&) const;
-    // Local muzzle flash: source lifetime, separate authored primary/alternate sprites.
-    std::array<std::shared_ptr<const OpenBlood2::Sprite>, 2> flashes;
-    std::array<OpenBlood2::SpriteTrack, 2> flash_tracks;
-    unsigned flash_visible = 0;
     double flash_started = 0;
     std::string flash_error, animation_sound_error;
     bool second_barrel = false;
-    DVector FlashOffset(bool original_projection) const;
-    DBYTE type = 0, character = 0;
-    std::string model_path, skin_path;
-    bool left = false;
-    std::shared_ptr<const OpenBlood2::Model> model;
-    OpenBlood2::AnimationTrack animation;
+    DBYTE character = 0;
     WeaponState state = WS_HOLSTERED;
     std::string last_key, pending_sound;
     bool sound_indexed = false; // Whether the last SOUND_KEY resource exists (played locally for every weapon).

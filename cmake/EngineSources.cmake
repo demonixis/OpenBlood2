@@ -10,6 +10,7 @@ add_library(engine_core STATIC
     src/client/effect_scene.cpp
     src/client/audio.cpp
     src/client/announcer.cpp
+    src/client/weapon_view.cpp
     src/client/camera.cpp
     src/client/hud.cpp
     src/game/original/PlayerDeathCamera.cpp
