@@ -70,7 +70,11 @@ namespace
         const auto frozen = replica; // Independent ownership, not a view into ObjectRecord.
         const auto clock = game.objects.time();
         const auto updates = source->updates;
-        source->state.m_Pos.x = 99;
+        DVector teleported{99, 0, 0};
+        CHECK(game.server.TeleportObject(parent, &teleported) == DE_OK && source->pose_revision);
+        const auto pose_revision = source->pose_revision;
+        CHECK(game.server.TeleportObject(parent, &teleported) == DE_OK && source->pose_revision == pose_revision);
+        CHECK(game.objects.refresh_attachments());
         source->hidden_nodes[0] = 0;
         source->animation.time = 75;
         CHECK(replica.get(id)->pose.position.x == 0 && replica.get(id)->animation.time == 25);
@@ -79,6 +83,8 @@ namespace
         CHECK(source->updates == updates && game.objects.time() == clock && source->animation.time == 75);
         CHECK(game.publish_client_world(error));
         CHECK(replica.get(id)->pose.position.x == 99 && replica.get(id)->hidden_nodes[0] == 0);
+        CHECK(replica.get(id)->pose_revision == pose_revision && replica.get(child_id)->pose_revision == pose_revision);
+        CHECK(frozen.get(id)->pose_revision == 0 && frozen.get(child_id)->pose_revision == 0);
         CHECK(frozen.get(id)->pose.position.x == 0 && frozen.get(id)->hidden_nodes[0] == 1);
         CHECK(game.objects.remove(parent));
         CHECK(game.publish_client_world(error) && !replica.get(reference)); // Pending removal, before reclamation.

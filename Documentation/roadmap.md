@@ -302,7 +302,9 @@ Bloodbath player. It owns join/departure/timeout cleanup and bounded heartbeats.
 rebuild object presentation with independently loaded client assets at admission.
 [Continuous object membership](implementation/reports/m9_world_membership.md) now
 replicates creations, metadata changes and removals after a checked baseline ACK.
-**Unreliable poses, full client separation, Team profiles and playable network gameplay remain pending.**
+[Absolute poses at 20 Hz](implementation/reports/m9_world_state.md) now update
+independent client replicas with bounded interpolation and reliable teleport revisions.
+**Collision/environment and private-event delivery, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client
 shell runs its own movement (CMoveMgr) and effects. The engine copies object
@@ -312,7 +314,8 @@ local client-owned replicas. Visual effects and lights/fog now use owned client 
 production/update services and remaining client-shell services still use the local server adapter. Typed client
 messages still exist as in-process gameplay values only. The new ENet wrapper
 now delivers admission, the initial object frame and reliable membership changes.
-Unreliable poses and private gameplay events remain to connect.
+Absolute poses now use the State channel; collision/environment and private
+gameplay events remain to connect.
 
 Original references are available. These include the multiplayer branches in
 PlayerObj, BloodServerShell, the pickups and B2BaseClass, as well as FlagObjects,

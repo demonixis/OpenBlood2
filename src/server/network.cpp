@@ -1,5 +1,6 @@
 #include "server/network.h"
 #include "game/game_settings.h"
+#include "net/world_state.h"
 #include <algorithm>
 
 namespace OpenBlood2
@@ -231,8 +232,38 @@ namespace OpenBlood2
                             return false;
                         continue;
                     }
-                    peer.previous = std::move(snapshot);
                     ++membership_updates;
+                }
+                std::vector<std::vector<std::uint8_t>> states;
+                if (!Net::encode_state_packets(snapshot, changed ? snapshot.sequence : peer.previous.sequence, states))
+                {
+                    if (!remove(i, std::uint32_t(Net::Reject::World), true, error))
+                        return false;
+                    continue;
+                }
+                if (changed)
+                    peer.previous = std::move(snapshot);
+                Net::PeerStats stats;
+                std::size_t bytes = 0;
+                for (const auto& packet : states)
+                    bytes += packet.size();
+                if (!transport_.stats(peer.peer, stats) || stats.queued_bytes > Net::Transport::queue_limit ||
+                    bytes > Net::Transport::queue_limit - stats.queued_bytes)
+                    ++state_drops;
+                else
+                {
+                    bool sent = true;
+                    for (const auto& packet : states)
+                        if (sent)
+                            sent = transport_.send(peer.peer, Net::Channel::State, packet, error);
+                    if (!sent)
+                    {
+                        if (!remove(i, std::uint32_t(Net::Reject::Capacity), true, error))
+                            return false;
+                        continue;
+                    }
+                    ++state_updates;
+                    state_bytes += bytes;
                 }
                 peer.publish_at = session_.ticks() + 3;
             }

@@ -2,6 +2,7 @@
 #include "engine/model_store.h"
 #include "engine/world.h"
 #include "net/world_snapshot.h"
+#include "net/world_state.h"
 
 namespace OpenBlood2
 {
@@ -12,8 +13,18 @@ namespace OpenBlood2
     class NetworkWorldReceiver
     {
       public:
+        enum class StateResult
+        {
+            Refused,
+            Ignored,
+            Applied
+        };
         bool begin(std::uint64_t world);
         bool receive(const Net::WorldUpdate&, const World&, ModelStore&, SpriteStore&, std::string& error);
+        StateResult receive(const Net::WorldState&, std::string& error);
+        // Caller supplies the delayed server clock. No prediction, extrapolation,
+        // model keys or game callbacks; the predicted player's state is left alone.
+        bool sample(double server_time, ObjectId predicted, ClientWorld&, std::string& error) const;
         const ClientWorld& world() const
         {
             return world_;
@@ -27,5 +38,19 @@ namespace OpenBlood2
         ClientWorld world_;
         std::vector<std::uint32_t> generations_;
         std::uint64_t membership_sequence_ = 0;
+        double membership_time_ = 0;
+        struct Sample
+        {
+            double time;
+            Net::ObjectMotion motion;
+        };
+        struct History
+        {
+            std::uint32_t generation = 0;
+            std::uint64_t sequence = 0;
+            std::vector<Sample> samples;
+        };
+        std::vector<History> histories_;
+        void reset_history(const Net::ObjectState&, double time, std::uint64_t sequence);
     };
 } // namespace OpenBlood2

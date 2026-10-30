@@ -17,6 +17,7 @@ namespace OpenBlood2
     struct ClientObject
     {
         ObjectId id;
+        std::uint64_t pose_revision = 0;
         std::uint16_t type = 0;
         std::uint32_t flags = 0, user_flags = 0;
         NodePose pose;
@@ -24,7 +25,7 @@ namespace OpenBlood2
         float alpha = 1;
         std::string filename, skin;
         // Immutable decoded assets are shared only by the immediate local transport.
-        // A future wire codec must send resource names, never these process-local references.
+        // The wire codec sends resource names; remote clients resolve their own assets.
         std::shared_ptr<const Model> model;
         std::shared_ptr<const Sprite> sprite;
         AnimationTrack animation;

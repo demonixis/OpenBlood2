@@ -152,7 +152,13 @@ namespace
         bool update(unsigned index, const Event& event)
         {
             CHECK(event.kind == EventKind::Received);
-            if (event.channel == Channel::Baseline)
+            if (event.channel == Channel::State)
+            {
+                WorldState state;
+                CHECK(decode_world_state(event.bytes, state));
+                CHECK(replicas[index].receive(state, error) != NetworkWorldReceiver::StateResult::Refused);
+            }
+            else if (event.channel == Channel::Baseline)
             {
                 WorldUpdate update;
                 CHECK(receivers[index]);
@@ -277,11 +283,13 @@ namespace
             CHECK(f.server.pump(f.now, error));
             for (unsigned i = 0; i < 16; ++i)
             {
-                Event event;
-                auto status = f.clients[i].poll(event, 0, error);
-                CHECK(status != PollResult::Failed);
-                if (status == PollResult::Event && event.kind == EventKind::Received)
+                for (unsigned work = 0; work < 64; ++work)
                 {
+                    Event event;
+                    const auto status = f.clients[i].poll(event, 0, error);
+                    CHECK(status != PollResult::Failed);
+                    if (status == PollResult::Idle)
+                        break;
                     CHECK(f.update(i, event));
                 }
                 CHECK(f.session.game().objects.get(f.joined[i].object));
@@ -302,7 +310,7 @@ namespace
             f.now += std::chrono::milliseconds(16);
             CHECK(f.server.pump(f.now, error));
             for (unsigned i = 0; i < 16; ++i)
-                for (unsigned events = 0; events < 8; ++events)
+                for (unsigned events = 0; events < 64; ++events)
                 {
                     Event event;
                     const auto status = f.clients[i].poll(event, 1, error);
@@ -313,6 +321,7 @@ namespace
                 }
         }
         CHECK(f.server.membership_updates >= 15);
+        CHECK(f.server.state_updates == 16 * 62 && f.server.state_drops == 0 && f.server.state_bytes > 0);
         for (unsigned i = 0; i < 16; ++i)
         {
             CHECK(!f.replicas[i].world().get(old.object));
@@ -325,7 +334,9 @@ namespace
             CHECK(!f.session.game().objects.get(player.object));
         CHECK(!f.session.game().server.client_audio && f.session.game().client_session.audio.mixer.voices().empty());
         std::cout << "Verified admission gates, 4 monotonic timeout phases, 16 ENet peers / 186 ticks, "
-                     "duplicate/reconnect and clean shutdown\n";
+                     "duplicate/reconnect and clean shutdown; "
+                  << f.server.state_updates << " pose publications, " << f.server.state_bytes << " pose bytes, "
+                  << f.server.state_drops << " queue drops\n";
         return true;
     }
 } // namespace

@@ -636,7 +636,7 @@ movement/combat and playable host/client operation remain pending.
 ## Continuous reliable object membership
 
 The [membership continuation](../implementation/reports/m9_world_membership.md)
-uses protocol version 3. After receiving Joined and resolving the initial frame,
+introduced protocol version 3, superseded by version 4 below. After receiving Joined and resolving the initial frame,
 the client sends `BaselineReady(world, sequence)`. Only an exact match enables
 continuous publication. The baseline phase has its own 30-second deadline;
 a wrong world/sequence or duplicate acknowledgement closes that admission and
@@ -663,3 +663,42 @@ No replica executes gameplay callbacks or takes ownership of server objects.
 Existing clients now observe arrivals, departures and metadata changes. Unreliable
 20 Hz poses/interpolation, collision/environment, private gameplay/audio/effect
 messages and interactive movement/combat still require their wire paths.
+
+
+## Twenty-Hz absolute poses and remote interpolation
+
+The [state continuation](../implementation/reports/m9_world_state.md) uses protocol
+version 4. Every three successful 60 Hz ticks, after reliable membership changes,
+the server sends absolute poses on the unreliable sequenced State channel. Each
+packet contains a world, membership revision, server sequence/time and at most ten
+object states. Its maximum encoded size is 1,120 bytes, below the 1,200-byte
+transport limit. There is no fragmented unreliable world-frame assembly: each
+packet can update its objects independently. All states are repeated at the next
+publication; missed opportunities coalesce without catch-up bursts. If the next
+publication cannot fit the existing 2 MiB peer queue, it is dropped and counted.
+
+Only the currently admitted membership revision can accept a pose. Packets for
+future membership are dropped until its reliable update arrives; later publication
+repairs the omission. Per-object sequences reject duplicates and older packets;
+world/object generations and pose revisions must match. A pose cannot create or
+remove an object or change its assets/flags. Invalid playback indices fail before
+any object mutation. ClientWorld publication sequence is local and independent
+of a server sequence that may span several packets.
+
+Each live object keeps at most eight pose samples. The separate sampling function
+uses a caller-provided delayed server time (100 ms in the process probe), linear
+position/scale/color interpolation and normalized shortest-sign quaternion
+interpolation. Compatible monotonically advancing animation clocks interpolate;
+clip/revision changes and loop boundaries select stored playback. No model keys
+or gameplay callbacks run. Outside the available interval, samples clamp without
+extrapolation. The predicted local player and its attached children retain their
+latest values; CMoveMgr remains the only local movement integration.
+
+A changed position through the existing TeleportObject service receives a new
+transient server-wide pose revision. Capture passes it to the object and its
+attached child (the checked attachment service disallows chains). That revision
+changes reliable membership and carries the destination pose, clearing that
+object's interpolation history. Repeated same-position calls do not create a
+revision. This adds no new teleport/collision path and changes no saved gameplay
+payload or RNG draw. Replicated gameplay teleports snap; private movement-force
+messages and their remote handling still need their own wire path.

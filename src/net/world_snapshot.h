@@ -10,6 +10,7 @@ namespace OpenBlood2::Net
     struct ObjectState
     {
         ObjectId id;
+        std::uint64_t pose_revision = 0;
         std::uint16_t type = 0;
         std::uint32_t flags = 0, user_flags = 0;
         NodePose pose;

@@ -154,7 +154,8 @@ namespace
         patch.values.objects[0].filename = "models/test.abc";
         CHECK(receiver.receive(patch, geometry, models, sprites, error));
         const auto before_replacement = receiver.world();
-        const auto current = Net::snapshot_values(receiver.world().frame());
+        auto current = Net::snapshot_values(receiver.world().frame());
+        current.sequence = receiver.membership_sequence();
         auto replacement = current;
         replacement.sequence = 14;
         replacement.objects[0].id.generation = 5;
@@ -166,6 +167,11 @@ namespace
         CHECK(receiver.receive(patch, geometry, models, sprites, error));
         CHECK(!receiver.world().get(a.id) && receiver.world().get(ObjectId{0, 5}));
         CHECK(before_replacement.get(a.id) && before_replacement.get(ObjectId{4, 1})->model);
+        Net::WorldState state{
+            18, 14, 15, receiver.world().frame().time, {Net::motion_values(replacement.objects.back())}};
+        state.objects[0].animation.animation = UINT32_MAX;
+        CHECK(receiver.receive(state, error) == NetworkWorldReceiver::StateResult::Refused);
+        CHECK(receiver.world().get(ObjectId{4, 1})->animation.animation == 0);
         CHECK(receiver.begin(19));
         first.world = 19;
         first.sequence = 1;

@@ -13,7 +13,7 @@ namespace OpenBlood2::Net
         constexpr std::uint32_t magic = 0x574d3242, chunk_magic = 0x424d3242;
         constexpr std::size_t chunk_header = 30;
         constexpr std::size_t chunk_data = packet_limit(Channel::Baseline) - chunk_header;
-        constexpr std::size_t minimum_object_bytes = 133;
+        constexpr std::size_t minimum_object_bytes = 141;
         bool bounded(double v, double limit = 1e7)
         {
             return std::isfinite(v) && std::abs(v) <= limit;
@@ -39,6 +39,7 @@ namespace OpenBlood2::Net
         template <class To, class From> void copy_object(To& to, const From& from)
         {
             to.id = from.id;
+            to.pose_revision = from.pose_revision;
             to.type = from.type;
             to.flags = from.flags;
             to.user_flags = from.user_flags;
@@ -216,6 +217,7 @@ namespace OpenBlood2::Net
         for (const auto& o : s.objects)
         {
             write_id(w, o.id);
+            w.u64(o.pose_revision);
             w.u16(o.type);
             w.u32(o.flags);
             w.u32(o.user_flags);
@@ -285,6 +287,7 @@ namespace OpenBlood2::Net
         {
             ObjectState o;
             o.id = read_id(r);
+            o.pose_revision = r.u64();
             o.type = r.u16();
             o.flags = r.u32();
             o.user_flags = r.u32();

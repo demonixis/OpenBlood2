@@ -64,7 +64,9 @@ namespace OpenBlood2
         if (!world_.begin(world))
             return false;
         generations_.clear();
+        histories_.clear();
         membership_sequence_ = 0;
+        membership_time_ = 0;
         return true;
     }
     bool NetworkWorldReceiver::receive(const Net::WorldUpdate& update, const World& geometry, ModelStore& models,
@@ -160,6 +162,10 @@ namespace OpenBlood2
             error = "World patch result exceeds snapshot bounds";
             return false;
         }
+        const auto sequence = next.sequence;
+        // ClientWorld publication counts accepted packets, independently of the
+        // server's sequence (one State sequence may span multiple datagrams).
+        next.sequence = world_.frame().sequence + 1;
         if (!receive_network_world(next, geometry, models, sprites, world_, error))
             return false;
         for (const auto& object : next.objects)
@@ -168,7 +174,28 @@ namespace OpenBlood2
                 generations_.resize(object.id.slot + 1);
             generations_[object.id.slot] = object.id.generation;
         }
-        membership_sequence_ = next.sequence;
+        if (const auto* patch = std::get_if<Net::WorldPatch>(&update))
+        {
+            for (auto id : patch->removed)
+                if (id.slot < histories_.size())
+                    histories_[id.slot] = {};
+            for (const auto& object : patch->values.objects)
+                reset_history(object, next.time, sequence);
+        }
+        else
+            for (const auto& object : next.objects)
+                reset_history(object, next.time, sequence);
+        membership_sequence_ = sequence;
+        membership_time_ = next.time;
         return true;
+    }
+    void NetworkWorldReceiver::reset_history(const Net::ObjectState& object, double time, std::uint64_t sequence)
+    {
+        if (histories_.size() <= object.id.slot)
+            histories_.resize(object.id.slot + 1);
+        auto& history = histories_[object.id.slot];
+        history.generation = object.id.generation;
+        history.sequence = sequence;
+        history.samples = {{time, Net::motion_values(object)}};
     }
 } // namespace OpenBlood2

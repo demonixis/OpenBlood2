@@ -48,6 +48,7 @@ namespace
         ObjectId own_object;
         ObjectId other_player;
         bool saw_arrival = false, saw_departure = false;
+        unsigned states_received = 0;
         Sha256Digest digest;
         CHECK(resources.mount_game(config, error) && content_fingerprint(resources, digest, error));
         Transport transport;
@@ -67,7 +68,7 @@ namespace
         {
             if (joined && replicated && !leaving && Clock::now() >= leave_at)
             {
-                CHECK(!observer || (saw_arrival && saw_departure));
+                CHECK(states_received && (!observer || (saw_arrival && saw_departure)));
                 if (observer)
                     std::cout << "Observed remote player creation and departure\n" << std::flush;
                 CHECK(transport.disconnect(peer, 0));
@@ -87,7 +88,21 @@ namespace
             }
             else
             {
-                if (event.channel == Channel::Baseline)
+                if (event.channel == Channel::State)
+                {
+                    WorldState state;
+                    CHECK(decode_world_state(event.bytes, state));
+                    const auto applied = receiver.receive(state, error);
+                    CHECK(applied != NetworkWorldReceiver::StateResult::Refused);
+                    if (applied == NetworkWorldReceiver::StateResult::Applied)
+                    {
+                        ++states_received;
+                        ClientWorld displayed;
+                        CHECK(receiver.sample(std::max(0.0, replica.frame().time - .1), own_object, displayed, error));
+                        CHECK(displayed.get(own_object));
+                    }
+                }
+                else if (event.channel == Channel::Baseline)
                 {
                     CHECK(ready && baseline);
                     WorldUpdate update;

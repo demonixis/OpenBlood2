@@ -29,10 +29,10 @@ namespace OpenBlood2::Net
         {
             // Frequent pose/scale/color/animation values belong to State. Initial
             // values still accompany a reliable creation or resource change.
-            return a.id == b.id && a.type == b.type && a.flags == b.flags && a.user_flags == b.user_flags &&
-                   a.filename == b.filename && a.skin == b.skin && a.has_model == b.has_model &&
-                   a.has_sprite == b.has_sprite && a.hidden_nodes == b.hidden_nodes && a.parent == b.parent &&
-                   a.attached == b.attached && a.attachment_resolved == b.attachment_resolved &&
+            return a.id == b.id && a.pose_revision == b.pose_revision && a.type == b.type && a.flags == b.flags &&
+                   a.user_flags == b.user_flags && a.filename == b.filename && a.skin == b.skin &&
+                   a.has_model == b.has_model && a.has_sprite == b.has_sprite && a.hidden_nodes == b.hidden_nodes &&
+                   a.parent == b.parent && a.attached == b.attached && a.attachment_resolved == b.attachment_resolved &&
                    a.world_model_index == b.world_model_index && a.world_model_bound == b.world_model_bound;
         }
         bool valid_patch(const WorldPatch& p)

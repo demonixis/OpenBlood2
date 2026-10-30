@@ -43,6 +43,7 @@ namespace OpenBlood2
                 out.hidden_nodes = std::move(hidden_nodes);
             }
             out.id = id;
+            out.pose_revision = r->pose_revision;
             out.type = r->state.m_ObjectType;
             out.flags = r->state.m_Flags;
             out.user_flags = r->user_flags;
@@ -65,6 +66,10 @@ namespace OpenBlood2
                 {
                     out.parent = identity(relation->second.parent);
                     out.attachment_resolved = relation->second.resolved;
+                    // The checked attachment service refuses chains. Its child
+                    // must snap with a teleported parent, including bone attachments.
+                    if (const auto* parent = objects.get(out.parent))
+                        out.pose_revision = std::max(out.pose_revision, parent->pose_revision);
                 }
             }
             out.world_model_index = r->world_model_index;

@@ -110,6 +110,7 @@ namespace OpenBlood2
         HCLASS type = nullptr;
         std::unique_ptr<BaseClass> game;
         ObjectCreateStruct state;
+        std::uint64_t pose_revision = 0; // Transient discontinuity, never a saved gameplay value.
         Properties properties;
         Creation reason = Creation::Runtime;
         Life life = Life::Constructing;

@@ -1,0 +1,55 @@
+{
+  "scope": "Absolute State packets, passive per-object interpolation and reliable teleport revisions",
+  "baseline": "e7604167",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "e760416797c273fc36aff6de29a5768d6dffcac9",
+      "path": "src/game/server_physics.cpp",
+      "sha256": "f5d1650d62cdc22cc8813c2fc367282bf5e6fcca117a41aaf3b8a65450642cef"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e760416797c273fc36aff6de29a5768d6dffcac9",
+      "path": "src/engine/attachments.cpp",
+      "sha256": "4078a70cad31fe16182b70af617b66d1591eac8533190a179b2d61c5171a06d8"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e760416797c273fc36aff6de29a5768d6dffcac9",
+      "path": "src/engine/model.cpp",
+      "sha256": "35121a7e396663806b27134593407d4c7c6634be25474403480c8f6da51e42c4"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e760416797c273fc36aff6de29a5768d6dffcac9",
+      "path": "src/game/client_replication.cpp",
+      "sha256": "494746ac408ed047f49f5ccfcc61c1cfbc3393b56ee9ef6348f1d88bc52bb5b5"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e760416797c273fc36aff6de29a5768d6dffcac9",
+      "path": "src/client/network_world.cpp",
+      "sha256": "9533bd7bd17a674b1f463bb89609500bd31790b5050becc52b7ac30a1537b536"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e760416797c273fc36aff6de29a5768d6dffcac9",
+      "path": "src/net/world_snapshot.cpp",
+      "sha256": "dd7317a425b4579b031b05ce5f549a90463e5e21db842894e59388b1b730a149"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "e760416797c273fc36aff6de29a5768d6dffcac9",
+      "path": "src/server/network.cpp",
+      "sha256": "102aa83dd6e4801c649605fb5e00c377d5106408fe2be2c1293a0d24034f7d86"
+    }
+  ],
+  "adaptations": [
+    "Replacement protocol version 4, explicit absolute values; ten records and 1120 bytes per unreliable packet, no unreliable multi-packet assembly.",
+    "Every three successful server ticks; per-object ordered eight-sample client history, clamped interpolation excluding local prediction.",
+    "Transient server-wide discontinuity counter added to existing TeleportObject; unchanged same-position behavior and existing collision semantics; attached children inherit the parent revision. No saved gameplay field or RNG change.",
+    "ClientWorld local publication sequence is independent of membership and per-object server sequence.",
+    "No new original game algorithm or asset import. Private force-position commands and actual remote movement remain separate."
+  ]
+}

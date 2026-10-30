@@ -220,8 +220,10 @@ namespace OpenBlood2
             a.trace_service("TeleportObject");
             auto* r = a.objects_.get(h);
             if (!r || r->life != Life::Alive || r->attachment || (r->container() || r->world_model) || !position ||
-                !physics_vector(*position))
+                !physics_vector(*position) || !a.next_pose_revision_)
                 return DE_INVALIDPARAMS;
+            if (r->state.m_Pos.x != position->x || r->state.m_Pos.y != position->y || r->state.m_Pos.z != position->z)
+                r->pose_revision = a.next_pose_revision_++;
             r->state.m_Pos = *position;
             r->grounded = false;
             r->contact_normal = {};

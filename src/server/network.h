@@ -26,6 +26,7 @@ namespace OpenBlood2
         }
         std::uint64_t admitted = 0, departed = 0, rejected = 0, timed_out = 0;
         std::uint64_t membership_updates = 0;
+        std::uint64_t state_updates = 0, state_drops = 0, state_bytes = 0;
         std::string last_rejection;
 
       private:

@@ -437,6 +437,7 @@ namespace OpenBlood2
 
       private:
         std::minstd_rand random_{1};
+        std::uint64_t next_pose_revision_ = 1;
         double world_time_origin_ = 0;
         struct String
         {
