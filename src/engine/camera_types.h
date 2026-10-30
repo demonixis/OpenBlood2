@@ -1,5 +1,5 @@
 #pragma once
-#include "basedefs_de.h"
+#include "game/legacy/basedefs_de.h"
 namespace OpenBlood2
 {
     // Owned equivalent of the original persistent SFX_CAMERA_ID descriptor.
@@ -7,5 +7,6 @@ namespace OpenBlood2
     {
         DBYTE type = 0;
         bool player_movement = false, hide_player = false, listener = true;
+        bool operator==(const CameraSettings&) const = default;
     };
 } // namespace OpenBlood2

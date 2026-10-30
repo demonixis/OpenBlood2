@@ -56,7 +56,8 @@ namespace
                                          OrbEvent{{10, 11}, true},
                                          FlagEvent{CTFEventKind::Captured, 2, 3, {12, 13}},
                                          items,
-                                         PlayerText{"hello"}};
+                                         PlayerText{"hello"},
+                                         CameraState{123, {4, 5}, {6, 7}, {8, 9}, {1, false, true, false}, 34, true}};
         CHECK(values.size() == std::variant_size_v<PrivateValue>);
         std::mt19937 random(0xB2E7);
         for (std::size_t index = 0; index < values.size(); ++index)
@@ -64,7 +65,7 @@ namespace
             PrivateEvent value{{7, 8, {9, 10}}, 11, 12, values[index]};
             std::vector<std::uint8_t> bytes, again;
             CHECK(encode_private(value, bytes) && is_private_packet(bytes) && bytes.size() <= private_packet_limit);
-            const std::vector<std::uint8_t> header{0x42, 0x32, 0x50, 0x45, 7, 0, std::uint8_t(index + 1)};
+            const std::vector<std::uint8_t> header{0x42, 0x32, 0x50, 0x45, 8, 0, std::uint8_t(index + 1)};
             CHECK(std::equal(header.begin(), header.end(), bytes.begin()));
             PrivateEvent decoded;
             CHECK(decode_private(bytes, decoded) == DecodePrivate::Ok && encode_private(decoded, again) &&
@@ -173,6 +174,6 @@ int main()
 {
     if (!codec() || !receiver())
         return 1;
-    std::cout << "20 private event tags: canonical LE bytes, every truncation, 30000 mutations, addressed HUD/inbox "
+    std::cout << "21 private event tags: canonical LE bytes, every truncation, 31500 mutations, addressed HUD/inbox "
                  "bounds passed\n";
 }

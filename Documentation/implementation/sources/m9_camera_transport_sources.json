@@ -1,0 +1,93 @@
+{
+  "scope": "Reliable camera selection, replica/predicted presentation and authoritative movement/look gates",
+  "baseline": "ab81b88d01765fa72e3255e6db6b2af99ad3f25d",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "ab81b88d01765fa72e3255e6db6b2af99ad3f25d",
+      "path": "src/game/local_presentation.cpp",
+      "sha256": "a0ac90e03e265cd95551354635aabb4540cd5e6b01bc2d7b4fb483b89cc53013"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ab81b88d01765fa72e3255e6db6b2af99ad3f25d",
+      "path": "src/game/server_cameras.cpp",
+      "sha256": "d09a79ca67fb4a424de888027d2cb2748328fec0dfd8885608c9617fa9b4ca0d"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ab81b88d01765fa72e3255e6db6b2af99ad3f25d",
+      "path": "src/game/original/InventoryClient.cpp",
+      "sha256": "69cf6109d2f8fb1862ff0e172bcbae49d55047ebaaf58095576db03ed8b7138d"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ab81b88d01765fa72e3255e6db6b2af99ad3f25d",
+      "path": "src/game/original/PlayerLocomotion.cpp",
+      "sha256": "999be4585af0dd92101f50aaab7bc27c410da785ca32c830ff69e7f38882f866"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ab81b88d01765fa72e3255e6db6b2af99ad3f25d",
+      "path": "src/game/original/OrbProjectile.cpp",
+      "sha256": "1be04aab36e28ad403fc10908d9e06dcd5d90418706371fb246c1c22e30499de"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ab81b88d01765fa72e3255e6db6b2af99ad3f25d",
+      "path": "src/game/original/PlayerDeathCamera.h",
+      "sha256": "0de40c0f816ed09f94c7b8281a2aa829f8c8a84956df5b8e5137ccc4f216d89c"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ab81b88d01765fa72e3255e6db6b2af99ad3f25d",
+      "path": "src/client/camera.cpp",
+      "sha256": "d0bf57b2f2f71e0c62cb9da082dcd19991f13f4bb140c165c3a7485fafb01b33"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ab81b88d01765fa72e3255e6db6b2af99ad3f25d",
+      "path": "src/server/player_movement.cpp",
+      "sha256": "abb418140e0403e7a7ee281a61bb3b2de3d68a2eb3803d591dce071ed403ec67"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ab81b88d01765fa72e3255e6db6b2af99ad3f25d",
+      "path": "src/server/player_events.cpp",
+      "sha256": "f0cdfd7380c5657dccb5251b31a0bc0e4cde270a0bca1b6d67b4eaf170381dbb"
+    },
+    {
+      "repository": "sources/blood2",
+      "path": "ObjectDLL/CameraObj.cpp",
+      "sha256": "5255f0d0efe9ba67b081f5ea8684d8ed60cf94c8f23caaad8c186c21718756ec"
+    },
+    {
+      "repository": "sources/blood2",
+      "path": "ObjectDLL/GameInvItems.cpp",
+      "sha256": "b2a72cdf5bd9e23ec496c6f6af3ed5bd4449e3b84d8cc088c33c1e1bbe081ee8"
+    },
+    {
+      "repository": "sources/blood2",
+      "path": "ObjectDLL/GameProjectiles.cpp",
+      "sha256": "d713d649cab9e9378ae7992ad74b0e608b6af534f3c5a4df39125219c0970e4f"
+    },
+    {
+      "repository": "sources/blood2",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "repository": "sources/blood2",
+      "path": "ClientShellDLL/PlayerCamera.cpp",
+      "sha256": "0315517beaaf85540d9810899fb312be4ae5ba78aae30cc9c1f38f4a2ca105f0"
+    }
+  ],
+  "adaptations": [
+    "Protocol 8 adds 86-byte private CameraState tag with IDs/settings/force, not poses or GPU structures.",
+    "Publish only the first active original scripted descriptor; retain original remote-view priority on the client.",
+    "Derive server movement/look gates from checked original camera ownership, not peer nominations.",
+    "Append camera changes after original private events; force identity preserves death/respawn ordering.",
+    "Reconstruct existing ClientCamera frames against owned replica/collision with predicted player position.",
+    "Defer missing references/future death clocks and keep original slow-death/Begin timing unchanged."
+  ]
+}

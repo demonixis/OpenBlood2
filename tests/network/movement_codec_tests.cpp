@@ -43,7 +43,7 @@ namespace
                   is_movement_packet(bytes));
             const std::array<std::size_t, 3> sizes{98, 104, 106};
             CHECK(bytes.size() == sizes[message.index()]);
-            const std::array<std::uint8_t, 7> prefix{0x42, 0x32, 0x4d, 0x50, 7, 0, std::uint8_t(message.index() + 1)};
+            const std::array<std::uint8_t, 7> prefix{0x42, 0x32, 0x4d, 0x50, 8, 0, std::uint8_t(message.index() + 1)};
             CHECK(std::equal(prefix.begin(), prefix.end(), bytes.begin()));
             MovementMessage decoded;
             CHECK(decode_movement(bytes, decoded) == DecodeMovement::Ok);

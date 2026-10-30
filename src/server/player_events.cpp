@@ -19,40 +19,55 @@ namespace OpenBlood2
             ++subsumed_events;
             return DE_OK;
         }
-        if (!found->next_event || found->events.size() >= Net::private_queue_limit)
-            return DE_ERROR;
         const auto identity = [&](HOBJECT handle)
         {
             const auto* record = game_.objects.get(handle);
             return record ? record->id : ObjectId{};
         };
-        Net::PrivateEvent next;
-        next.owner = {world_id_, found->id, owner->id};
-        next.sequence = found->next_event;
-        next.tick = ticks_;
+        Net::PrivateValue next;
         std::visit(
             [&](const auto& v)
             {
                 using T = std::decay_t<decltype(v)>;
                 if constexpr (std::is_same_v<T, SeeingEyeView>)
-                    next.value = Net::EyeEvent{identity(v.eye), v.active, v.blind_seconds};
+                    next = Net::EyeEvent{identity(v.eye), v.active, v.blind_seconds};
                 else if constexpr (std::is_same_v<T, OrbView>)
-                    next.value = Net::OrbEvent{identity(v.orb), v.active};
+                    next = Net::OrbEvent{identity(v.orb), v.active};
                 else if constexpr (std::is_same_v<T, CreatureAttach>)
-                    next.value = Net::AttachEvent{identity(v.creature), identity(v.enemy), v.active};
+                    next = Net::AttachEvent{identity(v.creature), identity(v.enemy), v.active};
                 else if constexpr (std::is_same_v<T, CTFEvent>)
-                    next.value = Net::FlagEvent{v.kind, v.team, v.points, identity(v.capturer)};
+                    next = Net::FlagEvent{v.kind, v.team, v.points, identity(v.capturer)};
                 else if constexpr (!std::is_same_v<T, PlayerInitRequest> && !std::is_same_v<T, PlayerPosition> &&
                                    !std::is_same_v<T, PlayerPhysics>)
-                    next.value = v;
+                    next = v;
             },
             value);
+        const auto result = queue_private(*found, owner->id, next);
+        if (result == DE_OK)
+        {
+            if (const auto* eye = std::get_if<Net::EyeEvent>(&next))
+                found->camera_eye = eye->active ? eye->eye : ObjectId{};
+            if (const auto* orb = std::get_if<Net::OrbEvent>(&next))
+            {
+                if (orb->active)
+                    found->camera_orb = orb->orb;
+                else if (found->camera_orb == orb->orb)
+                    found->camera_orb = {};
+            }
+        }
+        return result;
+    }
+    DRESULT ServerSession::queue_private(Player& player, ObjectId owner, const Net::PrivateValue& value)
+    {
+        if (!player.next_event || player.events.size() >= Net::private_queue_limit)
+            return DE_ERROR;
+        Net::PrivateEvent next{{world_id_, player.id, owner}, player.next_event, ticks_, value};
         if (!Net::valid_private(next))
             return DE_INVALIDPARAMS;
         // Snapshot identities now, including PendingRemoval/Destroying objects.
         // Queued values remain valid after Objects::finish_frame retires handles.
-        found->events.push_back(std::move(next));
-        ++found->next_event;
+        player.events.push_back(std::move(next));
+        ++player.next_event;
         ++private_events;
         return DE_OK;
     }

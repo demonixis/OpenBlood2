@@ -314,6 +314,8 @@ private setup/report/ACK values and checked server velocity advancement without 
 replays bounded CMoveMgr history and drives two independent ENet client processes.
 [Private player events](implementation/reports/m9_private_events.md) now reach bounded client inboxes;
 HUD/items apply independently and original null-client broadcasts reach every player.
+[Network camera state](implementation/reports/m9_camera_transport.md) now drives original replica-based
+view selection and server movement/look gates without client-selected permissions.
 **Remaining private presentation consumers/commands, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client

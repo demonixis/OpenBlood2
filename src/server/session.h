@@ -83,6 +83,8 @@ namespace OpenBlood2
             Net::MovementSetup setup;
             std::vector<Net::PrivateEvent> events;
             std::uint64_t next_event = 1;
+            ObjectId camera_eye, camera_orb;
+            std::optional<Net::CameraState> camera;
             std::optional<Net::MovementReport> pending;
             std::optional<Net::MovementAck> ack;
             PlayerControls controls;
@@ -95,6 +97,8 @@ namespace OpenBlood2
         std::uint64_t ticks_ = 0;
         unsigned mode_ = 0;
         DRESULT capture_event(HCLIENT, const PlayerEvent&);
+        DRESULT queue_private(Player&, ObjectId, const Net::PrivateValue&);
+        bool refresh_camera(Player&, Net::CameraState&, std::string& error);
         bool refresh_movement(Player&, std::string& error);
         bool advance_players(double seconds, std::string& error);
     };

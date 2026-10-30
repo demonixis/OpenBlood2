@@ -26,6 +26,9 @@ namespace OpenBlood2
             error = "Remote movement owner is unavailable";
             return false;
         }
+        Net::CameraState camera;
+        if (!refresh_camera(p, camera, error))
+            return false;
         Net::MovementSetup next;
         const bool force = !p.setup.sequence || p.source_revision != player->movement_revision ||
                            p.pose_revision != object->pose_revision;
@@ -74,6 +77,18 @@ namespace OpenBlood2
             p.setup = next;
             p.source_revision = player->movement_revision;
             p.pose_revision = object->pose_revision;
+        }
+        camera.force_revision = p.setup.owner.force_revision;
+        if (!p.camera || *p.camera != camera)
+        {
+            // Append after original private events (including PlayerDead). A
+            // changed force publishes even when death/respawn coalesced to alive.
+            if (queue_private(p, p.object, camera) != DE_OK)
+            {
+                error = "Private camera state queue refused";
+                return false;
+            }
+            p.camera = camera;
         }
         return true;
     }
@@ -135,9 +150,12 @@ namespace OpenBlood2
             if ((p.pending || p.ack) && !player->m_damage.IsDead())
             {
                 const bool active = p.setup.can_move && ticks_ - p.received_tick <= 30;
-                const auto controls = active ? p.controls : PlayerControls{{}, false, p.aim.yaw};
-                if (!game_.server_shell.OnMessage(p.client, controls) ||
-                    !game_.server_shell.OnMessage(p.client, p.aim) || !refresh_movement(p, error))
+                const bool look = p.camera && (!p.camera->scripted || p.camera->eye || p.camera->orb);
+                const auto aim = look ? p.aim : PlayerRotation{player->m_fPitch, player->m_fYaw};
+                auto controls = active ? p.controls : PlayerControls{{}, false, aim.yaw};
+                controls.yaw = aim.yaw;
+                if (!game_.server_shell.OnMessage(p.client, controls) || !game_.server_shell.OnMessage(p.client, aim) ||
+                    !refresh_movement(p, error))
                 {
                     if (error.empty())
                         error = "Remote player controls failed";

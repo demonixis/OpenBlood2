@@ -126,6 +126,9 @@ namespace OpenBlood2::Net
                     return item(v.current) && item(v.previous) && item(v.next);
                 else if constexpr (std::is_same_v<T, PlayerText>)
                     return text(v.text, 80);
+                else if constexpr (std::is_same_v<T, CameraState>)
+                    return v.force_revision && object(v.scripted) && object(v.eye) && object(v.orb) &&
+                           v.settings.type <= 2 && number(v.eye_level, 1000) && v.eye_level >= 0;
                 else
                     return true;
             },
@@ -245,6 +248,17 @@ namespace OpenBlood2::Net
                 }
                 else if constexpr (std::is_same_v<T, PlayerText>)
                     w.text(v.text, 80);
+                else if constexpr (std::is_same_v<T, CameraState>)
+                {
+                    w.u64(v.force_revision);
+                    id(w, v.scripted);
+                    id(w, v.eye);
+                    id(w, v.orb);
+                    w.u8(v.settings.type);
+                    w.u8(v.settings.player_movement | v.settings.hide_player << 1 | v.settings.listener << 2);
+                    w.f32(v.eye_level);
+                    w.u8(v.alive);
+                }
             },
             event.value);
         if (!w.good())
@@ -415,6 +429,25 @@ namespace OpenBlood2::Net
             case 20:
                 event.value = PlayerText{r.text(80)};
                 break;
+            case 21:
+            {
+                CameraState v;
+                v.force_revision = r.u64();
+                v.scripted = id(r);
+                v.eye = id(r);
+                v.orb = id(r);
+                v.settings.type = r.u8();
+                const auto flags = r.u8();
+                if (flags > 7)
+                    return DecodePrivate::Malformed;
+                v.settings.player_movement = flags & 1;
+                v.settings.hide_player = flags & 2;
+                v.settings.listener = flags & 4;
+                v.eye_level = r.f32();
+                ok = boolean(r, v.alive);
+                event.value = v;
+                break;
+            }
             default:
                 return DecodePrivate::Malformed;
         }

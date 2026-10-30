@@ -835,3 +835,25 @@ physics/force messages. Do not repeat those operations from this event channel.
 Preserve original one-recipient Bloodbath startup and all-recipient null-client
 conversation/objective/boss-health broadcasts; attempt remaining recipients after
 one failure. Keep the solo event path, RNG, logical audio and mode filters intact.
+
+## Reliable camera state and server permissions
+
+The [camera transport continuation](../implementation/reports/m9_camera_transport.md)
+adds private tag 21 in protocol 8. Publish the first active original scripted
+camera plus checked Eye/Orb IDs/settings, eye height, alive state and full movement
+force generation. Reuse replica poses and local predicted body; never transmit a
+GPU view or trust a peer's camera nomination. Validate live original type/owner
+before deriving camera movement/look gates. Preserve Eye aim through the existing
+original PlayerRotation path and suppress scripted/dead turning.
+
+Append changed CameraState after queued original private events, with force
+identity participating in equality. Preserve Eye reset and matching-Orb-clear
+semantics, descriptor creation order, original camera priority/listener, hidden
+player/weapons, death/chase collision and XR chase refusal. Defer missing objects
+or mismatched force identities without committing a partial view.
+
+Only PlayerDead starts the death orbit; slow-death state alone does not. Repeated
+death retains the original Begin guard. Wait for a delayed presentation clock to
+reach a future death tick, refuse backwards/invalid time, and clear old death
+state on an authoritative alive transition/force. Production clock mapping and
+interactive presentation remain separate; keep the immediate solo path unchanged.

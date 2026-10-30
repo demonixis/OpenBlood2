@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/camera_types.h"
 #include "game/player_messages.h"
 #include "net/admission.h"
 
@@ -29,12 +30,21 @@ namespace OpenBlood2::Net
         int points = 0;
         ObjectId capturer;
     };
+    struct CameraState
+    {
+        std::uint64_t force_revision = 0;
+        ObjectId scripted, eye, orb;
+        CameraSettings settings;
+        float eye_level = 0;
+        bool alive = false;
+        bool operator==(const CameraState&) const = default;
+    };
     // Stable tags are these alternatives plus one. Append only with a protocol
     // revision. Init/physics/force messages are handled by admission/movement.
     using PrivateValue =
         std::variant<BloodbathStart, PlayerRotation, PlayerStats, MissionObjectives, WorldExit, BossHealth,
                      Conversation, InventoryAction, ScreenFade, VoiceEvent, VoiceStop, PlayerDead, MusicCommand,
-                     ZoomView, EyeEvent, AttachEvent, OrbEvent, FlagEvent, InventoryItems, PlayerText>;
+                     ZoomView, EyeEvent, AttachEvent, OrbEvent, FlagEvent, InventoryItems, PlayerText, CameraState>;
     struct PrivateEvent
     {
         Joined owner;

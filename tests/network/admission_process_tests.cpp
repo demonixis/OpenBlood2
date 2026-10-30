@@ -1,3 +1,4 @@
+#include "client/network_camera.h"
 #include "client/network_movement.h"
 #include "client/network_player_events.h"
 #include "client/network_world.h"
@@ -48,6 +49,8 @@ namespace
         const auto& replica = receiver.world();
         NetworkMovement movement(receiver.collision());
         NetworkPlayerEvents inbox;
+        NetworkCamera camera;
+        unsigned camera_frames = 0;
         unsigned startup_announcements = 0;
         std::optional<MovementSetup> pending_setup;
         Clock::time_point next_step;
@@ -75,6 +78,17 @@ namespace
         Clock::time_point leave_at;
         std::uint64_t world = 0;
         bool hello = false, ready = false, joined = false, leaving = false, assembled = false, replicated = false;
+        const auto update_camera = [&]()
+        {
+            if (!movement.ready())
+                return true;
+            const auto result =
+                camera.update(replica, receiver.collision(), movement.movement(), movement.setup().owner.force_revision,
+                              0, 0, false, replica.frame().time, error);
+            CHECK(result != NetworkCamera::Reception::Refused);
+            camera_frames += result == NetworkCamera::Reception::Applied;
+            return true;
+        };
         while (Clock::now() < deadline)
         {
             if (drive && !leaving && movement.ready() && Clock::now() >= next_step)
@@ -93,10 +107,16 @@ namespace
                     ++moves_sent;
                 }
             }
+            CHECK(update_camera());
             if (joined && replicated && !leaving && Clock::now() >= leave_at)
             {
                 CHECK(states_received && (!observer || (saw_arrival && saw_departure)));
                 CHECK(inbox.sequence() && inbox.hud().stats.health > 0 && startup_announcements == 1);
+                CHECK(camera.ready() && camera_frames && camera.camera().kind == ClientCameraKind::FirstPerson);
+                CHECK(camera.camera().position.x == movement.movement().body.position.x);
+                std::cout << "Camera frames=" << camera_frames << ", predicted eye height="
+                          << camera.camera().view.position.y - movement.movement().body.position.y << "\n"
+                          << std::flush;
                 std::cout << "Private events=" << inbox.sequence() << ", health=" << inbox.hud().stats.health
                           << ", startup_announcements=" << startup_announcements << "\n"
                           << std::flush;
@@ -136,7 +156,10 @@ namespace
                     std::vector<PrivateEvent> delivered;
                     inbox.take(delivered);
                     for (const auto& value : delivered)
+                    {
                         startup_announcements += std::holds_alternative<BloodbathStart>(value.value);
+                        CHECK(camera.receive(value, error) != NetworkCamera::Reception::Refused);
+                    }
                 }
                 else if (is_movement_packet(event.bytes))
                 {
@@ -146,8 +169,7 @@ namespace
                     {
                         CHECK(event.channel == Channel::Control && joined && setup->owner.world == world &&
                               setup->owner.object == own_object);
-                        if (drive)
-                            pending_setup = *setup;
+                        pending_setup = *setup;
                     }
                     else
                     {
@@ -228,7 +250,7 @@ namespace
                         CHECK(ready && !joined && accepted->world == world);
                         joined = true;
                         own_object = accepted->object;
-                        CHECK(movement.begin(*accepted) && inbox.begin(*accepted));
+                        CHECK(movement.begin(*accepted) && inbox.begin(*accepted) && camera.begin(*accepted));
                     }
                     else if (const auto* pulse = std::get_if<Heartbeat>(&message))
                     {
@@ -268,6 +290,7 @@ namespace
                         initial_position = movement.movement().body.position;
                     }
                 }
+                CHECK(update_camera());
             }
         }
         error = "Child client protocol deadline";
