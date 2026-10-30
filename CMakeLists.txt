@@ -62,7 +62,49 @@ if(BLOOD2_XR AND BLOOD2_BUILD_CLIENT)
     target_include_directories(engine SYSTEM PRIVATE "${sdl3_SOURCE_DIR}/src/video/khronos")
 endif()
 
-add_library(blood2_game STATIC src/game/polygrids.cpp src/game/original/ScreenFade.cpp src/game/original/Credits.cpp src/game/original/PolyGrid.cpp src/game/original/PolyGridFX.cpp src/game/sparks.cpp src/game/original/SparksFX.cpp src/game/blood_spurts.cpp src/game/original/ParticleExplosionFX.cpp src/game/blood_splats.cpp src/game/original/BloodSplatFX.cpp src/game/original/ClientSplatFX.cpp src/game/original/RemoteBomb.cpp src/game/original/PlayerRemoteBombs.cpp src/game/original/BombExplosion.cpp src/game/original/ProximityBomb.cpp src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/particle_streams.cpp src/game/original/ParticleStreamFX.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/object_particles.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/original/LaserBeamFX.cpp src/game/laser_beams.cpp src/game/weapon_sprites.cpp src/game/original/SmokeImpactFX.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/explosion_flames.cpp src/game/original/ExplosionFlameFX.cpp src/game/original/ObjectParticleFX.cpp src/game/explosion_fragments.cpp src/game/original/ExplosionFragFX.cpp src/game/explosion_rings.cpp src/game/original/ExplosionRingFX.cpp src/game/explosion_lights.cpp src/game/original/ExplosionLightFX.cpp src/game/explosion_models.cpp src/game/original/ExplosionModelFX.cpp src/game/explosion_sprites.cpp src/game/original/ExplosionSpriteFX.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
+# Original cosmetic runtimes link independently of the authoritative game classes.
+add_library(blood2_client_effects STATIC
+    src/client/original_effects.cpp
+    src/game/polygrids.cpp
+    src/game/particle_streams.cpp
+    src/game/object_particles.cpp
+    src/game/explosion_fragments.cpp
+    src/game/explosion_sprites.cpp
+    src/game/explosion_models.cpp
+    src/game/explosion_lights.cpp
+    src/game/explosion_rings.cpp
+    src/game/explosion_flames.cpp
+    src/game/sparks.cpp
+    src/game/lightning.cpp
+    src/game/warp_gates.cpp
+    src/game/blood_spurts.cpp
+    src/game/blood_splats.cpp
+    src/game/flesh_gibs.cpp
+    src/game/shotgun_effects.cpp
+    src/game/weapon_sprites.cpp
+    src/game/laser_beams.cpp
+    src/game/original/PolyGridFX.cpp
+    src/game/original/ParticleStreamFX.cpp
+    src/game/original/ObjectParticleFX.cpp
+    src/game/original/ExplosionFragFX.cpp
+    src/game/original/ExplosionSpriteFX.cpp
+    src/game/original/ExplosionModelFX.cpp
+    src/game/original/ExplosionLightFX.cpp
+    src/game/original/ExplosionRingFX.cpp
+    src/game/original/ExplosionFlameFX.cpp
+    src/game/original/SparksFX.cpp
+    src/game/original/LightningFX.cpp
+    src/game/original/WarpGateFX.cpp
+    src/game/original/ParticleExplosionFX.cpp
+    src/game/original/BloodSplatFX.cpp
+    src/game/original/SmokeImpactFX.cpp
+    src/game/original/LaserBeamFX.cpp
+    src/game/original/LightFX.cpp
+)
+target_link_libraries(blood2_client_effects PUBLIC engine_core)
+blood2_project_options(blood2_client_effects)
+
+add_library(blood2_game STATIC src/game/original/ScreenFade.cpp src/game/original/Credits.cpp src/game/original/PolyGrid.cpp src/game/original/ClientSplatFX.cpp src/game/original/RemoteBomb.cpp src/game/original/PlayerRemoteBombs.cpp src/game/original/BombExplosion.cpp src/game/original/ProximityBomb.cpp src/game/server_sky.cpp src/game/original/SkyObjects.cpp src/game/original/ClientParticleStreamSFX.cpp src/game/original/Grenade.cpp src/game/original/FlareProjectile.cpp src/game/original/GideonShield.cpp src/game/original/Shockwave.cpp src/game/original/WeaponProjectile.cpp src/game/original/Projectile.cpp src/game/original/EnergyBlast.cpp src/game/server_projectiles.cpp src/game/original/NagaEyes.cpp src/game/destination_trial.cpp src/game/level_change.cpp src/game/world_preparation.cpp src/game/server_attachments.cpp src/game/original/HandWeaponModel.cpp src/game/original/WeaponHand.cpp
     src/game/original/engineobjects.cpp
     src/game/original/B2BaseClass.cpp
     src/game/original/CameraSpot.cpp
@@ -72,6 +114,7 @@ add_library(blood2_game STATIC src/game/polygrids.cpp src/game/original/ScreenFa
     src/game/original/PathMgr.cpp
     src/game/original/trigger_helpers.cpp
     src/game/original/session_load.cpp
+    src/game/server_effect_queries.cpp
     src/game/client_replication.cpp
     src/game/local_movement.cpp src/game/local_presentation.cpp src/game/local_audio.cpp src/game/local_effects.cpp
     src/game/session.cpp
@@ -85,18 +128,18 @@ add_library(blood2_game STATIC src/game/polygrids.cpp src/game/original/ScreenFa
     src/game/service_coverage.cpp)
 target_sources(blood2_game PRIVATE src/game/original/NewStatusBar.cpp src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp src/game/original/SoundFX.cpp)
 target_sources(blood2_game PRIVATE src/game/original/PlayerLanding.cpp src/game/original/PlayerDeath.cpp)
-target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/LightFX.cpp src/game/original/ClientLightFX.cpp)
+target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/ClientLightFX.cpp)
 target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
 target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/original/ConversationTrigger.cpp src/game/original/ConversationStrings.cpp src/game/original/CommLink.cpp src/game/original/VoiceMgr.cpp src/game/original/PlayerVoice.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
 target_sources(blood2_game PRIVATE src/game/original/WeaponPickups.cpp src/game/server_pickups.cpp src/game/original/PickupObject.cpp
     src/game/original/ItemPickups.cpp src/game/original/GameInvItems.cpp src/game/original/Flashlight.cpp src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp
     src/game/original/Spawner.cpp src/game/original/TripLaser.cpp src/game/original/SeeingEye.cpp src/game/original/TheEyeInventory.cpp src/game/original/BugSprayProjectile.cpp src/game/original/InventoryClient.cpp src/game/original/NapalmProjectile.cpp src/game/original/BoneLeech.cpp src/game/original/DrudgeLord.cpp src/game/original/SoulDrudge.cpp src/game/original/ShikariAI.cpp src/game/original/GremlinAI.cpp src/game/original/AddonProjectiles.cpp src/game/original/MadScientistAI.cpp src/game/original/Tchernotronic.cpp src/game/original/SingularityProjectile.cpp src/game/original/LeechProjectile.cpp src/game/original/OrbProjectile.cpp src/game/original/Fanatic.cpp src/game/original/Prophet.cpp src/game/original/ChosenAI.cpp src/game/original/IshmaelAI.cpp
     src/game/original/ParticleSystem.cpp src/game/original/LaterEnemies.cpp src/game/original/Naga.cpp src/game/original/ZealotAI.cpp src/game/original/CampaignWeapons.cpp src/game/original/CampaignProjectiles.cpp src/game/original/CabalAttack.cpp src/game/original/HowitzerShell.cpp src/game/original/TeslaProjectile.cpp)
-target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/Minefield.cpp src/game/original/SparksObj.cpp src/game/original/ClientLightningSFX.cpp src/game/original/LightningFX.cpp src/game/warp_gates.cpp src/game/original/WarpGateFX.cpp src/game/original/ClientWarpGateSFX.cpp src/game/lightning.cpp src/game/original/PlayerContainers.cpp src/game/original/PlayerPowers.cpp src/game/original/PlayerCheats.cpp)
+target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/Minefield.cpp src/game/original/SparksObj.cpp src/game/original/ClientLightningSFX.cpp src/game/original/ClientWarpGateSFX.cpp src/game/original/PlayerContainers.cpp src/game/original/PlayerPowers.cpp src/game/original/PlayerCheats.cpp)
 target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
     src/game/server_activation.cpp src/game/original/AIRuntime.cpp
     src/game/original/AIAmmo.cpp src/game/original/AISmell.cpp src/game/original/AIEscape.cpp src/game/original/AINavigationStates.cpp src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIDodge.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/AIScriptFire.cpp src/game/original/AISave.cpp src/game/original/BossSave.cpp src/game/original/Movement.cpp
-    src/game/original/AIState.cpp src/game/original/AIHitReaction.cpp src/game/original/AIDeath.cpp src/game/original/Gib.cpp src/game/flesh_gibs.cpp src/game/shotgun_effects.cpp src/game/original/Corpse.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
+    src/game/original/AIState.cpp src/game/original/AIHitReaction.cpp src/game/original/AIDeath.cpp src/game/original/Gib.cpp src/game/original/Corpse.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
     src/game/original/CivilianAI.cpp
     src/game/original/CultistAI.cpp src/game/original/Gideon.cpp src/game/original/EnhancedGideon.cpp src/game/original/UndeadGideon.cpp src/game/original/AncientOne.cpp src/game/original/AncientWeapons.cpp src/game/original/FlagObjects.cpp src/game/original/PlayerFlags.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
 target_sources(blood2_game PRIVATE src/game/server_exits.cpp src/game/original/ExitTrigger.cpp src/game/server_clients.cpp src/game/original/PlayerImprison.cpp src/game/original/PlayerObj.cpp src/game/original/PlayerSave.cpp src/game/original/CharacterNodes.cpp src/game/original/BloodShells.cpp)
@@ -113,7 +156,7 @@ if(BLOOD2_BUILD_CLIENT)
     target_link_libraries(blood2_frontend PUBLIC blood2_game)
     blood2_project_options(blood2_frontend)
 endif()
-target_link_libraries(blood2_game PUBLIC engine_core)
+target_link_libraries(blood2_game PUBLIC blood2_client_effects engine_core)
 
 target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableSave.cpp src/game/original/DestructableBrush.cpp src/game/original/DestructableModel.cpp
     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp src/game/original/RotatingModel.cpp

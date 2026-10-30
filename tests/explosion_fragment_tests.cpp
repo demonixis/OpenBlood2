@@ -119,7 +119,7 @@ namespace
         s.gravity = 0;
         CExplosionFragFX f;
         CHECK(f.Init(s, error) && f.CreateObject(g.models, g.resources, 0, rng, error) && f.Update(0, g.server));
-        CHECK(f.last_hit.object == h && near(f.position.z, 3) && near(f.velocity.z, -2.5f));
+        CHECK(f.last_hit.object == g.objects.get(h)->id && near(f.position.z, 3) && near(f.velocity.z, -2.5f));
         g.server.RemoveObject(h);
         CHECK(f.Init(s, error) && f.CreateObject(g.models, g.resources, 0, rng, error) && f.Update(0, g.server));
         CHECK(f.last_query == SegmentResult::Miss && near(f.position.z, 10));

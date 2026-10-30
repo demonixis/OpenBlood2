@@ -4,13 +4,15 @@
 
 namespace OpenBlood2
 {
-    ClientSession::ClientSession()
+    ClientSession::ClientSession(std::unique_ptr<EffectRuntime> runtime) : effect_runtime_(std::move(runtime))
     {
         reset_local_world();
     }
     void ClientSession::reset_local_world()
     {
         // Separate candidate sessions (save/NEW_LEVEL) must never reuse a world's identity.
+        if (effect_runtime_)
+            effect_runtime_->reset_world();
         movement = {};
         time = 0;
         static std::atomic<std::uint64_t> next{1};

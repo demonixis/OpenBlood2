@@ -1,4 +1,5 @@
 #pragma once
+#include "client/original_effects.h"
 #include "client/session.h"
 #include "engine/collision.h"
 #include "engine/model_store.h"
@@ -60,7 +61,14 @@ namespace OpenBlood2
     class ServerAdapter final : public ServerDE
     {
       public:
+        SegmentResult effect_segment(DVector, DVector, ClientSegmentHit&,
+                                     SegmentObjects = SegmentObjects::SolidOnly) override;
+        SegmentResult effect_world_segment(DVector, DVector, ClientSegmentHit&) override;
+        SegmentResult effect_world_ray(DVector, DVector, ClientSegmentHit&) override;
+        bool effect_container(DVector, ContainerCode&, bool visible_only = false) override;
         AudioTimeline audio;
+        // Immediate local publisher/inspection aliases. The client owns these pools.
+        OriginalEffects& client_effects;
         SoundId PlayCharacterSound(HOBJECT, const SoundRequest&, bool retain, std::string&) override;
         SoundId PlayCinematicSound(HOBJECT, const SoundRequest&, std::string&) override;
         SoundId PlayLocalSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) override;
@@ -75,7 +83,7 @@ namespace OpenBlood2
         void prepare_audio();
         bool advance_prepared_audio(double);
         bool advance_audio(double);
-        explicit ServerAdapter(Objects& objects);
+        explicit ServerAdapter(Objects& objects, OriginalEffects& effects);
         ~ServerAdapter() override;
         ServerAdapter(const ServerAdapter&) = delete;
         ServerAdapter& operator=(const ServerAdapter&) = delete;
@@ -117,45 +125,46 @@ namespace OpenBlood2
         void RecordBrushDestruction(HOBJECT, DVector, float, DBYTE, unsigned = 0, unsigned = 0) override;
         void RecordDebrisEffect(const DebrisEffect&) override;
         std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
-        ExplosionSprites explosion_sprites;
-        Sparks sparks;
-        LightningBolts lightning;
-        WarpGates warp_gates;
+        ExplosionSprites& explosion_sprites;
+        Sparks& sparks;
+        LightningBolts& lightning;
+        WarpGates& warp_gates;
         std::uint64_t PublishWarpGate(HOBJECT, const WarpGateSettings&, std::string&) override;
         std::uint64_t PublishLightning(HOBJECT, const LightningSettings&, std::string&) override;
         std::uint64_t PublishSparks(HOBJECT, const SparkSettings&, std::string&) override;
-        BloodSpurts blood_spurts;
+        BloodSpurts& blood_spurts;
         std::uint64_t PublishClientBloodSplat(const BloodSplatSettings&, std::string_view, std::string&) override;
         std::uint64_t PublishClientBloodSpurt(const BloodSpurtSettings&, std::string_view, bool, std::string&) override;
         std::uint64_t PublishBloodSpurt(HOBJECT, const BloodSpurtSettings&, std::string&) override;
-        BloodSplats blood_splats;
+        BloodSplats& blood_splats;
         std::uint64_t PublishBloodSplat(HOBJECT, const BloodSplatSettings&, std::string&) override;
-        ShotgunEffects shotgun_effects;
+        ShotgunEffects& shotgun_effects;
         std::uint64_t PublishShotgunEffects(HOBJECT, const ShotgunEffectSettings&, std::string&) override;
-        WeaponSprites weapon_sprites;
+        WeaponSprites& weapon_sprites;
         std::uint64_t PublishWeaponSprites(HOBJECT, const WeaponSpriteSettings&, std::string&) override;
-        ExplosionModels explosion_models;
-        LaserBeams laser_beams;
-        ObjectParticles object_particles;
+        ExplosionModels& explosion_models;
+        LaserBeams& laser_beams;
+        ObjectParticles& object_particles;
         SkyState sky;
         bool SetSkyDefinition(const SkyDefinition&) override;
         bool AddSkyObject(HOBJECT, unsigned) override;
         void ReportSkyFailure(std::string_view) override;
-        PolyGrids polygrids;
+        PolyGrids& polygrids;
         std::uint64_t PublishPolyGrid(HOBJECT, const PolyGridSettings&, std::string&) override;
-        ParticleStreams particle_streams;
+        ParticleStreams& particle_streams;
         std::uint64_t PublishParticleStream(HOBJECT, const ParticleStreamSettings&, std::string&) override;
         std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&, float lifetime_scale = 1,
                                              DVector offset = {}) override;
         std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&, DBYTE type = 0) override;
-        ExplosionLights explosion_lights;
-        ExplosionRings explosion_rings;
-        ExplosionFlames explosion_flames;
+        ExplosionLights& explosion_lights;
+        ExplosionRings& explosion_rings;
+        ExplosionFlames& explosion_flames;
         std::uint64_t PublishExplosionFlames(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
-        FleshGibs flesh_gibs, destruction_debris;
+        FleshGibs& flesh_gibs;
+        FleshGibs& destruction_debris;
         int debris_detail = 2;
         std::uint64_t PublishFleshGibs(HOBJECT, DVector, DVector, DVector, float, unsigned, std::string&) override;
-        ExplosionFragments explosion_fragments;
+        ExplosionFragments& explosion_fragments;
         std::uint64_t PublishExplosionFragments(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
         std::uint64_t PublishExplosionRings(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
         std::uint64_t PublishExplosionLights(HOBJECT, DDWORD, DVector, DVector, std::string&) override;
@@ -195,6 +204,7 @@ namespace OpenBlood2
         void reset_world_time()
         {
             audio.clear();
+            client_effects.reset_world();
             unavailable_services.clear();
             world_time_origin_ = objects_.time();
             brush_destructions.clear();
@@ -202,30 +212,10 @@ namespace OpenBlood2
             explosion_effects.clear();
             scene_explosions.clear();
             projectile_reports.clear();
-            explosion_sprites.clear();
-            sparks.clear();
-            lightning.clear();
-            warp_gates.clear();
-            blood_spurts.clear();
-            blood_splats.clear();
-            weapon_sprites.clear();
-            shotgun_effects.clear();
-            explosion_models.clear();
-            laser_beams.clear();
-            object_particles.clear();
-            particle_streams.clear();
-            polygrids.clear();
             sky = {};
-            explosion_lights.clear();
-            explosion_rings.clear();
-            explosion_flames.clear();
-            explosion_fragments.clear();
-            flesh_gibs.clear();
-            destruction_debris.clear();
             spawn_reports.clear();
             pickup_reports.clear();
             camera_effects.clear();
-            light_effects.clear();
             random_.seed(1);
             variables_.erase("GAME_WORLDNAME");
             client_strings = {};
@@ -263,7 +253,7 @@ namespace OpenBlood2
         StringResources client_strings;
         std::string client_strings_error;
         bool client_strings_attempted = false;
-        std::vector<CLightFX> light_effects;
+        std::vector<CLightFX>& light_effects;
         bool RandomFloat(float, float, float&) override;
         bool PublishLightEffect(HOBJECT, const LightSettings&) override;
         void RemoveLightEffect(HOBJECT) override;
@@ -573,14 +563,15 @@ namespace OpenBlood2
     class GameSession
     {
       public:
-        ClientSession client_session;
+        ClientSession client_session{std::make_unique<OriginalEffects>()};
+        OriginalEffects& client_effects{static_cast<OriginalEffects&>(*client_session.effect_runtime())};
         Resources resources;
         ModelStore models{resources};
         SpriteStore sprites{resources};
         CollisionWorld collision;
         WorldVisibility visibility;
         Objects objects;
-        ServerAdapter server{objects};
+        ServerAdapter server{objects, client_effects};
         CBloodServerShell server_shell{server};
         MusicCatalog music_catalog;
         LocalEffects local_effects;

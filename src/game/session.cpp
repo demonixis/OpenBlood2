@@ -935,9 +935,13 @@ namespace OpenBlood2
         ok = checked("server.lightning.advance", server.lightning.advance(objects.time())) && ok;
         ok = checked("server.warp_gates.advance", server.warp_gates.advance(objects.time(), server)) && ok;
         ok = checked("server.blood_spurts.advance", server.blood_spurts.advance(objects.time(), server)) && ok;
-        ok =
-            checked("server.explosion_fragments.advance", server.explosion_fragments.advance(objects.time(), server)) &&
-            ok;
+        // Copy a stable collision scene once for the original fragment update. Failure
+        // makes queries explicitly unavailable, never fall back to the live registry.
+        const bool fragment_geometry = server.explosion_fragments.active.empty() || local_movement.publish_collision();
+        ClientEffectQueries fragment_queries(fragment_geometry ? &client_session.collision : nullptr);
+        ok = checked("client.explosion_fragments.advance",
+                     server.explosion_fragments.advance(objects.time(), fragment_queries)) &&
+             ok;
         ok = checked("server.object_particles.advance", server.object_particles.advance(objects.time(), server)) && ok;
         ok = checked("server.particle_streams.advance", server.particle_streams.advance(objects.time(), server)) && ok;
         ok = checked("server.polygrids.advance", server.polygrids.advance(objects.time(), server)) && ok;

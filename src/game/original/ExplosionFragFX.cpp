@@ -1,6 +1,5 @@
 #include "ExplosionFragFX.h"
 #include "engine/collision.h"
-#include "game/legacy/server_de.h"
 #include <cmath>
 #include <numbers>
 using namespace OpenBlood2;
@@ -110,7 +109,7 @@ bool CExplosionFragFX::CreateObject(ModelStore& models, const Resources& resourc
     start_time = last_time = now;
     return true;
 }
-bool CExplosionFragFX::Update(double now, ServerDE& server)
+bool CExplosionFragFX::Update(double now, EffectQueries& queries)
 {
     error.clear();
     if (!model || !std::isfinite(now) || now < last_time)
@@ -155,8 +154,8 @@ bool CExplosionFragFX::Update(double now, ServerDE& server)
             error = "Fragment motion exceeds bounds";
             return false;
         }
-        SegmentHit hit;
-        last_query = server.IntersectSegment(position, ray_end, nullptr, hit, false, SegmentObjects::SolidOrRayHit);
+        ClientSegmentHit hit;
+        last_query = queries.effect_segment(position, ray_end, hit, SegmentObjects::SolidOrRayHit);
         if (last_query == SegmentResult::Invalid || last_query == SegmentResult::Unavailable)
         {
             error = "Fragment collision query invalid/unavailable";

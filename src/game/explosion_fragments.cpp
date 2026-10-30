@@ -124,13 +124,13 @@ namespace OpenBlood2
         reports.push_back(std::move(report));
         return id;
     }
-    bool ExplosionFragments::advance(double now, ServerDE& server)
+    bool ExplosionFragments::advance(double now, EffectQueries& queries)
     {
         bool valid = true;
         std::erase_if(active,
                       [&](auto& fx)
                       {
-                          if (fx.Update(now, server))
+                          if (fx.Update(now, queries))
                               return false;
                           if (fx.error.empty())
                               ++expired;

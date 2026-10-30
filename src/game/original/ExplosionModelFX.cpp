@@ -1,6 +1,6 @@
 #include "ExplosionModelFX.h"
 #include "engine/collision.h"
-#include "engine/objects.h"
+#include "engine/properties.h"
 #include <cmath>
 #include <numbers>
 using namespace OpenBlood2;

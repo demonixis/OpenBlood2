@@ -1,9 +1,8 @@
 #pragma once
+#include "client/effect_queries.h"
 #include "engine/model_store.h"
-#include "game/weapon_messages.h"
 #include <optional>
 #include <random>
-class ServerDE;
 namespace OpenBlood2
 {
     struct ExplosionFragSettings
@@ -20,7 +19,7 @@ class CExplosionFragFX
   public:
     bool Init(const OpenBlood2::ExplosionFragSettings&, std::string&);
     bool CreateObject(OpenBlood2::ModelStore&, const OpenBlood2::Resources&, double, std::minstd_rand&, std::string&);
-    bool Update(double, ServerDE&);
+    bool Update(double, OpenBlood2::EffectQueries&);
     OpenBlood2::ExplosionFragSettings settings;
     std::shared_ptr<const OpenBlood2::Model> model;
     OpenBlood2::AnimationTrack animation;
@@ -30,7 +29,7 @@ class CExplosionFragFX
     float alpha = 1;
     double start_time = 0, last_time = 0, next_update = 0;
     std::uint64_t id = 0, event = 0, updates = 0, impacts = 0;
-    OpenBlood2::SegmentHit last_hit;
+    OpenBlood2::ClientSegmentHit last_hit;
     OpenBlood2::SegmentResult last_query = OpenBlood2::SegmentResult::Miss;
     bool moving = true;
     DDWORD flags = FLAG_VISIBLE | FLAG_MODELGOURAUDSHADE | FLAG_NOLIGHT;

@@ -5,6 +5,7 @@ add_library(engine_core STATIC
     src/client/collision.cpp
     src/client/environment.cpp
     src/client/segment.cpp
+    src/client/effect_queries.cpp
     src/client/effects.cpp
     src/client/effect_scene.cpp
     src/client/audio.cpp

@@ -36,6 +36,11 @@ owned client snapshots. Preserve render order, independent array/shape lifetime,
 per-eye fog/warp behavior and immutable GPU references. Legacy effect producers,
 updates and collision/audio queries still use the local game adapter; their
 runtime/event extraction remains separate from this presentation boundary.
+The [client effect runtime step](Documentation/implementation/reports/m9_effect_queries.md)
+now owns original cosmetic pools through ClientSession and links them separately.
+Fragment updates query the independent collision replica. Preserve source update
+order/arithmetic, primary-only ray quirks and pool reset/identity behavior; remaining
+owner-bound updates, child effects and cosmetic audio still need service extraction.
 Preserve solo clocks, source pickup rules,
 immutable GPU references, existing PBR work and independent M2-GPU-001/M3 gates.
 

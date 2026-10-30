@@ -15,7 +15,7 @@ namespace OpenBlood2
       public:
         std::uint64_t publish(DDWORD, DVector, DVector, std::string_view, ModelStore&, const Resources&, double,
                               std::string&);
-        bool advance(double, ServerDE&);
+        bool advance(double, EffectQueries&);
         void clear();
         std::vector<CExplosionFragFX> active;
         std::vector<CObjectParticleFX> trails;

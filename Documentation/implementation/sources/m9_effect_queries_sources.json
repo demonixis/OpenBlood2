@@ -1,0 +1,64 @@
+{
+  "scope": "M9 client-owned original effect pools and independent fragment collision updates",
+  "baseline": "7c2fe6ad",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "7c2fe6ad",
+      "path": "src/game/server_sprites.cpp",
+      "sha256": "483b2ac250aa7022e5d16d42aeaf8908e89e65b2acbf6e60f2f0bbff866877b3"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "7c2fe6ad",
+      "path": "src/game/server_adapter.h",
+      "sha256": "6452c746e8e041fc7f4d5b72c0281d4dd59235e2c8b4451c7533165f2f8a3a7e"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "7c2fe6ad",
+      "path": "src/game/server_adapter.cpp",
+      "sha256": "fc5c62142c1b790f15d803659742c9a586c2bf3829e783d0b4466c418f24774d"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "7c2fe6ad",
+      "path": "src/game/session.cpp",
+      "sha256": "b0810cc81a04990ab6eec75a23d59c538d3355e1036d917fb53b91354b0369e7"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "7c2fe6ad",
+      "path": "src/game/original/ExplosionFragFX.cpp",
+      "sha256": "36d1b36df143817fa3ba176248fe5ff22d89238f9bc487eeb7b464a0a3bd10a2"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "7c2fe6ad",
+      "path": "src/game/original/ExplosionFragFX.h",
+      "sha256": "c98b00973d85cd4c1496c57b8706ab5b7554fd810a1d02b509a8a7fdd839ec2c"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "7c2fe6ad",
+      "path": "src/game/explosion_fragments.cpp",
+      "sha256": "34ce5caf6e9554df8c4209f5ea12f6712c76e7f0341193b256c72a6c1f5becb6"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ExplosionFX.cpp",
+      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342"
+    }
+  ],
+  "adaptations": [
+    "Own the existing cosmetic pools through ClientSession and link their implementations separately from authoritative game classes",
+    "Replace only fragment update services with pointer-free read-only collision queries; preserve source arithmetic and update position",
+    "Copy current collision state after authoritative frame completion when fragments are live; refuse unavailable snapshots without a server fallback"
+  ],
+  "remaining": [
+    "Owner-bound FX still retain original handles and update through the local server adapter",
+    "Other moving effects still query that adapter and publish cosmetic sounds/children through it",
+    "Typed remote effect events and client-shell extraction remain pending"
+  ]
+}

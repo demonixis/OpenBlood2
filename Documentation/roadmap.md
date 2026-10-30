@@ -275,7 +275,9 @@ voices from independent client playback, music, caches and SDL output. Device qu
 lead no longer changes authoritative sound completion.
 The [local effects presentation lot](implementation/reports/m9_client_effects.md)
 feeds every scene-effect consumer, including lights/fog, from owned client snapshots;
-legacy effect production/update services remain in the immediate local adapter.
+the [runtime continuation](implementation/reports/m9_effect_queries.md) now owns the
+original pools on the client and makes fragment collision updates independent.
+Remaining effect production/update services still use the immediate local adapter.
 **Full client separation, player
 admission and network gameplay remain pending.**
 

@@ -1,6 +1,6 @@
 #include "ExplosionSpriteFX.h"
 #include "engine/collision.h"
-#include "engine/objects.h"
+#include "engine/properties.h"
 #include <cmath>
 using namespace OpenBlood2;
 bool CExplosionSpriteFX::Init(const ExplosionSpriteSettings& input, std::string& failure)

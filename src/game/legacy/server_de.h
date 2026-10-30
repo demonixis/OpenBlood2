@@ -1,4 +1,5 @@
 #pragma once
+#include "client/effect_queries.h"
 namespace OpenBlood2
 {
     struct ShotgunEffectSettings;
@@ -86,7 +87,7 @@ inline constexpr DDWORD SAVEOBJECTS_SAVEGAMECONSOLE = 1, SAVEOBJECTS_SAVEPORTALS
 // Original Shared/ClientServerShared.h: the server shell's SaveGame lists objects with this user flag.
 inline constexpr DDWORD USRFLG_SAVEABLE = 1u << 3;
 class PathMgr;
-class ServerDE : public CSBase
+class ServerDE : public CSBase, public OpenBlood2::EffectQueries
 {
   public:
     virtual std::uint64_t PublishWarpGate(HOBJECT, const OpenBlood2::WarpGateSettings&, std::string&) = 0;

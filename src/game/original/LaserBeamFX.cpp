@@ -1,7 +1,7 @@
 // LaserBeamFX.cpp Init/CreateObject/Update/SetupBeam/UpdateBeam: red-small branch.
 #include "LaserBeamFX.h"
 #include "engine/collision.h"
-#include "engine/objects.h"
+#include "engine/properties.h"
 #include <cmath>
 using namespace OpenBlood2;
 void CLaserBeamFX::SetupBeam(DBYTE value)

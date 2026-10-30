@@ -1,6 +1,7 @@
 #pragma once
 #include "client/audio.h"
 #include "client/camera.h"
+#include "client/effect_runtime.h"
 #include "client/effects.h"
 #include "client/hud.h"
 #include "client/movement.h"
@@ -9,11 +10,16 @@
 namespace OpenBlood2
 {
     // First separation step: local replica admission/lifetime, independent of GameSession
-    // and the original server globals. FX and the original shell migrate later.
+    // and the original server globals. The optional cosmetic runtime is client-owned;
+    // remaining legacy services and the original shell migrate separately.
     class ClientSession
     {
       public:
-        ClientSession();
+        explicit ClientSession(std::unique_ptr<EffectRuntime> runtime = {});
+        EffectRuntime* effect_runtime() const
+        {
+            return effect_runtime_.get();
+        }
         void reset_local_world();
         bool receive(ClientWorldFrame&& frame, std::string& error)
         {
@@ -27,5 +33,8 @@ namespace OpenBlood2
         ClientWorld world;
         ClientMovement movement;
         ClientCollisionWorld collision;
+
+      private:
+        std::unique_ptr<EffectRuntime> effect_runtime_;
     };
 } // namespace OpenBlood2

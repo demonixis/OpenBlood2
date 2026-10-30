@@ -37,7 +37,16 @@ namespace OpenBlood2
         return true;
     }
 
-    ServerAdapter::ServerAdapter(Objects& objects) : objects_(objects)
+    ServerAdapter::ServerAdapter(Objects& objects, OriginalEffects& effects)
+        : client_effects(effects), explosion_sprites(effects.explosion_sprites), sparks(effects.sparks),
+          lightning(effects.lightning), warp_gates(effects.warp_gates), blood_spurts(effects.blood_spurts),
+          blood_splats(effects.blood_splats), shotgun_effects(effects.shotgun_effects),
+          weapon_sprites(effects.weapon_sprites), explosion_models(effects.explosion_models),
+          laser_beams(effects.laser_beams), object_particles(effects.object_particles), polygrids(effects.polygrids),
+          particle_streams(effects.particle_streams), explosion_lights(effects.explosion_lights),
+          explosion_rings(effects.explosion_rings), explosion_flames(effects.explosion_flames),
+          flesh_gibs(effects.flesh_gibs), destruction_debris(effects.destruction_debris),
+          explosion_fragments(effects.explosion_fragments), light_effects(effects.light_effects), objects_(objects)
     {
         // Noncapturing thunks are checked against each declared callback type.
         GetClass = [](const char* name) -> HCLASS

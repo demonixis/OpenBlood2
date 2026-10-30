@@ -406,3 +406,18 @@ cosmetic RNGs are unchanged. Moving these runtimes to an independent remote clie
 requires a later event/service boundary; this delivery separates every scene consumer
 without claiming that additional migration. Server logical audio, solo pause,
 CMoveMgr single integration and saved payloads are unchanged.
+
+## Client effect ownership and collision queries
+
+The [runtime continuation](../implementation/reports/m9_effect_queries.md) owns
+original cosmetic pools through ClientSession in a separately linked library.
+The local server adapter retains publication/inspection aliases. Reset preserves
+source pool ordering, seeds and identity lifetime. This does not yet remove all
+legacy update services or provide remote event delivery.
+
+Original explosion fragments now query the independent collision replica at their
+existing update point. Retain SolidOrRayHit selection, source reflection/rest/fade
+arithmetic, terminal motion and trails. Publishing geometry must not advance any
+body, clock or RNG. Failed publication supplies unavailable queries, never a server
+fallback. Primary-only effect queries keep the original ray bound and texture-flag
+quirk; point-container queries retain first-overlap hidden/zero-code masking.

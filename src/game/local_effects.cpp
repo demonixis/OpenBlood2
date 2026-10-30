@@ -22,7 +22,7 @@ namespace OpenBlood2
         frame.world = game.client_session.world.frame().world;
         frame.sequence = client.frame().sequence + 1;
         frame.time = game.server.world_time();
-        const auto& server = game.server;
+        const auto& server = game.client_effects;
         const auto& flashlight = game.client_shell.flashlight;
         const auto* source = game.objects.get(flashlight.source);
         const auto* owner = game.objects.get(flashlight.owner);
@@ -278,7 +278,7 @@ namespace OpenBlood2
                 ++frame.shadow_lights_unshadowed;
             frame.lights.push_back({{position, color, radius}, flags});
         };
-        for (const auto& light : game.server.light_effects)
+        for (const auto& light : game.client_effects.light_effects)
             if (light.visible)
                 add(light.position, light.color, light.radius, light.settings.flags);
         auto explosion = [&](const CExplosionLightFX& light)
@@ -286,9 +286,9 @@ namespace OpenBlood2
             if ((light.flags & FLAG_VISIBLE) && !light.delay)
                 add(light.settings.position, light.color, light.radius);
         };
-        for (const auto& light : game.server.explosion_lights.active)
+        for (const auto& light : game.client_effects.explosion_lights.active)
             explosion(light);
-        for (const auto& bolt : game.server.lightning.active)
+        for (const auto& bolt : game.client_effects.lightning.active)
             for (const auto& light : bolt.lights)
                 explosion(light);
         // Presentation-only equivalent of the source's owned projectile OT_LIGHT child.
