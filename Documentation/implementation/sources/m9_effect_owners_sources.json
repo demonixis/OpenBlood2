@@ -1,0 +1,90 @@
+{
+  "scope": "M9 world-qualified owner descriptors and independent owner-bound FX updates",
+  "baseline": "9cadcc3a",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "9cadcc3a",
+      "path": "src/game/object_particles.cpp",
+      "sha256": "9c58a14be3bee5f89a51b373d3970b4bf5b013ccc7776cda68b08c59a21d5aa8"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "9cadcc3a",
+      "path": "src/game/particle_streams.cpp",
+      "sha256": "98452608147d12ff8252808ad3b449019c1367d31621164c94c838f8f5007377"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "9cadcc3a",
+      "path": "src/game/polygrids.cpp",
+      "sha256": "ca2b6c68402a4fd28136536b90dd9e59fe6566f09ca27234491ec5cca06cb12a"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "9cadcc3a",
+      "path": "src/game/warp_gates.cpp",
+      "sha256": "6464786d18495df39015444c573611db4c9f5e140d97fa8dd7033f9d0b52247e"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "9cadcc3a",
+      "path": "src/game/server_lights.cpp",
+      "sha256": "854267cf0377cb85f44b8042e11ccbe7498c953d72f206ae29ae6132a289e0d1"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "9cadcc3a",
+      "path": "src/game/server_effects.cpp",
+      "sha256": "a1c7b775451ecb20faebca4c72d9b9d4910025ccfbcadb0e2d27eef1daf5ba98"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "9cadcc3a",
+      "path": "src/game/client_replication.cpp",
+      "sha256": "b3a41f5b578414688d3cb5def2bca08bcb78642954080cccd413297b10780d99"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "9cadcc3a",
+      "path": "src/game/original/LightFX.cpp",
+      "sha256": "8c259862304808bfb93ad422f28dc0a0f53552a12a64b898265374146a1a4e03"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "9cadcc3a",
+      "path": "tests/player_fixture.h",
+      "sha256": "457225e96e6f7c294a4051ad63066700b6369039945f1f681922b4d387f146d8"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ParticleStreamFX.cpp",
+      "sha256": "3ee43cbf08fda7abc3697cd9b6b8811f3fed9bde7bd82cd3af5d3556007404c0"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/PolyGridFX.cpp",
+      "sha256": "d61ca839ab78861c585ed705694acf79b369f2339a1e210f83ab037794b35ea1"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/LightFX.cpp",
+      "sha256": "ad0e75b3f16882b0a1b4fb65ddbfe11b2d8bce0ea84a60bb0c362e936ed887e5"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/WarpGateFX.cpp",
+      "sha256": "02603a642887e10aa266625c63196915193ac9b4a46a07d9be1639e10a5abb7b"
+    }
+  ],
+  "adaptations": [
+    "Copy checked owner identity/pose/visibility/name at local creation boundary, preserving attachment refresh",
+    "Use ClientWorld for every owner-bound update; retain source equations and family update ordering",
+    "Publish object-only replica after authoritative frame completion when an effect needs it",
+    "Carry checked identities through restore rollback, validation, diagnostics and existing test fixtures"
+  ]
+}

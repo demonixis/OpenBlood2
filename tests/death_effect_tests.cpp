@@ -1,3 +1,4 @@
+#include "effect_owner_fixture.h"
 #include "engine/collision.h"
 #include "game/original/AI_Mgr.h"
 #include "game/original/Corpse.h"
@@ -50,7 +51,7 @@ namespace
     bool step(GameSession& g, double dt)
     {
         CHECK(g.server.advance_models(dt) && g.server.advance_physics(dt) && g.objects.advance(dt));
-        CHECK(g.server.object_particles.advance(g.objects.time(), g.server));
+        CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()));
         CHECK(g.server.flesh_gibs.advance(g.objects.time(), g.server));
         CHECK(g.advance_audio(dt, {}, {}));
         return true;
@@ -289,7 +290,7 @@ namespace
             CHECK(g.objects.remove(h) || !g.server.IsObjectAlive(h));
             CHECK(g.objects.finish_frame());
             CHECK(!g.server.IsObjectAlive(fire) && g.objects.attachments().empty());
-            CHECK(g.server.object_particles.advance(g.objects.time(), g.server) &&
+            CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()) &&
                   g.server.object_particles.active.empty());
             CHECK(g.advance_audio(.01, {}, {}));
             CHECK(g.unload_world() && g.server.audio.voices().empty());
@@ -321,8 +322,8 @@ namespace
                 CHECK(gib->surface == SURFTYPE_PLASTIC && (g.server.GetObjectUserFlags(r->handle) >> 24) == 90);
                 // PostPropRead replaces the authored HitPoints/ObjectMass and InitFlags.
                 CHECK(gib->damage.m_fHitPoints == 10 && gib->damage.m_fMass == 3);
-                CHECK((g.server.GetObjectFlags(r->handle) & (FLAG_VISIBLE | FLAG_RAYHIT | FLAG_GRAVITY |
-                                                            FLAG_TOUCH_NOTIFY)) ==
+                CHECK((g.server.GetObjectFlags(r->handle) &
+                       (FLAG_VISIBLE | FLAG_RAYHIT | FLAG_GRAVITY | FLAG_TOUCH_NOTIFY)) ==
                       (FLAG_VISIBLE | FLAG_RAYHIT | FLAG_GRAVITY | FLAG_TOUCH_NOTIFY));
                 DVector dims;
                 CHECK(g.server.GetObjectDims(r->handle, &dims) == DE_OK);

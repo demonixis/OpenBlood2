@@ -1,5 +1,6 @@
 #include "brush_fixture.h"
 #include "camera_fixture.h"
+#include "effect_owner_fixture.h"
 #include "flare_fixture.h"
 #include "game/original/CultistAI.h"
 #include "game/original/HandWeaponModel.h"
@@ -137,7 +138,8 @@ namespace
                   report.light_error.empty() && report.ring_error.empty() && !report.model_event &&
                   !report.flame_event && !report.fragment_event);
         CHECK(g.objects.remove(ph) && g.objects.remove(fh) && g.objects.finish_frame());
-        CHECK(g.server.object_particles.advance(.1, g.server) && g.server.object_particles.active.empty());
+        CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, .1) &&
+              g.server.object_particles.active.empty());
         CHECK(g.unload_world() && g.server.explosion_sprites.active.empty() && g.server.explosion_rings.active.empty());
         return true;
     }

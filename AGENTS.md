@@ -41,6 +41,11 @@ now owns original cosmetic pools through ClientSession and links them separately
 Fragment updates query the independent collision replica. Preserve source update
 order/arithmetic, primary-only ray quirks and pool reset/identity behavior; remaining
 owner-bound updates, child effects and cosmetic audio still need service extraction.
+The [owner-bound effect continuation](Documentation/implementation/reports/m9_effect_owners.md)
+now updates particles, streams, PolyGrids, WarpGates and CLightFX from ClientWorld.
+Keep world/object generation checks, creation-time attachment refresh, original
+visibility/emission rules and checked restore cleanup. Remaining moving FX and
+flashlight collision, cosmetic audio and child publications still need extraction.
 Preserve solo clocks, source pickup rules,
 immutable GPU references, existing PBR work and independent M2-GPU-001/M3 gates.
 

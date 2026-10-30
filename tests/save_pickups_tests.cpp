@@ -543,13 +543,15 @@ namespace
         CHECK(flare && flare->trail && flare->trail_error.empty());
         for (auto* p : {static_cast<CProjectile*>(fragment), static_cast<CProjectile*>(flare)})
             CHECK(std::count_if(h.server.object_particles.active.begin(), h.server.object_particles.active.end(),
-                                [&](const auto& fx) { return fx.owner == p->m_hObject; }) == 1);
+                                [&](const auto& fx)
+                                { return fx.owner == h.server.effect_reference(p->m_hObject); }) == 1);
         for (const char* name : {"CGrenade", "CNapalmProjectile", "CHowitzerAltFrag", "CEnergyBlastProjectile",
                                  "CGroundStrikeProjectile", "CShikariLoogieProjectile"})
         {
             auto* p = named<CProjectile>(h, name);
             CHECK(p && std::count_if(h.server.object_particles.active.begin(), h.server.object_particles.active.end(),
-                                     [&](const auto& fx) { return fx.owner == p->m_hObject; }) == 1);
+                                     [&](const auto& fx)
+                                     { return fx.owner == h.server.effect_reference(p->m_hObject); }) == 1);
         }
         GameSave again;
         CHECK(save(h, again));

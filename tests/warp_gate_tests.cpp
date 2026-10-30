@@ -1,4 +1,5 @@
 #include "app/sprite_scene.h"
+#include "effect_owner_fixture.h"
 #include "game/original/ClientWarpGateSFX.h"
 #include "game/world_validation.h"
 #include <cmath>
@@ -114,9 +115,10 @@ namespace
         CHECK(controller->on && !(g.server.GetObjectUserFlags(h) & 1u));
         CHECK(g.objects.advance(.51) && controller->event && controller->error.empty());
         CHECK(g.server.GetObjectUserFlags(h) & 1u);
-        CHECK(g.server.warp_gates.advance(1.01, g.server));
+        CHECK(test_effect_owner::advance(g, g.client_effects.warp_gates, 1.01));
         const auto id = controller->event;
-        CHECK(g.server.warp_gates.advance(1.51, g.server) && g.server.warp_gates.particle_count() == 20);
+        CHECK(test_effect_owner::advance(g, g.client_effects.warp_gates, 1.51) &&
+              g.server.warp_gates.particle_count() == 20);
         SpriteView scene;
         CHECK(update_sprite_scene(g, scene, error));
         CHECK(scene.entries.size() == 21);
@@ -134,7 +136,7 @@ namespace
         CHECK(second && g.objects.advance(1.1));
         CHECK(g.server.warp_gates.active.size() == 2);
         CHECK(g.objects.remove(h) && g.objects.finish_frame() &&
-              g.server.warp_gates.advance(g.objects.time(), g.server));
+              test_effect_owner::advance(g, g.client_effects.warp_gates, g.objects.time()));
         CHECK(g.server.warp_gates.active.size() == 1 && g.server.warp_gates.reports[0].ended);
         CHECK(g.unload_world() && g.server.warp_gates.active.empty() && g.server.warp_gates.reports.empty());
         auto bad =
@@ -183,7 +185,7 @@ namespace
             const double start = g.objects.time();
             for (unsigned step = 0; step < 90; ++step)
             {
-                const bool updated = g.server.warp_gates.advance(start + step / 60.0, g.server);
+                const bool updated = test_effect_owner::advance(g, g.client_effects.warp_gates, start + step / 60.0);
                 error = g.server.warp_gates.update_error;
                 CHECK(updated);
             }

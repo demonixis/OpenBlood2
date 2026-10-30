@@ -1,5 +1,6 @@
 #include "app/model_scene.h"
 #include "app/sprite_scene.h"
+#include "effect_owner_fixture.h"
 #include "engine/capture.h"
 #include "engine/runtime.h"
 #include "engine/world_renderer.h"
@@ -112,8 +113,8 @@ int main(int argc, char** argv)
         CHECK(game.objects.remove(h) && game.objects.finish_frame());
         SpriteView sprites;
         const auto now = game.objects.time();
-        CHECK(game.server.object_particles.advance(now, game.server) &&
-              game.server.object_particles.advance(now + .11, game.server));
+        CHECK(test_effect_owner::advance(game, game.client_effects.object_particles, now) &&
+              test_effect_owner::advance(game, game.client_effects.object_particles, now + .11));
         CHECK(update_sprite_scene(game, sprites, error));
         CHECK(sprites.entries.size() == 15);
         const auto* body = game.objects.get(corpse->m_hObject);
@@ -131,7 +132,7 @@ int main(int argc, char** argv)
             again == pixels);
         CHECK(capture.save((std::filesystem::path(argv[1]) / ("flame-" + std::to_string(cycle) + ".png")).c_str()));
         corpse->ClearBurn();
-        CHECK(game.server.object_particles.advance(now + .12, game.server));
+        CHECK(test_effect_owner::advance(game, game.client_effects.object_particles, now + .12));
         auto limb = CreateLimb(corpse->m_hObject, 1, {0, 0, 1}, error);
         CHECK(limb);
         ModelView models;
@@ -152,10 +153,10 @@ int main(int argc, char** argv)
         auto smoke = game.objects.create(game.objects.find_class("BaseClass"), smoke_state);
         CHECK(smoke);
         CHECK(game.server.PublishObjectParticles(smoke, 21, error));
-        CHECK(game.server.object_particles.advance(now + .13, game.server));
+        CHECK(test_effect_owner::advance(game, game.client_effects.object_particles, now + .13));
         smoke_state.m_Pos.x += 26;
         CHECK(game.server.TeleportObject(smoke, &smoke_state.m_Pos) == DE_OK);
-        CHECK(game.server.object_particles.advance(now + .24, game.server));
+        CHECK(test_effect_owner::advance(game, game.client_effects.object_particles, now + .24));
         CHECK(update_sprite_scene(game, sprites, error) && sprites.entries.size() == 9);
         CHECK(render(runtime, renderer, sprites.mesh, sprites.revision, sprites.draws, {26, 100, 25}, {}, capture,
                      pixels, error));

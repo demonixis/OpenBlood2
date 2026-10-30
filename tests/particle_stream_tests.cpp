@@ -387,12 +387,12 @@ namespace
                 }
             CHECK(drawn == streams.particle_count());
             for (auto& i : streams.active)
-                CHECK(trigger(g, i.owner, "OFF"));
+                CHECK(trigger(g, g.objects.get(i.owner.object)->handle, "OFF"));
             for (unsigned i = 0; i < 100; ++i)
                 CHECK(g.step(.05));
             CHECK(streams.particle_count() == 0 && streams.active.size() == 8);
             for (auto& i : streams.active)
-                CHECK(trigger(g, i.owner, "ON"));
+                CHECK(trigger(g, g.objects.get(i.owner.object)->handle, "ON"));
             CHECK(g.step(.2) && streams.particle_count() == 42); // includes shack smoke + third spark source.
             std::cout << "CityHub cycle " << cycle << ": " << created << " created / " << unknown << " unsupported / "
                       << failed << " failed / " << omitted << " omitted; 8 streams, peak " << peak

@@ -11,6 +11,7 @@
 #include "game/server_adapter.h"
 #include <map>
 #include <set>
+#include <tuple>
 
 namespace OpenBlood2
 {
@@ -259,8 +260,10 @@ namespace OpenBlood2
                     if (!image(frame))
                         return false;
         }
-        for (const auto& instance : game.server.particle_streams.active)
-            if (game.server.IsObjectAlive(instance.owner) && !image(instance.effect.texture))
+        for (const auto& instance : game.client_effects.particle_streams.active)
+            if (const auto* owner = game.objects.get(instance.owner.object);
+                instance.owner.world == game.client_effects.world && owner && owner->life == Life::Alive &&
+                !image(instance.effect.texture))
                 return false;
         // First-person models are client-owned, outside the server object table.
         for (const auto& weapon : game.client_shell.weapons)
@@ -300,9 +303,11 @@ namespace OpenBlood2
             }
         // PolyGrid: world PolyGrids are always-load, VolumeBrush surfaces are recreated by the
         // volume's Load (never saved), and each publishes exactly one surface.
-        std::map<HOBJECT, std::size_t> published;
+        const auto effect_key = [](ClientObjectId id)
+        { return std::tuple{id.world, id.object.slot, id.object.generation}; };
+        std::map<std::tuple<std::uint64_t, std::uint32_t, std::uint32_t>, std::size_t> published;
         for (const auto& instance : game.server.polygrids.active)
-            if (++published[instance.owner] > 1)
+            if (++published[effect_key(instance.owner)] > 1)
             {
                 error = "PolyGrid published twice";
                 return false;
@@ -327,7 +332,7 @@ namespace OpenBlood2
             const auto* grid = r && r->life == Life::Alive ? dynamic_cast<const PolyGrid*>(r->game.get()) : nullptr;
             if (!grid)
                 continue;
-            if (grid->effect && published[r->handle] != 1)
+            if (grid->effect && published[effect_key(game.server.effect_reference(r->handle))] != 1)
             {
                 error = "PolyGrid " + std::string(r->state.m_Name) + " lost its published surface";
                 return false;

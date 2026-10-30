@@ -2,6 +2,21 @@
 #include <cmath>
 namespace OpenBlood2
 {
+    ClientObjectId ServerAdapter::effect_reference(HOBJECT handle) const
+    {
+        const auto* object = objects_.get(handle);
+        return {client_effects.world, object ? object->id : ObjectId{}};
+    }
+    EffectOwner ServerAdapter::effect_owner(HOBJECT handle) const
+    {
+        const auto* object = objects_.get(handle);
+        if (!object || object->life != Life::Alive || !objects_.refresh_attachment(handle))
+            return {};
+        return {{client_effects.world, object->id},
+                {object->state.m_Pos, object->state.m_Rotation},
+                object->user_flags,
+                object->state.m_Name};
+    }
     std::uint64_t ServerAdapter::PublishWarpGate(HOBJECT owner, const WarpGateSettings& settings, std::string& error)
     {
         if (!trace_service("PublishWarpGate"))
@@ -11,7 +26,8 @@ namespace OpenBlood2
             error = "Warp resources unavailable";
             return 0;
         }
-        return warp_gates.publish(owner, settings, *this, *objects_.sprites, *client_resources, objects_.time(), error);
+        return warp_gates.publish(effect_owner(owner), settings, *objects_.sprites, *client_resources, objects_.time(),
+                                  error);
     }
     std::uint64_t ServerAdapter::PublishLightning(HOBJECT source, const LightningSettings& settings, std::string& error)
     {
@@ -111,7 +127,7 @@ namespace OpenBlood2
             error = "PolyGrid sprite store unavailable";
             return 0;
         }
-        auto id = polygrids.publish(owner, settings, *this, *objects_.sprites, objects_.time(), error);
+        auto id = polygrids.publish(effect_owner(owner), settings, *objects_.sprites, objects_.time(), error);
         if (!id)
             record_unavailable("PolyGrid: " + error);
         return id;
@@ -121,15 +137,15 @@ namespace OpenBlood2
     {
         if (!trace_service("PublishParticleStream"))
             return 0;
-        return particle_streams.publish(owner, settings, *this, client_resources, objects_.time(), error);
+        return particle_streams.publish(effect_owner(owner), settings, client_resources, objects_.time(), error);
     }
     std::uint64_t ServerAdapter::PublishObjectParticles(HOBJECT owner, unsigned type, std::string& error,
                                                         float lifetime_scale, DVector offset)
     {
         if (!trace_service("PublishObjectParticles"))
             return 0;
-        return object_particles.publish(owner, type, *this, client_resources, objects_.time(), error, lifetime_scale,
-                                        offset);
+        return object_particles.publish(effect_owner(owner), type, client_resources, objects_.time(), error,
+                                        lifetime_scale, offset);
     }
     std::uint64_t ServerAdapter::PublishLaserBeam(HOBJECT source, DVector from, DVector to, std::string& error,
                                                   DBYTE type)

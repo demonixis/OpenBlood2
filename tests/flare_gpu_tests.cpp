@@ -172,7 +172,8 @@ int main(int argc, char** argv)
             // This fixture bypasses ObjectParticles::publish, which normally assigns the identity.
             fx.id = recipe;
             const auto expected = vector_add(fx.origin, fx.particles.front().position);
-            game.server.object_particles.active.push_back({owner->m_hObject, std::move(fx)});
+            game.server.object_particles.active.push_back(
+                {game.server.effect_reference(owner->m_hObject), std::move(fx)});
             CHECK(update_sprite_scene(game, scene, error, &camera));
             // A moved source must not apply its displacement a second time in scene assembly.
             const auto draw = std::find_if(scene.draws.begin(), scene.draws.end(),

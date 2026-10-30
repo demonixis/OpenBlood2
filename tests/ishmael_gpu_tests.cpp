@@ -2,6 +2,7 @@
 #include "app/sprite_scene.h"
 #include "blood_spurt_fixture.h"
 #include "brush_fixture.h"
+#include "effect_owner_fixture.h"
 #include "engine/capture.h"
 #include "engine/runtime.h"
 #include "engine/world_renderer.h"
@@ -92,8 +93,8 @@ int main(int argc, char** argv)
     CHECK(owner);
     g.client_shell.view.position = {0, 75, -60};
     CHECK(g.server.PublishObjectParticles(owner, 18, error));
-    CHECK(g.objects.advance(.01) && g.server.object_particles.advance(g.objects.time(), g.server));
-    CHECK(g.objects.advance(.1) && g.server.object_particles.advance(g.objects.time(), g.server));
+    CHECK(g.objects.advance(.01) && test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()));
+    CHECK(g.objects.advance(.1) && test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()));
     CHECK(update_sprite_scene(g, scene, error));
     CHECK(render(runtime, renderer, model_renderer, models, scene, g.client_shell.view.position, {}, capture, pixels,
                  error));

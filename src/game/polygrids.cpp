@@ -1,25 +1,24 @@
 #include "polygrids.h"
-#include "server_de.h"
 #include <algorithm>
 using namespace OpenBlood2;
-std::uint64_t PolyGrids::publish(HOBJECT owner, const PolyGridSettings& s, ServerDE& server, SpriteStore& store,
-                                 double now, std::string& error)
+std::uint64_t PolyGrids::publish(const EffectOwner& owner, const PolyGridSettings& s, SpriteStore& store, double now,
+                                 std::string& error)
 {
     error.clear();
     PolyGridReport report;
     CPolyGridFX fx;
-    if (!server.IsObjectAlive(owner) || server.GetObjectPos(owner, &fx.pose.position) != DE_OK ||
-        server.GetObjectRotation(owner, &fx.pose.rotation) != DE_OK)
+    fx.pose = owner.pose;
+    if (!owner)
         error = "PolyGrid owner/pose unavailable";
     else if (active.size() >= 128 || next_id_ == UINT64_MAX ||
-             std::any_of(active.begin(), active.end(), [&](auto& i) { return i.owner == owner; }))
+             std::any_of(active.begin(), active.end(), [&](auto& i) { return i.owner == owner.id; }))
         error = "PolyGrid capacity exhausted or duplicate owner";
     else if (fx.Init(s, store, now, error))
     {
         report.id = fx.id = next_id_++;
-        report.source = server.GetObjectName(owner);
-        fx.visible = (server.GetObjectUserFlags(owner) & 1u) != 0;
-        active.push_back({owner, std::move(fx)});
+        report.source = owner.name;
+        fx.visible = (owner.user_flags & 1u) != 0;
+        active.push_back({owner.id, std::move(fx)});
         ++started;
     }
     if (!error.empty())
@@ -31,18 +30,19 @@ std::uint64_t PolyGrids::publish(HOBJECT owner, const PolyGridSettings& s, Serve
     reports.push_back(std::move(report));
     return id;
 }
-bool PolyGrids::advance(double now, ServerDE& server)
+bool PolyGrids::advance(double now, const ClientWorld& world)
 {
     bool ok = true;
     std::erase_if(active,
                   [&](auto& i)
                   {
                       auto& fx = i.effect;
-                      bool live = server.IsObjectAlive(i.owner);
-                      if (live && server.GetObjectPos(i.owner, &fx.pose.position) == DE_OK &&
-                          fx.Update(now, (server.GetObjectUserFlags(i.owner) & 1u) != 0, phases))
+                      const auto* owner = world.get(i.owner);
+                      if (owner)
+                          fx.pose.position = owner->pose.position;
+                      if (owner && fx.Update(now, (owner->user_flags & 1u) != 0, phases))
                           return false;
-                      if (live)
+                      if (owner)
                       {
                           ++failed;
                           ok = false;

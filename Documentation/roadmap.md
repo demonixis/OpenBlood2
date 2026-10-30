@@ -277,7 +277,9 @@ The [local effects presentation lot](implementation/reports/m9_client_effects.md
 feeds every scene-effect consumer, including lights/fog, from owned client snapshots;
 the [runtime continuation](implementation/reports/m9_effect_queries.md) now owns the
 original pools on the client and makes fragment collision updates independent.
-Remaining effect production/update services still use the immediate local adapter.
+[Owner-bound effects](implementation/reports/m9_effect_owners.md) now update from
+world-qualified ClientWorld identities and copied owner values. Remaining moving
+FX collision/audio, child publication and flashlight services still use the immediate local adapter.
 **Full client separation, player
 admission and network gameplay remain pending.**
 

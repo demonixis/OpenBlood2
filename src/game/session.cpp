@@ -905,7 +905,20 @@ namespace OpenBlood2
             ok = checked("server.damage_containers", server.damage_containers()) && ok;
         ok = checked("objects.finish_frame", objects.finish_frame()) && ok;
         ok = checked("objects.refresh_attachments", objects.refresh_attachments()) && ok;
-        ok = checked("server.advance_lights", server.advance_lights()) && ok;
+        // Owner-bound effects consume a stable object frame, never the authoritative registry.
+        std::string owner_error;
+        const bool need_owners =
+            !client_effects.light_effects.empty() ||
+            (client && (!client_effects.warp_gates.active.empty() || !client_effects.object_particles.active.empty() ||
+                        !client_effects.particle_streams.active.empty() || !client_effects.polygrids.active.empty()));
+        const bool owners_ready = !need_owners || publish_client_objects(owner_error);
+        if (!owners_ready)
+            trace.push_back(owner_error);
+        ok = checked("client effect owners", owners_ready) && ok;
+        if (owners_ready && !client_effects.advance_lights(server.GetTime(), client_session.world))
+            ok = checked("client.advance_lights",
+                         objects.fail(ObjectError::InvalidProperty, "Light update produced invalid state")) &&
+                 ok;
         if (!client)
         {
             server.trace_enabled = was_tracing;
@@ -933,7 +946,9 @@ namespace OpenBlood2
         server.shotgun_effects.advance(objects.time(), server);
         ok = checked("server.sparks.advance", server.sparks.advance(objects.time())) && ok;
         ok = checked("server.lightning.advance", server.lightning.advance(objects.time())) && ok;
-        ok = checked("server.warp_gates.advance", server.warp_gates.advance(objects.time(), server)) && ok;
+        ok = checked("client.warp_gates.advance",
+                     owners_ready && client_effects.warp_gates.advance(objects.time(), client_session.world)) &&
+             ok;
         ok = checked("server.blood_spurts.advance", server.blood_spurts.advance(objects.time(), server)) && ok;
         // Copy a stable collision scene once for the original fragment update. Failure
         // makes queries explicitly unavailable, never fall back to the live registry.
@@ -942,9 +957,15 @@ namespace OpenBlood2
         ok = checked("client.explosion_fragments.advance",
                      server.explosion_fragments.advance(objects.time(), fragment_queries)) &&
              ok;
-        ok = checked("server.object_particles.advance", server.object_particles.advance(objects.time(), server)) && ok;
-        ok = checked("server.particle_streams.advance", server.particle_streams.advance(objects.time(), server)) && ok;
-        ok = checked("server.polygrids.advance", server.polygrids.advance(objects.time(), server)) && ok;
+        ok = checked("client.object_particles.advance",
+                     owners_ready && client_effects.object_particles.advance(objects.time(), client_session.world)) &&
+             ok;
+        ok = checked("client.particle_streams.advance",
+                     owners_ready && client_effects.particle_streams.advance(objects.time(), client_session.world)) &&
+             ok;
+        ok = checked("client.polygrids.advance",
+                     owners_ready && client_effects.polygrids.advance(objects.time(), client_session.world)) &&
+             ok;
         if (ok && preview_model && preview_playing &&
             !advance_animation(*preview_model, preview_animation, seconds, preview_events, preview_error))
             preview_playing = false;

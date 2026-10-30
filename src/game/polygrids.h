@@ -1,11 +1,11 @@
 #pragma once
+#include "client/effect_owner.h"
 #include "game/original/PolyGridFX.h"
-class ServerDE;
 namespace OpenBlood2
 {
     struct PolyGridInstance
     {
-        HOBJECT owner = nullptr;
+        ClientObjectId owner;
         CPolyGridFX effect;
     };
     struct PolyGridReport
@@ -17,8 +17,8 @@ namespace OpenBlood2
     class PolyGrids
     {
       public:
-        std::uint64_t publish(HOBJECT, const PolyGridSettings&, ServerDE&, SpriteStore&, double, std::string&);
-        bool advance(double, ServerDE&);
+        std::uint64_t publish(const EffectOwner&, const PolyGridSettings&, SpriteStore&, double, std::string&);
+        bool advance(double, const ClientWorld&);
         void clear();
         std::vector<PolyGridInstance> active;
         std::vector<PolyGridReport> reports;

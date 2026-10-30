@@ -201,13 +201,14 @@ namespace
     // Every owner-bound publication counted per owner: a load must leave at most one each.
     bool no_duplicates(GameSession& g)
     {
-        std::map<HOBJECT, unsigned> lights, streams, gates;
+        std::map<std::tuple<std::uint64_t, std::uint32_t, std::uint32_t>, unsigned> lights, streams, gates;
+        auto key = [](ClientObjectId id) { return std::tuple{id.world, id.object.slot, id.object.generation}; };
         for (const auto& l : g.server.light_effects)
-            CHECK(++lights[l.source] == 1);
+            CHECK(++lights[key(l.source)] == 1);
         for (const auto& s : g.server.particle_streams.active)
-            CHECK(++streams[s.owner] == 1);
+            CHECK(++streams[key(s.owner)] == 1);
         for (const auto& w : g.server.warp_gates.active)
-            CHECK(++gates[w.owner] == 1);
+            CHECK(++gates[key(w.owner)] == 1);
         std::map<HOBJECT, unsigned> voices;
         for (const auto& [id, voice] : g.server.audio.voices())
             if (voice.owner && !voice.world_owned && get<SoundFX>(g, voice.owner))
@@ -579,7 +580,7 @@ namespace
                 CHECK(s && s->settings.on == on && s->published.on == published && s->effect);
                 CHECK(bool(b.server.GetObjectUserFlags(h) & 1u) == on && s->published.texture == "frame.dtx");
                 for (const auto& i : b.server.particle_streams.active)
-                    if (i.owner == h)
+                    if (i.owner == b.server.effect_reference(h))
                         CHECK(i.effect.state == (published ? 2u : 0u) && i.effect.settings.count == 3);
             }
             return true;
@@ -647,7 +648,8 @@ namespace
             const auto h = named(b, "gate");
             const auto* w = get<CClientWarpGateSFX>(b, h);
             CHECK(w && w->on && !w->first_update && w->republished == 1 && w->event);
-            CHECK(b.server.warp_gates.active.size() == 1 && b.server.warp_gates.active[0].owner == h);
+            CHECK(b.server.warp_gates.active.size() == 1 &&
+                  b.server.warp_gates.active[0].owner == b.server.effect_reference(h));
             CHECK(w->settings.ramp_up == 3 && w->settings.sprite.resource == "anim.spr");
             return true;
         };
@@ -899,7 +901,8 @@ namespace
                        streams = game->server.particle_streams.active.size();
             std::size_t gates = 0;
             for (const auto& w : game->server.warp_gates.active)
-                gates += game->server.IsObjectAlive(w.owner);
+                if (const auto* owner = game->objects.get(w.owner.object))
+                    gates += w.owner.world == game->client_effects.world && owner->life == Life::Alive;
             SaveObjectsReport saved;
             CHECK(game->server.save_objects(current, covered, 0, save_flags, saved));
             save = {game->world_path, {}, *game->server.save_store.find(SaveStoreSlot::Current)};

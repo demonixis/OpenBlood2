@@ -1,6 +1,7 @@
 #include "app/polygrid_scene.h"
 #include "blood_splat_fixture.h"
 #include "brush_fixture.h"
+#include "effect_owner_fixture.h"
 #include "engine/container.h"
 #include "game/original/PolyGrid.h"
 #include "game/original/VolumeBrush.h"
@@ -137,7 +138,11 @@ namespace
         auto& fx = g.server.polygrids.active[0].effect;
         CHECK(fx.pose.position.y == 4 && fx.settings.dims.y == 2 && near(fx.settings.pan[0], 1.2f) &&
               near(fx.settings.pan[1], 1.3f));
-        auto step = [&] { return g.objects.advance(.01) && g.server.polygrids.advance(g.objects.time(), g.server); };
+        auto step = [&]
+        {
+            return g.objects.advance(.01) &&
+                   test_effect_owner::advance(g, g.client_effects.polygrids, g.objects.time());
+        };
         CHECK(step());
         const auto fixed = fx.pose.position;
         CHECK(g.server.advance_physics(.1) && g.server.damage_containers());
@@ -151,7 +156,7 @@ namespace
         CHECK(g.objects.remove(child));
         PolyGridView scene;
         CHECK(update_polygrid_scene(g, scene, error) && scene.entries.empty());
-        CHECK(g.objects.finish_frame() && g.server.polygrids.advance(g.objects.time(), g.server) &&
+        CHECK(g.objects.finish_frame() && test_effect_owner::advance(g, g.client_effects.polygrids, g.objects.time()) &&
               g.server.polygrids.active.empty() && g.server.polygrids.expired == 1);
         auto raw = g.objects.create(g.objects.find_class("PolyGrid"), {});
         auto* grid = dynamic_cast<PolyGrid*>(g.server.HandleToObject(raw));

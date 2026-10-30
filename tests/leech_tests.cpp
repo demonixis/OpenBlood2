@@ -1,4 +1,5 @@
 #include "app/sprite_scene.h"
+#include "effect_owner_fixture.h"
 #include "game/original/LeechProjectile.h"
 #include "game/original/WeaponPickups.h"
 #include "game/original/spawn_object.h"
@@ -135,10 +136,10 @@ namespace
         const auto bend = vector_subtract(velocity, vector_scale(prime->m_vDir, prime->m_fVelocity));
         CHECK(near(std::sqrt(vector_dot(bend, bend)), prime->amplitude));
         CHECK(g.objects.advance(.006) && near(g.objects.get(h)->state.m_Scale.x, .2f));
-        CHECK(g.server.object_particles.advance(g.objects.time(), g.server));
+        CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()));
         CHECK(g.server.advance_projectiles(.03));
         CHECK(g.objects.advance(.03));
-        CHECK(g.server.object_particles.advance(g.objects.time(), g.server));
+        CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()));
         CHECK(g.server.object_particles.particle_count() > 0);
         const auto& trail = g.server.object_particles.active.front().effect;
         CHECK(trail.recipe == 3 && near(trail.min_life, .25f * prime->trail_scale));
@@ -156,7 +157,7 @@ namespace
         CHECK(effect.type == 16 && effect.sprite_event && effect.light_event && effect.sprite_error.empty() &&
               effect.light_error.empty());
         CHECK(g.server.explosion_sprites.active.size() == 2);
-        CHECK(g.server.object_particles.advance(g.objects.time(), g.server) &&
+        CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()) &&
               g.server.object_particles.active.empty());
         // Empty focus rejects a real shot before creating another projectile.
         inventory.SetAmmoCount(AMMO_FOCUS, 1);

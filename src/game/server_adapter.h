@@ -69,6 +69,8 @@ namespace OpenBlood2
         AudioTimeline audio;
         // Immediate local publisher/inspection aliases. The client owns these pools.
         OriginalEffects& client_effects;
+        ClientObjectId effect_reference(HOBJECT) const;
+        EffectOwner effect_owner(HOBJECT) const;
         SoundId PlayCharacterSound(HOBJECT, const SoundRequest&, bool retain, std::string&) override;
         SoundId PlayCinematicSound(HOBJECT, const SoundRequest&, std::string&) override;
         SoundId PlayLocalSound(HOBJECT, const OpenBlood2::SoundRequest&, std::string&) override;
@@ -258,7 +260,6 @@ namespace OpenBlood2
         bool PublishLightEffect(HOBJECT, const LightSettings&) override;
         void RemoveLightEffect(HOBJECT) override;
         const CLightFX* GetLightEffect(HOBJECT) const;
-        bool advance_lights();
         std::vector<CameraView> camera_effects;
         bool PublishCameraEffect(HOBJECT, const CameraSettings&) override;
         void RemoveCameraEffect(HOBJECT) override;
@@ -663,6 +664,7 @@ namespace OpenBlood2
         bool unload_world();
         // Immediate local delivery at the presentation boundary, also used by inspection.
         bool publish_client_world(std::string& error);
+        bool publish_client_objects(std::string& error);
         bool publish_client_audio(std::string& error);
         bool advance_audio(double, DVector, DRotation);
         std::string audio_replica_error;

@@ -1,5 +1,6 @@
 #include "app/model_scene.h"
 #include "app/sprite_scene.h"
+#include "effect_owner_fixture.h"
 #include "gideon_fixture.h"
 #include <cmath>
 #include <functional>
@@ -253,7 +254,7 @@ namespace
               test_gideon::Actor::final_extra == 1 && test_gideon::Actor::final_powerup == 1 &&
               t->damage.m_fHitPoints < 1000);
         CHECK(g.objects.finish_frame());
-        CHECK(g.server.object_particles.advance(.2, g.server));
+        CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, .2));
         CHECK(g.server.object_particles.active.empty());
         CHECK(g.unload_world() && g.server.string_count() == 0 && g.server.message_count() == 0);
         return true;

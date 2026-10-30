@@ -191,8 +191,8 @@ namespace OpenBlood2
         }
         for (const auto& instance : server.particle_streams.active)
         {
-            const auto* owner = game.objects.get(instance.owner);
-            if (!owner || owner->life != Life::Alive)
+            const auto* owner = game.client_session.world.get(instance.owner);
+            if (!owner)
                 continue;
             const auto& fx = instance.effect;
             if (fx.settings.system && !fx.system_visible)
@@ -235,8 +235,8 @@ namespace OpenBlood2
                   1, true);
         for (const auto& instance : server.polygrids.active)
         {
-            const auto* owner = game.objects.get(instance.owner);
-            if (!owner || owner->life != Life::Alive)
+            const auto* owner = game.client_session.world.get(instance.owner);
+            if (!owner)
                 continue;
             const auto& fx = instance.effect;
             EffectPolyGrid p;

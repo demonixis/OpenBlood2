@@ -1,11 +1,11 @@
 #pragma once
-#include "game/legacy/server_de.h"
+#include "client/effect_owner.h"
 #include "game/original/ObjectParticleFX.h"
 namespace OpenBlood2
 {
     struct ObjectParticleInstance
     {
-        HOBJECT owner = nullptr; // Opaque, non-owning; resolved before every update.
+        ClientObjectId owner;
         CObjectParticleFX effect;
     };
     struct ObjectParticleReport
@@ -17,9 +17,9 @@ namespace OpenBlood2
     class ObjectParticles
     {
       public:
-        std::uint64_t publish(HOBJECT, unsigned, ServerDE&, const Resources*, double, std::string&,
+        std::uint64_t publish(const EffectOwner&, unsigned, const Resources*, double, std::string&,
                               float lifetime_scale = 1, DVector offset = {});
-        bool advance(double, ServerDE&);
+        bool advance(double, const ClientWorld&);
         void clear();
         std::size_t particle_count() const;
         std::vector<ObjectParticleInstance> active;

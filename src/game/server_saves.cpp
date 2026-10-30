@@ -672,7 +672,11 @@ namespace OpenBlood2
             }
             // Owner-bound effects a removed record's Load published again (lot 10) go with it; the
             // clock below may move back past their publication.
-            auto gone = [this](HOBJECT owner) { return !IsObjectAlive(owner); };
+            auto gone = [this](ClientObjectId owner)
+            {
+                const auto* object = owner.world == client_effects.world ? objects_.get(owner.object) : nullptr;
+                return !object || object->life != Life::Alive;
+            };
             std::erase_if(light_effects, [&](const auto& l) { return gone(l.source); });
             std::erase_if(particle_streams.active, [&](const auto& s) { return gone(s.owner); });
             std::erase_if(warp_gates.active, [&](const auto& w) { return gone(w.owner); });

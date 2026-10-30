@@ -421,3 +421,19 @@ arithmetic, terminal motion and trails. Publishing geometry must not advance any
 body, clock or RNG. Failed publication supplies unavailable queries, never a server
 fallback. Primary-only effect queries keep the original ray bound and texture-flag
 quirk; point-container queries retain first-overlap hidden/zero-code masking.
+
+## Owner-bound client effects
+
+The [owner-bound continuation](../implementation/reports/m9_effect_owners.md)
+replaces retained server handles in object particles, streams, PolyGrids, WarpGates
+and CLightFX with world-qualified object identities. Creation receives a copied
+owner descriptor; the local publisher preserves attachment refresh. Updates use
+ClientWorld only, after stable object publication at the original effect phase.
+No callback, movement integration, RNG draw or sound advance belongs in publication.
+An old world or object generation must not bind to a replacement owner.
+
+Keep original pool order/budgets, PolyGrid position-only polling and hidden update
+gates, missing-owner removal, warp child/ramp rules and light phase/visibility.
+Restore rollback and duplicate-publication checks resolve the same identities.
+Moving cosmetic collision/audio and flashlight services remain a separate step;
+this boundary is not a network codec or late-join implementation.

@@ -24,7 +24,14 @@ namespace OpenBlood2
     class OriginalEffects final : public EffectRuntime
     {
       public:
+        void begin_world(std::uint64_t epoch) override
+        {
+            world = epoch;
+            reset_world();
+        }
         void reset_world() override;
+        bool advance_lights(float time, const ClientWorld&);
+        std::uint64_t world = 0;
         ExplosionSprites explosion_sprites;
         Sparks sparks;
         LightningBolts lightning;

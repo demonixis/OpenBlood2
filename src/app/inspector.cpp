@@ -2908,7 +2908,7 @@ namespace OpenBlood2
             const auto* child = game.objects.get(brush->surface_object);
             ImGui::Text("Independent PolyGrid: %s", child && child->life == Life::Alive ? "alive" : "absent/removed");
             for (const auto& i : game.server.polygrids.active)
-                if (i.owner == brush->surface_object)
+                if (i.owner == game.server.effect_reference(brush->surface_object))
                 {
                     const auto& fx = i.effect;
                     ImGui::Text("Grid %u x %u | %s | updates %llu", fx.width, fx.width,

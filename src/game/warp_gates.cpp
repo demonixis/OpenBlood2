@@ -11,25 +11,24 @@ namespace OpenBlood2
                 count += system.particles.size();
         return count;
     }
-    std::uint64_t WarpGates::publish(HOBJECT owner, const WarpGateSettings& settings, ServerDE& server,
-                                     SpriteStore& store, const Resources& resources, double now, std::string& error)
+    std::uint64_t WarpGates::publish(const EffectOwner& owner, const WarpGateSettings& settings, SpriteStore& store,
+                                     const Resources& resources, double now, std::string& error)
     {
         error.clear();
         WarpGateReport report;
         WarpGateInstance gate;
-        NodePose pose;
+        const auto& pose = owner.pose;
         if (!std::isfinite(now) || now < 0)
             error = "Invalid warp gate publication clock";
-        else if (!server.IsObjectAlive(owner) || server.GetObjectPos(owner, &pose.position) != DE_OK ||
-                 server.GetObjectRotation(owner, &pose.rotation) != DE_OK)
+        else if (!owner)
             error = "Warp owner pose unavailable";
         else if (active.size() >= 128 || next_id_ == UINT64_MAX)
             error = "Warp gate capacity exceeded";
         else if (valid_warp_gate(settings, error))
         {
             report.id = gate.id = next_id_++;
-            report.source = server.GetObjectName(owner);
-            gate.owner = owner;
+            report.source = owner.name;
+            gate.owner = owner.id;
             gate.sprite_ready = gate.sprite.CreateObject(settings, store, pose, now);
             if (!gate.sprite_ready)
                 error = "sprite: " + gate.sprite.error;
@@ -52,13 +51,13 @@ namespace OpenBlood2
         reports.push_back(std::move(report));
         return id;
     }
-    bool WarpGates::advance(double now, ServerDE& server)
+    bool WarpGates::advance(double now, const ClientWorld& world)
     {
         bool valid = true;
         std::erase_if(active,
                       [&](auto& gate)
                       {
-                          if (!server.IsObjectAlive(gate.owner))
+                          if (!world.get(gate.owner))
                           {
                               for (auto& report : reports)
                                   if (report.id == gate.id)
@@ -70,14 +69,14 @@ namespace OpenBlood2
                       });
         for (auto& gate : active)
         {
-            NodePose pose;
+            const auto* owner = world.get(gate.owner);
             std::string failure;
-            if (server.GetObjectPos(gate.owner, &pose.position) != DE_OK ||
-                server.GetObjectRotation(gate.owner, &pose.rotation) != DE_OK)
+            if (!owner)
                 failure = "Warp owner pose unavailable";
             else
             {
-                const bool on = (server.GetObjectUserFlags(gate.owner) & 1u) != 0;
+                const auto& pose = owner->pose;
+                const bool on = (owner->user_flags & 1u) != 0;
                 if (gate.sprite_ready && !gate.sprite.Update(now, pose, on))
                 {
                     failure = gate.sprite.error;

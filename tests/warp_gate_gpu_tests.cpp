@@ -1,5 +1,6 @@
 #include "app/sprite_scene.h"
 #include "blood_spurt_fixture.h"
+#include "effect_owner_fixture.h"
 #include "engine/capture.h"
 #include "engine/runtime.h"
 #include "engine/world_renderer.h"
@@ -90,11 +91,12 @@ int main(int argc, char** argv)
     settings.particles[0].gravity = -15;
     settings.particles[1].count = 0;
     settings.particles[1].resource = "SpriteTextures\\";
-    const auto event = g.server.warp_gates.publish(owner, settings, g.server, g.sprites, g.resources, 0, error);
+    const auto event =
+        g.client_effects.warp_gates.publish(g.server.effect_owner(owner), settings, g.sprites, g.resources, 0, error);
     CHECK(event && error.empty());
     g.server.SetObjectUserFlags(owner, 1);
     for (unsigned i = 0; i <= 90; ++i)
-        CHECK(g.server.warp_gates.advance(i / 60., g.server));
+        CHECK(test_effect_owner::advance(g, g.client_effects.warp_gates, i / 60.));
     CHECK(g.server.warp_gates.particle_count() >= 40 && update_sprite_scene(g, scene, error));
     for (const auto& e : scene.entries)
         CHECK(e.warp_gate == event && e.error.empty());
@@ -118,7 +120,8 @@ int main(int argc, char** argv)
     CHECK(capture.save((std::filesystem::path(argv[1]) / "warp-particles.png").c_str()));
     std::cout << "animated particle pixels=" << particle_pixels << '\n';
     CHECK(particle_pixels > 100);
-    CHECK(g.objects.remove(owner) && g.objects.finish_frame() && g.server.warp_gates.advance(2, g.server));
+    CHECK(g.objects.remove(owner) && g.objects.finish_frame() &&
+          test_effect_owner::advance(g, g.client_effects.warp_gates, 2));
     CHECK(update_sprite_scene(g, scene, error) && scene.entries.empty());
     CHECK(render(runtime, renderer, scene, g.client_shell.view.position, {}, capture, pixels, error));
     for (unsigned i = 0; i < pixels.size(); i += 4)

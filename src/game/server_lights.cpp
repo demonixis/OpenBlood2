@@ -18,12 +18,14 @@ namespace OpenBlood2
     {
         if (!trace_service("PublishLightEffect"))
             return false;
+        const auto reference = effect_reference(h);
         if (!IsObjectAlive(h) || !dynamic_cast<ClientLightFX*>(objects_.get(h)->game.get()) ||
             light_effects.size() >= 4096 ||
-            std::any_of(light_effects.begin(), light_effects.end(), [h](const auto& l) { return l.source == h; }))
+            std::any_of(light_effects.begin(), light_effects.end(),
+                        [reference](const auto& l) { return l.source == reference; }))
             return objects_.fail(ObjectError::Unsupported, "Invalid/duplicate light source or light limit exceeded");
         CLightFX effect;
-        if (!effect.Init(h, settings, GetTime(), objects_.get(h)->state.m_Pos))
+        if (!effect.Init(reference, settings, GetTime(), objects_.get(h)->state.m_Pos))
             return objects_.fail(ObjectError::InvalidProperty, "Invalid light descriptor/pose");
         light_effects.push_back(std::move(effect));
         return true;
@@ -32,7 +34,8 @@ namespace OpenBlood2
     {
         if (!trace_service("RemoveLightEffect"))
             return;
-        std::erase_if(light_effects, [h](const auto& l) { return l.source == h; });
+        const auto reference = effect_reference(h);
+        std::erase_if(light_effects, [reference](const auto& l) { return l.source == reference; });
     }
     const CLightFX* ServerAdapter::GetLightEffect(HOBJECT h) const
     {
@@ -40,19 +43,8 @@ namespace OpenBlood2
         if (!r || r->life != Life::Alive)
             return nullptr;
         for (const auto& l : light_effects)
-            if (l.source == h)
+            if (l.source == effect_reference(h))
                 return &l;
         return nullptr;
-    }
-    bool ServerAdapter::advance_lights()
-    {
-        std::erase_if(light_effects, [this](const auto& l) { return !IsObjectAlive(l.source); });
-        for (auto& l : light_effects)
-        {
-            const auto* r = objects_.get(l.source);
-            if (!l.Update(GetTime(), r->state.m_Pos, (r->user_flags & 1) != 0))
-                return objects_.fail(ObjectError::InvalidProperty, "Light update produced invalid state");
-        }
-        return true;
     }
 } // namespace OpenBlood2

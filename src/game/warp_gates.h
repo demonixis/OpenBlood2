@@ -1,12 +1,12 @@
 #pragma once
-#include "game/legacy/server_de.h"
+#include "client/effect_owner.h"
 #include "game/original/WarpGateFX.h"
 namespace OpenBlood2
 {
     struct WarpGateInstance
     {
         std::uint64_t id = 0;
-        HOBJECT owner = nullptr;
+        ClientObjectId owner;
         CWarpGateSpriteFX sprite;
         std::array<CWarpGateParticleFX, 2> particles;
         bool sprite_ready = false;
@@ -21,9 +21,9 @@ namespace OpenBlood2
     class WarpGates
     {
       public:
-        std::uint64_t publish(HOBJECT, const WarpGateSettings&, ServerDE&, SpriteStore&, const Resources&, double,
+        std::uint64_t publish(const EffectOwner&, const WarpGateSettings&, SpriteStore&, const Resources&, double,
                               std::string&);
-        bool advance(double, ServerDE&);
+        bool advance(double, const ClientWorld&);
         void clear();
         std::size_t particle_count() const;
         std::vector<WarpGateInstance> active;

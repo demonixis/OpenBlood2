@@ -1,5 +1,6 @@
 #include "app/sprite_scene.h"
 #include "blood_spurt_fixture.h"
+#include "effect_owner_fixture.h"
 #include "engine/capture.h"
 #include "engine/runtime.h"
 #include "engine/world_renderer.h"
@@ -85,10 +86,10 @@ int main(int argc, char** argv)
     auto* prime = dynamic_cast<CVomitProjectile*>(g.server.HandleToObject(h));
     CHECK(prime && prime->Setup({1, 0, 0}, 43, 25, 2000, 0, owner));
     CHECK(g.objects.advance(.02));
-    CHECK(g.server.object_particles.advance(g.objects.time(), g.server));
+    CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()));
     DVector to{50, 0, 0};
     CHECK(g.server.TeleportObject(h, &to) == DE_OK && g.objects.advance(.03));
-    CHECK(g.server.object_particles.advance(g.objects.time(), g.server));
+    CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()));
     CHECK(g.server.object_particles.particle_count() > 10);
     CHECK(update_sprite_scene(g, scene, error));
     for (const auto& entry : scene.entries)
@@ -104,7 +105,7 @@ int main(int argc, char** argv)
     CHECK(lit > 100);
     prime->m_bExplode = true;
     CHECK(g.objects.advance(.002) && !g.server.IsObjectAlive(h));
-    CHECK(g.server.object_particles.advance(g.objects.time(), g.server));
+    CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()));
     CHECK(update_sprite_scene(g, scene, error));
     CHECK(render(runtime, renderer, scene, g.client_shell.view.position, {}, capture, pixels, error));
     CHECK(capture.save((std::filesystem::path(argv[1]) / "vomit-expired.png").c_str()));

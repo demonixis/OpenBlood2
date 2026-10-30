@@ -1,4 +1,5 @@
 #include "app/sprite_scene.h"
+#include "effect_owner_fixture.h"
 #include "game/original/AI_Mgr.h"
 #include "game/original/CampaignProjectiles.h"
 #include "game/original/CampaignWeapons.h"
@@ -181,8 +182,8 @@ namespace
         CHECK(wall && g.server.SetObjectDims(wall, &extents) == DE_OK);
         const float blocked_hp = p->m_damage.m_fHitPoints;
         CHECK(a->m_InventoryMgr.FireCurrentWeapon(fire) == FireResult::Fired);
-        CHECK(!weapon->immobilize_target && weapon->immobilize_deliveries == 1 &&
-              !p->m_bImprisoned && p->m_damage.m_fHitPoints == blocked_hp);
+        CHECK(!weapon->immobilize_target && weapon->immobilize_deliveries == 1 && !p->m_bImprisoned &&
+              p->m_damage.m_fHitPoints == blocked_hp);
         CHECK(!g.server.message_count());
         CHECK(g.unload_world());
         return true;
@@ -199,7 +200,7 @@ namespace
         CHECK(projectile && projectile->Setup({1, 0, 0}, 43, 25, 2000, 0, p->m_hObject));
         CHECK(g.objects.advance(10) && g.server.IsObjectAlive(h));
         CHECK(g.objects.advance(.002) && !g.server.IsObjectAlive(h));
-        CHECK(g.server.object_particles.advance(g.objects.time(), g.server) &&
+        CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()) &&
               g.server.object_particles.active.empty());
         CHECK(g.server.explosion_models.active.empty() && g.server.explosion_sprites.active.empty());
         auto* resources = g.server.client_resources;
@@ -242,10 +243,10 @@ namespace
         CHECK(g.objects.get(h)->state.m_Scale.x == 0);
         CHECK(g.objects.advance(.01));
         CHECK(g.objects.get(h)->state.m_Scale.x == .25f);
-        CHECK(g.server.object_particles.advance(g.objects.time(), g.server));
+        CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()));
         CHECK(projectile->AdvanceFlight(.02));
         CHECK(g.objects.advance(.03));
-        CHECK(g.server.object_particles.advance(g.objects.time(), g.server) &&
+        CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()) &&
               g.server.object_particles.particle_count() > 0);
         SpriteView scene;
         std::string error;
@@ -256,7 +257,7 @@ namespace
         CHECK(projectile->AdvanceFlight(.1) && projectile->m_bExplode);
         CHECK(g.objects.advance(.002) && !g.objects.get(h) && p->m_damage.m_fHitPoints < hp);
         CHECK(g.server.explosion_models.active.empty() && g.server.explosion_rings.active.empty());
-        CHECK(g.server.object_particles.advance(g.objects.time(), g.server) &&
+        CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()) &&
               g.server.object_particles.active.empty());
         CHECK(g.unload_world() && !g.server.message_count());
         return true;

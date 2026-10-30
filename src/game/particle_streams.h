@@ -1,11 +1,11 @@
 #pragma once
+#include "client/effect_owner.h"
 #include "game/original/ParticleStreamFX.h"
-class ServerDE;
 namespace OpenBlood2
 {
     struct ParticleStreamInstance
     {
-        HOBJECT owner = nullptr;
+        ClientObjectId owner;
         CParticleStreamFX effect;
     };
     struct ParticleStreamReport
@@ -17,9 +17,9 @@ namespace OpenBlood2
     class ParticleStreams
     {
       public:
-        std::uint64_t publish(HOBJECT, const ParticleStreamSettings&, ServerDE&, const Resources*, double,
+        std::uint64_t publish(const EffectOwner&, const ParticleStreamSettings&, const Resources*, double,
                               std::string&);
-        bool advance(double, ServerDE&);
+        bool advance(double, const ClientWorld&);
         void clear();
         std::size_t particle_count() const;
         std::vector<ParticleStreamInstance> active;

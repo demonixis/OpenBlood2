@@ -4,20 +4,19 @@
 #include <cmath>
 namespace OpenBlood2
 {
-    std::uint64_t ObjectParticles::publish(HOBJECT owner, unsigned recipe, ServerDE& server, const Resources* resources,
+    std::uint64_t ObjectParticles::publish(const EffectOwner& owner, unsigned recipe, const Resources* resources,
                                            double now, std::string& error, float lifetime_scale, DVector offset)
     {
         error.clear();
         ObjectParticleReport report;
         report.recipe = recipe;
-        NodePose pose;
-        if (!server.IsObjectAlive(owner))
+        const auto& pose = owner.pose;
+        if (!owner)
             error = "Object particle owner unavailable";
         else
         {
-            report.source = server.GetObjectName(owner);
-            if (!resources || server.GetObjectPos(owner, &pose.position) != DE_OK ||
-                server.GetObjectRotation(owner, &pose.rotation) != DE_OK)
+            report.source = owner.name;
+            if (!resources)
                 error = "Object particle resources/pose unavailable";
             else if (!physics_vector(offset) || ((offset.x || offset.y || offset.z) && recipe != 37 && recipe != 38))
                 error = "Unsupported object particle offset";
@@ -44,7 +43,7 @@ namespace OpenBlood2
                 if (error.empty() && fx.CreateObject(*resources, pose, now, error))
                 {
                     report.id = fx.id = next_id_++;
-                    active.push_back({owner, std::move(fx)});
+                    active.push_back({owner.id, std::move(fx)});
                     ++started;
                 }
             }
@@ -65,7 +64,7 @@ namespace OpenBlood2
             count += instance.effect.particles.size();
         return count;
     }
-    bool ObjectParticles::advance(double now, ServerDE& server)
+    bool ObjectParticles::advance(double now, const ClientWorld& world)
     {
         bool valid = true;
         std::size_t total = particle_count();
@@ -74,21 +73,15 @@ namespace OpenBlood2
                       {
                           auto& fx = instance.effect;
                           const auto previous = fx.particles.size();
-                          const bool live = server.IsObjectAlive(instance.owner);
-                          NodePose pose;
-                          const bool pose_ok =
-                              !live || (server.GetObjectPos(instance.owner, &pose.position) == DE_OK &&
-                                        server.GetObjectRotation(instance.owner, &pose.rotation) == DE_OK);
+                          const auto* owner = world.get(instance.owner);
                           const auto others = total - previous;
                           const std::size_t budget = others <= 8192 ? std::min<std::size_t>(2048, 8192 - others) : 0;
-                          if (pose_ok && fx.Update(now, live ? &pose : nullptr, random_, budget))
+                          if (fx.Update(now, owner ? &owner->pose : nullptr, random_, budget))
                           {
                               total = others + fx.particles.size();
                               return false;
                           }
                           total = others;
-                          if (!pose_ok)
-                              fx.error = "Object particle owner pose unavailable";
                           if (fx.error.empty())
                               ++expired;
                           else

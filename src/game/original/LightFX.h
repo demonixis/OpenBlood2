@@ -1,12 +1,13 @@
 #pragma once
+#include "client/world.h"
 #include "game/light_messages.h"
 // Selected original client CLightFX: real evaluated state, no generic SFX/packet ABI.
 class CLightFX
 {
   public:
-    bool Init(HOBJECT, const OpenBlood2::LightSettings&, float time, DVector position);
+    bool Init(OpenBlood2::ClientObjectId, const OpenBlood2::LightSettings&, float time, DVector position);
     bool Update(float time, DVector position, bool on);
-    HOBJECT source = nullptr;
+    OpenBlood2::ClientObjectId source;
     OpenBlood2::LightSettings settings;
     DVector position{}, color{};
     float radius = 0, off_start_time = 0;

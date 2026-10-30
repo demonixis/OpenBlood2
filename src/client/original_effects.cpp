@@ -1,6 +1,18 @@
 #include "client/original_effects.h"
+#include <algorithm>
 namespace OpenBlood2
 {
+    bool OriginalEffects::advance_lights(float time, const ClientWorld& replica)
+    {
+        std::erase_if(light_effects, [&](const auto& light) { return !replica.get(light.source); });
+        for (auto& light : light_effects)
+        {
+            const auto& owner = *replica.get(light.source);
+            if (!light.Update(time, owner.pose.position, (owner.user_flags & 1u) != 0))
+                return false;
+        }
+        return true;
+    }
     void OriginalEffects::reset_world()
     {
         explosion_sprites.clear();

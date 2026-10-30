@@ -2,6 +2,7 @@
 #include "app/sprite_scene.h"
 #include "blood_spurt_fixture.h"
 #include "brush_fixture.h"
+#include "effect_owner_fixture.h"
 #include "engine/capture.h"
 #include "engine/runtime.h"
 #include "engine/world_renderer.h"
@@ -100,10 +101,10 @@ int main(int argc, char** argv)
     auto* prime = dynamic_cast<COrbProjectile*>(g.server.HandleToObject(h));
     CHECK(prime && prime->Setup({1, 0, 0}, 15, 12, 500, 0, owner));
     CHECK(g.objects.advance(.02));
-    CHECK(g.server.object_particles.advance(g.objects.time(), g.server));
+    CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()));
     DVector to{15, 100, 0};
     CHECK(g.server.TeleportObject(h, &to) == DE_OK && g.objects.advance(.03));
-    CHECK(g.server.object_particles.advance(g.objects.time(), g.server));
+    CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()));
     CHECK(g.server.object_particles.particle_count() > 10);
     CHECK(update_model_scene(g, models, error) && update_sprite_scene(g, scene, error));
     for (const auto& entry : scene.entries)
@@ -120,7 +121,7 @@ int main(int argc, char** argv)
     CHECK(lit > 100);
     prime->m_bExplode = true;
     CHECK(g.objects.advance(.002) && !g.server.IsObjectAlive(h));
-    CHECK(g.server.object_particles.advance(g.objects.time(), g.server));
+    CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()));
     CHECK(g.server.explosion_fragments.advance(g.objects.time(), g.server));
     CHECK(g.objects.advance(.03));
     CHECK(g.server.explosion_fragments.advance(g.objects.time(), g.server));

@@ -4,7 +4,7 @@
 
 namespace OpenBlood2
 {
-    bool GameSession::publish_client_world(std::string& error)
+    bool GameSession::publish_client_objects(std::string& error)
     {
         if (objects.busy())
         {
@@ -81,11 +81,20 @@ namespace OpenBlood2
         frame.orb = identity(client_shell.orb_view);
         const auto* owner = server_shell.Player(local_client);
         frame.player_alive = owner && !owner->m_damage.IsDead();
+        auto effect_identity = [&](ClientObjectId reference)
+        {
+            const auto* object = reference.world == frame.world ? objects.get(reference.object) : nullptr;
+            return object && object->life == Life::Alive ? object->id : ObjectId{};
+        };
         for (const auto& fx : server.polygrids.active)
-            frame.polygrids.push_back({fx.effect.id, identity(fx.owner)});
+            frame.polygrids.push_back({fx.effect.id, effect_identity(fx.owner)});
         for (const auto& fx : server.particle_streams.active)
-            frame.particle_streams.push_back({fx.effect.id, identity(fx.owner)});
-        if (!client_session.receive(std::move(frame), error))
+            frame.particle_streams.push_back({fx.effect.id, effect_identity(fx.owner)});
+        return client_session.receive(std::move(frame), error);
+    }
+    bool GameSession::publish_client_world(std::string& error)
+    {
+        if (!publish_client_objects(error))
             return false;
         if (!local_effects.publish(*this, client_session.effects, effects_replica_error))
         {

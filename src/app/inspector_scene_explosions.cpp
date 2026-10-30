@@ -144,7 +144,9 @@ namespace OpenBlood2
             for (const auto& instance : streams.active)
             {
                 const auto& fx = instance.effect;
-                const auto* owner = game.objects.get(instance.owner);
+                const auto* owner = instance.owner.world == game.client_effects.world
+                                        ? game.objects.get(instance.owner.object)
+                                        : nullptr;
                 ImGui::PushID((int)fx.id);
                 if (ImGui::TreeNode("Stream", "%s / stream %llu / state %u",
                                     owner ? owner->state.m_Name : "removed owner", (unsigned long long)fx.id, fx.state))
@@ -326,7 +328,7 @@ namespace OpenBlood2
                 if (!ImGui::TreeNode((void*)(uintptr_t)fx.id, "%llu / recipe %u", (unsigned long long)fx.id, fx.recipe))
                     continue;
                 ImGui::Text("Owner %s | updates %llu | bursts %llu | live %zu / emitted %llu",
-                            game.server.IsObjectAlive(instance.owner) ? "alive" : "removed",
+                            game.client_session.world.get(instance.owner) ? "alive" : "removed",
                             (unsigned long long)fx.updates, (unsigned long long)fx.bursts, fx.particles.size(),
                             (unsigned long long)fx.emitted);
                 ImGui::Text("Time %.3f / %.3f | alpha %.3f (authored %.3f) | ramp %s %.3f",

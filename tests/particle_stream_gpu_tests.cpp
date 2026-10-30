@@ -141,7 +141,7 @@ int main(int argc, char** argv)
             std::cout << "CityHub stream GPU cycle " << cycle << ": " << quads << " actual particle quads, " << ink
                       << " covered pixels\n";
             for (const auto& i : streams.active)
-                CHECK(g.objects.remove(i.owner));
+                CHECK(g.objects.remove(g.objects.get(i.owner.object)->handle));
             CHECK(g.step(.02) && streams.active.empty());
             CHECK(update_sprite_scene(g, scene, error));
             for (auto& e : scene.entries)

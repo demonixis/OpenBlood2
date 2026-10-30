@@ -158,9 +158,9 @@ namespace OpenBlood2
         return std::isfinite(output);
     }
 } // namespace OpenBlood2
-bool CLightFX::Init(HOBJECT object, const LightSettings& value, float time, DVector pos)
+bool CLightFX::Init(ClientObjectId object, const LightSettings& value, float time, DVector pos)
 {
-    if (!object || !valid_light_settings(value) || !std::isfinite(time) || !physics_vector(pos))
+    if (!object.world || !object.object || !valid_light_settings(value) || !std::isfinite(time) || !physics_vector(pos))
         return false;
     source = object;
     settings = value;
