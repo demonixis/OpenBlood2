@@ -13,6 +13,7 @@
 | [Architecture](architecture.md) | Targets, ownership and engine/game boundaries. |
 | [Client cameras and HUD](implementation/reports/m9_client_view.md) | M9 independent camera selection/rays, client HUD ownership and local verification. |
 | [Client audio](implementation/reports/m9_client_audio.md) | M9 logical server voices, independent client playback and local verification. |
+| [Bloodbath player profiles](implementation/reports/m9_player_profiles.md) | Original skins, entry ammo and private startup announcement; fresh internal entry only. |
 | [Server player connections](implementation/reports/m9_player_connections.md) | 16 checked connections, private ownership and original Bloodbath marker selection; wire admission pending. |
 | [Client flashlight replica](implementation/reports/m9_flashlight.md) | Copied poses, generation-safe lifetime and independent client rays; unchanged battery rules. |
 | [Moving client effect services](implementation/reports/m9_effect_services.md) | Independent moving FX, copied collision queries and typed child/audio outputs. |

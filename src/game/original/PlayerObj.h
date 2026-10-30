@@ -194,6 +194,8 @@ class CPlayerObj : public CBaseCharacter
     bool entry_start_fallback = false, entry_start_multiplayer = false;
     bool SetCharacter(DBYTE);
     bool OnSinglePlayerInit(const OpenBlood2::PlayerInit&);
+    bool OnMultiplayerInit(const OpenBlood2::PlayerInit&);
+    void SetMultiplayerAmmo();
     void ValidateAttributes();
     FireResult HandleWeaponFireMessage(const OpenBlood2::WeaponFire&);
     bool HandlePlayerPositionMessage(const OpenBlood2::PlayerMove&);
@@ -320,6 +322,7 @@ class CPlayerObj : public CBaseCharacter
 
   private:
     friend class AI_Mgr;
+    bool InitializeProfile(const OpenBlood2::PlayerInit&, bool multiplayer);
     DLink m_CabalLink{}, m_MonsterLink{};
     OpenBlood2::PlayerStats last_sent_stats_{-1, -1, -1};
     std::optional<OpenBlood2::InventoryItems> last_sent_items_;

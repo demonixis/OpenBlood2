@@ -12,6 +12,7 @@ namespace OpenBlood2
     {
         // Separate candidate sessions (save/NEW_LEVEL) must never reuse a world's identity.
         movement = {};
+        announcer = {};
         time = 0;
         static std::atomic<std::uint64_t> next{1};
         const auto epoch = next.fetch_add(1, std::memory_order_relaxed);

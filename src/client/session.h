@@ -1,4 +1,5 @@
 #pragma once
+#include "client/announcer.h"
 #include "client/audio.h"
 #include "client/camera.h"
 #include "client/effect_runtime.h"
@@ -27,6 +28,7 @@ namespace OpenBlood2
         }
         float time = 0; // Immediate local clock publication, separate from world-relative time.
         ClientAudio audio;
+        ClientAnnouncer announcer;
         ClientEffects effects;
         ClientCamera camera;
         ClientHud hud;

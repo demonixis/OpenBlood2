@@ -83,6 +83,11 @@ class CInventoryMgr : public Aggregate
     float MaxAmmo(DBYTE) const;
     // Original SetFullAmmo (InventoryMgr.cpp:1276) and HasWeapon (InventoryMgr.cpp:1197).
     void SetFullAmmo();
+    void SetInfiniteAmmo(bool infinite)
+    {
+        m_bInfiniteAmmo = infinite;
+        SetFullAmmo(); // Original setter fills ordinary ammo and inventory bombs.
+    }
     bool HasWeapon(DBYTE type) const;
     void SetStrength(DBYTE);
     void SetMagic(DBYTE);

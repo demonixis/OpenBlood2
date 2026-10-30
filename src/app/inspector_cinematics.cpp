@@ -50,6 +50,11 @@ namespace OpenBlood2
                            "These are inspected requests, not successful services.");
         if (!comm.error.empty())
             ImGui::TextWrapped("Conversation audio: %s", comm.error.c_str());
+        const auto& announcer = game.client_session.announcer;
+        ImGui::Text("Multiplayer announcer: %llu messages / %llu original fallback texts",
+                    (unsigned long long)announcer.messages, (unsigned long long)announcer.fallback_texts);
+        if (!announcer.error.empty())
+            ImGui::TextWrapped("Announcer resources: %s", announcer.error.c_str());
         for (auto id : game.objects.snapshot())
         {
             const auto* record = game.objects.get(id);

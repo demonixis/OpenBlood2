@@ -181,7 +181,7 @@ bool CBloodServerShell::RespawnPlayer(CPlayerObj* player, HCLIENT client)
     if (server_.SetClientUserData(client, player->m_hObject) != DE_OK ||
         server_.SendToClient(client, OpenBlood2::PlayerInitRequest{}) != DE_OK)
         return false;
-    // Fresh single-player only: no saved client refs, team selection or restore.
+    // Fresh entry only: no saved client refs, team selection or restore here.
     if (!player->GoToStartPoint(nullptr, inspection_start))
         return false;
     server_.SetGameConVar("GAME_GOTOSTARTPOINT", "1");
@@ -247,7 +247,7 @@ void CBloodServerShell::OnClientExitWorld(HCLIENT client)
 bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerInit& init)
 {
     auto* player = Player(client);
-    return player && player->OnSinglePlayerInit(init);
+    return player && (server_.IsMultiplayerGame() ? player->OnMultiplayerInit(init) : player->OnSinglePlayerInit(init));
 }
 FireResult CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::WeaponFire& fire)
 {
@@ -545,6 +545,15 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     ++messages;
     if (std::holds_alternative<OpenBlood2::PlayerInitRequest>(event))
         return InitSinglePlayer(server);
+    if (const auto* value = std::get_if<OpenBlood2::BloodbathStart>(&event))
+    {
+        // Original SMSG_THEVOICE goes straight to CommLink, without the separate
+        // StopAll used by conversation-trigger messages. Playback remains in the
+        // existing CommLink service until its client-audio bridge is extracted.
+        if (server_.IsMultiplayerGame())
+            communication.Start(server_, client_view_.announcer.bloodbath(*value, resources_), false);
+        return true;
+    }
     if (const auto* value = std::get_if<OpenBlood2::MusicCommand>(&event))
     {
         music.HandleMusicMessage(*value, music_catalog_, audio_);

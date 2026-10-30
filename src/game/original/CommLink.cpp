@@ -7,10 +7,10 @@ void CCommLink::Reset(ServerDE& server)
         server.KillSound(voice);
     *this = {};
 }
-bool CCommLink::Start(ServerDE& server, const OpenBlood2::Conversation& value)
+bool CCommLink::Start(ServerDE& server, const OpenBlood2::Conversation& value, bool shell_stopped_voice)
 {
     ++received;
-    ++voice_manager_requests; // Original shell StopAll executes before Start, including a busy refusal.
+    voice_manager_requests += shell_stopped_voice; // Conversation shell StopAll, including a busy refusal.
     if (level)
     {
         ++busy;

@@ -4,7 +4,8 @@
 namespace OpenBlood2
 {
     // PlayerObj::gCharacterValues and BloodClientShell::SetCharacter.
-    // Default skins only; animation-driven body dimensions remain authoritative.
+    // Solo defaults; the retail multiplayer skin table is separate below.
+    // Animation-driven body dimensions remain authoritative.
     struct CharacterProfile
     {
         const char* model;
@@ -27,6 +28,26 @@ namespace OpenBlood2
     inline const CharacterProfile* character_profile(unsigned character)
     {
         return character < character_profiles.size() ? &character_profiles[character] : nullptr;
+    }
+    // Original PlayerObj::gCharacterSkins. The first entry stays the default solo skin.
+    inline constexpr std::array<std::array<const char*, 7>, 4> character_skins{
+        {{{"Skins\\Characters\\Caleb1.dtx", "Skins\\Characters\\CalMULTI_R.dtx", "Skins\\Characters\\CalMULTI_B.dtx",
+           "Skins\\Characters\\CalMULTI_G.dtx", "Skins\\Characters\\CalMULTI_Y.dtx", "Skins\\Characters\\CalTEAM_B.dtx",
+           "Skins\\Characters\\CalTEAM_R.dtx"}},
+         {{"Skins\\Characters\\Ophelia.dtx", "Skins\\Characters\\OphMULTI_R.dtx", "Skins\\Characters\\OphMULTI_B.dtx",
+           "Skins\\Characters\\OphMULTI_G.dtx", "Skins\\Characters\\OphMULTI_Y.dtx", "Skins\\Characters\\OphTEAM_B.dtx",
+           "Skins\\Characters\\OphTEAM_R.dtx"}},
+         {{"Skins\\Characters\\Ishmael.dtx", "Skins\\Characters\\IshMULTI_R.dtx", "Skins\\Characters\\IshMULTI_B.dtx",
+           "Skins\\Characters\\IshMULTI_G.dtx", "Skins\\Characters\\IshMULTI_Y.dtx", "Skins\\Characters\\IshTEAM_B.dtx",
+           "Skins\\Characters\\IshTEAM_R.dtx"}},
+         {{"Skins\\Characters\\Gabriella.dtx", "Skins\\Characters\\GabMULTI_R.dtx", "Skins\\Characters\\GabMULTI_B.dtx",
+           "Skins\\Characters\\GabMULTI_G.dtx", "Skins\\Characters\\GabMULTI_Y.dtx", "Skins\\Characters\\GabTEAM_B.dtx",
+           "Skins\\Characters\\GabTEAM_R.dtx"}}}};
+    inline const char* character_skin(unsigned character, unsigned skin)
+    {
+        return character < character_skins.size() && skin < character_skins[character].size()
+                   ? character_skins[character][skin]
+                   : nullptr;
     }
     inline bool select_character(unsigned character, PlayerInit& output)
     {

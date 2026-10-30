@@ -520,3 +520,35 @@ The original solo named/fallback selection and explicit inspection override stay
 unchanged. Team filtering, original multiplayer initialization and death/respawn
 are subsequent steps; the dedicated transport still refuses game admission.
 See [connection verification](../implementation/reports/m9_player_connections.md).
+
+## Fresh Bloodbath player profiles
+
+The shell now dispatches Bloodbath profile initialization to the original
+multiplayer entry branch, sharing the established profile/weapon/reset body with
+solo. Four characters and their seven original skin paths are admitted; selected
+body and physics descriptors agree. Invalid character/skin/name values, duplicate
+init and non-player/non-retail loadout types fail before allocation or a random
+draw. Valid attributes retain the existing source clamp and 12-point limit.
+The original weapon acquisition, dual-hand request and slot-1 selection order stay.
+The absent-B2C fallback in the reference client contains weapons 1 through 9;
+the current solo PlayerInit default deliberately remains a single Beretta.
+
+`SetMultiplayerAmmo` supplies None (empty), Half (25 bullets/4 shells), Normal
+(50 bullets/8 shells/5 BMG/20 batteries/5 spray/10 flares/10 fuel), Double
+(twice those quantities plus 5 Howitzer) or Insane (original infinite-ammo setter
+and full inventory, including bombs). It reads the same fixed match ammo level
+as the already ported pickups. Solo still clears ammo and grants 50 bullets.
+
+Before shared valid profile initialization, the source draws one 0..65535 index
+and sends VOICE_START_BB only to the joining client. The typed BloodbathStart
+message carries this index; the client resolves index modulo eight using the
+original Voice248..255 files, portrait 4 and external cres.dll strings 4001..4008,
+with the original English fallback texts and explicit resource diagnostics.
+No extra client random draw or server playback is introduced by table selection.
+Delivery uses the existing CommLink path; its local server/audio bridge, like
+VoiceMgr, still needs extraction before remote gameplay.
+
+This is fresh Bloodbath entry only. Team assignment/forced skins, configurable
+healing, dead respawn/slow death and the delayed spawn voice are subsequent lots.
+Team/CTF profile requests are explicitly refused meanwhile. Wire admission stays
+closed. See [profile verification](../implementation/reports/m9_player_profiles.md).

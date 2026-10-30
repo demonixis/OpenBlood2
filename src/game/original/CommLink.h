@@ -15,6 +15,6 @@ class CCommLink
     bool play_voice = false;
     std::string portrait, error;
     void Reset(ServerDE&);
-    bool Start(ServerDE&, const OpenBlood2::Conversation&);
+    bool Start(ServerDE&, const OpenBlood2::Conversation&, bool shell_stopped_voice = true);
     void Update(ServerDE&, HOBJECT player, CVoiceMgr&);
 };

@@ -122,12 +122,13 @@ DBOOL CPlayerObj::InitialUpdate(int reason)
 bool CPlayerObj::SetCharacter(DBYTE character)
 {
     const auto* profile = OpenBlood2::character_profile(character);
-    if (!profile || m_nSkin != 0)
+    const auto* skin = OpenBlood2::character_skin(character, m_nSkin);
+    if (!profile || !skin || (!network_game_type(GetServerDE()->net_game_type) && m_nSkin != 0))
     {
-        entry_error = "Only the four default Chosen profiles are supported";
+        entry_error = "Player character/skin is unavailable in this mode";
         return false;
     }
-    if (GetServerDE()->SetModelFilenames(m_hObject, profile->model, profile->skin) != DE_OK)
+    if (GetServerDE()->SetModelFilenames(m_hObject, profile->model, skin) != DE_OK)
     {
         entry_error = "Player model could not be loaded";
         return false;
@@ -143,7 +144,8 @@ bool CPlayerObj::Respawn()
 {
     auto* server = GetServerDE();
     // Preserve the original single-player dead-player gate. This operation is
-    // an entry reset, not a replacement for loading a save after death.
+    // an entry reset, not a replacement for loading a save after death. The
+    // multiplayer dead/slow-death respawn branches remain a separate port.
     if (m_damage.IsDead())
     {
         entry_error = "A dead single-player character requires save restoration";
@@ -176,12 +178,49 @@ bool CPlayerObj::Respawn()
     eye_level = crouched ? 12.0f : OpenBlood2::character_profiles[m_nCharacter].eye;
     m_fAirLevel = 100;
     containers = {};
-    for (DBYTE i = 1; i <= 12; ++i)
-        m_InventoryMgr.SetAmmoCount(i, 0);
-    m_InventoryMgr.SetAmmoCount(1, 50);
+    if (network_game_type(server->net_game_type))
+        SetMultiplayerAmmo();
+    else
+    {
+        for (DBYTE i = 1; i <= 12; ++i)
+            m_InventoryMgr.SetAmmoCount(i, 0);
+        m_InventoryMgr.SetAmmoCount(1, 50);
+    }
     ClearRemoteBombs();
     ++respawns;
     return UpdateClientPhysics() && TeleportClientToServerPos();
+}
+void CPlayerObj::SetMultiplayerAmmo()
+{
+    // PlayerObj.cpp:6194. Rules are fixed for the match; preserve the source's
+    // infinite-ammo setter and its refusal to overwrite ammo once enabled.
+    for (DBYTE i = AMMO_BULLET; i <= AMMO_TIMEBOMB; ++i)
+        m_InventoryMgr.SetAmmoCount(i, 0);
+    using OpenBlood2::PickupLevel;
+    const auto level = GetServerDE()->multiplayer_pickups.ammo.level;
+    if (level == PickupLevel::None)
+        return;
+    if (level == PickupLevel::Insane)
+    {
+        m_InventoryMgr.SetInfiniteAmmo(true);
+        return;
+    }
+    if (level == PickupLevel::Half)
+    {
+        m_InventoryMgr.SetAmmoCount(AMMO_BULLET, 25);
+        m_InventoryMgr.SetAmmoCount(AMMO_SHELL, 4);
+        return;
+    }
+    const float factor = level == PickupLevel::Double ? 2.f : 1.f;
+    m_InventoryMgr.SetAmmoCount(AMMO_BULLET, 50 * factor);
+    m_InventoryMgr.SetAmmoCount(AMMO_SHELL, 8 * factor);
+    m_InventoryMgr.SetAmmoCount(AMMO_BMG, 5 * factor);
+    m_InventoryMgr.SetAmmoCount(AMMO_BATTERY, 20 * factor);
+    m_InventoryMgr.SetAmmoCount(AMMO_DIEBUGDIE, 5 * factor);
+    m_InventoryMgr.SetAmmoCount(AMMO_FLARE, 10 * factor);
+    m_InventoryMgr.SetAmmoCount(AMMO_FUEL, 10 * factor);
+    if (level == PickupLevel::Double)
+        m_InventoryMgr.SetAmmoCount(AMMO_HOWITZER, 5);
 }
 void CPlayerObj::ValidateAttributes()
 {
@@ -207,13 +246,35 @@ void CPlayerObj::ValidateAttributes()
 }
 bool CPlayerObj::OnSinglePlayerInit(const OpenBlood2::PlayerInit& init)
 {
+    return !GetServerDE()->IsMultiplayerGame() && InitializeProfile(init, false);
+}
+bool CPlayerObj::OnMultiplayerInit(const OpenBlood2::PlayerInit& init)
+{
+    // Team assignment/forced team skin and regeneration settings arrive with
+    // the match-rule lot. Do not silently treat those modes as Bloodbath.
+    return GetServerDE()->net_game_type == GAMETYPE_BLOODBATH && InitializeProfile(init, true);
+}
+bool CPlayerObj::InitializeProfile(const OpenBlood2::PlayerInit& init, bool multiplayer)
+{
     if (restore_initialization || attributes_received || !m_hClient || init.name.size() > 100 ||
-        init.name.find('\0') != std::string::npos || !OpenBlood2::character_profile(init.character) || init.skin != 0)
+        init.name.find('\0') != std::string::npos || !OpenBlood2::character_profile(init.character) ||
+        !OpenBlood2::character_skin(init.character, init.skin) || (!multiplayer && init.skin != 0))
         return false;
     // Reject unsupported loadouts before allocating strings or weapons.
     for (auto type : init.weapons)
-        if (type && !weapon_definition(type & ~DUAL_HAND_MASK))
+        if (type &&
+            (!weapon_definition(type & ~DUAL_HAND_MASK) || (multiplayer && (type & ~DUAL_HAND_MASK) > WEAP_MELEE)))
             return false;
+    if (multiplayer)
+    {
+        // Original CMSG_MULTIPLAYER_INIT emits this before shared profile init.
+        // The source flags are male/male, but all eight entry lines match them.
+        int index = 0;
+        if (!GetServerDE()->RandomInt(0, 0xffff, index) ||
+            GetServerDE()->SendToClient(m_hClient, OpenBlood2::BloodbathStart{static_cast<std::uint16_t>(index)}) !=
+                DE_OK)
+            return false;
+    }
     m_hstrPlayerName = GetServerDE()->CreateString(init.name.c_str());
     if (!m_hstrPlayerName)
         return false;
@@ -378,7 +439,10 @@ bool CPlayerObj::UpdateClientPhysics()
     if (!profile)
         return false;
     physics.model = profile->model;
-    physics.skin = profile->skin;
+    const auto* skin = OpenBlood2::character_skin(m_nCharacter, m_nSkin);
+    if (!skin)
+        return false;
+    physics.skin = skin;
     auto* server = GetServerDE();
     if (server->GetObjectDims(m_hObject, &physics.dimensions) != DE_OK ||
         server->GetGlobalForce(&physics.gravity) != DE_OK)

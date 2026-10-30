@@ -22,6 +22,11 @@ namespace OpenBlood2
         DBYTE strength = 5, speed = 3, resistance = 3, magic = 1;
         std::array<DBYTE, 9> weapons{1}; // Original fresh single-player Beretta slot.
     };
+    // Original SMSG_THEVOICE / VOICE_START_BB. Only the joining client receives it.
+    struct BloodbathStart
+    {
+        std::uint16_t index = 0; // Server draw; client chooses index % 8, without another draw.
+    };
     struct PlayerRotation
     {
         float pitch = 0, yaw = 0;
@@ -217,8 +222,9 @@ namespace OpenBlood2
         std::string next_world; // Empty represents the source null HSTRING.
         WorldExitType type = WorldExitType::World;
     };
-    using PlayerEvent = std::variant<PlayerInitRequest, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
-                                     MissionObjectives, WorldExit, BossHealth, Conversation, InventoryAction,
-                                     ScreenFade, VoiceEvent, VoiceStop, PlayerDead, MusicCommand, ZoomView,
-                                     SeeingEyeView, CreatureAttach, OrbView, CTFEvent, InventoryItems, PlayerText>;
+    using PlayerEvent =
+        std::variant<PlayerInitRequest, BloodbathStart, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
+                     MissionObjectives, WorldExit, BossHealth, Conversation, InventoryAction, ScreenFade, VoiceEvent,
+                     VoiceStop, PlayerDead, MusicCommand, ZoomView, SeeingEyeView, CreatureAttach, OrbView, CTFEvent,
+                     InventoryItems, PlayerText>;
 } // namespace OpenBlood2

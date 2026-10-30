@@ -1,0 +1,69 @@
+{
+  "scope": "Fresh Bloodbath profiles, retail skins, ammo rules and addressed entry announcement",
+  "baseline": "d2a64d52",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "d2a64d52",
+      "path": "src/game/original/PlayerObj.cpp",
+      "sha256": "5475edfa381cc851a2ffbc53600b0bb90b2e48a0555ee1971885eb3be4eefe0f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "d2a64d52",
+      "path": "src/game/original/InventoryMgr.h",
+      "sha256": "de43a2a87f5f47971c35c8ec9a4b1327c16b330e1107453a5bb85fd0a8220eb0"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "d2a64d52",
+      "path": "src/game/original/CommLink.cpp",
+      "sha256": "340960656c94a2fe8e458bd4b893ea6dc9eb9831835e6a407ab162328a4fcc0d"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "d2a64d52",
+      "path": "src/app/cinematic_smoke.cpp",
+      "sha256": "e37b54a1388c9ec2006824f673b0b41cd430ed7178f6654943ca49cb73401c96"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/InventoryMgr.h",
+      "sha256": "a68853cfddeedae13bbf1203bc8bc791c57fbf82829771203ecdc8ffe51e0226"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/TheVoice.cpp",
+      "sha256": "19edb2b6de85f48687d57b1edd1de4c7d30d312fffe7b729aea586f0ff0c6659"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/TheVoice.h",
+      "sha256": "50b8adc368420d7276a6e45a60988cff351c3ca2a52775228529ad7a27bb6975"
+    }
+  ],
+  "adaptations": [
+    "Shared existing single-player profile initializer keeps its original solo restrictions. Multiplayer profile dispatch initially permits Bloodbath only.",
+    "Reject malformed names/character/skin IDs, duplicate init and non-retail-player weapon types before allocation or entry announcement. Valid initialization preserves its original one server draw before weapons/respawn.",
+    "Retain the seven skin paths for each of the four retail characters and advertise the selected skin in PlayerPhysics.",
+    "Port SetMultiplayerAmmo and SetInfiniteAmmo; default/none/half/double/insane match original values and bomb behavior.",
+    "BloodbathStart carries the original index only; all start-BB entries match the original male/male flags. Client table uses external localized text with original fallback lines.",
+    "Existing CommLink service still supplies playback; extraction from the local audio bridge remains pending. No new server rule depends on announcement playback.",
+    "Dead respawn, delayed spawn voice, Team/CTF init, regeneration settings, B2C UI and wire admission remain subsequent lots."
+  ]
+}
