@@ -37,6 +37,10 @@ entry. Single Player saves and loads the original slots; F5 quicksaves, F6
 quickloads. Use `release` for an optimized build without the
 inspector, `debug` for debugging. See [setup and controls](Documentation/getting_started.md).
 
+The ongoing [M9 network work](Documentation/implementation/reports/m9_network_frontend.md)
+adds `--host multi/bb_crypt` and `--connect HOST:27888` for graphical admission and
+movement. Combat and remote audio/effects are still being connected.
+
 ## CI builds
 
 [GitHub Actions](https://github.com/demonixis/OpenBlood2/actions/workflows/ci.yml)

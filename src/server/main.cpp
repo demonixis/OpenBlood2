@@ -33,7 +33,7 @@ int main(int argc, char** argv)
         const std::string_view arg = argv[i];
         if (arg == "--help")
         {
-            std::cout << "OpenBlood2 dedicated server (M9: Bloodbath world replication; movement/combat pending)\n"
+            std::cout << "OpenBlood2 dedicated server (M9: Bloodbath world replication; movement enabled; combat pending)\n"
                       << "  --data-dir PATH  External retail installation (or BLOOD2_DATA_DIR)\n"
                       << "  --world NAME     Retail multi/bb_* or multi/ctf_* map\n"
                       << "  --mode MODE      bloodbath, team, ctf\n"
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
     std::signal(SIGTERM, stop);
     std::cout << "Server simulation: " << session.game().world_path << ", UDP " << network.port() << ", data "
               << digest_text(session.fingerprint())
-              << "\nBloodbath admission and 20 Hz world replication enabled; movement/combat are pending.\n"
+              << "\nBloodbath admission and 20 Hz world replication enabled; movement enabled; combat pending.\n"
               << std::flush;
     ServerClock clock;
     auto previous = std::chrono::steady_clock::now();

@@ -57,7 +57,7 @@ namespace OpenBlood2
         initial_.reset();
         phase_ = Phase::Active;
         deadline_ = now + 15s;
-        remainder_ = 0;
+        input_ = {};
         return true;
     }
     bool NetworkClient::receive(const Net::Event& event, Clock::time_point now, std::string& error)
@@ -239,17 +239,16 @@ namespace OpenBlood2
         }
         if (phase_ == Phase::Active && movement_.ready())
         {
-            constexpr double step = 1. / 60;
-            const auto total = remainder_ + std::min(elapsed, 86400.);
-            const auto due = std::uint64_t(std::floor(total / step + 1e-9));
-            const auto count = std::min<std::uint64_t>(due, 6);
-            discarded_ticks += due - count;
-            remainder_ = std::max(0., total - double(due) * step);
+            unsigned count = 0;
+            MovementInput sampled;
+            if (!input_.advance(elapsed, input, commands, count, sampled))
+                return fail(error, "Invalid client tick/input sample");
+            discarded_ticks = input_.discarded_ticks();
             for (std::uint64_t i = 0; i < count; ++i)
             {
                 std::optional<Net::MovementReport> report;
-                if (!movement_.update(input, yaw_, pitch_, step, commands, false, bool(camera_.camera().view.object),
-                                      report, error))
+                if (!movement_.update(sampled, yaw_, pitch_, NetworkInput::step, commands, false,
+                                      bool(camera_.camera().view.object), report, error))
                     return fail(error, "Client prediction failed");
                 if (report)
                 {
@@ -270,7 +269,7 @@ namespace OpenBlood2
                 return fail(error, "Client camera failed");
         }
         else
-            remainder_ = 0;
+            input_ = {};
         transport_.flush();
         return true;
     }

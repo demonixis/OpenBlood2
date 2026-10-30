@@ -320,6 +320,8 @@ view selection and server movement/look gates without client-selected permission
 without GameSession, including client weapon visuals and checked GPU world ownership.
 [NetworkClient](implementation/reports/m9_network_client.md) now integrates admission, replication,
 CMoveMgr, private HUD and camera under a bounded, server-independent endpoint and mapped clock.
+[Graphical connection/host](implementation/reports/m9_network_frontend.md) now displays that endpoint
+with the existing renderer/HUD and controls; a host owns one server and a loopback client.
 **Remaining private presentation consumers/commands, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client

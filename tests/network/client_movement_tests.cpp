@@ -1,4 +1,5 @@
 #include "../brush_fixture.h"
+#include "client/network_input.h"
 #include "client/network_movement.h"
 #include "game/original/MoveMgr.h"
 #include <cmath>
@@ -283,6 +284,54 @@ namespace
         CHECK(f.client.receive(ack, f.error) == Reception::Applied && !f.client.replays);
         return true;
     }
+    bool render_frame_input()
+    {
+        Fixture sixty, fast, catchup;
+        CHECK(sixty.setup() && fast.setup() && catchup.setup());
+        NetworkInput a, b, c;
+        const auto frames = [](Fixture& f, NetworkInput& clock, unsigned count, double seconds, float offset)
+        {
+            for (unsigned frame = 0; frame < count; ++frame)
+            {
+                MovementInput input;
+                input.mouse_move = true;
+                input.mouse_forward = offset;
+                input.mouse_strafe = offset * .5f;
+                MovementInput sample;
+                unsigned ticks = 0;
+                CHECK(clock.advance(seconds, input, true, ticks, sample));
+                for (unsigned tick = 0; tick < ticks; ++tick)
+                {
+                    std::optional<Net::MovementReport> report;
+                    CHECK(f.step(report, sample));
+                }
+            }
+            return true;
+        };
+        CHECK(frames(sixty, a, 60, 1. / 60, .25f));
+        CHECK(frames(fast, b, 240, 1. / 240, .0625f));
+        CHECK(frames(catchup, c, 20, 1. / 20, .75f));
+        CHECK(equal(sixty.client, fast.client) && equal(sixty.client, catchup.client));
+        CHECK(sixty.client.manager().substeps == 120 && sixty.client.movement().predictions == 120);
+        CHECK(sixty.client.movement().body.position.z > 1);
+        NetworkInput gate;
+        MovementInput input, sample;
+        input.mouse_move = true;
+        input.mouse_forward = 4;
+        unsigned ticks = 99;
+        CHECK(gate.advance(1. / 240, input, true, ticks, sample) && !ticks);
+        CHECK(gate.advance(1. / 240, {}, false, ticks, sample) && !ticks);
+        CHECK(gate.advance(1. / 120, {}, true, ticks, sample) && ticks == 1 && !sample.mouse_forward);
+        CHECK(gate.advance(1. / 240, input, true, ticks, sample));
+        CHECK(gate.advance(1. / 80, {}, true, ticks, sample) && ticks == 1 && !sample.mouse_forward);
+        input.mouse_forward = std::numeric_limits<float>::quiet_NaN();
+        CHECK(!gate.advance(1, input, true, ticks, sample));
+        input.mouse_forward = 60;
+        CHECK(gate.advance(1, input, true, ticks, sample) && ticks == 6 && sample.mouse_forward == 1);
+        CHECK(gate.discarded_ticks() == 54);
+        CHECK(gate.advance(1. / 60, {}, true, ticks, sample) && ticks == 1 && !sample.mouse_forward);
+        return true;
+    }
     bool bounded_history()
     {
         Fixture f;
@@ -309,7 +358,7 @@ namespace
 int main()
 {
     if (!immediate() || !forces_and_stances() || !failures_and_ordering() || !immediate_obstruction() ||
-        !bounded_history())
+        !bounded_history() || !render_frame_input())
         return 1;
     for (auto code : {CC_NOTHING, CC_WATER, CC_LADDER, CC_CONVEYOR})
         if (!delayed(code))

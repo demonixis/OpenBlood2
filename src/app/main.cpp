@@ -1,3 +1,4 @@
+#include "app/network_frontend.h"
 #include "ai_model_key_smoke.h"
 #include "app/bench.h"
 #include "app/control_actions.h"
@@ -1850,6 +1851,10 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --containers-smoke  GPU liquid/air inspection; pass --world 02_CityHub\n"
                      "  --movement-smoke    GPU SDL movement, jump/landing, hidden simulation and reload\n"
                      "  --skeleton-smoke    Same lifecycle with original animation/node inspection\n"
+                     "  --host WORLD        Host a retail Bloodbath world\n"
+                     "  --connect HOST[:PORT] Join an IPv4 server\n"
+                     "  --port N            UDP port (27888 by default)\n"
+                     "  --name NAME         Multiplayer player name\n"
                      "  --help              Show this help\n";
         return 0;
     }
@@ -1871,7 +1876,7 @@ static int application_main(const OpenBlood2::Options& options)
         // An ordinary launch without data opens the setup screen; tools and smokes need data.
         const bool tool = options.check_data || options.inspect_world || options.start_game || options.bench ||
                           options.gpu_smoke || options.world_smoke || options.menu_smoke || options.demo_smoke ||
-                          options.view_world;
+                          options.view_world || !options.host_world.empty() || !options.connect_address.empty();
         if (unconfigured && !tool)
         {
 #if !BLOOD2_XR
@@ -1978,6 +1983,8 @@ static int application_main(const OpenBlood2::Options& options)
             return 5;
         return 0;
     }
+    if (!options.host_world.empty() || !options.connect_address.empty())
+        return OpenBlood2::run_network_frontend(options, config);
     if (!options.gpu_smoke && !options.world_smoke)
         return OpenBlood2::run_frontend(options, config);
     return run(options, config, data);

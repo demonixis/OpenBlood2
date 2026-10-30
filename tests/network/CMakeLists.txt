@@ -367,3 +367,21 @@ if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME network.client_endpoint COMMAND network_client_endpoint_tests "${BLOOD2_TEST_DATA_DIR}")
     set_tests_properties(network.client_endpoint PROPERTIES LABELS "headless;network;private-data" TIMEOUT 45)
 endif()
+
+add_executable(network_address_tests address_tests.cpp)
+target_link_libraries(network_address_tests PRIVATE blood2_net)
+blood2_project_options(network_address_tests)
+add_test(NAME network.address COMMAND network_address_tests)
+set_tests_properties(network.address PROPERTIES LABELS "headless;network" TIMEOUT 30)
+
+if(BLOOD2_TEST_DATA_DIR AND BLOOD2_BUILD_CLIENT AND BLOOD2_BUILD_SERVER AND BLOOD2_GPU_TESTS)
+    add_executable(network_frontend_process_tests frontend_process_tests.cpp)
+    target_link_libraries(network_frontend_process_tests PRIVATE SDL3::SDL3)
+    blood2_project_options(network_frontend_process_tests)
+    foreach(mode IN ITEMS dedicated host shutdown)
+        add_test(NAME gpu.network_${mode} COMMAND network_frontend_process_tests "$<TARGET_FILE:blood2_app>"
+            "$<TARGET_FILE:blood2_server>" "${BLOOD2_TEST_DATA_DIR}" "${CMAKE_CURRENT_BINARY_DIR}" ${mode})
+        set_tests_properties(gpu.network_${mode} PROPERTIES LABELS "gpu;network;private-data;process" TIMEOUT 120 RUN_SERIAL TRUE
+            ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+    endforeach()
+endif()

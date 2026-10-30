@@ -1,6 +1,7 @@
 #pragma once
 #include "client/network_camera.h"
 #include "client/network_clock.h"
+#include "client/network_input.h"
 #include "client/network_movement.h"
 #include "client/network_player_events.h"
 #include "client/network_world.h"
@@ -130,7 +131,8 @@ namespace OpenBlood2
         ClientWorld displayed_;
         Phase phase_ = Phase::Idle;
         Clock::time_point origin_, last_, deadline_;
-        double remainder_ = 0, mapped_time_ = 0;
+        NetworkInput input_;
+        double mapped_time_ = 0;
         float pitch_ = 0, yaw_ = 0;
         bool zoom_ = false;
         std::string reason_;

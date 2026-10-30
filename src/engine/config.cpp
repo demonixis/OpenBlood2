@@ -96,7 +96,7 @@ namespace OpenBlood2
     {
         options = {};
         error.clear();
-        bool explicit_world = false;
+        bool explicit_world = false, explicit_network_port = false;
         for (std::size_t i = 0; i < args.size(); ++i)
         {
             const auto arg = args[i];
@@ -302,14 +302,33 @@ namespace OpenBlood2
                 options.bench_height = h;
             }
             else if (arg == "--data-dir" || arg == "--config" || arg == "--frames" || arg == "--capture" ||
-                     arg == "--world" || arg == "--log-dir" || arg == "--log-level" || arg == "--rez")
+                     arg == "--world" || arg == "--log-dir" || arg == "--log-level" || arg == "--rez" ||
+                     arg == "--connect" || arg == "--host" || arg == "--port" || arg == "--name")
             {
                 if (++i == args.size() || args[i].empty() || args[i].starts_with("--"))
                 {
                     error = "Missing value for " + std::string(arg);
                     return false;
                 }
-                if (arg == "--rez")
+                if (arg == "--connect")
+                    options.connect_address = args[i];
+                else if (arg == "--host")
+                    options.host_world = args[i];
+                else if (arg == "--name")
+                    options.network_name = args[i];
+                else if (arg == "--port")
+                {
+                    const auto value = args[i];
+                    const auto parsed =
+                        std::from_chars(value.data(), value.data() + value.size(), options.network_port);
+                    if (parsed.ec != std::errc{} || parsed.ptr != value.data() + value.size())
+                    {
+                        error = "--port requires an integer from 0 to 65535";
+                        return false;
+                    }
+                    explicit_network_port = true;
+                }
+                else if (arg == "--rez")
                 {
                     const auto path = path_from_utf8(args[i]);
                     if (!path.is_absolute() || options.overlays.size() >= 24)
@@ -362,6 +381,16 @@ namespace OpenBlood2
                 error = "Unknown option: " + std::string(arg);
                 return false;
             }
+        }
+        const bool network = !options.host_world.empty() || !options.connect_address.empty();
+        if ((!options.host_world.empty() && !options.connect_address.empty()) || (explicit_network_port && !network) ||
+            (network && (explicit_world || options.demo || options.nightmares || !options.overlays.empty() ||
+                         options.xr_world || options.xr_test || options.bench || options.menu_smoke ||
+                         options.demo_smoke || options.view_world || options.inspect_world || options.start_game ||
+                         options.check_data || options.gpu_smoke || options.world_smoke)))
+        {
+            error = "Choose one retail desktop --host or --connect session, separate from solo diagnostics";
+            return false;
         }
         if (options.menu_smoke &&
             (options.view_world || options.inspect_world || options.start_game || options.check_data ||

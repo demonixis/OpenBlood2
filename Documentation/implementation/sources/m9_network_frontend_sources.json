@@ -1,0 +1,79 @@
+{
+  "scope": "Desktop graphical network client and single-simulation playable host; render-frame input accumulation",
+  "baseline": "fc4b840ba5c1e7f80074a04f2a7a90be94fac44d",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "fc4b840ba5c1e7f80074a04f2a7a90be94fac44d",
+      "path": "src/app/frontend.cpp",
+      "sha256": "b23130dc891ef56a65c9ef2788e80314ac33b53602d59714bc2abcdedfb35627"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "fc4b840ba5c1e7f80074a04f2a7a90be94fac44d",
+      "path": "src/app/movement_controls.h",
+      "sha256": "2016f3de3801c9ab1166518316e3a769f89745066c5c8c3adc481d563e02d624"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "fc4b840ba5c1e7f80074a04f2a7a90be94fac44d",
+      "path": "src/app/gamepad_devices.h",
+      "sha256": "0057167395fb25af4be99c11d75be2491b5d276b9c9fe9defb60b78164049c88"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "fc4b840ba5c1e7f80074a04f2a7a90be94fac44d",
+      "path": "src/app/hud.cpp",
+      "sha256": "6921f19f5a80085c5b7b1c27468bac18388c2a08f59d6716ba296779dd18674b"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "fc4b840ba5c1e7f80074a04f2a7a90be94fac44d",
+      "path": "src/app/display_options.cpp",
+      "sha256": "bcbe3d1451b572d3a79ab9d15614a9055416b6ed6ca1730cb6a9b304e48a11bc"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "fc4b840ba5c1e7f80074a04f2a7a90be94fac44d",
+      "path": "src/app/ui_runtime.cpp",
+      "sha256": "b66de73f993eaf00ccc4b7fab0731930d936e08084b76455225cf07a36a739e8"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "fc4b840ba5c1e7f80074a04f2a7a90be94fac44d",
+      "path": "src/app/client_scene.h",
+      "sha256": "dd4184c6f6861be67d943ab19acffa4eed5fb29a5765d6ab9fbb77e606d77e82"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "fc4b840ba5c1e7f80074a04f2a7a90be94fac44d",
+      "path": "src/client/network_client.cpp",
+      "sha256": "be6139b1dba588f15cb57124609aefeeb2ddb4e84e75f3af7bb30390df43a22f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "fc4b840ba5c1e7f80074a04f2a7a90be94fac44d",
+      "path": "src/server/main.cpp",
+      "sha256": "537b21ac2e1da278be050979953e3ca3067a8f0a96e741ca46fc1eacf3e57ecb"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "fc4b840ba5c1e7f80074a04f2a7a90be94fac44d",
+      "path": "src/server/clock.h",
+      "sha256": "95694168e891519dda037a30c2ef1101604fa17c1bc352864c5931c329a59180"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "fc4b840ba5c1e7f80074a04f2a7a90be94fac44d",
+      "path": "src/game/original/MoveMgr.cpp",
+      "sha256": "5e6ee14d007e3c0d2a795f625f480e66a67ae9efad477225b4597fce2d617334"
+    }
+  ],
+  "adaptations": [
+    "Reuse existing controls, preferences, HUD and ClientScene renderer from the independent NetworkClient.",
+    "Construct one ServerSession only for host; connect its client through the same ENet admission path.",
+    "Keep host ticks and network pumps running while local commands are neutralized.",
+    "Accumulate mouse movement offsets across zero-tick frames and consume once across bounded fixed ticks; CMoveMgr remains unchanged.",
+    "Remote audio/FX, view weapons, combat and match rules remain following work."
+  ]
+}

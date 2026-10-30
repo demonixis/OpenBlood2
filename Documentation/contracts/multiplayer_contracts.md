@@ -891,3 +891,22 @@ the monotonic mapped clock, with bounded lead during silence. Sample remote pose
 100 ms behind it, without changing authoritative reception time. Presentation
 callers drain typed events; pending audio/FX/weapon consumers and interactive
 host/join remain subsequent work, not implicitly supplied by this endpoint.
+
+
+## Graphical remote client and host
+
+The [desktop frontend](../implementation/reports/m9_network_frontend.md) creates
+no server in the remote path. Hosting owns one ServerSession and admits its local
+NetworkClient through the same ENet path. Keep server ticks and network pumps
+independent of focus/menus; only local commands are neutralized. Quitting the host
+ends the session. Preserve existing controls/preferences and passive ClientScene
+presentation; solo keeps its existing frontend and clocks.
+
+Per-frame mouse offsets survive zero-tick frames and are consumed once across
+fixed ticks, with proportional discard under the six-tick overload limit. Clear
+pending offsets when commands are neutralized or mouse-move mode ends. Do not
+modify CMoveMgr or add another integration to accommodate render scheduling.
+
+Remote weapon/audio/FX consumers, original Host/Join screens, LAN discovery and
+full gameplay remain separate deliveries. An empty effects frame and absent view
+weapons are explicit current limitations, not completed multiplayer presentation.
