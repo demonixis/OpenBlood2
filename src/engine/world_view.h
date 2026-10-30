@@ -1,11 +1,14 @@
 #pragma once
+#include "engine/model.h"
 #include "engine/resources.h"
 #include "engine/texture.h"
 #include "engine/world.h"
+#include "engine/object_id.h"
 #include <array>
 
 namespace OpenBlood2
 {
+    class Objects;
     // Albedo modulated by the baked per-vertex light (color); authored transparent faces
     // use decoded DTX alpha.
     struct WorldVertex

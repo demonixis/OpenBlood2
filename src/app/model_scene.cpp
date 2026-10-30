@@ -1,4 +1,5 @@
 #include "app/model_scene.h"
+#include "client/object_scene.h"
 #include <algorithm>
 namespace OpenBlood2
 {
@@ -58,45 +59,16 @@ namespace OpenBlood2
     bool update_model_scene(GameSession& game, ModelView& scene, std::string& error,
                             const std::array<ViewWeaponCamera, 2>* weapons)
     {
+        return game.publish_client_world(error) &&
+               update_model_scene(game, game.client_session.world, scene, error, weapons);
+    }
+    bool update_model_scene(const GameSession& game, const ClientWorld& world, ModelView& scene, std::string& error,
+                            const std::array<ViewWeaponCamera, 2>* weapons)
+    {
         scene.begin_frame();
-        auto& client = game.client_shell;
-        for (auto id : game.objects.snapshot())
-        {
-            const auto* record = game.objects.get(id);
-            if (!record || record->life != Life::Alive || record->state.m_ObjectType != OT_MODEL)
-                continue;
-            bool visible = (record->state.m_Flags & FLAG_VISIBLE) != 0;
-            if (record->handle == client.seeing_eye || record->handle == client.orb_view)
-                visible = false; // The camera is inside this model; do not draw its interior.
-            bool unresolved = false;
-            if (record->attachment)
-            {
-                const auto relation = game.objects.attachments().find(record->attachment);
-                unresolved = relation == game.objects.attachments().end() || !relation->second.resolved;
-                if (unresolved)
-                    visible = false;
-            }
-            if (!client.player_visible)
-            {
-                if (record->handle == client.player)
-                    visible = false;
-                if (record->attachment)
-                {
-                    const auto relation = game.objects.attachments().find(record->attachment);
-                    if (relation != game.objects.attachments().end() && relation->second.parent == client.player)
-                        visible = false;
-                }
-            }
-            if (!scene.add(record->model, record->animation, record->state.m_SkinName,
-                           {record->state.m_Pos, record->state.m_Rotation}, record->state.m_Scale, visible,
-                           (record->state.m_Flags & FLAG_REALLYCLOSE) != 0, id, record->state.m_Filename,
-                           game.resources, error, record->hidden_nodes, record->alpha))
-                return false;
-            if (record->alpha < 1)
-                scene.mark_translucent(scene.entries.size() - 1);
-            if (unresolved)
-                scene.entries.back().error = "Unresolved attachment pose";
-        }
+        const auto& client = game.client_shell;
+        if (!append_client_models(world, client.player_visible, scene, game.resources, error))
+            return false;
         for (const auto& fx : game.server.shotgun_effects.casings)
         {
             if (!scene.add(fx.model, fx.animation, fx.skin_path, {fx.position, fx.rotation},
@@ -104,7 +76,6 @@ namespace OpenBlood2
                            {}, 1, true))
                 return false;
         }
-        const auto* owner = game.server_shell.Player(game.local_client);
         for (const auto& weapon : client.weapons)
         {
             if (!weapon.model)
@@ -114,7 +85,7 @@ namespace OpenBlood2
             const auto camera =
                 weapons ? (*weapons)[weapon.left ? 0 : 1]
                         : ViewWeaponCamera{client.rotation.pitch, client.rotation.yaw, client.camera_position, {}, 1};
-            const bool visible = owner && !owner->m_damage.IsDead() && client.weapons_visible;
+            const bool visible = world.frame().player_alive && client.weapons_visible;
             const auto* label = weapon.left ? "left view weapon" : "right view weapon";
             if (definition && camera.arms)
             {

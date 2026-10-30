@@ -127,3 +127,45 @@ equivalent to source subclasses' multiplier applied at each touch while rules ar
 constant. The new internal pickup-rule structure is not yet a network/UI settings
 interface. Cosmetic resource failures remain explicit. Donor functions and engine
 adaptations are recorded in the [source ledger](../implementation/sources/m9_foundation_sources.json).
+
+## Local replica, first presentation lot
+
+`ClientSession` now owns a passive `ClientWorld`, independently of the original
+server registry. At the owning presentation boundary, `GameSession::publish_client_world`
+copies a complete local frame and delivers it immediately. Publication during
+an object callback is refused. `ScenePresenter::update` publishes once for all
+its consumers/eyes; standalone scene helpers publish before invoking the same
+consumers. Simulation still uses exactly its existing order and supplied delta;
+neither publication nor replica rendering ticks animation, physics, callbacks,
+audio or RNG. A paused frame may be published again without advancing time.
+
+The frame contains live objects in slot order, including inactive/hidden objects:
+poses, model/skin paths, scale, alpha/color, flags, animation/sprite playback,
+hidden nodes, resolved attachment pose/parent, world-model binding and sky slots.
+It also carries ModelAdd/ModelDirAdd, local player/Eye/Orb identities and the
+owner-alive gate for view weapons. PolyGrid and particle-stream visibility uses
+copied effect-to-owner identities; their effect pools are still shared storage.
+`append_client_models`, `append_client_sprites`, world/sky draw construction and
+model lighting consume the replica without an original object registry. Existing
+GPU structures, shaders, shading arithmetic and XR weapon placement are unchanged.
+
+`ClientObjectId` combines a world epoch and slot/generation. Distinct local session
+candidates and every teardown get distinct epochs, including save-load/NEW_LEVEL
+promotion. Old-world, duplicate/out-of-order frames, invalid object identities,
+nonfinite/backwards clocks and more than 65,536 records are refused atomically.
+The complete-frame replacement drops absent and pending-removal objects before
+the next consumer; stale attachment/sky IDs resolve to nothing. The renderer also
+checks the epoch when invalidating world-owned geometry and lighting caches.
+Bare `ObjectId` lookups are only for entries in the currently accepted frame.
+
+This is an **in-process frame**, not a wire schema: local delivery shares immutable
+decoded model/sprite resources and copies mutable playback/pose values. No
+HOBJECT, HCLIENT, BaseClass, callback or GPU resource is stored in the replica.
+Future network resource resolution must use names and independently mounted data,
+and validate/bound all decoded fields before admission. The current frame receiver
+is not an untrusted network decoder or a claim of full protocol fuzz coverage.
+
+Movement, original client-shell ownership, HUD/inventory/camera reads, FX pools,
+dynamic lights/fog and logical sound versus device playback still require
+separation. This lot does not enable a remote client, admission or host play.
+See the [local replica report](../implementation/reports/m9_client_world.md).

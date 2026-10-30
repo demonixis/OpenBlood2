@@ -1,5 +1,17 @@
 # Source and Dependency Provenance
 
+## M9 local object replica
+
+`ClientSession`/`ClientWorld` and immediate local frame publication are project-owned
+engine adaptations. Object model/sprite preparation, world/sky bindings and model
+lighting reuse the existing reconstruction algorithms from `2beeb100`; no new
+ObjectDLL gameplay branch or third-party dependency is imported. Property/Euler
+helpers and sky projection are extracted without arithmetic changes so passive
+replica consumers can link without the original callbacks. See the
+[source ledger](sources/m9_client_world_sources.json),
+[contract](../contracts/multiplayer_contracts.md#local-replica-first-presentation-lot)
+and [report](reports/m9_client_world.md).
+
 ## M9 dedicated/transport foundation
 
 ENet upstream (MIT), commit `5a9c537fd464b3c6d3c55e1d3bd47588faf71b42`, is

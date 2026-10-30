@@ -1,3 +1,4 @@
+#include "game/legacy/cpp_engineobjects_de.h"
 #include "radius_damage.h"
 #include "Destructable.h"
 #include "engine/collision.h"

@@ -11,6 +11,7 @@
 | [Setup screen](contracts/setup_screen_contracts.md) | Game data selection, demo installation and REZ mods. |
 | [Logs](logging.md) / [crash capture](crash_capture.md) | Collect and inspect diagnostics. |
 | [Architecture](architecture.md) | Targets, ownership and engine/game boundaries. |
+| [Local client replica](implementation/reports/m9_client_world.md) | M9 object presentation through ClientWorld; remaining client/server dependencies and validation. |
 | [Dedicated server foundation](dedicated_server.md) | Headless build and zero-client simulation; M9 player admission remains pending. |
 | [Contributing](contributing.md) | Source reuse, conventions and verification. |
 | [Server-class coverage](contracts/class_coverage.md) | Missing original registrations, replacements and Museum investigation. |

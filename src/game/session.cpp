@@ -823,6 +823,7 @@ namespace OpenBlood2
         music_catalog = {};
         world = {};
         ++world_revision;
+        client_session.reset_local_world();
         world_path.clear();
         trace.clear();
         state = SessionState::Empty;

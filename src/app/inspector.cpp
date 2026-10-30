@@ -831,6 +831,17 @@ namespace OpenBlood2
                     if (const auto* object = game.objects.get(selection.id))
                     {
                         const auto& state = object->state;
+                        if (const auto* copy = game.client_session.world.get(selection.id))
+                        {
+                            ImGui::Text("Replica pose %.2f %.2f %.2f | flags 0x%08X | alpha %.3f",
+                                        copy->pose.position.x, copy->pose.position.y, copy->pose.position.z,
+                                        copy->flags, copy->alpha);
+                            ImGui::Text("Replica model %s | skin %s | animation %u / %.3f ms",
+                                        copy->filename.c_str(), copy->skin.c_str(), copy->animation.animation,
+                                        copy->animation.time);
+                        }
+                        else
+                            ImGui::TextDisabled("Not present in the last delivered client frame.");
                         ImGui::SeparatorText("Selected object");
                         ImGui::Text("%s / %s   |   %s   |   Updates: %llu", object->type->name.c_str(), state.m_Name,
                                     creation_name(object->reason), static_cast<unsigned long long>(object->updates));
@@ -1603,6 +1614,11 @@ namespace OpenBlood2
 {
     void Inspector::draw_session(GameSession& game, ObjectSelection& selection)
     {
+        const auto& replica = game.client_session.world.frame();
+        ImGui::Text("Local replica: world %llu / frame %llu / %zu objects / %.6f s",
+                    static_cast<unsigned long long>(replica.world), static_cast<unsigned long long>(replica.sequence),
+                    replica.objects.size(), replica.time);
+        ImGui::TextDisabled("Last presentation-boundary delivery; no independent client movement or network admission.");
         ImGui::TextUnformatted("Original shell and CPlayerObj entry subset");
         ImGui::TextWrapped(
             "Original shell/player state and copied AI paths. Complete AI behavior, remaining combat/FX, audio "

@@ -7,6 +7,7 @@
 namespace OpenBlood2
 {
     class GameSession;
+    class ClientWorld;
     // Counters of the most recent apply(); world values are 0-255 like the original console.
     struct ModelLightingStats
     {
@@ -29,8 +30,10 @@ namespace OpenBlood2
       public:
         bool build(const WorldMesh&, const World&, std::string& error);
         void clear();
-        bool apply(const GameSession&, const WorldMesh&, std::span<const WorldDraw> world_draws, ModelView&,
+        bool apply(GameSession&, const WorldMesh&, std::span<const WorldDraw> world_draws, ModelView&,
                    std::string& error);
+        bool apply(const ClientWorld&, DVector eye, bool night_goggles, const WorldMesh&, std::span<const WorldDraw>,
+                   ModelView&, std::string& error);
         ModelLightingStats stats;
 
       private:
@@ -47,6 +50,7 @@ namespace OpenBlood2
             DRotation rotation{};
         };
         void sample(DVector center, std::span<const WorldDraw>, Sample&);
+        std::uint64_t world_epoch_ = 0;
         WorldShade shade_;
         std::vector<StaticLight> lights_;
         DVector ambient_{};

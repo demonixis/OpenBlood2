@@ -9,21 +9,6 @@ namespace OpenBlood2
 {
     namespace
     {
-        // GetServerConVarValueFloat, then the client's (int) truncation into "ModelAdd %d %d %d".
-        float console_channel(const GameSession& game, const char* name)
-        {
-            const auto& vars = game.server.variables();
-            const auto found = vars.find(name);
-            if (found == vars.end())
-                return 0;
-            const auto& text = found->second.text;
-            float value = 0;
-            const auto [end, error] = std::from_chars(text.data(), text.data() + text.size(), value);
-            if (error != std::errc{} || end != text.data() + text.size() || !std::isfinite(value) ||
-                std::abs(value) > 1e6f)
-                return 0;
-            return static_cast<float>(static_cast<int>(value));
-        }
         DVector clamp_light(DVector v)
         {
             return {std::clamp(v.x, 0.f, 1.f), std::clamp(v.y, 0.f, 1.f), std::clamp(v.z, 0.f, 1.f)};
@@ -73,6 +58,7 @@ namespace OpenBlood2
         poses_.clear();
         ambient_ = {};
         stats = {};
+        world_epoch_ = 0;
     }
     bool ModelLighting::build(const WorldMesh& mesh, const World& world, std::string& error)
     {
@@ -128,21 +114,26 @@ namespace OpenBlood2
         }
         ++stats.sampled;
     }
-    bool ModelLighting::apply(const GameSession& game, const WorldMesh& mesh, std::span<const WorldDraw> draws,
+    bool ModelLighting::apply(GameSession& game, const WorldMesh& mesh, std::span<const WorldDraw> draws,
                               ModelView& scene, std::string& error)
+    {
+        return game.publish_client_world(error) && apply(game.client_session.world, game.client_shell.view.position,
+                                                         game.client_shell.night_goggles, mesh, draws, scene, error);
+    }
+    bool ModelLighting::apply(const ClientWorld& world, DVector eye, bool night_goggles, const WorldMesh& mesh,
+                              std::span<const WorldDraw> draws, ModelView& scene, std::string& error)
     {
         error.clear();
         const auto shade = shade_.stats;
         stats.models = stats.sampled = stats.reused = stats.unlit = stats.flat = stats.sources = stats.occluded = 0;
-        stats.model_add = {console_channel(game, "ModelAddR"), console_channel(game, "ModelAddG"),
-                           console_channel(game, "ModelAddB")};
-        stats.model_dir_add = {console_channel(game, "ModelDirAddR"), console_channel(game, "ModelDirAddG"),
-                               console_channel(game, "ModelDirAddB")};
+        stats.model_add = world.frame().model_add;
+        stats.model_dir_add = world.frame().model_dir_add;
         const auto add = vector_scale(stats.model_add, 1.f / 255);
         // World boxes of ranges that moved, appeared or disappeared since the last apply:
         // a cached segment crossing one is sampled again.
         moved_.clear();
-        bool everything = poses_.size() != mesh.ranges.size();
+        bool everything = poses_.size() != mesh.ranges.size() || world_epoch_ != world.frame().world;
+        world_epoch_ = world.frame().world;
         if (everything)
             poses_.assign(mesh.ranges.size(), {});
         std::vector<bool> drawn(mesh.ranges.size());
@@ -193,16 +184,15 @@ namespace OpenBlood2
                 poses_[range].drawn = false;
             }
         next_.clear();
-        const auto& view = game.client_shell.view;
         for (std::size_t i = 0; i < scene.entries.size(); ++i)
         {
             const auto& entry = scene.entries[i];
             if (entry.range >= scene.instances.size())
                 continue;
             const auto& instance = scene.instances[entry.range];
-            const ObjectRecord* record = entry.object ? game.objects.get(entry.object) : nullptr;
+            const ClientObject* record = world.get(entry.object);
             ++stats.models;
-            if (record && game.client_shell.night_goggles && (record->user_flags & (1u << 10)))
+            if (record && night_goggles && (record->user_flags & (1u << 10)))
             {
                 ++stats.unlit;
                 auto& instance = scene.instances[entry.range];
@@ -213,7 +203,7 @@ namespace OpenBlood2
                 instance.light = glow;
                 continue;
             }
-            if (record && (record->state.m_Flags & FLAG_NOLIGHT))
+            if (record && (record->flags & FLAG_NOLIGHT))
             {
                 ++stats.unlit;
                 ModelLight unlit;
@@ -221,7 +211,7 @@ namespace OpenBlood2
                 scene.set_light(i, unlit);
                 continue;
             }
-            const auto center = entry.close ? view.position : instance.center;
+            const auto center = entry.close ? eye : instance.center;
             if (!physics_vector(center))
             {
                 error = "Invalid model lighting center";
@@ -255,7 +245,7 @@ namespace OpenBlood2
                 light.ambient = vector_add(light.ambient, record->color);
             // Without Gouraud model shading every source joins the ambient at the center. View
             // models have no object record and are shaded.
-            const bool gouraud = !record || (record->state.m_Flags & FLAG_MODELGOURAUDSHADE);
+            const bool gouraud = !record || (record->flags & FLAG_MODELGOURAUDSHADE);
             if (!gouraud)
             {
                 ++stats.flat;

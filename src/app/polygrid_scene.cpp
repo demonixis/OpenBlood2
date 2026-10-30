@@ -1,14 +1,22 @@
 #include "polygrid_scene.h"
+#include <algorithm>
 namespace OpenBlood2
 {
-    bool update_polygrid_scene(const GameSession& game, PolyGridView& scene, std::string& error)
+    bool update_polygrid_scene(GameSession& game, PolyGridView& scene, std::string& error)
+    {
+        return game.publish_client_world(error) && update_polygrid_scene(game, game.client_session.world, scene, error);
+    }
+    bool update_polygrid_scene(const GameSession& game, const ClientWorld& world, PolyGridView& scene,
+                               std::string& error)
     {
         error.clear();
         scene.begin_frame();
         for (const auto& instance : game.server.polygrids.active)
         {
-            const auto* record = game.objects.get(instance.owner);
-            if (!record || record->life != Life::Alive)
+            const auto found = std::find_if(world.frame().polygrids.begin(), world.frame().polygrids.end(),
+                                            [&](const auto& entry) { return entry.id == instance.effect.id; });
+            const auto* record = found != world.frame().polygrids.end() ? world.get(found->owner) : nullptr;
+            if (!record)
                 continue;
             const auto& fx = instance.effect;
             if (fx.sprite && fx.track.frame >= fx.sprite->frames.size())

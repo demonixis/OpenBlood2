@@ -1,4 +1,5 @@
 #pragma once
+#include "client/session.h"
 #include "engine/collision.h"
 #include "engine/model_store.h"
 #include "engine/objects.h"
@@ -566,6 +567,7 @@ namespace OpenBlood2
     class GameSession
     {
       public:
+        ClientSession client_session;
         Resources resources;
         ModelStore models{resources};
         SpriteStore sprites{resources};
@@ -657,6 +659,8 @@ namespace OpenBlood2
         bool leave_player();
         bool pump_player_messages(std::string& error);
         bool unload_world();
+        // Immediate local delivery at the presentation boundary, also used by inspection.
+        bool publish_client_world(std::string& error);
         bool step(double seconds);
         // Server clock only: no local MoveMgr, view weapons, camera or cosmetic pool updates.
         bool step_server(double seconds);

@@ -21,4 +21,7 @@ namespace OpenBlood2
     // weapons: {left hand, right hand} cameras replacing the client's pitch/yaw/eye (XR).
     bool update_model_scene(GameSession&, ModelView&, std::string&,
                             const std::array<ViewWeaponCamera, 2>* weapons = nullptr);
+    // Consume an already delivered frame (ScenePresenter publishes once for all views).
+    bool update_model_scene(const GameSession&, const ClientWorld&, ModelView&, std::string&,
+                            const std::array<ViewWeaponCamera, 2>* weapons = nullptr);
 } // namespace OpenBlood2

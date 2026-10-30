@@ -1,5 +1,9 @@
 # CPU services are available to a dedicated-only build. GPU/runtime sources are client-only.
 add_library(engine_core STATIC
+    src/client/object_scene.cpp
+    src/client/world.cpp
+    src/client/session.cpp
+    src/client/world_view.cpp
     src/engine/world_lights.cpp
     src/engine/world_shade.cpp
     src/engine/hud_surface.cpp
@@ -10,6 +14,9 @@ add_library(engine_core STATIC
     src/engine/model_view.cpp
     src/engine/texture.cpp
     src/engine/world_view.cpp
+    src/engine/world_bindings.cpp
+    src/engine/properties.cpp
+    src/engine/sky_projection.cpp
     src/engine/surface_materials.cpp
     src/engine/surface_report.cpp
     src/engine/normal_maps.cpp

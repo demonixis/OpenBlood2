@@ -1,6 +1,8 @@
 #pragma once
 
 #include "engine/model.h"
+#include "engine/object_id.h"
+#include "engine/properties.h"
 #include "engine/sprite.h"
 #include "game/legacy/cpp_engineobjects_de.h"
 #include "game/mover_messages.h"
@@ -19,28 +21,6 @@ namespace OpenBlood2
     class ContainerShape;
     struct World;
 
-    struct CaseLess
-    {
-        using is_transparent = void;
-        bool operator()(std::string_view a, std::string_view b) const;
-    };
-    struct EulerAngles
-    {
-        DVector radians;
-    };
-    DRotation rotation_from_euler(DVector radians);
-    bool align_rotation(DVector forward, DRotation&);
-    bool alignment_axes(DVector direction, DVector up, DVector& forward, DVector& right, bool& fallback);
-    bool align_rotation(DVector forward, DVector up, DRotation&);
-    using PropertyValue = std::variant<std::string, float, bool, std::int32_t, DVector, DRotation, EulerAngles>;
-    using Properties = std::map<std::string, PropertyValue, CaseLess>;
-    struct PropertySpec
-    {
-        std::string name;
-        PropertyValue value;
-        bool defaulted = true;
-        std::size_t max_string = MAX_CS_FILENAME_LEN;
-    };
     // Save support declared per registered class (save_load_contracts "Engine and game
     // responsibilities"). AlwaysLoad is inherited, like the original CF_ALWAYSLOAD.
     enum class SaveSupport : std::uint8_t
@@ -88,15 +68,6 @@ namespace OpenBlood2
         Limit,
         Unsupported,
         MissingWorldModel
-    };
-    struct ObjectId
-    {
-        std::uint32_t slot = UINT32_MAX, generation = 0;
-        bool operator==(const ObjectId&) const = default;
-        explicit operator bool() const
-        {
-            return slot != UINT32_MAX;
-        }
     };
     struct Attachment
     {
@@ -376,7 +347,6 @@ namespace OpenBlood2
         }
     };
     bool object_node_transform(const ObjectRecord&, const char*, DVector*, DRotation*);
-    std::string property_text(const PropertyValue& value);
     bool generic_property(const PropertyValue& value, GenericProp& out);
     const char* life_name(Life life);
     const char* creation_name(Creation reason);

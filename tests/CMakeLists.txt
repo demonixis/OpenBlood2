@@ -60,15 +60,6 @@ if(BLOOD2_GPU_TESTS)
     endforeach()
 endif()
 
-add_executable(object_contract_tests object_contract_tests.cpp)
-target_link_libraries(object_contract_tests PRIVATE blood2_game)
-blood2_project_options(object_contract_tests)
-foreach(case IN ITEMS builtin_model original_objects nested_creation reasons_properties scheduling deferred_removal
-        aggregate_dispatch handles_selection links_lists messages_strings message_churn message_limit unsupported_teardown creation_failures)
-    add_test(NAME objects.${case} COMMAND object_contract_tests "${case}")
-    set_tests_properties(objects.${case} PROPERTIES LABELS "headless;objects" TIMEOUT 10)
-endforeach()
-
 add_executable(save_message_tests save_message_tests.cpp)
 target_link_libraries(save_message_tests PRIVATE blood2_game)
 blood2_project_options(save_message_tests)

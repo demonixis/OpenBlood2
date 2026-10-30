@@ -260,12 +260,15 @@ retail Bloodbath → Team → CTF, a console dedicated server and playable host,
 ENet upstream pinned by commit/hash, IPv4, 16 players and UDP 27888. The
 [foundation report](implementation/reports/m9_multiplayer.md) records the current
 headless build, bounded transport, full-content fingerprint and zero-client
-world tests. **Player admission, replicas and network gameplay remain pending.**
+world tests. The [first local replica lot](implementation/reports/m9_client_world.md)
+feeds object presentation from `ClientWorld`. **Full client separation, player
+admission and network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client
 shell runs its own movement (CMoveMgr) and effects. The engine copies object
 state to every client. OpenBlood2 runs one session in one process with one
-client. Presentation, HUD and audio read server objects directly. Typed client
+client. Object presentation now uses a passive local replica; HUD, cameras,
+dynamic lights/fog and audio still read server state directly. Typed client
 messages still exist as in-process gameplay values only. The new ENet wrapper
 has no gameplay protocol connected to those values yet.
 

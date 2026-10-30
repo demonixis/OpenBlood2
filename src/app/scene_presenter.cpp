@@ -1,4 +1,5 @@
 #include "app/scene_presenter.h"
+#include "client/world_view.h"
 #include "engine/transparency.h"
 #include "game/original/ClientCrosshair.h"
 #include "game/presentation_effects.h"
@@ -55,16 +56,16 @@ namespace OpenBlood2
                 continue;
             const auto& instance = model_scene.instances[draw.range];
             // Entries map instances back to their object for the original FLAG_SHADOW.
-            const ObjectRecord* record = nullptr;
+            const ClientObject* record = nullptr;
             for (const auto& entry : model_scene.entries)
                 if (entry.range == draw.range && !entry.close && entry.object)
                 {
-                    record = game.objects.get(entry.object);
+                    record = game.client_session.world.get(entry.object);
                     break;
                 }
             // FLAG_REALLYCLOSE (bit 6 for models in basetypes_de.h) draws at the eye; no shadow.
             constexpr DDWORD really_close = 1u << 6;
-            if (!record || !(record->state.m_Flags & FLAG_SHADOW) || (record->state.m_Flags & really_close))
+            if (!record || !(record->flags & FLAG_SHADOW) || (record->flags & really_close))
                 continue;
             ++shadow_stats.candidates;
             if (!instance.bounded)
@@ -316,6 +317,9 @@ namespace OpenBlood2
             error = std::string(stage) + ": " + error;
             return false;
         };
+        if (!game.publish_client_world(error))
+            return fail("Local client world");
+        const auto& replica = game.client_session.world;
         ballistic_vertices.clear();
         const auto tracer_color = vector_scale(game.client_shell.SceneLightScale(), scene_fade);
         for (const auto& tracer : game.server.shotgun_effects.tracers)
@@ -327,7 +331,8 @@ namespace OpenBlood2
                 ballistic_vertices.push_back({{a.x, a.y, a.z}, {tracer_color.x, .8f * tracer_color.y, 0, .1f}});
                 ballistic_vertices.push_back({{b.x, b.y, b.z}, {tracer_color.x, 0, 0, .9f}});
             }
-        rebuilt = mesh_revision != game.world_revision || built_lightmaps_ != lightmaps;
+        rebuilt = client_world_epoch_ != replica.frame().world || mesh_revision != game.world_revision ||
+                  built_lightmaps_ != lightmaps;
         const auto model_revision = model_scene.revision, effect_revision = explosion_model_scene.revision,
                    sprite_revision = sprite_scene.revision, sky_sprite_revision = sky_sprite_scene.revision;
         if (rebuilt)
@@ -355,34 +360,36 @@ namespace OpenBlood2
             if (!model_lighting.build(world_mesh, game.world, error))
                 return fail("Model lighting");
             mesh_revision = game.world_revision;
+            client_world_epoch_ = replica.frame().world;
+            grid_revision_ = UINT64_MAX;
+            report_mesh_ = UINT64_MAX;
         }
         if (!prepare_surface(game, error))
             return fail("Enhanced renderer");
         render_world = game.client_shell.m_bInWorld && !world_mesh.ranges.empty();
         const auto started = SDL_GetTicksNS();
-        if (!OpenBlood2::world_draws(world_mesh, game.objects, world_draws, world_renderer.stats, error))
+        if (!OpenBlood2::world_draws(world_mesh, replica, world_draws, world_renderer.stats, error))
             return fail("World draw bindings");
         const auto& view = camera(game);
-        if (!game.server.sky.draws(game.world, world_mesh, game.objects, view.position, sky_draws, sky_eye, error))
+        if (!client_sky_draws(game.world, world_mesh, replica, view.position, sky_draws, sky_eye, error))
             return fail("Sky presentation");
         sky_order.clear();
         if (!sky_sprite_scene.begin_frame(sky_eye, view.rotation, error))
             return fail("Sky sprite camera");
         std::size_t world_index = 0;
-        for (auto id : game.server.sky.objects)
+        for (auto id : replica.frame().sky.objects)
         {
-            const auto* r = game.objects.get(id);
-            if (!r || r->life != Life::Alive || !(r->state.m_Flags & FLAG_VISIBLE))
+            const auto* r = replica.get(id);
+            if (!r || !(r->flags & FLAG_VISIBLE))
                 continue;
-            if (r->state.m_ObjectType != OT_SPRITE)
+            if (r->type != OT_SPRITE)
             {
                 sky_order.push_back({false, world_index++});
                 continue;
             }
             const auto before = sky_sprite_scene.draws.size();
-            if (!sky_sprite_scene.add(r->sprite.get(), r->sprite_track, {r->state.m_Pos, r->state.m_Rotation},
-                                      r->state.m_Scale, r->state.m_Flags & ~FLAG_SKYOBJECT, id, game.resources, error,
-                                      r->alpha, r->color))
+            if (!sky_sprite_scene.add(r->sprite.get(), r->sprite_track, {r->pose.position, r->pose.rotation}, r->scale,
+                                      r->flags & ~FLAG_SKYOBJECT, id, game.resources, error, r->alpha, r->color))
                 return fail("Sky sprite");
             if (!sky_sprite_scene.entries.back().error.empty())
             {
@@ -397,18 +404,19 @@ namespace OpenBlood2
             }
         }
         const auto world_done = SDL_GetTicksNS();
-        if (!update_model_scene(game, model_scene, error, weapon_cameras ? &*weapon_cameras : nullptr))
+        if (!update_model_scene(game, replica, model_scene, error, weapon_cameras ? &*weapon_cameras : nullptr))
             return fail("Model presentation");
-        if (!model_lighting.apply(game, world_mesh, world_draws, model_scene, error))
+        if (!model_lighting.apply(replica, game.client_shell.view.position, game.client_shell.night_goggles, world_mesh,
+                                  world_draws, model_scene, error))
             return fail("Model lighting");
         select_shadow_casters(game);
         model_renderer.per_pixel_lighting = per_pixel_lighting;
         if (!update_explosion_model_scene(game, explosion_model_scene, error, camera_override ? &view : nullptr))
             return fail("Explosion model presentation");
         const auto models_done = SDL_GetTicksNS();
-        if (!update_polygrid_scene(game, polygrid_scene, error))
+        if (!update_polygrid_scene(game, replica, polygrid_scene, error))
             return fail("PolyGrid presentation");
-        if (!update_sprite_scene(game, sprite_scene, error, camera_override ? &view : nullptr,
+        if (!update_sprite_scene(game, replica, sprite_scene, error, camera_override ? &view : nullptr,
                                  weapon_cameras ? &*weapon_cameras : nullptr))
             return fail("Sprite presentation");
         sprite_scene.batch();

@@ -25,5 +25,6 @@ namespace OpenBlood2
         bool draws(const World&, const WorldMesh&, const Objects&, DVector eye, std::vector<WorldDraw>&,
                    DVector& sky_eye, std::string&) const;
     };
+    bool valid_sky_definition(const SkyDefinition&);
     bool sky_view_position(const SkyDefinition&, DVector world_min, DVector world_max, DVector eye, DVector& out);
 } // namespace OpenBlood2

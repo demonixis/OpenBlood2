@@ -147,6 +147,7 @@ namespace OpenBlood2
         PresentationStats stats;
 
       private:
+        std::uint64_t client_world_epoch_ = 0;
         const CameraView& camera(const GameSession&) const;
         // Pipelines, renderer uploads, shadow tiles and a depth target with `layers` layers.
         bool prepare_depth(Uint32 width, Uint32 height, Uint32 layers, SDL_GPUSampleCount, std::string& error);

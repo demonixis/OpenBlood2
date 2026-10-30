@@ -1,0 +1,55 @@
+{
+  "scope": "M9 first local object-presentation replica",
+  "baseline": "2beeb100",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "2beeb100",
+      "path": "src/app/model_scene.cpp",
+      "sha256": "e880bcd50e1add36e82dd94d9b2296fb29ee4cbeb7493625a5b63f2f8450119f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "2beeb100",
+      "path": "src/app/sprite_scene.cpp",
+      "sha256": "3ffdc637013b58f76963f881136a6299e58932f6ea0d2b1de1f4c1eed61a32ea"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "2beeb100",
+      "path": "src/app/model_lighting.cpp",
+      "sha256": "c00dce029b19d5c5da5c087c120ebdcb33b8e04bb795a01a3f88c85953599de2"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "2beeb100",
+      "path": "src/engine/world_view.cpp",
+      "sha256": "539e9aac186ced446a780ba8571e40db9a6a200e7bc05e2e3c46fdcc5ec17ebd"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "2beeb100",
+      "path": "src/engine/sky.cpp",
+      "sha256": "bc2f204b58384175472768fbfafc1b7f8575163afde31571c05540021e117381"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "2beeb100",
+      "path": "src/engine/objects.cpp",
+      "sha256": "b143c235ba3362be6de7b8586241f74e15d5b98c8b6cac10912dcf7b143bf400"
+    }
+  ],
+  "adaptations": [
+    "Passive complete-frame local replica; process-unique world epoch plus object generations",
+    "Copy mutable playback/pose/appearance values and share only immutable decoded local assets",
+    "Publish at presentation boundary; no server callback, RNG, input, simulation or audio-clock changes",
+    "Retain existing presentation arithmetic and errors; stale attachment parents hide unresolved children",
+    "Extract common property/Euler/sky-projection helpers and isolate server world bindings for independent client linkage"
+  ],
+  "not_implemented": [
+    "wire gameplay protocol",
+    "independent client movement and shell",
+    "FX pool, dynamic light/fog and audio ownership migration",
+    "remote client admission"
+  ]
+}

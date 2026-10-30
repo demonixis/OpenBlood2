@@ -1,5 +1,9 @@
 #pragma once
-#include "engine/objects.h"
+#include "engine/properties.h"
+#include "engine/object_id.h"
+#include "engine/model.h"
+#include <span>
+#include <vector>
 #include <array>
 
 namespace OpenBlood2

@@ -1,25 +1,23 @@
 #include "app/sprite_scene.h"
+#include "client/object_scene.h"
 #include <algorithm>
 #include <cmath>
 namespace OpenBlood2
 {
-    bool update_sprite_scene(const GameSession& game, SpriteView& scene, std::string& error, const CameraView* camera,
+    bool update_sprite_scene(GameSession& game, SpriteView& scene, std::string& error, const CameraView* camera,
                              const std::array<ViewWeaponCamera, 2>* weapons)
+    {
+        return game.publish_client_world(error) &&
+               update_sprite_scene(game, game.client_session.world, scene, error, camera, weapons);
+    }
+    bool update_sprite_scene(const GameSession& game, const ClientWorld& world, SpriteView& scene, std::string& error,
+                             const CameraView* camera, const std::array<ViewWeaponCamera, 2>* weapons)
     {
         const auto& view = camera ? *camera : game.client_shell.view;
         if (!scene.begin_frame(view.position, view.rotation, error))
             return false;
-        for (auto id : game.objects.snapshot())
-        {
-            const auto* record = game.objects.get(id);
-            if (!record || record->life != Life::Alive || record->state.m_ObjectType != OT_SPRITE ||
-                (record->state.m_Flags & FLAG_SKYOBJECT))
-                continue;
-            if (!scene.add(record->sprite.get(), record->sprite_track, {record->state.m_Pos, record->state.m_Rotation},
-                           record->state.m_Scale, record->state.m_Flags, id, game.resources, error, record->alpha,
-                           record->color))
-                return false;
-        }
+        if (!append_client_sprites(world, scene, game.resources, error))
+            return false;
         for (const auto& fx : game.server.explosion_sprites.active)
         {
             if (!scene.add(fx.sprite.get(), fx.track, {fx.settings.position, fx.rotation}, fx.scale, fx.flags, {},
@@ -105,9 +103,7 @@ namespace OpenBlood2
             scene.entries.back().blood_splat = fx.id;
         }
         const auto& client = game.client_shell;
-        const auto* record = game.objects.get(client.player);
-        const auto* player = record ? dynamic_cast<const CPlayerObj*>(record->game.get()) : nullptr;
-        if (client.weapons_visible && player && !player->m_damage.IsDead())
+        if (client.weapons_visible && world.frame().player_alive)
             for (const auto& weapon : client.weapons)
             {
                 if (!weapon.flash_visible || !weapon.model)
@@ -243,7 +239,10 @@ namespace OpenBlood2
         }
         for (const auto& instance : game.server.particle_streams.active)
         {
-            if (!game.objects.get(instance.owner) || game.objects.get(instance.owner)->life != Life::Alive)
+            const auto found =
+                std::find_if(world.frame().particle_streams.begin(), world.frame().particle_streams.end(),
+                             [&](const auto& entry) { return entry.id == instance.effect.id; });
+            if (found == world.frame().particle_streams.end() || !world.get(found->owner))
                 continue;
             const auto& fx = instance.effect;
             if (fx.settings.system && !fx.system_visible)

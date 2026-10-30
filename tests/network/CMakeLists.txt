@@ -50,3 +50,32 @@ if(BLOOD2_BUILD_SERVER)
         endforeach()
     endif()
 endif()
+
+# Replica consumers are CPU-only; the receiver deliberately does not link ObjectDLL.
+add_executable(network_replica_receiver_tests replica_receiver_tests.cpp)
+target_link_libraries(network_replica_receiver_tests PRIVATE engine_core)
+blood2_project_options(network_replica_receiver_tests)
+add_test(NAME network.replica_receiver COMMAND network_replica_receiver_tests)
+set_tests_properties(network.replica_receiver PROPERTIES LABELS "headless;network;replica" TIMEOUT 30)
+
+add_executable(network_replica_local_tests replica_local_tests.cpp)
+target_link_libraries(network_replica_local_tests PRIVATE blood2_game)
+blood2_project_options(network_replica_local_tests)
+foreach(case IN ITEMS local bindings)
+    add_test(NAME network.replica_${case} COMMAND network_replica_local_tests ${case} "${CMAKE_CURRENT_BINARY_DIR}/replica-${case}")
+    set_tests_properties(network.replica_${case} PROPERTIES LABELS "headless;network;replica" TIMEOUT 30)
+endforeach()
+
+# The original object boundary is also a dedicated/sanitizer gate.
+add_executable(object_contract_tests ../object_contract_tests.cpp)
+target_link_libraries(object_contract_tests PRIVATE blood2_game)
+blood2_project_options(object_contract_tests)
+foreach(case IN ITEMS builtin_model original_objects nested_creation reasons_properties scheduling deferred_removal
+        aggregate_dispatch handles_selection links_lists messages_strings message_churn message_limit unsupported_teardown creation_failures)
+    add_test(NAME objects.${case} COMMAND object_contract_tests "${case}")
+    set_tests_properties(objects.${case} PROPERTIES LABELS "headless;objects" TIMEOUT 10)
+endforeach()
+if(BLOOD2_SANITIZERS)
+    # Debug + ASan/UBSan exercises 150k nested message transactions (~21 s locally).
+    set_tests_properties(objects.message_churn PROPERTIES TIMEOUT 60)
+endif()

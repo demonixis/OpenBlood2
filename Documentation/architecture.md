@@ -7,6 +7,7 @@ references, not build dependencies. [CMakeLists.txt](../CMakeLists.txt) defines:
 | --- | --- |
 | `blood2_startup` | Config/REZ readers. |
 | `engine_core` / [src/engine](../src/engine) | CPU resources, objects, collision, animation, audio and presentation preparation. |
+| [src/client](../src/client) (CPU, in `engine_core`) | Passive `ClientSession`/`ClientWorld` and replica model/sprite/world draw consumers; no ObjectDLL dependency. |
 | `engine` | Client-only SDL_GPU renderers, runtime, capture and optional XR. |
 | `blood2_game` / [src/game](../src/game) | Session ownership, typed messages and service adapters. |
 | `blood2_frontend` | Client-only original menus, loading screen and preferences. |
@@ -21,8 +22,11 @@ references, not build dependencies. [CMakeLists.txt](../CMakeLists.txt) defines:
 `blood2_server` → `blood2_game` / `blood2_net` → `engine_core` / `blood2_startup`.
 The [M9 ownership separation](contracts/multiplayer_contracts.md) is in progress:
 `ServerSession` currently wraps shared `GameSession` storage and advances only
-server services. Client shells and CPU FX still need extraction; this build split
-does not establish a replica or a network gameplay session.
+server services. `ClientSession` owns the first local `ClientWorld` replica;
+`GameSession::publish_client_world` delivers a complete frame before presentation.
+Models, sprites, world/sky bindings, model lighting and shadow flags use it.
+Client shells, movement, FX, camera/HUD and audio still need extraction; this does
+not establish a network gameplay session. See the [replica lot](implementation/reports/m9_client_world.md).
 `blood2_app` also holds the [setup screen](contracts/setup_screen_contracts.md): game data
 selection, mods and the demo download (miniz, and the platform's HTTPS stack: libcurl on
 Linux/Windows, NSURLSession on Apple, HttpsURLConnection on Android). The former standalone
