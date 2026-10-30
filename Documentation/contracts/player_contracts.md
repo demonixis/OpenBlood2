@@ -107,7 +107,9 @@ movement, combat reactions, audio and autosave still prevent a playable session.
 
 ## Typed services and lifetime
 
-`HCLIENT` is an opaque, owned stable token. One local client is supported, with a
+`HCLIENT` is an opaque, owned stable token. Solo keeps one local client; the
+[M9 connection continuation](multiplayer_contracts.md#multiple-server-connections-and-bloodbath-markers)
+allows 16 internal connections in the three authorized network modes, with a
 65,536-token lifetime budget per adapter. Tokens are never reused during that
 adapter's lifetime. Unknown/disconnected tokens fail validation. Client user
 data is a checked `HOBJECT`, replacing the original untyped C++ pointer; lookup

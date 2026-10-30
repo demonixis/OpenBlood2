@@ -1,0 +1,36 @@
+{
+  "scope": "Multiple checked server connections and original Bloodbath start selection; no wire admission yet",
+  "baseline": "bd8aa13c",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "bd8aa13c",
+      "path": "src/game/server_clients.cpp",
+      "sha256": "b58d3d85024403bc71650d05c868d428e3c979a450d4d2634aa3b665db280c43"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "bd8aa13c",
+      "path": "src/game/original/PlayerObj.cpp",
+      "sha256": "e0e359540e5d2974aa19961fddf954d1319ba8dd683d9f7a86babff1921ba50a"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed"
+    }
+  ],
+  "adaptations": [
+    "16 live connections only in the three M9 modes; solo retains one; stable tokens retain the 65536 lifetime budget.",
+    "Exclusive original player association and individually bounded private event queues.",
+    "Bloodbath uses exactly one selection draw over the whole named start list, preserving marker trigger, placement and force-position ordering. Missing/invalid markers fail rather than teleporting to an invented origin.",
+    "Team-specific start selection, multiplayer init, death/respawn and ENet admission remain subsequent work."
+  ]
+}

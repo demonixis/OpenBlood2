@@ -291,8 +291,9 @@ also uses replica owners/poses and client rays. Immediate creation queries still
 the local adapter; remote effect events remain pending.
 [Cosmetic impact audio](implementation/reports/m9_effect_audio.md) now plays only on the client,
 without consuming server voices or sound identities.
-**Full client separation, player
-admission and network gameplay remain pending.**
+The [server connection lot](implementation/reports/m9_player_connections.md) now allows
+16 checked internal connections and original Bloodbath marker selection.
+**Full client separation, multiplayer profiles, wire admission and network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client
 shell runs its own movement (CMoveMgr) and effects. The engine copies object

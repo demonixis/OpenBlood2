@@ -501,3 +501,22 @@ battery and source-child rules remain unchanged. The local effect phase shares
 one stable collision publication with later moving cosmetics. Stale worlds or
 object generations cannot relight an effect. Trusted local frame validation is
 not a complete wire decoder. Network creation/events remain separate.
+
+## Multiple server connections and Bloodbath markers
+
+The internal connection registry now accepts up to 16 live tokens for Bloodbath,
+Team and CTF. Other modes retain the one-client limit. Tokens remain opaque,
+never reused and bounded to 65,536 per adapter lifetime; this is not a wire ID.
+A live original player can belong to only one connection, including the restore
+window before its client field is assigned. Existing private queues retain their
+independent 256-event bounds, and exit detaches before disconnect.
+
+Bloodbath `GoToStartPoint` now makes the original single random ordinal draw over
+all named `Blood2StartPoint` objects, including markers whose `Multiplayer` field
+is false. It preserves trigger, rotation, checked teleport/ground placement,
+physics and forced-position messages. It does not add retries, a new spawn-safety
+policy or an origin fallback. Missing/invalid markers fail with owned-list cleanup.
+The original solo named/fallback selection and explicit inspection override stay
+unchanged. Team filtering, original multiplayer initialization and death/respawn
+are subsequent steps; the dedicated transport still refuses game admission.
+See [connection verification](../implementation/reports/m9_player_connections.md).

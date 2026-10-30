@@ -8,6 +8,7 @@
 #include "CharacterProfiles.h"
 #include "FlagObjects.h"
 #include "GameStartPoint.h"
+#include "game/game_settings.h"
 #include <algorithm>
 #include <cmath>
 
@@ -278,41 +279,68 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name, bool inspection_start)
             server->RelinquishList(list);
         }
     } release{server, list};
-    bool remove_string = !start_name;
-    if (remove_string)
-        start_name = server->CreateString("start");
-    if (!start_name)
-        return false;
     GameStartPoint* start = nullptr;
-    GameStartPoint* fallback = nullptr;
-    GameStartPoint* multiplayer = nullptr;
-    for (auto* link = list->m_pFirstLink; link; link = link->m_pNext)
+    if (server->net_game_type == GAMETYPE_BLOODBATH)
     {
-        auto* candidate = dynamic_cast<GameStartPoint*>(server->HandleToObject(link->m_hObject));
-        if (candidate && server->IsObjectAlive(link->m_hObject) && candidate->IsMultiplayer() && !multiplayer)
-            multiplayer = candidate;
-        if (candidate && server->IsObjectAlive(link->m_hObject) && !candidate->IsMultiplayer())
+        // Original PlayerObj::GoToStartPoint draws from the whole named list,
+        // including markers without Multiplayer=true. No solo/inspection fallback.
+        if (!list->m_pFirstLink || list->m_nInList <= 0)
         {
-            fallback = candidate;
-            if (server->CompareStringsUpper(start_name, candidate->GetName()))
+            entry_error = "No Bloodbath GameStartPoint";
+            return false;
+        }
+        int ordinal = 0;
+        if (!server->RandomInt(0, static_cast<int>(list->m_nInList) - 1, ordinal))
+            return false;
+        auto* selected = list->m_pFirstLink;
+        for (int i = 0; selected && i < ordinal; ++i)
+            selected = selected->m_pNext;
+        if (selected && server->IsObjectAlive(selected->m_hObject))
+            start = dynamic_cast<GameStartPoint*>(server->HandleToObject(selected->m_hObject));
+        if (!start)
+        {
+            entry_error = "Selected Bloodbath GameStartPoint unavailable";
+            return false;
+        }
+        entry_start_multiplayer = start->IsMultiplayer();
+    }
+    else
+    {
+        bool remove_string = !start_name;
+        if (remove_string)
+            start_name = server->CreateString("start");
+        if (!start_name)
+            return false;
+        GameStartPoint* fallback = nullptr;
+        GameStartPoint* multiplayer = nullptr;
+        for (auto* link = list->m_pFirstLink; link; link = link->m_pNext)
+        {
+            auto* candidate = dynamic_cast<GameStartPoint*>(server->HandleToObject(link->m_hObject));
+            if (candidate && server->IsObjectAlive(link->m_hObject) && candidate->IsMultiplayer() && !multiplayer)
+                multiplayer = candidate;
+            if (candidate && server->IsObjectAlive(link->m_hObject) && !candidate->IsMultiplayer())
             {
-                start = candidate;
-                break;
+                fallback = candidate;
+                if (server->CompareStringsUpper(start_name, candidate->GetName()))
+                {
+                    start = candidate;
+                    break;
+                }
             }
         }
-    }
-    if (remove_string)
-        server->FreeString(start_name);
-    if (!start)
-    {
-        start = fallback;
-        entry_start_fallback = true;
-    }
-    if (!start && inspection_start)
-    {
-        // Inspector policy only: deterministic first authored marker, never a fabricated origin.
-        start = multiplayer;
-        entry_start_multiplayer = start != nullptr;
+        if (remove_string)
+            server->FreeString(start_name);
+        if (!start)
+        {
+            start = fallback;
+            entry_start_fallback = true;
+        }
+        if (!start && inspection_start)
+        {
+            // Inspector policy only: deterministic first authored marker, never a fabricated origin.
+            start = multiplayer;
+            entry_start_multiplayer = start != nullptr;
+        }
     }
     if (!start)
     {

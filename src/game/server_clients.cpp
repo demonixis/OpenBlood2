@@ -1,6 +1,8 @@
 #include "engine/world_model.h"
+#include "game/game_settings.h"
 #include "game/original/AI_Mgr.h"
 #include "game/server_adapter.h"
+#include "net/transport.h"
 #include <algorithm>
 #include <cmath>
 
@@ -9,7 +11,8 @@ namespace OpenBlood2
     HCLIENT ServerAdapter::connect_client()
     {
         trace_service("ConnectClient");
-        if (!bound_ || !clients_.empty() || client_tokens_.size() >= 65536 || objects_.busy())
+        const auto capacity = network_game_type(net_game_type) ? Net::max_players : std::size_t{1};
+        if (!bound_ || clients_.size() >= capacity || client_tokens_.size() >= 65536 || objects_.busy())
             return nullptr;
         auto token = std::make_unique<ClientHandle>();
         auto h = token.get();
@@ -56,6 +59,14 @@ namespace OpenBlood2
                 !Objects::is_kind_of(record->type, objects_.find_class("CPlayerObj")))
                 return DE_INVALIDPARAMS;
             if (it->second.player && it->second.player != player)
+                return DE_ERROR;
+            // One original player belongs to one live connection. This check also
+            // covers restored objects whose CPlayerObj client field is not bound yet.
+            for (const auto& [other, state] : clients_)
+                if (other != client && state.player == player)
+                    return DE_ERROR;
+            const auto* character = dynamic_cast<const CPlayerObj*>(record->game.get());
+            if (!character || (character->GetClient() && character->GetClient() != client))
                 return DE_ERROR;
         }
         if (auto* previous = objects_.get(it->second.player))

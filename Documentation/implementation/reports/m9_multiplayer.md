@@ -9,7 +9,7 @@ M9 is in progress and unaccepted. M2-GPU-001 and M3 remain independent.
 | Subsystem | Current dependency | Required change |
 | --- | --- | --- |
 | Session | GameSession owns one ServerAdapter, server shell, client shell and local_client | Separate simulation and replica ownership; retain one bound original server per process |
-| Admission | server_clients.cpp rejects a second connection; init routes to OnSinglePlayerInit | Checked N-player admission and original multiplayer init |
+| Admission | Internal M9 registry accepts 16 checked connections; Bloodbath start selection is ported; init still routes to OnSinglePlayerInit | Checked N-player admission and original multiplayer init |
 | Renderer | Object/world/sky presentation and all scene FX/light/fog consumers use client replicas; legacy FX producers/updates remain in the local adapter | Extract legacy FX runtime services and the remaining client shell |
 | Movement | Local CMoveMgr body and owned collision replica, immediate authoritative correction; environment now queries copied geometry/values, stance remains a local service | Remaining services; delayed reports and checked server advancement between uploads |
 | Audio | Server AudioTimeline owns logical voices; ClientSession owns independent playback/music/device and copied descriptors | Recipient delivery/network synchronization; remaining legacy client request entry points |
@@ -158,3 +158,11 @@ push, hardware interoperability, human LAN play, mobile/Quest rebuild or GPU cap
 is claimed. GPU baselines, original sources, commercial data and existing PBR work
 are unchanged. Admission, ClientWorld, original multi-player life/combat/teams,
 snapshot interpolation, UI/discovery, rotation and impaired-network tests remain.
+
+## Server player connection prerequisite
+
+The [connection lot](m9_player_connections.md) now accepts 16 checked internal
+connections in M9 modes, enforces exclusive player ownership and restores the
+original random Bloodbath marker selection. Solo retains its connection limit
+and selection. No packet creates a player yet; multiplayer profiles, match rules
+and wire admission remain pending.
