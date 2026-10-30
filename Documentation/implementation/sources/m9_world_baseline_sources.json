@@ -1,0 +1,49 @@
+{
+  "scope": "Portable initial ClientWorld snapshot and independent remote asset resolution",
+  "baseline": "2613231d",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "2613231d8949f01ff6fda5f6f859e6fd550b7b3f",
+      "path": "src/game/client_replication.cpp",
+      "sha256": "195cf310e6bfa4614c75aaefa17869edf98d0e12ada9f3e2b1a79357bae45a1d"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "2613231d8949f01ff6fda5f6f859e6fd550b7b3f",
+      "path": "src/client/world.h",
+      "sha256": "a1c1b08f6931576599e260b29a8f5c81b183e7b74aff02eb8d39d62daeb44783"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "2613231d8949f01ff6fda5f6f859e6fd550b7b3f",
+      "path": "src/client/world.cpp",
+      "sha256": "3331a76f411c5cf81892cc8a114aab82a0b6dd72c6a26772dddc9260c29b7adb"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "2613231d8949f01ff6fda5f6f859e6fd550b7b3f",
+      "path": "src/client/object_scene.cpp",
+      "sha256": "b9438bc7a8fbb41914eb77a79c9c999947dca72de48536b7c1d4a4ba4a714037"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "2613231d8949f01ff6fda5f6f859e6fd550b7b3f",
+      "path": "src/net/codec.h",
+      "sha256": "62242bd781639c2567cc484f49fb350b046831bbb45b59b49e06499262b6eb86"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "2613231d8949f01ff6fda5f6f859e6fd550b7b3f",
+      "path": "src/server/network.cpp",
+      "sha256": "204ab70e6be54a11f404d01787961234db4400e3804fcad79ddf9d66e2e7cb20"
+    }
+  ],
+  "adaptations": [
+    "New replacement network protocol version 2. Value records preserve the existing local publisher fields; no original game algorithms or asset bytes are imported.",
+    "Explicit little-endian f32/f64/integer encoding; 1 MiB snapshot, 32768-byte reliable packets, exact bounded ordered chunk assembly and atomic receiver replacement.",
+    "Independent client model/sprite stores and DAT binding checks; no ObjectDLL construction, model-key callbacks, server registries or GPU objects.",
+    "Server captures one recipient-addressed initial frame after fresh admission, including a reconnect into an advanced world. Cross-channel order is not assumed.",
+    "Continuous membership/poses, interpolation, collision/environment/audio/effect/HUD delivery and cross-frame retired-identity policy remain subsequent work."
+  ]
+}

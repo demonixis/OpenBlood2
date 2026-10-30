@@ -1,5 +1,6 @@
 #include "server/session.h"
 #include <algorithm>
+#include "game/client_replication.h"
 #include "game/game_settings.h"
 #include "game/original/AI_Mgr.h"
 #include "game/world_validation.h"
@@ -110,6 +111,33 @@ namespace OpenBlood2
         const auto connection = next_player_++;
         players_.push_back({connection, client, id});
         joined = {world_id_, connection, id};
+        return true;
+    }
+    bool ServerSession::snapshot(std::uint64_t player, Net::WorldSnapshot& out, std::string& error)
+    {
+        const auto found =
+            std::find_if(players_.begin(), players_.end(), [&](const auto& p) { return p.id == player; });
+        if (!started_ || !next_snapshot_ || found == players_.end())
+        {
+            error = "Snapshot recipient is unavailable";
+            return false;
+        }
+        const auto* record = game_.objects.get(found->object);
+        const auto* owner = game_.server_shell.Player(found->client);
+        if (!record || record->life != Life::Alive || !owner)
+        {
+            error = "Snapshot player is unavailable";
+            return false;
+        }
+        ClientWorldFrame frame;
+        frame.world = world_id_;
+        frame.sequence = next_snapshot_;
+        frame.player = found->object;
+        frame.player_alive = !owner->m_damage.IsDead();
+        if (!capture_client_objects(game_, frame, error))
+            return false;
+        out = Net::snapshot_values(frame);
+        ++next_snapshot_;
         return true;
     }
     bool ServerSession::leave(std::uint64_t player)

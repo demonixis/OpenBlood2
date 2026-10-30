@@ -97,13 +97,32 @@ namespace
             JoinProfile profile;
             profile.name = "Player " + std::to_string(index);
             CHECK(send(index, Ready{session.world_id(), profile}));
-            Event event;
-            CHECK(wait(index, event, EventKind::Received));
-            AdmissionMessage message;
-            CHECK(decode_admission(event.bytes, message) == DecodeAdmission::Ok);
-            CHECK(std::holds_alternative<Joined>(message));
-            joined[index] = std::get<Joined>(message);
+            BaselineReceiver baseline(session.world_id());
+            WorldSnapshot snapshot;
+            bool accepted = false, loaded = false;
+            while (!accepted || !loaded)
+            {
+                Event event;
+                CHECK(wait(index, event, EventKind::Received));
+                if (event.channel == Channel::Baseline)
+                {
+                    CHECK(!loaded);
+                    const auto status = baseline.receive(event.bytes, snapshot);
+                    CHECK(status != BaselineResult::Refused);
+                    loaded = status == BaselineResult::Complete;
+                }
+                else
+                {
+                    AdmissionMessage message;
+                    CHECK(decode_admission(event.bytes, message) == DecodeAdmission::Ok);
+                    CHECK(!accepted && std::holds_alternative<Joined>(message));
+                    joined[index] = std::get<Joined>(message);
+                    accepted = true;
+                }
+            }
             CHECK(joined[index].world == session.world_id() && session.game().objects.get(joined[index].object));
+            CHECK(snapshot.player == joined[index].object && snapshot.player_alive && !snapshot.objects.empty());
+            CHECK(snapshot.time == session.game().server.world_time());
             return true;
         }
         bool rejected(unsigned index, Reject reason)

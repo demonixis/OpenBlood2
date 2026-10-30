@@ -1,21 +1,21 @@
+#include "game/client_replication.h"
 #include "game/server_adapter.h"
 #include <charconv>
 #include <cmath>
 
 namespace OpenBlood2
 {
-    bool GameSession::publish_client_objects(std::string& error)
+    bool capture_client_objects(GameSession& game, ClientWorldFrame& frame, std::string& error)
     {
+        auto& objects = game.objects;
+        auto& server = game.server;
         if (objects.busy())
         {
             error = "Client publication during a server callback rejected";
             return false;
         }
-        auto& frame = object_scratch_;
         frame.polygrids.clear();
         frame.particle_streams.clear();
-        frame.world = client_session.world.frame().world;
-        frame.sequence = client_session.world.frame().sequence + 1;
         frame.time = server.world_time();
         auto identity = [&](HOBJECT handle)
         {
@@ -33,7 +33,7 @@ namespace OpenBlood2
             auto& out = count < frame.objects.size() ? frame.objects[count] : frame.objects.emplace_back();
             ++count;
             {
-                // Reset every field, keeping only the allocations of the replaced frame.
+                // Reset every field, keeping only the allocations of a reused frame.
                 auto filename = std::move(out.filename);
                 auto skin = std::move(out.skin);
                 auto hidden_nodes = std::move(out.hidden_nodes);
@@ -90,21 +90,41 @@ namespace OpenBlood2
         };
         frame.model_add = {channel("ModelAddR"), channel("ModelAddG"), channel("ModelAddB")};
         frame.model_dir_add = {channel("ModelDirAddR"), channel("ModelDirAddG"), channel("ModelDirAddB")};
-        frame.player = identity(client_shell.player);
-        frame.seeing_eye = identity(client_shell.seeing_eye);
-        frame.orb = identity(client_shell.orb_view);
-        const auto* owner = server_shell.Player(local_client);
-        frame.player_alive = owner && !owner->m_damage.IsDead();
         auto effect_identity = [&](ClientObjectId reference)
         {
-            const auto* object = reference.world == frame.world ? objects.get(reference.object) : nullptr;
+            const auto* object =
+                reference.world == game.client_session.world.frame().world ? objects.get(reference.object) : nullptr;
             return object && object->life == Life::Alive ? object->id : ObjectId{};
         };
         for (const auto& fx : server.polygrids.active)
             frame.polygrids.push_back({fx.effect.id, effect_identity(fx.owner)});
         for (const auto& fx : server.particle_streams.active)
             frame.particle_streams.push_back({fx.effect.id, effect_identity(fx.owner)});
-        const bool accepted = client_session.receive(std::move(frame), error);
+        return true;
+    }
+    bool GameSession::publish_client_objects(std::string& error)
+    {
+        if (objects.busy())
+        {
+            error = "Client publication during a server callback rejected";
+            return false;
+        }
+        // The scratch frame is the replica's previous frame (swapped out by receive).
+        auto& frame = object_scratch_;
+        frame.world = client_session.world.frame().world;
+        frame.sequence = client_session.world.frame().sequence + 1;
+        auto identity = [&](HOBJECT handle)
+        {
+            const auto* record = objects.get(handle);
+            return record && record->life == Life::Alive ? record->id : ObjectId{};
+        };
+        frame.player = identity(client_shell.player);
+        frame.seeing_eye = identity(client_shell.seeing_eye);
+        frame.orb = identity(client_shell.orb_view);
+        const auto* owner = server_shell.Player(local_client);
+        frame.player_alive = owner && !owner->m_damage.IsDead();
+        const bool accepted =
+            capture_client_objects(*this, frame, error) && client_session.receive(std::move(frame), error);
         // The replaced (or refused) frame keeps no asset alive past this publication.
         for (auto& object : frame.objects)
         {

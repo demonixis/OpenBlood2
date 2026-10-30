@@ -518,7 +518,7 @@ physics and forced-position messages. It does not add retries, a new spawn-safet
 policy or an origin fallback. Missing/invalid markers fail with owned-list cleanup.
 The original solo named/fallback selection and explicit inspection override stay
 unchanged. Team filtering, original multiplayer initialization and death/respawn
-are subsequent steps; the dedicated transport still refuses game admission.
+were subsequent steps at that delivery; wire admission is now covered below.
 See [connection verification](../implementation/reports/m9_player_connections.md).
 
 ## Fresh Bloodbath player profiles
@@ -550,13 +550,13 @@ VoiceMgr, still needs extraction before remote gameplay.
 
 This is fresh Bloodbath entry only. Team assignment/forced skins, configurable
 healing, dead respawn/slow death and the delayed spawn voice are subsequent lots.
-Team/CTF profile requests are explicitly refused meanwhile. Wire admission stays
-closed. See [profile verification](../implementation/reports/m9_player_profiles.md).
+Team/CTF profile requests are explicitly refused meanwhile. Wire admission is
+covered by the subsequent continuation below. See [profile verification](../implementation/reports/m9_player_profiles.md).
 
 ## ENet Bloodbath admission
 
 The [admission continuation](../implementation/reports/m9_admission.md) opens
-Bloodbath entry through a bounded, portable protocol. Version 1 uses explicit
+Bloodbath entry through a bounded, portable protocol. Initial version 1 used explicit
 little-endian fields and five Control messages, each at most 256 bytes. Decode
 into a temporary value and validate the complete packet before committing it.
 Names, profile values, mounted map paths, player/object identities and world
@@ -593,3 +593,41 @@ This step admits original players and validates process isolation; it does not
 yet deliver their gameplay events, world snapshots or movement. Private event
 queues keep their existing bounds. Interactive host/client gameplay, slow death
 and respawn, match rules, LAN discovery and platform qualification remain open.
+
+## Initial world snapshot over ENet
+
+The [initial snapshot continuation](../implementation/reports/m9_world_baseline.md)
+uses protocol version 2; version 1 admission-only peers are now refused. After
+Joined, the server sends one complete observable object snapshot on reliable
+Baseline. Control and Baseline may arrive in either order; a client waits for
+both and verifies its addressed player before activating the received world.
+
+Capture shares the immediate local publisher's read-only object traversal,
+without advancing callbacks, animation, audio or RNG. The wire record contains
+only explicit little-endian values: identities, poses, flags/colors, named assets,
+animation/sprite tracks, hidden nodes, attachments, world-model bindings, sky and
+owner identities for PolyGrids/streams. There is no original handle, decoded
+asset, GPU resource or serialized C++ object layout. This is the object boundary;
+collision/environment values, effects recipes, logical voices and HUD still need
+their own wire delivery.
+
+A full snapshot is at most 1 MiB. Reliable chunks are at most 32,768 bytes,
+including their 30-byte world/sequence/length/offset header. The receiver owns
+one bounded assembly, requires exact contiguous offsets and matching metadata,
+and refuses old worlds/sequences, duplicates, truncations and excess lengths.
+Partial or invalid input cannot replace the accepted world. Decode validates
+finite/ranged fields, object ordering/generations, boolean encodings, resource
+names, node masks and aggregate counts before committing. No model keys or
+other gameplay callbacks execute in a replica.
+
+A separately linked client module resolves models and sprites from its own
+mounted resources. It verifies model animation/node bounds, sprite frame bounds
+and world-model names/indices against its own DAT. Only a fully resolved frame
+replaces ClientWorld. Decoded asset ownership survives server teardown; old
+references keep their world/object generation qualification. Cross-frame retired
+identity tracking and unreliable incremental updates belong to the next step.
+
+This is one initial frame at each admission, including after the world has
+advanced. Existing connected clients do not yet receive subsequent joins, poses
+or destructions. Twenty-Hz publication/interpolation, private events, remote
+movement/combat and playable host/client operation remain pending.

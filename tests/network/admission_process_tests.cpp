@@ -1,3 +1,5 @@
+#include "client/network_world.h"
+#include "client/object_scene.h"
 #include "engine/resources.h"
 #include "engine/world.h"
 #include "net/admission.h"
@@ -8,6 +10,7 @@
 #include <charconv>
 #include <chrono>
 #include <iostream>
+#include <optional>
 #include <thread>
 
 using namespace OpenBlood2;
@@ -34,6 +37,13 @@ namespace
         Config config;
         config.data_dir = path_from_utf8(data);
         Resources resources;
+        ModelStore models(resources);
+        SpriteStore sprites(resources);
+        World loaded;
+        ClientWorld replica;
+        std::optional<BaselineReceiver> baseline;
+        WorldSnapshot snapshot;
+        ObjectId own_object;
         Sha256Digest digest;
         CHECK(resources.mount_game(config, error) && content_fingerprint(resources, digest, error));
         Transport transport;
@@ -48,10 +58,10 @@ namespace
         const auto deadline = Clock::now() + std::chrono::seconds(8);
         Clock::time_point leave_at;
         std::uint64_t world = 0;
-        bool hello = false, ready = false, joined = false, leaving = false;
+        bool hello = false, ready = false, joined = false, leaving = false, assembled = false, replicated = false;
         while (Clock::now() < deadline)
         {
-            if (joined && !leaving && Clock::now() >= leave_at)
+            if (joined && replicated && !leaving && Clock::now() >= leave_at)
             {
                 CHECK(transport.disconnect(peer, 0));
                 leaving = true;
@@ -62,7 +72,7 @@ namespace
             if (status == PollResult::Idle)
                 continue;
             if (event.kind == EventKind::Disconnected)
-                return joined && leaving && event.reason == 0;
+                return joined && replicated && leaving && event.reason == 0;
             if (event.kind == EventKind::Connected)
             {
                 CHECK(!hello && send(Hello{Edition::Retail, digest}));
@@ -70,35 +80,58 @@ namespace
             }
             else
             {
-                AdmissionMessage message;
-                CHECK(decode_admission(event.bytes, message) == DecodeAdmission::Ok);
-                if (const auto* offer = std::get_if<WorldOffer>(&message))
+                if (event.channel == Channel::Baseline)
                 {
-                    CHECK(hello && !ready);
-                    std::vector<std::uint8_t> bytes;
-                    World loaded;
-                    CHECK(resources.read(offer->path, bytes, error) && read_world(bytes, loaded, error));
-                    world = offer->world;
-                    CHECK(send(Ready{world, {}}));
-                    ready = true;
-                }
-                else if (const auto* accepted = std::get_if<Joined>(&message))
-                {
-                    CHECK(ready && !joined && accepted->world == world);
-                    joined = true;
-                    leave_at = Clock::now() + std::chrono::milliseconds(1500);
-                    std::cout << "Joined player " << accepted->player << " world " << world
-                              << " after independent data hash and DAT decode\n"
-                              << std::flush;
-                }
-                else if (const auto* pulse = std::get_if<Heartbeat>(&message))
-                {
-                    CHECK(joined && pulse->world == world);
-                    if (!leaving)
-                        CHECK(send(*pulse));
+                    CHECK(ready && baseline && !assembled);
+                    const auto result = baseline->receive(event.bytes, snapshot);
+                    CHECK(result != BaselineResult::Refused);
+                    assembled = result == BaselineResult::Complete;
                 }
                 else
-                    CHECK(false);
+                {
+                    AdmissionMessage message;
+                    CHECK(decode_admission(event.bytes, message) == DecodeAdmission::Ok);
+                    if (const auto* offer = std::get_if<WorldOffer>(&message))
+                    {
+                        CHECK(hello && !ready);
+                        std::vector<std::uint8_t> bytes;
+                        CHECK(resources.read(offer->path, bytes, error) && read_world(bytes, loaded, error));
+                        world = offer->world;
+                        CHECK(replica.begin(world));
+                        baseline.emplace(world);
+                        CHECK(send(Ready{world, {}}));
+                        ready = true;
+                    }
+                    else if (const auto* accepted = std::get_if<Joined>(&message))
+                    {
+                        CHECK(ready && !joined && accepted->world == world);
+                        joined = true;
+                        own_object = accepted->object;
+                    }
+                    else if (const auto* pulse = std::get_if<Heartbeat>(&message))
+                    {
+                        CHECK(joined && pulse->world == world);
+                        if (!leaving)
+                            CHECK(send(*pulse));
+                    }
+                    else
+                        CHECK(false);
+                }
+                if (joined && assembled && !replicated)
+                {
+                    CHECK(snapshot.player == own_object &&
+                          receive_network_world(snapshot, loaded, models, sprites, replica, error));
+                    CHECK(replica.get(own_object) && replica.get(own_object)->model);
+                    ModelView scene;
+                    CHECK(append_client_models(replica, true, scene, resources, error));
+                    CHECK(!scene.entries.empty());
+                    replicated = true;
+                    leave_at = Clock::now() + std::chrono::milliseconds(1500);
+                    std::cout << "Replicated " << replica.frame().objects.size() << " objects, " << scene.entries.size()
+                              << " model entries in world " << world
+                              << " after independent hash, DAT and model decode\n"
+                              << std::flush;
+                }
             }
         }
         error = "Child client protocol deadline";
@@ -201,8 +234,8 @@ namespace
         std::cout << host.output << clients[0].output << clients[1].output;
         CHECK(host_done && host_code == 0 && finished[0] && finished[1] && codes[0] == 0 && codes[1] == 0);
         CHECK(host.output.find("admitted=2, departed=2, rejected=0, timed_out=0") != std::string::npos);
-        CHECK(clients[0].output.find("Joined player") != std::string::npos &&
-              clients[1].output.find("Joined player") != std::string::npos);
+        CHECK(clients[0].output.find("Replicated ") != std::string::npos &&
+              clients[1].output.find("Replicated ") != std::string::npos);
         return true;
     }
 } // namespace

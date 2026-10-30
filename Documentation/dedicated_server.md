@@ -3,7 +3,7 @@
 M9 is in progress. This executable loads and advances a retail multiplayer world
 without a window, GPU or audio device. Bloodbath accepts the new bounded ENet
 admission protocol; Team/CTF still refuse player admission. Host/join screens,
-network gameplay, match limits and rotation are not available yet. See the
+continuous network gameplay, match limits and rotation are not available yet. See the
 [admission report](implementation/reports/m9_admission.md),
 [foundation evidence](implementation/reports/m9_multiplayer.md) and
 [accepted contract](contracts/multiplayer_contracts.md).
@@ -42,7 +42,7 @@ Bloodbath admission, not interactive multiplayer gameplay. CI uses `ci-server` a
 are staged by `cmake/PackageServerCi.cmake`. Windows/macOS compilation, actual
 interoperability and human LAN play require their own recorded results.
 
-Admission version 1 exchanges little-endian messages on the reliable Control
+Admission version 2 exchanges little-endian messages on the reliable Control
 channel, limited to 256 bytes. A client sends its edition and complete content
 hash, receives the approved map and world generation, loads its own mounted
 map and returns a validated profile with that generation. Only then does the
@@ -54,3 +54,10 @@ server uses a monotonic wall clock independently of its simulation clock.
 Reconnect is a new admission with fresh player/object identities. Shutdown
 detaches players before destroying the transport. This protocol is not compatible
 with retail executables, and the regular graphical client is not connected yet.
+
+Version 2 also sends a complete initial object snapshot on the reliable Baseline
+channel. The client reconstructs ClientWorld using its own DAT and model/sprite
+resources; the snapshot contains no process-local pointer. It is capped at 1 MiB
+and sent in bounded ordered chunks. This initial frame is not yet followed by
+20 Hz updates, movement, HUD or combat messages. See the
+[initial snapshot report](implementation/reports/m9_world_baseline.md).

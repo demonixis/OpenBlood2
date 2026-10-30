@@ -102,6 +102,17 @@ namespace OpenBlood2
             ++admitted;
             if (!send(peer.peer, joined, error))
                 return reject(Net::Reject::Capacity);
+            Net::WorldSnapshot snapshot;
+            std::vector<std::vector<std::uint8_t>> chunks;
+            if (!session_.snapshot(peer.player, snapshot, error) || !Net::encode_baseline_chunks(snapshot, chunks))
+            {
+                if (error.empty())
+                    error = "Initial world snapshot cannot be encoded";
+                return reject(Net::Reject::World);
+            }
+            for (const auto& bytes : chunks)
+                if (!transport_.send(peer.peer, Net::Channel::Baseline, bytes, error))
+                    return reject(Net::Reject::Capacity);
             peer.phase = Phase::Joined;
             peer.deadline = now + 15s;
             peer.heartbeat = now + 1s;

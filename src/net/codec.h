@@ -45,6 +45,13 @@ namespace OpenBlood2::Net
             else
                 u32(std::bit_cast<std::uint32_t>(value));
         }
+        void f64(double value)
+        {
+            if (!std::isfinite(value))
+                good_ = false;
+            else
+                u64(std::bit_cast<std::uint64_t>(value));
+        }
         void raw(std::span<const std::uint8_t> value)
         {
             if (!good_ || value.size() > limit_ - bytes_.size())
@@ -110,6 +117,13 @@ namespace OpenBlood2::Net
         float f32()
         {
             const float value = std::bit_cast<float>(u32());
+            if (!std::isfinite(value))
+                good_ = false;
+            return good_ ? value : 0;
+        }
+        double f64()
+        {
+            const double value = std::bit_cast<double>(u64());
             if (!std::isfinite(value))
                 good_ = false;
             return good_ ? value : 0;

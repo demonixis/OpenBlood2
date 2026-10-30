@@ -25,7 +25,7 @@ namespace
             Joined{3, 4, {65535, 9}}, Heartbeat{10}};
         std::vector<std::uint8_t> bytes;
         CHECK(encode_admission(hello, bytes));
-        std::vector<std::uint8_t> golden{0x42, 0x32, 0x4d, 0x39, 1, 0, 1, 0};
+        std::vector<std::uint8_t> golden{0x42, 0x32, 0x4d, 0x39, 2, 0, 1, 0};
         for (unsigned i = 0; i < 32; ++i)
             golden.push_back(std::uint8_t(i));
         CHECK(bytes == golden);

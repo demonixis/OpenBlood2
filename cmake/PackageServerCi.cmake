@@ -34,12 +34,14 @@ file(COPY "${source}/Documentation/dedicated_server.md" DESTINATION "${package}/
 file(COPY "${source}/Documentation/contracts/multiplayer_contracts.md" DESTINATION "${package}/Documentation/contracts")
 file(COPY "${source}/Documentation/implementation/reports/m9_multiplayer.md"
     "${source}/Documentation/implementation/reports/m9_admission.md"
+    "${source}/Documentation/implementation/reports/m9_world_baseline.md"
     DESTINATION "${package}/Documentation/implementation/reports")
 file(COPY "${source}/Documentation/implementation/sources/m9_foundation_sources.json"
     "${source}/Documentation/implementation/sources/m9_admission_sources.json"
+    "${source}/Documentation/implementation/sources/m9_world_baseline_sources.json"
     DESTINATION "${package}/Documentation/implementation/sources")
 file(WRITE "${package}/README.txt"
-    "OpenBlood2 dedicated server (M9). Bloodbath admission is available; gameplay replication is pending.\nSee Documentation/dedicated_server.md for build status, data configuration and usage.\n")
+    "OpenBlood2 dedicated server (M9). Bloodbath initial world replication is available; gameplay updates are pending.\nSee Documentation/dedicated_server.md for build status, data configuration and usage.\n")
 file(COPY "${source}/Documentation/implementation/provenance.md" DESTINATION "${package}/Documentation/implementation")
 if(CMAKE_HOST_WIN32)
     file(TO_CMAKE_PATH "$ENV{VCToolsRedistDir}" redist)
@@ -64,7 +66,7 @@ endif()
 execute_process(COMMAND git rev-parse HEAD WORKING_DIRECTORY "${source}"
     OUTPUT_VARIABLE revision OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
 file(WRITE "${package}/BUILD.txt"
-    "OpenBlood2 ${version}\nDedicated server; Bloodbath admission, gameplay replication pending\nPlatform: ${PLATFORM}\nConfiguration: Release\nCommit: ${revision}\n")
+    "OpenBlood2 ${version}\nDedicated server; Bloodbath initial replication, gameplay updates pending\nPlatform: ${PLATFORM}\nConfiguration: Release\nCommit: ${revision}\n")
 execute_process(COMMAND ${run_environment} "${package}/blood2-server${suffix}" --help
     WORKING_DIRECTORY "${package}" COMMAND_ERROR_IS_FATAL ANY)
 if(CMAKE_HOST_WIN32)

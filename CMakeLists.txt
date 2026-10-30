@@ -47,12 +47,16 @@ add_library(blood2_startup STATIC src/engine/config.cpp src/engine/resources.cpp
 target_include_directories(blood2_startup PUBLIC src)
 blood2_project_options(blood2_startup)
 
-add_library(blood2_net STATIC src/net/transport.cpp src/net/content.cpp src/net/admission.cpp)
+add_library(blood2_net STATIC src/net/transport.cpp src/net/content.cpp src/net/admission.cpp src/net/world_snapshot.cpp)
 target_include_directories(blood2_net PUBLIC src)
 target_link_libraries(blood2_net PUBLIC blood2_startup PRIVATE enet)
 blood2_project_options(blood2_net)
 
 include(cmake/EngineSources.cmake)
+
+add_library(blood2_client_network STATIC src/client/network_world.cpp)
+target_link_libraries(blood2_client_network PUBLIC engine_core blood2_net)
+blood2_project_options(blood2_client_network)
 
 set_source_files_properties(src/engine/crash_capture.cpp PROPERTIES
     COMPILE_DEFINITIONS "BLOOD2_CRASH_SANITIZED=$<BOOL:${BLOOD2_SANITIZERS}>")

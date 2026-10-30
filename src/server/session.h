@@ -2,6 +2,7 @@
 #include "game/server_adapter.h"
 #include "net/admission.h"
 #include "net/content.h"
+#include "net/world_snapshot.h"
 #include "server/clock.h"
 #include <utility>
 #include <string>
@@ -19,6 +20,7 @@ namespace OpenBlood2
         bool tick(std::string& error);
         // Trusted local call after the endpoint's protocol/content/loading gates.
         bool join(const Net::JoinProfile&, Net::Joined&, std::string& error);
+        bool snapshot(std::uint64_t player, Net::WorldSnapshot&, std::string& error);
         bool leave(std::uint64_t player);
         bool clear_players();
         std::size_t player_count() const
@@ -61,7 +63,7 @@ namespace OpenBlood2
             ObjectId object;
         };
         std::vector<Player> players_;
-        std::uint64_t world_id_ = 0, next_player_ = 1;
+        std::uint64_t world_id_ = 0, next_player_ = 1, next_snapshot_ = 1;
         unsigned mode_ = 0;
     };
 } // namespace OpenBlood2
