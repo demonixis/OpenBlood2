@@ -69,6 +69,7 @@ namespace OpenBlood2
         AudioTimeline audio;
         // Immediate local publisher/inspection aliases. The client owns these pools.
         OriginalEffects& client_effects;
+        EffectServices effect_services(); // Synchronous local creation bridge; never retained by an effect.
         ClientObjectId effect_reference(HOBJECT) const;
         EffectOwner effect_owner(HOBJECT) const;
         SoundId PlayCharacterSound(HOBJECT, const SoundRequest&, bool retain, std::string&) override;

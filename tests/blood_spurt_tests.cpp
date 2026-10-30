@@ -1,3 +1,4 @@
+#include "client/effect_services.h"
 #include "app/sprite_scene.h"
 #include "blood_spurt_fixture.h"
 #include "game/original/AI_Mgr.h"
@@ -39,13 +40,13 @@ namespace
         CParticleExplosionFX f;
         std::minstd_rand random(1);
         CHECK(f.CreateObject(s, g.resources, g.server, 0, random, error));
-        CHECK(f.Update(0, .1, g.server, random, 16384));
+        CHECK(f.Update(0, .1, g.server.effect_services(), random, 16384));
         CHECK(f.particles.size() == 12 && f.position.x == 6 && f.position.y == 1000 && f.velocity.y == -20);
         for (const auto& p : f.particles)
             CHECK(std::abs(p.position.x) <= .5 && std::abs(p.position.y) <= .5 && p.lifetime == 10 &&
                   near(p.color.x, 128.f / 255) && p.velocity.y >= -10 && p.velocity.y <= -5);
         auto old = f.particles[0];
-        CHECK(f.Update(.1, .1, g.server, random, 16384));
+        CHECK(f.Update(.1, .1, g.server.effect_services(), random, 16384));
         CHECK(f.particles.size() == 24 && f.position.x == 12 && f.position.y == 998 && f.velocity.y == -40);
         CHECK(near(f.particles[0].position.y, old.position.y + old.velocity.y * .1f) &&
               near(f.particles[0].velocity.y, old.velocity.y - 10));
@@ -56,19 +57,19 @@ namespace
                 CHECK(std::abs(p.position.x - step) <= .5 && near(p.lifetime, 10 + step * .1f / 6));
             }
         f.emitting = false;
-        CHECK(f.Update(.5, .4, g.server, random, 16384) && f.alpha == 1);
-        CHECK(f.Update(1.25, .75, g.server, random, 16384) && near(f.alpha, .5));
-        CHECK(f.Update(2, .75, g.server, random, 16384) && f.alpha == 0);
-        CHECK(!f.Update(2.001, .001, g.server, random, 16384) && f.error.empty());
+        CHECK(f.Update(.5, .4, g.server.effect_services(), random, 16384) && f.alpha == 1);
+        CHECK(f.Update(1.25, .75, g.server.effect_services(), random, 16384) && near(f.alpha, .5));
+        CHECK(f.Update(2, .75, g.server.effect_services(), random, 16384) && f.alpha == 0);
+        CHECK(!f.Update(2.001, .001, g.server.effect_services(), random, 16384) && f.error.empty());
         // Source clients explicitly Update on creation; server SFX decoding waits for the manager.
         CHECK(g.server.PublishClientBloodSpurt(s, "immediate", true, error) && error.empty());
         CHECK(g.server.blood_spurts.active.back().updates == 1 && g.server.blood_spurts.live_particles() == 12);
-        CHECK(g.server.blood_spurts.advance(g.objects.time(), g.server) &&
+        CHECK(g.server.blood_spurts.advance(g.objects.time(), g.server.effect_services()) &&
               g.server.blood_spurts.live_particles() == 12);
         CHECK(g.server.PublishClientBloodSpurt(s, "deferred", false, error) && error.empty());
         CHECK(g.server.blood_spurts.active.back().first_update &&
               g.server.blood_spurts.active.back().particles.empty());
-        CHECK(g.server.blood_spurts.advance(g.objects.time(), g.server) &&
+        CHECK(g.server.blood_spurts.advance(g.objects.time(), g.server.effect_services()) &&
               g.server.blood_spurts.live_particles() == 24);
         return true;
     }
@@ -84,7 +85,7 @@ namespace
         for (unsigned i = 0; i < 32; ++i)
             CHECK(g.server.PublishClientBloodSpurt(s, "absent original zero", false, error) && error.empty());
         auto& effects = g.server.blood_spurts;
-        CHECK(effects.advance(.1, g.server));
+        CHECK(effects.advance(.1, g.server.effect_services()));
         unsigned absent = 0, played = 0;
         for (const auto& report : effects.reports)
         {
@@ -103,7 +104,7 @@ namespace
         }
         CHECK(absent > 0 && played > 0 && g.client_session.audio.mixer.voices().size() == played &&
               g.server.audio.voices().empty());
-        CHECK(effects.advance(1.0, g.server) && effects.advance(1.8, g.server) && effects.advance(2.101, g.server) &&
+        CHECK(effects.advance(1.0, g.server.effect_services()) && effects.advance(1.8, g.server.effect_services()) && effects.advance(2.101, g.server.effect_services()) &&
               effects.active.empty());
         unsigned retained = 0;
         for (const auto& report : effects.reports)
@@ -128,13 +129,13 @@ namespace
         s.position = {0, 1, 0};
         s.min_velocity = s.max_velocity = {0, -20, 0};
         CParticleExplosionFX fx;
-        CHECK(fx.CreateObject(s, g.resources, g.server, 0, rng, error) && fx.Update(.1, .1, g.server, rng, 16384));
+        CHECK(fx.CreateObject(s, g.resources, g.server, 0, rng, error) && fx.Update(.1, .1, g.server.effect_services(), rng, 16384));
         CHECK(!fx.emitting && fx.impacts == 1 && fx.splat_event && fx.splat_error.empty() && fx.sound_error.empty());
         CHECK(near(fx.position.y, .3f) && g.server.blood_splats.active.size() == 1);
         const auto splat = g.server.blood_splats.active.front();
         CHECK(splat.settings.scale >= 0 && splat.settings.scale <= .1 && splat.settings.grow_scale == .01f &&
               near(splat.position.y, .3f));
-        CHECK(fx.Update(.2, .1, g.server, rng, 16384) && fx.emitted == 12 && fx.impacts == 1);
+        CHECK(fx.Update(.2, .1, g.server.effect_services(), rng, 16384) && fx.emitted == 12 && fx.impacts == 1);
         // Client fragment uses its larger original splat recipe and is never parented to the mark.
         FleshGib fragment;
         fragment.position = {50, 1, 0};
@@ -142,7 +143,7 @@ namespace
         CHECK(g.models.load("models/characters/caleb.abc", fragment.model, error));
         fragment.sound_path = "sounds/gibs/flesh/gib_impact1.wav";
         g.server.flesh_gibs.active.push_back(fragment);
-        CHECK(g.server.flesh_gibs.advance(.1, g.server));
+        CHECK(g.server.flesh_gibs.advance(.1, g.server.effect_services()));
         const auto& f = g.server.flesh_gibs.active.front();
         CHECK(f.impacts == 1 && f.splat_event && f.splat_error.empty() && f.error.empty());
         const auto& large = g.server.blood_splats.reports.back();
@@ -205,16 +206,16 @@ namespace
             CHECK(g.server.PublishClientBloodSpurt(s, "capacity", true, error) && error.empty());
         CHECK(g.server.PublishClientBloodSpurt(s, "overflow", true, error) && !error.empty() &&
               g.server.blood_spurts.active.size() == 128);
-        CHECK(!g.server.blood_spurts.advance(-1, g.server) && g.server.blood_spurts.active.empty());
+        CHECK(!g.server.blood_spurts.advance(-1, g.server.effect_services()) && g.server.blood_spurts.active.empty());
         std::minstd_rand rng(1);
         CParticleExplosionFX fx;
         CHECK(fx.CreateObject(s, g.resources, g.server, 0, rng, error));
         // A burst beyond the shared budget is skipped whole; it is not an update failure.
-        CHECK(fx.Update(0, 0, g.server, rng, 11) && fx.error.empty() && fx.particles.empty());
+        CHECK(fx.Update(0, 0, g.server.effect_services(), rng, 11) && fx.error.empty() && fx.particles.empty());
         CHECK(fx.emitting && fx.emitted == 0 && fx.capacity_skips == 1);
         Resources missing;
         BloodSpurts effects;
-        CHECK(effects.publish(s, "missing", false, missing, g.server, 0, error) && !error.empty() &&
+        CHECK(effects.publish(s, "missing", false, missing, g.server.effect_services(), 0, error) && !error.empty() &&
               effects.active.empty());
         CHECK(g.unload_world() && g.server.blood_spurts.reports.empty() && g.server.blood_splats.reports.empty());
         return true;
@@ -237,7 +238,7 @@ namespace
             float last_y = effects.active.front().position.y;
             for (int tick = 1; tick <= 2 * hz; ++tick)
             {
-                CHECK(effects.advance(double(tick) / hz, g.server) && effects.update_error.empty());
+                CHECK(effects.advance(double(tick) / hz, g.server.effect_services()) && effects.update_error.empty());
                 const auto& fx = effects.active.front();
                 CHECK(fx.particles.size() <= 2048 && fx.emitting && fx.impacts == 0 && fx.position.y <= last_y);
                 last_y = fx.position.y;
@@ -253,7 +254,7 @@ namespace
                 high = std::max(high, fx.particles[i].position.y);
             }
             CHECK(high - low > 3);
-            CHECK(effects.advance(2.01, g.server) && effects.active.empty() && effects.expired == 1 && !effects.failed);
+            CHECK(effects.advance(2.01, g.server.effect_services()) && effects.active.empty() && effects.expired == 1 && !effects.failed);
             const auto& report = effects.reports.back();
             CHECK(report.ended && report.error.empty() && report.emitted == 61 * 12 && report.capacity_skips == 0);
             std::cout << "Spurt at " << hz << " Hz: " << report.emitted << " drops, no skipped burst\n";
@@ -341,8 +342,8 @@ namespace
             std::size_t peak = 0;
             for (int frame = 0; frame < 110; ++frame)
             {
-                CHECK(g.objects.advance(.02) && g.server.flesh_gibs.advance(g.objects.time(), g.server) &&
-                      g.server.blood_spurts.advance(g.objects.time(), g.server) &&
+                CHECK(g.objects.advance(.02) && g.server.flesh_gibs.advance(g.objects.time(), g.server.effect_services()) &&
+                      g.server.blood_spurts.advance(g.objects.time(), g.server.effect_services()) &&
                       g.server.blood_splats.advance(g.objects.time()));
                 peak = std::max(peak, g.server.blood_spurts.live_particles());
             }

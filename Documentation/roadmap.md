@@ -278,8 +278,10 @@ feeds every scene-effect consumer, including lights/fog, from owned client snaps
 the [runtime continuation](implementation/reports/m9_effect_queries.md) now owns the
 original pools on the client and makes fragment collision updates independent.
 [Owner-bound effects](implementation/reports/m9_effect_owners.md) now update from
-world-qualified ClientWorld identities and copied owner values. Remaining moving
-FX collision, child publication and flashlight services still use the immediate local adapter.
+world-qualified ClientWorld identities and copied owner values.
+[Moving FX services](implementation/reports/m9_effect_services.md) now use client
+geometry and typed child outputs. Immediate creation queries and flashlight services
+still use the local adapter.
 [Cosmetic impact audio](implementation/reports/m9_effect_audio.md) now plays only on the client,
 without consuming server voices or sound identities.
 **Full client separation, player

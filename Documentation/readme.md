@@ -13,6 +13,7 @@
 | [Architecture](architecture.md) | Targets, ownership and engine/game boundaries. |
 | [Client cameras and HUD](implementation/reports/m9_client_view.md) | M9 independent camera selection/rays, client HUD ownership and local verification. |
 | [Client audio](implementation/reports/m9_client_audio.md) | M9 logical server voices, independent client playback and local verification. |
+| [Moving client effect services](implementation/reports/m9_effect_services.md) | Independent moving FX, copied collision queries and typed child/audio outputs. |
 | [Client cosmetic audio](implementation/reports/m9_effect_audio.md) | Impact playback, independent IDs, bounded client voices and dedicated isolation. |
 | [Owner-bound client effects](implementation/reports/m9_effect_owners.md) | World-qualified particle/stream/PolyGrid/warp/light owners and independent replica updates. |
 | [Client effect ownership and queries](implementation/reports/m9_effect_queries.md) | Independent cosmetic library, client-owned pools and fragment collision updates. |

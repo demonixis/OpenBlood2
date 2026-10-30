@@ -1,3 +1,4 @@
+#include "client/effect_services.h"
 #include "app/model_scene.h"
 #include "app/scene_presenter.h"
 #include "app/sprite_scene.h"
@@ -132,7 +133,9 @@ int main(int argc, char** argv)
     for (auto id : game.objects.snapshot())
         if (auto* r = game.objects.get(id); r && r->state.m_ObjectType == OT_SPRITE)
             r->state.m_Flags &= ~FLAG_VISIBLE;
-    game.server.reset_world_time();
+    // Isolate cosmetic pools without rewinding the already-published world clock.
+    game.client_effects.reset_world();
+    game.server.audio.clear();
     game.client_shell.view.position = game.client_shell.camera_position = {};
     game.client_shell.view.rotation = {};
     game.client_shell.rotation = {};
@@ -172,7 +175,7 @@ int main(int argc, char** argv)
     shot.surface = SURFTYPE_STONE;
     shot.eject = true;
     CHECK(game.server.PublishShotgunEffects(player->m_hObject, shot, error) && error.empty());
-    game.server.shotgun_effects.advance(game.objects.time() + .02, game.server);
+    game.server.shotgun_effects.advance(game.objects.time() + .02, game.server.effect_services());
     for (auto& c : game.server.shotgun_effects.casings)
         c.rotation = rotation_from_euler({.6f, .7f, .2f});
     ModelView models;

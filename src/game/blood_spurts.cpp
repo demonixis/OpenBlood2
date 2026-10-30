@@ -1,5 +1,5 @@
 #include "game/blood_spurts.h"
-#include "game/legacy/server_de.h"
+#include "client/effect_services.h"
 namespace OpenBlood2
 {
     std::size_t BloodSpurts::live_particles() const
@@ -27,7 +27,8 @@ namespace OpenBlood2
             }
     }
     std::uint64_t BloodSpurts::publish(const BloodSpurtSettings& s, std::string_view source, bool immediate,
-                                       const Resources& resources, ServerDE& server, double now, std::string& error)
+                                       const Resources& resources, const EffectServices& services, double now,
+                                       std::string& error)
     {
         error.clear();
         if (source.size() > 100 || source.find('\0') != std::string_view::npos || next_event_ == UINT64_MAX)
@@ -44,12 +45,12 @@ namespace OpenBlood2
         const auto live = live_particles();
         if (active.size() >= 128 || live > 16384 - 12 || next_id_ == UINT64_MAX)
             error = "Blood-spurt capacity exhausted";
-        else if (fx.CreateObject(s, resources, server, now, random_, error))
+        else if (fx.CreateObject(s, resources, services.queries, now, random_, error))
         {
             fx.id = next_id_++;
             fx.event = r.id;
             r.effect = fx.id;
-            if (immediate && !fx.Update(now, server.GetFrameTime(), server, random_, 16384 - live))
+            if (immediate && !fx.Update(now, services.frame_time, services, random_, 16384 - live))
                 error = fx.error;
             if (error.empty())
             {
@@ -71,7 +72,7 @@ namespace OpenBlood2
             record(active.back(), false);
         return id;
     }
-    bool BloodSpurts::advance(double now, ServerDE& server)
+    bool BloodSpurts::advance(double now, const EffectServices& services)
     {
         bool ok = true;
         std::size_t total = live_particles();
@@ -84,7 +85,7 @@ namespace OpenBlood2
                 continue;
             }
             const auto before = fx.particles.size();
-            bool alive = fx.Update(now, now - fx.last_time, server, random_, 16384 - total);
+            bool alive = fx.Update(now, now - fx.last_time, services, random_, 16384 - total);
             total = total - before + fx.particles.size();
             record(fx, !alive);
             if (alive)

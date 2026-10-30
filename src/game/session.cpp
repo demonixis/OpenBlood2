@@ -1,3 +1,4 @@
+#include "client/effect_services.h"
 #include "game/game_settings.h"
 #include "game/original/AI_Mgr.h"
 #include "game/original/BuiltinSprite.h"
@@ -940,22 +941,31 @@ namespace OpenBlood2
         ok = checked("server.explosion_lights.advance", server.explosion_lights.advance(objects.time())) && ok;
         ok = checked("server.explosion_rings.advance", server.explosion_rings.advance(objects.time())) && ok;
         ok = checked("server.explosion_flames.advance", server.explosion_flames.advance(objects.time())) && ok;
-        ok = checked("server.flesh_gibs.advance", server.flesh_gibs.advance(objects.time(), server)) && ok;
+        // One stable scene for all moving cosmetic families. This publication cannot
+        // integrate CMoveMgr or dispatch contacts; child FX only mutate client pools.
+        const bool moving =
+            !client_effects.flesh_gibs.active.empty() || !client_effects.destruction_debris.active.empty() ||
+            !client_effects.shotgun_effects.casings.empty() || !client_effects.blood_spurts.active.empty() ||
+            !client_effects.explosion_fragments.active.empty();
+        const bool geometry_ready = !moving || local_movement.publish_collision();
+        ClientEffectQueries effect_queries(geometry_ready ? &client_session.collision : nullptr);
+        EffectServices effect_services{effect_queries,        client_effects, &resources,           &sprites,
+                                       &client_session.audio, objects.time(), server.GetFrameTime()};
+        ok = checked("client.flesh_gibs.advance", client_effects.flesh_gibs.advance(objects.time(), effect_services)) &&
+             ok;
         // Cosmetic failures stay inspectable without stopping campaign simulation.
-        server.destruction_debris.advance(objects.time(), server);
-        server.shotgun_effects.advance(objects.time(), server);
+        client_effects.destruction_debris.advance(objects.time(), effect_services);
+        client_effects.shotgun_effects.advance(objects.time(), effect_services);
         ok = checked("server.sparks.advance", server.sparks.advance(objects.time())) && ok;
         ok = checked("server.lightning.advance", server.lightning.advance(objects.time())) && ok;
         ok = checked("client.warp_gates.advance",
                      owners_ready && client_effects.warp_gates.advance(objects.time(), client_session.world)) &&
              ok;
-        ok = checked("server.blood_spurts.advance", server.blood_spurts.advance(objects.time(), server)) && ok;
-        // Copy a stable collision scene once for the original fragment update. Failure
-        // makes queries explicitly unavailable, never fall back to the live registry.
-        const bool fragment_geometry = server.explosion_fragments.active.empty() || local_movement.publish_collision();
-        ClientEffectQueries fragment_queries(fragment_geometry ? &client_session.collision : nullptr);
+        ok = checked("client.blood_spurts.advance",
+                     client_effects.blood_spurts.advance(objects.time(), effect_services)) &&
+             ok;
         ok = checked("client.explosion_fragments.advance",
-                     server.explosion_fragments.advance(objects.time(), fragment_queries)) &&
+                     client_effects.explosion_fragments.advance(objects.time(), effect_queries)) &&
              ok;
         ok = checked("client.object_particles.advance",
                      owners_ready && client_effects.object_particles.advance(objects.time(), client_session.world)) &&

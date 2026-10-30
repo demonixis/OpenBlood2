@@ -1,6 +1,7 @@
 #include "../brush_fixture.h"
 #include "../model_fixture.h"
 #include "client/effect_queries.h"
+#include "client/effect_services.h"
 #include "game/server_adapter.h"
 #include <iostream>
 using namespace OpenBlood2;
@@ -33,6 +34,55 @@ int main()
     ClientEffectQueries client(&game.client_session.collision);
     auto model = std::make_shared<Model>();
     CHECK(read_model(test_model::abc().b, *model, error));
+    // Compare the unchanged primary-only trajectories through both service backends.
+    // Real resource/output creation is covered by the independently linked services test.
+    OriginalEffects old_effects, new_effects;
+    EffectServices old_services{game.server, old_effects, nullptr, nullptr, nullptr, 0, .01};
+    EffectServices new_services{client, new_effects, nullptr, nullptr, nullptr, 0, .01};
+    FleshGib gib;
+    gib.model = model;
+    gib.position = {0, 2, 0};
+    gib.velocity = {30, -100, 0};
+    gib.sound_path = "expected-unavailable.wav";
+    old_effects.flesh_gibs.active.push_back(gib);
+    new_effects.flesh_gibs.active.push_back(gib);
+    ShotgunCasing casing;
+    casing.model = model;
+    casing.position = {0, 3, 0};
+    casing.velocity = {20, -100, 0};
+    casing.expires = 20;
+    old_effects.shotgun_effects.casings.push_back(casing);
+    new_effects.shotgun_effects.casings.push_back(casing);
+    CParticleExplosionFX old_blood, new_blood;
+    old_blood.position = old_blood.previous = {0, 1, 0};
+    old_blood.velocity = {10, -100, 0};
+    new_blood = old_blood;
+    std::minstd_rand old_random{1}, new_random{1};
+    const auto equal = [](DVector a, DVector b) { return a.x == b.x && a.y == b.y && a.z == b.z; };
+    for (unsigned tick = 1; tick <= 120; ++tick)
+    {
+        old_services.time = new_services.time = tick * .01;
+        CHECK(old_effects.flesh_gibs.advance(old_services.time, old_services));
+        old_effects.shotgun_effects.advance(old_services.time, old_services);
+        CHECK(old_blood.Update(old_services.time, .01, old_services, old_random, 16384));
+        const auto calls = game.server.service_calls;
+        CHECK(new_effects.flesh_gibs.advance(new_services.time, new_services));
+        new_effects.shotgun_effects.advance(new_services.time, new_services);
+        CHECK(new_blood.Update(new_services.time, .01, new_services, new_random, 16384));
+        CHECK(game.server.service_calls == calls);
+        const auto& a = old_effects.flesh_gibs.active.front();
+        const auto& b = new_effects.flesh_gibs.active.front();
+        CHECK(equal(a.position, b.position) && equal(a.velocity, b.velocity) && equal(a.angles, b.angles) &&
+              a.impacts == b.impacts && a.resting == b.resting && a.splat_error == b.splat_error);
+        const auto& c = old_effects.shotgun_effects.casings.front();
+        const auto& d = new_effects.shotgun_effects.casings.front();
+        CHECK(equal(c.position, d.position) && equal(c.velocity, d.velocity) && c.impacts == d.impacts &&
+              c.resting == d.resting && c.pitch == d.pitch && c.yaw == d.yaw && c.sound_error == d.sound_error);
+        CHECK(equal(old_blood.position, new_blood.position) && equal(old_blood.velocity, new_blood.velocity) &&
+              old_blood.impacts == new_blood.impacts && old_blood.emitted == new_blood.emitted &&
+              old_blood.sound_resource == new_blood.sound_resource && old_blood.alpha == new_blood.alpha &&
+              old_random == new_random);
+    }
     for (const auto position : {DVector{0, 5, 0}, DVector{0, 50, 0}})
     {
         ExplosionFragSettings settings;

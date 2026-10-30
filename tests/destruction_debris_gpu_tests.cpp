@@ -1,3 +1,4 @@
+#include "client/effect_services.h"
 #include "app/model_scene.h"
 #include "app/sprite_scene.h"
 #include "engine/capture.h"
@@ -137,7 +138,7 @@ int main(int argc, char** argv)
                   pixels != again);
             game.server.destruction_debris.active[0].alpha = .4f;
         }
-        CHECK(game.server.destruction_debris.advance(.1, game.server));
+        CHECK(game.server.destruction_debris.advance(.1, game.server.effect_services()));
         CHECK(update_explosion_model_scene(game, scene, error));
         CHECK(
             render(runtime, renderer, scene.mesh, scene.revision, scene.world_draws, eye, {}, capture, again, error) &&

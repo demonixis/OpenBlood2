@@ -1,3 +1,4 @@
+#include "client/effect_services.h"
 #include "app/sprite_scene.h"
 #include "blood_spurt_fixture.h"
 #include "engine/capture.h"
@@ -121,7 +122,7 @@ int main(int argc, char** argv)
         hit.position = {0, 1, 0};
         hit.min_velocity = hit.max_velocity = {0, -20, 0};
         CHECK(g.server.PublishClientBloodSpurt(hit, "GPU emitter collision", false, error) && error.empty());
-        CHECK(g.objects.advance(.1) && g.server.blood_spurts.advance(g.objects.time(), g.server));
+        CHECK(g.objects.advance(.1) && g.server.blood_spurts.advance(g.objects.time(), g.server.effect_services()));
         CHECK(g.server.blood_spurts.active.front().impacts == 1 && g.server.blood_splats.active.size() == 1);
         CHECK(g.server.blood_splats.active.front().settings.scale > 0);
         g.server.blood_spurts.clear(); // Remaining mark must have independent GPU lifetime.

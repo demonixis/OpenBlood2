@@ -1,8 +1,8 @@
 // Selected ClientShellDLL/ParticleExplosionFX.cpp and client_physics.cpp blood path.
 #include "ParticleExplosionFX.h"
 #include "BloodSplatFX.h"
+#include "client/effect_services.h"
 #include "engine/collision.h"
-#include "game/legacy/server_de.h"
 #include <cmath>
 using namespace OpenBlood2;
 namespace
@@ -13,7 +13,7 @@ namespace
         return lo + (hi - lo) * float(r() - r.min()) / float(r.max() - r.min());
     }
 } // namespace
-bool CParticleExplosionFX::CreateObject(const BloodSpurtSettings& s, const Resources& resources, ServerDE& server,
+bool CParticleExplosionFX::CreateObject(const BloodSpurtSettings& s, const Resources& resources, EffectQueries& queries,
                                         double now, std::minstd_rand& rng, std::string& failure)
 {
     failure.clear();
@@ -37,7 +37,7 @@ bool CParticleExplosionFX::CreateObject(const BloodSpurtSettings& s, const Resou
     velocity = {draw(rng, s.min_velocity.x, s.max_velocity.x), draw(rng, s.min_velocity.y, s.max_velocity.y),
                 draw(rng, s.min_velocity.z, s.max_velocity.z)};
     ContainerCode code = CC_NOTHING;
-    if (!server.GetPointContainerCode(position, code))
+    if (!queries.effect_container(position, code))
     {
         failure = "Blood-spurt contents query unavailable";
         return false;
@@ -46,7 +46,8 @@ bool CParticleExplosionFX::CreateObject(const BloodSpurtSettings& s, const Resou
     last_time = next_update = now;
     return true;
 }
-bool CParticleExplosionFX::Update(double now, double dt, ServerDE& server, std::minstd_rand& rng, std::size_t available)
+bool CParticleExplosionFX::Update(double now, double dt, const EffectServices& services, std::minstd_rand& rng,
+                                  std::size_t available)
 {
     if (!error.empty())
         return false;
@@ -109,10 +110,10 @@ bool CParticleExplosionFX::Update(double now, double dt, ServerDE& server, std::
     auto next = vector_add(position, vector_scale(velocity, float(dt)));
     // HALFGRAVITY is applied AFTER InitMovingObject for this effect (.20, not .50).
     velocity.y -= float(dt) * (liquid ? 100.f : 200.f);
-    SegmentHit hit;
+    ClientSegmentHit hit;
     const auto travel = vector_subtract(next, position);
     auto result = vector_dot(travel, travel) < 1e-12f ? SegmentResult::Miss
-                                                    : server.IntersectWorldSegment(position, next, hit);
+                                                      : services.queries.effect_world_segment(position, next, hit);
     if (result != SegmentResult::Miss && result != SegmentResult::Hit)
     {
         error = "Blood-spurt world collision unavailable";
@@ -126,20 +127,20 @@ bool CParticleExplosionFX::Update(double now, double dt, ServerDE& server, std::
             next = vector_add(hit.point, vector_scale(hit.normal, .3f));
         emitting = false; // Original bBounce=false, independent of the low-speed rest test.
         ++impacts;
-        SoundRequest sound;
+        SoundParameters sound;
         // Original B2_LITE GetRandom(0,NRES(5)) includes zero; do not alias a missing file.
         sound.resource = "sounds/gibs/flesh/gib_impact" + std::to_string(rng() % 4) + ".wav";
         sound_resource = sound.resource;
         sound.outer_radius = 300;
         sound.inner_radius = 30;
-        server.PlayClientSound(sound, next, sound_error);
+        services.sound(sound, next, sound_error);
         BloodSplatSettings splat;
         splat.resource = "sprites/blood" + std::to_string(1 + rng() % 3) + ".spr";
         splat.position = next;
         splat.scale = .05f + draw(rng, -.05f, .05f);
         splat.grow_scale = hit.normal.y > .5f ? .01f : 0;
         if (align_rotation(hit.normal, hit.normal, splat.rotation))
-            splat_event = server.PublishClientBloodSplat(splat, "particle impact", splat_error);
+            splat_event = services.splat(splat, "particle impact", splat_error);
         else
             splat_error = "Invalid blood-spurt impact normal";
     }

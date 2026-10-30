@@ -51,6 +51,11 @@ now plays fragment, blood-drop and casing impacts in ClientAudio only. Keep sepa
 sound identities, source requests/sample math, local completion, bounded voice
 admission and logical-voice priority. The dedicated has no cosmetic receiver.
 Moving effect queries and child publications remain to extract.
+The [moving effect services continuation](Documentation/implementation/reports/m9_effect_services.md)
+now updates flesh/destruction fragments, casings and blood emitters through client
+geometry and typed client child/audio outputs. Keep source clocks, pool/RNG order,
+primary-only collision quirks and synchronous creation results. Immediate creation
+queries still use the local bridge; flashlight and network events remain pending.
 Preserve solo clocks, source pickup rules,
 immutable GPU references, existing PBR work and independent M2-GPU-001/M3 gates.
 

@@ -1,7 +1,13 @@
+#include "client/effect_services.h"
 #include "game/server_adapter.h"
 #include <cmath>
 namespace OpenBlood2
 {
+    EffectServices ServerAdapter::effect_services()
+    {
+        return {*this,        client_effects,  client_resources, objects_.sprites,
+                client_audio, objects_.time(), GetFrameTime()};
+    }
     ClientObjectId ServerAdapter::effect_reference(HOBJECT handle) const
     {
         const auto* object = objects_.get(handle);
@@ -77,7 +83,8 @@ namespace OpenBlood2
             error = "Blood spurt resources unavailable";
             return 0;
         }
-        return blood_spurts.publish(settings, source, immediate, *client_resources, *this, objects_.time(), error);
+        return blood_spurts.publish(settings, source, immediate, *client_resources, effect_services(), objects_.time(),
+                                    error);
     }
     std::uint64_t ServerAdapter::PublishBloodSpurt(HOBJECT source, const BloodSpurtSettings& settings,
                                                    std::string& error)
@@ -115,8 +122,8 @@ namespace OpenBlood2
             error = "Flesh-gib resources unavailable";
             return 0;
         }
-        return flesh_gibs.publish(owner, pos, dir, dims, scale, count, *this, *objects_.models, *client_resources,
-                                  objects_.time(), error);
+        return flesh_gibs.publish(effect_owner(owner), pos, dir, dims, scale, count, effect_services(),
+                                  *objects_.models, *client_resources, objects_.time(), error);
     }
     std::uint64_t ServerAdapter::PublishPolyGrid(HOBJECT owner, const PolyGridSettings& settings, std::string& error)
     {
@@ -209,8 +216,8 @@ namespace OpenBlood2
                 }
             }
         }
-        return shotgun_effects.publish(source, clipped, *objects_.models, *objects_.sprites, *client_resources,
-                                       objects_.time(), *this, error);
+        return shotgun_effects.publish(effect_owner(source), clipped, *objects_.models, *objects_.sprites,
+                                       *client_resources, objects_.time(), effect_services(), error);
     }
     std::uint64_t ServerAdapter::PublishWeaponSprites(HOBJECT source, const WeaponSpriteSettings& settings,
                                                       std::string& error)
@@ -325,7 +332,7 @@ namespace OpenBlood2
             debris_effects.erase(debris_effects.begin());
         auto report = effect;
         if (client_resources && objects_.models)
-            report.event = destruction_debris.publish_debris(effect, debris_detail, *this, *objects_.models,
+            report.event = destruction_debris.publish_debris(effect, debris_detail, effect_services(), *objects_.models,
                                                              *client_resources, objects_.time(), report.error);
         else
             report.error = "Destruction debris resources unavailable";

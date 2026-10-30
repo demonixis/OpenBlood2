@@ -1,11 +1,12 @@
 #pragma once
+#include "client/effect_owner.h"
 #include "engine/model_store.h"
 #include "game/brush_messages.h"
 #include "game/weapon_messages.h"
 #include <random>
-class ServerDE;
 namespace OpenBlood2
 {
+    struct EffectServices;
     // Shared original CGibFX motion; flesh and destruction use independent client pools.
     struct FleshGib
     {
@@ -34,20 +35,20 @@ namespace OpenBlood2
     class FleshGibs
     {
       public:
-        std::uint64_t publish(HOBJECT, DVector, DVector, DVector, float, unsigned, ServerDE&, ModelStore&,
-                              const Resources&, double, std::string&);
-        std::uint64_t publish_debris(const DebrisEffect&, int detail, ServerDE&, ModelStore&, const Resources&, double,
-                                     std::string&);
-        bool advance(double, ServerDE&);
+        std::uint64_t publish(const EffectOwner&, DVector, DVector, DVector, float, unsigned, const EffectServices&,
+                              ModelStore&, const Resources&, double, std::string&);
+        std::uint64_t publish_debris(const DebrisEffect&, int detail, const EffectServices&, ModelStore&,
+                                     const Resources&, double, std::string&);
+        bool advance(double, const EffectServices&);
         void clear();
         std::vector<FleshGib> active;
         std::vector<FleshGibReport> reports;
         std::string update_error;
 
       private:
-        std::uint64_t publish_impl(HOBJECT, DVector, DVector, DVector, float, unsigned, ServerDE&, ModelStore&,
-                                   const Resources&, double, std::string&, const DebrisEffect* = nullptr,
-                                   int detail = 2);
+        std::uint64_t publish_impl(const EffectOwner&, DVector, DVector, DVector, float, unsigned,
+                                   const EffectServices&, ModelStore&, const Resources&, double, std::string&,
+                                   const DebrisEffect* = nullptr, int detail = 2);
         std::minstd_rand random_{1};
         std::uint64_t next_id_ = 1, next_event_ = 1;
     };

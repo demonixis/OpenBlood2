@@ -1,0 +1,71 @@
+{
+  "scope": "Client moving effect queries and synchronous child outputs",
+  "baseline": "7c4b9fd1",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "7c4b9fd1",
+      "path": "src/game/flesh_gibs.cpp",
+      "sha256": "5bc87d057c1016966de6469f5f2afd1d3b66629d4b65f40abb9b4113e1904721"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "7c4b9fd1",
+      "path": "src/game/shotgun_effects.cpp",
+      "sha256": "f9022081f8f0a7ffbf8da0ca79b3264d1b644be1d8ec92fd74e2f39c4c6d997e"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "7c4b9fd1",
+      "path": "src/game/blood_spurts.cpp",
+      "sha256": "dded6307fb733f0697fc4215b35c923a504e3c268e7b81ea7f9525c47d078033"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "7c4b9fd1",
+      "path": "src/game/original/ParticleExplosionFX.cpp",
+      "sha256": "e7077cbfc8ef8fab2ef5fc683530965c3aab1e8e1f755d2abc1b20bdb7162e67"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "7c4b9fd1",
+      "path": "src/game/server_effects.cpp",
+      "sha256": "e7b79476249a32c117507128a75a64cec40395b236b457a28a954aa3a259361c"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "7c4b9fd1",
+      "path": "src/game/session.cpp",
+      "sha256": "ac8fb6e12cd76724ad1eab3fc580414436b743003e548f3d2bbe1bda4046513b"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/gibfx.cpp",
+      "sha256": "4e448e2303e82eed903ae31a557a83963ea424f0c0a69406947ef5e6793858c5"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ParticleExplosionFX.cpp",
+      "sha256": "68ba5c98212936d16d940834ea0d0f2967b189d338b612f48b96a55379a8f60f"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ShellCasingFX.cpp",
+      "sha256": "b0c9fd0416f5da2d8db132728af386d66d90624363a9ae15283996e0edb1484d"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/client_physics.cpp",
+      "sha256": "a2d7fcae81f82df02406aa3b586897aff9c409e803e315f233fbe33e3d65de16"
+    }
+  ],
+  "adaptations": [
+    "Preserve original calculations and cosmetic RNG sequences in the existing selective ports.",
+    "Replace ServerDE in flesh/destruction fragments, blood emitters and casings with EffectQueries and typed client outputs.",
+    "Publish a stable collision scene once at the moving FX phase; preserve immediate local creation queries until event extraction."
+  ]
+}

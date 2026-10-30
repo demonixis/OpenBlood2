@@ -458,3 +458,20 @@ voices followed by cosmetic voices; arbitrary interleaved historical sums are no
 claimed bit-identical. Movement integration, server completion and save payloads
 are unchanged. The legacy effect publisher still forwards locally; remote events
 and the remaining moving-effect services are separate work.
+
+## Moving client effects and child outputs
+
+The [moving effect services continuation](../implementation/reports/m9_effect_services.md)
+removes ServerDE and original handles from flesh/destruction fragment, casing and
+blood-emitter creation/update interfaces. Keep source calculations, RNG sequences,
+primary-only geometry queries, zero texture flags, immediate first spurt updates
+and pool order. Typed outputs publish directly into client pools and ClientAudio.
+After authoritative completion, copy collision once before the moving FX phase;
+publication and updates must not integrate a body or dispatch server contacts.
+
+The synchronous local creation bridge still supplies live read-only geometry while
+inside callbacks, preserving existing ordering/resource failures without copying a
+busy registry. No effect retains those services. Client updates use the replica
+exclusively; unavailable geometry remains explicit, with existing cosmetic failure
+policy. Flashlight extraction, creation event delivery and remote qualification
+remain subsequent work. No new network acceptance is implied.

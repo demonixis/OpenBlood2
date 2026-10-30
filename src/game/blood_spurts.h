@@ -2,6 +2,7 @@
 #include "game/original/ParticleExplosionFX.h"
 namespace OpenBlood2
 {
+    struct EffectServices;
     struct BloodSpurtReport
     {
         std::uint64_t id = 0, effect = 0, emitted = 0, capacity_skips = 0, impacts = 0, splat_event = 0;
@@ -12,9 +13,9 @@ namespace OpenBlood2
     class BloodSpurts
     {
       public:
-        std::uint64_t publish(const BloodSpurtSettings&, std::string_view, bool, const Resources&, ServerDE&, double,
-                              std::string&);
-        bool advance(double, ServerDE&);
+        std::uint64_t publish(const BloodSpurtSettings&, std::string_view, bool, const Resources&,
+                              const EffectServices&, double, std::string&);
+        bool advance(double, const EffectServices&);
         void clear();
         std::size_t live_particles() const;
         std::vector<CParticleExplosionFX> active;

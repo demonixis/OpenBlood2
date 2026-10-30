@@ -1,3 +1,4 @@
+#include "client/effect_services.h"
 #include "blood_spurt_fixture.h"
 #include <cmath>
 #include <limits>
@@ -91,14 +92,14 @@ namespace
             GameSession g;
             CHECK(setup(g, root) && room(g, origin));
             CHECK(fragment(g, vector_add(origin, {0, 100, 0}), {20, -10, 0}));
-            CHECK(g.server.flesh_gibs.advance(.01, g.server));
+            CHECK(g.server.flesh_gibs.advance(.01, g.server.effect_services()));
             const auto& moving = g.server.flesh_gibs.active.front();
             CHECK(moving.impacts == 0 && moving.splat_event == 0 && g.client_session.audio.mixer.voices().empty() &&
                   g.server.blood_splats.active.empty());
             CHECK(near(moving.position.x, origin.x + .2f) && near(moving.position.y, origin.y + 99.9f));
             g.server.flesh_gibs.clear();
             CHECK(fragment(g, vector_add(origin, {199, 100, 0}), {200, 0, 0}));
-            CHECK(g.server.flesh_gibs.advance(.01, g.server));
+            CHECK(g.server.flesh_gibs.advance(.01, g.server.effect_services()));
             const auto& wall = g.server.flesh_gibs.active.front();
             CHECK(wall.impacts == 1 && !wall.resting && near(wall.position.x, origin.x + 199.7f) &&
                   wall.velocity.x < 0 && wall.error.empty() && wall.sound_error.empty() && wall.splat_event);
@@ -107,7 +108,7 @@ namespace
             g.client_session.audio.mixer.clear();
             g.server.blood_splats.clear();
             CHECK(fragment(g, vector_add(origin, {0, 1, 0}), {0, -200, 0}));
-            CHECK(g.server.flesh_gibs.advance(.01, g.server));
+            CHECK(g.server.flesh_gibs.advance(.01, g.server.effect_services()));
             const auto& floor = g.server.flesh_gibs.active.front();
             CHECK(floor.impacts == 1 && floor.resting && near(floor.position.y, origin.y + .3f) &&
                   floor.error.empty() && floor.sound_error.empty() && floor.splat_event);
@@ -118,7 +119,7 @@ namespace
                   g.client_session.audio.mixer.get(sound)->auto_remove);
             for (unsigned frame = 2; frame <= 201; ++frame)
             {
-                CHECK(g.server.flesh_gibs.advance(frame * .01, g.server));
+                CHECK(g.server.flesh_gibs.advance(frame * .01, g.server.effect_services()));
                 CHECK(g.advance_audio(.01, origin, {}));
             }
             CHECK(floor.impacts == 1 && g.client_session.audio.mixer.voices().empty() &&
@@ -135,7 +136,7 @@ namespace
         // even though this fragment is falling and never comes close to it.
         for (unsigned frame = 1; frame <= 12; ++frame)
         {
-            CHECK(g.server.flesh_gibs.advance(frame * .01, g.server));
+            CHECK(g.server.flesh_gibs.advance(frame * .01, g.server.effect_services()));
             CHECK(g.advance_audio(.01, {}, {}));
         }
         const auto& f = g.server.flesh_gibs.active.front();
@@ -159,7 +160,7 @@ namespace
             settings.min_velocity = settings.max_velocity = {0, -10, 0};
             CParticleExplosionFX distant;
             CHECK(distant.CreateObject(settings, g.resources, g.server, 0, random, error));
-            CHECK(distant.Update(.01, .01, g.server, random, 16384));
+            CHECK(distant.Update(.01, .01, g.server.effect_services(), random, 16384));
             CHECK(distant.impacts == 0 && distant.emitting && distant.splat_event == 0 &&
                   g.client_session.audio.mixer.voices().empty() && g.server.blood_splats.active.empty());
             CHECK(near(distant.position.y, origin.y + 99.9f));
@@ -167,12 +168,12 @@ namespace
             settings.min_velocity = settings.max_velocity = {0, -200, 0};
             CParticleExplosionFX floor;
             CHECK(floor.CreateObject(settings, g.resources, g.server, 0, random, error));
-            CHECK(floor.Update(.01, .01, g.server, random, 16384));
+            CHECK(floor.Update(.01, .01, g.server.effect_services(), random, 16384));
             CHECK(floor.impacts == 1 && !floor.emitting && floor.splat_event && floor.sound_error.empty() &&
                   near(floor.position.y, origin.y + .3f) && g.client_session.audio.mixer.voices().size() == 1);
             for (unsigned frame = 2; frame <= 101; ++frame)
             {
-                CHECK(floor.Update(frame * .01, .01, g.server, random, 16384));
+                CHECK(floor.Update(frame * .01, .01, g.server.effect_services(), random, 16384));
                 CHECK(g.advance_audio(.01, origin, {}));
             }
             CHECK(floor.impacts == 1 && g.client_session.audio.mixer.voices().empty() &&

@@ -1,8 +1,8 @@
 // Selected original WeaponFX, ShellCasingFX, SurfaceFragmentFX, MarkSFX, SplashFX and RippleFX.
 #include "game/shotgun_effects.h"
+#include "client/effect_services.h"
 #include "engine/collision.h"
 #include "engine/texture.h"
-#include "game/legacy/server_de.h"
 #include "game/original/SparksFX.h"
 #include "game/weapon_sprites.h"
 #include <algorithm>
@@ -56,9 +56,9 @@ namespace OpenBlood2
             s.particles.push_back(p);
         }
     }
-    std::uint64_t ShotgunEffects::publish(HOBJECT owner, const ShotgunEffectSettings& s, ModelStore& models,
-                                          SpriteStore& store, const Resources& resources, double now, ServerDE& server,
-                                          std::string& error)
+    std::uint64_t ShotgunEffects::publish(const EffectOwner& owner, const ShotgunEffectSettings& s, ModelStore& models,
+                                          SpriteStore& store, const Resources& resources, double now,
+                                          const EffectServices& services, std::string& error)
     {
         error.clear();
         ShotgunEffectReport report;
@@ -73,7 +73,7 @@ namespace OpenBlood2
                 error += message;
             }
         };
-        if (s.clip_polygon.size() > 512 ||
+        if (!owner || owner.name.size() > 100 || s.clip_polygon.size() > 512 ||
             std::any_of(s.clip_polygon.begin(), s.clip_polygon.end(), [](auto p) { return !physics_vector(p); }) ||
             !physics_vector(s.source) || !physics_vector(s.destination) || !physics_vector(s.forward) ||
             !physics_vector(s.normal) || vector_dot(s.forward, s.forward) < 1e-12f ||
@@ -89,8 +89,8 @@ namespace OpenBlood2
             align_rotation(normal, {0, 1, 0}, rotation);
             const auto up = rotate_vector(rotation, {0, 1, 0}), right = rotate_vector(rotation, {1, 0, 0});
             ContainerCode source_code = CC_NOTHING, dest_code = CC_NOTHING;
-            const bool containers = server.GetPointContainerCode(s.source, source_code, true) &&
-                                    server.GetPointContainerCode(s.destination, dest_code, true);
+            const bool containers = services.queries.effect_container(s.source, source_code, true) &&
+                                    services.queries.effect_container(s.destination, dest_code, true);
             if (!containers)
                 failure("Shotgun effect container query unavailable");
             auto bubble = [&](DVector at)
@@ -107,7 +107,7 @@ namespace OpenBlood2
                 b.gravity = 50;
                 b.texture = "SpriteTextures/Particles/ParticleBubble.dtx";
                 std::string e;
-                if (texture(resources, b.texture, e) && server.PublishSparks(owner, b, e))
+                if (texture(resources, b.texture, e) && services.spark(b, owner.name, e))
                     ++report.bubbles;
                 failure(e);
             };
@@ -137,7 +137,7 @@ namespace OpenBlood2
                         smoke.deceleration = vector_scale(direction, -.035f);
                     }
                     std::string e;
-                    report.smoke = server.PublishWeaponSprites(owner, ws, e);
+                    report.smoke = services.weapon_sprite(ws, owner.name, e);
                     failure(e);
                 }
                 DRotation eject_rotation;
@@ -181,8 +181,8 @@ namespace OpenBlood2
                 // CTracerFX uses the impact-normal rotation, not the velocity/damage direction.
                 // It is stationary for .1 s; its supplied velocity is never applied.
                 const auto cast = vector_add(s.source, vector_scale(normal, 50));
-                SegmentHit hit;
-                const auto result = server.CastWorldRay(cast, normal, hit);
+                ClientSegmentHit hit;
+                const auto result = services.queries.effect_world_ray(cast, normal, hit);
                 if (result == SegmentResult::Hit)
                 {
                     const auto delta = vector_subtract(hit.point, s.source);
@@ -347,7 +347,7 @@ namespace OpenBlood2
         reports.push_back(std::move(report));
         return id;
     }
-    void ShotgunEffects::advance(double now, ServerDE& server)
+    void ShotgunEffects::advance(double now, const EffectServices& services)
     {
         std::erase_if(tracers, [&](const auto& t) { return now > t.expires; });
         auto valid_time = [&](double last) { return std::isfinite(now) && now >= last && now - last <= 1; };
@@ -375,10 +375,10 @@ namespace OpenBlood2
             c.rotation = rotation_from_euler({c.pitch, c.yaw, 0});
             auto next = vector_add(c.position, vector_scale(c.velocity, float(dt)));
             c.velocity.y -= float(dt) * (c.liquid ? 125.f : 250.f); // InitMovingObject THEN MO_HALFGRAVITY.
-            SegmentHit hit;
+            ClientSegmentHit hit;
             auto result = vector_dot(vector_subtract(next, c.position), vector_subtract(next, c.position)) < 1e-12f
                               ? SegmentResult::Miss
-                              : server.IntersectWorldSegment(c.position, next, hit);
+                              : services.queries.effect_world_segment(c.position, next, hit);
             if (result == SegmentResult::Hit)
             {
                 const float dot = -2 * vector_dot(c.velocity, hit.normal);
@@ -412,12 +412,12 @@ namespace OpenBlood2
                     default:
                         break;
                 }
-                SoundRequest sound;
+                SoundParameters sound;
                 sound.resource = std::string("Sounds/Weapons/ShellDrops/") + material + "/Shell" +
                                  std::to_string(integer(1, 2)) + ".wav";
                 sound.outer_radius = 150;
                 sound.inner_radius = 15;
-                server.PlayClientSound(sound, next, c.sound_error);
+                services.sound(sound, next, c.sound_error);
                 c.pitch_velocity = random(-4 * std::numbers::pi_v<float>, 4 * std::numbers::pi_v<float>);
                 c.yaw_velocity = random(-4 * std::numbers::pi_v<float>, 4 * std::numbers::pi_v<float>);
                 if (--c.bounces <= 0)

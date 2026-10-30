@@ -1,13 +1,14 @@
 #pragma once
+#include "client/effect_owner.h"
 #include "engine/model_store.h"
 #include "engine/particles.h"
 #include "engine/sprite.h"
 #include "game/original/SurfaceTypes.h"
 #include "game/original/WeaponDefs.h"
 #include <random>
-class ServerDE;
 namespace OpenBlood2
 {
+    struct EffectServices;
     // Original WeaponFX payload after UpdateWeaponFX has consumed the one-shot ejection bit.
     struct ShotgunEffectSettings
     {
@@ -76,9 +77,9 @@ namespace OpenBlood2
     class ShotgunEffects
     {
       public:
-        std::uint64_t publish(HOBJECT, const ShotgunEffectSettings&, ModelStore&, SpriteStore&, const Resources&,
-                              double, ServerDE&, std::string&);
-        void advance(double, ServerDE&);
+        std::uint64_t publish(const EffectOwner&, const ShotgunEffectSettings&, ModelStore&, SpriteStore&,
+                              const Resources&, double, const EffectServices&, std::string&);
+        void advance(double, const EffectServices&);
         void clear();
         std::vector<ShotgunCasing> casings;
         std::vector<BallisticTracer> tracers;

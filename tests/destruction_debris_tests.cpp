@@ -1,3 +1,4 @@
+#include "client/effect_services.h"
 #include "app/model_scene.h"
 #include "blood_spurt_fixture.h"
 #include "game/original/DestructableBrush.h"
@@ -120,7 +121,7 @@ namespace
         auto invalid = request(30);
         invalid.scale = std::numeric_limits<float>::quiet_NaN();
         std::string error;
-        CHECK(!fx.publish_debris(invalid, 2, g.server, g.models, g.resources, 0, error) && !error.empty());
+        CHECK(!fx.publish_debris(invalid, 2, g.server.effect_services(), g.models, g.resources, 0, error) && !error.empty());
         CHECK(g.server.blood_spurts.active.empty() && g.server.blood_splats.active.empty() &&
               g.server.flesh_gibs.active.empty());
         return true;
@@ -135,30 +136,30 @@ namespace
         auto& f = fx.active[0];
         f.position = {0, 1, 0};
         f.velocity = {0, -100, 0};
-        CHECK(fx.advance(.02, g.server));
+        CHECK(fx.advance(.02, g.server.effect_services()));
         CHECK(f.impacts == 1 && f.bounces == 0 && !f.resting && f.sound_error.empty());
         CHECK(g.client_session.audio.mixer.voices().size() == 1 && g.server.audio.voices().empty() &&
               g.server.blood_splats.active.empty());
         for (int i = 3; i < 100; ++i)
         {
-            CHECK(fx.advance(i * .01, g.server));
+            CHECK(fx.advance(i * .01, g.server.effect_services()));
             CHECK(g.advance_audio(.01, {}, {}));
         }
         CHECK(f.resting && f.impacts == 2 && f.bounces == -1 && f.error.empty());
         const auto pos = f.position;
-        CHECK(fx.advance(1, g.server) && f.position.y == pos.y);
+        CHECK(fx.advance(1, g.server.effect_services()) && f.position.y == pos.y);
         // Eviction replaces oldest live slots and keeps at most 50 terminating effects.
         fx.clear();
         g.server.RecordDebrisEffect(request(30, 255));
         CHECK(fx.active.size() == 130);
         CHECK(std::count_if(fx.active.begin(), fx.active.end(), [](auto& x) { return x.fading; }) == 50);
         auto id = fx.active.front().id;
-        CHECK(fx.advance(.01, g.server));
+        CHECK(fx.advance(.01, g.server.effect_services()));
         CHECK(fx.active.front().id == id && fx.active.front().alpha == 1);
-        CHECK(fx.advance(.02, g.server));
+        CHECK(fx.advance(.02, g.server.effect_services()));
         CHECK(fx.active.front().alpha < 1);
         for (int i = 3; i <= 152; ++i)
-            CHECK(fx.advance(i * .01, g.server));
+            CHECK(fx.advance(i * .01, g.server.effect_services()));
         CHECK(fx.active.size() == 80 &&
               std::none_of(fx.active.begin(), fx.active.end(), [](auto& x) { return x.fading; }));
         g.server.reset_world_time();
@@ -189,7 +190,7 @@ namespace
             }
             for (unsigned frame = 1; frame < 500; ++frame)
             {
-                CHECK(fx.advance(frame * .01, g.server));
+                CHECK(fx.advance(frame * .01, g.server.effect_services()));
                 CHECK(g.advance_audio(.01, {}, {}));
             }
             for (const auto& f : fx.active)

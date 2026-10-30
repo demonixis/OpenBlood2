@@ -1,3 +1,4 @@
+#include "client/effect_services.h"
 #include "app/sprite_scene.h"
 #include "blood_spurt_fixture.h"
 #include "brush_fixture.h"
@@ -118,7 +119,7 @@ namespace
         auto& fx = g.server.shotgun_effects;
         CHECK(fx.reports.back().settings.clip_polygon.size() == 4);
         CHECK(fx.sprites.front().clip_polygon.size() == 4);
-        fx.advance(.1, g.server);
+        fx.advance(.1, g.server.effect_services());
         const auto& mark = fx.sprites.front();
         SpriteView view;
         CHECK(view.begin_frame({0, 80, 0}, {}, error));
@@ -208,9 +209,9 @@ namespace
         const auto& smoke = g.server.weapon_sprites.reports.back().settings.smoke;
         CHECK(smoke && smoke->duration == 1.5f && smoke->alpha == .5f && smoke->scale1.x == .05f &&
               smoke->velocity.z == 2);
-        fx.advance(.1, g.server);
+        fx.advance(.1, g.server.effect_services());
         CHECK(fx.tracers.size() == 1 && fx.tracers[0].center.y == tracer.center.y);
-        fx.advance(.101, g.server);
+        fx.advance(.101, g.server.effect_services());
         CHECK(fx.tracers.empty());
         fx.clear();
         s.source.y = 80; // Ray hit too close: deliberately no tracer.
@@ -276,15 +277,15 @@ namespace
         CHECK(publish(g, s, owner));
         auto& fx = g.server.shotgun_effects;
         const auto old = fx.casings[0];
-        fx.advance(.1, g.server);
+        fx.advance(.1, g.server.effect_services());
         CHECK(fx.casings[0].visible &&
               std::abs(fx.casings[0].position.y - (old.position.y + old.velocity.y * .1f)) < .001f);
         CHECK(std::abs(fx.casings[0].velocity.y - (old.velocity.y - 25)) < .001f);
         for (int i = 6; i <= 1000; ++i)
-            fx.advance(i * .02, g.server);
+            fx.advance(i * .02, g.server.effect_services());
         CHECK(fx.casings.size() == 2 && fx.casings[0].resting && fx.casings[0].impacts >= 1 &&
               fx.casings[0].impacts <= 2 && fx.casings[0].sound_error.empty());
-        fx.advance(20.01, g.server);
+        fx.advance(20.01, g.server.effect_services());
         CHECK(fx.casings.empty());
         CHECK(std::none_of(fx.sprites.begin(), fx.sprites.end(),
                            [](const auto& f) { return f.kind != ShotgunSpriteKind::Mark; }));
@@ -317,10 +318,10 @@ namespace
         s.color2 = {40, 50, 60};
         CHECK(publish(g, s, owner));
         CHECK(fx.reports.back().splashes == 1 && fx.reports.back().smoke && fx.splashes[0].particles.size() == 4);
-        fx.advance(.01, g.server);
+        fx.advance(.01, g.server.effect_services());
         CHECK(fx.splashes[0].particles.size() == 8);
         for (int i = 2; i <= 120; ++i)
-            fx.advance(i * .01, g.server);
+            fx.advance(i * .01, g.server.effect_services());
         CHECK(fx.splashes.empty());
         return true;
     }

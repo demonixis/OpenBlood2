@@ -1,3 +1,4 @@
+#include "client/effect_services.h"
 #include "effect_owner_fixture.h"
 #include "engine/collision.h"
 #include "game/original/AI_Mgr.h"
@@ -52,7 +53,7 @@ namespace
     {
         CHECK(g.server.advance_models(dt) && g.server.advance_physics(dt) && g.objects.advance(dt));
         CHECK(test_effect_owner::advance(g, g.client_effects.object_particles, g.objects.time()));
-        CHECK(g.server.flesh_gibs.advance(g.objects.time(), g.server));
+        CHECK(g.server.flesh_gibs.advance(g.objects.time(), g.server.effect_services()));
         CHECK(g.advance_audio(dt, {}, {}));
         return true;
     }
@@ -130,7 +131,7 @@ namespace
             const auto count = g.server.flesh_gibs.active.size();
             CHECK(count >= 7);
             const auto initial_position = g.server.flesh_gibs.active.front().position;
-            CHECK(g.server.flesh_gibs.advance(g.objects.time(), g.server)); // Publication frame has zero elapsed time.
+            CHECK(g.server.flesh_gibs.advance(g.objects.time(), g.server.effect_services())); // Publication frame has zero elapsed time.
             CHECK(g.server.flesh_gibs.active.front().position.x == initial_position.x &&
                   g.server.flesh_gibs.active.front().position.y == initial_position.y);
             CHECK(g.objects.engine_message(h, MID_UPDATE, nullptr) && g.objects.finish_frame() && !g.objects.get(h));

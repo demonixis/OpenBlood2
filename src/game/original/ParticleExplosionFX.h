@@ -2,9 +2,10 @@
 #include "engine/particles.h"
 #include "engine/resources.h"
 #include <random>
-class ServerDE;
 namespace OpenBlood2
 {
+    class EffectQueries;
+    struct EffectServices;
     // The original flesh recipe only: one non-bouncing, half-gravity emitter.
     struct BloodSpurtSettings
     {
@@ -16,9 +17,9 @@ namespace OpenBlood2
 class CParticleExplosionFX
 {
   public:
-    bool CreateObject(const OpenBlood2::BloodSpurtSettings&, const OpenBlood2::Resources&, ServerDE&, double,
-                      std::minstd_rand&, std::string&);
-    bool Update(double, double, ServerDE&, std::minstd_rand&, std::size_t);
+    bool CreateObject(const OpenBlood2::BloodSpurtSettings&, const OpenBlood2::Resources&, OpenBlood2::EffectQueries&,
+                      double, std::minstd_rand&, std::string&);
+    bool Update(double, double, const OpenBlood2::EffectServices&, std::minstd_rand&, std::size_t);
     OpenBlood2::BloodSpurtSettings settings;
     std::vector<OpenBlood2::Particle> particles;
     DVector position{}, previous{}, velocity{};
