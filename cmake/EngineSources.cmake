@@ -2,6 +2,8 @@
 add_library(engine_core STATIC
     src/client/object_scene.cpp
     src/client/world.cpp
+    src/client/collision.cpp
+    src/engine/shape_collision.cpp
     src/client/session.cpp
     src/client/world_view.cpp
     src/engine/world_lights.cpp

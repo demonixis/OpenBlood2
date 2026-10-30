@@ -1,10 +1,19 @@
 #include "engine/collision.h"
 #include <algorithm>
+#include <atomic>
 #include <cmath>
+#include <cstdlib>
 #include <limits>
 
 namespace OpenBlood2
 {
+    void CollisionWorld::revise()
+    {
+        static std::atomic<std::uint64_t> next{1};
+        revision_ = next.fetch_add(1, std::memory_order_relaxed);
+        if (!revision_)
+            std::abort();
+    }
     DVector rotate_vector(DVector v, DRotation q)
     {
         const auto cross = [](DVector a, DVector b)
@@ -24,6 +33,7 @@ namespace OpenBlood2
     }
     bool CollisionWorld::transform(DRotation rotation, DVector origin, DVector destination)
     {
+        revise();
         for (auto& triangle : triangles_)
         {
             for (auto& point : triangle.points)

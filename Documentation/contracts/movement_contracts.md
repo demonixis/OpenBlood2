@@ -84,7 +84,11 @@ still wraps intentionally. Pending, disconnected, invalid, duplicate, modified o
 old-world/old-force commands cannot be submitted. Position/velocity/acceleration
 retain bounded floats. This is an immediate trusted local boundary, not a wire
 codec or multiplayer anti-cheat. Delayed 0.14-second reports, server advancement
-between uploads and a collision scene built from a network replica remain pending.
+between uploads and network delivery of collision snapshots remain pending.
+The [client collision replica](multiplayer_contracts.md#client-collision-replica)
+now performs speculative sweeps/support/stairs/push validation using owned geometry
+and complete local collider frames. It has no server registry or gameplay service
+access. Authoritative support in corrections remains a server responsibility.
 
 `GetMovementState` returns values and checked contact identities. A fresh **0.02
 unit** downward box sweep checks support against the primary solid world and

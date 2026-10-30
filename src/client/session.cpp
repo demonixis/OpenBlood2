@@ -14,7 +14,7 @@ namespace OpenBlood2
         movement = {};
         static std::atomic<std::uint64_t> next{1};
         const auto epoch = next.fetch_add(1, std::memory_order_relaxed);
-        if (!world.begin(epoch))
+        if (!world.begin(epoch) || !collision.begin(epoch))
             std::abort(); // Identity exhaustion, never silently accept an old world.
     }
 } // namespace OpenBlood2

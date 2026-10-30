@@ -73,6 +73,11 @@ or a new cross-platform exact-float requirement. No new GPU reference was accept
 
 ## Remaining M9 work
 
+The [client collision continuation](m9_client_collision.md) now replaces this
+lot's live-server prediction query with an owned scene. The remaining list below
+records the initial movement boundary; environment and other services stay pending.
+
+
 Replicate collision and environment state without reading the server registry;
 separate the remaining original shell, HUD/camera, FX and audio dependencies; then
 connect admission, delayed movement delivery and gameplay to ENet. The dedicated

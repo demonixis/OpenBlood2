@@ -1,0 +1,48 @@
+{
+  "scope": "M9 independent local client collision replica",
+  "baseline": "00690d3c",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "00690d3c",
+      "path": "src/game/server_physics.cpp",
+      "sha256": "b68b8423f09018e1465b652f428f8901fc7d91d9e54ee7d06409cd747616b3b0"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "00690d3c",
+      "path": "src/game/server_world_bodies.cpp",
+      "sha256": "d4634f1b4f4d5b281b1424aad8992fe2b0f8bf2c53f7db141ccf4ac7bd49b9fc"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "00690d3c",
+      "path": "src/engine/world_model.cpp",
+      "sha256": "ceb0f72bbf32291cae563dcccda97428a56ac536a590b3f75d232ac92ef68a7c"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "00690d3c",
+      "path": "src/engine/collision.cpp",
+      "sha256": "5af353b90affeb8705ee95d01e1e7d774467a5a3bb67afd322f3d5282a7c2f74"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "00690d3c",
+      "path": "src/game/local_movement.cpp",
+      "sha256": "133ce008ca4858076e17492a03c91e2a946f49b1f0b5dbf25c5cf70c4d3c5105"
+    }
+  ],
+  "adaptations": [
+    "Passive complete collider frames with checked world/object/sequence identities",
+    "Deep client copies of primary and posed geometry with revision/identity caches",
+    "Geometry-only world-model sweeps extracted without arithmetic changes",
+    "Client geometric motion kernel follows server slide/stair/push/rider rules without touch collection or commits",
+    "Remove server prediction entry point; CMoveMgr and authoritative movement integration unchanged"
+  ],
+  "remaining": [
+    "network geometry/resource codec and admission",
+    "replicated environment, stance, camera and weapon ray services",
+    "delayed multiplayer uploads and authoritative advancement between them"
+  ]
+}

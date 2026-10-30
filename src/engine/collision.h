@@ -52,6 +52,7 @@ namespace OpenBlood2
         bool transform(DRotation, DVector origin, DVector destination);
         void clear()
         {
+            revise();
             triangles_.clear();
             nodes_.clear();
             work_ = {};
@@ -62,6 +63,12 @@ namespace OpenBlood2
         CollisionQuery sweep(DVector from, DVector to, DVector half, CollisionHit& hit, double allowed_penetration = 0,
                              StartOverlap start = StartOverlap::Block) const;
         BodyPlacement place_body(DVector anchor, DVector anchor_half, DVector requested, DVector half) const;
+        // Geometry identity survives copies and changes before any build/transform/clear.
+        // Query diagnostics do not invalidate a local collision replica.
+        std::uint64_t revision() const
+        {
+            return revision_;
+        }
         std::size_t triangles() const
         {
             return triangles_.size();
@@ -78,6 +85,8 @@ namespace OpenBlood2
         }
 
       private:
+        void revise();
+        std::uint64_t revision_ = 0;
         struct Triangle
         {
             std::array<DVector, 3> points;

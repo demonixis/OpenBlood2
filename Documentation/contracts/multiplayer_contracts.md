@@ -199,10 +199,49 @@ Exit clears the body and counters. Restore and NEW_LEVEL establish new world/cli
 identities; no save layout changes. Inspection shows predictions, acknowledgements,
 refusals, unresolved predictions and the owning world/object.
 
-This is still a **local collision-query bridge**: static collision and obstacle
-queries read the live server scene synchronously, and environment/animation/audio
-requests still use original server services through that bridge. It is not an
-independent remote movement client. The second collision pass is extra CPU work,
-not a second time integration. Replicated collision scenes, 0.14 s multiplayer
-uploads, authoritative advancement between them, interpolation, admission and
-network gameplay are later lots. See [verification](../implementation/reports/m9_local_movement.md).
+The initial movement lot used a live-server collision query bridge; the
+[client collision replica](#client-collision-replica) below supersedes that
+transitional boundary. Environment/animation/audio requests still use original
+server services. The second collision pass is extra CPU work, not a second time
+integration. Multiplayer uploads, advancement between them, interpolation,
+admission and network gameplay remain separate. See the
+[initial movement verification](../implementation/reports/m9_local_movement.md).
+
+## Client collision replica
+
+`ClientSession::collision` owns a passive `ClientCollisionWorld`. Before each
+local prediction, the publisher sends a complete, slot-ordered frame with world
+and sequence identities, collider IDs, poses/dimensions, velocities/accelerations,
+flags, surface flags, attachment/dynamic/pushable/priority traits and the original
+fresh Seeing Eye owner exclusion. Pending/dead registry entries disappear from
+the next frame; stale generations cannot resolve. Invalid identities, unordered/
+duplicate slots, invalid vectors/dimensions, missing shape/primary geometry and
+more than 65,536 colliders fail without replacing the accepted frame.
+
+The publisher deep-copies the primary collision index and posed world-model/
+container geometry. It shares no server shapes or query counters with the client.
+A geometry revision changes before build/clear/transform, including failed edits,
+so replacing geometry at the same address invalidates the primary copy. Copies
+retain this identity; read-only sweeps do not change it. Posed shape copies are
+cached by complete object identity and the source immutable shape's weak identity;
+translations copy only the pose, rotations/replacements copy the new posed shape.
+Dead entries are evicted and teardown clears caches and the client's scene. This
+is local transport of validated engine geometry, not a wire/resource codec.
+
+Client queries use only this scene, and can still run after the server is destroyed.
+The client solver retains the current replacement slide/stair/head-skin/overlap
+rules and read-only push/rider validation (four legs, 64 riders, no chain push).
+Common bounds/transformed-shape sweep arithmetic is extracted unchanged for both
+sides. The client kernel deliberately excludes contact collection, stopping-force
+callbacks and push commits; its geometric path is checked against the authoritative
+solver. `CMoveMgr` remains unchanged and integrates once. Server validation still
+commits the integrated command and corrects the local body immediately, preserving
+solo contacts, impulses, pose and clocks. The old server prediction entry point is
+removed. Inspection exposes scene sequence/size, geometry copies and publication
+failures; failed publication never queries an older scene as if it were current.
+
+Authoritative acknowledgements still query server support, as do server gameplay
+services. Environment, stance and audio exchanges remain local original services;
+this lot does not replicate volume rules, resize decisions, camera rays or weapon
+rays. Network delivery, geometry resource admission and delayed multiplayer timing
+remain pending. See [verification](../implementation/reports/m9_client_collision.md).

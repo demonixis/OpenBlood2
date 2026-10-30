@@ -236,7 +236,6 @@ namespace OpenBlood2
         bool PlaceNonSolidModel(HOBJECT, DVector requested, DVector anchor, DVector anchor_half,
                                 BodyPlacement&) override;
         bool GetMovementState(HOBJECT, MovementState&) override;
-        bool PredictPlayerMovement(HOBJECT, const ClientMotionState&, const PlayerMove&, ClientMotionState&);
         SegmentResult CastRay(DVector, DVector, SegmentHit&, HOBJECT ignore = nullptr) override;
         SegmentResult CastWorldRay(DVector from, DVector direction, SegmentHit&) override;
         SegmentResult IntersectWorldSegment(DVector from, DVector to, SegmentHit&) override;
@@ -475,7 +474,7 @@ namespace OpenBlood2
         void initialize_model_services();
         void initialize_physics_services();
         bool movement_state(const ObjectRecord&, MovementState&);
-        DRESULT resolve_object_motion(ObjectRecord&, DVector destination, bool prediction);
+        DRESULT resolve_object_motion(ObjectRecord&, DVector destination);
         CollisionQuery sweep_scene(HOBJECT, DVector, DVector, DVector, CollisionHit&, const std::vector<ObjectId>&,
                                    HOBJECT ignore_extra = nullptr, double allowed_penetration = 0,
                                    StartOverlap start = StartOverlap::Block);

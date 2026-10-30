@@ -1,4 +1,5 @@
 #pragma once
+#include "client/collision.h"
 #include "client/movement.h"
 #include "client/world.h"
 
@@ -17,5 +18,6 @@ namespace OpenBlood2
         }
         ClientWorld world;
         ClientMovement movement;
+        ClientCollisionWorld collision;
     };
 } // namespace OpenBlood2

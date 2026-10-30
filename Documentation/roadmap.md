@@ -263,7 +263,9 @@ headless build, bounded transport, full-content fingerprint and zero-client
 world tests. The [first local replica lot](implementation/reports/m9_client_world.md)
 feeds object presentation from `ClientWorld`. The [local movement lot](implementation/reports/m9_local_movement.md)
 adds a separate CMoveMgr body, callback-free prediction and immediate server correction
-without double integration. **Full client separation, player
+without double integration. Its [collision replica](implementation/reports/m9_client_collision.md)
+now owns primary/posed geometry and collider snapshots for independent prediction.
+**Full client separation, player
 admission and network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client

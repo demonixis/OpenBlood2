@@ -1,5 +1,16 @@
 # Source and Dependency Provenance
 
+## M9 client collision replica
+
+`ClientCollisionWorld` and the local geometry/collider publisher are project-owned
+adaptations of the replacement collision paths in `00690d3c`. Client slide/stair/
+push planning retains those rules without original object instances or callbacks;
+`shape_collision` extracts common bounds/transformed-shape arithmetic unchanged.
+No new original-game branch or dependency is imported. See the
+[source ledger](sources/m9_client_collision_sources.json),
+[contract](../contracts/multiplayer_contracts.md#client-collision-replica) and
+[report](reports/m9_client_collision.md).
+
 ## M9 local movement separation
 
 The existing selective `CMoveMgr` algorithms from `1e2bd7b8` are preserved; only

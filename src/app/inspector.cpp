@@ -2025,6 +2025,15 @@ namespace OpenBlood2
                         static_cast<unsigned long long>(local.acknowledgements),
                         static_cast<unsigned long long>(local.rejected));
             ImGui::Text("Unresolved predictions %llu", static_cast<unsigned long long>(local.prediction_failures));
+            const auto& collision = game.client_session.collision.frame();
+            ImGui::Text("Client collision: frame %llu | %zu bodies | %zu triangles",
+                        static_cast<unsigned long long>(collision.sequence), collision.objects.size(),
+                        collision.primary ? collision.primary->triangles() : 0);
+            ImGui::Text("Collision copies: primary %llu / shapes %llu",
+                        static_cast<unsigned long long>(game.local_movement.primary_copies),
+                        static_cast<unsigned long long>(game.local_movement.shape_copies));
+            if (!game.local_movement.collision_error.empty())
+                ImGui::TextWrapped("Collision publication: %s", game.local_movement.collision_error.c_str());
             ImGui::Text("Movement world %llu | object %u:%u",
                         static_cast<unsigned long long>(local.owner.world), local.owner.object.slot,
                         local.owner.object.generation);

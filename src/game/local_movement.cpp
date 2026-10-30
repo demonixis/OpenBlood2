@@ -1,4 +1,5 @@
 #include "game/local_movement.h"
+#include "game/original/SeeingEye.h"
 #include "game/server_adapter.h"
 
 namespace OpenBlood2
@@ -26,6 +27,12 @@ namespace OpenBlood2
     void LocalMovement::clear()
     {
         client_.movement = {};
+        shapes_.clear();
+        primary_.reset();
+        primary_source_ = nullptr;
+        collision_world_ = 0;
+        collision_error.clear();
+        primary_copies = shape_copies = 0;
         connection_ = nullptr;
         object_ = nullptr;
         force_revision_ = 0;
@@ -110,6 +117,80 @@ namespace OpenBlood2
     {
         return valid() && voices.PlayEventSound(object_, character, 11, external_camera);
     }
+    bool LocalMovement::publish_collision()
+    {
+        collision_error.clear();
+        if (objects_.busy() || !server_.collision || !server_.collision_ready)
+        {
+            collision_error = "Collision publication requires a stable loaded world";
+            return false;
+        }
+        const auto world = client_.world.frame().world;
+        if (collision_world_ != world)
+        {
+            shapes_.clear();
+            primary_.reset();
+            collision_world_ = world;
+        }
+        if (!primary_ || primary_source_ != server_.collision || primary_->revision() != server_.collision->revision())
+        {
+            primary_ = std::make_shared<const CollisionWorld>(*server_.collision);
+            primary_source_ = server_.collision;
+            ++primary_copies;
+        }
+        ClientCollisionFrame frame;
+        frame.world = world;
+        frame.sequence = client_.collision.frame().sequence + 1;
+        frame.primary = primary_;
+        const auto ids = objects_.snapshot();
+        frame.objects.reserve(ids.size());
+        for (auto id : ids)
+        {
+            const auto* object = objects_.get(id);
+            if (!object || object->life != Life::Alive)
+                continue;
+            ClientCollider value;
+            value.id = id;
+            value.position = object->state.m_Pos;
+            value.dimensions = object->dimensions;
+            value.velocity = object->velocity;
+            value.acceleration = object->acceleration;
+            value.flags = object->state.m_Flags;
+            value.user_flags = object->user_flags;
+            value.type = object->state.m_ObjectType;
+            value.attached = object->attachment != 0;
+            value.world_model = bool(object->world_model);
+            value.container = bool(object->container());
+            value.dynamic = object->world_body || object->model_body;
+            value.pushable = object->body_properties.pushable;
+            value.priority = object->blocking_priority;
+            if (const auto* eye = dynamic_cast<const SeeingEye*>(object->game.get()); eye && !eye->dropped)
+                if (const auto* owner = objects_.get(eye->m_hFiredFrom); owner && owner->life == Life::Alive)
+                    value.ignored_by = owner->id;
+            const auto& shape = object->world_model ? object->world_model : object->container();
+            if (shape)
+            {
+                auto& cached = shapes_[id.slot];
+                if (cached.id != id || cached.source.lock() != shape)
+                {
+                    cached = {id, shape, std::make_shared<const ContainerShape>(*shape)};
+                    ++shape_copies;
+                }
+                value.shape = cached.copy;
+            }
+            frame.objects.push_back(std::move(value));
+        }
+        // Cache lifetime follows current membership, not all objects ever observed.
+        for (auto it = shapes_.begin(); it != shapes_.end();)
+        {
+            const auto* object = objects_.get(it->second.id);
+            if (!object || object->life != Life::Alive || (!object->world_model && !object->container()))
+                it = shapes_.erase(it);
+            else
+                ++it;
+        }
+        return client_.collision.apply(std::move(frame), collision_error);
+    }
     bool LocalMovement::predict(const PlayerMove& move, LocalMoveReport& report)
     {
         report = {};
@@ -129,7 +210,8 @@ namespace OpenBlood2
         pending_ = {client_.movement.owner, force_revision_, ++next_sequence_, move};
         pending = true;
         report = pending_;
-        if (server_.PredictPlayerMovement(object_, body(), move, predicted))
+        if (publish_collision() && client_.collision.predict(client_.movement.owner, body(), move.position,
+                                                             move.velocity, move.acceleration, predicted))
             body() = predicted;
         else
             // The authoritative resolver still receives a bounded valid command:

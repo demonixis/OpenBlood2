@@ -11,6 +11,7 @@
 | [Setup screen](contracts/setup_screen_contracts.md) | Game data selection, demo installation and REZ mods. |
 | [Logs](logging.md) / [crash capture](crash_capture.md) | Collect and inspect diagnostics. |
 | [Architecture](architecture.md) | Targets, ownership and engine/game boundaries. |
+| [Client collision replica](implementation/reports/m9_client_collision.md) | M9 owned collision scene and independent prediction; solo validation and remaining services. |
 | [Local client movement](implementation/reports/m9_local_movement.md) | M9 separate CMoveMgr body, speculative collision and immediate server correction; solo verification. |
 | [Local client replica](implementation/reports/m9_client_world.md) | M9 object presentation through ClientWorld; remaining client/server dependencies and validation. |
 | [Dedicated server foundation](dedicated_server.md) | Headless build and zero-client simulation; M9 player admission remains pending. |
