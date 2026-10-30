@@ -740,3 +740,24 @@ Retained frames keep primary and shaped geometry after source/world teardown.
 Private player/movement messages and the actual network CMoveMgr command bridge
 remain next. The all-map geometry checks and process probes do not qualify
 interactive movement/combat, degraded-network collision behavior or human LAN play.
+
+## Independent movement services and replica prediction
+
+The [movement service continuation](../implementation/reports/m9_movement_services.md)
+builds original CMoveMgr independently of server game classes. Its service calls
+are values and client queries; the immediate LocalMovement implementation preserves
+solo control/stance, per-substep synchronization, prediction/submission/correction,
+voice and air-update ordering. The original integration arithmetic is unchanged.
+
+ReplicaMovement owns a client body, checks admitted world/object identity and uses
+only the collision/environment replica. Substeps retain prediction instead of
+copying an old authoritative pose. Reports carry owner, full force revision,
+sequence, move code and motion/control values. Preserve the original first-frame
+publication and 0.14-second float countdown reset, with discarded overshoot and
+no burst. Reporting uses real frame duration separately from capped physics time.
+
+This is an independently linked prediction/report producer. Wire setup/stance,
+report transport, server velocity advancement, correction/acknowledgement handling
+and remote voice playback remain pending. The future receiver must qualify force
+positions by full revision before calling the internal typed force service; an
+eight-bit move code alone never proves freshness across lives or teleports.

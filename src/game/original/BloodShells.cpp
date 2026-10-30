@@ -295,7 +295,8 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     const auto* owner = dynamic_cast<const CPlayerObj*>(server_.HandleToObject(object));
     if (!object || m_bInWorld || !owner || restored != owner->restore_engine_loaded)
         return false;
-    if (!move_mgr.Init(client))
+    move_mgr.Term();
+    if (!movement_.bind(client))
         return false;
     music.EnterWorld(music_catalog_, audio_);
     voice_manager.Init(resources_);
@@ -871,7 +872,7 @@ bool CBloodClientShell::UpdateMovement(CBloodServerShell& server, double seconds
         !server.OnMessage(client_, OpenBlood2::PlayerControls{{}, false, rotation.yaw}))
         return false;
     if (!owner->ApplyDoorPush() ||
-        !move_mgr.Update(server, voice_manager, bool(view.object), movement_input,
+        !move_mgr.Update(bool(view.object), movement_input,
                          locomotion_yaw ? *locomotion_yaw : rotation.yaw, seconds,
                          !owner->m_damage.IsDead() && !owner->camera_movement_blocked && !owner->MovementBlocked(),
                          weapon_input.primary || weapon_input.alternate, rotation.pitch))

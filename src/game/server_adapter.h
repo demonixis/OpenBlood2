@@ -582,7 +582,7 @@ namespace OpenBlood2
         MusicCatalog music_catalog;
         LocalEffects local_effects;
         std::string effects_replica_error;
-        LocalMovement local_movement{server, objects, client_session};
+        LocalMovement local_movement{server, objects, client_session, server_shell};
         LocalPresentation local_presentation{server, objects, client_session, local_movement};
         CBloodClientShell client_shell{server,         resources,          music_catalog, client_session.audio.mixer,
                                        local_movement, local_presentation, client_session};

@@ -1,4 +1,4 @@
-// Original movement/control/container branches, adapted to typed local services.
+// Original movement/control/container branches, adapted to typed client services.
 // Source attribution and deliberate differences: Documentation/implementation/sources/m2_movement_sources.json.
 #include "MoveMgr.h"
 #include "engine/collision.h"
@@ -37,11 +37,6 @@ namespace
 } // namespace
 using namespace OpenBlood2;
 
-bool CMoveMgr::Init(HCLIENT client)
-{
-    Term();
-    return movement_.bind(client);
-}
 void CMoveMgr::Term()
 {
     movement_.clear();
@@ -171,7 +166,7 @@ void CMoveMgr::UpdateOnConveyor(const ClientContainerInfo& info)
             vector_scale(body.velocity, std::max(0.0f, speed - m_ContainerTime * (m_fLadderVel / .2f)) / speed);
     // Unlike ladders, conveyors retain gravity and ordinary jump controls.
 }
-void CMoveMgr::UpdateMotion(float yaw, float pitch, CVoiceMgr& voices, int character, bool external_camera)
+void CMoveMgr::UpdateMotion(float yaw, float pitch, int character, bool external_camera)
 {
     body.acceleration = {};
     m_bUseGravity = true;
@@ -288,7 +283,7 @@ void CMoveMgr::UpdateMotion(float yaw, float pitch, CVoiceMgr& voices, int chara
                 m_fDryJumpTime = original_frame;
                 // Original client VME_JUMP: only this ground branch, never swimming/ladder ascent.
                 ++jump_voice_requests;
-                jump_voice_starts += movement_.jump_voice(voices, character, external_camera);
+                jump_voice_starts += movement_.jump_voice(character, external_camera);
                 m_bLastJumpCommand = true;
                 m_bOnGround = false;
                 ++jumps;
@@ -322,7 +317,7 @@ PlayerMove CMoveMgr::WritePositionInfo(DVector destination, DVector velocity) co
     return {m_ClientMoveCode,  destination, velocity,
             body.acceleration, m_bOnGround, static_cast<DBYTE>(m_eLastSurface)};
 }
-bool CMoveMgr::MoveLocalSolidObject(CBloodServerShell& shell)
+bool CMoveMgr::MoveLocalSolidObject()
 {
     // Replacement for the unavailable Blood II PhysicsLT::UpdateMovement:
     // constant-acceleration integration, followed by the actual swept solver.
@@ -342,9 +337,7 @@ bool CMoveMgr::MoveLocalSolidObject(CBloodServerShell& shell)
                                    vector_scale(acceleration, 0.5f * m_FrameTime * m_FrameTime));
     const auto velocity = vector_add(body.velocity, vector_scale(acceleration, m_FrameTime));
     const bool was_air = !m_bOnGround;
-    LocalMoveReport report;
-    if (!movement_.predict(WritePositionInfo(vector_add(body.position, offset), velocity), report) ||
-        !movement_.submit(shell, report))
+    if (!movement_.advance(WritePositionInfo(vector_add(body.position, offset), velocity)))
         return false;
     m_bOnGround = body.standing && body.ground_normal.y >= 0.5f;
     m_bFalling = !m_bOnGround;
@@ -353,8 +346,8 @@ bool CMoveMgr::MoveLocalSolidObject(CBloodServerShell& shell)
     m_fVelMagnitude = std::hypot(body.velocity.x, body.velocity.z);
     return true;
 }
-bool CMoveMgr::Update(CBloodServerShell& shell, CVoiceMgr& voices, bool external_camera, const MovementInput& input,
-                      float yaw, double seconds, bool can_move, bool firing, float pitch)
+bool CMoveMgr::Update(bool external_camera, const MovementInput& input, float yaw, double seconds, bool can_move,
+                      bool firing, float pitch)
 {
     if (!ready() || !std::isfinite(seconds) || seconds < 0 || seconds > 60 || !std::isfinite(yaw) ||
         !std::isfinite(pitch) || !movement_.valid())
@@ -367,7 +360,7 @@ bool CMoveMgr::Update(CBloodServerShell& shell, CVoiceMgr& voices, bool external
     animation.backward |= input.mouse_forward < 0;
     animation.right |= input.mouse_strafe > 0;
     animation.left |= input.mouse_strafe < 0;
-    if (!movement_.controls(shell, PlayerControls{animation, firing, yaw}, can_move, m_bForcedCrouch))
+    if (!movement_.controls(PlayerControls{animation, firing, yaw}, can_move, m_bForcedCrouch))
         return false;
     ++updates;
     // Original Update caps a frame at 0.1s. Track discarded time explicitly.
@@ -382,7 +375,7 @@ bool CMoveMgr::Update(CBloodServerShell& shell, CVoiceMgr& voices, bool external
         if (!movement_.synchronize())
             return false;
         int character = 0;
-        if (!movement_.environment(shell, containers, character))
+        if (!movement_.environment(containers, character))
             return false;
         container_clock += m_FrameTime;
         m_ContainerTime = 0;
@@ -391,10 +384,10 @@ bool CMoveMgr::Update(CBloodServerShell& shell, CVoiceMgr& voices, bool external
             container_clock = std::max(0.0, container_clock - original_frame);
             m_ContainerTime = original_frame;
         }
-        UpdateMotion(yaw, pitch, voices, character, external_camera);
-        if (!MoveLocalSolidObject(shell))
+        UpdateMotion(yaw, pitch, character, external_camera);
+        if (!MoveLocalSolidObject())
             return false;
         ++substeps;
     }
-    return movement_.finish(shell, static_cast<float>(duration), containers);
+    return movement_.finish(static_cast<float>(duration), containers);
 }

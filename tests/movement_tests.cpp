@@ -218,8 +218,8 @@ namespace
         move.move_code = player->m_byClientMoveCode;
         move.velocity.x = std::numeric_limits<float>::quiet_NaN();
         CHECK(!game.server_shell.OnMessage(game.local_client, move));
-        CHECK(!client.move_mgr.Update(game.server_shell, client.voice_manager, false, {}, 0, -1, true));
-        CHECK(!client.move_mgr.Update(game.server_shell, client.voice_manager, false, {},
+        CHECK(!client.move_mgr.Update(false, {}, 0, -1, true));
+        CHECK(!client.move_mgr.Update(false, {},
                                       std::numeric_limits<float>::infinity(), .01, true));
         CHECK(!game.step(std::numeric_limits<double>::infinity()));
         client.movement_input.forward = true;

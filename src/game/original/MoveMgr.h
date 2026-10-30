@@ -1,23 +1,21 @@
 #pragma once
 #include "SurfaceTypes.h"
-#include "game/local_movement.h"
+#include "client/movement_services.h"
 
-class CBloodServerShell;
-class CVoiceMgr;
 // Selected locomotion/container branches of original ClientShellDLL/MoveMgr.
-// CMoveMgr integrates a client-owned value body. LocalMovement delivers the
-// prediction and the immediate authoritative correction without double integration.
+// CMoveMgr integrates a client-owned value body through MovementServices.
+// LocalMovement preserves immediate solo correction; ReplicaMovement uses only
+// client collision and prepares periodic reports without a server dependency.
 // See movement_contracts.md and locomotion_contracts.md for the source selections and physics adaptations.
 class CMoveMgr
 {
   public:
-    explicit CMoveMgr(OpenBlood2::LocalMovement& movement) : body(movement.body()), movement_(movement) {}
-    bool Init(HCLIENT);
+    explicit CMoveMgr(OpenBlood2::MovementServices& movement) : body(movement.body()), movement_(movement) {}
     void Term();
     bool OnPhysicsUpdate(const OpenBlood2::PlayerPhysics&);
     bool OnServerForcePos(const OpenBlood2::PlayerPosition&);
-    bool Update(CBloodServerShell&, CVoiceMgr&, bool external_camera, const OpenBlood2::MovementInput&, float yaw,
-                double seconds, bool can_move, bool firing = false, float pitch = 0);
+    bool Update(bool external_camera, const OpenBlood2::MovementInput&, float yaw, double seconds, bool can_move,
+                bool firing = false, float pitch = 0);
     OpenBlood2::PlayerMove WritePositionInfo(DVector destination, DVector velocity) const;
     OpenBlood2::ClientMotionState& body;
     OpenBlood2::PlayerPhysics physics;
@@ -47,11 +45,11 @@ class CMoveMgr
     OpenBlood2::MovementInput input_;
     void UpdateControlFlags(const OpenBlood2::MovementInput&, bool);
     void UpdateOnGround();
-    void UpdateMotion(float yaw, float pitch, CVoiceMgr&, int character, bool external_camera);
+    void UpdateMotion(float yaw, float pitch, int character, bool external_camera);
     void UpdateInLiquid(const OpenBlood2::ClientContainerInfo&);
     void UpdateOnLadder(const OpenBlood2::ClientContainerInfo&);
     void UpdateOnConveyor(const OpenBlood2::ClientContainerInfo&);
-    bool MoveLocalSolidObject(CBloodServerShell&);
-    OpenBlood2::LocalMovement& movement_;
+    bool MoveLocalSolidObject();
+    OpenBlood2::MovementServices& movement_;
     bool configured_ = false, positioned_ = false;
 };

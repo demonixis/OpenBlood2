@@ -5,6 +5,27 @@
 
 namespace OpenBlood2
 {
+    bool LocalMovement::controls(const PlayerControls& value, bool send, bool& crouched)
+    {
+        return controls(shell_, value, send, crouched);
+    }
+    bool LocalMovement::environment(ClientContainerState& state, int& character)
+    {
+        return environment(shell_, state, character);
+    }
+    bool LocalMovement::finish(float seconds, ClientContainerState& state)
+    {
+        return finish(shell_, seconds, state);
+    }
+    bool LocalMovement::jump_voice(int character, bool external_camera)
+    {
+        return voices_ && jump_voice(*voices_, character, external_camera);
+    }
+    bool LocalMovement::advance(const PlayerMove& move)
+    {
+        LocalMoveReport report;
+        return predict(move, report) && submit(shell_, report);
+    }
     namespace
     {
         ClientMotionState client_state(const MovementState& state, const Objects& objects)

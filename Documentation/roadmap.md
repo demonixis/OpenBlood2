@@ -306,6 +306,8 @@ replicates creations, metadata changes and removals after a checked baseline ACK
 independent client replicas with bounded interpolation and reliable teleport revisions.
 [Wire collision/environment](implementation/reports/m9_collision_transport.md) now
 reconstructs client-owned geometry and volume properties from the admitted DAT.
+[Independent CMoveMgr](implementation/reports/m9_movement_services.md) now runs
+against replica collision and prepares original-cadence reports without server linkage.
 **Private player events and command delivery, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client

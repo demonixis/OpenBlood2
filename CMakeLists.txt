@@ -54,8 +54,12 @@ blood2_project_options(blood2_net)
 
 include(cmake/EngineSources.cmake)
 
+add_library(blood2_client_movement STATIC src/game/original/MoveMgr.cpp src/client/replica_movement.cpp)
+target_link_libraries(blood2_client_movement PUBLIC engine_core)
+blood2_project_options(blood2_client_movement)
+
 add_library(blood2_client_network STATIC src/client/network_world.cpp src/client/network_state.cpp src/client/network_collision.cpp)
-target_link_libraries(blood2_client_network PUBLIC engine_core blood2_net)
+target_link_libraries(blood2_client_network PUBLIC engine_core blood2_net blood2_client_movement)
 blood2_project_options(blood2_client_network)
 
 set_source_files_properties(src/engine/crash_capture.cpp PROPERTIES
@@ -142,7 +146,7 @@ target_sources(blood2_game PRIVATE src/game/original/WeaponPickups.cpp src/game/
     src/game/original/Spawner.cpp src/game/original/TripLaser.cpp src/game/original/SeeingEye.cpp src/game/original/TheEyeInventory.cpp src/game/original/BugSprayProjectile.cpp src/game/original/InventoryClient.cpp src/game/original/NapalmProjectile.cpp src/game/original/BoneLeech.cpp src/game/original/DrudgeLord.cpp src/game/original/SoulDrudge.cpp src/game/original/ShikariAI.cpp src/game/original/GremlinAI.cpp src/game/original/AddonProjectiles.cpp src/game/original/MadScientistAI.cpp src/game/original/Tchernotronic.cpp src/game/original/SingularityProjectile.cpp src/game/original/LeechProjectile.cpp src/game/original/OrbProjectile.cpp src/game/original/Fanatic.cpp src/game/original/Prophet.cpp src/game/original/ChosenAI.cpp src/game/original/IshmaelAI.cpp
     src/game/original/ParticleSystem.cpp src/game/original/LaterEnemies.cpp src/game/original/Naga.cpp src/game/original/ZealotAI.cpp src/game/original/CampaignWeapons.cpp src/game/original/CampaignProjectiles.cpp src/game/original/CabalAttack.cpp src/game/original/HowitzerShell.cpp src/game/original/TeslaProjectile.cpp)
 target_sources(blood2_game PRIVATE src/game/server_physics.cpp src/game/server_movers.cpp src/game/server_rotation.cpp src/game/original/RotatingDoor.cpp src/game/original/PlayerUse.cpp src/game/original/Door.cpp src/game/original/Trigger.cpp src/game/original/KeyPickup.cpp src/game/server_keys.cpp src/game/server_containers.cpp src/game/original/VolumeBrush.cpp src/game/original/Minefield.cpp src/game/original/SparksObj.cpp src/game/original/ClientLightningSFX.cpp src/game/original/ClientWarpGateSFX.cpp src/game/original/PlayerContainers.cpp src/game/original/PlayerPowers.cpp src/game/original/PlayerCheats.cpp)
-target_sources(blood2_game PRIVATE src/game/original/MoveMgr.cpp src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
+target_sources(blood2_game PRIVATE src/game/original/PlayerLocomotion.cpp src/game/original/Anim_Sound.cpp src/game/original/CharacterSound.cpp src/game/original/AI_Mgr.cpp src/game/original/AISight.cpp src/game/original/AIFire.cpp src/game/original/AIPerception.cpp
     src/game/server_activation.cpp src/game/original/AIRuntime.cpp
     src/game/original/AIAmmo.cpp src/game/original/AISmell.cpp src/game/original/AIEscape.cpp src/game/original/AINavigationStates.cpp src/game/original/AILocomotion.cpp src/game/original/CultistAttack.cpp src/game/original/AIDodge.cpp src/game/original/AIScript.cpp src/game/original/AIScriptMovement.cpp src/game/original/AIScriptFire.cpp src/game/original/AISave.cpp src/game/original/BossSave.cpp src/game/original/Movement.cpp
     src/game/original/AIState.cpp src/game/original/AIHitReaction.cpp src/game/original/AIDeath.cpp src/game/original/Gib.cpp src/game/original/Corpse.cpp src/game/original/AITrigger.cpp src/game/original/AISound.cpp
@@ -162,7 +166,7 @@ if(BLOOD2_BUILD_CLIENT)
     target_link_libraries(blood2_frontend PUBLIC blood2_game)
     blood2_project_options(blood2_frontend)
 endif()
-target_link_libraries(blood2_game PUBLIC blood2_client_effects engine_core)
+target_link_libraries(blood2_game PUBLIC blood2_client_effects blood2_client_movement engine_core)
 
 target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableSave.cpp src/game/original/DestructableBrush.cpp src/game/original/DestructableModel.cpp
     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp src/game/original/RotatingModel.cpp

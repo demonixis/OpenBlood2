@@ -17,6 +17,7 @@
 | [Network object membership](implementation/reports/m9_world_membership.md) | Reliable creation/removal, metadata updates, baseline ACK and retired-generation checks. |
 | [Network poses and interpolation](implementation/reports/m9_world_state.md) | Absolute 20 Hz poses, bounded per-object history and reliable teleport revisions. |
 | [Network collision/environment](implementation/reports/m9_collision_transport.md) | Client-owned DAT geometry, volume properties and atomic object/collision reception. |
+| [Independent client movement](implementation/reports/m9_movement_services.md) | Server-independent CMoveMgr, replica prediction and original report cadence; wire movement remains pending. |
 | [Network admission](implementation/reports/m9_admission.md) | Bounded ENet handshake, full-content gate and original player lifetime; gameplay replication pending. |
 | [Bloodbath player profiles](implementation/reports/m9_player_profiles.md) | Original skins, entry ammo and private startup announcement; fresh internal entry only. |
 | [Server player connections](implementation/reports/m9_player_connections.md) | 16 checked connections, private ownership and original Bloodbath marker selection; wire admission pending. |

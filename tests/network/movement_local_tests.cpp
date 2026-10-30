@@ -74,7 +74,7 @@ namespace
         CHECK(g.client_shell.move_mgr.substeps == substeps + 4);
         CHECK(state.predictions == predicted + 4 && state.acknowledgements == acknowledged + 4);
         // A zero-time update refreshes corrections without generating a displacement/report.
-        CHECK(g.client_shell.move_mgr.Update(g.server_shell, g.client_shell.voice_manager, false, {}, 0, 0, true));
+        CHECK(g.client_shell.move_mgr.Update(false, {}, 0, 0, true));
         CHECK(state.predictions == predicted + 4);
         return true;
     }

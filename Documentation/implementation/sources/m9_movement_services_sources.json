@@ -1,0 +1,66 @@
+{
+  "scope": "Independent CMoveMgr services and client-only replica prediction/report cadence",
+  "baseline": "789fee33ebfe05d491a54bad28c5ab2fcbba9fa3",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "789fee33ebfe05d491a54bad28c5ab2fcbba9fa3",
+      "path": "src/game/original/MoveMgr.cpp",
+      "sha256": "f0da7bc2971fc6c9c32939d7cc8c81e8e8d940b81fef4c43d2fba0bb4119707b"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "789fee33ebfe05d491a54bad28c5ab2fcbba9fa3",
+      "path": "src/game/original/MoveMgr.h",
+      "sha256": "68fe8f2208c7f233832debcc79330b3c233b75bde99a5f7a50c49b56d465d510"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "789fee33ebfe05d491a54bad28c5ab2fcbba9fa3",
+      "path": "src/game/local_movement.cpp",
+      "sha256": "81c97d6fd75efc61ad9b99cd957db890c41572a44727fa4b6126939542f40ac8"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "789fee33ebfe05d491a54bad28c5ab2fcbba9fa3",
+      "path": "src/client/collision.cpp",
+      "sha256": "7a084738b3e3ecc22727c16c37c497b5f7177411c36498a609bdc339205379f5"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "789fee33ebfe05d491a54bad28c5ab2fcbba9fa3",
+      "path": "src/client/environment.cpp",
+      "sha256": "f2c911dc7e39485521c0a5f5b1fa073d8cc8c729c02222febad0399962218d87"
+    },
+    {
+      "repository": "sources/blood2",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "reviewed_lines": [
+        [
+          71,
+          71
+        ],
+        [
+          103,
+          103
+        ],
+        [
+          1751,
+          1758
+        ],
+        [
+          1899,
+          1905
+        ]
+      ],
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    }
+  ],
+  "adaptations": [
+    "Extract service calls without changing original movement arithmetic or solo call ordering.",
+    "Build original CMoveMgr in blood2_client_movement, linked without server game classes by its independent fixture.",
+    "ReplicaMovement queries admitted collision only, retains prediction across substeps, and prepares bounded world/object/force/sequence-qualified reports.",
+    "Preserve original first-frame report and 0.14-second countdown reset, separately from capped movement duration; no catch-up burst.",
+    "This step does not transmit reports, receive server corrections/stance changes, or play remote jump voices. Those endpoints remain in the active network continuation."
+  ]
+}

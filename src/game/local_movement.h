@@ -1,4 +1,5 @@
 #pragma once
+#include "client/movement_services.h"
 #include "client/session.h"
 #include "game/container_messages.h"
 #include "game/player_messages.h"
@@ -20,18 +21,27 @@ namespace OpenBlood2
         std::uint64_t force_revision = 0, sequence = 0;
         PlayerMove move;
     };
-    class LocalMovement
+    class LocalMovement : public MovementServices
     {
       public:
-        LocalMovement(ServerAdapter& server, Objects& objects, ClientSession& client)
-            : server_(server), objects_(objects), client_(client)
+        LocalMovement(ServerAdapter& server, Objects& objects, ClientSession& client, CBloodServerShell& shell)
+            : server_(server), objects_(objects), client_(client), shell_(shell)
         {
         }
         bool bind(HCLIENT);
-        void clear();
-        bool valid() const;
-        bool synchronize();
-        bool force_position(const PlayerPosition&);
+        void clear() override;
+        bool valid() const override;
+        bool synchronize() override;
+        bool force_position(const PlayerPosition&) override;
+        void voices(CVoiceMgr& value)
+        {
+            voices_ = &value;
+        }
+        bool controls(const PlayerControls& value, bool send, bool& crouched) override;
+        bool environment(ClientContainerState&, int& character) override;
+        bool finish(float seconds, ClientContainerState&) override;
+        bool jump_voice(int character, bool external_camera) override;
+        bool advance(const PlayerMove&) override;
         bool controls(CBloodServerShell&, const PlayerControls&, bool send, bool& crouched);
         bool environment(CBloodServerShell&, ClientContainerState&, int& character);
         bool finish(CBloodServerShell&, float seconds, ClientContainerState&);
@@ -45,7 +55,7 @@ namespace OpenBlood2
         bool verify_prediction = false;
         bool predict(const PlayerMove&, LocalMoveReport&);
         bool submit(CBloodServerShell&, const LocalMoveReport&);
-        ClientMotionState& body()
+        ClientMotionState& body() override
         {
             return client_.movement.body;
         }
@@ -54,6 +64,8 @@ namespace OpenBlood2
         ServerAdapter& server_;
         Objects& objects_;
         ClientSession& client_;
+        CBloodServerShell& shell_;
+        CVoiceMgr* voices_ = nullptr;
         HCLIENT connection_ = nullptr;
         HOBJECT object_ = nullptr;
         std::uint64_t force_revision_ = 0, next_sequence_ = 0;

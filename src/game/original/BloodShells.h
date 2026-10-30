@@ -10,6 +10,7 @@
 #include "ScreenFade.h"
 #include "ViewWeapon.h"
 #include "VoiceMgr.h"
+#include "game/local_movement.h"
 #include "game/local_presentation.h"
 #include "game/session.h"
 #include <optional>
@@ -103,12 +104,13 @@ class CBloodClientShell
           weapons_visible(client.camera.weapons_visible), third_person(client.camera.third_person),
           third_person_active(client.camera.third_person_active), xr_view(client.camera.xr_view),
           death_camera(client.camera.death), stats(client.hud.stats), resources_(resources), server_(server),
-          music_catalog_(catalog), audio_(audio), presentation_(presentation), client_view_(client)
+          music_catalog_(catalog), audio_(audio), movement_(movement), presentation_(presentation), client_view_(client)
     {
         // OnEngineInitialized: m_MessageMgr.Init/Enable(DTRUE), then SetMaxMessages(6) on the
         // normal (not lobby-launched) start.
         m_MessageMgr.Enable(true);
         m_MessageMgr.SetMaxMessages(6);
+        movement.voices(voice_manager);
     }
     bool StartNewWorld(const char*, OpenBlood2::WorldMessage&);
     bool OnEnterWorld(HCLIENT, bool restored = false);
@@ -301,6 +303,7 @@ class CBloodClientShell
     ServerDE& server_;
     OpenBlood2::MusicCatalog& music_catalog_;
     OpenBlood2::AudioMixer& audio_;
+    OpenBlood2::LocalMovement& movement_;
     OpenBlood2::LocalPresentation& presentation_;
     OpenBlood2::ClientSession& client_view_;
 };
