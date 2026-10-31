@@ -18,14 +18,25 @@ namespace OpenBlood2
         if (!table.displayed)
             return true;
         const auto& image = table.surface();
-        // Allocate only the authored row width and room for the 16 supported players.
+        // Team columns and small-screen switching can change the required width.
+        // Finish previous submitted draws before releasing their owned texture.
+        if (texture_ && (image.width != width_ || image.height > height_))
+        {
+            SDL_WaitForGPUIdle(device_);
+            SDL_ReleaseGPUTexture(device_, texture_);
+            if (transfer_)
+                SDL_ReleaseGPUTransferBuffer(device_, transfer_);
+            texture_ = nullptr;
+            transfer_ = nullptr;
+            revision_ = UINT64_MAX;
+        }
         if (!texture_)
         {
             SDL_GPUTextureCreateInfo info{};
             info.type = SDL_GPU_TEXTURETYPE_2D;
             info.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
             width_ = image.width;
-            height_ = image.height / table.displayed * unsigned(Net::max_players);
+            height_ = image.height; // CPU composition bounds storage by supported rows, not viewport height.
             info.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
             info.width = width_;
             info.height = height_;

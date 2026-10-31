@@ -178,7 +178,7 @@ namespace OpenBlood2
                 return reject(Net::Reject::Edition);
             if (hello->content != session_.fingerprint())
                 return reject(Net::Reject::Content);
-            if (session_.mode() != GAMETYPE_BLOODBATH)
+            if (session_.mode() != GAMETYPE_BLOODBATH && session_.mode() != GAMETYPE_TEAMPLAY)
                 return reject(Net::Reject::Mode);
             Net::WorldOffer offer{session_.world_id(), std::uint8_t(session_.mode()), std::uint8_t(capacity_),
                                   session_.game().world_path};
@@ -201,8 +201,12 @@ namespace OpenBlood2
                 return reject(Net::Reject::Player);
             peer.profile = ready->profile;
             Net::Joined joined;
-            if (!session_.join(ready->profile, joined, error))
+            auto entry = ready->profile;
+            if (peer.team)
+                entry.team = peer.team; // Original transition-team override; Ready cannot change it.
+            if (!session_.join(entry, joined, error))
                 return reject(Net::Reject::Player);
+            peer.team = session_.player_team(joined.player);
             peer.player = joined.player;
             ++admitted;
             if (!send(peer.peer, joined, error))
@@ -274,9 +278,11 @@ namespace OpenBlood2
                     ++departed;
                 const auto id = peer.peer;
                 auto profile = std::move(peer.profile);
+                const auto team = peer.team;
                 peer = {};
                 peer.peer = id;
                 peer.profile = std::move(profile);
+                peer.team = team;
                 peer.phase = Phase::Loading;
                 peer.deadline = now + 30s;
                 if (!send(id,

@@ -121,6 +121,11 @@ namespace
         CHECK(scores.visible);
         scores.receive({owner, 3, 0, living});
         CHECK(scores.visible); // Ordinary live snapshots do not hide a manually opened table.
+        const auto column = scores.team_column;
+        scores.event(event, 3, true);
+        CHECK(!scores.visible && scores.team_column == column);
+        scores.event(event, 3, true);
+        CHECK(scores.visible && scores.team_column == column % 2 + 1);
         return true;
     }
     bool notices(const std::filesystem::path& root)
@@ -165,6 +170,10 @@ namespace
         CHECK(speech.update(6, error) && speech.notices().size() == 2);
         CHECK(speech.update(9, error) && speech.notices().empty());
         CHECK(!audio.local_started && !audio.started && !speech.communication.received);
+        std::string text;
+        CHECK(speech.announcer.player_notice("A%2!s!", true, resources, text, 2) &&
+              text == "A%2!s! has joined the game on Team Blue."); // Original missing-team-name fallback typo.
+        CHECK(!speech.announcer.player_notice("A", true, resources, text, 3));
         speech.clear();
         CHECK(speech.notices().empty());
         std::cout << "Localized arrival/departure, literal percent names, source fallback, shared four-line expiry and "
@@ -199,6 +208,28 @@ namespace
         CHECK(announcer.player_notice("A%s", true, resources, text) && text == "A%s has joined the game.");
         CHECK(announcer.player_notice("A%s", false, resources, text) && text == "A%s has left the game." &&
               !announcer.fallback_texts);
+        CHECK(announcer.team_name(1, resources) == "Team Blue" && announcer.team_name(2, resources) == "Team Red");
+        CHECK(announcer.player_notice("A%2!s!", true, resources, text, 2) &&
+              text == "A%2!s! has joined the game on Team Red." && !announcer.fallback_texts);
+        for (unsigned i = 0; i < rows.size(); ++i)
+            rows[i].team = DBYTE(i % 2 + 1);
+        CHECK(table.compose_teams(rows, {8, -3}, 0, 640, 480, error) && table.displayed == 6);
+        const auto team_image = table.surface().rgba;
+        const auto team_revision = table.revision;
+        CHECK(table.compose_teams(rows, {8, -3}, 0, 640, 480, error) && table.revision == team_revision);
+        CHECK(table.compose_teams(rows, {9, -3}, 0, 640, 480, error) && table.surface().rgba != team_image);
+        CHECK(table.compose_teams(rows, {9, -3}, 0, 320, 240, error) && !table.displayed);
+        CHECK(table.compose_teams(rows, {9, -3}, 1, 320, 240, error) && table.displayed == 3);
+        const auto blue = table.surface().rgba;
+        CHECK(table.compose_teams(rows, {9, -3}, 2, 320, 240, error) && table.displayed == 3 &&
+              table.surface().rgba != blue);
+        CHECK(table.compose_teams(rows, {9, -3}, 1, 32, 32, error) && !table.displayed && table.surface().rgba.empty());
+        CHECK(!table.compose_teams(rows, {1000001, 0}, 1, 640, 480, error));
+        CHECK(!table.compose_teams(rows, {0, 0}, 3, 640, 480, error));
+        rows[0].team = 0;
+        CHECK(!table.compose_teams(rows, {0, 0}, 1, 640, 480, error));
+        std::cout << "Retail Team titles/portraits/totals, localized notices, column switching and bounded tiny "
+                     "viewports passed\n";
         std::cout << "Retail frag PCX/FNT composition, cache revision, signed scores, small-screen mode, tiny-window "
                      "safety and exact localized notices passed\n";
         return true;
@@ -225,9 +256,22 @@ namespace
         std::error_code ec;
         std::filesystem::create_directories(output, ec);
         CHECK(!ec);
-        for (const auto [width, height] : {std::pair{640, 480}, std::pair{320, 240}})
+        struct Scene
         {
-            CHECK(table.compose(rows, width, height, error));
+            unsigned width, height;
+            DBYTE team;
+        };
+        for (const auto [width, height, team] :
+             {Scene{640, 480, 0}, Scene{320, 240, 0}, Scene{640, 480, 1}, Scene{320, 240, 1}, Scene{320, 240, 2}})
+        {
+            if (team)
+            {
+                for (unsigned i = 0; i < rows.size(); ++i)
+                    rows[i].team = DBYTE(i % 2 + 1);
+                CHECK(table.compose_teams(rows, {40, -5}, team, width, height, error));
+            }
+            else
+                CHECK(table.compose(rows, width, height, error));
             ImGui_ImplSDLGPU3_NewFrame();
             ImGui_ImplSDL3_NewFrame();
             ImGui::GetIO().DisplaySize = {float(width), float(height)};
@@ -265,7 +309,9 @@ namespace
             SDL_DownloadFromGPUTexture(copy, &region, &target);
             SDL_EndGPUCopyPass(copy);
             CHECK(SDL_SubmitGPUCommandBuffer(cmd));
-            CHECK(capture.save(path_text(output / ("scores-" + std::to_string(width) + ".png")).c_str()));
+            CHECK(capture.save(path_text(output / (std::string(team ? "team-" : "scores-") + std::to_string(width) +
+                                                   (team ? "-" + std::to_string(team) : "") + ".png"))
+                                   .c_str()));
         }
         return true;
     }

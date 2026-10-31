@@ -1,5 +1,10 @@
 # Source and Dependency Provenance
 
+The M9 [Team network lot](reports/m9_team_network.md) connects original transition
+team IDs, team-total end rules, localized team joins/HUD and CFragInfo team layout.
+The checked transport and owned client surfaces are reconstruction adapters; see
+the [source ledger](sources/m9_team_network_sources.json).
+
 The M9 [server Team rules](reports/m9_team_rules.md) select original
 BloodServerShell/TeamMgr assignment, PlayerObj team skin/spawn/frags,
 CDestructable friendly filtering and GameWeapons Voodoo team gates. Checked

@@ -55,7 +55,7 @@ namespace OpenBlood2::Net
     } // namespace
     bool valid_profile(const JoinProfile& p)
     {
-        return !p.name.empty() && p.name.size() <= 100 && p.character < 4 && p.skin < 7 &&
+        return !p.name.empty() && p.name.size() <= 100 && p.character < 4 && p.skin < 7 && p.team <= 2 &&
                std::all_of(
                    p.name.begin(), p.name.end(), [](unsigned char c) { return c >= 32 && c != 127; }) &&
                std::all_of(
@@ -98,6 +98,7 @@ namespace OpenBlood2::Net
                     writer.u8(v.profile.skin);
                     writer.raw(v.profile.attributes);
                     writer.raw(v.profile.weapons);
+                    writer.u8(v.profile.team);
                 }
                 else if constexpr (std::is_same_v<T, Joined>)
                 {
@@ -167,6 +168,7 @@ namespace OpenBlood2::Net
                     field = reader.u8();
                 for (auto& field : v.profile.weapons)
                     field = reader.u8();
+                v.profile.team = reader.u8();
                 next = std::move(v);
                 break;
             }

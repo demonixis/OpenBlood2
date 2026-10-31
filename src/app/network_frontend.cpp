@@ -33,6 +33,7 @@ namespace OpenBlood2
         };
         Net::JoinProfile profile;
         profile.name = options.network_name;
+        profile.team = options.network_team;
         if (!Net::valid_profile(profile))
         {
             error = "Invalid multiplayer player profile";
@@ -46,7 +47,7 @@ namespace OpenBlood2
         if (!options.host_world.empty())
         {
             server = std::make_unique<ServerSession>();
-            if (!server->start(config, options.host_world, GAMETYPE_BLOODBATH, error, options.network_rules))
+            if (!server->start(config, options.host_world, options.network_mode, error, options.network_rules))
                 return failed();
             network = std::make_unique<ServerNetwork>(*server);
             if (!network->listen("0.0.0.0", options.network_port, unsigned(Net::max_players), error))
@@ -233,7 +234,8 @@ namespace OpenBlood2
                 auto state =
                     hud_state(values.stats, true, bool(camera.view.object), camera.death.active,
                               !scores.visible && (settings.crosshair || client.zoom_crosshair()),
-                              client.zoom_crosshair() ? client.zoom_crosshair() : DBYTE(settings.crosshair_number));
+                              client.zoom_crosshair() ? client.zoom_crosshair() : DBYTE(settings.crosshair_number),
+                              client.players().team());
                 state.items = values.items;
                 state.item_messages = values.item_messages;
                 state.item_shows = values.item_shows;
@@ -246,9 +248,13 @@ namespace OpenBlood2
                 {
                     const auto size = ImGui::GetMainViewport()->Size;
                     const auto density = ImGui::GetIO().DisplayFramebufferScale;
-                    if (!frag_table.compose(client.players().scores(), unsigned(size.x * density.x),
-                                            unsigned(size.y * density.y), error) ||
-                        !frag_renderer.draw(frag_table, error))
+                    const auto width = unsigned(size.x * density.x), height = unsigned(size.y * density.y);
+                    const bool composed =
+                        team_game_type(client.players().mode())
+                            ? frag_table.compose_teams(client.players().roster(), client.players().team_frags(),
+                                                       scores.team_column, width, height, error)
+                            : frag_table.compose(client.players().scores(), width, height, error);
+                    if (!composed || !frag_renderer.draw(frag_table, error))
                         return failed();
                 }
                 const auto origin = ImGui::GetMainViewport()->Pos;

@@ -23,6 +23,7 @@ namespace OpenBlood2
         // Bounded like every other option: about a week of play.
         static constexpr std::uint32_t frag_limit = 1000000, minute_limit = 10000;
         std::vector<std::string> following_maps; // First map is --world / --host; original cap: 50 total.
+        bool friendly_fire = true, negative_team_frags = true;
         bool valid() const
         {
             return end >= MatchEnd::Frags && end <= MatchEnd::Never && frags <= frag_limit && minutes <= minute_limit &&
@@ -42,6 +43,13 @@ namespace OpenBlood2
     // Both frontends use the same spelling, ranges and settings object.
     inline bool parse_match_option(std::string_view option, std::string_view value, MultiplayerRules& rules)
     {
+        if (option == "--friendly-fire" || option == "--negative-team-frags")
+        {
+            if (value != "on" && value != "off")
+                return false;
+            (option == "--friendly-fire" ? rules.friendly_fire : rules.negative_team_frags) = value == "on";
+            return true;
+        }
         if (option == "--end")
         {
             if (value == "frags")

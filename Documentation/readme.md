@@ -31,6 +31,7 @@
 | [Independent client speech](implementation/reports/m9_client_speech.md) | Original VoiceMgr/CommLink services, actual private playback and shared bounded audio. |
 | [Validated weapon sounds](implementation/reports/m9_weapon_sounds.md) | Original animation one-shots/loops/stops, life checks and independent remote playback. |
 | [Reliable player roster](implementation/reports/m9_roster.md) | Independent names/characters/frags, late arrivals, departure and reconnect identity. |
+| [Team network play](implementation/reports/m9_team_network.md) | Team admission, absolute totals, retained assignments, source team HUD/columns and dedicated/host verification. |
 | [Server Team rules](implementation/reports/m9_team_rules.md) | Original membership, team skins/spawns, frag totals and friendly-fire/Voodoo rules; network Team admission follows. |
 | [Bloodbath limits and map rotation](implementation/reports/m9_rotation.md) | Original frag/time/intermission rules, same-peer world replacement and dedicated/host process checks. |
 | [Bloodbath scoreboard and player notices](implementation/reports/m9_scoreboard.md) | Original score ordering/art, Tab/gamepad toggle, death/revival visibility and localized arrival/departure text. |
@@ -55,7 +56,7 @@
 | [Client collision replica](implementation/reports/m9_client_collision.md) | M9 owned collision scene and independent prediction; solo validation and remaining services. |
 | [Local client movement](implementation/reports/m9_local_movement.md) | M9 separate CMoveMgr body, speculative collision and immediate server correction; solo verification. |
 | [Local client replica](implementation/reports/m9_client_world.md) | M9 object presentation through ClientWorld; remaining client/server dependencies and validation. |
-| [Dedicated server foundation](dedicated_server.md) | Headless build, zero-client simulation and Bloodbath admission; gameplay replication remains pending. |
+| [Dedicated server foundation](dedicated_server.md) | Headless build, Bloodbath/Team admission, gameplay and match rotation; qualification limits. |
 | [Contributing](contributing.md) | Source reuse, conventions and verification. |
 | [Server-class coverage](contracts/class_coverage.md) | Missing original registrations, replacements and Museum investigation. |
 | [Remaining original VFX](implementation/reports/vfx_inventory.md) | Weapon/environment gaps, existing components and source evidence; delivery order in the roadmap. |

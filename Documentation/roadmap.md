@@ -346,8 +346,9 @@ The [client roster](implementation/reports/m9_roster.md) now owns reliable names
 [Original Bloodbath scores and player notices](implementation/reports/m9_scoreboard.md) now consume reliable roster/frag updates, preserving tie order, source PCX/FNT layout, death/revival visibility and localized join/leave text.
 [Bloodbath match limits and rotation](implementation/reports/m9_rotation.md) now retain peers across cyclic maps, with original intermission, fresh world/life identities and strict stale-packet gates.
 [Server Team rules](implementation/reports/m9_team_rules.md) now preserve original assignment, skins/spawns, accumulated team frags and friendly-fire/Voodoo gates; Team admission and client/team-score transport remain to connect.
-Communication portraits, music, FX, measured pings/chat, Team/CTF integration and remaining multiplayer branches stay in progress.
-**Remaining private presentation consumers/commands, full client separation, Team/CTF and complete network qualification remain pending.**
+[Team network play](implementation/reports/m9_team_network.md) now connects assignment/skins, absolute totals, team limits and retained-team rotation, with original team HUD/notices/score columns.
+Communication portraits, music, FX, measured pings/chat, CTF integration and remaining multiplayer branches stay in progress.
+**Remaining private presentation consumers/commands, full client separation, CTF and complete network qualification remain pending.**
 
 Original model: the authoritative server runs ObjectDLL objects; the client runs
 CMoveMgr, rendering and effects over copied object state. The current local solo

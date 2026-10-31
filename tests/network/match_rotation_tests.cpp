@@ -22,6 +22,11 @@ namespace
         std::string error;
         MultiplayerRules r;
         CHECK(r.valid() && r.frags == 25 && r.minutes == 10 && Options{}.network_rules.minutes == 15);
+        CHECK(r.friendly_fire && r.negative_team_frags);
+        CHECK(parse_match_option("--friendly-fire", "off", r) && !r.friendly_fire);
+        CHECK(parse_match_option("--negative-team-frags", "off", r) && !r.negative_team_frags);
+        CHECK(!parse_match_option("--friendly-fire", "false", r));
+        CHECK(!parse_match_option("--negative-team-frags", "2", r));
         std::array<int, 3> scores{-1, 24, 0};
         CHECK(!match_limit_reached(r, 999999, scores));
         scores[1] = 25;
@@ -52,6 +57,22 @@ namespace
         CHECK(parse_options(args, parsed, error) && parsed.network_rules.minutes == 0);
         const std::array<std::string_view, 4> bad{"--connect", "localhost", "--end", "time"};
         CHECK(!parse_options(bad, parsed, error));
+        const std::array<std::string_view, 10> team{
+            "--host", "multi/bb_crypt",        "--mode", "team", "--team", "red", "--friendly-fire",
+            "off",    "--negative-team-frags", "off"};
+        CHECK(parse_options(team, parsed, error) && parsed.network_mode == GAMETYPE_TEAMPLAY &&
+              parsed.network_team == 2 && !parsed.network_rules.friendly_fire &&
+              !parsed.network_rules.negative_team_frags);
+        CHECK(
+            parse_options(std::array<std::string_view, 4>{"--connect", "localhost", "--team", "blue"}, parsed, error) &&
+            parsed.network_team == 1);
+        CHECK(!parse_options(std::array<std::string_view, 2>{"--team", "blue"}, parsed, error));
+        CHECK(
+            !parse_options(std::array<std::string_view, 4>{"--connect", "localhost", "--mode", "team"}, parsed, error));
+        CHECK(!parse_options(std::array<std::string_view, 4>{"--host", "multi/bb_crypt", "--team", "green"}, parsed,
+                             error));
+        CHECK(!parse_options(std::array<std::string_view, 4>{"--host", "multi/bb_crypt", "--mode", "ctf"}, parsed,
+                             error));
         std::cout << "Original frag/time/either/never thresholds, zero and large values, shared host/dedicated options "
                      "passed\n";
         return true;

@@ -90,7 +90,7 @@ namespace OpenBlood2
                                  [&](const auto& old) { return p.player == old.player; }))
                 {
                     std::string text;
-                    if (announcer.player_notice(p.name, true, resources_, text))
+                    if (announcer.player_notice(p.name, true, resources_, text, p.team))
                     {
                         notice(std::move(text));
                         ++joined_notices;

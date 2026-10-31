@@ -1,4 +1,5 @@
 #include "client/network_player_events.h"
+#include "game/game_settings.h"
 #include <algorithm>
 
 namespace OpenBlood2
@@ -32,14 +33,17 @@ namespace OpenBlood2
                 }
         }
     } // namespace
-    bool NetworkPlayerEvents::begin(const Net::Joined& owner)
+    bool NetworkPlayerEvents::begin(const Net::Joined& owner, DBYTE mode)
     {
-        if (!owner.world || !owner.player || !owner.object || !owner.object.generation || owner.object.slot >= 65536)
+        if (!network_game_type(mode) || !owner.world || !owner.player || !owner.object || !owner.object.generation ||
+            owner.object.slot >= 65536)
             return false;
         ClientHud next;
         if (!next.begin(owner.world) || !next.bind({owner.world, owner.object}))
             return false;
         owner_ = owner;
+        mode_ = mode;
+        team_frags_ = {};
         hud_ = std::move(next);
         sequence_ = tick_ = 0;
         events_.clear();
@@ -55,14 +59,19 @@ namespace OpenBlood2
     }
     bool NetworkPlayerEvents::replace_roster(const Net::PlayerRoster& state, std::string& error)
     {
+        if (state.mode != mode_)
+        {
+            error = "Player roster changed the admitted game mode";
+            return false;
+        }
         bool self = false;
         for (const auto& p : state.players)
         {
             const auto old = std::find_if(roster_.begin(), roster_.end(),
                                           [&](const auto& prior) { return prior.player == p.player; });
             if ((old == roster_.end() && p.player <= highest_player_) ||
-                (old != roster_.end() &&
-                 (p.object != old->object || p.name != old->name || p.character != old->character)) ||
+                (old != roster_.end() && (p.object != old->object || p.name != old->name ||
+                                          p.character != old->character || p.team != old->team)) ||
                 (p.player == owner_.player && p.object != owner_.object))
             {
                 error = "Player roster changed an admission identity or revived a departed player";
@@ -85,6 +94,7 @@ namespace OpenBlood2
         for (const auto& p : state.players)
             score(scores_, p);
         roster_ = state.players;
+        team_frags_ = state.team_frags;
         return true;
     }
     NetworkPlayerEvents::Reception NetworkPlayerEvents::receive(const Net::PrivateEvent& event, std::string& error)
@@ -108,12 +118,20 @@ namespace OpenBlood2
             if (!replace_roster(*roster, error))
                 return Reception::Refused;
         if (const auto* frag = std::get_if<Net::FragEvent>(&event.value))
+        {
+            if (!team_game_type(mode_) && frag->team_frags != std::array<int, 2>{})
+            {
+                error = "Bloodbath received team frag totals";
+                return Reception::Refused;
+            }
+            team_frags_ = frag->team_frags;
             for (auto& p : roster_)
                 if (p.object == frag->killer)
                 {
                     p.frags = frag->killer_frags; // Authoritative absolute score, including suicide.
                     score(scores_, p);
                 }
+        }
         if (std::holds_alternative<Net::LevelChanging>(event.value))
         {
             hud_.items = {};

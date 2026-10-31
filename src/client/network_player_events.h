@@ -15,7 +15,7 @@ namespace OpenBlood2
             Ignored,
             Refused
         };
-        bool begin(const Net::Joined&);
+        bool begin(const Net::Joined&, DBYTE mode = 1);
         Reception receive(const Net::PrivateEvent&, std::string& error);
         void take(std::vector<Net::PrivateEvent>& out)
         {
@@ -44,7 +44,23 @@ namespace OpenBlood2
             return scores_;
         }
 
+        DBYTE mode() const
+        {
+            return mode_;
+        }
+        const std::array<int, 2>& team_frags() const
+        {
+            return team_frags_;
+        }
+        DBYTE team() const
+        {
+            const auto* self = player(owner_.object);
+            return self ? self->team : 0;
+        }
+
       private:
+        DBYTE mode_ = 1;
+        std::array<int, 2> team_frags_{};
         Net::Joined owner_;
         ClientHud hud_;
         std::uint64_t sequence_ = 0, tick_ = 0;

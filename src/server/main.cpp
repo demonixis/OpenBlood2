@@ -34,13 +34,15 @@ int main(int argc, char** argv)
         const std::string_view arg = argv[i];
         if (arg == "--help")
         {
-            std::cout << "OpenBlood2 dedicated server (M9: Bloodbath movement, combat and respawn enabled)\n"
+            std::cout << "OpenBlood2 dedicated server (M9: Bloodbath and Team movement, combat and respawn enabled)\n"
                       << "  --data-dir PATH  External retail installation (or BLOOD2_DATA_DIR)\n"
                       << "  --world NAME     Retail multi/bb_* or multi/ctf_* map\n"
-                      << "  --mode MODE      bloodbath, team, ctf\n"
+                      << "  --mode MODE      bloodbath, team; ctf is zero-client inspection only\n"
                       << "  --end RULE       frags (default), time, either, never\n"
-                      << "  --frag-limit N   Original default 25; zero ends when a player is present\n"
+                      << "  --frag-limit N   Default 25; zero is immediate (Bloodbath needs a player)\n"
                       << "  --time-limit N   Minutes (dedicated default 10); zero is immediate\n"
+                      << "  --friendly-fire on|off       Team damage (default on)\n"
+                      << "  --negative-team-frags on|off Team-kill penalty (default on)\n"
                       << "  --map NAME       Append to rotation, up to 50 maps including --world\n"
                       << "  --bind ADDRESS   IPv4 bind address (default 0.0.0.0)\n"
                       << "  --port N         UDP port (default 27888; 0 selects an ephemeral port)\n"
@@ -67,7 +69,8 @@ int main(int argc, char** argv)
             valid = number(value, capacity) && capacity && capacity <= Net::max_players;
         else if (arg == "--ticks")
             valid = number(value, limit);
-        else if (arg == "--end" || arg == "--frag-limit" || arg == "--time-limit" || arg == "--map")
+        else if (arg == "--end" || arg == "--frag-limit" || arg == "--time-limit" || arg == "--map" ||
+                 arg == "--friendly-fire" || arg == "--negative-team-frags")
             valid = parse_match_option(arg, value, rules);
         else if (arg == "--mode")
         {

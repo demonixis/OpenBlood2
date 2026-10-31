@@ -43,6 +43,7 @@ namespace OpenBlood2
             Phase phase = Phase::Hello;
             std::uint64_t player = 0;
             std::optional<Net::JoinProfile> profile;
+            DBYTE team = 0; // Server-selected membership, retained across map changes.
             Clock::time_point deadline, heartbeat;
             Net::WorldSnapshot previous;
             std::uint64_t publish_at = 0;

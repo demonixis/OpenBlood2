@@ -26,7 +26,7 @@ namespace
             Heartbeat{10}, BaselineReady{10, 20}};
         std::vector<std::uint8_t> bytes;
         CHECK(encode_admission(hello, bytes));
-        std::vector<std::uint8_t> golden{0x42, 0x32, 0x4d, 0x39, 16, 0, 1, 0};
+        std::vector<std::uint8_t> golden{0x42, 0x32, 0x4d, 0x39, 17, 0, 1, 0};
         for (unsigned i = 0; i < 32; ++i)
             golden.push_back(std::uint8_t(i));
         CHECK(bytes == golden);
@@ -71,6 +71,19 @@ namespace
         CHECK(reject(ready));
         ready.profile = {};
         ready.profile.character = 4;
+        CHECK(reject(ready));
+        ready.profile = {};
+        for (std::uint8_t team = 0; team <= 2; ++team)
+        {
+            ready.profile.team = team;
+            CHECK(encode_admission(ready, bytes));
+            CHECK(bytes.back() == team);
+            AdmissionMessage decoded;
+            CHECK(decode_admission(bytes, decoded) == DecodeAdmission::Ok && std::get<Ready>(decoded) == ready);
+            bytes.back() = 3;
+            CHECK(decode_admission(bytes, decoded) == DecodeAdmission::Malformed && std::get<Ready>(decoded) == ready);
+        }
+        ready.profile.team = 3;
         CHECK(reject(ready));
         ready.profile = {};
         ready.profile.skin = 7;

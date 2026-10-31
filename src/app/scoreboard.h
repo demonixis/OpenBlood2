@@ -7,13 +7,18 @@ namespace OpenBlood2
     struct ScoreboardControl
     {
         bool visible = false, dead = false;
+        DBYTE team_column = 0; // CFragInfo::TurnOn cycles 1/2; no implicit first selection.
         void event(const SDL_Event& event, SDL_WindowID window, bool accepts_input)
         {
             if (accepts_input &&
                 ((event.type == SDL_EVENT_KEY_DOWN && event.key.windowID == window &&
                   event.key.scancode == SDL_SCANCODE_TAB && !event.key.repeat) ||
                  (event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN && event.gbutton.button == SDL_GAMEPAD_BUTTON_BACK)))
+            {
                 visible = !visible;
+                if (visible)
+                    team_column = team_column % 2 + 1;
+            }
         }
         void receive(const Net::PrivateEvent& event)
         {

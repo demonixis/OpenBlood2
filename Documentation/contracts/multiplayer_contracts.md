@@ -1470,3 +1470,28 @@ hit also suppress self punishment and secondary effects. Do not move the damage
 filter ahead of PlayerObj's original slow-death finishing branch: it confirms
 the first lethal attacker before aggregate filtering. Solo/local CTF behavior,
 logical audio/RNG clocks and one CMoveMgr integration remain unchanged.
+
+
+## Team network admission and presentation
+
+The [Team network lot](../implementation/reports/m9_team_network.md) opens Team
+with protocol 17. Preserve bounded auto/blue/red profile preferences, server
+assignment before spawn, immutable peer profiles and retained server-selected
+teams across map changes. Disconnect/reconnect starts fresh; no identity is
+recovered from a name. World/player/force generations and original ammo/skin/
+spawn ordering stay unchanged. FriendlyFire/NegTeamFrags default true; client
+CLI rule configuration applies only to hosts.
+
+Team end limits use accumulated team frags, including departed members and empty
+teams. Roster/frag payloads publish absolute totals; never derive them from live
+members or duplicate events. Require the admitted mode and immutable membership
+before replacing the replica. Keep the 2,048-byte private packet bound: maximum
+Team roster is 2,041 bytes. CTF admission waits for its capture-score integration.
+
+Feed the original HUD icon, localized team join text and Team scoreboard from
+client-owned values. Preserve blue/red column order, 32-pixel spacing, stable
+draw-time ranking, strict header/player row limit, scrunch and DrawClip quirks.
+Below width 500, manual opening cycles columns; automatic visibility does not
+replace original initial column zero. Keep external Voice/character portraits,
+font/name resources and bounded checked CPU/GPU ownership. Bloodbath layout,
+solo clocks, one CMoveMgr integration and PBR/world renderer references stay intact.

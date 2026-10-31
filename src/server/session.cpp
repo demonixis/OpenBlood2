@@ -63,6 +63,8 @@ namespace OpenBlood2
             }
         mode_ = mode;
         rules_ = rules;
+        game_.server.friendly_fire = rules.friendly_fire;
+        game_.server.negative_team_frags = rules.negative_team_frags;
         if (!load_map(0, error))
             return false;
         started_ = true;
@@ -132,13 +134,19 @@ namespace OpenBlood2
     }
     void ServerSession::update_match()
     {
-        if (ending_tick_ || mode_ != GAMETYPE_BLOODBATH)
-            return; // Original team-score evaluation is connected with Team/CTF.
+        if (ending_tick_ || (mode_ != GAMETYPE_BLOODBATH && mode_ != GAMETYPE_TEAMPLAY))
+            return; // CTF capture scoring is connected before admitting CTF players.
         std::array<int, Net::max_players> scores{};
         std::size_t count = 0;
-        for (const auto& p : players_)
-            if (const auto* player = game_.server_shell.Player(p.client))
-                scores[count++] = player->m_Frags;
+        if (mode_ == GAMETYPE_TEAMPLAY)
+        {
+            for (const auto score : game_.server.team_frags)
+                scores[count++] = score; // Includes empty teams and departed members' frags.
+        }
+        else
+            for (const auto& p : players_)
+                if (const auto* player = game_.server_shell.Player(p.client))
+                    scores[count++] = player->m_Frags;
         if (!match_limit_reached(rules_, ticks_, std::span(scores).first(count)))
             return;
         ending_tick_ = ticks_;
@@ -153,13 +161,19 @@ namespace OpenBlood2
                 p.roster_failed = true; // Existing bounded-recipient disconnect path.
         }
     }
+    DBYTE ServerSession::player_team(std::uint64_t player) const
+    {
+        const auto p =
+            std::find_if(players_.begin(), players_.end(), [&](const auto& row) { return row.id == player; });
+        return p == players_.end() ? 0 : game_.server.GetClientTeam(p->client);
+    }
     bool ServerSession::join(const Net::JoinProfile& profile, Net::Joined& joined, std::string& error)
     {
         error.clear();
-        if (!started_ || mode_ != GAMETYPE_BLOODBATH || !Net::valid_profile(profile) || !next_player_ ||
-            players_.size() >= Net::max_players || game_.objects.busy())
+        if (!started_ || (mode_ != GAMETYPE_BLOODBATH && mode_ != GAMETYPE_TEAMPLAY) || !Net::valid_profile(profile) ||
+            !next_player_ || players_.size() >= Net::max_players || game_.objects.busy())
         {
-            error = "Invalid or unavailable Bloodbath player admission";
+            error = "Invalid or unavailable multiplayer player admission";
             return false;
         }
         const auto client = game_.server.connect_client();
@@ -183,7 +197,7 @@ namespace OpenBlood2
         init.magic = profile.attributes[3];
         init.weapons = profile.weapons;
         const auto failures = game_.objects.failure_count();
-        auto* player = game_.server_shell.OnClientEnterWorld(client, &error);
+        auto* player = game_.server_shell.OnClientEnterWorld(client, &error, profile.team);
         const auto object = player ? player->m_hObject : nullptr;
         const bool initialized = player && game_.server_shell.OnMessage(client, init);
         const auto* record = game_.objects.get(object);

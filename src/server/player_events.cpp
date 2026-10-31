@@ -7,6 +7,8 @@ namespace OpenBlood2
     void ServerSession::publish_roster(std::uint64_t excluded)
     {
         Net::PlayerRoster roster;
+        roster.mode = DBYTE(mode_);
+        roster.team_frags = game_.server.team_frags;
         for (const auto& p : players_)
         {
             if (p.id == excluded)
@@ -14,7 +16,7 @@ namespace OpenBlood2
             const auto* original = game_.server_shell.Player(p.client);
             const auto* name = original ? game_.server.GetStringData(original->GetPlayerName()) : nullptr;
             roster.players.push_back({p.id, p.object, name ? name : "", original ? original->m_nCharacter : DBYTE(0),
-                                      original ? original->m_Frags : 0});
+                                      original ? original->m_Frags : 0, game_.server.GetClientTeam(p.client)});
         }
         for (auto& p : players_)
             if (p.id != excluded && !p.roster_failed && queue_private(p, p.object, roster) != DE_OK)
@@ -54,7 +56,8 @@ namespace OpenBlood2
                 else if constexpr (std::is_same_v<T, CreatureAttach>)
                     next = Net::AttachEvent{identity(v.creature), identity(v.enemy), v.active};
                 else if constexpr (std::is_same_v<T, PlayerFragged>)
-                    next = Net::FragEvent{identity(v.victim), identity(v.killer), v.killer_frags, v.index};
+                    next = Net::FragEvent{identity(v.victim), identity(v.killer), v.killer_frags, v.index,
+                                          game_.server.team_frags};
                 else if constexpr (std::is_same_v<T, CTFEvent>)
                     next = Net::FlagEvent{v.kind, v.team, v.points, identity(v.capturer)};
                 else if constexpr (!std::is_same_v<T, PlayerInitRequest> && !std::is_same_v<T, PlayerPosition> &&

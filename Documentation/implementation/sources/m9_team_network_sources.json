@@ -1,0 +1,122 @@
+{
+  "baseline": "a138931f948a92aad6d2f7ea50e240edfa4ecf7d",
+  "scope": "Team admission, absolute totals, match limits, retained assignments and original client team presentation",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "a138931f948a92aad6d2f7ea50e240edfa4ecf7d",
+      "path": "src/net/admission.h",
+      "sha256": "a07095e81acd9943cbe75831896329c4408973719b45bd2a216f4dd8f43ef876"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a138931f948a92aad6d2f7ea50e240edfa4ecf7d",
+      "path": "src/net/player_events.cpp",
+      "sha256": "494b31a637c7c722734296fec36a5a342f268fe4bd26e8cd4fcf927ff93246ec"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a138931f948a92aad6d2f7ea50e240edfa4ecf7d",
+      "path": "src/server/session.cpp",
+      "sha256": "4c654148ea6e4a90fd846ba223e08d44d88c26094e56b053b914942aa1445f9b"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a138931f948a92aad6d2f7ea50e240edfa4ecf7d",
+      "path": "src/server/network.cpp",
+      "sha256": "8cbce710a30872f45e13ed62fb4cf73c5ddd0bb7f845eec62e386f01ae3cb4fd"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a138931f948a92aad6d2f7ea50e240edfa4ecf7d",
+      "path": "src/client/network_player_events.cpp",
+      "sha256": "15d0b8efaed0eda8fefcf2e22ac6dd82f55f9191e100dbe93ab758a6130e2882"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a138931f948a92aad6d2f7ea50e240edfa4ecf7d",
+      "path": "src/client/frag_table.cpp",
+      "sha256": "bf4d0d0d3d9792933f52b7629807404530a8192ea7d417b8074b33bed3d760c4"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a138931f948a92aad6d2f7ea50e240edfa4ecf7d",
+      "path": "src/client/announcer.cpp",
+      "sha256": "ac3792c6890875eaa71eeb78f8a70a83a1149e7d1110da271035afa50a07e16f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a138931f948a92aad6d2f7ea50e240edfa4ecf7d",
+      "path": "src/app/scoreboard.cpp",
+      "sha256": "954bd8c2abad3bbc4b7057e1cc656fda66dd82b5849558a3cf7e08c32b2344c9"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a138931f948a92aad6d2f7ea50e240edfa4ecf7d",
+      "path": "src/engine/config.cpp",
+      "sha256": "ef59e0b71b04555df1372e4e3abeb71fde62eef6ab0f90c309dabcc285015368"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "a138931f948a92aad6d2f7ea50e240edfa4ecf7d",
+      "path": "src/game/multiplayer_rules.h",
+      "sha256": "9ed10b17bf092aeee02624e371387a55dcc69e38b79b9aa65c142dc2b28fc406"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Shared/TeamMgr.cpp",
+      "sha256": "fcb0db883ea13d497687c494be0e29587c0777a46bb46fa122860959aaac2f89"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/FragInfo.cpp",
+      "sha256": "bae0a3db7388d5209753df0e3f64c008cb3d977cb988e1d8b6443a3bb073282a"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/FragInfo.h",
+      "sha256": "75e08be25826093666c13c66e607fb255a07a9467213750b55f08ff15e642e61"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientRes/ClientRes.rc",
+      "sha256": "cc635e26e01b93e83e6202a336e7dda6af70bf681dbe731eedd82b450bcedfbd"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/NetStart.cpp",
+      "sha256": "320bd6f451fc7d08f93c294899af379756fa8432d439731b63c65124057dacbf"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Blood2Serv/NetStart.cpp",
+      "sha256": "c810d9ca3ac26a3f4e8629ffe75ddf1cb5e6a8afd776d367d4308bc05dbb7393"
+    }
+  ],
+  "adaptations": [
+    "Protocol 17 typed team preference, roster teams/mode and bounded absolute team totals replace original client-ID/TeamMgr messages.",
+    "Checked per-peer assignment survives world recreation while original client preference remains immutable; reconnect is fresh.",
+    "Original team frag limit includes departed members and existing empty teams.",
+    "Original localized team names/join text, HUD icon and CFragInfo team columns/stable draw-time ranking; bounded owned CPU/GPU surfaces replace engine surfaces.",
+    "Source initial narrow-column zero, strict row limit, scrunch spacing and second-team fallback typo remain explicit.",
+    "Independent client PvP fixture builds without a dedicated binary; all commercial resources remain external."
+  ]
+}

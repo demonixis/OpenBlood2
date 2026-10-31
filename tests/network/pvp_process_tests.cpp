@@ -30,7 +30,7 @@ using Clock = std::chrono::steady_clock;
 namespace
 {
 
-    bool client(const char* port_text, const char* data, bool victim, bool hosted, bool shotgun)
+    bool client(const char* port_text, const char* data, bool victim, bool hosted, bool shotgun, bool team)
     {
         std::string error;
         unsigned port = 0;
@@ -45,6 +45,7 @@ namespace
         float audio_peak = 0;
         JoinProfile profile;
         profile.name = victim ? "PvP victim" : "PvP attacker";
+        profile.team = team ? (victim ? 2 : 1) : 0;
         profile.weapons = {DBYTE(shotgun ? WEAP_SHOTGUN : WEAP_BERETTA)};
         std::set<SoundId> animation_voices;
         // The graphical host keeps Caleb. Distinct remote characters identify
@@ -195,6 +196,13 @@ namespace
                           killer->frags == 1 && killed->frags == 0 &&
                           client.players().roster().size() == (hosted ? 3 : 2));
                     CHECK(killer->character == (hosted ? 1 : 0) && killed->character == (hosted ? 2 : 0));
+                    if (team)
+                    {
+                        CHECK(killer->team == 1 && killed->team == 2 && client.players().team() == (victim ? 2 : 1));
+                        CHECK(client.players().team_frags()[0] == 1 && client.players().team_frags()[1] == 0 &&
+                              frag->team_frags == client.players().team_frags());
+                        std::cout << "Team frag confirmed: blue=1, red=0, protected teams active\n";
+                    }
                     CHECK(client.players().scores().size() == client.players().roster().size() &&
                           client.players().scores().front().object == frag->killer &&
                           client.players().scores().front().frags == 1);
@@ -276,16 +284,46 @@ namespace
             return SDL_GetIOStatus(stream) != SDL_IO_STATUS_ERROR;
         }
     };
-    bool parent(const char* self, const char* server, const char* data, bool hosted, bool shotgun)
+    bool parent(const char* self, const char* server, const char* data, bool hosted, bool shotgun, bool team)
     {
         std::string error;
         Process host;
-        const char* dedicated_args[]{server,   "--data-dir", data,     "--world",   "multi/bb_fields",
-                                     "--mode", "bloodbath",  "--bind", "127.0.0.1", "--port",
-                                     "0",      "--ticks",    "2400",   nullptr};
-        const char* hosted_args[]{server,      "--data-dir", data,           "--host", "multi/bb_fields",
-                                  "--port",    "0",          "--frames",     "1200",   "--name",
-                                  "Idle host", "--capture",  "pvp-host.png", nullptr};
+        const char* dedicated_args[]{server,
+                                     "--data-dir",
+                                     data,
+                                     "--world",
+                                     "multi/bb_fields",
+                                     "--mode",
+                                     team ? "team" : "bloodbath",
+                                     "--friendly-fire",
+                                     team ? "off" : "on",
+                                     "--bind",
+                                     "127.0.0.1",
+                                     "--port",
+                                     "0",
+                                     "--ticks",
+                                     "2400",
+                                     nullptr};
+        const char* hosted_args[]{server,
+                                  "--data-dir",
+                                  data,
+                                  "--host",
+                                  "multi/bb_fields",
+                                  "--port",
+                                  "0",
+                                  "--frames",
+                                  "1200",
+                                  "--name",
+                                  "Idle host",
+                                  "--mode",
+                                  team ? "team" : "bloodbath",
+                                  "--team",
+                                  "blue",
+                                  "--friendly-fire",
+                                  team ? "off" : "on",
+                                  "--capture",
+                                  team ? "team-pvp-host.png" : "pvp-host.png",
+                                  nullptr};
         host.handle = SDL_CreateProcess(hosted ? hosted_args : dedicated_args, true);
         error = SDL_GetError();
         CHECK(host.handle);
@@ -335,6 +373,7 @@ namespace
                                      i ? "victim" : "attacker",
                                      hosted ? "host" : "dedicated",
                                      shotgun ? "shotgun" : "beretta",
+                                     team ? "team" : "bloodbath",
                                      nullptr};
             clients[i].handle = SDL_CreateProcess(child_args, true);
             error = SDL_GetError();
@@ -368,7 +407,7 @@ namespace
         if (hosted)
         {
             std::error_code ec;
-            CHECK(std::filesystem::file_size("pvp-host.png", ec) > 4096 && !ec);
+            CHECK(std::filesystem::file_size(team ? "team-pvp-host.png" : "pvp-host.png", ec) > 4096 && !ec);
         }
         CHECK(clients[0].output.find("Ready ") != std::string::npos &&
               clients[1].output.find("Ready ") != std::string::npos);
@@ -379,20 +418,22 @@ namespace
 } // namespace
 int main(int argc, char** argv)
 {
-    if (argc == 7 && std::string_view(argv[1]) == "--peer")
+    if (argc == 8 && std::string_view(argv[1]) == "--peer")
         return client(argv[2], argv[3], std::string_view(argv[4]) == "victim", std::string_view(argv[5]) == "host",
-                      std::string_view(argv[6]) == "shotgun")
+                      std::string_view(argv[6]) == "shotgun", std::string_view(argv[7]) == "team")
                    ? 0
                    : 1;
-    bool hosted = false, shotgun = false;
+    bool hosted = false, shotgun = false, team = false;
     for (int i = 3; i < argc; ++i)
     {
         if (std::string_view(argv[i]) == "--host")
             hosted = true;
+        else if (std::string_view(argv[i]) == "--team")
+            team = true;
         else if (std::string_view(argv[i]) == "--shotgun")
             shotgun = true;
         else
             return 2;
     }
-    return argc >= 3 && argc <= 5 && parent(argv[0], argv[1], argv[2], hosted, shotgun) ? 0 : 1;
+    return argc >= 3 && argc <= 6 && parent(argv[0], argv[1], argv[2], hosted, shotgun, team) ? 0 : 1;
 }

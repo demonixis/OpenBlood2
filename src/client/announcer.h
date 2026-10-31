@@ -20,7 +20,8 @@ namespace OpenBlood2
         bool frag(std::uint16_t index, const AnnouncerPlayer& killer, const AnnouncerPlayer& victim, bool suicide,
                   const Resources&, Conversation&);
         bool finish(const FinishHimVoice&, const Resources&, Conversation&);
-        bool player_notice(std::string_view name, bool joined, const Resources&, std::string& out);
+        bool player_notice(std::string_view name, bool joined, const Resources&, std::string& out, DBYTE team = 0);
+        std::string team_name(DBYTE team, const Resources&);
         std::string level_change_notice(const Resources&);
         std::string error;
         std::uint64_t messages = 0, fallback_texts = 0;

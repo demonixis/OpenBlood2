@@ -66,10 +66,10 @@ Retail Single Player has the original Load and Save menus: eight slots, Quickloa
 start of the current level). After death, Use opens the Load menu. The demo has no saves; see the
 [save contract](contracts/save_load_contracts.md) and the [demo retry hook](contracts/demo_contracts.md).
 
-## Bloodbath hosting and direct connection
+## Bloodbath/Team hosting and direct connection
 
-The current [M9 implementation](implementation/reports/m9_rotation.md) supports
-retail Bloodbath through the command line; Host/Join/LAN screens remain pending.
+The current [M9 implementation](implementation/reports/m9_team_network.md) supports
+retail Bloodbath and Team through the command line; Host/Join/LAN screens remain pending.
 Use the same mounted content and protocol on all machines. Default port: UDP 27888.
 
 ```sh
@@ -83,16 +83,23 @@ The dedicated target/preset is described in the [server foundation](implementati
 ./build/server/blood2-server --data-dir "/path/to/Blood II" --world multi/bb_crypt --mode bloodbath --end either --frag-limit 25 --time-limit 10 --map multi/bb_fields
 ```
 
+Add `--mode team` to either hosting command for Team; use `--team auto|blue|red`
+on the graphical host or connecting client (default auto). Team forces the
+original team skin, preserves assignment across rotations and displays team
+icons/columns. Host/dedicated rules `--friendly-fire on|off` and
+`--negative-team-frags on|off` both default on.
+
 `--end` accepts `frags`, `time`, `either` or `never`. Defaults are 25 frags with
 `frags` selected, plus 15 minutes for a host or 10 for the dedicated when a timed
-rule is selected. Zero is an immediate threshold; use `never` to disable limits.
+rule is selected. Team uses team totals, including departed members' points.
+Zero is an immediate threshold (empty Team servers included); use `never` to disable limits.
 Repeat `--map` for a cyclic rotation of at most 50 maps including the initial
 map; one map reloads itself. An end notice/bell and scoreboard precede the change
 by more than 7.5 simulation seconds. Input is neutral during that interval.
 Connections/profiles persist, but scores and inventory restart on the next map.
 Esc/focus loss does not pause a hosted server; quitting its host ends the game.
 Use E to respawn after death. Internet direct connection requires a reachable UDP
-port; there is no relay or NAT traversal. Team/CTF admission remains pending.
+port; there is no relay or NAT traversal. CTF admission remains pending.
 
 ## Controls
 
@@ -110,7 +117,7 @@ port; there is no relay or NAT traversal. Team/CTF admission remains pending.
 | Proximity / remote / time bombs | P / R / T; B detonates remote charges |
 | Quicksave / quickload | F5 / F6 (retail) |
 | Pause / inspector | Esc / F10 |
-| Bloodbath scores (network) | Tab / gamepad Back; toggle without pausing |
+| Bloodbath/Team scores (network) | Tab / gamepad Back; toggle without pausing |
 
 Inventory actions require collection; release Shift before using them. Focus
 capture does not fire a shot. Text editing/focus loss suppress game input.

@@ -81,12 +81,27 @@ namespace OpenBlood2
             error = "Missing or invalid level change string 7011";
         return "End of level signaled.  Switching to next level...";
     }
-    bool ClientAnnouncer::player_notice(std::string_view name, bool joined, const Resources& resources,
-                                        std::string& out)
+    std::string ClientAnnouncer::team_name(DBYTE team, const Resources& resources)
     {
-        if (name.empty() || name.size() > 100 || name.find('\0') != name.npos)
+        if (team < 1 || team > 2)
+            return {};
+        load(resources);
+        const auto found = strings_.strings.find(7006 + team); // IDS_TEAM1NAME/IDS_TEAM2NAME.
+        if (found != strings_.strings.end() && !found->second.empty() && found->second.size() <= 100 &&
+            found->second.find('\0') == std::string::npos)
+            return found->second;
+        ++fallback_texts;
+        if (error.empty())
+            error = "Missing or invalid team name string " + std::to_string(7006 + team);
+        return "Team Blue"; // Original second-team fallback typo, only when its resource is absent.
+    }
+    bool ClientAnnouncer::player_notice(std::string_view name, bool joined, const Resources& resources,
+                                        std::string& out, DBYTE team)
+    {
+        if (team > 2 || name.empty() || name.size() > 100 || name.find('\0') != name.npos)
             return false;
         load(resources);
+        const auto team_text = joined && team ? team_name(team, resources) : std::string{};
         const auto format = [&](std::string_view pattern)
         {
             if (pattern.empty() || pattern.size() >= 500)
@@ -99,6 +114,11 @@ namespace OpenBlood2
                 if (pattern.substr(i).starts_with("%1!s!"))
                 {
                     next += name;
+                    i += 4;
+                }
+                else if (!team_text.empty() && pattern.substr(i).starts_with("%2!s!"))
+                {
+                    next += team_text;
                     i += 4;
                 }
                 else if (pattern.substr(i).starts_with("%%"))
@@ -116,14 +136,16 @@ namespace OpenBlood2
             out = std::move(next);
             return true;
         };
-        const unsigned resource = joined ? 25 : 26; // Original ClientRes.rc IDS_ADDPLAYER/IDS_REMOVEPLAYER.
+        const unsigned resource =
+            joined ? (team ? 7006 : 25) : 26; // Original ClientRes.rc IDS_ADDPLAYER/IDS_REMOVEPLAYER.
         const auto found = strings_.strings.find(resource);
         if (found != strings_.strings.end() && format(found->second))
             return true;
         ++fallback_texts;
         if (error.empty())
             error = "Missing or invalid player notice string " + std::to_string(resource);
-        return format(joined ? "%1!s! has joined the game." : "%1!s! has left the game.");
+        return format(joined ? (team ? "%1!s! has joined the game on %2!s!." : "%1!s! has joined the game.")
+                             : "%1!s! has left the game.");
     }
     bool ClientAnnouncer::message(std::uint32_t resource, std::string_view fallback, std::string_view file,
                                   std::span<const std::string_view> names, const Resources& resources,

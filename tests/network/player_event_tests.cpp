@@ -72,7 +72,7 @@ namespace
             PrivateEvent value{{7, 8, {9, 10}}, 11, 12, values[index]};
             std::vector<std::uint8_t> bytes, again;
             CHECK(encode_private(value, bytes) && is_private_packet(bytes) && bytes.size() <= private_packet_limit);
-            const std::vector<std::uint8_t> header{0x42, 0x32, 0x50, 0x45, 16, 0, std::uint8_t(index + 1)};
+            const std::vector<std::uint8_t> header{0x42, 0x32, 0x50, 0x45, 17, 0, std::uint8_t(index + 1)};
             CHECK(std::equal(header.begin(), header.end(), bytes.begin()));
             PrivateEvent decoded;
             CHECK(decode_private(bytes, decoded) == DecodePrivate::Ok && encode_private(decoded, again) &&
@@ -183,9 +183,13 @@ namespace
         state.players.clear();
         for (unsigned i = 0; i < 16; ++i)
             state.players.push_back({i + 1, {i, 1}, std::string(100, 'x'), DBYTE(i % 4), i % 2 ? -1000000 : 1000000});
+        state.mode = 4;
+        state.team_frags = {-1000000, 1000000};
+        for (auto& p : state.players)
+            p.team = DBYTE(1 + p.player % 2);
         event = {owner, 1, 0, state};
         std::vector<std::uint8_t> bytes, unchanged;
-        CHECK(encode_private(event, bytes) && bytes.size() == 2016 && bytes.size() <= private_packet_limit);
+        CHECK(encode_private(event, bytes) && bytes.size() == 2041 && bytes.size() <= private_packet_limit);
         PrivateEvent decoded;
         CHECK(decode_private(bytes, decoded) == DecodePrivate::Ok && std::get<PlayerRoster>(decoded.value) == state);
         for (std::size_t i = 0; i < bytes.size(); ++i)
@@ -205,6 +209,20 @@ namespace
             return !valid_private(event) && !encode_private(event, unchanged);
         };
         auto bad = state;
+        bad.team_frags[0] = -1000001;
+        CHECK(invalid(bad));
+        bad = state;
+        bad.mode = 1;
+        CHECK(invalid(bad));
+        bad = state;
+        bad.mode = 3;
+        CHECK(invalid(bad));
+        bad = state;
+        bad.players[0].team = 0;
+        CHECK(invalid(bad));
+        bad.players[0].team = 3;
+        CHECK(invalid(bad));
+        bad = state;
         bad.players.back().name += 'x';
         CHECK(invalid(bad));
         bad = state;

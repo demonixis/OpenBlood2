@@ -35,6 +35,7 @@ namespace OpenBlood2::Net
         ObjectId victim, killer;
         int killer_frags = 0;
         std::uint16_t index = 0;
+        std::array<int, 2> team_frags{}; // Absolute authoritative totals, including departed members.
     };
     struct RosterPlayer
     {
@@ -43,13 +44,15 @@ namespace OpenBlood2::Net
         std::string name;
         DBYTE character = 0;
         int frags = 0;
+        DBYTE team = 0;
         bool operator==(const RosterPlayer&) const = default;
     };
     struct PlayerRoster
     {
-        // Admission order; a complete, bounded replacement. Team assignment is
-        // separate from this Bloodbath roster, as is rendered scoreboard order.
+        // Admission order; a complete bounded replacement, independent of rendered ranking.
         std::vector<RosterPlayer> players;
+        DBYTE mode = 1;
+        std::array<int, 2> team_frags{};
         bool operator==(const PlayerRoster&) const = default;
     };
     struct CameraState

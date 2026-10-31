@@ -1,63 +1,70 @@
 # Dedicated server — M9 in progress
 
-M9 is in progress. This executable loads and advances a retail multiplayer world
-without a window, GPU or audio device. Bloodbath accepts the new bounded ENet
-admission protocol; Team/CTF still refuse player admission. Host/join screens,
-continuous network gameplay, match limits and rotation are not available yet. See the
-[admission report](implementation/reports/m9_admission.md),
-[foundation evidence](implementation/reports/m9_multiplayer.md) and
-[accepted contract](contracts/multiplayer_contracts.md).
+`blood2-server` hosts retail Bloodbath and Team without a window, GPU or audio
+device. It shares the same simulation as the playable host. Movement, validated
+weapon fire, death/respawn, scores, original logical audio and map rotation are
+connected; see [Team network verification](implementation/reports/m9_team_network.md),
+[Bloodbath combat](implementation/reports/m9_pvp.md),
+[rotation](implementation/reports/m9_rotation.md) and the
+[accepted contract](contracts/multiplayer_contracts.md). CTF admission, remote
+music/FX, chat/ping and Host/Join/LAN screens remain in progress.
 
 ```sh
 cmake --preset server
 cmake --build --preset server --parallel 4
 ctest --preset server --output-on-failure
-build/server/blood2-server --data-dir /path/to/Blood2 --world multi/bb_bloodarena --mode bloodbath
+build/server/blood2-server --data-dir /path/to/Blood2 --world multi/bb_crypt --mode team --end either --frag-limit 25 --time-limit 10 --map multi/bb_fields --friendly-fire off
 ```
 
+Clients connect with `blood2 --data-dir /path/to/Blood2 --connect HOST:27888
+--name Player --team auto`. Team preferences are `auto`, `blue` or `red`; the
+server assigns auto to the least populated team and preserves assignment across
+map rotations. Reconnecting is a fresh admission. Bloodbath ignores team choices.
+
 The `server` preset sets `BLOOD2_BUILD_CLIENT=OFF`, `BLOOD2_BUILD_SERVER=ON`.
-Both targets can also be enabled together in another build directory. Server-only
-configuration does not fetch ImGui, miniz or the HTTPS download dependencies.
-It retains CPU DAT/collision/model readers and SDL's sound decoding/conversion
-services. SDL has no graphical or real audio-device backend in the Linux server
-configuration; no audio subsystem/device is initialized.
+Both targets can be enabled together. Server-only configuration excludes ImGui,
+rendering/XR, setup and download dependencies. It retains CPU DAT/collision/model
+readers and SDL sound decoding/conversion, without initializing an audio device.
+Source logical durations, completion, stops and server RNG remain active.
 
 Data stay external. `--data-dir` or `BLOOD2_DATA_DIR` selects the retail installation;
-the full mounted archive contents are hashed at startup. No data download or
-distribution is provided. Demo, Nightmares and mod overlays are refused. The
-complete-content hash is separate from the existing save fingerprint.
+the complete mounted archive payloads are SHA-256 checked before admission. All
+clients need identical content and protocol **17**. No download, commercial data
+distribution, retail wire compatibility, demo, Nightmares or mod admission is
+provided. This complete-content hash is separate from the save fingerprint.
 
-Modes are `bloodbath`, `team` and `ctf`. Bloodbath/Team require a `multi/bb_*`
-world; CTF requires `multi/ctf_*`. These select source object filtering, not a
-completed playable match. Defaults are bind `0.0.0.0`, UDP port `27888`, maximum
-16 transport peers. `--bind 127.0.0.1 --port 0` confines tests to loopback with an
-ephemeral port. `--ticks 180` stops after three simulated seconds. Ctrl+C or
-SIGTERM exits cleanly. The shutdown line reports ticks, discarded
-overload ticks, admissions, departures, refusals and timeouts. Simulation runs
-at 60 Hz with at most six catch-up ticks.
+Modes are `bloodbath`, `team` and zero-client `ctf` inspection. Bloodbath/Team
+require `multi/bb_*`; CTF requires `multi/ctf_*` and refuses players until its
+network capture rules are connected. Defaults: bind `0.0.0.0`, UDP `27888`,
+16 peers including any playable host. `--bind 127.0.0.1 --port 0` selects an
+ephemeral loopback listener for tests. Internet by direct address needs a reachable
+UDP port; there is no NAT traversal or relay.
 
-For private-data checks, configure with
-`-DBLOOD2_TEST_DATA_DIR=/path/to/Blood2`. The tests exercise zero-client simulation and
-Bloodbath admission, not interactive multiplayer gameplay. CI uses `ci-server` and synthetic data; desktop archives
-are staged by `cmake/PackageServerCi.cmake`. Windows/macOS compilation, actual
-interoperability and human LAN play require their own recorded results.
+`--end frags|time|either|never` defaults to 25 frags. `--frag-limit` uses player
+scores in Bloodbath and accumulated team scores in Team, including contributions
+from departed members. `--time-limit` uses minutes (dedicated default 10, playable
+host default 15). Zero is immediate; an empty Team server has two zero-score teams.
+`--map` appends to a cyclic rotation of up to 50 maps including `--world`.
+Original intermission lasts strictly more than 7.5 simulation seconds. Peers and
+profiles/teams remain connected, but each map resets scores, inventory and world/
+player identities. `--friendly-fire on|off` and `--negative-team-frags on|off` both
+default on, preserving the original host/dedicated Team defaults.
 
-Admission version 2 exchanges little-endian messages on the reliable Control
-channel, limited to 256 bytes. A client sends its edition and complete content
-hash, receives the approved map and world generation, loads its own mounted
-map and returns a validated profile with that generation. Only then does the
-server create its original player. No content is sent by the server.
+Simulation runs at 60 Hz with at most six catch-up ticks; state publishes at
+20 Hz. `--ticks 180` stops after three simulated seconds. Ctrl+C/SIGTERM performs
+checked cleanup. The shutdown line reports total ticks, discarded overload,
+admissions/departures/refusals/timeouts and rotations. Empty servers keep ticking.
 
-Deadlines are 5 seconds for Hello, 30 seconds for loading and 15 seconds for
-joined-client liveness. Joined clients exchange a heartbeat every second; the
-server uses a monotonic wall clock independently of its simulation clock.
-Reconnect is a new admission with fresh player/object identities. Shutdown
-detaches players before destroying the transport. This protocol is not compatible
-with retail executables, and the regular graphical client is not connected yet.
+Control/private events and initial membership use separate reliable ENet channels;
+poses use sequenced unreliable updates. Clients rebuild world/collision/presentation
+from their own mounted resources; no process pointer is serialized. Admission
+messages are bounded to 256 bytes, private messages to 2,048 bytes and initial
+object snapshots to 1 MiB in bounded chunks. Deadlines: Hello 5 seconds, loading
+30 seconds, joined liveness 15 seconds, heartbeat every second. All use monotonic
+wall time independently of simulation clocks.
 
-Version 2 also sends a complete initial object snapshot on the reliable Baseline
-channel. The client reconstructs ClientWorld using its own DAT and model/sprite
-resources; the snapshot contains no process-local pointer. It is capped at 1 MiB
-and sent in bounded ordered chunks. This initial frame is not yet followed by
-20 Hz updates, movement, HUD or combat messages. See the
-[initial snapshot report](implementation/reports/m9_world_baseline.md).
+For private-data tests configure `-DBLOOD2_TEST_DATA_DIR=/path/to/Blood2`.
+Synthetic CI, private-data tests and actual graphical/process verification are
+reported separately. Desktop server archives use `cmake/PackageServerCi.cmake`.
+Current Linux scripted results do not qualify human LAN, Windows/macOS
+interoperability, 22-map combat, 16-player load or degraded-network combat.

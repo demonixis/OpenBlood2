@@ -9,7 +9,7 @@
 
 namespace OpenBlood2::Net
 {
-    inline constexpr std::uint16_t protocol_version = 16;
+    inline constexpr std::uint16_t protocol_version = 17;
     inline constexpr std::size_t admission_packet_limit = 256;
     enum class Edition : std::uint8_t
     {
@@ -51,6 +51,7 @@ namespace OpenBlood2::Net
         std::array<std::uint8_t, 4> attributes{5, 3, 3, 1};
         // Original SendPlayerInitMessage absent-B2C multiplayer fallback.
         std::array<std::uint8_t, 9> weapons{1, 2, 3, 4, 5, 6, 7, 8, 9};
+        std::uint8_t team = 0; // Original preference: auto, blue, red (0/1/2).
         bool operator==(const JoinProfile&) const = default;
     };
     struct Ready

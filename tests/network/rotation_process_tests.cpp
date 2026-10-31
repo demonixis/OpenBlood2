@@ -18,7 +18,7 @@ using Clock = std::chrono::steady_clock;
     } while (false)
 namespace
 {
-    bool client(const char* port_text, const char* data, const char* name)
+    bool client(const char* port_text, const char* data, const char* name, bool team)
     {
         std::string error;
         unsigned port = 0;
@@ -34,18 +34,26 @@ namespace
         CHECK(client.prepare(config, error));
         CHECK(client.connect("127.0.0.1", std::uint16_t(port), profile, Clock::now(), error));
         unsigned entries = 0, changes = 0;
+        DBYTE assigned_team = 0;
         std::uint64_t previous_world = 0, previous_player = 0;
         bool leaving = false;
         const auto deadline = Clock::now() + std::chrono::seconds(55);
         while (Clock::now() < deadline)
         {
             CHECK(client.update(Clock::now(), {}, true, error));
-            if (client.ready() && client.joined().world != previous_world)
+            if (client.ready() && (!team || client.players().team()) && client.joined().world != previous_world)
             {
                 CHECK(client.joined().world > previous_world && client.joined().player > previous_player);
                 previous_world = client.joined().world;
                 previous_player = client.joined().player;
                 ++entries;
+                if (team)
+                {
+                    CHECK(client.offer().mode == 4 && (!assigned_team || assigned_team == client.players().team()));
+                    assigned_team = client.players().team();
+                    CHECK(client.players().team_frags()[0] == 0 && client.players().team_frags()[1] == 0);
+                    std::cout << "Retained team=" << unsigned(assigned_team) << " for " << name << '\n';
+                }
                 CHECK(client.world().frame().world == previous_world &&
                       client.receiver().collision().frame().world == previous_world);
                 for (const auto& p : client.players().roster())
@@ -112,19 +120,53 @@ namespace
             return SDL_GetIOStatus(stream) != SDL_IO_STATUS_ERROR;
         }
     };
-    bool parent(const char* self, const char* server, const char* data, bool hosted)
+    bool parent(const char* self, const char* server, const char* data, bool hosted, bool team)
     {
         std::string error;
         Process host;
-        const char* dedicated_args[]{
-            server,  "--data-dir", data,           "--world", "multi/bb_crypt", "--map",     "multi/bb_fields",
-            "--end", "time",       "--time-limit", "0",       "--bind",         "127.0.0.1", "--port",
-            "0",     "--ticks",    "2100",         nullptr};
-        const char* hosted_args[]{server, "--data-dir", data, "--host", "multi/bb_crypt", "--map", "multi/bb_fields",
-                                  "--end", "time", "--time-limit", "0", "--port", "0",
+        const char* dedicated_args[]{server,
+                                     "--data-dir",
+                                     data,
+                                     "--world",
+                                     "multi/bb_crypt",
+                                     "--map",
+                                     "multi/bb_fields",
+                                     "--end",
+                                     "time",
+                                     "--time-limit",
+                                     "0",
+                                     "--bind",
+                                     "127.0.0.1",
+                                     "--port",
+                                     "0",
+                                     "--ticks",
+                                     "2100",
+                                     "--mode",
+                                     team ? "team" : "bloodbath",
+                                     nullptr};
+        const char* hosted_args[]{server,
+                                  "--data-dir",
+                                  data,
+                                  "--host",
+                                  "multi/bb_crypt",
+                                  "--map",
+                                  "multi/bb_fields",
+                                  "--end",
+                                  "time",
+                                  "--time-limit",
+                                  "0",
+                                  "--port",
+                                  "0",
                                   // Frames, not ticks: enough for two rotations
                                   // on a 120 Hz display as well as at 60 Hz.
-                                  "--frames", "2400", "--name", "Rotation host", "--capture", "rotation-host.png",
+                                  "--frames",
+                                  "2400",
+                                  "--name",
+                                  "Rotation host",
+                                  "--capture",
+                                  team ? "team-rotation-host.png" : "rotation-host.png",
+                                  "--mode",
+                                  team ? "team" : "bloodbath",
                                   nullptr};
         host.handle = SDL_CreateProcess(hosted ? hosted_args : dedicated_args, true);
         error = SDL_GetError();
@@ -168,7 +210,8 @@ namespace
                 }
                 CHECK(clients[0].output.find("Ready ") != std::string::npos);
             }
-            const char* child_args[]{self, "--peer", port.c_str(), data, i ? "Second" : "First", nullptr};
+            const char* child_args[]{
+                self, "--peer", port.c_str(), data, i ? "Second" : "First", team ? "team" : "bloodbath", nullptr};
             clients[i].handle = SDL_CreateProcess(child_args, true);
             error = SDL_GetError();
             CHECK(clients[i].handle);
@@ -202,7 +245,7 @@ namespace
         if (hosted)
         {
             std::error_code ec;
-            CHECK(std::filesystem::file_size("rotation-host.png", ec) > 4096 && !ec);
+            CHECK(std::filesystem::file_size(team ? "team-rotation-host.png" : "rotation-host.png", ec) > 4096 && !ec);
         }
         CHECK(clients[0].output.find("Three world entries") != std::string::npos &&
               clients[1].output.find("Three world entries") != std::string::npos);
@@ -211,9 +254,17 @@ namespace
 } // namespace
 int main(int argc, char** argv)
 {
-    if (argc == 5 && std::string_view(argv[1]) == "--peer")
-        return client(argv[2], argv[3], argv[4]) ? 0 : 1;
-    if (argc == 3 || (argc == 4 && std::string_view(argv[3]) == "--host"))
-        return parent(argv[0], argv[1], argv[2], argc == 4) ? 0 : 1;
+    if (argc == 6 && std::string_view(argv[1]) == "--peer")
+        return client(argv[2], argv[3], argv[4], std::string_view(argv[5]) == "team") ? 0 : 1;
+    bool hosted = false, team = false;
+    for (int i = 3; i < argc; ++i)
+        if (std::string_view(argv[i]) == "--host")
+            hosted = true;
+        else if (std::string_view(argv[i]) == "--team")
+            team = true;
+        else
+            return 2;
+    if (argc >= 3 && argc <= 5)
+        return parent(argv[0], argv[1], argv[2], hosted, team) ? 0 : 1;
     return 2;
 }

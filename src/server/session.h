@@ -48,6 +48,7 @@ namespace OpenBlood2
         }
         // Trusted local call after the endpoint's protocol/content/loading gates.
         bool join(const Net::JoinProfile&, Net::Joined&, std::string& error);
+        DBYTE player_team(std::uint64_t player) const;
         bool snapshot(std::uint64_t player, Net::WorldSnapshot&, std::string& error);
         enum class MoveResult
         {

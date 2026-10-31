@@ -96,7 +96,7 @@ namespace OpenBlood2
     {
         options = {};
         error.clear();
-        bool explicit_world = false, explicit_network_port = false, explicit_match = false;
+        bool explicit_world = false, explicit_network_port = false, explicit_match = false, explicit_team = false;
         for (std::size_t i = 0; i < args.size(); ++i)
         {
             const auto arg = args[i];
@@ -304,14 +304,16 @@ namespace OpenBlood2
             else if (arg == "--data-dir" || arg == "--config" || arg == "--frames" || arg == "--capture" ||
                      arg == "--world" || arg == "--log-dir" || arg == "--log-level" || arg == "--rez" ||
                      arg == "--connect" || arg == "--host" || arg == "--port" || arg == "--name" || arg == "--end" ||
-                     arg == "--frag-limit" || arg == "--time-limit" || arg == "--map")
+                     arg == "--frag-limit" || arg == "--time-limit" || arg == "--map" || arg == "--mode" ||
+                     arg == "--team" || arg == "--friendly-fire" || arg == "--negative-team-frags")
             {
                 if (++i == args.size() || args[i].empty() || args[i].starts_with("--"))
                 {
                     error = "Missing value for " + std::string(arg);
                     return false;
                 }
-                if (arg == "--end" || arg == "--frag-limit" || arg == "--time-limit" || arg == "--map")
+                if (arg == "--end" || arg == "--frag-limit" || arg == "--time-limit" || arg == "--map" ||
+                    arg == "--friendly-fire" || arg == "--negative-team-frags")
                 {
                     if (!parse_match_option(arg, args[i], options.network_rules))
                     {
@@ -319,6 +321,26 @@ namespace OpenBlood2
                         return false;
                     }
                     explicit_match = true;
+                }
+                else if (arg == "--mode")
+                {
+                    if (args[i] != "bloodbath" && args[i] != "team")
+                    {
+                        error = "--mode requires bloodbath or team for hosting";
+                        return false;
+                    }
+                    options.network_mode = args[i] == "team" ? 4 : 1;
+                    explicit_match = true;
+                }
+                else if (arg == "--team")
+                {
+                    if (args[i] != "auto" && args[i] != "blue" && args[i] != "red")
+                    {
+                        error = "--team requires auto, blue or red";
+                        return false;
+                    }
+                    options.network_team = args[i] == "auto" ? 0 : (args[i] == "blue" ? 1 : 2);
+                    explicit_team = true;
                 }
                 else if (arg == "--connect")
                     options.connect_address = args[i];
@@ -393,7 +415,7 @@ namespace OpenBlood2
             }
         }
         const bool network = !options.host_world.empty() || !options.connect_address.empty();
-        if ((explicit_match && options.host_world.empty()) ||
+        if ((explicit_match && options.host_world.empty()) || (explicit_team && !network) ||
             (!options.host_world.empty() && !options.connect_address.empty()) || (explicit_network_port && !network) ||
             (network && (explicit_world || options.demo || options.nightmares || !options.overlays.empty() ||
                          options.xr_world || options.xr_test || options.bench || options.menu_smoke ||

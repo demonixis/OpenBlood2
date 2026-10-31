@@ -1,4 +1,5 @@
 #include "net/player_events.h"
+#include "game/game_settings.h"
 #include "net/codec.h"
 #include "net/transport.h"
 #include <algorithm>
@@ -30,6 +31,21 @@ namespace OpenBlood2::Net
             };
             return !i || (i->type >= 1 && i->type <= 9 && path(i->icon) && path(i->highlighted_icon) &&
                           text(i->name, 100) && (i->type == 6 ? !i->name_id : i->name_id >= 301 && i->name_id <= 308));
+        }
+        bool team_scores(const std::array<int, 2>& values)
+        {
+            return std::all_of(values.begin(), values.end(), [](int v) { return v >= -1000000 && v <= 1000000; });
+        }
+        bool read_team_scores(Reader& r, std::array<int, 2>& values)
+        {
+            for (auto& v : values)
+            {
+                const auto wire = r.u32();
+                if (wire > 2000000)
+                    return false;
+                v = int(wire) - 1000000;
+            }
+            return r.good();
         }
         bool weapon(DBYTE type)
         {
@@ -133,17 +149,19 @@ namespace OpenBlood2::Net
                     return v.attacker_character < 4 && v.victim_character < 4;
                 else if constexpr (std::is_same_v<T, FragEvent>)
                     return object(v.victim, true) && object(v.killer, true) && v.killer_frags >= -1000000 &&
-                           v.killer_frags <= 1000000;
+                           v.killer_frags <= 1000000 && team_scores(v.team_frags);
                 else if constexpr (std::is_same_v<T, PlayerRoster>)
                 {
-                    if (v.players.empty() || v.players.size() > max_players)
+                    if (v.players.empty() || v.players.size() > max_players || !network_game_type(v.mode) ||
+                        !team_scores(v.team_frags) || (!team_game_type(v.mode) && v.team_frags != std::array<int, 2>{}))
                         return false;
                     std::uint64_t previous = 0;
                     for (std::size_t i = 0; i < v.players.size(); ++i)
                     {
                         const auto& p = v.players[i];
                         if (p.player <= previous || !object(p.object, true) || p.character >= 4 || p.frags < -1000000 ||
-                            p.frags > 1000000 || p.name.empty() || p.name.size() > 100 ||
+                            p.frags > 1000000 || (team_game_type(v.mode) ? p.team < 1 || p.team > 2 : p.team != 0) ||
+                            p.name.empty() || p.name.size() > 100 ||
                             !std::all_of(p.name.begin(), p.name.end(),
                                          [](unsigned char c) { return c >= 32 && c != 127; }))
                             return false;
@@ -302,6 +320,8 @@ namespace OpenBlood2::Net
                     id(w, v.killer);
                     w.u32(std::uint32_t(v.killer_frags + 1000000));
                     w.u16(v.index);
+                    for (auto score : v.team_frags)
+                        w.u32(std::uint32_t(score + 1000000));
                 }
                 else if constexpr (std::is_same_v<T, PlayerRoster>)
                 {
@@ -313,7 +333,11 @@ namespace OpenBlood2::Net
                         w.text(p.name, 100);
                         w.u8(p.character);
                         w.u32(std::uint32_t(p.frags + 1000000));
+                        w.u8(p.team);
                     }
+                    w.u8(v.mode);
+                    for (auto score : v.team_frags)
+                        w.u32(std::uint32_t(score + 1000000));
                 }
                 else if constexpr (std::is_same_v<T, WeaponLoadout>)
                 {
@@ -575,6 +599,7 @@ namespace OpenBlood2::Net
                     return DecodePrivate::Malformed;
                 v.killer_frags = int(score) - 1000000;
                 v.index = r.u16();
+                ok = read_team_scores(r, v.team_frags);
                 event.value = v;
                 break;
             }
@@ -595,8 +620,11 @@ namespace OpenBlood2::Net
                     if (score > 2000000)
                         return DecodePrivate::Malformed;
                     p.frags = int(score) - 1000000;
+                    p.team = r.u8();
                     v.players.push_back(std::move(p));
                 }
+                v.mode = r.u8();
+                ok = read_team_scores(r, v.team_frags);
                 event.value = std::move(v);
                 break;
             }

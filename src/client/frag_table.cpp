@@ -52,7 +52,7 @@ namespace OpenBlood2
             }
         if (!initialize(error))
             return false;
-        if (width == width_ && height == height_ &&
+        if (!teams_ && width == width_ && height == height_ &&
             std::equal(players.begin(), players.end(), previous_.begin(), previous_.end(),
                        [](const auto& a, const auto& b)
                        {
@@ -101,6 +101,143 @@ namespace OpenBlood2
         for (std::size_t i = 0; i < surface_.rgba.size(); i += 4)
             if (surface_.rgba[i] == 255 && surface_.rgba[i + 1] == 0 && surface_.rgba[i + 2] == 255)
                 surface_.rgba[i + 3] = 0;
+        teams_ = false;
+        previous_.assign(players.begin(), players.end());
+        width_ = width;
+        height_ = height;
+        ++revision;
+        return true;
+    }
+    bool ClientFragTable::compose_teams(std::span<const Net::RosterPlayer> players, const std::array<int, 2>& totals,
+                                        DBYTE column, unsigned width, unsigned height, std::string& error)
+    {
+        error.clear();
+        if (!width || !height || width > 16384 || height > 16384 || players.size() > Net::max_players || column > 2 ||
+            std::any_of(totals.begin(), totals.end(), [](int score) { return score < -1000000 || score > 1000000; }))
+        {
+            error = "Invalid team table viewport/count/scores";
+            return false;
+        }
+        for (const auto& p : players)
+            if (p.character >= 4 || p.team < 1 || p.team > 2 || p.name.empty() || p.name.size() > 100)
+            {
+                error = "Invalid team table player";
+                return false;
+            }
+        if (!initialize(error))
+            return false;
+        if (!voice_)
+        {
+            voice_ = canvas_.CreateSurfaceFromBitmap("interface/fragbar/v_frag.pcx");
+            if (!voice_ || voice_->width > bar_->width || voice_->height > bar_->height)
+            {
+                error = canvas_.error.empty() ? "Invalid team title portrait" : canvas_.error;
+                voice_ = nullptr;
+                return false;
+            }
+            for (DBYTE team = 1; team <= 2; ++team)
+                team_names_[team - 1] = text_.team_name(team, resources_);
+        }
+        if (teams_ && width == width_ && height == height_ && column == team_column_ && totals == team_totals_ &&
+            std::equal(players.begin(), players.end(), previous_.begin(), previous_.end()))
+            return true;
+        // CTeam::SortPlayersByFrags is a stable descending insertion sort at
+        // draw time. Preserve the last displayed tie order, including hidden updates.
+        for (DBYTE team = 1; team <= 2; ++team)
+        {
+            auto& ordered = team_order_[team - 1];
+            std::erase_if(ordered,
+                          [&](const auto& old)
+                          {
+                              return std::none_of(
+                                  players.begin(), players.end(), [&](const auto& p)
+                                  { return p.player == old.player && p.object == old.object && p.team == team; });
+                          });
+            for (const auto& p : players)
+                if (p.team == team)
+                {
+                    const auto old = std::find_if(ordered.begin(), ordered.end(),
+                                                  [&](const auto& row) { return row.player == p.player; });
+                    if (old == ordered.end())
+                        ordered.push_back(p);
+                    else
+                        *old = p;
+                }
+            std::stable_sort(ordered.begin(), ordered.end(),
+                             [](const auto& a, const auto& b) { return a.frags > b.frags; });
+        }
+        const bool single = width < 500, scrunch = height < 350;
+        const unsigned available = height > 2 * bar_->height ? height - 2 * bar_->height : 0;
+        const unsigned maximum = available / bar_->height;
+        displayed = 0;
+        surface_ = {};
+        x = y = 0;
+        if (maximum && (!single || column))
+        {
+            const unsigned first = single ? column - 1 : 0, columns = single ? 1 : 2;
+            unsigned largest = 0, shown = 0;
+            for (unsigned team = first; team < first + columns; ++team)
+            {
+                largest = std::max(largest, unsigned(team_order_[team].size()));
+                shown = std::max(shown, std::min(unsigned(team_order_[team].size()), maximum - 1));
+            }
+            const unsigned residual = (available - maximum * bar_->height) / 2;
+            const unsigned row_step = bar_->height - (scrunch ? 18 : 0);
+            const unsigned player_start =
+                unsigned(std::max(0, int(residual + bar_->height + font_.height / 2) - (scrunch ? 20 : 0)));
+            // Scrunch advances less than one full glyph row. Keep the last
+            // glyph's bottom, not merely the following row's starting point.
+            const unsigned player_bottom = shown ? player_start + (shown - 1) * row_step + bar_->height : 0;
+            const unsigned bottom = std::max(residual + bar_->height, player_bottom);
+            surface_ = {columns * bar_->width + (columns - 1) * 32, std::min(available, bottom), {}};
+            surface_.rgba.resize(surface_.width * surface_.height * 4);
+            canvas_.FillRect(&surface_, nullptr, hud_magenta);
+            x = std::max(0, (int(width) - int(surface_.width)) / 2);
+            y = std::max(0, int(height / 2) - int(bar_->height * (largest + 1) / 2) - int(bar_->height));
+            const auto draw = [&](const HudSurface* portrait, std::string text, int score, int left, int top, bool clip)
+            {
+                if (!scrunch)
+                {
+                    canvas_.DrawSurfaceToSurface(&surface_, bar_, nullptr, left, top);
+                    canvas_.DrawSurfaceToSurface(&surface_, portrait, nullptr, left, top);
+                }
+                const int text_y = top + int((bar_->height - font_.height) / 2);
+                if (!clip || font_.text_width(text) < 145)
+                    font_.draw(surface_, text, left + int(portrait->width), text_y, 0);
+                if (clip)
+                    while (text.size() > 1)
+                    {
+                        text.pop_back();
+                        if (font_.text_width(text) < 145)
+                        {
+                            font_.draw(surface_, text, left + int(portrait->width), text_y, 0);
+                            break;
+                        }
+                    }
+                font_.draw(surface_, std::to_string(score), left + int(bar_->width) - 20, text_y, 1);
+            };
+            for (unsigned team = first; team < first + columns; ++team)
+            {
+                const int left = int((team - first) * (bar_->width + 32));
+                draw(voice_, team_names_[team], totals[team], left, int(residual), false);
+                ++displayed;
+                unsigned count = 0;
+                for (const auto& p : team_order_[team])
+                {
+                    if (++count >= maximum)
+                        break; // Source nCount < nMax leaves the title row.
+                    draw(portraits_[p.character], "(-) " + p.name, p.frags, left,
+                         int(player_start + (count - 1) * row_step), true);
+                    ++displayed;
+                }
+            }
+            for (std::size_t i = 0; i < surface_.rgba.size(); i += 4)
+                if (surface_.rgba[i] == 255 && surface_.rgba[i + 1] == 0 && surface_.rgba[i + 2] == 255)
+                    surface_.rgba[i + 3] = 0;
+        }
+        teams_ = true;
+        team_column_ = column;
+        team_totals_ = totals;
         previous_.assign(players.begin(), players.end());
         width_ = width;
         height_ = height;

@@ -53,8 +53,11 @@ toggles with Tab or gamepad Back, opens on death and closes on revival. Arrival
 and departure notices use the original localized text. Unknown ping displays `(-)`.
 [Match limits and rotation](Documentation/implementation/reports/m9_rotation.md) now
 cycle maps without reconnecting: `--end either --frag-limit 25 --time-limit 10
---map multi/bb_fields`. Communication portraits, music, visual effects, chat
-and Team/CTF remain in progress.
+--map multi/bb_fields`. [Team](Documentation/implementation/reports/m9_team_network.md)
+adds `--mode team` for hosting and `--team auto|blue|red` for joining/hosting,
+original team HUD/scores and retained teams across rotations. Team rules accept
+`--friendly-fire on|off` and `--negative-team-frags on|off` (both default on).
+Communication portraits, music, visual effects, chat and CTF remain in progress.
 
 ## CI builds
 

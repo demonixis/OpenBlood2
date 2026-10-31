@@ -1,4 +1,5 @@
 #include "client/network_client.h"
+#include "game/game_settings.h"
 #include <algorithm>
 #include <cmath>
 namespace OpenBlood2
@@ -269,8 +270,8 @@ namespace OpenBlood2
             return false;
         if (const auto* offer = std::get_if<Net::WorldOffer>(&value))
         {
-            if ((phase_ != Phase::Offer && phase_ != Phase::Active && phase_ != Phase::Baseline) || offer->mode != 1 ||
-                offer->world <= offer_.world)
+            if ((phase_ != Phase::Offer && phase_ != Phase::Active && phase_ != Phase::Baseline) ||
+                (offer->mode != GAMETYPE_BLOODBATH && offer->mode != GAMETYPE_TEAMPLAY) || offer->world <= offer_.world)
                 return false;
             // End every old consumer before replacing geometry. Sound output and
             // mounted content persist; no live voice/body/model crosses worlds.
@@ -310,7 +311,7 @@ namespace OpenBlood2
         if (const auto* joined = std::get_if<Net::Joined>(&value))
         {
             if (phase_ != Phase::Baseline || joined_.player || joined->world != offer_.world ||
-                !movement_.begin(*joined) || !inbox_.begin(*joined) || !camera_.begin(*joined) ||
+                !movement_.begin(*joined) || !inbox_.begin(*joined, offer_.mode) || !camera_.begin(*joined) ||
                 !weapons_.begin(*joined) || !audio_.begin(*joined) || !speech_.begin(*joined))
                 return false;
             joined_ = *joined;
