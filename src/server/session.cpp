@@ -15,7 +15,7 @@ namespace OpenBlood2
         clear_players();
         game_.server.remote_event_sink = {};
         game_.server.remote_audio_sink = {};
-        game_.server.remote_ballistic_sink = {};
+        game_.server.remote_effect_sink = {};
     }
     bool ServerSession::start(const Config& config, std::string_view name, unsigned mode, std::string& error,
                               const MultiplayerRules& rules)
@@ -109,9 +109,9 @@ namespace OpenBlood2
         game_.server.remote_event_sink = [this](HCLIENT client, const PlayerEvent& event)
         { return capture_event(client, event); };
         game_.server.remote_audio_sink = [this](const AudioVoice& voice, bool start) { capture_audio(voice, start); };
-        game_.server.remote_ballistic_sink =
-            [this](ObjectId source, std::string_view name, const ShotgunEffectSettings& settings, std::string& error)
-        { return capture_ballistic(source, name, settings, error); };
+        game_.server.remote_effect_sink =
+            [this](ObjectId source, std::string_view name, const InstantEffectRecipe& settings, std::string& error)
+        { return capture_effect(source, name, settings, error); };
         for (const auto& [id, voice] : game_.server.audio.voices())
             capture_audio(voice, true);
         return true;
@@ -133,7 +133,7 @@ namespace OpenBlood2
         }
         game_.server.remote_event_sink = {};
         game_.server.remote_audio_sink = {};
-        game_.server.remote_ballistic_sink = {};
+        game_.server.remote_effect_sink = {};
         started_ = false; // A failed load cannot resume a partially destroyed world.
         if (!load_map((map_index_ + 1) % rotation_.size(), error))
             return false;

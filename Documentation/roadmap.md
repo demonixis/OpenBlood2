@@ -351,6 +351,7 @@ The [client roster](implementation/reports/m9_roster.md) now owns reliable names
 [Network CTF](implementation/reports/m9_ctf_network.md) now opens dedicated/host admission with independent carried icons, absolute capture scores, localized notices and local grab/return sounds. Server-triggered capture/drop replication and real-process rotation have separate verification scopes.
 [Client-routed CTF](implementation/reports/m9_ctf_capture.md) adds a Jam capture by an independently moving client, late admission while carried and capture-driven rotation. Full weapon ACK windows wait within the existing bound; skipped inputs are not banked. Other map routes and human LAN remain unqualified.
 [Network ballistic effects](implementation/reports/m9_ballistic_network.md) now deliver instant recipes to independent client casing/mark/smoke, fragment, liquid and tracer pools with local impact audio. Other FX families and persistent baselines remain pending.
+[Network impact sprites, sparks and blood](implementation/reports/m9_impact_network.md) now share one bounded ordered recipe stream, independent child splats/audio and original immediate/deferred updates. Source blood probability and exact missing sound failures stay explicit.
 Communication portraits, music, remaining FX, measured pings/chat and multiplayer branches stay in progress.
 **Remaining private presentation consumers/commands, full client separation, other CTF capture routes and complete network qualification remain pending.**
 

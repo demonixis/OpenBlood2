@@ -57,6 +57,8 @@ namespace OpenBlood2
             error = "Spark source/resources unavailable";
             return 0;
         }
+        if (remote_effect_sink)
+            return remote_effect_sink(objects_.get(source)->id, GetObjectName(source), settings, error);
         return sparks.publish(settings, GetObjectName(source), *client_resources, objects_.time(), error);
     }
     std::uint64_t ServerAdapter::PublishClientBloodSplat(const BloodSplatSettings& settings, std::string_view source,
@@ -70,6 +72,8 @@ namespace OpenBlood2
             error = "Blood splat store unavailable";
             return 0;
         }
+        if (remote_effect_sink)
+            return remote_effect_sink({}, source, settings, error);
         return blood_splats.publish(settings, source, *objects_.sprites, objects_.time(), error);
     }
     std::uint64_t ServerAdapter::PublishClientBloodSpurt(const BloodSpurtSettings& settings, std::string_view source,
@@ -83,6 +87,8 @@ namespace OpenBlood2
             error = "Blood spurt resources unavailable";
             return 0;
         }
+        if (remote_effect_sink)
+            return remote_effect_sink({}, source, BloodSpurtRecipe{settings, immediate}, error);
         return blood_spurts.publish(settings, source, immediate, *client_resources, effect_services(), objects_.time(),
                                     error);
     }
@@ -97,6 +103,16 @@ namespace OpenBlood2
             error = "Blood spurt source unavailable";
             return 0;
         }
+        if (remote_effect_sink)
+        {
+            if (!client_resources)
+            {
+                error = "Blood spurt resources unavailable";
+                return 0;
+            }
+            return remote_effect_sink(objects_.get(source)->id, GetObjectName(source),
+                                      BloodSpurtRecipe{settings, false}, error);
+        }
         return PublishClientBloodSpurt(settings, GetObjectName(source), false, error);
     }
     std::uint64_t ServerAdapter::PublishBloodSplat(HOBJECT source, const BloodSplatSettings& settings,
@@ -110,6 +126,8 @@ namespace OpenBlood2
             error = "Blood splat source/store unavailable";
             return 0;
         }
+        if (remote_effect_sink)
+            return remote_effect_sink(objects_.get(source)->id, GetObjectName(source), settings, error);
         return blood_splats.publish(settings, GetObjectName(source), *objects_.sprites, objects_.time(), error);
     }
     std::uint64_t ServerAdapter::PublishFleshGibs(HOBJECT owner, DVector pos, DVector dir, DVector dims, float scale,
@@ -216,8 +234,8 @@ namespace OpenBlood2
                 }
             }
         }
-        if (remote_ballistic_sink)
-            return remote_ballistic_sink(objects_.get(source)->id, GetObjectName(source), clipped, error);
+        if (remote_effect_sink)
+            return remote_effect_sink(objects_.get(source)->id, GetObjectName(source), clipped, error);
         return shotgun_effects.publish(effect_owner(source), clipped, *objects_.models, *objects_.sprites,
                                        *client_resources, objects_.time(), effect_services(), error);
     }
@@ -231,6 +249,8 @@ namespace OpenBlood2
             error = "Weapon sprite source/store unavailable";
             return 0;
         }
+        if (remote_effect_sink)
+            return remote_effect_sink(objects_.get(source)->id, GetObjectName(source), settings, error);
         return weapon_sprites.publish(settings, GetObjectName(source), *objects_.sprites, objects_.time(), error);
     }
 

@@ -1,18 +1,13 @@
 #pragma once
 #include "engine/particles.h"
 #include "engine/resources.h"
+#include "game/impact_settings.h"
 #include <random>
 namespace OpenBlood2
 {
     class EffectQueries;
     struct EffectServices;
-    // The original flesh recipe only: one non-bouncing, half-gravity emitter.
-    struct BloodSpurtSettings
-    {
-        DVector position{}, min_velocity{}, max_velocity{};
-        float lifetime = 2, fade_time = .5f;
-        unsigned texture = 1;
-    };
+
 } // namespace OpenBlood2
 class CParticleExplosionFX
 {

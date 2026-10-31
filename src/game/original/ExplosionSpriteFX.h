@@ -1,18 +1,8 @@
 #pragma once
 #include "engine/model.h"
 #include "engine/sprite.h"
+#include "game/impact_settings.h"
 #include <optional>
-namespace OpenBlood2
-{
-    struct ExplosionSpriteSettings
-    {
-        DVector position{}, normal{0, 1, 0}, scale1{}, scale2{1, 1, 1};
-        float duration = 1, alpha = 1;
-        DBYTE waveform = 0, fade = 0, align = 0;
-        // Null uses source default; an authored empty string is not null.
-        std::optional<std::string> resource;
-    };
-} // namespace OpenBlood2
 // Selected original ExplosionFX.cpp sprite Init/CreateObject/Update.
 // Typed owned state replaces the separate legacy client object and string handles.
 class CExplosionSpriteFX

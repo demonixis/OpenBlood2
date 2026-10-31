@@ -234,7 +234,7 @@ namespace OpenBlood2
                 return reject(Net::Reject::Order);
             if (ready->world != session_.world_id() || ready->sequence != peer.previous.sequence)
                 return reject(Net::Reject::World);
-            if (!session_.begin_audio(peer.player, error) || !session_.begin_ballistics(peer.player))
+            if (!session_.begin_audio(peer.player, error) || !session_.begin_effects(peer.player))
                 return reject(Net::Reject::Capacity);
             peer.phase = Phase::Joined;
             peer.deadline = now + 15s;
@@ -415,14 +415,14 @@ namespace OpenBlood2
                     sent = Net::encode_audio(event, bytes) &&
                            transport_.send(peer.peer, Net::Channel::Control, bytes, error);
                 }
-                std::vector<Net::BallisticEvent> ballistics;
-                sent = sent && session_.take_ballistic_events(peer.player, ballistics, error);
+                std::vector<Net::EffectEvent> ballistics;
+                sent = sent && session_.take_effect_events(peer.player, ballistics, error);
                 for (const auto& event : ballistics)
                 {
                     if (!sent)
                         break;
                     std::vector<std::uint8_t> bytes;
-                    sent = Net::encode_ballistic(event, bytes) &&
+                    sent = Net::encode_effect(event, bytes) &&
                            transport_.send(peer.peer, Net::Channel::Control, bytes, error);
                 }
                 if (!sent)

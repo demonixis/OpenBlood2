@@ -5,6 +5,7 @@
 #include "client/network_audio.h"
 #include "client/network_effects.h"
 #include "client/network_world.h"
+#include "effect_fixture.h"
 #include "game/original/WeaponDefs.h"
 #include <algorithm>
 #include <cmath>
@@ -54,7 +55,7 @@ namespace
         return true;
     }
 #endif
-    bool run(const char* data, bool ballistics)
+    bool run(const char* data, bool ballistics, bool impacts)
     {
         std::string error;
         Config config;
@@ -154,8 +155,8 @@ namespace
         const auto add_ballistic = [&]()
         {
             CHECK(ballistic.begin({7, 1, {0, 1}}) && audio.begin({7, 1, {0, 1}}));
-            Net::BallisticEvent event{7, 1, 1, {0, 1}, "synthetic wire impact", {}};
-            auto& shot = event.settings;
+            Net::EffectEvent event{7, 1, 1, {0, 1}, "synthetic wire impact", {}};
+            auto& shot = std::get<ShotgunEffectSettings>(event.recipe);
             shot.source = vector_add(eye, {-10, -5, 40});
             shot.destination = vector_add(eye, {0, 0, 60});
             shot.forward = {0, 0, 1};
@@ -163,11 +164,34 @@ namespace
             shot.eject = true;
             shot.ammo = AMMO_BULLET;
             shot.surface = SURFTYPE_METAL;
-            Net::BallisticEvent decoded_effect;
-            CHECK(Net::encode_ballistic(event, bytes) &&
-                  Net::decode_ballistic(bytes, decoded_effect) == Net::DecodeBallistic::Ok);
-            CHECK(ballistic.receive(decoded_effect, error) &&
-                  ballistic.advance(1. / 60, receiver.world(), receiver.collision(), models, sprites, resources, audio,
+            Net::EffectEvent decoded_effect;
+            CHECK(Net::encode_effect(event, bytes) &&
+                  Net::decode_effect(bytes, decoded_effect) == Net::DecodeEffect::Ok);
+            CHECK(ballistic.receive(decoded_effect, error));
+            if (impacts)
+                for (unsigned kind = 1; kind < 5; ++kind)
+                {
+                    auto message = effect_fixture::sample(kind);
+                    message.player = 1;
+                    const auto at = vector_add(eye, {float(kind * 4) - 10, -4, 35});
+                    if (auto* sprites = std::get_if<WeaponSpriteSettings>(&message.recipe))
+                    {
+                        sprites->flash->position = sprites->smoke->position = at;
+                        sprites->flash->normal = sprites->smoke->normal = {0, 0, -1};
+                    }
+                    else if (auto* spark = std::get_if<SparkSettings>(&message.recipe))
+                        spark->position = at;
+                    else if (auto* blood = std::get_if<BloodSpurtRecipe>(&message.recipe))
+                        blood->settings.position = at;
+                    else if (auto* splat = std::get_if<BloodSplatSettings>(&message.recipe))
+                        splat->position = at;
+                    CHECK(Net::encode_effect(message, bytes) &&
+                          Net::decode_effect(bytes, decoded_effect) == Net::DecodeEffect::Ok &&
+                          ballistic.receive(decoded_effect, error));
+                }
+            CHECK(ballistic.advance(1. / 60, receiver.world(), receiver.collision(), models, sprites, resources, audio,
+                                    error));
+            CHECK(ballistic.advance(1. / 60, receiver.world(), receiver.collision(), models, sprites, resources, audio,
                                     error));
             if (ballistic.failed)
                 error = ballistic.last_error;
@@ -178,6 +202,12 @@ namespace
             CHECK(update_model_scene(input, scene, error) && scene.world_draws.size() == 1);
             CHECK(update_explosion_model_scene(input, explosions, error) && explosions.world_draws.empty());
             CHECK(update_sprite_scene(input, sprite, error) && sprite.entries.size() >= 2);
+            if (impacts)
+            {
+                CHECK(sprite.entries.size() >= 7);
+                for (const auto count : ballistic.received_kinds)
+                    CHECK(count == 1);
+            }
             return true;
         };
 #ifndef BLOOD2_SCENE_GPU
@@ -207,15 +237,17 @@ namespace
                 std::size_t changed = 0;
                 for (std::size_t i = 0; i < original.size(); i += 4)
                     changed += !std::equal(original.begin() + i, original.begin() + i + 3, baseline.begin() + i);
-                CHECK(changed > 20 && capture.save("network-ballistic-original.png"));
-                std::cout << "Independent decoded ballistic rendering: changed pixels=" << changed << '\n';
+                CHECK(changed > 20 &&
+                      capture.save(impacts ? "network-impact-original.png" : "network-ballistic-original.png"));
+                std::cout << "Independent decoded " << (impacts ? "mixed impact" : "ballistic")
+                          << " rendering: changed pixels=" << changed << '\n';
             }
             CHECK(!presenter.rebuilt || presenter.mesh_revision == input.world_revision);
             const auto count = presenter.registry.stats.textures;
             presenter.shading = SurfaceShading::Standard;
             CHECK(render(gpu, presenter, input, capture, enhanced, error));
             if (ballistics)
-                CHECK(capture.save("network-ballistic-enhanced.png"));
+                CHECK(capture.save(impacts ? "network-impact-enhanced.png" : "network-ballistic-enhanced.png"));
             presenter.shading = SurfaceShading::Original;
             CHECK(render(gpu, presenter, input, capture, again, error));
             CHECK(original == again && original != enhanced && count > 0);
@@ -243,5 +275,9 @@ namespace
 } // namespace
 int main(int argc, char** argv)
 {
-    return (argc == 2 || (argc == 3 && std::string_view(argv[2]) == "--ballistics")) && run(argv[1], argc == 3) ? 0 : 1;
+    const bool impacts = argc == 3 && std::string_view(argv[2]) == "--impacts";
+    return (argc == 2 || (argc == 3 && (impacts || std::string_view(argv[2]) == "--ballistics"))) &&
+                   run(argv[1], argc == 3, impacts)
+               ? 0
+               : 1;
 }

@@ -1,0 +1,111 @@
+{
+  "scope": "Independent network impact sprites, sparks and blood with ordered bounded recipes",
+  "baseline": "6d508af321419957fd822b18c73ee84907d6e977",
+  "sources": [
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/ClientWeaponSFX.h",
+      "sha256": "ba7cc82a31c57294f2369ed51d5dd96bdfe8122fb90f1c700326ffc0ca224dc6"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/ClientSplatFX.cpp",
+      "sha256": "f3fdd4b2792668d189613b250cbeb15535c070f0171b399670ded7cee00384f3"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/WeaponFX.cpp",
+      "sha256": "95230fcffd888751528e1a9f1d4353844ebfce5dbf5ef0a46cb0cf0a8a1b0e25"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ParticleExplosionFX.cpp",
+      "sha256": "68ba5c98212936d16d940834ea0d0f2967b189d338b612f48b96a55379a8f60f"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/SmokeImpactFX.cpp",
+      "sha256": "85b54d4bc259e1ee58fd311acb77bf1d4d60f17b373f6b150bf43aa94abc6e4a"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/SparksFX.cpp",
+      "sha256": "ef8bba235a666cf00977a121de267edb57e41024f8cffdb60dc7823171c1478f"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/BloodSplatFX.cpp",
+      "sha256": "5d381f9d6af3203ad53d964e6dff497e291bd75c9605978915a499b5566cab3a"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "6d508af321419957fd822b18c73ee84907d6e977",
+      "path": "src/game/original/WeaponFX.cpp",
+      "sha256": "cc960d67c9298188ce38312fb0c42e9368629272963ce86d37a18aea47690d9d"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "6d508af321419957fd822b18c73ee84907d6e977",
+      "path": "src/game/original/WeaponVector.cpp",
+      "sha256": "4a4486cb7008697612a07ab70230efa8e0d514f730489898166245d911f56bbd"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "6d508af321419957fd822b18c73ee84907d6e977",
+      "path": "src/game/original/WeaponDefs.cpp",
+      "sha256": "6b9b5441deb7754d1ad75b200f18d585dbc39324127d6ac5218c22159ea1264d"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "6d508af321419957fd822b18c73ee84907d6e977",
+      "path": "src/game/original/ParticleExplosionFX.cpp",
+      "sha256": "d134e6af4e3500045100945855b50778743f800609ab16655431f35e7b2717c2"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "6d508af321419957fd822b18c73ee84907d6e977",
+      "path": "src/game/original/SmokeImpactFX.cpp",
+      "sha256": "0667e644923ec21fc9de47d00e73486bfd5f10cbf6d6ae880a4dfd36ac3c6e61"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "6d508af321419957fd822b18c73ee84907d6e977",
+      "path": "src/game/original/SparksFX.cpp",
+      "sha256": "2bb0a9843ac9eef99980ea030fb14d059192abd7ead2f6eb00494f9edc36f1d8"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "6d508af321419957fd822b18c73ee84907d6e977",
+      "path": "src/game/original/BloodSplatFX.cpp",
+      "sha256": "3906edbb21e38a11d9227b849702b04aae1d9d95a58606e29fb82004c5d7a66f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "6d508af321419957fd822b18c73ee84907d6e977",
+      "path": "src/game/server_effects.cpp",
+      "sha256": "8a7aa26b97e12b06a064a46a450768b2021ae8c2dad7dd492b6f8098c0eb342c"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "6d508af321419957fd822b18c73ee84907d6e977",
+      "path": "src/client/network_effects.cpp",
+      "sha256": "b79acb2c52219ca7a5a2c84a1719586229f8a1dea7de130ad3c0797bf1314ee1"
+    }
+  ],
+  "adaptations": [
+    "Protocol20 tagged B2EF recipes replace ballistic-only packets, preserving mixed publication order",
+    "2048-recipe and 2MiB encoded-byte outbox/pending bounds; existing ENet 2MiB aggregate unchanged",
+    "Value-only descriptor extraction preserves original runtime behavior and solo clock/order",
+    "Create at the execution tick, preserving exactly one immediate blood update and deferred zero-step startup",
+    "Ownerless blood publications have canonical absent provenance; detached lifetime and instant no-history baseline retained",
+    "Local child blood splats/audio and exact absent gib_impact0 failure diagnostics",
+    "Other cosmetic producers and persistent network baselines remain pending"
+  ]
+}

@@ -1,3 +1,4 @@
+#include "effect_fixture.h"
 #include "game/game_settings.h"
 #include "server/session.h"
 #include <iostream>
@@ -41,29 +42,64 @@ namespace
             shot.normal = {0, 1, 0};
             shot.eject = true;
             shot.ammo = AMMO_BULLET;
-            std::vector<BallisticEvent> events;
-            CHECK(!session.take_ballistic_events(a.player, events, error));
+            std::vector<EffectEvent> events;
+            CHECK(!session.take_effect_events(a.player, events, error));
             if (mode)
             {
                 CHECK(game.server.PublishShotgunEffects(source->handle, shot, error));
-                CHECK(session.begin_ballistics(a.player) && !session.begin_ballistics(a.player));
-                CHECK(session.take_ballistic_events(a.player, events, error) && events.empty());
+                CHECK(session.begin_effects(a.player) && !session.begin_effects(a.player));
+                CHECK(session.take_effect_events(a.player, events, error) && events.empty());
                 CHECK(game.server.PublishShotgunEffects(source->handle, shot, error));
                 if (mode == 2)
-                    CHECK(session.begin_ballistics(b.player));
-                CHECK(session.take_ballistic_events(a.player, events, error) && events.size() == 1);
+                    CHECK(session.begin_effects(b.player));
+                CHECK(session.take_effect_events(a.player, events, error) && events.size() == 1);
                 CHECK(events[0].world == a.world && events[0].player == a.player && events[0].sequence == 1 &&
                       events[0].source == a.object);
                 if (mode == 2)
-                    CHECK(session.take_ballistic_events(b.player, events, error) && events.empty());
-                for (unsigned i = 0; i <= ballistic_queue_limit; ++i)
+                    CHECK(session.take_effect_events(b.player, events, error) && events.empty());
+                for (unsigned i = 0; i <= effect_queue_limit; ++i)
                 {
                     CHECK(game.server.PublishShotgunEffects(source->handle, shot, error));
-                    CHECK(session.take_ballistic_events(a.player, events, error) && events.size() == 1);
+                    CHECK(session.take_effect_events(a.player, events, error) && events.size() == 1);
                     CHECK(events[0].sequence == i + 2);
                 }
                 if (mode == 2)
-                    CHECK(!session.take_ballistic_events(b.player, events, error));
+                    CHECK(!session.take_effect_events(b.player, events, error));
+                auto flash = std::get<WeaponSpriteSettings>(effect_fixture::sample(1).recipe);
+                const auto spark = std::get<SparkSettings>(effect_fixture::sample(2).recipe);
+                const auto blood = std::get<BloodSpurtRecipe>(effect_fixture::sample(3).recipe);
+                const auto splat = std::get<BloodSplatSettings>(effect_fixture::sample(4).recipe);
+                CHECK(game.server.PublishWeaponSprites(source->handle, flash, error));
+                CHECK(game.server.PublishSparks(source->handle, spark, error));
+                CHECK(game.server.PublishClientBloodSpurt(blood.settings, "weapon entry", true, error));
+                CHECK(game.server.PublishBloodSplat(source->handle, splat, error));
+                CHECK(game.server.PublishBloodSpurt(source->handle, blood.settings, error));
+                CHECK(game.server.PublishClientBloodSplat(splat, "client splat", error));
+                CHECK(session.take_effect_events(a.player, events, error) && events.size() == 6);
+                const std::size_t kinds[]{1, 2, 3, 4, 3, 4};
+                for (unsigned i = 0; i < 6; ++i)
+                {
+                    CHECK(events[i].recipe.index() == kinds[i]);
+                    CHECK(events[i].source == ((i == 2 || i == 5) ? ObjectId{} : a.object));
+                    if (i)
+                        CHECK(events[i].sequence == events[i - 1].sequence + 1);
+                }
+                CHECK(std::get<BloodSpurtRecipe>(events[2].recipe).immediate &&
+                      !std::get<BloodSpurtRecipe>(events[4].recipe).immediate);
+                CHECK(!game.client_effects.weapon_sprites.started && !game.client_effects.sparks.started &&
+                      !game.client_effects.blood_spurts.started && !game.client_effects.blood_splats.started);
+                // Count and encoded-byte limits are independent. Large bounded
+                // resource names need no server-side cosmetic asset binding.
+                flash.flash->resource = std::string(1000, 'f');
+                flash.smoke->resource = std::string(1000, 's');
+                std::vector<std::uint8_t> bytes;
+                EffectEvent large{a.world, a.player, 1, a.object, game.server.GetObjectName(source->handle), flash};
+                CHECK(encode_effect(large, bytes));
+                const auto count = effect_queue_bytes / bytes.size();
+                CHECK(count < effect_queue_limit);
+                for (std::size_t i = 0; i <= count; ++i)
+                    CHECK(game.server.PublishWeaponSprites(source->handle, flash, error));
+                CHECK(!session.take_effect_events(a.player, events, error));
                 CHECK(session.player_count() == 2 && game.client_effects.shotgun_effects.started == 0 &&
                       game.client_effects.shotgun_effects.casings.empty() &&
                       game.client_effects.shotgun_effects.reports.empty());
@@ -80,9 +116,11 @@ namespace
             }
             CHECK(session.clear_players());
         }
-        std::cout << "Authoritative ballistics: baseline-only recipients, no historical replay, private sequences, "
-                     "256-entry isolated overflow, no server cosmetic pools/logical sounds and unchanged game RNG "
-                     "with zero/one/two consumers passed\n";
+        std::cout
+            << "Authoritative impacts: mixed families/owner forms, ordered stream, baseline-only recipients, no "
+               "historical replay, private sequences, "
+               "2048-entry/2MiB isolated overflow, no server cosmetic pools/logical sounds and unchanged game RNG "
+               "with zero/one/two consumers passed\n";
         return true;
     }
 } // namespace

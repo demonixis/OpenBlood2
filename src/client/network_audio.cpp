@@ -192,6 +192,7 @@ namespace OpenBlood2
             mixer.voices_.size() >= 128 || next_local == UINT64_MAX)
         {
             error = "Invalid or over-capacity network cosmetic sound";
+            last_effect_error = parameters.resource + ": " + error;
             ++effects_failed;
             return 0;
         }
@@ -200,6 +201,7 @@ namespace OpenBlood2
         AudioVoice voice;
         if (!mixer.prepare_voice(resources, request, position, voice, error))
         {
+            last_effect_error = parameters.resource + ": " + error;
             ++effects_failed;
             return 0;
         }

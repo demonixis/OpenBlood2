@@ -149,8 +149,8 @@ namespace OpenBlood2
         std::uint64_t PublishBloodSplat(HOBJECT, const BloodSplatSettings&, std::string&) override;
         ShotgunEffects& shotgun_effects;
         // Multiplayer publishes copied recipes; solo retains synchronous local creation.
-        std::function<std::uint64_t(ObjectId, std::string_view, const ShotgunEffectSettings&, std::string&)>
-            remote_ballistic_sink;
+        std::function<std::uint64_t(ObjectId, std::string_view, const InstantEffectRecipe&, std::string&)>
+            remote_effect_sink;
         std::uint64_t PublishShotgunEffects(HOBJECT, const ShotgunEffectSettings&, std::string&) override;
         WeaponSprites& weapon_sprites;
         std::uint64_t PublishWeaponSprites(HOBJECT, const WeaponSpriteSettings&, std::string&) override;

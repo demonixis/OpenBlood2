@@ -15,6 +15,7 @@ namespace OpenBlood2
         SoundId play_voice(const Resources&, const SoundParameters&, std::string& error);
         SoundId play_effect(const Resources&, const SoundParameters&, DVector, std::string& error) override;
         std::uint64_t effects_started = 0, effects_failed = 0, effects_displaced = 0;
+        std::string last_effect_error; // Cumulative diagnostic, like the failure counter, survives world cleanup.
         bool stop_voice(SoundId);
         bool voice_done(SoundId, bool&) const;
         bool voice_duration(SoundId, float&) const;

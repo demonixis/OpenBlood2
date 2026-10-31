@@ -26,7 +26,7 @@ namespace
             Heartbeat{10}, BaselineReady{10, 20}};
         std::vector<std::uint8_t> bytes;
         CHECK(encode_admission(hello, bytes));
-        std::vector<std::uint8_t> golden{0x42, 0x32, 0x4d, 0x39, 19, 0, 1, 0};
+        std::vector<std::uint8_t> golden{0x42, 0x32, 0x4d, 0x39, 20, 0, 1, 0};
         for (unsigned i = 0; i < 32; ++i)
             golden.push_back(std::uint8_t(i));
         CHECK(bytes == golden);

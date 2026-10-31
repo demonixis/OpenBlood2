@@ -1,13 +1,9 @@
 #pragma once
+#include "game/impact_settings.h"
 #include "game/original/SmokeImpactFX.h"
 namespace OpenBlood2
 {
-    struct WeaponSpriteSettings
-    {
-        std::optional<ExplosionSpriteSettings> flash;
-        std::optional<SmokeImpactSettings> smoke;
-        bool bubbles_unavailable = false;
-    };
+
     struct WeaponSpriteReport
     {
         std::uint64_t id = 0, flash = 0, smoke = 0;

@@ -1,18 +1,9 @@
 #pragma once
 #include "engine/model.h"
 #include "engine/sprite.h"
+#include "game/impact_settings.h"
 #include <optional>
 #include <random>
-namespace OpenBlood2
-{
-    struct BloodSplatSettings
-    {
-        DVector position{};
-        DRotation rotation{};
-        float scale = .1f, grow_scale = .02f;
-        std::optional<std::string> resource;
-    };
-} // namespace OpenBlood2
 // Selected original ClientShellDLL/BloodSplatFX.cpp, owned client state.
 class CBloodSplatFX
 {

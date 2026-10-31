@@ -1,18 +1,8 @@
 #pragma once
 #include "engine/particles.h"
 #include "engine/resources.h"
+#include "game/impact_settings.h"
 #include <random>
-namespace OpenBlood2
-{
-    // Selected original WeaponFX metal/flesh recipes; no generic fade-color mode.
-    struct SparkSettings
-    {
-        DVector position{}, direction{}, color1{}, color2{};
-        unsigned count = 0;
-        float duration = 0, emission_radius = 0, radius = 0, gravity = 0;
-        std::string texture;
-    };
-} // namespace OpenBlood2
 class CSparksFX
 {
   public:

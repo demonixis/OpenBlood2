@@ -385,11 +385,14 @@ namespace OpenBlood2
         SDL_WaitForGPUIdle(runtime.gpu);
         spdlog::info("Network session ended: frames={}, reports={}, states={}, discarded_ticks={}, reason={}", frames,
                      client.reports, client.state_packets, client.discarded_ticks, client.reason());
-        spdlog::info(
-            "Ballistic effects: received={}, failed={}, models={}, billboards={}, cosmetic_sounds={}, error={}",
-            client.effects().received, client.effects().failed, client.effects().scene().frame().models.size(),
-            client.effects().scene().frame().billboards.size(), client.audio().effects_started,
-            client.effects().last_error);
+        spdlog::info("Impact effects: received={}, failed={}, models={}, billboards={}, cosmetic_sounds={}, "
+                     "audio_failures={}, kinds={}/{}/{}/{}/{}, error={}, audio_error={}",
+                     client.effects().received, client.effects().failed, client.effects().scene().frame().models.size(),
+                     client.effects().scene().frame().billboards.size(), client.audio().effects_started,
+                     client.audio().effects_failed, client.effects().received_kinds[0],
+                     client.effects().received_kinds[1], client.effects().received_kinds[2],
+                     client.effects().received_kinds[3], client.effects().received_kinds[4],
+                     client.effects().last_error, client.audio().last_effect_error);
         spdlog::info("Player commands: acknowledged={}, applied={}", client.command_acks, client.commands_applied);
         spdlog::info("Weapon input: frames={}, waiting_ticks={}", client.weapon_frames, client.weapon_wait_ticks);
         if (server)

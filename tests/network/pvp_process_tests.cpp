@@ -30,7 +30,7 @@ using Clock = std::chrono::steady_clock;
 namespace
 {
 
-    bool client(const char* port_text, const char* data, bool victim, bool hosted, bool shotgun, bool team)
+    bool client(const char* port_text, const char* data, bool victim, bool hosted, bool shotgun, bool team, bool rifle)
     {
         std::string error;
         unsigned port = 0;
@@ -46,8 +46,9 @@ namespace
         JoinProfile profile;
         profile.name = victim ? "PvP victim" : "PvP attacker";
         profile.team = team ? (victim ? 2 : 1) : 0;
-        profile.weapons = {DBYTE(shotgun ? WEAP_SHOTGUN : WEAP_BERETTA)};
+        profile.weapons = {DBYTE(rifle ? WEAP_SNIPERRIFLE : shotgun ? WEAP_SHOTGUN : WEAP_BERETTA)};
         std::set<SoundId> animation_voices;
+        std::set<std::uint64_t> missing_gib_zero;
         // The graphical host keeps Caleb. Distinct remote characters identify
         // the two combatants without treating the idle host as a test target.
         profile.character = hosted ? (victim ? 2 : 1) : 0;
@@ -67,6 +68,13 @@ namespace
         Clock::time_point stall_at = Clock::now();
         while (Clock::now() < deadline)
         {
+            for (const auto& report : client.effects().runtime().blood_spurts.reports)
+                if (!report.sound_error.empty())
+                {
+                    CHECK(report.sound_resource == "sounds/gibs/flesh/gib_impact0.wav" &&
+                          !client.resources().find(report.sound_resource));
+                    missing_gib_zero.insert(report.id);
+                }
             MovementInput input;
             bool firing = false, visible = false;
             if (client.ready() && !leaving)
@@ -228,9 +236,18 @@ namespace
                 std::cout << "Player notices: joined=" << client.speech().joined_notices
                           << ", left=" << client.speech().left_notices << '\n';
                 CHECK(client.effects().received > 0 && !client.effects().failed);
-                std::cout << "Remote ballistics: received=" << client.effects().received
+                CHECK(client.effects().received_kinds[0] > 0 && client.effects().received_kinds[2] > 0);
+                if (rifle)
+                    CHECK(client.effects().received_kinds[3] > 0); // Original raw damage >25 guarantees jets.
+                CHECK(client.audio().effects_failed == missing_gib_zero.size());
+                std::cout << "Remote impacts: received=" << client.effects().received
                           << ", failed=" << client.effects().failed
-                          << ", cosmetic_sounds=" << client.audio().effects_started << '\n';
+                          << ", cosmetic_sounds=" << client.audio().effects_started
+                          << ", audio_failures=" << client.audio().effects_failed
+                          << ", verified_missing_gib_zero=" << missing_gib_zero.size()
+                          << ", kinds=" << client.effects().received_kinds[0] << '/'
+                          << client.effects().received_kinds[1] << '/' << client.effects().received_kinds[2] << '/'
+                          << client.effects().received_kinds[3] << '/' << client.effects().received_kinds[4] << '\n';
                 std::cout << "Remote audio: starts=" << client.audio().started << ", stops=" << client.audio().stopped
                           << ", natural=" << client.audio().completed
                           << ", private_starts=" << client.audio().local_started << ", peak=" << audio_peak << '\n';
@@ -288,7 +305,8 @@ namespace
             return SDL_GetIOStatus(stream) != SDL_IO_STATUS_ERROR;
         }
     };
-    bool parent(const char* self, const char* server, const char* data, bool hosted, bool shotgun, bool team)
+    bool parent(const char* self, const char* server, const char* data, bool hosted, bool shotgun, bool team,
+                bool rifle)
     {
         std::string error;
         Process host;
@@ -376,7 +394,9 @@ namespace
                                      data,
                                      i ? "victim" : "attacker",
                                      hosted ? "host" : "dedicated",
-                                     shotgun ? "shotgun" : "beretta",
+                                     rifle     ? "rifle"
+                                     : shotgun ? "shotgun"
+                                               : "beretta",
                                      team ? "team" : "bloodbath",
                                      nullptr};
             clients[i].handle = SDL_CreateProcess(child_args, true);
@@ -424,20 +444,23 @@ int main(int argc, char** argv)
 {
     if (argc == 8 && std::string_view(argv[1]) == "--peer")
         return client(argv[2], argv[3], std::string_view(argv[4]) == "victim", std::string_view(argv[5]) == "host",
-                      std::string_view(argv[6]) == "shotgun", std::string_view(argv[7]) == "team")
+                      std::string_view(argv[6]) == "shotgun", std::string_view(argv[7]) == "team",
+                      std::string_view(argv[6]) == "rifle")
                    ? 0
                    : 1;
-    bool hosted = false, shotgun = false, team = false;
+    bool hosted = false, shotgun = false, team = false, rifle = false;
     for (int i = 3; i < argc; ++i)
     {
         if (std::string_view(argv[i]) == "--host")
             hosted = true;
         else if (std::string_view(argv[i]) == "--team")
             team = true;
+        else if (std::string_view(argv[i]) == "--rifle")
+            rifle = true;
         else if (std::string_view(argv[i]) == "--shotgun")
             shotgun = true;
         else
             return 2;
     }
-    return argc >= 3 && argc <= 6 && parent(argv[0], argv[1], argv[2], hosted, shotgun, team) ? 0 : 1;
+    return argc >= 3 && argc <= 6 && parent(argv[0], argv[1], argv[2], hosted, shotgun, team, rifle) ? 0 : 1;
 }

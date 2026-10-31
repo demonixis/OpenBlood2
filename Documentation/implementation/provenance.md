@@ -1,5 +1,11 @@
 # Source and Dependency Provenance
 
+The M9 [network impact lot](reports/m9_impact_network.md) reuses the existing
+flash/smoke/spark/blood ports with ordered tagged recipes, client child services
+and original immediate/deferred startup. Value-only headers and bounded encoding
+are engine adaptations; source selection/RNG stay unchanged. See its
+[source ledger](sources/m9_impact_network_sources.json).
+
 The M9 [network ballistic lot](reports/m9_ballistic_network.md) reuses the existing
 WeaponFX/ShellCasing/Mark/SurfaceFragment/Tracer port through independent client
 collision, resources and cosmetic audio. Protocol recipes, per-recipient bounds

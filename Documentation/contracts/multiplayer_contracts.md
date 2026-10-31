@@ -1611,3 +1611,35 @@ spatial and cosmetic. Share the 128-voice playback budget, reclaim completed
 cosmetics, preserve logical sound priority and preempt disposable impacts before
 retained speech. Cosmetic playback cannot advance server clocks or RNG. Other FX
 families, their baselines and network fog remain explicitly pending.
+
+## Ordered network impact sprites, sparks and blood
+
+The [impact continuation](../implementation/reports/m9_impact_network.md)
+supersedes the preceding ballistic-only protocol with **v20 B2EF**. Use one
+ordered recipe stream for ballistic composites, weapon sprites, sparks, blood
+spurts and splats. Preserve the existing port's publication order and resource
+null/empty distinctions. Keep finite field bounds, strict option/flag decoding,
+8 KiB packets, 100-byte labels and 1000-byte resources. The shared queue permits
+2048 recipes but at most 2 MiB of encoded payload on each side; draining or
+changing worlds resets byte credit. Overflow remains per-recipient, with the
+existing aggregate ENet bound unchanged.
+
+Only explicit ownerless blood publication may use the canonical absent source ID.
+All other identities remain generation qualified; detached sources are provenance,
+never requests to run gameplay. Keep baseline-ready admission, no historical
+instant replay, source-independent lifetime and world-qualified cleanup.
+
+Network creation now occurs at the executing client tick. Immediate blood updates
+once with the frame duration, then its .001 deadline suppresses a second update;
+deferred blood starts with zero elapsed time. Fresh flash alpha and next-update
+casing visibility follow this phase. Preserve relative splat/sprite/ballistic/
+spark/blood update order and original 30 Hz bounded blood emission. Child collision,
+splats and audio stay client-only; they cannot return through the server sink.
+CMoveMgr integration and solo clocks remain unchanged.
+
+Retain original blood choice before the raw-damage >25 condition. A Beretta hit
+does not guarantee blood jets. Keep required-resource failures explicit, including
+the exact absent `sounds/gibs/flesh/gib_impact0.wav`; never substitute another
+numbered sound. Cumulative cosmetic audio diagnostics survive world cleanup.
+Logical server sound/RNG and per-weapon selection draws remain unchanged. Other
+cosmetic producers, their children and persistent baselines still need routing.

@@ -18,10 +18,10 @@ using namespace OpenBlood2::Net;
     } while (false)
 namespace
 {
-    BallisticEvent sample()
+    EffectEvent sample()
     {
-        BallisticEvent e{7, 2, 1, {15, 3}, "detached source", {}};
-        auto& s = e.settings;
+        EffectEvent e{7, 2, 1, {15, 3}, "detached source", {}};
+        auto& s = std::get<ShotgunEffectSettings>(e.recipe);
         s.source = {50, 120, 0};
         s.destination = {100, 299, 0};
         s.forward = {1, 0, 0};
@@ -37,22 +37,20 @@ namespace
         std::string error;
         auto e = sample();
         std::vector<std::uint8_t> bytes, again;
-        CHECK(encode_ballistic(e, bytes));
-        const std::vector<std::uint8_t> header{0x42, 0x32, 0x42, 0x46, 19, 0, 1, 7, 0, 0, 0, 0,
+        CHECK(encode_effect(e, bytes));
+        const std::vector<std::uint8_t> header{0x42, 0x32, 0x45, 0x46, 20, 0, 1, 7, 0, 0, 0, 0,
                                                0,    0,    0,    2,    0,  0, 0, 0, 0, 0, 0, 1};
         CHECK(std::equal(header.begin(), header.end(), bytes.begin()));
-        BallisticEvent decoded = sample();
+        EffectEvent decoded = sample();
         decoded.sequence = 99;
         for (std::size_t n = 0; n < bytes.size(); ++n)
-            CHECK(decode_ballistic(std::span(bytes).first(n), decoded) != DecodeBallistic::Ok &&
-                  decoded.sequence == 99);
-        CHECK(decode_ballistic(bytes, decoded) == DecodeBallistic::Ok && encode_ballistic(decoded, again) &&
-              again == bytes);
+            CHECK(decode_effect(std::span(bytes).first(n), decoded) != DecodeEffect::Ok && decoded.sequence == 99);
+        CHECK(decode_effect(bytes, decoded) == DecodeEffect::Ok && encode_effect(decoded, again) && again == bytes);
         bytes.push_back(0);
-        CHECK(decode_ballistic(bytes, decoded) == DecodeBallistic::Malformed);
+        CHECK(decode_effect(bytes, decoded) == DecodeEffect::Malformed);
         bytes.pop_back();
         bytes[4] = 0;
-        CHECK(decode_ballistic(bytes, decoded) == DecodeBallistic::Protocol);
+        CHECK(decode_effect(bytes, decoded) == DecodeEffect::Protocol);
         for (unsigned bad = 0; bad < 12; ++bad)
         {
             auto v = e;
@@ -80,32 +78,33 @@ namespace
                     v.name = "a\0b"s;
                     break;
                 case 7:
-                    v.settings.forward = {};
+                    std::get<ShotgunEffectSettings>(v.recipe).forward = {};
                     break;
                 case 8:
-                    v.settings.normal.y = std::nanf("");
+                    std::get<ShotgunEffectSettings>(v.recipe).normal.y = std::nanf("");
                     break;
                 case 9:
-                    v.settings.color1.x = 256;
+                    std::get<ShotgunEffectSettings>(v.recipe).color1.x = 256;
                     break;
                 case 10:
-                    v.settings.ammo = AMMO_FUEL;
+                    std::get<ShotgunEffectSettings>(v.recipe).ammo = AMMO_FUEL;
                     break;
                 case 11:
-                    v.settings.clip_polygon.resize(513);
+                    std::get<ShotgunEffectSettings>(v.recipe).clip_polygon.resize(513);
                     break;
             }
-            CHECK(!valid_ballistic(v) && !encode_ballistic(v, again));
+            CHECK(!valid_effect(v) && !encode_effect(v, again));
         }
-        e.settings.clip_polygon.resize(512, {1, 2, 3});
+        std::get<ShotgunEffectSettings>(e.recipe).clip_polygon.resize(512, {1, 2, 3});
         e.name.assign(100, 'a');
-        CHECK(encode_ballistic(e, bytes) && bytes.size() < ballistic_packet_limit);
+        CHECK(encode_effect(e, bytes) && bytes.size() < effect_packet_limit);
         for (std::size_t n = 0; n < bytes.size(); ++n)
-            CHECK(decode_ballistic(std::span(bytes).first(n), decoded) != DecodeBallistic::Ok);
-        CHECK(decode_ballistic(bytes, decoded) == DecodeBallistic::Ok && decoded.settings.clip_polygon.size() == 512);
+            CHECK(decode_effect(std::span(bytes).first(n), decoded) != DecodeEffect::Ok);
+        CHECK(decode_effect(bytes, decoded) == DecodeEffect::Ok &&
+              std::get<ShotgunEffectSettings>(decoded.recipe).clip_polygon.size() == 512);
         auto over = bytes;
-        over.resize(ballistic_packet_limit + 1);
-        CHECK(decode_ballistic(over, decoded) == DecodeBallistic::Malformed);
+        over.resize(effect_packet_limit + 1);
+        CHECK(decode_effect(over, decoded) == DecodeEffect::Malformed);
         std::minstd_rand random(7);
         for (unsigned n = 0; n < 10000; ++n)
         {
@@ -113,8 +112,8 @@ namespace
             mutation.resize(random() % (bytes.size() + 1));
             for (unsigned j = 0; j < 4 && !mutation.empty(); ++j)
                 mutation[random() % mutation.size()] = std::uint8_t(random());
-            if (decode_ballistic(mutation, decoded) == DecodeBallistic::Ok)
-                CHECK(valid_ballistic(decoded));
+            if (decode_effect(mutation, decoded) == DecodeEffect::Ok)
+                CHECK(valid_effect(decoded));
         }
         NetworkEffects effects;
         CHECK(effects.begin({7, 2, {0, 1}}));
@@ -126,12 +125,12 @@ namespace
         e.player = 3;
         CHECK(!effects.receive(e, error));
         e.player = 2;
-        for (; e.sequence <= ballistic_queue_limit; ++e.sequence)
+        for (; e.sequence <= effect_queue_limit; ++e.sequence)
             CHECK(effects.receive(e, error));
-        CHECK(!effects.receive(e, error) && effects.received == ballistic_queue_limit);
+        CHECK(!effects.receive(e, error) && effects.received == effect_queue_limit);
         CHECK(effects.begin({8, 3, {0, 2}}) && effects.scene().frame().models.empty() && !effects.receive(e, error));
         std::cout << "Ballistic codec: portable header, full truncation, 512-point/8KiB bounds, 10k mutations; "
-                     "duplicate/gap/private/world and 256-event pending limits passed\n";
+                     "duplicate/gap/private/world and 2048-event/2MiB pending limits passed\n";
         return true;
     }
     bool runtime(const char* data)
@@ -166,11 +165,11 @@ namespace
         for (unsigned i = 0; i < 3; ++i)
         {
             e.sequence = i + 1;
-            e.settings.ammo = DBYTE(i + 1);
-            e.settings.eject = i < 2;
-            e.settings.left = i == 1;
-            e.settings.source.x += 100;
-            e.settings.destination.x += 100;
+            std::get<ShotgunEffectSettings>(e.recipe).ammo = DBYTE(i + 1);
+            std::get<ShotgunEffectSettings>(e.recipe).eject = i < 2;
+            std::get<ShotgunEffectSettings>(e.recipe).left = i == 1;
+            std::get<ShotgunEffectSettings>(e.recipe).source.x += 100;
+            std::get<ShotgunEffectSettings>(e.recipe).destination.x += 100;
             CHECK(effects.receive(e, error));
         }
         CHECK(effects.advance(1. / 60, world, collision, models, sprites, resources, audio, error));

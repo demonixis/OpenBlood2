@@ -1,15 +1,6 @@
 #pragma once
 #include "ExplosionSpriteFX.h"
-namespace OpenBlood2
-{
-    struct SmokeImpactSettings
-    {
-        DVector position{}, normal{}, velocity{}, deceleration{}, gravity{}, scale1{}, scale2{}, color{};
-        float offset = 0, duration = .3f, delay = 0, alpha = 0;
-        bool fade = false, rotate = false, move = false, update_scale = true;
-        std::optional<std::string> resource;
-    };
-} // namespace OpenBlood2
+#include "game/impact_settings.h"
 // Selected original SmokeImpactFX.cpp lifecycle; owned sprite replaces client object/string handles.
 class CSmokeImpactFX
 {

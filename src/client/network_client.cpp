@@ -90,11 +90,11 @@ namespace OpenBlood2
         }
         if (phase_ == Phase::Closing)
             return true;
-        if (Net::is_ballistic_packet(event.bytes))
+        if (Net::is_effect_packet(event.bytes))
         {
-            Net::BallisticEvent message;
+            Net::EffectEvent message;
             if (event.channel != Net::Channel::Control ||
-                Net::decode_ballistic(event.bytes, message) != Net::DecodeBallistic::Ok)
+                Net::decode_effect(event.bytes, message) != Net::DecodeEffect::Ok)
                 return false;
             if (message.world < offer_.world)
                 return true;
