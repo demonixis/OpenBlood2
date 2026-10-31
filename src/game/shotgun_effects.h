@@ -3,21 +3,13 @@
 #include "engine/model_store.h"
 #include "engine/particles.h"
 #include "engine/sprite.h"
+#include "game/ballistic_settings.h"
 #include "game/original/SurfaceTypes.h"
 #include "game/original/WeaponDefs.h"
 #include <random>
 namespace OpenBlood2
 {
     struct EffectServices;
-    // Original WeaponFX payload after UpdateWeaponFX has consumed the one-shot ejection bit.
-    struct ShotgunEffectSettings
-    {
-        DVector source{}, destination{}, forward{}, normal{}, color1{}, color2{};
-        SurfaceType surface = SURFTYPE_UNKNOWN;
-        bool eject = false, left = false;
-        DBYTE ammo = AMMO_SHELL;
-        std::vector<DVector> clip_polygon; // Copied world-space BSP ring; no retained object handle.
-    };
     struct ShotgunCasing
     {
         std::shared_ptr<const Model> model;

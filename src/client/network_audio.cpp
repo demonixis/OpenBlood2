@@ -3,6 +3,10 @@
 #include <cmath>
 namespace OpenBlood2
 {
+    namespace
+    {
+        SoundId next_local = client_sound_id_begin;
+    }
     void NetworkAudio::clear()
     {
         mixer.clear();
@@ -53,10 +57,15 @@ namespace OpenBlood2
                 error = "Network sound asset metadata mismatch";
                 return false;
             }
-            // Prefer retiring delayed server tails, then preempt local speech.
+            // Prefer retiring delayed server tails, then preempt local playback.
             // Never displace another active server voice or finish speech early.
             if (mixer.voices_.size() >= 128)
             {
+                auto local = mixer.voices_.lower_bound(client_sound_id_begin);
+                const auto cosmetic =
+                    std::find_if(local, mixer.voices_.end(), [](const auto& p) { return p.second.auto_remove; });
+                if (cosmetic != mixer.voices_.end())
+                    local = cosmetic; // Preserve retained speech before disposable impact sounds.
                 const auto tail =
                     std::find_if(voices_.begin(), voices_.end(), [](const auto& p) { return p.second.retired; });
                 if (tail != voices_.end())
@@ -65,23 +74,31 @@ namespace OpenBlood2
                     voices_.erase(tail);
                     ++displaced;
                 }
-                else if (const auto local = mixer.voices_.lower_bound(client_sound_id_begin);
-                         local != mixer.voices_.end())
+                else if (local != mixer.voices_.end())
                 {
                     const auto found = local_voices_.find(local->first);
-                    if (found == local_voices_.end())
+                    if (local->second.auto_remove)
+                    {
+                        mixer.kill(local->first);
+                        ++effects_displaced;
+                    }
+                    else if (found == local_voices_.end())
                     {
                         error = "Unowned local playback voice";
                         return false;
                     }
-                    auto& retained = found->second;
-                    const auto& source = local->second;
-                    retained.failed = !source.error.empty();
-                    retained.completion_frame = double(mixer.instruments.sample_clock()) +
-                                                std::ceil(std::max(0., (double(source.clip->frames()) - source.cursor) *
-                                                                           AudioMixer::rate / source.clip->rate));
-                    mixer.kill(local->first);
-                    ++local_displaced;
+                    else
+                    {
+                        auto& retained = found->second;
+                        const auto& source = local->second;
+                        retained.failed = !source.error.empty();
+                        retained.completion_frame =
+                            double(mixer.instruments.sample_clock()) +
+                            std::ceil(std::max(0., (double(source.clip->frames()) - source.cursor) * AudioMixer::rate /
+                                                       source.clip->rate));
+                        mixer.kill(local->first);
+                        ++local_displaced;
+                    }
                 }
                 else
                 {
@@ -129,6 +146,8 @@ namespace OpenBlood2
                 if (const auto* object = world.get(entry.speaker))
                     mixer.get(id)->position = object->pose.position;
         const bool ok = mixer.advance(seconds, listener, rotation);
+        std::erase_if(mixer.voices_, [](const auto& pair)
+                      { return pair.first >= client_sound_id_begin && pair.second.auto_remove && pair.second.done; });
         std::erase_if(voices_,
                       [&](const auto& pair)
                       {
@@ -142,7 +161,6 @@ namespace OpenBlood2
     SoundId NetworkAudio::play_voice(const Resources& resources, const SoundParameters& parameters, std::string& error)
     {
         error.clear();
-        static SoundId next_local = client_sound_id_begin;
         if (!joined_.world || parameters.space != SoundSpace::Local || parameters.loop || mixer.voices_.size() >= 128 ||
             local_voices_.size() >= 128 || next_local == UINT64_MAX)
         {
@@ -164,6 +182,32 @@ namespace OpenBlood2
         local_voices_.emplace(id, LocalVoice{float(voice.clip->duration())});
         mixer.voices_.emplace(id, std::move(voice));
         ++local_started;
+        return id;
+    }
+    SoundId NetworkAudio::play_effect(const Resources& resources, const SoundParameters& parameters, DVector position,
+                                      std::string& error)
+    {
+        error.clear();
+        if (!joined_.world || parameters.loop || parameters.streaming || parameters.space != SoundSpace::Spatial ||
+            mixer.voices_.size() >= 128 || next_local == UINT64_MAX)
+        {
+            error = "Invalid or over-capacity network cosmetic sound";
+            ++effects_failed;
+            return 0;
+        }
+        SoundRequest request;
+        static_cast<SoundParameters&>(request) = parameters;
+        AudioVoice voice;
+        if (!mixer.prepare_voice(resources, request, position, voice, error))
+        {
+            ++effects_failed;
+            return 0;
+        }
+        const auto id = next_local++;
+        voice.id = id;
+        voice.world_owned = voice.auto_remove = true;
+        mixer.voices_.emplace(id, std::move(voice));
+        ++effects_started;
         return id;
     }
     bool NetworkAudio::stop_voice(SoundId id)

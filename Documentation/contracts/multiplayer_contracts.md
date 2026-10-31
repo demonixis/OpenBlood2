@@ -1580,3 +1580,34 @@ count cumulative waiting ticks. Intermission suppression and fresh-world sequenc
 reset continue to apply. This supersedes the historical backlog-disconnect policy.
 The desktop network frontend logs one warning when a stall begins (it ends when a
 weapon frame is sent again), so a server that stops acknowledging is visible.
+
+## Network shared ballistic composite
+
+The [ballistic lot](../implementation/reports/m9_ballistic_network.md) adds protocol
+19 reliable `B2BF` impact recipes for the existing bullet/shell/BMG composite.
+Keep world/private recipient/sequence identities and a generation-qualified source;
+never serialize server pointers, asset bindings, particle arrays or GPU structures.
+Bound packets to 8 KiB, source names to 100 bytes, clipping rings to 512 points and
+each recipient's pending queue to 256. Validate finite vectors/colors, nonzero
+directions, ammo, booleans and full packet consumption before publication. Preserve
+raw surface-byte fallback. Duplicates do nothing; gaps/private mismatches fail.
+
+Start delivery only after baseline readiness. These are original instant SFX:
+do not replay historical shots/casings/marks to late arrivals. Detached impacts
+survive source removal; their source ID is provenance, not a gameplay lookup.
+Reject an overfull recipient independently without changing authoritative fire,
+RNG or other clients. Persistent owner-bound effects need a separate baseline.
+
+Network publication skips server runtime creation for this composite only. Keep
+the existing authoritative clipping query and all solo behavior. Each client owns
+the original pools, local resources, cosmetic RNG and callback-free collision.
+Preserve primary-only collision/texture quirks, original pool bounds and update
+order. Advance on existing bounded client ticks without invoking CMoveMgr again.
+Clear pending/runtime/presentation state before resource stores at world change.
+
+Use shared runtime-to-presentation extraction, retaining Original/Enhanced/XR
+consumers and solo projectile-light/fog handling. Casing sounds remain buffered,
+spatial and cosmetic. Share the 128-voice playback budget, reclaim completed
+cosmetics, preserve logical sound priority and preempt disposable impacts before
+retained speech. Cosmetic playback cannot advance server clocks or RNG. Other FX
+families, their baselines and network fog remain explicitly pending.

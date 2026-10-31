@@ -1,4 +1,5 @@
 #pragma once
+#include "client/effect_audio.h"
 #include "client/world.h"
 #include "engine/audio.h"
 #include <set>
@@ -21,12 +22,12 @@ namespace OpenBlood2
         std::uint64_t world = 0, sequence = 0;
         std::vector<ClientSound> sounds;
     };
-    class ClientAudio
+    class ClientAudio : public EffectAudio
     {
       public:
         bool begin(std::uint64_t world);
         bool receive(ClientAudioFrame&&, const Resources&, std::string& error);
-        SoundId play_effect(const Resources&, const SoundParameters&, DVector, std::string& error);
+        SoundId play_effect(const Resources&, const SoundParameters&, DVector, std::string& error) override;
         bool advance(double seconds, DVector listener, DRotation rotation);
         std::uint64_t effects_started = 0, effects_failed = 0, effects_displaced = 0;
         // A mirrored voice whose clip cannot be prepared here stays silent on this

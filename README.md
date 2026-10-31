@@ -61,7 +61,10 @@ original team HUD/scores and retained teams across rotations. Team rules accept
 and the four `multi/ctf_*` maps, carried flags and capture scores/notices.
 The [Jam capture check](Documentation/implementation/reports/m9_ctf_capture.md) drives
 independent clients through grabbing, carrying, scoring and rotating the map.
-Communication portraits, music, visual effects, chat and broader qualification remain in progress.
+[Ballistic effects](Documentation/implementation/reports/m9_ballistic_network.md) now
+create casings, marks, smoke, fragments, liquid effects and tracers on each client,
+with local impact audio. Communication portraits, music, other visual effects,
+chat and broader qualification remain in progress.
 
 ## CI builds
 

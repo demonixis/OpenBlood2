@@ -34,7 +34,7 @@ namespace
         AudioEvent start{7, 9, 1, tone()}, end{7, 9, 2, SoundEnd{1, true}};
         std::vector<std::uint8_t> bytes;
         CHECK(encode_audio(end, bytes));
-        const std::vector<std::uint8_t> golden{0x42, 0x32, 0x41, 0x55, 18, 0, 2, 7, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0,
+        const std::vector<std::uint8_t> golden{0x42, 0x32, 0x41, 0x55, 19, 0, 2, 7, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0,
                                                0,    0,    0,    2,    0,  0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1};
         CHECK(bytes == golden);
         std::mt19937 random(42);
@@ -97,6 +97,54 @@ namespace
             CHECK(!encode_audio(bad, bytes) && bytes == golden);
         }
         std::cout << "Audio codec: two golden/round-trip variants, all truncations, 40000 mutations\n";
+        return true;
+    }
+    bool cosmetic(const std::filesystem::path& root)
+    {
+        std::string error;
+        Resources resources;
+        CHECK(test_network_audio::setup(resources, root, error));
+        NetworkAudio audio;
+        CHECK(audio.begin({7, 9, {3, 4}}));
+        ClientWorld world;
+        CHECK(world.begin(7));
+        auto parameters = tone().parameters;
+        const auto retained = audio.play_voice(resources, parameters, error);
+        CHECK(retained);
+        parameters.space = SoundSpace::Spatial;
+        SoundId first = 0;
+        for (unsigned i = 0; i < 127; ++i)
+        {
+            const auto id = audio.play_effect(resources, parameters, {1, 2, 3}, error);
+            CHECK(id);
+            CHECK(audio.mixer.get(id)->auto_remove && audio.mixer.get(id)->position.x == 1);
+            if (!i)
+                first = id;
+        }
+        CHECK(!audio.play_effect(resources, parameters, {}, error));
+        AudioEvent event{7, 9, 1, tone()};
+        CHECK(audio.receive(event, resources, error));
+        CHECK(audio.effects_displaced == 1 && !audio.local_displaced && !audio.mixer.get(first) &&
+              audio.mixer.get(retained));
+        CHECK(audio.advance(1, world, {}, {}));
+        CHECK(audio.mixer.voices().size() == 2); // Server and retained speech handles persist, cosmetics retire.
+        bool done = false;
+        CHECK(audio.voice_done(retained, done) && done && audio.stop_voice(retained));
+        event.sequence = 2;
+        event.value = SoundEnd{1, true};
+        CHECK(audio.receive(event, resources, error));
+        CHECK(audio.advance(0, world, {}, {}) && audio.mixer.voices().empty());
+        for (unsigned i = 0; i < 256; ++i)
+        {
+            CHECK(audio.play_effect(resources, parameters, {}, error) && audio.advance(1, world, {}, {}));
+            CHECK(audio.mixer.voices().empty());
+        }
+        CHECK(audio.play_effect(resources, parameters, {}, error));
+        CHECK(audio.begin({8, 10, {3, 5}}) && audio.mixer.voices().empty());
+        parameters.loop = true;
+        CHECK(!audio.play_effect(resources, parameters, {}, error));
+        std::cout << "Network cosmetic audio: shared 128-voice budget, server priority, retained speech protection, "
+                     "spatial PCM, completion reclamation and world cleanup passed\n";
         return true;
     }
     bool receiver(const std::filesystem::path& root)
@@ -201,5 +249,7 @@ int main(int argc, char** argv)
 {
     if (argc == 2 && std::string_view(argv[1]) == "codec")
         return codec() ? 0 : 1;
+    if (argc == 3 && std::string_view(argv[1]) == "cosmetic")
+        return cosmetic(argv[2]) ? 0 : 1;
     return argc == 3 && std::string_view(argv[1]) == "receiver" && receiver(argv[2]) ? 0 : 1;
 }

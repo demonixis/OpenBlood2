@@ -227,6 +227,10 @@ namespace
                     CHECK(client.speech().left_notices == 1);
                 std::cout << "Player notices: joined=" << client.speech().joined_notices
                           << ", left=" << client.speech().left_notices << '\n';
+                CHECK(client.effects().received > 0 && !client.effects().failed);
+                std::cout << "Remote ballistics: received=" << client.effects().received
+                          << ", failed=" << client.effects().failed
+                          << ", cosmetic_sounds=" << client.audio().effects_started << '\n';
                 std::cout << "Remote audio: starts=" << client.audio().started << ", stops=" << client.audio().stopped
                           << ", natural=" << client.audio().completed
                           << ", private_starts=" << client.audio().local_started << ", peak=" << audio_peak << '\n';

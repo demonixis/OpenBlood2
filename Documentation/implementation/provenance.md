@@ -1,5 +1,11 @@
 # Source and Dependency Provenance
 
+The M9 [network ballistic lot](reports/m9_ballistic_network.md) reuses the existing
+WeaponFX/ShellCasing/Mark/SurfaceFragment/Tracer port through independent client
+collision, resources and cosmetic audio. Protocol recipes, per-recipient bounds
+and shared presentation extraction are reconstruction adapters; see its
+[source ledger](sources/m9_ballistic_network_sources.json).
+
 The M9 [client-routed CTF lot](reports/m9_ctf_capture.md) adds a test-only ground
 planner over independent client collision and real-process Jam capture coverage.
 It imports no additional original code. Bounded weapon waiting is an explicit

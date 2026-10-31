@@ -1,17 +1,20 @@
 #pragma once
+#include "client/effect_audio.h"
 #include "client/world.h"
 #include "engine/audio.h"
 #include "net/admission.h"
 #include "net/audio_events.h"
 namespace OpenBlood2
 {
-    class NetworkAudio
+    class NetworkAudio : public EffectAudio
     {
       public:
         bool begin(const Net::Joined&);
         bool receive(const Net::AudioEvent&, const Resources&, std::string& error);
         bool advance(double seconds, const ClientWorld&, DVector listener, DRotation rotation);
         SoundId play_voice(const Resources&, const SoundParameters&, std::string& error);
+        SoundId play_effect(const Resources&, const SoundParameters&, DVector, std::string& error) override;
+        std::uint64_t effects_started = 0, effects_failed = 0, effects_displaced = 0;
         bool stop_voice(SoundId);
         bool voice_done(SoundId, bool&) const;
         bool voice_duration(SoundId, float&) const;

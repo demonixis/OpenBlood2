@@ -1,0 +1,92 @@
+{
+  "scope": "Independent network shared ballistic composite and local casing audio",
+  "baseline": "cee08226157439c2dd9ca30ef280302a8699cb1f",
+  "sources": [
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/ClientWeaponSFX.h",
+      "sha256": "ba7cc82a31c57294f2369ed51d5dd96bdfe8122fb90f1c700326ffc0ca224dc6"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/WeaponFX.cpp",
+      "sha256": "95230fcffd888751528e1a9f1d4353844ebfce5dbf5ef0a46cb0cf0a8a1b0e25"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ShellCasingFX.cpp",
+      "sha256": "b0c9fd0416f5da2d8db132728af386d66d90624363a9ae15283996e0edb1484d"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/SurfaceFragmentFX.cpp",
+      "sha256": "35eac11104a4e155b2c0e2f8fe19c5be9b55d7d76bf96396507c28f3b7ee2d1b"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/MarkSFX.cpp",
+      "sha256": "cd27ee44547271670feb26b0e457c96e7c3563545e6d5c7269ff79fd9d167a2b"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/TracerFX.cpp",
+      "sha256": "d782c18ca9c8883636cc9d5d6bf8244cd62533b28179f8fa6b74316cfbeffc08"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "cee08226157439c2dd9ca30ef280302a8699cb1f",
+      "path": "src/game/shotgun_effects.cpp",
+      "sha256": "0fb8b4b29a7a1210cbf43bd59b753531addb08a59ba0d2654f7b8cea4f7b019f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "cee08226157439c2dd9ca30ef280302a8699cb1f",
+      "path": "src/game/local_effects.cpp",
+      "sha256": "d9737d542e625abf0f828baa2c9b82f05574f2681989ec7d2fe7f40e64ed386d"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "cee08226157439c2dd9ca30ef280302a8699cb1f",
+      "path": "src/game/server_effects.cpp",
+      "sha256": "034478c4cab509c0108d765d83a0c3509ecae6dddb4b1266779d2ed54b248d00"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "cee08226157439c2dd9ca30ef280302a8699cb1f",
+      "path": "src/game/original/WeaponVector.cpp",
+      "sha256": "4a4486cb7008697612a07ab70230efa8e0d514f730489898166245d911f56bbd"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "cee08226157439c2dd9ca30ef280302a8699cb1f",
+      "path": "src/client/network_audio.cpp",
+      "sha256": "1bc80813a4e0a0fb4fa3462e91e7f295c4df6a67cf27557fbc3d5bebed2e186c"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "cee08226157439c2dd9ca30ef280302a8699cb1f",
+      "path": "src/client/effect_services.cpp",
+      "sha256": "e7ed6193a9c5b86cd3aa1e1b2892bc64359f9dad0f410cd7e9700aa7edd9f100"
+    }
+  ],
+  "adaptations": [
+    "Protocol19 bounded reliable impact recipes; private recipient sequence and world/source generation identities",
+    "No historical instant-message replay to late arrivals; source removal does not cancel detached effects",
+    "Callback-free client collision/resources/cosmetic RNG and existing fixed client tick; no extra movement integration",
+    "Shared runtime presentation extraction preserves solo ordering; projectile lights/fog remain local",
+    "128-voice local cosmetic playback with completion reclamation and authoritative/retained speech priority",
+    "Other cosmetic families and persistent network effect baselines remain pending"
+  ]
+}

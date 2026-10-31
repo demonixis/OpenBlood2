@@ -2,6 +2,7 @@
 #include "client/network_audio.h"
 #include "client/network_camera.h"
 #include "client/network_clock.h"
+#include "client/network_effects.h"
 #include "client/network_input.h"
 #include "client/network_movement.h"
 #include "client/network_player_events.h"
@@ -126,6 +127,10 @@ namespace OpenBlood2
         {
             return weapons_;
         }
+        const NetworkEffects& effects() const
+        {
+            return effects_;
+        }
         const ClientHud& hud() const
         {
             return inbox_.hud();
@@ -185,6 +190,7 @@ namespace OpenBlood2
         NetworkCamera camera_;
         NetworkWeapons weapons_;
         NetworkAudio audio_;
+        NetworkEffects effects_;
         NetworkSpeech speech_;
         NetworkPlayerEvents inbox_;
         NetworkClock clock_;

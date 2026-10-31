@@ -216,6 +216,8 @@ namespace OpenBlood2
                 }
             }
         }
+        if (remote_ballistic_sink)
+            return remote_ballistic_sink(objects_.get(source)->id, GetObjectName(source), clipped, error);
         return shotgun_effects.publish(effect_owner(source), clipped, *objects_.models, *objects_.sprites,
                                        *client_resources, objects_.time(), effect_services(), error);
     }

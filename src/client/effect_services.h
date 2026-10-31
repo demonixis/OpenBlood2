@@ -1,9 +1,9 @@
 #pragma once
+#include "client/effect_audio.h"
 #include "client/effect_queries.h"
 #include "engine/audio.h"
 namespace OpenBlood2
 {
-    class ClientAudio;
     class OriginalEffects;
     class SpriteStore;
     struct BloodSplatSettings;
@@ -19,7 +19,7 @@ namespace OpenBlood2
         OriginalEffects& effects;
         const Resources* resources;
         SpriteStore* sprites;
-        ClientAudio* audio;
+        EffectAudio* audio;
         double time, frame_time;
         SoundId sound(const SoundParameters&, DVector, std::string&) const;
         std::uint64_t splat(const BloodSplatSettings&, std::string_view, std::string&) const;

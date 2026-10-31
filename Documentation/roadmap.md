@@ -350,8 +350,9 @@ The [client roster](implementation/reports/m9_roster.md) now owns reliable names
 [CTF server rules](implementation/reports/m9_ctf_rules.md) now connect capture contributions, enemy-only OnlyFlagScores, membership-based UseTeamSize and team limits/rotation; independent capture consumers and wire admission remain next.
 [Network CTF](implementation/reports/m9_ctf_network.md) now opens dedicated/host admission with independent carried icons, absolute capture scores, localized notices and local grab/return sounds. Server-triggered capture/drop replication and real-process rotation have separate verification scopes.
 [Client-routed CTF](implementation/reports/m9_ctf_capture.md) adds a Jam capture by an independently moving client, late admission while carried and capture-driven rotation. Full weapon ACK windows wait within the existing bound; skipped inputs are not banked. Other map routes and human LAN remain unqualified.
-Communication portraits, music, FX, measured pings/chat and remaining multiplayer branches stay in progress.
-**Remaining private presentation consumers/commands, full client separation, client-routed CTF captures and complete network qualification remain pending.**
+[Network ballistic effects](implementation/reports/m9_ballistic_network.md) now deliver instant recipes to independent client casing/mark/smoke, fragment, liquid and tracer pools with local impact audio. Other FX families and persistent baselines remain pending.
+Communication portraits, music, remaining FX, measured pings/chat and multiplayer branches stay in progress.
+**Remaining private presentation consumers/commands, full client separation, other CTF capture routes and complete network qualification remain pending.**
 
 Original model: the authoritative server runs ObjectDLL objects; the client runs
 CMoveMgr, rendering and effects over copied object state. The current local solo

@@ -15,6 +15,7 @@ namespace OpenBlood2
         transport_.close();
         speech_.clear();
         audio_.clear();
+        effects_.clear();
         phase_ = Phase::Failed;
         return false;
     }
@@ -82,12 +83,23 @@ namespace OpenBlood2
             reason_ = event.reason ? Net::reject_text(event.reason) : "Disconnected";
             speech_.clear();
             audio_.clear();
+            effects_.clear();
             phase_ = Phase::Closed;
             transport_.close();
             return true;
         }
         if (phase_ == Phase::Closing)
             return true;
+        if (Net::is_ballistic_packet(event.bytes))
+        {
+            Net::BallisticEvent message;
+            if (event.channel != Net::Channel::Control ||
+                Net::decode_ballistic(event.bytes, message) != Net::DecodeBallistic::Ok)
+                return false;
+            if (message.world < offer_.world)
+                return true;
+            return phase_ == Phase::Active && effects_.receive(message, error);
+        }
         if (Net::is_audio_packet(event.bytes))
         {
             Net::AudioEvent message;
@@ -277,6 +289,7 @@ namespace OpenBlood2
             // mounted content persist; no live voice/body/model crosses worlds.
             speech_.clear();
             audio_.clear();
+            effects_.clear();
             models_.clear();
             sprites_.clear();
             initial_.reset();
@@ -312,7 +325,8 @@ namespace OpenBlood2
         {
             if (phase_ != Phase::Baseline || joined_.player || joined->world != offer_.world ||
                 !movement_.begin(*joined) || !inbox_.begin(*joined, offer_.mode) || !camera_.begin(*joined) ||
-                !weapons_.begin(*joined) || !audio_.begin(*joined) || !speech_.begin(*joined))
+                !weapons_.begin(*joined) || !effects_.begin(*joined) || !audio_.begin(*joined) ||
+                !speech_.begin(*joined))
                 return false;
             joined_ = *joined;
             return complete_baseline(now, error);
@@ -341,6 +355,7 @@ namespace OpenBlood2
                 transport_.close();
                 speech_.clear();
                 audio_.clear();
+                effects_.clear();
                 phase_ = Phase::Closed;
                 reason_ = "Disconnected";
                 return true;
@@ -429,6 +444,9 @@ namespace OpenBlood2
                         ++weapon_frames;
                     }
                 }
+                if (!effects_.advance(NetworkInput::step, displayed_, receiver_.collision(), models_, sprites_,
+                                      resources_, audio_, error))
+                    return fail(error, "Client effects publication failed");
                 if (!camera_.camera().view.object)
                 {
                     const float speed = 8 * float(NetworkInput::step);

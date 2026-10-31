@@ -1,5 +1,5 @@
 #pragma once
-#include "basedefs_de.h"
+#include "game/legacy/basedefs_de.h"
 // Selected original definitions; complete source fields, base-game weapon numbering.
 inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_SUBMACHINEGUN = 2, WEAP_FLAREGUN = 3, WEAP_ASSAULTRIFLE = 9,
                        WEAP_MELEE = 17, WEAP_NAGA_EYEBEAM = 38, WEAP_ZEALOT_ENERGYBLAST = 27, WEAP_SHIKARI_CLAW = 18,

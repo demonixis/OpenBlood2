@@ -116,7 +116,6 @@ namespace OpenBlood2
         std::uint64_t entered_world = 0, weapon_wait_seen = 0, weapon_frames_seen = 0;
         bool weapon_stalled = false;
         unsigned frames = 0;
-        ClientEffects effects;
         std::vector<Net::PrivateEvent> events;
         const auto leave = [&]()
         {
@@ -218,7 +217,7 @@ namespace OpenBlood2
             weapon_wait_seen = client.weapon_wait_ticks;
             weapon_frames_seen = client.weapon_frames;
             // HUD/camera and logical sound events are applied by the endpoint.
-            // Speech consumes original combat announcements; music and effects remain separate.
+            // Speech consumes original combat announcements; music remains separate.
             client.take_events(events);
             if (client.ready() && entered_world != client.joined().world)
             {
@@ -329,13 +328,7 @@ namespace OpenBlood2
             auto* target = capture_frame ? capture.texture : swapchain;
             if (visible)
             {
-                if (effects.frame().world != client.joined().world && !effects.begin(client.joined().world))
-                {
-                    SDL_CancelGPUCommandBuffer(commands);
-                    error = "Cannot begin client effects world";
-                    return failed();
-                }
-                ClientScene scene{client.geometry(), client.resources(), client.world(), effects};
+                ClientScene scene{client.geometry(), client.resources(), client.world(), client.effects().scene()};
                 scene.world_revision = client.joined().world;
                 scene.world_path = client.offer().path;
                 scene.view = camera.view;
@@ -392,6 +385,11 @@ namespace OpenBlood2
         SDL_WaitForGPUIdle(runtime.gpu);
         spdlog::info("Network session ended: frames={}, reports={}, states={}, discarded_ticks={}, reason={}", frames,
                      client.reports, client.state_packets, client.discarded_ticks, client.reason());
+        spdlog::info(
+            "Ballistic effects: received={}, failed={}, models={}, billboards={}, cosmetic_sounds={}, error={}",
+            client.effects().received, client.effects().failed, client.effects().scene().frame().models.size(),
+            client.effects().scene().frame().billboards.size(), client.audio().effects_started,
+            client.effects().last_error);
         spdlog::info("Player commands: acknowledged={}, applied={}", client.command_acks, client.commands_applied);
         spdlog::info("Weapon input: frames={}, waiting_ticks={}", client.weapon_frames, client.weapon_wait_ticks);
         if (server)

@@ -3,6 +3,7 @@
 #include "game/server_adapter.h"
 #include "net/admission.h"
 #include "net/audio_events.h"
+#include "net/ballistic_events.h"
 #include "net/content.h"
 #include "net/movement.h"
 #include "net/player_commands.h"
@@ -95,6 +96,9 @@ namespace OpenBlood2
         static constexpr unsigned weapon_credit_limit = 30, weapon_frames_per_tick = 2;
         std::uint64_t weapon_sounds_blocked = 0;
         bool begin_audio(std::uint64_t player, std::string& error);
+        bool begin_ballistics(std::uint64_t player);
+        bool take_ballistic_events(std::uint64_t player, std::vector<Net::BallisticEvent>&, std::string& error);
+        std::uint64_t ballistic_events = 0;
         bool take_audio_events(std::uint64_t player, std::vector<Net::AudioEvent>&, std::string& error);
         bool take_private_events(std::uint64_t player, std::vector<Net::PrivateEvent>&, std::string& error);
         std::uint64_t private_events = 0, subsumed_events = 0;
@@ -143,6 +147,9 @@ namespace OpenBlood2
             std::uint64_t next_event = 1;
             bool roster_failed = false;
             bool audio_started = false, audio_failed = false;
+            bool ballistic_started = false, ballistic_failed = false;
+            std::uint64_t next_ballistic = 1;
+            std::vector<Net::BallisticEvent> ballistics;
             std::uint64_t next_audio = 1;
             std::vector<Net::AudioEvent> audio_events;
             std::set<SoundId> audio_voices;
@@ -200,6 +207,7 @@ namespace OpenBlood2
         bool load_map(std::size_t index, std::string& error);
         void update_match();
         void capture_audio(const AudioVoice&, bool started);
+        std::uint64_t capture_ballistic(ObjectId, std::string_view, const ShotgunEffectSettings&, std::string&);
         bool queue_audio(Player&, const AudioVoice&, bool started);
         DRESULT capture_event(HCLIENT, const PlayerEvent&);
         DRESULT queue_private(Player&, ObjectId, const Net::PrivateValue&);
