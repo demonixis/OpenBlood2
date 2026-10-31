@@ -215,7 +215,7 @@ namespace OpenBlood2
         step(runtime_.sparks.advance(time_), runtime_.sparks.update_error);
         step(runtime_.lightning.advance(time_), runtime_.lightning.update_error);
         step(runtime_.blood_spurts.advance(time_, services), runtime_.blood_spurts.update_error);
-        step(runtime_.explosion_fragments.advance(time_, queries), runtime_.explosion_fragments.update_error);
+        step(runtime_.explosion_fragments.advance(time_, queries, true), runtime_.explosion_fragments.update_error);
         step(runtime_.particle_streams.advance(time_, world), runtime_.particle_streams.update_error);
         ClientEffectsFrame frame;
         frame.world = owner_.world;

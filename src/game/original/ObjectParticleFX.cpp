@@ -443,7 +443,8 @@ bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t 
     emitted += kept;
     return true;
 }
-bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_rand& random, std::size_t budget)
+bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_rand& random, std::size_t budget,
+                               bool multiplayer)
 {
     error.clear();
     if (!created_ || !std::isfinite(now) || now < last_time || (owner && !pose_valid(*owner)))
@@ -484,8 +485,23 @@ bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_ra
         if (difference.x == 0 && difference.y == 0 && difference.z == 0)
         {
             moving = false;
-            duration = elapsed + max_life + ((recipe == 6 || recipe == 8 || recipe == 27) ? ramp_down : 0.f);
-        } // Never resumes in single player; only sparks request an alpha ramp.
+            if (!multiplayer)
+                duration = elapsed + max_life + ((recipe == 6 || recipe == 8 || recipe == 27) ? ramp_down : 0.f);
+            else
+            {
+                if (stop_time < 0)
+                    stop_time = now;
+                // Original ObjectFX.cpp: sparse network poses may pause/restart.
+                // Once this strict grace has elapsed, the duration is terminal.
+                if (now > stop_time + 1)
+                    duration = elapsed + ramp_down + max_life;
+            }
+        }
+        else if (multiplayer)
+        {
+            stop_time = -1;
+            moving = true;
+        }
         last_object_position = owner->position;
     }
     if (recipe == 1 || recipe == 2 || recipe == 34)

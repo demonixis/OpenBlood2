@@ -123,3 +123,14 @@ The [burning death/dismemberment continuation](death_effect_contracts.md) supers
 blanket fire/gib/corpse-damage omissions for its selected original paths. Real
 flame/smoke particles, burned corpses, runtime limbs and flesh models now run with
 inspection. Blood-spurt/splat FX, generic gib/save services and full M2 remain open.
+
+## Explicit multiplayer stop branch (M9)
+
+The [M9 stop/resume prerequisite](../implementation/reports/m9_particle_stop.md)
+adds the original network-only grace to the selected moving trail recipes. A
+stationary observation freezes movement, but moving again clears the first-stop
+clock and resumes until terminal duration has been set. Strictly more than one
+second stationary arms elapsed + ramp_down + max_life; exactly one second does not.
+This is selected explicitly by network fragment updates. Existing solo defaults,
+finite spell duration, first-update behavior and immediate owner removal stay.
+Owner-bound recipe replication remains pending separately.

@@ -1,5 +1,9 @@
 # Source and Dependency Provenance
 
+The M9 [particle-stop prerequisite](reports/m9_particle_stop.md) ports the original
+ObjectFX multiplayer stop/restart branch with an explicit client-only argument.
+Solo remains the default. See its [source ledger](sources/m9_particle_stop_sources.json).
+
 The M9 [network particle-stream lot](reports/m9_stream_network.md) extracts the
 existing ParticleStream/System value descriptor and validation unchanged, then
 transports it with generation-qualified owner membership. Original client emission

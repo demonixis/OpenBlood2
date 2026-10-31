@@ -1697,3 +1697,14 @@ ramp rules, private RNG, particle budgets and explicit failures remain unchanged
 Object-particle recipes/projectile trails, PolyGrids, WarpGates, evaluated lights
 and remaining presentation consumers are separate deliveries. Keep one CMoveMgr
 integration, logical server sound/RNG, all solo clocks and immutable PBR references.
+
+## Original multiplayer trail stop grace
+
+The [particle-stop prerequisite](../implementation/reports/m9_particle_stop.md)
+ports original ObjectFX's multiplayer branch: unchanged position freezes movement,
+movement resumes/clears the stop clock before terminal duration, and only strictly
+more than one second stopped arms elapsed + ramp-down + maximum particle lifetime.
+Once duration is armed, motion never restarts it. Network fragment children select
+this mode explicitly; solo keeps immediate terminal stopping and existing clocks.
+Finite-duration spells and all particle/RNG/collision budgets remain unchanged.
+This does not itself deliver owner-bound ObjectFX recipes over the network.

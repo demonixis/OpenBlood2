@@ -64,7 +64,7 @@ namespace OpenBlood2
             count += instance.effect.particles.size();
         return count;
     }
-    bool ObjectParticles::advance(double now, const ClientWorld& world)
+    bool ObjectParticles::advance(double now, const ClientWorld& world, bool multiplayer)
     {
         bool valid = true;
         std::size_t total = particle_count();
@@ -76,7 +76,7 @@ namespace OpenBlood2
                           const auto* owner = world.get(instance.owner);
                           const auto others = total - previous;
                           const std::size_t budget = others <= 8192 ? std::min<std::size_t>(2048, 8192 - others) : 0;
-                          if (fx.Update(now, owner ? &owner->pose : nullptr, random_, budget))
+                          if (fx.Update(now, owner ? &owner->pose : nullptr, random_, budget, multiplayer))
                           {
                               total = others + fx.particles.size();
                               return false;

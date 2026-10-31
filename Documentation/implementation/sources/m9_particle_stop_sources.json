@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-31",
+  "scope": "Original multiplayer ObjectFX stop/resume prerequisite, protocol unchanged",
+  "baseline": "0b665ad4",
+  "files": [
+    {
+      "path": "../sources/blood2/ClientShellDLL/ObjectFX.cpp",
+      "sha256": "1af815cdb07c8e0fcd56bebb723e78b539cd3398221a78e3b3fcf977bf109c48"
+    },
+    {
+      "path": "../sources/blood2/ClientShellDLL/ObjectFX.h",
+      "sha256": "f10854489408e05859507a3b73cfbbd1ba3514988aa7caf93ec48d992bbfaffe"
+    },
+    {
+      "path": "../sources/blood2/ClientShellDLL/SFXMgr.cpp",
+      "sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1"
+    },
+    {
+      "path": "../sources/blood2/ObjectDLL/Projectile.cpp",
+      "sha256": "52b805c67775579b5703e0ad1099a8ea44d76b245349c8f6d1fac0a1b3b74ef2"
+    },
+    {
+      "path": "src/game/original/ObjectParticleFX.cpp",
+      "sha256": "21475fb21e7f97aa96e621a0a9ab2c4439fbd8d1fc0375b4fb9bb87ca0a5016b"
+    },
+    {
+      "path": "src/game/original/ObjectParticleFX.h",
+      "sha256": "9539dd6bec568aba43ac30939d9838e151e5e9009fb13efaf6f100579f79b128"
+    },
+    {
+      "path": "src/game/object_particles.cpp",
+      "sha256": "356bc637912be1638ea87086399399faea2abd1100a6b1bac09b23c2b69ad752"
+    },
+    {
+      "path": "src/game/explosion_fragments.cpp",
+      "sha256": "a7b38d103e48002c50ea58e8ddf6eec0280060d8365985385a4cec79df8924c8"
+    },
+    {
+      "path": "src/client/network_effects.cpp",
+      "sha256": "5749a350870b0f835a241507d035ff9f1f4c0335122612f385a608c0b28d9e39"
+    },
+    {
+      "path": "tests/network/particle_stop_tests.cpp",
+      "sha256": "c42dc43ed8326dff43fb867cc6428b4dbeab6cd092ecc279edbbfa296b98492c"
+    }
+  ]
+}

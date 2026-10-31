@@ -4,14 +4,15 @@
 #include "engine/resources.h"
 #include <random>
 // Selected original smoke trail, shield and powerup recipes.
-// Other recipes, configurable flags/ramps and multiplayer behavior are not exposed.
+// Selected original multiplayer stop/resume is explicit; solo remains the default.
 class CObjectParticleFX
 {
   public:
     bool Init(unsigned type, std::uint64_t parent, std::string&);
     bool Init(unsigned type, std::uint64_t parent, std::minstd_rand&, std::string&);
     bool CreateObject(const OpenBlood2::Resources&, OpenBlood2::NodePose, double, std::string&);
-    bool Update(double, const OpenBlood2::NodePose*, std::minstd_rand&, std::size_t particle_budget = 2048);
+    bool Update(double, const OpenBlood2::NodePose*, std::minstd_rand&, std::size_t particle_budget = 2048,
+                bool multiplayer = false);
     std::uint64_t id = 0, parent = 0, event = 0, updates = 0, bursts = 0, emitted = 0;
     std::uint64_t dropped = 0; // Smoke-trail samples beyond the shared replacement pool.
     std::vector<OpenBlood2::Particle> particles;
@@ -23,6 +24,7 @@ class CObjectParticleFX
     bool ramping = false;
     double start_time = 0, last_time = 0, next_update = 0, last_add_time = 0;
     float duration = 0;
+    double stop_time = -1; // Original multiplayer first-stop clock; negative means not stopped.
     bool moving = true, first_update = true;
     // Original recipe fields; alpha is authored but unused without ramp flags.
     float radius = 2000, gravity = 25, density = 1, add_delay = .01f, requested_alpha = .25f, alpha = 1, min_life = .5f,

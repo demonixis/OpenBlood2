@@ -19,7 +19,7 @@ namespace OpenBlood2
       public:
         std::uint64_t publish(const EffectOwner&, unsigned, const Resources*, double, std::string&,
                               float lifetime_scale = 1, DVector offset = {});
-        bool advance(double, const ClientWorld&);
+        bool advance(double, const ClientWorld&, bool multiplayer = false);
         void clear();
         std::size_t particle_count() const;
         std::vector<ObjectParticleInstance> active;

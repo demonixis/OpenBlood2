@@ -124,7 +124,7 @@ namespace OpenBlood2
         reports.push_back(std::move(report));
         return id;
     }
-    bool ExplosionFragments::advance(double now, EffectQueries& queries)
+    bool ExplosionFragments::advance(double now, EffectQueries& queries, bool multiplayer)
     {
         bool valid = true;
         std::erase_if(active,
@@ -159,7 +159,8 @@ namespace OpenBlood2
                               total - previous <= 16384
                                   ? std::min<std::size_t>(max_particle_capacity, 16384 - (total - previous))
                                   : 0;
-                          if (trail.Update(now, parent == active.end() ? nullptr : &pose, trail_random_, budget))
+                          const auto* owner = parent == active.end() ? nullptr : &pose;
+                          if (trail.Update(now, owner, trail_random_, budget, multiplayer))
                           {
                               total = total - previous + trail.particles.size();
                               return false;
