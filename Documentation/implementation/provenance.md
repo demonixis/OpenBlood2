@@ -1,5 +1,10 @@
 # Source and Dependency Provenance
 
+The M9 [client-routed CTF lot](reports/m9_ctf_capture.md) adds a test-only ground
+planner over independent client collision and real-process Jam capture coverage.
+It imports no additional original code. Bounded weapon waiting is an explicit
+transport adaptation; original CMoveMgr, flag rules, cadence and queue limits stay.
+
 The M9 [CTF network lot](reports/m9_ctf_network.md) ports original flag notice/icon
 and local sound branches from BloodClientShell, using external localized strings.
 Absolute score transport, checked team/world identity and owned bounded client

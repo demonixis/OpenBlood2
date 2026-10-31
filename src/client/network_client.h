@@ -51,6 +51,8 @@ namespace OpenBlood2
         bool command(const Net::CommandAction&, std::string& error);
         std::uint64_t command_acks = 0, commands_applied = 0;
         std::uint64_t weapon_frames = 0;
+        // Cumulative fixed ticks waiting for bounded reliable input credit.
+        std::uint64_t weapon_wait_ticks = 0;
         const std::optional<Net::WeaponFrameAck>& weapon_ack() const
         {
             return weapon_ack_;

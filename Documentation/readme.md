@@ -31,6 +31,7 @@
 | [Independent client speech](implementation/reports/m9_client_speech.md) | Original VoiceMgr/CommLink services, actual private playback and shared bounded audio. |
 | [Validated weapon sounds](implementation/reports/m9_weapon_sounds.md) | Original animation one-shots/loops/stops, life checks and independent remote playback. |
 | [Reliable player roster](implementation/reports/m9_roster.md) | Independent names/characters/frags, late arrivals, departure and reconnect identity. |
+| [Client-routed CTF](implementation/reports/m9_ctf_capture.md) | Jam capture, late carried-flag admission, score-limit rotation and bounded weapon waiting under overload. |
 | [Network CTF](implementation/reports/m9_ctf_network.md) | Dedicated/host admission, carried flags, absolute capture totals, independent notices/audio and retained-team rotation. |
 | [Server CTF rules](implementation/reports/m9_ctf_rules.md) | Combined capture/match scores, OnlyFlagScores, membership multiplier, drops and bounded rotation; wire admission pending. |
 | [Team network play](implementation/reports/m9_team_network.md) | Team admission, absolute totals, retained assignments, source team HUD/columns and dedicated/host verification. |

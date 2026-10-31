@@ -381,6 +381,7 @@ namespace OpenBlood2
         spdlog::info("Network session ended: frames={}, reports={}, states={}, discarded_ticks={}, reason={}", frames,
                      client.reports, client.state_packets, client.discarded_ticks, client.reason());
         spdlog::info("Player commands: acknowledged={}, applied={}", client.command_acks, client.commands_applied);
+        spdlog::info("Weapon input: frames={}, waiting_ticks={}", client.weapon_frames, client.weapon_wait_ticks);
         if (server)
             spdlog::info("Host stopped: ticks={}, discarded_ticks={}, admitted={}, departed={}, rotations={}",
                          server->total_ticks(), server_clock.discarded_ticks(), network->admitted, network->departed,

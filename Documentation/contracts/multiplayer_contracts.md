@@ -1559,3 +1559,20 @@ frames during that intermission, including synchronous server map loading;
 otherwise a slow load can exhaust the unchanged 64-frame ACK window despite
 neutral input. New-world admission resets the weapon sequence. Movement/audio
 clocks and the normal-play frame budget remain unchanged.
+
+## Client-routed CTF and weapon backpressure
+
+The [capture lot](../implementation/reports/m9_ctf_capture.md) verifies Jam through
+ordinary independent CMoveMgr inputs, late arrival while carried, five-point
+capture and score-limit rotation. The test-only replica route planner must never
+invoke server rules, teleport the player or relax production collision. This
+selected ground route does not qualify other maps or human LAN.
+
+Normal-play weapon input now waits when its unchanged 64-frame ACK window is
+full. Do not advance the matching weapon animation, store skipped input ticks or
+replay their shots. On credit return, sample current buttons/aim. Continue the
+single movement integration, reports, camera/audio and transport timeouts.
+Already queued frames retain original checked animation/fire ordering. Keep
+server cadence/catch-up, loadout history and invalid/overflow handling unchanged;
+count cumulative waiting ticks. Intermission suppression and fresh-world sequence
+reset continue to apply. This supersedes the historical backlog-disconnect policy.

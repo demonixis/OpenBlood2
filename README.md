@@ -59,6 +59,8 @@ original team HUD/scores and retained teams across rotations. Team rules accept
 `--friendly-fire on|off` and `--negative-team-frags on|off` (both default on).
 [CTF](Documentation/implementation/reports/m9_ctf_network.md) adds `--mode ctf`
 and the four `multi/ctf_*` maps, carried flags and capture scores/notices.
+The [Jam capture check](Documentation/implementation/reports/m9_ctf_capture.md) drives
+independent clients through grabbing, carrying, scoring and rotating the map.
 Communication portraits, music, visual effects, chat and broader qualification remain in progress.
 
 ## CI builds

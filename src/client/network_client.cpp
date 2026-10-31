@@ -405,23 +405,29 @@ namespace OpenBlood2
                 if (!changing_level_ && weapons_.ready(movement_.setup().owner.force_revision))
                 {
                     const auto acknowledged = weapon_ack_ ? weapon_ack_->sequence : 0;
-                    if (weapon_frames == UINT64_MAX || weapon_frames - acknowledged >= Net::weapon_frame_queue_limit)
+                    if (weapon_frames == UINT64_MAX)
                     {
-                        error = "Unacknowledged weapon frame queue is full: sent=" + std::to_string(weapon_frames) +
-                                ", ack=" + std::to_string(acknowledged) +
-                                ", discarded=" + std::to_string(discarded_ticks) +
-                                ", state_packets=" + std::to_string(state_packets);
-                        return fail(error, "Weapon frame backlog");
+                        return fail(error, "Weapon frame sequence exhausted");
                     }
-                    const Net::WeaponFrame frame{movement_.setup().owner, weapon_frames + 1, weapons_.state_sequence(),
-                                                 {pitch_, yaw_},          weapon.primary,    weapon.alternate};
-                    std::vector<std::uint8_t> bytes;
-                    if (!Net::encode_weapon_frame(frame, bytes) ||
-                        !transport_.send(peer_, Net::Channel::Control, bytes, error))
-                        return fail(error, "Cannot send weapon frame");
-                    if (!weapons_.update(frame.owner.force_revision, NetworkInput::step, error, weapon, frame.aim))
-                        return fail(error, "Client weapon presentation failed");
-                    ++weapon_frames;
+                    // A slow server/ACK must not turn bounded input into a
+                    // disconnect. Pause only the weapon timeline while full;
+                    // never bank skipped inputs or replay their shots later.
+                    // Movement, camera, audio and normal timeouts keep running.
+                    if (weapon_frames - acknowledged >= Net::weapon_frame_queue_limit)
+                        ++weapon_wait_ticks;
+                    else
+                    {
+                        const Net::WeaponFrame frame{
+                            movement_.setup().owner, weapon_frames + 1, weapons_.state_sequence(),
+                            {pitch_, yaw_},          weapon.primary,    weapon.alternate};
+                        std::vector<std::uint8_t> bytes;
+                        if (!Net::encode_weapon_frame(frame, bytes) ||
+                            !transport_.send(peer_, Net::Channel::Control, bytes, error))
+                            return fail(error, "Cannot send weapon frame");
+                        if (!weapons_.update(frame.owner.force_revision, NetworkInput::step, error, weapon, frame.aim))
+                            return fail(error, "Client weapon presentation failed");
+                        ++weapon_frames;
+                    }
                 }
                 if (!camera_.camera().view.object)
                 {
