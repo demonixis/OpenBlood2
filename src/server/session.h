@@ -192,6 +192,15 @@ namespace OpenBlood2
             std::string failure;
         };
         std::vector<Player> players_;
+        struct StreamEmitter
+        {
+            ObjectId owner;
+            ParticleStreamSettings settings;
+        };
+        std::vector<StreamEmitter> stream_emitters_;
+        std::uint64_t next_stream_ = 1;
+        void prune_streams();
+        std::uint64_t capture_stream(ObjectId, const ParticleStreamSettings&, std::string&);
         struct AudioSource
         {
             ObjectId owner, speaker;

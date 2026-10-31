@@ -353,6 +353,7 @@ The [client roster](implementation/reports/m9_roster.md) now owns reliable names
 [Network ballistic effects](implementation/reports/m9_ballistic_network.md) now deliver instant recipes to independent client casing/mark/smoke, fragment, liquid and tracer pools with local impact audio. Other FX families and persistent baselines remain pending.
 [Network impact sprites, sparks and blood](implementation/reports/m9_impact_network.md) now share one bounded ordered recipe stream, independent child splats/audio and original immediate/deferred updates. Source blood probability and exact missing sound failures stay explicit.
 [Network explosions and fragments](implementation/reports/m9_instant_network.md) now deliver six original components, flesh/destruction fragments and instant laser/lightning, with local collisions, child blood/audio and debris detail. Persistent owner-bound baselines and remaining presentation/UI stay pending.
+[Network particle streams](implementation/reports/m9_stream_network.md) now carry immutable stream/system recipes with reliable owner membership and late-join baselines. Other owner-bound families and projectile trails remain pending.
 Communication portraits, music, remaining FX, measured pings/chat and multiplayer branches stay in progress.
 **Remaining private presentation consumers/commands, full client separation, other CTF capture routes and complete network qualification remain pending.**
 

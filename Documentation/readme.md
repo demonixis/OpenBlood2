@@ -33,6 +33,7 @@
 | [Reliable player roster](implementation/reports/m9_roster.md) | Independent names/characters/frags, late arrivals, departure and reconnect identity. |
 | [Network impact sprites, sparks and blood](implementation/reports/m9_impact_network.md) | Ordered bounded recipes, original immediate/deferred blood updates and client child splats/audio. |
 | [Network explosions and fragments](implementation/reports/m9_instant_network.md) | Six explosion components, flesh/debris children and laser/lightning in independent clients. |
+| [Network particle streams](implementation/reports/m9_stream_network.md) | Owner-bound reliable emitters, late arrivals, independent original streams/systems and generation cleanup. |
 | [Network ballistic effects](implementation/reports/m9_ballistic_network.md) | Bounded impact recipes, independent cosmetic runtime/collision/audio and existing scene rendering. |
 | [Client-routed CTF](implementation/reports/m9_ctf_capture.md) | Jam capture, late carried-flag admission, score-limit rotation and bounded weapon waiting under overload. |
 | [Network CTF](implementation/reports/m9_ctf_network.md) | Dedicated/host admission, carried flags, absolute capture totals, independent notices/audio and retained-team rotation. |

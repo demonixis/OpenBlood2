@@ -1,7 +1,38 @@
+#include "engine/texture.h"
 #include "server/session.h"
 #include <algorithm>
 namespace OpenBlood2
 {
+    void ServerSession::prune_streams()
+    {
+        std::erase_if(stream_emitters_,
+                      [&](const auto& stream)
+                      {
+                          const auto* object = game_.objects.get(stream.owner);
+                          return !object || object->life != Life::Alive;
+                      });
+    }
+    std::uint64_t ServerSession::capture_stream(ObjectId owner, const ParticleStreamSettings& settings,
+                                                std::string& error)
+    {
+        error.clear();
+        prune_streams();
+        const auto* object = game_.objects.get(owner);
+        if (!object || object->life != Life::Alive || !valid_particle_stream(settings) || !next_stream_ ||
+            stream_emitters_.size() >= 128 ||
+            std::any_of(stream_emitters_.begin(), stream_emitters_.end(),
+                        [&](const auto& stream) { return stream.owner == owner; }))
+        {
+            error = "Invalid, duplicate or over-capacity server particle stream";
+            return 0;
+        }
+        // Preserve strict resource admission without creating/advancing cosmetic particles.
+        Texture image;
+        if (!read_texture_resource(game_.resources, settings.texture, image, error))
+            return 0;
+        stream_emitters_.push_back({owner, settings});
+        return next_stream_++;
+    }
     bool ServerSession::begin_effects(std::uint64_t id)
     {
         const auto p = std::find_if(players_.begin(), players_.end(), [id](const auto& p) { return p.id == id; });

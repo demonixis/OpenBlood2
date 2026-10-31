@@ -1,5 +1,7 @@
 #pragma once
 #include "client/world.h"
+#include "game/particle_stream_settings.h"
+#include <optional>
 #include <span>
 #include <variant>
 
@@ -28,6 +30,8 @@ namespace OpenBlood2::Net
         std::uint32_t world_model_index = UINT32_MAX;
         bool world_model_bound = false;
         ClientCollisionValues collision;
+        // Immutable, owner-bound emitter; lifecycle shares reliable object membership.
+        std::optional<ParticleStreamSettings> particle_stream;
     };
     struct WorldSnapshot
     {

@@ -19,20 +19,6 @@ namespace
                         float(std::minstd_rand::max() - std::minstd_rand::min());
     }
 } // namespace
-bool OpenBlood2::valid_particle_stream(const ParticleStreamSettings& s)
-{
-    auto bound = [](float v, float lo, float hi) { return std::isfinite(v) && v >= lo && v <= hi; };
-    auto color = [&](DVector v) { return bound(v.x, 0, 255) && bound(v.y, 0, 255) && bound(v.z, 0, 255); };
-    auto path = [](const std::string& p) { return p.size() <= 1000 && p.find('\0') == p.npos; };
-    return bound(s.particles_per_second, 0, 10000) && bound(s.burst_wait, 0, 600) &&
-           bound(s.rotation_velocity, -10000, 10000) && bound(s.radius, 0, 640000) &&
-           bound(s.position_radius, 0, 10000) && bound(s.min_velocity, s.system ? -10000 : 0, 10000) &&
-           bound(s.max_velocity, s.min_velocity, 10000) && bound(s.spread, 0, 10000) && s.count <= 256 &&
-           color(s.min_color) && color(s.max_color) && std::isfinite(s.alpha) && bound(s.min_life, 0, 600) &&
-           bound(s.max_life, s.min_life, 600) && bound(s.ramp_time, 0, 600) && bound(s.delay, 0, 600) &&
-           bound(s.gravity, -10000, 10000) && s.ramp_flags <= 15 && path(s.texture) &&
-           bound(s.sound_radius, 0, 100000) && std::all_of(s.sounds.begin(), s.sounds.end(), path);
-}
 bool CParticleStreamFX::Init(const ParticleStreamSettings& s, std::string& failure)
 {
     failure.clear();

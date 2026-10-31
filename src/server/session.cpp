@@ -16,6 +16,7 @@ namespace OpenBlood2
         game_.server.remote_event_sink = {};
         game_.server.remote_audio_sink = {};
         game_.server.remote_effect_sink = {};
+        game_.server.remote_stream_sink = {};
     }
     bool ServerSession::start(const Config& config, std::string_view name, unsigned mode, std::string& error,
                               const MultiplayerRules& rules)
@@ -77,6 +78,10 @@ namespace OpenBlood2
         WorldRequest request;
         request.game_type = DBYTE(mode_);
         request.filename = rotation_[index];
+        stream_emitters_.clear();
+        game_.server.remote_stream_sink =
+            [this](ObjectId owner, const ParticleStreamSettings& settings, std::string& failure)
+        { return capture_stream(owner, settings, failure); };
         if (!game_.load_request(request, error))
             return false;
         g_ctf.only_flag_scores = rules_.only_flag_scores;
@@ -134,6 +139,7 @@ namespace OpenBlood2
         game_.server.remote_event_sink = {};
         game_.server.remote_audio_sink = {};
         game_.server.remote_effect_sink = {};
+        game_.server.remote_stream_sink = {};
         started_ = false; // A failed load cannot resume a partially destroyed world.
         if (!load_map((map_index_ + 1) % rotation_.size(), error))
             return false;
@@ -266,6 +272,14 @@ namespace OpenBlood2
         frame.player_alive = !owner->m_damage.IsDead();
         if (!capture_client_objects(game_, frame, error, true))
             return false;
+        prune_streams();
+        for (const auto& stream : stream_emitters_)
+        {
+            const auto target = std::lower_bound(frame.objects.begin(), frame.objects.end(), stream.owner.slot,
+                                                 [](const auto& object, auto slot) { return object.id.slot < slot; });
+            if (target != frame.objects.end() && target->id == stream.owner)
+                target->particle_stream = stream.settings;
+        }
         out = Net::snapshot_values(frame);
         ++next_snapshot_;
         return true;

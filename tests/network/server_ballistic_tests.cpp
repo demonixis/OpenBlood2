@@ -141,6 +141,12 @@ namespace
                 CHECK(session.player_count() == 2 && game.client_effects.shotgun_effects.started == 0 &&
                       game.client_effects.shotgun_effects.casings.empty() &&
                       game.client_effects.shotgun_effects.reports.empty());
+                ParticleStreamSettings stream;
+                stream.on = true;
+                stream.count = 128;
+                CHECK(game.server.PublishParticleStream(source->handle, stream, error));
+                CHECK(game.client_effects.particle_streams.active.empty() &&
+                      !game.client_effects.particle_streams.started);
                 CHECK(game.server.audio.voices().size() == logical);
             }
             for (unsigned i = 0; i < reference.size(); ++i)

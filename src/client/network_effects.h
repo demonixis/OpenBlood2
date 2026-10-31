@@ -43,5 +43,6 @@ namespace OpenBlood2
         std::vector<Net::EffectEvent> pending_;
         std::size_t pending_bytes_ = 0;
         int debris_detail_ = 2;
+        std::vector<ObjectId> stream_owners_;
     };
 } // namespace OpenBlood2

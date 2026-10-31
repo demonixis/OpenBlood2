@@ -2,6 +2,7 @@
 #include "client/effect_queries.h"
 #include "client/effect_services.h"
 #include "client/effect_snapshot.h"
+#include <algorithm>
 #include <cmath>
 namespace OpenBlood2
 {
@@ -9,6 +10,7 @@ namespace OpenBlood2
     {
         pending_.clear();
         pending_bytes_ = 0;
+        stream_owners_.clear();
         runtime_.reset_world();
         scene_ = {};
         last_error.clear();
@@ -66,6 +68,41 @@ namespace OpenBlood2
         // prevents the ordinary pool advance from integrating it a second time.
         time_ += seconds;
         EffectServices services{queries, runtime_, &resources, &sprites, &audio, time_, seconds};
+        // Descriptors arrive atomically with reliable membership, including late joins.
+        // Remember failed/expired starts as well, so snapshots never restart an emitter.
+        std::erase_if(stream_owners_, [&](auto id) { return !world.get(id) || !world.get(id)->particle_stream; });
+        auto& streams = runtime_.particle_streams;
+        std::erase_if(streams.active,
+                      [&](const auto& stream)
+                      {
+                          if (world.get(stream.owner) && world.get(stream.owner)->particle_stream)
+                              return false;
+                          ++streams.expired;
+                          for (auto& report : streams.reports)
+                              if (report.id == stream.effect.id)
+                                  report.removed = true;
+                          return true;
+                      });
+        for (const auto& object : world.frame().objects)
+        {
+            if (!object.particle_stream ||
+                std::find(stream_owners_.begin(), stream_owners_.end(), object.id) != stream_owners_.end())
+                continue;
+            stream_owners_.push_back(object.id);
+            auto settings = *object.particle_stream;
+            // Arrival starts a fresh local emitter in the current visible state;
+            // the source's creation-time On flag may have changed before admission.
+            settings.on = (object.user_flags & 1u) != 0;
+            std::string detail;
+            const EffectOwner source{world.reference(object.id), object.pose, object.user_flags,
+                                     "Network particle stream"};
+            if (!runtime_.particle_streams.publish(source, settings, &resources, time_, detail))
+            {
+                ++failed;
+                last_error = detail;
+            }
+        }
+
         for (const auto& event : pending_)
         {
             // Detached impact effects survive their source's removal. Identity
@@ -179,6 +216,7 @@ namespace OpenBlood2
         step(runtime_.lightning.advance(time_), runtime_.lightning.update_error);
         step(runtime_.blood_spurts.advance(time_, services), runtime_.blood_spurts.update_error);
         step(runtime_.explosion_fragments.advance(time_, queries), runtime_.explosion_fragments.update_error);
+        step(runtime_.particle_streams.advance(time_, world), runtime_.particle_streams.update_error);
         ClientEffectsFrame frame;
         frame.world = owner_.world;
         frame.sequence = scene_.frame().sequence + 1;

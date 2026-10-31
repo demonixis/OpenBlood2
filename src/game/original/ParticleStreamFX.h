@@ -2,28 +2,8 @@
 #include "engine/model.h"
 #include "engine/particles.h"
 #include "engine/resources.h"
-#include <array>
+#include "game/particle_stream_settings.h"
 #include <random>
-namespace OpenBlood2
-{
-    struct ParticleStreamSettings
-    {
-        // Original CParticleSystemFX has a different emission clock and local-axis velocity.
-        bool system = false;
-        float particles_per_second = 0, burst_wait = 0, rotation_velocity = 0;
-        float radius = 1000, position_radius = 1, min_velocity = 0, max_velocity = 25, spread = 0;
-        unsigned count = 1;
-        DVector min_color{255, 255, 255}, max_color{255, 255, 255};
-        float alpha = 1, min_life = 1, max_life = 2, ramp_time = 0, delay = .1f, gravity = 15;
-        DBYTE ramp_flags = 0;
-        bool on = false;
-        std::string texture = "SpriteTextures\\drop32_1.dtx";
-        // Sent by the original server, but never read by its SFXMgr client branch.
-        float sound_radius = 200;
-        std::array<std::string, 3> sounds;
-    };
-    bool valid_particle_stream(const ParticleStreamSettings&);
-} // namespace OpenBlood2
 // Selected original ClientShellDLL/ParticleStreamFX, with checked value-owned services.
 class CParticleStreamFX
 {

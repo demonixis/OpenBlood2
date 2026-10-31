@@ -38,7 +38,7 @@ namespace
         auto e = sample();
         std::vector<std::uint8_t> bytes, again;
         CHECK(encode_effect(e, bytes));
-        const std::vector<std::uint8_t> header{0x42, 0x32, 0x45, 0x46, 21, 0, 1, 7, 0, 0, 0, 0,
+        const std::vector<std::uint8_t> header{0x42, 0x32, 0x45, 0x46, 22, 0, 1, 7, 0, 0, 0, 0,
                                                0,    0,    0,    2,    0,  0, 0, 0, 0, 0, 0, 1};
         CHECK(std::equal(header.begin(), header.end(), bytes.begin()));
         EffectEvent decoded = sample();

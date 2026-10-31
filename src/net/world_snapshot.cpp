@@ -3,6 +3,7 @@
 #include "net/admission.h"
 #include "net/codec.h"
 #include "net/collision_codec.h"
+#include "net/particle_stream_codec.h"
 #include "net/transport.h"
 #include <algorithm>
 #include <cmath>
@@ -59,6 +60,7 @@ namespace OpenBlood2::Net
             to.world_model_index = from.world_model_index;
             to.world_model_bound = from.world_model_bound;
             to.collision = from.collision;
+            to.particle_stream = from.particle_stream;
         }
         template <class To, class From> void copy_frame(To& to, const From& from)
         {
@@ -168,6 +170,7 @@ namespace OpenBlood2::Net
         for (auto id : s.sky.objects)
             if (!identity(id))
                 return false;
+        std::size_t streams = 0;
         ObjectId previous;
         for (const auto& o : s.objects)
         {
@@ -193,6 +196,8 @@ namespace OpenBlood2::Net
                   (o.collision.container && (!o.world_model_index || o.world_model_index >= 65536)))) ||
                 o.hidden_nodes.size() > 256 ||
                 !std::all_of(o.hidden_nodes.begin(), o.hidden_nodes.end(), [](auto n) { return n <= 1; }))
+                return false;
+            if (o.particle_stream && (++streams > 128 || !valid_particle_stream(*o.particle_stream)))
                 return false;
             previous = o.id;
         }
@@ -255,6 +260,9 @@ namespace OpenBlood2::Net
             w.u32(o.world_model_index);
             w.u8(o.world_model_bound);
             write_collision_values(w, o.collision);
+            w.u8(o.particle_stream.has_value());
+            if (o.particle_stream)
+                write_particle_stream(w, *o.particle_stream);
         }
         write_effects(w, s.polygrids);
         write_effects(w, s.particle_streams);
@@ -332,6 +340,15 @@ namespace OpenBlood2::Net
                 return false;
             if (!read_collision_values(r, o.collision))
                 return false;
+            bool stream = false;
+            if (!read_bool(r, stream))
+                return false;
+            if (stream)
+            {
+                o.particle_stream.emplace();
+                if (!read_particle_stream(r, *o.particle_stream))
+                    return false;
+            }
             s.objects.push_back(std::move(o));
         }
         if (!read_effects(r, s.polygrids) || !read_effects(r, s.particle_streams) || !r.done() || !valid_snapshot(s))

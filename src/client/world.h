@@ -3,7 +3,9 @@
 #include "engine/model.h"
 #include "engine/object_id.h"
 #include "engine/sprite.h"
+#include "game/particle_stream_settings.h"
 #include <array>
+#include <optional>
 
 namespace OpenBlood2
 {
@@ -37,6 +39,8 @@ namespace OpenBlood2
         std::uint32_t world_model_index = UINT32_MAX;
         bool world_model_bound = false;
         ClientCollisionValues collision;
+        // Immutable, owner-bound emitter; lifecycle shares reliable object membership.
+        std::optional<ParticleStreamSettings> particle_stream;
     };
     struct ClientSky
     {

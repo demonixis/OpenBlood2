@@ -1,0 +1,83 @@
+{
+  "date": "2026-10-31",
+  "scope": "M9 protocol 22 owner-bound ParticleStream/System membership and independent client runtimes",
+  "original_source_policy": "Read-only reference; existing selective ports reused, no new algorithm imports",
+  "files": [
+    {
+      "path": "../sources/blood2/ObjectDLL/ClientParticleStreamSFX.cpp",
+      "sha256": "1471bf63a677a68dbfa7ea6efb909dcf45a2cf2c1ae231cc840ea9aa2b7b287f"
+    },
+    {
+      "path": "../sources/blood2/ObjectDLL/ParticleSystem.cpp",
+      "sha256": "aa731cbf37e427ddda3f2f576a1926928f720469ff0ad3bb541bf4d2e34f3b80"
+    },
+    {
+      "path": "../sources/blood2/ClientShellDLL/ParticleStreamFX.cpp",
+      "sha256": "3ee43cbf08fda7abc3697cd9b6b8811f3fed9bde7bd82cd3af5d3556007404c0"
+    },
+    {
+      "path": "../sources/blood2/ClientShellDLL/ParticleSystemFX.cpp",
+      "sha256": "c7cf3ec76a5cc033b2b675364b1e374bb2ae2eb4e352e294b2c69b8840d286a3"
+    },
+    {
+      "path": "../sources/blood2/ClientShellDLL/SFXMgr.cpp",
+      "sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1"
+    },
+    {
+      "path": "src/game/original/ParticleStreamFX.cpp",
+      "sha256": "cd56015201e992f00df8710953a571c470be9d70f187c7008f6c30afe3f136a5"
+    },
+    {
+      "path": "src/game/original/ParticleStreamFX.h",
+      "sha256": "fd1ff415bf5386c6b9d80414891092b4f1f8732b5f748bb2150a83a1d808eaf3"
+    },
+    {
+      "path": "src/game/original/ClientParticleStreamSFX.cpp",
+      "sha256": "d4644fd9ec26c001c5defda011af64b5d1715226f006ed6a28957b07f84a3587"
+    },
+    {
+      "path": "src/game/original/ParticleSystem.cpp",
+      "sha256": "bf3fbe168d7246ca27544a9cffbfd99af341f9290107a44ec3f4d689b49b7799"
+    },
+    {
+      "path": "src/game/particle_stream_settings.h",
+      "sha256": "3735a0e966705a6449e9ac2d2ce70e6e9eaaf03c84cc25fb08e81a5dcc62af08"
+    },
+    {
+      "path": "src/game/particle_streams.cpp",
+      "sha256": "da2b898e45a44550fa34e15686fff5a88dc4b7e0af4b7527c16720f55c8468de"
+    },
+    {
+      "path": "src/net/particle_stream_codec.h",
+      "sha256": "2b884b35baf2d0537cd7194cf328e05b10263f6e264b9928d05742b6697cfb14"
+    },
+    {
+      "path": "src/net/world_snapshot.cpp",
+      "sha256": "50087a0f058637c81edbfcea384fb8fb45b6368aa8f6d1250235eb426b3be968"
+    },
+    {
+      "path": "src/net/world_patch.cpp",
+      "sha256": "309ba6ecea7e1ec8d4fd36f47d78aebf0eb92fc298eca090080ab496fcf93b2e"
+    },
+    {
+      "path": "src/client/network_effects.cpp",
+      "sha256": "285cc2fefe3b5ad82c2391be48c153e79a5c835d0ed51d9e41ec4be3ee81da1a"
+    },
+    {
+      "path": "src/client/network_world.cpp",
+      "sha256": "e4dee94e845e59c2f709215a9f635e6e6e13024d6a9b5a87ea401a3bb28ac4a0"
+    },
+    {
+      "path": "src/server/effects.cpp",
+      "sha256": "cd0400f757dc6d4dc9093e7cc4f2493388f5179fac749b4720bf34595d07c775"
+    },
+    {
+      "path": "src/server/session.cpp",
+      "sha256": "07861e3b9913a020680c75f98c83be038c6c9066188ce07eb93fef4553307630"
+    },
+    {
+      "path": "src/game/server_effects.cpp",
+      "sha256": "b95fc643d163639e9234a2f47b414c2884c7da313ccd7f099bcbefb82ab89724"
+    }
+  ]
+}

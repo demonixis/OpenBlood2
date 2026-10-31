@@ -174,6 +174,16 @@ namespace OpenBlood2
     {
         if (!trace_service("PublishParticleStream"))
             return 0;
+        if (remote_stream_sink)
+        {
+            const auto source = effect_owner(owner);
+            if (!source || !client_resources)
+            {
+                error = "Particle stream owner/resources/pose unavailable";
+                return 0;
+            }
+            return remote_stream_sink(source.id.object, settings, error);
+        }
         return particle_streams.publish(effect_owner(owner), settings, client_resources, objects_.time(), error);
     }
     std::uint64_t ServerAdapter::PublishObjectParticles(HOBJECT owner, unsigned type, std::string& error,

@@ -1668,3 +1668,32 @@ Network publication skips these server cosmetic pools without touching damage,
 logical audio, source game RNG, solo services or CMoveMgr integration. Persistent
 owner-bound FX, projectile trails, fog and remaining presentation consumers still
 need their own baselines/delivery. PBR references and M2-GPU-001/M3 remain separate.
+
+## Reliable owner-bound particle streams
+
+The [stream continuation](../implementation/reports/m9_stream_network.md) adds
+protocol 22 optional ParticleStream/System recipes to object metadata. No separate
+cross-channel creation race or runtime particle arrays are introduced. The bounded
+1 MiB baseline/patch envelope, 128 active emitters, original numeric limits and
+1000-byte resource/sound fields apply on decode and on the merged world. Canonical
+booleans, finite values, whole-frame atomic validation and object generation history
+remain required. An existing recipe cannot be replaced or removed while its owner
+survives; OFF uses the owner's visible user flag. New recipes may attach to an
+existing owner once. World replacement clears descriptor ownership.
+
+Install server capture before map initialization. Prune retired owners before
+publication/snapshot, refuse duplicates and validate actual external textures;
+headless servers retain descriptors without creating cosmetic particles. Solo
+publication remains synchronous and uses the existing runtime. The network client
+starts each descriptor once, keeps failed/expired starts remembered while the
+owner lives, and removes old-generation particles before admitting replacements.
+It follows replica poses and visibility using original ParticleStream/System code.
+The authored initial ON and unused three-sound tail remain in the descriptor;
+network arrival starts from current owner visibility to avoid an obsolete ON flash.
+This is an explicit late-arrival adaptation: no past particles or ramp history are
+replayed. Original System floor(rate * elapsed), hidden internal emission, stream
+ramp rules, private RNG, particle budgets and explicit failures remain unchanged.
+
+Object-particle recipes/projectile trails, PolyGrids, WarpGates, evaluated lights
+and remaining presentation consumers are separate deliveries. Keep one CMoveMgr
+integration, logical server sound/RNG, all solo clocks and immutable PBR references.

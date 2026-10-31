@@ -137,6 +137,13 @@ namespace OpenBlood2
                         error = "World patch resurrects a retired generation";
                         return false;
                     }
+                    if (replacing && current.objects[left].particle_stream &&
+                        (!object.particle_stream ||
+                         !same_particle_stream(*current.objects[left].particle_stream, *object.particle_stream)))
+                    {
+                        error = "World patch changes an existing particle stream recipe";
+                        return false;
+                    }
                     if (replacing)
                         ++left;
                     next.objects.push_back(object);

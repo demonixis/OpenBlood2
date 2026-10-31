@@ -26,7 +26,7 @@ using Clock = std::chrono::steady_clock;
     } while (false)
 namespace
 {
-    bool client(const char* port_text, const char* data, bool observer, bool drive, bool fire)
+    bool client(const char* port_text, const char* data, bool observer, bool drive, bool fire, bool streams)
     {
         std::string error;
         unsigned port = 0;
@@ -44,6 +44,7 @@ namespace
         Clock::time_point leave_at;
         bool announced = false, leaving = false, saw_arrival = false, saw_departure = false, displaced = false;
         unsigned startup = 0, camera_frames = 0;
+        std::size_t stream_peak = 0;
         unsigned command_stage = 0;
         float fire_ammo = 0;
         DVector initial;
@@ -55,6 +56,7 @@ namespace
             const bool firing =
                 fire && command_stage == 7 && !leaving && (!client.weapon_ack() || client.weapon_ack()->fired[0] < 3);
             CHECK(client.update(Clock::now(), input, !leaving, error, {firing}));
+            stream_peak = std::max(stream_peak, client.effects().runtime().particle_streams.particle_count());
             std::vector<PrivateEvent> events;
             client.take_events(events);
             for (const auto& value : events)
@@ -175,6 +177,19 @@ namespace
                     std::cout << "Private events=" << client.event_sequence()
                               << ", health=" << client.hud().stats.health << ", startup_announcements=" << startup
                               << "\n";
+                    if (streams)
+                    {
+                        const auto& fx = client.effects().runtime().particle_streams;
+                        CHECK(fx.started == 2 && fx.active.size() == 2 && stream_peak && !fx.failed &&
+                              !client.effects().failed);
+                        for (const auto& stream : fx.active)
+                        {
+                            const auto* owner = world.get(stream.owner);
+                            CHECK(owner && owner->particle_stream && stream.effect.updates);
+                        }
+                        std::cout << "Replicated streams=" << fx.started << ", particle peak=" << stream_peak
+                                  << ", late arrival=" << !observer << ", no duplicate starts/failures\n";
+                    }
                     if (drive)
                     {
                         CHECK(displaced && client.reports >= 4 && client.movement().corrections >= 3);
@@ -227,12 +242,14 @@ namespace
             return SDL_GetIOStatus(stream) != SDL_IO_STATUS_ERROR;
         }
     };
-    bool parent(const char* self, const char* server, const char* data, bool drive, bool fire)
+    bool parent(const char* self, const char* server, const char* data, bool drive, bool fire, bool streams)
     {
         std::string error;
         Process host;
-        const char* args[]{server,   "--data-dir", data,     "--world", "multi/bb_crypt", "--mode", "bloodbath",
-                           "--bind", "127.0.0.1",  "--port", "0",       "--ticks",        "900",    nullptr};
+        const char* args[]{
+            server,   "--data-dir", data,     "--world",   streams ? "multi/bb_bridge" : "multi/bb_crypt",
+            "--mode", "bloodbath",  "--bind", "127.0.0.1", "--port",
+            "0",      "--ticks",    "900",    nullptr};
         host.handle = SDL_CreateProcess(args, true);
         error = SDL_GetError();
         CHECK(host.handle);
@@ -280,7 +297,10 @@ namespace
                                      port.c_str(),
                                      data,
                                      i ? "visitor" : "observer",
-                                     fire ? "fire" : drive ? "movement" : "passive",
+                                     streams ? "streams"
+                                     : fire  ? "fire"
+                                     : drive ? "movement"
+                                             : "passive",
                                      nullptr};
             clients[i].handle = SDL_CreateProcess(child_args, true);
             error = SDL_GetError();
@@ -320,12 +340,14 @@ int main(int argc, char** argv)
 {
     if (argc == 6 && std::string_view(argv[1]) == "--peer")
         return client(argv[2], argv[3], std::string_view(argv[4]) == "observer",
-                      std::string_view(argv[5]) == "movement", std::string_view(argv[5]) == "fire")
+                      std::string_view(argv[5]) == "movement", std::string_view(argv[5]) == "fire",
+                      std::string_view(argv[5]) == "streams")
                    ? 0
                    : 1;
     return (argc == 3 || argc == 4) &&
                    parent(argv[0], argv[1], argv[2], argc == 4 && std::string_view(argv[3]) == "--movement",
-                          argc == 4 && std::string_view(argv[3]) == "--fire")
+                          argc == 4 && std::string_view(argv[3]) == "--fire",
+                          argc == 4 && std::string_view(argv[3]) == "--streams")
                ? 0
                : 1;
 }

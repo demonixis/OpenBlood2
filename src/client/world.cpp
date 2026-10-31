@@ -24,6 +24,7 @@ namespace OpenBlood2
             error = "Client world frame limit exceeded";
         else
         {
+            std::size_t streams = 0;
             ObjectId previous;
             for (const auto& object : next.objects)
             {
@@ -31,6 +32,11 @@ namespace OpenBlood2
                     (previous && previous.slot >= object.id.slot))
                 {
                     error = "Invalid or unordered client object identity";
+                    break;
+                }
+                if (object.particle_stream && (++streams > 128 || !valid_particle_stream(*object.particle_stream)))
+                {
+                    error = "Invalid or excessive client particle stream descriptors";
                     break;
                 }
                 previous = object.id;

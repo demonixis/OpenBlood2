@@ -314,12 +314,15 @@ namespace
         ServerNetwork network(server);
         CHECK(network.listen("127.0.0.1", 0, 3, error));
         NetworkClient clients[2];
+        // Content preparation may be slow under sanitizers. Complete both mounts/hashes
+        // before starting either peer's real admission deadline.
+        for (auto& client : clients)
+            CHECK(client.prepare(config, error));
         for (unsigned i = 0; i < 2; ++i)
         {
             JoinProfile p;
             p.name = i ? "Second" : "First";
             p.character = i;
-            CHECK(clients[i].prepare(config, error));
             CHECK(clients[i].connect("127.0.0.1", network.port(), p, NetworkClient::Clock::now(), error));
         }
         std::array<std::uint64_t, 2> worlds{}, players{};

@@ -1,5 +1,11 @@
 # Source and Dependency Provenance
 
+The M9 [network particle-stream lot](reports/m9_stream_network.md) extracts the
+existing ParticleStream/System value descriptor and validation unchanged, then
+transports it with generation-qualified owner membership. Original client emission
+algorithms remain unchanged; network arrival selects current owner visibility.
+See the [source ledger](sources/m9_stream_network_sources.json).
+
 The M9 [instant-effect lot](reports/m9_instant_network.md) routes the existing
 explosion, CGibFX and laser/lightning ports through client-owned runtimes. Tagged
 recipe encoding and detached client execution are engine adaptations; original

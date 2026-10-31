@@ -55,7 +55,7 @@ namespace
         return true;
     }
 #endif
-    bool run(const char* data, bool ballistics, bool impacts, bool instants)
+    bool run(const char* data, bool ballistics, bool impacts, bool instants, bool streams)
     {
         std::string error;
         Config config;
@@ -109,6 +109,24 @@ namespace
         }
         object.pose.position = eye;
         values.objects.push_back(object);
+        if (streams)
+            for (unsigned kind = 0; kind < 2; ++kind)
+            {
+                ClientObject emitter;
+                emitter.id = {kind + 1, 1};
+                emitter.user_flags = 1;
+                emitter.pose.position = vector_add(eye, {kind ? 20.f : -20.f, 0, 80});
+                emitter.particle_stream.emplace();
+                auto& recipe = *emitter.particle_stream;
+                recipe.on = true;
+                recipe.system = kind != 0;
+                recipe.count = 12;
+                recipe.particles_per_second = 600;
+                recipe.position_radius = 10;
+                recipe.radius = 1500;
+                recipe.min_color = recipe.max_color = kind ? DVector{255, 40, 40} : DVector{40, 255, 40};
+                values.objects.push_back(std::move(emitter));
+            }
         Net::WorldSnapshot decoded;
         CHECK(Net::encode_world_snapshot(Net::snapshot_values(values), bytes) &&
               Net::decode_world_snapshot(bytes, decoded));
@@ -167,7 +185,8 @@ namespace
             Net::EffectEvent decoded_effect;
             CHECK(Net::encode_effect(event, bytes) &&
                   Net::decode_effect(bytes, decoded_effect) == Net::DecodeEffect::Ok);
-            CHECK(ballistic.receive(decoded_effect, error));
+            if (!streams)
+                CHECK(ballistic.receive(decoded_effect, error));
             if (impacts)
                 for (unsigned kind = 1; kind < (instants ? 10u : 5u); ++kind)
                 {
@@ -233,8 +252,13 @@ namespace
             CHECK(!ballistic.failed);
             auto frame = ballistic.scene().frame();
             CHECK(effects.receive(std::move(frame), error));
-            CHECK(instants ? effects.frame().models.size() >= 12 : effects.frame().models.size() == 1);
-            CHECK(update_model_scene(input, scene, error) && scene.world_draws.size() == 1);
+            CHECK(instants ? effects.frame().models.size() >= 12
+                           : effects.frame().models.size() == (streams ? 0u : 1u));
+            if (streams)
+                CHECK(ballistic.runtime().particle_streams.started == 2 &&
+                      ballistic.runtime().particle_streams.active[0].effect.emitted >= 12 &&
+                      ballistic.runtime().particle_streams.active[1].effect.emitted > 0);
+            CHECK(update_model_scene(input, scene, error) && scene.world_draws.size() == (streams ? 0u : 1u));
             CHECK(update_explosion_model_scene(input, explosions, error) &&
                   (instants ? explosions.world_draws.size() >= 11 : explosions.world_draws.empty()));
             CHECK(update_sprite_scene(input, sprite, error) && sprite.entries.size() >= 2);
@@ -279,13 +303,15 @@ namespace
                 std::size_t changed = 0;
                 for (std::size_t i = 0; i < original.size(); i += 4)
                     changed += !std::equal(original.begin() + i, original.begin() + i + 3, baseline.begin() + i);
-                CHECK(changed > 20 && capture.save(instants  ? "network-instant-original.png"
-                                                   : impacts ? "network-impact-original.png"
-                                                             : "network-ballistic-original.png"));
+                CHECK(changed > 20 && capture.save(streams    ? "network-stream-original.png"
+                                                   : instants ? "network-instant-original.png"
+                                                   : impacts  ? "network-impact-original.png"
+                                                              : "network-ballistic-original.png"));
                 std::cout << "Independent decoded "
-                          << (instants  ? "all instant families"
-                              : impacts ? "mixed impact"
-                                        : "ballistic")
+                          << (streams    ? "persistent streams/systems"
+                              : instants ? "all instant families"
+                              : impacts  ? "mixed impact"
+                                         : "ballistic")
                           << " rendering: changed pixels=" << changed << '\n';
             }
             CHECK(!presenter.rebuilt || presenter.mesh_revision == input.world_revision);
@@ -293,9 +319,10 @@ namespace
             presenter.shading = SurfaceShading::Standard;
             CHECK(render(gpu, presenter, input, capture, enhanced, error));
             if (ballistics)
-                CHECK(capture.save(instants  ? "network-instant-enhanced.png"
-                                   : impacts ? "network-impact-enhanced.png"
-                                             : "network-ballistic-enhanced.png"));
+                CHECK(capture.save(streams    ? "network-stream-enhanced.png"
+                                   : instants ? "network-instant-enhanced.png"
+                                   : impacts  ? "network-impact-enhanced.png"
+                                              : "network-ballistic-enhanced.png"));
             presenter.shading = SurfaceShading::Original;
             CHECK(render(gpu, presenter, input, capture, again, error));
             CHECK(original == again && original != enhanced && count > 0);
@@ -323,10 +350,11 @@ namespace
 } // namespace
 int main(int argc, char** argv)
 {
+    const bool streams = argc == 3 && std::string_view(argv[2]) == "--streams";
     const bool instants = argc == 3 && std::string_view(argv[2]) == "--instants";
     const bool impacts = instants || (argc == 3 && std::string_view(argv[2]) == "--impacts");
-    return (argc == 2 || (argc == 3 && (impacts || std::string_view(argv[2]) == "--ballistics"))) &&
-                   run(argv[1], argc == 3, impacts, instants)
+    return (argc == 2 || (argc == 3 && (streams || impacts || std::string_view(argv[2]) == "--ballistics"))) &&
+                   run(argv[1], argc == 3, impacts, instants, streams)
                ? 0
                : 1;
 }

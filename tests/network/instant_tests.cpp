@@ -25,7 +25,7 @@ namespace
         {
             auto event = effect_fixture::sample(kind);
             std::vector<std::uint8_t> bytes, again;
-            CHECK(encode_effect(event, bytes) && bytes[4] == 21 && bytes[6] == kind + 1);
+            CHECK(encode_effect(event, bytes) && bytes[4] == 22 && bytes[6] == kind + 1);
             EffectEvent decoded;
             decoded.sequence = 999;
             for (std::size_t n = 0; n < bytes.size(); ++n)
