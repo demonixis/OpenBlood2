@@ -1,0 +1,145 @@
+{
+  "scope": "Independent network explosions, flesh/destruction fragments and instant laser/lightning effects",
+  "baseline": "eb714e503e2bc772dcdf719e05e6628a3acf6cb6",
+  "sources": [
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/ClientExplosionSFX.cpp",
+      "sha256": "fc51674223cf67456341d4529bc93acbe8df9365a8730b0491c7e22803c85a09"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/ClientGibFX.cpp",
+      "sha256": "df9438b10d31a49c787dde9a1f3795e11fc436dd37c34799ffa30de519f305ba"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/Debris.cpp",
+      "sha256": "65cd8053b79a6ae5c9107d8997fb4a157debc1427afb2c5ba26acc7bbf60575b"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/ClientLightningSFX.cpp",
+      "sha256": "41a38c20f5d019c4ed321b292c63b17e7862ff9a9ed31b853633086b2de3f338"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ExplosionFX.cpp",
+      "sha256": "543eb9d6f890199019a0b98a3ad545d0826bdd19b6a6f3a6c5d0f98452791342"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/gibfx.cpp",
+      "sha256": "4e448e2303e82eed903ae31a557a83963ea424f0c0a69406947ef5e6793858c5"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/LaserBeamFX.cpp",
+      "sha256": "7f729e2e2b79fc9111b9b16e152ace1a274177d280ed9c0ac12e3535665a87d1"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/LightningFX.cpp",
+      "sha256": "d66d01cde4b40f3fd7eb35253f9e69a4fabd0d3c28e266ac289a45906f79ab94"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "eb714e503e2bc772dcdf719e05e6628a3acf6cb6",
+      "path": "src/game/server_effects.cpp",
+      "sha256": "41a3f993a4aaf7d667c77d95c8b88da1d7178aa04c4671e42d502ae934d00e36"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "eb714e503e2bc772dcdf719e05e6628a3acf6cb6",
+      "path": "src/game/explosion_sprites.cpp",
+      "sha256": "a0f67e63531d372b3cbd748c3f09e20da7d96a4ec6429a72e2ffd31b91ee35f4"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "eb714e503e2bc772dcdf719e05e6628a3acf6cb6",
+      "path": "src/game/explosion_models.cpp",
+      "sha256": "395f5d973c58f8b22d30c19b6d15b95d480bb67530b1d244552de1186e0dacbc"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "eb714e503e2bc772dcdf719e05e6628a3acf6cb6",
+      "path": "src/game/explosion_rings.cpp",
+      "sha256": "58597de5d8ae2692bb774a42bc46b8c6490c1502d85f679bed16b719b02a2225"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "eb714e503e2bc772dcdf719e05e6628a3acf6cb6",
+      "path": "src/game/explosion_fragments.cpp",
+      "sha256": "6b577f7f3060ac7bcd5c9bca7bf67fbb18c44d4e2cf63bf8c9704298914f484c"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "eb714e503e2bc772dcdf719e05e6628a3acf6cb6",
+      "path": "src/game/explosion_flames.cpp",
+      "sha256": "6f51516deb6e45e677202fba38656fe91919352c1d5291b9de1f2d10bcaed88e"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "eb714e503e2bc772dcdf719e05e6628a3acf6cb6",
+      "path": "src/game/explosion_lights.cpp",
+      "sha256": "d3b5793ce378913222df456f069017da2c96fc60ca512e92c6fecb9a885f76b6"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "eb714e503e2bc772dcdf719e05e6628a3acf6cb6",
+      "path": "src/game/flesh_gibs.cpp",
+      "sha256": "2060d559ccdf181e1928b69f8dc9c1461f41be2d790ca6a52ccebed6fd59e6f5"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "eb714e503e2bc772dcdf719e05e6628a3acf6cb6",
+      "path": "src/game/original/ObjectParticleFX.cpp",
+      "sha256": "78d869f22fc332449de41af62a4914bd94f87ac816c53ad3beb02f368e925c5f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "eb714e503e2bc772dcdf719e05e6628a3acf6cb6",
+      "path": "src/game/original/LaserBeamFX.cpp",
+      "sha256": "586e0d7fe7617e14c776cdd0d57d92ab2966188b5c587532738ab19afe6a0f7f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "eb714e503e2bc772dcdf719e05e6628a3acf6cb6",
+      "path": "src/game/original/LightningFX.cpp",
+      "sha256": "7315b9146043ec0a8f266ddd80314a1d75c2479354087f8505ff338ed1743989"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "eb714e503e2bc772dcdf719e05e6628a3acf6cb6",
+      "path": "src/game/original/NapalmProjectile.cpp",
+      "sha256": "73c888921fbfd3e12b13368063b2d9d327872af17c461bedb6df3a6805c3c293"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "eb714e503e2bc772dcdf719e05e6628a3acf6cb6",
+      "path": "src/game/original/PlayerObj.cpp",
+      "sha256": "a3fc92906476b89a5ad2199b31d8a55d72311c33b551948d281bbb64db84d88b"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "eb714e503e2bc772dcdf719e05e6628a3acf6cb6",
+      "path": "src/client/network_effects.cpp",
+      "sha256": "fb9a980e1dff3585e6ae8347c63ddad8410d9e5625de933570540092ca104498"
+    }
+  ],
+  "adaptations": [
+    "Protocol21 appends five tagged alternatives to the ordered B2EF stream; no pointer or report/runtime serialization",
+    "Preserve existing per-component explosion publication order, including successful empty branches",
+    "Execute existing cosmetic pools and child collision/audio on the independent client at 60Hz; unchanged solo path",
+    "Canonical absent source for original ownerless debris requests; local destruction detail preference",
+    "Existing renderer/light inputs and fixed budgets unchanged; persistent owner-bound baselines still pending"
+  ]
+}

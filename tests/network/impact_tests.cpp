@@ -26,7 +26,7 @@ namespace
             auto event = effect_fixture::sample(kind);
             std::vector<std::uint8_t> bytes, again;
             CHECK(encode_effect(event, bytes));
-            CHECK(bytes[0] == 0x42 && bytes[1] == 0x32 && bytes[2] == 0x45 && bytes[3] == 0x46 && bytes[4] == 20 &&
+            CHECK(bytes[0] == 0x42 && bytes[1] == 0x32 && bytes[2] == 0x45 && bytes[3] == 0x46 && bytes[4] == 21 &&
                   bytes[5] == 0 && bytes[6] == kind + 1);
             EffectEvent decoded;
             decoded.sequence = 999;
@@ -131,7 +131,7 @@ namespace
         CHECK(ordered.receive(e, error) && ordered.received == 5);
         e.sequence = 7;
         CHECK(!ordered.receive(e, error));
-        for (auto count : ordered.received_kinds)
+        for (auto count : std::span(ordered.received_kinds).first(5))
             CHECK(count == 1);
         std::cout << "Impact protocol: all five variants, little-endian tags, full truncation, 25k mutations, optional "
                      "resources, independent item/byte bounds and ordered mixed recipes passed\n";

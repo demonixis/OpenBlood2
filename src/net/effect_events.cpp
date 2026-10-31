@@ -85,6 +85,40 @@ namespace OpenBlood2::Net
             return vector(s.position) && std::isfinite(length) && std::abs(length - 1) <= .001f &&
                    range(s.scale, 0, 1000) && range(s.grow_scale, 0, .1f) && resource(s.resource);
         }
+        bool valid(const ExplosionRecipe& s)
+        {
+            return s.component <= ExplosionComponent::Lights && s.type <= 31 && vector(s.position) &&
+                   vector(s.normal) && length2(s.normal) >= 1e-12f;
+        }
+        bool valid(const FleshRecipe& s)
+        {
+            return vector(s.position) && vector(s.velocity) && positive(s.dimensions) && range(s.scale, 0, 100) &&
+                   s.scale > 0 && s.count <= 64;
+        }
+        bool valid(const DebrisRecipe& s)
+        {
+            const auto material = s.flags & 255;
+            const bool custom = s.flags & 0x4000;
+            return vector(s.position) && vector(s.velocity) && positive(s.dimensions) && range(s.scale, 0, 100) &&
+                   s.scale > 0 && s.flags <= 65535 &&
+                   (material == 1 || material == 2 || material == 3 || material == 4 || material == 5 ||
+                    material == 7 || material == 9 || material == 10 || material == 20) &&
+                   name(s.model, 100) && name(s.texture, 100) && name(s.sound, 100) &&
+                   (!custom || (!s.model.empty() && !s.texture.empty()));
+        }
+        bool endpoints(DVector from, DVector to)
+        {
+            const auto distance2 = length2({to.x - from.x, to.y - from.y, to.z - from.z});
+            return vector(from) && vector(to) && distance2 >= 1e-12f && distance2 <= 1e14f;
+        }
+        bool valid(const LaserRecipe& s)
+        {
+            return endpoints(s.source, s.destination); // Unknown bytes retain the original red default.
+        }
+        bool valid(const LightningSettings& s)
+        {
+            return endpoints(s.source, s.destination) && s.type <= 2; // Shape/form keep original fallback branches.
+        }
         void write(Writer& w, DVector v)
         {
             w.f32(v.x);
@@ -304,12 +338,101 @@ namespace OpenBlood2::Net
             s.grow_scale = r.f32();
             return read(r, s.resource);
         }
+        void write(Writer& w, const ExplosionRecipe& s)
+        {
+            w.u8(std::uint8_t(s.component));
+            w.u8(std::uint8_t(s.type));
+            write(w, s.position);
+            write(w, s.normal);
+        }
+        bool read(Reader& r, ExplosionRecipe& s)
+        {
+            s.component = ExplosionComponent(r.u8());
+            s.type = r.u8();
+            s.position = read_vector(r);
+            s.normal = read_vector(r);
+            return r.good();
+        }
+        void write(Writer& w, const FleshRecipe& s)
+        {
+            write(w, s.position);
+            write(w, s.velocity);
+            write(w, s.dimensions);
+            w.f32(s.scale);
+            w.u8(std::uint8_t(s.count));
+        }
+        bool read(Reader& r, FleshRecipe& s)
+        {
+            s.position = read_vector(r);
+            s.velocity = read_vector(r);
+            s.dimensions = read_vector(r);
+            s.scale = r.f32();
+            s.count = r.u8();
+            return r.good();
+        }
+        void write(Writer& w, const DebrisRecipe& s)
+        {
+            write(w, s.position);
+            write(w, s.velocity);
+            write(w, s.dimensions);
+            w.u16(std::uint16_t(s.flags));
+            w.f32(s.scale);
+            w.u8(s.amount);
+            w.text(s.model, 100);
+            w.text(s.texture, 100);
+            w.text(s.sound, 100);
+        }
+        bool read(Reader& r, DebrisRecipe& s)
+        {
+            s.position = read_vector(r);
+            s.velocity = read_vector(r);
+            s.dimensions = read_vector(r);
+            s.flags = r.u16();
+            s.scale = r.f32();
+            s.amount = r.u8();
+            s.model = r.text(100);
+            s.texture = r.text(100);
+            s.sound = r.text(100);
+            return r.good();
+        }
+        void write(Writer& w, const LaserRecipe& s)
+        {
+            write(w, s.source);
+            write(w, s.destination);
+            w.u8(s.type);
+        }
+        bool read(Reader& r, LaserRecipe& s)
+        {
+            s.source = read_vector(r);
+            s.destination = read_vector(r);
+            s.type = r.u8();
+            return r.good();
+        }
+        void write(Writer& w, const LightningSettings& s)
+        {
+            write(w, s.source);
+            write(w, s.destination);
+            w.u8(s.shape);
+            w.u8(s.form);
+            w.u8(s.type);
+        }
+        bool read(Reader& r, LightningSettings& s)
+        {
+            s.source = read_vector(r);
+            s.destination = read_vector(r);
+            s.shape = r.u8();
+            s.form = r.u8();
+            s.type = r.u8();
+            return r.good();
+        }
     } // namespace
     bool valid_effect(const EffectEvent& e)
     {
-        const bool source = e.source ? e.source.slot < 65536 && e.source.generation
-                                     : e.source == ObjectId{} && (std::holds_alternative<BloodSpurtRecipe>(e.recipe) ||
-                                                                  std::holds_alternative<BloodSplatSettings>(e.recipe));
+        const bool source = e.source
+                                ? e.source.slot < 65536 && e.source.generation
+                                : e.source == ObjectId{} && (std::holds_alternative<BloodSpurtRecipe>(e.recipe) ||
+                                                             std::holds_alternative<BloodSplatSettings>(e.recipe) ||
+                                                             std::holds_alternative<DebrisRecipe>(e.recipe));
         return e.world && e.player && e.sequence && source && name(e.name, 100) &&
                std::visit([](const auto& s) { return valid(s); }, e.recipe);
     }
@@ -371,6 +494,21 @@ namespace OpenBlood2::Net
                 break;
             case 5:
                 ok = read(r, e.recipe.emplace<BloodSplatSettings>());
+                break;
+            case 6:
+                ok = read(r, e.recipe.emplace<ExplosionRecipe>());
+                break;
+            case 7:
+                ok = read(r, e.recipe.emplace<FleshRecipe>());
+                break;
+            case 8:
+                ok = read(r, e.recipe.emplace<DebrisRecipe>());
+                break;
+            case 9:
+                ok = read(r, e.recipe.emplace<LaserRecipe>());
+                break;
+            case 10:
+                ok = read(r, e.recipe.emplace<LightningSettings>());
                 break;
             default:
                 return DecodeEffect::Malformed;

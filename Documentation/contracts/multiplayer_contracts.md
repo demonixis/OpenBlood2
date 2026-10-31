@@ -1643,3 +1643,28 @@ the exact absent `sounds/gibs/flesh/gib_impact0.wav`; never substitute another
 numbered sound. Cumulative cosmetic audio diagnostics survive world cleanup.
 Logical server sound/RNG and per-weapon selection draws remain unchanged. Other
 cosmetic producers, their children and persistent baselines still need routing.
+
+## Independent instant explosion, fragment and beam recipes
+
+The [instant-effect continuation](../implementation/reports/m9_instant_network.md)
+extends B2EF to protocol 21 with explosion components, flesh/destruction fragments,
+laser and lightning. Preserve existing six-component publication order and empty
+branches; no report IDs, runtime arrays or GPU resources enter the wire. Keep
+8 KiB messages, 2048 recipes/2 MiB queues, finite inputs, original byte/word bounds,
+resource validation and per-recipient overflow behavior. Canonical absent source
+is now also valid for ownerless destruction debris; other new sources require
+world/generation-qualified provenance. No historical instant replay is added.
+
+Run the existing client pools in solo's relative order. Keep per-update fragment
+motion/gravity/rotation, original trail sampling, 25-second grenade light tails,
+first-update laser timing and lightning fallback/typo behavior. Flesh launch blood
+updates exactly once at creation; fragment child splats/audio remain client-local.
+Destruction uses the recipient's existing detail preference, separate cosmetic RNG,
+original material/custom paths, LOW halving/HIGH flesh byte wrap and oldest-slot
+fading. Preserve all capacities and explicit partial failures. Resting fragments
+retain detached lifetime and world-owned cleanup, with no artificial timeout.
+
+Network publication skips these server cosmetic pools without touching damage,
+logical audio, source game RNG, solo services or CMoveMgr integration. Persistent
+owner-bound FX, projectile trails, fog and remaining presentation consumers still
+need their own baselines/delivery. PBR references and M2-GPU-001/M3 remain separate.

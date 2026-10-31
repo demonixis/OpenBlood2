@@ -131,6 +131,10 @@ namespace OpenBlood2
         {
             return effects_;
         }
+        bool set_effect_detail(int detail)
+        {
+            return effects_.set_detail(detail);
+        }
         const ClientHud& hud() const
         {
             return inbox_.hud();

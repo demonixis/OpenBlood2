@@ -98,6 +98,11 @@ namespace OpenBlood2
         const auto window = SDL_GetWindowID(runtime.window);
         const auto format = SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window);
         NetworkClient client;
+        if (!client.set_effect_detail(settings.detail))
+        {
+            error = "Invalid client effect detail preference";
+            return failed();
+        }
         ClientFragTable frag_table(client.resources());
         ScoreboardRenderer frag_renderer(runtime.gpu);
         ScoreboardControl scores;
@@ -385,14 +390,19 @@ namespace OpenBlood2
         SDL_WaitForGPUIdle(runtime.gpu);
         spdlog::info("Network session ended: frames={}, reports={}, states={}, discarded_ticks={}, reason={}", frames,
                      client.reports, client.state_packets, client.discarded_ticks, client.reason());
-        spdlog::info("Impact effects: received={}, failed={}, models={}, billboards={}, cosmetic_sounds={}, "
-                     "audio_failures={}, kinds={}/{}/{}/{}/{}, error={}, audio_error={}",
+        std::string effect_kinds;
+        for (const auto count : client.effects().received_kinds)
+        {
+            if (!effect_kinds.empty())
+                effect_kinds += '/';
+            effect_kinds += std::to_string(count);
+        }
+        spdlog::info("Instant effects: received={}, failed={}, models={}, billboards={}, cosmetic_sounds={}, "
+                     "audio_failures={}, kinds={}, error={}, audio_error={}",
                      client.effects().received, client.effects().failed, client.effects().scene().frame().models.size(),
                      client.effects().scene().frame().billboards.size(), client.audio().effects_started,
-                     client.audio().effects_failed, client.effects().received_kinds[0],
-                     client.effects().received_kinds[1], client.effects().received_kinds[2],
-                     client.effects().received_kinds[3], client.effects().received_kinds[4],
-                     client.effects().last_error, client.audio().last_effect_error);
+                     client.audio().effects_failed, effect_kinds, client.effects().last_error,
+                     client.audio().last_effect_error);
         spdlog::info("Player commands: acknowledged={}, applied={}", client.command_acks, client.commands_applied);
         spdlog::info("Weapon input: frames={}, waiting_ticks={}", client.weapon_frames, client.weapon_wait_ticks);
         if (server)

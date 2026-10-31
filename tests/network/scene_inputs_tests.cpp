@@ -55,7 +55,7 @@ namespace
         return true;
     }
 #endif
-    bool run(const char* data, bool ballistics, bool impacts)
+    bool run(const char* data, bool ballistics, bool impacts, bool instants)
     {
         std::string error;
         Config config;
@@ -169,7 +169,7 @@ namespace
                   Net::decode_effect(bytes, decoded_effect) == Net::DecodeEffect::Ok);
             CHECK(ballistic.receive(decoded_effect, error));
             if (impacts)
-                for (unsigned kind = 1; kind < 5; ++kind)
+                for (unsigned kind = 1; kind < (instants ? 10u : 5u); ++kind)
                 {
                     auto message = effect_fixture::sample(kind);
                     message.player = 1;
@@ -185,7 +185,42 @@ namespace
                         blood->settings.position = at;
                     else if (auto* splat = std::get_if<BloodSplatSettings>(&message.recipe))
                         splat->position = at;
+                    else if (auto* explosion = std::get_if<ExplosionRecipe>(&message.recipe))
+                    {
+                        explosion->position = vector_add(eye, {20, -5, 150});
+                        explosion->normal = {0, 0, -1};
+                    }
+                    else if (auto* flesh = std::get_if<FleshRecipe>(&message.recipe))
+                        flesh->position = at;
+                    else if (auto* debris = std::get_if<DebrisRecipe>(&message.recipe))
+                        debris->position = at;
+                    else if (auto* laser = std::get_if<LaserRecipe>(&message.recipe))
+                    {
+                        laser->source = vector_add(eye, {-25, -5, 50});
+                        laser->destination = vector_add(eye, {25, 5, 75});
+                    }
+                    else if (auto* bolt = std::get_if<LightningSettings>(&message.recipe))
+                    {
+                        bolt->source = vector_add(eye, {-25, 10, 70});
+                        bolt->destination = vector_add(eye, {25, 20, 95});
+                    }
                     CHECK(Net::encode_effect(message, bytes) &&
+                          Net::decode_effect(bytes, decoded_effect) == Net::DecodeEffect::Ok &&
+                          ballistic.receive(decoded_effect, error));
+                }
+            if (instants)
+                for (unsigned component = 1; component < 6; ++component)
+                {
+                    auto e = effect_fixture::sample(5);
+                    e.player = 1;
+                    e.sequence = 10 + component;
+                    auto& s = std::get<ExplosionRecipe>(e.recipe);
+                    s.component = ExplosionComponent(component);
+                    if (s.component == ExplosionComponent::Flames)
+                        s.type = 8;
+                    s.position = vector_add(eye, {20, -5, 150});
+                    s.normal = {0, 0, -1};
+                    CHECK(Net::encode_effect(e, bytes) &&
                           Net::decode_effect(bytes, decoded_effect) == Net::DecodeEffect::Ok &&
                           ballistic.receive(decoded_effect, error));
                 }
@@ -198,15 +233,22 @@ namespace
             CHECK(!ballistic.failed);
             auto frame = ballistic.scene().frame();
             CHECK(effects.receive(std::move(frame), error));
-            CHECK(effects.frame().models.size() == 1);
+            CHECK(instants ? effects.frame().models.size() >= 12 : effects.frame().models.size() == 1);
             CHECK(update_model_scene(input, scene, error) && scene.world_draws.size() == 1);
-            CHECK(update_explosion_model_scene(input, explosions, error) && explosions.world_draws.empty());
+            CHECK(update_explosion_model_scene(input, explosions, error) &&
+                  (instants ? explosions.world_draws.size() >= 11 : explosions.world_draws.empty()));
             CHECK(update_sprite_scene(input, sprite, error) && sprite.entries.size() >= 2);
             if (impacts)
             {
                 CHECK(sprite.entries.size() >= 7);
-                for (const auto count : ballistic.received_kinds)
+                for (const auto count : std::span(ballistic.received_kinds).first(5))
                     CHECK(count == 1);
+                if (instants)
+                {
+                    for (unsigned kind = 5; kind < 10; ++kind)
+                        CHECK(ballistic.received_kinds[kind] == (kind == 5 ? 6u : 1u));
+                    CHECK(sprite.entries.size() >= 100 && !effects.frame().lights.empty());
+                }
             }
             return true;
         };
@@ -237,9 +279,13 @@ namespace
                 std::size_t changed = 0;
                 for (std::size_t i = 0; i < original.size(); i += 4)
                     changed += !std::equal(original.begin() + i, original.begin() + i + 3, baseline.begin() + i);
-                CHECK(changed > 20 &&
-                      capture.save(impacts ? "network-impact-original.png" : "network-ballistic-original.png"));
-                std::cout << "Independent decoded " << (impacts ? "mixed impact" : "ballistic")
+                CHECK(changed > 20 && capture.save(instants  ? "network-instant-original.png"
+                                                   : impacts ? "network-impact-original.png"
+                                                             : "network-ballistic-original.png"));
+                std::cout << "Independent decoded "
+                          << (instants  ? "all instant families"
+                              : impacts ? "mixed impact"
+                                        : "ballistic")
                           << " rendering: changed pixels=" << changed << '\n';
             }
             CHECK(!presenter.rebuilt || presenter.mesh_revision == input.world_revision);
@@ -247,7 +293,9 @@ namespace
             presenter.shading = SurfaceShading::Standard;
             CHECK(render(gpu, presenter, input, capture, enhanced, error));
             if (ballistics)
-                CHECK(capture.save(impacts ? "network-impact-enhanced.png" : "network-ballistic-enhanced.png"));
+                CHECK(capture.save(instants  ? "network-instant-enhanced.png"
+                                   : impacts ? "network-impact-enhanced.png"
+                                             : "network-ballistic-enhanced.png"));
             presenter.shading = SurfaceShading::Original;
             CHECK(render(gpu, presenter, input, capture, again, error));
             CHECK(original == again && original != enhanced && count > 0);
@@ -275,9 +323,10 @@ namespace
 } // namespace
 int main(int argc, char** argv)
 {
-    const bool impacts = argc == 3 && std::string_view(argv[2]) == "--impacts";
+    const bool instants = argc == 3 && std::string_view(argv[2]) == "--instants";
+    const bool impacts = instants || (argc == 3 && std::string_view(argv[2]) == "--impacts");
     return (argc == 2 || (argc == 3 && (impacts || std::string_view(argv[2]) == "--ballistics"))) &&
-                   run(argv[1], argc == 3, impacts)
+                   run(argv[1], argc == 3, impacts, instants)
                ? 0
                : 1;
 }

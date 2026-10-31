@@ -88,6 +88,61 @@ namespace OpenBlood2
                                                       services, time_, detail);
                     else if constexpr (std::is_same_v<T, BloodSplatSettings>)
                         runtime_.blood_splats.publish(recipe, event.name, sprites, time_, detail);
+                    else if constexpr (std::is_same_v<T, ExplosionRecipe>)
+                    {
+                        switch (recipe.component)
+                        {
+                            case ExplosionComponent::Models:
+                                runtime_.explosion_models.publish(recipe.type, recipe.position, recipe.normal,
+                                                                  event.name, models, resources, time_, detail);
+                                break;
+                            case ExplosionComponent::Sprites:
+                                runtime_.explosion_sprites.publish(recipe.type, recipe.position, recipe.normal,
+                                                                   event.name, sprites, time_, detail);
+                                break;
+                            case ExplosionComponent::Rings:
+                                runtime_.explosion_rings.publish(recipe.type, recipe.position, recipe.normal,
+                                                                 event.name, resources, time_, detail);
+                                break;
+                            case ExplosionComponent::Fragments:
+                                runtime_.explosion_fragments.publish(recipe.type, recipe.position, recipe.normal,
+                                                                     event.name, models, resources, time_, detail);
+                                break;
+                            case ExplosionComponent::Flames:
+                                runtime_.explosion_flames.publish(recipe.type, recipe.position, recipe.normal,
+                                                                  event.name, resources, time_, detail);
+                                break;
+                            case ExplosionComponent::Lights:
+                                runtime_.explosion_lights.publish(recipe.type, recipe.position, recipe.normal,
+                                                                  event.name, time_, detail);
+                                break;
+                        }
+                    }
+                    else if constexpr (std::is_same_v<T, FleshRecipe>)
+                        runtime_.flesh_gibs.publish(owner, recipe.position, recipe.velocity, recipe.dimensions,
+                                                    recipe.scale, recipe.count, services, models, resources, time_,
+                                                    detail);
+                    else if constexpr (std::is_same_v<T, DebrisRecipe>)
+                    {
+                        DebrisEffect effect;
+                        effect.source = event.name;
+                        effect.position = recipe.position;
+                        effect.velocity = recipe.velocity;
+                        effect.dimensions = recipe.dimensions;
+                        effect.flags = recipe.flags;
+                        effect.scale = recipe.scale;
+                        effect.amount = recipe.amount;
+                        effect.model = recipe.model;
+                        effect.texture = recipe.texture;
+                        effect.sound = recipe.sound;
+                        runtime_.destruction_debris.publish_debris(effect, debris_detail_, services, models, resources,
+                                                                   time_, detail);
+                    }
+                    else if constexpr (std::is_same_v<T, LaserRecipe>)
+                        runtime_.laser_beams.publish(recipe.source, recipe.destination, event.name, models, resources,
+                                                     time_, detail, recipe.type);
+                    else if constexpr (std::is_same_v<T, LightningSettings>)
+                        runtime_.lightning.publish(recipe, event.name, resources, time_, detail);
                 },
                 event.recipe);
             if (!detail.empty())
@@ -98,20 +153,32 @@ namespace OpenBlood2
         }
         pending_.clear();
         pending_bytes_ = 0;
-        const bool splats_ok = runtime_.blood_splats.advance(time_);
-        const bool sprites_ok = runtime_.weapon_sprites.advance(time_);
-        runtime_.shotgun_effects.advance(time_, services);
-        // Child muzzle smoke and underwater bubbles use the same original pools
-        // and update order as the solo session. No second movement integration.
-        const bool sparks_ok = runtime_.sparks.advance(time_);
-        const bool blood_ok = runtime_.blood_spurts.advance(time_, services);
-        if (!splats_ok || !sprites_ok || !sparks_ok || !blood_ok || !runtime_.shotgun_effects.update_error.empty())
+        // Same relative order as the solo session. Cosmetic failures retain
+        // their own diagnostics and do not cancel another component's update.
+        auto step = [&](bool ok, const std::string& detail)
         {
-            ++failed;
-            last_error = runtime_.shotgun_effects.update_error + runtime_.weapon_sprites.update_error +
-                         runtime_.sparks.update_error + runtime_.blood_splats.update_error +
-                         runtime_.blood_spurts.update_error;
-        }
+            if (!ok)
+            {
+                ++failed;
+                last_error = detail;
+            }
+        };
+        step(runtime_.explosion_sprites.advance(time_), runtime_.explosion_sprites.update_error);
+        step(runtime_.blood_splats.advance(time_), runtime_.blood_splats.update_error);
+        step(runtime_.weapon_sprites.advance(time_), runtime_.weapon_sprites.update_error);
+        step(runtime_.explosion_models.advance(time_), runtime_.explosion_models.update_error);
+        step(runtime_.laser_beams.advance(time_), runtime_.laser_beams.update_error);
+        step(runtime_.explosion_lights.advance(time_), runtime_.explosion_lights.update_error);
+        step(runtime_.explosion_rings.advance(time_), runtime_.explosion_rings.update_error);
+        step(runtime_.explosion_flames.advance(time_), runtime_.explosion_flames.update_error);
+        step(runtime_.flesh_gibs.advance(time_, services), runtime_.flesh_gibs.update_error);
+        step(runtime_.destruction_debris.advance(time_, services), runtime_.destruction_debris.update_error);
+        runtime_.shotgun_effects.advance(time_, services);
+        step(runtime_.shotgun_effects.update_error.empty(), runtime_.shotgun_effects.update_error);
+        step(runtime_.sparks.advance(time_), runtime_.sparks.update_error);
+        step(runtime_.lightning.advance(time_), runtime_.lightning.update_error);
+        step(runtime_.blood_spurts.advance(time_, services), runtime_.blood_spurts.update_error);
+        step(runtime_.explosion_fragments.advance(time_, queries), runtime_.explosion_fragments.update_error);
         ClientEffectsFrame frame;
         frame.world = owner_.world;
         frame.sequence = scene_.frame().sequence + 1;

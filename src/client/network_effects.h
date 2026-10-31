@@ -13,6 +13,13 @@ namespace OpenBlood2
         bool begin(const Net::Joined&);
         void clear();
         bool receive(const Net::EffectEvent&, std::string&);
+        bool set_detail(int detail)
+        {
+            if (detail < 0 || detail > 2)
+                return false;
+            debris_detail_ = detail;
+            return true;
+        }
         bool advance(double seconds, const ClientWorld&, const ClientCollisionWorld&, ModelStore&, SpriteStore&,
                      const Resources&, EffectAudio&, std::string&);
         const ClientEffects& scene() const
@@ -24,7 +31,7 @@ namespace OpenBlood2
             return runtime_;
         }
         std::uint64_t received = 0, failed = 0;
-        std::array<std::uint64_t, 5> received_kinds{};
+        std::array<std::uint64_t, std::variant_size_v<InstantEffectRecipe>> received_kinds{};
         std::string last_error;
 
       private:
@@ -35,5 +42,6 @@ namespace OpenBlood2
         ClientEffects scene_;
         std::vector<Net::EffectEvent> pending_;
         std::size_t pending_bytes_ = 0;
+        int debris_detail_ = 2;
     };
 } // namespace OpenBlood2

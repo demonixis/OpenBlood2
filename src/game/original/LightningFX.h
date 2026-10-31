@@ -2,14 +2,10 @@
 #include "ExplosionLightFX.h"
 #include "engine/particles.h"
 #include "engine/resources.h"
+#include "game/impact_settings.h"
 #include <random>
 namespace OpenBlood2
 {
-    struct LightningSettings
-    {
-        DVector source{}, destination{};
-        DBYTE shape = 2, form = 1, type = 2;
-    };
     struct LightningSegment
     {
         DVector from{}, to{}, color{};

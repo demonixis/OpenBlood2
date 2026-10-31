@@ -53,6 +53,47 @@ namespace OpenBlood2
         BloodSpurtSettings settings;
         bool immediate = false;
     };
+    enum class ExplosionComponent : std::uint8_t
+    {
+        Models,
+        Sprites,
+        Rings,
+        Fragments,
+        Flames,
+        Lights
+    };
+    struct ExplosionRecipe
+    {
+        ExplosionComponent component = ExplosionComponent::Models;
+        std::uint32_t type = 0;
+        DVector position{}, normal{0, 1, 0};
+    };
+    struct FleshRecipe
+    {
+        DVector position{}, velocity{}, dimensions{};
+        float scale = 1;
+        unsigned count = 0;
+    };
+    // Only original message inputs, never report IDs/errors or decoded assets.
+    struct DebrisRecipe
+    {
+        DVector position{}, velocity{}, dimensions{};
+        std::uint32_t flags = 0;
+        float scale = 1;
+        std::uint8_t amount = 10;
+        std::string model, texture, sound;
+    };
+    struct LaserRecipe
+    {
+        DVector source{}, destination{};
+        std::uint8_t type = 0;
+    };
+    struct LightningSettings
+    {
+        DVector source{}, destination{};
+        DBYTE shape = 2, form = 1, type = 2;
+    };
     using InstantEffectRecipe =
-        std::variant<ShotgunEffectSettings, WeaponSpriteSettings, SparkSettings, BloodSpurtRecipe, BloodSplatSettings>;
+        std::variant<ShotgunEffectSettings, WeaponSpriteSettings, SparkSettings, BloodSpurtRecipe, BloodSplatSettings,
+                     ExplosionRecipe, FleshRecipe, DebrisRecipe, LaserRecipe, LightningSettings>;
 } // namespace OpenBlood2

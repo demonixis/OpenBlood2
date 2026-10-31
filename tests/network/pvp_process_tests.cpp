@@ -30,7 +30,8 @@ using Clock = std::chrono::steady_clock;
 namespace
 {
 
-    bool client(const char* port_text, const char* data, bool victim, bool hosted, bool shotgun, bool team, bool rifle)
+    bool client(const char* port_text, const char* data, bool victim, bool hosted, bool shotgun, bool team, bool rifle,
+                bool napalm)
     {
         std::string error;
         unsigned port = 0;
@@ -46,9 +47,13 @@ namespace
         JoinProfile profile;
         profile.name = victim ? "PvP victim" : "PvP attacker";
         profile.team = team ? (victim ? 2 : 1) : 0;
-        profile.weapons = {DBYTE(rifle ? WEAP_SNIPERRIFLE : shotgun ? WEAP_SHOTGUN : WEAP_BERETTA)};
+        profile.weapons = {DBYTE(napalm    ? WEAP_NAPALMCANNON
+                                 : rifle   ? WEAP_SNIPERRIFLE
+                                 : shotgun ? WEAP_SHOTGUN
+                                           : WEAP_BERETTA)};
         std::set<SoundId> animation_voices;
         std::set<std::uint64_t> missing_gib_zero;
+        std::size_t peak_explosion_models = 0, peak_fragments = 0, peak_rings = 0;
         // The graphical host keeps Caleb. Distinct remote characters identify
         // the two combatants without treating the idle host as a test target.
         profile.character = hosted ? (victim ? 2 : 1) : 0;
@@ -83,6 +88,7 @@ namespace
                 {
                     announced = true;
                     initial_ammo = client.weapons().state()->ammunition[0];
+                    CHECK(initial_ammo > 0);
                     std::cout << "Ready " << (victim ? "victim" : "attacker") << " id=" << client.joined().object.slot
                               << '\n'
                               << std::flush;
@@ -168,6 +174,10 @@ namespace
                 }
             }
             CHECK(client.update(Clock::now(), input, !leaving, error, {firing}));
+            peak_explosion_models =
+                std::max(peak_explosion_models, client.effects().runtime().explosion_models.active.size());
+            peak_fragments = std::max(peak_fragments, client.effects().runtime().explosion_fragments.active.size());
+            peak_rings = std::max(peak_rings, client.effects().runtime().explosion_rings.active.size());
             audio_peak = std::max(audio_peak, client.audio().mixer.peak);
             if (shotgun)
                 for (const auto& [id, voice] : client.audio().mixer.voices())
@@ -236,7 +246,15 @@ namespace
                 std::cout << "Player notices: joined=" << client.speech().joined_notices
                           << ", left=" << client.speech().left_notices << '\n';
                 CHECK(client.effects().received > 0 && !client.effects().failed);
-                CHECK(client.effects().received_kinds[0] > 0 && client.effects().received_kinds[2] > 0);
+                if (napalm)
+                {
+                    CHECK(client.effects().received_kinds[5] >= 6 && peak_explosion_models && peak_rings);
+                    std::cout << "Remote explosion peaks: models=" << peak_explosion_models
+                              << ", fragments=" << peak_fragments << ", rings=" << peak_rings
+                              << ", recipes=" << client.effects().received_kinds[5] << '\n';
+                }
+                else
+                    CHECK(client.effects().received_kinds[0] > 0 && client.effects().received_kinds[2] > 0);
                 if (rifle)
                     CHECK(client.effects().received_kinds[3] > 0); // Original raw damage >25 guarantees jets.
                 CHECK(client.audio().effects_failed == missing_gib_zero.size());
@@ -306,7 +324,7 @@ namespace
         }
     };
     bool parent(const char* self, const char* server, const char* data, bool hosted, bool shotgun, bool team,
-                bool rifle)
+                bool rifle, bool napalm)
     {
         std::string error;
         Process host;
@@ -394,7 +412,8 @@ namespace
                                      data,
                                      i ? "victim" : "attacker",
                                      hosted ? "host" : "dedicated",
-                                     rifle     ? "rifle"
+                                     napalm    ? "napalm"
+                                     : rifle   ? "rifle"
                                      : shotgun ? "shotgun"
                                                : "beretta",
                                      team ? "team" : "bloodbath",
@@ -445,16 +464,18 @@ int main(int argc, char** argv)
     if (argc == 8 && std::string_view(argv[1]) == "--peer")
         return client(argv[2], argv[3], std::string_view(argv[4]) == "victim", std::string_view(argv[5]) == "host",
                       std::string_view(argv[6]) == "shotgun", std::string_view(argv[7]) == "team",
-                      std::string_view(argv[6]) == "rifle")
+                      std::string_view(argv[6]) == "rifle", std::string_view(argv[6]) == "napalm")
                    ? 0
                    : 1;
-    bool hosted = false, shotgun = false, team = false, rifle = false;
+    bool hosted = false, shotgun = false, team = false, rifle = false, napalm = false;
     for (int i = 3; i < argc; ++i)
     {
         if (std::string_view(argv[i]) == "--host")
             hosted = true;
         else if (std::string_view(argv[i]) == "--team")
             team = true;
+        else if (std::string_view(argv[i]) == "--napalm")
+            napalm = true;
         else if (std::string_view(argv[i]) == "--rifle")
             rifle = true;
         else if (std::string_view(argv[i]) == "--shotgun")
@@ -462,5 +483,5 @@ int main(int argc, char** argv)
         else
             return 2;
     }
-    return argc >= 3 && argc <= 6 && parent(argv[0], argv[1], argv[2], hosted, shotgun, team, rifle) ? 0 : 1;
+    return argc >= 3 && argc <= 6 && parent(argv[0], argv[1], argv[2], hosted, shotgun, team, rifle, napalm) ? 0 : 1;
 }

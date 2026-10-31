@@ -63,7 +63,8 @@ The [Jam capture check](Documentation/implementation/reports/m9_ctf_capture.md) 
 independent clients through grabbing, carrying, scoring and rotating the map.
 [Ballistic effects](Documentation/implementation/reports/m9_ballistic_network.md) now
 create casings, marks, smoke, fragments, liquid effects and tracers on each client,
-with local impact audio. [Impact sprites, sparks and blood](Documentation/implementation/reports/m9_impact_network.md)
+with local impact audio. [Explosions, fragments and instant beams](Documentation/implementation/reports/m9_instant_network.md)
+now execute on independent network clients. [Impact sprites, sparks and blood](Documentation/implementation/reports/m9_impact_network.md)
 now share ordered delivery and independent child splat/audio execution.
 Communication portraits, music, other visual effects,
 chat and broader qualification remain in progress.

@@ -44,6 +44,8 @@ namespace OpenBlood2
             error = "Lightning owner/resources unavailable";
             return 0;
         }
+        if (remote_effect_sink)
+            return remote_effect_sink(objects_.get(source)->id, GetObjectName(source), settings, error);
         return lightning.publish(settings, GetObjectName(source), *client_resources, objects_.time(), error);
     }
 
@@ -140,6 +142,16 @@ namespace OpenBlood2
             error = "Flesh-gib resources unavailable";
             return 0;
         }
+        if (remote_effect_sink)
+        {
+            const auto source = effect_owner(owner);
+            if (!source)
+            {
+                error = "Flesh-gib source unavailable";
+                return 0;
+            }
+            return remote_effect_sink(source.id.object, source.name, FleshRecipe{pos, dir, dims, scale, count}, error);
+        }
         return flesh_gibs.publish(effect_owner(owner), pos, dir, dims, scale, count, effect_services(),
                                   *objects_.models, *client_resources, objects_.time(), error);
     }
@@ -182,6 +194,9 @@ namespace OpenBlood2
             error = "Laser source/model resources unavailable";
             return 0;
         }
+        if (remote_effect_sink)
+            return remote_effect_sink(objects_.get(source)->id, GetObjectName(source), LaserRecipe{from, to, type},
+                                      error);
         return laser_beams.publish(from, to, GetObjectName(source), *objects_.models, *client_resources,
                                    objects_.time(), error, type);
     }
@@ -266,6 +281,9 @@ namespace OpenBlood2
             error = "Explosion fragment source/resources unavailable";
             return 0;
         }
+        if (remote_effect_sink)
+            return remote_effect_sink(objects_.get(source)->id, GetObjectName(source),
+                                      ExplosionRecipe{ExplosionComponent::Fragments, type, pos, normal}, error);
         return explosion_fragments.publish(type, pos, normal, GetObjectName(source), *objects_.models,
                                            *client_resources, objects_.time(), error);
     }
@@ -279,6 +297,9 @@ namespace OpenBlood2
             error = "Explosion flame source/resources unavailable";
             return 0;
         }
+        if (remote_effect_sink)
+            return remote_effect_sink(objects_.get(source)->id, GetObjectName(source),
+                                      ExplosionRecipe{ExplosionComponent::Flames, type, position, normal}, error);
         return explosion_flames.publish(type, position, normal, GetObjectName(source), *client_resources,
                                         objects_.time(), error);
     }
@@ -292,6 +313,9 @@ namespace OpenBlood2
             error = "Explosion ring source/resources unavailable";
             return 0;
         }
+        if (remote_effect_sink)
+            return remote_effect_sink(objects_.get(source)->id, GetObjectName(source),
+                                      ExplosionRecipe{ExplosionComponent::Rings, type, position, normal}, error);
         return explosion_rings.publish(type, position, normal, GetObjectName(source), *client_resources,
                                        objects_.time(), error);
     }
@@ -305,6 +329,9 @@ namespace OpenBlood2
             error = "Explosion light source unavailable";
             return 0;
         }
+        if (remote_effect_sink)
+            return remote_effect_sink(objects_.get(source)->id, GetObjectName(source),
+                                      ExplosionRecipe{ExplosionComponent::Lights, type, position, normal}, error);
         return explosion_lights.publish(type, position, normal, GetObjectName(source), objects_.time(), error);
     }
     std::uint64_t ServerAdapter::PublishExplosionModels(HOBJECT source, DDWORD type, DVector position, DVector normal,
@@ -317,6 +344,9 @@ namespace OpenBlood2
             error = "Explosion source/model resources unavailable";
             return 0;
         }
+        if (remote_effect_sink)
+            return remote_effect_sink(objects_.get(source)->id, GetObjectName(source),
+                                      ExplosionRecipe{ExplosionComponent::Models, type, position, normal}, error);
         return explosion_models.publish(type, position, normal, GetObjectName(source), *objects_.models,
                                         *client_resources, objects_.time(), error);
     }
@@ -330,6 +360,9 @@ namespace OpenBlood2
             error = "Explosion source or sprite store unavailable";
             return 0;
         }
+        if (remote_effect_sink)
+            return remote_effect_sink(objects_.get(source)->id, GetObjectName(source),
+                                      ExplosionRecipe{ExplosionComponent::Sprites, type, position, normal}, error);
         return explosion_sprites.publish(type, position, normal, GetObjectName(source), *objects_.sprites,
                                          objects_.time(), error);
     }
@@ -354,8 +387,18 @@ namespace OpenBlood2
             debris_effects.erase(debris_effects.begin());
         auto report = effect;
         if (client_resources && objects_.models)
-            report.event = destruction_debris.publish_debris(effect, debris_detail, effect_services(), *objects_.models,
-                                                             *client_resources, objects_.time(), report.error);
+        {
+            if (remote_effect_sink)
+                report.event = remote_effect_sink({}, effect.source,
+                                                  DebrisRecipe{effect.position, effect.velocity, effect.dimensions,
+                                                               effect.flags, effect.scale, effect.amount, effect.model,
+                                                               effect.texture, effect.sound},
+                                                  report.error);
+            else
+                report.event =
+                    destruction_debris.publish_debris(effect, debris_detail, effect_services(), *objects_.models,
+                                                      *client_resources, objects_.time(), report.error);
+        }
         else
             report.error = "Destruction debris resources unavailable";
         debris_effects.push_back(std::move(report));

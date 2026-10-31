@@ -88,6 +88,44 @@ namespace
                       !std::get<BloodSpurtRecipe>(events[4].recipe).immediate);
                 CHECK(!game.client_effects.weapon_sprites.started && !game.client_effects.sparks.started &&
                       !game.client_effects.blood_spurts.started && !game.client_effects.blood_splats.started);
+                CHECK(game.server.PublishExplosionModels(source->handle, 3, shot.source, shot.normal, error));
+                CHECK(game.server.PublishExplosionSprites(source->handle, 3, shot.source, shot.normal, error));
+                CHECK(game.server.PublishExplosionRings(source->handle, 3, shot.source, shot.normal, error));
+                CHECK(game.server.PublishExplosionFragments(source->handle, 3, shot.source, shot.normal, error));
+                CHECK(game.server.PublishExplosionFlames(source->handle, 8, shot.source, shot.normal, error));
+                CHECK(game.server.PublishExplosionLights(source->handle, 3, shot.source, shot.normal, error));
+                CHECK(game.server.PublishFleshGibs(source->handle, shot.source, {0, 100, 0}, {5, 5, 5}, 1, 4, error));
+                DebrisEffect debris;
+                debris.source = "destroyed brush";
+                debris.position = shot.source;
+                debris.velocity = {0, 100, 0};
+                debris.dimensions = {5, 5, 5};
+                debris.flags = 3;
+                debris.amount = 4;
+                game.server.RecordDebrisEffect(debris);
+                CHECK(game.server.debris_effects.back().event && game.server.debris_effects.back().error.empty());
+                CHECK(game.server.PublishLaserBeam(source->handle, shot.source, shot.destination, error, 5));
+                CHECK(game.server.PublishLightning(source->handle,
+                                                   LightningSettings{shot.source, shot.destination, 2, 1, 2}, error));
+                CHECK(session.take_effect_events(a.player, events, error) && events.size() == 10);
+                for (unsigned i = 0; i < 10; ++i)
+                {
+                    CHECK(events[i].recipe.index() == (i < 6 ? 5 : i));
+                    CHECK(events[i].source == (i == 7 ? ObjectId{} : a.object));
+                    if (i)
+                        CHECK(events[i].sequence == events[i - 1].sequence + 1);
+                    if (i < 6)
+                        CHECK(unsigned(std::get<ExplosionRecipe>(events[i].recipe).component) == i);
+                }
+                CHECK(game.client_effects.explosion_models.reports.empty() &&
+                      game.client_effects.explosion_sprites.reports.empty() &&
+                      game.client_effects.explosion_rings.reports.empty() &&
+                      game.client_effects.explosion_fragments.reports.empty() &&
+                      game.client_effects.explosion_flames.reports.empty() &&
+                      game.client_effects.explosion_lights.reports.empty() &&
+                      game.client_effects.flesh_gibs.reports.empty() &&
+                      game.client_effects.destruction_debris.reports.empty() &&
+                      game.client_effects.laser_beams.reports.empty() && game.client_effects.lightning.reports.empty());
                 // Count and encoded-byte limits are independent. Large bounded
                 // resource names need no server-side cosmetic asset binding.
                 flash.flash->resource = std::string(1000, 'f');

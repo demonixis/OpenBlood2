@@ -60,7 +60,7 @@ namespace effect_fixture
             r.settings.fade_time = .8f;
             e.source = {}; // Original direct client publication has no source object.
         }
-        else
+        else if (kind == 4)
         {
             auto& s = e.recipe.emplace<BloodSplatSettings>();
             s.position = {100, .1f, 0};
@@ -68,6 +68,19 @@ namespace effect_fixture
             s.grow_scale = .02f;
             e.source = {};
         }
+        else if (kind == 5)
+            e.recipe = ExplosionRecipe{ExplosionComponent::Models, 3, {0, 80, 0}, {0, 1, 0}};
+        else if (kind == 6)
+            e.recipe = FleshRecipe{{0, 80, 0}, {0, 100, 0}, {5, 5, 5}, 1, 4};
+        else if (kind == 7)
+        {
+            e.recipe = DebrisRecipe{{100, 80, 0}, {0, 100, 0}, {5, 5, 5}, 3, 1, 4, {}, {}, {}};
+            e.source = {};
+        }
+        else if (kind == 8)
+            e.recipe = LaserRecipe{{-50, 80, 0}, {50, 80, 0}, 5};
+        else
+            e.recipe = LightningSettings{{-50, 100, 0}, {50, 100, 0}, 2, 1, 2};
         return e;
     }
 } // namespace effect_fixture

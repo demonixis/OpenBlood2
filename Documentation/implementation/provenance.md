@@ -1,5 +1,11 @@
 # Source and Dependency Provenance
 
+The M9 [instant-effect lot](reports/m9_instant_network.md) routes the existing
+explosion, CGibFX and laser/lightning ports through client-owned runtimes. Tagged
+recipe encoding and detached client execution are engine adaptations; original
+recipe math, child emission, collision quirks and game RNG are preserved. See the
+[source ledger](sources/m9_instant_network_sources.json).
+
 The M9 [network impact lot](reports/m9_impact_network.md) reuses the existing
 flash/smoke/spark/blood ports with ordered tagged recipes, client child services
 and original immediate/deferred startup. Value-only headers and bounded encoding
