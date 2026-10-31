@@ -271,7 +271,7 @@ namespace OpenBlood2
         if (const auto* offer = std::get_if<Net::WorldOffer>(&value))
         {
             if ((phase_ != Phase::Offer && phase_ != Phase::Active && phase_ != Phase::Baseline) ||
-                (offer->mode != GAMETYPE_BLOODBATH && offer->mode != GAMETYPE_TEAMPLAY) || offer->world <= offer_.world)
+                !network_game_type(offer->mode) || offer->world <= offer_.world)
                 return false;
             // End every old consumer before replacing geometry. Sound output and
             // mounted content persist; no live voice/body/model crosses worlds.
@@ -399,7 +399,10 @@ namespace OpenBlood2
                                       weapon.primary || weapon.alternate, bool(camera_.camera().view.object), report,
                                       error))
                     return fail(error, "Client prediction failed");
-                if (weapons_.ready(movement_.setup().owner.force_revision))
+                // LevelChanging already cancels both server and client weapons.
+                // Do not fill reliable input history while the server synchronously
+                // loads the next map; the fresh world begins a new weapon sequence.
+                if (!changing_level_ && weapons_.ready(movement_.setup().owner.force_revision))
                 {
                     const auto acknowledged = weapon_ack_ ? weapon_ack_->sequence : 0;
                     if (weapon_frames == UINT64_MAX || weapon_frames - acknowledged >= Net::weapon_frame_queue_limit)

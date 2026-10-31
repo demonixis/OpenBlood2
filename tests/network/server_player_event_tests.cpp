@@ -81,13 +81,13 @@ namespace
             CHECK(game.server.SendToClient(a->GetClient(), items) == DE_OK);
         CHECK(game.server.SendToClient(a->GetClient(), OrbView{other_handle, false}) == DE_OK);
         CHECK(game.server.SendToClient(a->GetClient(), SeeingEyeView{other_handle, false, 10}) == DE_OK);
-        CHECK(game.server.SendToClient(a->GetClient(), CTFEvent{CTFEventKind::Captured, 2, 3, other_handle}) == DE_OK);
+        CHECK(game.server.SendToClient(a->GetClient(), CTFEvent{CTFEventKind::Captured, 2, 3, other_handle}) ==
+              DE_INVALIDPARAMS);
         CHECK(session.leave(second.player) && !game.objects.get(second.object));
-        CHECK(session.take_private_events(first.player, events, error) && events.size() == 8);
+        CHECK(session.take_private_events(first.player, events, error) && events.size() == 7);
         CHECK(std::get<OrbEvent>(events[4].value).orb == second.object);
         CHECK(std::get<EyeEvent>(events[5].value).eye == second.object);
-        CHECK(std::get<FlagEvent>(events[6].value).capturer == second.object);
-        CHECK(std::get<PlayerRoster>(events[7].value).players.size() == 1);
+        CHECK(std::get<PlayerRoster>(events[6].value).players.size() == 1);
         CHECK(deliver() && inbox.hud().stats.health == 37 && inbox.hud().item_shows == 3 &&
               inbox.hud().item_messages == 3);
         CHECK(game.server.SendToClient(a->GetClient(), OrbView{other_handle, true}) == DE_INVALIDPARAMS);

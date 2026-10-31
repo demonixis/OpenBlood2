@@ -44,6 +44,7 @@ namespace OpenBlood2
         owner_ = owner;
         mode_ = mode;
         team_frags_ = {};
+        flag_icon_ = 0;
         hud_ = std::move(next);
         sequence_ = tick_ = 0;
         events_.clear();
@@ -131,6 +132,28 @@ namespace OpenBlood2
                     p.frags = frag->killer_frags; // Authoritative absolute score, including suicide.
                     score(scores_, p);
                 }
+        }
+        if (const auto* flag = std::get_if<Net::FlagEvent>(&event.value))
+        {
+            if (mode_ != GAMETYPE_CTF || (team() && flag->team != team()))
+            {
+                error = "Flag event mode/team differs from admitted membership";
+                return Reception::Refused;
+            }
+            if (flag->kind == CTFEventKind::Grabbed)
+                flag_icon_ = flag->team;
+            else if (flag->kind == CTFEventKind::Dropped || flag->kind == CTFEventKind::Captured)
+                flag_icon_ = 0;
+            if (flag->kind == CTFEventKind::Captured)
+            {
+                team_frags_ = flag->team_frags;
+                for (auto& p : roster_)
+                    if (p.object == flag->capturer)
+                    {
+                        p.frags = flag->capturer_frags;
+                        score(scores_, p);
+                    }
+            }
         }
         if (std::holds_alternative<Net::LevelChanging>(event.value))
         {

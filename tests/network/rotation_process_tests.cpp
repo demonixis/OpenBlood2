@@ -1,8 +1,10 @@
 #include "client/network_client.h"
+#include "game/game_settings.h"
 #include <SDL3/SDL_process.h>
 #include <charconv>
 #include <chrono>
 #include <iostream>
+#include <optional>
 #include <thread>
 using namespace OpenBlood2;
 using namespace OpenBlood2::Net;
@@ -18,7 +20,7 @@ using Clock = std::chrono::steady_clock;
     } while (false)
 namespace
 {
-    bool client(const char* port_text, const char* data, const char* name, bool team)
+    bool client(const char* port_text, const char* data, const char* name, DBYTE mode)
     {
         std::string error;
         unsigned port = 0;
@@ -37,19 +39,22 @@ namespace
         DBYTE assigned_team = 0;
         std::uint64_t previous_world = 0, previous_player = 0;
         bool leaving = false;
+        std::optional<std::uint64_t> stopped_frames;
         const auto deadline = Clock::now() + std::chrono::seconds(55);
         while (Clock::now() < deadline)
         {
             CHECK(client.update(Clock::now(), {}, true, error));
-            if (client.ready() && (!team || client.players().team()) && client.joined().world != previous_world)
+            if (client.ready() && (!team_game_type(mode) || client.players().team()) &&
+                client.joined().world != previous_world)
             {
                 CHECK(client.joined().world > previous_world && client.joined().player > previous_player);
                 previous_world = client.joined().world;
                 previous_player = client.joined().player;
                 ++entries;
-                if (team)
+                stopped_frames.reset();
+                if (team_game_type(mode))
                 {
-                    CHECK(client.offer().mode == 4 && (!assigned_team || assigned_team == client.players().team()));
+                    CHECK(client.offer().mode == mode && (!assigned_team || assigned_team == client.players().team()));
                     assigned_team = client.players().team();
                     CHECK(client.players().team_frags()[0] == 0 && client.players().team_frags()[1] == 0);
                     std::cout << "Retained team=" << unsigned(assigned_team) << " for " << name << '\n';
@@ -61,6 +66,11 @@ namespace
                 std::cout << "Ready " << name << " entry=" << entries << " epoch=" << previous_world
                           << " map=" << client.offer().path << '\n'
                           << std::flush;
+            }
+            if (client.changing_level())
+            {
+                CHECK(!stopped_frames || *stopped_frames == client.weapon_frames);
+                stopped_frames = client.weapon_frames;
             }
             std::vector<PrivateEvent> events;
             client.take_events(events);
@@ -120,54 +130,25 @@ namespace
             return SDL_GetIOStatus(stream) != SDL_IO_STATUS_ERROR;
         }
     };
-    bool parent(const char* self, const char* server, const char* data, bool hosted, bool team)
+    bool parent(const char* self, const char* server, const char* data, bool hosted, DBYTE mode)
     {
         std::string error;
+        const bool ctf = mode == GAMETYPE_CTF;
+        const char* mode_name = ctf ? "ctf" : mode == GAMETYPE_TEAMPLAY ? "team" : "bloodbath";
+        const char* first_map = ctf ? "multi/ctf_cabana" : "multi/bb_crypt";
+        const char* next_map = ctf ? "multi/ctf_jam" : "multi/bb_fields";
+        const char* capture = ctf                         ? "ctf-rotation-host.png"
+                              : mode == GAMETYPE_TEAMPLAY ? "team-rotation-host.png"
+                                                          : "rotation-host.png";
         Process host;
-        const char* dedicated_args[]{server,
-                                     "--data-dir",
-                                     data,
-                                     "--world",
-                                     "multi/bb_crypt",
-                                     "--map",
-                                     "multi/bb_fields",
-                                     "--end",
-                                     "time",
-                                     "--time-limit",
-                                     "0",
-                                     "--bind",
-                                     "127.0.0.1",
-                                     "--port",
-                                     "0",
-                                     "--ticks",
-                                     "2100",
-                                     "--mode",
-                                     team ? "team" : "bloodbath",
-                                     nullptr};
-        const char* hosted_args[]{server,
-                                  "--data-dir",
-                                  data,
-                                  "--host",
-                                  "multi/bb_crypt",
-                                  "--map",
-                                  "multi/bb_fields",
-                                  "--end",
-                                  "time",
-                                  "--time-limit",
-                                  "0",
-                                  "--port",
-                                  "0",
-                                  // Frames, not ticks: enough for two rotations
-                                  // on a 120 Hz display as well as at 60 Hz.
-                                  "--frames",
-                                  "2400",
-                                  "--name",
-                                  "Rotation host",
-                                  "--capture",
-                                  team ? "team-rotation-host.png" : "rotation-host.png",
-                                  "--mode",
-                                  team ? "team" : "bloodbath",
-                                  nullptr};
+        const char* dedicated_args[]{server,  "--data-dir", data,           "--world", first_map, "--map",     next_map,
+                                     "--end", "time",       "--time-limit", "0",       "--bind",  "127.0.0.1", "--port",
+                                     "0",     "--ticks",    "2100",         "--mode",  mode_name, nullptr};
+        // Frames, not ticks: enough for two rotations on a 120 Hz display as well as at 60 Hz.
+        const char* hosted_args[]{
+            server,          "--data-dir",   data,    "--host", first_map, "--map",    next_map, "--end",
+            "time",          "--time-limit", "0",     "--port", "0",       "--frames", "2400",   "--name",
+            "Rotation host", "--capture",    capture, "--mode", mode_name, nullptr};
         host.handle = SDL_CreateProcess(hosted ? hosted_args : dedicated_args, true);
         error = SDL_GetError();
         CHECK(host.handle);
@@ -210,8 +191,7 @@ namespace
                 }
                 CHECK(clients[0].output.find("Ready ") != std::string::npos);
             }
-            const char* child_args[]{
-                self, "--peer", port.c_str(), data, i ? "Second" : "First", team ? "team" : "bloodbath", nullptr};
+            const char* child_args[]{self, "--peer", port.c_str(), data, i ? "Second" : "First", mode_name, nullptr};
             clients[i].handle = SDL_CreateProcess(child_args, true);
             error = SDL_GetError();
             CHECK(clients[i].handle);
@@ -245,7 +225,7 @@ namespace
         if (hosted)
         {
             std::error_code ec;
-            CHECK(std::filesystem::file_size(team ? "team-rotation-host.png" : "rotation-host.png", ec) > 4096 && !ec);
+            CHECK(std::filesystem::file_size(capture, ec) > 4096 && !ec);
         }
         CHECK(clients[0].output.find("Three world entries") != std::string::npos &&
               clients[1].output.find("Three world entries") != std::string::npos);
@@ -255,16 +235,24 @@ namespace
 int main(int argc, char** argv)
 {
     if (argc == 6 && std::string_view(argv[1]) == "--peer")
-        return client(argv[2], argv[3], argv[4], std::string_view(argv[5]) == "team") ? 0 : 1;
-    bool hosted = false, team = false;
+        return client(argv[2], argv[3], argv[4],
+                      std::string_view(argv[5]) == "ctf"    ? GAMETYPE_CTF
+                      : std::string_view(argv[5]) == "team" ? GAMETYPE_TEAMPLAY
+                                                            : GAMETYPE_BLOODBATH)
+                   ? 0
+                   : 1;
+    bool hosted = false;
+    DBYTE mode = GAMETYPE_BLOODBATH;
     for (int i = 3; i < argc; ++i)
         if (std::string_view(argv[i]) == "--host")
             hosted = true;
         else if (std::string_view(argv[i]) == "--team")
-            team = true;
+            mode = GAMETYPE_TEAMPLAY;
+        else if (std::string_view(argv[i]) == "--ctf")
+            mode = GAMETYPE_CTF;
         else
             return 2;
     if (argc >= 3 && argc <= 5)
-        return parent(argv[0], argv[1], argv[2], hosted, team) ? 0 : 1;
+        return parent(argv[0], argv[1], argv[2], hosted, mode) ? 0 : 1;
     return 2;
 }

@@ -21,6 +21,8 @@ namespace OpenBlood2
                   const Resources&, Conversation&);
         bool finish(const FinishHimVoice&, const Resources&, Conversation&);
         bool player_notice(std::string_view name, bool joined, const Resources&, std::string& out, DBYTE team = 0);
+        bool flag_notice(CTFEventKind, std::string_view capturer, DBYTE team, bool local, const Resources&,
+                         std::string& out);
         std::string team_name(DBYTE team, const Resources&);
         std::string level_change_notice(const Resources&);
         std::string error;

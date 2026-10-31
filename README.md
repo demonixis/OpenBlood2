@@ -57,7 +57,9 @@ cycle maps without reconnecting: `--end either --frag-limit 25 --time-limit 10
 adds `--mode team` for hosting and `--team auto|blue|red` for joining/hosting,
 original team HUD/scores and retained teams across rotations. Team rules accept
 `--friendly-fire on|off` and `--negative-team-frags on|off` (both default on).
-Communication portraits, music, visual effects, chat and CTF remain in progress.
+[CTF](Documentation/implementation/reports/m9_ctf_network.md) adds `--mode ctf`
+and the four `multi/ctf_*` maps, carried flags and capture scores/notices.
+Communication portraits, music, visual effects, chat and broader qualification remain in progress.
 
 ## CI builds
 

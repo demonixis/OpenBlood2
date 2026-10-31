@@ -1,5 +1,11 @@
 # Source and Dependency Provenance
 
+The M9 [CTF network lot](reports/m9_ctf_network.md) ports original flag notice/icon
+and local sound branches from BloodClientShell, using external localized strings.
+Absolute score transport, checked team/world identity and owned bounded client
+sound lifetime are reconstruction adaptations; see its
+[source ledger](sources/m9_ctf_network_sources.json).
+
 The M9 [CTF server lot](reports/m9_ctf_rules.md) ports original capture contributions,
 OnlyFlagScores and UseTeamSize to checked team membership and match totals.
 Its [source ledger](sources/m9_ctf_rules_sources.json) distinguishes local inspection

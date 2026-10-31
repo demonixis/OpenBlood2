@@ -95,6 +95,54 @@ namespace OpenBlood2
             error = "Missing or invalid team name string " + std::to_string(7006 + team);
         return "Team Blue"; // Original second-team fallback typo, only when its resource is absent.
     }
+    bool ClientAnnouncer::flag_notice(CTFEventKind kind, std::string_view capturer, DBYTE team, bool local,
+                                      const Resources& resources, std::string& out)
+    {
+        unsigned resource = 0;
+        switch (kind)
+        {
+            case CTFEventKind::Grabbed:
+                resource = 7000;
+                break;
+            case CTFEventKind::Returned:
+                resource = 7001;
+                break;
+            case CTFEventKind::NeedFlag:
+                resource = 7009;
+                break;
+            case CTFEventKind::Captured:
+                if (capturer.empty() || capturer.size() > 100 || capturer.find('\0') != capturer.npos || team > 2)
+                    return false;
+                resource = local ? 7005 : team ? 7003 : 7004;
+                break;
+            default:
+                return false; // Original dropped/team messages print no text.
+        }
+        load(resources);
+        const auto found = strings_.strings.find(resource);
+        std::string pattern;
+        // ClientShell first uses FormatString (%% -> %), then sprintf for observer names.
+        // Insert names only in the second pass; player-controlled % characters stay literal.
+        if (found == strings_.strings.end() || found->second.empty() || found->second.size() >= 500 ||
+            !format_names(found->second, {}, pattern))
+        {
+            error = "Missing or invalid flag notice string " + std::to_string(resource);
+            return false;
+        }
+        if (kind == CTFEventKind::Captured && !local)
+        {
+            const auto team_text = team_name(team, resources);
+            const std::array<std::string_view, 2> names{capturer, team_text};
+            if (!format_names(pattern, std::span(names).first(team ? 2 : 1), out))
+            {
+                error = "Invalid flag capture notice format";
+                return false;
+            }
+        }
+        else
+            out = std::move(pattern);
+        return true;
+    }
     bool ClientAnnouncer::player_notice(std::string_view name, bool joined, const Resources& resources,
                                         std::string& out, DBYTE team)
     {

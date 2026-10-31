@@ -44,6 +44,10 @@ namespace OpenBlood2
             return scores_;
         }
 
+        DBYTE flag_icon() const
+        {
+            return flag_icon_;
+        }
         DBYTE mode() const
         {
             return mode_;
@@ -59,7 +63,7 @@ namespace OpenBlood2
         }
 
       private:
-        DBYTE mode_ = 1;
+        DBYTE mode_ = 1, flag_icon_ = 0;
         std::array<int, 2> team_frags_{};
         Net::Joined owner_;
         ClientHud hud_;

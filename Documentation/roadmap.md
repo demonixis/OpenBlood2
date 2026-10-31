@@ -348,8 +348,9 @@ The [client roster](implementation/reports/m9_roster.md) now owns reliable names
 [Server Team rules](implementation/reports/m9_team_rules.md) now preserve original assignment, skins/spawns, accumulated team frags and friendly-fire/Voodoo gates; Team admission and client/team-score transport remain to connect.
 [Team network play](implementation/reports/m9_team_network.md) now connects assignment/skins, absolute totals, team limits and retained-team rotation, with original team HUD/notices/score columns.
 [CTF server rules](implementation/reports/m9_ctf_rules.md) now connect capture contributions, enemy-only OnlyFlagScores, membership-based UseTeamSize and team limits/rotation; independent capture consumers and wire admission remain next.
-Communication portraits, music, FX, measured pings/chat, CTF integration and remaining multiplayer branches stay in progress.
-**Remaining private presentation consumers/commands, full client separation, CTF and complete network qualification remain pending.**
+[Network CTF](implementation/reports/m9_ctf_network.md) now opens dedicated/host admission with independent carried icons, absolute capture scores, localized notices and local grab/return sounds. Server-triggered capture/drop replication and real-process rotation have separate verification scopes.
+Communication portraits, music, FX, measured pings/chat and remaining multiplayer branches stay in progress.
+**Remaining private presentation consumers/commands, full client separation, client-routed CTF captures and complete network qualification remain pending.**
 
 Original model: the authoritative server runs ObjectDLL objects; the client runs
 CMoveMgr, rendering and effects over copied object state. The current local solo

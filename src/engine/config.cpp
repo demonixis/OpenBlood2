@@ -326,12 +326,12 @@ namespace OpenBlood2
                 }
                 else if (arg == "--mode")
                 {
-                    if (args[i] != "bloodbath" && args[i] != "team")
+                    if (args[i] != "bloodbath" && args[i] != "team" && args[i] != "ctf")
                     {
-                        error = "--mode requires bloodbath or team for hosting";
+                        error = "--mode requires bloodbath, team or ctf for hosting";
                         return false;
                     }
-                    options.network_mode = args[i] == "team" ? 4 : 1;
+                    options.network_mode = args[i] == "team" ? 4 : args[i] == "ctf" ? 2 : 1;
                     explicit_match = true;
                 }
                 else if (arg == "--team")

@@ -1,0 +1,96 @@
+{
+  "baseline": "c0f7588c85130315513bd0dc4e4ed1e6b2e59332",
+  "scope": "CTF admission and independent flag icons/notices/audio with bounded absolute capture score transport",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "c0f7588c85130315513bd0dc4e4ed1e6b2e59332",
+      "path": "src/client/network_player_events.cpp",
+      "sha256": "ba4a33f0f383175a6a5f42e0067a7a5355cdc7a337d3c6140334ee0f694bf523"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "c0f7588c85130315513bd0dc4e4ed1e6b2e59332",
+      "path": "src/client/network_speech.cpp",
+      "sha256": "70f703bd2625ee16c6104c0273d87e94b18d0c61dfd32c7e5e50ce7005265408"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "c0f7588c85130315513bd0dc4e4ed1e6b2e59332",
+      "path": "src/client/announcer.cpp",
+      "sha256": "bc0393adf07d43bdd45b60377ca7e89b0b2ee699327128d96ced914ef57dc69f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "c0f7588c85130315513bd0dc4e4ed1e6b2e59332",
+      "path": "src/client/network_audio.cpp",
+      "sha256": "1bc80813a4e0a0fb4fa3462e91e7f295c4df6a67cf27557fbc3d5bebed2e186c"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "c0f7588c85130315513bd0dc4e4ed1e6b2e59332",
+      "path": "src/game/original/PlayerFlags.cpp",
+      "sha256": "3da16f431822e4722ecf9a2fdb08a38188a03c932d3e2657c49348ebf799143e"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "c0f7588c85130315513bd0dc4e4ed1e6b2e59332",
+      "path": "src/server/player_events.cpp",
+      "sha256": "2162a1ea250f215348084920949e31c799b21d9b8d6b5fd4e21e716d3ae8c5f9"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "c0f7588c85130315513bd0dc4e4ed1e6b2e59332",
+      "path": "src/client/frag_table.cpp",
+      "sha256": "f6701624ff49aea21a8d63dfd7bd0551838fc39c65350a7a5070cd9cb97a5f5a"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "c0f7588c85130315513bd0dc4e4ed1e6b2e59332",
+      "path": "src/app/network_frontend.cpp",
+      "sha256": "c7456f6501d07d25527bcb3ff19d5c1b3024637bf348f37b586eaeca1a7668d6"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/NewStatusBar.cpp",
+      "sha256": "c4dee3b2502db56a1a85b94a55c64fca9ddab0a1e69421858b27aeac02e324f5"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ClientUtilities.cpp",
+      "sha256": "9af3aeb6cdc9833f91e0c63f307312b2ca4cf61766512e11d357874a6a31be02"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientRes/ClientRes.rc",
+      "sha256": "cc635e26e01b93e83e6202a336e7dda6af70bf681dbe731eedd82b450bcedfbd"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "c0f7588c85130315513bd0dc4e4ed1e6b2e59332",
+      "path": "src/game/server_clients.cpp",
+      "sha256": "7335746f00fb198fcfc7d53c15dfc33d23316cdbc8ad49f6cf3f0d4f4934a8ab"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "c0f7588c85130315513bd0dc4e4ed1e6b2e59332",
+      "path": "src/client/network_client.cpp",
+      "sha256": "377c8f82170b00a0609018479c672f650b0e3783b551cf455de0ffc01d425421"
+    }
+  ]
+}

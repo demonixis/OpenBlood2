@@ -137,8 +137,13 @@ namespace OpenBlood2::Net
                 else if constexpr (std::is_same_v<T, AttachEvent>)
                     return object(v.creature, true) && object(v.enemy, true);
                 else if constexpr (std::is_same_v<T, FlagEvent>)
-                    return v.kind <= CTFEventKind::Captured && v.team <= 2 && v.points >= 0 && v.points <= 1000000 &&
-                           object(v.capturer);
+                    return v.kind <= CTFEventKind::Captured && v.team >= 1 && v.team <= 2 && v.points >= 0 &&
+                           v.points <= 1000000 && v.capturer_frags >= -1000000 && v.capturer_frags <= 1000000 &&
+                           team_scores(v.team_frags) &&
+                           (v.kind == CTFEventKind::Captured
+                                ? object(v.capturer, true)
+                                : !v.capturer && object(v.capturer) && !v.points && !v.capturer_frags &&
+                                      v.team_frags == std::array<int, 2>{});
                 else if constexpr (std::is_same_v<T, InventoryItems>)
                     return item(v.current) && item(v.previous) && item(v.next);
                 else if constexpr (std::is_same_v<T, PlayerText>)
@@ -293,6 +298,9 @@ namespace OpenBlood2::Net
                     w.u8(v.team);
                     w.u32(std::uint32_t(v.points));
                     id(w, v.capturer);
+                    w.u32(std::uint32_t(v.capturer_frags + 1000000));
+                    for (auto score : v.team_frags)
+                        w.u32(std::uint32_t(score + 1000000));
                 }
                 else if constexpr (std::is_same_v<T, InventoryItems>)
                 {
@@ -522,6 +530,11 @@ namespace OpenBlood2::Net
                     return DecodePrivate::Malformed;
                 v.points = int(points);
                 v.capturer = id(r);
+                const auto score = r.u32();
+                if (score > 2000000)
+                    return DecodePrivate::Malformed;
+                v.capturer_frags = int(score) - 1000000;
+                ok = read_team_scores(r, v.team_frags);
                 event.value = v;
                 break;
             }

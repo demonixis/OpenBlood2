@@ -523,7 +523,13 @@ namespace OpenBlood2
             // A refused nudge leaves the original MoveObject below to report the contact.
             ResolveInitialWorldOverlap(h);
         }
-        if (Objects::is_kind_of(r->type, objects_.find_class("AI_Mgr")) && ResolveInitialActorOverlap(h) != DE_OK)
+        // A marker embedded in primary geometry can hide an occupied player from
+        // the pre-ground nearest-hit query. Recheck after the bounded world nudge,
+        // before dropping; otherwise admission may overlap an already moving peer.
+        const bool multiplayer_player =
+            network_game_type(net_game_type) && Objects::is_kind_of(r->type, objects_.find_class("CPlayerObj"));
+        if ((multiplayer_player || Objects::is_kind_of(r->type, objects_.find_class("AI_Mgr"))) &&
+            ResolveInitialActorOverlap(h) != DE_OK)
             return DE_ERROR;
         auto from = r->state.m_Pos;
         auto to = from;

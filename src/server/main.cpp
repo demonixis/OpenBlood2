@@ -34,10 +34,10 @@ int main(int argc, char** argv)
         const std::string_view arg = argv[i];
         if (arg == "--help")
         {
-            std::cout << "OpenBlood2 dedicated server (M9: Bloodbath and Team movement, combat and respawn enabled)\n"
+            std::cout << "OpenBlood2 dedicated server (M9: Bloodbath, Team and CTF enabled)\n"
                       << "  --data-dir PATH  External retail installation (or BLOOD2_DATA_DIR)\n"
                       << "  --world NAME     Retail multi/bb_* or multi/ctf_* map\n"
-                      << "  --mode MODE      bloodbath, team; ctf is zero-client inspection only\n"
+                      << "  --mode MODE      bloodbath, team or ctf\n"
                       << "  --end RULE       frags (default), time, either, never\n"
                       << "  --frag-limit N   Default 25; zero is immediate (Bloodbath needs a player)\n"
                       << "  --time-limit N   Minutes (dedicated default 10); zero is immediate\n"
@@ -119,8 +119,8 @@ int main(int argc, char** argv)
     std::signal(SIGTERM, stop);
     std::cout << "Server simulation: " << session.game().world_path << ", UDP " << network.port() << ", data "
               << digest_text(session.fingerprint())
-              << "\nBloodbath admission and 20 Hz world replication enabled; movement and player commands enabled; "
-                 "Bloodbath combat and respawn enabled.\n"
+              << "\nMultiplayer admission and 20 Hz world replication enabled; movement and player commands enabled; "
+                 "Bloodbath/Team combat and CTF capture/respawn enabled.\n"
               << std::flush;
     ServerClock clock;
     auto previous = std::chrono::steady_clock::now();

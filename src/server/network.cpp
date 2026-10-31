@@ -178,7 +178,7 @@ namespace OpenBlood2
                 return reject(Net::Reject::Edition);
             if (hello->content != session_.fingerprint())
                 return reject(Net::Reject::Content);
-            if (session_.mode() != GAMETYPE_BLOODBATH && session_.mode() != GAMETYPE_TEAMPLAY)
+            if (!network_game_type(session_.mode()))
                 return reject(Net::Reject::Mode);
             Net::WorldOffer offer{session_.world_id(), std::uint8_t(session_.mode()), std::uint8_t(capacity_),
                                   session_.game().world_path};

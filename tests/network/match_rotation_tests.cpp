@@ -87,8 +87,9 @@ namespace
             !parse_options(std::array<std::string_view, 4>{"--connect", "localhost", "--mode", "team"}, parsed, error));
         CHECK(!parse_options(std::array<std::string_view, 4>{"--host", "multi/bb_crypt", "--team", "green"}, parsed,
                              error));
-        CHECK(!parse_options(std::array<std::string_view, 4>{"--host", "multi/bb_crypt", "--mode", "ctf"}, parsed,
-                             error));
+        CHECK(parse_options(std::array<std::string_view, 4>{"--host", "multi/ctf_cabana", "--mode", "ctf"}, parsed,
+                            error) &&
+              parsed.network_mode == GAMETYPE_CTF);
         std::cout << "Original frag/time/either/never thresholds, zero and large values, shared host/dedicated options "
                      "passed\n";
         return true;

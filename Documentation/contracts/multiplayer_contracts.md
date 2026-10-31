@@ -1516,3 +1516,46 @@ drop, independent flag lifetime and 30-second scheduled return, including empty
 servers. CTF end conditions use team totals and the existing strict intermission.
 Wire admission stays closed until capture replicas and consumers are connected;
 internal server admission tests are not network-play qualification.
+
+
+## CTF network consumers and admission
+
+The [CTF network lot](../implementation/reports/m9_ctf_network.md) opens the same
+checked ENet admission to CTF and adds host `--mode ctf`. Protocol 18 capture
+events carry absolute capturer and team match totals, bounded to ±1,000,000;
+noncapture events carry no capturer/score payload. Preserve generation-qualified
+capture identity at publication, monotonic private sequence/world gates, checked
+recipient team/mode and no resurrection of departed roster entries.
+
+The independent inbox supplies original HUD flag icons and score ordering.
+Grab sets the recipient-team icon; return/need do not clear it; drop and capture
+clear it. Original capture clears every recipient, even an unrelated carrier.
+Late arrivals use the absolute roster/team baseline rather than replaying captures.
+Attached flag models remain ordinary passive ClientWorld members.
+
+Read original CTF notices from external cres.dll, with bounded two-stage %%/name
+formatting; inserted player names stay literal. Unknown capturers print nothing.
+Grab/return play independent local CtfFlagGrab one-shots; drop prints/plays nothing.
+Keep strict last+20 < client-time NeedFlag notices, four lines/five-second expiry,
+world reset and explicit absent resources. Owned flag sound handles share the
+128-voice client budget and retire on logical completion/preemption/map teardown.
+Capture audio stays in the existing authoritative logical sound stream; no extra
+server voice or random draw is added by private client playback.
+
+Preserve local solo sinks, CMoveMgr single integration and server capture rules.
+Server-triggered ENet flag tests do not qualify client-routed captures. Real-process
+rotation, human LAN and cross-platform qualification must remain distinct.
+
+A late Cabana admission exposed a primary-world overlap masking an occupied
+player during the first nearest-hit check. Multiplayer ground entry now repeats
+the existing bounded actor separation after the initial world nudge and before
+the ground drop. It keeps four horizontal candidates, checked endpoint/route,
+no extra RNG/marker selection, unchanged solo/AI ordering and strict runtime
+collision. A fully occupied start remains refused; this is not depenetration
+for moving players.
+
+LevelChanging already cancels client/server firing. Stop emitting client weapon
+frames during that intermission, including synchronous server map loading;
+otherwise a slow load can exhaust the unchanged 64-frame ACK window despite
+neutral input. New-world admission resets the weapon sequence. Movement/audio
+clocks and the normal-play frame budget remain unchanged.

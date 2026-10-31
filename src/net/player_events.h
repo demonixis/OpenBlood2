@@ -29,6 +29,8 @@ namespace OpenBlood2::Net
         DBYTE team = 0;
         int points = 0;
         ObjectId capturer;
+        int capturer_frags = 0;
+        std::array<int, 2> team_frags{}; // Capture publications carry absolute combined match scores.
     };
     struct FragEvent
     {

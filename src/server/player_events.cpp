@@ -1,3 +1,4 @@
+#include "game/game_settings.h"
 #include "server/session.h"
 #include <algorithm>
 #include <type_traits>
@@ -39,6 +40,8 @@ namespace OpenBlood2
             ++subsumed_events;
             return DE_OK;
         }
+        if (std::holds_alternative<CTFEvent>(value) && mode_ != GAMETYPE_CTF)
+            return DE_INVALIDPARAMS;
         const auto identity = [&](HOBJECT handle)
         {
             const auto* record = game_.objects.get(handle);
@@ -59,7 +62,19 @@ namespace OpenBlood2
                     next = Net::FragEvent{identity(v.victim), identity(v.killer), v.killer_frags, v.index,
                                           game_.server.team_frags};
                 else if constexpr (std::is_same_v<T, CTFEvent>)
-                    next = Net::FlagEvent{v.kind, v.team, v.points, identity(v.capturer)};
+                {
+                    Net::FlagEvent flag{v.kind, v.team, v.points, identity(v.capturer)};
+                    if (v.kind == CTFEventKind::Captured)
+                    {
+                        const auto* record = game_.objects.get(v.capturer);
+                        const auto* player = record ? dynamic_cast<const CPlayerObj*>(record->game.get()) : nullptr;
+                        flag.capturer_frags = player ? player->m_Frags : 0;
+                        flag.team_frags = game_.server.team_frags;
+                        if (!player)
+                            flag.capturer = {}; // Invalid capture fails the typed publication boundary.
+                    }
+                    next = flag;
+                }
                 else if constexpr (!std::is_same_v<T, PlayerInitRequest> && !std::is_same_v<T, PlayerPosition> &&
                                    !std::is_same_v<T, PlayerPhysics>)
                     next = v;

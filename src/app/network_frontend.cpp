@@ -235,7 +235,7 @@ namespace OpenBlood2
                     hud_state(values.stats, true, bool(camera.view.object), camera.death.active,
                               !scores.visible && (settings.crosshair || client.zoom_crosshair()),
                               client.zoom_crosshair() ? client.zoom_crosshair() : DBYTE(settings.crosshair_number),
-                              client.players().team());
+                              client.players().team(), client.players().flag_icon());
                 state.items = values.items;
                 state.item_messages = values.item_messages;
                 state.item_shows = values.item_shows;

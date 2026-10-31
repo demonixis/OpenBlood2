@@ -89,9 +89,16 @@ original team skin, preserves assignment across rotations and displays team
 icons/columns. Host/dedicated rules `--friendly-fire on|off` and
 `--negative-team-frags on|off` both default on.
 
+For CTF, use `--mode ctf --host multi/ctf_cabana` (or `--world` on the dedicated).
+The CTF maps are `ctf_cabana`, `ctf_deadcities`, `ctf_dmx` and `ctf_jam`, under
+`multi/`. Capture value defaults to five (`--flag-value N`); `--only-flag-scores`
+and `--use-team-size` accept `on|off` and default off. The first suppresses enemy
+kill points; suicide/friendly-kill penalties still apply. The second multiplies
+capture points by opposing membership, with a minimum of one.
+
 `--end` accepts `frags`, `time`, `either` or `never`. Defaults are 25 frags with
 `frags` selected, plus 15 minutes for a host or 10 for the dedicated when a timed
-rule is selected. Team uses team totals, including departed members' points.
+rule is selected. Team and CTF use team totals, including departed members' points.
 Zero is an immediate threshold (empty Team servers included); use `never` to disable limits.
 Repeat `--map` for a cyclic rotation of at most 50 maps including the initial
 map; one map reloads itself. An end notice/bell and scoreboard precede the change
@@ -99,7 +106,7 @@ by more than 7.5 simulation seconds. Input is neutral during that interval.
 Connections/profiles persist, but scores and inventory restart on the next map.
 Esc/focus loss does not pause a hosted server; quitting its host ends the game.
 Use E to respawn after death. Internet direct connection requires a reachable UDP
-port; there is no relay or NAT traversal. CTF admission remains pending.
+port; there is no relay or NAT traversal. Full multiplayer qualification remains in progress.
 
 ## Controls
 

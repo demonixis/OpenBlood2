@@ -24,8 +24,25 @@ namespace OpenBlood2
             audio_.stop_voice(level_bell_);
         level_bell_ = 0;
         level_sound_error.clear();
+        for (auto id : flag_voices_)
+            audio_.stop_voice(id);
+        flag_voices_.clear();
+        flag_sound_error.clear();
+        last_need_flag_ = 0;
         notices_.clear();
         known_players_.clear();
+    }
+    void NetworkSpeech::retire_flag_voices()
+    {
+        std::erase_if(flag_voices_,
+                      [&](SoundId id)
+                      {
+                          bool done = false;
+                          if (audio_.voice_done(id, done) && !done)
+                              return false;
+                          audio_.stop_voice(id);
+                          return true;
+                      });
     }
     void NetworkSpeech::notice(std::string text)
     {
@@ -127,6 +144,46 @@ namespace OpenBlood2
                 }
             }
         }
+        else if (const auto* flag = std::get_if<Net::FlagEvent>(&event.value))
+        {
+            ++flag_events;
+            if (flag->kind == CTFEventKind::Grabbed || flag->kind == CTFEventKind::Returned)
+            {
+                retire_flag_voices();
+                SoundParameters sound;
+                sound.resource = "sounds_multipatch/CtfFlagGrab.wav";
+                sound.space = SoundSpace::Local;
+                sound.priority = 1;
+                sound.reverb_requested = false;
+                if (auto id = audio_.play_voice(resources_, sound, flag_sound_error))
+                {
+                    flag_voices_.push_back(id); // Overlapping one-shots retain independent completion.
+                    ++flag_sounds;
+                }
+            }
+            const bool need = flag->kind == CTFEventKind::NeedFlag;
+            if (!need || last_need_flag_ + 20 < time_)
+            {
+                if (need)
+                    last_need_flag_ = time_;
+                const auto capturer = std::find_if(roster.begin(), roster.end(),
+                                                   [&](const auto& p) { return p.object == flag->capturer; });
+                if (flag->kind == CTFEventKind::Captured && capturer == roster.end())
+                    ++missing_players;
+                else
+                {
+                    std::string text;
+                    if (announcer.flag_notice(flag->kind,
+                                              capturer == roster.end() ? std::string_view{} : capturer->name,
+                                              capturer == roster.end() ? 0 : capturer->team,
+                                              flag->capturer == joined_.object, resources_, text))
+                    {
+                        notice(std::move(text));
+                        ++flag_notices;
+                    }
+                }
+            }
+        }
         else if (const auto* finish = std::get_if<FinishHimVoice>(&event.value))
         {
             ++finish_events;
@@ -166,6 +223,7 @@ namespace OpenBlood2
                 level_bell_ = 0;
             }
         }
+        retire_flag_voices();
         communication.Update(*this, manager);
         return true;
     }
