@@ -10,7 +10,7 @@ struct CTFWorldState
     std::array<int, 2> team_scores{};
     float last_need_flag = 0;
     int flag_value = 5;
-    bool use_team_size = false;
+    bool use_team_size = false, only_flag_scores = false;
 };
 extern CTFWorldState g_ctf;
 class FlagObject : public B2BaseClass

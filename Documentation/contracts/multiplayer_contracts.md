@@ -1495,3 +1495,24 @@ Below width 500, manual opening cycles columns; automatic visibility does not
 replace original initial column zero. Keep external Voice/character portraits,
 font/name resources and bounded checked CPU/GPU ownership. Bloodbath layout,
 solo clocks, one CMoveMgr integration and PBR/world renderer references stay intact.
+
+
+## Original CTF server match rules
+
+The [CTF server lot](../implementation/reports/m9_ctf_rules.md) connects captures
+to individual and accumulated team match frags. Preserve capture-only diagnostic
+counters, departed contributions, checked team membership and original CTF skins/
+spawn/ammo. OnlyFlagScores suppresses enemy-kill points, not suicide or enabled
+team-kill penalties; retain zero-delta announcements and their single RNG draw.
+UseTeamSize counts all opposing members, including inactive/dead clients, with a
+minimum of one. Captures broadcast to all associated players. Default flag value
+is five; both options default false. Apply configured options after every world
+load without changing local inspection's original state/defaults.
+
+Validate capture products and individual/team score bounds before mutation or
+sound/flag/message side effects. Zero-point captures still return and announce.
+Keep original missing-friendly-flag gates, death-before-null-killer drop, departure
+drop, independent flag lifetime and 30-second scheduled return, including empty
+servers. CTF end conditions use team totals and the existing strict intermission.
+Wire admission stays closed until capture replicas and consumers are connected;
+internal server admission tests are not network-play qualification.

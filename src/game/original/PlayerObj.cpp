@@ -274,10 +274,10 @@ bool CPlayerObj::OnSinglePlayerInit(const OpenBlood2::PlayerInit& init)
 }
 bool CPlayerObj::OnMultiplayerInit(const OpenBlood2::PlayerInit& init)
 {
-    // CTF admission waits for capture/team-score integration. Team uses the
-    // same original profile and its forced team skin; healing settings remain separate.
+    // All supported modes share the original profile; team modes force the
+    // assigned team skin. Network admission separately checks its available consumers.
     const auto mode = GetServerDE()->net_game_type;
-    return (mode == GAMETYPE_BLOODBATH || (mode == GAMETYPE_TEAMPLAY && ctf_team >= 1 && ctf_team <= 2)) &&
+    return (mode == GAMETYPE_BLOODBATH || (team_game_type(mode) && ctf_team >= 1 && ctf_team <= 2)) &&
            InitializeProfile(init, true);
 }
 bool CPlayerObj::InitializeProfile(const OpenBlood2::PlayerInit& init, bool multiplayer)

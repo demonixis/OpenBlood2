@@ -23,6 +23,16 @@ namespace
         MultiplayerRules r;
         CHECK(r.valid() && r.frags == 25 && r.minutes == 10 && Options{}.network_rules.minutes == 15);
         CHECK(r.friendly_fire && r.negative_team_frags);
+        CHECK(!r.only_flag_scores && !r.use_team_size && r.flag_value == 5);
+        CHECK(parse_match_option("--only-flag-scores", "on", r) && r.only_flag_scores);
+        CHECK(parse_match_option("--use-team-size", "on", r) && r.use_team_size);
+        CHECK(parse_match_option("--flag-value", "0", r) && r.flag_value == 0 && r.valid());
+        CHECK(parse_match_option("--flag-value", "1000000", r) && r.valid());
+        CHECK(!parse_match_option("--flag-value", "1000001", r) && !parse_match_option("--flag-value", "-1", r));
+        CHECK(!parse_match_option("--only-flag-scores", "true", r) && !parse_match_option("--use-team-size", "2", r));
+        r.flag_value = 1000001;
+        CHECK(!r.valid());
+        r.flag_value = 5;
         CHECK(parse_match_option("--friendly-fire", "off", r) && !r.friendly_fire);
         CHECK(parse_match_option("--negative-team-frags", "off", r) && !r.negative_team_frags);
         CHECK(!parse_match_option("--friendly-fire", "false", r));
@@ -55,6 +65,12 @@ namespace
         const std::array<std::string_view, 7> args{"--host", "multi/bb_crypt", "--end", "time", "--time-limit",
                                                    "0",      "--help"};
         CHECK(parse_options(args, parsed, error) && parsed.network_rules.minutes == 0);
+        const std::array<std::string_view, 8> flags{
+            "--host", "multi/bb_crypt", "--only-flag-scores", "on", "--use-team-size", "on", "--flag-value", "7"};
+        CHECK(parse_options(flags, parsed, error) && parsed.network_rules.only_flag_scores &&
+              parsed.network_rules.use_team_size && parsed.network_rules.flag_value == 7);
+        CHECK(!parse_options(std::array<std::string_view, 4>{"--connect", "localhost", "--flag-value", "5"}, parsed,
+                             error));
         const std::array<std::string_view, 4> bad{"--connect", "localhost", "--end", "time"};
         CHECK(!parse_options(bad, parsed, error));
         const std::array<std::string_view, 10> team{

@@ -24,10 +24,12 @@ namespace OpenBlood2
         static constexpr std::uint32_t frag_limit = 1000000, minute_limit = 10000;
         std::vector<std::string> following_maps; // First map is --world / --host; original cap: 50 total.
         bool friendly_fire = true, negative_team_frags = true;
+        bool only_flag_scores = false, use_team_size = false;
+        std::uint32_t flag_value = 5;
         bool valid() const
         {
             return end >= MatchEnd::Frags && end <= MatchEnd::Never && frags <= frag_limit && minutes <= minute_limit &&
-                   following_maps.size() < 50;
+                   flag_value <= frag_limit && following_maps.size() < 50;
         }
     };
     // Selected BloodServerShell::UpdateMultiplayer: TIME first, FRAGSANDTIME
@@ -43,11 +45,19 @@ namespace OpenBlood2
     // Both frontends use the same spelling, ranges and settings object.
     inline bool parse_match_option(std::string_view option, std::string_view value, MultiplayerRules& rules)
     {
-        if (option == "--friendly-fire" || option == "--negative-team-frags")
+        if (option == "--friendly-fire" || option == "--negative-team-frags" || option == "--only-flag-scores" ||
+            option == "--use-team-size")
         {
             if (value != "on" && value != "off")
                 return false;
-            (option == "--friendly-fire" ? rules.friendly_fire : rules.negative_team_frags) = value == "on";
+            if (option == "--friendly-fire")
+                rules.friendly_fire = value == "on";
+            else if (option == "--negative-team-frags")
+                rules.negative_team_frags = value == "on";
+            else if (option == "--only-flag-scores")
+                rules.only_flag_scores = value == "on";
+            else
+                rules.use_team_size = value == "on";
             return true;
         }
         if (option == "--end")
@@ -77,6 +87,8 @@ namespace OpenBlood2
             return false;
         if (option == "--frag-limit" && number <= MultiplayerRules::frag_limit)
             rules.frags = number;
+        else if (option == "--flag-value" && number <= MultiplayerRules::frag_limit)
+            rules.flag_value = number;
         else if (option == "--time-limit" && number <= MultiplayerRules::minute_limit)
             rules.minutes = number;
         else

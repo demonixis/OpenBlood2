@@ -305,7 +305,8 @@ namespace OpenBlood2
                      arg == "--world" || arg == "--log-dir" || arg == "--log-level" || arg == "--rez" ||
                      arg == "--connect" || arg == "--host" || arg == "--port" || arg == "--name" || arg == "--end" ||
                      arg == "--frag-limit" || arg == "--time-limit" || arg == "--map" || arg == "--mode" ||
-                     arg == "--team" || arg == "--friendly-fire" || arg == "--negative-team-frags")
+                     arg == "--team" || arg == "--friendly-fire" || arg == "--negative-team-frags" ||
+                     arg == "--only-flag-scores" || arg == "--use-team-size" || arg == "--flag-value")
             {
                 if (++i == args.size() || args[i].empty() || args[i].starts_with("--"))
                 {
@@ -313,7 +314,8 @@ namespace OpenBlood2
                     return false;
                 }
                 if (arg == "--end" || arg == "--frag-limit" || arg == "--time-limit" || arg == "--map" ||
-                    arg == "--friendly-fire" || arg == "--negative-team-frags")
+                    arg == "--friendly-fire" || arg == "--negative-team-frags" || arg == "--only-flag-scores" ||
+                    arg == "--use-team-size" || arg == "--flag-value")
                 {
                     if (!parse_match_option(arg, args[i], options.network_rules))
                     {

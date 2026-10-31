@@ -43,6 +43,9 @@ int main(int argc, char** argv)
                       << "  --time-limit N   Minutes (dedicated default 10); zero is immediate\n"
                       << "  --friendly-fire on|off       Team damage (default on)\n"
                       << "  --negative-team-frags on|off Team-kill penalty (default on)\n"
+                      << "  --only-flag-scores on|off    CTF enemy kills give no points (default off)\n"
+                      << "  --use-team-size on|off       Multiply capture by opposing members (default off)\n"
+                      << "  --flag-value N              Capture points, 0..1000000 (default 5)\n"
                       << "  --map NAME       Append to rotation, up to 50 maps including --world\n"
                       << "  --bind ADDRESS   IPv4 bind address (default 0.0.0.0)\n"
                       << "  --port N         UDP port (default 27888; 0 selects an ephemeral port)\n"
@@ -70,7 +73,8 @@ int main(int argc, char** argv)
         else if (arg == "--ticks")
             valid = number(value, limit);
         else if (arg == "--end" || arg == "--frag-limit" || arg == "--time-limit" || arg == "--map" ||
-                 arg == "--friendly-fire" || arg == "--negative-team-frags")
+                 arg == "--friendly-fire" || arg == "--negative-team-frags" || arg == "--only-flag-scores" ||
+                 arg == "--use-team-size" || arg == "--flag-value")
             valid = parse_match_option(arg, value, rules);
         else if (arg == "--mode")
         {

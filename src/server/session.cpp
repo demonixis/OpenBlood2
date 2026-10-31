@@ -2,6 +2,7 @@
 #include "game/client_replication.h"
 #include "game/game_settings.h"
 #include "game/original/AI_Mgr.h"
+#include "game/original/FlagObjects.h"
 #include "game/world_validation.h"
 #include "net/transport.h"
 #include <algorithm>
@@ -77,6 +78,9 @@ namespace OpenBlood2
         request.filename = rotation_[index];
         if (!game_.load_request(request, error))
             return false;
+        g_ctf.only_flag_scores = rules_.only_flag_scores;
+        g_ctf.use_team_size = rules_.use_team_size;
+        g_ctf.flag_value = int(rules_.flag_value); // World load resets original globals; reapply on every map.
         WorldValidation report;
         if (!check_world_initialization(game_, report, error))
         {
@@ -134,11 +138,11 @@ namespace OpenBlood2
     }
     void ServerSession::update_match()
     {
-        if (ending_tick_ || (mode_ != GAMETYPE_BLOODBATH && mode_ != GAMETYPE_TEAMPLAY))
-            return; // CTF capture scoring is connected before admitting CTF players.
+        if (ending_tick_)
+            return;
         std::array<int, Net::max_players> scores{};
         std::size_t count = 0;
-        if (mode_ == GAMETYPE_TEAMPLAY)
+        if (team_game_type(mode_))
         {
             for (const auto score : game_.server.team_frags)
                 scores[count++] = score; // Includes empty teams and departed members' frags.
@@ -170,8 +174,8 @@ namespace OpenBlood2
     bool ServerSession::join(const Net::JoinProfile& profile, Net::Joined& joined, std::string& error)
     {
         error.clear();
-        if (!started_ || (mode_ != GAMETYPE_BLOODBATH && mode_ != GAMETYPE_TEAMPLAY) || !Net::valid_profile(profile) ||
-            !next_player_ || players_.size() >= Net::max_players || game_.objects.busy())
+        if (!started_ || !Net::valid_profile(profile) || !next_player_ || players_.size() >= Net::max_players ||
+            game_.objects.busy())
         {
             error = "Invalid or unavailable multiplayer player admission";
             return false;

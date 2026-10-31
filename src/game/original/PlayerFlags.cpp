@@ -89,12 +89,23 @@ void CPlayerObj::GiveFlag(HOBJECT h)
         }
         return;
     }
+    const bool multiplayer = s->net_game_type == GAMETYPE_CTF;
+    if (ctf_team < 1 || ctf_team > 2 || (multiplayer && s->GetClientTeam(m_hClient) != ctf_team))
+    {
+        ctf_error = "CTF capture requires checked team membership";
+        return;
+    }
     int opponents = 0;
     if (g_ctf.use_team_size)
-        for (auto h = s->GetNextObject(nullptr); h; h = s->GetNextObject(h))
-            if (auto* p = dynamic_cast<CPlayerObj*>(s->HandleToObject(h));
-                p && p->GetClient() && p->ctf_team == 3 - ctf_team)
-                ++opponents;
+    {
+        if (multiplayer)
+            opponents = int(s->TeamPlayerCounts()[2 - ctf_team]); // TeamMgr includes inactive/dead members.
+        else
+            for (auto h = s->GetNextObject(nullptr); h; h = s->GetNextObject(h))
+                if (auto* p = dynamic_cast<CPlayerObj*>(s->HandleToObject(h));
+                    p && p->GetClient() && p->ctf_team == 3 - ctf_team)
+                    ++opponents; // Preserve explicit local inspection's independent team selection.
+    }
     const auto points = std::int64_t(g_ctf.flag_value) * std::max(1, opponents);
     if (points < 0 || points > 1000000 || ctf_score > std::numeric_limits<int>::max() - points ||
         g_ctf.team_scores[ctf_team - 1] > std::numeric_limits<int>::max() - points)
@@ -102,7 +113,17 @@ void CPlayerObj::GiveFlag(HOBJECT h)
         ctf_error = "CTF score outside bounded integer range";
         return;
     }
-    ctf_score += points;
+    if (multiplayer)
+    {
+        const auto score = std::int64_t(m_Frags) + points;
+        if (score < -1000000 || score > 1000000 || !s->AddClientTeamFrags(m_hClient, int(points)))
+        {
+            ctf_error = "CTF player/team match score outside bounded range";
+            return; // No partial counters, flag detachment, sound or notification.
+        }
+        m_Frags = int(score);
+    }
+    ctf_score += points; // Capture-only inspection counters, separate from combined match frags.
     g_ctf.team_scores[ctf_team - 1] += points;
     SoundRequest sound;
     sound.resource = "sounds_multipatch\\CtfFlagCapture.wav";
@@ -111,9 +132,11 @@ void CPlayerObj::GiveFlag(HOBJECT h)
     sound.outer_radius = 2000;
     sound.priority = 1;
     s->PlayCharacterSound(m_hObject, sound, false, ctf_error);
-    for (auto h = s->GetNextObject(nullptr); h; h = s->GetNextObject(h))
-        if (auto* p = dynamic_cast<CPlayerObj*>(s->HandleToObject(h)); p && p->GetClient())
-            p->NotifyCTF(CTFEventKind::Captured, static_cast<int>(points), m_hObject);
+    // Original StartMessage(NULL) includes inactive/dead connected players too.
+    for (auto next : {s->GetNextObject, s->GetNextInactiveObject})
+        for (auto h = next(nullptr); h; h = next(h))
+            if (auto* p = dynamic_cast<CPlayerObj*>(s->HandleToObject(h)); p && p->GetClient())
+                p->NotifyCTF(CTFEventKind::Captured, static_cast<int>(points), m_hObject);
     s->RemoveAttachment(m_hFlagAttach);
     m_hFlagAttach = 0;
     s->BreakInterObjectLink(m_hObject, m_hFlagObject);

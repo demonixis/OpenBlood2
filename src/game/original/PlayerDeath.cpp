@@ -2,6 +2,7 @@
 // Selected original PlayerObj HandleDeath/DoDeath/CreateCorpse/CreateGibs.
 // Single-player default Chosen profiles; source selections and limits: player_death_contracts.md.
 #include "Corpse.h"
+#include "FlagObjects.h"
 #include "Gib.h"
 #include "PlayerObj.h"
 #include "engine/collision.h"
@@ -157,8 +158,13 @@ void CPlayerObj::UpdateFragStatus()
     {
         who_killed_me_last = name;
         int delta = killer == this ? -1 : 1;
-        if (killer != this && team_game_type(s->net_game_type) && killer->GetTeamID() == GetTeamID())
-            delta = s->friendly_fire && s->negative_team_frags ? -1 : 0;
+        if (killer != this && team_game_type(s->net_game_type))
+        {
+            if (killer->GetTeamID() == GetTeamID())
+                delta = s->friendly_fire && s->negative_team_frags ? -1 : 0;
+            else if (s->net_game_type == GAMETYPE_CTF && g_ctf.only_flag_scores)
+                delta = 0; // Source OnlyFlagScores does not suppress suicide/team-kill penalties.
+        }
         if (killer->m_Frags + delta < -1000000 || killer->m_Frags + delta > 1000000)
         {
             death_error = "Player frag counter exhausted";

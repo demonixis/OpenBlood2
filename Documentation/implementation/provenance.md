@@ -1,5 +1,10 @@
 # Source and Dependency Provenance
 
+The M9 [CTF server lot](reports/m9_ctf_rules.md) ports original capture contributions,
+OnlyFlagScores and UseTeamSize to checked team membership and match totals.
+Its [source ledger](sources/m9_ctf_rules_sources.json) distinguishes local inspection
+from internal multiplayer server verification; CTF wire admission remains closed.
+
 The M9 [Team network lot](reports/m9_team_network.md) connects original transition
 team IDs, team-total end rules, localized team joins/HUD and CFragInfo team layout.
 The checked transport and owned client surfaces are reconstruction adapters; see

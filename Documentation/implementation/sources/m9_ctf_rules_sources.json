@@ -1,0 +1,96 @@
+{
+  "baseline": "02998762f563669a3558e240335657f6c298f8e5",
+  "scope": "Original CTF server capture/frag scoring, options, membership multiplier and checked match rotation; wire admission remains closed",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "02998762f563669a3558e240335657f6c298f8e5",
+      "path": "src/game/original/PlayerFlags.cpp",
+      "sha256": "4b2a9c39b28e69cade32eeed55bd200ff6beae312c28c128a8581783ceddf3c8"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "02998762f563669a3558e240335657f6c298f8e5",
+      "path": "src/game/original/FlagObjects.h",
+      "sha256": "34b14cdd18f975f57065eb33269ced40028594cdc02884e71bcd5eb81c468e6c"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "02998762f563669a3558e240335657f6c298f8e5",
+      "path": "src/game/original/PlayerDeath.cpp",
+      "sha256": "2cc309f14072151d9a428de1455e096fc522869d29616b18006b43fd1452bdb1"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "02998762f563669a3558e240335657f6c298f8e5",
+      "path": "src/game/original/PlayerObj.cpp",
+      "sha256": "dc30e3d8acade8f4eb954dda2e3236eb32faeb1da84109e6f8aa8445832e06a4"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "02998762f563669a3558e240335657f6c298f8e5",
+      "path": "src/game/original/BloodShells.cpp",
+      "sha256": "aa47b815f762493888e2113430bfe3e5389b786b71040c6a8def094da1b99774"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "02998762f563669a3558e240335657f6c298f8e5",
+      "path": "src/game/server_clients.cpp",
+      "sha256": "7335746f00fb198fcfc7d53c15dfc33d23316cdbc8ad49f6cf3f0d4f4934a8ab"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "02998762f563669a3558e240335657f6c298f8e5",
+      "path": "src/server/session.cpp",
+      "sha256": "aa45cfa2e47815cf00381d0a412ae8f20f5be7b45b431c7185015504a26d2ef6"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "02998762f563669a3558e240335657f6c298f8e5",
+      "path": "src/game/multiplayer_rules.h",
+      "sha256": "ef325cf6723f4f94c512b2aeda700110f5c983fce1c8cec72d0a1e88f239e30b"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/NetStart.cpp",
+      "sha256": "320bd6f451fc7d08f93c294899af379756fa8432d439731b63c65124057dacbf"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Blood2Serv/NetStart.cpp",
+      "sha256": "c810d9ca3ac26a3f4e8629ffe75ddf1cb5e6a8afd776d367d4308bc05dbb7393"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/FlagObjects.cpp",
+      "sha256": "a6714c84ed5990f43f61c0a92d87adc651295bc312f5a343a955b8ee110872c7"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Shared/TeamMgr.cpp",
+      "sha256": "fcb0db883ea13d497687c494be0e29587c0777a46bb46fa122860959aaac2f89"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Shared/TeamMgr.h",
+      "sha256": "ee9bad4767319a783bee04c8baba69d2e87ca279904495ff6ad3d66b77333464"
+    }
+  ]
+}

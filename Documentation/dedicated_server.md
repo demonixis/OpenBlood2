@@ -35,7 +35,7 @@ provided. This complete-content hash is separate from the save fingerprint.
 
 Modes are `bloodbath`, `team` and zero-client `ctf` inspection. Bloodbath/Team
 require `multi/bb_*`; CTF requires `multi/ctf_*` and refuses players until its
-network capture rules are connected. Defaults: bind `0.0.0.0`, UDP `27888`,
+independent capture consumers are connected. Defaults: bind `0.0.0.0`, UDP `27888`,
 16 peers including any playable host. `--bind 127.0.0.1 --port 0` selects an
 ephemeral loopback listener for tests. Internet by direct address needs a reachable
 UDP port; there is no NAT traversal or relay.
@@ -49,6 +49,14 @@ Original intermission lasts strictly more than 7.5 simulation seconds. Peers and
 profiles/teams remain connected, but each map resets scores, inventory and world/
 player identities. `--friendly-fire on|off` and `--negative-team-frags on|off` both
 default on, preserving the original host/dedicated Team defaults.
+
+CTF server prerequisites now include `--flag-value N` (default 5, bounded to
+0..1000000), `--only-flag-scores on|off` and `--use-team-size on|off` (both off by
+default). OnlyFlagScores suppresses enemy-kill points while retaining suicide and
+enabled team-kill penalties. UseTeamSize multiplies capture points by at least
+one opposing member, including inactive/dead members. These rules reset with the
+configured rotation; see [CTF server verification](implementation/reports/m9_ctf_rules.md).
+CTF wire admission and independent capture presentation remain pending.
 
 Simulation runs at 60 Hz with at most six catch-up ticks; state publishes at
 20 Hz. `--ticks 180` stops after three simulated seconds. Ctrl+C/SIGTERM performs
