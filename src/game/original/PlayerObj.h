@@ -61,8 +61,13 @@ class CPlayerObj : public CBaseCharacter
     void GiveFlag(HOBJECT);
     void DropFlag(bool notify = true);
     bool SetCTFTeam(int);
+    int GetTeamID() const
+    {
+        return ctf_team;
+    }
+    bool IsPlayerDamageOk(const CPlayerObj*) const;
     void NotifyCTF(OpenBlood2::CTFEventKind, int points = 0, HOBJECT capturer = nullptr);
-    int ctf_team = 0, ctf_score = 0;
+    int ctf_team = 0, ctf_score = 0; // Shared source team ID; local CTF capture score remains separate for now.
     HOBJECT m_hFlagObject = nullptr;
     HATTACHMENT m_hFlagAttach = 0;
     std::string ctf_error;

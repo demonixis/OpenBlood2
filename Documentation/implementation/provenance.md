@@ -1,5 +1,12 @@
 # Source and Dependency Provenance
 
+The M9 [server Team rules](reports/m9_team_rules.md) select original
+BloodServerShell/TeamMgr assignment, PlayerObj team skin/spawn/frags,
+CDestructable friendly filtering and GameWeapons Voodoo team gates. Checked
+client records and bounded team totals replace ID-linked membership; the existing
+portable server RNG replaces rand while retaining the strict tie predicate.
+See the [source ledger](sources/m9_team_rules_sources.json).
+
 The M9 [Bloodbath rotation lot](reports/m9_rotation.md) selects original
 UpdateMultiplayer thresholds, StartNextMultiplayerLevel wait/reset rules,
 NetStart host/dedicated defaults and client changing-level presentation.

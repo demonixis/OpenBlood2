@@ -24,8 +24,7 @@ void CBloodServerShell::PreStartWorld()
     inventory_capture = {};
     damage_capture = {};
     player_capture = {};
-    // Team setup, active cinematics, voice and multiplayer state are outside
-    // the accepted fresh single-player entry mode.
+    server_.ResetTeams(); // Original TeamMgr::Term/Init at a world boundary.
 }
 bool CBloodServerShell::PostStartWorld()
 {
@@ -167,6 +166,8 @@ CPlayerObj* CBloodServerShell::CreatePlayer(HCLIENT client, std::string* error)
         return nullptr;
     }
     player->SetClient(client);
+    if (team_game_type(server_.net_game_type))
+        player->ctf_team = server_.GetClientTeam(client);
     if (server_.SetClientUserData(client, player->m_hObject) != DE_OK || !player->Respawn())
     {
         if (error)
@@ -187,13 +188,13 @@ bool CBloodServerShell::RespawnPlayer(CPlayerObj* player, HCLIENT client)
     if (server_.SetClientUserData(client, player->m_hObject) != DE_OK ||
         server_.SendToClient(client, OpenBlood2::PlayerInitRequest{}) != DE_OK)
         return false;
-    // Fresh entry only: no saved client refs, team selection or restore here.
+    // Fresh entry only: team membership is already assigned; no saved refs or restore here.
     if (!player->GoToStartPoint(nullptr, inspection_start))
         return false;
     server_.SetGameConVar("GAME_GOTOSTARTPOINT", "1");
     return true;
 }
-CPlayerObj* CBloodServerShell::OnClientEnterWorld(HCLIENT client, std::string* error)
+CPlayerObj* CBloodServerShell::OnClientEnterWorld(HCLIENT client, std::string* error, DBYTE team)
 {
     if (error)
         error->clear();
@@ -201,6 +202,14 @@ CPlayerObj* CBloodServerShell::OnClientEnterWorld(HCLIENT client, std::string* e
     {
         if (error)
             *error = "Invalid original player entry state";
+        return nullptr;
+    }
+    // Original membership precedes player creation/spawn. Network profile and
+    // retained-team policy are supplied by the owning session, never a pointer.
+    if (team_game_type(server_.net_game_type) && !server_.AssignClientTeam(client, team))
+    {
+        if (error)
+            *error = "Invalid or unavailable team membership";
         return nullptr;
     }
     auto* player = CreatePlayer(client, error);
@@ -257,6 +266,7 @@ void CBloodServerShell::OnClientExitWorld(HCLIENT client)
         server_.RemoveObject(player->m_hObject);
     }
     server_.SetClientUserData(client, nullptr);
+    server_.ClearClientTeam(client);
 }
 bool CBloodServerShell::OnMessage(HCLIENT client, const OpenBlood2::PlayerInit& init)
 {

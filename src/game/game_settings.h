@@ -24,6 +24,10 @@ constexpr bool network_game_type(unsigned type)
 {
     return type == GAMETYPE_BLOODBATH || type == GAMETYPE_TEAMPLAY || type == GAMETYPE_CTF;
 }
+constexpr bool team_game_type(unsigned type)
+{
+    return type == GAMETYPE_TEAMPLAY || type == GAMETYPE_CTF;
+}
 enum SaveType
 {
     SAVETYPE_AUTO = 0,

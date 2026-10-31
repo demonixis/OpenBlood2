@@ -24,7 +24,7 @@ class CBloodServerShell
     explicit CBloodServerShell(ServerDE& server) : paths(server), server_(server) {}
     void PreStartWorld();
     bool PostStartWorld();
-    CPlayerObj* OnClientEnterWorld(HCLIENT, std::string* error = nullptr);
+    CPlayerObj* OnClientEnterWorld(HCLIENT, std::string* error = nullptr, DBYTE team = 0);
     CPlayerObj* OnRestoredClientEnterWorld(HCLIENT, HOBJECT, const char* start_name = nullptr);
     void OnClientExitWorld(HCLIENT);
     bool OnMessage(HCLIENT, const OpenBlood2::PlayerInit&);

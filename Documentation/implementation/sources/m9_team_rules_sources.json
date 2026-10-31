@@ -1,0 +1,111 @@
+{
+  "baseline": "68658e5161637004175c28468257437c55921083",
+  "scope": "Selected server Team membership/spawn/profile/frags/friendly-fire prerequisites; no Team wire admission",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "68658e5161637004175c28468257437c55921083",
+      "path": "src/game/server_clients.cpp",
+      "sha256": "97206eb2c60ce26dd2d6013c497bf7bfdbc370bdbc4288634de23cf6af1aaaa8"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "68658e5161637004175c28468257437c55921083",
+      "path": "src/game/original/BloodShells.cpp",
+      "sha256": "5cc46796ac2cdc8b843476407041bfadf51aedb4c40a4cddb8693ae1a21a3dc0"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "68658e5161637004175c28468257437c55921083",
+      "path": "src/game/original/PlayerObj.cpp",
+      "sha256": "625aec6030f1e2a04119ed08775958114b857e53d3cd09e7dddc10eedb63f811"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "68658e5161637004175c28468257437c55921083",
+      "path": "src/game/original/PlayerDeath.cpp",
+      "sha256": "adaf90a6aab53771c9b7f68eedcda43136e7d7ed75380433c42e9e3e40ae9843"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "68658e5161637004175c28468257437c55921083",
+      "path": "src/game/original/PlayerFlags.cpp",
+      "sha256": "a131c2362a0dcbb55f67bcf560775e462132abe145f416ae16c0554b35c1c411"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "68658e5161637004175c28468257437c55921083",
+      "path": "src/game/original/Destructable.cpp",
+      "sha256": "77edeb7f237fd54b86468843a444a3632f89dfac9481c59cd762272cf49d5203"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "68658e5161637004175c28468257437c55921083",
+      "path": "src/game/original/Voodoo.cpp",
+      "sha256": "8efb5bfcf544a660e25fb08816071f9eb2908f21c522f8c490dca976ff3ca1d0"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "68658e5161637004175c28468257437c55921083",
+      "path": "src/game/server_weapons.cpp",
+      "sha256": "910dc9f48b1d32984c2bc4005ff4446eb4db9de10d2c0390f968f3b162d7d138"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Shared/TeamMgr.cpp",
+      "sha256": "fcb0db883ea13d497687c494be0e29587c0777a46bb46fa122860959aaac2f89"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Shared/TeamMgr.h",
+      "sha256": "ee9bad4767319a783bee04c8baba69d2e87ca279904495ff6ad3d66b77333464"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/Destructable.cpp",
+      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/GameWeapons.cpp",
+      "sha256": "dfa82f932d6e64df9479681c2945fde28f29c1abe7e7bcf28addec4d7b578ddd"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/NetStart.cpp",
+      "sha256": "320bd6f451fc7d08f93c294899af379756fa8432d439731b63c65124057dacbf"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Blood2Serv/NetStart.cpp",
+      "sha256": "c810d9ca3ac26a3f4e8629ffe75ddf1cb5e6a8afd776d367d4308bc05dbb7393"
+    }
+  ],
+  "adaptations": [
+    "Checked per-client membership replaces TeamMgr ID-linked records; counts/totals are world-owned and reset at original PreStartWorld.",
+    "Portable server RandomInt replaces C rand modulo, preserving one draw per tie and strict >50 selection; no retail RNG-bit parity claim.",
+    "Original team+4 skin and random-ordinal cyclic own/neutral spawn scan, with source first-marker fallback and existing checked placement.",
+    "Player/team frags update atomically inside current +/-1000000 transport bounds. Departure retains team totals.",
+    "Source sender/owner/self friendly-fire priorities, Voodoo protected-hit and slow-death finishing order retained without relaxing typed damage attribution.",
+    "Existing ctf_team storage carries the original team ID; local CTF capture score and upcoming network CTF/OnlyFlagScores remain separate.",
+    "Protocol 16 and Bloodbath-only network admission unchanged; Team transport, match limits, rotation retention and presentation are next."
+  ]
+}

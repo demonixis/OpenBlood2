@@ -46,6 +46,64 @@ namespace OpenBlood2
         }
         return it->second.player;
     }
+    std::array<unsigned, 2> ServerAdapter::TeamPlayerCounts() const
+    {
+        std::array<unsigned, 2> counts{};
+        for (const auto& [client, state] : clients_)
+            if (state.team >= 1 && state.team <= 2)
+                ++counts[state.team - 1];
+        return counts;
+    }
+    bool ServerAdapter::AssignClientTeam(HCLIENT client, DBYTE preferred)
+    {
+        auto found = clients_.find(client);
+        if (!team_game_type(net_game_type) || preferred > 2 || found == clients_.end() || found->second.team ||
+            found->second.player || objects_.busy())
+            return false;
+        if (!preferred)
+        {
+            const auto counts = TeamPlayerCounts();
+            preferred = counts[0] <= counts[1] ? 1 : 2;
+            if (counts[0] == counts[1])
+            {
+                int roll = 0;
+                // TeamMgr::GetTeamWithLeastPlayers(TRUE): second team only
+                // when rand()%100 > 50, not >=50. One server draw per tie.
+                if (!RandomInt(0, 99, roll))
+                    return false;
+                preferred = roll > 50 ? 2 : 1;
+            }
+        }
+        found->second.team = preferred;
+        return true;
+    }
+    DBYTE ServerAdapter::GetClientTeam(HCLIENT client) const
+    {
+        const auto found = clients_.find(client);
+        return found == clients_.end() ? 0 : found->second.team;
+    }
+    void ServerAdapter::ClearClientTeam(HCLIENT client)
+    {
+        if (auto found = clients_.find(client); found != clients_.end())
+            found->second.team = 0;
+    }
+    bool ServerAdapter::AddClientTeamFrags(HCLIENT client, int delta)
+    {
+        const auto team = GetClientTeam(client);
+        if (!team_game_type(net_game_type) || !team || !GetClientUserData(client))
+            return false;
+        const auto next = std::int64_t(team_frags[team - 1]) + delta;
+        if (next < -1000000 || next > 1000000)
+            return false;
+        team_frags[team - 1] = static_cast<int>(next);
+        return true;
+    }
+    void ServerAdapter::ResetTeams()
+    {
+        team_frags = {};
+        for (auto& [client, state] : clients_)
+            state.team = 0;
+    }
     DRESULT ServerAdapter::SetClientUserData(HCLIENT client, HOBJECT player)
     {
         trace_service("SetClientUserData");

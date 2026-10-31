@@ -274,9 +274,11 @@ bool CPlayerObj::OnSinglePlayerInit(const OpenBlood2::PlayerInit& init)
 }
 bool CPlayerObj::OnMultiplayerInit(const OpenBlood2::PlayerInit& init)
 {
-    // Team assignment/forced team skin and regeneration settings arrive with
-    // the match-rule lot. Do not silently treat those modes as Bloodbath.
-    return GetServerDE()->net_game_type == GAMETYPE_BLOODBATH && InitializeProfile(init, true);
+    // CTF admission waits for capture/team-score integration. Team uses the
+    // same original profile and its forced team skin; healing settings remain separate.
+    const auto mode = GetServerDE()->net_game_type;
+    return (mode == GAMETYPE_BLOODBATH || (mode == GAMETYPE_TEAMPLAY && ctf_team >= 1 && ctf_team <= 2)) &&
+           InitializeProfile(init, true);
 }
 bool CPlayerObj::InitializeProfile(const OpenBlood2::PlayerInit& init, bool multiplayer)
 {
@@ -318,7 +320,7 @@ bool CPlayerObj::InitializeProfile(const OpenBlood2::PlayerInit& init, bool mult
         }
     } rollback{m_InventoryMgr, m_hstrPlayerName};
     m_nCharacter = init.character;
-    m_nSkin = init.skin;
+    m_nSkin = multiplayer && team_game_type(GetServerDE()->net_game_type) ? DBYTE(ctf_team + 4) : init.skin;
     m_nAttribStrength = init.strength;
     m_nAttribSpeed = init.speed;
     m_nAttribResistance = init.resistance;
@@ -367,7 +369,7 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name, bool inspection_start)
     } release{server, list};
     GameStartPoint* start = nullptr;
     ObjectLink* selected_link = nullptr;
-    if (server->net_game_type == GAMETYPE_BLOODBATH)
+    if (network_game_type(server->net_game_type))
     {
         // Original PlayerObj::GoToStartPoint draws from the whole named list,
         // including markers without Multiplayer=true. No solo/inspection fallback.
@@ -384,6 +386,28 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name, bool inspection_start)
             selected = selected->m_pNext;
         if (selected && server->IsObjectAlive(selected->m_hObject))
             start = dynamic_cast<GameStartPoint*>(server->HandleToObject(selected->m_hObject));
+        if (start && team_game_type(server->net_game_type))
+        {
+            int safety = static_cast<int>(list->m_nInList);
+            while (start && start->GetTeamID() != GetTeamID() && start->GetTeamID() != 0)
+            {
+                selected = selected->m_pNext ? selected->m_pNext : list->m_pFirstLink;
+                start = selected && server->IsObjectAlive(selected->m_hObject)
+                            ? dynamic_cast<GameStartPoint*>(server->HandleToObject(selected->m_hObject))
+                            : nullptr;
+                if (--safety < 0)
+                    start = nullptr;
+            }
+            if (!start)
+            {
+                // Source fallback is the first named marker, even an enemy's.
+                selected = list->m_pFirstLink;
+                start = selected && server->IsObjectAlive(selected->m_hObject)
+                            ? dynamic_cast<GameStartPoint*>(server->HandleToObject(selected->m_hObject))
+                            : nullptr;
+                entry_start_fallback = true;
+            }
+        }
         selected_link = selected;
         if (!start)
         {
@@ -470,6 +494,8 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name, bool inspection_start)
                               : nullptr;
             if (!other || server->GetObjectPos(other->m_hObject, &position) != DE_OK)
                 continue;
+            if (team_game_type(server->net_game_type) && other->GetTeamID() != GetTeamID() && other->GetTeamID() != 0)
+                continue; // Retries keep the source team filter.
             if (!server->IsObjectAlive(m_hObject) || server->TeleportObject(m_hObject, &position) != DE_OK)
                 return false;
             if (server->ResolveInitialActorOverlap(m_hObject) != DE_OK)

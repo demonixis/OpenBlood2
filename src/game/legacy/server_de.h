@@ -198,6 +198,13 @@ class ServerDE : public CSBase, public OpenBlood2::EffectQueries
     // raw C++ pointer whose lifetime can outlive its object.
     virtual HOBJECT GetClientUserData(HCLIENT) = 0;
     virtual DRESULT SetClientUserData(HCLIENT, HOBJECT) = 0;
+    // Selected original TeamMgr membership, kept with checked client ownership.
+    virtual bool AssignClientTeam(HCLIENT, DBYTE preferred) = 0;
+    virtual DBYTE GetClientTeam(HCLIENT) const = 0;
+    virtual void ClearClientTeam(HCLIENT) = 0;
+    virtual void ResetTeams() = 0;
+    virtual std::array<unsigned, 2> TeamPlayerCounts() const = 0;
+    virtual bool AddClientTeamFrags(HCLIENT, int delta) = 0;
     virtual bool RandomFloat(float, float, float&) = 0;
     virtual std::uint64_t PublishLightning(HOBJECT, const OpenBlood2::LightningSettings&, std::string&) = 0;
     virtual bool PublishLightEffect(HOBJECT, const OpenBlood2::LightSettings&) = 0;
@@ -224,6 +231,8 @@ class ServerDE : public CSBase, public OpenBlood2::EffectQueries
     // GAME_GAMETYPE console variable (B2BaseClass::GetGameType) holds their actual type.
     DBYTE net_game_type = 0;
     OpenBlood2::MultiplayerPickups multiplayer_pickups;
+    bool friendly_fire = true, negative_team_frags = true; // Original host/dedicated defaults.
+    std::array<int, 2> team_frags{}; // TeamMgr totals survive member departure, reset with the world.
     DBOOL IsMultiplayerGame() const
     {
         return net_game_type != 0;

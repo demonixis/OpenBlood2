@@ -1,4 +1,4 @@
-// Selected original ObjectDLL/GameWeapons.cpp CVoodooDoll solo branches.
+// Selected original ObjectDLL/GameWeapons.cpp CVoodooDoll branches.
 #include "InventoryMgr.h"
 #include "PlayerObj.h"
 #include "Weapon.h"
@@ -86,6 +86,7 @@ FireResult CVoodooDoll::FireVector()
     };
     float closest = 3000;
     HOBJECT nearest = nullptr;
+    bool protected_target = false;
     SegmentHit nearest_hit;
     DVector nearest_direction{}; // The source leaves this uninitialized on a primary miss.
     for (auto candidate : candidates)
@@ -108,6 +109,13 @@ FireResult CVoodooDoll::FireVector()
         direction = vector_scale(direction, 1 / distance);
         if (vector_dot(direction, forward) < (alternate ? .65f : .9f))
             continue;
+        if (alternate && !player->IsPlayerDamageOk(dynamic_cast<CPlayerObj*>(server->HandleToObject(candidate))))
+        {
+            // Original counts the protected target before the visibility ray,
+            // suppressing alternate self punishment even behind an obstruction.
+            protected_target = true;
+            continue;
+        }
         SegmentHit hit;
         const auto query = server->IntersectSegment(origin, vector_add(point, vector_scale(direction, 15)), m_hOwner,
                                                     hit, false, SegmentObjects::SolidOnly, SegmentFilter::IgnoreVolumes,
@@ -135,10 +143,12 @@ FireResult CVoodooDoll::FireVector()
     {
         if (!alternate && nearest)
         {
+            if (!player->IsPlayerDamageOk(dynamic_cast<CPlayerObj*>(server->HandleToObject(nearest))))
+                return last_shot.result = FireResult::Fired;
             if (!impact(nearest, nearest_hit, nearest_direction))
                 return fail("Voodoo primary damage/effect failed");
         }
-        else if (targets.empty() && (alternate || !candidates.empty()))
+        else if (targets.empty() && !protected_target && (alternate || !candidates.empty()))
         {
             const float amount = alternate ? 100 : last_shot.damage * m_pInventoryMgr->damage_multiplier / 3;
             if (!deliver(m_hOwner, origin, alternate ? DVector{0, -1, 0} : DVector{}, amount,

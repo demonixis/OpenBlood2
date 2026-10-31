@@ -1,9 +1,16 @@
 // Original PlayerObj::GrabFlag/GiveFlag/DropFlag, with checked local match state.
 #include "FlagObjects.h"
 #include "PlayerObj.h"
+#include "game/game_settings.h"
 #include <algorithm>
 #include <limits>
 using namespace OpenBlood2;
+bool CPlayerObj::IsPlayerDamageOk(const CPlayerObj* other) const
+{
+    const auto* server = GetServerDE();
+    return !other || other == this || !team_game_type(server->net_game_type) || server->friendly_fire ||
+           GetTeamID() != other->GetTeamID();
+}
 void CPlayerObj::NotifyCTF(CTFEventKind kind, int points, HOBJECT capturer)
 {
     if (!m_hClient)

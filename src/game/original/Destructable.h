@@ -46,6 +46,7 @@ class CDestructable : public Aggregate
         last_damager_ = attacker;
     }
     void CalculateResistance(DBYTE);
+    bool IsPlayerToPlayerDamageOk(HOBJECT damager, HOBJECT owner) const;
     bool Heal(float);
     bool MegaHeal(float);
     bool AddWard(float);

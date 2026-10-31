@@ -1438,3 +1438,35 @@ reporting clock. Preserve client output ownership, clear old voices before repla
 geometry, reset presentation clocks and rebuild the existing GPU world only
 through its checked epoch boundary. Solo, renderer references and logical
 server audio clocks are unchanged. Team/CTF team limits remain a separate lot.
+
+
+## Original server Team rules prerequisite
+
+The [Team rules lot](../implementation/reports/m9_team_rules.md) ports server
+membership, spawn/profile, frags and friendly fire. Protocol 16 and Bloodbath-only
+admission remain unchanged until the independent Team consumers are connected.
+Keep two teams with checked client memberships, assigned before creating the player.
+Auto chooses least populated; equal counts use the original strict >50 tie
+predicate and one server draw. Explicit/unequal choices draw nothing. Reject
+stale/repeated assignment; roll back failed entry. Departure never subtracts
+previous frags, and world reset clears memberships/totals. No team pointer goes
+into a client object or protocol.
+
+Force Team skins to team+4 while retaining profile/ammo/announcement order.
+Spawn draws once over all named markers, scans cyclically for own/neutral team,
+and falls back to the first marker when no match exists. Keep existing checked
+grounding/occupied-start placement; no new collision bypass or extra draw.
+Enemy kills add one; friendly kills subtract one only with both FriendlyFire and
+NegTeamFrags; suicide subtracts regardless of those flags. Keep team totals
+independent of connected-player sums and check individual/team bounds atomically.
+The original default flags are true. CTF OnlyFlagScores/capture scoring remains
+separate and must be connected before CTF admission.
+
+Preserve CDestructable's sender-self/owner-self exceptions, direct player sender
+priority over projectile owner, and no damage/armor/impulse/trigger on friendly
+refusal. Keep the existing checked attribution boundary. Voodoo's primary
+protected nearest-target return and alternate protected in-cone pre-visibility
+hit also suppress self punishment and secondary effects. Do not move the damage
+filter ahead of PlayerObj's original slow-death finishing branch: it confirms
+the first lethal attacker before aggregate filtering. Solo/local CTF behavior,
+logical audio/RNG clocks and one CMoveMgr integration remain unchanged.

@@ -5,6 +5,7 @@
 #include "Gib.h"
 #include "PlayerObj.h"
 #include "engine/collision.h"
+#include "game/game_settings.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -155,10 +156,17 @@ void CPlayerObj::UpdateFragStatus()
     if (const auto* name = s->GetStringData(killer->m_hstrPlayerName))
     {
         who_killed_me_last = name;
-        const auto delta = killer == this ? -1 : 1; // Bloodbath; Team/CTF admission remains separate.
+        int delta = killer == this ? -1 : 1;
+        if (killer != this && team_game_type(s->net_game_type) && killer->GetTeamID() == GetTeamID())
+            delta = s->friendly_fire && s->negative_team_frags ? -1 : 0;
         if (killer->m_Frags + delta < -1000000 || killer->m_Frags + delta > 1000000)
         {
             death_error = "Player frag counter exhausted";
+            return;
+        }
+        if (team_game_type(s->net_game_type) && !s->AddClientTeamFrags(killer->m_hClient, delta))
+        {
+            death_error = "Team frag counter or membership unavailable";
             return;
         }
         killer->m_Frags += delta;

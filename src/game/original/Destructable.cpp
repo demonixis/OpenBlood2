@@ -4,6 +4,7 @@
 #include "PlayerObj.h"
 #include "engine/collision.h"
 #include "engine/objects.h"
+#include "game/game_settings.h"
 #include "spawn_object.h"
 #include "trigger_helpers.h"
 #include <algorithm>
@@ -134,6 +135,21 @@ void CDestructable::SendTrigger(const std::string& target, const std::string& me
     if (text)
         server->FreeString(text);
 }
+bool CDestructable::IsPlayerToPlayerDamageOk(HOBJECT damager, HOBJECT owner) const
+{
+    // Original self exceptions precede team filtering. The direct sender takes
+    // precedence over the projectile's attributed owner when both are players.
+    if (m_hObject == damager || m_hObject == owner)
+        return true;
+    auto* server = BaseClass::GetServerDE();
+    if (!team_game_type(server->net_game_type) || server->friendly_fire)
+        return true;
+    const auto* victim = dynamic_cast<CPlayerObj*>(server->HandleToObject(m_hObject));
+    auto* hitter = dynamic_cast<CPlayerObj*>(server->HandleToObject(damager));
+    if (!hitter)
+        hitter = dynamic_cast<CPlayerObj*>(server->HandleToObject(owner));
+    return !victim || victim->IsPlayerDamageOk(hitter);
+}
 // Shared damage; production NPC localization is in AIHitReaction.cpp.
 // NPC impulses, powerups and complete death reactions remain bounded separately.
 DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD message, HMESSAGEREAD read)
@@ -164,6 +180,7 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD 
         if (!BaseClass::GetServerDE()->ReadDamage(read, damage))
             return 0;
         if (!m_bGodMode && !m_bDead && can_damage && !handling_damage &&
+            IsPlayerToPlayerDamageOk(sender, damage.attacker) &&
             (!trigger_only || damage.type == OpenBlood2::DamageType::Death))
         {
             handling_damage = true;
