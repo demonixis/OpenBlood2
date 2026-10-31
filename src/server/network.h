@@ -1,4 +1,5 @@
 #pragma once
+#include "net/discovery.h"
 #include "net/transport.h"
 #include "server/session.h"
 #include <chrono>
@@ -28,6 +29,7 @@ namespace OpenBlood2
         std::uint64_t membership_updates = 0;
         std::uint64_t state_updates = 0, state_drops = 0, state_bytes = 0;
         std::string last_rejection;
+        std::string discovery_error, server_name = "Blood II";
 
       private:
         enum class Phase
@@ -51,6 +53,9 @@ namespace OpenBlood2
         };
         ServerSession& session_;
         Net::Transport transport_;
+        Net::LanDiscovery discovery_;
+        Net::LanOffer discovery_offer_;
+        bool discovery_open_ = false;
         std::vector<Peer> peers_;
         unsigned capacity_ = 0;
         bool clock_started_ = false;

@@ -117,6 +117,8 @@ int main(int argc, char** argv)
     }
     std::signal(SIGINT, stop);
     std::signal(SIGTERM, stop);
+    if (!network.discovery_error.empty())
+        std::cerr << network.discovery_error << '\n';
     std::cout << "Server simulation: " << session.game().world_path << ", UDP " << network.port() << ", data "
               << digest_text(session.fingerprint())
               << "\nMultiplayer admission and 20 Hz world replication enabled; movement and player commands enabled; "

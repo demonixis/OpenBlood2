@@ -1,4 +1,5 @@
 #include "net/transport.h"
+#include "net/enet_runtime.h"
 #include <enet/enet.h>
 #include <limits>
 #include <mutex>
@@ -8,22 +9,6 @@ namespace OpenBlood2::Net
     namespace
     {
         constexpr std::uint32_t connection_magic = 0x4f423209;
-        std::mutex runtime_mutex;
-        unsigned runtime_users = 0;
-        bool acquire_runtime()
-        {
-            std::lock_guard lock(runtime_mutex);
-            if (!runtime_users && enet_initialize() != 0)
-                return false;
-            ++runtime_users;
-            return true;
-        }
-        void release_runtime()
-        {
-            std::lock_guard lock(runtime_mutex);
-            if (!--runtime_users)
-                enet_deinitialize();
-        }
         bool address_for(std::string_view name, std::uint16_t port, ENetAddress& address)
         {
             if (name.empty() || name.size() > 253 || name.find('\0') != name.npos)
@@ -37,6 +22,22 @@ namespace OpenBlood2::Net
             queued -= packet->dataLength;
         }
     } // namespace
+    std::mutex runtime_mutex;
+    unsigned runtime_users = 0;
+    bool acquire_enet_runtime()
+    {
+        std::lock_guard lock(runtime_mutex);
+        if (!runtime_users && enet_initialize() != 0)
+            return false;
+        ++runtime_users;
+        return true;
+    }
+    void release_enet_runtime()
+    {
+        std::lock_guard lock(runtime_mutex);
+        if (!--runtime_users)
+            enet_deinitialize();
+    }
     Transport::~Transport()
     {
         close();
@@ -51,7 +52,7 @@ namespace OpenBlood2::Net
             error = "Transport already open or invalid player capacity";
             return false;
         }
-        if (!acquire_runtime())
+        if (!acquire_enet_runtime())
         {
             error = "ENet initialization failed";
             return false;
@@ -60,14 +61,14 @@ namespace OpenBlood2::Net
         ENetAddress bind{};
         if (listening && !address_for(address, port, bind))
         {
-            release_runtime();
+            release_enet_runtime();
             error = "Invalid IPv4 bind address";
             return false;
         }
         host_ = enet_host_create(listening ? &bind : nullptr, capacity, unsigned(Channel::Count), 0, 0);
         if (!host_)
         {
-            release_runtime();
+            release_enet_runtime();
             error = "Cannot create ENet host (address or port unavailable)";
             return false;
         }
@@ -245,7 +246,7 @@ namespace OpenBlood2::Net
         host_ = nullptr;
         slots_.clear();
         listening_ = false;
-        release_runtime();
+        release_enet_runtime();
     }
     std::uint16_t Transport::port() const
     {

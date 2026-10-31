@@ -1768,3 +1768,38 @@ hooks. With no started recipient (load, or nobody joined) an instant effect is
 discarded instead of entering the dedicated server's never-advanced client pools.
 Protocol bytes in the network tests come from `Net::protocol_version`.
 
+
+## Host/Join menus and LAN discovery (2026-10-31)
+
+The retail desktop Main/BLOODBATH command opens the replacement Héberger/Rejoindre
+screen. The original demo promotion and non-network edition paths remain unchanged.
+Use the same validated host/connect options and network session loop as CLI entry;
+name, original character/team preference, Bloodbath/Team/CTF maps and match/rotation
+rules are selected in the UI. Defaults remain 25 frags, host 15 timed minutes and
+dedicated 10. Only the 22 mounted retail multiplayer DATs are listed.
+
+Closing the setup screen retains the paused solo world and logical audio exactly.
+Starting multiplayer retires its local GameSession before creating the host server:
+one server per process. SDL/GPU/ImGui survive the transition; network resources are
+released before returning to Main. Leave/End returns to Main, window close exits,
+and admission failures return with a visible reason. Local commands are neutral
+while menus are open; hosted simulation continues. No gameplay, CMoveMgr integration,
+server sound clocks or PBR rendering algorithms change.
+
+LAN discovery is a separate connectionless ENet UDP socket on 27889, sharing the
+reference-counted ENet runtime. Schema 1 uses explicit little-endian fields, magic,
+nonzero query nonce and server instance, gameplay protocol, port, mode, occupancy,
+capacity, name and world. No pointers or content are transmitted. Advertisements
+are hints only: joining always performs the existing complete-content admission.
+
+Bound packets to 256 bytes, decode strings to 32/100 bytes, poll at most 64 packets
+per frame, send at most 20 replies per server per second, and retain at most 64
+rows. Require the current nonce within three seconds of its query, deduplicate
+instance/port (prefer a LAN address over loopback), and expire rows after six seconds.
+The UI refreshes every two seconds and includes loopback for same-machine hosting.
+Full and incompatible-protocol offers stay visible but their Join action is disabled.
+Discovery socket failure leaves ordinary/direct connections usable. No internet
+server directory, IPv6, relay, NAT traversal or server-driven download is added.
+
+The [report](../implementation/reports/m9_multiplayer_menu.md) distinguishes bounded
+codec/UDP checks, native graphical tests and still-unqualified human/machine LAN.

@@ -27,6 +27,7 @@ namespace OpenBlood2
     enum class MenuAction
     {
         None,
+        Multiplayer,
         Resume,
         NewGame,
         Credits, // Original MenuCredits: StartNewGame("Credits", CUSTOM, MEDIUM), or GS_CREDITS in a world.
@@ -197,8 +198,9 @@ namespace OpenBlood2
         }
         MenuCommand take_command();
         bool active = false, in_world = false, alive = true;
-        bool vr = false;    // An XR session: Options offers the replacement VR page.
-        bool setup = false; // The owner offers Options > SETUP (the game data setup screen).
+        bool vr = false;          // An XR session: Options offers the replacement VR page.
+        bool multiplayer = false; // Retail desktop owner enables the host/join screen.
+        bool setup = false;       // The owner offers Options > SETUP (the game data setup screen).
         // The Cheats page's LEVEL row: the owner's campaign worlds and the displayed one.
         void set_levels(std::vector<std::string>);
         std::vector<std::string> levels;

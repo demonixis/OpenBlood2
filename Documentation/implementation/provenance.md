@@ -1,5 +1,11 @@
 # Source and Dependency Provenance
 
+The M9 [Host/Join and LAN lot](reports/m9_multiplayer_menu.md) connects the original
+Main/BLOODBATH command to replacement portable screens and the existing session
+loop. Original character/team and host rule defaults are retained; ENet discovery
+and UI lifecycle are new engine code, not retail wire compatibility. See the
+[source ledger](sources/m9_multiplayer_menu_sources.json).
+
 The M9 [network ObjectFX lot](reports/m9_object_network.md) carries the existing
 25 original owner-particle recipes as bounded value metadata. Original emission,
 texture selection, finite duration and multiplayer stop/resume remain in the client

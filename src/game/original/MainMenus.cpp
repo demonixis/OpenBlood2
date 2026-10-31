@@ -239,7 +239,7 @@ namespace OpenBlood2
             switch (item.command)
             {
                 case MENU_CMD_BLOODBATH:
-                    item.enabled = demo();
+                    item.enabled = demo() || multiplayer;
                     break;
                 case MENU_CMD_CUSTOMIZE_CONTROLS:
                     item.enabled = !demo() && !controls.empty(); // The demo has no action strings.
@@ -452,6 +452,8 @@ namespace OpenBlood2
             case MENU_CMD_BLOODBATH:
                 if (demo())
                     show_promotion(MenuPromotion::Bloodbath);
+                else if (multiplayer)
+                    pending_.action = MenuAction::Multiplayer;
                 break;
             case MENU_CMD_CREDITS:
                 if (demo())

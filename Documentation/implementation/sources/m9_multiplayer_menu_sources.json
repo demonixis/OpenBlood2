@@ -1,0 +1,105 @@
+{
+  "date": "2026-10-31",
+  "baseline": "1a2d44b4",
+  "scope": "Original main-menu command and existing host rules; replacement portable UI and bounded ENet discovery. No new original gameplay algorithm or retail protocol import.",
+  "references": [
+    {
+      "path": "../sources/blood2/ClientShellDLL/MenuMain.cpp",
+      "sha256": "5333fe0cc6a98782b9c1695d075556fd9f23f3ba8edfe8b279ab2c9aef3a0f5a"
+    },
+    {
+      "path": "../sources/blood2/ClientShellDLL/NetStart.cpp",
+      "sha256": "320bd6f451fc7d08f93c294899af379756fa8432d439731b63c65124057dacbf"
+    },
+    {
+      "path": "../sources/blood2/Blood2Serv/GameServDlg.cpp",
+      "sha256": "87a191253677ccf0911b27da3e3e56abdb573118a5a20f9b2b5c804414918f61"
+    }
+  ],
+  "implementation": [
+    {
+      "path": "src/app/frontend.cpp",
+      "sha256": "8ed3cd0db9166ac6ab98c4bfd47e39a5e96aed7d8f7d70c3eb8718b992e62867"
+    },
+    {
+      "path": "src/app/menu_smoke.h",
+      "sha256": "f0cc70633d42284e02e44c09f64cb55ce102c93e738e10450879872dbd612691"
+    },
+    {
+      "path": "src/app/network_frontend.cpp",
+      "sha256": "94ca1426005dc196d6e747cc8fa1e09e7973df98eee2403f21277d759428391b"
+    },
+    {
+      "path": "src/app/network_frontend.h",
+      "sha256": "cc9e411a246ae727e6860875f07868f70452d76f9227506f0fc88f732334a08f"
+    },
+    {
+      "path": "src/engine/config.h",
+      "sha256": "175a209473ae8d9287fd7a3e993d1b70e8ccbbfaf0f9d12874e5e4e4c9641f95"
+    },
+    {
+      "path": "src/game/menu.h",
+      "sha256": "8ed9a005057d70ed46c2bff8d693debdad9490f277984a4a09e749620ce13388"
+    },
+    {
+      "path": "src/game/original/MainMenus.cpp",
+      "sha256": "08f9e96581b4ddb3f5e2c3dd82cd14a3c9f07fdf00d2af563b17e4ce4663637e"
+    },
+    {
+      "path": "src/net/transport.cpp",
+      "sha256": "f166e5c3374232ba350da2c34b608f8b67b4c2f2c5f15f53235a331de9f90045"
+    },
+    {
+      "path": "src/server/main.cpp",
+      "sha256": "1159729c737b10f53b243bee5384e3ae64e93301f0e63f110266fbd202422527"
+    },
+    {
+      "path": "src/server/network.cpp",
+      "sha256": "58e9379b6c29bb2c3524dbc7d1bb86befb2d98e543846b0c41e11709e46626c6"
+    },
+    {
+      "path": "src/server/network.h",
+      "sha256": "eff40ea77de0a7ce0a8b79248cb3fe5bbae970cff281583f5dd9186e6c01cc70"
+    },
+    {
+      "path": "tests/network/CMakeLists.txt",
+      "sha256": "56f6e7e6439d7a83b753048ad9f74104daf9431cfb5694ce955b4c0a5f761369"
+    },
+    {
+      "path": "src/app/multiplayer_setup.h",
+      "sha256": "ef4540ba449c80f9839f0e23206261ed6d70063526ad145d6dc40f24f698355e"
+    },
+    {
+      "path": "src/app/multiplayer_setup.cpp",
+      "sha256": "b0848016d427d6bd613da47f604906e017566841d6f6faf27cbb1e45cff4f9e5"
+    },
+    {
+      "path": "src/app/multiplayer_screen.h",
+      "sha256": "fedec367dc6bf3632d90bcf76b310b89a3b3f7d90ab1a5d8064eb8290714c2f7"
+    },
+    {
+      "path": "src/app/multiplayer_screen.cpp",
+      "sha256": "bf51d263a7e756e1a0ae43b00baaed5e13c79c96a190a12791024874b4d04545"
+    },
+    {
+      "path": "src/net/discovery.h",
+      "sha256": "421f2515c74ca1e8644660d18c25b88cc662d95ee2f92889b5cad5c55301a49c"
+    },
+    {
+      "path": "src/net/discovery.cpp",
+      "sha256": "98850f923ca0d613a4c6be380cd9ce1566fc784d12964cf477d9ade1cf7b49b6"
+    },
+    {
+      "path": "src/net/enet_runtime.h",
+      "sha256": "9b5dec0e94c612d1cc4aaffa50e5383ef228407e64c6c05f32b108bb3a2f7881"
+    },
+    {
+      "path": "tests/network/discovery_tests.cpp",
+      "sha256": "6e70867ba37ba5cfeabf60e0bb021648ba33f60d8bc6d979e94b80545e79539b"
+    },
+    {
+      "path": "tests/network/multiplayer_setup_tests.cpp",
+      "sha256": "424fca5b742969cdff5568f6a38065d528c9b7925ba63c7b084215983826ded8"
+    }
+  ]
+}

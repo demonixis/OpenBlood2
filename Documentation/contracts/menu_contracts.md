@@ -430,3 +430,13 @@ held by the `CCredits` owner in `CBloodClientShell::m_Credits`.
 
 See the [implementation report](../implementation/reports/menu_credits.md) and the
 [source ledger](../implementation/sources/menu_credits_sources.json).
+
+
+## M9 network entry
+
+Retail desktop enables the original BLOODBATH row and emits an application-owned
+Multiplayer command. The replacement Héberger/Rejoindre screens use the existing
+ImGui SDL_GPU backend and keyboard/gamepad navigation, including Esc/Back. Demo
+keeps its original promotional command. The [M9 contract](multiplayer_contracts.md#hostjoin-menus-and-lan-discovery-2026-10-31)
+specifies session replacement, LAN limits and admission; the [verification report](../implementation/reports/m9_multiplayer_menu.md)
+records solo pause/resume preservation. Original menu artwork is unchanged.

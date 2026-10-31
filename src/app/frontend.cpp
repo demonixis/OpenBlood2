@@ -10,6 +10,8 @@
 #include "app/menu_input.h"
 #include "app/menu_renderer.h"
 #include "app/menu_smoke.h"
+#include "app/multiplayer_screen.h"
+#include "app/network_frontend.h"
 #include "app/save_flow.h"
 #include "app/scene_presenter.h"
 #include "app/session_playback.h"
@@ -39,7 +41,7 @@ namespace OpenBlood2
     namespace
     {
         // run_game's requests to run_frontend.
-        constexpr int restart_game = -1, return_to_setup = -2;
+        constexpr int restart_game = -1, return_to_setup = -2, enter_multiplayer = -3;
 
         // The setup screen before any game: until Play, Quit or a window close.
         SetupScreen::Result run_setup(const Options& options, Runtime& runtime, [[maybe_unused]] XrFrontend* xr,
@@ -181,7 +183,7 @@ namespace OpenBlood2
         // is Options > SETUP: Play with a new choice returns restart_game with `next`.
         int run_game(const Options& options, const Config& config, Runtime& runtime, [[maybe_unused]] UiRuntime& ui,
                      [[maybe_unused]] XrFrontend* xr, SetupScreen& setup, bool by_setup, Config& next,
-                     std::string& refusal)
+                     std::string& refusal, MultiplayerScreen& multiplayer, Options& network_request, bool show_title)
         {
             std::string error;
             // Ordinary play reports a fatal stop in a dialog; it used to close without any message.
@@ -231,6 +233,7 @@ namespace OpenBlood2
                       : config.nightmares ? MenuEdition::Nightmares
                                           : MenuEdition::Retail);
             menu.vr = xr_mode;
+            menu.multiplayer = !xr_mode && !config.demo && !config.nightmares && config.overlays.empty();
             menu.setup = true;
             std::filesystem::path preferences;
             std::string preference_error;
@@ -318,6 +321,8 @@ namespace OpenBlood2
             if (menu_enabled && !preference_error.empty())
                 menu.open(game->client_shell.m_bInWorld);
             menu.error = menu_enabled ? preference_error : std::string{};
+            if (!refusal.empty())
+                menu.error = std::exchange(refusal, {});
             DisplayOptions display_options(runtime);
             if (!display_options.apply(menu, error))
                 menu.error = error;
@@ -388,7 +393,7 @@ namespace OpenBlood2
             // or Space (no movies are played yet). Direct entry (runworld) and smokes skip it.
             HudSurface title;
             double title_remaining = 0;
-            if (menu_enabled && !options.view_world && !options.menu_smoke)
+            if (menu_enabled && !options.view_world && !options.menu_smoke && show_title)
             {
                 HudCanvas splash(artwork);
                 // _ADDON Splash_Display: the add-on title.
@@ -441,6 +446,13 @@ namespace OpenBlood2
             std::uint64_t reported_credits_failures = 0;
             while (!done && (!options.frame_limit || frames < options.frame_limit))
             {
+                if (multiplayer.pending)
+                {
+                    network_request = std::move(*multiplayer.pending);
+                    multiplayer.close();
+                    SDL_StopTextInput(runtime.window);
+                    return enter_multiplayer;
+                }
                 if (const auto result = std::exchange(setup_result, SetupScreen::Result::None);
                     result != SetupScreen::Result::None)
                 {
@@ -490,10 +502,10 @@ namespace OpenBlood2
                 saves.notice.advance(delta);
                 if (menu.active && !canvas->compose(menu, 0, error))
                     return failed(4);
-                if (options.menu_smoke &&
-                    !(config.demo
-                          ? demo_menu_smoke.before(frames, runtime.window, *game, menu, input, *menu_audio, error)
-                          : smoke.before(frames, runtime.window, *game, menu, input, *menu_audio, error)))
+                if (options.menu_smoke && !(config.demo ? demo_menu_smoke.before(frames, runtime.window, *game, menu,
+                                                                                 input, *menu_audio, error)
+                                                        : smoke.before(frames, runtime.window, *game, menu, input,
+                                                                       *menu_audio, error, multiplayer.active)))
                     return failed(4);
                 if (options.demo_smoke)
                 {
@@ -525,8 +537,13 @@ namespace OpenBlood2
                                                          event.window.windowID == SDL_GetWindowID(runtime.window)))
                         return false;
                     gamepads.event(event);
-                    if (input.setup_screen)
+                    if (input.setup_screen || multiplayer.active)
                     {
+                        if (multiplayer.active)
+                        {
+                            // Retain releases/focus while the replacement screen owns actions.
+                            input.controls.event(event, SDL_GetWindowID(runtime.window));
+                        }
                         ImGui_ImplSDL3_ProcessEvent(&event);
                         return true;
                     }
@@ -677,6 +694,15 @@ namespace OpenBlood2
                         game->client_shell.m_bInWorld
                             ? unsigned(game->server.GetVarValueFloat(game->server.GetGameConVar("GAME_DIFFICULTY")))
                             : unsigned(DIFFICULTY_MEDIUM);
+                }
+                if (command.action == MenuAction::Multiplayer)
+                {
+                    if (!multiplayer.open(artwork, config, game->client_shell.m_bInWorld, error))
+                        menu.error = error;
+                    input.reset(menu, game->client_shell.m_bInWorld);
+                    neutralize_app_input(game->client_shell);
+                    ImGui::GetIO().ClearInputKeys();
+                    ImGui::GetIO().ClearInputMouse();
                 }
                 if (command.action == MenuAction::Setup)
                 {
@@ -1197,9 +1223,9 @@ namespace OpenBlood2
                 }
 #endif
                 ImGui::GetIO().ConfigFlags &= ~(ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad);
-                if (input.inspector || input.setup_screen)
+                if (input.inspector || input.setup_screen || multiplayer.active)
                     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-                if (input.setup_screen)
+                if (input.setup_screen || multiplayer.active)
                     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
                 ImGui::NewFrame();
                 if (input.demo.finished())
@@ -1216,6 +1242,12 @@ namespace OpenBlood2
                 {
                     if (!loading_renderer.draw_surface(loading.screen.surface(), loading.screen.revision(), error))
                         return failed(4);
+                }
+                else if (multiplayer.active)
+                {
+                    multiplayer.draw();
+                    if (!multiplayer.active)
+                        input.reset(menu, game->client_shell.m_bInWorld);
                 }
                 else if (input.setup_screen)
                     setup_result = setup.draw(runtime.window);
@@ -1371,7 +1403,7 @@ namespace OpenBlood2
                     (options.menu_smoke && config.demo && DemoMenuSmoke::capture(frames)) ||
                     (options.menu_smoke && !config.demo &&
                      (frames == 4 || frames == 8 || frames == 17 || frames == 32 || frames == 23 || frames == 120 ||
-                      frames == 208 || frames == 214)) ||
+                      frames == 38 || frames == 208 || frames == 214)) ||
                     (options.demo_smoke && (frames == 4 || frames == 14 || frames == 45 || frames == 62));
                 const bool save =
                     target && ((frames >= 2 && !captured) || phase_capture) && !options.capture_file.empty();
@@ -1506,6 +1538,8 @@ namespace OpenBlood2
         if (!ui.initialize(error))
 #endif
             return failed(3);
+        MultiplayerScreen multiplayer;
+        multiplayer.font = ui.proportional;
         SetupScreen setup;
         setup.font = ui.proportional;
         // A configuration from the command line, environment or blood2.local.ini skips the screen,
@@ -1550,6 +1584,7 @@ namespace OpenBlood2
         if (next && by_setup)
             nightmares(*next);
         std::string refusal;
+        bool show_title = true;
         for (;;)
         {
             if (!next)
@@ -1568,7 +1603,18 @@ namespace OpenBlood2
                 nightmares(*next);
             }
             Config chosen;
-            const int code = run_game(options, *next, runtime, ui, session, setup, by_setup, chosen, refusal);
+            Options network_request;
+            const int code = run_game(options, *next, runtime, ui, session, setup, by_setup, chosen, refusal,
+                                      multiplayer, network_request, show_title);
+            if (code == enter_multiplayer)
+            {
+                bool quit = false;
+                const int result = run_network_session(network_request, *next, runtime, refusal, quit);
+                if (quit)
+                    return result;
+                show_title = false;
+                continue;
+            }
             if (code == restart_game)
                 next = std::move(chosen);
             else if (code == return_to_setup)

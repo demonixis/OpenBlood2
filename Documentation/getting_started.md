@@ -68,8 +68,25 @@ start of the current level). After death, Use opens the Load menu. The demo has 
 
 ## Bloodbath/Team hosting and direct connection
 
-The current [M9 implementation](implementation/reports/m9_team_network.md) supports
-retail Bloodbath and Team through the command line; Host/Join/LAN screens remain pending.
+The current [M9 menus](implementation/reports/m9_multiplayer_menu.md) support retail
+Bloodbath, Team and CTF without hosting/connection command-line arguments. Open
+**BLOODBATH** in the main menu, then **Héberger** or **Rejoindre**. Choose your name,
+character and team; the host chooses the map, mode, limits and optional rotation.
+**Lancer la partie** starts a playable host. **Rejoindre** lists local games; select
+**Rejoindre cette partie**, or enter an IPv4 address/hostname and port for
+**Connexion directe**. Esc opens the network menu; Leave/End returns to the main menu.
+Starting multiplayer from a paused solo game ends that solo session; Retour cancels
+without changing it. Demo, Nightmares, mods and XR retain their existing paths.
+
+LAN discovery uses IPv4 broadcast on **UDP 27889**, refreshed every two seconds;
+gameplay defaults to **UDP 27888**. Allow both ports through the host firewall.
+Discovery is limited to a reachable local subnet; if broadcasts are filtered, use
+direct connection. A listed server still checks protocol, edition and complete
+mounted-content SHA-256 before admission. Full/incompatible games are shown but
+cannot be joined from their row. This is a functional replacement interface;
+visual polish and cross-machine/platform LAN qualification remain separate.
+
+The same operations remain available from the command line:
 Use the same mounted content and protocol on all machines. Default port: UDP 27888.
 
 ```sh

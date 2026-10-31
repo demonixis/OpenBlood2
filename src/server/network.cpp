@@ -20,6 +20,8 @@ namespace OpenBlood2
         }
         if (!transport_.listen(address, port, capacity, error))
             return false;
+        discovery_open_ = discovery_.open(true, discovery_error, Net::discovery_port, address);
+        discovery_offer_.instance = std::uint64_t(Clock::now().time_since_epoch().count()) | 1;
         capacity_ = capacity;
         clock_started_ = false;
         return true;
@@ -259,6 +261,22 @@ namespace OpenBlood2
         {
             error = "Network pump requires an open listener and monotonic time";
             return false;
+        }
+        if (discovery_open_)
+        {
+            auto& offer = discovery_offer_;
+            offer.port = port();
+            offer.mode = std::uint8_t(session_.mode());
+            offer.players = std::uint8_t(session_.player_count());
+            offer.capacity = std::uint8_t(capacity_);
+            offer.world = session_.game().world_path;
+            offer.name = server_name;
+            if (!discovery_.pump(std::chrono::duration<double>(now.time_since_epoch()).count(), &offer,
+                                 discovery_error))
+            {
+                discovery_.close();
+                discovery_open_ = false;
+            }
         }
         last_time_ = now;
         clock_started_ = true;
@@ -567,6 +585,8 @@ namespace OpenBlood2
             }
         transport_.flush();
         transport_.close();
+        discovery_.close();
+        discovery_open_ = false;
         return ok;
     }
 } // namespace OpenBlood2

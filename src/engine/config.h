@@ -24,7 +24,8 @@ namespace OpenBlood2
         std::string world = "01_SubwayA"; // Demo_01 with --demo unless --world is given.
         std::string connect_address, host_world, network_name = "Player";
         std::uint16_t network_port = 27888;
-        std::uint8_t network_mode = 1, network_team = 0;             // Bloodbath; original auto/blue/red preference.
+        std::uint8_t network_mode = 1, network_team = 0,
+                     network_character = 0;                          // Bloodbath; original auto/blue/red preference.
         MultiplayerRules network_rules{MatchEnd::Frags, 25, 15, {}}; // NetStart host default: 15 minutes.
         bool demo = false;                                           // Original two-level demo layout (B2DEMO.REZ).
         bool nightmares = false; // Retail data plus the Nightmares expansion (BLOOD2NM.REZ).

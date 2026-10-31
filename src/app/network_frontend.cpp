@@ -23,17 +23,35 @@
 
 namespace OpenBlood2
 {
-    int run_network_frontend(const Options& options, const Config& config)
+    int run_network_session(const Options& options, const Config& config, Runtime& runtime, std::string& error,
+                            bool& quit)
     {
-        std::string error;
+        error.clear();
+        quit = false;
+        struct RestoreInput
+        {
+            SDL_Window* window;
+            ~RestoreInput()
+            {
+                SDL_SetWindowRelativeMouseMode(window, false);
+                SDL_StopTextInput(window);
+                ImGui::GetIO().ClearInputKeys();
+                ImGui::GetIO().ClearInputMouse();
+            }
+        } restore_input{runtime.window};
         const auto failed = [&]()
         {
-            spdlog::error("Network session: {}", error.empty() ? SDL_GetError() : error);
+            if (error.empty())
+                error = SDL_GetError();
+            if (error.empty())
+                error = "Network session could not start or continue.";
+            spdlog::error("Network session: {}", error);
             return 5;
         };
         Net::JoinProfile profile;
         profile.name = options.network_name;
         profile.team = options.network_team;
+        profile.character = options.network_character;
         if (!Net::valid_profile(profile))
         {
             error = "Invalid multiplayer player profile";
@@ -52,19 +70,16 @@ namespace OpenBlood2
             network = std::make_unique<ServerNetwork>(*server);
             if (!network->listen("0.0.0.0", options.network_port, unsigned(Net::max_players), error))
                 return failed();
+            network->server_name = profile.name.substr(0, 20) + " — Host";
+            if (!network->discovery_error.empty())
+                spdlog::warn("{}", network->discovery_error);
             address = {"127.0.0.1", network->port()};
             spdlog::info("Playable host: {}, UDP {}", options.host_world, network->port());
         }
         else if (!Net::parse_address(options.connect_address, options.network_port, address, error))
             return failed();
 
-        Runtime runtime;
-        if (!runtime.initialize(false, error))
-            return failed();
-        UiRuntime ui(runtime);
-        if (!ui.initialize(error))
-            return failed();
-        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
         ScenePresenter presenter(runtime.gpu);
         HudRenderer hud(runtime.gpu);
         GamepadDevices devices;
@@ -146,8 +161,11 @@ namespace OpenBlood2
                              client.ready() && !client.changing_level() && controls.focused && !menu && !leaving);
                 if (event.type == SDL_EVENT_QUIT ||
                     (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == window))
+                {
+                    quit = true;
                     if (!leave())
                         return failed();
+                }
                 if ((event.type == SDL_EVENT_KEY_DOWN && event.key.windowID == window && !event.key.repeat &&
                      event.key.scancode == SDL_SCANCODE_ESCAPE) ||
                     (event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN && event.gbutton.button == SDL_GAMEPAD_BUTTON_START))
@@ -291,6 +309,8 @@ namespace OpenBlood2
                 ImGui::TextUnformatted(leaving   ? "Leaving..."
                                        : visible ? "Game continues while this menu is open."
                                                  : "Connecting / loading world...");
+                if (network && !network->discovery_error.empty())
+                    ImGui::TextWrapped("%s", network->discovery_error.c_str());
                 if (!leaving)
                 {
                     if (visible && ImGui::Button("Resume"))
@@ -410,6 +430,25 @@ namespace OpenBlood2
             spdlog::info("Host stopped: ticks={}, discarded_ticks={}, admitted={}, departed={}, rotations={}",
                          server->total_ticks(), server_clock.discarded_ticks(), network->admitted, network->departed,
                          server->rotations);
+        error = leaving ? std::string{} : client.reason();
         return 0;
+    }
+    int run_network_frontend(const Options& options, const Config& config)
+    {
+        Runtime runtime;
+        std::string error;
+        if (!runtime.initialize(false, error))
+        {
+            spdlog::error("{}", error);
+            return 5;
+        }
+        UiRuntime ui(runtime);
+        if (!ui.initialize(error))
+        {
+            spdlog::error("{}", error);
+            return 5;
+        }
+        bool quit = false;
+        return run_network_session(options, config, runtime, error, quit);
     }
 } // namespace OpenBlood2

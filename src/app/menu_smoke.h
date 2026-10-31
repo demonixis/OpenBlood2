@@ -52,7 +52,7 @@ namespace OpenBlood2
         }
         bool confirmed = false;
         bool before(std::uint64_t frame, SDL_Window* window, const GameSession& game, const Menu& menu,
-                    MenuInput& input, const MenuAudio& audio, std::string& error)
+                    MenuInput& input, const MenuAudio& audio, std::string& error, bool multiplayer_active = false)
         {
             auto fail = [&](const char* why)
             {
@@ -96,6 +96,10 @@ namespace OpenBlood2
                 return fail("Options > SETUP");
             if (frame == 34 && (input.setup_screen || menu.page != MenuPage::Options))
                 return fail("setup screen Back");
+            if (frame == 39 && menu.multiplayer && !multiplayer_active)
+                return fail("Bloodbath did not open Host/Join");
+            if (frame == 41 && multiplayer_active)
+                return fail("Host/Join Back did not return to the paused solo menu");
             if (frame == 207)
             {
                 if (audio.mixer.mixed_frames <= ambient_frames_ + 48000 * 3)
@@ -180,6 +184,8 @@ namespace OpenBlood2
                     key(SDL_SCANCODE_F10);
                     break;
                 case 14:
+                    if (menu.multiplayer)
+                        key(SDL_SCANCODE_DOWN); // Bloodbath is now available.
                     key(SDL_SCANCODE_DOWN);
                     break;
                 case 15:
@@ -218,6 +224,8 @@ namespace OpenBlood2
                     key(SDL_SCANCODE_ESCAPE);
                     break;
                 case 30:
+                    if (menu.multiplayer)
+                        key(SDL_SCANCODE_DOWN);
                     key(SDL_SCANCODE_DOWN);
                     key(SDL_SCANCODE_RETURN);
                     break;
@@ -229,6 +237,18 @@ namespace OpenBlood2
                 case 32:
                 case 35:
                     key(SDL_SCANCODE_ESCAPE);
+                    break;
+                case 36:
+                    if (menu.multiplayer)
+                        key(SDL_SCANCODE_DOWN);
+                    break;
+                case 37:
+                    if (menu.multiplayer)
+                        key(SDL_SCANCODE_RETURN);
+                    break;
+                case 39:
+                    if (menu.multiplayer)
+                        key(SDL_SCANCODE_ESCAPE);
                     break;
                 case 120:
                     SDL_SetWindowSize(window, 900, 500);
@@ -273,7 +293,9 @@ namespace OpenBlood2
                 case 217:
                     key(SDL_SCANCODE_ESCAPE);
                     break;
-                case 218: // Options, the enabled in-world Credits row, Quit.
+                case 218: // Bloodbath, Options, the enabled in-world Credits row, Quit.
+                    if (menu.multiplayer)
+                        key(SDL_SCANCODE_DOWN);
                     key(SDL_SCANCODE_DOWN);
                     key(SDL_SCANCODE_DOWN);
                     key(SDL_SCANCODE_DOWN);
