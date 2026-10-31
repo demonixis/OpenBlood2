@@ -3,6 +3,7 @@
 #include "engine/model.h"
 #include "engine/object_id.h"
 #include "engine/sprite.h"
+#include "game/object_particle_recipe.h"
 #include "game/particle_stream_settings.h"
 #include <array>
 #include <optional>
@@ -41,6 +42,7 @@ namespace OpenBlood2
         ClientCollisionValues collision;
         // Immutable, owner-bound emitter; lifecycle shares reliable object membership.
         std::optional<ParticleStreamSettings> particle_stream;
+        std::vector<ObjectParticleRecipe> object_particles;
     };
     struct ClientSky
     {

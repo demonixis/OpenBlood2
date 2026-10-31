@@ -37,7 +37,8 @@ namespace OpenBlood2::Net
                    a.world_model_index == b.world_model_index && a.world_model_bound == b.world_model_bound &&
                    same_collision_metadata(a.collision, b.collision) &&
                    a.particle_stream.has_value() == b.particle_stream.has_value() &&
-                   (!a.particle_stream || same_particle_stream(*a.particle_stream, *b.particle_stream));
+                   (!a.particle_stream || same_particle_stream(*a.particle_stream, *b.particle_stream)) &&
+                   same_object_particles(a.object_particles, b.object_particles);
         }
         bool valid_patch(const WorldPatch& p)
         {

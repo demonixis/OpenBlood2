@@ -147,7 +147,11 @@ namespace
                                                      client.weapons().views()[0].state == WS_REST &&
                                                      client.weapons().state()->ammunition[0] ==
                                                          fire_ammo - float(client.weapon_ack()->fired[0]));
-                if (!leaving && command_stage == 7 && fire_finished && Clock::now() >= leave_at)
+                // The visitor also hashes its content and completes a weapon/zoom round trip.
+                // Wait for its actual departure within the existing overall deadline; a fixed
+                // six-second check can run before it is ready on sanitizer/build-loaded hosts.
+                if (!leaving && command_stage == 7 && fire_finished && Clock::now() >= leave_at &&
+                    (!observer || (saw_arrival && saw_departure)))
                 {
                     CHECK(client.state_packets && (!observer || (saw_arrival && saw_departure)));
                     CHECK(client.event_sequence() && client.hud().stats.health > 0 && startup == 1);

@@ -45,6 +45,7 @@ namespace OpenBlood2
         NetworkCollisionReceiver collision_;
         std::vector<std::uint32_t> generations_;
         std::uint64_t membership_sequence_ = 0;
+        std::uint64_t highest_particle_ = 0;
         double membership_time_ = 0;
         struct Sample
         {

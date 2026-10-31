@@ -197,6 +197,15 @@ namespace OpenBlood2
             ObjectId owner;
             ParticleStreamSettings settings;
         };
+        struct ParticleEmitter
+        {
+            ObjectId owner;
+            ObjectParticleRecipe recipe;
+        };
+        std::vector<ParticleEmitter> particle_emitters_;
+        std::uint64_t next_particle_ = 1;
+        void prune_particles();
+        std::uint64_t capture_particle(ObjectId, std::string_view, unsigned, float, DVector, std::string&);
         std::vector<StreamEmitter> stream_emitters_;
         std::uint64_t next_stream_ = 1;
         void prune_streams();

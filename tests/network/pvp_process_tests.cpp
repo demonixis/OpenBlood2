@@ -53,7 +53,8 @@ namespace
                                            : WEAP_BERETTA)};
         std::set<SoundId> animation_voices;
         std::set<std::uint64_t> missing_gib_zero;
-        std::size_t peak_explosion_models = 0, peak_fragments = 0, peak_rings = 0;
+        std::size_t peak_explosion_models = 0, peak_fragments = 0, peak_rings = 0, peak_trail_particles = 0;
+        std::set<std::pair<std::uint32_t, std::uint32_t>> trail_owners;
         // The graphical host keeps Caleb. Distinct remote characters identify
         // the two combatants without treating the idle host as a test target.
         profile.character = hosted ? (victim ? 2 : 1) : 0;
@@ -173,11 +174,27 @@ namespace
                     leaving = true;
                 }
             }
+            std::set<std::pair<std::uint32_t, std::uint32_t>> prior_owners;
+            if (napalm)
+                for (const auto& o : client.world().frame().objects)
+                    prior_owners.emplace(o.id.slot, o.id.generation);
             CHECK(client.update(Clock::now(), input, !leaving, error, {firing}));
             peak_explosion_models =
                 std::max(peak_explosion_models, client.effects().runtime().explosion_models.active.size());
             peak_fragments = std::max(peak_fragments, client.effects().runtime().explosion_fragments.active.size());
             peak_rings = std::max(peak_rings, client.effects().runtime().explosion_rings.active.size());
+            for (const auto& trail : client.effects().runtime().object_particles.active)
+                if (napalm && trail.effect.recipe == 2)
+                {
+                    // Effects consume the preceding displayed frame before presentation refresh.
+                    // Exact owner retirement is checked by the independent runtime test.
+                    CHECK(trail.owner.world == client.joined().world && trail.owner.object.generation);
+                    if (!trail_owners.contains({trail.owner.object.slot, trail.owner.object.generation}))
+                        CHECK(client.world().get(trail.owner) ||
+                              prior_owners.contains({trail.owner.object.slot, trail.owner.object.generation}));
+                    trail_owners.emplace(trail.owner.object.slot, trail.owner.object.generation);
+                    peak_trail_particles = std::max(peak_trail_particles, trail.effect.particles.size());
+                }
             audio_peak = std::max(audio_peak, client.audio().mixer.peak);
             if (shotgun)
                 for (const auto& [id, voice] : client.audio().mixer.voices())
@@ -249,6 +266,10 @@ namespace
                 if (napalm)
                 {
                     CHECK(client.effects().received_kinds[5] >= 6 && peak_explosion_models && peak_rings);
+                    CHECK(!trail_owners.empty() && peak_trail_particles);
+                    CHECK(client.effects().runtime().object_particles.active.empty());
+                    std::cout << "Remote Napalm trails: owners=" << trail_owners.size()
+                              << ", peak particles=" << peak_trail_particles << ", removed on teardown\n";
                     std::cout << "Remote explosion peaks: models=" << peak_explosion_models
                               << ", fragments=" << peak_fragments << ", rings=" << peak_rings
                               << ", recipes=" << client.effects().received_kinds[5] << '\n';

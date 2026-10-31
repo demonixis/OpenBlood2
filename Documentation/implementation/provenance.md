@@ -1,5 +1,11 @@
 # Source and Dependency Provenance
 
+The M9 [network ObjectFX lot](reports/m9_object_network.md) carries the existing
+25 original owner-particle recipes as bounded value metadata. Original emission,
+texture selection, finite duration and multiplayer stop/resume remain in the client
+runtime; publication IDs, clock mapping and immutable membership are new transport
+adaptations. See the [source ledger](sources/m9_object_network_sources.json).
+
 The M9 [particle-stop prerequisite](reports/m9_particle_stop.md) ports the original
 ObjectFX multiplayer stop/restart branch with an explicit client-only argument.
 Solo remains the default. See its [source ledger](sources/m9_particle_stop_sources.json).

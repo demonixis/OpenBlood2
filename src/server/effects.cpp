@@ -33,6 +33,40 @@ namespace OpenBlood2
         stream_emitters_.push_back({owner, settings});
         return next_stream_++;
     }
+    void ServerSession::prune_particles()
+    {
+        const double now = game_.server.world_time();
+        std::erase_if(particle_emitters_,
+                      [&](const auto& p)
+                      {
+                          const auto* object = game_.objects.get(p.owner);
+                          const auto duration = object_particle_duration(p.recipe.type);
+                          return !object || object->life != Life::Alive ||
+                                 (duration && float(now - p.recipe.created) > duration);
+                      });
+    }
+    std::uint64_t ServerSession::capture_particle(ObjectId owner, std::string_view name, unsigned type, float scale,
+                                                  DVector offset, std::string& error)
+    {
+        error.clear();
+        prune_particles();
+        ObjectParticleRecipe recipe{next_particle_, game_.server.world_time(), type, scale, offset, std::string(name)};
+        const auto* object = game_.objects.get(owner);
+        if (!object || object->life != Life::Alive || particle_emitters_.size() >= 128 ||
+            !valid_object_particle_recipe(recipe))
+        {
+            error = "Invalid, exhausted or over-capacity object particle publication";
+            return 0;
+        }
+        const auto texture = object_particle_texture(type);
+        if (!game_.resources.find(texture))
+        {
+            error = "Object particle texture is not indexed: " + std::string(texture);
+            return 0;
+        }
+        particle_emitters_.push_back({owner, std::move(recipe)});
+        return next_particle_++;
+    }
     bool ServerSession::begin_effects(std::uint64_t id)
     {
         const auto p = std::find_if(players_.begin(), players_.end(), [id](const auto& p) { return p.id == id; });

@@ -11,6 +11,8 @@ namespace OpenBlood2
         pending_.clear();
         pending_bytes_ = 0;
         stream_owners_.clear();
+        highest_particle_ = 0;
+        particle_time_ = 0;
         runtime_.reset_world();
         scene_ = {};
         last_error.clear();
@@ -102,6 +104,47 @@ namespace OpenBlood2
                 last_error = detail;
             }
         }
+
+        // Finite effects retain their authored age; long-lived trails start fresh.
+        // Membership can create an owner ahead of the delayed interpolation clock.
+        particle_time_ = std::max(particle_time_ + seconds, world.frame().time);
+        for (const auto& object : world.frame().objects)
+            for (const auto& p : object.object_particles)
+                particle_time_ = std::max(particle_time_, p.created);
+        if (!std::isfinite(particle_time_) || particle_time_ > 1e12)
+        {
+            error = "Network object particle clock exhausted";
+            return false;
+        }
+        auto& particles = runtime_.object_particles;
+        std::erase_if(particles.active,
+                      [&](const auto& p)
+                      {
+                          if (world.get(p.owner))
+                              return false;
+                          ++particles.expired;
+                          return true;
+                      });
+        auto highest_particle = highest_particle_;
+        for (const auto& object : world.frame().objects)
+            for (const auto& p : object.object_particles)
+            {
+                highest_particle = std::max(highest_particle, p.id);
+                if (p.id <= highest_particle_)
+                    continue;
+                const auto duration = object_particle_duration(p.type);
+                if (duration && float(particle_time_ - p.created) > duration)
+                    continue;
+                const EffectOwner source{world.reference(object.id), object.pose, object.user_flags, p.source};
+                std::string detail;
+                if (!particles.publish(source, p.type, &resources, duration ? p.created : particle_time_, detail,
+                                       p.lifetime_scale, p.offset))
+                {
+                    ++failed;
+                    last_error = detail;
+                }
+            }
+        highest_particle_ = highest_particle;
 
         for (const auto& event : pending_)
         {
@@ -216,6 +259,7 @@ namespace OpenBlood2
         step(runtime_.lightning.advance(time_), runtime_.lightning.update_error);
         step(runtime_.blood_spurts.advance(time_, services), runtime_.blood_spurts.update_error);
         step(runtime_.explosion_fragments.advance(time_, queries, true), runtime_.explosion_fragments.update_error);
+        step(runtime_.object_particles.advance(particle_time_, world, true), runtime_.object_particles.update_error);
         step(runtime_.particle_streams.advance(time_, world), runtime_.particle_streams.update_error);
         ClientEffectsFrame frame;
         frame.world = owner_.world;

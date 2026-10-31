@@ -1,0 +1,87 @@
+{
+  "date": "2026-10-31",
+  "scope": "Protocol 23 owner-bound ObjectFX recipes and independent client execution",
+  "baseline": "47ae92dfe705edcbb03faa4e1655d4ee8428499c",
+  "files": [
+    {
+      "path": "../sources/blood2/ClientShellDLL/ObjectFX.cpp",
+      "sha256": "1af815cdb07c8e0fcd56bebb723e78b539cd3398221a78e3b3fcf977bf109c48"
+    },
+    {
+      "path": "../sources/blood2/ClientShellDLL/ObjectFX.h",
+      "sha256": "f10854489408e05859507a3b73cfbbd1ba3514988aa7caf93ec48d992bbfaffe"
+    },
+    {
+      "path": "../sources/blood2/ClientShellDLL/SFXMgr.cpp",
+      "sha256": "7f203102ea93cfb7ab1d1817d66fecb1100a0863aab3b92c05b1c1b6a6acb5c1"
+    },
+    {
+      "path": "../sources/blood2/ObjectDLL/Projectile.cpp",
+      "sha256": "52b805c67775579b5703e0ad1099a8ea44d76b245349c8f6d1fac0a1b3b74ef2"
+    },
+    {
+      "path": "src/game/original/ObjectParticleFX.cpp",
+      "sha256": "21475fb21e7f97aa96e621a0a9ab2c4439fbd8d1fc0375b4fb9bb87ca0a5016b"
+    },
+    {
+      "path": "src/game/original/ObjectParticleFX.h",
+      "sha256": "9539dd6bec568aba43ac30939d9838e151e5e9009fb13efaf6f100579f79b128"
+    },
+    {
+      "path": "src/game/object_particles.cpp",
+      "sha256": "356bc637912be1638ea87086399399faea2abd1100a6b1bac09b23c2b69ad752"
+    },
+    {
+      "path": "src/game/explosion_fragments.cpp",
+      "sha256": "a7b38d103e48002c50ea58e8ddf6eec0280060d8365985385a4cec79df8924c8"
+    },
+    {
+      "path": "src/client/network_effects.cpp",
+      "sha256": "51af5a962bf6f8b2bf362ac8581ee20b8f93c47b6c34c9b94aa0e88d5bf2d979"
+    },
+    {
+      "path": "tests/network/particle_stop_tests.cpp",
+      "sha256": "c42dc43ed8326dff43fb867cc6428b4dbeab6cd092ecc279edbbfa296b98492c"
+    },
+    {
+      "path": "../sources/blood2/ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7"
+    },
+    {
+      "path": "src/game/object_particle_recipe.h",
+      "sha256": "19e07dae24fbffb5681689b67747e4992e6e071926f1b0513023ac63ba0438ec"
+    },
+    {
+      "path": "src/game/server_effects.cpp",
+      "sha256": "c589f828929b81f474e687b29c5e3da7a4e622b096f5b09c0455cd84651811b9"
+    },
+    {
+      "path": "src/server/session.cpp",
+      "sha256": "275783def393cef1d07dc05fa4b349837d0a0d63e65423c01181bf05b0813bf5"
+    },
+    {
+      "path": "src/server/effects.cpp",
+      "sha256": "6591cd8e2bc779746fcea716017510d851a8c7958f93644ddde603097ec4b641"
+    },
+    {
+      "path": "src/client/network_world.cpp",
+      "sha256": "120ea16dcd6e5819828dab3fb241ff088d6bbced5e4d9192b5e2b50989305da3"
+    },
+    {
+      "path": "src/client/world.cpp",
+      "sha256": "313c688a6c6550d9c84a6603970ed40b805950a2eb1e5d62770906097dec0c19"
+    },
+    {
+      "path": "src/net/object_particle_codec.h",
+      "sha256": "90a2fae7e7595fcd7741beaa28d4dd40967dcc8324a6f9c6031281da02e1f13f"
+    },
+    {
+      "path": "src/net/world_snapshot.cpp",
+      "sha256": "e6571f46b215ed86e9a885e968f0159936965cc6a5b8b6f7b289f022ce57fd10"
+    },
+    {
+      "path": "src/net/world_patch.cpp",
+      "sha256": "6945d9f637eb3ac71ba02e2122d6f84e1e2a6cd9d2113c1d58747fc86dd4105a"
+    }
+  ]
+}

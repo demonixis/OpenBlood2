@@ -1708,3 +1708,41 @@ Once duration is armed, motion never restarts it. Network fragment children sele
 this mode explicitly; solo keeps immediate terminal stopping and existing clocks.
 Finite-duration spells and all particle/RNG/collision budgets remain unchanged.
 This does not itself deliver owner-bound ObjectFX recipes over the network.
+
+
+## Reliable owner-bound ObjectFX recipes
+
+The [ObjectFX continuation](../implementation/reports/m9_object_network.md) adds
+protocol 23 lists of recipe values to reliable object membership. One object can
+own several simultaneous publications, including repeated Voodoo/shield effects
+and paired Death Ray rings. Each publication carries its own monotonic 64-bit ID,
+world-relative creation time, type, lifetime scale, offset and bounded source name.
+No server handle, runtime particle or GPU resource crosses this boundary.
+
+Validate supported recipes/scale/offset, finite creation time no later than the
+wire frame, strictly increasing IDs per owner, global uniqueness and 128 recipes
+across the entire decoded or merged world. Retain the 1 MiB snapshot limit. A new
+ID must exceed the prior world's publication high-water mark; existing IDs must
+keep the exact same owner/generation and values. Removed IDs cannot reappear.
+Commit the high-water mark only after the complete frame/assets/collision succeeds.
+Interpolated presentation time may precede a newly created object's metadata.
+
+The server captures before world load, preserves the original required-texture
+index check, and prunes removed owners and strict float-elapsed finite expiry.
+It does not initialize cosmetic systems or consume their RNG. Long-lived trail
+recipes survive until owner retirement; finite recipes survive only their authored
+window for late arrival. Rotation clears membership and resets client world state.
+
+The client processes all new IDs against the high-water mark at frame start,
+including interleaved IDs across owners, then advances the mark once. Failed or
+already-expired starts are never retried. Finite effects retain authored age;
+untimed trails start at the current local clock. Neither path replays historical
+particles. The original first-update skip remains. Keep an existing finite runtime
+when its descriptor expires; let its original duration finish it, or remove it
+immediately when its checked owner disappears. Enable original multiplayer motion
+grace; keep solo callers, clocks and update ordering unchanged. Existing system,
+per-system and aggregate particle budgets still apply.
+
+PolyGrid, WarpGate and light publication, remaining UI/presentation and final
+server-library extraction remain separate work. Loopback process and Linux GPU
+checks do not qualify human LAN, 16 players or other operating systems.

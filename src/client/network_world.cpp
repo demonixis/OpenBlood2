@@ -67,6 +67,7 @@ namespace OpenBlood2
         collision_ = {};
         histories_.clear();
         membership_sequence_ = 0;
+        highest_particle_ = 0;
         membership_time_ = 0;
         return true;
     }
@@ -170,6 +171,27 @@ namespace OpenBlood2
             error = "World patch result exceeds snapshot bounds";
             return false;
         }
+        auto highest_particle = highest_particle_;
+        for (const auto& object : next.objects)
+        {
+            const auto* previous = world_.get(object.id);
+            for (const auto& particle : object.object_particles)
+            {
+                if (particle.id <= highest_particle_)
+                {
+                    const auto* old = previous ? &previous->object_particles : nullptr;
+                    const auto found =
+                        old ? std::find_if(old->begin(), old->end(), [&](const auto& p) { return p.id == particle.id; })
+                            : std::vector<ObjectParticleRecipe>::const_iterator{};
+                    if (!old || found == old->end() || !same_object_particle(*found, particle))
+                    {
+                        error = "World patch changes, migrates or resurrects an object particle identity";
+                        return false;
+                    }
+                }
+                highest_particle = std::max(highest_particle, particle.id);
+            }
+        }
         const auto sequence = next.sequence;
         // ClientWorld publication counts accepted packets, independently of the
         // server's sequence (one State sequence may span multiple datagrams).
@@ -184,6 +206,7 @@ namespace OpenBlood2
         if (collision_.active() && !collision_.receive(candidate, error))
             return false;
         world_ = std::move(candidate);
+        highest_particle_ = highest_particle;
         for (const auto& object : next.objects)
         {
             if (generations_.size() <= object.id.slot)

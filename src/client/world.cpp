@@ -1,5 +1,6 @@
 #include "client/world.h"
 #include <algorithm>
+#include <array>
 #include <cmath>
 
 namespace OpenBlood2
@@ -25,6 +26,8 @@ namespace OpenBlood2
         else
         {
             std::size_t streams = 0;
+            std::array<std::uint64_t, 128> particles{};
+            std::size_t particle_count = 0;
             ObjectId previous;
             for (const auto& object : next.objects)
             {
@@ -39,8 +42,31 @@ namespace OpenBlood2
                     error = "Invalid or excessive client particle stream descriptors";
                     break;
                 }
+                if (object.object_particles.size() > particles.size() - particle_count)
+                {
+                    error = "Client object particle limit exceeded";
+                    break;
+                }
+                std::uint64_t previous_particle = 0;
+                for (const auto& p : object.object_particles)
+                {
+                    // Presentation frames may interpolate before the latest object's creation time.
+                    if (!valid_object_particle_recipe(p) || p.id <= previous_particle)
+                    {
+                        error = "Invalid client object particle descriptor";
+                        break;
+                    }
+                    previous_particle = p.id;
+                    particles[particle_count++] = p.id;
+                }
+                if (!error.empty())
+                    break;
                 previous = object.id;
             }
+            const auto end = particles.begin() + particle_count;
+            std::sort(particles.begin(), end);
+            if (std::adjacent_find(particles.begin(), end) != end)
+                error = "Duplicate client object particle identity";
         }
         if (!error.empty())
             return false;

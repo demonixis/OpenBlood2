@@ -191,6 +191,16 @@ namespace OpenBlood2
     {
         if (!trace_service("PublishObjectParticles"))
             return 0;
+        if (remote_object_particle_sink)
+        {
+            const auto source = effect_owner(owner);
+            if (!source || !client_resources)
+            {
+                error = "Object particle owner/resources/pose unavailable";
+                return 0;
+            }
+            return remote_object_particle_sink(source.id.object, source.name, type, lifetime_scale, offset, error);
+        }
         return object_particles.publish(effect_owner(owner), type, client_resources, objects_.time(), error,
                                         lifetime_scale, offset);
     }

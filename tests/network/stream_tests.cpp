@@ -47,7 +47,7 @@ namespace
         std::string error;
         auto s = sample();
         std::vector<std::uint8_t> bytes, again;
-        CHECK(encode_world_snapshot(s, bytes) && bytes[4] == 22);
+        CHECK(encode_world_snapshot(s, bytes) && bytes[4] == 23);
         WorldSnapshot decoded;
         decoded.sequence = 999;
         for (std::size_t n = 0; n < bytes.size(); ++n)

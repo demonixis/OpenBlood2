@@ -3,9 +3,11 @@
 #include "net/admission.h"
 #include "net/codec.h"
 #include "net/collision_codec.h"
+#include "net/object_particle_codec.h"
 #include "net/particle_stream_codec.h"
 #include "net/transport.h"
 #include <algorithm>
+#include <array>
 #include <cmath>
 
 namespace OpenBlood2::Net
@@ -61,6 +63,7 @@ namespace OpenBlood2::Net
             to.world_model_bound = from.world_model_bound;
             to.collision = from.collision;
             to.particle_stream = from.particle_stream;
+            to.object_particles = from.object_particles;
         }
         template <class To, class From> void copy_frame(To& to, const From& from)
         {
@@ -171,6 +174,8 @@ namespace OpenBlood2::Net
             if (!identity(id))
                 return false;
         std::size_t streams = 0;
+        std::array<std::uint64_t, 128> particles{};
+        std::size_t particle_count = 0;
         ObjectId previous;
         for (const auto& o : s.objects)
         {
@@ -199,9 +204,21 @@ namespace OpenBlood2::Net
                 return false;
             if (o.particle_stream && (++streams > 128 || !valid_particle_stream(*o.particle_stream)))
                 return false;
+            std::uint64_t previous_particle = 0;
+            if (o.object_particles.size() > particles.size() - particle_count)
+                return false;
+            for (const auto& p : o.object_particles)
+            {
+                if (!valid_object_particle_recipe(p) || p.created > s.time || p.id <= previous_particle)
+                    return false;
+                previous_particle = p.id;
+                particles[particle_count++] = p.id;
+            }
             previous = o.id;
         }
-        return true;
+        const auto end = particles.begin() + particle_count;
+        std::sort(particles.begin(), end);
+        return std::adjacent_find(particles.begin(), end) == end;
     }
     bool encode_world_snapshot(const WorldSnapshot& s, std::vector<std::uint8_t>& bytes)
     {
@@ -263,6 +280,7 @@ namespace OpenBlood2::Net
             w.u8(o.particle_stream.has_value());
             if (o.particle_stream)
                 write_particle_stream(w, *o.particle_stream);
+            write_object_particles(w, o.object_particles);
         }
         write_effects(w, s.polygrids);
         write_effects(w, s.particle_streams);
@@ -349,6 +367,8 @@ namespace OpenBlood2::Net
                 if (!read_particle_stream(r, *o.particle_stream))
                     return false;
             }
+            if (!read_object_particles(r, o.object_particles))
+                return false;
             s.objects.push_back(std::move(o));
         }
         if (!read_effects(r, s.polygrids) || !read_effects(r, s.particle_streams) || !r.done() || !valid_snapshot(s))

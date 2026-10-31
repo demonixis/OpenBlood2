@@ -1,5 +1,6 @@
 #pragma once
 #include "client/world.h"
+#include "game/object_particle_recipe.h"
 #include "game/particle_stream_settings.h"
 #include <optional>
 #include <span>
@@ -32,6 +33,7 @@ namespace OpenBlood2::Net
         ClientCollisionValues collision;
         // Immutable, owner-bound emitter; lifecycle shares reliable object membership.
         std::optional<ParticleStreamSettings> particle_stream;
+        std::vector<ObjectParticleRecipe> object_particles;
     };
     struct WorldSnapshot
     {

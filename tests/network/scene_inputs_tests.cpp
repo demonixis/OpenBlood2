@@ -55,7 +55,7 @@ namespace
         return true;
     }
 #endif
-    bool run(const char* data, bool ballistics, bool impacts, bool instants, bool streams)
+    bool run(const char* data, bool ballistics, bool impacts, bool instants, bool streams, bool objects)
     {
         std::string error;
         Config config;
@@ -127,6 +127,21 @@ namespace
                 recipe.min_color = recipe.max_color = kind ? DVector{255, 40, 40} : DVector{40, 255, 40};
                 values.objects.push_back(std::move(emitter));
             }
+        if (objects)
+            values.time = 10;
+        if (objects)
+            for (unsigned i = 0; i < 3; ++i)
+            {
+                ClientObject emitter;
+                emitter.id = {i + 1, 1};
+                emitter.pose.position = vector_add(eye, {float(i * 20) - 20, -5, 100});
+                // Same-owner death-ray rings plus an independent shield/trail.
+                const unsigned types[]{37, 19, 2};
+                emitter.object_particles.push_back({i * 2 + 1, 10, types[i], 1, {}, "scene wire recipe"});
+                if (!i)
+                    emitter.object_particles.push_back({2, 10, 38, 1, {}, "scene wire recipe"});
+                values.objects.push_back(std::move(emitter));
+            }
         Net::WorldSnapshot decoded;
         CHECK(Net::encode_world_snapshot(Net::snapshot_values(values), bytes) &&
               Net::decode_world_snapshot(bytes, decoded));
@@ -185,7 +200,7 @@ namespace
             Net::EffectEvent decoded_effect;
             CHECK(Net::encode_effect(event, bytes) &&
                   Net::decode_effect(bytes, decoded_effect) == Net::DecodeEffect::Ok);
-            if (!streams)
+            if (!streams && !objects)
                 CHECK(ballistic.receive(decoded_effect, error));
             if (impacts)
                 for (unsigned kind = 1; kind < (instants ? 10u : 5u); ++kind)
@@ -253,12 +268,16 @@ namespace
             auto frame = ballistic.scene().frame();
             CHECK(effects.receive(std::move(frame), error));
             CHECK(instants ? effects.frame().models.size() >= 12
-                           : effects.frame().models.size() == (streams ? 0u : 1u));
+                           : effects.frame().models.size() == ((streams || objects) ? 0u : 1u));
+            if (objects)
+                CHECK(ballistic.runtime().object_particles.started == 4 &&
+                      ballistic.runtime().object_particles.particle_count() > 0);
             if (streams)
                 CHECK(ballistic.runtime().particle_streams.started == 2 &&
                       ballistic.runtime().particle_streams.active[0].effect.emitted >= 12 &&
                       ballistic.runtime().particle_streams.active[1].effect.emitted > 0);
-            CHECK(update_model_scene(input, scene, error) && scene.world_draws.size() == (streams ? 0u : 1u));
+            CHECK(update_model_scene(input, scene, error) &&
+                  scene.world_draws.size() == ((streams || objects) ? 0u : 1u));
             CHECK(update_explosion_model_scene(input, explosions, error) &&
                   (instants ? explosions.world_draws.size() >= 11 : explosions.world_draws.empty()));
             CHECK(update_sprite_scene(input, sprite, error) && sprite.entries.size() >= 2);
@@ -303,12 +322,14 @@ namespace
                 std::size_t changed = 0;
                 for (std::size_t i = 0; i < original.size(); i += 4)
                     changed += !std::equal(original.begin() + i, original.begin() + i + 3, baseline.begin() + i);
-                CHECK(changed > 20 && capture.save(streams    ? "network-stream-original.png"
+                CHECK(changed > 20 && capture.save(objects    ? "network-object-original.png"
+                                                   : streams  ? "network-stream-original.png"
                                                    : instants ? "network-instant-original.png"
                                                    : impacts  ? "network-impact-original.png"
                                                               : "network-ballistic-original.png"));
                 std::cout << "Independent decoded "
-                          << (streams    ? "persistent streams/systems"
+                          << (objects    ? "owner-bound ObjectFX"
+                              : streams  ? "persistent streams/systems"
                               : instants ? "all instant families"
                               : impacts  ? "mixed impact"
                                          : "ballistic")
@@ -319,7 +340,8 @@ namespace
             presenter.shading = SurfaceShading::Standard;
             CHECK(render(gpu, presenter, input, capture, enhanced, error));
             if (ballistics)
-                CHECK(capture.save(streams    ? "network-stream-enhanced.png"
+                CHECK(capture.save(objects    ? "network-object-enhanced.png"
+                                   : streams  ? "network-stream-enhanced.png"
                                    : instants ? "network-instant-enhanced.png"
                                    : impacts  ? "network-impact-enhanced.png"
                                               : "network-ballistic-enhanced.png"));
@@ -350,11 +372,13 @@ namespace
 } // namespace
 int main(int argc, char** argv)
 {
+    const bool objects = argc == 3 && std::string_view(argv[2]) == "--objects";
     const bool streams = argc == 3 && std::string_view(argv[2]) == "--streams";
     const bool instants = argc == 3 && std::string_view(argv[2]) == "--instants";
     const bool impacts = instants || (argc == 3 && std::string_view(argv[2]) == "--impacts");
-    return (argc == 2 || (argc == 3 && (streams || impacts || std::string_view(argv[2]) == "--ballistics"))) &&
-                   run(argv[1], argc == 3, impacts, instants, streams)
+    return (argc == 2 ||
+            (argc == 3 && (objects || streams || impacts || std::string_view(argv[2]) == "--ballistics"))) &&
+                   run(argv[1], argc == 3, impacts, instants, streams, objects)
                ? 0
                : 1;
 }

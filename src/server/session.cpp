@@ -17,6 +17,7 @@ namespace OpenBlood2
         game_.server.remote_audio_sink = {};
         game_.server.remote_effect_sink = {};
         game_.server.remote_stream_sink = {};
+        game_.server.remote_object_particle_sink = {};
     }
     bool ServerSession::start(const Config& config, std::string_view name, unsigned mode, std::string& error,
                               const MultiplayerRules& rules)
@@ -79,6 +80,10 @@ namespace OpenBlood2
         request.game_type = DBYTE(mode_);
         request.filename = rotation_[index];
         stream_emitters_.clear();
+        particle_emitters_.clear();
+        game_.server.remote_object_particle_sink = [this](ObjectId owner, std::string_view name, unsigned type,
+                                                          float scale, DVector offset, std::string& failure)
+        { return capture_particle(owner, name, type, scale, offset, failure); };
         game_.server.remote_stream_sink =
             [this](ObjectId owner, const ParticleStreamSettings& settings, std::string& failure)
         { return capture_stream(owner, settings, failure); };
@@ -140,6 +145,7 @@ namespace OpenBlood2
         game_.server.remote_audio_sink = {};
         game_.server.remote_effect_sink = {};
         game_.server.remote_stream_sink = {};
+        game_.server.remote_object_particle_sink = {};
         started_ = false; // A failed load cannot resume a partially destroyed world.
         if (!load_map((map_index_ + 1) % rotation_.size(), error))
             return false;
@@ -279,6 +285,14 @@ namespace OpenBlood2
                                                  [](const auto& object, auto slot) { return object.id.slot < slot; });
             if (target != frame.objects.end() && target->id == stream.owner)
                 target->particle_stream = stream.settings;
+        }
+        prune_particles();
+        for (const auto& particle : particle_emitters_)
+        {
+            const auto target = std::lower_bound(frame.objects.begin(), frame.objects.end(), particle.owner.slot,
+                                                 [](const auto& object, auto slot) { return object.id.slot < slot; });
+            if (target != frame.objects.end() && target->id == particle.owner)
+                target->object_particles.push_back(particle.recipe);
         }
         out = Net::snapshot_values(frame);
         ++next_snapshot_;

@@ -44,5 +44,7 @@ namespace OpenBlood2
         std::size_t pending_bytes_ = 0;
         int debris_detail_ = 2;
         std::vector<ObjectId> stream_owners_;
+        std::uint64_t highest_particle_ = 0;
+        double particle_time_ = 0;
     };
 } // namespace OpenBlood2
