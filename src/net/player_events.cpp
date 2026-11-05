@@ -126,12 +126,18 @@ namespace OpenBlood2::Net
                     return item(v.current) && item(v.previous) && item(v.next);
                 else if constexpr (std::is_same_v<T, PlayerText>)
                     return text(v.text, 80);
+                else if constexpr (std::is_same_v<T, WonkyVision>)
+                    return number(v.seconds, 60) && v.seconds >= 0;
+                else if constexpr (std::is_same_v<T, FinishHimVoice>)
+                    return v.attacker_character < 4 && v.victim_character < 4;
+                else if constexpr (std::is_same_v<T, FragEvent>)
+                    return object(v.victim, true) && object(v.killer, true) && v.killer_frags >= -1000000 &&
+                           v.killer_frags <= 1000000;
                 else if constexpr (std::is_same_v<T, WeaponLoadout>)
                 {
                     const auto ammo = [](float value) { return number(value) && value >= 0; };
-                    return v.force_revision && v.character < 4 && v.slot < 13 &&
-                           v.view_revision[0] && v.view_revision[1] &&
-                           std::all_of(v.weapons.begin(), v.weapons.end(), weapon) &&
+                    return v.force_revision && v.character < 4 && v.slot < 13 && v.view_revision[0] &&
+                           v.view_revision[1] && std::all_of(v.weapons.begin(), v.weapons.end(), weapon) &&
                            std::all_of(v.ammunition.begin(), v.ammunition.end(), ammo) &&
                            std::all_of(v.alternate_ammunition.begin(), v.alternate_ammunition.end(), ammo) &&
                            (!v.fire_allowed || (v.alive && v.input_enabled && !v.binoculars));
@@ -258,6 +264,24 @@ namespace OpenBlood2::Net
                 }
                 else if constexpr (std::is_same_v<T, PlayerText>)
                     w.text(v.text, 80);
+                else if constexpr (std::is_same_v<T, WonkyVision>)
+                {
+                    w.f32(v.seconds);
+                    w.u8(v.no_move);
+                }
+                else if constexpr (std::is_same_v<T, FinishHimVoice>)
+                {
+                    w.u16(v.index);
+                    w.u8(v.attacker_character);
+                    w.u8(v.victim_character);
+                }
+                else if constexpr (std::is_same_v<T, FragEvent>)
+                {
+                    id(w, v.victim);
+                    id(w, v.killer);
+                    w.u32(std::uint32_t(v.killer_frags + 1000000));
+                    w.u16(v.index);
+                }
                 else if constexpr (std::is_same_v<T, WeaponLoadout>)
                 {
                     w.u64(v.force_revision);
@@ -494,6 +518,30 @@ namespace OpenBlood2::Net
                 v.input_enabled = flags & 2;
                 v.fire_allowed = flags & 4;
                 v.binoculars = flags & 8;
+                event.value = v;
+                break;
+            }
+            case 23:
+            {
+                WonkyVision v;
+                v.seconds = r.f32();
+                ok = boolean(r, v.no_move);
+                event.value = v;
+                break;
+            }
+            case 24:
+                event.value = FinishHimVoice{r.u16(), r.u8(), r.u8()};
+                break;
+            case 25:
+            {
+                FragEvent v;
+                v.victim = id(r);
+                v.killer = id(r);
+                const auto score = r.u32();
+                if (score > 2000000)
+                    return DecodePrivate::Malformed;
+                v.killer_frags = int(score) - 1000000;
+                v.index = r.u16();
                 event.value = v;
                 break;
             }

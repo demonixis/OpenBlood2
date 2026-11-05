@@ -24,6 +24,7 @@
 | [Private network weapon loadout](implementation/reports/m9_weapon_loadout.md) | Addressed two-hand state, mode-specific ammo and permissions, atomic resource loading and remote draw/rest views. |
 | [Reliable network player commands](implementation/reports/m9_player_commands.md) | Original weapon/item/USE dispatch, bounded request/ACK ordering, input edges and remote zoom. |
 | [Animation-validated network fire](implementation/reports/m9_network_fire.md) | Original animation timing on the server, independent prediction, checked actual fire and bounded input/ACK transport. |
+| [Bloodbath death and respawn](implementation/reports/m9_network_death.md) | Original slow-death clocks, USE rescue/respawn, frag attribution and independent weapon cancellation. |
 | [Independent scene inputs](implementation/reports/m9_scene_inputs.md) | Server-free renderer inputs, original weapon visuals and world-owned GPU presentation. |
 | [Network camera state](implementation/reports/m9_camera_transport.md) | Reliable selection, replica/predicted views and authoritative camera movement/look gates. |
 | [Private player events](implementation/reports/m9_private_events.md) | Reliable pointer-free event delivery, independent HUD inbox and corrected broadcasts. |

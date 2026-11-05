@@ -37,28 +37,32 @@ namespace
         items.previous = InventoryItemView{6, "key.pcx", "key_h.pcx", "Lab key", 0, 1};
         items.next = items.current;
         items.show = true;
-        std::vector<PrivateValue> values{BloodbathStart{1729},
-                                         PlayerRotation{-.25f, 1.5f},
-                                         stats,
-                                         MissionObjectives{4, "title", "text"},
-                                         WorldExit{"multi/bb_crypt", WorldExitType::World},
-                                         BossHealth{.75f},
-                                         Conversation{"voice.wav", "words", 4},
-                                         InventoryAction{3, true},
-                                         ScreenFade{true},
-                                         VoiceEvent{false, 3, 8},
-                                         VoiceStop{},
-                                         PlayerDead{},
-                                         MusicCommand{MusicCommandType::MotifLoop, 2, "Combat"},
-                                         ZoomView{true, 98},
-                                         EyeEvent{{4, 5}, true, 1.5f},
-                                         AttachEvent{{6, 7}, {8, 9}, false},
-                                         OrbEvent{{10, 11}, true},
-                                         FlagEvent{CTFEventKind::Captured, 2, 3, {12, 13}},
-                                         items,
-                                         PlayerText{"hello"},
-                                         CameraState{123, {4, 5}, {6, 7}, {8, 9}, {1, false, true, false}, 34, true},
-                                         WeaponLoadout{123, 1, 2, {1, 1}, {50, 50}, {50, 50}, true, true, true, false, {1, 1}}};
+        std::vector<PrivateValue> values{
+            BloodbathStart{1729},
+            PlayerRotation{-.25f, 1.5f},
+            stats,
+            MissionObjectives{4, "title", "text"},
+            WorldExit{"multi/bb_crypt", WorldExitType::World},
+            BossHealth{.75f},
+            Conversation{"voice.wav", "words", 4},
+            InventoryAction{3, true},
+            ScreenFade{true},
+            VoiceEvent{false, 3, 8},
+            VoiceStop{},
+            PlayerDead{},
+            MusicCommand{MusicCommandType::MotifLoop, 2, "Combat"},
+            ZoomView{true, 98},
+            EyeEvent{{4, 5}, true, 1.5f},
+            AttachEvent{{6, 7}, {8, 9}, false},
+            OrbEvent{{10, 11}, true},
+            FlagEvent{CTFEventKind::Captured, 2, 3, {12, 13}},
+            items,
+            PlayerText{"hello"},
+            CameraState{123, {4, 5}, {6, 7}, {8, 9}, {1, false, true, false}, 34, true},
+            WeaponLoadout{123, 1, 2, {1, 1}, {50, 50}, {50, 50}, true, true, true, false, {1, 1}},
+            WonkyVision{15, true},
+            FinishHimVoice{65535, 3, 0},
+            FragEvent{{2, 3}, {4, 5}, -7, 65535}};
         CHECK(values.size() == std::variant_size_v<PrivateValue>);
         std::mt19937 random(0xB2E7);
         for (std::size_t index = 0; index < values.size(); ++index)
@@ -66,7 +70,7 @@ namespace
             PrivateEvent value{{7, 8, {9, 10}}, 11, 12, values[index]};
             std::vector<std::uint8_t> bytes, again;
             CHECK(encode_private(value, bytes) && is_private_packet(bytes) && bytes.size() <= private_packet_limit);
-            const std::vector<std::uint8_t> header{0x42, 0x32, 0x50, 0x45, 11, 0, std::uint8_t(index + 1)};
+            const std::vector<std::uint8_t> header{0x42, 0x32, 0x50, 0x45, 12, 0, std::uint8_t(index + 1)};
             CHECK(std::equal(header.begin(), header.end(), bytes.begin()));
             PrivateEvent decoded;
             CHECK(decode_private(bytes, decoded) == DecodePrivate::Ok && encode_private(decoded, again) &&
@@ -117,6 +121,16 @@ namespace
         CHECK(valid_private(value)); // Original client decides whether a level exists.
         value.value = items;
         std::get<InventoryItems>(value.value).current->icon = "../outside.pcx";
+        CHECK(!valid_private(value));
+        value.value = WonkyVision{-1, true};
+        CHECK(!valid_private(value));
+        value.value = WonkyVision{std::numeric_limits<float>::quiet_NaN(), false};
+        CHECK(!valid_private(value));
+        value.value = FinishHimVoice{0, 4, 0};
+        CHECK(!valid_private(value));
+        value.value = FragEvent{{2, 3}, {}, 0, 0};
+        CHECK(!valid_private(value));
+        value.value = FragEvent{{2, 3}, {4, 5}, -1000001, 0};
         CHECK(!valid_private(value));
         return true;
     }
@@ -175,6 +189,6 @@ int main()
 {
     if (!codec() || !receiver())
         return 1;
-    std::cout << "21 private event tags: canonical LE bytes, every truncation, 31500 mutations, addressed HUD/inbox "
+    std::cout << "25 private event tags: canonical LE bytes, every truncation, 37500 mutations, addressed HUD/inbox "
                  "bounds passed\n";
 }

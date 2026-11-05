@@ -35,6 +35,8 @@ namespace OpenBlood2
                     next = Net::OrbEvent{identity(v.orb), v.active};
                 else if constexpr (std::is_same_v<T, CreatureAttach>)
                     next = Net::AttachEvent{identity(v.creature), identity(v.enemy), v.active};
+                else if constexpr (std::is_same_v<T, PlayerFragged>)
+                    next = Net::FragEvent{identity(v.victim), identity(v.killer), v.killer_frags, v.index};
                 else if constexpr (std::is_same_v<T, CTFEvent>)
                     next = Net::FlagEvent{v.kind, v.team, v.points, identity(v.capturer)};
                 else if constexpr (!std::is_same_v<T, PlayerInitRequest> && !std::is_same_v<T, PlayerPosition> &&
@@ -54,6 +56,16 @@ namespace OpenBlood2
                 else if (found->camera_orb == orb->orb)
                     found->camera_orb = {};
             }
+        }
+        if (result == DE_OK && std::holds_alternative<PlayerDead>(value) && found->setup.owner.force_revision)
+        {
+            // A following USE may respawn before the normal publication pass.
+            // Keep this actual dead loadout in the reliable timeline so both
+            // CViewWeapons cancel the attack even without an intervening tick.
+            Net::WeaponLoadout dead;
+            std::string error;
+            if (!weapon_loadout(found->id, dead, error))
+                return DE_ERROR;
         }
         return result;
     }

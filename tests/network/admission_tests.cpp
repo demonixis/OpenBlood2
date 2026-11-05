@@ -34,6 +34,8 @@ namespace
         std::array<Joined, 16> joined{};
         std::array<MovementSetup, 16> movement_setups;
         std::array<std::optional<MovementAck>, 16> movement_acks;
+        std::array<std::uint64_t, 16> loadouts{}, weapon_acks{};
+        bool discard_state = false;
         ServerNetwork::Clock::time_point now = ServerNetwork::Clock::now();
         std::string error;
         bool start(const char* path)
@@ -159,10 +161,24 @@ namespace
         bool update(unsigned index, const Event& event)
         {
             CHECK(event.kind == EventKind::Received);
+            if (discard_state && event.channel == Channel::State)
+                return true;
+            if (is_weapon_frame_packet(event.bytes))
+            {
+                WeaponFrameMessage message;
+                CHECK(event.channel == Channel::Control &&
+                      decode_weapon_frame(event.bytes, message) == DecodeWeaponFrame::Ok);
+                const auto* ack = std::get_if<WeaponFrameAck>(&message);
+                CHECK(ack && ack->owner == movement_setups[index].owner && ack->sequence > weapon_acks[index]);
+                weapon_acks[index] = ack->sequence;
+                return true;
+            }
             if (is_private_packet(event.bytes))
             {
                 PrivateEvent message;
                 CHECK(event.channel == Channel::Control && decode_private(event.bytes, message) == DecodePrivate::Ok);
+                if (std::holds_alternative<WeaponLoadout>(message.value))
+                    loadouts[index] = message.sequence;
                 CHECK(inboxes[index].receive(message, error) == NetworkPlayerEvents::Reception::Applied);
                 std::vector<PrivateEvent> delivered;
                 inboxes[index].take(delivered);
@@ -380,6 +396,49 @@ namespace
                   << f.server.state_drops << " queue drops\n";
         return true;
     }
+    bool weapon_acknowledgements(const char* path)
+    {
+        Fixture f;
+        auto& error = f.error;
+        CHECK(f.start(path) && f.connect(0) && f.offer(0) && f.join(0));
+        // Drop every best-effort State delivery. Input-window progress must
+        // survive independently of visual/movement snapshot delivery.
+        f.discard_state = true;
+        const auto progress = [&]() -> bool
+        {
+            CHECK(f.session.tick(error));
+            f.now += std::chrono::microseconds(16667);
+            CHECK(f.server.pump(f.now, error));
+            for (unsigned n = 0; n < 128; ++n)
+            {
+                Event event;
+                const auto status = f.clients[0].poll(event, 1, error);
+                CHECK(status != PollResult::Failed);
+                if (status == PollResult::Idle)
+                    break;
+                CHECK(f.update(0, event));
+            }
+            return true;
+        };
+        for (unsigned i = 0; i < 10; ++i)
+            CHECK(progress());
+        CHECK(f.loadouts[0] && f.movement_setups[0].sequence);
+        for (std::uint64_t sequence = 1; sequence <= 180; ++sequence)
+        {
+            CHECK(sequence - f.weapon_acks[0] <= weapon_frame_queue_limit);
+            const WeaponFrame frame{f.movement_setups[0].owner, sequence, f.loadouts[0], {}, false, false};
+            std::vector<std::uint8_t> bytes;
+            CHECK(encode_weapon_frame(frame, bytes) && f.clients[0].send(f.peers[0], Channel::Control, bytes, error));
+            f.clients[0].flush();
+            CHECK(progress());
+        }
+        for (unsigned i = 0; i < 10; ++i)
+            CHECK(progress());
+        CHECK(f.weapon_acks[0] == 180 && f.server.close());
+        std::cout << "180 real ENet weapon frames acknowledged on reliable Control with all State deliveries "
+                     "discarded; bounded input window remains live\n";
+        return true;
+    }
     bool movement(const char* path)
     {
         Fixture f;
@@ -451,6 +510,8 @@ namespace
 } // namespace
 int main(int argc, char** argv)
 {
+    if (argc == 3 && std::string_view(argv[2]) == "--weapon-acks")
+        return weapon_acknowledgements(argv[1]) ? 0 : 1;
     if (argc == 3 && std::string_view(argv[2]) == "--movement")
         return movement(argv[1]) ? 0 : 1;
     return argc == 2 && run(argv[1]) ? 0 : 1;

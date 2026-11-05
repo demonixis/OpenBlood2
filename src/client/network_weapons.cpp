@@ -64,6 +64,11 @@ namespace OpenBlood2
         if (!state_)
             time_ = double(event.tick) / 60;
         state_ = *next;
+        // A death and respawn can both be received between simulation ticks.
+        // Preserve the cancellation even when the next tick sees only live state.
+        if (!next->alive)
+            for (auto& view : views_)
+                view.CancelFiringState();
         sequence_ = event.sequence;
         return Reception::Applied;
     }
@@ -149,6 +154,8 @@ namespace OpenBlood2
         {
             PresentationWeapon services(*state_, hand, float(time_), sound_requests);
             views_[hand].binoculars_active = state_->binoculars;
+            if (!state_->alive)
+                views_[hand].CancelFiringState();
             if (!views_[hand].Update(services, input, {}, direction, seconds, error))
                 return false;
         }

@@ -74,7 +74,7 @@ namespace OpenBlood2
         if (Net::is_weapon_frame_packet(event.bytes))
         {
             Net::WeaponFrameMessage message;
-            if (phase_ != Phase::Active || event.channel != Net::Channel::State ||
+            if (phase_ != Phase::Active || event.channel != Net::Channel::Control ||
                 Net::decode_weapon_frame(event.bytes, message) != Net::DecodeWeaponFrame::Ok)
                 return false;
             const auto* ack = std::get_if<Net::WeaponFrameAck>(&message);
@@ -87,7 +87,7 @@ namespace OpenBlood2
                                 ack->fired[0] < weapon_ack_->fired[0] || ack->fired[1] < weapon_ack_->fired[1] ||
                                 ack->blocked < weapon_ack_->blocked))
                 return false;
-            // State can arrive before its reliable force setup. These are only
+            // ACKs may precede a new force setup. These are only
             // cumulative diagnostics; an ACK never moves the player or grants ammo.
             weapon_ack_ = *ack;
             return true;
@@ -304,7 +304,13 @@ namespace OpenBlood2
                 {
                     const auto acknowledged = weapon_ack_ ? weapon_ack_->sequence : 0;
                     if (weapon_frames == UINT64_MAX || weapon_frames - acknowledged >= Net::weapon_frame_queue_limit)
-                        return fail(error, "Unacknowledged weapon frame queue is full");
+                    {
+                        error = "Unacknowledged weapon frame queue is full: sent=" + std::to_string(weapon_frames) +
+                                ", ack=" + std::to_string(acknowledged) +
+                                ", discarded=" + std::to_string(discarded_ticks) +
+                                ", state_packets=" + std::to_string(state_packets);
+                        return fail(error, "Weapon frame backlog");
+                    }
                     const Net::WeaponFrame frame{movement_.setup().owner, weapon_frames + 1, weapons_.state_sequence(),
                                                  {pitch_, yaw_},          weapon.primary,    weapon.alternate};
                     std::vector<std::uint8_t> bytes;

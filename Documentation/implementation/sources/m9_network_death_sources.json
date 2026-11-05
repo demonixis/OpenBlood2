@@ -1,0 +1,69 @@
+{
+  "scope": "Original Bloodbath death/slow death/respawn/frags, typed protocol-v12 events and reliable weapon cancellation",
+  "baseline": "81fe4cfacd3ed4f4f31a471c326bc097ff2fe38e",
+  "sources": [
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/Destructable.cpp",
+      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/ObjectUtilities.h",
+      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ViewWeapon.cpp",
+      "sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "81fe4cfacd3ed4f4f31a471c326bc097ff2fe38e",
+      "path": "src/game/original/PlayerDeath.cpp",
+      "sha256": "d51a6fa262e492a08d0d63a5d2ae40e610223a2537c45e68d34254f3f1852744"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "81fe4cfacd3ed4f4f31a471c326bc097ff2fe38e",
+      "path": "src/game/original/PlayerObj.cpp",
+      "sha256": "3dc3cbf3248b42ca39f34b836c56e4feb2ee848cbffedf7edda80b1934659cce"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "81fe4cfacd3ed4f4f31a471c326bc097ff2fe38e",
+      "path": "src/game/original/PlayerUse.cpp",
+      "sha256": "3b97b53294d5c1ce5a141eb43095b5f74232566001d76896cdb3a0e9f0e7e5dc"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "81fe4cfacd3ed4f4f31a471c326bc097ff2fe38e",
+      "path": "src/server/player_fire.cpp",
+      "sha256": "dec3e635b68172b7b4581fb4b4218e5552c00f142924b4f77d0d737db2e0dc0c"
+    }
+  ],
+  "adaptations": [
+    "Checked original 10% slow-death chance, .5/5/15-second source clocks, explicit USE rescue, original lethal killer attribution and one broadcast RNG draw.",
+    "World-owned shared player-creation timestamp; collision-checked/deferred humiliation extents; failed respawn retains a dead player and reports the failure.",
+    "Pointer-free bounded WonkyVision/FinishHim/Frag events, signed score encoding and generation-qualified identities; remote audiovisual consumers and scoreboard remain separate.",
+    "Capture the dead loadout synchronously at PlayerDead and process every intervening issued loadout on the server; retain weapon RNG/reload/barrel state through original cancellation.",
+    "Solo save boundary rejects multiplayer life/frag state; solo movement, death, view-weapon update and audio services remain unchanged.",
+    "Remote impulse delivery and real-process lethal PvP remain required before interactive held fire; this lot does not claim playable M9 acceptance.",
+    "Protocol v12 moves weapon input-window ACKs to reliable Control at unchanged 20 Hz cadence, after reproduced GPU host starvation of unreliable ACK delivery; bounds remain unchanged."
+  ]
+}

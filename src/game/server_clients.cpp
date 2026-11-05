@@ -99,6 +99,13 @@ namespace OpenBlood2
                     return valid_hud_stats(value);
                 else if constexpr (std::is_same_v<T, MusicCommand>)
                     return valid_music_command(value);
+                else if constexpr (std::is_same_v<T, WonkyVision>)
+                    return std::isfinite(value.seconds) && value.seconds >= 0 && value.seconds <= 60;
+                else if constexpr (std::is_same_v<T, FinishHimVoice>)
+                    return value.attacker_character < 4 && value.victim_character < 4;
+                else if constexpr (std::is_same_v<T, PlayerFragged>)
+                    return value.victim && value.killer && value.killer_frags >= -1000000 &&
+                           value.killer_frags <= 1000000;
                 else if constexpr (std::is_same_v<T, VoiceEvent>)
                     return value.character >= 0 && value.character < 4 && value.event >= 0 &&
                            value.event < (value.group ? 12 : 9);
@@ -149,6 +156,12 @@ namespace OpenBlood2
             return DE_ERROR;
         events.push_back(event);
         return DE_OK;
+    }
+    DRESULT ServerAdapter::SendPlayerFragged(const PlayerFragged& value)
+    {
+        if (!trace_service("SendPlayerFragged") || !objects_.get(value.victim) || !objects_.get(value.killer))
+            return DE_INVALIDPARAMS;
+        return broadcast_client_event(value);
     }
     DRESULT ServerAdapter::SendBossHealth(const BossHealth& value)
     {

@@ -105,3 +105,15 @@ the computed death camera, checks unchanged repeated readback and teardown.
 See the implementation report for exact configurations/results and limitations.
 
 With [player damage impulses](player_impulse_contracts.md) enabled, lethal hits can leave passive motion after death; original DoDeath does not zero velocity. Dead controls remain suppressed while existing drag/collision settle the body. The regression checks both this decay and continued immobility after settling; instant Death damage adds no impulse.
+
+
+## M9 Bloodbath continuation
+
+The [M9 life-state lot](../implementation/reports/m9_network_death.md) supersedes
+the historical multiplayer-death refusal above for admitted retail Bloodbath
+players. It adds original slow death, humiliation, USE rescue/respawn and frag
+attribution while retaining the solo branch and existing save behavior. Network
+life/frag fields remain unsaved. Its checked cancellation and wire contracts are
+in [multiplayer contracts](multiplayer_contracts.md#bloodbath-life-transitions-and-reliable-death-cancellation).
+Remote impulse delivery and complete interactive combat qualification remain
+separate; this does not change the M2-GPU-001/M3 acceptance boundaries.

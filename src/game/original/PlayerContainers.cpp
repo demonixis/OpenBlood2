@@ -96,6 +96,10 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
         ++protected_volume_hits;
         return 0;
     }
+    // Source PlayerObj handles this before its damage aggregate: a finishing
+    // hit confirms the original lethal attacker's frag, even for a different sender.
+    if (message == OpenBlood2::damage_message && m_bInSlowDeath && m_fSlowDeathSafeTimer <= 0)
+        DoDeath(true);
     if (!m_bDead && !m_damage.IsDead() &&
         (message == OpenBlood2::key_query_message || message == OpenBlood2::key_pickup_message))
     {

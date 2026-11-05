@@ -100,22 +100,38 @@ namespace OpenBlood2
             return false;
         }
         const auto state = found->value;
-        std::array<CViewWeapon, 2> prepared;
-        std::array<bool, 2> changed{};
-        for (unsigned hand = 0; hand < 2; ++hand)
+        // The reliable stream delivers every intervening loadout to the client,
+        // even when no weapon tick runs between them. Reproduce those resource/
+        // cancellation transitions before advancing time (never replay movement).
+        for (const auto& record : p.weapon_states)
         {
-            changed[hand] = p.weapon_view_revision[hand] != state.view_revision[hand];
-            if (changed[hand] && state.weapons[hand] &&
-                !prepared[hand].Create(state.weapons[hand], hand != 0, game_.models, game_.resources, error,
-                                       state.character, CViewWeapon::ResourcesMode::AnimationOnly))
-                return false;
-        }
-        for (unsigned hand = 0; hand < 2; ++hand)
-            if (changed[hand])
+            if (record.sequence <= p.weapon_applied_state)
+                continue;
+            if (record.sequence > frame.state)
+                break;
+            const auto& received = record.value;
+            std::array<CViewWeapon, 2> prepared;
+            std::array<bool, 2> changed{};
+            for (unsigned hand = 0; hand < 2; ++hand)
             {
-                p.weapon_timeline[hand] = std::move(prepared[hand]);
-                p.weapon_view_revision[hand] = state.view_revision[hand];
+                changed[hand] = p.weapon_view_revision[hand] != received.view_revision[hand];
+                if (changed[hand] && received.weapons[hand] &&
+                    !prepared[hand].Create(received.weapons[hand], hand != 0, game_.models, game_.resources, error,
+                                           received.character, CViewWeapon::ResourcesMode::AnimationOnly))
+                    return false;
             }
+            for (unsigned hand = 0; hand < 2; ++hand)
+            {
+                if (changed[hand])
+                {
+                    p.weapon_timeline[hand] = std::move(prepared[hand]);
+                    p.weapon_view_revision[hand] = received.view_revision[hand];
+                }
+                if (!received.alive)
+                    p.weapon_timeline[hand].CancelFiringState();
+            }
+            p.weapon_applied_state = record.sequence;
+        }
         p.weapon_time += ServerClock::step;
         WeaponInput input{frame.primary, !frame.primary && frame.alternate, false, true};
         if (!state.input_enabled)
@@ -173,6 +189,8 @@ namespace OpenBlood2
             TimelineWeapon services(state, hand, float(p.weapon_time), fire);
             auto& view = p.weapon_timeline[hand];
             view.binoculars_active = state.binoculars;
+            if (!state.alive)
+                view.CancelFiringState();
             if (!view.Update(services, input, {}, direction, ServerClock::step, error) || !delivered)
                 return false;
         }

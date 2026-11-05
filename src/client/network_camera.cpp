@@ -16,7 +16,8 @@ namespace OpenBlood2
         owner_ = owner;
         state_.reset();
         sequence_ = 0;
-        time_ = 0;
+        time_ = wonky_until_ = 0;
+        wonky_no_move_ = dead_no_hide_ = false;
         return true;
     }
     NetworkCamera::Reception NetworkCamera::receive(const Net::PrivateEvent& event, std::string& error)
@@ -36,11 +37,35 @@ namespace OpenBlood2
             // PlayerDead remains the only trigger for the original death orbit.
             // Damage-dead/slow-death state alone must not start it early.
             if (state->alive && (!state_ || !state_->alive || state->force_revision != state_->force_revision))
+            {
                 camera_.death = {};
+                dead_no_hide_ = false;
+            }
             state_ = *state;
         }
+        else if (const auto* wonky = std::get_if<WonkyVision>(&event.value))
+        {
+            const double now = double(event.tick) / 60;
+            const float seconds = camera_.death.active ? 0 : wonky->seconds;
+            if (!seconds)
+            {
+                wonky_until_ = 0;
+                wonky_no_move_ = false;
+            }
+            else if (now + seconds > wonky_until_)
+            {
+                wonky_until_ = now + seconds;
+                wonky_no_move_ = wonky->no_move;
+            }
+        }
         else if (std::holds_alternative<PlayerDead>(event.value))
+        {
+            if (!camera_.death.active)
+                dead_no_hide_ = wonky_no_move_ && double(event.tick) / 60 < wonky_until_;
+            wonky_until_ = 0;
+            wonky_no_move_ = false;
             camera_.death.Begin(static_cast<float>(double(event.tick) / 60));
+        }
         else
             return Reception::Ignored;
         sequence_ = event.sequence;
@@ -103,6 +128,8 @@ namespace OpenBlood2
         next.camera_position.y += state_->eye_level;
         if (!next.receive(std::move(frame), error) || !next.select(collision, pitch, yaw, zoom, error))
             return Reception::Refused;
+        if (next.kind == ClientCameraKind::Death && dead_no_hide_)
+            next.player_visible = true;
         camera_ = std::move(next);
         time_ = time;
         return Reception::Applied;

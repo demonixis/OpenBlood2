@@ -331,7 +331,9 @@ Firing input, authoritative shot validation and remote audio/FX remain to connec
 items, alternate zoom and detonation through bounded, generation-checked server dispatch and ACKs.
 [Animation-validated fire](implementation/reports/m9_network_fire.md) now transports bounded weapon frames,
 runs original animation cadence on the server and checks actual shots independently of prediction.
-Interactive held fire awaits multiplayer death/slow-death/respawn; remote audio/FX remain separate.
+[Bloodbath life transitions](implementation/reports/m9_network_death.md) now preserve original death/slow-death,
+USE rescue/respawn and frag attribution, with reliable weapon cancellation across coalesced life changes.
+Remote damage impulses and real-process lethal PvP remain before frontend held fire; remote audio/FX remain separate.
 **Remaining private presentation consumers/commands, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client

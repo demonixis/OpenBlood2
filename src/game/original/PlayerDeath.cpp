@@ -33,14 +33,62 @@ void CPlayerObj::HandleDeath()
     bool unported_power = false;
     for (int i = 0; i < PU_MAXTYPES; ++i)
         unported_power |= m_bPowerupActivated[i] && i != PU_INVISIBLE && i != PU_INVULNERABLE && i != PU_TRIPLEDAMAGE;
-    if (s->IsMultiplayerGame() || !OpenBlood2::character_profile(m_nCharacter) || unported_power)
+    if (!OpenBlood2::character_profile(m_nCharacter) || unported_power)
     {
-        death_error = "Multiplayer and active unported timed-power death are unavailable";
+        death_error = "Player profile or active timed-power death is unavailable";
         return;
     }
-    // DoDeath: these supported players have no slow-death, parasitic attachment
-    // or flag to reset. ResetPowerups ends Willpower, invisibility and Anger.
+    const auto killer = m_damage.last_damage.attacker;
+    if (s->IsMultiplayerGame() && m_fDeathTimer == 0 && killer != m_hObject)
+    {
+        int chance = 100;
+        if (m_damage.m_fDeathHitPoints < -5 && !s->RandomInt(0, 99, chance))
+        {
+            death_error = "Slow-death random service unavailable";
+            return;
+        }
+        if (chance < 10) // Source code says 10%, despite its 25% comment.
+        {
+            m_fDeathTimer = 15;
+            m_fSlowDeathSafeTimer = .5f;
+            m_fSlowDeathStayTimer = 5;
+            m_bInSlowDeath = true;
+            humiliation_slot = -1;
+            ++slow_deaths;
+            SendWonkyVision(m_fDeathTimer, true);
+            auto* attacker = dynamic_cast<CPlayerObj*>(s->HandleToObject(killer));
+            if (attacker && attacker->m_hClient && s->GetClientUserData(attacker->m_hClient) == killer)
+            {
+                int index = 0;
+                if (!s->RandomInt(0, 65535, index) ||
+                    s->SendToClient(attacker->m_hClient, FinishHimVoice{std::uint16_t(index), attacker->m_nCharacter,
+                                                                        m_nCharacter}) != DE_OK)
+                    death_error = "Finish-him announcement delivery failed";
+            }
+        }
+        else
+            m_fDeathTimer = -1;
+        return; // Source confirms ordinary multiplayer death on the next update.
+    }
+    if (m_bInSlowDeath)
+    {
+        m_fDeathTimer -= s->GetFrameTime();
+        if (m_fDeathTimer <= 0)
+            m_bInSlowDeath = false;
+        return; // Expiry also waits until the following update before DoDeath.
+    }
+    DoDeath();
+}
+void CPlayerObj::DoDeath(bool humiliation)
+{
+    auto* s = GetServerDE();
+    if (!s || m_bDead || !s->IsObjectAlive(m_hObject))
+        return;
     m_bDead = DTRUE;
+    m_bInSlowDeath = false;
+    m_fSlowDeathSafeTimer = m_fSlowDeathStayTimer = 0;
+    humiliation_death = humiliation;
+
     ResetPowerups();
     ++deaths;
     m_InventoryMgr.RemoveDeathItems();
@@ -52,15 +100,25 @@ void CPlayerObj::HandleDeath()
         death_error = "Original SMSG_DEAD delivery failed";
     if (m_bZoomView)
         SetZoomMode(false); // Original weapon-zoom reset after SMSG_DEAD.
+    if (s->IsMultiplayerGame())
+        UpdateFragStatus();
     if (m_hCurSound)
     {
         s->KillSound(m_hCurSound);
         m_hCurSound = 0;
     }
-    s->SetObjectFlags(m_hObject, s->GetObjectFlags(m_hObject) & ~FLAG_VISIBLE);
+    if (!humiliation)
+        s->SetObjectFlags(m_hObject, s->GetObjectFlags(m_hObject) & ~FLAG_VISIBLE);
     move_state = MoveState::Dead;
     m_InventoryMgr.UpdateHandModels();
 
+    if (humiliation)
+    {
+        humiliation_slot = 3;
+        humiliation_animation_pending = true;
+        UpdateHumiliationAnimation(); // Contact callbacks defer a changed-size request.
+        return;
+    }
     const auto type = m_damage.reaction_damage_type;
     // Preserve source bit test and the literal 50.0 threshold. These differ
     // from NPC equality/.9 and must not be 'fixed' to guessed game behavior.
@@ -78,6 +136,86 @@ void CPlayerObj::HandleDeath()
     }
     // Original death commits even if cosmetic corpse/gib creation fails. Keep
     // the player/client alive and record failed presentation; never retry/spawn twice.
+}
+
+bool CPlayerObj::SendWonkyVision(float seconds, bool no_move)
+{
+    if (GetServerDE()->SendToClient(m_hClient, WonkyVision{seconds, no_move}) == DE_OK)
+        return true;
+    death_error = "Wonky-vision delivery failed";
+    return false;
+}
+void CPlayerObj::UpdateFragStatus()
+{
+    auto* s = GetServerDE();
+    auto* killer = dynamic_cast<CPlayerObj*>(s->HandleToObject(m_damage.last_damage.attacker));
+    if (!killer || !killer->m_hClient || s->GetClientUserData(killer->m_hClient) != killer->m_hObject)
+        return; // Original FindClient: removed killers receive neither a frag nor a draw.
+    if (const auto* name = s->GetStringData(killer->m_hstrPlayerName))
+    {
+        who_killed_me_last = name;
+        const auto delta = killer == this ? -1 : 1; // Bloodbath; Team/CTF admission remains separate.
+        if (killer->m_Frags + delta < -1000000 || killer->m_Frags + delta > 1000000)
+        {
+            death_error = "Player frag counter exhausted";
+            return;
+        }
+        killer->m_Frags += delta;
+        if (killer != this)
+            if (const auto* victim = s->GetStringData(m_hstrPlayerName))
+                killer->who_i_killed_last = victim;
+    }
+    int index = 0;
+    if (!s->RandomInt(0, 65535, index) ||
+        s->SendPlayerFragged({m_hObject, killer->m_hObject, killer->m_Frags, std::uint16_t(index)}) != DE_OK)
+        death_error = "Player frag broadcast failed";
+    else
+        ++frag_updates;
+}
+bool CPlayerObj::UpdateHumiliationAnimation()
+{
+    auto* s = GetServerDE();
+    if (!m_bInSlowDeath && !humiliation_animation_pending)
+        return true;
+    if (m_bInSlowDeath && move_state == MoveState::Humiliation && !humiliation_animation_pending)
+        return true;
+    if (humiliation_slot < 0)
+    {
+        if (!s->RandomInt(0, 2, humiliation_slot))
+            return false;
+        humiliation_animation_pending = true;
+    }
+    auto clip = m_Anim_Sound.m_nAnim_HUMILIATION[humiliation_slot];
+    std::string name;
+    if (!s->GetModelAnimationName(m_hObject, clip, name))
+        clip = s->GetModelAnimation(m_hObject); // Same original invalid-ordinal retention as locomotion.
+    DVector dimensions;
+    if (!s->GetModelAnimationName(m_hObject, clip, name) ||
+        s->GetModelAnimUserDims(m_hObject, &dimensions, clip) != DE_OK)
+    {
+        death_effect_error = "Humiliation animation/dimensions unavailable";
+        return false;
+    }
+    const auto resize = s->ResizeObject(m_hObject, dimensions);
+    if (resize == ResizeResult::Blocked || resize == ResizeResult::InTransaction)
+    {
+        humiliation_animation_pending = true;
+        death_effect_error = "Humiliation animation waits for checked dimensions";
+        return true;
+    }
+    if (resize != ResizeResult::Resized)
+        return false;
+    s->SetModelAnimation(m_hObject, clip);
+    if (s->ResetModelAnimation(m_hObject) != DE_OK)
+        return false;
+    s->SetModelLooping(m_hObject, true);
+    if (!m_bDead)
+        move_state = MoveState::Humiliation;
+    locomotion_clip = name;
+    ++animation_changes;
+    humiliation_animation_pending = false;
+    death_effect_error.clear();
+    return true;
 }
 
 bool CPlayerObj::CreateDeathCorpse()

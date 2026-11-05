@@ -195,6 +195,30 @@ namespace
         frame.alternate = false;
         for (unsigned tick = 0; tick < 180; ++tick)
             CHECK(step(false));
+        // Engage an attack, then confirm death and respawn without any client
+        // frame/publication pass between them. The reliable dead state must
+        // still cancel FIRE_KEY on both sequencers; no gun/resource recreation.
+        CHECK(step(true));
+        CHECK(client.views()[0].state == WS_START_FIRING || client.views()[0].state == WS_FIRING);
+        const auto before_death = gun->shots;
+        const auto death_revision = client.state()->view_revision[0];
+        player->m_damage.m_bDead = true;
+        player->m_damage.m_fHitPoints = 0;
+        player->m_damage.last_damage.attacker = player->m_hObject;
+        player->m_damage.reaction_damage_type = DamageType::FreeFall;
+        player->HandleDeath();
+        CHECK(player->m_bDead && player->Respawn() && player->GoToStartPoint(nullptr, false));
+        CHECK(publish() && client.state()->alive && client.state()->view_revision[0] == death_revision &&
+              client.views()[0].state == WS_REST);
+        CHECK(std::any_of(events.begin(), events.end(),
+                          [](const auto& event)
+                          {
+                              const auto* value = std::get_if<WeaponLoadout>(&event.value);
+                              return value && !value->alive;
+                          }));
+        for (unsigned tick = 0; tick < 180; ++tick)
+            CHECK(step(false));
+        CHECK(gun->shots == before_death);
         // Idle accrues at most 60 credits. A burst processes at most six inputs
         // per world tick, and its following selection must stay behind it.
         for (unsigned tick = 0; tick < 120; ++tick)

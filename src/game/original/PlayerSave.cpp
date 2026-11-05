@@ -101,6 +101,11 @@ namespace
             error = "Player fields require a live initialized owner outside damage callbacks";
             return false;
         }
+        if (server->IsMultiplayerGame() || player.m_bInSlowDeath || player.humiliation_death)
+        {
+            error = "Multiplayer life/frag state is not a single-player save";
+            return false;
+        }
         if (player.ctf_team || player.m_hFlagObject || player.m_hFlagAttach)
         {
             error = "CTF player requires unsaved match/flag state";

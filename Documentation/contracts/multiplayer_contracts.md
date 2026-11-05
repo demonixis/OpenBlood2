@@ -1042,3 +1042,38 @@ invalid channels/types/sequences/capacity reject the offending peer. Neutral
 menu/focus ticks continue. CMoveMgr receives the firing flag and still integrates
 once. Interactive held fire remains neutral until multiplayer death/slow-death/
 respawn is connected. Remote shot audio/FX identity/dedup remains separate.
+
+
+## Bloodbath life transitions and reliable death cancellation
+
+The [life-state continuation](../implementation/reports/m9_network_death.md) adds
+protocol-v12 WonkyVision, FinishHimVoice and FragEvent. Preserve original 10%
+slow-death chance below −5 death HP, self exclusion, .5-second finishing grace,
+5-second explicit USE rescue, 15-second expiry and separate confirmation update.
+Confirmed death, not lethal damage alone, starts the death camera/weapon cancellation.
+Finishing damage credits the first lethal attacker. Removed killers get no frag
+or draw; self is −1, another connected killer +1. Draw the broadcast index once,
+independently of recipient count. Team/CTF scoring is not enabled by this subset.
+
+Use the existing independent model replicas for humiliation and checked dimensions;
+defer resize from a contact transaction. Source fourth-animation gibs occur on
+respawn. Keep same player/inventory, source ammo reset, marker choice and world-owned
+shared creation timestamp for delayed spawn voice. A failed respawn must retain
+a dead player at the preceding position with explicit failure, never grant a live
+unchecked placement. Multiplayer life/frag fields are outside solo saves.
+
+Publish actual dead weapon state at PlayerDead even if USE runs before the next
+normal publication. Both endpoints observe every intervening loadout and run
+original CancelFiringState without resetting reload/barrel/RNG. Respawn's checked
+force invalidates old-life commands/shots. No CMoveMgr integration is added.
+Network camera no-hide survives repeated death notifications and clears on respawn.
+Wonky FOV/roll/model warble, remote announcements and scoreboard remain consumers
+to connect. Remote damage impulses and real-process lethal PvP are the next gate
+before frontend held fire; this lot alone is not playable network acceptance.
+
+
+Protocol v12 also moves weapon-frame ACKs to reliable Control at 20 Hz, only on
+processed-sequence changes. These ACKs release a bounded input window and cannot
+rely on best-effort State delivery. Keep State snapshots unreliable/sequenced and
+all existing queue/input/catch-up limits; the [life-state report](../implementation/reports/m9_network_death.md#reliable-weapon-acknowledgements)
+records the reproduced GPU failure, diagnosis and discarded-State regression.

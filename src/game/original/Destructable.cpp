@@ -243,11 +243,10 @@ DDWORD CDestructable::ObjectMessageFn(LPBASECLASS owner, HOBJECT sender, DDWORD 
             // A checked token avoids sharing/breaking the AI target's directed link.
             if (dynamic_cast<AI_Mgr*>(owner) && damage.type != OpenBlood2::DamageType::Death)
                 last_damager_ = damage.attacker;
-            // Original post-armor life leech, before victim death handling. Slow death
-            // is a separate, unavailable multiplayer state in this local runtime.
+            // Original post-armor life leech, excluding dead and slow-dying attackers.
             if (damage.type == OpenBlood2::DamageType::Leech && dynamic_cast<CBaseCharacter*>(owner))
                 if (auto* player = dynamic_cast<CPlayerObj*>(BaseClass::GetServerDE()->HandleToObject(damage.attacker));
-                    player && !player->m_bDead)
+                    player && !player->m_bDead && !player->m_bInSlowDeath)
                     player->m_damage.Heal(amount / 10.f);
             if (m_fHitPoints <= 0)
             {
@@ -307,6 +306,12 @@ namespace
 } // namespace
 bool CDestructable::Heal(float amount)
 {
+    auto* server = BaseClass::GetServerDE();
+    if (server && server->IsMultiplayerGame())
+        if (const auto* player = dynamic_cast<const CPlayerObj*>(server->HandleToObject(m_hObject));
+            player && player->m_bInSlowDeath)
+            return false; // Original slow death refuses ordinary healing (MegaHeal is distinct).
+
     if (!add_stat(m_fHitPoints, m_fMaxHitPoints, amount))
         return false;
     m_bDead = DFALSE;

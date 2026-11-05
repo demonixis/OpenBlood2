@@ -221,6 +221,7 @@ namespace OpenBlood2
             pickup_reports.clear();
             camera_effects.clear();
             random_.seed(1);
+            last_player_created_time = 0;
             variables_.erase("GAME_WORLDNAME");
             client_strings = {};
             client_strings_error.clear();
@@ -284,6 +285,7 @@ namespace OpenBlood2
         bool GetClientResourceString(std::uint32_t, std::string&) override;
         bool FindClientResourceString(std::uint32_t, std::string&) override;
         DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;
+        DRESULT SendPlayerFragged(const PlayerFragged&) override;
         bool GetModelFilenames(HOBJECT, std::string&, std::string&) override;
         DRESULT SetModelFilenames(HOBJECT, const char*, const char*) override;
         DRESULT GetModelNodeHideStatus(HOBJECT, const char*, DBOOL*) override;

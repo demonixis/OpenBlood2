@@ -44,6 +44,13 @@ DDWORD CBaseCharacter::EngineMessageFn(DDWORD message, void* data, DFLOAT fData)
     }
     return B2BaseClass::EngineMessageFn(message, data, fData);
 }
+CPlayerObj::CPlayerObj()
+{
+    // Original shared s_fCreatedTime is reset for every player construction.
+    // Keep that quirk inside this server instead of leaking across local worlds.
+    if (auto* server = GetServerDE())
+        server->last_player_created_time = server->GetTime();
+}
 CPlayerObj::~CPlayerObj()
 {
     ClearRemoteBombs();
@@ -143,14 +150,16 @@ bool CPlayerObj::SetCharacter(DBYTE character)
 bool CPlayerObj::Respawn()
 {
     auto* server = GetServerDE();
-    // Preserve the original single-player dead-player gate. This operation is
-    // an entry reset, not a replacement for loading a save after death. The
-    // multiplayer dead/slow-death respawn branches remain a separate port.
-    if (m_damage.IsDead())
+    // Solo retains its save-restoration gate. Source multiplayer USE may revive
+    // the existing player; it does not create another client or inventory.
+    if (m_damage.IsDead() && !server->IsMultiplayerGame())
     {
         entry_error = "A dead single-player character requires save restoration";
         return false;
     }
+    if (server->IsMultiplayerGame() && m_bDead &&
+        server->GetModelAnimation(m_hObject) == m_Anim_Sound.m_nAnim_HUMILIATION[3])
+        CreateDeathGibs(); // Original visible humiliation body gibs before reset.
     if (!SetCharacter(m_nCharacter))
         return false;
     if (!OpenBlood2::reset_character_nodes(m_hObject, entry_error))
@@ -179,7 +188,21 @@ bool CPlayerObj::Respawn()
     m_fAirLevel = 100;
     containers = {};
     if (network_game_type(server->net_game_type))
+    {
+        m_fDeathTimer = m_fSlowDeathSafeTimer = m_fSlowDeathStayTimer = 0;
+        m_bInSlowDeath = humiliation_death = humiliation_animation_pending = false;
+        humiliation_slot = -1;
+        original_values.burning = false;
+        if (server->GetTime() - server->last_player_created_time > 5)
+        {
+            int chance = 0;
+            if (!server->RandomInt(0, 99, chance))
+                return false;
+            if (chance < 65)
+                PlayVoiceGroupEventOnClient(7); // VME_SPAWN.
+        }
         SetMultiplayerAmmo();
+    }
     else
     {
         for (DBYTE i = 1; i <= 12; ++i)
@@ -545,6 +568,11 @@ DBOOL CPlayerObj::Update(DVector*)
     ++updates;
     if (!m_hClient)
         return DTRUE;
+    if (server->IsMultiplayerGame())
+    {
+        m_fSlowDeathSafeTimer = std::max(0.f, m_fSlowDeathSafeTimer - server->GetFrameTime());
+        m_fSlowDeathStayTimer = std::max(0.f, m_fSlowDeathStayTimer - server->GetFrameTime());
+    }
     if (m_bFirstUpdate && !InitializeClientState())
         return DFALSE;
     UpdateSound();
@@ -559,6 +587,8 @@ DBOOL CPlayerObj::Update(DVector*)
     // Original order: UpdateStats, then CheckPowerups.
     if (!UpdateStats() || !UpdateInventoryClient() || !CheckPowerups() || !CheckImprisonment() ||
         !UpdateLandingSound() || !UpdateSmellTrail())
+        return DFALSE;
+    if ((m_bInSlowDeath || humiliation_animation_pending) && !UpdateHumiliationAnimation())
         return DFALSE;
     // Original Update handles the first death after stats and smell, before
     // aggregate update clears accumulated frame damage.

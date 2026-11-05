@@ -40,7 +40,8 @@ namespace OpenBlood2
         if (!player)
             return false;
         bool applied = false;
-        if (command.owner == p.setup.owner && !player->m_bDead && !player->m_damage.IsDead())
+        if (command.owner == p.setup.owner &&
+            ((!player->m_bDead && !player->m_damage.IsDead()) || command.action.kind == Net::CommandKind::Use))
         {
             auto& inventory = player->m_InventoryMgr;
             const auto& action = command.action;

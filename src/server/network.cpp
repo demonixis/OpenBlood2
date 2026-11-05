@@ -379,16 +379,19 @@ namespace OpenBlood2
                         return false;
                     continue;
                 }
-                if (fire_ack)
+                if (fire_ack && fire_ack->sequence > peer.weapon_ack)
                 {
                     std::vector<std::uint8_t> packet;
-                    if (!Net::encode_weapon_frame(*fire_ack, packet))
+                    // This ACK releases the client's bounded input window.
+                    // It must not be starved by best-effort snapshot throttling.
+                    if (!Net::encode_weapon_frame(*fire_ack, packet) ||
+                        !transport_.send(peer.peer, Net::Channel::Control, packet, error))
                     {
                         if (!remove(i, std::uint32_t(Net::Reject::Player), true, error))
                             return false;
                         continue;
                     }
-                    states.push_back(std::move(packet));
+                    peer.weapon_ack = fire_ack->sequence;
                 }
                 Net::PeerStats stats;
                 std::size_t bytes = 0;

@@ -124,6 +124,7 @@ namespace OpenBlood2
             std::array<CViewWeapon, 2> weapon_timeline;
             std::array<std::uint64_t, 2> weapon_view_revision{}, fired{};
             std::uint64_t weapon_received = 0, weapon_received_state = 0, weapon_processed = 0, weapon_blocked = 0;
+            std::uint64_t weapon_applied_state = 0;
             double weapon_time = 0;
             unsigned weapon_credit = 0;
             bool weapon_clock_started = false;

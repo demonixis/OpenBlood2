@@ -1,7 +1,7 @@
 #pragma once
-#include "game/legacy/basedefs_de.h"
 #include "client/hud_values.h"
 #include "engine/movement_state.h"
+#include "game/legacy/basedefs_de.h"
 #include <array>
 #include <cstdint>
 #include <optional>
@@ -159,6 +159,22 @@ namespace OpenBlood2
     struct VoiceStop
     {
     };
+    struct WonkyVision
+    {
+        float seconds = 0;
+        bool no_move = false;
+    };
+    struct FinishHimVoice
+    {
+        std::uint16_t index = 0;
+        DBYTE attacker_character = 0, victim_character = 0;
+    };
+    struct PlayerFragged
+    {
+        HOBJECT victim = nullptr, killer = nullptr; // Captured as network identities before handle retirement.
+        int killer_frags = 0;
+        std::uint16_t index = 0;
+    };
     struct PlayerDead
     {
     };
@@ -226,5 +242,5 @@ namespace OpenBlood2
         std::variant<PlayerInitRequest, BloodbathStart, PlayerRotation, PlayerPosition, PlayerPhysics, PlayerStats,
                      MissionObjectives, WorldExit, BossHealth, Conversation, InventoryAction, ScreenFade, VoiceEvent,
                      VoiceStop, PlayerDead, MusicCommand, ZoomView, SeeingEyeView, CreatureAttach, OrbView, CTFEvent,
-                     InventoryItems, PlayerText>;
+                     InventoryItems, PlayerText, WonkyVision, FinishHimVoice, PlayerFragged>;
 } // namespace OpenBlood2

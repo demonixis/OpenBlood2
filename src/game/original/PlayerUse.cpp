@@ -5,14 +5,45 @@
 #include <cmath>
 using namespace OpenBlood2;
 
-// PlayerObj.cpp OnCommandOn(COMMAND_USE), ordinary single-player branch.
-// Dead multiplayer respawn / slow-death rescue are outside the accepted session.
+// PlayerObj.cpp OnCommandOn(COMMAND_USE), including multiplayer respawn/rescue.
 bool CPlayerObj::OnCommandUse()
 {
     if (!g_pServerDE->IsObjectAlive(m_hObject) || MovementBlocked() || camera_movement_blocked ||
         (m_InventoryMgr.eye && m_InventoryMgr.eye->active))
         return false;
     ++use_commands;
+    if (m_bDead && g_pServerDE->IsMultiplayerGame())
+    {
+        DVector previous;
+        if (g_pServerDE->GetObjectPos(m_hObject, &previous) != DE_OK)
+            return false;
+        if (Respawn() && GoToStartPoint(nullptr, false))
+            return true;
+        // An occupied/unsupported start cannot leave a live player at an
+        // unchecked destination. Retain the death and permit a later USE retry.
+        // Source respawn side effects already executed; never re-award a frag.
+        if (!g_pServerDE->IsObjectAlive(m_hObject))
+            return false;
+        m_bDead = true;
+        m_damage.m_bDead = true;
+        m_damage.SetHitPoints(0);
+        move_state = MoveState::Dead;
+        g_pServerDE->SetObjectFlags(m_hObject, g_pServerDE->GetObjectFlags(m_hObject) & ~FLAG_VISIBLE);
+        if (g_pServerDE->TeleportObject(m_hObject, &previous) != DE_OK || !TeleportClientToServerPos())
+            entry_error += "; failed to restore the previous dead position";
+        return false;
+    }
+    if (m_bInSlowDeath)
+    {
+        if (m_fSlowDeathStayTimer > 0)
+            return true;
+        m_bInSlowDeath = false;
+        m_fDeathTimer = 0;
+        humiliation_animation_pending = false;
+        m_damage.Heal(1);
+        ++slow_rescues;
+        return SendWonkyVision(0, false);
+    }
     use_hit = {};
     use_door_refused = false;
     g_pServerDE->GetObjectPos(m_hObject, &use_from);

@@ -87,6 +87,25 @@ namespace
         CHECK(std::abs(receiver.camera().death.fraction - .3f) < .00001f);
         CHECK(send(PlayerDead{}, 240) && update(3.9) == Reception::Applied);
         CHECK(std::abs(receiver.camera().death.start - 2.7f) < .00001f); // Repeated death does not restart the orbit.
+        NetworkCamera humiliated;
+        CHECK(humiliated.begin(owner));
+        CHECK(humiliated.receive({owner, 1, 150, state}, error) == Reception::Applied);
+        CHECK(humiliated.receive({owner, 2, 150, WonkyVision{15, true}}, error) == Reception::Applied);
+        CHECK(humiliated.receive({owner, 3, 180, PlayerDead{}}, error) == Reception::Applied);
+        CHECK(humiliated.update(world, collision, predicted, 300, 0, 0, false, 3.5, error) == Reception::Applied);
+        CHECK(humiliated.camera().kind == ClientCameraKind::Death && humiliated.camera().player_visible &&
+              !humiliated.camera().weapons_visible);
+        // A duplicate notification neither restarts the orbit nor loses no-hide.
+        CHECK(humiliated.receive({owner, 4, 210, PlayerDead{}}, error) == Reception::Applied);
+        CHECK(humiliated.update(world, collision, predicted, 300, 0, 0, false, 4, error) == Reception::Applied &&
+              humiliated.camera().player_visible && humiliated.camera().death.start == 3);
+        auto revived = state;
+        revived.force_revision = 301;
+        revived.alive = true;
+        revived.orb = {};
+        CHECK(humiliated.receive({owner, 5, 240, revived}, error) == Reception::Applied);
+        CHECK(humiliated.update(world, collision, predicted, 301, 0, 0, false, 4, error) == Reception::Applied &&
+              !humiliated.camera().death.active && !humiliated.camera().player_visible);
         NetworkCamera future;
         CHECK(future.begin(owner));
         CHECK(future.receive({owner, 1, 150, state}, error) == Reception::Applied);

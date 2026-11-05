@@ -178,7 +178,18 @@ namespace OpenBlood2
             // Preserve reliable Control order: selection/use precede this frame's
             // weapon timeline. Interactive firing follows the death/respawn port.
             if (!client.update(now, input, controls.enabled && controls.focused, error))
+            {
+                if (server)
+                {
+                    std::optional<Net::WeaponFrameAck> ack;
+                    server->weapon_frame_ack(client.joined().player, ack);
+                    spdlog::error(
+                        "Host clock: ticks={}, discarded={}, state_updates={}, state_drops={}, local_processed={}",
+                        server->ticks(), server_clock.discarded_ticks(), network->state_updates, network->state_drops,
+                        ack ? ack->sequence : 0);
+                }
                 return failed();
+            }
             // HUD/camera events are already applied by the endpoint. Audio and
             // other effects still need their remote consumers.
             client.take_events(events);

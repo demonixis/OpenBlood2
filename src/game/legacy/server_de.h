@@ -229,6 +229,8 @@ class ServerDE : public CSBase, public OpenBlood2::EffectQueries
         return net_game_type != 0;
     }
     virtual DRESULT SendToClient(HCLIENT, const OpenBlood2::PlayerEvent&) = 0;
+    virtual DRESULT SendPlayerFragged(const OpenBlood2::PlayerFragged&) = 0;
+    float last_player_created_time = 0; // Source static creation clock, owned by this server/world.
     virtual bool GetModelFilenames(HOBJECT, std::string&, std::string&) = 0;
     virtual DRESULT SetModelFilenames(HOBJECT, const char*, const char*) = 0;
     virtual DRESULT GetModelNodeHideStatus(HOBJECT, const char*, DBOOL*) = 0;

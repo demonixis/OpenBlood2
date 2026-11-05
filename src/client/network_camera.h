@@ -39,6 +39,7 @@ namespace OpenBlood2
         std::optional<Net::CameraState> state_;
         ClientCamera camera_;
         std::uint64_t sequence_ = 0;
-        double time_ = 0;
+        double time_ = 0, wonky_until_ = 0;
+        bool wonky_no_move_ = false, dead_no_hide_ = false;
     };
 } // namespace OpenBlood2

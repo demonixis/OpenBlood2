@@ -113,6 +113,19 @@ bool CViewWeapon::PlayAnimation(std::uint32_t clip)
     }
     return true;
 }
+void CViewWeapon::CancelFiringState()
+{
+    if (!model)
+        return;
+    // ViewWeapon.cpp:1241. Both resets are intentional, including repeated dead
+    // frames; RNG/reload/barrel state is retained rather than constructing a gun.
+    animation.reset();
+    PlayAnimation(rest_);
+    animation.reset();
+    state = WS_REST;
+    flash_visible = 0;
+    pending_sound.clear(); // The remote animation-sound receiver is still separate.
+}
 bool CViewWeapon::Update(WeaponServices& services, const WeaponInput& input, DVector position, DVector direction,
                          double seconds, std::string& error)
 {

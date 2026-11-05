@@ -33,6 +33,7 @@ class CViewWeapon : public OpenBlood2::ClientWeaponView
     bool Update(ServerDE&, CBloodServerShell&, HCLIENT, const OpenBlood2::WeaponInput&, DVector, DVector, double,
                 std::string&);
     bool Update(OpenBlood2::WeaponServices&, const OpenBlood2::WeaponInput&, DVector, DVector, double, std::string&);
+    void CancelFiringState(); // Original multiplayer dead-client animation reset.
     double flash_started = 0;
     std::string flash_error, animation_sound_error;
     bool second_barrel = false;

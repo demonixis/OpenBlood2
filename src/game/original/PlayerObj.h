@@ -50,6 +50,7 @@ enum PowerupType
 class CPlayerObj : public CBaseCharacter
 {
   public:
+    CPlayerObj();
     ~CPlayerObj() override;
     void ProcessTriggerMsg(HMESSAGEREAD, HOBJECT sender = nullptr);
     void GrabFlag(HOBJECT);
@@ -160,6 +161,17 @@ class CPlayerObj : public CBaseCharacter
     DBOOL Update(DVector*);
     bool Respawn();
     void HandleDeath();
+    void DoDeath(bool humiliation = false);
+    bool SendWonkyVision(float seconds, bool no_move);
+    void UpdateFragStatus();
+    bool UpdateHumiliationAnimation();
+    bool m_bInSlowDeath = false, humiliation_death = false;
+    float m_fDeathTimer = 0, m_fSlowDeathSafeTimer = 0, m_fSlowDeathStayTimer = 0;
+    int humiliation_slot = -1, m_Frags = 0;
+    bool humiliation_animation_pending = false;
+    std::string who_killed_me_last, who_i_killed_last;
+    std::uint64_t slow_deaths = 0, slow_rescues = 0, frag_updates = 0;
+
     bool CreateDeathCorpse();
     bool CreateDeathGibs();
     HOBJECT last_death_corpse = nullptr; // Non-owning, independent world lifetime.
@@ -222,7 +234,8 @@ class CPlayerObj : public CBaseCharacter
         FireJump,
         FireCrouch,
         FireCrawl,
-        Dead = 16 // Source 15 is the unported multiplayer humiliation state.
+        Humiliation = 15,
+        Dead = 16
     };
     MoveState move_state = MoveState::None;
     bool crouch_requested = false, crouched = false, forced_crouch = false;

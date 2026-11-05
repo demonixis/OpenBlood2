@@ -29,7 +29,7 @@ namespace OpenBlood2
                 out.orb = record->id;
         peer.camera_eye = out.eye;
         peer.camera_orb = out.orb;
-        out.alive = !player->m_damage.IsDead();
+        out.alive = !player->m_bDead;
         out.eye_level = player->eye_level;
         // Original LocalPresentation::commit permissions, derived exclusively
         // from checked server objects. A peer cannot nominate its own camera.

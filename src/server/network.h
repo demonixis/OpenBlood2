@@ -45,7 +45,7 @@ namespace OpenBlood2
             Clock::time_point deadline, heartbeat;
             Net::WorldSnapshot previous;
             std::uint64_t publish_at = 0;
-            std::uint64_t movement_setup = 0;
+            std::uint64_t movement_setup = 0, weapon_ack = 0;
         };
         ServerSession& session_;
         Net::Transport transport_;
