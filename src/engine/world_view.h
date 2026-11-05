@@ -128,8 +128,11 @@ namespace OpenBlood2
     {
         std::array<float, 4> eye{}, right{}, up{}, forward{}, projection{}, position{}, quaternion{}, texture_offset{};
     };
-    // Near and far planes of the scene projection (view models and sky use their own near plane).
-    inline constexpr float world_near = 1, world_far = 65536;
+    // Near plane and default far plane of the scene projection (view models and sky use their own planes).
+    inline constexpr float world_near = 1, world_default_far = 65536;
+    // Current scene far plane: the world's FarZ, which the original FirstUpdate applies with
+    // "FarZ %d" when positive (the LithTech camera far clip). The presenter sets it per view.
+    inline float world_far = world_default_far;
     // Horizontal projection scale (1 = 90 degrees) for a viewport aspect. The original
     // stretched a fixed 90 x 72 degree view to any resolution; square pixels with a fixed
     // 90-degree width cut the view (and the bottom of the view weapon) on wide screens.

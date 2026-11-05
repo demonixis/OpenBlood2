@@ -1,4 +1,5 @@
 #include "game/original/ClientCrosshair.h"
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 namespace OpenBlood2
@@ -18,6 +19,20 @@ namespace OpenBlood2
         if (!std::isfinite(fov_x) || fov_x <= 0 || fov_x >= 3.1f)
             return 1;
         return 1 / std::tan(fov_x / 2);
+    }
+    float presented_fov_x(float view, float user)
+    {
+        if (!std::isfinite(view) || view <= 0 || !std::isfinite(user) || user <= original_fov_zoomed || user >= 3.f ||
+            user == original_fov_normal)
+            return view;
+        if (view <= original_fov_zoomed)
+            return view;
+        if (view == original_fov_normal)
+            return user;
+        if (view <= original_fov_normal)
+            return original_fov_zoomed + (view - original_fov_zoomed) * (user - original_fov_zoomed) /
+                                             (original_fov_normal - original_fov_zoomed);
+        return std::min(view + (user - original_fov_normal), 3.f);
     }
     HudRect original_crosshair_rect(const HudRect& camera, unsigned width, unsigned height)
     {

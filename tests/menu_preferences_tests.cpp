@@ -35,13 +35,13 @@ int test_menu_preferences(int argc, char** argv)
         // The shared atomic writer keeps the exact preference bytes.
         std::ifstream in(path, std::ios::binary);
         const std::string bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        CHECK(bytes == "version=11\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
+        CHECK(bytes == "version=12\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
                        "invert_y=1\ndetail=2\npixel_lighting=0\nrenderer=0\nquality=0\nnormal_maps=1\n"
                        "vr_turn=45\nvr_laser=1\nvr_crosshair=1\nvr_move_hand=0\ncheats=0\ngod_mode=0\n"
                        "antialiasing=0\nbloom=1\ntonemap=1\nambient_occlusion=2\nreflections=2\n"
                        "fullscreen=0\nfullscreen_mode=0\nresolution_width=0\nresolution_height=0\nvsync=1\n"
                        "fps_limit=0\nvr_refresh_rate=0\nvr_render_scale=100\n"
-                       "run_lock=0\nmouse_look=1\ncrosshair=1\ncrosshair_number=1\n");
+                       "run_lock=0\nmouse_look=1\ncrosshair=1\ncrosshair_number=1\nfield_of_view=90\n");
     }
     {
         MenuSettings video;
@@ -111,6 +111,34 @@ int test_menu_preferences(int argc, char** argv)
             output << old;
         }
         CHECK(load_menu_preferences(path, loaded, error) && loaded == MenuSettings{});
+    }
+    {
+        // Version 12: the field of view (60..120 degrees, step 5); version 11 files keep 90.
+        MenuSettings view;
+        view.field_of_view = 110;
+        CHECK(save_menu_preferences(path, view, error));
+        CHECK(load_menu_preferences(path, loaded, error) && loaded == view);
+        for (int bad : {55, 125, 92})
+        {
+            view.field_of_view = bad;
+            CHECK(!save_menu_preferences(path, view, error));
+        }
+        CHECK(load_menu_preferences(path, loaded, error) && loaded.field_of_view == 110);
+        std::ifstream input(path);
+        std::string old((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
+        input.close();
+        old.resize(old.find("field_of_view="));
+        old.replace(0, 10, "version=11");
+        {
+            std::ofstream output(path);
+            output << old;
+        }
+        CHECK(load_menu_preferences(path, loaded, error) && loaded == MenuSettings{});
+        {
+            std::ofstream output(path);
+            output << old << "field_of_view=100\n";
+        }
+        CHECK(!load_menu_preferences(path, loaded, error)); // v11 cannot carry v12 keys.
     }
     settings.sound = true;
     CHECK(save_menu_preferences(path, settings, error));

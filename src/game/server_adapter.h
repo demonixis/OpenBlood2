@@ -257,6 +257,7 @@ namespace OpenBlood2
         StringResources client_strings;
         std::string client_strings_error;
         bool client_strings_attempted = false;
+        void load_client_strings();
         std::vector<CLightFX>& light_effects;
         bool RandomFloat(float, float, float&) override;
         bool PublishLightEffect(HOBJECT, const LightSettings&) override;
@@ -277,6 +278,7 @@ namespace OpenBlood2
         DRESULT SendConversation(const Conversation&) override;
         DRESULT SendObjectives(const MissionObjectives&) override;
         bool GetClientResourceString(std::uint32_t, std::string&) override;
+        bool FindClientResourceString(std::uint32_t, std::string&) override;
         DRESULT SendToClient(HCLIENT, const PlayerEvent&) override;
         bool GetModelFilenames(HOBJECT, std::string&, std::string&) override;
         DRESULT SetModelFilenames(HOBJECT, const char*, const char*) override;

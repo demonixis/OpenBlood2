@@ -929,6 +929,10 @@ namespace
                                        game->client_shell.view.settings.type == 1);
             OpenBlood2::draw_screen_fade(game->client_shell.fade.Scale(), game->client_shell.m_bInWorld);
             auto hud_values = game->client_shell.HudSnapshot();
+            OpenBlood2::hud_panels(hud_values, game->client_shell);
+            if (game->client_shell.m_bInWorld)
+                OpenBlood2::draw_messages(game->client_shell.m_MessageMgr, hud_values.time, nullptr,
+                                          game->client_shell.control_notice);
             if (!hud.draw(hud_values, game->resources, error))
             {
                 spdlog::error("Original HUD: {}", error);
@@ -1604,8 +1608,13 @@ namespace
                 if (world_mesh.effects.size() != 60 || !world_renderer.stats.pan_batches ||
                     world_renderer.stats.surface_time != game->server.world_time())
                     return 3;
-                if (world_mesh.blended != 31 || world_renderer.stats.alpha_batches != 31 ||
-                    world_renderer.stats.alpha_frames != world_renderer.stats.frames)
+                // Translucent batches are frustum culled like opaque ones, and SubwayA's FarZ (1500)
+                // drops the far ones, so only some of the 31 prepared batches are submitted. The shared
+                // translucent queue draws world alpha once per sprite depth slice: at least one
+                // translucent pass per frame.
+                if (world_mesh.blended != 31 || !world_renderer.stats.alpha_batches ||
+                    world_renderer.stats.alpha_batches > world_mesh.blended ||
+                    world_renderer.stats.alpha_frames < world_renderer.stats.frames)
                     return 4;
                 if (decoded < 50 || missing || !viewport_hidden || !viewport_unloaded || !viewport_reloaded ||
                     world_renderer.stats.uploads != 2 || world_renderer.width() != 1000 ||

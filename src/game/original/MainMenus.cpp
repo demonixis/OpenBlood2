@@ -3,6 +3,7 @@
 #include "MenuIds.h"
 #include "game/game_settings.h"
 #include "game/menu.h"
+#include "game/original/ClientCrosshair.h"
 #include <algorithm>
 #include <array>
 #include <utility>
@@ -156,6 +157,7 @@ namespace OpenBlood2
                 items.push_back({0, -1, true, {}, 17, {}});
                 for (int id = 22; id <= 26; ++id)
                     items.push_back({0, -1, true, {}, id, {}});
+                items.push_back({0, -1, true, {}, 30, {}});
                 break;
             case MenuPage::Vr:
                 // Replacement rows, labelled like the Display page's replacement rows.
@@ -655,6 +657,17 @@ namespace OpenBlood2
             case 27:
                 settings.vr_refresh_rate = cycle(video.refresh_rates, settings.vr_refresh_rate);
                 break;
+            case 30:
+            {
+                // Replacement FIELD OF VIEW row: wraps like the other cycling rows.
+                constexpr int count = (field_of_view_max - field_of_view_min) / field_of_view_step + 1;
+                const int index =
+                    (std::clamp(settings.field_of_view, field_of_view_min, field_of_view_max) - field_of_view_min) /
+                    field_of_view_step;
+                settings.field_of_view =
+                    field_of_view_min + (index + (direction < 0 ? count - 1 : 1)) % count * field_of_view_step;
+                break;
+            }
             case 28:
                 settings.vr_render_scale = 50 + (settings.vr_render_scale - 50 + (direction < 0 ? 50 : 10)) % 60;
                 break;

@@ -1,5 +1,6 @@
 // Selected original CDebris and SetupClientGibFX; see m2_explosion_sources.json.
 #include "Debris.h"
+#include "BombExplosion.h"
 #include "SaveFields.h"
 #include "engine/collision.h"
 #include "radius_damage.h"
@@ -75,9 +76,13 @@ void CDebris::Create(DVector direction, float damage)
     effect.velocity = length > 0 ? vector_scale(direction, (50 + damage) / length) : DVector{};
     if (exploding)
     {
+        // Original AddExplosion: SFX_EXPLOSIONFX_ID EXP_GRENADE facing world up and the C4 sound
+        // at radius 1000 (MISC_MEDIUM), then the area damage, all before the gib requests.
         ExplosionEffect explosion;
         explosion.source = effect.source;
         explosion.position = effect.position;
+        PublishBombExplosion(object, explosion.position, explosion.normal, explosion.type, explosion.sound.c_str(),
+                             explosion_damage, explosion_radius);
         explosion.targets = DamageObjectsInRadius(object, server->HandleToObject(object), effect.position,
                                                   explosion_radius, explosion_damage, DamageType::Explode);
         server->RecordExplosionEffect(explosion);

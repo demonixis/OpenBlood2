@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.28)
 if(POLICY CMP0168)
     cmake_policy(SET CMP0168 NEW)
 endif()
-project(Blood2 VERSION 0.5.1 LANGUAGES C CXX)
+project(Blood2 VERSION 0.5.2 LANGUAGES C CXX)
 option(BLOOD2_BUILD_CLIENT "Build the graphical game client" ON)
 option(BLOOD2_BUILD_SERVER "Build the dedicated server" OFF)
 if(NOT BLOOD2_BUILD_CLIENT AND NOT BLOOD2_BUILD_SERVER)
@@ -128,7 +128,7 @@ add_library(blood2_game STATIC src/game/original/ScreenFade.cpp src/game/origina
     src/game/server_messages.cpp
     src/game/server_saves.cpp
     src/game/service_coverage.cpp)
-target_sources(blood2_game PRIVATE src/game/original/NewStatusBar.cpp src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp src/game/original/SoundFX.cpp)
+target_sources(blood2_game PRIVATE src/game/original/NewStatusBar.cpp src/game/original/MessageMgr.cpp src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp src/game/original/SoundFX.cpp)
 target_sources(blood2_game PRIVATE src/game/original/PlayerLanding.cpp src/game/original/PlayerDeath.cpp)
 target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/ClientLightFX.cpp)
 target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)

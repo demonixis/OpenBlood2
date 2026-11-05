@@ -290,6 +290,21 @@ See the [implementation and validation report](../implementation/reports/display
 Preferences **version 11** adds auto-run, permanent mouse look, crosshair visibility and
 crosshair number (0–41). Versions 1–10 remain readable with defaults false/true/true/1.
 
+### Field of view (0.5.2)
+
+A replacement `FIELD OF VIEW [n]` row (setting 30) ends the Display page. It cycles 60–120
+degrees in steps of 5 (Enter/right up, left down, wrapping) and is disabled in XR, where the
+headset owns the projection. The value is the horizontal field at 4:3; the Hor+ rule
+(`horizontal_projection_scale`) still widens it for wider windows. `presented_fov_x`
+(`ClientCrosshair.h`) substitutes it for the original FOV_NORMAL only at presentation:
+`ViewFovX` and every game-side FOV (zoom, binoculars, sniper, Orb) are unchanged. FOV_ZOOMED
+stays fixed, the zoom ramp maps linearly between it and the chosen field, and wider special
+views keep their offset from 90 (clamped below 3 radians). The scene projection, AO/SSR
+reconstruction, shadow frustum and culling frustum (`ViewFrustum::widen`) use the same scale;
+the view weapon keeps the original fixed projection. `preferences.cfg` **version 12** adds
+`field_of_view` (default 90); versions 1–11 load the default and a version 11 file carrying
+the key is rejected.
+
 ## Controls (CMenuControls)
 
 Options > Controls is enabled in the retail edition (the demo has no action strings and keeps the

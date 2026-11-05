@@ -147,8 +147,7 @@ void TripLaser::InitialUpdate()
     g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | 1u << 3); // SAVEABLE
     m_vColor = vector_scale(m_vColor, 1.f / 255);
     m_vDims = vector_scale(m_vDims, 2);
-    if (!g_pServerDE->ScaleObject(m_hObject, m_vDims) ||
-        !g_pServerDE->SetObjectColor(m_hObject, m_vColor, m_fAlpha))
+    if (!g_pServerDE->ScaleObject(m_hObject, m_vDims) || !g_pServerDE->SetObjectColor(m_hObject, m_vColor, m_fAlpha))
         error = "TripLaser scale or color rejected";
     DVector position;
     DRotation rotation;
@@ -212,8 +211,18 @@ void TripLaser::HandleTouch(HOBJECT other)
         return;
     m_fDamageTime = now + damage_update_delta;
     // Something touches the box: the beam segment must hit that object first.
+    // The emitters are authored inside the walls (03_Museum: 8 or 24 units at each
+    // end). The original BSP ray only reports polygons crossed from their front side,
+    // so it left the wall unhindered; the replacement world query also reports the
+    // wall's inner face. Start the beam where it emerges into the room.
+    DVector from = m_vEndPoints[0], position;
+    g_pServerDE->GetObjectPos(m_hObject, &position);
     SegmentHit hit;
-    if (g_pServerDE->IntersectSegment(m_vEndPoints[0], m_vEndPoints[1], nullptr, hit) != SegmentResult::Hit ||
+    const auto beam = vector_subtract(m_vEndPoints[1], m_vEndPoints[0]);
+    const float length = std::sqrt(vector_dot(beam, beam));
+    if (length > 0 && g_pServerDE->IntersectWorldSegment(position, m_vEndPoints[0], hit) == SegmentResult::Hit)
+        from = vector_add(hit.point, vector_scale(beam, .01f / length));
+    if (g_pServerDE->IntersectSegment(from, m_vEndPoints[1], nullptr, hit) != SegmentResult::Hit ||
         hit.object != other || !g_pServerDE->IsObjectAlive(other))
         return;
     ++beam_hits;

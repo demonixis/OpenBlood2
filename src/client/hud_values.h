@@ -31,6 +31,9 @@ namespace OpenBlood2
         DBYTE weapon = 0, weapon_slot = 0, ammo_type = 0, alternate_ammo_type = 0;
         std::array<DBYTE, 10> weapon_slots{};
         float max_health = 100, max_armor = 100;
+        // Original PLAYERSTATS_AIRLEVEL value: m_fAirLevel / MAX_AIR_LEVEL (100). The client
+        // shell reacts only when it changes, as the source sent the field only then.
+        float air = 1;
         bool operator==(const PlayerStats&) const = default;
     };
 } // namespace OpenBlood2

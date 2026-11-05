@@ -1,6 +1,7 @@
 #include "engine/collision.h"
 #include "engine/world_model.h"
 #include "game/original/AI_Mgr.h"
+#include "game/original/Door.h"
 #include "game/original/PowerupPickups.h"
 #include "game/original/WeaponPickups.h"
 #include "game/server_adapter.h"
@@ -253,6 +254,43 @@ namespace
         CHECK(g.unload_world());
         return true;
     }
+    // 06_airship2's barred end door (issue #11): two leaves of three interleaved bars; each starts
+    // inside the other's bounding envelope, which blocked both forever while the busy sound played.
+    bool bars(const char* root)
+    {
+        auto g = std::make_unique<GameSession>();
+        CHECK(mount(*g, root));
+        std::string error;
+        CHECK(GameSession::start_new_game(g, "06_airship2", 1, 0, error));
+        ObjectId leaves[2]{};
+        DVector start[2]{};
+        for (auto id : g->objects.snapshot())
+            if (const auto* r = g->objects.get(id); r && dynamic_cast<const Door*>(r->game.get()))
+                for (int i = 0; i < 2; ++i)
+                    if (std::string_view(r->state.m_Name) == (i ? "enddoor11" : "enddoor10"))
+                        leaves[i] = id, start[i] = r->state.m_Pos;
+        for (int i = 0; i < 2; ++i)
+        {
+            const auto* r = g->objects.get(leaves[i]);
+            CHECK(r && r->life == Life::Alive);
+            auto text = g->server.CreateString("TRIGGER");
+            auto msg = g->server.StartMessageToObject(nullptr, r->handle, 1000); // MID_TRIGGER
+            CHECK(text && msg && g->server.WriteToMessageHString(msg, text) == DE_OK &&
+                  g->server.EndMessage(msg) == DE_OK);
+            g->server.FreeString(text);
+        }
+        for (int i = 0; i < 300; ++i) // 120 units at 64 per second.
+            CHECK(g->step(1. / 60));
+        for (int i = 0; i < 2; ++i)
+        {
+            const auto* r = g->objects.get(leaves[i]);
+            const auto* d = r ? dynamic_cast<const Door*>(r->game.get()) : nullptr;
+            CHECK(d && d->state == Door::Open && r->mover_blocks == 0);
+            CHECK(std::abs(r->state.m_Pos.y - (start[i].y + (i ? -120.f : 120.f))) < .01f);
+        }
+        CHECK(g->unload_world());
+        return true;
+    }
 } // namespace
 int main(int argc, char** argv)
 {
@@ -262,6 +300,8 @@ int main(int argc, char** argv)
         return weapons(argv[2]) ? 0 : 1;
     if (std::string_view(argv[1]) == "anger")
         return anger(argv[2]) ? 0 : 1;
+    if (std::string_view(argv[1]) == "bars")
+        return bars(argv[2]) ? 0 : 1;
     if (std::string_view(argv[1]) == "revenant")
         return revenant(argv[2]) ? 0 : 1;
     return entry(argv[2], argv[1]) ? 0 : 1;

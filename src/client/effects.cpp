@@ -42,6 +42,10 @@ namespace OpenBlood2
             return fail("Stale client effects frame");
         if (!std::isfinite(next.time) || next.time < frame_.time || next.time < 0)
             return fail("Invalid client effects clock");
+        if (!std::isfinite(next.far_z) || next.far_z < 0 ||
+            (next.sky_fog && (!std::isfinite(next.sky_fog_near) || !std::isfinite(next.sky_fog_far) ||
+                              next.sky_fog_far <= next.sky_fog_near)))
+            return fail("Invalid client far plane or sky fog");
         if (next.billboards.size() > record_limit || next.models.size() > record_limit ||
             next.polygrids.size() > record_limit || next.tracers.size() > record_limit ||
             next.lights.size() > record_limit || next.volumes.size() > record_limit)

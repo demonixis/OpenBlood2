@@ -275,7 +275,10 @@ namespace
         CHECK(mesh.build(world, error, &resources));
         CHECK(mesh.blended == 2 && mesh.ranges[0].batches.size() == 2);
         CHECK(mesh.ranges[0].batches[0].translucent && !mesh.ranges[1].batches[0].translucent);
-        CHECK(mesh.ranges[0].batches[0].material == mesh.ranges[1].batches[0].material);
+        // An unmasked transparent face binds the keyed copy (original chroma key); the opaque face keeps the image.
+        CHECK(mesh.ranges[0].batches[0].material != mesh.ranges[1].batches[0].material &&
+              mesh.materials[mesh.ranges[0].batches[0].material].path ==
+                  mesh.materials[mesh.ranges[1].batches[0].material].path);
         CHECK(mesh.vertices[0].uv[0] == 2 && mesh.vertices[0].color.y == 1);
         world.models[0].surfaces[0].flags |= 16; // Sky remains an explicit opaque marker.
         CHECK(mesh.build(world, error, &resources));

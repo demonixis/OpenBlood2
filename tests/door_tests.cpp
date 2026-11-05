@@ -70,11 +70,18 @@ namespace
             CHECK(l->state == Door::Closed && r->state == Door::Closed);
         }
         const auto before = g.objects.get(right)->state.m_Pos;
+        // A world-model neighbour without the original GOTHRUWORLD flag remains an immovable blocker.
+        g.objects.get(left)->state.m_Flags &= ~FLAG_GOTHRUWORLD;
         CHECK(g.server.MoveWorldModel(right, vector_add(before, {-1, 0, 0})) == MoverResult::Blocked);
         CHECK(g.objects.get(right)->state.m_Pos.x == before.x);
         // Still reject a move which crosses the entire other leaf and finishes clear.
         CHECK(g.server.MoveWorldModel(right, vector_add(before, {-100, 0, 0})) == MoverResult::Blocked);
         CHECK(g.objects.get(right)->state.m_Pos.x == before.x);
+        CHECK(g.objects.get(right)->mover_blocker == g.objects.get(left)->handle);
+        // Two GOTHRUWORLD doors pass each other (interleaved leaves, later LithTech MaybeCollide).
+        g.objects.get(left)->state.m_Flags |= FLAG_GOTHRUWORLD;
+        CHECK(g.server.MoveWorldModel(right, vector_add(before, {-1, 0, 0})) == MoverResult::Moved);
+        CHECK(g.server.MoveWorldModel(right, before) == MoverResult::Moved);
         CHECK(g.server.MoveWorldModel(right, vector_add(before, {1, 0, 0})) == MoverResult::Moved);
         std::cout
             << "Adjacent door leaves: exact endpoint contact, three cycles, separation and no penetration/tunnelling\n";

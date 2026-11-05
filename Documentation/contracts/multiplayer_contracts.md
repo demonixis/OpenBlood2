@@ -401,7 +401,10 @@ Preserve effect family/creation order, muzzle insertion, whole-system blood/spla
 batching, visibility, per-entry diagnostics, mark clipping, source light flags and
 existing platform light budgets. The first containing volume still masks later
 ones even when hidden; visible fog-off volumes retain world fog. Unaligned negative
-warp sprites and fog orientation remain per-eye computations, including XR.
+warp sprites and fog orientation remain per-eye computations, including XR. The frame
+also carries the 0.5.2 world FarZ and the SkyFog interval as truncated values; the
+consumer enables sky fog only while a fog colour applies, and receivers refuse a
+non-finite or negative far plane and an empty sky-fog interval.
 
 Receivers refuse old worlds/sequences, backwards/invalid clocks, duplicate or invalid
 family-qualified IDs, invalid poses and excessive aggregate counts atomically.

@@ -114,11 +114,18 @@ namespace
         p.position.x = 1.9f;
         auto saved = random;
         CHECK(t.Update(.02, &p, random) && t.emitted == 0 && random == saved); // No sample, no zero division or RNG.
+        // A long segment keeps the leading 2048 samples and counts the rest (issue #9).
         p.position.x = 5000;
-        CHECK(!t.Update(.04, &p, random) && !t.error.empty() && t.particles.empty() && random == saved);
+        CHECK(t.Update(.04, &p, random) && t.error.empty() && t.particles.size() == 2048 && t.emitted == 2048 &&
+              t.dropped == 2499 - 2048);
+        // An exhausted shared pool thins the trail instead of failing the update.
+        p = {};
         CHECK(t.Init(1, 1, e) && t.CreateObject(r, {}, 0, e) && t.Update(0, &p, random));
         p.position.x = 10;
-        CHECK(!t.Update(.02, &p, random, 4) && t.particles.empty());
+        CHECK(t.Update(.02, &p, random, 4) && t.error.empty() && t.particles.size() == 4 && t.dropped == 1);
+        p.position.x = 20;
+        CHECK(t.Update(.04, &p, random, 4) && t.particles.size() == 4 && t.dropped == 6);
+        CHECK(t.Update(.06, &p, random, 0) && t.particles.size() <= 4);
         std::vector<Particle> colors{{{}, {}, 1, {1, 1, 1}}, {{}, {}, 1, {-1, 1, 1}}};
         CHECK(!advance_particles(colors, 0, .5, e) && colors[0].lifetime == 1); // Atomic shared color validation.
         Resources partial;

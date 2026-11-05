@@ -116,9 +116,9 @@ namespace OpenBlood2
                 return fail("message editor ownership");
             if (frame == 214 && input.message.text != "Control test")
                 return fail("SDL message text");
-            if (frame == 215 &&
-                (input.message.active || SDL_TextInputActive(window) || game.client_shell.chat_lines.empty() ||
-                 game.client_shell.chat_lines.back() != ":Control test"))
+            if (frame == 215 && (input.message.active || SDL_TextInputActive(window) ||
+                                 game.client_shell.m_MessageMgr.lines().empty() ||
+                                 game.client_shell.m_MessageMgr.lines().back() != ":Control test"))
                 return fail("local message delivery and text input release");
             if (frame == 217 &&
                 (!menu.settings.run_lock || menu.settings.crosshair || game.client_shell.m_bShowCrosshair))

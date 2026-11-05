@@ -72,8 +72,10 @@ Unload releases all arrays/reports/RNG, with IDs never reused.
 
 Limits: 128 trail systems, 2048 particles per trail, 8192 particles across trails.
 A burst preflights its count/budget and endpoint bounds before allocating particles
-or consuming random values. Exhaustion fails visibly; no silent truncation or
-success-shaped empty emission is used. Update failure removes the failing trail,
+or consuming random values. Since 0.5.2 ([#9](https://github.com/demonixis/OpenBlood2/issues/9), a CDM
+crash after 62 s) a burst past the per-trail, shared or remaining budget keeps its leading samples
+and counts the rest as dropped (`trail_dropped`, inspected per trail); only non-finite or negative
+sample counts fail. Shell and cylinder emissions keep at most 2048 samples the same way. Update failure removes the failing trail,
 retains its error in bounded delivery reports and fails the session step. Failed
 trail creation preserves the successful metal fragment and records the missing
 component separately. Model/ring/sprite/audio siblings remain independent.

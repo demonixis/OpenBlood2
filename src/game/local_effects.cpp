@@ -331,6 +331,18 @@ namespace OpenBlood2
                      variable("FogNearZ"),
                      variable("FogFarZ"),
                      {variable("FogR"), variable("FogG"), variable("FogB")}};
+        if (const float far_z = std::trunc(variable("FarZ")); far_z > 0)
+            frame.far_z = far_z;
+        if (std::trunc(variable("SkyFog")) != 0)
+        {
+            const float near = std::trunc(variable("SkyFogNearZ")), far = std::trunc(variable("SkyFogFarZ"));
+            if (far > near)
+            {
+                frame.sky_fog = true;
+                frame.sky_fog_near = near;
+                frame.sky_fog_far = far;
+            }
+        }
         std::set<std::uint32_t> live;
         for (auto id : game.objects.container_snapshot())
         {

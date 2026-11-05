@@ -43,6 +43,10 @@ namespace OpenBlood2
         SurfaceAlpha,
         SkinnedSurfaceOpaque,
         SkinnedSurfaceAlpha,
+        // Sky sprites (OT_SPRITE in the sky) stay two-sided like the later engine's
+        // d3d_DrawSprite (D3DCULL_NONE); Sky/SkyAlpha cull back faces for sky world models.
+        SkySprite,
+        SkySpriteAlpha,
         Count
     };
     // Fragment shading of world faces and models. Original keeps the original shaders, which
@@ -123,11 +127,15 @@ namespace OpenBlood2
     {
         DVector eye{}, right{}, up{}, forward{};
         double aspect = 1, near = 1, far = 65536;
+        // Desktop side-plane tangent multiplier: 1/view_scale for fields wider than the
+        // default (user field of view, Orb camera); narrower zooms keep the default planes.
+        double widen = 1;
         // XR eyes: planes from tangent-space half angles instead of the 90-degree/aspect pair.
         bool asymmetric = false;
         double tan_left = -1, tan_right = 1, tan_down = -1, tan_up = 1;
     };
-    ViewFrustum view_frustum(DVector eye, DRotation view, double aspect, double near = 1, double far = 65536);
+    ViewFrustum view_frustum(DVector eye, DRotation view, double aspect, double near = 1, double far = 65536,
+                             double view_scale = 1);
     // XR eye view: an asymmetric projection replacing the desktop {1, aspect} * view_scale terms
     // (offsets go to the right/up w components, zero on desktop) and its culling tangents.
     struct EyeProjection
@@ -204,7 +212,7 @@ namespace OpenBlood2
         bool letterbox = false;
         float min_depth = 0, max_depth = 1;
         // Camera zoom: 1/tan(fovX/2) over the 90-degree default. View models keep 1; culling
-        // stays at 90 degrees, which contains every narrower zoomed view.
+        // widens with fields wider than 90 degrees and keeps 90 for narrower zoomed views.
         float view_scale = 1;
         // Vertical model shadow tiles and their uniform; receivers ignore them when null.
         SDL_GPUTexture* shadow_atlas = nullptr;
@@ -279,6 +287,7 @@ namespace OpenBlood2
         void clear_geometry();
         WorldViewStats stats;
         bool receive_shadows = false; // Opaque/translucent world passes read the shadow tiles.
+        bool two_sided_sky = false;   // Sky pass uses the two-sided sprite pipelines (sky sprite mesh).
         // Enhanced renderer state; world faces use it when the pipelines are not Original.
         const SurfaceScene* surface = nullptr;
         Uint32 width() const
@@ -317,7 +326,7 @@ namespace OpenBlood2
         // Checks every input and selects visible_/alpha_order_ before any pass is begun.
         bool validate(const WorldMesh&, std::span<const WorldDraw>, DVector eye, DRotation view, WorldPass,
                       double surface_time, const PointLight&, bool letterbox, bool close_view, std::string& error,
-                      const EyeProjection* eye_projection = nullptr);
+                      const EyeProjection* eye_projection = nullptr, float view_scale = 1);
         // Encodes the draws selected by the preceding successful validate().
         void encode(const WorldRecordTarget&, const WorldMesh&, DVector eye, DRotation view, WorldPass,
                     double surface_time, const PointLight&, bool close_view);

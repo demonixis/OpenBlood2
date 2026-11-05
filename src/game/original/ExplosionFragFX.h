@@ -29,6 +29,7 @@ class CExplosionFragFX
     float alpha = 1;
     double start_time = 0, last_time = 0, next_update = 0;
     std::uint64_t id = 0, event = 0, updates = 0, impacts = 0;
+    std::uint64_t embedded_hits = 0; // Start-inside hits without a normal (motion kept unreflected).
     OpenBlood2::ClientSegmentHit last_hit;
     OpenBlood2::SegmentResult last_query = OpenBlood2::SegmentResult::Miss;
     bool moving = true;

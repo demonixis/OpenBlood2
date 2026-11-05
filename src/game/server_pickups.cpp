@@ -27,7 +27,8 @@ namespace OpenBlood2
         if (!split_spawn(input, type, props))
             return false;
         bool supported = false;
-        // Fanatic/Prophet: original Spawner requests (fanatic_prophet_contracts.md). Item and weapon
+        // Fanatic/Prophet: original Spawner requests (fanatic_prophet_contracts.md); GabriellaAI: the
+        // 03_Museum conv1 cut-scene spawn0 (0.5.2). Item and weapon
         // leaves bounce on string creation.
         for (auto name : {"BulletAmmoPU",   "ShellAmmoPU",    "BMGAmmoPU",         "FlareAmmoPU",    "DieBugDieAmmoPU",
                           "HowitzerAmmoPU", "FuelAmmoPU",     "BatteryAmmoPU",     "HealthPU",       "MegaHealthPU",
@@ -37,7 +38,7 @@ namespace OpenBlood2
                           "AngerPU",        "SniperRiflePU",  "TeslaCannonPU",     "VoodooDollPU",   "ShotgunPU",
                           "BoneLeech",      "HowitzerPU",     "MiniGunPU",         "NapalmCannonPU", "DeathRayPU",
                           "TimeBombPU",     "SingularityPU",  "Fanatic",           "Prophet",        "RevenantPU",
-                          "LifeLeechPU",    "OrbPU"})
+                          "LifeLeechPU",    "OrbPU",          "GabriellaAI"})
             supported |= same_name(type, name);
         Properties parsed;
         return supported && objects_.parse_properties(objects_.find_class(type), props, parsed);

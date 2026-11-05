@@ -178,6 +178,13 @@ namespace OpenBlood2
             }
             break;
         }
+        // Original ResetGlobalFog / FirstUpdate: SkyFog applies only while a fog colour applies.
+        out.far_z = frame.far_z;
+        if (out.uniform.fog_color[3] != 0 && frame.sky_fog)
+        {
+            out.sky_fog = {frame.sky_fog_near, frame.sky_fog_far};
+            out.sky_fog_enabled = true;
+        }
         return out;
     }
 } // namespace OpenBlood2

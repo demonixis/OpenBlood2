@@ -202,3 +202,9 @@ charges have left that list. Restore/KeepAlive preserve weapon/ammo, never old b
 handles. The shared model-projectile solver now admits CGrenade, CProximityBomb
 and CRemoteBomb. Earlier remote omissions are historical; time bombs and the
 complete M2 gate remain open.
+
+View-weapon sound keys (0.5.2): original `CViewWeapon::OnModelKey` sends every `SOUND_KEY` to the
+server (`CMSG_WEAPON_SOUND`), which plays it from the player. The port played them only for the
+shotgun; every weapon now plays them locally with the same separator collapsing (Mac-10
+`start/end_alt_fire` stock flips, flare, howitzer, napalm, Tesla, Life Leech, M16, minigun, Orb,
+Singularity, sniper, voodoo and C4 keys).

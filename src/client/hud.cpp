@@ -24,7 +24,8 @@ namespace OpenBlood2
     bool valid_hud_stats(const PlayerStats& s)
     {
         return std::isfinite(s.max_health) && s.max_health >= 0 && std::isfinite(s.max_armor) && s.max_armor >= 0 &&
-               std::isfinite(s.health) && std::isfinite(s.armor) && std::isfinite(s.bullets) && std::isfinite(s.ammo) &&
+               std::isfinite(s.health) && std::isfinite(s.armor) && std::isfinite(s.air) && s.air >= 0 &&
+               s.air <= 1 && std::isfinite(s.bullets) && std::isfinite(s.ammo) &&
                s.ammo >= 0 && std::isfinite(s.alternate_ammo) && s.alternate_ammo >= 0 &&
                s.weapon_slot < inventory_weapon_slots && s.ammo_type < 13 && s.alternate_ammo_type < 13 &&
                (!s.weapon || weapon_definition(s.weapon)) &&

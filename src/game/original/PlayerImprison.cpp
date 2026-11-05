@@ -19,6 +19,8 @@ bool CPlayerObj::Imprison(float seconds)
     imprison_error.clear();
     if (!s->GetClientResourceString(265 /* IDS_GENERAL_IMMOBILE */, imprison_notice))
         imprison_error = "Original immobilization resource string unavailable";
+    else
+        SendConsoleMessage(imprison_notice); // MID_IMMOBILIZE: SendConsoleMessage(IDS_GENERAL_IMMOBILE).
     return true;
 }
 bool CPlayerObj::CheckImprisonment()
@@ -37,6 +39,8 @@ bool CPlayerObj::CheckImprisonment()
         imprison_error.clear();
         if (!s->GetClientResourceString(264 /* IDS_GENERAL_CANMOVE */, imprison_notice))
             imprison_error = "Original movement-restored resource string unavailable";
+        else
+            SendConsoleMessage(imprison_notice);
     }
     return true;
 }

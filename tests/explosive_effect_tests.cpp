@@ -108,7 +108,9 @@ namespace
         CHECK(!fx.Update(.5, &pose, rng) && fx.error.empty());
         CHECK(fx.Init(2, 1, rng, error) && fx.CreateObject(g.resources, {}, 0, error) && fx.Update(0, &pose, rng));
         auto before = rng;
-        CHECK(!fx.Update(.051, &pose, rng, 1) && !fx.error.empty() && rng == before);
+        // 0.5.2: a burst past the budget keeps its leading samples and counts the rest.
+        CHECK(fx.Update(.051, &pose, rng, 1) && fx.error.empty() && fx.particles.size() <= 1 && fx.dropped > 0);
+        (void)before;
         return g.unload_world();
     }
     bool callers(const char* root)

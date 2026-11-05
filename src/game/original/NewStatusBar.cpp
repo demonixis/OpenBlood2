@@ -1,5 +1,7 @@
-// Selective original CNewStatusBar: InitStatTabs, InitInvTabs, InitWeaponTabs, AdjustRes, UpdateInv,
-// UpdateWeap/UpdateCurrentWeap, ToggleWeapons, DrawInvTabs, DrawWeaponTabs, SetupTab, JustifySurface.
+// Selective original CNewStatusBar: InitStatTabs, InitInvTabs, InitWeaponTabs, InitObjectivesTab,
+// AdjustRes, UpdateInv, UpdateWeap/UpdateCurrentWeap, ToggleWeapons, ToggleObjectives,
+// UpdateObjectives, SetPowerBarLevel, Reset, DrawInvTabs, DrawWeaponTabs, DrawObjectives,
+// DrawObjectivesIcon, DrawPowerBar, SetupTab, JustifySurface.
 // Original locations/resources and composition order retained; typed surfaces replace the client ABI.
 #include "game/original/NewStatusBar.h"
 #include "game/original/WeaponDefs.h"
@@ -22,6 +24,7 @@ bool CNewStatusBar::Init()
     {
         InitInvTabs();
         InitWeaponTabs();
+        InitPanels();
     }
     return initialized;
 }
@@ -36,7 +39,10 @@ bool CNewStatusBar::Update(const OpenBlood2::PlayerStats& s, unsigned width, uns
     const bool resized = width != m_nScreenWidth || height != m_nScreenHeight;
     if (resized)
         AdjustRes(width, height);
-    if (have_previous && previous == s && !resized)
+    // The air level drives the power bar only; it never recomposes the stat tabs.
+    auto compared = s;
+    compared.air = previous.air;
+    if (have_previous && previous == compared && !resized)
         return true;
     // Source UpdateCurrentWeap: reserved inventory slots clear the weapon picture.
     m_stAmmo.hIcon = s.weapon_slot < 10 ? canvas.CreateSurfaceFromBitmap(weapon->m_szStatusIcon) : nullptr;
@@ -131,6 +137,10 @@ void CNewStatusBar::AdjustRes(unsigned width, unsigned height)
         m_nItemNameX = int(m_stCurrentItem.locX + m_stCurrentItem.sizeX) + 10;
         m_nItemNameY = int(m_stCurrentItem.locY + (m_stCurrentItem.sizeY / 2)) - int(stat_font.height / 2);
     }
+
+    // Adjust the power bar location (the 150x16 surface Init creates)
+    m_nPowerBarX = (int(m_nScreenWidth) - 150) / 2;
+    m_nPowerBarY = int(m_stAmmo.locY) - 16 - 16;
 }
 void CNewStatusBar::InitInvTabs()
 {
@@ -659,4 +669,256 @@ bool CNewStatusBar::UpdateCTF(DBYTE team, DBYTE flag)
     flag_color = flag;
     ++revision;
     return true;
+}
+
+// Original constructor scale tables for DrawObjectives.
+static const float g_ObjScaleUpX[OBJTAB_SCALE_LEVELS + 1] = {2.0f, 1.75f, 1.55f, 1.4f, 1.25f, 1.1f,
+                                                             1.0f, 0.9f,  0.85f, 0.9f, 1.0f};
+static const float g_ObjScaleUpY[OBJTAB_SCALE_LEVELS + 1] = {0.0f,  0.01f, 0.04f, 0.09f, 0.16f, 0.25f,
+                                                             0.36f, 0.49f, 0.64f, 0.81f, 1.0f};
+static const float g_ObjScaleDownX[OBJTAB_SCALE_LEVELS + 1] = {1.0f,  0.81f, 0.64f, 0.49f, 0.36f, 0.25f,
+                                                               0.16f, 0.09f, 0.04f, 0.01f, 0.0f};
+static const float g_ObjScaleDownY[OBJTAB_SCALE_LEVELS + 1] = {1.0f,  0.9f, 0.85f, 0.9f,  1.0f, 1.1f,
+                                                               1.25f, 1.4f, 1.55f, 1.75f, 2.0f};
+
+void CNewStatusBar::InitPanels()
+{
+    // Init: the objectives page, its icon and font, then the power bar surface and its two
+    // frames. Unlike the stat tabs these stay optional: a failure is reported, never fatal.
+    // Each load reports its own failure (CreateSurfaceFromBitmap refuses while an error is set).
+    const auto keep_error = [this](std::string& out)
+    {
+        if (!canvas.error.empty())
+            out = canvas.error;
+        canvas.error.clear();
+    };
+    objectives_background = canvas.CreateSurfaceFromBitmap("interface/objectives/objectives.pcx");
+    keep_error(objectives_error);
+    m_hObjectivesIcon = canvas.CreateSurfaceFromBitmap("interface/objectives/skull.pcx");
+    keep_error(objectives_error);
+    const bool font = objectives_background && canvas.load_font("interface/objectives/obj_font_1.pcx",
+                                                                "interface/objectives/obj_font_1.fnt", objectives_font);
+    keep_error(objectives_error);
+    if (objectives_background && font)
+    {
+        // Text fonts use the menus' quarter-height space (the CoolFont source is unavailable).
+        objectives_font.space_width = objectives_font.height / 4;
+        m_hObjectives = canvas.CreateSurface(objectives_background->width, objectives_background->height);
+        InitObjectivesTab();
+    }
+
+    m_hPowerBar = canvas.CreateSurface(150, 16);
+    m_hHealthBar = canvas.CreateSurfaceFromBitmap("interface/statusbar/bar_health.pcx");
+    keep_error(power_error);
+    m_hThrowBar = canvas.CreateSurfaceFromBitmap("interface/statusbar/bar_throw.pcx");
+    keep_error(power_error);
+    if (m_hPowerBar)
+        canvas.FillRect(m_hPowerBar, nullptr, m_hTransColor);
+}
+bool CNewStatusBar::InitObjectivesTab()
+{
+    if (!m_hObjectives)
+        return false;
+
+    // Reset the background picture of the objectives
+    canvas.DrawSurfaceToSurface(m_hObjectives, objectives_background, nullptr, 0, 0);
+
+    // Setup the font and print it out on the surface
+    objectives_font.draw(*m_hObjectives, "No Current Objective", OBJTAB_TITLE_CENTER, OBJTAB_TITLE_TOP, 1);
+    ++revision;
+    return true;
+}
+void CNewStatusBar::UpdateObjectives(bool valid, const std::string& title, const std::string& text)
+{
+    if (!m_hObjectives)
+        return;
+
+    // If we send in a null title or string, reset the objectives
+    if (!valid)
+    {
+        InitObjectivesTab();
+        m_nObjIcon = OBJICON_INVISIBLE;
+        return;
+    }
+
+    // The single/custom game-type test belongs to the shell's SMSG_OBJECTIVES filter.
+
+    // Reset the background picture of the objectives
+    canvas.DrawSurfaceToSurface(m_hObjectives, objectives_background, nullptr, 0, 0);
+
+    // Setup the font and print it out on the surface
+    objectives_font.draw(*m_hObjectives, title, OBJTAB_TITLE_CENTER, OBJTAB_TITLE_TOP, 1);
+    objectives_font.draw_format(*m_hObjectives, text, OBJTAB_TEXT_LEFT, OBJTAB_TEXT_TOP, OBJTAB_TEXT_WIDTH);
+
+    // Turn on the updated icon if we're not currently displaying the objectives
+    if (m_nObjLevel == OBJTAB_INVISIBLE || m_nObjLevel == OBJTAB_SCALE_DOWN)
+        m_nObjIcon = OBJICON_VISIBLE;
+    else
+        m_nObjIcon = OBJICON_INVISIBLE;
+
+    // The bellding1.wav change sound is the shell's (PlayInterfaceSound).
+    ++revision;
+}
+bool CNewStatusBar::ToggleObjectives(float time)
+{
+    // missionobj.wav plays on both state changes; the shell owns the sound.
+    if (m_nObjLevel == OBJTAB_INVISIBLE)
+    {
+        m_nObjLevel = OBJTAB_SCALE_UP;
+        m_fObjUpdateTime = time;
+        m_nObjIcon = OBJICON_INVISIBLE;
+        return true;
+    }
+    else if (m_nObjLevel == OBJTAB_STOPPED)
+    {
+        m_nObjLevel = OBJTAB_SCALE_DOWN;
+        m_fObjUpdateTime = time;
+        return true;
+    }
+    return false;
+}
+CNewStatusBar::ObjectivesLayout CNewStatusBar::DrawObjectives(float time)
+{
+    ObjectivesLayout layout;
+    // Draw: if(m_nObjLevel) DrawObjectives(); if(m_nObjIcon) DrawObjectivesIcon();
+    if (m_nObjLevel)
+    {
+        unsigned width = 0, height = 0;
+        if (m_hObjectives)
+            canvas.GetSurfaceDims(m_hObjectives, &width, &height);
+        const unsigned halfWidth = width / 2, halfHeight = height / 2;
+        unsigned scaleIndex = 0;
+        // The ratio is clamped before the DBYTE index (the source indexed past the table if the
+        // clock moved backwards).
+        const auto index = [this] { return unsigned(std::clamp(m_fObjScaleRatio, 0.0f, 1.0f) * OBJTAB_SCALE_LEVELS); };
+
+        // Handle the scrolling in and out of the inventory item tabs
+        switch (m_nObjLevel)
+        {
+            case OBJTAB_SCALE_UP:
+                if (time - m_fObjUpdateTime > OBJTAB_SCALE_TIME)
+                {
+                    m_fObjScaleRatio = 1.0f;
+                    m_nObjLevel = OBJTAB_STOPPED;
+                    m_fObjUpdateTime = time;
+                }
+                else
+                    m_fObjScaleRatio = (time - m_fObjUpdateTime) / OBJTAB_SCALE_TIME;
+
+                // Scale the rectangle accordingly...
+                scaleIndex = index();
+                m_rObjectives.top = (int)(m_nObjectivesY + (halfHeight * (1.0f - g_ObjScaleUpY[scaleIndex])));
+                m_rObjectives.left = (int)(m_nObjectivesX + (halfWidth * (1.0f - g_ObjScaleUpX[scaleIndex])));
+                m_rObjectives.bottom = (int)(m_nObjectivesY + halfHeight + (halfHeight * g_ObjScaleUpY[scaleIndex]));
+                m_rObjectives.right = (int)(m_nObjectivesX + halfWidth + (halfWidth * g_ObjScaleUpX[scaleIndex]));
+                break;
+
+            case OBJTAB_STOPPED:
+                // Scale the rectangle accordingly...
+                m_rObjectives.top = int(m_nObjectivesY);
+                m_rObjectives.left = int(m_nObjectivesX);
+                m_rObjectives.bottom = int(m_nObjectivesY + height);
+                m_rObjectives.right = int(m_nObjectivesX + width);
+                break;
+
+            case OBJTAB_SCALE_DOWN:
+                if (time - m_fObjUpdateTime > OBJTAB_SCALE_TIME)
+                {
+                    m_fObjScaleRatio = 1.0f;
+                    m_nObjLevel = INVTAB_INVISIBLE;
+                    m_fObjUpdateTime = time;
+                }
+                else
+                    m_fObjScaleRatio = (time - m_fObjUpdateTime) / OBJTAB_SCALE_TIME;
+
+                // Scale the rectangle accordingly...
+                scaleIndex = index();
+                m_rObjectives.top = (int)(m_nObjectivesY + (halfHeight * (1.0f - g_ObjScaleDownY[scaleIndex])));
+                m_rObjectives.left = (int)(m_nObjectivesX + (halfWidth * (1.0f - g_ObjScaleDownX[scaleIndex])));
+                m_rObjectives.bottom = (int)(m_nObjectivesY + halfHeight + (halfHeight * g_ObjScaleDownY[scaleIndex]));
+                m_rObjectives.right = (int)(m_nObjectivesX + halfWidth + (halfWidth * g_ObjScaleDownX[scaleIndex]));
+                break;
+        }
+
+        // ScaleSurfaceToSurfaceTransparent: an empty destination draws nothing.
+        layout.rect = m_rObjectives;
+        layout.page =
+            m_hObjectives && m_rObjectives.right > m_rObjectives.left && m_rObjectives.bottom > m_rObjectives.top;
+    }
+    if (m_nObjIcon && m_hObjectivesIcon)
+    {
+        layout.icon = true;
+        layout.icon_x = int(m_nScreenWidth) - int(m_hObjectivesIcon->width) - 5;
+        layout.icon_y = 5;
+    }
+    return layout;
+}
+void CNewStatusBar::SetPowerBarLevel(DBYTE nBar, float fPercent, float time)
+{
+    if (!m_hPowerBar)
+        return;
+
+    m_nPowerBar = nBar;
+    m_fPowerBarUpdate = time;
+
+    const OpenBlood2::HudSurface* bar = nullptr;
+    std::uint32_t color = 0;
+    switch (m_nPowerBar)
+    {
+        case BARTAB_THROW:
+            bar = m_hThrowBar;
+            color = 0xffff00; // SetupColor1(1, 1, 0)
+            break;
+        case BARTAB_AIR:
+            bar = m_hThrowBar;
+            color = 0x0000ff; // SetupColor1(0, 0, 1)
+            break;
+        case BARTAB_BOSS:
+            bar = m_hHealthBar;
+            color = 0xff0000; // SetupColor1(1, 0, 0)
+            break;
+    }
+
+    unsigned width = 0, height = 0;
+    if (bar)
+        canvas.GetSurfaceDims(bar, &width, &height);
+    const int fill = bar && color ? int(width * fPercent) : -1;
+    // The source redrew every call; identical pixels keep the composition revision.
+    if (fill == power_fill && nBar == power_drawn)
+        return;
+    power_fill = fill;
+    power_drawn = nBar;
+
+    canvas.FillRect(m_hPowerBar, nullptr, m_hTransColor);
+    if (bar && color)
+    {
+        const int centerX = int(m_hPowerBar->width / 2);
+        const int newX = centerX - int(width / 2);
+        OpenBlood2::HudRect fillArea{newX, 0, newX + fill, int(m_hPowerBar->height)};
+        canvas.FillRect(m_hPowerBar, &fillArea, color);
+        canvas.DrawSurfaceToSurfaceTransparent(m_hPowerBar, bar, nullptr, newX, 0, 0x000000); // m_hMaskColor
+    }
+    ++revision;
+}
+CNewStatusBar::PowerBarLayout CNewStatusBar::DrawPowerBar(float time)
+{
+    PowerBarLayout layout;
+    if (!m_nPowerBar || !m_hPowerBar)
+        return layout;
+
+    // The bar expires here but is still drawn this frame, as the source did.
+    if (time - m_fPowerBarUpdate > BARTAB_DISP_TIME)
+        m_nPowerBar = BARTAB_NONE;
+
+    layout.visible = true;
+    layout.x = m_nPowerBarX;
+    layout.y = m_nPowerBarY;
+    return layout;
+}
+void CNewStatusBar::Reset()
+{
+    ResetWeapons();
+    m_nObjLevel = OBJTAB_INVISIBLE;
+    m_nObjIcon = OBJICON_INVISIBLE;
+    m_nPowerBar = BARTAB_NONE;
 }

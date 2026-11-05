@@ -58,6 +58,14 @@ namespace OpenBlood2
                 CollisionHit contact;
                 if (body->world_model)
                 {
+                    // As in RotateWorldModel: two kinematic world models that both carry the
+                    // original GOTHRUWORLD flag (every Door) do not block each other. Interleaved
+                    // leaves (06_airship2 enddoor10/11 bars, issue #11) start inside each other's
+                    // conservative envelope; later LithTech MaybeCollide skips solid world models
+                    // for a GOTHRUWORLD mover. Brushes without the flag and free debris still block.
+                    if (!body->world_body && (mover->state.m_Flags & FLAG_GOTHRUWORLD) &&
+                        (body->state.m_Flags & FLAG_GOTHRUWORLD))
+                        continue;
                     // Other movers are immovable in this bounded solver. A
                     // conservative swept bound avoids tunnelling mesh pairs.
                     const auto center = object_bounds_center(*mover);

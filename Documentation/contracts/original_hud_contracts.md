@@ -78,10 +78,10 @@ and dimensions, including while the HUD is camera-hidden.
 ## Explicit limits
 
 This replaces the demonstration **statistics HUD**. Inventory scrolling (see the
-[inventory cursor](inventory_cursor_contracts.md)) and the weapon list (below) were
-connected later. The objective page/skull, power/air/throw/boss bars, communication portraits/text
-and multiplayer/team displays from the remaining original UI classes are not
-connected by this continuation. The inspector's boss bar remains diagnostic.
+[inventory cursor](inventory_cursor_contracts.md)), the weapon list, the objectives
+page/skull, the power bars and the message lines (below) were connected later.
+Communication portraits/text and multiplayer/team displays from the remaining
+original UI classes are not connected. The inspector's boss bar remains diagnostic.
 Menus, UI scaling preferences, original executable pixel-for-pixel comparison,
 Windows/macOS/mobile execution and full-game UI acceptance remain unverified.
 
@@ -122,3 +122,153 @@ sequence and reuses the authoritative field validation. Both frontends consume
 `HudSnapshot` with the client clock and world identity; CNewStatusBar artwork,
 layout, counters, crosshair and numeric rules are unchanged. Other original client
 notices remain in the client shell. See [verification](../implementation/reports/m9_client_view.md).
+
+## Objectives, power bars and message lines (issue #8)
+
+Tester issue #8 reported the missing air bar, objectives and pickup messages. The
+original `CNewStatusBar` objectives and power-bar code, `CMessageMgr` and
+`CInventoryMgr::SendPickedUpMessage` are now imported. The HUD atlas is 1024x512:
+a fourth band at y = 256 holds the objectives page (x 0), its skull icon (x 512)
+and the power bar (x 768), with exact magenta transparency (`m_hTransColor`).
+Missing art never fails the HUD; it is reported in `objectives_error` or
+`power_error`, as the weapon tabs report `weapon_error`.
+
+### Objectives page (Tab)
+
+`InitObjectivesTab`, `UpdateObjectives`, `ToggleObjectives`, `DrawObjectives` and
+`DrawObjectivesIcon` are imported. The retail page is
+`interface/objectives/objectives.pcx` (250x150), drawn at (100, 75). The title is
+centred at x 135, y 35 and the text wrapped by `DrawFormat` at (35, 50), 200
+pixels wide, in `obj_font_1.pcx/.fnt`. An empty page reads "No Current
+Objective". The FNT space width is the menus' quarter height (the CoolFont source
+is unavailable).
+
+- **Updates.** Each SMSG_OBJECTIVES (single or custom games; resource IDs give
+  strings 5000/6000 + id - 1) and each LoadClientData restore counts one
+  `UpdateObjectives` call. The client shell plays `Sounds\Events\bellding1.wav`
+  locally for a non-null page. Null strings reset the page and hide the icon
+  without a sound.
+- **Updated icon.** `interface/objectives/skull.pcx` (38x66) shows at
+  (width - 38 - 5, 5) when an update arrives while the page is hidden or scaling
+  down. Opening the page hides it.
+- **Tab.** The original VK_TAB key calls `ToggleObjectives` in single and custom
+  games, with `Sounds\Interface\MainMenus\missionobj.wav` on each accepted toggle.
+  It is the fixed `objectives` Interface action (Tab). It is not a Controls row:
+  CMenuControls ignored Tab, so `controls.cfg` and its version are unchanged.
+  There is no gamepad default. The multiplayer frag-bar branch is not
+  implemented.
+- **Scaling.** The page scales up or down over 0.1 s through the original
+  `g_ObjScale*` tables. A toggle during a scale is ignored. There is no display
+  timeout.
+- **Clamped ratio.** The scale ratio is clamped before indexing the tables: the
+  source indexed past them when the clock moved backwards.
+- **New world.** `Reset` on a new world hides the page and the icon; the page
+  keeps its text.
+
+### Power bar (air, throw, boss)
+
+`SetPowerBarLevel`, `TurnOffPowerBar` and `DrawPowerBar` are imported. The power
+bar is a 150x16 magenta surface at ((width - 150) / 2, ammo tab top - 32).
+
+- **Drawing.** The fill covers `int(barW * percent)` pixels from `75 - barW / 2`,
+  and the frame is drawn over it with a black key. Throw uses
+  `interface/statusbar/bar_throw.pcx` in yellow, air the same frame in blue, and
+  boss `bar_health.pcx` in red.
+- **Timeout.** The bar hides five seconds after its last request. It expires in
+  `DrawPowerBar` but is still drawn that frame.
+- **Recomposition.** The surface is recomposed only when the fill width or the bar
+  type changes, which limits atlas uploads.
+
+The shell rule is the original one: a percentage at or below 0, at or above 1, or
+non-finite turns the bar off. The requests come from three places:
+
+- **Air.** `PlayerStats::air` is the original PLAYERSTATS_AIRLEVEL value,
+  `m_fAirLevel / 100`, validated to 0..1. The client reacts only when it changes,
+  as the source sent the field only then.
+- **Throw.** While a proximity, remote or time bomb is held, the client weapon's
+  WS_FIRING call sends `min(held / 0.75, 1)`. Overholding a proximity or time
+  bomb past 1.25 s prints "Idiot! Let go next time!".
+- **Boss.** SMSG_BOSSHEALTH sends the boss health fraction.
+
+No server sends the unused SMSG_THROWDISTANCE.
+
+### Message lines
+
+`CMessageMgr` (`game/original/MessageMgr.cpp`) is imported with its 20-entry ring,
+the shell's `SetMaxMessages(6)`, five-second lines, and the oldest-first expiry in
+`Draw`. Lines are drawn at (1, 0), 16 pixels apart, in white with no shadow. They
+appear in play before the status bar, independent of the status-bar camera gate,
+as PostUpdate drew them.
+
+- **Editor line.** While typing, the editor line reads "SAY:" plus the text, with
+  a cursor in the second half of each second.
+- **Font.** The replacement font is Dear ImGui's default at the original 16-pixel
+  height; the GDI Arial 6x16 request has no portable equivalent.
+- **Encoding.** Windows-1252 resource bytes are shown as Latin-1 when a line is
+  not valid UTF-8.
+- **New world.** A world reset clears the ring, because the new world's clock
+  restarts. This is an adaptation; the source kept absolute-time lines.
+
+The lines now replace the earlier chat list. Original sources already present in
+the port reach them:
+
+- the typed SMSG_CONSOLEMESSAGE line (80 bytes at most);
+- the trigger LOCKED/UNLOCKED strings;
+- IDS_GENERAL_IMMOBILE/CANMOVE (265/264), now sent as the source did;
+- the Willpower, Stealth and Anger expiry strings 277/276/278, previously only
+  counted (`powerup_console_messages` or `powerup_console_unavailable`);
+- the local chat echo;
+- the pickup messages below.
+
+The port's own control notices (auto-run, view, drop refusals) stay replacement
+lines, drawn after the messages for three seconds. Not ported:
+
+- the cheat-message line (`DrawCheatMsg`);
+- the `_ALL` message sound;
+- network chat.
+
+### Pickup messages
+
+`CInventoryMgr::SendPickedUpMessage` runs for a player with a client, for
+PickupObject senders. The port's KeyPickup counts too, because it was a
+PickupObject subclass in the original.
+
+- **Display name.** `FormatString(m_nNameID)` when the ID is set, otherwise the
+  object name.
+- **Strings.** CHWEAP_OK shows IDS_GENERAL_PICKUP_1 (260, "Picked Up %1!s!").
+  CHWEAP_NOTAVAIL and CHWEAP_NOAVAILSLOTS show 261 and 262, but only when
+  `hObject != m_hLastPickupObject && iRet != m_nLastPickupResult`. That source
+  AND quirk is kept.
+- **Last pickup.** The last object and result update after every PickupObject
+  message, including CHWEAP_NOMESSAGE. They start as NULL/CHWEAP_OK and are not
+  saved.
+- **Results per caller.** Ammo is OK or NOMESSAGE. Weapons use ObtainWeapon's
+  result, with ammunition acceptance overriding it unless the slots are full.
+  Items and keys use their add result; an owned bomb's refused ammo is
+  NOMESSAGE. Powerups report only an accepted CHWEAP_OK.
+- **MID_PICKEDUP.** The reply is unchanged.
+- **NPCs.** NPC pickups print nothing, because they have no client.
+- **Missing strings.** A missing cres.dll string sends no line. It sets
+  `pickup_message_error` and records no session failure, through the new bounded
+  `FindClientResourceString` service.
+- **Retail text.** The retail IDS_WEAPON_BERETTA (350) ends with a space, so the
+  line is "Picked Up Beretta ", as in the original.
+
+### Verification
+
+`hud.panels` (headless) covers:
+
+- the message ring, expiry and positions;
+- the objectives state machine and power requests without art;
+- the Tab action;
+- the shell's air and throw rules;
+- the pickup reply without cres.dll.
+
+`hud.private` covers the retail art (page 250x150, skull 38x66, power bar at
+(245, 373) in 640x480), the page composition, scaling rectangles, icon rules,
+power colours and timeout. In 01_SubwayA it also checks the "Picked Up Beretta"
+and "Picked Up RedKey" lines, the ALREADYHAVE suppression, objective 1 ("Kill
+Gideon!") with its sound, and the air request.
+
+GPU presentation of the new band was not captured in an automated test. XR shows
+the same 640x480 HUD canvas.

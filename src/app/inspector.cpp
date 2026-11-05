@@ -1765,8 +1765,23 @@ namespace OpenBlood2
                         static_cast<unsigned long long>(hud_status->revision));
             for (const auto& [path, surface] : hud_status->canvas.images())
                 ImGui::Text("%s: %u x %u", path.c_str(), surface.width, surface.height);
+            ImGui::Text("Objectives page level %u | power bar %u", hud_status->objectives_level(),
+                        unsigned(hud_status->power_bar_type()));
+            for (const auto* text : {&hud_status->weapon_error, &hud_status->objectives_error, &hud_status->power_error})
+                if (!text->empty())
+                    ImGui::TextUnformatted(text->c_str());
             ImGui::TreePop();
         }
+        ImGui::Text("Objective updates %llu | power requests %llu (bar %u, %.2f) | air %.2f",
+                    static_cast<unsigned long long>(shell.objective_updates),
+                    static_cast<unsigned long long>(shell.power_bar.requests), unsigned(shell.power_bar.bar),
+                    shell.power_bar.percent, hud.air);
+        ImGui::Text("Message lines %d / %d | added %llu | expired %llu", shell.m_MessageMgr.count(),
+                    shell.m_MessageMgr.GetMaxMessages(), static_cast<unsigned long long>(shell.m_MessageMgr.added),
+                    static_cast<unsigned long long>(shell.m_MessageMgr.expired));
+        if (player)
+            ImGui::Text("Pickup messages %llu%s%s", static_cast<unsigned long long>(player->pickup_messages),
+                        player->pickup_message_error.empty() ? "" : " | ", player->pickup_message_error.c_str());
         else if (!hud_status)
             ImGui::TextUnformatted("Original HUD resources await the first visible player frame.");
         if (player && player->ctf_team)

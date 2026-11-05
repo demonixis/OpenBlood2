@@ -150,9 +150,20 @@ namespace
         CHECK(player->containers.count == 1 && player->containers.head.code == CC_NOTHING);
         CHECK(place(game, {0, 50, 0}));
         CHECK(player->containers.head.code == CC_WATER);
+        // Original UpdateContainerFX light scale at the camera (issue #8 underwater colours).
+        auto& shell = game.client_shell;
+        shell.camera_position = {0, 50, 0};
+        auto tint = shell.SceneLightScale();
+        CHECK(tint.x == .3f && tint.y == .8f && tint.z == .8f);
+        shell.camera_position = {0, 150, 0};
+        tint = shell.SceneLightScale();
+        CHECK(tint.x == 1 && tint.y == 1 && tint.z == 1);
+        shell.camera_position = {0, 50, 0};
         auto name = game.server.CreateString("water"), command = game.server.CreateString("OFF");
         SendTriggerMsgToObjects(player, name, command);
         game.server.FreeString(command);
+        tint = shell.SceneLightScale(); // A hidden container gives no tint.
+        CHECK(tint.x == 1 && tint.y == 1 && tint.z == 1);
         CHECK(player->UpdateContainerState());
         CHECK(player->containers.count == 1 && player->containers.body[0].hidden);
         CHECK(player->containers.head.code == CC_NOTHING);
@@ -650,9 +661,14 @@ namespace
         auto* brush = dynamic_cast<Conveyor*>(game.objects.get(belt)->game.get());
         brush->info.hidden = true;
         CHECK(volume(game, "Conveyor", "second", {-500, 0, -500}, {500, 900, 500}, {{"Current", DVector{120, 0, 0}}}));
+        // Conveyor currents apply once per original 1/30 s frame (force-position restarts
+        // that cadence): nothing for three 1/120 steps, then 120/30 on the fourth.
+        for (int i = 0; i < 3; ++i)
+            CHECK(game.step(1.0 / 120));
+        CHECK(std::abs(client.move_mgr.body.velocity.x) < .01f);
         CHECK(game.step(1.0 / 120));
         CHECK(!client.move_mgr.m_bBodyOnConveyor && client.move_mgr.m_bUseGravity);
-        CHECK(client.move_mgr.body.velocity.x > .8f && client.move_mgr.body.velocity.x < 1.01f);
+        CHECK(client.move_mgr.body.velocity.x > 3.2f && client.move_mgr.body.velocity.x < 4.01f);
         CHECK(game.objects.remove(belt));
         CHECK(game.step(1.0 / 120));
         CHECK(client.move_mgr.m_bBodyOnConveyor); // Pending removal cannot mask the next volume.

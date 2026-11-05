@@ -13,6 +13,11 @@ namespace OpenBlood2
     inline constexpr float original_fov_normal = 1.5707963267948966f, original_fov_zoomed = 0.21816615649929116f;
     // Projection scale for a horizontal FOV relative to the 90-degree presentation default.
     float original_fov_scale(float fov_x);
+    // Replacement Options > Display FIELD OF VIEW: the chosen horizontal field (radians, at 4:3)
+    // replaces FOV_NORMAL. Zoom keeps FOV_ZOOMED, with the zoom ramp mapped linearly between
+    // them; wider special views (the Orb's +45 degrees) keep their offset from the default.
+    inline constexpr int field_of_view_min = 60, field_of_view_max = 120, field_of_view_step = 5;
+    float presented_fov_x(float view_fov_x, float user_fov_x);
     bool original_crosshair_visible(bool in_world, bool external_camera, bool dead);
     HudRect original_crosshair_rect(const HudRect& camera, unsigned width, unsigned height);
 } // namespace OpenBlood2

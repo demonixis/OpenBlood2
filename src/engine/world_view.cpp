@@ -254,6 +254,30 @@ namespace OpenBlood2
             material_ids.emplace(key, id);
             return true;
         };
+        // Original SURF_TRANSPARENT chroma key: on a texture without an alpha mask (DTX flag 2)
+        // pure black texels are see-through and the others keep their palette alpha. A keyed copy
+        // (same path, own content) leaves opaque faces sharing the image untouched.
+        auto add_keyed = [&](std::uint32_t source, std::uint32_t& id)
+        {
+            const auto key = materials[source].path + "#chromakey";
+            if (auto found = material_ids.find(key); found != material_ids.end())
+            {
+                id = found->second;
+                return true;
+            }
+            if (materials.size() >= 4097 || materials[source].image.rgba.size() > 128 * 1024 * 1024 - texture_bytes)
+                return false;
+            WorldMaterial entry = materials[source];
+            for (auto* pixels : {&entry.image.rgba, &entry.image.mip_rgba})
+                for (std::size_t i = 0; i + 3 < pixels->size(); i += 4)
+                    if (!(*pixels)[i] && !(*pixels)[i + 1] && !(*pixels)[i + 2])
+                        (*pixels)[i + 3] = 0;
+            texture_bytes += entry.image.rgba.size();
+            id = static_cast<std::uint32_t>(materials.size());
+            materials.push_back(std::move(entry));
+            material_ids.emplace(key, id);
+            return true;
+        };
         for (const auto& model : world.models)
         {
             if (model.polygons.size() > 65536 || model.points.size() > 65536 || !physics_vector(model.translation))
@@ -401,6 +425,9 @@ namespace OpenBlood2
                         else
                             color = {1, 0, 1}; // Explicit unresolved material marker.
                     }
+                    if (material && (surface.flags & (1u << 3)) && materials[material].frames.empty() &&
+                        !(materials[material].image.flags & 2) && !add_keyed(material, material))
+                        return fail("World texture count/memory budget exceeded");
                 }
                 // A stored lightmap replaces the baked vertex light (original "LightMap 1"); other
                 // faces keep their per-vertex light. SURF_BRIGHT (bit 5) is fully bright and
@@ -601,7 +628,7 @@ namespace OpenBlood2
         out.right = packed(rotate_vector(DVector{1, 0, 0}, view));
         out.up = packed(rotate_vector(DVector{0, 1, 0}, view));
         out.forward = packed(rotate_vector(DVector{0, 0, 1}, view));
-        constexpr float near = world_near, far = world_far;
+        const float near = world_near, far = world_far;
         const float scale = horizontal_projection_scale(aspect);
         out.projection = {scale, scale * aspect, far / (far - near), -near * far / (far - near)};
         out.position = packed(draw.position);

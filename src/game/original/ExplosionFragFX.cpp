@@ -161,13 +161,21 @@ bool CExplosionFragFX::Update(double now, EffectQueries& queries)
             error = "Fragment collision query invalid/unavailable";
             return false;
         }
+        auto normal = hit.normal, direction = next_velocity;
+        // A fragment launched from inside geometry (an exploding wall, CDebris AddExplosion) gets a
+        // start-inside hit without a usable normal; the original reflected through an undefined
+        // VEC_NORM. It keeps its unreflected motion and is counted, never failing the session.
+        if (last_query == SegmentResult::Hit && !normalize(normal))
+        {
+            ++embedded_hits;
+            last_query = SegmentResult::Miss;
+        }
         if (last_query == SegmentResult::Hit)
         {
-            auto normal = hit.normal, direction = next_velocity;
             const float speed = std::sqrt(vector_dot(next_velocity, next_velocity));
-            if (!normalize(normal) || !normalize(direction))
+            if (!normalize(direction))
             {
-                error = "Invalid fragment reflection normal/velocity";
+                error = "Invalid fragment reflection velocity";
                 return false;
             }
             direction = vector_add(direction, vector_scale(normal, -2 * vector_dot(normal, direction)));

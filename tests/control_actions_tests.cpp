@@ -162,7 +162,7 @@ namespace
         CHECK(!input.controls.sample(false).forward);
         CHECK(g.server_shell.OnMessage(g.local_client, PlayerText{*input.message.submitted}));
         std::string error;
-        CHECK(g.pump_player_messages(error) && g.client_shell.chat_lines.back() == ":hell");
+        CHECK(g.pump_player_messages(error) && g.client_shell.m_MessageMgr.lines().back() == ":hell");
         CHECK(!g.server_shell.OnMessage(g.local_client, PlayerText{std::string(80, 'x')}));
         CHECK(!g.server_shell.OnMessage(g.local_client, PlayerText{"a\nb"}));
         send(key(SDL_SCANCODE_T, true));

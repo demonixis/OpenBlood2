@@ -66,11 +66,13 @@ its own eye and orientation. Rebuilding the snapshot also handles loads and tele
 
 This is a stateless adaptation: the original client only changed fog on a container-code
 transition, so adjacent same-code volumes could retain the previous parameters. The
-port uses the currently containing volume. `SkyFog` remains a separate pending sky
-policy; volume fog does not hide or transform the authored sky layers. There is no
+port uses the currently containing volume. Volume fog does not hide or transform the
+authored sky layers; `SkyFog` is applied separately (see the [sky contracts](sky_contracts.md#skyfog-farz-and-culling-052)). There is no
 volumetric scattering. Enhanced glow and reflection weight attenuate through the fog;
 alpha and depth stay unchanged. Fog applies inside the scene pass, before tonemap/AA.
-The XR fallback scene fade also scales the fog color, including the clear color.
+The XR fallback scene fade also scales the fog color, including the clear color. Since 0.5.2 the original global light scale (night goggles, Seeing Eye, blindness,
+underwater tint) scales them the same way, as fog is applied after the scene colour: a blinded
+player sees black, not the fog.
 
 ## Transparency
 

@@ -18,8 +18,17 @@ its opaque sky marker, even with bit 3. Missing/unsupported textures remain name
 errors and opaque magenta markers, so failure cannot turn geometry invisible.
 Texture-free synthetic diagnostics retain orientation/pink colors. Opaque surfaces
 still ignore texture alpha, including when they share an image with a transparent
-surface. No filename-based alpha or color-key rule is added. DTX decoding, generation
+surface. No filename-based alpha rule is added. DTX decoding, generation
 boundaries, exact-path lookup, resource and vertex budgets are unchanged.
+
+Color key (0.5.2, [#10](https://github.com/demonixis/OpenBlood2/issues/10)): the original
+renderer chroma-keys SURF_TRANSPARENT faces whose texture has no alpha mask (DTX flag 2):
+pure black texels are see-through and the others keep their palette alpha. Such a face
+now binds a keyed copy of its material (`path#chromakey`, counted in the texture budget),
+so opaque faces sharing the image are untouched and animated (SPR) materials keep their
+frames. This fixes the black Museum skylight and display-case panes (`black.dtx` z-fighting
+with the frame behind) and the haze caps. It supersedes the earlier "no color-key rule"
+statement; masked textures keep their decoded alpha.
 
 One translucent batch covers one original base-ring polygon. It is never merged
 with another polygon, even with an identical material. Its center is the mean of

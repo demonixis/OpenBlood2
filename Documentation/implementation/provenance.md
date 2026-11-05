@@ -2194,3 +2194,21 @@ connects owner-bound smoke recipes 1/2 to grenade, Napalm and Howitzer fragments
 including restore republication. Preserves separate damaging/cosmetic children,
 source random loop bounds, no unused zero-distance division and original light-state
 assignment quirks. No assets or save bytes change; illumination remains separate.
+
+## Objectives, power bars and message lines (issue #8)
+
+Selective imports from the original reference tree (`lithtech/Blood2`, SHA-256 of
+the copies used): `ClientShellDLL/NewStatusBar.cpp` (a2686150…e45855)
+InitObjectivesTab, UpdateObjectives, ToggleObjectives, DrawObjectives,
+DrawObjectivesIcon, SetPowerBarLevel, DrawPowerBar, Reset and the g_ObjScale tables;
+`ClientShellDLL/MessageMgr.cpp`/`.h` (625f7bb5…13056 / ada29217…a7fe) CMessageMgr
+Enable, AddLine, Draw, Clear, SetMaxMessages and the CInputLine prompt;
+`ClientShellDLL/BloodClientShell.cpp` (36a810c8…1006) PLAYERSTATS_AIRLEVEL,
+SMSG_BOSSHEALTH, SetPowerBarLevel, VK_TAB and the message-manager setup;
+`ClientShellDLL/GameWeapons.cpp` (b40ef0a2…ee55) the bomb charge power bar and
+overhold line; `ObjectDLL/InventoryMgr.cpp` (aab29291…0e53) SendPickedUpMessage
+and the CHWEAP results; `ObjectDLL/PlayerObj.cpp` its pickup, immobilize and power
+expiry console lines. The replacement message font (Dear ImGui default at 16 px),
+the clamped scale index, the world-reset message clear and the non-failing string
+lookup are documented adaptations. No commercial art or strings are imported. See
+[contracts](../contracts/original_hud_contracts.md#objectives-power-bars-and-message-lines-issue-8).

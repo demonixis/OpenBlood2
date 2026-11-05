@@ -32,6 +32,9 @@ class CMoveMgr
     ContainerCode m_eLastContainerCode = CC_NOTHING;
     float m_fSwimVel = 175, m_fLadderVel = 400;
     float m_fVelMagnitude = 0, m_FrameTime = 0;
+    // The original applied its container rules once per client frame; see Update.
+    float m_ContainerTime = 0, m_fDryJumpTime = 0;
+    double container_clock = 0;
     double discarded_time = 0;
     std::uint64_t updates = 0, substeps = 0, jumps = 0, landings = 0;
     std::uint64_t jump_voice_requests = 0, jump_voice_starts = 0;

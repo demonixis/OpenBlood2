@@ -53,7 +53,8 @@ base-state ordering: primary loops while held, release reaches end_fire's FIRE_K
 then redraws. Holding charge yields `250 + 1500 * min(held/.75, 1)` units/s;
 strictly more than 1.25 seconds sets special speed zero and finishes the throw.
 The typed special float is finite and bounded to 0..1750 before consumption.
-Power-bar state is inspectable; the original power-bar HUD is unavailable.
+The charge drives the original yellow throw power bar and the overhold prints "Idiot! Let go next time!"
+(see the [HUD contracts](original_hud_contracts.md#power-bar-air-throw-boss)).
 
 Speed zero takes the original in-hand branch: EXP_DEFAULT_SMALL, actual
 `time/explode.wav`, NORMAL damage to the owner only and no projectile/radius pass.

@@ -14,8 +14,17 @@ namespace OpenBlood2
         InventoryItems items;
         std::uint64_t item_messages = 0, item_shows = 0;
         float time = 0;
-        // A new world hides the weapon tabs (original CNewStatusBar::Reset).
+        // A new world hides the weapon tabs, objectives and power bar (original CNewStatusBar::Reset).
         std::uint64_t world_revision = 0;
+        // Original UpdateObjectives calls (SMSG_OBJECTIVES, LoadClientData): the shell's update
+        // counter with its current title and text; `objectives_valid` false is the null reset.
+        std::uint64_t objective_updates = 0;
+        bool objectives_valid = false;
+        std::string objectives_title, objectives_text;
+        // Original SetPowerBarLevel/TurnOffPowerBar calls: the latest request and its time.
+        std::uint64_t power_requests = 0;
+        DBYTE power_bar = 0;
+        float power_percent = 0, power_time = 0;
     };
     HudState hud_state(const PlayerStats&, bool in_world, bool external_camera, bool dead = false,
                        bool show_crosshair = true, DBYTE crosshair = 1, DBYTE ctf_team = 0, DBYTE ctf_flag = 0);

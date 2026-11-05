@@ -372,7 +372,14 @@ namespace
                     }
                     CHECK(command(g, h, "ON"));
                     for (int i = 0; i < 4; ++i)
-                        CHECK(g.step(.02));
+                        if (!g.step(.02))
+                        {
+                            std::cerr << path << ' ' << r->state.m_Name << ':';
+                            for (auto& e : g.step_errors())
+                                std::cerr << ' ' << e;
+                            std::cerr << '\n';
+                            CHECK(false);
+                        }
                     count.moved += r->mover_moves > 0;
                     count.dynamic += r->world_body;
                     count.blocked += r->world_body && r->mover_blocks > 0;
@@ -450,8 +457,9 @@ namespace
               counts["CDestructableBrush"].polygon == 29 && counts["CDestructableBrush"].boundary == 2);
         CHECK(!failures.contains("CDestructableBrush/shell") && !failures.contains("CDestructableBrush/schema") &&
               !failures.contains("CDestructableBrush/ambiguous") && failures["CDestructableBrush/missing"] == 37 &&
-              !failures.contains("CDestructableBrush/polygon dynamics") && !failures.contains("CDestructableBrush/spawn") &&
-              counts["CDestructableBrush"].absent_spawns == 2 && !failures.contains("RotatingBrush/ambiguous"));
+              !failures.contains("CDestructableBrush/polygon dynamics") &&
+              !failures.contains("CDestructableBrush/spawn") && counts["CDestructableBrush"].absent_spawns == 2 &&
+              !failures.contains("RotatingBrush/ambiguous"));
         CHECK(g.request_world("01_SubwayA", error));
         std::map<EntryState, unsigned> entries;
         for (const auto& e : g.entries)

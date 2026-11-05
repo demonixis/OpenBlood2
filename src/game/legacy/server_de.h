@@ -213,6 +213,9 @@ class ServerDE : public CSBase, public OpenBlood2::EffectQueries
     virtual DRESULT SendConversation(const OpenBlood2::Conversation&) = 0;
     virtual DRESULT SendObjectives(const OpenBlood2::MissionObjectives&) = 0;
     virtual bool GetClientResourceString(std::uint32_t, std::string&) = 0;
+    // The same lookup without a session failure record: the original FormatString returned a
+    // null string for a missing ID, which its callers (SendPickedUpMessage) treated as no text.
+    virtual bool FindClientResourceString(std::uint32_t, std::string&) = 0;
     // The engine GetGameInfo NetGame type the original server shell copies into m_GameInfo
     // (CBloodServerShell::GetGameType/IsMultiplayerGame). Local games (single, Chosen action,
     // custom) start STARTGAME_NORMAL without a NetGame, so it stays NGT_SINGLE (0) while the

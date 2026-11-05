@@ -2,6 +2,28 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.5.2] - 2026-11-05
+
+### Added
+
+- The original objectives page (Tab), air/throw/boss power bar and on-screen message lines, including pickup messages ([#8](https://github.com/demonixis/OpenBlood2/issues/8)).
+- Options > Display > FIELD OF VIEW, 60 to 120 degrees (default 90, the original); zoom and the binoculars keep their original magnification.
+
+### Fixed
+
+- The game no longer stops in the Center for Disease Management when a grenade fragment's smoke trail moves far in one frame ([#9](https://github.com/demonixis/OpenBlood2/issues/9)).
+- Skies are drawn like the original (no inside-out cloud layers), with their sky fog and the world's far distance ([#11](https://github.com/demonixis/OpenBlood2/issues/11), [#8](https://github.com/demonixis/OpenBlood2/issues/8)).
+- The barred double doors of Cas Revenant open ([#11](https://github.com/demonixis/OpenBlood2/issues/11)).
+- Exploding walls, speakers, fans, the floating ship and other exploding objects show their explosion and play its sound; wood crate fragments are visible ([#11](https://github.com/demonixis/OpenBlood2/issues/11), [#8](https://github.com/demonixis/OpenBlood2/issues/8)).
+- Museum skylights, display cases and other black-keyed glass are transparent ([#10](https://github.com/demonixis/OpenBlood2/issues/10), [#8](https://github.com/demonixis/OpenBlood2/issues/8)).
+- The view is tinted under water, blood and acid ([#8](https://github.com/demonixis/OpenBlood2/issues/8)).
+- Fog and the background follow the night goggles, Seeing Eye and blindness tints (a blinded player no longer sees the fog).
+- Escalators and conveyors drag the player at the original speed, and the player can jump out of shallow water (Museum shotgun pool) ([#8](https://github.com/demonixis/OpenBlood2/issues/8)).
+- Museum trip lasers damage the player ([#8](https://github.com/demonixis/OpenBlood2/issues/8)).
+- The Mac-10 alternate fire and other weapons play their animation sounds ([#8](https://github.com/demonixis/OpenBlood2/issues/8)).
+- Gabriella appears in the Museum cut-scene ([#8](https://github.com/demonixis/OpenBlood2/issues/8)).
+- The park seesaw plays its original double clank ([#8](https://github.com/demonixis/OpenBlood2/issues/8)).
+
 ## [0.5.1] - 2026-10-29
 
 ### Added

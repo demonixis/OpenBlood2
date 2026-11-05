@@ -24,6 +24,19 @@ double explosion, callback removal, other embedded-start refusals and detailed
 sweep diagnostics. The exact Downtown encounter and VFX stress-pool failure
 remain unverified/open respectively.
 
+The [2026-11-05 corrections](Documentation/implementation/reports/tester_feedback_2026_11_05.md)
+(0.5.2) truncate over-budget smoke-trail/shell/cylinder bursts (counted, never failing), cull sky
+world-model back faces (sprites two-sided) with SkyFog and world FarZ, let two GOTHRUWORLD world
+models pass each other, publish exploding CDebris AddExplosion, load wholly transparent model skins
+opaque, chroma-key unmasked SURF_TRANSPARENT faces (keyed material copy), tint the view per the
+camera's container, run conveyor/swim-cap rules on a fixed 1/30 s container cadence with a one-frame
+dry jump, start embedded TripLaser beams past their wall, play every view-weapon SOUND_KEY and allow
+the GabriellaAI spawn. The original objectives page (fixed Tab action), power bar (air, throw
+charge, boss) and CMessageMgr ring (pickup/power/movement strings) are ported; missing art/strings
+never fail the HUD. Options > Display FIELD OF VIEW (60–120, preferences version 12) replaces
+FOV_NORMAL only at presentation; game FOVs, zoom and XR are unchanged. The Mad Scientist pose and
+the macOS-failing gpu.character/viewport/polygrid/inventory_use tests remain open.
+
 The [2026-10-28 corrections](Documentation/implementation/reports/tester_feedback_2026_10_28.md)
 (0.5.1) resolve self/non-character last damagers and own-list self selection as no stimulus,
 sweep only the in-bounds part of a domain-edge segment against a displaced world model or
@@ -129,7 +142,7 @@ connects bounded dynamic FX lights, volume/world fog, a shared translucent queue
 polygon-clipped ballistic marks. Preserve source light flags, the inspector's dropped/
 unsupported-light counts, no game RNG/server-record/save changes, view-model/sky isolation,
 per-eye ordering with sprite slice batching, checked convex clipping and original mark
-reuse. Fog lights, effect-light shadows and SkyFog remain explicit limits. Regenerate
+reuse. Fog lights and effect-light shadows remain explicit limits (SkyFog is applied since 0.5.2). Regenerate
 all 72 shader artifacts together; keep the no-effect reference frames and post-processing
 contracts green. The source mark-ray and stateless fog adaptations are documented.
 The forward continuation selects lights per GPU model instance and world material batch:
@@ -187,7 +200,7 @@ corpses await a decision. The character chain and add-on classes are later lots.
 
 The [setup screen](Documentation/contracts/setup_screen_contracts.md) replaced the standalone launcher (removed; its documents are archived under `Documentation/history/launcher/`). Without `--data-dir`, `BLOOD2_DATA_DIR` or `blood2.local.ini` the game uses the playable choice stored in `setup.cfg`, else opens the screen: detected/added installations (retail or demo), the qualified Archive.org demo download and per-installation data-only REZ mods; Options > SETUP reopens it and a new choice restarts the game in-process. Preserve the explicit-configuration bypass, strict bounded `setup.cfg`, never-followed validated redirects, the platform HTTPS transports (libcurl on Linux/Windows, NSURLSession on Apple, HttpsURLConnection on Android; OpenSSL only on Linux), SHA-256 and bounded miniz checks, staging with atomic publication and `/sdcard/openblood2` with all-files access on Android.
 
-The [enhanced renderer](Documentation/contracts/enhanced_renderer_contracts.md) adds Options > Display `RENDERER [ORIGINAL/ENHANCED]`, enhanced `LIGHTING [STANDARD/HIGH]` and `NORMAL MAPS [GENERATED/OFF]`: physically based world faces and lit models, using `config/materials.json` classes, generated normal maps (in-memory content cache) and a per-world static-light grid. It has no probes and no baking. Keep the original set the untouched reference (byte-identical frames, `gpu.surface`). Sky, sprites, FX and PolyGrids stay on the original shaders, the diffuse term stays the original light, and manifest parsing stays bounded. Emission (5.2) adds a light-independent glow from the manifest's `emissive`/`emissive_threshold` classes and counts the DAT's fully bright faces per material; `surface_report` (5.5) feeds the inspector's "Enhanced materials" with the same normal-map rule as the renderer. Preserve emission only adding light, the original output on fully bright faces, the default class for SPR materials and the 32-byte material push. Regenerate all shader artifacts together (the sixty-four renderer and post-processing artifacts plus the eight shared line artifacts). Preferences are version 11 (through display/VR settings, then auto-run, mouse look and crosshair choices). M2/M3 scope is unchanged.
+The [enhanced renderer](Documentation/contracts/enhanced_renderer_contracts.md) adds Options > Display `RENDERER [ORIGINAL/ENHANCED]`, enhanced `LIGHTING [STANDARD/HIGH]` and `NORMAL MAPS [GENERATED/OFF]`: physically based world faces and lit models, using `config/materials.json` classes, generated normal maps (in-memory content cache) and a per-world static-light grid. It has no probes and no baking. Keep the original set the untouched reference (byte-identical frames, `gpu.surface`). Sky, sprites, FX and PolyGrids stay on the original shaders, the diffuse term stays the original light, and manifest parsing stays bounded. Emission (5.2) adds a light-independent glow from the manifest's `emissive`/`emissive_threshold` classes and counts the DAT's fully bright faces per material; `surface_report` (5.5) feeds the inspector's "Enhanced materials" with the same normal-map rule as the renderer. Preserve emission only adding light, the original output on fully bright faces, the default class for SPR materials and the 32-byte material push. Regenerate all shader artifacts together (the sixty-four renderer and post-processing artifacts plus the eight shared line artifacts). Preferences are version 12 (through display/VR settings, auto-run, mouse look and crosshair choices, then the field of view). M2/M3 scope is unchanged.
 
 [Post-processing](Documentation/contracts/post_processing_contracts.md) (M6) adds Options > Display `TONEMAP [OFF/NEUTRAL/FILMIC]`, `BLOOM [ON/OFF]`, `AMBIENT OCCLUSION [OFF/LOW/HIGH]` and `REFLECTIONS [OFF/LOW/HIGH]` for the enhanced renderer and `ANTI-ALIASING [OFF/FXAA/MSAA 2X/MSAA 4X]` for both, planned by `PostProcess` around the desktop scene pass. Preserve the direct scene pass (the original frame byte for byte) whenever no effect applies, the `-DAUX_TARGETS` glow (only enhanced emission; original shaders clear or attenuate it, its alpha the occlusion mask) and the R32F depth copy written by opaque non-sky pipelines (SDL_GPU cannot resolve MSAA depth), half-size GTAO with the depth-aware blur and gathered upsample (under 1 ms at 1080p on Apple M5) that never darkens emission, view models or translucent surfaces, a minimum-depth pyramid shared by GTAO (far taps) and SSR (Hi-Z traversal) whose levels never sample what they render, half-size SSR that replaces the environment light of the enhanced specular (`-DREFLECTION_TARGETS` weight and light, never added on top), NEUTRAL leaving everything below 0.76 linear unchanged, FXAA last on display values, the HUD/menus after every pass and XR without post-processing.
 

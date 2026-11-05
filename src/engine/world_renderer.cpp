@@ -20,7 +20,7 @@ namespace OpenBlood2
                                   .5 * std::sqrt(dx * dx + dy * dy + dz * dz));
         }
     } // namespace
-    ViewFrustum view_frustum(DVector eye, DRotation view, double aspect, double near, double far)
+    ViewFrustum view_frustum(DVector eye, DRotation view, double aspect, double near, double far, double view_scale)
     {
         return {eye,
                 rotate_vector({1, 0, 0}, view),
@@ -28,7 +28,8 @@ namespace OpenBlood2
                 rotate_vector({0, 0, 1}, view),
                 aspect,
                 near,
-                far};
+                far,
+                std::isfinite(view_scale) && view_scale > 0 && view_scale < 1 ? 1 / view_scale : 1};
     }
     ViewFrustum eye_frustum(DVector eye, DRotation view, const EyeProjection& p, double near, double far)
     {
@@ -54,7 +55,7 @@ namespace OpenBlood2
                    y - f.tan_down * z >= margin(f.tan_down) && f.tan_up * z - y >= margin(f.tan_up);
         }
         // Side planes x = +-h z and y = +-v z (horizontal_projection_scale's field).
-        const double h = 1.0 / horizontal_projection_scale(float(f.aspect)), v = h / f.aspect;
+        const double h = f.widen / horizontal_projection_scale(float(f.aspect)), v = h / f.aspect;
         const double side = radius * std::sqrt(1 + h * h), vertical = radius * std::sqrt(1 + v * v);
         return std::isfinite(radius) && z + radius >= f.near && z - radius <= f.far && h * z - x >= -side &&
                h * z + x >= -side && v * z - y >= -vertical && v * z + y >= -vertical;
@@ -171,8 +172,9 @@ namespace OpenBlood2
                 continue; // Only the enhanced renderer creates and uses them.
             const bool blend = kind == WorldPipeline::Alpha || kind == WorldPipeline::SkyAlpha ||
                                kind == WorldPipeline::SkinnedAlpha || kind == WorldPipeline::SurfaceAlpha ||
-                               kind == WorldPipeline::SkinnedSurfaceAlpha;
-            const bool sky = kind == WorldPipeline::Sky || kind == WorldPipeline::SkyAlpha;
+                               kind == WorldPipeline::SkinnedSurfaceAlpha || kind == WorldPipeline::SkySpriteAlpha;
+            const bool sky_model = kind == WorldPipeline::Sky || kind == WorldPipeline::SkyAlpha;
+            const bool sky = sky_model || kind == WorldPipeline::SkySprite || kind == WorldPipeline::SkySpriteAlpha;
             const bool caster = kind == WorldPipeline::ShadowCaster;
             const bool skin = kind == WorldPipeline::SkinnedOpaque || kind == WorldPipeline::SkinnedAlpha ||
                               kind == WorldPipeline::SkinnedSurfaceOpaque ||
@@ -223,7 +225,13 @@ namespace OpenBlood2
                                              : SDL_GPUVertexInputState{&buffer, 1, attributes, 5};
             create.primitive_type = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST;
             create.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
-            create.rasterizer_state.cull_mode = SDL_GPU_CULLMODE_NONE;
+            // Sky world models draw without depth, so their one-sided DAT faces need the original
+            // back-face culling (later LithTech draws sky world models with D3DCULL_CCW): the
+            // brushes are solid slabs/rings whose outward faces would otherwise paint over the
+            // inner ones (06_airship1's black Horizon backs). DAT polygons wind clockwise on
+            // screen when they face the viewer; ordinary passes keep the depth-resolved no-cull path.
+            create.rasterizer_state.cull_mode = sky_model ? SDL_GPU_CULLMODE_BACK : SDL_GPU_CULLMODE_NONE;
+            create.rasterizer_state.front_face = SDL_GPU_FRONTFACE_CLOCKWISE;
             create.rasterizer_state.enable_depth_clip = true;
             create.multisample_state.sample_count = caster ? SDL_GPU_SAMPLECOUNT_1 : samples;
             create.depth_stencil_state.enable_depth_test = !sky;
@@ -428,7 +436,8 @@ namespace OpenBlood2
     }
     bool WorldRenderer::validate(const WorldMesh& mesh, std::span<const WorldDraw> draws, DVector eye, DRotation view,
                                  WorldPass world_pass, double surface_time, const PointLight& light, bool letterbox,
-                                 bool close_view, std::string& error, const EyeProjection* eye_projection)
+                                 bool close_view, std::string& error, const EyeProjection* eye_projection,
+                                 float view_scale)
     {
         visible_.clear();
         alpha_order_.clear();
@@ -533,8 +542,8 @@ namespace OpenBlood2
             visible_.assign(draws.begin(), draws.end());
         else
         {
-            const auto frustum =
-                eye_projection ? eye_frustum(eye, view, *eye_projection) : view_frustum(eye, view, aspect);
+            const auto frustum = eye_projection ? eye_frustum(eye, view, *eye_projection)
+                                                : view_frustum(eye, view, aspect, world_near, world_far, view_scale);
             for (const auto& d : draws)
             {
                 if (in_frustum(mesh.ranges[d.range], d, frustum))
@@ -571,7 +580,7 @@ namespace OpenBlood2
             return false;
         }
         if (!validate(mesh, draws, eye, view, world_pass, surface_time, light, target.letterbox, close_view, error,
-                      target.eye))
+                      target.eye, target.view_scale))
             return false;
         encode(target, mesh, eye, view, world_pass, surface_time, light, close_view);
         return true;
@@ -698,6 +707,15 @@ namespace OpenBlood2
                 fragment.scene_color = {target.scene_color.x, target.scene_color.y, target.scene_color.z, 1};
                 if (target.effects && !close_view && !sky)
                     fragment.effects = target.effects->uniform;
+                else if (sky && !two_sided_sky && target.effects && target.effects->sky_fog_enabled)
+                {
+                    // SkyFog: the current fog colour over SkyFogNearZ..FarZ from the sky camera
+                    // (later LithTech d3d_DrawSkyObjects sets these fog distances for sky models).
+                    const auto& forward = target.effects->uniform.fog_forward_far;
+                    fragment.effects.fog_color = target.effects->uniform.fog_color;
+                    fragment.effects.fog_eye_near = {eye.x, eye.y, eye.z, target.effects->sky_fog[0]};
+                    fragment.effects.fog_forward_far = {forward[0], forward[1], forward[2], target.effects->sky_fog[1]};
+                }
 
                 fragment.modulation = {d.alpha, world_saturate_scale, receive ? 1.f : 0.f, 0};
                 fragment.position_radius = {light.position.x, light.position.y, light.position.z,
@@ -769,7 +787,7 @@ namespace OpenBlood2
                 {
                     if (sky)
                     {
-                        bind(pipelines_->get(WorldPipeline::Sky));
+                        bind(pipelines_->get(two_sided_sky ? WorldPipeline::SkySprite : WorldPipeline::Sky));
                         ++stats.sky_batches;
                     }
                     batch(r.first, r.count, 0, {}, 0);
@@ -782,7 +800,10 @@ namespace OpenBlood2
                         const auto& b = r.batches[index];
                         if (sky)
                         {
-                            bind(pipelines_->get(b.translucent ? WorldPipeline::SkyAlpha : WorldPipeline::Sky));
+                            bind(pipelines_->get(
+                                two_sided_sky
+                                    ? (b.translucent ? WorldPipeline::SkySpriteAlpha : WorldPipeline::SkySprite)
+                                    : (b.translucent ? WorldPipeline::SkyAlpha : WorldPipeline::Sky)));
                             batch(b.first, b.count, b.material, b.uv_rate, b.lightmap);
                             ++stats.sky_batches;
                         }

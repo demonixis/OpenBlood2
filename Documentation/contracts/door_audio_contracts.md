@@ -59,3 +59,9 @@ while inspection is hidden, in addition to original motion and rendering checks.
 The continuous train tests exercise actual USE/contact paths separately. NVIDIA
 and dummy-audio validation does not establish human listening or native Metal
 execution of this change.
+
+RotatingDoor stop sounds (0.5.2): original `RotatingDoor::Opening/Closing` first play the stop
+sound themselves (attached 3D one-shot, 100/1000, priority MISC_MEDIUM), then `SetOpen`/`SetClosed`
+play it again through `Door::StartSound` (500/1500). Both now overlap, as in the source (CityHub's
+park `seesaw`). The extra one-shot is not counted in the door's sound counters; a failure never
+changes the door state.

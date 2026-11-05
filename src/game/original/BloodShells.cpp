@@ -4,6 +4,7 @@
 #include "BloodShells.h"
 #include "ClientCrosshair.h"
 #include "MenuIds.h"
+#include "NewStatusBar.h"
 #include "SaveFields.h"
 #include "engine/collision.h"
 #include "engine/string_resources.h"
@@ -348,7 +349,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     next_item_requested = prev_item_requested = use_item_requested = false;
     grab_down = taunt_down = drop_weapon_requested = false;
     control_notice.clear();
-    chat_lines.clear();
+    m_MessageMgr.Clear(); // The new world's clock restarts; see original_hud_contracts.md.
     message_revision = 0;
     inventory_items = {};
     item_actions = item_sounds = item_voice = 0;
@@ -440,6 +441,8 @@ bool CBloodClientShell::LoadClientData(HMESSAGEREAD hMsg, std::string& error)
         objectives = {0, *title, *text}; // UpdateObjectives with the saved strings; no resource ID.
         objectives_resolved = true;
         objectives_error.clear();
+        ++objective_updates;
+        PlayInterfaceSound("Sounds\\Events\\bellding1.wav"); // UpdateObjectives' change sound.
     }
     // OnEnterWorld played silence; the client restarts music at the restored level.
     if (music_level != music.logical_level)
@@ -501,7 +504,7 @@ void CBloodClientShell::OnExitWorld()
     next_item_requested = prev_item_requested = use_item_requested = false;
     grab_down = taunt_down = drop_weapon_requested = false;
     control_notice.clear();
-    chat_lines.clear();
+    m_MessageMgr.Clear(); // The new world's clock restarts; see original_hud_contracts.md.
     message_revision = 0;
     inventory_items = {};
     item_actions = item_sounds = item_voice = 0;
@@ -531,13 +534,11 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
         return false;
     if (const auto* line = std::get_if<OpenBlood2::PlayerText>(&event))
     {
+        // SMSG_CONSOLEMESSAGE(_ALL): CSPrint2 into m_MessageMgr. The bounded local line keeps
+        // its 80-byte limit; the _ALL string sound (MSG_SOUND_STRING) is not played.
         if (line->text.size() > 80)
             return false;
-        if (chat_lines.size() == 4)
-            chat_lines.erase(chat_lines.begin());
-        chat_lines.push_back(line->text);
-        messages_until = client_view_.time + 5;
-        ++message_revision;
+        CSPrint(line->text);
         return true;
     }
 
@@ -674,7 +675,17 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
         physics = *value;
     }
     else if (const auto* value = std::get_if<OpenBlood2::PlayerStats>(&event))
-        return presentation_.deliver(client_, *value);
+    {
+        // PLAYERSTATS_AIRLEVEL is only present when m_fAirLevel changed (UpdateStats).
+        const bool air_changed = value->air != stats.air;
+        if (!presentation_.deliver(client_, *value))
+            return false;
+        if (air_changed)
+        {
+            ++air_updates;
+            SetPowerBarLevel(BARTAB_AIR, value->air);
+        }
+    }
     else if (const auto* value = std::get_if<OpenBlood2::InventoryItems>(&event))
         return presentation_.deliver(client_, *value);
     else if (const auto* value = std::get_if<OpenBlood2::CTFEvent>(&event))
@@ -687,6 +698,7 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
         ++boss_health_messages;
         // Original SMSG_BOSSHEALTH hides the bar at full health or zero.
         boss_health_visible = value->fraction > 0 && value->fraction < 1;
+        SetPowerBarLevel(BARTAB_BOSS, value->fraction);
     }
     else if (const auto* value = std::get_if<OpenBlood2::Conversation>(&event))
     {
@@ -711,6 +723,10 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
                 if (!objectives_resolved)
                     objectives_error = "Objective resource strings are missing or invalid";
             }
+            // UpdateObjectives: null strings reset the page silently; otherwise bellding1.wav.
+            ++objective_updates;
+            if (objectives_resolved)
+                PlayInterfaceSound("Sounds\\Events\\bellding1.wav");
         }
     }
     return true;
@@ -768,11 +784,40 @@ void CBloodClientShell::UpdateRollCredits(double seconds)
     if (m_Credits.IsInited())
         m_Credits.Update(frame);
 }
+bool CBloodClientShell::ObjectivesAvailable() const
+{
+    const auto mode = server_.GetVarValueFloat(server_.GetGameConVar("GAME_GAMETYPE"));
+    return mode == static_cast<float>(GAMETYPE_SINGLE) || mode == static_cast<float>(GAMETYPE_CUSTOM);
+}
+bool CBloodClientShell::PlayInterfaceSound(const char* resource)
+{
+    OpenBlood2::SoundRequest request;
+    request.resource = resource;
+    request.space = OpenBlood2::SoundSpace::Local;
+    request.priority = 1; // SOUNDPRIORITY_MISC_MEDIUM.
+    request.reverb_requested = false;
+    interface_sound_error.clear();
+    if (!player)
+    {
+        interface_sound_error = std::string("No local player for ") + resource;
+        return false;
+    }
+    const auto voice = server_.PlayLocalSound(player, request, interface_sound_error);
+    interface_sounds += voice != 0;
+    return voice != 0; // Presentation only: a failed sound never changes the page.
+}
+void CBloodClientShell::SetPowerBarLevel(DBYTE bar, float percent)
+{
+    if (!std::isfinite(percent) || percent <= 0.0f || percent >= 1.0f)
+        bar = BARTAB_NONE; // TurnOffPowerBar
+    power_bar.bar = bar;
+    power_bar.percent = bar ? percent : 0;
+    power_bar.time = float(server_.GetTime());
+    ++power_bar.requests;
+}
 bool CBloodClientShell::Update()
 {
     presentation_.sync_clock();
-    if (client_view_.time >= messages_until)
-        chat_lines.clear();
     if (client_view_.time >= control_notice_until)
         control_notice.clear();
 
@@ -1007,6 +1052,19 @@ bool CBloodClientShell::UpdateWeapons(CBloodServerShell& server, double seconds,
         const DVector& direction = weapon.left && left_hand_forward ? *left_hand_forward : forward;
         if (!weapon.Update(server_, server, client_, input, camera_position, direction, seconds, error))
             return false;
+        // GameWeapons.cpp CWeapProximityBomb/CWeapRemoteBomb/CWeapTimeBomb WS_FIRING:
+        // pShell->SetPowerBarLevel(fPercent), then the overhold CSPrint.
+        if (weapon.bomb_power >= 0)
+        {
+            ++throw_updates;
+            SetPowerBarLevel(BARTAB_THROW, weapon.bomb_power);
+        }
+        if (weapon.bomb_overholds != weapon.reported_overholds)
+        {
+            weapon.reported_overholds = weapon.bomb_overholds;
+            ++bomb_overholds;
+            CSPrint("Idiot! Let go next time!");
+        }
     }
     return true;
 }

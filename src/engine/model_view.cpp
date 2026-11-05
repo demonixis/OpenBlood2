@@ -107,6 +107,23 @@ namespace OpenBlood2
                 WorldMaterial next;
                 next.path = key;
                 read_texture_resource(resources, key, next.image, next.error);
+                // Thirty-five older mask-less retail skins (wood/flesh/stone gibs, casings, some
+                // pickups) carry palette byte 0 as alpha 0 throughout. The original draws models
+                // with these as plain opaque skins; a wholly transparent skin would make blended
+                // model passes (destruction debris, fading models) discard every texel.
+                if (next.error.empty() && !next.image.rgba.empty())
+                {
+                    bool invisible = true;
+                    for (std::size_t i = 3; i < next.image.rgba.size() && invisible; i += 4)
+                        invisible = next.image.rgba[i] == 0;
+                    if (invisible)
+                    {
+                        for (std::size_t i = 3; i < next.image.rgba.size(); i += 4)
+                            next.image.rgba[i] = 255;
+                        for (std::size_t i = 3; i < next.image.mip_rgba.size(); i += 4)
+                            next.image.mip_rgba[i] = 255;
+                    }
+                }
                 if (next.image.rgba.size() > 128 * 1024 * 1024 - mesh.texture_bytes)
                 {
                     return fail("Model texture memory budget exceeded");

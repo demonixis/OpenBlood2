@@ -96,24 +96,30 @@ int main(int argc, char** argv)
                     resources, error));
     std::vector<std::uint8_t> pixels;
     CHECK(render(runtime, renderer, scene, {}, {}, capture, pixels, error));
-    unsigned red = 0, green = 0, black = 0, transparent = 0, runs = 0;
+    // Repeat textures are sampled trilinearly (0.5.0), so texel colours blend into gradients:
+    // check the red, green, dark and see-through (clear 6,9,13) regions, two red runs and an
+    // exact repeat over the 150-pixel period instead of exact texel values.
+    unsigned red = 0, green = 0, black = 0, transparent = 0, runs = 0, repeat_mismatch = 0;
     bool previous = false;
+    auto at = [&](unsigned x) { return pixels.data() + (150 * 400 + x) * 4; };
     for (unsigned x = 51; x < 349; ++x)
     {
-        const auto* p = pixels.data() + (150 * 400 + x) * 4;
-        const bool is_red =
-            std::abs(int(p[0]) - 131) <= 2 && std::abs(int(p[1]) - 4) <= 2 && std::abs(int(p[2]) - 6) <= 2;
+        const auto* p = at(x);
+        const bool is_red = p[0] > 100 && p[1] < 20 && p[2] < 20;
         red += is_red;
         if (is_red && !previous)
             ++runs;
         previous = is_red;
-        green += p[1] > 60 && p[1] < 80 && p[0] < 10;
-        black += p[0] >= 2 && p[0] <= 4 && p[1] >= 3 && p[1] <= 5 && p[2] >= 5 && p[2] <= 8;
-        transparent += p[0] == 6 && p[1] == 9 && p[2] == 13;
+        green += p[1] > 60 && p[0] < 20;
+        black += p[0] <= 12 && p[1] <= 6 && p[2] <= 8;
+        transparent += std::abs(int(p[0]) - 6) <= 2 && std::abs(int(p[1]) - 9) <= 2 && std::abs(int(p[2]) - 13) <= 2;
+        if (x + 150 < 349)
+            for (int c = 0; c < 3; ++c)
+                repeat_mismatch += std::abs(int(p[c]) - int(at(x + 150)[c])) > 2;
     }
     std::cout << "Repeat/alpha scan: red=" << red << " green=" << green << " black=" << black
-              << " clear=" << transparent << " red runs=" << runs << "\n";
-    CHECK(red > 50 && green > 50 && black > 50 && transparent > 50 && runs == 2);
+              << " clear=" << transparent << " red runs=" << runs << " repeat mismatches=" << repeat_mismatch << "\n";
+    CHECK(red > 4 && green > 4 && black > 4 && transparent > 2 && runs == 2 && !repeat_mismatch);
     CHECK(capture.save((std::filesystem::path(argv[1]) / "polygrid-repeat-alpha.png").c_str()));
     if (argc == 3)
     {
@@ -139,8 +145,8 @@ int main(int argc, char** argv)
             CHECK(ink > 1000 && renderer.stats.alpha_batches > 0);
             CHECK(capture.save(
                 (std::filesystem::path(argv[1]) / ("cityhub-water-" + std::to_string(cycle) + ".png")).c_str()));
-            std::cout << "CityHub cycle " << cycle << " surface batches " << renderer.stats.alpha_batches << " changed pixels "
-                      << ink << "\n";
+            std::cout << "CityHub cycle " << cycle << " surface batches " << renderer.stats.alpha_batches
+                      << " changed pixels " << ink << "\n";
             auto prior = pixels;
             CHECK(g.step(.1) && update_polygrid_scene(g, scene, error) &&
                   render(runtime, renderer, scene, eye, camera, capture, pixels, error));

@@ -282,13 +282,19 @@ bool CObjectParticleFX::AddParticles(std::minstd_rand& random, std::size_t budge
     const auto delta = vector_subtract(last_position, position);
     const float distance = std::sqrt(vector_dot(delta, delta));
     const float samples = distance / (density * radius / 1000.f);
-    if (!std::isfinite(samples) || samples > 2048 || particles.size() > budget ||
-        std::size_t(samples) > budget - particles.size())
+    if (!std::isfinite(samples) || samples < 0)
     {
-        error = "Smoke-trail particle capacity exceeded";
+        error = "Invalid smoke-trail sample count";
         return false;
     }
-    const auto count = static_cast<unsigned>(samples);
+    // The original particle system has no fixed pool. The shared replacement bound keeps
+    // the first samples along this update's segment and counts the rest as dropped, so a
+    // burst of explosions thins its trails instead of ending play (tester issue #9).
+    const auto count = static_cast<unsigned>(std::min(samples, 1e9f));
+    const std::size_t limit = std::min(budget, recipe == 1 ? max_particle_capacity : std::size_t(2048));
+    const std::size_t room = particles.size() < limit ? limit - particles.size() : 0;
+    const auto kept = static_cast<unsigned>(std::min<std::size_t>({count, room, 2048}));
+    dropped += count - kept;
     // Source divides by zero here for short/stopped travel, but emits no particles.
     // Skip the unused division without manufacturing a sample or consuming RNG.
     if (!count)
@@ -304,8 +310,8 @@ bool CObjectParticleFX::AddParticles(std::minstd_rand& random, std::size_t budge
         return false;
     }
     forward = vector_scale(forward, 1 / length);
-    particles.reserve(particles.size() + count);
-    for (unsigned i = 0; i < count; ++i)
+    particles.reserve(particles.size() + kept);
+    for (unsigned i = 0; i < kept; ++i)
     {
         const float speed = draw(random, 20, recipe == 34 ? 40 : 50);
         const float ratio = draw(random, 0, 1); // One shared color ratio, not three channel draws.
@@ -316,7 +322,7 @@ bool CObjectParticleFX::AddParticles(std::minstd_rand& random, std::size_t budge
                                           : DVector{color, color, color}});
         start = vector_add(start, step);
     }
-    emitted += count;
+    emitted += kept;
     return true;
 }
 bool CObjectParticleFX::AddCylinderParticles(std::minstd_rand& random, std::size_t budget)
@@ -325,18 +331,18 @@ bool CObjectParticleFX::AddCylinderParticles(std::minstd_rand& random, std::size
     const auto delta = vector_subtract(last_object_position, position);
     const float length = std::sqrt(vector_dot(delta, delta)), magnitude = length * 2;
     const float samples = magnitude / (density * radius / 1000.f);
-    if (!std::isfinite(samples) || samples > 2048)
+    if (!std::isfinite(samples) || samples < 0)
     {
-        error = "Voodoo cylinder capacity exceeded";
+        error = "Invalid Voodoo cylinder sample count";
         return false;
     }
-    const auto copies = std::max(1u, static_cast<unsigned>(samples));
+    const auto copies = std::max(1u, static_cast<unsigned>(std::min(samples, 2048.f)));
     const auto count = copies * authored_count;
-    if (particles.size() > budget || count > budget - particles.size() || particles.size() + count > 2048)
-    {
-        error = "Voodoo particle burst capacity exceeded";
-        return false;
-    }
+    // Bounded replacement pool: keep the leading samples, count the rest as dropped.
+    const std::size_t limit = std::min<std::size_t>(budget, 2048);
+    const auto kept =
+        static_cast<unsigned>(std::min<std::size_t>(count, particles.size() < limit ? limit - particles.size() : 0));
+    dropped += count - kept;
     const auto forward = length > 1e-6f ? vector_scale(delta, 1 / length) : DVector{0, 0, 1};
     // Stable AlignRotation basis, including the vertical offset used by these recipes.
     DVector right{forward.z, 0, -forward.x};
@@ -344,10 +350,10 @@ bool CObjectParticleFX::AddCylinderParticles(std::minstd_rand& random, std::size
     right = right_length > 1e-6f ? vector_scale(right, 1 / right_length) : DVector{1, 0, 0};
     DVector offset{};
     const auto step = vector_scale(forward, magnitude / copies);
-    particles.reserve(particles.size() + count);
+    particles.reserve(particles.size() + kept);
     for (unsigned c = 0; c < copies; ++c)
     {
-        for (unsigned i = 0; i < authored_count; ++i)
+        for (unsigned i = 0; i < authored_count && c * authored_count + i < kept; ++i)
         {
             const auto previous_right = right;
             const float angle = draw(random, -std::numbers::pi_v<float>, std::numbers::pi_v<float>);
@@ -363,7 +369,7 @@ bool CObjectParticleFX::AddCylinderParticles(std::minstd_rand& random, std::size
         }
         offset = vector_add(offset, step);
     }
-    emitted += count;
+    emitted += kept;
     return true;
 }
 bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t budget)
@@ -374,23 +380,23 @@ bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t 
                            recipe == 31 || recipe == 32 || recipe == 33)
                               ? distance / (density * radius / 1000.f)
                               : 1.f;
-    if (!std::isfinite(samples) || samples > 2048)
+    if (!std::isfinite(samples) || samples < 0)
     {
-        error = "Object particle stream capacity exceeded";
+        error = "Invalid object particle sample count";
         return false;
     }
-    const unsigned copies = static_cast<unsigned>(samples), count = copies * authored_count;
-    if (particles.size() > budget || count > budget - particles.size() || particles.size() + count > 2048)
-    {
-        error = "Object particle burst capacity exceeded";
-        return false;
-    }
+    const unsigned copies = static_cast<unsigned>(std::min(samples, 2048.f)), count = copies * authored_count;
+    // Bounded replacement pool: keep the leading samples, count the rest as dropped.
+    const std::size_t limit = std::min<std::size_t>(budget, 2048);
+    const auto kept =
+        static_cast<unsigned>(std::min<std::size_t>(count, particles.size() < limit ? limit - particles.size() : 0));
+    dropped += count - kept;
     auto basis = source_rotation;
     if (!count)
         return true; // Source's unused zero-count division is skipped.
     const auto step = vector_scale(delta, 1.f / copies);
-    particles.reserve(particles.size() + count);
-    for (unsigned i = 0; i < count; ++i)
+    particles.reserve(particles.size() + kept);
+    for (unsigned i = 0; i < kept; ++i)
     {
         // Cache axes BEFORE rotating. The source uses the preceding right axis
         // for this particle, and carries the rotated basis into the next one.
@@ -434,7 +440,7 @@ bool CObjectParticleFX::AddShellParticles(std::minstd_rand& random, std::size_t 
                                  : draw(random, min_life, max_life),
                              color});
     }
-    emitted += count;
+    emitted += kept;
     return true;
 }
 bool CObjectParticleFX::Update(double now, const NodePose* owner, std::minstd_rand& random, std::size_t budget)

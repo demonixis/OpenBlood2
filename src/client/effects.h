@@ -118,6 +118,11 @@ namespace OpenBlood2
         std::vector<SceneEffectLight> lights;
         std::size_t fog_lights_unsupported = 0, shadow_lights_unshadowed = 0;
         EffectFog fog;
+        // World FarZ (truncated; 0 when unset or not positive) and the truncated SkyFog
+        // SkyFogNearZ/FarZ interval (`sky_fog` only when SkyFog is set and far > near).
+        float far_z = 0;
+        bool sky_fog = false;
+        float sky_fog_near = 0, sky_fog_far = 0;
         PointLight flashlight; // Dedicated light path, separate from ordinary effect-light budgets.
         std::vector<EffectFogVolume> volumes;
     };

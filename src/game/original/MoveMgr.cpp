@@ -11,6 +11,10 @@ namespace
                      strafe_right = 0x0100,
                      strafe_left = 0x0200; // Shared/SharedMovement.h
     constexpr float drag = 15.0f;          // Original g_fDragCoeff.
+    // Original MoveMgr ran once per client frame (~30 Hz on period hardware); the
+    // replacement integrates at 120 Hz. Rules whose result depends on that frame
+    // length use this period instead (as the blood-spurt emission cap does).
+    constexpr float original_frame = 1.0f / 30;
     DVector cross(DVector a, DVector b)
     {
         return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
@@ -55,6 +59,8 @@ void CMoveMgr::Term()
     m_fSwimVel = 175;
     m_fLadderVel = 400;
     m_fVelMagnitude = m_FrameTime = 0;
+    m_ContainerTime = m_fDryJumpTime = 0;
+    container_clock = 0;
     discarded_time = 0;
     updates = substeps = jumps = landings = jump_voice_requests = jump_voice_starts = 0;
     configured_ = positioned_ = false;
@@ -81,6 +87,8 @@ bool CMoveMgr::OnServerForcePos(const PlayerPosition& value)
     m_bBodyInLiquid = m_bBodyOnLadder = m_bBodyOnConveyor = m_bSwimmingOnSurface = m_bCanSwimJump = m_bSwimmingJump =
         false;
     m_bUseGravity = true;
+    m_fDryJumpTime = 0;
+    container_clock = 0;
     UpdateOnGround();
     return true;
 }
@@ -155,9 +163,12 @@ void CMoveMgr::UpdateOnConveyor(const ClientContainerInfo& info)
     if (info.hidden)
         return;
     m_bBodyOnConveyor = true;
+    // Braking and current share the original frame cadence: braking always exceeds
+    // the added current, so the conveyor speed settles at current * frame time.
     const auto speed = magnitude(body.velocity);
     if (speed > 1)
-        body.velocity = vector_scale(body.velocity, std::max(0.0f, speed - m_FrameTime * (m_fLadderVel / .2f)) / speed);
+        body.velocity =
+            vector_scale(body.velocity, std::max(0.0f, speed - m_ContainerTime * (m_fLadderVel / .2f)) / speed);
     // Unlike ladders, conveyors retain gravity and ordinary jump controls.
 }
 void CMoveMgr::UpdateMotion(float yaw, float pitch, CVoiceMgr& voices, int character, bool external_camera)
@@ -165,13 +176,17 @@ void CMoveMgr::UpdateMotion(float yaw, float pitch, CVoiceMgr& voices, int chara
     body.acceleration = {};
     m_bUseGravity = true;
     m_bBodyInLiquid = m_bBodyOnLadder = m_bBodyOnConveyor = false;
+    // A ground jump's original frame lifted the body out of shallow liquid before the
+    // next container update; keep the swim rules off for that frame's remainder.
+    m_fDryJumpTime = std::max(0.0f, m_fDryJumpTime - m_FrameTime);
     bool did_liquid = false, did_ladder = false, did_conveyor = false;
     for (std::size_t i = 0; i < containers.count; ++i)
     {
         const auto& info = containers.body[i];
         if (IsLiquid(info.code) && !did_liquid)
         {
-            UpdateInLiquid(info);
+            if (m_fDryJumpTime <= 0)
+                UpdateInLiquid(info);
             did_liquid = true;
         }
         else if (info.code == CC_LADDER && !did_ladder)
@@ -185,7 +200,8 @@ void CMoveMgr::UpdateMotion(float yaw, float pitch, CVoiceMgr& voices, int chara
             did_conveyor = true;
         }
         if (!info.hidden)
-            body.velocity = vector_add(body.velocity, vector_scale(info.current, m_FrameTime));
+            body.velocity = vector_add(
+                body.velocity, vector_scale(info.current, info.code == CC_CONVEYOR ? m_ContainerTime : m_FrameTime));
     }
     const bool head_liquid = IsLiquid(containers.head.code), in_liquid = head_liquid || m_bBodyInLiquid;
     const bool free_movement = head_liquid || m_bBodyOnLadder;
@@ -269,6 +285,7 @@ void CMoveMgr::UpdateMotion(float yaw, float pitch, CVoiceMgr& voices, int chara
             else if (m_bOnGround && !steep)
             {
                 body.velocity.y += physics.jump_speed * (m_bForcedCrouch ? .75f : 1.0f);
+                m_fDryJumpTime = original_frame;
                 // Original client VME_JUMP: only this ground branch, never swimming/ladder ascent.
                 ++jump_voice_requests;
                 jump_voice_starts += movement_.jump_voice(voices, character, external_camera);
@@ -367,6 +384,13 @@ bool CMoveMgr::Update(CBloodServerShell& shell, CVoiceMgr& voices, bool external
         int character = 0;
         if (!movement_.environment(shell, containers, character))
             return false;
+        container_clock += m_FrameTime;
+        m_ContainerTime = 0;
+        if (container_clock >= original_frame - 1e-6)
+        {
+            container_clock = std::max(0.0, container_clock - original_frame);
+            m_ContainerTime = original_frame;
+        }
         UpdateMotion(yaw, pitch, voices, character, external_camera);
         if (!MoveLocalSolidObject(shell))
             return false;

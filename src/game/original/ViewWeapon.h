@@ -42,10 +42,14 @@ class CViewWeapon
     OpenBlood2::AnimationTrack animation;
     WeaponState state = WS_HOLSTERED;
     std::string last_key, pending_sound;
-    bool sound_indexed = false; // Request only; audio output is not ported.
+    bool sound_indexed = false; // Whether the last SOUND_KEY resource exists (played locally for every weapon).
     std::uint64_t fire_keys = 0, shots = 0, binocular_refusals = 0;
     bool binoculars_active = false; // Client m_bBinocularsActive, set by the shell before Update.
     float bomb_start = 0, bomb_held = 0, bomb_speed = 1000;
+    // This update's WS_FIRING throw percent for the shell's power bar (-1: none), and the
+    // proximity/time-bomb overhold count the shell reports once each.
+    float bomb_power = -1;
+    std::uint64_t bomb_overholds = 0, reported_overholds = 0;
     DBYTE voodoo_hit = 0;
     FireResult last_result = FireResult::Invalid;
 

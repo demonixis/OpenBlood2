@@ -67,9 +67,10 @@ namespace OpenBlood2
             ImGui::TextWrapped("%s", fragments.update_error.c_str());
         for (const auto& fx : fragments.active)
         {
-            ImGui::Text("Fragment %llu / event %llu: elapsed %.3f, alpha %.3f, moving %s, impacts %llu",
+            ImGui::Text("Fragment %llu / event %llu: elapsed %.3f, alpha %.3f, moving %s, impacts %llu, embedded %llu",
                         (unsigned long long)fx.id, (unsigned long long)fx.event, fx.last_time - fx.start_time, fx.alpha,
-                        fx.moving ? "yes" : "resting", (unsigned long long)fx.impacts);
+                        fx.moving ? "yes" : "resting", (unsigned long long)fx.impacts,
+                        (unsigned long long)fx.embedded_hits);
             ImGui::Text("Position %.2f %.2f %.2f / velocity per update %.2f %.2f %.2f", fx.position.x, fx.position.y,
                         fx.position.z, fx.velocity.x, fx.velocity.y, fx.velocity.z);
             ImGui::Text("Normal %.2f %.2f %.2f / last query %d / polygon %u / hit object %s", fx.last_normal.x,
@@ -100,9 +101,14 @@ namespace OpenBlood2
                     ImGui::TextWrapped("%s", r.unavailable.c_str());
             }
         ImGui::Separator();
-        ImGui::Text("Fragment smoke trails: %zu systems / %zu particles / %llu started / %llu expired / %llu failed",
+        std::uint64_t dropped = fragments.trail_dropped;
+        for (const auto& t : fragments.trails)
+            dropped += t.dropped;
+        ImGui::Text("Fragment smoke trails: %zu systems / %zu particles / %llu started / %llu expired / %llu failed / "
+                    "%llu samples dropped at the pool bound",
                     fragments.trails.size(), fragments.trail_particles(), (unsigned long long)fragments.trail_started,
-                    (unsigned long long)fragments.trail_expired, (unsigned long long)fragments.trail_failed);
+                    (unsigned long long)fragments.trail_expired, (unsigned long long)fragments.trail_failed,
+                    (unsigned long long)dropped);
         for (const auto& t : fragments.trails)
         {
             ImGui::Text("Trail %llu / fragment %llu / %s / %zu particles / %llu emitted / deadline %.3f",

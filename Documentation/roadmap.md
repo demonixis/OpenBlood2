@@ -34,6 +34,12 @@ connects original wood, metal and glass fragments, their motion and impact sound
 The [class coverage inventory](contracts/class_coverage.md) distinguishes absent ports
 from replacement services. This does not expand milestone acceptance.
 
+The [2026-11-05 corrections](implementation/reports/tester_feedback_2026_11_05.md) (0.5.2)
+fix the CDM smoke-trail crash, sky culling/SkyFog/FarZ, interleaved GOTHRUWORLD doors,
+exploding-debris effects, chroma-keyed glass, underwater tint, conveyor/water-jump cadence,
+embedded trip lasers, view-weapon sound keys and the Gabriella spawn, and add an adjustable
+field of view.
+
 The [2026-10-28 corrections](implementation/reports/tester_feedback_2026_10_28.md) (0.5.1)
 stop NPCs freezing (and blocking saves) after damage-volume or self damage, domain-edge
 rays against moved world models and normal-less obstacles, and port the original F1
