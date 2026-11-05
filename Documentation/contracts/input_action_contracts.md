@@ -256,8 +256,11 @@ The original `CMenuControls` page is ported over the action layer; see the
   unassigned label. Replacement rows follow for actions the original
   menu did not list: Run Latch, Flashlight, Medkit, Binoculars, Night Goggles, The Eye, Third Person, then
   Restore Defaults.
-- **Rebindable actions** are the row actions. Menu, menu navigation, quick save/load and the
-  analog look axes keep their bindings.
+- **Rebindable actions** are the row actions. Menu, menu navigation, quick save/load, the
+  objectives toggle and the analog look axes keep their bindings. The `objectives` Interface
+  action is the original VK_TAB `ToggleObjectives` (single and custom games): Tab, no gamepad
+  default, never written to `controls.cfg`, so the file format and version are unchanged
+  (see the [HUD contracts](original_hud_contracts.md#objectives-page-tab)).
 - **Assigning** (original `HandleDeviceTrack`). Enter on a row shows "=" and waits for the next
   fresh down edge: a key, a mouse button (uncaptured too), a wheel tick, a gamepad button or a
   gamepad axis crossing ±0.5. The control first leaves every other rebindable action, then the

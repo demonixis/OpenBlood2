@@ -26,10 +26,8 @@ namespace OpenBlood2
         }
         return DE_NOTFOUND;
     }
-    bool ServerAdapter::GetClientResourceString(std::uint32_t id, std::string& value)
+    void ServerAdapter::load_client_strings()
     {
-        trace_service("GetClientResourceString");
-        value.clear();
         if (!client_strings_attempted)
         {
             client_strings_attempted = true;
@@ -42,6 +40,23 @@ namespace OpenBlood2
             else if (client_resources->read("cres.dll", bytes, client_strings_error))
                 read_string_resources(bytes, client_strings, client_strings_error);
         }
+    }
+    bool ServerAdapter::FindClientResourceString(std::uint32_t id, std::string& value)
+    {
+        trace_service("FindClientResourceString");
+        value.clear();
+        load_client_strings();
+        const auto it = client_strings.strings.find(id);
+        if (it == client_strings.strings.end())
+            return false;
+        value = it->second;
+        return true;
+    }
+    bool ServerAdapter::GetClientResourceString(std::uint32_t id, std::string& value)
+    {
+        trace_service("GetClientResourceString");
+        value.clear();
+        load_client_strings();
         auto it = client_strings.strings.find(id);
         if (it == client_strings.strings.end())
         {

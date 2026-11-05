@@ -75,6 +75,7 @@ namespace OpenBlood2
         MouseAim,
         Crosshair,
         ThirdPerson,
+        Objectives,
         Count
     };
     inline constexpr std::size_t input_action_count = std::size_t(InputAction::Count);
@@ -156,6 +157,7 @@ namespace OpenBlood2
         {"mouse_aim", InputActionKind::Hold},
         {"crosshair", InputActionKind::Command},
         {"third_person", InputActionKind::Command},
+        {"objectives", InputActionKind::Interface},
     }};
 
     constexpr const InputActionInfo& info(InputAction action)
@@ -366,6 +368,8 @@ namespace OpenBlood2
             key(SDL_SCANCODE_KP_ENTER, InputAction::MenuAccept);
             key(SDL_SCANCODE_F5, InputAction::QuickSave);
             key(SDL_SCANCODE_F6, InputAction::QuickLoad);
+            // Original OnKeyDown VK_TAB (CMenuControls ignores Tab: fixed, never in controls.cfg).
+            key(SDL_SCANCODE_TAB, InputAction::Objectives);
             // Original defaults.cfg for the commands added with the gamepad layout:
             // ' / ; next/previous weapon, [ / ] inventory left/right, Enter use inventory.
             key(SDL_SCANCODE_APOSTROPHE, InputAction::NextWeapon);

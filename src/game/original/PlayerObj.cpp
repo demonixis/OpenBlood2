@@ -483,6 +483,7 @@ bool CPlayerObj::UpdateStats(bool force)
     OpenBlood2::PlayerStats value{m_damage.m_fHitPoints, m_damage.m_fArmorPoints, m_InventoryMgr.GetAmmoCount(1)};
     value.max_health = m_damage.m_fMaxHitPoints;
     value.max_armor = m_damage.m_fMaxArmorPoints;
+    value.air = std::clamp(m_fAirLevel / 100.0f, 0.0f, 1.0f); // PLAYERSTATS_AIRLEVEL: m_fAirLevel / MAX_AIR_LEVEL.
     // Original UpdateStats current primary/alternate ammo; never substitute the bullet pool.
     value.weapon_slot = m_InventoryMgr.m_nCurWeaponSlot;
     if (const auto* w = m_InventoryMgr.CurrentWeapon())

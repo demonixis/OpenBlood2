@@ -34,6 +34,9 @@ namespace OpenBlood2
         bool quick_save = false, quick_load = false;
         // Original OnKeyDown VK_F1 without Shift: CNewStatusBar::ToggleWeapons, consumed by the HUD.
         bool weapon_tabs = false;
+        // Original OnKeyDown VK_TAB: CNewStatusBar::ToggleObjectives (single/custom games; the
+        // application checks the game type), consumed by the HUD.
+        bool objectives = false;
         std::vector<int> credit_keys; // Original VK codes for CCredits::HandleInput.
         static int credits_vk(SDL_Scancode code)
         {
@@ -377,6 +380,8 @@ namespace OpenBlood2
             if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.scancode == SDL_SCANCODE_F1 && player &&
                 !(e.key.mod & SDL_KMOD_SHIFT))
                 weapon_tabs = true;
+            if (player && press(InputAction::Objectives))
+                objectives = true;
             // Diagnostic control shortcuts do not change interactive ownership.
             if ((e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_KEY_UP) &&
                 (e.key.scancode == SDL_SCANCODE_F1 || e.key.scancode == SDL_SCANCODE_F2 ||

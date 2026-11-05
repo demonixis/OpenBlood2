@@ -212,8 +212,8 @@ namespace
               !trigger->last_voice && trigger->sound_starts == 0 && trigger->sound_error.empty());
         CHECK(send("UNLOCK", player->m_hObject) && !trigger->locked && trigger->console_feedback == 2 &&
               !trigger->last_voice);
-        CHECK(g->pump_player_messages(error) && g->client_shell.chat_lines.size() >= 2);
-        const auto& lines = g->client_shell.chat_lines;
+        CHECK(g->pump_player_messages(error) && g->client_shell.m_MessageMgr.lines().size() >= 2);
+        const auto lines = g->client_shell.m_MessageMgr.lines();
         CHECK(lines[lines.size() - 2] == locked_text && lines.back() == unlocked_text);
         std::cout << "Chosen lock feedback: \"" << locked_text << "\" / \"" << unlocked_text << "\"\n";
         CHECK(g->objects.remove(lock) && g->objects.finish_frame());

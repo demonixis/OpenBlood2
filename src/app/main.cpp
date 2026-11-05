@@ -934,6 +934,10 @@ namespace
             hud_values.item_messages = game->client_shell.inventory_item_messages;
             hud_values.item_shows = game->client_shell.inventory_show_requests;
             hud_values.time = float(game->objects.time());
+            OpenBlood2::hud_panels(hud_values, game->client_shell);
+            if (game->client_shell.m_bInWorld)
+                OpenBlood2::draw_messages(game->client_shell.m_MessageMgr, hud_values.time, nullptr,
+                                          game->client_shell.control_notice);
             if (!hud.draw(hud_values, game->resources, error))
             {
                 spdlog::error("Original HUD: {}", error);

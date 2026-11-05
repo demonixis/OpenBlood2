@@ -1,6 +1,7 @@
 #pragma once
 #include "CommLink.h"
 #include "Credits.h"
+#include "MessageMgr.h"
 #include "MoveMgr.h"
 #include "Music.h"
 #include "PathMgr.h"
@@ -94,6 +95,10 @@ class CBloodClientShell
                                OpenBlood2::MusicCatalog& catalog, OpenBlood2::AudioMixer& audio)
         : voice_manager(server), resources_(resources), server_(server), music_catalog_(catalog), audio_(audio)
     {
+        // OnEngineInitialized: m_MessageMgr.Init/Enable(DTRUE), then SetMaxMessages(6) on the
+        // normal (not lobby-launched) start.
+        m_MessageMgr.Enable(true);
+        m_MessageMgr.SetMaxMessages(6);
     }
     bool StartNewWorld(const char*, OpenBlood2::WorldMessage&);
     bool OnEnterWorld(HCLIENT, bool restored = false);
@@ -123,9 +128,28 @@ class CBloodClientShell
     bool UpdateUse(CBloodServerShell&);
     bool grab_down = false, taunt_down = false, drop_weapon_requested = false;
     std::string control_notice;
-    std::vector<std::string> chat_lines; // Bounded local console-message history.
+    // Original CMessageMgr lines (CSPrint/CSPrint2): console messages, pickup replies and
+    // client notices. The application draws them; Draw expires them.
+    CMessageMgr m_MessageMgr;
+    void CSPrint(std::string_view text)
+    {
+        m_MessageMgr.AddLine(text, float(server_.GetTime()));
+        ++message_revision;
+    }
     std::uint64_t message_revision = 0;
-    double messages_until = 0, control_notice_until = 0;
+    double control_notice_until = 0;
+    // Original CNewStatusBar SetPowerBarLevel/TurnOffPowerBar calls (PLAYERSTATS_AIRLEVEL, the
+    // bombs' CBloodClientShell::SetPowerBarLevel, SMSG_BOSSHEALTH; no server sends the unused
+    // SMSG_THROWDISTANCE): the latest request with its client time. bar 0 is TurnOffPowerBar.
+    struct PowerBarRequest
+    {
+        DBYTE bar = 0;
+        float percent = 0, time = 0;
+        std::uint64_t requests = 0;
+    } power_bar;
+    // Shell branch: percent <= 0 or >= 1 turns the bar off, otherwise SetPowerBarLevel.
+    void SetPowerBarLevel(DBYTE bar, float percent);
+    std::uint64_t air_updates = 0, throw_updates = 0, bomb_overholds = 0;
     void SetControlNotice(std::string text)
     {
         control_notice = std::move(text);
@@ -242,6 +266,17 @@ class CBloodClientShell
     std::string objectives_error;
     std::uint64_t objective_messages = 0;
     bool objectives_resolved = false;
+    // Each original CNewStatusBar::UpdateObjectives call (SMSG_OBJECTIVES and LoadClientData),
+    // monotonic: the status bar keeps the last page across levels. `objectives_resolved` false
+    // is the null-string reset.
+    std::uint64_t objective_updates = 0;
+    // GetGameType() single or custom: SMSG_OBJECTIVES and the Tab toggle (OnKeyDown).
+    bool ObjectivesAvailable() const;
+    // Original PLAYSOUND_LOCAL|PLAYSOUND_FILESTREAM, SOUNDPRIORITY_MISC_MEDIUM interface sounds
+    // (UpdateObjectives bellding1.wav, ToggleObjectives missionobj.wav). Whole-clip playback.
+    bool PlayInterfaceSound(const char* resource);
+    std::uint64_t interface_sounds = 0;
+    std::string interface_sound_error;
 
   private:
     bool InitSinglePlayer(CBloodServerShell&);
