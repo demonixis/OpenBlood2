@@ -120,6 +120,10 @@ namespace OpenBlood2
         {
             return inbox_.hud();
         }
+        const NetworkPlayerEvents& players() const
+        {
+            return inbox_;
+        }
         void take_events(std::vector<Net::PrivateEvent>& events)
         {
             inbox_.take(events);

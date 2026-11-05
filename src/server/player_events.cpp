@@ -4,6 +4,24 @@
 
 namespace OpenBlood2
 {
+    void ServerSession::publish_roster(std::uint64_t excluded)
+    {
+        Net::PlayerRoster roster;
+        for (const auto& p : players_)
+        {
+            if (p.id == excluded)
+                continue;
+            const auto* original = game_.server_shell.Player(p.client);
+            const auto* name = original ? game_.server.GetStringData(original->GetPlayerName()) : nullptr;
+            roster.players.push_back({p.id, p.object, name ? name : "", original ? original->m_nCharacter : DBYTE(0),
+                                      original ? original->m_Frags : 0});
+        }
+        for (auto& p : players_)
+            if (p.id != excluded && !p.roster_failed && queue_private(p, p.object, roster) != DE_OK)
+                // A slow recipient must disconnect rather than retain a silently
+                // incomplete roster. Its departure must still release gameplay.
+                p.roster_failed = true;
+    }
     DRESULT ServerSession::capture_event(HCLIENT client, const PlayerEvent& value)
     {
         auto found = std::find_if(players_.begin(), players_.end(), [&](const auto& p) { return p.client == client; });
@@ -92,6 +110,11 @@ namespace OpenBlood2
         if (found == players_.end())
         {
             error = "Private event recipient is unavailable";
+            return false;
+        }
+        if (found->roster_failed)
+        {
+            error = "Reliable player roster publication failed";
             return false;
         }
         out.clear();

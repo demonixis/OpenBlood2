@@ -62,7 +62,8 @@ namespace
             WeaponLoadout{123, 1, 2, {1, 1}, {50, 50}, {50, 50}, true, true, true, false, {1, 1}},
             WonkyVision{15, true},
             FinishHimVoice{65535, 3, 0},
-            FragEvent{{2, 3}, {4, 5}, -7, 65535}};
+            FragEvent{{2, 3}, {4, 5}, -7, 65535},
+            PlayerRoster{{{8, {9, 10}, "Caleb %s", 0, -7}, {15, {12, 13}, "Ophelia", 2, 10}}}};
         CHECK(values.size() == std::variant_size_v<PrivateValue>);
         std::mt19937 random(0xB2E7);
         for (std::size_t index = 0; index < values.size(); ++index)
@@ -70,7 +71,7 @@ namespace
             PrivateEvent value{{7, 8, {9, 10}}, 11, 12, values[index]};
             std::vector<std::uint8_t> bytes, again;
             CHECK(encode_private(value, bytes) && is_private_packet(bytes) && bytes.size() <= private_packet_limit);
-            const std::vector<std::uint8_t> header{0x42, 0x32, 0x50, 0x45, 13, 0, std::uint8_t(index + 1)};
+            const std::vector<std::uint8_t> header{0x42, 0x32, 0x50, 0x45, 15, 0, std::uint8_t(index + 1)};
             CHECK(std::equal(header.begin(), header.end(), bytes.begin()));
             PrivateEvent decoded;
             CHECK(decode_private(bytes, decoded) == DecodePrivate::Ok && encode_private(decoded, again) &&
@@ -134,6 +135,100 @@ namespace
         CHECK(!valid_private(value));
         return true;
     }
+    bool roster()
+    {
+        const Joined owner{7, 1, {0, 1}};
+        PlayerRoster state{{{1, owner.object, "Caleb", 0, 0}, {2, {1, 1}, "Ophelia %s", 2, -1}}};
+        PrivateEvent event{owner, 1, 0, state};
+        NetworkPlayerEvents inbox;
+        std::string error;
+        CHECK(inbox.begin(owner));
+        CHECK(inbox.receive(event, error) == NetworkPlayerEvents::Reception::Applied);
+        CHECK(inbox.roster() == state.players && inbox.player({1, 1})->name == "Ophelia %s");
+        ++event.sequence;
+        event.value = FragEvent{{0, 1}, {1, 1}, 0, 0};
+        CHECK(inbox.receive(event, error) == NetworkPlayerEvents::Reception::Applied &&
+              inbox.player({1, 1})->frags == 0);
+        CHECK(inbox.receive(event, error) == NetworkPlayerEvents::Reception::Ignored &&
+              inbox.player({1, 1})->frags == 0);
+        ++event.sequence;
+        event.value = FragEvent{{1, 1}, {1, 1}, -1, 0};
+        CHECK(inbox.receive(event, error) == NetworkPlayerEvents::Reception::Applied &&
+              inbox.player({1, 1})->frags == -1);
+        ++event.sequence;
+        state.players.pop_back();
+        event.value = state;
+        CHECK(inbox.receive(event, error) == NetworkPlayerEvents::Reception::Applied && !inbox.player({1, 1}));
+        ++event.sequence;
+        state.players.push_back({2, {1, 1}, "Revived old connection", 2, 0});
+        event.value = state;
+        CHECK(inbox.receive(event, error) == NetworkPlayerEvents::Reception::Refused && inbox.roster().size() == 1);
+        state.players.back().player = 3;
+        state.players.back().object.generation = 2;
+        event.value = state;
+        CHECK(inbox.receive(event, error) == NetworkPlayerEvents::Reception::Applied && !inbox.player({1, 1}));
+        const auto saved = inbox.roster();
+        ++event.sequence;
+        state.players[0].object.generation = 2;
+        event.value = state;
+        CHECK(inbox.receive(event, error) == NetworkPlayerEvents::Reception::Refused && inbox.roster() == saved);
+        state.players.erase(state.players.begin());
+        event.value = state;
+        CHECK(inbox.receive(event, error) == NetworkPlayerEvents::Reception::Refused && inbox.roster() == saved);
+        event.owner.world = 8;
+        CHECK(inbox.receive(event, error) == NetworkPlayerEvents::Reception::Ignored);
+        CHECK(inbox.begin({8, 4, {0, 2}}) && inbox.roster().empty());
+
+        state.players.clear();
+        for (unsigned i = 0; i < 16; ++i)
+            state.players.push_back({i + 1, {i, 1}, std::string(100, 'x'), DBYTE(i % 4), i % 2 ? -1000000 : 1000000});
+        event = {owner, 1, 0, state};
+        std::vector<std::uint8_t> bytes, unchanged;
+        CHECK(encode_private(event, bytes) && bytes.size() == 2016 && bytes.size() <= private_packet_limit);
+        PrivateEvent decoded;
+        CHECK(decode_private(bytes, decoded) == DecodePrivate::Ok && std::get<PlayerRoster>(decoded.value) == state);
+        for (std::size_t i = 0; i < bytes.size(); ++i)
+        {
+            CHECK(decode_private(std::span(bytes).first(i), decoded) == DecodePrivate::Malformed);
+            CHECK(encode_private(decoded, unchanged) && unchanged == bytes);
+        }
+        for (const auto count : {0, 17, 255})
+        {
+            auto corrupt = bytes;
+            corrupt[47] = std::uint8_t(count);
+            CHECK(decode_private(corrupt, decoded) == DecodePrivate::Malformed);
+        }
+        const auto invalid = [&](PlayerRoster bad)
+        {
+            event.value = std::move(bad);
+            return !valid_private(event) && !encode_private(event, unchanged);
+        };
+        auto bad = state;
+        bad.players.back().name += 'x';
+        CHECK(invalid(bad));
+        bad = state;
+        bad.players[0].name = "bad\nname";
+        CHECK(invalid(bad));
+        bad = state;
+        bad.players[0].character = 4;
+        CHECK(invalid(bad));
+        bad = state;
+        bad.players[0].frags = -1000001;
+        CHECK(invalid(bad));
+        bad = state;
+        bad.players[1].player = 1;
+        CHECK(invalid(bad));
+        bad = state;
+        bad.players[1].object = {0, 2};
+        CHECK(invalid(bad));
+        bad = state;
+        bad.players[1].object.generation = 0;
+        CHECK(invalid(bad));
+        bad = state;
+        bad.players.push_back({17, {16, 1}, "overflow", 0, 0});
+        CHECK(invalid(bad));
+        return true;
+    }
     bool receiver()
     {
         NetworkPlayerEvents a, b;
@@ -187,8 +282,8 @@ namespace
 } // namespace
 int main()
 {
-    if (!codec() || !receiver())
+    if (!codec() || !receiver() || !roster())
         return 1;
-    std::cout << "25 private event tags: canonical LE bytes, every truncation, 37500 mutations, addressed HUD/inbox "
-                 "bounds passed\n";
+    std::cout << "26 private event tags: canonical LE bytes, every truncation, 39000 mutations, addressed HUD/inbox "
+                 "bounds; atomic 16-player/2016-byte roster, scores, stale identity and generations passed\n";
 }

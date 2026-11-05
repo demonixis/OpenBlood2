@@ -36,6 +36,22 @@ namespace OpenBlood2::Net
         int killer_frags = 0;
         std::uint16_t index = 0;
     };
+    struct RosterPlayer
+    {
+        std::uint64_t player = 0;
+        ObjectId object;
+        std::string name;
+        DBYTE character = 0;
+        int frags = 0;
+        bool operator==(const RosterPlayer&) const = default;
+    };
+    struct PlayerRoster
+    {
+        // Admission order; a complete, bounded replacement. Team assignment is
+        // separate from this Bloodbath roster, as is rendered scoreboard order.
+        std::vector<RosterPlayer> players;
+        bool operator==(const PlayerRoster&) const = default;
+    };
     struct CameraState
     {
         std::uint64_t force_revision = 0;
@@ -61,7 +77,7 @@ namespace OpenBlood2::Net
         std::variant<BloodbathStart, PlayerRotation, PlayerStats, MissionObjectives, WorldExit, BossHealth,
                      Conversation, InventoryAction, ScreenFade, VoiceEvent, VoiceStop, PlayerDead, MusicCommand,
                      ZoomView, EyeEvent, AttachEvent, OrbEvent, FlagEvent, InventoryItems, PlayerText, CameraState,
-                     WeaponLoadout, WonkyVision, FinishHimVoice, FragEvent>;
+                     WeaponLoadout, WonkyVision, FinishHimVoice, FragEvent, PlayerRoster>;
     struct PrivateEvent
     {
         Joined owner;

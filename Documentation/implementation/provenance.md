@@ -1,5 +1,11 @@
 # Source and Dependency Provenance
 
+The M9 [roster lot](reports/m9_roster.md) takes original AddPlayer/RemovePlayer
+and frag ordering into a bounded protocol-15 client roster. Names, characters and
+scores come from initialized original players; no rule, RNG or movement changes.
+See the [source ledger](sources/m9_roster_sources.json). Team/scoreboard rendering
+and original announcement consumers remain separate.
+
 The M9 [weapon sound lot](reports/m9_weapon_sounds.md) connects the original
 ViewWeapon model-key actions and PlayerObj per-player loop/stop rules through
 server-validated animation timelines. Existing solo shotgun audio stays local.

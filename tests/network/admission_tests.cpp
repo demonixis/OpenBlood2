@@ -395,8 +395,15 @@ namespace
         for (unsigned i = 0; i < 16; ++i)
         {
             CHECK(!f.replicas[i].world().get(old.object));
-            for (const auto& player : f.joined)
+            CHECK(f.inboxes[i].roster().size() == 16 && !f.inboxes[i].player(old.object));
+            for (unsigned j = 0; j < 16; ++j)
+            {
+                const auto& player = f.joined[j];
                 CHECK(f.replicas[i].world().get(player.object));
+                const auto* row = f.inboxes[i].player(player.object);
+                CHECK(row && row->player == player.player && row->name == "Player " + std::to_string(j) &&
+                      row->frags == 0);
+            }
         }
         CHECK(f.server.close());
         CHECK(f.session.player_count() == 0 && f.session.game().server.client_count() == 0);

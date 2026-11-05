@@ -123,6 +123,13 @@ namespace OpenBlood2
         const auto id = record->id;
         players_.back().object = id;
         player->m_damage.replicate_velocity = true;
+        publish_roster();
+        if (players_.back().roster_failed)
+        {
+            error = "Cannot publish admitted player roster";
+            leave(connection);
+            return false;
+        }
         joined = {world_id_, connection, id};
         return true;
     }
@@ -160,6 +167,7 @@ namespace OpenBlood2
         if (found == players_.end() || game_.objects.busy())
             return false;
         const auto client = found->client;
+        publish_roster(player); // Original removal precedes player/flag destruction.
         game_.server_shell.OnClientExitWorld(client);
         if (!game_.objects.finish_frame() || !game_.server.disconnect_client(client))
             return false;

@@ -30,6 +30,7 @@
 | [Remote logical audio](implementation/reports/m9_network_audio.md) | Reliable sound starts/stops, private delivery, late loops and independent client playback. |
 | [Independent client speech](implementation/reports/m9_client_speech.md) | Original VoiceMgr/CommLink services, actual private playback and shared bounded audio. |
 | [Validated weapon sounds](implementation/reports/m9_weapon_sounds.md) | Original animation one-shots/loops/stops, life checks and independent remote playback. |
+| [Reliable player roster](implementation/reports/m9_roster.md) | Independent names/characters/frags, late arrivals, departure and reconnect identity. |
 | [Independent scene inputs](implementation/reports/m9_scene_inputs.md) | Server-free renderer inputs, original weapon visuals and world-owned GPU presentation. |
 | [Network camera state](implementation/reports/m9_camera_transport.md) | Reliable selection, replica/predicted views and authoritative camera movement/look gates. |
 | [Private player events](implementation/reports/m9_private_events.md) | Reliable pointer-free event delivery, independent HUD inbox and corrected broadcasts. |

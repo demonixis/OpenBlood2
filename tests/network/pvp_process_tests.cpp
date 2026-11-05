@@ -174,6 +174,12 @@ namespace
                 {
                     CHECK(frag->killer_frags == 1 && frag->victim == (victim ? client.joined().object : other) &&
                           frag->killer == (victim ? other : client.joined().object));
+                    const auto* killer = client.players().player(frag->killer);
+                    const auto* killed = client.players().player(frag->victim);
+                    CHECK(killer && killed && killer->name == "PvP attacker" && killed->name == "PvP victim" &&
+                          killer->frags == 1 && killed->frags == 0 &&
+                          client.players().roster().size() == (hosted ? 3 : 2));
+                    CHECK(killer->character == (hosted ? 1 : 0) && killed->character == (hosted ? 2 : 0));
                     ++frags;
                     std::cout << "Frag received: killer=" << frag->killer.slot << " victim=" << frag->victim.slot
                               << '\n'

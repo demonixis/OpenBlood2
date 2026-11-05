@@ -1,0 +1,68 @@
+{
+  "scope": "Bloodbath player identities, reliable client roster and authoritative frag scores",
+  "baseline": "07d60ab1d97e035bfc175bbf6ca94fcd601b9ee2",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "07d60ab1d97e035bfc175bbf6ca94fcd601b9ee2",
+      "path": "src/server/session.cpp",
+      "sha256": "c13d67903a492c060db08b6b6efb8a5d35fb2e47e27eb2872b19d9a4ec36ab3d"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "07d60ab1d97e035bfc175bbf6ca94fcd601b9ee2",
+      "path": "src/server/player_events.cpp",
+      "sha256": "f7a1096bf1c96825feb86ca3ef0486427d5b29e2873bc4043e6e4bc62745f0dd"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "07d60ab1d97e035bfc175bbf6ca94fcd601b9ee2",
+      "path": "src/net/player_events.cpp",
+      "sha256": "44e1858c469533399b41e5fbce36c344d4c8e24a985e6b44fc79ba029ad1e395"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "07d60ab1d97e035bfc175bbf6ca94fcd601b9ee2",
+      "path": "src/client/network_player_events.cpp",
+      "sha256": "94f219194c0dcf827a583da7485105e5132b541cf8b5c9f8f0989828a10a68e3"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "07d60ab1d97e035bfc175bbf6ca94fcd601b9ee2",
+      "path": "src/game/original/PlayerDeath.cpp",
+      "sha256": "adaf90a6aab53771c9b7f68eedcda43136e7d7ed75380433c42e9e3e40ae9843"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.h",
+      "sha256": "fb92d0a74b30d2a13b0589a2e4f90658a366cc2163e1fe37d446b2b50ed1da4a"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/FragInfo.cpp",
+      "sha256": "bae0a3db7388d5209753df0e3f64c008cb3d977cb988e1d8b6443a3bb073282a"
+    }
+  ],
+  "adaptations": [
+    "Original initialization/name/character/frag values, original GetPlayerName accessor, no new rules or RNG draws",
+    "One complete admission-ordered snapshot replaces original add/remove packets; original roster/frag ordering retained",
+    "Protocol 15 tag 26; at most 16 rows and 100-byte names, maximum 2016 bytes, within existing private message bounds",
+    "Atomic client replacement and immutable admission identity; retired connection IDs cannot reappear, exact object generations qualify score lookup",
+    "Unpublishable roster marks only its recipient for disconnect; departed gameplay bodies still release",
+    "Team metadata, original sorted scoreboard and join/leave/frag announcement presentation remain separate"
+  ]
+}

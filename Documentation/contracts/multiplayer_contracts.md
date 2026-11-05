@@ -1216,3 +1216,34 @@ Do not gate draw/reload sounds as fire attempts or run a second weapon/movement
 integration. Source sound failure is diagnostic and cannot undo a shot. Preserve
 the solo shotgun-only local one-shot, including its separator normalization and
 unchanged clock/ownership. Other solo key playback remains outside this lot.
+
+## Reliable Bloodbath player roster
+
+The [roster lot](../implementation/reports/m9_roster.md) adds protocol-15 private
+tag 26, a complete admission-ordered list of connection IDs, generation-qualified
+objects, original names, characters and authoritative frags. The maximum 16 rows
+with 100-byte names encode into 2,016 bytes, within the unchanged 2,048-byte
+private-packet budget. Reject empty/oversized lists, duplicate or unsorted IDs,
+duplicate object slots, bad generations, names, characters and score bounds before
+mutation. Retain original admission name validation; names are data, never formats.
+
+Publish after successful profile initialization and before departed player/flag
+destruction. Every current recipient receives the same full state; a late joiner
+therefore gets current scores. The existing reliable private-event sequence
+orders roster changes and original FragEvent scores. Absolute frag assignment
+does not replay damage or rerun source rules. No simulation callback or server
+pointer reaches the client roster. Team assignment and rendered sort order remain
+separate from this Bloodbath data boundary.
+
+The client validates all rows before replacing any, requires its own matching
+identity, and disallows changes to an admitted name/character/object. Retired
+connection IDs cannot reappear; reconnect is a higher connection ID and a fresh
+object generation. Duplicate/stale world or recipient events follow the existing
+inbox gates. An event's exact object generation selects its score row. Clearing
+the inbox for a new world clears the roster and admission high-water mark.
+
+A full server queue must never silently omit a roster transition or prevent
+departed gameplay cleanup. Mark the affected recipient as failed; its next
+private-event drain causes the existing endpoint rejection/disconnect path.
+Other recipients continue. The data are exposed through the independent client;
+scoreboard rendering and original join/leave/frag text/audio consumers follow.

@@ -1,5 +1,6 @@
 #include "net/player_events.h"
 #include "net/codec.h"
+#include "net/transport.h"
 #include <algorithm>
 #include <type_traits>
 
@@ -133,6 +134,26 @@ namespace OpenBlood2::Net
                 else if constexpr (std::is_same_v<T, FragEvent>)
                     return object(v.victim, true) && object(v.killer, true) && v.killer_frags >= -1000000 &&
                            v.killer_frags <= 1000000;
+                else if constexpr (std::is_same_v<T, PlayerRoster>)
+                {
+                    if (v.players.empty() || v.players.size() > max_players)
+                        return false;
+                    std::uint64_t previous = 0;
+                    for (std::size_t i = 0; i < v.players.size(); ++i)
+                    {
+                        const auto& p = v.players[i];
+                        if (p.player <= previous || !object(p.object, true) || p.character >= 4 || p.frags < -1000000 ||
+                            p.frags > 1000000 || p.name.empty() || p.name.size() > 100 ||
+                            !std::all_of(p.name.begin(), p.name.end(),
+                                         [](unsigned char c) { return c >= 32 && c != 127; }))
+                            return false;
+                        for (std::size_t j = 0; j < i; ++j)
+                            if (v.players[j].object.slot == p.object.slot)
+                                return false;
+                        previous = p.player;
+                    }
+                    return true;
+                }
                 else if constexpr (std::is_same_v<T, WeaponLoadout>)
                 {
                     const auto ammo = [](float value) { return number(value) && value >= 0; };
@@ -281,6 +302,18 @@ namespace OpenBlood2::Net
                     id(w, v.killer);
                     w.u32(std::uint32_t(v.killer_frags + 1000000));
                     w.u16(v.index);
+                }
+                else if constexpr (std::is_same_v<T, PlayerRoster>)
+                {
+                    w.u8(std::uint8_t(v.players.size()));
+                    for (const auto& p : v.players)
+                    {
+                        w.u64(p.player);
+                        id(w, p.object);
+                        w.text(p.name, 100);
+                        w.u8(p.character);
+                        w.u32(std::uint32_t(p.frags + 1000000));
+                    }
                 }
                 else if constexpr (std::is_same_v<T, WeaponLoadout>)
                 {
@@ -543,6 +576,28 @@ namespace OpenBlood2::Net
                 v.killer_frags = int(score) - 1000000;
                 v.index = r.u16();
                 event.value = v;
+                break;
+            }
+            case 26:
+            {
+                PlayerRoster v;
+                const auto count = r.u8();
+                if (!count || count > max_players)
+                    return DecodePrivate::Malformed;
+                for (unsigned i = 0; i < count && r.good(); ++i)
+                {
+                    RosterPlayer p;
+                    p.player = r.u64();
+                    p.object = id(r);
+                    p.name = r.text(100);
+                    p.character = r.u8();
+                    const auto score = r.u32();
+                    if (score > 2000000)
+                        return DecodePrivate::Malformed;
+                    p.frags = int(score) - 1000000;
+                    v.players.push_back(std::move(p));
+                }
+                event.value = std::move(v);
                 break;
             }
             default:

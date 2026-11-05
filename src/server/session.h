@@ -116,6 +116,7 @@ namespace OpenBlood2
             Net::MovementSetup setup;
             std::vector<Net::PrivateEvent> events;
             std::uint64_t next_event = 1;
+            bool roster_failed = false;
             bool audio_started = false, audio_failed = false;
             std::uint64_t next_audio = 1;
             std::vector<Net::AudioEvent> audio_events;
@@ -171,6 +172,7 @@ namespace OpenBlood2
         bool queue_audio(Player&, const AudioVoice&, bool started);
         DRESULT capture_event(HCLIENT, const PlayerEvent&);
         DRESULT queue_private(Player&, ObjectId, const Net::PrivateValue&);
+        void publish_roster(std::uint64_t excluded = 0);
         bool refresh_camera(Player&, Net::CameraState&, std::string& error);
         bool refresh_movement(Player&, std::string& error);
         bool collect_impulses(Player&, std::string& error);

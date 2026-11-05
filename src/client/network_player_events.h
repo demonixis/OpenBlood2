@@ -34,11 +34,19 @@ namespace OpenBlood2
         {
             return events_.size();
         }
+        const std::vector<Net::RosterPlayer>& roster() const
+        {
+            return roster_;
+        }
+        const Net::RosterPlayer* player(ObjectId) const;
 
       private:
         Net::Joined owner_;
         ClientHud hud_;
         std::uint64_t sequence_ = 0, tick_ = 0;
         std::vector<Net::PrivateEvent> events_;
+        std::vector<Net::RosterPlayer> roster_;
+        std::uint64_t highest_player_ = 0;
+        bool replace_roster(const Net::PlayerRoster&, std::string& error);
     };
 } // namespace OpenBlood2

@@ -52,6 +52,10 @@ class CPlayerObj : public CBaseCharacter
   public:
     CPlayerObj();
     ~CPlayerObj() override;
+    HSTRING GetPlayerName() const
+    {
+        return m_hstrPlayerName;
+    }
     void ProcessTriggerMsg(HMESSAGEREAD, HOBJECT sender = nullptr);
     void GrabFlag(HOBJECT);
     void GiveFlag(HOBJECT);

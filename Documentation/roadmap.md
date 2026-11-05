@@ -340,6 +340,7 @@ on dedicated and graphical-host sessions; the graphical frontend forwards held f
 [Remote logical audio](implementation/reports/m9_network_audio.md) now delivers reliable sound lifetimes and independent playback.
 [Independent speech](implementation/reports/m9_client_speech.md) now plays private VoiceMgr/CommLink events and startup announcements.
 [Weapon animation sounds](implementation/reports/m9_weapon_sounds.md) now run from checked server keys, including retained loops and stops.
+The [client roster](implementation/reports/m9_roster.md) now owns reliable names, characters and frag scores, including late arrivals and departures.
 Frag/music audio, FX, scoreboard, full match rules and remaining multiplayer branches stay in progress.
 **Remaining private presentation consumers/commands, full client separation, Team/CTF and complete network qualification remain pending.**
 
