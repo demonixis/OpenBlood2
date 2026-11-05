@@ -1077,3 +1077,28 @@ processed-sequence changes. These ACKs release a bounded input window and cannot
 rely on best-effort State delivery. Keep State snapshots unreliable/sequenced and
 all existing queue/input/catch-up limits; the [life-state report](../implementation/reports/m9_network_death.md#reliable-weapon-acknowledgements)
 records the reproduced GPU failure, diagnosis and discarded-State regression.
+
+
+## Reliable original player impulses
+
+The [remote impulse continuation](../implementation/reports/m9_network_impulses.md)
+uses protocol v13. Reliable Control MovementImpulse adds the original successful
+CDestructable/door delta to the independent client body once. Retain world/player/
+object/force identity, contiguous per-force sequence and finite bounded vectors.
+Do not run CMoveMgr, change position or reset the 0.14-second clock on receipt.
+Retire pre-impulse prediction checkpoints; never let an old ACK erase/replay a delta.
+Defer ACKs ahead of reliable impulse delivery and impulses ahead of collision/setup.
+
+Reports and ACKs carry their highest applied impulse. Retain at most 128 pending
+deltas per peer. Add only unreceived deltas to a report's overwritten velocity,
+before collision; an acknowledged delta must not be added again. A report tick
+never integrates velocity*time. Existing intervening substeps remain velocity-only.
+Force/respawn retires old deltas and histories. Backlog/velocity failure retires
+only the affected peer, leaving dedicated simulation and other players running.
+
+Death neutralizes commands, not passive CMoveMgr motion or checked report receipt.
+Preserve gravity/drag in the client and the half-second stale-report server hold.
+Enable accumulation only for remote ServerSession players: the solo synchronous
+bridge already sees the changed velocity and must never receive a second delta.
+Generic SetVelocity interception, remaining weapon-specific pushes/trapped branches,
+real-process lethal PvP and full playable-network qualification remain separate.

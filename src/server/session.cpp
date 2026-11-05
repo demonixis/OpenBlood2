@@ -118,6 +118,7 @@ namespace OpenBlood2
         }
         const auto id = record->id;
         players_.back().object = id;
+        player->m_damage.replicate_velocity = true;
         joined = {world_id_, connection, id};
         return true;
     }

@@ -100,8 +100,10 @@ namespace OpenBlood2::Net
                             return false;
                     return true;
                 }
-                else
+                else if constexpr (std::is_same_v<T, MovementAck>)
                     return v.setup_sequence && move(v.accepted) && dimensions(v.dimensions);
+                else
+                    return vector(v.velocity);
             },
             message);
     }
@@ -121,7 +123,10 @@ namespace OpenBlood2::Net
             [&](const auto& v)
             {
                 using T = std::decay_t<decltype(v)>;
-                w.u8(std::is_same_v<T, MovementSetup> ? 1 : std::is_same_v<T, MovementReport> ? 2 : 3);
+                w.u8(std::is_same_v<T, MovementSetup>    ? 1
+                     : std::is_same_v<T, MovementReport> ? 2
+                     : std::is_same_v<T, MovementAck>    ? 3
+                                                         : 4);
                 w.u64(v.owner.world);
                 w.u64(v.owner.player);
                 w.u32(v.owner.object.slot);
@@ -159,13 +164,17 @@ namespace OpenBlood2::Net
                         w.u8(s.on_ground);
                         w.u8(s.surface);
                     }
+                    w.u64(v.impulse_sequence);
                 }
-                else
+                else if constexpr (std::is_same_v<T, MovementAck>)
                 {
                     w.u64(v.setup_sequence);
                     write_move(w, v.accepted);
                     write_vector(w, v.dimensions);
+                    w.u64(v.impulse_sequence);
                 }
+                else
+                    write_vector(w, v.velocity);
             },
             message);
         if (!w.good())
@@ -242,6 +251,7 @@ namespace OpenBlood2::Net
                 s.on_ground = ground != 0;
                 s.surface = r.u8();
             }
+            v.impulse_sequence = r.u64();
             next = std::move(v);
         }
         else if (kind == 3)
@@ -253,6 +263,15 @@ namespace OpenBlood2::Net
             if (!read_move(r, v.accepted))
                 return DecodeMovement::Malformed;
             v.dimensions = read_vector(r);
+            v.impulse_sequence = r.u64();
+            next = v;
+        }
+        else if (kind == 4)
+        {
+            MovementImpulse v;
+            v.owner = owner;
+            v.sequence = sequence;
+            v.velocity = read_vector(r);
             next = v;
         }
         else

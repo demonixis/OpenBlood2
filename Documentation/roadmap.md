@@ -333,7 +333,9 @@ items, alternate zoom and detonation through bounded, generation-checked server 
 runs original animation cadence on the server and checks actual shots independently of prediction.
 [Bloodbath life transitions](implementation/reports/m9_network_death.md) now preserve original death/slow-death,
 USE rescue/respawn and frag attribution, with reliable weapon cancellation across coalesced life changes.
-Remote damage impulses and real-process lethal PvP remain before frontend held fire; remote audio/FX remain separate.
+[Remote damage/door impulses](implementation/reports/m9_network_impulses.md) now reach CMoveMgr reliably,
+with impulse-aware corrections, bounded per-peer history and passive dead-player movement.
+Real-process lethal PvP remains before frontend held fire; remote audio/FX remain separate.
 **Remaining private presentation consumers/commands, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client

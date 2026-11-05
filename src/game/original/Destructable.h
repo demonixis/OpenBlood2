@@ -58,6 +58,8 @@ class CDestructable : public Aggregate
     bool apply_damage_physics = false, last_impulse_ok = true;
     std::uint64_t damage_impulses = 0;
     DVector last_impulse{};
+    bool replicate_velocity = false, added_velocity_pending = false;
+    DVector added_velocity{};
     HOBJECT m_hObject = nullptr;
     CInventoryMgr* m_pInventoryMgr = nullptr;
     DLink m_Link{};

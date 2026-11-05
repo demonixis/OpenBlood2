@@ -148,6 +148,7 @@ namespace OpenBlood2
         std::optional<Net::BaselineReceiver> baseline_;
         std::optional<Net::WorldSnapshot> initial_;
         std::optional<Net::MovementSetup> setup_;
+        std::deque<Net::MovementImpulse> impulses_;
         NetworkWorldReceiver receiver_;
         NetworkMovement movement_;
         NetworkCamera camera_;

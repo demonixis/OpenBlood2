@@ -279,6 +279,27 @@ namespace OpenBlood2
                     continue;
                 }
                 peer.movement_setup = setup.sequence;
+                if (peer.movement_force != setup.owner.force_revision)
+                {
+                    peer.movement_force = setup.owner.force_revision;
+                    peer.movement_impulse = 0;
+                }
+                std::vector<Net::MovementImpulse> impulses;
+                bool impulses_sent = session_.movement_impulses(peer.player, peer.movement_impulse, impulses, error);
+                for (const auto& impulse : impulses)
+                {
+                    if (!impulses_sent)
+                        break;
+                    impulses_sent = send_movement(peer.peer, impulse, Net::Channel::Control, error);
+                    if (impulses_sent)
+                        peer.movement_impulse = impulse.sequence;
+                }
+                if (!impulses_sent)
+                {
+                    if (!remove(i, std::uint32_t(Net::Reject::Capacity), true, error))
+                        return false;
+                    continue;
+                }
                 std::vector<Net::PrivateEvent> events;
                 Net::WeaponLoadout weapons;
                 bool sent = session_.weapon_loadout(peer.player, weapons, error) &&

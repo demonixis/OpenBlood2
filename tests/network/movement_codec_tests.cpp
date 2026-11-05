@@ -1,3 +1,4 @@
+#include "net/admission.h"
 #include "net/movement.h"
 #include <iostream>
 #include <limits>
@@ -37,16 +38,25 @@ namespace
         report.origin = {1, 41, 1};
         report.steps = {{{0, 0, .5f}, {0, 0, 280}, {0, 0, 400}, 1.0f / 120, true, 3},
                         {{0, -.1f, .5f}, {0, -10, 280}, {0, 0, 400}, 1.0f / 240, false, 0}};
-        MovementAck ack{owner, 42, 2, report.move, {16, 41, 16}};
+        report.impulse_sequence = 117;
+        MovementAck ack{owner, 42, 2, report.move, {16, 41, 16}, 118};
+        MovementImpulse impulse{owner, 118, {12, 400, -10}};
         std::mt19937 random(0x4d39504d);
-        for (const MovementMessage& message : {MovementMessage(setup), MovementMessage(report), MovementMessage(ack)})
+        for (const MovementMessage& message :
+             {MovementMessage(setup), MovementMessage(report), MovementMessage(ack), MovementMessage(impulse)})
         {
             std::vector<std::uint8_t> bytes, roundtrip;
             CHECK(encode_movement(message, bytes) && bytes.size() <= movement_packet_limit &&
                   is_movement_packet(bytes));
-            const std::array<std::size_t, 3> sizes{98, 201, 106};
+            const std::array<std::size_t, 4> sizes{98, 209, 114, 59};
             CHECK(bytes.size() == sizes[message.index()]);
-            const std::array<std::uint8_t, 7> prefix{0x42, 0x32, 0x4d, 0x50, 9, 0, std::uint8_t(message.index() + 1)};
+            const std::array<std::uint8_t, 7> prefix{0x42,
+                                                     0x32,
+                                                     0x4d,
+                                                     0x50,
+                                                     std::uint8_t(protocol_version),
+                                                     std::uint8_t(protocol_version >> 8),
+                                                     std::uint8_t(message.index() + 1)};
             CHECK(std::equal(prefix.begin(), prefix.end(), bytes.begin()));
             MovementMessage decoded;
             CHECK(decode_movement(bytes, decoded) == DecodeMovement::Ok);
@@ -107,7 +117,7 @@ namespace
         CHECK(!encode_movement(report, bytes) && bytes == unchanged);
         ack.owner.object.generation = 0;
         CHECK(!encode_movement(ack, bytes) && bytes == unchanged);
-        std::cout << "Three movement messages; all truncations and 30000 seeded mutations passed\n";
+        std::cout << "Four movement messages; all truncations and 40000 seeded mutations passed\n";
         return true;
     }
 } // namespace

@@ -61,6 +61,7 @@ namespace OpenBlood2::Net
         float pitch = 0;
         DVector origin{};
         std::vector<MovementStep> steps;
+        std::uint64_t impulse_sequence = 0;
     };
     // Capture at report acceptance, before subsequent velocity advancement.
     // Using a later snapshot here would add a second velocity*time correction.
@@ -70,8 +71,18 @@ namespace OpenBlood2::Net
         std::uint64_t sequence = 0, setup_sequence = 0;
         PlayerMove accepted;
         DVector dimensions{};
+        std::uint64_t impulse_sequence = 0;
     };
-    using MovementMessage = std::variant<MovementSetup, MovementReport, MovementAck>;
+    // Reliable original PSTATE_ADDVELOCITY delta, scoped to one force/life.
+    // Reports acknowledge the latest applied delta; pose ACKs never reapply it.
+    struct MovementImpulse
+    {
+        MovementIdentity owner;
+        std::uint64_t sequence = 0;
+        DVector velocity{};
+    };
+    inline constexpr std::size_t movement_impulse_limit = 128;
+    using MovementMessage = std::variant<MovementSetup, MovementReport, MovementAck, MovementImpulse>;
     enum class DecodeMovement
     {
         Ok,

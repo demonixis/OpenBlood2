@@ -30,6 +30,8 @@ namespace OpenBlood2
         retired_ = std::max(retired_, sent_);
         frames_.clear();
         reports_.clear();
+        // Every later report acknowledges these impulses, so later ACKs include them.
+        impulses_.clear();
         future_ack_.reset();
     }
     bool NetworkMovement::begin(const Net::Joined& joined)
@@ -40,7 +42,7 @@ namespace OpenBlood2
         manager_.Term();
         joined_ = joined;
         setup_ = {};
-        next_frame_ = sent_ = acknowledged_ = retired_ = sent_frame_ = 0;
+        next_frame_ = sent_ = acknowledged_ = retired_ = sent_frame_ = impulse_sequence_ = 0;
         failed_frames_ = 0;
         corrections = replays = ignored = deferred = prediction_holds = 0;
         clear_history();
@@ -143,10 +145,51 @@ namespace OpenBlood2
         }
         const bool changed = force || !same_constraints(setup_, value);
         setup_ = value;
+        // Impulse sequences restart with each force/life (the body was zeroed).
+        if (force)
+            impulse_sequence_ = 0;
         // A changed physics/stance boundary cannot replay older input using new
         // constraints. New reports immediately establish checkpoints in this setup.
         if (changed)
             clear_history();
+        return Reception::Applied;
+    }
+    NetworkMovement::Reception NetworkMovement::receive(const Net::MovementImpulse& value, std::string& error)
+    {
+        error.clear();
+        if (!Net::valid_movement(value))
+        {
+            error = "Invalid movement impulse";
+            return Reception::Refused;
+        }
+        if (!belongs(value.owner) || value.owner.force_revision < setup_.owner.force_revision ||
+            (value.owner == setup_.owner && value.sequence <= impulse_sequence_))
+        {
+            ++ignored;
+            return Reception::Ignored;
+        }
+        // Reliable setup may await its collider, independently of Control delivery.
+        if (!ready() || value.owner.force_revision > setup_.owner.force_revision)
+        {
+            ++deferred;
+            return Reception::Deferred;
+        }
+        auto& body = movement_.body();
+        const DVector velocity{body.velocity.x + value.velocity.x, body.velocity.y + value.velocity.y,
+                               body.velocity.z + value.velocity.z};
+        if (impulse_sequence_ == UINT64_MAX || value.sequence != impulse_sequence_ + 1 ||
+            !Net::valid_movement(Net::MovementImpulse{value.owner, value.sequence, velocity}))
+        {
+            error = "Movement impulse order or combined velocity is invalid";
+            return Reception::Refused;
+        }
+        // The source adds velocity, without Update or force-position. History is
+        // kept: an ACK of an earlier report replays this delta at this frame.
+        body.velocity = velocity;
+        impulse_sequence_ = value.sequence;
+        if (impulses_.size() >= Net::movement_impulse_limit)
+            clear_history();
+        impulses_.push_back({value.sequence, next_frame_ + 1, value.velocity});
         return Reception::Applied;
     }
     bool NetworkMovement::update(const MovementInput& input, float yaw, float pitch, double seconds, bool commands,
@@ -163,7 +206,8 @@ namespace OpenBlood2
             error = "Movement prediction requires a ready client and bounded aim";
             return false;
         }
-        if (future_ack_ && future_ack_->setup_sequence == setup_.sequence)
+        if (future_ack_ && future_ack_->setup_sequence == setup_.sequence &&
+            future_ack_->impulse_sequence <= impulse_sequence_)
         {
             const auto pending = *future_ack_;
             const auto result = receive(pending, error);
@@ -202,7 +246,8 @@ namespace OpenBlood2
         if (report)
         {
             Net::MovementReport next{
-                setup_.owner, report->sequence, report->move, report->controls, pitch, report->origin, {}};
+                setup_.owner, report->sequence, report->move, report->controls, pitch, report->origin, {},
+                impulse_sequence_};
             next.steps.reserve(report->steps.size());
             for (const auto& s : report->steps)
                 next.steps.push_back({s.offset, s.velocity, s.acceleration, s.seconds, s.on_ground, s.surface});
@@ -238,7 +283,8 @@ namespace OpenBlood2
             error = "Movement acknowledgement names an unsent report or wrong code";
             return Reception::Refused;
         }
-        if (ack.setup_sequence > setup_.sequence)
+        // The server state names an impulse not received yet (reliable, on its way).
+        if (ack.setup_sequence > setup_.sequence || ack.impulse_sequence > impulse_sequence_)
         {
             if (!future_ack_ || future_ack_->sequence < ack.sequence)
                 future_ack_ = ack;
@@ -282,11 +328,24 @@ namespace OpenBlood2
             ++deferred;
             return Reception::Deferred;
         }
+        // Impulses newer than the server state the ACK carries: the client applied
+        // each one before a later frame; apply it again before that frame.
+        auto impulse = std::find_if(impulses_.begin(), impulses_.end(),
+                                    [&](const auto& i) { return i.sequence > ack.impulse_sequence; });
+        const auto replay_impulses = [&](std::uint64_t frame)
+        {
+            for (; impulse != impulses_.end() && impulse->frame <= frame; ++impulse)
+            {
+                auto& v = movement_.body().velocity;
+                v = {v.x + impulse->velocity.x, v.y + impulse->velocity.y, v.z + impulse->velocity.z};
+            }
+        };
         std::uint64_t replayed = 0;
         for (const auto& frame : frames_)
         {
             if (frame.id <= found->frame)
                 continue;
+            replay_impulses(frame.id);
             // Steps of reported frames are already on the wire; unsent frames
             // are recorded again with the corrected physics.
             movement_.record(frame.id > sent_frame_);
@@ -308,8 +367,12 @@ namespace OpenBlood2
                     later.prediction = movement_.prediction();
                 }
         }
+        // Impulses received after the latest frame are already in the body.
+        replay_impulses(UINT64_MAX);
         const auto accepted_frame = found->frame;
         acknowledged_ = ack.sequence;
+        while (!impulses_.empty() && impulses_.front().sequence <= ack.impulse_sequence)
+            impulses_.pop_front();
         reports_ = std::move(updated);
         while (!reports_.empty() && reports_.front().report <= acknowledged_)
             reports_.pop_front();

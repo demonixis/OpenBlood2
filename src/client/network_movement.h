@@ -26,6 +26,11 @@ namespace OpenBlood2
         bool begin(const Net::Joined&);
         Reception receive(const Net::MovementSetup&, std::string& error);
         Reception receive(const Net::MovementAck&, std::string& error);
+        Reception receive(const Net::MovementImpulse&, std::string& error);
+        std::uint64_t impulse_sequence() const
+        {
+            return impulse_sequence_;
+        }
         bool update(const MovementInput&, float yaw, float pitch, double seconds, bool commands, bool firing,
                     bool external_camera, std::optional<Net::MovementReport>&, std::string& error);
         bool ready() const
@@ -60,6 +65,13 @@ namespace OpenBlood2
             double seconds;
             bool commands, firing, external_camera;
         };
+        // A server velocity delta, applied before frame `frame`. An ACK whose
+        // server state predates it replays it at the same frame.
+        struct Impulse
+        {
+            std::uint64_t sequence, frame;
+            DVector velocity;
+        };
         struct Checkpoint
         {
             std::uint64_t report, frame;
@@ -74,6 +86,8 @@ namespace OpenBlood2
         std::optional<Net::MovementAck> future_ack_;
         std::deque<Frame> frames_;
         std::deque<Checkpoint> reports_;
+        std::deque<Impulse> impulses_;
+        std::uint64_t impulse_sequence_ = 0;
         std::uint64_t next_frame_ = 0, sent_ = 0, acknowledged_ = 0, retired_ = 0;
         // Frame of the latest sent report: later frames hold the unsent steps.
         std::uint64_t sent_frame_ = 0;

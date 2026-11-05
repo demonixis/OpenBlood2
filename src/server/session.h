@@ -39,6 +39,9 @@ namespace OpenBlood2
         MoveResult queue_movement(std::uint64_t player, const Net::MovementReport&);
         bool movement_setup(std::uint64_t player, Net::MovementSetup&, std::string& error);
         bool movement_ack(std::uint64_t player, std::optional<Net::MovementAck>&) const;
+        // Reliable PSTATE_ADDVELOCITY deltas after `after`, for the current force.
+        bool movement_impulses(std::uint64_t player, std::uint64_t after, std::vector<Net::MovementImpulse>&,
+                               std::string& error);
         // Reports are replayed in order, one resolved CMoveMgr substep at a time.
         // dropped: overflow of the bounded queue; catchups: one sweep to a
         // report's origin after a lost report; leashed: steps or catch-ups
@@ -130,6 +133,10 @@ namespace OpenBlood2
             bool weapon_clock_started = false;
             std::deque<Net::MovementReport> pending;
             std::optional<Net::MovementAck> ack;
+            // Sent but not yet acknowledged by a report: replayed steps of older
+            // reports add these deltas (the client integrated them without).
+            std::deque<Net::MovementImpulse> impulses;
+            std::uint64_t impulse_sequence = 0, impulse_received = 0;
             PlayerControls controls;
             PlayerRotation aim;
             std::uint64_t source_revision = 0, pose_revision = 0;
@@ -148,6 +155,7 @@ namespace OpenBlood2
         DRESULT queue_private(Player&, ObjectId, const Net::PrivateValue&);
         bool refresh_camera(Player&, Net::CameraState&, std::string& error);
         bool refresh_movement(Player&, std::string& error);
+        bool collect_impulses(Player&, std::string& error);
         bool advance_players(double seconds, std::string& error);
         bool apply_controls(std::string& error);
         bool apply_command(Player&, const Net::PlayerCommand&, std::string& error);

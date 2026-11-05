@@ -1,0 +1,52 @@
+{
+  "scope": "Original remote damage/door impulse publication and passive dead-player movement; protocol v13",
+  "baseline": "474732439eeed5af44cd04dedec9a36a9078ea52",
+  "sources": [
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/Destructable.cpp",
+      "sha256": "66ae35bcaf1ede955de691078b8102539001ffb7583ab3f093cfb4b264f55462"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/Destructable.h",
+      "sha256": "00e289d9cca1594035c8f20d0d45a076009c765e2767ce545f22f16d33bfea45"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/MoveMgr.cpp",
+      "sha256": "8b60f379f4e4733be7b80092e19e6daad36f53cf55cc0dc2c360187c0873452a"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/GameProjectiles.cpp",
+      "sha256": "d713d649cab9e9378ae7992ad74b0e608b6af534f3c5a4df39125219c0970e4f"
+    }
+  ],
+  "selections": [
+    "Destructable.cpp ApplyDamagePhysics: normalized damage*2500/mass, accumulate player delta",
+    "Destructable.h GetAddedVelocity: consume/reset vector and flag",
+    "PlayerObj.cpp UpdateClientPhysics: damage delta + once-consumed door push, PSTATE_ADDVELOCITY",
+    "MoveMgr.cpp OnPhysicsUpdate PSTATE_ADDVELOCITY: add to current client velocity without another update",
+    "PlayerObj.cpp HandlePlayerPositionMessage: no dead gate, original collision-leash teleport remains replaced",
+    "GameProjectiles.cpp Leech/Singularity direct target SetVelocity audited only, no explicit PSTATE publication in those branches"
+  ],
+  "adaptations": [
+    "Only ServerSession players enable accumulation; solo retains immediate body synchronization",
+    "Accumulate successful engine velocity mutations only; validate publication and isolate invalid/full backlog to its peer",
+    "Generation-qualified reliable impulses with bounded 128-entry history and explicit report/ACK impulse sequence",
+    "Restore only missing deltas before checked report collision; never double-integrate a report tick",
+    "Retire pre-impulse client checkpoints; retain report timer and ordinary delayed replay after new reports",
+    "Force/life change resets impulse history; already-dead aggregate refusal and trapped/weapon-specific gaps unchanged"
+  ]
+}

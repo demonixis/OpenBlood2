@@ -54,6 +54,7 @@ namespace
         const float hp = p->m_damage.m_fHitPoints;
         CHECK(damage(g, other, 10, {0, 0, 2}));
         CHECK(p->m_damage.damage_impulses == 1 && same(r->velocity, {3, 4, 55}));
+        CHECK(!p->m_damage.replicate_velocity && !p->m_damage.added_velocity_pending);
         CHECK(same(p->m_damage.last_impulse, {0, 0, 50}) && near(p->m_damage.m_fHitPoints, hp - 1.5f));
         // Additional hits accumulate once in the shared body, before armor absorption.
         CHECK(damage(g, other, 10, {2, 0, 0}) && same(r->velocity, {53, 4, 55}));

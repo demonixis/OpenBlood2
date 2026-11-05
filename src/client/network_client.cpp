@@ -160,6 +160,15 @@ namespace OpenBlood2
                     setup_ = *setup;
                 return true;
             }
+            if (const auto* impulse = std::get_if<Net::MovementImpulse>(&value))
+            {
+                if (event.channel != Net::Channel::Control || impulse->owner.world != joined_.world ||
+                    impulse->owner.player != joined_.player || impulse->owner.object != joined_.object ||
+                    impulses_.size() >= Net::movement_impulse_limit)
+                    return false;
+                impulses_.push_back(*impulse);
+                return true;
+            }
             const auto* ack = std::get_if<Net::MovementAck>(&value);
             return ack && event.channel == Net::Channel::State &&
                    movement_.receive(*ack, error) != NetworkMovement::Reception::Refused;
@@ -283,6 +292,15 @@ namespace OpenBlood2
                 return fail(error, "Invalid movement setup");
             if (result != NetworkMovement::Reception::Deferred)
                 setup_.reset();
+        }
+        while (phase_ == Phase::Active && !impulses_.empty())
+        {
+            const auto result = movement_.receive(impulses_.front(), error);
+            if (result == NetworkMovement::Reception::Refused)
+                return fail(error, "Invalid movement impulse");
+            if (result == NetworkMovement::Reception::Deferred)
+                break;
+            impulses_.pop_front();
         }
         if (phase_ == Phase::Active && movement_.ready())
         {

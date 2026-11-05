@@ -48,7 +48,7 @@ namespace
                 accepted.on_ground = found->second.standing && found->second.ground_normal.y >= .5f;
             }
             return {report.owner, report.sequence, client.setup().sequence, accepted,
-                    client.movement().body.dimensions};
+                    client.movement().body.dimensions, report.impulse_sequence};
         }
         bool box(DVector position, DVector dimensions)
         {
@@ -356,6 +356,80 @@ namespace
         CHECK(gate.advance(1. / 60, {}, true, ticks, sample) && ticks == 1 && !sample.mouse_forward);
         return true;
     }
+    bool impulses()
+    {
+        Fixture a, b;
+        CHECK(a.setup() && b.setup());
+        std::optional<Net::MovementReport> ra, rb;
+        CHECK(a.step(ra) && b.step(rb) && ra && rb);
+        const auto old = a.ack(*ra);
+        auto future = old;
+        future.impulse_sequence = 1;
+        future.accepted.velocity = {100, 300, 0};
+        CHECK(a.client.receive(future, a.error) == Reception::Deferred);
+        const auto before = a.client.movement().body;
+        const auto updates = a.client.manager().updates, substeps = a.client.manager().substeps;
+        Net::MovementImpulse impulse{a.client.setup().owner, 1, {100, 300, 0}};
+        CHECK(a.client.receive(impulse, a.error) == Reception::Applied);
+        CHECK(b.client.receive(impulse, b.error) == Reception::Applied);
+        CHECK(same(before.position, a.client.movement().body.position));
+        CHECK(same(vector_add(before.velocity, impulse.velocity), a.client.movement().body.velocity));
+        CHECK(a.client.manager().updates == updates && a.client.manager().substeps == substeps);
+        CHECK(a.client.receive(impulse, a.error) == Reception::Ignored);
+        CHECK(a.client.receive(old, a.error) == Reception::Ignored);
+        CHECK(a.client.receive(future, a.error) == Reception::Ignored);
+        auto invalid = impulse;
+        invalid.sequence = 3;
+        CHECK(a.client.receive(invalid, a.error) == Reception::Refused);
+        invalid = impulse;
+        invalid.velocity.x = std::numeric_limits<float>::infinity();
+        CHECK(a.client.receive(invalid, a.error) == Reception::Refused);
+        invalid = impulse;
+        invalid.owner.object.generation++;
+        CHECK(a.client.receive(invalid, a.error) == Reception::Ignored);
+        // A second source delta adds once, without moving or advancing the clock.
+        impulse.sequence = 2;
+        impulse.velocity = {-20, 50, 0};
+        CHECK(a.client.receive(impulse, a.error) == Reception::Applied);
+        CHECK(b.client.receive(impulse, b.error) == Reception::Applied);
+        CHECK(a.client.impulse_sequence() == 2 && equal(a.client, b.client));
+        for (unsigned i = 1; i < 9; ++i)
+            CHECK(a.step(ra) && b.step(rb) && !ra && !rb);
+        CHECK(a.step(ra) && b.step(rb) && ra && rb && ra->sequence == 2 && ra->impulse_sequence == 2);
+        CHECK(a.client.movement().body.position.y > before.position.y);
+        auto correction = a.ack(*ra);
+        correction.accepted.position.z += .1f;
+        CHECK(b.client.receive(correction, b.error) == Reception::Applied);
+        for (unsigned i = 0; i < 4; ++i)
+            CHECK(a.step(ra) && b.step(rb));
+        CHECK(a.client.receive(correction, a.error) == Reception::Applied && equal(a.client, b.client));
+        CHECK(a.client.replays == 4 && a.client.manager().substeps == 28);
+        // Dead/slow-death movement gates neutralize controls, not existing momentum.
+        auto setup = a.client.setup();
+        ++setup.sequence;
+        setup.can_move = false;
+        CHECK(a.client.receive(setup, a.error) == Reception::Applied);
+        CHECK(b.client.receive(setup, b.error) == Reception::Applied);
+        MovementInput held;
+        held.forward = held.jump = true;
+        CHECK(a.step(ra, held) && b.step(rb) && equal(a.client, b.client));
+        // Reliable impulse can arrive before the collider/setup is admitted.
+        ++setup.sequence;
+        ++setup.owner.force_revision;
+        ++setup.code;
+        impulse.owner = setup.owner;
+        impulse.sequence = 1;
+        CHECK(a.client.receive(impulse, a.error) == Reception::Deferred);
+        CHECK(a.client.receive(setup, a.error) == Reception::Applied);
+        CHECK(a.client.impulse_sequence() == 0 && same(a.client.movement().body.velocity, {}));
+        CHECK(a.client.receive(impulse, a.error) == Reception::Applied);
+        CHECK(a.client.receive(correction, a.error) == Reception::Ignored);
+        --impulse.owner.force_revision;
+        CHECK(a.client.receive(impulse, a.error) == Reception::Ignored);
+        std::cout
+            << "Reliable impulses: additive/deduplicated, receipt ordering, replay, report clocks and lives passed\n";
+        return true;
+    }
     bool bounded_history()
     {
         Fixture f;
@@ -382,7 +456,7 @@ namespace
 int main()
 {
     if (!immediate() || !forces_and_stances() || !failures_and_ordering() || !immediate_obstruction() ||
-        !bounded_history() || !render_frame_input())
+        !bounded_history() || !render_frame_input() || !impulses())
         return 1;
     for (auto code : {CC_NOTHING, CC_WATER, CC_LADDER, CC_CONVEYOR})
         if (!delayed(code))

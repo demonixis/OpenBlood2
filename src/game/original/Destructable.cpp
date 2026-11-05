@@ -78,6 +78,11 @@ void CDestructable::ApplyDamagePhysics(float damage, DVector direction)
         last_impulse_ok = server->SetVelocity(m_hObject, &velocity) == DE_OK;
     }
     damage_impulses += last_impulse_ok;
+    if (last_impulse_ok && replicate_velocity)
+    {
+        added_velocity = vector_add(added_velocity, last_impulse);
+        added_velocity_pending = true;
+    }
 }
 DDWORD CDestructable::EngineMessageFn(LPBASECLASS owner, DDWORD message, void* data, DFLOAT reason)
 {

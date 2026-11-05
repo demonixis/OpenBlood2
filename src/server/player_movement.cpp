@@ -10,6 +10,10 @@ namespace OpenBlood2
         {
             return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
         }
+        DVector add(DVector a, DVector b)
+        {
+            return {a.x + b.x, a.y + b.y, a.z + b.z};
+        }
         bool same(DVector a, DVector b)
         {
             return a.x == b.x && a.y == b.y && a.z == b.z;
@@ -82,6 +86,11 @@ namespace OpenBlood2
                 movement_ignored += p.pending.size();
                 p.pending.clear();
                 p.ack.reset();
+                // Impulses belong to one force/life: the zeroed body drops them.
+                p.impulses.clear();
+                p.impulse_sequence = p.impulse_received = 0;
+                player->m_damage.added_velocity = {};
+                player->m_damage.added_velocity_pending = false;
                 // The client snaps to this pose: its next report starts here.
                 p.applied_sequence = 0;
             }
@@ -111,6 +120,60 @@ namespace OpenBlood2
         out = it->setup;
         return true;
     }
+    bool ServerSession::collect_impulses(Player& p, std::string& error)
+    {
+        auto* player = game_.server_shell.Player(p.client);
+        if (!player)
+        {
+            error = "Remote movement owner is unavailable";
+            return false;
+        }
+        auto& damage = player->m_damage;
+        if (!damage.added_velocity_pending && !player->door_push_pending)
+            return true;
+        // Damage impulses and door pushes change the server body directly (the
+        // original PSTATE_ADDVELOCITY); the client adds the same delta to its
+        // prediction, and older reports' steps receive it on replay.
+        auto velocity = damage.added_velocity;
+        if (player->door_push_pending)
+        {
+            velocity = add(velocity, player->door_push_velocity);
+            if (!player->ApplyDoorPush())
+            {
+                error = "Remote player door push failed";
+                return false;
+            }
+        }
+        damage.added_velocity = {};
+        damage.added_velocity_pending = false;
+        Net::MovementImpulse value{p.setup.owner, p.impulse_sequence + 1, velocity};
+        if (p.impulse_sequence == UINT64_MAX || p.impulses.size() >= Net::movement_impulse_limit ||
+            !Net::valid_movement(value))
+        {
+            error = "Remote movement impulse capacity or velocity refused";
+            return false;
+        }
+        p.impulses.push_back(value);
+        p.impulse_sequence = value.sequence;
+        return true;
+    }
+    bool ServerSession::movement_impulses(std::uint64_t id, std::uint64_t after, std::vector<Net::MovementImpulse>& out,
+                                          std::string& error)
+    {
+        out.clear();
+        const auto it = std::find_if(players_.begin(), players_.end(), [&](const auto& p) { return p.id == id; });
+        if (it == players_.end() || !refresh_movement(*it, error) || !collect_impulses(*it, error))
+            return false;
+        if (after > it->impulse_sequence)
+        {
+            error = "Movement impulse cursor is ahead of the server";
+            return false;
+        }
+        for (const auto& value : it->impulses)
+            if (value.sequence > after)
+                out.push_back(value);
+        return true;
+    }
     bool ServerSession::movement_ack(std::uint64_t id, std::optional<Net::MovementAck>& out) const
     {
         auto it = std::find_if(players_.begin(), players_.end(), [&](const auto& p) { return p.id == id; });
@@ -134,6 +197,11 @@ namespace OpenBlood2
             ++movement_ignored;
             return MoveResult::Ignored;
         }
+        // A report acknowledges impulses the client applied: never one not yet
+        // created, never fewer than an earlier report.
+        if (value.impulse_sequence > it->impulse_sequence || value.impulse_sequence < it->impulse_received)
+            return MoveResult::Invalid;
+        it->impulse_received = value.impulse_sequence;
         // Every report carries distinct substeps: keep them in order. Dropping
         // the oldest leaves a sequence gap, which the next replay catches up.
         if (it->pending.size() >= movement_queue_limit)
@@ -162,7 +230,17 @@ namespace OpenBlood2
         // the server's own motion.
         if (player->m_damage.IsDead() || value.steps.empty())
             return true;
-        auto submit = [&](DVector destination, const Net::MovementStep& step)
+        // Velocity the client had not integrated yet: impulses created after
+        // this report's acknowledged one (including impulses from this replay).
+        auto missing = [&]
+        {
+            DVector delta{};
+            for (const auto& impulse : p.impulses)
+                if (impulse.sequence > value.impulse_sequence)
+                    delta = add(delta, impulse.velocity);
+            return delta;
+        };
+        auto submit = [&](DVector destination, Net::MovementStep step)
         {
             // The solo LocalMovement submission: an integrated destination and
             // pre-collision velocity; only the swept solver and contacts run here,
@@ -196,8 +274,13 @@ namespace OpenBlood2
             else if (distance > 0)
                 ++movement_leashed;
         }
-        for (const auto& step : value.steps)
+        for (auto step : value.steps)
         {
+            if (!collect_impulses(p, error))
+                return false;
+            const auto delta = missing();
+            step.velocity = add(step.velocity, delta);
+            step.offset = add(step.offset, {delta.x * step.seconds, delta.y * step.seconds, delta.z * step.seconds});
             // Never faster than real time nor than the speed limit; the
             // acknowledgement corrects the client to the server's result.
             if (step.seconds > p.movement_budget ||
@@ -237,6 +320,8 @@ namespace OpenBlood2
             return false;
         }
         p.movement_budget = std::min(movement_budget_limit, p.movement_budget + seconds * movement_budget_rate);
+        if (!collect_impulses(p, error))
+            return false;
         if (!p.pending.empty())
         {
             p.controls = p.pending.back().controls;
@@ -278,13 +363,14 @@ namespace OpenBlood2
         // A contact that forced a new pose reset the acknowledgement already.
         if (applied && applied->owner != p.setup.owner)
             applied.reset();
+        if (!collect_impulses(p, error))
+            return false;
         if (applied)
         {
-            if (!player->ApplyDoorPush())
-            {
-                error = "Remote player door push failed";
-                return false;
-            }
+            // The client integrates every impulse up to the one this report
+            // acknowledges: later reports never need those deltas.
+            while (!p.impulses.empty() && p.impulses.front().sequence <= applied->impulse_sequence)
+                p.impulses.pop_front();
             MovementState actual;
             if (!game_.server.GetMovementState(object->handle, actual))
             {
@@ -296,7 +382,8 @@ namespace OpenBlood2
                                      p.setup.sequence,
                                      {p.setup.code, actual.position, actual.velocity, actual.acceleration,
                                       actual.standing && actual.ground_normal.y >= .5f, applied->move.surface},
-                                     actual.dimensions};
+                                     actual.dimensions,
+                                     p.impulse_sequence};
         }
         else if (p.ack && ticks_ - p.received_tick > 30)
         {

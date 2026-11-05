@@ -35,6 +35,7 @@ namespace
         std::array<MovementSetup, 16> movement_setups;
         std::array<std::optional<MovementAck>, 16> movement_acks;
         std::array<std::uint64_t, 16> loadouts{}, weapon_acks{};
+        std::array<std::vector<MovementImpulse>, 16> movement_impulses;
         bool discard_state = false;
         ServerNetwork::Clock::time_point now = ServerNetwork::Clock::now();
         std::string error;
@@ -200,6 +201,11 @@ namespace
                 {
                     CHECK(event.channel == Channel::Control);
                     movement_setups[index] = *setup;
+                }
+                else if (const auto* impulse = std::get_if<MovementImpulse>(&message))
+                {
+                    CHECK(event.channel == Channel::Control && impulse->owner == movement_setups[index].owner);
+                    movement_impulses[index].push_back(*impulse);
                 }
                 else
                 {
@@ -396,6 +402,73 @@ namespace
                   << f.server.state_drops << " queue drops\n";
         return true;
     }
+    bool impulses(const char* path)
+    {
+        Fixture f;
+        auto& error = f.error;
+        CHECK(f.start(path));
+        for (unsigned i = 0; i < 2; ++i)
+            CHECK(f.connect(i) && f.offer(i) && f.join(i));
+        f.discard_state = true;
+        const auto progress = [&]() -> bool
+        {
+            CHECK(f.session.tick(error));
+            f.now += std::chrono::microseconds(16667);
+            CHECK(f.server.pump(f.now, error));
+            for (unsigned i = 0; i < 2; ++i)
+                for (unsigned n = 0; n < 128; ++n)
+                {
+                    Event event;
+                    const auto status = f.clients[i].poll(event, 1, error);
+                    CHECK(status != PollResult::Failed);
+                    if (status == PollResult::Idle)
+                        break;
+                    CHECK(f.update(i, event));
+                }
+            return true;
+        };
+        for (unsigned i = 0; i < 5; ++i)
+            CHECK(progress());
+        const auto* record = f.session.game().objects.get(f.joined[0].object);
+        auto* player = dynamic_cast<CPlayerObj*>(record->game.get());
+        CHECK(player);
+        for (std::uint64_t sequence = 1; sequence <= 140; ++sequence)
+        {
+            player->m_damage.ApplyDamagePhysics(.1f, {1, 0, 0});
+            for (unsigned i = 0; i < 10 && f.movement_impulses[0].size() < sequence; ++i)
+                CHECK(progress());
+            CHECK(f.movement_impulses[0].size() == sequence && f.movement_impulses[1].empty());
+            const auto& impulse = f.movement_impulses[0].back();
+            CHECK(impulse.sequence == sequence && impulse.velocity.x == 1 && impulse.velocity.y == 0);
+            MovementReport report{f.movement_setups[0].owner,
+                                  sequence,
+                                  {f.movement_setups[0].code, record->state.m_Pos, {}, {}, true, 0},
+                                  {},
+                                  0,
+                                  sequence};
+            std::vector<std::uint8_t> bytes;
+            CHECK(encode_movement(report, bytes) && f.clients[0].send(f.peers[0], Channel::State, bytes, error));
+            f.clients[0].flush();
+            for (unsigned i = 0; i < 10 && f.session.movement_reports < sequence; ++i)
+                CHECK(progress());
+            CHECK(f.session.movement_reports == sequence);
+        }
+        // Client stops acknowledging deltas. Only its admission is retired.
+        std::vector<MovementImpulse> pending;
+        for (unsigned i = 0; i < movement_impulse_limit; ++i)
+        {
+            player->m_damage.ApplyDamagePhysics(.1f, {1, 0, 0});
+            CHECK(f.session.movement_impulses(f.joined[0].player, 140 + i, pending, error));
+        }
+        player->m_damage.ApplyDamagePhysics(.1f, {1, 0, 0});
+        CHECK(f.rejected(0, Reject::Player));
+        CHECK(f.session.player_count() == 1 && f.server.peer_count() == 1);
+        CHECK(f.session.tick(error) && f.server.pump(f.now, error));
+        CHECK(f.server.close());
+        std::cout << "140 reliable ENet impulses with all State deliveries discarded; private ownership, report "
+                     "acknowledgements and isolated backlog rejection passed\n";
+        return true;
+    }
     bool weapon_acknowledgements(const char* path)
     {
         Fixture f;
@@ -510,6 +583,8 @@ namespace
 } // namespace
 int main(int argc, char** argv)
 {
+    if (argc == 3 && std::string_view(argv[2]) == "--impulses")
+        return impulses(argv[1]) ? 0 : 1;
     if (argc == 3 && std::string_view(argv[2]) == "--weapon-acks")
         return weapon_acknowledgements(argv[1]) ? 0 : 1;
     if (argc == 3 && std::string_view(argv[2]) == "--movement")
