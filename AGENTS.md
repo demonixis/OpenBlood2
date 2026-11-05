@@ -1,68 +1,16 @@
 # Blood2 Project Instructions
 
-The authorized [M9 multiplayer contract](Documentation/contracts/multiplayer_contracts.md)
-selects retail Bloodbath → Team → CTF, dedicated and playable host, ENet IPv4 and
-16 players. The [foundation report](Documentation/implementation/reports/m9_multiplayer.md)
-covers the server-only build, bounded transport, full-content hash, logical audio
-and zero-client simulation of all 22 multiplayer maps. The
-[local replica lot](Documentation/implementation/reports/m9_client_world.md) now
-feeds model/sprite/world/sky presentation, model lighting and shadow flags from
-passive ClientWorld frames. Preserve world epochs, atomic frame replacement and
-independent consumer linkage. The [local movement lot](Documentation/implementation/reports/m9_local_movement.md)
-now gives CMoveMgr a client-owned body with callback-free collision prediction and
-immediate authoritative correction. Preserve one integration, server-only contacts
-and pushes, world/object/force identities and solo substep ordering. The
-[client collision lot](Documentation/implementation/reports/m9_client_collision.md)
-now predicts against owned geometry and collider snapshots, independently of the
-server registry. Preserve copied geometry lifetime, atomic membership, source
-collision arithmetic and exactly-once authoritative contacts. The
-[client environment lot](Documentation/implementation/reports/m9_client_environment.md)
-now derives liquid/ladder/conveyor membership from copied shapes and values.
-Preserve four-entry slot order, hidden/zero-code head masking, source CMoveMgr math
-and server-only air/damage; client queries never run volume callbacks. The
-[client camera/HUD lot](Documentation/implementation/reports/m9_client_view.md) now
-owns camera descriptors, death/chase geometry queries, HUD values and presentation
-clock on the client. Preserve source camera priority/math, generation-qualified
-views, addressed HUD events and server-derived movement gates/Eye commands.
-The [client audio lot](Documentation/implementation/reports/m9_client_audio.md) now
-separates server logical voices from client playback, music and SDL output.
-Preserve sample clocks, source ownership and RNG, bounded pointer-free audio frames,
-independent stream readers and output transfer. Device lead must never advance server
-completion. Legacy client FX/VoiceMgr entry points, remaining shell extraction,
-admission and network gameplay remain pending.
-The [client effects presentation lot](Documentation/implementation/reports/m9_client_effects.md)
-now feeds sprites/particles, models, marks, surfaces, tracers and lights/fog from
-owned client snapshots. Preserve render order, independent array/shape lifetime,
-per-eye fog/warp behavior and immutable GPU references. Legacy effect producers,
-updates and collision/audio queries still use the local game adapter; their
-runtime/event extraction remains separate from this presentation boundary.
-The [client effect runtime step](Documentation/implementation/reports/m9_effect_queries.md)
-now owns original cosmetic pools through ClientSession and links them separately.
-Fragment updates query the independent collision replica. Preserve source update
-order/arithmetic, primary-only ray quirks and pool reset/identity behavior; remaining
-owner-bound updates, child effects and cosmetic audio still need service extraction.
-The [owner-bound effect continuation](Documentation/implementation/reports/m9_effect_owners.md)
-now updates particles, streams, PolyGrids, WarpGates and CLightFX from ClientWorld.
-Keep world/object generation checks, creation-time attachment refresh, original
-visibility/emission rules and checked restore cleanup. Remaining moving FX and
-flashlight collision, cosmetic audio and child publications still need extraction.
-The [cosmetic effect audio continuation](Documentation/implementation/reports/m9_effect_audio.md)
-now plays fragment, blood-drop and casing impacts in ClientAudio only. Keep separate
-sound identities, source requests/sample math, local completion, bounded voice
-admission and logical-voice priority. The dedicated has no cosmetic receiver.
-Moving effect queries and child publications remain to extract.
-The [moving effect services continuation](Documentation/implementation/reports/m9_effect_services.md)
-now updates flesh/destruction fragments, casings and blood emitters through client
-geometry and typed client child/audio outputs. Keep source clocks, pool/RNG order,
-primary-only collision quirks and synchronous creation results. Immediate creation
-queries still use the local bridge; flashlight and network events remain pending.
-The [client flashlight continuation](Documentation/implementation/reports/m9_flashlight.md)
-now casts from replica poses into client collision and keeps world-qualified owner
-identities. Preserve server battery/child rules, source body origin and light math,
-player exclusion, stale-owner hiding and invalid-ray refusal. Cosmetic runtimes
-are independently linked; immediate creation bridges and network delivery remain.
-Preserve solo clocks, source pickup rules,
-immutable GPU references, existing PBR work and independent M2-GPU-001/M3 gates.
+The [M9 multiplayer contract](Documentation/contracts/multiplayer_contracts.md) (backported
+from `develop-multiplayer`, lots 1–2) adds a dedicated `blood2-server` (`server` preset,
+ENet IPv4, 60 Hz) and separates solo client state from the authoritative session:
+presentation, camera/HUD, movement, collision, environment, audio and cosmetic FX read
+owned ClientWorld/ClientSession snapshots ([reports](Documentation/implementation/reports/m9_multiplayer.md)).
+Preserve one CMoveMgr integration, server-only contacts/pushes, source clocks/RNG/render
+order and solo behaviour. Cosmetic failures stay non-fatal: a mirrored voice the client
+cannot prepare is silent and counted, a malformed FX item is dropped and counted, an NPC
+runtime failure on the server suspends that actor. Solo skips the replica prediction
+solve (`LocalMovement::verify_prediction` is for parity tests). Raw evidence stays on
+`develop-multiplayer`. Admission, replication and network gameplay are later lots.
 
 The [desktop third-person camera](Documentation/contracts/camera_contracts.md) adds a rebindable C toggle,
 actual player/held models and centred aim convergence. Preserve unchanged eye/shot/movement state,

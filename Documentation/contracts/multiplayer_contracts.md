@@ -368,7 +368,7 @@ The 60 ms interactive output lead is presentation-only. It no longer advances se
 completion early. This is an explicit correction of prior device-dependent logical
 cursor advancement; zero-lead/offline solo stepping is unchanged. Solo pause gates
 both timelines, whereas dedicated advancement ignores client pause/output entirely.
-CMoveMgr, physics integration, source random draws and PBR files remain unchanged.
+CMoveMgr, physics integration and source random draws remain unchanged.
 
 This is an immediate local boundary. The legacy client FX/VoiceMgr entry points,
 per-recipient sound delivery, wire codec, delayed synchronization and network
