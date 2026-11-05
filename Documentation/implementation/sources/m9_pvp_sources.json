@@ -1,0 +1,49 @@
+{
+  "scope": "Graphical held fire and real-process Bloodbath combat/respawn qualification",
+  "baseline": "ec399fc2c752489b3fc37aa41bddad8645dec577",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "ec399fc2c752489b3fc37aa41bddad8645dec577",
+      "path": "src/game/original/BloodShells.cpp",
+      "sha256": "e7a7a7db9353e013918e03dcef094889dddf1b219e1f193ce743e16153b9af38"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ec399fc2c752489b3fc37aa41bddad8645dec577",
+      "path": "src/app/frontend.cpp",
+      "sha256": "b23130dc891ef56a65c9ef2788e80314ac33b53602d59714bc2abcdedfb35627"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ec399fc2c752489b3fc37aa41bddad8645dec577",
+      "path": "src/app/movement_controls.h",
+      "sha256": "2016f3de3801c9ab1166518316e3a769f89745066c5c8c3adc481d563e02d624"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ec399fc2c752489b3fc37aa41bddad8645dec577",
+      "path": "src/app/network_frontend.cpp",
+      "sha256": "3fa583653db716808b1273204cd554f44464fa70ed20de812243e589938a8660"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ec399fc2c752489b3fc37aa41bddad8645dec577",
+      "path": "src/server/player_fire.cpp",
+      "sha256": "2d00514cc5f3756fd65e493f7ee976de32df971ac3fa2baffe23c2e572a232d6"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ec399fc2c752489b3fc37aa41bddad8645dec577",
+      "path": "src/server/player_movement.cpp",
+      "sha256": "3338d606d71506cdb631a5639dcc984c1e333f867fd804af1b57d5f91ebff6f5"
+    }
+  ],
+  "adaptations": [
+    "Forward existing sampled primary/alternate bindings to the independent NetworkClient after reliable player commands",
+    "No changes to original CMoveMgr, weapon cadence, health/death/frag or impulse rules",
+    "Real-process fixture issues only ordinary client input, uses independently mounted retail data and replica queries",
+    "Respawn assertions wait for original separately published force, loadout, HUD and command acknowledgement",
+    "Graphical host fixture uses different remote characters to exclude the idle local player from target selection"
+  ]
+}

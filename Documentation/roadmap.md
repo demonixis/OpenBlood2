@@ -335,7 +335,9 @@ runs original animation cadence on the server and checks actual shots independen
 USE rescue/respawn and frag attribution, with reliable weapon cancellation across coalesced life changes.
 [Remote damage/door impulses](implementation/reports/m9_network_impulses.md) now reach CMoveMgr reliably,
 with impulse-aware corrections, bounded per-peer history and passive dead-player movement.
-Real-process lethal PvP remains before frontend held fire; remote audio/FX remain separate.
+[Real-process Bloodbath combat](implementation/reports/m9_pvp.md) now verifies damage, frag and USE respawn
+on dedicated and graphical-host sessions; the graphical frontend forwards held fire through the same endpoint.
+Remote audio/FX, scoreboard, full match rules and remaining multiplayer branches stay in progress.
 **Remaining private presentation consumers/commands, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client

@@ -1102,3 +1102,22 @@ Enable accumulation only for remote ServerSession players: the solo synchronous
 bridge already sees the changed velocity and must never receive a second delta.
 Generic SetVelocity interception, remaining weapon-specific pushes/trapped branches,
 real-process lethal PvP and full playable-network qualification remain separate.
+
+
+## Graphical held fire and real-process combat
+
+The [Bloodbath combat connection](../implementation/reports/m9_pvp.md) enables
+held primary/alternate fire through NetworkClient after reliable selection/USE/
+alternate commands. Reuse existing bindings and press suppression; menus/focus
+neutralize input without suspending the host. Keep original weapon timing,
+primary/dual-hand rules and one CMoveMgr update per client tick. Presentation
+prediction never applies damage. Original slow death and confirmed death remain
+distinct; USE respawn changes force before the following original HUD update.
+
+Two independent clients verify actual Beretta shots, private damage/impulses,
+one frag, new-life respawn and disconnect on the dedicated. The graphical host
+verifies the same loop between two independent remote clients while its local
+player/rendering remain active. These scripted retail encounters are bounded
+qualification, not human LAN or full M9 acceptance. Keep remaining remote audio/
+FX, scoreboard/chat, match limits/rotation, Team/CTF and broad combat qualification
+explicit. Preserve solo, PBR, immutable GPU references and independent M2/M3 gates.

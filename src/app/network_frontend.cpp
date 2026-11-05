@@ -176,8 +176,9 @@ namespace OpenBlood2
                 if (!client.command(action, error))
                     spdlog::info("Player command: {}", error);
             // Preserve reliable Control order: selection/use precede this frame's
-            // weapon timeline. Interactive firing follows the death/respawn port.
-            if (!client.update(now, input, controls.enabled && controls.focused, error))
+            // weapon timeline. Existing bindings suppress held fire across menus/focus.
+            const auto fire = controls.sample_fire(menu || leaving || !client.ready());
+            if (!client.update(now, input, controls.enabled && controls.focused, error, {fire.primary, fire.alternate}))
             {
                 if (server)
                 {
