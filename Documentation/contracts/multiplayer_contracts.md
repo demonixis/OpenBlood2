@@ -844,6 +844,12 @@ including corrections with no later frame to replay. Keep unavailable-owner
 setup deferred and invalid values refused. The separate-process loopback test
 is actual movement transport, not interactive gameplay or degraded combat.
 
+The endpoint publishes a joined peer's setup, impulses, weapon loadout, private
+events, command ACKs and audio only after the player's original first update
+(`InitializeClientState`) has run. That update teleports the client and forces
+the next owner generation in the admission tick; a command sent from an earlier
+setup would be refused as a stale owner. Queued state waits, it is never dropped.
+
 
 ## Reliable private player events
 
@@ -993,8 +999,11 @@ Refresh gates/force before each command, so a teleport between receipt and execu
 produces one negative ACK. Reuse original selection/cycling, USE, item/cursor/use,
 alternate zoom and detonation handlers. Empty/current in-range weapon selection
 still cancels zoom. Preserve item run/camera/Eye exceptions; ordinary gameplay
-refusal is a negative ACK, not a disconnected session. No cheat/raw-object command
-is exposed. Dead-player USE/respawn remains to port.
+refusal is a negative ACK, not a disconnected session. An actual command or
+weapon-frame error (a missing owner, a failed held-weapon update, a terminal
+respawn) isolates its player like a movement error: it is removed with a warning
+(`control_failures`) and the match keeps running. No cheat/raw-object command
+is exposed.
 
 The frontend samples existing bindings and source command order. Held Press input
 produces one rising command; focus/menu/loading suppression prevents replay on
@@ -1030,10 +1039,12 @@ A → B → A resets A even when no client tick ran between these events. Retain
 128 server-issued loadouts; input references must exist and be nondecreasing.
 
 Keep commands and weapon frames in one ordered Control queue. Bounds: 32 commands
-plus undrained command ACKs, 64 weapon frames, six processed weapon frames per
-server tick, one frame of credit per tick capped at 60. This bounded one-second
-late-input allowance may produce a catch-up burst; it is not hit rollback or a
-fully competitive authoritative movement/combat model. Duplicates never execute
+plus undrained command ACKs, 64 weapon frames, two processed weapon frames per
+server tick, one frame of credit per tick capped at 30. This half-second
+late-input allowance drains a delayed backlog at twice real time, so withheld
+frames never fire faster than 2x (the earlier six-per-tick/60-credit bound allowed
+a 6x burst); it is not hit rollback or a fully competitive authoritative
+movement/combat model. Duplicates never execute
 twice. Old force/view frames may advance animation proof but never grant gameplay.
 
 Latest unreliable State ACKs carry processed sequence and cumulative actual shots
@@ -1058,9 +1069,11 @@ independently of recipient count. Team/CTF scoring is not enabled by this subset
 Use the existing independent model replicas for humiliation and checked dimensions;
 defer resize from a contact transaction. Source fourth-animation gibs occur on
 respawn. Keep same player/inventory, source ammo reset, marker choice and world-owned
-shared creation timestamp for delayed spawn voice. A failed respawn must retain
-a dead player at the preceding position with explicit failure, never grant a live
-unchecked placement. Multiplayer life/frag fields are outside solo saves.
+shared creation timestamp for delayed spawn voice. A failed USE respawn (no start,
+or every marker occupied after the bounded retries) is terminal: Respawn's source
+side effects (ammo, inventory, timers, gibs, voice) cannot be undone, so the player
+is flagged (`respawn_failed`) and the server removes only that peer, naming the
+failure. Never hand-restore a half-respawned dead player for a later retry. Multiplayer life/frag fields are outside solo saves.
 
 Publish actual dead weapon state at PlayerDead even if USE runs before the next
 normal publication. Both endpoints observe every intervening loadout and run
@@ -1085,19 +1098,22 @@ The [remote impulse continuation](../implementation/reports/m9_network_impulses.
 uses protocol v13. Reliable Control MovementImpulse adds the original successful
 CDestructable/door delta to the independent client body once. Retain world/player/
 object/force identity, contiguous per-force sequence and finite bounded vectors.
-Do not run CMoveMgr, change position or reset the 0.14-second clock on receipt.
-Retire pre-impulse prediction checkpoints; never let an old ACK erase/replay a delta.
+Do not run CMoveMgr or change position on receipt. Prediction history is kept
+(clearing it on every impulse starved corrections under sustained fire): the
+client records the frame before which each impulse applied, and an ACK whose
+server state predates an impulse re-applies it at that frame while replaying.
 Defer ACKs ahead of reliable impulse delivery and impulses ahead of collision/setup.
 
-Reports and ACKs carry their highest applied impulse. Retain at most 128 pending
-deltas per peer. Add only unreceived deltas to a report's overwritten velocity,
-before collision; an acknowledged delta must not be added again. A report tick
-never integrates velocity*time. Existing intervening substeps remain velocity-only.
+Reports and ACKs carry their highest applied impulse. Retain at most 128 deltas
+per peer until a report acknowledges them. On replay, each substep of a report that
+predates a delta adds the missing velocity and its displacement over the substep,
+before collision and the leash; an acknowledged delta is never added again.
+Impulses created by a contact during replay apply to the report's later substeps.
 Force/respawn retires old deltas and histories. Backlog/velocity failure retires
 only the affected peer, leaving dedicated simulation and other players running.
 
 Death neutralizes commands, not passive CMoveMgr motion or checked report receipt.
-Preserve gravity/drag in the client and the half-second stale-report server hold.
+Preserve gravity/drag in the client and the server's no-extrapolation hold.
 Enable accumulation only for remote ServerSession players: the solo synchronous
 bridge already sees the changed velocity and must never receive a second delta.
 Generic SetVelocity interception, remaining weapon-specific pushes/trapped branches,
@@ -1117,10 +1133,13 @@ distinct; USE respawn changes force before the following original HUD update.
 Two independent clients verify actual Beretta shots, private damage/impulses,
 one frag, new-life respawn and disconnect on the dedicated. The graphical host
 verifies the same loop between two independent remote clients while its local
-player/rendering remain active. These scripted retail encounters are bounded
+player/rendering remain active. Both variants run on `multi/bb_fields`: Bloodbath
+markers are a random draw, and on `bb_bloodarena` two upper-ledge markers face
+each other through a wall. A hidden target's stalled walk turns 60 degrees.
+These scripted retail encounters are bounded
 qualification, not human LAN or full M9 acceptance. Keep remaining remote audio/
 FX, scoreboard/chat, match limits/rotation, Team/CTF and broad combat qualification
-explicit. Preserve solo, PBR, immutable GPU references and independent M2/M3 gates.
+explicit. Preserve solo, immutable GPU references and independent M2/M3 gates.
 
 
 ## Remote logical sound lifetimes
@@ -1185,7 +1204,7 @@ refusals remain explicit cosmetic diagnostics, never new server logical sounds.
 This adds actual private PCM, not the portrait/text HUD renderer. Frag/FinishHim,
 music, inventory sounds, movement cosmetics and server-mediated original weapon
 animation keys are separate consumers; the following lot connects weapon keys.
-Preserve the existing solo shotgun adaptation.
+Preserve the existing solo view-weapon key playback.
 
 ## Validated weapon animation sounds
 
@@ -1214,8 +1233,9 @@ force, pose, movement, camera, ammunition and combat checks.
 
 Do not gate draw/reload sounds as fire attempts or run a second weapon/movement
 integration. Source sound failure is diagnostic and cannot undo a shot. Preserve
-the solo shotgun-only local one-shot, including its separator normalization and
-unchanged clock/ownership. Other solo key playback remains outside this lot.
+the solo local one-shot for every weapon's SOUND_KEY (0.5.2), including its
+separator normalization and unchanged clock/ownership. Solo SOUNDLOOP/SOUNDSTOP
+keys remain outside this lot.
 
 ## Reliable Bloodbath player roster
 
@@ -1386,8 +1406,10 @@ protocol-16 LevelChanging, shared match settings and same-peer map replacement.
 Preserve original time-first `>=` thresholds, Either as OR, Never, and zero as an
 immediate threshold. Defaults remain Frags/25, host 15 minutes versus dedicated
 10 minutes. Use 64-bit 60 Hz ticks and at most 50 ordered maps, including the
-initial map. Bound frag limits to the current 1,000,000 score range. Host-only
-CLI flags cannot affect solo or a connecting client's server rules.
+initial map. Bound frag limits to the current 1,000,000 score range and time
+limits to 10,000 minutes. The header-only rules live in `engine/multiplayer_rules.h`
+(the engine options parse them). Host-only CLI flags cannot affect solo or a
+connecting client's server rules.
 
 Latch once before object updates, keep scores during the wait and rotate only
 when elapsed ticks exceed 450. Winner departure cannot cancel/restart it. Zero
@@ -1414,5 +1436,5 @@ look; gate commands and new shots independently on client and server while passi
 movement and existing simulation continue. Keep CMoveMgr's one integration and
 reporting clock. Preserve client output ownership, clear old voices before replacing
 geometry, reset presentation clocks and rebuild the existing GPU world only
-through its checked epoch boundary. Solo, renderer/PBR references and logical
+through its checked epoch boundary. Solo, renderer references and logical
 server audio clocks are unchanged. Team/CTF team limits remain a separate lot.

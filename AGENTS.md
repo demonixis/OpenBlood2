@@ -23,6 +23,16 @@ Preserve full force generations, `pose_continuity_limit` (followers stay interpo
 the occupied-marker list-order retry and one mouse total across the ticks that run.
 Combat, weapons/FX/audio over the wire and the original Host/Join screens are later lots.
 
+Lot 4 (protocol 16) adds Bloodbath combat: private loadouts, ordered commands, weapon
+frames replayed through the server CViewWeapon timeline, original death/slow death/
+respawn and frags, reliable impulses, network sounds/voices/announcer, roster,
+scoreboard, match limits and map rotation. Impulses ride the step replay (older
+reports' substeps add the missing delta; the client re-applies them at their frame
+on an ACK, history is kept). Weapon frames drain at most two per tick from half a
+second of credit. A failed USE respawn is terminal (`respawn_failed`) and command or
+weapon-frame errors isolate their player like movement errors. Solo plays every
+weapon SOUND_KEY as before; network-only paths stay behind the network game type.
+
 The [desktop third-person camera](Documentation/contracts/camera_contracts.md) adds a rebindable C toggle,
 actual player/held models and centred aim convergence. Preserve unchanged eye/shot/movement state,
 special-camera priority, temporary first-person zoom/tight-space fallback and the XR refusal.

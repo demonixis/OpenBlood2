@@ -41,7 +41,8 @@ namespace
         CHECK(parse_match_option("--end", "either", r) && r.end == MatchEnd::Either);
         CHECK(!parse_match_option("--end", "both", r) && !parse_match_option("--frag-limit", "-1", r));
         CHECK(!parse_match_option("--frag-limit", "1000001", r));
-        CHECK(parse_match_option("--time-limit", "4294967295", r) && !match_limit_reached(r, 36000, {}));
+        CHECK(!parse_match_option("--time-limit", "10001", r) && !parse_match_option("--time-limit", "4294967295", r));
+        CHECK(parse_match_option("--time-limit", "10000", r) && r.valid() && !match_limit_reached(r, 36000, {}));
         for (int i = 0; i < 49; ++i)
             CHECK(parse_match_option("--map", "multi/bb_crypt", r));
         CHECK(!parse_match_option("--map", "multi/bb_fields", r));

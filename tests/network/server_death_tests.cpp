@@ -178,18 +178,24 @@ namespace
                   last->killer == joined[1].object && last->killer_frags == -1);
         }
         CHECK(use()); // Exactly one broadcast draw for three recipients; no self slow-death chance.
-        // Missing starts retain the dead player instead of reviving at a bad destination.
+        // Missing starts make the USE respawn terminal: Respawn's side effects ran,
+        // so only this player is isolated (the endpoint removes it); no ACK, and
+        // the match keeps running.
         CHECK(hit(victim, victim, 1000, DamageType::FreeFall));
         victim.HandleDeath();
-        DVector dead_position;
-        CHECK(game.server.GetObjectPos(victim.m_hObject, &dead_position) == DE_OK);
         for (const auto id : game.objects.snapshot())
             if (auto* object = game.objects.get(id); object && dynamic_cast<GameStartPoint*>(object->game.get()))
                 CHECK(game.objects.remove(object->handle));
-        CHECK(game.objects.finish_frame() && use(false));
-        CHECK(victim.m_bDead && victim.m_damage.IsDead() && victim.m_damage.m_fHitPoints == 0);
-        const auto position = game.objects.get(joined[1].object)->state.m_Pos;
-        CHECK(position.x == dead_position.x && position.y == dead_position.y && position.z == dead_position.z);
+        CHECK(game.objects.finish_frame() && session.movement_setup(joined[1].player, setup, error));
+        CHECK(session.queue_command(joined[1].player, {setup.owner, ++command, {CommandKind::Use}}) ==
+              ServerSession::CommandResult::Queued);
+        CHECK(session.tick(error));
+        std::vector<CommandAck> refused;
+        CHECK(victim.respawn_failed && session.control_failures == 1);
+        CHECK(session.take_command_acks(joined[1].player, refused) && refused.empty());
+        CHECK(!session.movement_setup(joined[1].player, setup, error) &&
+              error.starts_with("Network respawn failed: No Bloodbath GameStartPoint"));
+        error.clear();
         CHECK(killer.m_Frags == 3 && victim.m_Frags == -2 && !finisher.m_Frags);
         CHECK(game.server.client_audio == nullptr && session.movement_steps == 0);
         CHECK(victim.Respawn());
@@ -210,7 +216,7 @@ namespace
         CHECK(session.clear_players());
         std::cout << "Retail Bloodbath death: source delay, slow .5/5/15s, healing gate, USE rescue/respawn, "
                      "humiliation, first-killer frags, self-frags, private/broadcast events, old-life refusal and "
-                     "failed-start rollback passed\n";
+                     "terminal failed-start respawn passed\n";
         return true;
     }
 } // namespace

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/multiplayer_rules.h"
+#include "engine/multiplayer_rules.h"
 #include <cstdint>
 #include <filesystem>
 #include <span>

@@ -459,6 +459,8 @@ namespace
                                   {f.movement_setups[0].code, record->state.m_Pos, {}, {}, true, 0},
                                   {},
                                   0,
+                                  record->state.m_Pos,
+                                  {},
                                   sequence};
             std::vector<std::uint8_t> bytes;
             CHECK(encode_movement(report, bytes) && f.clients[0].send(f.peers[0], Channel::State, bytes, error));

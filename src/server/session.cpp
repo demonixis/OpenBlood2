@@ -1,5 +1,4 @@
 #include "server/session.h"
-#include <algorithm>
 #include "game/client_replication.h"
 #include "game/game_settings.h"
 #include "game/original/AI_Mgr.h"
@@ -294,8 +293,8 @@ namespace OpenBlood2
                     std::find(reported_npcs_.begin(), reported_npcs_.end(), id) == reported_npcs_.end())
                 {
                     reported_npcs_.push_back(id);
-                    warnings_.push_back("Server NPC " + std::string(object->state.m_Name) + " suspended: " +
-                                        ai->runtime_error);
+                    warnings_.push_back("Server NPC " + std::string(object->state.m_Name) +
+                                        " suspended: " + ai->runtime_error);
                 }
         ++ticks_;
         ++total_ticks_;

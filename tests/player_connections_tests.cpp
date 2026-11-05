@@ -189,6 +189,24 @@ namespace
             const auto* record = game.objects.get(game.server_shell.Player(clients[i])->m_hObject);
             CHECK(record && record->state.m_Pos.x == positions[i].x && record->state.m_Pos.z == positions[i].z);
         }
+        // A USE respawn that finds no start is terminal: Respawn's side effects
+        // already ran, so the player is flagged for removal (never half-restored).
+        {
+            auto* dead = game.server_shell.Player(clients[1]);
+            CHECK(dead);
+            auto* markers = game.server.FindNamedObjects("Blood2StartPoint");
+            CHECK(markers);
+            std::vector<HOBJECT> handles;
+            for (auto* link = markers->m_pFirstLink; link; link = link->m_pNext)
+                handles.push_back(link->m_hObject);
+            game.server.RelinquishList(markers);
+            for (auto handle : handles)
+                CHECK(game.objects.remove(handle));
+            CHECK(game.objects.finish_frame());
+            dead->m_bDead = true;
+            dead->m_damage.m_bDead = true;
+            CHECK(!dead->OnCommandUse() && dead->respawn_failed && dead->entry_error == "No Bloodbath GameStartPoint");
+        }
         // The placement service does not expand the solo policy.
         game.server.net_game_type = GAMETYPE_SINGLE;
         CHECK(game.server.ResolveInitialActorOverlap(game.server_shell.Player(clients[0])->m_hObject) ==

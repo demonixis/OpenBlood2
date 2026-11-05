@@ -49,9 +49,20 @@ namespace
         CHECK(tick() && tick());
         MovementSetup setup;
         CHECK(session.movement_setup(joined.player, setup, error));
-        const auto initial = object->state.m_Pos;
-        MovementReport report{setup.owner, 1, {setup.code, initial, {1, 0, 0}, {}, true, 0}, {}, 0};
+        // One-substep report from the server body, as the client integrates it.
+        auto make = [&](std::uint64_t sequence, DVector velocity, std::uint64_t impulse)
+        {
+            const float seconds = 1.f / 120;
+            MovementReport value{setup.owner, sequence, {setup.code, object->state.m_Pos, velocity, {}, true, 0},
+                                 {},          0,        object->state.m_Pos,
+                                 {},          impulse};
+            value.steps.push_back({vector_scale(velocity, seconds), velocity, {}, seconds, true, 0});
+            value.move.position = vector_add(value.origin, value.steps[0].offset);
+            return value;
+        };
+        auto report = make(1, {1, 0, 0}, 0);
         CHECK(session.queue_movement(joined.player, report) == ServerSession::MoveResult::Queued && tick());
+        CHECK(near(object->velocity, {1, 0, 0}));
         // Original damage accumulation and once-consumed door push share one delta.
         player->m_damage.ApplyDamagePhysics(1, {1, 0, 0});
         player->m_damage.ApplyDamagePhysics(2, {1, 0, 0});
@@ -64,60 +75,49 @@ namespace
         CHECK(near(object->velocity, {31, 40, 0}) && !player->door_push_pending);
         CHECK(!player->m_damage.added_velocity_pending);
         CHECK(session.movement_impulses(joined.player, 1, impulses, error) && impulses.empty());
-        CHECK(near(object->velocity, {31, 40, 0}));
-        // A report in flight before the delta restores only its missing velocity.
-        ++report.sequence;
+        // A report integrated before the delta: each substep adds the missing
+        // velocity and its displacement, before collision.
+        const auto before = object->state.m_Pos;
+        report = make(2, {}, 0);
         CHECK(session.queue_movement(joined.player, report) == ServerSession::MoveResult::Queued && tick());
         std::optional<MovementAck> ack;
-        CHECK(session.movement_ack(joined.player, ack) && ack && ack->impulse_sequence == 1);
-        CHECK(near(ack->accepted.velocity, {31, 40, 0}) && near(object->state.m_Pos, initial));
-        CHECK(tick());
-        CHECK(near(object->state.m_Pos, vector_add(initial, vector_scale({31, 40, 0}, 1.f / 60))));
+        CHECK(session.movement_ack(joined.player, ack) && ack && ack->sequence == 2 && ack->impulse_sequence == 1);
+        CHECK(near(ack->accepted.velocity, {30, 40, 0}));
+        CHECK(near(object->state.m_Pos, vector_add(before, vector_scale({30, 40, 0}, 1.f / 120))));
+        // Not yet acknowledged by a report: still retained for the peer.
+        CHECK(session.movement_impulses(joined.player, 0, impulses, error) && impulses.size() == 1);
         // A client that has consumed the impulse carries the new velocity itself.
-        ++report.sequence;
-        report.impulse_sequence = 1;
-        report.move.position = object->state.m_Pos;
-        report.move.velocity = {8, 20, 0}; // Original drag/gravity may already have changed it.
+        report = make(3, {8, 20, 0}, 1); // Original drag/gravity may already have changed it.
         CHECK(session.queue_movement(joined.player, report) == ServerSession::MoveResult::Queued && tick());
-        CHECK(near(object->velocity, report.move.velocity));
+        CHECK(near(object->velocity, {8, 20, 0}));
         CHECK(session.movement_impulses(joined.player, 0, impulses, error) && impulses.empty());
-        auto invalid = report;
-        ++invalid.sequence;
-        invalid.impulse_sequence = 2;
+        auto invalid = make(4, {}, 2);
         CHECK(session.queue_movement(joined.player, invalid) == ServerSession::MoveResult::Invalid);
         invalid.impulse_sequence = 0;
         CHECK(session.queue_movement(joined.player, invalid) == ServerSession::MoveResult::Invalid);
-        // Death keeps passive reports and velocity-only server advance. No CMoveMgr
-        // commands, gravity or acceleration are integrated again on the server.
+        // A dead body keeps the server's own motion: reports are received but
+        // their substeps are not replayed.
         player->m_damage.m_bDead = DTRUE;
         player->m_damage.m_fHitPoints = 0;
         player->m_damage.reaction_damage_type = DamageType::FreeFall;
         player->DoDeath();
         CHECK(player->m_bDead && player->death_messages == 1);
-        ++report.sequence;
-        report.move.position = object->state.m_Pos;
-        report.move.velocity = {0, 12, 0};
-        report.move.acceleration = {0, 1000, 0};
-        report.controls.movement.forward = true;
-        CHECK(session.queue_movement(joined.player, report) == ServerSession::MoveResult::Queued && tick());
         const auto dead_position = object->state.m_Pos;
-        CHECK(session.movement_ack(joined.player, ack) && ack && near(ack->accepted.velocity, {0, 12, 0}));
-        CHECK(tick() && near(object->state.m_Pos, vector_add(dead_position, {0, .2f, 0})));
-        CHECK(near(object->velocity, {0, 12, 0}));
+        report = make(4, {0, 600, 0}, 1);
+        CHECK(session.queue_movement(joined.player, report) == ServerSession::MoveResult::Queued && tick());
+        CHECK(near(object->state.m_Pos, dead_position));
         // A new force/life retires unsent original deltas and every old ACK.
         player->m_damage.ApplyDamagePhysics(1, {1, 0, 0});
         CHECK(player->TeleportClientToServerPos());
+        const auto old_owner = setup.owner;
         CHECK(session.movement_setup(joined.player, setup, error));
-        CHECK(setup.owner.force_revision > report.owner.force_revision);
+        CHECK(setup.owner.force_revision > old_owner.force_revision);
         CHECK(!player->m_damage.added_velocity_pending && near(object->velocity, {}));
         CHECK(session.movement_impulses(joined.player, 0, impulses, error) && impulses.empty());
-        ++report.sequence;
+        report = make(5, {}, 0);
+        report.owner = old_owner;
         CHECK(session.queue_movement(joined.player, report) == ServerSession::MoveResult::Ignored);
-        report.owner = setup.owner;
-        report.move.move_code = setup.code;
-        report.impulse_sequence = 0;
-        report.move.velocity = report.move.acceleration = {};
-        report.move.position = object->state.m_Pos;
+        report = make(6, {}, 0);
         CHECK(session.queue_movement(joined.player, report) == ServerSession::MoveResult::Queued && tick());
         // Bound an unacknowledging peer without stopping other players/the server.
         for (unsigned i = 0; i < movement_impulse_limit; ++i)
@@ -131,7 +131,8 @@ namespace
         CHECK(!session.movement_setup(joined.player, setup, error));
         CHECK(session.movement_setup(other.player, setup, error));
         CHECK(session.leave(joined.player) && session.tick(error));
-        std::cout << "Server impulses: damage+door, old/new reports, dead passive motion, force retirement and "
+        std::cout << "Server impulses: damage+door, replayed missing deltas, acknowledged reports, dead bodies, force "
+                     "retirement and "
                      "isolated capacity passed\n";
         return true;
     }

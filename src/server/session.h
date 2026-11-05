@@ -1,5 +1,5 @@
 #pragma once
-#include "game/multiplayer_rules.h"
+#include "engine/multiplayer_rules.h"
 #include "game/server_adapter.h"
 #include "net/admission.h"
 #include "net/audio_events.h"
@@ -57,6 +57,9 @@ namespace OpenBlood2
         };
         MoveResult queue_movement(std::uint64_t player, const Net::MovementReport&);
         bool movement_setup(std::uint64_t player, Net::MovementSetup&, std::string& error);
+        // True until the original first update (InitializeClientState) has
+        // teleported the client: a setup published before it is superseded at once.
+        bool awaiting_first_update(std::uint64_t player);
         bool movement_ack(std::uint64_t player, std::optional<Net::MovementAck>&) const;
         // Reliable PSTATE_ADDVELOCITY deltas after `after`, for the current force.
         bool movement_impulses(std::uint64_t player, std::uint64_t after, std::vector<Net::MovementImpulse>&,
@@ -85,6 +88,10 @@ namespace OpenBlood2
         bool weapon_frame_ack(std::uint64_t player, std::optional<Net::WeaponFrameAck>&) const;
         bool take_command_acks(std::uint64_t player, std::vector<Net::CommandAck>&);
         std::uint64_t commands_applied = 0, commands_blocked = 0, commands_ignored = 0;
+        // Players removed after a command or weapon-frame error.
+        std::uint64_t control_failures = 0;
+        // Weapon frames: banked credit (half a second) and catch-up rate per tick.
+        static constexpr unsigned weapon_credit_limit = 30, weapon_frames_per_tick = 2;
         std::uint64_t weapon_sounds_blocked = 0;
         bool begin_audio(std::uint64_t player, std::string& error);
         bool take_audio_events(std::uint64_t player, std::vector<Net::AudioEvent>&, std::string& error);

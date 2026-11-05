@@ -120,25 +120,11 @@ namespace
             server,  "--data-dir", data,           "--world", "multi/bb_crypt", "--map",     "multi/bb_fields",
             "--end", "time",       "--time-limit", "0",       "--bind",         "127.0.0.1", "--port",
             "0",     "--ticks",    "2100",         nullptr};
-        const char* hosted_args[]{server,
-                                  "--data-dir",
-                                  data,
-                                  "--host",
-                                  "multi/bb_crypt",
-                                  "--map",
-                                  "multi/bb_fields",
-                                  "--end",
-                                  "time",
-                                  "--time-limit",
-                                  "0",
-                                  "--port",
-                                  "0",
-                                  "--frames",
-                                  "750",
-                                  "--name",
-                                  "Rotation host",
-                                  "--capture",
-                                  "rotation-host.png",
+        const char* hosted_args[]{server, "--data-dir", data, "--host", "multi/bb_crypt", "--map", "multi/bb_fields",
+                                  "--end", "time", "--time-limit", "0", "--port", "0",
+                                  // Frames, not ticks: enough for two rotations
+                                  // on a 120 Hz display as well as at 60 Hz.
+                                  "--frames", "2400", "--name", "Rotation host", "--capture", "rotation-host.png",
                                   nullptr};
         host.handle = SDL_CreateProcess(hosted ? hosted_args : dedicated_args, true);
         error = SDL_GetError();

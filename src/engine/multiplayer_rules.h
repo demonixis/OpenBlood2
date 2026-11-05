@@ -20,10 +20,13 @@ namespace OpenBlood2
     {
         MatchEnd end = MatchEnd::Frags;
         std::uint32_t frags = 25, minutes = 10;
+        // Bounded like every other option: about a week of play.
+        static constexpr std::uint32_t frag_limit = 1000000, minute_limit = 10000;
         std::vector<std::string> following_maps; // First map is --world / --host; original cap: 50 total.
         bool valid() const
         {
-            return end >= MatchEnd::Frags && end <= MatchEnd::Never && frags <= 1000000 && following_maps.size() < 50;
+            return end >= MatchEnd::Frags && end <= MatchEnd::Never && frags <= frag_limit && minutes <= minute_limit &&
+                   following_maps.size() < 50;
         }
     };
     // Selected BloodServerShell::UpdateMultiplayer: TIME first, FRAGSANDTIME
@@ -64,9 +67,9 @@ namespace OpenBlood2
         const auto [end, ec] = std::from_chars(value.data(), value.data() + value.size(), number);
         if (ec != std::errc{} || end != value.data() + value.size())
             return false;
-        if (option == "--frag-limit" && number <= 1000000)
+        if (option == "--frag-limit" && number <= MultiplayerRules::frag_limit)
             rules.frags = number;
-        else if (option == "--time-limit")
+        else if (option == "--time-limit" && number <= MultiplayerRules::minute_limit)
             rules.minutes = number;
         else
             return false;

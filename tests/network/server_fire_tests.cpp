@@ -219,8 +219,9 @@ namespace
         for (unsigned tick = 0; tick < 180; ++tick)
             CHECK(step(false));
         CHECK(gun->shots == before_death);
-        // Idle accrues at most 60 credits. A burst processes at most six inputs
-        // per world tick, and its following selection must stay behind it.
+        // Idle accrues at most half a second of credit. A burst processes at most
+        // two inputs per world tick (never above 2x the fire rate), and its
+        // following selection must stay behind it.
         for (unsigned tick = 0; tick < 120; ++tick)
             CHECK(session.tick(error));
         CHECK(publish());
@@ -237,10 +238,15 @@ namespace
         CHECK(session.queue_weapon_frame(joined.player, excess) == Reception::Invalid);
         CHECK(session.queue_command(joined.player, {frame.owner, 1, {CommandKind::WeaponSlot, 0}}) ==
               Reception::Queued);
-        CHECK(session.tick(error) && session.weapon_frame_ack(joined.player, ack) && ack->sequence == before + 6);
+        CHECK(session.tick(error) && session.weapon_frame_ack(joined.player, ack) &&
+              ack->sequence == before + ServerSession::weapon_frames_per_tick);
         CHECK(inv.m_nCurWeaponSlot == 1);
-        for (unsigned tick = 0; tick < 10; ++tick)
-            CHECK(session.tick(error));
+        for (unsigned tick = 0; tick < 60 && ack->sequence != frame.sequence; ++tick)
+        {
+            const auto previous = ack->sequence;
+            CHECK(session.tick(error) && session.weapon_frame_ack(joined.player, ack) &&
+                  ack->sequence - previous <= ServerSession::weapon_frames_per_tick);
+        }
         CHECK(session.weapon_frame_ack(joined.player, ack) && ack->sequence == frame.sequence &&
               inv.m_nCurWeaponSlot == 0);
         std::vector<CommandAck> commands;

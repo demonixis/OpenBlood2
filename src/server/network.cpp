@@ -341,7 +341,10 @@ namespace OpenBlood2
                     return false;
                 continue;
             }
-            if (peer.phase == Phase::Joined)
+            // Private state waits for the original first update: a command
+            // sent from the admission-time owner would be refused once
+            // InitializeClientState forces the next one in the same tick.
+            if (peer.phase == Phase::Joined && !session_.awaiting_first_update(peer.player))
             {
                 Net::MovementSetup setup;
                 if (!session_.movement_setup(peer.player, setup, error) ||

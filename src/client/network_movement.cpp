@@ -245,9 +245,8 @@ namespace OpenBlood2
         out.reset();
         if (report)
         {
-            Net::MovementReport next{
-                setup_.owner, report->sequence, report->move, report->controls, pitch, report->origin, {},
-                impulse_sequence_};
+            Net::MovementReport next{setup_.owner, report->sequence, report->move, report->controls,
+                                     pitch,        report->origin,   {},           impulse_sequence_};
             next.steps.reserve(report->steps.size());
             for (const auto& s : report->steps)
                 next.steps.push_back({s.offset, s.velocity, s.acceleration, s.seconds, s.on_ground, s.surface});

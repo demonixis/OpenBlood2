@@ -287,6 +287,8 @@ class CPlayerObj : public CBaseCharacter
     std::uint64_t door_pushes = 0;
     bool ObjectTouchDoor(HOBJECT);
     bool ApplyDoorPush();
+    // Set by a failed multiplayer USE respawn; the network server removes the player.
+    bool respawn_failed = false;
     DVector use_from{}, use_to{};
     OpenBlood2::SegmentHit use_hit;
     OpenBlood2::SegmentResult use_result = OpenBlood2::SegmentResult::Miss;

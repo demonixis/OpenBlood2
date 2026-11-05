@@ -38,7 +38,10 @@ namespace OpenBlood2
             return false;
         auto* player = game_.server_shell.Player(p.client);
         if (!player)
+        {
+            error = "Network command owner is unavailable";
             return false;
+        }
         bool applied = false;
         if (!changing_level() && command.owner == p.setup.owner &&
             ((!player->m_bDead && !player->m_damage.IsDead()) || command.action.kind == Net::CommandKind::Use))
@@ -66,6 +69,11 @@ namespace OpenBlood2
                     if (!player->MovementBlocked() && !player->camera_movement_blocked &&
                         !(inventory.eye && inventory.eye->active))
                         applied = game_.server_shell.OnMessage(p.client, PlayerUse{action.aim});
+                    if (player->respawn_failed)
+                    {
+                        error = "Network respawn failed: " + player->entry_error;
+                        return false;
+                    }
                     break;
                 case Kind::Item:
                     applied = game_.server_shell.OnMessage(p.client, PlayerItemCommand{action.argument});
@@ -99,14 +107,20 @@ namespace OpenBlood2
     {
         for (auto& p : players_)
         {
-            // At most one second of delayed input is banked. Loss recovery may
-            // process six weapon frames per tick; it never advances movement.
-            p.weapon_credit = std::min(p.weapon_credit + 1, 60u);
+            if (!p.failure.empty())
+                continue;
+            // One weapon frame per server tick on average: at most half a second
+            // of delayed frames is banked, and a backlog drains at twice real
+            // time, so withheld frames never fire faster than 2x. It never
+            // advances movement.
+            p.weapon_credit = std::min(p.weapon_credit + 1, weapon_credit_limit);
             unsigned frames = 0;
+            std::string failure;
+            bool failed = false;
             while (!p.pending_controls.empty())
             {
                 const bool weapon = std::holds_alternative<Net::WeaponFrame>(p.pending_controls.front());
-                if (weapon && (!p.weapon_credit || frames == 6))
+                if (weapon && (!p.weapon_credit || frames == weapon_frames_per_tick))
                     break; // Later Control commands may not overtake this frame.
                 auto value = std::move(p.pending_controls.front());
                 p.pending_controls.pop_front();
@@ -115,17 +129,33 @@ namespace OpenBlood2
                     --p.queued_weapon_frames;
                     --p.weapon_credit;
                     ++frames;
-                    if (!apply_weapon_frame(p, std::get<Net::WeaponFrame>(value), error))
-                        return false;
+                    if (!apply_weapon_frame(p, std::get<Net::WeaponFrame>(value), failure))
+                    {
+                        failed = true;
+                        break;
+                    }
                 }
                 else
                 {
                     --p.queued_commands;
-                    if (!apply_command(p, std::get<Net::PlayerCommand>(value), error))
-                        return false;
+                    if (!apply_command(p, std::get<Net::PlayerCommand>(value), failure))
+                    {
+                        failed = true;
+                        break;
+                    }
                 }
             }
+            if (!failed)
+                continue;
+            // Like a movement error: only this player is removed (endpoint), the
+            // match keeps running.
+            p.failure = failure.empty() ? "Remote player control failed" : failure;
+            p.pending_controls.clear();
+            p.queued_commands = p.queued_weapon_frames = 0;
+            ++control_failures;
+            warnings_.push_back("Remote player " + std::to_string(p.id) + " removed: " + p.failure);
         }
+        (void)error;
         return true;
     }
 } // namespace OpenBlood2

@@ -47,8 +47,12 @@ namespace
                 accepted.acceleration = found->second.acceleration;
                 accepted.on_ground = found->second.standing && found->second.ground_normal.y >= .5f;
             }
-            return {report.owner, report.sequence, client.setup().sequence, accepted,
-                    client.movement().body.dimensions, report.impulse_sequence};
+            return {report.owner,
+                    report.sequence,
+                    client.setup().sequence,
+                    accepted,
+                    client.movement().body.dimensions,
+                    report.impulse_sequence};
         }
         bool box(DVector position, DVector dimensions)
         {
@@ -376,7 +380,13 @@ namespace
         CHECK(same(vector_add(before.velocity, impulse.velocity), a.client.movement().body.velocity));
         CHECK(a.client.manager().updates == updates && a.client.manager().substeps == substeps);
         CHECK(a.client.receive(impulse, a.error) == Reception::Ignored);
-        CHECK(a.client.receive(old, a.error) == Reception::Ignored);
+        // History is kept: an ACK whose server state predates the impulse applies,
+        // and the impulse is re-applied at the frame it was received.
+        const auto expected = a.client.movement().body.velocity;
+        CHECK(a.client.receive(old, a.error) == Reception::Applied);
+        CHECK(b.client.receive(b.ack(*rb), b.error) == Reception::Applied);
+        CHECK(same(vector_add(old.accepted.velocity, impulse.velocity), a.client.movement().body.velocity));
+        CHECK(same(expected, a.client.movement().body.velocity));
         CHECK(a.client.receive(future, a.error) == Reception::Ignored);
         auto invalid = impulse;
         invalid.sequence = 3;
@@ -393,9 +403,11 @@ namespace
         CHECK(a.client.receive(impulse, a.error) == Reception::Applied);
         CHECK(b.client.receive(impulse, b.error) == Reception::Applied);
         CHECK(a.client.impulse_sequence() == 2 && equal(a.client, b.client));
-        for (unsigned i = 1; i < 9; ++i)
-            CHECK(a.step(ra) && b.step(rb) && !ra && !rb);
-        CHECK(a.step(ra) && b.step(rb) && ra && rb && ra->sequence == 2 && ra->impulse_sequence == 2);
+        // Reports follow the 1/30 s cadence and acknowledge the latest impulse.
+        ra.reset();
+        for (unsigned i = 0; i < 9 && !ra; ++i)
+            CHECK(a.step(ra) && b.step(rb) && bool(ra) == bool(rb));
+        CHECK(ra && ra->sequence == 2 && ra->impulse_sequence == 2);
         CHECK(a.client.movement().body.position.y > before.position.y);
         auto correction = a.ack(*ra);
         correction.accepted.position.z += .1f;
@@ -403,7 +415,9 @@ namespace
         for (unsigned i = 0; i < 4; ++i)
             CHECK(a.step(ra) && b.step(rb));
         CHECK(a.client.receive(correction, a.error) == Reception::Applied && equal(a.client, b.client));
-        CHECK(a.client.replays == 4 && a.client.manager().substeps == 28);
+        // Seven frames of two substeps; replayed frames are not counted again.
+        CHECK(a.client.replays == 4 && a.client.manager().substeps == 14 &&
+              b.client.manager().substeps == a.client.manager().substeps);
         // Dead/slow-death movement gates neutralize controls, not existing momentum.
         auto setup = a.client.setup();
         ++setup.sequence;

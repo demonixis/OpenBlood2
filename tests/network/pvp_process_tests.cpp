@@ -61,7 +61,9 @@ namespace
         unsigned deaths = 0, frags = 0;
         std::uint64_t death_force = 0, max_impulse = 0;
         Clock::time_point death_at{}, finish_at{}, next_status = Clock::now();
-        float initial_ammo = 0;
+        float initial_ammo = 0, detour = 0;
+        DVector stall_from{};
+        Clock::time_point stall_at = Clock::now();
         while (Clock::now() < deadline)
         {
             MovementInput input;
@@ -94,13 +96,22 @@ namespace
                     from.y += client.movement().setup().eye_level;
                     auto to = target->pose.position;
                     const auto delta = vector_subtract(to, from);
-                    const float yaw = std::atan2(delta.x, delta.z);
-                    const float pitch = -std::atan2(delta.y, std::hypot(delta.x, delta.z));
-                    CHECK(client.look(pitch - client.pitch(), yaw - client.yaw()));
                     ClientSegmentHit hit;
                     const auto result = client.receiver().collision().intersect(
                         from, to, {client.joined().world, client.joined().object}, hit);
                     visible = result == SegmentResult::Miss || (result == SegmentResult::Hit && hit.object == other);
+                    // Spawns are a random draw: a wall may separate the markers.
+                    // While the target is hidden, a stalled walk turns 60 degrees.
+                    const auto now = Clock::now();
+                    if (visible)
+                        detour = 0;
+                    else if (std::hypot(from.x - stall_from.x, from.z - stall_from.z) > 8)
+                        stall_from = from, stall_at = now;
+                    else if (now - stall_at > std::chrono::milliseconds(500))
+                        detour += 1.0472f, stall_from = from, stall_at = now;
+                    const float yaw = std::atan2(delta.x, delta.z) + detour;
+                    const float pitch = visible ? -std::atan2(delta.y, std::hypot(delta.x, delta.z)) : 0.0f;
+                    CHECK(client.look(pitch - client.pitch(), yaw - client.yaw()));
                     const bool in_range = !shotgun || std::hypot(delta.x, delta.z) <= 250;
                     firing = !victim && visible && in_range;
                     input.forward = !visible || (shotgun && !victim && !in_range);
@@ -269,7 +280,7 @@ namespace
     {
         std::string error;
         Process host;
-        const char* dedicated_args[]{server,   "--data-dir", data,     "--world",   "multi/bb_bloodarena",
+        const char* dedicated_args[]{server,   "--data-dir", data,     "--world",   "multi/bb_fields",
                                      "--mode", "bloodbath",  "--bind", "127.0.0.1", "--port",
                                      "0",      "--ticks",    "2400",   nullptr};
         const char* hosted_args[]{server,      "--data-dir", data,           "--host", "multi/bb_fields",

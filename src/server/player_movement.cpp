@@ -112,10 +112,20 @@ namespace OpenBlood2
         }
         return true;
     }
+    bool ServerSession::awaiting_first_update(std::uint64_t id)
+    {
+        const auto it = std::find_if(players_.begin(), players_.end(), [&](const auto& p) { return p.id == id; });
+        if (it == players_.end())
+            return false;
+        const auto* player = game_.server_shell.Player(it->client);
+        return player && player->m_bFirstUpdate;
+    }
     bool ServerSession::movement_setup(std::uint64_t id, Net::MovementSetup& out, std::string& error)
     {
         auto it = std::find_if(players_.begin(), players_.end(), [&](const auto& p) { return p.id == id; });
-        if (it == players_.end() || !refresh_movement(*it, error))
+        // Collect first: a refused impulse backlog removes the peer here, like any
+        // other player failure.
+        if (it == players_.end() || !refresh_movement(*it, error) || !collect_impulses(*it, error))
             return false;
         out = it->setup;
         return true;
@@ -140,7 +150,7 @@ namespace OpenBlood2
             velocity = add(velocity, player->door_push_velocity);
             if (!player->ApplyDoorPush())
             {
-                error = "Remote player door push failed";
+                error = p.failure = "Remote player door push failed";
                 return false;
             }
         }
@@ -150,7 +160,8 @@ namespace OpenBlood2
         if (p.impulse_sequence == UINT64_MAX || p.impulses.size() >= Net::movement_impulse_limit ||
             !Net::valid_movement(value))
         {
-            error = "Remote movement impulse capacity or velocity refused";
+            // Terminal: the delta is already consumed from the body record.
+            error = p.failure = "Remote movement impulse capacity or velocity refused";
             return false;
         }
         p.impulses.push_back(value);
