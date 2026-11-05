@@ -66,7 +66,10 @@ namespace OpenBlood2
                 if (other != client && state.player == player)
                     return DE_ERROR;
             const auto* character = dynamic_cast<const CPlayerObj*>(record->game.get());
-            if (!character || (character->GetClient() && character->GetClient() != client))
+            // A CPlayerObj already bound to another connection is refused; a
+            // record of a derived class without the original object (save
+            // probes) has no client field to compare.
+            if (character && character->GetClient() && character->GetClient() != client)
                 return DE_ERROR;
         }
         if (auto* previous = objects_.get(it->second.player))

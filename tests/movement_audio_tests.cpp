@@ -162,7 +162,7 @@ namespace
         c.movement_input.jump = false;
         CHECK(g.step(1. / 60));
         // Camera gate refuses audio while a permitted movement branch can still jump.
-        CHECK(c.move_mgr.Update(g.server_shell, c.voice_manager, true, {.jump = true}, 0, 1. / 60, true));
+        CHECK(c.move_mgr.Update(true, {.jump = true}, 0, 1. / 60, true));
         CHECK(c.move_mgr.jump_voice_requests == 2 && c.move_mgr.jump_voice_starts == 1 &&
               c.voice_manager.reason == "external camera");
         const auto requests = c.move_mgr.jump_voice_requests;

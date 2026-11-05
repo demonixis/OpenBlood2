@@ -595,14 +595,14 @@ namespace
             MovementInput input{};
             const float yaw = 3.14159265f;
             for (int i = 0; i < 5; ++i)
-                CHECK(mgr.Update(game.server_shell, c.voice_manager, false, input, yaw, 1.0 / 60, true));
+                CHECK(mgr.Update(false, input, yaw, 1.0 / 60, true));
             const float base = mgr.body.position.y - mgr.body.dimensions.y;
             float peak = base;
             input.jump = input.run = true;
             input.forward = index > 0;
             for (int i = 0; i < 45; ++i)
             {
-                CHECK(mgr.Update(game.server_shell, c.voice_manager, false, input, yaw, 1.0 / 60, true));
+                CHECK(mgr.Update(false, input, yaw, 1.0 / 60, true));
                 peak = std::max(peak, mgr.body.position.y - mgr.body.dimensions.y);
             }
             const float end = mgr.body.position.y - mgr.body.dimensions.y;
@@ -649,12 +649,12 @@ namespace
             MovementInput input{};
             input.crouch = t.crouch;
             for (int i = 0; i < 5; ++i)
-                CHECK(mgr.Update(game.server_shell, c.voice_manager, false, input, t.yaw, 1.0 / 60, true));
+                CHECK(mgr.Update(false, input, t.yaw, 1.0 / 60, true));
             CHECK(p->crouched == t.crouch);
             const auto steps = mgr.body.stair_steps;
             input.forward = true;
             for (int i = 0; i < 30; ++i)
-                CHECK(mgr.Update(game.server_shell, c.voice_manager, false, input, t.yaw, 1.0 / 60, true));
+                CHECK(mgr.Update(false, input, t.yaw, 1.0 / 60, true));
             const float feet = mgr.body.position.y - mgr.body.dimensions.y;
             std::cout << t.world << " feet " << t.feet.y << " -> " << feet << " steps " << mgr.body.stair_steps - steps
                       << " last " << mgr.body.last_step_height << '\n';
@@ -690,7 +690,7 @@ namespace
         {
             for (int i = 0; i < frames; ++i)
             {
-                if (!mgr.Update(game.server_shell, c.voice_manager, false, input, yaw, 1.0 / 60, true))
+                if (!mgr.Update(false, input, yaw, 1.0 / 60, true))
                     return false;
                 airborne += !mgr.m_bOnGround;
             }
@@ -701,8 +701,8 @@ namespace
         CHECK(run(0, 120)); // North to the bend.
         CHECK(mgr.body.position.z > -1390 && std::abs(feet() - 544.001f) < .01);
         CHECK(run(-1.5707963f, 90)); // West through the bend and up the ramp.
-        std::cout << "duct ramp " << mgr.body.position.x << ',' << feet() << ',' << mgr.body.position.z
-                  << " overlaps " << mgr.body.overlap_contacts << '\n';
+        std::cout << "duct ramp " << mgr.body.position.x << ',' << feet() << ',' << mgr.body.position.z << " overlaps "
+                  << mgr.body.overlap_contacts << '\n';
         CHECK(mgr.body.position.x < 450 && std::abs(feet() - 576.001f) < .01);
         CHECK(run(-1.5707963f, 330)); // Out of the duct, where Caleb stands again.
         input = {};

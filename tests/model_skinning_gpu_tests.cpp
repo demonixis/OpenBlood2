@@ -5,6 +5,7 @@
 #include "engine/capture.h"
 #include "engine/model_renderer.h"
 #include "engine/runtime.h"
+#include "game/server_adapter.h"
 #include <algorithm>
 #include <cmath>
 #include <iostream>

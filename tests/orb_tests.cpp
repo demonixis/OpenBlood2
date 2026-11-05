@@ -6,6 +6,7 @@
 #include "game/original/OrbProjectile.h"
 #include "game/original/WeaponPickups.h"
 #include "game/original/spawn_object.h"
+#include "game/server_adapter.h"
 #include <cmath>
 #include <iostream>
 using namespace OpenBlood2;

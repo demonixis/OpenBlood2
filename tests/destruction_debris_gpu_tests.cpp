@@ -1,6 +1,6 @@
-#include "client/effect_services.h"
 #include "app/model_scene.h"
 #include "app/sprite_scene.h"
+#include "client/effect_services.h"
 #include "engine/capture.h"
 #include "engine/collision.h"
 #include "engine/runtime.h"
@@ -8,6 +8,7 @@
 #include "game/original/AI_Mgr.h"
 #include "game/original/Corpse.h"
 #include "game/original/Gib.h"
+#include "game/server_adapter.h"
 #include <algorithm>
 #include <cmath>
 #include <iostream>

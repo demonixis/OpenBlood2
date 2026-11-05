@@ -2,6 +2,7 @@
 #include "engine/capture.h"
 #include "engine/runtime.h"
 #include "engine/world_renderer.h"
+#include "game/server_adapter.h"
 #include <algorithm>
 #include <iostream>
 using namespace OpenBlood2;
