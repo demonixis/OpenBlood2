@@ -36,11 +36,14 @@ namespace
         Config config;
         config.data_dir = path_from_utf8(data);
         NetworkClient client;
-        CHECK(client.connect(config, "127.0.0.1", std::uint16_t(port), {}, Clock::now(), error));
+        JoinProfile profile;
+        profile.weapons = {WEAP_BERETTA, WEAP_SNIPERRIFLE};
+        CHECK(client.connect(config, "127.0.0.1", std::uint16_t(port), profile, Clock::now(), error));
         const auto deadline = Clock::now() + std::chrono::seconds(18);
         Clock::time_point leave_at;
         bool announced = false, leaving = false, saw_arrival = false, saw_departure = false, displaced = false;
         unsigned startup = 0, camera_frames = 0;
+        unsigned command_stage = 0;
         DVector initial;
         ObjectId other_player;
         while (Clock::now() < deadline)
@@ -71,6 +74,50 @@ namespace
                     initial = client.movement().movement().body.position;
                     leave_at = Clock::now() + std::chrono::seconds(observer ? 6 : 1);
                 }
+                using Kind = CommandKind;
+                if (!command_stage)
+                {
+                    CHECK(client.command({Kind::WeaponSlot, 0}, error));
+                    command_stage = 1;
+                }
+                else if (command_stage == 1 && client.command_acks == 1)
+                {
+                    CHECK(client.weapons().views()[0].type != WEAP_BERETTA);
+                    CHECK(client.command({Kind::NextWeapon}, error));
+                    command_stage = 2;
+                }
+                else if (command_stage == 2 && client.command_acks == 2)
+                {
+                    CHECK(client.weapons().views()[0].type == WEAP_BERETTA);
+                    CHECK(client.command({Kind::WeaponSlot, 2}, error));
+                    command_stage = 3;
+                }
+                else if (command_stage == 3 && client.command_acks == 3)
+                {
+                    CHECK(client.weapons().views()[0].type == WEAP_SNIPERRIFLE);
+                    CHECK(client.command({Kind::Alternate}, error));
+                    command_stage = 4;
+                }
+                else if (command_stage == 4 && client.command_acks == 4 && client.fov_x() == original_fov_zoomed)
+                {
+                    CHECK(client.zoomed() && client.zoom_crosshair() == 99);
+                    CHECK(client.command({Kind::WeaponSlot, 9}, error));
+                    command_stage = 5;
+                }
+                else if (command_stage == 5 && client.command_acks == 5 && client.fov_x() == original_fov_normal)
+                {
+                    CHECK(!client.zoomed() && !client.zoom_crosshair());
+                    CHECK(client.command({Kind::WeaponSlot, 1}, error));
+                    CHECK(client.command({Kind::Use, 0, {client.pitch(), client.yaw()}}, error));
+                    CHECK(client.command({Kind::NextItem}, error));
+                    CHECK(client.command({Kind::PreviousItem}, error));
+                    command_stage = 6;
+                }
+                else if (command_stage == 6 && client.command_acks == 9)
+                {
+                    CHECK(client.commands_applied == 8 && client.weapons().views()[0].type == WEAP_BERETTA);
+                    command_stage = 7;
+                }
                 for (const auto& object : world.frame().objects)
                 {
                     std::string name;
@@ -87,7 +134,7 @@ namespace
                 displaced |= vector_dot(delta, delta) > 1;
                 ++camera_frames;
                 CHECK(client.camera().position.x == client.movement().movement().body.position.x);
-                if (!leaving && Clock::now() >= leave_at)
+                if (!leaving && command_stage == 7 && Clock::now() >= leave_at)
                 {
                     CHECK(client.state_packets && (!observer || (saw_arrival && saw_departure)));
                     CHECK(client.event_sequence() && client.hud().stats.health > 0 && startup == 1);
@@ -100,6 +147,8 @@ namespace
                               << ", ammo=" << client.weapons().state()->ammunition[0]
                               << ", animation_updates=" << client.weapons().updates
                               << ", shots=" << client.weapons().views()[0].shots << "\n";
+                    std::cout << "Commands acknowledged=" << client.command_acks
+                              << ", applied=" << client.commands_applied << ", sniper zoom round-trip passed\n";
                     std::cout << "Camera frames=" << camera_frames << ", predicted eye height="
                               << client.camera().view.position.y - client.movement().movement().body.position.y
                               << ", mapped clock=" << client.time() << "\n";

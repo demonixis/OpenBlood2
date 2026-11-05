@@ -20,7 +20,7 @@ namespace
         std::string error;
         Config config;
         config.data_dir = path_from_utf8(data);
-        for (unsigned test = 0; test < 4; ++test)
+        for (unsigned test = 0; test < 5; ++test)
         {
             Transport server;
             CHECK(server.listen("127.0.0.1", 0, 1, error));
@@ -67,6 +67,12 @@ namespace
                 std::vector<std::uint8_t> bytes;
                 CHECK(encode_admission(Heartbeat{1}, bytes) && server.send(peer, Channel::State, bytes, error));
             }
+            else if (test == 3)
+            {
+                std::vector<std::uint8_t> bytes;
+                CHECK(encode_command(CommandAck{{1, 1, {0, 1}, 1}, 1, true}, bytes) &&
+                      server.send(peer, Channel::Control, bytes, error));
+            }
             else
                 CHECK(server.disconnect(peer, std::uint32_t(Reject::Content)));
             server.flush();
@@ -76,13 +82,13 @@ namespace
             {
                 if (!client.update(Clock::now(), {}, false, error))
                 {
-                    CHECK(test < 3 && client.phase() == NetworkClient::Phase::Failed);
+                    CHECK(test < 4 && client.phase() == NetworkClient::Phase::Failed);
                     progressed = true;
                     break;
                 }
                 if (client.phase() == NetworkClient::Phase::Closed)
                 {
-                    CHECK(test == 3 && client.reason() == reject_text(std::uint32_t(Reject::Content)));
+                    CHECK(test == 4 && client.reason() == reject_text(std::uint32_t(Reject::Content)));
                     progressed = true;
                     break;
                 }

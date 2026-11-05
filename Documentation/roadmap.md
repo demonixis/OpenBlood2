@@ -327,6 +327,8 @@ logic behind client services; the synchronous solo bridge remains, with network 
 [Private weapon loadouts](implementation/reports/m9_weapon_loadout.md) now deliver both hands, mode-specific ammo
 and server permissions to independent remote views; draw/rest animations render in dedicated/host sessions.
 Firing input, authoritative shot validation and remote audio/FX remain to connect.
+[Reliable player commands](implementation/reports/m9_player_commands.md) now connect selection/cycling, USE,
+items, alternate zoom and detonation through bounded, generation-checked server dispatch and ACKs.
 **Remaining private presentation consumers/commands, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client

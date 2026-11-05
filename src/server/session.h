@@ -3,6 +3,7 @@
 #include "net/admission.h"
 #include "net/content.h"
 #include "net/movement.h"
+#include "net/player_commands.h"
 #include "net/player_events.h"
 #include "net/world_snapshot.h"
 #include "server/clock.h"
@@ -50,6 +51,15 @@ namespace OpenBlood2
         // server clock (client/server clock drift), capped at half a second.
         static constexpr double movement_budget_rate = 1.05, movement_budget_limit = .5;
         bool weapon_loadout(std::uint64_t player, Net::WeaponLoadout&, std::string& error);
+        enum class CommandResult
+        {
+            Queued,
+            Ignored,
+            Invalid
+        };
+        CommandResult queue_command(std::uint64_t player, const Net::PlayerCommand&);
+        bool take_command_acks(std::uint64_t player, std::vector<Net::CommandAck>&);
+        std::uint64_t commands_applied = 0, commands_blocked = 0, commands_ignored = 0;
         bool take_private_events(std::uint64_t player, std::vector<Net::PrivateEvent>&, std::string& error);
         std::uint64_t private_events = 0, subsumed_events = 0;
         bool leave(std::uint64_t player);
@@ -98,6 +108,9 @@ namespace OpenBlood2
             ObjectId camera_eye, camera_orb;
             std::optional<Net::CameraState> camera;
             std::optional<Net::WeaponLoadout> weapons;
+            std::vector<Net::PlayerCommand> commands;
+            std::vector<Net::CommandAck> command_acks;
+            std::uint64_t command_sequence = 0;
             std::deque<Net::MovementReport> pending;
             std::optional<Net::MovementAck> ack;
             PlayerControls controls;
@@ -119,6 +132,7 @@ namespace OpenBlood2
         bool refresh_camera(Player&, Net::CameraState&, std::string& error);
         bool refresh_movement(Player&, std::string& error);
         bool advance_players(double seconds, std::string& error);
+        bool apply_commands(std::string& error);
         bool advance_player(Player&, double seconds, std::string& error);
         bool replay_movement(Player&, const Net::MovementReport&, std::string& error);
     };

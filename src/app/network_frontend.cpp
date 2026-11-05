@@ -5,6 +5,7 @@
 #include "app/gamepad_devices.h"
 #include "app/hud.h"
 #include "app/movement_controls.h"
+#include "app/network_controls.h"
 #include "app/scene_presenter.h"
 #include "app/ui_runtime.h"
 #include "client/network_client.h"
@@ -66,6 +67,8 @@ namespace OpenBlood2
         HudRenderer hud(runtime.gpu);
         GamepadDevices devices;
         MovementControls controls;
+        NetworkControls actions;
+        std::vector<Net::CommandAction> sampled_actions;
         MenuSettings settings;
         std::filesystem::path preferences, bindings;
         if (!menu_preferences_path(preferences, error) || !load_menu_preferences(preferences, settings, error) ||
@@ -164,12 +167,17 @@ namespace OpenBlood2
             controls.enabled = !menu && !leaving;
             const auto input = controls.sample(menu);
             PlayerRotation aim{client.pitch(), client.yaw()};
-            controls.look(aim, seconds, menu);
+            controls.look(aim, seconds, menu, client.zoomed());
             if (!client.look(aim.pitch - client.pitch(), aim.yaw - client.yaw()) ||
                 !client.update(now, input, controls.enabled && controls.focused, error))
                 return failed();
+            actions.sample(controls, menu || leaving || !client.ready(), {client.pitch(), client.yaw()},
+                           sampled_actions);
+            for (const auto& action : sampled_actions)
+                if (!client.command(action, error))
+                    spdlog::info("Player command: {}", error);
             // HUD/camera events are already applied by the endpoint. Audio and
-            // other effects acquire their independent consumers in the next lot.
+            // other effects still need their remote consumers.
             client.take_events(events);
             if (client.ready() && !entered)
             {
@@ -189,8 +197,10 @@ namespace OpenBlood2
             if (visible)
             {
                 const auto& values = client.hud();
-                auto state = hud_state(values.stats, true, bool(camera.view.object), camera.death.active,
-                                       settings.crosshair, DBYTE(settings.crosshair_number));
+                auto state =
+                    hud_state(values.stats, true, bool(camera.view.object), camera.death.active,
+                              settings.crosshair || client.zoom_crosshair(),
+                              client.zoom_crosshair() ? client.zoom_crosshair() : DBYTE(settings.crosshair_number));
                 state.items = values.items;
                 state.item_messages = values.item_messages;
                 state.item_shows = values.item_shows;
@@ -265,6 +275,7 @@ namespace OpenBlood2
                 scene.pitch = client.pitch();
                 scene.yaw = client.yaw();
                 scene.camera_position = camera.camera_position;
+                scene.fov_x = client.fov_x();
                 scene.weapons = {&client.weapons().views()[0], &client.weapons().views()[1]};
                 if (!presenter.update(scene, error) ||
                     !presenter.record(scene, commands, target, format, width, height, error))
@@ -311,6 +322,7 @@ namespace OpenBlood2
         SDL_WaitForGPUIdle(runtime.gpu);
         spdlog::info("Network session ended: frames={}, reports={}, states={}, discarded_ticks={}, reason={}", frames,
                      client.reports, client.state_packets, client.discarded_ticks, client.reason());
+        spdlog::info("Player commands: acknowledged={}, applied={}", client.command_acks, client.commands_applied);
         if (server)
             spdlog::info("Host stopped: ticks={}, discarded_ticks={}, admitted={}, departed={}", server->ticks(),
                          server_clock.discarded_ticks(), network->admitted, network->departed);

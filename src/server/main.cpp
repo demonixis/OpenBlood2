@@ -33,14 +33,15 @@ int main(int argc, char** argv)
         const std::string_view arg = argv[i];
         if (arg == "--help")
         {
-            std::cout << "OpenBlood2 dedicated server (M9: Bloodbath world replication; movement enabled; combat pending)\n"
-                      << "  --data-dir PATH  External retail installation (or BLOOD2_DATA_DIR)\n"
-                      << "  --world NAME     Retail multi/bb_* or multi/ctf_* map\n"
-                      << "  --mode MODE      bloodbath, team, ctf\n"
-                      << "  --bind ADDRESS   IPv4 bind address (default 0.0.0.0)\n"
-                      << "  --port N         UDP port (default 27888; 0 selects an ephemeral port)\n"
-                      << "  --max-players N  1..16 (default 16)\n"
-                      << "  --ticks N        Stop after N simulation ticks (0: until SIGINT/SIGTERM)\n";
+            std::cout
+                << "OpenBlood2 dedicated server (M9: Bloodbath world replication; movement enabled; combat pending)\n"
+                << "  --data-dir PATH  External retail installation (or BLOOD2_DATA_DIR)\n"
+                << "  --world NAME     Retail multi/bb_* or multi/ctf_* map\n"
+                << "  --mode MODE      bloodbath, team, ctf\n"
+                << "  --bind ADDRESS   IPv4 bind address (default 0.0.0.0)\n"
+                << "  --port N         UDP port (default 27888; 0 selects an ephemeral port)\n"
+                << "  --max-players N  1..16 (default 16)\n"
+                << "  --ticks N        Stop after N simulation ticks (0: until SIGINT/SIGTERM)\n";
             return 0;
         }
         if (++i >= argc)
@@ -105,7 +106,8 @@ int main(int argc, char** argv)
     std::signal(SIGTERM, stop);
     std::cout << "Server simulation: " << session.game().world_path << ", UDP " << network.port() << ", data "
               << digest_text(session.fingerprint())
-              << "\nBloodbath admission and 20 Hz world replication enabled; movement enabled; combat pending.\n"
+              << "\nBloodbath admission and 20 Hz world replication enabled; movement and player commands enabled; "
+                 "combat pending.\n"
               << std::flush;
     ServerClock clock;
     auto previous = std::chrono::steady_clock::now();
@@ -140,6 +142,8 @@ int main(int argc, char** argv)
               << ", admitted=" << network.admitted << ", departed=" << network.departed
               << ", rejected=" << network.rejected << ", timed_out=" << network.timed_out
               << ", membership_updates=" << network.membership_updates << ", state_updates=" << network.state_updates
-              << ", state_drops=" << network.state_drops << ", state_bytes=" << network.state_bytes << '\n';
+              << ", state_drops=" << network.state_drops << ", state_bytes=" << network.state_bytes
+              << ", commands_applied=" << session.commands_applied << ", commands_blocked=" << session.commands_blocked
+              << ", commands_ignored=" << session.commands_ignored << '\n';
     return 0;
 }

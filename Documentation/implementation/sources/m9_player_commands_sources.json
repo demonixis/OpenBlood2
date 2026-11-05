@@ -1,0 +1,67 @@
+{
+  "scope": "Reliable bounded player commands, original server dispatch and remote zoom presentation",
+  "baseline": "04c7bdf88f6360afdee14e9ed8fcff0d94a33557",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "04c7bdf88f6360afdee14e9ed8fcff0d94a33557",
+      "path": "src/game/original/BloodShells.cpp",
+      "sha256": "e7a7a7db9353e013918e03dcef094889dddf1b219e1f193ce743e16153b9af38"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "04c7bdf88f6360afdee14e9ed8fcff0d94a33557",
+      "path": "src/game/original/PlayerUse.cpp",
+      "sha256": "3b97b53294d5c1ce5a141eb43095b5f74232566001d76896cdb3a0e9f0e7e5dc"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "04c7bdf88f6360afdee14e9ed8fcff0d94a33557",
+      "path": "src/game/original/PlayerRemoteBombs.cpp",
+      "sha256": "76b1898285358c5885a2d630e02a68779e9b30d8a803d35d44c9ee43bde9c545"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "04c7bdf88f6360afdee14e9ed8fcff0d94a33557",
+      "path": "src/game/original/InventoryMgr.cpp",
+      "sha256": "bf9085b7a5baf12dad2f8f103ac5097a1c1a8e712b224388ea9617ff2bd92f09"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "04c7bdf88f6360afdee14e9ed8fcff0d94a33557",
+      "path": "src/app/movement_controls.h",
+      "sha256": "2016f3de3801c9ab1166518316e3a769f89745066c5c8c3adc481d563e02d624"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "04c7bdf88f6360afdee14e9ed8fcff0d94a33557",
+      "path": "src/game/original/ClientCrosshair.h",
+      "sha256": "fe25d7206d17b1eed5c569e222ca0f99188b12ce2409ba9ac221e1e9af83f0be"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/InventoryMgr.cpp",
+      "sha256": "a207680a0d9ae190d9a751d63b9f575446f7b53b4d8ccb264f533af592b706bb"
+    }
+  ],
+  "adaptations": [
+    "New portable protocol-v10 command/ACK messages; fixed action allowlist, owner/world/full-force identity, ordered sequence and bounded request/ACK storage.",
+    "Execute commands after authoritative movement in the normal server tick; reuse original inventory, USE, item, zoom and remote detonation handlers.",
+    "Sample existing device bindings with fresh-edge suppression; preserve source command order, zoom FOV rate and crosshair types.",
+    "Accept bounded authored USE rotations without requiring normalization; no movement or firing simulation is added.",
+    "Fire validation, weapon drop/grab/taunt, creature escape, dead respawn, audio/FX and match rules remain subsequent work."
+  ]
+}

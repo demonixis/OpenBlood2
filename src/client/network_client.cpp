@@ -71,6 +71,26 @@ namespace OpenBlood2
         }
         if (phase_ == Phase::Closing)
             return true;
+        if (Net::is_command_packet(event.bytes))
+        {
+            Net::CommandMessage message;
+            if (phase_ != Phase::Active || event.channel != Net::Channel::Control ||
+                Net::decode_command(event.bytes, message) != Net::DecodeCommand::Ok)
+                return false;
+            const auto* ack = std::get_if<Net::CommandAck>(&message);
+            if (!ack || ack->owner.world != joined_.world || ack->owner.player != joined_.player ||
+                ack->owner.object != joined_.object)
+                return false;
+            if (ack->sequence <= command_acks)
+                return true;
+            if (pending_commands_.empty() || ack->sequence != pending_commands_.front().sequence ||
+                ack->owner != pending_commands_.front().owner)
+                return false;
+            command_acks = ack->sequence;
+            commands_applied += ack->applied;
+            pending_commands_.erase(pending_commands_.begin());
+            return true;
+        }
         if (event.kind == Net::EventKind::Connected)
         {
             if (phase_ != Phase::Connecting || !send(Net::Hello{Net::Edition::Retail, digest_}, error))
@@ -99,7 +119,10 @@ namespace OpenBlood2
                 yaw_ = aim->yaw;
             }
             if (const auto* zoom = std::get_if<ZoomView>(&value.value))
+            {
                 zoom_ = zoom->on;
+                zoom_crosshair_ = zoom->type;
+            }
             return observe(double(value.tick) / 60, now);
         }
         if (Net::is_movement_packet(event.bytes))
@@ -254,6 +277,16 @@ namespace OpenBlood2
                     return fail(error, "Client prediction failed");
                 if (!weapons_.update(movement_.setup().owner.force_revision, NetworkInput::step, error))
                     return fail(error, "Client weapon presentation failed");
+                if (!camera_.camera().view.object)
+                {
+                    const float speed = 8 * float(NetworkInput::step);
+                    if (zoom_ && fov_x_ > original_fov_zoomed)
+                        fov_x_ = std::max(fov_x_ - speed, original_fov_zoomed);
+                    else if (!zoom_ && fov_x_ < original_fov_normal)
+                        fov_x_ = std::min(fov_x_ + speed, original_fov_normal);
+                    else if (!zoom_ && fov_x_ > original_fov_normal)
+                        fov_x_ = std::max(fov_x_ - speed, original_fov_normal);
+                }
                 if (report)
                 {
                     std::vector<std::uint8_t> bytes;
@@ -275,6 +308,35 @@ namespace OpenBlood2
         else
             input_ = {};
         transport_.flush();
+        return true;
+    }
+    float NetworkClient::fov_x() const
+    {
+        if (camera_.camera().view.object && camera_.camera().kind == ClientCameraKind::Orb)
+            return original_fov_normal * 1.5f;
+        if (camera_.camera().view.object && camera_.camera().view.settings.type == 1)
+            return original_fov_normal;
+        return fov_x_;
+    }
+    bool NetworkClient::command(const Net::CommandAction& action, std::string& error)
+    {
+        error.clear();
+        if (!ready() || pending_commands_.size() >= Net::command_queue_limit || command_sequence_ == UINT64_MAX)
+        {
+            error = "Player command unavailable or pending queue full";
+            return false;
+        }
+        const Net::PlayerCommand value{movement_.setup().owner, command_sequence_ + 1, action};
+        std::vector<std::uint8_t> bytes;
+        if (!Net::encode_command(value, bytes))
+        {
+            error = "Invalid player command";
+            return false;
+        }
+        if (!transport_.send(peer_, Net::Channel::Control, bytes, error))
+            return false;
+        pending_commands_.push_back(value);
+        ++command_sequence_;
         return true;
     }
     bool NetworkClient::look(float pitch_delta, float yaw_delta)

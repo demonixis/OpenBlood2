@@ -976,3 +976,31 @@ This step supplies draw/rest presentation only. No firing input or weapon comman
 is submitted yet; animation sound requests are counted with explicit unavailable
 output, never reported as played. Authoritative fire validation/deduplication,
 selection, predicted cosmetic shots and remote audio/FX follow separately.
+
+
+## Reliable player commands
+
+The [command continuation](../implementation/reports/m9_player_commands.md) adds
+protocol-v10 B2PC requests/ACKs on Control. Keep the explicit ten-action allowlist,
+57-byte requests/48-byte replies, full world/player/object/force identity and
+strictly ordered command sequence. Duplicates never dispatch twice. At most 32
+queued requests plus undrained ACKs exist per server player; the client likewise
+keeps at most 32 outstanding requests. Reject malformed channels, types, stream
+gaps and excess capacity. ACKs must match the client's oldest pending identity.
+
+Apply commands after authoritative movement, within the existing server tick.
+Refresh gates/force before each command, so a teleport between receipt and execution
+produces one negative ACK. Reuse original selection/cycling, USE, item/cursor/use,
+alternate zoom and detonation handlers. Empty/current in-range weapon selection
+still cancels zoom. Preserve item run/camera/Eye exceptions; ordinary gameplay
+refusal is a negative ACK, not a disconnected session. No cheat/raw-object command
+is exposed. Dead-player USE/respawn remains to port.
+
+The frontend samples existing bindings and source command order. Held Press input
+produces one rising command; focus/menu/loading suppression prevents replay on
+resume. USE carries finite bounded original angles (authored yaw may exceed pi),
+never a client-selected origin or target. The server casts from its checked body.
+ZoomView now drives original FOV rate/limits, external-camera exceptions, crosshair
+overrides and quarter-sensitivity mouse look. Weapon firing, drop/grab/taunt,
+creature escape, remote item light/audio effects and complete match rules remain
+separate work. Solo entrypoints and CMoveMgr are unchanged.

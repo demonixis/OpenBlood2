@@ -6,7 +6,9 @@
 #include "client/network_player_events.h"
 #include "client/network_weapons.h"
 #include "client/network_world.h"
+#include "game/original/ClientCrosshair.h"
 #include "net/content.h"
+#include "net/player_commands.h"
 #include "net/transport.h"
 #include <chrono>
 namespace OpenBlood2
@@ -35,6 +37,8 @@ namespace OpenBlood2
                      Clock::time_point, std::string& error);
         bool update(Clock::time_point, const MovementInput&, bool commands, std::string& error);
         bool look(float pitch_delta, float yaw_delta);
+        bool command(const Net::CommandAction&, std::string& error);
+        std::uint64_t command_acks = 0, commands_applied = 0;
         bool disconnect(Clock::time_point);
         Phase phase() const
         {
@@ -112,6 +116,15 @@ namespace OpenBlood2
         {
             return mapped_time_;
         }
+        bool zoomed() const
+        {
+            return zoom_;
+        }
+        DBYTE zoom_crosshair() const
+        {
+            return zoom_ ? zoom_crosshair_ : 0;
+        }
+        float fov_x() const;
         std::uint64_t reports = 0, state_packets = 0, discarded_ticks = 0;
 
       private:
@@ -141,7 +154,11 @@ namespace OpenBlood2
         double mapped_time_ = 0;
         float pitch_ = 0, yaw_ = 0;
         bool zoom_ = false;
+        DBYTE zoom_crosshair_ = 0;
+        float fov_x_ = original_fov_normal;
         std::string reason_;
+        std::uint64_t command_sequence_ = 0;
+        std::vector<Net::PlayerCommand> pending_commands_;
         bool send(const Net::AdmissionMessage&, std::string&);
         bool receive(const Net::Event&, Clock::time_point, std::string&);
         bool complete_baseline(Clock::time_point, std::string&);

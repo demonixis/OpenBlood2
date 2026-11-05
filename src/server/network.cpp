@@ -72,6 +72,25 @@ namespace OpenBlood2
     bool ServerNetwork::receive(std::size_t index, const Net::Event& event, Clock::time_point now, std::string& error)
     {
         const auto reject = [&](Net::Reject reason) { return remove(index, std::uint32_t(reason), true, error); };
+        if (Net::is_command_packet(event.bytes))
+        {
+            auto& peer = peers_[index];
+            if (peer.phase != Phase::Joined || event.channel != Net::Channel::Control)
+                return reject(Net::Reject::Order);
+            Net::CommandMessage message;
+            const auto decoded = Net::decode_command(event.bytes, message);
+            if (decoded != Net::DecodeCommand::Ok)
+                return reject(decoded == Net::DecodeCommand::Protocol ? Net::Reject::Protocol : Net::Reject::Malformed);
+            const auto* command = std::get_if<Net::PlayerCommand>(&message);
+            if (!command)
+                return reject(Net::Reject::Order);
+            const auto result = session_.queue_command(peer.player, *command);
+            if (result == ServerSession::CommandResult::Invalid)
+                return reject(Net::Reject::Player);
+            if (result == ServerSession::CommandResult::Queued)
+                peer.deadline = now + 15s;
+            return true;
+        }
         if (Net::is_movement_packet(event.bytes))
         {
             auto& peer = peers_[index];
@@ -250,6 +269,16 @@ namespace OpenBlood2
                         break;
                     std::vector<std::uint8_t> bytes;
                     sent = Net::encode_private(event, bytes) &&
+                           transport_.send(peer.peer, Net::Channel::Control, bytes, error);
+                }
+                std::vector<Net::CommandAck> acknowledgements;
+                sent = sent && session_.take_command_acks(peer.player, acknowledgements);
+                for (const auto& ack : acknowledgements)
+                {
+                    if (!sent)
+                        break;
+                    std::vector<std::uint8_t> bytes;
+                    sent = Net::encode_command(ack, bytes) &&
                            transport_.send(peer.peer, Net::Channel::Control, bytes, error);
                 }
                 if (!sent)

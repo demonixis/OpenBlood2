@@ -176,7 +176,8 @@ namespace OpenBlood2
             error = "Server world is not started";
             return false;
         }
-        if (!game_.step_server(ServerClock::step, [&](double seconds) { return advance_players(seconds, error); }))
+        if (!game_.step_server(ServerClock::step, [&](double seconds)
+                               { return advance_players(seconds, error) && apply_commands(error); }))
         {
             if (error.empty())
                 error = "Server simulation failed";

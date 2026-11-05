@@ -66,7 +66,7 @@ namespace
             PrivateEvent value{{7, 8, {9, 10}}, 11, 12, values[index]};
             std::vector<std::uint8_t> bytes, again;
             CHECK(encode_private(value, bytes) && is_private_packet(bytes) && bytes.size() <= private_packet_limit);
-            const std::vector<std::uint8_t> header{0x42, 0x32, 0x50, 0x45, 9, 0, std::uint8_t(index + 1)};
+            const std::vector<std::uint8_t> header{0x42, 0x32, 0x50, 0x45, 10, 0, std::uint8_t(index + 1)};
             CHECK(std::equal(header.begin(), header.end(), bytes.begin()));
             PrivateEvent decoded;
             CHECK(decode_private(bytes, decoded) == DecodePrivate::Ok && encode_private(decoded, again) &&
