@@ -20,6 +20,7 @@
 | [Independent client movement](implementation/reports/m9_movement_services.md) | Server-independent CMoveMgr, replica prediction and original report cadence. |
 | [Reusable network client](implementation/reports/m9_network_client.md) | Independent admission, world/movement/HUD/camera endpoint and monotonic presentation clock. |
 | [Graphical network frontend](implementation/reports/m9_network_frontend.md) | Direct IPv4 connection, single-simulation host, independent rendered world/HUD and fixed-tick input. |
+| [Independent weapon runtime](implementation/reports/m9_weapon_services.md) | CViewWeapon service boundary, unchanged synchronous solo bridge and independent retail animation tests. |
 | [Independent scene inputs](implementation/reports/m9_scene_inputs.md) | Server-free renderer inputs, original weapon visuals and world-owned GPU presentation. |
 | [Network camera state](implementation/reports/m9_camera_transport.md) | Reliable selection, replica/predicted views and authoritative camera movement/look gates. |
 | [Private player events](implementation/reports/m9_private_events.md) | Reliable pointer-free event delivery, independent HUD inbox and corrected broadcasts. |

@@ -62,6 +62,10 @@ add_library(blood2_client_network STATIC src/client/network_client.cpp src/clien
 target_link_libraries(blood2_client_network PUBLIC engine_core blood2_net blood2_client_movement)
 blood2_project_options(blood2_client_network)
 
+add_library(blood2_client_weapons STATIC src/game/original/ViewWeapon.cpp)
+target_link_libraries(blood2_client_weapons PUBLIC engine_core)
+blood2_project_options(blood2_client_weapons)
+
 set_source_files_properties(src/engine/crash_capture.cpp PROPERTIES
     COMPILE_DEFINITIONS "BLOOD2_CRASH_SANITIZED=$<BOOL:${BLOOD2_SANITIZERS}>")
 if(BLOOD2_XR AND BLOOD2_BUILD_CLIENT)
@@ -156,7 +160,7 @@ target_sources(blood2_game PRIVATE src/game/original/PlayerLocomotion.cpp src/ga
     src/game/original/CultistAI.cpp src/game/original/Gideon.cpp src/game/original/EnhancedGideon.cpp src/game/original/UndeadGideon.cpp src/game/original/AncientOne.cpp src/game/original/AncientWeapons.cpp src/game/original/FlagObjects.cpp src/game/original/PlayerFlags.cpp src/game/original/ExitHint.cpp src/game/original/AITarget.cpp src/game/original/CharacterMotion.cpp src/game/original/Sparam.cpp)
 target_sources(blood2_game PRIVATE src/game/server_exits.cpp src/game/original/ExitTrigger.cpp src/game/server_clients.cpp src/game/original/PlayerImprison.cpp src/game/original/PlayerObj.cpp src/game/original/PlayerSave.cpp src/game/original/CharacterNodes.cpp src/game/original/BloodShells.cpp)
 target_sources(blood2_game PRIVATE src/game/server_weapons.cpp
-    src/game/original/InventoryMgr.cpp src/game/original/InventoryItems.cpp src/game/original/InventorySave.cpp src/game/original/Weapon.cpp src/game/original/Voodoo.cpp src/game/original/WeaponSound.cpp src/game/original/WeaponVector.cpp src/game/original/WeaponFX.cpp src/game/original/ViewWeapon.cpp)
+    src/game/original/InventoryMgr.cpp src/game/original/InventoryItems.cpp src/game/original/InventorySave.cpp src/game/original/Weapon.cpp src/game/original/Voodoo.cpp src/game/original/WeaponSound.cpp src/game/original/WeaponVector.cpp src/game/original/WeaponFX.cpp src/game/local_weapon.cpp)
 target_sources(blood2_game PRIVATE src/game/original/Music.cpp src/game/music_catalog.cpp)
 target_sources(blood2_game PRIVATE src/game/save_slots.cpp)
 target_include_directories(blood2_game PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
@@ -171,6 +175,7 @@ if(BLOOD2_BUILD_CLIENT)
 endif()
 target_link_libraries(blood2_game PUBLIC blood2_client_effects blood2_client_movement engine_core)
 
+target_link_libraries(blood2_game PUBLIC blood2_client_weapons)
 target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableSave.cpp src/game/original/DestructableBrush.cpp src/game/original/DestructableModel.cpp
     src/game/original/Rotating.cpp src/game/original/RotatingBrush.cpp src/game/original/RotatingModel.cpp
     src/game/original/WorldModelDebris.cpp

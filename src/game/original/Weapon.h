@@ -3,20 +3,12 @@
 #include "WeaponDefs.h"
 #include "WeaponFX.h"
 #include "engine/audio.h"
+#include "game/fire_result.h"
 #include "game/weapon_messages.h"
 #include <array>
 #include <string>
 
 class CInventoryMgr;
-enum class FireResult
-{
-    Fired,
-    Dry,
-    Invalid,
-    Unavailable,
-    DeliveryFailed,
-    Blocked
-};
 struct WeaponShot
 {
     OpenBlood2::WeaponFire request;

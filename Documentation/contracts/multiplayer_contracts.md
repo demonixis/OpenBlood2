@@ -941,3 +941,15 @@ modify CMoveMgr or add another integration to accommodate render scheduling.
 Remote weapon/audio/FX consumers, original Host/Join screens, LAN discovery and
 full gameplay remain separate deliveries. An empty effects frame and absent view
 weapons are explicit current limitations, not completed multiplayer presentation.
+
+
+## Independent view-weapon services
+
+The [weapon runtime extraction](../implementation/reports/m9_weapon_services.md)
+keeps CViewWeapon animation/cadence/RNG in blood2_client_weapons with no server
+object dependency. WeaponServices exposes a checked hand/owner, clock, ammo and
+typed fire/local-sound delivery. Preserve model-key ordering, committed attacks,
+shotgun barrel state, bombs, alternate ammo and deferred owner/selection rechecks.
+The local bridge retains synchronous OnMessage/PlayLocalSound behavior and solo
+clocks. A remote implementation must separately submit and validate authoritative
+fire; cosmetic acceptance alone cannot grant damage or ammo authority.

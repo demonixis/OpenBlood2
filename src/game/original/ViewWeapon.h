@@ -1,5 +1,6 @@
 #pragma once
-#include "Weapon.h"
+#include "WeaponDefs.h"
+#include "client/weapon_services.h"
 #include "client/weapon_view.h"
 #include <random>
 class ServerDE;
@@ -24,6 +25,7 @@ class CViewWeapon : public OpenBlood2::ClientWeaponView
     bool Create(DBYTE, bool, OpenBlood2::ModelStore&, OpenBlood2::Resources&, std::string&, DBYTE character = 0);
     bool Update(ServerDE&, CBloodServerShell&, HCLIENT, const OpenBlood2::WeaponInput&, DVector, DVector, double,
                 std::string&);
+    bool Update(OpenBlood2::WeaponServices&, const OpenBlood2::WeaponInput&, DVector, DVector, double, std::string&);
     double flash_started = 0;
     std::string flash_error, animation_sound_error;
     bool second_barrel = false;

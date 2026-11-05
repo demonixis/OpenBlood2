@@ -322,6 +322,8 @@ without GameSession, including client weapon visuals and checked GPU world owner
 CMoveMgr, private HUD and camera under a bounded, server-independent endpoint and mapped clock.
 [Graphical connection/host](implementation/reports/m9_network_frontend.md) now displays that endpoint
 with the existing renderer/HUD and controls; a host owns one server and a loopback client.
+[Independent view weapons](implementation/reports/m9_weapon_services.md) now retain original animation/fire-key
+logic behind client services; the synchronous solo bridge remains, with network fire delivery still pending.
 **Remaining private presentation consumers/commands, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client

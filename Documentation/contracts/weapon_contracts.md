@@ -1,5 +1,9 @@
 # Original Inventory and Vector Weapon Boundary
 
+The [M9 view-weapon extraction](../implementation/reports/m9_weapon_services.md)
+retains the original client state machine behind WeaponServices, with an unchanged
+synchronous solo bridge. This does not add a network fire trust boundary.
+
 The [Undead Gideon weapon continuation](gideon_weapons_contracts.md) adds original
 spear/vomit and typed timed player imprisonment.
 

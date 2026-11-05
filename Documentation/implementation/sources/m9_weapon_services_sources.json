@@ -1,0 +1,60 @@
+{
+  "scope": "CViewWeapon service extraction with synchronous solo bridge and independent consumer",
+  "baseline": "40d4a626ff6e98a833ab94dc8efa7501ae09ee8e",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "40d4a626ff6e98a833ab94dc8efa7501ae09ee8e",
+      "path": "src/game/original/ViewWeapon.cpp",
+      "sha256": "de977f11cdd42ece24389f8f0cc7a8201ab59bfcaeb2da07758fdff96ca2a92b"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "40d4a626ff6e98a833ab94dc8efa7501ae09ee8e",
+      "path": "src/game/original/ViewWeapon.h",
+      "sha256": "6e080d81349362500df71ac663d5f7247b79ddfaeed28c256f18da1be88586bd"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "40d4a626ff6e98a833ab94dc8efa7501ae09ee8e",
+      "path": "src/game/original/Weapon.cpp",
+      "sha256": "5997b8ba6b295a9c0d960455fafc26ab511ab6caf3eb3b1958a440f0f63382bb"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "40d4a626ff6e98a833ab94dc8efa7501ae09ee8e",
+      "path": "src/game/original/WeaponDefs.cpp",
+      "sha256": "6b9b5441deb7754d1ad75b200f18d585dbc39324127d6ac5218c22159ea1264d"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "40d4a626ff6e98a833ab94dc8efa7501ae09ee8e",
+      "path": "src/game/original/BloodShells.cpp",
+      "sha256": "e7a7a7db9353e013918e03dcef094889dddf1b219e1f193ce743e16153b9af38"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "40d4a626ff6e98a833ab94dc8efa7501ae09ee8e",
+      "path": "src/game/server_audio.cpp",
+      "sha256": "0786f1f7f1dd79aaddf8f9ff50c2d85411c362270413d6793b1fcc57ba3c1db8"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ViewWeapon.cpp",
+      "sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Shared/WeaponDefs.cpp",
+      "sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f"
+    }
+  ],
+  "adaptations": [
+    "Replace direct owner/inventory/clock/fire/animation-sound accesses with WeaponServices.",
+    "Keep original state-machine arithmetic, animation events, data references and RNG; retain existing solo entrypoint in local_weapon.cpp.",
+    "Share the existing FireResult vocabulary without defining a wire encoding.",
+    "Network weapon-state/commands/shot validation and predicted cosmetics remain subsequent work."
+  ]
+}

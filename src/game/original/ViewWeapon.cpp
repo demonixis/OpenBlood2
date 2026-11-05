@@ -1,5 +1,4 @@
 #include "ViewWeapon.h"
-#include "BloodShells.h"
 #include "CharacterProfiles.h"
 #include "engine/collision.h"
 #include "engine/model_commands.h"
@@ -108,14 +107,13 @@ bool CViewWeapon::PlayAnimation(std::uint32_t clip)
     }
     return true;
 }
-bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT client, const WeaponInput& input,
-                         DVector position, DVector direction, double seconds, std::string& error)
+bool CViewWeapon::Update(WeaponServices& services, const WeaponInput& input, DVector position, DVector direction,
+                         double seconds, std::string& error)
 {
     bomb_power = -1;
     if (!model)
         return true;
-    auto* player = server.Player(client);
-    if (!player || player->m_damage.IsDead())
+    if (!services.player_alive())
     {
         flash_visible = 0;
         return true;
@@ -123,26 +121,26 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
     for (unsigned i = 0; i < 2; ++i)
         if (flashes[i])
             advance_sprite(*flashes[i], flash_tracks[i], seconds);
-    if (flash_visible && engine.GetTime() >= flash_started + weapon_definition(type)->m_fFlashDuration &&
-        engine.GetTime() >= flash_started + seconds + .05)
+    if (flash_visible && services.time() >= flash_started + weapon_definition(type)->m_fFlashDuration &&
+        services.time() >= flash_started + seconds + .05)
         flash_visible = 0;
-    auto* weapon = player->m_InventoryMgr.CurrentWeapon(left);
-    if (!weapon || weapon->data.m_nType != type)
+    const auto* definition = weapon_definition(type);
+    if (!definition || !services.weapon_selected(type, left))
     {
-        error = "View/server weapon association mismatch";
+        error = "View/owner weapon association mismatch";
         return false;
     }
-    const auto& data = weapon->data;
-    auto ammo = [&](bool alt) { return weapon->CheckAmmo(alt); };
+    const auto& data = *definition;
+    auto ammo = [&](bool alt) { return services.ammunition(alt); };
     auto fire = [&]()
     {
-        if (!server.Player(client))
+        if (!services.has_player())
             return true;
         if (state != WS_FIRING && state != WS_ALT_FIRING &&
             !(inventory_bomb(type) && (state == WS_STOP_FIRING || state == WS_STOP_ALT_FIRING)))
             return true;
         const bool alternate = state == WS_ALT_FIRING || state == WS_STOP_ALT_FIRING;
-        if (player->m_InventoryMgr.CurrentWeapon(left) != weapon)
+        if (!services.weapon_selected(type, left))
             return true;
         if (binoculars_active)
         {
@@ -150,18 +148,18 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
             return true;
         }
         next_seed_ = static_cast<DBYTE>(2 + random_() % 254);
-        auto result = server.OnMessage(
-            client, WeaponFire{position, direction, next_seed_, type, alternate, left, bomb_speed, voodoo_hit});
+        auto result =
+            services.fire(WeaponFire{position, direction, next_seed_, type, alternate, left, bomb_speed, voodoo_hit});
         last_result = result;
         if (result == FireResult::Fired)
         {
             ++shots;
-            last_shot_time_ = engine.GetTime();
+            last_shot_time_ = services.time();
             last_alt_ = alternate;
             if (flashes[alternate])
             {
                 flash_visible = alternate ? 2 : 1;
-                flash_started = engine.GetTime();
+                flash_started = services.time();
             }
             pending_sound = alternate ? data.m_szAltFireSound : data.m_szFireSound;
             sound_indexed = resources_->find(pending_sound) != nullptr;
@@ -172,7 +170,7 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
         error = "Original weapon fire rejected or damage delivery failed";
         return false;
     };
-    const float time = engine.GetTime();
+    const float time = services.time();
     const bool hand = input.all_hands || input.left == left;
     bool primary = input.primary && hand, alternate = input.alternate && hand;
     // Original client CShotgun::UpdateFiringState: the second barrel uses alt_fire's reload
@@ -351,7 +349,7 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
         return false;
     for (auto key : events)
     {
-        if (!server.Player(client))
+        if (!services.has_player())
             break; // A hit callback may remove the owner.
         last_key = model->animations[animation.animation].keys[key].text;
         std::vector<std::vector<std::string>> parsed;
@@ -389,7 +387,7 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
                             sound.resource += c;
                     }
                     sound.space = SoundSpace::Local;
-                    engine.PlayLocalSound(player->m_hObject, sound, animation_sound_error);
+                    services.play_sound(sound, animation_sound_error);
                 }
             }
     }
