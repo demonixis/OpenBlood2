@@ -1,3 +1,4 @@
+#include "net/admission.h"
 #include "audio_fixture.h"
 #include "client/network_audio.h"
 #include <cmath>
@@ -34,7 +35,7 @@ namespace
         AudioEvent start{7, 9, 1, tone()}, end{7, 9, 2, SoundEnd{1, true}};
         std::vector<std::uint8_t> bytes;
         CHECK(encode_audio(end, bytes));
-        const std::vector<std::uint8_t> golden{0x42, 0x32, 0x41, 0x55, 23, 0, 2, 7, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0,
+        const std::vector<std::uint8_t> golden{0x42, 0x32, 0x41, 0x55, std::uint8_t(OpenBlood2::Net::protocol_version), std::uint8_t(OpenBlood2::Net::protocol_version >> 8), 2, 7, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0,
                                                0,    0,    0,    2,    0,  0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1};
         CHECK(bytes == golden);
         std::mt19937 random(42);

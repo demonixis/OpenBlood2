@@ -87,6 +87,12 @@ namespace OpenBlood2
         game_.server.remote_stream_sink =
             [this](ObjectId owner, const ParticleStreamSettings& settings, std::string& failure)
         { return capture_stream(owner, settings, failure); };
+        // Installed before the load like the owner-bound hooks: an instant effect
+        // published while the world loads has no recipient yet and is discarded,
+        // instead of filling the dedicated server's never-advanced client pools.
+        game_.server.remote_effect_sink =
+            [this](ObjectId source, std::string_view name, const InstantEffectRecipe& settings, std::string& error)
+        { return capture_effect(source, name, settings, error); };
         if (!game_.load_request(request, error))
             return false;
         g_ctf.only_flag_scores = rules_.only_flag_scores;
@@ -119,9 +125,6 @@ namespace OpenBlood2
         game_.server.remote_event_sink = [this](HCLIENT client, const PlayerEvent& event)
         { return capture_event(client, event); };
         game_.server.remote_audio_sink = [this](const AudioVoice& voice, bool start) { capture_audio(voice, start); };
-        game_.server.remote_effect_sink =
-            [this](ObjectId source, std::string_view name, const InstantEffectRecipe& settings, std::string& error)
-        { return capture_effect(source, name, settings, error); };
         for (const auto& [id, voice] : game_.server.audio.voices())
             capture_audio(voice, true);
         return true;

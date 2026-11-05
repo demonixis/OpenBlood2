@@ -42,6 +42,15 @@ return sounds. Occupied-marker retries keep the team filter and also cover a fai
 ground drop. A full weapon ACK window pauses only the weapon timeline (logged once
 per stall), never banks inputs. Every team branch stays behind the network game type.
 
+Lot 6 (protocol 24) replicates cosmetic effects: ordered instant recipes (ballistic
+composites, weapon sprites, sparks, blood, explosion components, flesh/debris
+fragments, lasers, lightning) run in each client's own original pools, while
+ParticleStreams and owner-bound ObjectFX ride object membership with finite-age
+late baselines and the original multiplayer stop grace. Recipes travel batched
+(`B2EB`) on their own reliable `Channel::Effects`; a full queue on either side drops
+and counts instead of disconnecting. Solo publication paths are unchanged (the
+redirect hooks exist only in ServerSession).
+
 The [desktop third-person camera](Documentation/contracts/camera_contracts.md) adds a rebindable C toggle,
 actual player/held models and centred aim convergence. Preserve unchanged eye/shot/movement state,
 special-camera priority, temporary first-person zoom/tight-space fallback and the XR refusal.

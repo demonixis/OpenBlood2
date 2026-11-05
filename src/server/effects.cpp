@@ -79,6 +79,15 @@ namespace OpenBlood2
                                                 const InstantEffectRecipe& settings, std::string& error)
     {
         error.clear();
+        if (effect_events == UINT64_MAX)
+        {
+            error = "Invalid or exhausted authoritative effect publication";
+            return 0;
+        }
+        // During a world load (or with nobody joined) there is no recipient: the
+        // instant effect is discarded, never published into the server's own pools.
+        if (std::none_of(players_.begin(), players_.end(), [](const auto& p) { return p.effects_started; }))
+            return ++effect_events;
         Net::EffectEvent event{world_id_, 1, 1, source, std::string(name), settings};
         std::vector<std::uint8_t> encoded;
         if (effect_events == UINT64_MAX || !Net::encode_effect(event, encoded))
@@ -90,13 +99,16 @@ namespace OpenBlood2
         {
             // Baseline-ready admission gate. These are one-shot impact
             // messages: never replay old shots/casings to a late arrival.
-            if (!player.effects_started || player.effects_failed)
+            if (!player.effects_started)
                 continue;
             if (!player.next_effect || player.effects.size() >= Net::effect_queue_limit ||
                 encoded.size() > Net::effect_queue_bytes - player.effect_bytes)
             {
-                player.effects_failed = true;
-                continue; // One slow recipient cannot alter the shot or other peers.
+                // Cosmetic: a full recipient drops this effect (no sequence is
+                // consumed) and stays connected; the shot and other peers are unchanged.
+                ++player.effects_dropped;
+                ++effect_drops;
+                continue;
             }
             event.player = player.id;
             event.sequence = player.next_effect++;
@@ -109,9 +121,9 @@ namespace OpenBlood2
     {
         error.clear();
         const auto p = std::find_if(players_.begin(), players_.end(), [id](const auto& p) { return p.id == id; });
-        if (p == players_.end() || !p->effects_started || p->effects_failed)
+        if (p == players_.end() || !p->effects_started)
         {
-            error = "Effect recipient queue unavailable or over capacity";
+            error = "Effect recipient queue unavailable";
             return false;
         }
         out.clear();

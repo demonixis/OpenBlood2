@@ -1746,3 +1746,25 @@ per-system and aggregate particle budgets still apply.
 PolyGrid, WarpGate and light publication, remaining UI/presentation and final
 server-library extraction remain separate work. Loopback process and Linux GPU
 checks do not qualify human LAN, 16 players or other operating systems.
+
+## Effects channel, batching and cosmetic drops (protocol 24)
+
+Instant recipes no longer share the reliable Control channel. The server batches
+complete B2EF encodings into `B2EB` packets (u16 count, then u16 length plus one
+B2EF each; at most 256 items and 16 KiB) on a fourth reliable ENet channel,
+`Channel::Effects`, so a burst of impacts or a lost effect packet never delays
+weapon frames, ACKs, private events or audio on Control. The client accepts only
+batches, only on that channel; a batch decodes completely or not at all.
+
+Overflow is cosmetic. A recipient whose server queue is full (2048 recipes or
+2 MiB) skips that effect without consuming a sequence number and stays connected
+(`effects_dropped`, `ServerSession::effect_drops`); the shot, RNG and other peers
+are unchanged. A client whose pending queue is full advances its sequence and
+counts the drop (`NetworkEffects::dropped`). A real sequence gap, a wrong
+recipient or a wrong world still fails, because the channel is reliable and ordered.
+
+The instant-effect hook is installed before the world load, like the owner-bound
+hooks. With no started recipient (load, or nobody joined) an instant effect is
+discarded instead of entering the dedicated server's never-advanced client pools.
+Protocol bytes in the network tests come from `Net::protocol_version`.
+

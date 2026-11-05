@@ -1,3 +1,4 @@
+#include "net/admission.h"
 #include "../brush_fixture.h"
 #include "client/network_audio.h"
 #include "client/network_effects.h"
@@ -38,7 +39,7 @@ namespace
         auto e = sample();
         std::vector<std::uint8_t> bytes, again;
         CHECK(encode_effect(e, bytes));
-        const std::vector<std::uint8_t> header{0x42, 0x32, 0x45, 0x46, 23, 0, 1, 7, 0, 0, 0, 0,
+        const std::vector<std::uint8_t> header{0x42, 0x32, 0x45, 0x46, std::uint8_t(OpenBlood2::Net::protocol_version), std::uint8_t(OpenBlood2::Net::protocol_version >> 8), 1, 7, 0, 0, 0, 0,
                                                0,    0,    0,    2,    0,  0, 0, 0, 0, 0, 0, 1};
         CHECK(std::equal(header.begin(), header.end(), bytes.begin()));
         EffectEvent decoded = sample();
@@ -115,6 +116,45 @@ namespace
             if (decode_effect(mutation, decoded) == DecodeEffect::Ok)
                 CHECK(valid_effect(decoded));
         }
+        // Effects-channel batches: bounded count/bytes, exact consumption, no partial result.
+        {
+            auto item = sample();
+            std::vector<std::vector<std::uint8_t>> encoded(300);
+            for (std::size_t i = 0; i < encoded.size(); ++i)
+            {
+                item.sequence = i + 1;
+                CHECK(encode_effect(item, encoded[i]));
+            }
+            std::vector<std::uint8_t> batch;
+            std::vector<EffectEvent> events;
+            std::size_t consumed = 0, packets = 0;
+            for (std::span<const std::vector<std::uint8_t>> rest(encoded); !rest.empty(); ++packets)
+            {
+                const auto count = encode_effect_batch(rest, batch);
+                CHECK(count && count <= effect_batch_items && batch.size() <= effect_batch_limit);
+                CHECK(is_effect_batch(batch) && !is_effect_packet(batch));
+                CHECK(decode_effect_batch(batch, events) == DecodeEffect::Ok && events.size() == count);
+                for (std::size_t i = 0; i < count; ++i)
+                    CHECK(events[i].sequence == consumed + i + 1);
+                consumed += count;
+                rest = rest.subspan(count);
+            }
+            CHECK(consumed == encoded.size() && packets >= 2);
+            CHECK(encode_effect_batch(std::span(encoded).first(3), batch) == 3);
+            for (std::size_t size = 0; size < batch.size(); ++size)
+                CHECK(decode_effect_batch(std::span(batch).first(size), events) != DecodeEffect::Ok && events.empty());
+            auto extra = batch;
+            extra.push_back(0);
+            CHECK(decode_effect_batch(extra, events) == DecodeEffect::Malformed);
+            auto version = batch;
+            version[4] ^= 1;
+            CHECK(decode_effect_batch(version, events) == DecodeEffect::Protocol);
+            auto empty_batch = batch;
+            empty_batch[6] = empty_batch[7] = 0;
+            CHECK(decode_effect_batch(empty_batch, events) == DecodeEffect::Malformed);
+            CHECK(decode_effect_batch(encoded[0], events) == DecodeEffect::Malformed);
+            CHECK(!encode_effect_batch({}, batch));
+        }
         NetworkEffects effects;
         CHECK(effects.begin({7, 2, {0, 1}}));
         e = sample();
@@ -127,10 +167,13 @@ namespace
         e.player = 2;
         for (; e.sequence <= effect_queue_limit; ++e.sequence)
             CHECK(effects.receive(e, error));
-        CHECK(!effects.receive(e, error) && effects.received == effect_queue_limit);
+        // A full pending queue drops and counts; the sequence stays contiguous.
+        CHECK(effects.receive(e, error) && effects.received == effect_queue_limit && effects.dropped == 1);
+        ++e.sequence;
+        CHECK(effects.receive(e, error) && effects.dropped == 2);
         CHECK(effects.begin({8, 3, {0, 2}}) && effects.scene().frame().models.empty() && !effects.receive(e, error));
         std::cout << "Ballistic codec: portable header, full truncation, 512-point/8KiB bounds, 10k mutations; "
-                     "duplicate/gap/private/world and 2048-event/2MiB pending limits passed\n";
+                     "duplicate/gap/private/world and 2048-event/2MiB pending drops passed\n";
         return true;
     }
     bool runtime(const char* data)

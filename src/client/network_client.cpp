@@ -90,15 +90,18 @@ namespace OpenBlood2
         }
         if (phase_ == Phase::Closing)
             return true;
-        if (Net::is_effect_packet(event.bytes))
+        if (event.channel == Net::Channel::Effects || Net::is_effect_packet(event.bytes) ||
+            Net::is_effect_batch(event.bytes))
         {
-            Net::EffectEvent message;
-            if (event.channel != Net::Channel::Control ||
-                Net::decode_effect(event.bytes, message) != Net::DecodeEffect::Ok)
+            // Only batches, only on their own channel; a stray single effect is malformed.
+            std::vector<Net::EffectEvent> batch;
+            if (event.channel != Net::Channel::Effects ||
+                Net::decode_effect_batch(event.bytes, batch) != Net::DecodeEffect::Ok)
                 return false;
-            if (message.world < offer_.world)
-                return true;
-            return phase_ == Phase::Active && effects_.receive(message, error);
+            for (const auto& message : batch)
+                if (message.world >= offer_.world && (phase_ != Phase::Active || !effects_.receive(message, error)))
+                    return false;
+            return true;
         }
         if (Net::is_audio_packet(event.bytes))
         {

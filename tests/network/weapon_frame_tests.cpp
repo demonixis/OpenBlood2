@@ -1,3 +1,4 @@
+#include "net/admission.h"
 #include "net/weapon_frames.h"
 #include <iostream>
 #include <limits>
@@ -26,7 +27,7 @@ namespace
             std::vector<std::uint8_t> bytes, again;
             CHECK(encode_weapon_frame(message, bytes) && is_weapon_frame_packet(bytes));
             CHECK(bytes.size() == (std::holds_alternative<WeaponFrame>(message) ? 64 : 71));
-            CHECK(bytes[0] == 'B' && bytes[1] == '2' && bytes[2] == 'W' && bytes[3] == 'F' && bytes[4] == 18);
+            CHECK(bytes[0] == 'B' && bytes[1] == '2' && bytes[2] == 'W' && bytes[3] == 'F' && bytes[4] == std::uint8_t(OpenBlood2::Net::protocol_version));
             CHECK(bytes[31] == 44 && bytes[32] == 1); // LE force revision 300.
             WeaponFrameMessage decoded = WeaponFrameAck{owner, 999};
             for (std::size_t size = 0; size < bytes.size(); ++size)

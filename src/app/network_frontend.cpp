@@ -397,9 +397,10 @@ namespace OpenBlood2
                 effect_kinds += '/';
             effect_kinds += std::to_string(count);
         }
-        spdlog::info("Instant effects: received={}, failed={}, models={}, billboards={}, cosmetic_sounds={}, "
+        spdlog::info("Instant effects: received={}, failed={}, dropped={}, models={}, billboards={}, cosmetic_sounds={}, "
                      "audio_failures={}, kinds={}, error={}, audio_error={}",
-                     client.effects().received, client.effects().failed, client.effects().scene().frame().models.size(),
+                     client.effects().received, client.effects().failed, client.effects().dropped,
+                     client.effects().scene().frame().models.size(),
                      client.effects().scene().frame().billboards.size(), client.audio().effects_started,
                      client.audio().effects_failed, effect_kinds, client.effects().last_error,
                      client.audio().last_effect_error);

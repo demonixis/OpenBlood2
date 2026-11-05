@@ -6,7 +6,8 @@ namespace OpenBlood2::Net
 {
     namespace
     {
-        constexpr std::uint32_t magic = 0x46453242; // B2EF.
+        constexpr std::uint32_t magic = 0x46453242;       // B2EF.
+        constexpr std::uint32_t batch_magic = 0x42453242; // B2EB.
         bool vector(DVector v)
         {
             return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z) && std::abs(v.x) <= 1e7f &&
@@ -516,6 +517,76 @@ namespace OpenBlood2::Net
         if (!ok || !r.done() || !valid_effect(e))
             return DecodeEffect::Malformed;
         out = std::move(e);
+        return DecodeEffect::Ok;
+    }
+    bool is_effect_batch(std::span<const std::uint8_t> bytes)
+    {
+        Reader r(bytes);
+        return bytes.size() >= 4 && r.u32() == batch_magic;
+    }
+    std::size_t encode_effect_batch(std::span<const std::vector<std::uint8_t>> encoded, std::vector<std::uint8_t>& out)
+    {
+        constexpr std::size_t header = 8;
+        std::size_t count = 0, size = header;
+        for (const auto& item : encoded)
+        {
+            if (item.empty() || item.size() > effect_packet_limit)
+                return 0;
+            if (count == effect_batch_items || size + 2 + item.size() > effect_batch_limit)
+                break;
+            size += 2 + item.size();
+            ++count;
+        }
+        if (!count)
+            return 0;
+        out.clear();
+        out.reserve(size);
+        const auto put16 = [&](std::uint16_t v)
+        {
+            out.push_back(std::uint8_t(v));
+            out.push_back(std::uint8_t(v >> 8));
+        };
+        for (unsigned shift = 0; shift < 32; shift += 8)
+            out.push_back(std::uint8_t(batch_magic >> shift));
+        put16(protocol_version);
+        put16(std::uint16_t(count));
+        for (std::size_t i = 0; i < count; ++i)
+        {
+            put16(std::uint16_t(encoded[i].size()));
+            out.insert(out.end(), encoded[i].begin(), encoded[i].end());
+        }
+        return count;
+    }
+    DecodeEffect decode_effect_batch(std::span<const std::uint8_t> bytes, std::vector<EffectEvent>& out)
+    {
+        out.clear();
+        if (bytes.size() < 8 || bytes.size() > effect_batch_limit)
+            return DecodeEffect::Malformed;
+        Reader r(bytes.first(8));
+        if (r.u32() != batch_magic)
+            return DecodeEffect::Malformed;
+        if (r.u16() != protocol_version)
+            return DecodeEffect::Protocol;
+        const std::size_t count = r.u16();
+        if (!count || count > effect_batch_items)
+            return DecodeEffect::Malformed;
+        std::vector<EffectEvent> events(count);
+        std::size_t at = 8;
+        for (auto& event : events)
+        {
+            if (bytes.size() - at < 2)
+                return DecodeEffect::Malformed;
+            const std::size_t length = bytes[at] | std::size_t(bytes[at + 1]) << 8;
+            at += 2;
+            if (!length || length > bytes.size() - at)
+                return DecodeEffect::Malformed;
+            if (const auto result = decode_effect(bytes.subspan(at, length), event); result != DecodeEffect::Ok)
+                return result;
+            at += length;
+        }
+        if (at != bytes.size())
+            return DecodeEffect::Malformed;
+        out = std::move(events);
         return DecodeEffect::Ok;
     }
 } // namespace OpenBlood2::Net

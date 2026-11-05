@@ -30,7 +30,7 @@ namespace OpenBlood2
         {
             return runtime_;
         }
-        std::uint64_t received = 0, failed = 0;
+        std::uint64_t received = 0, failed = 0, dropped = 0;
         std::array<std::uint64_t, std::variant_size_v<InstantEffectRecipe>> received_kinds{};
         std::string last_error;
 

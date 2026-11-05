@@ -1,3 +1,4 @@
+#include "net/admission.h"
 #include "../brush_fixture.h"
 #include "client/network_audio.h"
 #include "client/network_effects.h"
@@ -26,8 +27,8 @@ namespace
             auto event = effect_fixture::sample(kind);
             std::vector<std::uint8_t> bytes, again;
             CHECK(encode_effect(event, bytes));
-            CHECK(bytes[0] == 0x42 && bytes[1] == 0x32 && bytes[2] == 0x45 && bytes[3] == 0x46 && bytes[4] == 23 &&
-                  bytes[5] == 0 && bytes[6] == kind + 1);
+            CHECK(bytes[0] == 0x42 && bytes[1] == 0x32 && bytes[2] == 0x45 && bytes[3] == 0x46 && bytes[4] == std::uint8_t(OpenBlood2::Net::protocol_version) &&
+                  bytes[5] == std::uint8_t(OpenBlood2::Net::protocol_version >> 8) && bytes[6] == kind + 1);
             EffectEvent decoded;
             decoded.sequence = 999;
             for (std::size_t i = 0; i < bytes.size(); ++i)
@@ -115,7 +116,7 @@ namespace
             CHECK(receiver.receive(e, error));
         }
         e.sequence = capacity + 1;
-        CHECK(!receiver.receive(e, error) && receiver.received == capacity);
+        CHECK(receiver.receive(e, error) && receiver.received == capacity && receiver.dropped == 1);
         CHECK(receiver.begin({8, 3, {0, 2}}));
         e = effect_fixture::sample(3);
         e.world = 8;

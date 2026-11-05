@@ -128,9 +128,13 @@ namespace
                     const float yaw = std::atan2(delta.x, delta.z) + detour;
                     const float pitch = visible ? -std::atan2(delta.y, std::hypot(delta.x, delta.z)) : 0.0f;
                     CHECK(client.look(pitch - client.pitch(), yaw - client.yaw()));
-                    const bool in_range = !shotgun || std::hypot(delta.x, delta.z) <= 250;
+                    // Napalm's 300-unit splash must not reach the attacker: back off first.
+                    const float distance = std::hypot(delta.x, delta.z);
+                    const bool too_close = napalm && distance <= 400;
+                    const bool in_range = (!shotgun || distance <= 250) && !too_close;
                     firing = !victim && visible && in_range;
                     input.forward = !visible || (shotgun && !victim && !in_range);
+                    input.backward = visible && !victim && too_close;
                 }
                 if (victim)
                 {
@@ -372,8 +376,10 @@ namespace
                                   "multi/bb_fields",
                                   "--port",
                                   "0",
+                                  // Frames, not ticks: enough server time for the napalm
+                                  // exchange on a 120 Hz display as well as at 60 Hz.
                                   "--frames",
-                                  "1200",
+                                  "2400",
                                   "--name",
                                   "Idle host",
                                   "--mode",

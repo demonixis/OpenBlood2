@@ -40,11 +40,17 @@ namespace OpenBlood2
         if (event.sequence <= sequence_)
             return true;
         std::vector<std::uint8_t> encoded;
-        if (sequence_ == UINT64_MAX || event.sequence != sequence_ + 1 || pending_.size() >= Net::effect_queue_limit ||
-            !Net::encode_effect(event, encoded) || encoded.size() > Net::effect_queue_bytes - pending_bytes_)
+        if (sequence_ == UINT64_MAX || event.sequence != sequence_ + 1 || !Net::encode_effect(event, encoded))
         {
-            error = "Effect sequence gap or pending capacity exhausted";
+            error = "Effect sequence gap";
             return false;
+        }
+        if (pending_.size() >= Net::effect_queue_limit || encoded.size() > Net::effect_queue_bytes - pending_bytes_)
+        {
+            // Cosmetic: a full pending queue drops and counts, never ends the session.
+            sequence_ = event.sequence;
+            ++dropped;
+            return true;
         }
         pending_.push_back(event);
         pending_bytes_ += encoded.size();

@@ -415,15 +415,23 @@ namespace OpenBlood2
                     sent = Net::encode_audio(event, bytes) &&
                            transport_.send(peer.peer, Net::Channel::Control, bytes, error);
                 }
-                std::vector<Net::EffectEvent> ballistics;
-                sent = sent && session_.take_effect_events(peer.player, ballistics, error);
-                for (const auto& event : ballistics)
+                std::vector<Net::EffectEvent> effects;
+                sent = sent && session_.take_effect_events(peer.player, effects, error);
+                if (sent && !effects.empty())
                 {
-                    if (!sent)
-                        break;
-                    std::vector<std::uint8_t> bytes;
-                    sent = Net::encode_effect(event, bytes) &&
-                           transport_.send(peer.peer, Net::Channel::Control, bytes, error);
+                    // Cosmetic recipes ride their own reliable channel, batched, so
+                    // a burst or a lost packet never delays gameplay Control messages.
+                    std::vector<std::vector<std::uint8_t>> encoded(effects.size());
+                    for (std::size_t e = 0; sent && e < effects.size(); ++e)
+                        sent = Net::encode_effect(effects[e], encoded[e]);
+                    std::span<const std::vector<std::uint8_t>> rest(encoded);
+                    while (sent && !rest.empty())
+                    {
+                        std::vector<std::uint8_t> bytes;
+                        const auto count = Net::encode_effect_batch(rest, bytes);
+                        sent = count && transport_.send(peer.peer, Net::Channel::Effects, bytes, error);
+                        rest = rest.subspan(count);
+                    }
                 }
                 if (!sent)
                 {

@@ -39,7 +39,7 @@ namespace
             std::vector<std::uint8_t> bytes, again;
             CHECK(encode_command(message, bytes) && is_command_packet(bytes));
             CHECK(bytes.size() == (std::holds_alternative<PlayerCommand>(message) ? 57 : 48));
-            CHECK(bytes[0] == 'B' && bytes[1] == '2' && bytes[2] == 'P' && bytes[3] == 'C' && bytes[4] == 18);
+            CHECK(bytes[0] == 'B' && bytes[1] == '2' && bytes[2] == 'P' && bytes[3] == 'C' && bytes[4] == std::uint8_t(OpenBlood2::Net::protocol_version));
             CommandMessage decoded = CommandAck{owner, 999, true};
             for (std::size_t size = 0; size < bytes.size(); ++size)
                 CHECK(decode_command(std::span(bytes).first(size), decoded) == DecodeCommand::Malformed &&

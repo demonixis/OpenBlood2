@@ -17,6 +17,7 @@ namespace OpenBlood2::Net
         Control,
         Baseline,
         State,
+        Effects, // Reliable cosmetic recipes, ordered apart from gameplay Control.
         Count
     };
     constexpr std::size_t packet_limit(Channel channel)
@@ -24,6 +25,7 @@ namespace OpenBlood2::Net
         return channel == Channel::Control    ? 16384
                : channel == Channel::Baseline ? 32768
                : channel == Channel::State    ? 1200
+               : channel == Channel::Effects  ? 16384
                                               : 0;
     }
     enum class EventKind

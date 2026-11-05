@@ -98,7 +98,7 @@ namespace OpenBlood2
         bool begin_audio(std::uint64_t player, std::string& error);
         bool begin_effects(std::uint64_t player);
         bool take_effect_events(std::uint64_t player, std::vector<Net::EffectEvent>&, std::string& error);
-        std::uint64_t effect_events = 0;
+        std::uint64_t effect_events = 0, effect_drops = 0; // Drops: full recipient queues.
         bool take_audio_events(std::uint64_t player, std::vector<Net::AudioEvent>&, std::string& error);
         bool take_private_events(std::uint64_t player, std::vector<Net::PrivateEvent>&, std::string& error);
         std::uint64_t private_events = 0, subsumed_events = 0;
@@ -147,8 +147,8 @@ namespace OpenBlood2
             std::uint64_t next_event = 1;
             bool roster_failed = false;
             bool audio_started = false, audio_failed = false;
-            bool effects_started = false, effects_failed = false;
-            std::uint64_t next_effect = 1;
+            bool effects_started = false;
+            std::uint64_t next_effect = 1, effects_dropped = 0;
             std::vector<Net::EffectEvent> effects;
             std::size_t effect_bytes = 0;
             std::uint64_t next_audio = 1;

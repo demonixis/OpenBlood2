@@ -64,7 +64,8 @@ namespace
                     CHECK(events[0].sequence == i + 2);
                 }
                 if (mode == 2)
-                    CHECK(!session.take_effect_events(b.player, events, error));
+                    CHECK(session.take_effect_events(b.player, events, error) &&
+                          events.size() == effect_queue_limit && session.effect_drops == 1);
                 auto flash = std::get<WeaponSpriteSettings>(effect_fixture::sample(1).recipe);
                 const auto spark = std::get<SparkSettings>(effect_fixture::sample(2).recipe);
                 const auto blood = std::get<BloodSpurtRecipe>(effect_fixture::sample(3).recipe);
@@ -135,9 +136,17 @@ namespace
                 CHECK(encode_effect(large, bytes));
                 const auto count = effect_queue_bytes / bytes.size();
                 CHECK(count < effect_queue_limit);
+                const auto drops = session.effect_drops;
                 for (std::size_t i = 0; i <= count; ++i)
                     CHECK(game.server.PublishWeaponSprites(source->handle, flash, error));
-                CHECK(!session.take_effect_events(a.player, events, error));
+                // The byte bound drops the overflowing effect (no sequence used) and
+                // keeps the recipient: the queued ones stay contiguous and deliverable.
+                CHECK(session.effect_drops >= drops + 1);
+                CHECK(session.take_effect_events(a.player, events, error) && events.size() == count);
+                for (std::size_t i = 1; i < events.size(); ++i)
+                    CHECK(events[i].sequence == events[i - 1].sequence + 1);
+                CHECK(game.server.PublishWeaponSprites(source->handle, flash, error));
+                CHECK(session.take_effect_events(a.player, events, error) && events.size() == 1);
                 CHECK(session.player_count() == 2 && game.client_effects.shotgun_effects.started == 0 &&
                       game.client_effects.shotgun_effects.casings.empty() &&
                       game.client_effects.shotgun_effects.reports.empty());
