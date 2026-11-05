@@ -693,6 +693,8 @@ namespace OpenBlood2
 
       private:
         bool step_impl(double seconds, bool client);
+        // Storage of the last replaced object frame; only string/vector capacity is reused.
+        ClientWorldFrame object_scratch_;
     };
 
 } // namespace OpenBlood2

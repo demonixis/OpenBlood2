@@ -38,7 +38,8 @@ namespace OpenBlood2
         }
         if (!error.empty())
             return false;
-        frame_ = std::move(next);
+        // The caller receives the replaced frame, so a local publisher can reuse its storage.
+        std::swap(frame_, next);
         return true;
     }
     const ClientObject* ClientWorld::get(ObjectId id) const

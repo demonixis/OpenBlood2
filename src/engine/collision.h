@@ -2,6 +2,7 @@
 #include "engine/body_placement.h"
 #include "engine/world.h"
 #include <array>
+#include <cmath>
 
 namespace OpenBlood2
 {
@@ -111,7 +112,11 @@ namespace OpenBlood2
     DVector rotate_vector(DVector, DRotation);
     DRotation multiply_rotation(DRotation, DRotation);
     DRotation inverse_rotation(DRotation);
-    bool physics_vector(DVector v);
+    inline bool physics_vector(DVector v)
+    {
+        return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z) && std::abs(v.x) <= 1e7f &&
+               std::abs(v.y) <= 1e7f && std::abs(v.z) <= 1e7f;
+    }
     CollisionQuery sweep_box(DVector from, DVector to, DVector half, DVector center, DVector other_half,
                              CollisionHit& hit, double allowed_penetration = 0);
     DVector vector_add(DVector a, DVector b);

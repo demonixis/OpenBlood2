@@ -1,12 +1,38 @@
 #include "client/collision.h"
 #include "engine/shape_collision.h"
 #include <algorithm>
+#include <bit>
 #include <cmath>
 
 namespace OpenBlood2
 {
     namespace
     {
+        bool same_bits(float a, float b)
+        {
+            return std::bit_cast<std::uint32_t>(a) == std::bit_cast<std::uint32_t>(b);
+        }
+        bool same_bits(DVector a, DVector b)
+        {
+            return same_bits(a.x, b.x) && same_bits(a.y, b.y) && same_bits(a.z, b.z);
+        }
+        // Bit-exact: an identical collider already passed validation, NaN never compares equal.
+        bool same_collider(const ClientCollider& a, const ClientCollider& b)
+        {
+            if (a.id != b.id || a.ignored_by != b.ignored_by || a.shape != b.shape || a.flags != b.flags ||
+                a.user_flags != b.user_flags || a.type != b.type || a.priority != b.priority ||
+                a.volume_brush != b.volume_brush || a.attached != b.attached || a.world_model != b.world_model ||
+                a.container != b.container || a.dynamic != b.dynamic || a.pushable != b.pushable ||
+                !same_bits(a.position, b.position) || !same_bits(a.dimensions, b.dimensions) ||
+                !same_bits(a.velocity, b.velocity) || !same_bits(a.acceleration, b.acceleration) ||
+                a.environment.has_value() != b.environment.has_value())
+                return false;
+            if (!a.environment)
+                return true;
+            const auto &x = *a.environment, &y = *b.environment;
+            return x.code == y.code && x.hidden == y.hidden && same_bits(x.current, y.current) &&
+                   same_bits(x.gravity, y.gravity) && same_bits(x.viscosity, y.viscosity);
+        }
         bool dimensions(DVector v)
         {
             return physics_vector(v) && v.x >= 0 && v.y >= 0 && v.z >= 0;
@@ -46,7 +72,8 @@ namespace OpenBlood2
             error = "Stale client collision frame";
         else if (!next.primary || next.objects.size() > ClientWorld::object_limit)
             error = "Missing or excessive client collision scene";
-        else
+        else if (next.primary != frame_.primary || next.objects.size() != frame_.objects.size() ||
+                 !std::equal(next.objects.begin(), next.objects.end(), frame_.objects.begin(), same_collider))
         {
             ObjectId previous;
             for (const auto& object : next.objects)
@@ -83,7 +110,8 @@ namespace OpenBlood2
         }
         if (!error.empty())
             return false;
-        frame_ = std::move(next);
+        // The caller receives the replaced scene, so a local publisher can reuse its storage.
+        std::swap(frame_, next);
         return true;
     }
     const ClientCollider* ClientCollisionWorld::get(ObjectId id) const

@@ -28,7 +28,9 @@ namespace OpenBlood2
     void LocalMovement::clear()
     {
         client_.movement = {};
-        shapes_.clear();
+        colliders_.clear();
+        shaped_.clear();
+        scratch_ = {};
         primary_.reset();
         primary_source_ = nullptr;
         collision_world_ = 0;
@@ -132,7 +134,8 @@ namespace OpenBlood2
         const auto world = client_.world.frame().world;
         if (collision_world_ != world)
         {
-            shapes_.clear();
+            colliders_.clear();
+            shaped_.clear();
             primary_.reset();
             collision_world_ = world;
         }
@@ -142,17 +145,31 @@ namespace OpenBlood2
             primary_source_ = server_.collision;
             ++primary_copies;
         }
-        ClientCollisionFrame frame;
+        auto& frame = scratch_;
+        frame.objects.clear(); // Keeps the capacity of the previously replaced scene.
         frame.world = world;
         frame.sequence = client_.collision.frame().sequence + 1;
         frame.primary = primary_;
         const auto ids = objects_.snapshot();
         frame.objects.reserve(ids.size());
+        const auto publication = ++publication_;
         for (auto id : ids)
         {
             const auto* object = objects_.get(id);
             if (!object || object->life != Life::Alive)
                 continue;
+            if (colliders_.size() <= id.slot)
+                colliders_.resize(std::size_t(id.slot) + 1);
+            auto& cached = colliders_[id.slot];
+            if (cached.id != id || cached.game != object->game.get())
+            {
+                cached.id = id;
+                cached.game = object->game.get();
+                cached.volume_brush = dynamic_cast<const VolumeBrush*>(object->game.get()) != nullptr;
+                cached.eye = dynamic_cast<const SeeingEye*>(object->game.get());
+                cached.source.reset();
+                cached.copy.reset();
+            }
             ClientCollider value;
             value.id = id;
             value.position = object->state.m_Pos;
@@ -165,7 +182,7 @@ namespace OpenBlood2
             value.attached = object->attachment != 0;
             value.world_model = bool(object->world_model);
             value.container = bool(object->container());
-            value.volume_brush = dynamic_cast<const VolumeBrush*>(object->game.get()) != nullptr;
+            value.volume_brush = cached.volume_brush;
             value.dynamic = object->world_body || object->model_body;
             value.pushable = object->body_properties.pushable;
             value.priority = object->blocking_priority;
@@ -175,32 +192,45 @@ namespace OpenBlood2
                 if (container_info(*object, info))
                     value.environment = {info.code, info.current, info.gravity, info.viscosity, info.hidden};
             }
-            if (const auto* eye = dynamic_cast<const SeeingEye*>(object->game.get()); eye && !eye->dropped)
+            if (const auto* eye = cached.eye; eye && !eye->dropped)
                 if (const auto* owner = objects_.get(eye->m_hFiredFrom); owner && owner->life == Life::Alive)
                     value.ignored_by = owner->id;
             const auto& shape = object->world_model ? object->world_model : object->container();
             if (shape)
             {
-                auto& cached = shapes_[id.slot];
-                if (cached.id != id || cached.source.lock() != shape)
+                if (cached.source.lock() != shape)
                 {
-                    cached = {id, shape, std::make_shared<const ContainerShape>(*shape)};
+                    cached.source = shape;
+                    cached.copy = std::make_shared<const ContainerShape>(*shape);
                     ++shape_copies;
+                }
+                cached.shape_publication = publication;
+                if (!cached.listed)
+                {
+                    cached.listed = true;
+                    shaped_.push_back(id.slot);
                 }
                 value.shape = cached.copy;
             }
             frame.objects.push_back(std::move(value));
         }
-        // Cache lifetime follows current membership, not all objects ever observed.
-        for (auto it = shapes_.begin(); it != shapes_.end();)
-        {
-            const auto* object = objects_.get(it->second.id);
-            if (!object || object->life != Life::Alive || (!object->world_model && !object->container()))
-                it = shapes_.erase(it);
-            else
-                ++it;
-        }
-        return client_.collision.apply(std::move(frame), collision_error);
+        // Copy lifetime follows current membership, not all objects ever observed.
+        std::erase_if(shaped_,
+                      [&](std::uint32_t slot)
+                      {
+                          auto& cached = colliders_[slot];
+                          if (cached.copy && cached.shape_publication == publication)
+                              return false;
+                          cached.source.reset();
+                          cached.copy.reset();
+                          cached.listed = false;
+                          return true;
+                      });
+        const bool accepted = client_.collision.apply(std::move(frame), collision_error);
+        // Release the replaced (or refused) scene now; only its storage is kept.
+        frame.objects.clear();
+        frame.primary.reset();
+        return accepted;
     }
     bool LocalMovement::predict(const PlayerMove& move, LocalMoveReport& report)
     {

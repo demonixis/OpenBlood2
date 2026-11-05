@@ -213,7 +213,7 @@ class CBloodClientShell
     bool UpdateThirdPersonCamera();
     CPlayerDeathCamera& death_camera;
     std::uint64_t death_notifications = 0;
-    bool UpdateCameraSelection();
+    bool UpdateCameraSelection(bool published = false);
     OpenBlood2::HudState HudSnapshot(bool suppress_crosshair = false) const;
     // Scripted/death cameras own the view. The Eye and Orb are player-aimed remote views.
     bool player_look_allowed() const

@@ -785,7 +785,8 @@ bool CBloodClientShell::Update()
     position = client_view_.camera.frame().player.position;
     camera_position = position;
     camera_position.y += client_view_.camera.frame().eye_level;
-    if (!UpdateCameraSelection() || !UpdateInventoryEffects())
+    // The camera frame was just published; nothing changed the server since.
+    if (!UpdateCameraSelection(true) || !UpdateInventoryEffects())
         return false;
     m_bFirstUpdate = false;
     return true;
@@ -1037,9 +1038,9 @@ float CBloodClientShell::ViewFovX() const
         return OpenBlood2::original_fov_normal;
     return m_fovX;
 }
-bool CBloodClientShell::UpdateCameraSelection()
+bool CBloodClientShell::UpdateCameraSelection(bool published)
 {
-    if (!presentation_.publish(client_, seeing_eye, orb_view) ||
+    if ((!published && !presentation_.publish(client_, seeing_eye, orb_view)) ||
         !client_view_.camera.select(client_view_.collision, rotation.pitch, rotation.yaw, m_bZoomView, blocker))
         return false;
     const auto& frame = client_view_.camera.frame();

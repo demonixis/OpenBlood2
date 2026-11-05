@@ -98,6 +98,11 @@ namespace
         CHECK(client.predict(owner, initial, {0, 41.001f, 60}, {0, 0, 120}, {}, predicted));
         CHECK(predicted.stair_steps == 1 && std::abs(predicted.position.y - 57.001f) < .01f);
         CHECK(predicted.ground_object == wall.id);
+        // An unchanged scene under a newer sequence is admitted as is (no revalidation).
+        frame = client.frame();
+        const auto renewed = ++frame.sequence;
+        CHECK(client.apply(std::move(frame), error) && client.frame().sequence == renewed &&
+              client.get(wall.id)->shape == stair);
         frame = client.frame();
         ++frame.sequence;
         frame.objects.pop_back();

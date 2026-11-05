@@ -51,6 +51,8 @@ namespace OpenBlood2
     {
       public:
         bool begin(std::uint64_t world);
+        // An accepted frame swaps with the current scene: the argument then holds the
+        // replaced one. A scene identical to the accepted one skips revalidation.
         bool apply(ClientCollisionFrame&&, std::string& error);
         const ClientCollisionFrame& frame() const
         {

@@ -63,6 +63,7 @@ namespace OpenBlood2
       public:
         static constexpr std::size_t object_limit = 65536;
         bool begin(std::uint64_t world);
+        // An accepted frame swaps with the current one: the argument then holds the replaced frame.
         bool apply(ClientWorldFrame&&, std::string& error);
         const ClientWorldFrame& frame() const
         {

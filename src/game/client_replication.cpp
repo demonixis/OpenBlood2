@@ -11,7 +11,9 @@ namespace OpenBlood2
             error = "Client publication during a server callback rejected";
             return false;
         }
-        ClientWorldFrame frame;
+        auto& frame = object_scratch_;
+        frame.polygrids.clear();
+        frame.particle_streams.clear();
         frame.world = client_session.world.frame().world;
         frame.sequence = client_session.world.frame().sequence + 1;
         frame.time = server.world_time();
@@ -22,12 +24,24 @@ namespace OpenBlood2
         };
         const auto ids = objects.snapshot();
         frame.objects.reserve(ids.size());
+        std::size_t count = 0;
         for (auto id : ids)
         {
             const auto* r = objects.get(id);
             if (!r || r->life != Life::Alive)
                 continue;
-            ClientObject out;
+            auto& out = count < frame.objects.size() ? frame.objects[count] : frame.objects.emplace_back();
+            ++count;
+            {
+                // Reset every field, keeping only the allocations of the replaced frame.
+                auto filename = std::move(out.filename);
+                auto skin = std::move(out.skin);
+                auto hidden_nodes = std::move(out.hidden_nodes);
+                out = {};
+                out.filename = std::move(filename);
+                out.skin = std::move(skin);
+                out.hidden_nodes = std::move(hidden_nodes);
+            }
             out.id = id;
             out.type = r->state.m_ObjectType;
             out.flags = r->state.m_Flags;
@@ -55,8 +69,8 @@ namespace OpenBlood2
             }
             out.world_model_index = r->world_model_index;
             out.world_model_bound = bool(r->world_model);
-            frame.objects.push_back(std::move(out));
         }
+        frame.objects.resize(count);
         const auto& sky = server.sky;
         frame.sky = {sky.definition.min, sky.definition.max, sky.definition.view_min, sky.definition.view_max,
                      sky.objects};
@@ -90,7 +104,14 @@ namespace OpenBlood2
             frame.polygrids.push_back({fx.effect.id, effect_identity(fx.owner)});
         for (const auto& fx : server.particle_streams.active)
             frame.particle_streams.push_back({fx.effect.id, effect_identity(fx.owner)});
-        return client_session.receive(std::move(frame), error);
+        const bool accepted = client_session.receive(std::move(frame), error);
+        // The replaced (or refused) frame keeps no asset alive past this publication.
+        for (auto& object : frame.objects)
+        {
+            object.model.reset();
+            object.sprite.reset();
+        }
+        return accepted;
     }
     bool GameSession::publish_client_world(std::string& error)
     {

@@ -228,6 +228,16 @@ translations copy only the pose, rotations/replacements copy the new posed shape
 Dead entries are evicted and teardown clears caches and the client's scene. This
 is local transport of validated engine geometry, not a wire/resource codec.
 
+Solo publishes this scene several times per frame (camera, each movement substep,
+air update), so its cost is bounded: the publisher classifies each object identity
+(VolumeBrush, Seeing Eye) once instead of per publication, and an accepted frame
+swaps with the replaced scene, whose storage the publisher reuses. A frame that is
+bit-identical to the accepted scene apart from its newer sequence is admitted
+without revalidating its colliders (NaN never compares equal). The client object
+frame swaps the same way; the local object publisher keeps only string/vector
+capacity and drops model/sprite references right after delivery. The second
+camera selection of a client update reuses the camera frame published just before.
+
 Client queries use only this scene, and can still run after the server is destroyed.
 The client solver retains the current replacement slide/stair/head-skin/overlap
 rules and read-only push/rider validation (four legs, 64 riders, no chain push).

@@ -2,9 +2,11 @@
 #include "client/session.h"
 #include "game/container_messages.h"
 #include "game/player_messages.h"
-#include <map>
+#include <memory>
+#include <vector>
 
 class CBloodServerShell;
+class SeeingEye;
 class CVoiceMgr;
 namespace OpenBlood2
 {
@@ -59,13 +61,24 @@ namespace OpenBlood2
         // cannot change a checked prediction into a different command at submission.
         LocalMoveReport pending_;
         bool pending = false;
-        struct ShapeCopy
+        // Per-slot publication cache. The game-object class never changes for a
+        // live identity, so its RTTI classification is computed once per object;
+        // shape copies follow current membership like before.
+        struct ColliderCache
         {
             ObjectId id;
+            const void* game = nullptr;
+            bool volume_brush = false;
+            const SeeingEye* eye = nullptr;
             std::weak_ptr<const ContainerShape> source;
             std::shared_ptr<const ContainerShape> copy;
+            std::uint64_t shape_publication = 0;
+            bool listed = false;
         };
-        std::map<std::uint32_t, ShapeCopy> shapes_;
+        std::vector<ColliderCache> colliders_;
+        std::vector<std::uint32_t> shaped_; // Slots holding a shape copy.
+        std::uint64_t publication_ = 0;
+        ClientCollisionFrame scratch_;
         std::shared_ptr<const CollisionWorld> primary_;
         const CollisionWorld* primary_source_ = nullptr;
         std::uint64_t collision_world_ = 0;

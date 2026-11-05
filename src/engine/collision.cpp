@@ -73,11 +73,6 @@ namespace OpenBlood2
     {
         return a.x * b.x + a.y * b.y + a.z * b.z;
     }
-    bool physics_vector(DVector v)
-    {
-        return std::isfinite(v.x) && std::isfinite(v.y) && std::isfinite(v.z) && std::abs(v.x) <= 1e7f &&
-               std::abs(v.y) <= 1e7f && std::abs(v.z) <= 1e7f;
-    }
     namespace
     {
         double precise_dot(DVector a, DVector b)
