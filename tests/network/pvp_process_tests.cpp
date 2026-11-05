@@ -38,6 +38,8 @@ namespace
         Config config;
         config.data_dir = path_from_utf8(data);
         NetworkClient client;
+        client.audio().mixer.inspect_pcm = true;
+        float audio_peak = 0;
         JoinProfile profile;
         profile.name = victim ? "PvP victim" : "PvP attacker";
         profile.weapons = {WEAP_BERETTA};
@@ -140,6 +142,7 @@ namespace
                 }
             }
             CHECK(client.update(Clock::now(), input, !leaving, error, {firing}));
+            audio_peak = std::max(audio_peak, client.audio().mixer.peak);
             std::vector<PrivateEvent> events;
             client.take_events(events);
             for (const auto& event : events)
@@ -163,7 +166,12 @@ namespace
                 }
             }
             if (client.phase() == NetworkClient::Phase::Closed)
+            {
+                CHECK(client.audio().started > 0 && audio_peak > 0);
+                std::cout << "Remote audio: starts=" << client.audio().started << ", stops=" << client.audio().stopped
+                          << ", natural=" << client.audio().completed << ", peak=" << audio_peak << '\n';
                 return leaving && (victim ? respawned : frags == 1);
+            }
             if (announced && Clock::now() >= next_status)
             {
                 next_status = Clock::now() + std::chrono::seconds(2);

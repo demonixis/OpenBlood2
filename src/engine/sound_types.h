@@ -1,5 +1,5 @@
 #pragma once
-#include "basedefs_de.h"
+#include "game/legacy/basedefs_de.h"
 #include <cstdint>
 #include <string>
 namespace OpenBlood2

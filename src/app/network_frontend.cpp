@@ -99,6 +99,11 @@ namespace OpenBlood2
         if (!client.connect(config, address.host, address.port, profile, NetworkClient::Clock::now(), error))
             return failed();
         spdlog::info("Connecting to {}:{} as {}", address.host, address.port, profile.name);
+        if (!client.audio().mixer.set_gains(settings.sound ? settings.sound_volume / 50.f : 0,
+                                            settings.music ? settings.music_volume / 100.f : 0) ||
+            !client.audio().mixer.open_output(error))
+            return failed();
+        client.audio().mixer.output_lead = AudioMixer::interactive_output_lead;
         ServerClock server_clock;
         auto previous = NetworkClient::Clock::now();
         bool menu = false, leaving = false, entered = false, captured = false;
@@ -191,8 +196,8 @@ namespace OpenBlood2
                 }
                 return failed();
             }
-            // HUD/camera events are already applied by the endpoint. Audio and
-            // other effects still need their remote consumers.
+            // HUD/camera and logical sound events are applied by the endpoint.
+            // Announcements, music and other effects still need remote consumers.
             client.take_events(events);
             if (client.ready() && !entered)
             {

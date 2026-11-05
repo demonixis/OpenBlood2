@@ -47,7 +47,7 @@ add_library(blood2_startup STATIC src/engine/config.cpp src/engine/resources.cpp
 target_include_directories(blood2_startup PUBLIC src)
 blood2_project_options(blood2_startup)
 
-add_library(blood2_net STATIC src/net/address.cpp src/net/transport.cpp src/net/content.cpp src/net/admission.cpp src/net/world_snapshot.cpp src/net/world_patch.cpp src/net/world_state.cpp src/net/collision_codec.cpp src/net/movement.cpp src/net/player_events.cpp src/net/player_commands.cpp src/net/weapon_frames.cpp)
+add_library(blood2_net STATIC src/net/audio_events.cpp src/net/address.cpp src/net/transport.cpp src/net/content.cpp src/net/admission.cpp src/net/world_snapshot.cpp src/net/world_patch.cpp src/net/world_state.cpp src/net/collision_codec.cpp src/net/movement.cpp src/net/player_events.cpp src/net/player_commands.cpp src/net/weapon_frames.cpp)
 target_include_directories(blood2_net PUBLIC src)
 target_link_libraries(blood2_net PUBLIC blood2_startup PRIVATE enet)
 blood2_project_options(blood2_net)
@@ -58,7 +58,7 @@ add_library(blood2_client_movement STATIC src/game/original/MoveMgr.cpp src/clie
 target_link_libraries(blood2_client_movement PUBLIC engine_core)
 blood2_project_options(blood2_client_movement)
 
-add_library(blood2_client_network STATIC src/client/network_weapons.cpp src/client/network_client.cpp src/client/network_world.cpp src/client/network_state.cpp src/client/network_collision.cpp src/client/network_movement.cpp src/client/network_player_events.cpp src/client/network_camera.cpp)
+add_library(blood2_client_network STATIC src/client/network_audio.cpp src/client/network_weapons.cpp src/client/network_client.cpp src/client/network_world.cpp src/client/network_state.cpp src/client/network_collision.cpp src/client/network_movement.cpp src/client/network_player_events.cpp src/client/network_camera.cpp)
 target_link_libraries(blood2_client_network PUBLIC engine_core blood2_net blood2_client_movement blood2_client_weapons)
 blood2_project_options(blood2_client_network)
 
@@ -217,7 +217,7 @@ if(BLOOD2_BUILD_CLIENT)
 endif()
 blood2_project_options(blood2_game)
 
-add_library(blood2_server_runtime STATIC src/server/session.cpp src/server/network.cpp src/server/player_movement.cpp src/server/player_events.cpp src/server/player_camera.cpp src/server/player_weapons.cpp src/server/player_commands.cpp src/server/player_fire.cpp)
+add_library(blood2_server_runtime STATIC src/server/audio.cpp src/server/session.cpp src/server/network.cpp src/server/player_movement.cpp src/server/player_events.cpp src/server/player_camera.cpp src/server/player_weapons.cpp src/server/player_commands.cpp src/server/player_fire.cpp)
 target_link_libraries(blood2_server_runtime PUBLIC blood2_game blood2_net)
 blood2_project_options(blood2_server_runtime)
 if(BLOOD2_BUILD_SERVER)

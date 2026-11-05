@@ -1,6 +1,20 @@
 #include "game/server_adapter.h"
 namespace OpenBlood2
 {
+    SoundId ServerAdapter::publish_sound(SoundId id)
+    {
+        if (remote_audio_sink)
+            if (const auto* voice = audio.get(id))
+                remote_audio_sink(*voice, true);
+        return id;
+    }
+    bool ServerAdapter::retire_sound(SoundId id)
+    {
+        if (remote_audio_sink)
+            if (const auto* voice = audio.get(id))
+                remote_audio_sink(*voice, false);
+        return audio.kill(id);
+    }
     SoundId ServerAdapter::PlayObjectLoopSound(HOBJECT owner, const SoundRequest& request, std::string& error)
     {
         if (!trace_service("PlayObjectLoopSound"))
@@ -13,7 +27,7 @@ namespace OpenBlood2
         }
         DVector position{};
         GetObjectPos(owner, &position);
-        return audio.play(*client_resources, owner, request, position, error);
+        return publish_sound(audio.play(*client_resources, owner, request, position, error));
     }
     SoundId ServerAdapter::PlayCharacterSound(HOBJECT object, const SoundRequest& request, bool retain,
                                               std::string& error)
@@ -31,7 +45,7 @@ namespace OpenBlood2
         const auto id = audio.play(*client_resources, object, request, position, error);
         if (auto* voice = audio.get(id))
             voice->auto_remove = !retain;
-        return id;
+        return publish_sound(id);
     }
     SoundId ServerAdapter::PlayCinematicSound(HOBJECT owner, const SoundRequest& request, std::string& error)
     {
@@ -47,7 +61,7 @@ namespace OpenBlood2
         DVector position{};
         if (request.space != SoundSpace::Local)
             GetObjectPos(request.speaker, &position);
-        return audio.play(*client_resources, owner, request, position, error);
+        return publish_sound(audio.play(*client_resources, owner, request, position, error));
     }
     SoundId ServerAdapter::PlayClientSound(const SoundRequest& request, DVector position, std::string& error)
     {
@@ -75,7 +89,7 @@ namespace OpenBlood2
             error = "Fixed sound requires a live owner and ambient/spatial request without attachment";
             return 0;
         }
-        return audio.play(*client_resources, owner, request, position, error);
+        return publish_sound(audio.play(*client_resources, owner, request, position, error));
     }
     SoundId ServerAdapter::PlayLocalSound(HOBJECT source, const SoundRequest& request, std::string& error)
     {
@@ -90,7 +104,7 @@ namespace OpenBlood2
         const auto id = audio.play(*client_resources, source, request, {}, error);
         if (auto* voice = audio.get(id))
             voice->world_owned = voice->auto_remove = true;
-        return id;
+        return publish_sound(id);
     }
     SoundId ServerAdapter::PlayDetachedSound(HOBJECT source, const SoundRequest& request, DVector position,
                                              std::string& error)
@@ -126,7 +140,7 @@ namespace OpenBlood2
         const auto id = audio.play(*client_resources, source, actual, position, error);
         if (auto* voice = audio.get(id))
             voice->world_owned = true;
-        return id;
+        return publish_sound(id);
     }
     bool ServerAdapter::RandomInt(int low, int high, int& value)
     {
@@ -160,7 +174,7 @@ namespace OpenBlood2
     {
         if (!trace_service("KillSound"))
             return false;
-        return audio.kill(id);
+        return retire_sound(id);
     }
     void ServerAdapter::prepare_audio()
     {
@@ -176,13 +190,20 @@ namespace OpenBlood2
             {
                 auto* voice = audio.get(id);
                 if (!IsObjectAlive(voice->request.speaker))
+                {
+                    const bool newly_lost = !voice->speaker_lost;
                     voice->done = voice->speaker_lost = true;
+                    // Retained logical handles may remain until their owner polls
+                    // IsSoundDone. Playback must stop as soon as the speaker is lost.
+                    if (newly_lost && remote_audio_sink)
+                        remote_audio_sink(*voice, false);
+                }
                 else
                     GetObjectPos(voice->request.speaker, &voice->position);
             }
         }
         for (auto id : removed)
-            audio.kill(id);
+            retire_sound(id);
     }
     bool ServerAdapter::advance_audio(double seconds)
     {
@@ -197,7 +218,7 @@ namespace OpenBlood2
             if (entry.auto_remove && entry.done)
                 removed.push_back(id);
         for (auto id : removed)
-            audio.kill(id);
+            retire_sound(id);
         return ok;
     }
 } // namespace OpenBlood2

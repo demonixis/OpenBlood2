@@ -1,0 +1,81 @@
+{
+  "scope": "Reliable server sound lifetimes and independent network playback",
+  "baseline": "6fa73b97982bdf542433e76b7acd12477b1fd6e8",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "6fa73b97982bdf542433e76b7acd12477b1fd6e8",
+      "path": "src/game/server_audio.cpp",
+      "sha256": "0786f1f7f1dd79aaddf8f9ff50c2d85411c362270413d6793b1fcc57ba3c1db8"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "6fa73b97982bdf542433e76b7acd12477b1fd6e8",
+      "path": "src/game/local_audio.cpp",
+      "sha256": "79ca0e830af7a0ae1356b4571dfc96a57b294b53a24a12b5f757b0f1fae5fe2d"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "6fa73b97982bdf542433e76b7acd12477b1fd6e8",
+      "path": "src/client/audio.cpp",
+      "sha256": "ab1cb5abcf69b7c8da550e54092ad9c12898c553398110d9aefb48339a81f0fc"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "6fa73b97982bdf542433e76b7acd12477b1fd6e8",
+      "path": "src/game/original/WeaponSound.cpp",
+      "sha256": "a19d20a9c0b5b33362a12eecd782b609afe90018c02dbad6c2f286af84c11e09"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "6fa73b97982bdf542433e76b7acd12477b1fd6e8",
+      "path": "src/game/original/CinematicTrigger.cpp",
+      "sha256": "593ef00ebfc9e613c53774c20e8eda1b650866a3a45dffa849857b296a97ccf8"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "6fa73b97982bdf542433e76b7acd12477b1fd6e8",
+      "path": "src/game/original/PlayerContainers.cpp",
+      "sha256": "894b6128204dd8fffc246d8d9113ee29d5a8f599b3bba301e2927d1acdfb14ce"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "6fa73b97982bdf542433e76b7acd12477b1fd6e8",
+      "path": "src/game/original/CharacterSound.cpp",
+      "sha256": "13e1abe0ed2e35331724f3e9c1ef9530c51675996e9b177a8622a6f351af72c6"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "6fa73b97982bdf542433e76b7acd12477b1fd6e8",
+      "path": "src/game/session.cpp",
+      "sha256": "a9efd8a48a987ed922b114d2ba0a322cd7606c5ca6dddd0e956d2d3b619beac4"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/CinematicTrigger.cpp",
+      "sha256": "9cdfcc8740afae0dbb0ab3b9ffcc9d770df72234a090a157c6d893d1867a05af"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    }
+  ],
+  "adaptations": [
+    "Read-only synchronous start/retirement observation captures generation IDs before original handles disappear; solo has no observer",
+    "Protocol14 bounded B2AU events over reliable Control, per-recipient baseline and 512-event budget",
+    "Server natural completion retires the logical handle without cutting short delayed client one-shots; explicit stop cancels playback",
+    "At most128 client voices; only naturally retired playback tails may be displaced by new logical voices",
+    "Local player-owned sound is private; cinematic controller local and spatial/ambient sounds are broadcast",
+    "Independent client asset readers, sample clocks and replica speaker positions; no server PCM/device or playback acknowledgement",
+    "Animation-key sounds, announcement/VoiceMgr/music and cosmetic effect audio remain separate consumers"
+  ]
+}

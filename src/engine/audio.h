@@ -90,6 +90,7 @@ namespace OpenBlood2
 
       private:
         friend class ClientAudio;
+        friend class NetworkAudio;
         std::map<std::string, std::shared_ptr<const AudioClip>> clips_;
         std::map<std::string, std::shared_ptr<const AudioClip>> streams_;
         std::size_t stream_serial_ = 0;

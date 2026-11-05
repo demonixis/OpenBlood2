@@ -14,6 +14,7 @@ namespace OpenBlood2
     {
         clear_players();
         game_.server.remote_event_sink = {};
+        game_.server.remote_audio_sink = {};
     }
     bool ServerSession::start(const Config& config, std::string_view name, unsigned mode, std::string& error)
     {
@@ -65,6 +66,9 @@ namespace OpenBlood2
         mode_ = mode;
         game_.server.remote_event_sink = [this](HCLIENT client, const PlayerEvent& event)
         { return capture_event(client, event); };
+        game_.server.remote_audio_sink = [this](const AudioVoice& voice, bool start) { capture_audio(voice, start); };
+        for (const auto& [id, voice] : game_.server.audio.voices())
+            capture_audio(voice, true);
         started_ = true;
         return true;
     }

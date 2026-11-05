@@ -1,6 +1,7 @@
 #pragma once
 #include "game/server_adapter.h"
 #include "net/admission.h"
+#include "net/audio_events.h"
 #include "net/content.h"
 #include "net/movement.h"
 #include "net/player_commands.h"
@@ -9,6 +10,7 @@
 #include "net/world_snapshot.h"
 #include "server/clock.h"
 #include <deque>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -66,6 +68,8 @@ namespace OpenBlood2
         bool weapon_frame_ack(std::uint64_t player, std::optional<Net::WeaponFrameAck>&) const;
         bool take_command_acks(std::uint64_t player, std::vector<Net::CommandAck>&);
         std::uint64_t commands_applied = 0, commands_blocked = 0, commands_ignored = 0;
+        bool begin_audio(std::uint64_t player, std::string& error);
+        bool take_audio_events(std::uint64_t player, std::vector<Net::AudioEvent>&, std::string& error);
         bool take_private_events(std::uint64_t player, std::vector<Net::PrivateEvent>&, std::string& error);
         std::uint64_t private_events = 0, subsumed_events = 0;
         bool leave(std::uint64_t player);
@@ -111,6 +115,10 @@ namespace OpenBlood2
             Net::MovementSetup setup;
             std::vector<Net::PrivateEvent> events;
             std::uint64_t next_event = 1;
+            bool audio_started = false, audio_failed = false;
+            std::uint64_t next_audio = 1;
+            std::vector<Net::AudioEvent> audio_events;
+            std::set<SoundId> audio_voices;
             ObjectId camera_eye, camera_orb;
             std::optional<Net::CameraState> camera;
             std::optional<Net::WeaponLoadout> weapons;
@@ -148,9 +156,17 @@ namespace OpenBlood2
             std::string failure;
         };
         std::vector<Player> players_;
+        struct AudioSource
+        {
+            ObjectId owner, speaker;
+            bool private_player = false;
+        };
+        std::map<SoundId, AudioSource> audio_sources_;
         std::uint64_t world_id_ = 0, next_player_ = 1, next_snapshot_ = 1;
         std::uint64_t ticks_ = 0;
         unsigned mode_ = 0;
+        void capture_audio(const AudioVoice&, bool started);
+        bool queue_audio(Player&, const AudioVoice&, bool started);
         DRESULT capture_event(HCLIENT, const PlayerEvent&);
         DRESULT queue_private(Player&, ObjectId, const Net::PrivateValue&);
         bool refresh_camera(Player&, Net::CameraState&, std::string& error);

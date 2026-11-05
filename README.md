@@ -40,8 +40,9 @@ inspector, `debug` for debugging. See [setup and controls](Documentation/getting
 The ongoing [M9 network work](Documentation/implementation/reports/m9_network_frontend.md)
 adds `--host multi/bb_crypt` and `--connect HOST:27888` for graphical admission and
 movement. The [basic Bloodbath combat loop](Documentation/implementation/reports/m9_pvp.md)
-now supports held primary/alternate fire and USE respawn. Remote audio/effects,
-scoreboard, match limits/rotation and Team/CTF remain in progress.
+now supports held primary/alternate fire and USE respawn. [Server sounds](Documentation/implementation/reports/m9_network_audio.md)
+play through each client's independent audio mixer. Animation/announcement/music
+audio, visual effects, scoreboard, match limits/rotation and Team/CTF remain in progress.
 
 ## CI builds
 

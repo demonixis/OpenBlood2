@@ -68,6 +68,11 @@ namespace OpenBlood2
         SegmentResult effect_world_ray(DVector, DVector, ClientSegmentHit&) override;
         bool effect_container(DVector, ContainerCode&, bool visible_only = false) override;
         AudioTimeline audio;
+        // Synchronous observation only: capture IDs before original handles retire.
+        // Absent in solo; never changes the logical voice or its completion clock.
+        std::function<void(const AudioVoice&, bool started)> remote_audio_sink;
+        SoundId publish_sound(SoundId);
+        bool retire_sound(SoundId);
         // Immediate local publisher/inspection aliases. The client owns these pools.
         OriginalEffects& client_effects;
         EffectServices effect_services(); // Synchronous local creation bridge; never retained by an effect.

@@ -337,8 +337,9 @@ USE rescue/respawn and frag attribution, with reliable weapon cancellation acros
 with impulse-aware corrections, bounded per-peer history and passive dead-player movement.
 [Real-process Bloodbath combat](implementation/reports/m9_pvp.md) now verifies damage, frag and USE respawn
 on dedicated and graphical-host sessions; the graphical frontend forwards held fire through the same endpoint.
-Remote audio/FX, scoreboard, full match rules and remaining multiplayer branches stay in progress.
-**Remaining private presentation consumers/commands, full client separation, Team profiles and playable network gameplay remain pending.**
+[Remote logical audio](implementation/reports/m9_network_audio.md) now delivers reliable sound lifetimes and independent playback.
+Animation/announcement/music audio, FX, scoreboard, full match rules and remaining multiplayer branches stay in progress.
+**Remaining private presentation consumers/commands, full client separation, Team/CTF and complete network qualification remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client
 shell runs its own movement (CMoveMgr) and effects. The engine copies object

@@ -1121,3 +1121,35 @@ player/rendering remain active. These scripted retail encounters are bounded
 qualification, not human LAN or full M9 acceptance. Keep remaining remote audio/
 FX, scoreboard/chat, match limits/rotation, Team/CTF and broad combat qualification
 explicit. Preserve solo, PBR, immutable GPU references and independent M2/M3 gates.
+
+
+## Remote logical sound lifetimes
+
+The [network audio lot](../implementation/reports/m9_network_audio.md) adds protocol
+v14 B2AU messages on reliable Control. Capture starts and retirements synchronously
+at the sound service boundary, before object handles can disappear. Do not sample
+only the 20 Hz voice pool: one-shots can start and finish inside catch-up. Wire
+values contain world/recipient/sequence, monotonic sound ID, generation-qualified
+owner/speaker, resource/settings, initial position and validated asset metadata.
+No pointer, decoded PCM or playback acknowledgement crosses this boundary.
+
+After baseline acknowledgement, publish only currently playing voices at their
+logical cursor. Do not replay earlier one-shots. Subsequent starts begin at the
+captured cursor (normally zero); playback latency is not a new server gameplay
+clock. Natural one-shot completion retires the server handle while the client
+finishes its own clip. Explicit kill, owner/speaker loss or a failed logical voice
+cancels playback. Preserve current source retention rules and server IsSoundDone/
+GetSoundDuration. Local player-owned sound is private; non-player cinematic local
+sound and spatial/ambient sound go to admitted clients. Retain captured private
+ownership after player departure/slot reuse until the sound retires. Follow attached speakers
+from ClientWorld, retaining initial/last position until membership catches up.
+
+Keep 256-byte packets, 512 queued events per recipient, 128 voices and original
+asset/cache limits. Sequence gaps, stale worlds, invalid metadata and reused IDs
+fail before playback mutation. Duplicate sequence delivery is idempotent. New
+logical starts may displace only naturally retired client tails. Queue overflow
+isolates its recipient. Resource/output errors are explicit client failures;
+they never alter the authoritative sound or another player's object. Do not
+advance server clocks/RNG from device lead, client mixing or focus/menu state.
+Solo keeps its immediate publication path with no observer. Animation-key,
+announcement, music and cosmetic effect consumers remain separate work.

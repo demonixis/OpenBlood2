@@ -164,6 +164,13 @@ namespace
             CHECK(event.kind == EventKind::Received);
             if (discard_state && event.channel == Channel::State)
                 return true;
+            if (is_audio_packet(event.bytes))
+            {
+                AudioEvent message;
+                CHECK(event.channel == Channel::Control && decode_audio(event.bytes, message) == DecodeAudio::Ok);
+                CHECK(message.world == joined[index].world && message.player == joined[index].player);
+                return true;
+            }
             if (is_weapon_frame_packet(event.bytes))
             {
                 WeaponFrameMessage message;

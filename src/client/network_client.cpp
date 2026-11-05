@@ -12,6 +12,7 @@ namespace OpenBlood2
         transport_.disconnect(peer_, std::uint32_t(Net::Reject::Malformed));
         transport_.flush();
         transport_.close();
+        audio_.clear();
         phase_ = Phase::Failed;
         return false;
     }
@@ -65,12 +66,20 @@ namespace OpenBlood2
         if (event.kind == Net::EventKind::Disconnected)
         {
             reason_ = event.reason ? Net::reject_text(event.reason) : "Disconnected";
+            audio_.clear();
             phase_ = Phase::Closed;
             transport_.close();
             return true;
         }
         if (phase_ == Phase::Closing)
             return true;
+        if (Net::is_audio_packet(event.bytes))
+        {
+            Net::AudioEvent message;
+            return phase_ == Phase::Active && event.channel == Net::Channel::Control &&
+                   Net::decode_audio(event.bytes, message) == Net::DecodeAudio::Ok &&
+                   audio_.receive(message, resources_, error);
+        }
         if (Net::is_weapon_frame_packet(event.bytes))
         {
             Net::WeaponFrameMessage message;
@@ -234,7 +243,7 @@ namespace OpenBlood2
         {
             if (phase_ != Phase::Baseline || joined_.player || joined->world != offer_.world ||
                 !movement_.begin(*joined) || !inbox_.begin(*joined) || !camera_.begin(*joined) ||
-                !weapons_.begin(*joined))
+                !weapons_.begin(*joined) || !audio_.begin(*joined))
                 return false;
             joined_ = *joined;
             return complete_baseline(now, error);
@@ -261,6 +270,7 @@ namespace OpenBlood2
             if (phase_ == Phase::Closing)
             {
                 transport_.close();
+                audio_.clear();
                 phase_ = Phase::Closed;
                 reason_ = "Disconnected";
                 return true;
@@ -366,6 +376,12 @@ namespace OpenBlood2
                                movement_.setup().owner.force_revision, pitch_, yaw_, zoom_, mapped_time_,
                                error) == NetworkCamera::Reception::Refused)
                 return fail(error, "Client camera failed");
+            const auto& view = camera_.camera();
+            const auto rotation = view.view.object && view.view.settings.listener
+                                      ? view.view.rotation
+                                      : rotation_from_euler({pitch_, yaw_, 0});
+            if (!audio_.advance(elapsed, displayed_, view.listener_position, rotation))
+                return fail(error, "Client audio playback failed");
         }
         else
             input_ = {};

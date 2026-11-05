@@ -196,6 +196,8 @@ namespace OpenBlood2
                 return reject(Net::Reject::Order);
             if (ready->world != session_.world_id() || ready->sequence != peer.previous.sequence)
                 return reject(Net::Reject::World);
+            if (!session_.begin_audio(peer.player, error))
+                return reject(Net::Reject::Capacity);
             peer.phase = Phase::Joined;
             peer.deadline = now + 15s;
             peer.heartbeat = now + 1s;
@@ -320,6 +322,16 @@ namespace OpenBlood2
                         break;
                     std::vector<std::uint8_t> bytes;
                     sent = Net::encode_command(ack, bytes) &&
+                           transport_.send(peer.peer, Net::Channel::Control, bytes, error);
+                }
+                std::vector<Net::AudioEvent> audio;
+                sent = sent && session_.take_audio_events(peer.player, audio, error);
+                for (const auto& event : audio)
+                {
+                    if (!sent)
+                        break;
+                    std::vector<std::uint8_t> bytes;
+                    sent = Net::encode_audio(event, bytes) &&
                            transport_.send(peer.peer, Net::Channel::Control, bytes, error);
                 }
                 if (!sent)

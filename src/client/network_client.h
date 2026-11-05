@@ -1,4 +1,5 @@
 #pragma once
+#include "client/network_audio.h"
 #include "client/network_camera.h"
 #include "client/network_clock.h"
 #include "client/network_input.h"
@@ -95,6 +96,14 @@ namespace OpenBlood2
         {
             return camera_.camera();
         }
+        NetworkAudio& audio()
+        {
+            return audio_;
+        }
+        const NetworkAudio& audio() const
+        {
+            return audio_;
+        }
         const NetworkWeapons& weapons() const
         {
             return weapons_;
@@ -153,6 +162,7 @@ namespace OpenBlood2
         NetworkMovement movement_;
         NetworkCamera camera_;
         NetworkWeapons weapons_;
+        NetworkAudio audio_;
         NetworkPlayerEvents inbox_;
         NetworkClock clock_;
         ClientWorld displayed_;
