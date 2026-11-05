@@ -1262,3 +1262,41 @@ No hidden clock offset, widened timeout, simulated tick, content-hash shortcut
 or second movement integration compensates for preparation latency. The original
 roster-lot sanitizer timeout remains historical evidence; slow content reads no
 longer consume network connection time.
+
+
+## Independent combat announcements
+
+The [combat announcer lot](../implementation/reports/m9_combat_announcer.md)
+consumes existing protocol-15 FragEvent and FinishHimVoice values. It imports all
+184 kill, 24 suicide and eight humiliation entries from original TheVoice, with
+exact resource IDs, source order, flags and WAV filenames. Duplicate filenames
+are intentional. Fallback text is converted from source CP1252 to UTF-8.
+
+Keep GetVoiceEntry's ANY-shared-bit test for kills/suicides. Only humiliation uses
+DoVoiceFlagsMatch's separate attacker and victim checks. Preserve unsigned 16-bit
+index wrap, original safety counter and character IDs (Ophelia 1, Gabriella 3).
+The server chooses the index once; clients perform no additional random draw.
+
+Read cres.dll locally through the existing bounded PE string reader. Combat
+strings must be nonempty and shorter than the original 128-byte buffer. Replace
+unbounded sprintf with checked %s/%% substitution into fewer than 500 bytes;
+player names are literal data. Missing, oversized or malformed localized strings
+use the exact original fallback and increment a visible diagnostic. Extra names
+are permitted for source templates without placeholders. Invalid characters or
+names fail without changing the output. Never execute commercial DLL code.
+
+Resolve both names and characters from the already-applied roster using exact
+object generations. Missing identities produce no announcement, as in the source.
+Only the local killer, including suicide, starts CommLink; other clients receive
+text only. FinishHim remains private to its addressed attacker. Keep CommLink's
+busy refusal and delayed VoiceMgr interruption; do not stop speech at receipt.
+Duplicate sequences must not replay audio, append text or increment counters.
+No server logical sound is allocated for these private client voices.
+
+Observer notices retain MessageMgr's four-line default, oldest replacement,
+independent five-second lifetime and expiry at now >= deadline. Draw white text
+at (1, 0) with 16-pixel line height. The portable ImGui font replaces the original
+Windows Arial surface font; raster parity is not claimed. Clear notices and
+retained audio with the endpoint. Existing solo CommLink clocks/behavior and
+local message editing stay unchanged. Communication portrait/text rendering,
+join/leave notices, chat and scoreboard remain separate UI work.

@@ -198,7 +198,7 @@ namespace OpenBlood2
                 return failed();
             }
             // HUD/camera and logical sound events are applied by the endpoint.
-            // Announcements, music and other effects still need remote consumers.
+            // Speech consumes original combat announcements; music and effects remain separate.
             client.take_events(events);
             if (client.ready() && !entered)
             {
@@ -230,6 +230,16 @@ namespace OpenBlood2
                 if (!hud.draw(state, client.resources(), error))
                     return failed();
                 draw_letterbox(camera.view.object && camera.view.settings.type == 1);
+                const auto origin = ImGui::GetMainViewport()->Pos;
+                float y = origin.y;
+                for (const auto& line : client.speech().notices())
+                {
+                    // Original MessageMgr coordinates/line height; the portable
+                    // UI font replaces its Windows Arial surface renderer.
+                    ImGui::GetForegroundDrawList()->AddText(ImGui::GetFont(), 16, {origin.x + 1, y},
+                                                            IM_COL32(255, 255, 255, 255), line.text.c_str());
+                    y += 16;
+                }
             }
             if (menu || !visible || leaving)
             {

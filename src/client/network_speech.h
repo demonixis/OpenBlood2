@@ -22,12 +22,24 @@ namespace OpenBlood2
             communication.Reset(*this);
         }
         bool begin(const Net::Joined&);
-        bool receive(const Net::PrivateEvent&, double time, bool external_camera, std::string& error);
+        bool receive(const Net::PrivateEvent&, double time, bool external_camera, std::span<const Net::RosterPlayer>,
+                     std::string& error);
         bool update(double time, std::string& error);
         void clear();
         CVoiceMgr manager;
         CCommLink communication;
         ClientAnnouncer announcer;
+        struct Notice
+        {
+            std::string text;
+            float expires = 0;
+        };
+        const std::vector<Notice>& notices() const
+        {
+            return notices_;
+        }
+        std::uint64_t frag_events = 0, frag_communications = 0, frag_notices = 0, missing_players = 0,
+                      finish_events = 0;
         float time() const override
         {
             return time_;
@@ -55,5 +67,6 @@ namespace OpenBlood2
         double clock_ = 0;
         float time_ = 0;
         bool set_time(double, std::string&);
+        std::vector<Notice> notices_;
     };
 } // namespace OpenBlood2

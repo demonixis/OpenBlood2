@@ -1,5 +1,12 @@
 # Source and Dependency Provenance
 
+The M9 [combat announcement lot](reports/m9_combat_announcer.md) imports the 216
+original TheVoice kill/suicide/humiliation rows with exact flags and filenames,
+converting only CP1252 fallback text to UTF-8. It preserves source selection,
+private CommLink versus observer text, busy gates and MessageMgr expiry. Bounded
+formatting and the portable notice font are explicit adaptations. See the
+[source ledger](sources/m9_combat_announcer_sources.json).
+
 The M9 [roster lot](reports/m9_roster.md) takes original AddPlayer/RemovePlayer
 and frag ordering into a bounded protocol-15 client roster. Names, characters and
 scores come from initialized original players; no rule, RNG or movement changes.

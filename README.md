@@ -45,8 +45,11 @@ play through each client's independent audio mixer. [Private speech and startup
 announcements](Documentation/implementation/reports/m9_client_speech.md) now play
 through original VoiceMgr/CommLink. [Weapon animation sounds and loops](Documentation/implementation/reports/m9_weapon_sounds.md)
 now come from the validated server timeline. The [client roster](Documentation/implementation/reports/m9_roster.md)
-now receives names, characters and scores with reliable arrival/departure updates. Frag announcements, music, visual
-effects, scoreboard, match limits/rotation and Team/CTF remain in progress.
+now receives names, characters and scores with reliable arrival/departure updates.
+[Combat announcements](Documentation/implementation/reports/m9_combat_announcer.md) now
+play original frag/suicide/FinishHim voices privately and show frag text to other players.
+Communication portraits, music, visual effects, scoreboard, match limits/rotation
+and Team/CTF remain in progress.
 
 ## CI builds
 

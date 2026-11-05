@@ -1,4 +1,5 @@
 #include "client/network_speech.h"
+#include <algorithm>
 #include <cmath>
 namespace OpenBlood2
 {
@@ -15,6 +16,7 @@ namespace OpenBlood2
     {
         communication.Reset(*this);
         manager.Reset();
+        notices_.clear();
     }
     bool NetworkSpeech::set_time(double now, std::string& error)
     {
@@ -27,7 +29,8 @@ namespace OpenBlood2
         time_ = float(now);
         return true;
     }
-    bool NetworkSpeech::receive(const Net::PrivateEvent& event, double now, bool external_camera, std::string& error)
+    bool NetworkSpeech::receive(const Net::PrivateEvent& event, double now, bool external_camera,
+                                std::span<const Net::RosterPlayer> roster, std::string& error)
     {
         error.clear();
         if (!joined_.world || event.owner != joined_ || !Net::valid_private(event))
@@ -41,6 +44,42 @@ namespace OpenBlood2
             return false;
         if (const auto* start = std::get_if<BloodbathStart>(&event.value))
             communication.Start(*this, announcer.bloodbath(*start, resources_), false);
+        else if (const auto* frag = std::get_if<Net::FragEvent>(&event.value))
+        {
+            ++frag_events;
+            const auto killer =
+                std::find_if(roster.begin(), roster.end(), [&](const auto& p) { return p.object == frag->killer; });
+            const auto victim =
+                std::find_if(roster.begin(), roster.end(), [&](const auto& p) { return p.object == frag->victim; });
+            Conversation line;
+            if (killer == roster.end() || victim == roster.end())
+                ++missing_players; // Original refuses unnamed kills; no invented identity/text.
+            else if (announcer.frag(frag->index, {killer->name, killer->character}, {victim->name, victim->character},
+                                    frag->killer == frag->victim, resources_, line))
+            {
+                if (frag->killer == joined_.object)
+                {
+                    ++frag_communications;
+                    communication.Start(*this, line, false); // Source busy/delayed VoiceMgr stop.
+                }
+                else
+                {
+                    ++frag_notices;
+                    // Original CMessageMgr defaults: four lines, independent
+                    // five-second expiry, oldest replacement; white text output.
+                    if (notices_.size() == 4)
+                        notices_.erase(notices_.begin());
+                    notices_.push_back({std::move(line.text), time_ + 5});
+                }
+            }
+        }
+        else if (const auto* finish = std::get_if<FinishHimVoice>(&event.value))
+        {
+            ++finish_events;
+            Conversation line;
+            if (announcer.finish(*finish, resources_, line))
+                communication.Start(*this, line, false);
+        }
         else if (const auto* conversation = std::get_if<Conversation>(&event.value))
         {
             manager.StopAll(); // Even a busy CommLink refusal stops the player's voice.
@@ -63,6 +102,7 @@ namespace OpenBlood2
         error.clear();
         if (!joined_.world || !set_time(now, error))
             return false;
+        std::erase_if(notices_, [&](const auto& notice) { return time_ >= notice.expires; });
         communication.Update(*this, manager);
         return true;
     }

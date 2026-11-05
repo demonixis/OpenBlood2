@@ -168,7 +168,7 @@ namespace OpenBlood2
                 zoom_crosshair_ = zoom->type;
             }
             if (!speech_.receive(value, std::chrono::duration<double>(now - origin_).count(),
-                                 bool(camera_.camera().view.object), error))
+                                 bool(camera_.camera().view.object), inbox_.roster(), error))
                 return false;
             return observe(double(value.tick) / 60, now);
         }

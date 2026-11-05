@@ -65,7 +65,7 @@ namespace
         CHECK(world.begin(joined.world));
         std::uint64_t sequence = 0;
         const auto send = [&](PrivateValue value, double now, bool camera = false)
-        { return speech.receive({joined, ++sequence, 60, std::move(value)}, now, camera, error); };
+        { return speech.receive({joined, ++sequence, 60, std::move(value)}, now, camera, {}, error); };
         CHECK(send(VoiceEvent{true, 0, 9}, .1));
         auto id = speech.manager.voice;
         CHECK(id >= client_sound_id_begin && audio.mixer.get(id) && audio.mixer.get(id)->request.streaming);
@@ -102,10 +102,10 @@ namespace
         id = speech.manager.voice;
         const auto starts = audio.local_started;
         PrivateEvent duplicate{joined, sequence, 60, VoiceEvent{true, 0, 9}};
-        CHECK(speech.receive(duplicate, 5.72, false, error) && audio.local_started == starts &&
+        CHECK(speech.receive(duplicate, 5.72, false, {}, error) && audio.local_started == starts &&
               speech.manager.voice == id);
         duplicate.owner.world++;
-        CHECK(!speech.receive(duplicate, 6, false, error) && speech.manager.voice == id);
+        CHECK(!speech.receive(duplicate, 6, false, {}, error) && speech.manager.voice == id);
         CHECK(!speech.update(5.71, error) && speech.manager.voice == id);
         CHECK(send(VoiceStop{}, 6));
         CHECK(speech.manager.PlaySound("tone.wav", false));

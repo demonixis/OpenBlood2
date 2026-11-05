@@ -1,10 +1,124 @@
-// Selected original ClientShellDLL/TheVoice.cpp startup table and selection.
+// Selected original ClientShellDLL/TheVoice.cpp startup/combat tables and selection.
 // Copyright (c) 1998 Monolith Productions Inc.
 #include "client/announcer.h"
+#include "client/announcer_data.h"
 #include <array>
 
 namespace OpenBlood2
 {
+    namespace
+    {
+        std::uint8_t voice_flags(DBYTE attacker, DBYTE victim)
+        {
+            // Original SharedDefs: Ophelia=1, Gabriella=3; Caleb=0, Ishmael=2.
+            return ((attacker == 1 || attacker == 3) ? 2 : 1) | ((victim == 1 || victim == 3) ? 8 : 4);
+        }
+        const AnnouncerData::Entry* select(std::span<const AnnouncerData::Entry> entries, std::uint16_t index,
+                                           std::uint8_t flags, bool extra)
+        {
+            const auto* entry = &entries[index % entries.size()];
+            int safety = -1;
+            const auto matches = [&]
+            {
+                // Source GetVoiceEntry deliberately uses ANY shared bit. The
+                // humiliation variant alone requires both attacker and victim.
+                return extra ? (flags & (entry->flags & 12)) && (flags & (entry->flags & 3))
+                             : bool(entry->flags & flags);
+            };
+            while (!matches())
+            {
+                ++index; // Original D_WORD wrap is significant, including at 65535.
+                entry = &entries[index % entries.size()];
+                if (safety++ > int(entries.size()))
+                    return nullptr;
+            }
+            return entry;
+        }
+        bool format_names(std::string_view text, std::span<const std::string_view> names, std::string& out)
+        {
+            std::string next;
+            unsigned arg = 0;
+            for (std::size_t i = 0; i < text.size(); ++i)
+            {
+                const auto c = text[i];
+                if (!c)
+                    return false;
+                if (c != '%')
+                    next += c;
+                else if (++i < text.size() && text[i] == '%')
+                    next += '%';
+                else if (i < text.size() && text[i] == 's' && arg < names.size())
+                    next += names[arg++];
+                else
+                    return false;
+                if (next.size() >= 500)
+                    return false;
+            }
+            out = std::move(next);
+            return true;
+        }
+    } // namespace
+    void ClientAnnouncer::load(const Resources& resources)
+    {
+        if (loaded_)
+            return;
+        loaded_ = true;
+        std::vector<std::uint8_t> bytes;
+        if (const auto* entry = resources.find("cres.dll"); entry && entry->size > 32 * 1024 * 1024)
+            error = "cres.dll exceeds the 32 MiB string reader limit";
+        else if (resources.read("cres.dll", bytes, error))
+            read_string_resources(bytes, strings_, error);
+    }
+    bool ClientAnnouncer::message(std::uint32_t resource, std::string_view fallback, std::string_view file,
+                                  std::span<const std::string_view> names, const Resources& resources,
+                                  Conversation& out)
+    {
+        load(resources);
+        Conversation next;
+        next.character = 4;
+        next.file = "Sounds\\Voice\\" + std::string(file);
+        const auto found = strings_.strings.find(resource);
+        if (found == strings_.strings.end() || found->second.empty() || found->second.size() >= 128 ||
+            !format_names(found->second, names, next.text))
+        {
+            ++fallback_texts;
+            if (error.empty())
+                error = "Missing or invalid announcer string " + std::to_string(resource);
+            if (!format_names(fallback, names, next.text))
+                return false;
+        }
+        ++messages;
+        out = std::move(next);
+        return true;
+    }
+    bool ClientAnnouncer::frag(std::uint16_t index, const AnnouncerPlayer& killer, const AnnouncerPlayer& victim,
+                               bool suicide, const Resources& resources, Conversation& out)
+    {
+        if (killer.character >= 4 || victim.character >= 4 || killer.name.empty() || victim.name.empty() ||
+            killer.name.size() > 100 || victim.name.size() > 100 || killer.name.find('\0') != killer.name.npos ||
+            victim.name.find('\0') != victim.name.npos)
+        {
+            error = "Invalid announcer player";
+            return false;
+        }
+        const auto* entry = select(suicide ? std::span<const AnnouncerData::Entry>(AnnouncerData::suicide)
+                                           : std::span<const AnnouncerData::Entry>(AnnouncerData::kill),
+                                   index, voice_flags(killer.character, victim.character), false);
+        const std::array names{killer.name, victim.name};
+        return entry && message(entry->resource, entry->text, entry->file, std::span(names).first(suicide ? 1 : 2),
+                                resources, out);
+    }
+    bool ClientAnnouncer::finish(const FinishHimVoice& event, const Resources& resources, Conversation& out)
+    {
+        if (event.attacker_character >= 4 || event.victim_character >= 4)
+        {
+            error = "Invalid humiliation announcer character";
+            return false;
+        }
+        const auto* entry = select(AnnouncerData::humiliation, event.index,
+                                   voice_flags(event.attacker_character, event.victim_character), true);
+        return entry && message(entry->resource, entry->text, entry->file, {}, resources, out);
+    }
     Conversation ClientAnnouncer::bloodbath(const BloodbathStart& event, const Resources& resources)
     {
         // TheVoice.cpp:134-141. Every entry has VOICEFLAG_ALL, so the source's
@@ -13,15 +127,7 @@ namespace OpenBlood2
             {"Let The Bloodbath Begin!", "May The Bloodbath Continue!", "Determine The Master Of The Bloodbath",
              "The Carnage Continues!", "Let The Bloodbath Start!", "May The Killing Continue", "Begin The Bloodbath!",
              "Bloodbath, My Children!"}};
-        if (!loaded_)
-        {
-            loaded_ = true;
-            std::vector<std::uint8_t> bytes;
-            if (const auto* entry = resources.find("cres.dll"); entry && entry->size > 32 * 1024 * 1024)
-                error = "cres.dll exceeds the 32 MiB string reader limit";
-            else if (resources.read("cres.dll", bytes, error))
-                read_string_resources(bytes, strings_, error);
-        }
+        load(resources);
         ++messages;
         const auto index = event.index % fallback.size();
         Conversation result;

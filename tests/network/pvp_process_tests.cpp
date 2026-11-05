@@ -181,6 +181,12 @@ namespace
                           killer->frags == 1 && killed->frags == 0 &&
                           client.players().roster().size() == (hosted ? 3 : 2));
                     CHECK(killer->character == (hosted ? 1 : 0) && killed->character == (hosted ? 2 : 0));
+                    CHECK(client.speech().frag_events == 1 && !client.speech().missing_players);
+                    if (victim)
+                        CHECK(client.speech().frag_notices == 1 && !client.speech().notices().empty() &&
+                              !client.speech().frag_communications);
+                    else
+                        CHECK(client.speech().frag_communications == 1 && !client.speech().frag_notices);
                     ++frags;
                     std::cout << "Frag received: killer=" << frag->killer.slot << " victim=" << frag->victim.slot
                               << '\n'

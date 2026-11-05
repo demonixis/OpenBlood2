@@ -1,0 +1,130 @@
+{
+  "scope": "Original Bloodbath frag, suicide and FinishHim announcements in independent clients",
+  "baseline": "10205fa9c40e21ba981aac62c0b8406053c7ed32",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "10205fa9c40e21ba981aac62c0b8406053c7ed32",
+      "path": "src/client/announcer.cpp",
+      "sha256": "0a6cf78d8dd50bc96cb61103cce9faf2f618198a861dd0e6c89fa2a18fad9d30"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "10205fa9c40e21ba981aac62c0b8406053c7ed32",
+      "path": "src/client/network_speech.cpp",
+      "sha256": "9c2e14c6e399986dde9cee1631157649b971d78f11ece261064eb699db5415b5"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "10205fa9c40e21ba981aac62c0b8406053c7ed32",
+      "path": "src/client/network_client.cpp",
+      "sha256": "91f22eaec3a1970fd28440d35df304bcb397478e70fa72692728e9d5abc15181"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "10205fa9c40e21ba981aac62c0b8406053c7ed32",
+      "path": "src/app/network_frontend.cpp",
+      "sha256": "bee579b54cc4f07609465fee7d2102bba7c4faaccf3a4f54f9d49c0a0f46d5c5"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "10205fa9c40e21ba981aac62c0b8406053c7ed32",
+      "path": "src/game/original/CommLink.cpp",
+      "sha256": "53422c03b0acc7d7415f26b331d182e6aac064a43a468edfb9079c83b7129e78"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/TheVoice.cpp",
+      "sha256": "19edb2b6de85f48687d57b1edd1de4c7d30d312fffe7b729aea586f0ff0c6659"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/TheVoice.h",
+      "sha256": "50b8adc368420d7276a6e45a60988cff351c3ca2a52775228529ad7a27bb6975"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/MessageMgr.cpp",
+      "sha256": "b865f859d59856d28ea4d454c401cf5be018fad84cebcf5172458690ee4aa2cf"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/MessageMgr.h",
+      "sha256": "78947bf13905e3770fe497fab490f3d56b8029944a75d8448fa349b5afa7cd70"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/CommLink.cpp",
+      "sha256": "d870df0e5486ea70ee88c6f9829bb8257dbe8566c26905f1c56734ae50300e92"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Shared/SharedDefs.h",
+      "sha256": "9da1337eb4fd7610038248243e37b3f5e3c05c621bad2cad5c8ad24f7499619b"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Shared/ClientRes.h",
+      "sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b"
+    }
+  ],
+  "adaptations": [
+    "216 exact source rows (184 kills, 24 suicides, eight humiliations), 209 distinct WAV paths; source CP1252 fallback text converted to UTF-8",
+    "Original ANY-bit frag/suicide selection and strict attacker/victim humiliation selection, including 16-bit index wrap and duplicate filenames",
+    "Read bounded cres.dll string resources locally; explicit original fallback for missing, oversized or malformed localized formats; safe %s/%% substitution treats names as data",
+    "Addressed CommLink for local killer/suicide/FinishHim; four observer notices with independent five-second expiry and original coordinates/line height",
+    "Portable UI font replaces Windows Arial surface font; existing CommLink timing and solo bridge unchanged; communication portrait/text renderer remains separate",
+    "Protocol 15 and server RNG/logical audio unchanged; missing player generations skip announcements; duplicate private sequences remain inert"
+  ],
+  "observed_missing_retail_wavs": [
+    "Sounds\\Voice\\Voice7.wav",
+    "Sounds\\Voice\\Voice8.wav",
+    "Sounds\\Voice\\Voice9.wav",
+    "Sounds\\Voice\\Voice49.wav",
+    "Sounds\\Voice\\Voice68.wav",
+    "Sounds\\Voice\\Voice69.wav",
+    "Sounds\\Voice\\Voice70.wav",
+    "Sounds\\Voice\\Voice71.wav",
+    "Sounds\\Voice\\Voice72.wav",
+    "Sounds\\Voice\\Voice73.wav",
+    "Sounds\\Voice\\Voice74.wav",
+    "Sounds\\Voice\\Voice75.wav",
+    "Sounds\\Voice\\Voice76.wav",
+    "Sounds\\Voice\\Voice77.wav",
+    "Sounds\\Voice\\Voice78.wav",
+    "Sounds\\Voice\\Voice79.wav",
+    "Sounds\\Voice\\Voice80.wav",
+    "Sounds\\Voice\\Voice81.wav",
+    "Sounds\\Voice\\Voice82.wav",
+    "Sounds\\Voice\\Voice83.wav",
+    "Sounds\\Voice\\Voice84.wav",
+    "Sounds\\Voice\\Voice85.wav",
+    "Sounds\\Voice\\Voice86.wav",
+    "Sounds\\Voice\\Voice87.wav",
+    "Sounds\\Voice\\Voice88.wav",
+    "Sounds\\Voice\\Voice89.wav",
+    "Sounds\\Voice\\Voice90.wav",
+    "Sounds\\Voice\\Voice91.wav",
+    "Sounds\\Voice\\Voice92.wav",
+    "Sounds\\Voice\\Voice93.wav",
+    "Sounds\\Voice\\Voice94.wav",
+    "Sounds\\Voice\\Voice95.wav",
+    "Sounds\\Voice\\Voice96.wav",
+    "Sounds\\Voice\\Voice97.wav",
+    "Sounds\\Voice\\Voice98.wav",
+    "Sounds\\Voice\\Voice99.wav"
+  ]
+}
