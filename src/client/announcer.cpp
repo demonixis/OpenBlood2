@@ -69,6 +69,50 @@ namespace OpenBlood2
         else if (resources.read("cres.dll", bytes, error))
             read_string_resources(bytes, strings_, error);
     }
+    bool ClientAnnouncer::player_notice(std::string_view name, bool joined, const Resources& resources,
+                                        std::string& out)
+    {
+        if (name.empty() || name.size() > 100 || name.find('\0') != name.npos)
+            return false;
+        load(resources);
+        const auto format = [&](std::string_view pattern)
+        {
+            if (pattern.empty() || pattern.size() >= 500)
+                return false;
+            std::string next;
+            for (std::size_t i = 0; i < pattern.size(); ++i)
+            {
+                if (!pattern[i])
+                    return false;
+                if (pattern.substr(i).starts_with("%1!s!"))
+                {
+                    next += name;
+                    i += 4;
+                }
+                else if (pattern.substr(i).starts_with("%%"))
+                {
+                    next += '%';
+                    ++i;
+                }
+                else if (pattern[i] == '%')
+                    return false;
+                else
+                    next += pattern[i];
+                if (next.size() >= 500)
+                    return false;
+            }
+            out = std::move(next);
+            return true;
+        };
+        const unsigned resource = joined ? 25 : 26; // Original ClientRes.rc IDS_ADDPLAYER/IDS_REMOVEPLAYER.
+        const auto found = strings_.strings.find(resource);
+        if (found != strings_.strings.end() && format(found->second))
+            return true;
+        ++fallback_texts;
+        if (error.empty())
+            error = "Missing or invalid player notice string " + std::to_string(resource);
+        return format(joined ? "%1!s! has joined the game." : "%1!s! has left the game.");
+    }
     bool ClientAnnouncer::message(std::uint32_t resource, std::string_view fallback, std::string_view file,
                                   std::span<const std::string_view> names, const Resources& resources,
                                   Conversation& out)

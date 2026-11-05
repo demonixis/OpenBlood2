@@ -82,6 +82,7 @@ start of the current level). After death, Use opens the Load menu. The demo has 
 | Proximity / remote / time bombs | P / R / T; B detonates remote charges |
 | Quicksave / quickload | F5 / F6 (retail) |
 | Pause / inspector | Esc / F10 |
+| Bloodbath scores (network) | Tab / gamepad Back; toggle without pausing |
 
 Inventory actions require collection; release Shift before using them. Focus
 capture does not fire a shot. Text editing/focus loss suppress game input.

@@ -1330,3 +1330,50 @@ not a guarantee of storage latency or admission when all assets remain pinned.
 Expose the eviction count for inspection/tests and reset it on clear. Keep normal
 cache hits unchanged, deduplicate reliable sound events before any preparation,
 and retain the original local/server sound identities and sample-clock behavior.
+
+
+## Original Bloodbath scoreboard and player notices
+
+The [scoreboard continuation](../implementation/reports/m9_scoreboard.md) consumes
+protocol-15 roster/frag events only on the independent client. Keep the wire
+roster in admission order and a separate owned display order. Original CFragInfo
+moves new players and score gains upward only past strictly lower scores; a
+suicide loss moves downward only past strictly higher scores. Ties retain the
+previous display order. Late admission sorts the received initial scores, and
+removal/reconnect obeys existing generation and admission checks. Refused or
+duplicate events cannot alter the table.
+
+Use the external original c/o/i/g_frag.pcx portraits, fragbar.pcx and
+frag_font_1.pcx/.fnt. Preserve native pixel dimensions, centered table, original
+row cap/centering, 145-pixel name clipping, score center 20 pixels from the right,
+magenta transparency and the height-below-350 compact mode (no bar/portraits,
+18 fewer pixels between rows). Retain DrawClip's harmless repeated short-prefix
+draw. Unknown ping remains `(-)` until measured ping transport is implemented.
+The existing HudFont adapter replaces unavailable CoolFont implementation:
+ASCII 33–126 glyphs, quarter-font-height spaces, unsupported bytes skipped.
+Full names remain in the roster/notices; Unicode glyph support and exact retail
+raster parity are not claimed.
+
+Bound composition to 16 rows, authored bars of at most 1024 by 128 pixels and
+viewports of at most 16384 pixels per axis. Tiny viewports produce no rows instead
+of unsigned source underflow. GPU ownership stays in the frontend; upload only
+changed revisions, convert physical pixels through framebuffer density and wait
+for completion before releasing textures. No GPU structure enters the protocol
+or dedicated executable.
+
+Tab toggles scores, ignores keyboard repeats and requires focused gameplay;
+gamepad Back adds the same network-only action. PlayerDead opens the table and a
+validated living CameraState after death closes it, replacing the source's
+nonnegative-health revival heuristic. Showing scores hides the crosshair but
+never blocks movement/fire or pauses the host. Menu/leave hides presentation and
+blocks toggles without changing server ticks. Match-end and Team/CTF layouts remain
+separate from this Bloodbath consumer.
+
+Roster additions show IDS_ADDPLAYER (25), including self and existing players
+at initial admission. Removals show IDS_REMOVEPLAYER (26) using the cached name,
+excluding self. Resolve cres.dll as data only; accept bounded `%1!s!` and `%%`
+substitution, never interpret player names. Missing/malformed strings use exact
+original English fallback with a diagnostic. Notices share the existing four-line,
+five-second MessageMgr-style queue with frag text. Duplicate rosters create no
+extra notices or sound. Preserve client speech clocks, logical server audio,
+CMoveMgr single integration and all solo behavior.

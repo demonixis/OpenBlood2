@@ -39,6 +39,10 @@ namespace OpenBlood2
             return roster_;
         }
         const Net::RosterPlayer* player(ObjectId) const;
+        const std::vector<Net::RosterPlayer>& scores() const
+        {
+            return scores_;
+        }
 
       private:
         Net::Joined owner_;
@@ -46,6 +50,7 @@ namespace OpenBlood2
         std::uint64_t sequence_ = 0, tick_ = 0;
         std::vector<Net::PrivateEvent> events_;
         std::vector<Net::RosterPlayer> roster_;
+        std::vector<Net::RosterPlayer> scores_; // Original CFragInfo order, including history-stable ties.
         std::uint64_t highest_player_ = 0;
         bool replace_roster(const Net::PlayerRoster&, std::string& error);
     };

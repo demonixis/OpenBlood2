@@ -3,6 +3,35 @@
 
 namespace OpenBlood2
 {
+    namespace
+    {
+        // Original CFragInfo AddClient/AddFrags/RemoveFrag: move only past
+        // strictly lower/higher scores. A later tie retains its current position.
+        void score(std::vector<Net::RosterPlayer>& rows, const Net::RosterPlayer& value)
+        {
+            auto found =
+                std::find_if(rows.begin(), rows.end(), [&](const auto& row) { return row.player == value.player; });
+            const bool added = found == rows.end();
+            const int previous = added ? value.frags : found->frags;
+            std::size_t at = std::size_t(found - rows.begin());
+            if (added)
+                rows.push_back(value);
+            else
+                *found = value;
+            if (added || value.frags > previous)
+                while (at && rows[at].frags > rows[at - 1].frags)
+                {
+                    std::swap(rows[at], rows[at - 1]);
+                    --at;
+                }
+            else if (value.frags < previous)
+                while (at + 1 < rows.size() && rows[at].frags < rows[at + 1].frags)
+                {
+                    std::swap(rows[at], rows[at + 1]);
+                    ++at;
+                }
+        }
+    } // namespace
     bool NetworkPlayerEvents::begin(const Net::Joined& owner)
     {
         if (!owner.world || !owner.player || !owner.object || !owner.object.generation || owner.object.slot >= 65536)
@@ -15,6 +44,7 @@ namespace OpenBlood2
         sequence_ = tick_ = 0;
         events_.clear();
         roster_.clear();
+        scores_.clear();
         highest_player_ = 0;
         return true;
     }
@@ -46,6 +76,14 @@ namespace OpenBlood2
             return false;
         }
         highest_player_ = std::max(highest_player_, state.players.back().player);
+        std::erase_if(scores_,
+                      [&](const auto& old)
+                      {
+                          return std::none_of(state.players.begin(), state.players.end(),
+                                              [&](const auto& p) { return p.player == old.player; });
+                      });
+        for (const auto& p : state.players)
+            score(scores_, p);
         roster_ = state.players;
         return true;
     }
@@ -72,7 +110,10 @@ namespace OpenBlood2
         if (const auto* frag = std::get_if<Net::FragEvent>(&event.value))
             for (auto& p : roster_)
                 if (p.object == frag->killer)
+                {
                     p.frags = frag->killer_frags; // Authoritative absolute score, including suicide.
+                    score(scores_, p);
+                }
         if (const auto* stats = std::get_if<PlayerStats>(&event.value))
         {
             if (!hud_.receive(owner, event.sequence, *stats))

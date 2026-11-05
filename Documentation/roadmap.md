@@ -343,7 +343,8 @@ on dedicated and graphical-host sessions; the graphical frontend forwards held f
 The [client roster](implementation/reports/m9_roster.md) now owns reliable names, characters and frag scores, including late arrivals and departures.
 [Combat announcements](implementation/reports/m9_combat_announcer.md) now deliver original frag/suicide/FinishHim speech and observer notices.
 [Network audio cache reclamation](implementation/reports/m9_audio_cache.md) now retains fixed budgets across sequential playback without evicting live or prepared clips.
-Communication portraits, music, FX, scoreboard, full match rules and remaining multiplayer branches stay in progress.
+[Original Bloodbath scores and player notices](implementation/reports/m9_scoreboard.md) now consume reliable roster/frag updates, preserving tie order, source PCX/FNT layout, death/revival visibility and localized join/leave text.
+Communication portraits, music, FX, measured pings/chat, full match rules and remaining multiplayer branches stay in progress.
 **Remaining private presentation consumers/commands, full client separation, Team/CTF and complete network qualification remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client

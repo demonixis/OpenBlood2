@@ -1,3 +1,4 @@
+#include "app/scoreboard.h"
 #include "client/network_client.h"
 #include "client/object_scene.h"
 #include "engine/resources.h"
@@ -39,6 +40,7 @@ namespace
         Config config;
         config.data_dir = path_from_utf8(data);
         NetworkClient client;
+        ScoreboardControl scores;
         client.audio().mixer.inspect_pcm = true;
         float audio_peak = 0;
         JoinProfile profile;
@@ -163,12 +165,13 @@ namespace
             client.take_events(events);
             for (const auto& event : events)
             {
+                scores.receive(event);
                 if (std::holds_alternative<PlayerDead>(event.value))
                 {
                     ++deaths;
                     death_force = client.movement().setup().owner.force_revision;
                     death_at = Clock::now();
-                    CHECK(victim);
+                    CHECK(victim && scores.visible && scores.dead);
                     std::cout << "Death received at force " << death_force << '\n' << std::flush;
                 }
                 if (const auto* frag = std::get_if<FragEvent>(&event.value))
@@ -181,6 +184,10 @@ namespace
                           killer->frags == 1 && killed->frags == 0 &&
                           client.players().roster().size() == (hosted ? 3 : 2));
                     CHECK(killer->character == (hosted ? 1 : 0) && killed->character == (hosted ? 2 : 0));
+                    CHECK(client.players().scores().size() == client.players().roster().size() &&
+                          client.players().scores().front().object == frag->killer &&
+                          client.players().scores().front().frags == 1);
+                    CHECK(client.speech().joined_notices == (hosted ? 3 : 2));
                     CHECK(client.speech().frag_events == 1 && !client.speech().missing_players);
                     if (victim)
                         CHECK(client.speech().frag_notices == 1 && !client.speech().notices().empty() &&
@@ -196,6 +203,11 @@ namespace
             if (client.phase() == NetworkClient::Phase::Closed)
             {
                 CHECK(client.audio().started > 0 && client.audio().local_started > 0 && audio_peak > 0);
+                CHECK(!scores.dead && !scores.visible);
+                if (!victim)
+                    CHECK(client.speech().left_notices == 1);
+                std::cout << "Player notices: joined=" << client.speech().joined_notices
+                          << ", left=" << client.speech().left_notices << '\n';
                 std::cout << "Remote audio: starts=" << client.audio().started << ", stops=" << client.audio().stopped
                           << ", natural=" << client.audio().completed
                           << ", private_starts=" << client.audio().local_started << ", peak=" << audio_peak << '\n';

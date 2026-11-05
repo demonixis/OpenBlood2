@@ -7,6 +7,7 @@
 #include "app/movement_controls.h"
 #include "app/network_controls.h"
 #include "app/scene_presenter.h"
+#include "app/scoreboard.h"
 #include "app/ui_runtime.h"
 #include "client/network_client.h"
 #include "engine/capture.h"
@@ -96,6 +97,9 @@ namespace OpenBlood2
         const auto window = SDL_GetWindowID(runtime.window);
         const auto format = SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window);
         NetworkClient client;
+        ClientFragTable frag_table(client.resources());
+        ScoreboardRenderer frag_renderer(runtime.gpu);
+        ScoreboardControl scores;
         if (!client.prepare(config, error) ||
             !client.connect(address.host, address.port, profile, NetworkClient::Clock::now(), error))
             return failed();
@@ -131,6 +135,7 @@ namespace OpenBlood2
             {
                 ImGui_ImplSDL3_ProcessEvent(&event);
                 devices.event(event);
+                scores.event(event, window, client.ready() && controls.focused && !menu && !leaving);
                 if (event.type == SDL_EVENT_QUIT ||
                     (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == window))
                     if (!leave())
@@ -200,6 +205,8 @@ namespace OpenBlood2
             // HUD/camera and logical sound events are applied by the endpoint.
             // Speech consumes original combat announcements; music and effects remain separate.
             client.take_events(events);
+            for (const auto& applied : events)
+                scores.receive(applied);
             if (client.ready() && !entered)
             {
                 entered = true;
@@ -220,7 +227,7 @@ namespace OpenBlood2
                 const auto& values = client.hud();
                 auto state =
                     hud_state(values.stats, true, bool(camera.view.object), camera.death.active,
-                              settings.crosshair || client.zoom_crosshair(),
+                              !scores.visible && (settings.crosshair || client.zoom_crosshair()),
                               client.zoom_crosshair() ? client.zoom_crosshair() : DBYTE(settings.crosshair_number));
                 state.items = values.items;
                 state.item_messages = values.item_messages;
@@ -230,6 +237,15 @@ namespace OpenBlood2
                 if (!hud.draw(state, client.resources(), error))
                     return failed();
                 draw_letterbox(camera.view.object && camera.view.settings.type == 1);
+                if (scores.visible && !menu && !leaving)
+                {
+                    const auto size = ImGui::GetMainViewport()->Size;
+                    const auto density = ImGui::GetIO().DisplayFramebufferScale;
+                    if (!frag_table.compose(client.players().scores(), unsigned(size.x * density.x),
+                                            unsigned(size.y * density.y), error) ||
+                        !frag_renderer.draw(frag_table, error))
+                        return failed();
+                }
                 const auto origin = ImGui::GetMainViewport()->Pos;
                 float y = origin.y;
                 for (const auto& line : client.speech().notices())

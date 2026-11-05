@@ -1,5 +1,11 @@
 # Source and Dependency Provenance
 
+The M9 [Bloodbath scoreboard and player notices](reports/m9_scoreboard.md) reuse
+CFragInfo's strict score ordering, original PCX/FNT layout/DrawClip and shell
+Tab/death rules, plus original IDS_ADDPLAYER/IDS_REMOVEPLAYER strings. Owned
+vectors, bounded formatting, existing HudFont/ImGui services and gamepad Back
+are explicit adaptations. See the [source ledger](sources/m9_scoreboard_sources.json).
+
 The M9 [client audio cache correction](reports/m9_audio_cache.md) is replacement
 engine policy: only independent network playback reclaims cache-only entries
 when its fixed clip/byte budgets require it. Original rules, logical server

@@ -1,0 +1,82 @@
+{
+  "scope": "Original Bloodbath scoreboard ordering/layout and localized arrival/departure notices in independent clients",
+  "baseline": "1a4e82be85fa5dbdd98f051802cb45acd47a1a7d",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "1a4e82be85fa5dbdd98f051802cb45acd47a1a7d",
+      "path": "src/client/network_player_events.cpp",
+      "sha256": "1651f4053144ccc483f529a968d324d59d2dc913a65336eabaff4de97743d89e"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "1a4e82be85fa5dbdd98f051802cb45acd47a1a7d",
+      "path": "src/client/announcer.cpp",
+      "sha256": "703343eb39eed23345e31cccc703163a827e4277b52260ee07dbeac412bf01c9"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "1a4e82be85fa5dbdd98f051802cb45acd47a1a7d",
+      "path": "src/client/network_speech.cpp",
+      "sha256": "de29d0a000e134e74343bf618debb8e9926b2401a889bac03ee9236674fa3612"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "1a4e82be85fa5dbdd98f051802cb45acd47a1a7d",
+      "path": "src/engine/hud_surface.cpp",
+      "sha256": "0fb4a39170eca50c8706edd68e5530f500e4780933197004aa66b44916f4a384"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "1a4e82be85fa5dbdd98f051802cb45acd47a1a7d",
+      "path": "src/app/network_frontend.cpp",
+      "sha256": "f972caa5c5cbdda2e5cf2a070846dc889d139deccc58b3cf7c00f6fc8bde4a44"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/FragInfo.cpp",
+      "sha256": "bae0a3db7388d5209753df0e3f64c008cb3d977cb988e1d8b6443a3bb073282a"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/FragInfo.h",
+      "sha256": "75e08be25826093666c13c66e607fb255a07a9467213750b55f08ff15e642e61"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/MessageMgr.cpp",
+      "sha256": "b865f859d59856d28ea4d454c401cf5be018fad84cebcf5172458690ee4aa2cf"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientRes/ClientRes.rc",
+      "sha256": "cc635e26e01b93e83e6202a336e7dda6af70bf681dbe731eedd82b450bcedfbd"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Shared/ClientRes.h",
+      "sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b"
+    }
+  ],
+  "adaptations": [
+    "16 owned score rows replace linked client pointers; reliable roster retains admission order while presentation order changes only across strictly different scores.",
+    "Bloodbath CFragInfo layout, original PCX/FNT and DrawClip repeated-draw quirk; signed scores, unknown ping (-), 145-pixel names, 20-pixel score offset and source compact mode below height 350.",
+    "Existing portable HudFont adapter replaces unavailable CoolFont; ASCII glyph repertoire and quarter-height space width are explicit limitations.",
+    "SDL_GPU/ImGui upload of bounded CPU composition; authored native pixel dimensions and DPI conversion, checked teardown and lazy revision upload. Tiny viewport underflow is refused safely.",
+    "Original Tab toggle/death reveal and revival hide; gamepad Back added for network only. Validated CameraState.alive replaces source nonnegative-health revival heuristic.",
+    "Original IDS_ADDPLAYER/IDS_REMOVEPLAYER formatting accepts only bounded %1!s! and %%; player names remain literal. Exact English fallback is diagnosed.",
+    "Shared original MessageMgr defaults: four lines, five seconds, white notice text; portable ImGui font replaces Windows font. No notice audio.",
+    "Protocol 15 unchanged; no server rule, movement, audio logical clock, solo or PBR changes."
+  ]
+}

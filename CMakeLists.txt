@@ -58,7 +58,7 @@ add_library(blood2_client_movement STATIC src/game/original/MoveMgr.cpp src/clie
 target_link_libraries(blood2_client_movement PUBLIC engine_core)
 blood2_project_options(blood2_client_movement)
 
-add_library(blood2_client_network STATIC src/client/network_speech.cpp src/client/network_audio.cpp src/client/network_weapons.cpp src/client/network_client.cpp src/client/network_world.cpp src/client/network_state.cpp src/client/network_collision.cpp src/client/network_movement.cpp src/client/network_player_events.cpp src/client/network_camera.cpp)
+add_library(blood2_client_network STATIC src/client/frag_table.cpp src/client/network_speech.cpp src/client/network_audio.cpp src/client/network_weapons.cpp src/client/network_client.cpp src/client/network_world.cpp src/client/network_state.cpp src/client/network_collision.cpp src/client/network_movement.cpp src/client/network_player_events.cpp src/client/network_camera.cpp)
 target_link_libraries(blood2_client_network PUBLIC engine_core blood2_net blood2_client_movement blood2_client_weapons blood2_client_speech)
 blood2_project_options(blood2_client_network)
 
@@ -187,7 +187,7 @@ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/o
 target_sources(blood2_game PRIVATE src/game/original/ProjectileSave.cpp src/game/original/PickupSave.cpp)
 if(BLOOD2_BUILD_CLIENT)
     blood2_add_application(blood2_app src/app/model_lighting.cpp src/app/scene_presenter.cpp src/app/bench.cpp src/app/polygrid_scene.cpp src/app/hud.cpp src/app/ui_runtime.cpp src/app/path_manager_smoke.cpp src/app/ai_model_key_smoke.cpp src/app/character_motion_smoke.cpp src/app/main.cpp src/app/model_scene.cpp src/app/sprite_scene.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
-    target_sources(blood2_app PRIVATE src/app/menu_renderer.cpp src/app/frontend.cpp src/app/display_options.cpp src/app/network_frontend.cpp)
+    target_sources(blood2_app PRIVATE src/app/menu_renderer.cpp src/app/frontend.cpp src/app/display_options.cpp src/app/network_frontend.cpp src/app/scoreboard.cpp)
     # The setup screen: installations, mods and the demo download through the platform HTTPS stack.
     include(cmake/ContentDependencies.cmake)
     target_sources(blood2_app PRIVATE src/app/game_setup.cpp src/app/demo_install.cpp src/app/setup_screen.cpp)

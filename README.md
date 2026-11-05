@@ -48,7 +48,10 @@ now come from the validated server timeline. The [client roster](Documentation/i
 now receives names, characters and scores with reliable arrival/departure updates.
 [Combat announcements](Documentation/implementation/reports/m9_combat_announcer.md) now
 play original frag/suicide/FinishHim voices privately and show frag text to other players.
-Communication portraits, music, visual effects, scoreboard, match limits/rotation
+The [original Bloodbath scoreboard](Documentation/implementation/reports/m9_scoreboard.md)
+toggles with Tab or gamepad Back, opens on death and closes on revival. Arrival
+and departure notices use the original localized text. Unknown ping displays `(-)`.
+Communication portraits, music, visual effects, chat, match limits/rotation
 and Team/CTF remain in progress.
 
 ## CI builds
