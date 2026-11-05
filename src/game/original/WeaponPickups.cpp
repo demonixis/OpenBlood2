@@ -120,13 +120,16 @@ const char* WeaponPickupClass(DDWORD type)
 }
 DDWORD WeaponPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
-    auto result = PickupObject::EngineMessageFn(message, data, reason);
-    if (message == MID_INITIALUPDATE)
+    if (message == MID_INITIALUPDATE && g_pServerDE->IsMultiplayerGame())
     {
-        if (g_pServerDE->IsMultiplayerGame())
-            g_pServerDE->RemoveObject(m_hObject);
-        else
-            g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 7));
+        // Original removes multiplayer weapon pickups before PickupObject's initial update.
+        multiplayer_filtered = true;
+        g_pServerDE->RemoveObject(m_hObject);
+    }
+    auto result = PickupObject::EngineMessageFn(message, data, reason);
+    if (message == MID_INITIALUPDATE && !g_pServerDE->IsMultiplayerGame())
+    {
+        g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 7));
     }
     return result;
 }

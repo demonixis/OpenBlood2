@@ -1,5 +1,10 @@
 # Original pickups and destruction spawns
 
+The separately authorized [M9 foundation](multiplayer_contracts.md#pickup-loading-prerequisite)
+adds original multiplayer quantities, delayed respawn and source weapon-pickup
+filtering. Earlier multiplayer omissions below are historical for that subset;
+network player admission and gameplay remain pending.
+
 Continuation: [original collection audio](pickup_audio_contracts.md) supersedes the
 collection-sound omission for supported pickups and keys. Trigger activation
 sounds, character quips and other missing services remain separate.

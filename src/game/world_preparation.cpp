@@ -19,16 +19,18 @@ namespace OpenBlood2
         output = {};
         error.clear();
         std::string normalized;
-        // Local game types only: story, Chosen (action) and custom; a restore keeps the saved one
-        // (save_load_contracts "Scope").
-        if (!local_game_type(request.game_type) || request.difficulty > 3 ||
+        // Network requests are built by the dedicated/session owner, not the local
+        // CMSG_LOADWORLD parser. Multiplayer restores remain refused.
+        const bool network = network_game_type(request.game_type);
+        if ((!local_game_type(request.game_type) && !network) || request.difficulty > 3 ||
+            (network && (request.load_type == LOADTYPE_RESTORESAVE || resources.demo() || resources.nightmares())) ||
             (request.load_type != LOADTYPE_NEW_GAME && request.load_type != LOADTYPE_NEW_LEVEL &&
              request.load_type != LOADTYPE_RESTORESAVE) ||
             !resource_path(request.filename, normalized) || normalized != request.filename ||
             !(normalized.starts_with("worlds/") || (resources.nightmares() && normalized.starts_with("worlds_ao/"))) ||
             !normalized.ends_with(".dat"))
         {
-            error = "World preparation requires a normalized local-game NEW_GAME, NEW_LEVEL or restore request";
+            error = "World preparation requires a normalized supported game request (multiplayer restore refused)";
             return false;
         }
         PreparedWorld next;

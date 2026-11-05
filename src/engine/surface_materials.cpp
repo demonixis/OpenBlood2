@@ -13,6 +13,10 @@ namespace OpenBlood2
         // Minimal bounded JSON document: enough for the manifest, nothing more.
         struct Json
         {
+            Json();
+            ~Json();
+            Json(Json&&) noexcept;
+            Json& operator=(Json&&) noexcept;
             enum class Kind
             {
                 Null,
@@ -28,6 +32,12 @@ namespace OpenBlood2
             std::vector<Json> items;                           // Array values.
             std::vector<std::pair<std::string, Json>> members; // Object members in file order.
         };
+        // Define after Json is complete: Clang/libstdc++ 16 otherwise instantiates
+        // pair<string, Json>'s destruction while checking its default constructor.
+        Json::Json() = default;
+        Json::~Json() = default;
+        Json::Json(Json&&) noexcept = default;
+        Json& Json::operator=(Json&&) noexcept = default;
         class JsonReader
         {
           public:

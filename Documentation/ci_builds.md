@@ -10,10 +10,11 @@ runner, personal access token or repository secret is needed by this workflow.
 | `OpenBlood2-windows-x64` | Windows Server 2025 | MSVC | x86-64 |
 | `OpenBlood2-linux-x64` | Ubuntu 24.04 | GCC | x86-64 |
 | `OpenBlood2-macos-arm64` | macOS 26 | Apple Clang (Xcode 26.6) | Apple Silicon |
+| `OpenBlood2-server-<platform>` | Same three desktop runners | Same desktop compilers | x86-64 / Apple Silicon |
 | `OpenBlood2-android-arm64` | Ubuntu 24.04 | NDK 29.0.14206865 Clang | arm64-v8a (phone/tablet APK) |
 | `OpenBlood2-quest-arm64` | Ubuntu 24.04 | NDK 29.0.14206865 Clang | arm64-v8a (Meta Quest OpenXR APK) |
 
-Every job builds the inspector-free Release game, then runs its synthetic headless
+Each desktop game job builds the inspector-free Release game, then runs its synthetic headless
 CTest suite, including the setup screen's persistence and demo-installer checks.
 Missing tests are an error. GPU and private-data tests are
 excluded explicitly. The Android and Quest jobs build the `android` and `quest`
@@ -29,6 +30,13 @@ reports (JUnit), CTest logs and CMake diagnostics are uploaded even after failur
 Build archives are uploaded only after successful builds and tests. Artifacts
 expire after 14 days. Dependency archive downloads are cached; CMake still checks
 the repository's pinned hashes. Compiler outputs are not shared between runners.
+
+The separate `server` matrix configures `ci-server` without the graphical client,
+builds and tests the dedicated foundation, then packages `blood2-server` and its
+notices. **Player admission is not available yet**; see the
+[server instructions](dedicated_server.md). These synthetic CI jobs are not
+interoperability or LAN play qualification. Server archives use the same version,
+platform and commit metadata and include no commercial data.
 
 ## Get and use a build
 
@@ -61,7 +69,8 @@ the staged Windows executables without the developer tool directories on `PATH`.
 
 Pushing a tag `vx.y.z` that matches `project(VERSION)` (see [packaging](packaging.md))
 runs every job, then the `release` job creates the GitHub release `vx.y.z` with
-generated notes and attaches the three desktop archives and the two APKs. A
+generated notes and attaches the three desktop client archives, three server
+foundation archives and the two APKs. A
 mismatched tag fails packaging, and any failed job prevents the release. `0.x`
 versions are published as pre-releases. If a release for the tag already exists
 (created by hand on GitHub), the job only uploads the builds to it. Only this job

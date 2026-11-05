@@ -20,6 +20,10 @@ constexpr bool local_game_type(unsigned type)
 {
     return type == GAMETYPE_SINGLE || type == GAMETYPE_ACTION || type == GAMETYPE_CUSTOM;
 }
+constexpr bool network_game_type(unsigned type)
+{
+    return type == GAMETYPE_BLOODBATH || type == GAMETYPE_TEAMPLAY || type == GAMETYPE_CTF;
+}
 enum SaveType
 {
     SAVETYPE_AUTO = 0,

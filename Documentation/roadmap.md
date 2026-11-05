@@ -253,13 +253,21 @@ needs a small local Vulkan patch.
 Main risk: the frame budget on a mobile GPU. The Quest version may need
 reduced settings, and PBR/post-processing are likely optional there.
 
-## M9 — LAN multiplayer (evaluation)
+## M9 — LAN multiplayer (authorized, in progress)
+
+The 2026-10-30 [accepted contract](contracts/multiplayer_contracts.md) selects
+retail Bloodbath → Team → CTF, a console dedicated server and playable host,
+ENet upstream pinned by commit/hash, IPv4, 16 players and UDP 27888. The
+[foundation report](implementation/reports/m9_multiplayer.md) records the current
+headless build, bounded transport, full-content fingerprint and zero-client
+world tests. **Player admission, replicas and network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client
 shell runs its own movement (CMoveMgr) and effects. The engine copies object
 state to every client. OpenBlood2 runs one session in one process with one
 client. Presentation, HUD and audio read server objects directly. Typed client
-messages exist as in-process values only, and there is no network code.
+messages still exist as in-process gameplay values only. The new ENet wrapper
+has no gameplay protocol connected to those values yet.
 
 Original references are available. These include the multiplayer branches in
 PlayerObj, BloodServerShell, the pickups and B2BaseClass, as well as FlagObjects,
@@ -270,10 +278,10 @@ ship, so Co-op is assessed separately.
 
 | # | Task | Size | Depends on |
 | --- | --- | --- | --- |
-| 9.0 | Contracts and audit: every direct server-state read by the app, every original multiplayer branch, the choice of transport library (for example a pinned ENet) | S | — |
+| 9.0 | Accepted contracts and dependency audit; complete the per-reader/message inventory during replica extraction. ENet pin is implemented. | S | — |
 | 9.1 | Client replica: presentation (original, PBR and post-processing paths), HUD, audio and inspector read a client world that server snapshots feed. Loopback solo must match current behavior, checked by the GPU readback tests. | XL | 9.0 |
 | 9.2 | Wire protocol and transport: versioned, bounded encoding of every typed message; UDP with reliable and unreliable channels; fuzzed decoders | M | 9.0 |
-| 9.3 | Sessions: listen and headless dedicated server, LAN discovery, handshake (protocol, data and mod fingerprint), join/leave/timeout, map rotation | M | 9.2 |
+| 9.3 | Sessions: listen and headless dedicated server, LAN discovery, handshake (protocol, retail edition and full-content fingerprint; mods refused), join/leave/timeout, map rotation | M | 9.2 |
 | 9.4 | Multi-player server: N players and clients, the original multiplayer branches, respawn, slow death and humiliation, frags, item respawn, game-type filtering, start points, frag and time limits | L | 9.1 |
 | 9.5 | Game modes: Bloodbath; CTF with FlagStand, FlagObjects and TeamMgr; Team. The CTF objects, capture rules, world-owned scores and team HUD already run in local inspection ([contracts](contracts/ctf_contracts.md)); network team management and the other modes remain. | M | 9.4 |
 | 9.6 | Network movement and fire: the original client-side movement upload with server bounds, remote interpolation, server-side hits, loss and latency | M–L | 9.2, 9.4 |
@@ -282,8 +290,10 @@ ship, so Co-op is assessed separately.
 
 Sizes: S ≈ 1 lot, M ≈ 2–3, L ≈ 4–5, XL ≈ 6–8, where a lot is one
 continuation-sized change. Total: about 25–35 lots. Task 9.1 carries most of the
-risk because it changes how every renderer path reads state. Internet play, a
-master server and NAT traversal are out of scope.
+risk because it changes how every renderer path reads state. Direct IPv4 uses a
+reachable UDP port; a master server, relay, NAT traversal and host migration are
+out of scope. No desktop interoperability or human LAN acceptance is implied by
+the Linux foundation tests.
 
 ## Later
 

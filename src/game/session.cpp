@@ -243,6 +243,12 @@ namespace OpenBlood2
                     entry.state = EntryState::CollectedPickup;
                     entry.detail = "Original pickup offer acknowledged during initial ground placement";
                 }
+                else if (const auto* pickup = r ? dynamic_cast<const PickupObject*>(r->game.get()) : nullptr;
+                         pickup && pickup->multiplayer_filtered)
+                {
+                    entry.state = EntryState::Filtered;
+                    entry.detail = "Removed by original multiplayer pickup rules";
+                }
                 else if (const auto* sky = r ? dynamic_cast<const SkyObject*>(r->game.get()) : nullptr;
                          sky && !sky->error.empty())
                 {
@@ -825,6 +831,14 @@ namespace OpenBlood2
     }
     bool GameSession::step(double seconds)
     {
+        return step_impl(seconds, true);
+    }
+    bool GameSession::step_server(double seconds)
+    {
+        return step_impl(seconds, false);
+    }
+    bool GameSession::step_impl(double seconds, bool client)
+    {
         frame_failures.clear();
         frame_object_failure_begin = objects.failure_count();
         frame_trace_begin = trace.size();
@@ -852,7 +866,7 @@ namespace OpenBlood2
                   checked("physics", server.advance_physics(seconds)) &&
                   checked("projectiles", server.advance_projectiles(seconds)) &&
                   checked("models", server.advance_models(seconds));
-        if (local_client)
+        if (client && local_client)
         {
             if (!server.GetClientUserData(local_client))
                 ok = leave_player() && ok;
@@ -885,6 +899,11 @@ namespace OpenBlood2
         ok = checked("objects.finish_frame", objects.finish_frame()) && ok;
         ok = checked("objects.refresh_attachments", objects.refresh_attachments()) && ok;
         ok = checked("server.advance_lights", server.advance_lights()) && ok;
+        if (!client)
+        {
+            server.trace_enabled = was_tracing;
+            return ok;
+        }
         auto* flash_owner = server_shell.Player(local_client);
         const auto* flash_item = flash_owner ? flash_owner->m_InventoryMgr.flashlight.get() : nullptr;
         ok = (!flash_item || flash_item->update_ok) && ok;

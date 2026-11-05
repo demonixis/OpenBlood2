@@ -1,5 +1,17 @@
 # Source and Dependency Provenance
 
+## M9 dedicated/transport foundation
+
+ENet upstream (MIT), commit `5a9c537fd464b3c6d3c55e1d3bd47588faf71b42`, is
+statically integrated with archive SHA-256
+`537d42f31b0c0d27f5a9635f6c224f2451c1c1484bfde50e94c884e96181c290`.
+Its license accompanies server/client dependency notices. The transport wrapper,
+bounded scalar codec, full mounted-content fingerprint, fixed clock and console
+entry are project-owned replacement engine code, not a retail network ABI.
+The MFC dedicated frontend is not imported. Pickup branches and exact donor
+hashes are recorded in the [source ledger](sources/m9_foundation_sources.json);
+see [contracts](../contracts/multiplayer_contracts.md) and [evidence](reports/m9_multiplayer.md).
+
 ## Desktop third-person camera
 
 The local chase view is project-owned code using existing typed segment queries,

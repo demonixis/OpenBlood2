@@ -14,6 +14,7 @@ namespace OpenBlood2
 #include "game/key_messages.h"
 #include "game/light_messages.h"
 #include "game/mover_messages.h"
+#include "game/multiplayer_pickups.h"
 #include "game/pickup_messages.h"
 #include "game/player_messages.h"
 #include "game/projectile_report.h"
@@ -216,6 +217,7 @@ class ServerDE : public CSBase
     // custom) start STARTGAME_NORMAL without a NetGame, so it stays NGT_SINGLE (0) while the
     // GAME_GAMETYPE console variable (B2BaseClass::GetGameType) holds their actual type.
     DBYTE net_game_type = 0;
+    OpenBlood2::MultiplayerPickups multiplayer_pickups;
     DBOOL IsMultiplayerGame() const
     {
         return net_game_type != 0;

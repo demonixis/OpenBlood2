@@ -1,12 +1,10 @@
-// Selected ItemPickups.cpp: single-player charged item and MedKitPU constructor.
+// Selected original item constructors; multiplayer quantities/respawn share PickupObject.
 #include "ItemPickups.h"
 #include "game/game_settings.h"
 DDWORD ItemPickup::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
 {
-    // Multiplayer scaling/respawn are not implemented; string creation bounces (PickupObject).
-    if (message == MID_PRECREATE &&
-        ((reason != PRECREATE_WORLDFILE && reason != PRECREATE_STRINGPROP && reason != PRECREATE_SAVEGAME) ||
-         g_pServerDE->IsMultiplayerGame()))
+    if (message == MID_PRECREATE && reason != PRECREATE_WORLDFILE && reason != PRECREATE_STRINGPROP &&
+        reason != PRECREATE_SAVEGAME)
         return 0;
     return PickupObject::EngineMessageFn(message, data, reason);
 }

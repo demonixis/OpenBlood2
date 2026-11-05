@@ -1,5 +1,13 @@
 # Blood2 Project Instructions
 
+The authorized [M9 multiplayer contract](Documentation/contracts/multiplayer_contracts.md)
+selects retail Bloodbath → Team → CTF, dedicated and playable host, ENet IPv4 and
+16 players. The [foundation report](Documentation/implementation/reports/m9_multiplayer.md)
+covers the server-only build, bounded transport, full-content hash, logical audio
+and zero-client simulation of all 22 multiplayer maps. Admission, replicas and
+network gameplay remain pending. Preserve solo clocks, source pickup rules,
+immutable GPU references and independent M2-GPU-001/M3 gates.
+
 The [desktop third-person camera](Documentation/contracts/camera_contracts.md) adds a rebindable C toggle,
 actual player/held models and centred aim convergence. Preserve unchanged eye/shot/movement state,
 special-camera priority, temporary first-person zoom/tight-space fallback and the XR refusal.

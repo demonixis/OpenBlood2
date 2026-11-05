@@ -60,6 +60,14 @@ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
     // InitialUpdate: the engine record carries dims, user flags and the (zero) update.
     if (message == MID_INITIALUPDATE && reason != INITIALUPDATE_SAVEGAME && g_pServerDE->IsObjectAlive(m_hObject))
     {
+        if (g_pServerDE->IsMultiplayerGame())
+            ConfigureMultiplayer();
+        if (!g_pServerDE->IsObjectAlive(m_hObject))
+            return B2BaseClass::EngineMessageFn(message, data, reason);
+        if (reason == INITIALUPDATE_STRINGPROP)
+            respawn_seconds = 0; // Original SpawnItem: drops only spawn once.
+        if (g_pServerDE->IsMultiplayerGame())
+            g_pServerDE->SetNextUpdate(m_hObject, 0);
         DVector dims;
         if (g_pServerDE->GetModelAnimUserDims(m_hObject, &dims, g_pServerDE->GetModelAnimation(m_hObject)) != DE_OK)
         {
@@ -80,11 +88,22 @@ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         }
         g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | (1u << 3) | (1u << 10) |
                                                        (rotate_fx ? (1u << 4) : 0));
-        g_pServerDE->SetNextUpdate(m_hObject, 0);
+        if (!g_pServerDE->IsMultiplayerGame())
+            g_pServerDE->SetNextUpdate(m_hObject, 0);
         // String creation follows SpawnItem, with no ground snap; the helper applies
         // SpawnObjectVel after initial update. Bouncing pickups rise 10 units first.
         if (reason == INITIALUPDATE_STRINGPROP && bounce)
             SpawnBounce();
+    }
+    else if (message == MID_UPDATE && picked_up && respawn_seconds > 0 && g_pServerDE->IsMultiplayerGame())
+    {
+        // Original PickupObject::Update: restore the saved flags, then play respawn sound.
+        g_pServerDE->SetNextUpdate(m_hObject, 0);
+        g_pServerDE->SetObjectFlags(m_hObject, m_dwFlags);
+        picked_up = false;
+        const auto report = PlayPickupSound(m_hObject, "sounds/powerups/powerup2.wav");
+        if (!report.sound_error.empty())
+            error = "Respawn sound: " + report.sound_error;
     }
     else if (message == MID_TOUCHNOTIFY && !touching_ && !picked_up &&
              (g_pServerDE->GetObjectFlags(m_hObject) & FLAG_TOUCH_NOTIFY) &&
@@ -105,6 +124,36 @@ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         touching_ = nullptr;
     }
     return B2BaseClass::EngineMessageFn(message, data, reason);
+}
+void PickupObject::ConfigureMultiplayer()
+{
+    // Equivalent original subclass MID_INITIALUPDATE branches, before ground placement
+    // can offer the item. Keep the typed value equal to the acknowledged offered value.
+    const auto& rules = g_pServerDE->multiplayer_pickups;
+    const PickupRule* rule = nullptr;
+    if (value.kind == PickupKind::Ammo || (value.kind == PickupKind::Item && value.type >= 7))
+        rule = &rules.ammo;
+    else if (value.kind == PickupKind::Item)
+        rule = &rules.powerups;
+    else if (value.kind == PickupKind::Powerup)
+        rule = value.type <= 2 ? &rules.health : value.type <= 4 ? &rules.armor : &rules.powerups;
+    if (!rule)
+        return;
+    if (rule->level == PickupLevel::None)
+    {
+        multiplayer_filtered = true;
+        g_pServerDE->RemoveObject(m_hObject);
+        return;
+    }
+    respawn_seconds = float(rule->respawn_seconds);
+    const auto multiplier = pickup_multiplier(rule->level);
+    value.amount *= multiplier;
+    if (value.kind == PickupKind::Item)
+    {
+        value.amount = float(static_cast<DBYTE>(std::clamp(value.amount, 0.0f, 255.0f)));
+        if (value.amount == 0 && multiplier > 0)
+            value.amount = 1; // Original integer-item minimum, including LEVEL_HALF.
+    }
 }
 void PickupObject::SpawnBounce()
 {
@@ -132,6 +181,8 @@ DDWORD PickupObject::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREA
         picked_up = true;
         g_pServerDE->SetObjectFlags(m_hObject,
                                     g_pServerDE->GetObjectFlags(m_hObject) & ~FLAG_VISIBLE & ~FLAG_TOUCH_NOTIFY);
+        if (g_pServerDE->IsMultiplayerGame() && respawn_seconds > 0)
+            g_pServerDE->SetNextUpdate(m_hObject, respawn_seconds);
         ++sound_requests;
         auto report = PlayPickupSound(m_hObject, pickup_sound);
         report.value = value;
@@ -144,7 +195,11 @@ DDWORD PickupObject::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREA
             g_pServerDE->FreeString(target);
             g_pServerDE->FreeString(command);
         }
-        g_pServerDE->RemoveObject(m_hObject); // SP: no respawn. Reclaim after callbacks.
+        if (g_pServerDE->IsObjectAlive(m_hObject))
+        {
+            if (!g_pServerDE->IsMultiplayerGame() || respawn_seconds <= 0)
+                g_pServerDE->RemoveObject(m_hObject); // Solo or a drop: reclaim after callbacks.
+        }
     }
     return B2BaseClass::ObjectMessageFn(sender, message, read);
 }

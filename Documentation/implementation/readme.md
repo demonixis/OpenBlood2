@@ -5,6 +5,7 @@ accepted with open GPU reservation **M2-GPU-001**. M3 remains unaccepted.
 
 | Record | Location |
 | --- | --- |
+| M9 dedicated/transport foundation | [Report](reports/m9_multiplayer.md) / [contract](../contracts/multiplayer_contracts.md) / [sources](sources/m9_foundation_sources.json) |
 | Demo_01 ventilation computer, door seams and failure diagnostics | [Report](reports/demo_computer_doors.md) / [door contract](../contracts/door_contracts.md#replacement-translation-solver) |
 | Forward FX light selection per receiver | [Report](reports/forward_effect_lights.md) / [contract](../contracts/scene_effects_contracts.md#lights); 12 mobile / 32 desktop |
 | Scene effect rendering (lot 10) | [Report](reports/scene_effects.md) / [contract](../contracts/scene_effects_contracts.md) / [source ledger](sources/scene_effect_sources.json) |

@@ -1,0 +1,80 @@
+# CPU services are available to a dedicated-only build. GPU/runtime sources are client-only.
+add_library(engine_core STATIC
+    src/engine/world_lights.cpp
+    src/engine/world_shade.cpp
+    src/engine/hud_surface.cpp
+    src/engine/polygrid_view.cpp
+    src/engine/sky.cpp
+    src/engine/particles.cpp
+    src/engine/sprite_view.cpp
+    src/engine/model_view.cpp
+    src/engine/texture.cpp
+    src/engine/world_view.cpp
+    src/engine/surface_materials.cpp
+    src/engine/surface_report.cpp
+    src/engine/normal_maps.cpp
+    src/engine/light_grid.cpp
+    src/engine/attachments.cpp
+    src/engine/object_pose.cpp
+    src/engine/objects.cpp
+    src/engine/world.cpp
+    src/engine/sprite.cpp
+    src/engine/audio.cpp
+    src/engine/audio_stream.cpp
+    src/engine/music_asset.cpp
+    src/engine/ima_style.cpp
+    src/engine/ima_curve.cpp
+    src/engine/ima_curve_event.cpp
+    src/engine/ima_variation.cpp
+    src/engine/ima_note_event.cpp
+    src/engine/ima_note_pitch.cpp
+    src/engine/ima_harmony.cpp
+    src/engine/ima_selection.cpp
+    src/engine/ima_cursor.cpp
+    src/engine/ima_band.cpp
+    src/engine/ima_section.cpp
+    src/engine/ima_clock.cpp
+    src/engine/ima_program.cpp
+    src/engine/ima_playlist.cpp
+    src/engine/ima_transport.cpp
+    src/engine/ima_timeline.cpp
+    src/engine/dls_bank.cpp
+    src/engine/dls_sampler.cpp
+    src/engine/dls_midi_queue.cpp
+    src/engine/string_resources.cpp
+    src/engine/model.cpp
+    src/engine/arm_ik.cpp
+    src/engine/view_arms.cpp
+    src/engine/model_store.cpp
+    src/engine/collision.cpp
+    src/engine/visibility.cpp
+    src/engine/container.cpp
+    src/engine/world_model.cpp
+    src/engine/logging.cpp
+    src/engine/crash_capture.cpp
+    src/engine/atomic_file.cpp
+    src/engine/save_file.cpp
+    src/engine/save_fingerprint.cpp
+    src/engine/save_objects.cpp
+    src/engine/mark_clip.cpp
+    src/engine/scene_effects.cpp
+)
+target_include_directories(engine_core PUBLIC src src/game/legacy PRIVATE "${PROJECT_BINARY_DIR}/generated")
+target_link_libraries(engine_core PUBLIC SDL3::SDL3 blood2_startup PRIVATE spdlog::spdlog)
+blood2_project_options(engine_core)
+
+if(BLOOD2_BUILD_CLIENT)
+    add_library(engine STATIC
+        src/engine/gpu_registry.cpp
+        src/engine/model_renderer.cpp
+        src/engine/world_renderer.cpp
+        src/engine/world_shaders.cpp
+        src/engine/post_process.cpp
+        src/engine/runtime.cpp
+        src/engine/capture.cpp
+        src/engine/line_renderer.cpp
+    )
+    target_link_libraries(engine PUBLIC engine_core PRIVATE spdlog::spdlog)
+    target_include_directories(engine PRIVATE "${PROJECT_BINARY_DIR}/generated")
+    blood2_project_options(engine)
+endif()

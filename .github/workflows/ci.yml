@@ -117,6 +117,80 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+  server:
+    name: ${{ matrix.platform }} / Dedicated server
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            platform: linux-x64
+          - os: windows-2025
+            platform: windows-x64
+          - os: macos-26
+            platform: macos-arm64
+    defaults:
+      run:
+        shell: bash
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 3
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
+        if: runner.os == 'Windows'
+        with:
+          arch: x64
+      - name: Install server build tools (no display/audio development packages)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build pkg-config
+      - name: Set up macOS tools
+        if: runner.os == 'macOS'
+        run: |
+          echo 'DEVELOPER_DIR=/Applications/Xcode_26.6.app/Contents/Developer' >> "$GITHUB_ENV"
+          echo 'MACOSX_DEPLOYMENT_TARGET=26.0' >> "$GITHUB_ENV"
+          brew install ninja
+      - name: Cache pinned sources
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .cache/downloads
+          key: server-sources-${{ runner.os }}-${{ hashFiles('cmake/Dependencies.cmake') }}
+      - name: Configure, build and test dedicated server
+        run: |
+          cmake --preset ci-server
+          cmake --build --preset ci-server
+          ctest --preset ci-server --output-junit "$GITHUB_WORKSPACE/build/ci/server/server-tests.xml"
+      - name: Package server
+        env:
+          PACKAGE_PLATFORM: ${{ matrix.platform }}
+        run: cmake -DPLATFORM="$PACKAGE_PLATFORM" -P cmake/PackageServerCi.cmake
+      - name: Upload server archive
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: OpenBlood2-server-${{ matrix.platform }}-${{ github.sha }}
+          path: |
+            build/ci/server/dist/*.zip
+            build/ci/server/dist/*.tar.gz
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+      - name: Upload server test results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: server-tests-${{ matrix.platform }}-${{ github.sha }}
+          path: |
+            build/ci/server/Testing/Temporary/*.log
+            build/ci/server/server-tests.xml
+            build/ci/server/CMakeFiles/CMakeConfigureLog.yaml
+          if-no-files-found: warn
+          retention-days: 14
+
   android:
     name: ${{ matrix.preset }}-arm64 / APK
     runs-on: ubuntu-24.04
@@ -212,7 +286,7 @@ jobs:
   release:
     name: GitHub release
     if: github.ref_type == 'tag'
-    needs: [build, android]
+    needs: [build, server, android]
     runs-on: ubuntu-24.04
     permissions:
       contents: write

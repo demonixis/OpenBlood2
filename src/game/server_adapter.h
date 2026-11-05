@@ -658,6 +658,8 @@ namespace OpenBlood2
         bool pump_player_messages(std::string& error);
         bool unload_world();
         bool step(double seconds);
+        // Server clock only: no local MoveMgr, view weapons, camera or cosmetic pool updates.
+        bool step_server(double seconds);
         // Labelled durable subsystem errors for logging a failed step; many
         // update paths report through these fields, not object diagnostics.
         std::vector<std::string> step_errors();
@@ -674,6 +676,9 @@ namespace OpenBlood2
             return server.bind() && register_original_classes(objects);
         }
         HOBJECT create_example(std::string_view class_name);
+
+      private:
+        bool step_impl(double seconds, bool client);
     };
 
 } // namespace OpenBlood2

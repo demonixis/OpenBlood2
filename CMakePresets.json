@@ -116,6 +116,30 @@
         "BLOOD2_ANDROID_FLAVOR": "quest",
         "BLOOD2_XR": true
       }
+    },
+    {
+      "name": "server",
+      "displayName": "Dedicated server (no graphical client)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/server",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BLOOD2_BUILD_CLIENT": false,
+        "BLOOD2_BUILD_SERVER": true,
+        "BLOOD2_INSPECTOR": false,
+        "BLOOD2_XR": false,
+        "BLOOD2_GPU_TESTS": false,
+        "BUILD_TESTING": true
+      }
+    },
+    {
+      "name": "ci-server",
+      "displayName": "CI dedicated server",
+      "inherits": "server",
+      "binaryDir": "${sourceDir}/build/ci/server",
+      "cacheVariables": {
+        "BLOOD2_TEST_DATA_DIR": ""
+      }
     }
   ],
   "buildPresets": [
@@ -158,6 +182,14 @@
       "targets": [
         "blood2_apk"
       ]
+    },
+    {
+      "name": "server",
+      "configurePreset": "server"
+    },
+    {
+      "name": "ci-server",
+      "configurePreset": "ci-server"
     }
   ],
   "testPresets": [
@@ -195,6 +227,24 @@
         "exclude": {
           "label": "gpu|private"
         }
+      },
+      "execution": {
+        "noTestsAction": "error",
+        "timeout": 120
+      }
+    },
+    {
+      "name": "server",
+      "configurePreset": "server",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "ci-server",
+      "configurePreset": "ci-server",
+      "output": {
+        "outputOnFailure": true
       },
       "execution": {
         "noTestsAction": "error",

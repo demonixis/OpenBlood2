@@ -6,7 +6,7 @@ namespace OpenBlood2
     // Shared original PickupObject::PickedUp sound branch, also used by KeyPickup.
     PickupReport PlayPickupSound(HOBJECT, std::string_view);
 } // namespace OpenBlood2
-// Selected original single-player pickup rules; see Documentation/contracts/pickup_contracts.md.
+// Selected original pickup rules; see pickup_contracts.md and multiplayer_contracts.md.
 class PickupObject : public B2BaseClass
 {
   public:
@@ -16,6 +16,8 @@ class PickupObject : public B2BaseClass
     std::string pickup_target, pickup_command, error;
     std::int32_t resource_id = 0;
     bool picked_up = false, rotate_fx = false;
+    float respawn_seconds = 0;
+    bool multiplayer_filtered = false;
     // Original m_bBounce (item/weapon constructors) and the SpawnItem state it sets on
     // string creation. No update is scheduled afterwards, so the source spring never runs.
     bool bounce = false, bouncing = false;
@@ -31,6 +33,7 @@ class PickupObject : public B2BaseClass
   protected:
     DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
     void SpawnBounce();
+    void ConfigureMultiplayer();
     // Original PickupObject.cpp:617-674 (PickupSave.cpp).
     void Save(HMESSAGEWRITE);
     void Load(HMESSAGEREAD);

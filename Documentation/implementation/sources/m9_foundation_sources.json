@@ -1,0 +1,137 @@
+{
+  "date": "2026-10-30",
+  "status": "M9 foundation only; no player admission or network gameplay acceptance",
+  "donor_commit": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "imports_and_references": [
+    {
+      "source": "sources/blood2/ObjectDLL/PickupObject.cpp",
+      "source_sha256": "25e0388f983ec0c9e01b6deb8432f411271159a224d582e12300c10863b979da",
+      "source_line_ranges": [
+        [
+          398,
+          427
+        ],
+        [
+          469,
+          503
+        ],
+        [
+          536,
+          557
+        ]
+      ],
+      "selection": "Selected respawn scheduling, saved flags and respawn audio; existing typed live-toucher acknowledgement and trigger-before-deferred-removal adaptation retained. String drops remain single-use; no bounce spring scheduled."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PickupObject.h",
+      "source_sha256": "0fe5cf15943ebd87f0e367a5dee181721b5db29d6c7eee1f9874f46549dcb056",
+      "source_line_ranges": [
+        [
+          83,
+          111
+        ]
+      ],
+      "selection": "Original LEVEL_NONE/HALF/NORMAL/DOUBLE/INSANE multipliers."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/AmmoPickups.cpp",
+      "source_sha256": "3ea2f1ba0b90298563b5a97c451e4e1d60e0b10fdd666320944edb23afa50696",
+      "source_line_ranges": [
+        [
+          38,
+          64
+        ],
+        [
+          74,
+          84
+        ]
+      ],
+      "selection": "Ammo rule selection and multiplier, centralized in typed PickupObject initialization."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/PowerupPickups.cpp",
+      "source_sha256": "0e0d2190ea3785e7287309c0ccfe109c688a9c14b9b12779c4c5c50642f0d80c",
+      "source_line_ranges": [
+        [
+          78,
+          97
+        ],
+        [
+          172,
+          191
+        ],
+        [
+          266,
+          285
+        ]
+      ],
+      "selection": "Health, armor and timed-power rule groups; same typed implementation."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/ItemPickups.cpp",
+      "source_sha256": "87c242be5a31b2848652d695b97d4307c21eca809c25a3b7e5aff1f90439f4cf",
+      "source_line_ranges": [
+        [
+          38,
+          55
+        ],
+        [
+          79,
+          100
+        ],
+        [
+          222,
+          254
+        ]
+      ],
+      "selection": "Charged versus bomb-item rules and byte clamp/minimum-one quantities; remove reconstruction-only multiplayer precreate refusal."
+    },
+    {
+      "source": "sources/blood2/ObjectDLL/WeaponPickups.cpp",
+      "source_sha256": "116eac417209ee2cc523044e02ff615406b597164df9df5d5f2e0be80cfbc1d4",
+      "source_line_ranges": [
+        [
+          39,
+          60
+        ]
+      ],
+      "selection": "Multiplayer initial removal before base pickup initialization; explicit source-filtered accounting."
+    },
+    {
+      "source": "sources/blood2/ClientShellDLL/NetStart.cpp",
+      "source_sha256": "320bd6f451fc7d08f93c294899af379756fa8432d439731b63c65124057dacbf",
+      "source_line_ranges": [
+        [
+          121,
+          128
+        ]
+      ],
+      "selection": "Shared pickup quantity and respawn defaults."
+    },
+    {
+      "source": "sources/blood2/Blood2Serv/GameServDlg.cpp",
+      "source_sha256": "87a191253677ccf0911b27da3e3e56abdb573118a5a20f9b2b5c804414918f61",
+      "source_line_ranges": [
+        [
+          435,
+          503
+        ]
+      ],
+      "selection": "Reference only: dedicated hosting lifecycle and UDP 27888. No MFC code imported."
+    }
+  ],
+  "replacement_code": [
+    "src/net/transport.cpp",
+    "src/net/codec.h",
+    "src/net/content.cpp",
+    "src/server/clock.h",
+    "src/server/session.cpp",
+    "src/server/main.cpp"
+  ],
+  "dependency": {
+    "name": "ENet",
+    "revision": "5a9c537fd464b3c6d3c55e1d3bd47588faf71b42",
+    "archive_sha256": "537d42f31b0c0d27f5a9635f6c224f2451c1c1484bfde50e94c884e96181c290",
+    "license": "MIT"
+  }
+}

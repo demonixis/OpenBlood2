@@ -1,5 +1,7 @@
 # Service contracts
 
+- [M9 multiplayer, dedicated server and playable host](multiplayer_contracts.md)
+
 - [Game data setup screen, data mods and demo installation](setup_screen_contracts.md)
 
 - [Nightmares edition: selection, mount order, add-on switch and weapon numbering](nightmares_edition_contracts.md)
