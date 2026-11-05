@@ -1,13 +1,14 @@
 #include "CommLink.h"
 #include "VoiceMgr.h"
 #include <algorithm>
-void CCommLink::Reset(ServerDE& server)
+void CCommLink::Reset(OpenBlood2::VoiceServices& services)
 {
     if (voice)
-        server.KillSound(voice);
+        services.stop_voice(voice);
     *this = {};
 }
-bool CCommLink::Start(ServerDE& server, const OpenBlood2::Conversation& value, bool shell_stopped_voice)
+bool CCommLink::Start(OpenBlood2::VoiceServices& services, const OpenBlood2::Conversation& value,
+                      bool shell_stopped_voice)
 {
     ++received;
     voice_manager_requests += shell_stopped_voice; // Conversation shell StopAll, including a busy refusal.
@@ -17,14 +18,14 @@ bool CCommLink::Start(ServerDE& server, const OpenBlood2::Conversation& value, b
         return false;
     }
     if (voice)
-        server.KillSound(voice);
+        services.stop_voice(voice);
     voice = 0;
     message = value;
     length = std::max(2.5f, static_cast<float>(message.text.size()) / 15.f);
     text_length = length / 1.5f;
     text_scroll = (length - text_length) / 2.f;
     play_voice = message.file != "default.wav";
-    start = server.GetTime();
+    start = services.time();
     level = 1;
     static constexpr const char* portraits[] = {"c_comm.pcx", "o_comm.pcx", "i_comm.pcx", "g_comm.pcx", "v_comm.pcx"};
     portrait =
@@ -33,11 +34,11 @@ bool CCommLink::Start(ServerDE& server, const OpenBlood2::Conversation& value, b
     ++started;
     return true;
 }
-void CCommLink::Update(ServerDE& server, HOBJECT player, CVoiceMgr& manager)
+void CCommLink::Update(OpenBlood2::VoiceServices& services, CVoiceMgr& manager)
 {
     if (!level)
         return;
-    const auto time = server.GetTime();
+    const auto time = services.time();
     switch (level)
     {
         case 1:
@@ -53,21 +54,21 @@ void CCommLink::Update(ServerDE& server, HOBJECT player, CVoiceMgr& manager)
                     ++voice_manager_requests;
                     manager.StopAll();
                     if (voice)
-                        server.KillSound(voice);
-                    OpenBlood2::SoundRequest r;
+                        services.stop_voice(voice);
+                    OpenBlood2::SoundParameters r;
                     r.resource = message.file;
                     r.space = OpenBlood2::SoundSpace::Local;
                     r.streaming = false;
                     r.priority = 2;
                     r.reverb_requested = false;
                     ++sound_attempts;
-                    voice = server.PlayCinematicSound(player, r, error);
+                    voice = services.play_voice(r, error);
                     if (!voice)
                         ++sound_failures;
                     else
                     {
                         float duration = 3;
-                        server.GetSoundDuration(voice, duration);
+                        services.voice_duration(voice, duration);
                         voice_manager_delay = duration + .5f;
                         manager.SetNextPlayTime(voice_manager_delay);
                     }
@@ -83,7 +84,7 @@ void CCommLink::Update(ServerDE& server, HOBJECT player, CVoiceMgr& manager)
                 level = 3;
                 start = time;
                 if (voice)
-                    server.KillSound(voice);
+                    services.stop_voice(voice);
                 voice = 0;
             }
             break;

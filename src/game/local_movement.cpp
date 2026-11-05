@@ -142,7 +142,7 @@ namespace OpenBlood2
     }
     bool LocalMovement::jump_voice(CVoiceMgr& voices, int character, bool external_camera)
     {
-        return valid() && voices.PlayEventSound(object_, character, 11, external_camera);
+        return valid() && voices.PlayEventSound(character, 11, external_camera);
     }
     bool LocalMovement::publish_collision()
     {

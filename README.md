@@ -41,8 +41,10 @@ The ongoing [M9 network work](Documentation/implementation/reports/m9_network_fr
 adds `--host multi/bb_crypt` and `--connect HOST:27888` for graphical admission and
 movement. The [basic Bloodbath combat loop](Documentation/implementation/reports/m9_pvp.md)
 now supports held primary/alternate fire and USE respawn. [Server sounds](Documentation/implementation/reports/m9_network_audio.md)
-play through each client's independent audio mixer. Animation/announcement/music
-audio, visual effects, scoreboard, match limits/rotation and Team/CTF remain in progress.
+play through each client's independent audio mixer. [Private speech and startup
+announcements](Documentation/implementation/reports/m9_client_speech.md) now play
+through original VoiceMgr/CommLink. Weapon animation sounds, frag announcements,
+music, visual effects, scoreboard, match limits/rotation and Team/CTF remain in progress.
 
 ## CI builds
 

@@ -1,11 +1,13 @@
 #include "client/network_audio.h"
 #include <algorithm>
+#include <cmath>
 namespace OpenBlood2
 {
     void NetworkAudio::clear()
     {
         mixer.clear();
         voices_.clear();
+        local_voices_.clear();
     }
     bool NetworkAudio::begin(const Net::Joined& joined)
     {
@@ -50,20 +52,41 @@ namespace OpenBlood2
                 error = "Network sound asset metadata mismatch";
                 return false;
             }
-            // Network latency can leave a naturally completed server voice still
-            // playing here. Only such retired tails can be displaced by new starts.
-            if (voices_.size() >= 128)
+            // Prefer retiring delayed server tails, then preempt local speech.
+            // Never displace another active server voice or finish speech early.
+            if (mixer.voices_.size() >= 128)
             {
                 const auto tail =
                     std::find_if(voices_.begin(), voices_.end(), [](const auto& p) { return p.second.retired; });
-                if (tail == voices_.end())
+                if (tail != voices_.end())
+                {
+                    mixer.kill(tail->first);
+                    voices_.erase(tail);
+                    ++displaced;
+                }
+                else if (const auto local = mixer.voices_.lower_bound(client_sound_id_begin);
+                         local != mixer.voices_.end())
+                {
+                    const auto found = local_voices_.find(local->first);
+                    if (found == local_voices_.end())
+                    {
+                        error = "Unowned local playback voice";
+                        return false;
+                    }
+                    auto& retained = found->second;
+                    const auto& source = local->second;
+                    retained.failed = !source.error.empty();
+                    retained.completion_frame = double(mixer.instruments.sample_clock()) +
+                                                std::ceil(std::max(0., (double(source.clip->frames()) - source.cursor) *
+                                                                           AudioMixer::rate / source.clip->rate));
+                    mixer.kill(local->first);
+                    ++local_displaced;
+                }
+                else
                 {
                     error = "Network audio voice capacity exhausted";
                     return false;
                 }
-                mixer.kill(tail->first);
-                voices_.erase(tail);
-                ++displaced;
             }
             voice.id = sound->id;
             voice.cursor = sound->cursor;
@@ -114,5 +137,63 @@ namespace OpenBlood2
                           return true;
                       });
         return ok;
+    }
+    SoundId NetworkAudio::play_voice(const Resources& resources, const SoundParameters& parameters, std::string& error)
+    {
+        error.clear();
+        static SoundId next_local = client_sound_id_begin;
+        if (!joined_.world || parameters.space != SoundSpace::Local || parameters.loop || mixer.voices_.size() >= 128 ||
+            local_voices_.size() >= 128 || next_local == UINT64_MAX)
+        {
+            error = "Invalid or over-capacity local retained voice";
+            ++local_failed;
+            return 0;
+        }
+        SoundRequest request;
+        static_cast<SoundParameters&>(request) = parameters;
+        AudioVoice voice;
+        if (!mixer.prepare_voice(resources, request, {}, voice, error))
+        {
+            ++local_failed;
+            return 0;
+        }
+        const auto id = next_local++;
+        voice.id = id;
+        voice.world_owned = true;
+        local_voices_.emplace(id, LocalVoice{float(voice.clip->duration())});
+        mixer.voices_.emplace(id, std::move(voice));
+        ++local_started;
+        return id;
+    }
+    bool NetworkAudio::stop_voice(SoundId id)
+    {
+        if (!local_voices_.erase(id))
+            return false;
+        mixer.kill(id);
+        return true;
+    }
+    bool NetworkAudio::voice_done(SoundId id, bool& done) const
+    {
+        const auto found = local_voices_.find(id);
+        if (found == local_voices_.end() || found->second.failed)
+            return false;
+        if (const auto* voice = mixer.get(id))
+        {
+            if (!voice->error.empty())
+                return false;
+            done = voice->done;
+        }
+        else
+            done = double(mixer.instruments.sample_clock()) >= found->second.completion_frame;
+        return true;
+    }
+    bool NetworkAudio::voice_duration(SoundId id, float& duration) const
+    {
+        duration = 0;
+        const auto found = local_voices_.find(id);
+        if (found == local_voices_.end())
+            return false;
+        duration = found->second.duration;
+        return true;
     }
 } // namespace OpenBlood2

@@ -1,0 +1,81 @@
+{
+  "scope": "Independent original VoiceMgr/CommLink services and actual private network speech",
+  "baseline": "09f39c92fb8b77fc1ff23b97da39e8525a7c363b",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "09f39c92fb8b77fc1ff23b97da39e8525a7c363b",
+      "path": "src/game/original/VoiceMgr.cpp",
+      "sha256": "6de109d91cec1ebbdd2c3b4fb028a8f6e93a4b5286e4b3b2f5da8c4c35b1cae8"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "09f39c92fb8b77fc1ff23b97da39e8525a7c363b",
+      "path": "src/game/original/CommLink.cpp",
+      "sha256": "c284d52e0fc9102013fa474fb955f032370ef93500ad3a8d56d22b7b05a7cfd6"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "09f39c92fb8b77fc1ff23b97da39e8525a7c363b",
+      "path": "src/game/original/BloodShells.cpp",
+      "sha256": "e7a7a7db9353e013918e03dcef094889dddf1b219e1f193ce743e16153b9af38"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "09f39c92fb8b77fc1ff23b97da39e8525a7c363b",
+      "path": "src/game/local_movement.cpp",
+      "sha256": "6841c8812a5f208af4ccaf75cd59afbe231bd423ae1793c6945d6bbe61feed9f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "09f39c92fb8b77fc1ff23b97da39e8525a7c363b",
+      "path": "src/client/network_audio.cpp",
+      "sha256": "37230b8f3fe1581ae909a8756d6f818642f3c844adbf11cd1f46721d9241b7cd"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "09f39c92fb8b77fc1ff23b97da39e8525a7c363b",
+      "path": "src/client/announcer.cpp",
+      "sha256": "0a6cf78d8dd50bc96cb61103cce9faf2f618198a861dd0e6c89fa2a18fad9d30"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/VoiceMgr.cpp",
+      "sha256": "298aa4746f65fa5ef6b830ffc91dd1794d7f701f1437de090a62d8b3c5c9cc75"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/CommLink.cpp",
+      "sha256": "d870df0e5486ea70ee88c6f9829bb8257dbe8566c26905f1c56734ae50300e92"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ViewWeapon.cpp",
+      "sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    }
+  ],
+  "adaptations": [
+    "Pure client clock/retained-local-voice interface, no player/server handles; solo adapter delegates the exact previous calls",
+    "Original selection/RNG/cooldown, unique flags, CommLink busy/arbitration and text timing unchanged",
+    "NetworkSpeech consumes applied private events and owns local time, original voice manager and communication state",
+    "NetworkAudio high-namespace retained local handles share the existing bounded 128-voice mixer and cache",
+    "Server starts may preempt local PCM after retired tails; retained local completion follows the full client sample clock, never server time",
+    "No protocol or server logical audio changes; no communication portrait/text rendering added",
+    "Weapon animation keys remain server-mediated in the original multiplayer path; existing solo shotgun-only local sound remains unchanged"
+  ]
+}

@@ -12,6 +12,7 @@ namespace OpenBlood2
         transport_.disconnect(peer_, std::uint32_t(Net::Reject::Malformed));
         transport_.flush();
         transport_.close();
+        speech_.clear();
         audio_.clear();
         phase_ = Phase::Failed;
         return false;
@@ -66,6 +67,7 @@ namespace OpenBlood2
         if (event.kind == Net::EventKind::Disconnected)
         {
             reason_ = event.reason ? Net::reject_text(event.reason) : "Disconnected";
+            speech_.clear();
             audio_.clear();
             phase_ = Phase::Closed;
             transport_.close();
@@ -153,6 +155,9 @@ namespace OpenBlood2
                 zoom_ = zoom->on;
                 zoom_crosshair_ = zoom->type;
             }
+            if (!speech_.receive(value, std::chrono::duration<double>(now - origin_).count(),
+                                 bool(camera_.camera().view.object), error))
+                return false;
             return observe(double(value.tick) / 60, now);
         }
         if (Net::is_movement_packet(event.bytes))
@@ -243,7 +248,7 @@ namespace OpenBlood2
         {
             if (phase_ != Phase::Baseline || joined_.player || joined->world != offer_.world ||
                 !movement_.begin(*joined) || !inbox_.begin(*joined) || !camera_.begin(*joined) ||
-                !weapons_.begin(*joined) || !audio_.begin(*joined))
+                !weapons_.begin(*joined) || !audio_.begin(*joined) || !speech_.begin(*joined))
                 return false;
             joined_ = *joined;
             return complete_baseline(now, error);
@@ -270,6 +275,7 @@ namespace OpenBlood2
             if (phase_ == Phase::Closing)
             {
                 transport_.close();
+                speech_.clear();
                 audio_.clear();
                 phase_ = Phase::Closed;
                 reason_ = "Disconnected";
@@ -385,6 +391,8 @@ namespace OpenBlood2
         }
         else
             input_ = {};
+        if (phase_ == Phase::Active && !speech_.update(std::chrono::duration<double>(now - origin_).count(), error))
+            return fail(error, "Client speech clock failed");
         transport_.flush();
         return true;
     }

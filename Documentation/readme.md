@@ -28,6 +28,7 @@
 | [Remote damage and door impulses](implementation/reports/m9_network_impulses.md) | Reliable additive velocity, impulse-aware reports/ACKs and passive dead-player movement. |
 | [Real-process Bloodbath combat](implementation/reports/m9_pvp.md) | Held fire in the graphical frontend; dedicated and host combat, private damage, frag and USE respawn. |
 | [Remote logical audio](implementation/reports/m9_network_audio.md) | Reliable sound starts/stops, private delivery, late loops and independent client playback. |
+| [Independent client speech](implementation/reports/m9_client_speech.md) | Original VoiceMgr/CommLink services, actual private playback and shared bounded audio. |
 | [Independent scene inputs](implementation/reports/m9_scene_inputs.md) | Server-free renderer inputs, original weapon visuals and world-owned GPU presentation. |
 | [Network camera state](implementation/reports/m9_camera_transport.md) | Reliable selection, replica/predicted views and authoritative camera movement/look gates. |
 | [Private player events](implementation/reports/m9_private_events.md) | Reliable pointer-free event delivery, independent HUD inbox and corrected broadcasts. |

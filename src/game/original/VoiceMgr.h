@@ -1,7 +1,7 @@
 #pragma once
 // Selected original VoiceMgr.cpp/.h rules. Copyright (c) 1998 Monolith Productions Inc.
+#include "client/voice_services.h"
 #include "engine/resources.h"
-#include "server_de.h"
 #include <array>
 #include <random>
 
@@ -18,7 +18,7 @@ class CVoiceGroup
 class CVoiceMgr
 {
   public:
-    explicit CVoiceMgr(ServerDE& server) : server_(server) {}
+    explicit CVoiceMgr(OpenBlood2::VoiceServices& services) : services_(services) {}
     ~CVoiceMgr()
     {
         StopAll();
@@ -31,9 +31,9 @@ class CVoiceMgr
     void SetNextPlayTime(float delta);
     void InheritHistory(const CVoiceMgr&);
     void InheritAcrossLoad(const CVoiceMgr&);
-    bool PlayEventSound(HOBJECT player, int character, int event, bool external_camera);
-    bool PlayUniqueSound(HOBJECT player, int character, int unique, bool external_camera);
-    bool PlaySound(HOBJECT player, std::string_view resource, bool stream, float delay = .5f);
+    bool PlayEventSound(int character, int event, bool external_camera);
+    bool PlayUniqueSound(int character, int unique, bool external_camera);
+    bool PlaySound(std::string_view resource, bool stream, float delay = .5f);
     bool IsOkToPlaySound(bool external_camera);
     std::array<std::array<CVoiceGroup, 12>, 4> groups;
     std::array<std::array<bool, 9>, 4> played{};
@@ -44,6 +44,6 @@ class CVoiceMgr
     std::string last_resource, reason, error;
 
   private:
-    ServerDE& server_;
+    OpenBlood2::VoiceServices& services_;
     std::mt19937 random_{0xB200C01u}; // Client-only portable randomness, independent of gameplay.
 };

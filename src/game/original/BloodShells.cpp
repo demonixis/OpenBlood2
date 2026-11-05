@@ -346,7 +346,7 @@ bool CBloodClientShell::OnEnterWorld(HCLIENT client, bool restored)
     boss_health = {};
     boss_health_messages = 0;
     boss_health_visible = false;
-    communication.Reset(server_);
+    communication.Reset(voice_services);
     medkit_down = medkit_was_down = false;
     flashlight_down = flashlight_was_down = false;
     flashlight = {};
@@ -501,7 +501,7 @@ void CBloodClientShell::OnExitWorld()
     boss_health = {};
     boss_health_messages = 0;
     boss_health_visible = false;
-    communication.Reset(server_);
+    communication.Reset(voice_services);
     medkit_down = medkit_was_down = false;
     flashlight_down = flashlight_was_down = false;
     flashlight = {};
@@ -563,10 +563,10 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     if (const auto* value = std::get_if<OpenBlood2::BloodbathStart>(&event))
     {
         // Original SMSG_THEVOICE goes straight to CommLink, without the separate
-        // StopAll used by conversation-trigger messages. Playback remains in the
-        // existing CommLink service until its client-audio bridge is extracted.
+        // StopAll used by conversation-trigger messages. The solo voice service
+        // preserves the existing immediate audio path.
         if (server_.IsMultiplayerGame())
-            communication.Start(server_, client_view_.announcer.bloodbath(*value, resources_), false);
+            communication.Start(voice_services, client_view_.announcer.bloodbath(*value, resources_), false);
         return true;
     }
     if (const auto* value = std::get_if<OpenBlood2::MusicCommand>(&event))
@@ -589,9 +589,9 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     if (const auto* value = std::get_if<OpenBlood2::VoiceEvent>(&event))
     {
         if (value->group)
-            voice_manager.PlayEventSound(player, value->character, value->event, bool(view.object));
+            voice_manager.PlayEventSound(value->character, value->event, bool(view.object));
         else
-            voice_manager.PlayUniqueSound(player, value->character, value->event, bool(view.object));
+            voice_manager.PlayUniqueSound(value->character, value->event, bool(view.object));
         return true; // Delivery is distinct from gated or failed cosmetic playback.
     }
     if (const auto* value = std::get_if<OpenBlood2::ScreenFade>(&event))
@@ -727,7 +727,7 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
     else if (const auto* value = std::get_if<OpenBlood2::Conversation>(&event))
     {
         voice_manager.StopAll();
-        communication.Start(server_, *value); // Original ignores COMM_BUSY.
+        communication.Start(voice_services, *value); // Original ignores COMM_BUSY.
     }
     else if (const auto* value = std::get_if<OpenBlood2::MissionObjectives>(&event))
     {
@@ -848,7 +848,7 @@ bool CBloodClientShell::Update()
     if (!m_bInWorld || server_.GetClientUserData(client_) != player)
         return false;
     ++updates;
-    communication.Update(server_, player, voice_manager);
+    communication.Update(voice_services, voice_manager);
     if (!presentation_.publish(client_, seeing_eye, orb_view))
         return false;
     position = client_view_.camera.frame().player.position;
@@ -872,8 +872,7 @@ bool CBloodClientShell::UpdateMovement(CBloodServerShell& server, double seconds
         !server.OnMessage(client_, OpenBlood2::PlayerControls{{}, false, rotation.yaw}))
         return false;
     if (!owner->ApplyDoorPush() ||
-        !move_mgr.Update(bool(view.object), movement_input,
-                         locomotion_yaw ? *locomotion_yaw : rotation.yaw, seconds,
+        !move_mgr.Update(bool(view.object), movement_input, locomotion_yaw ? *locomotion_yaw : rotation.yaw, seconds,
                          !owner->m_damage.IsDead() && !owner->camera_movement_blocked && !owner->MovementBlocked(),
                          weapon_input.primary || weapon_input.alternate, rotation.pitch))
     {

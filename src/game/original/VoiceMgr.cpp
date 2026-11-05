@@ -67,7 +67,7 @@ void CVoiceMgr::StopAll()
     ++stops;
     next_play_time = 0;
     if (voice)
-        server_.KillSound(voice);
+        services_.stop_voice(voice);
     voice = 0;
 }
 void CVoiceMgr::Reset()
@@ -77,7 +77,7 @@ void CVoiceMgr::Reset()
 }
 void CVoiceMgr::SetNextPlayTime(float delta)
 {
-    next_play_time = server_.GetTime() + delta;
+    next_play_time = services_.time() + delta;
 }
 void CVoiceMgr::InheritHistory(const CVoiceMgr& source)
 {
@@ -109,7 +109,7 @@ bool CVoiceMgr::IsOkToPlaySound(bool external_camera)
     else if (voice)
     {
         bool done = false;
-        if (!server_.IsSoundDone(voice, done))
+        if (!services_.voice_done(voice, done))
         {
             ++failures;
             error = "Retained voice is missing or has failed";
@@ -120,13 +120,13 @@ bool CVoiceMgr::IsOkToPlaySound(bool external_camera)
     }
     if (reason.empty() && external_camera)
         reason = "external camera";
-    if (reason.empty() && !(server_.GetTime() > next_play_time))
+    if (reason.empty() && !(services_.time() > next_play_time))
         reason = "cooldown";
     if (!reason.empty())
         ++refused;
     return reason.empty();
 }
-bool CVoiceMgr::PlaySound(HOBJECT player, std::string_view resource, bool stream, float delay)
+bool CVoiceMgr::PlaySound(std::string_view resource, bool stream, float delay)
 {
     StopAll(); // Source replacement happens even if the new sound is missing.
     last_resource = resource;
@@ -137,20 +137,20 @@ bool CVoiceMgr::PlaySound(HOBJECT player, std::string_view resource, bool stream
         ++failures;
         return false;
     }
-    OpenBlood2::SoundRequest request;
+    OpenBlood2::SoundParameters request;
     request.resource = resource;
     request.space = OpenBlood2::SoundSpace::Local;
     request.streaming = stream;
     request.priority = 5; // PLAYER_MEDIUM; no reverb flag in original local helper.
     request.reverb_requested = false;
-    voice = server_.PlayCinematicSound(player, request, error);
+    voice = services_.play_voice(request, error);
     if (!voice)
     {
         ++failures;
         return false;
     }
     float duration = 1;
-    if (server_.GetSoundDuration(voice, duration))
+    if (services_.voice_duration(voice, duration))
         duration += delay;
     else
         duration = 1;
@@ -158,7 +158,7 @@ bool CVoiceMgr::PlaySound(HOBJECT player, std::string_view resource, bool stream
     ++starts;
     return true;
 }
-bool CVoiceMgr::PlayEventSound(HOBJECT player, int character, int event, bool external_camera)
+bool CVoiceMgr::PlayEventSound(int character, int event, bool external_camera)
 {
     ++requests;
     if (!IsOkToPlaySound(external_camera))
@@ -176,9 +176,9 @@ bool CVoiceMgr::PlayEventSound(HOBJECT player, int character, int event, bool ex
         error = "Voice group contains no WAV resources";
         return false;
     }
-    return PlaySound(player, *sound, event != 11); // Only JUMP is buffered in the source.
+    return PlaySound(*sound, event != 11); // Only JUMP is buffered in the source.
 }
-bool CVoiceMgr::PlayUniqueSound(HOBJECT player, int character, int unique, bool external_camera)
+bool CVoiceMgr::PlayUniqueSound(int character, int unique, bool external_camera)
 {
     ++requests;
     reason.clear();
@@ -204,7 +204,7 @@ bool CVoiceMgr::PlayUniqueSound(HOBJECT player, int character, int unique, bool 
     if (!IsOkToPlaySound(external_camera))
         return false;
     const auto path = "sounds/chosen/caleb/unique/msc" + std::to_string(unique + 1) + "_cal.wav";
-    if (!PlaySound(player, path, true))
+    if (!PlaySound(path, true))
         return false;
     played[character][unique] = true;
     return true;

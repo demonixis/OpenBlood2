@@ -12,6 +12,7 @@
 #include "VoiceMgr.h"
 #include "game/local_movement.h"
 #include "game/local_presentation.h"
+#include "game/local_voices.h"
 #include "game/session.h"
 #include <optional>
 
@@ -98,8 +99,9 @@ class CBloodClientShell
                                OpenBlood2::LocalMovement& movement, OpenBlood2::LocalPresentation& presentation,
                                OpenBlood2::ClientSession& client)
         : inventory_items(client.hud.items), inventory_show_requests(client.hud.item_shows),
-          inventory_item_messages(client.hud.item_messages), voice_manager(server), move_mgr(movement),
-          position(client.camera.position), camera_position(client.camera.camera_position), view(client.camera.view),
+          inventory_item_messages(client.hud.item_messages), voice_services(server, player),
+          voice_manager(voice_services), move_mgr(movement), position(client.camera.position),
+          camera_position(client.camera.camera_position), view(client.camera.view),
           listener_position(client.camera.listener_position), player_visible(client.camera.player_visible),
           weapons_visible(client.camera.weapons_visible), third_person(client.camera.third_person),
           third_person_active(client.camera.third_person_active), xr_view(client.camera.xr_view),
@@ -213,6 +215,7 @@ class CBloodClientShell
     OpenBlood2::SoundId item_voice = 0; // Checked inspection token, not owned.
     std::string item_audio_error;
     CScreenFade fade;
+    OpenBlood2::LocalVoices voice_services;
     CVoiceMgr voice_manager;
     CMusic music;
     CMoveMgr move_mgr;

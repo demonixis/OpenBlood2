@@ -167,9 +167,10 @@ namespace
             }
             if (client.phase() == NetworkClient::Phase::Closed)
             {
-                CHECK(client.audio().started > 0 && audio_peak > 0);
+                CHECK(client.audio().started > 0 && client.audio().local_started > 0 && audio_peak > 0);
                 std::cout << "Remote audio: starts=" << client.audio().started << ", stops=" << client.audio().stopped
-                          << ", natural=" << client.audio().completed << ", peak=" << audio_peak << '\n';
+                          << ", natural=" << client.audio().completed
+                          << ", private_starts=" << client.audio().local_started << ", peak=" << audio_peak << '\n';
                 return leaving && (victim ? respawned : frags == 1);
             }
             if (announced && Clock::now() >= next_status)

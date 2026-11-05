@@ -338,7 +338,8 @@ with impulse-aware corrections, bounded per-peer history and passive dead-player
 [Real-process Bloodbath combat](implementation/reports/m9_pvp.md) now verifies damage, frag and USE respawn
 on dedicated and graphical-host sessions; the graphical frontend forwards held fire through the same endpoint.
 [Remote logical audio](implementation/reports/m9_network_audio.md) now delivers reliable sound lifetimes and independent playback.
-Animation/announcement/music audio, FX, scoreboard, full match rules and remaining multiplayer branches stay in progress.
+[Independent speech](implementation/reports/m9_client_speech.md) now plays private VoiceMgr/CommLink events and startup announcements.
+Weapon animation/frag/music audio, FX, scoreboard, full match rules and remaining multiplayer branches stay in progress.
 **Remaining private presentation consumers/commands, full client separation, Team/CTF and complete network qualification remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client

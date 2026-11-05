@@ -58,9 +58,13 @@ add_library(blood2_client_movement STATIC src/game/original/MoveMgr.cpp src/clie
 target_link_libraries(blood2_client_movement PUBLIC engine_core)
 blood2_project_options(blood2_client_movement)
 
-add_library(blood2_client_network STATIC src/client/network_audio.cpp src/client/network_weapons.cpp src/client/network_client.cpp src/client/network_world.cpp src/client/network_state.cpp src/client/network_collision.cpp src/client/network_movement.cpp src/client/network_player_events.cpp src/client/network_camera.cpp)
-target_link_libraries(blood2_client_network PUBLIC engine_core blood2_net blood2_client_movement blood2_client_weapons)
+add_library(blood2_client_network STATIC src/client/network_speech.cpp src/client/network_audio.cpp src/client/network_weapons.cpp src/client/network_client.cpp src/client/network_world.cpp src/client/network_state.cpp src/client/network_collision.cpp src/client/network_movement.cpp src/client/network_player_events.cpp src/client/network_camera.cpp)
+target_link_libraries(blood2_client_network PUBLIC engine_core blood2_net blood2_client_movement blood2_client_weapons blood2_client_speech)
 blood2_project_options(blood2_client_network)
+
+add_library(blood2_client_speech STATIC src/game/original/VoiceMgr.cpp src/game/original/CommLink.cpp)
+target_link_libraries(blood2_client_speech PUBLIC engine_core)
+blood2_project_options(blood2_client_speech)
 
 add_library(blood2_client_weapons STATIC src/game/original/ViewWeapon.cpp)
 target_link_libraries(blood2_client_weapons PUBLIC engine_core)
@@ -146,7 +150,7 @@ target_sources(blood2_game PRIVATE src/game/original/NewStatusBar.cpp src/game/o
 target_sources(blood2_game PRIVATE src/game/original/PlayerLanding.cpp src/game/original/PlayerDeath.cpp)
 target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/ClientLightFX.cpp)
 target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
-target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/original/ConversationTrigger.cpp src/game/original/ConversationStrings.cpp src/game/original/CommLink.cpp src/game/original/VoiceMgr.cpp src/game/original/PlayerVoice.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
+target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/original/ConversationTrigger.cpp src/game/original/ConversationStrings.cpp src/game/local_voices.cpp src/game/original/PlayerVoice.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
 target_sources(blood2_game PRIVATE src/game/original/WeaponPickups.cpp src/game/server_pickups.cpp src/game/original/PickupObject.cpp
     src/game/original/ItemPickups.cpp src/game/original/GameInvItems.cpp src/game/original/Flashlight.cpp src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp
     src/game/original/Spawner.cpp src/game/original/TripLaser.cpp src/game/original/SeeingEye.cpp src/game/original/TheEyeInventory.cpp src/game/original/BugSprayProjectile.cpp src/game/original/InventoryClient.cpp src/game/original/NapalmProjectile.cpp src/game/original/BoneLeech.cpp src/game/original/DrudgeLord.cpp src/game/original/SoulDrudge.cpp src/game/original/ShikariAI.cpp src/game/original/GremlinAI.cpp src/game/original/AddonProjectiles.cpp src/game/original/MadScientistAI.cpp src/game/original/Tchernotronic.cpp src/game/original/SingularityProjectile.cpp src/game/original/LeechProjectile.cpp src/game/original/OrbProjectile.cpp src/game/original/Fanatic.cpp src/game/original/Prophet.cpp src/game/original/ChosenAI.cpp src/game/original/IshmaelAI.cpp
@@ -173,7 +177,7 @@ if(BLOOD2_BUILD_CLIENT)
     target_link_libraries(blood2_frontend PUBLIC blood2_game)
     blood2_project_options(blood2_frontend)
 endif()
-target_link_libraries(blood2_game PUBLIC blood2_client_effects blood2_client_movement engine_core)
+target_link_libraries(blood2_game PUBLIC blood2_client_speech blood2_client_effects blood2_client_movement engine_core)
 
 target_link_libraries(blood2_game PUBLIC blood2_client_weapons)
 target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/original/DestructableSave.cpp src/game/original/DestructableBrush.cpp src/game/original/DestructableModel.cpp

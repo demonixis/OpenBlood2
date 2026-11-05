@@ -1,5 +1,6 @@
 #pragma once
-#include "server_de.h"
+#include "client/voice_services.h"
+#include "game/player_messages.h"
 // Original ClientShellDLL/CommLink numeric-character path. Clock work is outside drawing.
 class CVoiceMgr;
 class CCommLink
@@ -14,7 +15,7 @@ class CCommLink
     float voice_manager_delay = 0;
     bool play_voice = false;
     std::string portrait, error;
-    void Reset(ServerDE&);
-    bool Start(ServerDE&, const OpenBlood2::Conversation&, bool shell_stopped_voice = true);
-    void Update(ServerDE&, HOBJECT player, CVoiceMgr&);
+    void Reset(OpenBlood2::VoiceServices&);
+    bool Start(OpenBlood2::VoiceServices&, const OpenBlood2::Conversation&, bool shell_stopped_voice = true);
+    void Update(OpenBlood2::VoiceServices&, CVoiceMgr&);
 };

@@ -123,13 +123,15 @@ namespace
         GameSession g;
         CHECK(setup(g, root));
         auto& c = g.client_shell.communication;
-        CHECK(c.Start(g.server, {"cue.wav", "short", 2}) && c.portrait == "interface/commlink/i_comm.pcx");
-        CHECK(!c.Start(g.server, {"other.wav", "replacement", 0}) && c.busy == 1 && c.message.file == "cue.wav");
+        CHECK(c.Start(g.client_shell.voice_services, {"cue.wav", "short", 2}) &&
+              c.portrait == "interface/commlink/i_comm.pcx");
+        CHECK(!c.Start(g.client_shell.voice_services, {"other.wav", "replacement", 0}) && c.busy == 1 &&
+              c.message.file == "cue.wav");
         CHECK(g.objects.advance(.2f));
-        c.Update(g.server, g.client_shell.player, g.client_shell.voice_manager);
+        c.Update(g.client_shell.voice_services, g.client_shell.voice_manager);
         CHECK(c.level == 1 && !c.voice);
         CHECK(g.objects.advance(.25 - g.objects.time()));
-        c.Update(g.server, g.client_shell.player, g.client_shell.voice_manager);
+        c.Update(g.client_shell.voice_services, g.client_shell.voice_manager);
         CHECK(c.level == 2 && c.text_level == 1 && c.voice && c.voice_manager_requests == 3);
         const auto id = c.voice;
         const auto* voice = g.server.audio.get(id);
@@ -138,17 +140,17 @@ namespace
         CHECK(g.advance_audio(.1, {}, {}));
         CHECK(g.server.audio.get(id)->done);
         CHECK(g.objects.advance(2.5));
-        c.Update(g.server, g.client_shell.player, g.client_shell.voice_manager);
+        c.Update(g.client_shell.voice_services, g.client_shell.voice_manager);
         CHECK(c.level == 2 && c.voice == id);
         CHECK(g.objects.advance(.01));
-        c.Update(g.server, g.client_shell.player, g.client_shell.voice_manager);
+        c.Update(g.client_shell.voice_services, g.client_shell.voice_manager);
         CHECK(c.level == 3 && !c.voice && !g.server.audio.get(id));
         CHECK(g.objects.advance(.21));
-        c.Update(g.server, g.client_shell.player, g.client_shell.voice_manager);
+        c.Update(g.client_shell.voice_services, g.client_shell.voice_manager);
         CHECK(!c.level);
-        CHECK(c.Start(g.server, {"default.wav", "no voice", 99}));
+        CHECK(c.Start(g.client_shell.voice_services, {"default.wav", "no voice", 99}));
         CHECK(g.objects.advance(.21));
-        c.Update(g.server, g.client_shell.player, g.client_shell.voice_manager);
+        c.Update(g.client_shell.voice_services, g.client_shell.voice_manager);
         CHECK(!c.voice && !c.play_voice && c.portrait == "interface/commlink/u_comm.pcx");
         CHECK(g.unload_world() && !c.level && !c.received);
         return true;
@@ -166,7 +168,7 @@ namespace
         auto& comm = g.client_shell.communication;
         CHECK(comm.level == 2 && !comm.voice && comm.sound_failures == 1 && !comm.error.empty());
         CHECK(g.step(.25) && comm.sound_attempts == 1); // No fabricated retries after missing file.
-        comm.Reset(g.server);
+        comm.Reset(g.client_shell.voice_services);
         CHECK(g.server.SendConversation({"long.wav", "voice", 0}) == DE_OK && g.pump_player_messages(error));
         CHECK(g.step(.25) && comm.voice);
         auto id = comm.voice;
@@ -288,7 +290,7 @@ namespace
             auto* probe = create(g, {{"WaveFile", file}});
             CHECK(probe && send(g, probe) && probe->queued == 1);
             CHECK(g.pump_player_messages(error) && g.objects.advance(.25));
-            g.client_shell.communication.Update(g.server, g.client_shell.player, g.client_shell.voice_manager);
+            g.client_shell.communication.Update(g.client_shell.voice_services, g.client_shell.voice_manager);
             auto id = g.client_shell.communication.voice;
             CHECK(id && g.server.audio.get(id)->clip->frames() == 25930);
             const auto& samples = g.server.audio.get(id)->clip->samples;

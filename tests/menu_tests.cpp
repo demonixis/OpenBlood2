@@ -1072,7 +1072,7 @@ namespace
                       hand.skin_path.find(std::string(1, p.hands) + "_") != std::string::npos);
             auto& voices = game->client_shell.voice_manager;
             CHECK(!voices.groups[c][11].sounds.empty());
-            CHECK(voices.PlaySound(player->m_hObject, voices.groups[c][11].sounds.front(), false));
+            CHECK(voices.PlaySound(voices.groups[c][11].sounds.front(), false));
             CHECK(game->server.audio.get(voices.voice) && game->server.audio.get(voices.voice)->clip->frames() > 0);
             CHECK(game->command_weapon(0, error));
             const auto& weapon = game->client_shell.weapons[0];

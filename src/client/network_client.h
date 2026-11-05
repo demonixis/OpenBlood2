@@ -5,6 +5,7 @@
 #include "client/network_input.h"
 #include "client/network_movement.h"
 #include "client/network_player_events.h"
+#include "client/network_speech.h"
 #include "client/network_weapons.h"
 #include "client/network_world.h"
 #include "game/original/ClientCrosshair.h"
@@ -32,7 +33,10 @@ namespace OpenBlood2
             Closed,
             Failed
         };
-        NetworkClient() : models_(resources_), sprites_(resources_), movement_(receiver_.collision()) {}
+        NetworkClient()
+            : models_(resources_), sprites_(resources_), movement_(receiver_.collision()), speech_(audio_, resources_)
+        {
+        }
         NetworkClient(const NetworkClient&) = delete;
         NetworkClient& operator=(const NetworkClient&) = delete;
         bool connect(const Config&, std::string_view host, std::uint16_t port, const Net::JoinProfile&,
@@ -104,6 +108,10 @@ namespace OpenBlood2
         {
             return audio_;
         }
+        const NetworkSpeech& speech() const
+        {
+            return speech_;
+        }
         const NetworkWeapons& weapons() const
         {
             return weapons_;
@@ -163,6 +171,7 @@ namespace OpenBlood2
         NetworkCamera camera_;
         NetworkWeapons weapons_;
         NetworkAudio audio_;
+        NetworkSpeech speech_;
         NetworkPlayerEvents inbox_;
         NetworkClock clock_;
         ClientWorld displayed_;

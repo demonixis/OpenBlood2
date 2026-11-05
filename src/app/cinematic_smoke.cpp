@@ -73,7 +73,7 @@ namespace OpenBlood2
         g.server.FreeString(text);
         if (!ok || !g.pump_player_messages(error) || !g.objects.advance(.25))
             return false;
-        g.client_shell.communication.Update(g.server, g.client_shell.player, g.client_shell.voice_manager);
+        g.client_shell.communication.Update(g.client_shell.voice_services, g.client_shell.voice_manager);
         // This diagnostic calls CommLink outside GameSession::step. Publish its
         // new/removed logical voices at the normal client boundary before reading
         // playback state; do not advance either sound clock to force the result.

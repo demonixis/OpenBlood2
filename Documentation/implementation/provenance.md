@@ -1,5 +1,12 @@
 # Source and Dependency Provenance
 
+The M9 [independent speech lot](reports/m9_client_speech.md) extracts only the
+service calls from existing original VoiceMgr/CommLink ports. Their source
+selection, timing and solo behavior remain unchanged; high-namespace retained
+network voices, bounded mixer preemption and client-clock delivery are explicit
+engine adaptations. See the [source ledger](sources/m9_client_speech_sources.json).
+
+
 The M9 [local effects presentation lot](reports/m9_client_effects.md) copies evaluated
 visual state at the existing publication boundary and extracts the unchanged scene
 consumption/fog arithmetic into independent client consumers. Legacy effect recipes,

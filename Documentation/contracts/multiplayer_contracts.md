@@ -1147,9 +1147,41 @@ from ClientWorld, retaining initial/last position until membership catches up.
 Keep 256-byte packets, 512 queued events per recipient, 128 voices and original
 asset/cache limits. Sequence gaps, stale worlds, invalid metadata and reused IDs
 fail before playback mutation. Duplicate sequence delivery is idempotent. New
-logical starts may displace only naturally retired client tails. Queue overflow
+logical starts prefer naturally retired client tails; the later speech boundary
+below also allows local PCM preemption with retained completion. Queue overflow
 isolates its recipient. Resource/output errors are explicit client failures;
 they never alter the authoritative sound or another player's object. Do not
 advance server clocks/RNG from device lead, client mixing or focus/menu state.
-Solo keeps its immediate publication path with no observer. Animation-key,
-announcement, music and cosmetic effect consumers remain separate work.
+Solo keeps its immediate publication path with no observer. The speech boundary
+below adds private announcements. Animation-key, music and cosmetic effect
+consumers remain separate work.
+
+## Independent client speech
+
+The [speech lot](../implementation/reports/m9_client_speech.md) separates existing
+CVoiceMgr/CommLink from ServerDE through VoiceServices: only time, retained local
+play/stop, duration and completion. LocalVoices delegates the exact previous
+solo calls with its current player reference. No original rule, RNG draw or
+audio-clock ownership changes on that path; CMoveMgr still integrates once.
+
+The network client owns those original runtimes and consumes applied private
+VoiceEvent/VoiceStop/Conversation/BloodbathStart once per addressed sequence.
+Use monotonic client elapsed time, not server tick mapping or device lead.
+Preserve source busy/external-camera/strict-cooldown order, unique flags, group
+selection and streaming/buffered intent. Conversation receipt stops VoiceMgr
+even on busy CommLink refusal. Startup announcement receipt does not; the
+delayed communication voice start does. Preserve text-derived interruption.
+
+Local speech shares NetworkAudio's existing cache, output and 128 physical
+voices. Allocate only high-namespace IDs with null original handles; retain at
+most 128 local completion records. Local callers cannot stop server IDs. New
+server sounds may preempt the oldest local PCM after trying retired server tails,
+but never active server sounds. Retain duration and remaining completion using
+the full client sample clock, including non-rendered advancement and device lead.
+Do not use rendered-frame count or mark a preempted voice done early. Stop releases
+its record, and disconnect clears speech before the mixer. Capacity/resource
+refusals remain explicit cosmetic diagnostics, never new server logical sounds.
+
+This adds actual private PCM, not the portrait/text HUD renderer. Frag/FinishHim,
+music, inventory sounds, movement cosmetics and server-mediated original weapon
+animation keys remain separate. Preserve the existing solo shotgun adaptation.

@@ -102,36 +102,36 @@ namespace
         CHECK(setup(g, root));
         auto& vm = g.client_shell.voice_manager;
         const auto player = g.client_shell.player;
-        CHECK(!vm.PlayEventSound(player, 0, 9, false) && vm.reason == "cooldown");
+        CHECK(!vm.PlayEventSound(0, 9, false) && vm.reason == "cooldown");
         CHECK(g.objects.advance(.01));
         vm.on = false;
-        CHECK(!vm.PlayEventSound(player, 0, 9, false) && vm.reason == "disabled");
+        CHECK(!vm.PlayEventSound(0, 9, false) && vm.reason == "disabled");
         vm.on = true;
-        CHECK(!vm.PlayEventSound(player, 0, 9, true) && vm.reason == "external camera");
-        CHECK(vm.PlayEventSound(player, 0, 9, false));
+        CHECK(!vm.PlayEventSound(0, 9, true) && vm.reason == "external camera");
+        CHECK(vm.PlayEventSound(0, 9, false));
         auto id = vm.voice;
         const auto* v = g.server.audio.get(id);
         CHECK(v && v->request.streaming && v->clip->stream && v->request.priority == 5 && !v->request.reverb_requested);
-        CHECK(!vm.PlayEventSound(player, 0, 9, true) && vm.reason == "busy");
+        CHECK(!vm.PlayEventSound(0, 9, true) && vm.reason == "busy");
         CHECK(g.advance_audio(.1, {}, {}) && g.server.audio.get(id)->done);
         CHECK(g.objects.advance(vm.next_play_time - g.objects.time()));
-        CHECK(!vm.PlayEventSound(player, 0, 9, false) && vm.reason == "cooldown");
-        CHECK(g.objects.advance(.01) && vm.PlayEventSound(player, 0, 9, false));
+        CHECK(!vm.PlayEventSound(0, 9, false) && vm.reason == "cooldown");
+        CHECK(g.objects.advance(.01) && vm.PlayEventSound(0, 9, false));
         CHECK(!g.server.audio.get(id));
         id = vm.voice;
-        CHECK(!vm.PlaySound(player, "missing.wav", true) && !vm.voice && !g.server.audio.get(id) && !vm.error.empty());
-        CHECK(vm.PlayEventSound(player, 0, 11, false));
+        CHECK(!vm.PlaySound("missing.wav", true) && !vm.voice && !g.server.audio.get(id) && !vm.error.empty());
+        CHECK(vm.PlayEventSound(0, 11, false));
         CHECK(!g.server.audio.get(vm.voice)->request.streaming && !g.server.audio.get(vm.voice)->clip->stream);
         vm.StopAll();
-        CHECK(!vm.PlayUniqueSound(player, 0, 1, false) && !vm.played[0][1] && !vm.error.empty());
-        CHECK(vm.PlayUniqueSound(player, 0, 0, false) && vm.played[0][0]);
+        CHECK(!vm.PlayUniqueSound(0, 1, false) && !vm.played[0][1] && !vm.error.empty());
+        CHECK(vm.PlayUniqueSound(0, 0, false) && vm.played[0][0]);
         vm.on = false;
-        CHECK(!vm.PlayUniqueSound(player, 0, 0, false) && vm.reason == "unique already played");
+        CHECK(!vm.PlayUniqueSound(0, 0, false) && vm.reason == "unique already played");
         vm.on = true;
         id = vm.voice;
         CHECK(g.objects.remove(player) && g.objects.finish_frame());
         CHECK(g.advance_audio(.01, {}, {}) && !g.server.audio.get(id));
-        CHECK(!vm.PlayUniqueSound(player, 0, 2, false) && !vm.played[0][2] && !vm.error.empty());
+        CHECK(!vm.PlayUniqueSound(0, 2, false) && !vm.played[0][2] && !vm.error.empty());
         CHECK(g.unload_world() && !vm.voice && g.server.audio.voices().empty());
         return true;
     }
@@ -160,7 +160,7 @@ namespace
         const auto requests = p->trigger_sound_requests;
         CHECK(send(g, "sound") && send(g, "sound ") && p->trigger_sound_requests == requests);
         CHECK(send(g, "sound\tcue.wav") && p->ignored_triggers == 1);
-        g.server.set_game_settings(1, 1);
+        g.server.set_game_settings(DIFFICULTY_MEDIUM, GAMETYPE_BLOODBATH);
         CHECK(send(g, "sound cue.wav") && p->trigger_sound_requests == requests);
         CHECK(!p->PlayVoiceUniqueEventOnClient(0) && !p->PlayVoiceGroupEventOnClient(9, true));
         g.server.set_game_settings(1, GAMETYPE_SINGLE);
@@ -168,16 +168,16 @@ namespace
         CHECK(send(g, "sound cue.wav") && p->trigger_sound_requests == requests + 1);
         p->m_bDead = false;
         CHECK(g.pump_player_messages(error) && g.server.string_count() == strings);
-        CHECK(vm.PlayEventSound(p->m_hObject, 0, 9, false));
+        CHECK(vm.PlayEventSound(0, 9, false));
         const auto interrupted = vm.voice;
         CHECK(g.server.SendToClient(g.local_client, Conversation{"cue.wav", "short", 0}) == DE_OK);
         CHECK(g.pump_player_messages(error) && !vm.voice && !g.server.audio.get(interrupted));
         CHECK(g.objects.advance(.25));
-        g.client_shell.communication.Update(g.server, p->m_hObject, vm);
+        g.client_shell.communication.Update(g.client_shell.voice_services, vm);
         CHECK(g.client_shell.communication.voice && vm.next_play_time > g.server.GetTime());
-        CHECK(!vm.PlayEventSound(p->m_hObject, 0, 9, false) && vm.reason == "cooldown");
+        CHECK(!vm.PlayEventSound(0, 9, false) && vm.reason == "cooldown");
         // A second conversation is busy, but still stops VoiceMgr before that refusal.
-        CHECK(vm.PlaySound(p->m_hObject, "long.wav", true));
+        CHECK(vm.PlaySound("long.wav", true));
         const auto busy_voice = vm.voice;
         CHECK(g.server.SendToClient(g.local_client, Conversation{"cue.wav", "second", 0}) == DE_OK);
         CHECK(g.pump_player_messages(error) && g.client_shell.communication.busy == 1 &&
@@ -266,13 +266,19 @@ namespace
         CHECK(damage(g, h, 31, DamageType::Fire, h) && p->UpdateStats() && g.pump_player_messages(error));
         CHECK(vm.starts == 2 && vm.last_resource == "sounds/chosen/caleb/burning/a.wav");
         vm.StopAll();
-        g.server.set_game_settings(1, 1);
+        g.server.set_game_settings(DIFFICULTY_MEDIUM, GAMETYPE_BLOODBATH);
         const auto messages = p->voice_messages, checks = p->damage_voice_checks;
         CHECK(damage(g, h, 31, DamageType::Normal, h) && p->UpdateStats() && g.pump_player_messages(error));
         CHECK(p->damage_voice_checks == checks + 1 && p->voice_messages == messages && !vm.voice);
-        g.server.set_game_settings(0, 1);
         PlayerState saved;
-        CHECK(p->SaveFields(saved, error));
+        CHECK(!p->SaveFields(saved, error));
+        g.server.set_game_settings(DIFFICULTY_MEDIUM, GAMETYPE_SINGLE);
+        CHECK(!g.server.IsMultiplayerGame());
+        if (!p->SaveFields(saved, error))
+        {
+            std::cerr << "Voice damage save fixture: " << error << '\n';
+            return false;
+        }
         CHECK(g.server.SetClientUserData(g.local_client, nullptr) == DE_OK);
         p->SetClient(nullptr);
         CHECK(!CPlayerObj::LocalVoicePlayer() && p->LoadFields(saved, error));
@@ -421,7 +427,7 @@ namespace
         for (int unique = 0; unique < 9; ++unique)
         {
             vm.StopAll();
-            const bool started = vm.PlayUniqueSound(g.client_shell.player, 0, unique, false);
+            const bool started = vm.PlayUniqueSound(0, unique, false);
             if (!started)
                 std::cerr << "unique " << unique << ": " << vm.error << " / " << vm.reason << '\n';
             if (unique == 1 || unique == 8)
@@ -446,7 +452,7 @@ namespace
         CHECK(g.server_shell.OnMessage(g.local_client, PlayerControlAction{PlayerControlAction::Taunt}));
         CHECK(g.pump_player_messages(error) && vm.starts == taunt_starts + 1); // Held taunts respect cooldown.
         vm.StopAll();
-        CHECK(vm.PlayEventSound(g.client_shell.player, 0, 9, false));
+        CHECK(vm.PlayEventSound(0, 9, false));
         const auto voice = vm.voice;
         const auto last = vm.groups[0][9].last;
         WorldMessage message;
@@ -463,8 +469,8 @@ namespace
         for (int unique = 0; unique < 9; ++unique)
             CHECK(next.played[0][unique] == (unique != 1 && unique != 8));
         CHECK(game->objects.advance(.01));
-        CHECK(!next.PlayUniqueSound(game->client_shell.player, 0, 0, false) && next.reason == "unique already played");
-        CHECK(next.PlayEventSound(game->client_shell.player, 0, 9, false) && next.groups[0][9].last != last);
+        CHECK(!next.PlayUniqueSound(0, 0, false) && next.reason == "unique already played");
+        CHECK(next.PlayEventSound(0, 9, false) && next.groups[0][9].last != last);
         CHECK(send(*game, "SOUND sounds/chosen/caleb/unique/msc1_cal.wav") && game->pump_player_messages(error));
         const auto* p = game->server_shell.Player(game->local_client);
         CHECK(!next.voice && p->trigger_sound_starts == 1 && game->server.audio.get(p->trigger_sound));
