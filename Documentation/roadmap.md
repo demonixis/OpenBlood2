@@ -344,19 +344,20 @@ The [client roster](implementation/reports/m9_roster.md) now owns reliable names
 [Combat announcements](implementation/reports/m9_combat_announcer.md) now deliver original frag/suicide/FinishHim speech and observer notices.
 [Network audio cache reclamation](implementation/reports/m9_audio_cache.md) now retains fixed budgets across sequential playback without evicting live or prepared clips.
 [Original Bloodbath scores and player notices](implementation/reports/m9_scoreboard.md) now consume reliable roster/frag updates, preserving tie order, source PCX/FNT layout, death/revival visibility and localized join/leave text.
-Communication portraits, music, FX, measured pings/chat, full match rules and remaining multiplayer branches stay in progress.
+[Bloodbath match limits and rotation](implementation/reports/m9_rotation.md) now retain peers across cyclic maps, with original intermission, fresh world/life identities and strict stale-packet gates.
+Communication portraits, music, FX, measured pings/chat, Team/CTF rules and remaining multiplayer branches stay in progress.
 **Remaining private presentation consumers/commands, full client separation, Team/CTF and complete network qualification remain pending.**
 
-Original model: the authoritative server runs the ObjectDLL objects. The client
-shell runs its own movement (CMoveMgr) and effects. The engine copies object
-state to every client. OpenBlood2 runs one session in one process with one
-client. Object presentation, movement geometry/environment, cameras, HUD and audio now use
-local client-owned replicas. Visual effects and lights/fog now use owned client presentation snapshots; their legacy
-production/update services and remaining client-shell services still use the local server adapter. Typed client
-messages still exist as in-process gameplay values only. The new ENet wrapper
-now delivers admission, the initial object frame and reliable membership changes.
-Absolute poses and collision motion now use State; reliable membership carries
-volume properties. Private gameplay events and commands remain to connect.
+Original model: the authoritative server runs ObjectDLL objects; the client runs
+CMoveMgr, rendering and effects over copied object state. The current local solo
+path uses owned client replicas with immediate delivery. NetworkClient independently
+owns admission, presentation, collision/environment, predicted movement, cameras,
+HUD, view weapons and playback; it links without server gameplay objects. ENet
+carries reliable membership/private events/commands/audio and sequenced State.
+Dedicated and host share ServerSession, authoritative combat and map rotation.
+The server-side GameSession still contains transitional local presentation/FX
+producers; remaining remote effects and final simulation/library separation are
+pending. The initial in-process-only assessment is superseded by these deliveries.
 
 Original references are available. These include the multiplayer branches in
 PlayerObj, BloodServerShell, the pickups and B2BaseClass, as well as FlagObjects,

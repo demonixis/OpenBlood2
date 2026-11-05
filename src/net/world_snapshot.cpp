@@ -369,6 +369,21 @@ namespace OpenBlood2::Net
         out = std::move(chunks);
         return true;
     }
+    bool world_chunk_epoch(std::span<const std::uint8_t> bytes, std::uint64_t& out)
+    {
+        if (bytes.size() <= chunk_header || bytes.size() > packet_limit(Channel::Baseline))
+            return false;
+        Reader r(bytes);
+        if (r.u32() != chunk_magic || r.u16() != protocol_version)
+            return false;
+        const auto world = r.u64(), sequence = r.u64();
+        const auto total = r.u32(), offset = r.u32();
+        if (!r.good() || !world || !sequence || !total || total > world_snapshot_limit || offset >= total ||
+            r.remaining() != std::min(chunk_data, std::size_t(total - offset)))
+            return false;
+        out = world;
+        return true;
+    }
     BaselineResult BaselineReceiver::receive(std::span<const std::uint8_t> bytes, WorldSnapshot& out)
     {
         WorldUpdate update;

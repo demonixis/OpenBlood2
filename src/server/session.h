@@ -1,4 +1,5 @@
 #pragma once
+#include "game/multiplayer_rules.h"
 #include "game/server_adapter.h"
 #include "net/admission.h"
 #include "net/audio_events.h"
@@ -23,11 +24,27 @@ namespace OpenBlood2
     {
       public:
         ~ServerSession();
-        bool start(const Config&, std::string_view world, unsigned mode, std::string& error);
+        bool start(const Config&, std::string_view world, unsigned mode, std::string& error,
+                   const MultiplayerRules& rules = {});
         bool tick(std::string& error);
+        bool changing_level() const
+        {
+            return ending_tick_.has_value();
+        }
+        bool rotation_due() const
+        {
+            return ending_tick_ && ticks_ > *ending_tick_ && ticks_ - *ending_tick_ > 450;
+        }
+        // Called only by the network owner between ticks, before offering the new epoch.
+        bool rotate(std::string& error);
+        std::uint64_t rotations = 0;
         std::uint64_t ticks() const
         {
             return ticks_;
+        }
+        std::uint64_t total_ticks() const
+        {
+            return total_ticks_;
         }
         // Trusted local call after the endpoint's protocol/content/loading gates.
         bool join(const Net::JoinProfile&, Net::Joined&, std::string& error);
@@ -166,8 +183,14 @@ namespace OpenBlood2
         };
         std::map<SoundId, AudioSource> audio_sources_;
         std::uint64_t world_id_ = 0, next_player_ = 1, next_snapshot_ = 1;
-        std::uint64_t ticks_ = 0;
+        std::uint64_t ticks_ = 0, total_ticks_ = 0;
         unsigned mode_ = 0;
+        MultiplayerRules rules_;
+        std::vector<std::string> rotation_;
+        std::size_t map_index_ = 0;
+        std::optional<std::uint64_t> ending_tick_;
+        bool load_map(std::size_t index, std::string& error);
+        void update_match();
         void capture_audio(const AudioVoice&, bool started);
         bool queue_audio(Player&, const AudioVoice&, bool started);
         DRESULT capture_event(HCLIENT, const PlayerEvent&);

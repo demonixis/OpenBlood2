@@ -114,6 +114,11 @@ namespace OpenBlood2
                     p.frags = frag->killer_frags; // Authoritative absolute score, including suicide.
                     score(scores_, p);
                 }
+        if (std::holds_alternative<Net::LevelChanging>(event.value))
+        {
+            hud_.items = {};
+            ++hud_.item_messages;
+        }
         if (const auto* stats = std::get_if<PlayerStats>(&event.value))
         {
             if (!hud_.receive(owner, event.sequence, *stats))

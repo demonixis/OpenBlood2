@@ -64,6 +64,10 @@ namespace OpenBlood2
         {
             return phase_ == Phase::Active && camera_.ready() && weapons_.ready(movement_.setup().owner.force_revision);
         }
+        bool changing_level() const
+        {
+            return changing_level_;
+        }
         const std::string& reason() const
         {
             return reason_;
@@ -189,6 +193,7 @@ namespace OpenBlood2
         double mapped_time_ = 0;
         float pitch_ = 0, yaw_ = 0;
         bool zoom_ = false;
+        bool changing_level_ = false;
         DBYTE zoom_crosshair_ = 0;
         float fov_x_ = original_fov_normal;
         std::string reason_;

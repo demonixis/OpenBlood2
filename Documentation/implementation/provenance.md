@@ -1,5 +1,13 @@
 # Source and Dependency Provenance
 
+The M9 [Bloodbath rotation lot](reports/m9_rotation.md) selects original
+UpdateMultiplayer thresholds, StartNextMultiplayerLevel wait/reset rules,
+NetStart host/dedicated defaults and client changing-level presentation.
+Fixed ticks, bounded shared CLI, ENet peer retention with fresh aliases and
+owned replica replacement are explicit adaptations. CancelFiringState's
+SOUNDSTOP is delivered by the existing authoritative sound path. See the
+[source ledger](sources/m9_rotation_sources.json).
+
 The M9 [Bloodbath scoreboard and player notices](reports/m9_scoreboard.md) reuse
 CFragInfo's strict score ordering, original PCX/FNT layout/DrawClip and shell
 Tab/death rules, plus original IDS_ADDPLAYER/IDS_REMOVEPLAYER strings. Owned

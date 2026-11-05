@@ -17,6 +17,8 @@ namespace OpenBlood2
         }
         void receive(const Net::PrivateEvent& event)
         {
+            if (std::holds_alternative<Net::LevelChanging>(event.value))
+                visible = true;
             if (std::holds_alternative<PlayerDead>(event.value))
             {
                 dead = true;

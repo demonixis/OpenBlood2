@@ -69,6 +69,18 @@ namespace OpenBlood2
         else if (resources.read("cres.dll", bytes, error))
             read_string_resources(bytes, strings_, error);
     }
+    std::string ClientAnnouncer::level_change_notice(const Resources& resources)
+    {
+        load(resources);
+        const auto found = strings_.strings.find(7011); // IDS_MP_CHANGINGLEVELS.
+        if (found != strings_.strings.end() && !found->second.empty() && found->second.size() < 500 &&
+            found->second.find('\0') == std::string::npos)
+            return found->second;
+        ++fallback_texts;
+        if (error.empty())
+            error = "Missing or invalid level change string 7011";
+        return "End of level signaled.  Switching to next level...";
+    }
     bool ClientAnnouncer::player_notice(std::string_view name, bool joined, const Resources& resources,
                                         std::string& out)
     {

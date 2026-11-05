@@ -40,7 +40,8 @@ namespace OpenBlood2
         }
         std::uint64_t frag_events = 0, frag_communications = 0, frag_notices = 0, missing_players = 0,
                       finish_events = 0;
-        std::uint64_t joined_notices = 0, left_notices = 0;
+        std::uint64_t joined_notices = 0, left_notices = 0, level_changes = 0;
+        std::string level_sound_error;
         float time() const override
         {
             return time_;
@@ -64,6 +65,8 @@ namespace OpenBlood2
 
       private:
         Net::Joined joined_;
+        SoundId level_bell_ = 0;
+        bool announced_change_ = false;
         std::uint64_t sequence_ = 0;
         double clock_ = 0;
         float time_ = 0;

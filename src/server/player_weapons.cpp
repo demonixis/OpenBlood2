@@ -24,8 +24,8 @@ namespace OpenBlood2
         next.character = player->m_nCharacter;
         next.slot = inventory.m_nCurWeaponSlot;
         next.alive = !player->m_bDead;
-        next.input_enabled =
-            !player->m_bInSlowDeath && !player->camera_movement_blocked && !(inventory.eye && inventory.eye->active);
+        next.input_enabled = !changing_level() && !player->m_bInSlowDeath && !player->camera_movement_blocked &&
+                             !(inventory.eye && inventory.eye->active);
         next.binoculars = inventory.binoculars && inventory.binoculars->active;
         next.fire_allowed = next.alive && !player->m_damage.IsDead() && next.input_enabled &&
                             player->attributes_received && !player->MovementBlocked() && !next.binoculars;

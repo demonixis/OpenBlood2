@@ -98,6 +98,22 @@ namespace
         std::vector<std::vector<std::uint8_t>> chunks;
         auto large = sample(2000);
         CHECK(encode_baseline_chunks(large, chunks) && chunks.size() > 1);
+        std::uint64_t envelope_world = 99;
+        CHECK(world_chunk_epoch(chunks[0], envelope_world) && envelope_world == source.world);
+        for (std::size_t length = 0; length < chunks[0].size(); ++length)
+        {
+            envelope_world = 99;
+            CHECK(!world_chunk_epoch(std::span(chunks[0]).first(length), envelope_world) && envelope_world == 99);
+        }
+        std::mt19937 envelope_random(0xB216);
+        for (unsigned mutation = 0; mutation < 10000; ++mutation)
+        {
+            auto changed = chunks[0];
+            changed[envelope_random() % changed.size()] ^= std::uint8_t(1u << (envelope_random() % 8));
+            envelope_world = 99;
+            const auto valid = world_chunk_epoch(changed, envelope_world);
+            CHECK(valid ? envelope_world != 0 : envelope_world == 99);
+        }
         BaselineReceiver receiver(source.world), wrong_world(source.world + 1);
         out.sequence = 99;
         CHECK(wrong_world.receive(chunks[0], out) == BaselineResult::Refused && out.sequence == 99);

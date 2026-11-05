@@ -96,7 +96,7 @@ namespace OpenBlood2
     {
         options = {};
         error.clear();
-        bool explicit_world = false, explicit_network_port = false;
+        bool explicit_world = false, explicit_network_port = false, explicit_match = false;
         for (std::size_t i = 0; i < args.size(); ++i)
         {
             const auto arg = args[i];
@@ -303,14 +303,24 @@ namespace OpenBlood2
             }
             else if (arg == "--data-dir" || arg == "--config" || arg == "--frames" || arg == "--capture" ||
                      arg == "--world" || arg == "--log-dir" || arg == "--log-level" || arg == "--rez" ||
-                     arg == "--connect" || arg == "--host" || arg == "--port" || arg == "--name")
+                     arg == "--connect" || arg == "--host" || arg == "--port" || arg == "--name" || arg == "--end" ||
+                     arg == "--frag-limit" || arg == "--time-limit" || arg == "--map")
             {
                 if (++i == args.size() || args[i].empty() || args[i].starts_with("--"))
                 {
                     error = "Missing value for " + std::string(arg);
                     return false;
                 }
-                if (arg == "--connect")
+                if (arg == "--end" || arg == "--frag-limit" || arg == "--time-limit" || arg == "--map")
+                {
+                    if (!parse_match_option(arg, args[i], options.network_rules))
+                    {
+                        error = "Invalid multiplayer match option: " + std::string(arg);
+                        return false;
+                    }
+                    explicit_match = true;
+                }
+                else if (arg == "--connect")
                     options.connect_address = args[i];
                 else if (arg == "--host")
                     options.host_world = args[i];
@@ -383,7 +393,8 @@ namespace OpenBlood2
             }
         }
         const bool network = !options.host_world.empty() || !options.connect_address.empty();
-        if ((!options.host_world.empty() && !options.connect_address.empty()) || (explicit_network_port && !network) ||
+        if ((explicit_match && options.host_world.empty()) ||
+            (!options.host_world.empty() && !options.connect_address.empty()) || (explicit_network_port && !network) ||
             (network && (explicit_world || options.demo || options.nightmares || !options.overlays.empty() ||
                          options.xr_world || options.xr_test || options.bench || options.menu_smoke ||
                          options.demo_smoke || options.view_world || options.inspect_world || options.start_game ||

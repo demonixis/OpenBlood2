@@ -600,6 +600,9 @@ namespace OpenBlood2::Net
                 event.value = std::move(v);
                 break;
             }
+            case 27:
+                event.value = LevelChanging{};
+                break;
             default:
                 return DecodePrivate::Malformed;
         }

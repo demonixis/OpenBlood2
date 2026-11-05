@@ -11,7 +11,8 @@ namespace OpenBlood2
     }
     bool NetworkAudio::begin(const Net::Joined& joined)
     {
-        if (!joined.world || !joined.player || !joined.object || !joined.object.generation || joined_.world)
+        if (!joined.world || !joined.player || !joined.object || !joined.object.generation ||
+            (joined_.world && joined.world <= joined_.world))
             return false;
         clear();
         joined_ = joined;

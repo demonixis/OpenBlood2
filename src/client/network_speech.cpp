@@ -5,10 +5,14 @@ namespace OpenBlood2
 {
     bool NetworkSpeech::begin(const Net::Joined& joined)
     {
-        if (!joined.world || !joined.player || !joined.object || !joined.object.generation || joined_.world)
+        if (!joined.world || !joined.player || !joined.object || !joined.object.generation ||
+            (joined_.world && joined.world <= joined_.world))
             return false;
         clear();
         joined_ = joined;
+        sequence_ = 0;
+        clock_ = time_ = 0;
+        announced_change_ = false;
         manager.Init(resources_);
         return true;
     }
@@ -16,6 +20,10 @@ namespace OpenBlood2
     {
         communication.Reset(*this);
         manager.Reset();
+        if (level_bell_)
+            audio_.stop_voice(level_bell_);
+        level_bell_ = 0;
+        level_sound_error.clear();
         notices_.clear();
         known_players_.clear();
     }
@@ -49,7 +57,22 @@ namespace OpenBlood2
             return true;
         if (!set_time(now, error))
             return false;
-        if (const auto* next = std::get_if<Net::PlayerRoster>(&event.value))
+        if (std::holds_alternative<Net::LevelChanging>(event.value))
+        {
+            if (!announced_change_)
+            {
+                announced_change_ = true;
+                ++level_changes;
+                notice(announcer.level_change_notice(resources_));
+                SoundParameters sound;
+                sound.resource = "sounds/events/bellding1.wav";
+                sound.space = SoundSpace::Local;
+                sound.priority = 1; // Original SOUNDPRIORITY_MISC_MEDIUM, no stream/loop.
+                sound.reverb_requested = false;
+                level_bell_ = audio_.play_voice(resources_, sound, level_sound_error);
+            }
+        }
+        else if (const auto* next = std::get_if<Net::PlayerRoster>(&event.value))
         {
             for (const auto& old : known_players_)
                 if (old.player != joined_.player && std::none_of(next->players.begin(), next->players.end(),
@@ -134,6 +157,15 @@ namespace OpenBlood2
         if (!joined_.world || !set_time(now, error))
             return false;
         std::erase_if(notices_, [&](const auto& notice) { return time_ >= notice.expires; });
+        if (level_bell_)
+        {
+            bool done = false;
+            if (!audio_.voice_done(level_bell_, done) || done)
+            {
+                audio_.stop_voice(level_bell_);
+                level_bell_ = 0;
+            }
+        }
         communication.Update(*this, manager);
         return true;
     }

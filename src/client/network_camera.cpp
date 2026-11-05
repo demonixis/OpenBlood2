@@ -30,6 +30,12 @@ namespace OpenBlood2
         }
         if (event.owner != owner_ || event.sequence <= sequence_)
             return Reception::Ignored;
+        if (std::holds_alternative<Net::LevelChanging>(event.value))
+        {
+            wonky_until_ = 0;
+            wonky_no_move_ = false;
+            camera_.third_person = true;
+        }
         if (const auto* state = std::get_if<Net::CameraState>(&event.value))
         {
             if (state_ && state->force_revision < state_->force_revision)

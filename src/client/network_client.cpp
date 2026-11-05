@@ -90,9 +90,12 @@ namespace OpenBlood2
         if (Net::is_audio_packet(event.bytes))
         {
             Net::AudioEvent message;
-            return phase_ == Phase::Active && event.channel == Net::Channel::Control &&
-                   Net::decode_audio(event.bytes, message) == Net::DecodeAudio::Ok &&
-                   audio_.receive(message, resources_, error);
+            if (event.channel != Net::Channel::Control ||
+                Net::decode_audio(event.bytes, message) != Net::DecodeAudio::Ok)
+                return false;
+            if (message.world < offer_.world)
+                return true;
+            return phase_ == Phase::Active && audio_.receive(message, resources_, error);
         }
         if (Net::is_weapon_frame_packet(event.bytes))
         {
@@ -146,8 +149,12 @@ namespace OpenBlood2
         if (Net::is_private_packet(event.bytes))
         {
             Net::PrivateEvent value;
-            if (phase_ != Phase::Active || event.channel != Net::Channel::Control ||
-                Net::decode_private(event.bytes, value) != Net::DecodePrivate::Ok || value.owner != joined_)
+            if (event.channel != Net::Channel::Control ||
+                Net::decode_private(event.bytes, value) != Net::DecodePrivate::Ok)
+                return false;
+            if (value.owner.world < offer_.world)
+                return true;
+            if (phase_ != Phase::Active || value.owner != joined_)
                 return false;
             const auto received = inbox_.receive(value, error);
             if (received == NetworkPlayerEvents::Reception::Refused)
@@ -157,6 +164,13 @@ namespace OpenBlood2
             if (camera_.receive(value, error) == NetworkCamera::Reception::Refused ||
                 weapons_.receive(value, models_, resources_, error) == NetworkWeapons::Reception::Refused)
                 return false;
+            if (std::holds_alternative<Net::LevelChanging>(value.value))
+            {
+                changing_level_ = true;
+                zoom_ = false;
+                zoom_crosshair_ = 0;
+                weapons_.cancel_firing();
+            }
             if (const auto* aim = std::get_if<PlayerRotation>(&value.value))
             {
                 pitch_ = aim->pitch;
@@ -175,7 +189,11 @@ namespace OpenBlood2
         if (Net::is_movement_packet(event.bytes))
         {
             Net::MovementMessage value;
-            if (phase_ != Phase::Active || Net::decode_movement(event.bytes, value) != Net::DecodeMovement::Ok)
+            if (Net::decode_movement(event.bytes, value) != Net::DecodeMovement::Ok)
+                return false;
+            if (std::visit([](const auto& v) { return v.owner.world; }, value) < offer_.world)
+                return true;
+            if (phase_ != Phase::Active)
                 return false;
             if (const auto* setup = std::get_if<Net::MovementSetup>(&value))
             {
@@ -202,7 +220,11 @@ namespace OpenBlood2
         if (event.channel == Net::Channel::State)
         {
             Net::WorldState value;
-            if (phase_ != Phase::Active || !Net::decode_world_state(event.bytes, value))
+            if (!Net::decode_world_state(event.bytes, value))
+                return false;
+            if (value.world < offer_.world)
+                return true;
+            if (phase_ != Phase::Active)
                 return false;
             const auto result = receiver_.receive(value, error);
             if (result == NetworkWorldReceiver::StateResult::Refused)
@@ -216,6 +238,11 @@ namespace OpenBlood2
         }
         if (event.channel == Net::Channel::Baseline)
         {
+            std::uint64_t world = 0;
+            if (!Net::world_chunk_epoch(event.bytes, world))
+                return false;
+            if (world < offer_.world)
+                return true;
             if ((phase_ != Phase::Baseline && phase_ != Phase::Active) || !baseline_)
                 return false;
             Net::WorldUpdate value;
@@ -242,7 +269,31 @@ namespace OpenBlood2
             return false;
         if (const auto* offer = std::get_if<Net::WorldOffer>(&value))
         {
-            if (phase_ != Phase::Offer || offer->mode != 1)
+            if ((phase_ != Phase::Offer && phase_ != Phase::Active && phase_ != Phase::Baseline) || offer->mode != 1 ||
+                offer->world <= offer_.world)
+                return false;
+            // End every old consumer before replacing geometry. Sound output and
+            // mounted content persist; no live voice/body/model crosses worlds.
+            speech_.clear();
+            audio_.clear();
+            models_.clear();
+            sprites_.clear();
+            initial_.reset();
+            setup_.reset();
+            impulses_.clear();
+            joined_ = {};
+            weapon_ack_.reset();
+            pending_commands_.clear();
+            command_sequence_ = command_acks = weapon_frames = 0;
+            changing_level_ = zoom_ = false;
+            zoom_crosshair_ = 0;
+            fov_x_ = original_fov_normal;
+            pitch_ = yaw_ = 0;
+            clock_ = {};
+            input_ = {};
+            mapped_time_ = 0;
+            origin_ = now;
+            if (!displayed_.begin(offer->world))
                 return false;
             std::vector<std::uint8_t> bytes;
             if (!resources_.read(offer->path, bytes, error) || !read_world(bytes, geometry_, error) ||
@@ -330,6 +381,7 @@ namespace OpenBlood2
                 break;
             impulses_.pop_front();
         }
+        commands = commands && !changing_level_;
         if (phase_ == Phase::Active && movement_.ready())
         {
             unsigned count = 0;
@@ -419,7 +471,8 @@ namespace OpenBlood2
     bool NetworkClient::command(const Net::CommandAction& action, std::string& error)
     {
         error.clear();
-        if (!ready() || pending_commands_.size() >= Net::command_queue_limit || command_sequence_ == UINT64_MAX)
+        if (!ready() || changing_level_ || pending_commands_.size() >= Net::command_queue_limit ||
+            command_sequence_ == UINT64_MAX)
         {
             error = "Player command unavailable or pending queue full";
             return false;
@@ -442,7 +495,7 @@ namespace OpenBlood2
         if (!std::isfinite(pitch_delta) || !std::isfinite(yaw_delta) || std::abs(pitch_delta) > 100 ||
             std::abs(yaw_delta) > 100)
             return false;
-        if (ready() && camera_.camera().look_allowed())
+        if (ready() && !changing_level_ && camera_.camera().look_allowed())
         {
             pitch_ = std::clamp(pitch_ + pitch_delta, -1.48f, 1.48f);
             yaw_ = std::remainder(yaw_ + yaw_delta, 6.283185307179586f);

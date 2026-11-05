@@ -66,6 +66,34 @@ Retail Single Player has the original Load and Save menus: eight slots, Quickloa
 start of the current level). After death, Use opens the Load menu. The demo has no saves; see the
 [save contract](contracts/save_load_contracts.md) and the [demo retry hook](contracts/demo_contracts.md).
 
+## Bloodbath hosting and direct connection
+
+The current [M9 implementation](implementation/reports/m9_rotation.md) supports
+retail Bloodbath through the command line; Host/Join/LAN screens remain pending.
+Use the same mounted content and protocol on all machines. Default port: UDP 27888.
+
+```sh
+./build/dev/blood2 --data-dir "/path/to/Blood II" --host multi/bb_crypt --name Caleb --end either --frag-limit 25 --time-limit 10 --map multi/bb_fields
+./build/dev/blood2 --data-dir "/path/to/Blood II" --connect 192.168.1.10:27888 --name Ophelia
+```
+
+The dedicated target/preset is described in the [server foundation](implementation/reports/m9_multiplayer.md):
+
+```sh
+./build/server/blood2-server --data-dir "/path/to/Blood II" --world multi/bb_crypt --mode bloodbath --end either --frag-limit 25 --time-limit 10 --map multi/bb_fields
+```
+
+`--end` accepts `frags`, `time`, `either` or `never`. Defaults are 25 frags with
+`frags` selected, plus 15 minutes for a host or 10 for the dedicated when a timed
+rule is selected. Zero is an immediate threshold; use `never` to disable limits.
+Repeat `--map` for a cyclic rotation of at most 50 maps including the initial
+map; one map reloads itself. An end notice/bell and scoreboard precede the change
+by more than 7.5 simulation seconds. Input is neutral during that interval.
+Connections/profiles persist, but scores and inventory restart on the next map.
+Esc/focus loss does not pause a hosted server; quitting its host ends the game.
+Use E to respawn after death. Internet direct connection requires a reachable UDP
+port; there is no relay or NAT traversal. Team/CTF admission remains pending.
+
 ## Controls
 
 | Action | Binding |

@@ -5,6 +5,8 @@
 
 namespace OpenBlood2::Net
 {
+    // Validate the bounded chunk envelope before ignoring a retired world.
+    bool world_chunk_epoch(std::span<const std::uint8_t>, std::uint64_t&);
     inline constexpr std::size_t world_snapshot_limit = 1024 * 1024;
     // Observable values only. No original object, decoded asset or GPU pointer.
     struct ObjectState

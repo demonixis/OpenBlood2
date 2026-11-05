@@ -21,6 +21,7 @@ namespace OpenBlood2
                   const Resources&, Conversation&);
         bool finish(const FinishHimVoice&, const Resources&, Conversation&);
         bool player_notice(std::string_view name, bool joined, const Resources&, std::string& out);
+        std::string level_change_notice(const Resources&);
         std::string error;
         std::uint64_t messages = 0, fallback_texts = 0;
 

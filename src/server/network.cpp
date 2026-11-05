@@ -2,6 +2,7 @@
 #include "game/game_settings.h"
 #include "net/world_state.h"
 #include <algorithm>
+#include <type_traits>
 
 namespace OpenBlood2
 {
@@ -75,7 +76,7 @@ namespace OpenBlood2
         if (Net::is_weapon_frame_packet(event.bytes))
         {
             auto& peer = peers_[index];
-            if (peer.phase != Phase::Joined || event.channel != Net::Channel::Control)
+            if (event.channel != Net::Channel::Control)
                 return reject(Net::Reject::Order);
             Net::WeaponFrameMessage message;
             const auto decoded = Net::decode_weapon_frame(event.bytes, message);
@@ -84,6 +85,12 @@ namespace OpenBlood2
                                                                           : Net::Reject::Malformed);
             const auto* frame = std::get_if<Net::WeaponFrame>(&message);
             if (!frame)
+                return reject(Net::Reject::Order);
+            if (peer.phase == Phase::Hello)
+                return reject(Net::Reject::Order);
+            if (frame->owner.world < session_.world_id())
+                return true;
+            if (peer.phase != Phase::Joined)
                 return reject(Net::Reject::Order);
             const auto result = session_.queue_weapon_frame(peer.player, *frame);
             if (result == ServerSession::CommandResult::Invalid)
@@ -95,7 +102,7 @@ namespace OpenBlood2
         if (Net::is_command_packet(event.bytes))
         {
             auto& peer = peers_[index];
-            if (peer.phase != Phase::Joined || event.channel != Net::Channel::Control)
+            if (event.channel != Net::Channel::Control)
                 return reject(Net::Reject::Order);
             Net::CommandMessage message;
             const auto decoded = Net::decode_command(event.bytes, message);
@@ -103,6 +110,12 @@ namespace OpenBlood2
                 return reject(decoded == Net::DecodeCommand::Protocol ? Net::Reject::Protocol : Net::Reject::Malformed);
             const auto* command = std::get_if<Net::PlayerCommand>(&message);
             if (!command)
+                return reject(Net::Reject::Order);
+            if (peer.phase == Phase::Hello)
+                return reject(Net::Reject::Order);
+            if (command->owner.world < session_.world_id())
+                return true;
+            if (peer.phase != Phase::Joined)
                 return reject(Net::Reject::Order);
             const auto result = session_.queue_command(peer.player, *command);
             if (result == ServerSession::CommandResult::Invalid)
@@ -114,7 +127,7 @@ namespace OpenBlood2
         if (Net::is_movement_packet(event.bytes))
         {
             auto& peer = peers_[index];
-            if (peer.phase != Phase::Joined || event.channel != Net::Channel::State)
+            if (event.channel != Net::Channel::State)
                 return reject(Net::Reject::Order);
             Net::MovementMessage value;
             const auto decoded = Net::decode_movement(event.bytes, value);
@@ -123,6 +136,12 @@ namespace OpenBlood2
                                                                        : Net::Reject::Malformed);
             const auto* report = std::get_if<Net::MovementReport>(&value);
             if (!report)
+                return reject(Net::Reject::Order);
+            if (peer.phase == Phase::Hello)
+                return reject(Net::Reject::Order);
+            if (report->owner.world < session_.world_id())
+                return true;
+            if (peer.phase != Phase::Joined)
                 return reject(Net::Reject::Order);
             const auto result = session_.queue_movement(peer.player, *report);
             if (result == ServerSession::MoveResult::Invalid)
@@ -138,6 +157,18 @@ namespace OpenBlood2
         if (decoded != Net::DecodeAdmission::Ok)
             return reject(decoded == Net::DecodeAdmission::Protocol ? Net::Reject::Protocol : Net::Reject::Malformed);
         auto& peer = peers_[index];
+        const bool retired = std::visit(
+            [&](const auto& value)
+            {
+                using T = std::decay_t<decltype(value)>;
+                if constexpr (std::is_same_v<T, Net::Ready> || std::is_same_v<T, Net::BaselineReady> ||
+                              std::is_same_v<T, Net::Heartbeat>)
+                    return value.world < session_.world_id();
+                return false;
+            },
+            message);
+        if (retired && peer.phase != Phase::Hello)
+            return true;
         if (peer.phase == Phase::Hello)
         {
             const auto* hello = std::get_if<Net::Hello>(&message);
@@ -166,6 +197,9 @@ namespace OpenBlood2
                 return reject(Net::Reject::World);
             if (session_.player_count() >= capacity_)
                 return reject(Net::Reject::Capacity);
+            if (peer.profile && ready->profile != *peer.profile)
+                return reject(Net::Reject::Player);
+            peer.profile = ready->profile;
             Net::Joined joined;
             if (!session_.join(ready->profile, joined, error))
                 return reject(Net::Reject::Player);
@@ -224,6 +258,39 @@ namespace OpenBlood2
         }
         last_time_ = now;
         clock_started_ = true;
+        if (session_.rotation_due())
+        {
+            if (!session_.rotate(error))
+                return false;
+            for (std::size_t i = 0; i < peers_.size();)
+            {
+                auto& peer = peers_[i];
+                if (peer.phase == Phase::Hello)
+                {
+                    ++i;
+                    continue;
+                }
+                if (peer.player)
+                    ++departed;
+                const auto id = peer.peer;
+                auto profile = std::move(peer.profile);
+                peer = {};
+                peer.peer = id;
+                peer.profile = std::move(profile);
+                peer.phase = Phase::Loading;
+                peer.deadline = now + 30s;
+                if (!send(id,
+                          Net::WorldOffer{session_.world_id(), std::uint8_t(session_.mode()), std::uint8_t(capacity_),
+                                          session_.game().world_path},
+                          error))
+                {
+                    if (!remove(i, std::uint32_t(Net::Reject::Capacity), true, error))
+                        return false;
+                    continue;
+                }
+                ++i;
+            }
+        }
         // Simulation work is owned by the caller. A flood cannot turn one pump
         // into an unbounded receive loop or grow this registry beyond capacity.
         for (unsigned work = 0; work < 64; ++work)
@@ -241,7 +308,12 @@ namespace OpenBlood2
                 if (found != peers_.end() || peers_.size() >= capacity_)
                     transport_.disconnect(event.peer, std::uint32_t(Net::Reject::Capacity));
                 else
-                    peers_.push_back({event.peer, Phase::Hello, 0, now + 5s, {}, {}, 0});
+                {
+                    Peer peer;
+                    peer.peer = event.peer;
+                    peer.deadline = now + 5s;
+                    peers_.push_back(std::move(peer));
+                }
             }
             else if (found != peers_.end())
             {

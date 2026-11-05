@@ -42,6 +42,7 @@ namespace OpenBlood2
             Net::PeerId peer = 0;
             Phase phase = Phase::Hello;
             std::uint64_t player = 0;
+            std::optional<Net::JoinProfile> profile;
             Clock::time_point deadline, heartbeat;
             Net::WorldSnapshot previous;
             std::uint64_t publish_at = 0;

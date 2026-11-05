@@ -137,7 +137,7 @@ namespace OpenBlood2
         }
         p.weapon_time += ServerClock::step;
         WeaponInput input{frame.primary, !frame.primary && frame.alternate, false, true};
-        if (!state.input_enabled)
+        if (!state.input_enabled || changing_level())
             input.primary = input.alternate = false;
         if (state.weapons[0] && state.weapons[1] && input.alternate)
         {
@@ -156,10 +156,10 @@ namespace OpenBlood2
                 auto* owner = game_.server_shell.Player(p.client);
                 const auto* object = game_.objects.get(p.object);
                 const auto* weapon = owner ? owner->m_InventoryMgr.CurrentWeapon(hand != 0) : nullptr;
-                if (!owner || !object || object->life != Life::Alive || owner->m_hObject != object->handle ||
-                    frame.owner != p.setup.owner || p.source_revision != owner->movement_revision ||
-                    p.pose_revision != object->pose_revision || !p.weapons ||
-                    p.weapons->view_revision[hand] != state.view_revision[hand] ||
+                if (changing_level() || !owner || !object || object->life != Life::Alive ||
+                    owner->m_hObject != object->handle || frame.owner != p.setup.owner ||
+                    p.source_revision != owner->movement_revision || p.pose_revision != object->pose_revision ||
+                    !p.weapons || p.weapons->view_revision[hand] != state.view_revision[hand] ||
                     owner->m_nCharacter != state.character || !weapon || weapon->data.m_nType != predicted.weapon ||
                     owner->m_bDead || owner->m_damage.IsDead() || !owner->attributes_received ||
                     owner->MovementBlocked() || owner->camera_movement_blocked ||
@@ -199,8 +199,8 @@ namespace OpenBlood2
                 // Keys come only from the issued ABC timeline. Sounds attach to
                 // the current body: a position correction does not change their
                 // life/view or invalidate its delayed STOP. A death boundary does.
-                if (!owner || !object || object->life != Life::Alive || owner->m_hObject != object->handle ||
-                    frame.state < p.weapon_sound_life_sequence || !p.weapons ||
+                if (changing_level() || !owner || !object || object->life != Life::Alive ||
+                    owner->m_hObject != object->handle || frame.state < p.weapon_sound_life_sequence || !p.weapons ||
                     p.weapons->view_revision[hand] != state.view_revision[hand] ||
                     owner->m_nCharacter != state.character || !weapon || weapon->data.m_nType != type ||
                     owner->m_bDead || !owner->attributes_received)

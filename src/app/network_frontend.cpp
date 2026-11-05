@@ -46,7 +46,7 @@ namespace OpenBlood2
         if (!options.host_world.empty())
         {
             server = std::make_unique<ServerSession>();
-            if (!server->start(config, options.host_world, GAMETYPE_BLOODBATH, error))
+            if (!server->start(config, options.host_world, GAMETYPE_BLOODBATH, error, options.network_rules))
                 return failed();
             network = std::make_unique<ServerNetwork>(*server);
             if (!network->listen("0.0.0.0", options.network_port, unsigned(Net::max_players), error))
@@ -111,7 +111,8 @@ namespace OpenBlood2
         client.audio().mixer.output_lead = AudioMixer::interactive_output_lead;
         ServerClock server_clock;
         auto previous = NetworkClient::Clock::now();
-        bool menu = false, leaving = false, entered = false, captured = false;
+        bool menu = false, leaving = false, captured = false;
+        std::uint64_t entered_world = 0;
         unsigned frames = 0;
         ClientEffects effects;
         std::vector<Net::PrivateEvent> events;
@@ -135,7 +136,8 @@ namespace OpenBlood2
             {
                 ImGui_ImplSDL3_ProcessEvent(&event);
                 devices.event(event);
-                scores.event(event, window, client.ready() && controls.focused && !menu && !leaving);
+                scores.event(event, window,
+                             client.ready() && !client.changing_level() && controls.focused && !menu && !leaving);
                 if (event.type == SDL_EVENT_QUIT ||
                     (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == window))
                     if (!leave())
@@ -181,14 +183,14 @@ namespace OpenBlood2
             controls.look(aim, seconds, menu, client.zoomed());
             if (!client.look(aim.pitch - client.pitch(), aim.yaw - client.yaw()))
                 return failed();
-            actions.sample(controls, menu || leaving || !client.ready(), {client.pitch(), client.yaw()},
-                           sampled_actions);
+            actions.sample(controls, menu || leaving || !client.ready() || client.changing_level(),
+                           {client.pitch(), client.yaw()}, sampled_actions);
             for (const auto& action : sampled_actions)
                 if (!client.command(action, error))
                     spdlog::info("Player command: {}", error);
             // Preserve reliable Control order: selection/use precede this frame's
             // weapon timeline. Existing bindings suppress held fire across menus/focus.
-            const auto fire = controls.sample_fire(menu || leaving || !client.ready());
+            const auto fire = controls.sample_fire(menu || leaving || !client.ready() || client.changing_level());
             if (!client.update(now, input, controls.enabled && controls.focused, error, {fire.primary, fire.alternate}))
             {
                 if (server)
@@ -205,14 +207,17 @@ namespace OpenBlood2
             // HUD/camera and logical sound events are applied by the endpoint.
             // Speech consumes original combat announcements; music and effects remain separate.
             client.take_events(events);
-            for (const auto& applied : events)
-                scores.receive(applied);
-            if (client.ready() && !entered)
+            if (client.ready() && entered_world != client.joined().world)
             {
-                entered = true;
+                entered_world = client.joined().world;
+                scores = {};
                 controls.request_play();
                 spdlog::info("Network world ready: {}, player {}", client.offer().path, client.joined().player);
             }
+            for (const auto& applied : events)
+                scores.receive(applied);
+            if (client.changing_level())
+                scores.visible = true;
             if (!controls.sync_mouse(runtime.window, client.ready(), menu || leaving, error))
                 return failed();
             if (client.phase() == NetworkClient::Phase::Closed)
@@ -371,8 +376,9 @@ namespace OpenBlood2
                      client.reports, client.state_packets, client.discarded_ticks, client.reason());
         spdlog::info("Player commands: acknowledged={}, applied={}", client.command_acks, client.commands_applied);
         if (server)
-            spdlog::info("Host stopped: ticks={}, discarded_ticks={}, admitted={}, departed={}", server->ticks(),
-                         server_clock.discarded_ticks(), network->admitted, network->departed);
+            spdlog::info("Host stopped: ticks={}, discarded_ticks={}, admitted={}, departed={}, rotations={}",
+                         server->total_ticks(), server_clock.discarded_ticks(), network->admitted, network->departed,
+                         server->rotations);
         return 0;
     }
 } // namespace OpenBlood2

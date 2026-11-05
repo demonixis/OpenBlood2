@@ -1377,3 +1377,42 @@ original English fallback with a diagnostic. Notices share the existing four-lin
 five-second MessageMgr-style queue with frag text. Duplicate rosters create no
 extra notices or sound. Preserve client speech clocks, logical server audio,
 CMoveMgr single integration and all solo behavior.
+
+
+## Bloodbath match limits and map rotation
+
+The [rotation continuation](../implementation/reports/m9_rotation.md) adds
+protocol-16 LevelChanging, shared match settings and same-peer map replacement.
+Preserve original time-first `>=` thresholds, Either as OR, Never, and zero as an
+immediate threshold. Defaults remain Frags/25, host 15 minutes versus dedicated
+10 minutes. Use 64-bit 60 Hz ticks and at most 50 ordered maps, including the
+initial map. Bound frag limits to the current 1,000,000 score range. Host-only
+CLI flags cannot affect solo or a connecting client's server rules.
+
+Latch once before object updates, keep scores during the wait and rotate only
+when elapsed ticks exceed 450. Winner departure cannot cancel/restart it. Zero
+clients must not stop the timer or simulation. Commit only between callbacks;
+clear old players under their owning adapter, stop old voices and reload through
+the existing fresh-world path. Validate map syntax/existence at startup and
+actual initialization at load. A failed next load terminates the session; never
+resume a partial world. Keep one server and one GameSession owner per process.
+
+Retain ENet peer/profile, but retire all public player/object/world identities,
+commands, impulses, weapon history, audio/private sequences and baseline state.
+A new WorldOffer requires Ready with the same profile and a new baseline ACK.
+Fresh players start with original equipment and zero frags. No multiplayer save
+or inventory carryover is implied. Keep all existing phase deadlines/bounds;
+retired valid packets must not refresh a server peer's deadline. Hello traffic
+still requires admission. Validate bounded old baseline envelopes without
+allocating/reassembling them. Control remains reliable and ordered; independent
+State/Baseline traffic cannot contaminate a newer world.
+
+Apply the original end notice, local nonstreaming bell, third person, scoreboard
+reveal, zoom/inventory reset and weapon cancellation. CancelFiringState's source
+SOUNDSTOP must end the retained authoritative loop exactly once. Neutralize client
+look; gate commands and new shots independently on client and server while passive
+movement and existing simulation continue. Keep CMoveMgr's one integration and
+reporting clock. Preserve client output ownership, clear old voices before replacing
+geometry, reset presentation clocks and rebuild the existing GPU world only
+through its checked epoch boundary. Solo, renderer/PBR references and logical
+server audio clocks are unchanged. Team/CTF team limits remain a separate lot.

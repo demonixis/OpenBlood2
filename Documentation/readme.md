@@ -31,6 +31,7 @@
 | [Independent client speech](implementation/reports/m9_client_speech.md) | Original VoiceMgr/CommLink services, actual private playback and shared bounded audio. |
 | [Validated weapon sounds](implementation/reports/m9_weapon_sounds.md) | Original animation one-shots/loops/stops, life checks and independent remote playback. |
 | [Reliable player roster](implementation/reports/m9_roster.md) | Independent names/characters/frags, late arrivals, departure and reconnect identity. |
+| [Bloodbath limits and map rotation](implementation/reports/m9_rotation.md) | Original frag/time/intermission rules, same-peer world replacement and dedicated/host process checks. |
 | [Bloodbath scoreboard and player notices](implementation/reports/m9_scoreboard.md) | Original score ordering/art, Tab/gamepad toggle, death/revival visibility and localized arrival/departure text. |
 | [Network audio cache](implementation/reports/m9_audio_cache.md) | Reclaim unused client clips within fixed budgets while keeping live voices and logical server audio intact. |
 | [Combat announcements](implementation/reports/m9_combat_announcer.md) | Original frag/suicide/FinishHim tables, private voice playback and bounded observer notices. |

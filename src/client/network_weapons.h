@@ -13,6 +13,11 @@ namespace OpenBlood2
             Refused
         };
         bool begin(const Net::Joined&);
+        void cancel_firing()
+        {
+            for (auto& view : views_)
+                view.CancelFiringState();
+        }
         Reception receive(const Net::PrivateEvent&, ModelStore&, Resources&, std::string& error);
         // One client simulation tick, never a renderer update or movement replay.
         // Inputs predict animation only; NetworkClient sends the corresponding frame.

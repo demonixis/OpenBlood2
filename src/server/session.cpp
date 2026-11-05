@@ -16,33 +16,65 @@ namespace OpenBlood2
         game_.server.remote_event_sink = {};
         game_.server.remote_audio_sink = {};
     }
-    bool ServerSession::start(const Config& config, std::string_view name, unsigned mode, std::string& error)
+    bool ServerSession::start(const Config& config, std::string_view name, unsigned mode, std::string& error,
+                              const MultiplayerRules& rules)
     {
         error.clear();
-        if (started_ || !network_game_type(mode) || config.demo || config.nightmares || !config.overlays.empty())
+        if (started_ || !network_game_type(mode) || !rules.valid() || config.demo || config.nightmares ||
+            !config.overlays.empty())
         {
-            error = "Dedicated startup requires a fresh retail multiplayer session without mods";
+            error = "Dedicated startup requires a fresh retail multiplayer session with valid rules and no mods";
             return false;
         }
-        WorldRequest request;
-        request.game_type = DBYTE(mode);
-        if (!world_resource_path(name, false, request.filename) || !request.filename.starts_with("worlds/multi/") ||
-            (mode == GAMETYPE_CTF ? !request.filename.starts_with("worlds/multi/ctf_")
-                                  : !request.filename.starts_with("worlds/multi/bb_")))
+        rotation_.clear();
+        const auto append = [&](std::string_view map)
+        {
+            std::string path;
+            if (!world_resource_path(map, false, path) ||
+                !path.starts_with(mode == GAMETYPE_CTF ? "worlds/multi/ctf_" : "worlds/multi/bb_"))
+                return false;
+            rotation_.push_back(std::move(path));
+            return true;
+        };
+        if (!append(name))
         {
             error = "Select a retail worlds/multi/bb_ map (Bloodbath/Team) or ctf_ map (CTF)";
             return false;
         }
+        for (const auto& map : rules.following_maps)
+            if (!append(map))
+            {
+                error = "Invalid multiplayer rotation map: " + map;
+                return false;
+            }
         if (!game_.initialize())
         {
             error = "Cannot bind original server objects";
             return false;
         }
-        // No local presentation receiver in a dedicated process. Immediate effect
-        // creation can request impact sounds before the client-only update phase.
         game_.server.client_audio = nullptr;
         if (!game_.resources.mount_game(config, error) ||
-            !Net::content_fingerprint(game_.resources, fingerprint_, error) || !game_.load_request(request, error))
+            !Net::content_fingerprint(game_.resources, fingerprint_, error))
+            return false;
+        for (const auto& path : rotation_)
+            if (!game_.resources.find(path))
+            {
+                error = "Missing multiplayer rotation map: " + path;
+                return false;
+            }
+        mode_ = mode;
+        rules_ = rules;
+        if (!load_map(0, error))
+            return false;
+        started_ = true;
+        return true;
+    }
+    bool ServerSession::load_map(std::size_t index, std::string& error)
+    {
+        WorldRequest request;
+        request.game_type = DBYTE(mode_);
+        request.filename = rotation_[index];
+        if (!game_.load_request(request, error))
             return false;
         WorldValidation report;
         if (!check_world_initialization(game_, report, error))
@@ -57,20 +89,70 @@ namespace OpenBlood2
         while (next && !next_world.compare_exchange_weak(next, next + 1, std::memory_order_relaxed))
         {
         }
-        world_id_ = next;
-        if (!world_id_)
+        if (!next)
         {
             error = "Server world identity exhausted";
             return false;
         }
-        mode_ = mode;
+        world_id_ = next;
+        map_index_ = index;
+        ticks_ = 0;
+        next_snapshot_ = 1;
+        ending_tick_.reset();
+        audio_sources_.clear();
         game_.server.remote_event_sink = [this](HCLIENT client, const PlayerEvent& event)
         { return capture_event(client, event); };
         game_.server.remote_audio_sink = [this](const AudioVoice& voice, bool start) { capture_audio(voice, start); };
         for (const auto& [id, voice] : game_.server.audio.voices())
             capture_audio(voice, true);
-        started_ = true;
         return true;
+    }
+    bool ServerSession::rotate(std::string& error)
+    {
+        error.clear();
+        if (!started_ || !rotation_due() || game_.objects.busy())
+        {
+            error = "Map rotation requires an expired match at a simulation boundary";
+            return false;
+        }
+        // Leave through original cleanup while the old world exists. No player,
+        // sound handle or queued private event survives the epoch replacement.
+        if (!clear_players())
+        {
+            error = "Cannot clear old multiplayer players";
+            return false;
+        }
+        game_.server.remote_event_sink = {};
+        game_.server.remote_audio_sink = {};
+        started_ = false; // A failed load cannot resume a partially destroyed world.
+        if (!load_map((map_index_ + 1) % rotation_.size(), error))
+            return false;
+        started_ = true;
+        ++rotations;
+        return true;
+    }
+    void ServerSession::update_match()
+    {
+        if (ending_tick_ || mode_ != GAMETYPE_BLOODBATH)
+            return; // Original team-score evaluation is connected with Team/CTF.
+        std::array<int, Net::max_players> scores{};
+        std::size_t count = 0;
+        for (const auto& p : players_)
+            if (const auto* player = game_.server_shell.Player(p.client))
+                scores[count++] = player->m_Frags;
+        if (!match_limit_reached(rules_, ticks_, std::span(scores).first(count)))
+            return;
+        ending_tick_ = ticks_;
+        for (auto& p : players_)
+        {
+            for (auto& view : p.weapon_timeline)
+                view.CancelFiringState();
+            // Original CancelFiringState sends SOUNDSTOP for the retained loop.
+            if (auto* player = game_.server_shell.Player(p.client))
+                player->StopWeaponSound();
+            if (queue_private(p, p.object, Net::LevelChanging{}) != DE_OK)
+                p.roster_failed = true; // Existing bounded-recipient disconnect path.
+        }
     }
     bool ServerSession::join(const Net::JoinProfile& profile, Net::Joined& joined, std::string& error)
     {
@@ -127,6 +209,12 @@ namespace OpenBlood2
         if (players_.back().roster_failed)
         {
             error = "Cannot publish admitted player roster";
+            leave(connection);
+            return false;
+        }
+        if (changing_level() && queue_private(players_.back(), id, Net::LevelChanging{}) != DE_OK)
+        {
+            error = "Cannot publish current match transition";
             leave(connection);
             return false;
         }
@@ -189,6 +277,7 @@ namespace OpenBlood2
             error = "Server world is not started";
             return false;
         }
+        update_match(); // Original server-shell decision precedes this tick's object updates.
         if (!game_.step_server(ServerClock::step, [&](double seconds)
                                { return advance_players(seconds, error) && apply_controls(error); }))
         {
@@ -209,6 +298,7 @@ namespace OpenBlood2
                                         ai->runtime_error);
                 }
         ++ticks_;
+        ++total_ticks_;
         return true;
     }
 } // namespace OpenBlood2

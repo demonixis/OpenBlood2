@@ -26,6 +26,7 @@ int main(int argc, char** argv)
 {
     using namespace OpenBlood2;
     Options options;
+    MultiplayerRules rules; // Original dedicated default: 10 minutes, frags mode.
     std::string world = "multi/bb_bloodarena", address = "0.0.0.0";
     unsigned mode = GAMETYPE_BLOODBATH, port = Net::default_port, capacity = unsigned(Net::max_players), limit = 0;
     for (int i = 1; i < argc; ++i)
@@ -37,6 +38,10 @@ int main(int argc, char** argv)
                       << "  --data-dir PATH  External retail installation (or BLOOD2_DATA_DIR)\n"
                       << "  --world NAME     Retail multi/bb_* or multi/ctf_* map\n"
                       << "  --mode MODE      bloodbath, team, ctf\n"
+                      << "  --end RULE       frags (default), time, either, never\n"
+                      << "  --frag-limit N   Original default 25; zero ends when a player is present\n"
+                      << "  --time-limit N   Minutes (dedicated default 10); zero is immediate\n"
+                      << "  --map NAME       Append to rotation, up to 50 maps including --world\n"
                       << "  --bind ADDRESS   IPv4 bind address (default 0.0.0.0)\n"
                       << "  --port N         UDP port (default 27888; 0 selects an ephemeral port)\n"
                       << "  --max-players N  1..16 (default 16)\n"
@@ -62,6 +67,8 @@ int main(int argc, char** argv)
             valid = number(value, capacity) && capacity && capacity <= Net::max_players;
         else if (arg == "--ticks")
             valid = number(value, limit);
+        else if (arg == "--end" || arg == "--frag-limit" || arg == "--time-limit" || arg == "--map")
+            valid = parse_match_option(arg, value, rules);
         else if (arg == "--mode")
         {
             if (value == "bloodbath")
@@ -90,7 +97,7 @@ int main(int argc, char** argv)
         return 2;
     }
     ServerSession session;
-    if (!session.start(config, world, mode, error))
+    if (!session.start(config, world, mode, error, rules))
     {
         std::cerr << error << '\n';
         return 5;
@@ -143,6 +150,6 @@ int main(int argc, char** argv)
               << ", membership_updates=" << network.membership_updates << ", state_updates=" << network.state_updates
               << ", state_drops=" << network.state_drops << ", state_bytes=" << network.state_bytes
               << ", commands_applied=" << session.commands_applied << ", commands_blocked=" << session.commands_blocked
-              << ", commands_ignored=" << session.commands_ignored << '\n';
+              << ", commands_ignored=" << session.commands_ignored << ", rotations=" << session.rotations << '\n';
     return 0;
 }

@@ -1,0 +1,117 @@
+{
+  "scope": "Original Bloodbath limits/intermission and retained-peer cyclic map rotation",
+  "baseline": "0a169bcd245ab6c7ecd64678a49c3183657c5a6b",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "0a169bcd245ab6c7ecd64678a49c3183657c5a6b",
+      "path": "src/server/session.cpp",
+      "sha256": "e4e6787729eebf4dc8283211b1c242e252bcdd8a4ea3989f489321e7924069e6"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "0a169bcd245ab6c7ecd64678a49c3183657c5a6b",
+      "path": "src/server/network.cpp",
+      "sha256": "03998079a8829a661bb845a554cd939a435feaff09e1ef39545646656765c72b"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "0a169bcd245ab6c7ecd64678a49c3183657c5a6b",
+      "path": "src/client/network_client.cpp",
+      "sha256": "fa273b03a8f0f122637e627d6ff531880504aadec62e4440eea8489b0451fde4"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "0a169bcd245ab6c7ecd64678a49c3183657c5a6b",
+      "path": "src/client/network_audio.cpp",
+      "sha256": "daca4a84377b2b76771ad8ee422e296813e759faff8e178f87132b10544cea6a"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "0a169bcd245ab6c7ecd64678a49c3183657c5a6b",
+      "path": "src/client/network_speech.cpp",
+      "sha256": "11bc46d22aef6ec436318a2d32d3ef238ed8a866902f0aaaabccb691c4865011"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "0a169bcd245ab6c7ecd64678a49c3183657c5a6b",
+      "path": "src/app/scene_presenter.cpp",
+      "sha256": "cf8b7c0ae90099f0bcc68736338c672343a6a0c7f8a44394400e9f0cc75c60e1"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "0a169bcd245ab6c7ecd64678a49c3183657c5a6b",
+      "path": "src/game/session.cpp",
+      "sha256": "a9efd8a48a987ed922b114d2ba0a322cd7606c5ca6dddd0e956d2d3b619beac4"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "0a169bcd245ab6c7ecd64678a49c3183657c5a6b",
+      "path": "src/game/original/PlayerWeaponSound.cpp",
+      "sha256": "5e2ea0d86abcd38cac43f20c5cf1b4a2318745ab518a303dff7c0b6419e65921"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/BloodServerShell.cpp",
+      "sha256": "034bdbf62dec6db28b1c8938fb4c87fd46dd2faa8d79dae9181d8f0dce596aed"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ViewWeapon.cpp",
+      "sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/NetStart.cpp",
+      "sha256": "320bd6f451fc7d08f93c294899af379756fa8432d439731b63c65124057dacbf"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Blood2Serv/NetStart.cpp",
+      "sha256": "c810d9ca3ac26a3f4e8629ffe75ddf1cb5e6a8afd776d367d4308bc05dbb7393"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Shared/NetDefs.h",
+      "sha256": "5e48903116b62be6d306b43400d8b663dd28e33162746a703b10d6322263fdf4"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Shared/SoundTypes.h",
+      "sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Shared/ClientRes.h",
+      "sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientRes/ClientRes.rc",
+      "sha256": "cc635e26e01b93e83e6202a336e7dda6af70bf681dbe731eedd82b450bcedfbd"
+    }
+  ],
+  "adaptations": [
+    "Fixed 60 Hz match time and strict elapsed >450 ticks; rotation commits outside object callbacks.",
+    "Shared bounded CLI and 50-map cycle; original Frags/25 default with host 15 versus dedicated 10 minutes. Frag limit capped at current wire score bound.",
+    "One ServerSession/GameSession; original player cleanup and fresh-world initialization; failed destination terminates instead of resuming partial state.",
+    "Protocol 16 LevelChanging; ENet peer/profile retained while public player aliases and world/object identities restart. Ready/baseline admission repeats.",
+    "Source end notice/bell, scores/third person/zoom/items reset, neutral input and CancelFiringState SOUNDSTOP; independent authoritative action gating.",
+    "Owned client geometry/replica/audio/clock reset, retired cross-channel packet filtering, no GPU or pointers on wire.",
+    "Existing solo, source RNG/logical audio, CMoveMgr integration and PBR remain unchanged; Team/CTF admission remains pending."
+  ]
+}

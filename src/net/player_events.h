@@ -73,11 +73,14 @@ namespace OpenBlood2::Net
     };
     // Stable tags are these alternatives plus one. Append only with a protocol
     // revision. Init/physics/force messages are handled by admission/movement.
+    struct LevelChanging
+    {
+    }; // Original SMSG_MP_CHANGING_LEVELS; one reliable event per map.
     using PrivateValue =
         std::variant<BloodbathStart, PlayerRotation, PlayerStats, MissionObjectives, WorldExit, BossHealth,
                      Conversation, InventoryAction, ScreenFade, VoiceEvent, VoiceStop, PlayerDead, MusicCommand,
                      ZoomView, EyeEvent, AttachEvent, OrbEvent, FlagEvent, InventoryItems, PlayerText, CameraState,
-                     WeaponLoadout, WonkyVision, FinishHimVoice, FragEvent, PlayerRoster>;
+                     WeaponLoadout, WonkyVision, FinishHimVoice, FragEvent, PlayerRoster, LevelChanging>;
     struct PrivateEvent
     {
         Joined owner;

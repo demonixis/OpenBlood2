@@ -63,7 +63,8 @@ namespace
             WonkyVision{15, true},
             FinishHimVoice{65535, 3, 0},
             FragEvent{{2, 3}, {4, 5}, -7, 65535},
-            PlayerRoster{{{8, {9, 10}, "Caleb %s", 0, -7}, {15, {12, 13}, "Ophelia", 2, 10}}}};
+            PlayerRoster{{{8, {9, 10}, "Caleb %s", 0, -7}, {15, {12, 13}, "Ophelia", 2, 10}}},
+            LevelChanging{}};
         CHECK(values.size() == std::variant_size_v<PrivateValue>);
         std::mt19937 random(0xB2E7);
         for (std::size_t index = 0; index < values.size(); ++index)
@@ -71,7 +72,7 @@ namespace
             PrivateEvent value{{7, 8, {9, 10}}, 11, 12, values[index]};
             std::vector<std::uint8_t> bytes, again;
             CHECK(encode_private(value, bytes) && is_private_packet(bytes) && bytes.size() <= private_packet_limit);
-            const std::vector<std::uint8_t> header{0x42, 0x32, 0x50, 0x45, 15, 0, std::uint8_t(index + 1)};
+            const std::vector<std::uint8_t> header{0x42, 0x32, 0x50, 0x45, 16, 0, std::uint8_t(index + 1)};
             CHECK(std::equal(header.begin(), header.end(), bytes.begin()));
             PrivateEvent decoded;
             CHECK(decode_private(bytes, decoded) == DecodePrivate::Ok && encode_private(decoded, again) &&
@@ -284,6 +285,6 @@ int main()
 {
     if (!codec() || !receiver() || !roster())
         return 1;
-    std::cout << "26 private event tags: canonical LE bytes, every truncation, 39000 mutations, addressed HUD/inbox "
+    std::cout << "27 private event tags: canonical LE bytes, every truncation, 40500 mutations, addressed HUD/inbox "
                  "bounds; atomic 16-player/2016-byte roster, scores, stale identity and generations passed\n";
 }
