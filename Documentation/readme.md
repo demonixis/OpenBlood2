@@ -31,6 +31,7 @@
 | [Independent client speech](implementation/reports/m9_client_speech.md) | Original VoiceMgr/CommLink services, actual private playback and shared bounded audio. |
 | [Validated weapon sounds](implementation/reports/m9_weapon_sounds.md) | Original animation one-shots/loops/stops, life checks and independent remote playback. |
 | [Reliable player roster](implementation/reports/m9_roster.md) | Independent names/characters/frags, late arrivals, departure and reconnect identity. |
+| [Network audio cache](implementation/reports/m9_audio_cache.md) | Reclaim unused client clips within fixed budgets while keeping live voices and logical server audio intact. |
 | [Combat announcements](implementation/reports/m9_combat_announcer.md) | Original frag/suicide/FinishHim tables, private voice playback and bounded observer notices. |
 | [Connection clock](implementation/reports/m9_connection_clock.md) | Exclude synchronous content preparation from the strict connection deadline. |
 | [Independent scene inputs](implementation/reports/m9_scene_inputs.md) | Server-free renderer inputs, original weapon visuals and world-owned GPU presentation. |

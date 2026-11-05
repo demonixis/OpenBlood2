@@ -115,3 +115,10 @@ metadata. The server reads no PCM windows during clock-only advancement. Interac
 queue lead affects only the client; original server completion no longer follows
 device refill lead. Existing stream bounds, failures and resource immutability
 requirements continue to apply independently to both sides.
+
+
+The later [network cache correction](multiplayer_contracts.md#bounded-network-audio-cache-reclamation)
+opts only independent NetworkAudio playback into budget-triggered reclamation of
+cache-only clips/readers. Live or externally retained assets remain pinned; solo
+and logical server caches retain the policy above. Cache count/byte bounds,
+stream window sizes, cursor math and completion clocks do not change.

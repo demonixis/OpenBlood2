@@ -1300,3 +1300,33 @@ Windows Arial surface font; raster parity is not claimed. Clear notices and
 retained audio with the endpoint. Existing solo CommLink clocks/behavior and
 local message editing stay unchanged. Communication portrait/text rendering,
 join/leave notices, chat and scoreboard remain separate UI work.
+
+
+## Bounded network audio cache reclamation
+
+The [client cache correction](../implementation/reports/m9_audio_cache.md) permits
+only NetworkAudio's remote sound and private speech preparation to reclaim
+unused assets at the existing combined 128-clip / 256 MiB limit. AudioTimeline
+and the immediate solo adapter default to retaining their caches until unload.
+This is an engine playback policy, not a change to original sound rules.
+
+An asset is reclaimable only when its cache is its sole shared owner. Active
+voices, completed-but-retained voices and externally prepared clips pin it.
+Retained speech completion records after physical preemption need no clip; they
+keep their existing duration and full sample-clock deadline. Never stop a voice,
+change a cursor/loop count, finish speech early or mutate logical server audio
+in order to reclaim a cache entry. Fully pinned budgets still fail explicitly.
+The separate 128-physical-voice and 128-local-record bounds remain unchanged.
+
+Check capacity before eviction; remove only enough unused entries in stable key
+order, buffered before streamed. Stream footprint remains its fixed reader
+windows, with independent readers and the existing monotonically assigned window
+phase. Clear the per-advance validation pointer list after reclamation. Reload an
+evicted resource from the independently mounted client data when requested again.
+Missing/invalid data remains an error. Buffered decode still has its existing
+bounded temporary allocation before the final cache-byte check. This policy is
+not a guarantee of storage latency or admission when all assets remain pinned.
+
+Expose the eviction count for inspection/tests and reset it on clear. Keep normal
+cache hits unchanged, deduplicate reliable sound events before any preparation,
+and retain the original local/server sound identities and sample-clock behavior.

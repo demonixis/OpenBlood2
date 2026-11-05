@@ -1,0 +1,49 @@
+{
+  "scope": "Opt-in reclamation of unused independent network audio cache entries",
+  "baseline": "17d2eec61542cb9fd8b79f10625b8d8ee8356adc",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "17d2eec61542cb9fd8b79f10625b8d8ee8356adc",
+      "path": "src/engine/audio.cpp",
+      "sha256": "d1290e2a3a1355ffab025c76ea62e829ed0f02f6a7f2661dac5f5e6f010ab460"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "17d2eec61542cb9fd8b79f10625b8d8ee8356adc",
+      "path": "src/engine/audio.h",
+      "sha256": "d418cab91736571c9d91df17d862246f45fb41883eb1b6ad24231535549bc349"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "17d2eec61542cb9fd8b79f10625b8d8ee8356adc",
+      "path": "src/engine/audio_stream.cpp",
+      "sha256": "49ccf9909dcae9615824fd7484c628b3fd324325561a170988382132ee201f29"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "17d2eec61542cb9fd8b79f10625b8d8ee8356adc",
+      "path": "src/engine/audio_stream.h",
+      "sha256": "62aac46f079965df71e40c3ec89e8ab904393b0a5edcffa3a6b8042613dba8e7"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "17d2eec61542cb9fd8b79f10625b8d8ee8356adc",
+      "path": "src/client/network_audio.cpp",
+      "sha256": "d70c4e4658c872d37288127b4c5c540e2dec41c57f8a968e146cdc3ea6452840"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "17d2eec61542cb9fd8b79f10625b8d8ee8356adc",
+      "path": "src/client/network_audio.h",
+      "sha256": "c630bf787d961d7807df986ceef781f177d7e3361f2710060cedc03c8a33a265"
+    }
+  ],
+  "adaptations": [
+    "Replacement engine cache policy, no new original game import",
+    "Only NetworkAudio opts in; default solo/logical AudioTimeline behavior unchanged",
+    "Combined 128 entries and 256 MiB, cache-only shared ownership eligible, completed retained voices and external prepared clips pinned",
+    "Stable buffered-first key order, budget preflight, bounded eviction count, stream validation pointer cleanup",
+    "No changes to voice identities, source RNG, sample clocks, retained completion, stream windows or active PCM"
+  ]
+}

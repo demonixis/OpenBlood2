@@ -1,5 +1,11 @@
 # Source and Dependency Provenance
 
+The M9 [client audio cache correction](reports/m9_audio_cache.md) is replacement
+engine policy: only independent network playback reclaims cache-only entries
+when its fixed clip/byte budgets require it. Original rules, logical server
+retention and solo behavior stay unchanged. See the
+[baseline ledger](sources/m9_audio_cache_sources.json).
+
 The M9 [combat announcement lot](reports/m9_combat_announcer.md) imports the 216
 original TheVoice kill/suicide/humiliation rows with exact flags and filenames,
 converting only CP1252 fallback text to UTF-8. It preserves source selection,

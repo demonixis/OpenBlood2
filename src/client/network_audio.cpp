@@ -44,7 +44,7 @@ namespace OpenBlood2
             AudioVoice voice;
             SoundRequest request;
             static_cast<SoundParameters&>(request) = sound->parameters;
-            if (!mixer.prepare_voice(resources, request, sound->position, voice, error))
+            if (!mixer.prepare_voice(resources, request, sound->position, voice, error, true))
                 return false;
             if (voice.clip->rate != sound->rate || voice.clip->channels != sound->channels ||
                 voice.clip->frames() != sound->frames)
@@ -152,7 +152,7 @@ namespace OpenBlood2
         SoundRequest request;
         static_cast<SoundParameters&>(request) = parameters;
         AudioVoice voice;
-        if (!mixer.prepare_voice(resources, request, {}, voice, error))
+        if (!mixer.prepare_voice(resources, request, {}, voice, error, true))
         {
             ++local_failed;
             return 0;
