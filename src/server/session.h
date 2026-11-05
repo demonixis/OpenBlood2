@@ -68,6 +68,7 @@ namespace OpenBlood2
         bool weapon_frame_ack(std::uint64_t player, std::optional<Net::WeaponFrameAck>&) const;
         bool take_command_acks(std::uint64_t player, std::vector<Net::CommandAck>&);
         std::uint64_t commands_applied = 0, commands_blocked = 0, commands_ignored = 0;
+        std::uint64_t weapon_sounds_blocked = 0;
         bool begin_audio(std::uint64_t player, std::string& error);
         bool take_audio_events(std::uint64_t player, std::vector<Net::AudioEvent>&, std::string& error);
         bool take_private_events(std::uint64_t player, std::vector<Net::PrivateEvent>&, std::string& error);
@@ -136,6 +137,7 @@ namespace OpenBlood2
             std::array<std::uint64_t, 2> weapon_view_revision{}, fired{};
             std::uint64_t weapon_received = 0, weapon_received_state = 0, weapon_processed = 0, weapon_blocked = 0;
             std::uint64_t weapon_applied_state = 0;
+            std::uint64_t weapon_sound_life_sequence = 0; // Last issued dead loadout; positional forces are separate.
             double weapon_time = 0;
             unsigned weapon_credit = 0;
             bool weapon_clock_started = false;

@@ -1,0 +1,92 @@
+{
+  "scope": "Original animation-key weapon sounds through validated server timelines",
+  "baseline": "ffa68c66f0fa128a6e693cd8803f3039772b6d44",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "ffa68c66f0fa128a6e693cd8803f3039772b6d44",
+      "path": "src/game/original/ViewWeapon.cpp",
+      "sha256": "241a93ad8949944856dfcdc6a34d76aaaeb4ae5bc6c1c05e6e3395673e84c641"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ffa68c66f0fa128a6e693cd8803f3039772b6d44",
+      "path": "src/game/local_weapon.cpp",
+      "sha256": "b6bfac1b12c64cd767a144a8a725b8e8aec1390b215ef7b40936fa1c3a23cd91"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ffa68c66f0fa128a6e693cd8803f3039772b6d44",
+      "path": "src/server/player_fire.cpp",
+      "sha256": "2d00514cc5f3756fd65e493f7ee976de32df971ac3fa2baffe23c2e572a232d6"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ffa68c66f0fa128a6e693cd8803f3039772b6d44",
+      "path": "src/server/player_weapons.cpp",
+      "sha256": "26cab2e014074f3d5d50869ee46098e9e89ed6d77fd689231b0b89afcee999ab"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ffa68c66f0fa128a6e693cd8803f3039772b6d44",
+      "path": "src/game/original/PlayerDeath.cpp",
+      "sha256": "626a1a8257be702b98b795e67bba7e64e1d8f160dbfbb13b3a16330187c8c772"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ffa68c66f0fa128a6e693cd8803f3039772b6d44",
+      "path": "src/game/original/WeaponSound.cpp",
+      "sha256": "a19d20a9c0b5b33362a12eecd782b609afe90018c02dbad6c2f286af84c11e09"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "ffa68c66f0fa128a6e693cd8803f3039772b6d44",
+      "path": "src/game/server_audio.cpp",
+      "sha256": "0f55fb777e91a64adda8ff5e4aac54dce168bab7f37d2480cb7ff18ba25d5eec"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ViewWeapon.cpp",
+      "sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/ObjectUtilities.cpp",
+      "sha256": "72d957398c9feb8147f4c76ca9073765a53b85071ebb381005685e70700770d3"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/ObjectUtilities.h",
+      "sha256": "93ed74e65208291a19f2f66d47843e4951f34992d8243d1d33492446f6cec842"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Shared/SoundTypes.h",
+      "sha256": "8c5064496bed888cc148de9e7d13d2704cfe09007022a911ce33d81a88fcc1c1"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "Shared/WeaponDefs.cpp",
+      "sha256": "213a5b029caa18e81f812d418aebacb69149bd70a6df773f5e5dd7f6860cff0f"
+    }
+  ],
+  "adaptations": [
+    "Shared source SOUND_KEY/SOUNDLOOP_KEY/SOUNDSTOP_KEY parsing with existing doubled-separator normalization",
+    "Solo service retains the prior shotgun-only local one-shot; network presentation predicts keys without PCM",
+    "Server derives resource/action from its own AnimationOnly model timeline; no client filename or new packet",
+    "Original attached one-shot and shared per-player retained loop, radius1000/100, priority2, reverb intent and replacement/stop/death/destructor ordering",
+    "World/player/view/life validation separates sound identity from positional correction; no damage or movement trust is relaxed",
+    "Authoritative loadout replacement/removal stops the old shared loop without waiting for a client acknowledgement"
+  ]
+}

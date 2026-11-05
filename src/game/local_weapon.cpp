@@ -37,9 +37,18 @@ namespace OpenBlood2
             {
                 return server_.OnMessage(client_, value);
             }
-            SoundId play_sound(const SoundRequest& value, std::string& error) override
+            void animation_sound(DBYTE weapon, WeaponSoundAction action, std::string_view resource,
+                                 std::string& error) override
             {
-                return engine_.PlayLocalSound(player_ ? player_->m_hObject : nullptr, value, error);
+                // Solo plays every SOUND_KEY from the player (0.5.2); loop/stop
+                // keys stay network-only, as before.
+                (void)weapon;
+                if (action != WeaponSoundAction::OneShot)
+                    return;
+                SoundRequest sound;
+                sound.resource = resource;
+                sound.space = SoundSpace::Local;
+                engine_.PlayLocalSound(player_ ? player_->m_hObject : nullptr, sound, error);
             }
 
           private:

@@ -111,11 +111,10 @@ namespace OpenBlood2
                     return FireResult::Dry;
                 return FireResult::Fired; // Prediction only; never changes ammunition or health.
             }
-            SoundId play_sound(const SoundRequest&, std::string& error) override
+            void animation_sound(DBYTE, WeaponSoundAction, std::string_view, std::string& error) override
             {
                 ++sounds_;
-                error = "Remote weapon animation sound output is not connected";
-                return 0;
+                error.clear(); // Predict keys only. Authoritative sound arrives once through NetworkAudio.
             }
 
           private:

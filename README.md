@@ -43,8 +43,9 @@ movement. The [basic Bloodbath combat loop](Documentation/implementation/reports
 now supports held primary/alternate fire and USE respawn. [Server sounds](Documentation/implementation/reports/m9_network_audio.md)
 play through each client's independent audio mixer. [Private speech and startup
 announcements](Documentation/implementation/reports/m9_client_speech.md) now play
-through original VoiceMgr/CommLink. Weapon animation sounds, frag announcements,
-music, visual effects, scoreboard, match limits/rotation and Team/CTF remain in progress.
+through original VoiceMgr/CommLink. [Weapon animation sounds and loops](Documentation/implementation/reports/m9_weapon_sounds.md)
+now come from the validated server timeline. Frag announcements, music, visual
+effects, scoreboard, match limits/rotation and Team/CTF remain in progress.
 
 ## CI builds
 

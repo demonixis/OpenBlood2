@@ -4,6 +4,14 @@
 
 namespace OpenBlood2
 {
+    // Original CMSG_WEAPON_SOUND flags. Resources come from checked model keys,
+    // never from a network-supplied filename.
+    enum class WeaponSoundAction : DBYTE
+    {
+        OneShot,
+        Loop,
+        Stop
+    };
     // Local equivalents of CMSG_WEAPONFIRE / MID_DAMAGE. No retail packet ABI.
     struct WeaponFire
     {

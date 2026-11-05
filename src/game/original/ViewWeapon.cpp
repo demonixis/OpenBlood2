@@ -124,7 +124,7 @@ void CViewWeapon::CancelFiringState()
     animation.reset();
     state = WS_REST;
     flash_visible = 0;
-    pending_sound.clear(); // The remote animation-sound receiver is still separate.
+    pending_sound.clear(); // The authoritative death/loadout path stops the retained weapon loop.
 }
 bool CViewWeapon::Update(WeaponServices& services, const WeaponInput& input, DVector position, DVector direction,
                          double seconds, std::string& error)
@@ -388,26 +388,34 @@ bool CViewWeapon::Update(WeaponServices& services, const WeaponInput& input, DVe
                     if (!fire())
                         return false;
                 }
-                else if (equal(command[i], "SOUND_KEY") && i + 1 < command.size())
+                else if ((equal(command[i], "SOUND_KEY") || equal(command[i], "SOUNDLOOP_KEY")) &&
+                         i + 1 < command.size())
                 {
-                    pending_sound = "Sounds\\Weapons\\" + command[++i];
-                    sound_indexed = resources_->find(pending_sound) != nullptr;
+                    const auto action =
+                        equal(command[i], "SOUND_KEY") ? WeaponSoundAction::OneShot : WeaponSoundAction::Loop;
+                    const auto path = "Sounds\\Weapons\\" + command[++i];
+                    if (action == WeaponSoundAction::OneShot)
+                    {
+                        pending_sound = path;
+                        sound_indexed = resources_->find(pending_sound) != nullptr;
+                    }
                     // Original CViewWeapon::OnModelKey sends every SOUND_KEY to the server
                     // (CMSG_WEAPON_SOUND 0x00), which plays it from the player for any weapon
                     // (Mac-10 start/end_alt_fire stock flips, shotgun reload, ...).
-                    SoundRequest sound;
-                    // Retail keys contain doubled backslashes. LithTech accepts them; collapse
-                    // separators here, retaining the audio service's path checks.
-                    for (char c : pending_sound)
+                    // Retail keys include doubled backslashes. Preserve the
+                    // existing normalization and the audio service's path checks.
+                    std::string resource;
+                    for (char c : path)
                     {
                         if (c == '\\')
                             c = '/';
-                        if (c != '/' || sound.resource.empty() || sound.resource.back() != '/')
-                            sound.resource += c;
+                        if (c != '/' || resource.empty() || resource.back() != '/')
+                            resource += c;
                     }
-                    sound.space = SoundSpace::Local;
-                    services.play_sound(sound, animation_sound_error);
+                    services.animation_sound(type, action, resource, animation_sound_error);
                 }
+                else if (equal(command[i], "SOUNDSTOP_KEY"))
+                    services.animation_sound(type, WeaponSoundAction::Stop, {}, animation_sound_error);
             }
     }
     return true;

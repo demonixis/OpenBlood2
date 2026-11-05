@@ -1,5 +1,13 @@
 # Source and Dependency Provenance
 
+The M9 [weapon sound lot](reports/m9_weapon_sounds.md) connects the original
+ViewWeapon model-key actions and PlayerObj per-player loop/stop rules through
+server-validated animation timelines. Existing solo shotgun audio stays local.
+World/player/view/life checks, attached logical sound services and earlier
+loadout cancellation are documented adaptations. See the
+[source ledger](sources/m9_weapon_sound_sources.json).
+
+
 The M9 [independent speech lot](reports/m9_client_speech.md) extracts only the
 service calls from existing original VoiceMgr/CommLink ports. Their source
 selection, timing and solo behavior remain unchanged; high-namespace retained

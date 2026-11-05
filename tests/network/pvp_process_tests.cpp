@@ -11,6 +11,7 @@
 #include <cmath>
 #include <iostream>
 #include <optional>
+#include <set>
 #include <thread>
 
 using namespace OpenBlood2;
@@ -28,7 +29,7 @@ using Clock = std::chrono::steady_clock;
 namespace
 {
 
-    bool client(const char* port_text, const char* data, bool victim, bool hosted)
+    bool client(const char* port_text, const char* data, bool victim, bool hosted, bool shotgun)
     {
         std::string error;
         unsigned port = 0;
@@ -42,7 +43,8 @@ namespace
         float audio_peak = 0;
         JoinProfile profile;
         profile.name = victim ? "PvP victim" : "PvP attacker";
-        profile.weapons = {WEAP_BERETTA};
+        profile.weapons = {DBYTE(shotgun ? WEAP_SHOTGUN : WEAP_BERETTA)};
+        std::set<SoundId> animation_voices;
         // The graphical host keeps Caleb. Distinct remote characters identify
         // the two combatants without treating the idle host as a test target.
         profile.character = hosted ? (victim ? 2 : 1) : 0;
@@ -96,8 +98,9 @@ namespace
                     const auto result = client.receiver().collision().intersect(
                         from, to, {client.joined().world, client.joined().object}, hit);
                     visible = result == SegmentResult::Miss || (result == SegmentResult::Hit && hit.object == other);
-                    firing = !victim && visible;
-                    input.forward = !visible;
+                    const bool in_range = !shotgun || std::hypot(delta.x, delta.z) <= 250;
+                    firing = !victim && visible && in_range;
+                    input.forward = !visible || (shotgun && !victim && !in_range);
                 }
                 if (victim)
                 {
@@ -143,6 +146,18 @@ namespace
             }
             CHECK(client.update(Clock::now(), input, !leaving, error, {firing}));
             audio_peak = std::max(audio_peak, client.audio().mixer.peak);
+            if (shotgun)
+                for (const auto& [id, voice] : client.audio().mixer.voices())
+                {
+                    std::string path;
+                    if (voice.request.priority == 2 && resource_path(voice.request.resource, path) &&
+                        path.starts_with("sounds/weapons/shotgun/"))
+                    {
+                        CHECK(id < client_sound_id_begin && voice.request.space == SoundSpace::Spatial &&
+                              voice.request.outer_radius == 1000 && voice.request.inner_radius == 100);
+                        animation_voices.insert(id);
+                    }
+                }
             std::vector<PrivateEvent> events;
             client.take_events(events);
             for (const auto& event : events)
@@ -171,6 +186,11 @@ namespace
                 std::cout << "Remote audio: starts=" << client.audio().started << ", stops=" << client.audio().stopped
                           << ", natural=" << client.audio().completed
                           << ", private_starts=" << client.audio().local_started << ", peak=" << audio_peak << '\n';
+                if (shotgun)
+                {
+                    CHECK(!animation_voices.empty());
+                    std::cout << "Authoritative shotgun animation voices=" << animation_voices.size() << '\n';
+                }
                 return leaving && (victim ? respawned : frags == 1);
             }
             if (announced && Clock::now() >= next_status)
@@ -220,7 +240,7 @@ namespace
             return SDL_GetIOStatus(stream) != SDL_IO_STATUS_ERROR;
         }
     };
-    bool parent(const char* self, const char* server, const char* data, bool hosted)
+    bool parent(const char* self, const char* server, const char* data, bool hosted, bool shotgun)
     {
         std::string error;
         Process host;
@@ -272,8 +292,14 @@ namespace
                 }
                 CHECK(clients[0].output.find("Ready ") != std::string::npos);
             }
-            const char* child_args[]{
-                self, "--peer", port.c_str(), data, i ? "victim" : "attacker", hosted ? "host" : "dedicated", nullptr};
+            const char* child_args[]{self,
+                                     "--peer",
+                                     port.c_str(),
+                                     data,
+                                     i ? "victim" : "attacker",
+                                     hosted ? "host" : "dedicated",
+                                     shotgun ? "shotgun" : "beretta",
+                                     nullptr};
             clients[i].handle = SDL_CreateProcess(child_args, true);
             error = SDL_GetError();
             CHECK(clients[i].handle);
@@ -317,11 +343,20 @@ namespace
 } // namespace
 int main(int argc, char** argv)
 {
-    if (argc == 6 && std::string_view(argv[1]) == "--peer")
-        return client(argv[2], argv[3], std::string_view(argv[4]) == "victim", std::string_view(argv[5]) == "host") ? 0
-                                                                                                                    : 1;
-    return (argc == 3 || argc == 4) &&
-                   parent(argv[0], argv[1], argv[2], argc == 4 && std::string_view(argv[3]) == "--host")
-               ? 0
-               : 1;
+    if (argc == 7 && std::string_view(argv[1]) == "--peer")
+        return client(argv[2], argv[3], std::string_view(argv[4]) == "victim", std::string_view(argv[5]) == "host",
+                      std::string_view(argv[6]) == "shotgun")
+                   ? 0
+                   : 1;
+    bool hosted = false, shotgun = false;
+    for (int i = 3; i < argc; ++i)
+    {
+        if (std::string_view(argv[i]) == "--host")
+            hosted = true;
+        else if (std::string_view(argv[i]) == "--shotgun")
+            shotgun = true;
+        else
+            return 2;
+    }
+    return argc >= 3 && argc <= 5 && parent(argv[0], argv[1], argv[2], hosted, shotgun) ? 0 : 1;
 }

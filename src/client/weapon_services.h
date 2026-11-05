@@ -17,6 +17,7 @@ namespace OpenBlood2
         virtual bool weapon_selected(DBYTE type, bool left) const = 0;
         virtual float ammunition(bool alternate) const = 0;
         virtual FireResult fire(const WeaponFire&) = 0;
-        virtual SoundId play_sound(const SoundRequest&, std::string& error) = 0;
+        virtual void animation_sound(DBYTE weapon, WeaponSoundAction, std::string_view resource,
+                                     std::string& error) = 0;
     };
 } // namespace OpenBlood2

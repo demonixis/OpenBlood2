@@ -56,6 +56,7 @@ CPlayerObj::~CPlayerObj()
     ClearRemoteBombs();
     AI_Mgr::RemovePlayer(*this);
     auto* server = GetServerDE();
+    StopWeaponSound();
     if (m_hCurSound)
         server->KillSound(m_hCurSound);
     for (auto sound : {m_hPowerupStartSound, m_hPowerupEndSound, m_hPowerupLoopSound})

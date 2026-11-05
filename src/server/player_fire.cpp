@@ -39,11 +39,11 @@ namespace OpenBlood2
         // Reconstruct the client's animation from state that this server issued.
         // Cosmetic acceptance advances that proof exactly like the client; the
         // separate delivery callback checks current authoritative gameplay state.
-        template <class Deliver> class TimelineWeapon final : public WeaponServices
+        template <class Deliver, class Sound> class TimelineWeapon final : public WeaponServices
         {
           public:
-            TimelineWeapon(const Net::WeaponLoadout& state, unsigned hand, float time, Deliver& deliver)
-                : state_(state), hand_(hand), time_(time), deliver_(deliver)
+            TimelineWeapon(const Net::WeaponLoadout& state, unsigned hand, float time, Deliver& deliver, Sound& sound)
+                : state_(state), hand_(hand), time_(time), deliver_(deliver), sound_(sound)
             {
             }
             float time() const override
@@ -77,15 +77,18 @@ namespace OpenBlood2
                 deliver_(request);
                 return FireResult::Fired;
             }
-            SoundId play_sound(const SoundRequest&, std::string&) override
+            void animation_sound(DBYTE weapon, WeaponSoundAction action, std::string_view resource,
+                                 std::string& error) override
             {
-                return 0;
-            } // Client SOUND_KEY, never a logical server voice.
+                sound_(weapon, action, resource, error);
+            }
+
           private:
             const Net::WeaponLoadout& state_;
             unsigned hand_;
             float time_;
             Deliver& deliver_;
+            Sound& sound_;
         };
     } // namespace
     bool ServerSession::apply_weapon_frame(Player& p, const Net::WeaponFrame& frame, std::string& error)
@@ -186,7 +189,32 @@ namespace OpenBlood2
                     error = "Authoritative network weapon fire failed";
                 }
             };
-            TimelineWeapon services(state, hand, float(p.weapon_time), fire);
+            const auto sound =
+                [&](DBYTE type, WeaponSoundAction action, std::string_view resource, std::string& sound_error)
+            {
+                sound_error.clear();
+                auto* owner = game_.server_shell.Player(p.client);
+                const auto* object = game_.objects.get(p.object);
+                const auto* weapon = owner ? owner->m_InventoryMgr.CurrentWeapon(hand != 0) : nullptr;
+                // Keys come only from the issued ABC timeline. Sounds attach to
+                // the current body: a position correction does not change their
+                // life/view or invalidate its delayed STOP. A death boundary does.
+                if (!owner || !object || object->life != Life::Alive || owner->m_hObject != object->handle ||
+                    frame.state < p.weapon_sound_life_sequence || !p.weapons ||
+                    p.weapons->view_revision[hand] != state.view_revision[hand] ||
+                    owner->m_nCharacter != state.character || !weapon || weapon->data.m_nType != type ||
+                    owner->m_bDead || !owner->attributes_received)
+                {
+                    ++weapon_sounds_blocked;
+                    return;
+                }
+                // Draw/reload sounds are not fire attempts: retain their source
+                // camera/binocular/ammunition behavior. Failure is diagnostic and
+                // never reverses a shot or advances the gameplay RNG.
+                owner->HandleWeaponSound(action, resource);
+                sound_error = owner->weapon_sound_error;
+            };
+            TimelineWeapon services(state, hand, float(p.weapon_time), fire, sound);
             auto& view = p.weapon_timeline[hand];
             view.binoculars_active = state.binoculars;
             if (!state.alive)

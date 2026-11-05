@@ -62,6 +62,16 @@ namespace OpenBlood2
                 error = "Private weapon state queue refused";
                 return false;
             }
+            if (!next.alive)
+                found->weapon_sound_life_sequence = sequence;
+            // Original view Term sends SOUNDSTOP when an existing hand is
+            // replaced/removed. Apply the authoritative transition now, even
+            // when the client has not yet acknowledged that new loadout.
+            if (found->weapons)
+                for (unsigned hand = 0; hand < 2; ++hand)
+                    if (found->weapons->weapons[hand] &&
+                        found->weapons->view_revision[hand] != next.view_revision[hand])
+                        player->StopWeaponSound();
             found->weapons = next;
             found->weapon_states.push_back({sequence, next});
             if (!found->weapon_clock_started)

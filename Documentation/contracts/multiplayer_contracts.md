@@ -1184,4 +1184,35 @@ refusals remain explicit cosmetic diagnostics, never new server logical sounds.
 
 This adds actual private PCM, not the portrait/text HUD renderer. Frag/FinishHim,
 music, inventory sounds, movement cosmetics and server-mediated original weapon
-animation keys remain separate. Preserve the existing solo shotgun adaptation.
+animation keys are separate consumers; the following lot connects weapon keys.
+Preserve the existing solo shotgun adaptation.
+
+## Validated weapon animation sounds
+
+The [weapon sound lot](../implementation/reports/m9_weapon_sounds.md) ports original
+SOUND_KEY/SOUNDLOOP_KEY/SOUNDSTOP_KEY delivery from the already validated server
+CViewWeapon timeline. The client sends no filename or sound command. It predicts
+the same keys without PCM; existing reliable sound events deliver playback once
+to the owner and other clients. Protocol 14 and packet/queue budgets are unchanged.
+
+Use original attached spatial sound, outer/inner radii 1000/100, priority 2,
+full volume, reverb intent and buffered WAVs. One-shots auto-retire. One loop belongs
+to the player, shared across both hands; a new loop stops the previous one before
+attempting playback, even when the replacement fails. STOP, DoDeath and destruction
+release that handle. A published replacement/removal of an existing hand also
+performs its original view-Term stop, without waiting for the client's ACK.
+Merely adding a previously absent second hand does not stop the other hand's loop.
+
+Admission and frame history validate world/player/object and ordered model input.
+Each sound key additionally checks current owner, character, weapon/view and life.
+Remember the last published dead-loadout sequence so an old-life key cannot start
+audio or stop a newer life’s loop after death/respawn coalesce between input frames.
+Position correction is not a new sound life: a delayed same-life/view key remains
+valid and attaches to the current body. In particular, rejecting its STOP would
+strand the loop after teleport. Actual FIRE_KEY still keeps the full current
+force, pose, movement, camera, ammunition and combat checks.
+
+Do not gate draw/reload sounds as fire attempts or run a second weapon/movement
+integration. Source sound failure is diagnostic and cannot undo a shot. Preserve
+the solo shotgun-only local one-shot, including its separator normalization and
+unchanged clock/ownership. Other solo key playback remains outside this lot.

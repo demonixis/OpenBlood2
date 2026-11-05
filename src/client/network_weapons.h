@@ -16,7 +16,7 @@ namespace OpenBlood2
         Reception receive(const Net::PrivateEvent&, ModelStore&, Resources&, std::string& error);
         // One client simulation tick, never a renderer update or movement replay.
         // Inputs predict animation only; NetworkClient sends the corresponding frame.
-        // Actual animation sound output remains a separate consumer.
+        // Animation keys predict no PCM; server sound events own playback.
         bool update(std::uint64_t force_revision, double seconds, std::string& error, WeaponInput input = {},
                     PlayerRotation aim = {});
         bool ready(std::uint64_t force_revision) const

@@ -2,6 +2,7 @@
 #include "game/original/ViewWeapon.h"
 #include <fstream>
 #include <iostream>
+#include <set>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
     do                                                                                                                 \
@@ -22,6 +23,12 @@ namespace
         FireResult result = FireResult::Fired;
         std::vector<WeaponFire> requests;
         std::vector<SoundRequest> sounds;
+        struct SoundKey
+        {
+            WeaponSoundAction action;
+            std::string resource;
+        };
+        std::vector<SoundKey> sound_keys;
         float time() const override
         {
             return clock;
@@ -48,10 +55,16 @@ namespace
             present = !remove_on_fire;
             return result;
         }
-        SoundId play_sound(const SoundRequest& value, std::string&) override
+        void animation_sound(DBYTE weapon, WeaponSoundAction action, std::string_view resource, std::string&) override
         {
-            sounds.push_back(value);
-            return sounds.size();
+            sound_keys.push_back({action, std::string(resource)});
+            if (weapon == WEAP_SHOTGUN && action == WeaponSoundAction::OneShot)
+            {
+                SoundRequest request;
+                request.resource = resource;
+                request.space = SoundSpace::Local;
+                sounds.push_back(std::move(request));
+            }
         }
     };
     bool step(CViewWeapon& view, Services& services, WeaponInput input, unsigned count, std::string& error)
@@ -196,6 +209,19 @@ namespace
         CHECK(step(view, services, {}, 30, error));
         CHECK(services.sounds.size() == 1 && services.sounds[0].resource == "Sounds/Weapons/Shotgun/reload.wav" &&
               services.sounds[0].space == SoundSpace::Local);
+        services = {};
+        CHECK(view.Create(WEAP_BERETTA, false, models, resources, error));
+        model = std::make_shared<Model>(*view.model);
+        model->animations[view.animation.animation].keys[1].text =
+            "sound_key Beretta\\\\reload.wav; SOUNDLOOP_KEY Tesla/charge.wav; SOUNDSTOP_KEY; SOUND_KEY";
+        view.model = model;
+        CHECK(step(view, services, {}, 30, error));
+        CHECK(services.sounds.empty() && services.sound_keys.size() == 3);
+        CHECK(services.sound_keys[0].action == WeaponSoundAction::OneShot &&
+              services.sound_keys[0].resource == "Sounds/Weapons/Beretta/reload.wav");
+        CHECK(services.sound_keys[1].action == WeaponSoundAction::Loop &&
+              services.sound_keys[1].resource == "Sounds/Weapons/Tesla/charge.wav");
+        CHECK(services.sound_keys[2].action == WeaponSoundAction::Stop && services.sound_keys[2].resource.empty());
         std::cout << "Independent view weapon: firing, ammunition, binocular/death/selection gates, removal and sound "
                      "passed\n";
         return true;
@@ -208,7 +234,9 @@ namespace
         Resources resources;
         CHECK(resources.mount_game(config, error));
         ModelStore models(resources);
-        unsigned fired = 0, modes = 0;
+        unsigned fired = 0, modes = 0, sound_keys = 0, loop_keys = 0, stop_keys = 0;
+        std::set<std::string> sound_assets;
+        AudioTimeline audio;
         for (DBYTE type : {DBYTE(1),  DBYTE(2),  DBYTE(3),  DBYTE(4),  DBYTE(5),  DBYTE(6),  DBYTE(7),
                            DBYTE(8),  DBYTE(9),  DBYTE(10), DBYTE(11), DBYTE(12), DBYTE(13), DBYTE(14),
                            DBYTE(15), DBYTE(16), DBYTE(17), DBYTE(49), DBYTE(50), DBYTE(51)})
@@ -236,6 +264,12 @@ namespace
                           view.bomb_held == timing.bomb_held && view.bomb_speed == timing.bomb_speed &&
                           view.voodoo_hit == timing.voodoo_hit);
                     CHECK(services.requests.size() == logical.requests.size());
+                    CHECK(services.sound_keys.size() == logical.sound_keys.size());
+                    if (!services.sound_keys.empty())
+                    {
+                        CHECK(services.sound_keys.back().action == logical.sound_keys.back().action);
+                        CHECK(services.sound_keys.back().resource == logical.sound_keys.back().resource);
+                    }
                     if (!services.requests.empty())
                     {
                         const auto& a = services.requests.back();
@@ -253,6 +287,28 @@ namespace
                           request.projectile_speed >= 0 && request.projectile_speed <= 1750);
                 fired += view.shots;
                 ++modes;
+                sound_keys += services.sound_keys.size();
+                for (const auto& key : services.sound_keys)
+                {
+                    loop_keys += key.action == WeaponSoundAction::Loop;
+                    stop_keys += key.action == WeaponSoundAction::Stop;
+                    if (key.action != WeaponSoundAction::Stop && sound_assets.insert(key.resource).second)
+                    {
+                        SoundRequest request;
+                        request.resource = key.resource;
+                        request.loop = key.action == WeaponSoundAction::Loop;
+                        AudioVoice voice;
+                        if (!audio.prepare_voice(resources, request, {}, voice, error))
+                        {
+                            std::cerr << "Weapon key asset " << key.resource << ": " << error << '\n';
+                            return false;
+                        }
+                        CHECK(voice.clip && voice.clip->frames());
+                    }
+                    if (key.action == WeaponSoundAction::Loop)
+                        std::cout << "Loop key: type=" << unsigned(type) << " alt=" << alternate
+                                  << " resource=" << key.resource << '\n';
+                }
             }
         }
         for (DBYTE character = 0; character < 4; ++character)
@@ -265,7 +321,10 @@ namespace
                 CHECK(step(view, services, {true, false, left}, 240, error) && view.shots);
             }
         std::cout << "Retail independent view weapons: modes=" << modes << ", shots=" << fired
+                  << ", sound_keys=" << sound_keys << ", loops=" << loop_keys << ", stops=" << stop_keys
+                  << ", decoded_assets=" << sound_assets.size()
                   << ", identical animation-only timing/requests, four characters and both hands passed\n";
+        CHECK(sound_keys);
         return true;
     }
 } // namespace

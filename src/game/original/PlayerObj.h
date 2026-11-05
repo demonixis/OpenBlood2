@@ -95,6 +95,11 @@ class CPlayerObj : public CBaseCharacter
         return index >= 0 && index < PU_MAXTYPES && m_bPowerupActivated[index];
     }
     bool PlayPlayerSound(std::string_view, float radius, DBYTE volume, bool stream, DBYTE priority = 2);
+    bool HandleWeaponSound(OpenBlood2::WeaponSoundAction, std::string_view);
+    void StopWeaponSound();
+    OpenBlood2::SoundId m_hWeapSound = 0;
+    std::uint64_t weapon_sound_requests = 0, weapon_sound_starts = 0, weapon_sound_stops = 0, weapon_sound_failures = 0;
+    std::string weapon_sound_resource, weapon_sound_error;
     OpenBlood2::SoundId m_hCurSound = 0;
     float m_fNextPingTime = 0;
     std::uint64_t activation_ping_failures = 0;

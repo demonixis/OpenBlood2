@@ -107,6 +107,7 @@ void CPlayerObj::DoDeath(bool humiliation)
         s->KillSound(m_hCurSound);
         m_hCurSound = 0;
     }
+    StopWeaponSound(); // Original DoDeath releases the per-player weapon loop.
     if (!humiliation)
         s->SetObjectFlags(m_hObject, s->GetObjectFlags(m_hObject) & ~FLAG_VISIBLE);
     move_state = MoveState::Dead;
