@@ -261,8 +261,10 @@ namespace
                                 "Idle CTF host",
                                 "--port",
                                 "0",
+                                // Frames, not ticks: at least the dedicated run's
+                                // 100 s of server time on a 120 Hz display.
                                 "--frames",
-                                "2000",
+                                "12000",
                                 "--capture",
                                 "ctf-capture-host.png",
                                 nullptr};
@@ -297,7 +299,7 @@ namespace
         CHECK(clients[0].handle);
         bool done[2]{}, host_done = false;
         int codes[2]{}, host_code = 0;
-        deadline = Clock::now() + std::chrono::seconds(160);
+        deadline = Clock::now() + std::chrono::seconds(280); // 12000 host frames at 60 Hz.
         while (Clock::now() < deadline && (!done[0] || !done[1] || !host_done))
         {
             CHECK(host.read());

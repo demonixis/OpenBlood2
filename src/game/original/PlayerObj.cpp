@@ -474,8 +474,20 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name, bool inspection_start)
     if (!server->IsObjectAlive(m_hObject) || server->TeleportObject(m_hObject, &position) != DE_OK ||
         server->SendToClient(m_hClient, OpenBlood2::PlayerRotation{m_fPitch, m_fYaw}) != DE_OK)
         return false;
-    if (network_game_type(server->net_game_type) && server->ResolveInitialActorOverlap(m_hObject) != DE_OK)
+    const bool network = network_game_type(server->net_game_type);
+    // MoveObjectToGround rechecks network players after its world nudge, so a
+    // marker can still fail there; both refusals take the retry below.
+    const auto settle = [&] {
+        return (!network || server->ResolveInitialActorOverlap(m_hObject) == DE_OK) &&
+               server->MoveObjectToGround(m_hObject) == DE_OK;
+    };
+    if (!settle())
     {
+        if (!network)
+        {
+            entry_error = "Start point has no supported ground collision";
+            return false;
+        }
         // Adaptation: the original spawned inside an occupied marker. When the
         // bounded separation finds no room, try the next markers in list order
         // (no further random draw, no trigger: the selected marker sent it).
@@ -498,7 +510,7 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name, bool inspection_start)
                 continue; // Retries keep the source team filter.
             if (!server->IsObjectAlive(m_hObject) || server->TeleportObject(m_hObject, &position) != DE_OK)
                 return false;
-            if (server->ResolveInitialActorOverlap(m_hObject) != DE_OK)
+            if (!settle())
                 continue;
             m_fYaw = other->GetPitchYawRoll().y;
             const auto* name = server->GetStringData(other->GetName());
@@ -514,11 +526,6 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name, bool inspection_start)
             entry_error = "Occupied multiplayer start has no clear bounded placement";
             return false;
         }
-    }
-    if (server->MoveObjectToGround(m_hObject) != DE_OK)
-    {
-        entry_error = "Start point has no supported ground collision";
-        return false;
     }
     return UpdateClientPhysics() && TeleportClientToServerPos();
 }

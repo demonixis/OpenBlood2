@@ -19,10 +19,9 @@ namespace OpenBlood2
             return true;
         const auto& image = table.surface();
         // Team columns and small-screen switching can change the required width.
-        // Finish previous submitted draws before releasing their owned texture.
+        // SDL_GPU defers the release until submitted draws that use it finish.
         if (texture_ && (image.width != width_ || image.height > height_))
         {
-            SDL_WaitForGPUIdle(device_);
             SDL_ReleaseGPUTexture(device_, texture_);
             if (transfer_)
                 SDL_ReleaseGPUTransferBuffer(device_, transfer_);

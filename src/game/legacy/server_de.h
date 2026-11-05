@@ -200,10 +200,10 @@ class ServerDE : public CSBase, public OpenBlood2::EffectQueries
     virtual DRESULT SetClientUserData(HCLIENT, HOBJECT) = 0;
     // Selected original TeamMgr membership, kept with checked client ownership.
     virtual bool AssignClientTeam(HCLIENT, DBYTE preferred) = 0;
-    virtual DBYTE GetClientTeam(HCLIENT) const = 0;
+    virtual DBYTE GetClientTeam(HCLIENT) = 0;
     virtual void ClearClientTeam(HCLIENT) = 0;
     virtual void ResetTeams() = 0;
-    virtual std::array<unsigned, 2> TeamPlayerCounts() const = 0;
+    virtual std::array<unsigned, 2> TeamPlayerCounts() = 0;
     virtual bool AddClientTeamFrags(HCLIENT, int delta) = 0;
     virtual bool RandomFloat(float, float, float&) = 0;
     virtual std::uint64_t PublishLightning(HOBJECT, const OpenBlood2::LightningSettings&, std::string&) = 0;

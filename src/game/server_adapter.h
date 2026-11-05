@@ -263,10 +263,10 @@ namespace OpenBlood2
         HOBJECT GetClientUserData(HCLIENT) override;
         DRESULT SetClientUserData(HCLIENT, HOBJECT) override;
         bool AssignClientTeam(HCLIENT, DBYTE preferred) override;
-        DBYTE GetClientTeam(HCLIENT) const override;
+        DBYTE GetClientTeam(HCLIENT) override;
         void ClearClientTeam(HCLIENT) override;
         void ResetTeams() override;
-        std::array<unsigned, 2> TeamPlayerCounts() const override;
+        std::array<unsigned, 2> TeamPlayerCounts() override;
         bool AddClientTeamFrags(HCLIENT, int delta) override;
         const Resources* client_resources = nullptr;
         ClientAudio* client_audio = nullptr; // Immediate local cosmetic publication only.

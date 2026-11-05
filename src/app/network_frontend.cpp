@@ -113,7 +113,8 @@ namespace OpenBlood2
         ServerClock server_clock;
         auto previous = NetworkClient::Clock::now();
         bool menu = false, leaving = false, captured = false;
-        std::uint64_t entered_world = 0;
+        std::uint64_t entered_world = 0, weapon_wait_seen = 0, weapon_frames_seen = 0;
+        bool weapon_stalled = false;
         unsigned frames = 0;
         ClientEffects effects;
         std::vector<Net::PrivateEvent> events;
@@ -205,6 +206,17 @@ namespace OpenBlood2
                 }
                 return failed();
             }
+            // A full ACK window pauses only the weapon timeline; name each stall
+            // once. It ends when a weapon frame is sent again.
+            if (client.weapon_wait_ticks != weapon_wait_seen && !weapon_stalled)
+            {
+                spdlog::warn("Weapon input waits for server acknowledgements (frames={})", client.weapon_frames);
+                weapon_stalled = true;
+            }
+            else if (client.weapon_frames != weapon_frames_seen)
+                weapon_stalled = false;
+            weapon_wait_seen = client.weapon_wait_ticks;
+            weapon_frames_seen = client.weapon_frames;
             // HUD/camera and logical sound events are applied by the endpoint.
             // Speech consumes original combat announcements; music and effects remain separate.
             client.take_events(events);

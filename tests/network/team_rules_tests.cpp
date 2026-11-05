@@ -166,6 +166,45 @@ namespace
                      "self punishment before visibility, true miss still punishes\n";
         return true;
     }
+    bool solo(const std::filesystem::path& root)
+    {
+        // Team options are server state, but outside team games the original
+        // rules never consult them: no team, no protection, Voodoo still hits.
+        GameSession game;
+        CHECK(test_player::setup(game, root));
+        const auto solo_type = game.server.net_game_type;
+        CHECK(!network_game_type(solo_type));
+        game.server.friendly_fire = false;
+        game.server.negative_team_frags = false;
+        // Solo admits one client; connect the second under network capacity,
+        // then enter both through the solo rules.
+        game.server.net_game_type = GAMETYPE_BLOODBATH;
+        auto a = game.server.connect_client(), b = game.server.connect_client();
+        game.server.net_game_type = solo_type;
+        CHECK(a && b);
+        auto* owner = game.server_shell.OnClientEnterWorld(a, nullptr, 1);
+        auto* other = game.server_shell.OnClientEnterWorld(b, nullptr, 1);
+        CHECK(owner && other && owner->GetTeamID() == 0 && other->GetTeamID() == 0);
+        CHECK(other->m_damage.IsPlayerToPlayerDamageOk(owner->m_hObject, owner->m_hObject));
+        DVector origin{0, 41, 0}, target{0, 41, 100};
+        CHECK(game.server.TeleportObject(owner->m_hObject, &origin) == DE_OK);
+        CHECK(game.server.TeleportObject(other->m_hObject, &target) == DE_OK);
+        owner->m_fPitch = owner->m_fYaw = 0;
+        CVoodooDoll weapon;
+        weapon.Init(owner->m_hObject, &owner->m_InventoryMgr, false);
+        weapon.last_shot.damage = 10;
+        weapon.last_shot.request.voodoo_hit = 4;
+        // Only the delivery matters here: the headless fixture has no FX
+        // service for the follow-up particle publication.
+        weapon.FireVector();
+        CHECK(weapon.deliveries == 1 && weapon.targets.size() == 1 && weapon.targets[0] == other->m_hObject &&
+              other->m_damage.accepted_damage == 1 && !owner->m_damage.accepted_damage);
+        game.server_shell.OnClientExitWorld(b);
+        game.server_shell.OnClientExitWorld(a);
+        CHECK(game.objects.finish_frame() && game.server.disconnect_client(a) && game.server.disconnect_client(b));
+        std::cout << "Solo ignores team options: no team, player damage allowed, Voodoo delivers\n";
+        return true;
+    }
     bool retail(const std::filesystem::path& data)
     {
         GameSession game;
@@ -314,6 +353,8 @@ int main(int argc, char** argv)
         return spawn(path_from_utf8(argv[2])) ? 0 : 1;
     if (std::string_view(argv[1]) == "voodoo")
         return voodoo(path_from_utf8(argv[2])) ? 0 : 1;
+    if (std::string_view(argv[1]) == "solo")
+        return solo(path_from_utf8(argv[2])) ? 0 : 1;
     if (std::string_view(argv[1]) == "retail")
         return retail(path_from_utf8(argv[2])) ? 0 : 1;
     return 2;

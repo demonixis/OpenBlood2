@@ -165,7 +165,7 @@ namespace OpenBlood2
                 p.roster_failed = true; // Existing bounded-recipient disconnect path.
         }
     }
-    DBYTE ServerSession::player_team(std::uint64_t player) const
+    DBYTE ServerSession::player_team(std::uint64_t player)
     {
         const auto p =
             std::find_if(players_.begin(), players_.end(), [&](const auto& row) { return row.id == player; });

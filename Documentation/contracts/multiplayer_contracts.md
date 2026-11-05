@@ -1551,8 +1551,10 @@ player during the first nearest-hit check. Multiplayer ground entry now repeats
 the existing bounded actor separation after the initial world nudge and before
 the ground drop. It keeps four horizontal candidates, checked endpoint/route,
 no extra RNG/marker selection, unchanged solo/AI ordering and strict runtime
-collision. A fully occupied start remains refused; this is not depenetration
-for moving players.
+collision. A refusal here, or a failed ground drop, takes the same list-order
+marker retry as an occupied marker; in Team and CTF the retry keeps the source
+same/neutral-team filter. Only every eligible marker failing is refused; this is
+not depenetration for moving players.
 
 LevelChanging already cancels client/server firing. Stop emitting client weapon
 frames during that intermission, including synchronous server map loading;
@@ -1576,3 +1578,5 @@ Already queued frames retain original checked animation/fire ordering. Keep
 server cadence/catch-up, loadout history and invalid/overflow handling unchanged;
 count cumulative waiting ticks. Intermission suppression and fresh-world sequence
 reset continue to apply. This supersedes the historical backlog-disconnect policy.
+The desktop network frontend logs one warning when a stall begins (it ends when a
+weapon frame is sent again), so a server that stops acknowledging is visible.

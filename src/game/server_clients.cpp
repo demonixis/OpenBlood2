@@ -46,8 +46,9 @@ namespace OpenBlood2
         }
         return it->second.player;
     }
-    std::array<unsigned, 2> ServerAdapter::TeamPlayerCounts() const
+    std::array<unsigned, 2> ServerAdapter::TeamPlayerCounts()
     {
+        trace_service("TeamPlayerCounts");
         std::array<unsigned, 2> counts{};
         for (const auto& [client, state] : clients_)
             if (state.team >= 1 && state.team <= 2)
@@ -56,6 +57,7 @@ namespace OpenBlood2
     }
     bool ServerAdapter::AssignClientTeam(HCLIENT client, DBYTE preferred)
     {
+        trace_service("AssignClientTeam");
         auto found = clients_.find(client);
         if (!team_game_type(net_game_type) || preferred > 2 || found == clients_.end() || found->second.team ||
             found->second.player || objects_.busy())
@@ -77,18 +79,21 @@ namespace OpenBlood2
         found->second.team = preferred;
         return true;
     }
-    DBYTE ServerAdapter::GetClientTeam(HCLIENT client) const
+    DBYTE ServerAdapter::GetClientTeam(HCLIENT client)
     {
+        trace_service("GetClientTeam");
         const auto found = clients_.find(client);
         return found == clients_.end() ? 0 : found->second.team;
     }
     void ServerAdapter::ClearClientTeam(HCLIENT client)
     {
+        trace_service("ClearClientTeam");
         if (auto found = clients_.find(client); found != clients_.end())
             found->second.team = 0;
     }
     bool ServerAdapter::AddClientTeamFrags(HCLIENT client, int delta)
     {
+        trace_service("AddClientTeamFrags");
         const auto team = GetClientTeam(client);
         if (!team_game_type(net_game_type) || !team || !GetClientUserData(client))
             return false;
@@ -100,6 +105,7 @@ namespace OpenBlood2
     }
     void ServerAdapter::ResetTeams()
     {
+        trace_service("ResetTeams");
         team_frags = {};
         for (auto& [client, state] : clients_)
             state.team = 0;

@@ -33,6 +33,15 @@ second of credit. A failed USE respawn is terminal (`respawn_failed`) and comman
 weapon-frame errors isolate their player like movement errors. Solo plays every
 weapon SOUND_KEY as before; network-only paths stay behind the network game type.
 
+Lot 5 (protocol 18) adds Team and CTF over the network: original least-populated
+assignment with the strict >50 tie draw, forced team skins, cyclic same/neutral-team
+spawn scan with first-marker fallback, team totals, friendly-fire/negative-team-frag
+priorities (Voodoo included), retained teams across rotation, team rosters, CTF
+captures with OnlyFlagScores/UseTeamSize/flag value, flag icons, notices and grab/
+return sounds. Occupied-marker retries keep the team filter and also cover a failed
+ground drop. A full weapon ACK window pauses only the weapon timeline (logged once
+per stall), never banks inputs. Every team branch stays behind the network game type.
+
 The [desktop third-person camera](Documentation/contracts/camera_contracts.md) adds a rebindable C toggle,
 actual player/held models and centred aim convergence. Preserve unchanged eye/shot/movement state,
 special-camera priority, temporary first-person zoom/tight-space fallback and the XR refusal.
