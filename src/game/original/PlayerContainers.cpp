@@ -1,6 +1,8 @@
 #include "game/game_settings.h"
 // Selected PlayerObj::UpdateClientPhysics and UpdateAirLevel source rules.
+#include "KeyPickup.h"
 #include "Music.h"
+#include "PickupObject.h"
 #include "PlayerObj.h"
 #include "game/key_messages.h"
 #include <algorithm>
@@ -103,6 +105,9 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
             const auto result = message == OpenBlood2::key_query_message ? m_InventoryMgr.QueryKey(key.item.name)
                                                                          : m_InventoryMgr.AddKey(key.item);
             key.have = result == InventoryResult::Ok;
+            const int picked = result == InventoryResult::Ok            ? CHWEAP_OK
+                               : result == InventoryResult::AlreadyHave ? CHWEAP_ALREADYHAVE
+                                                                        : CHWEAP_NOMESSAGE;
             auto reply = (message == OpenBlood2::key_query_message || key.have)
                              ? server->StartMessageToObject(this, sender,
                                                             message == OpenBlood2::key_query_message
@@ -114,6 +119,8 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
                 server->WriteKeyMessage(reply, key);
                 server->EndMessage(reply);
             }
+            if (message == OpenBlood2::key_pickup_message)
+                SendPickedUpMessage(sender, picked);
         }
     }
     if (!m_bDead && !m_damage.IsDead() &&
@@ -124,13 +131,44 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
         if (server->ReadPickupMessage(read, pickup))
         {
             bool accepted = false;
+            // Original iRet for SendPickedUpMessage (powerups send only an accepted CHWEAP_OK).
+            int picked = CHWEAP_NOMESSAGE;
+            const auto original_result = [](InventoryResult result)
+            {
+                switch (result)
+                {
+                    case InventoryResult::Ok:
+                        return int(CHWEAP_OK);
+                    case InventoryResult::NotAvailable:
+                    case InventoryResult::Invalid:
+                        return int(CHWEAP_NOTAVAIL);
+                    case InventoryResult::Current:
+                        return int(CHWEAP_CURRENT);
+                    case InventoryResult::Full:
+                        return int(CHWEAP_NOAVAILSLOTS);
+                    case InventoryResult::AlreadyHave:
+                        return int(CHWEAP_ALREADYHAVE);
+                    case InventoryResult::Busy:
+                        return int(CHWEAP_WEAPONBUSY);
+                }
+                return int(CHWEAP_NOMESSAGE);
+            };
             if (message == OpenBlood2::add_ammo_message)
+            {
+                // Original AddAmmo returns CHWEAP_OK or CHWEAP_NOMESSAGE.
                 accepted = m_InventoryMgr.AddAmmo(pickup.type, pickup.amount) == InventoryResult::Ok;
+                picked = accepted ? CHWEAP_OK : CHWEAP_NOMESSAGE;
+            }
             else if (message == OpenBlood2::add_item_message)
-                accepted = ((pickup.type == 7 || pickup.type == 8 || pickup.type == 9)
-                                ? m_InventoryMgr.AddInventoryWeapon(pickup.type, static_cast<DBYTE>(pickup.amount))
-                                : m_InventoryMgr.AddItem(pickup.type, static_cast<DBYTE>(pickup.amount))) ==
-                           InventoryResult::Ok;
+            {
+                const bool weapon = pickup.type == 7 || pickup.type == 8 || pickup.type == 9;
+                const auto result =
+                    weapon ? m_InventoryMgr.AddInventoryWeapon(pickup.type, static_cast<DBYTE>(pickup.amount))
+                           : m_InventoryMgr.AddItem(pickup.type, static_cast<DBYTE>(pickup.amount));
+                accepted = result == InventoryResult::Ok;
+                // An owned bomb returns AddAmmo's result, whose refusal is CHWEAP_NOMESSAGE.
+                picked = weapon && result == InventoryResult::Full ? CHWEAP_NOMESSAGE : original_result(result);
+            }
             else if (message == OpenBlood2::add_weapon_message)
             {
                 if (server->IsMultiplayerGame()) // Server shell GetGameType() != GAMETYPE_SINGLE.
@@ -151,6 +189,7 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
                     m_InventoryMgr.AddAmmo(definition->m_nAmmoType, pickup.amount) == InventoryResult::Ok)
                     result = InventoryResult::Ok;
                 accepted = result == InventoryResult::Ok;
+                picked = original_result(result);
             }
             else
                 switch (pickup.type)
@@ -182,9 +221,76 @@ DDWORD CPlayerObj::ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD 
                     server->EndMessage(reply);
                 }
             }
+            if (message != OpenBlood2::add_powerup_message)
+                SendPickedUpMessage(sender, picked);
+            else if (accepted) // AddPowerup: if (hSender && bPickedUp) ... CHWEAP_OK.
+                SendPickedUpMessage(sender, CHWEAP_OK);
         }
     }
     return CBaseCharacter::ObjectMessageFn(sender, message, read);
+}
+
+void CPlayerObj::SendPickedUpMessage(HOBJECT hObject, int iRet)
+{
+    auto* pServerDE = GetServerDE();
+    // Display an appropriate client message
+    if (!m_hClient || !pServerDE || !hObject)
+        return;
+
+    // IsKindOf(PickupObject): the port's KeyPickup is not a PickupObject subclass, but the
+    // original's was, with the same ResourceNum-or-ObjectName display name.
+    const auto* pickup = dynamic_cast<PickupObject*>(pServerDE->HandleToObject(hObject));
+    const auto* key = pickup ? nullptr : dynamic_cast<KeyPickup*>(pServerDE->HandleToObject(hObject));
+    if (!pickup && !key)
+        return;
+
+    // PickupObject InitialUpdate: FormatString(m_nNameID), otherwise the object name.
+    const auto display_name = [&]
+    {
+        const auto id = pickup ? pickup->resource_id : key->resource_id;
+        std::string name;
+        if (id && pServerDE->FindClientResourceString(std::uint32_t(id), name))
+            return name;
+        if (id)
+            pickup_message_error = "Missing pickup name string " + std::to_string(id) + "; object name shown";
+        return pickup ? pickup->display_name : key->item.name;
+    };
+    const auto format = [&](std::uint32_t id)
+    {
+        // FormatString(id, szObject): cres.dll uses FormatMessage's numbered insertion.
+        std::string text;
+        if (!pServerDE->FindClientResourceString(id, text))
+        {
+            pickup_message_error = "Missing pickup message string " + std::to_string(id);
+            return std::string();
+        }
+        if (const auto marker = text.find("%1!s!"); marker != text.npos)
+            text.replace(marker, 5, display_name());
+        else if (const auto plain = text.find("%1"); plain != text.npos)
+            text.replace(plain, 2, display_name());
+        return text;
+    };
+    std::string msgbuf;
+    switch (iRet)
+    {
+        case CHWEAP_OK:
+            msgbuf = format(260); // IDS_GENERAL_PICKUP_1
+            break;
+        case CHWEAP_NOTAVAIL:
+            if (hObject != m_hLastPickupObject && iRet != m_nLastPickupResult)
+                msgbuf = format(261); // IDS_GENERAL_PICKUP_2
+            break;
+        case CHWEAP_NOAVAILSLOTS:
+            if (hObject != m_hLastPickupObject && iRet != m_nLastPickupResult)
+                msgbuf = format(262); // IDS_GENERAL_PICKUP_3
+            break;
+    }
+
+    if (!msgbuf.empty() && SendConsoleMessage(msgbuf))
+        ++pickup_messages;
+
+    m_hLastPickupObject = hObject;
+    m_nLastPickupResult = iRet;
 }
 
 bool CPlayerObj::UpdateContainerState()

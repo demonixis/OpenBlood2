@@ -81,7 +81,8 @@ class CPlayerObj : public CBaseCharacter
     std::array<PowerupType, 15> m_ePowerupSoundStack{PU_NONE}; // Source PU_MAXSTACK.
     int m_nPowerupSoundStackPos = 0;
     OpenBlood2::SoundId m_hPowerupStartSound = 0, m_hPowerupEndSound = 0, m_hPowerupLoopSound = 0;
-    std::uint64_t powerup_pickups = 0, powerup_expiries = 0, powerup_console_unavailable = 0, powerup_loop_failures = 0;
+    std::uint64_t powerup_pickups = 0, powerup_expiries = 0, powerup_console_unavailable = 0,
+                  powerup_console_messages = 0, powerup_loop_failures = 0;
     std::string powerup_error;
     bool AddPowerup(DBYTE type, float value);
     bool CheckPowerups();
@@ -119,7 +120,26 @@ class CPlayerObj : public CBaseCharacter
     static CPlayerObj* LocalVoicePlayer(); // Checked replacement for the source single-player global.
     // Original SendConsoleMessage: SMSG_CONSOLEMESSAGE, CSPrint2 into the client's message lines.
     bool SendConsoleMessage(const std::string& text);
+    // FormatString(id) then SendConsoleMessage; a missing string sends nothing (null HSTRING).
+    bool SendConsoleString(std::uint32_t id);
     std::uint64_t console_messages = 0;
+    // Original CInventoryMgr::SendPickedUpMessage client line (InventoryMgr.cpp:2402-2478), with
+    // the original CHWEAP_* result values; the MID_PICKEDUP reply stays with each caller.
+    enum
+    {
+        CHWEAP_OK = 0,
+        CHWEAP_NOTAVAIL = -2,
+        CHWEAP_CURRENT = -3,
+        CHWEAP_NOAVAILSLOTS = -5,
+        CHWEAP_ALREADYHAVE = -6,
+        CHWEAP_WEAPONBUSY = -7,
+        CHWEAP_NOMESSAGE = -8,
+    };
+    void SendPickedUpMessage(HOBJECT sender, int result);
+    HOBJECT m_hLastPickupObject = nullptr; // Constructor values; never saved (source).
+    int m_nLastPickupResult = CHWEAP_OK;
+    std::uint64_t pickup_messages = 0;
+    std::string pickup_message_error; // Missing cres.dll strings: no line, as FormatString's null.
     void UpdateDamageVoice();
     std::uint32_t m_nLastHitPoints = 0, m_nLastDamage = 0;
     int damage_voice_roll = -1, damage_voice_event = -1;

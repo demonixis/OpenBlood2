@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <imgui.h>
+#include <tuple>
 namespace OpenBlood2
 {
     HudState hud_state(const PlayerStats& s, bool in_world, bool external_camera, bool dead, bool show_crosshair,
@@ -22,6 +23,77 @@ namespace OpenBlood2
                     std::isfinite(s.ammo) && std::isfinite(s.alternate_ammo) && std::isfinite(s.max_health) &&
                     std::isfinite(s.max_armor);
         return h;
+    }
+    namespace
+    {
+        // cres.dll strings are Windows-1252 bytes, typed lines are already UTF-8.
+        std::string display_text(const std::string& text)
+        {
+            for (std::size_t i = 0; i < text.size();)
+            {
+                const auto c = static_cast<unsigned char>(text[i]);
+                const std::size_t length = c < 0x80         ? 1
+                                           : (c >> 5) == 6  ? 2
+                                           : (c >> 4) == 14 ? 3
+                                           : (c >> 3) == 30 ? 4
+                                                            : 0;
+                bool valid = length && i + length <= text.size();
+                for (std::size_t k = 1; valid && k < length; ++k)
+                    valid = (static_cast<unsigned char>(text[i + k]) & 0xc0) == 0x80;
+                if (!valid)
+                {
+                    std::string latin;
+                    for (const unsigned char b : text)
+                    {
+                        if (b < 0x80)
+                            latin += char(b);
+                        else
+                        {
+                            latin += char(0xc0 | (b >> 6));
+                            latin += char(0x80 | (b & 0x3f));
+                        }
+                    }
+                    return latin;
+                }
+                i += length;
+            }
+            return text;
+        }
+    } // namespace
+    int draw_messages(CMessageMgr& messages, float time, const std::string* editor, const std::string& notice)
+    {
+        int y = 0;
+        const auto lines = messages.Draw(time, &y);
+        const auto* viewport = ImGui::GetMainViewport();
+        auto* font = ImGui::GetFont();
+        // Drawn before the status bar, as PostUpdate drew m_MessageMgr before m_NewStatusBar.
+        auto* list = ImGui::GetBackgroundDrawList();
+        const auto line = [&](const std::string& source, int x, int top)
+        {
+            const auto text = display_text(source);
+            list->AddText(font, float(CMessageMgr::kFontHeight), {viewport->Pos.x + x, viewport->Pos.y + top},
+                          IM_COL32(255, 255, 255, 255), text.c_str(), text.c_str() + text.size());
+        };
+        for (const auto& l : lines)
+            line(l.text, l.x, l.y);
+        int count = int(lines.size());
+        if (!notice.empty())
+        {
+            line(notice, 1, y);
+            y += CMessageMgr::kFontHeight;
+            ++count;
+        }
+        if (editor)
+        {
+            // CInputLine::Draw: "SAY:" + text, then a cursor when modf(GetTime()) > .5.
+            double whole = 0;
+            auto text = "SAY:" + *editor;
+            if (std::modf(double(time), &whole) > .5)
+                text += '_';
+            line(text, 1, y);
+            ++count;
+        }
+        return count;
     }
     bool draw_screen_fade(float scale, bool in_world)
     {
@@ -277,6 +349,30 @@ namespace OpenBlood2
                         data[to + 3] = 0;
                 }
         }
+        // The objectives page, its icon and the power bar: m_hTransColor (magenta) is transparent.
+        for (auto [surface, x0, limit] :
+             {std::tuple{status_->objectives_page(), 0u, objectives_icon_x},
+              std::tuple{status_->objectives_icon(), objectives_icon_x, power_x - objectives_icon_x},
+              std::tuple{status_->power_bar(), power_x, width - power_x}})
+        {
+            if (!surface)
+                continue;
+            if (surface->width > limit || surface->height > height - panels_y ||
+                surface->rgba.size() != std::size_t(surface->width) * surface->height * 4)
+            {
+                SDL_UnmapGPUTransferBuffer(device_, transfer_);
+                error = "Original objectives or power bar surface exceeds atlas bounds";
+                return false;
+            }
+            for (unsigned y = 0; y < surface->height; ++y)
+                for (unsigned x = 0; x < surface->width; ++x)
+                {
+                    const auto from = (y * surface->width + x) * 4, to = ((panels_y + y) * width + x0 + x) * 4;
+                    std::copy_n(surface->rgba.data() + from, 4, data + to);
+                    if (data[to] == 255 && data[to + 1] == 0 && data[to + 2] == 255)
+                        data[to + 3] = 0;
+                }
+        }
         SDL_UnmapGPUTransferBuffer(device_, transfer_);
         auto* commands = SDL_AcquireGPUCommandBuffer(device_);
         if (!commands)
@@ -325,6 +421,9 @@ namespace OpenBlood2
             uploaded_revision_ = UINT64_MAX;
             item_messages_ = UINT64_MAX;
             item_shows_ = h.item_shows;
+            // A new status bar applies the shell's current objectives and power bar request.
+            objective_updates_ = power_requests_ = 0;
+            world_revision_ = h.world_revision;
             crosshair_ = nullptr;
             if (!status_->Init())
             {
@@ -348,6 +447,12 @@ namespace OpenBlood2
         {
             error = status_->canvas.error.empty() ? "Invalid original HUD state" : status_->canvas.error;
             return false;
+        }
+        if (h.world_revision != world_revision_)
+        {
+            // OnEnterWorld's Reset precedes the new world's messages.
+            status_->Reset();
+            world_revision_ = h.world_revision;
         }
         if (h.item_messages != item_messages_)
         {
@@ -373,10 +478,19 @@ namespace OpenBlood2
             item_messages_ = h.item_messages;
             item_shows_ = h.item_shows;
         }
-        if (h.world_revision != world_revision_)
+        if (h.objective_updates != objective_updates_)
         {
-            status_->ResetWeapons();
-            world_revision_ = h.world_revision;
+            status_->UpdateObjectives(h.objectives_valid, h.objectives_title, h.objectives_text);
+            objective_updates_ = h.objective_updates;
+        }
+        if (h.power_requests != power_requests_)
+        {
+            // CBloodClientShell::SetPowerBarLevel: bar 0 is its TurnOffPowerBar branch.
+            if (h.power_bar)
+                status_->SetPowerBarLevel(h.power_bar, h.power_percent, h.power_time);
+            else
+                status_->TurnOffPowerBar();
+            power_requests_ = h.power_requests;
         }
         if (!status_->UpdateCTF(h.ctf_team, h.ctf_flag))
         {
@@ -431,6 +545,32 @@ namespace OpenBlood2
                 draw->AddImage((ImTextureID)(intptr_t)texture_, p, {p.x + s->width, p.y + s->height},
                                {float(x0) / atlas_width, float(y0) / atlas_height},
                                {float(x0 + s->width) / atlas_width, float(y0 + s->height) / atlas_height});
+            }
+            // Then DrawObjectives (ScaleSurfaceToSurfaceTransparent into m_rObjectives),
+            // DrawObjectivesIcon and DrawPowerBar.
+            const auto panel = [&](const HudSurface* s, unsigned atlas_x, ImVec2 min, ImVec2 max)
+            {
+                draw->AddImage((ImTextureID)(intptr_t)texture_, {viewport->Pos.x + min.x, viewport->Pos.y + min.y},
+                               {viewport->Pos.x + max.x, viewport->Pos.y + max.y},
+                               {float(atlas_x) / atlas_width, float(panels_y) / atlas_height},
+                               {float(atlas_x + s->width) / atlas_width, float(panels_y + s->height) / atlas_height});
+            };
+            const auto objectives = status_->DrawObjectives(h.time);
+            if (objectives.page)
+                panel(status_->objectives_page(), 0, {float(objectives.rect.left), float(objectives.rect.top)},
+                      {float(objectives.rect.right), float(objectives.rect.bottom)});
+            if (objectives.icon)
+            {
+                const auto* s = status_->objectives_icon();
+                panel(s, objectives_icon_x, {float(objectives.icon_x), float(objectives.icon_y)},
+                      {float(objectives.icon_x + int(s->width)), float(objectives.icon_y + int(s->height))});
+            }
+            const auto power = status_->DrawPowerBar(h.time);
+            if (power.visible)
+            {
+                const auto* s = status_->power_bar();
+                panel(s, power_x, {float(power.x), float(power.y)},
+                      {float(power.x + int(s->width)), float(power.y + int(s->height))});
             }
         }
         if (h.visible && h.ctf_team)

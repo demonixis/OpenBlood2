@@ -45,6 +45,30 @@
 #define WEAPTAB_STOPPED 2
 #define WEAPTAB_SCROLL_OUT 3
 
+#define OBJTAB_SCALE_TIME 0.10f
+#define OBJTAB_SCALE_LEVELS 10
+
+#define OBJTAB_INVISIBLE 0
+#define OBJTAB_SCALE_UP 1
+#define OBJTAB_STOPPED 2
+#define OBJTAB_SCALE_DOWN 3
+
+#define OBJTAB_TITLE_CENTER 135
+#define OBJTAB_TITLE_TOP 35
+#define OBJTAB_TEXT_LEFT 35
+#define OBJTAB_TEXT_TOP 50
+#define OBJTAB_TEXT_WIDTH 200
+
+#define OBJICON_INVISIBLE 0
+#define OBJICON_VISIBLE 1
+
+#define BARTAB_DISP_TIME 5.0f
+
+#define BARTAB_NONE 0
+#define BARTAB_THROW 1
+#define BARTAB_AIR 2
+#define BARTAB_BOSS 3
+
 struct StatTab
 {
 
@@ -131,6 +155,58 @@ class CNewStatusBar
         return m_nWeapLevel;
     }
     std::string weapon_error;
+    // Original Reset on a level change (OnEnterWorld): weapon tabs, objectives page, the
+    // updated-objectives icon and the power bar hide. The page keeps its last text.
+    void Reset();
+    // Original UpdateObjectives/InitObjectivesTab: null title or text (`valid` false) resets the
+    // page to "No Current Objective" and hides the icon. Missing art or font leaves the page
+    // unavailable (objectives_error), never failing the HUD.
+    void UpdateObjectives(bool valid, const std::string& title, const std::string& text);
+    // Original ToggleObjectives (shell Tab): true when the source plays missionobj.wav.
+    bool ToggleObjectives(float time);
+    struct ObjectivesLayout
+    {
+        bool page = false, icon = false;
+        OpenBlood2::HudRect rect{}; // DrawObjectives' ScaleSurfaceToSurface destination.
+        int icon_x = 0, icon_y = 0;
+    };
+    // Original DrawObjectives (scale up/down over 0.1 s) and DrawObjectivesIcon.
+    ObjectivesLayout DrawObjectives(float time);
+    const OpenBlood2::HudSurface* objectives_page() const
+    {
+        return m_hObjectives;
+    }
+    const OpenBlood2::HudSurface* objectives_icon() const
+    {
+        return m_hObjectivesIcon;
+    }
+    unsigned objectives_level() const
+    {
+        return m_nObjLevel;
+    }
+    std::string objectives_error;
+    // Original SetPowerBarLevel/TurnOffPowerBar/DrawPowerBar: a 150x16 surface centred above the
+    // ammunition tab, hidden five seconds after the last update. Missing art: power_error.
+    void SetPowerBarLevel(DBYTE nBar, float fPercent, float time);
+    void TurnOffPowerBar()
+    {
+        m_nPowerBar = BARTAB_NONE;
+    }
+    struct PowerBarLayout
+    {
+        bool visible = false;
+        int x = 0, y = 0;
+    };
+    PowerBarLayout DrawPowerBar(float time);
+    const OpenBlood2::HudSurface* power_bar() const
+    {
+        return m_hPowerBar;
+    }
+    DBYTE power_bar_type() const
+    {
+        return m_nPowerBar;
+    }
+    std::string power_error;
     std::array<const StatTab*, 4> tabs() const
     {
         return {&m_stHealth, &m_stArmor, &m_stAmmo, &m_stAltAmmo};
@@ -146,6 +222,8 @@ class CNewStatusBar
     bool InitStatTabs();
     void InitInvTabs();
     void InitWeaponTabs();
+    void InitPanels();
+    bool InitObjectivesTab();
     void UpdateWeapons(const OpenBlood2::PlayerStats&);
     void AdjustRes(unsigned width, unsigned height);
     void SetupTab(StatTab&, const OpenBlood2::HudFont*, unsigned flags);
@@ -163,6 +241,18 @@ class CNewStatusBar
     unsigned m_nWeapLevel = WEAPTAB_INVISIBLE;
     float m_fWeapUpdateTime = 0, m_fWeapScrollRatio = 0;
     bool weapons_ready = false;
+    OpenBlood2::HudSurface *m_hObjectives = nullptr, *m_hObjectivesIcon = nullptr, *m_hPowerBar = nullptr;
+    const OpenBlood2::HudSurface *objectives_background = nullptr, *m_hHealthBar = nullptr, *m_hThrowBar = nullptr;
+    OpenBlood2::HudFont objectives_font;
+    unsigned m_nObjLevel = OBJTAB_INVISIBLE, m_nObjIcon = OBJICON_INVISIBLE;
+    float m_fObjUpdateTime = 0, m_fObjScaleRatio = 0;
+    OpenBlood2::HudRect m_rObjectives{};
+    unsigned m_nObjectivesX = 100, m_nObjectivesY = 75;
+    DBYTE m_nPowerBar = BARTAB_NONE;
+    float m_fPowerBarUpdate = 0;
+    int m_nPowerBarX = 0, m_nPowerBarY = 0; // Signed: no DDWORD wrap below 150 pixels.
+    int power_fill = -1;                    // Last composed fill width and bar (revision only when pixels change).
+    DBYTE power_drawn = BARTAB_NONE;
     OpenBlood2::HudFont big_numbers, small_numbers, stat_font;
     unsigned m_nScreenWidth = 0, m_nScreenHeight = 0, m_nStatLevel = STATTAB_HIGH;
     OpenBlood2::PlayerStats previous{};

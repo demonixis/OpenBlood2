@@ -79,7 +79,10 @@ bool CPlayerObj::CheckPowerups()
         m_bPowerupActivated[PU_INVULNERABLE] = false;
         m_damage.m_bNighInvulnerable = false;
         ++powerup_expiries;
-        ++powerup_console_unavailable; // IDS_GENERAL_WILLPOWER_EXP console text is not delivered.
+        if (SendConsoleString(277)) // IDS_GENERAL_WILLPOWER_EXP
+            ++powerup_console_messages;
+        else
+            ++powerup_console_unavailable;
         EndPowerupSound(PU_INVULNERABLE);
         PlayVoiceGroupEventOnClient(6 /* VME_POWERUP */, true);
         s->SetObjectUserFlags(m_hObject, s->GetObjectUserFlags(m_hObject) & ~willpower_glow);
@@ -92,7 +95,10 @@ bool CPlayerObj::CheckPowerups()
             visible = true;
             m_bPowerupActivated[PU_INVISIBLE] = false;
             ++powerup_expiries;
-            ++powerup_console_unavailable; // IDS_GENERAL_INVISIBILITY_EXP console text is not delivered.
+            if (SendConsoleString(276)) // IDS_GENERAL_INVISIBILITY_EXP
+                ++powerup_console_messages;
+            else
+                ++powerup_console_unavailable;
             EndPowerupSound(PU_INVISIBLE);
         }
         else if (time > m_fInvisibleTime - 5)
@@ -121,7 +127,10 @@ bool CPlayerObj::CheckPowerups()
         m_InventoryMgr.damage_multiplier /= 3;
         m_bPowerupActivated[PU_TRIPLEDAMAGE] = false;
         ++powerup_expiries;
-        ++powerup_console_unavailable; // IDS_GENERAL_TRIPLEDAMAGE_EXP.
+        if (SendConsoleString(278)) // IDS_GENERAL_TRIPLEDAMAGE_EXP
+            ++powerup_console_messages;
+        else
+            ++powerup_console_unavailable;
         EndPowerupSound(PU_TRIPLEDAMAGE);
         s->SetObjectUserFlags(m_hObject, s->GetObjectUserFlags(m_hObject) & ~anger_glow);
     }

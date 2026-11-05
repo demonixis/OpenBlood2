@@ -77,6 +77,12 @@ bool CPlayerObj::SendConsoleMessage(const std::string& text)
     ++console_messages;
     return true;
 }
+bool CPlayerObj::SendConsoleString(std::uint32_t id)
+{
+    std::string text;
+    auto* server = GetServerDE();
+    return server && server->FindClientResourceString(id, text) && SendConsoleMessage(text);
+}
 CPlayerObj* CPlayerObj::LocalVoicePlayer()
 {
     auto* server = GetServerDE();

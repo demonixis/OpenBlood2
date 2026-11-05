@@ -370,7 +370,8 @@ namespace
         while (g.objects.time() < start + 31)
             CHECK(g.step(.1));
         CHECK(!p.IsPowerupActive(PU_INVISIBLE) && p.powerup_expiries == 1 && r->alpha == 1 &&
-              (r->state.m_Flags & FLAG_SHADOW) && p.powerup_console_unavailable == 1 && !p.m_nPowerupSoundStackPos);
+              (r->state.m_Flags & FLAG_SHADOW) && p.powerup_console_unavailable + p.powerup_console_messages == 1 &&
+              !p.m_nPowerupSoundStackPos);
         // Death resets it (DoDeath -> ResetPowerups).
         CHECK(p.AddPowerup(6, 30) && p.IsPowerupActive(PU_INVISIBLE));
         p.ResetPowerups();

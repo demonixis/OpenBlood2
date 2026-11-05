@@ -1,3 +1,4 @@
+#include "app/control_bindings.h"
 #include "app/hud.h"
 #include "app/movement_controls.h"
 #include "app/ui_runtime.h"
@@ -332,6 +333,216 @@ namespace
         p->m_damage.m_bDead = DFALSE;
         return true;
     }
+    // Original CMessageMgr ring, the objectives toggle/scale machine and power-bar requests without
+    // art, the Tab action, and the shell's air/throw requests and pickup reply on a fixture player.
+    bool panels(const std::filesystem::path& root)
+    {
+        CMessageMgr m;
+        CHECK(!m.GetState() && m.Draw(0).empty() && m.GetMaxMessages() == 4 && m.GetMessageTime() == 5);
+        m.Enable(true);
+        m.SetMaxMessages(0);
+        CHECK(m.GetMaxMessages() == 1);
+        m.SetMaxMessages(50);
+        CHECK(m.GetMaxMessages() == CMessageMgr::kMaxMessages);
+        m.SetMaxMessages(6); // The shell's OnEngineInitialized value.
+        for (int i = 0; i < 8; ++i)
+            m.AddLine("line " + std::to_string(i), float(i));
+        auto lines = m.lines();
+        CHECK(lines.size() == 6 && lines.front() == "line 2" && lines.back() == "line 7" && m.added == 8);
+        int y = -1;
+        auto drawn = m.Draw(6.5f, &y);
+        CHECK(drawn.size() == 6 && drawn[0].x == 1 && drawn[0].y == 0 && drawn[5].y == 80 && y == 96);
+        drawn = m.Draw(7, &y); // "line 2" expires at its 2 + 5 s, inclusive.
+        CHECK(drawn.size() == 5 && drawn[0].text == "line 3" && drawn[0].y == 0 && y == 80 && m.expired == 1);
+        CHECK(m.Draw(100, &y).empty() && y == 0 && !m.count());
+        for (int i = 0; i < 25; ++i) // The ring wraps past kMaxMessages.
+            m.AddLine(std::to_string(i), 200);
+        CHECK(m.lines().size() == 6 && m.lines().back() == "24");
+        m.Enable(false);
+        CHECK(!m.count() && m.Draw(0).empty());
+
+        Resources missing;
+        CNewStatusBar bar(missing);
+        CHECK(bar.ToggleObjectives(0) && bar.objectives_level() == OBJTAB_SCALE_UP);
+        CHECK(!bar.ToggleObjectives(0.05f)); // Ignored while scaling.
+        CHECK(!bar.DrawObjectives(0.05f).page && bar.objectives_level() == OBJTAB_SCALE_UP);
+        CHECK(!bar.DrawObjectives(0.2f).page && bar.objectives_level() == OBJTAB_STOPPED);
+        CHECK(bar.ToggleObjectives(1) && bar.objectives_level() == OBJTAB_SCALE_DOWN);
+        bar.DrawObjectives(1.2f);
+        CHECK(bar.objectives_level() == OBJTAB_INVISIBLE);
+        bar.UpdateObjectives(true, "Title", "Text"); // No page art: nothing to compose or flag.
+        bar.SetPowerBarLevel(BARTAB_AIR, .5f, 1);
+        CHECK(!bar.DrawObjectives(2).icon && !bar.DrawPowerBar(2).visible && bar.power_bar_type() == BARTAB_NONE);
+
+        const auto bindings = InputBindings::defaults();
+        CHECK(info(InputAction::Objectives).name == "objectives" &&
+              info(InputAction::Objectives).kind == InputActionKind::Interface && !rebindable(InputAction::Objectives));
+        CHECK(bindings.matches({InputSource::Key, SDL_SCANCODE_TAB, true, false}, InputAction::Objectives));
+
+        GameSession g;
+        std::string error;
+        CHECK(test_player::setup(g, root) && g.enter_player(error));
+        auto* p = g.server_shell.Player(g.local_client);
+        auto& client = g.client_shell;
+        CHECK(p->UpdateStats(true) && g.pump_player_messages(error) && client.stats.air == 1 && !client.air_updates);
+        // CBloodClientShell::SetPowerBarLevel: <= 0 or >= 1 turns the bar off.
+        client.SetPowerBarLevel(BARTAB_THROW, .5f);
+        CHECK(client.power_bar.bar == BARTAB_THROW && client.power_bar.percent == .5f);
+        for (float off : {0.f, 1.f, -1.f, std::numeric_limits<float>::quiet_NaN()})
+        {
+            client.SetPowerBarLevel(BARTAB_THROW, off);
+            CHECK(client.power_bar.bar == BARTAB_NONE);
+        }
+        const auto requests = client.power_bar.requests;
+        p->m_fAirLevel = 25; // PLAYERSTATS_AIRLEVEL is m_fAirLevel / MAX_AIR_LEVEL.
+        CHECK(p->UpdateStats(false) && g.pump_player_messages(error));
+        CHECK(client.air_updates == 1 && client.power_bar.bar == BARTAB_AIR && client.power_bar.percent == .25f &&
+              client.power_bar.requests == requests + 1);
+        CHECK(p->UpdateStats(false) && g.pump_player_messages(error) && client.air_updates == 1);
+        p->m_fAirLevel = 100;
+        CHECK(p->UpdateStats(false) && g.pump_player_messages(error));
+        CHECK(client.air_updates == 2 && client.power_bar.bar == BARTAB_NONE);
+        HudState h;
+        hud_panels(h, client);
+        CHECK(h.power_requests == client.power_bar.requests && h.power_bar == BARTAB_NONE);
+        // CSPrint2 of a typed console line, then the original pickup reply. The fixture has no
+        // cres.dll: no line and an explicit error, without a session failure.
+        CHECK(g.server.SendToClient(g.local_client, PlayerText{"Hello"}) == DE_OK && g.pump_player_messages(error));
+        CHECK(client.m_MessageMgr.lines().back() == "Hello" && client.message_revision == 1);
+        const auto failures = g.objects.failure_count();
+        auto pickup =
+            g.objects.create(g.objects.find_class("BerettaPU"), {}, Creation::World, {{"Pos", DVector{300, 100, 300}}});
+        CHECK(pickup && g.objects.engine_message(pickup, MID_TOUCHNOTIFY, client.player) &&
+              g.pump_player_messages(error));
+        CHECK(p->pickup_messages == 0 && p->pickup_message_error == "Missing pickup message string 260");
+        CHECK(p->m_hLastPickupObject == pickup && p->m_nLastPickupResult == CPlayerObj::CHWEAP_OK &&
+              g.objects.failure_count() == failures && client.m_MessageMgr.lines().size() == 1);
+        CHECK(g.leave_player() && g.unload_world());
+        return true;
+    }
+    // Original objectives page, updated icon and power bar on the retail art, then the original
+    // pickup, objective and air values through 01_SubwayA and the typed client messages.
+    bool private_panels(GameSession& g, CNewStatusBar& bar)
+    {
+        CHECK(bar.objectives_error.empty() && bar.power_error.empty());
+        const auto* page = bar.objectives_page();
+        const auto* icon = bar.objectives_icon();
+        const auto* power = bar.power_bar();
+        CHECK(page && page->width == 250 && page->height == 150 && icon && icon->width == 38 && icon->height == 66);
+        CHECK(power && power->width == 150 && power->height == 16);
+        PlayerStats sample;
+        sample.weapon = WEAP_BERETTA;
+        sample.weapon_slot = 1;
+        sample.health = 100;
+        sample.ammo = 50;
+        sample.ammo_type = sample.alternate_ammo_type = AMMO_BULLET;
+        CHECK(bar.Update(sample, 640, 480));
+        bar.Reset();
+        const auto empty = page->rgba; // "No Current Objective"
+        auto revision = bar.revision;
+        bar.UpdateObjectives(true, "Title", "An objective long enough to wrap over the page's 200 pixel width.");
+        CHECK(page->rgba != empty && bar.revision == revision + 1);
+        auto o = bar.DrawObjectives(100);
+        CHECK(!o.page && o.icon && o.icon_x == 640 - 38 - 5 && o.icon_y == 5);
+        CHECK(bar.ToggleObjectives(100) && bar.objectives_level() == OBJTAB_SCALE_UP && !bar.ToggleObjectives(100));
+        o = bar.DrawObjectives(100.05f); // Index 5: x 1.1, y .25 of the half sizes around the centre.
+        CHECK(o.page && !o.icon && o.rect.left == 87 && o.rect.right == 362 && o.rect.top == 131 &&
+              o.rect.bottom == 168);
+        o = bar.DrawObjectives(100.2f);
+        CHECK(o.page && bar.objectives_level() == OBJTAB_STOPPED && o.rect.left == 100 && o.rect.top == 75 &&
+              o.rect.right == 350 && o.rect.bottom == 225);
+        CHECK(bar.DrawObjectives(160).page); // No display timeout.
+        bar.UpdateObjectives(true, "Title", "Changed while shown: no icon.");
+        CHECK(!bar.DrawObjectives(160).icon);
+        CHECK(bar.ToggleObjectives(161) && bar.DrawObjectives(161.05f).page);
+        CHECK(!bar.DrawObjectives(161.2f).page && bar.objectives_level() == OBJTAB_INVISIBLE);
+        bar.UpdateObjectives(true, "Title", "Text");
+        CHECK(bar.DrawObjectives(162).icon);
+        bar.Reset(); // OnEnterWorld: the icon hides, the page keeps its text.
+        CHECK(!bar.DrawObjectives(162).icon && page->rgba != empty);
+        bar.UpdateObjectives(false, {}, {});
+        CHECK(page->rgba == empty && !bar.DrawObjectives(162).icon);
+
+        const auto pixels = [&](std::uint8_t r, std::uint8_t g, std::uint8_t b)
+        {
+            unsigned n = 0;
+            for (std::size_t i = 0; i + 3 < power->rgba.size(); i += 4)
+                n += power->rgba[i] == r && power->rgba[i + 1] == g && power->rgba[i + 2] == b;
+            return n;
+        };
+        revision = bar.revision;
+        bar.SetPowerBarLevel(BARTAB_AIR, .5f, 200);
+        CHECK(bar.revision == revision + 1 && bar.power_bar_type() == BARTAB_AIR && pixels(0, 0, 255) > 0);
+        bar.SetPowerBarLevel(BARTAB_AIR, .5f, 201); // Same pixels: no recomposition.
+        CHECK(bar.revision == revision + 1);
+        bar.SetPowerBarLevel(BARTAB_THROW, .5f, 202);
+        CHECK(pixels(255, 255, 0) > 0 && !pixels(0, 0, 255));
+        const auto half = pixels(255, 255, 0);
+        bar.SetPowerBarLevel(BARTAB_THROW, .9f, 202);
+        CHECK(pixels(255, 255, 0) > half);
+        bar.SetPowerBarLevel(BARTAB_BOSS, .25f, 203);
+        CHECK(pixels(255, 0, 0) > 0 && !pixels(255, 255, 0));
+        auto pb = bar.DrawPowerBar(203);
+        CHECK(pb.visible && pb.x == 245 && pb.y == int(bar.tabs()[2]->locY) - 32);
+        CHECK(bar.DrawPowerBar(208.1f).visible && bar.power_bar_type() == BARTAB_NONE &&
+              !bar.DrawPowerBar(208.2f).visible);
+        std::cout << "Objectives page 250x150, skull 38x66, power bar 150x16 at (" << pb.x << ',' << pb.y << ")\n";
+
+        std::string error;
+        CHECK(g.request_world("01_SubwayA", error) && g.enter_player(error));
+        auto* p = g.server_shell.Player(g.local_client);
+        auto& client = g.client_shell;
+        std::string format;
+        CHECK(g.server.FindClientResourceString(260, format));
+        std::cout << "IDS_GENERAL_PICKUP_1: \"" << format << "\"\n";
+        const auto create = [&](const char* type, Properties props)
+        {
+            props.try_emplace("Name", std::string("hud_pickup"));
+            props.try_emplace("Pos", DVector{200, 10000, 200});
+            return g.objects.create(g.objects.find_class(type), {}, Creation::World, props);
+        };
+        // The carried Beretta accepts the pickup's ammunition (CHWEAP_OK).
+        auto pickup = create("BerettaPU", {});
+        CHECK(pickup && g.objects.engine_message(pickup, MID_TOUCHNOTIFY, client.player) &&
+              g.pump_player_messages(error));
+        auto lines = client.m_MessageMgr.lines();
+        // IDS_WEAPON_BERETTA (350) carries a trailing space in the retail cres.dll; kept as is.
+        CHECK(p->pickup_messages == 1 && p->pickup_message_error.empty() && !lines.empty() &&
+              lines.back().starts_with("Picked Up Beretta"));
+        std::cout << "Pickup line: \"" << lines.back() << "\"\n";
+        // A key without ResourceNum shows its object name; a second copy is CHWEAP_ALREADYHAVE.
+        const Properties key{{"ObjectName", std::string("RedKey")},
+                             {"ModelFile", std::string("models/characters/caleb.abc")}};
+        pickup = create("KeyPickup", key);
+        CHECK(pickup && g.objects.engine_message(pickup, MID_TOUCHNOTIFY, client.player) &&
+              g.pump_player_messages(error));
+        CHECK(p->pickup_messages == 2 && client.m_MessageMgr.lines().back() == "Picked Up RedKey");
+        pickup = create("KeyPickup", key);
+        CHECK(pickup && g.objects.engine_message(pickup, MID_TOUCHNOTIFY, client.player) &&
+              g.pump_player_messages(error));
+        CHECK(p->pickup_messages == 2 && p->m_nLastPickupResult == CPlayerObj::CHWEAP_ALREADYHAVE);
+        const auto drawn = client.m_MessageMgr.Draw(float(g.objects.time()));
+        CHECK(drawn.size() >= 2 && drawn.back().text == "Picked Up RedKey" && drawn[0].y == 0 && drawn[1].y == 16);
+        // SMSG_OBJECTIVES with resource 1 (strings 5000/6000) and the air level.
+        const auto updates = client.objective_updates, sounds = client.interface_sounds;
+        CHECK(g.server.SendToClient(g.local_client, MissionObjectives{1, {}, {}}) == DE_OK &&
+              g.pump_player_messages(error));
+        CHECK(client.objective_updates == updates + 1 && client.objectives_resolved &&
+              !client.objectives.title.empty() && client.interface_sounds == sounds + 1 &&
+              client.interface_sound_error.empty());
+        HudState h;
+        hud_panels(h, client);
+        CHECK(h.objectives_valid && h.objectives_title == client.objectives.title &&
+              h.objective_updates == client.objective_updates);
+        bar.UpdateObjectives(true, h.objectives_title, h.objectives_text);
+        CHECK(page->rgba != empty);
+        std::cout << "Objective 1: \"" << client.objectives.title << "\"\n";
+        p->m_fAirLevel = 40;
+        CHECK(p->UpdateStats(false) && g.pump_player_messages(error));
+        CHECK(client.power_bar.bar == BARTAB_AIR && std::abs(client.power_bar.percent - .4f) < 1e-6f);
+        CHECK(g.unload_world() && !g.server.string_count());
+        return true;
+    }
     bool private_data(const std::filesystem::path& root)
     {
         GameSession g;
@@ -486,7 +697,7 @@ namespace
             CHECK(hud_state(g.client_shell.stats, true, false).stats.ammo_type == AMMO_NONE);
             CHECK(g.unload_world() && !g.client_shell.m_bInWorld && !g.server.string_count());
         }
-        return true;
+        return private_panels(g, bar);
     }
     bool gpu(const std::filesystem::path& root, const std::filesystem::path& content, bool ctf = false)
     {
@@ -742,6 +953,8 @@ int main(int argc, char** argv)
         return session(argv[2]) ? 0 : 1;
     if (mode == "inventory")
         return inventory(argv[2]) ? 0 : 1;
+    if (mode == "panels")
+        return panels(argv[2]) ? 0 : 1;
     if (mode == "private")
         return private_data(argv[2]) ? 0 : 1;
     if (mode == "gpu_ctf")

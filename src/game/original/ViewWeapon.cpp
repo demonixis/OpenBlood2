@@ -145,6 +145,7 @@ bool CViewWeapon::PlayAnimation(std::uint32_t clip)
 bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT client, const WeaponInput& input,
                          DVector position, DVector direction, double seconds, std::string& error)
 {
+    bomb_power = -1;
     if (!model)
         return true;
     auto* player = server.Player(client);
@@ -360,9 +361,11 @@ bool CViewWeapon::Update(ServerDE& engine, CBloodServerShell& server, HCLIENT cl
         if (state == WS_FIRING)
         {
             bomb_held = time - bomb_start;
-            bomb_speed = 250 + 1500 * std::min(bomb_held / .75f, 1.f);
+            bomb_power = std::min(bomb_held / .75f, 1.f); // fPercent = m_fTimeHeld / BOMBS_MAX_DIST_TIME.
+            bomb_speed = 250 + 1500 * bomb_power;
             if ((type == WEAP_PROXIMITYBOMB || type == WEAP_TIMEBOMB) && bomb_held > 1.25f)
             {
+                ++bomb_overholds; // pShell->CSPrint("Idiot! Let go next time!")
                 bomb_speed = 0;
                 bomb_held = 0;
                 state = WS_STOP_FIRING;

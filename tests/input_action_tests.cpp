@@ -138,7 +138,8 @@ namespace
         for (const auto& entry : all.entries)
             CHECK(InputBindings::valid(entry));
         for (std::size_t i = 0; i < input_action_count; ++i)
-            CHECK((InputAction(i) < InputAction::Strafe || InputAction(i) == InputAction::ThirdPerson)
+            CHECK((InputAction(i) < InputAction::Strafe || InputAction(i) == InputAction::ThirdPerson ||
+                   InputAction(i) == InputAction::Objectives)
                       ? count(all, InputAction(i)) > 0
                       : count(all, InputAction(i)) == 0);
         for (const auto& entry : b.entries)

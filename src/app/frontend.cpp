@@ -1246,27 +1246,19 @@ namespace OpenBlood2
                     state.item_shows = client.inventory_show_requests;
                     state.time = float(game->objects.time());
                     state.world_revision = game->world_revision;
+                    hud_panels(state, client);
                     if (std::exchange(input.weapon_tabs, false))
                         hud.toggle_weapons(state.time);
+                    // Original VK_TAB: ToggleObjectives in single/custom games, with missionobj.wav.
+                    if (std::exchange(input.objectives, false) && client.ObjectivesAvailable() &&
+                        hud.toggle_objectives(state.time))
+                        game->client_shell.PlayInterfaceSound("Sounds\\Interface\\MainMenus\\missionobj.wav");
+                    // PostUpdate GS_PLAYING: m_MessageMgr.Draw, then the status bar.
+                    if (client.m_bInWorld)
+                        draw_messages(game->client_shell.m_MessageMgr, state.time,
+                                      input.message.active ? &input.message.text : nullptr, client.control_notice);
                     if (!hud.draw(state, game->resources, error))
                         return failed(4);
-                    if (input.message.active || !client.chat_lines.empty() || !client.control_notice.empty())
-                    {
-                        auto* draw = ImGui::GetForegroundDrawList();
-                        float y = 12;
-                        const auto line = [&](const std::string& text)
-                        {
-                            draw->AddText({13, y + 1}, IM_COL32(0, 0, 0, 255), text.c_str());
-                            draw->AddText({12, y}, IM_COL32(255, 255, 255, 255), text.c_str());
-                            y += ImGui::GetTextLineHeightWithSpacing();
-                        };
-                        for (const auto& text : client.chat_lines)
-                            line(text);
-                        if (!client.control_notice.empty())
-                            line(client.control_notice);
-                        if (input.message.active)
-                            line("Say: " + input.message.text + "_");
-                    }
                     if (input.touch.visible && client.m_bInWorld && !xr_mode && !input.message.active)
                         draw_touch_controls(input.touch);
                     if (saves.notice.visible())
