@@ -1247,3 +1247,18 @@ departed gameplay cleanup. Mark the affected recipient as failed; its next
 private-event drain causes the existing endpoint rejection/disconnect path.
 Other recipients continue. The data are exposed through the independent client;
 scoreboard rendering and original join/leave/frag text/audio consumers follow.
+
+## Connection deadline after content preparation
+
+The [connection-clock correction](../implementation/reports/m9_connection_clock.md)
+separates synchronous resource mounting/fingerprinting from connecting. A fresh
+NetworkClient first prepares content without opening transport or starting any
+deadline. The caller then samples its monotonic time and starts the connection.
+Prepared endpoints cannot update gameplay or disconnect a nonexistent peer;
+invalid preparation/order/profile requests do not consume the prepared state.
+
+Keep the actual five-second connection budget and all later phase deadlines.
+No hidden clock offset, widened timeout, simulated tick, content-hash shortcut
+or second movement integration compensates for preparation latency. The original
+roster-lot sanitizer timeout remains historical evidence; slow content reads no
+longer consume network connection time.

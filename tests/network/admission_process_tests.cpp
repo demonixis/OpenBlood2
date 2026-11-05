@@ -38,7 +38,8 @@ namespace
         NetworkClient client;
         JoinProfile profile;
         profile.weapons = {WEAP_BERETTA, WEAP_SNIPERRIFLE};
-        CHECK(client.connect(config, "127.0.0.1", std::uint16_t(port), profile, Clock::now(), error));
+        CHECK(client.prepare(config, error));
+        CHECK(client.connect("127.0.0.1", std::uint16_t(port), profile, Clock::now(), error));
         const auto deadline = Clock::now() + std::chrono::seconds(18);
         Clock::time_point leave_at;
         bool announced = false, leaving = false, saw_arrival = false, saw_departure = false, displaced = false;

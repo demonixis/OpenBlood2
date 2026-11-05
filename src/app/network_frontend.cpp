@@ -96,7 +96,8 @@ namespace OpenBlood2
         const auto window = SDL_GetWindowID(runtime.window);
         const auto format = SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window);
         NetworkClient client;
-        if (!client.connect(config, address.host, address.port, profile, NetworkClient::Clock::now(), error))
+        if (!client.prepare(config, error) ||
+            !client.connect(address.host, address.port, profile, NetworkClient::Clock::now(), error))
             return failed();
         spdlog::info("Connecting to {}:{} as {}", address.host, address.port, profile.name);
         if (!client.audio().mixer.set_gains(settings.sound ? settings.sound_volume / 50.f : 0,

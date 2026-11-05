@@ -25,6 +25,7 @@ namespace OpenBlood2
         enum class Phase
         {
             Idle,
+            Prepared,
             Connecting,
             Offer,
             Baseline,
@@ -39,8 +40,11 @@ namespace OpenBlood2
         }
         NetworkClient(const NetworkClient&) = delete;
         NetworkClient& operator=(const NetworkClient&) = delete;
-        bool connect(const Config&, std::string_view host, std::uint16_t port, const Net::JoinProfile&,
-                     Clock::time_point, std::string& error);
+        // Mount/hash before starting any network deadline. The caller samples
+        // its monotonic clock after this synchronous preparation has returned.
+        bool prepare(const Config&, std::string& error);
+        bool connect(std::string_view host, std::uint16_t port, const Net::JoinProfile&, Clock::time_point,
+                     std::string& error);
         bool update(Clock::time_point, const MovementInput&, bool commands, std::string& error,
                     WeaponInput weapon = {});
         bool look(float pitch_delta, float yaw_delta);

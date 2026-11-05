@@ -51,7 +51,8 @@ namespace
         const std::string target_model =
             hosted ? (victim ? "models/characters/ophelia.abc" : "models/characters/ishmael.abc")
                    : "models/characters/caleb.abc";
-        CHECK(client.connect(config, "127.0.0.1", std::uint16_t(port), profile, Clock::now(), error));
+        CHECK(client.prepare(config, error));
+        CHECK(client.connect("127.0.0.1", std::uint16_t(port), profile, Clock::now(), error));
         const auto deadline = Clock::now() + std::chrono::seconds(35);
         ObjectId other;
         bool announced = false, leaving = false, hurt = false, use_sent = false, respawned = false;

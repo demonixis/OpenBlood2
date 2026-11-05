@@ -20,13 +20,38 @@ namespace
         std::string error;
         Config config;
         config.data_dir = path_from_utf8(data);
+        {
+            // A prepared endpoint can wait arbitrarily without consuming its
+            // connection budget. No sleeping, busy work or longer timeout.
+            Transport server;
+            CHECK(server.listen("127.0.0.1", 0, 1, error));
+            NetworkClient client;
+            const auto early = Clock::time_point{};
+            CHECK(!client.connect("127.0.0.1", server.port(), {}, early, error));
+            CHECK(client.phase() == NetworkClient::Phase::Idle && client.prepare(config, error));
+            CHECK(!client.prepare(config, error) && client.phase() == NetworkClient::Phase::Prepared);
+            const auto connected = early + std::chrono::hours(1);
+            CHECK(!client.update(connected, {}, false, error) && client.phase() == NetworkClient::Phase::Prepared);
+            CHECK(!client.disconnect(connected));
+            auto invalid = JoinProfile{};
+            invalid.name.clear();
+            CHECK(!client.connect("127.0.0.1", server.port(), invalid, connected, error));
+            CHECK(client.phase() == NetworkClient::Phase::Prepared);
+            CHECK(client.connect("127.0.0.1", server.port(), {}, connected, error));
+            CHECK(client.update(connected + std::chrono::milliseconds(4999), {}, false, error));
+            CHECK(client.phase() == NetworkClient::Phase::Connecting);
+            // The server deliberately never polls/acknowledges this connection.
+            CHECK(!client.update(connected + std::chrono::seconds(5), {}, false, error));
+            CHECK(client.phase() == NetworkClient::Phase::Failed && client.reason() == "Server connection timed out");
+        }
         for (unsigned test = 0; test < 5; ++test)
         {
             Transport server;
             CHECK(server.listen("127.0.0.1", 0, 1, error));
             NetworkClient client;
+            CHECK(client.prepare(config, error));
             const auto began = Clock::now();
-            CHECK(client.connect(config, "127.0.0.1", server.port(), {}, began, error));
+            CHECK(client.connect("127.0.0.1", server.port(), {}, began, error));
             PeerId peer = 0;
             bool hello = false;
             while (!hello && Clock::now() < began + std::chrono::seconds(5))
@@ -97,7 +122,8 @@ namespace
             }
             CHECK(progressed);
         }
-        std::cout << "NetworkClient: real ENet handshake, bad clock, timeout, malformed/order refusals and rejection "
+        std::cout << "NetworkClient: separate preparation, exact five-second connection budget, real ENet handshake, "
+                     "bad clock, timeout, malformed/order refusals and rejection "
                      "reason passed\n";
         return true;
     }

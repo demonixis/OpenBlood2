@@ -26,8 +26,9 @@ namespace
         ServerNetwork server(session);
         CHECK(server.listen("127.0.0.1", 0, 2, error));
         NetworkClient client;
+        CHECK(client.prepare(config, error));
         auto now = NetworkClient::Clock::now();
-        CHECK(client.connect(config, "127.0.0.1", server.port(), {}, now, error));
+        CHECK(client.connect("127.0.0.1", server.port(), {}, now, error));
         const auto step = [&]() -> bool
         {
             CHECK(session.tick(error));

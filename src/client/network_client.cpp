@@ -22,18 +22,30 @@ namespace OpenBlood2
         std::vector<std::uint8_t> bytes;
         return Net::encode_admission(value, bytes) && transport_.send(peer_, Net::Channel::Control, bytes, error);
     }
-    bool NetworkClient::connect(const Config& config, std::string_view host, std::uint16_t port,
-                                const Net::JoinProfile& profile, Clock::time_point now, std::string& error)
+    bool NetworkClient::prepare(const Config& config, std::string& error)
     {
         error.clear();
-        if (phase_ != Phase::Idle || !Net::valid_profile(profile))
+        if (phase_ != Phase::Idle)
         {
-            error = "Client connection requires a fresh endpoint and valid profile";
+            error = "Client content preparation requires a fresh endpoint";
             return false;
         }
-        if (!resources_.mount_game(config, error) || !Net::content_fingerprint(resources_, digest_, error) ||
-            !transport_.open_client(error))
-            return fail(error, "Client content/transport initialization failed");
+        if (!resources_.mount_game(config, error) || !Net::content_fingerprint(resources_, digest_, error))
+            return fail(error, "Client content initialization failed");
+        phase_ = Phase::Prepared;
+        return true;
+    }
+    bool NetworkClient::connect(std::string_view host, std::uint16_t port, const Net::JoinProfile& profile,
+                                Clock::time_point now, std::string& error)
+    {
+        error.clear();
+        if (phase_ != Phase::Prepared || !Net::valid_profile(profile))
+        {
+            error = "Client connection requires prepared content and a valid profile";
+            return false;
+        }
+        if (!transport_.open_client(error))
+            return fail(error, "Client transport initialization failed");
         peer_ = transport_.connect(host, port, error);
         if (!peer_)
             return fail(error, "Cannot connect to server");
@@ -263,7 +275,7 @@ namespace OpenBlood2
         error.clear();
         if (phase_ == Phase::Closed)
             return true;
-        if (phase_ == Phase::Idle || phase_ == Phase::Failed || now < last_)
+        if (phase_ == Phase::Idle || phase_ == Phase::Prepared || phase_ == Phase::Failed || now < last_)
         {
             error = "Client update requires a connected endpoint and monotonic time";
             return false;
@@ -441,7 +453,7 @@ namespace OpenBlood2
     {
         if (phase_ == Phase::Closed || phase_ == Phase::Failed)
             return true;
-        if (phase_ == Phase::Idle || now < last_ || !transport_.disconnect(peer_, 0))
+        if (phase_ == Phase::Idle || phase_ == Phase::Prepared || now < last_ || !transport_.disconnect(peer_, 0))
             return false;
         phase_ = Phase::Closing;
         deadline_ = now + 2s;
