@@ -175,5 +175,34 @@ DVector CBloodClientShell::SceneLightScale() const
         return {1, 0, .5f};
     if (creature)
         return {creature_light, creature_light, creature_light};
-    return night_goggles ? DVector{.1f, 1, .1f} : DVector{1, 1, 1};
+    if (night_goggles)
+        return {.1f, 1, .1f};
+    // Default: original UpdateContainerFX m_vLightScale for the first container holding the
+    // camera, unless that container is hidden (issue #8 underwater colours).
+    ContainerCode code = CC_NOTHING;
+    if (!server_.GetPointContainerCode(camera_position, code, true))
+        code = CC_NOTHING;
+    const float now = server_.GetTime();
+    if (code != view_container)
+    {
+        view_container = code;
+        view_container_start = now;
+    }
+    switch (code)
+    {
+        case CC_WATER:
+            return {.3f, .8f, .8f};
+        case CC_BLOOD:
+            return {1, 0, 0};
+        case CC_ACID:
+            return {0, .8f, .4f};
+        case CC_FREEFALL:
+        {
+            constexpr float fall = 1.5f;
+            const float scale = now < view_container_start + fall ? (view_container_start + fall - now) / fall : 0;
+            return {scale, scale, scale};
+        }
+        default:
+            return {1, 1, 1};
+    }
 }

@@ -81,6 +81,17 @@ namespace
               c.m_fovX == original_fov_zoomed);
         CHECK(std::abs(original_fov_scale(c.ViewFovX()) - 1 / std::tan(original_fov_zoomed / 2)) < 1e-4f);
         CHECK(original_fov_scale(original_fov_normal) > .9999f && original_fov_scale(original_fov_normal) < 1.0001f);
+        // Options > Display FIELD OF VIEW: the chosen field replaces FOV_NORMAL, zoom stays absolute.
+        {
+            const float wide = 110 * 0.017453292f, mid = (original_fov_normal + original_fov_zoomed) / 2;
+            CHECK(presented_fov_x(original_fov_normal, wide) == wide &&
+                  presented_fov_x(original_fov_zoomed, wide) == original_fov_zoomed);
+            CHECK(std::abs(presented_fov_x(mid, wide) - (wide + original_fov_zoomed) / 2) < 1e-5f);
+            CHECK(presented_fov_x(original_fov_normal, original_fov_normal) == original_fov_normal);
+            CHECK(std::abs(presented_fov_x(original_fov_normal * 1.5f, wide) -
+                           (original_fov_normal * 1.5f + wide - original_fov_normal)) < 1e-5f); // Orb offset.
+            CHECK(presented_fov_x(original_fov_normal, std::nanf("")) == original_fov_normal);
+        }
         CHECK(original_crosshair_path(98) == "interface/crosshairs/crosshair98.pcx" &&
               original_crosshair_path(1) == original_crosshair_bitmap);
         // Toggle off: action, zoom off, original crosshair restored, FOV widens back.
@@ -209,8 +220,7 @@ namespace
         auto& p = player(g);
         auto pickup_pos = g.client_shell.position;
         pickup_pos.x += 100; // Keep ground-placement contacts separate from the explicit touch below.
-        auto h = g.objects.create(g.objects.find_class("BinocularsPU"), {}, Creation::World,
-                                  {{"Pos", pickup_pos}});
+        auto h = g.objects.create(g.objects.find_class("BinocularsPU"), {}, Creation::World, {{"Pos", pickup_pos}});
         CHECK(h && g.objects.get(h)->model && g.objects.get(h)->model_error.empty());
         CHECK(g.objects.engine_message(h, MID_TOUCHNOTIFY, p.m_hObject) && p.m_InventoryMgr.binoculars);
         // The SubwayA intro camera blocks item commands; activate the inventory item directly.

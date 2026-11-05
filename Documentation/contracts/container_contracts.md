@@ -133,6 +133,12 @@ The [original PolyGrid continuation](polygrid_contracts.md) supersedes the blank
 liquid-surface omission for static VolumeBrush surfaces. Underwater fog, moving
 volumes, rendering parity and the actual M2 gate remain open.
 
+Underwater colour (0.5.2): the original `UpdateContainerFX` scene light scale now follows the
+camera's container (`GetPointContainerCode` at the camera position): water (.3, .8, .8),
+blood (1, 0, 0), acid (0, .8, .4), and FreeFall fading over 1.5 s from entry. It is applied
+after the night-goggles scale; hidden containers do not tint. Underwater fog and audio
+filtering remain open.
+
 ## Engine built-in Container
 
 `Container` is the engine class from AppHeaders/engineobjects.c (`cntr_MessageFn`):

@@ -1,6 +1,7 @@
 #include "app/sprite_scene.h"
 #include "game/original/AI_Mgr.h"
 #include "shield_fixture.h"
+#include <algorithm>
 #include <cmath>
 #include <limits>
 using namespace OpenBlood2;
@@ -120,7 +121,9 @@ namespace
         pose = {};
         CHECK(fx.CreateObject(r, pose, 0, error) && fx.Update(0, &pose, random));
         auto previous = random;
-        CHECK(!fx.Update(.11, &pose, random, 23) && !fx.error.empty() && fx.particles.empty() && random == previous);
+        // 0.5.2: a burst past the budget keeps its leading samples and counts the rest.
+        CHECK(fx.Update(.11, &pose, random, 23) && fx.error.empty() && fx.particles.size() <= 23 && fx.dropped > 0);
+        (void)previous;
         CHECK(!fx.Update(-1, &pose, random) && !fx.Update(std::numeric_limits<double>::infinity(), &pose, random));
         GameSession g;
         CHECK(test_player::setup(g, root / "session") && test_shield::mount(g.resources, root / "session", error));
@@ -134,8 +137,11 @@ namespace
         CHECK(!g.server.PublishObjectParticles(h, 19, error) && manager.reports.size() == 64);
         CHECK(manager.advance(0, g.server) && manager.advance(.11, g.server));
         CHECK(manager.advance(.22, g.server));
-        CHECK(!manager.advance(.33, g.server) && manager.failed > 3 && manager.particle_count() <= 8192);
-        CHECK(!manager.update_error.empty());
+        // 0.5.2: the shared pool bound truncates bursts (counted per effect) instead of failing.
+        CHECK(manager.advance(.33, g.server) && manager.failed == 3 &&
+              manager.particle_count() <= 8192); // The three refused publishes.
+        CHECK(manager.update_error.empty() &&
+              std::any_of(manager.active.begin(), manager.active.end(), [](auto& a) { return a.effect.dropped > 0; }));
         CHECK(g.objects.remove(h));
         CHECK(!g.server.PublishObjectParticles(h, 19, error)); // pending removal is already stale
         CHECK(g.objects.finish_frame() && manager.advance(.34, g.server) && manager.active.empty());

@@ -172,8 +172,9 @@ namespace OpenBlood2
         }
         const Uint32 top = target.letterbox ? height_ / 6 : 0, height = height_ - 2 * top;
         const float aspect = float(width_) / float(height);
-        const auto frustum =
-            target.eye ? eye_frustum(eye, view_rotation, *target.eye) : view_frustum(eye, view_rotation, aspect);
+        const auto frustum = target.eye
+                                 ? eye_frustum(eye, view_rotation, *target.eye)
+                                 : view_frustum(eye, view_rotation, aspect, world_near, world_far, target.view_scale);
         WorldViewUniform uniform;
         for (std::size_t i = 0; i < draws.size(); ++i)
         {

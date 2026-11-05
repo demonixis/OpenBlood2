@@ -112,6 +112,25 @@ void RotatingDoor::Move(bool opening)
     angles = next;
     if (x && y && z)
     {
+        // Original RotatingDoor::Opening/Closing first play the stop sound themselves
+        // (PlaySoundFromObject: attached 3D one-shot, radius 1000, inner 100,
+        // SOUNDPRIORITY_MISC_MEDIUM), then SetOpen/SetClosed play it again through
+        // Door::StartSound. Both overlap; a failure never changes the door state.
+        const auto& stop = opening ? open_stop : close_stop;
+        auto* server = GetServerDE();
+        if (server && !stop.empty())
+        {
+            SoundRequest request;
+            request.resource = stop;
+            request.speaker = m_hObject;
+            request.space = SoundSpace::Spatial;
+            request.inner_radius = 100;
+            request.outer_radius = 1000;
+            request.priority = 1;
+            request.reverb_requested = true;
+            std::string error;
+            server->PlayCharacterSound(m_hObject, request, false, error);
+        }
         if (opening)
             SetOpen();
         else

@@ -41,3 +41,14 @@ a visible one hides again (and is removed after KILL). Removal kills the loop.
 
 Inspection retains touches, beam hits, damage messages, flickers and the last
 sound result. Client SFX beyond the model are not ported.
+
+## Embedded emitters (0.5.2)
+
+03_Museum's beams are authored with both endpoints inside walls (8 units, 24 for tl25b–27b).
+The original BSP ray reports only polygons crossed from their front side, so the touch check
+left the wall unhindered; the replacement world query also reports the inner face, so the
+first hit was always the wall and players were never damaged ([#8](https://github.com/demonixis/OpenBlood2/issues/8)).
+`HandleTouch` now casts from the laser's position to its first endpoint against the world and
+starts the beam 0.01 past the wall it emerges from. The object test, `Damage * 0.1` per touch
+and its delay are unchanged. sl1–sl8 lie inside the DC9 display case and stay untouchable
+until its glass breaks, as in the original.

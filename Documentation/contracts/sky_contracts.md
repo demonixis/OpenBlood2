@@ -129,3 +129,19 @@ computes the projection and suppresses sky portal faces. Geometry/texture upload
 share the existing registry and scene pass; dependencies and shaders are unchanged.
 Models and PolyGrids in sky remain unsupported. This supersedes only the earlier
 sprite refusal. Unload clears the separate sprite snapshot and GPU geometry.
+
+## SkyFog, FarZ and culling (0.5.2)
+
+Issue [#11](https://github.com/demonixis/OpenBlood2/issues/11) (Cas Revenant) and #8 compare
+the sky against the original. Three original rules now apply.
+
+- Sky world models draw with back-face culling (later LithTech draws them with
+  `D3DCULL_CCW`; clockwise front faces here). Their depth-disabled pipelines previously drew
+  inner and outer faces in index order, so far sides covered the faces toward the camera.
+  Sky sprites keep two-sided pipelines (`SkySprite`/`SkySpriteAlpha`).
+- `SkyFog` with `SkyFogNearZ`/`SkyFogFarZ` fogs sky world-model draws in the current fog
+  colour, from the sky camera, only while world fog is enabled (original `ResetGlobalFog`);
+  an empty interval leaves the sky unfogged.
+- The world `FarZ` (truncated, positive) replaces the 65536 default far plane for the
+  scene (`world_far`); worlds without it keep the default. This changes frames of worlds
+  that author it (SubwayA uses 1500); the reference frames are regenerated with it.

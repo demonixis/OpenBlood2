@@ -13,6 +13,7 @@ class CObjectParticleFX
     bool CreateObject(const OpenBlood2::Resources&, OpenBlood2::NodePose, double, std::string&);
     bool Update(double, const OpenBlood2::NodePose*, std::minstd_rand&, std::size_t particle_budget = 2048);
     std::uint64_t id = 0, parent = 0, event = 0, updates = 0, bursts = 0, emitted = 0;
+    std::uint64_t dropped = 0; // Smoke-trail samples beyond the shared replacement pool.
     std::vector<OpenBlood2::Particle> particles;
     DVector origin{}, position{}, last_position{}, last_object_position{};
     DRotation source_rotation, system_rotation;

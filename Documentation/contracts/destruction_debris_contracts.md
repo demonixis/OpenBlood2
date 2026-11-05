@@ -86,3 +86,15 @@ and lifetime checks, actual retail resources and GPU images. Rain and the generi
 emitters remain conditional P3: the inventory has no exercised mounted-level caller for
 them. No speculative replacement class or asset is added. Recursive gib templates and
 original-executable visual parity remain outside this material lot.
+
+## Tester corrections (0.5.2)
+
+- Exploding CDebris (brushes and models with `Explode`, including E1L2's speakers/fan, the
+  Airship's floating ship and Cas Revenant's wall) now publishes the original `AddExplosion`
+  scene effect: EXP_GRENADE (type 3) facing world up with the C4 sound at radius 1000,
+  before the area damage. The effect previously existed only as a server record, so no
+  explosion was drawn or heard. Damage, radius and gib order are unchanged.
+- Model skins whose decoded alpha is zero everywhere (thirty-five older mask-less retail
+  skins: wood/flesh/stone gibs, casings, some pickups) load as opaque, as the original draws
+  them. The blended destruction pass previously discarded every texel, so wood crate
+  fragments were invisible. Skins with any nonzero alpha are unchanged.

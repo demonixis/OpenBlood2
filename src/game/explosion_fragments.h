@@ -20,6 +20,7 @@ namespace OpenBlood2
         std::vector<CExplosionFragFX> active;
         std::vector<CObjectParticleFX> trails;
         std::uint64_t trail_started = 0, trail_expired = 0, trail_failed = 0;
+        std::uint64_t trail_dropped = 0; // Samples beyond the bounded pool (removed and live trails).
         std::size_t trail_particles() const;
         std::vector<ExplosionFragmentReport> reports;
         std::string update_error;

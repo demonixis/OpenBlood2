@@ -122,6 +122,17 @@ namespace OpenBlood2
             }
             break;
         }
+        if (const float far_z = std::trunc(variable("FarZ")); far_z > 0)
+            out.far_z = far_z;
+        if (out.uniform.fog_color[3] != 0 && std::trunc(variable("SkyFog")) != 0)
+        {
+            const float near = std::trunc(variable("SkyFogNearZ")), far = std::trunc(variable("SkyFogFarZ"));
+            if (far > near)
+            {
+                out.sky_fog = {near, far};
+                out.sky_fog_enabled = true;
+            }
+        }
         return out;
     }
 } // namespace OpenBlood2

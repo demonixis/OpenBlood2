@@ -215,6 +215,10 @@ namespace
         const auto& effect = g.server.explosion_effects[0];
         CHECK(effect.type == 3 && effect.normal.y == 1 && effect.radius == 200 && effect.damage == 100);
         CHECK(effect.sound == "Sounds\\Weapons\\c4\\explosion_1.wav" && effect.sound_radius == 1000);
+        // Original AddExplosion also publishes the EXP_GRENADE composite and its C4 sound (issue #11).
+        CHECK(g.server.scene_explosions.size() == 3);
+        for (const auto& scene : g.server.scene_explosions)
+            CHECK(scene.type == 3 && scene.normal.y == 1 && scene.sound == effect.sound && scene.radius == 200);
         CHECK(g.step(.1) && g.server.explosion_effects.size() == 3);
         CHECK(g.unload_world() && g.server.explosion_effects.empty());
         return true;

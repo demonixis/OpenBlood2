@@ -156,3 +156,21 @@ superseded only for this boundary; dedicated mover/body/projectile forces, retai
 physics parity and the M2 gate remain open.
 
 The [player damage-impulse continuation](player_impulse_contracts.md) now enables original damage velocity for the shared player body. Self hits remain excluded, ordinary drag/caps/collision consume the delta once, and original restoration clears motion. Earlier player-impulse omissions are superseded only for this boundary.
+
+## Container cadence and dry jumps (0.5.2)
+
+Issue [#8](https://github.com/demonixis/OpenBlood2/issues/8): the original applied its container
+rules once per client frame (at most 0.1 s). The port's 1/120 s substeps made two of them
+frame-rate dependent in the wrong direction.
+
+- Conveyor braking (`frame * ladderVel / 0.2`) and the conveyor current use `m_ContainerTime`,
+  a fixed 1/30 s original frame applied on every fourth substep (`container_clock`). The
+  steady drag was current/120 (3.4 u/s on CityHub's escalators); it is now about current/30
+  (13.7 u/s). Other liquid/ladder rules and other currents keep `m_FrameTime`.
+- A ground jump opens a 1/30 s dry window (`m_fDryJumpTime`) in which `UpdateInLiquid` is
+  skipped, as one original frame lifted the body clear of shallow water before the next
+  container check. The swim cap previously crushed jumps out of 03_Museum's 16-unit shotgun
+  pool. `OnServerForcePos` resets both clocks.
+
+Like the blood-spurt emission cap, this is a fixed-cadence replacement for a frame-rate
+dependent source rule, not a verified retail trace.

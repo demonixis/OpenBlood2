@@ -43,6 +43,11 @@ namespace OpenBlood2
         std::size_t light_budget = platform_effect_lights;
         std::size_t fog_lights_unsupported = 0, shadow_lights_unshadowed = 0;
         bool invalid_fog = false;
+        // World FarZ (truncated; 0 when unset or not positive) and SkyFog's SkyFogNearZ/FarZ,
+        // enabled only while a fog colour applies (original ResetGlobalFog / FirstUpdate).
+        float far_z = 0;
+        std::array<float, 2> sky_fog{};
+        bool sky_fog_enabled = false;
         // Diagnostic references per submitted receiver, not a count of unique lights.
         mutable EffectLightSelectionStats selection;
     };

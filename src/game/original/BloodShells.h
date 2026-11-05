@@ -148,6 +148,10 @@ class CBloodClientShell
     HOBJECT seeing_eye = nullptr, creature = nullptr, orb_view = nullptr;
     OpenBlood2::SoundId goggles_loop = 0, eye_loop = 0;
     float blind_until = 0, creature_light = 1, creature_damage_time = 0, last_use_hit = 0;
+    // Original UpdateContainerFX: the visible container at the camera and when it was entered
+    // (the FreeFall fade), tracked by SceneLightScale's default branch.
+    mutable D_WORD view_container = 0;
+    mutable float view_container_start = 0;
     unsigned use_hits = 0, total_use_hits = 0;
     bool UpdateInventoryEffects();
     void ClearInventoryEffects();

@@ -968,6 +968,7 @@ namespace OpenBlood2
                 presenter.lightmaps = settings.detail >= 1;
                 presenter.model_shadows = options.model_shadows && settings.detail >= 2;
                 presenter.per_pixel_lighting = settings.pixel_lighting;
+                presenter.field_of_view = float(settings.field_of_view) * 0.017453292519943295f;
                 presenter.shading = !settings.renderer ? SurfaceShading::Original
                                     : settings.quality ? SurfaceShading::High
                                                        : SurfaceShading::Standard;

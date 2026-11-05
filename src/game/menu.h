@@ -126,6 +126,7 @@ namespace OpenBlood2
         int fps_limit = 0;                               // Software ceiling; zero leaves pacing to presentation.
         int vr_refresh_rate = 0;                         // Millihertz; zero asks the runtime to choose.
         int vr_render_scale = 100;                       // Percentage of recommended eye dimensions (50..100, step 10).
+        int field_of_view = 90; // Horizontal degrees at 4:3 (60..120, step 5); 90 is the original FOV_NORMAL.
 
         bool operator==(const MenuSettings&) const = default;
     };
@@ -138,7 +139,8 @@ namespace OpenBlood2
         // Setting IDs: sound, volume, music, volume, sensitivity, invert Y, detail, lighting,
         // renderer, normal maps, VR turn, VR laser, VR crosshair, VR movement reference, cheats,
         // god mode, cheat level, anti-aliasing, bloom, tonemap, ambient occlusion, reflections,
-        // fullscreen, fullscreen mode, resolution, vsync, frame limit, VR refresh rate, VR render scale.
+        // fullscreen, fullscreen mode, resolution, vsync, frame limit, VR refresh rate, VR render scale,
+        // (29) mouse look, (30) field of view.
         int setting = -1;
         HudRect rect{}, slider_rect{};
         std::string insertion; // FormatMessage %1!s! argument of the Load page's RESTART/QUICKLOAD strings.
@@ -221,7 +223,8 @@ namespace OpenBlood2
                    !((item.setting >= 22 && item.setting <= 24) && (!video.window || vr)) &&
                    !(item.setting == 23 && !settings.fullscreen) &&
                    !(item.setting == 24 && settings.fullscreen && settings.fullscreen_mode == 0) &&
-                   !(item.setting == 25 && (vr || !video.vsync_off)) && !(item.setting == 26 && vr) &&
+                   !(item.setting == 25 && (vr || !video.vsync_off)) &&
+                   !((item.setting == 26 || item.setting == 30) && vr) &&
                    !(item.setting == 27 && video.refresh_rates.size() < 2) &&
                    !(page == MenuPage::Cheats && item.setting != 14 && !settings.cheats);
         }

@@ -95,6 +95,12 @@ paired CDM doors remaining in Closing just short of their authored endpoints.
 
 - Door's original GOTHRUWORLD lets it slide into a wall pocket. Other translating
   world-model callers without that flag return Unavailable.
+- Two GOTHRUWORLD world models (0.5.2, [#11](https://github.com/demonixis/OpenBlood2/issues/11)):
+  a moving GOTHRUWORLD world model passes another non-primary world model that also carries
+  the flag, like later LithTech `MaybeCollide`. Airship2's `enddoor10/11` have interleaved
+  bars, so each leaf started inside the other and the pair never opened. A partner without
+  the flag, the primary world and characters still block; initial penetration and
+  pre-endpoint contacts with them remain refusals.
 - Continuous relative sweeps detect solid bodies crossed by a translating door,
   including a large single move. The body moves by the unconsumed translation,
   with a 0.002-unit contact separation.

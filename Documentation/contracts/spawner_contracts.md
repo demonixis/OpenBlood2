@@ -78,3 +78,9 @@ GenericProp and the `szSpawn` buffer, for Spawner and the destructable aggregate
 24_AncientCity and 24B_Arena author 112–141-byte requests; their Spawners are now
 created. Requests naming unported classes (UndeadGideon, the Revenant Chosen)
 still fail when triggered.
+
+GabriellaAI (0.5.2): the spawn allowlist accepts GabriellaAI, so 03_Museum's `conv1` cut-scene
+`spawn0` creates her ([#8](https://github.com/demonixis/OpenBlood2/issues/8)). Other registered
+AI classes that retail spawners request (ShikariAI, DrudgeLord, ZealotAI, SoulDrudge, Behemoth,
+DeathShroud, DrudgePriest, Naga and the Chosen/Gideon variants) are still refused by the
+allowlist; widening it is separate work.

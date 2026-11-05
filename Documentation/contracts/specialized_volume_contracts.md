@@ -106,3 +106,6 @@ combat and the remaining required classes still prevent playable startup.
 
 The separately requested [Minefield continuation](minefield_contracts.md) supersedes
 the Minefield omission above; other historical omissions keep their stated scope.
+
+Conveyor timing (0.5.2): player conveyor drag now uses the movement contract's fixed 1/30 s
+container cadence ([movement contracts](movement_contracts.md#container-cadence-and-dry-jumps-052)).

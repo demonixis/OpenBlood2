@@ -165,6 +165,7 @@ namespace OpenBlood2
                               return false;
                           }
                           total -= previous;
+                          trail_dropped += trail.dropped;
                           if (trail.error.empty())
                               ++trail_expired;
                           else
@@ -193,7 +194,7 @@ namespace OpenBlood2
     {
         active.clear();
         trails.clear();
-        trail_started = trail_expired = trail_failed = 0;
+        trail_started = trail_expired = trail_failed = trail_dropped = 0;
         trail_random_.seed(1);
         reports.clear();
         update_error.clear();

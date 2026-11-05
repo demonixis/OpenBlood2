@@ -115,6 +115,8 @@ namespace OpenBlood2
         // Original "LightMap" setting (off at low detail): a change rebuilds the world mesh.
         bool lightmaps = true;
         bool per_pixel_lighting = false; // Model light per pixel instead of per vertex.
+        // Options > Display FIELD OF VIEW (horizontal radians at 4:3, Hor+ beyond); XR ignores it.
+        float field_of_view = 1.5707963267948966f;
         // Renderer selection: Original keeps the original shaders; Standard/High enable the
         // physically based world and model shading, optionally with generated normal maps.
         SurfaceShading shading = SurfaceShading::Original;

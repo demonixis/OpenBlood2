@@ -19,6 +19,7 @@ namespace OpenBlood2
     {
         model_scene.gpu_skinning = explosion_model_scene.gpu_skinning = hand_scene.gpu_skinning = true;
         world_renderer.receive_shadows = true;
+        sky_sprite_renderer.two_sided_sky = true;
     }
     ScenePresenter::~ScenePresenter()
     {
@@ -41,7 +42,9 @@ namespace OpenBlood2
             return;
         const auto& view = camera(game);
         const auto eye = view.position;
-        const auto frustum = view_frustum(eye, view.rotation, shadow_aspect);
+        const auto frustum =
+            view_frustum(eye, view.rotation, shadow_aspect, world_near, world_far,
+                         original_fov_scale(presented_fov_x(game.client_shell.ViewFovX(), field_of_view)));
         struct Candidate
         {
             double distance = 0;
@@ -510,6 +513,7 @@ namespace OpenBlood2
         };
         const auto flashlight = game.client_shell.flashlight.Current(game.server);
         effects = gather_scene_effects(game, eye, rotation);
+        world_far = effects.far_z > 0 ? effects.far_z : world_default_far;
         // XR's fallback fade must also black out fog when no compositor fade layer exists.
         if (scene_fade != 1)
             for (unsigned channel = 0; channel < 3; ++channel)
@@ -567,7 +571,7 @@ namespace OpenBlood2
         close.max_depth = view_model_depth;
         close.shadow_atlas = nullptr;
         close.shadows = nullptr;
-        scene.view_scale = original_fov_scale(game.client_shell.ViewFovX());
+        scene.view_scale = original_fov_scale(presented_fov_x(game.client_shell.ViewFovX(), field_of_view));
         if (!shadow_casters.empty())
         {
             scene.shadow_atlas = registry.get(shadow_atlas_);
@@ -771,7 +775,8 @@ namespace OpenBlood2
         post_view.top = float(letterbox ? height / 6 : 0);
         post_view.height = float(height) - 2 * post_view.top;
         const float aspect = float(width) / std::max(post_view.height, 1.f);
-        const float zoom = original_fov_scale(game.client_shell.ViewFovX()) * horizontal_projection_scale(aspect);
+        const float zoom = original_fov_scale(presented_fov_x(game.client_shell.ViewFovX(), field_of_view)) *
+                           horizontal_projection_scale(aspect);
         post_view.projection = {zoom, zoom * aspect, world_far / (world_far - world_near),
                                 -world_near * world_far / (world_far - world_near)};
         post_view.slice = view_model_depth;
