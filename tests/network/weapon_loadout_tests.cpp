@@ -19,6 +19,7 @@ namespace
     {
         WeaponLoadout state;
         state.force_revision = 300;
+        state.view_revision = {1, 1};
         state.character = 0;
         state.slot = 1;
         state.weapons = {1, 1};
@@ -33,7 +34,7 @@ namespace
         std::string error;
         PrivateEvent event{owner, 1, 600, loadout()}, decoded;
         std::vector<std::uint8_t> bytes;
-        CHECK(encode_private(event, bytes) && bytes.size() == 76 && bytes[6] == 22);
+        CHECK(encode_private(event, bytes) && bytes.size() == 92 && bytes[6] == 22);
         CHECK(bytes[47] == 44 && bytes[48] == 1); // Explicit LE force revision 300.
         CHECK(decode_private(bytes, decoded) == DecodePrivate::Ok &&
               std::get<WeaponLoadout>(decoded.value) == loadout());
@@ -52,7 +53,7 @@ namespace
         bad = bytes;
         bad[4] = 8;
         CHECK(decode_private(bad, decoded) == DecodePrivate::Protocol);
-        for (unsigned case_id = 0; case_id < 9; ++case_id)
+        for (unsigned case_id = 0; case_id < 10; ++case_id)
         {
             auto state = loadout();
             switch (case_id)
@@ -84,6 +85,9 @@ namespace
                 case 8:
                     state.binoculars = true;
                     break;
+                case 9:
+                    state.view_revision[1] = 0;
+                    break;
             }
             event.value = state;
             CHECK(!valid_private(event));
@@ -100,7 +104,7 @@ namespace
             }
         }
         std::cout
-            << "Weapon loadout codec: 76 bytes, all truncations, invalid fields/flags/version, 5000 mutations passed\n";
+            << "Weapon loadout codec: 92 bytes, all truncations, invalid fields/flags/version, 5000 mutations passed\n";
         return true;
     }
     bool receive(const char* data)
@@ -139,6 +143,7 @@ namespace
         CHECK(client.receive(event, models, resources, error) == Reception::Ignored);
         state.force_revision = 301;
         state.weapons = {4, 0};
+        state.view_revision = {2, 2};
         event.value = state;
         Resources absent;
         ModelStore absent_models(absent);
@@ -152,6 +157,7 @@ namespace
         CHECK(client.update(301, 1. / 60, error) && client.time() > time && client.updates == updates + 1);
         CHECK(!client.update(301, std::numeric_limits<double>::quiet_NaN(), error));
         state.character = 1;
+        ++state.view_revision[0];
         event.value = state;
         ++event.sequence;
         CHECK(client.receive(event, models, resources, error) == Reception::Applied &&
@@ -163,6 +169,26 @@ namespace
         CHECK(client.receive(event, models, resources, error) == Reception::Applied);
         const auto frame = client.views()[0].animation;
         CHECK(client.update(301, 1. / 60, error) && client.views()[0].animation.time == frame.time);
+        // Same-type recreation is identified even if A -> B -> A happened
+        // between simulation ticks. The other hand retains its animation.
+        state.alive = state.fire_allowed = true;
+        state.view_revision[0] += 2;
+        event.value = state;
+        ++event.sequence;
+        CHECK(client.receive(event, models, resources, error) == Reception::Applied &&
+              client.views()[0].state == WS_DRAW);
+        for (unsigned tick = 0; tick < 180; ++tick)
+            CHECK(client.update(301, 1. / 60, error));
+        const auto retained = client.views()[0].animation;
+        state.weapons[1] = WEAP_BERETTA;
+        event.value = state;
+        ++event.sequence;
+        CHECK(client.receive(event, models, resources, error) == Reception::Refused); // Missing revision.
+        ++state.view_revision[1];
+        event.value = state;
+        CHECK(client.receive(event, models, resources, error) == Reception::Applied);
+        CHECK(client.views()[0].animation.time == retained.time &&
+              client.views()[0].animation.revision == retained.revision && client.views()[1].state == WS_DRAW);
         CHECK(client.begin({8, 2, {2, 5}}) && !client.ready(301) && !client.views()[0].model);
         CHECK(client.receive(event, models, resources, error) == Reception::Ignored);
         std::cout << "Independent loadout receiver: dual views, ammo retention, atomic resource failure, "

@@ -10,6 +10,7 @@
 #include "net/content.h"
 #include "net/player_commands.h"
 #include "net/transport.h"
+#include "net/weapon_frames.h"
 #include <chrono>
 namespace OpenBlood2
 {
@@ -35,10 +36,16 @@ namespace OpenBlood2
         NetworkClient& operator=(const NetworkClient&) = delete;
         bool connect(const Config&, std::string_view host, std::uint16_t port, const Net::JoinProfile&,
                      Clock::time_point, std::string& error);
-        bool update(Clock::time_point, const MovementInput&, bool commands, std::string& error);
+        bool update(Clock::time_point, const MovementInput&, bool commands, std::string& error,
+                    WeaponInput weapon = {});
         bool look(float pitch_delta, float yaw_delta);
         bool command(const Net::CommandAction&, std::string& error);
         std::uint64_t command_acks = 0, commands_applied = 0;
+        std::uint64_t weapon_frames = 0;
+        const std::optional<Net::WeaponFrameAck>& weapon_ack() const
+        {
+            return weapon_ack_;
+        }
         bool disconnect(Clock::time_point);
         Phase phase() const
         {
@@ -158,6 +165,7 @@ namespace OpenBlood2
         float fov_x_ = original_fov_normal;
         std::string reason_;
         std::uint64_t command_sequence_ = 0;
+        std::optional<Net::WeaponFrameAck> weapon_ack_;
         std::vector<Net::PlayerCommand> pending_commands_;
         bool send(const Net::AdmissionMessage&, std::string&);
         bool receive(const Net::Event&, Clock::time_point, std::string&);

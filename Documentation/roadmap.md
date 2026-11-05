@@ -329,6 +329,9 @@ and server permissions to independent remote views; draw/rest animations render 
 Firing input, authoritative shot validation and remote audio/FX remain to connect.
 [Reliable player commands](implementation/reports/m9_player_commands.md) now connect selection/cycling, USE,
 items, alternate zoom and detonation through bounded, generation-checked server dispatch and ACKs.
+[Animation-validated fire](implementation/reports/m9_network_fire.md) now transports bounded weapon frames,
+runs original animation cadence on the server and checks actual shots independently of prediction.
+Interactive held fire awaits multiplayer death/slow-death/respawn; remote audio/FX remain separate.
 **Remaining private presentation consumers/commands, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client

@@ -29,20 +29,45 @@ namespace OpenBlood2
         next.fire_allowed = next.alive && next.input_enabled && player->attributes_received &&
                             !player->MovementBlocked() && !next.binoculars;
         for (unsigned hand = 0; hand < 2; ++hand)
+        {
             if (const auto* weapon = inventory.CurrentWeapon(hand != 0))
             {
                 next.weapons[hand] = weapon->data.m_nType;
                 next.ammunition[hand] = weapon->CheckAmmo(false);
                 next.alternate_ammunition[hand] = weapon->CheckAmmo(true);
             }
+            next.view_revision[hand] = found->weapons ? found->weapons->view_revision[hand] : 1;
+            if (found->weapons && (next.weapons[hand] != found->weapons->weapons[hand] ||
+                                   (next.weapons[hand] && next.character != found->weapons->character)))
+            {
+                if (next.view_revision[hand] == UINT64_MAX)
+                {
+                    error = "Weapon view identity exhausted";
+                    return false;
+                }
+                ++next.view_revision[hand];
+            }
+        }
         if (!found->weapons || *found->weapons != next)
         {
+            if (found->weapon_states.size() >= 128)
+            {
+                error = "Unacknowledged weapon state history is full";
+                return false;
+            }
+            const auto sequence = found->next_event;
             if (queue_private(*found, found->object, next) != DE_OK)
             {
                 error = "Private weapon state queue refused";
                 return false;
             }
             found->weapons = next;
+            found->weapon_states.push_back({sequence, next});
+            if (!found->weapon_clock_started)
+            {
+                found->weapon_time = double(ticks_) / 60;
+                found->weapon_clock_started = true;
+            }
         }
         out = next;
         return true;

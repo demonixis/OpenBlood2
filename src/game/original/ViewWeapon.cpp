@@ -9,6 +9,11 @@ using namespace OpenBlood2;
 bool CViewWeapon::Create(DBYTE weapon, bool left_hand, ModelStore& models, Resources& resources, std::string& error,
                          DBYTE profile_id)
 {
+    return Create(weapon, left_hand, models, resources, error, profile_id, ResourcesMode::Presentation);
+}
+bool CViewWeapon::Create(DBYTE weapon, bool left_hand, ModelStore& models, Resources& resources, std::string& error,
+                         DBYTE profile_id, ResourcesMode mode)
+{
     const auto* definition = weapon_definition(weapon);
     const auto* profile = character_profile(profile_id);
     if (!definition || !profile)
@@ -33,7 +38,7 @@ bool CViewWeapon::Create(DBYTE weapon, bool left_hand, ModelStore& models, Resou
     std::shared_ptr<const Model> loaded;
     if (!models.load(resolved_model, loaded, error))
         return false;
-    if (!resources.find(resolved_skin))
+    if (mode == ResourcesMode::Presentation && !resources.find(resolved_skin))
     {
         error = "Selected character weapon skin is not indexed: " + resolved_skin;
         return false;
@@ -64,6 +69,7 @@ bool CViewWeapon::Create(DBYTE weapon, bool left_hand, ModelStore& models, Resou
         stop_[1] = stop_[0];
     }
     original_fire_ = fire_[0];
+    if (mode == ResourcesMode::Presentation)
     {
         SpriteStore sprites(resources);
         const char* paths[]{definition->m_szFlashSprite, definition->m_szAltFlashSprite};

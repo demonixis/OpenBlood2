@@ -26,7 +26,7 @@ using Clock = std::chrono::steady_clock;
     } while (false)
 namespace
 {
-    bool client(const char* port_text, const char* data, bool observer, bool drive)
+    bool client(const char* port_text, const char* data, bool observer, bool drive, bool fire)
     {
         std::string error;
         unsigned port = 0;
@@ -44,13 +44,16 @@ namespace
         bool announced = false, leaving = false, saw_arrival = false, saw_departure = false, displaced = false;
         unsigned startup = 0, camera_frames = 0;
         unsigned command_stage = 0;
+        float fire_ammo = 0;
         DVector initial;
         ObjectId other_player;
         while (Clock::now() < deadline)
         {
             MovementInput input;
             input.forward = drive && !leaving;
-            CHECK(client.update(Clock::now(), input, !leaving, error));
+            const bool firing =
+                fire && command_stage == 7 && !leaving && (!client.weapon_ack() || client.weapon_ack()->fired[0] < 3);
+            CHECK(client.update(Clock::now(), input, !leaving, error, {firing}));
             std::vector<PrivateEvent> events;
             client.take_events(events);
             for (const auto& value : events)
@@ -117,6 +120,9 @@ namespace
                 {
                     CHECK(client.commands_applied == 8 && client.weapons().views()[0].type == WEAP_BERETTA);
                     command_stage = 7;
+                    fire_ammo = client.weapons().state()->ammunition[0];
+                    if (fire)
+                        CHECK(client.look(-1.4f - client.pitch(), 0));
                 }
                 for (const auto& object : world.frame().objects)
                 {
@@ -134,15 +140,28 @@ namespace
                 displaced |= vector_dot(delta, delta) > 1;
                 ++camera_frames;
                 CHECK(client.camera().position.x == client.movement().movement().body.position.x);
-                if (!leaving && command_stage == 7 && Clock::now() >= leave_at)
+                const bool fire_finished = !fire || (client.weapon_ack() && client.weapon_ack()->fired[0] >= 3 &&
+                                                     client.weapons().views()[0].state == WS_REST &&
+                                                     client.weapons().state()->ammunition[0] ==
+                                                         fire_ammo - float(client.weapon_ack()->fired[0]));
+                if (!leaving && command_stage == 7 && fire_finished && Clock::now() >= leave_at)
                 {
                     CHECK(client.state_packets && (!observer || (saw_arrival && saw_departure)));
                     CHECK(client.event_sequence() && client.hud().stats.health > 0 && startup == 1);
                     CHECK(client.camera().kind == ClientCameraKind::FirstPerson && camera_frames);
-                    CHECK(client.weapons().updates && !client.weapons().views()[0].shots &&
+                    CHECK(client.weapons().updates && bool(client.weapons().views()[0].shots) == fire &&
                           client.weapons().state()->alive && client.weapons().state()->fire_allowed);
                     if (observer)
                         CHECK(client.weapons().views()[0].state == WS_REST);
+                    CHECK(client.weapon_ack() && client.weapon_ack()->sequence <= client.weapon_frames);
+                    if (fire)
+                    {
+                        CHECK(client.weapon_ack()->fired[0] == client.weapons().views()[0].shots &&
+                              !client.weapon_ack()->fired[1] && !client.weapon_ack()->blocked);
+                        std::cout << "Authoritative fire: frames=" << client.weapon_frames
+                                  << ", acknowledged=" << client.weapon_ack()->sequence
+                                  << ", actual shots=" << client.weapon_ack()->fired[0] << "\n";
+                    }
                     std::cout << "Private weapon type=" << unsigned(client.weapons().views()[0].type)
                               << ", ammo=" << client.weapons().state()->ammunition[0]
                               << ", animation_updates=" << client.weapons().updates
@@ -207,7 +226,7 @@ namespace
             return SDL_GetIOStatus(stream) != SDL_IO_STATUS_ERROR;
         }
     };
-    bool parent(const char* self, const char* server, const char* data, bool drive)
+    bool parent(const char* self, const char* server, const char* data, bool drive, bool fire)
     {
         std::string error;
         Process host;
@@ -255,9 +274,13 @@ namespace
                 }
                 CHECK(clients[0].output.find("Replicated ") != std::string::npos);
             }
-            const char* child_args[]{
-                self,   "--peer", port.c_str(), data, i ? "visitor" : "observer", drive ? "movement" : "passive",
-                nullptr};
+            const char* child_args[]{self,
+                                     "--peer",
+                                     port.c_str(),
+                                     data,
+                                     i ? "visitor" : "observer",
+                                     fire ? "fire" : drive ? "movement" : "passive",
+                                     nullptr};
             clients[i].handle = SDL_CreateProcess(child_args, true);
             error = SDL_GetError();
             CHECK(clients[i].handle);
@@ -296,8 +319,12 @@ int main(int argc, char** argv)
 {
     if (argc == 6 && std::string_view(argv[1]) == "--peer")
         return client(argv[2], argv[3], std::string_view(argv[4]) == "observer",
-                      std::string_view(argv[5]) == "movement")
+                      std::string_view(argv[5]) == "movement", std::string_view(argv[5]) == "fire")
                    ? 0
                    : 1;
-    return (argc == 3 || argc == 4) && parent(argv[0], argv[1], argv[2], argc == 4) ? 0 : 1;
+    return (argc == 3 || argc == 4) &&
+                   parent(argv[0], argv[1], argv[2], argc == 4 && std::string_view(argv[3]) == "--movement",
+                          argc == 4 && std::string_view(argv[3]) == "--fire")
+               ? 0
+               : 1;
 }

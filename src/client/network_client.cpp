@@ -71,6 +71,27 @@ namespace OpenBlood2
         }
         if (phase_ == Phase::Closing)
             return true;
+        if (Net::is_weapon_frame_packet(event.bytes))
+        {
+            Net::WeaponFrameMessage message;
+            if (phase_ != Phase::Active || event.channel != Net::Channel::State ||
+                Net::decode_weapon_frame(event.bytes, message) != Net::DecodeWeaponFrame::Ok)
+                return false;
+            const auto* ack = std::get_if<Net::WeaponFrameAck>(&message);
+            if (!ack || ack->owner.world != joined_.world || ack->owner.player != joined_.player ||
+                ack->owner.object != joined_.object || ack->sequence > weapon_frames)
+                return false;
+            if (weapon_ack_ && ack->sequence <= weapon_ack_->sequence)
+                return true;
+            if (weapon_ack_ && (ack->owner.force_revision < weapon_ack_->owner.force_revision ||
+                                ack->fired[0] < weapon_ack_->fired[0] || ack->fired[1] < weapon_ack_->fired[1] ||
+                                ack->blocked < weapon_ack_->blocked))
+                return false;
+            // State can arrive before its reliable force setup. These are only
+            // cumulative diagnostics; an ACK never moves the player or grants ammo.
+            weapon_ack_ = *ack;
+            return true;
+        }
         if (Net::is_command_packet(event.bytes))
         {
             Net::CommandMessage message;
@@ -213,7 +234,8 @@ namespace OpenBlood2
             return phase_ == Phase::Active && heartbeat->world == joined_.world && send(*heartbeat, error);
         return false;
     }
-    bool NetworkClient::update(Clock::time_point now, const MovementInput& input, bool commands, std::string& error)
+    bool NetworkClient::update(Clock::time_point now, const MovementInput& input, bool commands, std::string& error,
+                               WeaponInput weapon)
     {
         error.clear();
         if (phase_ == Phase::Closed)
@@ -269,14 +291,30 @@ namespace OpenBlood2
             if (!input_.advance(elapsed, input, commands, count, sampled))
                 return fail(error, "Invalid client tick/input sample");
             discarded_ticks = input_.discarded_ticks();
+            if (!commands)
+                weapon.primary = weapon.alternate = false;
             for (std::uint64_t i = 0; i < count; ++i)
             {
                 std::optional<Net::MovementReport> report;
-                if (!movement_.update(sampled, yaw_, pitch_, NetworkInput::step, commands, false,
-                                      bool(camera_.camera().view.object), report, error))
+                if (!movement_.update(sampled, yaw_, pitch_, NetworkInput::step, commands,
+                                      weapon.primary || weapon.alternate, bool(camera_.camera().view.object), report,
+                                      error))
                     return fail(error, "Client prediction failed");
-                if (!weapons_.update(movement_.setup().owner.force_revision, NetworkInput::step, error))
-                    return fail(error, "Client weapon presentation failed");
+                if (weapons_.ready(movement_.setup().owner.force_revision))
+                {
+                    const auto acknowledged = weapon_ack_ ? weapon_ack_->sequence : 0;
+                    if (weapon_frames == UINT64_MAX || weapon_frames - acknowledged >= Net::weapon_frame_queue_limit)
+                        return fail(error, "Unacknowledged weapon frame queue is full");
+                    const Net::WeaponFrame frame{movement_.setup().owner, weapon_frames + 1, weapons_.state_sequence(),
+                                                 {pitch_, yaw_},          weapon.primary,    weapon.alternate};
+                    std::vector<std::uint8_t> bytes;
+                    if (!Net::encode_weapon_frame(frame, bytes) ||
+                        !transport_.send(peer_, Net::Channel::Control, bytes, error))
+                        return fail(error, "Cannot send weapon frame");
+                    if (!weapons_.update(frame.owner.force_revision, NetworkInput::step, error, weapon, frame.aim))
+                        return fail(error, "Client weapon presentation failed");
+                    ++weapon_frames;
+                }
                 if (!camera_.camera().view.object)
                 {
                     const float speed = 8 * float(NetworkInput::step);

@@ -46,6 +46,7 @@ namespace OpenBlood2::Net
         std::array<DBYTE, 2> weapons{}; // Right, left; zero means absent.
         std::array<float, 2> ammunition{}, alternate_ammunition{};
         bool alive = false, input_enabled = false, fire_allowed = false, binoculars = false;
+        std::array<std::uint64_t, 2> view_revision{}; // Changes only with that hand's type/character.
         bool operator==(const WeaponLoadout&) const = default;
     };
     // Stable tags are these alternatives plus one. Append only with a protocol

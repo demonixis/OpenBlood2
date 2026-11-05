@@ -168,14 +168,17 @@ namespace OpenBlood2
             const auto input = controls.sample(menu);
             PlayerRotation aim{client.pitch(), client.yaw()};
             controls.look(aim, seconds, menu, client.zoomed());
-            if (!client.look(aim.pitch - client.pitch(), aim.yaw - client.yaw()) ||
-                !client.update(now, input, controls.enabled && controls.focused, error))
+            if (!client.look(aim.pitch - client.pitch(), aim.yaw - client.yaw()))
                 return failed();
             actions.sample(controls, menu || leaving || !client.ready(), {client.pitch(), client.yaw()},
                            sampled_actions);
             for (const auto& action : sampled_actions)
                 if (!client.command(action, error))
                     spdlog::info("Player command: {}", error);
+            // Preserve reliable Control order: selection/use precede this frame's
+            // weapon timeline. Interactive firing follows the death/respawn port.
+            if (!client.update(now, input, controls.enabled && controls.focused, error))
+                return failed();
             // HUD/camera events are already applied by the endpoint. Audio and
             // other effects still need their remote consumers.
             client.take_events(events);

@@ -130,6 +130,7 @@ namespace OpenBlood2::Net
                 {
                     const auto ammo = [](float value) { return number(value) && value >= 0; };
                     return v.force_revision && v.character < 4 && v.slot < 13 &&
+                           v.view_revision[0] && v.view_revision[1] &&
                            std::all_of(v.weapons.begin(), v.weapons.end(), weapon) &&
                            std::all_of(v.ammunition.begin(), v.ammunition.end(), ammo) &&
                            std::all_of(v.alternate_ammunition.begin(), v.alternate_ammunition.end(), ammo) &&
@@ -260,6 +261,8 @@ namespace OpenBlood2::Net
                 else if constexpr (std::is_same_v<T, WeaponLoadout>)
                 {
                     w.u64(v.force_revision);
+                    for (const auto revision : v.view_revision)
+                        w.u64(revision);
                     w.u8(v.character);
                     w.u8(v.slot);
                     for (const auto type : v.weapons)
@@ -474,6 +477,8 @@ namespace OpenBlood2::Net
             {
                 WeaponLoadout v;
                 v.force_revision = r.u64();
+                for (auto& revision : v.view_revision)
+                    revision = r.u64();
                 v.character = r.u8();
                 v.slot = r.u8();
                 for (auto& type : v.weapons)

@@ -29,11 +29,22 @@ namespace OpenBlood2
         std::array<CViewWeapon, 2> prepared;
         std::array<bool, 2> changed{};
         for (unsigned hand = 0; hand < 2; ++hand)
+            if (state_ && next->view_revision[hand] < state_->view_revision[hand])
+                return Reception::Ignored;
+        for (unsigned hand = 0; hand < 2; ++hand)
         {
             const auto type = next->weapons[hand];
             // Original SyncWeapons: ammunition or same-type replacement does
             // not restart the draw/fire animation.
             changed[hand] = views_[hand].type != type || (type && views_[hand].character != next->character);
+            if (state_ && changed[hand] && next->view_revision[hand] == state_->view_revision[hand])
+            {
+                error = "Weapon view changed without a new identity";
+                return Reception::Refused;
+            }
+            // An observed A -> B -> A change still recreates the final A even
+            // if no client simulation frame ran while B was selected.
+            changed[hand] |= state_ && next->view_revision[hand] != state_->view_revision[hand];
             if (!changed[hand] || !type)
                 continue;
             const auto* definition = weapon_definition(type);
@@ -85,9 +96,15 @@ namespace OpenBlood2
             {
                 return (alternate ? state_.alternate_ammunition : state_.ammunition)[hand_];
             }
-            FireResult fire(const WeaponFire&) override
+            FireResult fire(const WeaponFire& request) override
             {
-                return FireResult::Blocked;
+                if (!state_.fire_allowed)
+                    return FireResult::Blocked;
+                const auto* data = weapon_definition(request.weapon);
+                if (!data ||
+                    ammunition(request.alternate) < (request.alternate ? data->m_nAltAmmoUse : data->m_nAmmoUse))
+                    return FireResult::Dry;
+                return FireResult::Fired; // Prediction only; never changes ammunition or health.
             }
             SoundId play_sound(const SoundRequest&, std::string& error) override
             {
@@ -103,10 +120,13 @@ namespace OpenBlood2
             std::uint64_t& sounds_;
         };
     } // namespace
-    bool NetworkWeapons::update(std::uint64_t force_revision, double seconds, std::string& error)
+    bool NetworkWeapons::update(std::uint64_t force_revision, double seconds, std::string& error, WeaponInput input,
+                                PlayerRotation aim)
     {
         error.clear();
-        if (!std::isfinite(seconds) || seconds < 0 || seconds > .1 || time_ + seconds > 1e12)
+        if (!std::isfinite(seconds) || seconds < 0 || seconds > .1 || time_ + seconds > 1e12 ||
+            !std::isfinite(aim.pitch) || !std::isfinite(aim.yaw) || std::abs(aim.pitch) > 1e6f ||
+            std::abs(aim.yaw) > 1e6f)
         {
             error = "Invalid network weapon tick";
             return false;
@@ -114,11 +134,22 @@ namespace OpenBlood2
         if (!ready(force_revision))
             return true;
         time_ += seconds;
+        input.all_hands = true;
+        input.alternate &= !input.primary;
+        if (!state_->input_enabled)
+            input.primary = input.alternate = false;
+        if (state_->weapons[0] && state_->weapons[1] && input.alternate)
+        {
+            input.primary = true;
+            input.alternate = false;
+        }
+        const float cp = std::cos(aim.pitch);
+        const DVector direction{std::sin(aim.yaw) * cp, -std::sin(aim.pitch), std::cos(aim.yaw) * cp};
         for (unsigned hand = 0; hand < 2; ++hand)
         {
             PresentationWeapon services(*state_, hand, float(time_), sound_requests);
             views_[hand].binoculars_active = state_->binoculars;
-            if (!views_[hand].Update(services, {}, {}, {0, 0, 1}, seconds, error))
+            if (!views_[hand].Update(services, input, {}, direction, seconds, error))
                 return false;
         }
         ++updates;

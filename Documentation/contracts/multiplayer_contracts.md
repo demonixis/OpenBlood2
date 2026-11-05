@@ -1004,3 +1004,41 @@ ZoomView now drives original FOV rate/limits, external-camera exceptions, crossh
 overrides and quarter-sensitivity mouse look. Weapon firing, drop/grab/taunt,
 creature escape, remote item light/audio effects and complete match rules remain
 separate work. Solo entrypoints and CMoveMgr are unchanged.
+
+
+## Animation-validated network fire
+
+The [network fire continuation](../implementation/reports/m9_network_fire.md)
+adds protocol-v11 B2WF frames and actual-shot ACKs. One reliable input frame per
+normal 60 Hz client weapon tick references a server-issued loadout sequence, full
+world/player/object/force identity and bounded aim. No client origin, target, ammo,
+damage, seed or reload interval is trusted. Rendering and movement replay emit none.
+
+Run original CViewWeapon on both ends. The server's AnimationOnly mode loads ABC
+clips/keys without skins/flashes; default solo Create/Update remain unchanged.
+Both timelines use the same issued state and incremented double clock, preserving
+original reload/barrel/bomb/alternate/RNG behavior. Client prediction never changes
+ammo/health. Actual fire separately rechecks current ownership, force/pose, relevant
+hand revision, character/type, life, movement/camera/Eye/binocular gates and ammo,
+and invokes original CPlayerObj/CWeapon from the checked body/eye. SOUND_KEY stays
+cosmetic; actual fire audio still owns server logical duration/completion.
+
+Publish nonzero per-hand view revisions in the 92-byte loadout. Increment only for
+a published type change or character change of a present hand. Ammo/force updates
+retain animation, adding the left hand preserves the right, and a published
+A → B → A resets A even when no client tick ran between these events. Retain at most
+128 server-issued loadouts; input references must exist and be nondecreasing.
+
+Keep commands and weapon frames in one ordered Control queue. Bounds: 32 commands
+plus undrained command ACKs, 64 weapon frames, six processed weapon frames per
+server tick, one frame of credit per tick capped at 60. This bounded one-second
+late-input allowance may produce a catch-up burst; it is not hit rollback or a
+fully competitive authoritative movement/combat model. Duplicates never execute
+twice. Old force/view frames may advance animation proof but never grant gameplay.
+
+Latest unreliable State ACKs carry processed sequence and cumulative actual shots
+per hand/refusals. They never grant ammo or movement. Client queues are bounded;
+invalid channels/types/sequences/capacity reject the offending peer. Neutral
+menu/focus ticks continue. CMoveMgr receives the firing flag and still integrates
+once. Interactive held fire remains neutral until multiplayer death/slow-death/
+respawn is connected. Remote shot audio/FX identity/dedup remains separate.

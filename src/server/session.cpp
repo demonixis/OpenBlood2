@@ -177,7 +177,7 @@ namespace OpenBlood2
             return false;
         }
         if (!game_.step_server(ServerClock::step, [&](double seconds)
-                               { return advance_players(seconds, error) && apply_commands(error); }))
+                               { return advance_players(seconds, error) && apply_controls(error); }))
         {
             if (error.empty())
                 error = "Server simulation failed";

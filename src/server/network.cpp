@@ -72,6 +72,26 @@ namespace OpenBlood2
     bool ServerNetwork::receive(std::size_t index, const Net::Event& event, Clock::time_point now, std::string& error)
     {
         const auto reject = [&](Net::Reject reason) { return remove(index, std::uint32_t(reason), true, error); };
+        if (Net::is_weapon_frame_packet(event.bytes))
+        {
+            auto& peer = peers_[index];
+            if (peer.phase != Phase::Joined || event.channel != Net::Channel::Control)
+                return reject(Net::Reject::Order);
+            Net::WeaponFrameMessage message;
+            const auto decoded = Net::decode_weapon_frame(event.bytes, message);
+            if (decoded != Net::DecodeWeaponFrame::Ok)
+                return reject(decoded == Net::DecodeWeaponFrame::Protocol ? Net::Reject::Protocol
+                                                                          : Net::Reject::Malformed);
+            const auto* frame = std::get_if<Net::WeaponFrame>(&message);
+            if (!frame)
+                return reject(Net::Reject::Order);
+            const auto result = session_.queue_weapon_frame(peer.player, *frame);
+            if (result == ServerSession::CommandResult::Invalid)
+                return reject(Net::Reject::Player);
+            if (result == ServerSession::CommandResult::Queued)
+                peer.deadline = now + 15s;
+            return true;
+        }
         if (Net::is_command_packet(event.bytes))
         {
             auto& peer = peers_[index];
@@ -345,6 +365,24 @@ namespace OpenBlood2
                 {
                     std::vector<std::uint8_t> packet;
                     if (!Net::encode_movement(*ack, packet))
+                    {
+                        if (!remove(i, std::uint32_t(Net::Reject::Player), true, error))
+                            return false;
+                        continue;
+                    }
+                    states.push_back(std::move(packet));
+                }
+                std::optional<Net::WeaponFrameAck> fire_ack;
+                if (!session_.weapon_frame_ack(peer.player, fire_ack))
+                {
+                    if (!remove(i, std::uint32_t(Net::Reject::Player), true, error))
+                        return false;
+                    continue;
+                }
+                if (fire_ack)
+                {
+                    std::vector<std::uint8_t> packet;
+                    if (!Net::encode_weapon_frame(*fire_ack, packet))
                     {
                         if (!remove(i, std::uint32_t(Net::Reject::Player), true, error))
                             return false;

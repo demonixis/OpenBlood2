@@ -22,7 +22,14 @@ namespace OpenBlood2
 class CViewWeapon : public OpenBlood2::ClientWeaponView
 {
   public:
+    enum class ResourcesMode
+    {
+        Presentation,
+        AnimationOnly
+    };
     bool Create(DBYTE, bool, OpenBlood2::ModelStore&, OpenBlood2::Resources&, std::string&, DBYTE character = 0);
+    bool Create(DBYTE, bool, OpenBlood2::ModelStore&, OpenBlood2::Resources&, std::string&, DBYTE character,
+                ResourcesMode);
     bool Update(ServerDE&, CBloodServerShell&, HCLIENT, const OpenBlood2::WeaponInput&, DVector, DVector, double,
                 std::string&);
     bool Update(OpenBlood2::WeaponServices&, const OpenBlood2::WeaponInput&, DVector, DVector, double, std::string&);

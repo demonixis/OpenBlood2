@@ -82,7 +82,7 @@ namespace
             from = slash + 1;
         }
     }
-    bool fixture(Resources& resources, const std::filesystem::path& root, std::string& error)
+    bool fixture(Resources& resources, const std::filesystem::path& root, std::string& error, bool presentation = true)
     {
         test_resource::Directory dir;
         for (auto type : {WEAP_BERETTA, WEAP_SHOTGUN, WEAP_MELEE})
@@ -90,7 +90,8 @@ namespace
             const auto& data = *weapon_definition(type);
             add(dir, data.m_szViewModelFilename, test_model::abc(true).b);
             add(dir, data.m_szLeftViewModelFilename, test_model::abc(true).b);
-            add(dir, data.m_szViewModelSkin, {1, 2, 3});
+            if (presentation)
+                add(dir, data.m_szViewModelSkin, {1, 2, 3});
         }
         test_resource::Writer rez;
         rez.b.resize(168);
@@ -116,6 +117,14 @@ namespace
         Resources resources;
         CHECK(fixture(resources, root, error));
         ModelStore models(resources);
+        Resources timing_resources;
+        CHECK(fixture(timing_resources, root / "timing-only", error, false));
+        ModelStore timing_models(timing_resources);
+        CViewWeapon timing;
+        CHECK(!timing.Create(WEAP_BERETTA, false, timing_models, timing_resources, error));
+        CHECK(timing.Create(WEAP_BERETTA, false, timing_models, timing_resources, error, 0,
+                            CViewWeapon::ResourcesMode::AnimationOnly));
+        CHECK(timing.model && !timing.flashes[0] && !timing.flashes[1]);
         CViewWeapon view;
         Services services;
         CHECK(view.Create(WEAP_BERETTA, false, models, resources, error));
@@ -208,13 +217,34 @@ namespace
             {
                 if (alternate && weapon_definition(type)->m_bAltFireZoom)
                     continue;
-                CViewWeapon view;
-                Services services;
+                CViewWeapon view, timing;
+                Services services, logical;
                 services.type = type;
+                logical.type = type;
                 CHECK(view.Create(type, false, models, resources, error));
-                CHECK(step(view, services, {}, 180, error));
-                CHECK(step(view, services, {!alternate, alternate}, 360, error));
-                CHECK(step(view, services, {}, 180, error));
+                CHECK(
+                    timing.Create(type, false, models, resources, error, 0, CViewWeapon::ResourcesMode::AnimationOnly));
+                CHECK(!timing.flashes[0] && !timing.flashes[1]);
+                for (unsigned frame = 0; frame < 720; ++frame)
+                {
+                    const auto input = frame >= 180 && frame < 540 ? WeaponInput{!alternate, alternate} : WeaponInput{};
+                    CHECK(step(view, services, input, 1, error) && step(timing, logical, input, 1, error));
+                    CHECK(view.state == timing.state && view.animation.animation == timing.animation.animation &&
+                          view.animation.time == timing.animation.time &&
+                          view.animation.revision == timing.animation.revision && view.fire_keys == timing.fire_keys &&
+                          view.shots == timing.shots && view.second_barrel == timing.second_barrel &&
+                          view.bomb_held == timing.bomb_held && view.bomb_speed == timing.bomb_speed &&
+                          view.voodoo_hit == timing.voodoo_hit);
+                    CHECK(services.requests.size() == logical.requests.size());
+                    if (!services.requests.empty())
+                    {
+                        const auto& a = services.requests.back();
+                        const auto& b = logical.requests.back();
+                        CHECK(a.seed == b.seed && a.weapon == b.weapon && a.left == b.left &&
+                              a.alternate == b.alternate && a.projectile_speed == b.projectile_speed &&
+                              a.voodoo_hit == b.voodoo_hit);
+                    }
+                }
                 std::cout << "type=" << unsigned(type) << " alt=" << alternate << " shots=" << view.shots
                           << " keys=" << view.fire_keys << " state=" << view.state << '\n';
                 CHECK(!services.requests.empty() && view.shots == services.requests.size() && view.fire_keys);
@@ -235,7 +265,7 @@ namespace
                 CHECK(step(view, services, {true, false, left}, 240, error) && view.shots);
             }
         std::cout << "Retail independent view weapons: modes=" << modes << ", shots=" << fired
-                  << ", four characters and both hands passed\n";
+                  << ", identical animation-only timing/requests, four characters and both hands passed\n";
         return true;
     }
 } // namespace

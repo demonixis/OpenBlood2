@@ -1,0 +1,62 @@
+{
+  "scope": "Animation-validated network fire, independent prediction and authoritative shot counters",
+  "baseline": "0651140dfeed71bfe5360163399473fb15ae22f4",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "0651140dfeed71bfe5360163399473fb15ae22f4",
+      "path": "src/game/original/ViewWeapon.cpp",
+      "sha256": "e7f48df5cd3058d5230fa4e0fdee66905ca3ae23ec146af3db1528c156a7d03f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "0651140dfeed71bfe5360163399473fb15ae22f4",
+      "path": "src/game/original/Weapon.cpp",
+      "sha256": "5997b8ba6b295a9c0d960455fafc26ab511ab6caf3eb3b1958a440f0f63382bb"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "0651140dfeed71bfe5360163399473fb15ae22f4",
+      "path": "src/game/original/PlayerObj.cpp",
+      "sha256": "3dc3cbf3248b42ca39f34b836c56e4feb2ee848cbffedf7edda80b1934659cce"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "0651140dfeed71bfe5360163399473fb15ae22f4",
+      "path": "src/game/local_weapon.cpp",
+      "sha256": "b6bfac1b12c64cd767a144a8a725b8e8aec1390b215ef7b40936fa1c3a23cd91"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ViewWeapon.cpp",
+      "sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/Weapon.cpp",
+      "sha256": "1bb59cfdd747a1c2d5418fb13c4abc17d374f648c2ab9a67cc8dbf44c598c5c7"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    }
+  ],
+  "adaptations": [
+    "Reuse original CViewWeapon as an AnimationOnly server sequencer; default solo presentation and Update remain unchanged.",
+    "Protocol-v11 bounded reliable input frames reference server-issued private loadouts and per-hand view revisions, with full world/player/object/force identity.",
+    "Prediction uses issued state; actual original CWeapon delivery rechecks current authority and derives origin from the checked body/eye. No client-provided shot seed/damage/ammo/target.",
+    "Unified ordered command/frame queue, fixed 60 Hz weapon ticks, six-frame catchup cap and bounded 60-frame delayed-input credit. No CMoveMgr replay or second movement integration.",
+    "Latest unreliable ACK counts actual fire separately from cosmetic prediction; remote audiovisual shot events remain separate.",
+    "Interactive held fire remains neutral until multiplayer death/slow-death/respawn; current tests include nonlethal actual damage and separate-process world shots."
+  ]
+}

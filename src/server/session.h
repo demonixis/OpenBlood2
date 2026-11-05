@@ -5,6 +5,7 @@
 #include "net/movement.h"
 #include "net/player_commands.h"
 #include "net/player_events.h"
+#include "net/weapon_frames.h"
 #include "net/world_snapshot.h"
 #include "server/clock.h"
 #include <deque>
@@ -58,6 +59,8 @@ namespace OpenBlood2
             Invalid
         };
         CommandResult queue_command(std::uint64_t player, const Net::PlayerCommand&);
+        CommandResult queue_weapon_frame(std::uint64_t player, const Net::WeaponFrame&);
+        bool weapon_frame_ack(std::uint64_t player, std::optional<Net::WeaponFrameAck>&) const;
         bool take_command_acks(std::uint64_t player, std::vector<Net::CommandAck>&);
         std::uint64_t commands_applied = 0, commands_blocked = 0, commands_ignored = 0;
         bool take_private_events(std::uint64_t player, std::vector<Net::PrivateEvent>&, std::string& error);
@@ -108,9 +111,22 @@ namespace OpenBlood2
             ObjectId camera_eye, camera_orb;
             std::optional<Net::CameraState> camera;
             std::optional<Net::WeaponLoadout> weapons;
-            std::vector<Net::PlayerCommand> commands;
+            std::deque<std::variant<Net::PlayerCommand, Net::WeaponFrame>> pending_controls;
+            std::size_t queued_commands = 0, queued_weapon_frames = 0;
             std::vector<Net::CommandAck> command_acks;
             std::uint64_t command_sequence = 0;
+            struct WeaponState
+            {
+                std::uint64_t sequence = 0;
+                Net::WeaponLoadout value;
+            };
+            std::deque<WeaponState> weapon_states;
+            std::array<CViewWeapon, 2> weapon_timeline;
+            std::array<std::uint64_t, 2> weapon_view_revision{}, fired{};
+            std::uint64_t weapon_received = 0, weapon_received_state = 0, weapon_processed = 0, weapon_blocked = 0;
+            double weapon_time = 0;
+            unsigned weapon_credit = 0;
+            bool weapon_clock_started = false;
             std::deque<Net::MovementReport> pending;
             std::optional<Net::MovementAck> ack;
             PlayerControls controls;
@@ -132,7 +148,9 @@ namespace OpenBlood2
         bool refresh_camera(Player&, Net::CameraState&, std::string& error);
         bool refresh_movement(Player&, std::string& error);
         bool advance_players(double seconds, std::string& error);
-        bool apply_commands(std::string& error);
+        bool apply_controls(std::string& error);
+        bool apply_command(Player&, const Net::PlayerCommand&, std::string& error);
+        bool apply_weapon_frame(Player&, const Net::WeaponFrame&, std::string& error);
         bool advance_player(Player&, double seconds, std::string& error);
         bool replay_movement(Player&, const Net::MovementReport&, std::string& error);
     };

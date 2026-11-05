@@ -31,7 +31,8 @@ namespace
         CHECK(session.movement_setup(first.player, a, error) && session.movement_setup(second.player, b, error));
         CHECK(session.weapon_loadout(first.player, x, error) && session.weapon_loadout(second.player, y, error));
         CHECK(x.character == 0 && y.character == 1 && x.force_revision == a.owner.force_revision && x.weapons[0] == 1 &&
-              !x.weapons[1] && x.alive && x.input_enabled && x.fire_allowed && !x.binoculars);
+              (!x.weapons[1] && x.view_revision == std::array<std::uint64_t, 2>{1, 1}) && x.alive && x.input_enabled &&
+              x.fire_allowed && !x.binoculars);
         std::vector<PrivateEvent> events;
         for (const auto& joined : {first, second})
         {
@@ -54,7 +55,8 @@ namespace
         CHECK(inv.ObtainWeapon(WEAP_BERETTA) == InventoryResult::Ok);
         inv.SetAmmoCount(AMMO_BULLET, 37);
         CHECK(session.weapon_loadout(first.player, x, error));
-        CHECK((x.weapons == std::array<DBYTE, 2>{1, 1}) && x.ammunition[0] == 37 && x.ammunition[1] == 37);
+        CHECK((x.weapons == std::array<DBYTE, 2>{1, 1}) && x.ammunition[0] == 37 && x.ammunition[1] == 37 &&
+              (x.view_revision == std::array<std::uint64_t, 2>{1, 2}));
         CHECK(session.take_private_events(first.player, events, error) && events.size() == 1);
         CHECK(session.take_private_events(second.player, events, error) && events.empty());
         CHECK(inv.ChangeWeapon(WEAP_ASSAULTRIFLE) == InventoryResult::Ok);
@@ -78,8 +80,10 @@ namespace
         CHECK(session.weapon_loadout(first.player, x, error) && x.binoculars && x.input_enabled && !x.fire_allowed);
         inv.binoculars->active = false;
         const auto force = x.force_revision;
+        const auto revisions = x.view_revision;
         CHECK(player->TeleportClientToServerPos() && session.movement_setup(first.player, a, error));
-        CHECK(session.weapon_loadout(first.player, x, error) && x.force_revision > force && x.fire_allowed);
+        CHECK(session.weapon_loadout(first.player, x, error) && x.force_revision > force && x.fire_allowed &&
+              x.view_revision == revisions);
         CHECK(session.take_private_events(first.player, events, error));
         for (const auto& event : events)
         {
