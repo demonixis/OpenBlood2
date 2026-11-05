@@ -514,10 +514,14 @@ namespace OpenBlood2
         const auto flashlight = game.client_shell.flashlight.Current(game.server);
         effects = gather_scene_effects(game, eye, rotation);
         world_far = effects.far_z > 0 ? effects.far_z : world_default_far;
-        // XR's fallback fade must also black out fog when no compositor fade layer exists.
-        if (scene_fade != 1)
-            for (unsigned channel = 0; channel < 3; ++channel)
-                effects.uniform.fog_color[channel] *= scene_fade;
+        // The original global light scale (night goggles, Seeing Eye, blindness, underwater tint)
+        // tints the whole scene: the shaders fog after the scene colour, so the fog and clear
+        // colours carry it too. XR's fallback fade must also black out fog when no compositor
+        // fade layer exists.
+        const auto light_scale = vector_scale(game.client_shell.SceneLightScale(), scene_fade);
+        const float light[3]{light_scale.x, light_scale.y, light_scale.z};
+        for (unsigned channel = 0; channel < 3; ++channel)
+            effects.uniform.fog_color[channel] *= light[channel];
         const auto time = game.server.world_time();
         const auto layer = target.layer;
         // Colour, then the post-processing glow/occlusion mask, depth copy (cleared to the
@@ -534,7 +538,7 @@ namespace OpenBlood2
             color.texture = textures[i];
             color.resolve_texture = resolves[i];
             color.layer_or_depth_plane = layer;
-            color.clear_color = i == 0   ? SDL_FColor{.025f, .035f, .05f, 1}
+            color.clear_color = i == 0   ? SDL_FColor{.025f * light[0], .035f * light[1], .05f * light[2], 1}
                                 : i == 2 ? SDL_FColor{1, 1, 1, 1}
                                          : SDL_FColor{0, 0, 0, 0};
             if (i == 0 && effects.uniform.fog_color[3] != 0)
@@ -560,9 +564,7 @@ namespace OpenBlood2
         }
         ++stats.passes;
         WorldRecordTarget scene{commands, pass, letterbox, view_model_depth, 1};
-        scene.scene_color = game.client_shell.SceneLightScale();
-        if (scene_fade != 1)
-            scene.scene_color = vector_scale(scene.scene_color, scene_fade);
+        scene.scene_color = light_scale;
         scene.eye = projection;
         scene.effects = &effects;
         auto close = scene;

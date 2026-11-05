@@ -86,6 +86,18 @@ Options > Display ends with `FIELD OF VIEW [60–120]` (preferences version 12);
 
 ## Verification
 
-Headless and private-data suites pass on macOS (Apple M5). GPU tests ran on Metal: all pass
-except `gpu.character`, `gpu.viewport`, `gpu.polygrid` and `gpu.inventory_use`, which fail
-identically on the unmodified `446933cc` build and are not caused by this release.
+Headless and private-data suites pass on macOS (Apple M5), and the `ci-release` preset
+(headless, synthetic data) passes. The four GPU tests that already failed on `446933cc`
+now pass:
+
+- `gpu.character`: the moving AI smoke probes sat at y=10000, outside SubwayA's padded
+  extents, where the 0.5.1 outside-world hold stops them; they now use y=600, like
+  `ai_fire.script_private`.
+- `gpu.viewport`: translucent batches are frustum culled (and FarZ-clipped) like opaque ones,
+  and the shared translucent queue draws once per sprite slice; the check now requires 1..31
+  submitted batches and at least one translucent pass per frame.
+- `gpu.polygrid`: repeat textures are filtered trilinearly since 0.5.0; the scan checks
+  coloured regions, two red runs and an exact 150-pixel repeat instead of exact texel values.
+- `gpu.inventory_use`: a real bug. Fog and the clear colour ignored the global light scale,
+  so a blinded player saw the fog and the Seeing Eye kept green fog; both colours now carry
+  the scale ([scene effects](../../contracts/scene_effects_contracts.md)). The test is unchanged.

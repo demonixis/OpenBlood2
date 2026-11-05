@@ -1611,8 +1611,13 @@ namespace
                 if (world_mesh.effects.size() != 60 || !world_renderer.stats.pan_batches ||
                     world_renderer.stats.surface_time != game->server.world_time())
                     return 3;
-                if (world_mesh.blended != 31 || world_renderer.stats.alpha_batches != 31 ||
-                    world_renderer.stats.alpha_frames != world_renderer.stats.frames)
+                // Translucent batches are frustum culled like opaque ones, and SubwayA's FarZ (1500)
+                // drops the far ones, so only some of the 31 prepared batches are submitted. The shared
+                // translucent queue draws world alpha once per sprite depth slice: at least one
+                // translucent pass per frame.
+                if (world_mesh.blended != 31 || !world_renderer.stats.alpha_batches ||
+                    world_renderer.stats.alpha_batches > world_mesh.blended ||
+                    world_renderer.stats.alpha_frames < world_renderer.stats.frames)
                     return 4;
                 if (decoded < 50 || missing || !viewport_hidden || !viewport_unloaded || !viewport_reloaded ||
                     world_renderer.stats.uploads != 2 || world_renderer.width() != 1000 ||

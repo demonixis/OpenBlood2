@@ -70,7 +70,9 @@ port uses the currently containing volume. Volume fog does not hide or transform
 authored sky layers; `SkyFog` is applied separately (see the [sky contracts](sky_contracts.md#skyfog-farz-and-culling-052)). There is no
 volumetric scattering. Enhanced glow and reflection weight attenuate through the fog;
 alpha and depth stay unchanged. Fog applies inside the scene pass, before tonemap/AA.
-The XR fallback scene fade also scales the fog color, including the clear color.
+The XR fallback scene fade also scales the fog color, including the clear color. Since 0.5.2 the original global light scale (night goggles, Seeing Eye, blindness,
+underwater tint) scales them the same way, as fog is applied after the scene colour: a blinded
+player sees black, not the fog.
 
 ## Transparency
 

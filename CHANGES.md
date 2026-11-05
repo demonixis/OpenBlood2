@@ -17,6 +17,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Exploding walls, speakers, fans, the floating ship and other exploding objects show their explosion and play its sound; wood crate fragments are visible ([#11](https://github.com/demonixis/OpenBlood2/issues/11), [#8](https://github.com/demonixis/OpenBlood2/issues/8)).
 - Museum skylights, display cases and other black-keyed glass are transparent ([#10](https://github.com/demonixis/OpenBlood2/issues/10), [#8](https://github.com/demonixis/OpenBlood2/issues/8)).
 - The view is tinted under water, blood and acid ([#8](https://github.com/demonixis/OpenBlood2/issues/8)).
+- Fog and the background follow the night goggles, Seeing Eye and blindness tints (a blinded player no longer sees the fog).
 - Escalators and conveyors drag the player at the original speed, and the player can jump out of shallow water (Museum shotgun pool) ([#8](https://github.com/demonixis/OpenBlood2/issues/8)).
 - Museum trip lasers damage the player ([#8](https://github.com/demonixis/OpenBlood2/issues/8)).
 - The Mac-10 alternate fire and other weapons play their animation sounds ([#8](https://github.com/demonixis/OpenBlood2/issues/8)).

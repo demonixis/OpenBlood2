@@ -10,6 +10,9 @@
 #include <spdlog/spdlog.h>
 namespace OpenBlood2
 {
+    // Probes that move: free air above 01_SubwayA's geometry (y <= 512) yet inside its extents
+    // padded by 100, where the outside-world hold (tester_feedback_2026_10_27) does not stop them.
+    constexpr float moving_probe_y = 600;
     bool prepare_corpse_smoke(GameSession& g, ObjectId& selection)
     {
         const auto* player = g.objects.get(g.client_shell.player);
@@ -228,7 +231,7 @@ namespace OpenBlood2
             return false;
         ObjectCreateStruct state;
         state.m_ObjectType = OT_MODEL;
-        state.m_Pos = {3000, 10000, 0};
+        state.m_Pos = {3000, moving_probe_y, 0};
         SAFE_STRCPY(state.m_Name, "Civilian escape/beg probe (no full AI_Update)");
         SAFE_STRCPY(state.m_Filename, "models/enemies/f_civilian1.abc");
         const auto h = g.objects.create(&type, state);
@@ -278,7 +281,7 @@ namespace OpenBlood2
             return false;
         ObjectCreateStruct state;
         state.m_ObjectType = OT_MODEL;
-        state.m_Pos = {2000, 10000, 0};
+        state.m_Pos = {2000, moving_probe_y, 0};
         // No model-key audio driver; this probe isolates script movement and actual model clocks.
         SAFE_STRCPY(state.m_Name, "AI script/navigation probe (no full AI_Update)");
         SAFE_STRCPY(state.m_Filename, "models/enemies/m_cultist1.abc");
@@ -332,7 +335,7 @@ namespace OpenBlood2
             return false;
         ObjectCreateStruct state;
         state.m_ObjectType = OT_MODEL;
-        state.m_Pos = {1000, 10000, 0};
+        state.m_Pos = {1000, moving_probe_y, 0};
         state.m_Flags = FLAG_MODELKEYS;
         SAFE_STRCPY(state.m_Name, "Cultist attack/movement probe (no full AI_Update)");
         SAFE_STRCPY(state.m_Filename, "models/enemies/m_cultist1.abc");
@@ -348,7 +351,7 @@ namespace OpenBlood2
             !ai->InitStatics(table))
             return false;
         ObjectCreateStruct target;
-        target.m_Pos = {1000, 10000, 300};
+        target.m_Pos = {1000, moving_probe_y, 300};
         target.m_Flags = FLAG_SOLID;
         SAFE_STRCPY(target.m_Name, "AI weapon damage receiver (diagnostic)");
         const auto victim = g.objects.create(&target_type, target);
@@ -360,8 +363,9 @@ namespace OpenBlood2
         // placement is not a claim of authored NPC navigation or path following.
         SegmentHit vertical;
         if (!ai->m_MoveObj.Init(h) ||
-            !ai->m_MoveObj.ClearToPoint({1000, 10000, 0}, {1000, 10010, 0}, {1, 2, 1}, vertical) ||
-            ai->m_MoveObj.alignment_fallbacks != 1 || !ai->m_MoveObj.CalculatePath({1100, 10000, 0}))
+            !ai->m_MoveObj.ClearToPoint({1000, moving_probe_y, 0}, {1000, moving_probe_y + 10, 0}, {1, 2, 1},
+                                        vertical) ||
+            ai->m_MoveObj.alignment_fallbacks != 1 || !ai->m_MoveObj.CalculatePath({1100, moving_probe_y, 0}))
             return false;
         ai->m_fHearingDist = 1000;
         if (!ai->HandleTrigger(victim, "SOUND_TRIGGER 2"))
