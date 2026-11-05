@@ -514,8 +514,11 @@ independent 256-event bounds, and exit detaches before disconnect.
 Bloodbath `GoToStartPoint` now makes the original single random ordinal draw over
 all named `Blood2StartPoint` objects, including markers whose `Multiplayer` field
 is false. It preserves trigger, rotation, checked teleport/ground placement,
-physics and forced-position messages. It does not add retries, a new spawn-safety
-policy or an origin fallback. Missing/invalid markers fail with owned-list cleanup.
+physics and forced-position messages. When the selected marker is occupied and
+the bounded separation finds no room, the next live markers in list order are
+tried (adaptation: no further random draw, no trigger for a fallback marker, its
+rotation resent; `entry_start_retries` counts them). There is no origin fallback;
+every marker occupied or invalid still fails with owned-list cleanup.
 The original solo named/fallback selection and explicit inspection override stay
 unchanged. Team filtering, original multiplayer initialization and death/respawn
 were subsequent steps at that delivery; wire admission is now covered below.
@@ -695,7 +698,11 @@ extrapolation. The predicted local player and its attached children retain their
 latest values; CMoveMgr remains the only local movement integration.
 
 A changed position through the existing TeleportObject service receives a new
-transient server-wide pose revision. Capture passes it to the object and its
+transient server-wide pose revision when it is a discontinuity: any change for a
+client-moved player, or a jump beyond 64 units (`pose_continuity_limit`) for
+other objects. Original per-update followers (held models, carried flags,
+attached leeches) stay continuous, so their State poses keep interpolating
+instead of waiting for a reliable patch every update. Capture passes it to the object and its
 attached child (the checked attachment service disallows chains). That revision
 changes reliable membership and carries the destination pose, clearing that
 object's interpolation history. Repeated same-position calls do not create a
@@ -752,9 +759,15 @@ voice and air-update ordering. The original integration arithmetic is unchanged.
 ReplicaMovement owns a client body, checks admitted world/object identity and uses
 only the collision/environment replica. Substeps retain prediction instead of
 copying an old authoritative pose. Reports carry owner, full force revision,
-sequence, move code and motion/control values. Preserve the original first-frame
-publication and 0.14-second float countdown reset, with discarded overshoot and
-no burst. Reporting uses real frame duration separately from capped physics time.
+sequence, move code, controls, the origin and every CMoveMgr substep since the
+previous report (offset, pre-collision velocity/acceleration, duration, ground and
+surface), and the last predicted move with its pre-collision velocity. Preserve
+first-frame publication; later reports follow every 1/30 s or 12 substeps (one
+capped 0.1 s frame), without a burst (adaptation of the original 0.14 s countdown,
+whose single destination cannot carry stairs or landings). Reporting uses real
+frame duration separately from capped physics time. Prediction passes through a
+model it starts inside (players spawned or pushed into each other) and still
+stops at every other obstacle.
 
 This is an independently linked prediction/report producer. Wire setup/stance,
 report transport, server velocity advancement, correction/acknowledgement handling
@@ -765,11 +778,13 @@ eight-bit move code alone never proves freshness across lives or teleports.
 ## Movement reports and authoritative advancement
 
 The [movement transport continuation](../implementation/reports/m9_movement_transport.md)
-uses protocol 6 for 98-byte reliable setup, 104-byte unreliable client reports and
-106-byte unreliable ACKs, with a 256-byte decode limit. Validate the admitted
-peer/player, world, object generation, full force generation, byte code and report
-sequence. Coalesce to one pending report per player/tick; ignore stale/duplicate
-reports without refreshing liveness. A peer cannot command another player.
+introduced 98-byte reliable setup, unreliable client reports and 106-byte
+unreliable ACKs. Protocol 9 reports are 117 bytes plus 42 per substep, at most 24
+substeps (1,125 bytes, under the 1,200-byte State limit); each substep lasts at
+most 1/120 s. Validate the admitted peer/player, world, object generation, full
+force generation, byte code and report sequence. Queue up to eight reports per
+player in order, dropping the oldest on overflow; ignore stale/duplicate reports
+without refreshing liveness. A peer cannot command another player.
 
 Network force generation tracks both original player forces and engine pose
 discontinuities. Either invalidates pending reports and ACKs, even when the byte
@@ -777,14 +792,25 @@ code wraps or the engine teleport has no original player message. Keep this
 network identity separate from solo force codes and saved game state.
 
 Keep remote movement in the server player stage before container damage/cleanup.
-The report tick commits its already integrated destination through collision.
-Only intervening ticks advance received velocity, using two swept substeps at
-60 Hz, without another gravity/acceleration or command integration. Retain original
+Each queued report replays its substeps in order from the server's own body:
+destination = current position + offset, submitted with the substep's
+pre-collision velocity through the solo `PlayerMove` path. Only collision and
+contacts run, so stairs, stopping contacts and falling damage follow the solo
+rules; there is no other gravity, acceleration or command integration. A report
+after a lost one first makes one collision-checked sweep to its origin. Remaining
+substeps are skipped after a contact forces a new pose or kills the player. The
+server never extrapolates: after 30 ticks without a report the body velocity is
+held at zero and stale controls are neutralized. Retain original
 animation/clearance controls each tick, server air, door pushes and held models.
-After 30 ticks without a report, hold velocity and neutralize stale controls until
-the next report. This half-second extrapolation limit is a documented adaptation.
 
-Capture ACK motion at receipt, before subsequent velocity advance; repeat it at
+Adaptation (leash): a substep moving faster than 8,000 units/s, or exceeding the
+player's movement time, is refused; the catch-up sweep is charged at that speed.
+Movement time refills 5 % faster than the server clock and is capped at 0.5 s
+(it starts full, absorbing jitter). The ACK then corrects the client. A movement
+error isolates its player: it is removed with a warning (`movement_failures`) and
+the endpoint disconnects only that peer; the match keeps running.
+
+Capture ACK motion after the last applied report, before later ticks; repeat it at
 20 Hz. Publish setup/stance/force changes reliably. A force during report contacts
 invalidates that old report's ACK. Client setup/correction reception, complete
 private event delivery and interactive remote gameplay remain subsequent work.
@@ -806,7 +832,11 @@ collision. Update later checkpoints, without replaying report clocks, audio,
 server callbacks, air or damage. Logical counts advance once; expose replay work
 separately. Failed replay/prediction must not leave partially advanced state.
 
-Bound history to 512 frames/32 reports and one future-setup ACK. Refuse unsent
+Replay re-records substeps only for frames not yet reported. A failed prediction
+frame restores its state and holds the body (the replica can briefly disagree
+with the server); more than 240 consecutive failures refuse prediction.
+
+Bound history to 512 frames/64 reports and one future-setup ACK. Refuse unsent
 current sequences/wrong codes; ignore retired/duplicate/stale owner/force ACKs.
 Changed physics/stance retires old history; unchanged newer setup retains it.
 Defer corrections embedded in current collision without consuming the ACK,
@@ -885,7 +915,7 @@ and camera without a server session. Preserve one admission per endpoint lifetim
 cross-channel baseline ordering, phase/owner/channel checks, bounded pumps/inbox
 and explicit deadlines/rejections. Do not process a duplicate private event again.
 
-Keep the original report cadence and one client integration, 60 Hz client steps,
+Keep the report cadence above and one client integration, 60 Hz client steps,
 six-step catchup and discarded-tick accounting. Newer server stamps alone reanchor
 the monotonic mapped clock, with bounded lead during silence. Sample remote poses
 100 ms behind it, without changing authoritative reception time. Presentation
@@ -903,7 +933,8 @@ ends the session. Preserve existing controls/preferences and passive ClientScene
 presentation; solo keeps its existing frontend and clocks.
 
 Per-frame mouse offsets survive zero-tick frames and are consumed once across
-fixed ticks, with proportional discard under the six-tick overload limit. Clear
+the fixed ticks that run; time discarded under the six-tick overload limit never
+discards mouse movement. Clear
 pending offsets when commands are neutralized or mouse-move mode ends. Do not
 modify CMoveMgr or add another integration to accommodate render scheduling.
 

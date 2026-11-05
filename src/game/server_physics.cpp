@@ -222,7 +222,14 @@ namespace OpenBlood2
             if (!r || r->life != Life::Alive || r->attachment || (r->container() || r->world_model) || !position ||
                 !physics_vector(*position) || !a.next_pose_revision_)
                 return DE_INVALIDPARAMS;
-            if (r->state.m_Pos.x != position->x || r->state.m_Pos.y != position->y || r->state.m_Pos.z != position->z)
+            // A discontinuity for interpolation and remote movement: any move of a
+            // client-moved player, or a jump past the continuity limit. Original
+            // per-update followers (held models, carried flags, attached leeches)
+            // teleport a few units each update and stay continuous.
+            const DVector delta{position->x - r->state.m_Pos.x, position->y - r->state.m_Pos.y,
+                                position->z - r->state.m_Pos.z};
+            const float distance2 = delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;
+            if (distance2 > 0 && (r->client_movement || distance2 > pose_continuity_limit * pose_continuity_limit))
                 r->pose_revision = a.next_pose_revision_++;
             r->state.m_Pos = *position;
             r->grounded = false;

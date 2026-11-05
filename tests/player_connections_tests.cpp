@@ -149,6 +149,46 @@ namespace
             CHECK(record && record->state.m_Pos.x == positions[i].x && record->state.m_Pos.y == positions[i].y &&
                   record->state.m_Pos.z == positions[i].z);
         }
+        // With another marker, the occupied selection moves on to it in list
+        // order: still one random draw, the existing players untouched.
+        CHECK(game.objects.create(game.objects.find_class("GameStartPoint"), {}, Creation::World,
+                                  {{"Name", std::string("spare")},
+                                   {"Multiplayer", true},
+                                   {"Pos", DVector{-400, 100, -400}},
+                                   {"Rotation", EulerAngles{{0, .5f, 0}}}}));
+        client = game.server.connect_client();
+        CHECK(client);
+        auto* list = game.server.FindNamedObjects("Blood2StartPoint");
+        CHECK(list && list->m_nInList == 2);
+        const bool spare_first =
+            game.server.GetStringData(
+                dynamic_cast<GameStartPoint*>(game.server.HandleToObject(list->m_pFirstLink->m_hObject))->GetName()) ==
+            std::string("spare");
+        game.server.RelinquishList(list);
+        bool retried = false;
+        for (unsigned attempt = 0; attempt < 32 && !retried; ++attempt)
+        {
+            expected = std::minstd_rand(game.server.save_clock().generator);
+            const auto selected = std::uniform_int_distribution<int>(0, 1)(expected);
+            auto* player = game.server_shell.OnClientEnterWorld(client, &error);
+            CHECK(player && std::minstd_rand(game.server.save_clock().generator) == expected);
+            const auto* record = game.objects.get(player->m_hObject);
+            CHECK(record && std::abs(record->state.m_Pos.x + 400) < .01f &&
+                  std::abs(record->state.m_Pos.z + 400) < .01f);
+            CHECK(player->entry_start_name == "spare");
+            retried = player->entry_start_retries == 1;
+            CHECK(retried == ((selected == 0) != spare_first));
+            game.server_shell.OnClientExitWorld(client);
+            CHECK(game.objects.finish_frame() && game.server.disconnect_client(client));
+            client = game.server.connect_client();
+            CHECK(client);
+        }
+        CHECK(retried && game.server.disconnect_client(client));
+        for (unsigned i = 0; i < clients.size(); ++i)
+        {
+            const auto* record = game.objects.get(game.server_shell.Player(clients[i])->m_hObject);
+            CHECK(record && record->state.m_Pos.x == positions[i].x && record->state.m_Pos.z == positions[i].z);
+        }
         // The placement service does not expand the solo policy.
         game.server.net_game_type = GAMETYPE_SINGLE;
         CHECK(game.server.ResolveInitialActorOverlap(game.server_shell.Player(clients[0])->m_hObject) ==

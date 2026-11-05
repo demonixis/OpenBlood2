@@ -192,6 +192,8 @@ class CPlayerObj : public CBaseCharacter
     bool GoToStartPoint(HSTRING start_name, bool inspection_start = false);
     std::string entry_start_name; // Owned inspection of the actual selected marker.
     bool entry_start_fallback = false, entry_start_multiplayer = false;
+    // Occupied Bloodbath markers skipped for the next clear one (adaptation).
+    unsigned entry_start_retries = 0;
     bool SetCharacter(DBYTE);
     bool OnSinglePlayerInit(const OpenBlood2::PlayerInit&);
     bool OnMultiplayerInit(const OpenBlood2::PlayerInit&);

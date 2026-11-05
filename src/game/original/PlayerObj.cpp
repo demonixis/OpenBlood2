@@ -327,6 +327,7 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name, bool inspection_start)
     entry_start_name.clear();
     entry_start_fallback = false;
     entry_start_multiplayer = false;
+    entry_start_retries = 0;
     auto* list = server->FindNamedObjects("Blood2StartPoint");
     if (!list)
         return false;
@@ -341,6 +342,7 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name, bool inspection_start)
         }
     } release{server, list};
     GameStartPoint* start = nullptr;
+    ObjectLink* selected_link = nullptr;
     if (server->net_game_type == GAMETYPE_BLOODBATH)
     {
         // Original PlayerObj::GoToStartPoint draws from the whole named list,
@@ -358,6 +360,7 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name, bool inspection_start)
             selected = selected->m_pNext;
         if (selected && server->IsObjectAlive(selected->m_hObject))
             start = dynamic_cast<GameStartPoint*>(server->HandleToObject(selected->m_hObject));
+        selected_link = selected;
         if (!start)
         {
             entry_error = "Selected Bloodbath GameStartPoint unavailable";
@@ -425,8 +428,42 @@ bool CPlayerObj::GoToStartPoint(HSTRING start_name, bool inspection_start)
         return false;
     if (network_game_type(server->net_game_type) && server->ResolveInitialActorOverlap(m_hObject) != DE_OK)
     {
-        entry_error = "Occupied multiplayer start has no clear bounded placement";
-        return false;
+        // Adaptation: the original spawned inside an occupied marker. When the
+        // bounded separation finds no room, try the next markers in list order
+        // (no further random draw, no trigger: the selected marker sent it).
+        bool placed = false;
+        for (auto* link = selected_link ? selected_link->m_pNext : nullptr; link != selected_link && !placed;
+             link = link ? link->m_pNext : nullptr)
+        {
+            if (!link)
+            {
+                link = list->m_pFirstLink;
+                if (link == selected_link)
+                    break;
+            }
+            auto* other = server->IsObjectAlive(link->m_hObject)
+                              ? dynamic_cast<GameStartPoint*>(server->HandleToObject(link->m_hObject))
+                              : nullptr;
+            if (!other || server->GetObjectPos(other->m_hObject, &position) != DE_OK)
+                continue;
+            if (!server->IsObjectAlive(m_hObject) || server->TeleportObject(m_hObject, &position) != DE_OK)
+                return false;
+            if (server->ResolveInitialActorOverlap(m_hObject) != DE_OK)
+                continue;
+            m_fYaw = other->GetPitchYawRoll().y;
+            const auto* name = server->GetStringData(other->GetName());
+            entry_start_name = name ? name : "";
+            entry_start_multiplayer = other->IsMultiplayer();
+            ++entry_start_retries;
+            placed = server->SendToClient(m_hClient, OpenBlood2::PlayerRotation{m_fPitch, m_fYaw}) == DE_OK;
+            if (!placed)
+                return false;
+        }
+        if (!placed)
+        {
+            entry_error = "Occupied multiplayer start has no clear bounded placement";
+            return false;
+        }
     }
     if (server->MoveObjectToGround(m_hObject) != DE_OK)
     {

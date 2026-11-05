@@ -438,6 +438,9 @@ namespace OpenBlood2
             return variables_;
         }
         DVector gravity{0, -2000, 0};
+        // TeleportObject distance (units) beyond which a non-player object's
+        // pose is a discontinuity (see pose_revision).
+        static constexpr float pose_continuity_limit = 64;
 
       private:
         std::minstd_rand random_{1};

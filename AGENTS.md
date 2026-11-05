@@ -10,7 +10,18 @@ order and solo behaviour. Cosmetic failures stay non-fatal: a mirrored voice the
 cannot prepare is silent and counted, a malformed FX item is dropped and counted, an NPC
 runtime failure on the server suspends that actor. Solo skips the replica prediction
 solve (`LocalMovement::verify_prediction` is for parity tests). Raw evidence stays on
-`develop-multiplayer`. Admission, replication and network gameplay are later lots.
+`develop-multiplayer`.
+
+Lot 3 (protocol 9) adds Bloodbath ENet admission, 20 Hz world/pose replication,
+private events, cameras, the independent NetworkClient and the desktop host/join
+frontend. Remote movement reports carry every CMoveMgr substep with its pre-collision
+velocity; the server replays them from its own body through the solo `PlayerMove`
+path (stairs, landings, falling damage), never extrapolates, leashes to 8,000 u/s and
+0.5 s of movement time, and isolates a failing player instead of stopping the match.
+Client prediction passes through models it starts inside and holds on a failed frame.
+Preserve full force generations, `pose_continuity_limit` (followers stay interpolated),
+the occupied-marker list-order retry and one mouse total across the ticks that run.
+Combat, weapons/FX/audio over the wire and the original Host/Join screens are later lots.
 
 The [desktop third-person camera](Documentation/contracts/camera_contracts.md) adds a rebindable C toggle,
 actual player/held models and centred aim convergence. Preserve unchanged eye/shot/movement state,

@@ -74,6 +74,11 @@ namespace
         CHECK(game.server.TeleportObject(parent, &teleported) == DE_OK && source->pose_revision);
         const auto pose_revision = source->pose_revision;
         CHECK(game.server.TeleportObject(parent, &teleported) == DE_OK && source->pose_revision == pose_revision);
+        // A follower's small per-update teleport stays continuous (interpolated).
+        teleported.x = 90;
+        CHECK(game.server.TeleportObject(parent, &teleported) == DE_OK && source->pose_revision == pose_revision);
+        teleported.x = 99;
+        CHECK(game.server.TeleportObject(parent, &teleported) == DE_OK && source->pose_revision == pose_revision);
         CHECK(game.objects.refresh_attachments());
         source->hidden_nodes[0] = 0;
         source->animation.time = 75;
