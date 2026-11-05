@@ -43,7 +43,7 @@ black (z-fighting with frames behind it). Those faces now bind a keyed copy of t
 
 | Report | Result |
 |---|---|
-| Air bar, objectives page, pickup messages | See the HUD section below. |
+| Air bar, objectives page, pickup messages | Added: see the HUD section below. |
 | Mac-10 alt-fire sound | Fixed: view-weapon `SOUND_KEY`s played only for the shotgun; all weapons now play them ([weapon contracts](../../contracts/weapon_contracts.md)). |
 | Speaker/fan explosions (E1L2), floating ship explosion sound (E1L3) | Fixed by the exploding-debris change above. |
 | Floating trash bag (E1L2 start) | Matches the original: the second bag's ground sweep lands on the first bag's box; its round mesh overhangs. Unchanged. |
@@ -58,6 +58,21 @@ black (z-fighting with frames behind it). Those faces now bind a keyed copy of t
 | Gabriella missing in the cut-scene | Fixed: the spawn allowlist refused GabriellaAI ([spawner contracts](../../contracts/spawner_contracts.md)). |
 | Mad Scientist cowering | Open. His script matches the original; the pose depends on whether the cut-scene camera activates before his first update (object update order), which cannot be verified for LithTech 1.0. |
 | Civilians, gibbing rules, enemy line of sight | Gameplay requests, out of scope. |
+
+## HUD: air bar, objectives and pickup messages (added)
+
+Selected original `CNewStatusBar` and `CMessageMgr` code
+([original HUD contracts](../../contracts/original_hud_contracts.md)):
+
+- The objectives page (`objectives.pcx`, Tab, a fixed interface action outside Controls),
+  its 0.1 s scale, the updated skull icon and the `bellding1`/`missionobj` sounds.
+- The power bar for air (`m_fAirLevel`), bomb throw charge (with the original
+  overhold line) and boss health, hidden after 5 s.
+- The six-line, five-second message ring, now fed by `SendPickedUpMessage` (strings
+  260–262, keeping its AND quirk), power-expiry strings 276–278 and IMMOBILE/CANMOVE.
+
+Missing art or strings are reported without failing the HUD. Lines use the replacement
+ImGui font, the ring is cleared on a world reset, and no GPU capture covers the new band yet.
 
 ## Issue #5: weapon sidebar
 

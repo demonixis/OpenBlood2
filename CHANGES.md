@@ -6,6 +6,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- The original objectives page (Tab), air/throw/boss power bar and on-screen message lines, including pickup messages ([#8](https://github.com/demonixis/OpenBlood2/issues/8)).
 - Options > Display > FIELD OF VIEW, 60 to 120 degrees (default 90, the original); zoom and the binoculars keep their original magnification.
 
 ### Fixed

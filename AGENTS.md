@@ -19,7 +19,9 @@ models pass each other, publish exploding CDebris AddExplosion, load wholly tran
 opaque, chroma-key unmasked SURF_TRANSPARENT faces (keyed material copy), tint the view per the
 camera's container, run conveyor/swim-cap rules on a fixed 1/30 s container cadence with a one-frame
 dry jump, start embedded TripLaser beams past their wall, play every view-weapon SOUND_KEY and allow
-the GabriellaAI spawn. Options > Display FIELD OF VIEW (60–120, preferences version 12) replaces
+the GabriellaAI spawn. The original objectives page (fixed Tab action), power bar (air, throw
+charge, boss) and CMessageMgr ring (pickup/power/movement strings) are ported; missing art/strings
+never fail the HUD. Options > Display FIELD OF VIEW (60–120, preferences version 12) replaces
 FOV_NORMAL only at presentation; game FOVs, zoom and XR are unchanged. The Mad Scientist pose and
 the macOS-failing gpu.character/viewport/polygrid/inventory_use tests remain open.
 
