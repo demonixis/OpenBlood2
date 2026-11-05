@@ -45,7 +45,11 @@ namespace OpenBlood2
             return setup_;
         }
         std::uint64_t corrections = 0, replays = 0, ignored = 0, deferred = 0;
-        static constexpr std::size_t frame_limit = 512, report_limit = 32;
+        // Frames whose prediction failed and held the body (see update).
+        std::uint64_t prediction_holds = 0;
+        static constexpr std::size_t frame_limit = 512, report_limit = 64;
+        // Consecutive failed frames tolerated before the prediction is refused.
+        static constexpr unsigned hold_limit = 240;
 
       private:
         struct Frame
@@ -71,6 +75,9 @@ namespace OpenBlood2
         std::deque<Frame> frames_;
         std::deque<Checkpoint> reports_;
         std::uint64_t next_frame_ = 0, sent_ = 0, acknowledged_ = 0, retired_ = 0;
+        // Frame of the latest sent report: later frames hold the unsent steps.
+        std::uint64_t sent_frame_ = 0;
+        unsigned failed_frames_ = 0;
         bool belongs(const Net::MovementIdentity&) const;
         void clear_history();
         void trim();

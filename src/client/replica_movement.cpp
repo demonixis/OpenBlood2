@@ -10,6 +10,9 @@ namespace OpenBlood2
         state = value.state;
         controls_ = value.controls;
         surface_ = value.surface;
+        velocity_ = value.velocity;
+        origin_ = value.origin;
+        steps_ = value.steps;
         return true;
     }
     bool ReplicaMovement::stance(int character, float eye_level, bool crouched)
@@ -30,7 +33,10 @@ namespace OpenBlood2
         character_ = 0;
         eye_level_ = report_timer_ = 0;
         crouched_ = positioned_ = false;
+        recording_ = true;
         controls_ = {};
+        velocity_ = origin_ = {};
+        steps_.clear();
         // Reports remain distinct if this adapter is rebound to the same owner.
     }
     bool ReplicaMovement::bind(ClientObjectId owner, std::uint64_t revision, DBYTE code, int character, float eye_level,
@@ -51,6 +57,8 @@ namespace OpenBlood2
             return false;
         state.owner = owner;
         state.body = initial;
+        velocity_ = initial.velocity;
+        steps_.clear();
         revision_ = revision;
         code_ = code;
         character_ = character;
@@ -79,6 +87,9 @@ namespace OpenBlood2
         state.body = next;
         positioned_ = true;
         report_timer_ = 0;
+        // Steps integrated before a force belong to the previous revision.
+        velocity_ = {};
+        steps_.clear();
         return true;
     }
     bool ReplicaMovement::controls(const PlayerControls& value, bool send, bool& crouched)
@@ -104,15 +115,23 @@ namespace OpenBlood2
         int character;
         return std::isfinite(seconds) && seconds >= 0 && environment(value, character);
     }
-    bool ReplicaMovement::advance(const PlayerMove& move)
+    bool ReplicaMovement::advance(const PlayerMove& move, DVector offset, float seconds)
     {
         ClientMotionState predicted;
-        if (!valid() || !positioned_ || move.move_code != code_ ||
-            !collision_.predict(state.owner, body(), move.position, move.velocity, move.acceleration, predicted))
+        if (!valid() || !positioned_ || move.move_code != code_ || !physics_vector(offset) || !std::isfinite(seconds) ||
+            seconds <= 0 || (recording_ && steps_.size() >= step_limit) ||
+            !collision_.predict(state.owner, body(), move.position, move.velocity, move.acceleration, predicted, true))
         {
             ++state.prediction_failures;
             return false;
         }
+        if (recording_)
+        {
+            if (steps_.empty())
+                origin_ = body().position;
+            steps_.push_back({offset, move.velocity, move.acceleration, seconds, move.on_ground, move.surface});
+        }
+        velocity_ = move.velocity;
         body() = predicted;
         surface_ = move.surface;
         ++state.predictions;
@@ -125,16 +144,20 @@ namespace OpenBlood2
             return false;
         report_timer_ -= static_cast<float>(seconds);
         out.reset();
-        if (report_timer_ > 0)
+        if (report_timer_ > 0 && steps_.size() < report_steps)
             return true;
-        report_timer_ = .14f;
+        report_timer_ = report_period;
         const auto& b = body();
+        // Pre-collision velocity: the clipped body velocity would hide landings.
         out = ReplicaMoveReport{
             state.owner,
             revision_,
             ++next_sequence_,
-            {code_, b.position, b.velocity, b.acceleration, b.standing && b.ground_normal.y >= .5f, surface_},
-            controls_};
+            {code_, b.position, velocity_, b.acceleration, b.standing && b.ground_normal.y >= .5f, surface_},
+            controls_,
+            steps_.empty() ? b.position : origin_,
+            std::move(steps_)};
+        steps_.clear();
         return true;
     }
 } // namespace OpenBlood2

@@ -21,7 +21,7 @@ namespace OpenBlood2
     {
         return voices_ && jump_voice(*voices_, character, external_camera);
     }
-    bool LocalMovement::advance(const PlayerMove& move)
+    bool LocalMovement::advance(const PlayerMove& move, DVector, float)
     {
         LocalMoveReport report;
         return predict(move, report) && submit(shell_, report);

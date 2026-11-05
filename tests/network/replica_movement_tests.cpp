@@ -4,9 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
-#include <type_traits>
 using namespace OpenBlood2;
-static_assert(std::is_trivially_copyable_v<ReplicaMoveReport>);
 #define CHECK(x)                                                                                                       \
     do                                                                                                                 \
     {                                                                                                                  \
@@ -74,6 +72,9 @@ namespace
         input.forward = true;
         std::optional<ReplicaMoveReport> report;
         unsigned reports = 0;
+        std::size_t steps = 0;
+        float seconds = 0;
+        DVector origin = a.mgr.body.position;
         for (int i = 0; i < 60; ++i)
         {
             CHECK(a.mgr.Update(false, input, 0, 1. / 60, true));
@@ -84,11 +85,26 @@ namespace
                 CHECK(report->owner == a.owner && report->force_revision == 300 && report->sequence == reports);
                 CHECK(report->move.move_code == 44 && report->move.position.z == a.mgr.body.position.z);
                 CHECK(report->controls.movement.forward);
+                // Reports chain: each starts where the previous prediction ended,
+                // and its unclipped horizontal offsets reach the reported position.
+                CHECK(report->origin.z == origin.z && !report->steps.empty());
+                float z = report->origin.z;
+                for (const auto& step : report->steps)
+                {
+                    z += step.offset.z;
+                    seconds += step.seconds;
+                    CHECK(step.on_ground && step.velocity.z > 0);
+                }
+                CHECK(std::abs(z - report->move.position.z) < 1e-3f);
+                steps += report->steps.size();
+                origin = report->move.position;
             }
         }
+        CHECK(a.movement.pending_steps() == 120 - steps);
         for (int i = 0; i < 30; ++i)
-            CHECK(b.mgr.Update(false, input, 0, 1. / 30, true));
-        CHECK(a.mgr.substeps == 120 && b.mgr.substeps == 120 && reports == 7);
+            CHECK(b.mgr.Update(false, input, 0, 1. / 30, true) && b.movement.report(1. / 30, report));
+        CHECK(a.mgr.substeps == 120 && b.mgr.substeps == 120 && reports >= 29 && reports <= 31);
+        CHECK(steps + a.movement.pending_steps() == 120 && std::abs(seconds - steps / 120.f) < 1e-4f);
         CHECK(a.mgr.body.position.z > 250 && a.mgr.body.position.z < 280);
         CHECK(a.mgr.body.velocity.z == b.mgr.body.velocity.z && a.mgr.body.position.z == b.mgr.body.position.z);
         CHECK(a.collision.get(a.owner.object)->position.z == 0); // Prediction never edits authoritative poses.
@@ -101,17 +117,24 @@ namespace
         const auto predicted = a.mgr.body.position;
         CHECK(a.movement.synchronize() && a.mgr.body.position.z == predicted.z);
         input.jump = true;
-        CHECK(a.mgr.Update(false, input, 0, 1. / 60, true));
+        CHECK(a.mgr.Update(false, input, 0, 1. / 60, true) && a.movement.report(1. / 60, report));
         CHECK(a.mgr.jumps == 1 && a.mgr.body.velocity.y > 500);
         input = {};
+        bool airborne = false;
         for (int i = 0; i < 100; ++i)
-            CHECK(a.mgr.Update(false, input, 0, 1. / 60, true));
-        CHECK(a.mgr.landings == 1 && a.mgr.m_bOnGround && std::abs(a.mgr.body.position.y - 41.001f) < .01f);
+        {
+            CHECK(a.mgr.Update(false, input, 0, 1. / 60, true) && a.movement.report(1. / 60, report));
+            if (report)
+                for (const auto& step : report->steps)
+                    airborne = airborne || !step.on_ground;
+        }
+        CHECK(airborne && a.mgr.landings == 1 && a.mgr.m_bOnGround && std::abs(a.mgr.body.position.y - 41.001f) < .01f);
         CHECK(a.mgr.OnServerForcePos({{0, 41.001f, 0}, 44}));
-        CHECK(a.mgr.body.position.z == 0 && a.mgr.body.velocity.y == 0);
+        CHECK(a.mgr.body.position.z == 0 && a.mgr.body.velocity.y == 0 && !a.movement.pending_steps());
         CHECK(a.mgr.Update(false, {}, 0, 2, false));
         CHECK(a.mgr.discarded_time == 1.9);
         CHECK(a.movement.report(2, report) && report && !report->controls.movement.forward);
+        CHECK(report->steps.size() == 12 && report->origin.z == 0);
         CHECK(a.movement.report(0, report) && !report); // No burst after a long frame.
         return true;
     }
@@ -123,8 +146,9 @@ namespace
             CHECK(f.setup(code));
             MovementInput input;
             input.forward = input.run = true;
+            std::optional<ReplicaMoveReport> report;
             for (int i = 0; i < 60; ++i)
-                CHECK(f.mgr.Update(false, input, 0, 1. / 60, true, false, -.4f));
+                CHECK(f.mgr.Update(false, input, 0, 1. / 60, true, false, -.4f) && f.movement.report(1. / 60, report));
             CHECK(f.mgr.containers.count == 1 && f.mgr.containers.head.code == code);
             CHECK(f.mgr.body.position.z > 100);
             if (code == CC_WATER)
@@ -152,21 +176,35 @@ namespace
         CHECK(f.collision.apply(std::move(frame), error));
         MovementInput input;
         input.forward = true;
+        std::optional<ReplicaMoveReport> report;
+        std::uint64_t sequence = 0;
         for (int i = 0; i < 120; ++i)
-            CHECK(f.mgr.Update(false, input, 0, 1. / 60, true));
+        {
+            CHECK(f.mgr.Update(false, input, 0, 1. / 60, true) && f.movement.report(1. / 60, report));
+            if (report)
+            {
+                CHECK(report->sequence == ++sequence);
+                // Reported velocity is CMoveMgr's, before the wall clipped it:
+                // the server needs it for stopping contacts and falling damage.
+                if (i == 119)
+                    CHECK(report->move.velocity.z > 0 && f.mgr.body.velocity.z == 0);
+            }
+        }
         CHECK(f.mgr.body.position.z > 62.9f && f.mgr.body.position.z < 63.01f && f.mgr.body.velocity.z == 0);
         const auto before = f.mgr.body.position;
         auto move = f.mgr.WritePositionInfo({0, 41.001f, 100}, {0, 0, 100});
         move.move_code = 43;
-        CHECK(!f.movement.advance(move) && f.mgr.body.position.z == before.z);
+        CHECK(!f.movement.advance(move, {0, 0, 1}, 1.f / 120) && f.mgr.body.position.z == before.z);
         move.move_code = 44;
+        CHECK(!f.movement.advance(move, {0, 0, 1}, 0) && f.mgr.body.position.z == before.z);
+        CHECK(!f.movement.advance(move, {0, 0, std::numeric_limits<float>::quiet_NaN()}, 1.f / 120) &&
+              f.mgr.body.position.z == before.z);
         move.position.x = std::numeric_limits<float>::quiet_NaN();
-        CHECK(!f.movement.advance(move) && f.mgr.body.position.z == before.z);
+        CHECK(!f.movement.advance(move, {0, 0, 1}, 1.f / 120) && f.mgr.body.position.z == before.z);
         CHECK(!f.mgr.OnServerForcePos({{0, 41, 0}, 43}) && f.mgr.body.position.z == before.z);
         CHECK(!f.movement.bind(f.owner, 301, 45, 0, 34, false));
-        std::optional<ReplicaMoveReport> report;
         CHECK(!f.movement.report(-1, report));
-        CHECK(f.movement.report(0, report) && report->sequence == 1);
+        CHECK(f.movement.report(1, report) && report && report->sequence == sequence + 1);
         frame = f.collision.frame();
         ++frame.sequence;
         frame.objects.erase(frame.objects.begin());
@@ -176,8 +214,37 @@ namespace
         CHECK(!f.movement.state.owner.world);
         return true;
     }
+    // Two players spawned or pushed into each other: the predicted body leaves
+    // the player it starts inside, and still stops at a separate one.
+    bool overlapping_players()
+    {
+        Fixture f;
+        CHECK(f.setup());
+        auto frame = f.collision.frame();
+        ++frame.sequence;
+        ClientCollider other;
+        other.id = {2, 1};
+        other.type = OT_MODEL;
+        other.position = {0, 41.001f, 10};
+        other.dimensions = {16, 41, 16};
+        other.flags = FLAG_SOLID;
+        frame.objects.push_back(other);
+        other.id = {3, 1};
+        other.position.z = 200;
+        frame.objects.push_back(other);
+        std::string error;
+        CHECK(f.collision.apply(std::move(frame), error));
+        MovementInput input;
+        input.forward = true;
+        std::optional<ReplicaMoveReport> report;
+        for (int i = 0; i < 120; ++i)
+            CHECK(f.mgr.Update(false, input, 0, 1. / 60, true) && f.movement.report(1. / 60, report));
+        CHECK(f.movement.state.prediction_failures == 0);
+        CHECK(f.mgr.body.position.z > 167.9f && f.mgr.body.position.z < 168.01f);
+        return true;
+    }
 } // namespace
 int main()
 {
-    return walking() && environment() && rejection_and_collision() ? 0 : 1;
+    return walking() && environment() && rejection_and_collision() && overlapping_players() ? 0 : 1;
 }

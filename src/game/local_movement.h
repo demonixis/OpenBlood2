@@ -41,7 +41,7 @@ namespace OpenBlood2
         bool environment(ClientContainerState&, int& character) override;
         bool finish(float seconds, ClientContainerState&) override;
         bool jump_voice(int character, bool external_camera) override;
-        bool advance(const PlayerMove&) override;
+        bool advance(const PlayerMove&, DVector offset, float seconds) override;
         bool controls(CBloodServerShell&, const PlayerControls&, bool send, bool& crouched);
         bool environment(CBloodServerShell&, ClientContainerState&, int& character);
         bool finish(CBloodServerShell&, float seconds, ClientContainerState&);

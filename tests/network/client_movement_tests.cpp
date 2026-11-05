@@ -5,6 +5,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <map>
 #include <type_traits>
 using namespace OpenBlood2;
 using Reception = NetworkMovement::Reception;
@@ -26,13 +27,27 @@ namespace
         Net::MovementSetup initial;
         std::string error;
         ClientObjectId owner{7, {0, 1}};
+        // Predicted bodies at each report: an agreeing server acknowledges the
+        // resolved state, while reports carry CMoveMgr's pre-collision velocity.
+        std::map<std::uint64_t, ClientMotionState> reported;
         bool step(std::optional<Net::MovementReport>& report, MovementInput input = {})
         {
-            return client.update(input, 0, -.4f, 1. / 60, true, false, false, report, error);
+            if (!client.update(input, 0, -.4f, 1. / 60, true, false, false, report, error))
+                return false;
+            if (report)
+                reported[report->sequence] = client.movement().body;
+            return true;
         }
         Net::MovementAck ack(const Net::MovementReport& report) const
         {
-            return {report.owner, report.sequence, client.setup().sequence, report.move,
+            auto accepted = report.move;
+            if (const auto found = reported.find(report.sequence); found != reported.end())
+            {
+                accepted.velocity = found->second.velocity;
+                accepted.acceleration = found->second.acceleration;
+                accepted.on_ground = found->second.standing && found->second.ground_normal.y >= .5f;
+            }
+            return {report.owner, report.sequence, client.setup().sequence, accepted,
                     client.movement().body.dimensions};
         }
         bool box(DVector position, DVector dimensions)
@@ -132,7 +147,8 @@ namespace
                 ++count;
             }
         }
-        CHECK(count == 7 && f.client.manager().substeps == 120 && f.client.movement().predictions == 120);
+        CHECK(count >= 29 && count <= 31 && f.client.manager().substeps == 120 &&
+              f.client.movement().predictions == 120);
         CHECK(f.client.movement().acknowledgements == count && f.client.corrections == count && !f.client.replays);
         CHECK(f.client.movement().body.position.z > 250 && f.collision.get(f.owner.object)->position.z == 0);
         return true;
@@ -150,19 +166,23 @@ namespace
         first.accepted.position.z -= .2f;
         first.accepted.velocity.x += 30;
         CHECK(b.client.receive(first, b.error) == Reception::Applied);
-        for (int i = 1; i < 10; ++i)
-            CHECK(a.step(ra, input) && b.step(rb, input) && c.step(rc, input));
-        CHECK(ra && ra->sequence == 2);
+        unsigned frames = 1;
+        do
+        {
+            CHECK(frames < 10 && a.step(ra, input) && b.step(rb, input) && c.step(rc, input));
+            ++frames;
+        } while (!ra);
+        CHECK(ra->sequence == 2);
         const auto second = a.ack(*ra);
         CHECK(c.client.receive(second, c.error) == Reception::Applied);
         CHECK(a.client.receive(first, a.error) == Reception::Applied);
         CHECK(equal(a.client, b.client));
-        CHECK(a.client.replays == 9 && a.client.manager().substeps == 20);
-        for (int i = 10; i < 20; ++i)
+        CHECK(a.client.replays == frames - 1 && a.client.manager().substeps == frames * 2);
+        for (int i = 0; i < 10; ++i)
             CHECK(a.step(ra, input) && c.step(rc, input));
         CHECK(a.client.receive(second, a.error) == Reception::Applied);
         CHECK(equal(a.client, c.client));
-        CHECK(a.client.replays == 19 && a.client.movement().acknowledgements == 2);
+        CHECK(a.client.replays == frames - 1 + 10 && a.client.movement().acknowledgements == 2);
         CHECK(a.client.receive(first, a.error) == Reception::Ignored);
         CHECK(a.client.receive(second, a.error) == Reception::Ignored);
         auto invalid = second;
@@ -245,9 +265,8 @@ namespace
         CHECK(f.client.receive(ack, f.error) == Reception::Applied && f.client.replays == 1);
         // Reliable setup and unreliable ACK may cross. Identical constraints
         // keep useful report history; changing constraints retires it.
-        for (int i = 2; i < 10; ++i)
-            CHECK(f.step(report, input));
-        CHECK(report);
+        for (int i = 2; i < 10 || !report; ++i)
+            CHECK(i < 20 && f.step(report, input));
         ack = f.ack(*report);
         ++ack.setup_sequence;
         CHECK(f.client.receive(ack, f.error) == Reception::Deferred);
@@ -260,8 +279,13 @@ namespace
         input.mouse_forward = std::numeric_limits<float>::infinity();
         CHECK(!f.step(report, input) && !report && same(position, f.client.movement().body.position));
         CHECK(f.client.manager().updates == updates);
-        // A partially attempted collision step is rolled back on failure.
+        // A partially attempted collision step is rolled back and the body held:
+        // the next acknowledgement or force corrects a briefly disagreeing
+        // replica, while a failure that persists still refuses prediction.
         CHECK(f.box(position, {10, 30, 10}));
+        for (unsigned i = 0; i < NetworkMovement::hold_limit; ++i)
+            CHECK(f.step(report, {}) && !report && same(position, f.client.movement().body.position));
+        CHECK(f.client.prediction_holds == NetworkMovement::hold_limit && f.client.manager().updates == updates);
         CHECK(!f.step(report, {}) && !report && same(position, f.client.movement().body.position));
         CHECK(f.client.manager().updates == updates);
         return true;
@@ -327,7 +351,7 @@ namespace
         input.mouse_forward = std::numeric_limits<float>::quiet_NaN();
         CHECK(!gate.advance(1, input, true, ticks, sample));
         input.mouse_forward = 60;
-        CHECK(gate.advance(1, input, true, ticks, sample) && ticks == 6 && sample.mouse_forward == 1);
+        CHECK(gate.advance(1, input, true, ticks, sample) && ticks == 6 && sample.mouse_forward == 10);
         CHECK(gate.discarded_ticks() == 54);
         CHECK(gate.advance(1. / 60, {}, true, ticks, sample) && ticks == 1 && !sample.mouse_forward);
         return true;

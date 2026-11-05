@@ -1,6 +1,7 @@
 #include "client/collision.h"
 #include "engine/shape_collision.h"
 #include <algorithm>
+#include <array>
 #include <bit>
 #include <cmath>
 
@@ -126,6 +127,12 @@ namespace OpenBlood2
                                                ClientCollisionHit& nearest, ObjectId extra, double allowed,
                                                StartOverlap start) const
     {
+        return sweep(ignore, from, to, half, nearest, std::span<const ObjectId>(&extra, 1), allowed, start);
+    }
+    CollisionQuery ClientCollisionWorld::sweep(ClientObjectId ignore, DVector from, DVector to, DVector half,
+                                               ClientCollisionHit& nearest, std::span<const ObjectId> extras,
+                                               double allowed, StartOverlap start) const
+    {
         nearest = {};
         if (ignore.world != frame_.world || !frame_.primary || (ignore.object && !get(ignore.object)))
             return CollisionQuery::Invalid;
@@ -137,7 +144,8 @@ namespace OpenBlood2
         auto departed = nearest.departed;
         for (const auto& object : frame_.objects)
         {
-            if (object.attached || object.id == ignore.object || object.id == extra || !(object.flags & FLAG_SOLID) ||
+            if (object.attached || object.id == ignore.object ||
+                std::find(extras.begin(), extras.end(), object.id) != extras.end() || !(object.flags & FLAG_SOLID) ||
                 (ignore.object && object.ignored_by == ignore.object))
                 continue;
             ClientCollisionHit hit;
@@ -309,7 +317,8 @@ namespace OpenBlood2
         return true;
     }
     bool ClientCollisionWorld::predict(ClientObjectId owner, const ClientMotionState& input, DVector destination,
-                                       DVector velocity, DVector acceleration, ClientMotionState& result) const
+                                       DVector velocity, DVector acceleration, ClientMotionState& result,
+                                       bool pass_overlapping_models) const
     {
         auto state = input;
         result = {};
@@ -328,11 +337,15 @@ namespace OpenBlood2
                               velocity.y <= .01f && destination.y <= state.position.y + .001f;
         const auto skin = head_skin(flags, state.dimensions.y);
         const DVector box{state.dimensions.x, state.dimensions.y - skin, state.dimensions.z}, lower{0, skin, 0};
+        // Slot 0: a world model the body started inside; then overlapped models.
+        std::array<ObjectId, 5> passes{};
+        std::size_t models = 0;
         auto sweep_body = [&](DVector from, DVector to, ClientCollisionHit& hit, ObjectId extra = {},
                               double allowed = 0, StartOverlap start = StartOverlap::Block)
         {
-            const auto query =
-                sweep(owner, vector_subtract(from, lower), vector_subtract(to, lower), box, hit, extra, allowed, start);
+            passes[0] = extra;
+            const auto query = sweep(owner, vector_subtract(from, lower), vector_subtract(to, lower), box, hit,
+                                     std::span<const ObjectId>(passes.data(), models + 1), allowed, start);
             hit.point = vector_add(hit.point, lower);
             return query;
         };
@@ -340,7 +353,7 @@ namespace OpenBlood2
         constexpr double allowed = .01;
         const auto start = (flags & FLAG_SOLID) ? StartOverlap::Leave : StartOverlap::LeaveOrSlide;
         ObjectId passed;
-        for (unsigned iteration = 0; iteration < 4; ++iteration)
+        for (unsigned iteration = 0; iteration < 4 + models; ++iteration)
         {
             auto end = vector_add(position, remaining);
             ClientCollisionHit nearest;
@@ -366,6 +379,13 @@ namespace OpenBlood2
             if (found && nearest.start_solid && !passed && obstacle && obstacle->world_model && obstacle != source)
             {
                 passed = obstacle->id;
+                continue;
+            }
+            if (found && nearest.start_solid && pass_overlapping_models && obstacle && obstacle != source &&
+                obstacle->type == OT_MODEL && !obstacle->world_model && !obstacle->container && !obstacle->shape &&
+                models + 1 < passes.size())
+            {
+                passes[++models] = obstacle->id;
                 continue;
             }
             if (found && !nearest.start_solid && std::abs(nearest.normal.y) < .01f && obstacle && obstacle->dynamic &&

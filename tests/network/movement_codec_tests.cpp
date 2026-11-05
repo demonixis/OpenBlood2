@@ -34,6 +34,9 @@ namespace
         report.move = {44, {1, 41, 2}, {0, 0, 280}, {0, 0, 400}, true, 255};
         report.controls = {{true, true, true, true, true, true, true, true, .5f, -.25f}, true, .75f};
         report.pitch = -.5f;
+        report.origin = {1, 41, 1};
+        report.steps = {{{0, 0, .5f}, {0, 0, 280}, {0, 0, 400}, 1.0f / 120, true, 3},
+                        {{0, -.1f, .5f}, {0, -10, 280}, {0, 0, 400}, 1.0f / 240, false, 0}};
         MovementAck ack{owner, 42, 2, report.move, {16, 41, 16}};
         std::mt19937 random(0x4d39504d);
         for (const MovementMessage& message : {MovementMessage(setup), MovementMessage(report), MovementMessage(ack)})
@@ -41,9 +44,9 @@ namespace
             std::vector<std::uint8_t> bytes, roundtrip;
             CHECK(encode_movement(message, bytes) && bytes.size() <= movement_packet_limit &&
                   is_movement_packet(bytes));
-            const std::array<std::size_t, 3> sizes{98, 104, 106};
+            const std::array<std::size_t, 3> sizes{98, 201, 106};
             CHECK(bytes.size() == sizes[message.index()]);
-            const std::array<std::uint8_t, 7> prefix{0x42, 0x32, 0x4d, 0x50, 8, 0, std::uint8_t(message.index() + 1)};
+            const std::array<std::uint8_t, 7> prefix{0x42, 0x32, 0x4d, 0x50, 9, 0, std::uint8_t(message.index() + 1)};
             CHECK(std::equal(prefix.begin(), prefix.end(), bytes.begin()));
             MovementMessage decoded;
             CHECK(decode_movement(bytes, decoded) == DecodeMovement::Ok);
@@ -84,6 +87,22 @@ namespace
         setup.owner = owner;
         setup.dimensions.y = 0;
         CHECK(!encode_movement(setup, bytes) && bytes == unchanged);
+        // The largest report (one 0.1 s client frame plus an unsent remainder)
+        // fits the unreliable State channel; more steps or a longer substep do not.
+        report.steps.resize(movement_step_limit, report.steps[0]);
+        std::vector<std::uint8_t> largest;
+        CHECK(encode_movement(report, largest) && largest.size() <= movement_packet_limit);
+        report.steps.push_back(report.steps[0]);
+        CHECK(!encode_movement(report, bytes) && bytes == unchanged);
+        report.steps.resize(2);
+        report.steps[1].seconds = 1.0f / 60;
+        CHECK(!encode_movement(report, bytes) && bytes == unchanged);
+        report.steps[1].seconds = 0;
+        CHECK(!encode_movement(report, bytes) && bytes == unchanged);
+        report.steps[1].seconds = 1.0f / 120;
+        report.steps[1].offset.x = std::numeric_limits<float>::infinity();
+        CHECK(!encode_movement(report, bytes) && bytes == unchanged);
+        report.steps[1].offset.x = 0;
         report.controls.yaw = std::numeric_limits<float>::quiet_NaN();
         CHECK(!encode_movement(report, bytes) && bytes == unchanged);
         ack.owner.object.generation = 0;

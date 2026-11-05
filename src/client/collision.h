@@ -4,6 +4,7 @@
 #include "engine/segment_types.h"
 #include <memory>
 #include <optional>
+#include <span>
 #include <vector>
 namespace OpenBlood2
 {
@@ -61,6 +62,9 @@ namespace OpenBlood2
         const ClientCollider* get(ObjectId) const;
         CollisionQuery sweep(ClientObjectId ignore, DVector from, DVector to, DVector half, ClientCollisionHit&,
                              ObjectId extra = {}, double allowed = 0, StartOverlap start = StartOverlap::Block) const;
+        // `extras` are also ignored (at most a few objects passed by one prediction).
+        CollisionQuery sweep(ClientObjectId ignore, DVector from, DVector to, DVector half, ClientCollisionHit&,
+                             std::span<const ObjectId> extras, double allowed, StartOverlap start) const;
         SegmentResult intersect(DVector from, DVector to, ClientObjectId ignore, ClientSegmentHit&,
                                 SegmentObjects = SegmentObjects::SolidOnly, bool ignore_volumes = false,
                                 SegmentStart = SegmentStart::IncludeInterior) const;
@@ -70,8 +74,12 @@ namespace OpenBlood2
         CollisionQuery resize(ClientObjectId, const ClientMotionState&, DVector dimensions, ClientMotionState&) const;
         bool environment(ClientObjectId owner, const ClientMotionState&, DVector head, ClientContainerState&) const;
         // Destination/velocity have already been integrated by CMoveMgr.
+        // pass_overlapping_models: a network prediction starting inside another
+        // model's box (a remote player's latest snapshot pose) moves through it
+        // instead of failing; the server, which never has that overlap, resolves
+        // the contact and its acknowledgement corrects the prediction.
         bool predict(ClientObjectId, const ClientMotionState&, DVector destination, DVector velocity,
-                     DVector acceleration, ClientMotionState& result) const;
+                     DVector acceleration, ClientMotionState& result, bool pass_overlapping_models = false) const;
 
       private:
         bool push(const ClientCollider&, DVector destination, ObjectId ignore, DVector& reached) const;

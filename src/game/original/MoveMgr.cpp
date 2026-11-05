@@ -348,7 +348,7 @@ bool CMoveMgr::MoveLocalSolidObject()
                                    vector_scale(acceleration, 0.5f * m_FrameTime * m_FrameTime));
     const auto velocity = vector_add(body.velocity, vector_scale(acceleration, m_FrameTime));
     const bool was_air = !m_bOnGround;
-    if (!movement_.advance(WritePositionInfo(vector_add(body.position, offset), velocity)))
+    if (!movement_.advance(WritePositionInfo(vector_add(body.position, offset), velocity), offset, m_FrameTime))
         return false;
     m_bOnGround = body.standing && body.ground_normal.y >= 0.5f;
     m_bFalling = !m_bOnGround;

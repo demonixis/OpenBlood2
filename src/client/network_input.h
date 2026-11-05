@@ -5,8 +5,9 @@
 #include <cstdint>
 namespace OpenBlood2
 {
-    // Render frames may produce no simulation tick or several. Mouse movement
-    // offsets are consumed once across those ticks; digital controls remain held.
+    // Render frames may produce no simulation tick or several (at most six; the
+    // rest of a long frame is discarded). Mouse movement offsets are consumed
+    // once across the ticks that run; digital controls remain held.
     class NetworkInput
     {
       public:
@@ -27,8 +28,10 @@ namespace OpenBlood2
             remainder_ = std::max(0., total - double(due) * step);
             discarded_ += due - ticks;
             sampled = commands ? value : MovementInput{};
-            sampled.mouse_forward = due ? float(forward / double(due)) : 0;
-            sampled.mouse_strafe = due ? float(strafe / double(due)) : 0;
+            // Spread over the ticks that actually run: discarded catch-up time
+            // never discards mouse movement.
+            sampled.mouse_forward = ticks ? float(forward / double(ticks)) : 0;
+            sampled.mouse_strafe = ticks ? float(strafe / double(ticks)) : 0;
             forward_ = due ? 0 : forward;
             strafe_ = due ? 0 : strafe;
             return true;

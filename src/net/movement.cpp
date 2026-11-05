@@ -89,8 +89,17 @@ namespace OpenBlood2::Net
                            dimensions(v.dimensions) && vector(v.gravity) && bounded(v.move_speed, 10000) &&
                            v.move_speed >= 0 && bounded(v.jump_speed, 10000) && v.jump_speed >= 0;
                 else if constexpr (std::is_same_v<T, MovementReport>)
-                    return move(v.move) && bounded(v.controls.yaw, 1e6f) && bounded(v.pitch, 1e6f) &&
-                           bounded(v.controls.movement.mouse_forward) && bounded(v.controls.movement.mouse_strafe);
+                {
+                    if (!move(v.move) || !bounded(v.controls.yaw, 1e6f) || !bounded(v.pitch, 1e6f) ||
+                        !bounded(v.controls.movement.mouse_forward) || !bounded(v.controls.movement.mouse_strafe) ||
+                        !vector(v.origin) || v.steps.size() > movement_step_limit)
+                        return false;
+                    for (const auto& s : v.steps)
+                        if (!vector(s.offset) || !vector(s.velocity) || !vector(s.acceleration) ||
+                            !std::isfinite(s.seconds) || s.seconds <= 0 || s.seconds > movement_step_seconds)
+                            return false;
+                    return true;
+                }
                 else
                     return v.setup_sequence && move(v.accepted) && dimensions(v.dimensions);
             },
@@ -139,6 +148,17 @@ namespace OpenBlood2::Net
                     w.f32(v.controls.movement.mouse_strafe);
                     w.f32(v.controls.yaw);
                     w.f32(v.pitch);
+                    write_vector(w, v.origin);
+                    w.u8(std::uint8_t(v.steps.size()));
+                    for (const auto& s : v.steps)
+                    {
+                        write_vector(w, s.offset);
+                        write_vector(w, s.velocity);
+                        write_vector(w, s.acceleration);
+                        w.f32(s.seconds);
+                        w.u8(s.on_ground);
+                        w.u8(s.surface);
+                    }
                 }
                 else
                 {
@@ -205,7 +225,24 @@ namespace OpenBlood2::Net
             v.controls.movement.mouse_strafe = r.f32();
             v.controls.yaw = r.f32();
             v.pitch = r.f32();
-            next = v;
+            v.origin = read_vector(r);
+            const auto count = r.u8();
+            if (!r.good() || count > movement_step_limit)
+                return DecodeMovement::Malformed;
+            v.steps.resize(count);
+            for (auto& s : v.steps)
+            {
+                s.offset = read_vector(r);
+                s.velocity = read_vector(r);
+                s.acceleration = read_vector(r);
+                s.seconds = r.f32();
+                const auto ground = r.u8();
+                if (ground > 1)
+                    return DecodeMovement::Malformed;
+                s.on_ground = ground != 0;
+                s.surface = r.u8();
+            }
+            next = std::move(v);
         }
         else if (kind == 3)
         {

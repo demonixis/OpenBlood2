@@ -9,7 +9,7 @@
 
 namespace OpenBlood2::Net
 {
-    inline constexpr std::uint16_t protocol_version = 8;
+    inline constexpr std::uint16_t protocol_version = 9;
     inline constexpr std::size_t admission_packet_limit = 256;
     enum class Edition : std::uint8_t
     {

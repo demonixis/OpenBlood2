@@ -40,8 +40,9 @@ namespace OpenBlood2
         manager_.Term();
         joined_ = joined;
         setup_ = {};
-        next_frame_ = sent_ = acknowledged_ = retired_ = 0;
-        corrections = replays = ignored = deferred = 0;
+        next_frame_ = sent_ = acknowledged_ = retired_ = sent_frame_ = 0;
+        failed_frames_ = 0;
+        corrections = replays = ignored = deferred = prediction_holds = 0;
         clear_history();
         return true;
     }
@@ -177,9 +178,19 @@ namespace OpenBlood2
         {
             manager_.restore(original_manager);
             movement_.restore_prediction(original_prediction);
-            error = "Independent CMoveMgr prediction failed";
-            return false;
+            // Hold the body for this frame: the replica can briefly disagree
+            // with the server (a mover or body replicated into ours), and the
+            // next acknowledgement or force position corrects it. A prediction
+            // that keeps failing is a real client failure.
+            ++prediction_holds;
+            if (++failed_frames_ > hold_limit)
+            {
+                error = "Independent CMoveMgr prediction failed";
+                return false;
+            }
+            return true;
         }
+        failed_frames_ = 0;
         frames_.push_back({++next_frame_, input, yaw, pitch, seconds, commands, firing, external_camera});
         std::optional<ReplicaMoveReport> report;
         if (!movement_.report(seconds, report))
@@ -190,13 +201,18 @@ namespace OpenBlood2
         out.reset();
         if (report)
         {
-            Net::MovementReport next{setup_.owner, report->sequence, report->move, report->controls, pitch};
+            Net::MovementReport next{
+                setup_.owner, report->sequence, report->move, report->controls, pitch, report->origin, {}};
+            next.steps.reserve(report->steps.size());
+            for (const auto& s : report->steps)
+                next.steps.push_back({s.offset, s.velocity, s.acceleration, s.seconds, s.on_ground, s.surface});
             if (!Net::valid_movement(next))
             {
                 error = "Invalid predicted movement report";
                 return false;
             }
             sent_ = next.sequence;
+            sent_frame_ = next_frame_;
             reports_.push_back({sent_, next_frame_, manager_.checkpoint(), movement_.prediction()});
             out = next;
         }
@@ -271,8 +287,13 @@ namespace OpenBlood2
         {
             if (frame.id <= found->frame)
                 continue;
-            if (!manager_.Update(frame.external_camera, frame.input, frame.yaw, frame.seconds,
-                                 frame.commands && setup_.can_move, frame.firing, frame.pitch))
+            // Steps of reported frames are already on the wire; unsent frames
+            // are recorded again with the corrected physics.
+            movement_.record(frame.id > sent_frame_);
+            const bool updated_frame = manager_.Update(frame.external_camera, frame.input, frame.yaw, frame.seconds,
+                                                       frame.commands && setup_.can_move, frame.firing, frame.pitch);
+            movement_.record(true);
+            if (!updated_frame)
             {
                 manager_.restore(original_manager);
                 movement_.restore_prediction(original_prediction);

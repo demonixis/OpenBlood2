@@ -21,6 +21,8 @@ namespace OpenBlood2
         virtual bool jump_voice(int character, bool external_camera) = 0;
         // The destination and velocity are already integrated. No implementation
         // may integrate elapsed time again when accepting this prediction.
-        virtual bool advance(const PlayerMove&) = 0;
+        // `offset` is the substep displacement (destination minus the body
+        // position) and `seconds` its duration, as integrated by CMoveMgr.
+        virtual bool advance(const PlayerMove&, DVector offset, float seconds) = 0;
     };
 } // namespace OpenBlood2

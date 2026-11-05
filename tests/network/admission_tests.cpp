@@ -418,6 +418,9 @@ namespace
         report.sequence = 1;
         report.move.move_code = f.movement_setups[0].code;
         report.move.position = first->state.m_Pos;
+        report.origin = first->state.m_Pos;
+        for (unsigned i = 0; i < 4; ++i)
+            report.steps.push_back({{.25f, 0, 0}, {30, 0, 0}, {}, 1.0f / 120, true, 0});
         report.move.position.x += 1;
         const auto send = [&](const MovementReport& value)
         {
