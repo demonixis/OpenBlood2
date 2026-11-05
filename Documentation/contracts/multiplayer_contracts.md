@@ -1771,8 +1771,8 @@ Protocol bytes in the network tests come from `Net::protocol_version`.
 
 ## Host/Join menus and LAN discovery (2026-10-31)
 
-The retail desktop Main/BLOODBATH command opens the replacement Héberger/Rejoindre
-screen. The original demo promotion and non-network edition paths remain unchanged.
+The retail desktop Main/BLOODBATH command opens the replacement Host/Join
+screen (English labels since lot 7's review; desktop only, never Android/iOS). The original demo promotion and non-network edition paths remain unchanged.
 Use the same validated host/connect options and network session loop as CLI entry;
 name, original character/team preference, Bloodbath/Team/CTF maps and match/rotation
 rules are selected in the UI. Defaults remain 25 frags, host 15 timed minutes and
@@ -1798,7 +1798,10 @@ rows. Require the current nonce within three seconds of its query, deduplicate
 instance/port (prefer a LAN address over loopback), and expire rows after six seconds.
 The UI refreshes every two seconds and includes loopback for same-machine hosting.
 Full and incompatible-protocol offers stay visible but their Join action is disabled.
-Discovery socket failure leaves ordinary/direct connections usable. No internet
+Discovery socket failure leaves ordinary/direct connections usable. Gameplay
+may not listen on 27889 (the setup screen and `ServerNetwork::listen` refuse it), the
+host name is cut on a UTF-8 boundary before its ASCII " (host)" suffix, and the
+dedicated server's `--no-lan` answers no discovery queries. No internet
 server directory, IPv6, relay, NAT traversal or server-driven download is added.
 
 The [report](../implementation/reports/m9_multiplayer_menu.md) distinguishes bounded

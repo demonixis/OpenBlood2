@@ -36,7 +36,12 @@ namespace
         CHECK(setup.request(true, request, error));
         setup.port = 0;
         CHECK(!setup.request(true, request, error));
+        setup.port = 27889; // LAN discovery's own socket.
+        CHECK(!setup.request(true, request, error) && error.find("27889") != std::string::npos);
         setup.port = 27888;
+        setup.minutes = 10001; // MultiplayerRules::minute_limit + 1.
+        CHECK(!setup.request(true, request, error));
+        setup.minutes = 15;
         setup.frags = -1;
         CHECK(!setup.request(true, request, error));
         setup.frags = 25;

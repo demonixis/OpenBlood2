@@ -158,7 +158,8 @@ them over real slot files: the rows show the original slot names, a save or load
 menu, a refusal keeps the page under the error modal, and death USE opens Load as the top
 level. The demo keeps no rows. Quit uses the original
 localized prompt with keyboard/mouse Yes/No controls (No selected initially); Y/N
-also confirm/cancel. BloodBath and custom levels remain disabled; Credits is covered
+also confirm/cancel. Custom levels remain disabled; BLOODBATH is covered by
+[M9 network entry](#m9-network-entry); Credits is covered
 by the [Credits entry](#credits-entry) section.
 
 `--menu-smoke` injects explicit SDL events into the real frontend with its own
@@ -434,9 +435,10 @@ See the [implementation report](../implementation/reports/menu_credits.md) and t
 
 ## M9 network entry
 
-Retail desktop enables the original BLOODBATH row and emits an application-owned
-Multiplayer command. The replacement Héberger/Rejoindre screens use the existing
-ImGui SDL_GPU backend and keyboard/gamepad navigation, including Esc/Back. Demo
+Retail desktop (never Android, iOS or XR) enables the original BLOODBATH row and emits an
+application-owned Multiplayer command. The replacement Host/Join screens use the existing
+ImGui SDL_GPU backend and keyboard/gamepad navigation; Esc/B go back only while no text
+field or combo is active, and play keys stay released while the screen is open. Demo
 keeps its original promotional command. The [M9 contract](multiplayer_contracts.md#hostjoin-menus-and-lan-discovery-2026-10-31)
 specifies session replacement, LAN limits and admission; the [verification report](../implementation/reports/m9_multiplayer_menu.md)
 records solo pause/resume preservation. Original menu artwork is unchanged.

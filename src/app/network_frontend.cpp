@@ -70,7 +70,12 @@ namespace OpenBlood2
             network = std::make_unique<ServerNetwork>(*server);
             if (!network->listen("0.0.0.0", options.network_port, unsigned(Net::max_players), error))
                 return failed();
-            network->server_name = profile.name.substr(0, 20) + " — Host";
+            // Cut on a UTF-8 boundary: the advertised name must stay valid text.
+            auto name = profile.name.substr(0, 20);
+            if (name.size() < profile.name.size())
+                while (!name.empty() && (std::uint8_t(profile.name[name.size()]) & 0xC0) == 0x80)
+                    name.pop_back();
+            network->server_name = name + " (host)";
             if (!network->discovery_error.empty())
                 spdlog::warn("{}", network->discovery_error);
             address = {"127.0.0.1", network->port()};

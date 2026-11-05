@@ -18,9 +18,14 @@ namespace OpenBlood2
             error = "Network listener requires a loaded world and valid capacity";
             return false;
         }
+        if (port == Net::discovery_port)
+        {
+            error = "UDP " + std::to_string(Net::discovery_port) + " is reserved for LAN discovery";
+            return false;
+        }
         if (!transport_.listen(address, port, capacity, error))
             return false;
-        discovery_open_ = discovery_.open(true, discovery_error, Net::discovery_port, address);
+        discovery_open_ = lan_discovery && discovery_.open(true, discovery_error, Net::discovery_port, address);
         discovery_offer_.instance = std::uint64_t(Clock::now().time_since_epoch().count()) | 1;
         capacity_ = capacity;
         clock_started_ = false;

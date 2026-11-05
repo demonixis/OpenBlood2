@@ -30,6 +30,7 @@ namespace OpenBlood2
         std::uint64_t state_updates = 0, state_drops = 0, state_bytes = 0;
         std::string last_rejection;
         std::string discovery_error, server_name = "Blood II";
+        bool lan_discovery = true; // --no-lan: answer no LAN discovery queries.
 
       private:
         enum class Phase

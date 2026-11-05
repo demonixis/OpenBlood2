@@ -2,6 +2,7 @@
 #include "game/game_settings.h"
 #include "net/address.h"
 #include "net/admission.h"
+#include "net/discovery.h"
 #include <algorithm>
 namespace OpenBlood2
 {
@@ -65,12 +66,15 @@ namespace OpenBlood2
         {
             const auto choices = mode_maps();
             if (mode < 0 || mode > 2 || map < 0 || std::size_t(map) >= choices.size() || port < 1 || port > 65535 ||
-                end < 0 || end > 3 || frags < 0 || frags > 1000000 || minutes < 0 || minutes > 1000000 ||
+                port == Net::discovery_port || end < 0 || end > 3 || frags < 0 ||
+                frags > int(MultiplayerRules::frag_limit) || minutes < 0 ||
+                minutes > int(MultiplayerRules::minute_limit) ||
                 flag_value < 0 || flag_value > 1000000 || rotation.size() > 49 ||
                 std::any_of(rotation.begin(), rotation.end(), [&](const auto& p)
                             { return std::find(choices.begin(), choices.end(), p) == choices.end(); }))
             {
-                error = "Choose a valid map, port, rotation and match limits.";
+                error = "Choose a valid map, port (not " + std::to_string(Net::discovery_port) +
+                        ", reserved for LAN discovery), rotation and match limits.";
                 return false;
             }
             next.host_world = choices[map];

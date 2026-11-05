@@ -50,21 +50,24 @@ namespace OpenBlood2
                 browser_.close();
             }
         }
+        // Esc/B cancel an active field or an open combo first; only then close
+        // the screen. Sampled before the widgets, which clear it on Escape.
+        const bool editing = ImGui::IsAnyItemActive() || ImGui::IsPopupOpen("", ImGuiPopupFlags_AnyPopupId);
         if (font)
             ImGui::PushFont(font, 0);
         const auto* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->GetCenter(), ImGuiCond_Always, {.5f, .5f});
         ImGui::SetNextWindowSize({std::min(720.f, viewport->Size.x - 24), std::min(720.f, viewport->Size.y - 24)},
                                  ImGuiCond_Always);
-        ImGui::Begin("Multijoueur", &active, ImGuiWindowFlags_NoCollapse);
-        ImGui::InputText("Nom", setup.name.data(), setup.name.size());
-        ImGui::Combo("Personnage", &setup.character, "Caleb\0Ophelia\0Ishmael\0Gabriella\0");
-        ImGui::Combo("Équipe souhaitée", &setup.team, "Automatique\0Bleue\0Rouge\0");
+        ImGui::Begin("Multiplayer", &active, ImGuiWindowFlags_NoCollapse);
+        ImGui::InputText("Name", setup.name.data(), setup.name.size());
+        ImGui::Combo("Character", &setup.character, "Caleb\0Ophelia\0Ishmael\0Gabriella\0");
+        ImGui::Combo("Preferred team", &setup.team, "Automatic\0Blue\0Red\0");
         if (replaces_solo_)
-            ImGui::TextWrapped("Lancer une partie multijoueur terminera la session solo en cours.");
+            ImGui::TextWrapped("Starting a multiplayer game ends the current single-player session.");
         if (ImGui::BeginTabBar("Session"))
         {
-            if (ImGui::BeginTabItem("Héberger"))
+            if (ImGui::BeginTabItem("Host"))
             {
                 if (ImGui::Combo("Mode", &setup.mode, "Bloodbath\0Team\0CTF\0"))
                 {
@@ -72,57 +75,57 @@ namespace OpenBlood2
                     setup.rotation.clear();
                 }
                 const auto maps = setup.mode_maps();
-                if (ImGui::BeginCombo("Carte", maps.empty() ? "Aucune carte" : maps[setup.map].c_str()))
+                if (ImGui::BeginCombo("Map", maps.empty() ? "No map" : maps[setup.map].c_str()))
                 {
                     for (std::size_t i = 0; i < maps.size(); ++i)
                         if (ImGui::Selectable(maps[i].c_str(), std::size_t(setup.map) == i))
                             setup.map = int(i);
                     ImGui::EndCombo();
                 }
-                ImGui::InputInt("Port UDP", &setup.port);
-                ImGui::Combo("Fin de partie", &setup.end, "Frags / score\0Temps\0Premier seuil atteint\0Sans limite\0");
+                ImGui::InputInt("UDP port", &setup.port);
+                ImGui::Combo("Match end", &setup.end, "Frags / score\0Time\0First limit reached\0No limit\0");
                 if (setup.end == 0 || setup.end == 2)
-                    ImGui::InputInt("Limite de score", &setup.frags);
+                    ImGui::InputInt("Score limit", &setup.frags);
                 if (setup.end == 1 || setup.end == 2)
-                    ImGui::InputInt("Durée (minutes)", &setup.minutes);
+                    ImGui::InputInt("Time limit (minutes)", &setup.minutes);
                 if (setup.mode)
                 {
-                    ImGui::Checkbox("Tir allié", &setup.friendly_fire);
-                    ImGui::Checkbox("Scores d'équipe négatifs", &setup.negative_team_frags);
+                    ImGui::Checkbox("Friendly fire", &setup.friendly_fire);
+                    ImGui::Checkbox("Negative team frags", &setup.negative_team_frags);
                 }
                 if (setup.mode == 2)
                 {
-                    ImGui::InputInt("Points par capture", &setup.flag_value);
-                    ImGui::Checkbox("Seules les captures comptent", &setup.only_flag_scores);
-                    ImGui::Checkbox("Score selon la taille des équipes", &setup.use_team_size);
+                    ImGui::InputInt("Points per capture", &setup.flag_value);
+                    ImGui::Checkbox("Only flag captures score", &setup.only_flag_scores);
+                    ImGui::Checkbox("Scale score by team size", &setup.use_team_size);
                 }
-                if (ImGui::TreeNode("Rotation des cartes"))
+                if (ImGui::TreeNode("Map rotation"))
                 {
                     ImGui::TextWrapped(
-                        "La carte de départ est jouée en premier. La liste suivante est répétée en boucle avec elle.");
+                        "The starting map plays first. It repeats in a loop with the list below.");
                     ImGui::BeginDisabled(maps.empty() || setup.rotation.size() >= 49);
-                    if (ImGui::Button("Ajouter la carte sélectionnée"))
+                    if (ImGui::Button("Add selected map"))
                         setup.rotation.push_back(maps[setup.map]);
                     ImGui::EndDisabled();
                     ImGui::SameLine();
-                    if (ImGui::Button("Vider"))
+                    if (ImGui::Button("Clear"))
                         setup.rotation.clear();
                     for (std::size_t i = 0; i < setup.rotation.size(); ++i)
                         ImGui::Text("%zu. %s", i + 1, setup.rotation[i].c_str());
                     ImGui::TreePop();
                 }
-                ImGui::TextWrapped("La partie sera visible sur le réseau local. Quitter l'hôte termine la partie.");
-                if (ImGui::Button("Lancer la partie"))
+                ImGui::TextWrapped("The game is visible on the local network. Leaving as host ends the game.");
+                if (ImGui::Button("Start game"))
                     start(true);
                 ImGui::EndTabItem();
             }
-            if (ImGui::BeginTabItem("Rejoindre"))
+            if (ImGui::BeginTabItem("Join"))
             {
-                ImGui::InputText("Adresse IP ou nom : port", setup.address.data(), setup.address.size());
-                if (ImGui::Button("Connexion directe"))
+                ImGui::InputText("Address or host:port", setup.address.data(), setup.address.size());
+                if (ImGui::Button("Connect"))
                     start(false);
-                ImGui::SeparatorText("Parties sur le réseau local");
-                if (ImGui::Button("Actualiser"))
+                ImGui::SeparatorText("Local network games");
+                if (ImGui::Button("Refresh"))
                 {
                     if (!browsing_)
                         browsing_ = browser_.open(false, discovery_error_);
@@ -131,25 +134,25 @@ namespace OpenBlood2
                 if (!discovery_error_.empty())
                     ImGui::TextWrapped("%s", discovery_error_.c_str());
                 if (browser_.servers().empty())
-                    ImGui::TextWrapped("Recherche en cours. Si aucune partie n'apparaît, utilisez son adresse IP.");
+                    ImGui::TextWrapped("Searching. If a game does not appear, connect to its address.");
                 for (const auto& s : browser_.servers())
                 {
                     const auto endpoint = s.address.host + ":" + std::to_string(s.address.port);
                     ImGui::PushID(endpoint.c_str());
                     const bool compatible = s.offer.protocol == Net::protocol_version;
-                    ImGui::TextWrapped("%s — %s — %u/%u", s.offer.name.c_str(), endpoint.c_str(),
+                    ImGui::TextWrapped("%s - %s - %u/%u", s.offer.name.c_str(), endpoint.c_str(),
                                        unsigned(s.offer.players), unsigned(s.offer.capacity));
-                    ImGui::TextWrapped("%s · %s",
+                    ImGui::TextWrapped("%s - %s",
                                        s.offer.mode == 1   ? "Bloodbath"
                                        : s.offer.mode == 2 ? "CTF"
                                                            : "Team",
                                        s.offer.world.c_str());
                     if (!compatible)
-                        ImGui::TextUnformatted("Version du jeu incompatible");
+                        ImGui::TextUnformatted("Incompatible game version");
                     else if (s.offer.players >= s.offer.capacity)
-                        ImGui::TextUnformatted("Partie complète");
+                        ImGui::TextUnformatted("Game full");
                     ImGui::BeginDisabled(!compatible || s.offer.players >= s.offer.capacity);
-                    if (ImGui::Button("Rejoindre cette partie"))
+                    if (ImGui::Button("Join this game"))
                     {
                         std::snprintf(setup.address.data(), setup.address.size(), "%s", endpoint.c_str());
                         start(false);
@@ -164,8 +167,9 @@ namespace OpenBlood2
         }
         if (!error_.empty())
             ImGui::TextWrapped("%s", error_.c_str());
-        if (ImGui::Button("Retour") ||
-            (ImGui::IsKeyPressed(ImGuiKey_Escape, false) || ImGui::IsKeyPressed(ImGuiKey_GamepadFaceRight, false)))
+        if (ImGui::Button("Back") ||
+            (!editing &&
+             (ImGui::IsKeyPressed(ImGuiKey_Escape, false) || ImGui::IsKeyPressed(ImGuiKey_GamepadFaceRight, false))))
             active = false;
         ImGui::End();
         if (font)

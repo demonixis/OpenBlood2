@@ -29,6 +29,7 @@ int main(int argc, char** argv)
     MultiplayerRules rules; // Original dedicated default: 10 minutes, frags mode.
     std::string world = "multi/bb_bloodarena", address = "0.0.0.0";
     unsigned mode = GAMETYPE_BLOODBATH, port = Net::default_port, capacity = unsigned(Net::max_players), limit = 0;
+    bool lan = true;
     for (int i = 1; i < argc; ++i)
     {
         const std::string_view arg = argv[i];
@@ -48,10 +49,16 @@ int main(int argc, char** argv)
                       << "  --flag-value N              Capture points, 0..1000000 (default 5)\n"
                       << "  --map NAME       Append to rotation, up to 50 maps including --world\n"
                       << "  --bind ADDRESS   IPv4 bind address (default 0.0.0.0)\n"
-                      << "  --port N         UDP port (default 27888; 0 selects an ephemeral port)\n"
+                      << "  --port N         UDP port (default 27888; 0 selects an ephemeral port; not 27889)\n"
+                      << "  --no-lan         Do not answer LAN discovery on UDP 27889\n"
                       << "  --max-players N  1..16 (default 16)\n"
                       << "  --ticks N        Stop after N simulation ticks (0: until SIGINT/SIGTERM)\n";
             return 0;
+        }
+        if (arg == "--no-lan")
+        {
+            lan = false;
+            continue;
         }
         if (++i >= argc)
         {
@@ -110,6 +117,7 @@ int main(int argc, char** argv)
         return 5;
     }
     ServerNetwork network(session);
+    network.lan_discovery = lan;
     if (!network.listen(address, std::uint16_t(port), capacity, error))
     {
         std::cerr << error << '\n';

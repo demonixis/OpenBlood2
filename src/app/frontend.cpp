@@ -233,7 +233,12 @@ namespace OpenBlood2
                       : config.nightmares ? MenuEdition::Nightmares
                                           : MenuEdition::Retail);
             menu.vr = xr_mode;
+            // Desktop only: the replacement screen needs a keyboard for names and addresses.
+#if SDL_PLATFORM_ANDROID || SDL_PLATFORM_IOS
+            menu.multiplayer = false;
+#else
             menu.multiplayer = !xr_mode && !config.demo && !config.nightmares && config.overlays.empty();
+#endif
             menu.setup = true;
             std::filesystem::path preferences;
             std::string preference_error;
@@ -541,8 +546,9 @@ namespace OpenBlood2
                     {
                         if (multiplayer.active)
                         {
-                            // Retain releases/focus while the replacement screen owns actions.
-                            input.controls.event(event, SDL_GetWindowID(runtime.window));
+                            // Retain releases/focus while the replacement screen owns actions;
+                            // its text fields own every key, so no play key is pressed.
+                            input.controls.event(event, SDL_GetWindowID(runtime.window), true);
                         }
                         ImGui_ImplSDL3_ProcessEvent(&event);
                         return true;

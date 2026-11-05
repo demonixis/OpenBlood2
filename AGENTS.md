@@ -51,6 +51,13 @@ late baselines and the original multiplayer stop grace. Recipes travel batched
 and counts instead of disconnecting. Solo publication paths are unchanged (the
 redirect hooks exist only in ServerSession).
 
+Lot 7 (protocol 24) adds the desktop BLOODBATH Host/Join screen (English labels, never
+Android/iOS/XR/demo/Nightmares/mods) and bounded LAN discovery on its own UDP 27889
+socket: schema-1 offers are hints only, joining keeps the full content admission.
+Preserve the paused-solo retention on Back, one server per process, Esc/B only outside
+active fields, released play keys, the refused 27889 gameplay port, UTF-8-safe host
+names and the dedicated server's `--no-lan`.
+
 The [desktop third-person camera](Documentation/contracts/camera_contracts.md) adds a rebindable C toggle,
 actual player/held models and centred aim convergence. Preserve unchanged eye/shot/movement state,
 special-camera priority, temporary first-person zoom/tight-space fallback and the XR refusal.

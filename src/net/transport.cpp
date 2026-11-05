@@ -21,9 +21,9 @@ namespace OpenBlood2::Net
             auto& queued = *static_cast<std::size_t*>(packet->userData);
             queued -= packet->dataLength;
         }
+        std::mutex runtime_mutex;
+        unsigned runtime_users = 0;
     } // namespace
-    std::mutex runtime_mutex;
-    unsigned runtime_users = 0;
     bool acquire_enet_runtime()
     {
         std::lock_guard lock(runtime_mutex);

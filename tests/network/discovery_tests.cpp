@@ -56,13 +56,15 @@ namespace
         CHECK(server.open(true, error, 0, "127.0.0.1") && server.port());
         CHECK(client.open(false, error) && client.query(0, error, "127.0.0.1", server.port()));
         auto offer = *sample.offer;
+        // Wait for a row carrying the current offer: an older row must not end the wait.
         const auto exchange = [&](double now)
         {
             for (unsigned i = 0; i < 50; ++i)
             {
                 if (!server.pump(now, &offer, error) || !client.pump(now, nullptr, error))
                     return false;
-                if (!client.servers().empty())
+                if (!client.servers().empty() && client.servers()[0].offer.protocol == offer.protocol &&
+                    client.servers()[0].offer.players == offer.players)
                     return true;
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }

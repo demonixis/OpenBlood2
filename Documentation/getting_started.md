@@ -70,13 +70,14 @@ start of the current level). After death, Use opens the Load menu. The demo has 
 
 The current [M9 menus](implementation/reports/m9_multiplayer_menu.md) support retail
 Bloodbath, Team and CTF without hosting/connection command-line arguments. Open
-**BLOODBATH** in the main menu, then **Héberger** or **Rejoindre**. Choose your name,
+**BLOODBATH** in the main menu, then **Host** or **Join**. Choose your name,
 character and team; the host chooses the map, mode, limits and optional rotation.
-**Lancer la partie** starts a playable host. **Rejoindre** lists local games; select
-**Rejoindre cette partie**, or enter an IPv4 address/hostname and port for
-**Connexion directe**. Esc opens the network menu; Leave/End returns to the main menu.
-Starting multiplayer from a paused solo game ends that solo session; Retour cancels
-without changing it. Demo, Nightmares, mods and XR retain their existing paths.
+**Start game** starts a playable host. **Join** lists local games; select
+**Join this game**, or enter an IPv4 address/hostname and port and press
+**Connect**. Esc opens the network menu; Leave/End returns to the main menu.
+Starting multiplayer from a paused solo game ends that solo session; Back cancels
+without changing it. Demo, Nightmares, mods, XR, Android and iOS retain their existing
+paths. The gameplay port may not be 27889, which LAN discovery uses.
 
 LAN discovery uses IPv4 broadcast on **UDP 27889**, refreshed every two seconds;
 gameplay defaults to **UDP 27888**. Allow both ports through the host firewall.

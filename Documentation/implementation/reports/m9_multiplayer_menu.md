@@ -4,6 +4,9 @@
 
 ## Delivered behavior
 
+Backport note (2026-11-05): the screen labels are now English (Host, Join, Start game,
+Join this game, Connect, Back); the French names below are the labels as delivered.
+
 Normal retail desktop launch now offers **BLOODBATH → Héberger / Rejoindre**.
 Choose name, one of the four Chosen, team preference, Bloodbath/Team/CTF, a mounted
 multiplayer map, gameplay port, match thresholds, team/flag rules and rotation.
