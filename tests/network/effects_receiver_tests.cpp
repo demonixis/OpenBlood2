@@ -71,6 +71,20 @@ int main()
         CHECK(!client.receive(std::move(copy), error));
         CHECK(client.frame().sequence == 1 && client.frame().billboards.size() == 2);
     }
+    {
+        // The local solo publisher drops a malformed cosmetic item and keeps the rest.
+        ClientEffects lenient;
+        CHECK(lenient.begin(5));
+        copy = accepted;
+        copy.world = 5;
+        std::get<EffectSprite>(copy.billboards[1].value).pose.position.x = NAN;
+        CHECK(lenient.receive(std::move(copy), error, true) && lenient.frame().billboards.size() == 1 &&
+              lenient.dropped_items == 1 && !lenient.drop_error.empty());
+        // Stale frames still refuse in that mode.
+        copy = accepted;
+        copy.world = 5;
+        CHECK(!lenient.receive(std::move(copy), error, true));
+    }
     ClientEffects second;
     CHECK(second.begin(3));
     copy = accepted;

@@ -55,8 +55,10 @@ namespace OpenBlood2
         AudioTimeline(const AudioTimeline&) = delete;
         AudioTimeline& operator=(const AudioTimeline&) = delete;
         static constexpr unsigned rate = 48000;
-        bool load(const Resources&, std::string_view, std::shared_ptr<const AudioClip>&, std::string&);
-        bool prepare_voice(const Resources&, const SoundRequest&, DVector, AudioVoice&, std::string&);
+        bool load(const Resources&, std::string_view, std::shared_ptr<const AudioClip>&, std::string&,
+                  bool reclaim_unused = false);
+        bool prepare_voice(const Resources&, const SoundRequest&, DVector, AudioVoice&, std::string&,
+                           bool reclaim_unused = false);
         SoundId play(const Resources&, HOBJECT owner, const SoundRequest&, DVector, std::string&);
         bool kill(SoundId);
         const AudioVoice* get(SoundId) const;
@@ -73,6 +75,10 @@ namespace OpenBlood2
         {
             return cached_bytes_;
         }
+        std::uint64_t cache_evictions() const
+        {
+            return cache_evictions_;
+        }
         std::uint64_t stream_read_ns() const;
         std::uint64_t stream_reads() const;
         bool advance(double seconds);
@@ -88,9 +94,12 @@ namespace OpenBlood2
         std::map<std::string, std::shared_ptr<const AudioClip>> streams_;
         std::size_t stream_serial_ = 0;
         std::vector<const PcmStream*> validated_;
-        bool load_stream(const Resources&, std::string_view, std::shared_ptr<const AudioClip>&, std::string&);
+        bool load_stream(const Resources&, std::string_view, std::shared_ptr<const AudioClip>&, std::string&,
+                         bool reclaim_unused);
+        bool cache_room(std::size_t bytes, bool reclaim_unused);
         std::map<SoundId, AudioVoice> voices_;
         std::size_t cached_bytes_ = 0;
+        std::uint64_t cache_evictions_ = 0;
         double remainder_ = 0;
     };
     class AudioMixer : public AudioTimeline

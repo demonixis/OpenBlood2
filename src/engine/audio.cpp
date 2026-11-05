@@ -157,8 +157,47 @@ namespace OpenBlood2
         out = std::move(value);
         return true;
     }
+    bool AudioTimeline::cache_room(std::size_t bytes, bool reclaim_unused)
+    {
+        constexpr std::size_t byte_limit = 256 * 1024 * 1024;
+        if (bytes > byte_limit)
+            return false;
+        const auto fits = [&](std::size_t count, std::size_t size)
+        { return count < 128 && bytes <= byte_limit - size; };
+        if (fits(cached_clips(), cached_bytes_))
+            return true;
+        if (!reclaim_unused)
+            return false; // Logical server audio and the solo adapter retain their existing policy.
+        const auto footprint = [](const AudioClip& clip)
+        { return clip.stream ? PcmStream::buffer_bytes : clip.samples.size() * sizeof(float); };
+        // Preflight each budget check before eviction. A voice or an
+        // external prepared clip pins its asset; cache-only entries are reclaimable.
+        auto count = cached_clips(), size = cached_bytes_;
+        for (const auto* cache : {&clips_, &streams_})
+            for (const auto& [name, clip] : *cache)
+                if (clip.use_count() == 1)
+                {
+                    --count;
+                    size -= footprint(*clip);
+                }
+        if (!fits(count, size))
+            return false;
+        // Stable key order, buffered before streaming; no random draws or voice mutations.
+        for (auto* cache : {&clips_, &streams_})
+            for (auto it = cache->begin(); it != cache->end() && !fits(cached_clips(), cached_bytes_);)
+                if (it->second.use_count() == 1)
+                {
+                    cached_bytes_ -= footprint(*it->second);
+                    it = cache->erase(it);
+                    ++cache_evictions_;
+                }
+                else
+                    ++it;
+        validated_.clear(); // Never retain pointers to evicted stream readers.
+        return true;
+    }
     bool AudioTimeline::load(const Resources& resources, std::string_view path, std::shared_ptr<const AudioClip>& out,
-                             std::string& error)
+                             std::string& error, bool reclaim_unused)
     {
         std::string name;
         if (!resource_path(path, name))
@@ -177,7 +216,7 @@ namespace OpenBlood2
             error = "Missing or oversized sound resource";
             return false;
         }
-        if (cached_clips() >= 128)
+        if (!cache_room(0, reclaim_unused))
         {
             error = "Sound cache exceeds 128 clips";
             return false;
@@ -187,7 +226,7 @@ namespace OpenBlood2
         if (!resources.read(name, bytes, error) || !read_wave(bytes, *clip, error))
             return false;
         const auto size = clip->samples.size() * sizeof(float);
-        if (size > 256 * 1024 * 1024 - cached_bytes_)
+        if (!cache_room(size, reclaim_unused))
         {
             error = "Sound cache exceeds 256 MiB";
             return false;
@@ -198,7 +237,7 @@ namespace OpenBlood2
         return true;
     }
     bool AudioTimeline::load_stream(const Resources& resources, std::string_view path,
-                                    std::shared_ptr<const AudioClip>& out, std::string& error)
+                                    std::shared_ptr<const AudioClip>& out, std::string& error, bool reclaim_unused)
     {
         std::string name;
         if (!resource_path(path, name))
@@ -219,7 +258,7 @@ namespace OpenBlood2
             error = "Missing streaming sound resource";
             return false;
         }
-        if (cached_clips() >= 128 || PcmStream::buffer_bytes > 256 * 1024 * 1024 - cached_bytes_)
+        if (!cache_room(PcmStream::buffer_bytes, reclaim_unused))
         {
             error = "Streaming sound cache budget exceeded";
             return false;
@@ -241,7 +280,7 @@ namespace OpenBlood2
         return true;
     }
     bool AudioTimeline::prepare_voice(const Resources& resources, const SoundRequest& request, DVector position,
-                                      AudioVoice& voice, std::string& error)
+                                      AudioVoice& voice, std::string& error, bool reclaim_unused)
     {
         error.clear();
         if (!physics_vector(position) || !std::isfinite(request.volume) || request.volume < 0 || request.volume > 1 ||
@@ -255,8 +294,8 @@ namespace OpenBlood2
             return false;
         }
         std::shared_ptr<const AudioClip> clip;
-        if (!(request.streaming ? load_stream(resources, request.resource, clip, error)
-                                : load(resources, request.resource, clip, error)))
+        if (!(request.streaming ? load_stream(resources, request.resource, clip, error, reclaim_unused)
+                                : load(resources, request.resource, clip, error, reclaim_unused)))
             return false;
         if (request.loop && clip->loop_metadata)
         {
@@ -584,6 +623,7 @@ namespace OpenBlood2
         streams_.clear();
         stream_serial_ = 0;
         cached_bytes_ = 0;
+        cache_evictions_ = 0;
         remainder_ = 0;
         validated_.clear();
     }

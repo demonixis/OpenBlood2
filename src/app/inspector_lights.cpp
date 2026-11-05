@@ -20,6 +20,9 @@ namespace OpenBlood2
                     static_cast<unsigned long long>(game.local_effects.shape_copies));
         if (!game.effects_replica_error.empty())
             ImGui::TextWrapped("FX publication: %s", game.effects_replica_error.c_str());
+        if (const auto& fx = game.client_session.effects; fx.dropped_items)
+            ImGui::TextWrapped("Dropped malformed FX items: %llu (last: %s)",
+                               static_cast<unsigned long long>(fx.dropped_items), fx.drop_error.c_str());
         if (scene_effects)
         {
             ImGui::Text("Scene FX: %zu live lights / %zu per receiver", scene_effects->lights.size(),

@@ -51,7 +51,7 @@ namespace
         // Publication updates positions/status, never rewinds already rendered PCM.
         CHECK(client.mixer.advance(.25, {}, {}));
         CHECK(voice->cursor == 4000);
-        for (int bad = 0; bad < 9; ++bad)
+        for (int bad = 0; bad < 8; ++bad)
         {
             copy = frame;
             copy.sequence = 3;
@@ -71,15 +71,23 @@ namespace
                 copy.sounds[0].owner = {2, 0};
             if (bad == 7)
                 copy.sounds[0].error.assign(1025, 'x');
-            if (bad == 8)
-            {
-                copy.sounds.push_back(sound);
-                copy.sounds.back().id = 2;
-                copy.sounds.back().parameters.resource = "missing.wav";
-            }
             CHECK(!client.receive(std::move(copy), resources, error) && client.frame().sequence == 2 &&
                   voice->cursor == 4000 && client.mixer.voices().size() == 1);
         }
+        // A clip this client cannot prepare leaves only that voice silent: the
+        // frame is admitted, the failure is counted once and never retried.
+        ClientAudio silent;
+        CHECK(silent.begin(1));
+        copy = frame;
+        copy.sounds.push_back(sound);
+        copy.sounds.back().id = 2;
+        copy.sounds.back().parameters.resource = "missing.wav";
+        auto again = copy;
+        CHECK(silent.receive(std::move(copy), resources, error) && silent.mixer.voices().size() == 1 &&
+              silent.mirror_failed == 1 && !silent.mirror_error.empty() && silent.frame().sounds.size() == 2);
+        again.sequence = frame.sequence + 1;
+        CHECK(silent.receive(std::move(again), resources, error) && silent.mixer.voices().size() == 1 &&
+              silent.mirror_failed == 1);
         ClientAudio late;
         CHECK(late.begin(1));
         copy = frame;

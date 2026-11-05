@@ -136,6 +136,7 @@ namespace
         for (const auto* world : {"01_SubwayA", "02_CityHub"})
         {
             GameSession game;
+            game.local_movement.verify_prediction = true;
             CHECK(game.initialize());
             Config config;
             config.data_dir = root;

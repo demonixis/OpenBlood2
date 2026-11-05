@@ -15,6 +15,10 @@ namespace OpenBlood2
                     game.server.audio.voices().size());
         if (!game.audio_replica_error.empty())
             ImGui::TextWrapped("Audio publication failed: %s", game.audio_replica_error.c_str());
+        if (const auto& client = game.client_session.audio; client.mirror_failed)
+            ImGui::TextWrapped("Silent mirrored voices: %llu (last: %s) | client cache evictions %llu",
+                               static_cast<unsigned long long>(client.mirror_failed), client.mirror_error.c_str(),
+                               static_cast<unsigned long long>(client.mixer.cache_evictions()));
         ImGui::Text("Output: %s | voices %zu | cached clips %zu (%.1f MiB)",
                     audio.has_output() ? "SDL stream" : "offline clock", audio.voices().size(), audio.cached_clips(),
                     audio.cached_bytes() / 1048576.0);

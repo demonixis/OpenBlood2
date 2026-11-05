@@ -1,3 +1,4 @@
+#include "effect_owner_fixture.h"
 #include "app/sprite_scene.h"
 #include "game/original/AI_Mgr.h"
 #include "shield_fixture.h"
@@ -132,13 +133,13 @@ namespace
         for (unsigned i = 0; i < 128; ++i)
             CHECK(g.server.PublishObjectParticles(h, 19, error));
         CHECK(!g.server.PublishObjectParticles(h, 19, error) && manager.reports.size() == 64);
-        CHECK(manager.advance(0, g.server) && manager.advance(.11, g.server));
-        CHECK(manager.advance(.22, g.server));
-        CHECK(!manager.advance(.33, g.server) && manager.failed > 3 && manager.particle_count() <= 8192);
+        CHECK(test_effect_owner::advance(g, manager, 0) && test_effect_owner::advance(g, manager, .11));
+        CHECK(test_effect_owner::advance(g, manager, .22));
+        CHECK(!test_effect_owner::advance(g, manager, .33) && manager.failed > 3 && manager.particle_count() <= 8192);
         CHECK(!manager.update_error.empty());
         CHECK(g.objects.remove(h));
         CHECK(!g.server.PublishObjectParticles(h, 19, error)); // pending removal is already stale
-        CHECK(g.objects.finish_frame() && manager.advance(.34, g.server) && manager.active.empty());
+        CHECK(g.objects.finish_frame() && test_effect_owner::advance(g, manager, .34) && manager.active.empty());
         std::cout << "Invalid recipe/owner/pose/clock/resources and preflight budgets fail; history bounded, pending "
                      "owners rejected, no live overflow.\n";
         return true;
@@ -207,8 +208,8 @@ namespace
         CHECK(g.unload_world() && m.reports.empty());
         h = g.objects.create(g.objects.find_class("BaseClass"));
         CHECK(g.server.PublishObjectParticles(h, 19, error) > first);
-        CHECK(m.advance(g.objects.time(), g.server));
-        CHECK(!m.advance(-1, g.server) && m.active.empty() && !m.reports.back().error.empty());
+        CHECK(test_effect_owner::advance(g, m, g.objects.time()));
+        CHECK(!test_effect_owner::advance(g, m, -1) && m.active.empty() && !m.reports.back().error.empty());
         std::cout << "UI-independent session updates, read-only repeated render, removal/unload, nonreused IDs and "
                      "durable failure inspection verified.\n";
         return true;
@@ -264,7 +265,7 @@ namespace
             CHECK(g.server.PublishObjectParticles(owner->m_hObject, 36, error));
             auto& m = g.server.object_particles;
             const auto now = g.objects.time();
-            CHECK(m.advance(now, g.server) && m.advance(now + .11, g.server));
+            CHECK(test_effect_owner::advance(g, m, now) && test_effect_owner::advance(g, m, now + .11));
             CHECK(m.particle_count() == 42);
             const auto first = m.active[0].effect.particles[0];
             WorldMessage message;
@@ -283,8 +284,8 @@ namespace
                     partial += entry.partial_alpha;
                 }
             CHECK(rendered == 42 && partial > 0);
-            CHECK(m.advance(now + 2.501, g.server) && m.active.size() == 1);
-            CHECK(m.advance(now + 5.001, g.server) && m.active.empty());
+            CHECK(test_effect_owner::advance(g, m, now + 2.501) && m.active.size() == 1);
+            CHECK(test_effect_owner::advance(g, m, now + 5.001) && m.active.empty());
             std::cout << "Private loop " << loop
                       << ": actual shield WAV, 42 decoded shield/powerup quads, source preserved across destination "
                          "rehearsal; exact independent expiry.\n";

@@ -21,7 +21,7 @@ namespace OpenBlood2
             error = "Client sound requires a buffered spatial one-shot";
         else if (mixer.voices_.size() >= 128 || next_effect == std::numeric_limits<SoundId>::max())
             error = "Client cosmetic sound capacity exhausted";
-        else if (!mixer.prepare_voice(resources, request, position, voice, error))
+        else if (!mixer.prepare_voice(resources, request, position, voice, error, true))
         {
             ++effects_failed;
             return 0;
@@ -59,7 +59,9 @@ namespace OpenBlood2
         frame_ = {};
         frame_.world = world;
         high_id_ = 0;
-        effects_started = effects_failed = effects_displaced = 0;
+        unplayable_.clear();
+        effects_started = effects_failed = effects_displaced = mirror_failed = 0;
+        mirror_error.clear();
         return true;
     }
     bool ClientAudio::receive(ClientAudioFrame&& next, const Resources& resources, std::string& error)
@@ -98,7 +100,7 @@ namespace OpenBlood2
                     return false;
                 }
             }
-            else if (sound.id <= high_id_)
+            else if (sound.id <= high_id_ && !unplayable_.contains(sound.id))
             {
                 error = "Retired client sound identity";
                 return false;
@@ -106,14 +108,25 @@ namespace OpenBlood2
             high = std::max(high, sound.id);
         }
         std::map<SoundId, AudioVoice> prepared;
+        std::set<SoundId> unplayable;
         for (const auto& sound : next.sounds)
-            if (!mixer.get(sound.id))
+            if (unplayable_.contains(sound.id))
+                unplayable.insert(sound.id);
+            else if (!mixer.get(sound.id))
             {
                 SoundRequest request;
                 static_cast<SoundParameters&>(request) = sound.parameters;
                 AudioVoice voice;
-                if (!mixer.prepare_voice(resources, request, sound.position, voice, error))
-                    return false;
+                std::string reason;
+                // Cosmetic playback only: the client cache may reclaim unpinned clips, and a
+                // clip it still cannot hold leaves this voice silent instead of failing the game.
+                if (!mixer.prepare_voice(resources, request, sound.position, voice, reason, true))
+                {
+                    unplayable.insert(sound.id);
+                    ++mirror_failed;
+                    mirror_error = reason;
+                    continue;
+                }
                 if (voice.clip->rate != sound.rate || voice.clip->channels != sound.channels ||
                     voice.clip->frames() != sound.frames)
                 {
@@ -139,6 +152,8 @@ namespace OpenBlood2
         mixer.voices_.merge(prepared);
         for (const auto& sound : next.sounds)
         {
+            if (unplayable.contains(sound.id))
+                continue;
             auto& voice = *mixer.get(sound.id);
             voice.position = sound.position;
             voice.done = voice.done || sound.done; // Never replay a client voice that finished ahead of simulation.
@@ -149,6 +164,7 @@ namespace OpenBlood2
                 voice.error = sound.error;
         }
         high_id_ = high;
+        unplayable_ = std::move(unplayable);
         frame_ = std::move(next);
         return true;
     }

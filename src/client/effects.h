@@ -128,7 +128,12 @@ namespace OpenBlood2
       public:
         static constexpr std::size_t record_limit = 65536, particle_limit = 1048576, height_limit = 1048576;
         bool begin(std::uint64_t world);
-        bool receive(ClientEffectsFrame&&, std::string& error);
+        // drop_invalid (the local solo publisher): a malformed cosmetic item is
+        // removed and counted, like the renderer's per-entry diagnostics, instead
+        // of refusing the frame. Stale frames and record limits always refuse.
+        bool receive(ClientEffectsFrame&&, std::string& error, bool drop_invalid = false);
+        std::uint64_t dropped_items = 0;
+        std::string drop_error;
         const ClientEffectsFrame& frame() const
         {
             return frame_;

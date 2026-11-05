@@ -221,13 +221,18 @@ namespace OpenBlood2
         pending_ = {client_.movement.owner, force_revision_, ++next_sequence_, move};
         pending = true;
         report = pending_;
-        if (publish_collision() && client_.collision.predict(client_.movement.owner, body(), move.position,
-                                                             move.velocity, move.acceleration, predicted))
-            body() = predicted;
-        else
-            // The authoritative resolver still receives a bounded valid command:
-            // preserve its original failure diagnostics and deferred contact semantics.
-            ++client_.movement.prediction_failures;
+        // submit() synchronizes the body from the authoritative resolution; only
+        // parity checks solve the replica first.
+        if (verify_prediction)
+        {
+            if (publish_collision() && client_.collision.predict(client_.movement.owner, body(), move.position,
+                                                                 move.velocity, move.acceleration, predicted))
+                body() = predicted;
+            else
+                // The authoritative resolver still receives a bounded valid command:
+                // preserve its original failure diagnostics and deferred contact semantics.
+                ++client_.movement.prediction_failures;
+        }
         ++client_.movement.predictions;
         return true;
     }

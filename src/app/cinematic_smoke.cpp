@@ -2,6 +2,7 @@
 #include "game/original/CinematicTrigger.h"
 #include "game/original/ConversationTrigger.h"
 #include <algorithm>
+#include <spdlog/spdlog.h>
 namespace OpenBlood2
 {
     bool prepare_cinematic_smoke(GameSession& g, ObjectId& selected)
@@ -47,11 +48,20 @@ namespace OpenBlood2
         const auto prior_starts = manager.starts;
         if (!g.objects.advance(.01) || !g.client_shell.OnMessage(VoiceEvent{false, 0, 0}, g.server_shell) ||
             !manager.voice || manager.starts != prior_starts + 1 || !g.advance_audio(.01, {}, {}))
+        {
+            spdlog::error("Conversation probe: prior voice {} / starts {} -> {} / {} / {}", manager.voice, prior_starts,
+                          manager.starts, manager.reason, manager.error);
             return false;
+        }
         const auto prior_voice = manager.voice;
         const auto* prior = g.client_session.audio.mixer.get(prior_voice);
         if (!prior || !prior->clip->stream || !prior->cursor || !g.client_session.audio.mixer.submitted_frames)
+        {
+            spdlog::error("Conversation probe: prior replica {} / stream {} / cursor {} / submitted {}",
+                          prior != nullptr, prior && bool(prior->clip->stream), prior ? prior->cursor : 0,
+                          g.client_session.audio.mixer.submitted_frames);
             return false;
+        }
         auto h = g.objects.create(g.objects.find_class("ConversationTrigger"), {}, Creation::World,
                                   {{"Name", std::string("Diagnostic conversation (retail WAV)")}, {"WaveFile", file}});
         if (!h)
@@ -64,8 +74,20 @@ namespace OpenBlood2
         if (!ok || !g.pump_player_messages(error) || !g.objects.advance(.25))
             return false;
         g.client_shell.communication.Update(g.server, g.client_shell.player, g.client_shell.voice_manager);
-        return g.client_shell.communication.voice != 0 && !manager.voice &&
-               !g.client_session.audio.mixer.get(prior_voice);
+        // This diagnostic calls CommLink outside GameSession::step. Publish its
+        // new/removed logical voices at the normal client boundary before reading
+        // playback state; do not advance either sound clock to force the result.
+        if (!g.publish_client_audio(error))
+        {
+            spdlog::error("Conversation probe audio publication: {}", error);
+            return false;
+        }
+        const bool replaced = g.client_shell.communication.voice != 0 && !manager.voice &&
+                              !g.server.audio.get(prior_voice) && !g.client_session.audio.mixer.get(prior_voice) &&
+                              g.client_session.audio.mixer.get(g.client_shell.communication.voice);
+        if (!replaced)
+            spdlog::error("Conversation probe: voice replacement was not reflected in client playback");
+        return replaced;
     }
     bool check_cinematic_smoke(GameSession& g, ObjectId selected)
     {

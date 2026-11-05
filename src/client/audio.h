@@ -1,6 +1,7 @@
 #pragma once
 #include "client/world.h"
 #include "engine/audio.h"
+#include <set>
 namespace OpenBlood2
 {
     struct ClientSound
@@ -28,6 +29,10 @@ namespace OpenBlood2
         SoundId play_effect(const Resources&, const SoundParameters&, DVector, std::string& error);
         bool advance(double seconds, DVector listener, DRotation rotation);
         std::uint64_t effects_started = 0, effects_failed = 0, effects_displaced = 0;
+        // A mirrored voice whose clip cannot be prepared here stays silent on this
+        // client only; the authoritative timeline and the game keep running.
+        std::uint64_t mirror_failed = 0;
+        std::string mirror_error;
         const ClientAudioFrame& frame() const
         {
             return frame_;
@@ -47,5 +52,6 @@ namespace OpenBlood2
       private:
         ClientAudioFrame frame_;
         SoundId high_id_ = 0; // A removed sound cannot restart in the same world.
+        std::set<SoundId> unplayable_; // Mirrored voices this client could not prepare.
     };
 } // namespace OpenBlood2

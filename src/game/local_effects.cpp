@@ -356,6 +356,6 @@ namespace OpenBlood2
             frame.volumes.push_back(std::move(volume));
         }
         std::erase_if(shapes_, [&](const auto& pair) { return !live.contains(pair.first); });
-        return client.receive(std::move(frame), error);
+        return client.receive(std::move(frame), error, true);
     }
 } // namespace OpenBlood2

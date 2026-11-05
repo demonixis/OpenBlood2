@@ -37,6 +37,10 @@ namespace OpenBlood2
         bool publish_collision();
         std::string collision_error;
         std::uint64_t primary_copies = 0, shape_copies = 0;
+        // Solo submits every prediction to the local authority at once, which then
+        // overwrites the body, so the replica solve is skipped: collision resolves
+        // exactly once. Parity tests enable it to compare replica and authority.
+        bool verify_prediction = false;
         bool predict(const PlayerMove&, LocalMoveReport&);
         bool submit(CBloodServerShell&, const LocalMoveReport&);
         ClientMotionState& body()

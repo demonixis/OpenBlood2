@@ -1,3 +1,4 @@
+#include "effect_owner_fixture.h"
 #include "app/sprite_scene.h"
 #include "engine/capture.h"
 #include "engine/runtime.h"
@@ -83,7 +84,7 @@ int main(int argc, char** argv)
     CHECK(test_gideon::key(g, *boss, "[extra_key:powerup]"));
     CHECK(boss->fire_shots == 1 && boss->powerup_effect && boss->key_outcome == AIKeyOutcome::ExtraAction);
     auto& manager = g.server.object_particles;
-    CHECK(manager.advance(0, g.server) && manager.advance(.11, g.server));
+    CHECK(test_effect_owner::advance(g, manager, 0) && test_effect_owner::advance(g, manager, .11));
     SpriteView scene;
     Capture capture;
     std::vector<std::uint8_t> pixels, again;
@@ -102,10 +103,10 @@ int main(int argc, char** argv)
     CHECK(capture.save((std::filesystem::path(argv[1]) / "shield-powerup.png").c_str()));
     std::cout << (argc == 3 ? "Original external" : "Synthetic") << " shield/powerup: 42 textured quads, " << ink
               << " changed pixels; repeated readback identical, clocks unchanged.\n";
-    CHECK(manager.advance(2.375, g.server) && manager.active.size() == 2);
+    CHECK(test_effect_owner::advance(g, manager, 2.375) && manager.active.size() == 2);
     CHECK(manager.active[1].effect.alpha == .25f);
     CHECK(update_sprite_scene(g, scene, error) && render(runtime, renderer, scene, {}, {}, capture, pixels, error));
-    CHECK(g.objects.remove(h) && g.objects.finish_frame() && manager.advance(2.4, g.server));
+    CHECK(g.objects.remove(h) && g.objects.finish_frame() && test_effect_owner::advance(g, manager, 2.4));
     CHECK(manager.active.empty() && update_sprite_scene(g, scene, error) && scene.draws.empty());
     CHECK(g.unload_world());
     scene.clear();

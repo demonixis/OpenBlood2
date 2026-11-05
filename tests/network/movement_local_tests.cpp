@@ -39,6 +39,7 @@ namespace
     bool separation(const std::filesystem::path& root)
     {
         GameSession g;
+        g.local_movement.verify_prediction = true;
         CHECK(enter(g, root));
         auto& local = g.local_movement;
         auto& state = g.client_session.movement;
@@ -99,6 +100,7 @@ namespace
     bool contacts(const std::filesystem::path& root)
     {
         GameSession g;
+        g.local_movement.verify_prediction = true;
         CHECK(enter(g, root));
         CHECK(g.objects.register_class(sensor_class));
         auto* authoritative = g.objects.get(g.client_shell.player);
@@ -122,6 +124,7 @@ namespace
     bool pushing(const std::filesystem::path& root)
     {
         GameSession g;
+        g.local_movement.verify_prediction = true;
         CHECK(enter(g, root));
         const auto start = g.client_session.movement.body.position;
         const auto dims = g.client_session.movement.body.dimensions;
@@ -145,6 +148,7 @@ namespace
     bool stale(const std::filesystem::path& root)
     {
         GameSession g;
+        g.local_movement.verify_prediction = true;
         CHECK(enter(g, root));
         auto* player = g.server_shell.Player(g.local_client);
         auto* authoritative = g.objects.get(g.client_shell.player);
@@ -196,6 +200,7 @@ namespace
     bool collision(const std::filesystem::path& root)
     {
         GameSession g;
+        g.local_movement.verify_prediction = true;
         CHECK(enter(g, root));
         auto* player = g.objects.get(g.client_shell.player);
         const auto before = player->state.m_Pos;
@@ -226,6 +231,7 @@ namespace
     bool lifetime(const std::filesystem::path& root)
     {
         GameSession g;
+        g.local_movement.verify_prediction = true;
         CHECK(enter(g, root));
         LocalMoveReport report;
         CHECK(g.local_movement.predict(forward(g), report));
