@@ -90,7 +90,8 @@ namespace OpenBlood2
                 return false;
             if (received == NetworkPlayerEvents::Reception::Ignored)
                 return true;
-            if (camera_.receive(value, error) == NetworkCamera::Reception::Refused)
+            if (camera_.receive(value, error) == NetworkCamera::Reception::Refused ||
+                weapons_.receive(value, models_, resources_, error) == NetworkWeapons::Reception::Refused)
                 return false;
             if (const auto* aim = std::get_if<PlayerRotation>(&value.value))
             {
@@ -179,7 +180,8 @@ namespace OpenBlood2
         if (const auto* joined = std::get_if<Net::Joined>(&value))
         {
             if (phase_ != Phase::Baseline || joined_.player || joined->world != offer_.world ||
-                !movement_.begin(*joined) || !inbox_.begin(*joined) || !camera_.begin(*joined))
+                !movement_.begin(*joined) || !inbox_.begin(*joined) || !camera_.begin(*joined) ||
+                !weapons_.begin(*joined))
                 return false;
             joined_ = *joined;
             return complete_baseline(now, error);
@@ -250,6 +252,8 @@ namespace OpenBlood2
                 if (!movement_.update(sampled, yaw_, pitch_, NetworkInput::step, commands, false,
                                       bool(camera_.camera().view.object), report, error))
                     return fail(error, "Client prediction failed");
+                if (!weapons_.update(movement_.setup().owner.force_revision, NetworkInput::step, error))
+                    return fail(error, "Client weapon presentation failed");
                 if (report)
                 {
                     std::vector<std::uint8_t> bytes;

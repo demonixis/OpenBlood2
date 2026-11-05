@@ -241,7 +241,9 @@ namespace OpenBlood2
                 }
                 peer.movement_setup = setup.sequence;
                 std::vector<Net::PrivateEvent> events;
-                bool sent = session_.take_private_events(peer.player, events, error);
+                Net::WeaponLoadout weapons;
+                bool sent = session_.weapon_loadout(peer.player, weapons, error) &&
+                            session_.take_private_events(peer.player, events, error);
                 for (const auto& event : events)
                 {
                     if (!sent)

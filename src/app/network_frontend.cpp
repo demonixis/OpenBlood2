@@ -265,6 +265,7 @@ namespace OpenBlood2
                 scene.pitch = client.pitch();
                 scene.yaw = client.yaw();
                 scene.camera_position = camera.camera_position;
+                scene.weapons = {&client.weapons().views()[0], &client.weapons().views()[1]};
                 if (!presenter.update(scene, error) ||
                     !presenter.record(scene, commands, target, format, width, height, error))
                 {

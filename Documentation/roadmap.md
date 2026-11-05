@@ -324,6 +324,9 @@ CMoveMgr, private HUD and camera under a bounded, server-independent endpoint an
 with the existing renderer/HUD and controls; a host owns one server and a loopback client.
 [Independent view weapons](implementation/reports/m9_weapon_services.md) now retain original animation/fire-key
 logic behind client services; the synchronous solo bridge remains, with network fire delivery still pending.
+[Private weapon loadouts](implementation/reports/m9_weapon_loadout.md) now deliver both hands, mode-specific ammo
+and server permissions to independent remote views; draw/rest animations render in dedicated/host sessions.
+Firing input, authoritative shot validation and remote audio/FX remain to connect.
 **Remaining private presentation consumers/commands, full client separation, Team profiles and playable network gameplay remain pending.**
 
 Original model: the authoritative server runs the ObjectDLL objects. The client

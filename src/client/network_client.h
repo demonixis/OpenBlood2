@@ -4,6 +4,7 @@
 #include "client/network_input.h"
 #include "client/network_movement.h"
 #include "client/network_player_events.h"
+#include "client/network_weapons.h"
 #include "client/network_world.h"
 #include "net/content.h"
 #include "net/transport.h"
@@ -41,7 +42,7 @@ namespace OpenBlood2
         }
         bool ready() const
         {
-            return phase_ == Phase::Active && camera_.ready();
+            return phase_ == Phase::Active && camera_.ready() && weapons_.ready(movement_.setup().owner.force_revision);
         }
         const std::string& reason() const
         {
@@ -82,6 +83,10 @@ namespace OpenBlood2
         ClientCamera& camera()
         {
             return camera_.camera();
+        }
+        const NetworkWeapons& weapons() const
+        {
+            return weapons_;
         }
         const ClientHud& hud() const
         {
@@ -126,6 +131,7 @@ namespace OpenBlood2
         NetworkWorldReceiver receiver_;
         NetworkMovement movement_;
         NetworkCamera camera_;
+        NetworkWeapons weapons_;
         NetworkPlayerEvents inbox_;
         NetworkClock clock_;
         ClientWorld displayed_;

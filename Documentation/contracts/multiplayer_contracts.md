@@ -938,9 +938,9 @@ discards mouse movement. Clear
 pending offsets when commands are neutralized or mouse-move mode ends. Do not
 modify CMoveMgr or add another integration to accommodate render scheduling.
 
-Remote weapon/audio/FX consumers, original Host/Join screens, LAN discovery and
-full gameplay remain separate deliveries. An empty effects frame and absent view
-weapons are explicit current limitations, not completed multiplayer presentation.
+Remote audio/FX consumers, original Host/Join screens, LAN discovery and full
+gameplay remain separate deliveries. The private loadout continuation below adds
+view weapons; the empty effects frame remains an explicit limitation.
 
 
 ## Independent view-weapon services
@@ -953,3 +953,26 @@ shotgun barrel state, bombs, alternate ammo and deferred owner/selection recheck
 The local bridge retains synchronous OnMessage/PlayLocalSound behavior and solo
 clocks. A remote implementation must separately submit and validate authoritative
 fire; cosmetic acceptance alone cannot grant damage or ammo authority.
+
+
+## Private network weapon loadout
+
+The [loadout continuation](../implementation/reports/m9_weapon_loadout.md) adds
+protocol-v9 tag 22: a private snapshot qualified by world, player/object and full
+force revision. It carries character/slot, two weapon types, each hand's primary
+and alternate ammo, liveness, input/fire permissions and binocular state. The
+server reads original inventory/player state after refreshing movement/camera
+gates; clients cannot nominate their ammo or permissions. Publish only changes.
+
+Load both changed views and held resources before replacing either hand. Match
+SyncWeapons: only type or character changes recreate a view; ammo changes retain
+its animation. Keep the original CViewWeapon runtime, one update per existing
+60 Hz client tick, and a monotonic clock anchored at the first loadout. Rendering
+and correction replay never advance it. Reject invalid data/resources atomically;
+ignore old owners, sequences and force revisions. A current-force loadout is part
+of client readiness. Solo services, clocks and CMoveMgr remain unchanged.
+
+This step supplies draw/rest presentation only. No firing input or weapon command
+is submitted yet; animation sound requests are counted with explicit unavailable
+output, never reported as played. Authoritative fire validation/deduplication,
+selection, predicted cosmetic shots and remote audio/FX follow separately.

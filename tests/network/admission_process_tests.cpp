@@ -62,6 +62,8 @@ namespace
                     ModelView scene;
                     CHECK(append_client_models(world, true, scene, client.resources(), error));
                     CHECK(!scene.entries.empty() && client.receiver().collision().frame().primary);
+                    CHECK(client.weapons().state() && client.weapons().views()[0].type == 1 &&
+                          client.weapons().views()[0].model && !client.weapons().views()[1].model);
                     std::cout << "Replicated " << world.frame().objects.size() << " objects, " << scene.entries.size()
                               << " model entries through NetworkClient in world " << client.joined().world << "\n"
                               << std::flush;
@@ -90,6 +92,14 @@ namespace
                     CHECK(client.state_packets && (!observer || (saw_arrival && saw_departure)));
                     CHECK(client.event_sequence() && client.hud().stats.health > 0 && startup == 1);
                     CHECK(client.camera().kind == ClientCameraKind::FirstPerson && camera_frames);
+                    CHECK(client.weapons().updates && !client.weapons().views()[0].shots &&
+                          client.weapons().state()->alive && client.weapons().state()->fire_allowed);
+                    if (observer)
+                        CHECK(client.weapons().views()[0].state == WS_REST);
+                    std::cout << "Private weapon type=" << unsigned(client.weapons().views()[0].type)
+                              << ", ammo=" << client.weapons().state()->ammunition[0]
+                              << ", animation_updates=" << client.weapons().updates
+                              << ", shots=" << client.weapons().views()[0].shots << "\n";
                     std::cout << "Camera frames=" << camera_frames << ", predicted eye height="
                               << client.camera().view.position.y - client.movement().movement().body.position.y
                               << ", mapped clock=" << client.time() << "\n";

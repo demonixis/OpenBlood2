@@ -1,0 +1,54 @@
+{
+  "scope": "Private network weapon loadout and independent draw/rest presentation",
+  "baseline": "3726ce1694b1c18187f510b26e62b74e826161f2",
+  "sources": [
+    {
+      "repository": "Blood2",
+      "revision": "3726ce1694b1c18187f510b26e62b74e826161f2",
+      "path": "src/game/original/BloodShells.cpp",
+      "sha256": "e7a7a7db9353e013918e03dcef094889dddf1b219e1f193ce743e16153b9af38"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "3726ce1694b1c18187f510b26e62b74e826161f2",
+      "path": "src/game/original/ViewWeapon.cpp",
+      "sha256": "e7f48df5cd3058d5230fa4e0fdee66905ca3ae23ec146af3db1528c156a7d03f"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "3726ce1694b1c18187f510b26e62b74e826161f2",
+      "path": "src/game/original/PlayerObj.cpp",
+      "sha256": "3dc3cbf3248b42ca39f34b836c56e4feb2ee848cbffedf7edda80b1934659cce"
+    },
+    {
+      "repository": "Blood2",
+      "revision": "3726ce1694b1c18187f510b26e62b74e826161f2",
+      "path": "src/game/original/InventoryMgr.cpp",
+      "sha256": "bf9085b7a5baf12dad2f8f103ac5097a1c1a8e712b224388ea9617ff2bd92f09"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/BloodClientShell.cpp",
+      "sha256": "7844346a0d1dedf0b819066ca0c5973210a46f5309ebc3099701351bc51a5452"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ClientShellDLL/ViewWeapon.cpp",
+      "sha256": "b2c3c4fb7ea6d87acde30ff2fe176d355ddb985ab00613ebb78dff7033e952a9"
+    },
+    {
+      "repository": "sources/blood2",
+      "revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+      "path": "ObjectDLL/PlayerObj.cpp",
+      "sha256": "56c1f514cd5848fa0c368abdb307411bb015e71a821b850ef418136ce82129bc"
+    }
+  ],
+  "adaptations": [
+    "Append bounded portable protocol-v9 private tag22 with full owner/force identity, per-hand ammo and server permissions.",
+    "Read existing inventory and player gates; no client-selected ammunition or gameplay state.",
+    "Reuse SyncWeapons type/character comparison and atomic resource preparation; run existing CViewWeapon once per network client tick.",
+    "Firing commands, authoritative shot validation and remote audio/FX are subsequent work; no solo gameplay change."
+  ]
+}

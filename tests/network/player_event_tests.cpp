@@ -57,7 +57,8 @@ namespace
                                          FlagEvent{CTFEventKind::Captured, 2, 3, {12, 13}},
                                          items,
                                          PlayerText{"hello"},
-                                         CameraState{123, {4, 5}, {6, 7}, {8, 9}, {1, false, true, false}, 34, true}};
+                                         CameraState{123, {4, 5}, {6, 7}, {8, 9}, {1, false, true, false}, 34, true},
+                                         WeaponLoadout{123, 1, 2, {1, 1}, {50, 50}, {50, 50}, true, true, true, false}};
         CHECK(values.size() == std::variant_size_v<PrivateValue>);
         std::mt19937 random(0xB2E7);
         for (std::size_t index = 0; index < values.size(); ++index)

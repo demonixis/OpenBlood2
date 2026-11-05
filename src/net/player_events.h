@@ -39,12 +39,21 @@ namespace OpenBlood2::Net
         bool alive = false;
         bool operator==(const CameraState&) const = default;
     };
+    struct WeaponLoadout
+    {
+        std::uint64_t force_revision = 0;
+        DBYTE character = 0, slot = 0;
+        std::array<DBYTE, 2> weapons{}; // Right, left; zero means absent.
+        std::array<float, 2> ammunition{}, alternate_ammunition{};
+        bool alive = false, input_enabled = false, fire_allowed = false, binoculars = false;
+        bool operator==(const WeaponLoadout&) const = default;
+    };
     // Stable tags are these alternatives plus one. Append only with a protocol
     // revision. Init/physics/force messages are handled by admission/movement.
-    using PrivateValue =
-        std::variant<BloodbathStart, PlayerRotation, PlayerStats, MissionObjectives, WorldExit, BossHealth,
-                     Conversation, InventoryAction, ScreenFade, VoiceEvent, VoiceStop, PlayerDead, MusicCommand,
-                     ZoomView, EyeEvent, AttachEvent, OrbEvent, FlagEvent, InventoryItems, PlayerText, CameraState>;
+    using PrivateValue = std::variant<BloodbathStart, PlayerRotation, PlayerStats, MissionObjectives, WorldExit,
+                                      BossHealth, Conversation, InventoryAction, ScreenFade, VoiceEvent, VoiceStop,
+                                      PlayerDead, MusicCommand, ZoomView, EyeEvent, AttachEvent, OrbEvent, FlagEvent,
+                                      InventoryItems, PlayerText, CameraState, WeaponLoadout>;
     struct PrivateEvent
     {
         Joined owner;

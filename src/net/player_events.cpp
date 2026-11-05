@@ -126,6 +126,15 @@ namespace OpenBlood2::Net
                     return item(v.current) && item(v.previous) && item(v.next);
                 else if constexpr (std::is_same_v<T, PlayerText>)
                     return text(v.text, 80);
+                else if constexpr (std::is_same_v<T, WeaponLoadout>)
+                {
+                    const auto ammo = [](float value) { return number(value) && value >= 0; };
+                    return v.force_revision && v.character < 4 && v.slot < 13 &&
+                           std::all_of(v.weapons.begin(), v.weapons.end(), weapon) &&
+                           std::all_of(v.ammunition.begin(), v.ammunition.end(), ammo) &&
+                           std::all_of(v.alternate_ammunition.begin(), v.alternate_ammunition.end(), ammo) &&
+                           (!v.fire_allowed || (v.alive && v.input_enabled && !v.binoculars));
+                }
                 else if constexpr (std::is_same_v<T, CameraState>)
                     return v.force_revision && object(v.scripted) && object(v.eye) && object(v.orb) &&
                            v.settings.type <= 2 && number(v.eye_level, 1000) && v.eye_level >= 0;
@@ -248,6 +257,19 @@ namespace OpenBlood2::Net
                 }
                 else if constexpr (std::is_same_v<T, PlayerText>)
                     w.text(v.text, 80);
+                else if constexpr (std::is_same_v<T, WeaponLoadout>)
+                {
+                    w.u64(v.force_revision);
+                    w.u8(v.character);
+                    w.u8(v.slot);
+                    for (const auto type : v.weapons)
+                        w.u8(type);
+                    for (const auto ammo : v.ammunition)
+                        w.f32(ammo);
+                    for (const auto ammo : v.alternate_ammunition)
+                        w.f32(ammo);
+                    w.u8(v.alive | v.input_enabled << 1 | v.fire_allowed << 2 | v.binoculars << 3);
+                }
                 else if constexpr (std::is_same_v<T, CameraState>)
                 {
                     w.u64(v.force_revision);
@@ -445,6 +467,28 @@ namespace OpenBlood2::Net
                 v.settings.listener = flags & 4;
                 v.eye_level = r.f32();
                 ok = boolean(r, v.alive);
+                event.value = v;
+                break;
+            }
+            case 22:
+            {
+                WeaponLoadout v;
+                v.force_revision = r.u64();
+                v.character = r.u8();
+                v.slot = r.u8();
+                for (auto& type : v.weapons)
+                    type = r.u8();
+                for (auto& ammo : v.ammunition)
+                    ammo = r.f32();
+                for (auto& ammo : v.alternate_ammunition)
+                    ammo = r.f32();
+                const auto flags = r.u8();
+                if (flags > 15)
+                    return DecodePrivate::Malformed;
+                v.alive = flags & 1;
+                v.input_enabled = flags & 2;
+                v.fire_allowed = flags & 4;
+                v.binoculars = flags & 8;
                 event.value = v;
                 break;
             }

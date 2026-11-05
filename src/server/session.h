@@ -49,6 +49,7 @@ namespace OpenBlood2
         // Real time a player may still move: refilled 5 % faster than the
         // server clock (client/server clock drift), capped at half a second.
         static constexpr double movement_budget_rate = 1.05, movement_budget_limit = .5;
+        bool weapon_loadout(std::uint64_t player, Net::WeaponLoadout&, std::string& error);
         bool take_private_events(std::uint64_t player, std::vector<Net::PrivateEvent>&, std::string& error);
         std::uint64_t private_events = 0, subsumed_events = 0;
         bool leave(std::uint64_t player);
@@ -96,6 +97,7 @@ namespace OpenBlood2
             std::uint64_t next_event = 1;
             ObjectId camera_eye, camera_orb;
             std::optional<Net::CameraState> camera;
+            std::optional<Net::WeaponLoadout> weapons;
             std::deque<Net::MovementReport> pending;
             std::optional<Net::MovementAck> ack;
             PlayerControls controls;
