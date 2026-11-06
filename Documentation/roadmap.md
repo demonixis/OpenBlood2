@@ -79,6 +79,7 @@ the checked sequence and repeated door cycles are not a full demo traversal.
 | M7 | ~90% | Gamepad: action layer, rebinding, hotplug, menus; a parallel track, needed before M8. The [input actions](contracts/input_action_contracts.md) cover keyboard, mouse and gamepad (console layout, hot-plug, menus, weapon cycling), the original [inventory cursor](contracts/inventory_cursor_contracts.md) with its item tabs, a touch camera drag, the original Controls page with `controls.cfg`, all nine previously missing control actions, and on-screen touch controls. Device testing on a touch screen, menu auto-repeat and the Keyboard/Joystick pages remain. |
 | M8 | ~55% | VR through OpenXR: Meta Quest first, PCVR on Linux last; also the Android gate. The [OpenXR plan](implementation/openxr_plan.md) orders the lots; 8.1–8.2 reached [first light on a Quest 3](implementation/reports/xr_first_light.md) 8.3 [renders SubwayA in stereo at 72 Hz](implementation/reports/xr_stereo_world.md) 8.5 adds [controller play](implementation/reports/xr_controls.md), 8.6 the [menus and HUD](implementation/reports/xr_menus_hud.md), 8.7 the [menu laser](implementation/reports/xr_laser_playtest.md) and 8.9 [arm IK](implementation/reports/xr_arms.md). |
 | M9 | ~10% | LAN multiplayer: Bloodbath, CTF and Team on the original multiplayer maps. |
+| M10 | 0% — planned | Baked GI: GI lightmaps that override the original ones, light probes for models and reflection probes for the enhanced renderer, with an F8 tools overlay and a bake-all script. The [GI plan](implementation/gi_plan.md) orders the lots. |
 
 The milestones after M4 were renumbered on 2026-10-20. Earlier reports use the
 old numbers: M5 campaign/persistence, M6 packages and optimization, M7 mobile,
@@ -403,7 +404,7 @@ the Linux foundation tests.
 | Mobile — M10 | Phones/tablets on Android and iOS: touch UI, audio focus, resume, thermal tests. This reuses the M8 Android build. |
 | Mods — M11 | Versioned packages, load order/conflicts, replacements/custom levels and save compatibility. Existing REZ overlays are a first subset. |
 | In-game editor — M12 | Hierarchy, asset browser, gizmos, undo/redo, edit/play modes, materials/probes and mod export. |
-| Rendering extras | Baked GI/probes, reflection probes, render scaling and FSR1. |
+| Rendering extras | Render scaling and FSR1 (baked GI and probes moved to M10). |
 | Desktop release | Signed/notarized installers, sustained-play soak tests and measured optimization, continuing from the M3 beta. |
 | Shogo | Reassess after Blood II's campaign and engine contracts are established. |
 | Dreamcast | Exploratory: a native PowerVR2 scene backend in this repository, after the campaign. Memory (16 MB) is the main risk; see the [study](implementation/dreamcast_study.md). |
