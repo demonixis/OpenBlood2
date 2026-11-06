@@ -43,6 +43,8 @@ android {
         getByName("main") {
             java.srcDir(blood2("sdlJava"))
             jniLibs.srcDir(blood2("jniLibs"))
+            // Optional: baked GI files (assets/gi), staged only by local builds.
+            providers.gradleProperty("blood2.assets").orNull?.let { assets.srcDir(it) }
         }
     }
 

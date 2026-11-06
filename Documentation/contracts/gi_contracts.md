@@ -8,6 +8,7 @@ GI is not rendered yet: nothing in this contract changes a frame, a save or the 
 - [F8 overlay (lot G3)](#f8-overlay-lot-g3)
 - [Probe placement (lot G4)](#probe-placement-lot-g4)
 - [Bake scene and tracer (lot G5)](#bake-scene-and-tracer-lot-g5)
+- [Bake-all script and packaging (lot G6)](#bake-all-script-and-packaging-lot-g6)
 
 ## World queries (lot G1)
 
@@ -738,3 +739,88 @@ reports current; a cancelled bake exits 12, keeps the previous file and writes n
 empty folder; an unmounted world (2) and a Foreign placement (4); throughput is printed.
 
 **`config.gi`** The `--bake-gi` options and every refused combination.
+
+## Bake-all script and packaging (lot G6)
+
+`tools/gi/bake_all.py` bakes a set of worlds with the game binary, and the build copies the
+results where the runtime's packaged root looks (`SDL_GetBasePath()/gi`). Baked files are
+derived from commercial data: they stay local (decision D3).
+
+### `tools/gi/bake_all.py`
+
+Standard library only, run as `python3 -I tools/gi/bake_all.py`. The binary owns every format
+and staleness decision: the script never opens a `.ob2gi` file.
+
+- **Worlds** come from `blood2 --list-worlds --json`. `--set single` (default) is the `single`
+  and `addon` kinds, `multi` the `multi` kind, `all` everything (`other` included). `--worlds`
+  names worlds by path, file name or stem, case-insensitive; an unknown name is a setup error.
+- **Each world** runs `blood2 [--data-dir D] [--nightmares|--demo] --log-level error --bake-gi
+  PATH --gi-quality Q --gi-jobs T --gi-out OUT --gi-placement-dir P [--gi-bounces B]
+  [--gi-rays R] [--gi-if-stale]` from the repository root. `--gi-if-stale` is dropped by
+  `--force`. `--bounces`/`--rays` need `--quality custom`.
+- `--edition retail|nightmares|demo` adds `--nightmares` or `--demo`; `--data-dir` is passed
+  through (absent: the game's own configuration). `--blood2` defaults to `build/release/blood2`,
+  then `build/dev/blood2`.
+- `--jobs N` (1–64, default 1) bakes N worlds at once; `--threads T` (0–256) is each bake's
+  `--gi-jobs`, by default the processor count divided by the jobs.
+- **Status** from the last `GI_RESULT` line and the exit code: `baked` + 0 is PASS, `current` + 0
+  is SKIP, exit 12 or `cancelled` is CANCELLED, anything else is FAIL (the error, or the last
+  output lines when there is none). A failed world never stops the run.
+- **Output:** one `GI_BAKE <world> PASS|SKIP|FAIL|CANCELLED` line per world (probes, reflections,
+  bytes, ms, the error), then `GI_BAKE_TOTAL worlds= pass= skip= fail= cancelled= not_run=
+  seconds= report=`.
+- **Report:** `--report` (default `data/gi/bake_report.json`, ignored by git), written
+  atomically: schema 1, start time, duration, binary, edition, selection, quality, force, jobs,
+  threads, output folder, cancelled, totals, pruned files and one entry per world (status, exit,
+  seconds, error and the numeric `GI_RESULT` fields).
+- **Cancellation:** SIGINT and SIGTERM send SIGINT to every running bake (terminate on Windows);
+  bakes exit 12 and write nothing, worlds not yet started are NOT_RUN, the report records the
+  cancel and the script exits 12.
+- `--prune` removes, after a run that was not cancelled, every `.ob2gi` under the output folder
+  whose relative path is no mounted world's `gi_file`, selected or not (`GI_PRUNE` lines, listed
+  in the report).
+- `--list` bakes nothing: `GI_LIST <world> READY|STALE|INVALID|FOREIGN|MISSING|ERROR` from the
+  file's presence and `--gi-verify`'s exit code and `stale` line.
+- `--dry-run` prints each bake command (and `--prune`'s candidates) and runs nothing.
+- Exit 0 (every world PASS or SKIP), 1 (a FAIL), 2 (arguments, binary, listing, selection or
+  report), 12 (cancelled).
+
+### Packaging (`cmake/GiPackaging.cmake`)
+
+- `BLOOD2_GI_DATA_DIR` (default `data/gi/baked`, the script's output) and `BLOOD2_PACKAGE_GI`
+  (default ON; `ci-release` and the CI APK jobs set it OFF).
+- A `CONFIGURE_DEPENDS` glob finds `**/*.ob2gi`; configure prints `Packaged GI files: N`. With
+  none, nothing is added to the build. Otherwise each file is its own `copy_if_different`
+  command and the `blood2_gi_data` target (in ALL, a dependency of the game) holds them, so a new
+  bake is copied by the next build without relinking and an unchanged tree has no work. This
+  replaces the plan's POST_BUILD `copy_directory_if_different`, which runs on every link and
+  cannot leave the empty case free.
+- Destinations keep the `worlds/` subfolders: `<executable folder>/gi` (`$<CONFIG>/gi` with a
+  multi-config generator); Apple bundles take the files as resources at
+  `MACOSX_PACKAGE_LOCATION Resources/gi/…` (`Contents/Resources/gi` on macOS, the bundle root's
+  `gi` on iOS); Android stages them in `<build>/android/assets/gi`, which `blood2_apk` passes as
+  `-Pblood2.assets` and Gradle adds as an optional `assets` source folder (`assets/gi` in the
+  APK, read through SDL I/O's `assets://` base path).
+- Copies are never removed by the build: a file deleted from the data folder stays in an existing
+  build tree until it is cleaned. The runtime picks files by their expected name, so a leftover
+  is reported by F8 but never used for another DAT.
+
+### Decision D3 guard
+
+- `.gitignore` ignores `/data/gi/baked/` and `/data/gi/bake_report.json`; placement and settings
+  stay committed.
+- `cmake/CheckGiPolicy.cmake` (the `gi_policy` test) fails when git tracks a `.ob2gi` file,
+  anything under `data/gi/baked` or the report, or when `.gitignore` stops ignoring them; outside
+  a git checkout it reports a skip.
+- `cmake/PackageCi.cmake` refuses to package when `build/ci/game/gi` exists.
+
+### Tests
+
+**`gi_policy`** The repository check above (verified failing on a tracked `.ob2gi` and on a
+missing ignore rule in a scratch repository).
+
+**`gi_bake_all`** (Unix, Python 3) The script against a stub binary: PASS, FAIL with a quoted
+error, the totals and report, `--gi-if-stale`/`--gi-jobs`/`--log-level` forwarding, a second run
+skipping, `--force`, `--list` (ready, stale with reasons, missing), `--dry-run` running nothing,
+`--prune` keeping unselected worlds' files, an unknown world (exit 2), and SIGINT to the script
+reaching a running bake (exit 12, later worlds NOT_RUN, nothing baked after the cancel).

@@ -2347,3 +2347,10 @@ traversal, translucent layer list, job pool, splitmix64 streams, rejection-sampl
 settings text and `--bake-gi` driver are written for this project; the presets follow the
 [GI plan](gi_plan.md). See
 [contracts](../contracts/gi_contracts.md#bake-scene-and-tracer-lot-g5).
+
+## GI bake-all script and packaging (lot G6, 2026-11-06)
+
+No code is imported. `tools/gi/bake_all.py` (Python standard library), `cmake/GiPackaging.cmake`,
+`cmake/CheckGiPolicy.cmake`, the optional Gradle `assets` folder and the stub-driven test are
+written for this project from the [GI plan](gi_plan.md). See
+[contracts](../contracts/gi_contracts.md#bake-all-script-and-packaging-lot-g6).

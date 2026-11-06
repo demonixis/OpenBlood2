@@ -13,3 +13,6 @@ crash-executable
 /platform/android/.gradle/
 /platform/android/build/
 /platform/android/app/build/
+# Baked GI files are derived from commercial data (gi_contracts.md decision D3): local only.
+/data/gi/baked/
+/data/gi/bake_report.json

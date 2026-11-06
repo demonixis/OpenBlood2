@@ -1004,6 +1004,19 @@ if(BLOOD2_TEST_DATA_DIR)
     set_tests_properties(gi_bake.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
 endif()
 
+# Lot G6: baked GI files never enter the repository (decision D3), and the bake-all script
+# drives a stub binary (the stub is an executable script, hence Unix only).
+add_test(NAME gi_policy COMMAND "${CMAKE_COMMAND}" -DSOURCE=${PROJECT_SOURCE_DIR}
+         -P "${PROJECT_SOURCE_DIR}/cmake/CheckGiPolicy.cmake")
+set_tests_properties(gi_policy PROPERTIES LABELS "headless;gi" TIMEOUT 60
+                     SKIP_REGULAR_EXPRESSION "GI_POLICY skipped")
+find_package(Python3 COMPONENTS Interpreter QUIET)
+if(Python3_Interpreter_FOUND AND NOT WIN32)
+    add_test(NAME gi_bake_all COMMAND "${Python3_EXECUTABLE}" -I "${CMAKE_CURRENT_SOURCE_DIR}/gi_bake_all_test.py"
+             "${PROJECT_SOURCE_DIR}/tools/gi/bake_all.py" "${CMAKE_CURRENT_BINARY_DIR}/gi-bake-all")
+    set_tests_properties(gi_bake_all PROPERTIES LABELS "headless;gi" TIMEOUT 120)
+endif()
+
 if(BLOOD2_BUILD_CLIENT AND BLOOD2_GI_TOOLS)
     add_executable(gi_overlay_tests gi_overlay_tests.cpp ../src/app/gi_overlay.cpp)
     target_link_libraries(gi_overlay_tests PRIVATE blood2_game imgui)

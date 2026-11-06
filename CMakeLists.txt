@@ -40,6 +40,7 @@ set(BLOOD2_DEMO_DATA_DIR "" CACHE PATH "Optional private 1998 Blood II demo dire
 
 include(cmake/ProjectOptions.cmake)
 include(cmake/Packaging.cmake)
+include(cmake/GiPackaging.cmake)
 include(CTest)
 include(cmake/Dependencies.cmake)
 execute_process(COMMAND git describe --always --dirty
@@ -234,6 +235,7 @@ if(BLOOD2_BUILD_CLIENT)
 
     blood2_project_options(blood2_app)
     blood2_package_application(blood2_app)
+    blood2_package_gi(blood2_app)
 endif()
 blood2_project_options(blood2_game)
 

@@ -2,13 +2,13 @@
 
 Drafted 2026-11-06 at `55c640b6`. Nothing is implemented yet. On 2026-11-06
 the user accepted every recommendation in the [decisions](#decisions) table
-(D1–D15) and the defaults. Lots G1 to G5 are done
+(D1–D15) and the defaults. Lots G1 to G6 are done
 ([G1 report](reports/gi_g1_prerequisites.md), [G2 report](reports/gi_g2_file_format.md),
 [G3 report](reports/gi_g3_f8_shell.md), [G4 report](reports/gi_g4_placement.md),
-[G5 report](reports/gi_g5_tracer.md)). On 2026-11-06
+[G5 report](reports/gi_g5_tracer.md), [G6 report](reports/gi_g6_packaging.md)). On 2026-11-06
 the user accepted Gate A as recommended (spacing 128, budget 16,384, cap 42, rooms 192×96, the
 two-level lattice decided in G9) and the 36 single-player placement files are committed in
-`data/gi/placement` (format 2 since G5, with `excluded_models`). G6 is next.
+`data/gi/placement` (format 2 since G5, with `excluded_models`). G7 is next.
 
 ## The request
 

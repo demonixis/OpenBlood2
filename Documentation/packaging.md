@@ -162,6 +162,15 @@ folder is chosen, then the original title and main menu with that choice. The he
 worn, or its proximity sensor paused, for the session to reach FOCUSED; a Guardian dialog
 blocks immersive launches until the boundary is set.
 
+## Baked GI files
+
+Local builds carry the baked GI files of `data/gi/baked` (written by
+`python3 -I tools/gi/bake_all.py`): `gi/` beside the binary, `Resources/gi` in the macOS and
+iOS bundles and `assets/gi` in the APKs. `BLOOD2_GI_DATA_DIR` picks another folder and
+`-DBLOOD2_PACKAGE_GI=OFF` disables the copy; an empty folder adds nothing to the build.
+The files derive from commercial data, so they are never committed and CI packages never
+carry them ([GI contracts](contracts/gi_contracts.md#bake-all-script-and-packaging-lot-g6)).
+
 ## Scope
 
 iOS and Android phones are anticipation: they are verified to build, not to run, and no
