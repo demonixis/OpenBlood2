@@ -1,7 +1,8 @@
 # Global illumination plan (M10: baked GI, light probes and reflection probes)
 
-Drafted 2026-11-06 at `55c640b6`. Nothing is implemented yet. The user answers
-the [decisions](#decisions) before lot G1 starts.
+Drafted 2026-11-06 at `55c640b6`. Nothing is implemented yet. On 2026-11-06
+the user accepted every recommendation in the [decisions](#decisions) table
+(D1–D15) and the defaults; lot G1 is next.
 
 ## The request
 
@@ -338,7 +339,7 @@ generated artifacts.
 
 ## Decisions
 
-| # | Question | Options | Recommendation |
+| # | Question | Options | Recommendation (accepted 2026-11-06) |
 | --- | --- | --- | --- |
 | D1 | What does "GI overrides the lightmaps" mean on world surfaces? | (a) GI pages in the DAT layout: original direct light and shadows plus baked bounce, zero per-frame cost; (b) per-pixel probe sampling in the shaders, as in CyberEngine (per-pixel cost including XR, leaks through thin walls); (c) also re-bake the direct light from Light/DirLight objects. | **(a)**, with the Light probes world source for comparison; (c) as a later option. |
 | D2 | Which renderer gets GI? | (a) GI pages and model probes in both renderers, reflections in ENHANCED only; (b) everything in ENHANCED only. | **(a)**: free on Quest. GI off keeps ORIGINAL byte-identical. |
