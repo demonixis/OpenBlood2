@@ -1,0 +1,77 @@
+{
+  "format": "openblood2-gi-placement",
+  "version": 1,
+  "world": "worlds/01_subwaya.dat",
+  "dat_sha256": "91bc95a10ed80a03b2defdbae94c8705b31183d0c3e86ac9f9c77173099f4873",
+  "light_probes": {
+    "spacing": 128,
+    "budget": 16384,
+    "clearance": 8,
+    "volumes": []
+  },
+  "reflection_probes": {
+    "cap": 42,
+    "probes": [
+      {
+        "auto": true,
+        "capture": [-32, 208, 3488],
+        "influence": {"min": [-192, 32, 896], "max": [128, 384, 6080]},
+        "projection": {"min": [-192, 32, 896], "max": [128, 384, 6080]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [-32, 202.6875, -3856],
+        "influence": {"min": [-192, 32, -5696], "max": [128, 373.3125, -2016]},
+        "projection": {"min": [-192, 32, -5696], "max": [128, 373.3125, -2016]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [-128, 224, -1792],
+        "influence": {"min": [-192, 128, -1904], "max": [128, 256, -624]},
+        "projection": {"min": [-192, 128, -1904], "max": [128, 256, -624]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [-32, 200, 144],
+        "influence": {"min": [-140, 128, -496], "max": [76, 272, 784]},
+        "projection": {"min": [-140, 128, -496], "max": [76, 272, 784]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [-32, 322.6875, -1264],
+        "influence": {"min": [-181.3125, 272, -1920], "max": [117.3125, 373.3125, -608]},
+        "projection": {"min": [-181.3125, 272, -1920], "max": [117.3125, 373.3125, -608]},
+        "blend_distance": 25.328125,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [-32, 322.6875, 144],
+        "influence": {"min": [-181.3125, 272, -512], "max": [117.3125, 373.3125, 800]},
+        "projection": {"min": [-181.3125, 272, -512], "max": [117.3125, 373.3125, 800]},
+        "blend_distance": 25.328125,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      }
+    ]
+  }
+}

@@ -133,6 +133,9 @@ probes, 2.3 s light and 0.5 s reflection time.
 
 ## Gate A: decisions for the user
 
+**Accepted on 2026-11-06 as recommended**, without a separate F8 review: items 1–4 keep the
+defaults, and the 36 single-player files were generated with `--gi-place single` and committed.
+
 1. **Spacing and budget.** Keep 128 / 16,384 (six open worlds coarsen to 160–256), raise the
    default budget (32,768 keeps CDMB and the multiplayer worlds at 128; Airship1 and AncientOne
    would still coarsen), or set per-world budgets in their files (already possible).
@@ -151,7 +154,7 @@ probes, 2.3 s light and 0.5 s reflection time.
 
 ## Not done in G4
 
-- **SubwayA and CityHub have not been reviewed in F8 by the user** (a Gate A criterion). The
+- **SubwayA and CityHub were not reviewed in F8**: the user accepted Gate A from the table. The
   panels and markers are covered by headless ImGui frames and `gi_overlay.retail`, not by a
   hand-driven session in a game window.
 - Per-object bake exclusion in the placement file (decision D8) arrives with the bake scene

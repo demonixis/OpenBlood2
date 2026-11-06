@@ -1,0 +1,27 @@
+{
+  "format": "openblood2-gi-placement",
+  "version": 1,
+  "world": "worlds/credits.dat",
+  "dat_sha256": "096aad962c45d4f2b65caf711d4fc414fad134f48b2955fa1865aae17756feac",
+  "light_probes": {
+    "spacing": 128,
+    "budget": 16384,
+    "clearance": 8,
+    "volumes": []
+  },
+  "reflection_probes": {
+    "cap": 42,
+    "probes": [
+      {
+        "auto": true,
+        "capture": [0, 128, 128],
+        "influence": {"min": [-192, 0, -256], "max": [192, 256, 512]},
+        "projection": {"min": [-192, 0, -256], "max": [192, 256, 512]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      }
+    ]
+  }
+}

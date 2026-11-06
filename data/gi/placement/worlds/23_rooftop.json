@@ -1,0 +1,27 @@
+{
+  "format": "openblood2-gi-placement",
+  "version": 1,
+  "world": "worlds/23_rooftop.dat",
+  "dat_sha256": "4f4c0b5cfc4ce6ac66642ddeb7fc7b3814e59f2ad3318fd5c1fad4c581eb5f18",
+  "light_probes": {
+    "spacing": 128,
+    "budget": 16384,
+    "clearance": 8,
+    "volumes": []
+  },
+  "reflection_probes": {
+    "cap": 42,
+    "probes": [
+      {
+        "auto": true,
+        "capture": [-2048, -5312, -1728],
+        "influence": {"min": [-2176, -5376, -1792], "max": [2048, 960, 6912]},
+        "projection": {"min": [-2176, -5376, -1792], "max": [2048, 960, 6912]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      }
+    ]
+  }
+}

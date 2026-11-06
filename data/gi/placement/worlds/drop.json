@@ -1,0 +1,27 @@
+{
+  "format": "openblood2-gi-placement",
+  "version": 1,
+  "world": "worlds/drop.dat",
+  "dat_sha256": "9de8017918b7fccf53eb831c6d92a9d37359ab188a51762ec5f08228f69c56f8",
+  "light_probes": {
+    "spacing": 128,
+    "budget": 16384,
+    "clearance": 8,
+    "volumes": []
+  },
+  "reflection_probes": {
+    "cap": 42,
+    "probes": [
+      {
+        "auto": true,
+        "capture": [0, 160, 0],
+        "influence": {"min": [-410, 0, -512], "max": [410, 320, 512]},
+        "projection": {"min": [-410, 0, -512], "max": [410, 320, 512]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      }
+    ]
+  }
+}

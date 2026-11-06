@@ -1,0 +1,267 @@
+{
+  "format": "openblood2-gi-placement",
+  "version": 1,
+  "world": "worlds/07_cathedral.dat",
+  "dat_sha256": "7f2f222a3b51244d55f7fb05897aa3748e8bcd5b981b967fb3cc3e1611ac883c",
+  "light_probes": {
+    "spacing": 128,
+    "budget": 16384,
+    "clearance": 8,
+    "volumes": []
+  },
+  "reflection_probes": {
+    "cap": 42,
+    "probes": [
+      {
+        "auto": true,
+        "capture": [0, 1344, -2208],
+        "influence": {"min": [-896, 0, -3264], "max": [896, 2688, -1152]},
+        "projection": {"min": [-896, 0, -3264], "max": [896, 2688, -1152]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [-1536, 1712, -1352],
+        "influence": {"min": [-2432, 736, -2176], "max": [-640, 2688, -528]},
+        "projection": {"min": [-2432, 736, -2176], "max": [-640, 2688, -528]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [-1536, 1712, 328],
+        "influence": {"min": [-2432, 736, -496], "max": [-640, 2688, 1152]},
+        "projection": {"min": [-2432, 736, -496], "max": [-640, 2688, 1152]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [-2176, 2144, -1792],
+        "influence": {"min": [-2432, 1280, -2176], "max": [-1280, 2176, 1152]},
+        "projection": {"min": [-2432, 1280, -2176], "max": [-1280, 2176, 1152]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [-160, 736, 992],
+        "influence": {"min": [-832, 384, 320], "max": [512, 1088, 1664]},
+        "projection": {"min": [-832, 384, 320], "max": [512, 1088, 1664]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [0, 560, -640],
+        "influence": {"min": [-588, 128, -1152], "max": [588, 992, -128]},
+        "projection": {"min": [-588, 128, -1152], "max": [588, 992, -128]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [1536, 840, -1536],
+        "influence": {"min": [1280, 16, -1792], "max": [1792, 1664, -1280]},
+        "projection": {"min": [1280, 16, -1792], "max": [1792, 1664, -1280]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [-2176, 1024, -864],
+        "influence": {"min": [-2368, 736, -896], "max": [-1312, 1248, -128]},
+        "projection": {"min": [-2368, 736, -896], "max": [-1312, 1248, -128]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [2048, 176, -1024],
+        "influence": {"min": [1344, 160, -1728], "max": [2176, 576, -832]},
+        "projection": {"min": [1344, 160, -1728], "max": [2176, 576, -832]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [872, 336, -896],
+        "influence": {"min": [592, 128, -1200], "max": [1152, 544, -592]},
+        "projection": {"min": [592, 128, -1200], "max": [1152, 544, -592]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [768, 1792, -1760],
+        "influence": {"min": [640, 1456, -1792], "max": [1152, 1984, -1280]},
+        "projection": {"min": [640, 1456, -1792], "max": [1152, 1984, -1280]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [-872, 336, -858],
+        "influence": {"min": [-1152, 128, -1152], "max": [-592, 544, -564]},
+        "projection": {"min": [-1152, 128, -1152], "max": [-592, 544, -564]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [1024, 256, -1408],
+        "influence": {"min": [667.4375, 128, -1764.5625], "max": [1152, 416, -1232]},
+        "projection": {"min": [667.4375, 128, -1764.5625], "max": [1152, 416, -1232]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [1024, 640, -1408],
+        "influence": {"min": [667.4375, 480, -1764.5625], "max": [1124.5625, 800, -1307.4375]},
+        "projection": {"min": [667.4375, 480, -1764.5625], "max": [1124.5625, 800, -1307.4375]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [896, 256, -312],
+        "influence": {"min": [640, 128, -560], "max": [1152, 384, -64]},
+        "projection": {"min": [640, 128, -560], "max": [1152, 384, -64]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [0, 472, 1888],
+        "influence": {"min": [-512, 320, 1792], "max": [512, 624, 1984]},
+        "projection": {"min": [-512, 320, 1792], "max": [512, 624, 1984]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [-896, 256, -288],
+        "influence": {"min": [-1152, 128, -512], "max": [-640, 384, -64]},
+        "projection": {"min": [-1152, 128, -512], "max": [-640, 384, -64]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [896, 444, -1610.625],
+        "influence": {"min": [667.4375, 288, -1764.5625], "max": [1124.5625, 600, -1456.625]},
+        "projection": {"min": [667.4375, 288, -1764.5625], "max": [1124.5625, 600, -1456.625]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [1120, 1408, -1440],
+        "influence": {"min": [649.125, 1216, -1672], "max": [1142.875, 1536, -1400]},
+        "projection": {"min": [649.125, 1216, -1672], "max": [1142.875, 1536, -1400]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [-672, 160, -1632],
+        "influence": {"min": [-1142.875, 128, -1672], "max": [-649.125, 336, -1280]},
+        "projection": {"min": [-1142.875, 128, -1672], "max": [-649.125, 336, -1280]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [896, 1448, -1376],
+        "influence": {"min": [760, 1296, -1472], "max": [1032, 1600, -1280]},
+        "projection": {"min": [760, 1296, -1472], "max": [1032, 1600, -1280]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [-1056, 389.75, -1502.6875],
+        "influence": {"min": [-1152, 240, -1605.3125], "max": [-960, 539.4375, -1400]},
+        "projection": {"min": [-1152, 240, -1605.3125], "max": [-960, 539.4375, -1400]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [1664, 1408, -1664],
+        "influence": {"min": [1216, 736, -1792], "max": [1728, 1664, 1984]},
+        "projection": {"min": [1216, 736, -1792], "max": [1728, 1664, 1984]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": false,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [-768, 256, -768],
+        "influence": {"min": [-1152, 128, -1200], "max": [-640, 2688, -640]},
+        "projection": {"min": [-1152, 128, -1200], "max": [-640, 2688, -640]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": false,
+        "resolution": 64
+      },
+      {
+        "auto": true,
+        "capture": [1920, 384, -1024],
+        "influence": {"min": [1408, 160, -3264], "max": [2176, 512, -832]},
+        "projection": {"min": [1408, 160, -3264], "max": [2176, 512, -832]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": false,
+        "resolution": 64
+      }
+    ]
+  }
+}
