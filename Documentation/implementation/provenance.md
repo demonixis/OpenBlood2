@@ -2328,3 +2328,13 @@ expiry console lines. The replacement message font (Dear ImGui default at 16 px)
 the clamped scale index, the world-reset message clear and the non-failing string
 lookup are documented adaptations. No commercial art or strings are imported. See
 [contracts](../contracts/original_hud_contracts.md#objectives-power-bars-and-message-lines-issue-8).
+
+## GI probe placement (lot G4, 2026-11-06)
+
+No code is imported. The reflection-probe fields and F8 labels (influence box, projection box,
+blend distance, priority, box projection, resolution 16–256, default 64) follow the vocabulary
+of CyberEngine's `docs/probes-baking.md` (`../CyberEngine`), as decision 9
+of the [GI plan](gi_plan.md) asks. The lattice, relocation, validity rules, room fitting and the
+JSON/PLAC formats are written for this project. The bounded JSON parser was moved, unchanged
+in behaviour, from the project's own material manifest reader. See
+[contracts](../contracts/gi_contracts.md#probe-placement-lot-g4).

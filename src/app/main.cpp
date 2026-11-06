@@ -1804,6 +1804,9 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --list-worlds       List mounted world DATs with digests and GI file names (--json: JSON)\n"
                      "  --gi-verify FILE    Validate a baked GI file (.ob2gi) against the mounted world\n"
                      "  --gi-dir DIR        First baked GI search directory (also gi_dir= in the config file)\n"
+                     "  --gi-place WORLD    Place GI light and reflection probes for WORLD, single or all; writes\n"
+                     "                      placement files (--gi-reset: ignore existing files, --gi-dry-run, --json)\n"
+                     "  --gi-placement-dir DIR  GI placement files (gi_placement_dir=; default data/gi/placement)\n"
                      "  --world NAME        World resource (default: 01_SubwayA, Demo_01 with --demo)\n"
                      "  --inspect-world     Parse/mount/create original subset headlessly; does not run a game\n"
                      "  --inspect-player    Exercise original shell/player entry headlessly; not playable\n"
@@ -1890,6 +1893,7 @@ static int application_main(const OpenBlood2::Options& options)
     {
         // An ordinary launch without data opens the setup screen; tools and smokes need data.
         const bool tool = options.check_data || options.list_worlds || !options.gi_verify.empty() ||
+                          !options.gi_place.empty() ||
                           options.inspect_world || options.start_game || options.bench ||
                           options.gpu_smoke || options.world_smoke || options.menu_smoke || options.demo_smoke ||
                           options.view_world || !options.host_world.empty() || !options.connect_address.empty();
@@ -1917,6 +1921,8 @@ static int application_main(const OpenBlood2::Options& options)
         return OpenBlood2::run_list_worlds(options, config);
     if (!options.gi_verify.empty())
         return OpenBlood2::run_gi_verify(options, config);
+    if (!options.gi_place.empty())
+        return OpenBlood2::run_gi_place(options, config);
     spdlog::info("External data: {} ({})", OpenBlood2::path_text(config.data_dir), config.source);
     for (const auto& archive : data.archives)
     {

@@ -16,6 +16,7 @@ namespace OpenBlood2
         std::filesystem::path config_file = "blood2.local.ini";
         std::filesystem::path data_dir;
         std::filesystem::path gi_dir; // --gi-dir: first GI bake search root (gi_contracts.md lot G2).
+        std::filesystem::path gi_placement_dir; // --gi-placement-dir: GI placement files (lot G4).
         std::vector<std::filesystem::path> overlays{}; // Explicit, ordered data-only REZ mods.
         std::filesystem::path capture_file;
         std::filesystem::path log_dir;
@@ -49,9 +50,11 @@ namespace OpenBlood2
         bool xr_test = false;  // OpenXR first light (BLOOD2_XR builds); needs no game data.
         bool xr_world = false; // Direct world entry rendered in an OpenXR session (BLOOD2_XR builds).
         bool check_data = false;
-        // GI tools (gi_contracts.md lot G2): --list-worlds [--json], --gi-verify FILE.
-        bool list_worlds = false, json = false;
+        // GI tools (gi_contracts.md lots G2, G4): --list-worlds [--json], --gi-verify FILE,
+        // --gi-place WORLD|single|all [--gi-reset] [--gi-dry-run] [--json].
+        bool list_worlds = false, json = false, gi_reset = false, gi_dry_run = false;
         std::filesystem::path gi_verify;
+        std::string gi_place;
         bool inspector = true;
         bool gpu_smoke = false;
         bool world_smoke = false;
@@ -81,6 +84,9 @@ namespace OpenBlood2
         bool nightmares = false;
         std::vector<std::filesystem::path> overlays{};
         std::filesystem::path gi_dir{}; // --gi-dir, else gi_dir= (relative to the ini); empty when neither.
+        // --gi-placement-dir, else gi_placement_dir= (relative to the ini); empty selects
+        // user_directory()/gi/placement.
+        std::filesystem::path gi_placement_dir{};
     };
     // Original first single-player level: ClientShellDLL sFirstLevel (_DEMO "Demo_01").
     inline const char* first_level(bool demo)

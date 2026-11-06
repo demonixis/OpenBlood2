@@ -58,6 +58,13 @@ Preserve the paused-solo retention on Back, one server per process, Esc/B only o
 active fields, released play keys, the refused 27889 gameplay port, UTF-8-safe host
 names and the dedicated server's `--no-lan`.
 
+The [GI plan](Documentation/implementation/gi_plan.md) (M10, [contracts](Documentation/contracts/gi_contracts.md))
+has lots G1–G4: world queries, the `.ob2gi` file and keys, the F8 overlay and probe placement
+(`--gi-place`, canonical `data/gi/placement/<world>.json`, F8 editing). Nothing renders GI yet.
+Preserve canonical placement bytes, the strict bounded reader, untouched Foreign/Failed files,
+a derived (never stored) light lattice and scratch placement directories in tests. Gate A
+(placement review) awaits the user.
+
 The [desktop third-person camera](Documentation/contracts/camera_contracts.md) adds a rebindable C toggle,
 actual player/held models and centred aim convergence. Preserve unchanged eye/shot/movement state,
 special-camera priority, temporary first-person zoom/tight-space fallback and the XR refusal.

@@ -279,7 +279,8 @@ namespace
         return true;
     }
 
-    // GI lot G2: gi_dir= / --gi-dir and the --list-worlds / --gi-verify tools.
+    // GI lots G2/G4: gi_dir= / --gi-dir, gi_placement_dir= and the --list-worlds / --gi-verify /
+    // --gi-place tools.
     bool gi(const fs::path& root)
     {
         Options options;
@@ -321,6 +322,54 @@ namespace
         CHECK(load_config(options, "", config, error) && config.gi_dir.empty());
         for (const auto text : {"data_dir = data\ngi_dir =\n", "data_dir = data\ngi_dir = a\ngi_dir = b\n",
                                 "data_dir = data\nGI_DIR = a\n", "data_dir = data\ngi_dir = \"broken\n"})
+        {
+            CHECK(write(options.config_file, text));
+            CHECK(!load_config(options, "", config, error));
+        }
+
+        // GI lot G4: --gi-place, its modifiers and gi_placement_dir= / --gi-placement-dir.
+        options = {};
+        const std::array<std::string_view, 6> place{"--gi-place", "all",    "--gi-reset",
+                                                    "--gi-dry-run", "--json", "--gi-placement-dir"};
+        CHECK(!parse_options(place, options, error)); // --gi-placement-dir needs a value.
+        const std::array<std::string_view, 7> place_dir{"--gi-place", "all",    "--gi-reset",         "--gi-dry-run",
+                                                        "--json",     "--gi-placement-dir", "placements"};
+        options = {};
+        CHECK(parse_options(place_dir, options, error));
+        CHECK(options.gi_place == "all" && options.gi_reset && options.gi_dry_run && options.json);
+        CHECK(path_text(options.gi_placement_dir) == "placements" && options.log_level == "error");
+        for (const auto& args : std::initializer_list<std::vector<std::string_view>>{
+                 {"--gi-place"},
+                 {"--gi-reset"},
+                 {"--gi-dry-run"},
+                 {"--gi-reset", "--list-worlds"},
+                 {"--gi-place", "all", "--list-worlds"},
+                 {"--gi-place", "all", "--gi-verify", "a.ob2gi"},
+                 {"--gi-place", "all", "--world", "02_CityHub"},
+                 {"--gi-place", "single", "--view-world"},
+                 {"--gi-place", "all", "--bench"}})
+        {
+            options = {};
+            CHECK(!parse_options(args, options, error));
+        }
+        options = {};
+        const std::array<std::string_view, 3> separate{"--gi-place", "all", "--list-worlds"};
+        CHECK(!parse_options(separate, options, error));
+        CHECK(error == "--list-worlds, --gi-verify and --gi-place are separate headless tools");
+
+        options = {};
+        options.config_file = root / "config.ini";
+        options.explicit_config = true;
+        CHECK(write(options.config_file, "data_dir = data\ngi_placement_dir = placements\ngi_dir = bakes\n"));
+        CHECK(load_config(options, "", config, error));
+        CHECK(config.gi_placement_dir == root / "placements" && config.gi_dir == root / "bakes");
+        options.gi_placement_dir = root / "from-command-line";
+        CHECK(load_config(options, "", config, error) && config.gi_placement_dir == options.gi_placement_dir);
+        options.gi_placement_dir.clear();
+        CHECK(write(options.config_file, "data_dir = data\n"));
+        CHECK(load_config(options, "", config, error) && config.gi_placement_dir.empty());
+        for (const auto text : {"data_dir = data\ngi_placement_dir =\n",
+                                "data_dir = data\ngi_placement_dir = a\ngi_placement_dir = b\n"})
         {
             CHECK(write(options.config_file, text));
             CHECK(!load_config(options, "", config, error));

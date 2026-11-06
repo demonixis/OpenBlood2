@@ -33,6 +33,7 @@ add_library(engine_core STATIC
     src/engine/properties.cpp
     src/engine/sky_projection.cpp
     src/engine/surface_materials.cpp
+    src/engine/bounded_json.cpp
     src/engine/surface_report.cpp
     src/engine/normal_maps.cpp
     src/engine/light_grid.cpp
@@ -73,6 +74,7 @@ add_library(engine_core STATIC
     src/engine/visibility.cpp
     src/engine/gi_world.cpp
     src/engine/gi_file.cpp
+    src/engine/gi_placement.cpp
     src/engine/container.cpp
     src/engine/world_model.cpp
     src/engine/logging.cpp
@@ -86,6 +88,11 @@ add_library(engine_core STATIC
 )
 target_include_directories(engine_core PUBLIC src src/game/legacy PRIVATE "${PROJECT_BINARY_DIR}/generated")
 target_link_libraries(engine_core PUBLIC SDL3::SDL3 blood2_startup PRIVATE spdlog::spdlog)
+# GI tool builds default placement files to the checkout's committed data/gi (gi_contracts.md lot G4).
+if(BLOOD2_GI_TOOLS)
+    set_property(SOURCE src/engine/gi_placement.cpp APPEND PROPERTY COMPILE_DEFINITIONS
+                 "BLOOD2_GI_PROJECT_DIR=\"${PROJECT_SOURCE_DIR}/data/gi\"")
+endif()
 blood2_project_options(engine_core)
 
 if(BLOOD2_BUILD_CLIENT)

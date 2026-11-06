@@ -28,8 +28,10 @@ namespace OpenBlood2
             return value;
         }
 
-        // Keys: data_dir and gi_dir (GI bake directory, gi_contracts.md lot G2), each at most once.
-        bool read_config(const fs::path& path, fs::path& data_dir, fs::path& gi_dir, std::string& error)
+        // Keys: data_dir, gi_dir (GI bake directory, gi_contracts.md lot G2) and gi_placement_dir
+        // (GI placement files, lot G4), each at most once.
+        bool read_config(const fs::path& path, fs::path& data_dir, fs::path& gi_dir, fs::path& gi_placement_dir,
+                         std::string& error)
         {
             std::error_code ec;
             const auto bytes = fs::file_size(path, ec);
@@ -44,7 +46,7 @@ namespace OpenBlood2
                 error = "Cannot open configuration: " + path_text(path);
                 return false;
             }
-            bool seen_data = false, seen_gi = false;
+            bool seen_data = false, seen_gi = false, seen_placement = false;
             std::string line;
             unsigned line_number = 0;
             while (std::getline(file, line))
@@ -55,8 +57,10 @@ namespace OpenBlood2
                     continue;
                 const auto equals = text.find('=');
                 const auto key = equals == std::string_view::npos ? std::string_view{} : trim(text.substr(0, equals));
-                const bool is_data = key == "data_dir", is_gi = key == "gi_dir";
-                if ((!is_data && !is_gi) || (is_data && seen_data) || (is_gi && seen_gi))
+                const bool is_data = key == "data_dir", is_gi = key == "gi_dir",
+                           is_placement = key == "gi_placement_dir";
+                if ((!is_data && !is_gi && !is_placement) || (is_data && seen_data) || (is_gi && seen_gi) ||
+                    (is_placement && seen_placement))
                 {
                     error = "Unknown, malformed or duplicate configuration key at line " + std::to_string(line_number);
                     return false;
@@ -71,8 +75,8 @@ namespace OpenBlood2
                     error = "Invalid " + std::string(key) + " at line " + std::to_string(line_number);
                     return false;
                 }
-                (is_data ? data_dir : gi_dir) = path_from_utf8(value);
-                (is_data ? seen_data : seen_gi) = true;
+                (is_data ? data_dir : is_gi ? gi_dir : gi_placement_dir) = path_from_utf8(value);
+                (is_data ? seen_data : is_gi ? seen_gi : seen_placement) = true;
             }
             if (file.bad())
             {
@@ -212,6 +216,10 @@ namespace OpenBlood2
                 options.list_worlds = true;
             else if (arg == "--json")
                 options.json = true;
+            else if (arg == "--gi-reset")
+                options.gi_reset = true;
+            else if (arg == "--gi-dry-run")
+                options.gi_dry_run = true;
             else if (arg == "--no-inspector")
                 options.inspector = false;
             else if (arg == "--no-crash-capture")
@@ -310,6 +318,7 @@ namespace OpenBlood2
                 options.bench_height = h;
             }
             else if (arg == "--data-dir" || arg == "--gi-dir" || arg == "--gi-verify" || arg == "--config" ||
+                     arg == "--gi-place" || arg == "--gi-placement-dir" ||
                      arg == "--frames" || arg == "--capture" || arg == "--world" || arg == "--log-dir" ||
                      arg == "--log-level" || arg == "--rez" ||
                      arg == "--connect" || arg == "--host" || arg == "--port" || arg == "--name" || arg == "--end" ||
@@ -405,6 +414,10 @@ namespace OpenBlood2
                     options.gi_dir = path_from_utf8(args[i]);
                 else if (arg == "--gi-verify")
                     options.gi_verify = path_from_utf8(args[i]);
+                else if (arg == "--gi-place")
+                    options.gi_place = args[i];
+                else if (arg == "--gi-placement-dir")
+                    options.gi_placement_dir = path_from_utf8(args[i]);
                 else if (arg == "--capture")
                     options.capture_file = path_from_utf8(args[i]);
                 else if (arg == "--config")
@@ -431,19 +444,26 @@ namespace OpenBlood2
             }
         }
         const bool network = !options.host_world.empty() || !options.connect_address.empty();
-        const bool gi_tool = options.list_worlds || !options.gi_verify.empty();
-        if (options.json && !options.list_worlds)
+        const bool gi_place = !options.gi_place.empty();
+        const bool gi_tool = options.list_worlds || !options.gi_verify.empty() || gi_place;
+        if (options.json && !options.list_worlds && !gi_place)
         {
-            error = "--json requires --list-worlds";
+            error = "--json requires --list-worlds or --gi-place";
+            return false;
+        }
+        if ((options.gi_reset || options.gi_dry_run) && !gi_place)
+        {
+            error = "--gi-reset and --gi-dry-run require --gi-place";
             return false;
         }
         if (gi_tool &&
-            ((options.list_worlds && !options.gi_verify.empty()) || network || explicit_world || options.check_data ||
+            (int(options.list_worlds) + int(!options.gi_verify.empty()) + int(gi_place) > 1 || network ||
+             explicit_world || options.check_data ||
              options.inspect_world || options.start_game || options.bench || options.view_world ||
              options.menu_smoke || options.demo_smoke || options.gpu_smoke || options.world_smoke ||
              options.xr_world || options.xr_test || options.frame_limit || !options.capture_file.empty()))
         {
-            error = "--list-worlds and --gi-verify are separate headless tools";
+            error = "--list-worlds, --gi-verify and --gi-place are separate headless tools";
             return false;
         }
         // JSON owns standard output: only errors reach the console unless a level is chosen.
@@ -578,7 +598,7 @@ namespace OpenBlood2
         }
         if (exists)
         {
-            if (!read_config(options.config_file, config.data_dir, config.gi_dir, error))
+            if (!read_config(options.config_file, config.data_dir, config.gi_dir, config.gi_placement_dir, error))
                 return false;
             if (!config.data_dir.empty() && config.data_dir.is_relative())
             {
@@ -586,6 +606,8 @@ namespace OpenBlood2
             }
             if (!config.gi_dir.empty() && config.gi_dir.is_relative())
                 config.gi_dir = options.config_file.parent_path() / config.gi_dir;
+            if (!config.gi_placement_dir.empty() && config.gi_placement_dir.is_relative())
+                config.gi_placement_dir = options.config_file.parent_path() / config.gi_placement_dir;
             config.source = path_text(options.config_file);
         }
         if (!environment_data_dir.empty())
@@ -600,6 +622,8 @@ namespace OpenBlood2
         }
         if (!options.gi_dir.empty())
             config.gi_dir = options.gi_dir;
+        if (!options.gi_placement_dir.empty())
+            config.gi_placement_dir = options.gi_placement_dir;
         if (config.data_dir.empty())
         {
             if (unconfigured)

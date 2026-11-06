@@ -1,4 +1,5 @@
-// GI lot G3: the F8 overlay's gizmo, status lookup and headless ImGui drawing (gi_contracts.md).
+// GI lots G3/G4: the F8 overlay's gizmos, status lookup, placement editing and headless ImGui drawing
+// (gi_contracts.md).
 #include "app/gi_overlay.h"
 #include "engine/config.h"
 #include "game/server_adapter.h"
@@ -87,6 +88,116 @@ namespace
         for (int i = 0; i < 2; ++i) // Auto-sized windows are measured, hidden, on their first frame.
             frame.run([&] { closed = tools.draw(input, game, config, gizmos); });
         CHECK(!closed && ImGui::GetDrawData()->TotalVtxCount > 0);
+        // Every panel draws without a world; the placement is not editable.
+        input.gi = GiOverlay::Open;
+        for (const auto panel : {GiTools::Panel::Status, GiTools::Panel::Runtime, GiTools::Panel::LightProbes,
+                                 GiTools::Panel::ReflectionProbes, GiTools::Panel::Bake})
+        {
+            tools.select = panel;
+            frame.run([&] { closed = tools.draw(input, game, config, gizmos); });
+            CHECK(!closed && !tools.select && ImGui::GetDrawData()->TotalVtxCount > 0);
+        }
+        CHECK(!tools.placement().edit && gizmos.empty());
+        CHECK(!tools.place_light_probes() && !tools.add_reflection({}) && !tools.save_placement());
+        return true;
+    }
+
+    std::size_t count_color(const std::vector<LineVertex>& lines, std::array<float, 4> color)
+    {
+        std::size_t n = 0;
+        for (const auto& v : lines)
+            n += v.color == color;
+        return n;
+    }
+
+    // Private, after `retail`: 01_SubwayA's placement in a scratch --gi-placement-dir. Missing gives
+    // the defaults (1,031 probes, as the audit), edits stay unsaved until Save, a foreign file waits
+    // for "Start from defaults", and edits survive closing and reopening the overlay.
+    bool placement(GameSession& game, Config& config, const std::filesystem::path& scratch)
+    {
+        config.gi_placement_dir = scratch / "placement";
+        GiTools tools;
+        tools.refresh(game, config);
+        const auto& p = tools.placement();
+        CHECK(p.status == GiPlacementStatus::Missing && p.edit && !p.dirty && p.error.empty());
+        CHECK(p.stats.probes == 1031 && p.lattice.spacing == 128 && p.lattice.probes.size() == 1031);
+        CHECK(p.directory == config.gi_placement_dir && !p.rejected.empty());
+        const auto at = p.lattice.probes.front().position;
+        std::vector<LineVertex> lines;
+        tools.placement_gizmos(at, lines);
+        const auto probes = lines.size();
+        CHECK(probes > 0 && probes % 6 == 0 && probes <= GiTools::max_probe_markers * 6);
+        tools.show_rejected = true;
+        lines.clear();
+        tools.placement_gizmos(p.rejected.front().position, lines);
+        CHECK(count_color(lines, {1, .2f, 1, 1}) >= 6); // At least the rejected node itself.
+        tools.show_rejected = false;
+
+        // A manual reflection probe at the first probe; Save writes the canonical file.
+        CHECK(tools.add_reflection(at));
+        CHECK(p.edit->reflections.size() == 1 && !p.edit->reflections[0].automatic && p.dirty);
+        CHECK(tools.selected_reflection == 0 && p.edit->reflections[0].projection.contains(at));
+        lines.clear();
+        tools.placement_gizmos(at, lines);
+        CHECK(lines.size() == probes + 2 * 24 + 6 && count_color(lines, {1, 1, .2f, 1}) == 24 + 6);
+        CHECK(tools.save_placement() && p.status == GiPlacementStatus::Ready && !p.dirty);
+        const auto file = config.gi_placement_dir / "worlds" / "01_subwaya.json";
+        CHECK(std::filesystem::exists(file));
+        CHECK(!tools.move_reflection(0, {1e5f, 1e5f, 1e5f}) && !p.detail.empty()); // Void: refused, unchanged.
+        CHECK(!p.dirty && p.edit->reflections.size() == 1);
+
+        // Automatic placement keeps the manual probe first; deleting marks the placement dirty.
+        CHECK(tools.place_reflection_probes() && p.dirty);
+        const auto placed = p.edit->reflections.size();
+        CHECK(placed > 1 && placed <= 42 && !p.edit->reflections[0].automatic && p.stats.manual == 1);
+        CHECK(p.edit->reflections[1].automatic && p.stats.automatic == placed - 1);
+        tools.delete_reflection(0);
+        CHECK(p.edit->reflections.size() == placed - 1 && tools.selected_reflection == -1);
+
+        // An exclude volume at the first probe removes nodes; deleting it restores the lattice.
+        tools.add_volume(false, at);
+        CHECK(p.edit->volumes.size() == 1 && p.stats.excluded > 0 && p.stats.probes < 1031 && p.error.empty());
+        tools.delete_volume(0);
+        CHECK(p.edit->volumes.empty() && p.stats.probes == 1031 && p.stats.excluded == 0);
+
+        // Revert drops edits; reset gives defaults (unsaved).
+        tools.revert_placement();
+        CHECK(p.status == GiPlacementStatus::Ready && !p.dirty && p.edit->reflections.size() == 1);
+        tools.reset_placement();
+        CHECK(p.dirty && p.edit->reflections.empty() && p.stats.probes == 1031);
+        tools.revert_placement();
+
+        // Every panel draws with the placement loaded.
+        MenuInput input;
+        input.gi = GiOverlay::Open;
+        Frame frame;
+        for (const auto panel : {GiTools::Panel::LightProbes, GiTools::Panel::ReflectionProbes})
+        {
+            tools.select = panel;
+            frame.run([&] { tools.draw(input, game, config, lines); });
+            CHECK(ImGui::GetDrawData()->TotalVtxCount > 0);
+        }
+
+        // Unsaved edits survive closing and reopening the overlay.
+        tools.add_volume(true, at);
+        CHECK(p.dirty && p.edit->volumes.size() == 1);
+        input.gi = GiOverlay::Closed;
+        frame.run([&] { tools.draw(input, game, config, lines); });
+        input.gi = GiOverlay::Open;
+        frame.run([&] { tools.draw(input, game, config, lines); });
+        CHECK(p.dirty && p.edit->volumes.size() == 1);
+        tools.revert_placement();
+
+        // A file made for another DAT is Foreign: nothing to edit until "Start from defaults".
+        auto foreign = *p.edit;
+        foreign.world[0] ^= 1;
+        std::string error;
+        CHECK(save_gi_placement(config.gi_placement_dir, foreign, error));
+        tools.revert_placement();
+        CHECK(p.status == GiPlacementStatus::Foreign && !p.edit && !p.detail.empty());
+        tools.reset_placement();
+        CHECK(p.edit && p.dirty && p.status == GiPlacementStatus::Foreign && p.edit->world != foreign.world);
+        CHECK(tools.save_placement() && p.status == GiPlacementStatus::Ready);
         return true;
     }
 
@@ -124,11 +235,13 @@ namespace
         MenuInput input;
         input.gi = GiOverlay::Open;
         std::vector<LineVertex> gizmos;
-        Frame frame;
-        frame.run([&] { tools.draw(input, game, config, gizmos); });
-        CHECK(ImGui::GetDrawData()->TotalVtxCount > 0);
+        {
+            Frame frame; // One ImGui context at a time: `placement` makes its own.
+            frame.run([&] { tools.draw(input, game, config, gizmos); });
+            CHECK(ImGui::GetDrawData()->TotalVtxCount > 0);
+        }
         CHECK(gizmos.empty()); // No player: no camera, no cell.
-        return Testing::remove_scratch_dir(scratch);
+        return placement(game, config, scratch) && Testing::remove_scratch_dir(scratch);
     }
 } // namespace
 

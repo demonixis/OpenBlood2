@@ -11,4 +11,9 @@ namespace OpenBlood2
     // world. Exit 0 (ready), 2 (arguments, data, unreadable file), 4 (invalid, stale or foreign),
     // 5 (its world is not mounted or cannot be read).
     int run_gi_verify(const Options&, const Config&);
+    // --gi-place WORLD|single|all (lot G4): places light and reflection probes and writes the placement
+    // file of each world (existing settings, volumes and manual probes are kept unless --gi-reset;
+    // --gi-dry-run writes nothing). Exit 0, 2 (arguments, data, directory), 4 (a placement failed or an
+    // existing file is invalid or foreign), 5 (a world cannot be read).
+    int run_gi_place(const Options&, const Config&);
 } // namespace OpenBlood2

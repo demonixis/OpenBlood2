@@ -6,6 +6,7 @@ GI is not rendered yet: nothing in this contract changes a frame, a save or the 
 - [World queries (lot G1)](#world-queries-lot-g1)
 - [Baked file and keys (lot G2)](#baked-file-and-keys-lot-g2)
 - [F8 overlay (lot G3)](#f8-overlay-lot-g3)
+- [Probe placement (lot G4)](#probe-placement-lot-g4)
 
 ## World queries (lot G1)
 
@@ -330,7 +331,8 @@ while it is closed, and no GI is applied by it.
 ### Panels
 
 Panels use CyberEngine's vocabulary: Status, Runtime, Light probes, Reflection probes, Bake.
-Only Status works in G3; the others name the lot that brings them (G8, G4, G4, G10).
+Status works since G3 and the two probe panels since [G4](#f8-placement-editing); Runtime and Bake
+name the lot that brings them (G8, G10).
 
 **Status** shows, truthfully:
 - the summary: no world, error, no baked file, a stale file with its reasons, a refused/foreign
@@ -371,3 +373,223 @@ Pinned draw without a world.
 
 **`gi_overlay.retail`** (private data) 01_SubwayA through `--gi-dir`: no baked file, stale
 (albedo), then ready and chosen; the Open window draws its table.
+
+## Probe placement (lot G4)
+
+`engine/gi_placement.{h,cpp}` places the light and reflection probes a bake will use. A
+placement file holds only the editable inputs; the light-probe lattice is derived from the file
+and the world, deterministically, so the file stays small and reviewable. Nothing is baked or
+rendered from it yet (G5, G8).
+
+### Placement file
+
+One canonical JSON file per world, `<normalized world path without .dat>.json` (for example
+`worlds/01_subwaya.json`), in the placement directory:
+
+1. `--gi-placement-dir DIR`, else `gi_placement_dir = DIR` in the configuration file (relative to
+   that file, at most once, like `gi_dir`);
+2. in GI tool builds, the checkout's `data/gi/placement` when `data/gi` exists (decision 8; the
+   path is compiled in as `BLOOD2_GI_PROJECT_DIR`);
+3. `user_directory()/gi/placement`.
+
+```json
+{
+  "format": "openblood2-gi-placement",
+  "version": 1,
+  "world": "worlds/01_subwaya.dat",
+  "dat_sha256": "<64 lowercase hex digits>",
+  "light_probes": {
+    "spacing": 128,
+    "budget": 16384,
+    "clearance": 8,
+    "volumes": [
+      {"mode": "exclude", "min": [x, y, z], "max": [x, y, z]}
+    ]
+  },
+  "reflection_probes": {
+    "cap": 42,
+    "probes": [
+      {
+        "auto": true,
+        "capture": [x, y, z],
+        "influence": {"min": [x, y, z], "max": [x, y, z]},
+        "projection": {"min": [x, y, z], "max": [x, y, z]},
+        "blend_distance": 32,
+        "priority": 0,
+        "box_projection": true,
+        "resolution": 64
+      }
+    ]
+  }
+}
+```
+
+- **Writer** (`write_gi_placement`): fixed key order and layout, shortest round-trip floats,
+  `-0` written as `0`. The same placement always gives the same bytes. Saves are atomic; the
+  previous file survives any failure.
+- **Reader** (`read_gi_placement`): at most 256 KiB, nesting 6, 8,192 values, strings of 256
+  bytes (the shared bounded parser `engine/bounded_json.{h,cpp}`, also used by the material
+  manifest). Every key exactly once, no unknown key, then `validate_gi_placement`. Output is
+  untouched on failure.
+- **Limits:** a normalized `.dat` world path without `"`, `\` or control characters (at most
+  128 bytes); spacing a multiple of 8 in [32, 1024]; budget [1, 262144]; clearance [0, 64];
+  at most 256 volumes; boxes with min < max on every axis and coordinates within 1e6; cap
+  [0, 42] and no more probes than the cap; capture inside the projection box; blend [0, 1024];
+  priority [−1000, 1000]; resolution a power of two in [16, 256].
+- **Statuses** (`load_gi_placement`): Missing (no file), Ready, Foreign (valid but made for
+  another world path or DAT digest; the detail names it) and Failed (unreadable or invalid).
+  A Foreign or Failed file is never replaced implicitly.
+- **Placement hash** (`gi_placement_hash`): SHA-256 of the canonical text followed by
+  `placement_algorithm 1\n`; the `.ob2gi` placement key. `gi_placement_algorithm` is bumped
+  whenever the same file and world would resolve to different probes.
+
+### Light probes
+
+`GiPlacementScene::build` keeps references to the world and its primary collision (both must
+outlive it and stay unchanged). `classify(point, clearance)` decides a probe point, in order:
+
+1. the root BSP must say Empty: Solid (or void) gives **Solid**, an undecidable or invalid
+   query **Unknown**;
+2. a cube of half-size `clearance` must meet no primary collision face (`point_clear`), else
+   **Clearance**;
+3. Mover, Destructible and Unbound world models (doors, breakables, crates) whose bounds, grown
+   by the clearance, contain the point: a model without a BSP tree, a point not Empty in the
+   model's own tree, or a clearance-cube corner Solid there gives **WorldModel**. Containers
+   and sky models never block.
+
+`resolve_light_probes`:
+
+- **Lattice:** nodes on multiples of the spacing over the primary model's point bounds:
+  `origin = floor(min/s)·s`, `dims = floor((max − origin)/s) + 1` per axis, node index
+  `x + nx·(y + ny·z)`, at most 16 M nodes.
+- **Volumes:** a node or relocation target inside an exclude box, or outside every include box
+  when any exists, is **Excluded**.
+- **Relocation:** an invalid node tries the 26 neighbour offsets at s/4 then at 3s/8, nearest
+  first (stable), and takes the first valid, non-excluded one. A node rejected for Clearance or
+  WorldModel (empty space) must also see its target (no primary face on the segment); a Solid
+  or Unknown node moves without that test. Relocated probes are flagged.
+- **Budget:** over the budget, the spacing grows along ×1.25, ×1.5, ×1.75, ×2, ×2.5, ×3, ×4
+  (rounded to multiples of 8; counting stops at budget + 1). Each tried spacing is reported
+  with its count. Still over at ×4 is a failure.
+- **Stats:** every node of the final lattice is exactly one of probe (kept or relocated),
+  excluded, solid, unknown, clearance or world model. Unknown, Clearance and WorldModel nodes
+  are also returned for the F8 markers.
+
+Accepted risk: relocation can cross a wall thinner than s/4 from a solid node (no visibility
+test there); wall nodes are the common case, so most relocated probes move into the room.
+
+### Reflection probes
+
+`fit_room(point)` casts six axis rays against the primary collision faces, limited to the
+world bounds. A hit within 1e-3 of the bounds limit counts as the outer wall (enclosed); a miss
+marks the room **open**. Closed doors (Mover models at the authored pose) crossing a ray
+shorten it to their bounds. Faces are rounded to 1/16 unit.
+
+`place_reflection_probes` replaces the automatic probes and keeps the manual ones first:
+
+- candidates are rooms fitted around the lattice probes (a stride keeps at most 4,096);
+- rooms narrower than 192 units (x or z) or lower than 96 units (y) are **small** and skipped;
+- the rest are ranked enclosed first, then by volume (largest first), then by probe order;
+- a room overlapping an accepted probe (manual, or of the same kind, enclosed or open) by more
+  than half of the smaller volume is **overlapping**; beyond the cap it is **capped** but still
+  counts against later duplicates;
+- an accepted room becomes a probe whose influence and projection boxes are the room, with
+  `blend_distance = min(32, smallest extent / 4)`, priority 0, resolution 64 and box projection
+  only when enclosed. Its capture point is the room centre (rounded to 1/16) when that point
+  passes `classify` with the placement clearance and is visible from the seed, else the seed.
+
+`fit_reflection_probe(point)` builds one manual probe the same way around any point whose root
+contents are Empty and refuses solid or void capture points.
+
+### Placement section
+
+`encode/decode_gi_placement_section` define the `.ob2gi` PLAC payload (version 1, little-endian)
+that G5 will write: `u32 version, u32 spacing, f32 origin[3], u32 dims[3], u32 count`, then per
+light probe `u32 node, f32 position[3], u32 flags` (bit 0 relocated), then `u32 count` and per
+reflection probe 76 bytes: capture, influence min/max, projection min/max (f32×3 each), `f32
+blend, i32 priority, u32 resolution, u32 flags` (bit 0 box projection, bit 1 automatic).
+Decoding refuses descending or out-of-lattice nodes, a probe farther than 3s/8 from its node, an
+unrelocated probe away from it, invalid reflection probes and trailing bytes.
+
+### `--gi-place`
+
+`--gi-place WORLD|single|all` (a name such as `01_SubwayA`, a resource path, the single-player
+worlds or every mounted world, in `--list-worlds` order) loads each world, reads its placement
+(Missing gives the defaults), resolves the light probes, re-places the automatic reflection
+probes and writes the canonical file when its bytes change.
+
+- `--gi-reset` ignores existing files (a Foreign or Failed file otherwise fails that world with
+  "(--gi-reset replaces it)"); `--gi-dry-run` writes nothing; `--json` prints one object
+  (`directory`, `worlds[]`) and lowers the console log level like `--list-worlds`.
+- One `GI_PLACE <path> status=written|unchanged|dry-run|failed` line per world with the
+  spacing, the lattice counts by reason, the reflection counts (`reflections`, `manual`,
+  `open`, `rooms`, `small_rooms`, `overlapping`, `capped`), `light_ms`, `reflection_ms` and the
+  file; a failure adds its detail.
+- Exit 0, 2 (arguments, data, directory or an unmounted world), 4 (a placement failed), 5 (a DAT
+  cannot be read). It is a separate headless tool: it refuses `--list-worlds`, `--gi-verify`,
+  `--world`, `--frames`, `--capture`, `--bench` and every other execution mode.
+
+### F8 placement editing
+
+The overlay loads the current world's placement when the world path or revision changes (not
+when it reopens) and resolves the lattice; unsaved edits survive closing the overlay and a
+reload of the same DAT. Missing gives the defaults; Foreign and Failed leave nothing to edit
+until **Start from defaults**, which replaces the file only when saved.
+
+- **Shared header:** directory, status, Dirty ("unsaved edits"), the last message, a live
+  validation line, **Save** (refused while the light probes do not resolve), **Revert** and
+  **Reset to defaults**.
+- **Light probes:** spacing, budget and clearance (applied on Enter or the step buttons,
+  re-resolving the lattice), **Place light probes**, the counts, rejections by reason and
+  over-budget spacings, the resolve time, marker switches and radius, and the volume list
+  (**Add include/exclude at camera**: a 512-unit box; type switch, box drag, delete). Box drags
+  re-resolve when released.
+- **Reflection probes:** the cap (lowering it drops the last automatic probes), **Place
+  automatically**, **Add at camera**, the last placement's counts, a selectable list and, for
+  the selected probe, **Move to camera** and **Fit to room** (refit, keeping priority,
+  resolution, box projection and blend), **Delete**, capture, influence and projection drags,
+  blend, priority, box projection and the resolution (16–256). Any edit makes the probe manual
+  and moves it among the manual probes.
+- Every edit sets Dirty; Save writes the canonical file and sets Ready.
+- **Markers** (Open and Pinned, in a world): light probes as 16-unit crosses (green kept, yellow
+  relocated) and, when shown, rejected nodes (magenta), within the marker radius (default 1,536)
+  and at most 4,096 together; volumes (green include, red exclude); reflection probes (orange
+  influence, blue projection, white capture; the selected influence and capture yellow). The
+  Pinned strip and the Status panel add the placement summary.
+
+### Tests
+
+**`gi_placement.lattice`** Synthetic 1024×256×1024 room: 9×3×9 nodes, 243 probes (194
+relocated); exclude and include boxes; clearance 64 rejects wall nodes; budget 100 moves to
+spacing 160 and reports `{128, 101}`; budget 1 fails.
+
+**`gi_placement.world_models`** A door block inside the room: WorldModel (inside and within
+the clearance), Clearance, Solid and Unknown classifications, one WorldModel and two Clearance
+rejections, a probe moved off the door face; containers and sky never block, an unbound model
+does; a world without a primary tree is refused.
+
+**`gi_placement.reflections`** An exact enclosed room box; one probe at the centre with 242
+overlapping candidates and its defaults; a manual probe kept first and suppressing the room;
+cap 0 caps it; a door ends a room; a narrow room gets no probe.
+
+**`gi_placement.json`** Canonical round trip, formatting-independent hash, every refusal named,
+the writer refusing what the reader refuses, and 3,000 seeded mutations, each refused or
+rewritten canonically.
+
+**`gi_placement.files`** Names, directories, Missing/Ready/Foreign (DAT and world path)/Failed,
+and a refused save keeping the previous file.
+
+**`gi_placement.section`** PLAC round trip, sizes `36 + 20n + 4 + 76m` and refusals.
+
+**`gi_placement.retail`** (private data) All 58 mounted worlds resolve within the default
+budget; prints the audit lines.
+
+**`gi_overlay.draw`** Every panel draws without a world; edits are refused without one.
+
+**`gi_overlay.retail`** (private data) 01_SubwayA in a scratch placement directory: Missing
+gives 1,031 probes; markers; a manual probe added at a probe, saved and refused in the void;
+automatic placement keeps it first; delete; an exclude volume removes probes; Revert and
+Reset; both panels draw; edits survive closing; a Foreign file waits for Start from defaults.
+
+**`config.gi`** `gi_placement_dir=` (relative, empty and duplicate refused), the
+`--gi-placement-dir` override, `--gi-place` with its modifiers and every refused combination.
