@@ -1,8 +1,9 @@
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/04_steamtunnels.dat",
   "dat_sha256": "3911db8d4a172cc4663ca24584f3154b95905d772c971d905adfdda08e06608a",
+  "excluded_models": [],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,

@@ -1,8 +1,9 @@
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/06_airship2.dat",
   "dat_sha256": "d80dfcfc3b0560505f236a00b5da9adcd92ca5a08b261e0a016e0130f5bfa57a",
+  "excluded_models": [],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,

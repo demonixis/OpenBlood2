@@ -1,8 +1,9 @@
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/05_cdm.dat",
   "dat_sha256": "4ec3417b09316017d10ffa6d3299430503401873497aae989330d8ce0815a93e",
+  "excluded_models": [],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,

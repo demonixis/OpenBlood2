@@ -59,11 +59,14 @@ active fields, released play keys, the refused 27889 gameplay port, UTF-8-safe h
 names and the dedicated server's `--no-lan`.
 
 The [GI plan](Documentation/implementation/gi_plan.md) (M10, [contracts](Documentation/contracts/gi_contracts.md))
-has lots G1–G4: world queries, the `.ob2gi` file and keys, the F8 overlay and probe placement
-(`--gi-place`, canonical `data/gi/placement/<world>.json`, F8 editing). Nothing renders GI yet.
+has lots G1–G5: world queries, the `.ob2gi` file and keys, the F8 overlay, probe placement
+(`--gi-place`, canonical `data/gi/placement/<world>.json` format 2, F8 editing) and the bake
+scene/tracer (`--bake-gi`, INFO + PLAC files only). Nothing renders GI yet.
 Preserve canonical placement bytes, the strict bounded reader, untouched Foreign/Failed files,
 a derived (never stored) light lattice and scratch placement directories in tests. Gate A was
-accepted with the defaults; the 36 single-player placement files are committed.
+accepted with the defaults; the 36 single-player placement files are committed. The tracer's
+results must not depend on threads or builds: per-slot jobs, per-ray seeds, `-ffp-contract=off`,
+no library trigonometry; hits match WorldShade; a cancelled bake exits 12 and writes nothing.
 
 The [desktop third-person camera](Documentation/contracts/camera_contracts.md) adds a rebindable C toggle,
 actual player/held models and centred aim convergence. Preserve unchanged eye/shot/movement state,

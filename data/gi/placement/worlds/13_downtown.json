@@ -1,8 +1,9 @@
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/13_downtown.dat",
   "dat_sha256": "129c55e6a06e12855e910a980204a8441f7d0ad13f82cfc307d8d563b9149a16",
+  "excluded_models": [],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,

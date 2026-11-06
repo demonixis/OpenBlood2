@@ -2338,3 +2338,12 @@ of the [GI plan](gi_plan.md) asks. The lattice, relocation, validity rules, room
 JSON/PLAC formats are written for this project. The bounded JSON parser was moved, unchanged
 in behaviour, from the project's own material manifest reader. See
 [contracts](../contracts/gi_contracts.md#probe-placement-lot-g4).
+
+## GI bake scene and tracer (lot G5, 2026-11-06)
+
+No code is imported. The triangle test, the lightmap page sampling and the vertex-light rule
+repeat the project's own `WorldShade` so bake hits match it. The binned SAH builder, ordered
+traversal, translucent layer list, job pool, splitmix64 streams, rejection-sampled directions,
+settings text and `--bake-gi` driver are written for this project; the presets follow the
+[GI plan](gi_plan.md). See
+[contracts](../contracts/gi_contracts.md#bake-scene-and-tracer-lot-g5).

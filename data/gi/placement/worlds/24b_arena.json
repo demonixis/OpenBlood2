@@ -1,8 +1,9 @@
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/24b_arena.dat",
   "dat_sha256": "ae01e62407add0bc15272492cb025459409389f9e6108b2b65964044ff61ac26",
+  "excluded_models": [],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,

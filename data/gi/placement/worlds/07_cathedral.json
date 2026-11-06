@@ -1,8 +1,9 @@
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/07_cathedral.dat",
   "dat_sha256": "7f2f222a3b51244d55f7fb05897aa3748e8bcd5b981b967fb3cc3e1611ac883c",
+  "excluded_models": [],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,

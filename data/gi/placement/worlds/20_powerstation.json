@@ -1,8 +1,9 @@
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/20_powerstation.dat",
   "dat_sha256": "746e45e451a70b8340c5444cb077cfa517dc7488fda579ec548e5c9cdd4e2264",
+  "excluded_models": [],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,

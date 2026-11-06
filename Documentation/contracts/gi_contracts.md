@@ -7,6 +7,7 @@ GI is not rendered yet: nothing in this contract changes a frame, a save or the 
 - [Baked file and keys (lot G2)](#baked-file-and-keys-lot-g2)
 - [F8 overlay (lot G3)](#f8-overlay-lot-g3)
 - [Probe placement (lot G4)](#probe-placement-lot-g4)
+- [Bake scene and tracer (lot G5)](#bake-scene-and-tracer-lot-g5)
 
 ## World queries (lot G1)
 
@@ -395,9 +396,10 @@ One canonical JSON file per world, `<normalized world path without .dat>.json` (
 ```json
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/01_subwaya.dat",
   "dat_sha256": "<64 lowercase hex digits>",
+  "excluded_models": ["Door01"],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,
@@ -435,7 +437,12 @@ One canonical JSON file per world, `<normalized world path without .dat>.json` (
   128 bytes); spacing a multiple of 8 in [32, 1024]; budget [1, 262144]; clearance [0, 64];
   at most 256 volumes; boxes with min < max on every axis and coordinates within 1e6; cap
   [0, 42] and no more probes than the cap; capture inside the projection box; blend [0, 1024];
-  priority [−1000, 1000]; resolution a power of two in [16, 256].
+  priority [−1000, 1000]; resolution a power of two in [16, 256]; at most 256 excluded models,
+  each 1–128 bytes of printable ASCII without `"` or `\`, unique ignoring case.
+- **Versions:** the writer emits version 2. The reader also accepts version 1, which has no
+  `excluded_models` key (read as empty); a version 2 file must have it. Lot G5 added it
+  (decision D8); the light-probe lattice ignores it, and its F8 editing arrives with the G10 Bake
+  panel.
 - **Statuses** (`load_gi_placement`): Missing (no file), Ready, Foreign (valid but made for
   another world path or DAT digest; the detail names it) and Failed (unreadable or invalid).
   A Foreign or Failed file is never replaced implicitly.
@@ -593,3 +600,141 @@ Reset; both panels draw; edits survive closing; a Foreign file waits for Start f
 
 **`config.gi`** `gi_placement_dir=` (relative, empty and duplicate refused), the
 `--gi-placement-dir` override, `--gi-place` with its modifiers and every refused combination.
+
+## Bake scene and tracer (lot G5)
+
+`engine/gi_bake_scene.{h,cpp}`, `engine/gi_jobs.{h,cpp}` and `engine/gi_bake.{h,cpp}` turn a
+world and its placement into a `.ob2gi` file through a deterministic CPU tracer. Lot G5 traces a
+probe survey only: the file holds INFO and PLAC, and the lighting sections arrive with G7 (LMAP,
+`VTX `) and G9 (PROB). Nothing here changes a frame, a save or the simulation.
+
+### Bake scene
+
+`GiBakeScene::build(mesh, uses)` takes a `WorldMesh` built with resources and lightmaps on (the
+faces the renderer draws) and one use per range:
+
+- `gi_range_uses(world, excluded)` gives Main to the Primary, Mover and Destructible models, Sky
+  to DemoSkyWorldModel models and Skip to containers and unbound models (`world_model_roles`).
+  Every name in the placement's `excluded_models` must match at least one non-primary model
+  (case-insensitive; all matches are skipped) or the bake fails with exit 4.
+- Positions are local + pivot with no rotation: the authored pose (decision D8). Sky ranges go
+  to a separate tree (`trace_sky`) for the G7 sky pass (decision D9); they never block bake rays.
+- Each triangle keeps its face record: range, material, lightmap page, flags, plane normal, UVs,
+  lightmap coordinates and vertex colors. Flags: **Translucent** (a SURF_TRANSPARENT batch with
+  a material, chroma-keyed copies included), **SkyPortal** (a sky face; rays end there with
+  `Sky`), **Lightmapped** and **Unresolved** (no material: opaque, albedo 0.5 grey).
+- **Albedo** (`albedo(face, u, v)`): raw stored RGB (0–1; G7 fixes the colour space), nearest
+  texel, repeating, from mip `round(log2(20 × texels per world unit))` clamped to the image's
+  levels (`gi_albedo_mip`; texels per unit is the square root of the texel area over the world
+  area). An SPR uses its first frame, the presentation's initial texture. Alpha is the mip-0
+  texel alpha the tracer used, 1 for opaque faces.
+- **Baked light** (`baked_light(face, u, v)`): WorldShade's rule, bilinear page sample ×
+  `world_saturate_scale` for lightmapped faces, else the interpolated vertex colors.
+- Images are checked once (dimensions, RGBA size; mips used only when `mip_rgba` has exactly
+  `texture_mip_bytes`); at most 4 Mi triangles.
+
+### BVH and tracing
+
+`GiBvh` is a binned SAH tree (12 bins, leaves of at most 4 triangles, a traversal step costing one
+triangle test) built single-threaded and deterministically: stable partitions, and below depth 40
+or when no split helps, a median split with ties by input order; depth is at most 64. Nodes are 32
+bytes; triangles store `v0`, `e1`, `e2` and their face.
+
+`trace(origin, direction, tmax, hit)` (t in units of `direction`) is ordered (nearer child first by
+the split axis sign) with a fixed per-call stack, so any number of threads trace one scene. The
+triangle test is WorldShade's two-sided Möller–Trumbore (`|det| < 1e-12` rejected, `u ∈ [0, 1]`,
+`v ≥ 0`, `u + v ≤ 1`, `0 ≤ t ≤ limit`); equal distances go to the lower face index.
+
+- Opaque, sky-portal and unresolved faces stop the ray; an opaque face ignores texture alpha like
+  the renderer.
+- A translucent face reads its mip-0 alpha at the hit (nearest, repeating, as the alpha pass
+  draws it): 0 is a cutout and is skipped, 255 stops the ray, anything between is a layer.
+- The nearest nine layers are kept. Up to eight pass through and are returned nearest first with
+  their alpha; a ninth stops the ray as `LayerLimit`. Layers beyond the opaque hit are dropped.
+- `GiHit`: kind (Miss, Surface, Sky, LayerLimit), back (`dot(direction, normal) > 0`), t, u, v,
+  face and the layers.
+
+The tracer and bake sources compile with `-ffp-contract=off`, and ray directions use rejection
+sampling (`gi_uniform_direction`: + − × ÷ and `sqrt` only, no library trigonometry), so results do
+not depend on the optimization level: the Debug ASan and RelWithDebInfo builds give the same
+survey digest.
+
+### Jobs and randomness
+
+`run_gi_jobs(count, threads, cancel, job)` runs jobs on SDL threads (the caller is thread 0; a
+thread that fails to start leaves its share to the others). An atomic counter hands out indices;
+the cancel flag is read before every job and no job starts once it is set. Results never depend
+on the thread count: jobs write their own slots and draw from `GiRandom(stream, index)`, a
+splitmix64 sequence seeded from their own indices. `gi_default_jobs()` is the logical core count.
+
+### Settings and survey
+
+| Preset | Bounces | Rays |
+| --- | --- | --- |
+| `preview` | 1 | 64 |
+| `final` (default) | 2 | 256 |
+| `custom` | `--gi-bounces` 1–3 (default 2) | `--gi-rays` 16–4096 (default 256) |
+
+The INFO text is `openblood2-gi-settings 1`, then `quality`, `bounces` and `rays` lines; the
+thread count is never part of it. `survey_gi_probes` casts each light probe's rays (directions
+from `(probe index, ray)`) to infinity and counts front, back, sky, miss, layer-limit hits and
+layers; a probe is **inside** when more than half its rays hit back faces. Each probe hashes every
+hit (kind, side, face, t bits, layer count); the survey digest is the SHA-256 of the per-probe
+records in order. Progress is reported about every 5 % of the probes.
+
+### `bake_gi_world` and `--bake-gi`
+
+1. The world must be mounted (exit 2); the DAT is read and parsed and `gi_expectation` computed
+   (exit 5).
+2. Placement: a Ready file is used verbatim; Missing gives the defaults with automatic reflection
+   probes; Foreign or Failed fails (exit 4). The light probes are resolved (exit 4).
+3. `--gi-if-stale`: when the output file is Ready for this world, albedo, edition, algorithm,
+   settings hash and placement key, the bake reports `current` and traces nothing. A committed
+   placement is checked before any geometry work.
+4. Scene (exit 5 on a mesh or scene failure, 4 on an unmatched exclusion), then the survey.
+5. The file: key from the expectation, `key.settings` = SHA-256 of the INFO text, `key.placement`
+   = `gi_placement_hash`, sections INFO and PLAC. It is written atomically to
+   `--gi-out` (default `user_directory()/gi`) under `gi_file_name`, creating folders.
+
+Cancellation is checked before the scene, during the survey and before writing: a cancelled bake
+exits 12 and writes nothing, so an existing file is kept.
+
+`--bake-gi WORLD` (a name or resource path) runs it with `--gi-quality`, `--gi-bounces`,
+`--gi-rays` (custom only), `--gi-jobs` 1–256, `--gi-out DIR`, `--gi-if-stale` and the placement
+directory of lot G4 (`--gi-placement-dir`, the plan's `--gi-placement`). SIGINT and SIGTERM set the
+cancel flag. It prints `GI_PROGRESS stage=survey done=N total=M` lines and one line
+`GI_RESULT status=baked|current|failed|cancelled exit=N world=… quality=… bounces=… rays_per_probe=…
+jobs=…`, then the error or file and, for a bake, the placement status, probe and face counts, BVH
+size, threads, rays, `rays_per_second`, `rays_per_second_per_thread`, the survey counts, `digest`,
+`scene_ms`, `survey_ms`, `bytes` and `ms`. Exit 0, 2 (arguments or data), 4 (placement, bake or
+write), 5 (world load), 12 (cancelled). It is a separate headless tool, like `--gi-place`.
+
+### Tests
+
+**`gi_bake.bvh`** 6,002 random triangles in two ranges (one offset by its pivot): 20,000 rays,
+axis-aligned and bounded ones included, give the same face and t as brute force; equal faces tie
+to the lower index; negative tmax and an empty scene miss.
+
+**`gi_bake.alpha`** Cutout, partial layer, alpha-255 stop and an opaque face ignoring alpha;
+bounded segments; 8, 9 and 12 layers (eight pass, the ninth stops); sky portal and unresolved
+faces; Sky ranges only in the sky tree and Skip ranges nowhere; a use list of the wrong size.
+
+**`gi_bake.albedo`** Mip choice (clamping, flat UVs), sampling of the chosen level, vertex light
+and a lightmapped face's page sample × 2.
+
+**`gi_bake.jobs`** Every slot written once; zero jobs; cancellation stops new jobs; a pre-set
+flag runs none; `GiRandom` and `gi_uniform_direction` reproducible, unit length and centred.
+
+**`gi_bake.settings`** Presets, custom defaults and ranges, refusals and the INFO text.
+
+**`gi_bake.determinism`** A closed room with glass and a sky portal: the survey digest and
+counts are identical for 1, 2 and 7 jobs, ordered progress, a different ray count changes the
+digest, a pre-set cancel flag cancels.
+
+**`gi_bake.retail`** (private data) 01_SubwayA: exclusions by case and an unknown name; 20,000
+probe segments where the bake's opaque, unlayered hits equal WorldShade's (fraction and light);
+Preview bakes with 1 and 4 jobs give identical bytes and digests and a Ready file; `--gi-if-stale`
+reports current; a cancelled bake exits 12, keeps the previous file and writes nothing into an
+empty folder; an unmounted world (2) and a Foreign placement (4); throughput is printed.
+
+**`config.gi`** The `--bake-gi` options and every refused combination.

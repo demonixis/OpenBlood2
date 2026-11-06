@@ -55,6 +55,12 @@ namespace OpenBlood2
         bool list_worlds = false, json = false, gi_reset = false, gi_dry_run = false;
         std::filesystem::path gi_verify;
         std::string gi_place;
+        // --bake-gi WORLD [--gi-quality preview|final|custom] [--gi-bounces N] [--gi-rays N] [--gi-jobs N]
+        // [--gi-out DIR] [--gi-if-stale] (lot G5); zero means not given.
+        std::string bake_gi, gi_quality;
+        std::uint32_t gi_bounces = 0, gi_rays = 0, gi_jobs = 0;
+        std::filesystem::path gi_out;
+        bool gi_if_stale = false;
         bool inspector = true;
         bool gpu_smoke = false;
         bool world_smoke = false;

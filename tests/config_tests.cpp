@@ -355,7 +355,39 @@ namespace
         options = {};
         const std::array<std::string_view, 3> separate{"--gi-place", "all", "--list-worlds"};
         CHECK(!parse_options(separate, options, error));
-        CHECK(error == "--list-worlds, --gi-verify and --gi-place are separate headless tools");
+        CHECK(error == "--list-worlds, --gi-verify, --gi-place and --bake-gi are separate headless tools");
+
+        // GI lot G5: --bake-gi and its options.
+        options = {};
+        const std::array<std::string_view, 12> bake{"--bake-gi",   "01_SubwayA", "--gi-quality", "custom",
+                                                    "--gi-bounces", "3",          "--gi-rays",    "4096",
+                                                    "--gi-jobs",   "7",          "--gi-out",     "bakes"};
+        CHECK(parse_options(bake, options, error));
+        CHECK(options.bake_gi == "01_SubwayA" && options.gi_quality == "custom" && options.gi_bounces == 3);
+        CHECK(options.gi_rays == 4096 && options.gi_jobs == 7 && path_text(options.gi_out) == "bakes");
+        CHECK(!options.gi_if_stale);
+        options = {};
+        const std::array<std::string_view, 3> stale{"--bake-gi", "01_SubwayA", "--gi-if-stale"};
+        CHECK(parse_options(stale, options, error) && options.gi_if_stale && options.gi_quality.empty());
+        for (const auto& args : std::initializer_list<std::vector<std::string_view>>{
+                 {"--bake-gi"},
+                 {"--gi-if-stale"},
+                 {"--gi-quality", "final"},
+                 {"--gi-out", "bakes"},
+                 {"--bake-gi", "a", "--gi-quality", "best"},
+                 {"--bake-gi", "a", "--gi-rays", "64"},
+                 {"--bake-gi", "a", "--gi-quality", "preview", "--gi-bounces", "1"},
+                 {"--bake-gi", "a", "--gi-quality", "custom", "--gi-bounces", "4"},
+                 {"--bake-gi", "a", "--gi-quality", "custom", "--gi-rays", "15"},
+                 {"--bake-gi", "a", "--gi-jobs", "0"},
+                 {"--bake-gi", "a", "--gi-jobs", "257"},
+                 {"--bake-gi", "a", "--gi-jobs", "2x"},
+                 {"--bake-gi", "a", "--gi-place", "all"},
+                 {"--bake-gi", "a", "--world", "02_CityHub"}})
+        {
+            options = {};
+            CHECK(!parse_options(args, options, error));
+        }
 
         options = {};
         options.config_file = root / "config.ini";

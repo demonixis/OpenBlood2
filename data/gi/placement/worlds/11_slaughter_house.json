@@ -1,8 +1,9 @@
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/11_slaughter_house.dat",
   "dat_sha256": "a9fbd95cd8b1a33f841de7571025aa1049874600ecd8dde01dc58f039ec067cd",
+  "excluded_models": [],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,

@@ -1,8 +1,9 @@
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/18_temple.dat",
   "dat_sha256": "478fa08180155d3e1a96b1b68068dea02910b3b74dcf31ff7ae217bb4de78dd8",
+  "excluded_models": [],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,

@@ -1,8 +1,9 @@
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/14_subwayc.dat",
   "dat_sha256": "7da580215bc930a7fa6b5a0771dae38a718c3adfa95548c8c41a978774e650a7",
+  "excluded_models": [],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,

@@ -988,6 +988,22 @@ if(BLOOD2_TEST_DATA_DIR)
     set_tests_properties(gi_placement.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 1200)
 endif()
 
+add_executable(gi_bake_tests gi_bake_tests.cpp)
+target_link_libraries(gi_bake_tests PRIVATE engine)
+blood2_project_options(gi_bake_tests)
+if(NOT MSVC) # The brute-force reference repeats the tracer's arithmetic bit for bit.
+    set_property(SOURCE gi_bake_tests.cpp APPEND PROPERTY COMPILE_OPTIONS -ffp-contract=off)
+endif()
+foreach(case IN ITEMS bvh alpha albedo jobs settings determinism)
+    add_test(NAME gi_bake.${case} COMMAND gi_bake_tests "${case}")
+    set_tests_properties(gi_bake.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 60)
+endforeach()
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME gi_bake.retail COMMAND gi_bake_tests retail "${BLOOD2_TEST_DATA_DIR}"
+             "${PROJECT_SOURCE_DIR}/data/gi/placement" "${CMAKE_CURRENT_BINARY_DIR}/gi-bake-retail")
+    set_tests_properties(gi_bake.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
+endif()
+
 if(BLOOD2_BUILD_CLIENT AND BLOOD2_GI_TOOLS)
     add_executable(gi_overlay_tests gi_overlay_tests.cpp ../src/app/gi_overlay.cpp)
     target_link_libraries(gi_overlay_tests PRIVATE blood2_game imgui)

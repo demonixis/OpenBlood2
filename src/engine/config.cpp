@@ -220,6 +220,8 @@ namespace OpenBlood2
                 options.gi_reset = true;
             else if (arg == "--gi-dry-run")
                 options.gi_dry_run = true;
+            else if (arg == "--gi-if-stale")
+                options.gi_if_stale = true;
             else if (arg == "--no-inspector")
                 options.inspector = false;
             else if (arg == "--no-crash-capture")
@@ -318,7 +320,9 @@ namespace OpenBlood2
                 options.bench_height = h;
             }
             else if (arg == "--data-dir" || arg == "--gi-dir" || arg == "--gi-verify" || arg == "--config" ||
-                     arg == "--gi-place" || arg == "--gi-placement-dir" ||
+                     arg == "--gi-place" || arg == "--gi-placement-dir" || arg == "--bake-gi" ||
+                     arg == "--gi-quality" || arg == "--gi-bounces" || arg == "--gi-rays" || arg == "--gi-jobs" ||
+                     arg == "--gi-out" ||
                      arg == "--frames" || arg == "--capture" || arg == "--world" || arg == "--log-dir" ||
                      arg == "--log-level" || arg == "--rez" ||
                      arg == "--connect" || arg == "--host" || arg == "--port" || arg == "--name" || arg == "--end" ||
@@ -418,6 +422,35 @@ namespace OpenBlood2
                     options.gi_place = args[i];
                 else if (arg == "--gi-placement-dir")
                     options.gi_placement_dir = path_from_utf8(args[i]);
+                else if (arg == "--bake-gi")
+                    options.bake_gi = args[i];
+                else if (arg == "--gi-out")
+                    options.gi_out = path_from_utf8(args[i]);
+                else if (arg == "--gi-quality")
+                {
+                    if (args[i] != "preview" && args[i] != "final" && args[i] != "custom")
+                    {
+                        error = "--gi-quality requires preview, final or custom";
+                        return false;
+                    }
+                    options.gi_quality = args[i];
+                }
+                else if (arg == "--gi-bounces" || arg == "--gi-rays" || arg == "--gi-jobs")
+                {
+                    const auto value = args[i];
+                    std::uint32_t number = 0;
+                    const auto result = std::from_chars(value.data(), value.data() + value.size(), number);
+                    const bool bounces = arg == "--gi-bounces", rays = arg == "--gi-rays";
+                    const std::uint32_t low = bounces ? 1 : rays ? 16 : 1, high = bounces ? 3 : rays ? 4096 : 256;
+                    if (result.ec != std::errc{} || result.ptr != value.data() + value.size() || number < low ||
+                        number > high)
+                    {
+                        error = std::string(arg) + " requires an integer from " + std::to_string(low) + " to " +
+                                std::to_string(high);
+                        return false;
+                    }
+                    (bounces ? options.gi_bounces : rays ? options.gi_rays : options.gi_jobs) = number;
+                }
                 else if (arg == "--capture")
                     options.capture_file = path_from_utf8(args[i]);
                 else if (arg == "--config")
@@ -445,7 +478,20 @@ namespace OpenBlood2
         }
         const bool network = !options.host_world.empty() || !options.connect_address.empty();
         const bool gi_place = !options.gi_place.empty();
-        const bool gi_tool = options.list_worlds || !options.gi_verify.empty() || gi_place;
+        const bool bake_gi = !options.bake_gi.empty();
+        const bool gi_tool = options.list_worlds || !options.gi_verify.empty() || gi_place || bake_gi;
+        if ((!options.gi_quality.empty() || options.gi_bounces || options.gi_rays || options.gi_jobs ||
+             !options.gi_out.empty() || options.gi_if_stale) &&
+            !bake_gi)
+        {
+            error = "--gi-quality, --gi-bounces, --gi-rays, --gi-jobs, --gi-out and --gi-if-stale require --bake-gi";
+            return false;
+        }
+        if ((options.gi_bounces || options.gi_rays) && options.gi_quality != "custom")
+        {
+            error = "--gi-bounces and --gi-rays require --gi-quality custom";
+            return false;
+        }
         if (options.json && !options.list_worlds && !gi_place)
         {
             error = "--json requires --list-worlds or --gi-place";
@@ -457,13 +503,14 @@ namespace OpenBlood2
             return false;
         }
         if (gi_tool &&
-            (int(options.list_worlds) + int(!options.gi_verify.empty()) + int(gi_place) > 1 || network ||
+            (int(options.list_worlds) + int(!options.gi_verify.empty()) + int(gi_place) + int(bake_gi) > 1 ||
+             network ||
              explicit_world || options.check_data ||
              options.inspect_world || options.start_game || options.bench || options.view_world ||
              options.menu_smoke || options.demo_smoke || options.gpu_smoke || options.world_smoke ||
              options.xr_world || options.xr_test || options.frame_limit || !options.capture_file.empty()))
         {
-            error = "--list-worlds, --gi-verify and --gi-place are separate headless tools";
+            error = "--list-worlds, --gi-verify, --gi-place and --bake-gi are separate headless tools";
             return false;
         }
         // JSON owns standard output: only errors reach the console unless a level is chosen.

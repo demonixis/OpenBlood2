@@ -16,4 +16,8 @@ namespace OpenBlood2
     // --gi-dry-run writes nothing). Exit 0, 2 (arguments, data, directory), 4 (a placement failed or an
     // existing file is invalid or foreign), 5 (a world cannot be read).
     int run_gi_place(const Options&, const Config&);
+    // --bake-gi WORLD (lot G5): bakes one world into --gi-out (default user_directory()/gi), printing
+    // GI_PROGRESS lines and one GI_RESULT line. SIGINT/SIGTERM cancel; nothing is written then. Exit 0,
+    // 2 (arguments, data), 4 (placement, bake or write), 5 (world load), 12 (cancelled).
+    int run_gi_bake(const Options&, const Config&);
 } // namespace OpenBlood2

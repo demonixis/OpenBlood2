@@ -1,8 +1,9 @@
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/10_sewagetreatmentplant.dat",
   "dat_sha256": "6f610312c679e197eae9843b32bf410e24e1fefbd239ff72c6d97aae5492b32d",
+  "excluded_models": [],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,

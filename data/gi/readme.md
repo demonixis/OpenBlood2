@@ -7,4 +7,6 @@ The formats are in the [GI contracts](../../Documentation/contracts/gi_contracts
   `--gi-place` and the F8 overlay's Save, which use this folder by default in GI tool builds.
   The lattice is derived from the file and the world, so a file holds only the settings, the
   include/exclude volumes and the reflection probes.
-- Later lots add `settings/`, `baked/` (never committed, decision D3) and `bake_report.json`.
+- `--bake-gi WORLD` (lot G5) writes `.ob2gi` files to `--gi-out`, by default the user directory's
+  `gi/` folder. Later lots add `settings/`, `baked/` (never committed, decision D3) and
+  `bake_report.json`.

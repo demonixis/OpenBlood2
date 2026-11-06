@@ -1,8 +1,9 @@
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/02_cityhubb.dat",
   "dat_sha256": "8dd954ce6233b021716a9d5573e8b244acf38244946061d7b39429c1d9d22dff",
+  "excluded_models": [],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,

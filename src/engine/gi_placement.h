@@ -29,6 +29,7 @@ namespace OpenBlood2
         constexpr float max_coordinate = 1e6f;
         constexpr std::uint64_t max_nodes = 16u * 1024 * 1024; // Lattice nodes per run.
         constexpr std::size_t max_text = 256 * 1024;            // Placement JSON bytes.
+        constexpr std::size_t max_excluded = 256, max_model_name = 128; // Bake exclusions (D8).
     } // namespace gi_placement_limits
     // Bumped whenever the same placement file and world would resolve to different probes.
     constexpr std::uint32_t gi_placement_algorithm = 1;
@@ -69,6 +70,9 @@ namespace OpenBlood2
         std::vector<GiProbeVolume> volumes;
         std::uint32_t reflection_cap = 42;
         std::vector<GiReflectionProbe> reflections; // Manual probes first, then automatic ones by rank.
+        // World models left out of the bake scene (decision D8), by DAT name, case-insensitive:
+        // printable ASCII without '"' or '\\', unique. Placement validity ignores them.
+        std::vector<std::string> excluded_models;
     };
     GiPlacement default_gi_placement(std::string world_path, const Sha256Digest& world);
     bool validate_gi_placement(const GiPlacement&, std::string& error);

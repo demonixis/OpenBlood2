@@ -416,6 +416,18 @@ namespace OpenBlood2
             return fail("the reflection cap is above 42");
         if (p.reflections.size() > p.reflection_cap)
             return fail("more reflection probes than the cap");
+        if (p.excluded_models.size() > L::max_excluded)
+            return fail("more than 256 excluded models");
+        for (std::size_t i = 0; i < p.excluded_models.size(); ++i)
+        {
+            const auto& name = p.excluded_models[i];
+            const auto bad = [](char c) { return c < 0x20 || c > 0x7e || c == '"' || c == '\\'; };
+            if (name.empty() || name.size() > L::max_model_name || std::any_of(name.begin(), name.end(), bad))
+                return fail("an excluded model name is empty, longer than 128 bytes or not printable ASCII");
+            for (std::size_t j = 0; j < i; ++j)
+                if (!CaseLess{}(name, p.excluded_models[j]) && !CaseLess{}(p.excluded_models[j], name))
+                    return fail("an excluded model is listed twice");
+        }
         std::string reason;
         for (const auto& r : p.reflections)
             if (!valid_reflection(r, reason))
@@ -427,8 +439,12 @@ namespace OpenBlood2
     {
         if (!validate_gi_placement(p, error))
             return false;
-        std::string o = "{\n  \"format\": \"" + std::string(format_name) + "\",\n  \"version\": 1,\n";
+        std::string o = "{\n  \"format\": \"" + std::string(format_name) + "\",\n  \"version\": 2,\n";
         o += "  \"world\": \"" + p.world_path + "\",\n  \"dat_sha256\": \"" + digest_text(p.world) + "\",\n";
+        o += "  \"excluded_models\": [";
+        for (std::size_t i = 0; i < p.excluded_models.size(); ++i)
+            o += std::string(i ? ", " : "") + "\"" + p.excluded_models[i] + "\"";
+        o += "],\n";
         o += "  \"light_probes\": {\n    \"spacing\": " + std::to_string(p.spacing) +
              ",\n    \"budget\": " + std::to_string(p.budget) + ",\n    \"clearance\": " + number(p.clearance) +
              ",\n    \"volumes\": [";
@@ -469,14 +485,33 @@ namespace OpenBlood2
         std::string reason;
         GiPlacement p;
         std::int64_t value = 0;
-        if (!exact_keys(root, {"format", "version", "world", "dat_sha256", "light_probes", "reflection_probes"},
-                        "the document", reason))
+        // Version 1 (lot G4) has no excluded_models; version 2 requires it.
+        const auto* version = root.find("version");
+        const bool v1 = version && version->kind == Json::Kind::Number && version->number == 1;
+        if (!(v1 ? exact_keys(root, {"format", "version", "world", "dat_sha256", "light_probes", "reflection_probes"},
+                              "the document", reason)
+                 : exact_keys(root,
+                              {"format", "version", "world", "dat_sha256", "excluded_models", "light_probes",
+                               "reflection_probes"},
+                              "the document", reason)))
             return fail(reason);
         const auto* format = root.find("format");
         if (format->kind != Json::Kind::String || format->text != format_name)
             return fail("'format' must be \"" + std::string(format_name) + "\"");
-        if (!integer(root, "version", 1, 1, value, reason))
+        if (!integer(root, "version", 1, 2, value, reason))
             return fail("unsupported version");
+        if (!v1)
+        {
+            const auto& excluded = *root.find("excluded_models");
+            if (excluded.kind != Json::Kind::Array || excluded.items.size() > L::max_excluded)
+                return fail("'excluded_models' must be an array of at most 256 names");
+            for (const auto& item : excluded.items)
+            {
+                if (item.kind != Json::Kind::String)
+                    return fail("'excluded_models' must hold strings");
+                p.excluded_models.push_back(item.text);
+            }
+        }
         const auto* world = root.find("world");
         const auto* digest = root.find("dat_sha256");
         if (world->kind != Json::Kind::String || !valid_world_path(world->text))

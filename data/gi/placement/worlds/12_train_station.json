@@ -1,8 +1,9 @@
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/12_train_station.dat",
   "dat_sha256": "a587575f05725b4d22c0741ea6e9838390fcad526c384b9f112a872e9edd6f7d",
+  "excluded_models": [],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,

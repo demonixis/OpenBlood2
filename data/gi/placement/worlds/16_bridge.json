@@ -1,8 +1,9 @@
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/16_bridge.dat",
   "dat_sha256": "d31887fff459b01f2a2422b925f301dcb8bad19cae30825bfb024071435b8149",
+  "excluded_models": [],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,

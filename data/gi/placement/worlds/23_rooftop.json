@@ -1,8 +1,9 @@
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/23_rooftop.dat",
   "dat_sha256": "4f4c0b5cfc4ce6ac66642ddeb7fc7b3814e59f2ad3318fd5c1fad4c581eb5f18",
+  "excluded_models": [],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,

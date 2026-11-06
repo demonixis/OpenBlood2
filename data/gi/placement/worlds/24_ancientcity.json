@@ -1,8 +1,9 @@
 {
   "format": "openblood2-gi-placement",
-  "version": 1,
+  "version": 2,
   "world": "worlds/24_ancientcity.dat",
   "dat_sha256": "43e927b3c7c1d07489ac2cea0038a21d4b66c42f5efa85583bd0fe8d49acd38b",
+  "excluded_models": [],
   "light_probes": {
     "spacing": 128,
     "budget": 16384,

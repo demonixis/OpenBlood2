@@ -1,10 +1,14 @@
 #include "app/gi_tool.h"
 #include "engine/atomic_file.h"
+#include "engine/gi_bake.h"
+#include "engine/gi_jobs.h"
 #include "engine/gi_file.h"
 #include "engine/gi_placement.h"
 #include "engine/resources.h"
 #include <spdlog/spdlog.h>
+#include <atomic>
 #include <chrono>
+#include <csignal>
 #include <iostream>
 
 namespace OpenBlood2
@@ -54,6 +58,20 @@ namespace OpenBlood2
             std::stable_sort(worlds.begin(), worlds.end(),
                              [](const auto& a, const auto& b) { return a.first < b.first; });
             return worlds;
+        }
+        // A world by name (worlds/<name>.dat) or resource path; false when it is not a mounted DAT.
+        bool mounted_world(const Resources& resources, const std::string& world, std::string& path)
+        {
+            const bool is_path = world.find_first_of("/\\") != std::string::npos || world.ends_with(".dat") ||
+                                 world.ends_with(".DAT");
+            return resource_path(is_path ? world : "worlds/" + world + ".dat", path) && path.ends_with(".dat") &&
+                   resources.find(path);
+        }
+        std::atomic<bool> bake_cancel{false};
+        static_assert(std::atomic<bool>::is_always_lock_free); // Written from a signal handler.
+        extern "C" void on_bake_signal(int)
+        {
+            bake_cancel.store(true);
         }
         double elapsed_ms(std::chrono::steady_clock::time_point start)
         {
@@ -173,11 +191,8 @@ namespace OpenBlood2
                 targets.push_back(path);
         if (options.gi_place != "all" && options.gi_place != "single")
         {
-            const bool is_path = options.gi_place.find_first_of("/\\") != std::string::npos ||
-                                 options.gi_place.ends_with(".dat") || options.gi_place.ends_with(".DAT");
             std::string path;
-            if (!resource_path(is_path ? options.gi_place : "worlds/" + options.gi_place + ".dat", path) ||
-                !path.ends_with(".dat") || !resources.find(path))
+            if (!mounted_world(resources, options.gi_place, path))
             {
                 spdlog::error("World {} is not mounted", options.gi_place);
                 return 2;
@@ -287,5 +302,73 @@ namespace OpenBlood2
             std::cout << json << "]}\n";
         spdlog::info("GI placement: {} world(s), directory {}", targets.size(), path_text(directory));
         return exit_code;
+    }
+
+    int run_gi_bake(const Options& options, const Config& config)
+    {
+        Resources resources;
+        std::string error;
+        if (!resources.mount_game(config, error))
+        {
+            spdlog::error("Mount: {}", error);
+            std::cout << "GI_RESULT status=failed exit=2 error=" << json_text(error) << '\n';
+            return 2;
+        }
+        GiBakeRequest request;
+        if (!mounted_world(resources, options.bake_gi, request.world))
+            request.world = options.bake_gi; // Reported as unmounted by the bake (exit 2).
+        if (!make_gi_bake_settings(options.gi_quality, options.gi_bounces, options.gi_rays, request.settings, error))
+        {
+            spdlog::error("{}", error);
+            std::cout << "GI_RESULT status=failed exit=2 error=" << json_text(error) << '\n';
+            return 2;
+        }
+        request.jobs = options.gi_jobs ? options.gi_jobs : gi_default_jobs();
+        request.out_dir = options.gi_out;
+        request.placement_dir = config.gi_placement_dir;
+        request.if_stale = options.gi_if_stale;
+        request.cancel = &bake_cancel;
+        request.progress = [](std::string_view stage, std::uint64_t done, std::uint64_t total)
+        { std::cout << "GI_PROGRESS stage=" << stage << " done=" << done << " total=" << total << std::endl; };
+        bake_cancel.store(false);
+        const auto old_int = std::signal(SIGINT, on_bake_signal);
+        const auto old_term = std::signal(SIGTERM, on_bake_signal);
+        const auto result = bake_gi_world(resources, request);
+        std::signal(SIGINT, old_int == SIG_ERR ? SIG_DFL : old_int);
+        std::signal(SIGTERM, old_term == SIG_ERR ? SIG_DFL : old_term);
+
+        const auto& survey = result.survey;
+        const auto& scene = result.scene;
+        std::cout << "GI_RESULT status=" << gi_bake_status_name(result.status) << " exit=" << result.exit_code
+                  << " world=" << request.world << " quality=" << gi_quality_name(request.settings.quality)
+                  << " bounces=" << request.settings.bounces << " rays_per_probe=" << request.settings.rays
+                  << " jobs=" << request.jobs;
+        if (result.status == GiBakeResult::Status::Failed || result.status == GiBakeResult::Status::Cancelled)
+            std::cout << " error=" << json_text(result.error);
+        if (!result.file.empty())
+            std::cout << " file=" << path_text(result.file);
+        if (result.status == GiBakeResult::Status::Baked)
+        {
+            const double seconds = survey.ms / 1000;
+            const double rate = seconds > 0 ? double(survey.rays) / seconds : 0;
+            std::cout << " placement=" << gi_placement_status_name(result.placement) << " probes=" << result.probes
+                      << " reflections=" << result.reflections << " faces=" << scene.main_faces
+                      << " sky_faces=" << scene.sky_faces << " translucent=" << scene.translucent
+                      << " unresolved=" << scene.unresolved << " excluded=" << scene.excluded_ranges
+                      << " nodes=" << scene.nodes << " depth=" << scene.depth << " threads=" << survey.threads
+                      << " rays=" << survey.rays << " rays_per_second=" << std::llround(rate)
+                      << " rays_per_second_per_thread=" << std::llround(survey.threads ? rate / survey.threads : 0)
+                      << " front=" << survey.front << " back=" << survey.back << " sky=" << survey.sky
+                      << " miss=" << survey.miss << " layer_limit=" << survey.layer_limit
+                      << " layers=" << survey.layers << " inside=" << survey.inside
+                      << " digest=" << digest_text(survey.digest) << " scene_ms=" << std::lround(scene.build_ms)
+                      << " survey_ms=" << std::lround(survey.ms);
+        }
+        if (result.status == GiBakeResult::Status::Baked || result.status == GiBakeResult::Status::Current)
+            std::cout << " bytes=" << result.bytes;
+        std::cout << " ms=" << std::lround(result.ms) << std::endl;
+        if (result.exit_code && result.exit_code != 12)
+            spdlog::error("GI bake {}: {}", request.world, result.error);
+        return result.exit_code;
     }
 } // namespace OpenBlood2

@@ -262,6 +262,7 @@ namespace
     {
         auto p = placement_for_test();
         p.volumes = {{true, {{-1.5f, 0, 0}, {10, 20.25f, 30}}}, {false, {{1, 2, 3}, {4, 5, 6}}}};
+        p.excluded_models = {"Door01", "Glass_B"};
         GiReflectionProbe r;
         r.automatic = false;
         r.capture = {5, 5, 5};
@@ -290,7 +291,27 @@ namespace
         CHECK(read.volumes.size() == 2 && read.volumes[0].include && read.volumes[0].box.min.x == -1.5f);
         CHECK(read.reflections.size() == 2 && !read.reflections[0].automatic && read.reflections[1].automatic);
         CHECK(read.reflections[0].resolution == 128 && read.reflections[0].priority == -3);
+        CHECK(read.excluded_models == (std::vector<std::string>{"Door01", "Glass_B"}));
         CHECK(write_gi_placement(read, again, error) && again == text);
+        CHECK(text.find("\"version\": 2") != std::string::npos);
+        CHECK(text.find("\"excluded_models\": [\"Door01\", \"Glass_B\"],") != std::string::npos);
+        // Version 1 (lot G4) has no excluded_models and reads as an empty list; saving writes version 2.
+        {
+            auto v1 = text;
+            v1.replace(v1.find("\"version\": 2"), 12, "\"version\": 1");
+            const std::string line = "  \"excluded_models\": [\"Door01\", \"Glass_B\"],\n";
+            v1.erase(v1.find(line), line.size());
+            GiPlacement old;
+            CHECK(read_gi_placement(v1, old, error) && old.excluded_models.empty() && old.volumes.size() == 2);
+            auto with_key = v1;
+            with_key.replace(with_key.find("\"version\": 1"), 12, "\"version\": 2");
+            CHECK(!read_gi_placement(with_key, old, error) &&
+                  error.find("missing key 'excluded_models'") != std::string::npos);
+            CHECK(!read_gi_placement(text.substr(0, text.find("\"version\": 2")) + "\"version\": 1" +
+                                         text.substr(text.find("\"version\": 2") + 12),
+                                     old, error) &&
+                  error.find("unknown key 'excluded_models'") != std::string::npos);
+        }
         // Formatting does not matter to the reader or the hash; values do.
         std::string compact;
         for (const char c : text)
@@ -318,7 +339,11 @@ namespace
             }
             return untouched.spacing == read.spacing && untouched.reflections.size() == read.reflections.size();
         };
-        CHECK(refuse("\"version\": 1", "\"version\": 2", "unsupported version"));
+        CHECK(refuse("\"version\": 2", "\"version\": 3", "unsupported version"));
+        CHECK(refuse("[\"Door01\", \"Glass_B\"]", "[\"Door01\", \"door01\"]", "listed twice"));
+        CHECK(refuse("[\"Door01\", \"Glass_B\"]", "[\"Door01\", \"\"]", "excluded model name"));
+        CHECK(refuse("[\"Door01\", \"Glass_B\"]", "[\"Door01\", 3]", "'excluded_models'"));
+        CHECK(refuse("[\"Door01\", \"Glass_B\"]", "{}", "'excluded_models'"));
         CHECK(refuse("openblood2-gi-placement", "other", "'format'"));
         CHECK(refuse("\"world\": \"worlds/test.dat\"", "\"world\": \"Worlds/Test.dat\"", "'world'"));
         CHECK(refuse("\"world\": \"worlds/test.dat\"", "\"world\": \"worlds/test.txt\"", "'world'"));

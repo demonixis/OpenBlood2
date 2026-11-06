@@ -75,6 +75,9 @@ add_library(engine_core STATIC
     src/engine/gi_world.cpp
     src/engine/gi_file.cpp
     src/engine/gi_placement.cpp
+    src/engine/gi_bake_scene.cpp
+    src/engine/gi_jobs.cpp
+    src/engine/gi_bake.cpp
     src/engine/container.cpp
     src/engine/world_model.cpp
     src/engine/logging.cpp
@@ -89,6 +92,12 @@ add_library(engine_core STATIC
 target_include_directories(engine_core PUBLIC src src/game/legacy PRIVATE "${PROJECT_BINARY_DIR}/generated")
 target_link_libraries(engine_core PUBLIC SDL3::SDL3 blood2_startup PRIVATE spdlog::spdlog)
 # GI tool builds default placement files to the checkout's committed data/gi (gi_contracts.md lot G4).
+# The GI tracer's float results (hit distances, survey digests) must not depend on the optimization
+# level: no fused multiply-add contraction (gi_contracts.md lot G5).
+if(NOT MSVC)
+    set_property(SOURCE src/engine/gi_bake_scene.cpp src/engine/gi_bake.cpp APPEND PROPERTY COMPILE_OPTIONS
+                 -ffp-contract=off)
+endif()
 if(BLOOD2_GI_TOOLS)
     set_property(SOURCE src/engine/gi_placement.cpp APPEND PROPERTY COMPILE_DEFINITIONS
                  "BLOOD2_GI_PROJECT_DIR=\"${PROJECT_SOURCE_DIR}/data/gi\"")
