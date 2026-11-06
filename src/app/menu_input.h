@@ -9,6 +9,14 @@
 #include <vector>
 namespace OpenBlood2
 {
+    // GI tools overlay (F8, gi_contracts.md lot G3): Closed; Open owns input like the F10
+    // inspector; Pinned keeps its markers and status strip during play without taking input.
+    enum class GiOverlay
+    {
+        Closed,
+        Open,
+        Pinned
+    };
     // Normal interactive input. Smoke tests deliberately retain their original adapter.
     struct MenuInput
     {
@@ -16,6 +24,10 @@ namespace OpenBlood2
         MessageInput message;
         TouchControls touch; // On-screen virtual gamepad for direct touch screens.
         bool inspector = false;
+        GiOverlay gi = GiOverlay::Closed;
+        bool gi_pin = false;       // The overlay's Pin switch: closing it from Open leaves it Pinned.
+        bool gi_available = false; // BLOOD2_GI_TOOLS desktop builds outside XR; set by the frontend.
+        bool text_entry = false;   // An ImGui text field has focus (set by the frontend each frame).
         bool demo_mode = false;
         DemoFlow demo;
         // Original GS_CREDITS: the in-world text-only credits screen pauses play.
@@ -63,6 +75,37 @@ namespace OpenBlood2
                     return 0;
             }
         }
+        // A tools window (inspector or open GI overlay) owns device input; play is blocked.
+        bool tools_open() const
+        {
+            return inspector || gi == GiOverlay::Open;
+        }
+        // Leaving Open (F8, the window's close button or the inspector taking over).
+        void close_gi()
+        {
+            if (gi == GiOverlay::Open)
+                gi = gi_pin ? GiOverlay::Pinned : GiOverlay::Closed;
+        }
+        // F8: Closed or Pinned -> Open (the inspector closes); Open -> Pinned or Closed. Ignored
+        // when unavailable, during text entry (message editor, ImGui field) and control capture,
+        // where the event continues unchanged. True when consumed.
+        bool gi_event(const SDL_Event& e, Menu& menu, bool player)
+        {
+            if (e.type != SDL_EVENT_KEY_DOWN || e.key.scancode != SDL_SCANCODE_F8 || !gi_available || text_entry ||
+                message.active || menu.binding >= 0)
+                return false;
+            if (e.key.repeat)
+                return true;
+            if (gi == GiOverlay::Open)
+                close_gi();
+            else
+            {
+                gi = GiOverlay::Open;
+                inspector = false;
+            }
+            reset(menu, player);
+            return true;
+        }
         bool paused(const Menu& menu) const
         {
             return demo_mode ? demo.paused()
@@ -77,7 +120,7 @@ namespace OpenBlood2
             std::erase_if(controls.gamepads, [](const GamepadState& pad) { return pad.id == touch_gamepad_id; });
             if (demo_mode)
             {
-                demo.reset(controls, inspector, player);
+                demo.reset(controls, tools_open(), player);
                 return;
             }
             menu.cancel_pointer();
@@ -87,7 +130,7 @@ namespace OpenBlood2
                 ++menu.revision;
             }
             quick_save = quick_load = false;
-            controls.player_changed(player && !menu.active && !credits_screen && !loading_screen && !inspector);
+            controls.player_changed(player && !menu.active && !credits_screen && !loading_screen && !tools_open());
         }
         // Fresh (non-repeated) down edge of an action in this event.
         bool pressed(const InputEdges& edges, InputAction action) const
@@ -167,7 +210,7 @@ namespace OpenBlood2
                 e.tfinger.windowID == window && e.tfinger.touchID != SDL_MOUSE_TOUCHID &&
                 controls.touch_screen(e.tfinger.touchID) && height > 0)
             {
-                const bool play = player && controls.focused && controls.enabled && !paused(menu) && !inspector;
+                const bool play = player && controls.focused && controls.enabled && !paused(menu) && !tools_open();
                 std::vector<SDL_Event> synthetic;
                 if (touch.event(e, width / height, play, synthetic))
                 {
@@ -177,7 +220,30 @@ namespace OpenBlood2
                 }
             }
             if (demo_mode)
-                return demo.event(e, window, controls, inspector, inspector_available, player, alive);
+            {
+                if (!demo.finished() && e.type == SDL_EVENT_KEY_DOWN && e.key.windowID == window &&
+                    gi_event(e, menu, player))
+                    return false;
+                if (gi == GiOverlay::Open)
+                {
+                    // The overlay owns input like the inspector; F10 hands it over.
+                    bool open = true;
+                    const bool forward = demo.event(e, window, controls, open, inspector_available, player, alive);
+                    if (!open)
+                    {
+                        close_gi();
+                        inspector = true;
+                        reset(menu, player);
+                    }
+                    if (demo.finished())
+                        gi = GiOverlay::Closed;
+                    return forward;
+                }
+                const bool forward = demo.event(e, window, controls, inspector, inspector_available, player, alive);
+                if (demo.finished())
+                    gi = GiOverlay::Closed;
+                return forward;
+            }
             if ((e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_KEY_UP) && e.key.windowID != window)
                 return false;
             if ((e.type == SDL_EVENT_MOUSE_BUTTON_DOWN || e.type == SDL_EVENT_MOUSE_BUTTON_UP) &&
@@ -191,15 +257,15 @@ namespace OpenBlood2
             {
                 controls.event(e, window);
                 menu.cancel_pointer();
-                if (player && !menu.active && !credits_screen && !loading_screen && !inspector)
+                if (player && !menu.active && !credits_screen && !loading_screen && !tools_open())
                     menu.open(true, alive);
                 reset(menu, player);
-                return inspector;
+                return tools_open();
             }
             if (e.type == SDL_EVENT_WINDOW_FOCUS_GAINED && e.window.windowID == window)
             {
                 controls.event(e, window);
-                return inspector;
+                return tools_open();
             }
             const bool gamepad = MovementControls::gamepad_event(e);
             if (e.type == SDL_EVENT_GAMEPAD_REMOVED || !controls.focused)
@@ -235,16 +301,20 @@ namespace OpenBlood2
                 }
                 return false; // Promotions accept source keys only; never leak to the underlying menu/game.
             }
+            if (gi_event(e, menu, player))
+                return false;
             if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.scancode == SDL_SCANCODE_F10)
             {
                 if (inspector_available)
                 {
                     inspector = !inspector;
+                    if (inspector)
+                        close_gi();
                     reset(menu, player);
                 }
                 return false;
             }
-            if (inspector)
+            if (tools_open())
                 return true;
             if (loading_screen)
             {

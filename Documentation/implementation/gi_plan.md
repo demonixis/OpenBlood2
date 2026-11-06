@@ -2,9 +2,9 @@
 
 Drafted 2026-11-06 at `55c640b6`. Nothing is implemented yet. On 2026-11-06
 the user accepted every recommendation in the [decisions](#decisions) table
-(D1–D15) and the defaults. Lots G1 and G2 are done
-([G1 report](reports/gi_g1_prerequisites.md), [G2 report](reports/gi_g2_file_format.md)); G4 is next
-(G3 can run alongside it).
+(D1–D15) and the defaults. Lots G1, G2 and G3 are done
+([G1 report](reports/gi_g1_prerequisites.md), [G2 report](reports/gi_g2_file_format.md),
+[G3 report](reports/gi_g3_f8_shell.md)); G4 is next.
 
 ## The request
 

@@ -93,9 +93,12 @@ namespace OpenBlood2
         std::vector<Net::CommandAction> sampled_actions;
         MenuSettings settings;
         std::filesystem::path preferences, bindings;
+        std::vector<std::string> dropped;
         if (!menu_preferences_path(preferences, error) || !load_menu_preferences(preferences, settings, error) ||
-            !controls_path(bindings, error) || !load_controls(bindings, controls.bindings, error))
+            !controls_path(bindings, error) || !load_controls(bindings, controls.bindings, error, &dropped))
             return failed();
+        for (const auto& binding : dropped)
+            spdlog::warn("Controls: dropped {} (F8 is reserved for the GI tools)", binding);
         Menu display_menu;
         display_menu.settings = settings;
         DisplayOptions display(runtime);

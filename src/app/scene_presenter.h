@@ -108,6 +108,9 @@ namespace OpenBlood2
         PostSettings post;        // Display settings for record(); all but AA need the enhanced renderer.
         LineRenderer ballistic_lines;
         std::vector<LineVertex> ballistic_vertices;
+        // Tool gizmos (the F8 GI overlay), drawn after the tracers with the same line pipeline and
+        // world depth. Read when a frame is recorded; empty (no frame change) unless a tool fills it.
+        std::vector<LineVertex> tool_lines;
         unsigned ballistic_draws = 0;
         WorldPipelines pipelines; // Declared before the renderers that borrow it.
         WorldRenderer world_renderer;
@@ -181,5 +184,6 @@ namespace OpenBlood2
         TextureHandle depth_;
         Uint32 depth_width_ = 0, depth_height_ = 0, depth_layers_ = 0;
         SDL_GPUSampleCount depth_samples_ = SDL_GPU_SAMPLECOUNT_1;
+        std::size_t tracer_vertices_ = 0; // ballistic_vertices built by update(); tool_lines follow.
     };
 } // namespace OpenBlood2

@@ -5,6 +5,7 @@ GI is not rendered yet: nothing in this contract changes a frame, a save or the 
 
 - [World queries (lot G1)](#world-queries-lot-g1)
 - [Baked file and keys (lot G2)](#baked-file-and-keys-lot-g2)
+- [F8 overlay (lot G3)](#f8-overlay-lot-g3)
 
 ## World queries (lot G1)
 
@@ -287,3 +288,86 @@ to an absent texture appearing and to the texture set; invalid paths fail.
 saved file is Ready, then Stale (albedo) after its key moves.
 
 **`config.gi`** `gi_dir` precedence and refusals, tool option conflicts, the JSON log level.
+
+## F8 overlay (lot G3)
+
+The GI tools overlay (`app/gi_overlay.{h,cpp}`, class `GiTools`) is the shell the later lots
+fill. It reads the session and the GI folders only: no simulation, save or rendered-frame change
+while it is closed, and no GI is applied by it.
+
+### Builds
+
+- `BLOOD2_GI_TOOLS` defaults to ON on desktop (macOS, Linux, Windows), Release included
+  (decision D4), and OFF on iOS and Android (Quest included); turning it on there is a
+  configuration error. The dedicated server builds no client.
+- In XR sessions F8 is unavailable (`MenuInput::gi_available` is false) and the overlay never
+  draws.
+- F8 itself is reserved in every build, like F10 (decision D5); without the overlay it does
+  nothing.
+
+### States and input
+
+| State | Shown | Input |
+| --- | --- | --- |
+| Closed | Nothing | Unchanged |
+| Open | The window (panels below) and the gizmos | Owned like the F10 inspector: play blocked, mouse released, keyboard and mouse go to ImGui, Esc does not open the pause menu |
+| Pinned | A non-interactive status strip (top right) and the gizmos | Unchanged: play continues |
+
+- **F8**, a fresh key down: Closed or Pinned → Open, and the inspector closes; Open → Pinned
+  when the window's **Pin** switch is set, otherwise Closed. Repeats do nothing.
+- The window's close button leaves Open the same way.
+- **F10** opening the inspector leaves Open (to Pinned or Closed); the two never own input
+  together.
+- F8 is ignored, and the event continues unchanged, during text entry (the message editor or a
+  focused ImGui field), while a Controls row tracks a device, and when the overlay is
+  unavailable.
+- `MenuInput` handles F8 before the inspector gate in the normal flow (title screen and
+  promotions first, as for F10) and before `DemoFlow` in the menu-free demo, where F10 hands the
+  overlay over to the inspector and a finished demo closes it. `--view-world` uses the normal
+  flow.
+- Ownership changes reset play input like the inspector (`MenuInput::reset`, `tools_open()`).
+
+### Panels
+
+Panels use CyberEngine's vocabulary: Status, Runtime, Light probes, Reflection probes, Bake.
+Only Status works in G3; the others name the lot that brings them (G8, G4, G4, G10).
+
+**Status** shows, truthfully:
+- the summary: no world, error, no baked file, a stale file with its reasons, a refused/foreign
+  file, or "ready file, not applied (GI rendering: lot G8)";
+- that GI rendering is disabled until G8 and the original lightmaps are in use;
+- the world path, DAT and albedo digests, edition, algorithm and expected file name;
+- every search root with its status (the chosen Ready candidate marked), path, stale reasons
+  or failure detail, exactly as `find_gi_file` reports them;
+- the camera position and the root-BSP contents there;
+- **Refresh**, and the **Show camera cell** switch.
+
+The lookup is recomputed when the overlay leaves Closed, when the world path or revision
+changes, and on Refresh; never per frame.
+
+### Gizmos
+
+- `ScenePresenter::tool_lines` is drawn after the ballistic tracers with the same line pipeline,
+  depth test and pass. It is read when a frame is recorded and is empty unless a tool fills it,
+  so frames with the overlay closed are unchanged. No shader artifact is added.
+- G3's one gizmo is the 128-unit lattice cell containing the camera, coloured by the root-BSP
+  contents at the camera: green Empty, red Solid, magenta Unknown (`GiTools::cell_gizmo`).
+
+### Tests
+
+**`menus.gi_tools`** Unavailable F8; Open blocking play, fire and Esc; repeats; Closed; Pin and
+Pinned play; inspector exclusion both ways; message editor, ImGui text field and control
+capture keeping F8; the demo flow (no pause while open, F10 hand-over, finished demo).
+
+**`input_actions.table` / `input_actions.rebind`** F8 refused as a binding and for assignment.
+
+**`input_actions.controls_file`** Version 3 writes; version 1/2 F8 lines dropped and reported;
+version 3 F8 refused; an unknown version refused.
+
+**`gi_overlay.cell`** Cell bounds and the Unknown colour.
+
+**`gi_overlay.draw`** Headless ImGui frames: Closed draws nothing and clears gizmos; Open and
+Pinned draw without a world.
+
+**`gi_overlay.retail`** (private data) 01_SubwayA through `--gi-dir`: no baked file, stale
+(albedo), then ready and chosen; the Open window draws its table.

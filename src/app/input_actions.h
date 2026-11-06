@@ -244,11 +244,12 @@ namespace OpenBlood2
         static constexpr std::size_t max_entries = 256;
         std::vector<InputBinding> entries;
 
-        // F1/F2/F3/F10 stay inspector/diagnostic shortcuts handled before bindings.
+        // F1/F2/F3/F10 stay inspector/diagnostic shortcuts handled before bindings; F8 is the GI
+        // tools overlay (gi_contracts.md lot G3), reserved in every build like F10.
         static bool reserved_key(int code)
         {
             return code == SDL_SCANCODE_F1 || code == SDL_SCANCODE_F2 || code == SDL_SCANCODE_F3 ||
-                   code == SDL_SCANCODE_F10;
+                   code == SDL_SCANCODE_F8 || code == SDL_SCANCODE_F10;
         }
         static bool valid(const InputBinding& b)
         {

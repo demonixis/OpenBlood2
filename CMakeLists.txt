@@ -21,6 +21,17 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 
 option(BLOOD2_INSPECTOR "Build the in-game inspection UI" ON)
+# The F8 GI tools overlay (gi_contracts.md lot G3): every desktop build, Release included;
+# never iOS or Android (Quest included). The dedicated server builds no client.
+if(IOS OR ANDROID)
+    set(BLOOD2_GI_TOOLS_DEFAULT OFF)
+else()
+    set(BLOOD2_GI_TOOLS_DEFAULT ON)
+endif()
+option(BLOOD2_GI_TOOLS "Build the F8 GI tools overlay (desktop)" ${BLOOD2_GI_TOOLS_DEFAULT})
+if(BLOOD2_GI_TOOLS AND (IOS OR ANDROID))
+    message(FATAL_ERROR "BLOOD2_GI_TOOLS is desktop-only")
+endif()
 option(BLOOD2_XR "Build OpenXR support (SDL_GPU sessions; the Quest preset enables it)" OFF)
 option(BLOOD2_GPU_TESTS "Register tests that open a real GPU window" OFF)
 option(BLOOD2_SANITIZERS "Enable ASan/UBSan on project code (Clang/GCC)" OFF)
@@ -207,6 +218,10 @@ if(BLOOD2_BUILD_CLIENT)
     target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
     target_link_libraries(blood2_app PRIVATE blood2_frontend engine spdlog::spdlog imgui blood2_client_network blood2_server_runtime)
     target_compile_definitions(blood2_app PRIVATE BLOOD2_INSPECTOR=$<BOOL:${BLOOD2_INSPECTOR}>)
+    target_compile_definitions(blood2_app PRIVATE BLOOD2_GI_TOOLS=$<BOOL:${BLOOD2_GI_TOOLS}>)
+    if(BLOOD2_GI_TOOLS)
+        target_sources(blood2_app PRIVATE src/app/gi_overlay.cpp)
+    endif()
     target_compile_definitions(blood2_app PRIVATE BLOOD2_XR=$<BOOL:${BLOOD2_XR}>)
     if(BLOOD2_XR)
         target_sources(blood2_app PRIVATE src/app/xr_scene.cpp src/app/xr_player.cpp

@@ -347,6 +347,7 @@ namespace OpenBlood2
                 ballistic_vertices.push_back({{a.x, a.y, a.z}, {tracer_color.x, .8f * tracer_color.y, 0, .1f}});
                 ballistic_vertices.push_back({{b.x, b.y, b.z}, {tracer_color.x, 0, 0, .9f}});
             }
+        tracer_vertices_ = ballistic_vertices.size();
         rebuilt = client_world_epoch_ != replica.frame().world || mesh_revision != source.world_revision ||
                   built_lightmaps_ != lightmaps;
         const auto model_revision = model_scene.revision, effect_revision = explosion_model_scene.revision,
@@ -461,6 +462,8 @@ namespace OpenBlood2
             renderer->draw_calls = renderer->culled = 0;
         if (!pipelines.prepare(format, shading, aux, reflections, samples, error))
             return fail("World pipelines");
+        ballistic_vertices.resize(tracer_vertices_); // Tool gizmos follow the tracers of this update.
+        ballistic_vertices.insert(ballistic_vertices.end(), tool_lines.begin(), tool_lines.end());
         if (!ballistic_vertices.empty() &&
             (!ballistic_lines.prepare(format, SDL_GPU_TEXTUREFORMAT_D32_FLOAT, error, samples,
                                       reflections ? 5

@@ -24,6 +24,9 @@
 #if BLOOD2_INSPECTOR
 #include "app/inspector.h"
 #endif
+#if BLOOD2_GI_TOOLS
+#include "app/gi_overlay.h"
+#endif
 #if BLOOD2_XR
 #include "app/xr_frontend.h"
 #endif
@@ -371,7 +374,12 @@ namespace OpenBlood2
             if (!options.menu_smoke && !options.demo_smoke)
             {
                 std::string why;
-                if (!controls_path(controls_file, why) || !load_controls(controls_file, input.controls.bindings, why))
+                std::vector<std::string> dropped;
+                const bool loaded = controls_path(controls_file, why) &&
+                                    load_controls(controls_file, input.controls.bindings, why, &dropped);
+                for (const auto& binding : dropped) // Controls v3: F8 now opens the GI tools overlay.
+                    spdlog::warn("Controls: dropped {} (F8 is reserved for the GI tools)", binding);
+                if (!loaded)
                 {
                     spdlog::warn("Controls: {}", why);
                     if (menu_enabled && menu.error.empty())
@@ -437,6 +445,10 @@ namespace OpenBlood2
             inspector.materials = &presenter.material_report;
 #else
             (void)data;
+#endif
+#if BLOOD2_GI_TOOLS
+            GiTools gi_tools; // F8 overlay: desktop only, never in XR (gi_contracts.md lot G3).
+            input.gi_available = !xr_mode;
 #endif
             MenuSmoke smoke;
             DemoSmoke demo_smoke;
@@ -568,6 +580,7 @@ namespace OpenBlood2
                     auto* player = game->server_shell.Player(game->local_client);
                     const bool old_message = input.message.active;
                     const bool old_inspector = input.inspector, old_menu = input.paused(menu);
+                    const auto old_gi = input.gi;
                     const bool forward =
                         input.event(event, SDL_GetWindowID(runtime.window), menu, game->client_shell.m_bInWorld,
                                     player && !player->m_damage.IsDead(), BLOOD2_INSPECTOR && options.inspector,
@@ -576,7 +589,7 @@ namespace OpenBlood2
                         gamepads.resync(input.controls);
                     sync_message_input();
                     if (old_message != input.message.active || old_inspector != input.inspector ||
-                        old_menu != input.paused(menu))
+                        old_gi != input.gi || old_menu != input.paused(menu))
                     {
                         neutralize_app_input(game->client_shell);
                         ImGui::GetIO().ClearEventsQueue();
@@ -1039,7 +1052,7 @@ namespace OpenBlood2
                 if (!game->client_session.audio.mixer.pause_output(input.paused(menu), error))
                     return failed(4);
                 auto& shell = game->client_shell;
-                if (input.paused(menu) || input.inspector || input.message.active)
+                if (input.paused(menu) || input.tools_open() || input.message.active)
                     neutralize_app_input(shell);
                 if (input.message.submitted)
                 {
@@ -1073,7 +1086,7 @@ namespace OpenBlood2
                 // World/menu resets can cancel the editor outside SDL event dispatch.
                 sync_message_input();
                 shell.xr_view = xr_mode;
-                const bool blocked = input.paused(menu) || input.inspector || input.message.active;
+                const bool blocked = input.paused(menu) || input.tools_open() || input.message.active;
                 input.controls.enabled = !blocked;
 #if BLOOD2_XR
                 if (xr)
@@ -1156,6 +1169,7 @@ namespace OpenBlood2
                         else
                             input.demo.state = DemoFlow::State::Finished;
                         input.inspector = false;
+                        input.gi = GiOverlay::Closed;
                         input.reset(menu, false);
                         neutralize_app_input(game->client_shell);
                         if (!game->client_session.audio.mixer.pause_output(true, error))
@@ -1229,7 +1243,7 @@ namespace OpenBlood2
                 }
 #endif
                 ImGui::GetIO().ConfigFlags &= ~(ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad);
-                if (input.inspector || input.setup_screen || multiplayer.active)
+                if (input.tools_open() || input.setup_screen || multiplayer.active)
                     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
                 if (input.setup_screen || multiplayer.active)
                     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
@@ -1342,6 +1356,11 @@ namespace OpenBlood2
                 if (was_visible && !input.inspector)
                     input.reset(menu, game->client_shell.m_bInWorld);
 #endif
+#if BLOOD2_GI_TOOLS
+                if (!xr_mode && gi_tools.draw(input, *game, config, presenter.tool_lines))
+                    input.reset(menu, game->client_shell.m_bInWorld);
+#endif
+                input.text_entry = ImGui::GetIO().WantTextInput; // F8 is ignored while a field has focus.
                 ImGui::Render();
 #if BLOOD2_XR
                 if (xr)
