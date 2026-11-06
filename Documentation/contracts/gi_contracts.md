@@ -3,6 +3,9 @@
 Baked GI for the M10 [GI plan](../implementation/gi_plan.md). Each lot adds its section.
 GI is not rendered yet: nothing in this contract changes a frame, a save or the simulation.
 
+- [World queries (lot G1)](#world-queries-lot-g1)
+- [Baked file and keys (lot G2)](#baked-file-and-keys-lot-g2)
+
 ## World queries (lot G1)
 
 `engine/gi_world.h` holds read-only queries over the DAT. The baker and the presentation
@@ -144,3 +147,143 @@ value the save fingerprint stores. It is the bake identity key of lot G2.
 
 **`gi_world_tests digests <data>`**
 - Prints the mesh digests that proved the refactor byte-identical.
+
+## Baked file and keys (lot G2)
+
+`engine/gi_file.h` holds the baked GI container (`.ob2gi`), the keys that tie it to the mounted
+content, the freshness rules and the search order. No bake writes one yet (G5); nothing reads
+one at runtime yet (G8).
+
+### Container
+
+One file per world, little-endian, deterministic: the same `GiFile` always gives the same
+bytes (no time, host name or padding garbage).
+
+| Field | Bytes | Rule |
+| --- | --- | --- |
+| Magic | 8 | `OB2GI` 0x1A 0 0 |
+| Version | 4 | 1 |
+| Endian marker | 4 | 0x01020304 |
+| File size | 8 | The whole file, trailer included; at most 256 MiB |
+| World digest | 32 | SHA-256 of the world DAT (`world_dat_digest`) |
+| Albedo key | 32 | See below |
+| Settings hash | 32 | SHA-256 of the INFO settings text |
+| Placement hash | 32 | Placement the bake used (G4); zero until then |
+| Algorithm | 4 | `gi_algorithm_version`, bumped when a bake would change numbers |
+| Edition | 1 + 3 | 0 retail, 1 Nightmares, 2 demo; three zero bytes |
+| World path length | 2 + 2 | At most 128; two zero bytes |
+| World path | n | Normalized resource path ending in `.dat` |
+| Section count | 4 | 1 to 6 |
+| Sections | | Tag (4), flags (4, zero), size (8), CRC-32 (4, `SDL_crc32`), payload |
+| Trailer | 32 | SHA-256 of every preceding byte |
+
+Sections appear in one order only, each at most once: `INFO` (mandatory, first), then the
+optional `PLAC` (G4), `LMAP` and `VTX ` (G7), `PROB` (G9), `REFL` (G11). The INFO payload is a
+u16 length and the canonical settings text (UTF-8, no NUL, at most 4,096 bytes). Every other
+payload is opaque here; its owning lot decodes it and applies its own limits (texels, probes,
+reflection resolution).
+
+### What refuses a file
+
+`read_gi_file` validates everything before returning and leaves its output untouched on
+failure. Each refusal names its reason ("Invalid GI file: …"):
+
+- wrong magic or a file shorter than the fixed header;
+- a file over 256 MiB, a declared size different from the actual size;
+- an unsupported version, a wrong endian marker, an unknown edition, nonzero reserved bytes;
+- a world path that is too long, truncated or not a normalized `.dat` resource path;
+- a SHA-256 trailer mismatch (checked before any section);
+- a section count outside 1–6, an unknown tag, a duplicate or out-of-order section, INFO not
+  first, nonzero flags, a truncated section header or payload, a CRC-32 mismatch;
+- INFO with a bad length, invalid UTF-8, or a text whose SHA-256 differs from the header;
+- bytes left between the last section and the trailer.
+
+`write_gi_file` refuses the matching invalid inputs (settings hash, text, world path, edition,
+section order, size) and never returns partial bytes. `save_gi_file` writes atomically: a
+refused or failed write keeps the previous file.
+
+### What only marks it stale
+
+A valid file is compared with the mounted content by `gi_status`:
+
+| Status | When | Applied? |
+| --- | --- | --- |
+| Missing | No file under that name | No |
+| Failed | Unreadable or refused (above) | No |
+| Foreign | Another world digest, or a file baked for another world path | No; not a candidate |
+| Stale | Same world DAT, but a compared key differs | No; reported with its reasons |
+| Ready | Every compared key matches | Yes, the only applied status |
+
+Stale reasons are `albedo`, `algorithm`, `edition`, `settings` and `placement`. Settings and
+placement are compared only when the caller asks for them: the runtime accepts any bake
+settings, while a bake with `--gi-if-stale` (G5) compares its own. The F8 states Dirty, Baking
+and Disabled are runtime states of G3/G10, not file statuses.
+
+### Keys
+
+- **World:** the DAT SHA-256, the same value as the save fingerprint.
+- **Albedo:** SHA-256 over the sorted set of normalized texture paths of every world model, plus
+  the DTX frames of SPR textures. Per texture: the path, a present flag, then for a present one
+  the providing archive's directory digest, entry offset and size. Missing textures are keyed
+  as absent, so installing one marks the bake stale. An invalid texture path fails the key.
+- **Edition:** from the mounted set (`--demo`, `--nightmares`, otherwise retail).
+- `gi_expectation(resources, world_path)` computes world, albedo, edition and algorithm.
+
+### Names and search order
+
+`gi_file_name` maps a world to `<normalized path without .dat>.<first 12 hex digits of the DAT
+digest>.ob2gi`, for example `worlds/01_subwaya.91bc95a10ed8.ob2gi`. A new DAT gets a new name,
+so an old bake never shadows it.
+
+`gi_search_roots(configured)` returns, in order:
+
+1. `--gi-dir DIR`, else `gi_dir = DIR` from the configuration file (relative to that file);
+2. `user_directory()/gi`;
+3. `/sdcard/openblood2/gi` (Android only);
+4. `SDL_GetBasePath()/gi`, the packaged copy (decision 8).
+
+`find_gi_file` reads at most one file per root through SDL I/O (Android assets work), never
+writes or deletes, records every candidate with its status and detail, and chooses the first
+Ready one. Later roots are still reported, so a shadowed or stale copy is visible.
+
+### Configuration and tools
+
+- The configuration file accepts `gi_dir` beside `data_dir`, each at most once; keys stay
+  case-sensitive and anything else is still refused.
+- `--list-worlds` prints every mounted world DAT: single-player (`worlds/<name>.dat`), then
+  `worlds/multi/`, then other `worlds/` subdirectories, then `worlds_ao/`, in path order within
+  each group, with its kind, DAT digest and GI file name. `--json` prints one JSON object
+  (`edition`, `worlds[]` with `path`, `kind`, `digest`, `gi_file`) and lowers the console log
+  level to `error` unless `--log-level` is given. Exit 0, 2 (data), 5 (a DAT cannot be read).
+- `--gi-verify FILE` validates a file, prints its header and sections, then its status against
+  the mounted world and the expected file name. Exit 0 (ready), 2 (arguments, data or an
+  unreadable file), 4 (refused, stale or foreign), 5 (its world is not mounted or unreadable).
+- Both are separate headless tools: they refuse `--world`, `--frames`, `--capture`, the other
+  tool and every other execution mode.
+
+### Tests
+
+**`gi_file.roundtrip`** Byte-identical rewrites, INFO-only files and the largest settings text.
+
+**`gi_file.write_refusals`** Every writer refusal, with the output left unchanged.
+
+**`gi_file.read_refusals`** Every reader refusal above, each reached past the earlier checks by
+resealing the size and trailer; the output is left unchanged.
+
+**`gi_file.fuzz`** 4,000 deterministic mutations (with and without resealing, with truncation):
+each is refused or round-trips byte for byte.
+
+**`gi_file.status`** Ready, each stale reason, combined reasons and Foreign.
+
+**`gi_file.naming`** Normalization, the digest suffix and refused paths.
+
+**`gi_file.search`** Root order with the isolated user directory; Missing, Failed, Stale, Ready
+and shadowed candidates; a renamed foreign file; atomic save keeping the previous file.
+
+**`gi_file.albedo`** A synthetic REZ: order-free, case-normalized, sensitive to entry size,
+to an absent texture appearing and to the texture set; invalid paths fail.
+
+**`gi_file.retail`** (private data) Deterministic expectations and names for all 58 worlds; a
+saved file is Ready, then Stale (albedo) after its key moves.
+
+**`config.gi`** `gi_dir` precedence and refusals, tool option conflicts, the JSON log level.

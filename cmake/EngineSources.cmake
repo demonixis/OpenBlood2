@@ -72,6 +72,7 @@ add_library(engine_core STATIC
     src/engine/collision.cpp
     src/engine/visibility.cpp
     src/engine/gi_world.cpp
+    src/engine/gi_file.cpp
     src/engine/container.cpp
     src/engine/world_model.cpp
     src/engine/logging.cpp

@@ -2,6 +2,7 @@
 
 #include "scratch_dir.h"
 #include <array>
+#include <vector>
 #include <fstream>
 #include <iostream>
 
@@ -278,6 +279,55 @@ namespace
         return true;
     }
 
+    // GI lot G2: gi_dir= / --gi-dir and the --list-worlds / --gi-verify tools.
+    bool gi(const fs::path& root)
+    {
+        Options options;
+        std::string error;
+        const std::array<std::string_view, 2> list{"--list-worlds", "--json"};
+        CHECK(parse_options(list, options, error) && options.list_worlds && options.json);
+        CHECK(options.log_level == "error"); // JSON owns standard output.
+        const std::array<std::string_view, 4> list_level{"--list-worlds", "--json", "--log-level", "debug"};
+        CHECK(parse_options(list_level, options, error) && options.log_level == "debug");
+        const std::array<std::string_view, 3> verify{"--gi-verify", "a.ob2gi", "--gi-dir"};
+        CHECK(!parse_options(verify, options, error)); // --gi-dir needs a value.
+        const std::array<std::string_view, 4> verify_dir{"--gi-verify", "a.ob2gi", "--gi-dir", "bakes"};
+        CHECK(parse_options(verify_dir, options, error));
+        CHECK(path_text(options.gi_verify) == "a.ob2gi" && path_text(options.gi_dir) == "bakes");
+        for (const auto& args : std::initializer_list<std::vector<std::string_view>>{
+                 {"--json"},
+                 {"--gi-verify", "a.ob2gi", "--json"},
+                 {"--list-worlds", "--gi-verify", "a.ob2gi"},
+                 {"--list-worlds", "--world", "02_CityHub"},
+                 {"--list-worlds", "--check-data"},
+                 {"--gi-verify", "a.ob2gi", "--bench"},
+                 {"--list-worlds", "--view-world"},
+                 {"--gi-verify", "a.ob2gi", "--frames", "5"}})
+            CHECK(!parse_options(args, options, error));
+
+        options = {};
+        options.config_file = root / "config.ini";
+        options.explicit_config = true;
+        Config config;
+        CHECK(write(options.config_file, "data_dir = data\ngi_dir = \"GI bakes\"\n"));
+        CHECK(load_config(options, "", config, error));
+        CHECK(config.gi_dir == root / "GI bakes"); // Relative to the configuration file.
+        options.gi_dir = root / "from-command-line";
+        CHECK(load_config(options, "", config, error) && config.gi_dir == options.gi_dir);
+        options.gi_dir.clear();
+        CHECK(write(options.config_file, "gi_dir = /absolute/gi\ndata_dir = data\n"));
+        CHECK(load_config(options, "", config, error) && config.gi_dir == fs::path("/absolute/gi"));
+        CHECK(write(options.config_file, "data_dir = data\n"));
+        CHECK(load_config(options, "", config, error) && config.gi_dir.empty());
+        for (const auto text : {"data_dir = data\ngi_dir =\n", "data_dir = data\ngi_dir = a\ngi_dir = b\n",
+                                "data_dir = data\nGI_DIR = a\n", "data_dir = data\ngi_dir = \"broken\n"})
+        {
+            CHECK(write(options.config_file, text));
+            CHECK(!load_config(options, "", config, error));
+        }
+        return true;
+    }
+
 } // namespace
 
 int main(int argc, char** argv)
@@ -302,6 +352,8 @@ int main(int argc, char** argv)
         test = demo;
     else if (name == "nightmares")
         test = nightmares;
+    else if (name == "gi")
+        test = gi;
     if (!test)
         return 2;
     std::error_code ec;

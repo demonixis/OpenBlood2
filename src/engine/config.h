@@ -15,6 +15,7 @@ namespace OpenBlood2
     {
         std::filesystem::path config_file = "blood2.local.ini";
         std::filesystem::path data_dir;
+        std::filesystem::path gi_dir; // --gi-dir: first GI bake search root (gi_contracts.md lot G2).
         std::vector<std::filesystem::path> overlays{}; // Explicit, ordered data-only REZ mods.
         std::filesystem::path capture_file;
         std::filesystem::path log_dir;
@@ -48,6 +49,9 @@ namespace OpenBlood2
         bool xr_test = false;  // OpenXR first light (BLOOD2_XR builds); needs no game data.
         bool xr_world = false; // Direct world entry rendered in an OpenXR session (BLOOD2_XR builds).
         bool check_data = false;
+        // GI tools (gi_contracts.md lot G2): --list-worlds [--json], --gi-verify FILE.
+        bool list_worlds = false, json = false;
+        std::filesystem::path gi_verify;
         bool inspector = true;
         bool gpu_smoke = false;
         bool world_smoke = false;
@@ -76,6 +80,7 @@ namespace OpenBlood2
         // Selects the retail set plus BLOOD2NM.REZ (nightmares_plan.md); never inferred either.
         bool nightmares = false;
         std::vector<std::filesystem::path> overlays{};
+        std::filesystem::path gi_dir{}; // --gi-dir, else gi_dir= (relative to the ini); empty when neither.
     };
     // Original first single-player level: ClientShellDLL sFirstLevel (_DEMO "Demo_01").
     inline const char* first_level(bool demo)
