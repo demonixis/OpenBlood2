@@ -1,5 +1,6 @@
 #include "engine/world_view.h"
 #include "engine/collision.h"
+#include "engine/gi_world.h"
 #include "engine/sprite.h"
 #include <algorithm>
 #include <charconv>
@@ -434,27 +435,13 @@ namespace OpenBlood2
                 // geometry without baked colors stays unlit.
                 const bool bright = (surface.flags & (1u << 5)) != 0;
                 std::uint32_t lightmap = 0, atlas_x = 0, atlas_y = 0;
-                std::array<double, 2> lightmap_origin_value{};
+                LightmapFrame lightmap_layout; // Shared with the GI baker (gi_world.h).
                 if (use_lightmaps && material && !bright && model.lightmaps && (surface.flags & (1u << 7)) &&
                     polygon.lightmap_width && polygon.lightmap_height)
                 {
-                    if (std::size_t(polygon.lightmap_offset) +
-                            std::size_t(polygon.lightmap_width) * polygon.lightmap_height >
-                        model.lightmap_texels.size())
+                    if (!lightmap_frame(model, polygon, count, lightmap_layout))
                         return fail("Invalid world lightmap reference");
-                    const std::array<DVector, 2> axes{surface.lightmap_p, surface.lightmap_q};
-                    const std::array<unsigned, 2> texels{polygon.lightmap_width, polygon.lightmap_height};
-                    for (int k = 0; k < 2; ++k)
-                    {
-                        double lo = std::numeric_limits<double>::max(), hi = -lo;
-                        for (std::size_t i = 0; i < count; ++i)
-                        {
-                            const double d = vector_dot(axes[k], model.points[polygon.points[i]]);
-                            lo = std::min(lo, d);
-                            hi = std::max(hi, d);
-                        }
-                        lightmap_unfitted += !lightmap_origin(lo, hi, texels[k], lightmap_origin_value[k]);
-                    }
+                    lightmap_unfitted += lightmap_layout.unfitted;
                     if (!place_lightmap(model, polygon, atlas_x, atlas_y))
                         return fail("World lightmap page budget exceeded");
                     lightmap = page;
@@ -528,10 +515,9 @@ namespace OpenBlood2
                         {
                             // Texel centers lie on the grid: texel coordinate = axis offset / 20 + .5,
                             // inside the bordered rectangle.
-                            const double s = (vector_dot(surface.lightmap_p, p) - lightmap_origin_value[0]) / 20 + .5;
-                            const double t = (vector_dot(surface.lightmap_q, p) - lightmap_origin_value[1]) / 20 + .5;
-                            vertex.lightmap = {float((atlas_x + 1 + s) / page_size),
-                                               float((atlas_y + 1 + t) / page_size)};
+                            const auto st = lightmap_layout.coordinate(p);
+                            vertex.lightmap = {float((atlas_x + 1 + st[0]) / page_size),
+                                               float((atlas_y + 1 + st[1]) / page_size)};
                             if (!std::isfinite(vertex.lightmap[0]) || !std::isfinite(vertex.lightmap[1]))
                                 return fail("World lightmap coordinates exceed limits");
                         }

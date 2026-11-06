@@ -2,7 +2,8 @@
 
 Drafted 2026-11-06 at `55c640b6`. Nothing is implemented yet. On 2026-11-06
 the user accepted every recommendation in the [decisions](#decisions) table
-(D1–D15) and the defaults; lot G1 is next.
+(D1–D15) and the defaults. Lot G1 is done
+([report](reports/gi_g1_prerequisites.md)); G2 is next.
 
 ## The request
 
