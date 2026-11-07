@@ -13,8 +13,8 @@ namespace OpenBlood2
         // the renderer selection; version 4 the VR options; version 5 the VR movement reference;
         // version 6 the cheat switch and god mode; version 7 the post-processing rows; version 8
         // ambient occlusion; version 9 reflections; version 10 display; version 11 control toggles;
-        // version 12 the field of view; version 13 global illumination.
-        constexpr std::array<const char*, 37> names{"version",
+        // version 12 the field of view; version 13 global illumination; version 14 reflection probes.
+        constexpr std::array<const char*, 38> names{"version",
                                                     "sound",
                                                     "music",
                                                     "sound_volume",
@@ -50,8 +50,9 @@ namespace OpenBlood2
                                                     "crosshair",
                                                     "crosshair_number",
                                                     "field_of_view",
-                                                    "global_illumination"};
-        constexpr std::array<std::size_t, 13> version_keys{7, 9, 12, 15, 16, 18, 21, 22, 23, 31, 35, 36, 37};
+                                                    "global_illumination",
+                                                    "reflection_probes"};
+        constexpr std::array<std::size_t, 14> version_keys{7, 9, 12, 15, 16, 18, 21, 22, 23, 31, 35, 36, 37, 38};
         bool valid(const MenuSettings& s)
         {
             const bool turn = s.vr_turn == 0 || s.vr_turn == 15 || s.vr_turn == 30 || s.vr_turn == 45 ||
@@ -69,7 +70,8 @@ namespace OpenBlood2
                    (s.vr_refresh_rate == 0 || (s.vr_refresh_rate >= 30000 && s.vr_refresh_rate <= 1000000)) &&
                    s.vr_render_scale >= 50 && s.vr_render_scale <= 100 && s.vr_render_scale % 10 == 0 &&
                    s.crosshair_number >= 0 && s.crosshair_number <= 41 && s.field_of_view >= 60 &&
-                   s.field_of_view <= 120 && s.field_of_view % 5 == 0;
+                   s.field_of_view <= 120 && s.field_of_view % 5 == 0 && s.reflection_probes >= 0 &&
+                   s.reflection_probes <= 2;
         }
     } // namespace
     bool menu_preferences_path(std::filesystem::path& output, std::string& error)
@@ -206,6 +208,8 @@ namespace OpenBlood2
             result.field_of_view = values[35];
         if (required >= version_keys[12])
             result.global_illumination = values[36];
+        if (required >= version_keys[13])
+            result.reflection_probes = values[37];
         if (!valid(result))
         {
             error = "Preferences out of range";
@@ -222,7 +226,7 @@ namespace OpenBlood2
             error = "Preferences out of range";
             return false;
         }
-        const std::array<int, names.size()> values{13,
+        const std::array<int, names.size()> values{14,
                                                    settings.sound,
                                                    settings.music,
                                                    settings.sound_volume,
@@ -258,7 +262,8 @@ namespace OpenBlood2
                                                    settings.crosshair,
                                                    settings.crosshair_number,
                                                    settings.field_of_view,
-                                                   settings.global_illumination};
+                                                   settings.global_illumination,
+                                                   settings.reflection_probes};
         std::string text;
         for (unsigned i = 0; i < values.size(); ++i)
             text += std::string(names[i]) + '=' + std::to_string(values[i]) + '\n';

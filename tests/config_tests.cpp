@@ -520,7 +520,43 @@ namespace
         CHECK(options.gi_source == 0 && options.gi_source_given && options.gi_probes == 0);
         options = {};
         CHECK(parse_options(plain, options, error) && options.gi_source == 0 && options.gi_probes == 1 &&
-              !options.gi_source_given && !options.gi_probes_given);
+              !options.gi_source_given && !options.gi_probes_given && options.gi_reflections == 0 &&
+              !options.gi_reflections_given);
+        // Lot G12: reflection probes in --bench and smoke runs, with or without --gi (GI off draws the
+        // Original set).
+        for (const auto [text, mode] :
+             std::initializer_list<std::pair<std::string_view, int>>{{"off", 0}, {"low", 1}, {"high", 2}})
+        {
+            options = {};
+            CHECK(parse_options(std::array<std::string_view, 4>{"--bench", "--gi", "--gi-reflections", text}, options,
+                                error));
+            CHECK(options.gi_reflections == mode && options.gi_reflections_given);
+            options = {};
+            CHECK(parse_options(std::array<std::string_view, 3>{"--gpu-smoke", "--gi-reflections", text}, options,
+                                error) &&
+                  options.gi_reflections == mode && !options.gi);
+        }
+        for (const auto& args : std::initializer_list<std::vector<std::string_view>>{
+                 {"--bench", "--gi-reflections", "HIGH"},
+                 {"--bench", "--gi-reflections", "2"},
+                 {"--bench", "--gi-reflections"}})
+        {
+            options = {};
+            CHECK(!parse_options(args, options, error));
+        }
+        options = {};
+        CHECK(!parse_options(std::array<std::string_view, 3>{"--bench", "--gi-reflections", "medium"}, options, error) &&
+              error == "--gi-reflections requires off, low or high");
+        for (const auto& args : std::initializer_list<std::vector<std::string_view>>{
+                 {"--gi-reflections", "high"},
+                 {"--view-world", "--gi-reflections", "low"},
+                 {"--bake-gi", "a", "--gi-reflections", "low"},
+                 {"--connect", "127.0.0.1", "--gi-reflections", "low"}})
+        {
+            options = {};
+            CHECK(!parse_options(args, options, error) &&
+                  error.rfind("--gi-reflections applies reflection probes to --bench and smoke runs", 0) == 0);
+        }
         for (const auto [text, view] : std::initializer_list<std::pair<std::string_view, int>>{
                  {"final", 0}, {"original", 1}, {"direct", 2}, {"indirect", 3}, {"lighting", 4}, {"validity", 5}})
         {

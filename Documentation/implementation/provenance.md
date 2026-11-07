@@ -2406,3 +2406,29 @@ the project's own `GiBvh` and WorldShade Möller–Trumbore arithmetic, and its 
 reproduces the GD1 `CollisionWorld` sweep's treatment of a start lying on a face. See the
 [GD2 report](reports/gi_gd2_rebaked_direct.md) and
 [contracts](../contracts/gi_contracts.md#re-baked-direct-bake-lot-gd2).
+
+## GI reflection bake (lot G11, 2026-11-07)
+
+No code is imported. CyberEngine's `src/engine/graphics/rendering/internal/reflection_prefilter.cpp`
+and its `tests/graphics/reflection_prefilter_tests.cpp` (`../CyberEngine`) were references only
+(decision D13): the roughness-per-level rule, alpha = max(roughness², 0.001), the radical-inverse
+(Hammersley) points and the three prefilter properties the tests check (constant radiance kept,
+reproducible chains, a spread rough level) are rewritten in `gi_reflections.cpp` and
+`gi_reflections.prefilter`; the 64/32 sample counts are the [GI plan](gi_plan.md)'s.
+The GGX half-vector sampling follows Karis ("Real Shading in Unreal Engine 4", 2013), the Hammersley
+points and the octahedral map (Cigolle et al., "A Survey of Efficient Representations for Independent
+Unit Vectors", JCGT 2014) their published descriptions; the borders, the cube capture, the two light
+sets and the REFL format are written for this project from the [GI plan](gi_plan.md). See
+[contracts](../contracts/gi_contracts.md#reflection-bake-lot-g11).
+
+## GI reflection runtime (lot G12, 2026-11-07)
+
+No code is imported. CyberEngine's `shaders/include/reflection_environment.hlsli` and
+`tests/graphics/reflection_environment_shader_contract_tests.cpp` (`../CyberEngine`) were references
+only (decision D13) for the box coverage over a blend distance, the two-probe selection by priority
+and coverage, the level saturate(roughness) × (levels − 1) and the box projection by slab
+intersection; the `-DGI` code of `pbr.frag.hlsl`, the
+cell grid, the record layout, the CPU mirror (`gi_reflection_environment`) and the page alpha are
+written for this project from the [GI plan](gi_plan.md). The binary16 conversion reuses the
+project's G9 codec. See [contracts](../contracts/gi_contracts.md#reflection-runtime-lot-g12).
+

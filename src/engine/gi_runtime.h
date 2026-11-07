@@ -3,6 +3,7 @@
 #include "engine/gi_file.h"
 #include "engine/gi_lightmap.h"
 #include "engine/gi_probes.h"
+#include "engine/gi_reflections.h"
 #include <array>
 #include <cstdint>
 #include <optional>
@@ -79,6 +80,11 @@ namespace OpenBlood2
         std::vector<std::uint8_t> probe_texel_valid, probe_corner_valid;
         bool probe_source_ready = false;
         double probe_source_ms = 0;
+        // The REFL section and the PLAC reflection probes it was baked for (lots G11, G12); empty when the
+        // file has none. The enhanced renderer draws them (REFLECTION PROBES), never WorldMesh::build.
+        GiReflections reflections;
+        std::vector<GiReflectionProbe> reflection_probes;
+        bool has_reflections = false;
         // E from the probes at every listed texel centre and corner, with the face normal. Elements
         // without a valid probe get 0 (the original light at f = 1). False without probes.
         bool prepare_probe_source(const World&, std::string& error);
@@ -86,18 +92,23 @@ namespace OpenBlood2
         std::int64_t block(std::uint32_t model, std::uint32_t polygon) const;
         std::int64_t set(std::uint32_t model, std::uint32_t polygon) const;
         // The composed 8-bit light of texel or corner `index` (an index into lightmaps.texels or
-        // vertex.corners) whose stored light is `original`, under `composition`.
-        std::array<std::uint8_t, 3> compose(bool texel, std::uint32_t index,
-                                            std::array<std::uint8_t, 3> original) const;
+        // vertex.corners) whose stored light is `original`, under `composition`. `share` (lot G12, the
+        // page alpha) receives the part of that light that is not GI indirect light beyond the ambient
+        // fill it replaces: 255 - round(255 L(min(X, P)) / L(P)), with P the composed value, X =
+        // max(0, k E s - f A_eff) per channel and L the shader's luminance (.299, .587, .114); 255 when X
+        // is 0 or P is black, and in the Original, Direct and Validity views; 0 in the Indirect view.
+        std::array<std::uint8_t, 3> compose(bool texel, std::uint32_t index, std::array<std::uint8_t, 3> original,
+                                            std::uint8_t* share = nullptr) const;
     };
     // Decodes the LMAP and VTX sections (both required) and checks them against the world, DIR when
-    // present (one value per LMAP texel), then PLAC and PROB when the file has PROB (a PROB that does
-    // not match its lattice fails the file). The output is untouched on failure.
+    // present (one value per LMAP texel), then PLAC with PROB and REFL when the file has them (a PROB
+    // that does not match its lattice, or a REFL that does not match the PLAC reflection probes, fails
+    // the file). The output is untouched on failure.
     bool gi_world_light(const World&, const GiFile&, GiWorldLight&, std::string& error);
 
     enum class GiRuntimeState : std::uint8_t
     {
-        Off,     // GLOBAL ILLUMINATION is off: nothing is looked up.
+        Off,     // GLOBAL ILLUMINATION and REFLECTION PROBES are off: nothing is looked up.
         NoWorld, // No world loaded.
         Missing, // No Ready file (every candidate is Missing, Stale, Foreign or Failed).
         Failed,  // The content keys, the lookup or the sections failed.
@@ -110,10 +121,14 @@ namespace OpenBlood2
         std::string world_path, file, detail; // file: the chosen candidate; detail: why it is not applied.
         std::string settings;                 // The applied file's bake settings (INFO text).
         bool rebaked = false;                 // The applied file has a re-baked direct source (DIR).
+        // GLOBAL ILLUMINATION composes the file (lot G12: false when it was read for reflection probes only).
+        bool lighting = true;
         GiLookup lookup;                      // Every candidate, without the file's payload.
         std::size_t blocks = 0, texels = 0, sets = 0, corners = 0;
         std::size_t probes = 0, valid_probes = 0; // PROB entries (0 when the file has none).
         std::uint32_t probe_spacing = 0;
+        std::size_t reflection_probes = 0, valid_reflections = 0; // REFL chains (0 when the file has none).
+        std::uint32_t reflection_resolution = 0, reflection_levels = 0;
         // Load cost: content keys (DAT and albedo digests), file lookup, section decode and checks.
         double expectation_ms = 0, lookup_ms = 0, decode_ms = 0;
         std::uint64_t loads = 0; // Lookups since construction; identifies the decoded data.

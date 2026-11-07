@@ -5,6 +5,7 @@
 #include "engine/gi_lightmap.h"
 #include "engine/gi_placement.h"
 #include "engine/gi_probes.h"
+#include "engine/gi_reflections.h"
 #include <atomic>
 #include <filesystem>
 #include <functional>
@@ -112,6 +113,7 @@ namespace OpenBlood2
         std::uint64_t direct_tests = 0;
         double direct_ms = 0;
         GiProbeReport light_probes;
+        GiReflectionReport reflection_probes; // Lot G11.
         std::uint64_t bytes = 0;
         double ms = 0;
     };

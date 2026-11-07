@@ -165,7 +165,7 @@ namespace OpenBlood2
         const bool shaded = enhanced();
         if (shaded && (surface_materials_.uniforms.size() < textures_.size() ||
                        surface_materials_.normals.size() < textures_.size() || !surface_materials_.sampler ||
-                       !registry_->get(surface->lights) || !registry_->get(surface->cells)))
+                       !surface->ready(*registry_) || pipelines_->gi() != surface->gi))
         {
             error = "Enhanced surface materials not prepared";
             return false;

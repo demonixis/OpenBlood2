@@ -428,7 +428,7 @@ namespace OpenBlood2
             ScenePresenter presenter(runtime.gpu);
             presenter.model_shadows = options.model_shadows;
             presenter.gi_roots = gi_search_roots(config.gi_dir); // Baked GI (lot G8), read while enabled.
-            std::uint64_t gi_logged = 0;
+            GiLogState gi_logged;
             HudRenderer hud(runtime.gpu);
 #if BLOOD2_INSPECTOR
             Inspector inspector(runtime);
@@ -1015,6 +1015,7 @@ namespace OpenBlood2
                 game->server.debris_detail = settings.detail;
                 presenter.lightmaps = settings.detail >= 1;
                 presenter.global_illumination = settings.global_illumination;
+                presenter.gi_reflections = GiReflectionMode(std::clamp(settings.reflection_probes, 0, 2));
                 presenter.model_shadows = options.model_shadows && settings.detail >= 2;
                 presenter.per_pixel_lighting = settings.pixel_lighting;
                 presenter.field_of_view = float(settings.field_of_view) * 0.017453292519943295f;
@@ -1366,7 +1367,9 @@ namespace OpenBlood2
                                               {&menu.settings.global_illumination, &presenter.gi_composition,
                                                &presenter.gi_reload, &presenter.gi_status(), &presenter.world_mesh,
                                                presenter.mesh_build_ms, &presenter.gi_probes, presenter.gi_light(),
-                                               &presenter.model_lighting.stats}))
+                                               &presenter.model_lighting.stats, &menu.settings.reflection_probes,
+                                               &presenter.gi_reflection_view, &presenter.reflection_stats(),
+                                               presenter.shading != SurfaceShading::Original}))
                     input.reset(menu, game->client_shell.m_bInWorld);
 #endif
                 input.text_entry = ImGui::GetIO().WantTextInput; // F8 is ignored while a field has focus.

@@ -327,7 +327,7 @@ namespace OpenBlood2
                      arg == "--gi-out" || arg == "--gi-sky" || arg == "--gi-preview" || arg == "--gi-preview-dir" ||
                      arg == "--gi-direct-audit" || arg == "--gi-direct" ||
                      arg == "--gi-k" || arg == "--gi-f" || arg == "--gi-view" || arg == "--gi-source" ||
-                     arg == "--gi-probes" || arg == "--frames" || arg == "--capture" || arg == "--world" || arg == "--log-dir" ||
+                     arg == "--gi-probes" || arg == "--gi-reflections" || arg == "--frames" || arg == "--capture" || arg == "--world" || arg == "--log-dir" ||
                      arg == "--log-level" || arg == "--rez" ||
                      arg == "--connect" || arg == "--host" || arg == "--port" || arg == "--name" || arg == "--end" ||
                      arg == "--frag-limit" || arg == "--time-limit" || arg == "--map" || arg == "--mode" ||
@@ -468,6 +468,18 @@ namespace OpenBlood2
                     options.gi_view = int(it - views.begin());
                     options.gi_view_given = true;
                 }
+                else if (arg == "--gi-reflections")
+                {
+                    constexpr std::array<std::string_view, 3> modes{"off", "low", "high"};
+                    const auto it = std::find(modes.begin(), modes.end(), args[i]);
+                    if (it == modes.end())
+                    {
+                        error = "--gi-reflections requires off, low or high";
+                        return false;
+                    }
+                    options.gi_reflections = int(it - modes.begin()); // GiReflectionMode order.
+                    options.gi_reflections_given = true;
+                }
                 else if (arg == "--gi-source")
                 {
                     if (args[i] != "texels" && args[i] != "probes")
@@ -601,6 +613,13 @@ namespace OpenBlood2
         {
             error = "--gi-k and --gi-f require --gi-preview or --gi; --gi-view, --gi-source and --gi-probes "
                     "require --gi";
+            return false;
+        }
+        if (options.gi_reflections_given &&
+            (gi_tool || network || (!options.bench && !options.gpu_smoke && !options.world_smoke)))
+        {
+            error = "--gi-reflections applies reflection probes to --bench and smoke runs; the game uses Options > "
+                    "Display REFLECTION PROBES and the F8 Runtime panel";
             return false;
         }
         if (options.gi && (gi_tool || network || (!options.bench && !options.gpu_smoke && !options.world_smoke)))

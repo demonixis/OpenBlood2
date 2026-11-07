@@ -5,13 +5,17 @@
 // the Light probes world source identical; nonzero probes change the models only, and the switch,
 // intensity 0 and the Original view restore the frame. Lot GD2: a DIR section equal to O - A_eff with
 // E = 0 is the reference frame; the re-baked D' changes the lightmapped frame only, and the Original
-// view, DETAIL LOW and GI off keep the reference.
+// view, DETAIL LOW and GI off keep the reference. Lot G12: a file with a constant reflection probe
+// keeps the enhanced frame while REFLECTION PROBES is off; LOW and HIGH change it, "Reflections only"
+// draws the CPU mirror's radiance on the enhanced faces (the composed set with GI on, the Original set
+// with GI off), and the original renderer never draws probes.
 #include "app/scene_presenter.h"
 #include "app/session_playback.h"
 #include "engine/capture.h"
 #include "engine/gi_bake_scene.h"
 #include "engine/gi_direct.h"
 #include "engine/gi_lightmap.h"
+#include "engine/gi_reflection_runtime.h"
 #include "engine/sha256.h"
 #include "engine/world_shaders.h"
 #include "game/local_scene.h"
@@ -66,8 +70,11 @@ namespace
     // LMAP/VTX of uniform E, and (lot G9) PLAC/PROB: a probe at every node of a 256-unit lattice over the
     // world with uniform E = probe_energy.
     // `direct` (lot GD2): 0 no DIR section, 1 D = O - A_eff, 2 the re-baked D'.
+    // `reflection` (lot G12): one reflection probe over the world, of constant radiance in the Original
+    // set ([0]) and the composed set ([1]).
     bool gi_file(const World& world, const Resources& resources, std::string_view path, float energy,
-                 float probe_energy, GiFile& file, std::string& error, int direct = 0)
+                 float probe_energy, GiFile& file, std::string& error, int direct = 0,
+                 const std::array<DVector, 2>* reflection = nullptr)
     {
         WorldMesh mesh;
         std::vector<WorldTriangleSource> sources;
@@ -107,7 +114,19 @@ namespace
         file.sections[1].tag = gi_format::lightmaps;
         file.sections[2].tag = gi_format::vertices;
         file.sections[3].tag = gi_format::probes;
-        if (!encode_gi_placement_section(lattice, {}, file.sections[0].payload, error) ||
+        std::vector<GiReflectionProbe> reflections;
+        if (reflection)
+        {
+            GiReflectionProbe probe;
+            probe.influence = {vector_subtract(world.min, {64, 64, 64}), vector_add(world.max, {64, 64, 64})};
+            probe.projection = probe.influence;
+            probe.capture = vector_scale(vector_add(world.min, world.max), .5f);
+            probe.blend_distance = 0;
+            probe.box_projection = false;
+            probe.resolution = 16;
+            reflections.push_back(probe);
+        }
+        if (!encode_gi_placement_section(lattice, reflections, file.sections[0].payload, error) ||
             !write_gi_lightmaps(maps, file.sections[1].payload, error) ||
             !write_gi_vertex_light(vertex, file.sections[2].payload, error) ||
             !write_gi_probes(probes, file.sections[3].payload, error))
@@ -141,6 +160,19 @@ namespace
             if (!write_gi_direct(section, dir.payload, error))
                 return false;
             file.sections.insert(file.sections.begin() + 2, std::move(dir));
+        }
+        if (reflection)
+        {
+            GiReflections refl;
+            refl.resolution = 16;
+            refl.levels = gi_reflection_levels(16);
+            refl.valid = {1};
+            for (const auto& radiance : *reflection)
+                refl.texels.insert(refl.texels.end(), gi_reflection_chain_texels(16), gi_rgb9e5(radiance));
+            GiSection section{gi_format::reflections, {}};
+            if (!write_gi_reflections(refl, section.payload, error))
+                return false;
+            file.sections.push_back(std::move(section));
         }
         file.key.world = expected.world;
         file.key.albedo = expected.albedo;
@@ -289,6 +321,101 @@ int main(int argc, char** argv)
                 std::cout << label << ": missing, stale and zero files identical; E = 0.05 changed " << brighter
                           << " channels up, " << darker << " down\n";
             }
+        {
+            // Lot G12: one constant reflection probe over the world, exact in RGB9E5 and binary16 and away
+            // from rounding ties: (.25, .625, .875) in the Original set, (.75, .375, .125) composed.
+            const std::array<DVector, 2> radiance{DVector{.25f, .625f, .875f}, DVector{.75f, .375f, .125f}};
+            GiFile reflected;
+            CHECK(gi_file(scene.geometry, game->resources, path, 0, 0, reflected, error, 0, &radiance));
+            const auto centre = vector_scale(vector_add(scene.geometry.min, scene.geometry.max), .5f);
+            // Pixels drawn as `value` times the scene colour ("Reflections only"), one unit apart at most.
+            auto drawn = [&](const std::vector<Uint8>& pixels, DVector value)
+            {
+                const long want[3]{std::lround(255 * value.z * scene.light_scale.z),
+                                   std::lround(255 * value.y * scene.light_scale.y),
+                                   std::lround(255 * value.x * scene.light_scale.x)}; // B, G, R.
+                std::size_t count = 0;
+                for (std::size_t i = 0; i < pixels.size(); i += 4)
+                    count += std::abs(pixels[i] - want[0]) <= 1 && std::abs(pixels[i + 1] - want[1]) <= 1 &&
+                             std::abs(pixels[i + 2] - want[2]) <= 1;
+                return count;
+            };
+            auto mirror = [&](const ScenePresenter& p)
+            {
+                const auto* data = p.reflection_data();
+                return data ? gi_reflection_environment(*data, centre, {0, 1, 0}, .5, {0, 0, 0}) : DVector{-1, -1, -1};
+            };
+            auto same = [](DVector a, DVector b) { return a.x == b.x && a.y == b.y && a.z == b.z; };
+            Capture capture;
+            CHECK(capture.initialize(gpu, SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM, 960, 540));
+            ScenePresenter presenter(gpu);
+            presenter.post = {Antialiasing::Off, false, Tonemap::Off, AmbientOcclusion::Off, Reflections::Off};
+            presenter.gi_roots = {{"--gi-dir", path_text(scratch)}};
+            fs::remove(target, ec);
+            // Fog applies after the probes as on every face; the radiance checks read the frame without it
+            // (the next world's WorldProperties set it again).
+            game->server.SetGameConVar("FogEnable", "0"); // The loaded session's adapter is the bound one.
+            std::vector<Uint8> original_reference, reference, pixels, low;
+            presenter.shading = SurfaceShading::Original;
+            CHECK(frame(gpu, presenter, *game, capture, original_reference, error));
+            presenter.shading = SurfaceShading::Standard;
+            CHECK(frame(gpu, presenter, *game, capture, reference, error));
+            const std::size_t threshold = reference.size() / 4 / 20; // 5 % of the frame.
+            // GI on with the file, probes off: the GI variants with the placeholder keep the frame.
+            CHECK(save_gi_file(target, reflected, error));
+            presenter.global_illumination = true;
+            ++presenter.gi_reload;
+            CHECK(frame(gpu, presenter, *game, capture, pixels, error));
+            const auto& stats = presenter.reflection_stats();
+            CHECK(presenter.gi_status().state == GiRuntimeState::Applied && presenter.gi_status().reflection_probes == 1 &&
+                  presenter.gi_status().valid_reflections == 1 && stats.gi_variant && !stats.active &&
+                  pixels == reference);
+            presenter.gi_reflections = GiReflectionMode::Low;
+            CHECK(frame(gpu, presenter, *game, capture, low, error));
+            CHECK(stats.active && stats.mode == GiReflectionMode::Low && stats.set == GiReflectionSet::Composed &&
+                  stats.layers == 1 && stats.size == 8 && stats.levels == 2 && stats.dropped == 1 && low != reference);
+            presenter.gi_reflections = GiReflectionMode::High;
+            CHECK(frame(gpu, presenter, *game, capture, pixels, error));
+            CHECK(stats.active && stats.size == 16 && stats.levels == 3 && stats.dropped == 0);
+            CHECK(pixels == low); // One constant probe covering everything: the same radiance at every level.
+            // "Reflections only": the mirror's radiance on every lit enhanced face.
+            const auto builds = stats.builds;
+            const auto creations = presenter.pipelines.creations; // GI pipelines are kept across frames.
+            CHECK(same(mirror(presenter), radiance[1]));
+            presenter.gi_reflection_view.only = true;
+            CHECK(frame(gpu, presenter, *game, capture, pixels, error));
+            const auto composed_drawn = drawn(pixels, mirror(presenter));
+            CHECK(composed_drawn > threshold && stats.builds == builds); // The panel never rebuilds the data.
+            presenter.gi_reflection_view.intensity = .5f;
+            CHECK(frame(gpu, presenter, *game, capture, pixels, error));
+            const DVector half{radiance[1].x / 2, radiance[1].y / 2, radiance[1].z / 2};
+            CHECK(same(mirror(presenter), half) && drawn(pixels, half) > threshold && stats.builds == builds &&
+                  presenter.pipelines.creations == creations);
+            // GI off draws the Original set.
+            presenter.gi_reflection_view.intensity = 1;
+            presenter.global_illumination = false;
+            CHECK(frame(gpu, presenter, *game, capture, pixels, error));
+            const auto original_drawn = drawn(pixels, radiance[0]);
+            CHECK(stats.active && stats.set == GiReflectionSet::Original && same(mirror(presenter), radiance[0]) &&
+                  original_drawn > threshold);
+            presenter.gi_reflection_view = {};
+            CHECK(frame(gpu, presenter, *game, capture, pixels, error) && pixels != reference);
+            // Screen-space reflections replace the probes' environment light (the GI SSR variants).
+            presenter.post.reflections = Reflections::Low;
+            CHECK(frame(gpu, presenter, *game, capture, pixels, error));
+            presenter.post.reflections = Reflections::Off;
+            // The original renderer never draws probes.
+            presenter.shading = SurfaceShading::Original;
+            presenter.global_illumination = true;
+            CHECK(frame(gpu, presenter, *game, capture, pixels, error) && pixels == original_reference &&
+                  !stats.gi_variant && !stats.active);
+            presenter.shading = SurfaceShading::Standard;
+            presenter.gi_reflections = GiReflectionMode::Off;
+            presenter.global_illumination = false;
+            CHECK(frame(gpu, presenter, *game, capture, pixels, error) && pixels == reference);
+            std::cout << world << ": reflection probes off identical; reflections only drew " << composed_drawn
+                      << " composed and " << original_drawn << " Original pixels at the mirror's value\n";
+        }
         game->unload_world();
     }
     SDL_DestroyGPUDevice(gpu);

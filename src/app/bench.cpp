@@ -111,11 +111,12 @@ namespace OpenBlood2
                               AmbientOcclusion(options.ambient_occlusion), Reflections(options.reflections)};
             // --gi (lot G8): the world's Ready bake from the search roots, composed at the first update.
             presenter.global_illumination = options.gi;
+            presenter.gi_reflections = GiReflectionMode(options.gi_reflections); // --gi-reflections (lot G12).
             presenter.gi_roots = gi_search_roots(config.gi_dir);
             presenter.gi_composition = {options.gi_k, options.gi_f, GiView(options.gi_view),
                                         GiWorldSource(options.gi_source)};
             presenter.gi_probes = {options.gi_probes > 0, options.gi_probes > 0 ? options.gi_probes : 1};
-            std::uint64_t gi_logged = 0;
+            GiLogState gi_logged;
             double first_update_ms = 0;
             Capture capture;
             Series step, world, models, effects, record, gpu, total, draws, culled, pings, reads, read_counts, probes;
@@ -269,6 +270,18 @@ namespace OpenBlood2
                          "without a valid probe, {} pseudo-lights in the top four) last frame",
                          gi.valid_probes, gi.probes, gi.probe_spacing, lighting.probe_lit, lighting.probe_sampled,
                          lighting.probe_reused, lighting.probe_missing, lighting.probe_sources);
+            const auto& reflections = presenter.reflection_stats();
+            spdlog::info("Reflection probes (GI lot G12): {} {} ({} variant), {} set, {} layers of {} ({} levels, {} "
+                         "dropped), cells {}x{}x{} of {} ({} occupied, {} over the limit, {} lists), {} texture bytes, "
+                         "{} buffer bytes, {} builds ({:.1f} ms last){}{}",
+                         gi_reflection_mode_name(reflections.mode), reflections.active ? "drawn" : "not drawn",
+                         reflections.gi_variant ? "GI" : "enhanced",
+                         reflections.set == GiReflectionSet::Composed ? "composed" : "Original", reflections.layers,
+                         reflections.size, reflections.levels, reflections.dropped, reflections.cells[0],
+                         reflections.cells[1], reflections.cells[2], reflections.cell_size, reflections.occupied,
+                         reflections.overflow, reflections.lists, reflections.texture_bytes, reflections.buffer_bytes,
+                         reflections.builds, reflections.build_ms, reflections.detail.empty() ? "" : ": ",
+                         reflections.detail);
             const auto& shadows = presenter.shadow_stats;
             spdlog::info("Model shadows: {} FLAG_SHADOW candidates, {} drawn ({} beyond limit, {} distant, {} outside "
                          "view, {} unbounded), atlas {}",

@@ -644,10 +644,28 @@ namespace
         CHECK(!a.empty() && a == b && a.size() == one.bytes);
         GiFile file;
         CHECK(read_gi_file(a, file, error) && file.settings == gi_settings_text(request.settings));
-        // The default bake re-bakes the direct light (Gate G): DIR after LMAP.
+        // The default bake re-bakes the direct light (Gate G): DIR after LMAP; REFL last (lot G11).
         CHECK(file.find(gi_format::placement) && file.find(gi_format::lightmaps) && file.find(gi_format::direct) &&
-              file.find(gi_format::vertices) && file.find(gi_format::probes) && file.sections.size() == 5 &&
-              file.key.algorithm == 3 && file.settings.ends_with("\ndirect rebaked\n"));
+              file.find(gi_format::vertices) && file.find(gi_format::probes) && file.sections.size() == 6 &&
+              file.sections[5].tag == gi_format::reflections && file.key.algorithm == 4 &&
+              file.settings.ends_with("\ndirect rebaked\n"));
+        // Lot G11: one REFL chain per PLAC reflection probe, at their resolution.
+        {
+            GiLightLattice baked_lattice;
+            std::vector<GiReflectionProbe> reflections;
+            GiReflections refl;
+            CHECK(decode_gi_placement_section(file.find(gi_format::placement)->payload, baked_lattice, reflections,
+                                              error) &&
+                  read_gi_reflections(file.find(gi_format::reflections)->payload, refl, error) &&
+                  check_gi_reflections(reflections, refl, error));
+            CHECK(refl.size() == reflections.size() && refl.size() == one.reflection_probes.probes &&
+                  !reflections.empty() && one.reflection_probes.valid == refl.size() && refl.resolution == 64 &&
+                  refl.levels == 5);
+            std::cout << "REFLECTIONS probes=" << refl.size() << " valid=" << one.reflection_probes.valid
+                      << " rays=" << one.reflection_probes.rays << " capture_ms=" << one.reflection_probes.capture_ms
+                      << " prefilter_ms=" << one.reflection_probes.prefilter_ms << " ms=" << one.reflection_probes.ms
+                      << " bytes=" << file.find(gi_format::reflections)->payload.size() << '\n';
+        }
         // Lot G9: one PROB entry per PLAC probe, every SubwayA probe valid.
         {
             GiLightLattice baked_lattice;
@@ -781,9 +799,10 @@ namespace
         CHECK(direct_stage != stages.end() && bounce_stage != stages.end() && direct_stage < bounce_stage);
         GiFile file;
         CHECK(read_gi_file(reference, file, error) && file.settings == gi_settings_text(request.settings));
-        CHECK(file.settings.ends_with("\ndirect rebaked\n") && file.sections.size() == 5);
+        CHECK(file.settings.ends_with("\ndirect rebaked\n") && file.sections.size() == 6);
         CHECK(file.sections[1].tag == gi_format::lightmaps && file.sections[2].tag == gi_format::direct &&
-              file.sections[3].tag == gi_format::vertices && file.key.algorithm == 3);
+              file.sections[3].tag == gi_format::vertices && file.sections[5].tag == gi_format::reflections &&
+              file.key.algorithm == 4);
         GiLightmaps maps;
         GiDirectSection direct;
         CHECK(read_gi_lightmaps(file.find(gi_format::lightmaps)->payload, maps, error) &&

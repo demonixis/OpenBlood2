@@ -131,6 +131,9 @@ namespace OpenBlood2
         // Replacement GLOBAL ILLUMINATION row (gi_contracts.md lot G8): baked GI composed into the world
         // light of both renderers when the world has a current bake. Off by default (decision D11).
         bool global_illumination = false;
+        // Replacement REFLECTION PROBES row (lot G12): 0 off, 1 low, 2 high (GiReflectionMode order). The
+        // enhanced renderer draws the current bake's reflection probes; off by default (decision D11).
+        int reflection_probes = 0;
 
         bool operator==(const MenuSettings&) const = default;
     };
@@ -224,7 +227,8 @@ namespace OpenBlood2
         bool enabled(const MenuItem& item) const
         {
             return item.enabled && !(item.setting == 1 && !settings.sound) && !(item.setting == 3 && !settings.music) &&
-                   !((item.setting == 9 || (item.setting >= 18 && item.setting <= 21)) && !settings.renderer) &&
+                   !((item.setting == 9 || (item.setting >= 18 && item.setting <= 21) || item.setting == 32) &&
+                     !settings.renderer) &&
                    !((item.setting >= 22 && item.setting <= 24) && (!video.window || vr)) &&
                    !(item.setting == 23 && !settings.fullscreen) &&
                    !(item.setting == 24 && settings.fullscreen && settings.fullscreen_mode == 0) &&

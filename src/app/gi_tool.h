@@ -34,7 +34,12 @@ namespace OpenBlood2
     int run_gi_direct_audit(const Options&, const Config&);
 
     class ScenePresenter;
-    // Logs the presenter's baked GI status (lot G8) once per lookup (`logged` holds the last logged
-    // lookup), and the world mesh build time of each rebuild that composed GI.
-    void log_gi_status(const ScenePresenter&, std::uint64_t& logged);
+    // Logs the presenter's baked GI status (lot G8) once per lookup, the world mesh build time of each
+    // rebuild that composed GI, and each reflection data build (lot G12).
+    // What log_gi_status already reported: the lookup and the reflection data build (lot G12).
+    struct GiLogState
+    {
+        std::uint64_t loads = 0, reflection_builds = 0;
+    };
+    void log_gi_status(const ScenePresenter&, GiLogState& logged);
 } // namespace OpenBlood2

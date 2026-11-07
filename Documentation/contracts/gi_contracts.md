@@ -3,8 +3,9 @@
 Baked GI for the M10 [GI plan](../implementation/gi_plan.md). Each lot adds its section.
 Lot G7 bakes the GI lightmaps and lot G8 composes them into the world when Options > Display
 GLOBAL ILLUMINATION is on (off by default, decision D11); lot G9 adds light probes that light the
-models. With it off, or without a Ready file, every frame is unchanged; nothing in this contract
-changes a save or the simulation.
+models. Lot G11 bakes reflection probes and lot G12 draws them in the enhanced renderer when Options >
+Display REFLECTION PROBES is LOW or HIGH (OFF by default). With both off, or without a Ready file,
+every frame is unchanged; nothing in this contract changes a save or the simulation.
 
 - [World queries (lot G1)](#world-queries-lot-g1)
 - [Baked file and keys (lot G2)](#baked-file-and-keys-lot-g2)
@@ -17,6 +18,9 @@ changes a save or the simulation.
 - [Light probes (lot G9)](#light-probes-lot-g9)
 - [In-game bake (lot G10)](#in-game-bake-lot-g10)
 - [Direct-light audit (lot GD1)](#direct-light-audit-lot-gd1)
+- [Re-baked direct bake (lot GD2)](#re-baked-direct-bake-lot-gd2)
+- [Reflection bake (lot G11)](#reflection-bake-lot-g11)
+- [Reflection runtime (lot G12)](#reflection-runtime-lot-g12)
 
 ## World queries (lot G1)
 
@@ -308,9 +312,14 @@ while it is closed, and no GI is applied by it.
 
 ### Builds
 
-- `BLOOD2_GI_TOOLS` defaults to ON on desktop (macOS, Linux, Windows), Release included
-  (decision D4), and OFF on iOS and Android (Quest included); turning it on there is a
-  configuration error. The dedicated server builds no client.
+- `BLOOD2_GI_TOOLS` follows the inspector (decision D4 (b), Gate C, 2026-11-07): ON by default in
+  desktop builds with `BLOOD2_INSPECTOR` (the `debug` and `dev` presets on macOS, Linux and
+  Windows), forced OFF without it (`release`, `ci-release`, `xcode-macos`) and on iOS and Android
+  (Quest included) by `cmake_dependent_option`, existing caches included. The dedicated server
+  builds no client.
+- The headless GI command line (`--gi-place`, `--bake-gi`, `--gi-preview`, `--list-worlds`,
+  `--gi-verify` and the audits, `app/gi_tool.cpp`) stays in every build: `tools/gi/bake_all.py`
+  and packaging use it, and its bytes do not depend on the build (G5).
 - In XR sessions F8 is unavailable (`MenuInput::gi_available` is false) and the overlay never
   draws.
 - F8 itself is reserved in every build, like F10 (decision D5); without the overlay it does
@@ -1114,7 +1123,8 @@ changes: geometry, UVs, materials, batches, collision, saves and the simulation 
 ### Switch, preferences and command line
 
 - Options > Display ends with `GLOBAL ILLUMINATION [OFF/ON]` (setting 31, the 16th row), off by
-  default until Gate C and the defaults of G13 (decision D11). It serves both renderers, every
+  default (decision D11; Gate C, 2026-11-07: the original lightmaps stay the default and GI stays a
+  player option in every build). It serves both renderers, every
   detail level and XR (the composition is CPU-side; no shader changes).
 - `preferences.cfg` **version 13** adds `global_illumination` (0 or 1, default 0). Versions 1–12
   load it off; a version 12 file carrying the key, a version 13 file without it and any other
@@ -1194,10 +1204,12 @@ and never looks a file up.
 - **Models:** superseded by [lot G9](#light-probes-lot-g9). The earlier statement that models read
   the composed light was wrong: `ModelLighting` uses the world mesh only for ClipLight occlusion,
   which GI does not change, so models kept their original light until the light probes.
-- **Model shadows** remove 60 % of the composed light below a caster, GI included.
-- **Enhanced renderer:** the static-light specular occlusion (`saturate(baked / predicted)`) and
-  the normal-map relief read the total, GI-composed luminance, so GI raises grid specular where it
-  adds light until the reflection probes (G12) separate the terms.
+- **Model shadows** remove 60 % of the composed light below a caster, GI included, in the original
+  renderer. In the enhanced renderer they remove it from the direct share only since
+  [G12](#page-alpha-the-direct-share).
+- **Enhanced renderer:** superseded by [G12](#page-alpha-the-direct-share): the static-light specular
+  occlusion reads the direct share of the composed luminance, so GI no longer raises grid specular.
+  The normal-map relief still reads the total luminance.
 
 ### Cost
 
@@ -1389,7 +1401,7 @@ The F8 **Bake** panel bakes the current world with this binary's `--bake-gi` in 
 (decision 10, D6): `app/gi_bake_process.{h,cpp}` (`GiBakeProcess`) and `GiTools::start_bake`,
 `update_bake` and `bake_panel`. The file equals the CLI's by construction (same code, and the bytes
 do not depend on the job count, G5); the game process gains no threads. Desktop GI tool builds only
-(`BLOOD2_GI_TOOLS`), never in XR, like the rest of F8.
+(`BLOOD2_GI_TOOLS`: debug and dev since Gate C), never in XR, like the rest of F8.
 
 ### Child process
 
@@ -1672,3 +1684,205 @@ across sources and after a placement change, cancel during the direct pass (exit
 **`gpu.gi`** (private, GPU) for CityHub and SubwayA, original and enhanced, high and low detail: a
 DIR of O − A_eff with E = 0 is the reference frame; the re-baked D′ changes the lightmapped frame and
 keeps DETAIL LOW; the Original view restores it.
+
+## Reflection bake (lot G11)
+
+Lot G11 captures every PLAC reflection probe ([G4](#reflection-probes)) and stores prefiltered
+octahedral chains in the `REFL` section; [lot G12](#reflection-runtime-lot-g12) draws them. The
+measurements are in the [G11 report](../implementation/reports/gi_g11_reflection_bake.md).
+
+### Capture
+
+- **Rays:** per probe, the six faces of a cube at the probe's resolution (16–256, default 64), with
+  2 × 2 fixed strata per texel (`gi_reflection_limits::subsamples`), traced from the capture point
+  through the bake scene (`GiBakeScene::trace`, G5) without a distance limit. There is no random
+  number in the capture.
+- **Radiance** (`gi_hit_radiance`, the light probes' rule of G9): display radiance, albedo times
+  drawn light (0–1 per channel, unbounded), of the element hit. Sky rays see the sky as shown, at
+  scale 1 whatever the bake's sky scale (`GiSky::set_scale`).
+- **Two sets from one trace** (`gi_reflection_light`): **Original**, the stored light O/255 (what GI
+  off draws); **Composed**, `gi_compose` at `gi_default_k` and `gi_default_f` in the Final view, and
+  `gi_compose_direct` with D′ for the texels of a re-baked bake (what GI on draws at the defaults).
+- **Validity:** a probe whose rays hit back faces more than half the time (`back_limit` 0.5) is
+  invalid. Its chain is still written; the runtime leaves it out.
+- **Jobs:** one probe per job, results in probe order: the bytes do not depend on the job count.
+
+### Prefilter (CyberEngine, reference only)
+
+- **Levels:** from the resolution down to 4 × 4 (`gi_reflection_levels`: 16 gives 3, 64 gives 5,
+  256 gives 7). roughness = level / (levels − 1), alpha = max(roughness², 0.001).
+- **Samples:** Hammersley points (64 per texel, 32 above a 128 face) through `gi_ggx_half_vector`,
+  N = V = R, weighted by N·L; bilinear base-cube samples within a face, edges clamped
+  (`gi_reflection_cube_sample`). With no weighted sample, the cube at N. Every probe's chain has the
+  largest PLAC resolution: its cube is sampled at that size.
+- **Octahedral map**, +y as the pole (`gi_octahedral_coordinates`, `gi_octahedral_direction`): a
+  level of size s holds the map in its n² interior (n = s − 2), texel (a, b) at u = 2(a + 0.5)/n − 1,
+  v = 2(b + 0.5)/n − 1, and a one-texel border that repeats the folded neighbours, so bilinear
+  filtering never leaves the level. A map coordinate o in [0, 1] reads the level at o(1 − 2/s) + 1/s.
+- **Storage:** RGB9E5. The R11G11B10 and compression options of the plan are not used.
+
+### REFL section
+
+Tag `REFL` (`gi_format::reflections`), after `PROB`: u32 format (1), probes, resolution, levels, sets
+(2) and zero; u32 flags per probe (bit 0 valid); then the RGB9E5 texels by set (Original, then
+Composed), probe, level and row. `read_gi_reflections` is strict (format, sets, a power-of-two
+resolution 16–256 or 0 without probes, levels, the reserved field, flags, the probe limit and the
+exact size; output untouched on failure). `check_gi_reflections` requires one chain per PLAC
+reflection probe at their largest resolution. `gi_algorithm_version` is 4: every older file is
+stale.
+
+### Bake outputs
+
+- `GI_PROGRESS stage=reflections` (one step per probe); the F8 bake gives the light probes 2 % and the
+  reflection probes 3 % of its progress bar.
+- `GI_RESULT` adds `reflection_resolution`, `reflection_levels`, `reflection_valid`,
+  `reflection_invalid`, `reflection_rays`, `reflection_back`, `reflection_sky`,
+  `reflection_capture_ms`, `reflection_prefilter_ms` and `reflection_ms`. `bake_all.py` records
+  `reflection_valid` and `reflection_ms` per world.
+- The CLI, `bake_all.py` and the F8 bake write REFL whenever the placement has reflection probes.
+
+### Memory and GPU layout (decision D12)
+
+D12 is decided as (a), an octahedral RGBA16F 2D array (Gate D, 2026-11-07). One probe takes 43,648
+bytes at 64² (5 levels) and 10,880 bytes at 32². On Metal, 42 probes at 64² allocate 2,080,768 bytes
+as a 2D array, 12,484,608 bytes as a cube array, and 74,907,648 bytes as SDL_GPU creates a cube array
+(its `arrayLength` is six times the cube count): the 6× over-allocation is confirmed, and no SDL
+patch is needed.
+
+### Tests
+
+**`gi_reflections.octahedral`** Round trips, folded edges and corners, level sizes and offsets,
+cube directions and samples, borders repeating the folded interior, level 0 following the cube.
+**`gi_reflections.prefilter`** The ported CyberEngine tests: a constant cube stays constant at
+every level, the chain is reproducible, the rough level spreads a sharp lobe.
+**`gi_reflections.sections`** REFL round trips, every refusal, the empty section and the placement
+check. **`gi_reflections.capture`** A lit box: the two light sets (E = 0 composes the stored
+light), valid probes, identical bytes for 1, 2 and 7 jobs, cancel, a probe outside the box seeing
+the sky and an invalid probe. **`gi_bake.retail`** (private) the default bake writes REFL last with
+one valid chain per PLAC probe at 64². **`gi_bake_process.parse`** the progress shares.
+
+## Reflection runtime (lot G12)
+
+Lot G12 draws the REFL chains in the enhanced renderer as the environment term, and gives GI pages
+the alpha that separates direct from GI light. The measurements are in the
+[G12 report](../implementation/reports/gi_g12_reflection_runtime.md).
+
+### Switch, preferences and command line
+
+- **Options > Display row 32:** REFLECTION PROBES [OFF/LOW/HIGH], after GLOBAL ILLUMINATION,
+  enabled only with the enhanced renderer. OFF by default; preferences version 14
+  (`reflection_probes`, 0–2), version 13 files load OFF.
+- **Independent of GI:** with GLOBAL ILLUMINATION off the presenter still looks the file up for the
+  probes (same lookup and staleness as G8), reads it without composing it (status line "GI read for
+  reflection probes only") and draws the Original set. Light probes still need GI.
+- **Command line:** `--gi-reflections off|low|high` for `--bench` and the smoke runs, with or
+  without `--gi`; refused elsewhere ("the game uses Options > Display REFLECTION PROBES and the F8
+  Runtime panel").
+- **F8 Runtime panel**, Reflection probes: OFF/LOW/HIGH (writes the setting), the status (probes,
+  size, levels, cells, memory, set, or why nothing is drawn), Reflection intensity (0–4), Reflections
+  only, Defaults. The log has one line per data build.
+
+### File decode
+
+`gi_world_light` decodes PLAC whenever PROB or REFL is present, then REFL through
+`read_gi_reflections` and `check_gi_reflections`. A REFL without PLAC ("The file has a REFL section
+without PLAC"), a malformed REFL or one that does not match PLAC refuses the whole file, like PROB.
+
+### GPU data (`gi_reflection_gpu`)
+
+- **Layers:** one per valid probe, in PLAC order; invalid probes are left out. **HIGH** keeps the
+  whole chain; **LOW** drops its top level (a quarter of the memory; nothing is dropped from a
+  one-level chain). Texels become RGBA16F (`gi_half`, alpha 1) in an SDL_GPU 2D array of
+  max(1, layers) layers, sampled trilinear and clamped (the sprite sampler).
+- **Records** (float4 storage buffer): [0] probes, mode (1 LOW, 2 HIGH), chain levels, intensity;
+  [1] dropped levels, array levels, array size, Reflections only; [2] grid origin, 1 / cell size;
+  then five per probe: influence min and blend distance, influence max and priority, projection min
+  and flags (bit 0 box projection), projection max and layer, capture point.
+- **Cells** (u32 storage buffer): cells per axis and cell count, one word per cell (x fastest:
+  `first << 4 | count`), then the shared candidate lists. The grid covers the influence boxes grown
+  by 1 unit; its cell edge starts at 64 units and doubles until every axis has at most 128 cells and
+  the grid at most 65,536. A probe is listed in every cell its grown box meets; identical lists are
+  stored once. Over 8 candidates, a cell keeps the highest priorities, then the smallest influence
+  boxes, then the lowest indices, listed in index order.
+- **Set:** Composed when the world mesh is GI-composed and the GI view is not Original (the
+  defaults' composition, whatever the other views show); otherwise Original.
+- **Placeholder** (`gi_reflection_placeholder`): probes 0 and mode 0, a 1 × 1 layer and empty cells;
+  bound while the GI variant runs without probes.
+- **Rebuilds** happen when the file, the mode or the set changes; the panel's intensity and
+  Reflections only restage the records only. Nothing is looked up or rebuilt per frame.
+
+### Shader (`-DGI`)
+
+The 24 GI variants (`pbr[_high][_alpha]_gi[_aux[_ssr]]_frag`, SPIR-V and MSL) replace the enhanced
+variants for world faces and lit models while the world mesh is GI-composed or probes are drawn.
+Otherwise the 72 existing artifacts are used, unchanged; the original renderer never uses them.
+Fragment bindings: t4/s4 the reflection array, t5 grid lights, t6 grid cells, t7 probe records, t8
+probe cells.
+
+- **Selection** (`probeEnvironment`): the pixel's cell lists at most 8 candidates; coverage is 0
+  outside the influence box and rises to 1 over the blend distance inside (1 at once with blend 0).
+  The two best are ordered by priority, then coverage, then squared distance to the capture point,
+  the first listed winning ties. **HIGH** blends two: equal priorities share min(c0 + c1, 1) /
+  (c0 + c1) of their coverages; otherwise the second fills (1 − w0) c1. **LOW** uses one. The baked
+  light keeps the remaining weight.
+- **Level** = clamp(saturate(roughness) (chain levels − 1) − dropped, 0, array levels − 1), linear
+  between the two nearest levels.
+- **Box projection** (CyberEngine `reflection_environment.hlsli`): the nearest exit of the
+  reflected ray from the projection box by slab intersection (clamped at 0), seen from the capture
+  point; without it, the reflected direction.
+- **Use:** the result replaces the baked light as the environment of the split-sum reflection. With
+  screen-space reflections (`REFLECTION_TARGETS`) the probes' environment is the light SSR replaces,
+  never added on top. The XR inline environment and the full-size Metal pushes are unchanged.
+- **Reflections only** (records [1].w): the body is black and the output is the probes' radiance
+  times the scene colour, black where no probe covers. Fog still applies afterwards, as on every
+  face.
+- **CPU mirror:** `gi_reflection_environment` reproduces `probeEnvironment` over the same data in
+  double precision (bilinear, clamped to the level's edge, linear between levels).
+
+### Page alpha (the direct share)
+
+A GI page's alpha (`GiWorldLight::compose`'s `share`) is the share of the composed light that is not
+GI light beyond the ambient fill: with I = k E s (s = 255/2 for texels) and F = f min(O, A) per
+channel, X = max(0, I − F) and share = round(255 (1 − Σ w min(X, out) / Σ w out)) over the luminance
+weights (0.299, 0.587, 0.114), when both sums are positive; 255 otherwise. It is 0 in the Indirect
+view and 255 in the Original, Direct and Validity views; original pages and vertex light are 255.
+The GI variant multiplies the model shadow by it (`FACE_SHADOW`, shadows remove only direct light)
+and the baked luminance of the static-light specular visibility (`DIRECT_LUMINANCE`). The original
+renderer ignores the alpha.
+
+### Cost
+
+Measured on Apple M5 at 1920×1080 with the enhanced renderer at HIGH and the default post-processing
+([G12 report](../implementation/reports/gi_g12_reflection_runtime.md#cost)): HIGH adds 0.17 to 0.27 ms
+of GPU time per frame on 01_SubwayA, 02_CityHub, 03_Museum and 06_Airship2 (the aim was 0.3 ms); LOW
+costs the same time and a quarter of the memory; the GI variant without probes costs nothing
+measurable. HIGH holds 43,648 bytes per valid probe (1.79 MB for Museum's 41) plus at most 181 KB of
+records and cells; the data builds in 0.3 to 2.4 ms once per file, mode or set.
+
+### Identities
+
+- E = 0 gives every page alpha 255, and REFLECTION PROBES OFF (or no valid probe) keeps probes = 0:
+  the GI variant then draws the G8 frame byte for byte (`gpu.gi`, Metal).
+- A file without REFL, GI off with REFLECTION PROBES OFF, and the original renderer draw what they
+  drew before G12.
+
+### Tests
+
+**`gi_reflections.runtime`** Layers of valid probes only, LOW and HIGH levels, binary16 texels,
+records and header, the panel's header updates, refusals, the placeholder and the fallback.
+**`gi_reflections.cells`** The grid origin, size and cells, every cell's list against the grown boxes,
+shared lists, the overflow order, the doubling for a world-sized box and invalid probes left out.
+**`gi_reflections.mirror`** Coverage and weights over constant probes (HIGH and LOW, equal and higher
+priorities, the fallback's share), the intensity, the level choice, and directions through a
+prefiltered chain with and without box projection. **`gi_reflections.world`** REFL decoded with its
+PLAC probes; refused without PLAC, malformed or not matching. **`gi_runtime.override`** and
+**`gi_direct.bake`** the page alpha per view against its formula. **`config.gi`**
+`--gi-reflections` and its refusals. **`menus.state`** / **`menus.preferences`** row 32 and version 14.
+**`gpu.gi`** (private, GPU) for CityHub and SubwayA, with the world's fog switched off
+(`FogEnable 0`): a constant probe over the world keeps the frame while REFLECTION PROBES is off; LOW
+and HIGH change it identically; Reflections only draws the CPU mirror's radiance times the scene
+colour, within one unit, on more than 5 % of the frame (92 % in CityHub, 98 % in SubwayA), half at
+intensity 0.5, with neither the data nor the pipelines rebuilt; GI off draws the Original set;
+screen-space reflections run with probes; the original renderer is unchanged. Switching GI off
+after GI frames gives the reference frame back (this caught pipelines kept from the GI variant). It
+also passes on Vulkan through MoltenVK (`SDL_GPU_DRIVER=vulkan`) with the same counts.

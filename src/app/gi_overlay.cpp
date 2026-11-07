@@ -631,7 +631,60 @@ namespace OpenBlood2
         ImGui::TextWrapped("Light probes: E evaluated at every texel centre and corner with its face normal, in "
                            "place of the texel gather (an F8 comparison; elements without a valid probe keep their "
                            "stored light at f = 1). Models take the probes whatever the world source.");
-        ImGui::TextDisabled("The enhanced renderer's static-light specular reads the total GI luminance until G12.");
+        ImGui::TextWrapped("Enhanced renderer: model shadows and the static lights' specular visibility read the "
+                           "part of each GI page that is not indirect light (its alpha); the environment term reads "
+                           "the reflection probes below.");
+        reflection_section();
+    }
+
+    void GiTools::reflection_section()
+    {
+        if (!runtime_.reflections || !runtime_.reflection_view || !runtime_.reflection_stats)
+            return;
+        ImGui::Separator();
+        if (!ImGui::CollapsingHeader("Reflection probes", ImGuiTreeNodeFlags_DefaultOpen))
+            return;
+        auto& mode = *runtime_.reflections;
+        ImGui::TextUnformatted("Reflection probes");
+        for (int m = 0; m < 3; ++m)
+        {
+            ImGui::SameLine();
+            if (ImGui::RadioButton(gi_reflection_mode_name(GiReflectionMode(m)), mode == m))
+                mode = m;
+        }
+        ImGui::SameLine();
+        ImGui::TextDisabled("(Options > Display REFLECTION PROBES, saved with the preferences)");
+        const auto& r = *runtime_.reflection_stats;
+        if (!runtime_.enhanced)
+            ImGui::TextDisabled("They need RENDERER [ENHANCED]; the original shaders have no environment term.");
+        else if (mode == 0)
+            ImGui::TextDisabled("Off: the enhanced shaders keep the baked light as their environment.");
+        else if (r.active)
+        {
+            ImGui::TextColored({.4f, .9f, .4f, 1}, "Drawn: %u probes, %s set, %ux%u from chain level %u (%u levels)",
+                               r.layers, r.set == GiReflectionSet::Composed ? "composed" : "original", r.size, r.size,
+                               r.dropped, r.levels);
+            ImGui::Text("Cells: %u x %u x %u of %.0f units, %zu occupied, %zu over 8 probes, %zu lists", r.cells[0],
+                        r.cells[1], r.cells[2], r.cell_size, r.occupied, r.overflow, r.lists);
+            ImGui::Text("GPU: %.2f MB array, %.1f KB buffers; built in %.1f ms", double(r.texture_bytes) / (1024 * 1024),
+                        double(r.buffer_bytes) / 1024, r.build_ms);
+        }
+        else
+            ImGui::TextColored({1, .6f, .3f, 1}, "Not drawn: %s", r.detail.empty() ? "no data yet" : r.detail.c_str());
+        auto& view = *runtime_.reflection_view;
+        ImGui::SliderFloat("Reflection intensity", &view.intensity, 0, gi_reflection_runtime_limits::max_intensity,
+                           "%.2f", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::Checkbox("Reflections only", &view.only);
+        ImGui::SameLine();
+        if (ImGui::Button("Defaults##reflections"))
+            view = {};
+        ImGui::SameLine();
+        ImGui::TextDisabled("(intensity 1; not saved)");
+        ImGui::TextWrapped("LOW: one probe per pixel, chains from their second level. HIGH: two probes per pixel "
+                           "(equal priorities share by coverage, otherwise the second fills what the first leaves), "
+                           "whole chains. Box projection by slab intersection; where no probe covers a pixel, the "
+                           "baked light stays the environment. The composed set is drawn while GI is composed, the "
+                           "original set otherwise.");
     }
 
     std::string GiTools::placement_summary() const

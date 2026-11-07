@@ -35,14 +35,14 @@ int test_menu_preferences(int argc, char** argv)
         // The shared atomic writer keeps the exact preference bytes.
         std::ifstream in(path, std::ios::binary);
         const std::string bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        CHECK(bytes == "version=13\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
+        CHECK(bytes == "version=14\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
                        "invert_y=1\ndetail=2\npixel_lighting=0\nrenderer=0\nquality=0\nnormal_maps=1\n"
                        "vr_turn=45\nvr_laser=1\nvr_crosshair=1\nvr_move_hand=0\ncheats=0\ngod_mode=0\n"
                        "antialiasing=0\nbloom=1\ntonemap=1\nambient_occlusion=2\nreflections=2\n"
                        "fullscreen=0\nfullscreen_mode=0\nresolution_width=0\nresolution_height=0\nvsync=1\n"
                        "fps_limit=0\nvr_refresh_rate=0\nvr_render_scale=100\n"
                        "run_lock=0\nmouse_look=1\ncrosshair=1\ncrosshair_number=1\nfield_of_view=90\n"
-                       "global_illumination=0\n");
+                       "global_illumination=0\nreflection_probes=0\n");
     }
     {
         MenuSettings video;
@@ -150,7 +150,7 @@ int test_menu_preferences(int argc, char** argv)
         std::ifstream input(path);
         std::string text((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
         input.close();
-        CHECK(text.ends_with("global_illumination=1\n"));
+        CHECK(text.ends_with("global_illumination=1\nreflection_probes=0\n"));
         const auto v12 = text.substr(0, text.find("global_illumination=")).replace(0, 10, "version=12");
         for (const auto& [content, ok] : std::initializer_list<std::pair<std::string, bool>>{
                  {v12, true},
@@ -166,6 +166,35 @@ int test_menu_preferences(int argc, char** argv)
             if (ok)
                 CHECK(loaded == MenuSettings{});
         }
+    }
+    {
+        // Version 14: reflection probes (lot G12); version 13 files keep them off.
+        MenuSettings probes;
+        probes.reflection_probes = 2;
+        CHECK(save_menu_preferences(path, probes, error));
+        CHECK(load_menu_preferences(path, loaded, error) && loaded == probes);
+        std::ifstream input(path);
+        std::string text((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
+        input.close();
+        CHECK(text.ends_with("global_illumination=0\nreflection_probes=2\n"));
+        const auto v13 = text.substr(0, text.find("reflection_probes=")).replace(0, 10, "version=13");
+        for (const auto& [content, ok] : std::initializer_list<std::pair<std::string, bool>>{
+                 {v13, true},
+                 {v13 + "reflection_probes=1\n", false},                // v13 cannot carry the v14 key.
+                 {text.substr(0, text.find("reflection_probes=")), false}, // v14 requires it.
+                 {text.substr(0, text.find("reflection_probes=")) + "reflection_probes=3\n", false},
+                 {text.substr(0, text.find("reflection_probes=")) + "reflection_probes=-1\n", false}})
+        {
+            {
+                std::ofstream output(path);
+                output << content;
+            }
+            CHECK(load_menu_preferences(path, loaded, error) == ok);
+            if (ok)
+                CHECK(loaded == MenuSettings{});
+        }
+        probes.reflection_probes = 3;
+        CHECK(!save_menu_preferences(path, probes, error));
     }
     settings.sound = true;
     CHECK(save_menu_preferences(path, settings, error));

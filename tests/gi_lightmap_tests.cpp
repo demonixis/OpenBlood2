@@ -14,6 +14,8 @@
 #include "engine/gi_lightmap.h"
 #include "engine/gi_placement.h"
 #include "engine/gi_probes.h"
+#include "engine/gi_reflection_runtime.h"
+#include "engine/gi_reflections.h"
 #include "engine/gi_preview.h"
 #include "engine/gi_runtime.h"
 #include "engine/gi_sky.h"
@@ -1408,17 +1410,41 @@ namespace
     {
         return m.path.rfind("lightmap page", 0) == 0;
     }
-    // Every opaque (alpha 255) page colour but the unused white page area.
-    std::set<std::array<std::uint8_t, 3>> page_colors(const WorldMesh& mesh)
+    // Every page texel (colour, then the lot G12 alpha) but the unused white page area.
+    std::set<std::array<std::uint8_t, 4>> page_texels(const WorldMesh& mesh)
     {
-        std::set<std::array<std::uint8_t, 3>> out;
+        std::set<std::array<std::uint8_t, 4>> out;
         for (const auto& m : mesh.materials)
             if (is_page(m))
                 for (std::size_t p = 0; p + 3 < m.image.rgba.size(); p += 4)
-                    if (m.image.rgba[p + 3] == 255)
-                        out.insert({m.image.rgba[p], m.image.rgba[p + 1], m.image.rgba[p + 2]});
+                    out.insert({m.image.rgba[p], m.image.rgba[p + 1], m.image.rgba[p + 2], m.image.rgba[p + 3]});
+        out.erase({255, 255, 255, 255});
+        return out;
+    }
+    // Every page colour, whatever its alpha, but the unused white page area.
+    std::set<std::array<std::uint8_t, 3>> page_colors(const WorldMesh& mesh)
+    {
+        std::set<std::array<std::uint8_t, 3>> out;
+        for (const auto& t : page_texels(mesh))
+            out.insert({t[0], t[1], t[2]});
         out.erase({255, 255, 255});
         return out;
+    }
+    // The page alpha of lot G12 for a composed texel `out` of stored light `o`: 255 less the luminance
+    // share of GI light beyond the ambient fill, k E 255 / 2 - f min(o, A), at most the channel.
+    std::uint8_t expect_share(std::array<std::uint8_t, 3> o, const float a[3], const float e[3], float k, float f,
+                              std::array<std::uint8_t, 3> out)
+    {
+        constexpr double weight[3]{.299, .587, .114};
+        double page = 0, extra = 0;
+        for (int c = 0; c < 3; ++c)
+        {
+            const double fill = double(f) * std::min(double(o[c]), double(a[c]));
+            const double x = std::max(0.0, double(k) * double(e[c]) * 127.5 - fill);
+            page += weight[c] * out[c];
+            extra += weight[c] * std::min(x, double(out[c]));
+        }
+        return page > 0 && extra > 0 ? std::uint8_t(std::floor(255 * (1 - extra / page) + .5)) : 255;
     }
     GiFile section_file(const GiLightmaps& maps, const GiVertexLight& vertex, bool with_vertex = true)
     {
@@ -1567,10 +1593,40 @@ namespace
             return high.build(b.world, error, &resources, true, nullptr, &light) &&
                    low.build(b.world, error, &resources, false, nullptr, &light);
         };
+        // The page texels with their alpha (lot G12): the direct share at Final and Lighting.
+        auto expect_texels = [&](float k, float f)
+        {
+            std::set<std::array<std::uint8_t, 4>> out;
+            for (std::size_t bi = 0; bi < r.blocks.size(); ++bi)
+            {
+                const auto o = expand(face_texel[r.blocks[bi].id.polygon]);
+                const auto e = block_energy(bi);
+                const float ev[3]{e.x, e.y, e.z};
+                std::array<std::uint8_t, 3> rgb{};
+                for (int c = 0; c < 3; ++c)
+                    rgb[c] = gi_compose(o[c], a[c], ev[c], k, f, true);
+                out.insert({rgb[0], rgb[1], rgb[2], expect_share(o, a, ev, k, f, rgb)});
+            }
+            return out;
+        };
+        auto alphas = [&](const WorldMesh& mesh)
+        {
+            std::set<std::uint8_t> out;
+            for (const auto& t : page_texels(mesh))
+                out.insert(t[3]);
+            return out;
+        };
         WorldMesh final_high, final_low;
         CHECK(build(GiView::Final, 2, 1, final_high, final_low));
         CHECK(page_colors(final_high) ==
               expect_pages([](std::uint8_t o, float a, float e, int) { return gi_compose(o, a, e, 2, 1, true); }));
+        CHECK(page_texels(final_high) == expect_texels(2, 1));
+        {
+            // Every block adds GI light beyond the fill in some channel: alphas between 0 and 255, lower
+            // for the brighter blocks.
+            const auto final_alphas = alphas(final_high);
+            CHECK(final_alphas.size() > 1 && *final_alphas.begin() > 0 && *final_alphas.rbegin() < 255);
+        }
         CHECK(page_colors(final_high) != page_colors(off));
         CHECK(check_corners(final_high, off, sources, [](std::uint8_t o, float a, float e, int, bool)
                             { return gi_compose(o, a, e, 2, 1, false) / 255.f; }));
@@ -1582,6 +1638,7 @@ namespace
             CHECK(build(GiView::Final, .5f, .25f, high, low));
             CHECK(page_colors(high) == expect_pages([](std::uint8_t o, float a, float e, int)
                                                     { return gi_compose(o, a, e, .5f, .25f, true); }));
+            CHECK(page_texels(high) == expect_texels(.5f, .25f));
             CHECK(check_corners(low, off_low, sources_low, [](std::uint8_t o, float a, float e, int, bool)
                                 { return gi_compose(o, a, e, .5f, .25f, false) / 255.f; }));
         }
@@ -1595,6 +1652,7 @@ namespace
             CHECK(build(GiView::Direct, 2, 1, high, low));
             CHECK(page_colors(high) ==
                   expect_pages([](std::uint8_t o, float a, float, int) { return gi_compose(o, a, 0, 0, 0, true); }));
+            CHECK(alphas(high) == std::set<std::uint8_t>{255});
             CHECK(check_corners(low, off_low, sources_low, [](std::uint8_t o, float a, float, int, bool)
                                 { return gi_compose(o, a, 0, 0, 0, false) / 255.f; }));
         }
@@ -1603,6 +1661,7 @@ namespace
             CHECK(build(GiView::Indirect, 3, 1, high, low));
             CHECK(page_colors(high) ==
                   expect_pages([](std::uint8_t, float, float e, int) { return gi_compose(0, 0, e, 3, 0, true); }));
+            CHECK(alphas(high) == std::set<std::uint8_t>{0}); // GI light alone: no direct share.
             CHECK(check_corners(low, off_low, sources_low, [](std::uint8_t, float, float e, int, bool)
                                 { return gi_compose(0, 0, e, 3, 0, false) / 255.f; }));
         }
@@ -1611,6 +1670,7 @@ namespace
             CHECK(build(GiView::Validity, 2, 1, high, low));
             const std::set<std::array<std::uint8_t, 3>> both{{0, 128, 0}, {128, 0, 0}};
             CHECK(page_colors(high) == both); // Block 1 is invalid, the others valid.
+            CHECK(alphas(high) == std::set<std::uint8_t>{255});
             CHECK(check_corners(low, off_low, sources_low, [](std::uint8_t, float, float, int c, bool valid)
                                 { return (valid ? c == 1 : c == 0) ? 1.f : 0.f; }));
         }
@@ -2828,12 +2888,13 @@ namespace
         {
             const auto e = gi_rgb9e5_decode(maps.texels[t]), d = gi_rgb9e5_decode(one.section.texels[t]);
             const float ev[3]{e.x, e.y, e.z}, dv[3]{d.x, d.y, d.z};
+            std::uint8_t share = 0;
             light.composition = {2, 1, GiView::Original};
-            CHECK(light.compose(true, t, stored) == stored);
+            CHECK(light.compose(true, t, stored, &share) == stored && share == 255);
             for (const auto view : {GiView::Final, GiView::Lighting, GiView::Direct, GiView::Indirect})
             {
                 light.composition = {2, .5f, view};
-                const auto got = light.compose(true, t, stored);
+                const auto got = light.compose(true, t, stored, &share);
                 for (int c = 0; c < 3; ++c)
                 {
                     const auto want = view == GiView::Direct     ? gi_compose_direct(dv[c], o[c], a[c], 0, 0, 0)
@@ -2841,11 +2902,16 @@ namespace
                                                                  : gi_compose_direct(dv[c], o[c], a[c], ev[c], 2, .5f);
                     CHECK(got[c] == want);
                 }
+                // The page alpha (lot G12): the direct share of the composed light, D' included.
+                CHECK(share == (view == GiView::Direct     ? 255
+                                : view == GiView::Indirect ? 0
+                                                           : expect_share(stored, a, ev, 2, .5f, got)));
             }
             light.composition = {2, 1, GiView::Validity};
-            const auto validity = light.compose(true, t, stored);
+            const auto validity = light.compose(true, t, stored, &share);
             CHECK(validity == (maps.valid[t] ? std::array<std::uint8_t, 3>{0, 128, 0}
-                                             : std::array<std::uint8_t, 3>{128, 0, 0}));
+                                             : std::array<std::uint8_t, 3>{128, 0, 0}) &&
+                  share == 255);
         }
         for (std::uint32_t q = 0; q < vertex.corners.size(); ++q)
         {
@@ -2908,6 +2974,721 @@ namespace
         CHECK(gi_status_line(status).find(", re-baked direct light") != std::string::npos);
         return true;
     }
+
+    // Lot G11: reflection probes.
+    GiReflectionProbe reflection_at(DVector capture, std::uint32_t resolution)
+    {
+        GiReflectionProbe p;
+        p.capture = capture;
+        p.influence = {{capture.x - 40, capture.y - 40, capture.z - 40}, {capture.x + 40, capture.y + 40, capture.z + 40}};
+        p.projection = p.influence;
+        p.resolution = resolution;
+        return p;
+    }
+    GiReflectionCube uniform_cube(std::uint32_t size, DVector value)
+    {
+        GiReflectionCube cube;
+        cube.size = size;
+        cube.texels.resize(std::size_t(6) * size * size * 3);
+        for (std::size_t i = 0; i < cube.texels.size(); i += 3)
+            cube.texels[i] = value.x, cube.texels[i + 1] = value.y, cube.texels[i + 2] = value.z;
+        return cube;
+    }
+    // The octahedral map (+y pole): round trips, folded edges and corners, level sizes and borders.
+    bool reflection_octahedral()
+    {
+        for (std::uint32_t i = 0; i < 4096; ++i)
+        {
+            const auto d = gi_fibonacci_direction(i, 4096);
+            double u = 0, v = 0;
+            gi_octahedral_coordinates(d.x, d.y, d.z, u, v);
+            CHECK(u >= -1 && u <= 1 && v >= -1 && v <= 1);
+            const auto back = gi_octahedral_direction(u, v);
+            CHECK(vector_dot(back, d) > 1 - 1e-6);
+            CHECK((d.y >= 0) == (std::fabs(u) + std::fabs(v) <= 1 + 1e-6));
+        }
+        for (int i = -8; i <= 8; ++i)
+        {
+            const double t = i / 8.0;
+            CHECK(vector_dot(gi_octahedral_direction(-1, t), gi_octahedral_direction(-1, -t)) > 1 - 1e-6);
+            CHECK(vector_dot(gi_octahedral_direction(1, t), gi_octahedral_direction(1, -t)) > 1 - 1e-6);
+            CHECK(vector_dot(gi_octahedral_direction(t, -1), gi_octahedral_direction(-t, -1)) > 1 - 1e-6);
+            CHECK(vector_dot(gi_octahedral_direction(t, 1), gi_octahedral_direction(-t, 1)) > 1 - 1e-6);
+        }
+        for (const double u : {-1.0, 1.0})
+            for (const double v : {-1.0, 1.0})
+                CHECK(gi_octahedral_direction(u, v).y == -1);
+        CHECK(gi_octahedral_direction(0, 0).y == 1);
+        CHECK(gi_reflection_levels(16) == 3 && gi_reflection_levels(64) == 5 && gi_reflection_levels(256) == 7);
+        CHECK(gi_reflection_chain_texels(64) == 4096 + 1024 + 256 + 64 + 16);
+        CHECK(gi_reflection_level_offset(64, 2) == 4096 + 1024);
+        // Borders repeat the folded interior neighbours.
+        GiReflectionCube cube;
+        cube.size = 16;
+        cube.texels.resize(6 * 16 * 16 * 3);
+        for (unsigned f = 0; f < 6; ++f)
+            for (std::uint32_t y = 0; y < 16; ++y)
+                for (std::uint32_t x = 0; x < 16; ++x)
+                {
+                    const auto d = gi_reflection_cube_direction(f, 2 * (x + .5) / 16 - 1, 2 * (y + .5) / 16 - 1);
+                    const auto t = ((f * 16 + y) * 16 + x) * 3;
+                    cube.texels[t] = 1 + d.x, cube.texels[t + 1] = 1 + d.y, cube.texels[t + 2] = 1 + d.z;
+                }
+        // A cube texel's centre direction samples that texel exactly.
+        for (unsigned f = 0; f < 6; ++f)
+            for (std::uint32_t y = 0; y < 16; y += 5)
+                for (std::uint32_t x = 0; x < 16; x += 3)
+                {
+                    double sample[3];
+                    gi_reflection_cube_sample(
+                        cube, gi_reflection_cube_direction(f, 2 * (x + .5) / 16 - 1, 2 * (y + .5) / 16 - 1), sample);
+                    const auto t = ((f * 16 + y) * 16 + x) * 3;
+                    CHECK(near(sample[0], cube.texels[t], 1e-5) && near(sample[1], cube.texels[t + 1], 1e-5) &&
+                          near(sample[2], cube.texels[t + 2], 1e-5));
+                }
+        std::vector<std::uint32_t> chain(gi_reflection_chain_texels(32));
+        gi_reflection_chain(cube, 32, chain);
+        for (std::uint32_t level = 0; level < gi_reflection_levels(32); ++level)
+        {
+            const std::uint32_t s = 32 >> level, n = s - 2;
+            const auto* t = chain.data() + gi_reflection_level_offset(32, level);
+            const auto in = [&](std::uint32_t a, std::uint32_t b) { return t[(b + 1) * s + a + 1]; };
+            for (std::uint32_t b = 0; b < n; ++b)
+                CHECK(t[(b + 1) * s] == in(0, n - 1 - b) && t[(b + 1) * s + s - 1] == in(n - 1, n - 1 - b) &&
+                      t[b + 1] == in(n - 1 - b, 0) && t[(s - 1) * s + b + 1] == in(n - 1 - b, n - 1));
+            CHECK(t[0] == in(n - 1, n - 1) && t[s - 1] == in(0, n - 1) && t[(s - 1) * s] == in(n - 1, 0) &&
+                  t[s * s - 1] == in(0, 0));
+            // Level 0 follows the cube: each interior texel is close to 1 + its direction.
+            if (level == 0)
+                for (std::uint32_t b = 0; b < n; ++b)
+                    for (std::uint32_t a = 0; a < n; ++a)
+                    {
+                        const auto d = gi_octahedral_direction(2 * (a + .5) / n - 1, 2 * (b + .5) / n - 1);
+                        const auto value = gi_rgb9e5_decode(in(a, b));
+                        CHECK(near(value.x, 1 + d.x, .1) && near(value.y, 1 + d.y, .1) && near(value.z, 1 + d.z, .1));
+                    }
+        }
+        return true;
+    }
+    // The CyberEngine prefilter tests, ported: deterministic, constant radiance kept at every level
+    // (HDR values included), directional radiance mixed by the rough levels and not by level 0.
+    bool reflection_prefilter()
+    {
+        const auto constant = uniform_cube(16, {12, 3.5f, .125f});
+        std::vector<std::uint32_t> a(gi_reflection_chain_texels(16)), b(a.size());
+        gi_reflection_chain(constant, 16, a);
+        gi_reflection_chain(constant, 16, b);
+        CHECK(a == b);
+        for (const auto t : a)
+        {
+            const auto v = gi_rgb9e5_decode(t);
+            CHECK(near(v.x, 12, 12 * 2e-3) && near(v.y, 3.5, 12 * 2e-3) && near(v.z, .125, 12 * 2e-3));
+        }
+        // The half vector at the smallest alpha stays on the normal; samples cover the GGX lobe.
+        const DVector n = unit_vector({.3f, .8f, -.5f});
+        for (std::uint32_t i = 0; i < 64; ++i)
+        {
+            const auto h = gi_ggx_half_vector((i + .5) / 64, i / 64.0, n, 0);
+            CHECK(vector_dot(h, n) > .999);
+            const auto rough = gi_ggx_half_vector((i + .5) / 64, i / 64.0, n, 1);
+            CHECK(std::fabs(vector_dot(rough, rough) - 1) < 1e-5 && vector_dot(rough, n) >= -1e-6);
+        }
+        // Faces: +X red, +Y blue, the others black.
+        GiReflectionCube faces = uniform_cube(32, {0, 0, 0});
+        for (std::size_t i = 0; i < std::size_t(32) * 32; ++i)
+        {
+            faces.texels[i * 3] = 1;                       // +X
+            faces.texels[(2 * 32 * 32 + i) * 3 + 2] = 1;   // +Y
+        }
+        std::vector<std::uint32_t> chain(gi_reflection_chain_texels(32));
+        gi_reflection_chain(faces, 32, chain);
+        const auto texel_at = [&](std::uint32_t level, DVector d)
+        {
+            const std::uint32_t s = 32 >> level, n = s - 2;
+            double u = 0, v = 0;
+            gi_octahedral_coordinates(d.x, d.y, d.z, u, v);
+            const auto a = std::min<std::uint32_t>(n - 1, std::uint32_t((u + 1) / 2 * n));
+            const auto b = std::min<std::uint32_t>(n - 1, std::uint32_t((v + 1) / 2 * n));
+            return gi_rgb9e5_decode(chain[gi_reflection_level_offset(32, level) + (b + 1) * s + a + 1]);
+        };
+        const DVector x{1, 0, 0};
+        const auto sharp = texel_at(0, x), rough = texel_at(gi_reflection_levels(32) - 1, x);
+        CHECK(sharp.x > .99 && sharp.z == 0);
+        CHECK(rough.x > .2 && rough.x < .99 && rough.z > .01);
+        return true;
+    }
+    // REFL: round trips and strict refusals; the placement check.
+    bool reflection_sections()
+    {
+        std::string error;
+        GiReflections in;
+        in.resolution = 32;
+        in.levels = gi_reflection_levels(32);
+        in.valid = {1, 0};
+        in.texels.resize(2 * 2 * gi_reflection_chain_texels(32));
+        for (std::size_t i = 0; i < in.texels.size(); ++i)
+            in.texels[i] = std::uint32_t(i * 2654435761u);
+        std::vector<std::uint8_t> bytes;
+        CHECK(write_gi_reflections(in, bytes, error));
+        CHECK(bytes.size() == 24 + 4 * (2 + in.texels.size()));
+        GiReflections out;
+        CHECK(read_gi_reflections(bytes, out, error) && out.resolution == 32 && out.levels == in.levels &&
+              out.valid == in.valid && out.texels == in.texels);
+        CHECK(out.first(GiReflectionSet::Composed, 1, 2) ==
+              3 * gi_reflection_chain_texels(32) + gi_reflection_level_offset(32, 2));
+        const auto refused = [&](std::size_t offset, std::uint32_t value)
+        {
+            auto copy = bytes;
+            for (int i = 0; i < 4; ++i)
+                copy[offset + i] = std::uint8_t(value >> (8 * i));
+            GiReflections r;
+            std::string e;
+            return !read_gi_reflections(copy, r, e) && r.size() == 0 && !e.empty();
+        };
+        CHECK(refused(0, 2));   // format
+        CHECK(refused(4, 3));   // probes (size)
+        CHECK(refused(4, 43));  // probe limit
+        CHECK(refused(8, 48));  // resolution
+        CHECK(refused(8, 512)); // resolution
+        CHECK(refused(12, 5));  // levels
+        CHECK(refused(16, 1));  // sets
+        CHECK(refused(20, 1));  // reserved
+        CHECK(refused(24, 2));  // flags
+        {
+            auto copy = bytes;
+            copy.push_back(0);
+            CHECK(!read_gi_reflections(copy, out, error));
+            copy.resize(bytes.size() - 1);
+            CHECK(!read_gi_reflections(copy, out, error));
+            copy.resize(20);
+            CHECK(!read_gi_reflections(copy, out, error));
+        }
+        GiReflections none;
+        CHECK(write_gi_reflections(none, bytes, error) && bytes.size() == 24 && read_gi_reflections(bytes, out, error) &&
+              out.size() == 0 && out.resolution == 0);
+        auto bad = in;
+        bad.levels = 5;
+        CHECK(!write_gi_reflections(bad, bytes, error));
+        bad = in;
+        bad.texels.pop_back();
+        CHECK(!write_gi_reflections(bad, bytes, error));
+        std::vector<GiReflectionProbe> placement{reflection_at({0, 0, 0}, 16), reflection_at({9, 9, 9}, 32)};
+        CHECK(check_gi_reflections(placement, in, error));
+        placement[1].resolution = 64;
+        CHECK(!check_gi_reflections(placement, in, error));
+        placement.pop_back();
+        CHECK(!check_gi_reflections(placement, in, error));
+        return true;
+    }
+    bool reflect(const Prepared& p, const GiSky& sky, std::span<const float> original, std::span<const float> composed,
+                 std::span<const GiReflectionProbe> probes, GiReflections& out, GiReflectionReport& report,
+                 unsigned jobs = 2)
+    {
+        std::string error;
+        if (!bake_gi_reflections(p.scene, sky, p.receivers, original, composed, probes, jobs, nullptr, {}, out, report,
+                                 error))
+        {
+            std::cerr << "reflections: " << error << '\n';
+            return false;
+        }
+        return out.size() == probes.size();
+    }
+    // Capture: a closed uniformly lit box gives one radiance per set everywhere (the stored light and
+    // the default composition); probes inside outward walls are invalid; any job count gives the same
+    // bytes; a cancel stops the bake.
+    bool reflection_capture(const fs::path& root)
+    {
+        Resources resources;
+        CHECK(mount(root, resources));
+        const double albedo = 153 / 255.f;
+        GiSky sky;
+        sky.fill({1, 1, 1}, 1);
+        std::string error;
+        {
+            WorldBuilder b;
+            b.box({5, 5, 5}, {95, 95, 95},
+                  [&](int, Face& face)
+                  {
+                      face.kind = Kind::Vertex;
+                      face.color = {51, 51, 51};
+                  });
+            Prepared p;
+            CHECK(prepare(b.world, resources, p));
+            GiIndirect indirect;
+            GiLightmapReport lightmap;
+            CHECK(bake(p, sky, 2, 64, indirect, lightmap));
+            GiLightmaps maps;
+            GiVertexLight vertex;
+            gi_lightmap_sections(p.receivers, indirect, maps, vertex);
+            std::vector<float> original, composed;
+            CHECK(gi_reflection_light(p.receivers, maps, vertex, {}, original, composed, error));
+            CHECK(original[0] == 51 / 255.f && composed[0] > original[0]);
+            for (std::size_t i = 0; i < original.size(); ++i)
+                CHECK(original[i] == original[0] && composed[i] == composed[0]);
+            // E = 0 composes the stored light exactly.
+            {
+                auto zero_maps = maps;
+                auto zero_vertex = vertex;
+                std::fill(zero_maps.texels.begin(), zero_maps.texels.end(), 0u);
+                std::fill(zero_vertex.corners.begin(), zero_vertex.corners.end(), 0u);
+                std::vector<float> o2, c2;
+                CHECK(gi_reflection_light(p.receivers, zero_maps, zero_vertex, {}, o2, c2, error) && c2 == o2 &&
+                      o2 == original);
+                zero_vertex.corners.pop_back();
+                CHECK(!gi_reflection_light(p.receivers, zero_maps, zero_vertex, {}, o2, c2, error));
+            }
+            const std::vector<GiReflectionProbe> probes{reflection_at({50, 50, 50}, 16),
+                                                        reflection_at({20, 30, 70}, 32)};
+            GiReflections refl;
+            GiReflectionReport report;
+            CHECK(reflect(p, sky, original, composed, probes, refl, report));
+            CHECK(report.probes == 2 && report.valid == 2 && report.back == 0 && report.sky == 0);
+            CHECK(report.rays == 6 * 4 * (16 * 16 + 32 * 32) && report.resolution == 32 && report.levels == 4);
+            CHECK(refl.resolution == 32 && refl.levels == 4 && refl.valid == std::vector<std::uint8_t>({1, 1}));
+            CHECK(check_gi_reflections(probes, refl, error));
+            for (const auto set : {GiReflectionSet::Original, GiReflectionSet::Composed})
+            {
+                const double expected = albedo * (set == GiReflectionSet::Original ? original[0] : composed[0]);
+                for (std::size_t probe = 0; probe < 2; ++probe)
+                {
+                    const auto first = refl.first(set, probe, 0);
+                    for (std::size_t t = 0; t < gi_reflection_chain_texels(32); ++t)
+                    {
+                        const auto v = gi_rgb9e5_decode(refl.texels[first + t]);
+                        CHECK(near(v.x, expected, expected * 5e-3) && v.x == v.y && v.y == v.z);
+                    }
+                }
+            }
+            // Bitwise identical for 1, 2 and 7 jobs.
+            for (const unsigned jobs : {1u, 7u})
+            {
+                GiReflections again;
+                GiReflectionReport again_report;
+                CHECK(reflect(p, sky, original, composed, probes, again, again_report, jobs));
+                CHECK(again.texels == refl.texels && again.valid == refl.valid && again_report.rays == report.rays);
+            }
+            std::atomic<bool> cancel{true};
+            GiReflections cancelled;
+            GiReflectionReport cancelled_report;
+            CHECK(!bake_gi_reflections(p.scene, sky, p.receivers, original, composed, probes, 2, &cancel, {}, cancelled,
+                                       cancelled_report, error) &&
+                  cancelled_report.cancelled && error == "cancelled" && cancelled.size() == 0);
+            // A probe outside the box sees the sky (radiance 1) away from it.
+            const std::vector<GiReflectionProbe> outside{reflection_at({50, 50, 400}, 16)};
+            CHECK(reflect(p, sky, original, composed, outside, refl, report) && report.valid == 1 && report.sky > 0);
+            const auto up = refl.first(GiReflectionSet::Original, 0, 0) + (1 + 6) * 16 + 1 + 6; // Near +y.
+            CHECK(near(gi_rgb9e5_decode(refl.texels[up]).x, 1, 5e-3));
+        }
+        WorldBuilder b;
+        b.box({5, 5, 5}, {95, 95, 95},
+              [](int, Face& face)
+              {
+                  std::reverse(face.ring.begin(), face.ring.end());
+                  face.normal = vector_scale(face.normal, -1);
+              });
+        Prepared p;
+        CHECK(prepare(b.world, resources, p));
+        GiIndirect indirect;
+        GiLightmapReport lightmap;
+        CHECK(bake(p, sky, 1, 16, indirect, lightmap));
+        GiLightmaps maps;
+        GiVertexLight vertex;
+        gi_lightmap_sections(p.receivers, indirect, maps, vertex);
+        std::vector<float> original, composed;
+        CHECK(gi_reflection_light(p.receivers, maps, vertex, {}, original, composed, error));
+        const std::vector<GiReflectionProbe> probes{reflection_at({50, 50, 50}, 16)};
+        GiReflections refl;
+        GiReflectionReport report;
+        CHECK(reflect(p, sky, original, composed, probes, refl, report));
+        CHECK(report.valid == 0 && !refl.valid[0] && report.back == report.rays);
+        return true;
+    }
+
+    // Lot G12: reflection probes at runtime.
+    // A REFL of `probes` whose texels are small integers, exact in RGB9E5 and binary16: x the set, probe
+    // and level, y the texel index (mod 256), z 1.
+    GiReflections exact_reflections(std::span<const GiReflectionProbe> probes, std::vector<std::uint8_t> valid)
+    {
+        GiReflections refl;
+        for (const auto& p : probes)
+            refl.resolution = std::max(refl.resolution, p.resolution);
+        refl.levels = gi_reflection_levels(refl.resolution);
+        refl.valid = std::move(valid);
+        refl.texels.resize(gi_reflection_limits::sets * probes.size() * gi_reflection_chain_texels(refl.resolution));
+        for (std::uint32_t set = 0; set < gi_reflection_limits::sets; ++set)
+            for (std::size_t p = 0; p < probes.size(); ++p)
+                for (std::uint32_t level = 0; level < refl.levels; ++level)
+                {
+                    const std::size_t s = refl.resolution >> level, first = refl.first(GiReflectionSet(set), p, level);
+                    for (std::size_t t = 0; t < s * s; ++t)
+                        refl.texels[first + t] =
+                            gi_rgb9e5({float((set * 16 + p) * 8 + level + 1), float(t % 256 + 1), 1.f});
+                }
+        return refl;
+    }
+    GiReflectionProbe reflection_box(DVector lo, DVector hi, std::int32_t priority = 0, float blend = 0)
+    {
+        GiReflectionProbe p;
+        p.capture = {(lo.x + hi.x) / 2, (lo.y + hi.y) / 2, (lo.z + hi.z) / 2};
+        p.influence = p.projection = {lo, hi};
+        p.priority = priority;
+        p.blend_distance = blend;
+        p.box_projection = false;
+        p.resolution = 16;
+        return p;
+    }
+    // The GPU data: one layer per valid probe, the Low and High levels as binary16, the records and the
+    // panel header; the refusals and the data without a valid probe.
+    bool reflection_runtime()
+    {
+        std::string error;
+        CHECK(std::string_view(gi_reflection_mode_name(GiReflectionMode::Off)) == "OFF" &&
+              std::string_view(gi_reflection_mode_name(GiReflectionMode::Low)) == "LOW" &&
+              std::string_view(gi_reflection_mode_name(GiReflectionMode::High)) == "HIGH");
+        std::vector<GiReflectionProbe> probes{reflection_at({0, 0, 0}, 16), reflection_at({500, 0, 0}, 16),
+                                              reflection_at({100, 20, 0}, 16)};
+        probes[1].priority = 3;
+        probes[2].priority = -2;
+        probes[2].blend_distance = 0;
+        probes[2].box_projection = false;
+        probes[2].projection = {{50, -30, -60}, {150, 70, 60}};
+        const auto refl = exact_reflections(probes, {1, 0, 1});
+        CHECK(check_gi_reflections(probes, refl, error));
+        GiReflectionGpu g;
+        CHECK(!gi_reflection_gpu(refl, probes, GiReflectionSet::Original, GiReflectionMode::Off, g, error));
+        CHECK(!gi_reflection_gpu(refl, probes, GiReflectionSet(2), GiReflectionMode::High, g, error));
+        for (const auto mode : {GiReflectionMode::High, GiReflectionMode::Low})
+            for (const auto set : {GiReflectionSet::Original, GiReflectionSet::Composed})
+            {
+                CHECK(gi_reflection_gpu(refl, probes, set, mode, g, error));
+                const bool low = mode == GiReflectionMode::Low;
+                CHECK(g.set == set && g.mode == mode && g.layers == 2 &&
+                      g.probe_of_layer == (std::vector<std::uint32_t>{0, 2}));
+                CHECK(g.chain_levels == 3 && g.dropped == (low ? 1u : 0u) && g.levels == (low ? 2u : 3u) &&
+                      g.size == (low ? 8u : 16u));
+                CHECK(g.texels.size() == std::size_t(2) * (low ? 64 + 16 : 256 + 64 + 16) * 4 &&
+                      g.texture_bytes() == g.texels.size() * 2);
+                for (std::uint32_t layer = 0; layer < g.layers; ++layer)
+                    for (std::uint32_t level = 0; level < g.levels; ++level)
+                    {
+                        const auto* t = g.texels.data() + g.level_offset(layer, level) * 4;
+                        const std::size_t s = g.size >> level;
+                        const float x = float((std::uint32_t(set) * 16 + g.probe_of_layer[layer]) * 8 + level +
+                                              g.dropped + 1);
+                        for (std::size_t i = 0; i < s * s; ++i)
+                            CHECK(gi_half_decode(t[i * 4]) == x && gi_half_decode(t[i * 4 + 1]) == float(i % 256 + 1) &&
+                                  gi_half_decode(t[i * 4 + 2]) == 1 && t[i * 4 + 3] == gi_half(1.f));
+                    }
+                CHECK(g.records.size() == 3 + 5 * 2);
+                CHECK(g.records[0] == (std::array<float, 4>{2, low ? 1.f : 2.f, 3, 1}));
+                CHECK(g.records[1] == (std::array<float, 4>{low ? 1.f : 0.f, low ? 2.f : 3.f, low ? 8.f : 16.f, 0}));
+                const auto* first = &g.records[3]; // Layer 0: probe 0.
+                CHECK(first[0] == (std::array<float, 4>{-40, -40, -40, 32}) &&
+                      first[1] == (std::array<float, 4>{40, 40, 40, 0}) && first[2][3] == 1 && first[3][3] == 0 &&
+                      first[4] == (std::array<float, 4>{0, 0, 0, 0}));
+                const auto* second = &g.records[3 + 5]; // Layer 1: probe 2.
+                CHECK(second[0] == (std::array<float, 4>{60, -20, -40, 0}) &&
+                      second[1] == (std::array<float, 4>{140, 60, 40, -2}));
+                CHECK(second[2] == (std::array<float, 4>{50, -30, -60, 0}) &&
+                      second[3] == (std::array<float, 4>{150, 70, 60, 1}) &&
+                      second[4] == (std::array<float, 4>{100, 20, 0, 0}));
+                CHECK(g.buffer_bytes() == g.records.size() * 16 + g.cells.size() * 4);
+            }
+        // The panel changes the header only; an invalid intensity keeps 1.
+        gi_reflection_header(g, {2.5f, true});
+        CHECK(g.records[0][3] == 2.5f && g.records[1][3] == 1);
+        gi_reflection_header(g, {9, false});
+        CHECK(g.records[0][3] == 1 && g.records[1][3] == 0);
+        CHECK(valid_gi_reflection_view({}) && valid_gi_reflection_view({4, true}) && valid_gi_reflection_view({0, false}));
+        CHECK(!valid_gi_reflection_view({-1, false}) && !valid_gi_reflection_view({4.5f, false}) &&
+              !valid_gi_reflection_view({std::numeric_limits<float>::quiet_NaN(), false}));
+        // Texels or probes that do not match refuse.
+        auto short_texels = refl;
+        short_texels.texels.pop_back();
+        CHECK(!gi_reflection_gpu(short_texels, probes, GiReflectionSet::Original, GiReflectionMode::High, g, error));
+        CHECK(!gi_reflection_gpu(refl, std::span(probes).first(2), GiReflectionSet::Original, GiReflectionMode::High, g,
+                                 error));
+        // Without a valid probe: the placeholder (probes 0, mode 0), so the shader keeps the baked light.
+        const auto placeholder = gi_reflection_placeholder();
+        CHECK(placeholder.records[0] == (std::array<float, 4>{0, 0, 0, 1}) &&
+              placeholder.records[1] == (std::array<float, 4>{0, 1, 1, 0}) && placeholder.cells.size() == 4 &&
+              placeholder.texels.size() == 4 && placeholder.layers == 0 && placeholder.buffer_bytes() == 3 * 16 + 16);
+        CHECK(gi_reflection_gpu(exact_reflections(probes, {0, 0, 0}), probes, GiReflectionSet::Composed,
+                                GiReflectionMode::High, g, error));
+        CHECK(g.layers == 0 && g.records == placeholder.records && g.cells == placeholder.cells &&
+              g.texels == placeholder.texels && g.probe_of_layer.empty());
+        const DVector fallback{.3f, .2f, .1f};
+        for (const GiReflectionGpu* data : {&placeholder, static_cast<const GiReflectionGpu*>(&g)})
+        {
+            const auto e = gi_reflection_environment(*data, {0, 0, 0}, {1, 0, 0}, .5, fallback);
+            CHECK(e.x == fallback.x && e.y == fallback.y && e.z == fallback.z);
+        }
+        return true;
+    }
+    // The cell grid over the influence boxes grown by the margin: the cell size, shared lists, every
+    // cell's candidates, the overflow order and the doubling for a large world.
+    bool reflection_cells()
+    {
+        std::string error;
+        GiReflectionGpu g;
+        const std::vector<GiReflectionProbe> two{reflection_box({0, 0, 0}, {100, 100, 100}),
+                                                 reflection_box({100, 0, 0}, {300, 100, 100})};
+        CHECK(gi_reflection_gpu(exact_reflections(two, {1, 1}), two, GiReflectionSet::Original, GiReflectionMode::High,
+                                g, error));
+        CHECK(g.cell_size == 64 && g.origin.x == -1 && g.origin.y == -1 && g.origin.z == -1);
+        CHECK(g.dimensions == (std::array<std::uint32_t, 3>{5, 2, 2}) && g.cells[0] == 5 && g.cells[1] == 2 &&
+              g.cells[2] == 2 && g.cells[3] == 20);
+        CHECK(g.records[2] == (std::array<float, 4>{-1, -1, -1, 1.f / 64}));
+        // Lists {0}, {0, 1} and {1}, each stored once.
+        CHECK(g.occupied == 20 && g.overflow == 0 && g.lists == 3 && g.cells.size() == 4 + 20 + 4);
+        for (std::uint32_t z = 0; z < 2; ++z)
+            for (std::uint32_t y = 0; y < 2; ++y)
+                for (std::uint32_t x = 0; x < 5; ++x)
+                {
+                    std::vector<std::uint32_t> want;
+                    for (std::uint32_t i = 0; i < two.size(); ++i)
+                    {
+                        const auto& b = two[i].influence;
+                        auto meets = [](double lo, double hi, std::uint32_t c)
+                        { return lo - 1 < -1 + (c + 1) * 64.0 && hi + 1 >= -1 + c * 64.0; };
+                        if (meets(b.min.x, b.max.x, x) && meets(b.min.y, b.max.y, y) && meets(b.min.z, b.max.z, z))
+                            want.push_back(i);
+                    }
+                    const auto packed = g.cells[4 + (z * 2 + y) * 5 + x];
+                    const auto at = g.cells.begin() + 24 + (packed >> 4);
+                    CHECK(std::vector<std::uint32_t>(at, at + (packed & 15)) == want);
+                }
+        // Ten probes in one cell keep the eight of highest priority, then the smallest boxes, then the
+        // lowest indices, listed in index order.
+        std::vector<GiReflectionProbe> many(10, reflection_box({0, 0, 0}, {10, 10, 10}));
+        many[6] = reflection_box({2, 2, 2}, {8, 8, 8});
+        const std::int32_t priorities[10]{0, 5, 0, 5, 1, 1, 0, 2, 3, 0};
+        for (std::size_t i = 0; i < many.size(); ++i)
+            many[i].priority = priorities[i];
+        CHECK(gi_reflection_gpu(exact_reflections(many, std::vector<std::uint8_t>(10, 1)), many,
+                                GiReflectionSet::Original, GiReflectionMode::High, g, error));
+        CHECK(g.dimensions == (std::array<std::uint32_t, 3>{1, 1, 1}) && g.occupied == 1 && g.overflow == 1 &&
+              g.lists == 1 && g.cells[4] == 8);
+        CHECK(std::vector<std::uint32_t>(g.cells.begin() + 5, g.cells.end()) ==
+              (std::vector<std::uint32_t>{0, 1, 3, 4, 5, 6, 7, 8}));
+        // A world-sized box doubles the cell until 128 per axis and 65536 cells hold.
+        const std::vector<GiReflectionProbe> large{reflection_box({0, 0, 0}, {100000, 100000, 100000})};
+        CHECK(gi_reflection_gpu(exact_reflections(large, {1}), large, GiReflectionSet::Original, GiReflectionMode::Low,
+                                g, error));
+        CHECK(g.cell_size == 4096 && g.dimensions == (std::array<std::uint32_t, 3>{25, 25, 25}) &&
+              g.occupied == 25 * 25 * 25 && g.lists == 1);
+        // An invalid probe is not listed: its layer does not exist.
+        CHECK(gi_reflection_gpu(exact_reflections(two, {0, 1}), two, GiReflectionSet::Original, GiReflectionMode::High,
+                                g, error));
+        CHECK(g.layers == 1 && g.probe_of_layer == (std::vector<std::uint32_t>{1}) && g.origin.x == 99 &&
+              g.dimensions == (std::array<std::uint32_t, 3>{4, 2, 2}) && g.lists == 1);
+        return true;
+    }
+    // The CPU mirror of probeEnvironment: coverage and weights over constant probes (HIGH and LOW,
+    // equal and higher priorities), the intensity, the level choice, and directions through a
+    // prefiltered octahedral chain, with and without box projection.
+    bool reflection_mirror()
+    {
+        std::string error;
+        auto near = [](DVector a, DVector b, double tolerance = 1e-5)
+        {
+            return std::abs(double(a.x) - b.x) <= tolerance && std::abs(double(a.y) - b.y) <= tolerance &&
+                   std::abs(double(a.z) - b.z) <= tolerance;
+        };
+        const DVector value[3]{{1, .5f, .25f}, {.25f, .5f, 1}, {2, 2, 2}}, fallback{.125f, .125f, .125f};
+        auto mix = [&](std::initializer_list<std::pair<int, double>> weights)
+        {
+            double rest = 1, out[3]{};
+            for (const auto& [i, w] : weights)
+            {
+                rest -= w;
+                out[0] += value[i].x * w, out[1] += value[i].y * w, out[2] += value[i].z * w;
+            }
+            return DVector{float(out[0] + fallback.x * rest), float(out[1] + fallback.y * rest),
+                           float(out[2] + fallback.z * rest)};
+        };
+        // A over [0, 100]^3 (blend 20), B over [50, 200] x [0, 100]^2 (blend 10), C inside B at priority 1
+        // (blend 20); constant radiance per probe and set (the composed set doubled).
+        const std::vector<GiReflectionProbe> probes{reflection_box({0, 0, 0}, {100, 100, 100}, 0, 20),
+                                                    reflection_box({50, 0, 0}, {200, 100, 100}, 0, 10),
+                                                    reflection_box({150, 30, 30}, {190, 70, 70}, 1, 20)};
+        GiReflections refl;
+        refl.resolution = 16;
+        refl.levels = gi_reflection_levels(16);
+        refl.valid = {1, 1, 1};
+        refl.texels.resize(2 * 3 * gi_reflection_chain_texels(16));
+        for (std::uint32_t set = 0; set < 2; ++set)
+            for (std::size_t p = 0; p < 3; ++p)
+                std::fill_n(refl.texels.begin() + std::ptrdiff_t(refl.first(GiReflectionSet(set), p, 0)),
+                            gi_reflection_chain_texels(16),
+                            gi_rgb9e5({value[p].x * float(set + 1), value[p].y * float(set + 1),
+                                       value[p].z * float(set + 1)}));
+        GiReflectionGpu high, low, composed;
+        CHECK(gi_reflection_gpu(refl, probes, GiReflectionSet::Original, GiReflectionMode::High, high, error));
+        CHECK(gi_reflection_gpu(refl, probes, GiReflectionSet::Original, GiReflectionMode::Low, low, error));
+        CHECK(gi_reflection_gpu(refl, probes, GiReflectionSet::Composed, GiReflectionMode::High, composed, error));
+        const DVector r{0, 0, 1};
+        auto env = [&](const GiReflectionGpu& g, DVector p) { return gi_reflection_environment(g, p, r, .3, fallback); };
+        CHECK(near(env(high, {30, 50, 50}), value[0]) && near(env(low, {30, 50, 50}), value[0])); // A alone, inside.
+        CHECK(near(env(high, {10, 50, 50}), mix({{0, .5}})));    // A's blend zone: coverage 10 / 20.
+        CHECK(near(env(high, {-.5f, 50, 50}), fallback));        // Listed (margin) but not covered.
+        CHECK(near(env(high, {250, 50, 50}), fallback));         // Outside the grid.
+        CHECK(near(env(high, {95, 50, 50}), mix({{1, .8}, {0, .2}}))); // Equal priorities: 1 and .25 share 1.
+        CHECK(near(env(low, {95, 50, 50}), value[1]));           // LOW: B alone.
+        CHECK(near(env(high, {55, 50, 50}), mix({{0, 2 / 3.}, {1, 1 / 3.}})));
+        CHECK(near(env(high, {95, 95, 50}), mix({{1, .5}, {0, .25}}))); // .5 and .25 under 1: the fallback keeps .25.
+        CHECK(near(env(low, {95, 95, 50}), mix({{1, .5}})));
+        CHECK(near(env(high, {165, 50, 50}), mix({{2, .75}, {1, .25}}))); // C first (priority), B fills the rest.
+        CHECK(near(env(low, {165, 50, 50}), mix({{2, .75}})));
+        CHECK(near(env(high, {170, 50, 50}), value[2])); // C covers fully: B gets nothing.
+        CHECK(near(env(composed, {30, 50, 50}), {2, 1, .5f}));
+        // Intensity scales the probes, not the fallback.
+        gi_reflection_header(high, {2, false});
+        CHECK(near(env(high, {10, 50, 50}), {float(fallback.x * .5 + 1), float(fallback.y * .5 + .5),
+                                             float(fallback.z * .5 + .25)}));
+        gi_reflection_header(high, {});
+        // The level: roughness times the chain's last level, less the dropped level, linear between levels.
+        const std::vector<GiReflectionProbe> one{reflection_box({0, 0, 0}, {100, 100, 100})};
+        GiReflections levels;
+        levels.resolution = 16;
+        levels.levels = gi_reflection_levels(16);
+        levels.valid = {1};
+        levels.texels.resize(2 * gi_reflection_chain_texels(16));
+        for (std::uint32_t set = 0; set < 2; ++set)
+            for (std::uint32_t level = 0; level < 3; ++level)
+                std::fill_n(levels.texels.begin() + std::ptrdiff_t(levels.first(GiReflectionSet(set), 0, level)),
+                            (16 >> level) * (16 >> level), gi_rgb9e5({float(level + 1), 1, 1}));
+        GiReflectionGpu lh, ll;
+        CHECK(gi_reflection_gpu(levels, one, GiReflectionSet::Original, GiReflectionMode::High, lh, error));
+        CHECK(gi_reflection_gpu(levels, one, GiReflectionSet::Original, GiReflectionMode::Low, ll, error));
+        const DVector centre{50, 50, 50};
+        for (const auto& [roughness, high_level, low_level] :
+             std::initializer_list<std::tuple<double, double, double>>{
+                 {0, 1, 2}, {.25, 1.5, 2}, {.5, 2, 2}, {.75, 2.5, 2.5}, {1, 3, 3}, {1.5, 3, 3}, {-1, 1, 2}})
+        {
+            CHECK(std::abs(gi_reflection_environment(lh, centre, r, roughness, fallback).x - high_level) < 1e-5);
+            CHECK(std::abs(gi_reflection_environment(ll, centre, r, roughness, fallback).x - low_level) < 1e-5);
+        }
+        // Directions: a cube of (1 + d) / 2 through the prefilter; level 0 returns it within the texel size,
+        // the last level is closer to the mean, and box projection turns r towards the projection box.
+        GiReflectionCube cube;
+        cube.size = 32;
+        cube.texels.resize(std::size_t(6) * 32 * 32 * 3);
+        for (unsigned f = 0; f < 6; ++f)
+            for (std::uint32_t y = 0; y < 32; ++y)
+                for (std::uint32_t x = 0; x < 32; ++x)
+                {
+                    const auto d = gi_reflection_cube_direction(f, 2 * (x + .5) / 32 - 1, 2 * (y + .5) / 32 - 1);
+                    const auto t = ((f * 32 + y) * 32 + x) * 3;
+                    cube.texels[t] = (1 + d.x) / 2, cube.texels[t + 1] = (1 + d.y) / 2,
+                    cube.texels[t + 2] = (1 + d.z) / 2;
+                }
+        std::vector<GiReflectionProbe> smooth{reflection_box({0, 0, 0}, {100, 100, 100})};
+        smooth[0].resolution = 32;
+        GiReflections chain;
+        chain.resolution = 32;
+        chain.levels = gi_reflection_levels(32);
+        chain.valid = {1};
+        chain.texels.resize(2 * gi_reflection_chain_texels(32));
+        gi_reflection_chain(cube, 32, std::span(chain.texels).first(gi_reflection_chain_texels(32)));
+        std::copy_n(chain.texels.begin(), gi_reflection_chain_texels(32),
+                    chain.texels.begin() + std::ptrdiff_t(gi_reflection_chain_texels(32)));
+        GiReflectionGpu directions;
+        CHECK(gi_reflection_gpu(chain, smooth, GiReflectionSet::Original, GiReflectionMode::High, directions, error));
+        std::mt19937 random(12);
+        std::normal_distribution<double> normal;
+        double worst = 0;
+        for (int i = 0; i < 400; ++i)
+        {
+            auto d = unit_vector(DVector{float(normal(random)), float(normal(random)), float(normal(random))});
+            const auto sharp = gi_reflection_environment(directions, centre, d, 0, fallback);
+            const DVector want{(1 + d.x) / 2, (1 + d.y) / 2, (1 + d.z) / 2};
+            worst = std::max({worst, std::abs(double(sharp.x) - want.x), std::abs(double(sharp.y) - want.y),
+                              std::abs(double(sharp.z) - want.z)});
+            if (std::abs(d.x) > .8f)
+            {
+                const auto rough = gi_reflection_environment(directions, centre, d, 1, fallback);
+                CHECK(std::abs(rough.x - .5) < std::abs(sharp.x - .5) && (rough.x - .5) * d.x > 0);
+            }
+        }
+        CHECK(worst < .03);
+        smooth[0].box_projection = true;
+        CHECK(gi_reflection_gpu(chain, smooth, GiReflectionSet::Original, GiReflectionMode::High, directions, error));
+        const auto diagonal = unit_vector(DVector{1, 1, 0});
+        const auto projected = gi_reflection_environment(directions, {90, 50, 50}, diagonal, 0, fallback);
+        const auto toward = unit_vector(DVector{50, 10, 0}); // The exit (100, 60, 50) from the capture.
+        CHECK(near(projected, {(1 + toward.x) / 2, (1 + toward.y) / 2, (1 + toward.z) / 2}, .03));
+        CHECK(std::abs(projected.y - (1 + diagonal.y) / 2) > .2);
+        // At the capture point, box projection keeps r.
+        const auto at_capture = gi_reflection_environment(directions, centre, diagonal, 0, fallback);
+        CHECK(near(at_capture, {(1 + diagonal.x) / 2, (1 + diagonal.y) / 2, .5f}, .03));
+        return true;
+    }
+    // The file's REFL section through gi_world_light: decoded with its PLAC probes, and refused without
+    // PLAC, malformed or not matching PLAC.
+    bool reflection_world(const fs::path& root)
+    {
+        Resources resources;
+        CHECK(mount(root, resources));
+        WorldBuilder b;
+        b.world.info = "AmbientLight 40 20 10";
+        b.box({5, 5, 5}, {95, 95, 95},
+              [&](int, Face& face)
+              {
+                  face.texel = 20 << 11 | 30 << 5 | 12;
+                  face.kind = Kind::Lightmap;
+                  face.texture = "grey.dtx";
+              });
+        Prepared p;
+        CHECK(prepare(b.world, resources, p));
+        std::string error;
+        GiIndirect zero;
+        zero.energy.assign(p.receivers.elements() * 3, 0.f);
+        zero.valid.assign(p.receivers.elements(), 1);
+        GiLightmaps maps;
+        GiVertexLight vertex;
+        gi_lightmap_sections(p.receivers, zero, maps, vertex);
+        const std::vector<GiReflectionProbe> probes{reflection_at({30, 30, 30}, 16), reflection_at({70, 70, 70}, 32)};
+        auto refl = exact_reflections(probes, {1, 0});
+        auto file_with = [&](const GiReflections& r, bool plac)
+        {
+            auto file = section_file(maps, vertex);
+            GiSection placement{gi_format::placement, {}}, section{gi_format::reflections, {}};
+            GiLightLattice lattice; // A lattice without light probes: PLAC carries the reflection probes.
+            lattice.spacing = 64;
+            lattice.dims = {2, 2, 2};
+            encode_gi_placement_section(lattice, probes, placement.payload, error);
+            write_gi_reflections(r, section.payload, error);
+            if (plac)
+                file.sections.insert(file.sections.begin(), std::move(placement));
+            file.sections.push_back(std::move(section));
+            return file;
+        };
+        GiWorldLight light;
+        if (!gi_world_light(b.world, file_with(refl, true), light, error))
+            return std::cerr << "reflection-world: " << error << '\n', false;
+        CHECK(light.has_reflections && !light.has_probes && light.reflections.resolution == 32 &&
+              light.reflections.levels == gi_reflection_levels(32) && light.reflections.valid == refl.valid &&
+              light.reflections.texels == refl.texels && light.reflection_probes.size() == 2 &&
+              light.reflection_probes[1].resolution == 32 && light.reflection_probes[0].capture.x == 30);
+        GiReflectionGpu g;
+        CHECK(gi_reflection_gpu(light.reflections, light.reflection_probes, GiReflectionSet::Composed,
+                                GiReflectionMode::High, g, error) &&
+              g.layers == 1 && g.size == 32);
+        GiWorldLight plain;
+        CHECK(gi_world_light(b.world, section_file(maps, vertex), plain, error) && !plain.has_reflections);
+        GiWorldLight refused;
+        CHECK(!gi_world_light(b.world, file_with(refl, false), refused, error) &&
+              error.find("REFL section without PLAC") != std::string::npos && !refused.has_reflections);
+        auto broken = file_with(refl, true);
+        broken.sections.back().payload[0] = 2; // Format 2.
+        CHECK(!gi_world_light(b.world, broken, refused, error) && refused.lightmaps.blocks.empty());
+        auto fewer = refl;
+        fewer.valid.pop_back();
+        fewer.texels.resize(2 * 1 * gi_reflection_chain_texels(32));
+        CHECK(!gi_world_light(b.world, file_with(fewer, true), refused, error) && !refused.has_reflections);
+        return true;
+    }
 } // namespace
 
 int main(int argc, char** argv)
@@ -2936,6 +3717,18 @@ int main(int argc, char** argv)
         ok = probe_light();
     else if (name == "probe-cost")
         ok = probe_cost();
+    else if (name == "reflection-octahedral")
+        ok = reflection_octahedral();
+    else if (name == "reflection-prefilter")
+        ok = reflection_prefilter();
+    else if (name == "reflection-sections")
+        ok = reflection_sections();
+    else if (name == "reflection-runtime")
+        ok = reflection_runtime();
+    else if (name == "reflection-cells")
+        ok = reflection_cells();
+    else if (name == "reflection-mirror")
+        ok = reflection_mirror();
     else if (name == "direct-term")
         ok = direct_term();
     else if (name == "direct-lights")
@@ -2954,7 +3747,8 @@ int main(int argc, char** argv)
             {"leak", leak},           {"dilation", dilation},       {"back", back}, {"determinism", determinism},
             {"sky", sky},             {"preview", preview},         {"runtime", runtime_override},
             {"probe-capture", probe_capture}, {"probe-source", probe_source}, {"direct-shadow", direct_shadow},
-            {"direct-bake", direct_bake}};
+            {"direct-bake", direct_bake}, {"reflection-capture", reflection_capture},
+            {"reflection-world", reflection_world}};
         const auto found = cases.find(name);
         if (found == cases.end())
             return 2;

@@ -72,18 +72,19 @@ namespace OpenBlood2
     }
     bool WorldPipelines::prepare(SDL_GPUTextureFormat format, std::string& error)
     {
-        return pipelines_[0] ? prepare(format, shading_, aux_, reflections_, samples_, error)
+        return pipelines_[0] ? prepare(format, shading_, aux_, reflections_, gi_, samples_, error)
                              : prepare(format, SurfaceShading::Original, error);
     }
     bool WorldPipelines::prepare(SDL_GPUTextureFormat format, SurfaceShading shading, std::string& error)
     {
-        return prepare(format, shading, false, false, SDL_GPU_SAMPLECOUNT_1, error);
+        return prepare(format, shading, false, false, false, SDL_GPU_SAMPLECOUNT_1, error);
     }
     bool WorldPipelines::prepare(SDL_GPUTextureFormat format, SurfaceShading shading, bool aux, bool reflections,
-                                 SDL_GPUSampleCount samples, std::string& error)
+                                 bool gi, SDL_GPUSampleCount samples, std::string& error)
     {
         reflections = aux && reflections;
-        if (format_ == format && shading_ == shading && aux_ == aux && reflections_ == reflections &&
+        gi = gi && shading != SurfaceShading::Original;
+        if (format_ == format && shading_ == shading && aux_ == aux && reflections_ == reflections && gi_ == gi &&
             samples_ == samples && pipelines_[0])
             return true;
         release();
@@ -92,14 +93,20 @@ namespace OpenBlood2
         SDL_GPUShaderCreateInfo vertex_info{}, skinned_info{}, opaque_info{}, alpha_info{}, shadow_info{},
             surface_info{}, surface_alpha_info{};
         const auto formats = SDL_GetGPUShaderFormats(device_);
-        const auto surface_kind = reflections
-                                      ? (high ? WorldShader::PbrHighAuxSsrFragment : WorldShader::PbrAuxSsrFragment)
-                                  : aux ? (high ? WorldShader::PbrHighAuxFragment : WorldShader::PbrAuxFragment)
-                                        : (high ? WorldShader::PbrHighFragment : WorldShader::PbrFragment);
+        const auto surface_kind =
+            gi ? (reflections ? (high ? WorldShader::PbrHighGiAuxSsrFragment : WorldShader::PbrGiAuxSsrFragment)
+                  : aux       ? (high ? WorldShader::PbrHighGiAuxFragment : WorldShader::PbrGiAuxFragment)
+                              : (high ? WorldShader::PbrHighGiFragment : WorldShader::PbrGiFragment))
+            : reflections ? (high ? WorldShader::PbrHighAuxSsrFragment : WorldShader::PbrAuxSsrFragment)
+            : aux         ? (high ? WorldShader::PbrHighAuxFragment : WorldShader::PbrAuxFragment)
+                          : (high ? WorldShader::PbrHighFragment : WorldShader::PbrFragment);
         const auto surface_alpha_kind =
-            reflections ? (high ? WorldShader::PbrHighAlphaAuxSsrFragment : WorldShader::PbrAlphaAuxSsrFragment)
-            : aux       ? (high ? WorldShader::PbrHighAlphaAuxFragment : WorldShader::PbrAlphaAuxFragment)
-                        : (high ? WorldShader::PbrHighAlphaFragment : WorldShader::PbrAlphaFragment);
+            gi ? (reflections ? (high ? WorldShader::PbrHighAlphaGiAuxSsrFragment : WorldShader::PbrAlphaGiAuxSsrFragment)
+                  : aux       ? (high ? WorldShader::PbrHighAlphaGiAuxFragment : WorldShader::PbrAlphaGiAuxFragment)
+                              : (high ? WorldShader::PbrHighAlphaGiFragment : WorldShader::PbrAlphaGiFragment))
+            : reflections ? (high ? WorldShader::PbrHighAlphaAuxSsrFragment : WorldShader::PbrAlphaAuxSsrFragment)
+            : aux         ? (high ? WorldShader::PbrHighAlphaAuxFragment : WorldShader::PbrAlphaAuxFragment)
+                          : (high ? WorldShader::PbrHighAlphaFragment : WorldShader::PbrAlphaFragment);
         const auto opaque_kind = reflections ? WorldShader::OpaqueAuxSsrFragment
                                  : aux       ? WorldShader::OpaqueAuxFragment
                                              : WorldShader::OpaqueFragment;
@@ -260,6 +267,7 @@ namespace OpenBlood2
         shading_ = shading;
         aux_ = aux;
         reflections_ = reflections;
+        gi_ = gi;
         samples_ = samples;
         ++creations;
         return true;
@@ -303,13 +311,26 @@ namespace OpenBlood2
         }
         return true;
     }
+    bool SurfaceScene::ready(const GpuRegistry& registry) const
+    {
+        return registry.get(lights) && registry.get(cells) &&
+               (!gi || (registry.get(probes) && registry.get(probe_cells) && registry.get(reflections) &&
+                        reflection_sampler));
+    }
     bool SurfaceMaterials::bind_scene(const SurfaceScene& scene, const GpuRegistry& registry,
                                       SDL_GPUCommandBuffer* commands, SDL_GPURenderPass* pass, DVector eye)
     {
-        SDL_GPUBuffer* buffers[] = {registry.get(scene.lights), registry.get(scene.cells)};
-        if (!buffers[0] || !buffers[1])
+        if (!scene.ready(registry))
             return false;
-        SDL_BindGPUFragmentStorageBuffers(pass, 0, buffers, 2);
+        SDL_GPUBuffer* buffers[] = {registry.get(scene.lights), registry.get(scene.cells), registry.get(scene.probes),
+                                    registry.get(scene.probe_cells)};
+        SDL_BindGPUFragmentStorageBuffers(pass, 0, buffers, scene.gi ? 4 : 2);
+        if (scene.gi)
+        {
+            // Slot 4, after the four per-material slots, which never rebind it.
+            const SDL_GPUTextureSamplerBinding binding{registry.get(scene.reflections), scene.reflection_sampler};
+            SDL_BindGPUFragmentSamplers(pass, 4, &binding, 1);
+        }
         auto frame = scene.frame;
         frame.eye = {eye.x, eye.y, eye.z, 0};
         SDL_PushGPUFragmentUniformData(commands, 2, &frame, sizeof(frame));
@@ -555,7 +576,7 @@ namespace OpenBlood2
         if (enhanced() && !sky && !close_view &&
             (surface_materials_.uniforms.size() < textures_.size() ||
              surface_materials_.normals.size() < textures_.size() || !surface_materials_.sampler ||
-             !registry_->get(surface->lights) || !registry_->get(surface->cells)))
+             !surface->ready(*registry_) || pipelines_->gi() != surface->gi))
         {
             visible_.clear();
             error = "Enhanced surface materials not prepared";

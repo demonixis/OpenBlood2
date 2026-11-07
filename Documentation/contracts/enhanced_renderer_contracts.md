@@ -64,9 +64,10 @@ On top of it:
   - **world faces:** the static light objects from the light grid (×2 Saturate);
   - **models:** their four `ModelLighting` sources;
   - **both:** the radial point light (flashlight and similar).
-- **Environment.** No probe and no cube map yet (reflection probes are GI lot G12): the local
-  baked light stands in for uniform
-  environment radiance, through Karis' analytic split-sum approximation. Fdez-Agüera
+- **Environment.** The local baked light stands in for uniform environment radiance, through
+  Karis' analytic split-sum approximation. Since GI lot G12, with REFLECTION PROBES on and a
+  file with valid reflection probes, the probes' prefiltered radiance replaces it where they cover
+  ([reflection runtime](gi_contracts.md#reflection-runtime-lot-g12)). Fdez-Agüera
   multiple-scattering compensation keeps rough metals from darkening against the
   original.
 - **Metallic workflow.** F0 is `0.04 · specular` for dielectrics, or albedo for metals.
@@ -204,13 +205,17 @@ With Options > Display `GLOBAL ILLUMINATION` on and a Ready baked file for the w
 lightmap pages and vertex light that both renderers draw are GI-composed when the world mesh is
 built ([GI world override](gi_contracts.md#world-override-lot-g8)). The enhanced shaders and
 pipelines are unchanged: their diffuse term is still "the original light", which now includes
-the indirect light. Interim effect until the reflection probes (G12): the specular occlusion
-(`saturate(baked luminance / predicted luminance)`) and the normal-map relief read the total,
-GI-composed luminance, so grid specular rises where GI adds light. With GI off, missing, stale or
+the indirect light. Until G12 the specular occlusion (`saturate(baked luminance / predicted
+luminance)`) and the normal-map relief read the total, GI-composed luminance, so grid specular rose
+where GI added light. Since G12 the GI variants of the enhanced shaders replace these pipelines while
+the mesh is GI-composed or probes are drawn: the specular occlusion reads the direct share of the
+page (its alpha, [page alpha](gi_contracts.md#page-alpha-the-direct-share)) and model shadows remove
+only the direct light; the relief still reads the total luminance. With GI off, missing, stale or
 a zero bake, every frame is byte-identical (`gpu.gi`). Since GI lot G9 the light probes light
 the models in both renderers ([light probes](gi_contracts.md#light-probes-lot-g9)): their ambient
 replaces AmbientLight and their pseudo-light, an ordinary model light source, also gives enhanced
-specular. Reflection probes remain a later lot (G12).
+specular. Reflection probes (G12) are drawn by the GI variants only, so the 72 earlier shader
+artifacts and their frames are unchanged.
 
 ## Generated normal maps
 

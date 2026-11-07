@@ -3,6 +3,7 @@
 #include "app/model_scene.h"
 #include "app/polygrid_scene.h"
 #include "app/sprite_scene.h"
+#include "engine/gi_reflection_runtime.h"
 #include "engine/gi_runtime.h"
 #include "engine/light_grid.h"
 #include "engine/line_renderer.h"
@@ -134,15 +135,35 @@ namespace OpenBlood2
         // the view is not Original or Direct only; no mesh rebuild. The Light probes world source
         // (gi_composition.source) needs the file's PROB section, else the texels are composed.
         GiProbeSettings gi_probes;
+        // Reflection probes (lot G12), Options > Display REFLECTION PROBES: the enhanced renderer's
+        // environment term from the file's REFL chains, the composed set while GI is composed into the
+        // mesh (Original view excepted), else the original set. On, they look the file up even with
+        // GLOBAL ILLUMINATION off; the mesh is composed only while GLOBAL ILLUMINATION is on. The GI
+        // shader variants run while GI is composed or probes are drawn; otherwise the enhanced shaders
+        // are the G8 ones, frame for frame.
+        GiReflectionMode gi_reflections = GiReflectionMode::Off;
+        GiReflectionView gi_reflection_view; // F8: intensity and Reflections only (no data rebuild).
+        const GiReflectionStats& reflection_stats() const
+        {
+            return reflection_stats_;
+        }
+        const GiReflectionGpu* reflection_data() const // The uploaded data, or null.
+        {
+            return reflections_ready_ ? &reflection_gpu_ : nullptr;
+        }
+        const GiWorldLight* gi_file() const // The decoded file (GI or reflection probes), or null.
+        {
+            return gi_light_ ? &*gi_light_ : nullptr;
+        }
         std::vector<GiRoot> gi_roots; // gi_search_roots(); empty searches nothing.
         std::uint64_t gi_reload = 0;  // A change looks the file up again (F8 Refresh).
         const GiRuntimeStatus& gi_status() const
         {
             return gi_status_;
         }
-        const GiWorldLight* gi_light() const // The applied file, or null.
+        const GiWorldLight* gi_light() const // The file composed into the world (GI on), or null.
         {
-            return gi_light_ ? &*gi_light_ : nullptr;
+            return global_illumination && gi_light_ ? &*gi_light_ : nullptr;
         }
         double mesh_build_ms = 0; // CPU time of the last world mesh build (GI composition included).
         bool per_pixel_lighting = false; // Model light per pixel instead of per vertex.
@@ -208,6 +229,22 @@ namespace OpenBlood2
         };
         GiBuild built_gi_;
         bool prepare_surface(const ClientScene&, std::string& error);
+        // The GI variant switch and the reflection data (lot G12), after prepare_surface.
+        bool prepare_reflections(std::string& error);
+        struct ReflectionBuild
+        {
+            bool active = false;
+            std::uint64_t load = 0;
+            GiReflectionSet set = GiReflectionSet::Original;
+            GiReflectionMode mode = GiReflectionMode::Off;
+            bool operator==(const ReflectionBuild&) const = default;
+        };
+        ReflectionBuild built_reflections_;
+        bool reflections_ready_ = false;
+        GiReflectionGpu reflection_gpu_;
+        GiReflectionView applied_reflection_view_;
+        GiReflectionStats reflection_stats_;
+        void release_reflections();
         SurfaceScene surface_scene_;
         bool manifest_loaded_ = false;
         std::uint64_t grid_revision_ = UINT64_MAX;

@@ -402,7 +402,26 @@ namespace OpenBlood2
         if (stop())
             return cancelled();
 
-        // The file: INFO, PLAC, LMAP, DIR (re-baked only), VTX and PROB.
+        // Reflection probes (lot G11): the world as GI off and GI on draw it, and the sky as shown.
+        GiLightmaps maps;
+        GiVertexLight vertex_light;
+        gi_lightmap_sections(receivers, indirect, maps, vertex_light);
+        std::vector<float> original_light, composed_light;
+        if (!gi_reflection_light(receivers, maps, vertex_light, rebaked ? std::span<const std::uint32_t>(direct.section.texels)
+                                                                        : std::span<const std::uint32_t>{},
+                                 original_light, composed_light, error))
+            return fail(4, error);
+        GiSky shown = sky;
+        shown.set_scale(1);
+        GiReflections reflections;
+        if (!bake_gi_reflections(scene, shown, receivers, original_light, composed_light, placement.reflections,
+                                 request.jobs, request.cancel, request.progress, reflections, result.reflection_probes,
+                                 error))
+            return result.reflection_probes.cancelled ? cancelled() : fail(4, "GI reflection probes: " + error);
+        if (stop())
+            return cancelled();
+
+        // The file: INFO, PLAC, LMAP, DIR (re-baked only), VTX, PROB and REFL.
         GiFile file;
         file.key.world = expected.world;
         file.key.albedo = expected.albedo;
@@ -416,9 +435,6 @@ namespace OpenBlood2
         if (!encode_gi_placement_section(lattice, placement.reflections, plac.payload, error))
             return fail(4, "Placement section: " + error);
         file.sections.push_back(std::move(plac));
-        GiLightmaps maps;
-        GiVertexLight vertex_light;
-        gi_lightmap_sections(receivers, indirect, maps, vertex_light);
         GiSection lmap{gi_format::lightmaps, {}}, vtx{gi_format::vertices, {}};
         if (!write_gi_lightmaps(maps, lmap.payload, error) || !write_gi_vertex_light(vertex_light, vtx.payload, error))
             return fail(4, "Lightmap sections: " + error);
@@ -435,6 +451,10 @@ namespace OpenBlood2
         if (!write_gi_probes(probes, prob.payload, error))
             return fail(4, "Probe section: " + error);
         file.sections.push_back(std::move(prob));
+        GiSection refl{gi_format::reflections, {}};
+        if (!write_gi_reflections(reflections, refl.payload, error))
+            return fail(4, "Reflection section: " + error);
+        file.sections.push_back(std::move(refl));
         std::vector<std::uint8_t> encoded;
         if (!write_gi_file(file, encoded, error))
             return fail(4, "GI file: " + error);

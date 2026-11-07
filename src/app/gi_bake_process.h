@@ -37,7 +37,8 @@ namespace OpenBlood2
     // starts with a quote is a JSON string (the child's error=), read to its closing quote and decoded.
     bool parse_gi_result(std::string_view line, std::map<std::string, std::string, std::less<>>&);
     // Overall progress 0-1 from the last progress line: survey 5 %, the bounces 90 % in equal parts,
-    // the probes 5 %. Before the first line (mounting, scene, sky, receivers) it is 0.
+    // the light probes 2 % and the reflection probes 3 % (lot G11). Before the first line (mounting,
+    // scene, sky, receivers) and during the direct pass it is 0.
     double gi_bake_fraction(const GiBakeProgress&);
 
     class GiBakeProcess

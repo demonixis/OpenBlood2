@@ -4,6 +4,7 @@
 #include "engine/config.h"
 #include "engine/gi_file.h"
 #include "engine/gi_placement.h"
+#include "engine/gi_reflection_runtime.h"
 #include "engine/gi_runtime.h"
 #include "engine/line_renderer.h"
 #include <filesystem>
@@ -28,6 +29,11 @@ namespace OpenBlood2
         GiProbeSettings* probes = nullptr;                   // ScenePresenter::gi_probes (lot G9).
         const GiWorldLight* light = nullptr;                 // The applied file, or null.
         const ModelLightingStats* model_lighting = nullptr;  // The last frame's model light.
+        // Reflection probes (lot G12).
+        int* reflections = nullptr;                     // Options > Display REFLECTION PROBES (0-2, saved).
+        GiReflectionView* reflection_view = nullptr;    // ScenePresenter::gi_reflection_view.
+        const GiReflectionStats* reflection_stats = nullptr;
+        bool enhanced = false; // The enhanced renderer is selected (the probes need it).
     };
     // The F8 GI tools overlay (gi_contracts.md lots G3, G4, G8, G9, G10), built with BLOOD2_GI_TOOLS on desktop.
     // It shares UiRuntime's ImGui context and only reads the session: no frame changes while
@@ -168,6 +174,7 @@ namespace OpenBlood2
         Status status_;
         GiRuntimeLink runtime_; // The last draw's link.
         void runtime_panel();
+        void reflection_section();
         std::uint64_t world_revision_ = UINT64_MAX;
         bool stale_ = true;
         Placement placement_;

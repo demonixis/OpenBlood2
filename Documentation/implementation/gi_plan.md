@@ -2,18 +2,20 @@
 
 Drafted 2026-11-06 at `55c640b6`. Nothing is implemented yet. On 2026-11-06
 the user accepted every recommendation in the [decisions](#decisions) table
-(D1–D15) and the defaults. Lots G1 to G10 are done
+(D1–D15) and the defaults. Lots G1 to G12, GD1 and GD2 are done
 ([G1 report](reports/gi_g1_prerequisites.md), [G2 report](reports/gi_g2_file_format.md),
 [G3 report](reports/gi_g3_f8_shell.md), [G4 report](reports/gi_g4_placement.md),
 [G5 report](reports/gi_g5_tracer.md), [G6 report](reports/gi_g6_packaging.md),
-[G7 report](reports/gi_g7_lightmaps.md), [G8 report](reports/gi_g8_world_override.md), [G9 report](reports/gi_g9_light_probes.md), [G10 report](reports/gi_g10_in_game_bake.md)). On 2026-11-06 the user accepted Gate A as recommended
+[G7 report](reports/gi_g7_lightmaps.md), [G8 report](reports/gi_g8_world_override.md), [G9 report](reports/gi_g9_light_probes.md), [G10 report](reports/gi_g10_in_game_bake.md), [G11 report](reports/gi_g11_reflection_bake.md), [G12 report](reports/gi_g12_reflection_runtime.md)). On 2026-11-06 the user accepted Gate A as recommended
 (spacing 128, budget 16,384, cap 42, rooms 192×96, the two-level lattice decided in G9: it stays
 single-level, see the [G9 contracts](../contracts/gi_contracts.md#lattice)) and the
 36 single-player placement files are committed in `data/gi/placement` (format 2 since G5, with
 `excluded_models`). On 2026-11-07 the user accepted Gate B (bake time, determinism and look of
 the raw bake) with the intensity raised to **k = 2**; f = 1, the Final preset (2 bounces, 256
-rays) and sky scale 1.0 stay. G8 (world override) is implemented on 2026-11-07; Gate C (look in
-game, and whether GI becomes a player option) awaits the user's A/B. G9 (light probes for models
+rays) and sky scale 1.0 stay. G8 (world override) is implemented on 2026-11-07; Gate C was accepted the
+same day: the original lightmaps stay the default, GLOBAL ILLUMINATION stays a player option, and
+the F8 tools (bake included) are built only with the inspector (D4 (b)); the full rebake waits for
+the end of M10. G9 (light probes for models
 and the Light probes world source) is implemented on 2026-11-07 (`gi_algorithm_version` 3), and
 G10 (the F8 bake as a child process with hot reload) the same day. Also on 2026-11-07, after
 seeing that GI at k = 0 shows exactly the original lightmaps (D1 (a) by design), the user asked to
@@ -24,7 +26,10 @@ OuterColor and per-BSP hard shadows fits 84.8 % of the 10.1 M texels (93.6 % awa
 edges); the user accepted Gate F (the term). GD2 (the re-baked direct bake,
 [report](reports/gi_gd2_rebaked_direct.md)) is implemented the same day: the `direct` setting, the
 `DIR ` section and composition of D′. At Gate G (the A/B) the user made `rebaked` the default
-direct source the same day.
+direct source the same day. G11 (the reflection bake, `gi_algorithm_version` 4) and G12 (the
+reflection runtime: the 24 `-DGI` shader artifacts, Options > Display REFLECTION PROBES, preferences
+v14) are implemented on 2026-11-07, tested on four worlds as the user asked. Gate D decided D12 as
+(a) after measuring the Metal allocation; Gate E (cost and the A/B) awaits the user.
 
 ## The request
 
@@ -288,9 +293,9 @@ baked data and generated artifacts.
 | --- | --- | --- |
 | A | G4 | Placement quality and budgets. |
 | B | G7 | Bake time, determinism and look of the raw bake. Accepted 2026-11-07 with k = 2. |
-| C | G8 | Look in game, and whether GI becomes a player option. Pending the user's A/B. |
-| D | G11 | Reflection memory and GPU layout. |
-| E | G12 | Reflection cost, and the default per platform. |
+| C | G8 | Look in game, and whether GI becomes a player option. Accepted on 2026-11-07: the original lightmaps stay the default, GLOBAL ILLUMINATION is a player option, and F8 and the in-game bake are built with the inspector only (D4 (b)). |
+| D | G11 | Reflection memory and GPU layout. Decided on 2026-11-07: D12 (a), the octahedral RGBA16F 2D array (SDL_GPU allocates Metal cube arrays six times over). |
+| E | G12 | Reflection cost, and the default per platform. Pending the user's A/B; REFLECTION PROBES is OFF by default until then. |
 | F | GD1 | The re-baked direct term (fit per world, N·L or not, occluders). |
 | G | GD2 | Look of the re-baked direct light in game, and the default direct source. Accepted on 2026-11-07: `rebaked` is the default. |
 
@@ -313,7 +318,7 @@ baked data and generated artifacts.
 - The runtime search order is decision 8.
 
 **G3, F8 shell (medium).**
-- Compiled under `BLOOD2_GI_TOOLS`: desktop presets including Release, never iOS, Android, Quest or the dedicated server.
+- Compiled under `BLOOD2_GI_TOOLS`: desktop builds with the inspector (debug and dev since Gate C; every desktop preset before), never iOS, Android, Quest or the dedicated server.
 - Shares UiRuntime's ImGui context with the HUD and the F10 inspector.
 - F8 is handled in `MenuInput` and `DemoFlow` before the inspector gate, following the F10 pattern. It is added to `reserved_key`, and controls v3 drops and logs any existing F8 binding.
 - Closed, Open and Pinned states. Gizmos use the existing line renderer, so no new shader artifact is needed.
@@ -367,7 +372,7 @@ baked data and generated artifacts.
 - The F8 Runtime panel offers intensities and views, all produced by recomposing pages.
 - Network clients load GI from their own content; the dedicated server never does.
 - Supersedes "no probes and no baking" in the enhanced renderer contract and AGENTS.md.
-- Known interim effect: until G12, enhanced grid specular reads the total GI luminance. This is documented.
+- Known interim effect until G12: enhanced grid specular read the total GI luminance. G12 resolved it: the GI pages' alpha carries the direct share, which the specular visibility and the model shadows read.
 
 **G9, light probes (xhigh).**
 - Capture: Fibonacci-sphere rays with a seeded rotation per probe, against the GI-composed world and the sky.
@@ -382,13 +387,13 @@ baked data and generated artifacts.
 - Optional suspension of scene rendering during the bake.
 - Hot reload follows decision 10.
 
-**G11, reflection bake (high).**
+**G11, reflection bake (high).** Implemented on 2026-11-07 ([report](reports/gi_g11_reflection_bake.md)); Gate D decided D12 (a). The file stores RGB9E5 chains; the R11G11B10 and compression options are not used.
 - Six faces at 64² (16–256) with 2×2 supersampling, captured from the GI-composed world and the sky.
 - CPU GGX prefilter: roughness = level/(levels − 1), with 64/32 samples.
 - Octahedral encoding with borders, RGBA16F (R11G11B10 optional), and optional miniz compression of the REFL section.
 - Measures the Metal allocation needed for D12.
 
-**G12, reflection runtime (max).**
+**G12, reflection runtime (max).** Implemented on 2026-11-07 ([report](reports/gi_g12_reflection_runtime.md)); Gate E pending.
 - `-DGI` variants of `pbr.frag`, for enhanced pipelines only.
 - GPU data:
   - storage buffers for probe records and the cell grid;
@@ -484,7 +489,7 @@ baked data and generated artifacts.
 | D1 | What does "GI overrides the lightmaps" mean on world surfaces? | (a) GI pages in the DAT layout: original direct light and shadows plus baked bounce, zero per-frame cost; (b) per-pixel probe sampling in the shaders, as in CyberEngine (per-pixel cost including XR, leaks through thin walls); (c) also re-bake the direct light from Light/DirLight objects. | **(a)**, with the Light probes world source for comparison; (c) as a later option, planned on 2026-11-07 as lots GD1–GD3 (D16–D20). |
 | D2 | Which renderer gets GI? | (a) GI pages and model probes in both renderers, reflections in ENHANCED only; (b) everything in ENHANCED only. | **(a)**: free on Quest. GI off keeps ORIGINAL byte-identical. |
 | D3 | May baked payloads (derived from retail lightmaps and textures, about 100–150 MB for the campaign at Final) be committed or shipped? | (a) placement and settings committed, `baked/` gitignored and injected only into local builds; (b) commit the payloads; (c) Git LFS or a private repository. | **(a)**. The folder and its injection exist either way. |
-| D4 | Which builds contain F8 and the baker? | (a) every desktop preset including Release, behind `BLOOD2_GI_TOOLS`; (b) debug/dev only, with the inspector. | **(a)** |
+| D4 | Which builds contain F8 and the baker? | (a) every desktop preset including Release, behind `BLOOD2_GI_TOOLS`; (b) debug/dev only, with the inspector. | **(b)** since Gate C (2026-11-07; (a) until then). The headless CLI stays in every build. |
 | D5 | How is F8 claimed? | (a) reserved like F10, with controls v3 dropping existing F8 bindings; (b) a rebindable "GI tools" action, default F8. | **(a)** |
 | D6 | How does F8 bake? | (a) a child process running the same binary; (b) worker threads inside the game. | **(a)**: CLI-identical output, no threads in the game. |
 | D7 | Which worlds are covered? | (a) the 36 single-player worlds accepted, multiplayer, Nightmares and demo best-effort through `--set`/`--edition`; (b) all 58 worlds plus Nightmares accepted. | **(a)** |
@@ -492,7 +497,7 @@ baked data and generated artifacts.
 | D9 | Does the sky emit light? | (a) trace the sky world models from the mapped sky eye, falling back to the average sky colour, with a sky scale (1.0) in F8; (b) a constant colour; (c) no sky light. | **(a)** |
 | D10 | Which surfaces emit in the bake? | (a) lit surfaces re-emit their light, SURF_BRIGHT faces emit their albedo, manifest emission is not baked; (b) also bake manifest emissive classes. | **(a)** |
 | D11 | Display rows and defaults? | (a) GLOBAL ILLUMINATION [OFF/ON] and REFLECTION PROBES [OFF/LOW/HIGH], off until acceptance, with defaults decided at G13; (b) on by default once data exists. | **(a)** |
-| D12 | How are reflections stored on the GPU? | (a) octahedral RGBA16F 2D array; (b) cube array, with the SDL Metal patch if the over-allocation is confirmed. | **(a)**, revisited at Gate D. |
+| D12 | How are reflections stored on the GPU? | (a) octahedral RGBA16F 2D array; (b) cube array, with the SDL Metal patch if the over-allocation is confirmed. | **(a)**, confirmed at Gate D (2026-11-07): the over-allocation is real (6×), and (a) needs no patch. |
 | D13 | How is CyberEngine code reused? | (a) as a reference, reimplemented, with provenance notes; (b) import selected files (SH, prefilter), which needs a license statement since the repository has no LICENSE. | **(a)**; the author may approve (b). |
 | D14 | Where does the work sit in the roadmap? | (a) a new M10, "Baked GI and probes", taken from the "Rendering extras" row under Later; (b) left under Later. | **(a)** |
 | D15 | Fix the case-sensitive AmbientLight read? | (a) GI reads it case-insensitively and the original renderer is unchanged; (b) also fix the original renderer (lot GA). | **(a)**, with GA as a separate approval. |

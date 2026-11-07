@@ -1052,6 +1052,14 @@ foreach(case IN ITEMS half sections basis capture field light source cost)
     set_tests_properties(gi_probes.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 120)
 endforeach()
 
+# Lot G11: reflection probes (octahedral map, the ported CyberEngine prefilter tests, REFL, capture);
+# lot G12: their GPU data, cell grid, CPU mirror of the shader and the file decode.
+foreach(case IN ITEMS octahedral prefilter sections capture runtime cells mirror world)
+    add_test(NAME gi_reflections.${case} COMMAND gi_lightmap_tests "reflection-${case}"
+             "${CMAKE_CURRENT_BINARY_DIR}/gi-reflections-${case}")
+    set_tests_properties(gi_reflections.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 120)
+endforeach()
+
 # Lot G6: baked GI files never enter the repository (decision D3), and the bake-all script
 # drives a stub binary (the stub is an executable script, hence Unix only).
 add_test(NAME gi_policy COMMAND "${CMAKE_COMMAND}" -DSOURCE=${PROJECT_SOURCE_DIR}

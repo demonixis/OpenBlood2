@@ -241,9 +241,11 @@ namespace OpenBlood2
                     out[3] = 255;
                     if (gi_block >= 0)
                     {
+                        // Alpha: the share that is not GI indirect light (lot G12, read by the GI shader
+                        // variants only; 255 keeps the original pages' value).
                         const auto composed =
                             gi->compose(true, gi->block_first[std::size_t(gi_block)] + std::uint32_t(sy) * w + sx,
-                                        {out[0], out[1], out[2]});
+                                        {out[0], out[1], out[2]}, &out[3]);
                         out[0] = composed[0], out[1] = composed[1], out[2] = composed[2];
                     }
                 }

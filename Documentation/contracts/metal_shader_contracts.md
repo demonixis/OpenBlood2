@@ -131,3 +131,11 @@ generator maps `<stem>_<vert|frag>` to `<stem>.<stage>.hlsl` unless a `<name>_so
 names a shared source. Sixty-eight artifacts, including the four XR line artifacts, are now
 regenerated together; the 22 earlier ones are byte-identical. Only Metal execution on Apple M5
 was verified.
+
+[GI lot G12](gi_contracts.md#reflection-runtime-lot-g12) adds the twenty-four `-DGI` variants of
+`pbr.frag` (`pbr[_high][_alpha]_gi[_aux[_ssr]]_frag`, SPIR-V and MSL; `<name>_source` points them at
+`pbr.frag.hlsl`): fragment texture/sampler 4 (the RGBA16F reflection array) and storage buffers 0–3
+(grid lights, grid cells, probe records, probe cells; t5–t8 in register space 2). Ninety-six
+artifacts are now regenerated together; the 72 earlier ones are byte-identical, and a regeneration
+into a scratch directory reproduces all 96 bytes. `gpu.gi` passed on Apple M5 with Metal and with
+Vulkan through MoltenVK (`SDL_GPU_DRIVER=vulkan`); no native Vulkan driver was tested.

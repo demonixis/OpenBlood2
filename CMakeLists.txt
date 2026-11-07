@@ -21,17 +21,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 
 option(BLOOD2_INSPECTOR "Build the in-game inspection UI" ON)
-# The F8 GI tools overlay (gi_contracts.md lot G3): every desktop build, Release included;
-# never iOS or Android (Quest included). The dedicated server builds no client.
-if(IOS OR ANDROID)
-    set(BLOOD2_GI_TOOLS_DEFAULT OFF)
-else()
-    set(BLOOD2_GI_TOOLS_DEFAULT ON)
-endif()
-option(BLOOD2_GI_TOOLS "Build the F8 GI tools overlay (desktop)" ${BLOOD2_GI_TOOLS_DEFAULT})
-if(BLOOD2_GI_TOOLS AND (IOS OR ANDROID))
-    message(FATAL_ERROR "BLOOD2_GI_TOOLS is desktop-only")
-endif()
+# The F8 GI tools overlay (gi_contracts.md lot G3, Gate C): desktop builds with the inspector
+# (the debug and dev presets), never Release presets, iOS or Android (Quest included). It is forced
+# OFF elsewhere, existing caches included. The headless GI command line (gi_tool.cpp) stays in every
+# build. The dedicated server builds no client.
+include(CMakeDependentOption)
+cmake_dependent_option(BLOOD2_GI_TOOLS "Build the F8 GI tools overlay (desktop, with the inspector)" ON
+                       "BLOOD2_INSPECTOR;NOT IOS;NOT ANDROID" OFF)
 option(BLOOD2_XR "Build OpenXR support (SDL_GPU sessions; the Quest preset enables it)" OFF)
 option(BLOOD2_GPU_TESTS "Register tests that open a real GPU window" OFF)
 option(BLOOD2_SANITIZERS "Enable ASan/UBSan on project code (Clang/GCC)" OFF)

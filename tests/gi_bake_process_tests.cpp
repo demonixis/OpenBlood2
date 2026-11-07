@@ -209,7 +209,8 @@ namespace
         CHECK(fraction("survey", 5, 10) == .025 && fraction("survey", 10, 10) == .05);
         CHECK(fraction("bounce 1/2", 0, 10) == .05 && std::abs(fraction("bounce 2/2", 10, 10) - .95) < 1e-12);
         CHECK(std::abs(fraction("bounce 1/2", 5, 10) - .275) < 1e-12);
-        CHECK(fraction("probes", 0, 4) == .95 && std::abs(fraction("probes", 4, 4) - 1) < 1e-12);
+        CHECK(fraction("probes", 0, 4) == .95 && std::abs(fraction("probes", 4, 4) - .97) < 1e-12);
+        CHECK(std::abs(fraction("reflections", 0, 4) - .97) < 1e-12 && std::abs(fraction("reflections", 4, 4) - 1) < 1e-12);
         CHECK(fraction("bounce 3/2", 1, 2) == 0 && fraction("bounce 0/2", 1, 2) == 0 && fraction("other", 1, 2) == 0);
         CHECK(fraction("survey", 0, 0) == 0 && gi_bake_fraction({}) == 0);
 

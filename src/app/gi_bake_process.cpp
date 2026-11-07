@@ -234,7 +234,9 @@ namespace OpenBlood2
         if (p.stage == "survey")
             return .05 * local;
         if (p.stage == "probes")
-            return .95 + .05 * local;
+            return .95 + .02 * local;
+        if (p.stage == "reflections") // Lot G11.
+            return .97 + .03 * local;
         unsigned pass = 0, passes = 0;
         if (std::sscanf(p.stage.c_str(), "bounce %u/%u", &pass, &passes) == 2 && pass >= 1 && pass <= passes)
             return .05 + .9 * ((pass - 1) + local) / passes;

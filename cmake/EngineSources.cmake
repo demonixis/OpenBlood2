@@ -80,10 +80,12 @@ add_library(engine_core STATIC
     src/engine/gi_lightmap.cpp
     src/engine/gi_direct.cpp
     src/engine/gi_probes.cpp
+    src/engine/gi_reflections.cpp
     src/engine/gi_preview.cpp
     src/engine/gi_jobs.cpp
     src/engine/gi_bake.cpp
     src/engine/gi_runtime.cpp
+    src/engine/gi_reflection_runtime.cpp
     src/engine/container.cpp
     src/engine/world_model.cpp
     src/engine/logging.cpp
@@ -102,7 +104,8 @@ target_link_libraries(engine_core PUBLIC SDL3::SDL3 blood2_startup PRIVATE spdlo
 # level: no fused multiply-add contraction (gi_contracts.md lot G5).
 if(NOT MSVC)
     set_property(SOURCE src/engine/gi_bake_scene.cpp src/engine/gi_sky.cpp src/engine/gi_lightmap.cpp
-                 src/engine/gi_probes.cpp src/engine/gi_bake.cpp src/engine/gi_direct.cpp APPEND PROPERTY COMPILE_OPTIONS -ffp-contract=off)
+                 src/engine/gi_probes.cpp src/engine/gi_bake.cpp src/engine/gi_direct.cpp
+                 src/engine/gi_reflections.cpp APPEND PROPERTY COMPILE_OPTIONS -ffp-contract=off)
 endif()
 if(BLOOD2_GI_TOOLS)
     set_property(SOURCE src/engine/gi_placement.cpp APPEND PROPERTY COMPILE_DEFINITIONS

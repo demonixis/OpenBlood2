@@ -63,8 +63,10 @@ namespace OpenBlood2
         return find_record(vertex.sets, model, polygon);
     }
     std::array<std::uint8_t, 3> GiWorldLight::compose(bool texel, std::uint32_t index,
-                                                      std::array<std::uint8_t, 3> original) const
+                                                      std::array<std::uint8_t, 3> original, std::uint8_t* share) const
     {
+        if (share)
+            *share = 255;
         const bool from_probes = composition.source == GiWorldSource::Probes && probe_source_ready;
         const auto& values = from_probes ? (texel ? probe_texels : probe_corners)
                                          : (texel ? lightmaps.texels : vertex.corners);
@@ -80,6 +82,37 @@ namespace OpenBlood2
         const auto energy = gi_rgb9e5_decode(values[index]);
         const float e[3]{energy.x, energy.y, energy.z}, a[3]{ambient.x, ambient.y, ambient.z};
         std::array<std::uint8_t, 3> out{};
+        // The page alpha (lot G12): the share of the composed light that is not GI light beyond the fill.
+        auto direct_share = [&]
+        {
+            if (!share)
+                return;
+            if (composition.view == GiView::Indirect)
+            {
+                *share = 0;
+                return;
+            }
+            if (composition.view != GiView::Final && composition.view != GiView::Lighting)
+                return;
+            constexpr double weight[3]{.299, .587, .114};
+            double page = 0, extra = 0;
+            for (int c = 0; c < 3; ++c)
+            {
+                const double o = original[c];
+                const double fill_ambient = a[c] > 0 ? std::min(o, double(a[c])) : 0.0;
+                double fill = double(composition.f) * fill_ambient;
+                if (!(fill >= 0))
+                    fill = 0;
+                double indirect = double(composition.k) * (e[c] > 0 ? double(e[c]) : 0.0) * (texel ? 255.0 / 2 : 255.0);
+                if (!(indirect >= 0))
+                    indirect = 0;
+                const double x = indirect > fill ? indirect - fill : 0.0;
+                page += weight[c] * out[c];
+                extra += weight[c] * std::min(x, double(out[c]));
+            }
+            if (page > 0 && extra > 0)
+                *share = static_cast<std::uint8_t>(std::clamp(std::floor(255 * (1 - extra / page) + .5), 0.0, 255.0));
+        };
         if (texel && rebaked && index < direct.texels.size())
         {
             // A re-baked file (lot GD2): D' replaces D.
@@ -98,6 +131,7 @@ namespace OpenBlood2
                         out[c] = gi_compose_direct(dv[c], original[c], a[c], e[c], composition.k, composition.f);
                         break;
                 }
+            direct_share();
             return out;
         }
         for (int c = 0; c < 3; ++c)
@@ -113,6 +147,7 @@ namespace OpenBlood2
                     out[c] = gi_compose(original[c], a[c], e[c], composition.k, composition.f, texel);
                     break;
             }
+        direct_share();
         return out;
     }
 
@@ -157,22 +192,36 @@ namespace OpenBlood2
         }
         if (!world_info_ambient_any_case(world.info, light.ambient))
             light.ambient = {};
-        if (const auto* prob = file.find(gi_format::probes))
+        const auto* prob = file.find(gi_format::probes);
+        const auto* refl = file.find(gi_format::reflections);
+        if (prob || refl)
         {
             const auto* plac = file.find(gi_format::placement);
             if (!plac)
             {
-                error = "The file has a PROB section without PLAC";
+                error = std::string("The file has a ") + (prob ? "PROB" : "REFL") + " section without PLAC";
                 return false;
             }
             GiLightLattice lattice;
             std::vector<GiReflectionProbe> reflections;
-            GiProbes probes;
-            if (!decode_gi_placement_section(plac->payload, lattice, reflections, error) ||
-                !read_gi_probes(prob->payload, probes, error) ||
-                !light.probes.build(std::move(lattice), std::move(probes), error))
+            if (!decode_gi_placement_section(plac->payload, lattice, reflections, error))
                 return false;
-            light.has_probes = true;
+            if (prob)
+            {
+                GiProbes probes;
+                if (!read_gi_probes(prob->payload, probes, error) ||
+                    !light.probes.build(std::move(lattice), std::move(probes), error))
+                    return false;
+                light.has_probes = true;
+            }
+            if (refl)
+            {
+                if (!read_gi_reflections(refl->payload, light.reflections, error) ||
+                    !check_gi_reflections(reflections, light.reflections, error))
+                    return false;
+                light.reflection_probes = std::move(reflections);
+                light.has_reflections = true;
+            }
         }
         out = std::move(light);
         return true;
@@ -267,10 +316,12 @@ namespace OpenBlood2
         SDL_snprintf(cost, sizeof cost, "keys %.1f ms, lookup %.1f ms, sections %.1f ms", s.expectation_ms,
                      s.lookup_ms, s.decode_ms);
         if (s.state == GiRuntimeState::Applied)
-            return "GI applied: " + s.world_path + " from " + s.file + " (" + std::to_string(s.blocks) + " blocks, " +
+            return std::string(s.lighting ? "GI applied: " : "GI read for reflection probes only: ") + s.world_path + " from " + s.file + " (" + std::to_string(s.blocks) + " blocks, " +
                    std::to_string(s.texels) + " texels, " + std::to_string(s.sets) + " corner sets, " +
                    std::to_string(s.corners) + " corners, " + std::to_string(s.valid_probes) + "/" +
-                   std::to_string(s.probes) + " light probes" + (s.rebaked ? ", re-baked direct light" : "") +
+                   std::to_string(s.probes) + " light probes, " + std::to_string(s.valid_reflections) + "/" +
+                   std::to_string(s.reflection_probes) + " reflection probes" +
+                   (s.rebaked ? ", re-baked direct light" : "") +
                    "; " + cost + ")";
         if (s.state == GiRuntimeState::Off || s.state == GiRuntimeState::NoWorld)
             return std::string("GI ") + gi_runtime_state_name(s.state);
@@ -351,6 +402,11 @@ namespace OpenBlood2
         status.probes = decoded.probes.probes().size();
         status.valid_probes = decoded.probes.valid();
         status.probe_spacing = decoded.probes.lattice().spacing;
+        status.reflection_probes = decoded.reflections.size();
+        status.valid_reflections = std::size_t(std::count(decoded.reflections.valid.begin(),
+                                                          decoded.reflections.valid.end(), std::uint8_t(1)));
+        status.reflection_resolution = decoded.reflections.resolution;
+        status.reflection_levels = decoded.reflections.levels;
         status.state = GiRuntimeState::Applied;
         light = std::move(decoded);
     }

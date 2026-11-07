@@ -308,13 +308,24 @@ the key is rejected.
 
 ### Global illumination (GI lot G8)
 
-A replacement `GLOBAL ILLUMINATION [OFF/ON]` row (setting 31) now ends the Display page (16
-rows). It is off by default (decision D11) and enabled in both renderers, at every detail level
+A replacement `GLOBAL ILLUMINATION [OFF/ON]` row (setting 31) ended the Display page (16
+rows) until lot G12. It is off by default (decision D11) and enabled in both renderers, at every detail level
 and in XR. On, the world faces draw the current world's baked GI when a Ready file exists; see
 the [GI world override](gi_contracts.md#world-override-lot-g8). The F8 Runtime panel's checkbox is
 the same setting. `preferences.cfg` **version 13** adds `global_illumination` (default 0);
 versions 1–12 load it off, a version 12 file carrying the key and a version 13 file without it
 are rejected.
+
+### Reflection probes (GI lot G12)
+
+A replacement `REFLECTION PROBES [OFF/LOW/HIGH]` row (setting 32) follows GLOBAL ILLUMINATION and
+now ends the Display page (17 rows). It is off by default, enabled only with the enhanced renderer
+(like LIGHTING and NORMAL MAPS), and cycles OFF → LOW → HIGH. On, the enhanced renderer draws the
+current world's baked reflection probes, with or without GLOBAL ILLUMINATION; see the
+[reflection runtime](gi_contracts.md#reflection-runtime-lot-g12). The F8 Runtime panel's mode is
+the same setting. `preferences.cfg` **version 14** adds `reflection_probes` (0–2, default 0);
+versions 1–13 load it off, a version 13 file carrying the key and a version 14 file without it are
+rejected.
 
 ## Controls (CMenuControls)
 

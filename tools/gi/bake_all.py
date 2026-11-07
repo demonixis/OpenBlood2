@@ -31,7 +31,7 @@ EXIT_CANCELLED = 12
 # key=value tokens of a GI_RESULT line; values may be JSON strings with spaces (error=).
 TOKEN = re.compile(r'(\w+)=("(?:[^"\\]|\\.)*"|\S+)')
 REPORT_FIELDS = ("quality", "direct", "bounces", "rays_per_probe", "jobs", "placement", "probes", "reflections",
-                 "threads", "rays", "miss", "inside", "digest", "bytes", "ms")
+                 "reflection_valid", "reflection_ms", "threads", "rays", "miss", "inside", "digest", "bytes", "ms")
 
 
 def parse_arguments(argv):

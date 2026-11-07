@@ -77,6 +77,10 @@ namespace OpenBlood2
         bool gi = false, gi_view_given = false, gi_source_given = false, gi_probes_given = false;
         int gi_view = 0, gi_source = 0;
         float gi_probes = 1;
+        // --gi-reflections off|low|high (lot G12): reflection probes for --bench and smoke runs, with or
+        // without --gi (GiReflectionMode order; the game uses Options > Display REFLECTION PROBES).
+        int gi_reflections = 0;
+        bool gi_reflections_given = false;
         std::filesystem::path gi_out;
         bool gi_if_stale = false;
         bool inspector = true;

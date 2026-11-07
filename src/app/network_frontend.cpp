@@ -18,6 +18,7 @@
 #include "server/network.h"
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlgpu3.h>
+#include <algorithm>
 #include <imgui.h>
 #include <memory>
 #include <spdlog/spdlog.h>
@@ -113,8 +114,9 @@ namespace OpenBlood2
         presenter.lightmaps = settings.detail >= 1;
         // Baked GI (lot G8) from this client's own content and roots, never from the server.
         presenter.global_illumination = settings.global_illumination;
+        presenter.gi_reflections = GiReflectionMode(std::clamp(settings.reflection_probes, 0, 2));
         presenter.gi_roots = gi_search_roots(config.gi_dir);
-        std::uint64_t gi_logged = 0;
+        GiLogState gi_logged;
         presenter.model_shadows = options.model_shadows && settings.detail >= 2;
         presenter.per_pixel_lighting = settings.pixel_lighting;
         presenter.shading = !settings.renderer ? SurfaceShading::Original

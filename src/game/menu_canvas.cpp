@@ -365,6 +365,12 @@ namespace OpenBlood2
             if (item.setting == 31)
                 label = item.literal =
                     display.global_illumination ? "GLOBAL ILLUMINATION [ON]" : "GLOBAL ILLUMINATION [OFF]";
+            if (item.setting == 32)
+            {
+                static constexpr std::array<const char*, 3> modes{"REFLECTION PROBES [OFF]", "REFLECTION PROBES [LOW]",
+                                                                  "REFLECTION PROBES [HIGH]"};
+                label = item.literal = modes[std::size_t(std::clamp(display.reflection_probes, 0, 2))];
+            }
             const bool enabled = menu.enabled(item);
             const auto& font = menu.small()              ? small_
                                : !enabled                ? disabled_

@@ -84,6 +84,11 @@ namespace OpenBlood2
         {
             return scale_;
         }
+        // Keeps the texels with another scale (the reflection capture draws the sky as shown: 1).
+        void set_scale(float scale)
+        {
+            scale_ = scale;
+        }
         std::span<const float> texels() const
         {
             return texels_;

@@ -416,6 +416,13 @@ namespace OpenBlood2
             for (std::size_t i = 0; i < probes.back_fraction.size(); ++i)
                 std::cout << (i ? "," : "") << probes.back_fraction[i];
             std::cout << " probe_ms=" << std::lround(probes.ms);
+            const auto& refl = result.reflection_probes;
+            std::cout << " reflection_resolution=" << refl.resolution << " reflection_levels=" << refl.levels
+                      << " reflection_valid=" << refl.valid << " reflection_invalid=" << refl.probes - refl.valid
+                      << " reflection_rays=" << refl.rays << " reflection_back=" << refl.back
+                      << " reflection_sky=" << refl.sky << " reflection_capture_ms=" << std::lround(refl.capture_ms)
+                      << " reflection_prefilter_ms=" << std::lround(refl.prefilter_ms)
+                      << " reflection_ms=" << std::lround(refl.ms);
         }
         if (result.status == GiBakeResult::Status::Baked || result.status == GiBakeResult::Status::Current)
             std::cout << " bytes=" << result.bytes;
@@ -815,12 +822,12 @@ namespace OpenBlood2
         return 0;
     }
 
-    void log_gi_status(const ScenePresenter& presenter, std::uint64_t& logged)
+    void log_gi_status(const ScenePresenter& presenter, GiLogState& logged)
     {
         const auto& status = presenter.gi_status();
-        if (status.loads != logged)
+        if (status.loads != logged.loads)
         {
-            logged = status.loads;
+            logged.loads = status.loads;
             if (status.state != GiRuntimeState::NoWorld)
                 spdlog::info("{}", gi_status_line(status));
         }
@@ -830,5 +837,19 @@ namespace OpenBlood2
                          gi_view_name(presenter.gi_composition.view), presenter.gi_composition.k,
                          presenter.gi_composition.f, presenter.world_mesh.gi_blocks, presenter.world_mesh.gi_texels,
                          presenter.world_mesh.gi_sets, presenter.mesh_build_ms);
+        const auto& r = presenter.reflection_stats();
+        if (r.builds != logged.reflection_builds)
+        {
+            logged.reflection_builds = r.builds;
+            if (r.active)
+                spdlog::info("GI reflection probes {} ({} set): {} probes at {}x{}, {} levels, {} cells of {:.0f} "
+                             "units ({} occupied, {} over the limit), {:.2f} MB; built in {:.1f} ms",
+                             gi_reflection_mode_name(r.mode),
+                             r.set == GiReflectionSet::Composed ? "composed" : "original", r.layers, r.size, r.size,
+                             r.levels, std::size_t(r.cells[0]) * r.cells[1] * r.cells[2], r.cell_size, r.occupied,
+                             r.overflow, double(r.texture_bytes + r.buffer_bytes) / (1024 * 1024), r.build_ms);
+            else if (!r.detail.empty())
+                spdlog::info("GI reflection probes {}: not drawn ({})", gi_reflection_mode_name(r.mode), r.detail);
+        }
     }
 } // namespace OpenBlood2
