@@ -377,7 +377,9 @@ namespace
         presenter.normal_maps = options.normal_maps;
         presenter.global_illumination = options.gi; // Baked GI (lot G8) for smoke runs, as --bench --gi.
         presenter.gi_roots = OpenBlood2::gi_search_roots(config.gi_dir);
-        presenter.gi_composition = {options.gi_k, options.gi_f, OpenBlood2::GiView(options.gi_view)};
+        presenter.gi_composition = {options.gi_k, options.gi_f, OpenBlood2::GiView(options.gi_view),
+                                    OpenBlood2::GiWorldSource(options.gi_source)};
+        presenter.gi_probes = {options.gi_probes > 0, options.gi_probes > 0 ? options.gi_probes : 1};
         std::uint64_t gi_logged = 0;
         presenter.post = {OpenBlood2::Antialiasing(options.antialiasing), options.bloom,
                           OpenBlood2::Tonemap(options.tonemap), OpenBlood2::AmbientOcclusion(options.ambient_occlusion),

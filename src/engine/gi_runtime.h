@@ -1,6 +1,7 @@
 #pragma once
 #include "engine/gi_file.h"
 #include "engine/gi_lightmap.h"
+#include "engine/gi_probes.h"
 #include <array>
 #include <cstdint>
 #include <optional>
@@ -28,16 +29,33 @@ namespace OpenBlood2
     inline constexpr std::array<GiView, 6> gi_views{GiView::Final,    GiView::Original, GiView::Direct,
                                                     GiView::Indirect, GiView::Lighting, GiView::Validity};
     const char* gi_view_name(GiView);
+    // Where the world's E comes from (lot G9): the baked texels and corners (default), or the light
+    // probes evaluated at each texel centre and corner with its face normal (an F8 comparison).
+    enum class GiWorldSource : std::uint8_t
+    {
+        Texels, // "Texel gather": the LMAP and VTX sections.
+        Probes  // "Light probes": the PROB section over the PLAC lattice.
+    };
+    const char* gi_world_source_name(GiWorldSource);
 
     // What WorldMesh::build composes. k and f are composition parameters: no new bake is needed.
     struct GiComposition
     {
         float k = gi_default_k, f = gi_default_f;
         GiView view = GiView::Final;
+        GiWorldSource source = GiWorldSource::Texels;
         bool operator==(const GiComposition&) const = default;
     };
     constexpr float gi_max_intensity = 4; // The k and f range (as --gi-k and --gi-f).
     bool valid_gi_composition(const GiComposition&);
+    // Light probes on models (lot G9): the F8 Runtime switch and the probe intensity p (0-4, the
+    // model term is k p E / 2). Changing them never rebuilds the world mesh.
+    struct GiProbeSettings
+    {
+        bool models = true;
+        float intensity = 1;
+        bool operator==(const GiProbeSettings&) const = default;
+    };
 
     // The decoded, checked indirect light of one Ready file, for one world.
     struct GiWorldLight
@@ -47,6 +65,18 @@ namespace OpenBlood2
         std::vector<std::uint32_t> block_first, set_first; // First value of each record.
         DVector ambient{}; // world_info_ambient_any_case (0-255); zero when the info has none.
         GiComposition composition;
+        // The PROB section over the PLAC lattice (lot G9); empty when the file has none.
+        GiProbeField probes;
+        bool has_probes = false;
+        // The Light probes world source in LMAP/VTX order (RGB9E5 E and validity), built on demand by
+        // prepare_probe_source; compose uses it while composition.source is Probes.
+        std::vector<std::uint32_t> probe_texels, probe_corners;
+        std::vector<std::uint8_t> probe_texel_valid, probe_corner_valid;
+        bool probe_source_ready = false;
+        double probe_source_ms = 0;
+        // E from the probes at every listed texel centre and corner, with the face normal. Elements
+        // without a valid probe get 0 (the original light at f = 1). False without probes.
+        bool prepare_probe_source(const World&, std::string& error);
         // The record of a polygon, or -1 when the file does not list it.
         std::int64_t block(std::uint32_t model, std::uint32_t polygon) const;
         std::int64_t set(std::uint32_t model, std::uint32_t polygon) const;
@@ -55,8 +85,9 @@ namespace OpenBlood2
         std::array<std::uint8_t, 3> compose(bool texel, std::uint32_t index,
                                             std::array<std::uint8_t, 3> original) const;
     };
-    // Decodes the LMAP and VTX sections (both required) and checks them against the world. The output
-    // is untouched on failure.
+    // Decodes the LMAP and VTX sections (both required) and checks them against the world, then PLAC
+    // and PROB when the file has PROB (a PROB that does not match its lattice fails the file). The
+    // output is untouched on failure.
     bool gi_world_light(const World&, const GiFile&, GiWorldLight&, std::string& error);
 
     enum class GiRuntimeState : std::uint8_t
@@ -75,6 +106,8 @@ namespace OpenBlood2
         std::string settings;                 // The applied file's bake settings (INFO text).
         GiLookup lookup;                      // Every candidate, without the file's payload.
         std::size_t blocks = 0, texels = 0, sets = 0, corners = 0;
+        std::size_t probes = 0, valid_probes = 0; // PROB entries (0 when the file has none).
+        std::uint32_t probe_spacing = 0;
         // Load cost: content keys (DAT and albedo digests), file lookup, section decode and checks.
         double expectation_ms = 0, lookup_ms = 0, decode_ms = 0;
         std::uint64_t loads = 0; // Lookups since construction; identifies the decoded data.

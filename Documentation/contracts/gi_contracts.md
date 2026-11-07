@@ -2,8 +2,9 @@
 
 Baked GI for the M10 [GI plan](../implementation/gi_plan.md). Each lot adds its section.
 Lot G7 bakes the GI lightmaps and lot G8 composes them into the world when Options > Display
-GLOBAL ILLUMINATION is on (off by default, decision D11). With it off, or without a Ready file,
-every frame is unchanged; nothing in this contract changes a save or the simulation.
+GLOBAL ILLUMINATION is on (off by default, decision D11); lot G9 adds light probes that light the
+models. With it off, or without a Ready file, every frame is unchanged; nothing in this contract
+changes a save or the simulation.
 
 - [World queries (lot G1)](#world-queries-lot-g1)
 - [Baked file and keys (lot G2)](#baked-file-and-keys-lot-g2)
@@ -13,6 +14,7 @@ every frame is unchanged; nothing in this contract changes a save or the simulat
 - [Bake-all script and packaging (lot G6)](#bake-all-script-and-packaging-lot-g6)
 - [GI lightmap core (lot G7)](#gi-lightmap-core-lot-g7)
 - [World override (lot G8)](#world-override-lot-g8)
+- [Light probes (lot G9)](#light-probes-lot-g9)
 
 ## World queries (lot G1)
 
@@ -614,8 +616,8 @@ Reset; both panels draw; edits survive closing; a Foreign file waits for Start f
 `engine/gi_bake_scene.{h,cpp}`, `engine/gi_jobs.{h,cpp}` and `engine/gi_bake.{h,cpp}` turn a
 world and its placement into a `.ob2gi` file through a deterministic CPU tracer. Lot G5 traced a
 probe survey and wrote INFO and PLAC; lot G7 adds the LMAP and `VTX ` sections
-([below](#gi-lightmap-core-lot-g7)) and G9 will add PROB. Nothing here changes a frame, a save or
-the simulation.
+([below](#gi-lightmap-core-lot-g7)) and G9 adds PROB ([below](#light-probes-lot-g9)). Nothing here
+changes a frame, a save or the simulation.
 
 ### Bake scene
 
@@ -1007,7 +1009,7 @@ u32 RGB9E5 values and the validity bits:
 
 - The INFO text is `openblood2-gi-settings 2`, then the `quality`, `bounces`, `rays` and
   `sky X.YY` lines, so the sky scale is part of the settings key. `gi_algorithm_version` is 2:
-  files from lot G5 become stale.
+  files from lot G5 become stale (3 since G9, which adds PROB).
 - The bake runs the survey, then the sky, the receivers and the passes; exit 4 for a sky,
   receiver or section failure. Cancellation is also checked during every pass.
 - `GI_PROGRESS stage=bounce b/B done=N total=M` lines report each pass. `GI_RESULT` adds
@@ -1185,10 +1187,11 @@ A network client loads GI from its own content (its mounted data and its own `gi
 never from the server; nothing about GI goes over the wire. The dedicated server has no presenter
 and never looks a file up.
 
-### Interim effects (until G9 and G12)
+### Interim effects (until G12)
 
-- **Models** sample the face light below them from the world mesh (`ModelLighting`, `WorldShade`),
-  so with GI on they see the composed light until the light probes (G9) replace model lighting.
+- **Models:** superseded by [lot G9](#light-probes-lot-g9). The earlier statement that models read
+  the composed light was wrong: `ModelLighting` uses the world mesh only for ClipLight occlusion,
+  which GI does not change, so models kept their original light until the light probes.
 - **Model shadows** remove 60 % of the composed light below a caster, GI included.
 - **Enhanced renderer:** the static-light specular occlusion (`saturate(baked / predicted)`) and
   the normal-map relief read the total, GI-composed luminance, so GI raises grid specular where it
@@ -1225,3 +1228,155 @@ restore it, and Lighting only differs.
 bytes, version 12 loading off, and the refused key/value combinations. **`config.gi`** `--gi`,
 `--gi-view` and their refusals. **`gi_overlay.draw` / `gi_overlay.retail`** The Runtime panel with
 and without the presenter link, and the summaries per runtime state.
+
+## Light probes (lot G9)
+
+`engine/gi_probes.{h,cpp}` captures an SH L2 irradiance probe at every light probe of the placement
+lattice (G4) and stores them in the PROB section; `ModelLighting` samples them per model instance
+and splits the sample into an ambient term and a pseudo-light (decision 3). The same probes offer
+the **Light probes** world source in F8. Probes change models and, only when selected, world
+pages; never geometry, collision, saves or the simulation.
+
+### Units
+
+A probe stores E(n): the cosine-weighted mean of the display radiance arriving from the
+hemisphere around a normal n, in the units of the LMAP/`VTX ` E (decision D1). Its 27 values are
+the irradiance SH divided by π, coefficient-major then RGB: the projection of the radiance with
+the band factors 1, 2/3 and 1/4 (the published clamped-cosine factors π, 2π/3, π/4 over π). Basis
+order: Y00, Y1−1 (y), Y10 (z), Y11 (x), Y2−2 (xy), Y2−1 (yz), Y20, Y21 (xz), Y22. Uniform
+radiance L gives E = L for every normal; a lone directional light of colour C gives
+E(n) = C·max(0, n·l) up to the L2 truncation (1.0625 C facing it, 0.0625 C away).
+
+### Capture
+
+- After the last lightmap pass the bake builds the light state those passes read
+  (`gi_light_state`): `min(D + E/2, 1)` per texel and `min(D + E, 1)` per corner (DETAIL LOW
+  corners keep D). That is the composition at k = 1 without the ambient fill: the probes see the
+  bounced world, not the flat fill, so the fill is never counted twice.
+- Each probe traces `rays` directions (the preset's rays: 64 Preview, 256 Final): the Fibonacci
+  sphere `z = 1 − (2i + 1)/n` with golden-angle azimuths (`gi_quarter_sin_cos`, no library
+  trigonometry), turned by a uniform random rotation per probe (a unit quaternion by rejection
+  from `GiRandom(seed, probe, "PROB")`, a stream disjoint from the lightmap passes).
+- Each ray brings the radiance the lightmap passes use (`gi_hit_radiance`: translucent layers,
+  the sky through its world models, D9/D10) and is projected with the weight 4π/rays.
+- A ray that ends on a back face brings 0. A probe is **invalid** when more than half its rays end
+  on back faces; its values are still stored.
+- Jobs take 16 probes each; results are identical for any thread count (`-ffp-contract=off`).
+  `GI_PROGRESS stage=probes done=N total=M` reports the pass; a cancel exits 12 and writes nothing;
+  a failure exits 4 (`GI light probes: …`).
+- `GI_RESULT` adds `probe_valid`, `probe_invalid`, `probe_rays`, `probe_back`, `probe_sky`,
+  `probe_back_fraction` (ten counts) and `probe_ms`.
+
+### PROB section
+
+| Field | Bytes | Value |
+| --- | --- | --- |
+| Format | 4 | 1 |
+| Probes | 4 | One per PLAC light probe, in PLAC order (at most 262,144) |
+| Reserved | 4 | 0 |
+| Values | 54 per probe | 27 IEEE binary16, round to nearest even; NaN writes 0, larger than 65,504 saturates |
+| Validity | ⌈probes/8⌉ | LSB-first bits, zero padding |
+
+The reader is strict: format, count, reserved field, exact size, finite halves (exponent 31 is
+refused) and padding. A file with PROB needs PLAC, and the probe count must match its lattice; a
+mismatch fails the whole file at lookup. `gi_algorithm_version` is **3**: every older bake is
+stale.
+
+### Field
+
+`GiProbeField` holds one Ready file's probes over the PLAC lattice. A sample at a point:
+
+1. lattice coordinates `(p − origin)/spacing`, clamped to the lattice (NaN as the low edge);
+2. the eight corners of that cell, each found by binary search over the sorted node list;
+3. trilinear weights, with missing and invalid probes dropped and the rest renormalized;
+4. no valid probe with weight: the sample is **invalid**.
+
+### Model light (decision 3)
+
+For each lit model the presenter's field is sampled at the instance's bounds centre (view models:
+the camera) and split by `gi_probe_model_light` with s = k·p/2 (k the composition intensity, p the
+probe intensity; the factor 1/2 is the page doubling, so s·E is in AmbientLight/255 units):
+
+- e0 = s·Y00·sh0 (the mean of s·E over directions), g = s·Y1·(sh_x, sh_y, sh_z) (its linear term);
+- d = the Rec. 709 luminance direction of g;
+- per channel c = min(2·max(0, g·d), 4·e0) and a = max(0, e0 − c/4): a lone directional light
+  is recovered exactly as colour c along d with no ambient;
+- ambient = max(a, f·A) and pseudo-light colour = max(a + c, f·A) − ambient, A being AmbientLight
+  (case-sensitive, as the original model light read it).
+
+The ambient replaces AmbientLight; ModelAdd, the object colour and the remainder are added as
+before. The pseudo-light is a source at centre + d·10⁵ with range 10²⁰ and no cone: the original
+light term then gives it attenuation 1, a directional light. It competes in the top four by its
+largest channel; a static light of equal strength stays first, and a static light it displaces
+joins the remainder with its value at the centre. A pseudo-light outside the top four, or on a
+model without Gouraud shading, adds c/4 (its mean over directions). In the enhanced renderer it
+also gives specular, like the static lights.
+
+- **Identity:** an invalid sample, a zero sample with f = 1, the switch off, p = 0, the Original
+  and Direct only views, a file without PROB and GI off all leave every model light exactly as
+  before (`world_lighting.retail`, `gpu.gi`).
+- **Cache:** per object slot and generation; reused while the instance stays in its cell and
+  within 16 units of the sampled centre; dropped when the applied file changes.
+- `ModelLightingStats` counts `probe_lit`, `probe_sampled`, `probe_reused`, `probe_missing`,
+  `probe_sources` and `probe_ms`.
+
+### Light probes world source
+
+`GiComposition::source` selects **Texel gather** (the LMAP/`VTX ` E, default) or **Light probes**.
+The probe source evaluates E at every listed texel centre (`LightmapFrame::position(x + .5, y +
+.5)`) and corner with the polygon's plane normal (as the bake's receivers), RGB9E5-encoded with its
+validity; it is prepared once per applied file, on first use. An element without a valid probe
+gets E = 0, its original light at f = 1. `gi_compose` and every view then work as for the texels.
+Changing the source rebuilds the world mesh; a file without probes keeps Texel gather.
+
+### Lattice
+
+The lattice stays single-level. Decision 3 left a two-level lattice to G9: the G4 spacing ladder
+already keeps every single-player world within its budget (the Final rebake: 63 to 12,182 probes,
+the five largest worlds coarsened to 160–256 units), so a second level would add data and lookup
+cost without a measured need. It is revisited only if the user's A/B shows missing detail.
+
+### Switches, F8 and command line
+
+- `GiProbeSettings` (presenter): **Light probes (models)** on by default and **Probe intensity
+  p** 0–4 (default 1). Both last for the session, are not saved and never rebuild the world mesh.
+  Models use probes when GI is applied, the file has PROB, the switch is on, 0 < p ≤ 4 and the
+  view is neither Original nor Direct only.
+- **F8 Runtime:** the file's probe counts and spacing; the switch, the p slider (Defaults resets
+  p to 1) and the model counters; **World source** Texel gather / Light probes (disabled without
+  probes); the Pinned strip names the source and "probes on models".
+- **F8 Light probes:** the baked counts, **Show baked SH samples** (each probe within the marker
+  radius as three 12-segment circles coloured by clamp(k·E, 0.08, 1) along each segment, invalid
+  probes magenta, at most 1,024), the camera cell with its eight corners, probe indices and
+  weights, the blended SH, E up and down, and the model split at the camera.
+- `--gi-source texels|probes` and `--gi-probes P` (0–4, 0 = off) apply to `--bench` and the smoke
+  runs and require `--gi`. `--bench` adds a "light probes (GI lot G9)" series and a summary line.
+- The status line adds "N/M light probes".
+
+### Cost
+
+- Bake: the 36 single-player worlds at Final take 194 s on Apple M5 (10 jobs); the probe pass
+  totals 1.6 s (63–12,182 probes per world, 60 invalid of 175,510).
+- Runtime: a sample and split cost about 0.4 µs (1,000 in 0.4 ms, `gi_probes.cost`), so 100
+  moving models stay far below the 0.2 ms target; `--bench --bench-sweep --gi` measures about
+  0.001 ms per frame for SubwayA's 28 models and 0.011 ms for CityHub's 232 (frame totals
+  unchanged within noise). The probe source takes about 20 ms on SubwayA, once.
+
+### Tests
+
+**`gi_probes.half`** Binary16 rounding, subnormals, saturation, NaN and every finite half.
+**`gi_probes.sections`** PROB layout, round trip, every refusal and the lattice check.
+**`gi_probes.basis`** SH orthonormality, Fibonacci and rotation reproducibility and rigidity, the
+uniform and directional irradiance. **`gi_probes.capture`** A uniformly lit closed box (E = albedo
+× light, L1/L2 near 0), probes inside outward walls (invalid, black) and outside (sky), identical
+results for 1, 2 and 7 jobs, another seed, cancellation and refused inputs. **`gi_probes.field`**
+Weights, missing and invalid corners, clamping, NaN and build refusals. **`gi_probes.light`** The
+zero identity, directional recovery, ambient plus light, the floor and non-finite input.
+**`gi_probes.source`** Zero and invalid probes leave the mesh byte-identical, uniform probes give
+every element its E, refused files. **`gi_probes.cost`** 1,000 samples under 2 ms.
+**`gi_bake.retail`** PROB present, one entry per PLAC probe, 1,031 valid on SubwayA.
+**`gi_runtime.retail`** Zero probes over a SubwayA lattice: counts and identical meshes with the
+probe source. **`world_lighting.retail`** Zero probes leave every model light identical; uniform
+probes raise ambients and are reused. **`gpu.gi`** Zero probes leave models and the probe source
+byte-identical; nonzero probes change the models only, and the switch, p = 0 and the Original view
+restore the frame. **`config.gi`**, **`gi_overlay.draw`** The options and panels.

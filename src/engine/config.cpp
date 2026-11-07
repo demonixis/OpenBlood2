@@ -325,8 +325,8 @@ namespace OpenBlood2
                      arg == "--gi-place" || arg == "--gi-placement-dir" || arg == "--bake-gi" ||
                      arg == "--gi-quality" || arg == "--gi-bounces" || arg == "--gi-rays" || arg == "--gi-jobs" ||
                      arg == "--gi-out" || arg == "--gi-sky" || arg == "--gi-preview" || arg == "--gi-preview-dir" ||
-                     arg == "--gi-k" || arg == "--gi-f" || arg == "--gi-view" ||
-                     arg == "--frames" || arg == "--capture" || arg == "--world" || arg == "--log-dir" ||
+                     arg == "--gi-k" || arg == "--gi-f" || arg == "--gi-view" || arg == "--gi-source" ||
+                     arg == "--gi-probes" || arg == "--frames" || arg == "--capture" || arg == "--world" || arg == "--log-dir" ||
                      arg == "--log-level" || arg == "--rez" ||
                      arg == "--connect" || arg == "--host" || arg == "--port" || arg == "--name" || arg == "--end" ||
                      arg == "--frag-limit" || arg == "--time-limit" || arg == "--map" || arg == "--mode" ||
@@ -456,7 +456,17 @@ namespace OpenBlood2
                     options.gi_view = int(it - views.begin());
                     options.gi_view_given = true;
                 }
-                else if (arg == "--gi-k" || arg == "--gi-f")
+                else if (arg == "--gi-source")
+                {
+                    if (args[i] != "texels" && args[i] != "probes")
+                    {
+                        error = "--gi-source requires texels or probes";
+                        return false;
+                    }
+                    options.gi_source = args[i] == "probes" ? 1 : 0; // GiWorldSource order.
+                    options.gi_source_given = true;
+                }
+                else if (arg == "--gi-k" || arg == "--gi-f" || arg == "--gi-probes")
                 {
                     const auto value = args[i];
                     float number = 0;
@@ -467,8 +477,16 @@ namespace OpenBlood2
                         error = std::string(arg) + " requires a number from 0 to 4";
                         return false;
                     }
-                    (arg == "--gi-k" ? options.gi_k : options.gi_f) = number;
-                    options.gi_composition = true;
+                    if (arg == "--gi-probes")
+                    {
+                        options.gi_probes = number;
+                        options.gi_probes_given = true;
+                    }
+                    else
+                    {
+                        (arg == "--gi-k" ? options.gi_k : options.gi_f) = number;
+                        options.gi_composition = true;
+                    }
                 }
                 else if (arg == "--gi-sky")
                 {
@@ -561,9 +579,11 @@ namespace OpenBlood2
             error = "--gi-preview-dir requires --gi-preview";
             return false;
         }
-        if ((options.gi_composition && !gi_preview && !options.gi) || (options.gi_view_given && !options.gi))
+        if ((options.gi_composition && !gi_preview && !options.gi) ||
+            ((options.gi_view_given || options.gi_source_given || options.gi_probes_given) && !options.gi))
         {
-            error = "--gi-k and --gi-f require --gi-preview or --gi; --gi-view requires --gi";
+            error = "--gi-k and --gi-f require --gi-preview or --gi; --gi-view, --gi-source and --gi-probes "
+                    "require --gi";
             return false;
         }
         if (options.gi && (gi_tool || network || (!options.bench && !options.gpu_smoke && !options.world_smoke)))

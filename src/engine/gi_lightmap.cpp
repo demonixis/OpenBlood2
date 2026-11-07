@@ -756,6 +756,121 @@ namespace OpenBlood2
         return {float(out.x), float(out.y), float(out.z)};
     }
 
+    namespace
+    {
+        // Radiance leaving a face point toward the ray, from the light state.
+        void surface_radiance(const GiBakeScene& scene, const GiSky& sky, const GiReceivers& r, const float* light,
+                              std::uint32_t face, float u, float v, DVector direction, GiRayCounters& count,
+                              double out[3])
+        {
+            const auto& link = r.links[face];
+            switch (link.kind)
+            {
+            case GiReceivers::Link::Lightmap:
+            case GiReceivers::Link::Vertex:
+            {
+                const auto albedo = scene.albedo(face, u, v);
+                double value[3];
+                sample_link(r, light, link, u, v, value);
+                const double scale = link.kind == GiReceivers::Link::Lightmap ? world_saturate_scale : 1;
+                for (int c = 0; c < 3; ++c)
+                    out[c] = albedo[c] * scale * value[c];
+                return;
+            }
+            case GiReceivers::Link::Bright:
+            {
+                const auto albedo = scene.albedo(face, u, v);
+                out[0] = albedo[0], out[1] = albedo[1], out[2] = albedo[2];
+                return;
+            }
+            case GiReceivers::Link::Sky:
+            {
+                const auto s = sky.radiance(direction);
+                out[0] = s.x, out[1] = s.y, out[2] = s.z;
+                ++count.sky;
+                return;
+            }
+            default:
+                out[0] = out[1] = out[2] = 0;
+                ++count.untextured;
+            }
+        }
+    } // namespace
+    void gi_hit_radiance(const GiBakeScene& scene, const GiSky& sky, const GiReceivers& r, const float* light,
+                         const GiHit& hit, DVector direction, GiRayCounters& count, double out[3], bool& back)
+    {
+        out[0] = out[1] = out[2] = 0;
+        back = false;
+        double transmission = 1, value[3];
+        for (std::uint32_t i = 0; i < hit.layer_count; ++i)
+        {
+            const auto& layer = hit.layers[i];
+            surface_radiance(scene, sky, r, light, layer.face, layer.u, layer.v, direction, count, value);
+            for (int c = 0; c < 3; ++c)
+                out[c] += layer.alpha * transmission * value[c];
+            transmission *= 1 - layer.alpha;
+        }
+        switch (hit.kind)
+        {
+        case GiHit::Kind::Miss:
+        {
+            const auto s = sky.radiance(direction);
+            value[0] = s.x, value[1] = s.y, value[2] = s.z;
+            ++count.sky;
+            break;
+        }
+        case GiHit::Kind::LayerLimit:
+        {
+            // The ninth layer: its own share only.
+            ++count.layer_limit;
+            surface_radiance(scene, sky, r, light, hit.face, hit.u, hit.v, direction, count, value);
+            const double alpha = scene.albedo(hit.face, hit.u, hit.v)[3];
+            for (int c = 0; c < 3; ++c)
+                value[c] *= alpha;
+            break;
+        }
+        default:
+            if (hit.back)
+            {
+                back = true;
+                ++count.back;
+                return;
+            }
+            if (hit.kind == GiHit::Kind::Sky)
+            {
+                const auto s = sky.radiance(direction);
+                value[0] = s.x, value[1] = s.y, value[2] = s.z;
+                ++count.sky;
+            }
+            else
+                surface_radiance(scene, sky, r, light, hit.face, hit.u, hit.v, direction, count, value);
+        }
+        for (int c = 0; c < 3; ++c)
+            out[c] += transmission * value[c];
+    }
+    void gi_light_state(const GiReceivers& r, const GiIndirect& indirect, std::vector<float>& light)
+    {
+        const auto n = r.elements();
+        light.assign(n * 3, 0.f);
+        if (indirect.energy.size() != n * 3 || r.original.size() != n || r.owner.size() != n)
+            return;
+        const float ambient[3]{r.ambient.x, r.ambient.y, r.ambient.z};
+        for (std::size_t e = 0; e < n; ++e)
+        {
+            const bool low = e >= r.texels && r.sets[r.owner[e] - r.blocks.size()].low;
+            const double scale = e < r.texels ? .5 : 1;
+            for (int c = 0; c < 3; ++c)
+            {
+                // The passes' arithmetic: D as a float, then min(1, D + scale E) as a float.
+                const double o = r.original[e][c];
+                const double a = ambient[c] > 0 ? std::min(o, double(ambient[c])) : 0.0;
+                const float direct = float((o - a) / 255);
+                light[e * 3 + c] =
+                    low ? direct : float(std::min(1.0, direct + scale * indirect.energy[e * 3 + c]));
+            }
+        }
+    }
+
     bool bake_gi_lightmaps(const GiBakeScene& scene, const GiSky& sky, const GiReceivers& r, std::uint32_t bounces,
                            std::uint32_t rays, std::uint64_t seed, unsigned jobs, const std::atomic<bool>* cancel,
                            const GiProgress& progress, GiIndirect& result, GiLightmapReport& report,
@@ -796,97 +911,10 @@ namespace OpenBlood2
         std::vector<std::uint8_t> valid(n, 0);
         struct Counters
         {
-            GiTraceStats trace;
-            std::uint64_t back = 0, sky = 0, untextured = 0, layer_limit = 0;
+            GiRayCounters rays;
             std::array<std::uint64_t, 10> fraction{};
         };
         std::vector<Counters> counters(threads);
-        // Radiance arriving along a ray, from the state in `light`.
-        auto surface = [&](std::uint32_t face, float u, float v, DVector direction, Counters& count, double out[3])
-        {
-            const auto& link = r.links[face];
-            switch (link.kind)
-            {
-            case GiReceivers::Link::Lightmap:
-            case GiReceivers::Link::Vertex:
-            {
-                const auto albedo = scene.albedo(face, u, v);
-                double value[3];
-                sample_link(r, light.data(), link, u, v, value);
-                const double scale = link.kind == GiReceivers::Link::Lightmap ? world_saturate_scale : 1;
-                for (int c = 0; c < 3; ++c)
-                    out[c] = albedo[c] * scale * value[c];
-                return;
-            }
-            case GiReceivers::Link::Bright:
-            {
-                const auto albedo = scene.albedo(face, u, v);
-                out[0] = albedo[0], out[1] = albedo[1], out[2] = albedo[2];
-                return;
-            }
-            case GiReceivers::Link::Sky:
-            {
-                const auto s = sky.radiance(direction);
-                out[0] = s.x, out[1] = s.y, out[2] = s.z;
-                ++count.sky;
-                return;
-            }
-            default:
-                out[0] = out[1] = out[2] = 0;
-                ++count.untextured;
-            }
-        };
-        auto radiance = [&](const GiHit& hit, DVector direction, Counters& count, double out[3], bool& back)
-        {
-            out[0] = out[1] = out[2] = 0;
-            back = false;
-            double transmission = 1, value[3];
-            for (std::uint32_t i = 0; i < hit.layer_count; ++i)
-            {
-                const auto& layer = hit.layers[i];
-                surface(layer.face, layer.u, layer.v, direction, count, value);
-                for (int c = 0; c < 3; ++c)
-                    out[c] += layer.alpha * transmission * value[c];
-                transmission *= 1 - layer.alpha;
-            }
-            switch (hit.kind)
-            {
-            case GiHit::Kind::Miss:
-            {
-                const auto s = sky.radiance(direction);
-                value[0] = s.x, value[1] = s.y, value[2] = s.z;
-                ++count.sky;
-                break;
-            }
-            case GiHit::Kind::LayerLimit:
-            {
-                // The ninth layer: its own share only.
-                ++count.layer_limit;
-                surface(hit.face, hit.u, hit.v, direction, count, value);
-                const double alpha = scene.albedo(hit.face, hit.u, hit.v)[3];
-                for (int c = 0; c < 3; ++c)
-                    value[c] *= alpha;
-                break;
-            }
-            default:
-                if (hit.back)
-                {
-                    back = true;
-                    ++count.back;
-                    return;
-                }
-                if (hit.kind == GiHit::Kind::Sky)
-                {
-                    const auto s = sky.radiance(direction);
-                    value[0] = s.x, value[1] = s.y, value[2] = s.z;
-                    ++count.sky;
-                }
-                else
-                    surface(hit.face, hit.u, hit.v, direction, count, value);
-            }
-            for (int c = 0; c < 3; ++c)
-                out[c] += transmission * value[c];
-        };
         std::vector<std::uint32_t> traced;
         std::vector<std::uint8_t> seeds(n, 0);
         std::vector<std::uint8_t> state(receivers, 0); // 0: no value, 1: own samples, 2: neighbour fill.
@@ -932,10 +960,10 @@ namespace OpenBlood2
                         for (std::uint32_t i = 0; i < rays; ++i)
                         {
                             const auto direction = gi_cosine_direction(normal, i, rays, s1, s2);
-                            scene.trace(origin, direction, FLT_MAX, hit, count.trace);
+                            scene.trace(origin, direction, FLT_MAX, hit, count.rays.trace);
                             double value[3];
                             bool back = false;
-                            radiance(hit, direction, count, value, back);
+                            gi_hit_radiance(scene, sky, r, light.data(), hit, direction, count.rays, value, back);
                             back_rays += back;
                             for (int c = 0; c < 3; ++c)
                                 sum[c] += value[c];
@@ -1136,14 +1164,14 @@ namespace OpenBlood2
         }
         for (const auto& count : counters)
         {
-            report.trace.rays += count.trace.rays;
-            report.trace.nodes += count.trace.nodes;
-            report.trace.triangles += count.trace.triangles;
-            report.trace.texels += count.trace.texels;
-            report.back += count.back;
-            report.sky += count.sky;
-            report.untextured += count.untextured;
-            report.layer_limit += count.layer_limit;
+            report.trace.rays += count.rays.trace.rays;
+            report.trace.nodes += count.rays.trace.nodes;
+            report.trace.triangles += count.rays.trace.triangles;
+            report.trace.texels += count.rays.trace.texels;
+            report.back += count.rays.back;
+            report.sky += count.rays.sky;
+            report.untextured += count.rays.untextured;
+            report.layer_limit += count.rays.layer_limit;
             for (std::size_t i = 0; i < count.fraction.size(); ++i)
                 report.back_fraction[i] += count.fraction[i];
         }

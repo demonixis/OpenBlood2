@@ -441,6 +441,11 @@ namespace
                  {"--gi-preview", "a", "--gi-view", "final"},
                  {"--gi", "--gi-view", "bright"},
                  {"--gi", "--gi-view"},
+                 {"--gi-source", "probes"},
+                 {"--bench", "--gi", "--gi-source", "lattice"},
+                 {"--gi-probes", "1"},
+                 {"--bench", "--gi", "--gi-probes", "4.5"},
+                 {"--bench", "--gi", "--gi-probes", "-1"},
                  {"--gi", "--bake-gi", "a"},
                  {"--gi", "--gi-preview", "a"},
                  {"--gi", "--list-worlds"},
@@ -467,7 +472,22 @@ namespace
         CHECK(parse_options(std::array<std::string_view, 2>{"--gpu-smoke", "--gi"}, options, error) && options.gi);
         options = {};
         CHECK(!parse_options(std::array<std::string_view, 2>{"--gi-k", "1"}, options, error));
-        CHECK(error == "--gi-k and --gi-f require --gi-preview or --gi; --gi-view requires --gi");
+        CHECK(error ==
+              "--gi-k and --gi-f require --gi-preview or --gi; --gi-view, --gi-source and --gi-probes require --gi");
+        // Lot G9: the world source and the probe intensity on models (0 turns them off).
+        options = {};
+        CHECK(parse_options(std::array<std::string_view, 6>{"--bench", "--gi", "--gi-source", "probes", "--gi-probes",
+                                                            "2.5"},
+                            options, error));
+        CHECK(options.gi_source == 1 && options.gi_source_given && options.gi_probes == 2.5f && options.gi_probes_given);
+        options = {};
+        CHECK(parse_options(std::array<std::string_view, 6>{"--bench", "--gi", "--gi-source", "texels", "--gi-probes",
+                                                            "0"},
+                            options, error));
+        CHECK(options.gi_source == 0 && options.gi_source_given && options.gi_probes == 0);
+        options = {};
+        CHECK(parse_options(plain, options, error) && options.gi_source == 0 && options.gi_probes == 1 &&
+              !options.gi_source_given && !options.gi_probes_given);
         for (const auto [text, view] : std::initializer_list<std::pair<std::string_view, int>>{
                  {"final", 0}, {"original", 1}, {"direct", 2}, {"indirect", 3}, {"lighting", 4}, {"validity", 5}})
         {

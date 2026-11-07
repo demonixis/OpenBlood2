@@ -169,6 +169,21 @@ namespace OpenBlood2
     // The LMAP and VTX contents of a bake.
     void gi_lightmap_sections(const GiReceivers&, const GiIndirect&, GiLightmaps&, GiVertexLight&);
 
+    // What the passes count per ray (summed per thread).
+    struct GiRayCounters
+    {
+        GiTraceStats trace;
+        std::uint64_t back = 0, sky = 0, untextured = 0, layer_limit = 0;
+    };
+    // The radiance a traced ray brings back (decisions D9/D10), from a light state (per element RGB,
+    // 0-1, as the passes keep it): the rule bake_gi_lightmaps applies, shared with the light probes
+    // (lot G9). `back` is set for a back-face hit (radiance 0).
+    void gi_hit_radiance(const GiBakeScene&, const GiSky&, const GiReceivers&, const float* light, const GiHit&,
+                         DVector direction, GiRayCounters&, double out[3], bool& back);
+    // The light state bake_gi_lightmaps leaves after its last pass: min(D + E/2, 1) per texel and
+    // min(D + E, 1) per corner, D alone for DETAIL LOW corners (they feed no lookup).
+    void gi_light_state(const GiReceivers&, const GiIndirect&, std::vector<float>& light);
+
     // Per-element values at a face point: bilinear over a lightmap block (clamped, centres at i + 0.5)
     // or interpolated over a set's corners. False for faces without a receiver.
     bool gi_receiver_sample(const GiReceivers&, std::span<const float> values, std::uint32_t face, float u, float v,

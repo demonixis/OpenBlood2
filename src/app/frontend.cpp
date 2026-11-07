@@ -1365,7 +1365,8 @@ namespace OpenBlood2
                 if (!xr_mode && gi_tools.draw(input, *game, config, presenter.tool_lines,
                                               {&menu.settings.global_illumination, &presenter.gi_composition,
                                                &presenter.gi_reload, &presenter.gi_status(), &presenter.world_mesh,
-                                               presenter.mesh_build_ms}))
+                                               presenter.mesh_build_ms, &presenter.gi_probes, presenter.gi_light(),
+                                               &presenter.model_lighting.stats}))
                     input.reset(menu, game->client_shell.m_bInWorld);
 #endif
                 input.text_entry = ImGui::GetIO().WantTextInput; // F8 is ignored while a field has focus.

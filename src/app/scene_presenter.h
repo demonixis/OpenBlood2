@@ -130,11 +130,19 @@ namespace OpenBlood2
         // byte. Applying, dropping or recomposing GI (gi_composition) rebuilds the world mesh.
         bool global_illumination = false;
         GiComposition gi_composition; // F8 Runtime panel; an invalid value falls back to the defaults.
+        // Light probes (lot G9): models take the file's probes while GI is applied, the switch is on and
+        // the view is not Original or Direct only; no mesh rebuild. The Light probes world source
+        // (gi_composition.source) needs the file's PROB section, else the texels are composed.
+        GiProbeSettings gi_probes;
         std::vector<GiRoot> gi_roots; // gi_search_roots(); empty searches nothing.
         std::uint64_t gi_reload = 0;  // A change looks the file up again (F8 Refresh).
         const GiRuntimeStatus& gi_status() const
         {
             return gi_status_;
+        }
+        const GiWorldLight* gi_light() const // The applied file, or null.
+        {
+            return gi_light_ ? &*gi_light_ : nullptr;
         }
         double mesh_build_ms = 0; // CPU time of the last world mesh build (GI composition included).
         bool per_pixel_lighting = false; // Model light per pixel instead of per vertex.

@@ -112,11 +112,13 @@ namespace OpenBlood2
             // --gi (lot G8): the world's Ready bake from the search roots, composed at the first update.
             presenter.global_illumination = options.gi;
             presenter.gi_roots = gi_search_roots(config.gi_dir);
-            presenter.gi_composition = {options.gi_k, options.gi_f, GiView(options.gi_view)};
+            presenter.gi_composition = {options.gi_k, options.gi_f, GiView(options.gi_view),
+                                        GiWorldSource(options.gi_source)};
+            presenter.gi_probes = {options.gi_probes > 0, options.gi_probes > 0 ? options.gi_probes : 1};
             std::uint64_t gi_logged = 0;
             double first_update_ms = 0;
             Capture capture;
-            Series step, world, models, effects, record, gpu, total, draws, culled, pings, reads, read_counts;
+            Series step, world, models, effects, record, gpu, total, draws, culled, pings, reads, read_counts, probes;
             std::uint64_t ping_calls = 0;
             // The game mix is otherwise skipped without a device; render it to time streamed reads.
             game->client_session.audio.mixer.inspect_pcm = options.bench_audio;
@@ -196,6 +198,7 @@ namespace OpenBlood2
                 read_counts.add(double(game->client_session.audio.mixer.stream_reads() - read_count));
                 world.add(presenter.stats.world_ns / 1e6);
                 models.add(presenter.stats.models_ns / 1e6);
+                probes.add(presenter.model_lighting.stats.probe_ms);
                 effects.add(presenter.stats.effects_ns / 1e6);
                 record.add(milliseconds(updated, submitted));
                 gpu.add(milliseconds(submitted, completed));
@@ -216,6 +219,7 @@ namespace OpenBlood2
             row("  streamed PCM reads", reads);
             row("world/sky draw lists", world);
             row("models (CPU pose/vertices)", models);
+            row("  light probes (GI lot G9)", probes);
             row("polygrids/sprites/particles", effects);
             row("record (uploads/encode/submit)", record);
             row("GPU completion wait", gpu);
@@ -261,6 +265,10 @@ namespace OpenBlood2
                          mesh.lit, mesh.fullbright, lighting.lights.lights, lighting.models, lighting.sampled,
                          lighting.reused, lighting.flat, lighting.unlit, lighting.sources, lighting.occluded,
                          lighting.model_add.x, lighting.model_add.y, lighting.model_add.z);
+            spdlog::info("Light probes: {} / {} valid ({} spacing); {} probe-lit models ({} sampled, {} reused, {} "
+                         "without a valid probe, {} pseudo-lights in the top four) last frame",
+                         gi.valid_probes, gi.probes, gi.probe_spacing, lighting.probe_lit, lighting.probe_sampled,
+                         lighting.probe_reused, lighting.probe_missing, lighting.probe_sources);
             const auto& shadows = presenter.shadow_stats;
             spdlog::info("Model shadows: {} FLAG_SHADOW candidates, {} drawn ({} beyond limit, {} distant, {} outside "
                          "view, {} unbounded), atlas {}",

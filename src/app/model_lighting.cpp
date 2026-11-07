@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cctype>
 #include <charconv>
+#include <SDL3/SDL_timer.h>
 #include <cmath>
 
 namespace OpenBlood2
@@ -56,6 +57,9 @@ namespace OpenBlood2
         lights_.clear();
         samples_.clear();
         next_.clear();
+        probe_samples_.clear();
+        probe_next_.clear();
+        probe_field_ = nullptr;
         poses_.clear();
         ambient_ = {};
         stats = {};
@@ -109,6 +113,8 @@ namespace OpenBlood2
                 const auto& light = lights_[ranked_[k].light];
                 out.light.sources[k] = {light.position, light.color, light.direction, light.radius, light.cos_half};
                 out.light.count = static_cast<std::uint32_t>(k + 1);
+                out.strength[k] = ranked_[k].strength;
+                out.value[k] = ranked_[k].value;
             }
             else
                 out.remainder = vector_add(out.remainder, ranked_[k].value);
@@ -121,6 +127,13 @@ namespace OpenBlood2
         error.clear();
         const auto shade = shade_.stats;
         stats.models = stats.sampled = stats.reused = stats.unlit = stats.flat = stats.sources = stats.occluded = 0;
+        stats.probe_lit = stats.probe_sampled = stats.probe_reused = stats.probe_missing = stats.probe_sources = 0;
+        stats.probe_ms = 0;
+        const auto* field = probes.field && !probes.field->empty() ? probes.field : nullptr;
+        if (field != probe_field_)
+            probe_samples_.clear(); // Another file (or none): no cached sample survives.
+        probe_field_ = field;
+        probe_next_.clear();
         stats.model_add = world.frame().model_add;
         stats.model_dir_add = world.frame().model_dir_add;
         const auto add = vector_scale(stats.model_add, 1.f / 255);
@@ -235,12 +248,78 @@ namespace OpenBlood2
             if (entry.object)
                 next_[key] = current;
             auto light = current.light;
-            light.ambient = vector_add(vector_add(ambient_, add), current.remainder);
-            if (record)
-                light.ambient = vector_add(light.ambient, record->color);
+            auto remainder = current.remainder;
+            auto world_ambient = ambient_;
             // Without Gouraud model shading every source joins the ambient at the center. View
             // models have no object record and are shaded.
             const bool gouraud = !record || (record->flags & FLAG_MODELGOURAUDSHADE);
+            if (field)
+            {
+                const auto probe_started = SDL_GetTicksNS();
+                ProbeSample probe;
+                std::array<std::uint32_t, 3> cell{};
+                field->cell(center, cell);
+                const auto cached = entry.object ? probe_samples_.find(key) : probe_samples_.end();
+                const auto moved = vector_subtract(cached != probe_samples_.end() ? cached->second.center : center,
+                                                   center);
+                if (cached != probe_samples_.end() && cached->second.cell == cell &&
+                    double(vector_dot(moved, moved)) <=
+                        gi_probe_limits::reuse_distance * gi_probe_limits::reuse_distance)
+                {
+                    probe = cached->second;
+                    ++stats.probe_reused;
+                }
+                else
+                {
+                    GiProbeSample sample;
+                    probe.center = center;
+                    probe.cell = cell;
+                    probe.valid = field->sample(center, sample);
+                    probe.sh = sample.sh;
+                    ++stats.probe_sampled;
+                }
+                if (entry.object)
+                    probe_next_[key] = probe;
+                if (!probe.valid)
+                    ++stats.probe_missing;
+                else
+                {
+                    ++stats.probe_lit;
+                    const auto split = gi_probe_model_light(probe.sh, probes.k * probes.intensity / 2, probes.f,
+                                                            ambient_);
+                    world_ambient = split.ambient;
+                    const float strength = std::max({split.color.x, split.color.y, split.color.z});
+                    const auto mean = vector_scale(split.color, .25f);
+                    if (strength > 0 && gouraud)
+                    {
+                        // Ties keep the static light first.
+                        std::uint32_t at = 0;
+                        while (at < light.count && current.strength[at] >= strength)
+                            ++at;
+                        if (at < ModelLight::source_limit)
+                        {
+                            if (light.count == ModelLight::source_limit)
+                                remainder = vector_add(remainder, current.value[ModelLight::source_limit - 1]);
+                            for (auto k = std::min<std::uint32_t>(light.count, ModelLight::source_limit - 1); k > at;
+                                 --k)
+                                light.sources[k] = light.sources[k - 1];
+                            const auto far = vector_add(
+                                center, vector_scale(split.direction, float(gi_probe_limits::pseudo_distance)));
+                            light.sources[at] = {far, split.color, split.direction, gi_probe_limits::pseudo_range, -2};
+                            light.count = std::min<std::uint32_t>(light.count + 1, ModelLight::source_limit);
+                            ++stats.probe_sources;
+                        }
+                        else
+                            remainder = vector_add(remainder, mean);
+                    }
+                    else if (strength > 0)
+                        world_ambient = vector_add(world_ambient, mean);
+                }
+                stats.probe_ms += double(SDL_GetTicksNS() - probe_started) / 1e6;
+            }
+            light.ambient = vector_add(vector_add(world_ambient, add), remainder);
+            if (record)
+                light.ambient = vector_add(light.ambient, record->color);
             if (!gouraud)
             {
                 ++stats.flat;
@@ -259,6 +338,7 @@ namespace OpenBlood2
             scene.set_light(i, light);
         }
         samples_.swap(next_);
+        probe_samples_.swap(probe_next_);
         stats.shade = shade_.stats;
         stats.shade.traces -= shade.traces;
         stats.shade.blocked -= shade.blocked;

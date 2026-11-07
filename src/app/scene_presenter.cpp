@@ -372,8 +372,13 @@ namespace OpenBlood2
         GiBuild gi_build;
         if (gi_light_)
         {
-            gi_light_->composition = valid_gi_composition(gi_composition) ? gi_composition : GiComposition{};
-            gi_build = {true, gi_status_.loads, gi_light_->composition};
+            auto composition = valid_gi_composition(gi_composition) ? gi_composition : GiComposition{};
+            if (composition.source == GiWorldSource::Probes &&
+                (!gi_light_->has_probes || !gi_light_->prepare_probe_source(source.geometry, error)))
+                composition.source = GiWorldSource::Texels; // No probes: the texels, as F8 reports.
+            error.clear();
+            gi_light_->composition = composition;
+            gi_build = {true, gi_status_.loads, composition};
         }
         rebuilt = world_changed || built_lightmaps_ != lightmaps || built_gi_ != gi_build;
         const auto model_revision = model_scene.revision, effect_revision = explosion_model_scene.revision,
@@ -454,6 +459,14 @@ namespace OpenBlood2
         const auto world_done = SDL_GetTicksNS();
         if (!update_model_scene(source, model_scene, error, weapon_cameras ? &*weapon_cameras : nullptr))
             return fail("Model presentation");
+        // Light probes on models (lot G9): the applied file's field unless switched off or viewing the
+        // original or direct light.
+        model_lighting.probes = {};
+        if (gi_light_ && gi_light_->has_probes && gi_probes.models && gi_probes.intensity > 0 &&
+            gi_probes.intensity <= gi_max_intensity && gi_light_->composition.view != GiView::Original &&
+            gi_light_->composition.view != GiView::Direct)
+            model_lighting.probes = {&gi_light_->probes, gi_light_->composition.k, gi_light_->composition.f,
+                                     gi_probes.intensity};
         if (!model_lighting.apply(replica, source.view.position, source.night_goggles, world_mesh, world_draws,
                                   model_scene, error))
             return fail("Model lighting");

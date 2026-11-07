@@ -43,10 +43,15 @@ namespace OpenBlood2
         }
         return "?";
     }
+    const char* gi_world_source_name(GiWorldSource source)
+    {
+        return source == GiWorldSource::Probes ? "Light probes" : "Texel gather";
+    }
     bool valid_gi_composition(const GiComposition& c)
     {
         return c.k >= 0 && c.k <= gi_max_intensity && c.f >= 0 && c.f <= gi_max_intensity &&
-               std::uint8_t(c.view) <= std::uint8_t(GiView::Validity);
+               std::uint8_t(c.view) <= std::uint8_t(GiView::Validity) &&
+               std::uint8_t(c.source) <= std::uint8_t(GiWorldSource::Probes);
     }
 
     std::int64_t GiWorldLight::block(std::uint32_t model, std::uint32_t polygon) const
@@ -60,8 +65,11 @@ namespace OpenBlood2
     std::array<std::uint8_t, 3> GiWorldLight::compose(bool texel, std::uint32_t index,
                                                       std::array<std::uint8_t, 3> original) const
     {
-        const auto& values = texel ? lightmaps.texels : vertex.corners;
-        const auto& valid = texel ? lightmaps.valid : vertex.valid;
+        const bool from_probes = composition.source == GiWorldSource::Probes && probe_source_ready;
+        const auto& values = from_probes ? (texel ? probe_texels : probe_corners)
+                                         : (texel ? lightmaps.texels : vertex.corners);
+        const auto& valid = from_probes ? (texel ? probe_texel_valid : probe_corner_valid)
+                                        : (texel ? lightmaps.valid : vertex.valid);
         if (index >= values.size() || composition.view == GiView::Original)
             return original;
         if (composition.view == GiView::Validity)
@@ -118,7 +126,89 @@ namespace OpenBlood2
         }
         if (!world_info_ambient_any_case(world.info, light.ambient))
             light.ambient = {};
+        if (const auto* prob = file.find(gi_format::probes))
+        {
+            const auto* plac = file.find(gi_format::placement);
+            if (!plac)
+            {
+                error = "The file has a PROB section without PLAC";
+                return false;
+            }
+            GiLightLattice lattice;
+            std::vector<GiReflectionProbe> reflections;
+            GiProbes probes;
+            if (!decode_gi_placement_section(plac->payload, lattice, reflections, error) ||
+                !read_gi_probes(prob->payload, probes, error) ||
+                !light.probes.build(std::move(lattice), std::move(probes), error))
+                return false;
+            light.has_probes = true;
+        }
         out = std::move(light);
+        return true;
+    }
+
+    bool GiWorldLight::prepare_probe_source(const World& world, std::string& error)
+    {
+        if (probe_source_ready)
+            return true;
+        if (!has_probes)
+        {
+            error = "The file has no light probes";
+            return false;
+        }
+        const auto start = SDL_GetTicksNS();
+        auto ring = [](const Polygon& p)
+        { return p.base_points == UINT16_MAX ? p.points.size() : std::min<std::size_t>(p.base_points, p.points.size()); };
+        auto evaluate = [&](DVector point, DVector normal, std::uint32_t& value, std::uint8_t& valid)
+        {
+            GiProbeSample sample;
+            valid = probes.sample(point, sample);
+            value = valid ? gi_rgb9e5(gi_sh_irradiance(sample.sh, normal)) : 0;
+        };
+        std::vector<std::uint32_t> texels(lightmaps.texels.size()), corners(vertex.corners.size());
+        std::vector<std::uint8_t> texel_valid(texels.size()), corner_valid(corners.size());
+        for (std::size_t b = 0; b < lightmaps.blocks.size(); ++b)
+        {
+            const auto& block = lightmaps.blocks[b];
+            const auto& model = world.models[block.model];
+            const auto& polygon = model.polygons[block.polygon];
+            LightmapFrame frame;
+            if (!lightmap_frame(model, polygon, ring(polygon), frame))
+            {
+                error = "Light probes: invalid lightmap frame";
+                return false;
+            }
+            const auto length = std::sqrt(vector_dot(frame.normal, frame.normal));
+            const auto normal = length > 0 ? vector_scale(frame.normal, 1 / length) : DVector{0, 0, 1};
+            for (std::uint32_t y = 0; y < block.height; ++y)
+                for (std::uint32_t x = 0; x < block.width; ++x)
+                {
+                    const auto at = block_first[b] + y * block.width + x;
+                    DVector position{};
+                    if (!frame.position(x + .5, y + .5, position))
+                        continue; // Degenerate frames draw nothing: 0.
+                    evaluate(position, normal, texels[at], texel_valid[at]);
+                }
+        }
+        for (std::size_t s = 0; s < vertex.sets.size(); ++s)
+        {
+            const auto& set = vertex.sets[s];
+            const auto& model = world.models[set.model];
+            const auto& polygon = model.polygons[set.polygon];
+            // The plane normal, as the bake's receivers use it.
+            auto normal = model.planes[model.surfaces[polygon.surface].plane].normal;
+            const auto length = std::sqrt(vector_dot(normal, normal));
+            normal = length > 0 ? vector_scale(normal, 1 / length) : DVector{0, 0, 1};
+            for (std::uint32_t k = 0; k < set.corners; ++k)
+                evaluate(model.points[polygon.points[k]], normal, corners[set_first[s] + k],
+                         corner_valid[set_first[s] + k]);
+        }
+        probe_texels = std::move(texels);
+        probe_corners = std::move(corners);
+        probe_texel_valid = std::move(texel_valid);
+        probe_corner_valid = std::move(corner_valid);
+        probe_source_ready = true;
+        probe_source_ms = since(start);
         return true;
     }
 
@@ -148,7 +238,8 @@ namespace OpenBlood2
         if (s.state == GiRuntimeState::Applied)
             return "GI applied: " + s.world_path + " from " + s.file + " (" + std::to_string(s.blocks) + " blocks, " +
                    std::to_string(s.texels) + " texels, " + std::to_string(s.sets) + " corner sets, " +
-                   std::to_string(s.corners) + " corners; " + cost + ")";
+                   std::to_string(s.corners) + " corners, " + std::to_string(s.valid_probes) + "/" +
+                   std::to_string(s.probes) + " light probes; " + cost + ")";
         if (s.state == GiRuntimeState::Off || s.state == GiRuntimeState::NoWorld)
             return std::string("GI ") + gi_runtime_state_name(s.state);
         return "GI not applied to " + s.world_path + " (" + gi_runtime_state_name(s.state) + "): " + s.detail + " (" +
@@ -224,6 +315,9 @@ namespace OpenBlood2
         status.texels = decoded.lightmaps.texels.size();
         status.sets = decoded.vertex.sets.size();
         status.corners = decoded.vertex.corners.size();
+        status.probes = decoded.probes.probes().size();
+        status.valid_probes = decoded.probes.valid();
+        status.probe_spacing = decoded.probes.lattice().spacing;
         status.state = GiRuntimeState::Applied;
         light = std::move(decoded);
     }

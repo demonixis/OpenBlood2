@@ -14,7 +14,8 @@ namespace OpenBlood2
 {
     class GameSession;
     struct WorldMesh;
-    // What the Runtime panel (lot G8) reads and controls. Null members leave it unavailable.
+    struct ModelLightingStats;
+    // What the Runtime panel (lots G8, G9) reads and controls. Null members leave it unavailable.
     struct GiRuntimeLink
     {
         bool* enabled = nullptr;              // Options > Display GLOBAL ILLUMINATION (saved with the preferences).
@@ -23,8 +24,11 @@ namespace OpenBlood2
         const GiRuntimeStatus* status = nullptr;
         const WorldMesh* mesh = nullptr;
         double mesh_build_ms = 0;
+        GiProbeSettings* probes = nullptr;                   // ScenePresenter::gi_probes (lot G9).
+        const GiWorldLight* light = nullptr;                 // The applied file, or null.
+        const ModelLightingStats* model_lighting = nullptr;  // The last frame's model light.
     };
-    // The F8 GI tools overlay (gi_contracts.md lots G3, G4, G8), built with BLOOD2_GI_TOOLS on desktop.
+    // The F8 GI tools overlay (gi_contracts.md lots G3, G4, G8, G9), built with BLOOD2_GI_TOOLS on desktop.
     // It shares UiRuntime's ImGui context and only reads the session: no frame changes while
     // Closed, and its gizmos go through the scene's existing line renderer. Placement edits stay in
     // the overlay (Dirty) until saved to the placement directory.
@@ -114,6 +118,13 @@ namespace OpenBlood2
         bool show_light_probes = true, show_rejected = false, show_reflections = true, show_volumes = true;
         float marker_radius = 1536;
         static constexpr std::size_t max_probe_markers = 4096;
+        // "Show baked SH samples" (lot G9): the applied file's probes within marker_radius as spheres
+        // whose segments take min(1, k E(direction)) (at least a dim grey), invalid probes magenta.
+        bool show_baked_probes = false;
+        static constexpr std::size_t max_sh_markers = 1024;
+        static constexpr float sh_radius = 10;
+        static void baked_probe_gizmos(const GiProbeField&, float k, DVector camera, float radius,
+                                       std::vector<LineVertex>&);
         int selected_reflection = -1;
 
       private:
@@ -133,6 +144,7 @@ namespace OpenBlood2
         std::string placement_summary() const;
         void status_panel(const GameSession&, const Config&);
         void light_panel(const GameSession&);
+        void baked_probe_panel(const GameSession&);
         void reflection_panel(const GameSession&);
         void volume_table();
     };

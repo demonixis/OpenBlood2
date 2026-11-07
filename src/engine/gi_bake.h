@@ -3,6 +3,7 @@
 #include "engine/gi_file.h"
 #include "engine/gi_lightmap.h"
 #include "engine/gi_placement.h"
+#include "engine/gi_probes.h"
 #include <atomic>
 #include <filesystem>
 #include <functional>
@@ -10,9 +11,9 @@
 #include <string>
 #include <string_view>
 
-// One world's bake (gi_contracts.md, lots G5 and G7): settings, placement, scene, a traced probe
-// survey, the sky, the indirect light of every lightmap texel and vertex colour, and the .ob2gi file
-// (INFO, PLAC, LMAP and VTX; probes come with G9).
+// One world's bake (gi_contracts.md, lots G5, G7 and G9): settings, placement, scene, a traced probe
+// survey, the sky, the indirect light of every lightmap texel and vertex colour, the SH light probes
+// and the .ob2gi file (INFO, PLAC, LMAP, VTX and PROB).
 namespace OpenBlood2
 {
     enum class GiQuality : std::uint8_t
@@ -93,6 +94,7 @@ namespace OpenBlood2
         GiSkySetup sky_setup;
         GiSkyReport sky;
         GiLightmapReport lightmaps;
+        GiProbeReport light_probes;
         std::uint64_t bytes = 0;
         double ms = 0;
     };

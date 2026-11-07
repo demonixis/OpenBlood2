@@ -4,9 +4,13 @@
 // preview helpers. The private case bakes 01_SubwayA through the driver and checks its sections.
 // Lot G8 (gi_runtime.*): the world override composed by WorldMesh::build, every view, and the
 // runtime lookup of 01_SubwayA (missing, stale, ready; E = 0 leaves the mesh byte-identical).
+// Lot G9 (gi_probes.*): binary16, the PROB section, the SH basis, probe capture (furnace, back faces,
+// determinism), the trilinear field, the model split, the Light probes world source and its cost.
 #include "engine/config.h"
 #include "engine/gi_bake.h"
 #include "engine/gi_lightmap.h"
+#include "engine/gi_placement.h"
+#include "engine/gi_probes.h"
 #include "engine/gi_preview.h"
 #include "engine/gi_runtime.h"
 #include "engine/gi_sky.h"
@@ -15,7 +19,9 @@
 #include "resource_fixture.h"
 #include "scratch_dir.h"
 #include <algorithm>
+#include <atomic>
 #include <cfloat>
+#include <chrono>
 #include <cmath>
 #include <cstring>
 #include <fstream>
@@ -1423,6 +1429,8 @@ namespace
         return file;
     }
 
+    GiFile probe_file(const GiLightmaps&, const GiVertexLight&, const GiLightLattice&, const GiProbes&);
+
     // A box of lightmapped, vertex-lit and DETAIL LOW faces with an ambient fill. E = 0 at Final is
     // byte-identical to no GI; otherwise pages and corners follow gi_compose, view by view, and only
     // listed polygons change.
@@ -1732,6 +1740,42 @@ namespace
             std::cout << "GI_RUNTIME detail=" << (lightmaps ? "high" : "low") << " blocks=" << on.gi_blocks
                       << " texels=" << on.gi_texels << " sets=" << on.gi_sets << " corners=" << on.gi_corners << '\n';
         }
+        // Lot G9: zero probes over a coarse lattice: models and the Light probes source leave every
+        // page and corner unchanged.
+        {
+            GiLightLattice lattice;
+            lattice.spacing = 256;
+            lattice.origin = world.min;
+            for (int a = 0; a < 3; ++a)
+            {
+                const float extent = a == 0 ? world.max.x - world.min.x : a == 1 ? world.max.y - world.min.y
+                                                                                 : world.max.z - world.min.z;
+                lattice.dims[a] = std::uint32_t(std::ceil(extent / 256)) + 1;
+            }
+            const auto nodes = lattice.dims[0] * lattice.dims[1] * lattice.dims[2];
+            for (std::uint32_t node = 0; node < nodes; node += 3)
+                lattice.probes.push_back({node, lattice.node_position(node)});
+            GiProbes probes;
+            probes.sh.assign(lattice.probes.size() * 27, 0.f);
+            probes.valid.assign(lattice.probes.size(), 1);
+            auto with_probes = probe_file(maps, vertex, lattice, probes);
+            with_probes.key = file.key;
+            with_probes.settings = file.settings;
+            CHECK(save_gi_file(target, with_probes, error));
+            load_gi_world_light(resources, world, path, roots, light, status);
+            CHECK(status.state == GiRuntimeState::Applied && light && light->has_probes);
+            CHECK(status.probes == lattice.probes.size() && status.valid_probes == status.probes &&
+                  status.probe_spacing == 256 && gi_status_line(status).find(" light probes") != std::string::npos);
+            light->composition.source = GiWorldSource::Probes;
+            CHECK(light->prepare_probe_source(world, error));
+            WorldMesh off, on;
+            CHECK(off.build(world, error, &resources) && on.build(world, error, &resources, true, nullptr, &*light));
+            CHECK(same_mesh(on, off));
+            std::cout << "GI_RUNTIME probes=" << status.probes << " probe_source_ms=" << light->probe_source_ms
+                      << " texels=" << light->probe_texels.size() << " corners=" << light->probe_corners.size()
+                      << '\n';
+            CHECK(save_gi_file(target, file, error));
+        }
         std::fill(indirect.energy.begin(), indirect.energy.end(), .05f);
         gi_lightmap_sections(p.receivers, indirect, maps, vertex);
         auto lit = section_file(maps, vertex);
@@ -1739,13 +1783,564 @@ namespace
         lit.settings = file.settings;
         CHECK(save_gi_file(target, lit, error));
         load_gi_world_light(resources, world, path, roots, light, status);
-        CHECK(status.state == GiRuntimeState::Applied && light && status.loads == 5);
+        CHECK(status.state == GiRuntimeState::Applied && light && status.loads == 6);
         WorldMesh off, on;
         CHECK(off.build(world, error, &resources) && on.build(world, error, &resources, true, nullptr, &*light));
         CHECK(same_vertices(on, off) == vertex.sets.empty() && !same_materials(on, off));
         std::cout << "GI_RUNTIME keys_ms=" << status.expectation_ms << " lookup_ms=" << status.lookup_ms
                   << " sections_ms=" << status.decode_ms << '\n';
         return Testing::remove_scratch_dir(scratch);
+    }
+
+    // ---- Lot G9: light probes (gi_probes.*) ----
+
+    // binary16: rounding to nearest even, subnormals, saturation, NaN, and every finite half round trips.
+    bool probe_half()
+    {
+        CHECK(gi_half(0.f) == 0 && gi_half(-0.f) == 0x8000 && gi_half(1.f) == 0x3C00 && gi_half(-2.f) == 0xC000);
+        CHECK(gi_half(65504.f) == 0x7BFF && gi_half(65520.f) == 0x7BFF && gi_half(1e30f) == 0x7BFF);
+        CHECK(gi_half(std::numeric_limits<float>::infinity()) == 0x7BFF);
+        CHECK(gi_half(-std::numeric_limits<float>::infinity()) == 0xFBFF);
+        CHECK(gi_half(std::numeric_limits<float>::quiet_NaN()) == 0);
+        CHECK(gi_half(std::ldexp(1.f, -14)) == 0x0400 && gi_half(std::ldexp(1.f, -24)) == 1);
+        CHECK(gi_half(std::ldexp(1.f, -25)) == 0 && gi_half(std::ldexp(3.f, -25)) == 2); // Ties to even.
+        CHECK(gi_half(1 + std::ldexp(1.f, -11)) == 0x3C00 && gi_half(1 + std::ldexp(3.f, -11)) == 0x3C02);
+        CHECK(gi_half(std::ldexp(4095.f, -12)) == 0x3C00); // A tie carried into the next binade.
+        CHECK(gi_half_decode(0x7C00) == 0 && gi_half_decode(0x7E00) == 0 && gi_half_decode(0x0001) == std::ldexp(1.f, -24));
+        for (std::uint32_t h = 0; h < 0x10000; ++h)
+        {
+            if ((h >> 10 & 31) == 31)
+                continue;
+            const float value = gi_half_decode(std::uint16_t(h));
+            CHECK(gi_half(value) == h);
+            CHECK(std::isfinite(value) && std::abs(value) <= 65504);
+        }
+        return true;
+    }
+
+    std::vector<std::uint8_t> probe_payload(const GiProbes& probes)
+    {
+        std::vector<std::uint8_t> out;
+        std::string error;
+        write_gi_probes(probes, out, error);
+        return out;
+    }
+    // The PROB section: layout, strict reader and lattice check.
+    bool probe_sections()
+    {
+        std::string error;
+        GiProbes probes;
+        for (std::size_t i = 0; i < 9 * 27; ++i)
+            probes.sh.push_back(float(int(i % 61) - 30) / 8); // Exact halves.
+        probes.valid = {1, 0, 1, 1, 0, 0, 1, 0, 1};
+        auto bytes = probe_payload(probes);
+        CHECK(bytes.size() == 12 + 9 * 27 * 2 + 2 && bytes[0] == 1 && bytes[4] == 9 && bytes[8] == 0);
+        CHECK(bytes[12 + 9 * 54] == 0x4D && bytes[12 + 9 * 54 + 1] == 0x01);
+        GiProbes back;
+        CHECK(read_gi_probes(bytes, back, error));
+        CHECK(back.sh == probes.sh && back.valid == probes.valid && back.size() == 9);
+        GiProbes empty;
+        CHECK(read_gi_probes(probe_payload(empty), back, error) && back.size() == 0 && back.sh.empty());
+        auto refused = [&](std::vector<std::uint8_t> b, const char* expected)
+        {
+            GiProbes untouched = probes;
+            std::string message;
+            return !read_gi_probes(b, untouched, message) && message.find(expected) != std::string::npos &&
+                   untouched.sh == probes.sh;
+        };
+        auto edit = [&](std::size_t at, std::uint8_t value)
+        {
+            auto b = bytes;
+            b[at] = value;
+            return b;
+        };
+        CHECK(refused({bytes.begin(), bytes.begin() + 11}, "truncated"));
+        CHECK(refused(edit(0, 2), "format"));
+        CHECK(refused(edit(6, 4), "too many"));
+        CHECK(refused(edit(8, 1), "reserved"));
+        CHECK(refused(edit(4, 8), "size"));
+        CHECK(refused({bytes.begin(), bytes.end() - 1}, "size"));
+        CHECK(refused(edit(13, 0x7C), "finite"));
+        CHECK(refused(edit(bytes.size() - 1, 0x03), "padding"));
+        GiProbes mismatched = probes;
+        mismatched.sh.pop_back();
+        std::vector<std::uint8_t> out;
+        CHECK(!write_gi_probes(mismatched, out, error));
+        GiLightLattice lattice;
+        lattice.probes.resize(8);
+        CHECK(!check_gi_probes(lattice, probes, error));
+        lattice.probes.resize(9);
+        CHECK(check_gi_probes(lattice, probes, error));
+        return true;
+    }
+
+    // The coefficients of E(n) = color max(0, n.l) (a lone directional light): A_l Y_lm(l).
+    std::array<float, 27> directional_sh(DVector l, DVector color)
+    {
+        double basis[9];
+        gi_sh_basis(l, basis);
+        constexpr double a[9]{pi, 2 * pi / 3, 2 * pi / 3, 2 * pi / 3, pi / 4, pi / 4, pi / 4, pi / 4, pi / 4};
+        std::array<float, 27> sh{};
+        const double c[3]{color.x, color.y, color.z};
+        for (int k = 0; k < 9; ++k)
+            for (int ch = 0; ch < 3; ++ch)
+                sh[k * 3 + ch] = float(a[k] * basis[k] * c[ch]);
+        return sh;
+    }
+    DVector unit_vector(DVector v)
+    {
+        return vector_scale(v, 1 / std::sqrt(vector_dot(v, v)));
+    }
+    // The SH basis is orthonormal; Fibonacci directions and probe rotations are unit, reproducible and
+    // rigid; the irradiance of known coefficient sets.
+    bool probe_basis()
+    {
+        const std::uint32_t n = 40000;
+        double gram[9][9]{};
+        for (std::uint32_t i = 0; i < n; ++i)
+        {
+            const auto d = gi_fibonacci_direction(i, n);
+            CHECK(near(vector_dot(d, d), 1, 1e-6) && d.z == float(1 - (2.0 * i + 1) / n));
+            double y[9];
+            gi_sh_basis(d, y);
+            for (int a = 0; a < 9; ++a)
+                for (int b = 0; b < 9; ++b)
+                    gram[a][b] += y[a] * y[b] * 4 * pi / n;
+        }
+        for (int a = 0; a < 9; ++a)
+            for (int b = 0; b < 9; ++b)
+                CHECK(near(gram[a][b], a == b, 2e-4));
+        const auto q = gi_probe_rotation(0x5eed, 7);
+        CHECK(q == gi_probe_rotation(0x5eed, 7) && q != gi_probe_rotation(0x5eed, 8) &&
+              q != gi_probe_rotation(0x5eee, 7));
+        CHECK(near(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3], 1, 1e-12));
+        for (std::uint32_t i = 0; i < 64; ++i)
+            for (std::uint32_t j = i + 1; j < 64; j += 7)
+            {
+                const auto a = gi_probe_direction(q, i, 64), b = gi_probe_direction(q, j, 64);
+                CHECK(near(vector_dot(a, a), 1, 1e-6));
+                CHECK(near(vector_dot(a, b), vector_dot(gi_fibonacci_direction(i, 64), gi_fibonacci_direction(j, 64)),
+                           1e-6));
+            }
+        // Uniform E = 1: only the first coefficient (1 / Y00).
+        std::array<float, 27> uniform{};
+        uniform[0] = uniform[1] = uniform[2] = float(1 / 0.28209479177387814);
+        for (const DVector normal : {DVector{0, 0, 1}, DVector{1, 0, 0}, unit_vector({-1, 2, -3})})
+            CHECK(near(gi_sh_irradiance(uniform, normal).y, 1, 1e-6));
+        // A directional light: the L2 clamped cosine is 1/4 + 1/2 + 5/16 facing it and 1/16 away.
+        const auto l = unit_vector({1, 2, 3});
+        const auto sh = directional_sh(l, {1, .5f, .25f});
+        CHECK(near(gi_sh_irradiance(sh, l).x, 1.0625, 1e-6) && near(gi_sh_irradiance(sh, l).z, 1.0625 / 4, 1e-6));
+        CHECK(near(gi_sh_irradiance(sh, vector_scale(l, -1)).x, .0625, 1e-6));
+        return true;
+    }
+
+    std::vector<GiLightProbe> probes_at(std::initializer_list<DVector> points)
+    {
+        std::vector<GiLightProbe> out;
+        for (const auto& p : points)
+            out.push_back({std::uint32_t(out.size()), p});
+        return out;
+    }
+    bool capture(const Prepared& p, const GiSky& sky, std::span<const float> light, std::span<const GiLightProbe> lattice,
+                 std::uint32_t rays, GiProbes& out, GiProbeReport& report, unsigned jobs = 2,
+                 std::uint64_t seed = 0x5eed)
+    {
+        std::string error;
+        if (!bake_gi_probes(p.scene, sky, p.receivers, light, lattice, rays, seed, jobs, nullptr, {}, out, report,
+                            error))
+        {
+            std::cerr << "probes: " << error << '\n';
+            return false;
+        }
+        return out.size() == lattice.size() && out.sh.size() == lattice.size() * 27;
+    }
+    // A probe in a closed, uniformly lit box sees uniform radiance: E = albedo x light everywhere.
+    // A probe inside outward-facing walls sees only back faces: invalid and black. Bitwise identical
+    // for 1, 2 and 7 jobs; another seed turns the rays.
+    bool probe_capture(const fs::path& root)
+    {
+        Resources resources;
+        CHECK(mount(root, resources));
+        const double albedo = 153 / 255.f;
+        GiSky sky;
+        sky.fill({1, 1, 1}, 1); // Never seen in the closed box.
+        {
+            WorldBuilder b;
+            b.box({5, 5, 5}, {95, 95, 95},
+                  [&](int, Face& face)
+                  {
+                      face.kind = Kind::Vertex;
+                      face.color = {51, 51, 51};
+                  });
+            Prepared p;
+            CHECK(prepare(b.world, resources, p));
+            GiIndirect indirect;
+            GiLightmapReport lightmap;
+            CHECK(bake(p, sky, 2, 64, indirect, lightmap));
+            std::vector<float> light;
+            gi_light_state(p.receivers, indirect, light);
+            CHECK(light.size() == p.receivers.elements() * 3);
+            for (const auto v : light)
+                CHECK(v == light[0] && near(v, .2 + albedo * .2 * 1.6, 1e-6));
+            const double radiance = albedo * light[0];
+            const auto lattice = probes_at({{50, 50, 50}, {20, 30, 70}, {80, 85, 15}});
+            GiProbes probes;
+            GiProbeReport report;
+            CHECK(capture(p, sky, light, lattice, 64, probes, report));
+            CHECK(report.probes == 3 && report.valid == 3 && report.rays == 192 && report.back == 0);
+            CHECK(report.sky == 0 && report.untextured == 0 && report.back_fraction[0] == 3);
+            for (std::size_t i = 0; i < 3; ++i)
+            {
+                CHECK(probes.valid[i]);
+                const std::span<const float, 27> sh(probes.sh.data() + i * 27, 27);
+                for (int c = 0; c < 3; ++c)
+                    CHECK(near(sh[c], radiance / 0.28209479177387814, 1e-5));
+                for (const DVector n : {DVector{0, 0, 1}, DVector{0, 0, -1}, DVector{1, 0, 0}, DVector{0, -1, 0},
+                                        unit_vector({1, 1, 1})})
+                    CHECK(near(gi_sh_irradiance(sh, n).x, radiance, .02 * radiance));
+            }
+        }
+        {
+            WorldBuilder b;
+            b.box({5, 5, 5}, {95, 95, 95},
+                  [](int, Face& face)
+                  {
+                      std::reverse(face.ring.begin(), face.ring.end());
+                      face.normal = vector_scale(face.normal, -1);
+                  });
+            Prepared p;
+            CHECK(prepare(b.world, resources, p));
+            GiIndirect indirect;
+            GiLightmapReport lightmap;
+            CHECK(bake(p, sky, 1, 16, indirect, lightmap));
+            std::vector<float> light;
+            gi_light_state(p.receivers, indirect, light);
+            const auto lattice = probes_at({{50, 50, 50}, {50, 50, 400}});
+            GiProbes probes;
+            GiProbeReport report;
+            CHECK(capture(p, sky, light, lattice, 64, probes, report));
+            CHECK(!probes.valid[0] && probes.valid[1] && report.valid == 1 && report.back_fraction[9] == 1);
+            for (std::size_t k = 0; k < 27; ++k)
+                CHECK(probes.sh[k] == 0);
+            // Outside, the box hides a small part of the sky: the rest arrives at radiance 1.
+            CHECK(report.back >= 64 && report.back < 64 + 32 && report.sky == 128 - report.back);
+        }
+        WorldBuilder b;
+        two_rooms(b);
+        Prepared p;
+        CHECK(prepare(b.world, resources, p));
+        GiSky colored;
+        colored.fill({.3f, .4f, .5f}, 1.5f);
+        GiIndirect indirect;
+        GiLightmapReport lightmap;
+        CHECK(bake(p, colored, 2, 32, indirect, lightmap));
+        std::vector<float> light;
+        gi_light_state(p.receivers, indirect, light);
+        const auto lattice = probes_at({{50, 50, 50}, {140, 50, 50}, {94, 50, 50}, {30, 80, 20}, {170, 20, 90},
+                                        {100, 50, 50}, {60, 60, 60}});
+        GiProbes one;
+        GiProbeReport first;
+        CHECK(capture(p, colored, light, lattice, 48, one, first, 1));
+        CHECK(first.valid == lattice.size());
+        for (const unsigned jobs : {2u, 7u})
+        {
+            GiProbes other;
+            GiProbeReport report;
+            CHECK(capture(p, colored, light, lattice, 48, other, report, jobs));
+            CHECK(std::memcmp(other.sh.data(), one.sh.data(), one.sh.size() * sizeof(float)) == 0);
+            CHECK(other.valid == one.valid && report.rays == first.rays && report.back == first.back);
+            CHECK(report.back_fraction == first.back_fraction && report.sky == first.sky);
+        }
+        GiProbes reseeded;
+        GiProbeReport report;
+        CHECK(capture(p, colored, light, lattice, 48, reseeded, report, 2, 0x5eee));
+        CHECK(std::memcmp(reseeded.sh.data(), one.sh.data(), one.sh.size() * sizeof(float)) != 0);
+        // The bright ceiling of room B: its probe is brighter than room A's.
+        const auto e_a = gi_sh_irradiance(std::span<const float, 27>(one.sh.data(), 27), {0, 0, 1});
+        const auto e_b = gi_sh_irradiance(std::span<const float, 27>(one.sh.data() + 27, 27), {0, 0, 1});
+        CHECK(e_b.x > 2 * e_a.x);
+        // Cancelled: nothing out.
+        std::atomic<bool> cancel{true};
+        GiProbes cancelled;
+        std::string error;
+        CHECK(!bake_gi_probes(p.scene, colored, p.receivers, light, lattice, 48, 1, 2, &cancel, {}, cancelled, report,
+                              error) &&
+              report.cancelled && cancelled.size() == 0);
+        CHECK(!bake_gi_probes(p.scene, colored, p.receivers, std::span<const float>(light).first(3), lattice, 48, 1, 2,
+                              nullptr, {}, cancelled, report, error));
+        return true;
+    }
+
+    // A 3 x 2 x 2 lattice (spacing 10 at the origin): probe i at node i holds E = i + 1, node 5 has no
+    // probe and node 2 is invalid.
+    GiProbeField test_field(bool all_invalid = false)
+    {
+        GiLightLattice lattice;
+        lattice.spacing = 10;
+        lattice.dims = {3, 2, 2};
+        GiProbes probes;
+        for (std::uint32_t node = 0; node < 12; ++node)
+        {
+            if (node == 5)
+                continue;
+            lattice.probes.push_back({node, lattice.node_position(node)});
+            for (int k = 0; k < 27; ++k)
+                probes.sh.push_back(k < 3 ? float((node + 1) / 0.28209479177387814) : 0.f);
+            probes.valid.push_back(node != 2 && !all_invalid);
+        }
+        GiProbeField field;
+        std::string error;
+        field.build(std::move(lattice), std::move(probes), error);
+        return field;
+    }
+    double field_e(const GiProbeSample& s)
+    {
+        return gi_sh_irradiance(s.sh, {0, 0, 1}).x;
+    }
+    // Validity-weighted trilinear: weights, missing/invalid corners renormalized, clamping and refusals.
+    bool probe_field()
+    {
+        std::string error;
+        auto field = test_field();
+        CHECK(field.probes().size() == 11 && field.valid() == 10 && !field.empty());
+        CHECK(field.probe_at(0) == 0 && field.probe_at(4) == 4 && field.probe_at(5) == -1 && field.probe_at(6) == 5 &&
+              field.probe_at(11) == 10 && field.probe_at(12) == -1);
+        GiProbeSample s;
+        // Cell (0,0,0) at fractions (.25, .5, .75): nodes 0 1 3 4 6 7 9 10, all valid.
+        CHECK(field.sample({2.5f, 5, 7.5f}, s) && s.valid && s.cell == (std::array<std::uint32_t, 3>{0, 0, 0}));
+        double expected = 0, total = 0;
+        const std::uint32_t nodes[8]{0, 1, 3, 4, 6, 7, 9, 10};
+        for (int c = 0; c < 8; ++c)
+        {
+            const double w = (c & 1 ? .25 : .75) * .5 * (c & 4 ? .75 : .25);
+            expected += w * (nodes[c] + 1);
+            total += s.weights[c];
+            CHECK(near(s.weights[c], w, 1e-7) && s.probes[c] == field.probe_at(nodes[c]));
+        }
+        CHECK(near(total, 1, 1e-6) && near(field_e(s), expected, 1e-5));
+        // Cell (1,0,0): node 2 invalid and node 5 missing drop out; the rest renormalize.
+        CHECK(field.sample({15, 5, 5}, s) && s.cell == (std::array<std::uint32_t, 3>{1, 0, 0}));
+        CHECK(s.probes[1] == 2 && s.weights[1] == 0 && s.probes[3] == -1 && s.weights[3] == 0);
+        expected = 0;
+        const std::uint32_t corners[8]{1, 2, 4, 5, 7, 8, 10, 11};
+        for (int c = 0; c < 8; ++c)
+            if (corners[c] != 2 && corners[c] != 5)
+                expected += (corners[c] + 1) / 6.0;
+        CHECK(near(field_e(s), expected, 1e-5));
+        // Clamped to the lattice: far below is node 0 alone, far above node 11, NaN as the low edge.
+        CHECK(field.sample({-1000, -1000, -1000}, s) && near(field_e(s), 1, 1e-6) && s.weights[0] == 1);
+        CHECK(field.sample({1000, 1000, 1000}, s) && near(field_e(s), 12, 1e-5) && s.weights[7] == 1);
+        CHECK(s.cell == (std::array<std::uint32_t, 3>{1, 0, 0}));
+        const float nan = std::numeric_limits<float>::quiet_NaN();
+        CHECK(field.sample({nan, nan, nan}, s) && near(field_e(s), 1, 1e-6));
+        // Exactly on invalid node 2 with the missing node beside it: no valid weight.
+        CHECK(!field.sample({20, 0, 0}, s) && !s.valid && s.probes[1] == 2);
+        std::array<std::uint32_t, 3> cell{};
+        field.cell({25, 15, 15}, cell);
+        CHECK(cell == (std::array<std::uint32_t, 3>{1, 0, 0}));
+        CHECK(!test_field(true).sample({5, 5, 5}, s) && !s.valid);
+        CHECK(!GiProbeField().sample({0, 0, 0}, s) && GiProbeField().empty());
+        // Refusals: counts, order, range.
+        GiLightLattice lattice;
+        lattice.spacing = 10;
+        lattice.dims = {2, 1, 1};
+        GiProbes probes;
+        probes.sh.assign(54, 0.f);
+        probes.valid = {1, 1};
+        lattice.probes = {{1, {}}, {0, {}}};
+        CHECK(!GiProbeField().build(lattice, probes, error));
+        lattice.probes = {{0, {}}, {2, {}}};
+        CHECK(!GiProbeField().build(lattice, probes, error));
+        lattice.probes = {{0, {}}};
+        CHECK(!GiProbeField().build(lattice, probes, error));
+        lattice.probes = {{0, {}}, {1, {}}};
+        GiProbeField one_axis;
+        CHECK(one_axis.build(lattice, probes, error) && one_axis.sample({4, 50, -50}, s) && s.weights[0] == .6f);
+        return true;
+    }
+
+    // Decision 3's model split: the zero identity, a lone directional light recovered, ambient plus a
+    // light, and the floor.
+    bool probe_light()
+    {
+        const std::array<float, 27> zero{};
+        const DVector a{.2f, .3f, .4f};
+        auto light = gi_probe_model_light(zero, 1, 1, a);
+        CHECK(light.ambient.x == a.x && light.ambient.y == a.y && light.ambient.z == a.z);
+        CHECK(light.color.x == 0 && light.color.y == 0 && light.color.z == 0);
+        light = gi_probe_model_light(zero, 1, 0, a);
+        CHECK(light.ambient.x == 0 && light.color.x == 0);
+        const auto l = unit_vector({1, 2, 3});
+        const DVector c{.5f, .25f, .125f};
+        for (const float scale : {1.f, 2.f})
+        {
+            light = gi_probe_model_light(directional_sh(l, c), scale, 0, a);
+            CHECK(near(light.direction.x, l.x, 1e-6) && near(light.direction.y, l.y, 1e-6) &&
+                  near(light.direction.z, l.z, 1e-6));
+            CHECK(near(light.color.x, scale * c.x, 1e-6) && near(light.color.y, scale * c.y, 1e-6) &&
+                  near(light.color.z, scale * c.z, 1e-6));
+            CHECK(near(light.ambient.x, 0, 1e-6) && near(light.ambient.z, 0, 1e-6));
+        }
+        // Plus a uniform U: the ambient is U and the light keeps its colour.
+        auto sh = directional_sh(l, c);
+        const DVector u{.1f, .05f, .2f};
+        sh[0] += float(u.x / 0.28209479177387814), sh[1] += float(u.y / 0.28209479177387814),
+            sh[2] += float(u.z / 0.28209479177387814);
+        light = gi_probe_model_light(sh, 1, 0, a);
+        CHECK(near(light.ambient.x, u.x, 1e-6) && near(light.ambient.y, u.y, 1e-6) && near(light.ambient.z, u.z, 1e-6));
+        CHECK(near(light.color.x, c.x, 1e-6) && near(light.color.z, c.z, 1e-6));
+        // The floor f A: facing the light a + c and away a, each at least f A.
+        light = gi_probe_model_light(directional_sh(l, c), 1, 1, {.1f, .1f, .1f});
+        CHECK(near(light.ambient.x, .1, 1e-6) && near(light.color.x, .4, 1e-6) && near(light.color.y, .15, 1e-6));
+        CHECK(near(light.ambient.z, .1, 1e-6) && near(light.color.z, .025, 1e-6));
+        light = gi_probe_model_light(directional_sh(l, c), 1, 1, {.9f, .9f, .9f});
+        CHECK(light.ambient.x == .9f && light.color.x == 0 && light.color.z == 0);
+        // Negative or non-finite coefficients never make light.
+        std::array<float, 27> negative{};
+        negative[0] = negative[1] = negative[2] = -1;
+        light = gi_probe_model_light(negative, 1, 0, a);
+        CHECK(light.ambient.x == 0 && light.color.x == 0);
+        negative[9] = std::numeric_limits<float>::infinity();
+        light = gi_probe_model_light(negative, 1, 0, a);
+        CHECK(std::isfinite(light.ambient.x) && std::isfinite(light.color.x) && std::isfinite(light.direction.x));
+        return true;
+    }
+
+    GiFile probe_file(const GiLightmaps& maps, const GiVertexLight& vertex, const GiLightLattice& lattice,
+                      const GiProbes& probes)
+    {
+        auto file = section_file(maps, vertex);
+        std::string error;
+        GiSection plac{gi_format::placement, {}}, prob{gi_format::probes, {}};
+        encode_gi_placement_section(lattice, {}, plac.payload, error);
+        write_gi_probes(probes, prob.payload, error);
+        file.sections.insert(file.sections.begin(), std::move(plac)); // PLAC precedes LMAP.
+        file.sections.push_back(std::move(prob));
+        return file;
+    }
+    // The Light probes world source: zero or invalid probes leave the mesh byte-identical; uniform probes
+    // give every texel and corner their E; a file without PLAC, or a PROB of the wrong size, fails.
+    bool probe_source(const fs::path& root)
+    {
+        Resources resources;
+        CHECK(mount(root, resources));
+        WorldBuilder b;
+        b.world.info = "AmbientLight 40 20 10";
+        b.box({5, 5, 5}, {95, 95, 95},
+              [&](int s, Face& face)
+              {
+                  face.texel = 20 << 11 | 30 << 5 | 12;
+                  face.kind = s == 2 ? Kind::Vertex : Kind::Lightmap;
+                  face.color = {90, 80, 70};
+              });
+        Prepared p;
+        CHECK(prepare(b.world, resources, p));
+        const auto& r = p.receivers;
+        std::string error;
+        GiIndirect zero;
+        zero.energy.assign(r.elements() * 3, 0.f);
+        zero.valid.assign(r.elements(), 1);
+        GiLightmaps maps;
+        GiVertexLight vertex;
+        gi_lightmap_sections(r, zero, maps, vertex);
+        GiLightLattice lattice;
+        lattice.spacing = 64;
+        lattice.dims = {3, 3, 3};
+        for (std::uint32_t node = 0; node < 27; ++node)
+            lattice.probes.push_back({node, lattice.node_position(node)});
+        GiProbes probes;
+        probes.sh.assign(27 * 27, 0.f);
+        probes.valid.assign(27, 1);
+        WorldMesh off;
+        CHECK(off.build(b.world, error, &resources));
+        GiWorldLight light;
+        CHECK(gi_world_light(b.world, probe_file(maps, vertex, lattice, probes), light, error));
+        CHECK(light.has_probes && light.probes.probes().size() == 27 && !light.probe_source_ready);
+        light.composition.source = GiWorldSource::Probes;
+        WorldMesh on;
+        CHECK(on.build(b.world, error, &resources, true, nullptr, &light) && same_mesh(on, off)); // Not prepared yet.
+        CHECK(light.prepare_probe_source(b.world, error) && light.probe_source_ready);
+        CHECK(light.probe_texels.size() == maps.texels.size() && light.probe_corners.size() == vertex.corners.size());
+        CHECK(on.build(b.world, error, &resources, true, nullptr, &light) && same_mesh(on, off));
+        // All invalid: E = 0 and red validity.
+        GiProbes invalid = probes;
+        invalid.valid.assign(27, 0);
+        GiWorldLight none;
+        CHECK(gi_world_light(b.world, probe_file(maps, vertex, lattice, invalid), none, error));
+        none.composition.source = GiWorldSource::Probes;
+        CHECK(none.prepare_probe_source(b.world, error));
+        CHECK(std::all_of(none.probe_texel_valid.begin(), none.probe_texel_valid.end(), [](auto v) { return !v; }));
+        CHECK(on.build(b.world, error, &resources, true, nullptr, &none) && same_mesh(on, off));
+        // Uniform E = .25: every element gets it, and the mesh changes.
+        GiProbes uniform = probes;
+        for (std::size_t i = 0; i < 27; ++i)
+            for (int c = 0; c < 3; ++c)
+                uniform.sh[i * 27 + c] = float(.25 / 0.28209479177387814);
+        GiWorldLight lit;
+        CHECK(gi_world_light(b.world, probe_file(maps, vertex, lattice, uniform), lit, error));
+        CHECK(lit.prepare_probe_source(b.world, error));
+        const auto quarter = gi_rgb9e5({.25f, .25f, .25f});
+        for (const auto v : lit.probe_texels)
+            CHECK(std::abs(gi_rgb9e5_decode(v).x - .25f) <= .25f * 1e-3f);
+        for (const auto v : lit.probe_corners)
+            CHECK(std::abs(gi_rgb9e5_decode(v).y - .25f) <= .25f * 1e-3f);
+        CHECK(lit.probe_texels.front() == quarter || std::abs(gi_rgb9e5_decode(lit.probe_texels.front()).x - .25f) < 1e-3f);
+        CHECK(on.build(b.world, error, &resources, true, nullptr, &lit) && same_mesh(on, off)); // Texels: E = 0.
+        lit.composition.source = GiWorldSource::Probes;
+        CHECK(on.build(b.world, error, &resources, true, nullptr, &lit) && !same_materials(on, off) &&
+              !same_vertices(on, off));
+        CHECK(lit.compose(true, 0, {10, 10, 10}) == (std::array<std::uint8_t, 3>{gi_compose(10, 40, .25f, 2, 1, true),
+                                                                                 gi_compose(10, 20, .25f, 2, 1, true),
+                                                                                 gi_compose(10, 10, .25f, 2, 1, true)}));
+        // Refusals: PROB without PLAC, a PROB that does not match its lattice.
+        auto file = section_file(maps, vertex);
+        GiSection prob{gi_format::probes, probe_payload(probes)};
+        file.sections.push_back(prob);
+        GiWorldLight refused;
+        CHECK(!gi_world_light(b.world, file, refused, error) && error.find("PLAC") != std::string::npos);
+        GiProbes short_probes = probes;
+        short_probes.valid.pop_back();
+        short_probes.sh.resize(26 * 27);
+        CHECK(!gi_world_light(b.world, probe_file(maps, vertex, lattice, short_probes), refused, error));
+        GiWorldLight plain;
+        CHECK(gi_world_light(b.world, section_file(maps, vertex), plain, error) && !plain.has_probes);
+        CHECK(!plain.prepare_probe_source(b.world, error));
+        return true;
+    }
+
+    // Cost: 1000 samples of a 64^3 lattice stay far below a frame.
+    bool probe_cost()
+    {
+        GiLightLattice lattice;
+        lattice.spacing = 64;
+        lattice.dims = {64, 64, 64};
+        GiProbes probes;
+        std::mt19937 random(7);
+        for (std::uint32_t node = 0; node < 64 * 64 * 64; node += 2)
+        {
+            lattice.probes.push_back({node, lattice.node_position(node)});
+            for (int k = 0; k < 27; ++k)
+                probes.sh.push_back(float(random() % 1000) / 1000);
+            probes.valid.push_back(1);
+        }
+        GiProbeField field;
+        std::string error;
+        CHECK(field.build(std::move(lattice), std::move(probes), error));
+        GiProbeSample s;
+        std::size_t valid = 0;
+        const auto start = std::chrono::steady_clock::now();
+        for (int i = 0; i < 1000; ++i)
+        {
+            const DVector point{float(random() % 4000) + .5f, float(random() % 4000) + .5f, float(random() % 4000) + .5f};
+            valid += field.sample(point, s);
+            const auto split = gi_probe_model_light(s.sh, 1, 1, {.1f, .1f, .1f});
+            valid += split.ambient.x >= 0 ? 0 : 1;
+        }
+        const double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
+        std::cout << "GI_PROBE_COST samples=1000 ms=" << ms << '\n';
+        CHECK(valid == 1000 && ms < 2);
+        return true;
     }
 } // namespace
 
@@ -1763,6 +2358,18 @@ int main(int argc, char** argv)
         ok = sections();
     else if (name == "directions")
         ok = directions();
+    else if (name == "probe-half")
+        ok = probe_half();
+    else if (name == "probe-sections")
+        ok = probe_sections();
+    else if (name == "probe-basis")
+        ok = probe_basis();
+    else if (name == "probe-field")
+        ok = probe_field();
+    else if (name == "probe-light")
+        ok = probe_light();
+    else if (name == "probe-cost")
+        ok = probe_cost();
     else if (name == "retail" && argc == 5)
         return retail(path_from_utf8(argv[2]), path_from_utf8(argv[3]), path_from_utf8(argv[4])) ? 0 : 1;
     else if (name == "runtime-retail" && argc == 4)
@@ -1773,7 +2380,8 @@ int main(int argc, char** argv)
         static const std::map<std::string_view, bool (*)(const fs::path&)> cases{
             {"placement", placement}, {"furnace", furnace},         {"box", box},   {"planes", planes},
             {"leak", leak},           {"dilation", dilation},       {"back", back}, {"determinism", determinism},
-            {"sky", sky},             {"preview", preview},         {"runtime", runtime_override}};
+            {"sky", sky},             {"preview", preview},         {"runtime", runtime_override},
+            {"probe-capture", probe_capture}, {"probe-source", probe_source}};
         const auto found = cases.find(name);
         if (found == cases.end())
             return 2;

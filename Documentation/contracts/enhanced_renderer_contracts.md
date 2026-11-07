@@ -207,8 +207,10 @@ pipelines are unchanged: their diffuse term is still "the original light", which
 the indirect light. Interim effect until the reflection probes (G12): the specular occlusion
 (`saturate(baked luminance / predicted luminance)`) and the normal-map relief read the total,
 GI-composed luminance, so grid specular rises where GI adds light. With GI off, missing, stale or
-a zero bake, every frame is byte-identical (`gpu.gi`). Light and reflection probes remain later
-lots (G9, G12).
+a zero bake, every frame is byte-identical (`gpu.gi`). Since GI lot G9 the light probes light
+the models in both renderers ([light probes](gi_contracts.md#light-probes-lot-g9)): their ambient
+replaces AmbientLight and their pseudo-light, an ordinary model light source, also gives enhanced
+specular. Reflection probes remain a later lot (G12).
 
 ## Generated normal maps
 

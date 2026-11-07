@@ -2366,3 +2366,13 @@ radiance repeats the project's `WorldShade` and `WorldMesh` lighting rules. Rece
 placement, passes, dilation, the LMAP/`VTX ` formats, the preview tool and the analytic tests
 (Lambert's polygon form factor) are written for this project from the
 [GI plan](gi_plan.md). See [contracts](../contracts/gi_contracts.md#gi-lightmap-core-lot-g7).
+
+## GI light probes (lot G9, 2026-11-07)
+
+No code is imported. The real SH basis constants and the clamped-cosine band factors π, 2π/3 and
+π/4 are the published values (Ramamoorthi and Hanrahan, "An Efficient Representation for
+Irradiance Environment Maps", 2001); CyberEngine's `docs/probes-baking.md` (`../CyberEngine`) uses
+the same constants and served as a reference only (decision D13). The Fibonacci sphere, the
+quaternion rotation by rejection, the binary16 codec (IEEE 754-2008), the PROB format, the trilinear
+field and the ambient/pseudo-light split are written for this project from the
+[GI plan](gi_plan.md). See [contracts](../contracts/gi_contracts.md#light-probes-lot-g9).

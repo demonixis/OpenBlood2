@@ -1,4 +1,5 @@
 #include "app/gi_overlay.h"
+#include "app/model_lighting.h"
 #include "engine/gi_world.h"
 #include "game/server_adapter.h"
 #include <imgui.h>
@@ -449,6 +450,46 @@ namespace OpenBlood2
             }
     }
 
+    void GiTools::baked_probe_gizmos(const GiProbeField& field, float k, DVector camera, float radius,
+                                     std::vector<LineVertex>& gizmos)
+    {
+        const auto& lattice = field.lattice();
+        const auto& probes = field.probes();
+        const double radius2 = double(radius) * radius;
+        constexpr int segments = 12;
+        constexpr double turn = 6.283185307179586 / segments;
+        std::size_t markers = 0;
+        for (std::size_t i = 0; i < lattice.probes.size() && markers < max_sh_markers; ++i)
+        {
+            const auto center = lattice.probes[i].position;
+            if (distance2(center, camera) > radius2)
+                continue;
+            ++markers;
+            const std::span<const float, 27> sh(probes.sh.data() + i * gi_probe_limits::values, 27);
+            const bool valid = probes.valid[i] != 0;
+            for (int plane = 0; plane < 3; ++plane)
+                for (int j = 0; j < segments; ++j)
+                {
+                    auto point = [&](double angle)
+                    {
+                        const float c = float(std::cos(angle)), s = float(std::sin(angle));
+                        return plane == 0 ? DVector{c, s, 0} : plane == 1 ? DVector{c, 0, s} : DVector{0, c, s};
+                    };
+                    const auto a = point(j * turn), b = point((j + 1) * turn), mid = point((j + .5) * turn);
+                    Color color = rejected_color;
+                    if (valid)
+                    {
+                        const auto e = gi_sh_irradiance(sh, mid);
+                        color = {std::clamp(k * e.x, .08f, 1.f), std::clamp(k * e.y, .08f, 1.f),
+                                 std::clamp(k * e.z, .08f, 1.f), 1};
+                    }
+                    const auto from = vector_add(center, vector_scale(a, sh_radius)),
+                               to = vector_add(center, vector_scale(b, sh_radius));
+                    add_line(gizmos, {from.x, from.y, from.z}, {to.x, to.y, to.z}, color);
+                }
+        }
+    }
+
     std::string GiTools::summary() const
     {
         if (status_.world_path.empty())
@@ -524,15 +565,56 @@ namespace OpenBlood2
                 ImGui::Text("Composed: %zu blocks (%zu texels), %zu corner sets (%zu corners); world mesh %.1f ms",
                             runtime_.mesh->gi_blocks, runtime_.mesh->gi_texels, runtime_.mesh->gi_sets,
                             runtime_.mesh->gi_corners, runtime_.mesh_build_ms);
+            if (s.probes)
+                ImGui::Text("Light probes: %zu of %zu valid, spacing %u", s.valid_probes, s.probes, s.probe_spacing);
+            else
+                ImGui::TextDisabled("Light probes: none in this file (a bake older than lot G9)");
         }
         ImGui::Separator();
         auto& c = *runtime_.composition;
         ImGui::SliderFloat("Intensity k", &c.k, 0, gi_max_intensity, "%.2f", ImGuiSliderFlags_AlwaysClamp);
         ImGui::SliderFloat("Ambient floor f", &c.f, 0, gi_max_intensity, "%.2f", ImGuiSliderFlags_AlwaysClamp);
+        if (runtime_.probes)
+            ImGui::SliderFloat("Probe intensity p", &runtime_.probes->intensity, 0, gi_max_intensity, "%.2f",
+                               ImGuiSliderFlags_AlwaysClamp);
         if (ImGui::Button("Defaults"))
+        {
             c.k = gi_default_k, c.f = gi_default_f;
+            if (runtime_.probes)
+                runtime_.probes->intensity = 1;
+        }
         ImGui::SameLine();
-        ImGui::TextDisabled("k %.0f, f %.0f (Gate B); not saved", double(gi_default_k), double(gi_default_f));
+        ImGui::TextDisabled("k %.0f, f %.0f (Gate B), p 1; not saved", double(gi_default_k), double(gi_default_f));
+        const bool has_probes = runtime_.light && runtime_.light->has_probes;
+        if (runtime_.probes)
+        {
+            ImGui::Checkbox("Light probes (models)", &runtime_.probes->models);
+            ImGui::SameLine();
+            ImGui::TextDisabled("(ambient max(k p E/2, f AmbientLight) and a pseudo-light; not in Original or "
+                                "Direct only)");
+            if (runtime_.model_lighting)
+            {
+                const auto& m = *runtime_.model_lighting;
+                ImGui::Text("Models: %zu probe-lit (%zu sampled, %zu reused, %zu without a valid probe), %zu "
+                            "pseudo-lights in the top four, %.3f ms",
+                            m.probe_lit, m.probe_sampled, m.probe_reused, m.probe_missing, m.probe_sources,
+                            m.probe_ms);
+            }
+        }
+        ImGui::TextUnformatted("World source");
+        ImGui::SameLine();
+        if (ImGui::RadioButton(gi_world_source_name(GiWorldSource::Texels), c.source == GiWorldSource::Texels))
+            c.source = GiWorldSource::Texels;
+        ImGui::SameLine();
+        ImGui::BeginDisabled(!has_probes);
+        if (ImGui::RadioButton(gi_world_source_name(GiWorldSource::Probes), c.source == GiWorldSource::Probes))
+            c.source = GiWorldSource::Probes;
+        ImGui::EndDisabled();
+        if (has_probes && runtime_.light->probe_source_ready)
+        {
+            ImGui::SameLine();
+            ImGui::TextDisabled("(probes evaluated per texel in %.1f ms)", runtime_.light->probe_source_ms);
+        }
         ImGui::TextUnformatted("View");
         for (const auto view : gi_views)
         {
@@ -545,8 +627,10 @@ namespace OpenBlood2
         ImGui::TextWrapped("Every change recomposes the lightmap pages and vertex colours from the decoded file (a "
                            "world mesh rebuild, no new bake). Texel validity: green where a sample was valid, red "
                            "where it was filled; polygons the file does not list keep their stored light.");
-        ImGui::TextDisabled("Models keep the original model lighting until the light probes (G9). The enhanced "
-                            "renderer's static-light specular reads the total GI luminance until G12.");
+        ImGui::TextWrapped("Light probes: E evaluated at every texel centre and corner with its face normal, in "
+                           "place of the texel gather (an F8 comparison; elements without a valid probe keep their "
+                           "stored light at f = 1). Models take the probes whatever the world source.");
+        ImGui::TextDisabled("The enhanced renderer's static-light specular reads the total GI luminance until G12.");
     }
 
     std::string GiTools::placement_summary() const
@@ -786,6 +870,89 @@ namespace OpenBlood2
             add_volume(false, game.client_shell.view.position);
         ImGui::EndDisabled();
         volume_table();
+        ImGui::Separator();
+        baked_probe_panel(game);
+    }
+
+    void GiTools::baked_probe_panel(const GameSession& game)
+    {
+        ImGui::TextUnformatted("Baked light probes (the applied file)");
+        if (!runtime_.light || !runtime_.light->has_probes)
+        {
+            ImGui::TextDisabled("None applied: turn GLOBAL ILLUMINATION on with a file baked since lot G9.");
+            return;
+        }
+        const auto& field = runtime_.light->probes;
+        const auto& lattice = field.lattice();
+        ImGui::Text("%zu probes (%zu valid) at spacing %u, lattice %u x %u x %u", field.probes().size(), field.valid(),
+                    lattice.spacing, lattice.dims[0], lattice.dims[1], lattice.dims[2]);
+        ImGui::Checkbox("Show baked SH samples", &show_baked_probes);
+        ImGui::SameLine();
+        ImGui::TextDisabled("(spheres within the marker radius, at most %zu; magenta: invalid)", max_sh_markers);
+        if (!game.client_shell.m_bInWorld)
+            return;
+        const auto camera = game.client_shell.view.position;
+        GiProbeSample sample;
+        const bool valid = field.sample(camera, sample);
+        ImGui::Text("Camera cell %u %u %u", sample.cell[0], sample.cell[1], sample.cell[2]);
+        if (ImGui::BeginTable("gi_probe_corners", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg |
+                                                         ImGuiTableFlags_SizingStretchProp))
+        {
+            ImGui::TableSetupColumn("Corner");
+            ImGui::TableSetupColumn("Probe");
+            ImGui::TableSetupColumn("Distance");
+            ImGui::TableSetupColumn("Weight");
+            ImGui::TableHeadersRow();
+            for (int corner = 0; corner < 8; ++corner)
+            {
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("%d%d%d", corner & 1, corner >> 1 & 1, corner >> 2 & 1);
+                ImGui::TableNextColumn();
+                const auto probe = sample.probes[std::size_t(corner)];
+                if (probe < 0)
+                {
+                    ImGui::TextDisabled("no probe");
+                    ImGui::TableNextColumn();
+                    ImGui::TableNextColumn();
+                    continue;
+                }
+                const bool ok = field.probes().valid[std::size_t(probe)] != 0;
+                ImGui::TextColored(ok ? ImVec4{.45f, .9f, .45f, 1} : error_color, "#%lld%s", (long long)probe,
+                                   ok ? "" : " invalid");
+                ImGui::TableNextColumn();
+                ImGui::Text("%.0f", std::sqrt(distance2(lattice.probes[std::size_t(probe)].position, camera)));
+                ImGui::TableNextColumn();
+                ImGui::Text("%.3f", double(sample.weights[std::size_t(corner)]));
+            }
+            ImGui::EndTable();
+        }
+        if (!valid)
+        {
+            ImGui::TextColored(error_color, "No valid probe around the camera: models here keep the original light.");
+            return;
+        }
+        const auto& sh = sample.sh;
+        ImGui::Text("SH (E, display units): L0 %.3f %.3f %.3f", sh[0], sh[1], sh[2]);
+        ImGui::Text("L1 y %.3f %.3f %.3f  z %.3f %.3f %.3f  x %.3f %.3f %.3f", sh[3], sh[4], sh[5], sh[6], sh[7],
+                    sh[8], sh[9], sh[10], sh[11]);
+        ImGui::Text("L2 %.3f %.3f %.3f | %.3f %.3f %.3f | %.3f %.3f %.3f | %.3f %.3f %.3f | %.3f %.3f %.3f", sh[12],
+                    sh[13], sh[14], sh[15], sh[16], sh[17], sh[18], sh[19], sh[20], sh[21], sh[22], sh[23], sh[24],
+                    sh[25], sh[26]);
+        const auto up = gi_sh_irradiance(sh, {0, 1, 0}), down = gi_sh_irradiance(sh, {0, -1, 0});
+        ImGui::Text("E up %.3f %.3f %.3f  down %.3f %.3f %.3f", up.x, up.y, up.z, down.x, down.y, down.z);
+        if (runtime_.composition)
+        {
+            const float p = runtime_.probes ? runtime_.probes->intensity : 1;
+            DVector ambient{};
+            if (runtime_.model_lighting)
+                ambient = vector_scale(runtime_.model_lighting->world_ambient, 1.f / 255);
+            const auto split = gi_probe_model_light(sh, runtime_.composition->k * p / 2, runtime_.composition->f,
+                                                    ambient);
+            ImGui::Text("Model light: ambient %.3f %.3f %.3f, pseudo-light %.3f %.3f %.3f toward %.2f %.2f %.2f",
+                        split.ambient.x, split.ambient.y, split.ambient.z, split.color.x, split.color.y,
+                        split.color.z, split.direction.x, split.direction.y, split.direction.z);
+        }
     }
 
     void GiTools::reflection_panel(const GameSession& game)
@@ -911,6 +1078,9 @@ namespace OpenBlood2
             if (camera_cell && !game.world.models.empty())
                 cell_gizmo(game.world.models[0], game.client_shell.view.position, gizmos);
             placement_gizmos(game.client_shell.view.position, gizmos);
+            if (show_baked_probes && runtime_.light && runtime_.light->has_probes)
+                baked_probe_gizmos(runtime_.light->probes, runtime_.composition ? runtime_.composition->k : 1,
+                                   game.client_shell.view.position, marker_radius, gizmos);
         }
         if (input.gi == GiOverlay::Pinned)
         {
@@ -924,8 +1094,10 @@ namespace OpenBlood2
             {
                 ImGui::Text("GI tools (pinned, F8): %s", summary().c_str());
                 if (runtime_.status && runtime_.enabled && *runtime_.enabled && runtime_.composition)
-                    ImGui::Text("View %s, k %.2f, f %.2f", gi_view_name(runtime_.composition->view),
-                                runtime_.composition->k, runtime_.composition->f);
+                    ImGui::Text("View %s, k %.2f, f %.2f, %s%s", gi_view_name(runtime_.composition->view),
+                                runtime_.composition->k, runtime_.composition->f,
+                                gi_world_source_name(runtime_.composition->source),
+                                runtime_.probes && runtime_.probes->models ? ", probes on models" : "");
                 ImGui::TextUnformatted(placement_summary().c_str());
             }
             ImGui::End();

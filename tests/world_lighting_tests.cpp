@@ -358,6 +358,68 @@ namespace
             // Unchanged models and ranges reuse their samples on the next frame.
             CHECK(update_model_scene(game, scene, error) && lighting.apply(game, mesh, draws, scene, error));
             CHECK(lighting.stats.reused + lighting.stats.sampled == lighting.stats.models && lighting.stats.reused > 0);
+            // GI lot G9: zero light probes at f = 1 leave every model light exactly as it was; uniform
+            // probes raise the ambient of every lit model and are reused while nothing moves.
+            {
+                std::vector<ModelLight> before;
+                for (const auto& instance : scene.instances)
+                    before.push_back(instance.light);
+                auto same = [](const ModelLight& a, const ModelLight& b)
+                {
+                    auto eq = [](DVector x, DVector y) { return x.x == y.x && x.y == y.y && x.z == y.z; };
+                    if (!eq(a.ambient, b.ambient) || a.scale != b.scale || a.count != b.count)
+                        return false;
+                    for (std::uint32_t k = 0; k < a.count; ++k)
+                        if (!eq(a.sources[k].position, b.sources[k].position) ||
+                            !eq(a.sources[k].color, b.sources[k].color) ||
+                            !eq(a.sources[k].direction, b.sources[k].direction) ||
+                            a.sources[k].radius != b.sources[k].radius || a.sources[k].cos_half != b.sources[k].cos_half)
+                            return false;
+                    return true;
+                };
+                auto field = [&](float energy)
+                {
+                    GiLightLattice lattice;
+                    lattice.spacing = 512;
+                    lattice.origin = game.world.min;
+                    lattice.dims = {std::uint32_t(std::ceil((game.world.max.x - game.world.min.x) / 512)) + 1,
+                                    std::uint32_t(std::ceil((game.world.max.y - game.world.min.y) / 512)) + 1,
+                                    std::uint32_t(std::ceil((game.world.max.z - game.world.min.z) / 512)) + 1};
+                    GiProbes probes;
+                    for (std::uint32_t node = 0; node < lattice.dims[0] * lattice.dims[1] * lattice.dims[2]; ++node)
+                    {
+                        lattice.probes.push_back({node, lattice.node_position(node)});
+                        for (int k = 0; k < 27; ++k)
+                            probes.sh.push_back(k < 3 ? float(energy / 0.28209479177387814) : 0.f);
+                        probes.valid.push_back(1);
+                    }
+                    GiProbeField out;
+                    std::string message;
+                    out.build(std::move(lattice), std::move(probes), message);
+                    return out;
+                };
+                const auto zero = field(0);
+                lighting.probes = {&zero, 2, 1, 1};
+                CHECK(update_model_scene(game, scene, error) && lighting.apply(game, mesh, draws, scene, error));
+                CHECK(lighting.stats.probe_lit > 0 && lighting.stats.probe_missing == 0 &&
+                      lighting.stats.probe_sources == 0 && scene.instances.size() == before.size());
+                for (std::size_t i = 0; i < before.size(); ++i)
+                    CHECK(same(scene.instances[i].light, before[i]));
+                const auto lit = field(.5f);
+                lighting.probes = {&lit, 2, 1, 1};
+                CHECK(update_model_scene(game, scene, error) && lighting.apply(game, mesh, draws, scene, error));
+                CHECK(lighting.stats.probe_sampled == lighting.stats.probe_lit && lighting.stats.probe_reused == 0);
+                std::size_t raised = 0;
+                for (std::size_t i = 0; i < before.size(); ++i)
+                    raised += scene.instances[i].light.ambient.y > before[i].ambient.y;
+                CHECK(raised > 0);
+                CHECK(update_model_scene(game, scene, error) && lighting.apply(game, mesh, draws, scene, error));
+                CHECK(lighting.stats.probe_reused > 0 &&
+                      lighting.stats.probe_reused + lighting.stats.probe_sampled == lighting.stats.probe_lit);
+                std::cout << name << ": light probes lit " << lighting.stats.probe_lit << " models (" << raised
+                          << " brighter), " << lighting.stats.probe_ms << " ms\n";
+                lighting.probes = {};
+            }
             std::cout << name << ": " << polygons << " polygons, darkest lightmapped light " << darkest[0] << " "
                       << darkest[1] << " " << darkest[2] << ", " << mesh.lightmapped << " lightmapped ("
                       << mesh.lightmap_pages << " pages, " << mesh.lightmap_texels << " texels) / " << mesh.lit

@@ -393,6 +393,13 @@ namespace OpenBlood2
             for (std::size_t i = 0; i < maps.pass_ms.size(); ++i)
                 std::cout << (i ? "," : "") << std::lround(maps.pass_ms[i]);
             std::cout << " lightmap_ms=" << std::lround(maps.ms);
+            const auto& probes = result.light_probes;
+            std::cout << " probe_valid=" << probes.valid << " probe_invalid=" << probes.probes - probes.valid
+                      << " probe_rays=" << probes.rays << " probe_back=" << probes.back
+                      << " probe_sky=" << probes.sky << " probe_back_fraction=";
+            for (std::size_t i = 0; i < probes.back_fraction.size(); ++i)
+                std::cout << (i ? "," : "") << probes.back_fraction[i];
+            std::cout << " probe_ms=" << std::lround(probes.ms);
         }
         if (result.status == GiBakeResult::Status::Baked || result.status == GiBakeResult::Status::Current)
             std::cout << " bytes=" << result.bytes;

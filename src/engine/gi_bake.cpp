@@ -360,7 +360,17 @@ namespace OpenBlood2
         if (stop())
             return cancelled();
 
-        // The file: INFO, PLAC, LMAP and VTX (probes arrive with G9).
+        // Light probes (lot G9), from the state the last pass leaves, with the pass ray count.
+        std::vector<float> light;
+        gi_light_state(receivers, indirect, light);
+        GiProbes probes;
+        if (!bake_gi_probes(scene, sky, receivers, light, lattice.probes, request.settings.rays, seed, request.jobs,
+                            request.cancel, request.progress, probes, result.light_probes, error))
+            return result.light_probes.cancelled ? cancelled() : fail(4, "GI light probes: " + error);
+        if (stop())
+            return cancelled();
+
+        // The file: INFO, PLAC, LMAP, VTX and PROB.
         GiFile file;
         file.key.world = expected.world;
         file.key.albedo = expected.albedo;
@@ -382,6 +392,10 @@ namespace OpenBlood2
             return fail(4, "Lightmap sections: " + error);
         file.sections.push_back(std::move(lmap));
         file.sections.push_back(std::move(vtx));
+        GiSection prob{gi_format::probes, {}};
+        if (!write_gi_probes(probes, prob.payload, error))
+            return fail(4, "Probe section: " + error);
+        file.sections.push_back(std::move(prob));
         std::vector<std::uint8_t> encoded;
         if (!write_gi_file(file, encoded, error))
             return fail(4, "GI file: " + error);

@@ -625,7 +625,26 @@ namespace
         GiFile file;
         CHECK(read_gi_file(a, file, error) && file.settings == gi_settings_text(request.settings));
         CHECK(file.find(gi_format::placement) && file.find(gi_format::lightmaps) && file.find(gi_format::vertices) &&
-              file.sections.size() == 3);
+              file.find(gi_format::probes) && file.sections.size() == 4 && file.key.algorithm == 3);
+        // Lot G9: one PROB entry per PLAC probe, every SubwayA probe valid.
+        {
+            GiLightLattice baked_lattice;
+            std::vector<GiReflectionProbe> reflections;
+            GiProbes probes;
+            CHECK(decode_gi_placement_section(file.find(gi_format::placement)->payload, baked_lattice, reflections,
+                                              error) &&
+                  read_gi_probes(file.find(gi_format::probes)->payload, probes, error) &&
+                  check_gi_probes(baked_lattice, probes, error));
+            CHECK(probes.size() == 1031 && one.light_probes.probes == 1031 && one.light_probes.valid == 1031);
+            CHECK(one.light_probes.rays == 1031ull * request.settings.rays && four.light_probes.valid == 1031);
+            std::size_t lit = 0;
+            for (std::size_t i = 0; i < probes.size(); ++i)
+                lit += gi_sh_irradiance(std::span<const float, 27>(probes.sh.data() + i * 27, 27), {0, 0, 1}).y > 0;
+            CHECK(lit * 10 > probes.size() * 9);
+            std::cout << "PROBES valid=" << one.light_probes.valid << " rays=" << one.light_probes.rays
+                      << " back=" << one.light_probes.back << " sky=" << one.light_probes.sky
+                      << " ms=" << one.light_probes.ms << " lit_up=" << lit << '\n';
+        }
         GiExpectation expected;
         CHECK(gi_expectation(resources, path, expected, error));
         unsigned stale = 0;

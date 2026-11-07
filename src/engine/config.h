@@ -66,9 +66,11 @@ namespace OpenBlood2
         float gi_k = 2, gi_f = 1; // gi_default_k and gi_default_f (engine/gi_lightmap.h).
         bool gi_composition = false; // --gi-k or --gi-f given.
         // --gi (lot G8): baked GI for --bench and smoke runs (the game uses the Display setting and F8),
-        // composed with --gi-k, --gi-f and --gi-view (0 final ... 5 validity, GiView order).
-        bool gi = false, gi_view_given = false;
-        int gi_view = 0;
+        // composed with --gi-k, --gi-f and --gi-view (0 final ... 5 validity, GiView order). Lot G9 adds
+        // --gi-source texels|probes (the world's E) and --gi-probes P (model probe intensity 0-4, 0: off).
+        bool gi = false, gi_view_given = false, gi_source_given = false, gi_probes_given = false;
+        int gi_view = 0, gi_source = 0;
+        float gi_probes = 1;
         std::filesystem::path gi_out;
         bool gi_if_stale = false;
         bool inspector = true;

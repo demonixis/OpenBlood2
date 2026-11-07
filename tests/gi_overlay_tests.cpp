@@ -1,6 +1,7 @@
 // GI lots G3/G4: the F8 overlay's gizmos, status lookup, placement editing and headless ImGui drawing
 // (gi_contracts.md).
 #include "app/gi_overlay.h"
+#include "app/model_lighting.h"
 #include "engine/config.h"
 #include "game/server_adapter.h"
 #include "scratch_dir.h"
@@ -114,6 +115,50 @@ namespace
         frame.run([&] { closed = tools.draw(input, game, config, gizmos, link); });
         CHECK(tools.runtime_summary() == "GI rendering: no world; the original lightmaps are in use.");
         CHECK(composition == GiComposition{} && reload == 0);
+        // Lot G9: the probe controls, the Light probes panel's baked samples and their gizmos.
+        GiProbeSettings probe_settings;
+        GiWorldLight light;
+        {
+            GiLightLattice lattice;
+            lattice.spacing = 64;
+            lattice.dims = {2, 1, 1};
+            lattice.probes = {{0, lattice.node_position(0)}, {1, lattice.node_position(1)}};
+            GiProbes probes;
+            probes.sh.assign(54, 0.f);
+            probes.sh[0] = probes.sh[1] = probes.sh[2] = 1;
+            probes.valid = {1, 0};
+            std::string error;
+            CHECK(light.probes.build(lattice, probes, error));
+            light.has_probes = true;
+        }
+        ModelLightingStats lighting;
+        lighting.probe_lit = 3;
+        status.state = GiRuntimeState::Applied;
+        status.file = "x.ob2gi";
+        status.probes = 2;
+        status.valid_probes = 1;
+        const GiRuntimeLink probe_link{&enabled, &composition, &reload,         &status,
+                                       nullptr,  0,            &probe_settings, &light, &lighting};
+        for (const auto panel : {GiTools::Panel::Runtime, GiTools::Panel::LightProbes})
+        {
+            tools.select = panel;
+            frame.run([&] { closed = tools.draw(input, game, config, gizmos, probe_link); });
+            CHECK(!closed && ImGui::GetDrawData()->TotalVtxCount > 0);
+        }
+        tools.show_baked_probes = true;
+        frame.run([&] { closed = tools.draw(input, game, config, gizmos, probe_link); });
+        CHECK(composition == GiComposition{} && probe_settings == GiProbeSettings{} && reload == 0);
+        std::vector<LineVertex> sh_lines;
+        GiTools::baked_probe_gizmos(light.probes, 2, {0, 0, 0}, 1536, sh_lines);
+        CHECK(sh_lines.size() == 2 * 3 * 12 * 2);
+        // The valid probe: k E = 2 Y00, a .56 grey; the invalid one magenta.
+        CHECK(std::abs(sh_lines.front().color[0] - 2 * 0.28209479f) < 1e-5f && sh_lines.front().color[0] ==
+                                                                               sh_lines.front().color[1]);
+        CHECK(sh_lines.back().color[1] < sh_lines.back().color[0] && sh_lines.back().color[2] > .5f);
+        sh_lines.clear();
+        GiTools::baked_probe_gizmos(light.probes, 2, {1000, 0, 0}, 100, sh_lines);
+        CHECK(sh_lines.empty());
+        tools.show_baked_probes = false;
         frame.run([&] { closed = tools.draw(input, game, config, gizmos); });
         CHECK(tools.runtime_summary() == "GI rendering: unavailable here.");
         return true;

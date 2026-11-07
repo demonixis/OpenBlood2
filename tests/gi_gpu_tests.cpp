@@ -1,7 +1,9 @@
 // GI lot G8 on retail worlds (gi_contracts.md): with GLOBAL ILLUMINATION on, a missing, stale or
 // zero (E = 0) Ready file leaves the presented frame byte-identical to GI off, in the original and
 // the enhanced renderer and at DETAIL LOW; a nonzero file changes it, the Original view restores it,
-// and switching GI off again gives the reference frame back.
+// and switching GI off again gives the reference frame back. Lot G9: zero light probes leave models and
+// the Light probes world source identical; nonzero probes change the models only, and the switch,
+// intensity 0 and the Original view restore the frame.
 #include "app/scene_presenter.h"
 #include "app/session_playback.h"
 #include "engine/capture.h"
@@ -12,6 +14,7 @@
 #include "game/local_scene.h"
 #include <SDL3/SDL.h>
 #include <filesystem>
+#include <cmath>
 #include <iostream>
 using namespace OpenBlood2;
 namespace fs = std::filesystem;
@@ -57,8 +60,10 @@ namespace
         return true;
     }
     // A file of uniform E for every receiver of the world, keyed for the mounted content.
-    bool gi_file(const World& world, const Resources& resources, std::string_view path, float energy, GiFile& file,
-                 std::string& error)
+    // LMAP/VTX of uniform E, and (lot G9) PLAC/PROB: a probe at every node of a 256-unit lattice over the
+    // world with uniform E = probe_energy.
+    bool gi_file(const World& world, const Resources& resources, std::string_view path, float energy,
+                 float probe_energy, GiFile& file, std::string& error)
     {
         WorldMesh mesh;
         std::vector<WorldTriangleSource> sources;
@@ -78,12 +83,30 @@ namespace
         GiLightmaps maps;
         GiVertexLight vertex;
         gi_lightmap_sections(receivers, indirect, maps, vertex);
+        GiLightLattice lattice;
+        lattice.spacing = 256;
+        lattice.origin = world.min;
+        lattice.dims = {std::uint32_t(std::ceil((world.max.x - world.min.x) / 256)) + 1,
+                        std::uint32_t(std::ceil((world.max.y - world.min.y) / 256)) + 1,
+                        std::uint32_t(std::ceil((world.max.z - world.min.z) / 256)) + 1};
+        GiProbes probes;
+        for (std::uint32_t node = 0; node < lattice.dims[0] * lattice.dims[1] * lattice.dims[2]; ++node)
+        {
+            lattice.probes.push_back({node, lattice.node_position(node)});
+            for (int k = 0; k < 27; ++k)
+                probes.sh.push_back(k < 3 ? float(probe_energy / 0.28209479177387814) : 0.f);
+            probes.valid.push_back(1);
+        }
         file = {};
-        file.sections.resize(2);
-        file.sections[0].tag = gi_format::lightmaps;
-        file.sections[1].tag = gi_format::vertices;
-        if (!write_gi_lightmaps(maps, file.sections[0].payload, error) ||
-            !write_gi_vertex_light(vertex, file.sections[1].payload, error))
+        file.sections.resize(4);
+        file.sections[0].tag = gi_format::placement;
+        file.sections[1].tag = gi_format::lightmaps;
+        file.sections[2].tag = gi_format::vertices;
+        file.sections[3].tag = gi_format::probes;
+        if (!encode_gi_placement_section(lattice, {}, file.sections[0].payload, error) ||
+            !write_gi_lightmaps(maps, file.sections[1].payload, error) ||
+            !write_gi_vertex_light(vertex, file.sections[2].payload, error) ||
+            !write_gi_probes(probes, file.sections[3].payload, error))
             return false;
         file.key.world = expected.world;
         file.key.albedo = expected.albedo;
@@ -123,9 +146,10 @@ int main(int argc, char** argv)
         CHECK(gi_expectation(game->resources, path, expected, error) && gi_file_name(path, expected.world, name));
         const auto target = scratch / path_from_utf8(name);
         fs::remove(target, ec);
-        GiFile zero, lit;
-        CHECK(gi_file(scene.geometry, game->resources, path, 0, zero, error));
-        CHECK(gi_file(scene.geometry, game->resources, path, .05f, lit, error));
+        GiFile zero, lit, probed;
+        CHECK(gi_file(scene.geometry, game->resources, path, 0, 0, zero, error));
+        CHECK(gi_file(scene.geometry, game->resources, path, .05f, 0, lit, error));
+        CHECK(gi_file(scene.geometry, game->resources, path, 0, .4f, probed, error)); // Above AmbientLight.
         Capture capture;
         CHECK(capture.initialize(gpu, SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM, 960, 540));
         ScenePresenter presenter(gpu);
@@ -138,6 +162,7 @@ int main(int argc, char** argv)
                 presenter.lightmaps = lightmaps;
                 presenter.global_illumination = false;
                 presenter.gi_composition = {};
+                presenter.gi_probes = {};
                 fs::remove(target, ec);
                 std::vector<Uint8> reference, pixels;
                 CHECK(frame(gpu, presenter, *game, capture, reference, error));
@@ -162,6 +187,34 @@ int main(int argc, char** argv)
                 CHECK(frame(gpu, presenter, *game, capture, pixels, error));
                 CHECK(presenter.gi_status().state == GiRuntimeState::Applied && pixels == reference);
                 CHECK(presenter.world_mesh.gi_blocks + presenter.world_mesh.gi_sets > 0);
+                CHECK(presenter.gi_status().probes > 0 && presenter.model_lighting.stats.probe_lit > 0);
+                // The zero probes also leave the Light probes world source identical.
+                presenter.gi_composition.source = GiWorldSource::Probes;
+                CHECK(frame(gpu, presenter, *game, capture, pixels, error) && presenter.rebuilt && pixels == reference);
+                presenter.gi_composition.source = GiWorldSource::Texels;
+                // Lot G9: nonzero probes light the models only (E = 0 keeps the world); the switch,
+                // intensity 0 and the Original view restore the frame; as the world source they change it.
+                CHECK(save_gi_file(target, probed, error));
+                ++presenter.gi_reload;
+                CHECK(frame(gpu, presenter, *game, capture, pixels, error));
+                CHECK(presenter.gi_status().state == GiRuntimeState::Applied && pixels != reference);
+                const auto lit_models = presenter.model_lighting.stats.probe_lit;
+                CHECK(lit_models > 0 && presenter.model_lighting.stats.probe_missing == 0);
+                presenter.gi_probes.models = false;
+                CHECK(frame(gpu, presenter, *game, capture, pixels, error) && !presenter.rebuilt && pixels == reference);
+                CHECK(presenter.model_lighting.stats.probe_lit == 0);
+                presenter.gi_probes = {true, 0};
+                CHECK(frame(gpu, presenter, *game, capture, pixels, error) && pixels == reference);
+                presenter.gi_probes = {};
+                presenter.gi_composition.view = GiView::Original;
+                CHECK(frame(gpu, presenter, *game, capture, pixels, error) && pixels == reference);
+                presenter.gi_composition.view = GiView::Final;
+                presenter.gi_composition.source = GiWorldSource::Probes;
+                presenter.gi_probes.models = false;
+                CHECK(frame(gpu, presenter, *game, capture, pixels, error) && presenter.rebuilt && pixels != reference);
+                presenter.gi_composition.source = GiWorldSource::Texels;
+                presenter.gi_probes.models = true;
+                std::cout << label << ": probes lit " << lit_models << " models\n";
                 // Nonzero E changes the frame; the Original view and GI off restore it.
                 CHECK(save_gi_file(target, lit, error));
                 ++presenter.gi_reload;

@@ -1030,6 +1030,12 @@ if(BLOOD2_TEST_DATA_DIR)
              "${CMAKE_CURRENT_BINARY_DIR}/gi-runtime-retail")
     set_tests_properties(gi_runtime.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
 endif()
+# Lot G9: light probes (capture, PROB, the field, the model split, the world source).
+foreach(case IN ITEMS half sections basis capture field light source cost)
+    add_test(NAME gi_probes.${case} COMMAND gi_lightmap_tests "probe-${case}"
+             "${CMAKE_CURRENT_BINARY_DIR}/gi-probes-${case}")
+    set_tests_properties(gi_probes.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 120)
+endforeach()
 
 # Lot G6: baked GI files never enter the repository (decision D3), and the bake-all script
 # drives a stub binary (the stub is an executable script, hence Unix only).
