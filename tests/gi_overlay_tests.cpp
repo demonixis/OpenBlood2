@@ -366,9 +366,10 @@ namespace
                                             threads > 2 ? threads - 2 : 1));
         }
 
-        // Cancel (Final, re-baked direct light, lot GD2), with the Pinned strip drawn while it runs.
+        // Cancel (Final, original direct light, lot GD2), with the Pinned strip drawn while it runs.
+        CHECK(tools.bake.rebaked); // Re-baked is the panel's default since Gate G.
         tools.bake.final_quality = true;
-        tools.bake.rebaked = true;
+        tools.bake.rebaked = false;
         CHECK(tools.start_bake(game, config));
         CHECK(run_until(tools, game, config, input, link, 20000, 16, progressed) && running());
         input.gi = GiOverlay::Pinned;
@@ -386,9 +387,9 @@ namespace
                 args.push_back(line);
             const unsigned threads = std::thread::hardware_concurrency();
             CHECK(args == gi_bake_arguments(config, "worlds/01_subwaya.dat", "final", config.gi_placement_dir, out,
-                                            threads > 2 ? threads - 2 : 1, true));
+                                            threads > 2 ? threads - 2 : 1, false));
         }
-        tools.bake.rebaked = false;
+        tools.bake.rebaked = true;
 
         // Quit during a bake: stop_bake cancels and waits.
         CHECK(tools.start_bake(game, config));

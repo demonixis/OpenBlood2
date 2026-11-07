@@ -3,8 +3,8 @@
 2026-11-07, lot GD2 of the [GI plan](../gi_plan.md) (D1 (c), decision D17), after the user accepted
 Gate F (the GD1 term). The contract is in
 [gi_contracts.md](../../contracts/gi_contracts.md#re-baked-direct-bake-lot-gd2). Host: Apple M5 (4
-performance and 6 efficiency cores), macOS, Metal. `original` stays the default direct source until
-Gate G.
+performance and 6 efficiency cores), macOS, Metal. At Gate G the user made `rebaked` the default
+direct source.
 
 ## What landed
 
@@ -97,7 +97,10 @@ changes most: about half the changed pixels darken and the frame is 1.6 levels d
 
 ## Gate G
 
-The user plays the A/B and picks the default direct source: keep `original` (D1 (a), the 1998
-lightmaps under the bounce) or make `rebaked` the default for `bake_all.py`, the F8 panel and the
-packaged files. Either way the Original view stays the stored light and `original` files stay
-current. GD3 (a 10-unit direct grid) waits for Gate G and a separate approval.
+The user looked at these captures and made `rebaked` the default direct source on 2026-11-07:
+`GiBakeSettings`, `--bake-gi` without `--gi-direct`, `bake_all.py` (and so the packaged files) and
+the F8 Bake panel now re-bake the direct light. `original` stays one option away (`--gi-direct
+original`, `bake_all.py --direct original`, the panel's Original lightmaps), its files keep their
+bytes, and the Original view still shows the stored light. Existing original files are stale for a
+default bake and are rebaked by the next `bake_all.py` run. GD3 (a 10-unit direct grid) waits for a
+separate approval.

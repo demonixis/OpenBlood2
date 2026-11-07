@@ -1588,24 +1588,26 @@ job and with all of them.
 
 ## Re-baked direct bake (lot GD2)
 
-Lot GD2 bakes the GD1 term (decision D17) as an optional direct source and composes it on
-lightmapped faces. `original` stays the default until Gate G, and `original` files keep their bytes.
+Lot GD2 bakes the GD1 term (decision D17) as a selectable direct source and composes it on
+lightmapped faces. The user made `rebaked` the default at Gate G (2026-11-07); `original` stays
+available and its files keep their bytes.
 The measurements are in the [GD2 report](../implementation/reports/gi_gd2_rebaked_direct.md).
 
 ### Setting
 
-- `GiBakeSettings::direct`: `GiDirectSource::Original` (default) or `Rebaked`; `gi_direct_source_name`
-  gives `original` / `rebaked`, `gi_direct_source` parses them (exact, lower case). The presets leave
-  it to the caller.
+- `GiBakeSettings::direct`: `GiDirectSource::Rebaked` (the default since Gate G) or `Original`;
+  `gi_direct_source_name` gives `original` / `rebaked`, `gi_direct_source` parses them (exact, lower
+  case). The presets (`make_gi_bake_settings`) give the default.
 - **Settings text:** `direct rebaked` is appended as a last line only for re-baked bakes, so the
   settings hash, and the bytes, of `original` files do not change. Staleness follows the settings
   hash: `--gi-if-stale` rebakes an original file for a re-baked request and the reverse, and
   `gi_algorithm_version` stays 3. The runtime accepts either source.
-- **Command line:** `--bake-gi WORLD --gi-direct original|rebaked` (with `--bake-gi` only; another
-  value fails with exit 2). `tools/gi/bake_all.py --direct original|rebaked` passes it (not for
-  `original`) and records `direct` per world in its report. The F8 Bake panel has a Direct light
-  choice (Original lightmaps / Re-baked) that adds `--gi-direct rebaked` after the quality
-  (`gi_bake_arguments(..., rebaked)`).
+- **Command line:** `--bake-gi WORLD --gi-direct original|rebaked` (with `--bake-gi` only; absent:
+  `rebaked`; another value fails with exit 2). `tools/gi/bake_all.py --direct original|rebaked`
+  (default `rebaked`) passes it only for `original` and records `direct` per world in its report, so
+  the packaged files are re-baked unless asked otherwise. The F8 Bake panel's Direct light choice
+  (Original lightmaps / Re-baked, Re-baked selected) adds `--gi-direct original` after the quality
+  for the original source (`gi_bake_arguments(..., rebaked)`).
 
 ### Direct pass
 
@@ -1660,8 +1662,10 @@ cases and its round trip; the DIR payload and its refusals; a lit box: D′ per 
 the passes and the light state with D′ = exact D (bit for bit) and with the re-baked D′; runtime
 composition per view, corners unchanged, DIR refusals, meshes (identity at both detail levels,
 pages only changing, Original byte-identical) and the status line. **`gi_bake.settings`** the
-source names, parse and settings text. **`gi_bake_process.parse`** the `--gi-direct rebaked`
-argument. **`config.gi`** `--gi-direct` parsing and refusal. **`gi_bake.retail_direct`** (private)
+re-baked default of the presets, the source names, parse and settings text.
+**`gi_bake_process.parse`** and **`gi_overlay`** the `--gi-direct original` argument for the original
+source, none for the default. **`config.gi`** `--gi-direct` parsing and refusal. **`gi_bake.retail`**
+(private) the default bake writes DIR after LMAP. **`gi_bake.retail_direct`** (private)
 01_SubwayA Preview against a scratch placement: identical bytes for 1, 2 and 7 jobs, the direct
 stage before the bounce, DIR after LMAP, an original bake without DIR or a direct line, staleness
 across sources and after a placement change, cancel during the direct pass (exit 12, file kept).

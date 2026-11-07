@@ -19,12 +19,12 @@ namespace OpenBlood2
     bool gi_executable_path(std::filesystem::path&, std::string& error);
     // The child's arguments after the executable: the game's content (data directory, edition, data
     // mods), the placement directory, the output directory (empty: the child's default,
-    // user_directory()/gi), the quality, the world and, for a re-baked direct source, "--gi-direct rebaked"
-    // (lot GD2; original bakes keep the earlier arguments).
+    // user_directory()/gi), the quality, the world and, for the original direct source, "--gi-direct
+    // original" (lot GD2; re-baked is the child's default since Gate G).
     std::vector<std::string> gi_bake_arguments(const Config&, std::string_view world, std::string_view quality,
                                                const std::filesystem::path& placement_dir,
                                                const std::filesystem::path& out_dir, unsigned jobs = 0,
-                                               bool rebaked = false);
+                                               bool rebaked = true);
 
     // `GI_PROGRESS stage=<stage> done=N total=M` (the stage may hold a space: "bounce 1/2").
     struct GiBakeProgress

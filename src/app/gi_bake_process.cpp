@@ -44,8 +44,8 @@ namespace OpenBlood2
                                                const std::filesystem::path& out_dir, unsigned jobs, bool rebaked)
     {
         std::vector<std::string> args{"--bake-gi", std::string(world), "--gi-quality", std::string(quality)};
-        if (rebaked)
-            args.insert(args.end(), {"--gi-direct", "rebaked"});
+        if (!rebaked)
+            args.insert(args.end(), {"--gi-direct", "original"});
         if (!config.data_dir.empty())
             args.insert(args.end(), {"--data-dir", path_text(config.data_dir)});
         if (config.demo)

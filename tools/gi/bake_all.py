@@ -45,8 +45,8 @@ def parse_arguments(argv):
     selection.add_argument("--worlds", nargs="+", metavar="WORLD",
                            help="worlds by path, file name or stem, case-insensitive")
     parser.add_argument("--quality", choices=("preview", "final", "custom"), default="final")
-    parser.add_argument("--direct", choices=("original", "rebaked"), default="original",
-                        help="direct light on lightmapped faces: the stored lightmaps or re-baked (lot GD2)")
+    parser.add_argument("--direct", choices=("original", "rebaked"), default="rebaked",
+                        help="direct light on lightmapped faces: re-baked (default, lot GD2) or the stored lightmaps")
     parser.add_argument("--bounces", type=int, help="custom quality bounces (1-3)")
     parser.add_argument("--rays", type=int, help="custom quality rays per probe (16-4096)")
     parser.add_argument("--jobs", type=int, default=1, help="worlds baked at once (default 1)")
@@ -135,7 +135,7 @@ def bake_command(base, world, arguments, threads):
         command += ["--gi-bounces", str(arguments.bounces)]
     if arguments.rays is not None:
         command += ["--gi-rays", str(arguments.rays)]
-    if arguments.direct != "original":
+    if arguments.direct != "rebaked":  # The game's default since Gate G.
         command += ["--gi-direct", arguments.direct]
     if not arguments.force:
         command.append("--gi-if-stale")

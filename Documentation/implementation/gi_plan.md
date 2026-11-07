@@ -23,8 +23,8 @@ audit, [report](reports/gi_gd1_direct_audit.md)) is implemented on 2026-11-07: t
 OuterColor and per-BSP hard shadows fits 84.8 % of the 10.1 M texels (93.6 % away from shadow
 edges); the user accepted Gate F (the term). GD2 (the re-baked direct bake,
 [report](reports/gi_gd2_rebaked_direct.md)) is implemented the same day: the `direct` setting, the
-`DIR ` section and composition of D′, with `original` the default; Gate G (the A/B and the default
-source) awaits the user.
+`DIR ` section and composition of D′. At Gate G (the A/B) the user made `rebaked` the default
+direct source the same day.
 
 ## The request
 
@@ -277,7 +277,7 @@ Effort scale (the Claude Code reasoning effort to set before starting the lot):
 - G6 lands right after G5. At that point the files hold only placement, so the F8 → CLI → folder → build → runtime loop is proven before the physics lots.
 - G10 can run alongside G9.
 - GD1 and GD2 come before G11 so that the reflection gates judge the final light. Reflections stay correct either way, since a new direct source makes older files stale.
-- GD3 waits for Gate G and a separate approval.
+- GD3 waits for a separate approval (Gate G is accepted).
 
 **Total:** about 20,000–28,000 changed lines with GD1–GD2 (GD3 adds 2,500 or more), excluding
 baked data and generated artifacts.
@@ -292,7 +292,7 @@ baked data and generated artifacts.
 | D | G11 | Reflection memory and GPU layout. |
 | E | G12 | Reflection cost, and the default per platform. |
 | F | GD1 | The re-baked direct term (fit per world, N·L or not, occluders). |
-| G | GD2 | Look of the re-baked direct light in game, and the default direct source. |
+| G | GD2 | Look of the re-baked direct light in game, and the default direct source. Accepted on 2026-11-07: `rebaked` is the default. |
 
 ### Lot details
 
@@ -418,7 +418,7 @@ baked data and generated artifacts.
 - Records the static light evidence correction; whether model light keeps its ×2 (justified by the superseded N·L figure) is a separate question for the user.
 - No file or frame changes.
 
-**GD2, re-baked direct bake (xhigh).** Implemented on 2026-11-07 ([report](reports/gi_gd2_rebaked_direct.md)); Gate G pending.
+**GD2, re-baked direct bake (xhigh).** Implemented on 2026-11-07 ([report](reports/gi_gd2_rebaked_direct.md)); Gate G accepted the same day with `rebaked` as the default.
 - The `direct` bake setting (`original` default) in presets, `--gi-direct`, the settings hash
   (omitted for `original`, so those files keep their bytes), `bake_all.py --direct` and the F8 Bake panel.
 - A direct pass before the bounce passes: jobs, cancel, `GI_PROGRESS stage=direct`, the fields in `GI_RESULT`.
@@ -472,7 +472,7 @@ baked data and generated artifacts.
 | Reserving F8 removes a player binding | The controls v3 migration logs what it drops; same pattern as F10. |
 | In-game bake contention and lifetime | A child process, cancelled by killing it, with reload only if the digest still matches. |
 | The user pictures probes lighting every surface | D1 is explicit, and the Light probes world source lets the user compare both in game. |
-| The re-baked direct light drifts from the 1998 look (a quarter of the texels differ today) | GD1 audits every world before anything changes; `original` stays the default until Gate G; the Original view stays byte-identical. |
+| The re-baked direct light drifts from the 1998 look (a quarter of the texels differ today) | GD1 audits every world before anything changes; `original` stayed the default until Gate G (accepted on 2026-11-07, `rebaked` since); the Original view stays byte-identical. |
 | Shadow acne or leaks at the 20-unit grid | Point-sampled hard shadows like the original, the G7 sample rules, and GD1's offset sweep. |
 | Shadows from world models at the authored pose (doors, breakables) | The same behaviour as the original (D8); GD1 decides which models occlude (D19). |
 | Model light keeps a ×2 justified by the superseded N·L figure | Recorded by GD1; changing model light is a separate decision. |
@@ -516,6 +516,6 @@ Decisions for D1 (c), proposed and accepted on 2026-11-07:
 | Reflection probes | 64² with 2×2 supersampling; at most 42 per world on desktop, 16 on mobile |
 | Bake presets | Preview: 1 bounce, 64 rays. Final: 2 bounces, 256 rays. Custom: up to 3 bounces. |
 | Runtime intensities | k = 2 (Gate B; first planned at 1), f = 1, probe 1, reflection 1, sky 1 |
-| Direct source | `original` until Gate G (D17) |
+| Direct source | `rebaked` since Gate G (D17; `original` until then) |
 | Names | Folder `data/gi`, extension `.ob2gi`, script `tools/gi/bake_all.py`, contract `gi_contracts.md` |
 | Effort levels | As listed in the lot table |

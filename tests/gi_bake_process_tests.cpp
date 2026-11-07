@@ -225,12 +225,13 @@ namespace
                                                 "/games/blood 2", "--demo", "--nightmares", "--rez", "/mods/a.rez",
                                                 "--rez", "/mods/b c.rez", "--gi-placement-dir", "/p q", "--gi-out",
                                                 "/o", "--gi-jobs", "6"}));
-        // Lot GD2: a re-baked direct source follows the quality; an original one adds nothing.
-        CHECK(gi_bake_arguments(config, "worlds/x.dat", "final", "/p q", "/o", 6, false) == args);
-        auto rebaked = gi_bake_arguments(config, "worlds/01_subwaya.dat", "preview", {}, {}, 0, true);
-        CHECK((rebaked == std::vector<std::string>{"--bake-gi", "worlds/01_subwaya.dat", "--gi-quality", "preview",
-                                                   "--gi-direct", "rebaked", "--data-dir", "/games/blood 2", "--demo",
-                                                   "--nightmares", "--rez", "/mods/a.rez", "--rez", "/mods/b c.rez"}));
+        // Lot GD2: re-baked is the child's default (Gate G) and adds nothing; the original direct
+        // source follows the quality.
+        CHECK(gi_bake_arguments(config, "worlds/x.dat", "final", "/p q", "/o", 6, true) == args);
+        auto original = gi_bake_arguments(config, "worlds/01_subwaya.dat", "preview", {}, {}, 0, false);
+        CHECK((original == std::vector<std::string>{"--bake-gi", "worlds/01_subwaya.dat", "--gi-quality", "preview",
+                                                    "--gi-direct", "original", "--data-dir", "/games/blood 2", "--demo",
+                                                    "--nightmares", "--rez", "/mods/a.rez", "--rez", "/mods/b c.rez"}));
 
         CHECK(std::string(gi_bake_state_name(GiBakeProcess::State::Idle)) == "idle");
         CHECK(std::string(gi_bake_state_name(GiBakeProcess::State::Cancelled)) == "cancelled");

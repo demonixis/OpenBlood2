@@ -425,15 +425,22 @@ namespace
         CHECK(make_gi_bake_settings("preview", 0, 0, -1, s, error) && s.quality == GiQuality::Preview);
         CHECK(s.bounces == 1 && s.rays == 64 && s.sky == 100);
         CHECK(make_gi_bake_settings("", 0, 0, -1, s, error) && s.quality == GiQuality::Final && s.rays == 256);
-        CHECK(gi_settings_text(s) == "openblood2-gi-settings 2\nquality final\nbounces 2\nrays 256\nsky 1.00\n");
+        // Re-baked is the default direct source since Gate G; its settings line comes last.
+        CHECK(s.direct == GiDirectSource::Rebaked);
+        CHECK(gi_settings_text(s) ==
+              "openblood2-gi-settings 2\nquality final\nbounces 2\nrays 256\nsky 1.00\ndirect rebaked\n");
         CHECK(make_gi_bake_settings("custom", 3, 0, -1, s, error) && s.bounces == 3 && s.rays == 256 && s.sky == 100);
         CHECK(make_gi_bake_settings("custom", 0, 4096, 25, s, error) && s.bounces == 2 && s.rays == 4096);
+        CHECK(s.direct == GiDirectSource::Rebaked);
+        CHECK(gi_settings_text(s) ==
+              "openblood2-gi-settings 2\nquality custom\nbounces 2\nrays 4096\nsky 0.25\ndirect rebaked\n");
+        // Original bakes keep the text (and the bytes) of the lots before GD2.
+        s.direct = GiDirectSource::Original;
         CHECK(gi_settings_text(s) == "openblood2-gi-settings 2\nquality custom\nbounces 2\nrays 4096\nsky 0.25\n");
         CHECK(make_gi_bake_settings("custom", 0, 0, 0, s, error) && s.sky == 0);
-        CHECK(gi_settings_text(s).ends_with("\nsky 0.00\n"));
+        CHECK(gi_settings_text(s).ends_with("\nsky 0.00\ndirect rebaked\n"));
         CHECK(make_gi_bake_settings("custom", 0, 0, 400, s, error) && s.sky == 400);
-        CHECK(gi_settings_text(s).ends_with("\nsky 4.00\n"));
-        // Lot GD2: the direct source, named only when re-baked (original files keep their bytes).
+        CHECK(gi_settings_text(s).ends_with("\nsky 4.00\ndirect rebaked\n"));
         CHECK(std::string(gi_direct_source_name(GiDirectSource::Original)) == "original" &&
               std::string(gi_direct_source_name(GiDirectSource::Rebaked)) == "rebaked");
         GiDirectSource source = GiDirectSource::Original;
@@ -441,12 +448,10 @@ namespace
         CHECK(!gi_direct_source("Rebaked", source) && !gi_direct_source("", source) &&
               source == GiDirectSource::Rebaked);
         CHECK(gi_direct_source("original", source) && source == GiDirectSource::Original);
-        CHECK(s.direct == GiDirectSource::Original);
-        s.direct = GiDirectSource::Rebaked;
-        CHECK(gi_settings_text(s) == "openblood2-gi-settings 2\nquality custom\nbounces 2\nrays 256\nsky 4.00\n"
-                                     "direct rebaked\n");
-        // The presets leave the source to the caller (Original).
-        CHECK(make_gi_bake_settings("custom", 0, 0, 400, s, error) && s.direct == GiDirectSource::Original);
+        // The presets always give the default source, whatever the settings held before.
+        s.direct = GiDirectSource::Original;
+        CHECK(make_gi_bake_settings("preview", 0, 0, -1, s, error) && s.direct == GiDirectSource::Rebaked);
+        CHECK(make_gi_bake_settings("custom", 0, 0, 400, s, error) && s.direct == GiDirectSource::Rebaked);
         const auto before = s.rays;
         CHECK(!make_gi_bake_settings("custom", 4, 0, -1, s, error) && s.rays == before);
         CHECK(!make_gi_bake_settings("custom", 0, 15, -1, s, error));
@@ -639,8 +644,10 @@ namespace
         CHECK(!a.empty() && a == b && a.size() == one.bytes);
         GiFile file;
         CHECK(read_gi_file(a, file, error) && file.settings == gi_settings_text(request.settings));
-        CHECK(file.find(gi_format::placement) && file.find(gi_format::lightmaps) && file.find(gi_format::vertices) &&
-              file.find(gi_format::probes) && file.sections.size() == 4 && file.key.algorithm == 3);
+        // The default bake re-bakes the direct light (Gate G): DIR after LMAP.
+        CHECK(file.find(gi_format::placement) && file.find(gi_format::lightmaps) && file.find(gi_format::direct) &&
+              file.find(gi_format::vertices) && file.find(gi_format::probes) && file.sections.size() == 5 &&
+              file.key.algorithm == 3 && file.settings.ends_with("\ndirect rebaked\n"));
         // Lot G9: one PROB entry per PLAC probe, every SubwayA probe valid.
         {
             GiLightLattice baked_lattice;
@@ -728,6 +735,7 @@ namespace
         GiBakeRequest request;
         request.world = path;
         CHECK(make_gi_bake_settings("preview", 0, 0, -1, request.settings, error));
+        request.settings.direct = GiDirectSource::Original;
         request.placement_dir = scratch / "placement";
         request.jobs = 2;
         request.out_dir = scratch / "original";

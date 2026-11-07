@@ -29,7 +29,8 @@ namespace OpenBlood2
         constexpr std::uint32_t max_sky = 400; // Hundredths.
         constexpr unsigned max_jobs = 256;
     } // namespace gi_bake_settings_limits
-    // The direct light the bake composes and bounces on lightmapped faces (lot GD2, decision D17).
+    // The direct light the bake composes and bounces on lightmapped faces (lot GD2, decision D17);
+    // re-baked by default since Gate G (2026-11-07).
     enum class GiDirectSource : std::uint8_t
     {
         Original, // D = O - A_eff, the stored 1998 texel without its ambient fill.
@@ -40,7 +41,7 @@ namespace OpenBlood2
         GiQuality quality = GiQuality::Final;
         std::uint32_t bounces = 2, rays = 256;
         std::uint32_t sky = 100; // Decision D9's sky scale, in hundredths.
-        GiDirectSource direct = GiDirectSource::Original;
+        GiDirectSource direct = GiDirectSource::Rebaked;
     };
     const char* gi_quality_name(GiQuality);
     const char* gi_direct_source_name(GiDirectSource); // "original", "rebaked".
