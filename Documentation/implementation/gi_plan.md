@@ -18,7 +18,8 @@ and the Light probes world source) is implemented on 2026-11-07 (`gi_algorithm_v
 G10 (the F8 bake as a child process with hot reload) the same day. Also on 2026-11-07, after
 seeing that GI at k = 0 shows exactly the original lightmaps (D1 (a) by design), the user asked to
 plan D1 (c): the [re-baked direct light](#re-baked-direct-light-d1-c), lots GD1–GD3 with
-decisions D16–D20. They are proposed and not implemented.
+decisions D16–D20, which the user accepted as recommended the same day. Nothing is implemented yet;
+GD1 is next.
 
 ## The request
 
@@ -162,7 +163,7 @@ Its donor commit is `00fc3b28663883155ef277afcaf3e389d5dad07f`.
 ## Re-baked direct light (D1 c)
 
 Requested on 2026-11-07, after the user saw that GI at k = 0 shows exactly the original
-lightmaps. Proposed, not implemented; decisions D16–D20 await the user.
+lightmaps. Decisions D16–D20 were accepted as recommended the same day; not implemented.
 
 **What changes.** Today a lightmapped texel composes `D + max(k·E, f·A_eff)` with the original
 direct term D = O − A_eff. With D1 (c) the bake also computes the direct light D′ of every LMAP
@@ -473,9 +474,9 @@ baked data and generated artifacts.
 | D14 | Where does the work sit in the roadmap? | (a) a new M10, "Baked GI and probes", taken from the "Rendering extras" row under Later; (b) left under Later. | **(a)** |
 | D15 | Fix the case-sensitive AmbientLight read? | (a) GI reads it case-insensitively and the original renderer is unchanged; (b) also fix the original renderer (lot GA). | **(a)**, with GA as a separate approval. |
 
-Decisions for D1 (c), proposed on 2026-11-07 and awaiting the user:
+Decisions for D1 (c), proposed and accepted on 2026-11-07:
 
-| # | Question | Options | Recommendation |
+| # | Question | Options | Recommendation (accepted 2026-11-07) |
 | --- | --- | --- | --- |
 | D16 | Which direct term does the re-bake use? | (a) the measured original term: no N·L, linear falloff and cone, hard ClipLight shadows; (b) add Lambert N·L; (c) inverse-square falloff with N·L. | **(a)**: k = 0 stays close to the 1998 look; (b) and (c) change every level. |
 | D17 | How is the direct source chosen? | (a) a bake setting (`original` or `rebaked`): one file per world, probes consistent with it; (b) both sources in one file with a runtime switch (two bounce sets, about 3× the LMAP payload). | **(a)**; the A/B uses the Original view, and a Preview rebake takes seconds. |
