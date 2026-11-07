@@ -59,7 +59,7 @@ active fields, released play keys, the refused 27889 gameplay port, UTF-8-safe h
 names and the dedicated server's `--no-lan`.
 
 The [GI plan](Documentation/implementation/gi_plan.md) (M10, [contracts](Documentation/contracts/gi_contracts.md))
-has lots G1–G9: world queries, the `.ob2gi` file and keys, the F8 overlay, probe placement
+has lots G1–G10: world queries, the `.ob2gi` file and keys, the F8 overlay, probe placement
 (`--gi-place`, canonical `data/gi/placement/<world>.json` format 2, F8 editing), the bake
 scene/tracer (`--bake-gi`), `tools/gi/bake_all.py` with build packaging of `data/gi/baked`
 (`BLOOD2_PACKAGE_GI`, `gi/` beside the binary, `Resources/gi`, APK `assets/gi`) and the lightmap
@@ -77,7 +77,12 @@ and the sky, and lights models from them: validity-weighted trilinear samples ca
 ambient max(a, f A) with A the case-sensitive AmbientLight, and one dominant-direction pseudo-light
 in the top four; F8 offers the Light probes world source, p and Show baked SH samples. Preserve the
 exact model identity (invalid or zero probes at f = 1, switch off, p = 0, Original/Direct views),
-thread-independent capture and the single-level lattice.
+thread-independent capture and the single-level lattice. G10's F8 Bake panel runs this binary's
+`--bake-gi` as a child process (`GiBakeProcess`: content arguments, `user_directory()/gi`, jobs =
+threads − 2, non-blocking polls each draw, SIGTERM cancel exiting 12, forced on Windows), saves an
+edited placement first, edits `excluded_models` and reloads a finished file at the next frame only
+for the same world and DAT digest. Preserve no threads in the game, CLI-identical bytes, the
+bounded output lines and stopping the child at quit (`stop_bake`, the destructor).
 Preserve the D1 units (pages ×2 Saturate, vertex light not, the exact E = 0/f = 1 identity
 of `gi_compose`), D-only re-emission, edge-inset samples, the 10 % back-face validity on the
 first trace and SkyPointer targets as Sky ranges.

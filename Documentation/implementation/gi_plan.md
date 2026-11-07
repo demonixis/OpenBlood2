@@ -2,11 +2,11 @@
 
 Drafted 2026-11-06 at `55c640b6`. Nothing is implemented yet. On 2026-11-06
 the user accepted every recommendation in the [decisions](#decisions) table
-(D1–D15) and the defaults. Lots G1 to G9 are done
+(D1–D15) and the defaults. Lots G1 to G10 are done
 ([G1 report](reports/gi_g1_prerequisites.md), [G2 report](reports/gi_g2_file_format.md),
 [G3 report](reports/gi_g3_f8_shell.md), [G4 report](reports/gi_g4_placement.md),
 [G5 report](reports/gi_g5_tracer.md), [G6 report](reports/gi_g6_packaging.md),
-[G7 report](reports/gi_g7_lightmaps.md), [G8 report](reports/gi_g8_world_override.md), [G9 report](reports/gi_g9_light_probes.md)). On 2026-11-06 the user accepted Gate A as recommended
+[G7 report](reports/gi_g7_lightmaps.md), [G8 report](reports/gi_g8_world_override.md), [G9 report](reports/gi_g9_light_probes.md), [G10 report](reports/gi_g10_in_game_bake.md)). On 2026-11-06 the user accepted Gate A as recommended
 (spacing 128, budget 16,384, cap 42, rooms 192×96, the two-level lattice decided in G9: it stays
 single-level, see the [G9 contracts](../contracts/gi_contracts.md#lattice)) and the
 36 single-player placement files are committed in `data/gi/placement` (format 2 since G5, with
@@ -14,7 +14,8 @@ single-level, see the [G9 contracts](../contracts/gi_contracts.md#lattice)) and 
 the raw bake) with the intensity raised to **k = 2**; f = 1, the Final preset (2 bounces, 256
 rays) and sky scale 1.0 stay. G8 (world override) is implemented on 2026-11-07; Gate C (look in
 game, and whether GI becomes a player option) awaits the user's A/B. G9 (light probes for models
-and the Light probes world source) is implemented on 2026-11-07 (`gi_algorithm_version` 3).
+and the Light probes world source) is implemented on 2026-11-07 (`gi_algorithm_version` 3), and
+G10 (the F8 bake as a child process with hot reload) the same day.
 
 ## The request
 

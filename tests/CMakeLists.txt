@@ -1051,17 +1051,27 @@ if(Python3_Interpreter_FOUND AND NOT WIN32)
 endif()
 
 if(BLOOD2_BUILD_CLIENT AND BLOOD2_GI_TOOLS)
-    add_executable(gi_overlay_tests gi_overlay_tests.cpp ../src/app/gi_overlay.cpp)
+    add_executable(gi_overlay_tests gi_overlay_tests.cpp ../src/app/gi_overlay.cpp ../src/app/gi_bake_process.cpp)
     target_link_libraries(gi_overlay_tests PRIVATE blood2_game imgui)
     blood2_project_options(gi_overlay_tests)
     foreach(case IN ITEMS cell draw)
         add_test(NAME gi_overlay.${case} COMMAND gi_overlay_tests "${case}")
         set_tests_properties(gi_overlay.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 30)
     endforeach()
+    # Lot G10: the F8 bake's child process; this executable is also the stub child and fake baker.
+    add_executable(gi_bake_process_tests gi_bake_process_tests.cpp ../src/app/gi_bake_process.cpp)
+    target_link_libraries(gi_bake_process_tests PRIVATE blood2_game)
+    blood2_project_options(gi_bake_process_tests)
+    add_test(NAME gi_bake_process.parse COMMAND gi_bake_process_tests parse)
+    add_test(NAME gi_bake_process.process COMMAND gi_bake_process_tests process
+             "${CMAKE_CURRENT_BINARY_DIR}/gi-bake-process")
+    set_tests_properties(gi_bake_process.parse gi_bake_process.process PROPERTIES LABELS "headless;gi" TIMEOUT 60)
     if(BLOOD2_TEST_DATA_DIR)
+        # The F8 bake through the fake baker, then this build's blood2 (Preview bake and Final cancel).
         add_test(NAME gi_overlay.retail COMMAND gi_overlay_tests retail "${BLOOD2_TEST_DATA_DIR}"
-                                                "${CMAKE_CURRENT_BINARY_DIR}/gi-overlay-retail")
-        set_tests_properties(gi_overlay.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 120)
+                                                "${CMAKE_CURRENT_BINARY_DIR}/gi-overlay-retail"
+                                                $<TARGET_FILE:gi_bake_process_tests> $<TARGET_FILE:blood2_app>)
+        set_tests_properties(gi_overlay.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
     endif()
 endif()
 

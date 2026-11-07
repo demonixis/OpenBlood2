@@ -340,7 +340,7 @@ while it is closed, and no GI is applied by it.
 
 Panels use CyberEngine's vocabulary: Status, Runtime, Light probes, Reflection probes, Bake.
 Status works since G3, the two probe panels since [G4](#f8-placement-editing) and Runtime since
-[G8](#f8-runtime-panel); Bake names the lot that brings it (G10).
+[G8](#f8-runtime-panel) and Bake since [G10](#in-game-bake-lot-g10).
 
 **Status** shows, truthfully:
 - the summary: no world, error, no baked file, a stale file with its reasons, a refused/foreign
@@ -451,8 +451,8 @@ One canonical JSON file per world, `<normalized world path without .dat>.json` (
   each 1–128 bytes of printable ASCII without `"` or `\`, unique ignoring case.
 - **Versions:** the writer emits version 2. The reader also accepts version 1, which has no
   `excluded_models` key (read as empty); a version 2 file must have it. Lot G5 added it
-  (decision D8); the light-probe lattice ignores it, and its F8 editing arrives with the G10 Bake
-  panel.
+  (decision D8); the light-probe lattice ignores it, and the G10 Bake panel edits it
+  ([Excluded models](#bake-panel)).
 - **Statuses** (`load_gi_placement`): Missing (no file), Ready, Foreign (valid but made for
   another world path or DAT digest; the detail names it) and Failed (unreadable or invalid).
   A Foreign or Failed file is never replaced implicitly.
@@ -1380,3 +1380,95 @@ probe source. **`world_lighting.retail`** Zero probes leave every model light id
 probes raise ambients and are reused. **`gpu.gi`** Zero probes leave models and the probe source
 byte-identical; nonzero probes change the models only, and the switch, p = 0 and the Original view
 restore the frame. **`config.gi`**, **`gi_overlay.draw`** The options and panels.
+
+## In-game bake (lot G10)
+
+The F8 **Bake** panel bakes the current world with this binary's `--bake-gi` in a child process
+(decision 10, D6): `app/gi_bake_process.{h,cpp}` (`GiBakeProcess`) and `GiTools::start_bake`,
+`update_bake` and `bake_panel`. The file equals the CLI's by construction (same code, and the bytes
+do not depend on the job count, G5); the game process gains no threads. Desktop GI tool builds only
+(`BLOOD2_GI_TOOLS`), never in XR, like the rest of F8.
+
+### Child process
+
+- **Executable:** the running one (`gi_executable_path`: `_NSGetExecutablePath` on Apple,
+  `GetModuleFileNameW` on Windows, `/proc/self/exe` elsewhere); tests set `bake_executable`.
+- **Arguments** (`gi_bake_arguments`): `--bake-gi <world path> --gi-quality final|preview`, the
+  game's content (`--data-dir`, `--demo`, `--nightmares`, every `--rez` in order), the overlay's
+  placement directory (`--gi-placement-dir`), `--gi-out user_directory()/gi` and `--gi-jobs`
+  (hardware threads − 2, at least 1, leaving the game its frame and audio threads).
+- **I/O** (`SDL_CreateProcessWithProperties`): stdin null, stdout piped, stderr merged into it. The
+  overlay polls at every draw (each frame, also while Closed or Pinned): one non-blocking read of
+  what the child printed, then `SDL_WaitProcess(…, false)`. Lines split on LF (a trailing CR is
+  dropped); the last 64 are kept, each cut at 4,096 bytes; a final line without LF counts when the
+  child exits.
+- **Progress:** `GI_PROGRESS stage=<stage> done=N total=M`, the stage possibly holding a space
+  (`bounce 1/2`); refused lines (done > total, missing or non-numeric fields) leave the last
+  progress. The overall fraction is survey 5 %, the bounces 90 % in equal parts, the probes 5 %
+  (0 before the first line: mounting, scene, sky, receivers); the ETA is elapsed × (1 − f)/f once
+  f ≥ 2 %.
+- **Result:** `GI_RESULT key=value …`; a value runs to the next ` key=` (paths may hold spaces),
+  except a value starting with a quote, a JSON string (the child's `error=`) read to its closing
+  quote and decoded (`\uXXXX` as UTF-8, a lone surrogate as U+FFFD). A malformed line is ignored.
+- **States:** Idle, Running, Finished (exited by itself: 0 baked or current, 2/4/5 failures, the
+  `error=` field kept), Cancelled (after `cancel` or `stop`, whatever the code), Failed (could not
+  start, or killed by a signal nobody requested). A finished process starts again with fresh state;
+  a second start while one runs is refused.
+- **Cancel:** `SDL_KillProcess(…, false)`, SIGTERM: the bake's handler (G5) stops it at the next
+  job; it exits 12 and writes nothing. On Windows SDL's graceful kill only posts WM_CLOSE, which a
+  console child never reads, so cancel forces the kill there (the file is written atomically at the
+  very end, so no partial `.ob2gi` remains).
+- **Stop** (quit, destruction): cancel, then poll every 5 ms for up to 5 s, then a forced kill and a
+  blocking wait. The frontend calls `stop_bake` after its main loop; `GiBakeProcess`'s destructor
+  stops a child on every other exit path. No child outlives the game.
+
+### Bake panel
+
+- **Quality:** Final (2 bounces, 256 rays) or Preview (1 bounce, 64 rays), the CLI presets.
+- **Excluded models:** the current world's named world models (index ≥ 1); a checkbox adds or
+  removes the name (case-insensitive) in the placement's `excluded_models` after
+  `validate_gi_placement`, marking the placement dirty.
+- **Suspend scene rendering during bake:** while the child runs, the frame skips the world record
+  and clears to black; the simulation, audio and UI continue. Off by default, not saved.
+- **Bake** saves a dirty placement first (the child reads the file), then starts the child. It
+  refuses, with the reason as the notice: no world, a bake already running, content keys
+  unavailable, the placement not loaded for this world, a failed save, a Foreign or Failed
+  placement (Reset or fix it first), no user directory, no executable path, or a failed start.
+- **Cancel**, a progress bar (stage, fraction, elapsed, ETA), the last outcome, the expected file,
+  **Copy to project data/gi** (GI tool builds of a checkout, `gi_project_directory`: the file goes
+  to `data/gi/baked` with its path below the output folder) and the last output lines.
+- The Pinned strip shows `Baking <world>: N%`.
+
+### Hot reload
+
+- When the child finishes with exit 0 and `status=baked` or `current`, the overlay compares the
+  session's world with the one it started for: same path and the same DAT digest
+  (`gi_expectation`). Then it increments the presenter's reload counter at that draw; the presenter
+  looks the file up at its next update, the start of the following frame (the G8 lookup: whole
+  file after the section checks, or nothing). The swap is therefore at a frame boundary.
+- Another world (NEW_LEVEL, a load) keeps the file for its own world: the notice says it applies
+  when that world loads, through the ordinary lookup.
+- Every outcome sets the notice and one log line: `<world> <status> (exit N) in S s; frames during
+  the bake: N frames, mean M ms, max X ms` (draw-to-draw intervals while the child ran), plus the
+  child's error. Status re-reads the folders.
+
+### Cost
+
+- `02_CityHub`, `--bench --bench-sweep --gi` (1920×1080, 1,200 frames, Apple M5) alone and during
+  an 8-job bake of the same world (`--gi-jobs 8`, as F8 on 10 threads): frame mean 2.37 → 3.69 ms,
+  p95 2.47 → 4.10 ms, GPU completion wait 0.77 → 1.88 ms (the shared power budget), simulation
+  1.21 → 1.38 ms. A poll is one non-blocking read and one non-blocking wait.
+- An F8 Preview bake of `01_SubwayA` takes 0.5 s.
+
+### Tests
+
+**`gi_bake_process.parse`** Progress and result parsing (spaces, JSON escapes, refusals), the
+fraction, the arguments, the state names, an idle process. **`gi_bake_process.process`** This
+executable as the child: exit 0 with merged stderr, bounded and cut lines, a final line without LF;
+exit 4 with the decoded error; restart with fresh state; a missing executable; on POSIX a graceful
+cancel (exit 12), a child ignoring SIGTERM killed after the stop timeout, and the destructor reaping
+a running child. **`gi_overlay.draw`** No world: nothing starts. **`gi_overlay.retail`** A fake
+baker checks the child's arguments, the reload hand-off, suspension, cancel, quit and a world
+change during a bake; then this build's `blood2` bakes `01_SubwayA` Preview from F8 (frame times
+printed), the lookup chooses its file, its bytes equal an in-process bake with another job count,
+and a cancelled Final exits 12 and leaves that file unchanged.

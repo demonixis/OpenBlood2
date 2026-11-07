@@ -1,12 +1,19 @@
-// GI lots G3/G4: the F8 overlay's gizmos, status lookup, placement editing and headless ImGui drawing
-// (gi_contracts.md).
+// GI lots G3/G4/G8/G9/G10: the F8 overlay's gizmos, status lookup, placement editing, runtime panels,
+// the F8 bake (a fake baker, then this build's blood2) and headless ImGui drawing (gi_contracts.md).
 #include "app/gi_overlay.h"
 #include "app/model_lighting.h"
 #include "engine/config.h"
+#include "engine/gi_bake.h"
+#include "engine/user_directory.h"
 #include "game/server_adapter.h"
 #include "scratch_dir.h"
 #include <imgui.h>
+#include <cctype>
+#include <chrono>
+#include <fstream>
 #include <iostream>
+#include <iterator>
+#include <thread>
 
 using namespace OpenBlood2;
 
@@ -85,6 +92,9 @@ namespace
         frame.run([&] { closed = tools.draw(input, game, config, gizmos); });
         CHECK(!closed && gizmos.empty() && ImGui::GetDrawData()->TotalVtxCount > 0);
         CHECK(tools.summary() == "no world" && tools.status().roots.front().source == "user");
+        // The F8 bake (lot G10) needs a world; nothing starts.
+        CHECK(!tools.start_bake(game, config) && tools.bake.notice == "No world loaded.");
+        CHECK(tools.bake.process.state == GiBakeProcess::State::Idle && !tools.suspend_scene());
         input.gi = GiOverlay::Pinned;
         for (int i = 0; i < 2; ++i) // Auto-sized windows are measured, hidden, on their first frame.
             frame.run([&] { closed = tools.draw(input, game, config, gizmos); });
@@ -263,11 +273,185 @@ namespace
         return true;
     }
 
+
+    // Draws the overlay every `frame_ms` (the game's per-frame poll) until `until` holds.
+    template <class Until>
+    bool run_until(GiTools& tools, GameSession& game, const Config& config, MenuInput& input,
+                   const GiRuntimeLink& link, int timeout_ms, int frame_ms, Until until)
+    {
+        std::vector<LineVertex> lines;
+        Frame frame;
+        const auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(timeout_ms);
+        while (std::chrono::steady_clock::now() < end)
+        {
+            frame.run([&] { tools.draw(input, game, config, lines, link); });
+            if (until())
+                return true;
+            std::this_thread::sleep_for(std::chrono::milliseconds(frame_ms));
+        }
+        return false;
+    }
+    bool same_bytes(const std::filesystem::path& a, const std::filesystem::path& b)
+    {
+        std::ifstream fa(a, std::ios::binary), fb(b, std::ios::binary);
+        const std::vector<char> va{std::istreambuf_iterator<char>(fa), {}}, vb{std::istreambuf_iterator<char>(fb), {}};
+        return fa.good() == fb.good() && !va.empty() && va == vb;
+    }
+
+    // Private, after `placement` (lot G10): the F8 bake of 01_SubwayA. The fake baker checks the child's
+    // arguments, the reload hand-off, cancel, a world change (NEW_LEVEL) and quit during a bake; then
+    // this build's blood2 bakes Preview (frame times logged), its bytes equal an in-process bake, and a
+    // cancelled Final exits 12 without touching the file.
+    bool bake(GameSession& game, Config& config, const std::filesystem::path& scratch,
+              const std::filesystem::path& stub, const std::filesystem::path& blood2)
+    {
+        config.gi_dir.clear(); // The lookup below searches the user directory first.
+        std::filesystem::path out;
+        std::string error;
+        CHECK(user_directory(out, error));
+        out /= "gi";
+        GiTools tools;
+        tools.refresh(game, config);
+        CHECK(tools.placement().status == GiPlacementStatus::Ready);
+        bool enabled = true;
+        GiComposition composition;
+        std::uint64_t reload = 0;
+        GiRuntimeStatus runtime;
+        const GiRuntimeLink link{&enabled, &composition, &reload, &runtime, nullptr, 0};
+        MenuInput input;
+        input.gi = GiOverlay::Open;
+        tools.select = GiTools::Panel::Bake;
+        const auto running = [&] { return tools.bake.process.running(); };
+        const auto done = [&] { return !running(); };
+        const auto progressed = [&] { return !tools.bake.process.progress.stage.empty() || !running(); };
+        using State = GiBakeProcess::State;
+
+        CHECK(tools.bake.process.state == State::Idle && !tools.suspend_scene());
+
+        // Excluded models (case-insensitive, validated); Bake saves the edited placement first.
+        std::string model;
+        for (std::size_t m = 1; m < game.world.models.size() && model.empty(); ++m)
+            model = game.world.models[m].name;
+        const auto& placed = tools.placement();
+        const auto excluded = placed.edit->excluded_models;
+        CHECK(!model.empty() && tools.exclude_model(model, true) && placed.dirty);
+        CHECK(placed.edit->excluded_models.size() == excluded.size() + 1);
+        auto lower = model;
+        for (auto& c : lower)
+            c = char(std::tolower(static_cast<unsigned char>(c)));
+        CHECK(tools.exclude_model(lower, true) && placed.edit->excluded_models.size() == excluded.size() + 1);
+        CHECK(!tools.exclude_model("bad\"name", true) && placed.edit->excluded_models.size() == excluded.size() + 1);
+        CHECK(placed.detail.rfind("Not excluded: ", 0) == 0);
+        CHECK(tools.exclude_model(lower, false) && placed.edit->excluded_models == excluded && placed.dirty);
+
+        // The fake baker (Preview): the child's arguments, the reload at the next frame.
+        tools.bake_executable = stub;
+        tools.bake.final_quality = false;
+        tools.bake.suspend_scene = true;
+        CHECK(tools.start_bake(game, config) && running() && tools.suspend_scene() && !placed.dirty);
+        CHECK(!tools.start_bake(game, config) && tools.bake.notice == "A bake is already running.");
+        CHECK(run_until(tools, game, config, input, link, 20000, 16, done));
+        CHECK(tools.bake.process.state == State::Finished && tools.bake.process.exit_code == 0);
+        CHECK(reload == 1 && tools.bake.reloaded && !tools.bake.reload_pending && !tools.suspend_scene());
+        CHECK(tools.bake.notice.rfind("worlds/01_subwaya.dat baked (exit 0) in ", 0) == 0);
+        CHECK(tools.bake.notice.find("; frames during the bake: ") != std::string::npos && tools.bake.frames > 0);
+        CHECK(tools.bake.out_dir == out && tools.bake.file.parent_path().parent_path() == out);
+        {
+            std::ifstream in(out / "args.txt");
+            std::vector<std::string> args;
+            for (std::string line; std::getline(in, line);)
+                args.push_back(line);
+            const unsigned threads = std::thread::hardware_concurrency();
+            CHECK(args == gi_bake_arguments(config, "worlds/01_subwaya.dat", "preview", config.gi_placement_dir, out,
+                                            threads > 2 ? threads - 2 : 1));
+        }
+
+        // Cancel (Final), with the Pinned strip drawn while it runs.
+        tools.bake.final_quality = true;
+        CHECK(tools.start_bake(game, config));
+        CHECK(run_until(tools, game, config, input, link, 20000, 16, progressed) && running());
+        input.gi = GiOverlay::Pinned;
+        CHECK(run_until(tools, game, config, input, link, 1000, 0, [] { return true; }));
+        CHECK(ImGui::GetCurrentContext() == nullptr); // run_until owns its context.
+        input.gi = GiOverlay::Open;
+        tools.cancel_bake();
+        CHECK(run_until(tools, game, config, input, link, 20000, 16, done));
+        CHECK(tools.bake.process.state == State::Cancelled && tools.bake.process.exit_code == 12 && reload == 1);
+        CHECK(tools.bake.notice.find(" cancelled (exit 12)") != std::string::npos);
+
+        // Quit during a bake: stop_bake cancels and waits.
+        CHECK(tools.start_bake(game, config));
+        CHECK(run_until(tools, game, config, input, link, 20000, 16, progressed) && running());
+        tools.stop_bake();
+        CHECK(tools.bake.process.state == State::Cancelled && !running());
+
+        if (!blood2.empty())
+        {
+            // This build's blood2: an F8 Preview bake of 01_SubwayA at about 60 draws per second.
+            tools.bake_executable = blood2;
+            tools.bake.final_quality = false;
+            tools.bake.suspend_scene = false;
+            CHECK(tools.start_bake(game, config));
+            CHECK(run_until(tools, game, config, input, link, 300000, 16, done));
+            const auto& p = tools.bake.process;
+            std::cout << "F8 bake: " << tools.bake.notice << '\n';
+            CHECK(p.state == State::Finished && p.exit_code == 0 && p.result.at("status") == "baked");
+            CHECK(p.progress.stage == "probes" && p.progress.done == p.progress.total && p.progress.total == 1031);
+            CHECK(p.result.at("file") == path_text(tools.bake.file) && std::filesystem::is_regular_file(tools.bake.file));
+            CHECK(reload == 2 && tools.bake.reloaded && tools.bake.frames > 0);
+            tools.refresh(game, config);
+            const auto& lookup = tools.status().lookup;
+            CHECK(lookup.chosen >= 0 && lookup.candidates[lookup.chosen].path == path_text(tools.bake.file));
+
+            // The same bytes as an in-process bake (another job count).
+            GiBakeRequest request;
+            request.world = game.world_path;
+            CHECK(make_gi_bake_settings("preview", 0, 0, -1, request.settings, error));
+            request.placement_dir = config.gi_placement_dir;
+            request.out_dir = scratch / "in-process";
+            request.jobs = 3;
+            const auto local = bake_gi_world(game.resources, request);
+            CHECK(local.exit_code == 0 && same_bytes(local.file, tools.bake.file));
+
+            // A cancelled Final exits 12 and leaves the Preview file as it was.
+            tools.bake.final_quality = true;
+            CHECK(tools.start_bake(game, config));
+            CHECK(run_until(tools, game, config, input, link, 300000, 16, progressed) && running());
+            tools.cancel_bake();
+            CHECK(run_until(tools, game, config, input, link, 60000, 16, done));
+            std::cout << "F8 cancel: " << tools.bake.notice << '\n';
+            CHECK(p.state == State::Cancelled && p.exit_code == 12 && reload == 2);
+            CHECK(same_bytes(local.file, tools.bake.file));
+        }
+
+        // NEW_LEVEL during a bake (last: it changes the session's world): the result is kept for its
+        // own world and not reloaded into the new one.
+        tools.bake_executable = stub;
+        tools.bake.final_quality = true;
+        const auto before = reload;
+        CHECK(tools.start_bake(game, config));
+        CHECK(run_until(tools, game, config, input, link, 20000, 16, progressed) && running());
+        CHECK(game.request_world("02_CityHub", error) && game.world_path == "worlds/02_cityhub.dat");
+        CHECK(run_until(tools, game, config, input, link, 20000, 16, done));
+        CHECK(tools.bake.process.state == State::Finished && reload == before && !tools.bake.reload_pending);
+        CHECK(tools.bake.notice.find("the world changed, so it applies when that world loads") != std::string::npos);
+
+        std::vector<LineVertex> lines;
+        Frame frame;
+        frame.run([&] { tools.draw(input, game, config, lines); }); // Drops the link to these locals.
+        return Testing::remove_scratch_dir(out);
+    }
+
     // Private: 01_SubwayA's status follows the --gi-dir folder (missing, stale, ready), and the
     // Open window draws its status table.
-    bool retail(const std::filesystem::path& data, const std::filesystem::path& scratch)
+    bool retail(const std::filesystem::path& data, const std::filesystem::path& scratch,
+                const std::filesystem::path& stub, const std::filesystem::path& blood2)
     {
         CHECK(Testing::reset_scratch_dir(scratch));
+        // The test's own user directory (CTest): an earlier F8 bake left a Ready file in its gi folder.
+        std::filesystem::path user_gi;
+        std::string user_error;
+        CHECK(user_directory(user_gi, user_error) && Testing::reset_scratch_dir(user_gi / "gi"));
         Config config;
         config.data_dir = data;
         config.gi_dir = scratch;
@@ -326,7 +510,8 @@ namespace
             CHECK(ImGui::GetDrawData()->TotalVtxCount > 0);
         }
         CHECK(gizmos.empty()); // No player: no camera, no cell.
-        return placement(game, config, scratch) && Testing::remove_scratch_dir(scratch);
+        return placement(game, config, scratch) && (stub.empty() || bake(game, config, scratch, stub, blood2)) &&
+               Testing::remove_scratch_dir(scratch);
     }
 } // namespace
 
@@ -340,8 +525,9 @@ int main(int argc, char** argv)
         ok = cell();
     else if (name == "draw")
         ok = draw();
-    else if (name == "retail" && argc == 4)
-        ok = retail(path_from_utf8(argv[2]), path_from_utf8(argv[3]));
+    else if (name == "retail" && (argc == 4 || argc == 6))
+        ok = retail(path_from_utf8(argv[2]), path_from_utf8(argv[3]), argc == 6 ? path_from_utf8(argv[4]) : "",
+                    argc == 6 ? path_from_utf8(argv[5]) : "");
     else
         return 2;
     return ok ? 0 : 1;

@@ -2376,3 +2376,13 @@ the same constants and served as a reference only (decision D13). The Fibonacci 
 quaternion rotation by rejection, the binary16 codec (IEEE 754-2008), the PROB format, the trilinear
 field and the ambient/pseudo-light split are written for this project from the
 [GI plan](gi_plan.md). See [contracts](../contracts/gi_contracts.md#light-probes-lot-g9).
+
+## GI in-game bake (lot G10, 2026-11-07)
+
+No code is imported. The child process uses SDL 3's process API (`SDL_CreateProcessWithProperties`,
+`SDL_KillProcess`, `SDL_WaitProcess`) from the pinned SDL; the executable lookups are the platform
+calls (`_NSGetExecutablePath`, `GetModuleFileNameW`, `/proc/self/exe`). CyberEngine's
+`BakeExecutor` (`../CyberEngine`) was a reference only (decision D13) for the panel vocabulary
+(Bake, Cancel, progress); decision D6 replaced its in-process threads with a child process. The
+GI_PROGRESS/GI_RESULT parsers, the Bake panel and the reload hand-off are written for this project
+from the [GI plan](gi_plan.md). See [contracts](../contracts/gi_contracts.md#in-game-bake-lot-g10).

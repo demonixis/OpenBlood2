@@ -596,6 +596,22 @@ namespace OpenBlood2
         return true;
     }
 
+    bool gi_project_directory(std::filesystem::path& directory)
+    {
+#ifdef BLOOD2_GI_PROJECT_DIR
+        // GI tool builds: the checkout's committed data/gi folder, when it exists (decision 8).
+        std::error_code ec;
+        const auto project = path_from_utf8(BLOOD2_GI_PROJECT_DIR);
+        if (std::filesystem::is_directory(project, ec))
+        {
+            directory = project;
+            return true;
+        }
+#endif
+        (void)directory;
+        return false;
+    }
+
     bool gi_placement_directory(const std::filesystem::path& configured, std::filesystem::path& directory,
                                 std::string& error)
     {
@@ -604,16 +620,12 @@ namespace OpenBlood2
             directory = configured;
             return true;
         }
-#ifdef BLOOD2_GI_PROJECT_DIR
-        // GI tool builds: the checkout's committed data/gi folder, when it exists (decision 8).
-        std::error_code ec;
-        const auto project = path_from_utf8(BLOOD2_GI_PROJECT_DIR);
-        if (std::filesystem::is_directory(project, ec))
+        std::filesystem::path project;
+        if (gi_project_directory(project))
         {
             directory = project / "placement";
             return true;
         }
-#endif
         std::filesystem::path user;
         if (!user_directory(user, error))
             return false;

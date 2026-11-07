@@ -1,12 +1,16 @@
 #include "app/gi_overlay.h"
 #include "app/model_lighting.h"
 #include "engine/gi_world.h"
+#include "engine/user_directory.h"
 #include "game/server_adapter.h"
+#include <SDL3/SDL.h>
 #include <imgui.h>
 #include <algorithm>
+#include <cctype>
 #include <chrono>
 #include <cmath>
 #include <cstdio>
+#include <thread>
 
 namespace OpenBlood2
 {
@@ -47,10 +51,6 @@ namespace OpenBlood2
             }
         }
         constexpr ImVec4 error_color{.95f, .4f, .35f, 1};
-        void unavailable(const char* lot, const char* what)
-        {
-            ImGui::TextDisabled("Not available yet: %s arrives with lot %s.", what, lot);
-        }
         void cross(std::vector<LineVertex>& out, DVector p, float r, const Color& color)
         {
             add_line(out, {p.x - r, p.y, p.z}, {p.x + r, p.y, p.z}, color);
@@ -1061,11 +1061,275 @@ namespace OpenBlood2
         }
     }
 
+    void GiTools::update_bake(const GameSession& game)
+    {
+        auto& b = bake;
+        const bool was_running = b.process.running();
+        if (was_running)
+        {
+            const auto now = SDL_GetTicksNS();
+            if (b.last_frame_ns)
+            {
+                const double ms = double(now - b.last_frame_ns) / 1e6;
+                ++b.frames;
+                b.frame_sum_ms += ms;
+                b.frame_max_ms = std::max(b.frame_max_ms, ms);
+            }
+            b.last_frame_ns = now;
+            b.process.poll();
+        }
+        if (was_running && !b.process.running())
+        {
+            const auto& p = b.process;
+            const auto found = p.result.find("status");
+            const std::string status = found != p.result.end() ? found->second : std::string();
+            const bool ok = p.state == GiBakeProcess::State::Finished && p.exit_code == 0 &&
+                            (status == "baked" || status == "current");
+            char frames[192];
+            std::snprintf(frames, sizeof frames, "%llu frames, mean %.2f ms, max %.2f ms",
+                          static_cast<unsigned long long>(b.frames), b.frames ? b.frame_sum_ms / b.frames : 0.0,
+                          b.frame_max_ms);
+            char head[256];
+            std::snprintf(head, sizeof head, "%s %s (exit %d) in %.1f s", b.world.c_str(),
+                          ok ? status.c_str() : gi_bake_state_name(p.state), p.exit_code, p.elapsed_s());
+            b.notice = std::string(head) + "; frames during the bake: " + frames;
+            if (!ok && !p.error.empty())
+                b.notice += "; " + p.error;
+            if (ok)
+            {
+                // Decision 10: reload only for the DAT it was baked from.
+                GiExpectation expected;
+                std::string error;
+                if (game.world_path == b.world && gi_expectation(game.resources, game.world_path, expected, error) &&
+                    expected.world == b.world_digest)
+                    b.reload_pending = true;
+                else
+                    b.notice += "; the world changed, so it applies when that world loads";
+                stale_ = true; // Status re-reads the folders.
+            }
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "GI bake %s", b.notice.c_str());
+        }
+        if (b.reload_pending && runtime_.reload)
+        {
+            ++*runtime_.reload; // The presenter looks it up at the start of the next frame.
+            b.reload_pending = false;
+            b.reloaded = true;
+        }
+    }
+
+    bool GiTools::start_bake(const GameSession& game, const Config& config)
+    {
+        auto& b = bake;
+        if (b.process.running())
+            return b.notice = "A bake is already running.", false;
+        if (game.world_path.empty() || game.world.models.empty())
+            return b.notice = "No world loaded.", false;
+        GiExpectation expected;
+        std::string error;
+        if (!gi_expectation(game.resources, game.world_path, expected, error))
+            return b.notice = "Not started: " + error, false;
+        auto& p = placement_;
+        if (placement_world_ != game.world_path || p.directory.empty())
+            return b.notice = "Not started: the placement is not loaded.", false;
+        if (p.edit && p.dirty && !save_placement())
+            return b.notice = "Not started: " + p.detail, false;
+        if (p.status == GiPlacementStatus::Foreign || p.status == GiPlacementStatus::Failed)
+            return b.notice = "Not started: the placement file is " +
+                              std::string(gi_placement_status_name(p.status)) + " (Reset or fix it first).",
+                   false;
+        std::filesystem::path out;
+        if (!user_directory(out, error))
+            return b.notice = "Not started: " + error, false;
+        out /= "gi";
+        std::string name;
+        gi_file_name(game.world_path, expected.world, name);
+        auto executable = bake_executable;
+        if (executable.empty() && !gi_executable_path(executable, error))
+            return b.notice = "Not started: " + error, false;
+        // The child leaves two hardware threads to the game (its frame and audio); the bytes do not
+        // depend on the job count.
+        const unsigned threads = std::thread::hardware_concurrency();
+        const auto args = gi_bake_arguments(config, game.world_path, b.final_quality ? "final" : "preview",
+                                            p.directory, out, threads > 2 ? threads - 2 : 1);
+        if (!b.process.start(executable, args, error))
+            return b.notice = error, false;
+        b.world = game.world_path;
+        b.world_digest = expected.world;
+        b.out_dir = out;
+        b.file = out / path_from_utf8(name);
+        b.notice.clear();
+        b.reload_pending = b.reloaded = false;
+        b.frames = b.last_frame_ns = 0;
+        b.frame_sum_ms = b.frame_max_ms = 0;
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "GI bake %s started (%s) into %s", b.world.c_str(),
+                    b.final_quality ? "final" : "preview", path_text(out).c_str());
+        return true;
+    }
+
+    void GiTools::cancel_bake()
+    {
+        bake.process.cancel();
+    }
+
+    void GiTools::stop_bake()
+    {
+        if (bake.process.running())
+        {
+            bake.process.stop();
+            SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "GI bake %s stopped (%s, exit %d)", bake.world.c_str(),
+                        gi_bake_state_name(bake.process.state), bake.process.exit_code);
+        }
+    }
+
+    bool GiTools::exclude_model(std::string_view name, bool excluded)
+    {
+        auto& p = placement_;
+        if (!p.edit || name.empty())
+            return false;
+        auto& list = p.edit->excluded_models;
+        const auto same = [&](const std::string& entry)
+        {
+            return entry.size() == name.size() &&
+                   std::equal(entry.begin(), entry.end(), name.begin(), [](char a, char b)
+                              { return std::tolower(static_cast<unsigned char>(a)) ==
+                                       std::tolower(static_cast<unsigned char>(b)); });
+        };
+        const auto found = std::find_if(list.begin(), list.end(), same);
+        if (excluded == (found != list.end()))
+            return true;
+        auto edited = *p.edit;
+        if (excluded)
+            edited.excluded_models.emplace_back(name);
+        else
+            edited.excluded_models.erase(edited.excluded_models.begin() + (found - list.begin()));
+        std::string error;
+        if (!validate_gi_placement(edited, error))
+        {
+            p.detail = "Not excluded: " + error;
+            return false;
+        }
+        *p.edit = std::move(edited);
+        p.dirty = true;
+        return true;
+    }
+
+    bool GiTools::copy_bake_to_project(std::string& error)
+    {
+        std::error_code ec;
+        std::filesystem::path project;
+        if (!gi_project_directory(project))
+            return error = "No project data/gi folder (GI tool builds of a checkout only)", false;
+        if (bake.file.empty() || !std::filesystem::is_regular_file(bake.file, ec))
+            return error = "No baked file to copy", false;
+        const auto relative = bake.file.lexically_relative(bake.out_dir);
+        if (relative.empty() || *relative.begin() == "..")
+            return error = "The baked file is outside its output folder", false;
+        const auto target = project / "baked" / relative;
+        std::filesystem::create_directories(target.parent_path(), ec);
+        if (ec || !std::filesystem::copy_file(bake.file, target, std::filesystem::copy_options::overwrite_existing, ec) ||
+            ec)
+            return error = "Copy failed: " + (ec ? ec.message() : std::string("unknown error")), false;
+        bake.notice = "Copied to " + path_text(target);
+        return true;
+    }
+
+    void GiTools::bake_panel(const GameSession& game, const Config& config)
+    {
+        auto& b = bake;
+        auto& p = b.process;
+        ImGui::TextWrapped("Bakes the current world with this binary's --bake-gi in a child process; the result "
+                           "goes to the user GI folder and is applied at a frame boundary when it finishes.");
+        ImGui::Text("World: %s", game.world_path.empty() ? "(none)" : game.world_path.c_str());
+        ImGui::Text("Placement: %s%s", gi_placement_status_name(placement_.status),
+                    placement_.dirty ? " (edited: saved before baking)" : "");
+        const bool running = p.running();
+        ImGui::BeginDisabled(running);
+        if (ImGui::RadioButton("Final (2 bounces, 256 rays)", b.final_quality))
+            b.final_quality = true;
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Preview (1 bounce, 64 rays)", !b.final_quality))
+            b.final_quality = false;
+        if (placement_.edit && !game.world.models.empty() &&
+            ImGui::CollapsingHeader("Excluded models (left out of the bake scene)"))
+        {
+            std::vector<std::string> names;
+            for (std::size_t m = 1; m < game.world.models.size(); ++m)
+                if (!game.world.models[m].name.empty())
+                    names.push_back(game.world.models[m].name);
+            std::sort(names.begin(), names.end());
+            names.erase(std::unique(names.begin(), names.end()), names.end());
+            ImGui::BeginChild("excluded", {0, 140}, ImGuiChildFlags_Borders);
+            for (const auto& name : names)
+            {
+                bool excluded = false;
+                for (const auto& entry : placement_.edit->excluded_models)
+                    excluded |= entry.size() == name.size() &&
+                                std::equal(entry.begin(), entry.end(), name.begin(), [](char x, char y)
+                                           { return std::tolower(static_cast<unsigned char>(x)) ==
+                                                    std::tolower(static_cast<unsigned char>(y)); });
+                if (ImGui::Checkbox(name.c_str(), &excluded))
+                    exclude_model(name, excluded);
+            }
+            ImGui::EndChild();
+        }
+        ImGui::EndDisabled();
+        ImGui::Checkbox("Suspend scene rendering during bake", &b.suspend_scene);
+        ImGui::BeginDisabled(running || game.world_path.empty());
+        if (ImGui::Button("Bake"))
+            start_bake(game, config);
+        ImGui::EndDisabled();
+        ImGui::SameLine();
+        ImGui::BeginDisabled(!running);
+        if (ImGui::Button("Cancel"))
+            cancel_bake();
+        ImGui::EndDisabled();
+        if (running)
+        {
+            const double fraction = gi_bake_fraction(p.progress);
+            char overlay[160];
+            const double eta = p.eta_s();
+            if (eta >= 0)
+                std::snprintf(overlay, sizeof overlay, "%s %llu/%llu, %.0f s, about %.0f s left",
+                              p.progress.stage.c_str(), static_cast<unsigned long long>(p.progress.done),
+                              static_cast<unsigned long long>(p.progress.total), p.elapsed_s(), eta);
+            else
+                std::snprintf(overlay, sizeof overlay, "%s, %.0f s", p.progress.stage.empty() ? "preparing"
+                                                                                               : p.progress.stage.c_str(),
+                              p.elapsed_s());
+            ImGui::ProgressBar(float(fraction), {-1, 0}, overlay);
+        }
+        if (!b.notice.empty())
+            ImGui::TextWrapped("%s", b.notice.c_str());
+        if (!running && p.state == GiBakeProcess::State::Finished && p.exit_code == 0)
+        {
+            ImGui::Text("File: %s", path_text(b.file).c_str());
+            if (b.reloaded)
+                ImGui::TextUnformatted(runtime_.enabled && *runtime_.enabled
+                                           ? "Handed to the runtime (see Runtime)."
+                                           : "Turn GLOBAL ILLUMINATION on to see it.");
+            std::filesystem::path project;
+            if (gi_project_directory(project) && ImGui::Button("Copy to project data/gi"))
+            {
+                std::string error;
+                if (!copy_bake_to_project(error))
+                    b.notice = error;
+            }
+        }
+        if (!p.lines.empty() && ImGui::CollapsingHeader("Bake output"))
+        {
+            ImGui::BeginChild("bake_output", {0, 160}, ImGuiChildFlags_Borders, ImGuiWindowFlags_HorizontalScrollbar);
+            for (const auto& line : p.lines)
+                ImGui::TextUnformatted(line.c_str());
+            ImGui::EndChild();
+        }
+    }
+
     bool GiTools::draw(MenuInput& input, GameSession& game, const Config& config, std::vector<LineVertex>& gizmos,
                        const GiRuntimeLink& runtime)
     {
         gizmos.clear();
         runtime_ = runtime;
+        update_bake(game); // A bake keeps running while the overlay is Closed or Pinned.
         if (input.gi == GiOverlay::Closed)
         {
             stale_ = true; // Opening again re-reads the folders (placement edits survive).
@@ -1099,6 +1363,9 @@ namespace OpenBlood2
                                 gi_world_source_name(runtime_.composition->source),
                                 runtime_.probes && runtime_.probes->models ? ", probes on models" : "");
                 ImGui::TextUnformatted(placement_summary().c_str());
+                if (bake.process.running())
+                    ImGui::Text("Baking %s: %.0f%%", bake.world.c_str(),
+                                100 * gi_bake_fraction(bake.process.progress));
             }
             ImGui::End();
             return false;
@@ -1138,7 +1405,7 @@ namespace OpenBlood2
                 }
                 if (tab("Bake", Panel::Bake))
                 {
-                    unavailable("G10", "baking from the game");
+                    bake_panel(game, config);
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();

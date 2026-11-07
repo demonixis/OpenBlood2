@@ -1451,8 +1451,14 @@ namespace OpenBlood2
                 if (target)
                 {
                     auto* color_target = save ? capture.texture : target;
+#if BLOOD2_GI_TOOLS
+                    // "Suspend the scene while baking" (lot G10): the bake gets the GPU and memory.
+                    const bool gi_suspend = !xr_mode && gi_tools.suspend_scene();
+#else
+                    const bool gi_suspend = false;
+#endif
                     const bool world = !menu.active && !input.credits_screen && !input.demo.finished() &&
-                                       !screen_shown && presenter.render_world;
+                                       !screen_shown && presenter.render_world && !gi_suspend;
                     if (world &&
                         !presenter.record(*game, commands, color_target,
                                           SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), w, h, error))
@@ -1505,6 +1511,9 @@ namespace OpenBlood2
                 if (!target)
                     SDL_Delay(10);
             }
+#if BLOOD2_GI_TOOLS
+            gi_tools.stop_bake(); // Quit during an F8 bake: cancel the child and wait (lot G10).
+#endif
             if (options.demo_smoke && !demo_smoke.confirmed)
             {
                 error = "Demo diagnostic did not complete both worlds and the ending";

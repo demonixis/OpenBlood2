@@ -1,4 +1,5 @@
 #pragma once
+#include "app/gi_bake_process.h"
 #include "app/menu_input.h"
 #include "engine/config.h"
 #include "engine/gi_file.h"
@@ -28,7 +29,7 @@ namespace OpenBlood2
         const GiWorldLight* light = nullptr;                 // The applied file, or null.
         const ModelLightingStats* model_lighting = nullptr;  // The last frame's model light.
     };
-    // The F8 GI tools overlay (gi_contracts.md lots G3, G4, G8, G9), built with BLOOD2_GI_TOOLS on desktop.
+    // The F8 GI tools overlay (gi_contracts.md lots G3, G4, G8, G9, G10), built with BLOOD2_GI_TOOLS on desktop.
     // It shares UiRuntime's ImGui context and only reads the session: no frame changes while
     // Closed, and its gizmos go through the scene's existing line renderer. Placement edits stay in
     // the overlay (Dirty) until saved to the placement directory.
@@ -127,6 +128,41 @@ namespace OpenBlood2
                                        std::vector<LineVertex>&);
         int selected_reflection = -1;
 
+        // Bake (lot G10, decision 10): the current world baked by a child process of this binary
+        // (`--bake-gi`), polled every draw (also while Closed), cancelled with SIGTERM (forced on
+        // Windows). A finished bake reloads at the next frame boundary (the presenter's lookup,
+        // through the runtime link) when the world's DAT digest still matches the one it started for.
+        struct Bake
+        {
+            GiBakeProcess process;
+            bool final_quality = true; // Final (2 bounces, 256 rays) or Preview (1, 64).
+            bool suspend_scene = false; // "Suspend scene rendering during bake".
+            std::string world;          // The world path being (or last) baked.
+            Sha256Digest world_digest{};
+            std::filesystem::path out_dir, file; // user_directory()/gi and the expected file.
+            std::string notice;                  // The last outcome, or why a bake did not start.
+            bool reload_pending = false;         // Finished for the current world; waiting for a link.
+            bool reloaded = false;               // The last bake was handed to the presenter.
+            // Frame times between draws while the bake runs (logged when it ends).
+            std::uint64_t frames = 0, last_frame_ns = 0;
+            double frame_sum_ms = 0, frame_max_ms = 0;
+        };
+        Bake bake;
+        std::filesystem::path bake_executable; // Empty: this executable (tests use a stub).
+        // Saves a dirty placement, then starts the child for the current world. False with
+        // bake.notice when nothing started.
+        bool start_bake(const GameSession&, const Config&);
+        void cancel_bake();
+        void stop_bake(); // Cancels and waits (quit).
+        bool suspend_scene() const
+        {
+            return bake.suspend_scene && bake.process.running();
+        }
+        // Toggles a world model in the placement's excluded_models (marks it dirty).
+        bool exclude_model(std::string_view name, bool excluded);
+        // Desktop GI tool builds: copies the last baked file into the checkout's data/gi/baked.
+        bool copy_bake_to_project(std::string& error);
+
       private:
         Status status_;
         GiRuntimeLink runtime_; // The last draw's link.
@@ -147,5 +183,7 @@ namespace OpenBlood2
         void baked_probe_panel(const GameSession&);
         void reflection_panel(const GameSession&);
         void volume_table();
+        void update_bake(const GameSession&);
+        void bake_panel(const GameSession&, const Config&);
     };
 } // namespace OpenBlood2

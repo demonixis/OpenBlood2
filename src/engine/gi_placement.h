@@ -88,6 +88,8 @@ namespace OpenBlood2
     // checkout's data/gi/placement when data/gi exists; else user_directory()/gi/placement.
     bool gi_placement_directory(const std::filesystem::path& configured, std::filesystem::path& directory,
                                 std::string& error);
+    // GI tool builds of a checkout: its data/gi folder when it exists (decision 8); false otherwise.
+    bool gi_project_directory(std::filesystem::path& directory);
     // What a placement file is to the mounted world.
     enum class GiPlacementStatus
     {
