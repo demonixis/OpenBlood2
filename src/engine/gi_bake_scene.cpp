@@ -1,4 +1,5 @@
 #include "engine/gi_bake_scene.h"
+#include "engine/gi_sky.h"
 #include "engine/collision.h"
 #include <algorithm>
 #include <cfloat>
@@ -228,20 +229,24 @@ namespace OpenBlood2
     {
         use.clear();
         const auto roles = world_model_roles(world);
-        for (const auto& info : roles)
-            switch (info.role)
-            {
-            case WorldModelRole::Primary:
-            case WorldModelRole::Mover:
-            case WorldModelRole::Destructible:
-                use.push_back(GiRangeUse::Main);
-                break;
-            case WorldModelRole::Sky:
+        // Sky models are the ones FLAG_SKYOBJECT marks: DemoSkyWorldModel models and SkyPointer targets
+        // (doors and brushes drawn in the sky pass, never in the world). A DemoSkyWorldModel model whose
+        // object the original refuses is drawn by nothing.
+        const auto sky = gi_sky_setup(world);
+        for (std::size_t m = 0; m < roles.size(); ++m)
+            if (m && std::binary_search(sky.models.begin(), sky.models.end(), std::uint32_t(m)))
                 use.push_back(GiRangeUse::Sky);
-                break;
-            default:
-                use.push_back(GiRangeUse::Skip);
-            }
+            else
+                switch (roles[m].role)
+                {
+                case WorldModelRole::Primary:
+                case WorldModelRole::Mover:
+                case WorldModelRole::Destructible:
+                    use.push_back(GiRangeUse::Main);
+                    break;
+                default:
+                    use.push_back(GiRangeUse::Skip);
+                }
         report.excluded_ranges = 0;
         for (const auto& name : excluded)
         {
@@ -334,7 +339,7 @@ namespace OpenBlood2
             ++(use[r] == GiRangeUse::Main ? report.main_ranges : report.sky_ranges);
             for (const auto& batch : range.batches)
             {
-                if (batch.count % 3 || batch.first > mesh.vertices.size() ||
+                if (batch.count % 3 || batch.first % 3 || batch.first > mesh.vertices.size() ||
                     batch.count > mesh.vertices.size() - batch.first ||
                     batch.count / 3 > L::max_triangles - faces_.size() || batch.material >= mesh.materials.size())
                     return fail("GI scene geometry exceeds limits");
@@ -384,6 +389,7 @@ namespace OpenBlood2
                         face.colors[k] = vertex.color;
                     }
                     face.normal = mesh.vertices[i].normal;
+                    face.triangle = i / 3;
                     face.mip = image ? gi_albedo_mip(points, face.uv, image->width, image->height, image_levels) : 0;
                     GiBvh::Triangle t;
                     const auto e1 = vector_subtract(points[1], points[0]);

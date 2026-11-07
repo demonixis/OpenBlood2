@@ -421,18 +421,26 @@ namespace
     {
         GiBakeSettings s;
         std::string error;
-        CHECK(make_gi_bake_settings("preview", 0, 0, s, error) && s.quality == GiQuality::Preview);
-        CHECK(s.bounces == 1 && s.rays == 64);
-        CHECK(make_gi_bake_settings("", 0, 0, s, error) && s.quality == GiQuality::Final && s.rays == 256);
-        CHECK(gi_settings_text(s) == "openblood2-gi-settings 1\nquality final\nbounces 2\nrays 256\n");
-        CHECK(make_gi_bake_settings("custom", 3, 0, s, error) && s.bounces == 3 && s.rays == 256);
-        CHECK(make_gi_bake_settings("custom", 0, 4096, s, error) && s.bounces == 2 && s.rays == 4096);
-        CHECK(gi_settings_text(s) == "openblood2-gi-settings 1\nquality custom\nbounces 2\nrays 4096\n");
+        CHECK(make_gi_bake_settings("preview", 0, 0, -1, s, error) && s.quality == GiQuality::Preview);
+        CHECK(s.bounces == 1 && s.rays == 64 && s.sky == 100);
+        CHECK(make_gi_bake_settings("", 0, 0, -1, s, error) && s.quality == GiQuality::Final && s.rays == 256);
+        CHECK(gi_settings_text(s) == "openblood2-gi-settings 2\nquality final\nbounces 2\nrays 256\nsky 1.00\n");
+        CHECK(make_gi_bake_settings("custom", 3, 0, -1, s, error) && s.bounces == 3 && s.rays == 256 && s.sky == 100);
+        CHECK(make_gi_bake_settings("custom", 0, 4096, 25, s, error) && s.bounces == 2 && s.rays == 4096);
+        CHECK(gi_settings_text(s) == "openblood2-gi-settings 2\nquality custom\nbounces 2\nrays 4096\nsky 0.25\n");
+        CHECK(make_gi_bake_settings("custom", 0, 0, 0, s, error) && s.sky == 0);
+        CHECK(gi_settings_text(s).ends_with("\nsky 0.00\n"));
+        CHECK(make_gi_bake_settings("custom", 0, 0, 400, s, error) && s.sky == 400);
+        CHECK(gi_settings_text(s).ends_with("\nsky 4.00\n"));
         const auto before = s.rays;
-        CHECK(!make_gi_bake_settings("custom", 4, 0, s, error) && s.rays == before);
-        CHECK(!make_gi_bake_settings("custom", 0, 15, s, error));
-        CHECK(!make_gi_bake_settings("final", 2, 0, s, error));
-        CHECK(!make_gi_bake_settings("best", 0, 0, s, error));
+        CHECK(!make_gi_bake_settings("custom", 4, 0, -1, s, error) && s.rays == before);
+        CHECK(!make_gi_bake_settings("custom", 0, 15, -1, s, error));
+        CHECK(!make_gi_bake_settings("custom", 0, 0, 401, s, error) && error == "--gi-sky must be 0 to 4");
+        CHECK(!make_gi_bake_settings("custom", 0, 0, -2, s, error) && s.sky == 400);
+        CHECK(!make_gi_bake_settings("final", 2, 0, -1, s, error));
+        CHECK(!make_gi_bake_settings("final", 0, 0, 100, s, error));
+        CHECK(error == "--gi-bounces, --gi-rays and --gi-sky need --gi-quality custom");
+        CHECK(!make_gi_bake_settings("best", 0, 0, -1, s, error));
         CHECK(std::string(gi_bake_status_name(GiBakeResult::Status::Current)) == "current");
         return true;
     }
@@ -599,7 +607,7 @@ namespace
         // Bakes: identical bytes and digests for 1 and 4 jobs; --gi-if-stale; cancellation.
         GiBakeRequest request;
         request.world = path;
-        CHECK(make_gi_bake_settings("preview", 0, 0, request.settings, error));
+        CHECK(make_gi_bake_settings("preview", 0, 0, -1, request.settings, error));
         request.placement_dir = placement_dir;
         request.jobs = 1;
         request.out_dir = scratch / "one";
@@ -616,7 +624,8 @@ namespace
         CHECK(!a.empty() && a == b && a.size() == one.bytes);
         GiFile file;
         CHECK(read_gi_file(a, file, error) && file.settings == gi_settings_text(request.settings));
-        CHECK(file.find(gi_format::placement) && file.sections.size() == 1);
+        CHECK(file.find(gi_format::placement) && file.find(gi_format::lightmaps) && file.find(gi_format::vertices) &&
+              file.sections.size() == 3);
         GiExpectation expected;
         CHECK(gi_expectation(resources, path, expected, error));
         unsigned stale = 0;
@@ -636,7 +645,7 @@ namespace
         const auto current = bake_gi_world(resources, request);
         CHECK(current.status == GiBakeResult::Status::Current && current.exit_code == 0);
         auto final_request = request;
-        CHECK(make_gi_bake_settings("final", 0, 0, final_request.settings, error));
+        CHECK(make_gi_bake_settings("final", 0, 0, -1, final_request.settings, error));
         final_request.cancel = nullptr;
         // Other settings: stale, so it bakes (cancelled at once here, keeping the Preview file).
         std::atomic<bool> cancel{false};

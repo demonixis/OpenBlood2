@@ -20,4 +20,9 @@ namespace OpenBlood2
     // GI_PROGRESS lines and one GI_RESULT line. SIGINT/SIGTERM cancel; nothing is written then. Exit 0,
     // 2 (arguments, data), 4 (placement, bake or write), 5 (world load), 12 (cancelled).
     int run_gi_bake(const Options&, const Config&);
+    // --gi-preview WORLD (lot G7): reads the world's Ready file from --gi-out (default
+    // user_directory()/gi) and writes Original | GI | Indirect PNG views from its start points into
+    // --gi-preview-dir (default user_directory()/gi/preview), composed with --gi-k and --gi-f (1).
+    // Exit 0, 2 (arguments, data), 4 (missing, invalid or stale file, image write), 5 (world load).
+    int run_gi_preview(const Options&, const Config&);
 } // namespace OpenBlood2

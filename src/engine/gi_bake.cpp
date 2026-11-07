@@ -63,14 +63,14 @@ namespace OpenBlood2
             return "custom";
         }
     }
-    bool make_gi_bake_settings(std::string_view quality, std::uint32_t bounces, std::uint32_t rays,
+    bool make_gi_bake_settings(std::string_view quality, std::uint32_t bounces, std::uint32_t rays, std::int32_t sky,
                                GiBakeSettings& settings, std::string& error)
     {
         GiBakeSettings out;
         if (quality == "preview")
-            out = {GiQuality::Preview, 1, 64};
+            out = {GiQuality::Preview, 1, 64, 100};
         else if (quality == "final" || quality.empty())
-            out = {GiQuality::Final, 2, 256};
+            out = {GiQuality::Final, 2, 256, 100};
         else if (quality == "custom")
         {
             out.quality = GiQuality::Custom;
@@ -78,6 +78,13 @@ namespace OpenBlood2
                 out.bounces = bounces;
             if (rays)
                 out.rays = rays;
+            if (sky >= 0)
+                out.sky = static_cast<std::uint32_t>(sky);
+            if (sky < -1 || out.sky > S::max_sky)
+            {
+                error = "--gi-sky must be 0 to 4";
+                return false;
+            }
             if (out.bounces < S::min_bounces || out.bounces > S::max_bounces)
             {
                 error = "--gi-bounces must be 1 to 3";
@@ -94,9 +101,9 @@ namespace OpenBlood2
             error = "--gi-quality must be preview, final or custom";
             return false;
         }
-        if (out.quality != GiQuality::Custom && (bounces || rays))
+        if (out.quality != GiQuality::Custom && (bounces || rays || sky >= 0))
         {
-            error = "--gi-bounces and --gi-rays need --gi-quality custom";
+            error = "--gi-bounces, --gi-rays and --gi-sky need --gi-quality custom";
             return false;
         }
         settings = out;
@@ -104,8 +111,10 @@ namespace OpenBlood2
     }
     std::string gi_settings_text(const GiBakeSettings& settings)
     {
-        return "openblood2-gi-settings 1\nquality " + std::string(gi_quality_name(settings.quality)) + "\nbounces " +
-               std::to_string(settings.bounces) + "\nrays " + std::to_string(settings.rays) + "\n";
+        const auto sky = std::to_string(settings.sky / 100) + "." + char('0' + settings.sky / 10 % 10) +
+                         char('0' + settings.sky % 10);
+        return "openblood2-gi-settings 2\nquality " + std::string(gi_quality_name(settings.quality)) + "\nbounces " +
+               std::to_string(settings.bounces) + "\nrays " + std::to_string(settings.rays) + "\nsky " + sky + "\n";
     }
 
     GiSurvey survey_gi_probes(const GiBakeScene& scene, std::span<const GiLightProbe> probes, std::uint32_t rays,
@@ -316,7 +325,8 @@ namespace OpenBlood2
 
         // Scene and survey.
         WorldMesh mesh;
-        if (!mesh.build(world, error, &resources, true))
+        std::vector<WorldTriangleSource> sources;
+        if (!mesh.build(world, error, &resources, true, &sources))
             return fail(5, "World mesh: " + error);
         std::vector<GiRangeUse> use;
         if (!gi_range_uses(world, placement.excluded_models, use, result.scene, error))
@@ -331,7 +341,26 @@ namespace OpenBlood2
         if (result.survey.cancelled || stop())
             return cancelled();
 
-        // The file: INFO and PLAC (lighting sections arrive with G7/G9).
+        // Sky and indirect light (lot G7). The lattice seed is the first eight digest bytes.
+        result.sky_setup = gi_sky_setup(world);
+        GiSky sky;
+        if (!sky.build(world, scene, result.sky_setup, float(request.settings.sky) / 100, request.jobs, result.sky,
+                       error))
+            return fail(4, "GI sky: " + error);
+        GiReceivers receivers;
+        if (!gi_receivers(world, scene, sources, use, request.jobs, receivers, error))
+            return fail(4, error);
+        std::uint64_t seed = 0;
+        for (int i = 0; i < 8; ++i)
+            seed |= std::uint64_t(digest[i]) << (8 * i);
+        GiIndirect indirect;
+        if (!bake_gi_lightmaps(scene, sky, receivers, request.settings.bounces, request.settings.rays, seed,
+                               request.jobs, request.cancel, request.progress, indirect, result.lightmaps, error))
+            return result.lightmaps.cancelled ? cancelled() : fail(4, "GI lightmaps: " + error);
+        if (stop())
+            return cancelled();
+
+        // The file: INFO, PLAC, LMAP and VTX (probes arrive with G9).
         GiFile file;
         file.key.world = expected.world;
         file.key.albedo = expected.albedo;
@@ -345,6 +374,14 @@ namespace OpenBlood2
         if (!encode_gi_placement_section(lattice, placement.reflections, plac.payload, error))
             return fail(4, "Placement section: " + error);
         file.sections.push_back(std::move(plac));
+        GiLightmaps maps;
+        GiVertexLight vertex_light;
+        gi_lightmap_sections(receivers, indirect, maps, vertex_light);
+        GiSection lmap{gi_format::lightmaps, {}}, vtx{gi_format::vertices, {}};
+        if (!write_gi_lightmaps(maps, lmap.payload, error) || !write_gi_vertex_light(vertex_light, vtx.payload, error))
+            return fail(4, "Lightmap sections: " + error);
+        file.sections.push_back(std::move(lmap));
+        file.sections.push_back(std::move(vtx));
         std::vector<std::uint8_t> encoded;
         if (!write_gi_file(file, encoded, error))
             return fail(4, "GI file: " + error);

@@ -171,13 +171,18 @@ namespace OpenBlood2
         }
         range.bounded = physics_vector(range.min) && physics_vector(range.max);
     }
-    bool WorldMesh::build(const World& world, std::string& error, const Resources* resources, bool use_lightmaps)
+    bool WorldMesh::build(const World& world, std::string& error, const Resources* resources, bool use_lightmaps,
+                          std::vector<WorldTriangleSource>* sources)
     {
         *this = {};
         error.clear();
+        if (sources)
+            sources->clear();
         auto fail = [&](const char* why)
         {
             *this = {};
+            if (sources)
+                sources->clear();
             error = why;
             return false;
         };
@@ -315,12 +320,14 @@ namespace OpenBlood2
             {
                 WorldBatch batch;
                 std::vector<WorldVertex> vertices;
+                std::vector<WorldTriangleSource> sources; // Filled only when the caller asks.
             };
             std::vector<Group> groups, faces;
             std::map<std::tuple<std::uint32_t, bool, double, double, std::uint32_t>, std::size_t> group_ids;
             std::size_t pending = 0;
-            for (const auto& polygon : model.polygons)
+            for (std::size_t polygon_index = 0; polygon_index < model.polygons.size(); ++polygon_index)
             {
+                const auto& polygon = model.polygons[polygon_index];
                 const auto count = polygon.base_points == UINT16_MAX ? polygon.points.size() : polygon.base_points;
                 if (polygon.surface >= model.surfaces.size() || count < 3 || count > 512 ||
                     count > polygon.points.size())
@@ -474,6 +481,11 @@ namespace OpenBlood2
                             center,
                             vector_scale(vector_subtract(model.points[polygon.points[i]], range.pivot), 1.f / count));
                 const bool sky_portal = (surface.flags & (1u << 4)) != 0;
+                const auto light = sky_portal  ? WorldFaceLight::Sky
+                                   : lightmap ? WorldFaceLight::Lightmap
+                                   : baked    ? WorldFaceLight::Vertex
+                                   : material ? WorldFaceLight::Bright
+                                              : WorldFaceLight::Untextured;
                 Group* group = nullptr;
                 const auto a = model.points[polygon.points[0]];
                 for (std::size_t i = 1; i + 1 < count; ++i)
@@ -487,7 +499,7 @@ namespace OpenBlood2
                     }
                     if (!group && translucent)
                     {
-                        faces.push_back({{0, 0, material, true, center, uv_rate, sky_portal, lightmap}, {}});
+                        faces.push_back({{0, 0, material, true, center, uv_rate, sky_portal, lightmap}, {}, {}});
                         group = &faces.back();
                         ++blended;
                     }
@@ -496,11 +508,17 @@ namespace OpenBlood2
                         const auto key = std::make_tuple(material, sky_portal, uv_rate[0], uv_rate[1], lightmap);
                         auto [found, added] = group_ids.emplace(key, groups.size());
                         if (added)
-                            groups.push_back({{0, 0, material, false, {}, uv_rate, sky_portal, lightmap}, {}});
+                            groups.push_back({{0, 0, material, false, {}, uv_rate, sky_portal, lightmap}, {}, {}});
                         group = &groups[found->second];
                     }
                     group->batch.count += 3;
                     pending += 3;
+                    if (sources)
+                        group->sources.push_back({static_cast<std::uint32_t>(ranges.size()),
+                                                  static_cast<std::uint32_t>(polygon_index),
+                                                  {std::uint16_t(0), static_cast<std::uint16_t>(i),
+                                                   static_cast<std::uint16_t>(i + 1)},
+                                                  light});
                     for (const std::size_t corner : {std::size_t(0), i, i + 1})
                     {
                         const auto p = model.points[polygon.points[corner]];
@@ -540,6 +558,8 @@ namespace OpenBlood2
                 {
                     group.batch.first = static_cast<std::uint32_t>(vertices.size());
                     vertices.insert(vertices.end(), group.vertices.begin(), group.vertices.end());
+                    if (sources)
+                        sources->insert(sources->end(), group.sources.begin(), group.sources.end());
                     range.batches.push_back(group.batch);
                 }
             range.count = static_cast<std::uint32_t>(vertices.size()) - range.first;

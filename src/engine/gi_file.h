@@ -34,7 +34,7 @@ namespace OpenBlood2
         constexpr std::uint32_t order[]{info, placement, lightmaps, vertices, probes, reflections};
     } // namespace gi_format
     // Bumped whenever a bake would produce different numbers from the same inputs.
-    constexpr std::uint32_t gi_algorithm_version = 1;
+    constexpr std::uint32_t gi_algorithm_version = 2; // 2: lot G7 (sky, lightmaps, vertex light).
 
     enum class GiEdition : std::uint8_t
     {

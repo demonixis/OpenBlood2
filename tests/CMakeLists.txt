@@ -1004,6 +1004,25 @@ if(BLOOD2_TEST_DATA_DIR)
     set_tests_properties(gi_bake.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
 endif()
 
+# Lot G7: the lightmap core. Like the tracer, its results must not depend on the build.
+add_executable(gi_lightmap_tests gi_lightmap_tests.cpp)
+target_link_libraries(gi_lightmap_tests PRIVATE engine)
+blood2_project_options(gi_lightmap_tests)
+if(NOT MSVC)
+    set_property(SOURCE gi_lightmap_tests.cpp APPEND PROPERTY COMPILE_OPTIONS -ffp-contract=off)
+endif()
+foreach(case IN ITEMS identity rgb9e5 sections directions placement furnace box planes leak dilation back
+                      determinism sky preview)
+    add_test(NAME gi_lightmap.${case} COMMAND gi_lightmap_tests "${case}"
+             "${CMAKE_CURRENT_BINARY_DIR}/gi-lightmap-${case}")
+    set_tests_properties(gi_lightmap.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 120)
+endforeach()
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME gi_lightmap.retail COMMAND gi_lightmap_tests retail "${BLOOD2_TEST_DATA_DIR}"
+             "${PROJECT_SOURCE_DIR}/data/gi/placement" "${CMAKE_CURRENT_BINARY_DIR}/gi-lightmap-retail")
+    set_tests_properties(gi_lightmap.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
+endif()
+
 # Lot G6: baked GI files never enter the repository (decision D3), and the bake-all script
 # drives a stub binary (the stub is an executable script, hence Unix only).
 add_test(NAME gi_policy COMMAND "${CMAKE_COMMAND}" -DSOURCE=${PROJECT_SOURCE_DIR}

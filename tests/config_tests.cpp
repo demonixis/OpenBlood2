@@ -355,7 +355,8 @@ namespace
         options = {};
         const std::array<std::string_view, 3> separate{"--gi-place", "all", "--list-worlds"};
         CHECK(!parse_options(separate, options, error));
-        CHECK(error == "--list-worlds, --gi-verify, --gi-place and --bake-gi are separate headless tools");
+        CHECK(error == "--list-worlds, --gi-verify, --gi-place, --bake-gi and --gi-preview are separate headless "
+                       "tools");
 
         // GI lot G5: --bake-gi and its options.
         options = {};
@@ -384,6 +385,56 @@ namespace
                  {"--bake-gi", "a", "--gi-jobs", "2x"},
                  {"--bake-gi", "a", "--gi-place", "all"},
                  {"--bake-gi", "a", "--world", "02_CityHub"}})
+        {
+            options = {};
+            CHECK(!parse_options(args, options, error));
+        }
+
+        // GI lot G7: --gi-sky in exact hundredths (custom bakes only), --gi-preview and its options.
+        for (const auto& [text, hundredths] : std::initializer_list<std::pair<std::string_view, int>>{
+                 {"0", 0}, {"4", 400}, {"1.5", 150}, {"0.25", 25}, {"3.99", 399}, {"2.00", 200}})
+        {
+            options = {};
+            const std::array<std::string_view, 6> sky{"--bake-gi", "a", "--gi-quality", "custom", "--gi-sky", text};
+            CHECK(parse_options(sky, options, error) && options.gi_sky == hundredths);
+        }
+        for (const auto text : {"4.01", "5", "-1", "1.", ".5", "1.234", "1e0", "", "nan", "0x1", "1,5", "1000"})
+        {
+            options = {};
+            const std::array<std::string_view, 6> sky{"--bake-gi", "a", "--gi-quality", "custom", "--gi-sky", text};
+            CHECK(!parse_options(sky, options, error));
+        }
+        options = {};
+        const std::array<std::string_view, 4> plain_sky{"--bake-gi", "a", "--gi-sky", "1"};
+        CHECK(!parse_options(plain_sky, options, error));
+        CHECK(error == "--gi-bounces, --gi-rays and --gi-sky require --gi-quality custom");
+        options = {};
+        const std::array<std::string_view, 12> preview{"--gi-preview", "07_Cathedral", "--gi-preview-dir", "shots",
+                                                       "--gi-k",       "2",            "--gi-f",           "0.5",
+                                                       "--gi-out",     "bakes",        "--gi-jobs",        "3"};
+        CHECK(parse_options(preview, options, error));
+        CHECK(options.gi_preview == "07_Cathedral" && path_text(options.gi_preview_dir) == "shots");
+        CHECK(options.gi_k == 2 && options.gi_f == .5f && options.gi_composition);
+        CHECK(path_text(options.gi_out) == "bakes" && options.gi_jobs == 3 && options.bake_gi.empty());
+        options = {};
+        const std::array<std::string_view, 2> preview_defaults{"--gi-preview", "07_Cathedral"};
+        CHECK(parse_options(preview_defaults, options, error));
+        CHECK(options.gi_k == 1 && options.gi_f == 1 && !options.gi_composition && options.gi_preview_dir.empty());
+        for (const auto& args : std::initializer_list<std::vector<std::string_view>>{
+                 {"--gi-preview"},
+                 {"--gi-preview-dir", "shots"},
+                 {"--gi-k", "1"},
+                 {"--gi-f", "1"},
+                 {"--bake-gi", "a", "--gi-k", "1"},
+                 {"--gi-preview", "a", "--gi-k", "4.5"},
+                 {"--gi-preview", "a", "--gi-f", "-1"},
+                 {"--gi-preview", "a", "--gi-k", "nan"},
+                 {"--gi-preview", "a", "--gi-k", "1x"},
+                 {"--gi-preview", "a", "--gi-quality", "final"},
+                 {"--gi-preview", "a", "--gi-sky", "1"},
+                 {"--gi-preview", "a", "--bake-gi", "a"},
+                 {"--gi-preview", "a", "--list-worlds"},
+                 {"--gi-preview", "a", "--world", "02_CityHub"}})
         {
             options = {};
             CHECK(!parse_options(args, options, error));

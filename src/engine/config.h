@@ -55,10 +55,16 @@ namespace OpenBlood2
         bool list_worlds = false, json = false, gi_reset = false, gi_dry_run = false;
         std::filesystem::path gi_verify;
         std::string gi_place;
-        // --bake-gi WORLD [--gi-quality preview|final|custom] [--gi-bounces N] [--gi-rays N] [--gi-jobs N]
-        // [--gi-out DIR] [--gi-if-stale] (lot G5); zero means not given.
+        // --bake-gi WORLD [--gi-quality preview|final|custom] [--gi-bounces N] [--gi-rays N] [--gi-sky S]
+        // [--gi-jobs N] [--gi-out DIR] [--gi-if-stale] (lots G5, G7); zero (sky: -1) means not given.
         std::string bake_gi, gi_quality;
         std::uint32_t gi_bounces = 0, gi_rays = 0, gi_jobs = 0;
+        std::int32_t gi_sky = -1; // Sky scale in hundredths (0-400).
+        // --gi-preview WORLD [--gi-out DIR] [--gi-preview-dir DIR] [--gi-k K] [--gi-f F] [--gi-jobs N] (lot G7).
+        std::string gi_preview;
+        std::filesystem::path gi_preview_dir;
+        float gi_k = 1, gi_f = 1;
+        bool gi_composition = false; // --gi-k or --gi-f given.
         std::filesystem::path gi_out;
         bool gi_if_stale = false;
         bool inspector = true;

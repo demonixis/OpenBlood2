@@ -322,7 +322,8 @@ namespace OpenBlood2
             else if (arg == "--data-dir" || arg == "--gi-dir" || arg == "--gi-verify" || arg == "--config" ||
                      arg == "--gi-place" || arg == "--gi-placement-dir" || arg == "--bake-gi" ||
                      arg == "--gi-quality" || arg == "--gi-bounces" || arg == "--gi-rays" || arg == "--gi-jobs" ||
-                     arg == "--gi-out" ||
+                     arg == "--gi-out" || arg == "--gi-sky" || arg == "--gi-preview" || arg == "--gi-preview-dir" ||
+                     arg == "--gi-k" || arg == "--gi-f" ||
                      arg == "--frames" || arg == "--capture" || arg == "--world" || arg == "--log-dir" ||
                      arg == "--log-level" || arg == "--rez" ||
                      arg == "--connect" || arg == "--host" || arg == "--port" || arg == "--name" || arg == "--end" ||
@@ -435,6 +436,52 @@ namespace OpenBlood2
                     }
                     options.gi_quality = args[i];
                 }
+                else if (arg == "--gi-preview")
+                    options.gi_preview = args[i];
+                else if (arg == "--gi-preview-dir")
+                    options.gi_preview_dir = path_from_utf8(args[i]);
+                else if (arg == "--gi-k" || arg == "--gi-f")
+                {
+                    const auto value = args[i];
+                    float number = 0;
+                    const auto result = std::from_chars(value.data(), value.data() + value.size(), number);
+                    if (result.ec != std::errc{} || result.ptr != value.data() + value.size() || !(number >= 0) ||
+                        number > 4)
+                    {
+                        error = std::string(arg) + " requires a number from 0 to 4";
+                        return false;
+                    }
+                    (arg == "--gi-k" ? options.gi_k : options.gi_f) = number;
+                    options.gi_composition = true;
+                }
+                else if (arg == "--gi-sky")
+                {
+                    // A decimal from 0 to 4 with at most two places, kept exactly in hundredths.
+                    const std::string_view value = args[i];
+                    const auto dot = value.find('.');
+                    const auto whole = value.substr(0, dot);
+                    const auto fraction = dot == std::string_view::npos ? std::string_view{} : value.substr(dot + 1);
+                    auto digits = [](std::string_view text)
+                    { return std::all_of(text.begin(), text.end(), [](char c) { return c >= '0' && c <= '9'; }); };
+                    const bool shaped = !whole.empty() && whole.size() <= 3 && digits(whole) && digits(fraction) &&
+                                        (dot == std::string_view::npos || (!fraction.empty() && fraction.size() <= 2));
+                    int hundredths = -1;
+                    if (shaped)
+                    {
+                        hundredths = 0;
+                        for (const char c : whole)
+                            hundredths = hundredths * 10 + (c - '0');
+                        hundredths *= 100;
+                        if (!fraction.empty())
+                            hundredths += (fraction[0] - '0') * 10 + (fraction.size() > 1 ? fraction[1] - '0' : 0);
+                    }
+                    if (hundredths < 0 || hundredths > 400)
+                    {
+                        error = "--gi-sky requires a number from 0 to 4 with at most two decimals";
+                        return false;
+                    }
+                    options.gi_sky = hundredths;
+                }
                 else if (arg == "--gi-bounces" || arg == "--gi-rays" || arg == "--gi-jobs")
                 {
                     const auto value = args[i];
@@ -479,17 +526,28 @@ namespace OpenBlood2
         const bool network = !options.host_world.empty() || !options.connect_address.empty();
         const bool gi_place = !options.gi_place.empty();
         const bool bake_gi = !options.bake_gi.empty();
-        const bool gi_tool = options.list_worlds || !options.gi_verify.empty() || gi_place || bake_gi;
-        if ((!options.gi_quality.empty() || options.gi_bounces || options.gi_rays || options.gi_jobs ||
-             !options.gi_out.empty() || options.gi_if_stale) &&
+        const bool gi_preview = !options.gi_preview.empty();
+        const bool gi_tool = options.list_worlds || !options.gi_verify.empty() || gi_place || bake_gi || gi_preview;
+        if ((!options.gi_quality.empty() || options.gi_bounces || options.gi_rays || options.gi_sky >= 0 ||
+             options.gi_if_stale) &&
             !bake_gi)
         {
-            error = "--gi-quality, --gi-bounces, --gi-rays, --gi-jobs, --gi-out and --gi-if-stale require --bake-gi";
+            error = "--gi-quality, --gi-bounces, --gi-rays, --gi-sky and --gi-if-stale require --bake-gi";
             return false;
         }
-        if ((options.gi_bounces || options.gi_rays) && options.gi_quality != "custom")
+        if ((options.gi_jobs || !options.gi_out.empty()) && !bake_gi && !gi_preview)
         {
-            error = "--gi-bounces and --gi-rays require --gi-quality custom";
+            error = "--gi-jobs and --gi-out require --bake-gi or --gi-preview";
+            return false;
+        }
+        if ((!options.gi_preview_dir.empty() || options.gi_composition) && !gi_preview)
+        {
+            error = "--gi-preview-dir, --gi-k and --gi-f require --gi-preview";
+            return false;
+        }
+        if ((options.gi_bounces || options.gi_rays || options.gi_sky >= 0) && options.gi_quality != "custom")
+        {
+            error = "--gi-bounces, --gi-rays and --gi-sky require --gi-quality custom";
             return false;
         }
         if (options.json && !options.list_worlds && !gi_place)
@@ -503,14 +561,16 @@ namespace OpenBlood2
             return false;
         }
         if (gi_tool &&
-            (int(options.list_worlds) + int(!options.gi_verify.empty()) + int(gi_place) + int(bake_gi) > 1 ||
+            (int(options.list_worlds) + int(!options.gi_verify.empty()) + int(gi_place) + int(bake_gi) +
+                     int(gi_preview) >
+                 1 ||
              network ||
              explicit_world || options.check_data ||
              options.inspect_world || options.start_game || options.bench || options.view_world ||
              options.menu_smoke || options.demo_smoke || options.gpu_smoke || options.world_smoke ||
              options.xr_world || options.xr_test || options.frame_limit || !options.capture_file.empty()))
         {
-            error = "--list-worlds, --gi-verify, --gi-place and --bake-gi are separate headless tools";
+            error = "--list-worlds, --gi-verify, --gi-place, --bake-gi and --gi-preview are separate headless tools";
             return false;
         }
         // JSON owns standard output: only errors reach the console unless a level is chosen.

@@ -1,6 +1,7 @@
 #pragma once
 #include "engine/gi_bake_scene.h"
 #include "engine/gi_file.h"
+#include "engine/gi_lightmap.h"
 #include "engine/gi_placement.h"
 #include <atomic>
 #include <filesystem>
@@ -9,30 +10,34 @@
 #include <string>
 #include <string_view>
 
-// One world's bake (gi_contracts.md, lot G5): settings, placement, scene, a traced probe survey and
-// the .ob2gi file. Lot G5 writes INFO and PLAC only; the lighting sections come with G7 and G9.
+// One world's bake (gi_contracts.md, lots G5 and G7): settings, placement, scene, a traced probe
+// survey, the sky, the indirect light of every lightmap texel and vertex colour, and the .ob2gi file
+// (INFO, PLAC, LMAP and VTX; probes come with G9).
 namespace OpenBlood2
 {
     enum class GiQuality : std::uint8_t
     {
         Preview, // 1 bounce, 64 rays.
         Final,   // 2 bounces, 256 rays.
-        Custom   // --gi-bounces 1-3, --gi-rays 16-4096.
+        Custom   // --gi-bounces 1-3, --gi-rays 16-4096, --gi-sky 0-4.
     };
     namespace gi_bake_settings_limits
     {
         constexpr std::uint32_t min_bounces = 1, max_bounces = 3, min_rays = 16, max_rays = 4096;
+        constexpr std::uint32_t max_sky = 400; // Hundredths.
         constexpr unsigned max_jobs = 256;
     } // namespace gi_bake_settings_limits
     struct GiBakeSettings
     {
         GiQuality quality = GiQuality::Final;
         std::uint32_t bounces = 2, rays = 256;
+        std::uint32_t sky = 100; // Decision D9's sky scale, in hundredths.
     };
     const char* gi_quality_name(GiQuality);
-    // A preset name; bounces and rays (0 = not given) only with "custom", where both default to Final's.
-    bool make_gi_bake_settings(std::string_view quality, std::uint32_t bounces, std::uint32_t rays, GiBakeSettings&,
-                               std::string& error);
+    // A preset name; bounces, rays (0 = not given) and the sky scale (hundredths, -1 = not given) only
+    // with "custom", where they default to Final's.
+    bool make_gi_bake_settings(std::string_view quality, std::uint32_t bounces, std::uint32_t rays, std::int32_t sky,
+                               GiBakeSettings&, std::string& error);
     // The canonical INFO text; the thread count is never part of it.
     std::string gi_settings_text(const GiBakeSettings&);
 
@@ -53,7 +58,6 @@ namespace OpenBlood2
     // A uniform unit direction for ray `index` of stream `stream` (a probe): the same bits on every
     // build and thread count.
     DVector gi_uniform_direction(std::uint64_t stream, std::uint64_t index);
-    using GiProgress = std::function<void(std::string_view stage, std::uint64_t done, std::uint64_t total)>;
     // `progress` is called (serialized, increasing `done`) about every 5% of the probes.
     GiSurvey survey_gi_probes(const GiBakeScene&, std::span<const GiLightProbe>, std::uint32_t rays, unsigned jobs,
                               const std::atomic<bool>* cancel, const GiProgress& progress);
@@ -86,6 +90,9 @@ namespace OpenBlood2
         std::size_t probes = 0, reflections = 0;
         GiSceneReport scene;
         GiSurvey survey;
+        GiSkySetup sky_setup;
+        GiSkyReport sky;
+        GiLightmapReport lightmaps;
         std::uint64_t bytes = 0;
         double ms = 0;
     };

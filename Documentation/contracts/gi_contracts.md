@@ -1,7 +1,8 @@
 # Global illumination contracts
 
 Baked GI for the M10 [GI plan](../implementation/gi_plan.md). Each lot adds its section.
-GI is not rendered yet: nothing in this contract changes a frame, a save or the simulation.
+GI is not rendered yet: nothing in this contract changes a frame, a save or the simulation. Lot G7
+bakes the GI lightmaps; lot G8 will compose them into the world.
 
 - [World queries (lot G1)](#world-queries-lot-g1)
 - [Baked file and keys (lot G2)](#baked-file-and-keys-lot-g2)
@@ -9,6 +10,7 @@ GI is not rendered yet: nothing in this contract changes a frame, a save or the 
 - [Probe placement (lot G4)](#probe-placement-lot-g4)
 - [Bake scene and tracer (lot G5)](#bake-scene-and-tracer-lot-g5)
 - [Bake-all script and packaging (lot G6)](#bake-all-script-and-packaging-lot-g6)
+- [GI lightmap core (lot G7)](#gi-lightmap-core-lot-g7)
 
 ## World queries (lot G1)
 
@@ -605,34 +607,41 @@ Reset; both panels draw; edits survive closing; a Foreign file waits for Start f
 ## Bake scene and tracer (lot G5)
 
 `engine/gi_bake_scene.{h,cpp}`, `engine/gi_jobs.{h,cpp}` and `engine/gi_bake.{h,cpp}` turn a
-world and its placement into a `.ob2gi` file through a deterministic CPU tracer. Lot G5 traces a
-probe survey only: the file holds INFO and PLAC, and the lighting sections arrive with G7 (LMAP,
-`VTX `) and G9 (PROB). Nothing here changes a frame, a save or the simulation.
+world and its placement into a `.ob2gi` file through a deterministic CPU tracer. Lot G5 traced a
+probe survey and wrote INFO and PLAC; lot G7 adds the LMAP and `VTX ` sections
+([below](#gi-lightmap-core-lot-g7)) and G9 will add PROB. Nothing here changes a frame, a save or
+the simulation.
 
 ### Bake scene
 
 `GiBakeScene::build(mesh, uses)` takes a `WorldMesh` built with resources and lightmaps on (the
 faces the renderer draws) and one use per range:
 
-- `gi_range_uses(world, excluded)` gives Main to the Primary, Mover and Destructible models, Sky
-  to DemoSkyWorldModel models and Skip to containers and unbound models (`world_model_roles`).
+- `gi_range_uses(world, excluded)` gives Sky to the models drawn as sky (FLAG_SKYOBJECT:
+  DemoSkyWorldModel models and SkyPointer targets, as `gi_sky_setup` replays them, lot G7), Main
+  to the other Primary, Mover and Destructible models and Skip to containers, unbound models and
+  the models of refused DemoSkyWorldModel objects (`world_model_roles`).
   Every name in the placement's `excluded_models` must match at least one non-primary model
   (case-insensitive; all matches are skipped) or the bake fails with exit 4.
 - Positions are local + pivot with no rotation: the authored pose (decision D8). Sky ranges go
-  to a separate tree (`trace_sky`) for the G7 sky pass (decision D9); they never block bake rays.
-- Each triangle keeps its face record: range, material, lightmap page, flags, plane normal, UVs,
-  lightmap coordinates and vertex colors. Flags: **Translucent** (a SURF_TRANSPARENT batch with
-  a material, chroma-keyed copies included), **SkyPortal** (a sky face; rays end there with
-  `Sky`), **Lightmapped** and **Unresolved** (no material: opaque, albedo 0.5 grey).
-- **Albedo** (`albedo(face, u, v)`): raw stored RGB (0–1; G7 fixes the colour space), nearest
-  texel, repeating, from mip `round(log2(20 × texels per world unit))` clamped to the image's
-  levels (`gi_albedo_mip`; texels per unit is the square root of the texel area over the world
-  area). An SPR uses its first frame, the presentation's initial texture. Alpha is the mip-0
-  texel alpha the tracer used, 1 for opaque faces.
+  to a separate tree (`trace_sky`) and never block bake rays; the G7 sky cube paints their faces
+  directly (decision D9).
+- Each triangle keeps its face record: range, material, `WorldMesh` triangle index, lightmap
+  page, flags, plane normal, UVs, lightmap coordinates and vertex colors. Flags: **Translucent**
+  (a SURF_TRANSPARENT batch with a material, chroma-keyed copies included), **SkyPortal** (a sky
+  face; rays end there with `Sky`), **Lightmapped** and **Unresolved** (no material: opaque,
+  albedo 0.5 grey).
+- **Albedo** (`albedo(face, u, v)`): raw stored RGB (0–1, display values: lot G7 keeps them raw,
+  as the renderer multiplies them by the light), nearest texel, repeating, from mip
+  `round(log2(20 × texels per world unit))` clamped to the image's levels (`gi_albedo_mip`;
+  texels per unit is the square root of the texel area over the world area). An SPR uses its
+  first frame, the presentation's initial texture. Alpha is the mip-0 texel alpha the tracer
+  used, 1 for opaque faces.
 - **Baked light** (`baked_light(face, u, v)`): WorldShade's rule, bilinear page sample ×
   `world_saturate_scale` for lightmapped faces, else the interpolated vertex colors.
 - Images are checked once (dimensions, RGBA size; mips used only when `mip_rgba` has exactly
-  `texture_mip_bytes`); at most 4 Mi triangles.
+  `texture_mip_bytes`); batches hold whole triangles from a triangle boundary; at most 4 Mi
+  triangles.
 
 ### BVH and tracing
 
@@ -676,7 +685,8 @@ splitmix64 sequence seeded from their own indices. `gi_default_jobs()` is the lo
 | `final` (default) | 2 | 256 |
 | `custom` | `--gi-bounces` 1–3 (default 2) | `--gi-rays` 16–4096 (default 256) |
 
-The INFO text is `openblood2-gi-settings 1`, then `quality`, `bounces` and `rays` lines; the
+Lot G5's INFO text was `openblood2-gi-settings 1`, then `quality`, `bounces` and `rays` lines;
+lot G7 makes it version 2 with a `sky` line ([settings](#settings-file-and---bake-gi)). The
 thread count is never part of it. `survey_gi_probes` casts each light probe's rays (directions
 from `(probe index, ray)`) to infinity and counts front, back, sky, miss, layer-limit hits and
 layers; a probe is **inside** when more than half its rays hit back faces. Each probe hashes every
@@ -692,23 +702,25 @@ records in order. Progress is reported about every 5 % of the probes.
 3. `--gi-if-stale`: when the output file is Ready for this world, albedo, edition, algorithm,
    settings hash and placement key, the bake reports `current` and traces nothing. A committed
    placement is checked before any geometry work.
-4. Scene (exit 5 on a mesh or scene failure, 4 on an unmatched exclusion), then the survey.
+4. Scene (exit 5 on a mesh or scene failure, 4 on an unmatched exclusion), then the survey, then
+   the lot G7 sky, receivers and passes (exit 4).
 5. The file: key from the expectation, `key.settings` = SHA-256 of the INFO text, `key.placement`
-   = `gi_placement_hash`, sections INFO and PLAC. It is written atomically to
+   = `gi_placement_hash`, sections INFO, PLAC, LMAP and `VTX `. It is written atomically to
    `--gi-out` (default `user_directory()/gi`) under `gi_file_name`, creating folders.
 
-Cancellation is checked before the scene, during the survey and before writing: a cancelled bake
-exits 12 and writes nothing, so an existing file is kept.
+Cancellation is checked before the scene, during the survey and the passes, and before writing:
+a cancelled bake exits 12 and writes nothing, so an existing file is kept.
 
 `--bake-gi WORLD` (a name or resource path) runs it with `--gi-quality`, `--gi-bounces`,
-`--gi-rays` (custom only), `--gi-jobs` 1–256, `--gi-out DIR`, `--gi-if-stale` and the placement
-directory of lot G4 (`--gi-placement-dir`, the plan's `--gi-placement`). SIGINT and SIGTERM set the
-cancel flag. It prints `GI_PROGRESS stage=survey done=N total=M` lines and one line
-`GI_RESULT status=baked|current|failed|cancelled exit=N world=… quality=… bounces=… rays_per_probe=…
-jobs=…`, then the error or file and, for a bake, the placement status, probe and face counts, BVH
-size, threads, rays, `rays_per_second`, `rays_per_second_per_thread`, the survey counts, `digest`,
-`scene_ms`, `survey_ms`, `bytes` and `ms`. Exit 0, 2 (arguments or data), 4 (placement, bake or
-write), 5 (world load), 12 (cancelled). It is a separate headless tool, like `--gi-place`.
+`--gi-rays` and `--gi-sky` (custom only, the last from lot G7), `--gi-jobs` 1–256, `--gi-out DIR`,
+`--gi-if-stale` and the placement directory of lot G4 (`--gi-placement-dir`, the plan's
+`--gi-placement`). SIGINT and SIGTERM set the cancel flag. It prints `GI_PROGRESS stage=survey
+done=N total=M` lines and one line `GI_RESULT status=baked|current|failed|cancelled exit=N
+world=… quality=… bounces=… rays_per_probe=… jobs=…`, then the error or file and, for a bake, the
+placement status, probe and face counts, BVH size, threads, rays, `rays_per_second`,
+`rays_per_second_per_thread`, the survey counts, `digest`, `scene_ms`, `survey_ms`, the lot G7
+fields, `bytes` and `ms`. Exit 0, 2 (arguments or data), 4 (placement, bake or write), 5 (world
+load), 12 (cancelled). It is a separate headless tool, like `--gi-place`.
 
 ### Tests
 
@@ -824,3 +836,257 @@ error, the totals and report, `--gi-if-stale`/`--gi-jobs`/`--log-level` forwardi
 skipping, `--force`, `--list` (ready, stale with reasons, missing), `--dry-run` running nothing,
 `--prune` keeping unselected worlds' files, an unknown world (exit 2), and SIGINT to the script
 reaching a running bake (exit 12, later worlds NOT_RUN, nothing baked after the cancel).
+
+## GI lightmap core (lot G7)
+
+`engine/gi_lightmap.{h,cpp}`, `engine/gi_sky.{h,cpp}` and `engine/gi_preview.{h,cpp}` compute the
+indirect light of every stored lightmap texel and baked vertex colour, and the bake writes it into
+the LMAP and `VTX ` sections after the survey. The game does not read these sections yet: lot G8
+composes them into the world, so nothing here changes a frame, a save or the simulation.
+
+### Units (decision D1)
+
+- **E** is the cosine-weighted mean of the display radiance arriving at a sample: raw albedo (0–1)
+  times the light the renderer draws, per channel, unbounded. The sky adds its own radiance.
+- **Pages draw as 2 × Saturate, vertex light does not.** A lightmapped face shows
+  `albedo × 2 × min(page, 1)` (`world_saturate_scale`); a vertex-lit face shows
+  `albedo × min(colour, 1)`. A texel therefore adds `E × 255 / 2` to its 8-bit value and a corner
+  adds `E × 255`.
+- **Composition** (`gi_compose`, one 8-bit channel O, AmbientLight A, intensity k, floor f):
+  `A_eff = A > 0 ? min(O, A) : 0`, `D = O − A_eff`, indirect `= k × max(E, 0) × s` with s = 255/2
+  for a texel and 255 for a corner, and `out = clamp(floor(D + max(indirect, f × A_eff) + 0.5),
+  0, 255)`. A NaN E or indirect counts as 0. **E = 0 with f = 1 gives O exactly**, for every O,
+  every A (negative, NaN and infinite included) and every k. A is `world_info_ambient_any_case`
+  (lot G1), zero when the info has none.
+- The ambient fill is never bounced: the light a hit re-emits is built from D, never from O.
+
+### Receivers
+
+`WorldMesh::build` reports, when asked, one `WorldTriangleSource` per emitted triangle: its model,
+polygon, the three base-ring corners (0, i, i + 1) and how the mesh lights it (`WorldFaceLight`):
+**Sky** (a sky portal), **Lightmap** (its stored page), **Vertex** (baked colours), **Bright**
+(SURF_BRIGHT, or a textured face without baked colours) or **Untextured**. The mesh itself does not
+change. `gi_receivers` builds, from the Main ranges only:
+
+- **Blocks:** one per polygon the mesh lights with its lightmap, sorted by (model, polygon). The
+  `lightmap_frame` must exist with the polygon's stored width and height, and its texels must lie
+  in the model's block; otherwise the bake fails (exit 4). At most 4 Mi texels.
+- **Sets:** one per vertex-lit polygon and per lightmapped polygon that also has a colour per
+  point. The second kind is **DETAIL LOW**: its corners show only when lightmaps are off. Corners
+  are the base ring (`base_points`, else every point). At most 4 Mi corners.
+- **Elements:** every block's texels row-major, then every set's corners; element indices run over
+  both. Each element keeps its owner, its stored light (RGB565 expanded like the mesh, or the
+  colour) and its sample.
+- **Texel samples:** the texel centre (`LightmapFrame::position(i, j)`) stays where it is when it
+  lies inside the base ring and at least `edge_inset` (1 unit) from every edge. Otherwise it moves
+  to the closest boundary point, then toward the centroid by min(1, half the distance), so a
+  sample never sits on the plane of the wall it meets. Corners move toward the centroid the same
+  way. Every sample is then raised 0.5 units along the unit plane normal.
+- **Solid samples:** a sample whose root-BSP `point_contents` is `Solid` is never traced.
+  `Unknown` counts as open. World models are not carved into the root BSP: the back-face rule
+  below catches samples inside them.
+- **Links:** each scene face gets the receiver that lights it (bilinear texel coordinates of its
+  vertices for a block, set corners for a set), or Bright, Sky or Black (untextured faces, and
+  lightmapped or vertex faces outside Main ranges).
+- **Neighbours:** receivers sharing a base-ring edge (the same two point indices in one model) with
+  a receiver of the same kind (block, vertex set or DETAIL LOW set) whose unit normal has a dot
+  product of at least 0.9 with theirs.
+
+### Gathering
+
+- **Directions:** ray i of n follows the rank-1 lattice `((i + 0.5)/n, i/φ)`, shifted by
+  (s1, s2) and wrapped, through the concentric disk map to the cosine-weighted hemisphere around
+  the receiver's unit plane normal (the Duff et al. basis). Only `+ − × ÷` and `sqrt` are used:
+  `gi_quarter_sin_cos` is a Taylor series on [−π/4, π/4]. The shift comes from
+  `GiRandom(seed, element, pass)`, and the seed is the first eight bytes of the world DAT
+  SHA-256, little-endian. Results never depend on the thread count.
+- **Passes:** pass 1 traces every element that is not solid and not DETAIL LOW. A later pass
+  traces the valid ones again. DETAIL LOW sets feed no lookup, so they are traced once, in the last
+  pass. Pass b reads only the state left by pass b − 1: passes are separated by barriers.
+- **Radiance at a hit** (decisions D9 and D10), from the current state:
+  - lightmapped face: `albedo × 2 × bilinear(min(D + E/2, 1))` over its block;
+  - vertex-lit face: `albedo × min(D + E, 1)`, interpolated over its set's corners;
+  - SURF_BRIGHT face: its albedo (manifest emission is not baked);
+  - untextured face: 0 (counted);
+  - sky portal or miss: the sky radiance in the ray direction;
+  - back face (`dot(direction, normal) > 0`): 0 (counted);
+  - translucent layers composite in front of the hit, nearest first (`out += α T L`,
+    `T ×= 1 − α`); a ninth layer (`LayerLimit`) adds only its own α share.
+  D is `(O − A_eff) / 255`; before pass 1, E is 0, so the first bounce re-emits the original
+  direct light.
+- **Validity:** an element is valid when at most 10 % of its rays (`back_limit`) hit back faces on
+  its first trace (pass 1, or the last pass for DETAIL LOW). `back_fraction` counts first traces
+  by tenth of back-face rays.
+- **E** of a traced element is the mean radiance of its rays. After each pass and its dilation,
+  the state becomes `min(D + E/2, 1)` for texels and `min(D + E, 1)` for corners.
+
+### Dilation
+
+After every pass, elements that are not valid (or not traced) take values in three steps:
+
+1. **Inside each block:** rounds over a snapshot. Each missing texel with at least one known
+   8-neighbour takes their mean and becomes known for the next round, until the block is full.
+   A block with no valid texel is left for step 3.
+2. **Inside each set:** missing corners take the mean of the valid corners.
+3. **Across shared edges:** a receiver with no valid element takes the mean of its neighbours'
+   receiver means, in at most 8 rounds; a filled receiver can fill others in the next round.
+   Receivers still empty are 0 and counted as `unfilled`.
+
+Validity bits record each element's own sample, not whether it was filled.
+
+### Sky (decision D9)
+
+`gi_sky_setup(world)` replays what the DAT objects set up once creation, initial updates and first
+updates have run:
+
+- DemoSkyWorldModel (file order) adds its own model to slot `Index` at its initial update.
+- SkyPointer (file order, at its first update, so after every initial update) adds the model of
+  the first object whose `Name` equals `SkyObjectName` exactly (case-sensitive, like
+  `FindNamedObjects`) to slot `Index`, replacing the slot's holder. A target already in the sky
+  keeps its slot. A target that is missing or binds no world model is counted as unresolved.
+- The last of either class with three nonzero `SkyDims` defines the sky box and the view box.
+- Objects the original precreate refuses (`Index` outside 0–29, negative or non-finite `SkyDims`
+  or `InnerPercent`) add nothing, and neither does an object whose definition is rejected.
+- SkyFog comes from the last WorldProperties object and applies only when `FogEnable` gives a
+  valid fog colour, as in the client's `ResetGlobalFog`.
+
+The models of every registered object are drawn as sky (FLAG_SKYOBJECT): `gi_range_uses` gives
+them the Sky use, SkyPointer targets (doors and brushes) included, so they never block bake rays.
+
+`GiSky::build` paints a cube map (6 faces of 64², 2×2 samples per texel) from the sky eye of the
+world centre (`sky_view_position`, the linear map from the world box to the view box), as the sky
+pass draws:
+
+- slots in order, front faces only, no depth test, each range's triangles in submission order;
+  opaque faces replace the colour, translucent faces blend with their texel alpha;
+- distances in (0.01, 65536], the sky pass projection planes;
+- a texel holds albedo times baked light (sky-portal and untextured faces show their vertex
+  colour, like the renderer), fogged by SkyFog over the radial distance (the sky pass uses view
+  depth, which a cube shared by every view cannot follow);
+- directions no model covers take the solid-angle average of the covered colour, or black when
+  the sky draws nothing.
+
+Like the sky pass, an invalid definition fails the bake only when a visible object holds a slot.
+`radiance(direction)` is the bilinear texel within the direction's face (edges clamped) times the
+**sky scale**; `displayed` omits the scale.
+
+### Sections
+
+Both payloads start with u32 format (1), u32 records and u32 values, then 8-byte records, the
+u32 RGB9E5 values and the validity bits:
+
+- **LMAP:** one record per block (u16 model, u16 polygon, u8 width, u8 height, u16 zero), then
+  one E per texel;
+- **`VTX `:** one record per set (u16 model, u16 polygon, u16 corners, u16 zero), then one E per
+  corner.
+
+- Records are sorted by (model, polygon) and unique. Values follow in record order (texels
+  row-major). Validity bits are LSB-first with zero padding.
+- **RGB9E5** is the `GL_EXT_texture_shared_exponent` rule (9 mantissa bits, bias 15): negative and
+  NaN channels encode 0, values above 65,408 saturate, and only `frexp`/`ldexp` are used, so it is
+  exact.
+- The readers are strict about format, counts, sizes, order, reserved fields and padding.
+  `check_gi_lightmaps`/`check_gi_vertex_light` also require the records to name polygons with a
+  stored lightmap of that size, or with baked colours and that base ring.
+
+### Settings, file and `--bake-gi`
+
+| Preset | Bounces | Rays | Sky scale |
+| --- | --- | --- | --- |
+| `preview` | 1 | 64 | 1.00 |
+| `final` (default) | 2 | 256 | 1.00 |
+| `custom` | `--gi-bounces` 1–3 | `--gi-rays` 16–4096 | `--gi-sky` 0–4, at most two decimals |
+
+- The INFO text is `openblood2-gi-settings 2`, then the `quality`, `bounces`, `rays` and
+  `sky X.YY` lines, so the sky scale is part of the settings key. `gi_algorithm_version` is 2:
+  files from lot G5 become stale.
+- The bake runs the survey, then the sky, the receivers and the passes; exit 4 for a sky,
+  receiver or section failure. Cancellation is also checked during every pass.
+- `GI_PROGRESS stage=bounce b/B done=N total=M` lines report each pass. `GI_RESULT` adds
+  `sky_scale`, the sky counts (`sky_slots`, `sky_triangles`, `sky_covered`, `sky_average`,
+  `sky_pointers`, `sky_unresolved`, `sky_fog`, `sky_ms`) and the lightmap counts (`blocks`,
+  `texels`, `sets`, `corners`, `low_corners`, `solid`, `back_invalid`, `filled`,
+  `neighbour_filled`, `unfilled`, `lightmap_rays`, `lightmap_back`, `lightmap_sky`,
+  `lightmap_untextured`, `lightmap_layer_limit`, `back_fraction` as ten counts, `pass_ms` per pass
+  and `lightmap_ms`).
+
+### `--gi-preview` (diagnostic)
+
+`--gi-preview WORLD` reads the Ready baked file of a mounted world from `--gi-out` (any settings
+and placement), rebuilds the bake scene, sky and receivers, and writes one PNG per view under
+`--gi-preview-dir` (default `user_directory()/gi/preview`): three 480×360 panels, **Original |
+GI | Indirect**, CPU-rendered with a 90° horizontal field and 2×2 samples per pixel.
+
+- Views: the first GameStartPoint at its yaw, then turned by 120° and 240°, then the other start
+  points, six at most; eyes 36 units above `Pos`. A world without one uses its centre.
+- Faces show albedo times their drawn light (pages doubled): the stored light, then the D1
+  composition with `--gi-k` and `--gi-f` (0–4, default 1). The indirect panel shows
+  `albedo × k E × 4`. The sky shows as drawn, unscaled.
+- `GI_PREVIEW_RESULT` reports the mean E of valid texels and corners, the fraction of 8-bit
+  channels the composition changes, the mean change and the file's settings. Exit 2 (arguments or
+  data), 4 (no current file, sections that do not match the world), 5 (world load).
+
+The game never uses this tool; it exists to choose the k, f, bounce and sky defaults (Gate B).
+
+### Known limits
+
+- **Coplanar twins.** The tracer's equal-distance rule (the lower face index wins) means that of
+  two opaque faces in one plane facing opposite ways, a ray reaching them from one side can hit
+  the back of the other. Retail data has 2 drawn opaque twin pairs, both in
+  09_Abandoned_Buildings; the leak test shows the effect on a synthetic zero-thickness wall.
+- **13_Downtown's sky** covers 0.2 % of the cube: two DemoSkyWorldModel boxes bind the same
+  model name, the first match wins and the last definition is kept, so the bake sees what the
+  runtime draws.
+- Model shadows and dynamic lights are not part of the bake; neither is manifest emission (D10).
+
+### Tests
+
+**`gi_lightmap.identity`** E of 0, −0, a negative value or NaN with f = 1 returns O for every O,
+texel or corner, on a grid of 232,960 cases (negative, NaN and infinite A; infinite and NaN k);
+worked values of the formula.
+
+**`gi_lightmap.rgb9e5`** Exact round trips, saturation, NaN and negative channels, rounding into
+the next exponent, the smallest exponent, and 100,000 random values within half a step.
+
+**`gi_lightmap.sections`** LMAP/VTX round trips; refusals of every count, size, order, reserved
+field and padding byte; `check_gi_*` against a synthetic world.
+
+**`gi_lightmap.directions`** The quarter sine/cosine against the library (< 1e-13), unit length,
+hemisphere, measured cosine moments and mean direction per ray count, shift wrapping.
+
+**`gi_lightmap.placement`** A synthetic world with a triangle (DETAIL LOW), two vertex squares, a
+perpendicular wall, a bright quad, a half-solid BSP and AmbientLight: layout, every sample against
+a restated rule, the edge corrections, owners, neighbours, links, bilinear lookup, section checks
+and identical samples for 1 and 7 jobs.
+
+**`gi_lightmap.furnace`** A closed box of uniform albedo and light: bounces 1–3 match
+`E_b = 2aD(1 + a + … + a^(b−1))` (pages) and `aD(1 + …)` (vertex) to 2e-6 relative; exact ray
+counts.
+
+**`gi_lightmap.box`** A floor under a grey bright ceiling and black bright walls, against the
+analytic form factor: worst error below 2e-3 (lightmap and vertex floors, 4,096 rays).
+
+**`gi_lightmap.planes`** A white emitter above a receiver, with a uniform sky: worst error below
+3e-3.
+
+**`gi_lightmap.leak`** Two rooms sharing a wall: the dark room's E is exactly 0, its samples stay
+on its side, the lit room's floor is fully lit.
+
+**`gi_lightmap.dilation`** Blocks with solid texels, a solid block filled from its neighbour, an
+isolated block and set left at 0, and the report counts, against a restated dilation.
+
+**`gi_lightmap.back`** A sample under a large overhanging back face is invalid and unfilled; a
+small one stays valid with the expected energy.
+
+**`gi_lightmap.determinism`** Identical E and validity for 1, 2 and 7 jobs; another seed differs.
+
+**`gi_lightmap.sky`** Setup rules (refusals, last definition, pointer replacement, case-sensitive
+targets, unresolved targets, fog), a six-colour sky box seen from the mapped eye, texel-centre
+mapping, the scale, the hidden-holder rule, partial coverage and fog.
+
+**`gi_lightmap.preview`** Views, panel values, the section round trip, a mismatch refusal and a
+uniform render.
+
+**`gi_lightmap.retail`** (private data) 01_SubwayA at Preview: the file's sections pass the
+checks, match the receivers and the report, every traced element is counted, and the
+composition is the identity at E = 0 on real data.

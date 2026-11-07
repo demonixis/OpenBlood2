@@ -40,6 +40,7 @@ namespace OpenBlood2
             Unresolved = 8   // No material (missing texture): opaque, albedo 0.5.
         };
         std::uint32_t range = 0, material = 0; // WorldMesh range and material (0 when none).
+        std::uint32_t triangle = 0;            // WorldMesh triangle: vertices 3 * triangle onwards.
         std::uint32_t page = UINT32_MAX;       // Index into GiBakeScene::pages(), or none.
         std::uint8_t flags = 0, mip = 0;       // Albedo mip level.
         DVector normal{};                      // Unit plane normal.

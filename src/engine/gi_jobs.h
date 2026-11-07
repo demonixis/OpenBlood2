@@ -2,6 +2,7 @@
 #include <atomic>
 #include <cstdint>
 #include <functional>
+#include <string_view>
 
 // The GI bake's job pool and per-ray randomness (gi_contracts.md, lot G5). Results never depend
 // on the thread count: jobs write their own slots and every ray draws from a seed derived from
@@ -19,6 +20,8 @@ namespace OpenBlood2
     // before each job; once set, no further job starts. Returns when every started job finished.
     GiJobRun run_gi_jobs(std::uint64_t count, unsigned threads, const std::atomic<bool>* cancel,
                          const std::function<void(std::uint64_t index, unsigned thread)>& job);
+    // Bake progress: `done` of `total` units of a named stage, reported serialized and increasing.
+    using GiProgress = std::function<void(std::string_view stage, std::uint64_t done, std::uint64_t total)>;
     // Default --gi-jobs: the logical core count.
     unsigned gi_default_jobs();
 

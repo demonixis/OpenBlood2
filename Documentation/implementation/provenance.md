@@ -2354,3 +2354,15 @@ No code is imported. `tools/gi/bake_all.py` (Python standard library), `cmake/Gi
 `cmake/CheckGiPolicy.cmake`, the optional Gradle `assets` folder and the stub-driven test are
 written for this project from the [GI plan](gi_plan.md). See
 [contracts](../contracts/gi_contracts.md#bake-all-script-and-packaging-lot-g6).
+
+## GI lightmap core (lot G7, 2026-11-07)
+
+No code is imported. The RGB9E5 encoding follows the published `GL_EXT_texture_shared_exponent`
+rule; the cosine-weighted directions use the concentric disk map (Shirley and Chiu, 1997), the
+orthonormal basis of Duff et al. ("Building an Orthonormal Basis, Revisited", JCGT 2017) and a
+golden-ratio rank-1 lattice, all written from their published descriptions. The sky setup
+replays the project's own DemoSkyWorldModel/SkyPointer ports and `sky_view_position`; the hit
+radiance repeats the project's `WorldShade` and `WorldMesh` lighting rules. Receivers, sample
+placement, passes, dilation, the LMAP/`VTX ` formats, the preview tool and the analytic tests
+(Lambert's polygon form factor) are written for this project from the
+[GI plan](gi_plan.md). See [contracts](../contracts/gi_contracts.md#gi-lightmap-core-lot-g7).
