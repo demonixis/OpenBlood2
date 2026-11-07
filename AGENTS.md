@@ -59,7 +59,7 @@ active fields, released play keys, the refused 27889 gameplay port, UTF-8-safe h
 names and the dedicated server's `--no-lan`.
 
 The [GI plan](Documentation/implementation/gi_plan.md) (M10, [contracts](Documentation/contracts/gi_contracts.md))
-has lots G1–G10: world queries, the `.ob2gi` file and keys, the F8 overlay, probe placement
+has lots G1–G10 (the re-baked direct light, D1 (c), is planned as GD1–GD3, not implemented): world queries, the `.ob2gi` file and keys, the F8 overlay, probe placement
 (`--gi-place`, canonical `data/gi/placement/<world>.json` format 2, F8 editing), the bake
 scene/tracer (`--bake-gi`), `tools/gi/bake_all.py` with build packaging of `data/gi/baked`
 (`BLOOD2_PACKAGE_GI`, `gi/` beside the binary, `Resources/gi`, APK `assets/gi`) and the lightmap

@@ -15,7 +15,10 @@ the raw bake) with the intensity raised to **k = 2**; f = 1, the Final preset (2
 rays) and sky scale 1.0 stay. G8 (world override) is implemented on 2026-11-07; Gate C (look in
 game, and whether GI becomes a player option) awaits the user's A/B. G9 (light probes for models
 and the Light probes world source) is implemented on 2026-11-07 (`gi_algorithm_version` 3), and
-G10 (the F8 bake as a child process with hot reload) the same day.
+G10 (the F8 bake as a child process with hot reload) the same day. Also on 2026-11-07, after
+seeing that GI at k = 0 shows exactly the original lightmaps (D1 (a) by design), the user asked to
+plan D1 (c): the [re-baked direct light](#re-baked-direct-light-d1-c), lots GD1–GD3 with
+decisions D16–D20. They are proposed and not implemented.
 
 ## The request
 
@@ -46,7 +49,7 @@ Size scale: S < 400 changed lines, M 400–1,200, L 1,200–2,500, XL > 2,500.
 | Area | Current state | Consequence |
 | --- | --- | --- |
 | World lighting | DAT RGB565 lightmaps are decoded into 1024² RGBA8 pages bound at t1. The shader computes `albedo × 2 × min(lightmap × (1 − shadow) + dynamic, 1)`. Pages are rebuilt when the `presenter.lightmaps` key changes (DETAIL LOW). | GI can replace the pages in the same layout with no shader change and no per-frame cost. |
-| Original preprocessor | Bakes direct light and shadows plus a flat AmbientLight fill, with no bounce. Stored texels are 1.0–1.4× the N·L term. | Keep the lightmap as the shadowed direct term; replace only the flat fill with baked bounce light. |
+| Original preprocessor | Bakes direct light with hard ClipLight shadows plus a flat AmbientLight fill, with no bounce. Texels follow the vertex-colour term without N·L (measured 2026-11-07, see [re-baked direct light](#re-baked-direct-light-d1-c); this supersedes the earlier "1.0–1.4× the N·L term"). | Keep the lightmap as the shadowed direct term; replace only the flat fill with baked bounce light. D1 (c) re-bakes the direct term too. |
 | Vertex-lit data | Credits, six GlobalDirLight multiplayer maps and Nightmares `soc_kickthehead2` are almost entirely vertex-lit. DETAIL LOW uses vertex light everywhere. | Bake per-corner values as well as texels. |
 | World models | 2,729 world models carry their own lightmaps. Movers and breakables: 2,464 CDestructableBrush, 680 Door, 242 RotatingDoor, 136 RotatingBrush. | Bake at the authored pose like the original; GI moves with the model. |
 | Model lighting | `ModelLighting` runs on the CPU per instance: the 4 strongest static lights with N·L ×2, plus AmbientLight + ModelAdd + the remainder + the object colour, cached. | Light probes replace the flat AmbientLight share on the CPU, with no shader change. |
@@ -95,6 +98,7 @@ Its donor commit is `00fc3b28663883155ef277afcaf3e389d5dad07f`.
      - The ambient fill is never bounced twice.
    - Page alpha holds the direct fraction. The enhanced GI variant uses it for specular visibility and to apply model shadows to the direct part only.
    - Never modified: SURF_BRIGHT faces, sky faces, sprites, FX and PolyGrids.
+   - D1 (c), planned as lots GD1–GD2: a file baked with the re-baked direct source replaces D by D′ on lightmapped faces ([re-baked direct light](#re-baked-direct-light-d1-c)).
 3. **Light probes are the model GI**, sampled per receiver as in CyberEngine.
    - Validity-weighted trilinear sampling at the instance bounds centre, on the CPU.
    - `ModelLighting` ambient becomes `max(k_p·SH_ambient, f·AmbientLight)`. A dominant-direction pseudo-light from the L1 band competes in the existing top-4.
@@ -155,6 +159,61 @@ Its donor commit is `00fc3b28663883155ef277afcaf3e389d5dad07f`.
     - Reflection probes need ENHANCED. They are off by default on mobile and Quest; the opt-in uses 32², at most 16 probes, nearest probe only.
     - F8 and the baker exist only on desktop.
 
+## Re-baked direct light (D1 c)
+
+Requested on 2026-11-07, after the user saw that GI at k = 0 shows exactly the original
+lightmaps. Proposed, not implemented; decisions D16–D20 await the user.
+
+**What changes.** Today a lightmapped texel composes `D + max(k·E, f·A_eff)` with the original
+direct term D = O − A_eff. With D1 (c) the bake also computes the direct light D′ of every LMAP
+texel from the Light and DirLight objects, and the texel composes `D′ + max(k·E′, f·A_eff)`, where
+E′ is the bounce of D′. No lightmapped surface then reads the 1998 texel; k = 0 shows the
+re-baked direct light with the ambient floor.
+
+**Measured starting point** (2026-11-07, a scratch audit over the 36 single-player worlds:
+2.2 M of 10.3 M texels sampled, 13,475 Light and DirLight objects; each texel predicted as
+`A + Σ` the term below, clamped to 0–255, against the stored RGB565 texel):
+
+| Term per light | Texels within the RGB565 step + 3 | Notes |
+| --- | --- | --- |
+| `colour × BrightScale × (1 − d/R) × linear cone`, no shadow | 33.6 % | The vertex-colour term of the [static light contract](../contracts/static_light_contracts.md) |
+| The same with hard ClipLight shadows, every opaque bake-scene face occluding | 74.7 % | Median stored/predicted 0.93–1.00 per world |
+| The same, only the primary world occluding | 76.4 % | World models seem to cast less than the bake scene assumes |
+| The same, translucent faces occluding | 73.4 % | |
+| The same, five-tap soft shadows | 67.0 % | The original is point-sampled |
+| Lambert N·L with shadows | 56.5 % (SubwayA), 32.2 % (CityHub) | Median ratio about 1.5 |
+
+- Lightmap texels follow the vertex term without N·L, plus hard shadows. The note "texels are
+  1.0–1.4× the N·L term" (Starting point, static light contract) is superseded by this
+  measurement.
+- Per world, the shadowed fit ranges from 54 % (06_Airship2) and 55 % (22_Office) to 91 %
+  (25_AncientOne).
+- 18 lights are unclipped (six in each lobby world). 19 ObjectLights light only objects. No
+  single-player world has a GlobalDirLight or a negative BrightScale.
+- The remaining quarter splits about evenly between texels predicted too bright and too dark:
+  mostly shadow edges and the choice of occluders. GD1 must explain them before D′ replaces
+  anything.
+
+**Design:**
+- **Term (D16):** the measured original term, evaluated at each LMAP texel: no N·L, linear
+  falloff and cone, hard shadows for ClipLight lights, sample position and occluders fixed by GD1.
+  The ambient floor stays `f·A_eff`.
+- **Vertex-lit faces (D18)** keep their stored colours: the unshadowed term already reproduces
+  them (SubwayA 100 %), so D′ = D there.
+- **Bounce:** E′ re-emits D′ instead of D. Light probes and the later reflection probes capture
+  the re-baked world, since they read the composed light.
+- **Source (D17):** a bake setting, `direct = original | rebaked`, in the presets, `--gi-direct`,
+  `tools/gi/bake_all.py --direct` and the F8 Bake panel. `original` bakes keep today's bytes and
+  stay current; a `rebaked` file adds one section, D′ per LMAP texel in RGB9E5, so k, f and the
+  views still recompose without a rebake.
+- **Views:** Original stays the stored light byte for byte (the A/B against 1998); Direct only
+  shows D′; Final and Indirect only follow the file's source.
+- **Resolution (D20):** the DAT 20-unit grid, so pages, UVs, the packer and VRAM do not change.
+  A finer grid is the optional lot GD3.
+- **Cost:** one shadow ray per texel and clipped light in range. The audit traced its 2.2 M
+  samples with six shadow variants in about 15 s for all 36 worlds, so the direct pass adds little
+  next to the bounce passes.
+
 ## Lots
 
 Effort scale (the Claude Code reasoning effort to set before starting the lot):
@@ -181,18 +240,23 @@ Effort scale (the Claude Code reasoning effort to set before starting the lot):
 | G12 | Reflection probe runtime: the single shader lot, REFLECTION PROBES row, F8 switches | XL | **max** | G11 | The 72 existing artifacts are unchanged and the 24 GI artifacts are regenerated together. GPU tests pass on Metal (and Vulkan when available), and readbacks match a CPU mirror. The cost is measured (aim ≤ 0.3 ms at 1080p HIGH on the M5), and the user accepts the A/B. |
 | G13 | Platform tiers, full bake evidence, AGENTS.md, acceptance | M | **medium** | G6, G10, G12 | Every preset builds: macOS, iOS with `CODE_SIGNING_ALLOWED=NO`, Android and the Quest APK. Cost, size and coverage tables are recorded. The user accepts M10 or lists follow-ups. |
 | GA | Optional: case-insensitive AmbientLight in the original renderer | S | **low** | user approval | Only the lowercase-key worlds change, with evidence. |
+| GD1 | Direct-light audit: the original lightmap term, sample position, occluders, all-world table, preview panels (Gate F) | M | **xhigh** | G10, D16–D20 | The report explains the per-world fit, names the worst worlds' causes and states the term in the contract. Original / Re-baked direct preview panels exist for 3 worlds. The user accepts the term. |
+| GD2 | Re-baked direct bake and composition: `direct` setting, direct pass, D′ section, E′ from D′ (Gate G) | L | **xhigh** | GD1 | `original` files keep their bytes; GI off and the Original view stay byte-identical; a D′ equal to O − A_eff composes O exactly. Bytes are identical across job counts and cancel exits 12. The 36 worlds bake with `rebaked` at Final with the time measured. The user plays the A/B and picks the default source. |
+| GD3 | Optional: finer direct grid (10 units) in new pages | XL | **max** | GD2, Gate G, user approval | Pages, UVs and VRAM are measured per tier, GI off is unchanged, and the user accepts the sharper shadows against the cost. |
 
-**Effort summary:** max ×2 (G7, G12), xhigh ×3 (G4, G8, G9), high ×5
+**Effort summary:** max ×3 (G7, G12, GD3), xhigh ×5 (G4, G8, G9, GD1, GD2), high ×5
 (G1, G2, G5, G10, G11), medium ×3 (G3, G6, G13), low ×1 (GA).
 
-**Order:** G1 → G2 → G4 → G5 → G6 → G7 → G8 → G9 → G10 → G11 → G12 → G13.
+**Order:** G1 → G2 → G4 → G5 → G6 → G7 → G8 → G9 → G10 → GD1 → GD2 → G11 → G12 → G13.
 
 - G3 can run alongside G2.
 - G6 lands right after G5. At that point the files hold only placement, so the F8 → CLI → folder → build → runtime loop is proven before the physics lots.
 - G10 can run alongside G9.
+- GD1 and GD2 come before G11 so that the reflection gates judge the final light. Reflections stay correct either way, since a new direct source makes older files stale.
+- GD3 waits for Gate G and a separate approval.
 
-**Total:** about 18,000–25,000 changed lines, excluding baked data and
-generated artifacts.
+**Total:** about 20,000–28,000 changed lines with GD1–GD2 (GD3 adds 2,500 or more), excluding
+baked data and generated artifacts.
 
 **Gates:**
 
@@ -203,6 +267,8 @@ generated artifacts.
 | C | G8 | Look in game, and whether GI becomes a player option. Pending the user's A/B. |
 | D | G11 | Reflection memory and GPU layout. |
 | E | G12 | Reflection cost, and the default per platform. |
+| F | GD1 | The re-baked direct term (fit per world, N·L or not, occluders). |
+| G | GD2 | Look of the re-baked direct light in game, and the default direct source. |
 
 ### Lot details
 
@@ -312,6 +378,39 @@ generated artifacts.
 - Options > Display row 32: REFLECTION PROBES [OFF/LOW/HIGH].
 - F8 switches and the Reflections only view.
 
+**GD1, direct-light audit (xhigh).**
+- An engine `gi_direct` function: the term and its shadow test for one sample, deterministic and
+  with no library trigonometry beyond what `world_lights` already uses for cone setup.
+- A `--gi-direct-audit` mode (JSON with the world list, like `--list-worlds`) and a private test:
+  per world, texels within the RGB565 step, mean error, too-bright and too-dark shares, by surface
+  flags and by the number of lights reaching the texel.
+- Sweeps, each kept only if it improves the all-world fit:
+  - texel position (centre, corner, the G7 moved sample) for the term and for the shadow ray;
+  - the shadow ray's start offset and end margin;
+  - occluders: primary world only, world models by role (G1: static, mover, destructible), translucent and invisible faces, sky portals;
+  - lights inside solid space, unclipped lights, the clamp order (per-light sum then 255) and the rounding of the prediction.
+- The worst worlds (06_Airship2, 22_Office, 17_Entrance, 05_CDMB, 20_PowerStation) get named causes or stay listed as open.
+- `--gi-preview` gains an Original | Re-baked direct pair for 3 worlds.
+- Records the static light evidence correction; whether model light keeps its ×2 (justified by the superseded N·L figure) is a separate question for the user.
+- No file or frame changes.
+
+**GD2, re-baked direct bake (xhigh).**
+- The `direct` bake setting (`original` default) in presets, `--gi-direct`, the settings hash
+  (omitted for `original`, so those files keep their bytes), `bake_all.py --direct` and the F8 Bake panel.
+- A direct pass before the bounce passes: jobs, cancel, `GI_PROGRESS stage=direct`, the fields in `GI_RESULT`.
+- The D′ section after LMAP, D′ in RGB9E5 per LMAP texel; E′ re-emits D′ (texels) and the stored D
+  (vertex sets). Staleness comes from the settings hash, so `gi_algorithm_version` stays 3.
+- `gi_compose` takes D′ instead of O − A_eff where the section exists; DETAIL LOW and vertex corners are unchanged.
+- F8 Runtime shows the file's direct source; Direct only shows D′.
+- Tests: the identities above, determinism across 1/2/7 jobs, cancel, a stale `rebaked` file
+  after a placement change, `gpu.gi` with a `rebaked` file.
+- A/B captures of SubwayA, CityHub and the two worst GD1 worlds.
+
+**GD3, finer direct grid (max, optional).**
+- D′ at a 10-unit grid on lightmapped faces, E′ kept at 20 units and sampled bilinearly.
+- New LightmapFrame resolutions, packer, pages and UVs; VRAM per tier (Quest included) measured before any default.
+- Only after Gate G and a separate approval.
+
 **G13, acceptance (medium).**
 - Builds every preset, and runs the desktop-forced mobile tier test.
 - A full single-player bake with time, size, coverage and cost tables.
@@ -349,12 +448,16 @@ generated artifacts.
 | Reserving F8 removes a player binding | The controls v3 migration logs what it drops; same pattern as F10. |
 | In-game bake contention and lifetime | A child process, cancelled by killing it, with reload only if the digest still matches. |
 | The user pictures probes lighting every surface | D1 is explicit, and the Light probes world source lets the user compare both in game. |
+| The re-baked direct light drifts from the 1998 look (a quarter of the texels differ today) | GD1 audits every world before anything changes; `original` stays the default until Gate G; the Original view stays byte-identical. |
+| Shadow acne or leaks at the 20-unit grid | Point-sampled hard shadows like the original, the G7 sample rules, and GD1's offset sweep. |
+| Shadows from world models at the authored pose (doors, breakables) | The same behaviour as the original (D8); GD1 decides which models occlude (D19). |
+| Model light keeps a ×2 justified by the superseded N·L figure | Recorded by GD1; changing model light is a separate decision. |
 
 ## Decisions
 
 | # | Question | Options | Recommendation (accepted 2026-11-06) |
 | --- | --- | --- | --- |
-| D1 | What does "GI overrides the lightmaps" mean on world surfaces? | (a) GI pages in the DAT layout: original direct light and shadows plus baked bounce, zero per-frame cost; (b) per-pixel probe sampling in the shaders, as in CyberEngine (per-pixel cost including XR, leaks through thin walls); (c) also re-bake the direct light from Light/DirLight objects. | **(a)**, with the Light probes world source for comparison; (c) as a later option. |
+| D1 | What does "GI overrides the lightmaps" mean on world surfaces? | (a) GI pages in the DAT layout: original direct light and shadows plus baked bounce, zero per-frame cost; (b) per-pixel probe sampling in the shaders, as in CyberEngine (per-pixel cost including XR, leaks through thin walls); (c) also re-bake the direct light from Light/DirLight objects. | **(a)**, with the Light probes world source for comparison; (c) as a later option, planned on 2026-11-07 as lots GD1–GD3 (D16–D20). |
 | D2 | Which renderer gets GI? | (a) GI pages and model probes in both renderers, reflections in ENHANCED only; (b) everything in ENHANCED only. | **(a)**: free on Quest. GI off keeps ORIGINAL byte-identical. |
 | D3 | May baked payloads (derived from retail lightmaps and textures, about 100–150 MB for the campaign at Final) be committed or shipped? | (a) placement and settings committed, `baked/` gitignored and injected only into local builds; (b) commit the payloads; (c) Git LFS or a private repository. | **(a)**. The folder and its injection exist either way. |
 | D4 | Which builds contain F8 and the baker? | (a) every desktop preset including Release, behind `BLOOD2_GI_TOOLS`; (b) debug/dev only, with the inspector. | **(a)** |
@@ -370,6 +473,16 @@ generated artifacts.
 | D14 | Where does the work sit in the roadmap? | (a) a new M10, "Baked GI and probes", taken from the "Rendering extras" row under Later; (b) left under Later. | **(a)** |
 | D15 | Fix the case-sensitive AmbientLight read? | (a) GI reads it case-insensitively and the original renderer is unchanged; (b) also fix the original renderer (lot GA). | **(a)**, with GA as a separate approval. |
 
+Decisions for D1 (c), proposed on 2026-11-07 and awaiting the user:
+
+| # | Question | Options | Recommendation |
+| --- | --- | --- | --- |
+| D16 | Which direct term does the re-bake use? | (a) the measured original term: no N·L, linear falloff and cone, hard ClipLight shadows; (b) add Lambert N·L; (c) inverse-square falloff with N·L. | **(a)**: k = 0 stays close to the 1998 look; (b) and (c) change every level. |
+| D17 | How is the direct source chosen? | (a) a bake setting (`original` or `rebaked`): one file per world, probes consistent with it; (b) both sources in one file with a runtime switch (two bounce sets, about 3× the LMAP payload). | **(a)**; the A/B uses the Original view, and a Preview rebake takes seconds. |
+| D18 | What happens to vertex-lit faces? | (a) they keep their stored colours, already the exact unshadowed term; (b) they are re-baked with shadows. | **(a)** |
+| D19 | Which faces cast direct shadows? | (a) the set the GD1 audit fits best (primary world only fits better today, 76.4 % against 74.7 %); (b) every bake-scene face, like the bounce. | **(a)** |
+| D20 | At what resolution? | (a) the DAT 20-unit grid: same pages, UVs and VRAM; (b) a 10-unit grid in the optional lot GD3 (4× the texels, sharper shadows). | **(a)** now; (b) after Gate G. |
+
 ## Defaults taken (the user may override)
 
 | Setting | Default |
@@ -379,5 +492,6 @@ generated artifacts.
 | Reflection probes | 64² with 2×2 supersampling; at most 42 per world on desktop, 16 on mobile |
 | Bake presets | Preview: 1 bounce, 64 rays. Final: 2 bounces, 256 rays. Custom: up to 3 bounces. |
 | Runtime intensities | k = 2 (Gate B; first planned at 1), f = 1, probe 1, reflection 1, sky 1 |
+| Direct source | `original` until Gate G (D17) |
 | Names | Folder `data/gi`, extension `.ob2gi`, script `tools/gi/bake_all.py`, contract `gi_contracts.md` |
 | Effort levels | As listed in the lot table |
