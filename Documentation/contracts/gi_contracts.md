@@ -15,6 +15,8 @@ changes a save or the simulation.
 - [GI lightmap core (lot G7)](#gi-lightmap-core-lot-g7)
 - [World override (lot G8)](#world-override-lot-g8)
 - [Light probes (lot G9)](#light-probes-lot-g9)
+- [In-game bake (lot G10)](#in-game-bake-lot-g10)
+- [Direct-light audit (lot GD1)](#direct-light-audit-lot-gd1)
 
 ## World queries (lot G1)
 
@@ -1472,3 +1474,106 @@ baker checks the child's arguments, the reload hand-off, suspension, cancel, qui
 change during a bake; then this build's `blood2` bakes `01_SubwayA` Preview from F8 (frame times
 printed), the lookup chooses its file, its bytes equal an in-process bake with another job count,
 and a cancelled Final exits 12 and leaves that file unchanged.
+
+## Direct-light audit (lot GD1)
+
+Lot GD1 of the [re-baked direct light](../implementation/gi_plan.md#re-baked-direct-light-d1-c)
+(D1 (c)) recomputes the 1998 preprocessor's direct light for every stored lightmap texel and
+measures it against the stored texels. `engine/gi_direct.{h,cpp}`, `--gi-direct-audit` and the
+difference panel of `render_gi_preview` are diagnostic: no GI file, frame, save or simulation
+changes. GD2 will bake the result (decision D17). The measurements are in the
+[GD1 report](../implementation/reports/gi_gd1_direct_audit.md).
+
+### Lights
+
+`gi_direct_lights` reads the world's objects in file order:
+
+- **Light** (omni) and **DirLight** (cone) light the world. ObjectLight (objects only) and
+  GlobalDirLight (none in the shipped single-player worlds) are counted and skipped.
+- **Refused** (counted as invalid): a missing or non-finite `Pos`, `LightRadius` or colour, a radius
+  at or below 0 or above 10⁶, a non-finite `BrightScale` or `OuterColor`, and a DirLight without a
+  positive finite `FOV` or with a non-finite `Rotation`.
+- **Colours** are 0–255 values times `BrightScale` (absent: 1), the sign kept. A Light reads
+  `LightColor`, a DirLight `InnerColor`; both read `OuterColor` (absent: 0).
+- **Cone:** +Z rotated by `rotation_from_euler(Rotation)` (`rotate_vector`'s rule), and cos(FOV/2)
+  capped at 0.9999; a FOV of 360 or more is no cone. The sines and cosines use `gi_sin_cos`
+  (quarter-turn reduction, then `gi_quarter_sin_cos`): no library trigonometry.
+- **ClipLight** (absent: true) decides whether the light is shadowed; `in_solid` records a position
+  in solid root-BSP space (such lights stay shadowed, as the original).
+- At most 65,536 lights.
+
+### Term (decision D16)
+
+For a texel with centre p (`LightmapFrame::position(i, j)`), d the distance from p to the light and
+f = 1 − d/R:
+
+- **Light:** `LightColor × f + OuterColor × (1 − f)` for d < R.
+- **DirLight:** `(InnerColor × a + OuterColor × (1 − a)) × f` for d < R inside the cone, with
+  `a = (cos − cos(FOV/2)) / (1 − cos(FOV/2))` and cos the angle between the light's axis and the
+  direction from the light to p; nothing outside the cone (a point at the light takes a = 1).
+- **Texel:** `AmbientLight + Σ` over visible lights; the 8-bit value rounds half up and clamps to
+  0–255 once, after the sum (`GiDirectTexels::value`).
+- No N·L, no inverse square. These are DEdit's lightmap rules (`tools/DEdit/Lightmap/LMSampleGen.cpp`
+  in the later LithTech tree) with the linear falloff the 1998 data fits; the GD1 report gives the
+  measurements and the rejected alternatives.
+
+### Visibility (decision D19)
+
+- **Sample:** the receiver's lot-G7 sample (texel centre moved into the base ring with the edge
+  inset, raised `sample_offset` 0.5) raised `gi_direct_limits::lift` 0.5 more along the face
+  normal: 1 unit off the face.
+- **Segment:** from the sample toward the light, stopping `margin` 1 unit short of it; a sample within
+  the margin sees the light. One `CollisionWorld::sweep` with a zero box, two-sided.
+- **Occluders** (`GiDirectOccluders`): each BSP shadows only its own texels. Primary-world texels
+  test the root BSP's SURF_SOLID polygons, a world model's texels that model's polygons. SURF_INVISIBLE
+  polygons cast no shadow. Translucent and sky faces with SURF_SOLID do.
+- **ClipLight false** skips the test.
+
+### Texels and determinism
+
+`gi_direct_texels` computes every texel of `GiReceivers` (lot G7, built with no excluded models) in
+LMAP order: lights are summed in object order, each block takes the lights whose radius reaches its
+corner sphere, and jobs write their own blocks (16 per job), so the values do not depend on the job
+count. The file compiles with `-ffp-contract=off`. `CollisionWorld` is game code compiled without
+it: GD2 must make the shadow test build-independent before D′ is written to a file.
+
+### Audit
+
+`gi_direct_audit` compares each texel whose sample is not in solid space with the stored RGB565
+texel expanded to 8 bits:
+
+- **fit:** every channel within one RGB565 step plus 3 (11, 7, 11); **fit_step:** within one step
+  (8, 4, 8); **mean_abs:** the mean absolute channel difference; **brighter / darker:** the misfits by
+  the sign of their summed difference.
+- **Splits:** interior or shadow edge (a 4-neighbour in the block sees a different set of lights),
+  primary world or world models, lights reaching the texel (0, 1, 2–3, 4+) and surface flags.
+
+### `--gi-direct-audit WORLD|single|all`
+
+- One world (name or path), the single-player worlds or every mounted world, in `--list-worlds`
+  order; `--gi-jobs N` (1–256).
+- One JSON document on standard output (logging drops to errors unless `--log-level` is given):
+  `status`, `term`, `tolerance`, one entry per world (light counts, ambient, blocks, solid texels,
+  visibility tests, times and every split) and a `total` over the worlds.
+- **`--gi-preview-dir DIR`:** for each world, up to three views (`gi_preview_views`) written as
+  `<gi file stem>.direct.<view>.png`: Original | Re-baked direct | Difference. Vertex-lit faces keep
+  their stored colours in the middle panel (D18). The difference panel (`GiPreviewThird::Difference`)
+  shows, on lightmapped faces, 4 × the mean channel difference (re-baked − stored, 0–1 light) in red
+  where brighter and blue where darker, over 0.15 × the albedo in grey; other faces show the grey
+  only and the sky stays as drawn.
+- Exit 0, 2 (arguments, data), 4 (receivers, occluders, image write), 5 (world load). A separate
+  headless tool, like `--gi-preview`.
+
+### Tests
+
+**`gi_direct.term`** The omni and cone terms (falloff, OuterColor, no N·L, outside the cone) and
+the audit tolerance. **`gi_direct.lights`** `gi_sin_cos` against the library to 10⁻¹²; light classes,
+colours, BrightScale, ClipLight, FOV, invalid objects; cone axes against
+`rotate_vector(rotation_from_euler)` for 16 random rotations. **`gi_direct.shadow`** A lightmapped
+floor under a SOLID shelf: shadowed texels are 0, lit texels equal the term exactly (texels within
+2 units of the shadow edge skipped), a non-solid shelf casts nothing, the values do not depend on
+the job count; the audit's counts; the difference panel shows a brighter texel red; another model's
+wall and an invisible solid face cast no shadow, ClipLight false and the end margin.
+**`gi_direct.retail`** (private) The light counts of `01_SubwayA` and `22_Office`, their fit
+(at least 82 % and 78 %, interior at least 95 % and 90 %) and, for SubwayA, identical texels with one
+job and with all of them.

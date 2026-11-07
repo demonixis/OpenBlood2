@@ -30,11 +30,20 @@ namespace OpenBlood2
 
     // The indirect panel's brightness factor: k E is a fraction of the drawn light.
     constexpr float gi_preview_indirect_exposure = 4;
+    // The third panel: k E (lot G7), or the signed difference composed - original on lightmapped faces
+    // (lot GD1: Original | Re-baked direct | Difference), red where brighter and blue where darker,
+    // gi_preview_difference_exposure times the mean channel difference, over a dim grey of the albedo.
+    enum class GiPreviewThird
+    {
+        Indirect,
+        Difference
+    };
+    constexpr float gi_preview_difference_exposure = 4;
     // Original | GI | Indirect only, each panel width x height, 90-degree horizontal field, 2x2 samples
     // per pixel, RGBA8. Faces show albedo times their drawn light (pages doubled); the indirect panel
     // shows albedo times k E times gi_preview_indirect_exposure on lit faces and black elsewhere. The
     // sky shows as drawn (unscaled) in every panel.
     void render_gi_preview(const GiBakeScene&, const GiSky&, const GiReceivers&, const GiPreviewValues&,
                            const GiPreviewView&, unsigned width, unsigned height, unsigned jobs,
-                           std::vector<std::uint8_t>& rgba);
+                           std::vector<std::uint8_t>& rgba, GiPreviewThird third = GiPreviewThird::Indirect);
 } // namespace OpenBlood2

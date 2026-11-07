@@ -2,6 +2,7 @@
 #include "app/scene_presenter.h"
 #include "engine/atomic_file.h"
 #include "engine/gi_bake.h"
+#include "engine/gi_direct.h"
 #include "engine/gi_jobs.h"
 #include "engine/gi_file.h"
 #include "engine/gi_placement.h"
@@ -587,6 +588,196 @@ namespace OpenBlood2
         }
         std::cout << "GI_PREVIEW_RESULT status=ok exit=0 world=" << path << " views=" << views.size() << numbers
                   << settings << " texels=" << receivers.texels << " corners=" << receivers.corners << '\n';
+        return 0;
+    }
+
+    namespace
+    {
+        std::string fit_json(const GiDirectFit& fit)
+        {
+            char buffer[256];
+            std::snprintf(buffer, sizeof buffer,
+                          "{\"texels\":%zu,\"fit\":%.4f,\"fit_step\":%.4f,\"mean_abs\":%.3f,\"brighter\":%.4f,"
+                          "\"darker\":%.4f}",
+                          fit.texels, fit.share(fit.fit), fit.share(fit.fit_step), fit.mean_abs(),
+                          fit.share(fit.brighter), fit.share(fit.darker));
+            return buffer;
+        }
+        void merge_fit(GiDirectFit& into, const GiDirectFit& fit)
+        {
+            into.texels += fit.texels;
+            into.fit += fit.fit;
+            into.fit_step += fit.fit_step;
+            into.brighter += fit.brighter;
+            into.darker += fit.darker;
+            into.abs_sum += fit.abs_sum;
+        }
+        // Writes one RGBA preview strip as a PNG.
+        bool save_png(const std::filesystem::path& png, unsigned width, unsigned height,
+                      std::vector<std::uint8_t>& rgba, std::string& error)
+        {
+            std::error_code code;
+            std::filesystem::create_directories(png.parent_path(), code);
+            if (code)
+            {
+                error = code.message();
+                return false;
+            }
+            auto* surface =
+                SDL_CreateSurfaceFrom(int(width), int(height), SDL_PIXELFORMAT_RGBA32, rgba.data(), int(width * 4));
+            const bool saved = surface && SDL_SavePNG(surface, path_text(png).c_str());
+            if (!saved)
+                error = SDL_GetError();
+            SDL_DestroySurface(surface);
+            return saved;
+        }
+    } // namespace
+
+    int run_gi_direct_audit(const Options& options, const Config& config)
+    {
+        auto fail = [](int code, const std::string& error)
+        {
+            spdlog::error("{}", error);
+            std::cout << "{\"status\":\"failed\",\"exit\":" << code << ",\"error\":" << json_text(error) << "}\n";
+            return code;
+        };
+        Resources resources;
+        std::string error;
+        if (!resources.mount_game(config, error))
+            return fail(2, "Mount: " + error);
+        if (options.gi_jobs > 256)
+            return fail(2, "--gi-jobs must be 1 to 256");
+        const unsigned jobs = options.gi_jobs ? options.gi_jobs : gi_default_jobs();
+        const auto& target = options.gi_direct_audit;
+        std::vector<std::string> targets;
+        for (const auto& [group, path] : mounted_worlds(resources))
+            if (target == "all" || (target == "single" && group == 0))
+                targets.push_back(path);
+        if (target != "all" && target != "single")
+        {
+            std::string path;
+            if (!mounted_world(resources, target, path))
+                return fail(2, "World " + target + " is not mounted");
+            targets.push_back(path);
+        }
+        std::filesystem::path preview_dir = options.gi_preview_dir;
+        std::string json = "{\"status\":\"ok\",\"term\":\"ambient + BrightScale (Light: color f + outer (1 - f); "
+                           "DirLight: (inner a + outer (1 - a)) f), f = 1 - d/R\",\"tolerance\":[11,7,11],\"worlds\":[";
+        GiDirectFit total, total_edge, total_interior;
+        std::size_t total_lights = 0;
+        for (std::size_t index = 0; index < targets.size(); ++index)
+        {
+            const auto& path = targets[index];
+            const auto start = std::chrono::steady_clock::now();
+            std::vector<std::uint8_t> bytes;
+            World world;
+            if (!resources.read(path, bytes, error) || !read_world(bytes, world, error))
+                return fail(5, "World " + path + ": " + error);
+            std::vector<GiDirectLight> lights;
+            GiDirectLightReport light_report;
+            if (!gi_direct_lights(world, lights, light_report, error))
+                return fail(4, "World " + path + ": " + error);
+            WorldMesh mesh;
+            std::vector<WorldTriangleSource> sources;
+            if (!mesh.build(world, error, &resources, true, &sources))
+                return fail(5, "World mesh " + path + ": " + error);
+            std::vector<GiRangeUse> use;
+            GiSceneReport scene_report;
+            if (!gi_range_uses(world, {}, use, scene_report, error))
+                return fail(4, "World " + path + ": " + error);
+            GiBakeScene scene;
+            if (!scene.build(std::move(mesh), use, scene_report, error))
+                return fail(5, "GI scene " + path + ": " + error);
+            GiReceivers receivers;
+            if (!gi_receivers(world, scene, sources, use, jobs, receivers, error))
+                return fail(4, "World " + path + ": " + error);
+            GiDirectOccluders occluders;
+            if (!occluders.build(world, error))
+                return fail(4, "World " + path + ": " + error);
+            GiDirectTexels direct;
+            if (!gi_direct_texels(world, receivers, lights, occluders, jobs, direct, error))
+                return fail(4, "World " + path + ": " + error);
+            GiDirectAudit audit;
+            gi_direct_audit(world, receivers, direct, audit);
+            merge_fit(total, audit.all);
+            merge_fit(total_edge, audit.edge);
+            merge_fit(total_interior, audit.interior);
+            total_lights += light_report.lights;
+
+            std::string views;
+            if (!preview_dir.empty())
+            {
+                GiSkyReport sky_report;
+                GiSky sky;
+                if (!sky.build(world, scene, gi_sky_setup(world), 1, jobs, sky_report, error))
+                    return fail(4, "GI sky " + path + ": " + error);
+                GiPreviewValues values;
+                const auto n = receivers.elements();
+                values.original.resize(n * 3);
+                values.composed.resize(n * 3);
+                for (std::size_t e = 0; e < n; ++e)
+                    for (int c = 0; c < 3; ++c)
+                    {
+                        values.original[e * 3 + c] = receivers.original[e][c] / 255.f;
+                        // Decision D18: vertex-lit faces keep their stored colours.
+                        values.composed[e * 3 + c] =
+                            e < receivers.texels ? direct.value(e, c) / 255.f : values.original[e * 3 + c];
+                    }
+                auto list = gi_preview_views(world);
+                if (list.size() > 3)
+                    list.resize(3);
+                std::string name;
+                if (!gi_file_name(path, sha256(bytes), name))
+                    return fail(2, "World path too long for a GI file: " + path);
+                const auto stem = name.substr(0, name.size() - std::string_view(".ob2gi").size());
+                constexpr unsigned width = 480, height = 360;
+                std::vector<std::uint8_t> rgba;
+                for (std::size_t v = 0; v < list.size(); ++v)
+                {
+                    render_gi_preview(scene, sky, receivers, values, list[v], width, height, jobs, rgba,
+                                      GiPreviewThird::Difference);
+                    const auto png = preview_dir / path_from_utf8(stem + ".direct." + list[v].label + ".png");
+                    if (!save_png(png, width * 3, height, rgba, error))
+                        return fail(4, "GI preview " + path_text(png) + ": " + error);
+                    views += std::string(v ? "," : "") + json_text(path_text(png));
+                }
+            }
+            const auto& l = light_report;
+            char head[640];
+            std::snprintf(head, sizeof head,
+                          "{\"path\":%s,\"lights\":{\"lights\":%zu,\"omni\":%zu,\"cones\":%zu,\"unclipped\":%zu,"
+                          "\"in_solid\":%zu,\"negative\":%zu,\"cone_outer\":%zu,\"omni_outer\":%zu,"
+                          "\"object_lights\":%zu,\"global_dir_lights\":%zu,\"invalid\":%zu},"
+                          "\"ambient\":[%.0f,%.0f,%.0f],\"blocks\":%zu,\"solid_texels\":%zu,\"tests\":%llu,"
+                          "\"direct_ms\":%.0f,\"ms\":%.0f,",
+                          json_text(path).c_str(), l.lights, l.omni, l.cones, l.unclipped, l.in_solid, l.negative,
+                          l.cone_outer, l.omni_outer, l.object_lights, l.global_dir_lights, l.invalid,
+                          receivers.ambient.x, receivers.ambient.y, receivers.ambient.z, receivers.blocks.size(),
+                          audit.solid_texels, static_cast<unsigned long long>(direct.tests), direct.ms,
+                          elapsed_ms(start));
+            std::string entry = head;
+            entry += "\"all\":" + fit_json(audit.all) + ",\"interior\":" + fit_json(audit.interior) +
+                     ",\"edge\":" + fit_json(audit.edge) + ",\"primary\":" + fit_json(audit.primary) +
+                     ",\"world_models\":" + fit_json(audit.world_models) + ",\"by_lights\":{";
+            static constexpr const char* groups[4]{"0", "1", "2-3", "4+"};
+            for (int g = 0; g < 4; ++g)
+                entry += std::string(g ? "," : "") + "\"" + groups[g] + "\":" + fit_json(audit.by_lights[g]);
+            entry += "},\"by_flags\":{";
+            for (std::size_t f = 0; f < audit.by_flags.size(); ++f)
+            {
+                char flags[16];
+                std::snprintf(flags, sizeof flags, "0x%x", audit.by_flags[f].first);
+                entry += std::string(f ? "," : "") + "\"" + flags + "\":" + fit_json(audit.by_flags[f].second);
+            }
+            entry += "},\"views\":[" + views + "]}";
+            json += std::string(index ? "," : "") + entry;
+            spdlog::info("Direct audit {}: fit {:.1f}% over {} texels", path, 100 * audit.all.share(audit.all.fit),
+                         audit.all.texels);
+        }
+        json += "],\"total\":{\"worlds\":" + std::to_string(targets.size()) +
+                ",\"lights\":" + std::to_string(total_lights) + ",\"all\":" + fit_json(total) +
+                ",\"interior\":" + fit_json(total_interior) + ",\"edge\":" + fit_json(total_edge) + "}}";
+        std::cout << json << '\n';
         return 0;
     }
 

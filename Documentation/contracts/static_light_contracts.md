@@ -63,8 +63,13 @@ bounds center (view models: the camera position).
    - `FLAG_NOLIGHT` models use their object color.
    - Explosion FX stay fully bright, as before.
 6. **Scale.** N.L terms are doubled after the clamp, like the lightmaps (`world_saturate_scale`,
-   from the shipped `Saturate` default), because both include N.L:
-   - Lightmap texels measure 1.0–1.4× the N.L term, while baked vertex colors omit N.L.
+   from the shipped `Saturate` default), because both were taken to include N.L:
+   - Lightmap texels were measured at 1.0–1.4× the N.L term, while baked vertex colors omit N.L.
+     **Superseded (GI lot GD1, 2026-11-07):** over the 36 single-player worlds, lightmap texels
+     follow the vertex-colour term without N.L, with hard ClipLight shadows and OuterColor (see the
+     [direct-light audit](gi_contracts.md#direct-light-audit-lot-gd1)). The ×2 on model N.L terms
+     is unchanged; whether it stays is a separate decision for the user.
+   - Model light reads no OuterColor (counted in the statistics); the lightmap term uses it.
    - Flat and unlit models stay ×1.
 
 The uniform carries `ambient` (w = source count) and three float4 per source; the skinned

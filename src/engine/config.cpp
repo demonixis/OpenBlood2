@@ -325,6 +325,7 @@ namespace OpenBlood2
                      arg == "--gi-place" || arg == "--gi-placement-dir" || arg == "--bake-gi" ||
                      arg == "--gi-quality" || arg == "--gi-bounces" || arg == "--gi-rays" || arg == "--gi-jobs" ||
                      arg == "--gi-out" || arg == "--gi-sky" || arg == "--gi-preview" || arg == "--gi-preview-dir" ||
+                     arg == "--gi-direct-audit" ||
                      arg == "--gi-k" || arg == "--gi-f" || arg == "--gi-view" || arg == "--gi-source" ||
                      arg == "--gi-probes" || arg == "--frames" || arg == "--capture" || arg == "--world" || arg == "--log-dir" ||
                      arg == "--log-level" || arg == "--rez" ||
@@ -442,6 +443,8 @@ namespace OpenBlood2
                     options.gi_preview = args[i];
                 else if (arg == "--gi-preview-dir")
                     options.gi_preview_dir = path_from_utf8(args[i]);
+                else if (arg == "--gi-direct-audit")
+                    options.gi_direct_audit = args[i];
                 else if (arg == "--gi-view")
                 {
                     // GiView order (engine/gi_runtime.h).
@@ -561,7 +564,9 @@ namespace OpenBlood2
         const bool gi_place = !options.gi_place.empty();
         const bool bake_gi = !options.bake_gi.empty();
         const bool gi_preview = !options.gi_preview.empty();
-        const bool gi_tool = options.list_worlds || !options.gi_verify.empty() || gi_place || bake_gi || gi_preview;
+        const bool gi_direct = !options.gi_direct_audit.empty();
+        const bool gi_tool =
+            options.list_worlds || !options.gi_verify.empty() || gi_place || bake_gi || gi_preview || gi_direct;
         if ((!options.gi_quality.empty() || options.gi_bounces || options.gi_rays || options.gi_sky >= 0 ||
              options.gi_if_stale) &&
             !bake_gi)
@@ -569,14 +574,16 @@ namespace OpenBlood2
             error = "--gi-quality, --gi-bounces, --gi-rays, --gi-sky and --gi-if-stale require --bake-gi";
             return false;
         }
-        if ((options.gi_jobs || !options.gi_out.empty()) && !bake_gi && !gi_preview)
+        if ((options.gi_jobs && !bake_gi && !gi_preview && !gi_direct) ||
+            (!options.gi_out.empty() && !bake_gi && !gi_preview))
         {
-            error = "--gi-jobs and --gi-out require --bake-gi or --gi-preview";
+            error = "--gi-jobs requires --bake-gi, --gi-preview or --gi-direct-audit; --gi-out requires --bake-gi "
+                    "or --gi-preview";
             return false;
         }
-        if (!options.gi_preview_dir.empty() && !gi_preview)
+        if (!options.gi_preview_dir.empty() && !gi_preview && !gi_direct)
         {
-            error = "--gi-preview-dir requires --gi-preview";
+            error = "--gi-preview-dir requires --gi-preview or --gi-direct-audit";
             return false;
         }
         if ((options.gi_composition && !gi_preview && !options.gi) ||
@@ -609,7 +616,7 @@ namespace OpenBlood2
         }
         if (gi_tool &&
             (int(options.list_worlds) + int(!options.gi_verify.empty()) + int(gi_place) + int(bake_gi) +
-                     int(gi_preview) >
+                     int(gi_preview) + int(gi_direct) >
                  1 ||
              network ||
              explicit_world || options.check_data ||
@@ -617,11 +624,12 @@ namespace OpenBlood2
              options.menu_smoke || options.demo_smoke || options.gpu_smoke || options.world_smoke ||
              options.xr_world || options.xr_test || options.frame_limit || !options.capture_file.empty()))
         {
-            error = "--list-worlds, --gi-verify, --gi-place, --bake-gi and --gi-preview are separate headless tools";
+            error = "--list-worlds, --gi-verify, --gi-place, --bake-gi, --gi-preview and --gi-direct-audit are "
+                    "separate headless tools";
             return false;
         }
         // JSON owns standard output: only errors reach the console unless a level is chosen.
-        if (options.json && !explicit_log_level)
+        if ((options.json || gi_direct) && !explicit_log_level)
             options.log_level = "error";
         if ((explicit_match && options.host_world.empty()) || (explicit_team && !network) ||
             (!options.host_world.empty() && !options.connect_address.empty()) || (explicit_network_port && !network) ||

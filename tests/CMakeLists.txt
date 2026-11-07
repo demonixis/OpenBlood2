@@ -1030,6 +1030,16 @@ if(BLOOD2_TEST_DATA_DIR)
              "${CMAKE_CURRENT_BINARY_DIR}/gi-runtime-retail")
     set_tests_properties(gi_runtime.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
 endif()
+# Lot GD1: the re-baked direct light (term, light objects, shadows, audit, difference panel).
+foreach(case IN ITEMS term lights shadow)
+    add_test(NAME gi_direct.${case} COMMAND gi_lightmap_tests "direct-${case}"
+             "${CMAKE_CURRENT_BINARY_DIR}/gi-direct-${case}")
+    set_tests_properties(gi_direct.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 120)
+endforeach()
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME gi_direct.retail COMMAND gi_lightmap_tests direct-retail "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(gi_direct.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
+endif()
 # Lot G9: light probes (capture, PROB, the field, the model split, the world source).
 foreach(case IN ITEMS half sections basis capture field light source cost)
     add_test(NAME gi_probes.${case} COMMAND gi_lightmap_tests "probe-${case}"

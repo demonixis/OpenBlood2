@@ -121,7 +121,7 @@ namespace OpenBlood2
 
     void render_gi_preview(const GiBakeScene& scene, const GiSky& sky, const GiReceivers& r,
                            const GiPreviewValues& values, const GiPreviewView& view, unsigned width, unsigned height,
-                           unsigned jobs, std::vector<std::uint8_t>& rgba)
+                           unsigned jobs, std::vector<std::uint8_t>& rgba, GiPreviewThird third)
     {
         rgba.assign(std::size_t(width) * 3 * height * 4, 255);
         const auto forward = unit(view.forward);
@@ -137,6 +137,20 @@ namespace OpenBlood2
             const auto& link = r.links[face];
             const auto albedo = scene.albedo(face, u, v);
             DVector light{};
+            if (panel == 2 && third == GiPreviewThird::Difference && link.kind != GiReceivers::Link::Sky)
+            {
+                const double grey = .15 * (albedo[0] + albedo[1] + albedo[2]) / 3;
+                out[0] = out[1] = out[2] = grey;
+                DVector a{}, b{};
+                if (link.kind == GiReceivers::Link::Lightmap && gi_receiver_sample(r, values.original, face, u, v, a) &&
+                    gi_receiver_sample(r, values.composed, face, u, v, b))
+                {
+                    const double d = ((b.x - a.x) + (b.y - a.y) + (b.z - a.z)) / 3 * gi_preview_difference_exposure;
+                    out[0] += std::max(d, 0.0);
+                    out[2] += std::max(-d, 0.0);
+                }
+                return;
+            }
             switch (link.kind)
             {
             case GiReceivers::Link::Lightmap:

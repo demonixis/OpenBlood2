@@ -1819,6 +1819,9 @@ static int application_main(const OpenBlood2::Options& options)
                      "                      --gi-if-stale); exit 12 when cancelled\n"
                      "  --gi-preview WORLD  Write Original | GI | Indirect PNG views of WORLD's baked file\n"
                      "                      (--gi-out DIR, --gi-preview-dir DIR, --gi-k 0-4, --gi-f 0-4, --gi-jobs N)\n"
+                     "  --gi-direct-audit WORLD  Compare the re-baked direct light of WORLD, single or all with the\n"
+                     "                      stored lightmaps, as JSON (--gi-jobs N; --gi-preview-dir DIR: Original |\n"
+                     "                      Re-baked direct | Difference PNG views)\n"
                      "  --world NAME        World resource (default: 01_SubwayA, Demo_01 with --demo)\n"
                      "  --inspect-world     Parse/mount/create original subset headlessly; does not run a game\n"
                      "  --inspect-player    Exercise original shell/player entry headlessly; not playable\n"
@@ -1908,7 +1911,7 @@ static int application_main(const OpenBlood2::Options& options)
         // An ordinary launch without data opens the setup screen; tools and smokes need data.
         const bool tool = options.check_data || options.list_worlds || !options.gi_verify.empty() ||
                           !options.gi_place.empty() || !options.bake_gi.empty() || !options.gi_preview.empty() ||
-                          options.inspect_world || options.start_game || options.bench ||
+                          !options.gi_direct_audit.empty() || options.inspect_world || options.start_game || options.bench ||
                           options.gpu_smoke || options.world_smoke || options.menu_smoke || options.demo_smoke ||
                           options.view_world || !options.host_world.empty() || !options.connect_address.empty();
         if (unconfigured && !tool)
@@ -1941,6 +1944,8 @@ static int application_main(const OpenBlood2::Options& options)
         return OpenBlood2::run_gi_bake(options, config);
     if (!options.gi_preview.empty())
         return OpenBlood2::run_gi_preview(options, config);
+    if (!options.gi_direct_audit.empty())
+        return OpenBlood2::run_gi_direct_audit(options, config);
     spdlog::info("External data: {} ({})", OpenBlood2::path_text(config.data_dir), config.source);
     for (const auto& archive : data.archives)
     {

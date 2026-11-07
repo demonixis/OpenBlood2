@@ -18,8 +18,10 @@ and the Light probes world source) is implemented on 2026-11-07 (`gi_algorithm_v
 G10 (the F8 bake as a child process with hot reload) the same day. Also on 2026-11-07, after
 seeing that GI at k = 0 shows exactly the original lightmaps (D1 (a) by design), the user asked to
 plan D1 (c): the [re-baked direct light](#re-baked-direct-light-d1-c), lots GD1–GD3 with
-decisions D16–D20, which the user accepted as recommended the same day. Nothing is implemented yet;
-GD1 is next.
+decisions D16–D20, which the user accepted as recommended the same day. GD1 (the direct-light
+audit, [report](reports/gi_gd1_direct_audit.md)) is implemented on 2026-11-07: the DEdit term with
+OuterColor and per-BSP hard shadows fits 84.8 % of the 10.1 M texels (93.6 % away from shadow
+edges); Gate F (the term) awaits the user, then GD2.
 
 ## The request
 
@@ -163,7 +165,25 @@ Its donor commit is `00fc3b28663883155ef277afcaf3e389d5dad07f`.
 ## Re-baked direct light (D1 c)
 
 Requested on 2026-11-07, after the user saw that GI at k = 0 shows exactly the original
-lightmaps. Decisions D16–D20 were accepted as recommended the same day; not implemented.
+lightmaps. Decisions D16–D20 were accepted as recommended the same day. GD1 is implemented the
+same day; GD2–GD3 are not.
+
+**GD1 result** ([report](reports/gi_gd1_direct_audit.md)). The full audit replaces the sampled
+starting point below.
+- **Term:** DEdit's lightmap rules with linear falloff, no N·L.
+  - Light: `LightColor·f + OuterColor·(1 − f)`.
+  - DirLight: `(InnerColor·a + OuterColor·(1 − a))·f` inside the cone, nothing outside.
+  - f = 1 − d/R from the texel centre. Colours ×BrightScale.
+  - Texel: ambient + Σ, rounded half up and clamped once.
+- **Shadows:** hard, from 1 unit off the face to 1 unit short of the light. Each BSP shadows only
+  its own texels, with its SOLID polygons minus SURF_INVISIBLE ones. Unclipped lights are always
+  visible; lights in solid space stay shadowed.
+- **Fit:** 84.8 % of 10,107,436 texels within one RGB565 step + 3, 93.6 % away from shadow
+  edges. Per world, from 72.4 % (06_Airship2) to 97.7 % (25_AncientOne).
+- **Causes found:** ignoring OuterColor cost Office and PowerStation up to 9 points. An invisible
+  solid face cost CDMB 0.8 points.
+- **Still open:** shadow edges, world-model texels (68.5 %), grilles, masked fences and
+  Airship2.
 
 **What changes.** Today a lightmapped texel composes `D + max(k·E, f·A_eff)` with the original
 direct term D = O − A_eff. With D1 (c) the bake also computes the direct light D′ of every LMAP
@@ -379,7 +399,7 @@ baked data and generated artifacts.
 - Options > Display row 32: REFLECTION PROBES [OFF/LOW/HIGH].
 - F8 switches and the Reflections only view.
 
-**GD1, direct-light audit (xhigh).**
+**GD1, direct-light audit (xhigh).** Implemented on 2026-11-07 ([report](reports/gi_gd1_direct_audit.md)); Gate F pending.
 - An engine `gi_direct` function: the term and its shadow test for one sample, deterministic and
   with no library trigonometry beyond what `world_lights` already uses for cone setup.
 - A `--gi-direct-audit` mode (JSON with the world list, like `--list-worlds`) and a private test:

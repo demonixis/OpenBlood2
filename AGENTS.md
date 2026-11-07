@@ -59,7 +59,7 @@ active fields, released play keys, the refused 27889 gameplay port, UTF-8-safe h
 names and the dedicated server's `--no-lan`.
 
 The [GI plan](Documentation/implementation/gi_plan.md) (M10, [contracts](Documentation/contracts/gi_contracts.md))
-has lots G1–G10 (the re-baked direct light, D1 (c), is planned as GD1–GD3, not implemented): world queries, the `.ob2gi` file and keys, the F8 overlay, probe placement
+has lots G1–G10 and GD1 (the re-baked direct light, D1 (c), is planned as GD1–GD3; GD2–GD3 are not implemented): world queries, the `.ob2gi` file and keys, the F8 overlay, probe placement
 (`--gi-place`, canonical `data/gi/placement/<world>.json` format 2, F8 editing), the bake
 scene/tracer (`--bake-gi`), `tools/gi/bake_all.py` with build packaging of `data/gi/baked`
 (`BLOOD2_PACKAGE_GI`, `gi/` beside the binary, `Resources/gi`, APK `assets/gi`) and the lightmap
@@ -83,6 +83,13 @@ threads − 2, non-blocking polls each draw, SIGTERM cancel exiting 12, forced o
 edited placement first, edits `excluded_models` and reloads a finished file at the next frame only
 for the same world and DAT digest. Preserve no threads in the game, CLI-identical bytes, the
 bounded output lines and stopping the child at quit (`stop_bake`, the destructor).
+GD1 (`gi_direct`, `--gi-direct-audit`, the
+Difference preview panel) audits the DEdit lightmap term against the stored texels: no N·L, linear
+falloff, omni and cone OuterColor, ambient + Σ rounded half up and clamped once, and hard shadows
+from 1 unit off the face against the receiver's own BSP (SURF_INVISIBLE excepted, unclipped lights
+visible, lights in solid shadowed). It fits 84.8 % of the texels and changes no file or frame;
+Gate F (the term) awaits the user. Preserve object-order sums, per-slot jobs and `-ffp-contract=off`;
+GD2 must make the occlusion test build-independent before writing bytes.
 Preserve the D1 units (pages ×2 Saturate, vertex light not, the exact E = 0/f = 1 identity
 of `gi_compose`), D-only re-emission, edge-inset samples, the 10 % back-face validity on the
 first trace and SkyPointer targets as Sky ranges.

@@ -2386,3 +2386,14 @@ calls (`_NSGetExecutablePath`, `GetModuleFileNameW`, `/proc/self/exe`). CyberEng
 (Bake, Cancel, progress); decision D6 replaced its in-process threads with a child process. The
 GI_PROGRESS/GI_RESULT parsers, the Bake panel and the reload hand-off are written for this project
 from the [GI plan](gi_plan.md). See [contracts](../contracts/gi_contracts.md#in-game-bake-lot-g10).
+
+## GI direct-light audit (lot GD1, 2026-11-07)
+
+No code is imported. The term follows DEdit's lightmap sample rules in the later LithTech tree
+(`../lithtech/tools/DEdit/Lightmap/LMSampleGen.cpp`: the omni `inner × f + outer × (1 − f)` and the
+cone `(inner × a + outer × (1 − a)) × f`, read only) with the linear falloff the 1998 data fits;
+`../lithtech/tools/PreProcessor/LightMapMaker.cpp` was read for the sample placement and shadow
+segment. `gi_direct`, the audit and the difference panel are written for this project from the
+[GI plan](gi_plan.md) and the measurements in the
+[GD1 report](reports/gi_gd1_direct_audit.md). See
+[contracts](../contracts/gi_contracts.md#direct-light-audit-lot-gd1).

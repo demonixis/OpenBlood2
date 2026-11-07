@@ -6,8 +6,11 @@
 // runtime lookup of 01_SubwayA (missing, stale, ready; E = 0 leaves the mesh byte-identical).
 // Lot G9 (gi_probes.*): binary16, the PROB section, the SH basis, probe capture (furnace, back faces,
 // determinism), the trilinear field, the model split, the Light probes world source and its cost.
+// Lot GD1 (gi_direct.*): the re-baked direct term, the light objects, hard shadows from each BSP's own
+// SOLID polygons, the audit tolerance, the difference panel and, privately, the retail fit.
 #include "engine/config.h"
 #include "engine/gi_bake.h"
+#include "engine/gi_direct.h"
 #include "engine/gi_lightmap.h"
 #include "engine/gi_placement.h"
 #include "engine/gi_probes.h"
@@ -2342,6 +2345,255 @@ namespace
         CHECK(valid == 1000 && ms < 2);
         return true;
     }
+
+    // ---- Lot GD1: the re-baked direct light ----
+    WorldProperty vector_property(std::string name, DVector v)
+    {
+        return property(std::move(name), v);
+    }
+    GiDirectLight omni_light(DVector position, double radius, std::array<double, 3> color)
+    {
+        GiDirectLight light;
+        light.position = position;
+        light.radius = radius;
+        light.inner = color;
+        return light;
+    }
+    // The term: linear falloff, no N.L (the point's side is irrelevant), the DirLight inner/outer mix.
+    bool direct_term()
+    {
+        const auto light = omni_light({0, 0, 100}, 200, {200, 100, -50});
+        const auto at = [&](DVector p) { return gi_direct_term(light, p); };
+        CHECK(at({0, 0, 100})[0] == 200);
+        const auto half = at({0, 0, 0});
+        CHECK(near(half[0], 100, 1e-12) && near(half[1], 50, 1e-12) && near(half[2], -25, 1e-12));
+        CHECK(at({0, 0, 300})[0] == 0 && at({0, 0, 301})[0] == 0 && at({0, 0, -100})[0] == 0);
+        CHECK(near(at({0, 0, 200})[0], 100, 1e-12)); // Behind any surface: the same.
+        GiDirectLight outer = light;
+        outer.outer = {40, 0, 0}; // Light: LightColor x f + OuterColor x (1 - f) within R.
+        CHECK(near(gi_direct_term(outer, {0, 0, 50})[0], 200 * .75 + 40 * .25, 1e-12));
+        CHECK(gi_direct_term(outer, {0, 0, 301})[0] == 0);
+        GiDirectLight cone = light;
+        cone.inner = {255, 255, 255};
+        cone.outer = {0, 128, 255};
+        cone.direction = {0, 0, -1};
+        cone.cos_half = .5; // FOV 120.
+        const auto axis = gi_direct_term(cone, {0, 0, 0});
+        CHECK(near(axis[0], 127.5, 1e-12) && near(axis[2], 127.5, 1e-12));
+        // 45 degrees off the axis: cos .7071, a = (.7071 - .5) / .5.
+        const DVector off{100, 0, 0};
+        const double d = std::sqrt(2.0) * 100, c = 100 / d, a = (c - .5) / .5, f = 1 - d / 200;
+        const auto side = gi_direct_term(cone, off);
+        CHECK(near(side[0], 255 * a * f, 1e-9) && near(side[1], (255 * a + 128 * (1 - a)) * f, 1e-9) &&
+              near(side[2], 255 * f, 1e-9));
+        CHECK(gi_direct_term(cone, {100, 0, 150})[0] == 0); // Outside the cone.
+        // Audit tolerance: one RGB565 step plus 3, per channel.
+        GiDirectFit fit;
+        fit.add({100, 100, 100}, {111, 107, 89});
+        fit.add({100, 100, 100}, {112, 100, 100});
+        fit.add({100, 100, 100}, {100, 92, 100});
+        CHECK(fit.texels == 3 && fit.fit == 1 && fit.fit_step == 0 && fit.darker == 1 && fit.brighter == 1);
+        return true;
+    }
+    // Light objects: classes, colours, BrightScale, ClipLight, the cone from Rotation and FOV.
+    bool direct_lights()
+    {
+        for (double angle = -20; angle <= 20; angle += .0137)
+        {
+            double s, c;
+            gi_sin_cos(angle, s, c);
+            CHECK(near(s, std::sin(angle), 1e-12) && near(c, std::cos(angle), 1e-12));
+        }
+        World world;
+        world.models.resize(1);
+        auto light = [](std::string cls, std::vector<WorldProperty> extra, float radius = 300)
+        {
+            std::vector<WorldProperty> props{vector_property("Pos", {1, 2, 3}), property("LightRadius", radius),
+                                             property("BrightScale", .5f)};
+            for (auto& p : extra)
+                props.push_back(std::move(p));
+            return object(std::move(cls), std::move(props));
+        };
+        world.objects.push_back(light("Light", {vector_property("LightColor", {200, 100, 50}),
+                                                vector_property("OuterColor", {10, 10, 10})}));
+        std::mt19937 random(7);
+        std::uniform_real_distribution<float> angle(-7, 7);
+        std::vector<DVector> rotations;
+        for (int i = 0; i < 16; ++i)
+        {
+            const DVector r{angle(random), angle(random), angle(random)};
+            rotations.push_back(r);
+            world.objects.push_back(light("DirLight", {vector_property("InnerColor", {255, 0, 0}),
+                                                       vector_property("OuterColor", {0, 0, i ? 0.f : 64.f}),
+                                                       property("FOV", 90.f), property("ClipLight", i != 3),
+                                                       property("Rotation", EulerAngles{r})}));
+        }
+        world.objects.push_back(light("DirLight", {vector_property("InnerColor", {1, 1, 1}), property("FOV", 360.f)}));
+        world.objects.push_back(light("ObjectLight", {vector_property("LightColor", {1, 1, 1})}));
+        world.objects.push_back(object("GlobalDirLight", {}));
+        world.objects.push_back(light("Light", {vector_property("LightColor", {1, 1, 1})}, -1));
+        world.objects.push_back(object("Light", {vector_property("Pos", {0, 0, 0})}));
+        world.objects.push_back(light("DirLight", {vector_property("InnerColor", {1, 1, 1})})); // No FOV.
+        std::vector<GiDirectLight> lights;
+        GiDirectLightReport report;
+        std::string error;
+        CHECK(gi_direct_lights(world, lights, report, error));
+        CHECK(report.lights == 18 && report.omni == 1 && report.cones == 17 && report.unclipped == 1);
+        CHECK(report.cone_outer == 1 && report.omni_outer == 1 && report.object_lights == 1);
+        CHECK(report.global_dir_lights == 1 && report.invalid == 3 && report.negative == 0);
+        CHECK(lights[0].inner[0] == 100 && lights[0].outer[0] == 5 && lights[0].cos_half < -1);
+        CHECK(lights[1].outer[2] == 32 && lights[1].object == 1 && !lights[4].clip);
+        CHECK(near(lights[1].cos_half, std::sqrt(.5), 1e-12) && lights[17].cos_half < -1);
+        for (int i = 0; i < 16; ++i)
+        {
+            const auto expected = rotate_vector({0, 0, 1}, rotation_from_euler(rotations[i]));
+            const auto& d = lights[1 + i].direction;
+            CHECK(near(d[0], expected.x, 2e-6) && near(d[1], expected.y, 2e-6) && near(d[2], expected.z, 2e-6));
+        }
+        return true;
+    }
+    // Hard shadows on a lightmapped floor from a SOLID shelf of the same BSP; a non-solid shelf, an
+    // invisible solid face and another model's wall cast none; texels away from the shadow edge match
+    // the term exactly.
+    bool direct_shadow(const fs::path& root)
+    {
+        Resources resources;
+        CHECK(mount(root, resources));
+        for (const bool solid : {true, false})
+        {
+            WorldBuilder b;
+            b.add({quad_z(0, 0, 200, 200, 0), {0, 0, 1}, Kind::Lightmap});
+            const auto shelf = quad_z(-50, -50, 100, 250, 50);
+            const auto polygon = b.add({shelf, {0, 0, 1}, Kind::Vertex, "grey.dtx", 0, {9, 9, 9}});
+            auto& model = b.world.models[0];
+            if (solid)
+                model.surfaces[model.polygons[polygon].surface].flags |= 1;
+            Prepared p;
+            CHECK(prepare(b.world, resources, p));
+            const auto& r = p.receivers;
+            CHECK(r.blocks.size() == 1);
+            const std::vector<GiDirectLight> lights{omni_light({150, 100, 100}, 400, {255, 200, 150})};
+            GiDirectOccluders occluders;
+            std::string error;
+            CHECK(occluders.build(b.world, error));
+            GiDirectTexels direct, single;
+            CHECK(gi_direct_texels(b.world, r, lights, occluders, 3, direct, error));
+            CHECK(gi_direct_texels(b.world, r, lights, occluders, 1, single, error));
+            CHECK(direct.light == single.light && direct.visible == single.visible);
+            const auto& block = r.blocks[0];
+            std::size_t lit = 0, dark = 0, skipped = 0;
+            for (unsigned j = 0; j < block.frame.height; ++j)
+                for (unsigned i = 0; i < block.frame.width; ++i)
+                {
+                    const std::size_t e = block.first + j * block.frame.width + i;
+                    DVector centre;
+                    CHECK(block.frame.position(i, j, centre));
+                    const auto term = gi_direct_term(lights[0], centre);
+                    // Where the sample-to-light segment crosses z = 50 (the shelf ends at x = 100).
+                    const DVector s = vector_add(r.samples[e], {0, 0, float(gi_direct_limits::lift)});
+                    const double t = (50 - s.z) / (100 - s.z), x = s.x + t * (150 - s.x);
+                    if (std::abs(x - 100) < 2)
+                    {
+                        ++skipped;
+                        continue;
+                    }
+                    const bool shadowed = solid && x < 100;
+                    for (int c = 0; c < 3; ++c)
+                        CHECK(direct.light[e * 3 + c] == (shadowed ? 0.f : float(term[c])));
+                    (shadowed ? dark : lit) += 1;
+                }
+            std::cout << "DIRECT_SHADOW solid=" << solid << " lit=" << lit << " dark=" << dark
+                      << " edge=" << skipped << " tests=" << direct.tests << '\n';
+            CHECK(lit > 0 && (solid ? dark > 0 : dark == 0));
+            GiDirectAudit audit;
+            gi_direct_audit(b.world, r, direct, audit);
+            CHECK(audit.all.texels + audit.solid_texels == r.texels && audit.by_flags.size() == 1);
+            if (!solid)
+                continue;
+            // The difference panel: a re-baked texel brighter than the stored one shows red.
+            GiSky sky;
+            sky.fill({0, 0, 0}, 1);
+            GiPreviewValues values;
+            values.original.assign(r.elements() * 3, .2f);
+            values.composed.assign(r.elements() * 3, .6f);
+            std::vector<std::uint8_t> rgba;
+            render_gi_preview(p.scene, sky, r, values, {{150, 100, 30}, {0, 0, -1}, "down"}, 8, 8, 1, rgba,
+                              GiPreviewThird::Difference);
+            const auto* pixel = &rgba[(4 * 24 + 16 + 4) * 4];
+            CHECK(pixel[0] > 200 && pixel[2] < 60);
+        }
+        // Each BSP shadows only itself: model 1's wall blocks model 1's receivers, not model 0's.
+        World world;
+        world.models.resize(2);
+        auto& wall = world.models[1];
+        wall.points = {{-10, -10, 50}, {10, -10, 50}, {10, 10, 50}, {-10, 10, 50}};
+        wall.planes.push_back({{0, 0, 1}, 50});
+        Surface surface;
+        surface.flags = 1;
+        wall.surfaces.push_back(surface);
+        Polygon quad;
+        quad.points = {0, 1, 2, 3};
+        wall.polygons.push_back(quad);
+        // The same quad in model 0, SOLID but SURF_INVISIBLE: no shadow.
+        world.models[0] = wall;
+        world.models[0].surfaces[0].flags = 5;
+        GiDirectOccluders occluders;
+        std::string error;
+        CHECK(occluders.build(world, error));
+        const auto light = omni_light({0, 0, 100}, 400, {1, 1, 1});
+        CHECK(gi_direct_visible(occluders, 0, {0, 0, 0}, light));
+        CHECK(!gi_direct_visible(occluders, 1, {0, 0, 0}, light));
+        GiDirectLight unclipped = light;
+        unclipped.clip = false;
+        CHECK(gi_direct_visible(occluders, 1, {0, 0, 0}, unclipped));
+        CHECK(gi_direct_visible(occluders, 1, {0, 0, 99.5f}, light)); // Within the margin.
+        return true;
+    }
+    // Private: the retail fit of 01_SubwayA and 22_Office (DirLight OuterColor), thread determinism.
+    bool direct_retail(const fs::path& data)
+    {
+        Config config;
+        config.data_dir = data;
+        Resources resources;
+        std::string error;
+        CHECK(resources.mount_game(config, error));
+        struct Expect
+        {
+            const char* path;
+            std::size_t lights, cones, in_solid, cone_outer;
+            double fit, interior;
+        };
+        for (const auto& x : {Expect{"worlds/01_subwaya.dat", 371, 261, 6, 0, .82, .95},
+                              Expect{"worlds/22_office.dat", 530, 299, 2, 160, .78, .90}})
+        {
+            std::vector<std::uint8_t> bytes;
+            World world;
+            CHECK(resources.read(x.path, bytes, error) && read_world(bytes, world, error));
+            std::vector<GiDirectLight> lights;
+            GiDirectLightReport report;
+            CHECK(gi_direct_lights(world, lights, report, error));
+            CHECK(report.lights == x.lights && report.cones == x.cones && report.in_solid == x.in_solid &&
+                  report.cone_outer == x.cone_outer && report.invalid == 0 && report.negative == 0);
+            Prepared p;
+            CHECK(prepare(world, resources, p, 0));
+            GiDirectOccluders occluders;
+            CHECK(occluders.build(world, error));
+            GiDirectTexels direct, single;
+            CHECK(gi_direct_texels(world, p.receivers, lights, occluders, 0, direct, error));
+            GiDirectAudit audit;
+            gi_direct_audit(world, p.receivers, direct, audit);
+            const double fit = audit.all.share(audit.all.fit), interior = audit.interior.share(audit.interior.fit);
+            std::cout << "DIRECT_RETAIL world=" << x.path << " texels=" << audit.all.texels << " fit=" << fit
+                      << " interior=" << interior << " edge=" << audit.edge.share(audit.edge.fit)
+                      << " ms=" << direct.ms << '\n';
+            CHECK(fit >= x.fit && interior >= x.interior);
+            if (x.cone_outer)
+                continue;
+            CHECK(gi_direct_texels(world, p.receivers, lights, occluders, 1, single, error));
+            CHECK(direct.light == single.light && direct.reaching == single.reaching);
+        }
+        return true;
+    }
 } // namespace
 
 int main(int argc, char** argv)
@@ -2370,6 +2622,12 @@ int main(int argc, char** argv)
         ok = probe_light();
     else if (name == "probe-cost")
         ok = probe_cost();
+    else if (name == "direct-term")
+        ok = direct_term();
+    else if (name == "direct-lights")
+        ok = direct_lights();
+    else if (name == "direct-retail" && argc == 3)
+        return direct_retail(path_from_utf8(argv[2])) ? 0 : 1;
     else if (name == "retail" && argc == 5)
         return retail(path_from_utf8(argv[2]), path_from_utf8(argv[3]), path_from_utf8(argv[4])) ? 0 : 1;
     else if (name == "runtime-retail" && argc == 4)
@@ -2381,7 +2639,7 @@ int main(int argc, char** argv)
             {"placement", placement}, {"furnace", furnace},         {"box", box},   {"planes", planes},
             {"leak", leak},           {"dilation", dilation},       {"back", back}, {"determinism", determinism},
             {"sky", sky},             {"preview", preview},         {"runtime", runtime_override},
-            {"probe-capture", probe_capture}, {"probe-source", probe_source}};
+            {"probe-capture", probe_capture}, {"probe-source", probe_source}, {"direct-shadow", direct_shadow}};
         const auto found = cases.find(name);
         if (found == cases.end())
             return 2;

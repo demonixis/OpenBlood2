@@ -356,8 +356,8 @@ namespace
         options = {};
         const std::array<std::string_view, 3> separate{"--gi-place", "all", "--list-worlds"};
         CHECK(!parse_options(separate, options, error));
-        CHECK(error == "--list-worlds, --gi-verify, --gi-place, --bake-gi and --gi-preview are separate headless "
-                       "tools");
+        CHECK(error == "--list-worlds, --gi-verify, --gi-place, --bake-gi, --gi-preview and --gi-direct-audit are "
+                       "separate headless tools");
 
         // GI lot G5: --bake-gi and its options.
         options = {};
@@ -422,6 +422,24 @@ namespace
         CHECK(parse_options(preview_defaults, options, error));
         CHECK(options.gi_k == gi_default_k && options.gi_f == gi_default_f && gi_default_k == 2 && gi_default_f == 1);
         CHECK(!options.gi_composition && options.gi_preview_dir.empty());
+        // GI lot GD1: --gi-direct-audit with --gi-jobs and --gi-preview-dir; JSON owns standard output.
+        options = {};
+        const std::array<std::string_view, 6> direct{"--gi-direct-audit", "single", "--gi-jobs", "4",
+                                                     "--gi-preview-dir",  "panels"};
+        CHECK(parse_options(direct, options, error));
+        CHECK(options.gi_direct_audit == "single" && options.gi_jobs == 4 && options.log_level == "error");
+        CHECK(path_text(options.gi_preview_dir) == "panels" && options.gi_preview.empty());
+        for (const auto& args : std::initializer_list<std::vector<std::string_view>>{
+                 {"--gi-direct-audit"},
+                 {"--gi-direct-audit", "a", "--gi-out", "bakes"},
+                 {"--gi-direct-audit", "a", "--gi-k", "1"},
+                 {"--gi-direct-audit", "a", "--gi-preview", "a"},
+                 {"--gi-direct-audit", "a", "--list-worlds"},
+                 {"--gi-direct-audit", "a", "--world", "02_CityHub"}})
+        {
+            options = {};
+            CHECK(!parse_options(args, options, error));
+        }
         for (const auto& args : std::initializer_list<std::vector<std::string_view>>{
                  {"--gi-preview"},
                  {"--gi-preview-dir", "shots"},

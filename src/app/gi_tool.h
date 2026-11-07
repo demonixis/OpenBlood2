@@ -26,6 +26,12 @@ namespace OpenBlood2
     // --gi-preview-dir (default user_directory()/gi/preview), composed with --gi-k and --gi-f (1).
     // Exit 0, 2 (arguments, data), 4 (missing, invalid or stale file, image write), 5 (world load).
     int run_gi_preview(const Options&, const Config&);
+    // --gi-direct-audit WORLD|single|all (lot GD1): recomputes each world's direct light per stored
+    // lightmap texel (engine/gi_direct.h, no placement exclusions) and prints one JSON document with the
+    // per-world fit against the stored texels; with --gi-preview-dir, writes Original | Re-baked direct |
+    // Difference PNG views from the start points. Exit 0, 2 (arguments, data), 4 (receivers, occluders,
+    // image write), 5 (world load).
+    int run_gi_direct_audit(const Options&, const Config&);
 
     class ScenePresenter;
     // Logs the presenter's baked GI status (lot G8) once per lookup (`logged` holds the last logged
