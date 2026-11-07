@@ -366,8 +366,9 @@ namespace
                                             threads > 2 ? threads - 2 : 1));
         }
 
-        // Cancel (Final), with the Pinned strip drawn while it runs.
+        // Cancel (Final, re-baked direct light, lot GD2), with the Pinned strip drawn while it runs.
         tools.bake.final_quality = true;
+        tools.bake.rebaked = true;
         CHECK(tools.start_bake(game, config));
         CHECK(run_until(tools, game, config, input, link, 20000, 16, progressed) && running());
         input.gi = GiOverlay::Pinned;
@@ -378,6 +379,16 @@ namespace
         CHECK(run_until(tools, game, config, input, link, 20000, 16, done));
         CHECK(tools.bake.process.state == State::Cancelled && tools.bake.process.exit_code == 12 && reload == 1);
         CHECK(tools.bake.notice.find(" cancelled (exit 12)") != std::string::npos);
+        {
+            std::ifstream in(out / "args.txt");
+            std::vector<std::string> args;
+            for (std::string line; std::getline(in, line);)
+                args.push_back(line);
+            const unsigned threads = std::thread::hardware_concurrency();
+            CHECK(args == gi_bake_arguments(config, "worlds/01_subwaya.dat", "final", config.gi_placement_dir, out,
+                                            threads > 2 ? threads - 2 : 1, true));
+        }
+        tools.bake.rebaked = false;
 
         // Quit during a bake: stop_bake cancels and waits.
         CHECK(tools.start_bake(game, config));

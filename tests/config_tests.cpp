@@ -368,6 +368,21 @@ namespace
         CHECK(options.bake_gi == "01_SubwayA" && options.gi_quality == "custom" && options.gi_bounces == 3);
         CHECK(options.gi_rays == 4096 && options.gi_jobs == 7 && path_text(options.gi_out) == "bakes");
         CHECK(!options.gi_if_stale);
+        // Lot GD2: --gi-direct original|rebaked, bakes only.
+        for (const auto value : {"original", "rebaked"})
+        {
+            options = {};
+            const std::array<std::string_view, 4> direct{"--bake-gi", "a", "--gi-direct", value};
+            CHECK(parse_options(direct, options, error) && options.gi_direct == value);
+        }
+        options = {};
+        const std::array<std::string_view, 4> wrong_direct{"--bake-gi", "a", "--gi-direct", "Rebaked"};
+        CHECK(!parse_options(wrong_direct, options, error) && error == "--gi-direct requires original or rebaked");
+        options = {};
+        const std::array<std::string_view, 2> lone_direct{"--gi-direct", "rebaked"};
+        CHECK(!parse_options(lone_direct, options, error) &&
+              error == "--gi-quality, --gi-bounces, --gi-rays, --gi-sky, --gi-direct and --gi-if-stale require "
+                       "--bake-gi");
         options = {};
         const std::array<std::string_view, 3> stale{"--bake-gi", "01_SubwayA", "--gi-if-stale"};
         CHECK(parse_options(stale, options, error) && options.gi_if_stale && options.gi_quality.empty());

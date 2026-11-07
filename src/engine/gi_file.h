@@ -28,10 +28,11 @@ namespace OpenBlood2
         constexpr std::uint32_t info = tag('I', 'N', 'F', 'O');
         constexpr std::uint32_t placement = tag('P', 'L', 'A', 'C'); // Placement the bake used (G4/G5).
         constexpr std::uint32_t lightmaps = tag('L', 'M', 'A', 'P'); // Indirect light per texel (G7).
+        constexpr std::uint32_t direct = tag('D', 'I', 'R', ' ');    // Re-baked direct light per texel (GD2).
         constexpr std::uint32_t vertices = tag('V', 'T', 'X', ' ');  // Indirect light per corner (G7).
         constexpr std::uint32_t probes = tag('P', 'R', 'O', 'B');    // SH L2 light probes (G9).
         constexpr std::uint32_t reflections = tag('R', 'E', 'F', 'L'); // Reflection probes (G11).
-        constexpr std::uint32_t order[]{info, placement, lightmaps, vertices, probes, reflections};
+        constexpr std::uint32_t order[]{info, placement, lightmaps, direct, vertices, probes, reflections};
     } // namespace gi_format
     // Bumped whenever a bake would produce different numbers from the same inputs.
     // 2: lot G7 (sky, lightmaps, vertex light); 3: lot G9 (light probes).

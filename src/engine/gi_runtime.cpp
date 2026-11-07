@@ -80,6 +80,26 @@ namespace OpenBlood2
         const auto energy = gi_rgb9e5_decode(values[index]);
         const float e[3]{energy.x, energy.y, energy.z}, a[3]{ambient.x, ambient.y, ambient.z};
         std::array<std::uint8_t, 3> out{};
+        if (texel && rebaked && index < direct.texels.size())
+        {
+            // A re-baked file (lot GD2): D' replaces D.
+            const auto d = gi_rgb9e5_decode(direct.texels[index]);
+            const float dv[3]{d.x, d.y, d.z};
+            for (int c = 0; c < 3; ++c)
+                switch (composition.view)
+                {
+                    case GiView::Direct:
+                        out[c] = gi_compose_direct(dv[c], original[c], a[c], 0, 0, 0);
+                        break;
+                    case GiView::Indirect:
+                        out[c] = gi_compose(0, 0, e[c], composition.k, 0, true);
+                        break;
+                    default: // Final and Lighting only.
+                        out[c] = gi_compose_direct(dv[c], original[c], a[c], e[c], composition.k, composition.f);
+                        break;
+                }
+            return out;
+        }
         for (int c = 0; c < 3; ++c)
             switch (composition.view)
             {
@@ -110,6 +130,17 @@ namespace OpenBlood2
             !read_gi_vertex_light(vtx->payload, light.vertex, error) ||
             !check_gi_lightmaps(world, light.lightmaps, error) || !check_gi_vertex_light(world, light.vertex, error))
             return false;
+        if (const auto* dir = file.find(gi_format::direct))
+        {
+            if (!read_gi_direct(dir->payload, light.direct, error))
+                return false;
+            if (light.direct.texels.size() != light.lightmaps.texels.size())
+            {
+                error = "The DIR section does not have one value per LMAP texel";
+                return false;
+            }
+            light.rebaked = true;
+        }
         light.block_first.reserve(light.lightmaps.blocks.size());
         std::uint32_t first = 0;
         for (const auto& b : light.lightmaps.blocks)
@@ -239,7 +270,8 @@ namespace OpenBlood2
             return "GI applied: " + s.world_path + " from " + s.file + " (" + std::to_string(s.blocks) + " blocks, " +
                    std::to_string(s.texels) + " texels, " + std::to_string(s.sets) + " corner sets, " +
                    std::to_string(s.corners) + " corners, " + std::to_string(s.valid_probes) + "/" +
-                   std::to_string(s.probes) + " light probes; " + cost + ")";
+                   std::to_string(s.probes) + " light probes" + (s.rebaked ? ", re-baked direct light" : "") +
+                   "; " + cost + ")";
         if (s.state == GiRuntimeState::Off || s.state == GiRuntimeState::NoWorld)
             return std::string("GI ") + gi_runtime_state_name(s.state);
         return "GI not applied to " + s.world_path + " (" + gi_runtime_state_name(s.state) + "): " + s.detail + " (" +
@@ -311,6 +343,7 @@ namespace OpenBlood2
             status.detail = error;
             return;
         }
+        status.rebaked = decoded.rebaked;
         status.blocks = decoded.lightmaps.blocks.size();
         status.texels = decoded.lightmaps.texels.size();
         status.sets = decoded.vertex.sets.size();

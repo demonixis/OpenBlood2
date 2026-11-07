@@ -59,7 +59,7 @@ active fields, released play keys, the refused 27889 gameplay port, UTF-8-safe h
 names and the dedicated server's `--no-lan`.
 
 The [GI plan](Documentation/implementation/gi_plan.md) (M10, [contracts](Documentation/contracts/gi_contracts.md))
-has lots G1–G10 and GD1 (the re-baked direct light, D1 (c), is planned as GD1–GD3; GD2–GD3 are not implemented): world queries, the `.ob2gi` file and keys, the F8 overlay, probe placement
+has lots G1–G10, GD1 and GD2 (the re-baked direct light, D1 (c), is planned as GD1–GD3; GD3 is not implemented): world queries, the `.ob2gi` file and keys, the F8 overlay, probe placement
 (`--gi-place`, canonical `data/gi/placement/<world>.json` format 2, F8 editing), the bake
 scene/tracer (`--bake-gi`), `tools/gi/bake_all.py` with build packaging of `data/gi/baked`
 (`BLOOD2_PACKAGE_GI`, `gi/` beside the binary, `Resources/gi`, APK `assets/gi`) and the lightmap
@@ -88,8 +88,16 @@ Difference preview panel) audits the DEdit lightmap term against the stored texe
 falloff, omni and cone OuterColor, ambient + Σ rounded half up and clamped once, and hard shadows
 from 1 unit off the face against the receiver's own BSP (SURF_INVISIBLE excepted, unclipped lights
 visible, lights in solid shadowed). It fits 84.8 % of the texels and changes no file or frame;
-Gate F (the term) awaits the user. Preserve object-order sums, per-slot jobs and `-ffp-contract=off`;
-GD2 must make the occlusion test build-independent before writing bytes.
+Gate F was accepted. Preserve object-order sums, per-slot jobs and `-ffp-contract=off`.
+GD2 bakes it as the `direct` setting (`original` default until Gate G; `--gi-direct`, `bake_all.py
+--direct`, the F8 Bake panel): a direct pass before the bounces writes D′ = max(0, min(T, 255) −
+A_eff)/255 per LMAP texel (solid or unplaced texels keep D) as the RGB9E5 `DIR ` section after LMAP,
+the passes re-emit D′ (corners keep D) and texels compose `gi_compose_direct` in Final/Lighting/Direct.
+The shadow test is a `GiBvh` any-hit trace (0.01-unit touch rule), so bytes do not depend on jobs or
+builds. Preserve `original` bytes (no settings line), staleness through the settings hash
+(`gi_algorithm_version` 3), the exact identity of a D′ equal to O − A_eff, Original/Indirect/
+Validity views, DETAIL LOW and corners unchanged, and the strict DIR count; Gate G (the A/B and the
+default source) awaits the user.
 Preserve the D1 units (pages ×2 Saturate, vertex light not, the exact E = 0/f = 1 identity
 of `gi_compose`), D-only re-emission, edge-inset samples, the 10 % back-face validity on the
 first trace and SkyPointer targets as Sky ranges.

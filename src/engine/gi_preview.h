@@ -22,7 +22,9 @@ namespace OpenBlood2
     {
         std::vector<float> original, composed, indirect;
     };
-    GiPreviewValues gi_preview_values(const GiReceivers&, const GiIndirect&, float k, float f);
+    // `direct` (texels x 3, decoded D') composes a re-baked file's texels (lot GD2).
+    GiPreviewValues gi_preview_values(const GiReceivers&, const GiIndirect&, float k, float f,
+                                      std::span<const float> direct = {});
     // The indirect light stored in the sections, in receiver order; false when the sections do not list
     // exactly these blocks and sets.
     bool gi_indirect_from_sections(const GiReceivers&, const GiLightmaps&, const GiVertexLight&, GiIndirect&,

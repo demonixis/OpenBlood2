@@ -1002,6 +1002,10 @@ if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME gi_bake.retail COMMAND gi_bake_tests retail "${BLOOD2_TEST_DATA_DIR}"
              "${PROJECT_SOURCE_DIR}/data/gi/placement" "${CMAKE_CURRENT_BINARY_DIR}/gi-bake-retail")
     set_tests_properties(gi_bake.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
+    # Lot GD2: re-baked bakes against a scratch placement.
+    add_test(NAME gi_bake.retail_direct COMMAND gi_bake_tests retail-direct "${BLOOD2_TEST_DATA_DIR}"
+             "${CMAKE_CURRENT_BINARY_DIR}/gi-bake-retail-direct")
+    set_tests_properties(gi_bake.retail_direct PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
 endif()
 
 # Lot G7: the lightmap core. Like the tracer, its results must not depend on the build.
@@ -1030,8 +1034,9 @@ if(BLOOD2_TEST_DATA_DIR)
              "${CMAKE_CURRENT_BINARY_DIR}/gi-runtime-retail")
     set_tests_properties(gi_runtime.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
 endif()
-# Lot GD1: the re-baked direct light (term, light objects, shadows, audit, difference panel).
-foreach(case IN ITEMS term lights shadow)
+# Lots GD1-GD2: the re-baked direct light (term, light objects, shadows, audit, difference panel; the
+# D' source: identities, DIR, jobs, cancel, passes, runtime).
+foreach(case IN ITEMS term lights shadow bake)
     add_test(NAME gi_direct.${case} COMMAND gi_lightmap_tests "direct-${case}"
              "${CMAKE_CURRENT_BINARY_DIR}/gi-direct-${case}")
     set_tests_properties(gi_direct.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 120)

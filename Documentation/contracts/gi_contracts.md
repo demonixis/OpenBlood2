@@ -190,7 +190,7 @@ bytes (no time, host name or padding garbage).
 | Trailer | 32 | SHA-256 of every preceding byte |
 
 Sections appear in one order only, each at most once: `INFO` (mandatory, first), then the
-optional `PLAC` (G4), `LMAP` and `VTX ` (G7), `PROB` (G9), `REFL` (G11). The INFO payload is a
+optional `PLAC` (G4), `LMAP` (G7), `DIR ` (GD2), `VTX ` (G7), `PROB` (G9), `REFL` (G11). The INFO payload is a
 u16 length and the canonical settings text (UTF-8, no NUL, at most 4,096 bytes). Every other
 payload is opaque here; its owning lot decodes it and applies its own limits (texels, probes,
 reflection resolution).
@@ -205,7 +205,7 @@ failure. Each refusal names its reason ("Invalid GI file: …"):
 - an unsupported version, a wrong endian marker, an unknown edition, nonzero reserved bytes;
 - a world path that is too long, truncated or not a normalized `.dat` resource path;
 - a SHA-256 trailer mismatch (checked before any section);
-- a section count outside 1–6, an unknown tag, a duplicate or out-of-order section, INFO not
+- a section count outside 1–7 (one per known tag), an unknown tag, a duplicate or out-of-order section, INFO not
   first, nonzero flags, a truncated section header or payload, a CRC-32 mismatch;
 - INFO with a bad length, invalid UTF-8, or a text whose SHA-256 differs from the header;
 - bytes left between the last section and the trailer.
@@ -1523,10 +1523,16 @@ f = 1 − d/R:
   inset, raised `sample_offset` 0.5) raised `gi_direct_limits::lift` 0.5 more along the face
   normal: 1 unit off the face.
 - **Segment:** from the sample toward the light, stopping `margin` 1 unit short of it; a sample within
-  the margin sees the light. One `CollisionWorld::sweep` with a zero box, two-sided.
+  the margin sees the light. Since GD2 the test is `gi_segment_blocked`, a two-sided any-hit trace
+  over a `GiBvh` of the occluders' fan triangles (WorldShade's Möller–Trumbore arithmetic, the far end
+  included); hits within `gi_direct_limits::touch` 0.01 units of the sample are ignored, so a sample
+  lying on a face never blocks (GD1 used `CollisionWorld::sweep` with a zero box, whose touching rule
+  this reproduces: 89 segments differ over SubwayA, Office and Airship2, 25 of SubwayA's 459,762).
 - **Occluders** (`GiDirectOccluders`): each BSP shadows only its own texels. Primary-world texels
   test the root BSP's SURF_SOLID polygons, a world model's texels that model's polygons. SURF_INVISIBLE
-  polygons cast no shadow. Translucent and sky faces with SURF_SOLID do.
+  polygons cast no shadow. Translucent and sky faces with SURF_SOLID do. One BVH per model of the
+  polygons' fan triangles; degenerate triangles (float |e1 × e2|² below 10⁻¹²) are skipped, invalid
+  surfaces or points fail, and the total is capped at `gi_bake_limits::max_triangles`.
 - **ClipLight false** skips the test.
 
 ### Texels and determinism
@@ -1534,8 +1540,10 @@ f = 1 − d/R:
 `gi_direct_texels` computes every texel of `GiReceivers` (lot G7, built with no excluded models) in
 LMAP order: lights are summed in object order, each block takes the lights whose radius reaches its
 corner sphere, and jobs write their own blocks (16 per job), so the values do not depend on the job
-count. The file compiles with `-ffp-contract=off`. `CollisionWorld` is game code compiled without
-it: GD2 must make the shadow test build-independent before D′ is written to a file.
+count. The file compiles with `-ffp-contract=off`, and since GD2 the shadow test runs entirely in it
+(float arithmetic, no `CollisionWorld`), so the texels do not depend on the build either. `placed`
+marks texels whose centre could be placed; `progress` reports stage `direct` in blocks and a set
+`cancel` stops the pass (`cancelled`).
 
 ### Audit
 
@@ -1577,3 +1585,86 @@ wall and an invisible solid face cast no shadow, ClipLight false and the end mar
 **`gi_direct.retail`** (private) The light counts of `01_SubwayA` and `22_Office`, their fit
 (at least 82 % and 78 %, interior at least 95 % and 90 %) and, for SubwayA, identical texels with one
 job and with all of them.
+
+## Re-baked direct bake (lot GD2)
+
+Lot GD2 bakes the GD1 term (decision D17) as an optional direct source and composes it on
+lightmapped faces. `original` stays the default until Gate G, and `original` files keep their bytes.
+The measurements are in the [GD2 report](../implementation/reports/gi_gd2_rebaked_direct.md).
+
+### Setting
+
+- `GiBakeSettings::direct`: `GiDirectSource::Original` (default) or `Rebaked`; `gi_direct_source_name`
+  gives `original` / `rebaked`, `gi_direct_source` parses them (exact, lower case). The presets leave
+  it to the caller.
+- **Settings text:** `direct rebaked` is appended as a last line only for re-baked bakes, so the
+  settings hash, and the bytes, of `original` files do not change. Staleness follows the settings
+  hash: `--gi-if-stale` rebakes an original file for a re-baked request and the reverse, and
+  `gi_algorithm_version` stays 3. The runtime accepts either source.
+- **Command line:** `--bake-gi WORLD --gi-direct original|rebaked` (with `--bake-gi` only; another
+  value fails with exit 2). `tools/gi/bake_all.py --direct original|rebaked` passes it (not for
+  `original`) and records `direct` per world in its report. The F8 Bake panel has a Direct light
+  choice (Original lightmaps / Re-baked) that adds `--gi-direct rebaked` after the quality
+  (`gi_bake_arguments(..., rebaked)`).
+
+### Direct pass
+
+`bake_gi_world` runs `gi_rebake_direct` after the receivers and before the bounce passes, on the
+bake's jobs, cancel flag and progress (`GI_PROGRESS stage=direct`, in blocks). A cancel exits 12 and
+writes nothing; a light, occluder or receiver error exits 4 (`GI direct light: ...`).
+
+- **D′ (decision D17):** per LMAP texel and channel, with T = AmbientLight + Σ (`gi_direct_texels`)
+  and A_eff = clamp(min(O, A), 0, O) from the stored texel O as `gi_compose` takes it:
+  `D′ = max(0, min(T, 255) − A_eff) / 255` (`gi_direct_value`; NaN or negative T gives 0).
+- **Kept texels:** a texel whose sample lies in solid space or whose centre cannot be placed keeps
+  D = (O − A_eff)/255.
+- **RGB9E5:** D′ is rounded through RGB9E5 before the passes, so the bounce reads exactly what the
+  file stores (at most about 0.25 of 255 off, so a composed value may differ from the exact D′ by
+  one step).
+- **Vertex sets (D18)** keep their stored colours: corners keep D, in the passes and in composition.
+- **Bounce:** `bake_gi_lightmaps(..., direct)` starts every texel's D and B from D′, so E′ is the
+  bounce of D′ (texels) and of the stored D (corners); `gi_light_state(..., direct)` gives the light
+  probes the same state. An empty `direct` is the original bake bit for bit; a wrong size fails.
+- **`GI_RESULT`:** `direct=original|rebaked`, and for re-baked bakes `direct_lights`, `direct_cones`,
+  `direct_unclipped`, `direct_in_solid`, `direct_triangles`, `direct_tests`, `direct_kept`,
+  `direct_saturated` (texels with a channel of T above 255) and `direct_ms`.
+
+### DIR section
+
+Tag `DIR ` (`gi_format::direct`), after LMAP and before VTX: u32 format (`gi_direct_limits::format`
+1), u32 count, then count u32 RGB9E5 D′ values in LMAP order. `read_gi_direct` is strict (format,
+count up to `max_texels`, exact size; output untouched on failure), and `gi_world_light` refuses a
+file whose DIR count differs from its LMAP texels. Original bakes have no DIR section.
+
+### Composition
+
+`gi_compose_direct(D′, O, A, E, k, f) = clamp(round(255 D′ + max(k E 255/2, f A_eff)))`, A_eff from
+the stored O. `GiWorldLight::compose` uses it for texels of a re-baked file:
+
+- **Final and Lighting:** `gi_compose_direct(D′, O, A, E, k, f)`.
+- **Direct:** `gi_compose_direct(D′, O, A, 0, 0, 0)`, D′ alone.
+- **Indirect, Original, Validity:** unchanged (Original stays the stored light byte for byte).
+- **Corners and DETAIL LOW** compose as in an original file.
+- **Identity:** a D′ equal to (O − A_eff)/255, also through RGB9E5, composes O exactly at f = 1 and
+  E = 0, whatever k; elsewhere it stays within one step of `gi_compose`.
+- `--gi-preview` composes a re-baked file's texels the same way; the F8 Runtime panel shows
+  `Direct light: re-baked (DIR section)` or `original lightmaps`, and the status line adds
+  `, re-baked direct light`.
+
+### Tests
+
+**`gi_direct.bake`** The identity over every O, 13 ambients (NaN and infinities included), k and
+E = 0, also through RGB9E5; within one step of `gi_compose` elsewhere; worked examples; `gi_direct_value`
+cases and its round trip; the DIR payload and its refusals; a lit box: D′ per texel against
+`gi_direct_value`, identical with 1, 3 and 7 jobs, progress `direct`, cancel and invalid receivers;
+the passes and the light state with D′ = exact D (bit for bit) and with the re-baked D′; runtime
+composition per view, corners unchanged, DIR refusals, meshes (identity at both detail levels,
+pages only changing, Original byte-identical) and the status line. **`gi_bake.settings`** the
+source names, parse and settings text. **`gi_bake_process.parse`** the `--gi-direct rebaked`
+argument. **`config.gi`** `--gi-direct` parsing and refusal. **`gi_bake.retail_direct`** (private)
+01_SubwayA Preview against a scratch placement: identical bytes for 1, 2 and 7 jobs, the direct
+stage before the bounce, DIR after LMAP, an original bake without DIR or a direct line, staleness
+across sources and after a placement change, cancel during the direct pass (exit 12, file kept).
+**`gpu.gi`** (private, GPU) for CityHub and SubwayA, original and enhanced, high and low detail: a
+DIR of O − A_eff with E = 0 is the reference frame; the re-baked D′ changes the lightmapped frame and
+keeps DETAIL LOW; the Original view restores it.

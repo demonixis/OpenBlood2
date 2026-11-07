@@ -231,6 +231,18 @@ namespace OpenBlood2
         const double out = std::floor(d + std::max(indirect, fill >= 0 ? fill : 0.0) + .5);
         return static_cast<std::uint8_t>(out >= 255 ? 255 : out > 0 ? out : 0);
     }
+    std::uint8_t gi_compose_direct(float direct, std::uint8_t original, float ambient, float energy, float k, float f)
+    {
+        const double o = original;
+        const double a = ambient > 0 ? std::min(o, double(ambient)) : 0.0;
+        const double d = direct > 0 ? double(direct) * 255 : 0.0;
+        double indirect = double(k) * (energy > 0 ? double(energy) : 0.0) * (255.0 / 2);
+        if (!(indirect >= 0))
+            indirect = 0;
+        const double fill = double(f) * a;
+        const double out = std::floor(d + std::max(indirect, fill >= 0 ? fill : 0.0) + .5);
+        return static_cast<std::uint8_t>(out >= 255 ? 255 : out > 0 ? out : 0);
+    }
 
     bool write_gi_lightmaps(const GiLightmaps& maps, std::vector<std::uint8_t>& out, std::string& error)
     {
@@ -848,11 +860,13 @@ namespace OpenBlood2
         for (int c = 0; c < 3; ++c)
             out[c] += transmission * value[c];
     }
-    void gi_light_state(const GiReceivers& r, const GiIndirect& indirect, std::vector<float>& light)
+    void gi_light_state(const GiReceivers& r, const GiIndirect& indirect, std::vector<float>& light,
+                        std::span<const float> rebaked)
     {
         const auto n = r.elements();
         light.assign(n * 3, 0.f);
-        if (indirect.energy.size() != n * 3 || r.original.size() != n || r.owner.size() != n)
+        if (indirect.energy.size() != n * 3 || r.original.size() != n || r.owner.size() != n ||
+            (!rebaked.empty() && rebaked.size() != r.texels * 3))
             return;
         const float ambient[3]{r.ambient.x, r.ambient.y, r.ambient.z};
         for (std::size_t e = 0; e < n; ++e)
@@ -864,7 +878,7 @@ namespace OpenBlood2
                 // The passes' arithmetic: D as a float, then min(1, D + scale E) as a float.
                 const double o = r.original[e][c];
                 const double a = ambient[c] > 0 ? std::min(o, double(ambient[c])) : 0.0;
-                const float direct = float((o - a) / 255);
+                const float direct = e < r.texels && !rebaked.empty() ? rebaked[e * 3 + c] : float((o - a) / 255);
                 light[e * 3 + c] =
                     low ? direct : float(std::min(1.0, direct + scale * indirect.energy[e * 3 + c]));
             }
@@ -874,7 +888,7 @@ namespace OpenBlood2
     bool bake_gi_lightmaps(const GiBakeScene& scene, const GiSky& sky, const GiReceivers& r, std::uint32_t bounces,
                            std::uint32_t rays, std::uint64_t seed, unsigned jobs, const std::atomic<bool>* cancel,
                            const GiProgress& progress, GiIndirect& result, GiLightmapReport& report,
-                           std::string& error)
+                           std::string& error, std::span<const float> rebaked)
     {
         const auto start = std::chrono::steady_clock::now();
         result = {};
@@ -889,7 +903,7 @@ namespace OpenBlood2
         const auto receivers = r.blocks.size() + r.sets.size();
         if (!bounces || !rays || r.links.size() != scene.faces().size() || r.owner.size() != n ||
             r.samples.size() != n || r.solid.size() != n || r.original.size() != n ||
-            r.neighbour_first.size() != receivers + 1)
+            r.neighbour_first.size() != receivers + 1 || (!rebaked.empty() && rebaked.size() != r.texels * 3))
         {
             error = "GI lightmaps: invalid receivers or settings";
             return false;
@@ -898,7 +912,8 @@ namespace OpenBlood2
         auto is_low = [&](std::size_t e) { return e >= r.texels && r.sets[r.owner[e] - r.blocks.size()].low; };
         auto normal_of = [&](std::size_t e)
         { return e < r.texels ? r.blocks[r.owner[e]].normal : r.sets[r.owner[e] - r.blocks.size()].normal; };
-        // D: the original light without the ambient fill (0-1), and B: what the next pass sees.
+        // D: the original light without the ambient fill (0-1), or the re-baked D' on texels (lot
+        // GD2), and B: what the next pass sees.
         const float ambient[3]{r.ambient.x, r.ambient.y, r.ambient.z};
         std::vector<float> direct(n * 3), light(n * 3), energy(n * 3, 0.f), next(n * 3);
         for (std::size_t e = 0; e < n; ++e)
@@ -906,7 +921,8 @@ namespace OpenBlood2
             {
                 const double o = r.original[e][c];
                 const double a = ambient[c] > 0 ? std::min(o, double(ambient[c])) : 0.0;
-                direct[e * 3 + c] = light[e * 3 + c] = float((o - a) / 255);
+                direct[e * 3 + c] = light[e * 3 + c] =
+                    e < r.texels && !rebaked.empty() ? rebaked[e * 3 + c] : float((o - a) / 255);
             }
         std::vector<std::uint8_t> valid(n, 0);
         struct Counters

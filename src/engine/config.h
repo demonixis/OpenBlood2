@@ -56,8 +56,9 @@ namespace OpenBlood2
         std::filesystem::path gi_verify;
         std::string gi_place;
         // --bake-gi WORLD [--gi-quality preview|final|custom] [--gi-bounces N] [--gi-rays N] [--gi-sky S]
-        // [--gi-jobs N] [--gi-out DIR] [--gi-if-stale] (lots G5, G7); zero (sky: -1) means not given.
-        std::string bake_gi, gi_quality;
+        // [--gi-jobs N] [--gi-out DIR] [--gi-if-stale] (lots G5, G7) [--gi-direct original|rebaked] (lot
+        // GD2); zero (sky: -1) and an empty direct source mean not given.
+        std::string bake_gi, gi_quality, gi_direct;
         std::uint32_t gi_bounces = 0, gi_rays = 0, gi_jobs = 0;
         std::int32_t gi_sky = -1; // Sky scale in hundredths (0-400).
         // --gi-preview WORLD [--gi-out DIR] [--gi-preview-dir DIR] [--gi-k K] [--gi-f F] [--gi-jobs N] (lot G7).

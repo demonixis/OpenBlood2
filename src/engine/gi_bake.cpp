@@ -63,6 +63,20 @@ namespace OpenBlood2
             return "custom";
         }
     }
+    const char* gi_direct_source_name(GiDirectSource source)
+    {
+        return source == GiDirectSource::Rebaked ? "rebaked" : "original";
+    }
+    bool gi_direct_source(std::string_view name, GiDirectSource& source)
+    {
+        if (name == "original")
+            source = GiDirectSource::Original;
+        else if (name == "rebaked")
+            source = GiDirectSource::Rebaked;
+        else
+            return false;
+        return true;
+    }
     bool make_gi_bake_settings(std::string_view quality, std::uint32_t bounces, std::uint32_t rays, std::int32_t sky,
                                GiBakeSettings& settings, std::string& error)
     {
@@ -114,7 +128,8 @@ namespace OpenBlood2
         const auto sky = std::to_string(settings.sky / 100) + "." + char('0' + settings.sky / 10 % 10) +
                          char('0' + settings.sky % 10);
         return "openblood2-gi-settings 2\nquality " + std::string(gi_quality_name(settings.quality)) + "\nbounces " +
-               std::to_string(settings.bounces) + "\nrays " + std::to_string(settings.rays) + "\nsky " + sky + "\n";
+               std::to_string(settings.bounces) + "\nrays " + std::to_string(settings.rays) + "\nsky " + sky + "\n" +
+               (settings.direct == GiDirectSource::Rebaked ? "direct rebaked\n" : "");
     }
 
     GiSurvey survey_gi_probes(const GiBakeScene& scene, std::span<const GiLightProbe> probes, std::uint32_t rays,
@@ -353,16 +368,33 @@ namespace OpenBlood2
         std::uint64_t seed = 0;
         for (int i = 0; i < 8; ++i)
             seed |= std::uint64_t(digest[i]) << (8 * i);
+        // The re-baked direct light (lot GD2), before the passes that bounce it.
+        GiDirectBake direct;
+        const bool rebaked = request.settings.direct == GiDirectSource::Rebaked;
+        if (rebaked)
+        {
+            if (!gi_rebake_direct(world, receivers, request.jobs, request.cancel, request.progress, direct, error))
+                return direct.cancelled ? cancelled() : fail(4, "GI direct light: " + error);
+            result.direct_lights = direct.lights;
+            result.direct_triangles = direct.occluder_triangles;
+            result.direct_kept = direct.kept;
+            result.direct_saturated = direct.saturated;
+            result.direct_tests = direct.tests;
+            result.direct_ms = direct.ms;
+            if (stop())
+                return cancelled();
+        }
         GiIndirect indirect;
         if (!bake_gi_lightmaps(scene, sky, receivers, request.settings.bounces, request.settings.rays, seed,
-                               request.jobs, request.cancel, request.progress, indirect, result.lightmaps, error))
+                               request.jobs, request.cancel, request.progress, indirect, result.lightmaps, error,
+                               direct.direct))
             return result.lightmaps.cancelled ? cancelled() : fail(4, "GI lightmaps: " + error);
         if (stop())
             return cancelled();
 
         // Light probes (lot G9), from the state the last pass leaves, with the pass ray count.
         std::vector<float> light;
-        gi_light_state(receivers, indirect, light);
+        gi_light_state(receivers, indirect, light, direct.direct);
         GiProbes probes;
         if (!bake_gi_probes(scene, sky, receivers, light, lattice.probes, request.settings.rays, seed, request.jobs,
                             request.cancel, request.progress, probes, result.light_probes, error))
@@ -370,7 +402,7 @@ namespace OpenBlood2
         if (stop())
             return cancelled();
 
-        // The file: INFO, PLAC, LMAP, VTX and PROB.
+        // The file: INFO, PLAC, LMAP, DIR (re-baked only), VTX and PROB.
         GiFile file;
         file.key.world = expected.world;
         file.key.albedo = expected.albedo;
@@ -391,6 +423,13 @@ namespace OpenBlood2
         if (!write_gi_lightmaps(maps, lmap.payload, error) || !write_gi_vertex_light(vertex_light, vtx.payload, error))
             return fail(4, "Lightmap sections: " + error);
         file.sections.push_back(std::move(lmap));
+        if (rebaked)
+        {
+            GiSection dir{gi_format::direct, {}};
+            if (!write_gi_direct(direct.section, dir.payload, error))
+                return fail(4, "Direct section: " + error);
+            file.sections.push_back(std::move(dir));
+        }
         file.sections.push_back(std::move(vtx));
         GiSection prob{gi_format::probes, {}};
         if (!write_gi_probes(probes, prob.payload, error))

@@ -21,7 +21,10 @@ plan D1 (c): the [re-baked direct light](#re-baked-direct-light-d1-c), lots GD1�
 decisions D16–D20, which the user accepted as recommended the same day. GD1 (the direct-light
 audit, [report](reports/gi_gd1_direct_audit.md)) is implemented on 2026-11-07: the DEdit term with
 OuterColor and per-BSP hard shadows fits 84.8 % of the 10.1 M texels (93.6 % away from shadow
-edges); Gate F (the term) awaits the user, then GD2.
+edges); the user accepted Gate F (the term). GD2 (the re-baked direct bake,
+[report](reports/gi_gd2_rebaked_direct.md)) is implemented the same day: the `direct` setting, the
+`DIR ` section and composition of D′, with `original` the default; Gate G (the A/B and the default
+source) awaits the user.
 
 ## The request
 
@@ -166,7 +169,7 @@ Its donor commit is `00fc3b28663883155ef277afcaf3e389d5dad07f`.
 
 Requested on 2026-11-07, after the user saw that GI at k = 0 shows exactly the original
 lightmaps. Decisions D16–D20 were accepted as recommended the same day. GD1 is implemented the
-same day; GD2–GD3 are not.
+same day, then GD2 after Gate F; GD3 is not.
 
 **GD1 result** ([report](reports/gi_gd1_direct_audit.md)). The full audit replaces the sampled
 starting point below.
@@ -399,7 +402,7 @@ baked data and generated artifacts.
 - Options > Display row 32: REFLECTION PROBES [OFF/LOW/HIGH].
 - F8 switches and the Reflections only view.
 
-**GD1, direct-light audit (xhigh).** Implemented on 2026-11-07 ([report](reports/gi_gd1_direct_audit.md)); Gate F pending.
+**GD1, direct-light audit (xhigh).** Implemented on 2026-11-07 ([report](reports/gi_gd1_direct_audit.md)); Gate F accepted the same day.
 - An engine `gi_direct` function: the term and its shadow test for one sample, deterministic and
   with no library trigonometry beyond what `world_lights` already uses for cone setup.
 - A `--gi-direct-audit` mode (JSON with the world list, like `--list-worlds`) and a private test:
@@ -415,7 +418,7 @@ baked data and generated artifacts.
 - Records the static light evidence correction; whether model light keeps its ×2 (justified by the superseded N·L figure) is a separate question for the user.
 - No file or frame changes.
 
-**GD2, re-baked direct bake (xhigh).**
+**GD2, re-baked direct bake (xhigh).** Implemented on 2026-11-07 ([report](reports/gi_gd2_rebaked_direct.md)); Gate G pending.
 - The `direct` bake setting (`original` default) in presets, `--gi-direct`, the settings hash
   (omitted for `original`, so those files keep their bytes), `bake_all.py --direct` and the F8 Bake panel.
 - A direct pass before the bounce passes: jobs, cancel, `GI_PROGRESS stage=direct`, the fields in `GI_RESULT`.

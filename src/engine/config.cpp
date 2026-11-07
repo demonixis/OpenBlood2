@@ -325,7 +325,7 @@ namespace OpenBlood2
                      arg == "--gi-place" || arg == "--gi-placement-dir" || arg == "--bake-gi" ||
                      arg == "--gi-quality" || arg == "--gi-bounces" || arg == "--gi-rays" || arg == "--gi-jobs" ||
                      arg == "--gi-out" || arg == "--gi-sky" || arg == "--gi-preview" || arg == "--gi-preview-dir" ||
-                     arg == "--gi-direct-audit" ||
+                     arg == "--gi-direct-audit" || arg == "--gi-direct" ||
                      arg == "--gi-k" || arg == "--gi-f" || arg == "--gi-view" || arg == "--gi-source" ||
                      arg == "--gi-probes" || arg == "--frames" || arg == "--capture" || arg == "--world" || arg == "--log-dir" ||
                      arg == "--log-level" || arg == "--rez" ||
@@ -443,6 +443,15 @@ namespace OpenBlood2
                     options.gi_preview = args[i];
                 else if (arg == "--gi-preview-dir")
                     options.gi_preview_dir = path_from_utf8(args[i]);
+                else if (arg == "--gi-direct")
+                {
+                    if (args[i] != "original" && args[i] != "rebaked")
+                    {
+                        error = "--gi-direct requires original or rebaked";
+                        return false;
+                    }
+                    options.gi_direct = args[i];
+                }
                 else if (arg == "--gi-direct-audit")
                     options.gi_direct_audit = args[i];
                 else if (arg == "--gi-view")
@@ -568,10 +577,11 @@ namespace OpenBlood2
         const bool gi_tool =
             options.list_worlds || !options.gi_verify.empty() || gi_place || bake_gi || gi_preview || gi_direct;
         if ((!options.gi_quality.empty() || options.gi_bounces || options.gi_rays || options.gi_sky >= 0 ||
-             options.gi_if_stale) &&
+             options.gi_if_stale || !options.gi_direct.empty()) &&
             !bake_gi)
         {
-            error = "--gi-quality, --gi-bounces, --gi-rays, --gi-sky and --gi-if-stale require --bake-gi";
+            error = "--gi-quality, --gi-bounces, --gi-rays, --gi-sky, --gi-direct and --gi-if-stale require "
+                    "--bake-gi";
             return false;
         }
         if ((options.gi_jobs && !bake_gi && !gi_preview && !gi_direct) ||

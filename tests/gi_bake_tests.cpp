@@ -7,6 +7,7 @@
 #include "engine/resources.h"
 #include "engine/world_shade.h"
 #include "scratch_dir.h"
+#include <algorithm>
 #include <cfloat>
 #include <chrono>
 #include <cmath>
@@ -432,6 +433,20 @@ namespace
         CHECK(gi_settings_text(s).ends_with("\nsky 0.00\n"));
         CHECK(make_gi_bake_settings("custom", 0, 0, 400, s, error) && s.sky == 400);
         CHECK(gi_settings_text(s).ends_with("\nsky 4.00\n"));
+        // Lot GD2: the direct source, named only when re-baked (original files keep their bytes).
+        CHECK(std::string(gi_direct_source_name(GiDirectSource::Original)) == "original" &&
+              std::string(gi_direct_source_name(GiDirectSource::Rebaked)) == "rebaked");
+        GiDirectSource source = GiDirectSource::Original;
+        CHECK(gi_direct_source("rebaked", source) && source == GiDirectSource::Rebaked);
+        CHECK(!gi_direct_source("Rebaked", source) && !gi_direct_source("", source) &&
+              source == GiDirectSource::Rebaked);
+        CHECK(gi_direct_source("original", source) && source == GiDirectSource::Original);
+        CHECK(s.direct == GiDirectSource::Original);
+        s.direct = GiDirectSource::Rebaked;
+        CHECK(gi_settings_text(s) == "openblood2-gi-settings 2\nquality custom\nbounces 2\nrays 256\nsky 4.00\n"
+                                     "direct rebaked\n");
+        // The presets leave the source to the caller (Original).
+        CHECK(make_gi_bake_settings("custom", 0, 0, 400, s, error) && s.direct == GiDirectSource::Original);
         const auto before = s.rays;
         CHECK(!make_gi_bake_settings("custom", 4, 0, -1, s, error) && s.rays == before);
         CHECK(!make_gi_bake_settings("custom", 0, 15, -1, s, error));
@@ -692,6 +707,141 @@ namespace
         CHECK(refused.exit_code == 4 && refused.placement == GiPlacementStatus::Foreign);
         return Testing::remove_scratch_dir(scratch);
     }
+
+    // Private, lot GD2: re-baked 01_SubwayA Preview bakes against a scratch placement. Identical bytes
+    // for 1, 2 and 7 jobs; the DIR section after LMAP; an original bake without it or a direct line;
+    // staleness across sources and after a placement change; cancellation during the direct pass.
+    bool retail_direct(const std::filesystem::path& data, const std::filesystem::path& scratch)
+    {
+        CHECK(Testing::reset_scratch_dir(scratch));
+        Config config;
+        config.data_dir = data;
+        Resources resources;
+        std::string error;
+        CHECK(resources.mount_game(config, error));
+        const std::string path = "worlds/01_subwaya.dat";
+        std::vector<std::uint8_t> bytes;
+        CHECK(resources.read(path, bytes, error));
+        auto placement = default_gi_placement(path, sha256(bytes));
+        CHECK(save_gi_placement(scratch / "placement", placement, error));
+
+        GiBakeRequest request;
+        request.world = path;
+        CHECK(make_gi_bake_settings("preview", 0, 0, -1, request.settings, error));
+        request.placement_dir = scratch / "placement";
+        request.jobs = 2;
+        request.out_dir = scratch / "original";
+        const auto original = bake_gi_world(resources, request);
+        CHECK(original.status == GiBakeResult::Status::Baked && original.direct_lights.lights == 0 &&
+              original.direct_tests == 0);
+        std::vector<std::uint8_t> original_bytes;
+        GiFile original_file;
+        CHECK(read_gi_bytes(path_text(original.file), original_bytes, error) &&
+              read_gi_file(original_bytes, original_file, error));
+        CHECK(!original_file.find(gi_format::direct) && original_file.settings.find("direct") == std::string::npos);
+
+        request.settings.direct = GiDirectSource::Rebaked;
+        std::vector<std::uint8_t> reference;
+        GiBakeResult first;
+        std::vector<std::string> stages;
+        for (const unsigned jobs : {1u, 2u, 7u})
+        {
+            request.jobs = jobs;
+            request.out_dir = scratch / ("rebaked" + std::to_string(jobs));
+            if (jobs == 1)
+                request.progress = [&](std::string_view stage, std::uint64_t, std::uint64_t)
+                {
+                    if (stages.empty() || stages.back() != stage)
+                        stages.emplace_back(stage);
+                };
+            const auto result = bake_gi_world(resources, request);
+            request.progress = {};
+            CHECK(result.status == GiBakeResult::Status::Baked && result.exit_code == 0);
+            CHECK(result.direct_lights.lights > 0 && result.direct_tests > 0 && result.direct_triangles > 0);
+            std::vector<std::uint8_t> got;
+            CHECK(read_gi_bytes(path_text(result.file), got, error));
+            if (jobs == 1)
+            {
+                reference = got;
+                first = result;
+            }
+            CHECK(got == reference);
+        }
+        // The direct pass runs before the bounce passes.
+        const auto direct_stage = std::find(stages.begin(), stages.end(), "direct");
+        const auto bounce_stage = std::find(stages.begin(), stages.end(), "bounce 1/1");
+        CHECK(direct_stage != stages.end() && bounce_stage != stages.end() && direct_stage < bounce_stage);
+        GiFile file;
+        CHECK(read_gi_file(reference, file, error) && file.settings == gi_settings_text(request.settings));
+        CHECK(file.settings.ends_with("\ndirect rebaked\n") && file.sections.size() == 5);
+        CHECK(file.sections[1].tag == gi_format::lightmaps && file.sections[2].tag == gi_format::direct &&
+              file.sections[3].tag == gi_format::vertices && file.key.algorithm == 3);
+        GiLightmaps maps;
+        GiDirectSection direct;
+        CHECK(read_gi_lightmaps(file.find(gi_format::lightmaps)->payload, maps, error) &&
+              read_gi_direct(file.find(gi_format::direct)->payload, direct, error) &&
+              direct.texels.size() == maps.texels.size());
+        // The re-bake changes the light the passes start from, so E differs; the placement does not.
+        CHECK(file.find(gi_format::placement)->payload == original_file.find(gi_format::placement)->payload);
+        CHECK(file.find(gi_format::lightmaps)->payload != original_file.find(gi_format::lightmaps)->payload);
+        GiExpectation expected;
+        CHECK(gi_expectation(resources, path, expected, error));
+        unsigned stale = 0;
+        CHECK(gi_status(file.key, expected, stale) == GiStatus::Ready);
+        std::cout << "REBAKED bytes=" << reference.size() << " original=" << original_bytes.size()
+                  << " lights=" << first.direct_lights.lights << " triangles=" << first.direct_triangles
+                  << " tests=" << first.direct_tests << " kept=" << first.direct_kept
+                  << " saturated=" << first.direct_saturated << " direct_ms=" << first.direct_ms << '\n';
+
+        // --gi-if-stale: the original file is stale for a re-baked request, then current.
+        request.if_stale = true;
+        request.jobs = 2;
+        request.out_dir = scratch / "original";
+        CHECK(bake_gi_world(resources, request).status == GiBakeResult::Status::Baked);
+        std::vector<std::uint8_t> replaced;
+        CHECK(read_gi_bytes(path_text(original.file), replaced, error) && replaced == reference);
+        CHECK(bake_gi_world(resources, request).status == GiBakeResult::Status::Current);
+        // And the re-baked file is stale for an original request.
+        auto original_request = request;
+        original_request.settings.direct = GiDirectSource::Original;
+        original_request.out_dir = scratch / "rebaked2";
+        const auto restored = bake_gi_world(resources, original_request);
+        CHECK(restored.status == GiBakeResult::Status::Baked);
+        std::vector<std::uint8_t> back;
+        CHECK(read_gi_bytes(path_text(restored.file), back, error) && back == original_bytes);
+
+        // Cancelled during the direct pass: exit 12, the file kept.
+        std::atomic<bool> cancel{false};
+        auto cancelled_request = request;
+        cancelled_request.if_stale = false;
+        cancelled_request.out_dir = scratch / "rebaked1";
+        cancelled_request.cancel = &cancel;
+        std::string cancelled_at;
+        cancelled_request.progress = [&](std::string_view stage, std::uint64_t, std::uint64_t)
+        {
+            if (stage == "direct" && !cancel.load())
+            {
+                cancelled_at = stage;
+                cancel.store(true);
+            }
+        };
+        const auto stopped = bake_gi_world(resources, cancelled_request);
+        CHECK(stopped.status == GiBakeResult::Status::Cancelled && stopped.exit_code == 12 && cancelled_at == "direct");
+        std::vector<std::uint8_t> kept;
+        const auto relative = original.file.lexically_relative(scratch / "original");
+        CHECK(read_gi_bytes(path_text(scratch / "rebaked1" / relative), kept, error) && kept == reference);
+
+        // A placement change makes the re-baked file stale.
+        placement.spacing = 160;
+        CHECK(save_gi_placement(scratch / "placement", placement, error));
+        request.out_dir = scratch / "rebaked7";
+        const auto moved = bake_gi_world(resources, request);
+        CHECK(moved.status == GiBakeResult::Status::Baked && moved.direct_lights.lights == first.direct_lights.lights);
+        std::vector<std::uint8_t> moved_bytes;
+        CHECK(read_gi_bytes(path_text(moved.file), moved_bytes, error) && moved_bytes != reference);
+        CHECK(bake_gi_world(resources, request).status == GiBakeResult::Status::Current);
+        return Testing::remove_scratch_dir(scratch);
+    }
 } // namespace
 
 int main(int argc, char** argv)
@@ -714,6 +864,8 @@ int main(int argc, char** argv)
         ok = determinism();
     else if (name == "retail" && argc == 5)
         ok = retail(path_from_utf8(argv[2]), path_from_utf8(argv[3]), path_from_utf8(argv[4]));
+    else if (name == "retail-direct" && argc == 4)
+        ok = retail_direct(path_from_utf8(argv[2]), path_from_utf8(argv[3]));
     else
         return 2;
     return ok ? 0 : 1;

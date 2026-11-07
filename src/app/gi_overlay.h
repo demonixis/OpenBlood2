@@ -136,6 +136,7 @@ namespace OpenBlood2
         {
             GiBakeProcess process;
             bool final_quality = true; // Final (2 bounces, 256 rays) or Preview (1, 64).
+            bool rebaked = false;       // Direct light: re-baked (lot GD2) or the original lightmaps.
             bool suspend_scene = false; // "Suspend scene rendering during bake".
             std::string world;          // The world path being (or last) baked.
             Sha256Digest world_digest{};

@@ -64,7 +64,8 @@ namespace OpenBlood2
         return views;
     }
 
-    GiPreviewValues gi_preview_values(const GiReceivers& r, const GiIndirect& indirect, float k, float f)
+    GiPreviewValues gi_preview_values(const GiReceivers& r, const GiIndirect& indirect, float k, float f,
+                                      std::span<const float> direct)
     {
         GiPreviewValues values;
         const auto n = r.elements();
@@ -78,7 +79,11 @@ namespace OpenBlood2
                 const auto o = r.original[e][c];
                 const float energy = indirect.energy.size() == n * 3 ? indirect.energy[e * 3 + c] : 0.f;
                 values.original[e * 3 + c] = o / 255.f;
-                values.composed[e * 3 + c] = gi_compose(o, ambient[c], energy, k, f, e < r.texels) / 255.f;
+                const bool rebaked = e < r.texels && direct.size() == r.texels * 3;
+                values.composed[e * 3 + c] =
+                    (rebaked ? gi_compose_direct(direct[e * 3 + c], o, ambient[c], energy, k, f)
+                             : gi_compose(o, ambient[c], energy, k, f, e < r.texels)) /
+                    255.f;
                 values.indirect[e * 3 + c] = gi_preview_indirect_exposure * k * energy;
             }
         return values;

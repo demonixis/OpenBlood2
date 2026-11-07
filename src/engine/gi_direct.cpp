@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cmath>
 #include <map>
+#include <mutex>
 
 namespace OpenBlood2
 {
@@ -178,22 +179,57 @@ namespace OpenBlood2
 
     bool GiDirectOccluders::build(const World& world, std::string& error)
     {
-        models.assign(world.models.size(), CollisionWorld{});
+        models.assign(world.models.size(), GiBvh{});
+        triangles = 0;
         for (std::size_t m = 0; m < world.models.size(); ++m)
         {
-            // SURF_INVISIBLE faces cast no shadow: a copy without their SURF_SOLID bit.
-            const auto& source = world.models[m];
-            const bool invisible = std::any_of(source.surfaces.begin(), source.surfaces.end(),
-                                               [](const Surface& s) { return (s.flags & 5) == 5; });
-            WorldModel copy;
-            if (invisible)
+            const auto& model = world.models[m];
+            std::vector<GiBvh::Triangle> list;
+            for (std::uint32_t i = 0; i < model.polygons.size(); ++i)
             {
-                copy = source;
-                for (auto& s : copy.surfaces)
-                    if (s.flags & 4)
-                        s.flags &= ~1u;
+                const auto& polygon = model.polygons[i];
+                if (polygon.surface >= model.surfaces.size() || polygon.points.size() < 3)
+                {
+                    error = "Direct-light occluders of model " + std::to_string(m) + ": invalid polygon " +
+                            std::to_string(i);
+                    models.clear();
+                    return false;
+                }
+                // SURF_SOLID polygons cast shadows, SURF_INVISIBLE ones do not.
+                const auto flags = model.surfaces[polygon.surface].flags;
+                if (!(flags & 1) || (flags & 4))
+                    continue;
+                for (const auto index : polygon.points)
+                    if (index >= model.points.size() || !finite(model.points[index]))
+                    {
+                        error = "Direct-light occluders of model " + std::to_string(m) + ": invalid point";
+                        models.clear();
+                        return false;
+                    }
+                const auto& p0 = model.points[polygon.points[0]];
+                for (std::size_t j = 1; j + 1 < polygon.points.size(); ++j)
+                {
+                    const auto& p1 = model.points[polygon.points[j]];
+                    const auto& p2 = model.points[polygon.points[j + 1]];
+                    GiBvh::Triangle t{{p0.x, p0.y, p0.z},
+                                      {p1.x - p0.x, p1.y - p0.y, p1.z - p0.z},
+                                      {p2.x - p0.x, p2.y - p0.y, p2.z - p0.z},
+                                      i};
+                    const float cx = t.e1[1] * t.e2[2] - t.e1[2] * t.e2[1], cy = t.e1[2] * t.e2[0] - t.e1[0] * t.e2[2],
+                                cz = t.e1[0] * t.e2[1] - t.e1[1] * t.e2[0];
+                    if (cx * cx + cy * cy + cz * cz < 1e-12f)
+                        continue;
+                    if (list.size() + triangles >= gi_bake_limits::max_triangles)
+                    {
+                        error = "Direct-light occluders: too many triangles";
+                        models.clear();
+                        return false;
+                    }
+                    list.push_back(t);
+                }
             }
-            if (!models[m].build(invisible ? copy : source, error))
+            triangles += list.size();
+            if (!models[m].build(std::move(list), error))
             {
                 error = "Direct-light occluders of model " + std::to_string(m) + ": " + error;
                 models.clear();
@@ -201,6 +237,72 @@ namespace OpenBlood2
             }
         }
         return true;
+    }
+
+    bool gi_segment_blocked(const GiBvh& tree, DVector from, DVector to)
+    {
+        const auto nodes = tree.nodes();
+        const auto triangles = tree.triangles();
+        if (nodes.empty())
+            return false;
+        const float o[3]{from.x, from.y, from.z}, d[3]{to.x - from.x, to.y - from.y, to.z - from.z};
+        const float length = std::sqrt(d[0] * d[0] + d[1] * d[1] + d[2] * d[2]);
+        if (!(length > 0))
+            return false;
+        // A start touching a triangle does not block (the old zero-box sweep's touching rule).
+        const float skip = float(L::touch) / length;
+        float inv[3];
+        for (int a = 0; a < 3; ++a)
+            inv[a] = d[a] != 0 ? 1 / d[a] : std::copysign(1e30f, d[a]);
+        std::uint32_t stack[gi_bake_limits::max_depth + 2];
+        std::uint32_t top = 0, index = 0;
+        for (;;)
+        {
+            const auto& node = nodes[index];
+            float near = 0, far = 1;
+            for (int a = 0; a < 3; ++a)
+            {
+                float t0 = (node.min[a] - o[a]) * inv[a], t1 = (node.max[a] - o[a]) * inv[a];
+                if (t0 > t1)
+                    std::swap(t0, t1);
+                near = std::max(near, t0);
+                far = std::min(far, t1);
+            }
+            if (near <= far)
+            {
+                if (!node.count)
+                {
+                    stack[top++] = node.index + 1;
+                    index = node.index;
+                    continue;
+                }
+                for (std::uint32_t i = node.index; i < node.index + node.count; ++i)
+                {
+                    const auto& t = triangles[i];
+                    // Two-sided Moller-Trumbore, the bake tracer's arithmetic, any hit in [0, 1].
+                    const float px = d[1] * t.e2[2] - d[2] * t.e2[1], py = d[2] * t.e2[0] - d[0] * t.e2[2],
+                                pz = d[0] * t.e2[1] - d[1] * t.e2[0];
+                    const float det = t.e1[0] * px + t.e1[1] * py + t.e1[2] * pz;
+                    if (std::abs(det) < 1e-12f)
+                        continue;
+                    const float sx = o[0] - t.v0[0], sy = o[1] - t.v0[1], sz = o[2] - t.v0[2];
+                    const float u = (sx * px + sy * py + sz * pz) / det;
+                    if (u < 0 || u > 1)
+                        continue;
+                    const float qx = sy * t.e1[2] - sz * t.e1[1], qy = sz * t.e1[0] - sx * t.e1[2],
+                                qz = sx * t.e1[1] - sy * t.e1[0];
+                    const float v = (d[0] * qx + d[1] * qy + d[2] * qz) / det;
+                    if (v < 0 || u + v > 1)
+                        continue;
+                    const float f = (t.e2[0] * qx + t.e2[1] * qy + t.e2[2] * qz) / det;
+                    if (f > skip && f <= 1)
+                        return true;
+                }
+            }
+            if (!top)
+                return false;
+            index = stack[--top];
+        }
     }
 
     bool gi_direct_visible(const GiDirectOccluders& occluders, std::uint16_t model, DVector sample,
@@ -217,8 +319,7 @@ namespace OpenBlood2
             return true;
         const double f = (distance - L::margin) / distance;
         const DVector end{float(sample.x + dx * f), float(sample.y + dy * f), float(sample.z + dz * f)};
-        CollisionHit hit;
-        return occluders.models[model].sweep(sample, end, {0, 0, 0}, hit) != CollisionQuery::Hit;
+        return !gi_segment_blocked(occluders.models[model], sample, end);
     }
 
     std::uint8_t GiDirectTexels::value(std::size_t t, int c) const
@@ -228,7 +329,8 @@ namespace OpenBlood2
     }
 
     bool gi_direct_texels(const World& world, const GiReceivers& r, std::span<const GiDirectLight> lights,
-                          const GiDirectOccluders& occluders, unsigned jobs, GiDirectTexels& out, std::string& error)
+                          const GiDirectOccluders& occluders, unsigned jobs, GiDirectTexels& out, std::string& error,
+                          const std::atomic<bool>* cancel, const GiProgress& progress)
     {
         const auto start = std::chrono::steady_clock::now();
         error.clear();
@@ -241,9 +343,15 @@ namespace OpenBlood2
         out.light.assign(r.texels * 3, 0.f);
         out.reaching.assign(r.texels, 0);
         out.visible.assign(r.texels, 0);
+        out.placed.assign(r.texels, 0);
         const std::uint64_t chunks = (r.blocks.size() + L::chunk - 1) / L::chunk;
         std::vector<std::uint64_t> tests(chunks, 0);
-        run_gi_jobs(chunks, jobs ? jobs : gi_default_jobs(), nullptr,
+        std::atomic<std::uint64_t> done{0};
+        std::uint64_t reported = 0;
+        std::mutex report_lock;
+        const std::uint64_t total = r.blocks.size();
+        const auto run = run_gi_jobs(
+            chunks, jobs ? jobs : gi_default_jobs(), cancel,
                     [&](std::uint64_t chunk, unsigned)
                     {
                         std::vector<const GiDirectLight*> near;
@@ -275,7 +383,8 @@ namespace OpenBlood2
                                 if (std::sqrt(x * x + y * y + z * z) < light.radius + reach + 1)
                                     near.push_back(&light);
                             }
-                            const DVector lift = vector_scale(block.normal, float(L::lift));
+                            const DVector lift{block.normal.x * float(L::lift), block.normal.y * float(L::lift),
+                                               block.normal.z * float(L::lift)};
                             for (unsigned j = 0; j < frame.height; ++j)
                                 for (unsigned i = 0; i < frame.width; ++i)
                                 {
@@ -283,7 +392,8 @@ namespace OpenBlood2
                                     DVector centre_point;
                                     if (!frame.position(i, j, centre_point))
                                         continue;
-                                    const DVector sample = vector_add(r.samples[e], lift);
+                                    const auto& at = r.samples[e];
+                                    const DVector sample{at.x + lift.x, at.y + lift.y, at.z + lift.z};
                                     double sum[3]{r.ambient.x, r.ambient.y, r.ambient.z};
                                     std::uint64_t hash = 1469598103934665603ull;
                                     unsigned reaching = 0;
@@ -304,11 +414,131 @@ namespace OpenBlood2
                                         out.light[e * 3 + c] = float(sum[c]);
                                     out.reaching[e] = std::uint8_t(std::min(reaching, 255u));
                                     out.visible[e] = hash;
+                                    out.placed[e] = 1;
                                 }
+                        }
+                        const std::uint64_t count = last - chunk * L::chunk;
+                        const auto finished = done.fetch_add(count) + count;
+                        if (progress && total && finished * 20 / total != (finished - count) * 20 / total)
+                        {
+                            std::lock_guard lock(report_lock);
+                            if (finished > reported)
+                            {
+                                reported = finished;
+                                progress("direct", finished, total);
+                            }
                         }
                     });
         for (const auto t : tests)
             out.tests += t;
+        out.ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
+        if (run.cancelled || (cancel && cancel->load()))
+        {
+            out.cancelled = true;
+            error = "cancelled";
+            return false;
+        }
+        return true;
+    }
+
+    float gi_direct_value(float light, std::uint8_t original, float ambient)
+    {
+        const double o = original;
+        const double a = ambient > 0 ? std::min(o, double(ambient)) : 0.0; // NaN and negative: no fill.
+        const double t = light >= 0 ? std::min(double(light), 255.0) : 0.0;  // NaN: 0.
+        return float(std::max(0.0, t - a) / 255);
+    }
+
+    bool write_gi_direct(const GiDirectSection& section, std::vector<std::uint8_t>& out, std::string& error)
+    {
+        out.clear();
+        if (section.texels.size() > gi_lightmap_limits::max_texels)
+        {
+            error = "DIR: too many texels";
+            return false;
+        }
+        auto put = [&](std::uint32_t v)
+        {
+            for (int i = 0; i < 4; ++i)
+                out.push_back(std::uint8_t(v >> (8 * i)));
+        };
+        out.reserve(8 + 4 * section.texels.size());
+        put(L::format);
+        put(std::uint32_t(section.texels.size()));
+        for (const auto v : section.texels)
+            put(v);
+        return true;
+    }
+    bool read_gi_direct(std::span<const std::uint8_t> payload, GiDirectSection& out, std::string& error)
+    {
+        auto get32 = [&](std::size_t at)
+        {
+            return std::uint32_t(payload[at]) | std::uint32_t(payload[at + 1]) << 8 |
+                   std::uint32_t(payload[at + 2]) << 16 | std::uint32_t(payload[at + 3]) << 24;
+        };
+        if (payload.size() < 8 || get32(0) != L::format)
+        {
+            error = "DIR: unsupported payload format";
+            return false;
+        }
+        const std::uint64_t count = get32(4);
+        if (count > gi_lightmap_limits::max_texels || payload.size() != 8 + 4 * count)
+        {
+            error = "DIR: payload size does not match its count";
+            return false;
+        }
+        GiDirectSection section;
+        section.texels.resize(count);
+        for (std::size_t i = 0; i < count; ++i)
+            section.texels[i] = get32(8 + 4 * i);
+        out = std::move(section);
+        return true;
+    }
+
+    bool gi_rebake_direct(const World& world, const GiReceivers& r, unsigned jobs, const std::atomic<bool>* cancel,
+                          const GiProgress& progress, GiDirectBake& out, std::string& error)
+    {
+        const auto start = std::chrono::steady_clock::now();
+        out = {};
+        if (r.original.size() != r.elements() || r.solid.size() != r.elements())
+        {
+            error = "Direct light: invalid receivers";
+            return false;
+        }
+        std::vector<GiDirectLight> lights;
+        if (!gi_direct_lights(world, lights, out.lights, error))
+            return false;
+        GiDirectOccluders occluders;
+        if (!occluders.build(world, error))
+            return false;
+        out.occluder_triangles = occluders.triangles;
+        GiDirectTexels texels;
+        if (!gi_direct_texels(world, r, lights, occluders, jobs, texels, error, cancel, progress))
+        {
+            out.cancelled = texels.cancelled;
+            return false;
+        }
+        out.tests = texels.tests;
+        const float ambient[3]{r.ambient.x, r.ambient.y, r.ambient.z};
+        out.direct.resize(r.texels * 3);
+        out.section.texels.resize(r.texels);
+        for (std::size_t t = 0; t < r.texels; ++t)
+        {
+            const bool keep = r.solid[t] || !texels.placed[t];
+            out.kept += keep;
+            float v[3];
+            for (int c = 0; c < 3; ++c)
+            {
+                const auto o = r.original[t][c];
+                const double a = ambient[c] > 0 ? std::min(double(o), double(ambient[c])) : 0.0;
+                v[c] = keep ? float((o - a) / 255) : gi_direct_value(texels.light[t * 3 + c], o, ambient[c]);
+            }
+            out.saturated += !keep && (texels.light[t * 3] > 255 || texels.light[t * 3 + 1] > 255 ||
+                                       texels.light[t * 3 + 2] > 255);
+            out.section.texels[t] = gi_rgb9e5({v[0], v[1], v[2]});
+            const auto decoded = gi_rgb9e5_decode(out.section.texels[t]);
+            out.direct[t * 3] = decoded.x, out.direct[t * 3 + 1] = decoded.y, out.direct[t * 3 + 2] = decoded.z;
+        }
         out.ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
         return true;
     }

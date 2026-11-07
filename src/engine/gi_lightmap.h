@@ -40,6 +40,10 @@ namespace OpenBlood2
     // out = clamp(round(D + max(k E s, f A_eff)), 0, 255), s = 255 / 2 for a texel, 255 for a corner.
     // A NaN or negative E counts as 0; E = 0 with f = 1 gives back O exactly.
     std::uint8_t gi_compose(std::uint8_t original, float ambient, float energy, float k, float f, bool texel);
+    // A texel of a re-baked file (lot GD2): D' (0-1, as decoded) replaces D:
+    // out = clamp(round(255 D' + max(k E 255 / 2, f A_eff)), 0, 255). A NaN or negative D' counts as 0;
+    // D' = D gives gi_compose's value.
+    std::uint8_t gi_compose_direct(float direct, std::uint8_t original, float ambient, float energy, float k, float f);
     // The default intensity and ambient-floor weight, chosen at Gate B (2026-11-07). They are composition
     // parameters, not bake settings: changing them needs no new bake.
     constexpr float gi_default_k = 2, gi_default_f = 1;
@@ -162,10 +166,12 @@ namespace OpenBlood2
     // vertex-lit faces albedo x min(D + E, 1), bright faces their albedo, untextured faces and back
     // faces 0, misses and sky portals the sky; translucent layers composite in front of the hit.
     // Pass b reads the state of pass b - 1; invalid elements are traced once, DETAIL LOW sets only in
-    // the last pass. `seed` keys every element's lattice shift with (element, pass).
+    // the last pass. `seed` keys every element's lattice shift with (element, pass). `direct` (texels
+    // x 3, 0-1) replaces the texels' D = (O - A_eff) / 255 when given (lot GD2); corners keep D.
     bool bake_gi_lightmaps(const GiBakeScene&, const GiSky&, const GiReceivers&, std::uint32_t bounces,
                            std::uint32_t rays, std::uint64_t seed, unsigned jobs, const std::atomic<bool>* cancel,
-                           const GiProgress&, GiIndirect&, GiLightmapReport&, std::string& error);
+                           const GiProgress&, GiIndirect&, GiLightmapReport&, std::string& error,
+                           std::span<const float> direct = {});
     // The LMAP and VTX contents of a bake.
     void gi_lightmap_sections(const GiReceivers&, const GiIndirect&, GiLightmaps&, GiVertexLight&);
 
@@ -181,8 +187,9 @@ namespace OpenBlood2
     void gi_hit_radiance(const GiBakeScene&, const GiSky&, const GiReceivers&, const float* light, const GiHit&,
                          DVector direction, GiRayCounters&, double out[3], bool& back);
     // The light state bake_gi_lightmaps leaves after its last pass: min(D + E/2, 1) per texel and
-    // min(D + E, 1) per corner, D alone for DETAIL LOW corners (they feed no lookup).
-    void gi_light_state(const GiReceivers&, const GiIndirect&, std::vector<float>& light);
+    // min(D + E, 1) per corner, D alone for DETAIL LOW corners (they feed no lookup); `direct` as there.
+    void gi_light_state(const GiReceivers&, const GiIndirect&, std::vector<float>& light,
+                        std::span<const float> direct = {});
 
     // Per-element values at a face point: bilinear over a lightmap block (clamped, centres at i + 0.5)
     // or interpolated over a set's corners. False for faces without a receiver.

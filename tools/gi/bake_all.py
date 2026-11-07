@@ -30,7 +30,7 @@ SETS = {"single": {"single", "addon"}, "multi": {"multi"}, "all": None}
 EXIT_CANCELLED = 12
 # key=value tokens of a GI_RESULT line; values may be JSON strings with spaces (error=).
 TOKEN = re.compile(r'(\w+)=("(?:[^"\\]|\\.)*"|\S+)')
-REPORT_FIELDS = ("quality", "bounces", "rays_per_probe", "jobs", "placement", "probes", "reflections",
+REPORT_FIELDS = ("quality", "direct", "bounces", "rays_per_probe", "jobs", "placement", "probes", "reflections",
                  "threads", "rays", "miss", "inside", "digest", "bytes", "ms")
 
 
@@ -45,6 +45,8 @@ def parse_arguments(argv):
     selection.add_argument("--worlds", nargs="+", metavar="WORLD",
                            help="worlds by path, file name or stem, case-insensitive")
     parser.add_argument("--quality", choices=("preview", "final", "custom"), default="final")
+    parser.add_argument("--direct", choices=("original", "rebaked"), default="original",
+                        help="direct light on lightmapped faces: the stored lightmaps or re-baked (lot GD2)")
     parser.add_argument("--bounces", type=int, help="custom quality bounces (1-3)")
     parser.add_argument("--rays", type=int, help="custom quality rays per probe (16-4096)")
     parser.add_argument("--jobs", type=int, default=1, help="worlds baked at once (default 1)")
@@ -133,6 +135,8 @@ def bake_command(base, world, arguments, threads):
         command += ["--gi-bounces", str(arguments.bounces)]
     if arguments.rays is not None:
         command += ["--gi-rays", str(arguments.rays)]
+    if arguments.direct != "original":
+        command += ["--gi-direct", arguments.direct]
     if not arguments.force:
         command.append("--gi-if-stale")
     return command
@@ -354,6 +358,7 @@ def main(argv):
         "edition": edition,
         "selection": {"worlds": arguments.worlds} if arguments.worlds else {"set": arguments.set},
         "quality": arguments.quality,
+        "direct": arguments.direct,
         "bounces": arguments.bounces,
         "rays": arguments.rays,
         "force": arguments.force,

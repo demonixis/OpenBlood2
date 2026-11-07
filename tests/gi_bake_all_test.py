@@ -124,6 +124,14 @@ def main():
     code, stdout, _ = run("--worlds", "a", "--force")
     check(code == 0 and "GI_BAKE worlds/a.dat PASS" in stdout, "--force rebakes")
     check("--gi-if-stale" not in [json.loads(line) for line in open(log)][-1], "--force drops --gi-if-stale")
+    check(all("--gi-direct" not in json.loads(line) for line in open(log)), "original bakes pass no --gi-direct")
+
+    # --direct rebaked (lot GD2) reaches the binary and the report.
+    code, stdout, _ = run("--worlds", "a", "--force", "--direct", "rebaked")
+    last = [json.loads(line) for line in open(log)][-1]
+    check(code == 0 and "--gi-direct" in last and last[last.index("--gi-direct") + 1] == "rebaked",
+          "--direct rebaked passes --gi-direct rebaked")
+    check(report()["direct"] == "rebaked", "report direct source")
 
     # --list asks the binary; a missing file is not run.
     with open(os.path.join(out, "worlds", "c.0123456789ab.ob2gi"), "w") as stream:

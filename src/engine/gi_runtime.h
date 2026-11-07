@@ -1,4 +1,5 @@
 #pragma once
+#include "engine/gi_direct.h"
 #include "engine/gi_file.h"
 #include "engine/gi_lightmap.h"
 #include "engine/gi_probes.h"
@@ -21,7 +22,7 @@ namespace OpenBlood2
     {
         Final,    // gi_compose with k and f.
         Original, // The stored light, byte for byte (the same pages as GI off).
-        Direct,   // D = O - min(O, A): the stored light without its ambient fill.
+        Direct,   // D = O - min(O, A): the stored light without its ambient fill (D' for a re-baked file).
         Indirect, // k E alone (no direct light, no floor).
         Lighting, // Final over white textures (texture alpha kept).
         Validity  // Green where the element's own sample was valid, red where it was filled.
@@ -62,6 +63,10 @@ namespace OpenBlood2
     {
         GiLightmaps lightmaps;
         GiVertexLight vertex;
+        // The DIR section of a re-baked file (lot GD2): D' per LMAP texel, which replaces D in every view
+        // but Original and Validity. Empty for an original bake.
+        GiDirectSection direct;
+        bool rebaked = false;
         std::vector<std::uint32_t> block_first, set_first; // First value of each record.
         DVector ambient{}; // world_info_ambient_any_case (0-255); zero when the info has none.
         GiComposition composition;
@@ -85,9 +90,9 @@ namespace OpenBlood2
         std::array<std::uint8_t, 3> compose(bool texel, std::uint32_t index,
                                             std::array<std::uint8_t, 3> original) const;
     };
-    // Decodes the LMAP and VTX sections (both required) and checks them against the world, then PLAC
-    // and PROB when the file has PROB (a PROB that does not match its lattice fails the file). The
-    // output is untouched on failure.
+    // Decodes the LMAP and VTX sections (both required) and checks them against the world, DIR when
+    // present (one value per LMAP texel), then PLAC and PROB when the file has PROB (a PROB that does
+    // not match its lattice fails the file). The output is untouched on failure.
     bool gi_world_light(const World&, const GiFile&, GiWorldLight&, std::string& error);
 
     enum class GiRuntimeState : std::uint8_t
@@ -104,6 +109,7 @@ namespace OpenBlood2
         GiRuntimeState state = GiRuntimeState::Off;
         std::string world_path, file, detail; // file: the chosen candidate; detail: why it is not applied.
         std::string settings;                 // The applied file's bake settings (INFO text).
+        bool rebaked = false;                 // The applied file has a re-baked direct source (DIR).
         GiLookup lookup;                      // Every candidate, without the file's payload.
         std::size_t blocks = 0, texels = 0, sets = 0, corners = 0;
         std::size_t probes = 0, valid_probes = 0; // PROB entries (0 when the file has none).

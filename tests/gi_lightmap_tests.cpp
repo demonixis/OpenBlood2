@@ -32,6 +32,7 @@
 #include <iostream>
 #include <limits>
 #include <map>
+#include <mutex>
 #include <random>
 #include <set>
 
@@ -2594,6 +2595,319 @@ namespace
         }
         return true;
     }
+
+    // Lot GD2: the re-baked direct source. D' = O - A_eff composes what gi_compose composes; the DIR
+    // section is strict; gi_rebake_direct is thread-independent and cancellable; the passes and the
+    // light state read D'; the runtime composes D' on texels in Final/Direct/Lighting only.
+    bool direct_bake(const fs::path& root)
+    {
+        const float nan = std::numeric_limits<float>::quiet_NaN(), inf = std::numeric_limits<float>::infinity();
+        auto exact = [](std::uint8_t o, float a)
+        {
+            const double fill = a > 0 ? std::min(double(o), double(a)) : 0.0;
+            return float((o - fill) / 255);
+        };
+        // The identity: at f = 1 and E = 0, D' = (O - A_eff) / 255 gives O back, also through RGB9E5;
+        // elsewhere it is gi_compose up to the float rounding of D.
+        const float ambients[]{0, .5f, 1, 7.5f, 20, 63.25f, 254.9f, 255, 300, -3, nan, inf, -inf};
+        std::size_t checked = 0, equal = 0, compared = 0;
+        for (unsigned o = 0; o < 256; ++o)
+            for (const float a : ambients)
+            {
+                const auto d = exact(std::uint8_t(o), a);
+                for (const float k : {0.f, 1.f, 4.f, nan})
+                    for (const float e : {0.f, -1.f, nan})
+                    {
+                        CHECK(gi_compose_direct(d, std::uint8_t(o), a, e, k, 1) == o);
+                        ++checked;
+                    }
+                const auto stored = gi_rgb9e5_decode(gi_rgb9e5({d, d, d}));
+                CHECK(gi_compose_direct(stored.x, std::uint8_t(o), a, 0, 0, 1) == o);
+                for (const float e : {.01f, .1f, .37f, 1.f})
+                    for (const float k : {.5f, 1.f, 2.f})
+                        for (const float f : {0.f, .25f, 1.f, 2.f})
+                        {
+                            const int x = gi_compose_direct(d, std::uint8_t(o), a, e, k, f);
+                            const int y = gi_compose(std::uint8_t(o), a, e, k, f, true);
+                            CHECK(std::abs(x - y) <= 1);
+                            equal += x == y;
+                            ++compared;
+                        }
+            }
+        std::cout << "DIRECT_IDENTITY checked=" << checked << " equal=" << equal << '/' << compared << '\n';
+        CHECK(equal * 100 >= compared * 95);
+        // out = round(255 D' + max(k E 255/2, f A_eff)).
+        const float hundred = 100 / 255.f;
+        CHECK(gi_compose_direct(hundred, 200, 20, .1f, 1, 1) == 120); // 100 + max(12.75, 20).
+        CHECK(gi_compose_direct(hundred, 200, 20, .5f, 1, 1) == 164); // 100 + 63.75.
+        CHECK(gi_compose_direct(hundred, 200, 20, 0, 0, 0) == 100);   // The Direct view.
+        CHECK(gi_compose_direct(50 / 255.f, 10, 20, 0, 0, 1) == 60);  // A_eff = min(O, A) = 10.
+        CHECK(gi_compose_direct(nan, 200, 20, 0, 0, 1) == 20 && gi_compose_direct(-1, 200, 20, 0, 0, 1) == 20);
+        CHECK(gi_compose_direct(1, 200, 20, 0, 0, 1) == 255); // Clamped.
+        // D' from the re-baked texel light T: max(0, min(T, 255) - A_eff) / 255.
+        CHECK(gi_direct_value(250, 200, 20) == float(230.0 / 255) &&
+              gi_direct_value(300, 200, 20) == float(235.0 / 255));
+        CHECK(gi_direct_value(inf, 200, 20) == float(235.0 / 255) && gi_direct_value(10, 200, 20) == 0);
+        CHECK(gi_direct_value(nan, 200, 20) == 0 && gi_direct_value(-5, 200, 20) == 0);
+        CHECK(gi_direct_value(100, 200, nan) == float(100.0 / 255) &&
+              gi_direct_value(100, 10, 20) == float(90.0 / 255));
+        for (int t = 0; t <= 300; ++t)
+            for (const float a : {0.f, 20.f, 63.f})
+                for (const std::uint8_t o : {0, 10, 200, 255})
+                {
+                    const int fill = int(std::min(float(o), a));
+                    CHECK(gi_compose_direct(gi_direct_value(float(t), o, a), o, a, 0, 0, 1) ==
+                          std::max(std::min(t, 255), fill));
+                }
+
+        // The DIR payload.
+        std::string error;
+        GiDirectSection section, back;
+        section.texels = {0, 1, 0xffffffffu, gi_rgb9e5({.5f, .25f, 1})};
+        std::vector<std::uint8_t> payload;
+        CHECK(write_gi_direct(section, payload, error) && payload.size() == 8 + 16);
+        CHECK(payload[0] == gi_direct_limits::format && payload[4] == 4);
+        CHECK(read_gi_direct(payload, back, error) && back.texels == section.texels);
+        auto refused = [&](const std::vector<std::uint8_t>& bytes, std::string_view what)
+        {
+            GiDirectSection out;
+            out.texels = {7};
+            return !read_gi_direct(bytes, out, error) && error.find(what) != std::string::npos &&
+                   out.texels == std::vector<std::uint32_t>{7};
+        };
+        auto bad = payload;
+        bad[0] = 2;
+        CHECK(refused(bad, "format"));
+        bad = payload;
+        bad.pop_back();
+        CHECK(refused(bad, "count"));
+        bad = payload;
+        bad.push_back(0);
+        CHECK(refused(bad, "count"));
+        bad = payload;
+        bad[4] = 5;
+        CHECK(refused(bad, "count"));
+        bad = payload;
+        bad[7] = 0xff; // Beyond max_texels.
+        CHECK(refused(bad, "count"));
+        CHECK(refused({1, 0, 0}, "format"));
+        CHECK(write_gi_direct({}, payload, error) && payload.size() == 8 && read_gi_direct(payload, back, error) &&
+              back.texels.empty());
+
+        // A lit box: one Light inside, an ambient fill, one DETAIL LOW face.
+        Resources resources;
+        CHECK(mount(root, resources));
+        WorldBuilder b;
+        b.world.info = "AmbientLight 40 20 10";
+        const std::uint16_t stored_texel = 20 << 11 | 30 << 5 | 12;
+        b.box({5, 5, 5}, {95, 95, 95},
+              [&](int s, Face& face)
+              {
+                  face.texel = stored_texel;
+                  face.kind = s == 3 ? Kind::LowLightmap : Kind::Lightmap;
+                  face.color = {60, 50, 30};
+              });
+        b.world.objects.push_back(object("Light", {vector_property("Pos", {50, 50, 80}), property("LightRadius", 200.f),
+                                                   property("BrightScale", 1.f),
+                                                   vector_property("LightColor", {255, 200, 150}),
+                                                   vector_property("OuterColor", {0, 0, 0})}));
+        Prepared p;
+        CHECK(prepare(b.world, resources, p));
+        const auto& r = p.receivers;
+        CHECK(r.texels > 0 && r.ambient.x == 40 && r.ambient.y == 20 && r.ambient.z == 10);
+        const auto o = expand(stored_texel);
+        const float a[3]{40, 20, 10};
+        std::mutex progress_mutex;
+        std::size_t calls = 0, foreign = 0;
+        std::uint64_t last = 0, total = 0;
+        const GiProgress progress = [&](std::string_view stage, std::uint64_t done, std::uint64_t all)
+        {
+            std::lock_guard lock(progress_mutex);
+            ++calls;
+            foreign += stage != "direct";
+            last = std::max(last, done);
+            total = all;
+        };
+        GiDirectBake one, three, seven;
+        CHECK(gi_rebake_direct(b.world, r, 1, nullptr, progress, one, error));
+        CHECK(gi_rebake_direct(b.world, r, 3, nullptr, {}, three, error));
+        CHECK(gi_rebake_direct(b.world, r, 7, nullptr, {}, seven, error));
+        CHECK(one.section.texels == three.section.texels && one.section.texels == seven.section.texels &&
+              one.direct == three.direct && one.direct == seven.direct);
+        CHECK(calls > 0 && foreign == 0 && total == r.blocks.size() && last == total);
+        CHECK(one.lights.lights == 1 && one.kept == 0 && one.saturated > 0 && one.tests > 0 &&
+              one.direct.size() == r.texels * 3 && one.section.texels.size() == r.texels);
+        std::cout << "DIRECT_BAKE texels=" << r.texels << " triangles=" << one.occluder_triangles
+                  << " tests=" << one.tests << " saturated=" << one.saturated << '\n';
+        {
+            // D' per texel is gi_direct_value of the texel light, through RGB9E5.
+            std::vector<GiDirectLight> lights;
+            GiDirectLightReport report;
+            GiDirectOccluders occluders;
+            GiDirectTexels texels;
+            CHECK(gi_direct_lights(b.world, lights, report, error) && occluders.build(b.world, error) &&
+                  gi_direct_texels(b.world, r, lights, occluders, 2, texels, error));
+            std::size_t brighter = 0;
+            for (std::size_t t = 0; t < r.texels; ++t)
+            {
+                const DVector v{gi_direct_value(texels.light[t * 3], o[0], a[0]),
+                                gi_direct_value(texels.light[t * 3 + 1], o[1], a[1]),
+                                gi_direct_value(texels.light[t * 3 + 2], o[2], a[2])};
+                CHECK(one.section.texels[t] == gi_rgb9e5(v));
+                const auto d = gi_rgb9e5_decode(one.section.texels[t]);
+                CHECK(one.direct[t * 3] == d.x && one.direct[t * 3 + 1] == d.y && one.direct[t * 3 + 2] == d.z);
+                brighter += gi_compose_direct(d.x, o[0], a[0], 0, 0, 1) > o[0];
+            }
+            CHECK(brighter > 0); // The light is brighter than the stored texel near it.
+        }
+        {
+            // A set cancel flag stops it.
+            std::atomic<bool> stop{true};
+            GiDirectBake cancelled;
+            CHECK(!gi_rebake_direct(b.world, r, 2, &stop, {}, cancelled, error) && cancelled.cancelled);
+            auto broken = r;
+            broken.original.pop_back();
+            GiDirectBake refused_bake;
+            CHECK(!gi_rebake_direct(b.world, broken, 2, nullptr, {}, refused_bake, error) &&
+                  error.find("invalid receivers") != std::string::npos && !refused_bake.cancelled);
+        }
+
+        // The passes: D' = exact D is the original bake bit for bit; the re-baked D' changes E.
+        GiSky sky;
+        sky.fill({0, 0, 0}, 1);
+        std::vector<float> exact_d(r.texels * 3);
+        for (std::size_t t = 0; t < r.texels; ++t)
+            for (int c = 0; c < 3; ++c)
+                exact_d[t * 3 + c] = exact(r.original[t][c], a[c]);
+        auto pass = [&](std::span<const float> direct, GiIndirect& out)
+        {
+            GiLightmapReport report;
+            return bake_gi_lightmaps(p.scene, sky, r, 2, 16, 0x5eed, 2, nullptr, {}, out, report, error, direct);
+        };
+        GiIndirect plain, same, rebaked;
+        CHECK(pass({}, plain) && pass(exact_d, same) && pass(one.direct, rebaked));
+        CHECK(plain.energy == same.energy && plain.valid == same.valid);
+        CHECK(rebaked.energy != plain.energy);
+        {
+            std::vector<float> wrong(5);
+            GiIndirect refused_pass;
+            CHECK(!pass(wrong, refused_pass));
+        }
+        std::vector<float> state_plain, state_same, state_rebaked;
+        gi_light_state(r, plain, state_plain);
+        gi_light_state(r, plain, state_same, exact_d);
+        gi_light_state(r, plain, state_rebaked, one.direct);
+        CHECK(state_plain == state_same && state_rebaked != state_plain);
+        for (std::size_t t = 0; t < r.texels; ++t)
+            for (int c = 0; c < 3; ++c)
+                CHECK(state_rebaked[t * 3 + c] ==
+                      float(std::min(1.0, double(one.direct[t * 3 + c]) + .5 * plain.energy[t * 3 + c])));
+        for (std::size_t e = r.texels * 3; e < state_plain.size(); ++e)
+            CHECK(state_rebaked[e] == state_plain[e]); // Corners keep D.
+
+        // The runtime: a DIR section after LMAP.
+        auto with_direct = [&](const GiIndirect& energy, const GiDirectSection& direct)
+        {
+            GiLightmaps maps;
+            GiVertexLight vertex;
+            gi_lightmap_sections(r, energy, maps, vertex);
+            auto file = section_file(maps, vertex);
+            GiSection dir{gi_format::direct, {}};
+            write_gi_direct(direct, dir.payload, error);
+            file.sections.insert(file.sections.begin() + 1, std::move(dir));
+            return file;
+        };
+        GiWorldLight light;
+        CHECK(gi_world_light(b.world, with_direct(rebaked, one.section), light, error));
+        CHECK(light.rebaked && light.direct.texels == one.section.texels);
+        GiLightmaps maps;
+        GiVertexLight vertex;
+        gi_lightmap_sections(r, rebaked, maps, vertex);
+        const std::array<std::uint8_t, 3> stored{o[0], o[1], o[2]};
+        for (std::uint32_t t = 0; t < maps.texels.size(); ++t)
+        {
+            const auto e = gi_rgb9e5_decode(maps.texels[t]), d = gi_rgb9e5_decode(one.section.texels[t]);
+            const float ev[3]{e.x, e.y, e.z}, dv[3]{d.x, d.y, d.z};
+            light.composition = {2, 1, GiView::Original};
+            CHECK(light.compose(true, t, stored) == stored);
+            for (const auto view : {GiView::Final, GiView::Lighting, GiView::Direct, GiView::Indirect})
+            {
+                light.composition = {2, .5f, view};
+                const auto got = light.compose(true, t, stored);
+                for (int c = 0; c < 3; ++c)
+                {
+                    const auto want = view == GiView::Direct     ? gi_compose_direct(dv[c], o[c], a[c], 0, 0, 0)
+                                      : view == GiView::Indirect ? gi_compose(0, 0, ev[c], 2, 0, true)
+                                                                 : gi_compose_direct(dv[c], o[c], a[c], ev[c], 2, .5f);
+                    CHECK(got[c] == want);
+                }
+            }
+            light.composition = {2, 1, GiView::Validity};
+            const auto validity = light.compose(true, t, stored);
+            CHECK(validity == (maps.valid[t] ? std::array<std::uint8_t, 3>{0, 128, 0}
+                                             : std::array<std::uint8_t, 3>{128, 0, 0}));
+        }
+        for (std::uint32_t q = 0; q < vertex.corners.size(); ++q)
+        {
+            // Corners compose the stored colours as in an original bake.
+            const auto e = gi_rgb9e5_decode(vertex.corners[q]);
+            const float ev[3]{e.x, e.y, e.z};
+            const std::array<std::uint8_t, 3> colour{60, 50, 30};
+            light.composition = {2, .5f, GiView::Final};
+            const auto got = light.compose(false, q, colour);
+            for (int c = 0; c < 3; ++c)
+                CHECK(got[c] == gi_compose(colour[c], a[c], ev[c], 2, .5f, false));
+        }
+        {
+            // A DIR whose count differs from LMAP, or a malformed one, refuses the file.
+            GiWorldLight refused_light;
+            auto shorter = one.section;
+            shorter.texels.pop_back();
+            CHECK(!gi_world_light(b.world, with_direct(rebaked, shorter), refused_light, error) &&
+                  error.find("DIR") != std::string::npos && !refused_light.rebaked);
+            auto file = with_direct(rebaked, one.section);
+            file.sections[1].payload[0] = 9;
+            CHECK(!gi_world_light(b.world, file, refused_light, error) && refused_light.lightmaps.blocks.empty());
+        }
+        {
+            // Meshes: D' = exact D with E = 0 is the original frame at both detail levels; the re-baked
+            // D' changes the pages only; Original and DETAIL LOW stay byte-identical.
+            WorldMesh off, off_low;
+            CHECK(off.build(b.world, error, &resources, true) && off_low.build(b.world, error, &resources, false));
+            GiIndirect zero;
+            zero.energy.assign(r.elements() * 3, 0.f);
+            zero.valid.assign(r.elements(), 1);
+            GiDirectSection exact_section;
+            for (std::size_t t = 0; t < r.texels; ++t)
+                exact_section.texels.push_back(
+                    gi_rgb9e5({exact_d[t * 3], exact_d[t * 3 + 1], exact_d[t * 3 + 2]}));
+            GiWorldLight identity_light, rebaked_light;
+            CHECK(gi_world_light(b.world, with_direct(zero, exact_section), identity_light, error));
+            CHECK(gi_world_light(b.world, with_direct(zero, one.section), rebaked_light, error));
+            for (const float k : {0.f, 2.f})
+            {
+                identity_light.composition = {k, 1, GiView::Final};
+                WorldMesh high, low;
+                CHECK(high.build(b.world, error, &resources, true, nullptr, &identity_light) &&
+                      low.build(b.world, error, &resources, false, nullptr, &identity_light));
+                CHECK(same_mesh(high, off) && same_mesh(low, off_low));
+            }
+            rebaked_light.composition = {2, 1, GiView::Final};
+            WorldMesh high, low, original_high;
+            CHECK(high.build(b.world, error, &resources, true, nullptr, &rebaked_light) &&
+                  low.build(b.world, error, &resources, false, nullptr, &rebaked_light));
+            CHECK(!same_mesh(high, off) && same_vertices(high, off) && same_mesh(low, off_low));
+            rebaked_light.composition = {2, 1, GiView::Original};
+            CHECK(original_high.build(b.world, error, &resources, true, nullptr, &rebaked_light) &&
+                  same_mesh(original_high, off));
+        }
+        GiRuntimeStatus status;
+        status.state = GiRuntimeState::Applied;
+        CHECK(gi_status_line(status).find("re-baked") == std::string::npos);
+        status.rebaked = true;
+        CHECK(gi_status_line(status).find(", re-baked direct light") != std::string::npos);
+        return true;
+    }
 } // namespace
 
 int main(int argc, char** argv)
@@ -2639,7 +2953,8 @@ int main(int argc, char** argv)
             {"placement", placement}, {"furnace", furnace},         {"box", box},   {"planes", planes},
             {"leak", leak},           {"dilation", dilation},       {"back", back}, {"determinism", determinism},
             {"sky", sky},             {"preview", preview},         {"runtime", runtime_override},
-            {"probe-capture", probe_capture}, {"probe-source", probe_source}, {"direct-shadow", direct_shadow}};
+            {"probe-capture", probe_capture}, {"probe-source", probe_source}, {"direct-shadow", direct_shadow},
+            {"direct-bake", direct_bake}};
         const auto found = cases.find(name);
         if (found == cases.end())
             return 2;

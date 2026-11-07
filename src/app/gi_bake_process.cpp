@@ -41,9 +41,11 @@ namespace OpenBlood2
 
     std::vector<std::string> gi_bake_arguments(const Config& config, std::string_view world, std::string_view quality,
                                                const std::filesystem::path& placement_dir,
-                                               const std::filesystem::path& out_dir, unsigned jobs)
+                                               const std::filesystem::path& out_dir, unsigned jobs, bool rebaked)
     {
         std::vector<std::string> args{"--bake-gi", std::string(world), "--gi-quality", std::string(quality)};
+        if (rebaked)
+            args.insert(args.end(), {"--gi-direct", "rebaked"});
         if (!config.data_dir.empty())
             args.insert(args.end(), {"--data-dir", path_text(config.data_dir)});
         if (config.demo)

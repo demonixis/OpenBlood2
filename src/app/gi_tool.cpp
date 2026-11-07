@@ -330,6 +330,11 @@ namespace OpenBlood2
             std::cout << "GI_RESULT status=failed exit=2 error=" << json_text(error) << '\n';
             return 2;
         }
+        if (!options.gi_direct.empty() && !gi_direct_source(options.gi_direct, request.settings.direct))
+        {
+            std::cout << "GI_RESULT status=failed exit=2 error=\"--gi-direct requires original or rebaked\"\n";
+            return 2;
+        }
         request.jobs = options.gi_jobs ? options.gi_jobs : gi_default_jobs();
         request.out_dir = options.gi_out;
         request.placement_dir = config.gi_placement_dir;
@@ -350,7 +355,8 @@ namespace OpenBlood2
                   << " world=" << request.world << " quality=" << gi_quality_name(request.settings.quality)
                   << " bounces=" << request.settings.bounces << " rays_per_probe=" << request.settings.rays
                   << " sky_scale=" << request.settings.sky / 100 << '.' << request.settings.sky / 10 % 10
-                  << request.settings.sky % 10 << " jobs=" << request.jobs;
+                  << request.settings.sky % 10 << " direct=" << gi_direct_source_name(request.settings.direct)
+                  << " jobs=" << request.jobs;
         if (result.status == GiBakeResult::Status::Failed || result.status == GiBakeResult::Status::Cancelled)
             std::cout << " error=" << json_text(result.error);
         if (!result.file.empty())
@@ -394,6 +400,15 @@ namespace OpenBlood2
             for (std::size_t i = 0; i < maps.pass_ms.size(); ++i)
                 std::cout << (i ? "," : "") << std::lround(maps.pass_ms[i]);
             std::cout << " lightmap_ms=" << std::lround(maps.ms);
+            if (request.settings.direct == GiDirectSource::Rebaked)
+            {
+                const auto& lights = result.direct_lights;
+                std::cout << " direct_lights=" << lights.lights << " direct_cones=" << lights.cones
+                          << " direct_unclipped=" << lights.unclipped << " direct_in_solid=" << lights.in_solid
+                          << " direct_triangles=" << result.direct_triangles << " direct_tests=" << result.direct_tests
+                          << " direct_kept=" << result.direct_kept << " direct_saturated=" << result.direct_saturated
+                          << " direct_ms=" << std::lround(result.direct_ms);
+            }
             const auto& probes = result.light_probes;
             std::cout << " probe_valid=" << probes.valid << " probe_invalid=" << probes.probes - probes.valid
                       << " probe_rays=" << probes.rays << " probe_back=" << probes.back
@@ -499,7 +514,22 @@ namespace OpenBlood2
             !check_gi_lightmaps(world, maps, error) || !check_gi_vertex_light(world, vertex, error) ||
             !gi_indirect_from_sections(receivers, maps, vertex, indirect, error))
             return fail(4, "GI file " + path_text(file_path) + ": " + error);
-        const auto values = gi_preview_values(receivers, indirect, options.gi_k, options.gi_f);
+        // A re-baked file (lot GD2): D' per texel replaces D in the composed panel.
+        std::vector<float> direct;
+        if (const auto* dir = file.find(gi_format::direct))
+        {
+            GiDirectSection section;
+            if (!read_gi_direct(dir->payload, section, error) || section.texels.size() != receivers.texels)
+                return fail(4, "GI file " + path_text(file_path) + ": " +
+                                   (error.empty() ? std::string("DIR does not match LMAP") : error));
+            direct.resize(receivers.texels * 3);
+            for (std::size_t t = 0; t < receivers.texels; ++t)
+            {
+                const auto d = gi_rgb9e5_decode(section.texels[t]);
+                direct[t * 3] = d.x, direct[t * 3 + 1] = d.y, direct[t * 3 + 2] = d.z;
+            }
+        }
+        const auto values = gi_preview_values(receivers, indirect, options.gi_k, options.gi_f, direct);
 
         // Mean E over valid texels and corners, and how much the composition changes the stored light
         // (8-bit channels of every element, DETAIL LOW corners included), for comparing bakes.
@@ -512,8 +542,12 @@ namespace OpenBlood2
             {
                 const auto o = receivers.original[e][c];
                 const float ambient = c == 0 ? receivers.ambient.x : c == 1 ? receivers.ambient.y : receivers.ambient.z;
-                const int d = int(gi_compose(o, ambient, indirect.energy[e * 3 + c], options.gi_k, options.gi_f,
-                                             kind == 0)) - o;
+                const auto energy = indirect.energy[e * 3 + c];
+                const int d = int(kind == 0 && !direct.empty()
+                                      ? gi_compose_direct(direct[e * 3 + c], o, ambient, energy, options.gi_k,
+                                                          options.gi_f)
+                                      : gi_compose(o, ambient, energy, options.gi_k, options.gi_f, kind == 0)) -
+                              o;
                 changed += d != 0;
                 delta += d;
             }

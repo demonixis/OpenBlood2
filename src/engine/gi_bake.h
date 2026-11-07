@@ -1,5 +1,6 @@
 #pragma once
 #include "engine/gi_bake_scene.h"
+#include "engine/gi_direct.h"
 #include "engine/gi_file.h"
 #include "engine/gi_lightmap.h"
 #include "engine/gi_placement.h"
@@ -11,9 +12,9 @@
 #include <string>
 #include <string_view>
 
-// One world's bake (gi_contracts.md, lots G5, G7 and G9): settings, placement, scene, a traced probe
-// survey, the sky, the indirect light of every lightmap texel and vertex colour, the SH light probes
-// and the .ob2gi file (INFO, PLAC, LMAP, VTX and PROB).
+// One world's bake (gi_contracts.md, lots G5, G7, G9 and GD2): settings, placement, scene, a traced
+// probe survey, the sky, the re-baked direct light when asked, the indirect light of every lightmap
+// texel and vertex colour, the SH light probes and the .ob2gi file (INFO, PLAC, LMAP, DIR, VTX, PROB).
 namespace OpenBlood2
 {
     enum class GiQuality : std::uint8_t
@@ -28,18 +29,28 @@ namespace OpenBlood2
         constexpr std::uint32_t max_sky = 400; // Hundredths.
         constexpr unsigned max_jobs = 256;
     } // namespace gi_bake_settings_limits
+    // The direct light the bake composes and bounces on lightmapped faces (lot GD2, decision D17).
+    enum class GiDirectSource : std::uint8_t
+    {
+        Original, // D = O - A_eff, the stored 1998 texel without its ambient fill.
+        Rebaked   // D', the re-baked direct light (gi_direct.h), stored in the DIR section.
+    };
     struct GiBakeSettings
     {
         GiQuality quality = GiQuality::Final;
         std::uint32_t bounces = 2, rays = 256;
         std::uint32_t sky = 100; // Decision D9's sky scale, in hundredths.
+        GiDirectSource direct = GiDirectSource::Original;
     };
     const char* gi_quality_name(GiQuality);
+    const char* gi_direct_source_name(GiDirectSource); // "original", "rebaked".
+    bool gi_direct_source(std::string_view name, GiDirectSource&);
     // A preset name; bounces, rays (0 = not given) and the sky scale (hundredths, -1 = not given) only
     // with "custom", where they default to Final's.
     bool make_gi_bake_settings(std::string_view quality, std::uint32_t bounces, std::uint32_t rays, std::int32_t sky,
                                GiBakeSettings&, std::string& error);
-    // The canonical INFO text; the thread count is never part of it.
+    // The canonical INFO text; the thread count is never part of it. A re-baked direct source adds
+    // the line "direct rebaked"; original bakes keep the text (and the bytes) of earlier lots.
     std::string gi_settings_text(const GiBakeSettings&);
 
     // Every light probe casts `rays` uniform directions, seeded by (probe index, ray index): what
@@ -94,6 +105,11 @@ namespace OpenBlood2
         GiSkySetup sky_setup;
         GiSkyReport sky;
         GiLightmapReport lightmaps;
+        // The re-baked direct pass (lot GD2); zero for an original bake.
+        GiDirectLightReport direct_lights;
+        std::size_t direct_triangles = 0, direct_kept = 0, direct_saturated = 0;
+        std::uint64_t direct_tests = 0;
+        double direct_ms = 0;
         GiProbeReport light_probes;
         std::uint64_t bytes = 0;
         double ms = 0;

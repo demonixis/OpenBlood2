@@ -3,11 +3,14 @@
 // the enhanced renderer and at DETAIL LOW; a nonzero file changes it, the Original view restores it,
 // and switching GI off again gives the reference frame back. Lot G9: zero light probes leave models and
 // the Light probes world source identical; nonzero probes change the models only, and the switch,
-// intensity 0 and the Original view restore the frame.
+// intensity 0 and the Original view restore the frame. Lot GD2: a DIR section equal to O - A_eff with
+// E = 0 is the reference frame; the re-baked D' changes the lightmapped frame only, and the Original
+// view, DETAIL LOW and GI off keep the reference.
 #include "app/scene_presenter.h"
 #include "app/session_playback.h"
 #include "engine/capture.h"
 #include "engine/gi_bake_scene.h"
+#include "engine/gi_direct.h"
 #include "engine/gi_lightmap.h"
 #include "engine/sha256.h"
 #include "engine/world_shaders.h"
@@ -62,8 +65,9 @@ namespace
     // A file of uniform E for every receiver of the world, keyed for the mounted content.
     // LMAP/VTX of uniform E, and (lot G9) PLAC/PROB: a probe at every node of a 256-unit lattice over the
     // world with uniform E = probe_energy.
+    // `direct` (lot GD2): 0 no DIR section, 1 D = O - A_eff, 2 the re-baked D'.
     bool gi_file(const World& world, const Resources& resources, std::string_view path, float energy,
-                 float probe_energy, GiFile& file, std::string& error)
+                 float probe_energy, GiFile& file, std::string& error, int direct = 0)
     {
         WorldMesh mesh;
         std::vector<WorldTriangleSource> sources;
@@ -108,6 +112,36 @@ namespace
             !write_gi_vertex_light(vertex, file.sections[2].payload, error) ||
             !write_gi_probes(probes, file.sections[3].payload, error))
             return false;
+        if (direct)
+        {
+            GiDirectSection section;
+            if (direct == 1)
+            {
+                const float ambient[3]{receivers.ambient.x, receivers.ambient.y, receivers.ambient.z};
+                for (std::size_t t = 0; t < receivers.texels; ++t)
+                {
+                    float d[3];
+                    for (int c = 0; c < 3; ++c)
+                    {
+                        const double o = receivers.original[t][c];
+                        const double a = ambient[c] > 0 ? std::min(o, double(ambient[c])) : 0.0;
+                        d[c] = float((o - a) / 255);
+                    }
+                    section.texels.push_back(gi_rgb9e5({d[0], d[1], d[2]}));
+                }
+            }
+            else
+            {
+                GiDirectBake bake;
+                if (!gi_rebake_direct(world, receivers, 0, nullptr, {}, bake, error))
+                    return false;
+                section = std::move(bake.section);
+            }
+            GiSection dir{gi_format::direct, {}};
+            if (!write_gi_direct(section, dir.payload, error))
+                return false;
+            file.sections.insert(file.sections.begin() + 2, std::move(dir));
+        }
         file.key.world = expected.world;
         file.key.albedo = expected.albedo;
         file.key.edition = expected.edition;
@@ -146,8 +180,10 @@ int main(int argc, char** argv)
         CHECK(gi_expectation(game->resources, path, expected, error) && gi_file_name(path, expected.world, name));
         const auto target = scratch / path_from_utf8(name);
         fs::remove(target, ec);
-        GiFile zero, lit, probed;
+        GiFile zero, lit, probed, exact_direct, rebaked;
         CHECK(gi_file(scene.geometry, game->resources, path, 0, 0, zero, error));
+        CHECK(gi_file(scene.geometry, game->resources, path, 0, 0, exact_direct, error, 1));
+        CHECK(gi_file(scene.geometry, game->resources, path, 0, 0, rebaked, error, 2));
         CHECK(gi_file(scene.geometry, game->resources, path, .05f, 0, lit, error));
         CHECK(gi_file(scene.geometry, game->resources, path, 0, .4f, probed, error)); // Above AmbientLight.
         Capture capture;
@@ -215,6 +251,22 @@ int main(int argc, char** argv)
                 presenter.gi_composition.source = GiWorldSource::Texels;
                 presenter.gi_probes.models = true;
                 std::cout << label << ": probes lit " << lit_models << " models\n";
+                // Lot GD2: a DIR section of O - A_eff with E = 0 is the identity; the re-baked D'
+                // changes the lightmapped frame, not DETAIL LOW; the Original view restores it.
+                CHECK(save_gi_file(target, exact_direct, error));
+                ++presenter.gi_reload;
+                CHECK(frame(gpu, presenter, *game, capture, pixels, error));
+                CHECK(presenter.gi_status().state == GiRuntimeState::Applied && presenter.gi_status().rebaked &&
+                      pixels == reference);
+                CHECK(save_gi_file(target, rebaked, error));
+                ++presenter.gi_reload;
+                CHECK(frame(gpu, presenter, *game, capture, pixels, error));
+                CHECK(presenter.gi_status().state == GiRuntimeState::Applied && presenter.gi_status().rebaked &&
+                      (lightmaps ? pixels != reference : pixels == reference));
+                presenter.gi_composition.view = GiView::Original;
+                CHECK(frame(gpu, presenter, *game, capture, pixels, error) && pixels == reference);
+                presenter.gi_composition.view = GiView::Final;
+                std::cout << label << ": re-baked direct light " << (lightmaps ? "changed" : "kept") << " the frame\n";
                 // Nonzero E changes the frame; the Original view and GI off restore it.
                 CHECK(save_gi_file(target, lit, error));
                 ++presenter.gi_reload;

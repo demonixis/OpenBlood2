@@ -225,9 +225,9 @@ namespace
         reseal(bytes);
         CHECK(refuses(bytes, "section count 0"));
         bytes = good;
-        put32(bytes, section - 4, 7);
+        put32(bytes, section - 4, 8); // One more than the known tags (seven since lot GD2's DIR).
         reseal(bytes);
-        CHECK(refuses(bytes, "section count 7"));
+        CHECK(refuses(bytes, "section count 8"));
         bytes = good;
         put32(bytes, section, gi_format::tag('Z', 'Z', 'Z', 'Z'));
         reseal(bytes);

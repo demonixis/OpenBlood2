@@ -557,6 +557,7 @@ namespace OpenBlood2
         if (s.state == GiRuntimeState::Applied)
         {
             ImGui::Text("Bake: %s", s.settings.c_str());
+            ImGui::Text("Direct light: %s", s.rebaked ? "re-baked (DIR section)" : "original lightmaps");
             ImGui::Text("File: %zu blocks (%zu texels), %zu corner sets (%zu corners)", s.blocks, s.texels, s.sets,
                         s.corners);
             ImGui::Text("Load: keys %.1f ms, lookup %.1f ms, sections %.1f ms", s.expectation_ms, s.lookup_ms,
@@ -1150,7 +1151,7 @@ namespace OpenBlood2
         // depend on the job count.
         const unsigned threads = std::thread::hardware_concurrency();
         const auto args = gi_bake_arguments(config, game.world_path, b.final_quality ? "final" : "preview",
-                                            p.directory, out, threads > 2 ? threads - 2 : 1);
+                                            p.directory, out, threads > 2 ? threads - 2 : 1, b.rebaked);
         if (!b.process.start(executable, args, error))
             return b.notice = error, false;
         b.world = game.world_path;
@@ -1161,8 +1162,9 @@ namespace OpenBlood2
         b.reload_pending = b.reloaded = false;
         b.frames = b.last_frame_ns = 0;
         b.frame_sum_ms = b.frame_max_ms = 0;
-        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "GI bake %s started (%s) into %s", b.world.c_str(),
-                    b.final_quality ? "final" : "preview", path_text(out).c_str());
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "GI bake %s started (%s, %s direct light) into %s",
+                    b.world.c_str(), b.final_quality ? "final" : "preview", b.rebaked ? "re-baked" : "original",
+                    path_text(out).c_str());
         return true;
     }
 
@@ -1249,6 +1251,13 @@ namespace OpenBlood2
         ImGui::SameLine();
         if (ImGui::RadioButton("Preview (1 bounce, 64 rays)", !b.final_quality))
             b.final_quality = false;
+        ImGui::TextUnformatted("Direct light:");
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Original lightmaps", !b.rebaked))
+            b.rebaked = false;
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Re-baked", b.rebaked))
+            b.rebaked = true;
         if (placement_.edit && !game.world.models.empty() &&
             ImGui::CollapsingHeader("Excluded models (left out of the bake scene)"))
         {

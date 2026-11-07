@@ -2397,3 +2397,12 @@ segment. `gi_direct`, the audit and the difference panel are written for this pr
 [GI plan](gi_plan.md) and the measurements in the
 [GD1 report](reports/gi_gd1_direct_audit.md). See
 [contracts](../contracts/gi_contracts.md#direct-light-audit-lot-gd1).
+
+## GI re-baked direct bake (lot GD2, 2026-11-07)
+
+No code is imported. The direct pass, the `DIR ` section, `gi_compose_direct` and the BVH shadow
+test are written for this project from the [GI plan](gi_plan.md) and lot GD1; the shadow trace reuses
+the project's own `GiBvh` and WorldShade Möller–Trumbore arithmetic, and its 0.01-unit touch rule
+reproduces the GD1 `CollisionWorld` sweep's treatment of a start lying on a face. See the
+[GD2 report](reports/gi_gd2_rebaked_direct.md) and
+[contracts](../contracts/gi_contracts.md#re-baked-direct-bake-lot-gd2).
