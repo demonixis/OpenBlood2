@@ -63,17 +63,19 @@ has lots G1–G7: world queries, the `.ob2gi` file and keys, the F8 overlay, pro
 (`--gi-place`, canonical `data/gi/placement/<world>.json` format 2, F8 editing), the bake
 scene/tracer (`--bake-gi`), `tools/gi/bake_all.py` with build packaging of `data/gi/baked`
 (`BLOOD2_PACKAGE_GI`, `gi/` beside the binary, `Resources/gi`, APK `assets/gi`) and the lightmap
-core (D9 sky cube, cosine passes, dilation, RGB9E5 LMAP/`VTX ` sections, `--gi-preview`; Gate B
-pending). Nothing renders GI yet. Preserve the D1 units (pages ×2 Saturate, vertex light not, the
-exact E = 0/f = 1 identity of `gi_compose`), D-only re-emission, edge-inset samples, the 10 %
-back-face validity on the first trace and SkyPointer targets as Sky ranges.
+core (D9 sky cube, cosine passes, dilation, RGB9E5 LMAP/`VTX ` sections, `--gi-preview`). Gate B
+was accepted with k = 2 (`gi_default_k`), f = 1, the Final preset and sky 1.0. Nothing renders GI
+yet. Preserve the D1 units (pages ×2 Saturate, vertex light not, the exact E = 0/f = 1 identity
+of `gi_compose`), D-only re-emission, edge-inset samples, the 10 % back-face validity on the
+first trace and SkyPointer targets as Sky ranges.
 Preserve canonical placement bytes, the strict bounded reader, untouched Foreign/Failed files,
 a derived (never stored) light lattice and scratch placement directories in tests. Gate A was
 accepted with the defaults; the 36 single-player placement files are committed. The tracer's
-results must not depend on threads or builds: per-slot jobs, per-element/pass lattice seeds, `-ffp-contract=off`,
-no library trigonometry; hits match WorldShade; a cancelled bake exits 12 and writes nothing.
-Baked files are never committed (D3: `.gitignore`, the `gi_policy` test, CI with packaging OFF);
-the script never parses `.ob2gi` and an empty data folder adds no build step.
+results must not depend on threads or builds: per-slot jobs, per-element/pass lattice seeds,
+`-ffp-contract=off`, no library trigonometry; hits match WorldShade; a cancelled bake exits 12
+and writes nothing. Baked files are never committed (D3: `.gitignore`, the `gi_policy` test, CI
+with packaging OFF); the script never parses `.ob2gi` and an empty data folder adds no build
+step.
 
 The [desktop third-person camera](Documentation/contracts/camera_contracts.md) adds a rebindable C toggle,
 actual player/held models and centred aim convergence. Preserve unchanged eye/shot/movement state,

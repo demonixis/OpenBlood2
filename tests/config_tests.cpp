@@ -1,4 +1,5 @@
 #include "engine/config.h"
+#include "engine/gi_lightmap.h"
 
 #include "scratch_dir.h"
 #include <array>
@@ -410,16 +411,17 @@ namespace
         CHECK(error == "--gi-bounces, --gi-rays and --gi-sky require --gi-quality custom");
         options = {};
         const std::array<std::string_view, 12> preview{"--gi-preview", "07_Cathedral", "--gi-preview-dir", "shots",
-                                                       "--gi-k",       "2",            "--gi-f",           "0.5",
+                                                       "--gi-k",       "3",            "--gi-f",           "0.5",
                                                        "--gi-out",     "bakes",        "--gi-jobs",        "3"};
         CHECK(parse_options(preview, options, error));
         CHECK(options.gi_preview == "07_Cathedral" && path_text(options.gi_preview_dir) == "shots");
-        CHECK(options.gi_k == 2 && options.gi_f == .5f && options.gi_composition);
+        CHECK(options.gi_k == 3 && options.gi_f == .5f && options.gi_composition);
         CHECK(path_text(options.gi_out) == "bakes" && options.gi_jobs == 3 && options.bake_gi.empty());
         options = {};
         const std::array<std::string_view, 2> preview_defaults{"--gi-preview", "07_Cathedral"};
         CHECK(parse_options(preview_defaults, options, error));
-        CHECK(options.gi_k == 1 && options.gi_f == 1 && !options.gi_composition && options.gi_preview_dir.empty());
+        CHECK(options.gi_k == gi_default_k && options.gi_f == gi_default_f && gi_default_k == 2 && gi_default_f == 1);
+        CHECK(!options.gi_composition && options.gi_preview_dir.empty());
         for (const auto& args : std::initializer_list<std::vector<std::string_view>>{
                  {"--gi-preview"},
                  {"--gi-preview-dir", "shots"},

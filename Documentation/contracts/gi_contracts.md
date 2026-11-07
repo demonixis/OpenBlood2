@@ -858,6 +858,8 @@ composes them into the world, so nothing here changes a frame, a save or the sim
   0, 255)`. A NaN E or indirect counts as 0. **E = 0 with f = 1 gives O exactly**, for every O,
   every A (negative, NaN and infinite included) and every k. A is `world_info_ambient_any_case`
   (lot G1), zero when the info has none.
+- **Defaults** (Gate B, 2026-11-07): `gi_default_k` = 2 and `gi_default_f` = 1. They are
+  composition parameters that G8 applies at load; changing them needs no new bake.
 - The ambient fill is never bounced: the light a hit re-emits is built from D, never from O.
 
 ### Receivers
@@ -1020,7 +1022,8 @@ GI | Indirect**, CPU-rendered with a 90° horizontal field and 2×2 samples per 
 - Views: the first GameStartPoint at its yaw, then turned by 120° and 240°, then the other start
   points, six at most; eyes 36 units above `Pos`. A world without one uses its centre.
 - Faces show albedo times their drawn light (pages doubled): the stored light, then the D1
-  composition with `--gi-k` and `--gi-f` (0–4, default 1). The indirect panel shows
+  composition with `--gi-k` and `--gi-f` (0–4, default `gi_default_k` and `gi_default_f`). The
+  indirect panel shows
   `albedo × k E × 4`. The sky shows as drawn, unscaled.
 - `GI_PREVIEW_RESULT` reports the mean E of valid texels and corners, the fraction of 8-bit
   channels the composition changes, the mean change and the file's settings. Exit 2 (arguments or

@@ -40,6 +40,9 @@ namespace OpenBlood2
     // out = clamp(round(D + max(k E s, f A_eff)), 0, 255), s = 255 / 2 for a texel, 255 for a corner.
     // A NaN or negative E counts as 0; E = 0 with f = 1 gives back O exactly.
     std::uint8_t gi_compose(std::uint8_t original, float ambient, float energy, float k, float f, bool texel);
+    // The default intensity and ambient-floor weight, chosen at Gate B (2026-11-07). They are composition
+    // parameters, not bake settings: changing them needs no new bake.
+    constexpr float gi_default_k = 2, gi_default_f = 1;
 
     struct GiLightmapBlock
     {

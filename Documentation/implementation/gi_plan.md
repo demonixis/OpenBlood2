@@ -9,8 +9,9 @@ the user accepted every recommendation in the [decisions](#decisions) table
 [G7 report](reports/gi_g7_lightmaps.md)). On 2026-11-06 the user accepted Gate A as recommended
 (spacing 128, budget 16,384, cap 42, rooms 192×96, the two-level lattice decided in G9) and the
 36 single-player placement files are committed in `data/gi/placement` (format 2 since G5, with
-`excluded_models`). Gate B (bake time, determinism and look of the raw bake, with the k, f,
-bounce and sky defaults) awaits the user's decision; G8 is next.
+`excluded_models`). On 2026-11-07 the user accepted Gate B (bake time, determinism and look of
+the raw bake) with the intensity raised to **k = 2**; f = 1, the Final preset (2 bounces, 256
+rays) and sky scale 1.0 stay. G8 is next.
 
 ## The request
 
@@ -81,7 +82,7 @@ Its donor commit is `00fc3b28663883155ef277afcaf3e389d5dad07f`.
    - **Reflection probes:** box-projected radiance, prefiltered on the CPU, used by the enhanced renderer.
 2. **What "override" means (D1).** When GI is effective, no surface samples the original pages.
    - `WorldMesh::build` substitutes GI pages composed in the exact DAT layout: same blocks, UVs, packer, borders, page count and VRAM.
-   - Symbols: O is the original texel; A is the world ambient fill; A_eff = min(O, A); D = O − A_eff is the direct light with its shadows; E is the baked indirect irradiance in display units; k is the intensity (default 1); f is the ambient-floor weight (default 1).
+   - Symbols: O is the original texel; A is the world ambient fill; A_eff = min(O, A); D = O − A_eff is the direct light with its shadows; E is the baked indirect irradiance in display units; k is the intensity (default 2 since Gate B, first planned at 1); f is the ambient-floor weight (default 1).
    - Lightmapped faces: `rgb = clamp(D + max(k·E/2, f·A_eff), 0, 1)`.
    - Vertex-lit faces: `Dv + max(k·Ev, f·A_eff)`, with no /2 because the vertex path has no ×2.
    - Guarantees:
@@ -194,7 +195,7 @@ generated artifacts.
 | Gate | After | What is decided |
 | --- | --- | --- |
 | A | G4 | Placement quality and budgets. |
-| B | G7 | Bake time, determinism and look of the raw bake. |
+| B | G7 | Bake time, determinism and look of the raw bake. Accepted 2026-11-07 with k = 2. |
 | C | G8 | Look in game, and whether GI becomes a player option. |
 | D | G11 | Reflection memory and GPU layout. |
 | E | G12 | Reflection cost, and the default per platform. |
@@ -373,6 +374,6 @@ generated artifacts.
 | Light-probe budget | 16,384 probes per world |
 | Reflection probes | 64² with 2×2 supersampling; at most 42 per world on desktop, 16 on mobile |
 | Bake presets | Preview: 1 bounce, 64 rays. Final: 2 bounces, 256 rays. Custom: up to 3 bounces. |
-| Runtime intensities | k = 1, f = 1, probe 1, reflection 1, sky 1 |
+| Runtime intensities | k = 2 (Gate B; first planned at 1), f = 1, probe 1, reflection 1, sky 1 |
 | Names | Folder `data/gi`, extension `.ob2gi`, script `tools/gi/bake_all.py`, contract `gi_contracts.md` |
 | Effort levels | As listed in the lot table |

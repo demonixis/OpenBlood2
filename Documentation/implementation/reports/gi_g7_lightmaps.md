@@ -156,6 +156,13 @@ Bounces on 07_Cathedral (256 rays, sky 1.00): mean texel E 0.041 0.048 0.059 wit
 - **2 bounces** capture nearly all the energy; a third costs 45 % more time for 2 %.
 - **Sky 1.00** draws the sky as the renderer does.
 
+## Gate B decision
+
+On 2026-11-07 the user accepted Gate B with the intensity raised to **k = 2**; f = 1, the Final
+preset (2 bounces, 256 rays) and sky scale 1.00 stay. `gi_default_k` and `gi_default_f` hold the
+defaults (`--gi-preview` uses them when `--gi-k`/`--gi-f` are absent); G8 composes with them. k
+is not a bake setting, so the files above stay current.
+
 ## Decisions and adaptations
 
 - **Vertex radiance** is `albedo × min(D + E, 1)` rather than the plan's `albedo·(Dv + Ev)`: the
