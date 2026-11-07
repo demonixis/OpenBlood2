@@ -1,8 +1,9 @@
 # Global illumination contracts
 
 Baked GI for the M10 [GI plan](../implementation/gi_plan.md). Each lot adds its section.
-GI is not rendered yet: nothing in this contract changes a frame, a save or the simulation. Lot G7
-bakes the GI lightmaps; lot G8 will compose them into the world.
+Lot G7 bakes the GI lightmaps and lot G8 composes them into the world when Options > Display
+GLOBAL ILLUMINATION is on (off by default, decision D11). With it off, or without a Ready file,
+every frame is unchanged; nothing in this contract changes a save or the simulation.
 
 - [World queries (lot G1)](#world-queries-lot-g1)
 - [Baked file and keys (lot G2)](#baked-file-and-keys-lot-g2)
@@ -11,6 +12,7 @@ bakes the GI lightmaps; lot G8 will compose them into the world.
 - [Bake scene and tracer (lot G5)](#bake-scene-and-tracer-lot-g5)
 - [Bake-all script and packaging (lot G6)](#bake-all-script-and-packaging-lot-g6)
 - [GI lightmap core (lot G7)](#gi-lightmap-core-lot-g7)
+- [World override (lot G8)](#world-override-lot-g8)
 
 ## World queries (lot G1)
 
@@ -157,8 +159,8 @@ value the save fingerprint stores. It is the bake identity key of lot G2.
 ## Baked file and keys (lot G2)
 
 `engine/gi_file.h` holds the baked GI container (`.ob2gi`), the keys that tie it to the mounted
-content, the freshness rules and the search order. No bake writes one yet (G5); nothing reads
-one at runtime yet (G8).
+content, the freshness rules and the search order. Lot G5 writes it and lot G8 reads it at
+runtime ([world override](#world-override-lot-g8)).
 
 ### Container
 
@@ -335,13 +337,16 @@ while it is closed, and no GI is applied by it.
 ### Panels
 
 Panels use CyberEngine's vocabulary: Status, Runtime, Light probes, Reflection probes, Bake.
-Status works since G3 and the two probe panels since [G4](#f8-placement-editing); Runtime and Bake
-name the lot that brings them (G8, G10).
+Status works since G3, the two probe panels since [G4](#f8-placement-editing) and Runtime since
+[G8](#f8-runtime-panel); Bake names the lot that brings it (G10).
 
 **Status** shows, truthfully:
 - the summary: no world, error, no baked file, a stale file with its reasons, a refused/foreign
-  file, or "ready file, not applied (GI rendering: lot G8)";
-- that GI rendering is disabled until G8 and the original lightmaps are in use;
+  file, or a ready file with the runtime state since G8: "ready file, applied", "ready file, GI
+  off (Options > Display)" or "ready file, not applied (<state>)" ("ready file" where no presenter
+  is linked);
+- the runtime line: whether GI is drawn, from which file, or why the original lightmaps are in
+  use;
 - the world path, DAT and albedo digests, edition, algorithm and expected file name;
 - every search root with its status (the chosen Ready candidate marked), path, stale reasons
   or failure detail, exactly as `find_gi_file` reports them;
@@ -382,8 +387,8 @@ Pinned draw without a world.
 
 `engine/gi_placement.{h,cpp}` places the light and reflection probes a bake will use. A
 placement file holds only the editable inputs; the light-probe lattice is derived from the file
-and the world, deterministically, so the file stays small and reviewable. Nothing is baked or
-rendered from it yet (G5, G8).
+and the world, deterministically, so the file stays small and reviewable. The bake reads it (G5);
+the runtime never does.
 
 ### Placement file
 
@@ -841,8 +846,8 @@ reaching a running bake (exit 12, later worlds NOT_RUN, nothing baked after the 
 
 `engine/gi_lightmap.{h,cpp}`, `engine/gi_sky.{h,cpp}` and `engine/gi_preview.{h,cpp}` compute the
 indirect light of every stored lightmap texel and baked vertex colour, and the bake writes it into
-the LMAP and `VTX ` sections after the survey. The game does not read these sections yet: lot G8
-composes them into the world, so nothing here changes a frame, a save or the simulation.
+the LMAP and `VTX ` sections after the survey. Lot G8 composes them into the world
+([world override](#world-override-lot-g8)); nothing here changes a save or the simulation.
 
 ### Units (decision D1)
 
@@ -859,7 +864,8 @@ composes them into the world, so nothing here changes a frame, a save or the sim
   every A (negative, NaN and infinite included) and every k. A is `world_info_ambient_any_case`
   (lot G1), zero when the info has none.
 - **Defaults** (Gate B, 2026-11-07): `gi_default_k` = 2 and `gi_default_f` = 1. They are
-  composition parameters that G8 applies at load; changing them needs no new bake.
+  composition parameters that G8 applies when it builds the world mesh; changing them needs no new
+  bake.
 - The ambient fill is never bounced: the light a hit re-emits is built from D, never from O.
 
 ### Receivers
@@ -1093,3 +1099,129 @@ uniform render.
 **`gi_lightmap.retail`** (private data) 01_SubwayA at Preview: the file's sections pass the
 checks, match the receivers and the report, every traced element is counted, and the
 composition is the identity at E = 0 on real data.
+
+## World override (lot G8)
+
+`engine/gi_runtime.{h,cpp}` loads the current world's Ready file, and `WorldMesh::build` composes
+its LMAP and `VTX ` sections (decision D1) into the lightmap pages and vertex colours it emits.
+Nothing is baked or written at load, and nothing outside those page texels and vertex colours
+changes: geometry, UVs, materials, batches, collision, saves and the simulation are untouched.
+
+### Switch, preferences and command line
+
+- Options > Display ends with `GLOBAL ILLUMINATION [OFF/ON]` (setting 31, the 16th row), off by
+  default until Gate C and the defaults of G13 (decision D11). It serves both renderers, every
+  detail level and XR (the composition is CPU-side; no shader changes).
+- `preferences.cfg` **version 13** adds `global_illumination` (0 or 1, default 0). Versions 1–12
+  load it off; a version 12 file carrying the key, a version 13 file without it and any other
+  value are refused.
+- The F8 Runtime checkbox is the same setting, so it is saved like a Display change.
+- `--gi` applies the baked GI to `--bench` and the smoke runs (`--gpu-smoke`, world smokes),
+  composed with `--gi-k`, `--gi-f` (0–4, defaults 2 and 1) and `--gi-view final|original|direct|
+  indirect|lighting|validity`. It is refused with the GI tools, network sessions and the game
+  itself, where the Display row and F8 own it; `--gi-view` requires `--gi`.
+
+### Lookup
+
+`ScenePresenter` looks the file up when GI is on and the world changes, when GI is turned on, and
+when F8 asks again (`gi_reload`); never per frame. `load_gi_world_light`:
+
+1. computes the content keys (`gi_expectation`: DAT and albedo digests);
+2. runs `find_gi_file` over `gi_search_roots(config.gi_dir)` (the G2 order: `--gi-dir`, user,
+   sdcard, packaged); the first Ready candidate wins and any bake settings are accepted;
+3. decodes LMAP and `VTX ` (both required: an older file fails) and checks them against the
+   world (`check_gi_lightmaps`, `check_gi_vertex_light`).
+
+States: **Off** (nothing looked up, decoded data dropped), **NoWorld**, **Missing** (no Ready
+candidate; the detail names each Stale, Foreign or Failed candidate with its reason), **Failed**
+(keys, lookup or sections; the detail names it) and **Applied**. A file is applied whole or not at
+all, and its payload is released once decoded. The game logs one line per lookup: what was
+applied with its counts and load cost (keys, lookup, sections in ms), or why nothing was; and the
+world mesh build time of each rebuild that composed GI.
+
+### Composition
+
+- **Pages:** each texel of a listed block (LMAP record of the same model and polygon) is expanded
+  from RGB565 as before, then replaced by `gi_compose(O, A, E, k, f, texel)` per channel (s =
+  255/2). The replicated borders copy the composed texels. Page alpha stays 255.
+- **Corners:** a listed set (`VTX ` record) whose ring matches the polygon's composes each
+  corner's colour (s = 255): vertex-lit polygons at every detail level, and lightmapped polygons
+  with baked colours at DETAIL LOW.
+- **A** is `world_info_ambient_any_case` (zero without AmbientLight).
+- Unlisted polygons, fully bright faces, sky portals, untextured faces, FX geometry and models
+  keep their stored or original light.
+- **E = 0 with f = 1 is the exact identity** for every k: GI on with a zero bake, like GI off, a
+  missing file or a stale one, presents byte-identical frames in both renderers (`gpu.gi`).
+- The presenter rebuilds the world mesh when the world, the detail level, the applied file
+  (lookup count), k, f or the view changes; the rebuild clears the presentation textures as every
+  world rebuild does. k and f outside [0, 4] fall back to the defaults.
+
+### Views
+
+Every view recomposes the pages and corners from the decoded file; none needs a bake.
+
+| View | Pages and corners |
+|---|---|
+| Final | `gi_compose(O, A, E, k, f)` |
+| Original | The stored light, byte for byte |
+| Direct only | `gi_compose(O, A, 0, 0, 0)`: the stored light without its ambient fill |
+| Indirect only | `gi_compose(0, 0, E, k, 0)` |
+| Lighting only | Final, with every decoded world texture drawn white (texture alpha kept) |
+| Texel validity | Green where the element's own sample was valid, red where it was filled or left |
+
+### F8 Runtime panel
+
+- **Global illumination** checkbox (the Display setting) and the runtime state line.
+- **Look up again** (after a bake, for example).
+- When applied: the bake settings, the file's blocks, texels, corner sets and corners, the load
+  cost, and what the current mesh composed with the world mesh build time.
+- **Intensity k** and **Ambient floor f** sliders (0–4), **Defaults** (k 2, f 1); they last for
+  the session and are not saved.
+- **View** buttons for the six views. The Pinned strip shows the view, k and f while GI is on.
+
+### Network and server
+
+A network client loads GI from its own content (its mounted data and its own `gi_dir` roots),
+never from the server; nothing about GI goes over the wire. The dedicated server has no presenter
+and never looks a file up.
+
+### Interim effects (until G9 and G12)
+
+- **Models** sample the face light below them from the world mesh (`ModelLighting`, `WorldShade`),
+  so with GI on they see the composed light until the light probes (G9) replace model lighting.
+- **Model shadows** remove 60 % of the composed light below a caster, GI included.
+- **Enhanced renderer:** the static-light specular occlusion (`saturate(baked / predicted)`) and
+  the normal-map relief read the total, GI-composed luminance, so GI raises grid specular where it
+  adds light until the reflection probes (G12) separate the terms.
+
+### Cost
+
+`--bench --gi` on Apple M5 (960×540): see the
+[G8 report](../implementation/reports/gi_g8_world_override.md). Composition runs only when the
+world mesh is rebuilt (SubwayA 5.6 ms with GI); frames draw the same pages and vertex colours as
+before, so the frame cost does not change. The lookup costs about 13 ms on SubwayA (content keys
+6 ms, file read and validation 6 ms, sections 0.2 ms).
+
+### Tests
+
+**`gi_runtime.override`** A synthetic box of lightmapped, vertex-lit and DETAIL LOW faces with
+AmbientLight: E = 0 at Final is byte-identical to no GI for k 0–4 at both detail levels, with the
+composed counts; a uniform E per block and varying corners give `gi_compose` pages and colours at
+Final (two k/f pairs), Original (identical), Direct, Indirect, Validity and Lighting (white
+textures, alpha kept, pages unchanged); an unlisted polygon keeps its stored light; files without
+`VTX `, with a block or a set that does not fit the world are refused untouched; composition
+bounds and record lookup.
+
+**`gi_runtime.retail`** (private data) 01_SubwayA through the runtime lookup: NoWorld, Missing
+with no file, Missing naming a stale (albedo) file, then a Ready zero bake applied with its counts
+and byte-identical meshes at high and low detail, then a nonzero bake changing the pages.
+
+**`gpu.gi`** (private data, GPU) 02_CityHub and 01_SubwayA in the original and the enhanced
+renderer at high and low detail: GI off is the reference; GI on with no file, a stale file and a
+zero Ready file are byte-identical; a nonzero file changes the frame, the Original view and GI off
+restore it, and Lighting only differs.
+
+**`menus.state`** The 16th Display row toggles setting 31. **`menus.preferences`** Version 13
+bytes, version 12 loading off, and the refused key/value combinations. **`config.gi`** `--gi`,
+`--gi-view` and their refusals. **`gi_overlay.draw` / `gi_overlay.retail`** The Runtime panel with
+and without the presenter link, and the summaries per runtime state.

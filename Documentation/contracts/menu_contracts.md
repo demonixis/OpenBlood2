@@ -306,6 +306,16 @@ the view weapon keeps the original fixed projection. `preferences.cfg` **version
 `field_of_view` (default 90); versions 1–11 load the default and a version 11 file carrying
 the key is rejected.
 
+### Global illumination (GI lot G8)
+
+A replacement `GLOBAL ILLUMINATION [OFF/ON]` row (setting 31) now ends the Display page (16
+rows). It is off by default (decision D11) and enabled in both renderers, at every detail level
+and in XR. On, the world faces draw the current world's baked GI when a Ready file exists; see
+the [GI world override](gi_contracts.md#world-override-lot-g8). The F8 Runtime panel's checkbox is
+the same setting. `preferences.cfg` **version 13** adds `global_illumination` (default 0);
+versions 1–12 load it off, a version 12 file carrying the key and a version 13 file without it
+are rejected.
+
 ## Controls (CMenuControls)
 
 Options > Controls is enabled in the retail edition (the demo has no action strings and keeps the

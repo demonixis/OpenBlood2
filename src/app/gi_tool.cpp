@@ -1,4 +1,5 @@
 #include "app/gi_tool.h"
+#include "app/scene_presenter.h"
 #include "engine/atomic_file.h"
 #include "engine/gi_bake.h"
 #include "engine/gi_jobs.h"
@@ -580,5 +581,22 @@ namespace OpenBlood2
         std::cout << "GI_PREVIEW_RESULT status=ok exit=0 world=" << path << " views=" << views.size() << numbers
                   << settings << " texels=" << receivers.texels << " corners=" << receivers.corners << '\n';
         return 0;
+    }
+
+    void log_gi_status(const ScenePresenter& presenter, std::uint64_t& logged)
+    {
+        const auto& status = presenter.gi_status();
+        if (status.loads != logged)
+        {
+            logged = status.loads;
+            if (status.state != GiRuntimeState::NoWorld)
+                spdlog::info("{}", gi_status_line(status));
+        }
+        if (presenter.rebuilt && presenter.world_mesh.gi_blocks + presenter.world_mesh.gi_sets)
+            spdlog::info("GI composed ({}, k {:.2f}, f {:.2f}): {} blocks, {} texels, {} corner sets; world mesh "
+                         "{:.1f} ms",
+                         gi_view_name(presenter.gi_composition.view), presenter.gi_composition.k,
+                         presenter.gi_composition.f, presenter.world_mesh.gi_blocks, presenter.world_mesh.gi_texels,
+                         presenter.world_mesh.gi_sets, presenter.mesh_build_ms);
     }
 } // namespace OpenBlood2

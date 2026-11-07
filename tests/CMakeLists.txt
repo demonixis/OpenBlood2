@@ -1022,6 +1022,14 @@ if(BLOOD2_TEST_DATA_DIR)
              "${PROJECT_SOURCE_DIR}/data/gi/placement" "${CMAKE_CURRENT_BINARY_DIR}/gi-lightmap-retail")
     set_tests_properties(gi_lightmap.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
 endif()
+# Lot G8: the world override (WorldMesh composition, views) and the runtime lookup.
+add_test(NAME gi_runtime.override COMMAND gi_lightmap_tests runtime "${CMAKE_CURRENT_BINARY_DIR}/gi-runtime-override")
+set_tests_properties(gi_runtime.override PROPERTIES LABELS "headless;gi" TIMEOUT 120)
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME gi_runtime.retail COMMAND gi_lightmap_tests runtime-retail "${BLOOD2_TEST_DATA_DIR}"
+             "${CMAKE_CURRENT_BINARY_DIR}/gi-runtime-retail")
+    set_tests_properties(gi_runtime.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
+endif()
 
 # Lot G6: baked GI files never enter the repository (decision D3), and the bake-all script
 # drives a stub binary (the stub is an executable script, hence Unix only).
@@ -2213,6 +2221,14 @@ if(BLOOD2_GPU_TESTS)
         blood2_project_options(post_gpu_tests)
         add_test(NAME gpu.post COMMAND post_gpu_tests "${BLOOD2_TEST_DATA_DIR}")
         set_tests_properties(gpu.post PROPERTIES LABELS "gpu;private;surface" TIMEOUT 180 RUN_SERIAL TRUE
+            ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+        # Lot G8: the GI world override leaves the frame intact unless a Ready nonzero file applies.
+        add_executable(gi_gpu_tests gi_gpu_tests.cpp ../src/app/scene_presenter.cpp
+            ../src/app/model_lighting.cpp ../src/app/model_scene.cpp ../src/app/polygrid_scene.cpp ../src/app/sprite_scene.cpp)
+        target_link_libraries(gi_gpu_tests PRIVATE blood2_game)
+        blood2_project_options(gi_gpu_tests)
+        add_test(NAME gpu.gi COMMAND gi_gpu_tests "${BLOOD2_TEST_DATA_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/gpu-gi")
+        set_tests_properties(gpu.gi PROPERTIES LABELS "gpu;private;gi" TIMEOUT 300 RUN_SERIAL TRUE
             ENVIRONMENT "SDL_AUDIODRIVER=dummy")
         add_executable(save_native_gpu_tests save_native_gpu_tests.cpp ../src/app/scene_presenter.cpp
             ../src/app/model_lighting.cpp ../src/app/model_scene.cpp ../src/app/polygrid_scene.cpp ../src/app/sprite_scene.cpp)

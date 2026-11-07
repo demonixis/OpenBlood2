@@ -3,6 +3,7 @@
 #include "app/control_bindings.h"
 #include "app/display_options.h"
 #include "app/gamepad_devices.h"
+#include "app/gi_tool.h"
 #include "app/hud.h"
 #include "app/movement_controls.h"
 #include "app/network_controls.h"
@@ -110,6 +111,10 @@ namespace OpenBlood2
         controls.mouse_look = settings.mouse_look;
         controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
         presenter.lightmaps = settings.detail >= 1;
+        // Baked GI (lot G8) from this client's own content and roots, never from the server.
+        presenter.global_illumination = settings.global_illumination;
+        presenter.gi_roots = gi_search_roots(config.gi_dir);
+        std::uint64_t gi_logged = 0;
         presenter.model_shadows = options.model_shadows && settings.detail >= 2;
         presenter.per_pixel_lighting = settings.pixel_lighting;
         presenter.shading = !settings.renderer ? SurfaceShading::Original
@@ -379,6 +384,7 @@ namespace OpenBlood2
                     SDL_CancelGPUCommandBuffer(commands);
                     return failed();
                 }
+                log_gi_status(presenter, gi_logged);
             }
             ImGui_ImplSDLGPU3_PrepareDrawData(ImGui::GetDrawData(), commands);
             SDL_GPUColorTargetInfo color{};

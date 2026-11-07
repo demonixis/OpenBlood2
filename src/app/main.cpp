@@ -375,6 +375,10 @@ namespace
         presenter.per_pixel_lighting = options.pixel_lighting;
         presenter.shading = OpenBlood2::SurfaceShading(options.renderer);
         presenter.normal_maps = options.normal_maps;
+        presenter.global_illumination = options.gi; // Baked GI (lot G8) for smoke runs, as --bench --gi.
+        presenter.gi_roots = OpenBlood2::gi_search_roots(config.gi_dir);
+        presenter.gi_composition = {options.gi_k, options.gi_f, OpenBlood2::GiView(options.gi_view)};
+        std::uint64_t gi_logged = 0;
         presenter.post = {OpenBlood2::Antialiasing(options.antialiasing), options.bloom,
                           OpenBlood2::Tonemap(options.tonemap), OpenBlood2::AmbientOcclusion(options.ambient_occlusion),
                           OpenBlood2::Reflections(options.reflections)};
@@ -902,6 +906,7 @@ namespace
                 spdlog::error("{}", error);
                 return 5;
             }
+            OpenBlood2::log_gi_status(presenter, gi_logged);
             if (presenter.rebuilt && game->world_path.empty())
                 viewport_unloaded = true;
             const bool render_world = presenter.render_world;
@@ -1831,6 +1836,8 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --no-model-shadows  Disable FLAG_SHADOW model shadows (original low/medium detail)\n"
                      "  --pixel-lighting    Light models per pixel (menu: Options > Display)\n"
                      "  --renderer MODE     original (default), standard or high enhanced shading (menu: Display)\n"
+                     "  --gi                Baked GI with --bench or a smoke run (game: Display, F8)\n"
+                     "  --gi-view VIEW      With --gi: final, original, direct, indirect, lighting or validity\n"
                      "  --normal-maps       Generate normal maps for the enhanced renderer (menu: Display)\n"
                      "  --aa MODE           Anti-aliasing: off (default), fxaa, msaa2 or msaa4 (menu: Display)\n"
                      "  --no-bloom          Enhanced renderer without bloom (menu: Display)\n"

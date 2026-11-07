@@ -456,7 +456,15 @@ namespace OpenBlood2
         if (!status_.error.empty())
             return "error";
         if (status_.lookup.chosen >= 0)
-            return "ready file, not applied (GI rendering: lot G8)";
+        {
+            if (!runtime_.status || !runtime_.enabled)
+                return "ready file";
+            if (!*runtime_.enabled)
+                return "ready file, GI off (Options > Display)";
+            return runtime_.status->state == GiRuntimeState::Applied
+                       ? "ready file, applied"
+                       : std::string("ready file, not applied (") + gi_runtime_state_name(runtime_.status->state) + ")";
+        }
         for (const auto& candidate : status_.lookup.candidates)
             if (candidate.status != GiStatus::Missing)
             {
@@ -466,6 +474,79 @@ namespace OpenBlood2
                 return text;
             }
         return "no baked file";
+    }
+
+    std::string GiTools::runtime_summary() const
+    {
+        if (!runtime_.status || !runtime_.enabled)
+            return "GI rendering: unavailable here.";
+        if (!*runtime_.enabled)
+            return "GI rendering: off (Options > Display GLOBAL ILLUMINATION); the original lightmaps are in use.";
+        const auto& s = *runtime_.status;
+        if (s.state == GiRuntimeState::Applied)
+            return "GI rendering: applied from " + s.file + ".";
+        if (s.state == GiRuntimeState::Off)
+            return "GI rendering: on; the file is looked up at the next scene update.";
+        return std::string("GI rendering: ") + gi_runtime_state_name(s.state) +
+               (s.detail.empty() ? std::string() : " (" + s.detail + ")") + "; the original lightmaps are in use.";
+    }
+
+    void GiTools::runtime_panel()
+    {
+        if (!runtime_.status || !runtime_.enabled || !runtime_.composition)
+        {
+            ImGui::TextDisabled("The runtime switches need the game's scene presenter.");
+            return;
+        }
+        const auto& s = *runtime_.status;
+        ImGui::Checkbox("Global illumination", runtime_.enabled);
+        ImGui::SameLine();
+        ImGui::TextDisabled("(Options > Display GLOBAL ILLUMINATION, saved with the preferences)");
+        const ImVec4 color = s.state == GiRuntimeState::Applied ? ImVec4{.4f, .9f, .4f, 1}
+                             : s.state == GiRuntimeState::Off  ? ImVec4{.7f, .7f, .7f, 1}
+                                                                : ImVec4{1, .6f, .3f, 1};
+        ImGui::TextColored(color, "%s", runtime_summary().c_str());
+        if (runtime_.reload && *runtime_.enabled)
+        {
+            if (ImGui::Button("Look up again"))
+                ++*runtime_.reload;
+            ImGui::SameLine();
+            ImGui::TextDisabled("(re-reads the search roots, for example after a bake)");
+        }
+        if (s.state == GiRuntimeState::Applied)
+        {
+            ImGui::Text("Bake: %s", s.settings.c_str());
+            ImGui::Text("File: %zu blocks (%zu texels), %zu corner sets (%zu corners)", s.blocks, s.texels, s.sets,
+                        s.corners);
+            ImGui::Text("Load: keys %.1f ms, lookup %.1f ms, sections %.1f ms", s.expectation_ms, s.lookup_ms,
+                        s.decode_ms);
+            if (runtime_.mesh)
+                ImGui::Text("Composed: %zu blocks (%zu texels), %zu corner sets (%zu corners); world mesh %.1f ms",
+                            runtime_.mesh->gi_blocks, runtime_.mesh->gi_texels, runtime_.mesh->gi_sets,
+                            runtime_.mesh->gi_corners, runtime_.mesh_build_ms);
+        }
+        ImGui::Separator();
+        auto& c = *runtime_.composition;
+        ImGui::SliderFloat("Intensity k", &c.k, 0, gi_max_intensity, "%.2f", ImGuiSliderFlags_AlwaysClamp);
+        ImGui::SliderFloat("Ambient floor f", &c.f, 0, gi_max_intensity, "%.2f", ImGuiSliderFlags_AlwaysClamp);
+        if (ImGui::Button("Defaults"))
+            c.k = gi_default_k, c.f = gi_default_f;
+        ImGui::SameLine();
+        ImGui::TextDisabled("k %.0f, f %.0f (Gate B); not saved", double(gi_default_k), double(gi_default_f));
+        ImGui::TextUnformatted("View");
+        for (const auto view : gi_views)
+        {
+            if (view != GiView::Final && view != GiView::Direct && view != GiView::Lighting)
+                ImGui::SameLine();
+            if (ImGui::RadioButton(gi_view_name(view), c.view == view))
+                c.view = view;
+        }
+        ImGui::Separator();
+        ImGui::TextWrapped("Every change recomposes the lightmap pages and vertex colours from the decoded file (a "
+                           "world mesh rebuild, no new bake). Texel validity: green where a sample was valid, red "
+                           "where it was filled; polygons the file does not list keep their stored light.");
+        ImGui::TextDisabled("Models keep the original model lighting until the light probes (G9). The enhanced "
+                            "renderer's static-light specular reads the total GI luminance until G12.");
     }
 
     std::string GiTools::placement_summary() const
@@ -491,7 +572,7 @@ namespace OpenBlood2
             refresh(game, config);
         ImGui::SameLine();
         ImGui::TextUnformatted(("GI: " + summary()).c_str());
-        ImGui::TextDisabled("GI rendering is disabled until lot G8: the original lightmaps are in use.");
+        ImGui::TextDisabled("%s", runtime_summary().c_str());
         ImGui::TextUnformatted(placement_summary().c_str());
         ImGui::Separator();
         if (status_.world_path.empty())
@@ -813,9 +894,11 @@ namespace OpenBlood2
         }
     }
 
-    bool GiTools::draw(MenuInput& input, GameSession& game, const Config& config, std::vector<LineVertex>& gizmos)
+    bool GiTools::draw(MenuInput& input, GameSession& game, const Config& config, std::vector<LineVertex>& gizmos,
+                       const GiRuntimeLink& runtime)
     {
         gizmos.clear();
+        runtime_ = runtime;
         if (input.gi == GiOverlay::Closed)
         {
             stale_ = true; // Opening again re-reads the folders (placement edits survive).
@@ -840,6 +923,9 @@ namespace OpenBlood2
                                  ImGuiWindowFlags_NoSavedSettings))
             {
                 ImGui::Text("GI tools (pinned, F8): %s", summary().c_str());
+                if (runtime_.status && runtime_.enabled && *runtime_.enabled && runtime_.composition)
+                    ImGui::Text("View %s, k %.2f, f %.2f", gi_view_name(runtime_.composition->view),
+                                runtime_.composition->k, runtime_.composition->f);
                 ImGui::TextUnformatted(placement_summary().c_str());
             }
             ImGui::End();
@@ -865,7 +951,7 @@ namespace OpenBlood2
                 }
                 if (tab("Runtime", Panel::Runtime))
                 {
-                    unavailable("G8", "the GI switches, intensities and views");
+                    runtime_panel();
                     ImGui::EndTabItem();
                 }
                 if (tab("Light probes", Panel::LightProbes))

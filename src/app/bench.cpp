@@ -1,4 +1,5 @@
 #include "app/bench.h"
+#include "app/gi_tool.h"
 #include "app/scene_presenter.h"
 #include "app/session_playback.h"
 #include "engine/capture.h"
@@ -108,6 +109,12 @@ namespace OpenBlood2
             presenter.normal_maps = options.normal_maps;
             presenter.post = {Antialiasing(options.antialiasing), options.bloom, Tonemap(options.tonemap),
                               AmbientOcclusion(options.ambient_occlusion), Reflections(options.reflections)};
+            // --gi (lot G8): the world's Ready bake from the search roots, composed at the first update.
+            presenter.global_illumination = options.gi;
+            presenter.gi_roots = gi_search_roots(config.gi_dir);
+            presenter.gi_composition = {options.gi_k, options.gi_f, GiView(options.gi_view)};
+            std::uint64_t gi_logged = 0;
+            double first_update_ms = 0;
             Capture capture;
             Series step, world, models, effects, record, gpu, total, draws, culled, pings, reads, read_counts;
             std::uint64_t ping_calls = 0;
@@ -132,6 +139,9 @@ namespace OpenBlood2
                     spdlog::error("Bench {}", error);
                     return 5;
                 }
+                if (frame == 0)
+                    first_update_ms = milliseconds(stepped, SDL_GetTicksNS());
+                log_gi_status(presenter, gi_logged);
                 if (options.bench_sweep)
                 {
                     // Presentation-only yaw sweep around the current view; simulation never reads it.
@@ -240,6 +250,11 @@ namespace OpenBlood2
             const auto& mesh = presenter.world_mesh;
             spdlog::info("Lightmaps: {} faces, {} pages, {} texels, {} unfitted origin axes", mesh.lightmapped,
                          mesh.lightmap_pages, mesh.lightmap_texels, mesh.lightmap_unfitted);
+            const auto& gi = presenter.gi_status();
+            spdlog::info("Load: first update {:.1f} ms, world mesh {:.1f} ms; GI {} ({} blocks / {} texels, {} corner "
+                         "sets / {} corners composed; keys {:.1f} ms, lookup {:.1f} ms, sections {:.1f} ms)",
+                         first_update_ms, presenter.mesh_build_ms, gi_runtime_state_name(gi.state), mesh.gi_blocks,
+                         mesh.gi_texels, mesh.gi_sets, mesh.gi_corners, gi.expectation_ms, gi.lookup_ms, gi.decode_ms);
             spdlog::info("Lighting: {} vertex-lit / {} fully bright textured faces; {} static lights; {} lit models "
                          "({} sampled, {} reused, {} flat, {} FLAG_NOLIGHT, {} directional sources, {} occluded "
                          "lights) last frame; ModelAdd {} {} {}",

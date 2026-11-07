@@ -64,7 +64,8 @@ On top of it:
   - **world faces:** the static light objects from the light grid (×2 Saturate);
   - **models:** their four `ModelLighting` sources;
   - **both:** the radial point light (flashlight and similar).
-- **Environment.** No probe and no cube map: the local baked light stands in for uniform
+- **Environment.** No probe and no cube map yet (reflection probes are GI lot G12): the local
+  baked light stands in for uniform
   environment radiance, through Karis' analytic split-sum approximation. Fdez-Agüera
   multiple-scattering compensation keeps rough metals from darkening against the
   original.
@@ -182,7 +183,8 @@ default-class rows and for emissive or fully bright rows.
 
 `build_light_grid` bins every `Light`/`DirLight`/`ObjectLight` sphere (the same static
 lights as [model lighting](static_light_contracts.md)) into a world grid on the CPU. It
-runs once per world revision. There is no baking, ray casting or probe.
+runs once per world revision. The grid itself bakes nothing and casts no ray; baked GI reaches
+the enhanced shaders only through the world light (see [Baked GI](#baked-gi-gi-lot-g8)).
 
 - **Cells.** At least 128 units, at most 65536 cells (the cell grows by 1.25× until it
   fits).
@@ -194,6 +196,19 @@ runs once per world revision. There is no baking, ray casting or probe.
 
 Measured on Apple M5 (`gpu.surface`): CityHub has 540 lights in 45540 cells (3.6 ms),
 SubwayA 371 lights in 10920 cells (1.1 ms).
+
+## Baked GI (GI lot G8)
+
+The earlier statement that the enhanced renderer has "no probes and no baking" is superseded.
+With Options > Display `GLOBAL ILLUMINATION` on and a Ready baked file for the world, the
+lightmap pages and vertex light that both renderers draw are GI-composed when the world mesh is
+built ([GI world override](gi_contracts.md#world-override-lot-g8)). The enhanced shaders and
+pipelines are unchanged: their diffuse term is still "the original light", which now includes
+the indirect light. Interim effect until the reflection probes (G12): the specular occlusion
+(`saturate(baked luminance / predicted luminance)`) and the normal-map relief read the total,
+GI-composed luminance, so grid specular rises where GI adds light. With GI off, missing, stale or
+a zero bake, every frame is byte-identical (`gpu.gi`). Light and reflection probes remain later
+lots (G9, G12).
 
 ## Generated normal maps
 

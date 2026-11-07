@@ -211,7 +211,7 @@ namespace
         menu.build(MenuPage::Options);
         CHECK(menu.items[0].command == int(MENU_CMD_DISPLAY) && menu.enabled(menu.items[0]) && menu.selected == 0);
         menu.activate();
-        CHECK(menu.page == MenuPage::Display && menu.items.size() == 15 && menu.small());
+        CHECK(menu.page == MenuPage::Display && menu.items.size() == 16 && menu.small());
         CHECK(menu.items[0].setting == 6 && menu.items[0].string_id == IDS_MENU_DISPLAY_DETAIL_HIGH &&
               menu.items[1].setting == 8 && !menu.items[1].string_id && menu.items[2].setting == 7 &&
               !menu.items[2].string_id && menu.items[3].setting == 9 && !menu.enabled(menu.items[3]));
@@ -338,6 +338,13 @@ namespace
         CHECK(menu.settings.field_of_view == 60);
         menu.adjust(-1);
         CHECK(menu.settings.field_of_view == 120);
+        // GLOBAL ILLUMINATION (lot G8): off by default, toggles; both renderers.
+        menu.selected = 15;
+        CHECK(menu.items[15].setting == 31 && !menu.settings.global_illumination && menu.enabled(menu.items[15]));
+        menu.adjust(1);
+        CHECK(menu.settings.global_illumination);
+        menu.adjust(-1);
+        CHECK(!menu.settings.global_illumination);
         menu.settings.field_of_view = 90;
         menu.vr = true;
         for (int i = 9; i < 15; ++i)

@@ -3,6 +3,7 @@
 #include "engine/config.h"
 #include "engine/gi_file.h"
 #include "engine/gi_placement.h"
+#include "engine/gi_runtime.h"
 #include "engine/line_renderer.h"
 #include <filesystem>
 #include <optional>
@@ -12,7 +13,18 @@
 namespace OpenBlood2
 {
     class GameSession;
-    // The F8 GI tools overlay (gi_contracts.md lots G3, G4), built with BLOOD2_GI_TOOLS on desktop.
+    struct WorldMesh;
+    // What the Runtime panel (lot G8) reads and controls. Null members leave it unavailable.
+    struct GiRuntimeLink
+    {
+        bool* enabled = nullptr;              // Options > Display GLOBAL ILLUMINATION (saved with the preferences).
+        GiComposition* composition = nullptr; // ScenePresenter::gi_composition.
+        std::uint64_t* reload = nullptr;      // ScenePresenter::gi_reload.
+        const GiRuntimeStatus* status = nullptr;
+        const WorldMesh* mesh = nullptr;
+        double mesh_build_ms = 0;
+    };
+    // The F8 GI tools overlay (gi_contracts.md lots G3, G4, G8), built with BLOOD2_GI_TOOLS on desktop.
     // It shares UiRuntime's ImGui context and only reads the session: no frame changes while
     // Closed, and its gizmos go through the scene's existing line renderer. Placement edits stay in
     // the overlay (Dirty) until saved to the placement directory.
@@ -22,7 +34,8 @@ namespace OpenBlood2
         // Draws the Open window or the Pinned strip into the current ImGui frame and fills
         // `gizmos` (cleared while Closed). The lookup is recomputed only when the world changes,
         // on Refresh, or when the overlay leaves Closed. Returns true when its own window closed it.
-        bool draw(MenuInput& input, GameSession&, const Config&, std::vector<LineVertex>& gizmos);
+        bool draw(MenuInput& input, GameSession&, const Config&, std::vector<LineVertex>& gizmos,
+                  const GiRuntimeLink& runtime = {});
         // Forgets the cached lookup (world unload or a new GI directory). Placement edits survive.
         void forget();
 
@@ -48,6 +61,8 @@ namespace OpenBlood2
         void refresh(const GameSession&, const Config&);
         // One-line summary for the Pinned strip and the Status header.
         std::string summary() const;
+        // The Runtime panel's state line: whether the world draws GI, and why not.
+        std::string runtime_summary() const;
 
         // Panels, in tab order. Setting `select` makes the next Open frame show that panel.
         enum class Panel
@@ -103,6 +118,8 @@ namespace OpenBlood2
 
       private:
         Status status_;
+        GiRuntimeLink runtime_; // The last draw's link.
+        void runtime_panel();
         std::uint64_t world_revision_ = UINT64_MAX;
         bool stale_ = true;
         Placement placement_;

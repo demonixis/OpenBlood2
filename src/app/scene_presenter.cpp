@@ -348,8 +348,34 @@ namespace OpenBlood2
                 ballistic_vertices.push_back({{b.x, b.y, b.z}, {tracer_color.x, 0, 0, .9f}});
             }
         tracer_vertices_ = ballistic_vertices.size();
-        rebuilt = client_world_epoch_ != replica.frame().world || mesh_revision != source.world_revision ||
-                  built_lightmaps_ != lightmaps;
+        const bool world_changed =
+            client_world_epoch_ != replica.frame().world || mesh_revision != source.world_revision;
+        // Baked GI (lot G8): one lookup per world while enabled, never while off. Network clients
+        // read their own content and roots; the dedicated server has no presenter.
+        if (!global_illumination)
+        {
+            gi_light_.reset();
+            gi_looked_up_ = false;
+            if (gi_status_.state != GiRuntimeState::Off)
+            {
+                const auto loads = gi_status_.loads;
+                gi_status_ = {};
+                gi_status_.loads = loads;
+            }
+        }
+        else if (world_changed || !gi_looked_up_ || gi_reload_seen_ != gi_reload)
+        {
+            load_gi_world_light(source.resources, source.geometry, source.world_path, gi_roots, gi_light_, gi_status_);
+            gi_looked_up_ = true;
+            gi_reload_seen_ = gi_reload;
+        }
+        GiBuild gi_build;
+        if (gi_light_)
+        {
+            gi_light_->composition = valid_gi_composition(gi_composition) ? gi_composition : GiComposition{};
+            gi_build = {true, gi_status_.loads, gi_light_->composition};
+        }
+        rebuilt = world_changed || built_lightmaps_ != lightmaps || built_gi_ != gi_build;
         const auto model_revision = model_scene.revision, effect_revision = explosion_model_scene.revision,
                    sprite_revision = sprite_scene.revision, sky_sprite_revision = sky_sprite_scene.revision;
         if (rebuilt)
@@ -371,9 +397,14 @@ namespace OpenBlood2
             world_mesh = {};
             world_draws.clear();
             model_lighting.clear();
-            if (!source.world_path.empty() && !world_mesh.build(source.geometry, error, &source.resources, lightmaps))
+            const auto build_started = SDL_GetTicksNS();
+            if (!source.world_path.empty() &&
+                !world_mesh.build(source.geometry, error, &source.resources, lightmaps, nullptr,
+                                  gi_build.applied ? &*gi_light_ : nullptr))
                 return fail("World mesh");
+            mesh_build_ms = double(SDL_GetTicksNS() - build_started) / 1e6;
             built_lightmaps_ = lightmaps;
+            built_gi_ = gi_build;
             if (!model_lighting.build(world_mesh, source.geometry, error))
                 return fail("Model lighting");
             mesh_revision = source.world_revision;

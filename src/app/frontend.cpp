@@ -5,6 +5,7 @@
 #include "app/demo_smoke.h"
 #include "app/display_options.h"
 #include "app/gamepad_devices.h"
+#include "app/gi_tool.h"
 #include "app/hud.h"
 #include "app/loading_flow.h"
 #include "app/menu_input.h"
@@ -426,6 +427,8 @@ namespace OpenBlood2
             ObjectSelection selection;
             ScenePresenter presenter(runtime.gpu);
             presenter.model_shadows = options.model_shadows;
+            presenter.gi_roots = gi_search_roots(config.gi_dir); // Baked GI (lot G8), read while enabled.
+            std::uint64_t gi_logged = 0;
             HudRenderer hud(runtime.gpu);
 #if BLOOD2_INSPECTOR
             Inspector inspector(runtime);
@@ -1011,6 +1014,7 @@ namespace OpenBlood2
                 // Original detail*.cfg: LightMap 0 at low detail, MaxModelShadows 1 at high detail.
                 game->server.debris_detail = settings.detail;
                 presenter.lightmaps = settings.detail >= 1;
+                presenter.global_illumination = settings.global_illumination;
                 presenter.model_shadows = options.model_shadows && settings.detail >= 2;
                 presenter.per_pixel_lighting = settings.pixel_lighting;
                 presenter.field_of_view = float(settings.field_of_view) * 0.017453292519943295f;
@@ -1231,6 +1235,7 @@ namespace OpenBlood2
 #endif
                     if (!presenter.update(*game, error))
                         return failed(5);
+                    log_gi_status(presenter, gi_logged);
                 }
                 ImGui_ImplSDLGPU3_NewFrame();
                 ImGui_ImplSDL3_NewFrame();
@@ -1357,7 +1362,10 @@ namespace OpenBlood2
                     input.reset(menu, game->client_shell.m_bInWorld);
 #endif
 #if BLOOD2_GI_TOOLS
-                if (!xr_mode && gi_tools.draw(input, *game, config, presenter.tool_lines))
+                if (!xr_mode && gi_tools.draw(input, *game, config, presenter.tool_lines,
+                                              {&menu.settings.global_illumination, &presenter.gi_composition,
+                                               &presenter.gi_reload, &presenter.gi_status(), &presenter.world_mesh,
+                                               presenter.mesh_build_ms}))
                     input.reset(menu, game->client_shell.m_bInWorld);
 #endif
                 input.text_entry = ImGui::GetIO().WantTextInput; // F8 is ignored while a field has focus.

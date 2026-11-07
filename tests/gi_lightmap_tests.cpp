@@ -2,12 +2,16 @@
 // two planes, leak), the exact E = 0 identity, RGB9E5, the LMAP and VTX sections, sample placement,
 // dilation, back-face validity, directions, thread determinism, the sky setup and cube, and the
 // preview helpers. The private case bakes 01_SubwayA through the driver and checks its sections.
+// Lot G8 (gi_runtime.*): the world override composed by WorldMesh::build, every view, and the
+// runtime lookup of 01_SubwayA (missing, stale, ready; E = 0 leaves the mesh byte-identical).
 #include "engine/config.h"
 #include "engine/gi_bake.h"
 #include "engine/gi_lightmap.h"
 #include "engine/gi_preview.h"
+#include "engine/gi_runtime.h"
 #include "engine/gi_sky.h"
 #include "engine/resources.h"
+#include "engine/sha256.h"
 #include "resource_fixture.h"
 #include "scratch_dir.h"
 #include <algorithm>
@@ -20,6 +24,7 @@
 #include <limits>
 #include <map>
 #include <random>
+#include <set>
 
 using namespace OpenBlood2;
 namespace fs = std::filesystem;
@@ -1355,6 +1360,393 @@ namespace
                   << baked.sky.average.x << ',' << baked.sky.average.y << ',' << baked.sky.average.z << '\n';
         return Testing::remove_scratch_dir(scratch);
     }
+
+    // ---- Lot G8: the world override ----
+
+    // The mesh data a GI composition may change (pages and vertex colours) and everything else.
+    bool same_vertices(const WorldMesh& a, const WorldMesh& b)
+    {
+        if (a.vertices.size() != b.vertices.size())
+            return false;
+        for (std::size_t i = 0; i < a.vertices.size(); ++i)
+        {
+            const auto &x = a.vertices[i], &y = b.vertices[i];
+            if (std::memcmp(&x.position, &y.position, sizeof x.position) ||
+                std::memcmp(&x.color, &y.color, sizeof x.color) || x.uv != y.uv || x.lightmap != y.lightmap ||
+                std::memcmp(&x.normal, &y.normal, sizeof x.normal))
+                return false;
+        }
+        return true;
+    }
+    bool same_materials(const WorldMesh& a, const WorldMesh& b)
+    {
+        if (a.materials.size() != b.materials.size())
+            return false;
+        for (std::size_t i = 0; i < a.materials.size(); ++i)
+            if (a.materials[i].path != b.materials[i].path || a.materials[i].image.rgba != b.materials[i].image.rgba ||
+                a.materials[i].image.mip_rgba != b.materials[i].image.mip_rgba)
+                return false;
+        return true;
+    }
+    bool same_mesh(const WorldMesh& a, const WorldMesh& b)
+    {
+        return same_vertices(a, b) && same_materials(a, b) && a.ranges.size() == b.ranges.size() &&
+               a.lightmapped == b.lightmapped && a.lightmap_pages == b.lightmap_pages && a.lit == b.lit &&
+               a.fullbright == b.fullbright;
+    }
+    bool is_page(const WorldMaterial& m)
+    {
+        return m.path.rfind("lightmap page", 0) == 0;
+    }
+    // Every opaque (alpha 255) page colour but the unused white page area.
+    std::set<std::array<std::uint8_t, 3>> page_colors(const WorldMesh& mesh)
+    {
+        std::set<std::array<std::uint8_t, 3>> out;
+        for (const auto& m : mesh.materials)
+            if (is_page(m))
+                for (std::size_t p = 0; p + 3 < m.image.rgba.size(); p += 4)
+                    if (m.image.rgba[p + 3] == 255)
+                        out.insert({m.image.rgba[p], m.image.rgba[p + 1], m.image.rgba[p + 2]});
+        out.erase({255, 255, 255});
+        return out;
+    }
+    GiFile section_file(const GiLightmaps& maps, const GiVertexLight& vertex, bool with_vertex = true)
+    {
+        GiFile file;
+        std::string error;
+        GiSection lmap{gi_format::lightmaps, {}}, vtx{gi_format::vertices, {}};
+        write_gi_lightmaps(maps, lmap.payload, error);
+        write_gi_vertex_light(vertex, vtx.payload, error);
+        file.sections.push_back(std::move(lmap));
+        if (with_vertex)
+            file.sections.push_back(std::move(vtx));
+        return file;
+    }
+
+    // A box of lightmapped, vertex-lit and DETAIL LOW faces with an ambient fill. E = 0 at Final is
+    // byte-identical to no GI; otherwise pages and corners follow gi_compose, view by view, and only
+    // listed polygons change.
+    bool runtime_override(const fs::path& root)
+    {
+        Resources resources;
+        CHECK(mount(root, resources));
+        WorldBuilder b;
+        b.world.info = "AmbientLight 40 20 10";
+        const std::uint16_t texel = 20 << 11 | 30 << 5 | 12, other = 6 << 11 | 12 << 5 | 6;
+        std::map<std::uint32_t, std::uint16_t> face_texel;
+        b.box({5, 5, 5}, {95, 95, 95},
+              [&](int s, Face& face)
+              {
+                  face.texel = s == 5 ? other : texel;
+                  face.kind = s == 2 ? Kind::Vertex : s == 3 ? Kind::LowLightmap : Kind::Lightmap;
+                  face.color = s == 2 ? std::array<std::uint8_t, 3>{90, 80, 70}
+                                      : std::array<std::uint8_t, 3>{60, 50, 30};
+                  face.texture = s == 4 ? "red.dtx" : "grey.dtx";
+                  face_texel[std::uint32_t(s)] = face.texel;
+              });
+        Prepared p;
+        CHECK(prepare(b.world, resources, p));
+        const auto& r = p.receivers;
+        CHECK(r.blocks.size() == 5 && r.sets.size() == 2); // Faces 0, 1, 3, 4, 5; faces 2 and 3 (low).
+        std::string error;
+        WorldMesh off, off_low;
+        std::vector<WorldTriangleSource> sources, sources_low;
+        CHECK(off.build(b.world, error, &resources, true, &sources));
+        CHECK(off_low.build(b.world, error, &resources, false, &sources_low));
+        const DVector ambient{40, 20, 10};
+        const float a[3]{40, 20, 10};
+
+        // E = 0: the exact identity, whatever k.
+        GiIndirect zero;
+        zero.energy.assign(r.elements() * 3, 0.f);
+        zero.valid.assign(r.elements(), 1);
+        GiLightmaps maps;
+        GiVertexLight vertex;
+        gi_lightmap_sections(r, zero, maps, vertex);
+        GiWorldLight light;
+        CHECK(gi_world_light(b.world, section_file(maps, vertex), light, error));
+        CHECK(light.ambient.x == ambient.x && light.ambient.y == ambient.y && light.ambient.z == ambient.z);
+        CHECK(light.block_first.size() == 5 && light.set_first.size() == 2 && light.set_first[1] == 4);
+        for (const float k : {0.f, 1.f, 2.f, 4.f})
+        {
+            light.composition = {k, 1, GiView::Final};
+            WorldMesh on, on_low;
+            CHECK(on.build(b.world, error, &resources, true, nullptr, &light));
+            CHECK(on_low.build(b.world, error, &resources, false, nullptr, &light));
+            CHECK(same_mesh(on, off) && same_mesh(on_low, off_low));
+            CHECK(on.gi_blocks == 5 && on.gi_texels == maps.texels.size());
+            CHECK(on.gi_sets == 1 && on.gi_corners == 4 && on_low.gi_blocks == 0 && on_low.gi_sets == 2 &&
+                  on_low.gi_corners == 8 && on.gi_white_materials == 0);
+        }
+        // Block 2 is face 3, the DETAIL LOW face: lightmapped at high detail.
+        CHECK(r.blocks[2].id.polygon == 3 && r.sets[1].low && r.sets[1].id.polygon == 3);
+
+        // A uniform E per block and a varying one per corner, with some invalid elements.
+        GiIndirect energy;
+        energy.energy.resize(r.elements() * 3);
+        energy.valid.resize(r.elements());
+        for (std::size_t bi = 0; bi < r.blocks.size(); ++bi)
+            for (std::uint32_t t = 0; t < std::uint32_t(r.blocks[bi].id.width) * r.blocks[bi].id.height; ++t)
+            {
+                const auto e = r.blocks[bi].first + t;
+                for (int c = 0; c < 3; ++c)
+                    energy.energy[e * 3 + c] = .02f * float(bi + 1) * float(c + 1);
+                energy.valid[e] = bi != 1;
+            }
+        for (std::size_t e = r.texels; e < r.elements(); ++e)
+        {
+            for (int c = 0; c < 3; ++c)
+                energy.energy[e * 3 + c] = .03f * float(e - r.texels + 1) + .01f * float(c);
+            energy.valid[e] = e % 2;
+        }
+        gi_lightmap_sections(r, energy, maps, vertex);
+        CHECK(gi_world_light(b.world, section_file(maps, vertex), light, error));
+        auto block_energy = [&](std::size_t bi) { return gi_rgb9e5_decode(maps.texels[r.blocks[bi].first]); };
+        auto corner_energy = [&](std::size_t set, std::uint16_t corner)
+        { return gi_rgb9e5_decode(vertex.corners[r.sets[set].first - r.texels + corner]); };
+        // The expected page colours (a set per block) and vertex colours, per view.
+        auto expect_pages = [&](const std::function<std::uint8_t(std::uint8_t o, float a, float e, int c)>& f)
+        {
+            std::set<std::array<std::uint8_t, 3>> out;
+            for (std::size_t bi = 0; bi < r.blocks.size(); ++bi)
+            {
+                const auto o = expand(face_texel[r.blocks[bi].id.polygon]);
+                const auto e = block_energy(bi);
+                const float ev[3]{e.x, e.y, e.z};
+                std::array<std::uint8_t, 3> rgb{};
+                for (int c = 0; c < 3; ++c)
+                    rgb[c] = f(o[c], a[c], ev[c], c);
+                out.insert(rgb);
+            }
+            return out;
+        };
+        // Vertex colours of `mesh` against `f` over the set's corners; unlisted triangles unchanged.
+        auto check_corners = [&](const WorldMesh& mesh, const WorldMesh& reference,
+                                 const std::vector<WorldTriangleSource>& src,
+                                 const std::function<float(std::uint8_t o, float a, float e, int c, bool valid)>& f)
+        {
+            for (std::size_t t = 0; t < src.size(); ++t)
+                for (int v = 0; v < 3; ++v)
+                {
+                    const auto& got = mesh.vertices[t * 3 + v].color;
+                    const auto& was = reference.vertices[t * 3 + v].color;
+                    if (src[t].light != WorldFaceLight::Vertex)
+                    {
+                        if (std::memcmp(&got, &was, sizeof got))
+                            return false;
+                        continue;
+                    }
+                    const auto polygon = src[t].polygon;
+                    const std::size_t set = polygon == 2 ? 0 : 1;
+                    const auto corner = src[t].corners[v];
+                    const auto e = corner_energy(set, corner);
+                    const float ev[3]{e.x, e.y, e.z}, gv[3]{got.x, got.y, got.z};
+                    const auto& o = b.world.models[0].polygons[polygon].colors[corner];
+                    const bool valid = vertex.valid[r.sets[set].first - r.texels + corner];
+                    for (int c = 0; c < 3; ++c)
+                        if (gv[c] != f(o[c], a[c], ev[c], c, valid))
+                            return false;
+                }
+            return true;
+        };
+        auto build = [&](GiView view, float k, float f, WorldMesh& high, WorldMesh& low)
+        {
+            light.composition = {k, f, view};
+            return high.build(b.world, error, &resources, true, nullptr, &light) &&
+                   low.build(b.world, error, &resources, false, nullptr, &light);
+        };
+        WorldMesh final_high, final_low;
+        CHECK(build(GiView::Final, 2, 1, final_high, final_low));
+        CHECK(page_colors(final_high) ==
+              expect_pages([](std::uint8_t o, float a, float e, int) { return gi_compose(o, a, e, 2, 1, true); }));
+        CHECK(page_colors(final_high) != page_colors(off));
+        CHECK(check_corners(final_high, off, sources, [](std::uint8_t o, float a, float e, int, bool)
+                            { return gi_compose(o, a, e, 2, 1, false) / 255.f; }));
+        CHECK(check_corners(final_low, off_low, sources_low, [](std::uint8_t o, float a, float e, int, bool)
+                            { return gi_compose(o, a, e, 2, 1, false) / 255.f; }));
+        CHECK(same_materials(final_low, off_low)); // DETAIL LOW draws no page.
+        {
+            WorldMesh high, low;
+            CHECK(build(GiView::Final, .5f, .25f, high, low));
+            CHECK(page_colors(high) == expect_pages([](std::uint8_t o, float a, float e, int)
+                                                    { return gi_compose(o, a, e, .5f, .25f, true); }));
+            CHECK(check_corners(low, off_low, sources_low, [](std::uint8_t o, float a, float e, int, bool)
+                                { return gi_compose(o, a, e, .5f, .25f, false) / 255.f; }));
+        }
+        {
+            WorldMesh high, low;
+            CHECK(build(GiView::Original, 2, 1, high, low));
+            CHECK(same_mesh(high, off) && same_mesh(low, off_low));
+        }
+        {
+            WorldMesh high, low;
+            CHECK(build(GiView::Direct, 2, 1, high, low));
+            CHECK(page_colors(high) ==
+                  expect_pages([](std::uint8_t o, float a, float, int) { return gi_compose(o, a, 0, 0, 0, true); }));
+            CHECK(check_corners(low, off_low, sources_low, [](std::uint8_t o, float a, float, int, bool)
+                                { return gi_compose(o, a, 0, 0, 0, false) / 255.f; }));
+        }
+        {
+            WorldMesh high, low;
+            CHECK(build(GiView::Indirect, 3, 1, high, low));
+            CHECK(page_colors(high) ==
+                  expect_pages([](std::uint8_t, float, float e, int) { return gi_compose(0, 0, e, 3, 0, true); }));
+            CHECK(check_corners(low, off_low, sources_low, [](std::uint8_t, float, float e, int, bool)
+                                { return gi_compose(0, 0, e, 3, 0, false) / 255.f; }));
+        }
+        {
+            WorldMesh high, low;
+            CHECK(build(GiView::Validity, 2, 1, high, low));
+            const std::set<std::array<std::uint8_t, 3>> both{{0, 128, 0}, {128, 0, 0}};
+            CHECK(page_colors(high) == both); // Block 1 is invalid, the others valid.
+            CHECK(check_corners(low, off_low, sources_low, [](std::uint8_t, float, float, int c, bool valid)
+                                { return (valid ? c == 1 : c == 0) ? 1.f : 0.f; }));
+        }
+        {
+            WorldMesh high, low;
+            CHECK(build(GiView::Lighting, 2, 1, high, low));
+            CHECK(same_vertices(high, final_high) && same_vertices(low, final_low));
+            std::size_t white = 0;
+            for (std::size_t i = 1; i < high.materials.size(); ++i)
+            {
+                const auto &m = high.materials[i], &was = final_high.materials[i];
+                if (is_page(m))
+                {
+                    CHECK(m.image.rgba == was.image.rgba);
+                    continue;
+                }
+                if (m.image.rgba.empty())
+                    continue;
+                ++white;
+                for (std::size_t q = 0; q + 3 < m.image.rgba.size(); q += 4)
+                    CHECK(m.image.rgba[q] == 255 && m.image.rgba[q + 1] == 255 && m.image.rgba[q + 2] == 255 &&
+                          m.image.rgba[q + 3] == was.image.rgba[q + 3]);
+            }
+            CHECK(white == 2 && high.gi_white_materials == 2 && low.gi_white_materials == 2); // grey, red.
+        }
+        // A polygon the file does not list keeps its stored light.
+        {
+            auto partial = maps;
+            const auto first = r.blocks[4].first, size = std::uint32_t(r.blocks[4].id.width) * r.blocks[4].id.height;
+            partial.blocks.erase(partial.blocks.begin() + 4);
+            partial.texels.erase(partial.texels.begin() + first, partial.texels.begin() + first + size);
+            partial.valid.erase(partial.valid.begin() + first, partial.valid.begin() + first + size);
+            GiWorldLight some;
+            CHECK(gi_world_light(b.world, section_file(partial, vertex), some, error));
+            some.composition = {};
+            WorldMesh high;
+            CHECK(high.build(b.world, error, &resources, true, nullptr, &some));
+            CHECK(high.gi_blocks == 4 && page_colors(high).count(expand(other)));
+        }
+        // Refusals leave the output untouched.
+        {
+            GiWorldLight refused;
+            CHECK(!gi_world_light(b.world, section_file(maps, vertex, false), refused, error));
+            CHECK(error.find("LMAP/VTX") != std::string::npos && refused.lightmaps.blocks.empty());
+            auto wrong = maps;
+            wrong.blocks[4].polygon = 999; // Still sorted; no such polygon.
+            CHECK(!gi_world_light(b.world, section_file(wrong, vertex), refused, error));
+            CHECK(error.find("does not match") != std::string::npos && refused.lightmaps.blocks.empty());
+            auto wrong_ring = vertex;
+            wrong_ring.sets[0].polygon = 0; // A lightmapped polygon without baked colours.
+            CHECK(!gi_world_light(b.world, section_file(maps, wrong_ring), refused, error));
+            CHECK(refused.vertex.sets.empty());
+        }
+        CHECK(valid_gi_composition({}) && valid_gi_composition({0, 0}) && valid_gi_composition({4, 4}));
+        CHECK(!valid_gi_composition({4.5f, 1}) && !valid_gi_composition({2, -1}) &&
+              !valid_gi_composition({std::numeric_limits<float>::quiet_NaN(), 1}));
+        CHECK(light.block(0, 999) == -1 && light.set(1, 2) == -1 && light.block(0, 0) == 0 && light.set(0, 2) == 0);
+        // Composition of an element outside the decoded data keeps the stored value.
+        light.composition = {};
+        const std::array<std::uint8_t, 3> stored{1, 2, 3};
+        CHECK(light.compose(true, std::uint32_t(maps.texels.size()), stored) == stored);
+        return true;
+    }
+
+    // Private: 01_SubwayA through the runtime lookup: no file, then a stale one, then a Ready zero bake
+    // (byte-identical mesh at both detail levels), then a nonzero one (changed pages).
+    bool runtime_retail(const fs::path& data, const fs::path& scratch)
+    {
+        CHECK(Testing::reset_scratch_dir(scratch));
+        Config config;
+        config.data_dir = data;
+        Resources resources;
+        std::string error;
+        CHECK(resources.mount_game(config, error));
+        const std::string path = "worlds/01_subwaya.dat";
+        std::vector<std::uint8_t> world_bytes;
+        World world;
+        CHECK(resources.read(path, world_bytes, error) && read_world(world_bytes, world, error));
+        const std::vector<GiRoot> roots{{"--gi-dir", path_text(scratch)}};
+        std::optional<GiWorldLight> light;
+        GiRuntimeStatus status;
+        load_gi_world_light(resources, world, "", roots, light, status);
+        CHECK(status.state == GiRuntimeState::NoWorld && !light && status.loads == 1);
+        load_gi_world_light(resources, world, path, roots, light, status);
+        CHECK(status.state == GiRuntimeState::Missing && !light && status.loads == 2);
+        CHECK(status.detail == "No baked file in any search root" && status.expectation_ms > 0);
+        CHECK(gi_status_line(status).find("not applied") != std::string::npos);
+
+        GiExpectation expected;
+        CHECK(gi_expectation(resources, path, expected, error));
+        Prepared p;
+        CHECK(prepare(world, resources, p, 0));
+        GiIndirect indirect;
+        indirect.energy.assign(p.receivers.elements() * 3, 0.f);
+        indirect.valid.assign(p.receivers.elements(), 1);
+        GiLightmaps maps;
+        GiVertexLight vertex;
+        gi_lightmap_sections(p.receivers, indirect, maps, vertex);
+        auto file = section_file(maps, vertex);
+        file.key.world = expected.world;
+        file.key.albedo = expected.albedo;
+        file.key.world_path = path;
+        file.settings = "quality=test";
+        file.key.settings = sha256(std::span(reinterpret_cast<const std::uint8_t*>(file.settings.data()),
+                                             file.settings.size()));
+        std::string name;
+        CHECK(gi_file_name(path, expected.world, name));
+        fs::create_directories(scratch / "worlds");
+        const auto target = scratch / path_from_utf8(name);
+        file.key.albedo[0] ^= 1;
+        CHECK(save_gi_file(target, file, error));
+        load_gi_world_light(resources, world, path, roots, light, status);
+        CHECK(status.state == GiRuntimeState::Missing && !light &&
+              status.detail.find("stale (albedo)") != std::string::npos);
+        file.key.albedo[0] ^= 1;
+        CHECK(save_gi_file(target, file, error));
+        load_gi_world_light(resources, world, path, roots, light, status);
+        CHECK(status.state == GiRuntimeState::Applied && light && status.settings == "quality=test");
+        CHECK(status.lookup.chosen == 0 && !status.lookup.file && status.file.find(name) != std::string::npos);
+        CHECK(status.blocks == maps.blocks.size() && status.texels == maps.texels.size() &&
+              status.sets == vertex.sets.size() && status.corners == vertex.corners.size());
+        CHECK(gi_status_line(status).rfind("GI applied: " + path, 0) == 0);
+        for (const bool lightmaps : {true, false})
+        {
+            WorldMesh off, on;
+            CHECK(off.build(world, error, &resources, lightmaps));
+            CHECK(on.build(world, error, &resources, lightmaps, nullptr, &*light));
+            CHECK(same_mesh(on, off));
+            CHECK(lightmaps ? on.gi_blocks == maps.blocks.size() && on.gi_texels == maps.texels.size()
+                            : on.gi_blocks == 0 && on.gi_sets == vertex.sets.size());
+            std::cout << "GI_RUNTIME detail=" << (lightmaps ? "high" : "low") << " blocks=" << on.gi_blocks
+                      << " texels=" << on.gi_texels << " sets=" << on.gi_sets << " corners=" << on.gi_corners << '\n';
+        }
+        std::fill(indirect.energy.begin(), indirect.energy.end(), .05f);
+        gi_lightmap_sections(p.receivers, indirect, maps, vertex);
+        auto lit = section_file(maps, vertex);
+        lit.key = file.key;
+        lit.settings = file.settings;
+        CHECK(save_gi_file(target, lit, error));
+        load_gi_world_light(resources, world, path, roots, light, status);
+        CHECK(status.state == GiRuntimeState::Applied && light && status.loads == 5);
+        WorldMesh off, on;
+        CHECK(off.build(world, error, &resources) && on.build(world, error, &resources, true, nullptr, &*light));
+        CHECK(same_vertices(on, off) == vertex.sets.empty() && !same_materials(on, off));
+        std::cout << "GI_RUNTIME keys_ms=" << status.expectation_ms << " lookup_ms=" << status.lookup_ms
+                  << " sections_ms=" << status.decode_ms << '\n';
+        return Testing::remove_scratch_dir(scratch);
+    }
 } // namespace
 
 int main(int argc, char** argv)
@@ -1373,13 +1765,15 @@ int main(int argc, char** argv)
         ok = directions();
     else if (name == "retail" && argc == 5)
         return retail(path_from_utf8(argv[2]), path_from_utf8(argv[3]), path_from_utf8(argv[4])) ? 0 : 1;
+    else if (name == "runtime-retail" && argc == 4)
+        return runtime_retail(path_from_utf8(argv[2]), path_from_utf8(argv[3])) ? 0 : 1;
     else if (argc == 3)
     {
         const auto root = path_from_utf8(argv[2]);
         static const std::map<std::string_view, bool (*)(const fs::path&)> cases{
             {"placement", placement}, {"furnace", furnace},         {"box", box},   {"planes", planes},
             {"leak", leak},           {"dilation", dilation},       {"back", back}, {"determinism", determinism},
-            {"sky", sky},             {"preview", preview}};
+            {"sky", sky},             {"preview", preview},         {"runtime", runtime_override}};
         const auto found = cases.find(name);
         if (found == cases.end())
             return 2;

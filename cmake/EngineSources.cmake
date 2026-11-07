@@ -81,6 +81,7 @@ add_library(engine_core STATIC
     src/engine/gi_preview.cpp
     src/engine/gi_jobs.cpp
     src/engine/gi_bake.cpp
+    src/engine/gi_runtime.cpp
     src/engine/container.cpp
     src/engine/world_model.cpp
     src/engine/logging.cpp

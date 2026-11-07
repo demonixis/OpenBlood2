@@ -1,5 +1,6 @@
 #include "engine/world_view.h"
 #include "engine/collision.h"
+#include "engine/gi_runtime.h"
 #include "engine/gi_world.h"
 #include "engine/sprite.h"
 #include <algorithm>
@@ -172,7 +173,7 @@ namespace OpenBlood2
         range.bounded = physics_vector(range.min) && physics_vector(range.max);
     }
     bool WorldMesh::build(const World& world, std::string& error, const Resources* resources, bool use_lightmaps,
-                          std::vector<WorldTriangleSource>* sources)
+                          std::vector<WorldTriangleSource>* sources, const GiWorldLight* gi)
     {
         *this = {};
         error.clear();
@@ -197,7 +198,9 @@ namespace OpenBlood2
         // bilinear filtering never reads a neighbor.
         constexpr std::uint32_t page_size = lightmap_page_size;
         std::uint32_t page = 0, page_x = 0, page_y = 0, shelf = 0;
-        auto place_lightmap = [&](const WorldModel& model, const Polygon& polygon, std::uint32_t& x0, std::uint32_t& y0)
+        // gi_block: the polygon's LMAP record, or -1 (the stored texels, unchanged).
+        auto place_lightmap = [&](const WorldModel& model, const Polygon& polygon, std::int64_t gi_block,
+                                  std::uint32_t& x0, std::uint32_t& y0)
         {
             const std::uint32_t w = polygon.lightmap_width, h = polygon.lightmap_height;
             if (page && page_x + w + 2 > page_size)
@@ -236,8 +239,20 @@ namespace OpenBlood2
                     out[1] = static_cast<std::uint8_t>(g << 2 | g >> 4);
                     out[2] = static_cast<std::uint8_t>(b << 3 | b >> 2);
                     out[3] = 255;
+                    if (gi_block >= 0)
+                    {
+                        const auto composed =
+                            gi->compose(true, gi->block_first[std::size_t(gi_block)] + std::uint32_t(sy) * w + sx,
+                                        {out[0], out[1], out[2]});
+                        out[0] = composed[0], out[1] = composed[1], out[2] = composed[2];
+                    }
                 }
             lightmap_texels += std::size_t(w) * h;
+            if (gi_block >= 0)
+            {
+                ++gi_blocks;
+                gi_texels += std::size_t(w) * h;
+            }
             return true;
         };
         auto add_image = [&](const std::string& key, std::uint32_t& id)
@@ -284,8 +299,10 @@ namespace OpenBlood2
             material_ids.emplace(key, id);
             return true;
         };
+        std::vector<std::uint32_t> pages; // Lightmap page materials (never drawn white).
         for (const auto& model : world.models)
         {
+            const auto model_index = static_cast<std::uint32_t>(ranges.size());
             if (model.polygons.size() > 65536 || model.points.size() > 65536 || !physics_vector(model.translation))
                 return fail("Diagnostic model exceeds geometry limits");
             if (model.surfaces.size() > 2000000)
@@ -449,12 +466,24 @@ namespace OpenBlood2
                     if (!lightmap_frame(model, polygon, count, lightmap_layout))
                         return fail("Invalid world lightmap reference");
                     lightmap_unfitted += lightmap_layout.unfitted;
-                    if (!place_lightmap(model, polygon, atlas_x, atlas_y))
+                    const auto gi_block = gi ? gi->block(model_index, std::uint32_t(polygon_index)) : -1;
+                    if (!place_lightmap(model, polygon, gi_block, atlas_x, atlas_y))
                         return fail("World lightmap page budget exceeded");
                     lightmap = page;
+                    if (pages.empty() || pages.back() != page)
+                        pages.push_back(page);
                     ++lightmapped;
                 }
                 const bool baked = material && !bright && !lightmap && polygon.colors.size() == polygon.points.size();
+                // The polygon's VTX record (vertex-lit, or lightmapped at DETAIL LOW), or -1.
+                std::int64_t gi_set = baked && gi ? gi->set(model_index, std::uint32_t(polygon_index)) : -1;
+                if (gi_set >= 0 && gi->vertex.sets[std::size_t(gi_set)].corners != count)
+                    gi_set = -1; // check_gi_vertex_light guarantees the ring; never index past it.
+                if (gi_set >= 0)
+                {
+                    ++gi_sets;
+                    gi_corners += count;
+                }
                 if (material && !lightmap)
                     ++(baked ? lit : fullbright);
                 if (material && !lightmap && !baked)
@@ -526,7 +555,10 @@ namespace OpenBlood2
                         vertex.normal = vector_scale(normal, 1 / length);
                         if (baked)
                         {
-                            const auto& rgb = polygon.colors[corner];
+                            auto rgb = polygon.colors[corner];
+                            if (gi_set >= 0)
+                                rgb = gi->compose(false, gi->set_first[std::size_t(gi_set)] + std::uint32_t(corner),
+                                                  rgb);
                             vertex.color = {rgb[0] / 255.f, rgb[1] / 255.f, rgb[2] / 255.f};
                         }
                         if (lightmap)
@@ -567,6 +599,18 @@ namespace OpenBlood2
             ranges.push_back(std::move(range));
         }
         fullbright_faces.resize(materials.size());
+        // GI Lighting only: decoded textures drawn white, texture alpha (cutouts, chroma keys) kept.
+        if (gi && gi->composition.view == GiView::Lighting)
+            for (std::uint32_t i = 1; i < materials.size(); ++i)
+            {
+                auto& entry = materials[i];
+                if (std::binary_search(pages.begin(), pages.end(), i) || entry.image.rgba.empty())
+                    continue;
+                for (auto* pixels : {&entry.image.rgba, &entry.image.mip_rgba})
+                    for (std::size_t p = 0; p + 3 < pixels->size(); p += 4)
+                        (*pixels)[p] = (*pixels)[p + 1] = (*pixels)[p + 2] = 255;
+                ++gi_white_materials;
+            }
         return true;
     }
     bool world_alpha_order(const WorldMesh& mesh, std::span<const WorldDraw> draws, DVector eye, DRotation view,

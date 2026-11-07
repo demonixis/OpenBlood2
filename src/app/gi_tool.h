@@ -1,5 +1,6 @@
 #pragma once
 #include "engine/config.h"
+#include <cstdint>
 
 namespace OpenBlood2
 {
@@ -25,4 +26,9 @@ namespace OpenBlood2
     // --gi-preview-dir (default user_directory()/gi/preview), composed with --gi-k and --gi-f (1).
     // Exit 0, 2 (arguments, data), 4 (missing, invalid or stale file, image write), 5 (world load).
     int run_gi_preview(const Options&, const Config&);
+
+    class ScenePresenter;
+    // Logs the presenter's baked GI status (lot G8) once per lookup (`logged` holds the last logged
+    // lookup), and the world mesh build time of each rebuild that composed GI.
+    void log_gi_status(const ScenePresenter&, std::uint64_t& logged);
 } // namespace OpenBlood2

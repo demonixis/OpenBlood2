@@ -236,6 +236,8 @@ namespace OpenBlood2
                 options.gpu_smoke = true;
             else if (arg == "--bench")
                 options.bench = true;
+            else if (arg == "--gi")
+                options.gi = true;
             else if (arg == "--no-model-shadows")
                 options.model_shadows = false;
             else if (arg == "--pixel-lighting")
@@ -323,7 +325,7 @@ namespace OpenBlood2
                      arg == "--gi-place" || arg == "--gi-placement-dir" || arg == "--bake-gi" ||
                      arg == "--gi-quality" || arg == "--gi-bounces" || arg == "--gi-rays" || arg == "--gi-jobs" ||
                      arg == "--gi-out" || arg == "--gi-sky" || arg == "--gi-preview" || arg == "--gi-preview-dir" ||
-                     arg == "--gi-k" || arg == "--gi-f" ||
+                     arg == "--gi-k" || arg == "--gi-f" || arg == "--gi-view" ||
                      arg == "--frames" || arg == "--capture" || arg == "--world" || arg == "--log-dir" ||
                      arg == "--log-level" || arg == "--rez" ||
                      arg == "--connect" || arg == "--host" || arg == "--port" || arg == "--name" || arg == "--end" ||
@@ -440,6 +442,20 @@ namespace OpenBlood2
                     options.gi_preview = args[i];
                 else if (arg == "--gi-preview-dir")
                     options.gi_preview_dir = path_from_utf8(args[i]);
+                else if (arg == "--gi-view")
+                {
+                    // GiView order (engine/gi_runtime.h).
+                    constexpr std::array<std::string_view, 6> views{"final",    "original", "direct",
+                                                                    "indirect", "lighting", "validity"};
+                    const auto it = std::find(views.begin(), views.end(), args[i]);
+                    if (it == views.end())
+                    {
+                        error = "--gi-view requires final, original, direct, indirect, lighting or validity";
+                        return false;
+                    }
+                    options.gi_view = int(it - views.begin());
+                    options.gi_view_given = true;
+                }
                 else if (arg == "--gi-k" || arg == "--gi-f")
                 {
                     const auto value = args[i];
@@ -540,9 +556,20 @@ namespace OpenBlood2
             error = "--gi-jobs and --gi-out require --bake-gi or --gi-preview";
             return false;
         }
-        if ((!options.gi_preview_dir.empty() || options.gi_composition) && !gi_preview)
+        if (!options.gi_preview_dir.empty() && !gi_preview)
         {
-            error = "--gi-preview-dir, --gi-k and --gi-f require --gi-preview";
+            error = "--gi-preview-dir requires --gi-preview";
+            return false;
+        }
+        if ((options.gi_composition && !gi_preview && !options.gi) || (options.gi_view_given && !options.gi))
+        {
+            error = "--gi-k and --gi-f require --gi-preview or --gi; --gi-view requires --gi";
+            return false;
+        }
+        if (options.gi && (gi_tool || network || (!options.bench && !options.gpu_smoke && !options.world_smoke)))
+        {
+            error = "--gi applies baked GI to --bench and smoke runs; the game uses Options > Display GLOBAL "
+                    "ILLUMINATION and the F8 Runtime panel";
             return false;
         }
         if ((options.gi_bounces || options.gi_rays || options.gi_sky >= 0) && options.gi_quality != "custom")

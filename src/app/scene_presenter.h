@@ -3,6 +3,7 @@
 #include "app/model_scene.h"
 #include "app/polygrid_scene.h"
 #include "app/sprite_scene.h"
+#include "engine/gi_runtime.h"
 #include "engine/light_grid.h"
 #include "engine/line_renderer.h"
 #include "engine/model_renderer.h"
@@ -123,6 +124,19 @@ namespace OpenBlood2
         bool model_shadows = true;
         // Original "LightMap" setting (off at low detail): a change rebuilds the world mesh.
         bool lightmaps = true;
+        // Baked GI (gi_contracts.md lot G8), Options > Display GLOBAL ILLUMINATION. While it is set, the
+        // current world's Ready file is looked up once under gi_roots and composed into the world mesh;
+        // nothing is read while it is off. Off, missing, stale or failed: the original mesh, byte for
+        // byte. Applying, dropping or recomposing GI (gi_composition) rebuilds the world mesh.
+        bool global_illumination = false;
+        GiComposition gi_composition; // F8 Runtime panel; an invalid value falls back to the defaults.
+        std::vector<GiRoot> gi_roots; // gi_search_roots(); empty searches nothing.
+        std::uint64_t gi_reload = 0;  // A change looks the file up again (F8 Refresh).
+        const GiRuntimeStatus& gi_status() const
+        {
+            return gi_status_;
+        }
+        double mesh_build_ms = 0; // CPU time of the last world mesh build (GI composition included).
         bool per_pixel_lighting = false; // Model light per pixel instead of per vertex.
         // Options > Display FIELD OF VIEW (horizontal radians at 4:3, Hor+ beyond); XR ignores it.
         float field_of_view = 1.5707963267948966f;
@@ -173,6 +187,18 @@ namespace OpenBlood2
         bool record_shadow_tiles(SDL_GPUCommandBuffer*, std::string& error);
         TextureHandle shadow_atlas_, shadow_depth_;
         bool built_lightmaps_ = true;
+        std::optional<GiWorldLight> gi_light_;
+        GiRuntimeStatus gi_status_;
+        bool gi_looked_up_ = false;
+        std::uint64_t gi_reload_seen_ = 0;
+        struct GiBuild
+        {
+            bool applied = false;
+            std::uint64_t load = 0;
+            GiComposition composition;
+            bool operator==(const GiBuild&) const = default;
+        };
+        GiBuild built_gi_;
         bool prepare_surface(const ClientScene&, std::string& error);
         SurfaceScene surface_scene_;
         bool manifest_loaded_ = false;

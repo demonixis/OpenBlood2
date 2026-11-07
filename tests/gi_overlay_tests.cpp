@@ -99,6 +99,23 @@ namespace
         }
         CHECK(!tools.placement().edit && gizmos.empty());
         CHECK(!tools.place_light_probes() && !tools.add_reflection({}) && !tools.save_placement());
+        // The Runtime panel (lot G8) with the presenter's controls, then without them.
+        bool enabled = false;
+        GiComposition composition;
+        std::uint64_t reload = 0;
+        GiRuntimeStatus status;
+        const GiRuntimeLink link{&enabled, &composition, &reload, &status, nullptr, 0};
+        tools.select = GiTools::Panel::Runtime;
+        frame.run([&] { closed = tools.draw(input, game, config, gizmos, link); });
+        CHECK(!closed && ImGui::GetDrawData()->TotalVtxCount > 0);
+        CHECK(tools.runtime_summary().find("off (Options > Display") != std::string::npos);
+        enabled = true;
+        status.state = GiRuntimeState::NoWorld;
+        frame.run([&] { closed = tools.draw(input, game, config, gizmos, link); });
+        CHECK(tools.runtime_summary() == "GI rendering: no world; the original lightmaps are in use.");
+        CHECK(composition == GiComposition{} && reload == 0);
+        frame.run([&] { closed = tools.draw(input, game, config, gizmos); });
+        CHECK(tools.runtime_summary() == "GI rendering: unavailable here.");
         return true;
     }
 
@@ -231,7 +248,30 @@ namespace
         file.key.albedo[0] ^= 1;
         CHECK(save_gi_file(path, file, error));
         tools.refresh(game, config);
-        CHECK(tools.status().lookup.chosen == 0 && tools.summary() == "ready file, not applied (GI rendering: lot G8)");
+        CHECK(tools.status().lookup.chosen == 0 && tools.summary() == "ready file");
+        {
+            // The summary follows the presenter's runtime state (lot G8).
+            bool enabled = false;
+            GiComposition composition;
+            std::uint64_t reload = 0;
+            GiRuntimeStatus runtime;
+            const GiRuntimeLink link{&enabled, &composition, &reload, &runtime, nullptr, 0};
+            MenuInput closed_input;
+            std::vector<LineVertex> lines;
+            Frame frame;
+            frame.run([&] { tools.draw(closed_input, game, config, lines, link); });
+            CHECK(tools.summary() == "ready file, GI off (Options > Display)");
+            enabled = true;
+            runtime.state = GiRuntimeState::Failed;
+            runtime.detail = "test";
+            CHECK(tools.summary() == "ready file, not applied (failed)");
+            CHECK(tools.runtime_summary() == "GI rendering: failed (test); the original lightmaps are in use.");
+            runtime.state = GiRuntimeState::Applied;
+            runtime.file = "x.ob2gi";
+            CHECK(tools.summary() == "ready file, applied" &&
+                  tools.runtime_summary() == "GI rendering: applied from x.ob2gi.");
+            frame.run([&] { tools.draw(closed_input, game, config, lines); }); // Drops the link to these locals.
+        }
         MenuInput input;
         input.gi = GiOverlay::Open;
         std::vector<LineVertex> gizmos;

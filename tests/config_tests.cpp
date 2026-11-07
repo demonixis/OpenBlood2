@@ -436,10 +436,44 @@ namespace
                  {"--gi-preview", "a", "--gi-sky", "1"},
                  {"--gi-preview", "a", "--bake-gi", "a"},
                  {"--gi-preview", "a", "--list-worlds"},
-                 {"--gi-preview", "a", "--world", "02_CityHub"}})
+                 {"--gi-preview", "a", "--world", "02_CityHub"},
+                 {"--gi-view", "final"},
+                 {"--gi-preview", "a", "--gi-view", "final"},
+                 {"--gi", "--gi-view", "bright"},
+                 {"--gi", "--gi-view"},
+                 {"--gi", "--bake-gi", "a"},
+                 {"--gi", "--gi-preview", "a"},
+                 {"--gi", "--list-worlds"},
+                 {"--gi", "--connect", "127.0.0.1"},
+                 {"--gi", "--gi-preview-dir", "shots"},
+                 {"--gi"},
+                 {"--gi", "--view-world"}})
         {
             options = {};
             CHECK(!parse_options(args, options, error));
+        }
+        // Lot G8: --gi applies the baked GI to --bench and the direct paths, with --gi-k/--gi-f/--gi-view.
+        options = {};
+        const std::array<std::string_view, 9> runtime{"--bench", "--gi",     "--gi-k",   "3",       "--gi-f",
+                                                      ".5",      "--gi-view", "indirect", "--frames"};
+        CHECK(!parse_options(runtime, options, error)); // --frames needs its value.
+        options = {};
+        CHECK(parse_options(std::span(runtime).first(8), options, error));
+        CHECK(options.gi && options.bench && options.gi_k == 3 && options.gi_f == .5f && options.gi_view == 3);
+        options = {};
+        const std::array<std::string_view, 2> plain{"--bench", "--gi"};
+        CHECK(parse_options(plain, options, error) && options.gi && options.gi_view == 0 && options.gi_k == 2);
+        options = {};
+        CHECK(parse_options(std::array<std::string_view, 2>{"--gpu-smoke", "--gi"}, options, error) && options.gi);
+        options = {};
+        CHECK(!parse_options(std::array<std::string_view, 2>{"--gi-k", "1"}, options, error));
+        CHECK(error == "--gi-k and --gi-f require --gi-preview or --gi; --gi-view requires --gi");
+        for (const auto [text, view] : std::initializer_list<std::pair<std::string_view, int>>{
+                 {"final", 0}, {"original", 1}, {"direct", 2}, {"indirect", 3}, {"lighting", 4}, {"validity", 5}})
+        {
+            options = {};
+            CHECK(parse_options(std::array<std::string_view, 4>{"--bench", "--gi", "--gi-view", text}, options, error));
+            CHECK(options.gi_view == view && options.gi_view_given);
         }
 
         options = {};

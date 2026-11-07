@@ -362,6 +362,9 @@ namespace OpenBlood2
                 label = item.literal = "RENDER SCALE [" + std::to_string(display.vr_render_scale) + "%]";
             if (item.setting == 30)
                 label = item.literal = "FIELD OF VIEW [" + std::to_string(display.field_of_view) + "]";
+            if (item.setting == 31)
+                label = item.literal =
+                    display.global_illumination ? "GLOBAL ILLUMINATION [ON]" : "GLOBAL ILLUMINATION [OFF]";
             const bool enabled = menu.enabled(item);
             const auto& font = menu.small()              ? small_
                                : !enabled                ? disabled_
