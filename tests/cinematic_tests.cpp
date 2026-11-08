@@ -291,8 +291,16 @@ namespace
         CHECK(g.resources.mount(voice_archive, error));
         Localization french, incomplete;
         CHECK(french.load_catalog(Language::French,
-                                  "[dialogue]\n4caleb1=Tu as le choix.\nsounds.events.cwvoice5=Accès autorisé.", error));
+                                  "[dialogue]\n4caleb1=Tu as le choix.\nsounds.events.cwvoice5=Accès autorisé.\n"
+                                  "[intro]\nline01=Nous sommes la Cabale.", error));
         CHECK(incomplete.load_catalog(Language::Korean, "[menu]\nlanguage=언어", error));
+        CHECK(intro_caption(6.89, &french).english.empty());
+        CHECK(intro_caption(6.90, &french).translated == "Nous sommes la Cabale.");
+        CHECK(intro_caption(8, &incomplete).english == "We are the Cabal." &&
+              intro_caption(8, &incomplete).translated.empty());
+        CHECK(intro_caption(9.70, &french).english.empty());
+        CHECK(intro_caption(63).english == "And Caleb will die for the last time.");
+        CHECK(intro_caption(67.20).english.empty());
         const auto read_caption = [&](const Localization& language)
         { return cinematic_caption(g.client_session.audio, g.resources, &language); };
 

@@ -21,6 +21,30 @@ namespace OpenBlood2
 #include "cinematic_transcripts.inc"
         };
 
+        struct IntroCue
+        {
+            double start, end;
+            std::string_view key, english;
+        };
+
+        // Align complete phrases to the original Intro.smk narration. Leave the music-only
+        // opening and tail clear. Spelling follows the original ConversationStrings table.
+        constexpr IntroCue intro_cues[]{
+            {6.90, 9.70, "intro.line01", "We are the Cabal."},
+            {9.90, 15.60, "intro.line02", "I, Gideon, am its sinister genius leader."},
+            {16.10, 19.50, "intro.line03", "We have always lurked among you."},
+            {19.50, 25.50, "intro.line04", "Like maggots in the bloated, stinking corpse of a diseased rat."},
+            {25.50, 31.70, "intro.line05", "Servants of the One That Binds, the dark god Tchernobog."},
+            {31.90, 38.50, "intro.line06", "Until a century ago, everything was going according to our evil plans."},
+            {38.70, 42.50, "intro.line07", "We never expected to be betrayed by one of our own."},
+            {42.50, 45.60, "intro.line08", "His name was Caleb."},
+            {45.60, 51.10, "intro.line09", "He destroyed our god and absorbed the power of Tchernobog."},
+            {51.20, 55.90, "intro.line10", "I, and I alone, will restore our dark god."},
+            {55.90, 57.90, "intro.line11", "I will destroy Caleb."},
+            {57.90, 62.60, "intro.line12", "I will mash his intestines beneath my feet like rotten grapes."},
+            {62.70, 67.20, "intro.line13", "And Caleb will die for the last time."},
+        };
+
         bool in_audible_range(const ClientSound& sound, const DVector& listener)
         {
             const auto& parameters = sound.parameters;
@@ -73,5 +97,14 @@ namespace OpenBlood2
             selected = priority;
         }
         return caption;
+    }
+
+    CinematicCaption intro_caption(double seconds, const Localization* localization)
+    {
+        const auto cue = std::ranges::find_if(intro_cues, [&](const IntroCue& line)
+        { return line.start <= seconds && seconds < line.end; });
+        if (cue == std::end(intro_cues))
+            return {};
+        return {cue->english, localization ? localization->text(cue->key) : std::string_view{}};
     }
 } // namespace OpenBlood2

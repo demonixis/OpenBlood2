@@ -16,6 +16,7 @@
 #include "app/scene_presenter.h"
 #include "app/session_playback.h"
 #include "app/setup_screen.h"
+#include "app/startup_movies.h"
 #include "app/ui_runtime.h"
 #include "engine/capture.h"
 #include "engine/user_directory.h"
@@ -33,6 +34,7 @@
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlgpu3.h>
 #include <spdlog/spdlog.h>
+#include <array>
 #include <cfloat>
 #include <utility>
 
@@ -46,7 +48,9 @@ namespace OpenBlood2
         // run_game's requests to run_frontend.
         constexpr int restart_game = -1, return_to_setup = -2, enter_multiplayer = -3;
 
-        void draw_cinematic_caption(CinematicCaption caption, bool letterbox, const UiRuntime& ui,
+        enum class CaptionPlacement { Play, Letterbox, Movie };
+
+        void draw_cinematic_caption(CinematicCaption caption, CaptionPlacement placement, const UiRuntime& ui,
                                     const LocalizedFont& font)
         {
             if (caption.english.empty())
@@ -74,6 +78,7 @@ namespace OpenBlood2
             const float scale = std::min(viewport.Size.x / 640.f, viewport.Size.y / 480.f);
             if (scale <= 0)
                 return;
+            const bool letterbox = placement == CaptionPlacement::Letterbox;
             const float wrap = std::min(viewport.Size.x - 16 * scale, 544 * scale);
             const float available = letterbox ? viewport.Size.y / 6 - 8 * scale : 96 * scale;
             const auto end = text.data() + text.size();
@@ -84,13 +89,106 @@ namespace OpenBlood2
                 size -= scale;
                 bounds = face->CalcTextSizeA(size, FLT_MAX, wrap, text.data(), end);
             }
-            const float top = viewport.Size.y - (letterbox ? (viewport.Size.y / 6 + bounds.y) / 2
-                                                           : 74 * scale + bounds.y);
+            const float bottom = placement == CaptionPlacement::Movie ? (viewport.Size.y + 480 * scale) / 2
+                                                                       : viewport.Size.y;
+            const float inset = placement == CaptionPlacement::Movie ? 12 * scale : 74 * scale;
+            const float top = bottom - (letterbox ? (viewport.Size.y / 6 + bounds.y) / 2 : inset + bounds.y);
             const ImVec2 pos{viewport.Pos.x + (viewport.Size.x - bounds.x) / 2, viewport.Pos.y + top};
             auto* draw = ImGui::GetForegroundDrawList();
             draw->AddText(face, size, {pos.x + scale, pos.y + scale}, IM_COL32(0, 0, 0, 255), text.data(), end, wrap);
             draw->AddText(face, size, pos, IM_COL32(255, 255, 255, 255), text.data(), end, wrap);
         }
+
+        struct StartupSmoke
+        {
+            std::string_view previous_movie;
+            std::uint64_t started = SDL_GetTicksNS();
+            unsigned movies_seen = 0;
+            bool intro_seen = false, title_seen = false, finished = false;
+            const char* capture = nullptr;
+
+            bool before(SDL_Window* window, const StartupMovies& movies, const MenuInput& input, const Menu& menu,
+                        const Localization& localization, const LocalizedFont& font, std::string& error)
+            {
+                capture = nullptr;
+                const auto window_id = SDL_GetWindowID(window);
+                const auto escape = [&]
+                {
+                    SDL_Event event{};
+                    event.type = SDL_EVENT_KEY_DOWN;
+                    event.key.windowID = window_id;
+                    event.key.which = MenuSmoke::device;
+                    event.key.scancode = SDL_SCANCODE_ESCAPE;
+                    SDL_PushEvent(&event);
+                    event.type = SDL_EVENT_KEY_UP;
+                    SDL_PushEvent(&event);
+                };
+                if (SDL_GetTicksNS() - started > 25'000'000'000ull)
+                {
+                    error = "Startup smoke timed out";
+                    return false;
+                }
+                if (movies.active())
+                {
+                    constexpr std::array<std::string_view, 3> order{"Monolith.smk", "Gti.smk", "Intro.smk"};
+                    if (movies.name() != previous_movie)
+                    {
+                        if (menu.demo() || movies_seen == order.size() || movies.name() != order[movies_seen] ||
+                            !movies.submitted_audio())
+                        {
+                            error = "Startup smoke expected the original retail movie order and soundtrack";
+                            return false;
+                        }
+                        previous_movie = movies.name();
+                        ++movies_seen;
+                    }
+                    if (movies.name() != "Intro.smk")
+                    {
+                        if (movies.elapsed() >= .12)
+                            escape();
+                    }
+                    else if (intro_seen)
+                        escape();
+                    else if (movies.elapsed() >= 12)
+                    {
+                        const auto caption = intro_caption(movies.elapsed(), &localization);
+                        if (caption.english.empty() || caption.translated.empty() || !font.supports(caption.translated))
+                        {
+                            error = "Startup smoke expected a translated introduction caption";
+                            return false;
+                        }
+                        intro_seen = true;
+                        capture = "intro";
+                    }
+                }
+                else if (input.title_screen)
+                {
+                    if (!menu.demo() && (movies_seen != 3 || !intro_seen))
+                    {
+                        error = "Startup smoke reached the retail title before all three movies";
+                        return false;
+                    }
+                    if (title_seen)
+                        escape();
+                    else
+                    {
+                        title_seen = true;
+                        capture = "title";
+                    }
+                }
+                else if (title_seen && menu.active && menu.page == MenuPage::Main)
+                {
+                    capture = "menu";
+                    finished = true;
+                }
+                else
+                {
+                    error = "Startup smoke expected the original title and main menu";
+                    return false;
+                }
+                return true;
+            }
+        };
 
         struct FrontendPreferences
         {
@@ -265,13 +363,14 @@ namespace OpenBlood2
         int run_game(const Options& options, const Config& config, Runtime& runtime, UiRuntime& ui,
                      const LocalizedFont& localized_font, FrontendPreferences& preferences,
                      [[maybe_unused]] XrFrontend* xr, SetupScreen& setup, bool by_setup, Config& next,
-                     std::string& refusal, MultiplayerScreen& multiplayer, Options& network_request, bool show_title)
+                     std::string& refusal, MultiplayerScreen& multiplayer, Options& network_request, bool show_title,
+                     bool show_movies)
         {
             std::string error;
             const auto& localization = preferences.localization;
             // Ordinary play reports a fatal stop in a dialog; it used to close without any message.
-            const bool interactive = !options.menu_smoke && !options.demo_smoke && options.capture_file.empty() &&
-                                     !options.frame_limit && !xr;
+            const bool diagnostic = options.menu_smoke || options.demo_smoke || options.startup_smoke;
+            const bool interactive = !diagnostic && options.capture_file.empty() && !options.frame_limit && !xr;
             auto failed = [&](int code)
             {
                 spdlog::error("Frontend: {}", error);
@@ -330,7 +429,7 @@ namespace OpenBlood2
             saves.localization = &localization;
             if (config.demo)
                 saves.slots.unavailable = "The demo edition has no saved games.";
-            else if (options.menu_smoke || options.demo_smoke)
+            else if (diagnostic)
                 saves.slots.unavailable = "Saved games are disabled in diagnostic runs.";
             else if (std::filesystem::path directory; save_directory(directory, error, config.nightmares))
             {
@@ -452,7 +551,7 @@ namespace OpenBlood2
             };
             // controls.cfg beside the preferences, under the same smoke-run exclusion.
             std::filesystem::path controls_file;
-            if (!options.menu_smoke && !options.demo_smoke)
+            if (!diagnostic)
             {
                 std::string why;
                 if (!controls_path(controls_file, why) || !load_controls(controls_file, input.controls.bindings, why))
@@ -480,11 +579,21 @@ namespace OpenBlood2
             LoadingFlow loading(artwork);
             loading.screen.localization = &localization;
             loading.screen.localized_font = ui.localized ? &localized_font : nullptr;
-            // Original startup: title.pcx stretched to the screen for six seconds, or until Esc, Return
-            // or Space (no movies are played yet). Direct entry (runworld) and smokes skip it.
+            // Original StartMovies, followed by the six-second Splash_Display.
+            StartupMovies movies;
             HudSurface title;
             double title_remaining = 0;
-            if (menu_enabled && !options.view_world && !options.menu_smoke && show_title)
+            const auto begin_title = [&]
+            {
+                if (title.rgba.empty())
+                    return;
+                input.title_screen = true;
+                title_remaining = 6;
+                input.reset(menu, false);
+                spdlog::info("Startup title: {}", config.nightmares ? "screens_ao/title.pcx" : "screens/title.pcx");
+            };
+            const bool startup = menu_enabled && !options.view_world && !options.menu_smoke && show_title;
+            if (startup)
             {
                 HudCanvas splash(artwork);
                 // _ADDON Splash_Display: the add-on title.
@@ -494,12 +603,14 @@ namespace OpenBlood2
                     title = {LoadingScreen::width, LoadingScreen::height,
                              std::vector<std::uint8_t>(std::size_t(LoadingScreen::width) * LoadingScreen::height * 4)};
                     hud_scale(title, *image);
-                    title_remaining = 6;
-                    input.title_screen = true;
-                    input.reset(menu, false);
                 }
                 else
                     spdlog::warn("Title screen: {}", splash.error);
+                if (show_movies)
+                    movies.start(config, menu.settings.sound ? menu.settings.sound_volume / 50.f : 0);
+                input.movie_screen = movies.active();
+                if (!input.movie_screen)
+                    begin_title();
             }
             ObjectSelection selection;
             ScenePresenter presenter(runtime.gpu);
@@ -529,6 +640,7 @@ namespace OpenBlood2
             MenuSmoke smoke;
             DemoSmoke demo_smoke;
             DemoMenuSmoke demo_menu_smoke;
+            StartupSmoke startup_smoke;
             bool done = false, captured = false, dismiss_error = false;
             // Options > SETUP over the paused menu (input.setup_screen); its result applies next frame.
             auto setup_result = SetupScreen::Result::None;
@@ -594,8 +706,8 @@ namespace OpenBlood2
                 const bool paused_at_start = input.paused(menu);
                 [[maybe_unused]] bool level_changed = false;
                 const auto tick = SDL_GetTicksNS();
-                double delta =
-                    options.menu_smoke || options.demo_smoke ? 1. / 60 : app_frame_delta(double(tick - previous) / 1e9);
+                const double wall_delta = double(tick - previous) / 1e9;
+                double delta = options.menu_smoke || options.demo_smoke ? 1. / 60 : app_frame_delta(wall_delta);
 #if BLOOD2_XR
                 if (xr)
                     delta = xr->delta();
@@ -624,6 +736,19 @@ namespace OpenBlood2
                     if (!demo_smoke.before(frames, runtime.window, *game, input, error))
                         return failed(4);
                 }
+                if (options.startup_smoke)
+                {
+                    if (frames == 0)
+                    {
+                        SDL_Event focus{};
+                        focus.type = SDL_EVENT_WINDOW_FOCUS_GAINED;
+                        focus.window.windowID = SDL_GetWindowID(runtime.window);
+                        focus.window.data1 = int(MenuSmoke::device);
+                        SDL_PushEvent(&focus);
+                    }
+                    if (!startup_smoke.before(runtime.window, movies, input, menu, localization, localized_font, error))
+                        return failed(4);
+                }
                 input.roll_credits = game->client_shell.m_bInWorld && game->client_shell.m_bRollCredits;
                 SDL_Event event;
                 int width = 0, height = 0;
@@ -638,7 +763,7 @@ namespace OpenBlood2
                 // One event through the menu/game input; false on a quit request.
                 const auto dispatch = [&](SDL_Event& event)
                 {
-                    if ((options.menu_smoke || options.demo_smoke) && MenuSmoke::unrelated(event))
+                    if (diagnostic && MenuSmoke::unrelated(event))
                         return true;
                     if (event.type == SDL_EVENT_QUIT || (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED &&
                                                          event.window.windowID == SDL_GetWindowID(runtime.window)))
@@ -736,7 +861,16 @@ namespace OpenBlood2
 #endif
                 if (done || input.demo.quit)
                     break;
-                if (input.title_screen && (title_remaining -= delta) <= 0)
+                if (input.movie_screen)
+                {
+                    movies.advance(wall_delta, input.controls.focused, std::exchange(input.movie_advance, false));
+                    if (!movies.active())
+                    {
+                        input.movie_screen = false;
+                        begin_title();
+                    }
+                }
+                else if (input.title_screen && (title_remaining -= delta) <= 0)
                 {
                     input.title_screen = false;
                     input.reset(menu, false);
@@ -1077,7 +1211,7 @@ namespace OpenBlood2
                         saves.notice.text.clear();
                     }
                     stored_settings = menu.settings;
-                    if (!options.menu_smoke && !options.demo_smoke &&
+                    if (!diagnostic &&
                         !save_menu_preferences(preferences.file, menu.settings, error))
                     {
                         menu.error = error;
@@ -1127,7 +1261,7 @@ namespace OpenBlood2
                 if (menu_audio)
                 {
                     menu_audio->focus(menu.active && menu.promotion == MenuPromotion::None && !loading.visible() &&
-                                      !input.title_screen);
+                                      !input.title_screen && !input.movie_screen);
                     for (auto cue : menu.cues)
                         menu_audio->play(cue);
                     menu.cues.clear();
@@ -1312,14 +1446,15 @@ namespace OpenBlood2
                 }
                 selection.refresh(game->objects);
                 // A waiting loading screen still prepares the loaded world behind it.
-                const bool screen_shown = input.title_screen || loading.visible();
+                const bool screen_shown = input.movie_screen || input.title_screen || loading.visible();
                 if (loading.waiting)
                 {
                     loading.clock += delta;
                     if (!loading.screen.draw(true, loading.clock, error))
                         return failed(4);
                 }
-                if (!menu.active && !input.credits_screen && !input.demo.finished() && !input.title_screen)
+                if (!menu.active && !input.credits_screen && !input.demo.finished() && !input.title_screen &&
+                    !input.movie_screen)
                 {
 #if BLOOD2_XR
                     if (xr)
@@ -1349,9 +1484,17 @@ namespace OpenBlood2
                     if (!end_screen || !menu_renderer.draw_surface(*end_screen, 1, error))
                         return failed(4);
                 }
+                else if (input.movie_screen)
+                {
+                    if (!title_renderer.draw_surface(movies.surface(), movies.revision(), error))
+                        return failed(4);
+                    if (movies.name() == "Intro.smk")
+                        draw_cinematic_caption(intro_caption(movies.elapsed(), &localization), CaptionPlacement::Movie,
+                                               ui, localized_font);
+                }
                 else if (input.title_screen)
                 {
-                    if (!title_renderer.draw_surface(title, 1, error))
+                    if (!title_renderer.draw_surface(title, 0, error))
                         return failed(4);
                 }
                 else if (loading.visible())
@@ -1368,7 +1511,7 @@ namespace OpenBlood2
                 else if (input.setup_screen)
                 {
                     setup_result = setup.draw(runtime.window);
-                    if (apply_setup_language(setup, preferences, !options.menu_smoke))
+                    if (apply_setup_language(setup, preferences, !diagnostic))
                     {
                         stored_settings.language = menu.settings.language = setup.language;
                         game->client_shell.control_notice.clear();
@@ -1433,7 +1576,8 @@ namespace OpenBlood2
                             error = "The authored dialogue did not render in the selected language";
                             return failed(4);
                         }
-                        draw_cinematic_caption(caption, letterbox, ui, localized_font);
+                        draw_cinematic_caption(caption, letterbox ? CaptionPlacement::Letterbox : CaptionPlacement::Play,
+                                               ui, localized_font);
                     }
                     if (options.menu_smoke && (config.demo ? DemoMenuSmoke::phase(frames) == 78 : frames == 230) &&
                         (!hud.status_bar() || hud.status_bar()->objectives_level() != OBJTAB_STOPPED))
@@ -1569,7 +1713,7 @@ namespace OpenBlood2
                 }
                 Capture capture;
                 const bool phase_capture =
-                    (options.menu_smoke && config.demo && DemoMenuSmoke::capture(frames)) ||
+                    startup_smoke.capture || (options.menu_smoke && config.demo && DemoMenuSmoke::capture(frames)) ||
                     (options.menu_smoke && !config.demo &&
                      (frames == 4 || frames == 8 || frames == 15 || frames == 17 || frames == 32 || frames == 23 ||
                       frames == 120 || frames == 38 || frames == 208 || frames == 214 || frames == 226 || frames == 230 ||
@@ -1624,10 +1768,12 @@ namespace OpenBlood2
                 }
                 if (save)
                 {
-                    const auto capture_path =
-                        phase_capture ? options.capture_file.parent_path() / (path_text(options.capture_file.stem()) +
-                                                                              "-" + std::to_string(frames) + ".png")
-                                      : options.capture_file;
+                    const auto suffix = startup_smoke.capture ? std::string(startup_smoke.capture)
+                                                              : std::to_string(frames);
+                    const auto capture_path = phase_capture
+                                                  ? options.capture_file.parent_path() /
+                                                        (path_text(options.capture_file.stem()) + "-" + suffix + ".png")
+                                                  : options.capture_file;
                     if (!capture.save(path_text(capture_path).c_str()))
                     {
                         error = SDL_GetError();
@@ -1637,6 +1783,8 @@ namespace OpenBlood2
                 }
                 if (!options.menu_smoke && !options.demo_smoke)
                     DisplayOptions::pace(tick, menu.settings.fps_limit);
+                if (startup_smoke.finished)
+                    done = true;
                 ++frames;
                 if (!target)
                     SDL_Delay(10);
@@ -1645,6 +1793,15 @@ namespace OpenBlood2
             {
                 error = "Demo diagnostic did not complete both worlds and the ending";
                 return failed(4);
+            }
+            if (options.startup_smoke)
+            {
+                if (!startup_smoke.finished)
+                {
+                    error = "Startup smoke did not reach the main menu";
+                    return failed(4);
+                }
+                spdlog::info("Startup traversal passed: {} movies, title and main menu", startup_smoke.movies_seen);
             }
             if (options.demo_smoke)
                 spdlog::info("Demo SDL traversal passed: no menu resources/mixer, pause/resume/focus, authored exits, "
@@ -1716,10 +1873,12 @@ namespace OpenBlood2
             spdlog::warn("Cannot initialize the language font. Using English.");
 
         FrontendPreferences preferences;
-        if (!options.menu_smoke && !options.demo_smoke &&
+        if (!options.menu_smoke && !options.demo_smoke && !options.startup_smoke &&
             (!menu_preferences_path(preferences.file, preferences.error) ||
              !load_menu_preferences(preferences.file, preferences.settings, preferences.error)))
             spdlog::warn("Preferences: {}", preferences.error);
+        if (options.startup_smoke)
+            preferences.settings.language = Language::French;
         preferences.load_language(ui.localized != nullptr);
         MultiplayerScreen multiplayer;
         multiplayer.font = ui.proportional;
@@ -1770,7 +1929,7 @@ namespace OpenBlood2
         if (next && by_setup)
             nightmares(*next);
         std::string refusal;
-        bool show_title = true;
+        bool show_title = true, show_movies = true;
         for (;;)
         {
             if (!next)
@@ -1791,7 +1950,7 @@ namespace OpenBlood2
             Config chosen;
             Options network_request;
             const int code = run_game(options, *next, runtime, ui, localized_font, preferences, session, setup, by_setup,
-                                      chosen, refusal, multiplayer, network_request, show_title);
+                                      chosen, refusal, multiplayer, network_request, show_title, show_movies);
             if (code == enter_multiplayer)
             {
                 bool quit = false;
@@ -1800,10 +1959,14 @@ namespace OpenBlood2
                 if (quit)
                     return result;
                 show_title = false;
+                show_movies = false;
                 continue;
             }
             if (code == restart_game)
+            {
                 next = std::move(chosen);
+                show_movies = false;
+            }
             else if (code == return_to_setup)
                 next.reset();
             else

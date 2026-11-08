@@ -42,6 +42,7 @@ namespace OpenBlood2
         bool view_world = false, viewport_smoke = false;
         bool start_game = false;
         bool menu_smoke = false;
+        bool startup_smoke = false; // Play the selected edition's original startup path, then exit at the menu.
         bool demo_smoke = false; // Dedicated two-level SDL traversal, never changes normal play.
         bool explicit_config = false;
         bool help = false;

@@ -90,7 +90,8 @@ before lot N2's original path branch.
 - **Art.** Title splash `screens_ao\title.pcx`; every menu page's background
   `interface_ao\background.pcx` (`MainMenus`/`MenuBase`); a `WORLDS_AO` level's loading screen is
   always `Screens_ao\Bumper.pcx`, whatever the DAT names, with its title and load-screen ID
-  unchanged. The movie skip is moot (movies are not played).
+  unchanged. Startup plays the Monolith and GTI logos before the add-on title,
+  following the original branch that skips The Chosen's introduction.
 - **Credits.** The add-on reads `TEXT/CREDITS_AO` (33 entries, versus 87 for `CREDITS`) for the
   menu and in-world credits and the END roll; there is no `INTRO_AO` (the intro roll is not
   ported). `WORLDS_AO\END` (and the absent `WORLDS_AO\CREDITS`) roll the credits over the world.

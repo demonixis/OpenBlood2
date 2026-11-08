@@ -67,6 +67,10 @@ namespace
             CHECK(!strings.dialogue("Sounds\\Chosen\\Caleb\\1ACaleb1.WAV").empty());
             CHECK(!strings.text("dialogue.sounds.events.cwvoice8").empty());
             CHECK(!strings.text("dialogue.sounds.events.tavoice1").empty());
+            for (auto key : {"intro.line01", "intro.line02", "intro.line03", "intro.line04", "intro.line05",
+                             "intro.line06", "intro.line07", "intro.line08", "intro.line09", "intro.line10",
+                             "intro.line11", "intro.line12", "intro.line13"})
+                CHECK(!strings.text(key).empty());
         }
         CHECK(!parse_language("zh") && !parse_language("pt-br") && !parse_language("../../fr"));
 

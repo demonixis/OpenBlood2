@@ -102,6 +102,8 @@ namespace OpenBlood2
             const auto arg = args[i];
             if (arg == "--menu-smoke")
                 options.menu_smoke = true;
+            else if (arg == "--startup-smoke")
+                options.startup_smoke = true;
             else if (arg == "--demo")
                 options.demo = true;
             else if (arg == "--nightmares")
@@ -421,8 +423,8 @@ namespace OpenBlood2
             (!options.host_world.empty() && !options.connect_address.empty()) || (explicit_network_port && !network) ||
             (network && (explicit_world || options.demo || options.nightmares || !options.overlays.empty() ||
                          options.xr_world || options.xr_test || options.bench || options.menu_smoke ||
-                         options.demo_smoke || options.view_world || options.inspect_world || options.start_game ||
-                         options.check_data || options.gpu_smoke || options.world_smoke)))
+                         options.startup_smoke || options.demo_smoke || options.view_world || options.inspect_world ||
+                         options.start_game || options.check_data || options.gpu_smoke || options.world_smoke)))
         {
             error = "Choose one retail desktop --host or --connect session, separate from solo diagnostics";
             return false;
@@ -455,6 +457,14 @@ namespace OpenBlood2
             options.keyframes_smoke || options.worldpaths_smoke || options.lights_smoke || options.cinematics_smoke ||
             options.random_sounds_smoke || options.world_sounds_smoke || options.sprites_smoke ||
             options.scene_explosions_smoke;
+        if (options.startup_smoke &&
+            (options.nightmares || options.xr_world || options.xr_test || options.menu_smoke || options.demo_smoke ||
+             content_smoke || options.view_world || options.inspect_world || options.start_game || options.check_data ||
+             options.bench || options.frame_limit || explicit_world))
+        {
+            error = "--startup-smoke exercises the retail or demo startup and owns its frame count";
+            return false;
+        }
         if (options.demo && options.nightmares)
         {
             error = "--demo and --nightmares select different editions";

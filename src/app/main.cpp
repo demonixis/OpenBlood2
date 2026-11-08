@@ -1827,6 +1827,7 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --ssr MODE          Enhanced reflections: off, low or high (default) (menu: Display)\n"
                      "  --capture FILE.png  Save the third GPU frame after UI layout has settled (bench: last frame)\n"
                      "  --menu-smoke        Selected-edition menu SDL traversal, isolated preferences/pause checks\n"
+                     "  --startup-smoke     Validate the retail intro or demo splash and the transition to the menu\n"
                      "  --demo-smoke        Menu-free demo SDL pause, authored exits and ending diagnostic\n"
                      "  --gpu-smoke         Exercise GPU presentation, inspector toggle, resize and quit\n"
                      "  --world-smoke       GPU lifecycle with real world unload/reload assertions\n"
@@ -1887,7 +1888,8 @@ static int application_main(const OpenBlood2::Options& options)
         // An ordinary launch without data opens the setup screen; tools and smokes need data.
         const bool tool = options.check_data || options.inspect_world || options.start_game || options.bench ||
                           options.gpu_smoke || options.world_smoke || options.menu_smoke || options.demo_smoke ||
-                          options.view_world || !options.host_world.empty() || !options.connect_address.empty();
+                          options.startup_smoke || options.view_world || !options.host_world.empty() ||
+                          !options.connect_address.empty();
         if (unconfigured && !tool)
         {
 #if !BLOOD2_XR

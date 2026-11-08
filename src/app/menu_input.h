@@ -26,6 +26,7 @@ namespace OpenBlood2
         // Original GS_LOADINGLEVEL/GS_WAITING: the loading screen pauses play; while waiting, the
         // next fresh key continues (other devices: any button or tap).
         bool loading_screen = false, loading_wait = false, loading_continue = false;
+        bool movie_screen = false, movie_advance = false;
         // Original startup title.pcx splash (Splash_Display, then TimedKeyWait on Esc, Return or Space).
         bool title_screen = false;
         // Options > SETUP: the replacement setup screen over the paused menu owns all input.
@@ -66,7 +67,8 @@ namespace OpenBlood2
         bool paused(const Menu& menu) const
         {
             return demo_mode ? demo.paused()
-                             : menu.active || credits_screen || loading_screen || title_screen || setup_screen;
+                             : menu.active || credits_screen || loading_screen || movie_screen || title_screen ||
+                                   setup_screen;
         }
         void reset(Menu& menu, bool player)
         {
@@ -214,6 +216,15 @@ namespace OpenBlood2
             const auto press = [&](InputAction action) { return pressed(edges, action); };
             const bool button = (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && e.button.windowID == window) ||
                                 e.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN;
+            if (movie_screen)
+            {
+                // Original GS_MOVIES owns keys. Escape stops only the current movie.
+                if ((e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.scancode == SDL_SCANCODE_ESCAPE) ||
+                    (gamepad && press(InputAction::MenuBack)) ||
+                    (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && e.button.which == SDL_TOUCH_MOUSEID))
+                    movie_advance = true;
+                return false;
+            }
             if (title_screen)
             {
                 if ((e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat &&

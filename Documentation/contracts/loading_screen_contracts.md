@@ -73,17 +73,31 @@ The demo's two worlds carry IDs 7 and 8, so the demo waits too (without a prompt
 as its branch draws none). A failed screen (missing art or strings) is logged and
 the load proceeds without it.
 
-## Title splash
+## Startup movies and title splash
+
+On a normal retail launch, `StartMovies` plays the loose `Monolith.smk`, `Gti.smk`
+and `Intro.smk` in that order. Look in the selected external data directory first,
+then its `Movies` subdirectory, matching those names without regard to case.
+Missing or unreadable clips are skipped with a diagnostic, so installations with
+only the introduction can play it. The demo retains the original movie skip.
+Nightmares plays the logos and proceeds to its own title.
+
+Smacker playback preserves the source frames, palette, frame intervals and
+soundtrack. The frame fits the display with black margins where needed. Only
+`Intro.smk` has timed captions. The selected language uses the `[intro]` catalog,
+with the English cue as fallback. Esc advances the current movie and consumes
+the event. Direct world entry, networking and diagnostic menu traversal skip
+the movies. Switching installations through Setup in-process does not replay
+them.
 
 On normal menu launches the original `Splash_Display("\screens\title.pcx")` (Nightmares:
 `\screens_ao\title.pcx`) is shown,
 stretched to the screen, for six seconds or until Esc, Return or Space (mouse,
-gamepad and tap adapters as above), then the main menu opens. The retail
-introduction movies (`Monolith.smk`, `Gti.smk`, `Intro.smk`, played before the
-splash by `StartMovies`) are not played yet; the demo has none. Direct entry
-(`runworld`, here `--view-world`) and smokes skip the splash. A missing title
-image is logged and skipped.
+gamepad and tap adapters as above), then the main menu opens. Direct entry
+(`runworld`, here `--view-world`) and diagnostic menu traversal skip the splash.
+A missing title image is logged and skipped.
 
-Tests: `loading_screen.*` (parser, formatting, retail/demo composition) and the
-retail/demo menu traversal smokes, which now see the loading screen, wait and
-continue.
+The `loading_screen.*` tests cover parsing, formatting and retail/demo
+composition. The menu traversal smokes exercise the loading screen, wait and
+continue. The private `gpu.startup_retail` and `gpu.startup_demo` tests exercise
+startup and the handoff to the main menu using `--startup-smoke`.

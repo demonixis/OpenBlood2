@@ -742,6 +742,12 @@ if(BLOOD2_TEST_DATA_DIR AND BLOOD2_GPU_TESTS)
     set_tests_properties(gpu.cinematics PROPERTIES LABELS "private;gpu;cinematics" TIMEOUT 30 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
 endif()
 
+add_executable(smacker_tests smacker_tests.cpp)
+target_link_libraries(smacker_tests PRIVATE engine)
+blood2_project_options(smacker_tests)
+add_test(NAME smacker.decode COMMAND smacker_tests "${CMAKE_CURRENT_BINARY_DIR}/smacker-fixture.smk")
+set_tests_properties(smacker.decode PROPERTIES LABELS "headless;smacker" TIMEOUT 10)
+
 add_executable(random_sound_tests random_sound_tests.cpp)
 target_link_libraries(random_sound_tests PRIVATE blood2_game)
 blood2_project_options(random_sound_tests)
@@ -2834,6 +2840,34 @@ set_tests_properties(localization.catalogs PROPERTIES LABELS "headless;localizat
 if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
     add_test(NAME gpu.menu_traversal COMMAND blood2_app --menu-smoke --data-dir "${BLOOD2_TEST_DATA_DIR}" --capture "${CMAKE_CURRENT_BINARY_DIR}/menu-traversal.png")
     set_tests_properties(gpu.menu_traversal PROPERTIES LABELS "gpu;private;menus" TIMEOUT 120 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy" FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+endif()
+
+if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
+    # The diagnostic asserts the full sequence. Archive-only installations are playable without these films.
+    set(startup_movies_present TRUE)
+    foreach(movie IN ITEMS "[mM][oO][nN][oO][lL][iI][tT][hH]" "[gG][tT][iI]" "[iI][nN][tT][rR][oO]")
+        file(GLOB startup_movie LIST_DIRECTORIES FALSE
+            "${BLOOD2_TEST_DATA_DIR}/${movie}.[sS][mM][kK]"
+            "${BLOOD2_TEST_DATA_DIR}/[mM][oO][vV][iI][eE][sS]/${movie}.[sS][mM][kK]")
+        if(NOT startup_movie)
+            set(startup_movies_present FALSE)
+            break()
+        endif()
+    endforeach()
+    if(startup_movies_present)
+        add_test(NAME gpu.startup_retail COMMAND blood2_app --startup-smoke
+            --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini" --data-dir "${BLOOD2_TEST_DATA_DIR}"
+            --capture "${CMAKE_CURRENT_BINARY_DIR}/startup-retail.png")
+        set_tests_properties(gpu.startup_retail PROPERTIES LABELS "gpu;private;startup" TIMEOUT 35 RUN_SERIAL TRUE
+            ENVIRONMENT "SDL_AUDIODRIVER=dummy" FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
+    endif()
+endif()
+if(BLOOD2_GPU_TESTS AND BLOOD2_DEMO_DATA_DIR)
+    add_test(NAME gpu.startup_demo COMMAND blood2_app --demo --startup-smoke
+        --config "${CMAKE_CURRENT_BINARY_DIR}/empty.ini" --data-dir "${BLOOD2_DEMO_DATA_DIR}"
+        --capture "${CMAKE_CURRENT_BINARY_DIR}/startup-demo.png")
+    set_tests_properties(gpu.startup_demo PROPERTIES LABELS "gpu;private;startup;demo" TIMEOUT 35 RUN_SERIAL TRUE
+        ENVIRONMENT "SDL_AUDIODRIVER=dummy" FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")
 endif()
 
 add_executable(builtin_sprite_tests builtin_sprite_tests.cpp ../src/app/sprite_scene.cpp)

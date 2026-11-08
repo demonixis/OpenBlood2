@@ -184,6 +184,16 @@ membership result. See the [source ledger](sources/m9_client_environment_sources
 [contract](../contracts/multiplayer_contracts.md#client-environment-replica) and
 [report](reports/m9_client_environment.md). No new dependency or save payload.
 
+## Smacker startup
+
+Retail startup follows the original `CBloodClientShell::StartMovies`,
+`UpdateMoviesState` and `AdvanceMovies` from `ClientShellDLL/BloodClientShell.cpp`.
+The bounded SMK2 decoder follows the [published Smacker format description](https://wiki.multimedia.cx/index.php/Smacker).
+It preserves the original palette and stereo PCM and adds no third-party runtime
+dependency. The three externally installed movies decode to the same RGBA frames
+and PCM samples as FFmpeg 8.0.1. Intro captions were timed against the soundtrack
+from the installed movie. The media files remain external.
+
 ## M9 client collision replica
 
 `ClientCollisionWorld` and the local geometry/collider publisher are project-owned

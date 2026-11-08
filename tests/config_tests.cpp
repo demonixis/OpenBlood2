@@ -91,6 +91,13 @@ namespace
         CHECK(!parse_options(headless_capture, options, error));
         const std::array<std::string_view, 2> conflicting_modes{"--gpu-smoke", "--check-data"};
         CHECK(!parse_options(conflicting_modes, options, error));
+        const std::array<std::string_view, 3> startup{"--startup-smoke", "--capture", "startup.png"};
+        CHECK(parse_options(startup, options, error) && options.startup_smoke && !options.demo);
+        for (const auto mode : {"--view-world", "--menu-smoke", "--gpu-smoke", "--check-data", "--nightmares", "--xr"})
+        {
+            const std::array<std::string_view, 2> args{"--startup-smoke", mode};
+            CHECK(!parse_options(args, options, error));
+        }
         return true;
     }
 
@@ -191,6 +198,8 @@ namespace
         }
         const std::array<std::string_view, 2> demo_menu{"--demo", "--menu-smoke"};
         CHECK(parse_options(demo_menu, options, error) && options.menu_smoke && options.demo);
+        const std::array<std::string_view, 2> demo_startup{"--demo", "--startup-smoke"};
+        CHECK(parse_options(demo_startup, options, error) && options.startup_smoke && options.demo);
         const std::array<std::string_view, 4> demo_menu_world{"--demo", "--menu-smoke", "--world", "Demo_02"};
         CHECK(!parse_options(demo_menu_world, options, error));
         const std::array<std::string_view, 0> none{};

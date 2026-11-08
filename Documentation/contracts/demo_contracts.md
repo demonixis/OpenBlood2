@@ -9,7 +9,8 @@ accept M3 or certify a complete campaign. See the [implementation and evidence](
 ## Edition and startup
 
 `--demo --data-dir DIR` explicitly selects the demo and mounts only `B2Demo.rez`
-(case-insensitive filename). Normal launch opens the [demo menu](demo_menu_contracts.md);
+(case-insensitive filename). Normal launch shows the demo title and opens the
+[demo menu](demo_menu_contracts.md), following the original branch that skips movies.
 Caleb and the selected difficulty start Demo_01. `--demo --view-world` starts
 Demo_01 directly with Caleb/medium, and `--world Demo_02` overrides that direct
 world. Diagnostics keep their own dispatch:

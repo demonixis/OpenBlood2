@@ -96,6 +96,7 @@ if(BLOOD2_BUILD_CLIENT)
         src/engine/runtime.cpp
         src/engine/capture.cpp
         src/engine/line_renderer.cpp
+        src/engine/smacker.cpp
     )
     target_link_libraries(engine PUBLIC engine_core PRIVATE spdlog::spdlog)
     target_include_directories(engine PRIVATE "${PROJECT_BINARY_DIR}/generated")

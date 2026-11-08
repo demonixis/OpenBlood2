@@ -93,8 +93,8 @@ there is no add-on music.
 5. `WORLDS_AO\END` (and `WORLDS_AO\CREDITS`, absent from the REZ) set `m_bRollCredits`;
    the credits text is `CREDITS_AO`/`INTRO_AO` instead of `CREDITS`/`INTRO`.
 6. Presentation: title splash `screens_ao\title.pcx`, menu background
-   `interface_ao\background.pcx`; the GTI movie goes straight to `MOVIE_FINISHED` (no
-   `Intro.smk` — movies are not played by OpenBlood2 yet anyway).
+   `interface_ao\background.pcx`; the GTI movie goes straight to `MOVIE_FINISHED`
+   before `Intro.smk`. See the [startup contract](../contracts/loading_screen_contracts.md#startup-movies-and-title-splash).
 
 ## `_ADD_ON`/`_ADDON` branch inventory
 
