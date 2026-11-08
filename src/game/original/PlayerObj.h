@@ -135,7 +135,7 @@ class CPlayerObj : public CBaseCharacter
     void PlayWeaponVoiceSoundOnClient(int weapon);
     static CPlayerObj* LocalVoicePlayer(); // Checked replacement for the source single-player global.
     // Original SendConsoleMessage: SMSG_CONSOLEMESSAGE, CSPrint2 into the client's message lines.
-    bool SendConsoleMessage(const std::string& text);
+    bool SendConsoleMessage(const std::string& text, OpenBlood2::ConsoleTextSource source = {});
     // FormatString(id) then SendConsoleMessage; a missing string sends nothing (null HSTRING).
     bool SendConsoleString(std::uint32_t id);
     std::uint64_t console_messages = 0;

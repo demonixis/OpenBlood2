@@ -8,6 +8,9 @@
 
 namespace OpenBlood2
 {
+    class Localization;
+    class LocalizedFont;
+
     // GetWorldTitle's results for one StartNewWorld.
     struct WorldLoadInfo
     {
@@ -57,6 +60,8 @@ namespace OpenBlood2
         std::uint32_t random_state = 0x4c4f4144; // Private cosmetic stream (GetRandom); injectable in tests.
         bool played_waiting_sound = false;       // m_bPlayedWaitingSound: the caller plays esc01.wav once.
         unsigned message_id = 0;                 // The last loading message drawn (IDS_LOADING_MESSAGE_n).
+        const Localization* localization = nullptr;
+        const LocalizedFont* localized_font = nullptr;
 
       private:
         const Resources& resources_;
@@ -68,7 +73,10 @@ namespace OpenBlood2
         bool active_ = false;
         double fade_time_ = 0; // m_fLoadingFadeTime
         bool fade_up_ = false; // m_bLoadingFadeUp
+        bool translated_resources_ = false;
         std::uint64_t revision_ = 0;
         bool lookup(unsigned id, std::string& out, std::string& error) const;
+        void draw_label(HudSurface&, std::string_view english, std::string_view translation, int x, int y,
+                        std::optional<std::uint32_t> color = {}) const;
     };
 } // namespace OpenBlood2

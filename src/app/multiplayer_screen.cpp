@@ -1,13 +1,28 @@
 #include "app/multiplayer_screen.h"
+#include "engine/localization.h"
+#include "game/localized_font.h"
 #include <SDL3/SDL_timer.h>
 #include <cstdio>
 #include <imgui.h>
 namespace OpenBlood2
 {
+    const char* multiplayer_label(const Localization* locale, const LocalizedFont* font, std::string_view key,
+                                  const char* english)
+    {
+        if (locale && font)
+        {
+            const auto value = locale->text(key);
+            if (!value.empty() && font->supports(value))
+                return value.data();
+        }
+        return english;
+    }
+
     bool MultiplayerScreen::open(const Resources& resources, const Config& config, bool in_world, std::string& error)
     {
         close();
         error_.clear();
+        error_key_ = {};
         discovery_error_.clear();
         if (!setup.load(resources, config, error))
             return false;
@@ -27,10 +42,10 @@ namespace OpenBlood2
     void MultiplayerScreen::start(bool host)
     {
         Options options;
-        if (setup.request(host, options, error_))
+        if (setup.request(host, options, error_, &error_key_))
             pending = std::move(options);
     }
-    void MultiplayerScreen::draw()
+    void MultiplayerScreen::draw(const Localization* locale, const LocalizedFont* localized_font, ImFont* localized_face)
     {
         if (!active)
             return;
@@ -53,79 +68,87 @@ namespace OpenBlood2
         // Esc/B cancel an active field or an open combo first; only then close
         // the screen. Sampled before the widgets, which clear it on Escape.
         const bool editing = ImGui::IsAnyItemActive() || ImGui::IsPopupOpen("", ImGuiPopupFlags_AnyPopupId);
-        if (font)
-            ImGui::PushFont(font, 0);
+        const bool localized = locale && localized_face && locale->language() != Language::English;
+        ImFont* face = localized ? localized_face : font;
+        if (face)
+            ImGui::PushFont(face, 0);
+        const auto tr = [&](std::string_view key, const char* english)
+        { return multiplayer_label(locale, localized ? localized_font : nullptr, key, english); };
         const auto* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->GetCenter(), ImGuiCond_Always, {.5f, .5f});
         ImGui::SetNextWindowSize({std::min(720.f, viewport->Size.x - 24), std::min(720.f, viewport->Size.y - 24)},
                                  ImGuiCond_Always);
-        ImGui::Begin("Multiplayer", &active, ImGuiWindowFlags_NoCollapse);
-        ImGui::InputText("Name", setup.name.data(), setup.name.size());
-        ImGui::Combo("Character", &setup.character, "Caleb\0Ophelia\0Ishmael\0Gabriella\0");
-        ImGui::Combo("Preferred team", &setup.team, "Automatic\0Blue\0Red\0");
+        ImGui::Begin(tr("network.title", "Multiplayer"), &active, ImGuiWindowFlags_NoCollapse);
+        ImGui::InputText(tr("network.name", "Name"), setup.name.data(), setup.name.size());
+        ImGui::Combo(tr("network.character", "Character"), &setup.character, "Caleb\0Ophelia\0Ishmael\0Gabriella\0");
+        const char* teams[]{tr("network.automatic", "Automatic"), tr("network.blue", "Blue"), tr("network.red", "Red")};
+        ImGui::Combo(tr("network.preferred_team", "Preferred team"), &setup.team, teams, IM_ARRAYSIZE(teams));
         if (replaces_solo_)
-            ImGui::TextWrapped("Starting a multiplayer game ends the current single-player session.");
+            ImGui::TextWrapped("%s", tr("network.replaces_solo", "Starting a multiplayer game ends the current single-player session."));
         if (ImGui::BeginTabBar("Session"))
         {
-            if (ImGui::BeginTabItem("Host"))
+            if (ImGui::BeginTabItem(tr("network.host", "Host")))
             {
-                if (ImGui::Combo("Mode", &setup.mode, "Bloodbath\0Team\0CTF\0"))
+                const char* modes[]{tr("network.bloodbath", "Bloodbath"), tr("network.team", "Team"), tr("network.ctf", "CTF")};
+                if (ImGui::Combo(tr("network.mode", "Mode"), &setup.mode, modes, IM_ARRAYSIZE(modes)))
                 {
                     setup.map = 0;
                     setup.rotation.clear();
                 }
                 const auto maps = setup.mode_maps();
-                if (ImGui::BeginCombo("Map", maps.empty() ? "No map" : maps[setup.map].c_str()))
+                if (ImGui::BeginCombo(tr("network.map", "Map"), maps.empty() ? tr("network.no_map", "No map") : maps[setup.map].c_str()))
                 {
                     for (std::size_t i = 0; i < maps.size(); ++i)
                         if (ImGui::Selectable(maps[i].c_str(), std::size_t(setup.map) == i))
                             setup.map = int(i);
                     ImGui::EndCombo();
                 }
-                ImGui::InputInt("UDP port", &setup.port);
-                ImGui::Combo("Match end", &setup.end, "Frags / score\0Time\0First limit reached\0No limit\0");
+                ImGui::InputInt(tr("network.udp_port", "UDP port"), &setup.port);
+                const char* ends[]{tr("network.frags_score", "Frags / score"), tr("network.time", "Time"),
+                                   tr("network.first_limit", "First limit reached"), tr("network.no_limit", "No limit")};
+                ImGui::Combo(tr("network.match_end", "Match end"), &setup.end, ends, IM_ARRAYSIZE(ends));
                 if (setup.end == 0 || setup.end == 2)
-                    ImGui::InputInt("Score limit", &setup.frags);
+                    ImGui::InputInt(tr("network.score_limit", "Score limit"), &setup.frags);
                 if (setup.end == 1 || setup.end == 2)
-                    ImGui::InputInt("Time limit (minutes)", &setup.minutes);
+                    ImGui::InputInt(tr("network.time_limit", "Time limit (minutes)"), &setup.minutes);
                 if (setup.mode)
                 {
-                    ImGui::Checkbox("Friendly fire", &setup.friendly_fire);
-                    ImGui::Checkbox("Negative team frags", &setup.negative_team_frags);
+                    ImGui::Checkbox(tr("network.friendly_fire", "Friendly fire"), &setup.friendly_fire);
+                    ImGui::Checkbox(tr("network.negative_team_frags", "Negative team frags"), &setup.negative_team_frags);
                 }
                 if (setup.mode == 2)
                 {
-                    ImGui::InputInt("Points per capture", &setup.flag_value);
-                    ImGui::Checkbox("Only flag captures score", &setup.only_flag_scores);
-                    ImGui::Checkbox("Scale score by team size", &setup.use_team_size);
+                    ImGui::InputInt(tr("network.points_per_capture", "Points per capture"), &setup.flag_value);
+                    ImGui::Checkbox(tr("network.only_flag_scores", "Only flag captures score"), &setup.only_flag_scores);
+                    ImGui::Checkbox(tr("network.scale_team_size", "Scale score by team size"), &setup.use_team_size);
                 }
-                if (ImGui::TreeNode("Map rotation"))
+                if (ImGui::TreeNode(tr("network.rotation", "Map rotation")))
                 {
                     ImGui::TextWrapped(
-                        "The starting map plays first. It repeats in a loop with the list below.");
+                        "%s", tr("network.rotation_help", "The starting map plays first. It repeats in a loop with the list below."));
                     ImGui::BeginDisabled(maps.empty() || setup.rotation.size() >= 49);
-                    if (ImGui::Button("Add selected map"))
+                    if (ImGui::Button(tr("network.add_map", "Add selected map")))
                         setup.rotation.push_back(maps[setup.map]);
                     ImGui::EndDisabled();
                     ImGui::SameLine();
-                    if (ImGui::Button("Clear"))
+                    if (ImGui::Button(tr("network.clear", "Clear")))
                         setup.rotation.clear();
                     for (std::size_t i = 0; i < setup.rotation.size(); ++i)
                         ImGui::Text("%zu. %s", i + 1, setup.rotation[i].c_str());
                     ImGui::TreePop();
                 }
-                ImGui::TextWrapped("The game is visible on the local network. Leaving as host ends the game.");
-                if (ImGui::Button("Start game"))
+                ImGui::TextWrapped("%s", tr("network.lan_help", "The game is visible on the local network. Leaving as host ends the game."));
+                if (ImGui::Button(tr("network.start_game", "Start game")))
                     start(true);
                 ImGui::EndTabItem();
             }
-            if (ImGui::BeginTabItem("Join"))
+            if (ImGui::BeginTabItem(tr("network.join", "Join")))
             {
-                ImGui::InputText("Address or host:port", setup.address.data(), setup.address.size());
-                if (ImGui::Button("Connect"))
+                ImGui::InputText(tr("network.address", "Address or host:port"), setup.address.data(), setup.address.size());
+                if (ImGui::Button(tr("network.connect", "Connect")))
                     start(false);
-                ImGui::SeparatorText("Local network games");
-                if (ImGui::Button("Refresh"))
+                ImGui::SeparatorText(tr("network.lan_games", "Local network games"));
+                if (ImGui::Button(tr("network.refresh", "Refresh")))
                 {
                     if (!browsing_)
                         browsing_ = browser_.open(false, discovery_error_);
@@ -134,7 +157,7 @@ namespace OpenBlood2
                 if (!discovery_error_.empty())
                     ImGui::TextWrapped("%s", discovery_error_.c_str());
                 if (browser_.servers().empty())
-                    ImGui::TextWrapped("Searching. If a game does not appear, connect to its address.");
+                    ImGui::TextWrapped("%s", tr("network.searching", "Searching. If a game does not appear, connect to its address."));
                 for (const auto& s : browser_.servers())
                 {
                     const auto endpoint = s.address.host + ":" + std::to_string(s.address.port);
@@ -143,16 +166,16 @@ namespace OpenBlood2
                     ImGui::TextWrapped("%s - %s - %u/%u", s.offer.name.c_str(), endpoint.c_str(),
                                        unsigned(s.offer.players), unsigned(s.offer.capacity));
                     ImGui::TextWrapped("%s - %s",
-                                       s.offer.mode == 1   ? "Bloodbath"
-                                       : s.offer.mode == 2 ? "CTF"
-                                                           : "Team",
+                                       s.offer.mode == 1   ? tr("network.bloodbath", "Bloodbath")
+                                       : s.offer.mode == 2 ? tr("network.ctf", "CTF")
+                                                           : tr("network.team", "Team"),
                                        s.offer.world.c_str());
                     if (!compatible)
-                        ImGui::TextUnformatted("Incompatible game version");
+                        ImGui::TextUnformatted(tr("network.incompatible", "Incompatible game version"));
                     else if (s.offer.players >= s.offer.capacity)
-                        ImGui::TextUnformatted("Game full");
+                        ImGui::TextUnformatted(tr("network.full", "Game full"));
                     ImGui::BeginDisabled(!compatible || s.offer.players >= s.offer.capacity);
-                    if (ImGui::Button("Join this game"))
+                    if (ImGui::Button(tr("network.join_game", "Join this game")))
                     {
                         std::snprintf(setup.address.data(), setup.address.size(), "%s", endpoint.c_str());
                         start(false);
@@ -166,13 +189,21 @@ namespace OpenBlood2
             ImGui::EndTabBar();
         }
         if (!error_.empty())
-            ImGui::TextWrapped("%s", error_.c_str());
-        if (ImGui::Button("Back") ||
+        {
+            if (localized && localized_font && error_key_ == "network.invalid_host")
+            {
+                const auto detail = locale->format(error_key_, error_, {std::to_string(Net::discovery_port)});
+                ImGui::TextWrapped("%s", localized_font->supports(detail) ? detail.c_str() : error_.c_str());
+            }
+            else
+                ImGui::TextWrapped("%s", tr(error_key_, error_.c_str()));
+        }
+        if (ImGui::Button(tr("network.back", "Back")) ||
             (!editing &&
              (ImGui::IsKeyPressed(ImGuiKey_Escape, false) || ImGui::IsKeyPressed(ImGuiKey_GamepadFaceRight, false))))
             active = false;
         ImGui::End();
-        if (font)
+        if (face)
             ImGui::PopFont();
         if (!active)
         {

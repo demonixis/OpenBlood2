@@ -55,6 +55,14 @@ together; never edit an output by hand.
 The Ninja macOS builds (and therefore the current CI archive) stay plain
 executables without an icon; pass `-DBLOOD2_APPLE_BUNDLE=ON` to bundle them.
 
+## Language assets
+
+Client builds ship `lang/` for both the demo and the full game. Desktop builds
+and CI archives place it beside the executable. Apple bundles copy it into their
+resource directory, and the Android and Quest APKs include it under `assets/lang/`.
+The seven catalogs include `ko.ini`. The shared font covers modern Hangul, and its
+license ships beside it in `lang/fonts/`.
+
 ## Presets
 
 | Preset | Output | Notes |

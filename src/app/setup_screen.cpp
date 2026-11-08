@@ -21,27 +21,6 @@ namespace OpenBlood2
     namespace
     {
         const ImVec4 accent{0.80f, 0.12f, 0.10f, 1}, dim{0.62f, 0.60f, 0.58f, 1}, failure{0.95f, 0.35f, 0.30f, 1};
-        const char* edition_label(Edition edition)
-        {
-            return edition == Edition::Demo         ? "Blood II demo (1998, two levels)"
-                   : edition == Edition::Nightmares ? "Blood II: The Nightmare Levels (expansion levels not ported yet)"
-                                                    : "Blood II: The Chosen";
-        }
-        const char* instructions()
-        {
-#if defined(SDL_PLATFORM_IOS)
-            return "Copy your Blood II folder (the one holding BLOOD2.REZ) into the OpenBlood2 folder: Files app > "
-                   "On My iPhone (or iPad) > OpenBlood2, or Finder > your device > Files. Then tap Rescan. No copy of "
-                   "Blood II? Download the free demo below.";
-#elif defined(SDL_PLATFORM_ANDROID)
-            return "Copy your Blood II files (with BLOOD2.REZ) into /sdcard/openblood2/game, or the demo's "
-                   "(B2DEMO.REZ) into /sdcard/openblood2/demo, then tap Rescan. No copy of Blood II? Download the "
-                   "free demo below.";
-#else
-            return "Choose the folder of your Blood II installation (CD, GOG or Steam): the one holding BLOOD2.REZ. "
-                   "No copy of Blood II? Download the free demo below.";
-#endif
-        }
         // The mods folder of an installation, any case.
         fs::path mods_folder(const fs::path& directory)
         {
@@ -71,8 +50,10 @@ namespace OpenBlood2
     struct SetupScreen::Dialog
     {
         std::mutex mutex;
-        bool pending = false, ready = false;
+        bool pending = false, ready = false, invalid_path = false;
         std::string path, error;
+        std::string filter_name;
+        SDL_DialogFileFilter filter{};
         static void SDLCALL completed(void* userdata, const char* const* files, int)
         {
             auto& self = *static_cast<Dialog*>(userdata);
@@ -83,7 +64,7 @@ namespace OpenBlood2
             {
                 const auto size = SDL_strnlen(files[0], 4097);
                 if (size > 4096 || !valid_setup_text(std::string_view(files[0], size), 4096))
-                    self.error = "The selected path is invalid or exceeds 4096 bytes";
+                    self.invalid_path = true;
                 else
                     self.path.assign(files[0], size);
             }
@@ -101,9 +82,30 @@ namespace OpenBlood2
             (void)dialog_.release();
     }
 
+    const Localization& SetupScreen::strings() const
+    {
+        static const Localization english;
+        return localization && localized_font ? *localization : english;
+    }
+
+    const char* SetupScreen::text(std::string_view key, const char* english) const
+    {
+        return strings().text(key, english).data();
+    }
+
+    std::string SetupScreen::widget(std::string_view key, const char* english) const
+    {
+        std::string label = text(key, english);
+        // ImGui hashes the suffix and keeps the original widget ID across languages.
+        label += "###";
+        label += english;
+        return label;
+    }
+
     bool SetupScreen::open(const Config* running, std::string& error)
     {
         from_game_ = running != nullptr;
+        language_picker_open_ = false;
         running_.clear();
         if (running)
             running_.push_back({running->demo         ? Edition::Demo
@@ -117,7 +119,8 @@ namespace OpenBlood2
         {
             // A damaged file must not lock the player out: start over and say so.
             spdlog::warn("Setup: {}; starting with an empty setup", error);
-            message = "setup.cfg was unreadable and has been reset: " + error;
+            message =
+                strings().format("setup.reset_config", "setup.cfg was unreadable and has been reset: {0}", {error});
             state_ = {};
             error.clear();
         }
@@ -180,17 +183,22 @@ namespace OpenBlood2
                 return;
             dialog_->pending = true;
             dialog_->ready = false;
+            dialog_->invalid_path = false;
             dialog_->path.clear();
             dialog_->error.clear();
         }
         pick_ = pick;
-        static const SDL_DialogFileFilter rez{"REZ archives", "rez"};
-        static const SDL_DialogFileFilter zip{"ZIP archives", "zip"};
         if (pick == Pick::Folder)
             SDL_ShowOpenFolderDialog(Dialog::completed, dialog_.get(), window, nullptr, false);
         else
-            SDL_ShowOpenFileDialog(Dialog::completed, dialog_.get(), window, pick == Pick::Mod ? &rez : &zip, 1,
-                                   nullptr, false);
+        {
+            const bool rez = pick == Pick::Mod;
+            // SDL may use the filter until the asynchronous dialog completes.
+            dialog_->filter_name =
+                rez ? text("setup.rez_filter", "REZ archives") : text("setup.zip_filter", "ZIP archives");
+            dialog_->filter = {dialog_->filter_name.c_str(), rez ? "rez" : "zip"};
+            SDL_ShowOpenFileDialog(Dialog::completed, dialog_.get(), window, &dialog_->filter, 1, nullptr, false);
+        }
 #else
         (void)pick;
 #endif
@@ -207,7 +215,7 @@ namespace OpenBlood2
             else
             {
                 spdlog::info("Demo installed: {}", path_text(installed.directory));
-                message = "The demo is installed.";
+                message = text("setup.demo_installed", "The demo is installed.");
                 state_.selected = Installation{Edition::Demo, installed.directory};
                 if (!save(error))
                     message = error;
@@ -222,10 +230,12 @@ namespace OpenBlood2
             dialog_->pending = false;
             path = std::move(dialog_->path);
             error = std::move(dialog_->error);
+            if (dialog_->invalid_path)
+                error = text("setup.invalid_path", "The selected path is invalid or exceeds 4096 bytes");
         }
         if (!error.empty())
         {
-            message = "The file dialog failed: " + error;
+            message = strings().format("setup.dialog_error", "The file dialog failed: {0}", {error});
             return;
         }
         if (path.empty()) // Cancelled.
@@ -235,7 +245,7 @@ namespace OpenBlood2
         {
             message.clear();
             if (!installer_.start(setup_content_folder(user_), chosen))
-                message = "Cannot start the demo installation";
+                message = text("setup.start_install_failed", "Cannot start the demo installation");
             return;
         }
         if (pick_ == Pick::Mod)
@@ -253,7 +263,7 @@ namespace OpenBlood2
         const auto found = folder_installations(chosen);
         if (found.empty())
         {
-            message = "No BLOOD2.REZ or B2DEMO.REZ in " + path;
+            message = strings().format("setup.no_archive", "No BLOOD2.REZ or B2DEMO.REZ in {0}", {path});
             return;
         }
         const auto previous = state_;
@@ -271,7 +281,7 @@ namespace OpenBlood2
         rescan();
     }
 
-    SetupScreen::Result SetupScreen::draw(SDL_Window* window)
+    SetupScreen::Result SetupScreen::draw([[maybe_unused]] SDL_Window* window)
     {
         poll();
         Result result = Result::None;
@@ -285,8 +295,9 @@ namespace OpenBlood2
         ImGui::Begin("##setup", nullptr,
                      ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings |
                          ImGuiWindowFlags_NoBringToFrontOnFocus);
-        if (font)
-            ImGui::PushFont(font, 0.0f);
+        ImFont* screen_font = strings().language() != Language::English ? localized_font : font;
+        if (screen_font)
+            ImGui::PushFont(screen_font, 0.0f);
         const float em = ImGui::GetFontSize();
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {em * 0.7f, em * 0.4f});
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {em * 0.6f, em * 0.5f});
@@ -305,14 +316,61 @@ namespace OpenBlood2
         ImGui::PopFont();
         ImGui::SameLine();
         ImGui::TextColored(dim, "%s", build::version);
+        const bool picker_was_open = language_picker_open_;
+        language_picker_open_ = false;
+        if (localized_font)
+        {
+            // Autonyms need the localized face even while the rest of the screen uses English.
+            ImGui::PushFont(localized_font, em);
+            ImGui::SetNextItemWidth(12 * em);
+            language_picker_open_ =
+                ImGui::BeginCombo(widget("setup.language", "Language").c_str(), language_name(language).data());
+            if (language_picker_open_)
+            {
+                for (auto choice : languages())
+                {
+                    const bool current = choice == language;
+                    if (ImGui::Selectable(language_name(choice).data(), current))
+                    {
+                        language_picker_open_ = false;
+                        if (!current)
+                            language_request = choice;
+                    }
+                    if (current)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+            ImGui::PopFont();
+        }
         ImGui::PushTextWrapPos(0);
-        ImGui::TextColored(dim, "%s", instructions());
+#if defined(SDL_PLATFORM_IOS)
+        ImGui::TextColored(
+            dim, "%s",
+            text("setup.instructions_ios",
+                 "Copy your Blood II folder (the one holding BLOOD2.REZ) into the OpenBlood2 folder: Files app > "
+                 "On My iPhone (or iPad) > OpenBlood2, or Finder > your device > Files. Then tap Rescan. No copy of "
+                 "Blood II? Download the free demo below."));
+#elif defined(SDL_PLATFORM_ANDROID)
+        ImGui::TextColored(
+            dim, "%s",
+            text("setup.instructions_android",
+                 "Copy your Blood II files (with BLOOD2.REZ) into /sdcard/openblood2/game, or the demo's "
+                 "(B2DEMO.REZ) into /sdcard/openblood2/demo, then tap Rescan. No copy of Blood II? Download the "
+                 "free demo below."));
+#else
+        ImGui::TextColored(
+            dim, "%s",
+            text("setup.instructions_desktop",
+                 "Choose the folder of your Blood II installation (CD, GOG or Steam): the one holding BLOOD2.REZ. "
+                 "No copy of Blood II? Download the free demo below."));
+#endif
         ImGui::PopTextWrapPos();
 
-        section("Game data");
+        section(text("setup.game_data", "Game data"));
         const SetupEntry* chosen = nullptr;
         if (entries_.empty())
-            ImGui::TextColored(dim, "No Blood II data found yet.");
+            ImGui::TextColored(dim, "%s", text("setup.no_game_data", "No Blood II data found yet."));
         // The Nightmares edition of a folder is the original launcher's "Launch Nightmares" box under
         // its retail entry, not a row of its own.
         const auto expansion = [&](const fs::path& directory) -> const SetupEntry*
@@ -337,7 +395,10 @@ namespace OpenBlood2
             if (selected && playable)
                 chosen = nightmares_selected ? (nightmares->error.empty() ? nightmares : nullptr) : &entry;
             ImGui::BeginDisabled(!playable);
-            if (ImGui::RadioButton(edition_label(entry.installation.edition), selected && playable) && !selected)
+            const auto edition = entry.installation.edition == Edition::Demo
+                                     ? widget("setup.edition_demo", "Blood II demo (1998, two levels)")
+                                     : "Blood II: The Chosen";
+            if (ImGui::RadioButton(edition.c_str(), selected && playable) && !selected)
             {
                 state_.selected = entry.installation;
                 if (!save(error))
@@ -347,7 +408,7 @@ namespace OpenBlood2
             if (entry.added)
             {
                 ImGui::SameLine();
-                if (ImGui::SmallButton("Remove"))
+                if (ImGui::SmallButton(widget("setup.remove", "Remove").c_str()))
                 {
                     std::erase(state_.added, entry.installation);
                     if (selected)
@@ -369,7 +430,7 @@ namespace OpenBlood2
             {
                 bool launch = nightmares_selected;
                 ImGui::BeginDisabled(!nightmares->error.empty());
-                if (ImGui::Checkbox("Launch Nightmares", &launch))
+                if (ImGui::Checkbox(widget("setup.launch_nightmares", "Launch Nightmares").c_str(), &launch))
                 {
                     state_.selected = launch ? nightmares->installation : entry.installation;
                     if (!save(error))
@@ -380,69 +441,75 @@ namespace OpenBlood2
                 if (!nightmares->error.empty())
                     ImGui::TextColored(failure, "%s", nightmares->error.c_str());
                 else
-                    ImGui::TextColored(dim, "The Nightmare Levels expansion (BLOOD2NM.REZ): Single Player > "
-                                            "NIGHTMARES, with The Chosen still available. Its levels are in "
-                                            "progress; saves are kept apart.");
+                    ImGui::TextColored(
+                        dim, "%s",
+                        text("setup.nightmares_help",
+                             "The Nightmare Levels expansion (BLOOD2NM.REZ): Single Player > NIGHTMARES, "
+                             "with The Chosen still available. Its levels are in progress; saves are kept apart."));
                 ImGui::PopTextWrapPos();
             }
             ImGui::Unindent(em * 1.6f);
             ImGui::PopID();
         }
 #if BLOOD2_SETUP_DIALOGS
-        if (ImGui::Button("Add folder..."))
+        if (ImGui::Button(widget("setup.add_folder", "Add folder...").c_str()))
             open_dialog(window, Pick::Folder);
         ImGui::SameLine();
 #endif
-        if (ImGui::Button("Rescan"))
+        if (ImGui::Button(widget("setup.rescan", "Rescan").c_str()))
             rescan();
         if (!storage_access())
         {
             ImGui::PushTextWrapPos(0);
-            ImGui::TextColored(failure, "OpenBlood2 needs \"All files access\" to read /sdcard/openblood2.");
+            ImGui::TextColored(
+                failure, "%s",
+                text("setup.storage_help", "OpenBlood2 needs \"All files access\" to read /sdcard/openblood2."));
             ImGui::PopTextWrapPos();
-            if (ImGui::Button("Allow file access"))
+            if (ImGui::Button(widget("setup.allow_storage", "Allow file access").c_str()))
                 request_storage_access();
         }
 
-        section("Free demo");
+        section(text("setup.free_demo", "Free demo"));
         if (installer_.pending())
         {
             const auto stage = installer_.progress.stage.load();
-            const char* text = stage == InstallStage::Downloading  ? "Downloading the demo..."
-                               : stage == InstallStage::Extracting ? "Installing the demo..."
-                                                                   : "Checking the demo files...";
+            const char* status =
+                stage == InstallStage::Downloading  ? text("setup.demo_downloading", "Downloading the demo...")
+                : stage == InstallStage::Extracting ? text("setup.demo_installing", "Installing the demo...")
+                                                    : text("setup.demo_checking", "Checking the demo files...");
             const auto total = installer_.progress.total.load();
             ImGui::ProgressBar(total ? float(installer_.progress.bytes.load()) / float(total) : 0, {width - 7 * em, 0},
-                               text);
+                               status);
             ImGui::SameLine();
-            if (ImGui::Button("Cancel"))
+            if (ImGui::Button(widget("setup.cancel", "Cancel").c_str()))
                 installer_.cancel();
         }
         else if (std::any_of(entries_.begin(), entries_.end(), [](const SetupEntry& entry)
                              { return entry.installation.edition == Edition::Demo && entry.error.empty(); }))
-            ImGui::TextColored(dim, "The demo is installed.");
+            ImGui::TextColored(dim, "%s", text("setup.demo_installed", "The demo is installed."));
         else
         {
-            if (ImGui::Button("Download the demo"))
+            if (ImGui::Button(widget("setup.download_demo", "Download the demo").c_str()))
             {
                 message.clear();
                 if (!installer_.start(setup_content_folder(user_)))
-                    message = "Cannot start the demo download";
+                    message = text("setup.start_download_failed", "Cannot start the demo download");
             }
 #if BLOOD2_SETUP_DIALOGS
             ImGui::SameLine();
-            if (ImGui::Button("Install from ZIP..."))
+            if (ImGui::Button(widget("setup.install_zip", "Install from ZIP...").c_str()))
                 open_dialog(window, Pick::Zip);
 #endif
             ImGui::PushTextWrapPos(0);
-            ImGui::TextColored(dim, "The original 1998 demo, 37.7 MB from Archive.org, checked and installed in "
-                                    "OpenBlood2's own folder.");
+            ImGui::TextColored(dim, "%s",
+                               text("setup.demo_help", "The original 1998 demo, 37.7 MB from Archive.org, checked and "
+                                                       "installed in OpenBlood2's own folder."));
             ImGui::PopTextWrapPos();
         }
 
-        section("Mods");
+        section(text("setup.mods", "Mods"));
         if (!state_.selected)
-            ImGui::TextColored(dim, "Choose the game data first.");
+            ImGui::TextColored(dim, "%s", text("setup.choose_data_first", "Choose the game data first."));
         else
         {
             unsigned rows = 0;
@@ -465,7 +532,7 @@ namespace OpenBlood2
                 // Load order: later entries take priority.
                 std::size_t swap = i;
                 ImGui::SameLine();
-                if (ImGui::SmallButton("Up"))
+                if (ImGui::SmallButton(widget("setup.move_up", "Up").c_str()))
                     for (std::size_t j = i; j-- > 0;)
                         if (state_.mods[j].installation == mod.installation)
                         {
@@ -473,7 +540,7 @@ namespace OpenBlood2
                             break;
                         }
                 ImGui::SameLine();
-                if (ImGui::SmallButton("Down"))
+                if (ImGui::SmallButton(widget("setup.move_down", "Down").c_str()))
                     for (std::size_t j = i + 1; j < state_.mods.size(); ++j)
                         if (state_.mods[j].installation == mod.installation)
                         {
@@ -481,7 +548,7 @@ namespace OpenBlood2
                             break;
                         }
                 ImGui::SameLine();
-                const bool remove = ImGui::SmallButton("Remove");
+                const bool remove = ImGui::SmallButton(widget("setup.remove", "Remove").c_str());
                 ImGui::PopID();
                 if (swap != i)
                 {
@@ -499,14 +566,16 @@ namespace OpenBlood2
                 }
             }
             if (!rows)
-                ImGui::TextColored(dim, "No mods for this installation.");
+                ImGui::TextColored(dim, "%s", text("setup.no_mods", "No mods for this installation."));
 #if BLOOD2_SETUP_DIALOGS
-            if (ImGui::Button("Add mod..."))
+            if (ImGui::Button(widget("setup.add_mod", "Add mod...").c_str()))
                 open_dialog(window, Pick::Mod);
 #endif
             ImGui::PushTextWrapPos(0);
-            ImGui::TextColored(dim, "Data-only .rez archives; those in the game folder's \"mods\" folder are listed "
-                                    "automatically. Later entries take priority.");
+            ImGui::TextColored(dim, "%s",
+                               text("setup.mods_help",
+                                    "Data-only .rez archives; those in the game folder's \"mods\" folder are listed "
+                                    "automatically. Later entries take priority."));
             ImGui::PopTextWrapPos();
         }
 
@@ -519,7 +588,7 @@ namespace OpenBlood2
             ImGui::PopTextWrapPos();
         }
         ImGui::BeginDisabled(!chosen || installer_.pending());
-        if (ImGui::Button("Play", {8 * em, 0}))
+        if (ImGui::Button(widget("setup.play", "Play").c_str(), {8 * em, 0}))
         {
             config_ = setup_config(state_, chosen->installation);
             // From the game, an unchanged setup returns to it instead of restarting.
@@ -535,20 +604,22 @@ namespace OpenBlood2
         {
             ImGui::SameLine();
             // Esc and the gamepad's B also return, as the menus' Back does.
-            if (ImGui::Button("Back", {8 * em, 0}) || ImGui::IsKeyPressed(ImGuiKey_Escape, false) ||
-                ImGui::IsKeyPressed(ImGuiKey_GamepadFaceRight, false))
+            const bool back_key =
+                !picker_was_open && !language_picker_open_ &&
+                (ImGui::IsKeyPressed(ImGuiKey_Escape, false) || ImGui::IsKeyPressed(ImGuiKey_GamepadFaceRight, false));
+            if (ImGui::Button(widget("setup.back", "Back").c_str(), {8 * em, 0}) || back_key)
                 result = Result::Back;
         }
         if (quit_available)
         {
             ImGui::SameLine();
-            if (ImGui::Button("Quit", {8 * em, 0}))
+            if (ImGui::Button(widget("setup.quit", "Quit").c_str(), {8 * em, 0}))
                 result = Result::Quit;
         }
         ImGui::EndChild();
         ImGui::PopStyleColor(6);
         ImGui::PopStyleVar(2);
-        if (font)
+        if (screen_font)
             ImGui::PopFont();
         ImGui::End();
         ImGui::PopStyleVar(2);

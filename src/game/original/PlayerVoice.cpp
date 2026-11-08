@@ -69,10 +69,10 @@ void CPlayerObj::PlayWeaponVoiceSoundOnClient(int weapon)
         PlayVoiceGroupEventOnClient(9, true);
 }
 
-bool CPlayerObj::SendConsoleMessage(const std::string& text)
+bool CPlayerObj::SendConsoleMessage(const std::string& text, OpenBlood2::ConsoleTextSource source)
 {
     // The typed local line replaces the msgbuf copy; the client bounds it like CSPrint2's lines.
-    if (GetServerDE()->SendToClient(m_hClient, OpenBlood2::PlayerText{text}) != DE_OK)
+    if (GetServerDE()->SendToClient(m_hClient, OpenBlood2::PlayerText{text, std::move(source)}) != DE_OK)
         return false;
     ++console_messages;
     return true;
@@ -81,7 +81,7 @@ bool CPlayerObj::SendConsoleString(std::uint32_t id)
 {
     std::string text;
     auto* server = GetServerDE();
-    return server && server->FindClientResourceString(id, text) && SendConsoleMessage(text);
+    return server && server->FindClientResourceString(id, text) && SendConsoleMessage(text, {id, 0, {}});
 }
 CPlayerObj* CPlayerObj::LocalVoicePlayer()
 {

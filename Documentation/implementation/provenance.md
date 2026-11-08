@@ -1,5 +1,43 @@
 # Source and Dependency Provenance
 
+## Localization font
+
+`lang/fonts/locale.ttf` combines Noto Sans SC and the Hangul outlines of Noto Sans KR
+from Google Fonts commit `2894aab31764f10f29c421bdfd2340d3b382d384`. The original
+variable TTFs have SHA-256 `a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da`
+for SC and `194018e6b2b293a7964f037b25c0249ce1418bc9ab3c971060a03aa57861e252` for KR.
+Both originals carry the same SIL Open Font License 1.1 notice, shipped with the derivative.
+[Noto Sans SC](https://github.com/google/fonts/blob/2894aab31764f10f29c421bdfd2340d3b382d384/ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf) · [Noto Sans KR](https://github.com/google/fonts/blob/2894aab31764f10f29c421bdfd2340d3b382d384/ofl/notosanskr/NotoSansKR%5Bwght%5D.ttf) · [Bundled license](../../lang/fonts/OFL.txt)
+
+To reproduce the SC base with FontTools 4.61.1, instantiate the original
+with `instantiateVariableFont(font, {'wght': 400}, inplace=True, updateFontNames=True)`.
+Subset with default options and `name_IDs=['*']` to all Unicode characters
+decoded by Python's `gb2312` codec from byte pairs `A1–F7` by `A1–FE`, plus
+U+0020–U+024F, U+2000–U+206F, U+3000–U+303F, U+20AC and U+FFFD. Remove name ID 25,
+set IDs 1 and 16 to `OpenBlood2 UI`, IDs 3 and 4 to `OpenBlood2 UI Regular`, and
+ID 6 to `OpenBlood2UI-Regular` in all retained records. Save with
+`recalcTimestamp=False`. This intermediate TTF has SHA-256
+`f7e23f921e05bcc4fc859907ff7425335ae96230b113e3bff61f7b3a6bb1dc98`.
+
+Instantiate KR the same way and subset it to U+1100–U+11FF, U+3130–U+318F,
+U+A960–U+A97F, U+AC00–U+D7A3 and U+D7B0–U+D7FF, excluding code points already
+in the SC base. Save with `recalcTimestamp=False`, reload and subset the same
+cmap again with `hinting=False`. Append its `glyf`, `hmtx` and `vmtx` entries in
+glyph order except `.notdef`. Prefix the appended names and component references
+with `ko.`. Add those mappings to both Unicode cmap subtables, recalculate the
+OS/2 Unicode and code page ranges, and save without recalculating the timestamp.
+The result preserves the SC glyph order, outlines, instructions, metrics and layout
+tables. It adds all 11,172 modern Hangul syllables and 451 assigned Jamo. The shipped
+TTF is 5,019,600 bytes and its SHA-256 is
+`bf723373cda8e7b988c50b44f0fe7da76209dde2ed0474f7ccc6433e1adc1a76`.
+
+Dialogue localization uses the original ConversationStrings table and the stock
+demo and retail WAVs referenced by mounted levels. The additional English
+transcripts were prepared offline from those WAVs. No recording or transcription
+runtime ships with the game. See [conversation](../contracts/conversation_contracts.md)
+and [cinematic](../contracts/cinematic_contracts.md) contracts for the rendering and
+audio boundaries.
+
 The M9 [Host/Join and LAN lot](reports/m9_multiplayer_menu.md) connects the original
 Main/BLOODBATH command to replacement portable screens and the existing session
 loop. Original character/team and host rule defaults are retained; ENet discovery

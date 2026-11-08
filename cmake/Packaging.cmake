@@ -54,6 +54,7 @@ function(blood2_package_application target)
     set(description "OpenBlood 2")
     get_target_property(file_name ${target} OUTPUT_NAME)
     set(generated "${PROJECT_BINARY_DIR}/generated/${target}")
+    set(language_dir "${PROJECT_SOURCE_DIR}/lang")
 
     if(WIN32)
         set(BLOOD2_RC_ICON "${blood2_platform_dir}/windows/${icon}.ico")
@@ -94,6 +95,16 @@ function(blood2_package_application target)
             target_sources(${target} PRIVATE "${icns}")
             set_source_files_properties("${icns}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
         endif()
+        foreach(asset IN ITEMS fr.ini zh-Hans.ini de.ini it.ini es.ini pt-BR.ini ko.ini fonts/locale.ttf fonts/OFL.txt)
+            cmake_path(GET asset PARENT_PATH folder)
+            set(location "Resources/lang")
+            if(folder)
+                string(APPEND location "/${folder}")
+            endif()
+            set(file "${language_dir}/${asset}")
+            target_sources(${target} PRIVATE "${file}")
+            set_source_files_properties("${file}" PROPERTIES MACOSX_PACKAGE_LOCATION "${location}")
+        endforeach()
         if(CMAKE_OSX_DEPLOYMENT_TARGET)
             set(BLOOD2_PLIST_MINIMUM_SYSTEM ${CMAKE_OSX_DEPLOYMENT_TARGET})
         else()
@@ -101,6 +112,13 @@ function(blood2_package_application target)
         endif()
         configure_file("${plist}" "${generated}/Info.plist" @ONLY)
         set_target_properties(${target} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${generated}/Info.plist")
+    elseif(NOT ANDROID)
+        # A catalog edit must be picked up even when the executable is up to date.
+        add_custom_target(${target}_languages
+            COMMAND "${CMAKE_COMMAND}" -E copy_directory_if_different
+                "${language_dir}" "$<TARGET_FILE_DIR:${target}>/lang"
+            VERBATIM)
+        add_dependencies(${target} ${target}_languages)
     endif()
 
     if(ANDROID)
@@ -158,7 +176,9 @@ function(blood2_android_package target)
     else()
         set(variant Debug)
     endif()
+    set(assets "${PROJECT_BINARY_DIR}/android/language-assets")
     add_custom_target(blood2_apk
+        COMMAND "${CMAKE_COMMAND}" -E copy_directory_if_different "${PROJECT_SOURCE_DIR}/lang" "${assets}/lang"
         COMMAND "${CMAKE_COMMAND}" -E env "ANDROID_HOME=${sdk}"
             "${gradle}" --no-daemon --console=plain
             -p "${blood2_platform_dir}/android"
@@ -166,6 +186,7 @@ function(blood2_android_package target)
             "assemble${first}${rest}${variant}"
             "-Pblood2.buildDir=${PROJECT_BINARY_DIR}/android/gradle"
             "-Pblood2.jniLibs=${jni}"
+            "-Pblood2.assets=${assets}"
             "-Pblood2.sdlJava=${sdl3_SOURCE_DIR}/android-project/app/src/main/java"
             "-Pblood2.versionName=${PROJECT_VERSION}"
             "-Pblood2.versionCode=${BLOOD2_VERSION_CODE}"

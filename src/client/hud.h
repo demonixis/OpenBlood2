@@ -3,6 +3,14 @@
 #include "client/world.h"
 namespace OpenBlood2
 {
+    struct CommLinkHudState
+    {
+        std::string file, text, portrait;
+        float portrait_ratio = 0, text_ratio = 0;
+        bool text_from_start = true;
+        bool operator==(const CommLinkHudState&) const = default;
+    };
+
     // Presentation values only, read from the checked typed client snapshot.
     struct HudState
     {
@@ -20,11 +28,13 @@ namespace OpenBlood2
         // counter with its current title and text; `objectives_valid` false is the null reset.
         std::uint64_t objective_updates = 0;
         bool objectives_valid = false;
+        std::uint32_t objectives_resource = 0;
         std::string objectives_title, objectives_text;
         // Original SetPowerBarLevel/TurnOffPowerBar calls: the latest request and its time.
         std::uint64_t power_requests = 0;
         DBYTE power_bar = 0;
         float power_percent = 0, power_time = 0;
+        CommLinkHudState communication;
     };
     HudState hud_state(const PlayerStats&, bool in_world, bool external_camera, bool dead = false,
                        bool show_crosshair = true, DBYTE crosshair = 1, DBYTE ctf_team = 0, DBYTE ctf_flag = 0);

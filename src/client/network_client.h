@@ -123,6 +123,10 @@ namespace OpenBlood2
         {
             return speech_;
         }
+        void set_announcer_translations(ClientAnnouncer::TextLookup lookup)
+        {
+            speech_.announcer.set_translations(std::move(lookup));
+        }
         const NetworkWeapons& weapons() const
         {
             return weapons_;

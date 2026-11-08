@@ -306,6 +306,28 @@ the view weapon keeps the original fixed projection. `preferences.cfg` **version
 `field_of_view` (default 90); versions 1–11 load the default and a version 11 file carrying
 the key is rejected.
 
+## Language
+
+Options > Language applies immediately in the demo and the full game. Enter or Right
+cycles forward, and Left cycles backward. The [setup screen](setup_screen_contracts.md)
+offers the same preference before an installation is selected. `preferences.cfg`
+version 13 stores the language tag. Earlier versions default to English. The other
+choices are French, Simplified Chinese, German, Italian, Spanish, Brazilian Portuguese
+and Korean.
+
+`lang/` contains one UTF-8 INI per translation. `[resources]` uses the original numeric
+string IDs. Other sections group named keys for menus, controls, setup, loading, network,
+HUD, objectives, promotions and dialogue. Absent keys use the original English value. Missing or malformed
+catalogs fall back to English. A malformed numbered substitution uses its English
+template. Resource translations leave strings from a mod's replacement `cres.dll`
+to the mod. Localized menu rows reuse the original bitmap glyphs and their three
+states. The bundled font supplies missing glyphs, styled from the active bitmap
+palette. Translated headings follow the original artwork roles. The three demo
+promotions draw translated text within the original PCX artwork, keeping the logo,
+illustrations and screenshot. English and any poster with missing or unsupported
+translations use its original image.
+See [packaging](../packaging.md) for the asset paths.
+
 ## Controls (CMenuControls)
 
 Options > Controls is enabled in the retail edition (the demo has no action strings and keeps the

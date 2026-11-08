@@ -1,5 +1,6 @@
 #pragma once
 #include "engine/hud_surface.h"
+#include "engine/localization.h"
 #include "engine/string_resources.h"
 #include "game/menu_resources.h"
 #include <array>
@@ -7,6 +8,9 @@
 
 namespace OpenBlood2
 {
+    class LocalizedFont;
+    inline constexpr int menu_language_setting = 31;
+
     enum class MenuPage
     {
         Main,
@@ -63,6 +67,7 @@ namespace OpenBlood2
     {
         std::string name = "<EMPTY SLOT>";
         bool loadable = false;
+        bool unreadable = false;
         bool operator==(const MenuSaveRow&) const = default;
     };
     struct MenuSaveSlots
@@ -81,6 +86,7 @@ namespace OpenBlood2
         std::string literal;
         std::string binding;
         bool enabled = true;
+        std::string_view localization_key{};
         bool operator==(const MenuControlRow&) const = default;
     };
     struct MenuVideoCapabilities
@@ -128,6 +134,7 @@ namespace OpenBlood2
         int vr_refresh_rate = 0;                         // Millihertz; zero asks the runtime to choose.
         int vr_render_scale = 100;                       // Percentage of recommended eye dimensions (50..100, step 10).
         int field_of_view = 90; // Horizontal degrees at 4:3 (60..120, step 5); 90 is the original FOV_NORMAL.
+        Language language = Language::English;
 
         bool operator==(const MenuSettings&) const = default;
     };
@@ -146,6 +153,7 @@ namespace OpenBlood2
         HudRect rect{}, slider_rect{};
         std::string insertion; // FormatMessage %1!s! argument of the Load page's RESTART/QUICKLOAD strings.
         int cheat = -1;        // A Cheats action row's CheatCodes value.
+        std::string_view localization_key{}, insertion_key{};
     };
     // Typed service adapter for the selected original menu Build/OnCommand code.
     // No original client ABI or hidden dependency on ImGui/SDL input.
@@ -206,6 +214,8 @@ namespace OpenBlood2
         std::vector<std::string> levels;
         int level = 0;
         std::string cheat_status;  // The last cheat's original message line, shown on the Cheats page.
+        std::string_view cheat_status_key;
+        unsigned cheat_status_count = 0;
         bool audio_failed = false; // Nonmodal application-owned audio status.
         MenuPage page = MenuPage::Main, top = MenuPage::Main;
         std::vector<MenuItem> items;
@@ -256,10 +266,16 @@ namespace OpenBlood2
         HudCanvas canvas;
         HudSurface* surface = nullptr;
         StringResources strings;
+        const Localization* localization = nullptr;
+        const LocalizedFont* localized_font = nullptr;
         std::uint64_t revision = 0;
 
       private:
+        std::string_view translated(std::string_view) const;
+        std::string_view translated(unsigned) const;
+        void draw_small(std::string_view english, std::string_view translation, int x, int y, int right = 625);
         const Resources& resources_;
+        bool stock_strings_ = true;
         HudFont small_, normal_, selected_, disabled_;
         const HudSurface* background_ = nullptr;
         const HudSurface* slider_ = nullptr;

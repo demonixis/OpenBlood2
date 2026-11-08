@@ -2,7 +2,9 @@
 // with ClientShellDLL/LoadScreenData.cpp (g_LoadScreenData, g_LoadScreenMessages). The engine's
 // screen surface is the 640x480 reference canvas; CoolFont is the HudFont adapter.
 #include "game/original/LoadingScreen.h"
+#include "engine/localization.h"
 #include "engine/world.h"
+#include "game/localized_font.h"
 #include "game/session.h"
 #include <algorithm>
 #include <cctype>
@@ -73,6 +75,29 @@ namespace OpenBlood2
         return false;
     }
 
+    void LoadingScreen::draw_label(HudSurface& surface, std::string_view english, std::string_view translation,
+                                   int x, int y, std::optional<std::uint32_t> color) const
+    {
+        if (!translation.empty() && localized_font && localized_font->supports(translation))
+        {
+            const auto h = int(title_font_.height);
+            const auto available = 2 * std::min(x, int(width) - x) - 16;
+            const LocalizedBitmapLine label(title_font_, *localized_font, translation);
+            const auto label_width = std::min(color ? localized_font->text_width(translation, h) : label.advance(),
+                                              available);
+            const auto left = x - label_width / 2;
+            const HudRect row{left, y, left + label_width, y + h};
+            if (color)
+                localized_font->draw(surface, translation, row, *color);
+            else
+                label.draw(surface, row);
+        }
+        else if (color)
+            title_font_.draw_solid(surface, english, x, y, 1, *color);
+        else
+            title_font_.draw(surface, english, x, y, 1);
+    }
+
     bool LoadingScreen::begin(std::string_view world, bool action, std::string& error)
     {
         active_ = false;
@@ -89,6 +114,8 @@ namespace OpenBlood2
                 read_world_info(header, info, ignored);
         }
         info_ = world_load_info(info, world, demo);
+        translated_resources_ = localization && !resources_.nightmares() &&
+                                !localization_resource_overridden(resources_, "cres.dll");
         // _ADDON StartNewWorld: a nightmare level always shows the add-on bumper, whatever the DAT
         // names (its load-screen ID still applies).
         if (resources_.nightmares() && addon_world_name(world))
@@ -155,20 +182,37 @@ namespace OpenBlood2
         // The title, bumper title and text drawn on m_hLoadingScreen. _DEMO and ID 0 draw the
         // centred title only.
         const auto h = int(title_font_.height);
+        std::string_view translated_world;
+        if (localization && path.starts_with("worlds/") && path.ends_with(".dat") &&
+            !localization_resource_overridden(resources_, path))
+        {
+            std::string key = "loading.world." + path.substr(7, path.size() - 11);
+            std::replace(key.begin(), key.end(), '/', '.');
+            translated_world = localization->text(key);
+        }
         if (demo || !info_.load_screen_id)
-            title_font_.draw(background_, info_.title, int(width / 2), h * 2, 1);
+            draw_label(background_, info_.title, translated_world, int(width / 2), h * 2);
         else
         {
             std::string title, text;
-            if (!lookup(bumper_title_ids + info_.load_screen_id - 1, title, error))
+            const auto title_id = bumper_title_ids + info_.load_screen_id - 1;
+            if (!lookup(title_id, title, error))
                 return false;
-            title_font_.draw(background_, info_.title, title_x, h * 2, 1);
-            title_font_.draw(background_, title, title_x, h * 3, 1);
+            draw_label(background_, info_.title, translated_world, title_x, h * 2);
+            draw_label(background_, title, translated_resources_ ? localization->text(title_id) : std::string_view{},
+                       title_x, h * 3);
             if (!action) // && the screen is at least 512x384, always true for the reference screen.
             {
-                if (!lookup(bumper_text_ids + info_.load_screen_id - 1, text, error))
+                const auto text_id = bumper_text_ids + info_.load_screen_id - 1;
+                if (!lookup(text_id, text, error))
                     return false;
-                text_font_.draw_format(background_, text, text_x, h * 5, text_wrap_width);
+                const auto translation = translated_resources_ ? localization->text(text_id) : std::string_view{};
+                if (!translation.empty() && localized_font && localized_font->supports(translation))
+                    localized_font->draw_wrapped(background_, translation,
+                        {text_x, h * 5, text_x + text_wrap_width, int(height) - h}, int(text_font_.height), 0xffffff,
+                        &text_font_);
+                else
+                    text_font_.draw_format(background_, text, text_x, h * 5, text_wrap_width);
             }
         }
         active_ = true;
@@ -203,8 +247,9 @@ namespace OpenBlood2
             const float g = fade_up_ ? 0.647f - 0.647f * calc : 0.647f * calc;
             const float b = fade_up_ ? 0.518f - 0.518f * calc : 0.518f * calc;
             const auto channel = [](float v) { return std::uint32_t(std::clamp(v, 0.f, 1.f) * 255.f); };
-            title_font_.draw_solid(screen_, "Press a key to continue...", x, y, 1,
-                                   (channel(r) << 16) | (channel(g) << 8) | channel(b));
+            const auto prompt = localization ? localization->text("loading.continue") : std::string_view{};
+            draw_label(screen_, "Press a key to continue...", prompt, x, y,
+                       (channel(r) << 16) | (channel(g) << 8) | channel(b));
             return true;
         }
         // GetRandom(0, MAX_LOADING_MESSAGES - 1) on every draw.
@@ -213,7 +258,7 @@ namespace OpenBlood2
         std::string message;
         if (!lookup(message_id, message, error))
             return false;
-        title_font_.draw(screen_, message, x, y, 1);
+        draw_label(screen_, message, translated_resources_ ? localization->text(message_id) : std::string_view{}, x, y);
         return true;
     }
 } // namespace OpenBlood2

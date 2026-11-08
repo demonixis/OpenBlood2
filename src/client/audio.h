@@ -15,6 +15,7 @@ namespace OpenBlood2
         std::uint64_t frames = 0, loops = 0;
         double cursor = 0;
         bool done = false, speaker_lost = false, world_owned = false, auto_remove = false;
+        bool cinematic = false; // Presentation provenance for local scripted dialogue.
         std::string error;
     };
     struct ClientAudioFrame

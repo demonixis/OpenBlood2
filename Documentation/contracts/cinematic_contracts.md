@@ -127,3 +127,26 @@ Device queue lead no longer advances those authoritative clocks; zero-lead solo
 arithmetic is unchanged. Client sound descriptors contain checked identities and
 values, with independent clip/stream lifetime. The inspector shows logical and
 playback cursors separately.
+
+## Localized subtitles
+
+The original `CinematicTrigger` plays WAVs without sending subtitle text. The legacy
+`Script::SubTitleDisplay` message prints to the console in the original client, and
+the inspected demo and retail maps contain no `Script` instances. OpenBlood2 draws
+the recognized spoken cues in the existing lower letterbox bar or above the bottom
+of the gameplay canvas when the view has no bars.
+
+Local sound frames identify the exact voice owned by each active cinematic trigger.
+The presenter reads those descriptors and uses the original conversation text where
+it matches, or a transcription of the stock WAV keyed by its full resource path.
+Full paths distinguish reused filenames. The `[dialogue]` catalogs translate these
+lines. Missing entries or unsupported glyphs use the English source. Stock text is
+suppressed for audio replaced by a mod.
+
+Verified authored gameplay lines can also draw a subtitle while the listener is in
+the sound's original audible range. The list includes player-triggered remarks and
+public-address messages. The visible cue follows the authoritative voice lifetime,
+with cinematic lines taking priority and the newest recognized line winning within
+each group. CommLink draws its own voice, and sound effects have no caption. The
+presenter does not change the sound request, advance the playback cursor, or add a
+save or network payload.

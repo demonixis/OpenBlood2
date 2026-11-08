@@ -106,6 +106,7 @@ void CCommLink::Update(OpenBlood2::VoiceServices& services, CVoiceMgr& manager)
             {
                 text_level = 2;
                 text_start = time;
+                text_ratio = 1;
             }
             else
                 text_ratio = (time - text_start) / text_scroll;
@@ -115,6 +116,7 @@ void CCommLink::Update(OpenBlood2::VoiceServices& services, CVoiceMgr& manager)
             {
                 text_level = 3;
                 text_start = time;
+                text_ratio = 0;
             }
             break;
         case 3:

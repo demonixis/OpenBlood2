@@ -523,6 +523,11 @@ namespace
         CHECK(p->pickup_messages == 2 && p->m_nLastPickupResult == CPlayerObj::CHWEAP_ALREADYHAVE);
         const auto drawn = client.m_MessageMgr.Draw(float(g.objects.time()));
         CHECK(drawn.size() >= 2 && drawn.back().text == "Picked Up RedKey" && drawn[0].y == 0 && drawn[1].y == 16);
+        const auto& weapon_source = drawn[drawn.size() - 2].source;
+        const auto& key_source = drawn.back().source;
+        CHECK(weapon_source.resource == 260 && weapon_source.argument_resource == 350 &&
+              weapon_source.argument.starts_with("Beretta"));
+        CHECK(key_source.resource == 260 && key_source.argument_resource == 0 && key_source.argument == "RedKey");
         // SMSG_OBJECTIVES with resource 1 (strings 5000/6000) and the air level.
         const auto updates = client.objective_updates, sounds = client.interface_sounds;
         CHECK(g.server.SendToClient(g.local_client, MissionObjectives{1, {}, {}}) == DE_OK &&
@@ -532,7 +537,7 @@ namespace
               client.interface_sound_error.empty());
         HudState h;
         hud_panels(h, client);
-        CHECK(h.objectives_valid && h.objectives_title == client.objectives.title &&
+        CHECK(h.objectives_valid && h.objectives_resource == 1 && h.objectives_title == client.objectives.title &&
               h.objective_updates == client.objective_updates);
         bar.UpdateObjectives(true, h.objectives_title, h.objectives_text);
         CHECK(page->rgba != empty);

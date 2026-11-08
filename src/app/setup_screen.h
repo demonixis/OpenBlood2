@@ -1,6 +1,7 @@
 #pragma once
 #include "app/demo_install.h"
 #include "app/game_setup.h"
+#include "engine/localization.h"
 #include <SDL3/SDL_video.h>
 #include <memory>
 
@@ -37,6 +38,10 @@ namespace OpenBlood2
         // A refusal from outside (the game could not mount the selection) shown on the screen.
         std::string message;
         ImFont* font = nullptr; // Proportional UI font; the default font when absent.
+        ImFont* localized_font = nullptr;
+        const Localization* localization = nullptr;
+        Language language = Language::English;
+        std::optional<Language> language_request;
         bool quit_available = true;
 
       private:
@@ -56,6 +61,10 @@ namespace OpenBlood2
         DemoInstaller installer_;
         Config config_;
         bool from_game_ = false;
+        bool language_picker_open_ = false;
+        const Localization& strings() const;
+        const char* text(std::string_view key, const char* english) const;
+        std::string widget(std::string_view key, const char* english) const;
         void rescan();
         bool save(std::string& error);
         void add_mods(const Installation&);

@@ -2,6 +2,7 @@
 // Copyright (c) 1998 Monolith Productions Inc.
 #include "client/announcer.h"
 #include "client/announcer_data.h"
+#include <algorithm>
 #include <array>
 
 namespace OpenBlood2
@@ -57,7 +58,53 @@ namespace OpenBlood2
             out = std::move(next);
             return true;
         }
+
+        std::size_t name_count(std::string_view text)
+        {
+            std::size_t count = 0;
+            for (auto at = text.find('%'); at != text.npos && at + 1 < text.size(); at = text.find('%', at + 2))
+                if (text[at + 1] == 's')
+                    ++count;
+            return count;
+        }
     } // namespace
+
+    bool ClientAnnouncer::translated(unsigned id, std::span<const std::string_view> names, std::string& out) const
+    {
+        if (!lookup_ || names.size() > 2)
+            return false;
+        const auto pattern = lookup_(id);
+        if (pattern.empty() || pattern.size() >= 500 || pattern.find('\0') != pattern.npos)
+            return false;
+        std::array<bool, 2> used{};
+        std::string next;
+        for (std::size_t at = 0; at < pattern.size();)
+        {
+            const auto c = pattern[at++];
+            if (c == '{')
+            {
+                if (at + 1 >= pattern.size() || pattern[at] < '0' || pattern[at] > '1' || pattern[at + 1] != '}')
+                    return false;
+                const auto index = std::size_t(pattern[at] - '0');
+                if (index >= names.size())
+                    return false;
+                used[index] = true;
+                next += names[index]; // Names are literal, even when they contain braces or percent signs.
+                at += 2;
+            }
+            else if (c == '}')
+                return false;
+            else
+                next += c;
+            if (next.size() >= 500)
+                return false;
+        }
+        for (std::size_t i = 0; i < names.size(); ++i)
+            if (!used[i])
+                return false;
+        out = std::move(next);
+        return true;
+    }
     void ClientAnnouncer::load(const Resources& resources)
     {
         if (loaded_)
@@ -71,6 +118,9 @@ namespace OpenBlood2
     }
     std::string ClientAnnouncer::level_change_notice(const Resources& resources)
     {
+        std::string text;
+        if (translated(7011, {}, text))
+            return text;
         load(resources);
         const auto found = strings_.strings.find(7011); // IDS_MP_CHANGINGLEVELS.
         if (found != strings_.strings.end() && !found->second.empty() && found->second.size() < 500 &&
@@ -84,6 +134,15 @@ namespace OpenBlood2
     std::string ClientAnnouncer::team_name(DBYTE team, const Resources& resources)
     {
         if (team < 1 || team > 2)
+            return {};
+        std::string text;
+        if (translated(7006 + team, {}, text) && text.size() <= 100)
+            return text;
+        return original_team_name(team, resources);
+    }
+    std::string ClientAnnouncer::original_team_name(DBYTE team, const Resources& resources)
+    {
+        if (!team)
             return {};
         load(resources);
         const auto found = strings_.strings.find(7006 + team); // IDS_TEAM1NAME/IDS_TEAM2NAME.
@@ -118,6 +177,16 @@ namespace OpenBlood2
             default:
                 return false; // Original dropped/team messages print no text.
         }
+        const bool observer = kind == CTFEventKind::Captured && !local;
+        if (lookup_ && observer)
+        {
+            const auto name = team_name(team, resources);
+            const std::array<std::string_view, 2> names{capturer, name};
+            if (translated(resource, std::span(names).first(team ? 2 : 1), out))
+                return true;
+        }
+        else if (!observer && translated(resource, {}, out))
+            return true;
         load(resources);
         const auto found = strings_.strings.find(resource);
         std::string pattern;
@@ -129,9 +198,9 @@ namespace OpenBlood2
             error = "Missing or invalid flag notice string " + std::to_string(resource);
             return false;
         }
-        if (kind == CTFEventKind::Captured && !local)
+        if (observer)
         {
-            const auto team_text = team_name(team, resources);
+            const auto team_text = original_team_name(team, resources);
             const std::array<std::string_view, 2> names{capturer, team_text};
             if (!format_names(pattern, std::span(names).first(team ? 2 : 1), out))
             {
@@ -148,8 +217,17 @@ namespace OpenBlood2
     {
         if (team > 2 || name.empty() || name.size() > 100 || name.find('\0') != name.npos)
             return false;
+        const unsigned resource =
+            joined ? (team ? 7006 : 25) : 26; // Original ClientRes.rc IDS_ADDPLAYER/IDS_REMOVEPLAYER.
+        if (lookup_)
+        {
+            const auto name_team = joined && team ? team_name(team, resources) : std::string{};
+            const std::array<std::string_view, 2> names{name, name_team};
+            if (translated(resource, std::span(names).first(joined && team ? 2 : 1), out))
+                return true;
+        }
         load(resources);
-        const auto team_text = joined && team ? team_name(team, resources) : std::string{};
+        const auto team_text = joined && team ? original_team_name(team, resources) : std::string{};
         const auto format = [&](std::string_view pattern)
         {
             if (pattern.empty() || pattern.size() >= 500)
@@ -184,8 +262,6 @@ namespace OpenBlood2
             out = std::move(next);
             return true;
         };
-        const unsigned resource =
-            joined ? (team ? 7006 : 25) : 26; // Original ClientRes.rc IDS_ADDPLAYER/IDS_REMOVEPLAYER.
         const auto found = strings_.strings.find(resource);
         if (found != strings_.strings.end() && format(found->second))
             return true;
@@ -197,7 +273,7 @@ namespace OpenBlood2
     }
     bool ClientAnnouncer::message(std::uint32_t resource, std::string_view fallback, std::string_view file,
                                   std::span<const std::string_view> names, const Resources& resources,
-                                  Conversation& out)
+                                  Conversation& out, std::string* caption)
     {
         load(resources);
         Conversation next;
@@ -213,12 +289,17 @@ namespace OpenBlood2
             if (!format_names(fallback, names, next.text))
                 return false;
         }
+        if (caption)
+        {
+            caption->clear();
+            translated(resource, names.first(std::min(names.size(), name_count(fallback))), *caption);
+        }
         ++messages;
         out = std::move(next);
         return true;
     }
     bool ClientAnnouncer::frag(std::uint16_t index, const AnnouncerPlayer& killer, const AnnouncerPlayer& victim,
-                               bool suicide, const Resources& resources, Conversation& out)
+                               bool suicide, const Resources& resources, Conversation& out, std::string* caption)
     {
         if (killer.character >= 4 || victim.character >= 4 || killer.name.empty() || victim.name.empty() ||
             killer.name.size() > 100 || victim.name.size() > 100 || killer.name.find('\0') != killer.name.npos ||
@@ -232,9 +313,10 @@ namespace OpenBlood2
                                    index, voice_flags(killer.character, victim.character), false);
         const std::array names{killer.name, victim.name};
         return entry && message(entry->resource, entry->text, entry->file, std::span(names).first(suicide ? 1 : 2),
-                                resources, out);
+                                resources, out, caption);
     }
-    bool ClientAnnouncer::finish(const FinishHimVoice& event, const Resources& resources, Conversation& out)
+    bool ClientAnnouncer::finish(const FinishHimVoice& event, const Resources& resources, Conversation& out,
+                                 std::string* caption)
     {
         if (event.attacker_character >= 4 || event.victim_character >= 4)
         {
@@ -243,9 +325,10 @@ namespace OpenBlood2
         }
         const auto* entry = select(AnnouncerData::humiliation, event.index,
                                    voice_flags(event.attacker_character, event.victim_character), true);
-        return entry && message(entry->resource, entry->text, entry->file, {}, resources, out);
+        return entry && message(entry->resource, entry->text, entry->file, {}, resources, out, caption);
     }
-    Conversation ClientAnnouncer::bloodbath(const BloodbathStart& event, const Resources& resources)
+    Conversation ClientAnnouncer::bloodbath(const BloodbathStart& event, const Resources& resources,
+                                            std::string* caption)
     {
         // TheVoice.cpp:134-141. Every entry has VOICEFLAG_ALL, so the source's
         // male/male startup flags select the first index without a search.
@@ -268,6 +351,11 @@ namespace OpenBlood2
             ++fallback_texts;
             if (error.empty())
                 error = "Missing or invalid announcer string " + std::to_string(4001 + index);
+        }
+        if (caption)
+        {
+            caption->clear();
+            translated(4001 + unsigned(index), {}, *caption);
         }
         return result;
     }

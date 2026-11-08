@@ -1,6 +1,8 @@
 #include "app/hud.h"
+#include "game/localized_font.h"
 #include "game/menu.h"
 #include "game/original/ClientCrosshair.h"
+#include "game/original/ConversationTrigger.h"
 #include "game/original/WeaponDefs.h"
 #include <algorithm>
 #include <cmath>
@@ -10,6 +12,16 @@ namespace OpenBlood2
 {
     namespace
     {
+        std::string authored_objective_key(std::string_view title, std::string_view text)
+        {
+            Sha256 digest;
+            constexpr std::uint8_t separator = 0;
+            digest.update({reinterpret_cast<const std::uint8_t*>(title.data()), title.size()});
+            digest.update({&separator, 1});
+            digest.update({reinterpret_cast<const std::uint8_t*>(text.data()), text.size()});
+            return "objectives.authored." + digest_text(digest.finish()).substr(0, 16);
+        }
+
         // cres.dll strings are Windows-1252 bytes, typed lines are already UTF-8.
         std::string display_text(const std::string& text)
         {
@@ -44,7 +56,8 @@ namespace OpenBlood2
             return text;
         }
     } // namespace
-    int draw_messages(CMessageMgr& messages, float time, const std::string* editor, const std::string& notice)
+    int draw_messages(CMessageMgr& messages, float time, const std::string* editor, const std::string& notice,
+                      ImFont* localized_font, const Localization* localization, const Resources* resources)
     {
         int y = 0;
         const auto lines = messages.Draw(time, &y);
@@ -52,18 +65,40 @@ namespace OpenBlood2
         auto* font = ImGui::GetFont();
         // Drawn before the status bar, as PostUpdate drew m_MessageMgr before m_NewStatusBar.
         auto* list = ImGui::GetBackgroundDrawList();
-        const auto line = [&](const std::string& source, int x, int top)
+        const auto line = [&](const std::string& source, int x, int top, ImFont* face)
         {
             const auto text = display_text(source);
-            list->AddText(font, float(CMessageMgr::kFontHeight), {viewport->Pos.x + x, viewport->Pos.y + top},
+            list->AddText(face, float(CMessageMgr::kFontHeight), {viewport->Pos.x + x, viewport->Pos.y + top},
                           IM_COL32(255, 255, 255, 255), text.c_str(), text.c_str() + text.size());
         };
+        const bool translated = localization && localized_font && localization->language() != Language::English;
+        const bool stock = translated && (!resources || !localization_resource_overridden(*resources, "cres.dll"));
         for (const auto& l : lines)
-            line(l.text, l.x, l.y);
+        {
+            std::string translated_line;
+            if (translated && l.source.builtin == ConsoleTextSource::Builtin::BombOverhold)
+                translated_line = localization->text("hud.bomb_overhold");
+            else if (stock && l.source.resource)
+            {
+                constexpr std::string_view pickups[]{"hud.picked_up", "hud.pickup_unavailable", "hud.pickup_no_slot"};
+                if (l.source.resource >= 260 && l.source.resource <= 262)
+                {
+                    if (!l.source.argument.empty())
+                    {
+                        const auto name = localization->text(l.source.argument_resource, l.source.argument);
+                        translated_line = localization->format(pickups[l.source.resource - 260], {}, {name});
+                    }
+                }
+                else
+                    translated_line = localization->text(l.source.resource);
+            }
+            const bool use_translation = !translated_line.empty() && translated_line != l.text;
+            line(use_translation ? translated_line : l.text, l.x, l.y, use_translation ? localized_font : font);
+        }
         int count = int(lines.size());
         if (!notice.empty())
         {
-            line(notice, 1, y);
+            line(notice, 1, y, localized_font ? localized_font : font);
             y += CMessageMgr::kFontHeight;
             ++count;
         }
@@ -71,10 +106,11 @@ namespace OpenBlood2
         {
             // CInputLine::Draw: "SAY:" + text, then a cursor when modf(GetTime()) > .5.
             double whole = 0;
-            auto text = "SAY:" + *editor;
+            const auto prefix = translated ? localization->text("hud.say", "SAY:") : "SAY:";
+            auto text = std::string(prefix) + (prefix != "SAY:" ? " " : "") + *editor;
             if (std::modf(double(time), &whole) > .5)
                 text += '_';
-            line(text, 1, y);
+            line(text, 1, y, prefix != "SAY:" ? localized_font : font);
             ++count;
         }
         return count;
@@ -184,49 +220,89 @@ namespace OpenBlood2
         }
         return true;
     }
+    namespace
+    {
+        std::uint8_t* map_hud_texture(SDL_GPUDevice* device, SDL_GPUTexture*& texture, SDL_GPUTransferBuffer*& transfer,
+                                      unsigned width, unsigned height, std::string& error)
+        {
+            if (!texture)
+            {
+                SDL_GPUTextureCreateInfo info{};
+                info.type = SDL_GPU_TEXTURETYPE_2D;
+                info.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
+                info.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
+                info.width = width;
+                info.height = height;
+                info.layer_count_or_depth = 1;
+                info.num_levels = 1;
+                info.sample_count = SDL_GPU_SAMPLECOUNT_1;
+                texture = SDL_CreateGPUTexture(device, &info);
+            }
+            if (!transfer)
+            {
+                SDL_GPUTransferBufferCreateInfo info{};
+                info.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+                info.size = width * height * 4;
+                transfer = SDL_CreateGPUTransferBuffer(device, &info);
+            }
+            auto* data = texture && transfer ? SDL_MapGPUTransferBuffer(device, transfer, true) : nullptr;
+            if (!data)
+                error = SDL_GetError();
+            return static_cast<std::uint8_t*>(data);
+        }
+
+        bool submit_hud_texture(SDL_GPUDevice* device, SDL_GPUTexture* texture, SDL_GPUTransferBuffer* transfer,
+                                unsigned width, unsigned height, std::string& error)
+        {
+            SDL_UnmapGPUTransferBuffer(device, transfer);
+            auto* commands = SDL_AcquireGPUCommandBuffer(device);
+            if (!commands)
+            {
+                error = SDL_GetError();
+                return false;
+            }
+            auto* pass = SDL_BeginGPUCopyPass(commands);
+            if (!pass)
+            {
+                SDL_CancelGPUCommandBuffer(commands);
+                error = SDL_GetError();
+                return false;
+            }
+            SDL_GPUTextureTransferInfo source{};
+            source.transfer_buffer = transfer;
+            source.pixels_per_row = width;
+            source.rows_per_layer = height;
+            SDL_GPUTextureRegion destination{};
+            destination.texture = texture;
+            destination.w = width;
+            destination.h = height;
+            destination.d = 1;
+            SDL_UploadToGPUTexture(pass, &source, &destination, true);
+            SDL_EndGPUCopyPass(pass);
+            if (SDL_SubmitGPUCommandBuffer(commands))
+                return true;
+            error = SDL_GetError();
+            return false;
+        }
+    } // namespace
+
     HudRenderer::~HudRenderer()
     {
         if (device_)
             SDL_WaitForGPUIdle(device_);
-        if (texture_)
-            SDL_ReleaseGPUTexture(device_, texture_);
-        if (transfer_)
-            SDL_ReleaseGPUTransferBuffer(device_, transfer_);
+        for (auto* texture : {texture_, communication_texture_})
+            if (texture)
+                SDL_ReleaseGPUTexture(device_, texture);
+        for (auto* transfer : {transfer_, communication_transfer_})
+            if (transfer)
+                SDL_ReleaseGPUTransferBuffer(device_, transfer);
     }
     bool HudRenderer::upload(std::string& error)
     {
         constexpr unsigned width = atlas_width, height = atlas_height;
-        if (!texture_)
-        {
-            SDL_GPUTextureCreateInfo info{};
-            info.type = SDL_GPU_TEXTURETYPE_2D;
-            info.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
-            info.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
-            info.width = width;
-            info.height = height;
-            info.layer_count_or_depth = 1;
-            info.num_levels = 1;
-            info.sample_count = SDL_GPU_SAMPLECOUNT_1;
-            texture_ = SDL_CreateGPUTexture(device_, &info);
-        }
-        if (!transfer_)
-        {
-            SDL_GPUTransferBufferCreateInfo info{};
-            info.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
-            info.size = width * height * 4;
-            transfer_ = SDL_CreateGPUTransferBuffer(device_, &info);
-        }
-        if (!texture_ || !transfer_)
-        {
-            error = SDL_GetError();
-            return false;
-        }
-        auto* data = static_cast<std::uint8_t*>(SDL_MapGPUTransferBuffer(device_, transfer_, true));
+        auto* data = map_hud_texture(device_, texture_, transfer_, width, height, error);
         if (!data)
-        {
-            error = SDL_GetError();
             return false;
-        }
         std::fill_n(data, width * height * 4, 0);
         unsigned offset = 0;
         for (const auto* tab : status_->tabs())
@@ -333,9 +409,36 @@ namespace OpenBlood2
                         data[to + 3] = 0;
                 }
         }
+        // The original heading is painted into the stock 250x150 PCX. Retouch only its strip
+        // with the adjacent unlettered texture, leaving the page, skull and border in place.
+        const auto* objectives = status_->objectives_page();
+        HudSurface localized_page;
+        if (objectives && objectives->width == 250 && objectives->height == 150 && localization_ && localized_font_ &&
+            resources_ && !localization_resource_overridden(*resources_, "interface/objectives/objectives.pcx"))
+        {
+            const auto heading = localization_->text("objectives.heading");
+            if (!heading.empty() && localized_font_->supports(heading))
+            {
+                localized_page = *objectives;
+                constexpr HudRect caption{46, 9, 171, 29};
+                constexpr HudRect clean_strip{174, caption.top, 235, caption.bottom};
+                for (int x = caption.left; x < caption.right; x += clean_strip.right - clean_strip.left)
+                {
+                    auto source = clean_strip;
+                    source.right = std::min(source.right, source.left + caption.right - x);
+                    hud_blit(localized_page, *objectives, &source, x, caption.top, true, hud_magenta);
+                }
+                const int label_width = std::min(caption.right - caption.left,
+                    localized_font_->text_width(heading, caption.bottom - caption.top));
+                const int left = (caption.left + caption.right - label_width) / 2;
+                localized_font_->draw(localized_page, heading, {left, caption.top, left + label_width, caption.bottom},
+                                      0xd7a569);
+                objectives = &localized_page;
+            }
+        }
         // The objectives page, its icon and the power bar: m_hTransColor (magenta) is transparent.
         for (auto [surface, x0, limit] :
-             {std::tuple{status_->objectives_page(), 0u, objectives_icon_x},
+             {std::tuple{objectives, 0u, objectives_icon_x},
               std::tuple{status_->objectives_icon(), objectives_icon_x, power_x - objectives_icon_x},
               std::tuple{status_->power_bar(), power_x, width - power_x}})
         {
@@ -357,48 +460,139 @@ namespace OpenBlood2
                         data[to + 3] = 0;
                 }
         }
-        SDL_UnmapGPUTransferBuffer(device_, transfer_);
-        auto* commands = SDL_AcquireGPUCommandBuffer(device_);
-        if (!commands)
-        {
-            error = SDL_GetError();
+        if (!submit_hud_texture(device_, texture_, transfer_, width, height, error))
             return false;
-        }
-        auto* pass = SDL_BeginGPUCopyPass(commands);
-        if (!pass)
-        {
-            SDL_CancelGPUCommandBuffer(commands);
-            error = SDL_GetError();
-            return false;
-        }
-        SDL_GPUTextureTransferInfo source{};
-        source.transfer_buffer = transfer_;
-        source.pixels_per_row = width;
-        source.rows_per_layer = height;
-        SDL_GPUTextureRegion destination{};
-        destination.texture = texture_;
-        destination.w = width;
-        destination.h = height;
-        destination.d = 1;
-        SDL_UploadToGPUTexture(pass, &source, &destination, true);
-        SDL_EndGPUCopyPass(pass);
-        if (!SDL_SubmitGPUCommandBuffer(commands))
-        {
-            error = SDL_GetError();
-            return false;
-        }
         uploaded_revision_ = status_->revision;
         return true;
     }
+    void HudRenderer::read_hud_strings(const Resources& resources)
+    {
+        if (hud_strings_read_)
+            return;
+        hud_strings_read_ = true;
+        std::vector<std::uint8_t> bytes;
+        const auto* dll = resources.find("cres.dll");
+        if (dll && dll->size <= 32 * 1024 * 1024 && resources.read("cres.dll", bytes, hud_strings_error_) &&
+            read_string_resources(bytes, hud_strings_, hud_strings_error_))
+            return;
+        if (hud_strings_error_.empty())
+            hud_strings_error_ = "cres.dll item names unavailable";
+    }
+
+    bool HudRenderer::draw_communication(const CommLinkHudState& h, const Resources& resources, std::string& error)
+    {
+        if (h.portrait.empty())
+            return true;
+        constexpr unsigned max_width = 4096, max_height = 128;
+        constexpr int margin = 10, max_lines = 4;
+        const auto* viewport = ImGui::GetMainViewport();
+        const unsigned width = unsigned(std::clamp(viewport->Size.x, 0.f, float(max_width)));
+        if (width <= 2 * margin)
+            return true;
+        const auto language = localization_ && localized_font_ ? localization_->language() : Language::English;
+        if (!communication_canvas_ || communication_resources_ != &resources)
+        {
+            communication_resources_ = &resources;
+            communication_canvas_ = std::make_unique<HudCanvas>(resources);
+            communication_font_ = {};
+            communication_canvas_->load_font("interface/commlink/comm_font_1.pcx", "interface/commlink/comm_font_1.fnt",
+                                             communication_font_);
+            communication_font_.space_width = std::max(1u, communication_font_.height / 4);
+            communication_width_ = 0;
+        }
+        if (communication_width_ != width || communication_language_ != language || drawn_communication_ != h)
+        {
+            // CCommLink::Draw paints the magenta-keyed face and the four-line text strip at y=10.
+            communication_canvas_->error.clear();
+            const auto* face = communication_canvas_->CreateSurfaceFromBitmap(h.portrait.c_str());
+            const int face_width = face ? int(face->width) : 0;
+            const unsigned height = std::min(max_height, std::max({1u, face ? face->height : 0u,
+                                                                 max_lines * communication_font_.height}));
+            HudSurface strip{width, height, std::vector<std::uint8_t>(std::size_t(width) * height * 4)};
+            if (face)
+            {
+                const int x = int(face_width * std::clamp(h.portrait_ratio, 0.f, 1.f)) - face_width;
+                hud_blit(strip, *face, nullptr, x, 0, true, hud_magenta);
+            }
+            const int left = face_width + margin, right = int(width) - margin;
+            if (communication_font_.surface && left < right && h.text_ratio > 0)
+            {
+                std::string_view text = h.text;
+                const auto* original = conversation_text(h.file);
+                if (language != Language::English && original && text == original &&
+                    !localization_resource_overridden(resources, h.file))
+                {
+                    const auto value = localization_->dialogue(h.file);
+                    if (!value.empty() && localized_font_->supports(value))
+                        text = value;
+                }
+                const auto continuation = [](unsigned char c) { return (c & 0xc0) == 0x80; };
+                const auto count = std::ranges::count_if(text, [&](unsigned char c) { return !continuation(c); });
+                const auto shown = std::size_t(double(count) * std::clamp(h.text_ratio, 0.f, 1.f));
+                auto boundary = h.text_from_start ? shown : std::size_t(count) - shown;
+                std::size_t at = 0;
+                while (at < text.size() && (boundary || continuation(text[at])))
+                    if (!continuation(text[at++]))
+                        --boundary;
+                const LocalizedFont::TextReveal reveal = h.text_from_start ? LocalizedFont::TextReveal{0, at}
+                                                                          : LocalizedFont::TextReveal{at, text.size()};
+                const int rows = std::min(int(height), max_lines * int(communication_font_.height));
+                if (localized_font_ && *localized_font_)
+                {
+                    localized_font_->draw_wrapped(strip, text, {left, 0, right, rows}, int(communication_font_.height),
+                                                 0xffffff, &communication_font_, reveal);
+                    // Keep the PCX pixels and color the Unicode coverage with the original comm_font_1 ink.
+                    for (unsigned y = 0; y < unsigned(rows); ++y)
+                        for (int x = left; x < right; ++x)
+                        {
+                            auto* pixel = strip.rgba.data() + (std::size_t(y) * width + x) * 4;
+                            if (!pixel[3] && pixel[0])
+                            {
+                                pixel[3] = pixel[0];
+                                pixel[0] = 198;
+                                pixel[1] = 165;
+                                pixel[2] = 132;
+                            }
+                        }
+                }
+                else
+                    communication_font_.draw_format(strip, text.substr(reveal.first, reveal.last - reveal.first), left,
+                                                    0, right - left);
+            }
+            auto* bytes = map_hud_texture(device_, communication_texture_, communication_transfer_, max_width,
+                                          max_height, error);
+            if (!bytes)
+                return false;
+            std::ranges::copy(strip.rgba, bytes);
+            if (!submit_hud_texture(device_, communication_texture_, communication_transfer_, width, height, error))
+                return false;
+            drawn_communication_ = h;
+            communication_width_ = width;
+            communication_height_ = height;
+            communication_language_ = language;
+        }
+        const ImVec2 p{viewport->Pos.x, viewport->Pos.y + margin};
+        ImGui::GetBackgroundDrawList()->AddImage((ImTextureID)(intptr_t)communication_texture_, p,
+            {p.x + communication_width_, p.y + communication_height_}, {0, 0},
+            {float(communication_width_) / max_width, float(communication_height_) / max_height});
+        return true;
+    }
+
     bool HudRenderer::draw(const HudState& h, const Resources& resources, std::string& error)
     {
         error.clear();
         if (!h.visible && !h.crosshair_visible)
-            return true;
+            return draw_communication(h.communication, resources, error);
         const auto* viewport = ImGui::GetMainViewport();
         if (viewport->Size.x < 135 || viewport->Size.y < 100)
             return true;
-        if (!status_ || resources_ != &resources)
+        const auto language = localization_ && localized_font_ ? localization_->language() : Language::English;
+        const bool translated = language != Language::English;
+        const bool locale_changed = language != language_;
+        const bool stock = translated && !localization_resource_overridden(resources, "cres.dll");
+        language_ = language;
+        const bool recreate = !status_ || resources_ != &resources;
+        if (recreate)
         {
             status_ = std::make_unique<CNewStatusBar>(resources);
             resources_ = &resources;
@@ -407,6 +601,9 @@ namespace OpenBlood2
             item_shows_ = h.item_shows;
             // A new status bar applies the shell's current objectives and power bar request.
             objective_updates_ = power_requests_ = 0;
+            hud_strings_ = {};
+            hud_strings_error_.clear();
+            hud_strings_read_ = false;
             world_revision_ = h.world_revision;
             crosshair_ = nullptr;
             if (!status_->Init())
@@ -438,33 +635,99 @@ namespace OpenBlood2
             status_->Reset();
             world_revision_ = h.world_revision;
         }
-        if (h.item_messages != item_messages_)
+        const bool new_items = h.item_messages != item_messages_;
+        if (new_items || locale_changed)
         {
             // One original UpdateInv per SMSG_ITEMCHANGED; names resolve cres.dll IDS_ITEM_*.
             auto items = h.items;
             for (auto* item : {&items.current, &items.previous, &items.next})
                 if (*item && (*item)->name_id)
                 {
-                    if (!item_names_read_)
-                    {
-                        item_names_read_ = true;
-                        std::vector<std::uint8_t> bytes;
-                        std::string read_error;
-                        if (const auto* dll = resources.find("cres.dll");
-                            !dll || dll->size > 32 * 1024 * 1024 || !resources.read("cres.dll", bytes, read_error) ||
-                            !read_string_resources(bytes, item_names_, read_error))
-                            status_->item_error = read_error.empty() ? "cres.dll item names unavailable" : read_error;
-                    }
-                    const auto name = item_names_.strings.find((*item)->name_id);
-                    (*item)->name = name != item_names_.strings.end() ? name->second : std::string{};
+                    read_hud_strings(resources);
+                    if (!hud_strings_error_.empty())
+                        status_->item_error = hud_strings_error_;
+                    const auto name = hud_strings_.strings.find((*item)->name_id);
+                    (*item)->name = name != hud_strings_.strings.end() ? name->second : std::string{};
                 }
-            status_->UpdateInv(items, h.item_shows != item_shows_, h.time);
+            CNewStatusBar::TextPainter paint_name;
+            if (stock && items.current && items.current->name_id)
+            {
+                const auto value = localization_->text(items.current->name_id);
+                if (!value.empty() && value != items.current->name && localized_font_->supports(value))
+                    paint_name = [font = localized_font_, value](HudSurface& surface, int)
+                    {
+                        // Rasterize a grayscale mask and carry its coverage into the keyed atlas as alpha.
+                        std::fill(surface.rgba.begin(), surface.rgba.end(), 0);
+                        font->draw(surface, value, {0, 0, int(surface.width), int(surface.height)}, 0xffffff);
+                        for (std::size_t i = 0; i < surface.rgba.size(); i += 4)
+                        {
+                            surface.rgba[i + 3] = surface.rgba[i];
+                            std::fill_n(surface.rgba.begin() + i, 3, 255);
+                        }
+                    };
+            }
+            status_->UpdateInv(items, h.item_shows != item_shows_, h.time, paint_name, new_items);
             item_messages_ = h.item_messages;
             item_shows_ = h.item_shows;
         }
-        if (h.objective_updates != objective_updates_)
+        const bool new_objective = h.objective_updates != objective_updates_;
+        if (new_objective || locale_changed || (recreate && translated))
         {
-            status_->UpdateObjectives(h.objectives_valid, h.objectives_title, h.objectives_text);
+            CNewStatusBar::TextPainter paint_title, paint_body;
+            if (translated)
+            {
+                std::string_view title, body;
+                auto resource = h.objectives_resource;
+                if (!h.objectives_valid)
+                    title = localization_->text("objectives.empty");
+                else if (!resource)
+                {
+                    const auto key = authored_objective_key(h.objectives_title, h.objectives_text);
+                    title = localization_->text(key + ".title");
+                    body = localization_->text(key + ".text");
+                    if (stock && title.empty() && body.empty() && !resources.demo())
+                    {
+                        // Client save data contains only the resolved English pair. Recover the
+                        // original resource number without changing the save payload or shell state.
+                        read_hud_strings(resources);
+                        const auto& strings = hud_strings_.strings;
+                        for (auto it = strings.lower_bound(5000); it != strings.end() && it->first < 6000; ++it)
+                            if (it->second == h.objectives_title)
+                            {
+                                const auto text = strings.find(it->first + 1000);
+                                if (text != strings.end() && text->second == h.objectives_text)
+                                {
+                                    resource = it->first - 4999;
+                                    break;
+                                }
+                            }
+                    }
+                }
+                if (stock && resource)
+                {
+                    title = localization_->text(4999 + resource);
+                    body = localization_->text(5999 + resource);
+                }
+                if (!title.empty() && title != h.objectives_title && localized_font_->supports(title))
+                    paint_title = [font = localized_font_, title](HudSurface& surface, int font_height)
+                    {
+                        const int height = std::min(font_height, OBJTAB_TEXT_TOP - OBJTAB_TITLE_TOP);
+                        const int width = std::min(OBJTAB_TEXT_WIDTH, font->text_width(title, height));
+                        const int left = OBJTAB_TITLE_CENTER - width / 2;
+                        font->draw(surface, title, {left, OBJTAB_TITLE_TOP, left + width, OBJTAB_TITLE_TOP + height},
+                                   0xffffff);
+                    };
+                if (!body.empty() && body != h.objectives_text && localized_font_->supports(body))
+                    paint_body = [font = localized_font_, body](HudSurface& surface, int font_height)
+                    {
+                        font->draw_wrapped(surface, body,
+                                           {OBJTAB_TEXT_LEFT, OBJTAB_TEXT_TOP, OBJTAB_TEXT_LEFT + OBJTAB_TEXT_WIDTH,
+                                            int(surface.height) - 7},
+                                           font_height, 0xffffff);
+                    };
+            }
+            status_->UpdateObjectives(h.objectives_valid, h.objectives_title, h.objectives_text, paint_title, paint_body,
+                                      new_objective);
             objective_updates_ = h.objective_updates;
         }
         if (h.power_requests != power_requests_)
@@ -571,6 +834,8 @@ namespace OpenBlood2
                                {float(slot + surface->width) / atlas_width, float(surface->height) / atlas_height});
             }
         }
+        if (!draw_communication(h.communication, resources, error))
+            return false;
         if (h.crosshair_visible)
         {
             const auto rect = original_crosshair_rect({0, 0, int(viewport->Size.x), int(viewport->Size.y)},

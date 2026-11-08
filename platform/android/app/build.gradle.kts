@@ -2,8 +2,8 @@ plugins {
     id("com.android.application")
 }
 
-// Supplied by cmake/Packaging.cmake: native libraries, the pinned SDL Java
-// sources and the version derived from project(VERSION).
+// Supplied by cmake/Packaging.cmake: native libraries, language assets, the
+// pinned SDL Java sources and the version derived from project(VERSION).
 fun blood2(name: String): String =
     providers.gradleProperty("blood2.$name").orNull
         ?: error("Missing -Pblood2.$name; build through the CMake blood2_apk target")
@@ -43,6 +43,7 @@ android {
         getByName("main") {
             java.srcDir(blood2("sdlJava"))
             jniLibs.srcDir(blood2("jniLibs"))
+            assets.directories.add(blood2("assets"))
         }
     }
 

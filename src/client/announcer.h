@@ -2,7 +2,9 @@
 #include "engine/resources.h"
 #include "engine/string_resources.h"
 #include "game/player_messages.h"
+#include <functional>
 #include <span>
+#include <utility>
 
 namespace OpenBlood2
 {
@@ -16,10 +18,13 @@ namespace OpenBlood2
     class ClientAnnouncer
     {
       public:
-        Conversation bloodbath(const BloodbathStart&, const Resources&);
+        using TextLookup = std::function<std::string_view(unsigned)>;
+        void set_translations(TextLookup lookup) { lookup_ = std::move(lookup); }
+        // Captions are presentation only. Conversation::text retains its original timing input.
+        Conversation bloodbath(const BloodbathStart&, const Resources&, std::string* caption = nullptr);
         bool frag(std::uint16_t index, const AnnouncerPlayer& killer, const AnnouncerPlayer& victim, bool suicide,
-                  const Resources&, Conversation&);
-        bool finish(const FinishHimVoice&, const Resources&, Conversation&);
+                  const Resources&, Conversation&, std::string* caption = nullptr);
+        bool finish(const FinishHimVoice&, const Resources&, Conversation&, std::string* caption = nullptr);
         bool player_notice(std::string_view name, bool joined, const Resources&, std::string& out, DBYTE team = 0);
         bool flag_notice(CTFEventKind, std::string_view capturer, DBYTE team, bool local, const Resources&,
                          std::string& out);
@@ -30,9 +35,12 @@ namespace OpenBlood2
 
       private:
         StringResources strings_;
+        TextLookup lookup_;
         bool loaded_ = false;
         void load(const Resources&);
+        bool translated(unsigned, std::span<const std::string_view> names, std::string& out) const;
+        std::string original_team_name(DBYTE team, const Resources&);
         bool message(std::uint32_t resource, std::string_view fallback, std::string_view file,
-                     std::span<const std::string_view> names, const Resources&, Conversation&);
+                     std::span<const std::string_view> names, const Resources&, Conversation&, std::string* caption);
     };
 } // namespace OpenBlood2

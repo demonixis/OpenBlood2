@@ -18,8 +18,8 @@ namespace OpenBlood2
             if (frame >= 36 && frame < 216)
                 return frame == 40;
             const auto p = phase(frame);
-            return p == 2 || p == 4 || p == 8 || p == 10 || p == 15 || p == 19 || p == 23 || p == 27 || p == 32 ||
-                   p == 54 || p == 61 || p == 63 || p == 72;
+            return p == 2 || p == 4 || p == 8 || p == 10 || p == 15 || p == 19 || p == 23 || p == 27 || p == 32 || p == 33 ||
+                   p == 34 || p == 54 || p == 61 || p == 63 || p == 78 || p == 81;
         }
         bool before(std::uint64_t frame, SDL_Window* window, GameSession& game, const Menu& menu, MenuInput& input,
                     const MenuAudio& audio, std::string& error)
@@ -86,6 +86,9 @@ namespace OpenBlood2
                 return fail("promotion retained menu ambience");
             if (p == 7 && (menu.promotion != MenuPromotion::None || menu.selected != 0))
                 return fail("promotion return/selection");
+            if (p == 9 && (menu.page != MenuPage::Options || menu.settings.language != Language::French ||
+                           menu.items[menu.selected].setting != menu_language_setting))
+                return fail("Options language selection");
             if (p == 10 && menu.page != MenuPage::Display)
                 return fail("display page");
             if (p == 15 && (menu.page != MenuPage::Audio || menu.settings.sound_volume != 45))
@@ -104,6 +107,10 @@ namespace OpenBlood2
                             game.server.GetVarValueFloat(game.server.GetGameConVar("GAME_DIFFICULTY")) != 2 ||
                             !input.loading_wait))
                 return fail("hard Caleb new game");
+            if (p == 34 && (!game.client_shell.third_person || game.client_shell.control_notice != "Troisième personne"))
+                return fail("French third-person notice");
+            if (p == 35 && (game.client_shell.third_person || game.client_shell.control_notice != "Première personne"))
+                return fail("French first-person notice");
             if (p == 43 && (menu.active || game.objects.time() != frozen_time))
                 return fail("resume catch-up");
             if (p == 44 && game.objects.time() <= frozen_time)
@@ -126,7 +133,7 @@ namespace OpenBlood2
                             game.server.GetVarValueFloat(game.server.GetGameConVar("GAME_DIFFICULTY")) != 0 ||
                             !input.loading_wait))
                 return fail("new game after ending");
-            if (p == 72)
+            if (p == 81)
             {
                 if (menu.promotion != MenuPromotion::Info || !menu.promotion_exit)
                     return fail("quit promotion");
@@ -148,8 +155,13 @@ namespace OpenBlood2
                     key(SDL_SCANCODE_DOWN);
                     key(SDL_SCANCODE_DOWN);
                     key(SDL_SCANCODE_RETURN);
+                    key(SDL_SCANCODE_UP); // CHEATS, then LANGUAGE.
+                    key(SDL_SCANCODE_UP);
+                    key(SDL_SCANCODE_RIGHT);
                     break;
                 case 9:
+                    key(SDL_SCANCODE_DOWN); // LANGUAGE -> CHEATS -> Display.
+                    key(SDL_SCANCODE_DOWN);
                     key(SDL_SCANCODE_RETURN);
                     key(SDL_SCANCODE_LEFT);
                     key(SDL_SCANCODE_RIGHT);
@@ -217,6 +229,10 @@ namespace OpenBlood2
                 case 68:
                     key(SDL_SCANCODE_SPACE);
                     break;
+                case 33:
+                case 34:
+                    key(SDL_SCANCODE_C);
+                    break;
                 case 35:
                     key(SDL_SCANCODE_ESCAPE);
                     break;
@@ -282,20 +298,25 @@ namespace OpenBlood2
                     key(SDL_SCANCODE_UP);
                     key(SDL_SCANCODE_RETURN);
                     break;
-                case 70:
+                case 69:
+                    if (!show_authored_objective_for_smoke(game, 0, error))
+                        return false;
+                    key(SDL_SCANCODE_TAB);
+                    break;
+                case 79:
                     key(SDL_SCANCODE_ESCAPE);
                     break;
-                case 71:
+                case 80:
                     key(SDL_SCANCODE_UP);
                     key(SDL_SCANCODE_RETURN);
                     break;
-                case 73:
+                case 82:
                     key(SDL_SCANCODE_SPACE);
                     break;
                 default:
                     break;
             }
-            return p <= 73 || fail("quit was not consumed");
+            return p <= 82 || fail("quit was not consumed");
         }
     };
 } // namespace OpenBlood2

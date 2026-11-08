@@ -26,6 +26,12 @@ not exist yet) in `app/setup_screen.{h,cpp}`, over the headless `app/game_setup.
 - The demo's 41-pixel menu font fits six rows; pages with more rows (Options with SETUP, and
   VR) share the list height evenly instead of failing.
 
+The language picker works before an installation is selected and shares the game's
+`preferences.cfg` choice. It applies immediately and leaves the installation and mod
+selections in place. Setup labels and guidance read `[setup]` in the selected INI, with
+the existing English text as fallback. File paths and lower-level errors are shown as
+reported. In the in-game setup, Esc or B first closes an open language list.
+
 ## Installations
 
 An installation is a folder and an edition: retail with `BLOOD2.REZ`, Nightmares with

@@ -247,6 +247,7 @@ namespace OpenBlood2
             const auto& slot_info = info(slot);
             MenuSaveRow out;
             out.loadable = slot_info.state != SaveSlotInfo::State::Empty;
+            out.unreadable = slot_info.state == SaveSlotInfo::State::Unreadable;
             if (slot_info.state == SaveSlotInfo::State::Ready)
                 out.name = slot_info.meta.display_name;
             else if (slot_info.state == SaveSlotInfo::State::Unreadable)

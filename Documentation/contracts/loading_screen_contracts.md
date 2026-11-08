@@ -35,7 +35,14 @@ stretched to the screen. Fonts are `stat_font_1` (title, bottom line) and
   y = 480 - h, is a random `IDS_LOADING_MESSAGE_1..20` while loading and the pulsing
   `Press a key to continue...` while waiting (the source's one-second red/tan
   alternation, `DrawSolid`). `esc01.wav` plays once per wait (through the menu mixer).
-- Strings come from `cres.dll` as data. IDs above 34 or missing strings fail.
+- Original strings come from `cres.dll` as data. IDs above 34 or missing original strings fail.
+
+The language catalogs translate the 34 retail briefings by original resource ID.
+Translated titles and bodies reuse the mounted bitmap glyphs where available and
+fill gaps with the bundled Unicode font. The original artwork, text positions,
+line breaks, indents and 300-pixel body width are preserved. Missing translations
+or unavailable glyphs use the original English text. Replacement `cres.dll`
+resources from a mod retain precedence.
 
 CoolFont is unavailable, so `HudFont::draw_format` and `draw_solid` are adapters:
 words wrap before the width, `|` breaks a line and `~` indents by four spaces.

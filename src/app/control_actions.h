@@ -1,5 +1,6 @@
 #pragma once
 #include "app/movement_controls.h"
+#include "game/localized_font.h"
 #include "game/menu.h"
 #include "game/original/BloodShells.h"
 
@@ -8,7 +9,8 @@ namespace OpenBlood2
     // Shared by ordinary play and diagnostic play. Preferences are owned by the frontend;
     // commands still work without a menu in the diagnostic adapter.
     inline void apply_control_actions(MovementControls& controls, CBloodClientShell& shell, bool blocked,
-                                      MenuSettings* settings = nullptr)
+                                      MenuSettings* settings = nullptr, const Localization* localization = nullptr,
+                                      const LocalizedFont* font = nullptr)
     {
         if (settings)
         {
@@ -18,11 +20,18 @@ namespace OpenBlood2
             shell.m_nCrosshairOriginalNum = DBYTE(settings->crosshair_number);
         }
         if (controls.sample_command(InputAction::ThirdPerson, blocked))
-            shell.ToggleThirdPerson();
+        {
+            const auto key = shell.third_person ? TextKey::FirstPerson : TextKey::ThirdPerson;
+            const auto notice = localization ? localization->text(key, {}) : std::string_view{};
+            shell.ToggleThirdPerson(!notice.empty() && font && font->supports(notice) ? notice : std::string_view{});
+        }
         if (controls.sample_command(InputAction::RunLock, blocked))
         {
             controls.run_lock = !controls.run_lock;
-            shell.SetControlNotice(controls.run_lock ? "Auto run ON" : "Auto run OFF");
+            const std::string_view english = controls.run_lock ? "Auto run ON" : "Auto run OFF";
+            const auto key = controls.run_lock ? "hud.auto_run_on" : "hud.auto_run_off";
+            const auto text = localization ? localization->text(key, english) : english;
+            shell.SetControlNotice(std::string(font && font->supports(text) ? text : english));
             if (settings)
                 settings->run_lock = controls.run_lock;
         }

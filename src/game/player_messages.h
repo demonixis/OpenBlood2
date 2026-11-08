@@ -44,9 +44,21 @@ namespace OpenBlood2
         } kind;
         DVector displacement{}; // Grab: the player's accepted movement this frame.
     };
+    struct ConsoleTextSource
+    {
+        enum class Builtin : std::uint8_t
+        {
+            None,
+            BombOverhold,
+        };
+        std::uint32_t resource = 0, argument_resource = 0;
+        std::string argument;
+        Builtin builtin = Builtin::None;
+    };
     struct PlayerText
     {
         std::string text; // Bounded local CMSG_PLAYERMESSAGE / SMSG_CONSOLEMESSAGE_ALL.
+        ConsoleTextSource source{}; // Local presentation metadata. The network carries the original literal.
     };
     struct PlayerDetonate
     {

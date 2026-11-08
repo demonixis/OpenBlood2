@@ -29,6 +29,10 @@ namespace OpenBlood2
         CVoiceMgr manager;
         CCommLink communication;
         ClientAnnouncer announcer;
+        std::string_view announcer_caption() const
+        {
+            return communication.text_level ? std::string_view(announcer_caption_) : std::string_view{};
+        }
         struct Notice
         {
             std::string text;
@@ -77,6 +81,8 @@ namespace OpenBlood2
         bool set_time(double, std::string&);
         std::vector<Notice> notices_;
         std::vector<Net::RosterPlayer> known_players_;
+        std::string announcer_caption_;
+        void start_announcement(const Conversation&, std::string caption);
         void notice(std::string);
     };
 } // namespace OpenBlood2

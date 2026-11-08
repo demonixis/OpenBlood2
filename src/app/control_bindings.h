@@ -23,6 +23,7 @@ namespace OpenBlood2
         unsigned string_id;
         std::string_view literal;
         std::optional<InputAction> action;
+        std::string_view localization_key{};
     };
     inline constexpr std::array<ControlRow, 49> control_rows{{
         {705, {}, InputAction::MoveForward},  // Forward
@@ -68,13 +69,13 @@ namespace OpenBlood2
         {747, {}, InputAction::WeaponSlot9},
         {748, {}, InputAction::WeaponSlot10}, // Weapon_9 (key 0)
         // Replacement rows: actions of the action layer that the original menu did not list.
-        {0, "Run Latch", InputAction::RunLatch},
-        {0, "Flashlight", InputAction::Flashlight},
-        {0, "Medkit", InputAction::Medkit},
-        {0, "Binoculars", InputAction::Binoculars},
-        {0, "Night Goggles", InputAction::NightGoggles},
-        {0, "The Eye", InputAction::TheEye},
-        {0, "Third Person", InputAction::ThirdPerson},
+        {0, "Run Latch", InputAction::RunLatch, "control.run_latch"},
+        {0, "Flashlight", InputAction::Flashlight, "control.flashlight"},
+        {0, "Medkit", InputAction::Medkit, "control.medkit"},
+        {0, "Binoculars", InputAction::Binoculars, "control.binoculars"},
+        {0, "Night Goggles", InputAction::NightGoggles, "control.night_goggles"},
+        {0, "The Eye", InputAction::TheEye, "control.the_eye"},
+        {0, "Third Person", InputAction::ThirdPerson, "control.third_person"},
     }};
 
     // Actions the Controls page rebinds; menu/system and analog look bindings stay fixed.
@@ -204,7 +205,8 @@ namespace OpenBlood2
         std::vector<MenuControlRow> rows;
         for (const auto& row : control_rows)
             rows.push_back({row.string_id, std::string(row.literal),
-                            row.action ? control_text(bindings, *row.action) : std::string{}, row.action.has_value()});
+                            row.action ? control_text(bindings, *row.action) : std::string{}, row.action.has_value(),
+                            row.localization_key});
         return rows;
     }
 

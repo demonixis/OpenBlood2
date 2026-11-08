@@ -307,11 +307,17 @@ namespace
         menu.set_controls({});
         // XR sessions add the replacement VR page: the turn step cycles 15..90 degrees then smooth,
         // the aim laser and crosshair toggle. Desktop Options has no VR row; CHEATS is always last.
-        CHECK(menu.items.size() == 7 && menu.items[6].literal == "CHEATS");
+        CHECK(menu.items.size() == 8 && menu.items[6].setting == menu_language_setting &&
+              menu.items.back().literal == "CHEATS");
+        menu.selected = 6;
+        menu.adjust(-1);
+        CHECK(menu.settings.language == Language::Korean && menu.take_command().action == MenuAction::Settings);
+        menu.activate();
+        CHECK(menu.settings.language == Language::English && menu.take_command().action == MenuAction::Settings);
         menu.vr = true;
         menu.build(MenuPage::Options);
-        CHECK(menu.items.size() == 8 && menu.items[6].literal == "VR" && menu.enabled(menu.items[6]) &&
-              menu.items[7].literal == "CHEATS");
+        CHECK(menu.items.size() == 9 && menu.items[6].literal == "VR" && menu.enabled(menu.items[6]) &&
+              menu.items[7].setting == menu_language_setting && menu.items.back().literal == "CHEATS");
         menu.selected = 6;
         menu.activate();
         CHECK(menu.page == MenuPage::Vr && menu.small() && menu.items.size() == 6 &&
@@ -363,7 +369,7 @@ namespace
         // the action rows need a living player in a world; LEVEL cycles the owner's worlds and GO TO
         // LEVEL requests a new game there.
         menu.build(MenuPage::Options);
-        menu.selected = 6;
+        menu.selected = int(menu.items.size()) - 1;
         menu.activate();
         CHECK(menu.page == MenuPage::Cheats && menu.small() && !strcmp(menu.title(), "options.pcx") &&
               menu.items.size() == 10 && menu.items[0].setting == 14 && menu.items[1].setting == 15 &&

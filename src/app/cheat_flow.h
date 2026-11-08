@@ -25,29 +25,39 @@ namespace OpenBlood2
         return levels;
     }
     // Original CCheatMgr::Process message lines (MessageMgr.cpp:886-1000); ALL KEYS is replacement.
-    inline std::string cheat_message(int code, bool state, bool applied, unsigned keys = 0)
+    inline std::string cheat_message(int code, bool state, bool applied, unsigned keys = 0,
+                                     std::string_view* translation_key = nullptr)
     {
+        const auto result = [&](std::string_view key, std::string english)
+        {
+            if (translation_key)
+                *translation_key = key;
+            return english;
+        };
         if (!applied)
-            return "Cheats are unavailable in this game.";
+            return result("menu.cheat_unavailable", "Cheats are unavailable in this game.");
         switch (code)
         {
             case CHEAT_GOD:
-                return state ? "You are a GOD." : "God mode off. Help!";
+                return state ? result("menu.cheat_god_on", "You are a GOD.")
+                             : result("menu.cheat_god_off", "God mode off. Help!");
             case CHEAT_KFA:
-                return "Monolith Rulez...";
+                return result("menu.cheat_weapons", "Monolith Rulez...");
             case CHEAT_AMMO:
-                return "You have full ammo.";
+                return result("menu.cheat_ammo", "You have full ammo.");
             case CHEAT_HEALTH:
-                return "You have full health.";
+                return result("menu.cheat_health", "You have full health.");
             case CHEAT_KILLALLAI:
-                return "...Let Tchernobog sort'em out.";
+                return result("menu.cheat_kill", "...Let Tchernobog sort'em out.");
             case CHEAT_GIVEALLINV:
-                return "You just bought our entire inventory!";
+                return result("menu.cheat_items", "You just bought our entire inventory!");
             case CHEAT_ALLKEYS:
-                return keys ? std::to_string(keys) + (keys == 1 ? " key added." : " keys added.")
-                            : std::string("No other key in this level.");
+                if (!keys)
+                    return result("menu.cheat_no_keys", "No other key in this level.");
+                return keys == 1 ? result("menu.cheat_one_key", "1 key added.")
+                                 : result("menu.cheat_keys", std::to_string(keys) + " keys added.");
             default:
-                return {};
+                return result({}, {});
         }
     }
     struct CheatFlow
@@ -62,7 +72,9 @@ namespace OpenBlood2
         {
             const bool applied = game.client_shell.SendCheatMessage(game.server_shell, DBYTE(request.cheat), true);
             const auto* player = game.server_shell.Player(game.local_client);
-            menu.cheat_status = cheat_message(request.cheat, true, applied, player ? player->cheat_keys_added : 0);
+            menu.cheat_status_count = player ? player->cheat_keys_added : 0;
+            menu.cheat_status = cheat_message(request.cheat, true, applied, menu.cheat_status_count,
+                                              &menu.cheat_status_key);
             ++menu.revision;
             ++sent;
             return applied;
@@ -94,7 +106,7 @@ namespace OpenBlood2
             const bool applied = game.client_shell.SendCheatMessage(game.server_shell, CHEAT_GOD, god);
             refused_player = applied ? nullptr : player->m_hObject;
             refused_state = god;
-            menu.cheat_status = cheat_message(CHEAT_GOD, god, applied);
+            menu.cheat_status = cheat_message(CHEAT_GOD, god, applied, 0, &menu.cheat_status_key);
             ++menu.revision;
             ++sent;
         }

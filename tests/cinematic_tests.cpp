@@ -1,4 +1,6 @@
 #include "audio_fixture.h"
+#include "engine/localization.h"
+#include "game/cinematic_captions.h"
 #include "game/game_settings.h"
 #include "game/original/CinematicTrigger.h"
 #include <SDL3/SDL.h>
@@ -263,6 +265,69 @@ namespace
         CHECK(g.unload_world() && !g.server.message_count() && !g.server.list_count() && !g.server.string_count());
         return true;
     }
+    bool captions(const std::filesystem::path& root)
+    {
+        GameSession g;
+        CHECK(setup(g, root));
+        test_player::Directory directory;
+        directory.files["4caleb1.wav"] = wave();
+        directory.children["sounds"].children["events"].files["cwvoice5.wav"] = wave();
+        test_model::Writer archive;
+        archive.b.resize(168);
+        archive.b[0] = archive.b[62] = archive.b[124] = 13;
+        archive.b[1] = archive.b[63] = archive.b[125] = 10;
+        archive.b[126] = 26;
+        archive.patch(127, 1);
+        const auto [offset, size] = test_player::write_dir(archive, directory);
+        archive.patch(131, offset);
+        archive.patch(135, size);
+        const auto voice_archive = root / "dialogue.rez";
+        {
+            std::ofstream out(voice_archive, std::ios::binary);
+            out.write(reinterpret_cast<const char*>(archive.b.data()), archive.b.size());
+            CHECK(out.good());
+        }
+        std::string error;
+        CHECK(g.resources.mount(voice_archive, error));
+        Localization french, incomplete;
+        CHECK(french.load_catalog(Language::French,
+                                  "[dialogue]\n4caleb1=Tu as le choix.\nsounds.events.cwvoice5=Accès autorisé.", error));
+        CHECK(incomplete.load_catalog(Language::Korean, "[menu]\nlanguage=언어", error));
+        const auto read_caption = [&](const Localization& language)
+        { return cinematic_caption(g.client_session.audio, g.resources, &language); };
+
+        auto line = cine(g, {{"Sound1", std::string("4CALEB1.WAV")}, {"WhoPlaysSound1", std::string("player")}});
+        auto effect = cine(g, {{"Sound1", std::string("long.wav")}});
+        CHECK(line && effect && read_caption(french).english.empty());
+        CHECK(trigger(g, line) && trigger(g, effect) && g.step(.001));
+        const auto voice_id = get(g, line)->sound;
+        CHECK(voice_id && get(g, effect)->sound > voice_id);
+        const auto voice = g.client_session.audio.descriptor(voice_id);
+        CHECK(voice && voice->cinematic && voice->cursor == 0 && !voice->done && voice->frames == 800);
+        CHECK(read_caption(french).translated == "Tu as le choix.");
+        const auto fallback = read_caption(incomplete);
+        CHECK(fallback.english == "The choice is yours.  Walk now and live.  Stay, and die." &&
+              fallback.translated.empty());
+        CHECK(voice->cursor == 0 && g.step(.05) && !read_caption(french).english.empty());
+        CHECK(g.step(.05) && read_caption(french).english.empty() && g.server.audio.get(get(g, effect)->sound));
+
+        const auto speaker = g.objects.create(g.objects.find_class("BaseClass"), {}, Creation::World);
+        SoundRequest request;
+        request.resource = "sounds/events/cwvoice5.wav";
+        request.speaker = speaker;
+        request.inner_radius = 10;
+        request.outer_radius = 20;
+        const auto announcement = g.server.PlayCharacterSound(speaker, request, false, error);
+        CHECK(announcement && g.step(.001));
+        const DVector nearby{}, edge{20, 0, 0};
+        CHECK(cinematic_caption(g.client_session.audio, g.resources, &french, &nearby).translated == "Accès autorisé.");
+        CHECK(cinematic_caption(g.client_session.audio, g.resources, &french, &edge).english.empty());
+        CHECK(cinematic_caption(g.client_session.audio, g.resources, &french, &nearby, announcement).english.empty());
+        CHECK(g.resources.mount(voice_archive, error, MountRole::Mod));
+        CHECK(cinematic_caption(g.client_session.audio, g.resources, &french, &nearby).english.empty());
+        CHECK(g.unload_world() && read_caption(french).english.empty());
+        return true;
+    }
     bool failures(const std::filesystem::path& root)
     {
         GameSession g;
@@ -493,7 +558,7 @@ int main(int argc, char** argv)
     const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
         {"decode", decode},     {"mixer", mixer},       {"spatial", spatial},
         {"sequence", sequence}, {"lifetime", lifetime}, {"failures", failures},
-        {"device", device},     {"catalog", catalog},   {"subway", subway}};
+        {"device", device},     {"captions", captions}, {"catalog", catalog},   {"subway", subway}};
     auto it = cases.find(argv[1]);
     return it != cases.end() && it->second(argv[2]) ? 0 : 1;
 }

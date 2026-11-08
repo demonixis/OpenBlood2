@@ -28,6 +28,7 @@ endif()
 file(MAKE_DIRECTORY "${package}")
 # Third-party notices staged by the game build (cmake/ContentDependencies.cmake).
 file(COPY "${build}/game/blood2${suffix}" "${source}/LICENSE" "${build}/game/licenses" DESTINATION "${package}")
+file(COPY "${build}/game/lang" DESTINATION "${package}")
 file(COPY "${source}/Documentation/ci_builds.md" DESTINATION "${package}")
 file(COPY "${source}/Documentation/implementation/provenance.md" DESTINATION "${package}/Documentation/implementation")
 file(COPY "${source}/config/blood2.example.ini" DESTINATION "${package}/config")

@@ -2,6 +2,7 @@
 #pragma once
 #include "engine/hud_surface.h"
 #include "game/player_messages.h"
+#include <functional>
 #define TAB_INC_NONE 0x00
 #define TAB_INC_BORDER 0x01
 #define TAB_INC_ICON 0x02
@@ -116,7 +117,9 @@ class CNewStatusBar
     bool Update(const OpenBlood2::PlayerStats&, unsigned width, unsigned height);
     // Original UpdateInv for one SMSG_ITEMCHANGED (show: ITEMF_SHOWITEMS). Missing item
     // pictures leave that tab empty, as CreateSurfaceFromBitmap's null did; see item_error.
-    void UpdateInv(const OpenBlood2::InventoryItems&, bool show, float time);
+    using TextPainter = std::function<void(OpenBlood2::HudSurface&, int font_height)>;
+    void UpdateInv(const OpenBlood2::InventoryItems&, bool show, float time, const TextPainter& name_painter = {},
+                   bool update_scroll = true);
     // Original DrawInvTabs scroll state at this time, then the tab screen positions.
     struct InventoryLayout
     {
@@ -161,7 +164,9 @@ class CNewStatusBar
     // Original UpdateObjectives/InitObjectivesTab: null title or text (`valid` false) resets the
     // page to "No Current Objective" and hides the icon. Missing art or font leaves the page
     // unavailable (objectives_error), never failing the HUD.
-    void UpdateObjectives(bool valid, const std::string& title, const std::string& text);
+    void UpdateObjectives(bool valid, const std::string& title, const std::string& text,
+                          const TextPainter& title_painter = {}, const TextPainter& body_painter = {},
+                          bool update_icon = true);
     // Original ToggleObjectives (shell Tab): true when the source plays missionobj.wav.
     bool ToggleObjectives(float time);
     struct ObjectivesLayout
@@ -223,7 +228,7 @@ class CNewStatusBar
     void InitInvTabs();
     void InitWeaponTabs();
     void InitPanels();
-    bool InitObjectivesTab();
+    bool InitObjectivesTab(const TextPainter& title_painter = {});
     void UpdateWeapons(const OpenBlood2::PlayerStats&);
     void AdjustRes(unsigned width, unsigned height);
     void SetupTab(StatTab&, const OpenBlood2::HudFont*, unsigned flags);

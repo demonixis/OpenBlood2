@@ -1,4 +1,5 @@
 #include "game/server_adapter.h"
+#include "game/original/CinematicTrigger.h"
 #include <cmath>
 namespace OpenBlood2
 {
@@ -18,6 +19,9 @@ namespace OpenBlood2
             sound.id = id;
             sound.owner = identity(voice.owner);
             sound.speaker = identity(voice.request.speaker);
+            if (const auto* owner = objects.get(sound.owner))
+                if (const auto* controller = dynamic_cast<const CinematicTrigger*>(owner->game.get()))
+                    sound.cinematic = controller->sound == id;
             sound.parameters = voice.request;
             sound.position = voice.position;
             sound.rate = voice.clip->rate;

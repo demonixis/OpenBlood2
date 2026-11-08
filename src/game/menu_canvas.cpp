@@ -1,9 +1,13 @@
 #include "game/menu.h"
+#include "engine/localization.h"
+#include "game/localized_font.h"
 #include "game/original/MenuIds.h"
+#include <SDL3/SDL_stdinc.h>
 #include <algorithm>
 #include <array>
 #include <cctype>
 #include <cmath>
+#include <optional>
 
 namespace OpenBlood2
 {
@@ -44,6 +48,138 @@ namespace OpenBlood2
                 }
             }
         }
+
+        struct SettingLabel
+        {
+            std::string english, localized;
+        };
+        struct Choice
+        {
+            std::string_view english, key{};
+        };
+        SettingLabel setting_label(const Menu& menu, int setting, const Localization* localization)
+        {
+            const auto& display = menu.settings;
+            constexpr Choice on{"ON", "menu.on"}, off{"OFF", "menu.off"};
+            constexpr Choice low{"LOW", "menu.low"}, high{"HIGH", "menu.high"};
+            const auto toggle = [&](bool value) { return value ? on : off; };
+            const auto row = [&](std::string_view key, std::string_view english, Choice value,
+                                 std::string_view suffix = {})
+            {
+                SettingLabel label;
+                label.english = std::string(english) + " [" + std::string(value.english) + std::string(suffix) + "]";
+                const auto title = localization ? localization->text(key, {}) : std::string_view{};
+                if (!title.empty())
+                {
+                    const auto option = value.key.empty() ? value.english : localization->text(value.key, value.english);
+                    label.localized = std::string(title) + " [" + std::string(option) + std::string(suffix) + "]";
+                }
+                return label;
+            };
+            switch (setting)
+            {
+                case 7:
+                    return row("menu.lighting", "LIGHTING",
+                               display.renderer ? (display.quality ? high : Choice{"STANDARD", "menu.standard"})
+                               : display.pixel_lighting ? Choice{"PER PIXEL", "menu.per_pixel"}
+                                                        : Choice{"PER VERTEX", "menu.per_vertex"});
+                case 8:
+                    return row("menu.renderer", "RENDERER", display.renderer ? Choice{"ENHANCED", "menu.enhanced"}
+                                                                             : Choice{"ORIGINAL", "menu.original"});
+                case 9:
+                    return row("menu.normal_maps", "NORMAL MAPS",
+                               display.normal_maps ? Choice{"GENERATED", "menu.generated"} : off);
+                case 10:
+                    if (display.vr_turn)
+                        return row("menu.turn", "TURN", {"SNAP", "menu.snap"}, " " + std::to_string(display.vr_turn));
+                    return row("menu.turn", "TURN", {"SMOOTH", "menu.smooth"});
+                case 11:
+                    return row("menu.aim_laser", "AIM LASER", toggle(display.vr_laser));
+                case 12:
+                    return row("menu.crosshair", "CROSSHAIR", toggle(display.vr_crosshair));
+                case 13:
+                    return row("menu.move", "MOVE", display.vr_move_hand ? Choice{"RIGHT HAND", "menu.right_hand"}
+                                                                        : Choice{"HEAD", "menu.head"});
+                case 14:
+                    return row("menu.cheats", "CHEATS", toggle(display.cheats));
+                case 15:
+                    return row("menu.god_mode", "GOD MODE", toggle(display.god_mode));
+                case 16:
+                {
+                    if (menu.level < 0 || menu.level >= int(menu.levels.size()))
+                        return row("menu.level", "LEVEL", {"NONE", "menu.none"});
+                    auto world = menu.levels[std::size_t(menu.level)];
+                    for (auto& c : world)
+                        c = char(std::toupper(static_cast<unsigned char>(c)));
+                    return row("menu.level", "LEVEL", {world});
+                }
+                case 17:
+                {
+                    constexpr std::array modes{off, Choice{"FXAA"}, Choice{"MSAA 2X"}, Choice{"MSAA 4X"}};
+                    return row("menu.antialiasing", "ANTI-ALIASING", modes[std::clamp(display.antialiasing, 0, 3)]);
+                }
+                case 18:
+                    return row("menu.bloom", "BLOOM", toggle(display.bloom));
+                case 19:
+                {
+                    constexpr std::array modes{off, Choice{"NEUTRAL", "menu.neutral"}, Choice{"FILMIC", "menu.filmic"}};
+                    return row("menu.tonemap", "TONEMAP", modes[std::clamp(display.tonemap, 0, 2)]);
+                }
+                case 20:
+                {
+                    constexpr std::array modes{off, low, high};
+                    return row("menu.ambient_occlusion", "AMBIENT OCCLUSION",
+                               modes[std::clamp(display.ambient_occlusion, 0, 2)]);
+                }
+                case 21:
+                {
+                    constexpr std::array modes{off, low, high};
+                    return row("menu.reflections", "REFLECTIONS", modes[std::clamp(display.reflections, 0, 2)]);
+                }
+                case 22:
+                    return row("menu.fullscreen", "FULLSCREEN", toggle(display.fullscreen));
+                case 23:
+                    return row("menu.fullscreen_mode", "FULLSCREEN MODE",
+                               display.fullscreen_mode ? Choice{"EXCLUSIVE", "menu.exclusive"}
+                                                       : Choice{"BORDERLESS", "menu.borderless"});
+                case 24:
+                    if (display.fullscreen && !display.fullscreen_mode)
+                        return row("menu.resolution", "RESOLUTION", {"DESKTOP", "menu.desktop"});
+                    if (display.resolution_width)
+                        return row("menu.resolution", "RESOLUTION",
+                                   {std::to_string(display.resolution_width) + " X " +
+                                    std::to_string(display.resolution_height)});
+                    return row("menu.resolution", "RESOLUTION", {"DEFAULT", "menu.default"});
+                case 25:
+                    return row("menu.vsync", "VSYNC", toggle(display.vsync));
+                case 26:
+                    if (display.fps_limit)
+                        return row("menu.frame_limit", "FRAME LIMIT", {std::to_string(display.fps_limit) + " FPS"});
+                    return row("menu.frame_limit", "FRAME LIMIT", {"UNLIMITED", "menu.unlimited"});
+                case 27:
+                    if (menu.video.refresh_rates.size() < 2)
+                        return row("menu.refresh_rate", "REFRESH RATE", {"UNAVAILABLE", "menu.unavailable"});
+                    if (display.vr_refresh_rate)
+                        return row("menu.refresh_rate", "REFRESH RATE", {refresh_label(display.vr_refresh_rate)});
+                    return row("menu.refresh_rate", "REFRESH RATE", {"AUTO", "menu.auto"});
+                case 28:
+                    return row("menu.render_scale", "RENDER SCALE", {std::to_string(display.vr_render_scale) + "%"});
+                case 30:
+                    return row("menu.field_of_view", "FIELD OF VIEW", {std::to_string(display.field_of_view)});
+                case menu_language_setting:
+                {
+                    const auto fallback = display.language == Language::English ? std::string_view("English")
+                                                                                : language_tag(display.language);
+                    auto label = row("menu.language", "LANGUAGE", {fallback});
+                    if (localization)
+                        label.localized = std::string(localization->text("menu.language", "LANGUAGE")) + " [" +
+                                          std::string(language_name(display.language)) + "]";
+                    return label;
+                }
+                default:
+                    return {};
+            }
+        }
     } // namespace
     MenuViewport MenuViewport::fit(float width, float height)
     {
@@ -67,6 +203,10 @@ namespace OpenBlood2
         const auto& assets = menu_resources(menu_edition(resources_));
         if (!load_menu_strings(resources_, strings, error))
             return false;
+        if (!resources_.demo())
+            if (const auto* source = resources_.find("cres.dll"))
+                stock_strings_ = std::ranges::none_of(resources_.mounts(), [&](const Mount& mount)
+                { return mount.role == MountRole::Mod && mount.path == source->archive; });
         if (!canvas.load_font(assets.small_bitmap, assets.small_font, small_) ||
             !canvas.load_font(assets.large_bitmaps[0], assets.large_font, selected_, 1) ||
             !canvas.load_font(assets.large_bitmaps[1], assets.large_font, normal_, 1) ||
@@ -105,6 +245,21 @@ namespace OpenBlood2
         surface = canvas.CreateSurface(640, 480);
         return surface != nullptr;
     }
+    std::string_view MenuCanvas::translated(std::string_view key) const
+    {
+        return localization && localized_font && !key.empty() ? localization->text(key, {}) : std::string_view{};
+    }
+    std::string_view MenuCanvas::translated(unsigned id) const
+    {
+        return localization && localized_font && stock_strings_ ? localization->text(id, {}) : std::string_view{};
+    }
+    void MenuCanvas::draw_small(std::string_view english, std::string_view translation, int x, int y, int right)
+    {
+        if (!translation.empty() && localized_font && localized_font->supports(translation))
+            LocalizedBitmapLine(small_, *localized_font, translation).draw(*surface, {x, y, right, y + int(small_.height)});
+        else
+            text(*surface, small_, english, x, y);
+    }
     // CMenuControls rows: CLTGUIColumnTextCtrl columns (action 100 px right-justified, an 11 px
     // buffer, "=" 20 px, then the bound controls) in the 280-pixel CLTGUIListCtrl at the options
     // position, with the CMenuBase::RenderArrows up/down arrows centered on x = 298.
@@ -139,26 +294,46 @@ namespace OpenBlood2
             if (i < menu.first || i >= menu.first + visible)
                 continue;
             const bool control = item.command == int(MENU_CMD_CHANGE_CONTROL);
-            const int label = width(small_, item.literal);
-            const int x = control ? std::max(0, left + 100 - label) : left;
-            item.rect = {left, y, 625, y + row};
-            text(*surface, small_, item.literal, x, y);
+            const auto translation = item.string_id ? translated(item.string_id) : translated(item.localization_key);
+            const bool draw_translation = !translation.empty() && localized_font->supports(translation);
+            const int label = draw_translation ? LocalizedBitmapLine(small_, *localized_font, translation).advance()
+                                               : width(small_, item.literal);
+            const int x = control ? std::max(draw_translation ? 40 : 0, left + 100 - label) : left;
+            item.rect = {draw_translation ? std::min(left, x) : left, y, 625, y + row};
+            draw_small(item.literal, translation, x, y, control ? left + 100 : 625);
             if (control && i == menu.binding)
                 text(*surface, small_, "=", left + 111, y);
             if (control && i < int(menu.controls.size()))
             {
                 std::string value = menu.controls[i].binding;
+                std::string binding_translation;
                 if (!menu.controls[i].enabled)
+                {
                     value = "NOT IMPLEMENTED";
+                    binding_translation = translated("control.not_implemented");
+                }
                 else if (value.empty())
+                {
                     value = unassigned->second;
+                    binding_translation = translated(IDS_MENU_KEY_UNASSIGNED);
+                }
+                else if (const auto either = translated("control.or"); !either.empty())
+                {
+                    const std::string separator = " " + std::string(either) + " ";
+                    binding_translation = value;
+                    for (std::size_t at = 0; (at = binding_translation.find(" or ", at)) != value.npos;
+                         at += separator.size())
+                        binding_translation.replace(at, 4, separator);
+                    if (binding_translation == value)
+                        binding_translation.clear();
+                }
                 // The bound text stops at the canvas edge instead of overflowing it.
                 while (!value.empty() && left + 131 + width(small_, value) > 635)
                     value.pop_back();
-                text(*surface, small_, value, left + 131, y);
+                draw_small(value, binding_translation, left + 131, y, 635);
             }
             if (i == menu.selected && menu.enabled(item))
-                text(*surface, small_, ">", left - 16, y);
+                text(*surface, small_, ">", item.rect.left - 16, y);
             if (!menu.enabled(item))
                 for (int py = item.rect.top; py < item.rect.bottom; ++py)
                     for (int px = item.rect.left; px < item.rect.right; ++px)
@@ -175,9 +350,221 @@ namespace OpenBlood2
                                                    arrow_center - int(down_arrow_->width) / 2, top + height - 5,
                                                    hud_magenta);
         if (menu.audio_failed)
-            text(*surface, small_, "Menu audio unavailable - see log.", 180, 460);
+            draw_small("Menu audio unavailable - see log.", translated("menu.audio_unavailable"), 180, 460);
         return true;
     }
+    namespace
+    {
+        enum class PosterTextStyle
+        {
+            Glow,
+            Center,
+            Underline,
+            Left,
+            Paragraph,
+        };
+        struct PosterText
+        {
+            std::string_view key;
+            HudRect original, translated;
+            int height;
+            PosterTextStyle style;
+        };
+
+        std::span<const PosterText> poster_text(MenuPromotion promotion)
+        {
+            using Style = PosterTextStyle;
+            static constexpr PosterText bloodbath[] = {
+                {"promotions.bloodbath_title", {119, 42, 520, 92}, {56, 42, 584, 92}, 48, Style::Glow},
+                {"promotions.bloodbath_tagline", {65, 94, 576, 115}, {58, 94, 582, 115}, 20, Style::Center},
+                {"promotions.bloodbath_soon", {206, 119, 417, 151}, {115, 118, 525, 150}, 25, Style::Underline},
+                {"promotions.blood_brother_title", {67, 159, 311, 183}, {68, 159, 313, 183}, 24, Style::Center},
+                {"promotions.blood_brother_body", {68, 184, 311, 234}, {72, 184, 312, 238}, 16, Style::Paragraph},
+                {"promotions.blood_feud_title", {351, 159, 540, 183}, {330, 159, 582, 183}, 24, Style::Center},
+                {"promotions.blood_feud_body", {328, 184, 584, 239}, {331, 184, 582, 239}, 16, Style::Paragraph},
+            };
+            static constexpr PosterText info[] = {
+                {"promotions.info_title", {177, 89, 466, 138}, {56, 88, 584, 137}, 48, Style::Glow},
+                {"promotions.info_characters", {300, 145, 624, 177}, {303, 145, 620, 179}, 14, Style::Paragraph},
+                {"promotions.info_weapons", {300, 182, 624, 243}, {303, 182, 620, 245}, 14, Style::Paragraph},
+                {"promotions.info_levels", {300, 248, 624, 280}, {303, 248, 620, 282}, 14, Style::Paragraph},
+                {"promotions.info_maps", {300, 284, 624, 318}, {303, 284, 620, 320}, 14, Style::Paragraph},
+                {"promotions.info_network", {300, 321, 624, 342}, {303, 321, 620, 345}, 14, Style::Paragraph},
+                {"promotions.info_editor", {300, 345, 624, 377}, {303, 345, 620, 381}, 14, Style::Paragraph},
+                {"promotions.info_engine", {300, 382, 624, 425}, {303, 382, 620, 426}, 14, Style::Paragraph},
+            };
+            static constexpr PosterText modes[] = {
+                {"promotions.modes_title", {79, 42, 582, 100}, {56, 42, 584, 100}, 50, Style::Glow},
+                {"promotions.modes_caleb", {194, 126, 621, 168}, {195, 126, 620, 174}, 16, Style::Paragraph},
+                {"promotions.modes_chosen_title", {91, 377, 431, 399}, {92, 377, 431, 399}, 22, Style::Left},
+                {"promotions.modes_chosen", {91, 399, 431, 432}, {93, 399, 431, 433}, 16, Style::Paragraph},
+            };
+            switch (promotion)
+            {
+                case MenuPromotion::Bloodbath:
+                    return bloodbath;
+                case MenuPromotion::Info:
+                    return info;
+                case MenuPromotion::Modes:
+                    return modes;
+                default:
+                    return {};
+            }
+        }
+
+        std::uint8_t* poster_pixel(HudSurface& surface, int x, int y)
+        {
+            return surface.rgba.data() + (std::size_t(y) * surface.width + unsigned(x)) * 4;
+        }
+        const std::uint8_t* poster_pixel(const HudSurface& surface, int x, int y)
+        {
+            return surface.rgba.data() + (std::size_t(y) * surface.width + unsigned(x)) * 4;
+        }
+
+        bool poster_ink(const std::uint8_t* rgb)
+        {
+            const int peak = std::max({rgb[0], rgb[1], rgb[2]});
+            const int base = std::min({rgb[0], rgb[1], rgb[2]});
+            return peak >= 24 && peak - base <= 22;
+        }
+
+        void erase_poster_ink(HudSurface& target, const HudSurface& original, const HudSurface& background,
+                              const HudRect& rect, bool glow)
+        {
+            // Copper headings have a large, low-contrast halo. Restore the rock across the whole
+            // title region to remove it, without bringing over the menu background's bright seam.
+            // Gray captions only need individual ink texels repaired from their own backdrop.
+            for (int y = rect.top; y < rect.bottom; ++y)
+                for (int x = rect.left; x < rect.right; ++x)
+                {
+                    auto* pixel = poster_pixel(target, x, y);
+                    if (glow && x < int(background.width) && y < int(background.height))
+                    {
+                        auto* rock = poster_pixel(background, x, y);
+                        if (std::max({rock[0], rock[1], rock[2]}) >= 40 && x >= 16)
+                            rock = poster_pixel(background, x - 16, y);
+                        const auto edge = unsigned(std::min({x - rect.left + 1, rect.right - x,
+                                                             y - rect.top + 1, rect.bottom - y, 4}));
+                        for (unsigned c = 0; c < 3; ++c)
+                            pixel[c] = std::uint8_t((pixel[c] * (4 - edge) + rock[c] * edge) / 4);
+                        continue;
+                    }
+                    if (!poster_ink(poster_pixel(original, x, y)))
+                        continue;
+
+                    std::array<unsigned, 3> color{};
+                    unsigned count = 0;
+                    for (int radius = 1; radius <= 10 && !count; ++radius)
+                        for (const auto& [sx, sy] : {std::pair{x - radius, y}, std::pair{x + radius, y},
+                                                     std::pair{x, y - radius}, std::pair{x, y + radius}})
+                        {
+                            if (sx < rect.left || sx >= rect.right || sy < rect.top || sy >= rect.bottom)
+                                continue;
+                            const auto* sample = poster_pixel(original, sx, sy);
+                            if (poster_ink(sample))
+                                continue;
+                            for (unsigned c = 0; c < 3; ++c)
+                                color[c] += sample[c];
+                            ++count;
+                        }
+                    for (unsigned c = 0; c < 3; ++c)
+                        pixel[c] = count ? std::uint8_t(color[c] / count) : 0;
+                }
+        }
+
+        void draw_poster_glow(HudSurface& target, const HudSurface& original, const LocalizedFont& font,
+                              std::string_view label, const HudRect& source, const HudRect& rect)
+        {
+            const unsigned width = unsigned(rect.right - rect.left), height = unsigned(rect.bottom - rect.top);
+            HudSurface mask{width, height, std::vector<std::uint8_t>(std::size_t(width) * height * 4)};
+            font.draw(mask, label, {0, 0, int(width), int(height)}, 0xffffff);
+            constexpr int radius = 3;
+            constexpr unsigned amber[]{184, 87, 20};
+            for (int y = 0; y < int(height); ++y)
+                for (int x = 0; x < int(width); ++x)
+                {
+                    unsigned total = 0;
+                    for (int sy = std::max(0, y - radius); sy <= std::min(int(height) - 1, y + radius); ++sy)
+                        for (int sx = std::max(0, x - radius); sx <= std::min(int(width) - 1, x + radius); ++sx)
+                            total += *poster_pixel(mask, sx, sy);
+                    const unsigned coverage = total / ((radius * 2 + 1) * (radius * 2 + 1) * 2);
+                    auto* pixel = poster_pixel(target, rect.left + x, rect.top + y);
+                    for (unsigned c = 0; c < 3; ++c)
+                        pixel[c] = std::uint8_t((pixel[c] * (255 - coverage) + amber[c] * coverage + 127) / 255);
+                }
+
+            const unsigned sample_width = unsigned(source.right - source.left);
+            const unsigned sample_height = unsigned(source.bottom - source.top);
+            HudSurface sample{sample_width, sample_height,
+                              std::vector<std::uint8_t>(std::size_t(sample_width) * sample_height * 4)};
+            hud_blit(sample, original, &source, 0, 0, false, 0);
+            font.draw_menu(target, label, rect, sample, true);
+
+            std::array<unsigned, 3> highlight{};
+            unsigned highlights = 0;
+            for (std::size_t i = 0; i < sample.rgba.size(); i += 4)
+                if (sample.rgba[i] >= 208 && sample.rgba[i + 1] >= 155 && sample.rgba[i + 2] >= 95)
+                {
+                    for (unsigned c = 0; c < 3; ++c)
+                        highlight[c] += sample.rgba[i + c];
+                    ++highlights;
+                }
+            if (!highlights)
+                return;
+            for (auto& channel : highlight)
+                channel /= highlights;
+            for (int y = 0; y < int(height); ++y)
+                for (int x = 0; x < int(width); ++x)
+                {
+                    const unsigned coverage = *poster_pixel(mask, x, y) / 3;
+                    auto* pixel = poster_pixel(target, rect.left + x, rect.top + y);
+                    for (unsigned c = 0; c < 3; ++c)
+                        pixel[c] = std::uint8_t((pixel[c] * (255 - coverage) + highlight[c] * coverage + 127) / 255);
+                }
+        }
+
+        void localize_poster(HudSurface& target, const HudSurface& original, const HudSurface& background,
+                            MenuPromotion promotion, const Localization& catalog, const LocalizedFont& font)
+        {
+            const auto entries = poster_text(promotion);
+            if (std::ranges::any_of(entries, [&](const PosterText& entry)
+                                   {
+                                       const auto label = catalog.text(entry.key);
+                                       return label.empty() || !font.supports(label);
+                                   }))
+                return; // Incomplete catalogs keep the authored English poster intact.
+
+            // Restore every text region before painting so one replacement cannot erase its neighbor.
+            for (const auto& entry : entries)
+                erase_poster_ink(target, original, background, entry.original, entry.style == PosterTextStyle::Glow);
+
+            constexpr std::uint32_t gray = 0x868686;
+            for (const auto& entry : entries)
+            {
+                const auto label = catalog.text(entry.key);
+                auto rect = entry.translated;
+                if (entry.style == PosterTextStyle::Paragraph)
+                {
+                    font.draw_wrapped(target, label, rect, entry.height, gray);
+                    continue;
+                }
+                const int fitted = std::min(rect.right - rect.left, font.text_width(label, entry.height) + 2);
+                if (entry.style != PosterTextStyle::Left)
+                    rect.left += (rect.right - rect.left - fitted) / 2;
+                rect.right = rect.left + fitted;
+                rect.top += (rect.bottom - rect.top - entry.height) / 2;
+                rect.bottom = rect.top + entry.height;
+                if (entry.style == PosterTextStyle::Glow)
+                    draw_poster_glow(target, original, font, label, entry.original, rect);
+                else
+                    font.draw(target, label, rect, gray);
+                if (entry.style == PosterTextStyle::Underline)
+                    for (int x = rect.left; x < rect.right; ++x)
+                        std::fill_n(poster_pixel(target, x, rect.bottom), 3, std::uint8_t(gray & 255));
+            }
+        }
+    } // namespace
+
     bool MenuCanvas::compose(Menu& menu, double, std::string& error)
     {
         if (menu.edition() != menu_edition(resources_))
@@ -199,6 +586,9 @@ namespace OpenBlood2
                 return false;
             }
             canvas.DrawSurfaceToSurface(surface, it->second, nullptr, 0, 0);
+            if (localization && localized_font && localization->language() != Language::English &&
+                !localization_resource_overridden(resources_, menu_resources(menu.edition()).promotion(menu.promotion)))
+                localize_poster(*surface, *it->second, *background_, menu.promotion, *localization, *localized_font);
             ++revision;
             composed_ = menu.revision;
             return true;
@@ -211,8 +601,24 @@ namespace OpenBlood2
             error = std::string("Unavailable menu title: ") + menu.title();
             return false;
         }
-        canvas.DrawSurfaceToSurfaceTransparent(surface, title->second, nullptr, assets.title_x, assets.title_y,
-                                               hud_magenta);
+        const std::string_view title_role = menu.title();
+        const unsigned title_id = title_role == "singleplayer.pcx" ? IDS_MENU_MAIN_SINGLEPLAYER
+                                  : title_role == "options.pcx"    ? IDS_MENU_MAIN_OPTIONS
+                                  : title_role == "savegame.pcx"   ? IDS_MENU_SINGLEPLAYER_SAVEGAME
+                                  : title_role == "loadgame.pcx"   ? IDS_MENU_SINGLEPLAYER_LOADGAME
+                                                                  : 0;
+        const auto original_title = strings.strings.find(title_id);
+        const std::string_view english_title = original_title == strings.strings.end() ? std::string_view("MAIN MENU")
+                                                                                      : original_title->second;
+        const auto translated_title = title_id ? translated(title_id) : translated("menu.main_title");
+        if (translated_title.empty() || translated_title == english_title || !localized_font->supports(translated_title))
+            canvas.DrawSurfaceToSurfaceTransparent(surface, title->second, nullptr, assets.title_x, assets.title_y,
+                                                   hud_magenta);
+        else
+            localized_font->draw_menu(*surface, translated_title,
+                                      {assets.title_x, assets.title_y, 625,
+                                       std::min(assets.list_y, assets.title_y + int(title->second->height))},
+                                      *title->second, true);
         if (menu.page == MenuPage::Controls)
         {
             if (!compose_controls(menu, error))
@@ -230,7 +636,7 @@ namespace OpenBlood2
                 error = "Missing original quit text";
                 return false;
             }
-            text(*surface, small_, it->second, 180, y);
+            draw_small(it->second, translated(IDS_MENU_MESSAGE_QUIT), 180, y);
             y += small_.height + 12;
         }
         // Replacement rows can exceed the bounded list (the demo's 41-pixel font fits six): the
@@ -257,117 +663,65 @@ namespace OpenBlood2
             if (int(i) < menu.first || int(i) >= menu.first + visible)
                 continue;
             std::string label = item.literal;
+            std::string translation;
             if (item.string_id)
             {
-                auto it = strings.strings.find(item.string_id);
+                const auto it = strings.strings.find(item.string_id);
                 if (it == strings.strings.end())
                 {
                     error = "Missing original menu string " + std::to_string(item.string_id);
                     return false;
                 }
                 label = it->second;
+                translation = translated(item.string_id);
                 if (menu.page == MenuPage::Load)
                 {
-                    // Original cres.dll uses FormatMessage's numbered string insertion.
-                    const auto marker = label.find("%1!s!");
+                    // The retail strings use one FormatMessage numbered insertion.
+                    constexpr std::string_view placeholder = "%1!s!";
+                    const auto marker = label.find(placeholder);
                     if (marker == label.npos)
                     {
                         error = "Unsupported load-menu string insertion";
                         return false;
                     }
-                    label.replace(marker, 5, item.insertion);
+                    const auto translated_insertion = translated(item.insertion_key);
+                    const auto translated_marker = translation.find(placeholder);
+                    if (translated_marker == translation.npos ||
+                        translation.find(placeholder, translated_marker + placeholder.size()) != translation.npos)
+                        translation.clear();
+                    if (!translated_insertion.empty() && translation.empty())
+                        translation = label;
+                    if (!translation.empty())
+                        translation.replace(translation.find(placeholder), placeholder.size(),
+                                            translated_insertion.empty() ? std::string_view(item.insertion)
+                                                                         : translated_insertion);
+                    label.replace(marker, placeholder.size(), item.insertion);
                 }
                 item.literal = label;
             }
-            // Replacement options, styled after the original DETAIL LEVEL row.
-            const auto& display = menu.settings;
-            if (item.setting == 7)
-                label = item.literal = display.renderer ? (display.quality ? "LIGHTING [HIGH]" : "LIGHTING [STANDARD]")
-                                       : display.pixel_lighting ? "LIGHTING [PER PIXEL]"
-                                                                : "LIGHTING [PER VERTEX]";
-            else if (item.setting == 8)
-                label = item.literal = display.renderer ? "RENDERER [ENHANCED]" : "RENDERER [ORIGINAL]";
-            else if (item.setting == 9)
-                label = item.literal = display.normal_maps ? "NORMAL MAPS [GENERATED]" : "NORMAL MAPS [OFF]";
-            else if (item.setting == 17)
+            else if (!item.localization_key.empty())
+                translation = translated(item.localization_key);
+            if (item.setting >= 0)
             {
-                static constexpr std::array<const char*, 4> modes{"ANTI-ALIASING [OFF]", "ANTI-ALIASING [FXAA]",
-                                                                  "ANTI-ALIASING [MSAA 2X]", "ANTI-ALIASING [MSAA 4X]"};
-                label = item.literal = modes[std::size_t(std::clamp(display.antialiasing, 0, 3))];
+                auto setting = setting_label(menu, item.setting, localized_font ? localization : nullptr);
+                if (!setting.english.empty())
+                {
+                    label = item.literal = std::move(setting.english);
+                    translation = std::move(setting.localized);
+                }
             }
-            else if (item.setting == 18)
-                label = item.literal = display.bloom ? "BLOOM [ON]" : "BLOOM [OFF]";
-            else if (item.setting == 19)
-            {
-                static constexpr std::array<const char*, 3> modes{"TONEMAP [OFF]", "TONEMAP [NEUTRAL]",
-                                                                  "TONEMAP [FILMIC]"};
-                label = item.literal = modes[std::size_t(std::clamp(display.tonemap, 0, 2))];
-            }
-            else if (item.setting == 20)
-            {
-                static constexpr std::array<const char*, 3> modes{"AMBIENT OCCLUSION [OFF]", "AMBIENT OCCLUSION [LOW]",
-                                                                  "AMBIENT OCCLUSION [HIGH]"};
-                label = item.literal = modes[std::size_t(std::clamp(display.ambient_occlusion, 0, 2))];
-            }
-            else if (item.setting == 21)
-            {
-                static constexpr std::array<const char*, 3> modes{"REFLECTIONS [OFF]", "REFLECTIONS [LOW]",
-                                                                  "REFLECTIONS [HIGH]"};
-                label = item.literal = modes[std::size_t(std::clamp(display.reflections, 0, 2))];
-            }
-            else if (item.setting == 10)
-                label = item.literal = display.vr_turn ? "TURN [SNAP " + std::to_string(display.vr_turn) + "]"
-                                                       : std::string("TURN [SMOOTH]");
-            else if (item.setting == 11)
-                label = item.literal = display.vr_laser ? "AIM LASER [ON]" : "AIM LASER [OFF]";
-            else if (item.setting == 12)
-                label = item.literal = display.vr_crosshair ? "CROSSHAIR [ON]" : "CROSSHAIR [OFF]";
-            else if (item.setting == 13)
-                label = item.literal = display.vr_move_hand ? "MOVE [RIGHT HAND]" : "MOVE [HEAD]";
-            else if (item.setting == 14)
-                label = item.literal = display.cheats ? "CHEATS [ON]" : "CHEATS [OFF]";
-            else if (item.setting == 15)
-                label = item.literal = display.god_mode ? "GOD MODE [ON]" : "GOD MODE [OFF]";
-            else if (item.setting == 16)
-            {
-                std::string world = menu.level >= 0 && menu.level < int(menu.levels.size())
-                                        ? menu.levels[std::size_t(menu.level)]
-                                        : std::string("NONE");
-                for (auto& c : world)
-                    c = char(std::toupper(static_cast<unsigned char>(c)));
-                label = item.literal = "LEVEL [" + world + "]";
-            }
-            if (item.setting == 22)
-                label = item.literal = display.fullscreen ? "FULLSCREEN [ON]" : "FULLSCREEN [OFF]";
-            if (item.setting == 23)
-                label = item.literal =
-                    display.fullscreen_mode ? "FULLSCREEN MODE [EXCLUSIVE]" : "FULLSCREEN MODE [BORDERLESS]";
-            if (item.setting == 24)
-                label = item.literal = display.fullscreen && !display.fullscreen_mode ? "RESOLUTION [DESKTOP]"
-                                       : display.resolution_width
-                                           ? "RESOLUTION [" + std::to_string(display.resolution_width) + " X " +
-                                                 std::to_string(display.resolution_height) + "]"
-                                           : "RESOLUTION [DEFAULT]";
-            if (item.setting == 25)
-                label = item.literal = display.vsync ? "VSYNC [ON]" : "VSYNC [OFF]";
-            if (item.setting == 26)
-                label = item.literal = display.fps_limit ? "FRAME LIMIT [" + std::to_string(display.fps_limit) + " FPS]"
-                                                         : "FRAME LIMIT [UNLIMITED]";
-            if (item.setting == 27)
-                label = item.literal = menu.video.refresh_rates.size() < 2 ? "REFRESH RATE [UNAVAILABLE]"
-                                       : display.vr_refresh_rate
-                                           ? "REFRESH RATE [" + refresh_label(display.vr_refresh_rate) + "]"
-                                           : "REFRESH RATE [AUTO]";
-            if (item.setting == 28)
-                label = item.literal = "RENDER SCALE [" + std::to_string(display.vr_render_scale) + "%]";
-            if (item.setting == 30)
-                label = item.literal = "FIELD OF VIEW [" + std::to_string(display.field_of_view) + "]";
             const bool enabled = menu.enabled(item);
             const auto& font = menu.small()              ? small_
                                : !enabled                ? disabled_
                                : int(i) == menu.selected ? selected_
                                                          : normal_;
-            item.rect = {180, y, std::min(625, 180 + width(font, label)), y + std::min(int(font.height), step)};
+            const int row_height = std::min(int(font.height), step);
+            std::optional<LocalizedBitmapLine> translated_label;
+            if (!translation.empty() && (item.setting != menu_language_setting || translation != label) &&
+                localized_font->supports(translation))
+                translated_label.emplace(font, *localized_font, translation);
+            const int label_width = translated_label ? translated_label->advance() : width(font, label);
+            item.rect = {180, y, std::min(625, 180 + label_width), y + row_height};
             if (item.setting >= 0)
                 item.rect.right = 500;
             if (y + int(font.height) > 425)
@@ -375,7 +729,15 @@ namespace OpenBlood2
                 error = "Original menu list exceeds bounded canvas";
                 return false;
             }
-            text(*surface, font, label, 180, y);
+            if (translated_label)
+            {
+                const bool slider = item.setting == 1 || item.setting == 3 || item.setting == 4;
+                const bool toggle = item.setting == 0 || item.setting == 2 || item.setting == 5 || item.setting == 29;
+                const int right = slider ? 280 : toggle ? 440 : item.setting == menu_language_setting ? 500 : 625;
+                translated_label->draw(*surface, {180, y, right, y + int(font.height)});
+            }
+            else
+                text(*surface, font, label, 180, y);
             if (menu.small() && int(i) == menu.selected && enabled)
                 text(*surface, small_, ">", 164, y);
             if ((item.setting >= 0 && item.setting <= 5) ||
@@ -389,7 +751,7 @@ namespace OpenBlood2
                                     : item.setting == 2  ? settings.music
                                     : item.setting == 29 ? settings.mouse_look
                                                          : settings.invert_y;
-                    text(*surface, small_, on ? "On" : "Off", 440, y);
+                    draw_small(on ? "On" : "Off", translated(on ? "menu.on_short" : "menu.off_short"), 440, y);
                 }
                 else
                 {
@@ -422,21 +784,34 @@ namespace OpenBlood2
             canvas.DrawSurfaceToSurfaceTransparent(surface, down_arrow_, nullptr, 298 - int(down_arrow_->width) / 2,
                                                    426, hud_magenta);
         if (menu.page == MenuPage::Vr && menu.video.current_refresh_rate)
-            text(*surface, small_, "CURRENT REFRESH: " + refresh_label(menu.video.current_refresh_rate), 180, 440);
+        {
+            const auto value = refresh_label(menu.video.current_refresh_rate);
+            const auto english = "CURRENT REFRESH: " + value;
+            const auto translation = localization ? localization->format("menu.current_refresh", "CURRENT REFRESH: {0}", {value})
+                                                  : english;
+            draw_small(english, translation == english ? std::string_view{} : translation, 180, 440);
+        }
         if ((menu.page == MenuPage::Save || menu.page == MenuPage::Load) && !menu.saves.unavailable.empty())
             text(*surface, small_, menu.saves.unavailable, 180, 440);
         if (menu.page == MenuPage::Cheats)
-            text(*surface, small_,
-                 !menu.cheat_status.empty() ? menu.cheat_status
-                 : menu.settings.cheats && !(menu.in_world && menu.alive)
-                     ? std::string("Grey cheats need a game in progress.")
-                     : std::string{},
-                 180, 440);
+        {
+            if (!menu.cheat_status.empty())
+            {
+                std::string translation(translated(menu.cheat_status_key));
+                if (!translation.empty() && menu.cheat_status_key == "menu.cheat_keys")
+                    translation = localization->format(menu.cheat_status_key, "{0} keys added.",
+                                                       {std::to_string(menu.cheat_status_count)});
+                draw_small(menu.cheat_status, translation == menu.cheat_status ? std::string_view{} : translation,
+                           180, 440);
+            }
+            else if (menu.settings.cheats && !(menu.in_world && menu.alive))
+                draw_small("Grey cheats need a game in progress.", translated("menu.cheat_requires_game"), 180, 440);
+        }
         if (menu.demo() &&
             (menu.page == MenuPage::Options || menu.page == MenuPage::Audio || menu.page == MenuPage::Mouse))
-            text(*surface, small_, "Grey options are unavailable in OpenBlood2.", 180, 440);
+            draw_small("Grey options are unavailable in OpenBlood2.", translated("menu.unavailable_options"), 180, 440);
         if (menu.audio_failed)
-            text(*surface, small_, "Menu audio unavailable - see log.", 180, 460);
+            draw_small("Menu audio unavailable - see log.", translated("menu.audio_unavailable"), 180, 460);
         ++revision;
         composed_ = menu.revision;
         return true;

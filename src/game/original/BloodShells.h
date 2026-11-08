@@ -142,12 +142,13 @@ class CBloodClientShell
     bool UpdateUse(CBloodServerShell&);
     bool grab_down = false, taunt_down = false, drop_weapon_requested = false;
     std::string control_notice;
+    std::string_view control_notice_key; // Static catalog key for a shell-authored notice.
     // Original CMessageMgr lines (CSPrint/CSPrint2): console messages, pickup replies and
     // client notices. The application draws them; Draw expires them.
     CMessageMgr m_MessageMgr;
-    void CSPrint(std::string_view text)
+    void CSPrint(std::string_view text, const OpenBlood2::ConsoleTextSource& source = {})
     {
-        m_MessageMgr.AddLine(text, float(server_.GetTime()));
+        m_MessageMgr.AddLine(text, float(server_.GetTime()), source);
         ++message_revision;
     }
     std::uint64_t message_revision = 0;
@@ -164,9 +165,10 @@ class CBloodClientShell
     // Shell branch: percent <= 0 or >= 1 turns the bar off, otherwise SetPowerBarLevel.
     void SetPowerBarLevel(DBYTE bar, float percent);
     std::uint64_t air_updates = 0, throw_updates = 0, bomb_overholds = 0;
-    void SetControlNotice(std::string text)
+    void SetControlNotice(std::string text, std::string_view key = {})
     {
         control_notice = std::move(text);
+        control_notice_key = key;
         control_notice_until = client_view_.time + 3;
     }
     // Original CCheatMgr::SendCheatMessage (MessageMgr.cpp:1022): the application's Options >
@@ -242,7 +244,7 @@ class CBloodClientShell
     bool& third_person;
     bool& third_person_active;
     bool& xr_view;
-    bool ToggleThirdPerson();
+    bool ToggleThirdPerson(std::string_view notice = {});
     bool UpdateThirdPersonCamera();
     CPlayerDeathCamera& death_camera;
     std::uint64_t death_notifications = 0;

@@ -21,13 +21,18 @@ namespace OpenBlood2
         {
             int code;
             const char* label;
+            const char* key;
         };
-        constexpr std::array<CheatRow, 6> cheat_rows{{{CHEAT_KFA, "ALL WEAPONS"},
-                                                      {CHEAT_AMMO, "FULL AMMO"},
-                                                      {CHEAT_HEALTH, "FULL HEALTH"},
-                                                      {CHEAT_GIVEALLINV, "ALL ITEMS"},
-                                                      {CHEAT_ALLKEYS, "ALL KEYS"},
-                                                      {CHEAT_KILLALLAI, "KILL ALL ENEMIES"}}};
+        constexpr std::array<CheatRow, 6> cheat_rows{{{CHEAT_KFA, "ALL WEAPONS", "menu.all_weapons"},
+                                                      {CHEAT_AMMO, "FULL AMMO", "menu.full_ammo"},
+                                                      {CHEAT_HEALTH, "FULL HEALTH", "menu.full_health"},
+                                                      {CHEAT_GIVEALLINV, "ALL ITEMS", "menu.all_items"},
+                                                      {CHEAT_ALLKEYS, "ALL KEYS", "menu.all_keys"},
+                                                      {CHEAT_KILLALLAI, "KILL ALL ENEMIES", "menu.kill_all_enemies"}}};
+        std::string_view slot_key(const MenuSaveRow& slot)
+        {
+            return slot.unreadable ? "menu.unreadable_slot" : !slot.loadable ? "menu.empty_slot" : std::string_view{};
+        }
         // VR turn steps in the order the row cycles them; 0 turns smoothly.
         constexpr std::array<int, 6> vr_turns{15, 30, 45, 60, 90, 0};
     } // namespace
@@ -131,10 +136,19 @@ namespace OpenBlood2
                 AddLargeTextItemOption(IDS_MENU_OPTIONS_JOYSTICK, MENU_CMD_JOYSTICK);
                 AddLargeTextItemOption(IDS_MENU_OPTIONS_KEYBOARD, MENU_CMD_KEYBOARD);
                 if (vr)
+                {
                     items.push_back({0, MENU_CMD_VR, true, "VR", -1, {}});
+                    items.back().localization_key = "menu.vr";
+                }
                 if (setup)
+                {
                     items.push_back({0, MENU_CMD_SETUP, true, "SETUP", -1, {}});
+                    items.back().localization_key = "menu.setup";
+                }
+                setting(0, menu_language_setting);
+                items.back().literal = "LANGUAGE";
                 items.push_back({0, MENU_CMD_CHEATS, true, "CHEATS", -1, {}});
+                items.back().localization_key = "menu.cheats";
                 break;
             case MenuPage::Audio:
                 setting(IDS_MENU_AUDIO_SOUND, 0);
@@ -174,9 +188,13 @@ namespace OpenBlood2
                 items.push_back({0, -1, true, {}, 14, {}});
                 items.push_back({0, -1, true, {}, 15, {}});
                 for (const auto& row : cheat_rows)
+                {
                     items.push_back({0, MENU_CMD_CHEAT, true, row.label, -1, {}, {}, {}, row.code});
+                    items.back().localization_key = row.key;
+                }
                 items.push_back({0, -1, !levels.empty(), {}, 16, {}});
                 items.push_back({0, MENU_CMD_WARP, !levels.empty(), "GO TO LEVEL", -1, {}});
+                items.back().localization_key = "menu.go_to_level";
                 break;
             case MenuPage::Mouse:
                 setting(IDS_MENU_MOUSE_SENSITIVITY, 4);
@@ -192,8 +210,12 @@ namespace OpenBlood2
                 // CMenuControls::InitColumns: one MENU_CMD_CHANGE_CONTROL row per action, small font,
                 // no spacing, no wrap; the replacement RESTORE DEFAULTS row follows.
                 for (const auto& row : controls)
+                {
                     items.push_back({row.string_id, int(MENU_CMD_CHANGE_CONTROL), row.enabled, row.literal, -1, {}});
+                    items.back().localization_key = row.localization_key;
+                }
                 items.push_back({0, MENU_CMD_RESTORE_CONTROLS, true, "Restore Defaults", -1, {}});
+                items.back().localization_key = "control.restore_defaults";
                 break;
             case MenuPage::Load:
                 // CMenuLoadGame::InitSavedGameSlots: "RESTART: %s", "QUICKLOAD: %s", then the slots.
@@ -205,6 +227,7 @@ namespace OpenBlood2
                                  {},
                                  {},
                                  saves.restart.name});
+                items.back().insertion_key = slot_key(saves.restart);
                 items.push_back({IDS_MENU_LOADGAME_QUICKLOAD,
                                  int(MENU_CMD_LOAD_SAVE_GAME),
                                  saves.quick.loadable,
@@ -213,22 +236,31 @@ namespace OpenBlood2
                                  {},
                                  {},
                                  saves.quick.name});
+                items.back().insertion_key = slot_key(saves.quick);
                 for (const auto& slot : saves.slots)
+                {
                     items.push_back({0, int(MENU_CMD_LOAD_SAVE_GAME), slot.loadable, slot.name, -1, {}});
+                    items.back().localization_key = slot_key(slot);
+                }
                 break;
             case MenuPage::Save:
                 // CMenuSaveGame::InitSavedGameSlots: the eight slot names; any slot may be overwritten.
                 for (const auto& slot : saves.slots)
+                {
                     items.push_back({0,
                                      int(MENU_CMD_SAVE_GAME),
                                      in_world && alive && saves.unavailable.empty(),
                                      slot.name,
                                      -1,
                                      {}});
+                    items.back().localization_key = slot_key(slot);
+                }
                 break;
             case MenuPage::Quit:
                 items.push_back({0, int(MENU_CMD_EXIT), true, "Yes", -1, {}});
+                items.back().localization_key = "menu.yes";
                 items.push_back({0, int(MENU_CMD_KILL_MESSAGEBOX), true, "No", -1, {}});
+                items.back().localization_key = "menu.no";
                 selected = 1;
                 break;
         }
@@ -546,6 +578,7 @@ namespace OpenBlood2
                 break;
             case MENU_CMD_CHEATS:
                 cheat_status.clear();
+                cheat_status_key = {};
                 build(MenuPage::Cheats);
                 break;
             case MENU_CMD_CHEAT:
@@ -672,6 +705,9 @@ namespace OpenBlood2
             }
             case 28:
                 settings.vr_render_scale = 50 + (settings.vr_render_scale - 50 + (direction < 0 ? 50 : 10)) % 60;
+                break;
+            case menu_language_setting:
+                settings.language = cycle(languages(), settings.language);
                 break;
             case 10:
             {

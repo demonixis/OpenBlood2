@@ -3,6 +3,28 @@
 #include "game/original/ObjectivesTrigger.h"
 namespace OpenBlood2
 {
+    bool show_authored_objective_for_smoke(GameSession& game, unsigned resource, std::string& error)
+    {
+        for (auto id : game.objects.snapshot())
+        {
+            auto* record = game.objects.get(id);
+            auto* trigger = record ? dynamic_cast<ObjectivesTrigger*>(record->game.get()) : nullptr;
+            if (!trigger || trigger->objectives.resource != resource || trigger->objectives.title.empty() ||
+                trigger->objectives.text.empty())
+                continue;
+            // Publish the real authored payload without requiring its trigger conditions. The
+            // separate objectives smoke exercises those conditions and the original callback.
+            const auto before = game.client_shell.objective_messages;
+            if (game.server.SendObjectives(trigger->objectives) == DE_OK && game.pump_player_messages(error) &&
+                game.client_shell.objective_messages == before + 1 && game.client_shell.objectives_resolved)
+                return true;
+            break;
+        }
+        if (error.empty())
+            error = "Cannot deliver the selected authored objective";
+        return false;
+    }
+
     bool objective_smoke(GameSession& g)
     {
         auto* player = g.server_shell.Player(g.local_client);

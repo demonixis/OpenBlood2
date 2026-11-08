@@ -82,7 +82,7 @@ void Trigger::Sound(const std::string& name, HOBJECT owner, float radius, DBYTE 
             return;
         if (!g_pServerDE->GetClientResourceString(action_string, text))
             sound_error = "Action-mode lock feedback string " + std::to_string(action_string) + " is unavailable";
-        else if (!player->SendConsoleMessage(text))
+        else if (!player->SendConsoleMessage(text, {action_string, 0, {}}))
             sound_error = "Action-mode lock feedback could not reach the client";
         else
             ++console_feedback;

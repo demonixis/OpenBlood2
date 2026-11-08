@@ -53,6 +53,12 @@ namespace OpenBlood2
     {
         SaveSlots slots;
         SaveNotice notice;
+        const Localization* localization = nullptr;
+
+        std::string text(std::string_view key, std::string_view english) const
+        {
+            return std::string(localization ? localization->text(key, english) : english);
+        }
         enum class Outcome : std::uint8_t
         {
             None,
@@ -88,7 +94,7 @@ namespace OpenBlood2
                     menu.close();
                     return Outcome::Loaded;
                 case SaveSlots::LoadResult::Empty:
-                    error = "That slot is empty.";
+                    error = text("menu.slot_empty", "That slot is empty.");
                     return Outcome::Failed;
                 case SaveSlots::LoadResult::Refused:
                     break;
@@ -101,7 +107,7 @@ namespace OpenBlood2
         {
             if (!slots.save(game, SLOT_QUICK, error))
                 return Outcome::Failed;
-            notice.show("Quicksave...");
+            notice.show(text("hud.quicksave", "Quicksave..."));
             return Outcome::Saved;
         }
         // F6: MenuLoadGame(SLOT_QUICK), then "Quickload..."; an empty quick slot shows a notice.
@@ -110,10 +116,10 @@ namespace OpenBlood2
             switch (slots.load(game, SLOT_QUICK, error))
             {
                 case SaveSlots::LoadResult::Loaded:
-                    notice.show("Quickload...");
+                    notice.show(text("hud.quickload", "Quickload..."));
                     return Outcome::Loaded;
                 case SaveSlots::LoadResult::Empty:
-                    notice.show("No quicksave to load.");
+                    notice.show(text("hud.no_quicksave", "No quicksave to load."));
                     return Outcome::Empty;
                 case SaveSlots::LoadResult::Refused:
                     break;

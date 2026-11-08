@@ -248,13 +248,17 @@ void CPlayerObj::SendPickedUpMessage(HOBJECT hObject, int iRet)
     if (!pickup && !key)
         return;
 
+    OpenBlood2::ConsoleTextSource source;
     // PickupObject InitialUpdate: FormatString(m_nNameID), otherwise the object name.
     const auto display_name = [&]
     {
         const auto id = pickup ? pickup->resource_id : key->resource_id;
         std::string name;
         if (id && pServerDE->FindClientResourceString(std::uint32_t(id), name))
+        {
+            source.argument_resource = std::uint32_t(id);
             return name;
+        }
         if (id)
             pickup_message_error = "Missing pickup name string " + std::to_string(id) + "; object name shown";
         return pickup ? pickup->display_name : key->item.name;
@@ -262,6 +266,7 @@ void CPlayerObj::SendPickedUpMessage(HOBJECT hObject, int iRet)
     const auto format = [&](std::uint32_t id)
     {
         // FormatString(id, szObject): cres.dll uses FormatMessage's numbered insertion.
+        source.resource = id;
         std::string text;
         if (!pServerDE->FindClientResourceString(id, text))
         {
@@ -269,9 +274,15 @@ void CPlayerObj::SendPickedUpMessage(HOBJECT hObject, int iRet)
             return std::string();
         }
         if (const auto marker = text.find("%1!s!"); marker != text.npos)
-            text.replace(marker, 5, display_name());
+        {
+            source.argument = display_name();
+            text.replace(marker, 5, source.argument);
+        }
         else if (const auto plain = text.find("%1"); plain != text.npos)
-            text.replace(plain, 2, display_name());
+        {
+            source.argument = display_name();
+            text.replace(plain, 2, source.argument);
+        }
         return text;
     };
     std::string msgbuf;
@@ -290,7 +301,7 @@ void CPlayerObj::SendPickedUpMessage(HOBJECT hObject, int iRet)
             break;
     }
 
-    if (!msgbuf.empty() && SendConsoleMessage(msgbuf))
+    if (!msgbuf.empty() && SendConsoleMessage(msgbuf, std::move(source)))
         ++pickup_messages;
 
     m_hLastPickupObject = hObject;

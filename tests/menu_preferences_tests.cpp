@@ -35,13 +35,13 @@ int test_menu_preferences(int argc, char** argv)
         // The shared atomic writer keeps the exact preference bytes.
         std::ifstream in(path, std::ios::binary);
         const std::string bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        CHECK(bytes == "version=12\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
+        CHECK(bytes == "version=13\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
                        "invert_y=1\ndetail=2\npixel_lighting=0\nrenderer=0\nquality=0\nnormal_maps=1\n"
                        "vr_turn=45\nvr_laser=1\nvr_crosshair=1\nvr_move_hand=0\ncheats=0\ngod_mode=0\n"
                        "antialiasing=0\nbloom=1\ntonemap=1\nambient_occlusion=2\nreflections=2\n"
                        "fullscreen=0\nfullscreen_mode=0\nresolution_width=0\nresolution_height=0\nvsync=1\n"
                        "fps_limit=0\nvr_refresh_rate=0\nvr_render_scale=100\n"
-                       "run_lock=0\nmouse_look=1\ncrosshair=1\ncrosshair_number=1\nfield_of_view=90\n");
+                       "run_lock=0\nmouse_look=1\ncrosshair=1\ncrosshair_number=1\nfield_of_view=90\nlanguage=en\n");
     }
     {
         MenuSettings video;
@@ -330,6 +330,30 @@ int test_menu_preferences(int argc, char** argv)
             out << text;
         }
         CHECK(!load_menu_preferences(path, loaded, error) && !error.empty() && loaded == settings);
+    }
+    {
+        MenuSettings localized;
+        localized.language = Language::ChineseSimplified;
+        CHECK(save_menu_preferences(path, localized, error));
+        CHECK(load_menu_preferences(path, loaded, error) && loaded == localized);
+        std::ifstream input(path);
+        const std::string bytes((std::istreambuf_iterator<char>(input)), {});
+        input.close();
+        const auto language = bytes.find("language=zh-Hans\n");
+        CHECK(language != bytes.npos);
+        {
+            std::ofstream output(path);
+            output << bytes.substr(0, language) << "language=zh\n";
+        }
+        CHECK(!load_menu_preferences(path, loaded, error) && loaded == localized);
+        {
+            std::ofstream output(path);
+            output << "version=12" << bytes.substr(10, language - 10);
+        }
+        CHECK(load_menu_preferences(path, loaded, error) && loaded == MenuSettings{});
+        localized.language = Language::Korean;
+        CHECK(save_menu_preferences(path, localized, error));
+        CHECK(load_menu_preferences(path, loaded, error) && loaded.language == Language::Korean);
     }
     CHECK(save_menu_preferences(path, settings, error));
     auto invalid = settings;

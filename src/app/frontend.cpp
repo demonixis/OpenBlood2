@@ -19,6 +19,8 @@
 #include "app/ui_runtime.h"
 #include "engine/capture.h"
 #include "engine/user_directory.h"
+#include "game/cinematic_captions.h"
+#include "game/localized_font.h"
 #include "game/menu_audio.h"
 #include "game/menu_preferences.h"
 #if BLOOD2_INSPECTOR
@@ -31,6 +33,7 @@
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlgpu3.h>
 #include <spdlog/spdlog.h>
+#include <cfloat>
 #include <utility>
 
 namespace OpenBlood2
@@ -43,9 +46,86 @@ namespace OpenBlood2
         // run_game's requests to run_frontend.
         constexpr int restart_game = -1, return_to_setup = -2, enter_multiplayer = -3;
 
+        void draw_cinematic_caption(CinematicCaption caption, bool letterbox, const UiRuntime& ui,
+                                    const LocalizedFont& font)
+        {
+            if (caption.english.empty())
+                return;
+            const bool translated = ui.localized && !caption.translated.empty() && font.supports(caption.translated);
+            const auto text = translated ? caption.translated : caption.english;
+            auto* face = ui.proportional ? ui.proportional : ImGui::GetFont();
+            if (translated)
+            {
+                // Prefer the proportional face for Latin punctuation, including narrow apostrophes.
+                auto* cursor = text.data();
+                auto remaining = text.size();
+                while (remaining)
+                {
+                    const auto codepoint = SDL_StepUTF8(&cursor, &remaining);
+                    if (codepoint > IM_UNICODE_CODEPOINT_MAX || !face->IsGlyphInFont(ImWchar(codepoint)))
+                    {
+                        face = ui.localized;
+                        break;
+                    }
+                }
+            }
+
+            const auto& viewport = *ImGui::GetMainViewport();
+            const float scale = std::min(viewport.Size.x / 640.f, viewport.Size.y / 480.f);
+            if (scale <= 0)
+                return;
+            const float wrap = std::min(viewport.Size.x - 16 * scale, 544 * scale);
+            const float available = letterbox ? viewport.Size.y / 6 - 8 * scale : 96 * scale;
+            const auto end = text.data() + text.size();
+            float size = 16 * scale;
+            auto bounds = face->CalcTextSizeA(size, FLT_MAX, wrap, text.data(), end);
+            while (bounds.y > available && size > 11 * scale)
+            {
+                size -= scale;
+                bounds = face->CalcTextSizeA(size, FLT_MAX, wrap, text.data(), end);
+            }
+            const float top = viewport.Size.y - (letterbox ? (viewport.Size.y / 6 + bounds.y) / 2
+                                                           : 74 * scale + bounds.y);
+            const ImVec2 pos{viewport.Pos.x + (viewport.Size.x - bounds.x) / 2, viewport.Pos.y + top};
+            auto* draw = ImGui::GetForegroundDrawList();
+            draw->AddText(face, size, {pos.x + scale, pos.y + scale}, IM_COL32(0, 0, 0, 255), text.data(), end, wrap);
+            draw->AddText(face, size, pos, IM_COL32(255, 255, 255, 255), text.data(), end, wrap);
+        }
+
+        struct FrontendPreferences
+        {
+            std::filesystem::path file;
+            MenuSettings settings;
+            std::string error;
+            Localization localization;
+
+            void load_language(bool font_available)
+            {
+                std::string why;
+                if (font_available && !localization.load(settings.language, why))
+                    spdlog::warn("Language {}: {}. Using English.", language_tag(settings.language), why);
+            }
+        };
+
+        bool apply_setup_language(SetupScreen& setup, FrontendPreferences& preferences, bool persist)
+        {
+            const auto language = std::exchange(setup.language_request, std::nullopt);
+            if (!language || *language == preferences.settings.language)
+                return false;
+            preferences.settings.language = setup.language = *language;
+            preferences.load_language(setup.localized_font != nullptr);
+            std::string error;
+            if (persist && !save_menu_preferences(preferences.file, preferences.settings, error))
+            {
+                setup.message = error;
+                spdlog::error("Save preferences failed: {}", error);
+            }
+            return true;
+        }
+
         // The setup screen before any game: until Play, Quit or a window close.
         SetupScreen::Result run_setup(const Options& options, Runtime& runtime, [[maybe_unused]] XrFrontend* xr,
-                                      SetupScreen& setup, std::string& error)
+                                      SetupScreen& setup, FrontendPreferences& preferences, std::string& error)
         {
             // --frames ends the screen like a Quit; --capture saves its third frame (desktop).
             std::uint64_t frames = 0;
@@ -109,6 +189,7 @@ namespace OpenBlood2
                 ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
                 ImGui::NewFrame();
                 const auto result = setup.draw(runtime.window);
+                apply_setup_language(setup, preferences, true);
 #if BLOOD2_XR
                 if (xr && xr->pointer())
                 {
@@ -181,11 +262,13 @@ namespace OpenBlood2
 
         // One game run with one configuration, from the title screen to Quit. The same setup screen
         // is Options > SETUP: Play with a new choice returns restart_game with `next`.
-        int run_game(const Options& options, const Config& config, Runtime& runtime, [[maybe_unused]] UiRuntime& ui,
+        int run_game(const Options& options, const Config& config, Runtime& runtime, UiRuntime& ui,
+                     const LocalizedFont& localized_font, FrontendPreferences& preferences,
                      [[maybe_unused]] XrFrontend* xr, SetupScreen& setup, bool by_setup, Config& next,
                      std::string& refusal, MultiplayerScreen& multiplayer, Options& network_request, bool show_title)
         {
             std::string error;
+            const auto& localization = preferences.localization;
             // Ordinary play reports a fatal stop in a dialog; it used to close without any message.
             const bool interactive = !options.menu_smoke && !options.demo_smoke && options.capture_file.empty() &&
                                      !options.frame_limit && !xr;
@@ -197,8 +280,9 @@ namespace OpenBlood2
                     std::filesystem::path logs;
                     std::string ignored;
                     const auto where = user_directory(logs, ignored) ? path_text(logs / "logs") : "the user directory";
-                    const auto text = "OpenBlood2 stopped: " + error + "\n\nThe session log in " + where +
-                                      " has the details. Please include it when reporting this problem.";
+                    const auto text = localization.format("menu.stopped",
+                        "OpenBlood2 stopped: {0}\n\nThe session log in {1} has the details. "
+                        "Please include it when reporting this problem.", {error, where});
                     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "OpenBlood2", text.c_str(), runtime.window);
                 }
                 return code;
@@ -240,14 +324,10 @@ namespace OpenBlood2
             menu.multiplayer = !xr_mode && !config.demo && !config.nightmares && config.overlays.empty();
 #endif
             menu.setup = true;
-            std::filesystem::path preferences;
-            std::string preference_error;
-            if (!options.menu_smoke && !options.demo_smoke &&
-                (!menu_preferences_path(preferences, preference_error) ||
-                 !load_menu_preferences(preferences, menu.settings, preference_error)))
-                spdlog::warn("Preferences: {}", preference_error);
+            menu.settings = preferences.settings;
             // Saved games (decision 1): the per-user directory, never in smoke runs or the demo (decision 7).
             SaveFlow saves;
+            saves.localization = &localization;
             if (config.demo)
                 saves.slots.unavailable = "The demo edition has no saved games.";
             else if (options.menu_smoke || options.demo_smoke)
@@ -287,6 +367,8 @@ namespace OpenBlood2
             if (menu_enabled)
             {
                 canvas = std::make_unique<MenuCanvas>(artwork);
+                canvas->localization = &localization;
+                canvas->localized_font = ui.localized ? &localized_font : nullptr;
                 if (!canvas->initialize(error))
                     return failed(5);
                 menu_audio = std::make_unique<MenuAudio>(artwork);
@@ -323,9 +405,10 @@ namespace OpenBlood2
             }
             else
                 menu.open(false);
-            if (menu_enabled && !preference_error.empty())
+            if (menu_enabled && !preferences.error.empty())
                 menu.open(game->client_shell.m_bInWorld);
-            menu.error = menu_enabled ? preference_error : std::string{};
+            if (menu_enabled)
+                menu.error = std::exchange(preferences.error, {});
             if (!refusal.empty())
                 menu.error = std::exchange(refusal, {});
             DisplayOptions display_options(runtime);
@@ -358,7 +441,8 @@ namespace OpenBlood2
                 {
                     if (!SDL_StartTextInput(runtime.window))
                     {
-                        game->client_shell.SetControlNotice("Text input unavailable");
+                        game->client_shell.SetControlNotice(std::string(localization.text(
+                            "hud.text_input_unavailable", "Text input unavailable")));
                         input.message.cancel();
                     }
                 }
@@ -394,6 +478,8 @@ namespace OpenBlood2
             // The original loading screen (StartNewWorld) on normal menu launches; the menu-free demo,
             // direct entry and inspector levels keep their immediate loads.
             LoadingFlow loading(artwork);
+            loading.screen.localization = &localization;
+            loading.screen.localized_font = ui.localized ? &localized_font : nullptr;
             // Original startup: title.pcx stretched to the screen for six seconds, or until Esc, Return
             // or Space (no movies are played yet). Direct entry (runworld) and smokes skip it.
             HudSurface title;
@@ -419,6 +505,8 @@ namespace OpenBlood2
             ScenePresenter presenter(runtime.gpu);
             presenter.model_shadows = options.model_shadows;
             HudRenderer hud(runtime.gpu);
+            if (ui.localized)
+                hud.set_localization(&localization, &localized_font);
 #if BLOOD2_INSPECTOR
             Inspector inspector(runtime);
             inspector.world_mesh = &presenter.world_mesh;
@@ -492,6 +580,17 @@ namespace OpenBlood2
                     }
                 }
 #endif
+                // The opening subway cinematic hides the HUD. Validate localized play in the
+                // next story map after the scripted pause/menu traversal completes.
+                if (options.menu_smoke && !config.demo && frames == 218)
+                {
+                    if (!GameSession::start_new_game(game, "02_CityHub", 1, 0, error))
+                        return failed(4);
+                    reset_after_promotion(menu, input, selection, controlled, game->client_shell);
+#if BLOOD2_INSPECTOR
+                    inspector.forget_world();
+#endif
+                }
                 const bool paused_at_start = input.paused(menu);
                 [[maybe_unused]] bool level_changed = false;
                 const auto tick = SDL_GetTicksNS();
@@ -511,6 +610,9 @@ namespace OpenBlood2
                                                                                  input, *menu_audio, error)
                                                         : smoke.before(frames, runtime.window, *game, menu, input,
                                                                        *menu_audio, error, multiplayer.active)))
+                    return failed(4);
+                if (options.menu_smoke && frames == (config.demo ? 33u : 224u) &&
+                    !MenuSmoke::trigger_caption(*game, config.demo ? "jaycin1" : "hankgermconv", error))
                     return failed(4);
                 if (options.demo_smoke)
                 {
@@ -966,9 +1068,17 @@ namespace OpenBlood2
 #endif
                 if (stored_settings != menu.settings)
                 {
+                    preferences.settings = menu.settings;
+                    if (stored_settings.language != menu.settings.language)
+                    {
+                        setup.language = menu.settings.language;
+                        preferences.load_language(ui.localized != nullptr);
+                        game->client_shell.control_notice.clear();
+                        saves.notice.text.clear();
+                    }
                     stored_settings = menu.settings;
                     if (!options.menu_smoke && !options.demo_smoke &&
-                        !save_menu_preferences(preferences, menu.settings, error))
+                        !save_menu_preferences(preferences.file, menu.settings, error))
                     {
                         menu.error = error;
                         spdlog::error("Save preferences failed: {}", error);
@@ -1090,7 +1200,7 @@ namespace OpenBlood2
                 }
                 if (!blocked && !menu.active && !xr_mode)
                 {
-                    apply_control_actions(input.controls, shell, false, &menu.settings);
+                    apply_control_actions(input.controls, shell, false, &menu.settings, &localization, &localized_font);
                     shell.movement_input = input.controls.sample(false);
                     const auto fire = input.controls.sample_fire(false);
                     shell.weapon_input.primary = fire.primary;
@@ -1251,12 +1361,21 @@ namespace OpenBlood2
                 }
                 else if (multiplayer.active)
                 {
-                    multiplayer.draw();
+                    multiplayer.draw(&localization, &localized_font, ui.localized);
                     if (!multiplayer.active)
                         input.reset(menu, game->client_shell.m_bInWorld);
                 }
                 else if (input.setup_screen)
+                {
                     setup_result = setup.draw(runtime.window);
+                    if (apply_setup_language(setup, preferences, !options.menu_smoke))
+                    {
+                        stored_settings.language = menu.settings.language = setup.language;
+                        game->client_shell.control_notice.clear();
+                        saves.notice.text.clear();
+                        ++menu.revision;
+                    }
+                }
                 else if (menu.active)
                 {
                     if (!canvas->compose(menu, 0, error) || !menu_renderer.draw(*canvas, error))
@@ -1270,10 +1389,11 @@ namespace OpenBlood2
                     if (game->client_shell.m_bInWorld && game->client_shell.m_bRollCredits)
                         draw_credits(game->client_shell.m_Credits);
                     const auto& client = game->client_shell;
+                    const bool letterbox = !xr_mode && client.m_bInWorld && presenter.render_world &&
+                                           client.view.object && client.view.settings.type == 1;
                     if (!xr_mode) // XR has no letterbox and fades the scene, not the head-locked canvas.
                     {
-                        draw_letterbox(client.m_bInWorld && presenter.render_world && client.view.object &&
-                                       client.view.settings.type == 1);
+                        draw_letterbox(letterbox);
                         draw_screen_fade(client.fade.Scale(), client.m_bInWorld);
                     }
                     // XR aims with the controller (laser and reticle): no screen-centred crosshair.
@@ -1287,20 +1407,55 @@ namespace OpenBlood2
                         game->client_shell.PlayInterfaceSound("Sounds\\Interface\\MainMenus\\missionobj.wav");
                     // PostUpdate GS_PLAYING: m_MessageMgr.Draw, then the status bar.
                     if (client.m_bInWorld)
+                    {
+                        std::string notice = client.control_notice;
+                        if (!notice.empty() && !client.control_notice_key.empty())
+                        {
+                            const auto text = localization.text(client.control_notice_key);
+                            if (!text.empty() && localized_font.supports(text))
+                                notice = text;
+                        }
                         draw_messages(game->client_shell.m_MessageMgr, state.time,
-                                      input.message.active ? &input.message.text : nullptr, client.control_notice);
+                                      input.message.active ? &input.message.text : nullptr, notice,
+                                      localization.language() != Language::English ? ui.localized : nullptr,
+                                      &localization, &game->resources);
+                    }
                     if (!hud.draw(state, game->resources, error))
                         return failed(4);
+                    if (client.m_bInWorld)
+                    {
+                        const auto caption = cinematic_caption(game->client_session.audio, game->resources, &localization,
+                                                               &client.listener_position, client.communication.voice);
+                        if (options.menu_smoke && frames == (config.demo ? 34u : 226u) &&
+                            (caption.english.empty() || caption.translated.empty() ||
+                             !localized_font.supports(caption.translated)))
+                        {
+                            error = "The authored dialogue did not render in the selected language";
+                            return failed(4);
+                        }
+                        draw_cinematic_caption(caption, letterbox, ui, localized_font);
+                    }
+                    if (options.menu_smoke && (config.demo ? DemoMenuSmoke::phase(frames) == 78 : frames == 230) &&
+                        (!hud.status_bar() || hud.status_bar()->objectives_level() != OBJTAB_STOPPED))
+                    {
+                        error = "The authored objective page did not open in the menu traversal";
+                        return failed(4);
+                    }
                     if (input.touch.visible && client.m_bInWorld && !xr_mode && !input.message.active)
                         draw_touch_controls(input.touch);
                     if (saves.notice.visible())
                     {
+                        const bool localized = ui.localized && localization.language() != Language::English;
+                        if (localized)
+                            ImGui::PushFont(ui.localized, 0.0f);
                         const auto& io = ImGui::GetIO();
                         const auto size = ImGui::CalcTextSize(saves.notice.text.c_str());
                         const ImVec2 at{(io.DisplaySize.x - size.x) * .5f, io.DisplaySize.y * .25f};
                         auto* draw = ImGui::GetForegroundDrawList();
                         draw->AddText({at.x + 1, at.y + 1}, IM_COL32(0, 0, 0, 255), saves.notice.text.c_str());
                         draw->AddText(at, IM_COL32(255, 255, 255, 255), saves.notice.text.c_str());
+                        if (localized)
+                            ImGui::PopFont();
                     }
                 }
 #if BLOOD2_XR
@@ -1315,20 +1470,28 @@ namespace OpenBlood2
 #endif
                 if (!menu.error.empty())
                 {
-                    ImGui::OpenPopup("Unable to complete request");
-                    if (ImGui::BeginPopupModal("Unable to complete request", nullptr,
+                    const bool localized = ui.localized && localization.language() != Language::English;
+                    if (localized)
+                        ImGui::PushFont(ui.localized, 0.0f);
+                    const auto caption = std::string(localization.text("menu.request_failed", "Unable to complete request")) +
+                                         "###menu.error";
+                    ImGui::OpenPopup(caption.c_str());
+                    if (ImGui::BeginPopupModal(caption.c_str(), nullptr,
                                                ImGuiWindowFlags_AlwaysAutoResize))
                     {
                         ImGui::PushTextWrapPos(500);
                         ImGui::TextWrapped("%s", menu.error.c_str());
                         ImGui::PopTextWrapPos();
-                        if (ImGui::Button("Close") || std::exchange(dismiss_error, false))
+                        const auto close = std::string(localization.text("menu.close", "Close")) + "###menu.error.close";
+                        if (ImGui::Button(close.c_str()) || std::exchange(dismiss_error, false))
                         {
                             menu.error.clear();
                             ImGui::CloseCurrentPopup();
                         }
                         ImGui::EndPopup();
                     }
+                    if (localized)
+                        ImGui::PopFont();
                 }
 #if BLOOD2_INSPECTOR
                 inspector.hud_status = hud.status_bar();
@@ -1408,8 +1571,9 @@ namespace OpenBlood2
                 const bool phase_capture =
                     (options.menu_smoke && config.demo && DemoMenuSmoke::capture(frames)) ||
                     (options.menu_smoke && !config.demo &&
-                     (frames == 4 || frames == 8 || frames == 17 || frames == 32 || frames == 23 || frames == 120 ||
-                      frames == 38 || frames == 208 || frames == 214)) ||
+                     (frames == 4 || frames == 8 || frames == 15 || frames == 17 || frames == 32 || frames == 23 ||
+                      frames == 120 || frames == 38 || frames == 208 || frames == 214 || frames == 226 || frames == 230 ||
+                      frames == 234)) ||
                     (options.demo_smoke && (frames == 4 || frames == 14 || frames == 45 || frames == 62));
                 const bool save =
                     target && ((frames >= 2 && !captured) || phase_capture) && !options.capture_file.empty();
@@ -1535,6 +1699,7 @@ namespace OpenBlood2
             return failed(3);
         spdlog::info("GPU device: {}", SDL_GetStringProperty(SDL_GetGPUDeviceProperties(runtime.gpu),
                                                              SDL_PROP_GPU_DEVICE_NAME_STRING, "unreported"));
+        LocalizedFont localized_font;
         UiRuntime ui(runtime);
 #if BLOOD2_XR
         XrFrontend* session = xr.get();
@@ -1544,10 +1709,25 @@ namespace OpenBlood2
         if (!ui.initialize(error))
 #endif
             return failed(3);
+        std::string font_error;
+        if (!localized_font.load(font_error))
+            spdlog::warn("Language font: {}. Using English.", font_error);
+        else if (!ui.set_localized_font(localized_font))
+            spdlog::warn("Cannot initialize the language font. Using English.");
+
+        FrontendPreferences preferences;
+        if (!options.menu_smoke && !options.demo_smoke &&
+            (!menu_preferences_path(preferences.file, preferences.error) ||
+             !load_menu_preferences(preferences.file, preferences.settings, preferences.error)))
+            spdlog::warn("Preferences: {}", preferences.error);
+        preferences.load_language(ui.localized != nullptr);
         MultiplayerScreen multiplayer;
         multiplayer.font = ui.proportional;
         SetupScreen setup;
         setup.font = ui.proportional;
+        setup.localized_font = ui.localized;
+        setup.localization = &preferences.localization;
+        setup.language = preferences.settings.language;
         // A configuration from the command line, environment or blood2.local.ini skips the screen,
         // and so does a game installed around the executable (a portable copy) or a stored choice
         // that is still playable.
@@ -1600,7 +1780,7 @@ namespace OpenBlood2
                 if (!refusal.empty())
                     setup.message = std::exchange(refusal, {});
                 spdlog::info("Setup screen shown");
-                const auto result = run_setup(options, runtime, session, setup, error);
+                const auto result = run_setup(options, runtime, session, setup, preferences, error);
                 if (result == SetupScreen::Result::Quit)
                     return 0;
                 if (result != SetupScreen::Result::Play)
@@ -1610,12 +1790,13 @@ namespace OpenBlood2
             }
             Config chosen;
             Options network_request;
-            const int code = run_game(options, *next, runtime, ui, session, setup, by_setup, chosen, refusal,
-                                      multiplayer, network_request, show_title);
+            const int code = run_game(options, *next, runtime, ui, localized_font, preferences, session, setup, by_setup,
+                                      chosen, refusal, multiplayer, network_request, show_title);
             if (code == enter_multiplayer)
             {
                 bool quit = false;
-                const int result = run_network_session(network_request, *next, runtime, refusal, quit);
+                const int result = run_network_session(network_request, *next, runtime, refusal, quit, &localized_font,
+                                                       ui.localized);
                 if (quit)
                     return result;
                 show_title = false;

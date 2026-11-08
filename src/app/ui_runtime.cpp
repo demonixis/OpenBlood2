@@ -1,4 +1,5 @@
 #include "app/ui_runtime.h"
+#include "game/localized_font.h"
 #include "ui_font.h"
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
@@ -55,6 +56,21 @@ namespace OpenBlood2
         if (!renderer)
             error = "Cannot initialize Dear ImGui SDL_GPU renderer backend";
         return renderer;
+    }
+
+    bool UiRuntime::set_localized_font(const LocalizedFont& font)
+    {
+        if (!context || !font)
+            return false;
+        if (!localized)
+        {
+            const auto bytes = font.bytes();
+            ImFontConfig config;
+            config.FontDataOwnedByAtlas = false;
+            localized = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(const_cast<std::uint8_t*>(bytes.data()),
+                                                                 int(bytes.size()), 0.0f, &config);
+        }
+        return localized != nullptr;
     }
 
     UiRuntime::~UiRuntime()

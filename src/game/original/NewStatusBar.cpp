@@ -325,7 +325,8 @@ CNewStatusBar::WeaponLayout CNewStatusBar::DrawWeaponTabs(float time)
         layout.y[i] = int(m_stWeapons[i].locY);
     return layout;
 }
-void CNewStatusBar::UpdateInv(const OpenBlood2::InventoryItems& items, bool bShow, float time)
+void CNewStatusBar::UpdateInv(const OpenBlood2::InventoryItems& items, bool bShow, float time,
+                             const TextPainter& name_painter, bool update_scroll)
 {
     if (!inventory_ready)
         return;
@@ -345,7 +346,9 @@ void CNewStatusBar::UpdateInv(const OpenBlood2::InventoryItems& items, bool bSho
 
     // Fill in the name of the current object
     canvas.FillRect(m_hItemName, nullptr, m_hTransColor);
-    if (items.current && !items.current->name.empty())
+    if (name_painter)
+        name_painter(*m_hItemName, int(stat_font.height));
+    else if (items.current && !items.current->name.empty())
         stat_font.draw(*m_hItemName, items.current->name, 0, 0, 0);
 
     // Currently selected item, the highlighted item in the inv tabs, previous and next
@@ -359,27 +362,30 @@ void CNewStatusBar::UpdateInv(const OpenBlood2::InventoryItems& items, bool bSho
     m_stItems[2].value = items.next ? items.next->charges : 0;
 
     // Update the time so it stays on the screen for a while
-    switch (m_nInvLevel)
+    if (update_scroll)
     {
-        case INVTAB_INVISIBLE:
-            if (bShow)
-            {
+        switch (m_nInvLevel)
+        {
+            case INVTAB_INVISIBLE:
+                if (bShow)
+                {
+                    m_nInvLevel = INVTAB_SCROLL_IN;
+                    m_fInvUpdateTime = time;
+                }
+                break;
+
+            case INVTAB_SCROLL_IN:
+                break;
+
+            case INVTAB_STOPPED:
+                m_fInvUpdateTime = time;
+                break;
+
+            case INVTAB_SCROLL_OUT:
                 m_nInvLevel = INVTAB_SCROLL_IN;
                 m_fInvUpdateTime = time;
-            }
-            break;
-
-        case INVTAB_SCROLL_IN:
-            break;
-
-        case INVTAB_STOPPED:
-            m_fInvUpdateTime = time;
-            break;
-
-        case INVTAB_SCROLL_OUT:
-            m_nInvLevel = INVTAB_SCROLL_IN;
-            m_fInvUpdateTime = time;
-            break;
+                break;
+        }
     }
 
     // Setup the items tabs with the new information
@@ -715,7 +721,7 @@ void CNewStatusBar::InitPanels()
     if (m_hPowerBar)
         canvas.FillRect(m_hPowerBar, nullptr, m_hTransColor);
 }
-bool CNewStatusBar::InitObjectivesTab()
+bool CNewStatusBar::InitObjectivesTab(const TextPainter& title_painter)
 {
     if (!m_hObjectives)
         return false;
@@ -724,11 +730,15 @@ bool CNewStatusBar::InitObjectivesTab()
     canvas.DrawSurfaceToSurface(m_hObjectives, objectives_background, nullptr, 0, 0);
 
     // Setup the font and print it out on the surface
-    objectives_font.draw(*m_hObjectives, "No Current Objective", OBJTAB_TITLE_CENTER, OBJTAB_TITLE_TOP, 1);
+    if (title_painter)
+        title_painter(*m_hObjectives, int(objectives_font.height));
+    else
+        objectives_font.draw(*m_hObjectives, "No Current Objective", OBJTAB_TITLE_CENTER, OBJTAB_TITLE_TOP, 1);
     ++revision;
     return true;
 }
-void CNewStatusBar::UpdateObjectives(bool valid, const std::string& title, const std::string& text)
+void CNewStatusBar::UpdateObjectives(bool valid, const std::string& title, const std::string& text,
+                                    const TextPainter& title_painter, const TextPainter& body_painter, bool update_icon)
 {
     if (!m_hObjectives)
         return;
@@ -736,8 +746,9 @@ void CNewStatusBar::UpdateObjectives(bool valid, const std::string& title, const
     // If we send in a null title or string, reset the objectives
     if (!valid)
     {
-        InitObjectivesTab();
-        m_nObjIcon = OBJICON_INVISIBLE;
+        InitObjectivesTab(title_painter);
+        if (update_icon)
+            m_nObjIcon = OBJICON_INVISIBLE;
         return;
     }
 
@@ -747,14 +758,19 @@ void CNewStatusBar::UpdateObjectives(bool valid, const std::string& title, const
     canvas.DrawSurfaceToSurface(m_hObjectives, objectives_background, nullptr, 0, 0);
 
     // Setup the font and print it out on the surface
-    objectives_font.draw(*m_hObjectives, title, OBJTAB_TITLE_CENTER, OBJTAB_TITLE_TOP, 1);
-    objectives_font.draw_format(*m_hObjectives, text, OBJTAB_TEXT_LEFT, OBJTAB_TEXT_TOP, OBJTAB_TEXT_WIDTH);
+    if (title_painter)
+        title_painter(*m_hObjectives, int(objectives_font.height));
+    else
+        objectives_font.draw(*m_hObjectives, title, OBJTAB_TITLE_CENTER, OBJTAB_TITLE_TOP, 1);
+    if (body_painter)
+        body_painter(*m_hObjectives, int(objectives_font.height));
+    else
+        objectives_font.draw_format(*m_hObjectives, text, OBJTAB_TEXT_LEFT, OBJTAB_TEXT_TOP, OBJTAB_TEXT_WIDTH);
 
     // Turn on the updated icon if we're not currently displaying the objectives
-    if (m_nObjLevel == OBJTAB_INVISIBLE || m_nObjLevel == OBJTAB_SCALE_DOWN)
-        m_nObjIcon = OBJICON_VISIBLE;
-    else
-        m_nObjIcon = OBJICON_INVISIBLE;
+    if (update_icon)
+        m_nObjIcon = m_nObjLevel == OBJTAB_INVISIBLE || m_nObjLevel == OBJTAB_SCALE_DOWN ? OBJICON_VISIBLE
+                                                                                       : OBJICON_INVISIBLE;
 
     // The bellding1.wav change sound is the shell's (PlayInterfaceSound).
     ++revision;

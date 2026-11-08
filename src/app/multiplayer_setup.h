@@ -16,6 +16,6 @@ namespace OpenBlood2
         bool load(const Resources&, const Config&, std::string& error);
         unsigned game_type() const;
         std::vector<std::string> mode_maps() const;
-        bool request(bool host, Options&, std::string& error) const;
+        bool request(bool host, Options&, std::string& error, std::string_view* error_key = nullptr) const;
     };
 } // namespace OpenBlood2

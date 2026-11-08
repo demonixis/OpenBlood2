@@ -1300,10 +1300,16 @@ The server chooses the index once; clients perform no additional random draw.
 Read cres.dll locally through the existing bounded PE string reader. Combat
 strings must be nonempty and shorter than the original 128-byte buffer. Replace
 unbounded sprintf with checked %s/%% substitution into fewer than 500 bytes;
-player names are literal data. Missing, oversized or malformed localized strings
+player names are literal data. Missing, oversized or malformed DLL strings
 use the exact original fallback and increment a visible diagnostic. Extra names
 are permitted for source templates without placeholders. Invalid characters or
 names fail without changing the output. Never execute commercial DLL code.
+
+For translated clients, the same resource IDs can supply UTF-8 catalog strings.
+Numbered placeholders let languages reorder names while inserting each name as
+literal text. An unusable translation keeps the original string. Translated
+CommLink captions follow the existing text visibility clock, and clients retain
+the original voice clips and server-selected index.
 
 Resolve both names and characters from the already-applied roster using exact
 object generations. Missing identities produce no announcement, as in the source.
@@ -1318,8 +1324,7 @@ independent five-second lifetime and expiry at now >= deadline. Draw white text
 at (1, 0) with 16-pixel line height. The portable ImGui font replaces the original
 Windows Arial surface font; raster parity is not claimed. Clear notices and
 retained audio with the endpoint. Existing solo CommLink clocks/behavior and
-local message editing stay unchanged. Communication portrait/text rendering,
-join/leave notices, chat and scoreboard remain separate UI work.
+local message editing stay unchanged.
 
 
 ## Bounded network audio cache reclamation
@@ -1772,7 +1777,7 @@ Protocol bytes in the network tests come from `Net::protocol_version`.
 ## Host/Join menus and LAN discovery (2026-10-31)
 
 The retail desktop Main/BLOODBATH command opens the replacement Host/Join
-screen (English labels since lot 7's review; desktop only, never Android/iOS). The original demo promotion and non-network edition paths remain unchanged.
+screen (desktop only, with [localized labels](menu_contracts.md#language)). The demo uses its original promotional screen and other editions keep their admission rules.
 Use the same validated host/connect options and network session loop as CLI entry;
 name, original character/team preference, Bloodbath/Team/CTF maps and match/rotation
 rules are selected in the UI. Defaults remain 25 frags, host 15 timed minutes and

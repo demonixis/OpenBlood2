@@ -138,6 +138,7 @@ add_library(blood2_game STATIC src/game/original/ScreenFade.cpp src/game/origina
     src/game/local_scene.cpp src/game/local_scene_model.cpp src/game/local_scene_sprite.cpp
     src/game/local_scene_polygrid.cpp src/game/local_scene_lighting.cpp
     src/game/local_movement.cpp src/game/local_presentation.cpp src/game/local_audio.cpp src/game/local_effects.cpp
+    src/game/cinematic_captions.cpp
     src/game/session.cpp
     src/game/world_validation.cpp
     src/game/player_restore.cpp
@@ -173,8 +174,15 @@ target_sources(blood2_game PRIVATE src/game/menu_resources.cpp)
 if(BLOOD2_BUILD_CLIENT)
     target_sources(blood2_game PRIVATE src/game/local_scene_presenter.cpp)
     add_library(blood2_frontend STATIC src/game/original/MainMenus.cpp src/game/menu_canvas.cpp src/game/menu_audio.cpp
+        src/engine/localization.cpp
         src/game/original/LoadingScreen.cpp
-        src/game/menu_preferences.cpp src/game/new_game.cpp)
+        src/game/menu_preferences.cpp src/game/new_game.cpp src/game/localized_font.cpp)
+    target_include_directories(blood2_frontend SYSTEM PRIVATE "${imgui_source_SOURCE_DIR}")
+    set(localized_font "${PROJECT_SOURCE_DIR}/lang/fonts/locale.ttf")
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${localized_font}")
+    file(SHA256 "${localized_font}" localized_font_sha256)
+    set_source_files_properties(src/game/localized_font.cpp PROPERTIES
+        COMPILE_DEFINITIONS BLOOD2_LOCALIZED_FONT_SHA256="${localized_font_sha256}")
     target_link_libraries(blood2_frontend PUBLIC blood2_game)
     blood2_project_options(blood2_frontend)
 endif()

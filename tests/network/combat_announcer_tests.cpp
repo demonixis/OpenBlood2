@@ -155,6 +155,37 @@ namespace
               line.text == "A%s eliminated % himself");
         CHECK(announcer.finish({0, 0, 0}, resources, line) && line.text == "Humiliate Him!");
         CHECK(announcer.fallback_texts == 4 && !announcer.error.empty());
+        announcer.set_translations([](unsigned id) -> std::string_view
+        {
+            switch (id)
+            {
+                case 25:
+                    return "{0} 참가";
+                case 7003:
+                    return "{1}: {0} 깃발 점령";
+                case 7008:
+                    return "빨강 팀";
+                case 4130:
+                    return "{1} est anéanti par {0} (100%).";
+                case 4131:
+                    return "{0} incomplete";
+                case 4100:
+                    return "Unexpected {0}";
+                default:
+                    return {};
+            }
+        });
+        std::string caption;
+        CHECK(announcer.frag(30, {"A%s{1}", 0}, {"V%n{0}", 1}, false, resources, line, &caption));
+        CHECK(line.text == "A%s{1} slagged V%n{0}" && line.file == "Sounds\\Voice\\Voice31.wav" &&
+              caption == "V%n{0} est anéanti par A%s{1} (100%).");
+        CHECK(announcer.frag(31, {"A%s", 0}, {"V%n", 1}, false, resources, line, &caption) && caption.empty() &&
+              line.text == "A%s annihilated V%n");
+        CHECK(announcer.frag(0, {"A%s", 0}, {"V%n", 1}, false, resources, line, &caption) && caption.empty() &&
+              line.text == "Destroyed");
+        CHECK(announcer.player_notice("A%s{1}", true, resources, caption) && caption == "A%s{1} 참가");
+        CHECK(announcer.flag_notice(CTFEventKind::Captured, "A%s{1}", 2, false, resources, caption) &&
+              caption == "빨강 팀: A%s{1} 깃발 점령");
         return true;
     }
     bool speech(const std::filesystem::path& root)
@@ -173,6 +204,10 @@ namespace
             {1, {0, 1}, "A%s", 0, 1}, {2, {1, 1}, "Victim", 1, 0}, {3, {2, 1}, "Observer", 2, 0}};
         NetworkAudio audio[3];
         NetworkSpeech a(audio[0], resources), b(audio[1], resources), c(audio[2], resources);
+        constexpr auto translated = "{0} a réduit {1} en scories. Ce texte allongé ne change pas la durée de la voix.";
+        const auto locale = [&](unsigned id) -> std::string_view { return id == 4130 ? translated : ""; };
+        a.announcer.set_translations(locale);
+        b.announcer.set_translations(locale);
         NetworkSpeech* clients[]{&a, &b, &c};
         ClientWorld world;
         CHECK(world.begin(7));
@@ -183,19 +218,24 @@ namespace
             CHECK(clients[i]->receive({owners[i], 1, 0, FragEvent{{1, 1}, {0, 1}, 1, 30}}, .1, false, roster, error));
         }
         CHECK(a.communication.level == 1 && a.communication.message.text == "A%s slagged Victim" &&
-              a.notices().empty());
+              a.communication.length == 2.5f && a.announcer_caption().empty() && a.notices().empty());
         CHECK(b.notices().size() == 1 && c.notices().size() == 1 && !b.communication.level && !c.communication.level);
+        CHECK(b.notices().back().text.starts_with("A%s a réduit Victim en scories.") &&
+              c.notices().back().text == "A%s slagged Victim");
         CHECK(a.manager.PlaySound("tone.wav", true));
         const auto prior = a.manager.voice;
         CHECK(a.receive({owners[0], 1, 0, FragEvent{{1, 1}, {0, 1}, 1, 30}}, .2, false, roster, error));
         CHECK(a.frag_events == 1 && a.manager.voice == prior && a.communication.received == 1);
         CHECK(a.update(.31, error) && a.communication.voice && !a.manager.voice && !audio[0].mixer.get(prior));
+        CHECK(a.announcer_caption() ==
+              "A%s a réduit Victim en scories. Ce texte allongé ne change pas la durée de la voix.");
         CHECK(audio[0].advance(.1, world, {}, {}) && audio[0].mixer.peak == .5f);
         CHECK(!audio[1].local_started && !audio[2].local_started);
         const auto voice = a.communication.voice;
         CHECK(a.receive({owners[0], 2, 0, FinishHimVoice{0, 0, 1}}, .4, false, roster, error));
-        CHECK(a.communication.busy == 1 && a.communication.voice == voice);
+        CHECK(a.communication.busy == 1 && a.communication.voice == voice && !a.announcer_caption().empty());
         a.clear();
+        CHECK(a.announcer_caption().empty());
         CHECK(a.receive({owners[0], 3, 0, FinishHimVoice{0, 0, 1}}, 4, false, roster, error));
         CHECK(a.communication.message.text == "Humiliate Her!" &&
               a.communication.message.file == "Sounds\\Voice\\Voice241.wav");

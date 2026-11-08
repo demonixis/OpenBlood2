@@ -38,7 +38,8 @@ The SMSG_CONVERSATION branch invokes the numeric-character `CCommLink` path. A b
 communication discards the incoming message without replacing the current one;
 the server does not rewind. Character 0–4 selects the original Caleb, Ophelia,
 Ishmael, Gabriella and voice portrait path; other bytes select the unknown portrait.
-Paths are metadata; the original PCX/font HUD is not rendered.
+The presentation draws the original portrait and communication font with the
+original entry, text reveal, hold and exit ratios.
 
 The tab uses strict `> 0.2` second entry/exit transitions. Its stopped duration is
 `max(2.5, text_bytes / 15)`, with the original separate text scroll/hold phases.
@@ -58,8 +59,12 @@ Timing moved from the source Draw method into the client simulation update so it
 continues with Dear ImGui hidden or compiled out. This is an explicit adaptation.
 The [player VoiceMgr continuation](player_voice_contracts.md) now connects the
 source StopAll/SetNextPlayTime arbitration to actual retained player speech.
-Original portrait/font HUD drawing remains pending; Save/Load follow the original block
-([save/load lot 7](save_load_contracts.md#implemented-world-logic-lot-7)). Safe
+The `[dialogue]` catalog resolves the original, case-insensitive WAV basename
+when the communication text matches the source table. It fills missing bitmap
+glyphs with the bundled Unicode face and reveals whole UTF-8 characters. Absent
+or unsupported translations draw the source text. The selected language never
+changes the bytes used for the original deadline, the voice path or arbitration.
+Save/Load follow the original block ([save/load lot 7](save_load_contracts.md#implemented-world-logic-lot-7)). Safe
 NEW_LEVEL is covered by the later [transition contract](level_change_contracts.md).
 
 ## Inspection and external-data evidence

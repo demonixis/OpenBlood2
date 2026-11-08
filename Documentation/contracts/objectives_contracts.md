@@ -49,6 +49,15 @@ An unresolved UI string is reported without tearing down an otherwise valid
 inspection session; it is not credited as implemented gameplay or successful
 resource resolution.
 
+The status bar applies the selected language to the resolved title and body when
+drawing its page. Numbered objectives use their original resource IDs. Objectives
+authored as text use a fingerprint of the original title and body so translations
+match the supplied text. A restored objective can recover its resource ID from an
+exact English title/body pair. Each absent translation uses the source text.
+The HUD wraps translated text within the original page, including Chinese text
+without spaces and explicit `|` line breaks. Delivery, sound and save fields keep
+the original values.
+
 ## Portable PE resource reader
 
 The first localized objective reads external `cres.dll` through the existing REZ

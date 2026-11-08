@@ -9,7 +9,7 @@ void CMessageMgr::Enable(bool bEnabled)
 
     m_bEnabled = bEnabled;
 }
-void CMessageMgr::AddLine(std::string_view szMsg, float time)
+void CMessageMgr::AddLine(std::string_view szMsg, float time, const OpenBlood2::ConsoleTextSource& source)
 {
     Message* pMsg = &m_Messages[m_nNextMessage];
 
@@ -21,7 +21,7 @@ void CMessageMgr::AddLine(std::string_view szMsg, float time)
     {
         // expire the oldest Message and recalculate the first Message in the buffer
         Message* pOld = &m_Messages[m_nFirstMessage];
-        pOld->text.clear();
+        *pOld = {};
 
         m_nFirstMessage = (m_nFirstMessage + 1) % kMaxMessages;
 
@@ -30,6 +30,7 @@ void CMessageMgr::AddLine(std::string_view szMsg, float time)
     }
 
     pMsg->text = std::string(szMsg);
+    pMsg->source = source;
     pMsg->fExpiration = time + m_fMessageTime;
     ++added;
 }
@@ -56,7 +57,7 @@ std::vector<CMessageMgr::Line> CMessageMgr::Draw(float time, int* input_y)
         // expire Messages that have overstayed their welcome
         if (time >= pMsg->fExpiration)
         {
-            pMsg->text.clear();
+            *pMsg = {};
             // expire the oldest Message and recalculate the Message position and counter
             m_nFirstMessage = (m_nFirstMessage + 1) % kMaxMessages;
             m_nMessageCount--;
@@ -67,7 +68,7 @@ std::vector<CMessageMgr::Line> CMessageMgr::Draw(float time, int* input_y)
         }
 
         // draw the text
-        out.push_back({pMsg->text, m_x, y});
+        out.push_back({pMsg->text, m_x, y, pMsg->source});
         y += kFontHeight;
     }
     if (input_y)
@@ -77,7 +78,7 @@ std::vector<CMessageMgr::Line> CMessageMgr::Draw(float time, int* input_y)
 void CMessageMgr::Clear()
 {
     for (int i = 0; i < m_nMessageCount; i++)
-        m_Messages[(m_nFirstMessage + i) % kMaxMessages].text.clear();
+        m_Messages[(m_nFirstMessage + i) % kMaxMessages] = {};
 
     m_nFirstMessage = m_nNextMessage = m_nMessageCount = 0;
 }

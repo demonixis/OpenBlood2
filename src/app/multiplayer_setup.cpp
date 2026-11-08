@@ -41,23 +41,26 @@ namespace OpenBlood2
                 out.push_back(p);
         return out;
     }
-    bool MultiplayerSetup::request(bool host, Options& out, std::string& error) const
+    bool MultiplayerSetup::request(bool host, Options& out, std::string& error, std::string_view* error_key) const
     {
         error.clear();
-        if (name.back() || address.back() || character < 0 || character > 3 || team < 0 || team > 2)
+        if (error_key)
+            *error_key = {};
+        const auto fail = [&](std::string_view key, std::string message)
         {
-            error = "Choose a valid player name, character and team.";
+            if (error_key)
+                *error_key = key;
+            error = std::move(message);
             return false;
-        }
+        };
+        if (name.back() || address.back() || character < 0 || character > 3 || team < 0 || team > 2)
+            return fail("network.invalid_profile", "Choose a valid player name, character and team.");
         Net::JoinProfile profile;
         profile.name = name.data();
         profile.character = std::uint8_t(character);
         profile.team = std::uint8_t(team);
         if (!Net::valid_profile(profile))
-        {
-            error = "Enter a player name (1 to 100 characters, no control characters).";
-            return false;
-        }
+            return fail("network.invalid_name", "Enter a player name (1 to 100 characters, no control characters).");
         Options next;
         next.network_name = profile.name;
         next.network_character = profile.character;
@@ -72,11 +75,8 @@ namespace OpenBlood2
                 flag_value < 0 || flag_value > 1000000 || rotation.size() > 49 ||
                 std::any_of(rotation.begin(), rotation.end(), [&](const auto& p)
                             { return std::find(choices.begin(), choices.end(), p) == choices.end(); }))
-            {
-                error = "Choose a valid map, port (not " + std::to_string(Net::discovery_port) +
-                        ", reserved for LAN discovery), rotation and match limits.";
-                return false;
-            }
+                return fail("network.invalid_host", "Choose a valid map, port (not " + std::to_string(Net::discovery_port) +
+                                                        ", reserved for LAN discovery), rotation and match limits.");
             next.host_world = choices[map];
             next.network_port = std::uint16_t(port);
             next.network_mode = std::uint8_t(game_type());
@@ -88,7 +88,7 @@ namespace OpenBlood2
         {
             Net::ServerAddress parsed;
             if (!Net::parse_address(address.data(), Net::default_port, parsed, error))
-                return false;
+                return fail("network.invalid_address", std::move(error));
             next.connect_address = parsed.host + ":" + std::to_string(parsed.port);
         }
         out = std::move(next);

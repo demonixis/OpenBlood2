@@ -1,6 +1,7 @@
 // Selective original Blood II CMessageMgr (ClientShellDLL/MessageMgr.cpp): the on-screen
 // message lines. See Documentation/contracts/original_hud_contracts.md#message-lines.
 #pragma once
+#include "game/player_messages.h"
 #include <array>
 #include <cstdint>
 #include <string>
@@ -24,7 +25,7 @@ class CMessageMgr
     void Enable(bool enabled);
     // AddLine: the oldest line expires when the count passes the maximum. An empty string
     // still occupies a line, as CreateSurfaceFromString's padded surface did.
-    void AddLine(std::string_view text, float time);
+    void AddLine(std::string_view text, float time, const OpenBlood2::ConsoleTextSource& source = {});
     void Clear();
     void SetMaxMessages(int count);
     void SetMessageTime(float seconds)
@@ -40,6 +41,7 @@ class CMessageMgr
     {
         std::string text;
         int x = 0, y = 0;
+        OpenBlood2::ConsoleTextSource source;
     };
     // Original Draw: expires lines whose time has come (the oldest first, as the source
     // advanced m_nFirstMessage) and returns the remaining lines at their screen positions.
@@ -70,6 +72,7 @@ class CMessageMgr
     {
         float fExpiration = 0;
         std::string text;
+        OpenBlood2::ConsoleTextSource source;
     };
     bool m_bEnabled = false;
     int m_x = 1, m_y = 0;

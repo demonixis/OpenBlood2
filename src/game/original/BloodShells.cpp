@@ -563,7 +563,7 @@ bool CBloodClientShell::OnMessage(const OpenBlood2::PlayerEvent& event, CBloodSe
         // its 80-byte limit; the _ALL string sound (MSG_SOUND_STRING) is not played.
         if (line->text.size() > 80)
             return false;
-        CSPrint(line->text);
+        CSPrint(line->text, line->source);
         return true;
     }
 
@@ -905,10 +905,11 @@ bool CBloodClientShell::UpdateMovement(CBloodServerShell& server, double seconds
         control_notice.clear();
         const auto idle = [](const CViewWeapon& w) { return !w.model || w.state == WS_REST || w.state == WS_IDLE; };
         if (!idle(weapons[0]) || !idle(weapons[1]))
-            SetControlNotice("Weapon is busy");
+            SetControlNotice("Weapon is busy", "hud.weapon_busy");
         else if (!server.OnMessage(client_,
                                    OpenBlood2::PlayerControlAction{OpenBlood2::PlayerControlAction::DropWeapon}))
-            SetControlNotice(owner->control_error.empty() ? "Cannot drop weapon now" : owner->control_error);
+            SetControlNotice(owner->control_error.empty() ? "Cannot drop weapon now" : owner->control_error,
+                             owner->control_error.empty() ? "hud.cannot_drop_weapon" : "");
     }
     return true;
 }
@@ -1096,7 +1097,7 @@ bool CBloodClientShell::UpdateWeapons(CBloodServerShell& server, double seconds,
         {
             weapon.reported_overholds = weapon.bomb_overholds;
             ++bomb_overholds;
-            CSPrint("Idiot! Let go next time!");
+            CSPrint("Idiot! Let go next time!", {0, 0, {}, OpenBlood2::ConsoleTextSource::Builtin::BombOverhold});
         }
     }
     return true;
@@ -1137,13 +1138,13 @@ bool CBloodClientShell::UpdateCameraSelection(bool published)
     const auto& frame = client_view_.camera.frame();
     return presentation_.commit(client_, {{frame.world, frame.player.object}, frame.sequence, rotation});
 }
-bool CBloodClientShell::ToggleThirdPerson()
+bool CBloodClientShell::ToggleThirdPerson(std::string_view notice)
 {
     if (!m_bInWorld || !presentation_.publish(client_, seeing_eye, orb_view) ||
         !client_view_.camera.can_toggle(m_bInWorld))
         return false;
     third_person = !third_person;
-    SetControlNotice(third_person ? "Third person" : "First person");
+    SetControlNotice(std::string(notice.empty() ? (third_person ? "Third person" : "First person") : notice));
     return true;
 }
 bool CBloodClientShell::UpdateThirdPersonCamera()
@@ -1161,6 +1162,14 @@ OpenBlood2::HudState CBloodClientShell::HudSnapshot(bool suppress_crosshair) con
     state.item_shows = inventory_show_requests;
     state.time = client_view_.time;
     state.world_revision = client_view_.world.frame().world;
+    if (m_bInWorld && communication.level)
+    {
+        const auto visible = communication.text_level == 3 ? 1 - communication.text_ratio
+                           : communication.text_level     ? communication.text_ratio
+                                                          : 0;
+        state.communication = {communication.message.file, communication.message.text, communication.portrait,
+                               communication.ratio, visible, communication.text_level != 3};
+    }
     return state;
 }
 

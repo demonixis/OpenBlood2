@@ -1,5 +1,6 @@
 #pragma once
 #include "app/menu_input.h"
+#include "app/objectives_smoke.h"
 #include "game/menu_audio.h"
 #include "game/server_adapter.h"
 #include <SDL3/SDL.h>
@@ -51,7 +52,26 @@ namespace OpenBlood2
             return false;
         }
         bool confirmed = false;
-        bool before(std::uint64_t frame, SDL_Window* window, const GameSession& game, const Menu& menu,
+        static bool trigger_caption(GameSession& game, std::string_view name, std::string& error)
+        {
+            for (auto id : game.objects.snapshot())
+            {
+                const auto* entry = game.objects.get(id);
+                if (!same_name(entry->state.m_Name, name))
+                    continue;
+                auto text = game.server.CreateString("TRIGGER");
+                auto message = game.server.StartMessageToObject(nullptr, entry->handle, 1000);
+                const bool sent = message && game.server.WriteToMessageHString(message, text) == DE_OK &&
+                                  game.server.EndMessage(message) == DE_OK;
+                game.server.FreeString(text);
+                if (sent)
+                    return true;
+                break;
+            }
+            error = "Cannot trigger the authored dialogue for menu smoke: " + std::string(name);
+            return false;
+        }
+        bool before(std::uint64_t frame, SDL_Window* window, GameSession& game, const Menu& menu,
                     MenuInput& input, const MenuAudio& audio, std::string& error, bool multiplayer_active = false)
         {
             auto fail = [&](const char* why)
@@ -89,6 +109,9 @@ namespace OpenBlood2
             }
             if (frame > 11 && frame <= 207 && snapshot(game) != frozen_)
                 return fail("world/audio changed during menu pause");
+            if (frame == 16 && (menu.page != MenuPage::Options || menu.settings.language != Language::Korean ||
+                                menu.items[menu.selected].setting != menu_language_setting))
+                return fail("Options language selection");
             // Options > SETUP opens the setup screen over the paused menu; Esc returns to Options.
             if (frame == 30 && (menu.page != MenuPage::Main || input.setup_screen))
                 return fail("main menu before setup");
@@ -127,9 +150,13 @@ namespace OpenBlood2
             if (frame == 217 &&
                 (!menu.settings.run_lock || menu.settings.crosshair || game.client_shell.m_bShowCrosshair))
                 return fail("control commands through the frontend");
-            if (frame == 220 && menu.page != MenuPage::Quit)
+            if (frame == 235 && (!game.client_shell.third_person || game.client_shell.control_notice != "3인칭"))
+                return fail("Korean camera notice");
+            if (frame == 236 && (game.client_shell.third_person || game.client_shell.control_notice != "1인칭"))
+                return fail("Korean first-person notice");
+            if (frame == 239 && menu.page != MenuPage::Quit)
                 return fail("quit confirmation");
-            if (frame > 221)
+            if (frame > 240)
                 return fail("quit not executed");
             auto key = [&](SDL_Scancode code, bool repeat = false)
             {
@@ -190,9 +217,14 @@ namespace OpenBlood2
                     break;
                 case 15:
                     key(SDL_SCANCODE_RETURN);
+                    key(SDL_SCANCODE_UP); // CHEATS, then LANGUAGE.
+                    key(SDL_SCANCODE_UP);
+                    key(SDL_SCANCODE_LEFT); // English wraps back to Korean.
                     break;
                 case 16:
-                    key(SDL_SCANCODE_DOWN); // Options opens on Display; Audio is next.
+                    key(SDL_SCANCODE_DOWN); // LANGUAGE -> CHEATS -> Display -> Audio.
+                    key(SDL_SCANCODE_DOWN);
+                    key(SDL_SCANCODE_DOWN);
                     key(SDL_SCANCODE_RETURN);
                     break;
                 case 17:
@@ -290,23 +322,35 @@ namespace OpenBlood2
                     key(SDL_SCANCODE_R);
                     key(SDL_SCANCODE_H);
                     break;
-                case 217:
+                case 221:
+                    if (!show_authored_objective_for_smoke(game, 2, error))
+                        return false;
+                    key(SDL_SCANCODE_TAB);
+                    break;
+                case 231:
+                    key(SDL_SCANCODE_TAB);
+                    break;
+                case 234:
+                case 235:
+                    key(SDL_SCANCODE_C);
+                    break;
+                case 236:
                     key(SDL_SCANCODE_ESCAPE);
                     break;
-                case 218: // Bloodbath, Options, the enabled in-world Credits row, Quit.
+                case 237: // Bloodbath, Options, the enabled in-world Credits row, Quit.
                     if (menu.multiplayer)
                         key(SDL_SCANCODE_DOWN);
                     key(SDL_SCANCODE_DOWN);
                     key(SDL_SCANCODE_DOWN);
                     key(SDL_SCANCODE_DOWN);
                     break;
-                case 219:
+                case 238:
                     key(SDL_SCANCODE_RETURN);
                     break;
-                case 220:
+                case 239:
                     key(SDL_SCANCODE_UP);
                     break;
-                case 221:
+                case 240:
                     key(SDL_SCANCODE_RETURN);
                     confirmed = true;
                     break;

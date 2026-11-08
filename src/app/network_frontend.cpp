@@ -5,6 +5,7 @@
 #include "app/gamepad_devices.h"
 #include "app/hud.h"
 #include "app/movement_controls.h"
+#include "app/multiplayer_screen.h"
 #include "app/network_controls.h"
 #include "app/scene_presenter.h"
 #include "app/scoreboard.h"
@@ -12,19 +13,21 @@
 #include "client/network_client.h"
 #include "engine/capture.h"
 #include "game/game_settings.h"
+#include "game/localized_font.h"
 #include "game/menu_preferences.h"
 #include "net/address.h"
 #include "server/network.h"
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlgpu3.h>
 #include <imgui.h>
+#include <cfloat>
 #include <memory>
 #include <spdlog/spdlog.h>
 
 namespace OpenBlood2
 {
     int run_network_session(const Options& options, const Config& config, Runtime& runtime, std::string& error,
-                            bool& quit)
+                            bool& quit, const LocalizedFont* localized_font, ImFont* localized_face)
     {
         error.clear();
         quit = false;
@@ -86,7 +89,6 @@ namespace OpenBlood2
 
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
         ScenePresenter presenter(runtime.gpu);
-        HudRenderer hud(runtime.gpu);
         GamepadDevices devices;
         MovementControls controls;
         NetworkControls actions;
@@ -96,6 +98,16 @@ namespace OpenBlood2
         if (!menu_preferences_path(preferences, error) || !load_menu_preferences(preferences, settings, error) ||
             !controls_path(bindings, error) || !load_controls(bindings, controls.bindings, error))
             return failed();
+        Localization localization;
+        std::string language_error;
+        if (localized_face && !localization.load(settings.language, language_error))
+            spdlog::warn("Language {}: {}. Using English.", language_tag(settings.language), language_error);
+        const bool localized = localized_face && localization.language() != Language::English;
+        HudRenderer hud(runtime.gpu);
+        if (localized)
+            hud.set_localization(&localization, localized_font);
+        const auto tr = [&](std::string_view key, const char* english)
+        { return multiplayer_label(&localization, localized ? localized_font : nullptr, key, english); };
         Menu display_menu;
         display_menu.settings = settings;
         DisplayOptions display(runtime);
@@ -126,8 +138,15 @@ namespace OpenBlood2
         ClientFragTable frag_table(client.resources());
         ScoreboardRenderer frag_renderer(runtime.gpu);
         ScoreboardControl scores;
-        if (!client.prepare(config, error) ||
-            !client.connect(address.host, address.port, profile, NetworkClient::Clock::now(), error))
+        if (!client.prepare(config, error))
+            return failed();
+        if (localized && localized_font && !localization_resource_overridden(client.resources(), "cres.dll"))
+            client.set_announcer_translations([&](unsigned id)
+            {
+                const auto value = localization.text(id);
+                return localized_font->supports(value) ? value : std::string_view{};
+            });
+        if (!client.connect(address.host, address.port, profile, NetworkClient::Clock::now(), error))
             return failed();
         spdlog::info("Connecting to {}:{} as {}", address.host, address.port, profile.name);
         if (!client.audio().mixer.set_gains(settings.sound ? settings.sound_volume / 50.f : 0,
@@ -302,32 +321,59 @@ namespace OpenBlood2
                 {
                     // Original MessageMgr coordinates/line height; the portable
                     // UI font replaces its Windows Arial surface renderer.
-                    ImGui::GetForegroundDrawList()->AddText(ImGui::GetFont(), 16, {origin.x + 1, y},
+                    ImGui::GetForegroundDrawList()->AddText(localized ? localized_face : ImGui::GetFont(), 16,
+                                                            {origin.x + 1, y},
                                                             IM_COL32(255, 255, 255, 255), line.text.c_str());
                     y += 16;
+                }
+                const auto caption = client.speech().announcer_caption();
+                if (!caption.empty() && localized)
+                {
+                    const auto* viewport = ImGui::GetMainViewport();
+                    constexpr float height = 16;
+                    const float wrap = std::max(1.f, std::min(560.f, viewport->Size.x - 24));
+                    const auto end = caption.data() + caption.size();
+                    const auto size = localized_face->CalcTextSizeA(height, FLT_MAX, wrap, caption.data(), end);
+                    const ImVec2 pos{origin.x + (viewport->Size.x - size.x) / 2,
+                                     origin.y + std::max(0.f, viewport->Size.y - size.y - 64)};
+                    auto* draw = ImGui::GetForegroundDrawList();
+                    draw->AddText(localized_face, height, {pos.x + 1, pos.y + 1}, IM_COL32(0, 0, 0, 255),
+                                  caption.data(), end, wrap);
+                    draw->AddText(localized_face, height, pos, IM_COL32(255, 255, 255, 255), caption.data(), end, wrap);
                 }
             }
             if (menu || !visible || leaving)
             {
+                if (localized)
+                    ImGui::PushFont(localized_face, 0);
                 ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, {0.5f, 0.5f});
-                ImGui::Begin("Multiplayer", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
-                ImGui::TextUnformatted(leaving   ? "Leaving..."
-                                       : visible ? "Game continues while this menu is open."
-                                                 : "Connecting / loading world...");
+                ImGui::Begin(tr("network.title", "Multiplayer"), nullptr,
+                             ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+                ImGui::TextUnformatted(leaving   ? tr("network.leaving", "Leaving...")
+                                       : visible ? tr("network.continues", "Game continues while this menu is open.")
+                                                 : tr("network.connecting", "Connecting / loading world..."));
                 if (network && !network->discovery_error.empty())
                     ImGui::TextWrapped("%s", network->discovery_error.c_str());
                 if (!leaving)
                 {
-                    if (visible && ImGui::Button("Resume"))
+                    if (visible && ImGui::Button(tr("network.resume", "Resume")))
                     {
                         menu = false;
                         controls.request_play();
                     }
-                    if (ImGui::Button(server ? "End hosted game" : "Leave game"))
+                    if (ImGui::Button(server ? tr("network.end_host", "End hosted game")
+                                             : tr("network.leave_game", "Leave game")))
                         if (!leave())
+                        {
+                            ImGui::End();
+                            if (localized)
+                                ImGui::PopFont();
                             return failed();
+                        }
                 }
                 ImGui::End();
+                if (localized)
+                    ImGui::PopFont();
             }
             ImGui::Render();
             auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
@@ -447,13 +493,19 @@ namespace OpenBlood2
             spdlog::error("{}", error);
             return 5;
         }
+        LocalizedFont localized_font;
         UiRuntime ui(runtime);
         if (!ui.initialize(error))
         {
             spdlog::error("{}", error);
             return 5;
         }
+        std::string font_error;
+        if (!localized_font.load(font_error))
+            spdlog::warn("Language font: {}. Using English.", font_error);
+        else if (!ui.set_localized_font(localized_font))
+            spdlog::warn("Cannot initialize the language font. Using English.");
         bool quit = false;
-        return run_network_session(options, config, runtime, error, quit);
+        return run_network_session(options, config, runtime, error, quit, &localized_font, ui.localized);
     }
 } // namespace OpenBlood2

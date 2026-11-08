@@ -13,8 +13,8 @@ namespace OpenBlood2
         // the renderer selection; version 4 the VR options; version 5 the VR movement reference;
         // version 6 the cheat switch and god mode; version 7 the post-processing rows; version 8
         // ambient occlusion; version 9 reflections; version 10 display; version 11 control toggles;
-        // version 12 the field of view.
-        constexpr std::array<const char*, 36> names{"version",
+        // version 12 the field of view; version 13 the UI language tag.
+        constexpr std::array<const char*, 37> names{"version",
                                                     "sound",
                                                     "music",
                                                     "sound_volume",
@@ -49,8 +49,9 @@ namespace OpenBlood2
                                                     "mouse_look",
                                                     "crosshair",
                                                     "crosshair_number",
-                                                    "field_of_view"};
-        constexpr std::array<std::size_t, 12> version_keys{7, 9, 12, 15, 16, 18, 21, 22, 23, 31, 35, 36};
+                                                    "field_of_view",
+                                                    "language"};
+        constexpr std::array<std::size_t, 13> version_keys{7, 9, 12, 15, 16, 18, 21, 22, 23, 31, 35, 36, 37};
         bool valid(const MenuSettings& s)
         {
             const bool turn = s.vr_turn == 0 || s.vr_turn == 15 || s.vr_turn == 30 || s.vr_turn == 45 ||
@@ -68,7 +69,7 @@ namespace OpenBlood2
                    (s.vr_refresh_rate == 0 || (s.vr_refresh_rate >= 30000 && s.vr_refresh_rate <= 1000000)) &&
                    s.vr_render_scale >= 50 && s.vr_render_scale <= 100 && s.vr_render_scale % 10 == 0 &&
                    s.crosshair_number >= 0 && s.crosshair_number <= 41 && s.field_of_view >= 60 &&
-                   s.field_of_view <= 120 && s.field_of_view % 5 == 0;
+                   s.field_of_view <= 120 && s.field_of_view % 5 == 0 && !language_tag(s.language).empty();
         }
     } // namespace
     bool menu_preferences_path(std::filesystem::path& output, std::string& error)
@@ -102,8 +103,9 @@ namespace OpenBlood2
             error = "Cannot open preferences";
             return false;
         }
-        std::array<int, names.size()> values{};
+        std::array<int, names.size() - 1> values{};
         std::array<bool, names.size()> seen{};
+        Language language = Language::English;
         std::string line;
         while (std::getline(input, line))
         {
@@ -121,12 +123,25 @@ namespace OpenBlood2
                 error = "Unknown or duplicate preferences key";
                 return false;
             }
-            auto first = line.data() + equal + 1, last = line.data() + line.size();
-            const auto parsed = std::from_chars(first, last, values[key]);
-            if (parsed.ec != std::errc{} || parsed.ptr != last)
+            if (key == values.size())
             {
-                error = "Invalid preferences value";
-                return false;
+                const auto parsed = parse_language(std::string_view(line).substr(equal + 1));
+                if (!parsed)
+                {
+                    error = "Unknown language in preferences";
+                    return false;
+                }
+                language = *parsed;
+            }
+            else
+            {
+                auto first = line.data() + equal + 1, last = line.data() + line.size();
+                const auto parsed = std::from_chars(first, last, values[key]);
+                if (parsed.ec != std::errc{} || parsed.ptr != last)
+                {
+                    error = "Invalid preferences value";
+                    return false;
+                }
             }
             seen[key] = true;
         }
@@ -203,6 +218,7 @@ namespace OpenBlood2
         }
         if (required >= version_keys[11])
             result.field_of_view = values[35];
+        result.language = language;
         if (!valid(result))
         {
             error = "Preferences out of range";
@@ -219,7 +235,7 @@ namespace OpenBlood2
             error = "Preferences out of range";
             return false;
         }
-        const std::array<int, names.size()> values{12,
+        const std::array<int, names.size() - 1> values{13,
                                                    settings.sound,
                                                    settings.music,
                                                    settings.sound_volume,
@@ -258,6 +274,9 @@ namespace OpenBlood2
         std::string text;
         for (unsigned i = 0; i < values.size(); ++i)
             text += std::string(names[i]) + '=' + std::to_string(values[i]) + '\n';
+        text += "language=";
+        text += language_tag(settings.language);
+        text += '\n';
         return write_file_atomic(path, std::span(reinterpret_cast<const std::uint8_t*>(text.data()), text.size()),
                                  "preferences", error);
     }
