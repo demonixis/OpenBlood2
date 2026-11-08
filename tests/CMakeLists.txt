@@ -1016,7 +1016,7 @@ if(NOT MSVC)
     set_property(SOURCE gi_lightmap_tests.cpp APPEND PROPERTY COMPILE_OPTIONS -ffp-contract=off)
 endif()
 foreach(case IN ITEMS identity rgb9e5 sections directions placement furnace box planes leak dilation back
-                      determinism sky preview)
+                      determinism sky preview quality emission)
     add_test(NAME gi_lightmap.${case} COMMAND gi_lightmap_tests "${case}"
              "${CMAKE_CURRENT_BINARY_DIR}/gi-lightmap-${case}")
     set_tests_properties(gi_lightmap.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 120)

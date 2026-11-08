@@ -55,13 +55,19 @@ namespace OpenBlood2
         bool list_worlds = false, json = false, gi_reset = false, gi_dry_run = false;
         std::filesystem::path gi_verify;
         std::string gi_place;
-        // --bake-gi WORLD [--gi-quality preview|final|custom] [--gi-bounces N] [--gi-rays N] [--gi-sky S]
+        // --bake-gi WORLD [--gi-quality preview|final|ultra|custom] [--gi-bounces N] [--gi-rays N] [--gi-sky S]
         // [--gi-jobs N] [--gi-out DIR] [--gi-if-stale] (lots G5, G7) [--gi-direct original|rebaked] (lot
         // GD2); zero (sky: -1) and an empty direct source mean not given (the direct source then
         // defaults to rebaked).
         std::string bake_gi, gi_quality, gi_direct;
         std::uint32_t gi_bounces = 0, gi_rays = 0, gi_jobs = 0;
         std::int32_t gi_sky = -1; // Sky scale in hundredths (0-400).
+        // Lot GQ1 (with --gi-quality custom): --gi-texel-samples 1|4|9|16, --gi-denoise 0-4,
+        // --gi-shadow-radius 1-64, --gi-shadow-rays 1-64, --gi-reflection-strata 2-8,
+        // --gi-reflection-samples 32-1024; lot GE1 (any preset): --gi-emissive S (0-4, hundredths).
+        std::uint32_t gi_texel_samples = 0, gi_shadow_radius = 0, gi_shadow_rays = 0, gi_reflection_strata = 0,
+                      gi_reflection_samples = 0;
+        std::int32_t gi_denoise = -1, gi_emissive = -1;
         // --gi-preview WORLD [--gi-out DIR] [--gi-preview-dir DIR] [--gi-k K] [--gi-f F] [--gi-jobs N] (lot G7).
         std::string gi_preview;
         std::filesystem::path gi_preview_dir;

@@ -322,6 +322,54 @@ namespace OpenBlood2
         return !gi_segment_blocked(occluders.models[model], sample, end);
     }
 
+    double gi_direct_visibility(const GiDirectOccluders& occluders, std::uint16_t model, DVector sample,
+                                const GiDirectLight& light, double radius, std::uint32_t rays, double s1, double s2)
+    {
+        if (!light.clip)
+            return 1;
+        if (model >= occluders.models.size())
+            return 0;
+        auto hard = [&] { return gi_direct_visible(occluders, model, sample, light) ? 1.0 : 0.0; };
+        const double dx = double(light.position.x) - sample.x, dy = double(light.position.y) - sample.y,
+                     dz = double(light.position.z) - sample.z;
+        const double distance = std::sqrt(dx * dx + dy * dy + dz * dz);
+        if (!(radius > 0) || !rays || distance <= L::margin)
+            return hard();
+        // The disk faces the sample: an orthonormal basis around the light direction (Duff et al.).
+        const double nx = dx / distance, ny = dy / distance, nz = dz / distance;
+        const double sign = std::copysign(1.0, nz);
+        const double c = -1 / (sign + nz), d = nx * ny * c;
+        const double t[3]{1 + sign * nx * nx * c, sign * d, -sign * nx}, b[3]{d, sign + ny * ny * c, -ny};
+        std::uint32_t counted = 0, reached = 0;
+        for (std::uint32_t m = 0; m < rays; ++m)
+        {
+            double u1 = (m + .5) / rays + s1, u2 = m * 0.6180339887498949 + s2;
+            u1 -= std::floor(u1);
+            u2 -= std::floor(u2);
+            double x = 0, y = 0;
+            gi_concentric_disk(2 * u1 - 1, 2 * u2 - 1, x, y);
+            const DVector target{float(light.position.x + radius * (x * t[0] + y * b[0])),
+                                 float(light.position.y + radius * (x * t[1] + y * b[1])),
+                                 float(light.position.z + radius * (x * t[2] + y * b[2]))};
+            // Only the part of the disk the light's centre sees belongs to the light.
+            if (gi_segment_blocked(occluders.models[model], light.position, target))
+                continue;
+            ++counted;
+            const double ex = double(target.x) - sample.x, ey = double(target.y) - sample.y,
+                         ez = double(target.z) - sample.z;
+            const double length = std::sqrt(ex * ex + ey * ey + ez * ez);
+            if (length <= L::margin)
+            {
+                ++reached;
+                continue;
+            }
+            const double f = (length - L::margin) / length;
+            const DVector end{float(sample.x + ex * f), float(sample.y + ey * f), float(sample.z + ez * f)};
+            reached += !gi_segment_blocked(occluders.models[model], sample, end);
+        }
+        return counted ? double(reached) / counted : hard();
+    }
+
     std::uint8_t GiDirectTexels::value(std::size_t t, int c) const
     {
         const double v = std::floor(double(light[t * 3 + c]) + .5);
@@ -330,16 +378,20 @@ namespace OpenBlood2
 
     bool gi_direct_texels(const World& world, const GiReceivers& r, std::span<const GiDirectLight> lights,
                           const GiDirectOccluders& occluders, unsigned jobs, GiDirectTexels& out, std::string& error,
-                          const std::atomic<bool>* cancel, const GiProgress& progress)
+                          const std::atomic<bool>* cancel, const GiProgress& progress, const GiDirectOptions& options)
     {
         const auto start = std::chrono::steady_clock::now();
         error.clear();
         out = {};
-        if (r.samples.size() < r.texels || occluders.models.size() != world.models.size())
+        const std::uint32_t grid = r.texel_grid;
+        const std::size_t per_texel = std::size_t(grid) * grid;
+        if (r.samples.size() < r.texels || occluders.models.size() != world.models.size() || grid < 1 ||
+            (grid > 1 && (r.texel_points.size() != r.texels * per_texel || r.texel_solid.size() != r.texels * per_texel)))
         {
             error = "Direct light: receivers or occluders do not match the world";
             return false;
         }
+        const bool soft = options.shadow_radius > 0 && options.shadow_rays > 0;
         out.light.assign(r.texels * 3, 0.f);
         out.reaching.assign(r.texels, 0);
         out.visible.assign(r.texels, 0);
@@ -355,6 +407,7 @@ namespace OpenBlood2
                     [&](std::uint64_t chunk, unsigned)
                     {
                         std::vector<const GiDirectLight*> near;
+                        std::vector<std::uint8_t> seen, lit; // Lot GQ1, per texel.
                         const std::size_t last = std::min<std::size_t>(r.blocks.size(), (chunk + 1) * L::chunk);
                         for (std::size_t b = chunk * L::chunk; b < last; ++b)
                         {
@@ -389,6 +442,80 @@ namespace OpenBlood2
                                 for (unsigned i = 0; i < frame.width; ++i)
                                 {
                                     const std::size_t e = block.first + std::size_t(j) * frame.width + i;
+                                    if (grid > 1 || soft)
+                                    {
+                                        // Lot GQ1: the texel's points (or its centre) with soft or hard shadows.
+                                        double sum[3]{};
+                                        std::uint64_t hash = 1469598103934665603ull;
+                                        seen.assign(near.size(), 0);
+                                        lit.assign(near.size(), 0);
+                                        std::uint32_t used = 0;
+                                        for (std::size_t k = 0; k < per_texel; ++k)
+                                        {
+                                            DVector term_point, at;
+                                            if (grid > 1)
+                                            {
+                                                const auto slot = e * per_texel + k;
+                                                if (r.texel_solid[slot])
+                                                    continue;
+                                                const auto offset = gi_texel_point_offset(std::uint32_t(k), grid);
+                                                if (!frame.position(i + offset[0], j + offset[1], term_point))
+                                                    continue;
+                                                at = r.texel_points[slot];
+                                            }
+                                            else
+                                            {
+                                                if (!frame.position(i, j, term_point))
+                                                    continue;
+                                                at = r.samples[e];
+                                            }
+                                            const DVector sample{at.x + lift.x, at.y + lift.y, at.z + lift.z};
+                                            ++used;
+                                            for (std::size_t l = 0; l < near.size(); ++l)
+                                            {
+                                                const auto* light = near[l];
+                                                const auto term = gi_direct_term(*light, term_point);
+                                                if (term[0] == 0 && term[1] == 0 && term[2] == 0)
+                                                    continue;
+                                                seen[l] = 1;
+                                                tests[chunk] += light->clip ? (soft ? options.shadow_rays : 1) : 0;
+                                                double share = 1;
+                                                if (soft)
+                                                {
+                                                    GiRandom random(options.seed, std::uint64_t(e) << 4 | k, light->object);
+                                                    const double s1 = random.uniform(), s2 = random.uniform();
+                                                    share = gi_direct_visibility(occluders, block.id.model, sample, *light,
+                                                                                 options.shadow_radius,
+                                                                                 options.shadow_rays, s1, s2);
+                                                }
+                                                else if (!gi_direct_visible(occluders, block.id.model, sample, *light))
+                                                    share = 0;
+                                                if (!(share > 0))
+                                                    continue;
+                                                lit[l] = 1;
+                                                for (int c = 0; c < 3; ++c)
+                                                    sum[c] += term[c] * share;
+                                            }
+                                        }
+                                        if (!used)
+                                            continue;
+                                        unsigned reaching = 0;
+                                        for (std::size_t l = 0; l < near.size(); ++l)
+                                        {
+                                            reaching += seen[l];
+                                            if (lit[l])
+                                                hash = (hash ^ near[l]->object) * 1099511628211ull;
+                                        }
+                                        for (int c = 0; c < 3; ++c)
+                                            out.light[e * 3 + c] = float(double(c == 0   ? r.ambient.x
+                                                                                : c == 1 ? r.ambient.y
+                                                                                         : r.ambient.z) +
+                                                                         sum[c] / used);
+                                        out.reaching[e] = std::uint8_t(std::min(reaching, 255u));
+                                        out.visible[e] = hash;
+                                        out.placed[e] = 1;
+                                        continue;
+                                    }
                                     DVector centre_point;
                                     if (!frame.position(i, j, centre_point))
                                         continue;
@@ -496,7 +623,8 @@ namespace OpenBlood2
     }
 
     bool gi_rebake_direct(const World& world, const GiReceivers& r, unsigned jobs, const std::atomic<bool>* cancel,
-                          const GiProgress& progress, GiDirectBake& out, std::string& error)
+                          const GiProgress& progress, GiDirectBake& out, std::string& error,
+                          const GiDirectOptions& options)
     {
         const auto start = std::chrono::steady_clock::now();
         out = {};
@@ -513,7 +641,7 @@ namespace OpenBlood2
             return false;
         out.occluder_triangles = occluders.triangles;
         GiDirectTexels texels;
-        if (!gi_direct_texels(world, r, lights, occluders, jobs, texels, error, cancel, progress))
+        if (!gi_direct_texels(world, r, lights, occluders, jobs, texels, error, cancel, progress, options))
         {
             out.cancelled = texels.cancelled;
             return false;
@@ -524,7 +652,8 @@ namespace OpenBlood2
         out.section.texels.resize(r.texels);
         for (std::size_t t = 0; t < r.texels; ++t)
         {
-            const bool keep = r.solid[t] || !texels.placed[t];
+            // With texel points (lot GQ1) the points decide: a texel is kept only when none is placed.
+            const bool keep = (r.texel_grid > 1 ? false : r.solid[t] != 0) || !texels.placed[t];
             out.kept += keep;
             float v[3];
             for (int c = 0; c < 3; ++c)

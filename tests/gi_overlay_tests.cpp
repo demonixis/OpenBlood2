@@ -344,9 +344,15 @@ namespace
         CHECK(placed.detail.rfind("Not excluded: ", 0) == 0);
         CHECK(tools.exclude_model(lower, false) && placed.edit->excluded_models == excluded && placed.dirty);
 
-        // The fake baker (Preview): the child's arguments, the reload at the next frame.
+        // The fake baker (Custom, lot GQ1, with emission, lot GE1): the child's arguments, the reload
+        // at the next frame.
         tools.bake_executable = stub;
-        tools.bake.final_quality = false;
+        CHECK(tools.bake.settings.quality == GiQuality::Final && tools.bake.settings.emissive == 0);
+        tools.bake.settings.quality = GiQuality::Custom;
+        tools.bake.settings.texel_grid = 2;
+        tools.bake.settings.shadow_radius = 4;
+        tools.bake.settings.shadow_rays = 8;
+        tools.bake.settings.emissive = 150;
         tools.bake.suspend_scene = true;
         CHECK(tools.start_bake(game, config) && running() && tools.suspend_scene() && !placed.dirty);
         CHECK(!tools.start_bake(game, config) && tools.bake.notice == "A bake is already running.");
@@ -362,14 +368,20 @@ namespace
             for (std::string line; std::getline(in, line);)
                 args.push_back(line);
             const unsigned threads = std::thread::hardware_concurrency();
-            CHECK(args == gi_bake_arguments(config, "worlds/01_subwaya.dat", "preview", config.gi_placement_dir, out,
-                                            threads > 2 ? threads - 2 : 1));
+            CHECK(args == gi_bake_arguments(config, "worlds/01_subwaya.dat", tools.bake.settings,
+                                            config.gi_placement_dir, out, threads > 2 ? threads - 2 : 1));
+            const std::string custom[]{"--gi-quality", "custom",  "--gi-bounces", "2",    "--gi-rays",
+                                       "256",          "--gi-sky", "1.00",         "--gi-texel-samples", "4"};
+            CHECK(std::search(args.begin(), args.end(), std::begin(custom), std::end(custom)) != args.end());
+            const std::string soft[]{"--gi-shadow-radius", "4", "--gi-shadow-rays", "8", "--gi-emissive", "1.50"};
+            CHECK(std::search(args.begin(), args.end(), std::begin(soft), std::end(soft)) != args.end());
         }
+        tools.bake.settings = {};
 
         // Cancel (Final, original direct light, lot GD2), with the Pinned strip drawn while it runs.
-        CHECK(tools.bake.rebaked); // Re-baked is the panel's default since Gate G.
-        tools.bake.final_quality = true;
-        tools.bake.rebaked = false;
+        CHECK(tools.bake.settings.direct == GiDirectSource::Rebaked); // The panel's default since Gate G.
+        tools.bake.settings.quality = GiQuality::Final;
+        tools.bake.settings.direct = GiDirectSource::Original;
         CHECK(tools.start_bake(game, config));
         CHECK(run_until(tools, game, config, input, link, 20000, 16, progressed) && running());
         input.gi = GiOverlay::Pinned;
@@ -386,10 +398,11 @@ namespace
             for (std::string line; std::getline(in, line);)
                 args.push_back(line);
             const unsigned threads = std::thread::hardware_concurrency();
-            CHECK(args == gi_bake_arguments(config, "worlds/01_subwaya.dat", "final", config.gi_placement_dir, out,
-                                            threads > 2 ? threads - 2 : 1, false));
+            CHECK(args == gi_bake_arguments(config, "worlds/01_subwaya.dat", tools.bake.settings,
+                                            config.gi_placement_dir, out, threads > 2 ? threads - 2 : 1));
+            CHECK(std::find(args.begin(), args.end(), "original") != args.end());
         }
-        tools.bake.rebaked = true;
+        tools.bake.settings.direct = GiDirectSource::Rebaked;
 
         // Quit during a bake: stop_bake cancels and waits.
         CHECK(tools.start_bake(game, config));
@@ -401,7 +414,7 @@ namespace
         {
             // This build's blood2: an F8 Preview bake of 01_SubwayA at about 60 draws per second.
             tools.bake_executable = blood2;
-            tools.bake.final_quality = false;
+            tools.bake.settings.quality = GiQuality::Preview;
             tools.bake.suspend_scene = false;
             CHECK(tools.start_bake(game, config));
             CHECK(run_until(tools, game, config, input, link, 300000, 16, done));
@@ -426,7 +439,7 @@ namespace
             CHECK(local.exit_code == 0 && same_bytes(local.file, tools.bake.file));
 
             // A cancelled Final exits 12 and leaves the Preview file as it was.
-            tools.bake.final_quality = true;
+            tools.bake.settings.quality = GiQuality::Final;
             CHECK(tools.start_bake(game, config));
             CHECK(run_until(tools, game, config, input, link, 300000, 16, progressed) && running());
             tools.cancel_bake();
@@ -439,7 +452,7 @@ namespace
         // NEW_LEVEL during a bake (last: it changes the session's world): the result is kept for its
         // own world and not reloaded into the new one.
         tools.bake_executable = stub;
-        tools.bake.final_quality = true;
+        tools.bake.settings.quality = GiQuality::Final;
         const auto before = reload;
         CHECK(tools.start_bake(game, config));
         CHECK(run_until(tools, game, config, input, link, 20000, 16, progressed) && running());

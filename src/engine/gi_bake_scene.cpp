@@ -1,6 +1,7 @@
 #include "engine/gi_bake_scene.h"
 #include "engine/gi_sky.h"
 #include "engine/collision.h"
+#include "engine/surface_materials.h"
 #include <algorithm>
 #include <cfloat>
 #include <chrono>
@@ -459,6 +460,115 @@ namespace OpenBlood2
         const auto* texel = pixels + (wrap(t, height) * width + wrap(s, width)) * 4;
         const float alpha = face.flags & GiBakeFace::Translucent ? alpha_byte(face, u, v) / 255.f : 1.f;
         return {texel[0] / 255.f, texel[1] / 255.f, texel[2] / 255.f, alpha};
+    }
+    bool GiBakeScene::prepare_emission(const SurfaceManifest& manifest, std::uint32_t scale,
+                                       GiEmissionReport& report, std::string& error)
+    {
+        const auto start = std::chrono::steady_clock::now();
+        report = {};
+        emission_.clear();
+        emission_index_.assign(mesh_.materials.size(), UINT32_MAX);
+        if (!scale)
+        {
+            emission_index_.clear();
+            return true;
+        }
+        const double factor = scale / 100.0;
+        for (std::size_t m = 0; m < mesh_.materials.size(); ++m)
+        {
+            const auto& material = mesh_.materials[m];
+            const auto& path = material.path;
+            // SurfaceMaterials::refresh: only DTX paths read the manifest.
+            const bool texture = path.size() > 4 && (path.ends_with(".dtx") || path.ends_with(".DTX"));
+            if (!texture || !material.error.empty() || !material.frames.empty())
+                continue;
+            const auto& surface = manifest.resolve(path);
+            if (!(surface.emissive > 0))
+                continue;
+            const auto& image = material.image;
+            if (!image.width || !image.height || image.rgba.size() != std::size_t(image.width) * image.height * 4)
+                return error = "Invalid GI emission image: " + path, false;
+            const std::uint32_t levels = image.mipmaps > 1 && image.mip_rgba.size() == texture_mip_bytes(image)
+                                             ? std::min(image.mipmaps, 255u)
+                                             : 1;
+            Emission chain;
+            chain.width = image.width;
+            chain.height = image.height;
+            std::size_t total = 0;
+            for (std::uint32_t level = 0; level < levels; ++level)
+            {
+                chain.offsets.push_back(total);
+                total += std::size_t(std::max(1u, image.width >> level)) * std::max(1u, image.height >> level) * 3;
+            }
+            chain.rgb.resize(total);
+            // The shader's emitted(): strength, threshold and BT.601 luminance, in float like the GPU.
+            const float strength = surface.emissive, threshold = surface.emissive_threshold;
+            const float ramp = std::max(1.0f - threshold, 1e-3f);
+            std::uint64_t glowing = 0;
+            for (std::size_t t = 0; t < std::size_t(image.width) * image.height; ++t)
+            {
+                const float c[3]{image.rgba[t * 4] / 255.f, image.rgba[t * 4 + 1] / 255.f,
+                                 image.rgba[t * 4 + 2] / 255.f};
+                const float luminance = c[0] * .299f + c[1] * .587f + c[2] * .114f;
+                const float weight = strength * std::clamp((luminance - threshold) / ramp, 0.f, 1.f);
+                for (int k = 0; k < 3; ++k)
+                    chain.rgb[t * 3 + k] = float(c[k] * weight * factor);
+                glowing += weight > 0 && (c[0] > 0 || c[1] > 0 || c[2] > 0);
+            }
+            if (!glowing)
+                continue;
+            // Box filter: each texel of a level averages the (up to) 2 x 2 texels above it.
+            for (std::uint32_t level = 1; level < levels; ++level)
+            {
+                const std::uint32_t pw = std::max(1u, image.width >> (level - 1)),
+                                    ph = std::max(1u, image.height >> (level - 1));
+                const std::uint32_t w = std::max(1u, image.width >> level), h = std::max(1u, image.height >> level);
+                const float* above = chain.rgb.data() + chain.offsets[level - 1];
+                float* out = chain.rgb.data() + chain.offsets[level];
+                for (std::uint32_t y = 0; y < h; ++y)
+                    for (std::uint32_t x = 0; x < w; ++x)
+                    {
+                        double sum[3]{};
+                        int count = 0;
+                        for (std::uint32_t sy = 2 * y; sy < std::min(2 * y + 2, ph); ++sy)
+                            for (std::uint32_t sx = 2 * x; sx < std::min(2 * x + 2, pw); ++sx, ++count)
+                                for (int k = 0; k < 3; ++k)
+                                    sum[k] += above[(std::size_t(sy) * pw + sx) * 3 + k];
+                        for (int k = 0; k < 3; ++k)
+                            out[(std::size_t(y) * w + x) * 3 + k] = float(sum[k] / count);
+                    }
+            }
+            emission_index_[m] = static_cast<std::uint32_t>(emission_.size());
+            emission_.push_back(std::move(chain));
+            ++report.materials;
+            report.texels += glowing;
+        }
+        if (emission_.empty())
+            emission_index_.clear();
+        else
+            for (const auto& face : faces_)
+                report.faces += face.material < emission_index_.size() && emission_index_[face.material] != UINT32_MAX;
+        report.ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
+        return true;
+    }
+    DVector GiBakeScene::emission(std::uint32_t index, float u, float v) const
+    {
+        if (emission_.empty())
+            return {};
+        const auto& face = faces_[index];
+        if (face.flags & (GiBakeFace::Unresolved | GiBakeFace::SkyPortal) || face.material >= emission_index_.size())
+            return {};
+        const auto at = emission_index_[face.material];
+        if (at == UINT32_MAX)
+            return {};
+        const auto& chain = emission_[at];
+        const std::uint32_t level = std::min<std::uint32_t>(face.mip, std::uint32_t(chain.offsets.size() - 1));
+        const std::uint32_t width = std::max(1u, chain.width >> level), height = std::max(1u, chain.height >> level);
+        const float w = 1 - u - v;
+        const float s = w * face.uv[0][0] + u * face.uv[1][0] + v * face.uv[2][0];
+        const float t = w * face.uv[0][1] + u * face.uv[1][1] + v * face.uv[2][1];
+        const float* texel = chain.rgb.data() + chain.offsets[level] + (wrap(t, height) * width + wrap(s, width)) * 3;
+        return {texel[0], texel[1], texel[2]};
     }
     DVector GiBakeScene::baked_light(std::uint32_t index, float u, float v) const
     {

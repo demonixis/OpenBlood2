@@ -29,6 +29,8 @@ namespace OpenBlood2
         constexpr std::uint32_t fill_rounds = 8; // Receiver-to-receiver fill across shared edges.
         constexpr double fill_normal = .9;       // Minimum unit-normal dot between filled neighbours.
         constexpr std::uint32_t chunk = 32;      // Elements per job.
+        // Lot GQ1 denoise: hit distances are clamped to this range (world units) for the guide.
+        constexpr double guide_near = 1, guide_far = 4096;
     } // namespace gi_lightmap_limits
 
     // Shared-exponent RGB (N = 9 mantissa bits, bias 15), the GL_EXT_texture_shared_exponent rule:
@@ -128,6 +130,13 @@ namespace OpenBlood2
         std::vector<std::uint8_t> solid;  // Per element: the sample lies in solid root-BSP space.
         std::vector<std::array<std::uint8_t, 3>> original; // Per element: stored texel or colour (0-255).
         DVector ambient{};                // AmbientLight (0-255); zero when the info has none.
+        // Lot GQ1 texel supersampling: with texel_grid n > 1, every texel also has n x n points at the
+        // centres of an n x n grid over the texel (texel t, point k = row * n + column at t * n^2 + k),
+        // placed like `samples` (moved into the base ring, raised), and their root-BSP contents.
+        // `samples` and `solid` keep the texel centre. Empty when n = 1.
+        std::uint32_t texel_grid = 1;
+        std::vector<DVector> texel_points;
+        std::vector<std::uint8_t> texel_solid;
         std::size_t elements() const
         {
             return texels + corners;
@@ -138,9 +147,13 @@ namespace OpenBlood2
     // Texel samples sit on texel centres; a centre outside the base ring or nearer than edge_inset to
     // its boundary moves to the closest boundary point, then toward the centroid by min(edge_inset,
     // half the distance); corners move toward the centroid the same way; every sample is then raised
-    // sample_offset along the normal.
+    // sample_offset along the normal. texel_grid (1-4, lot GQ1) adds the texel points.
     bool gi_receivers(const World&, const GiBakeScene&, std::span<const WorldTriangleSource>,
-                      std::span<const GiRangeUse>, unsigned jobs, GiReceivers&, std::string& error);
+                      std::span<const GiRangeUse>, unsigned jobs, GiReceivers&, std::string& error,
+                      std::uint32_t texel_grid = 1);
+    // The texel-space offset of point k of an n x n texel grid from the texel centre (lot GQ1):
+    // ((k % n + 0.5) / n - 0.5, (k / n + 0.5) / n - 0.5).
+    std::array<double, 2> gi_texel_point_offset(std::uint32_t k, std::uint32_t n);
 
     // The indirect light of every element.
     struct GiIndirect
@@ -152,6 +165,10 @@ namespace OpenBlood2
     {
         std::size_t blocks = 0, texels = 0, sets = 0, corners = 0, low_sets = 0, low_corners = 0;
         std::size_t solid = 0, back_invalid = 0;          // Invalid elements by cause.
+        std::size_t points = 0, solid_points = 0, back_points = 0; // Lot GQ1 texel points, invalid by cause.
+        std::uint32_t denoise = 0;                        // Lot GQ1 filter radius.
+        std::uint64_t denoised = 0;                       // Texels the filter changed (last pass).
+        double denoise_ms = 0;                            // All passes.
         std::size_t filled = 0;                           // Invalid elements filled inside their receiver.
         std::size_t neighbour_filled = 0, unfilled = 0;   // Receivers with no valid element.
         std::uint64_t rays = 0, back = 0, sky = 0, untextured = 0, layer_limit = 0;
@@ -168,10 +185,25 @@ namespace OpenBlood2
     // Pass b reads the state of pass b - 1; invalid elements are traced once, DETAIL LOW sets only in
     // the last pass. `seed` keys every element's lattice shift with (element, pass). `direct` (texels
     // x 3, 0-1) replaces the texels' D = (O - A_eff) / 255 when given (lot GD2); corners keep D.
+    //
+    // Lot GQ1. With receivers built at texel_grid n > 1, each texel splits ceil(rays / n^2) rays per
+    // point among its points (shift keyed by (element << 4 | point, pass + 256)); points in solid
+    // space are never traced, a point decides its validity on its first trace like an element, and
+    // the texel takes the mean of its valid points (valid when one is). `denoise` R > 0 filters the
+    // texels' E after each pass's dilation (gi_denoise_texels).
     bool bake_gi_lightmaps(const GiBakeScene&, const GiSky&, const GiReceivers&, std::uint32_t bounces,
                            std::uint32_t rays, std::uint64_t seed, unsigned jobs, const std::atomic<bool>* cancel,
                            const GiProgress&, GiIndirect&, GiLightmapReport&, std::string& error,
-                           std::span<const float> direct = {});
+                           std::span<const float> direct = {}, std::uint32_t denoise = 0);
+    // Lot GQ1 denoise of the texels' E (elements x 3, texels first), in place. Each texel q within R
+    // texels of texel p, in p's block and in its neighbouring blocks (neighbour_first, texels located
+    // with the block frame), weighs w = (1 - d^2 / h^2)^2 (d: distance between the samples, h = 20 (R
+    // + 1/2)) times rho^2 (rho: the smaller over the larger of the two hit-distance guides), and only
+    // when q is valid (`valid`, texels). p takes the weighted mean, or keeps its value when no weight
+    // remains. Only + - * /; the result does not depend on `jobs`. Returns the texels changed.
+    std::uint64_t gi_denoise_texels(const GiReceivers&, std::span<const std::uint8_t> valid,
+                                    std::span<const float> guide, std::span<float> energy, std::uint32_t radius,
+                                    unsigned jobs);
     // The LMAP and VTX contents of a bake.
     void gi_lightmap_sections(const GiReceivers&, const GiIndirect&, GiLightmaps&, GiVertexLight&);
 
@@ -200,6 +232,9 @@ namespace OpenBlood2
     // (s1, s2) and wrapped, through the concentric disk to the cosine-weighted hemisphere of the unit
     // normal (Duff et al. basis). + - * / and sqrt only.
     DVector gi_cosine_direction(DVector normal, std::uint32_t i, std::uint32_t n, double s1, double s2);
+    // Shirley-Chiu concentric map of (a, b) in [-1, 1]^2 to the unit disk, the arithmetic of
+    // gi_cosine_direction (lot GQ1 shares it with the soft shadow disk).
+    void gi_concentric_disk(double a, double b, double& x, double& y);
     // sin and cos on [-pi/4, pi/4] (Taylor to the 13th / 14th power).
     void gi_quarter_sin_cos(double angle, double& sine, double& cosine);
 } // namespace OpenBlood2

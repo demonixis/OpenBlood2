@@ -2432,3 +2432,20 @@ cell grid, the record layout, the CPU mirror (`gi_reflection_environment`) and t
 written for this project from the [GI plan](gi_plan.md). The binary16 conversion reuses the
 project's G9 codec. See [contracts](../contracts/gi_contracts.md#reflection-runtime-lot-g12).
 
+
+## GI bake quality settings (lot GQ1, 2026-11-08)
+
+No code is imported. The texel points, the hit-distance-guided denoise and the soft direct shadows
+are written for this project from the [GI plan](gi_plan.md) (decisions D21 and D22). The light disk
+uses the published orthonormal basis of Duff et al. ("Building an Orthonormal Basis, Revisited",
+JCGT 2017), the concentric square-to-disk map of Shirley and Chiu ("A Low Distortion Map Between
+Disk and Square", 1997) and a golden-ratio rank-1 lattice, all rewritten with arithmetic and sqrt
+only. See the [GQ1 report](reports/gi_gq1_bake_quality.md) and
+[contracts](../contracts/gi_contracts.md#bake-quality-settings-lot-gq1).
+
+## GI emissive texels (lot GE1, 2026-11-08)
+
+No code is imported. The emission chain repeats the project's own enhanced-renderer formula
+(`emitted()` in `pbr.frag.hlsl`, the classes of `config/materials.json`) on the CPU, with a box
+filter down the albedo mips (decisions D23 and D24). See the [GE1 report](reports/gi_ge1_emissive.md)
+and [contracts](../contracts/gi_contracts.md#emissive-texels-lot-ge1).

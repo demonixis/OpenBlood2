@@ -381,8 +381,7 @@ namespace
         options = {};
         const std::array<std::string_view, 2> lone_direct{"--gi-direct", "rebaked"};
         CHECK(!parse_options(lone_direct, options, error) &&
-              error == "--gi-quality, --gi-bounces, --gi-rays, --gi-sky, --gi-direct and --gi-if-stale require "
-                       "--bake-gi");
+              error == "--gi-quality, its settings, --gi-emissive, --gi-direct and --gi-if-stale require --bake-gi");
         options = {};
         const std::array<std::string_view, 3> stale{"--bake-gi", "01_SubwayA", "--gi-if-stale"};
         CHECK(parse_options(stale, options, error) && options.gi_if_stale && options.gi_quality.empty());
@@ -394,7 +393,7 @@ namespace
                  {"--bake-gi", "a", "--gi-quality", "best"},
                  {"--bake-gi", "a", "--gi-rays", "64"},
                  {"--bake-gi", "a", "--gi-quality", "preview", "--gi-bounces", "1"},
-                 {"--bake-gi", "a", "--gi-quality", "custom", "--gi-bounces", "4"},
+                 {"--bake-gi", "a", "--gi-quality", "custom", "--gi-bounces", "5"},
                  {"--bake-gi", "a", "--gi-quality", "custom", "--gi-rays", "15"},
                  {"--bake-gi", "a", "--gi-jobs", "0"},
                  {"--bake-gi", "a", "--gi-jobs", "257"},
@@ -423,7 +422,64 @@ namespace
         options = {};
         const std::array<std::string_view, 4> plain_sky{"--bake-gi", "a", "--gi-sky", "1"};
         CHECK(!parse_options(plain_sky, options, error));
-        CHECK(error == "--gi-bounces, --gi-rays and --gi-sky require --gi-quality custom");
+        CHECK(error == "--gi-bounces, --gi-rays, --gi-sky, --gi-texel-samples, --gi-denoise, --gi-shadow-radius, "
+                       "--gi-shadow-rays, --gi-reflection-strata and --gi-reflection-samples require --gi-quality custom");
+
+        // Lots GQ1 and GE1: the ultra preset, the custom quality settings and the emission scale (any preset).
+        options = {};
+        const std::array<std::string_view, 26> tuned{
+            "--bake-gi",  "a",  "--gi-quality",       "custom", "--gi-bounces",          "4",
+            "--gi-texel-samples", "9", "--gi-denoise", "0",     "--gi-shadow-radius",    "64",
+            "--gi-shadow-rays", "1", "--gi-reflection-strata", "8", "--gi-reflection-samples", "1024",
+            "--gi-emissive", "2.5", "--gi-rays", "16", "--gi-sky", "0", "--gi-jobs", "2"};
+        CHECK(parse_options(tuned, options, error));
+        CHECK(options.gi_bounces == 4 && options.gi_texel_samples == 9 && options.gi_denoise == 0);
+        CHECK(options.gi_shadow_radius == 64 && options.gi_shadow_rays == 1 && options.gi_reflection_strata == 8);
+        CHECK(options.gi_reflection_samples == 1024 && options.gi_emissive == 250 && options.gi_sky == 0);
+        options = {};
+        const std::array<std::string_view, 2> untuned{"--bake-gi", "a"};
+        CHECK(parse_options(untuned, options, error) && options.gi_denoise == -1 && options.gi_emissive == -1);
+        CHECK(options.gi_texel_samples == 0 && options.gi_shadow_radius == 0 && options.gi_reflection_strata == 0);
+        for (const auto quality : {"preview", "final", "ultra"})
+        {
+            options = {};
+            const std::array<std::string_view, 6> emissive{"--bake-gi", "a", "--gi-quality", quality,
+                                                           "--gi-emissive", "1"};
+            CHECK(parse_options(emissive, options, error) && options.gi_emissive == 100 && options.gi_quality == quality);
+        }
+        for (const auto& [args, message] :
+             std::initializer_list<std::pair<std::vector<std::string_view>, std::string_view>>{
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-texel-samples", "3"},
+                  "--gi-texel-samples requires 1, 4, 9 or 16"},
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-texel-samples", "0"},
+                  "--gi-texel-samples requires 1, 4, 9 or 16"},
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-denoise", "5"},
+                  "--gi-denoise requires an integer from 0 to 4"},
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-shadow-radius", "0"},
+                  "--gi-shadow-radius requires an integer from 1 to 64"},
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-shadow-radius", "4", "--gi-shadow-rays", "65"},
+                  "--gi-shadow-rays requires an integer from 1 to 64"},
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-shadow-rays", "4"},
+                  "--gi-shadow-rays requires --gi-shadow-radius"},
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-reflection-strata", "1"},
+                  "--gi-reflection-strata requires an integer from 2 to 8"},
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-reflection-samples", "31"},
+                  "--gi-reflection-samples requires an integer from 32 to 1024"},
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-reflection-samples", "1x"},
+                  "--gi-reflection-samples requires an integer from 32 to 1024"},
+                 {{"--bake-gi", "a", "--gi-emissive", "4.5"},
+                  "--gi-emissive requires a number from 0 to 4 with at most two decimals"},
+                 {{"--bake-gi", "a", "--gi-quality", "ultra", "--gi-denoise", "1"},
+                  "--gi-bounces, --gi-rays, --gi-sky, --gi-texel-samples, --gi-denoise, --gi-shadow-radius, "
+                  "--gi-shadow-rays, --gi-reflection-strata and --gi-reflection-samples require --gi-quality custom"},
+                 {{"--gi-emissive", "1"},
+                  "--gi-quality, its settings, --gi-emissive, --gi-direct and --gi-if-stale require --bake-gi"},
+                 {{"--gi-texel-samples", "4"},
+                  "--gi-quality, its settings, --gi-emissive, --gi-direct and --gi-if-stale require --bake-gi"}})
+        {
+            options = {};
+            CHECK(!parse_options(args, options, error) && error == message);
+        }
         options = {};
         const std::array<std::string_view, 12> preview{"--gi-preview", "07_Cathedral", "--gi-preview-dir", "shots",
                                                        "--gi-k",       "3",            "--gi-f",           "0.5",

@@ -141,8 +141,10 @@ namespace OpenBlood2
         struct Bake
         {
             GiBakeProcess process;
-            bool final_quality = true; // Final (2 bounces, 256 rays) or Preview (1, 64).
-            bool rebaked = true;        // Direct light: re-baked (lot GD2, the default) or the original lightmaps.
+            // Preset (Preview, Final, Ultra or Custom with its settings, lot GQ1), emission scale (lot
+            // GE1) and direct light (re-baked, lot GD2's default, or the original lightmaps). The Custom
+            // fields start at Final's values and survive switching presets.
+            GiBakeSettings settings;
             bool suspend_scene = false; // "Suspend scene rendering during bake".
             std::string world;          // The world path being (or last) baked.
             Sha256Digest world_digest{};

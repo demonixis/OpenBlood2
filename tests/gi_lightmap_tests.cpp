@@ -21,6 +21,7 @@
 #include "engine/gi_sky.h"
 #include "engine/resources.h"
 #include "engine/sha256.h"
+#include "engine/surface_materials.h"
 #include "resource_fixture.h"
 #include "scratch_dir.h"
 #include <algorithm>
@@ -162,6 +163,17 @@ namespace
         image.b.insert(image.b.end(), {0, 0, 0, 0});
         return image.b;
     }
+    // Lot GE1: a 2 x 2 white/black checker with an authored all-white 1 x 1 mip, so the bake's own
+    // box filter (half white) differs from the authored level.
+    std::vector<std::uint8_t> checker_dtx()
+    {
+        auto image = dtx(255, 255, 255);
+        image.resize(1068);
+        image[12] = 2;                                          // Two mip levels.
+        image[48] = 255, image[49] = image[50] = image[51] = 0; // Palette entry 1: opaque black.
+        image.insert(image.end(), {0, 1, 1, 0, 0});
+        return image;
+    }
     // textures/<name>.dtx for every colour the cases use.
     bool write_rez(const fs::path& path)
     {
@@ -176,6 +188,8 @@ namespace
         files["yellow.dtx"] = dtx(255, 255, 0);
         files["cyan.dtx"] = dtx(0, 255, 255);
         files["magenta.dtx"] = dtx(255, 0, 255);
+        files["glow.dtx"] = dtx(153, 153, 153);
+        files["checker.dtx"] = checker_dtx();
         test_resource::Writer w;
         w.b.resize(168);
         w.b[0] = w.b[62] = w.b[124] = 13; // REZ v1 header line breaks, EOF marker and version.
@@ -342,7 +356,8 @@ namespace
         std::vector<WorldTriangleSource> sources;
         std::vector<GiRangeUse> use;
     };
-    bool prepare(const World& world, const Resources& resources, Prepared& out, unsigned jobs = 2)
+    bool prepare(const World& world, const Resources& resources, Prepared& out, unsigned jobs = 2,
+                 std::uint32_t texel_grid = 1)
     {
         std::string error;
         WorldMesh mesh;
@@ -350,7 +365,7 @@ namespace
         if (!mesh.build(world, error, &resources, true, &out.sources) ||
             !gi_range_uses(world, {}, out.use, report, error) ||
             !out.scene.build(std::move(mesh), out.use, report, error) ||
-            !gi_receivers(world, out.scene, out.sources, out.use, jobs, out.receivers, error))
+            !gi_receivers(world, out.scene, out.sources, out.use, jobs, out.receivers, error, texel_grid))
         {
             std::cerr << "prepare: " << error << '\n';
             return false;
@@ -358,10 +373,11 @@ namespace
         return true;
     }
     bool bake(const Prepared& p, const GiSky& sky, std::uint32_t bounces, std::uint32_t rays, GiIndirect& out,
-              GiLightmapReport& report, unsigned jobs = 2, std::uint64_t seed = 0x5eed)
+              GiLightmapReport& report, unsigned jobs = 2, std::uint64_t seed = 0x5eed, std::uint32_t denoise = 0)
     {
         std::string error;
-        if (!bake_gi_lightmaps(p.scene, sky, p.receivers, bounces, rays, seed, jobs, nullptr, {}, out, report, error))
+        if (!bake_gi_lightmaps(p.scene, sky, p.receivers, bounces, rays, seed, jobs, nullptr, {}, out, report, error,
+                               {}, denoise))
         {
             std::cerr << "bake: " << error << '\n';
             return false;
@@ -821,6 +837,104 @@ namespace
             std::cout << "PLANES bounces=" << bounces << " worst=" << worst << '\n';
             CHECK(worst < 3e-3);
         }
+        return true;
+    }
+
+    // Lot GE1: emissive classes light the bake by their analytic amount; bright faces add nothing.
+    bool emission(const fs::path& root)
+    {
+        Resources resources;
+        CHECK(mount(root, resources));
+        SurfaceManifest manifest;
+        std::string error;
+        CHECK(manifest.parse(R"({"version": 1, "classes": {"glow": {"emissive": 1, "emissive_threshold": 0},
+            "dim": {"emissive": 2, "emissive_threshold": 0.7}},
+            "rules": [{"match": "*glow*", "class": "glow"}, {"match": "*checker*", "class": "glow"},
+                      {"match": "*grey*", "class": "dim"}]})",
+                             error));
+        GiSky sky;
+        sky.fill({1, 1, 1}, 1);
+        // A black box (bright walls) with a lightmapped floor and an unlit vertex ceiling of glow.dtx:
+        // E = c x strength x luminance(c) x F = 0.6 x 0.6 x F.
+        for (const auto ceiling : {Kind::Vertex, Kind::Bright})
+        {
+            WorldBuilder b;
+            b.box({5, 5, 5}, {95, 95, 95},
+                  [&](int side, Face& face)
+                  {
+                      face.kind = side == 0 ? Kind::Lightmap : side == 1 ? ceiling : Kind::Bright;
+                      face.texture = side == 1 ? "glow.dtx" : side == 0 ? "white.dtx" : "black.dtx";
+                      face.color = {0, 0, 0};
+                  });
+            Prepared p;
+            CHECK(prepare(b.world, resources, p));
+            GiIndirect plain;
+            GiLightmapReport report;
+            CHECK(bake(p, sky, 1, 4096, plain, report));
+            GiEmissionReport glow;
+            CHECK(p.scene.prepare_emission(manifest, 100, glow, error));
+            CHECK(glow.materials == 1 && glow.faces == 2 && glow.texels == 4 && p.scene.emissive());
+            GiIndirect lit, half, single;
+            CHECK(bake(p, sky, 1, 4096, lit, report));
+            CHECK(bake(p, sky, 1, 4096, single, report, 1));
+            CHECK(lit.energy == single.energy);
+            CHECK(p.scene.prepare_emission(manifest, 50, glow, error));
+            CHECK(bake(p, sky, 1, 4096, half, report));
+            const std::vector<DVector> lid = quad_z(5, 5, 95, 95, 95);
+            const double strength = (153 / 255.f) * (153 / 255.f);
+            double worst = 0;
+            for (std::size_t e = 0; e < p.receivers.texels; ++e)
+            {
+                const double f = form_factor(p.receivers.samples[e], {0, 0, 1}, lid);
+                for (int c = 0; c < 3; ++c)
+                {
+                    const double base = plain.energy[e * 3 + c];
+                    if (ceiling == Kind::Bright)
+                    {
+                        CHECK(lit.energy[e * 3 + c] == float(base)); // SURF_BRIGHT: albedo only.
+                        continue;
+                    }
+                    CHECK(base == 0);
+                    worst = std::max(worst, std::abs(lit.energy[e * 3 + c] - strength * f));
+                    CHECK(near(half.energy[e * 3 + c], lit.energy[e * 3 + c] / 2, 1e-6));
+                }
+            }
+            if (ceiling == Kind::Vertex)
+            {
+                std::cout << "EMISSION worst=" << worst << '\n';
+                CHECK(worst < 2e-3);
+            }
+            // Scale 0 clears it: the bake is the plain one again.
+            CHECK(p.scene.prepare_emission(manifest, 0, glow, error) && !p.scene.emissive() && glow.materials == 0);
+            GiIndirect cleared;
+            CHECK(bake(p, sky, 1, 4096, cleared, report));
+            CHECK(cleared.energy == plain.energy);
+        }
+        // The emission chain is its own box filter of the per-texel formula, not the authored mip;
+        // a class whose threshold no texel exceeds emits nothing (grey: luminance 0.6 < 0.7).
+        WorldBuilder b;
+        b.add({quad_z(5, 5, 95, 95, 5), {0, 0, 1}, Kind::Vertex, "checker.dtx"});
+        b.add({quad_z(105, 5, 195, 95, 5), {0, 0, 1}, Kind::Vertex, "grey.dtx"});
+        Prepared p;
+        CHECK(prepare(b.world, resources, p));
+        GiEmissionReport report;
+        CHECK(p.scene.prepare_emission(manifest, 200, report, error));
+        CHECK(report.materials == 1 && report.texels == 2 && report.faces == 2);
+        std::size_t checked = 0;
+        for (std::uint32_t f = 0; f < p.scene.faces().size(); ++f)
+        {
+            const auto& face = p.scene.faces()[f];
+            const auto glow = p.scene.emission(f, .25f, .25f);
+            if (p.scene.mesh().materials[face.material].path.find("grey") != std::string::npos)
+            {
+                CHECK(glow.x == 0 && glow.y == 0 && glow.z == 0);
+                continue;
+            }
+            CHECK(face.mip == 1 && p.scene.albedo(f, .25f, .25f)[0] == 1); // The authored mip is white.
+            CHECK(glow.x == 1 && glow.y == 1 && glow.z == 1);                // Half of 2 x white.
+            ++checked;
+        }
+        CHECK(checked == 2);
         return true;
     }
 
@@ -2610,6 +2724,166 @@ namespace
         CHECK(gi_direct_visible(occluders, 1, {0, 0, 99.5f}, light)); // Within the margin.
         return true;
     }
+    // Lot GQ1: texel points, their unbiased furnace, denoise and job-count independence.
+    bool quality(const fs::path& root)
+    {
+        Resources resources;
+        CHECK(mount(root, resources));
+        const auto o00 = gi_texel_point_offset(0, 2), o11 = gi_texel_point_offset(3, 2);
+        CHECK(o00[0] == -.25 && o00[1] == -.25 && o11[0] == .25 && o11[1] == .25);
+        const auto c = gi_texel_point_offset(4, 3);
+        CHECK(c[0] == 0 && c[1] == 0 && gi_texel_point_offset(0, 1)[0] == 0);
+        // Points of an inner floor texel: its centre +- 5 units on P and Q, raised half a unit.
+        {
+            WorldBuilder b;
+            b.add({quad_z(5, 5, 95, 95, 5), {0, 0, 1}, Kind::Lightmap});
+            Prepared one, four;
+            CHECK(prepare(b.world, resources, one) && prepare(b.world, resources, four, 2, 2));
+            const auto& r = four.receivers;
+            CHECK(one.receivers.texel_points.empty() && one.receivers.texel_grid == 1);
+            CHECK(r.texel_grid == 2 && r.texel_points.size() == r.texels * 4 && r.texel_solid.size() == r.texels * 4);
+            CHECK(r.samples.size() == one.receivers.samples.size());
+            const auto& block = r.blocks[0];
+            DVector centre;
+            CHECK(block.frame.position(2, 2, centre) && centre.x == 40 && centre.y == 40);
+            const std::size_t e = block.first + 2 * block.frame.width + 2;
+            const V3 expected[4]{{35, 35, 5.5}, {45, 35, 5.5}, {35, 45, 5.5}, {45, 45, 5.5}};
+            for (int k = 0; k < 4; ++k)
+            {
+                CHECK(norm(v3(r.texel_points[e * 4 + k]) - expected[k]) < 1e-4);
+                CHECK(!r.texel_solid[e * 4 + k]);
+            }
+            Prepared threads;
+            CHECK(prepare(b.world, resources, threads, 7, 2));
+            CHECK(std::memcmp(threads.receivers.texel_points.data(), r.texel_points.data(),
+                              r.texel_points.size() * sizeof(DVector)) == 0);
+        }
+        // The furnace keeps its analytic value with 9 points per texel and with the filter.
+        const double albedo = 153 / 255.f;
+        const std::uint16_t texel = 6 << 11 | 12 << 5 | 6;
+        GiSky sky;
+        sky.fill({1, 1, 1}, 1);
+        WorldBuilder furnace;
+        furnace.box({5, 5, 5}, {95, 95, 95},
+                    [&](int, Face& face)
+                    {
+                        face.kind = Kind::LowLightmap;
+                        face.texel = texel;
+                        face.color = {51, 51, 51};
+                    });
+        Prepared p;
+        CHECK(prepare(furnace.world, resources, p, 2, 3));
+        const auto o = expand(texel);
+        for (const std::uint32_t denoise : {0u, 2u})
+        {
+            GiIndirect out, single;
+            GiLightmapReport report, single_report;
+            CHECK(bake(p, sky, 2, 63, out, report, 4, 0x5eed, denoise));
+            CHECK(bake(p, sky, 2, 63, single, single_report, 1, 0x5eed, denoise));
+            CHECK(out.energy == single.energy && out.valid == single.valid);
+            CHECK(report.points == 216 * 9 && report.solid_points == 0 && report.back_points == 0);
+            CHECK(report.denoise == denoise && (denoise || report.denoised == 0)); // A flat field stays flat.
+            // 63 rays split as ceil(63 / 9) = 7 per point.
+            CHECK(report.rays == 7ull * 9 * 216 * 2 + 63ull * 24);
+            for (std::size_t e = 0; e < p.receivers.texels; ++e)
+                for (int k = 0; k < 3; ++k)
+                {
+                    const double expected = 2 * albedo * (o[k] / 255.0) * (1 + albedo);
+                    CHECK(near(out.energy[e * 3 + k], expected, 2e-6 * expected));
+                }
+        }
+        // Denoise reduces the error of a noisy open floor under a bright square (the planes case).
+        WorldBuilder open;
+        open.add({quad_z(5, 5, 395, 395, 5), {0, 0, 1}, Kind::Lightmap});
+        const auto emitter = quad_z(100, 100, 300, 300, 105);
+        open.add({{emitter[0], emitter[3], emitter[2], emitter[1]}, {0, 0, -1}, Kind::Bright, "white.dtx"});
+        Prepared q;
+        CHECK(prepare(open.world, resources, q));
+        GiSky black;
+        black.fill({0, 0, 0}, 1);
+        double error[3]{};
+        for (const std::uint32_t denoise : {0u, 1u, 2u})
+        {
+            GiIndirect out;
+            GiLightmapReport report;
+            CHECK(bake(q, black, 1, 64, out, report, 2, 0x5eed, denoise));
+            CHECK(denoise ? report.denoised > q.receivers.texels / 2 : report.denoised == 0);
+            for (std::size_t e = 0; e < q.receivers.texels; ++e)
+            {
+                const double d = out.energy[e * 3] - form_factor(q.receivers.samples[e], {0, 0, 1}, emitter);
+                error[denoise] += d * d;
+            }
+            error[denoise] = std::sqrt(error[denoise] / q.receivers.texels);
+        }
+        std::cout << "QUALITY denoise rms " << error[0] << " " << error[1] << " " << error[2] << '\n';
+        CHECK(error[1] < .75 * error[0] && error[2] < error[1]);
+        // Soft shadows: a 40-unit square halfway to a light disk of radius 64 hides 1600 / (pi 64^2).
+        World world;
+        world.models.resize(2);
+        auto& wall = world.models[1];
+        wall.points = {{-10, -10, 50}, {10, -10, 50}, {10, 10, 50}, {-10, 10, 50}};
+        wall.planes.push_back({{0, 0, 1}, 50});
+        Surface surface;
+        surface.flags = 1;
+        wall.surfaces.push_back(surface);
+        Polygon square;
+        square.points = {0, 1, 2, 3};
+        wall.polygons.push_back(square);
+        world.models[0] = wall;
+        world.models[0].surfaces[0].flags = 5; // SURF_INVISIBLE: no shadow.
+        GiDirectOccluders occluders;
+        std::string message;
+        CHECK(occluders.build(world, message));
+        const auto light = omni_light({0, 0, 100}, 400, {1, 1, 1});
+        const double share = gi_direct_visibility(occluders, 1, {0, 0, 0}, light, 64, 64, .3, .7);
+        std::cout << "QUALITY soft share " << share << '\n';
+        CHECK(std::abs(share - (1 - 1600 / (3.14159265358979 * 64 * 64))) < .04);
+        CHECK(gi_direct_visibility(occluders, 1, {0, 0, 0}, light, 8, 16, .3, .7) == 0);
+        CHECK(gi_direct_visibility(occluders, 0, {0, 0, 0}, light, 64, 16, .3, .7) == 1);
+        GiDirectLight unclipped = light;
+        unclipped.clip = false;
+        CHECK(gi_direct_visibility(occluders, 1, {0, 0, 0}, unclipped, 64, 16, .3, .7) == 1);
+        CHECK(gi_direct_visibility(occluders, 1, {0, 0, 99.5f}, light, 64, 16, .3, .7) == 1); // Within the margin.
+        // The shelf of direct_shadow: soft shadows give a penumbra, the same for any job count.
+        WorldBuilder shelf;
+        shelf.add({quad_z(0, 0, 200, 200, 0), {0, 0, 1}, Kind::Lightmap});
+        const auto polygon = shelf.add({quad_z(-50, -50, 100, 250, 50), {0, 0, 1}, Kind::Vertex, "grey.dtx", 0, {9, 9, 9}});
+        auto& model = shelf.world.models[0];
+        model.surfaces[model.polygons[polygon].surface].flags |= 1;
+        for (const std::uint32_t grid : {1u, 2u})
+        {
+            Prepared s;
+            CHECK(prepare(shelf.world, resources, s, 2, grid));
+            const std::vector<GiDirectLight> lights{omni_light({150, 100, 100}, 400, {255, 200, 150})};
+            GiDirectOccluders shelf_occluders;
+            CHECK(shelf_occluders.build(shelf.world, message));
+            GiDirectTexels hard, soft, soft_single;
+            const GiDirectOptions options{30, 24, 0x5eed};
+            CHECK(gi_direct_texels(shelf.world, s.receivers, lights, shelf_occluders, 3, hard, message));
+            CHECK(gi_direct_texels(shelf.world, s.receivers, lights, shelf_occluders, 3, soft, message, nullptr, {},
+                                   options));
+            CHECK(gi_direct_texels(shelf.world, s.receivers, lights, shelf_occluders, 1, soft_single, message, nullptr,
+                                   {}, options));
+            CHECK(soft.light == soft_single.light && soft.tests == soft_single.tests);
+            std::size_t partial = 0, hard_partial = 0;
+            for (std::size_t e = 0; e < s.receivers.texels; ++e)
+            {
+                DVector centre;
+                const auto& block = s.receivers.blocks[0];
+                CHECK(block.frame.position(std::uint32_t(e % block.frame.width), std::uint32_t(e / block.frame.width),
+                                           centre));
+                const double full = gi_direct_term(lights[0], centre)[0];
+                const double value = soft.light[e * 3];
+                partial += value > 1e-6 && value < full * .98;
+                hard_partial += hard.light[e * 3] > 1e-6 && hard.light[e * 3] < full * .98;
+            }
+            std::cout << "QUALITY shelf grid=" << grid << " partial=" << partial << " hard_partial=" << hard_partial
+                      << " tests=" << soft.tests << '\n';
+            CHECK(partial > hard_partial);
+        }
+        return true;
+    }
+
     // Private: the retail fit of 01_SubwayA and 22_Office (DirLight OuterColor), thread determinism.
     bool direct_retail(const fs::path& data)
     {
@@ -3748,7 +4022,7 @@ int main(int argc, char** argv)
             {"sky", sky},             {"preview", preview},         {"runtime", runtime_override},
             {"probe-capture", probe_capture}, {"probe-source", probe_source}, {"direct-shadow", direct_shadow},
             {"direct-bake", direct_bake}, {"reflection-capture", reflection_capture},
-            {"reflection-world", reflection_world}};
+            {"reflection-world", reflection_world}, {"quality", quality}, {"emission", emission}};
         const auto found = cases.find(name);
         if (found == cases.end())
             return 2;

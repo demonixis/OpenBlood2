@@ -215,24 +215,71 @@ namespace
         CHECK(fraction("survey", 0, 0) == 0 && gi_bake_fraction({}) == 0);
 
         Config config;
-        auto args = gi_bake_arguments(config, "worlds/01_subwaya.dat", "preview", {}, {});
+        GiBakeSettings preview, final_quality, original;
+        preview.quality = GiQuality::Preview;
+        original.quality = GiQuality::Preview;
+        original.direct = GiDirectSource::Original;
+        auto args = gi_bake_arguments(config, "worlds/01_subwaya.dat", preview, {}, {});
         CHECK((args == std::vector<std::string>{"--bake-gi", "worlds/01_subwaya.dat", "--gi-quality", "preview"}));
         config.data_dir = "/games/blood 2";
         config.demo = true;
         config.nightmares = true;
         config.overlays = {"/mods/a.rez", "/mods/b c.rez"};
-        args = gi_bake_arguments(config, "worlds/x.dat", "final", "/p q", "/o", 6);
+        args = gi_bake_arguments(config, "worlds/x.dat", final_quality, "/p q", "/o", 6);
         CHECK((args == std::vector<std::string>{"--bake-gi", "worlds/x.dat", "--gi-quality", "final", "--data-dir",
                                                 "/games/blood 2", "--demo", "--nightmares", "--rez", "/mods/a.rez",
                                                 "--rez", "/mods/b c.rez", "--gi-placement-dir", "/p q", "--gi-out",
                                                 "/o", "--gi-jobs", "6"}));
         // Lot GD2: re-baked is the child's default (Gate G) and adds nothing; the original direct
         // source follows the quality.
-        CHECK(gi_bake_arguments(config, "worlds/x.dat", "final", "/p q", "/o", 6, true) == args);
-        auto original = gi_bake_arguments(config, "worlds/01_subwaya.dat", "preview", {}, {}, 0, false);
-        CHECK((original == std::vector<std::string>{"--bake-gi", "worlds/01_subwaya.dat", "--gi-quality", "preview",
-                                                    "--gi-direct", "original", "--data-dir", "/games/blood 2", "--demo",
-                                                    "--nightmares", "--rez", "/mods/a.rez", "--rez", "/mods/b c.rez"}));
+        auto lone = gi_bake_arguments(config, "worlds/01_subwaya.dat", original, {}, {}, 0);
+        CHECK((lone == std::vector<std::string>{"--bake-gi", "worlds/01_subwaya.dat", "--gi-quality", "preview",
+                                                "--gi-direct", "original", "--data-dir", "/games/blood 2", "--demo",
+                                                "--nightmares", "--rez", "/mods/a.rez", "--rez", "/mods/b c.rez"}));
+
+        // Lots GQ1 and GE1: Ultra is its name alone; Custom gives every setting (shadow rays and GGX
+        // samples only when set); emission goes with any preset; the child parses them all back into
+        // the same settings.
+        GiBakeSettings ultra;
+        ultra.quality = GiQuality::Ultra;
+        CHECK((gi_quality_arguments(ultra) == std::vector<std::string>{"--gi-quality", "ultra"}));
+        ultra.emissive = 5;
+        CHECK((gi_quality_arguments(ultra) == std::vector<std::string>{"--gi-quality", "ultra", "--gi-emissive", "0.05"}));
+        GiBakeSettings custom;
+        custom.quality = GiQuality::Custom;
+        CHECK((gi_quality_arguments(custom) ==
+               std::vector<std::string>{"--gi-quality", "custom", "--gi-bounces", "2", "--gi-rays", "256", "--gi-sky",
+                                        "1.00", "--gi-texel-samples", "1", "--gi-denoise", "0",
+                                        "--gi-reflection-strata", "2"}));
+        custom = {GiQuality::Custom, 4, 1024, 250, GiDirectSource::Original, 3, 2, 10, 7, 5, 512, 400};
+        const auto tuned = gi_quality_arguments(custom);
+        CHECK((tuned == std::vector<std::string>{"--gi-quality", "custom", "--gi-bounces", "4", "--gi-rays", "1024",
+                                                 "--gi-sky", "2.50", "--gi-texel-samples", "9", "--gi-denoise", "2",
+                                                 "--gi-reflection-strata", "5", "--gi-shadow-radius", "10",
+                                                 "--gi-shadow-rays", "7", "--gi-reflection-samples", "512",
+                                                 "--gi-emissive", "4.00", "--gi-direct", "original"}));
+        std::vector<std::string> command{"blood2", "--bake-gi", "worlds/x.dat"};
+        command.insert(command.end(), tuned.begin(), tuned.end());
+        std::vector<std::string_view> views(command.begin() + 1, command.end());
+        Options options;
+        std::string parse_error;
+        CHECK(parse_options(views, options, parse_error));
+        GiBakeArguments parsed;
+        parsed.quality = options.gi_quality;
+        parsed.bounces = options.gi_bounces;
+        parsed.rays = options.gi_rays;
+        parsed.sky = options.gi_sky;
+        parsed.texel_samples = options.gi_texel_samples;
+        parsed.denoise = options.gi_denoise;
+        parsed.shadow_radius = options.gi_shadow_radius;
+        parsed.shadow_rays = options.gi_shadow_rays;
+        parsed.reflection_strata = options.gi_reflection_strata;
+        parsed.reflection_samples = options.gi_reflection_samples;
+        parsed.emissive = options.gi_emissive;
+        GiBakeSettings back;
+        CHECK(make_gi_bake_settings(parsed, back, parse_error));
+        back.direct = options.gi_direct == "original" ? GiDirectSource::Original : GiDirectSource::Rebaked;
+        CHECK(gi_settings_text(back) == gi_settings_text(custom));
 
         CHECK(std::string(gi_bake_state_name(GiBakeProcess::State::Idle)) == "idle");
         CHECK(std::string(gi_bake_state_name(GiBakeProcess::State::Cancelled)) == "cancelled");

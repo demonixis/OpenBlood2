@@ -1203,8 +1203,8 @@ namespace OpenBlood2
         // The child leaves two hardware threads to the game (its frame and audio); the bytes do not
         // depend on the job count.
         const unsigned threads = std::thread::hardware_concurrency();
-        const auto args = gi_bake_arguments(config, game.world_path, b.final_quality ? "final" : "preview",
-                                            p.directory, out, threads > 2 ? threads - 2 : 1, b.rebaked);
+        const auto args =
+            gi_bake_arguments(config, game.world_path, b.settings, p.directory, out, threads > 2 ? threads - 2 : 1);
         if (!b.process.start(executable, args, error))
             return b.notice = error, false;
         b.world = game.world_path;
@@ -1216,7 +1216,8 @@ namespace OpenBlood2
         b.frames = b.last_frame_ns = 0;
         b.frame_sum_ms = b.frame_max_ms = 0;
         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "GI bake %s started (%s, %s direct light) into %s",
-                    b.world.c_str(), b.final_quality ? "final" : "preview", b.rebaked ? "re-baked" : "original",
+                    b.world.c_str(), gi_quality_name(b.settings.quality),
+                    b.settings.direct == GiDirectSource::Rebaked ? "re-baked" : "original",
                     path_text(out).c_str());
         return true;
     }
@@ -1299,18 +1300,78 @@ namespace OpenBlood2
                     placement_.dirty ? " (edited: saved before baking)" : "");
         const bool running = p.running();
         ImGui::BeginDisabled(running);
-        if (ImGui::RadioButton("Final (2 bounces, 256 rays)", b.final_quality))
-            b.final_quality = true;
+        auto& s = b.settings;
+        auto preset = [&](const char* label, GiQuality quality, const char* tip)
+        {
+            if (ImGui::RadioButton(label, s.quality == quality))
+                s.quality = quality;
+            ImGui::SetItemTooltip("%s", tip);
+        };
+        preset("Preview", GiQuality::Preview, "1 bounce, 64 rays");
         ImGui::SameLine();
-        if (ImGui::RadioButton("Preview (1 bounce, 64 rays)", !b.final_quality))
-            b.final_quality = false;
+        preset("Final", GiQuality::Final, "2 bounces, 256 rays");
+        ImGui::SameLine();
+        preset("Ultra", GiQuality::Ultra,
+               "3 bounces, 512 rays, 4 samples per texel, denoise 1, soft shadows (radius 8, 16 rays), "
+               "reflection strata 4 and 256 GGX samples");
+        ImGui::SameLine();
+        preset("Custom", GiQuality::Custom, "The settings below");
+        if (s.quality == GiQuality::Custom)
+        {
+            namespace L = gi_bake_settings_limits;
+            ImGui::Indent();
+            ImGui::SliderScalar("Bounces", ImGuiDataType_U32, &s.bounces, &L::min_bounces, &L::max_bounces);
+            ImGui::SliderScalar("Rays per probe", ImGuiDataType_U32, &s.rays, &L::min_rays, &L::max_rays, nullptr,
+                                ImGuiSliderFlags_Logarithmic);
+            float sky = float(s.sky) / 100;
+            if (ImGui::SliderFloat("Sky scale", &sky, 0, float(L::max_sky) / 100, "%.2f"))
+                s.sky = std::uint32_t(std::clamp(std::lround(sky * 100), 0l, long(L::max_sky)));
+            int grid = int(s.texel_grid) - 1;
+            if (ImGui::Combo("Samples per texel", &grid, "1\0" "4 (2 x 2)\0" "9 (3 x 3)\0" "16 (4 x 4)\0"))
+                s.texel_grid = std::uint32_t(grid + 1);
+            ImGui::SetItemTooltip("The texel's rays split between an n x n grid of points (fewer leaks, softer edges)");
+            const std::uint32_t zero = 0, one = 1;
+            ImGui::SliderScalar("Denoise radius", ImGuiDataType_U32, &s.denoise, &zero, &L::max_denoise,
+                                s.denoise ? "%u texels" : "off");
+            if (ImGui::SliderScalar("Light radius", ImGuiDataType_U32, &s.shadow_radius, &zero,
+                                    &L::max_shadow_radius, s.shadow_radius ? "%u units" : "hard shadows") &&
+                s.shadow_radius && !s.shadow_rays)
+                s.shadow_rays = L::default_shadow_rays;
+            if (!s.shadow_radius)
+                s.shadow_rays = 0;
+            ImGui::BeginDisabled(!s.shadow_radius);
+            ImGui::SliderScalar("Shadow rays", ImGuiDataType_U32, &s.shadow_rays, &one, &L::max_shadow_rays);
+            ImGui::EndDisabled();
+            ImGui::SliderScalar("Reflection strata", ImGuiDataType_U32, &s.reflection_strata,
+                                &L::min_reflection_strata, &L::max_reflection_strata);
+            ImGui::SliderScalar("GGX samples", ImGuiDataType_U32, &s.reflection_samples, &zero,
+                                &L::max_reflection_samples, s.reflection_samples ? "%u" : "auto");
+            if (s.reflection_samples && s.reflection_samples < L::min_reflection_samples)
+                s.reflection_samples = L::min_reflection_samples;
+            ImGui::Unindent();
+        }
+        bool emission = s.emissive != 0;
+        if (ImGui::Checkbox("Emissive textures light the bake", &emission))
+            s.emissive = emission ? 100 : 0;
+        ImGui::SetItemTooltip("The enhanced renderer's emissive materials (config/materials.json) add their glow "
+                              "to the indirect light (lot GE1)");
+        if (emission)
+        {
+            ImGui::SameLine();
+            float scale = float(s.emissive) / 100;
+            ImGui::SetNextItemWidth(120);
+            if (ImGui::SliderFloat("##emissive", &scale, .01f, float(gi_bake_settings_limits::max_emissive) / 100,
+                                   "x %.2f"))
+                s.emissive = std::uint32_t(
+                    std::clamp(std::lround(scale * 100), 1l, long(gi_bake_settings_limits::max_emissive)));
+        }
         ImGui::TextUnformatted("Direct light:");
         ImGui::SameLine();
-        if (ImGui::RadioButton("Original lightmaps", !b.rebaked))
-            b.rebaked = false;
+        if (ImGui::RadioButton("Original lightmaps", s.direct == GiDirectSource::Original))
+            s.direct = GiDirectSource::Original;
         ImGui::SameLine();
-        if (ImGui::RadioButton("Re-baked", b.rebaked))
-            b.rebaked = true;
+        if (ImGui::RadioButton("Re-baked", s.direct == GiDirectSource::Rebaked))
+            s.direct = GiDirectSource::Rebaked;
         if (placement_.edit && !game.world.models.empty() &&
             ImGui::CollapsingHeader("Excluded models (left out of the bake scene)"))
         {

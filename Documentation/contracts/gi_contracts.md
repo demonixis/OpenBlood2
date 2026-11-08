@@ -4,7 +4,9 @@ Baked GI for the M10 [GI plan](../implementation/gi_plan.md). Each lot adds its 
 Lot G7 bakes the GI lightmaps and lot G8 composes them into the world when Options > Display
 GLOBAL ILLUMINATION is on (off by default, decision D11); lot G9 adds light probes that light the
 models. Lot G11 bakes reflection probes and lot G12 draws them in the enhanced renderer when Options >
-Display REFLECTION PROBES is LOW or HIGH (HIGH on desktop and LOW on Android, Quest and iOS by default since Gate E). With both off, or without a Ready file,
+Display REFLECTION PROBES is LOW or HIGH (HIGH on desktop and LOW on Android, Quest and iOS by default since Gate E). Lot GQ1
+adds bake quality settings and the Ultra preset, and lot GE1 bakes the enhanced renderer's emissive
+textures as light sources; both are opt-in and leave default bakes byte for byte. With both off, or without a Ready file,
 every frame is unchanged; nothing in this contract changes a save or the simulation.
 
 - [World queries (lot G1)](#world-queries-lot-g1)
@@ -21,6 +23,8 @@ every frame is unchanged; nothing in this contract changes a save or the simulat
 - [Re-baked direct bake (lot GD2)](#re-baked-direct-bake-lot-gd2)
 - [Reflection bake (lot G11)](#reflection-bake-lot-g11)
 - [Reflection runtime (lot G12)](#reflection-runtime-lot-g12)
+- [Bake quality settings (lot GQ1)](#bake-quality-settings-lot-gq1)
+- [Emissive texels (lot GE1)](#emissive-texels-lot-ge1)
 
 ## World queries (lot G1)
 
@@ -1888,3 +1892,142 @@ intensity 0.5, with neither the data nor the pipelines rebuilt; GI off draws the
 screen-space reflections run with probes; the original renderer is unchanged. Switching GI off
 after GI frames gives the reference frame back (this caught pipelines kept from the GI variant). It
 also passes on Vulkan through MoltenVK (`SDL_GPU_DRIVER=vulkan`) with the same counts.
+
+## Bake quality settings (lot GQ1)
+
+Lot GQ1 adds bake settings for better bakes (decision D21: opt-in, the defaults keep every byte) and
+the Ultra preset. The measurements are in the [GQ1 report](../implementation/reports/gi_gq1_bake_quality.md).
+
+### Settings and presets
+
+`GiBakeSettings` gains `texel_grid` (1), `denoise` (0), `shadow_radius` (0), `shadow_rays` (0),
+`reflection_strata` (2) and `reflection_samples` (0); the values in brackets are the defaults, which
+bake exactly what G11 baked. `make_gi_bake_settings(GiBakeArguments, ...)` builds them:
+
+| Preset | Bounces | Rays | Sky | Texel samples | Denoise | Shadows (radius, rays) | Reflection strata | GGX samples |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `preview` | 1 | 64 | 1.00 | 1 | 0 | hard | 2 | 64 (32 above a 128 face) |
+| `final` (default) | 2 | 256 | 1.00 | 1 | 0 | hard | 2 | 64 (32 above a 128 face) |
+| `ultra` | 3 | 512 | 1.00 | 4 | 1 | 8, 16 | 4 | 256 |
+| `custom` | 1–4 | 16–4096 | 0–4 | 1, 4, 9, 16 | 0–4 | 1–64, 1–64 (default 16) | 2–8 | 32–1024 |
+
+- The quality settings need `custom` (their message names all nine flags); `custom` starts from
+  Final's values. A failure leaves the settings unchanged.
+- **Settings text:** every value away from its default adds one line before `direct rebaked`, in this
+  order: `texel-samples N`, `denoise R`, `shadows R N`, `reflection-strata N`, `reflection-samples N`
+  (then lot GE1's `emissive`). Default values add nothing, so the hash and bytes of earlier files stay;
+  files with other settings go stale under `--gi-if-stale`. `gi_algorithm_version` stays 4.
+- **Command line** (with `--bake-gi`): `--gi-quality ultra`, `--gi-bounces 1-4`,
+  `--gi-texel-samples 1|4|9|16`, `--gi-denoise 0-4`, `--gi-shadow-radius 1-64`, `--gi-shadow-rays 1-64`
+  (needs a radius), `--gi-reflection-strata 2-8`, `--gi-reflection-samples 32-1024`. Exit 2 otherwise.
+  `GI_RESULT` adds `texel_samples`, `denoise`, `shadow_radius`, `shadow_rays`, `reflection_strata`,
+  `reflection_samples` and `emissive` after `jobs`, `texel_points`, `solid_points` and `back_points`
+  when texels have points, and `denoised` and `denoise_ms` when the filter runs.
+- **`tools/gi/bake_all.py`:** `--quality ultra`, and `--sky`, `--texel-samples`, `--denoise`,
+  `--shadow-radius`, `--shadow-rays`, `--reflection-strata`, `--reflection-samples` with `--quality
+  custom`; its report records them (`settings`) and each world's values.
+- **F8 Bake panel:** Preview, Final, Ultra and Custom; Custom shows the settings (bounces, rays, sky,
+  samples per texel, denoise radius, light radius and shadow rays, reflection strata, GGX samples, with
+  0 shown as auto). `gi_quality_arguments(GiBakeSettings)` gives the child's arguments: the preset,
+  every Custom setting (the shadow rays and GGX samples only when set), `--gi-emissive` for any preset
+  and `--gi-direct original` for the original source; `gi_bake_arguments` now takes the settings.
+
+### Texel points (decision D22)
+
+With `texel_grid` n > 1, `gi_receivers` gives every texel n × n points: point k sits at the texel's
+grid position plus `gi_texel_point_offset(k, n)` = ((k mod n + 0.5)/n − 0.5, (⌊k/n⌋ + 0.5)/n − 0.5)
+texels, moved into the polygon and raised half a unit like the G7 sample (`texel_points`), with its
+solid-space flag (`texel_solid`). The G7 sample stays the texel's position for dilation, denoise and
+the light probes' neighbours.
+
+- **Passes:** each point traces ⌈rays / n²⌉ rays, with the shift `GiRandom(seed, texel << 4 | k,
+  pass + 256)`. A point in solid space, or one whose first pass sees more than 10 % back faces, is
+  dropped for good. The texel takes the mean of its valid points; it is valid if one point is. A texel
+  whose points all lie in solid space counts as solid; the others take part in dilation as seeds when
+  valid, so half-buried texels at wall edges keep their own light.
+- **Direct pass:** `gi_direct_texels` averages the term over the texel's open points, each at its own
+  grid position, with visibility from the lifted point; `gi_rebake_direct` keeps D only for an
+  unplaced texel.
+- Corners and DETAIL LOW sets are unchanged.
+
+### Denoise
+
+With `denoise` R > 0, after each pass's dilation, `gi_denoise_texels` filters the texels' E (corners
+are not filtered):
+
+- each texel p averages the valid texels q within R texels in its own block and in its neighbouring
+  blocks (found with the block frame's `coordinate`), weighted by (1 − d²/h²)² ρ², with d the distance
+  between the G7 samples, h = 20 (R + ½) and ρ the smaller over the larger of the two texels' guides;
+- the guide is the harmonic mean of the first pass's hit distances, clamped to 1–4,096, misses and sky
+  counting 4,096 (back hits do not count), so contact shadow near walls survives;
+- it reads a copy of the pass and writes per block on the bake's jobs; a texel with no weight keeps
+  its value. ρ² replaced the first design's ρ⁴ during the lot: hit distances from few rays are noisy,
+  and ρ⁴ blocked most of the filtering on open floors while keeping wall contact no better (report).
+
+### Soft direct shadows
+
+With `shadow_radius` R > 0, `gi_direct_visibility` replaces the hard test of a ClipLight light: the
+light is a disk of radius R facing the sample (Duff et al. basis), and ray m of `shadow_rays` aims at
+the concentric-mapped point of the rank-1 lattice ((m + ½)/N, m/φ) shifted by `GiRandom(seed, texel
+<< 4 | point, light object)`. A disk point the light's centre cannot see is not counted (geometry
+around the light); the share is the reached points over the counted ones, the hard test when none
+counts or within the margin, and 1 for unclipped lights. `direct_tests` counts every ray.
+
+### Reflections
+
+`bake_gi_reflections(..., subsamples, ggx_samples)`: `reflection_strata` n traces n × n capture rays per
+cube texel (G11: 2 × 2); `reflection_samples` sets the GGX samples per texel (0: G11's 64, 32 above a
+128 face).
+
+### Tests
+
+**`gi_lightmap.quality`** The point offsets; an inner texel's four points (centre ± 5 units, raised
+half a unit) and job independence; the furnace with nine points (and with R = 2) at its analytic
+value, the rays split as ⌈63/9⌉ = 7, identical for 1 and 4 jobs; the filter lowering the error of an
+open floor (64 rays: RMS 0.0140 → 0.0092 at R = 1); a soft shadow of a 40-unit square under a
+radius-64 disk (0.844 against the analytic 0.876 with 64 rays), full shadow under a radius-8 disk,
+SURF_INVISIBLE, unclipped lights and the margin; a penumbra on the direct_shadow shelf with 1 and 4
+points, the same for 1 and 3 jobs. **`gi_bake.settings`** the presets, Ultra's values, the settings
+lines and their order, explicit defaults keeping the text, and every refusal (settings kept).
+**`config.gi`** the flags, their ranges, custom-only and `--bake-gi`-only refusals.
+**`gi_bake_process.parse`** `gi_quality_arguments` for every preset and a full Custom set, parsed back
+by the command line into the same settings text. **`gi_overlay.retail`** (private) the panel's Custom
+arguments reach the child. **`gi_bake_all`** the script with the new options.
+
+## Emissive texels (lot GE1)
+
+Lot GE1 bakes the enhanced renderer's emissive texture classes as light sources (decisions D23 and
+D24), opt-in with a scale. The measurements are in the [GE1 report](../implementation/reports/gi_ge1_emissive.md).
+
+- **Setting:** `GiBakeSettings::emissive`, a scale in hundredths (0–400, 0 = off), with any preset;
+  `--gi-emissive 0-4` (two decimals), `bake_all.py --emissive`, and the F8 Bake panel's "Emissive
+  textures light the bake" with its scale. The settings line `emissive S M` names the scale and the
+  first 16 hex digits of the built-in manifest's SHA-256 (`gi_manifest_digest_prefix`), so editing
+  `config/materials.json` makes the file stale under `--gi-if-stale`. An emission of 0 adds no line.
+- **Chains (`GiBakeScene::prepare_emission`):** materials resolve like `SurfaceMaterials::refresh`
+  (only paths ending in `.dtx`/`.DTX` read the built-in manifest; SPR and failed materials emit
+  nothing). For a class with `emissive` > 0, every mip-0 texel c gets the shader's `emitted()`:
+  c × strength × saturate((luminance(c) − threshold) / max(1 − threshold, 0.001)) with BT.601
+  luminance, in float, times S/100; each further level is the box filter (the up to 2 × 2 texels above
+  it) of the previous one, not of the authored mip, so small bright spots keep their energy. A
+  material with no glowing texel is left out. `GI_RESULT` adds `emissive_materials`, `emissive_faces`,
+  `emissive_texels` and `emissive_ms`.
+- **Lookup (`emission`):** the face's chain at its albedo mip, nearest texel, repeating, like
+  `albedo`. `surface_radiance` adds it to the light of lightmapped and vertex-lit faces only:
+  SURF_BRIGHT faces keep their albedo (the renderer does not glow there), and sky, unresolved and
+  untextured faces add nothing. Translucent layers carry it with their alpha.
+- **What sees it:** every lightmap pass, the light probes and both reflection sets (Original and
+  Composed) read radiance through `gi_hit_radiance`, so all three receive the bounce of the glow. The
+  stored light of the emissive face itself does not include its own glow: the enhanced renderer adds
+  it, and the original renderer shows only its bounce (D23).
+- **Identity:** without `--gi-emissive` (or with 0) the scene prepares nothing and the bake is byte for
+  byte the G11/GQ1 one.
+
+### Tests
+
+**`gi_lightmap.emission`** A black box with an unlit vertex ceiling of an emissive class lights a
+lightmapped floor by 0.6 × 0.6 × F (form factor; worst error 4.6e-4 at 4,096 rays), half at scale
+0.5, the same for 1 and 2 jobs; a SURF_BRIGHT ceiling of the same class adds nothing; scale 0 restores
+the plain bake bit for bit; a checker texture's chain at mip 1 is the box filter (half of twice white)
+while the authored mip is white, and a class whose threshold no texel exceeds is left out.
+**`gi_bake.settings`** the emissive line with the manifest digest, with any preset.

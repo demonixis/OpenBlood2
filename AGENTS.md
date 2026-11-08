@@ -59,7 +59,7 @@ active fields, released play keys, the refused 27889 gameplay port, UTF-8-safe h
 names and the dedicated server's `--no-lan`.
 
 The [GI plan](Documentation/implementation/gi_plan.md) (M10, [contracts](Documentation/contracts/gi_contracts.md))
-has lots G1–G12, GD1 and GD2 (the re-baked direct light, D1 (c), is planned as GD1–GD3; GD3 is not implemented): world queries, the `.ob2gi` file and keys, the F8 overlay, probe placement
+has lots G1–G12, GD1, GD2, GQ1 and GE1 (the re-baked direct light, D1 (c), is planned as GD1–GD3; GD3 is not implemented): world queries, the `.ob2gi` file and keys, the F8 overlay, probe placement
 (`--gi-place`, canonical `data/gi/placement/<world>.json` format 2, F8 editing), the bake
 scene/tracer (`--bake-gi`), `tools/gi/bake_all.py` with build packaging of `data/gi/baked`
 (`BLOOD2_PACKAGE_GI`, `gi/` beside the binary, `Resources/gi`, APK `assets/gi`) and the lightmap
@@ -113,6 +113,14 @@ result replaces the baked environment light and SSR replaces it in turn. Preserv
 for byte with E = 0 and probes OFF (placeholder data), the 72 earlier artifacts unchanged, no
 lookup or rebuild per frame (the F8 intensity and Reflections only restage the records), the CPU
 mirror `gi_reflection_environment` and the original renderer untouched; a version 14 OFF reads as the platform default.
+GQ1 adds opt-in bake quality (D21): `--gi-quality ultra` (3 bounces, 512 rays, 4 texel samples, denoise 1, soft
+shadows 8/16, reflection strata 4, 256 GGX samples) and custom `--gi-texel-samples`, `--gi-denoise`,
+`--gi-shadow-radius/-rays`, `--gi-reflection-strata/-samples`, bounces up to 4 (CLI, `bake_all.py`, F8 panel).
+GE1 bakes manifest emission (`--gi-emissive S`, any preset, D23/D24): the shader's `emitted()` per mip-0
+texel, box-filtered down the albedo mip, added on lightmapped and vertex-lit hits (never SURF_BRIGHT).
+Preserve default bytes and settings text (each non-default value adds one line before `direct rebaked`;
+`emissive` names the manifest digest), points split the texel's rays (⌈rays/n²⌉, invalid points dropped),
+the ρ² hit-distance guide of the denoiser, job-independent bytes, and Gate H (default preset, emission on?) open.
 Preserve the D1 units (pages ×2 Saturate, vertex light not, the exact E = 0/f = 1 identity
 of `gi_compose`), D-only re-emission, edge-inset samples, the 10 % back-face validity on the
 first trace and SkyPointer targets as Sky ranges.

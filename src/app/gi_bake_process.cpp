@@ -39,13 +39,43 @@ namespace OpenBlood2
         return true;
     }
 
-    std::vector<std::string> gi_bake_arguments(const Config& config, std::string_view world, std::string_view quality,
-                                               const std::filesystem::path& placement_dir,
-                                               const std::filesystem::path& out_dir, unsigned jobs, bool rebaked)
+    std::vector<std::string> gi_quality_arguments(const GiBakeSettings& settings)
     {
-        std::vector<std::string> args{"--bake-gi", std::string(world), "--gi-quality", std::string(quality)};
-        if (!rebaked)
+        auto hundredths = [](std::uint32_t value)
+        {
+            char text[16];
+            std::snprintf(text, sizeof text, "%u.%02u", value / 100, value % 100);
+            return std::string(text);
+        };
+        std::vector<std::string> args{"--gi-quality", gi_quality_name(settings.quality)};
+        if (settings.quality == GiQuality::Custom)
+        {
+            args.insert(args.end(), {"--gi-bounces", std::to_string(settings.bounces), "--gi-rays",
+                                     std::to_string(settings.rays), "--gi-sky", hundredths(settings.sky),
+                                     "--gi-texel-samples", std::to_string(settings.texel_grid * settings.texel_grid),
+                                     "--gi-denoise", std::to_string(settings.denoise), "--gi-reflection-strata",
+                                     std::to_string(settings.reflection_strata)});
+            if (settings.shadow_radius)
+                args.insert(args.end(), {"--gi-shadow-radius", std::to_string(settings.shadow_radius),
+                                         "--gi-shadow-rays", std::to_string(settings.shadow_rays)});
+            if (settings.reflection_samples)
+                args.insert(args.end(), {"--gi-reflection-samples", std::to_string(settings.reflection_samples)});
+        }
+        if (settings.emissive)
+            args.insert(args.end(), {"--gi-emissive", hundredths(settings.emissive)});
+        if (settings.direct == GiDirectSource::Original)
             args.insert(args.end(), {"--gi-direct", "original"});
+        return args;
+    }
+
+    std::vector<std::string> gi_bake_arguments(const Config& config, std::string_view world,
+                                               const GiBakeSettings& settings,
+                                               const std::filesystem::path& placement_dir,
+                                               const std::filesystem::path& out_dir, unsigned jobs)
+    {
+        std::vector<std::string> args{"--bake-gi", std::string(world)};
+        const auto quality = gi_quality_arguments(settings);
+        args.insert(args.end(), quality.begin(), quality.end());
         if (!config.data_dir.empty())
             args.insert(args.end(), {"--data-dir", path_text(config.data_dir)});
         if (config.demo)

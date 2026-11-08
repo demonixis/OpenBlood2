@@ -25,7 +25,7 @@ namespace OpenBlood2
     {
         constexpr std::uint32_t format = 1;         // REFL payload format.
         constexpr std::uint32_t sets = 2;           // Original, then composed.
-        constexpr std::uint32_t subsamples = 2;     // Capture rays per cube texel and axis (fixed strata).
+        constexpr std::uint32_t subsamples = 2;     // Capture rays per cube texel and axis (default strata).
         constexpr std::uint32_t smallest_level = 4; // The chain ends at 4 x 4 (2 x 2 inside the border).
         constexpr std::uint32_t max_levels = 7;     // 256 down to 4.
         constexpr double back_limit = .5;           // Invalid when more than half the rays hit back faces.
@@ -92,7 +92,9 @@ namespace OpenBlood2
                           double out[3]);
     // The chain of one cube at `resolution`, RGB9E5, borders filled: level 0 averages 2 x 2 cube
     // samples per texel, level l > 0 is the GGX prefilter at roughness l / (levels - 1).
-    void gi_reflection_chain(const GiReflectionCube&, std::uint32_t resolution, std::span<std::uint32_t> out);
+    // `ggx_samples` (lot GQ1) replaces the 64 / 32 rule when nonzero.
+    void gi_reflection_chain(const GiReflectionCube&, std::uint32_t resolution, std::span<std::uint32_t> out,
+                             std::uint32_t ggx_samples = 0);
 
     // The two light states the capture reads (per receiver element, RGB, 0-1 as drawn): the stored
     // light O / 255, and the composition the runtime's Final view draws at gi_default_k and
@@ -116,9 +118,10 @@ namespace OpenBlood2
     // Captures every probe: six faces at its PLAC resolution, 2 x 2 fixed rays per texel from the
     // capture point, each traced once and evaluated against both light states (gi_hit_radiance) and
     // `sky` (the displayed sky: scale 1); then the two chains. One job per probe; identical for any
-    // thread count.
+    // thread count. Lot GQ1: `subsamples` (2-8) rays per cube texel axis, `ggx_samples` as above.
     bool bake_gi_reflections(const GiBakeScene&, const GiSky& sky, const GiReceivers&, std::span<const float> original,
                              std::span<const float> composed, std::span<const GiReflectionProbe>, unsigned jobs,
                              const std::atomic<bool>* cancel, const GiProgress&, GiReflections&,
-                             GiReflectionReport&, std::string& error);
+                             GiReflectionReport&, std::string& error, std::uint32_t subsamples = 2,
+                             std::uint32_t ggx_samples = 0);
 } // namespace OpenBlood2

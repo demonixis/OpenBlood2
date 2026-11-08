@@ -30,8 +30,15 @@ SETS = {"single": {"single", "addon"}, "multi": {"multi"}, "all": None}
 EXIT_CANCELLED = 12
 # key=value tokens of a GI_RESULT line; values may be JSON strings with spaces (error=).
 TOKEN = re.compile(r'(\w+)=("(?:[^"\\]|\\.)*"|\S+)')
-REPORT_FIELDS = ("quality", "direct", "bounces", "rays_per_probe", "jobs", "placement", "probes", "reflections",
-                 "reflection_valid", "reflection_ms", "threads", "rays", "miss", "inside", "digest", "bytes", "ms")
+REPORT_FIELDS = ("quality", "direct", "bounces", "rays_per_probe", "sky_scale", "texel_samples", "denoise",
+                 "shadow_radius", "shadow_rays", "reflection_strata", "reflection_samples", "emissive", "jobs",
+                 "placement", "probes", "reflections", "reflection_valid", "reflection_ms", "threads", "rays", "miss",
+                 "inside", "digest", "bytes", "ms")
+# Lot GQ1: the custom quality's settings, as (option, --gi- flag); --emissive (lot GE1) goes with any preset.
+CUSTOM_SETTINGS = (("bounces", "--gi-bounces"), ("rays", "--gi-rays"), ("sky", "--gi-sky"),
+                   ("texel_samples", "--gi-texel-samples"), ("denoise", "--gi-denoise"),
+                   ("shadow_radius", "--gi-shadow-radius"), ("shadow_rays", "--gi-shadow-rays"),
+                   ("reflection_strata", "--gi-reflection-strata"), ("reflection_samples", "--gi-reflection-samples"))
 
 
 def parse_arguments(argv):
@@ -44,11 +51,20 @@ def parse_arguments(argv):
                            help="world kinds to bake (default single: single-player and add-on worlds)")
     selection.add_argument("--worlds", nargs="+", metavar="WORLD",
                            help="worlds by path, file name or stem, case-insensitive")
-    parser.add_argument("--quality", choices=("preview", "final", "custom"), default="final")
+    parser.add_argument("--quality", choices=("preview", "final", "ultra", "custom"), default="final",
+                        help="bake preset (default final); ultra and the custom settings are lot GQ1")
     parser.add_argument("--direct", choices=("original", "rebaked"), default="rebaked",
                         help="direct light on lightmapped faces: re-baked (default, lot GD2) or the stored lightmaps")
-    parser.add_argument("--bounces", type=int, help="custom quality bounces (1-3)")
+    parser.add_argument("--bounces", type=int, help="custom quality bounces (1-4)")
     parser.add_argument("--rays", type=int, help="custom quality rays per probe (16-4096)")
+    parser.add_argument("--sky", help="custom quality sky scale (0-4, two decimals)")
+    parser.add_argument("--texel-samples", type=int, help="custom quality sample points per texel (1, 4, 9 or 16)")
+    parser.add_argument("--denoise", type=int, help="custom quality texel filter radius (0-4)")
+    parser.add_argument("--shadow-radius", type=int, help="custom quality light disk radius, soft shadows (0-64)")
+    parser.add_argument("--shadow-rays", type=int, help="custom quality soft-shadow rays per light (1-64)")
+    parser.add_argument("--reflection-strata", type=int, help="custom quality reflection capture strata (2-8)")
+    parser.add_argument("--reflection-samples", type=int, help="custom quality GGX samples (32-1024)")
+    parser.add_argument("--emissive", help="bake the manifest's emissive textures at this scale (0-4, lot GE1)")
     parser.add_argument("--jobs", type=int, default=1, help="worlds baked at once (default 1)")
     parser.add_argument("--threads", type=int, default=0,
                         help="threads per bake, --gi-jobs (default: processors / jobs)")
@@ -66,8 +82,8 @@ def parse_arguments(argv):
         parser.error("--jobs must be 1-64")
     if arguments.threads < 0 or arguments.threads > 256:
         parser.error("--threads must be 0-256")
-    if (arguments.bounces is not None or arguments.rays is not None) and arguments.quality != "custom":
-        parser.error("--bounces and --rays need --quality custom")
+    if arguments.quality != "custom" and any(getattr(arguments, name) is not None for name, _ in CUSTOM_SETTINGS):
+        parser.error("the quality settings (--bounces, --rays, --sky, --texel-samples, ...) need --quality custom")
     return arguments
 
 
@@ -131,10 +147,11 @@ def bake_command(base, world, arguments, threads):
     command = base + ["--bake-gi", world["path"], "--gi-quality", arguments.quality,
                       "--gi-jobs", str(threads), "--gi-out", os.path.abspath(arguments.out),
                       "--gi-placement-dir", os.path.abspath(arguments.placement_dir)]
-    if arguments.bounces is not None:
-        command += ["--gi-bounces", str(arguments.bounces)]
-    if arguments.rays is not None:
-        command += ["--gi-rays", str(arguments.rays)]
+    for name, flag in CUSTOM_SETTINGS:
+        if getattr(arguments, name) is not None:
+            command += [flag, str(getattr(arguments, name))]
+    if arguments.emissive is not None:
+        command += ["--gi-emissive", arguments.emissive]
     if arguments.direct != "rebaked":  # The game's default since Gate G.
         command += ["--gi-direct", arguments.direct]
     if not arguments.force:
@@ -361,6 +378,9 @@ def main(argv):
         "direct": arguments.direct,
         "bounces": arguments.bounces,
         "rays": arguments.rays,
+        "settings": {name: getattr(arguments, name) for name, _ in CUSTOM_SETTINGS[2:]
+                     if getattr(arguments, name) is not None},
+        "emissive": arguments.emissive,
         "force": arguments.force,
         "jobs": jobs,
         "threads": threads,

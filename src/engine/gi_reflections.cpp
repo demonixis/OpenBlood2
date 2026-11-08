@@ -291,10 +291,12 @@ namespace OpenBlood2
         else
             gi_reflection_cube_sample(cube, normal, out);
     }
-    void gi_reflection_chain(const GiReflectionCube& cube, std::uint32_t resolution, std::span<std::uint32_t> out)
+    void gi_reflection_chain(const GiReflectionCube& cube, std::uint32_t resolution, std::span<std::uint32_t> out,
+                             std::uint32_t ggx_samples)
     {
         const auto levels = gi_reflection_levels(resolution);
-        const std::uint32_t samples = cube.size > L::wide_face ? L::wide_samples : L::samples;
+        const std::uint32_t samples =
+            ggx_samples ? ggx_samples : cube.size > L::wide_face ? L::wide_samples : L::samples;
         for (std::uint32_t level = 0; level < levels; ++level)
         {
             const std::uint32_t size = resolution >> level, n = size - 2;
@@ -365,8 +367,10 @@ namespace OpenBlood2
                              std::span<const float> original, std::span<const float> composed,
                              std::span<const GiReflectionProbe> probes, unsigned jobs, const std::atomic<bool>* cancel,
                              const GiProgress& progress, GiReflections& out, GiReflectionReport& report,
-                             std::string& error)
+                             std::string& error, std::uint32_t subsamples, std::uint32_t ggx_samples)
     {
+        if (subsamples < 1 || subsamples > 8 || ggx_samples > 1024)
+            return error = "GI reflections: invalid strata or GGX samples", false;
         const auto start = std::chrono::steady_clock::now();
         out = {};
         report = {};
@@ -418,14 +422,14 @@ namespace OpenBlood2
                 GiRayCounters ignored;
                 GiHit hit;
                 std::uint64_t back_rays = 0;
-                const double strata = L::subsamples;
+                const double strata = subsamples;
                 for (unsigned face = 0; face < 6; ++face)
                     for (std::uint32_t y = 0; y < size; ++y)
                         for (std::uint32_t x = 0; x < size; ++x)
                         {
                             double sum[L::sets][3]{};
-                            for (std::uint32_t j = 0; j < L::subsamples; ++j)
-                                for (std::uint32_t i = 0; i < L::subsamples; ++i)
+                            for (std::uint32_t j = 0; j < subsamples; ++j)
+                                for (std::uint32_t i = 0; i < subsamples; ++i)
                                 {
                                     const auto direction =
                                         gi_reflection_cube_direction(face, 2 * (x + (i + .5) / strata) / size - 1,
@@ -447,13 +451,14 @@ namespace OpenBlood2
                                 for (int c = 0; c < 3; ++c)
                                     cubes[s].texels[texel + c] = float(sum[s][c] / (strata * strata));
                         }
-                const std::uint64_t rays = std::uint64_t(6) * size * size * L::subsamples * L::subsamples;
+                const std::uint64_t rays = std::uint64_t(6) * size * size * subsamples * subsamples;
                 result.valid[p] = back_rays <= L::back_limit * rays;
                 const auto filtered = std::chrono::steady_clock::now();
                 count.capture_ms += std::chrono::duration<double, std::milli>(filtered - captured).count();
                 for (std::uint32_t s = 0; s < L::sets; ++s)
                     gi_reflection_chain(cubes[s], resolution,
-                                        std::span<std::uint32_t>(result.texels).subspan((s * total + p) * chain, chain));
+                                        std::span<std::uint32_t>(result.texels).subspan((s * total + p) * chain, chain),
+                                        ggx_samples);
                 count.prefilter_ms += elapsed_ms(filtered);
                 const auto finished = done.fetch_add(1) + 1;
                 if (progress)

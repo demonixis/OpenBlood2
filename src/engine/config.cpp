@@ -325,7 +325,9 @@ namespace OpenBlood2
                      arg == "--gi-place" || arg == "--gi-placement-dir" || arg == "--bake-gi" ||
                      arg == "--gi-quality" || arg == "--gi-bounces" || arg == "--gi-rays" || arg == "--gi-jobs" ||
                      arg == "--gi-out" || arg == "--gi-sky" || arg == "--gi-preview" || arg == "--gi-preview-dir" ||
-                     arg == "--gi-direct-audit" || arg == "--gi-direct" ||
+                     arg == "--gi-direct-audit" || arg == "--gi-direct" || arg == "--gi-texel-samples" ||
+                     arg == "--gi-denoise" || arg == "--gi-shadow-radius" || arg == "--gi-shadow-rays" ||
+                     arg == "--gi-reflection-strata" || arg == "--gi-reflection-samples" || arg == "--gi-emissive" ||
                      arg == "--gi-k" || arg == "--gi-f" || arg == "--gi-view" || arg == "--gi-source" ||
                      arg == "--gi-probes" || arg == "--gi-reflections" || arg == "--frames" || arg == "--capture" || arg == "--world" || arg == "--log-dir" ||
                      arg == "--log-level" || arg == "--rez" ||
@@ -432,9 +434,9 @@ namespace OpenBlood2
                     options.gi_out = path_from_utf8(args[i]);
                 else if (arg == "--gi-quality")
                 {
-                    if (args[i] != "preview" && args[i] != "final" && args[i] != "custom")
+                    if (args[i] != "preview" && args[i] != "final" && args[i] != "ultra" && args[i] != "custom")
                     {
-                        error = "--gi-quality requires preview, final or custom";
+                        error = "--gi-quality requires preview, final, ultra or custom";
                         return false;
                     }
                     options.gi_quality = args[i];
@@ -512,7 +514,7 @@ namespace OpenBlood2
                         options.gi_composition = true;
                     }
                 }
-                else if (arg == "--gi-sky")
+                else if (arg == "--gi-sky" || arg == "--gi-emissive")
                 {
                     // A decimal from 0 to 4 with at most two places, kept exactly in hundredths.
                     const std::string_view value = args[i];
@@ -535,10 +537,10 @@ namespace OpenBlood2
                     }
                     if (hundredths < 0 || hundredths > 400)
                     {
-                        error = "--gi-sky requires a number from 0 to 4 with at most two decimals";
+                        error = std::string(arg) + " requires a number from 0 to 4 with at most two decimals";
                         return false;
                     }
-                    options.gi_sky = hundredths;
+                    (arg == "--gi-sky" ? options.gi_sky : options.gi_emissive) = hundredths;
                 }
                 else if (arg == "--gi-bounces" || arg == "--gi-rays" || arg == "--gi-jobs")
                 {
@@ -546,7 +548,7 @@ namespace OpenBlood2
                     std::uint32_t number = 0;
                     const auto result = std::from_chars(value.data(), value.data() + value.size(), number);
                     const bool bounces = arg == "--gi-bounces", rays = arg == "--gi-rays";
-                    const std::uint32_t low = bounces ? 1 : rays ? 16 : 1, high = bounces ? 3 : rays ? 4096 : 256;
+                    const std::uint32_t low = bounces ? 1 : rays ? 16 : 1, high = bounces ? 4 : rays ? 4096 : 256;
                     if (result.ec != std::errc{} || result.ptr != value.data() + value.size() || number < low ||
                         number > high)
                     {
@@ -555,6 +557,38 @@ namespace OpenBlood2
                         return false;
                     }
                     (bounces ? options.gi_bounces : rays ? options.gi_rays : options.gi_jobs) = number;
+                }
+                else if (arg == "--gi-texel-samples" || arg == "--gi-denoise" || arg == "--gi-shadow-radius" ||
+                         arg == "--gi-shadow-rays" || arg == "--gi-reflection-strata" ||
+                         arg == "--gi-reflection-samples")
+                {
+                    // Lot GQ1 integers.
+                    const auto value = args[i];
+                    std::uint32_t number = 0;
+                    const auto result = std::from_chars(value.data(), value.data() + value.size(), number);
+                    const bool texel = arg == "--gi-texel-samples", denoise = arg == "--gi-denoise",
+                               strata = arg == "--gi-reflection-strata", samples = arg == "--gi-reflection-samples";
+                    const std::uint32_t low = denoise ? 0 : strata ? 2 : samples ? 32 : 1,
+                                        high = texel ? 16 : denoise ? 4 : strata ? 8 : samples ? 1024 : 64;
+                    const bool square = !texel || number == 1 || number == 4 || number == 9 || number == 16;
+                    if (result.ec != std::errc{} || result.ptr != value.data() + value.size() || number < low ||
+                        number > high || !square)
+                    {
+                        error = texel ? std::string("--gi-texel-samples requires 1, 4, 9 or 16")
+                                      : std::string(arg) + " requires an integer from " + std::to_string(low) + " to " +
+                                            std::to_string(high);
+                        return false;
+                    }
+                    if (texel)
+                        options.gi_texel_samples = number;
+                    else if (denoise)
+                        options.gi_denoise = std::int32_t(number);
+                    else if (strata)
+                        options.gi_reflection_strata = number;
+                    else if (samples)
+                        options.gi_reflection_samples = number;
+                    else
+                        (arg == "--gi-shadow-radius" ? options.gi_shadow_radius : options.gi_shadow_rays) = number;
                 }
                 else if (arg == "--capture")
                     options.capture_file = path_from_utf8(args[i]);
@@ -588,12 +622,14 @@ namespace OpenBlood2
         const bool gi_direct = !options.gi_direct_audit.empty();
         const bool gi_tool =
             options.list_worlds || !options.gi_verify.empty() || gi_place || bake_gi || gi_preview || gi_direct;
-        if ((!options.gi_quality.empty() || options.gi_bounces || options.gi_rays || options.gi_sky >= 0 ||
-             options.gi_if_stale || !options.gi_direct.empty()) &&
+        const bool gi_tuned = options.gi_bounces || options.gi_rays || options.gi_sky >= 0 || options.gi_texel_samples ||
+                              options.gi_denoise >= 0 || options.gi_shadow_radius || options.gi_shadow_rays ||
+                              options.gi_reflection_strata || options.gi_reflection_samples;
+        if ((!options.gi_quality.empty() || gi_tuned || options.gi_emissive >= 0 || options.gi_if_stale ||
+             !options.gi_direct.empty()) &&
             !bake_gi)
         {
-            error = "--gi-quality, --gi-bounces, --gi-rays, --gi-sky, --gi-direct and --gi-if-stale require "
-                    "--bake-gi";
+            error = "--gi-quality, its settings, --gi-emissive, --gi-direct and --gi-if-stale require --bake-gi";
             return false;
         }
         if ((options.gi_jobs && !bake_gi && !gi_preview && !gi_direct) ||
@@ -628,9 +664,15 @@ namespace OpenBlood2
                     "ILLUMINATION and the F8 Runtime panel";
             return false;
         }
-        if ((options.gi_bounces || options.gi_rays || options.gi_sky >= 0) && options.gi_quality != "custom")
+        if (gi_tuned && options.gi_quality != "custom")
         {
-            error = "--gi-bounces, --gi-rays and --gi-sky require --gi-quality custom";
+            error = "--gi-bounces, --gi-rays, --gi-sky, --gi-texel-samples, --gi-denoise, --gi-shadow-radius, "
+                    "--gi-shadow-rays, --gi-reflection-strata and --gi-reflection-samples require --gi-quality custom";
+            return false;
+        }
+        if (options.gi_shadow_rays && !options.gi_shadow_radius)
+        {
+            error = "--gi-shadow-rays requires --gi-shadow-radius";
             return false;
         }
         if (options.json && !options.list_worlds && !gi_place)

@@ -453,14 +453,74 @@ namespace
         CHECK(make_gi_bake_settings("preview", 0, 0, -1, s, error) && s.direct == GiDirectSource::Rebaked);
         CHECK(make_gi_bake_settings("custom", 0, 0, 400, s, error) && s.direct == GiDirectSource::Rebaked);
         const auto before = s.rays;
-        CHECK(!make_gi_bake_settings("custom", 4, 0, -1, s, error) && s.rays == before);
+        CHECK(!make_gi_bake_settings("custom", 5, 0, -1, s, error) && s.rays == before);
         CHECK(!make_gi_bake_settings("custom", 0, 15, -1, s, error));
         CHECK(!make_gi_bake_settings("custom", 0, 0, 401, s, error) && error == "--gi-sky must be 0 to 4");
         CHECK(!make_gi_bake_settings("custom", 0, 0, -2, s, error) && s.sky == 400);
         CHECK(!make_gi_bake_settings("final", 2, 0, -1, s, error));
         CHECK(!make_gi_bake_settings("final", 0, 0, 100, s, error));
-        CHECK(error == "--gi-bounces, --gi-rays and --gi-sky need --gi-quality custom");
+        CHECK(error == "--gi-bounces, --gi-rays, --gi-sky, --gi-texel-samples, --gi-denoise, --gi-shadow-radius, "
+                       "--gi-shadow-rays, --gi-reflection-strata and --gi-reflection-samples need --gi-quality custom");
         CHECK(!make_gi_bake_settings("best", 0, 0, -1, s, error));
+
+        // Lots GQ1 and GE1 (decision D21): explicit defaults keep the text; each other value adds a line
+        // before "direct rebaked".
+        const std::string final_text = "openblood2-gi-settings 2\nquality final\nbounces 2\nrays 256\nsky 1.00\n";
+        GiBakeArguments arguments;
+        CHECK(make_gi_bake_settings(arguments, s, error) && gi_settings_text(s) == final_text + "direct rebaked\n");
+        CHECK(s.texel_grid == 1 && s.denoise == 0 && s.shadow_radius == 0 && s.shadow_rays == 0);
+        CHECK(s.reflection_strata == 2 && s.reflection_samples == 0 && s.emissive == 0);
+        arguments.emissive = 0; // Given as zero: still the defaults.
+        CHECK(make_gi_bake_settings(arguments, s, error) && gi_settings_text(s) == final_text + "direct rebaked\n");
+        arguments = {"ultra"};
+        CHECK(make_gi_bake_settings(arguments, s, error) && s.quality == GiQuality::Ultra);
+        CHECK(s.bounces == 3 && s.rays == 512 && s.sky == 100 && s.texel_grid == 2 && s.denoise == 1);
+        CHECK(s.shadow_radius == 8 && s.shadow_rays == 16 && s.reflection_strata == 4 && s.reflection_samples == 256);
+        CHECK(gi_settings_text(s) == "openblood2-gi-settings 2\nquality ultra\nbounces 3\nrays 512\nsky 1.00\n"
+                                     "texel-samples 4\ndenoise 1\nshadows 8 16\nreflection-strata 4\n"
+                                     "reflection-samples 256\ndirect rebaked\n");
+        CHECK(std::string(gi_quality_name(GiQuality::Ultra)) == "ultra");
+        const auto digest = gi_manifest_digest_prefix();
+        CHECK(digest.size() == 16 && digest.find_first_not_of("0123456789abcdef") == std::string::npos);
+        arguments.emissive = 150;
+        CHECK(make_gi_bake_settings(arguments, s, error) && s.emissive == 150);
+        CHECK(gi_settings_text(s).ends_with("reflection-samples 256\nemissive 1.50 " + digest + "\ndirect rebaked\n"));
+        arguments = {"preview"};
+        arguments.emissive = 5;
+        CHECK(make_gi_bake_settings(arguments, s, error) && s.emissive == 5 && s.quality == GiQuality::Preview);
+        CHECK(gi_settings_text(s) == "openblood2-gi-settings 2\nquality preview\nbounces 1\nrays 64\nsky 1.00\n"
+                                     "emissive 0.05 " + digest + "\ndirect rebaked\n");
+        arguments = {"custom", 4, 0, -1, 16, 4, 64, 0, 8, 1024, 400};
+        CHECK(make_gi_bake_settings(arguments, s, error) && s.bounces == 4 && s.texel_grid == 4);
+        CHECK(s.denoise == 4 && s.shadow_radius == 64 && s.shadow_rays == 16 && s.reflection_strata == 8);
+        CHECK(s.reflection_samples == 1024 && s.emissive == 400);
+        CHECK(gi_settings_text(s) == "openblood2-gi-settings 2\nquality custom\nbounces 4\nrays 256\nsky 1.00\n"
+                                     "texel-samples 16\ndenoise 4\nshadows 64 16\nreflection-strata 8\n"
+                                     "reflection-samples 1024\nemissive 4.00 " + digest + "\ndirect rebaked\n");
+        s.direct = GiDirectSource::Original; // The original source drops only its own line.
+        CHECK(gi_settings_text(s).ends_with("emissive 4.00 " + digest + "\n"));
+        arguments = {"custom", 0, 0, -1, 1, 0, 4, 9, 2, 32};
+        CHECK(make_gi_bake_settings(arguments, s, error) && gi_settings_text(s).ends_with(
+                  "sky 1.00\nshadows 4 9\nreflection-samples 32\ndirect rebaked\n"));
+        const auto kept = s;
+        for (const auto& [wrong, message] : std::initializer_list<std::pair<GiBakeArguments, std::string_view>>{
+                 {{"custom", 0, 0, -1, 3}, "--gi-texel-samples must be 1, 4, 9 or 16"},
+                 {{"custom", 0, 0, -1, 0, 5}, "--gi-denoise must be 0 to 4"},
+                 {{"custom", 0, 0, -1, 0, -1, 65}, "--gi-shadow-radius and --gi-shadow-rays must be 1 to 64"},
+                 {{"custom", 0, 0, -1, 0, -1, 4, 65}, "--gi-shadow-radius and --gi-shadow-rays must be 1 to 64"},
+                 {{"custom", 0, 0, -1, 0, -1, 0, 4}, "--gi-shadow-rays needs --gi-shadow-radius"},
+                 {{"custom", 0, 0, -1, 0, -1, 0, 0, 9}, "--gi-reflection-strata must be 2 to 8"},
+                 {{"custom", 0, 0, -1, 0, -1, 0, 0, 1}, "--gi-reflection-strata must be 2 to 8"},
+                 {{"custom", 0, 0, -1, 0, -1, 0, 0, 0, 31}, "--gi-reflection-samples must be 32 to 1024"},
+                 {{"custom", 0, 0, -1, 0, -1, 0, 0, 0, 1025}, "--gi-reflection-samples must be 32 to 1024"},
+                 {{"final", 0, 0, -1, 0, -1, 0, 0, 0, 0, 401}, "--gi-emissive must be 0 to 4"},
+                 {{"ultra", 0, 0, -1, 0, 1},
+                  "--gi-bounces, --gi-rays, --gi-sky, --gi-texel-samples, --gi-denoise, --gi-shadow-radius, "
+                  "--gi-shadow-rays, --gi-reflection-strata and --gi-reflection-samples need --gi-quality custom"}})
+        {
+            CHECK(!make_gi_bake_settings(wrong, s, error) && error == message);
+            CHECK(gi_settings_text(s) == gi_settings_text(kept)); // Failures leave the settings.
+        }
         CHECK(std::string(gi_bake_status_name(GiBakeResult::Status::Current)) == "current");
         return true;
     }

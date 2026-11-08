@@ -122,6 +122,16 @@ namespace OpenBlood2
         double build_ms = 0;
     };
 
+    class SurfaceManifest;
+    // Lot GE1: what prepare_emission found.
+    struct GiEmissionReport
+    {
+        std::size_t materials = 0; // Materials with an emissive class and at least one glowing texel.
+        std::size_t faces = 0;     // Bake faces using them (SURF_BRIGHT faces included; they add nothing).
+        std::uint64_t texels = 0;  // Mip-0 texels with emission above zero.
+        double ms = 0;
+    };
+
     class GiBakeScene
     {
       public:
@@ -138,6 +148,19 @@ namespace OpenBlood2
         // Raw albedo (0-1, as stored) at the face's mip, nearest texel, repeating; 0.5 grey for an
         // unresolved face. Alpha is the mip-0 texel alpha the traversal used (1 for opaque faces).
         std::array<float, 4> albedo(std::uint32_t face, float u, float v) const;
+        // Lot GE1 (decision D24): the emission of every material whose manifest class is emissive,
+        // resolved like the enhanced renderer's (DTX paths only; SPR and failed materials emit
+        // nothing): the renderer's per-texel formula c x strength x saturate((luminance(c) -
+        // threshold) / max(1 - threshold, 0.001)) on the mip-0 texels, box-filtered down every albedo
+        // mip, times scale / 100. Replaces any earlier preparation; scale 0 clears it.
+        bool prepare_emission(const SurfaceManifest&, std::uint32_t scale, GiEmissionReport&, std::string& error);
+        // A face's emission at barycentric (u, v): its material's chain at the face's albedo mip,
+        // nearest texel, repeating; zero for materials that emit nothing.
+        DVector emission(std::uint32_t face, float u, float v) const;
+        bool emissive() const
+        {
+            return !emission_.empty();
+        }
         std::span<const GiBakeFace> faces() const
         {
             return faces_;
@@ -164,7 +187,15 @@ namespace OpenBlood2
         // Mip-0 alpha byte at (u, v), and the image of a face's material.
         std::uint8_t alpha_byte(const GiBakeFace&, float u, float v) const;
         const Texture* face_image(const GiBakeFace&) const;
+        struct Emission
+        {
+            std::uint32_t width = 0, height = 0;
+            std::vector<std::size_t> offsets; // Per level: first float of its RGB texels.
+            std::vector<float> rgb;
+        };
         WorldMesh mesh_;
+        std::vector<Emission> emission_;            // Per emitting material.
+        std::vector<std::uint32_t> emission_index_; // Per mesh material: into emission_, or UINT32_MAX.
         std::vector<GiBakeFace> faces_;
         std::vector<Texture> pages_;
         GiBvh main_, sky_;

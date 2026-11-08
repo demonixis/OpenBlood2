@@ -30,7 +30,11 @@ direct source the same day. G11 (the reflection bake, `gi_algorithm_version` 4) 
 reflection runtime: the 24 `-DGI` shader artifacts, Options > Display REFLECTION PROBES, preferences
 v14) are implemented on 2026-11-07, tested on four worlds as the user asked. Gate D decided D12 as
 (a) after measuring the Metal allocation. Gate E was accepted on 2026-11-08: REFLECTION PROBES
-defaults to HIGH on desktop and LOW on Android, Quest and iOS (preferences version 15).
+defaults to HIGH on desktop and LOW on Android, Quest and iOS (preferences version 15). The same day
+the user asked for better bake settings and emissive light sources: lots
+[GQ1 and GE1](#bake-quality-and-emission-lots-gq1-ge1) with decisions D21–D24, both implemented the
+same day ([GQ1 report](reports/gi_gq1_bake_quality.md), [GE1 report](reports/gi_ge1_emissive.md)).
+Gate H (the default preset and emission) awaits the user's A/B.
 
 ## The request
 
@@ -244,6 +248,52 @@ re-baked direct light with the ambient floor.
   samples with six shadow variants in about 15 s for all 36 worlds, so the direct pass adds little
   next to the bounce passes.
 
+## Bake quality and emission (lots GQ1, GE1)
+
+Requested on 2026-11-08: more bake settings for better bakes, and the enhanced renderer's emissive
+texture classes as light sources. The user chose both lots, quality first. Decisions D21–D24 below
+are the recommendations the user took with that choice. Higher-resolution GI pages stay the
+optional lot GD3.
+
+**GQ1, bake quality settings.** Implemented on 2026-11-08 ([report](reports/gi_gq1_bake_quality.md)).
+Every new setting defaults to today's behaviour. A file baked
+with the defaults keeps its bytes and its settings text; a non-default setting adds one line to
+the settings text, so files with other settings go stale under `--gi-if-stale`.
+- **Texel supersampling** (`--gi-texel-samples 1|4|9|16`): an n × n grid of sample points per
+  lightmap texel, each moved into the polygon and raised like the G7 sample. The texel's rays are
+  split between the points, so the cost stays the same. Points in solid space or seeing too many
+  back faces are dropped, and the texel keeps the mean of the others: half-buried texels at wall
+  edges keep their own light instead of being dilated. The re-baked direct light uses the same
+  points, which turns its stair-stepped 20-unit shadow edges into partial shadow.
+- **Denoise** (`--gi-denoise 0-4`, a radius in texels): after each pass, an edge-aware filter
+  on the texels' indirect light, across neighbouring coplanar polygons. Weights use only
+  arithmetic: distance between the samples, and the ratio of each sample's mean hit distance (so
+  contact shadow near walls survives), squared: the first design's fourth power filtered open floors
+  half as much and kept wall contact no better. Only valid samples contribute.
+- **Soft direct shadows** (`--gi-shadow-radius 1-64`, `--gi-shadow-rays 1-64`, default 16): each
+  ClipLight light becomes a disk of that radius facing the sample; the term is scaled by the
+  fraction of shadow rays that reach it. The 1998 shadows are hard (D16), so this stays an option.
+- **More bounces and reflection quality:** bounces up to 4; reflection capture strata
+  (`--gi-reflection-strata 2-8`, today 2 × 2 per cube texel) and GGX samples per texel
+  (`--gi-reflection-samples 32-1024`, today 64, 32 above a 128 face).
+- **Ultra preset** (`--gi-quality ultra`): 3 bounces, 512 rays, 4 texel samples, denoise 1, soft
+  shadows of radius 8 with 16 rays, reflection strata 4 and 256 GGX samples. 3.2–3.4 times a Final
+  bake on the four test worlds.
+- **Tools:** the CLI, `tools/gi/bake_all.py` and the F8 Bake panel (preset and Custom fields).
+
+**GE1, emissive texels (D10 (b)).** Implemented on 2026-11-08 ([report](reports/gi_ge1_emissive.md)).
+With `--gi-emissive S` (0.01–4, any preset), a ray that hits a
+lightmapped or vertex-lit face whose manifest class is emissive adds that texel's emission × S:
+the renderer's own formula, albedo × strength × saturate((luminance − threshold) / (1 −
+threshold)), box-filtered down the face's albedo mip so small bright spots keep their energy.
+SURF_BRIGHT faces keep their albedo and add nothing (the renderer does not glow there). The
+bounce, the light probes and both reflection sets see it. The settings line names S and the first
+16 hex digits of the built-in manifest's SHA-256, so editing `config/materials.json` makes the
+file stale under `--gi-if-stale`.
+
+**Gate H** (after GE1): the user plays an A/B of Final against Ultra, with and without emission,
+on the four test worlds, and picks the default preset and whether emission is on by default.
+
 ## Lots
 
 Effort scale (the Claude Code reasoning effort to set before starting the lot):
@@ -272,6 +322,8 @@ Effort scale (the Claude Code reasoning effort to set before starting the lot):
 | GA | Optional: case-insensitive AmbientLight in the original renderer | S | **low** | user approval | Only the lowercase-key worlds change, with evidence. |
 | GD1 | Direct-light audit: the original lightmap term, sample position, occluders, all-world table, preview panels (Gate F) | M | **xhigh** | G10, D16–D20 | The report explains the per-world fit, names the worst worlds' causes and states the term in the contract. Original / Re-baked direct preview panels exist for 3 worlds. The user accepts the term. |
 | GD2 | Re-baked direct bake and composition: `direct` setting, direct pass, D′ section, E′ from D′ (Gate G) | L | **xhigh** | GD1 | `original` files keep their bytes; GI off and the Original view stay byte-identical; a D′ equal to O − A_eff composes O exactly. Bytes are identical across job counts and cancel exits 12. The 36 worlds bake with `rebaked` at Final with the time measured. The user plays the A/B and picks the default source. |
+| GQ1 | Bake quality settings: texel supersampling, denoise, soft direct shadows, bounces and reflection quality, Ultra preset | L | **xhigh** | GD2, G11 | Defaults keep every file's bytes and settings text; each setting changes only its own stage; bytes are identical across job counts. Ultra bakes the four test worlds with times measured. |
+| GE1 | Emissive texels in the bake (D10 (b)) | M | **high** | GQ1 | Without `--gi-emissive` the bytes are unchanged; an emissive test quad lights a floor by the analytic amount; the four test worlds bake with it (Gate H). |
 | GD3 | Optional: finer direct grid (10 units) in new pages | XL | **max** | GD2, Gate G, user approval | Pages, UVs and VRAM are measured per tier, GI off is unchanged, and the user accepts the sharper shadows against the cost. |
 
 **Effort summary:** max ×3 (G7, G12, GD3), xhigh ×5 (G4, G8, G9, GD1, GD2), high ×5
@@ -299,6 +351,7 @@ baked data and generated artifacts.
 | E | G12 | Reflection cost, and the default per platform. **Accepted** 2026-11-08: HIGH on desktop, LOW on Android (Quest included) and iOS; preferences version 15 reads a version 14 OFF as the default. |
 | F | GD1 | The re-baked direct term (fit per world, N·L or not, occluders). |
 | G | GD2 | Look of the re-baked direct light in game, and the default direct source. Accepted on 2026-11-07: `rebaked` is the default. |
+| H | GE1 | The default preset (Final or Ultra) and whether emission is on by default, from an A/B on the four test worlds. |
 
 ### Lot details
 
@@ -512,6 +565,15 @@ Decisions for D1 (c), proposed and accepted on 2026-11-07:
 | D18 | What happens to vertex-lit faces? | (a) they keep their stored colours, already the exact unshadowed term; (b) they are re-baked with shadows. | **(a)** |
 | D19 | Which faces cast direct shadows? | (a) the set the GD1 audit fits best (primary world only fits better today, 76.4 % against 74.7 %); (b) every bake-scene face, like the bounce. | **(a)** |
 | D20 | At what resolution? | (a) the DAT 20-unit grid: same pages, UVs and VRAM; (b) a 10-unit grid in the optional lot GD3 (4× the texels, sharper shadows). | **(a)** now; (b) after Gate G. |
+
+Decisions for the bake quality and emission lots, taken with the user's choice on 2026-11-08:
+
+| # | Question | Options | Recommendation (taken 2026-11-08) |
+| --- | --- | --- | --- |
+| D21 | How do the new settings reach existing bakes? | (a) opt-in settings whose defaults keep today's bytes and settings text, plus an Ultra preset; (b) raise Final itself. | **(a)**; Gate H may make Ultra the default. |
+| D22 | How are a texel's sample points weighted? | (a) the texel's rays split evenly between n × n stratum centres, invalid points dropped; (b) n × n times the rays. | **(a)**: same cost, and `--gi-rays` still sets the budget. |
+| D23 | D10 again: are manifest emissive classes baked? | (a) no; (b) yes, opt-in with a scale, into the bounce of both renderers (GI is already a replacement option). | **(b)**; the original renderer then shows their bounce without the glow itself. |
+| D24 | Which emission does the bake use? | (a) the renderer's per-texel formula box-filtered down the albedo mip; (b) the class strength times the mean albedo of the face. | **(a)** |
 
 ## Defaults taken (the user may override)
 

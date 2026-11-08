@@ -77,6 +77,21 @@ namespace OpenBlood2
     bool gi_segment_blocked(const GiBvh&, DVector from, DVector to);
     // Whether `light` reaches `sample` on a receiver of `model`.
     bool gi_direct_visible(const GiDirectOccluders&, std::uint16_t model, DVector sample, const GiDirectLight&);
+    // Lot GQ1 soft shadows: the share of a ClipLight light, seen as a disk of `radius` facing the sample,
+    // that reaches `sample`. Ray m of `rays` aims at the disk point of the rank-1 lattice ((m + 0.5) /
+    // rays, m / golden ratio) shifted by (s1, s2), through the concentric map; a ray whose disk point
+    // the light's own centre cannot see (geometry around the light) does not count. 1 for an unclipped
+    // light; the hard test when no ray counts or the sample is within `margin` of the light.
+    double gi_direct_visibility(const GiDirectOccluders&, std::uint16_t model, DVector sample, const GiDirectLight&,
+                                double radius, std::uint32_t rays, double s1, double s2);
+    // Lot GQ1 options of the direct pass: soft shadows (radius 0: hard), and the seed of their shifts
+    // (keyed with (texel << 4 | point, light object)). Texel points come from the receivers' grid.
+    struct GiDirectOptions
+    {
+        double shadow_radius = 0;
+        std::uint32_t shadow_rays = 0;
+        std::uint64_t seed = 0;
+    };
 
     // The re-baked direct light of every texel of the receivers, in LMAP order.
     struct GiDirectTexels
@@ -92,9 +107,13 @@ namespace OpenBlood2
         std::uint8_t value(std::size_t t, int c) const;
     };
     // `progress` reports stage "direct" in blocks; a set `cancel` stops it (false, cancelled set).
+    // With receivers built at texel_grid n > 1 (lot GQ1) a texel averages its points that lie outside
+    // solid space: the term at the point's grid position and the visibility from its sample; a texel
+    // whose points are all solid is not placed. `reaching` and `visible` then count the lights seen
+    // from any point.
     bool gi_direct_texels(const World&, const GiReceivers&, std::span<const GiDirectLight>, const GiDirectOccluders&,
                           unsigned jobs, GiDirectTexels&, std::string& error, const std::atomic<bool>* cancel = nullptr,
-                          const GiProgress& progress = {});
+                          const GiProgress& progress = {}, const GiDirectOptions& options = {});
 
     // The audit of one world: the re-baked 8-bit texels against the stored ones (RGB565 expanded),
     // over texels whose sample is not in solid space.
@@ -148,6 +167,7 @@ namespace OpenBlood2
         double ms = 0;
         bool cancelled = false;
     };
+    // With texel points (lot GQ1) a texel is kept (D) only when it is not placed.
     bool gi_rebake_direct(const World&, const GiReceivers&, unsigned jobs, const std::atomic<bool>* cancel,
-                          const GiProgress&, GiDirectBake&, std::string& error);
+                          const GiProgress&, GiDirectBake&, std::string& error, const GiDirectOptions& options = {});
 } // namespace OpenBlood2

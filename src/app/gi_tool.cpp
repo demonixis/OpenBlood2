@@ -323,8 +323,19 @@ namespace OpenBlood2
         GiBakeRequest request;
         if (!mounted_world(resources, options.bake_gi, request.world))
             request.world = options.bake_gi; // Reported as unmounted by the bake (exit 2).
-        if (!make_gi_bake_settings(options.gi_quality, options.gi_bounces, options.gi_rays, options.gi_sky,
-                                   request.settings, error))
+        GiBakeArguments arguments;
+        arguments.quality = options.gi_quality;
+        arguments.bounces = options.gi_bounces;
+        arguments.rays = options.gi_rays;
+        arguments.sky = options.gi_sky;
+        arguments.texel_samples = options.gi_texel_samples;
+        arguments.denoise = options.gi_denoise;
+        arguments.shadow_radius = options.gi_shadow_radius;
+        arguments.shadow_rays = options.gi_shadow_rays;
+        arguments.reflection_strata = options.gi_reflection_strata;
+        arguments.reflection_samples = options.gi_reflection_samples;
+        arguments.emissive = options.gi_emissive;
+        if (!make_gi_bake_settings(arguments, request.settings, error))
         {
             spdlog::error("{}", error);
             std::cout << "GI_RESULT status=failed exit=2 error=" << json_text(error) << '\n';
@@ -357,6 +368,14 @@ namespace OpenBlood2
                   << " sky_scale=" << request.settings.sky / 100 << '.' << request.settings.sky / 10 % 10
                   << request.settings.sky % 10 << " direct=" << gi_direct_source_name(request.settings.direct)
                   << " jobs=" << request.jobs;
+        {
+            // Lot GQ1/GE1 settings.
+            const auto& q = request.settings;
+            std::cout << " texel_samples=" << q.texel_grid * q.texel_grid << " denoise=" << q.denoise
+                      << " shadow_radius=" << q.shadow_radius << " shadow_rays=" << q.shadow_rays
+                      << " reflection_strata=" << q.reflection_strata << " reflection_samples=" << q.reflection_samples
+                      << " emissive=" << q.emissive / 100 << '.' << q.emissive / 10 % 10 << q.emissive % 10;
+        }
         if (result.status == GiBakeResult::Status::Failed || result.status == GiBakeResult::Status::Cancelled)
             std::cout << " error=" << json_text(result.error);
         if (!result.file.empty())
@@ -386,6 +405,11 @@ namespace OpenBlood2
                       << " sky_covered=" << covered << " sky_average=" << average << " sky_pointers=" << setup.pointers
                       << " sky_unresolved=" << setup.unresolved_pointers << " sky_fog=" << setup.fog.enabled
                       << " sky_ms=" << std::lround(sky.ms);
+            if (request.settings.emissive)
+                std::cout << " emissive_materials=" << result.emission.materials
+                          << " emissive_faces=" << result.emission.faces
+                          << " emissive_texels=" << result.emission.texels
+                          << " emissive_ms=" << std::lround(result.emission.ms);
             const auto& maps = result.lightmaps;
             std::cout << " blocks=" << maps.blocks << " texels=" << maps.texels << " sets=" << maps.sets
                       << " corners=" << maps.corners << " low_corners=" << maps.low_corners << " solid=" << maps.solid
@@ -400,6 +424,11 @@ namespace OpenBlood2
             for (std::size_t i = 0; i < maps.pass_ms.size(); ++i)
                 std::cout << (i ? "," : "") << std::lround(maps.pass_ms[i]);
             std::cout << " lightmap_ms=" << std::lround(maps.ms);
+            if (maps.points)
+                std::cout << " texel_points=" << maps.points << " solid_points=" << maps.solid_points
+                          << " back_points=" << maps.back_points;
+            if (maps.denoise)
+                std::cout << " denoised=" << maps.denoised << " denoise_ms=" << std::lround(maps.denoise_ms);
             if (request.settings.direct == GiDirectSource::Rebaked)
             {
                 const auto& lights = result.direct_lights;

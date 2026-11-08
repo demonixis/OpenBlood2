@@ -438,10 +438,20 @@ namespace OpenBlood2
         return true;
     }
 
+    std::array<double, 2> gi_texel_point_offset(std::uint32_t k, std::uint32_t n)
+    {
+        return {(double(k % n) + .5) / n - .5, (double(k / n) + .5) / n - .5};
+    }
     bool gi_receivers(const World& world, const GiBakeScene& scene, std::span<const WorldTriangleSource> sources,
-                      std::span<const GiRangeUse> use, unsigned jobs, GiReceivers& out, std::string& error)
+                      std::span<const GiRangeUse> use, unsigned jobs, GiReceivers& out, std::string& error,
+                      std::uint32_t texel_grid)
     {
         out = {};
+        if (texel_grid < 1 || texel_grid > 4)
+        {
+            error = "GI receivers: texel grid must be 1 to 4";
+            return false;
+        }
         const auto faces = scene.faces();
         if (sources.size() != scene.mesh().vertices.size() / 3 || use.size() != world.models.size() ||
             scene.mesh().ranges.size() != world.models.size())
@@ -599,6 +609,13 @@ namespace OpenBlood2
         out.samples.resize(elements);
         out.solid.assign(elements, 0);
         out.original.resize(elements);
+        out.texel_grid = texel_grid;
+        const std::size_t points_per_texel = std::size_t(texel_grid) * texel_grid;
+        if (texel_grid > 1)
+        {
+            out.texel_points.resize(out.texels * points_per_texel);
+            out.texel_solid.assign(out.texels * points_per_texel, 0);
+        }
         if (!world_info_ambient_any_case(world.info, out.ambient))
             out.ambient = {};
         const auto receivers = out.blocks.size() + out.sets.size();
@@ -631,6 +648,25 @@ namespace OpenBlood2
                                 point_contents(world.models[0], out.samples[element]) == PointContents::Solid;
                             out.owner[element] = static_cast<std::uint32_t>(index);
                         };
+                        // Lot GQ1: the texel's grid points, placed the same way.
+                        auto place_points = [&](std::size_t element, const LightmapFrame& frame, unsigned i,
+                                                unsigned j)
+                        {
+                            for (std::size_t k = 0; k < points_per_texel; ++k)
+                            {
+                                const auto offset = gi_texel_point_offset(std::uint32_t(k), texel_grid);
+                                DVector at;
+                                if (!frame.position(i + offset[0], j + offset[1], at))
+                                    return false;
+                                const auto sample =
+                                    add(clamp_into(d3(at), ring, normal, centroid), mul(normal, L::sample_offset));
+                                const auto slot = element * points_per_texel + k;
+                                out.texel_points[slot] = {float(sample.x), float(sample.y), float(sample.z)};
+                                out.texel_solid[slot] =
+                                    point_contents(world.models[0], out.texel_points[slot]) == PointContents::Solid;
+                            }
+                            return true;
+                        };
                         if (is_block)
                         {
                             const auto& block = out.blocks[index];
@@ -645,6 +681,11 @@ namespace OpenBlood2
                                         return;
                                     }
                                     place(element, clamp_into(d3(centre), ring, normal, centroid));
+                                    if (texel_grid > 1 && !place_points(element, block.frame, i, j))
+                                    {
+                                        failed = true;
+                                        return;
+                                    }
                                     out.original[element] = expand_565(
                                         model.lightmap_texels[polygon.lightmap_offset + j * block.id.width + i]);
                                 }
@@ -737,13 +778,9 @@ namespace OpenBlood2
         const double tail = 1 - x2 / 132 * (1 - x2 / 182);
         cosine = 1 - x2 / 2 * (1 - x2 / 12 * (1 - x2 / 30 * (1 - x2 / 56 * (1 - x2 / 90 * tail))));
     }
-    DVector gi_cosine_direction(DVector normal, std::uint32_t i, std::uint32_t n, double s1, double s2)
+    void gi_concentric_disk(double a, double b, double& x, double& y)
     {
-        double u1 = (i + .5) / n + s1, u2 = i * 0.6180339887498949 + s2;
-        u1 -= std::floor(u1);
-        u2 -= std::floor(u2);
-        const double a = 2 * u1 - 1, b = 2 * u2 - 1;
-        double x = 0, y = 0;
+        x = 0, y = 0;
         if (a != 0 || b != 0)
         {
             constexpr double quarter_pi = 0.78539816339744830962;
@@ -759,6 +796,14 @@ namespace OpenBlood2
                 x = b * sine, y = b * cosine;
             }
         }
+    }
+    DVector gi_cosine_direction(DVector normal, std::uint32_t i, std::uint32_t n, double s1, double s2)
+    {
+        double u1 = (i + .5) / n + s1, u2 = i * 0.6180339887498949 + s2;
+        u1 -= std::floor(u1);
+        u2 -= std::floor(u2);
+        double x = 0, y = 0;
+        gi_concentric_disk(2 * u1 - 1, 2 * u2 - 1, x, y);
         const double z = std::sqrt(std::max(0.0, 1 - x * x - y * y));
         const D3 nn = d3(normal);
         const double sign = std::copysign(1.0, nn.z);
@@ -787,6 +832,12 @@ namespace OpenBlood2
                 const double scale = link.kind == GiReceivers::Link::Lightmap ? world_saturate_scale : 1;
                 for (int c = 0; c < 3; ++c)
                     out[c] = albedo[c] * scale * value[c];
+                // Lot GE1: the face's own glow, independent of its light (not on SURF_BRIGHT faces).
+                if (scene.emissive())
+                {
+                    const auto glow = scene.emission(face, u, v);
+                    out[0] += glow.x, out[1] += glow.y, out[2] += glow.z;
+                }
                 return;
             }
             case GiReceivers::Link::Bright:
@@ -888,7 +939,7 @@ namespace OpenBlood2
     bool bake_gi_lightmaps(const GiBakeScene& scene, const GiSky& sky, const GiReceivers& r, std::uint32_t bounces,
                            std::uint32_t rays, std::uint64_t seed, unsigned jobs, const std::atomic<bool>* cancel,
                            const GiProgress& progress, GiIndirect& result, GiLightmapReport& report,
-                           std::string& error, std::span<const float> rebaked)
+                           std::string& error, std::span<const float> rebaked, std::uint32_t denoise)
     {
         const auto start = std::chrono::steady_clock::now();
         result = {};
@@ -901,9 +952,17 @@ namespace OpenBlood2
         report.low_corners = r.low_corners;
         const auto n = r.elements();
         const auto receivers = r.blocks.size() + r.sets.size();
+        // Lot GQ1 texel points.
+        const std::uint32_t grid = r.texel_grid;
+        const std::size_t per_texel = std::size_t(grid) * grid;
+        const bool points = grid > 1;
+        const std::uint32_t point_rays = points ? std::uint32_t((rays + per_texel - 1) / per_texel) : rays;
+        report.denoise = denoise;
         if (!bounces || !rays || r.links.size() != scene.faces().size() || r.owner.size() != n ||
             r.samples.size() != n || r.solid.size() != n || r.original.size() != n ||
-            r.neighbour_first.size() != receivers + 1 || (!rebaked.empty() && rebaked.size() != r.texels * 3))
+            r.neighbour_first.size() != receivers + 1 || (!rebaked.empty() && rebaked.size() != r.texels * 3) ||
+            grid < 1 || grid > 4 ||
+            (points && (r.texel_points.size() != r.texels * per_texel || r.texel_solid.size() != r.texels * per_texel)))
         {
             error = "GI lightmaps: invalid receivers or settings";
             return false;
@@ -925,6 +984,20 @@ namespace OpenBlood2
                     e < r.texels && !rebaked.empty() ? rebaked[e * 3 + c] : float((o - a) / 255);
             }
         std::vector<std::uint8_t> valid(n, 0);
+        std::vector<std::uint8_t> point_valid(points ? r.texels * per_texel : 0, 0);
+        std::vector<float> guide(denoise ? n : 0, float(L::guide_far));
+        auto is_point_texel = [&](std::size_t e) { return points && e < r.texels; };
+        // A texel with points is traced while one of its points is (outside solid space, and valid after
+        // pass 1); other elements follow the sample's own solid flag and validity.
+        auto traceable = [&](std::size_t e, bool first)
+        {
+            if (!is_point_texel(e))
+                return !r.solid[e] && (first || valid[e]);
+            for (std::size_t k = 0; k < per_texel; ++k)
+                if (!r.texel_solid[e * per_texel + k] && (first || point_valid[e * per_texel + k]))
+                    return true;
+            return false;
+        };
         struct Counters
         {
             GiRayCounters rays;
@@ -945,10 +1018,8 @@ namespace OpenBlood2
             traced.clear();
             for (std::size_t e = 0; e < n; ++e)
             {
-                if (r.solid[e])
-                    continue;
                 const bool low = is_low(e);
-                if ((low && last) || (!low && (pass == 1 || valid[e])))
+                if ((low && last && traceable(e, true)) || (!low && traceable(e, pass == 1)))
                     traced.push_back(static_cast<std::uint32_t>(e));
             }
             std::fill(next.begin(), next.end(), 0.f);
@@ -964,15 +1035,80 @@ namespace OpenBlood2
                     auto& count = counters[thread];
                     GiHit hit;
                     const auto first = chunk * L::chunk, end = std::min<std::uint64_t>(first + L::chunk, total);
+                    // Lot GQ1 guide: the harmonic mean of the hit distances of the first trace.
+                    auto record_guide = [&](std::size_t e, double inverse_sum, std::uint32_t count)
+                    {
+                        if (denoise && pass == 1)
+                            guide[e] = count ? float(double(count) / inverse_sum) : float(L::guide_far);
+                    };
+                    auto distance_term = [&](const GiHit& h, bool back, double& inverse_sum, std::uint32_t& count)
+                    {
+                        if (!denoise || pass != 1 || back)
+                            return;
+                        const double t = h.kind == GiHit::Kind::Miss || h.kind == GiHit::Kind::Sky
+                                             ? L::guide_far
+                                             : std::clamp(double(h.t), L::guide_near, L::guide_far);
+                        inverse_sum += 1 / t;
+                        ++count;
+                    };
                     for (auto t = first; t < end; ++t)
                     {
                         const auto e = traced[t];
                         const auto normal = normal_of(e);
+                        if (is_point_texel(e))
+                        {
+                            // Lot GQ1: the texel's valid points, each with its share of the rays.
+                            double sum[3]{}, inverse_sum = 0;
+                            std::uint32_t used = 0, back_total = 0, traced_rays = 0, hits = 0;
+                            for (std::size_t k = 0; k < per_texel; ++k)
+                            {
+                                const auto slot = std::size_t(e) * per_texel + k;
+                                if (r.texel_solid[slot] || (pass > 1 && !point_valid[slot]))
+                                    continue;
+                                GiRandom random(seed, std::uint64_t(e) << 4 | k, pass + 256);
+                                const double s1 = random.uniform(), s2 = random.uniform();
+                                const auto origin = r.texel_points[slot];
+                                double local[3]{};
+                                std::uint32_t back_rays = 0;
+                                for (std::uint32_t i = 0; i < point_rays; ++i)
+                                {
+                                    const auto direction = gi_cosine_direction(normal, i, point_rays, s1, s2);
+                                    scene.trace(origin, direction, FLT_MAX, hit, count.rays.trace);
+                                    double value[3];
+                                    bool back = false;
+                                    gi_hit_radiance(scene, sky, r, light.data(), hit, direction, count.rays, value,
+                                                    back);
+                                    back_rays += back;
+                                    distance_term(hit, back, inverse_sum, hits);
+                                    for (int c = 0; c < 3; ++c)
+                                        local[c] += value[c];
+                                }
+                                if (pass == 1)
+                                    point_valid[slot] = back_rays <= L::back_limit * point_rays;
+                                back_total += back_rays;
+                                traced_rays += point_rays;
+                                if (!point_valid[slot])
+                                    continue;
+                                for (int c = 0; c < 3; ++c)
+                                    sum[c] += local[c] / point_rays;
+                                ++used;
+                            }
+                            for (int c = 0; c < 3; ++c)
+                                next[std::size_t(e) * 3 + c] = used ? float(sum[c] / used) : 0.f;
+                            if (pass == 1)
+                            {
+                                valid[e] = used > 0;
+                                ++count.fraction[std::min<std::uint32_t>(
+                                    9, traced_rays ? std::uint32_t(std::uint64_t(back_total) * 10 / traced_rays) : 9)];
+                                record_guide(e, inverse_sum, hits);
+                            }
+                            continue;
+                        }
                         const auto origin = r.samples[e];
                         GiRandom random(seed, e, pass);
                         const double s1 = random.uniform(), s2 = random.uniform();
-                        double sum[3]{};
-                        std::uint32_t back_rays = 0;
+                        double sum[3]{}, inverse_sum = 0;
+                        std::uint32_t back_rays = 0, hits = 0;
                         for (std::uint32_t i = 0; i < rays; ++i)
                         {
                             const auto direction = gi_cosine_direction(normal, i, rays, s1, s2);
@@ -981,9 +1117,12 @@ namespace OpenBlood2
                             bool back = false;
                             gi_hit_radiance(scene, sky, r, light.data(), hit, direction, count.rays, value, back);
                             back_rays += back;
+                            distance_term(hit, back, inverse_sum, hits);
                             for (int c = 0; c < 3; ++c)
                                 sum[c] += value[c];
                         }
+                        if (pass == 1 && e < r.texels)
+                            record_guide(e, inverse_sum, hits);
                         for (int c = 0; c < 3; ++c)
                             next[std::size_t(e) * 3 + c] = float(sum[c] / rays);
                         // A sample decides its validity on its first trace.
@@ -1014,7 +1153,7 @@ namespace OpenBlood2
             }
             // Dilation: inside each receiver first, then from receivers to neighbours that have none.
             for (std::size_t e = 0; e < n; ++e)
-                seeds[e] = !r.solid[e] && valid[e] && (!is_low(e) || last);
+                seeds[e] = (!r.solid[e] || is_point_texel(e)) && valid[e] && (!is_low(e) || last);
             std::fill(state.begin(), state.end(), 0);
             std::size_t filled = 0;
             std::vector<std::uint8_t> known;
@@ -1156,6 +1295,15 @@ namespace OpenBlood2
                     std::fill(next.begin() + first * 3, next.begin() + (first + size) * 3, 0.f);
                     ++unfilled;
                 }
+            // Lot GQ1: the edge-aware filter of the texels, from their own valid samples.
+            if (denoise)
+            {
+                const auto filter_start = std::chrono::steady_clock::now();
+                const auto changed = gi_denoise_texels(r, std::span(seeds).first(r.texels), guide, next, denoise, threads);
+                if (last)
+                    report.denoised = changed;
+                report.denoise_ms += elapsed_ms(filter_start);
+            }
             energy.swap(next);
             for (std::size_t e = 0; e < n; ++e)
             {
@@ -1175,6 +1323,23 @@ namespace OpenBlood2
         }
         for (std::size_t e = 0; e < n; ++e)
         {
+            if (is_point_texel(e))
+            {
+                // A texel whose points all lie in solid space counts as solid.
+                bool open = false;
+                for (std::size_t k = 0; k < per_texel; ++k)
+                {
+                    const auto slot = e * per_texel + k;
+                    const bool solid = r.texel_solid[slot] != 0;
+                    open = open || !solid;
+                    ++report.points;
+                    report.solid_points += solid;
+                    report.back_points += !solid && !point_valid[slot];
+                }
+                report.solid += !open;
+                report.back_invalid += open && !valid[e];
+                continue;
+            }
             report.solid += r.solid[e] != 0;
             report.back_invalid += !r.solid[e] && !valid[e];
         }
@@ -1196,6 +1361,85 @@ namespace OpenBlood2
         result.valid = std::move(valid);
         report.ms = elapsed_ms(start);
         return true;
+    }
+
+    std::uint64_t gi_denoise_texels(const GiReceivers& r, std::span<const std::uint8_t> valid,
+                                    std::span<const float> guide, std::span<float> energy, std::uint32_t radius,
+                                    unsigned jobs)
+    {
+        if (!radius || valid.size() != r.texels || guide.size() < r.texels || energy.size() < r.texels * 3 ||
+            r.neighbour_first.size() != r.blocks.size() + r.sets.size() + 1)
+            return 0;
+        const std::vector<float> source(energy.begin(), energy.begin() + std::ptrdiff_t(r.texels * 3));
+        const double h = LightmapFrame::grid * (radius + .5), h2 = h * h;
+        const int reach = int(radius);
+        std::vector<std::uint64_t> changed(r.blocks.size(), 0);
+        run_gi_jobs(r.blocks.size(), jobs ? jobs : gi_default_jobs(), nullptr,
+                    [&](std::uint64_t b, unsigned)
+                    {
+                        const auto& block = r.blocks[b];
+                        const int width = block.id.width, height = block.id.height;
+                        for (int y = 0; y < height; ++y)
+                            for (int x = 0; x < width; ++x)
+                            {
+                                const std::size_t p = block.first + std::size_t(y) * width + x;
+                                const auto& at = r.samples[p];
+                                const double gp = guide[p];
+                                double sum[3]{}, total = 0;
+                                // One block's texels within the window around (cx, cy).
+                                auto gather = [&](const GiReceivers::Block& other, int cx, int cy)
+                                {
+                                    const int w = other.id.width, hgt = other.id.height;
+                                    for (int j = std::max(0, cy - reach); j <= std::min(hgt - 1, cy + reach); ++j)
+                                        for (int i = std::max(0, cx - reach); i <= std::min(w - 1, cx + reach); ++i)
+                                        {
+                                            const std::size_t q = other.first + std::size_t(j) * w + i;
+                                            if (!valid[q])
+                                                continue;
+                                            const auto& to = r.samples[q];
+                                            const double dx = double(to.x) - at.x, dy = double(to.y) - at.y,
+                                                         dz = double(to.z) - at.z;
+                                            const double d2 = dx * dx + dy * dy + dz * dz;
+                                            if (!(d2 < h2))
+                                                continue;
+                                            const double fall = 1 - d2 / h2;
+                                            const double gq = guide[q];
+                                            const double rho = gp > 0 && gq > 0 ? std::min(gp, gq) / std::max(gp, gq) : 1;
+                                            const double weight = fall * fall * rho * rho;
+                                            for (int c = 0; c < 3; ++c)
+                                                sum[c] += weight * source[q * 3 + c];
+                                            total += weight;
+                                        }
+                                };
+                                gather(block, x, y);
+                                for (auto n = r.neighbour_first[b]; n < r.neighbour_first[b + 1]; ++n)
+                                {
+                                    const auto other = r.neighbours[n];
+                                    if (other >= r.blocks.size())
+                                        continue;
+                                    const auto st = r.blocks[other].frame.coordinate(at);
+                                    if (!std::isfinite(st[0]) || !std::isfinite(st[1]) || st[0] < -reach - 1 ||
+                                        st[1] < -reach - 1 || st[0] > r.blocks[other].id.width + reach + 1 ||
+                                        st[1] > r.blocks[other].id.height + reach + 1)
+                                        continue;
+                                    gather(r.blocks[other], int(std::floor(st[0])), int(std::floor(st[1])));
+                                }
+                                if (!(total > 0))
+                                    continue;
+                                bool differs = false;
+                                for (int c = 0; c < 3; ++c)
+                                {
+                                    const float value = float(sum[c] / total);
+                                    differs = differs || value != source[p * 3 + c];
+                                    energy[p * 3 + c] = value;
+                                }
+                                changed[b] += differs;
+                            }
+                    });
+        std::uint64_t total = 0;
+        for (const auto c : changed)
+            total += c;
+        return total;
     }
 
     void gi_lightmap_sections(const GiReceivers& r, const GiIndirect& indirect, GiLightmaps& maps,
