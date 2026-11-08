@@ -908,8 +908,20 @@ bool CBloodClientShell::UpdateMovement(CBloodServerShell& server, double seconds
             SetControlNotice("Weapon is busy", "hud.weapon_busy");
         else if (!server.OnMessage(client_,
                                    OpenBlood2::PlayerControlAction{OpenBlood2::PlayerControlAction::DropWeapon}))
+        {
+            const auto& reason = owner->control_error;
+            std::string_view key = "hud.cannot_drop_weapon";
+            if (reason == "Original weapon drops require single-player mode")
+                key = "hud.drop_single_player_only";
+            else if (reason == "No live current held weapon")
+                key = "hud.no_weapon_to_drop";
+            else if (reason == "Weapon is firing")
+                key = "hud.weapon_busy";
+            else if (reason == "Original melee weapon cannot be dropped")
+                key = "hud.cannot_drop_melee";
             SetControlNotice(owner->control_error.empty() ? "Cannot drop weapon now" : owner->control_error,
-                             owner->control_error.empty() ? "hud.cannot_drop_weapon" : "");
+                             key);
+        }
     }
     return true;
 }

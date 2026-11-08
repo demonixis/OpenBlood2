@@ -141,11 +141,21 @@ namespace OpenBlood2
         if (!client.prepare(config, error))
             return failed();
         if (localized && localized_font && !localization_resource_overridden(client.resources(), "cres.dll"))
+        {
             client.set_announcer_translations([&](unsigned id)
             {
                 const auto value = localization.text(id);
                 return localized_font->supports(value) ? value : std::string_view{};
             });
+            frag_table.set_team_label([&](DBYTE team, HudSurface& image, const HudFont& bitmap, const HudRect& row)
+            {
+                const auto value = localization.text(team == 1 ? "network.blue_team" : "network.red_team");
+                if (value.empty() || !localized_font->supports(value))
+                    return false;
+                LocalizedBitmapLine(bitmap, *localized_font, value).draw(image, row);
+                return true;
+            });
+        }
         if (!client.connect(address.host, address.port, profile, NetworkClient::Clock::now(), error))
             return failed();
         spdlog::info("Connecting to {}:{} as {}", address.host, address.port, profile.name);
@@ -353,7 +363,11 @@ namespace OpenBlood2
                                        : visible ? tr("network.continues", "Game continues while this menu is open.")
                                                  : tr("network.connecting", "Connecting / loading world..."));
                 if (network && !network->discovery_error.empty())
-                    ImGui::TextWrapped("%s", network->discovery_error.c_str());
+                {
+                    const auto message = localization.format("network.discovery_failed", "{0}",
+                                                             {network->discovery_error});
+                    ImGui::TextWrapped("%s", message.c_str());
+                }
                 if (!leaving)
                 {
                     if (visible && ImGui::Button(tr("network.resume", "Resume")))

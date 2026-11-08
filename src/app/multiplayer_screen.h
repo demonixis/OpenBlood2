@@ -1,6 +1,7 @@
 #pragma once
 #include "app/multiplayer_setup.h"
 #include "net/discovery.h"
+#include <map>
 struct ImFont;
 namespace OpenBlood2
 {
@@ -25,6 +26,7 @@ namespace OpenBlood2
         double refresh_ = -10;
         std::string error_, discovery_error_;
         std::string_view error_key_;
+        std::map<std::string, std::string, std::less<>> map_titles_;
         void start(bool host);
     };
 } // namespace OpenBlood2

@@ -3,6 +3,8 @@
 #include "engine/hud_surface.h"
 #include "net/player_events.h"
 #include "net/transport.h"
+#include <functional>
+#include <utility>
 namespace OpenBlood2
 {
     // Original CFragInfo Bloodbath/Team composition, on owned CPU surfaces.
@@ -10,6 +12,12 @@ namespace OpenBlood2
     {
       public:
         explicit ClientFragTable(const Resources& resources) : resources_(resources), canvas_(resources) {}
+        using TeamLabel = std::function<bool(DBYTE, HudSurface&, const HudFont&, const HudRect&)>;
+        void set_team_label(TeamLabel label)
+        {
+            team_label_ = std::move(label);
+            width_ = 0; // Recompose the next visible table, including with an unchanged roster.
+        }
         bool compose(std::span<const Net::RosterPlayer>, unsigned width, unsigned height, std::string& error);
         bool compose_teams(std::span<const Net::RosterPlayer>, const std::array<int, 2>& totals, DBYTE column,
                            unsigned width, unsigned height, std::string& error);
@@ -25,6 +33,7 @@ namespace OpenBlood2
         const Resources& resources_;
         HudCanvas canvas_;
         ClientAnnouncer text_;
+        TeamLabel team_label_;
         const HudSurface* voice_ = nullptr;
         std::array<std::string, 2> team_names_;
         std::array<std::vector<Net::RosterPlayer>, 2> team_order_;

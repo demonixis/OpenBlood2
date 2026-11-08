@@ -17,9 +17,9 @@ namespace OpenBlood2
         constexpr std::array<std::string_view, supported_languages.size()> names{
             "English", "Français", "简体中文", "Deutsch", "Italiano", "Español", "Português (Brasil)", "한국어"};
         constexpr std::size_t max_catalog_size = 256 * 1024, max_entries = 2048;
-        constexpr std::array<std::string_view, 11> sections{"menu", "resources", "hud", "setup", "control",
+        constexpr std::array<std::string_view, 12> sections{"menu", "resources", "hud", "setup", "control",
                                                            "network", "loading", "objectives", "promotions",
-                                                           "dialogue", "intro"};
+                                                           "dialogue", "intro", "credits"};
         constexpr std::array<std::string_view, static_cast<std::size_t>(TextKey::Count)> pilot_keys{
             "", "menu.language", "menu.setup", "menu.cheats", "menu.unavailable_options", "hud.first_person",
             "hud.third_person"};
@@ -266,6 +266,31 @@ namespace OpenBlood2
     {
         const auto found = resource_labels_.find(resource_id);
         return found == resource_labels_.end() ? english : std::string_view(found->second);
+    }
+
+    std::string_view Localization::world(std::string_view dat_path) const
+    {
+        if (language_ == Language::English)
+            return {};
+        std::string path;
+        if (!resource_path(dat_path, path) || !path.ends_with(".dat"))
+            return {};
+        const bool addon = path.starts_with("worlds_ao/");
+        if (!addon && !path.starts_with("worlds/"))
+            return {};
+        const std::size_t prefix = addon ? 10 : 7;
+        auto key = std::string(addon ? "ao." : "") + path.substr(prefix, path.size() - prefix - 4);
+        std::replace(key.begin(), key.end(), '/', '.');
+        return valid_key(key) ? text("loading.world." + key) : std::string_view{};
+    }
+
+    std::string_view Localization::pickup_name(std::string_view source) const
+    {
+        if (language_ == Language::English || source.empty())
+            return {};
+        Sha256 digest;
+        digest.update({reinterpret_cast<const std::uint8_t*>(source.data()), source.size()});
+        return text("hud.pickup_name." + digest_text(digest.finish()).substr(0, 16));
     }
 
     std::string_view Localization::dialogue(std::string_view wav_path) const

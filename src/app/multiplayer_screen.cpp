@@ -1,6 +1,8 @@
 #include "app/multiplayer_screen.h"
 #include "engine/localization.h"
+#include "engine/world.h"
 #include "game/localized_font.h"
+#include "game/save_slots.h"
 #include <SDL3/SDL_timer.h>
 #include <cstdio>
 #include <imgui.h>
@@ -24,8 +26,16 @@ namespace OpenBlood2
         error_.clear();
         error_key_ = {};
         discovery_error_.clear();
+        map_titles_.clear();
         if (!setup.load(resources, config, error))
             return false;
+        for (const auto& path : setup.maps)
+        {
+            std::vector<std::uint8_t> header;
+            std::string info, ignored;
+            if (resources.read(path, header, ignored, 16 + 65536) && read_world_info(header, info, ignored))
+                map_titles_.emplace(path, world_title(info, path));
+        }
         replaces_solo_ = in_world;
         active = true;
         refresh_ = -10;
@@ -74,6 +84,19 @@ namespace OpenBlood2
             ImGui::PushFont(face, 0);
         const auto tr = [&](std::string_view key, const char* english)
         { return multiplayer_label(locale, localized ? localized_font : nullptr, key, english); };
+        const auto map_label = [&](const std::string& path)
+        {
+            const auto title = map_titles_.find(path);
+            if (title == map_titles_.end())
+                return path.c_str(); // A peer can advertise a map we do not have.
+            if (localized && localized_font)
+            {
+                const auto value = locale->world(path);
+                if (!value.empty() && value.find("##") == value.npos && localized_font->supports(value))
+                    return value.data();
+            }
+            return title->second.c_str();
+        };
         const auto* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->GetCenter(), ImGuiCond_Always, {.5f, .5f});
         ImGui::SetNextWindowSize({std::min(720.f, viewport->Size.x - 24), std::min(720.f, viewport->Size.y - 24)},
@@ -96,11 +119,16 @@ namespace OpenBlood2
                     setup.rotation.clear();
                 }
                 const auto maps = setup.mode_maps();
-                if (ImGui::BeginCombo(tr("network.map", "Map"), maps.empty() ? tr("network.no_map", "No map") : maps[setup.map].c_str()))
+                if (ImGui::BeginCombo(tr("network.map", "Map"),
+                                      maps.empty() ? tr("network.no_map", "No map") : map_label(maps[setup.map])))
                 {
                     for (std::size_t i = 0; i < maps.size(); ++i)
-                        if (ImGui::Selectable(maps[i].c_str(), std::size_t(setup.map) == i))
+                    {
+                        ImGui::PushID(maps[i].c_str());
+                        if (ImGui::Selectable(map_label(maps[i]), std::size_t(setup.map) == i))
                             setup.map = int(i);
+                        ImGui::PopID();
+                    }
                     ImGui::EndCombo();
                 }
                 ImGui::InputInt(tr("network.udp_port", "UDP port"), &setup.port);
@@ -134,7 +162,7 @@ namespace OpenBlood2
                     if (ImGui::Button(tr("network.clear", "Clear")))
                         setup.rotation.clear();
                     for (std::size_t i = 0; i < setup.rotation.size(); ++i)
-                        ImGui::Text("%zu. %s", i + 1, setup.rotation[i].c_str());
+                        ImGui::Text("%zu. %s", i + 1, map_label(setup.rotation[i]));
                     ImGui::TreePop();
                 }
                 ImGui::TextWrapped("%s", tr("network.lan_help", "The game is visible on the local network. Leaving as host ends the game."));
@@ -155,7 +183,13 @@ namespace OpenBlood2
                     refresh_ = -10;
                 }
                 if (!discovery_error_.empty())
-                    ImGui::TextWrapped("%s", discovery_error_.c_str());
+                {
+                    const auto detail = localized && localized_font
+                                            ? locale->format("network.discovery_failed", discovery_error_, {discovery_error_})
+                                            : discovery_error_;
+                    ImGui::TextWrapped("%s", localized_font && localized_font->supports(detail)
+                                                 ? detail.c_str() : discovery_error_.c_str());
+                }
                 if (browser_.servers().empty())
                     ImGui::TextWrapped("%s", tr("network.searching", "Searching. If a game does not appear, connect to its address."));
                 for (const auto& s : browser_.servers())
@@ -169,7 +203,7 @@ namespace OpenBlood2
                                        s.offer.mode == 1   ? tr("network.bloodbath", "Bloodbath")
                                        : s.offer.mode == 2 ? tr("network.ctf", "CTF")
                                                            : tr("network.team", "Team"),
-                                       s.offer.world.c_str());
+                                       map_label(s.offer.world));
                     if (!compatible)
                         ImGui::TextUnformatted(tr("network.incompatible", "Incompatible game version"));
                     else if (s.offer.players >= s.offer.capacity)

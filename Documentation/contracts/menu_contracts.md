@@ -311,21 +311,30 @@ the key is rejected.
 Options > Language applies immediately in the demo and the full game. Enter or Right
 cycles forward, and Left cycles backward. The [setup screen](setup_screen_contracts.md)
 offers the same preference before an installation is selected. `preferences.cfg`
-version 13 stores the language tag. Earlier versions default to English. The other
-choices are French, Simplified Chinese, German, Italian, Spanish, Brazilian Portuguese
-and Korean.
+version 13 stores the language tag. Fresh installations and earlier versions
+default to English. The other choices are French, Simplified Chinese, German,
+Italian, Spanish, Brazilian Portuguese and Korean.
 
 `lang/` contains one UTF-8 INI per translation. `[resources]` uses the original numeric
 string IDs. Other sections group named keys for menus, controls, setup, loading, network,
-HUD, objectives, promotions and dialogue. Absent keys use the original English value. Missing or malformed
-catalogs fall back to English. A malformed numbered substitution uses its English
+HUD, objectives, promotions, dialogue, intro captions and credits. Absent keys use
+the original English value. Missing or malformed catalogs fall back to English.
+A malformed numbered substitution uses its English
 template. Resource translations leave strings from a mod's replacement `cres.dll`
 to the mod. Localized menu rows reuse the original bitmap glyphs and their three
 states. The bundled font supplies missing glyphs, styled from the active bitmap
 palette. Translated headings follow the original artwork roles. The three demo
 promotions draw translated text within the original PCX artwork, keeping the logo,
 illustrations and screenshot. English and any poster with missing or unsupported
-translations use its original image.
+translations use its original image. The menu-free demo ending uses the same poster.
+
+Stock world labels use normalized DAT paths in menus, saved-game rows and loading
+screens. The save metadata keeps its original title and timestamp. The Controls page
+translates device descriptions while preserving physical key names and binding data.
+Team scoreboard headings use the mounted bitmap font and the shared Unicode fallback.
+Credits translate authored headings and prose by their original text and keep the
+original names, positions and fade. Menu error dialogs present translated guidance,
+with raw diagnostic details available separately.
 See [packaging](../packaging.md) for the asset paths.
 
 ## Controls (CMenuControls)
@@ -450,6 +459,12 @@ held by the `CCredits` owner in `CBloodClientShell::m_Credits`.
   `CCredits::font_name/font_width/font_height`. It draws with Dear ImGui's embedded
   default font at 22 virtual pixels, without the requested 14-pixel average width
   and without GDI's rasterization. No system font is loaded.
+- **Localization.** The retail and Nightmares rolls use `[credits]` to translate
+  role labels, acknowledgements and prose. Each lookup is keyed by the original
+  line after trimming outer spaces. Credits keep the same timing, block layout,
+  color and ordering. The bundled face fits longer translations to the viewport.
+  Missing entries and unavailable glyphs show the original line. Credits from a
+  mod's replacement `cres.dll` keep their own text.
 
 See the [implementation report](../implementation/reports/menu_credits.md) and the
 [source ledger](../implementation/sources/menu_credits_sources.json).

@@ -194,7 +194,7 @@ namespace OpenBlood2
             canvas_.FillRect(&surface_, nullptr, hud_magenta);
             x = std::max(0, (int(width) - int(surface_.width)) / 2);
             y = std::max(0, int(height / 2) - int(bar_->height * (largest + 1) / 2) - int(bar_->height));
-            const auto draw = [&](const HudSurface* portrait, std::string text, int score, int left, int top, bool clip)
+            const auto draw = [&](const HudSurface* portrait, std::string text, int score, int left, int top, DBYTE team)
             {
                 if (!scrunch)
                 {
@@ -202,24 +202,34 @@ namespace OpenBlood2
                     canvas_.DrawSurfaceToSurface(&surface_, portrait, nullptr, left, top);
                 }
                 const int text_y = top + int((bar_->height - font_.height) / 2);
-                if (!clip || font_.text_width(text) < 145)
-                    font_.draw(surface_, text, left + int(portrait->width), text_y, 0);
-                if (clip)
+                const int text_x = left + int(portrait->width);
+                if (team)
+                {
+                    const HudRect label{text_x, text_y, std::min(text_x + 145, left + int(bar_->width) - 56),
+                                        text_y + int(font_.height)};
+                    if (!team_label_ || label.right <= label.left || !team_label_(team, surface_, font_, label))
+                        font_.draw(surface_, text, text_x, text_y, 0);
+                }
+                else
+                {
+                    if (font_.text_width(text) < 145)
+                        font_.draw(surface_, text, text_x, text_y, 0);
                     while (text.size() > 1)
                     {
                         text.pop_back();
                         if (font_.text_width(text) < 145)
                         {
-                            font_.draw(surface_, text, left + int(portrait->width), text_y, 0);
+                            font_.draw(surface_, text, text_x, text_y, 0);
                             break;
                         }
                     }
+                }
                 font_.draw(surface_, std::to_string(score), left + int(bar_->width) - 20, text_y, 1);
             };
             for (unsigned team = first; team < first + columns; ++team)
             {
                 const int left = int((team - first) * (bar_->width + 32));
-                draw(voice_, team_names_[team], totals[team], left, int(residual), false);
+                draw(voice_, team_names_[team], totals[team], left, int(residual), DBYTE(team + 1));
                 ++displayed;
                 unsigned count = 0;
                 for (const auto& p : team_order_[team])
@@ -227,7 +237,7 @@ namespace OpenBlood2
                     if (++count >= maximum)
                         break; // Source nCount < nMax leaves the title row.
                     draw(portraits_[p.character], "(-) " + p.name, p.frags, left,
-                         int(player_start + (count - 1) * row_step), true);
+                         int(player_start + (count - 1) * row_step), 0);
                     ++displayed;
                 }
             }

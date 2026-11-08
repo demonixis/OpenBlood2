@@ -4,6 +4,7 @@
 #include "game/original/LoadingScreen.h"
 #include "engine/localization.h"
 #include "engine/world.h"
+#include "game/localized_art.h"
 #include "game/localized_font.h"
 #include "game/session.h"
 #include <algorithm>
@@ -114,8 +115,7 @@ namespace OpenBlood2
                 read_world_info(header, info, ignored);
         }
         info_ = world_load_info(info, world, demo);
-        translated_resources_ = localization && !resources_.nightmares() &&
-                                !localization_resource_overridden(resources_, "cres.dll");
+        translated_resources_ = localization && !localization_resource_overridden(resources_, "cres.dll");
         // _ADDON StartNewWorld: a nightmare level always shows the add-on bumper, whatever the DAT
         // names (its load-screen ID still applies).
         if (resources_.nightmares() && addon_world_name(world))
@@ -158,38 +158,50 @@ namespace OpenBlood2
         // m_hLoadingScreen: the authored screen (or LoadScreen.pcx with Loading_01.pcx at 215, 321)
         // stretched to the screen.
         canvas_->error.clear();
-        const auto* source = canvas_->CreateSurfaceFromBitmap(
-            bitmap_path(info_.load_screen.empty() ? "Interface\\LoadScreens\\LoadScreen.pcx" : info_.load_screen)
-                .c_str());
+        const auto screen_path =
+            bitmap_path(info_.load_screen.empty() ? "Interface\\LoadScreens\\LoadScreen.pcx" : info_.load_screen);
+        const auto* source = canvas_->CreateSurfaceFromBitmap(screen_path.c_str());
         if (!source)
         {
             error = canvas_->error;
             return false;
         }
         HudSurface temp = *source;
+        const bool translate_art = localization && localized_font && localization->language() != Language::English &&
+                                   !localization_resource_overridden(resources_, screen_path);
         if (info_.load_screen.empty())
         {
-            const auto* text = canvas_->CreateSurfaceFromBitmap("interface/loadscreens/loadingtext/loading_01.pcx");
+            constexpr auto plate = "interface/loadscreens/loadingtext/loading_01.pcx";
+            const auto* text = canvas_->CreateSurfaceFromBitmap(plate);
             if (!text)
             {
                 error = canvas_->error;
                 return false;
             }
-            hud_blit(temp, *text, nullptr, 215, 321, false, 0);
+            if (!translate_art || localization_resource_overridden(resources_, plate) ||
+                !localize_loading_plate(temp, *text, *localization, *localized_font))
+                hud_blit(temp, *text, nullptr, 215, 321, false, 0);
         }
         background_ = {width, height, std::vector<std::uint8_t>(std::size_t(width) * height * 4)};
         hud_scale(background_, temp);
+        std::string art_path;
+        if (translate_art && resource_path(screen_path, art_path))
+        {
+            constexpr auto chapter_background = "interface/mainmenus/background.pcx";
+            const auto* backdrop = art_path.starts_with("interface/loadscreens/b2bumper") &&
+                                           !localization_resource_overridden(resources_, chapter_background)
+                                       ? canvas_->CreateSurfaceFromBitmap(chapter_background)
+                                       : nullptr;
+            if (!backdrop)
+                canvas_->error.clear();
+            localize_loading_art(background_, art_path, *localization, *localized_font, backdrop);
+        }
         // The title, bumper title and text drawn on m_hLoadingScreen. _DEMO and ID 0 draw the
         // centred title only.
         const auto h = int(title_font_.height);
         std::string_view translated_world;
-        if (localization && path.starts_with("worlds/") && path.ends_with(".dat") &&
-            !localization_resource_overridden(resources_, path))
-        {
-            std::string key = "loading.world." + path.substr(7, path.size() - 11);
-            std::replace(key.begin(), key.end(), '/', '.');
-            translated_world = localization->text(key);
-        }
+        if (localization && !localization_resource_overridden(resources_, path))
+            translated_world = localization->world(path);
         if (demo || !info_.load_screen_id)
             draw_label(background_, info_.title, translated_world, int(width / 2), h * 2);
         else

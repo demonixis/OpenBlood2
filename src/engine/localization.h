@@ -64,8 +64,12 @@ namespace OpenBlood2
         std::string_view text(TextKey, std::string_view english = {}) const;
         std::string_view text(std::string_view key, std::string_view english = {}) const;
         std::string_view text(unsigned resource_id, std::string_view english = {}) const;
+        // World labels use normalized DAT paths, with an independent Nightmares namespace.
+        std::string_view world(std::string_view dat_path) const;
         // Stock dialogue keys are the lowercase WAV filename without its extension.
         std::string_view dialogue(std::string_view wav_path) const;
+        // Authored pickup names have no resource ID. Resolve only exact source names.
+        std::string_view pickup_name(std::string_view source) const;
         // Each numbered argument must appear in a valid translation. Substitutions are literal text.
         std::string format(std::string_view key, std::string_view english,
                            std::initializer_list<std::string_view> arguments) const;

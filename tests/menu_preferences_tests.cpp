@@ -26,7 +26,8 @@ int test_menu_preferences(int argc, char** argv)
     const auto path = root / "preferences.cfg";
     std::filesystem::remove(path, ec);
     MenuSettings defaults, settings;
-    CHECK(load_menu_preferences(path, settings, error) && settings == defaults);
+    CHECK(load_menu_preferences(path, settings, error) && settings == defaults &&
+          settings.language == Language::English);
     settings = {false, true, true, 15, 35, 730};
     CHECK(save_menu_preferences(path, settings, error));
     MenuSettings loaded;

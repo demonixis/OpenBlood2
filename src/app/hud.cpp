@@ -57,7 +57,8 @@ namespace OpenBlood2
         }
     } // namespace
     int draw_messages(CMessageMgr& messages, float time, const std::string* editor, const std::string& notice,
-                      ImFont* localized_font, const Localization* localization, const Resources* resources)
+                      ImFont* localized_font, const Localization* localization, const Resources* resources,
+                      const LocalizedFont* glyphs)
     {
         int y = 0;
         const auto lines = messages.Draw(time, &y);
@@ -85,14 +86,19 @@ namespace OpenBlood2
                 {
                     if (!l.source.argument.empty())
                     {
-                        const auto name = localization->text(l.source.argument_resource, l.source.argument);
+                        auto name = l.source.argument_resource
+                                        ? localization->text(l.source.argument_resource, l.source.argument)
+                                        : localization->pickup_name(l.source.argument);
+                        if (name.empty())
+                            name = l.source.argument;
                         translated_line = localization->format(pickups[l.source.resource - 260], {}, {name});
                     }
                 }
                 else
                     translated_line = localization->text(l.source.resource);
             }
-            const bool use_translation = !translated_line.empty() && translated_line != l.text;
+            const bool use_translation = !translated_line.empty() && translated_line != l.text &&
+                                         (!glyphs || glyphs->supports(translated_line));
             line(use_translation ? translated_line : l.text, l.x, l.y, use_translation ? localized_font : font);
         }
         int count = int(lines.size());
@@ -106,7 +112,9 @@ namespace OpenBlood2
         {
             // CInputLine::Draw: "SAY:" + text, then a cursor when modf(GetTime()) > .5.
             double whole = 0;
-            const auto prefix = translated ? localization->text("hud.say", "SAY:") : "SAY:";
+            auto prefix = translated ? localization->text("hud.say", "SAY:") : "SAY:";
+            if (glyphs && !glyphs->supports(prefix))
+                prefix = "SAY:";
             auto text = std::string(prefix) + (prefix != "SAY:" ? " " : "") + *editor;
             if (std::modf(double(time), &whole) > .5)
                 text += '_';
@@ -145,7 +153,8 @@ namespace OpenBlood2
         list->AddRectFilled({min.x, max.y - bar}, max, IM_COL32(0, 0, 0, 255));
         return true;
     }
-    void draw_touch_controls(const TouchControls& touch)
+    void draw_touch_controls(const TouchControls& touch, const Localization* localization, ImFont* localized_face,
+                             const LocalizedFont* glyphs)
     {
         const auto* viewport = ImGui::GetMainViewport();
         const float h = viewport->Size.y, aspect = h > 0 ? viewport->Size.x / h : 0;
@@ -162,10 +171,21 @@ namespace OpenBlood2
             if (touch.pressed[i])
                 list->AddCircleFilled(center, radius, IM_COL32(255, 255, 255, 70));
             list->AddCircle(center, radius, IM_COL32(255, 255, 255, 130), 0, std::max(1.f, h / 360));
-            const float size = std::max(8.f, radius * .45f);
-            const auto text = font->CalcTextSizeA(size, FLT_MAX, 0, c.label);
-            list->AddText(font, size, {center.x - text.x / 2, center.y - text.y / 2}, IM_COL32(255, 255, 255, 170),
-                          c.label);
+            const auto translation = localization && localized_face ? localization->text(c.localization_key)
+                                                                    : std::string_view{};
+            const bool localized = !translation.empty() && glyphs && glyphs->supports(translation);
+            const auto label = localized ? translation : std::string_view(c.label);
+            auto* face = localized ? localized_face : font;
+            const auto* end = label.data() + label.size();
+            float size = std::max(8.f, radius * .45f);
+            auto text = face->CalcTextSizeA(size, FLT_MAX, 0, label.data(), end);
+            if (localized && text.x > radius * 1.7f)
+            {
+                size *= radius * 1.7f / text.x;
+                text = face->CalcTextSizeA(size, FLT_MAX, 0, label.data(), end);
+            }
+            list->AddText(face, size, {center.x - text.x / 2, center.y - text.y / 2}, IM_COL32(255, 255, 255, 170),
+                          label.data(), end);
         }
         if (touch.stick_active)
         {
@@ -176,7 +196,8 @@ namespace OpenBlood2
                                   touch_stick_radius * h * .4f, IM_COL32(255, 255, 255, 90));
         }
     }
-    bool draw_credits(const CCredits& credits)
+    bool draw_credits(const CCredits& credits, const Resources& resources, const Localization* localization,
+                      ImFont* localized_font, const LocalizedFont* glyphs)
     {
         const auto& drawn = credits.drawn;
         if (!drawn.credit || !std::isfinite(drawn.color))
@@ -193,30 +214,46 @@ namespace OpenBlood2
         auto* font = ImGui::GetFont();
         auto* list = ImGui::GetBackgroundDrawList();
         const int count = drawn.credit->GetNumStrings(), height = credits.font_height;
+        const bool translate = localized_font && glyphs && localization && localization->language() != Language::English &&
+                               !localization_resource_overridden(resources, "cres.dll");
         for (int i = 0; i < count; ++i)
         {
             const auto* source = drawn.credit->GetString(i);
             if (!source)
                 continue;
-            std::string text; // Windows-1252 resource bytes; Latin-1 to UTF-8 for display.
-            for (const unsigned char c : *source)
+            const auto replacement = translate ? localization->text(credit_line_key(*source)) : std::string_view{};
+            const bool translated = !replacement.empty() && glyphs->supports(replacement);
+            auto* face = translated ? localized_font : font;
+            std::string fallback;
+            auto text = replacement;
+            if (!translated)
             {
-                if (c < 0x80)
-                    text += char(c);
-                else
+                // Original resource bytes use a Windows single-byte encoding.
+                for (const unsigned char c : *source)
                 {
-                    text += char(0xc0 | (c >> 6));
-                    text += char(0x80 | (c & 0x3f));
+                    if (c < 0x80)
+                        fallback += char(c);
+                    else
+                    {
+                        fallback += char(0xc0 | (c >> 6));
+                        fallback += char(0x80 | (c & 0x3f));
+                    }
                 }
+                text = fallback;
             }
             // Original DrawString: rcDraw.left = x - xString / 2, top = y - yString / 2.
+            const auto* end = text.data() + text.size();
             const int width = static_cast<int>(
-                std::ceil(font->CalcTextSizeA(float(height), FLT_MAX, 0, text.c_str(), text.c_str() + text.size()).x));
+                std::ceil(face->CalcTextSizeA(float(height), FLT_MAX, 0, text.data(), end).x));
+            constexpr int available = 624;
+            const float size = translated && width > available ? float(height) * available / width : float(height);
+            const int drawn_width = translated ? std::min(width, available) : width;
             const int center = credit_line_center(240, count, i, height, credits.font_spacing);
-            const int left = 320 - width / 2, top = center - height / 2;
-            list->AddText(font, height * fit.scale,
+            const int left = 320 - drawn_width / 2;
+            const float top = translated ? center - size / 2 : float(center - height / 2);
+            list->AddText(face, size * fit.scale,
                           {viewport->Pos.x + fit.x + left * fit.scale, viewport->Pos.y + fit.y + top * fit.scale},
-                          IM_COL32(red, 0, 0, 255), text.c_str(), text.c_str() + text.size());
+                          IM_COL32(red, 0, 0, 255), text.data(), end);
         }
         return true;
     }

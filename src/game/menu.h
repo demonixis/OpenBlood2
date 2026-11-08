@@ -68,6 +68,7 @@ namespace OpenBlood2
         std::string name = "<EMPTY SLOT>";
         bool loadable = false;
         bool unreadable = false;
+        std::string world_path{}, world_title{};
         bool operator==(const MenuSaveRow&) const = default;
     };
     struct MenuSaveSlots
@@ -87,6 +88,7 @@ namespace OpenBlood2
         std::string binding;
         bool enabled = true;
         std::string_view localization_key{};
+        std::string localized_binding{};
         bool operator==(const MenuControlRow&) const = default;
     };
     struct MenuVideoCapabilities

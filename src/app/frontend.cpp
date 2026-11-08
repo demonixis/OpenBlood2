@@ -21,6 +21,7 @@
 #include "engine/capture.h"
 #include "engine/user_directory.h"
 #include "game/cinematic_captions.h"
+#include "game/localized_art.h"
 #include "game/localized_font.h"
 #include "game/menu_audio.h"
 #include "game/menu_preferences.h"
@@ -215,7 +216,7 @@ namespace OpenBlood2
             std::string error;
             if (persist && !save_menu_preferences(preferences.file, preferences.settings, error))
             {
-                setup.message = error;
+                setup.message = preferences.localization.text("menu.preferences_save_error", error);
                 spdlog::error("Save preferences failed: {}", error);
             }
             return true;
@@ -415,6 +416,15 @@ namespace OpenBlood2
             Menu menu(config.demo         ? MenuEdition::Demo
                       : config.nightmares ? MenuEdition::Nightmares
                                           : MenuEdition::Retail);
+            std::string_view menu_error_key;
+            const auto menu_error = [&](std::string_view key, std::string detail)
+            {
+                if (!detail.empty())
+                {
+                    menu_error_key = key;
+                    menu.error = std::move(detail);
+                }
+            };
             menu.vr = xr_mode;
             // Desktop only: the replacement screen needs a keyboard for names and addresses.
 #if SDL_PLATFORM_ANDROID || SDL_PLATFORM_IOS
@@ -507,12 +517,12 @@ namespace OpenBlood2
             if (menu_enabled && !preferences.error.empty())
                 menu.open(game->client_shell.m_bInWorld);
             if (menu_enabled)
-                menu.error = std::exchange(preferences.error, {});
+                menu_error("menu.preferences_load_error", std::exchange(preferences.error, {}));
             if (!refusal.empty())
-                menu.error = std::exchange(refusal, {});
+                menu_error("menu.multiplayer_error", std::exchange(refusal, {}));
             DisplayOptions display_options(runtime);
             if (!display_options.apply(menu, error))
-                menu.error = error;
+                menu_error("menu.display_error", error);
 #if BLOOD2_XR
             int applied_refresh_rate = 0;
             if (xr)
@@ -521,7 +531,7 @@ namespace OpenBlood2
                 menu.video.refresh_rates.insert(menu.video.refresh_rates.begin(), 0);
                 if (!xr->request_refresh_rate(menu.settings.vr_refresh_rate, error))
                 {
-                    menu.error = error;
+                    menu_error("menu.display_error", error);
                     menu.settings.vr_refresh_rate = 0;
                 }
                 applied_refresh_rate = menu.settings.vr_refresh_rate;
@@ -531,6 +541,7 @@ namespace OpenBlood2
 #endif
             auto stored_settings = menu.settings;
             MenuInput input;
+            input.localization = &localization;
             bool message_text_input = false;
             const auto sync_message_input = [&]
             {
@@ -560,7 +571,7 @@ namespace OpenBlood2
                     if (menu_enabled && menu.error.empty())
                     {
                         menu.open(game->client_shell.m_bInWorld);
-                        menu.error = why;
+                        menu_error("menu.controls_load_error", why);
                     }
                 }
             }
@@ -603,6 +614,8 @@ namespace OpenBlood2
                     title = {LoadingScreen::width, LoadingScreen::height,
                              std::vector<std::uint8_t>(std::size_t(LoadingScreen::width) * LoadingScreen::height * 4)};
                     hud_scale(title, *image);
+                    if (config.demo)
+                        localize_demo_title(title, artwork, localization, localized_font);
                 }
                 else
                     spdlog::warn("Title screen: {}", splash.error);
@@ -940,7 +953,7 @@ namespace OpenBlood2
                 if (command.action == MenuAction::Multiplayer)
                 {
                     if (!multiplayer.open(artwork, config, game->client_shell.m_bInWorld, error))
-                        menu.error = error;
+                        menu_error("menu.multiplayer_error", error);
                     input.reset(menu, game->client_shell.m_bInWorld);
                     neutralize_app_input(game->client_shell);
                     ImGui::GetIO().ClearInputKeys();
@@ -957,7 +970,7 @@ namespace OpenBlood2
                         ImGui::GetIO().ClearInputMouse();
                     }
                     else
-                        menu.error = why;
+                        menu_error("menu.setup_error", why);
                 }
                 if (command.action == MenuAction::RestoreControls)
                 {
@@ -972,7 +985,7 @@ namespace OpenBlood2
                     if (!shell.InitCredits(true, error))
                     {
                         shell.m_Credits.Term();
-                        menu.error = error;
+                        menu_error("menu.credits_error", error);
                         spdlog::error("Credits failed: {}", error);
                     }
                     else
@@ -1002,7 +1015,7 @@ namespace OpenBlood2
                     const bool started = start_menu_world(game, start, error);
                     if (!started)
                     {
-                        menu.error = error;
+                        menu_error(credits ? "menu.credits_error" : "menu.world_error", error);
                         spdlog::error("{} failed: {}", what, error);
                     }
                     else
@@ -1032,7 +1045,7 @@ namespace OpenBlood2
 #endif
                     previous = SDL_GetTicksNS();
                 };
-                const auto refused = [&](const char* what)
+                const auto refused = [&](const char* what, std::string_view key)
                 {
                     spdlog::warn("{} refused: {}", what, error);
                     if (!menu.active) // Pause under the modal, as the menu does.
@@ -1041,7 +1054,7 @@ namespace OpenBlood2
                         menu.open(game->client_shell.m_bInWorld, owner && !owner->m_damage.IsDead());
                         input.reset(menu, game->client_shell.m_bInWorld);
                     }
-                    menu.error = error;
+                    menu_error(key, error);
                 };
                 const auto load_slot = [&](const MenuCommand& request)
                 {
@@ -1054,7 +1067,13 @@ namespace OpenBlood2
                     else if (outcome == SaveFlow::Outcome::Loaded)
                         loaded("Saved game");
                     else if (outcome == SaveFlow::Outcome::Failed)
-                        refused(request.action == MenuAction::SaveGame ? "Save" : "Load");
+                    {
+                        const bool saving = request.action == MenuAction::SaveGame;
+                        const auto key = saving ? "menu.save_error"
+                                       : error == saves.text("menu.slot_empty", "That slot is empty.") ? ""
+                                                                                                      : "menu.load_error";
+                        refused(saving ? "Save" : "Load", key);
+                    }
                     return outcome == SaveFlow::Outcome::Loaded;
                 };
                 const auto quick_load = [&]
@@ -1063,7 +1082,7 @@ namespace OpenBlood2
                     if (quick == SaveFlow::Outcome::Loaded)
                         loaded("Quickload");
                     else if (quick == SaveFlow::Outcome::Failed)
-                        refused("Quickload");
+                        refused("Quickload", "menu.load_error");
                     return quick == SaveFlow::Outcome::Loaded;
                 };
                 const auto change_level = [&]
@@ -1143,7 +1162,7 @@ namespace OpenBlood2
                     if (saves.quick_save(*game, error) == SaveFlow::Outcome::Saved)
                         spdlog::info("Quicksave: {}", game->world_path);
                     else
-                        refused("Quicksave");
+                        refused("Quicksave", "menu.save_error");
                 }
                 if (std::exchange(input.quick_load, false) &&
                     !show_loading(LoadingFlow::Request::QuickLoad, saved_world(SLOT_QUICK), false))
@@ -1175,7 +1194,7 @@ namespace OpenBlood2
 #endif
                 if (!display_options.apply(menu, error))
                 {
-                    menu.error = error;
+                    menu_error("menu.display_error", error);
                     spdlog::warn("{}", error);
                 }
 #if BLOOD2_XR
@@ -1185,7 +1204,7 @@ namespace OpenBlood2
                     {
                         if (!xr->request_refresh_rate(menu.settings.vr_refresh_rate, error))
                         {
-                            menu.error = error;
+                            menu_error("menu.display_error", error);
                             menu.settings.vr_refresh_rate = applied_refresh_rate;
                             ++menu.revision;
                         }
@@ -1207,6 +1226,7 @@ namespace OpenBlood2
                     {
                         setup.language = menu.settings.language;
                         preferences.load_language(ui.localized != nullptr);
+                        input.refresh_controls(menu);
                         game->client_shell.control_notice.clear();
                         saves.notice.text.clear();
                     }
@@ -1214,7 +1234,7 @@ namespace OpenBlood2
                     if (!diagnostic &&
                         !save_menu_preferences(preferences.file, menu.settings, error))
                     {
-                        menu.error = error;
+                        menu_error("menu.preferences_save_error", error);
                         spdlog::error("Save preferences failed: {}", error);
                     }
                 }
@@ -1223,7 +1243,7 @@ namespace OpenBlood2
                     stored_controls = input.controls.bindings.entries;
                     if (!controls_file.empty() && !save_controls(controls_file, input.controls.bindings, error))
                     {
-                        menu.error = error;
+                        menu_error("menu.controls_save_error", error);
                         spdlog::error("Save controls failed: {}", error);
                     }
                 }
@@ -1329,7 +1349,7 @@ namespace OpenBlood2
                     if (!menu_enabled)
                         return failed(4);
                     menu.open(shell.m_bInWorld);
-                    menu.error = "Cannot capture mouse: " + error;
+                    menu_error("menu.mouse_capture_error", "Cannot capture mouse: " + error);
                     input.reset(menu, shell.m_bInWorld);
                 }
                 if (!blocked && !menu.active && !xr_mode)
@@ -1383,7 +1403,7 @@ namespace OpenBlood2
                     {
                         if (!menu_enabled)
                         {
-                            end_screen = end_canvas.CreateSurfaceFromBitmap("screens/info.pcx");
+                            end_screen = demo_end_screen(end_canvas, artwork, localization, localized_font);
                             if (!end_screen)
                             {
                                 error = end_canvas.error;
@@ -1514,6 +1534,7 @@ namespace OpenBlood2
                     if (apply_setup_language(setup, preferences, !diagnostic))
                     {
                         stored_settings.language = menu.settings.language = setup.language;
+                        input.refresh_controls(menu);
                         game->client_shell.control_notice.clear();
                         saves.notice.text.clear();
                         ++menu.revision;
@@ -1525,12 +1546,14 @@ namespace OpenBlood2
                         return failed(4);
                 }
                 else if (input.credits_screen)
-                    draw_credits(game->client_shell.m_Credits);
+                    draw_credits(game->client_shell.m_Credits, game->resources, &localization, ui.localized,
+                                 &localized_font);
                 else
                 {
                     // The original rolls credits inside Start3D/End3D, below fades and the status bar.
                     if (game->client_shell.m_bInWorld && game->client_shell.m_bRollCredits)
-                        draw_credits(game->client_shell.m_Credits);
+                        draw_credits(game->client_shell.m_Credits, game->resources, &localization, ui.localized,
+                                     &localized_font);
                     const auto& client = game->client_shell;
                     const bool letterbox = !xr_mode && client.m_bInWorld && presenter.render_world &&
                                            client.view.object && client.view.settings.type == 1;
@@ -1561,7 +1584,7 @@ namespace OpenBlood2
                         draw_messages(game->client_shell.m_MessageMgr, state.time,
                                       input.message.active ? &input.message.text : nullptr, notice,
                                       localization.language() != Language::English ? ui.localized : nullptr,
-                                      &localization, &game->resources);
+                                      &localization, &game->resources, &localized_font);
                     }
                     if (!hud.draw(state, game->resources, error))
                         return failed(4);
@@ -1586,7 +1609,7 @@ namespace OpenBlood2
                         return failed(4);
                     }
                     if (input.touch.visible && client.m_bInWorld && !xr_mode && !input.message.active)
-                        draw_touch_controls(input.touch);
+                        draw_touch_controls(input.touch, &localization, ui.localized, &localized_font);
                     if (saves.notice.visible())
                     {
                         const bool localized = ui.localized && localization.language() != Language::English;
@@ -1624,7 +1647,17 @@ namespace OpenBlood2
                                                ImGuiWindowFlags_AlwaysAutoResize))
                     {
                         ImGui::PushTextWrapPos(500);
-                        ImGui::TextWrapped("%s", menu.error.c_str());
+                        const auto message = localization.text(menu_error_key);
+                        if (!message.empty() && localized_font.supports(message))
+                        {
+                            ImGui::TextWrapped("%s", message.data());
+                            const auto details = std::string(localization.text("menu.error_details", "Technical details")) +
+                                                 "###menu.error.details";
+                            if (ImGui::CollapsingHeader(details.c_str()))
+                                ImGui::TextWrapped("%s", menu.error.c_str());
+                        }
+                        else
+                            ImGui::TextWrapped("%s", menu.error.c_str());
                         ImGui::PopTextWrapPos();
                         const auto close = std::string(localization.text("menu.close", "Close")) + "###menu.error.close";
                         if (ImGui::Button(close.c_str()) || std::exchange(dismiss_error, false))

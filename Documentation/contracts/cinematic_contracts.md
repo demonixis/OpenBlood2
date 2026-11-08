@@ -143,6 +143,10 @@ Full paths distinguish reused filenames. The `[dialogue]` catalogs translate the
 lines. Missing entries or unsupported glyphs use the English source. Stock text is
 suppressed for audio replaced by a mod.
 
+Nightmares uses the same full-path matching for its stock WAVs. Long monologues
+split into consecutive cards selected by the local sound cursor in source samples.
+The same times apply to every language, including the English transcript.
+
 Verified authored gameplay lines can also draw a subtitle while the listener is in
 the sound's original audible range. The list includes player-triggered remarks and
 public-address messages. The visible cue follows the authoritative voice lifetime,

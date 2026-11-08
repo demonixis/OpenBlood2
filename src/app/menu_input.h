@@ -12,6 +12,7 @@ namespace OpenBlood2
     // Normal interactive input. Smoke tests deliberately retain their original adapter.
     struct MenuInput
     {
+        const Localization* localization = nullptr;
         MovementControls controls;
         MessageInput message;
         TouchControls touch; // On-screen virtual gamepad for direct touch screens.
@@ -117,7 +118,7 @@ namespace OpenBlood2
         // The Controls rows follow the current bindings.
         void refresh_controls(Menu& menu) const
         {
-            menu.set_controls(control_menu_rows(controls.bindings));
+            menu.set_controls(control_menu_rows(controls.bindings, localization));
         }
         // CMenuControls::HandleDeviceTrack while a row shows "=": the next fresh key, mouse
         // button, wheel tick or gamepad button/axis edge binds it. Escape (any Menu source)

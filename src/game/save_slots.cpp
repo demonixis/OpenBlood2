@@ -249,7 +249,11 @@ namespace OpenBlood2
             out.loadable = slot_info.state != SaveSlotInfo::State::Empty;
             out.unreadable = slot_info.state == SaveSlotInfo::State::Unreadable;
             if (slot_info.state == SaveSlotInfo::State::Ready)
+            {
                 out.name = slot_info.meta.display_name;
+                out.world_path = slot_info.meta.world_path;
+                out.world_title = slot_info.meta.world_title;
+            }
             else if (slot_info.state == SaveSlotInfo::State::Unreadable)
                 out.name = std::string("<UNREADABLE: ") + save_fault_name(slot_info.error.fault) + ">";
             return out;

@@ -194,6 +194,9 @@ class CCredits
 
 namespace OpenBlood2
 {
+    // Identify original lines independently of edition, line position and surrounding names.
+    std::string credit_line_key(std::string_view text);
+
     // Original CCredit::Draw/DrawString vertical arithmetic: center y of string `index`
     // of `count`, then the top edge for a string of height `string_height`.
     inline int credit_line_center(int y, int count, int index, int font_height, int font_spacing)

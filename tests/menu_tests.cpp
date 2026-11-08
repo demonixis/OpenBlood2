@@ -272,6 +272,18 @@ namespace
         menu.back();
         CHECK(menu.page == MenuPage::Options && !strcmp(menu.title(), "options.pcx"));
         // CMenuControls: owner rows, no scroll wrap, Back cancels tracking before leaving.
+        Localization control_locale;
+        CHECK(control_locale.load_catalog(Language::French,
+            "[control]\nor=ou\nmouse_button=SOURIS {0}\ngamepad=MANETTE {0}\nleft=GAUCHE\n"
+            "[loading]\nworld.multi.bb_fields=Le champ\nworld.ao.caleb1_cc_c=Le premier cauchemar\n", error));
+        InputBindings inputs;
+        CHECK(inputs.add(InputSource::MouseButton, SDL_BUTTON_LEFT, InputAction::FirePrimary) &&
+              inputs.add(InputSource::GamepadAxisNegative, SDL_GAMEPAD_AXIS_LEFTX, InputAction::FirePrimary));
+        CHECK(control_text(inputs, InputAction::FirePrimary) == "MBUTTON 1 or PAD LS LEFT");
+        CHECK(control_text(inputs, InputAction::FirePrimary, &control_locale) == "SOURIS 1 ou MANETTE LS GAUCHE");
+        CHECK(control_locale.world("Worlds\\Multi\\BB_FIELDS.DAT") == "Le champ" &&
+              control_locale.world("Worlds_ao/caleb1_cc_c.dat") == "Le premier cauchemar" &&
+              control_locale.world("Worlds/Multi/missing.dat").empty());
         CHECK(!menu.enabled(menu.items[2]));
         menu.set_controls({{705, {}, "W", true}, {709, {}, {}, false}, {706, {}, {}, true}});
         CHECK(menu.page == MenuPage::Options && menu.enabled(menu.items[2]));
@@ -734,6 +746,8 @@ namespace
     bool credits_text()
     {
         std::string error;
+        CHECK(credit_line_key("  Quality Assurance\t") == "credits.line.49252934c11d1f7a");
+        CHECK(credit_line_key(" \t").empty());
         CCredits credits;
         CHECK(!credits.IsInited() && credits.IsDone());
         // "##" separators, leading newlines skipped, blank lines collapse, >TIME: hold override,

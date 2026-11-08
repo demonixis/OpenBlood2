@@ -272,6 +272,8 @@ namespace
         test_player::Directory directory;
         directory.files["4caleb1.wav"] = wave();
         directory.children["sounds"].children["events"].files["cwvoice5.wav"] = wave();
+        directory.children["sounds_ao"].children["enemies"].children["gideon"].files["gideoni2.wav"] =
+            wave(1, 8, 8000, 16 * 8000);
         test_model::Writer archive;
         archive.b.resize(168);
         archive.b[0] = archive.b[62] = archive.b[124] = 13;
@@ -292,6 +294,8 @@ namespace
         Localization french, incomplete;
         CHECK(french.load_catalog(Language::French,
                                   "[dialogue]\n4caleb1=Tu as le choix.\nsounds.events.cwvoice5=Accès autorisé.\n"
+                                  "sounds_ao.enemies.gideon.gideoni2.1=Les Élus rentraient chez eux.\n"
+                                  "sounds_ao.enemies.gideon.gideoni2.2=Ils ont affronté quelques démons.\n"
                                   "[intro]\nline01=Nous sommes la Cabale.", error));
         CHECK(incomplete.load_catalog(Language::Korean, "[menu]\nlanguage=언어", error));
         CHECK(intro_caption(6.89, &french).english.empty());
@@ -301,6 +305,30 @@ namespace
         CHECK(intro_caption(9.70, &french).english.empty());
         CHECK(intro_caption(63).english == "And Caleb will die for the last time.");
         CHECK(intro_caption(67.20).english.empty());
+        ClientAudio timed_audio;
+        CHECK(timed_audio.begin(1));
+        ClientSound narration;
+        narration.id = 1;
+        narration.cinematic = true;
+        narration.parameters.resource = "sounds_ao/enemies/gideon/gideoni2.wav";
+        narration.parameters.space = SoundSpace::Local;
+        narration.channels = 1;
+        narration.rate = 8000;
+        narration.frames = 16 * narration.rate;
+        const auto at = [&](std::uint64_t sequence, double seconds)
+        {
+            narration.cursor = seconds * narration.rate;
+            return timed_audio.receive({1, sequence, {narration}}, g.resources, error);
+        };
+        CHECK(at(1, 0) && cinematic_caption(timed_audio, g.resources, &french).translated ==
+                             "Les Élus rentraient chez eux.");
+        CHECK(at(2, 6.5) && cinematic_caption(timed_audio, g.resources, &french).english.empty());
+        CHECK(at(3, 7.5) && cinematic_caption(timed_audio, g.resources, &french).translated ==
+                               "Ils ont affronté quelques démons.");
+        CHECK(at(4, 13.5));
+        const auto english_narration = cinematic_caption(timed_audio, g.resources, &french);
+        CHECK(english_narration.english.ends_with("The Nightmare.") && english_narration.translated.empty());
+
         const auto read_caption = [&](const Localization& language)
         { return cinematic_caption(g.client_session.audio, g.resources, &language); };
 

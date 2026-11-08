@@ -1,5 +1,17 @@
 #include "Credits.h"
+#include "engine/sha256.h"
 #include <charconv>
+
+std::string OpenBlood2::credit_line_key(std::string_view text)
+{
+    const auto first = text.find_first_not_of(" \t");
+    if (first == text.npos)
+        return {};
+    text = text.substr(first, text.find_last_not_of(" \t") - first + 1);
+    Sha256 digest;
+    digest.update({reinterpret_cast<const std::uint8_t*>(text.data()), text.size()});
+    return "credits.line." + digest_text(digest.finish()).substr(0, 16);
+}
 
 namespace
 {

@@ -1,5 +1,6 @@
 #include "game/menu.h"
 #include "engine/localization.h"
+#include "game/localized_art.h"
 #include "game/localized_font.h"
 #include "game/original/MenuIds.h"
 #include <SDL3/SDL_stdinc.h>
@@ -57,7 +58,41 @@ namespace OpenBlood2
         {
             std::string_view english, key{};
         };
-        SettingLabel setting_label(const Menu& menu, int setting, const Localization* localization)
+        std::string localized_save_name(const MenuSaveRow& slot, const Localization& locale, const Resources& resources)
+        {
+            if (locale.language() == Language::English || slot.world_title.empty())
+                return {};
+            std::string_view title = slot.name, suffix;
+            const auto bracket = title.rfind(" [");
+            if (bracket != title.npos && title.size() - bracket == 18 && title.ends_with(']'))
+            {
+                suffix = title.substr(bracket);
+                title = title.substr(0, bracket);
+            }
+            // Translate the original slot layout while retaining any custom display name.
+            if (title != slot.world_title)
+                return {};
+            auto translated = localization_resource_overridden(resources, slot.world_path)
+                                  ? std::string_view{} : locale.world(slot.world_path);
+            std::string date(suffix);
+            if (!date.empty())
+            {
+                constexpr std::array<std::string_view, 12> months{"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                                                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+                const auto month = std::ranges::find(months, suffix.substr(2, 3));
+                if (month != months.end())
+                {
+                    const auto key = "menu.save_month." + std::to_string(month - months.begin() + 1);
+                    date.replace(2, 3, locale.text(key, suffix.substr(2, 3)));
+                }
+            }
+            if (translated.empty() && date == suffix)
+                return {};
+            return std::string(translated.empty() ? title : translated) + date;
+        }
+
+        SettingLabel setting_label(const Menu& menu, int setting, const Localization* localization,
+                                   const Resources& resources)
         {
             const auto& display = menu.settings;
             constexpr Choice on{"ON", "menu.on"}, off{"OFF", "menu.off"};
@@ -109,9 +144,16 @@ namespace OpenBlood2
                     if (menu.level < 0 || menu.level >= int(menu.levels.size()))
                         return row("menu.level", "LEVEL", {"NONE", "menu.none"});
                     auto world = menu.levels[std::size_t(menu.level)];
+                    const auto path = "worlds/" + world + ".dat";
+                    const auto localized = localization && !localization_resource_overridden(resources, path)
+                                               ? localization->world(path) : std::string_view{};
                     for (auto& c : world)
                         c = char(std::toupper(static_cast<unsigned char>(c)));
-                    return row("menu.level", "LEVEL", {world});
+                    auto label = row("menu.level", "LEVEL", {world});
+                    if (!localized.empty())
+                        label.localized = std::string(localization->text("menu.level", "LEVEL")) + " [" +
+                                          std::string(localized) + "]";
+                    return label;
                 }
                 case 17:
                 {
@@ -317,16 +359,8 @@ namespace OpenBlood2
                     value = unassigned->second;
                     binding_translation = translated(IDS_MENU_KEY_UNASSIGNED);
                 }
-                else if (const auto either = translated("control.or"); !either.empty())
-                {
-                    const std::string separator = " " + std::string(either) + " ";
-                    binding_translation = value;
-                    for (std::size_t at = 0; (at = binding_translation.find(" or ", at)) != value.npos;
-                         at += separator.size())
-                        binding_translation.replace(at, 4, separator);
-                    if (binding_translation == value)
-                        binding_translation.clear();
-                }
+                else if (menu.controls[i].localized_binding != value)
+                    binding_translation = menu.controls[i].localized_binding;
                 // The bound text stops at the canvas edge instead of overflowing it.
                 while (!value.empty() && left + 131 + width(small_, value) > 635)
                     value.pop_back();
@@ -473,13 +507,13 @@ namespace OpenBlood2
         }
 
         void draw_poster_glow(HudSurface& target, const HudSurface& original, const LocalizedFont& font,
-                              std::string_view label, const HudRect& source, const HudRect& rect)
+                              std::string_view label, const HudRect& source, const HudRect& rect,
+                              const std::array<unsigned, 3>& glow = {184, 87, 20})
         {
             const unsigned width = unsigned(rect.right - rect.left), height = unsigned(rect.bottom - rect.top);
             HudSurface mask{width, height, std::vector<std::uint8_t>(std::size_t(width) * height * 4)};
             font.draw(mask, label, {0, 0, int(width), int(height)}, 0xffffff);
             constexpr int radius = 3;
-            constexpr unsigned amber[]{184, 87, 20};
             for (int y = 0; y < int(height); ++y)
                 for (int x = 0; x < int(width); ++x)
                 {
@@ -490,7 +524,7 @@ namespace OpenBlood2
                     const unsigned coverage = total / ((radius * 2 + 1) * (radius * 2 + 1) * 2);
                     auto* pixel = poster_pixel(target, rect.left + x, rect.top + y);
                     for (unsigned c = 0; c < 3; ++c)
-                        pixel[c] = std::uint8_t((pixel[c] * (255 - coverage) + amber[c] * coverage + 127) / 255);
+                        pixel[c] = std::uint8_t((pixel[c] * (255 - coverage) + glow[c] * coverage + 127) / 255);
                 }
 
             const unsigned sample_width = unsigned(source.right - source.left);
@@ -563,7 +597,154 @@ namespace OpenBlood2
                         std::fill_n(poster_pixel(target, x, rect.bottom), 3, std::uint8_t(gray & 255));
             }
         }
+
+        enum class ArtInk
+        {
+            Splash,
+            Copper,
+            Red,
+        };
+
+        void replace_art_label(HudSurface& art, const HudRect& area, HudRect text, std::string_view label,
+                               const LocalizedFont& font, ArtInk ink, const HudSurface* backdrop = nullptr)
+        {
+            const HudSurface original = art;
+            const int width = area.right - area.left, height = area.bottom - area.top;
+            std::vector<std::uint8_t> mask(std::size_t(width) * height);
+            const auto inside = [&](int x, int y)
+            {
+                return x >= area.left && x < area.right && y >= area.top && y < area.bottom;
+            };
+            const auto at = [&](int x, int y) { return std::size_t(y - area.top) * width + (x - area.left); };
+            const auto covered = [&](int x, int y) { return inside(x, y) && mask[at(x, y)]; };
+            // Include the darker glow around the letter strokes. Sampling it as background
+            // would leave recognizable English letters underneath the translation.
+            const int radius = ink == ArtInk::Splash ? 4 : 3;
+            for (int y = area.top; y < area.bottom; ++y)
+                for (int x = area.left; x < area.right; ++x)
+                {
+                    const auto* pixel = poster_pixel(original, x, y);
+                    const int r = pixel[0], g = pixel[1], b = pixel[2];
+                    const bool colored = ink == ArtInk::Splash ? r >= 170
+                                       : ink == ArtInk::Red    ? r >= 18 && r > 3 * (g + b)
+                                                               : r >= 18 && r - g >= 7 && g - b >= 5;
+                    if (colored)
+                        for (int dy = -radius; dy <= radius; ++dy)
+                            for (int dx = -radius; dx <= radius; ++dx)
+                                if (dx * dx + dy * dy <= radius * radius && inside(x + dx, y + dy))
+                                    mask[at(x + dx, y + dy)] = 1;
+                }
+            constexpr std::pair<int, int> directions[]{{1, 0}, {-1, 0}, {0, 1}, {0, -1},
+                                                       {1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
+            for (int y = area.top; y < area.bottom; ++y)
+                for (int x = area.left; x < area.right; ++x)
+                {
+                    if (!covered(x, y))
+                        continue;
+                    auto* pixel = poster_pixel(art, x, y);
+                    if (backdrop && backdrop->width == art.width && backdrop->height == art.height)
+                    {
+                        std::copy_n(poster_pixel(*backdrop, x, y), 3, pixel);
+                        continue;
+                    }
+                    std::array<float, 3> color{};
+                    float total_weight = 0;
+                    for (const auto& [dx, dy] : directions)
+                    {
+                        if (ink == ArtInk::Copper && y >= 350 && y <= 355 && dy)
+                            continue; // Follow the horizontal divider through the lettering.
+                        int distance = 1;
+                        while (covered(x + dx * distance, y + dy * distance))
+                            ++distance;
+                        const auto* sample = poster_pixel(original, x + dx * distance, y + dy * distance);
+                        const float weight = 1.f / (distance * (dx && dy ? 1.414f : 1.f));
+                        for (unsigned c = 0; c < 3; ++c)
+                            color[c] += sample[c] * weight;
+                        total_weight += weight;
+                    }
+                    for (unsigned c = 0; c < 3; ++c)
+                        pixel[c] = std::uint8_t(color[c] / total_weight + .5f);
+                }
+            const int fitted = std::min(text.right - text.left, font.text_width(label, text.bottom - text.top) + 2);
+            text.left += (text.right - text.left - fitted) / 2;
+            text.right = text.left + fitted;
+            if (ink == ArtInk::Red)
+            {
+                draw_poster_glow(art, original, font, label, area, text, {130, 0, 0});
+                return;
+            }
+            draw_poster_glow(art, original, font, label, area, text);
+        }
     } // namespace
+
+    const HudSurface* demo_end_screen(HudCanvas& canvas, const Resources& resources, const Localization& catalog,
+                                     const LocalizedFont& font)
+    {
+        constexpr auto path = "screens/info.pcx";
+        const auto* original = canvas.CreateSurfaceFromBitmap(path);
+        if (!original || original->width != 640 || original->height != 480 || catalog.language() == Language::English ||
+            !font || localization_resource_overridden(resources, path))
+            return original;
+        const auto* background = canvas.CreateSurfaceFromBitmap(menu_resources(MenuEdition::Demo).background);
+        if (!background)
+        {
+            canvas.error.clear();
+            return original;
+        }
+        auto* result = canvas.CreateSurface(640, 480);
+        if (!result)
+        {
+            canvas.error.clear();
+            return original;
+        }
+        *result = *original;
+        localize_poster(*result, *original, *background, MenuPromotion::Info, catalog, font);
+        return result;
+    }
+
+    void localize_demo_title(HudSurface& title, const Resources& resources, const Localization& catalog,
+                             const LocalizedFont& font)
+    {
+        const auto label = catalog.text("menu.demo_version");
+        if (title.width != 640 || title.height != 480 || label.empty() || !font.supports(label) ||
+            localization_resource_overridden(resources, "screens/title.pcx"))
+            return;
+        replace_art_label(title, {74, 302, 550, 362}, {72, 309, 552, 353}, label, font, ArtInk::Splash);
+    }
+
+    void localize_loading_art(HudSurface& screen, std::string_view path, const Localization& catalog,
+                              const LocalizedFont& font, const HudSurface* chapter_backdrop)
+    {
+        if (screen.width != 640 || screen.height != 480)
+            return;
+        const auto replace = [&](std::string_view key, const HudRect& area, const HudRect& text, ArtInk ink,
+                                 const HudSurface* backdrop = nullptr)
+        {
+            const auto label = catalog.text(key);
+            if (!label.empty() && font.supports(label))
+                replace_art_label(screen, area, text, label, font, ink, backdrop);
+        };
+        if (path == "screens/loading1.pcx" || path == "screens/loading2.pcx")
+            replace("loading.demo_level", {138, 306, 482, 350}, {138, 308, 480, 351}, ArtInk::Copper);
+        else if (path == "interface/loadscreens/b2bumper01.pcx" || path == "interface/loadscreens/b2bumper02.pcx" ||
+                 path == "interface/loadscreens/b2bumper03.pcx" || path == "interface/loadscreens/b2bumper04.pcx")
+            replace("loading.chapter", {267, 303, 483, 366}, {267, 306, 479, 360}, ArtInk::Copper, chapter_backdrop);
+        else if (path == "screens_ao/bumper.pcx")
+            replace("loading.loading", {174, 399, 466, 455}, {171, 400, 469, 451}, ArtInk::Red);
+    }
+
+    bool localize_loading_plate(HudSurface& screen, const HudSurface& plate, const Localization& catalog,
+                                const LocalizedFont& font)
+    {
+        const auto label = catalog.text("loading.loading");
+        if (screen.width != 640 || screen.height != 480 || plate.width != 209 || plate.height != 42 || label.empty() ||
+            !font.supports(label))
+            return false;
+        const int fitted = std::min(209, font.text_width(label, 38) + 2);
+        const int left = 215 + (209 - fitted) / 2;
+        draw_poster_glow(screen, plate, font, label, {0, 0, 209, 42}, {left, 322, left + fitted, 360});
+        return true;
+    }
 
     bool MenuCanvas::compose(Menu& menu, double, std::string& error)
     {
@@ -664,6 +845,18 @@ namespace OpenBlood2
                 continue;
             std::string label = item.literal;
             std::string translation;
+            std::string localized_slot;
+            if (localization && localized_font)
+            {
+                const MenuSaveRow* slot = nullptr;
+                if (menu.page == MenuPage::Load)
+                    slot = i == 0 ? &menu.saves.restart : i == 1 ? &menu.saves.quick :
+                           i - 2 < menu.saves.slots.size() ? &menu.saves.slots[i - 2] : nullptr;
+                else if (menu.page == MenuPage::Save && i < menu.saves.slots.size())
+                    slot = &menu.saves.slots[i];
+                if (slot)
+                    localized_slot = localized_save_name(*slot, *localization, resources_);
+            }
             if (item.string_id)
             {
                 const auto it = strings.strings.find(item.string_id);
@@ -684,7 +877,8 @@ namespace OpenBlood2
                         error = "Unsupported load-menu string insertion";
                         return false;
                     }
-                    const auto translated_insertion = translated(item.insertion_key);
+                    const auto translated_insertion = localized_slot.empty() ? translated(item.insertion_key)
+                                                                            : std::string_view(localized_slot);
                     const auto translated_marker = translation.find(placeholder);
                     if (translated_marker == translation.npos ||
                         translation.find(placeholder, translated_marker + placeholder.size()) != translation.npos)
@@ -701,9 +895,11 @@ namespace OpenBlood2
             }
             else if (!item.localization_key.empty())
                 translation = translated(item.localization_key);
+            else if (!localized_slot.empty())
+                translation = std::move(localized_slot);
             if (item.setting >= 0)
             {
-                auto setting = setting_label(menu, item.setting, localized_font ? localization : nullptr);
+                auto setting = setting_label(menu, item.setting, localized_font ? localization : nullptr, resources_);
                 if (!setting.english.empty())
                 {
                     label = item.literal = std::move(setting.english);
@@ -792,7 +988,7 @@ namespace OpenBlood2
             draw_small(english, translation == english ? std::string_view{} : translation, 180, 440);
         }
         if ((menu.page == MenuPage::Save || menu.page == MenuPage::Load) && !menu.saves.unavailable.empty())
-            text(*surface, small_, menu.saves.unavailable, 180, 440);
+            draw_small(menu.saves.unavailable, translated("menu.saves_unavailable"), 180, 440);
         if (menu.page == MenuPage::Cheats)
         {
             if (!menu.cheat_status.empty())

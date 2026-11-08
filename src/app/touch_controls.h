@@ -20,22 +20,23 @@ namespace OpenBlood2
     struct TouchControl
     {
         const char* label;
+        const char* localization_key;
         bool right;         // Anchored to the right edge (else the left one).
         float x, y, radius; // Center offset from the anchor edge and from the bottom.
         int button;         // SDL_GamepadButton, or -1 for a trigger axis.
         int axis;           // SDL_GamepadAxis of a trigger, or -1.
     };
     inline constexpr std::array<TouchControl, 10> touch_layout{{
-        {"FIRE", true, .20f, .24f, .10f, -1, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER},
-        {"ALT", true, .43f, .13f, .07f, -1, SDL_GAMEPAD_AXIS_LEFT_TRIGGER},
-        {"JUMP", true, .13f, .47f, .07f, SDL_GAMEPAD_BUTTON_NORTH, -1},
-        {"DUCK", true, .36f, .37f, .065f, SDL_GAMEPAD_BUTTON_RIGHT_STICK, -1},
-        {"USE", true, .63f, .11f, .06f, SDL_GAMEPAD_BUTTON_SOUTH, -1},
-        {"WEAPON", true, .10f, .86f, .06f, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, -1},
-        {"ITEM", true, .26f, .86f, .06f, SDL_GAMEPAD_BUTTON_WEST, -1},
-        {"NEXT", true, .42f, .86f, .055f, SDL_GAMEPAD_BUTTON_BACK, -1},
-        {"RUN", false, .10f, .55f, .06f, SDL_GAMEPAD_BUTTON_LEFT_STICK, -1},
-        {"MENU", false, .08f, .90f, .05f, SDL_GAMEPAD_BUTTON_START, -1},
+        {"FIRE", "hud.touch_fire", true, .20f, .24f, .10f, -1, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER},
+        {"ALT", "hud.touch_alt", true, .43f, .13f, .07f, -1, SDL_GAMEPAD_AXIS_LEFT_TRIGGER},
+        {"JUMP", "hud.touch_jump", true, .13f, .47f, .07f, SDL_GAMEPAD_BUTTON_NORTH, -1},
+        {"DUCK", "hud.touch_duck", true, .36f, .37f, .065f, SDL_GAMEPAD_BUTTON_RIGHT_STICK, -1},
+        {"USE", "hud.touch_use", true, .63f, .11f, .06f, SDL_GAMEPAD_BUTTON_SOUTH, -1},
+        {"WEAPON", "hud.touch_weapon", true, .10f, .86f, .06f, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, -1},
+        {"ITEM", "hud.touch_item", true, .26f, .86f, .06f, SDL_GAMEPAD_BUTTON_WEST, -1},
+        {"NEXT", "hud.touch_next", true, .42f, .86f, .055f, SDL_GAMEPAD_BUTTON_BACK, -1},
+        {"RUN", "hud.touch_run", false, .10f, .55f, .06f, SDL_GAMEPAD_BUTTON_LEFT_STICK, -1},
+        {"MENU", "hud.touch_menu", false, .08f, .90f, .05f, SDL_GAMEPAD_BUTTON_START, -1},
     }};
 
     struct TouchControls

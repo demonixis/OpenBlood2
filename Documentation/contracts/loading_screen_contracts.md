@@ -44,6 +44,10 @@ line breaks, indents and 300-pixel body width are preserved. Missing translation
 or unavailable glyphs use the original English text. Replacement `cres.dll`
 resources from a mod retain precedence.
 
+The selected language also applies to the demo level and chapter lettering, the
+loading plate and the stock Nightmares titles. The English version uses the
+original PCX pixels. Translated labels are confined to the original text areas.
+
 CoolFont is unavailable, so `HudFont::draw_format` and `draw_solid` are adapters:
 words wrap before the width, `|` breaks a line and `~` indents by four spaces.
 This source revision's `_DEMO` branch never blits its surface; the demo instead

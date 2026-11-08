@@ -151,7 +151,10 @@ namespace OpenBlood2
 
     bool SetupScreen::save(std::string& error)
     {
-        return save_setup(file_, state_, error);
+        if (save_setup(file_, state_, error))
+            return true;
+        error = strings().format("setup.save_failed", error, {error});
+        return false;
     }
 
     void SetupScreen::add_mods(const Installation& installation)
@@ -211,7 +214,9 @@ namespace OpenBlood2
         if (installer_.poll(installed))
         {
             if (!installed.success)
-                message = installed.error;
+                message = installer_.progress.cancel
+                              ? text("setup.install_cancelled", installed.error.c_str())
+                              : strings().format("setup.install_failed", installed.error, {installed.error});
             else
             {
                 spdlog::info("Demo installed: {}", path_text(installed.directory));
@@ -424,7 +429,10 @@ namespace OpenBlood2
             ImGui::PushTextWrapPos(0);
             ImGui::TextColored(dim, "%s", path_text(entry.installation.directory).c_str());
             if (!playable)
-                ImGui::TextColored(failure, "%s", entry.error.c_str());
+            {
+                const auto detail = strings().format("setup.invalid_game_data", entry.error, {entry.error});
+                ImGui::TextColored(failure, "%s", detail.c_str());
+            }
             ImGui::PopTextWrapPos();
             if (nightmares && playable)
             {
@@ -439,7 +447,10 @@ namespace OpenBlood2
                 ImGui::EndDisabled();
                 ImGui::PushTextWrapPos(0);
                 if (!nightmares->error.empty())
-                    ImGui::TextColored(failure, "%s", nightmares->error.c_str());
+                {
+                    const auto detail = strings().format("setup.invalid_game_data", nightmares->error, {nightmares->error});
+                    ImGui::TextColored(failure, "%s", detail.c_str());
+                }
                 else
                     ImGui::TextColored(
                         dim, "%s",

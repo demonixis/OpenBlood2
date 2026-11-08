@@ -2,6 +2,7 @@
 #include "app/input_actions.h"
 #include "engine/atomic_file.h"
 #include "engine/config.h"
+#include "engine/localization.h"
 #include "engine/user_directory.h"
 #include "game/menu.h"
 #include "game/original/MenuIds.h"
@@ -153,7 +154,7 @@ namespace OpenBlood2
         }
         return result;
     }
-    inline std::string control_name(InputSource source, int code)
+    inline std::string control_name(InputSource source, int code, const Localization* locale = nullptr)
     {
         static constexpr std::array<const char*, SDL_GAMEPAD_BUTTON_COUNT> buttons{
             "A",  "B",  "X",        "Y",     "BACK",  "GUIDE", "START", "LS",   "RS",
@@ -166,6 +167,16 @@ namespace OpenBlood2
                                                                                               {"RS UP", "RS DOWN"},
                                                                                               {"LT-", "LT"},
                                                                                               {"RT-", "RT"}}};
+        const auto label = [&](std::string_view key, std::string_view english)
+        { return std::string(locale ? locale->text(key, english) : english); };
+        const auto formatted = [&](std::string_view key, std::string_view english, const std::string& argument)
+        {
+            const auto marker = english.find("{0}");
+            std::string original(english);
+            original.replace(marker, 3, argument);
+            return locale ? locale->format(key, original, {argument}) : original;
+        };
+        constexpr std::array direction{"control.left", "control.right", "control.up", "control.down"};
         switch (source)
         {
             case InputSource::Key:
@@ -174,39 +185,113 @@ namespace OpenBlood2
                     ascii_upper(SDL_GetKeyName(SDL_GetKeyFromScancode(SDL_Scancode(code), SDL_KMOD_NONE, false)));
                 if (name.empty())
                     name = ascii_upper(SDL_GetScancodeName(SDL_Scancode(code)));
-                return name.empty() ? "KEY " + std::to_string(code) : name;
+                if (name.empty())
+                    return formatted("control.key_number", "KEY {0}", std::to_string(code));
+                if (!locale)
+                    return name;
+                static constexpr std::pair<int, std::string_view> named_keys[]{
+                    {SDL_SCANCODE_RETURN, "control.key_enter"}, {SDL_SCANCODE_ESCAPE, "control.key_escape"},
+                    {SDL_SCANCODE_BACKSPACE, "control.key_backspace"}, {SDL_SCANCODE_TAB, "control.key_tab"},
+                    {SDL_SCANCODE_SPACE, "control.key_space"}, {SDL_SCANCODE_CAPSLOCK, "control.key_caps_lock"},
+                    {SDL_SCANCODE_PRINTSCREEN, "control.key_print_screen"},
+                    {SDL_SCANCODE_SCROLLLOCK, "control.key_scroll_lock"}, {SDL_SCANCODE_PAUSE, "control.key_pause"},
+                    {SDL_SCANCODE_INSERT, "control.key_insert"}, {SDL_SCANCODE_HOME, "control.key_home"},
+                    {SDL_SCANCODE_PAGEUP, "control.key_page_up"}, {SDL_SCANCODE_DELETE, "control.key_delete"},
+                    {SDL_SCANCODE_END, "control.key_end"}, {SDL_SCANCODE_PAGEDOWN, "control.key_page_down"},
+                    {SDL_SCANCODE_LEFT, direction[0]}, {SDL_SCANCODE_RIGHT, direction[1]},
+                    {SDL_SCANCODE_UP, direction[2]}, {SDL_SCANCODE_DOWN, direction[3]},
+                    {SDL_SCANCODE_NUMLOCKCLEAR, "control.key_num_lock"},
+                    {SDL_SCANCODE_KP_ENTER, "control.key_keypad_enter"}, {SDL_SCANCODE_APPLICATION, "control.key_menu"},
+                };
+                for (const auto& [scan, key] : named_keys)
+                    if (code == scan)
+                        return label(key, name);
+                if (code >= SDL_SCANCODE_LCTRL && code <= SDL_SCANCODE_RGUI)
+                {
+                    constexpr std::array modifiers{"CTRL", "SHIFT", "ALT", "GUI"};
+                    const bool right = code >= SDL_SCANCODE_RCTRL;
+                    const auto modifier = modifiers[std::size_t(code - (right ? SDL_SCANCODE_RCTRL : SDL_SCANCODE_LCTRL))];
+                    const auto text = modifier == std::string_view("SHIFT") ? label("control.key_shift", modifier)
+                                                                           : std::string(modifier);
+                    return locale->format(right ? "control.right_modifier" : "control.left_modifier", name, {text});
+                }
+                if (code >= SDL_SCANCODE_KP_1 && code <= SDL_SCANCODE_KP_0)
+                    return locale->format("control.keypad_number", name,
+                                          {std::to_string((code - SDL_SCANCODE_KP_1 + 1) % 10)});
+                return name;
             }
             case InputSource::MouseButton:
                 // DirectInput order (left, right, middle, X1, X2), one-based like the original.
-                return "MBUTTON " + std::to_string(code == SDL_BUTTON_RIGHT ? 2 : code == SDL_BUTTON_MIDDLE ? 3 : code);
+                return formatted("control.mouse_button", "MBUTTON {0}",
+                                 std::to_string(code == SDL_BUTTON_RIGHT ? 2 : code == SDL_BUTTON_MIDDLE ? 3 : code));
             case InputSource::MouseWheel:
-                return code ? "MWHEEL DOWN" : "MWHEEL UP";
+                return code ? label("control.wheel_down", "MWHEEL DOWN") : label("control.wheel_up", "MWHEEL UP");
             case InputSource::GamepadButton:
-                return std::string("PAD ") + (unsigned(code) < buttons.size() ? buttons[code] : "?");
+            {
+                std::string_view button = unsigned(code) < buttons.size() ? buttons[code] : "?";
+                std::string_view key;
+                switch (code)
+                {
+                    case SDL_GAMEPAD_BUTTON_BACK: key = "control.pad_back"; break;
+                    case SDL_GAMEPAD_BUTTON_GUIDE: key = "control.pad_guide"; break;
+                    case SDL_GAMEPAD_BUTTON_START: key = "control.pad_start"; break;
+                    case SDL_GAMEPAD_BUTTON_DPAD_UP: key = direction[2]; break;
+                    case SDL_GAMEPAD_BUTTON_DPAD_DOWN: key = direction[3]; break;
+                    case SDL_GAMEPAD_BUTTON_DPAD_LEFT: key = direction[0]; break;
+                    case SDL_GAMEPAD_BUTTON_DPAD_RIGHT: key = direction[1]; break;
+                    case SDL_GAMEPAD_BUTTON_TOUCHPAD: key = "control.pad_touchpad"; break;
+                    default: break;
+                }
+                const auto original = std::string("PAD ") + std::string(button);
+                return locale ? locale->format("control.gamepad", original, {label(key, button)}) : original;
+            }
             case InputSource::GamepadAxisPositive:
             case InputSource::GamepadAxisNegative:
-                return std::string("PAD ") +
-                       (unsigned(code) < axes.size() ? axes[code][source == InputSource::GamepadAxisPositive] : "?");
+            {
+                const bool positive = source == InputSource::GamepadAxisPositive;
+                const auto axis = unsigned(code) < axes.size() ? axes[code][positive] : "?";
+                std::string localized(axis);
+                if (locale && unsigned(code) < 4)
+                {
+                    const auto d = (code % 2) * 2 + int(positive);
+                    localized = std::string(code < 2 ? "LS " : "RS ") +
+                                label(direction[std::size_t(d)], std::string_view(axis).substr(3));
+                }
+                const auto original = std::string("PAD ") + axis;
+                return locale ? locale->format("control.gamepad", original, {localized}) : original;
+            }
         }
         return {};
     }
     // CMenuControls::SetControlText: keyboard, mouse then gamepad controls joined by " or ".
-    inline std::string control_text(const InputBindings& bindings, InputAction action)
+    inline std::string control_text(const InputBindings& bindings, InputAction action, const Localization* locale = nullptr)
     {
         std::string text;
         for (const auto device : {ControlDevice::Keyboard, ControlDevice::Mouse, ControlDevice::Gamepad})
             for (const auto& b : bindings.entries)
                 if (b.action == action && control_device(b.source) == device)
-                    text += (text.empty() ? "" : " or ") + control_name(b.source, b.code);
+                {
+                    if (!text.empty())
+                    {
+                        text += ' ';
+                        text += locale ? locale->text("control.or", "or") : "or";
+                        text += ' ';
+                    }
+                    text += control_name(b.source, b.code, locale);
+                }
         return text;
     }
-    inline std::vector<MenuControlRow> control_menu_rows(const InputBindings& bindings)
+    inline std::vector<MenuControlRow> control_menu_rows(const InputBindings& bindings,
+                                                        const Localization* locale = nullptr)
     {
         std::vector<MenuControlRow> rows;
         for (const auto& row : control_rows)
             rows.push_back({row.string_id, std::string(row.literal),
                             row.action ? control_text(bindings, *row.action) : std::string{}, row.action.has_value(),
-                            row.localization_key});
+                            row.localization_key,
+                            row.action && locale && locale->language() != Language::English
+                                ? control_text(bindings, *row.action, locale)
+                                : std::string{}});
         return rows;
     }
 

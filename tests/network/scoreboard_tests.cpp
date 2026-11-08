@@ -217,6 +217,17 @@ namespace
         const auto team_image = table.surface().rgba;
         const auto team_revision = table.revision;
         CHECK(table.compose_teams(rows, {8, -3}, 0, 640, 480, error) && table.revision == team_revision);
+        unsigned labels = 0;
+        table.set_team_label([&](DBYTE team, HudSurface& surface, const HudFont& font, const HudRect& row)
+        {
+            ++labels;
+            font.draw(surface, team == 1 ? "EQUIPE BLEUE" : "EQUIPE ROUGE", row.left, row.top, 0);
+            return true;
+        });
+        CHECK(table.compose_teams(rows, {8, -3}, 0, 640, 480, error) && table.revision != team_revision &&
+              table.surface().rgba != team_image && labels == 2);
+        table.set_team_label({});
+        CHECK(table.compose_teams(rows, {8, -3}, 0, 640, 480, error) && table.surface().rgba == team_image);
         CHECK(table.compose_teams(rows, {9, -3}, 0, 640, 480, error) && table.surface().rgba != team_image);
         CHECK(table.compose_teams(rows, {9, -3}, 0, 320, 240, error) && !table.displayed);
         CHECK(table.compose_teams(rows, {9, -3}, 1, 320, 240, error) && table.displayed == 3);

@@ -15,6 +15,7 @@ namespace OpenBlood2
         {
             std::string_view path, key, text;
             bool gameplay = false;
+            double start = 0, end = 0; // No end time means the entire spoken clip.
         };
 
         constexpr std::initializer_list<Transcript> transcripts{
@@ -76,10 +77,15 @@ namespace OpenBlood2
             std::string path;
             if (!resource_path(sound.parameters.resource, path) || localization_resource_overridden(resources, path))
                 continue;
-            const auto transcript = std::ranges::find(transcripts, path, &Transcript::path);
-            if (transcript != transcripts.end())
+            const auto first = std::ranges::find(transcripts, path, &Transcript::path);
+            if (first != transcripts.end())
             {
-                if (!sound.cinematic && !transcript->gameplay)
+                const double seconds = sound.rate ? sound.cursor / sound.rate : 0;
+                const auto transcript = std::find_if(first, transcripts.end(), [&](const Transcript& line)
+                {
+                    return line.path == path && (!line.end || (line.start <= seconds && seconds < line.end));
+                });
+                if (transcript == transcripts.end() || (!sound.cinematic && !transcript->gameplay))
                     continue;
                 caption = {transcript->text, localization ? localization->text(transcript->key) : std::string_view{}};
             }

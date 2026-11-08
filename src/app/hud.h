@@ -100,13 +100,15 @@ namespace OpenBlood2
     // control feedback, drawn as one more line. Returns the number of drawn lines.
     int draw_messages(CMessageMgr&, float time, const std::string* editor, const std::string& notice,
                       ImFont* localized_font = nullptr, const Localization* localization = nullptr,
-                      const Resources* resources = nullptr);
+                      const Resources* resources = nullptr, const LocalizedFont* glyphs = nullptr);
     bool draw_screen_fade(float scale, bool in_world);
     // Black rows over a letterbox camera's top and bottom sixth (the scene clears to the fog colour).
     bool draw_letterbox(bool letterbox);
     // The last drawn CCredit, centered in the 640x480 menu viewport. Replacement font:
     // Dear ImGui's embedded default instead of the original GDI Arial request.
-    bool draw_credits(const CCredits&);
+    bool draw_credits(const CCredits&, const Resources&, const Localization*, ImFont* localized_font,
+                      const LocalizedFont* glyphs);
     // The on-screen touch controls: outlined circles, filled while held, and the floating stick.
-    void draw_touch_controls(const TouchControls&);
+    void draw_touch_controls(const TouchControls&, const Localization* = nullptr, ImFont* = nullptr,
+                             const LocalizedFont* = nullptr);
 } // namespace OpenBlood2
