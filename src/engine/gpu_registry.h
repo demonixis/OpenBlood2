@@ -62,6 +62,10 @@ namespace OpenBlood2
         TextureHandle derived_texture(std::string_view kind, const Texture&, std::string& error);
         // Render targets and other textures with explicit lifetime (not content-addressed).
         TextureHandle create_texture(const SDL_GPUTextureCreateInfo&, std::string& error);
+        // Stages tightly packed texels for one layer and mip level of a created texture (uploaded at the
+        // next flush; GI lot G12's reflection array). `bytes` must equal width * height * texel size.
+        bool stage_texture(TextureHandle, Uint32 layer, Uint32 level, Uint32 width, Uint32 height, const void* data,
+                           std::size_t bytes, std::string& error);
         SDL_GPUTexture* get(TextureHandle) const;
         void release(TextureHandle&);
         // Repeating: trilinear 8x anisotropic scene textures. Clamped: nearest filtering with
@@ -136,7 +140,7 @@ namespace OpenBlood2
         {
             TextureHandle texture;
             std::size_t offset = 0;
-            Uint32 level = 0, width = 0, height = 0;
+            Uint32 level = 0, width = 0, height = 0, layer = 0;
         };
         TextureHandle add_texture(SDL_GPUTexture*, bool content, std::size_t bytes, std::string key);
         // Validates, creates and stages one content texture; registers it under `key`.

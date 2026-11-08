@@ -2328,3 +2328,124 @@ expiry console lines. The replacement message font (Dear ImGui default at 16 px)
 the clamped scale index, the world-reset message clear and the non-failing string
 lookup are documented adaptations. No commercial art or strings are imported. See
 [contracts](../contracts/original_hud_contracts.md#objectives-power-bars-and-message-lines-issue-8).
+
+## GI probe placement (lot G4, 2026-11-06)
+
+No code is imported. The reflection-probe fields and F8 labels (influence box, projection box,
+blend distance, priority, box projection, resolution 16–256, default 64) follow the vocabulary
+of CyberEngine's `docs/probes-baking.md` (`../CyberEngine`), as decision 9
+of the [GI plan](gi_plan.md) asks. The lattice, relocation, validity rules, room fitting and the
+JSON/PLAC formats are written for this project. The bounded JSON parser was moved, unchanged
+in behaviour, from the project's own material manifest reader. See
+[contracts](../contracts/gi_contracts.md#probe-placement-lot-g4).
+
+## GI bake scene and tracer (lot G5, 2026-11-06)
+
+No code is imported. The triangle test, the lightmap page sampling and the vertex-light rule
+repeat the project's own `WorldShade` so bake hits match it. The binned SAH builder, ordered
+traversal, translucent layer list, job pool, splitmix64 streams, rejection-sampled directions,
+settings text and `--bake-gi` driver are written for this project; the presets follow the
+[GI plan](gi_plan.md). See
+[contracts](../contracts/gi_contracts.md#bake-scene-and-tracer-lot-g5).
+
+## GI bake-all script and packaging (lot G6, 2026-11-06)
+
+No code is imported. `tools/gi/bake_all.py` (Python standard library), `cmake/GiPackaging.cmake`,
+`cmake/CheckGiPolicy.cmake`, the optional Gradle `assets` folder and the stub-driven test are
+written for this project from the [GI plan](gi_plan.md). See
+[contracts](../contracts/gi_contracts.md#bake-all-script-and-packaging-lot-g6).
+
+## GI lightmap core (lot G7, 2026-11-07)
+
+No code is imported. The RGB9E5 encoding follows the published `GL_EXT_texture_shared_exponent`
+rule; the cosine-weighted directions use the concentric disk map (Shirley and Chiu, 1997), the
+orthonormal basis of Duff et al. ("Building an Orthonormal Basis, Revisited", JCGT 2017) and a
+golden-ratio rank-1 lattice, all written from their published descriptions. The sky setup
+replays the project's own DemoSkyWorldModel/SkyPointer ports and `sky_view_position`; the hit
+radiance repeats the project's `WorldShade` and `WorldMesh` lighting rules. Receivers, sample
+placement, passes, dilation, the LMAP/`VTX ` formats, the preview tool and the analytic tests
+(Lambert's polygon form factor) are written for this project from the
+[GI plan](gi_plan.md). See [contracts](../contracts/gi_contracts.md#gi-lightmap-core-lot-g7).
+
+## GI light probes (lot G9, 2026-11-07)
+
+No code is imported. The real SH basis constants and the clamped-cosine band factors π, 2π/3 and
+π/4 are the published values (Ramamoorthi and Hanrahan, "An Efficient Representation for
+Irradiance Environment Maps", 2001); CyberEngine's `docs/probes-baking.md` (`../CyberEngine`) uses
+the same constants and served as a reference only (decision D13). The Fibonacci sphere, the
+quaternion rotation by rejection, the binary16 codec (IEEE 754-2008), the PROB format, the trilinear
+field and the ambient/pseudo-light split are written for this project from the
+[GI plan](gi_plan.md). See [contracts](../contracts/gi_contracts.md#light-probes-lot-g9).
+
+## GI in-game bake (lot G10, 2026-11-07)
+
+No code is imported. The child process uses SDL 3's process API (`SDL_CreateProcessWithProperties`,
+`SDL_KillProcess`, `SDL_WaitProcess`) from the pinned SDL; the executable lookups are the platform
+calls (`_NSGetExecutablePath`, `GetModuleFileNameW`, `/proc/self/exe`). CyberEngine's
+`BakeExecutor` (`../CyberEngine`) was a reference only (decision D13) for the panel vocabulary
+(Bake, Cancel, progress); decision D6 replaced its in-process threads with a child process. The
+GI_PROGRESS/GI_RESULT parsers, the Bake panel and the reload hand-off are written for this project
+from the [GI plan](gi_plan.md). See [contracts](../contracts/gi_contracts.md#in-game-bake-lot-g10).
+
+## GI direct-light audit (lot GD1, 2026-11-07)
+
+No code is imported. The term follows DEdit's lightmap sample rules in the later LithTech tree
+(`../lithtech/tools/DEdit/Lightmap/LMSampleGen.cpp`: the omni `inner × f + outer × (1 − f)` and the
+cone `(inner × a + outer × (1 − a)) × f`, read only) with the linear falloff the 1998 data fits;
+`../lithtech/tools/PreProcessor/LightMapMaker.cpp` was read for the sample placement and shadow
+segment. `gi_direct`, the audit and the difference panel are written for this project from the
+[GI plan](gi_plan.md) and the measurements in the
+[GD1 report](reports/gi_gd1_direct_audit.md). See
+[contracts](../contracts/gi_contracts.md#direct-light-audit-lot-gd1).
+
+## GI re-baked direct bake (lot GD2, 2026-11-07)
+
+No code is imported. The direct pass, the `DIR ` section, `gi_compose_direct` and the BVH shadow
+test are written for this project from the [GI plan](gi_plan.md) and lot GD1; the shadow trace reuses
+the project's own `GiBvh` and WorldShade Möller–Trumbore arithmetic, and its 0.01-unit touch rule
+reproduces the GD1 `CollisionWorld` sweep's treatment of a start lying on a face. See the
+[GD2 report](reports/gi_gd2_rebaked_direct.md) and
+[contracts](../contracts/gi_contracts.md#re-baked-direct-bake-lot-gd2).
+
+## GI reflection bake (lot G11, 2026-11-07)
+
+No code is imported. CyberEngine's `src/engine/graphics/rendering/internal/reflection_prefilter.cpp`
+and its `tests/graphics/reflection_prefilter_tests.cpp` (`../CyberEngine`) were references only
+(decision D13): the roughness-per-level rule, alpha = max(roughness², 0.001), the radical-inverse
+(Hammersley) points and the three prefilter properties the tests check (constant radiance kept,
+reproducible chains, a spread rough level) are rewritten in `gi_reflections.cpp` and
+`gi_reflections.prefilter`; the 64/32 sample counts are the [GI plan](gi_plan.md)'s.
+The GGX half-vector sampling follows Karis ("Real Shading in Unreal Engine 4", 2013), the Hammersley
+points and the octahedral map (Cigolle et al., "A Survey of Efficient Representations for Independent
+Unit Vectors", JCGT 2014) their published descriptions; the borders, the cube capture, the two light
+sets and the REFL format are written for this project from the [GI plan](gi_plan.md). See
+[contracts](../contracts/gi_contracts.md#reflection-bake-lot-g11).
+
+## GI reflection runtime (lot G12, 2026-11-07)
+
+No code is imported. CyberEngine's `shaders/include/reflection_environment.hlsli` and
+`tests/graphics/reflection_environment_shader_contract_tests.cpp` (`../CyberEngine`) were references
+only (decision D13) for the box coverage over a blend distance, the two-probe selection by priority
+and coverage, the level saturate(roughness) × (levels − 1) and the box projection by slab
+intersection; the `-DGI` code of `pbr.frag.hlsl`, the
+cell grid, the record layout, the CPU mirror (`gi_reflection_environment`) and the page alpha are
+written for this project from the [GI plan](gi_plan.md). The binary16 conversion reuses the
+project's G9 codec. See [contracts](../contracts/gi_contracts.md#reflection-runtime-lot-g12).
+
+
+## GI bake quality settings (lot GQ1, 2026-11-08)
+
+No code is imported. The texel points, the hit-distance-guided denoise and the soft direct shadows
+are written for this project from the [GI plan](gi_plan.md) (decisions D21 and D22). The light disk
+uses the published orthonormal basis of Duff et al. ("Building an Orthonormal Basis, Revisited",
+JCGT 2017), the concentric square-to-disk map of Shirley and Chiu ("A Low Distortion Map Between
+Disk and Square", 1997) and a golden-ratio rank-1 lattice, all rewritten with arithmetic and sqrt
+only. See the [GQ1 report](reports/gi_gq1_bake_quality.md) and
+[contracts](../contracts/gi_contracts.md#bake-quality-settings-lot-gq1).
+
+## GI emissive texels (lot GE1, 2026-11-08)
+
+No code is imported. The emission chain repeats the project's own enhanced-renderer formula
+(`emitted()` in `pbr.frag.hlsl`, the classes of `config/materials.json`) on the CPU, with a box
+filter down the albedo mips (decisions D23 and D24). See the [GE1 report](reports/gi_ge1_emissive.md)
+and [contracts](../contracts/gi_contracts.md#emissive-texels-lot-ge1).

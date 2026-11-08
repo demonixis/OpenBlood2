@@ -245,7 +245,7 @@ jobs:
 
       - name: Configure game
         # Distributed APKs drop the debug info; the symbols are uploaded separately.
-        run: cmake --preset ${{ matrix.preset }} -DBLOOD2_ANDROID_STRIP=ON
+        run: cmake --preset ${{ matrix.preset }} -DBLOOD2_ANDROID_STRIP=ON -DBLOOD2_PACKAGE_GI=OFF
 
       - name: Build APK
         run: cmake --build --preset ${{ matrix.preset }}

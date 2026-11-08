@@ -85,6 +85,14 @@ namespace OpenBlood2
         BufferHandle lights, cells;            // Light grid storage buffers (LightGrid layout).
         SurfaceFrameUniform frame;             // eye is filled per record.
         std::uint64_t revision = 0;
+        // GI variant (lot G12, WorldPipelines::prepare with gi): the probe records and cell grid (storage
+        // slots 2 and 3) and the reflection array (sampler slot 4), bound with the light grid.
+        bool gi = false;
+        BufferHandle probes, probe_cells;
+        TextureHandle reflections;
+        SDL_GPUSampler* reflection_sampler = nullptr;
+        // True when every resource the bound pipelines read is present.
+        bool ready(const GpuRegistry&) const;
     };
     // Post-processing scene passes: color target 1 holds the linear light that emission adds,
     // premultiplied by coverage (only the enhanced shaders emit), and in alpha the share of the pixel
@@ -166,7 +174,9 @@ namespace OpenBlood2
         // other choices. Reflection targets require the auxiliary ones.
         bool prepare(SDL_GPUTextureFormat, std::string& error);
         bool prepare(SDL_GPUTextureFormat, SurfaceShading, std::string& error);
-        bool prepare(SDL_GPUTextureFormat, SurfaceShading, bool aux, bool reflections, SDL_GPUSampleCount,
+        // `gi` (lot G12) selects the GI variants of the enhanced shaders, which also read the reflection
+        // probes and the GI page alpha (SurfaceScene::gi); the original shaders ignore it.
+        bool prepare(SDL_GPUTextureFormat, SurfaceShading, bool aux, bool reflections, bool gi, SDL_GPUSampleCount,
                      std::string& error);
         SurfaceShading shading() const
         {
@@ -188,6 +198,10 @@ namespace OpenBlood2
         {
             return reflections_;
         }
+        bool gi() const
+        {
+            return gi_;
+        }
         SDL_GPUSampleCount samples() const
         {
             return samples_;
@@ -200,7 +214,7 @@ namespace OpenBlood2
         std::array<SDL_GPUGraphicsPipeline*, static_cast<std::size_t>(WorldPipeline::Count)> pipelines_{};
         SDL_GPUTextureFormat format_ = SDL_GPU_TEXTUREFORMAT_INVALID;
         SurfaceShading shading_ = SurfaceShading::Original;
-        bool aux_ = false, reflections_ = false;
+        bool aux_ = false, reflections_ = false, gi_ = false;
         SDL_GPUSampleCount samples_ = SDL_GPU_SAMPLECOUNT_1;
     };
     // Destination of record(): an already begun render pass whose color/depth

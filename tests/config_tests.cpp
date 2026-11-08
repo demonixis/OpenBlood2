@@ -1,7 +1,9 @@
 #include "engine/config.h"
+#include "engine/gi_lightmap.h"
 
 #include "scratch_dir.h"
 #include <array>
+#include <vector>
 #include <fstream>
 #include <iostream>
 
@@ -278,6 +280,367 @@ namespace
         return true;
     }
 
+    // GI lots G2/G4: gi_dir= / --gi-dir, gi_placement_dir= and the --list-worlds / --gi-verify /
+    // --gi-place tools.
+    bool gi(const fs::path& root)
+    {
+        Options options;
+        std::string error;
+        const std::array<std::string_view, 2> list{"--list-worlds", "--json"};
+        CHECK(parse_options(list, options, error) && options.list_worlds && options.json);
+        CHECK(options.log_level == "error"); // JSON owns standard output.
+        const std::array<std::string_view, 4> list_level{"--list-worlds", "--json", "--log-level", "debug"};
+        CHECK(parse_options(list_level, options, error) && options.log_level == "debug");
+        const std::array<std::string_view, 3> verify{"--gi-verify", "a.ob2gi", "--gi-dir"};
+        CHECK(!parse_options(verify, options, error)); // --gi-dir needs a value.
+        const std::array<std::string_view, 4> verify_dir{"--gi-verify", "a.ob2gi", "--gi-dir", "bakes"};
+        CHECK(parse_options(verify_dir, options, error));
+        CHECK(path_text(options.gi_verify) == "a.ob2gi" && path_text(options.gi_dir) == "bakes");
+        for (const auto& args : std::initializer_list<std::vector<std::string_view>>{
+                 {"--json"},
+                 {"--gi-verify", "a.ob2gi", "--json"},
+                 {"--list-worlds", "--gi-verify", "a.ob2gi"},
+                 {"--list-worlds", "--world", "02_CityHub"},
+                 {"--list-worlds", "--check-data"},
+                 {"--gi-verify", "a.ob2gi", "--bench"},
+                 {"--list-worlds", "--view-world"},
+                 {"--gi-verify", "a.ob2gi", "--frames", "5"}})
+            CHECK(!parse_options(args, options, error));
+
+        options = {};
+        options.config_file = root / "config.ini";
+        options.explicit_config = true;
+        Config config;
+        CHECK(write(options.config_file, "data_dir = data\ngi_dir = \"GI bakes\"\n"));
+        CHECK(load_config(options, "", config, error));
+        CHECK(config.gi_dir == root / "GI bakes"); // Relative to the configuration file.
+        options.gi_dir = root / "from-command-line";
+        CHECK(load_config(options, "", config, error) && config.gi_dir == options.gi_dir);
+        options.gi_dir.clear();
+        CHECK(write(options.config_file, "gi_dir = /absolute/gi\ndata_dir = data\n"));
+        CHECK(load_config(options, "", config, error) && config.gi_dir == fs::path("/absolute/gi"));
+        CHECK(write(options.config_file, "data_dir = data\n"));
+        CHECK(load_config(options, "", config, error) && config.gi_dir.empty());
+        for (const auto text : {"data_dir = data\ngi_dir =\n", "data_dir = data\ngi_dir = a\ngi_dir = b\n",
+                                "data_dir = data\nGI_DIR = a\n", "data_dir = data\ngi_dir = \"broken\n"})
+        {
+            CHECK(write(options.config_file, text));
+            CHECK(!load_config(options, "", config, error));
+        }
+
+        // GI lot G4: --gi-place, its modifiers and gi_placement_dir= / --gi-placement-dir.
+        options = {};
+        const std::array<std::string_view, 6> place{"--gi-place", "all",    "--gi-reset",
+                                                    "--gi-dry-run", "--json", "--gi-placement-dir"};
+        CHECK(!parse_options(place, options, error)); // --gi-placement-dir needs a value.
+        const std::array<std::string_view, 7> place_dir{"--gi-place", "all",    "--gi-reset",         "--gi-dry-run",
+                                                        "--json",     "--gi-placement-dir", "placements"};
+        options = {};
+        CHECK(parse_options(place_dir, options, error));
+        CHECK(options.gi_place == "all" && options.gi_reset && options.gi_dry_run && options.json);
+        CHECK(path_text(options.gi_placement_dir) == "placements" && options.log_level == "error");
+        for (const auto& args : std::initializer_list<std::vector<std::string_view>>{
+                 {"--gi-place"},
+                 {"--gi-reset"},
+                 {"--gi-dry-run"},
+                 {"--gi-reset", "--list-worlds"},
+                 {"--gi-place", "all", "--list-worlds"},
+                 {"--gi-place", "all", "--gi-verify", "a.ob2gi"},
+                 {"--gi-place", "all", "--world", "02_CityHub"},
+                 {"--gi-place", "single", "--view-world"},
+                 {"--gi-place", "all", "--bench"}})
+        {
+            options = {};
+            CHECK(!parse_options(args, options, error));
+        }
+        options = {};
+        const std::array<std::string_view, 3> separate{"--gi-place", "all", "--list-worlds"};
+        CHECK(!parse_options(separate, options, error));
+        CHECK(error == "--list-worlds, --gi-verify, --gi-place, --bake-gi, --gi-preview and --gi-direct-audit are "
+                       "separate headless tools");
+
+        // GI lot G5: --bake-gi and its options.
+        options = {};
+        const std::array<std::string_view, 12> bake{"--bake-gi",   "01_SubwayA", "--gi-quality", "custom",
+                                                    "--gi-bounces", "3",          "--gi-rays",    "4096",
+                                                    "--gi-jobs",   "7",          "--gi-out",     "bakes"};
+        CHECK(parse_options(bake, options, error));
+        CHECK(options.bake_gi == "01_SubwayA" && options.gi_quality == "custom" && options.gi_bounces == 3);
+        CHECK(options.gi_rays == 4096 && options.gi_jobs == 7 && path_text(options.gi_out) == "bakes");
+        CHECK(!options.gi_if_stale);
+        // Lot GD2: --gi-direct original|rebaked, bakes only.
+        for (const auto value : {"original", "rebaked"})
+        {
+            options = {};
+            const std::array<std::string_view, 4> direct{"--bake-gi", "a", "--gi-direct", value};
+            CHECK(parse_options(direct, options, error) && options.gi_direct == value);
+        }
+        options = {};
+        const std::array<std::string_view, 4> wrong_direct{"--bake-gi", "a", "--gi-direct", "Rebaked"};
+        CHECK(!parse_options(wrong_direct, options, error) && error == "--gi-direct requires original or rebaked");
+        options = {};
+        const std::array<std::string_view, 2> lone_direct{"--gi-direct", "rebaked"};
+        CHECK(!parse_options(lone_direct, options, error) &&
+              error == "--gi-quality, its settings, --gi-emissive, --gi-direct and --gi-if-stale require --bake-gi");
+        options = {};
+        const std::array<std::string_view, 3> stale{"--bake-gi", "01_SubwayA", "--gi-if-stale"};
+        CHECK(parse_options(stale, options, error) && options.gi_if_stale && options.gi_quality.empty());
+        for (const auto& args : std::initializer_list<std::vector<std::string_view>>{
+                 {"--bake-gi"},
+                 {"--gi-if-stale"},
+                 {"--gi-quality", "final"},
+                 {"--gi-out", "bakes"},
+                 {"--bake-gi", "a", "--gi-quality", "best"},
+                 {"--bake-gi", "a", "--gi-rays", "64"},
+                 {"--bake-gi", "a", "--gi-quality", "preview", "--gi-bounces", "1"},
+                 {"--bake-gi", "a", "--gi-quality", "custom", "--gi-bounces", "5"},
+                 {"--bake-gi", "a", "--gi-quality", "custom", "--gi-rays", "15"},
+                 {"--bake-gi", "a", "--gi-jobs", "0"},
+                 {"--bake-gi", "a", "--gi-jobs", "257"},
+                 {"--bake-gi", "a", "--gi-jobs", "2x"},
+                 {"--bake-gi", "a", "--gi-place", "all"},
+                 {"--bake-gi", "a", "--world", "02_CityHub"}})
+        {
+            options = {};
+            CHECK(!parse_options(args, options, error));
+        }
+
+        // GI lot G7: --gi-sky in exact hundredths (custom bakes only), --gi-preview and its options.
+        for (const auto& [text, hundredths] : std::initializer_list<std::pair<std::string_view, int>>{
+                 {"0", 0}, {"4", 400}, {"1.5", 150}, {"0.25", 25}, {"3.99", 399}, {"2.00", 200}})
+        {
+            options = {};
+            const std::array<std::string_view, 6> sky{"--bake-gi", "a", "--gi-quality", "custom", "--gi-sky", text};
+            CHECK(parse_options(sky, options, error) && options.gi_sky == hundredths);
+        }
+        for (const auto text : {"4.01", "5", "-1", "1.", ".5", "1.234", "1e0", "", "nan", "0x1", "1,5", "1000"})
+        {
+            options = {};
+            const std::array<std::string_view, 6> sky{"--bake-gi", "a", "--gi-quality", "custom", "--gi-sky", text};
+            CHECK(!parse_options(sky, options, error));
+        }
+        options = {};
+        const std::array<std::string_view, 4> plain_sky{"--bake-gi", "a", "--gi-sky", "1"};
+        CHECK(!parse_options(plain_sky, options, error));
+        CHECK(error == "--gi-bounces, --gi-rays, --gi-sky, --gi-texel-samples, --gi-denoise, --gi-shadow-radius, "
+                       "--gi-shadow-rays, --gi-reflection-strata and --gi-reflection-samples require --gi-quality custom");
+
+        // Lots GQ1 and GE1: the ultra preset, the custom quality settings and the emission scale (any preset).
+        options = {};
+        const std::array<std::string_view, 26> tuned{
+            "--bake-gi",  "a",  "--gi-quality",       "custom", "--gi-bounces",          "4",
+            "--gi-texel-samples", "9", "--gi-denoise", "0",     "--gi-shadow-radius",    "64",
+            "--gi-shadow-rays", "1", "--gi-reflection-strata", "8", "--gi-reflection-samples", "1024",
+            "--gi-emissive", "2.5", "--gi-rays", "16", "--gi-sky", "0", "--gi-jobs", "2"};
+        CHECK(parse_options(tuned, options, error));
+        CHECK(options.gi_bounces == 4 && options.gi_texel_samples == 9 && options.gi_denoise == 0);
+        CHECK(options.gi_shadow_radius == 64 && options.gi_shadow_rays == 1 && options.gi_reflection_strata == 8);
+        CHECK(options.gi_reflection_samples == 1024 && options.gi_emissive == 250 && options.gi_sky == 0);
+        options = {};
+        const std::array<std::string_view, 2> untuned{"--bake-gi", "a"};
+        CHECK(parse_options(untuned, options, error) && options.gi_denoise == -1 && options.gi_emissive == -1);
+        CHECK(options.gi_texel_samples == 0 && options.gi_shadow_radius == 0 && options.gi_reflection_strata == 0);
+        for (const auto quality : {"preview", "final", "ultra"})
+        {
+            options = {};
+            const std::array<std::string_view, 6> emissive{"--bake-gi", "a", "--gi-quality", quality,
+                                                           "--gi-emissive", "1"};
+            CHECK(parse_options(emissive, options, error) && options.gi_emissive == 100 && options.gi_quality == quality);
+        }
+        for (const auto& [args, message] :
+             std::initializer_list<std::pair<std::vector<std::string_view>, std::string_view>>{
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-texel-samples", "3"},
+                  "--gi-texel-samples requires 1, 4, 9 or 16"},
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-texel-samples", "0"},
+                  "--gi-texel-samples requires 1, 4, 9 or 16"},
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-denoise", "5"},
+                  "--gi-denoise requires an integer from 0 to 4"},
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-shadow-radius", "0"},
+                  "--gi-shadow-radius requires an integer from 1 to 64"},
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-shadow-radius", "4", "--gi-shadow-rays", "65"},
+                  "--gi-shadow-rays requires an integer from 1 to 64"},
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-shadow-rays", "4"},
+                  "--gi-shadow-rays requires --gi-shadow-radius"},
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-reflection-strata", "1"},
+                  "--gi-reflection-strata requires an integer from 2 to 8"},
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-reflection-samples", "31"},
+                  "--gi-reflection-samples requires an integer from 32 to 1024"},
+                 {{"--bake-gi", "a", "--gi-quality", "custom", "--gi-reflection-samples", "1x"},
+                  "--gi-reflection-samples requires an integer from 32 to 1024"},
+                 {{"--bake-gi", "a", "--gi-emissive", "4.5"},
+                  "--gi-emissive requires a number from 0 to 4 with at most two decimals"},
+                 {{"--bake-gi", "a", "--gi-quality", "ultra", "--gi-denoise", "1"},
+                  "--gi-bounces, --gi-rays, --gi-sky, --gi-texel-samples, --gi-denoise, --gi-shadow-radius, "
+                  "--gi-shadow-rays, --gi-reflection-strata and --gi-reflection-samples require --gi-quality custom"},
+                 {{"--gi-emissive", "1"},
+                  "--gi-quality, its settings, --gi-emissive, --gi-direct and --gi-if-stale require --bake-gi"},
+                 {{"--gi-texel-samples", "4"},
+                  "--gi-quality, its settings, --gi-emissive, --gi-direct and --gi-if-stale require --bake-gi"}})
+        {
+            options = {};
+            CHECK(!parse_options(args, options, error) && error == message);
+        }
+        options = {};
+        const std::array<std::string_view, 12> preview{"--gi-preview", "07_Cathedral", "--gi-preview-dir", "shots",
+                                                       "--gi-k",       "3",            "--gi-f",           "0.5",
+                                                       "--gi-out",     "bakes",        "--gi-jobs",        "3"};
+        CHECK(parse_options(preview, options, error));
+        CHECK(options.gi_preview == "07_Cathedral" && path_text(options.gi_preview_dir) == "shots");
+        CHECK(options.gi_k == 3 && options.gi_f == .5f && options.gi_composition);
+        CHECK(path_text(options.gi_out) == "bakes" && options.gi_jobs == 3 && options.bake_gi.empty());
+        options = {};
+        const std::array<std::string_view, 2> preview_defaults{"--gi-preview", "07_Cathedral"};
+        CHECK(parse_options(preview_defaults, options, error));
+        CHECK(options.gi_k == gi_default_k && options.gi_f == gi_default_f && gi_default_k == 2 && gi_default_f == 1);
+        CHECK(!options.gi_composition && options.gi_preview_dir.empty());
+        // GI lot GD1: --gi-direct-audit with --gi-jobs and --gi-preview-dir; JSON owns standard output.
+        options = {};
+        const std::array<std::string_view, 6> direct{"--gi-direct-audit", "single", "--gi-jobs", "4",
+                                                     "--gi-preview-dir",  "panels"};
+        CHECK(parse_options(direct, options, error));
+        CHECK(options.gi_direct_audit == "single" && options.gi_jobs == 4 && options.log_level == "error");
+        CHECK(path_text(options.gi_preview_dir) == "panels" && options.gi_preview.empty());
+        for (const auto& args : std::initializer_list<std::vector<std::string_view>>{
+                 {"--gi-direct-audit"},
+                 {"--gi-direct-audit", "a", "--gi-out", "bakes"},
+                 {"--gi-direct-audit", "a", "--gi-k", "1"},
+                 {"--gi-direct-audit", "a", "--gi-preview", "a"},
+                 {"--gi-direct-audit", "a", "--list-worlds"},
+                 {"--gi-direct-audit", "a", "--world", "02_CityHub"}})
+        {
+            options = {};
+            CHECK(!parse_options(args, options, error));
+        }
+        for (const auto& args : std::initializer_list<std::vector<std::string_view>>{
+                 {"--gi-preview"},
+                 {"--gi-preview-dir", "shots"},
+                 {"--gi-k", "1"},
+                 {"--gi-f", "1"},
+                 {"--bake-gi", "a", "--gi-k", "1"},
+                 {"--gi-preview", "a", "--gi-k", "4.5"},
+                 {"--gi-preview", "a", "--gi-f", "-1"},
+                 {"--gi-preview", "a", "--gi-k", "nan"},
+                 {"--gi-preview", "a", "--gi-k", "1x"},
+                 {"--gi-preview", "a", "--gi-quality", "final"},
+                 {"--gi-preview", "a", "--gi-sky", "1"},
+                 {"--gi-preview", "a", "--bake-gi", "a"},
+                 {"--gi-preview", "a", "--list-worlds"},
+                 {"--gi-preview", "a", "--world", "02_CityHub"},
+                 {"--gi-view", "final"},
+                 {"--gi-preview", "a", "--gi-view", "final"},
+                 {"--gi", "--gi-view", "bright"},
+                 {"--gi", "--gi-view"},
+                 {"--gi-source", "probes"},
+                 {"--bench", "--gi", "--gi-source", "lattice"},
+                 {"--gi-probes", "1"},
+                 {"--bench", "--gi", "--gi-probes", "4.5"},
+                 {"--bench", "--gi", "--gi-probes", "-1"},
+                 {"--gi", "--bake-gi", "a"},
+                 {"--gi", "--gi-preview", "a"},
+                 {"--gi", "--list-worlds"},
+                 {"--gi", "--connect", "127.0.0.1"},
+                 {"--gi", "--gi-preview-dir", "shots"},
+                 {"--gi"},
+                 {"--gi", "--view-world"}})
+        {
+            options = {};
+            CHECK(!parse_options(args, options, error));
+        }
+        // Lot G8: --gi applies the baked GI to --bench and the direct paths, with --gi-k/--gi-f/--gi-view.
+        options = {};
+        const std::array<std::string_view, 9> runtime{"--bench", "--gi",     "--gi-k",   "3",       "--gi-f",
+                                                      ".5",      "--gi-view", "indirect", "--frames"};
+        CHECK(!parse_options(runtime, options, error)); // --frames needs its value.
+        options = {};
+        CHECK(parse_options(std::span(runtime).first(8), options, error));
+        CHECK(options.gi && options.bench && options.gi_k == 3 && options.gi_f == .5f && options.gi_view == 3);
+        options = {};
+        const std::array<std::string_view, 2> plain{"--bench", "--gi"};
+        CHECK(parse_options(plain, options, error) && options.gi && options.gi_view == 0 && options.gi_k == 2);
+        options = {};
+        CHECK(parse_options(std::array<std::string_view, 2>{"--gpu-smoke", "--gi"}, options, error) && options.gi);
+        options = {};
+        CHECK(!parse_options(std::array<std::string_view, 2>{"--gi-k", "1"}, options, error));
+        CHECK(error ==
+              "--gi-k and --gi-f require --gi-preview or --gi; --gi-view, --gi-source and --gi-probes require --gi");
+        // Lot G9: the world source and the probe intensity on models (0 turns them off).
+        options = {};
+        CHECK(parse_options(std::array<std::string_view, 6>{"--bench", "--gi", "--gi-source", "probes", "--gi-probes",
+                                                            "2.5"},
+                            options, error));
+        CHECK(options.gi_source == 1 && options.gi_source_given && options.gi_probes == 2.5f && options.gi_probes_given);
+        options = {};
+        CHECK(parse_options(std::array<std::string_view, 6>{"--bench", "--gi", "--gi-source", "texels", "--gi-probes",
+                                                            "0"},
+                            options, error));
+        CHECK(options.gi_source == 0 && options.gi_source_given && options.gi_probes == 0);
+        options = {};
+        CHECK(parse_options(plain, options, error) && options.gi_source == 0 && options.gi_probes == 1 &&
+              !options.gi_source_given && !options.gi_probes_given && options.gi_reflections == 0 &&
+              !options.gi_reflections_given);
+        // Lot G12: reflection probes in --bench and smoke runs, with or without --gi (GI off draws the
+        // Original set).
+        for (const auto [text, mode] :
+             std::initializer_list<std::pair<std::string_view, int>>{{"off", 0}, {"low", 1}, {"high", 2}})
+        {
+            options = {};
+            CHECK(parse_options(std::array<std::string_view, 4>{"--bench", "--gi", "--gi-reflections", text}, options,
+                                error));
+            CHECK(options.gi_reflections == mode && options.gi_reflections_given);
+            options = {};
+            CHECK(parse_options(std::array<std::string_view, 3>{"--gpu-smoke", "--gi-reflections", text}, options,
+                                error) &&
+                  options.gi_reflections == mode && !options.gi);
+        }
+        for (const auto& args : std::initializer_list<std::vector<std::string_view>>{
+                 {"--bench", "--gi-reflections", "HIGH"},
+                 {"--bench", "--gi-reflections", "2"},
+                 {"--bench", "--gi-reflections"}})
+        {
+            options = {};
+            CHECK(!parse_options(args, options, error));
+        }
+        options = {};
+        CHECK(!parse_options(std::array<std::string_view, 3>{"--bench", "--gi-reflections", "medium"}, options, error) &&
+              error == "--gi-reflections requires off, low or high");
+        for (const auto& args : std::initializer_list<std::vector<std::string_view>>{
+                 {"--gi-reflections", "high"},
+                 {"--view-world", "--gi-reflections", "low"},
+                 {"--bake-gi", "a", "--gi-reflections", "low"},
+                 {"--connect", "127.0.0.1", "--gi-reflections", "low"}})
+        {
+            options = {};
+            CHECK(!parse_options(args, options, error) &&
+                  error.rfind("--gi-reflections applies reflection probes to --bench and smoke runs", 0) == 0);
+        }
+        for (const auto [text, view] : std::initializer_list<std::pair<std::string_view, int>>{
+                 {"final", 0}, {"original", 1}, {"direct", 2}, {"indirect", 3}, {"lighting", 4}, {"validity", 5}})
+        {
+            options = {};
+            CHECK(parse_options(std::array<std::string_view, 4>{"--bench", "--gi", "--gi-view", text}, options, error));
+            CHECK(options.gi_view == view && options.gi_view_given);
+        }
+
+        options = {};
+        options.config_file = root / "config.ini";
+        options.explicit_config = true;
+        CHECK(write(options.config_file, "data_dir = data\ngi_placement_dir = placements\ngi_dir = bakes\n"));
+        CHECK(load_config(options, "", config, error));
+        CHECK(config.gi_placement_dir == root / "placements" && config.gi_dir == root / "bakes");
+        options.gi_placement_dir = root / "from-command-line";
+        CHECK(load_config(options, "", config, error) && config.gi_placement_dir == options.gi_placement_dir);
+        options.gi_placement_dir.clear();
+        CHECK(write(options.config_file, "data_dir = data\n"));
+        CHECK(load_config(options, "", config, error) && config.gi_placement_dir.empty());
+        for (const auto text : {"data_dir = data\ngi_placement_dir =\n",
+                                "data_dir = data\ngi_placement_dir = a\ngi_placement_dir = b\n"})
+        {
+            CHECK(write(options.config_file, text));
+            CHECK(!load_config(options, "", config, error));
+        }
+        return true;
+    }
+
 } // namespace
 
 int main(int argc, char** argv)
@@ -302,6 +665,8 @@ int main(int argc, char** argv)
         test = demo;
     else if (name == "nightmares")
         test = nightmares;
+    else if (name == "gi")
+        test = gi;
     if (!test)
         return 2;
     std::error_code ec;

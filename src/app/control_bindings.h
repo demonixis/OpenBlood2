@@ -208,9 +208,11 @@ namespace OpenBlood2
         return rows;
     }
 
-    // controls.cfg beside preferences.cfg: "version=2" (reads version 1 too) then one "bind=<action> <source> <code>"
-    // line per rebindable binding. Loading starts from the defaults, replaces every rebindable
-    // action with the file's lines (an absent action is unassigned) and changes nothing on error.
+    // controls.cfg beside preferences.cfg: "version=3" (reads versions 1 and 2 too) then one
+    // "bind=<action> <source> <code>" line per rebindable binding. Loading starts from the defaults,
+    // replaces every rebindable action with the file's lines (an absent action is unassigned) and
+    // changes nothing on error. Version 3 reserves F8 (GI tools): a version 1/2 F8 key line is
+    // dropped and described in `dropped`; in version 3 it is refused like any reserved key.
     inline constexpr std::array<const char*, 6> control_source_names{"key",   "mouse", "button",
                                                                      "wheel", "axis+", "axis-"};
     inline bool controls_path(std::filesystem::path& output, std::string& error)
@@ -220,9 +222,13 @@ namespace OpenBlood2
         output /= "controls.cfg";
         return true;
     }
-    inline bool load_controls(const std::filesystem::path& path, InputBindings& output, std::string& error)
+    inline bool load_controls(const std::filesystem::path& path, InputBindings& output, std::string& error,
+                              std::vector<std::string>* dropped = nullptr)
     {
         error.clear();
+        if (dropped)
+            dropped->clear();
+        std::vector<std::string> migrated;
         std::error_code ec;
         const bool exists = std::filesystem::exists(path, ec);
         if (ec)
@@ -254,7 +260,7 @@ namespace OpenBlood2
                 line.pop_back();
             if (line.empty() || line.front() == '#')
                 continue;
-            if ((line == "version=1" || line == "version=2") && !version)
+            if ((line == "version=1" || line == "version=2" || line == "version=3") && !version)
             {
                 version = line.back() - '0';
                 continue;
@@ -265,7 +271,7 @@ namespace OpenBlood2
                 return false;
             };
             if (!version || !line.starts_with("bind="))
-                return fail("expected version=1/2 then bind lines");
+                return fail("expected version=1/2/3 then bind lines");
             const std::string_view rest = std::string_view(line).substr(5);
             const auto a = rest.find(' '), b = a == rest.npos ? rest.npos : rest.find(' ', a + 1);
             if (b == rest.npos)
@@ -282,6 +288,11 @@ namespace OpenBlood2
                 kind == control_source_names.size() || parsed.ec != std::errc{} ||
                 parsed.ptr != number.data() + number.size())
                 return fail("unknown action, source or code");
+            if (version < 3 && InputSource(kind) == InputSource::Key && code == SDL_SCANCODE_F8)
+            {
+                migrated.push_back(std::string(name) + " key F8");
+                continue;
+            }
             if (!result.add(InputSource(kind), code, InputAction(action)))
                 return fail("refused binding");
         }
@@ -300,12 +311,14 @@ namespace OpenBlood2
                                          }))
             result.add(InputSource::Key, SDL_SCANCODE_C, InputAction::ThirdPerson);
         output = std::move(result);
+        if (dropped)
+            *dropped = std::move(migrated);
         return true;
     }
     inline bool save_controls(const std::filesystem::path& path, const InputBindings& bindings, std::string& error)
     {
         error.clear();
-        std::string text = "version=2\n";
+        std::string text = "version=3\n";
         for (const auto& b : bindings.entries)
             if (rebindable(b.action))
                 text += std::string("bind=") + std::string(info(b.action).name) + ' ' +

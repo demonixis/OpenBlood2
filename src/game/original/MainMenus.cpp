@@ -158,6 +158,8 @@ namespace OpenBlood2
                 for (int id = 22; id <= 26; ++id)
                     items.push_back({0, -1, true, {}, id, {}});
                 items.push_back({0, -1, true, {}, 30, {}});
+                items.push_back({0, -1, true, {}, 31, {}});
+                items.push_back({0, -1, true, {}, 32, {}});
                 break;
             case MenuPage::Vr:
                 // Replacement rows, labelled like the Display page's replacement rows.
@@ -670,6 +672,12 @@ namespace OpenBlood2
                     field_of_view_min + (index + (direction < 0 ? count - 1 : 1)) % count * field_of_view_step;
                 break;
             }
+            case 31:
+                settings.global_illumination = !settings.global_illumination;
+                break;
+            case 32:
+                settings.reflection_probes = (std::clamp(settings.reflection_probes, 0, 2) + (direction < 0 ? 2 : 1)) % 3;
+                break;
             case 28:
                 settings.vr_render_scale = 50 + (settings.vr_render_scale - 50 + (direction < 0 ? 50 : 10)) % 60;
                 break;

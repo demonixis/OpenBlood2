@@ -72,7 +72,8 @@ The mapping is many-to-many:
 
 - It refuses unknown or out-of-range codes and out-of-range actions.
 - It refuses F1, F2, F3 and F10, which stay inspector/diagnostic shortcuts handled
-  before bindings.
+  before bindings, and F8, the GI tools overlay ([GI contracts](gi_contracts.md#f8-overlay-lot-g3)),
+  reserved in every build like F10.
 - It refuses entries beyond 256.
 - A duplicate is accepted and kept once.
 
@@ -268,7 +269,7 @@ The original `CMenuControls` page is ported over the action layer; see the
   then the control is bound. So each device keeps one control per action, as in the original.
   A control may still serve a menu action: Enter bound to Jump stays the menu accept key.
 - **Not bound.** Any Menu source (Esc, Start) cancels the tracking. Tab (original), F5/F6
-  (quick save/load) and the reserved F1/F2/F3 are ignored and tracking continues; F10 toggles the
+  (quick save/load) and the reserved F1/F2/F3/F8 are ignored and tracking continues; F10 toggles the
   inspector, which ends tracking like every ownership change. Key repeats and touch-emulated
   clicks never bind.
 - **Unassigning.** Delete (original) or Backspace (the Mac delete key) removes every control of
@@ -287,7 +288,7 @@ The bindings persist in `controls.cfg`, beside `preferences.cfg` under
 `SDL_GetPrefPath("OpenBlood2", "Blood2")`, and replace the original console `rangebind` lines:
 
 ```
-version=2
+version=3
 bind=jump key 44
 bind=fire_primary mouse 1
 ```
@@ -303,6 +304,11 @@ bind=fire_primary mouse 1
   that action only if no saved action already uses C and no third-person binding
   is present. Version 2 can leave Third Person unassigned. Other absent rows stay
   unassigned; the nine original additional controls retain their unbound defaults.
+- Version 3 reserves F8 for the GI tools overlay. A version 1 or 2 `key 65` (F8) line is
+  dropped, the rest of the file loads, and the frontend logs each dropped binding
+  ("Controls: dropped jump key F8 …"); the action keeps its other controls or becomes
+  unassigned on the keyboard. In version 3 an F8 line is refused like any reserved key. Saves
+  always write version 3.
 - The frontend writes the file atomically whenever the bindings change. Smoke runs never read
   or write it. A missing file means the defaults.
 - The `--view-world` frontend and the demo use the same bindings; the headless diagnostic loop in

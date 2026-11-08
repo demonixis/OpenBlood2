@@ -9,6 +9,7 @@
 namespace OpenBlood2
 {
     class Objects;
+    struct GiWorldLight;
     // Albedo modulated by the baked per-vertex light (color); authored transparent faces
     // use decoded DTX alpha.
     struct WorldVertex
@@ -67,6 +68,22 @@ namespace OpenBlood2
     };
     // Sets the range's local bounds from its emitted vertices.
     void bound_range(std::span<const WorldVertex> vertices, WorldRange&);
+    // What lights an emitted triangle, by the mesh's own rule (GI bake, gi_contracts.md lot G7).
+    enum class WorldFaceLight : std::uint8_t
+    {
+        Lightmap,   // Its stored lightmap page.
+        Vertex,     // Its baked vertex colours.
+        Bright,     // Fully bright: SURF_BRIGHT, or a textured face without baked colours.
+        Untextured, // No resolved material (the unresolved marker or a diagnostic colour).
+        Sky         // A sky portal.
+    };
+    // The DAT polygon an emitted triangle comes from: triangle k is vertices 3k..3k+2.
+    struct WorldTriangleSource
+    {
+        std::uint32_t model = 0, polygon = 0;
+        std::array<std::uint16_t, 3> corners{}; // Indices into the polygon's points (0, i, i + 1).
+        WorldFaceLight light = WorldFaceLight::Untextured;
+    };
     struct WorldMesh
     {
         std::vector<WorldVertex> vertices;
@@ -84,10 +101,17 @@ namespace OpenBlood2
         // Faces drawn with their stored lightmap, lightmap atlas pages (materials named
         // "lightmap page N"), packed texels and axes whose origin no candidate fitted.
         std::size_t lightmapped = 0, lightmap_pages = 0, lightmap_texels = 0, lightmap_unfitted = 0;
+        // Baked GI composed into this mesh (lot G8): lightmapped polygons and their texels, vertex-lit
+        // (or DETAIL LOW) polygons and their corners, and materials drawn white (Lighting only).
+        std::size_t gi_blocks = 0, gi_texels = 0, gi_sets = 0, gi_corners = 0, gi_white_materials = 0;
         static constexpr std::uint32_t lightmap_page_size = 1024;
         // lightmaps=false is the original "LightMap 0" (low detail): lightmapped faces keep their
-        // baked vertex light.
-        bool build(const World&, std::string&, const Resources* = nullptr, bool lightmaps = true);
+        // baked vertex light. `sources`, when given, receives one entry per emitted triangle; the
+        // mesh itself does not depend on it. `gi`, when given, composes the polygons its sections list
+        // (gi_contracts.md lot G8): page texels and vertex colours change, nothing else does; without it
+        // the mesh is the original one byte for byte.
+        bool build(const World&, std::string&, const Resources* = nullptr, bool lightmaps = true,
+                   std::vector<WorldTriangleSource>* sources = nullptr, const GiWorldLight* gi = nullptr);
     };
     bool world_material_frame(const WorldMesh&, std::uint32_t material, double time, std::uint32_t& image);
     struct WorldDraw

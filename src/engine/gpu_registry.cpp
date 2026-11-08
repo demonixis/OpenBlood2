@@ -116,6 +116,24 @@ namespace OpenBlood2
         }
         return add_texture(texture, false, 0, {});
     }
+    bool GpuRegistry::stage_texture(TextureHandle handle, Uint32 layer, Uint32 level, Uint32 width, Uint32 height,
+                                    const void* data, std::size_t bytes, std::string& error)
+    {
+        // Copy offsets are multiples of 16, so any texel size up to 16 bytes is aligned (Vulkan and Metal
+        // require a multiple of the texel size).
+        const std::size_t offset = (staging_.size() + 15) & ~std::size_t(15);
+        if (!get(handle) || !width || !height || !bytes || bytes % (std::size_t(width) * height) ||
+            offset + bytes > staging_limit)
+        {
+            error = "Invalid or oversized texture upload";
+            return false;
+        }
+        const auto* begin = static_cast<const std::uint8_t*>(data);
+        staging_.resize(offset);
+        staging_.insert(staging_.end(), begin, begin + bytes);
+        texture_copies_.push_back({handle, offset, level, width, height, layer});
+        return true;
+    }
     bool GpuRegistry::textures(std::span<const WorldMaterial> materials, std::vector<TextureHandle>& out,
                                std::string& error)
     {
@@ -486,6 +504,7 @@ namespace OpenBlood2
                 SDL_GPUTextureRegion target{};
                 target.texture = texture;
                 target.mip_level = copy.level;
+                target.layer = copy.layer;
                 target.w = copy.width;
                 target.h = copy.height;
                 target.d = 1;

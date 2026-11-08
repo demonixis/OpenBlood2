@@ -24,6 +24,7 @@ namespace OpenBlood2
     }
     ScenePresenter::~ScenePresenter()
     {
+        release_reflections();
         registry.release(depth_);
         registry.release(shadow_atlas_);
         registry.release(shadow_depth_);
@@ -322,6 +323,124 @@ namespace OpenBlood2
         surface_stats.grid_build_ns = SDL_GetTicksNS() - started;
         return true;
     }
+    void ScenePresenter::release_reflections()
+    {
+        registry.release(surface_scene_.reflections);
+        registry.release(surface_scene_.probes);
+        registry.release(surface_scene_.probe_cells);
+        reflection_gpu_ = {};
+        reflections_ready_ = false;
+        built_reflections_ = {};
+    }
+    bool ScenePresenter::prepare_reflections(std::string& error)
+    {
+        const bool enhanced = shading != SurfaceShading::Original;
+        const bool composed = built_gi_.applied;
+        auto& stats = reflection_stats_;
+        stats.mode = gi_reflections;
+        stats.detail.clear();
+        const bool wanted = enhanced && gi_reflections != GiReflectionMode::Off;
+        const bool probes = wanted && gi_light_ && gi_light_->has_reflections;
+        if (wanted && !probes)
+            stats.detail = !gi_light_ ? "No Ready GI file for this world"
+                                      : "The world's GI file has no reflection probes (baked before lot G11)";
+        // The GI variant reads the page alpha of a composed mesh and the probes; without either, the
+        // enhanced shaders stay the G8 ones and nothing is allocated.
+        surface_scene_.gi = enhanced && (composed || probes);
+        stats.gi_variant = surface_scene_.gi;
+        if (!surface_scene_.gi)
+        {
+            if (reflections_ready_)
+                release_reflections();
+            stats.active = false;
+            return true;
+        }
+        ReflectionBuild build;
+        build.active = probes;
+        if (probes)
+        {
+            build.load = gi_status_.loads;
+            build.mode = gi_reflections;
+            build.set = composed && gi_light_->composition.view != GiView::Original ? GiReflectionSet::Composed
+                                                                                   : GiReflectionSet::Original;
+        }
+        if (!reflections_ready_ || !(build == built_reflections_))
+        {
+            const auto started = SDL_GetTicksNS();
+            GiReflectionGpu data;
+            if (!probes)
+                data = gi_reflection_placeholder();
+            else if (!gi_reflection_gpu(gi_light_->reflections, gi_light_->reflection_probes, build.set, build.mode,
+                                        data, error))
+                return false;
+            gi_reflection_header(data, gi_reflection_view);
+            release_reflections();
+            SDL_GPUTextureCreateInfo info{};
+            info.type = SDL_GPU_TEXTURETYPE_2D_ARRAY;
+            info.format = SDL_GPU_TEXTUREFORMAT_R16G16B16A16_FLOAT;
+            info.usage = SDL_GPU_TEXTUREUSAGE_SAMPLER;
+            info.width = info.height = data.size;
+            info.layer_count_or_depth = std::max<std::uint32_t>(1, data.layers);
+            info.num_levels = data.levels;
+            info.sample_count = SDL_GPU_SAMPLECOUNT_1;
+            surface_scene_.reflections = registry.create_texture(info, error);
+            if (!surface_scene_.reflections)
+                return false;
+            for (std::uint32_t layer = 0; layer < info.layer_count_or_depth; ++layer)
+                for (std::uint32_t level = 0; level < data.levels; ++level)
+                {
+                    const std::uint32_t s = std::max<std::uint32_t>(1, data.size >> level);
+                    if (!registry.stage_texture(surface_scene_.reflections, layer, level, s, s,
+                                                data.texels.data() + data.level_offset(layer, level) * 4,
+                                                std::size_t(s) * s * 8, error))
+                        return false;
+                }
+            const auto record_bytes = static_cast<Uint32>(data.records.size() * 16);
+            const auto cell_bytes = static_cast<Uint32>(data.cells.size() * 4);
+            if (!registry.reserve(surface_scene_.probes, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, record_bytes,
+                                  error) ||
+                !registry.reserve(surface_scene_.probe_cells, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, cell_bytes,
+                                  error) ||
+                !registry.stage(surface_scene_.probes, data.records.data()->data(), record_bytes, true, error) ||
+                !registry.stage(surface_scene_.probe_cells, data.cells.data(), cell_bytes, true, error))
+                return false;
+            surface_scene_.reflection_sampler = registry.sprite_sampler(error); // Trilinear, clamped.
+            if (!surface_scene_.reflection_sampler)
+                return false;
+            reflection_gpu_ = std::move(data);
+            built_reflections_ = build;
+            reflections_ready_ = true;
+            applied_reflection_view_ = gi_reflection_view;
+            ++stats.builds;
+            stats.build_ms = double(SDL_GetTicksNS() - started) / 1e6;
+            const auto& g = reflection_gpu_;
+            stats.set = g.set;
+            stats.layers = g.layers;
+            stats.size = g.size;
+            stats.levels = g.levels;
+            stats.dropped = g.dropped;
+            stats.cells = g.dimensions;
+            stats.occupied = g.occupied;
+            stats.overflow = g.overflow;
+            stats.lists = g.lists;
+            stats.cell_size = g.cell_size;
+            stats.texture_bytes = g.texture_bytes();
+            stats.buffer_bytes = g.buffer_bytes();
+        }
+        else if (!(applied_reflection_view_ == gi_reflection_view))
+        {
+            // The whole buffer: a cycled upload leaves the rest of a new backing buffer undefined.
+            gi_reflection_header(reflection_gpu_, gi_reflection_view);
+            if (!registry.stage(surface_scene_.probes, reflection_gpu_.records.data()->data(),
+                                static_cast<Uint32>(reflection_gpu_.records.size() * 16), true, error))
+                return false;
+            applied_reflection_view_ = gi_reflection_view;
+        }
+        stats.active = probes && reflection_gpu_.layers > 0;
+        if (probes && !reflection_gpu_.layers)
+            stats.detail = "Every reflection probe of the file is invalid";
+        return true;
+    }
     bool ScenePresenter::update(const ClientScene& source, std::string& error)
     {
         error.clear();
@@ -347,8 +466,42 @@ namespace OpenBlood2
                 ballistic_vertices.push_back({{a.x, a.y, a.z}, {tracer_color.x, .8f * tracer_color.y, 0, .1f}});
                 ballistic_vertices.push_back({{b.x, b.y, b.z}, {tracer_color.x, 0, 0, .9f}});
             }
-        rebuilt = client_world_epoch_ != replica.frame().world || mesh_revision != source.world_revision ||
-                  built_lightmaps_ != lightmaps;
+        tracer_vertices_ = ballistic_vertices.size();
+        const bool world_changed =
+            client_world_epoch_ != replica.frame().world || mesh_revision != source.world_revision;
+        // Baked GI (lot G8): one lookup per world while enabled, never while off; reflection probes (lot
+        // G12) read the same file. Network clients read their own content and roots; the dedicated server
+        // has no presenter.
+        if (!global_illumination && gi_reflections == GiReflectionMode::Off)
+        {
+            gi_light_.reset();
+            gi_looked_up_ = false;
+            if (gi_status_.state != GiRuntimeState::Off)
+            {
+                const auto loads = gi_status_.loads;
+                gi_status_ = {};
+                gi_status_.loads = loads;
+            }
+        }
+        else if (world_changed || !gi_looked_up_ || gi_reload_seen_ != gi_reload)
+        {
+            load_gi_world_light(source.resources, source.geometry, source.world_path, gi_roots, gi_light_, gi_status_);
+            gi_looked_up_ = true;
+            gi_reload_seen_ = gi_reload;
+        }
+        gi_status_.lighting = global_illumination;
+        GiBuild gi_build;
+        if (gi_light_ && global_illumination)
+        {
+            auto composition = valid_gi_composition(gi_composition) ? gi_composition : GiComposition{};
+            if (composition.source == GiWorldSource::Probes &&
+                (!gi_light_->has_probes || !gi_light_->prepare_probe_source(source.geometry, error)))
+                composition.source = GiWorldSource::Texels; // No probes: the texels, as F8 reports.
+            error.clear();
+            gi_light_->composition = composition;
+            gi_build = {true, gi_status_.loads, composition};
+        }
+        rebuilt = world_changed || built_lightmaps_ != lightmaps || built_gi_ != gi_build;
         const auto model_revision = model_scene.revision, effect_revision = explosion_model_scene.revision,
                    sprite_revision = sprite_scene.revision, sky_sprite_revision = sky_sprite_scene.revision;
         if (rebuilt)
@@ -370,9 +523,14 @@ namespace OpenBlood2
             world_mesh = {};
             world_draws.clear();
             model_lighting.clear();
-            if (!source.world_path.empty() && !world_mesh.build(source.geometry, error, &source.resources, lightmaps))
+            const auto build_started = SDL_GetTicksNS();
+            if (!source.world_path.empty() &&
+                !world_mesh.build(source.geometry, error, &source.resources, lightmaps, nullptr,
+                                  gi_build.applied ? &*gi_light_ : nullptr))
                 return fail("World mesh");
+            mesh_build_ms = double(SDL_GetTicksNS() - build_started) / 1e6;
             built_lightmaps_ = lightmaps;
+            built_gi_ = gi_build;
             if (!model_lighting.build(world_mesh, source.geometry, error))
                 return fail("Model lighting");
             mesh_revision = source.world_revision;
@@ -382,6 +540,8 @@ namespace OpenBlood2
         }
         if (!prepare_surface(source, error))
             return fail("Enhanced renderer");
+        if (!prepare_reflections(error))
+            return fail("Reflection probes");
         render_world = source.in_world && !world_mesh.ranges.empty();
         const auto started = SDL_GetTicksNS();
         if (!OpenBlood2::world_draws(world_mesh, replica, world_draws, world_renderer.stats, error))
@@ -422,6 +582,14 @@ namespace OpenBlood2
         const auto world_done = SDL_GetTicksNS();
         if (!update_model_scene(source, model_scene, error, weapon_cameras ? &*weapon_cameras : nullptr))
             return fail("Model presentation");
+        // Light probes on models (lot G9): the applied file's field unless switched off or viewing the
+        // original or direct light.
+        model_lighting.probes = {};
+        if (global_illumination && gi_light_ && gi_light_->has_probes && gi_probes.models && gi_probes.intensity > 0 &&
+            gi_probes.intensity <= gi_max_intensity && gi_light_->composition.view != GiView::Original &&
+            gi_light_->composition.view != GiView::Direct)
+            model_lighting.probes = {&gi_light_->probes, gi_light_->composition.k, gi_light_->composition.f,
+                                     gi_probes.intensity};
         if (!model_lighting.apply(replica, source.view.position, source.night_goggles, world_mesh, world_draws,
                                   model_scene, error))
             return fail("Model lighting");
@@ -459,8 +627,10 @@ namespace OpenBlood2
              {&world_renderer.stats, &model_renderer.stats, &explosion_model_renderer.stats, &polygrid_renderer.stats,
               &sprite_renderer.stats, &sky_sprite_renderer.stats, &hand_renderer.stats})
             renderer->draw_calls = renderer->culled = 0;
-        if (!pipelines.prepare(format, shading, aux, reflections, samples, error))
+        if (!pipelines.prepare(format, shading, aux, reflections, surface_scene_.gi, samples, error))
             return fail("World pipelines");
+        ballistic_vertices.resize(tracer_vertices_); // Tool gizmos follow the tracers of this update.
+        ballistic_vertices.insert(ballistic_vertices.end(), tool_lines.begin(), tool_lines.end());
         if (!ballistic_vertices.empty() &&
             (!ballistic_lines.prepare(format, SDL_GPU_TEXTUREFORMAT_D32_FLOAT, error, samples,
                                       reflections ? 5
@@ -861,7 +1031,8 @@ namespace OpenBlood2
         const auto started = SDL_GetTicksNS();
         hand_renderer.stats.draw_calls = hand_renderer.stats.culled = 0;
         stats.passes = 0;
-        if (!pipelines.prepare(format, shading, error))
+        // The set record_eyes prepared (no auxiliary targets, single-sampled), so nothing is recreated.
+        if (!pipelines.prepare(format, shading, false, false, surface_scene_.gi, SDL_GPU_SAMPLECOUNT_1, error))
             return fail("World pipelines");
         if (draw_hands && !hand_renderer.prepare(hand_scene, format, width, height, error))
             return fail("Hand viewport");

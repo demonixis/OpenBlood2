@@ -28,7 +28,10 @@ namespace OpenBlood2
             return value;
         }
 
-        bool read_config(const fs::path& path, fs::path& data_dir, std::string& error)
+        // Keys: data_dir, gi_dir (GI bake directory, gi_contracts.md lot G2) and gi_placement_dir
+        // (GI placement files, lot G4), each at most once.
+        bool read_config(const fs::path& path, fs::path& data_dir, fs::path& gi_dir, fs::path& gi_placement_dir,
+                         std::string& error)
         {
             std::error_code ec;
             const auto bytes = fs::file_size(path, ec);
@@ -43,7 +46,7 @@ namespace OpenBlood2
                 error = "Cannot open configuration: " + path_text(path);
                 return false;
             }
-            bool seen_data = false;
+            bool seen_data = false, seen_gi = false, seen_placement = false;
             std::string line;
             unsigned line_number = 0;
             while (std::getline(file, line))
@@ -53,7 +56,11 @@ namespace OpenBlood2
                 if (text.empty() || text.front() == '#')
                     continue;
                 const auto equals = text.find('=');
-                if (equals == std::string_view::npos || trim(text.substr(0, equals)) != "data_dir" || seen_data)
+                const auto key = equals == std::string_view::npos ? std::string_view{} : trim(text.substr(0, equals));
+                const bool is_data = key == "data_dir", is_gi = key == "gi_dir",
+                           is_placement = key == "gi_placement_dir";
+                if ((!is_data && !is_gi && !is_placement) || (is_data && seen_data) || (is_gi && seen_gi) ||
+                    (is_placement && seen_placement))
                 {
                     error = "Unknown, malformed or duplicate configuration key at line " + std::to_string(line_number);
                     return false;
@@ -65,11 +72,11 @@ namespace OpenBlood2
                 }
                 if (value.empty() || value.find('"') != std::string_view::npos)
                 {
-                    error = "Invalid data_dir at line " + std::to_string(line_number);
+                    error = "Invalid " + std::string(key) + " at line " + std::to_string(line_number);
                     return false;
                 }
-                data_dir = path_from_utf8(value);
-                seen_data = true;
+                (is_data ? data_dir : is_gi ? gi_dir : gi_placement_dir) = path_from_utf8(value);
+                (is_data ? seen_data : is_gi ? seen_gi : seen_placement) = true;
             }
             if (file.bad())
             {
@@ -96,7 +103,8 @@ namespace OpenBlood2
     {
         options = {};
         error.clear();
-        bool explicit_world = false, explicit_network_port = false, explicit_match = false, explicit_team = false;
+        bool explicit_world = false, explicit_log_level = false, explicit_network_port = false, explicit_match = false,
+             explicit_team = false;
         for (std::size_t i = 0; i < args.size(); ++i)
         {
             const auto arg = args[i];
@@ -204,6 +212,16 @@ namespace OpenBlood2
                 options.start_game = true;
             else if (arg == "--check-data")
                 options.check_data = true;
+            else if (arg == "--list-worlds")
+                options.list_worlds = true;
+            else if (arg == "--json")
+                options.json = true;
+            else if (arg == "--gi-reset")
+                options.gi_reset = true;
+            else if (arg == "--gi-dry-run")
+                options.gi_dry_run = true;
+            else if (arg == "--gi-if-stale")
+                options.gi_if_stale = true;
             else if (arg == "--no-inspector")
                 options.inspector = false;
             else if (arg == "--no-crash-capture")
@@ -218,6 +236,8 @@ namespace OpenBlood2
                 options.gpu_smoke = true;
             else if (arg == "--bench")
                 options.bench = true;
+            else if (arg == "--gi")
+                options.gi = true;
             else if (arg == "--no-model-shadows")
                 options.model_shadows = false;
             else if (arg == "--pixel-lighting")
@@ -301,8 +321,16 @@ namespace OpenBlood2
                 options.bench_width = w;
                 options.bench_height = h;
             }
-            else if (arg == "--data-dir" || arg == "--config" || arg == "--frames" || arg == "--capture" ||
-                     arg == "--world" || arg == "--log-dir" || arg == "--log-level" || arg == "--rez" ||
+            else if (arg == "--data-dir" || arg == "--gi-dir" || arg == "--gi-verify" || arg == "--config" ||
+                     arg == "--gi-place" || arg == "--gi-placement-dir" || arg == "--bake-gi" ||
+                     arg == "--gi-quality" || arg == "--gi-bounces" || arg == "--gi-rays" || arg == "--gi-jobs" ||
+                     arg == "--gi-out" || arg == "--gi-sky" || arg == "--gi-preview" || arg == "--gi-preview-dir" ||
+                     arg == "--gi-direct-audit" || arg == "--gi-direct" || arg == "--gi-texel-samples" ||
+                     arg == "--gi-denoise" || arg == "--gi-shadow-radius" || arg == "--gi-shadow-rays" ||
+                     arg == "--gi-reflection-strata" || arg == "--gi-reflection-samples" || arg == "--gi-emissive" ||
+                     arg == "--gi-k" || arg == "--gi-f" || arg == "--gi-view" || arg == "--gi-source" ||
+                     arg == "--gi-probes" || arg == "--gi-reflections" || arg == "--frames" || arg == "--capture" || arg == "--world" || arg == "--log-dir" ||
+                     arg == "--log-level" || arg == "--rez" ||
                      arg == "--connect" || arg == "--host" || arg == "--port" || arg == "--name" || arg == "--end" ||
                      arg == "--frag-limit" || arg == "--time-limit" || arg == "--map" || arg == "--mode" ||
                      arg == "--team" || arg == "--friendly-fire" || arg == "--negative-team-frags" ||
@@ -388,9 +416,180 @@ namespace OpenBlood2
                         return false;
                     }
                     options.log_level = args[i];
+                    explicit_log_level = true;
                 }
                 else if (arg == "--data-dir")
                     options.data_dir = path_from_utf8(args[i]);
+                else if (arg == "--gi-dir")
+                    options.gi_dir = path_from_utf8(args[i]);
+                else if (arg == "--gi-verify")
+                    options.gi_verify = path_from_utf8(args[i]);
+                else if (arg == "--gi-place")
+                    options.gi_place = args[i];
+                else if (arg == "--gi-placement-dir")
+                    options.gi_placement_dir = path_from_utf8(args[i]);
+                else if (arg == "--bake-gi")
+                    options.bake_gi = args[i];
+                else if (arg == "--gi-out")
+                    options.gi_out = path_from_utf8(args[i]);
+                else if (arg == "--gi-quality")
+                {
+                    if (args[i] != "preview" && args[i] != "final" && args[i] != "ultra" && args[i] != "custom")
+                    {
+                        error = "--gi-quality requires preview, final, ultra or custom";
+                        return false;
+                    }
+                    options.gi_quality = args[i];
+                }
+                else if (arg == "--gi-preview")
+                    options.gi_preview = args[i];
+                else if (arg == "--gi-preview-dir")
+                    options.gi_preview_dir = path_from_utf8(args[i]);
+                else if (arg == "--gi-direct")
+                {
+                    if (args[i] != "original" && args[i] != "rebaked")
+                    {
+                        error = "--gi-direct requires original or rebaked";
+                        return false;
+                    }
+                    options.gi_direct = args[i];
+                }
+                else if (arg == "--gi-direct-audit")
+                    options.gi_direct_audit = args[i];
+                else if (arg == "--gi-view")
+                {
+                    // GiView order (engine/gi_runtime.h).
+                    constexpr std::array<std::string_view, 6> views{"final",    "original", "direct",
+                                                                    "indirect", "lighting", "validity"};
+                    const auto it = std::find(views.begin(), views.end(), args[i]);
+                    if (it == views.end())
+                    {
+                        error = "--gi-view requires final, original, direct, indirect, lighting or validity";
+                        return false;
+                    }
+                    options.gi_view = int(it - views.begin());
+                    options.gi_view_given = true;
+                }
+                else if (arg == "--gi-reflections")
+                {
+                    constexpr std::array<std::string_view, 3> modes{"off", "low", "high"};
+                    const auto it = std::find(modes.begin(), modes.end(), args[i]);
+                    if (it == modes.end())
+                    {
+                        error = "--gi-reflections requires off, low or high";
+                        return false;
+                    }
+                    options.gi_reflections = int(it - modes.begin()); // GiReflectionMode order.
+                    options.gi_reflections_given = true;
+                }
+                else if (arg == "--gi-source")
+                {
+                    if (args[i] != "texels" && args[i] != "probes")
+                    {
+                        error = "--gi-source requires texels or probes";
+                        return false;
+                    }
+                    options.gi_source = args[i] == "probes" ? 1 : 0; // GiWorldSource order.
+                    options.gi_source_given = true;
+                }
+                else if (arg == "--gi-k" || arg == "--gi-f" || arg == "--gi-probes")
+                {
+                    const auto value = args[i];
+                    float number = 0;
+                    const auto result = std::from_chars(value.data(), value.data() + value.size(), number);
+                    if (result.ec != std::errc{} || result.ptr != value.data() + value.size() || !(number >= 0) ||
+                        number > 4)
+                    {
+                        error = std::string(arg) + " requires a number from 0 to 4";
+                        return false;
+                    }
+                    if (arg == "--gi-probes")
+                    {
+                        options.gi_probes = number;
+                        options.gi_probes_given = true;
+                    }
+                    else
+                    {
+                        (arg == "--gi-k" ? options.gi_k : options.gi_f) = number;
+                        options.gi_composition = true;
+                    }
+                }
+                else if (arg == "--gi-sky" || arg == "--gi-emissive")
+                {
+                    // A decimal from 0 to 4 with at most two places, kept exactly in hundredths.
+                    const std::string_view value = args[i];
+                    const auto dot = value.find('.');
+                    const auto whole = value.substr(0, dot);
+                    const auto fraction = dot == std::string_view::npos ? std::string_view{} : value.substr(dot + 1);
+                    auto digits = [](std::string_view text)
+                    { return std::all_of(text.begin(), text.end(), [](char c) { return c >= '0' && c <= '9'; }); };
+                    const bool shaped = !whole.empty() && whole.size() <= 3 && digits(whole) && digits(fraction) &&
+                                        (dot == std::string_view::npos || (!fraction.empty() && fraction.size() <= 2));
+                    int hundredths = -1;
+                    if (shaped)
+                    {
+                        hundredths = 0;
+                        for (const char c : whole)
+                            hundredths = hundredths * 10 + (c - '0');
+                        hundredths *= 100;
+                        if (!fraction.empty())
+                            hundredths += (fraction[0] - '0') * 10 + (fraction.size() > 1 ? fraction[1] - '0' : 0);
+                    }
+                    if (hundredths < 0 || hundredths > 400)
+                    {
+                        error = std::string(arg) + " requires a number from 0 to 4 with at most two decimals";
+                        return false;
+                    }
+                    (arg == "--gi-sky" ? options.gi_sky : options.gi_emissive) = hundredths;
+                }
+                else if (arg == "--gi-bounces" || arg == "--gi-rays" || arg == "--gi-jobs")
+                {
+                    const auto value = args[i];
+                    std::uint32_t number = 0;
+                    const auto result = std::from_chars(value.data(), value.data() + value.size(), number);
+                    const bool bounces = arg == "--gi-bounces", rays = arg == "--gi-rays";
+                    const std::uint32_t low = bounces ? 1 : rays ? 16 : 1, high = bounces ? 4 : rays ? 4096 : 256;
+                    if (result.ec != std::errc{} || result.ptr != value.data() + value.size() || number < low ||
+                        number > high)
+                    {
+                        error = std::string(arg) + " requires an integer from " + std::to_string(low) + " to " +
+                                std::to_string(high);
+                        return false;
+                    }
+                    (bounces ? options.gi_bounces : rays ? options.gi_rays : options.gi_jobs) = number;
+                }
+                else if (arg == "--gi-texel-samples" || arg == "--gi-denoise" || arg == "--gi-shadow-radius" ||
+                         arg == "--gi-shadow-rays" || arg == "--gi-reflection-strata" ||
+                         arg == "--gi-reflection-samples")
+                {
+                    // Lot GQ1 integers.
+                    const auto value = args[i];
+                    std::uint32_t number = 0;
+                    const auto result = std::from_chars(value.data(), value.data() + value.size(), number);
+                    const bool texel = arg == "--gi-texel-samples", denoise = arg == "--gi-denoise",
+                               strata = arg == "--gi-reflection-strata", samples = arg == "--gi-reflection-samples";
+                    const std::uint32_t low = denoise ? 0 : strata ? 2 : samples ? 32 : 1,
+                                        high = texel ? 16 : denoise ? 4 : strata ? 8 : samples ? 1024 : 64;
+                    const bool square = !texel || number == 1 || number == 4 || number == 9 || number == 16;
+                    if (result.ec != std::errc{} || result.ptr != value.data() + value.size() || number < low ||
+                        number > high || !square)
+                    {
+                        error = texel ? std::string("--gi-texel-samples requires 1, 4, 9 or 16")
+                                      : std::string(arg) + " requires an integer from " + std::to_string(low) + " to " +
+                                            std::to_string(high);
+                        return false;
+                    }
+                    if (texel)
+                        options.gi_texel_samples = number;
+                    else if (denoise)
+                        options.gi_denoise = std::int32_t(number);
+                    else if (strata)
+                        options.gi_reflection_strata = number;
+                    else if (samples)
+                        options.gi_reflection_samples = number;
+                    else
+                        (arg == "--gi-shadow-radius" ? options.gi_shadow_radius : options.gi_shadow_rays) = number;
+                }
                 else if (arg == "--capture")
                     options.capture_file = path_from_utf8(args[i]);
                 else if (arg == "--config")
@@ -417,6 +616,92 @@ namespace OpenBlood2
             }
         }
         const bool network = !options.host_world.empty() || !options.connect_address.empty();
+        const bool gi_place = !options.gi_place.empty();
+        const bool bake_gi = !options.bake_gi.empty();
+        const bool gi_preview = !options.gi_preview.empty();
+        const bool gi_direct = !options.gi_direct_audit.empty();
+        const bool gi_tool =
+            options.list_worlds || !options.gi_verify.empty() || gi_place || bake_gi || gi_preview || gi_direct;
+        const bool gi_tuned = options.gi_bounces || options.gi_rays || options.gi_sky >= 0 || options.gi_texel_samples ||
+                              options.gi_denoise >= 0 || options.gi_shadow_radius || options.gi_shadow_rays ||
+                              options.gi_reflection_strata || options.gi_reflection_samples;
+        if ((!options.gi_quality.empty() || gi_tuned || options.gi_emissive >= 0 || options.gi_if_stale ||
+             !options.gi_direct.empty()) &&
+            !bake_gi)
+        {
+            error = "--gi-quality, its settings, --gi-emissive, --gi-direct and --gi-if-stale require --bake-gi";
+            return false;
+        }
+        if ((options.gi_jobs && !bake_gi && !gi_preview && !gi_direct) ||
+            (!options.gi_out.empty() && !bake_gi && !gi_preview))
+        {
+            error = "--gi-jobs requires --bake-gi, --gi-preview or --gi-direct-audit; --gi-out requires --bake-gi "
+                    "or --gi-preview";
+            return false;
+        }
+        if (!options.gi_preview_dir.empty() && !gi_preview && !gi_direct)
+        {
+            error = "--gi-preview-dir requires --gi-preview or --gi-direct-audit";
+            return false;
+        }
+        if ((options.gi_composition && !gi_preview && !options.gi) ||
+            ((options.gi_view_given || options.gi_source_given || options.gi_probes_given) && !options.gi))
+        {
+            error = "--gi-k and --gi-f require --gi-preview or --gi; --gi-view, --gi-source and --gi-probes "
+                    "require --gi";
+            return false;
+        }
+        if (options.gi_reflections_given &&
+            (gi_tool || network || (!options.bench && !options.gpu_smoke && !options.world_smoke)))
+        {
+            error = "--gi-reflections applies reflection probes to --bench and smoke runs; the game uses Options > "
+                    "Display REFLECTION PROBES and the F8 Runtime panel";
+            return false;
+        }
+        if (options.gi && (gi_tool || network || (!options.bench && !options.gpu_smoke && !options.world_smoke)))
+        {
+            error = "--gi applies baked GI to --bench and smoke runs; the game uses Options > Display GLOBAL "
+                    "ILLUMINATION and the F8 Runtime panel";
+            return false;
+        }
+        if (gi_tuned && options.gi_quality != "custom")
+        {
+            error = "--gi-bounces, --gi-rays, --gi-sky, --gi-texel-samples, --gi-denoise, --gi-shadow-radius, "
+                    "--gi-shadow-rays, --gi-reflection-strata and --gi-reflection-samples require --gi-quality custom";
+            return false;
+        }
+        if (options.gi_shadow_rays && !options.gi_shadow_radius)
+        {
+            error = "--gi-shadow-rays requires --gi-shadow-radius";
+            return false;
+        }
+        if (options.json && !options.list_worlds && !gi_place)
+        {
+            error = "--json requires --list-worlds or --gi-place";
+            return false;
+        }
+        if ((options.gi_reset || options.gi_dry_run) && !gi_place)
+        {
+            error = "--gi-reset and --gi-dry-run require --gi-place";
+            return false;
+        }
+        if (gi_tool &&
+            (int(options.list_worlds) + int(!options.gi_verify.empty()) + int(gi_place) + int(bake_gi) +
+                     int(gi_preview) + int(gi_direct) >
+                 1 ||
+             network ||
+             explicit_world || options.check_data ||
+             options.inspect_world || options.start_game || options.bench || options.view_world ||
+             options.menu_smoke || options.demo_smoke || options.gpu_smoke || options.world_smoke ||
+             options.xr_world || options.xr_test || options.frame_limit || !options.capture_file.empty()))
+        {
+            error = "--list-worlds, --gi-verify, --gi-place, --bake-gi, --gi-preview and --gi-direct-audit are "
+                    "separate headless tools";
+            return false;
+        }
+        // JSON owns standard output: only errors reach the console unless a level is chosen.
+        if ((options.json || gi_direct) && !explicit_log_level)
+            options.log_level = "error";
         if ((explicit_match && options.host_world.empty()) || (explicit_team && !network) ||
             (!options.host_world.empty() && !options.connect_address.empty()) || (explicit_network_port && !network) ||
             (network && (explicit_world || options.demo || options.nightmares || !options.overlays.empty() ||
@@ -546,12 +831,16 @@ namespace OpenBlood2
         }
         if (exists)
         {
-            if (!read_config(options.config_file, config.data_dir, error))
+            if (!read_config(options.config_file, config.data_dir, config.gi_dir, config.gi_placement_dir, error))
                 return false;
             if (!config.data_dir.empty() && config.data_dir.is_relative())
             {
                 config.data_dir = options.config_file.parent_path() / config.data_dir;
             }
+            if (!config.gi_dir.empty() && config.gi_dir.is_relative())
+                config.gi_dir = options.config_file.parent_path() / config.gi_dir;
+            if (!config.gi_placement_dir.empty() && config.gi_placement_dir.is_relative())
+                config.gi_placement_dir = options.config_file.parent_path() / config.gi_placement_dir;
             config.source = path_text(options.config_file);
         }
         if (!environment_data_dir.empty())
@@ -564,6 +853,10 @@ namespace OpenBlood2
             config.data_dir = options.data_dir;
             config.source = "--data-dir";
         }
+        if (!options.gi_dir.empty())
+            config.gi_dir = options.gi_dir;
+        if (!options.gi_placement_dir.empty())
+            config.gi_placement_dir = options.gi_placement_dir;
         if (config.data_dir.empty())
         {
             if (unconfigured)

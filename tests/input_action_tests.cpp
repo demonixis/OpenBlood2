@@ -111,7 +111,8 @@ namespace
         InputBindings b;
         CHECK(!b.add(InputSource::Key, SDL_SCANCODE_UNKNOWN, InputAction::Jump));
         CHECK(!b.add(InputSource::Key, SDL_SCANCODE_COUNT, InputAction::Jump));
-        for (const auto reserved : {SDL_SCANCODE_F1, SDL_SCANCODE_F2, SDL_SCANCODE_F3, SDL_SCANCODE_F10})
+        for (const auto reserved :
+             {SDL_SCANCODE_F1, SDL_SCANCODE_F2, SDL_SCANCODE_F3, SDL_SCANCODE_F8, SDL_SCANCODE_F10})
             CHECK(!b.add(InputSource::Key, reserved, InputAction::Jump));
         CHECK(!b.add(InputSource::MouseButton, 0, InputAction::FirePrimary));
         CHECK(!b.add(InputSource::MouseButton, SDL_BUTTON_X2 + 1, InputAction::FirePrimary));
@@ -801,6 +802,7 @@ namespace
         CHECK(assign_control(bindings, InputAction::Jump, InputSource::Key, SDL_SCANCODE_K));
         CHECK(!assign_control(bindings, InputAction::Menu, InputSource::Key, SDL_SCANCODE_K));   // Not rebindable.
         CHECK(!assign_control(bindings, InputAction::Jump, InputSource::Key, SDL_SCANCODE_F10)); // Reserved.
+        CHECK(!assign_control(bindings, InputAction::Jump, InputSource::Key, SDL_SCANCODE_F8));  // GI tools.
         m.close();
         input.reset(m, true);
         send(key(SDL_SCANCODE_K, true));
@@ -922,7 +924,7 @@ namespace
             std::ifstream in(path);
             std::string first;
             std::getline(in, first);
-            CHECK(first == "version=2");
+            CHECK(first == "version=3");
         }
         // Malformed files change nothing.
         const auto refused = [&](const std::string& text)
@@ -936,7 +938,8 @@ namespace
             return !ok && !error.empty() && result.entries == InputBindings::defaults().entries;
         };
         CHECK(refused("bind=jump key 44\n"));                               // No version.
-        CHECK(refused("version=3\nbind=jump key 44\n"));                    // Unknown version.
+        CHECK(refused("version=4\nbind=jump key 44\n"));                    // Unknown version.
+        CHECK(refused("version=3\nbind=jump key 65\n"));                    // F8 is reserved (GI tools).
         CHECK(refused("version=1\nbind=fly key 44\n"));                     // Unknown action.
         CHECK(refused("version=1\nbind=menu key 41\n"));                    // Not rebindable.
         CHECK(refused("version=1\nbind=jump keyboard 44\n"));               // Unknown source.
@@ -945,6 +948,26 @@ namespace
         CHECK(refused("version=1\nbind=jump mouse 9\n"));                   // Out of range.
         CHECK(refused("version=1\nbind=jump key\n"));                       // Missing field.
         CHECK(refused("version=1\n" + std::string(17 * 1024, '#') + "\n")); // Over 16 KiB.
+        // Controls v3: a version 1/2 F8 key line is dropped and reported; the rest loads.
+        for (const char* version : {"version=1\n", "version=2\n"})
+        {
+            {
+                std::ofstream out(path, std::ios::binary | std::ios::trunc);
+                out << version << "bind=jump key 65\nbind=jump key 44\nbind=use button 0\n";
+            }
+            auto migrated = InputBindings::defaults();
+            std::vector<std::string> dropped{"stale"};
+            CHECK(load_controls(path, migrated, error, &dropped));
+            CHECK(dropped == std::vector<std::string>{"jump key F8"});
+            CHECK(migrated.bound(InputSource::Key, SDL_SCANCODE_SPACE, InputAction::Jump));
+            CHECK(!migrated.bound(InputSource::Key, SDL_SCANCODE_F8, InputAction::Jump));
+            CHECK(migrated.bound(InputSource::GamepadButton, 0, InputAction::Use));
+        }
+        {
+            std::vector<std::string> dropped{"stale"};
+            CHECK(save_controls(path, bindings, error) && load_controls(path, loaded, error, &dropped));
+            CHECK(dropped.empty());
+        }
         // Legacy files acquire C without stealing a custom C binding.
         for (const bool occupied : {false, true})
         {

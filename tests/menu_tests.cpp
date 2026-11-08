@@ -28,6 +28,88 @@ using namespace OpenBlood2;
     } while (false)
 namespace
 {
+    // GI lot G3: the F8 overlay states in the normal and demo flows (gi_contracts.md).
+    bool gi_tools()
+    {
+        const char* error = ""; // Read by CHECK.
+        Menu menu;
+        MenuInput input;
+        input.controls.focused = true;
+        SDL_Event key{};
+        key.type = SDL_EVENT_KEY_DOWN;
+        key.key.windowID = 42;
+        auto press = [&](SDL_Scancode code, bool repeat = false)
+        {
+            key.key.scancode = code;
+            key.key.repeat = repeat;
+            return input.event(key, 42, menu, true, true, true, 640, 480);
+        };
+        // Unavailable (XR, mobile, builds without BLOOD2_GI_TOOLS): F8 does nothing.
+        CHECK(!press(SDL_SCANCODE_F8) && input.gi == GiOverlay::Closed);
+        input.gi_available = true;
+        input.reset(menu, true); // Player entry requests capture.
+        // Play, then F8 opens: input is blocked like the inspector and reaches ImGui.
+        press(SDL_SCANCODE_W);
+        CHECK(input.controls.sample(false).forward && input.controls.mouse_requested);
+        CHECK(!press(SDL_SCANCODE_F8) && input.gi == GiOverlay::Open && input.tools_open());
+        CHECK(!input.controls.sample(false).forward && !input.controls.mouse_requested);
+        CHECK(press(SDL_SCANCODE_F) && !input.controls.sample_fire(false).primary);
+        CHECK(press(SDL_SCANCODE_ESCAPE) && !menu.active); // The overlay owns Esc; no pause menu.
+        press(SDL_SCANCODE_F8, true);
+        CHECK(input.gi == GiOverlay::Open); // Repeats never toggle.
+        CHECK(!press(SDL_SCANCODE_F8) && input.gi == GiOverlay::Closed && input.controls.mouse_requested);
+        // Pin: leaving Open keeps the strip and markers while play continues; F8 reopens.
+        press(SDL_SCANCODE_F8);
+        input.gi_pin = true;
+        press(SDL_SCANCODE_F8);
+        CHECK(input.gi == GiOverlay::Pinned && !input.tools_open() && input.controls.mouse_requested);
+        CHECK(!press(SDL_SCANCODE_W) && input.controls.sample(false).forward);
+        press(SDL_SCANCODE_F8);
+        CHECK(input.gi == GiOverlay::Open);
+        // The inspector and the open overlay exclude each other.
+        CHECK(!press(SDL_SCANCODE_F10) && input.inspector && input.gi == GiOverlay::Pinned);
+        CHECK(!press(SDL_SCANCODE_F8) && !input.inspector && input.gi == GiOverlay::Open);
+        input.gi_pin = false;
+        input.close_gi();
+        CHECK(input.gi == GiOverlay::Closed);
+        // Text entry: the message editor and a focused ImGui field keep F8.
+        input.message.open();
+        CHECK(!press(SDL_SCANCODE_F8) && input.gi == GiOverlay::Closed && input.message.active);
+        input.message.cancel();
+        input.text_entry = true;
+        CHECK(!press(SDL_SCANCODE_F8) && input.gi == GiOverlay::Closed);
+        input.text_entry = false;
+        // Control capture keeps F8 too (reserved keys never bind).
+        menu.open(true);
+        menu.binding = 0;
+        press(SDL_SCANCODE_F8);
+        CHECK(input.gi == GiOverlay::Closed && menu.binding == 0);
+        menu.binding = -1;
+        menu.close();
+        input.reset(menu, true);
+
+        // The menu-free demo flow: same states; F10 hands over; a finished demo closes it.
+        MenuInput demo;
+        demo.demo_mode = true;
+        demo.gi_available = true;
+        demo.controls.focused = true;
+        demo.reset(menu, true);
+        auto demo_press = [&](SDL_Scancode code)
+        {
+            key.key.scancode = code;
+            key.key.repeat = false;
+            return demo.event(key, 42, menu, true, true, true, 640, 480);
+        };
+        CHECK(!demo_press(SDL_SCANCODE_F8) && demo.gi == GiOverlay::Open && !demo.controls.mouse_requested);
+        CHECK(demo_press(SDL_SCANCODE_ESCAPE) && !demo.demo.paused()); // No pause while open.
+        CHECK(!demo_press(SDL_SCANCODE_F10) && demo.inspector && demo.gi == GiOverlay::Closed);
+        CHECK(!demo_press(SDL_SCANCODE_F8) && !demo.inspector && demo.gi == GiOverlay::Open);
+        CHECK(!demo_press(SDL_SCANCODE_F8) && demo.gi == GiOverlay::Closed && demo.controls.mouse_requested);
+        demo.demo.state = DemoFlow::State::Finished;
+        CHECK(!demo_press(SDL_SCANCODE_F8) && demo.gi == GiOverlay::Closed);
+        return true;
+    }
+
     bool state()
     {
         std::string error;
@@ -129,7 +211,7 @@ namespace
         menu.build(MenuPage::Options);
         CHECK(menu.items[0].command == int(MENU_CMD_DISPLAY) && menu.enabled(menu.items[0]) && menu.selected == 0);
         menu.activate();
-        CHECK(menu.page == MenuPage::Display && menu.items.size() == 15 && menu.small());
+        CHECK(menu.page == MenuPage::Display && menu.items.size() == 17 && menu.small());
         CHECK(menu.items[0].setting == 6 && menu.items[0].string_id == IDS_MENU_DISPLAY_DETAIL_HIGH &&
               menu.items[1].setting == 8 && !menu.items[1].string_id && menu.items[2].setting == 7 &&
               !menu.items[2].string_id && menu.items[3].setting == 9 && !menu.enabled(menu.items[3]));
@@ -256,6 +338,34 @@ namespace
         CHECK(menu.settings.field_of_view == 60);
         menu.adjust(-1);
         CHECK(menu.settings.field_of_view == 120);
+        // GLOBAL ILLUMINATION (lot G8): off by default, toggles; both renderers.
+        menu.selected = 15;
+        CHECK(menu.items[15].setting == 31 && !menu.settings.global_illumination && menu.enabled(menu.items[15]));
+        menu.adjust(1);
+        CHECK(menu.settings.global_illumination);
+        menu.adjust(-1);
+        CHECK(!menu.settings.global_illumination);
+        // REFLECTION PROBES (lot G12): the platform default (Gate E: HIGH on desktop, LOW on mobile),
+        // cycles OFF/LOW/HIGH; the enhanced renderer only.
+        menu.selected = 16;
+        CHECK(menu.items[16].setting == 32 && menu.settings.reflection_probes == default_reflection_probes &&
+              !menu.enabled(menu.items[16]));
+        menu.settings.renderer = true;
+        CHECK(menu.enabled(menu.items[16]));
+        menu.settings.reflection_probes = 0;
+        menu.adjust(1);
+        CHECK(menu.settings.reflection_probes == 1);
+        menu.adjust(1);
+        CHECK(menu.settings.reflection_probes == 2);
+        menu.adjust(1);
+        CHECK(menu.settings.reflection_probes == 0);
+        menu.adjust(-1);
+        CHECK(menu.settings.reflection_probes == 2);
+        menu.adjust(-1);
+        menu.adjust(-1);
+        CHECK(menu.settings.reflection_probes == 0);
+        menu.settings.reflection_probes = default_reflection_probes;
+        menu.settings.renderer = false;
         menu.settings.field_of_view = 90;
         menu.vr = true;
         for (int i = 9; i < 15; ++i)
@@ -1244,6 +1354,8 @@ int main(int argc, char** argv)
         return test_menu_preferences(argc - 1, argv + 1);
     if (mode == "state")
         return state() ? 0 : 1;
+    if (mode == "gi_tools")
+        return gi_tools() ? 0 : 1;
     if (mode == "credits_text")
         return credits_text() ? 0 : 1;
     if (argc < 3)

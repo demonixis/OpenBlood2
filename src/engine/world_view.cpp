@@ -1,5 +1,7 @@
 #include "engine/world_view.h"
 #include "engine/collision.h"
+#include "engine/gi_runtime.h"
+#include "engine/gi_world.h"
 #include "engine/sprite.h"
 #include <algorithm>
 #include <charconv>
@@ -170,13 +172,18 @@ namespace OpenBlood2
         }
         range.bounded = physics_vector(range.min) && physics_vector(range.max);
     }
-    bool WorldMesh::build(const World& world, std::string& error, const Resources* resources, bool use_lightmaps)
+    bool WorldMesh::build(const World& world, std::string& error, const Resources* resources, bool use_lightmaps,
+                          std::vector<WorldTriangleSource>* sources, const GiWorldLight* gi)
     {
         *this = {};
         error.clear();
+        if (sources)
+            sources->clear();
         auto fail = [&](const char* why)
         {
             *this = {};
+            if (sources)
+                sources->clear();
             error = why;
             return false;
         };
@@ -191,7 +198,9 @@ namespace OpenBlood2
         // bilinear filtering never reads a neighbor.
         constexpr std::uint32_t page_size = lightmap_page_size;
         std::uint32_t page = 0, page_x = 0, page_y = 0, shelf = 0;
-        auto place_lightmap = [&](const WorldModel& model, const Polygon& polygon, std::uint32_t& x0, std::uint32_t& y0)
+        // gi_block: the polygon's LMAP record, or -1 (the stored texels, unchanged).
+        auto place_lightmap = [&](const WorldModel& model, const Polygon& polygon, std::int64_t gi_block,
+                                  std::uint32_t& x0, std::uint32_t& y0)
         {
             const std::uint32_t w = polygon.lightmap_width, h = polygon.lightmap_height;
             if (page && page_x + w + 2 > page_size)
@@ -230,8 +239,22 @@ namespace OpenBlood2
                     out[1] = static_cast<std::uint8_t>(g << 2 | g >> 4);
                     out[2] = static_cast<std::uint8_t>(b << 3 | b >> 2);
                     out[3] = 255;
+                    if (gi_block >= 0)
+                    {
+                        // Alpha: the share that is not GI indirect light (lot G12, read by the GI shader
+                        // variants only; 255 keeps the original pages' value).
+                        const auto composed =
+                            gi->compose(true, gi->block_first[std::size_t(gi_block)] + std::uint32_t(sy) * w + sx,
+                                        {out[0], out[1], out[2]}, &out[3]);
+                        out[0] = composed[0], out[1] = composed[1], out[2] = composed[2];
+                    }
                 }
             lightmap_texels += std::size_t(w) * h;
+            if (gi_block >= 0)
+            {
+                ++gi_blocks;
+                gi_texels += std::size_t(w) * h;
+            }
             return true;
         };
         auto add_image = [&](const std::string& key, std::uint32_t& id)
@@ -278,8 +301,10 @@ namespace OpenBlood2
             material_ids.emplace(key, id);
             return true;
         };
+        std::vector<std::uint32_t> pages; // Lightmap page materials (never drawn white).
         for (const auto& model : world.models)
         {
+            const auto model_index = static_cast<std::uint32_t>(ranges.size());
             if (model.polygons.size() > 65536 || model.points.size() > 65536 || !physics_vector(model.translation))
                 return fail("Diagnostic model exceeds geometry limits");
             if (model.surfaces.size() > 2000000)
@@ -314,12 +339,14 @@ namespace OpenBlood2
             {
                 WorldBatch batch;
                 std::vector<WorldVertex> vertices;
+                std::vector<WorldTriangleSource> sources; // Filled only when the caller asks.
             };
             std::vector<Group> groups, faces;
             std::map<std::tuple<std::uint32_t, bool, double, double, std::uint32_t>, std::size_t> group_ids;
             std::size_t pending = 0;
-            for (const auto& polygon : model.polygons)
+            for (std::size_t polygon_index = 0; polygon_index < model.polygons.size(); ++polygon_index)
             {
+                const auto& polygon = model.polygons[polygon_index];
                 const auto count = polygon.base_points == UINT16_MAX ? polygon.points.size() : polygon.base_points;
                 if (polygon.surface >= model.surfaces.size() || count < 3 || count > 512 ||
                     count > polygon.points.size())
@@ -434,33 +461,31 @@ namespace OpenBlood2
                 // geometry without baked colors stays unlit.
                 const bool bright = (surface.flags & (1u << 5)) != 0;
                 std::uint32_t lightmap = 0, atlas_x = 0, atlas_y = 0;
-                std::array<double, 2> lightmap_origin_value{};
+                LightmapFrame lightmap_layout; // Shared with the GI baker (gi_world.h).
                 if (use_lightmaps && material && !bright && model.lightmaps && (surface.flags & (1u << 7)) &&
                     polygon.lightmap_width && polygon.lightmap_height)
                 {
-                    if (std::size_t(polygon.lightmap_offset) +
-                            std::size_t(polygon.lightmap_width) * polygon.lightmap_height >
-                        model.lightmap_texels.size())
+                    if (!lightmap_frame(model, polygon, count, lightmap_layout))
                         return fail("Invalid world lightmap reference");
-                    const std::array<DVector, 2> axes{surface.lightmap_p, surface.lightmap_q};
-                    const std::array<unsigned, 2> texels{polygon.lightmap_width, polygon.lightmap_height};
-                    for (int k = 0; k < 2; ++k)
-                    {
-                        double lo = std::numeric_limits<double>::max(), hi = -lo;
-                        for (std::size_t i = 0; i < count; ++i)
-                        {
-                            const double d = vector_dot(axes[k], model.points[polygon.points[i]]);
-                            lo = std::min(lo, d);
-                            hi = std::max(hi, d);
-                        }
-                        lightmap_unfitted += !lightmap_origin(lo, hi, texels[k], lightmap_origin_value[k]);
-                    }
-                    if (!place_lightmap(model, polygon, atlas_x, atlas_y))
+                    lightmap_unfitted += lightmap_layout.unfitted;
+                    const auto gi_block = gi ? gi->block(model_index, std::uint32_t(polygon_index)) : -1;
+                    if (!place_lightmap(model, polygon, gi_block, atlas_x, atlas_y))
                         return fail("World lightmap page budget exceeded");
                     lightmap = page;
+                    if (pages.empty() || pages.back() != page)
+                        pages.push_back(page);
                     ++lightmapped;
                 }
                 const bool baked = material && !bright && !lightmap && polygon.colors.size() == polygon.points.size();
+                // The polygon's VTX record (vertex-lit, or lightmapped at DETAIL LOW), or -1.
+                std::int64_t gi_set = baked && gi ? gi->set(model_index, std::uint32_t(polygon_index)) : -1;
+                if (gi_set >= 0 && gi->vertex.sets[std::size_t(gi_set)].corners != count)
+                    gi_set = -1; // check_gi_vertex_light guarantees the ring; never index past it.
+                if (gi_set >= 0)
+                {
+                    ++gi_sets;
+                    gi_corners += count;
+                }
                 if (material && !lightmap)
                     ++(baked ? lit : fullbright);
                 if (material && !lightmap && !baked)
@@ -487,6 +512,11 @@ namespace OpenBlood2
                             center,
                             vector_scale(vector_subtract(model.points[polygon.points[i]], range.pivot), 1.f / count));
                 const bool sky_portal = (surface.flags & (1u << 4)) != 0;
+                const auto light = sky_portal  ? WorldFaceLight::Sky
+                                   : lightmap ? WorldFaceLight::Lightmap
+                                   : baked    ? WorldFaceLight::Vertex
+                                   : material ? WorldFaceLight::Bright
+                                              : WorldFaceLight::Untextured;
                 Group* group = nullptr;
                 const auto a = model.points[polygon.points[0]];
                 for (std::size_t i = 1; i + 1 < count; ++i)
@@ -500,7 +530,7 @@ namespace OpenBlood2
                     }
                     if (!group && translucent)
                     {
-                        faces.push_back({{0, 0, material, true, center, uv_rate, sky_portal, lightmap}, {}});
+                        faces.push_back({{0, 0, material, true, center, uv_rate, sky_portal, lightmap}, {}, {}});
                         group = &faces.back();
                         ++blended;
                     }
@@ -509,11 +539,17 @@ namespace OpenBlood2
                         const auto key = std::make_tuple(material, sky_portal, uv_rate[0], uv_rate[1], lightmap);
                         auto [found, added] = group_ids.emplace(key, groups.size());
                         if (added)
-                            groups.push_back({{0, 0, material, false, {}, uv_rate, sky_portal, lightmap}, {}});
+                            groups.push_back({{0, 0, material, false, {}, uv_rate, sky_portal, lightmap}, {}, {}});
                         group = &groups[found->second];
                     }
                     group->batch.count += 3;
                     pending += 3;
+                    if (sources)
+                        group->sources.push_back({static_cast<std::uint32_t>(ranges.size()),
+                                                  static_cast<std::uint32_t>(polygon_index),
+                                                  {std::uint16_t(0), static_cast<std::uint16_t>(i),
+                                                   static_cast<std::uint16_t>(i + 1)},
+                                                  light});
                     for (const std::size_t corner : {std::size_t(0), i, i + 1})
                     {
                         const auto p = model.points[polygon.points[corner]];
@@ -521,17 +557,19 @@ namespace OpenBlood2
                         vertex.normal = vector_scale(normal, 1 / length);
                         if (baked)
                         {
-                            const auto& rgb = polygon.colors[corner];
+                            auto rgb = polygon.colors[corner];
+                            if (gi_set >= 0)
+                                rgb = gi->compose(false, gi->set_first[std::size_t(gi_set)] + std::uint32_t(corner),
+                                                  rgb);
                             vertex.color = {rgb[0] / 255.f, rgb[1] / 255.f, rgb[2] / 255.f};
                         }
                         if (lightmap)
                         {
                             // Texel centers lie on the grid: texel coordinate = axis offset / 20 + .5,
                             // inside the bordered rectangle.
-                            const double s = (vector_dot(surface.lightmap_p, p) - lightmap_origin_value[0]) / 20 + .5;
-                            const double t = (vector_dot(surface.lightmap_q, p) - lightmap_origin_value[1]) / 20 + .5;
-                            vertex.lightmap = {float((atlas_x + 1 + s) / page_size),
-                                               float((atlas_y + 1 + t) / page_size)};
+                            const auto st = lightmap_layout.coordinate(p);
+                            vertex.lightmap = {float((atlas_x + 1 + st[0]) / page_size),
+                                               float((atlas_y + 1 + st[1]) / page_size)};
                             if (!std::isfinite(vertex.lightmap[0]) || !std::isfinite(vertex.lightmap[1]))
                                 return fail("World lightmap coordinates exceed limits");
                         }
@@ -554,6 +592,8 @@ namespace OpenBlood2
                 {
                     group.batch.first = static_cast<std::uint32_t>(vertices.size());
                     vertices.insert(vertices.end(), group.vertices.begin(), group.vertices.end());
+                    if (sources)
+                        sources->insert(sources->end(), group.sources.begin(), group.sources.end());
                     range.batches.push_back(group.batch);
                 }
             range.count = static_cast<std::uint32_t>(vertices.size()) - range.first;
@@ -561,6 +601,18 @@ namespace OpenBlood2
             ranges.push_back(std::move(range));
         }
         fullbright_faces.resize(materials.size());
+        // GI Lighting only: decoded textures drawn white, texture alpha (cutouts, chroma keys) kept.
+        if (gi && gi->composition.view == GiView::Lighting)
+            for (std::uint32_t i = 1; i < materials.size(); ++i)
+            {
+                auto& entry = materials[i];
+                if (std::binary_search(pages.begin(), pages.end(), i) || entry.image.rgba.empty())
+                    continue;
+                for (auto* pixels : {&entry.image.rgba, &entry.image.mip_rgba})
+                    for (std::size_t p = 0; p + 3 < pixels->size(); p += 4)
+                        (*pixels)[p] = (*pixels)[p + 1] = (*pixels)[p + 2] = 255;
+                ++gi_white_materials;
+            }
         return true;
     }
     bool world_alpha_order(const WorldMesh& mesh, std::span<const WorldDraw> draws, DVector eye, DRotation view,

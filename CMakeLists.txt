@@ -21,6 +21,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 
 option(BLOOD2_INSPECTOR "Build the in-game inspection UI" ON)
+# The F8 GI tools overlay (gi_contracts.md lot G3, Gate C): desktop builds with the inspector
+# (the debug and dev presets), never Release presets, iOS or Android (Quest included). It is forced
+# OFF elsewhere, existing caches included. The headless GI command line (gi_tool.cpp) stays in every
+# build. The dedicated server builds no client.
+include(CMakeDependentOption)
+cmake_dependent_option(BLOOD2_GI_TOOLS "Build the F8 GI tools overlay (desktop, with the inspector)" ON
+                       "BLOOD2_INSPECTOR;NOT IOS;NOT ANDROID" OFF)
 option(BLOOD2_XR "Build OpenXR support (SDL_GPU sessions; the Quest preset enables it)" OFF)
 option(BLOOD2_GPU_TESTS "Register tests that open a real GPU window" OFF)
 option(BLOOD2_SANITIZERS "Enable ASan/UBSan on project code (Clang/GCC)" OFF)
@@ -29,6 +36,7 @@ set(BLOOD2_DEMO_DATA_DIR "" CACHE PATH "Optional private 1998 Blood II demo dire
 
 include(cmake/ProjectOptions.cmake)
 include(cmake/Packaging.cmake)
+include(cmake/GiPackaging.cmake)
 include(CTest)
 include(cmake/Dependencies.cmake)
 execute_process(COMMAND git describe --always --dirty
@@ -187,7 +195,7 @@ target_sources(blood2_game PRIVATE src/game/original/Destructable.cpp src/game/o
     src/game/original/Debris.cpp src/game/original/radius_damage.cpp src/game/server_effects.cpp src/game/server_world_bodies.cpp)
 target_sources(blood2_game PRIVATE src/game/original/ProjectileSave.cpp src/game/original/PickupSave.cpp)
 if(BLOOD2_BUILD_CLIENT)
-    blood2_add_application(blood2_app src/app/model_lighting.cpp src/app/scene_presenter.cpp src/app/bench.cpp src/app/polygrid_scene.cpp src/app/hud.cpp src/app/ui_runtime.cpp src/app/path_manager_smoke.cpp src/app/ai_model_key_smoke.cpp src/app/character_motion_smoke.cpp src/app/main.cpp src/app/model_scene.cpp src/app/sprite_scene.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
+    blood2_add_application(blood2_app src/app/model_lighting.cpp src/app/scene_presenter.cpp src/app/bench.cpp src/app/gi_tool.cpp src/app/polygrid_scene.cpp src/app/hud.cpp src/app/ui_runtime.cpp src/app/path_manager_smoke.cpp src/app/ai_model_key_smoke.cpp src/app/character_motion_smoke.cpp src/app/main.cpp src/app/model_scene.cpp src/app/sprite_scene.cpp src/app/trigger_smoke.cpp src/app/interaction_smoke.cpp src/app/brush_smoke.cpp src/app/pickup_smoke.cpp src/app/objectives_smoke.cpp src/app/camera_smoke.cpp src/app/keyframe_smoke.cpp src/app/light_smoke.cpp src/app/cinematic_smoke.cpp src/app/random_sound_smoke.cpp src/app/world_sound_smoke.cpp src/app/sprite_smoke.cpp src/app/scene_explosion_smoke.cpp)
     target_sources(blood2_app PRIVATE src/app/menu_renderer.cpp src/app/frontend.cpp src/app/display_options.cpp src/app/network_frontend.cpp src/app/multiplayer_setup.cpp src/app/multiplayer_screen.cpp src/app/scoreboard.cpp)
     # The setup screen: installations, mods and the demo download through the platform HTTPS stack.
     include(cmake/ContentDependencies.cmake)
@@ -207,6 +215,10 @@ if(BLOOD2_BUILD_CLIENT)
     target_include_directories(blood2_app PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
     target_link_libraries(blood2_app PRIVATE blood2_frontend engine spdlog::spdlog imgui blood2_client_network blood2_server_runtime)
     target_compile_definitions(blood2_app PRIVATE BLOOD2_INSPECTOR=$<BOOL:${BLOOD2_INSPECTOR}>)
+    target_compile_definitions(blood2_app PRIVATE BLOOD2_GI_TOOLS=$<BOOL:${BLOOD2_GI_TOOLS}>)
+    if(BLOOD2_GI_TOOLS)
+        target_sources(blood2_app PRIVATE src/app/gi_overlay.cpp src/app/gi_bake_process.cpp)
+    endif()
     target_compile_definitions(blood2_app PRIVATE BLOOD2_XR=$<BOOL:${BLOOD2_XR}>)
     if(BLOOD2_XR)
         target_sources(blood2_app PRIVATE src/app/xr_scene.cpp src/app/xr_player.cpp
@@ -219,6 +231,7 @@ if(BLOOD2_BUILD_CLIENT)
 
     blood2_project_options(blood2_app)
     blood2_package_application(blood2_app)
+    blood2_package_gi(blood2_app)
 endif()
 blood2_project_options(blood2_game)
 

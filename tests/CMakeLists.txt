@@ -212,7 +212,7 @@ endforeach()
 add_executable(config_tests config_tests.cpp)
 target_link_libraries(config_tests PRIVATE engine)
 blood2_project_options(config_tests)
-foreach(case IN ITEMS arguments precedence relative_paths invalid_config content_validation case_lookup demo nightmares)
+foreach(case IN ITEMS arguments precedence relative_paths invalid_config content_validation case_lookup demo nightmares gi)
     add_test(NAME config.${case} COMMAND config_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/test-runs")
     set_tests_properties(config.${case} PROPERTIES LABELS "headless;config")
 endforeach()
@@ -947,6 +947,155 @@ endforeach()
 if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME world_lighting.retail COMMAND world_lighting_tests retail "${BLOOD2_TEST_DATA_DIR}")
     set_tests_properties(world_lighting.retail PROPERTIES LABELS "headless;private;world_lighting" TIMEOUT 120)
+endif()
+
+add_executable(gi_world_tests gi_world_tests.cpp)
+target_link_libraries(gi_world_tests PRIVATE blood2_game)
+blood2_project_options(gi_world_tests)
+foreach(case IN ITEMS frame contents roles ambient)
+    add_test(NAME gi_world.${case} COMMAND gi_world_tests "${case}")
+    set_tests_properties(gi_world.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 30)
+endforeach()
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME gi_world.retail COMMAND gi_world_tests retail "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(gi_world.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
+endif()
+
+add_executable(gi_file_tests gi_file_tests.cpp)
+target_link_libraries(gi_file_tests PRIVATE engine)
+blood2_project_options(gi_file_tests)
+foreach(case IN ITEMS roundtrip write_refusals read_refusals fuzz status naming search albedo)
+    add_test(NAME gi_file.${case} COMMAND gi_file_tests "${case}" "${CMAKE_CURRENT_BINARY_DIR}/gi-file-${case}")
+    set_tests_properties(gi_file.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 60)
+endforeach()
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME gi_file.retail COMMAND gi_file_tests retail "${BLOOD2_TEST_DATA_DIR}"
+                                         "${CMAKE_CURRENT_BINARY_DIR}/gi-file-retail")
+    set_tests_properties(gi_file.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
+endif()
+
+add_executable(gi_placement_tests gi_placement_tests.cpp)
+target_link_libraries(gi_placement_tests PRIVATE engine)
+blood2_project_options(gi_placement_tests)
+foreach(case IN ITEMS lattice world_models reflections json section)
+    add_test(NAME gi_placement.${case} COMMAND gi_placement_tests "${case}")
+    set_tests_properties(gi_placement.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 60)
+endforeach()
+add_test(NAME gi_placement.files COMMAND gi_placement_tests files "${CMAKE_CURRENT_BINARY_DIR}/gi-placement-files")
+set_tests_properties(gi_placement.files PROPERTIES LABELS "headless;gi" TIMEOUT 60)
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME gi_placement.retail COMMAND gi_placement_tests retail "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(gi_placement.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 1200)
+endif()
+
+add_executable(gi_bake_tests gi_bake_tests.cpp)
+target_link_libraries(gi_bake_tests PRIVATE engine)
+blood2_project_options(gi_bake_tests)
+if(NOT MSVC) # The brute-force reference repeats the tracer's arithmetic bit for bit.
+    set_property(SOURCE gi_bake_tests.cpp APPEND PROPERTY COMPILE_OPTIONS -ffp-contract=off)
+endif()
+foreach(case IN ITEMS bvh alpha albedo jobs settings determinism)
+    add_test(NAME gi_bake.${case} COMMAND gi_bake_tests "${case}")
+    set_tests_properties(gi_bake.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 60)
+endforeach()
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME gi_bake.retail COMMAND gi_bake_tests retail "${BLOOD2_TEST_DATA_DIR}"
+             "${PROJECT_SOURCE_DIR}/data/gi/placement" "${CMAKE_CURRENT_BINARY_DIR}/gi-bake-retail")
+    set_tests_properties(gi_bake.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
+    # Lot GD2: re-baked bakes against a scratch placement.
+    add_test(NAME gi_bake.retail_direct COMMAND gi_bake_tests retail-direct "${BLOOD2_TEST_DATA_DIR}"
+             "${CMAKE_CURRENT_BINARY_DIR}/gi-bake-retail-direct")
+    set_tests_properties(gi_bake.retail_direct PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
+endif()
+
+# Lot G7: the lightmap core. Like the tracer, its results must not depend on the build.
+add_executable(gi_lightmap_tests gi_lightmap_tests.cpp)
+target_link_libraries(gi_lightmap_tests PRIVATE engine)
+blood2_project_options(gi_lightmap_tests)
+if(NOT MSVC)
+    set_property(SOURCE gi_lightmap_tests.cpp APPEND PROPERTY COMPILE_OPTIONS -ffp-contract=off)
+endif()
+foreach(case IN ITEMS identity rgb9e5 sections directions placement furnace box planes leak dilation back
+                      determinism sky preview quality emission)
+    add_test(NAME gi_lightmap.${case} COMMAND gi_lightmap_tests "${case}"
+             "${CMAKE_CURRENT_BINARY_DIR}/gi-lightmap-${case}")
+    set_tests_properties(gi_lightmap.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 120)
+endforeach()
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME gi_lightmap.retail COMMAND gi_lightmap_tests retail "${BLOOD2_TEST_DATA_DIR}"
+             "${PROJECT_SOURCE_DIR}/data/gi/placement" "${CMAKE_CURRENT_BINARY_DIR}/gi-lightmap-retail")
+    set_tests_properties(gi_lightmap.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
+endif()
+# Lot G8: the world override (WorldMesh composition, views) and the runtime lookup.
+add_test(NAME gi_runtime.override COMMAND gi_lightmap_tests runtime "${CMAKE_CURRENT_BINARY_DIR}/gi-runtime-override")
+set_tests_properties(gi_runtime.override PROPERTIES LABELS "headless;gi" TIMEOUT 120)
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME gi_runtime.retail COMMAND gi_lightmap_tests runtime-retail "${BLOOD2_TEST_DATA_DIR}"
+             "${CMAKE_CURRENT_BINARY_DIR}/gi-runtime-retail")
+    set_tests_properties(gi_runtime.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
+endif()
+# Lots GD1-GD2: the re-baked direct light (term, light objects, shadows, audit, difference panel; the
+# D' source: identities, DIR, jobs, cancel, passes, runtime).
+foreach(case IN ITEMS term lights shadow bake)
+    add_test(NAME gi_direct.${case} COMMAND gi_lightmap_tests "direct-${case}"
+             "${CMAKE_CURRENT_BINARY_DIR}/gi-direct-${case}")
+    set_tests_properties(gi_direct.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 120)
+endforeach()
+if(BLOOD2_TEST_DATA_DIR)
+    add_test(NAME gi_direct.retail COMMAND gi_lightmap_tests direct-retail "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(gi_direct.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
+endif()
+# Lot G9: light probes (capture, PROB, the field, the model split, the world source).
+foreach(case IN ITEMS half sections basis capture field light source cost)
+    add_test(NAME gi_probes.${case} COMMAND gi_lightmap_tests "probe-${case}"
+             "${CMAKE_CURRENT_BINARY_DIR}/gi-probes-${case}")
+    set_tests_properties(gi_probes.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 120)
+endforeach()
+
+# Lot G11: reflection probes (octahedral map, the ported CyberEngine prefilter tests, REFL, capture);
+# lot G12: their GPU data, cell grid, CPU mirror of the shader and the file decode.
+foreach(case IN ITEMS octahedral prefilter sections capture runtime cells mirror world)
+    add_test(NAME gi_reflections.${case} COMMAND gi_lightmap_tests "reflection-${case}"
+             "${CMAKE_CURRENT_BINARY_DIR}/gi-reflections-${case}")
+    set_tests_properties(gi_reflections.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 120)
+endforeach()
+
+# Lot G6: baked GI files never enter the repository (decision D3), and the bake-all script
+# drives a stub binary (the stub is an executable script, hence Unix only).
+add_test(NAME gi_policy COMMAND "${CMAKE_COMMAND}" -DSOURCE=${PROJECT_SOURCE_DIR}
+         -P "${PROJECT_SOURCE_DIR}/cmake/CheckGiPolicy.cmake")
+set_tests_properties(gi_policy PROPERTIES LABELS "headless;gi" TIMEOUT 60
+                     SKIP_REGULAR_EXPRESSION "GI_POLICY skipped")
+find_package(Python3 COMPONENTS Interpreter QUIET)
+if(Python3_Interpreter_FOUND AND NOT WIN32)
+    add_test(NAME gi_bake_all COMMAND "${Python3_EXECUTABLE}" -I "${CMAKE_CURRENT_SOURCE_DIR}/gi_bake_all_test.py"
+             "${PROJECT_SOURCE_DIR}/tools/gi/bake_all.py" "${CMAKE_CURRENT_BINARY_DIR}/gi-bake-all")
+    set_tests_properties(gi_bake_all PROPERTIES LABELS "headless;gi" TIMEOUT 120)
+endif()
+
+if(BLOOD2_BUILD_CLIENT AND BLOOD2_GI_TOOLS)
+    add_executable(gi_overlay_tests gi_overlay_tests.cpp ../src/app/gi_overlay.cpp ../src/app/gi_bake_process.cpp)
+    target_link_libraries(gi_overlay_tests PRIVATE blood2_game imgui)
+    blood2_project_options(gi_overlay_tests)
+    foreach(case IN ITEMS cell draw)
+        add_test(NAME gi_overlay.${case} COMMAND gi_overlay_tests "${case}")
+        set_tests_properties(gi_overlay.${case} PROPERTIES LABELS "headless;gi" TIMEOUT 30)
+    endforeach()
+    # Lot G10: the F8 bake's child process; this executable is also the stub child and fake baker.
+    add_executable(gi_bake_process_tests gi_bake_process_tests.cpp ../src/app/gi_bake_process.cpp)
+    target_link_libraries(gi_bake_process_tests PRIVATE blood2_game)
+    blood2_project_options(gi_bake_process_tests)
+    add_test(NAME gi_bake_process.parse COMMAND gi_bake_process_tests parse)
+    add_test(NAME gi_bake_process.process COMMAND gi_bake_process_tests process
+             "${CMAKE_CURRENT_BINARY_DIR}/gi-bake-process")
+    set_tests_properties(gi_bake_process.parse gi_bake_process.process PROPERTIES LABELS "headless;gi" TIMEOUT 60)
+    if(BLOOD2_TEST_DATA_DIR)
+        # The F8 bake through the fake baker, then this build's blood2 (Preview bake and Final cancel).
+        add_test(NAME gi_overlay.retail COMMAND gi_overlay_tests retail "${BLOOD2_TEST_DATA_DIR}"
+                                                "${CMAKE_CURRENT_BINARY_DIR}/gi-overlay-retail"
+                                                $<TARGET_FILE:gi_bake_process_tests> $<TARGET_FILE:blood2_app>)
+        set_tests_properties(gi_overlay.retail PROPERTIES LABELS "headless;private;gi" TIMEOUT 600)
+    endif()
 endif()
 
 add_executable(world_view_tests world_view_tests.cpp)
@@ -2112,6 +2261,14 @@ if(BLOOD2_GPU_TESTS)
         add_test(NAME gpu.post COMMAND post_gpu_tests "${BLOOD2_TEST_DATA_DIR}")
         set_tests_properties(gpu.post PROPERTIES LABELS "gpu;private;surface" TIMEOUT 180 RUN_SERIAL TRUE
             ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+        # Lot G8: the GI world override leaves the frame intact unless a Ready nonzero file applies.
+        add_executable(gi_gpu_tests gi_gpu_tests.cpp ../src/app/scene_presenter.cpp
+            ../src/app/model_lighting.cpp ../src/app/model_scene.cpp ../src/app/polygrid_scene.cpp ../src/app/sprite_scene.cpp)
+        target_link_libraries(gi_gpu_tests PRIVATE blood2_game)
+        blood2_project_options(gi_gpu_tests)
+        add_test(NAME gpu.gi COMMAND gi_gpu_tests "${BLOOD2_TEST_DATA_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/gpu-gi")
+        set_tests_properties(gpu.gi PROPERTIES LABELS "gpu;private;gi" TIMEOUT 300 RUN_SERIAL TRUE
+            ENVIRONMENT "SDL_AUDIODRIVER=dummy")
         add_executable(save_native_gpu_tests save_native_gpu_tests.cpp ../src/app/scene_presenter.cpp
             ../src/app/model_lighting.cpp ../src/app/model_scene.cpp ../src/app/polygrid_scene.cpp ../src/app/sprite_scene.cpp)
         target_link_libraries(save_native_gpu_tests PRIVATE blood2_game)
@@ -2797,6 +2954,8 @@ target_link_libraries(menu_tests PRIVATE blood2_game imgui)
 blood2_project_options(menu_tests)
 add_test(NAME menus.state COMMAND menu_tests state)
 add_test(NAME menus.credits_text COMMAND menu_tests credits_text)
+add_test(NAME menus.gi_tools COMMAND menu_tests gi_tools)
+set_tests_properties(menus.gi_tools PROPERTIES LABELS "headless;menus;gi" TIMEOUT 10)
 set_tests_properties(menus.state PROPERTIES LABELS "headless;menus" TIMEOUT 10)
 set_tests_properties(menus.credits_text PROPERTIES LABELS "headless;menus" TIMEOUT 10)
 if(BLOOD2_TEST_DATA_DIR)

@@ -4,6 +4,9 @@
 #include "game/menu_resources.h"
 #include <array>
 #include <optional>
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#endif
 
 namespace OpenBlood2
 {
@@ -92,6 +95,11 @@ namespace OpenBlood2
         std::vector<int> refresh_rates{0};
         int current_refresh_rate = 0;
     };
+#if defined(__ANDROID__) || (defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE)
+    inline constexpr int default_reflection_probes = 1; // Gate E: LOW on mobile and Quest.
+#else
+    inline constexpr int default_reflection_probes = 2; // Gate E: HIGH on desktop.
+#endif
     struct MenuSettings
     {
         bool sound = true, music = true, invert_y = false;
@@ -128,6 +136,13 @@ namespace OpenBlood2
         int vr_refresh_rate = 0;                         // Millihertz; zero asks the runtime to choose.
         int vr_render_scale = 100;                       // Percentage of recommended eye dimensions (50..100, step 10).
         int field_of_view = 90; // Horizontal degrees at 4:3 (60..120, step 5); 90 is the original FOV_NORMAL.
+        // Replacement GLOBAL ILLUMINATION row (gi_contracts.md lot G8): baked GI composed into the world
+        // light of both renderers when the world has a current bake. Off by default (decision D11).
+        bool global_illumination = false;
+        // Replacement REFLECTION PROBES row (lot G12): 0 off, 1 low, 2 high (GiReflectionMode order). The
+        // enhanced renderer draws the current bake's reflection probes; HIGH on desktop, LOW on Android
+        // (Quest included) and iOS by default (Gate E).
+        int reflection_probes = default_reflection_probes;
 
         bool operator==(const MenuSettings&) const = default;
     };
@@ -141,7 +156,7 @@ namespace OpenBlood2
         // renderer, normal maps, VR turn, VR laser, VR crosshair, VR movement reference, cheats,
         // god mode, cheat level, anti-aliasing, bloom, tonemap, ambient occlusion, reflections,
         // fullscreen, fullscreen mode, resolution, vsync, frame limit, VR refresh rate, VR render scale,
-        // (29) mouse look, (30) field of view.
+        // (29) mouse look, (30) field of view, (31) global illumination.
         int setting = -1;
         HudRect rect{}, slider_rect{};
         std::string insertion; // FormatMessage %1!s! argument of the Load page's RESTART/QUICKLOAD strings.
@@ -221,7 +236,8 @@ namespace OpenBlood2
         bool enabled(const MenuItem& item) const
         {
             return item.enabled && !(item.setting == 1 && !settings.sound) && !(item.setting == 3 && !settings.music) &&
-                   !((item.setting == 9 || (item.setting >= 18 && item.setting <= 21)) && !settings.renderer) &&
+                   !((item.setting == 9 || (item.setting >= 18 && item.setting <= 21) || item.setting == 32) &&
+                     !settings.renderer) &&
                    !((item.setting >= 22 && item.setting <= 24) && (!video.window || vr)) &&
                    !(item.setting == 23 && !settings.fullscreen) &&
                    !(item.setting == 24 && settings.fullscreen && settings.fullscreen_mode == 0) &&

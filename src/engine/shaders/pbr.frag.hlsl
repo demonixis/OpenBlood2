@@ -3,7 +3,7 @@
 // model light, model shadows and the radial point light) so rough dielectrics keep the
 // original look; GGX/Smith/Schlick specular comes from the static light objects (world: the
 // light grid; models: their four sources) and the radial light, and the baked light stands in
-// for the environment through an analytic split-sum approximation. No probe or baked data.
+// for the environment through an analytic split-sum approximation (without GI: no probe or baked data).
 // Manifest emission adds a light-independent glow to bright texels (the input of M6 bloom).
 // PBR_HIGH: eight grid lights and specular cavity. PBR_ALPHA: translucent output.
 // AUX_TARGETS (post-processing passes): target 1 receives the linear light the emission adds
@@ -11,6 +11,9 @@
 // depth (opaque pipelines only). REFLECTION_TARGETS adds, for screen-space reflections, the
 // weight of the environment specular (target 3, roughness in alpha) and the environment light
 // it multiplied (target 4): the composite replaces that light by the reflected one.
+// GI (GI lot G12): baked reflection probes replace the baked light in the environment term (at
+// most two per pixel, the rest of the weight keeps it), and a GI page's alpha (the share of its
+// light that is not GI indirect light) bounds model shadows and the light grid's visibility.
 // SDL_GPU fragment conventions: textures/samplers then storage buffers in space2, uniforms in space3.
 Texture2D<float4> albedo : register(t0, space2);
 SamplerState albedoSampler : register(s0, space2);
@@ -20,8 +23,17 @@ Texture2D<float4> shadowAtlas : register(t2, space2);
 SamplerState shadowSampler : register(s2, space2);
 Texture2D<float4> normalMap : register(t3, space2); // RGB tangent normal, A height (cavity).
 SamplerState normalSampler : register(s3, space2);
+#ifdef GI
+Texture2DArray<float4> reflections : register(t4, space2); // Octahedral chains, one layer per probe.
+SamplerState reflectionSampler : register(s4, space2);
+StructuredBuffer<float4> gridLights : register(t5, space2);
+StructuredBuffer<uint> gridCells : register(t6, space2);
+StructuredBuffer<float4> probes : register(t7, space2);   // Three header float4, then five per probe.
+StructuredBuffer<uint> probeCells : register(t8, space2); // Size and cell count, cells, probe indices.
+#else
 StructuredBuffer<float4> gridLights : register(t4, space2); // Three float4 per static light.
 StructuredBuffer<uint> gridCells : register(t5, space2);    // Cells, then their light indices.
+#endif
 cbuffer Light : register(b0, space3)
 {
     float4 modulation, positionRadius, lightColor;
@@ -123,6 +135,108 @@ float shadowAmount(float3 p)
     }
     return amount * facing * shadowInfo.y;
 }
+#ifdef GI
+// Octahedral coordinates of a direction with +y as the pole, in [-1, 1] (gi_octahedral_coordinates).
+float2 octahedral(float3 d)
+{
+    d /= abs(d.x) + abs(d.y) + abs(d.z);
+    float2 uv = d.xz;
+    if (d.y < 0.0)
+        uv = (1.0 - abs(d.zx)) * float2(d.x >= 0.0 ? 1.0 : -1.0, d.z >= 0.0 ? 1.0 : -1.0);
+    return uv;
+}
+// Level `level` of a probe's chain (array levels from probes[1].z down, each with a one-texel
+// border), linear between the two nearest levels.
+float3 probeSample(uint layer, float3 direction, float level)
+{
+    float2 o = octahedral(direction) * 0.5 + 0.5;
+    float l0 = floor(level), l1 = min(l0 + 1.0, probes[1].y - 1.0);
+    float s0 = probes[1].z * exp2(-l0), s1 = probes[1].z * exp2(-l1);
+    float3 a = reflections.SampleLevel(reflectionSampler, float3(o * (1.0 - 2.0 / s0) + 1.0 / s0, float(layer)), l0).rgb;
+    float3 b = reflections.SampleLevel(reflectionSampler, float3(o * (1.0 - 2.0 / s1) + 1.0 / s1, float(layer)), l1).rgb;
+    return lerp(a, b, level - l0);
+}
+// Box coverage (CyberEngine): 0 outside, rising to 1 over the blend distance inside.
+float probeCoverage(float3 p, float4 lo, float4 hi)
+{
+    float3 inside = min(p - lo.xyz, hi.xyz - p);
+    float d = min(min(inside.x, inside.y), inside.z);
+    if (d < 0.0)
+        return 0.0;
+    return lo.w > 0.0 ? saturate(d / lo.w) : 1.0;
+}
+// One probe's radiance along r: box projection by slab intersection (the nearest exit), else r.
+float3 probeRadiance(uint index, float3 p, float3 r, float level)
+{
+    uint base = 3u + index * 5u;
+    float3 d = r;
+    if ((uint(probes[base + 2u].w) & 1u) != 0u)
+    {
+        float3 safe = float3(abs(r.x) > 1e-6 ? r.x : 1e-6, abs(r.y) > 1e-6 ? r.y : 1e-6, abs(r.z) > 1e-6 ? r.z : 1e-6);
+        float3 far = max((probes[base + 2u].xyz - p) / safe, (probes[base + 3u].xyz - p) / safe);
+        d = p + r * max(min(min(far.x, far.y), far.z), 0.0) - probes[base + 4u].xyz;
+    }
+    return probeSample(uint(probes[base + 3u].w), d, level) * probes[0].w;
+}
+// The environment radiance along r at p: the cell's candidates ordered by priority, coverage,
+// distance to the capture point and index; HIGH (mode 2) blends two (equal priorities share by
+// coverage, otherwise the second fills what the first leaves), LOW one; `fallback` keeps the rest.
+float3 probeEnvironment(float3 p, float3 r, float roughness, float3 fallback)
+{
+    uint mode = uint(probes[0].y);
+    if (uint(probes[0].x) == 0u || mode == 0u)
+        return fallback;
+    int3 cell = int3(floor((p - probes[2].xyz) * probes[2].w));
+    uint3 dims = uint3(probeCells[0], probeCells[1], probeCells[2]);
+    if (any(cell < int3(0, 0, 0)) || any(cell >= int3(dims)))
+        return fallback;
+    uint packed = probeCells[4u + (uint(cell.z) * dims.y + uint(cell.y)) * dims.x + uint(cell.x)];
+    uint first = 4u + probeCells[3] + (packed >> 4), candidates = min(packed & 15u, 8u);
+    int best0 = -1, best1 = -1;
+    float c0 = 0.0, c1 = 0.0, pr0 = 0.0, pr1 = 0.0, d0 = 0.0, d1 = 0.0;
+    for (uint i = 0u; i < candidates; ++i)
+    {
+        uint index = probeCells[first + i];
+        uint base = 3u + index * 5u;
+        float c = probeCoverage(p, probes[base], probes[base + 1u]);
+        if (c <= 0.0)
+            continue;
+        float priority = probes[base + 1u].w;
+        float3 toCapture = probes[base + 4u].xyz - p;
+        float d = dot(toCapture, toCapture);
+        if (best0 < 0 || priority > pr0 || (priority == pr0 && (c > c0 || (c == c0 && d < d0))))
+        {
+            best1 = best0, c1 = c0, pr1 = pr0, d1 = d0;
+            best0 = int(index), c0 = c, pr0 = priority, d0 = d;
+        }
+        else if (best1 < 0 || priority > pr1 || (priority == pr1 && (c > c1 || (c == c1 && d < d1))))
+            best1 = int(index), c1 = c, pr1 = priority, d1 = d;
+    }
+    if (best0 < 0)
+        return fallback;
+    float w0 = c0, w1 = 0.0;
+    if (mode >= 2u && best1 >= 0)
+    {
+        if (pr1 == pr0)
+        {
+            float total = c0 + c1, share = min(total, 1.0) / total;
+            w0 = c0 * share, w1 = c1 * share;
+        }
+        else
+            w1 = (1.0 - w0) * c1;
+    }
+    float level = clamp(saturate(roughness) * (probes[0].z - 1.0) - probes[1].x, 0.0, probes[1].y - 1.0);
+    float3 environment = fallback * (1.0 - w0 - w1) + probeRadiance(uint(best0), p, r, level) * w0;
+    if (w1 > 0.0)
+        environment += probeRadiance(uint(best1), p, r, level) * w1;
+    return environment;
+}
+#define FACE_SHADOW (shadow * directShare)
+#define DIRECT_LUMINANCE (bakedLuminance * directShare)
+#else
+#define FACE_SHADOW shadow
+#define DIRECT_LUMINANCE bakedLuminance
+#endif
 // The original light term of one source: color * (1 - d/R) * linear cone; direction in `l`.
 float3 sourceTerm(float4 positionRange, float4 colorCone, float3 axis, float3 p, out float3 l)
 {
@@ -324,11 +438,18 @@ float4 main(Input input) : SV_Target0
     else
     {
         bool lightmapped = input.lightmapCoord.x >= 0.0;
+#ifdef GI
+        float4 page = lightmapped ? lightmap.SampleLevel(lightmapSampler, max(input.lightmapCoord, float2(0.0, 0.0)), 0.0)
+                                  : float4(input.faceColor, 1.0);
+        float3 baked = page.rgb;
+        float directShare = page.a; // 1 for original pages and vertex light.
+#else
         float3 baked = lightmapped
                            ? lightmap.SampleLevel(lightmapSampler, max(input.lightmapCoord, float2(0.0, 0.0)), 0.0).rgb
                            : input.faceColor;
-        diffuse = lightmapped ? modulation.y * min(baked * (1.0 - shadow) + dynamicLight, float3(1.0, 1.0, 1.0))
-                              : baked * (1.0 - shadow) + dynamicLight;
+#endif
+        diffuse = lightmapped ? modulation.y * min(baked * (1.0 - FACE_SHADOW) + dynamicLight, float3(1.0, 1.0, 1.0))
+                              : baked * (1.0 - FACE_SHADOW) + dynamicLight;
         // SURF_BRIGHT and unlit faces carry no light information: original output.
         if (!lightmapped && all(input.faceColor >= 0.999))
 #ifdef PBR_ALPHA
@@ -361,8 +482,8 @@ float4 main(Input input) : SV_Target0
         // Static lights are not occluded here: the baked light, which includes the
         // preprocessor's shadows, bounds how much of their predicted light reaches the face.
         float bakedLuminance = luminance(baked);
-        float visibility = predicted > 1e-4 ? saturate(bakedLuminance / predicted) : 1.0;
-        direct += sourceSpecular * (SATURATE * visibility * (1.0 - shadow));
+        float visibility = predicted > 1e-4 ? saturate(DIRECT_LUMINANCE / predicted) : 1.0;
+        direct += sourceSpecular * (SATURATE * visibility * (1.0 - FACE_SHADOW));
         // Normal-map relief: the change of the lights' N.L, plus, for the baked light that no
         // listed light explains, a soft overhead light so relief stays readable in ambient areas.
         float unexplained = saturate(1.0 - predicted * visibility / max(bakedLuminance, 1e-4));
@@ -377,11 +498,23 @@ float4 main(Input input) : SV_Target0
     float3 white = environmentBrdf(float3(1.0, 1.0, 1.0), roughness, nv);
     float3 compensation = 1.0 + f0 * (1.0 / max(white, 0.05) - 1.0);
     float3 body = (baseColor * diffuse * bump * (1.0 - metallic) + emitted(baseColor)) * sceneColor.rgb;
-    float3 reflected = (diffuse * split + direct) * compensation * cavity * sceneColor.rgb;
+#ifdef GI
+    // Reflections only (probes[1].w): the probes' radiance alone, black where none covers.
+    bool probeView = probes[1].w > 0.5;
+    float3 environment = probeEnvironment(p, 2.0 * dot(n, v) * n - v, roughness, probeView ? float3(0.0, 0.0, 0.0) : diffuse);
+#define ENVIRONMENT environment
+#else
+#define ENVIRONMENT diffuse
+#endif
+    float3 reflected = (ENVIRONMENT * split + direct) * compensation * cavity * sceneColor.rgb;
+#ifdef GI
+    if (probeView)
+        body = float3(0.0, 0.0, 0.0), reflected = environment * sceneColor.rgb;
+#endif
 #ifdef AUX_TARGETS
     // The environment specular is reflectionLight * reflectionWeight.
     reflectionWeight = float4(split * compensation * cavity, roughness);
-    reflectionLight = float4(diffuse * sceneColor.rgb, 0.0);
+    reflectionLight = float4(ENVIRONMENT * sceneColor.rgb, 0.0);
 #endif
 #ifdef PBR_ALPHA
     // Highlights survive on nearly transparent glass: coverage rises to carry them.

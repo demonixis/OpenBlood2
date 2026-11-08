@@ -1,4 +1,5 @@
 #include "app/bench.h"
+#include "app/gi_tool.h"
 #include "app/scene_presenter.h"
 #include "app/session_playback.h"
 #include "engine/capture.h"
@@ -108,8 +109,17 @@ namespace OpenBlood2
             presenter.normal_maps = options.normal_maps;
             presenter.post = {Antialiasing(options.antialiasing), options.bloom, Tonemap(options.tonemap),
                               AmbientOcclusion(options.ambient_occlusion), Reflections(options.reflections)};
+            // --gi (lot G8): the world's Ready bake from the search roots, composed at the first update.
+            presenter.global_illumination = options.gi;
+            presenter.gi_reflections = GiReflectionMode(options.gi_reflections); // --gi-reflections (lot G12).
+            presenter.gi_roots = gi_search_roots(config.gi_dir);
+            presenter.gi_composition = {options.gi_k, options.gi_f, GiView(options.gi_view),
+                                        GiWorldSource(options.gi_source)};
+            presenter.gi_probes = {options.gi_probes > 0, options.gi_probes > 0 ? options.gi_probes : 1};
+            GiLogState gi_logged;
+            double first_update_ms = 0;
             Capture capture;
-            Series step, world, models, effects, record, gpu, total, draws, culled, pings, reads, read_counts;
+            Series step, world, models, effects, record, gpu, total, draws, culled, pings, reads, read_counts, probes;
             std::uint64_t ping_calls = 0;
             // The game mix is otherwise skipped without a device; render it to time streamed reads.
             game->client_session.audio.mixer.inspect_pcm = options.bench_audio;
@@ -132,6 +142,9 @@ namespace OpenBlood2
                     spdlog::error("Bench {}", error);
                     return 5;
                 }
+                if (frame == 0)
+                    first_update_ms = milliseconds(stepped, SDL_GetTicksNS());
+                log_gi_status(presenter, gi_logged);
                 if (options.bench_sweep)
                 {
                     // Presentation-only yaw sweep around the current view; simulation never reads it.
@@ -186,6 +199,7 @@ namespace OpenBlood2
                 read_counts.add(double(game->client_session.audio.mixer.stream_reads() - read_count));
                 world.add(presenter.stats.world_ns / 1e6);
                 models.add(presenter.stats.models_ns / 1e6);
+                probes.add(presenter.model_lighting.stats.probe_ms);
                 effects.add(presenter.stats.effects_ns / 1e6);
                 record.add(milliseconds(updated, submitted));
                 gpu.add(milliseconds(submitted, completed));
@@ -206,6 +220,7 @@ namespace OpenBlood2
             row("  streamed PCM reads", reads);
             row("world/sky draw lists", world);
             row("models (CPU pose/vertices)", models);
+            row("  light probes (GI lot G9)", probes);
             row("polygrids/sprites/particles", effects);
             row("record (uploads/encode/submit)", record);
             row("GPU completion wait", gpu);
@@ -240,12 +255,33 @@ namespace OpenBlood2
             const auto& mesh = presenter.world_mesh;
             spdlog::info("Lightmaps: {} faces, {} pages, {} texels, {} unfitted origin axes", mesh.lightmapped,
                          mesh.lightmap_pages, mesh.lightmap_texels, mesh.lightmap_unfitted);
+            const auto& gi = presenter.gi_status();
+            spdlog::info("Load: first update {:.1f} ms, world mesh {:.1f} ms; GI {} ({} blocks / {} texels, {} corner "
+                         "sets / {} corners composed; keys {:.1f} ms, lookup {:.1f} ms, sections {:.1f} ms)",
+                         first_update_ms, presenter.mesh_build_ms, gi_runtime_state_name(gi.state), mesh.gi_blocks,
+                         mesh.gi_texels, mesh.gi_sets, mesh.gi_corners, gi.expectation_ms, gi.lookup_ms, gi.decode_ms);
             spdlog::info("Lighting: {} vertex-lit / {} fully bright textured faces; {} static lights; {} lit models "
                          "({} sampled, {} reused, {} flat, {} FLAG_NOLIGHT, {} directional sources, {} occluded "
                          "lights) last frame; ModelAdd {} {} {}",
                          mesh.lit, mesh.fullbright, lighting.lights.lights, lighting.models, lighting.sampled,
                          lighting.reused, lighting.flat, lighting.unlit, lighting.sources, lighting.occluded,
                          lighting.model_add.x, lighting.model_add.y, lighting.model_add.z);
+            spdlog::info("Light probes: {} / {} valid ({} spacing); {} probe-lit models ({} sampled, {} reused, {} "
+                         "without a valid probe, {} pseudo-lights in the top four) last frame",
+                         gi.valid_probes, gi.probes, gi.probe_spacing, lighting.probe_lit, lighting.probe_sampled,
+                         lighting.probe_reused, lighting.probe_missing, lighting.probe_sources);
+            const auto& reflections = presenter.reflection_stats();
+            spdlog::info("Reflection probes (GI lot G12): {} {} ({} variant), {} set, {} layers of {} ({} levels, {} "
+                         "dropped), cells {}x{}x{} of {} ({} occupied, {} over the limit, {} lists), {} texture bytes, "
+                         "{} buffer bytes, {} builds ({:.1f} ms last){}{}",
+                         gi_reflection_mode_name(reflections.mode), reflections.active ? "drawn" : "not drawn",
+                         reflections.gi_variant ? "GI" : "enhanced",
+                         reflections.set == GiReflectionSet::Composed ? "composed" : "Original", reflections.layers,
+                         reflections.size, reflections.levels, reflections.dropped, reflections.cells[0],
+                         reflections.cells[1], reflections.cells[2], reflections.cell_size, reflections.occupied,
+                         reflections.overflow, reflections.lists, reflections.texture_bytes, reflections.buffer_bytes,
+                         reflections.builds, reflections.build_ms, reflections.detail.empty() ? "" : ": ",
+                         reflections.detail);
             const auto& shadows = presenter.shadow_stats;
             spdlog::info("Model shadows: {} FLAG_SHADOW candidates, {} drawn ({} beyond limit, {} distant, {} outside "
                          "view, {} unbounded), atlas {}",

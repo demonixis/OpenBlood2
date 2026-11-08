@@ -1,5 +1,6 @@
 #include "ai_model_key_smoke.h"
 #include "app/bench.h"
+#include "app/gi_tool.h"
 #include "app/control_actions.h"
 #include "app/frontend.h"
 #include "app/gamepad_devices.h"
@@ -374,6 +375,13 @@ namespace
         presenter.per_pixel_lighting = options.pixel_lighting;
         presenter.shading = OpenBlood2::SurfaceShading(options.renderer);
         presenter.normal_maps = options.normal_maps;
+        presenter.global_illumination = options.gi; // Baked GI (lot G8) for smoke runs, as --bench --gi.
+        presenter.gi_reflections = OpenBlood2::GiReflectionMode(options.gi_reflections); // Lot G12.
+        presenter.gi_roots = OpenBlood2::gi_search_roots(config.gi_dir);
+        presenter.gi_composition = {options.gi_k, options.gi_f, OpenBlood2::GiView(options.gi_view),
+                                    OpenBlood2::GiWorldSource(options.gi_source)};
+        presenter.gi_probes = {options.gi_probes > 0, options.gi_probes > 0 ? options.gi_probes : 1};
+        OpenBlood2::GiLogState gi_logged;
         presenter.post = {OpenBlood2::Antialiasing(options.antialiasing), options.bloom,
                           OpenBlood2::Tonemap(options.tonemap), OpenBlood2::AmbientOcclusion(options.ambient_occlusion),
                           OpenBlood2::Reflections(options.reflections)};
@@ -901,6 +909,7 @@ namespace
                 spdlog::error("{}", error);
                 return 5;
             }
+            OpenBlood2::log_gi_status(presenter, gi_logged);
             if (presenter.rebuilt && game->world_path.empty())
                 viewport_unloaded = true;
             const bool render_world = presenter.render_world;
@@ -1800,6 +1809,24 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --nightmares        Also mount the Nightmares expansion (BLOOD2NM.REZ) as its own edition; "
                      "its levels are not ported yet\n"
                      "  --check-data        Check file metadata without opening a window or parsing archives\n"
+                     "  --list-worlds       List mounted world DATs with digests and GI file names (--json: JSON)\n"
+                     "  --gi-verify FILE    Validate a baked GI file (.ob2gi) against the mounted world\n"
+                     "  --gi-dir DIR        First baked GI search directory (also gi_dir= in the config file)\n"
+                     "  --gi-place WORLD    Place GI light and reflection probes for WORLD, single or all; writes\n"
+                     "                      placement files (--gi-reset: ignore existing files, --gi-dry-run, --json)\n"
+                     "  --gi-placement-dir DIR  GI placement files (gi_placement_dir=; default data/gi/placement)\n"
+                     "  --bake-gi WORLD     Bake GI for WORLD (--gi-quality preview|final|ultra|custom, default\n"
+                     "                      ultra; --gi-emissive 0-4, default 1; --gi-jobs N, --gi-out DIR,\n"
+                     "                      --gi-if-stale, --gi-direct original|rebaked); custom: --gi-bounces 1-4,\n"
+                     "                      --gi-rays 16-4096, --gi-sky 0-4, --gi-texel-samples 1|4|9|16,\n"
+                     "                      --gi-denoise 0-4, --gi-shadow-radius 1-64 [--gi-shadow-rays 1-64],\n"
+                     "                      --gi-reflection-strata 2-8, --gi-reflection-samples 32-1024;\n"
+                     "                      exit 12 when cancelled\n"
+                     "  --gi-preview WORLD  Write Original | GI | Indirect PNG views of WORLD's baked file\n"
+                     "                      (--gi-out DIR, --gi-preview-dir DIR, --gi-k 0-4, --gi-f 0-4, --gi-jobs N)\n"
+                     "  --gi-direct-audit WORLD  Compare the re-baked direct light of WORLD, single or all with the\n"
+                     "                      stored lightmaps, as JSON (--gi-jobs N; --gi-preview-dir DIR: Original |\n"
+                     "                      Re-baked direct | Difference PNG views)\n"
                      "  --world NAME        World resource (default: 01_SubwayA, Demo_01 with --demo)\n"
                      "  --inspect-world     Parse/mount/create original subset headlessly; does not run a game\n"
                      "  --inspect-player    Exercise original shell/player entry headlessly; not playable\n"
@@ -1819,6 +1846,8 @@ static int application_main(const OpenBlood2::Options& options)
                      "  --no-model-shadows  Disable FLAG_SHADOW model shadows (original low/medium detail)\n"
                      "  --pixel-lighting    Light models per pixel (menu: Options > Display)\n"
                      "  --renderer MODE     original (default), standard or high enhanced shading (menu: Display)\n"
+                     "  --gi                Baked GI with --bench or a smoke run (game: Display, F8)\n"
+                     "  --gi-view VIEW      With --gi: final, original, direct, indirect, lighting or validity\n"
                      "  --normal-maps       Generate normal maps for the enhanced renderer (menu: Display)\n"
                      "  --aa MODE           Anti-aliasing: off (default), fxaa, msaa2 or msaa4 (menu: Display)\n"
                      "  --no-bloom          Enhanced renderer without bloom (menu: Display)\n"
@@ -1885,7 +1914,9 @@ static int application_main(const OpenBlood2::Options& options)
     if (!OpenBlood2::load_config(options, environment ? environment : "", config, error, &unconfigured))
     {
         // An ordinary launch without data opens the setup screen; tools and smokes need data.
-        const bool tool = options.check_data || options.inspect_world || options.start_game || options.bench ||
+        const bool tool = options.check_data || options.list_worlds || !options.gi_verify.empty() ||
+                          !options.gi_place.empty() || !options.bake_gi.empty() || !options.gi_preview.empty() ||
+                          !options.gi_direct_audit.empty() || options.inspect_world || options.start_game || options.bench ||
                           options.gpu_smoke || options.world_smoke || options.menu_smoke || options.demo_smoke ||
                           options.view_world || !options.host_world.empty() || !options.connect_address.empty();
         if (unconfigured && !tool)
@@ -1908,6 +1939,18 @@ static int application_main(const OpenBlood2::Options& options)
         spdlog::error("{}", error);
         return 2;
     }
+    if (options.list_worlds)
+        return OpenBlood2::run_list_worlds(options, config);
+    if (!options.gi_verify.empty())
+        return OpenBlood2::run_gi_verify(options, config);
+    if (!options.gi_place.empty())
+        return OpenBlood2::run_gi_place(options, config);
+    if (!options.bake_gi.empty())
+        return OpenBlood2::run_gi_bake(options, config);
+    if (!options.gi_preview.empty())
+        return OpenBlood2::run_gi_preview(options, config);
+    if (!options.gi_direct_audit.empty())
+        return OpenBlood2::run_gi_direct_audit(options, config);
     spdlog::info("External data: {} ({})", OpenBlood2::path_text(config.data_dir), config.source);
     for (const auto& archive : data.archives)
     {

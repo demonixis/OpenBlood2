@@ -22,7 +22,12 @@ set(pbr_alpha_frag_source pbr.frag)
 set(pbr_alpha_frag_defines -DPBR_ALPHA)
 set(pbr_high_alpha_frag_source pbr.frag)
 set(pbr_high_alpha_frag_defines -DPBR_HIGH -DPBR_ALPHA)
-foreach(variant line world sprite pbr pbr_high pbr_alpha pbr_high_alpha)
+# GI lot G12: the reflection probe variants of the four enhanced shaders (and their auxiliary forms).
+foreach(base pbr pbr_high pbr_alpha pbr_high_alpha)
+    set(${base}_gi_frag_source pbr.frag)
+    set(${base}_gi_frag_defines ${${base}_frag_defines} -DGI)
+endforeach()
+foreach(variant line world sprite pbr pbr_high pbr_alpha pbr_high_alpha pbr_gi pbr_high_gi pbr_alpha_gi pbr_high_alpha_gi)
     if(DEFINED ${variant}_frag_source)
         set(${variant}_aux_frag_source ${${variant}_frag_source})
     else()
@@ -36,7 +41,10 @@ foreach(shader world_vert skinned_vert world_frag sprite_frag shadow_frag pbr_fr
         pbr_high_alpha_frag line_vert line_frag line_aux_frag line_aux_ssr_frag world_aux_frag sprite_aux_frag pbr_aux_frag pbr_high_aux_frag
         pbr_alpha_aux_frag pbr_high_alpha_aux_frag post_vert bloom_down_frag bloom_up_frag composite_frag fxaa_frag
         ao_depth_frag gtao_frag ao_blur_frag world_aux_ssr_frag sprite_aux_ssr_frag pbr_aux_ssr_frag pbr_high_aux_ssr_frag
-        pbr_alpha_aux_ssr_frag pbr_high_alpha_aux_ssr_frag ssr_trace_frag ssr_blur_frag hiz_down_frag)
+        pbr_alpha_aux_ssr_frag pbr_high_alpha_aux_ssr_frag ssr_trace_frag ssr_blur_frag hiz_down_frag
+        pbr_gi_frag pbr_high_gi_frag pbr_alpha_gi_frag pbr_high_alpha_gi_frag pbr_gi_aux_frag pbr_high_gi_aux_frag
+        pbr_alpha_gi_aux_frag pbr_high_alpha_gi_aux_frag pbr_gi_aux_ssr_frag pbr_high_gi_aux_ssr_frag
+        pbr_alpha_gi_aux_ssr_frag pbr_high_alpha_gi_aux_ssr_frag)
     string(REGEX REPLACE "_(vert|frag)$" ".\\1" filename "${shader}")
     set(defines ${${shader}_defines})
     if(DEFINED ${shader}_source)

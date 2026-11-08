@@ -5,6 +5,7 @@
 #include "app/demo_smoke.h"
 #include "app/display_options.h"
 #include "app/gamepad_devices.h"
+#include "app/gi_tool.h"
 #include "app/hud.h"
 #include "app/loading_flow.h"
 #include "app/menu_input.h"
@@ -23,6 +24,9 @@
 #include "game/menu_preferences.h"
 #if BLOOD2_INSPECTOR
 #include "app/inspector.h"
+#endif
+#if BLOOD2_GI_TOOLS
+#include "app/gi_overlay.h"
 #endif
 #if BLOOD2_XR
 #include "app/xr_frontend.h"
@@ -371,7 +375,12 @@ namespace OpenBlood2
             if (!options.menu_smoke && !options.demo_smoke)
             {
                 std::string why;
-                if (!controls_path(controls_file, why) || !load_controls(controls_file, input.controls.bindings, why))
+                std::vector<std::string> dropped;
+                const bool loaded = controls_path(controls_file, why) &&
+                                    load_controls(controls_file, input.controls.bindings, why, &dropped);
+                for (const auto& binding : dropped) // Controls v3: F8 now opens the GI tools overlay.
+                    spdlog::warn("Controls: dropped {} (F8 is reserved for the GI tools)", binding);
+                if (!loaded)
                 {
                     spdlog::warn("Controls: {}", why);
                     if (menu_enabled && menu.error.empty())
@@ -418,6 +427,8 @@ namespace OpenBlood2
             ObjectSelection selection;
             ScenePresenter presenter(runtime.gpu);
             presenter.model_shadows = options.model_shadows;
+            presenter.gi_roots = gi_search_roots(config.gi_dir); // Baked GI (lot G8), read while enabled.
+            GiLogState gi_logged;
             HudRenderer hud(runtime.gpu);
 #if BLOOD2_INSPECTOR
             Inspector inspector(runtime);
@@ -437,6 +448,10 @@ namespace OpenBlood2
             inspector.materials = &presenter.material_report;
 #else
             (void)data;
+#endif
+#if BLOOD2_GI_TOOLS
+            GiTools gi_tools; // F8 overlay: desktop only, never in XR (gi_contracts.md lot G3).
+            input.gi_available = !xr_mode;
 #endif
             MenuSmoke smoke;
             DemoSmoke demo_smoke;
@@ -568,6 +583,7 @@ namespace OpenBlood2
                     auto* player = game->server_shell.Player(game->local_client);
                     const bool old_message = input.message.active;
                     const bool old_inspector = input.inspector, old_menu = input.paused(menu);
+                    const auto old_gi = input.gi;
                     const bool forward =
                         input.event(event, SDL_GetWindowID(runtime.window), menu, game->client_shell.m_bInWorld,
                                     player && !player->m_damage.IsDead(), BLOOD2_INSPECTOR && options.inspector,
@@ -576,7 +592,7 @@ namespace OpenBlood2
                         gamepads.resync(input.controls);
                     sync_message_input();
                     if (old_message != input.message.active || old_inspector != input.inspector ||
-                        old_menu != input.paused(menu))
+                        old_gi != input.gi || old_menu != input.paused(menu))
                     {
                         neutralize_app_input(game->client_shell);
                         ImGui::GetIO().ClearEventsQueue();
@@ -998,6 +1014,8 @@ namespace OpenBlood2
                 // Original detail*.cfg: LightMap 0 at low detail, MaxModelShadows 1 at high detail.
                 game->server.debris_detail = settings.detail;
                 presenter.lightmaps = settings.detail >= 1;
+                presenter.global_illumination = settings.global_illumination;
+                presenter.gi_reflections = GiReflectionMode(std::clamp(settings.reflection_probes, 0, 2));
                 presenter.model_shadows = options.model_shadows && settings.detail >= 2;
                 presenter.per_pixel_lighting = settings.pixel_lighting;
                 presenter.field_of_view = float(settings.field_of_view) * 0.017453292519943295f;
@@ -1039,7 +1057,7 @@ namespace OpenBlood2
                 if (!game->client_session.audio.mixer.pause_output(input.paused(menu), error))
                     return failed(4);
                 auto& shell = game->client_shell;
-                if (input.paused(menu) || input.inspector || input.message.active)
+                if (input.paused(menu) || input.tools_open() || input.message.active)
                     neutralize_app_input(shell);
                 if (input.message.submitted)
                 {
@@ -1073,7 +1091,7 @@ namespace OpenBlood2
                 // World/menu resets can cancel the editor outside SDL event dispatch.
                 sync_message_input();
                 shell.xr_view = xr_mode;
-                const bool blocked = input.paused(menu) || input.inspector || input.message.active;
+                const bool blocked = input.paused(menu) || input.tools_open() || input.message.active;
                 input.controls.enabled = !blocked;
 #if BLOOD2_XR
                 if (xr)
@@ -1156,6 +1174,7 @@ namespace OpenBlood2
                         else
                             input.demo.state = DemoFlow::State::Finished;
                         input.inspector = false;
+                        input.gi = GiOverlay::Closed;
                         input.reset(menu, false);
                         neutralize_app_input(game->client_shell);
                         if (!game->client_session.audio.mixer.pause_output(true, error))
@@ -1217,6 +1236,7 @@ namespace OpenBlood2
 #endif
                     if (!presenter.update(*game, error))
                         return failed(5);
+                    log_gi_status(presenter, gi_logged);
                 }
                 ImGui_ImplSDLGPU3_NewFrame();
                 ImGui_ImplSDL3_NewFrame();
@@ -1229,7 +1249,7 @@ namespace OpenBlood2
                 }
 #endif
                 ImGui::GetIO().ConfigFlags &= ~(ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad);
-                if (input.inspector || input.setup_screen || multiplayer.active)
+                if (input.tools_open() || input.setup_screen || multiplayer.active)
                     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
                 if (input.setup_screen || multiplayer.active)
                     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
@@ -1342,6 +1362,17 @@ namespace OpenBlood2
                 if (was_visible && !input.inspector)
                     input.reset(menu, game->client_shell.m_bInWorld);
 #endif
+#if BLOOD2_GI_TOOLS
+                if (!xr_mode && gi_tools.draw(input, *game, config, presenter.tool_lines,
+                                              {&menu.settings.global_illumination, &presenter.gi_composition,
+                                               &presenter.gi_reload, &presenter.gi_status(), &presenter.world_mesh,
+                                               presenter.mesh_build_ms, &presenter.gi_probes, presenter.gi_light(),
+                                               &presenter.model_lighting.stats, &menu.settings.reflection_probes,
+                                               &presenter.gi_reflection_view, &presenter.reflection_stats(),
+                                               presenter.shading != SurfaceShading::Original}))
+                    input.reset(menu, game->client_shell.m_bInWorld);
+#endif
+                input.text_entry = ImGui::GetIO().WantTextInput; // F8 is ignored while a field has focus.
                 ImGui::Render();
 #if BLOOD2_XR
                 if (xr)
@@ -1423,8 +1454,14 @@ namespace OpenBlood2
                 if (target)
                 {
                     auto* color_target = save ? capture.texture : target;
+#if BLOOD2_GI_TOOLS
+                    // "Suspend the scene while baking" (lot G10): the bake gets the GPU and memory.
+                    const bool gi_suspend = !xr_mode && gi_tools.suspend_scene();
+#else
+                    const bool gi_suspend = false;
+#endif
                     const bool world = !menu.active && !input.credits_screen && !input.demo.finished() &&
-                                       !screen_shown && presenter.render_world;
+                                       !screen_shown && presenter.render_world && !gi_suspend;
                     if (world &&
                         !presenter.record(*game, commands, color_target,
                                           SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), w, h, error))
@@ -1477,6 +1514,9 @@ namespace OpenBlood2
                 if (!target)
                     SDL_Delay(10);
             }
+#if BLOOD2_GI_TOOLS
+            gi_tools.stop_bake(); // Quit during an F8 bake: cancel the child and wait (lot G10).
+#endif
             if (options.demo_smoke && !demo_smoke.confirmed)
             {
                 error = "Demo diagnostic did not complete both worlds and the ending";

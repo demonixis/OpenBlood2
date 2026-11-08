@@ -45,7 +45,8 @@
       "cacheVariables": {
         "BLOOD2_GPU_TESTS": false,
         "BLOOD2_TEST_DATA_DIR": "",
-        "BLOOD2_DEMO_DATA_DIR": ""
+        "BLOOD2_DEMO_DATA_DIR": "",
+        "BLOOD2_PACKAGE_GI": false
       }
     },
     {

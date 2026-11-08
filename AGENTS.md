@@ -58,6 +58,82 @@ Preserve the paused-solo retention on Back, one server per process, Esc/B only o
 active fields, released play keys, the refused 27889 gameplay port, UTF-8-safe host
 names and the dedicated server's `--no-lan`.
 
+The [GI plan](Documentation/implementation/gi_plan.md) (M10, [contracts](Documentation/contracts/gi_contracts.md))
+has lots G1–G12, GD1, GD2, GQ1 and GE1 (the re-baked direct light, D1 (c), is planned as GD1–GD3; GD3 is not implemented): world queries, the `.ob2gi` file and keys, the F8 overlay, probe placement
+(`--gi-place`, canonical `data/gi/placement/<world>.json` format 2, F8 editing), the bake
+scene/tracer (`--bake-gi`), `tools/gi/bake_all.py` with build packaging of `data/gi/baked`
+(`BLOOD2_PACKAGE_GI`, `gi/` beside the binary, `Resources/gi`, APK `assets/gi`) and the lightmap
+core (D9 sky cube, cosine passes, dilation, RGB9E5 LMAP/`VTX ` sections, `--gi-preview`). Gate B
+was accepted with k = 2 (`gi_default_k`), f = 1, the Final preset and sky 1.0. G8 composes the
+current world's Ready file into the lightmap pages and vertex colours at mesh build when Options >
+Display GLOBAL ILLUMINATION (setting 31, off by default, preferences version 13) is on; the F8
+Runtime panel recomposes k, f and six views, and `--bench --gi` measures it. Preserve
+byte-identical frames with GI off, a missing/stale file or a zero bake (`gpu.gi`), whole-file
+application only after `find_gi_file` and the section checks, no lookup per frame, network clients
+reading their own content (the server never loads GI) and the GI pages' alpha (the direct share, which
+the enhanced specular visibility and model shadows read since G12); Gate C accepted GI off by default as a player option, with
+the F8 tools (bake included) only in inspector builds (`cmake_dependent_option`, CLI in every build). G9 bakes SH L2 light
+probes (PROB, binary16, one per PLAC probe, `gi_algorithm_version` 3) from the passes' light state
+and the sky, and lights models from them: validity-weighted trilinear samples cached per instance,
+ambient max(a, f A) with A the case-sensitive AmbientLight, and one dominant-direction pseudo-light
+in the top four; F8 offers the Light probes world source, p and Show baked SH samples. Preserve the
+exact model identity (invalid or zero probes at f = 1, switch off, p = 0, Original/Direct views),
+thread-independent capture and the single-level lattice. G10's F8 Bake panel runs this binary's
+`--bake-gi` as a child process (`GiBakeProcess`: content arguments, `user_directory()/gi`, jobs =
+threads − 2, non-blocking polls each draw, SIGTERM cancel exiting 12, forced on Windows), saves an
+edited placement first, edits `excluded_models` and reloads a finished file at the next frame only
+for the same world and DAT digest. Preserve no threads in the game, CLI-identical bytes, the
+bounded output lines and stopping the child at quit (`stop_bake`, the destructor).
+GD1 (`gi_direct`, `--gi-direct-audit`, the
+Difference preview panel) audits the DEdit lightmap term against the stored texels: no N·L, linear
+falloff, omni and cone OuterColor, ambient + Σ rounded half up and clamped once, and hard shadows
+from 1 unit off the face against the receiver's own BSP (SURF_INVISIBLE excepted, unclipped lights
+visible, lights in solid shadowed). It fits 84.8 % of the texels and changes no file or frame;
+Gate F was accepted. Preserve object-order sums, per-slot jobs and `-ffp-contract=off`.
+GD2 bakes it as the `direct` setting (`rebaked` default since Gate G; `--gi-direct`, `bake_all.py
+--direct`, the F8 Bake panel): a direct pass before the bounces writes D′ = max(0, min(T, 255) −
+A_eff)/255 per LMAP texel (solid or unplaced texels keep D) as the RGB9E5 `DIR ` section after LMAP,
+the passes re-emit D′ (corners keep D) and texels compose `gi_compose_direct` in Final/Lighting/Direct.
+The shadow test is a `GiBvh` any-hit trace (0.01-unit touch rule), so bytes do not depend on jobs or
+builds. Preserve `original` bytes (no settings line), staleness through the settings hash
+(`gi_algorithm_version` 3), the exact identity of a D′ equal to O − A_eff, Original/Indirect/
+Validity views, DETAIL LOW and corners unchanged, and the strict DIR count; `original` stays an
+option (`--gi-direct original`, `bake_all.py --direct original`).
+G11 captures each PLAC reflection probe (six faces at its resolution, 2 × 2 strata, the sky at scale
+1) into the Original (O/255) and Composed (k = 2, f = 1, Final, D′) sets, prefilters them with GGX
+(CyberEngine, Hammersley 64/32 samples) into octahedral chains down to 4 × 4 (+y pole, folded
+borders) and stores RGB9E5 `REFL` after PROB (`gi_algorithm_version` 4; a probe hitting back faces
+over half the time is invalid). Gate D kept D12 (a): SDL_GPU allocates Metal cube arrays 6× over.
+G12 draws them in the enhanced renderer: Options > Display REFLECTION PROBES (row 32, OFF/LOW/HIGH,
+HIGH on desktop and LOW on Android/Quest/iOS by default since Gate E, preferences version 15, independent of GI; GI off reads the Original set), an
+RGBA16F 2D array (LOW drops the top level), probe records and a cell grid in storage buffers, and
+the 24 `-DGI` variants of `pbr.frag` (t4–t8), used only while the mesh is GI-composed or probes are
+drawn; HIGH blends two probes by priority, coverage and blend distance with box projection, the
+result replaces the baked environment light and SSR replaces it in turn. Preserve the G8 frame byte
+for byte with E = 0 and probes OFF (placeholder data), the 72 earlier artifacts unchanged, no
+lookup or rebuild per frame (the F8 intensity and Reflections only restage the records), the CPU
+mirror `gi_reflection_environment` and the original renderer untouched; a version 14 OFF reads as the platform default.
+GQ1 adds bake quality (D21): `--gi-quality ultra` (3 bounces, 512 rays, 4 texel samples, denoise 1, soft
+shadows 8/16, reflection strata 4, 256 GGX samples) and custom `--gi-texel-samples`, `--gi-denoise`,
+`--gi-shadow-radius/-rays`, `--gi-reflection-strata/-samples`, bounces up to 4 (CLI, `bake_all.py`, F8 panel).
+GE1 bakes manifest emission (`--gi-emissive S`, any preset, D23/D24): the shader's `emitted()` per mip-0
+texel, box-filtered down the albedo mip, added on lightmapped and vertex-lit hits (never SURF_BRIGHT).
+Gate H made Ultra with emission 1 the default (CLI, `bake_all.py`, F8 panel; `--gi-emissive 0` turns it off).
+Preserve the earlier bytes and settings text of `--gi-quality final --gi-emissive 0` (each other value adds one
+line before `direct rebaked`; `emissive` names the manifest digest), points split the texel's rays (⌈rays/n²⌉,
+invalid points dropped), the ρ² hit-distance guide of the denoiser and job-independent bytes.
+Preserve the D1 units (pages ×2 Saturate, vertex light not, the exact E = 0/f = 1 identity
+of `gi_compose`), D-only re-emission, edge-inset samples, the 10 % back-face validity on the
+first trace and SkyPointer targets as Sky ranges.
+Preserve canonical placement bytes, the strict bounded reader, untouched Foreign/Failed files,
+a derived (never stored) light lattice and scratch placement directories in tests. Gate A was
+accepted with the defaults; the 36 single-player placement files are committed. The tracer's
+results must not depend on threads or builds: per-slot jobs, per-element/pass lattice seeds,
+`-ffp-contract=off`, no library trigonometry; hits match WorldShade; a cancelled bake exits 12
+and writes nothing. Baked files are never committed (D3: `.gitignore`, the `gi_policy` test, CI
+with packaging OFF); the script never parses `.ob2gi` and an empty data folder adds no build
+step.
+
 The [desktop third-person camera](Documentation/contracts/camera_contracts.md) adds a rebindable C toggle,
 actual player/held models and centred aim convergence. Preserve unchanged eye/shot/movement state,
 special-camera priority, temporary first-person zoom/tight-space fallback and the XR refusal.
@@ -79,7 +155,7 @@ camera's container, run conveyor/swim-cap rules on a fixed 1/30 s container cade
 dry jump, start embedded TripLaser beams past their wall, play every view-weapon SOUND_KEY and allow
 the GabriellaAI spawn. The original objectives page (fixed Tab action), power bar (air, throw
 charge, boss) and CMessageMgr ring (pickup/power/movement strings) are ported; missing art/strings
-never fail the HUD. Options > Display FIELD OF VIEW (60–120, preferences version 12) replaces
+never fail the HUD. Options > Display FIELD OF VIEW (60–120, added in preferences version 12, now 15) replaces
 FOV_NORMAL only at presentation; game FOVs, zoom and XR are unchanged. The Mad Scientist pose and
 the macOS-failing gpu.character/viewport/polygrid/inventory_use tests remain open.
 
@@ -148,7 +224,7 @@ Preserve first-contact ejection consumption, bullet versus shell casing/mark/smo
 rules, no BMG casing and no Minigun impact FX. Tracers cast along the original impact
 normal, stay stationary for a strict .1 seconds and use three gradient hardware lines.
 The shared engine line renderer keeps XR defaults and masks translucent depth/reflection
-writes while attenuating glow/AO. Regenerate all 72 shader artifacts together.
+writes while attenuating glow/AO. Regenerate all 96 shader artifacts together.
 
 The [flare VFX lot 5](Documentation/contracts/flare_contracts.md#original-vfx-completion--lot-5-2026-10-25)
 connects primary/fragment sparks and composites 13–15. Preserve the disabled alternate
@@ -189,7 +265,7 @@ polygon-clipped ballistic marks. Preserve source light flags, the inspector's dr
 unsupported-light counts, no game RNG/server-record/save changes, view-model/sky isolation,
 per-eye ordering with sprite slice batching, checked convex clipping and original mark
 reuse. Fog lights and effect-light shadows remain explicit limits (SkyFog is applied since 0.5.2). Regenerate
-all 72 shader artifacts together; keep the no-effect reference frames and post-processing
+all 96 shader artifacts together; keep the no-effect reference frames and post-processing
 contracts green. The source mark-ray and stateless fog adaptations are documented.
 The forward continuation selects lights per GPU model instance and world material batch:
 12 on Android/Quest/iOS, 32 on desktop, with no camera-wide truncation. Preserve sphere/
@@ -246,7 +322,7 @@ corpses await a decision. The character chain and add-on classes are later lots.
 
 The [setup screen](Documentation/contracts/setup_screen_contracts.md) replaced the standalone launcher (removed; its documents are archived under `Documentation/history/launcher/`). Without `--data-dir`, `BLOOD2_DATA_DIR` or `blood2.local.ini` the game uses the playable choice stored in `setup.cfg`, else opens the screen: detected/added installations (retail or demo), the qualified Archive.org demo download and per-installation data-only REZ mods; Options > SETUP reopens it and a new choice restarts the game in-process. Preserve the explicit-configuration bypass, strict bounded `setup.cfg`, never-followed validated redirects, the platform HTTPS transports (libcurl on Linux/Windows, NSURLSession on Apple, HttpsURLConnection on Android; OpenSSL only on Linux), SHA-256 and bounded miniz checks, staging with atomic publication and `/sdcard/openblood2` with all-files access on Android.
 
-The [enhanced renderer](Documentation/contracts/enhanced_renderer_contracts.md) adds Options > Display `RENDERER [ORIGINAL/ENHANCED]`, enhanced `LIGHTING [STANDARD/HIGH]` and `NORMAL MAPS [GENERATED/OFF]`: physically based world faces and lit models, using `config/materials.json` classes, generated normal maps (in-memory content cache) and a per-world static-light grid. It has no probes and no baking. Keep the original set the untouched reference (byte-identical frames, `gpu.surface`). Sky, sprites, FX and PolyGrids stay on the original shaders, the diffuse term stays the original light, and manifest parsing stays bounded. Emission (5.2) adds a light-independent glow from the manifest's `emissive`/`emissive_threshold` classes and counts the DAT's fully bright faces per material; `surface_report` (5.5) feeds the inspector's "Enhanced materials" with the same normal-map rule as the renderer. Preserve emission only adding light, the original output on fully bright faces, the default class for SPR materials and the 32-byte material push. Regenerate all shader artifacts together (the sixty-four renderer and post-processing artifacts plus the eight shared line artifacts). Preferences are version 12 (through display/VR settings, auto-run, mouse look and crosshair choices, then the field of view). M2/M3 scope is unchanged.
+The [enhanced renderer](Documentation/contracts/enhanced_renderer_contracts.md) adds Options > Display `RENDERER [ORIGINAL/ENHANCED]`, enhanced `LIGHTING [STANDARD/HIGH]` and `NORMAL MAPS [GENERATED/OFF]`: physically based world faces and lit models, using `config/materials.json` classes, generated normal maps (in-memory content cache) and a per-world static-light grid. With GLOBAL ILLUMINATION on (GI lot G8) its world faces receive the GI-composed lightmaps and vertex light, and since G9 light probes light its models (pseudo-light specular included); since G12 reflection probes (REFLECTION PROBES) replace its environment light. Keep the original set the untouched reference (byte-identical frames, `gpu.surface`). Sky, sprites, FX and PolyGrids stay on the original shaders, the diffuse term stays the original light, and manifest parsing stays bounded. Emission (5.2) adds a light-independent glow from the manifest's `emissive`/`emissive_threshold` classes and counts the DAT's fully bright faces per material; `surface_report` (5.5) feeds the inspector's "Enhanced materials" with the same normal-map rule as the renderer. Preserve emission only adding light, the original output on fully bright faces, the default class for SPR materials and the 32-byte material push. Regenerate all shader artifacts together (the sixty-four renderer and post-processing artifacts, the twenty-four GI variants and the eight shared line artifacts). Preferences are version 15 (through display/VR settings, auto-run, mouse look and crosshair choices, the field of view, global illumination, then reflection probes; version 15 applies the Gate E probe default). M2/M3 scope is unchanged.
 
 [Post-processing](Documentation/contracts/post_processing_contracts.md) (M6) adds Options > Display `TONEMAP [OFF/NEUTRAL/FILMIC]`, `BLOOM [ON/OFF]`, `AMBIENT OCCLUSION [OFF/LOW/HIGH]` and `REFLECTIONS [OFF/LOW/HIGH]` for the enhanced renderer and `ANTI-ALIASING [OFF/FXAA/MSAA 2X/MSAA 4X]` for both, planned by `PostProcess` around the desktop scene pass. Preserve the direct scene pass (the original frame byte for byte) whenever no effect applies, the `-DAUX_TARGETS` glow (only enhanced emission; original shaders clear or attenuate it, its alpha the occlusion mask) and the R32F depth copy written by opaque non-sky pipelines (SDL_GPU cannot resolve MSAA depth), half-size GTAO with the depth-aware blur and gathered upsample (under 1 ms at 1080p on Apple M5) that never darkens emission, view models or translucent surfaces, a minimum-depth pyramid shared by GTAO (far taps) and SSR (Hi-Z traversal) whose levels never sample what they render, half-size SSR that replaces the environment light of the enhanced specular (`-DREFLECTION_TARGETS` weight and light, never added on top), NEUTRAL leaving everything below 0.76 linear unchanged, FXAA last on display values, the HUD/menus after every pass and XR without post-processing.
 
@@ -262,7 +338,7 @@ request only enumerated OpenXR refresh rates (AUTO = 0) and show the actual rate
 Render scale is 50–100% of eye dimensions via matching viewports/depth/subimages; swapchain
 allocation and the 640×480 UI quad stay fixed. Desktop pacing never applies to XR.
 
-The [input action layer](Documentation/contracts/input_action_contracts.md) (input lot, steps 1–4) routes keyboard, mouse, gamepad and touch play and menu input through `InputBindings`; keyboard defaults are the previous layout plus original defaults.cfg cycling keys, gamepads use the console layout. Preserve the Hold/Latch/Analog/Press/Command/Interface kinds, the Press repeat guard, suppression and re-arming, captured-only mouse buttons, focus-loss gamepad reset with polled resync, state tracking before menu early returns, reserved F1/F2/F3/F10, original credit VK/Quit Y-N/promotion Space keys, and bounded validated bindings. The [inventory cursor](Documentation/contracts/inventory_cursor_contracts.md) ports the original item cursor, USEINVENTORY, SMSG_ITEMCHANGED and status-bar item tabs: preserve the typed item order, zero-charge absence, wrap-on-select but no display wrap, the removal hand-off, the saved current-item type, missing item art never failing the HUD, and the original scroll timing. The touch camera drag owns one right-half finger on direct touch screens only and never treats touch-emulated mouse events as play look or fire. The original Options > Controls page (`CMenuControls`) rebinds the row actions into `controls.cfg`: preserve one control per device per action, the control leaving its other rebindable action, fixed menu/system keys, Esc/Start cancel, ignored Tab/F5/F6, transactional loading and initially unbound additional actions. On-screen touch controls are a virtual gamepad (`touch_gamepad_id`) on the ordinary gamepad path; preserve play-only fingers, release without edges on ownership changes and the camera drag for other right-half fingers.
+The [input action layer](Documentation/contracts/input_action_contracts.md) (input lot, steps 1–4) routes keyboard, mouse, gamepad and touch play and menu input through `InputBindings`; keyboard defaults are the previous layout plus original defaults.cfg cycling keys, gamepads use the console layout. Preserve the Hold/Latch/Analog/Press/Command/Interface kinds, the Press repeat guard, suppression and re-arming, captured-only mouse buttons, focus-loss gamepad reset with polled resync, state tracking before menu early returns, reserved F1/F2/F3/F8/F10 (F8: GI tools, controls v3 drops old F8 bindings), original credit VK/Quit Y-N/promotion Space keys, and bounded validated bindings. The [inventory cursor](Documentation/contracts/inventory_cursor_contracts.md) ports the original item cursor, USEINVENTORY, SMSG_ITEMCHANGED and status-bar item tabs: preserve the typed item order, zero-charge absence, wrap-on-select but no display wrap, the removal hand-off, the saved current-item type, missing item art never failing the HUD, and the original scroll timing. The touch camera drag owns one right-half finger on direct touch screens only and never treats touch-emulated mouse events as play look or fire. The original Options > Controls page (`CMenuControls`) rebinds the row actions into `controls.cfg`: preserve one control per device per action, the control leaving its other rebindable action, fixed menu/system keys, Esc/Start cancel, ignored Tab/F5/F6, transactional loading and initially unbound additional actions. On-screen touch controls are a virtual gamepad (`touch_gamepad_id`) on the ordinary gamepad path; preserve play-only fingers, release without edges on ownership changes and the camera drag for other right-half fingers.
 
 The [save-message primitives](Documentation/contracts/save_load_contracts.md#implemented-primitives-lot-1) (save/load lot 1) add the original CSBase Byte/Word/Float/Vector/Rotation/String, nested-message and object-reference calls plus bounded `MID_SAVEOBJECT`/`MID_LOADOBJECT` payload dispatch. Preserve LoadSave references only on the active payload, NULL for unlisted/going-away targets and plain references (D7), no load rewind, exact consumption and owned read-only nested readers. Nothing saves to a file yet; M2 closure is unchanged.
 

@@ -3,6 +3,7 @@
 #include "app/control_bindings.h"
 #include "app/display_options.h"
 #include "app/gamepad_devices.h"
+#include "app/gi_tool.h"
 #include "app/hud.h"
 #include "app/movement_controls.h"
 #include "app/network_controls.h"
@@ -17,6 +18,7 @@
 #include "server/network.h"
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlgpu3.h>
+#include <algorithm>
 #include <imgui.h>
 #include <memory>
 #include <spdlog/spdlog.h>
@@ -93,9 +95,12 @@ namespace OpenBlood2
         std::vector<Net::CommandAction> sampled_actions;
         MenuSettings settings;
         std::filesystem::path preferences, bindings;
+        std::vector<std::string> dropped;
         if (!menu_preferences_path(preferences, error) || !load_menu_preferences(preferences, settings, error) ||
-            !controls_path(bindings, error) || !load_controls(bindings, controls.bindings, error))
+            !controls_path(bindings, error) || !load_controls(bindings, controls.bindings, error, &dropped))
             return failed();
+        for (const auto& binding : dropped)
+            spdlog::warn("Controls: dropped {} (F8 is reserved for the GI tools)", binding);
         Menu display_menu;
         display_menu.settings = settings;
         DisplayOptions display(runtime);
@@ -107,6 +112,11 @@ namespace OpenBlood2
         controls.mouse_look = settings.mouse_look;
         controls.focused = (SDL_GetWindowFlags(runtime.window) & SDL_WINDOW_INPUT_FOCUS) != 0;
         presenter.lightmaps = settings.detail >= 1;
+        // Baked GI (lot G8) from this client's own content and roots, never from the server.
+        presenter.global_illumination = settings.global_illumination;
+        presenter.gi_reflections = GiReflectionMode(std::clamp(settings.reflection_probes, 0, 2));
+        presenter.gi_roots = gi_search_roots(config.gi_dir);
+        GiLogState gi_logged;
         presenter.model_shadows = options.model_shadows && settings.detail >= 2;
         presenter.per_pixel_lighting = settings.pixel_lighting;
         presenter.shading = !settings.renderer ? SurfaceShading::Original
@@ -376,6 +386,7 @@ namespace OpenBlood2
                     SDL_CancelGPUCommandBuffer(commands);
                     return failed();
                 }
+                log_gi_status(presenter, gi_logged);
             }
             ImGui_ImplSDLGPU3_PrepareDrawData(ImGui::GetDrawData(), commands);
             SDL_GPUColorTargetInfo color{};

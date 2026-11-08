@@ -33,6 +33,7 @@ add_library(engine_core STATIC
     src/engine/properties.cpp
     src/engine/sky_projection.cpp
     src/engine/surface_materials.cpp
+    src/engine/bounded_json.cpp
     src/engine/surface_report.cpp
     src/engine/normal_maps.cpp
     src/engine/light_grid.cpp
@@ -71,6 +72,20 @@ add_library(engine_core STATIC
     src/engine/model_store.cpp
     src/engine/collision.cpp
     src/engine/visibility.cpp
+    src/engine/gi_world.cpp
+    src/engine/gi_file.cpp
+    src/engine/gi_placement.cpp
+    src/engine/gi_bake_scene.cpp
+    src/engine/gi_sky.cpp
+    src/engine/gi_lightmap.cpp
+    src/engine/gi_direct.cpp
+    src/engine/gi_probes.cpp
+    src/engine/gi_reflections.cpp
+    src/engine/gi_preview.cpp
+    src/engine/gi_jobs.cpp
+    src/engine/gi_bake.cpp
+    src/engine/gi_runtime.cpp
+    src/engine/gi_reflection_runtime.cpp
     src/engine/container.cpp
     src/engine/world_model.cpp
     src/engine/logging.cpp
@@ -84,6 +99,18 @@ add_library(engine_core STATIC
 )
 target_include_directories(engine_core PUBLIC src src/game/legacy PRIVATE "${PROJECT_BINARY_DIR}/generated")
 target_link_libraries(engine_core PUBLIC SDL3::SDL3 blood2_startup PRIVATE spdlog::spdlog)
+# GI tool builds default placement files to the checkout's committed data/gi (gi_contracts.md lot G4).
+# The GI tracer's float results (hit distances, survey digests) must not depend on the optimization
+# level: no fused multiply-add contraction (gi_contracts.md lot G5).
+if(NOT MSVC)
+    set_property(SOURCE src/engine/gi_bake_scene.cpp src/engine/gi_sky.cpp src/engine/gi_lightmap.cpp
+                 src/engine/gi_probes.cpp src/engine/gi_bake.cpp src/engine/gi_direct.cpp
+                 src/engine/gi_reflections.cpp APPEND PROPERTY COMPILE_OPTIONS -ffp-contract=off)
+endif()
+if(BLOOD2_GI_TOOLS)
+    set_property(SOURCE src/engine/gi_placement.cpp APPEND PROPERTY COMPILE_DEFINITIONS
+                 "BLOOD2_GI_PROJECT_DIR=\"${PROJECT_SOURCE_DIR}/data/gi\"")
+endif()
 blood2_project_options(engine_core)
 
 if(BLOOD2_BUILD_CLIENT)

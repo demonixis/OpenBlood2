@@ -138,7 +138,10 @@ the extra row or column when the previous size is odd, so every texel covers its
 
 The enhanced shaders light every surface with a uniform environment: the local baked light
 (`diffuse`) times the split-sum specular weight. Screen-space reflections replace that light by the
-light actually reflected, where the screen can supply it. Nothing is added twice.
+light actually reflected, where the screen can supply it. Nothing is added twice. Since GI lot G12,
+where reflection probes are drawn, their radiance is that environment light (the GI variants write
+it to target 4), so SSR replaces the probes' light, never adds to it
+([reflection runtime](gi_contracts.md#reflection-runtime-lot-g12)).
 
 - **Inputs** (targets 3 and 4, opaque non-sky pipelines only, like the depth copy):
   - the environment specular weight `split · compensation · cavity` (RGB), with roughness in alpha;

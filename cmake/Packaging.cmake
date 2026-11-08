@@ -158,6 +158,11 @@ function(blood2_android_package target)
     else()
         set(variant Debug)
     endif()
+    # Baked GI files staged by blood2_package_gi (cmake/GiPackaging.cmake) become assets/gi.
+    set(gi_assets "")
+    if(BLOOD2_PACKAGE_GI)
+        set(gi_assets "-Pblood2.assets=${PROJECT_BINARY_DIR}/android/assets")
+    endif()
     add_custom_target(blood2_apk
         COMMAND "${CMAKE_COMMAND}" -E env "ANDROID_HOME=${sdk}"
             "${gradle}" --no-daemon --console=plain
@@ -169,6 +174,7 @@ function(blood2_android_package target)
             "-Pblood2.sdlJava=${sdl3_SOURCE_DIR}/android-project/app/src/main/java"
             "-Pblood2.versionName=${PROJECT_VERSION}"
             "-Pblood2.versionCode=${BLOOD2_VERSION_CODE}"
+            ${gi_assets}
         DEPENDS ${target}
         USES_TERMINAL VERBATIM
         COMMENT "Assembling the ${BLOOD2_ANDROID_FLAVOR} ${variant} APK")
