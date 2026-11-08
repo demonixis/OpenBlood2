@@ -41,6 +41,29 @@ oversized, unsupported or malformed materials render an opaque magenta marker.
 Malformed geometry/path/UV data and exhausted aggregate budgets fail mesh building
 atomically. An intentionally texture-free synthetic mesh retains orientation colors.
 
+## Localized signage
+
+The client resolves stock sign and lettering recipes by their exact resource
+path and decoded texture fingerprint. The `[signs]` entries in the selected INI
+replace lettering in measured texture regions using the bundled face, the
+source ink colors and local background samples. Multi-line signs use `|` between
+lines. Changed texels propagate through the corresponding areas of the authored
+mip levels. Dimensions, decoded alpha, material paths, UVs and draw order remain the
+same, so world faces, animated material frames and model skins use the same
+geometry, lighting and sampling.
+
+Large billboards are composed in their original tile layout before the translated
+lettering is split back into the texture tiles. All tiles must match the stock
+fingerprints for the billboard to use the replacement.
+
+English uses the original decoded pixels. Missing labels, unavailable glyphs,
+unrecognized assets and textures replaced by mods use the mounted artwork. The
+client invalidates presentation materials when the language changes. Asset
+mounts, world validation, collision and network content checks still use the
+original data. The repository ships the recipes and translations.
+
+## Mesh coordinates and GPU uploads
+
 UVs are dot(position - surface origin, surface U/V), divided by image width/height.
 They use authored positions before subtracting a moving model's DAT pivot. Applying
 the current object transform therefore moves the surface and texture together.

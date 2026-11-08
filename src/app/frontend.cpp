@@ -23,6 +23,7 @@
 #include "game/cinematic_captions.h"
 #include "game/localized_art.h"
 #include "game/localized_font.h"
+#include "game/localized_signs.h"
 #include "game/menu_audio.h"
 #include "game/menu_preferences.h"
 #if BLOOD2_INSPECTOR
@@ -627,6 +628,11 @@ namespace OpenBlood2
             }
             ObjectSelection selection;
             ScenePresenter presenter(runtime.gpu);
+            const auto refresh_sign_language = [&]
+            {
+                presenter.set_texture_decoration(sign_texture_decoration(localization, localized_font));
+            };
+            refresh_sign_language();
             presenter.model_shadows = options.model_shadows;
             HudRenderer hud(runtime.gpu);
             if (ui.localized)
@@ -1226,6 +1232,7 @@ namespace OpenBlood2
                     {
                         setup.language = menu.settings.language;
                         preferences.load_language(ui.localized != nullptr);
+                        refresh_sign_language();
                         input.refresh_controls(menu);
                         game->client_shell.control_notice.clear();
                         saves.notice.text.clear();
@@ -1534,6 +1541,7 @@ namespace OpenBlood2
                     if (apply_setup_language(setup, preferences, !diagnostic))
                     {
                         stored_settings.language = menu.settings.language = setup.language;
+                        refresh_sign_language();
                         input.refresh_controls(menu);
                         game->client_shell.control_notice.clear();
                         saves.notice.text.clear();

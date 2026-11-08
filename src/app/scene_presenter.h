@@ -69,6 +69,8 @@ namespace OpenBlood2
                          Uint32 width, Uint32 height, std::span<const StereoEye> eyes, std::string& error);
         // Independent remote/local client entrypoints, with no authoritative session access.
         bool update(const ClientScene&, std::string& error);
+        // Changing display text invalidates presentation materials at the next update.
+        void set_texture_decoration(TextureDecoration);
         bool record(const ClientScene&, SDL_GPUCommandBuffer*, SDL_GPUTexture*, SDL_GPUTextureFormat, Uint32 width,
                     Uint32 height, std::string& error);
         bool record_eyes(const ClientScene&, SDL_GPUCommandBuffer*, SDL_GPUTexture*, SDL_GPUTextureFormat, Uint32 width,
@@ -156,6 +158,8 @@ namespace OpenBlood2
 
       private:
         std::uint64_t client_world_epoch_ = 0;
+        TextureDecoration texture_decoration_;
+        bool texture_decoration_changed_ = false;
         const ClientCameraView& camera(const ClientScene&) const;
         bool valid_frame(const ClientScene&, std::string& error) const;
         // Pipelines, renderer uploads, shadow tiles and a depth target with `layers` layers.

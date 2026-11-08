@@ -17,9 +17,9 @@ namespace OpenBlood2
         constexpr std::array<std::string_view, supported_languages.size()> names{
             "English", "Français", "简体中文", "Deutsch", "Italiano", "Español", "Português (Brasil)", "한국어"};
         constexpr std::size_t max_catalog_size = 256 * 1024, max_entries = 2048;
-        constexpr std::array<std::string_view, 12> sections{"menu", "resources", "hud", "setup", "control",
+        constexpr std::array<std::string_view, 13> sections{"menu", "resources", "hud", "setup", "control",
                                                            "network", "loading", "objectives", "promotions",
-                                                           "dialogue", "intro", "credits"};
+                                                           "dialogue", "intro", "credits", "signs"};
         constexpr std::array<std::string_view, static_cast<std::size_t>(TextKey::Count)> pilot_keys{
             "", "menu.language", "menu.setup", "menu.cheats", "menu.unavailable_options", "hud.first_person",
             "hud.third_person"};

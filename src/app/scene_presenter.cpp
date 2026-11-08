@@ -28,6 +28,16 @@ namespace OpenBlood2
         registry.release(shadow_atlas_);
         registry.release(shadow_depth_);
     }
+    void ScenePresenter::set_texture_decoration(TextureDecoration decoration)
+    {
+        if (!decoration && !texture_decoration_)
+            return;
+        texture_decoration_ = std::move(decoration);
+        const auto* load = texture_decoration_ ? &texture_decoration_ : nullptr;
+        model_scene.decorate_texture = explosion_model_scene.decorate_texture = load;
+        sprite_scene.decorate_texture = sky_sprite_scene.decorate_texture = load;
+        texture_decoration_changed_ = true;
+    }
     const ClientCameraView& ScenePresenter::camera(const ClientScene& source) const
     {
         return camera_override ? *camera_override : source.view;
@@ -348,7 +358,7 @@ namespace OpenBlood2
                 ballistic_vertices.push_back({{b.x, b.y, b.z}, {tracer_color.x, 0, 0, .9f}});
             }
         rebuilt = client_world_epoch_ != replica.frame().world || mesh_revision != source.world_revision ||
-                  built_lightmaps_ != lightmaps;
+                  built_lightmaps_ != lightmaps || texture_decoration_changed_;
         const auto model_revision = model_scene.revision, effect_revision = explosion_model_scene.revision,
                    sprite_revision = sprite_scene.revision, sky_sprite_revision = sky_sprite_scene.revision;
         if (rebuilt)
@@ -370,7 +380,9 @@ namespace OpenBlood2
             world_mesh = {};
             world_draws.clear();
             model_lighting.clear();
-            if (!source.world_path.empty() && !world_mesh.build(source.geometry, error, &source.resources, lightmaps))
+            const auto* decorate = texture_decoration_ ? &texture_decoration_ : nullptr;
+            if (!source.world_path.empty() &&
+                !world_mesh.build(source.geometry, error, &source.resources, lightmaps, decorate))
                 return fail("World mesh");
             built_lightmaps_ = lightmaps;
             if (!model_lighting.build(world_mesh, source.geometry, error))
@@ -379,6 +391,7 @@ namespace OpenBlood2
             client_world_epoch_ = replica.frame().world;
             grid_revision_ = UINT64_MAX;
             report_mesh_ = UINT64_MAX;
+            texture_decoration_changed_ = false;
         }
         if (!prepare_surface(source, error))
             return fail("Enhanced renderer");

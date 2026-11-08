@@ -6,7 +6,8 @@
 
 namespace OpenBlood2
 {
-    bool read_texture_resource(const Resources& resources, std::string_view path, Texture& out, std::string& error)
+    bool read_texture_resource(const Resources& resources, std::string_view path, Texture& out, std::string& error,
+                               const TextureDecoration* decorate)
     {
         out = {};
         const auto* resource = resources.find(path);
@@ -21,7 +22,11 @@ namespace OpenBlood2
             return false;
         }
         std::vector<std::uint8_t> bytes;
-        return resources.read(path, bytes, error) && read_texture(bytes, out, error);
+        if (!resources.read(path, bytes, error) || !read_texture(bytes, out, error))
+            return false;
+        if (decorate)
+            (*decorate)(resources, path, out);
+        return true;
     }
     std::size_t texture_mip_bytes(const Texture& image)
     {

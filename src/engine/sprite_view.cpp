@@ -104,7 +104,7 @@ namespace OpenBlood2
             }
             WorldMaterial next;
             next.path = key;
-            read_texture_resource(resources, key, next.image, next.error);
+            read_texture_resource(resources, key, next.image, next.error, decorate_texture);
             if (next.image.rgba.size() > 128 * 1024 * 1024 - mesh.texture_bytes)
             {
                 error = "Sprite texture memory budget exceeded";

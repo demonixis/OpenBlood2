@@ -87,7 +87,8 @@ namespace OpenBlood2
         static constexpr std::uint32_t lightmap_page_size = 1024;
         // lightmaps=false is the original "LightMap 0" (low detail): lightmapped faces keep their
         // baked vertex light.
-        bool build(const World&, std::string&, const Resources* = nullptr, bool lightmaps = true);
+        bool build(const World&, std::string&, const Resources* = nullptr, bool lightmaps = true,
+                   const TextureDecoration* = nullptr);
     };
     bool world_material_frame(const WorldMesh&, std::uint32_t material, double time, std::uint32_t& image);
     struct WorldDraw

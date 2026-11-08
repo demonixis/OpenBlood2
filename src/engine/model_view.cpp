@@ -106,7 +106,7 @@ namespace OpenBlood2
                 }
                 WorldMaterial next;
                 next.path = key;
-                read_texture_resource(resources, key, next.image, next.error);
+                read_texture_resource(resources, key, next.image, next.error, decorate_texture);
                 // Thirty-five older mask-less retail skins (wood/flesh/stone gibs, casings, some
                 // pickups) carry palette byte 0 as alpha 0 throughout. The original draws models
                 // with these as plain opaque skins; a wholly transparent skin would make blended

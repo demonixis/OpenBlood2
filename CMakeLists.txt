@@ -176,7 +176,7 @@ if(BLOOD2_BUILD_CLIENT)
     add_library(blood2_frontend STATIC src/game/original/MainMenus.cpp src/game/menu_canvas.cpp src/game/menu_audio.cpp
         src/engine/localization.cpp
         src/game/original/LoadingScreen.cpp
-        src/game/menu_preferences.cpp src/game/new_game.cpp src/game/localized_font.cpp)
+        src/game/menu_preferences.cpp src/game/new_game.cpp src/game/localized_font.cpp src/game/localized_signs.cpp)
     target_include_directories(blood2_frontend SYSTEM PRIVATE "${imgui_source_SOURCE_DIR}")
     set(localized_font "${PROJECT_SOURCE_DIR}/lang/fonts/locale.ttf")
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${localized_font}")

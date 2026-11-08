@@ -30,6 +30,7 @@ namespace OpenBlood2
             clear();
         }
         void clear();
+        const TextureDecoration* decorate_texture = nullptr; // Borrowed for material loads.
         bool begin_frame(DVector eye, DRotation camera, std::string& error);
         bool add(const Sprite*, const SpriteTrack&, NodePose, DVector scale, DDWORD flags, ObjectId, const Resources&,
                  std::string& error, float alpha = 1, DVector color = {1, 1, 1});

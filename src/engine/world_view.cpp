@@ -170,7 +170,8 @@ namespace OpenBlood2
         }
         range.bounded = physics_vector(range.min) && physics_vector(range.max);
     }
-    bool WorldMesh::build(const World& world, std::string& error, const Resources* resources, bool use_lightmaps)
+    bool WorldMesh::build(const World& world, std::string& error, const Resources* resources, bool use_lightmaps,
+                          const TextureDecoration* decorate)
     {
         *this = {};
         error.clear();
@@ -245,7 +246,7 @@ namespace OpenBlood2
                 return false;
             WorldMaterial entry;
             entry.path = key;
-            read_texture_resource(*resources, key, entry.image, entry.error);
+            read_texture_resource(*resources, key, entry.image, entry.error, decorate);
             if (entry.image.rgba.size() > 128 * 1024 * 1024 - texture_bytes)
                 return false;
             texture_bytes += entry.image.rgba.size();

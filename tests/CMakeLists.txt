@@ -2837,6 +2837,34 @@ blood2_project_options(localization_tests)
 add_test(NAME localization.catalogs COMMAND localization_tests "${PROJECT_SOURCE_DIR}/lang")
 set_tests_properties(localization.catalogs PROPERTIES LABELS "headless;localization" TIMEOUT 10)
 
+if(BLOOD2_GPU_TESTS AND (BLOOD2_TEST_DATA_DIR OR BLOOD2_DEMO_DATA_DIR))
+    add_executable(localized_sign_gpu_tests localized_sign_gpu_tests.cpp ../src/app/scene_presenter.cpp
+        ../src/app/model_lighting.cpp ../src/app/model_scene.cpp ../src/app/polygrid_scene.cpp ../src/app/sprite_scene.cpp)
+    target_link_libraries(localized_sign_gpu_tests PRIVATE blood2_game)
+    blood2_project_options(localized_sign_gpu_tests)
+    set_target_properties(localized_sign_gpu_tests PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/localized-sign-check")
+    add_custom_target(localized_sign_test_assets
+        COMMAND "${CMAKE_COMMAND}" -E copy_directory_if_different
+            "${PROJECT_SOURCE_DIR}/lang" "$<TARGET_FILE_DIR:localized_sign_gpu_tests>/lang"
+        VERBATIM)
+    add_dependencies(localized_sign_gpu_tests localized_sign_test_assets)
+    if(BLOOD2_DEMO_DATA_DIR)
+        add_test(NAME gpu.localized_signs_demo COMMAND localized_sign_gpu_tests demo "${BLOOD2_DEMO_DATA_DIR}"
+            "${CMAKE_CURRENT_BINARY_DIR}/signs-demo-gpu")
+        set_tests_properties(gpu.localized_signs_demo PROPERTIES LABELS "gpu;private;localization;demo"
+            TIMEOUT 60 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+    endif()
+    if(BLOOD2_TEST_DATA_DIR)
+        foreach(edition IN ITEMS retail billboard)
+            add_test(NAME gpu.localized_signs_${edition} COMMAND localized_sign_gpu_tests
+                "${edition}" "${BLOOD2_TEST_DATA_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/signs-${edition}-gpu")
+            set_tests_properties(gpu.localized_signs_${edition} PROPERTIES LABELS "gpu;private;localization"
+                TIMEOUT 60 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy")
+        endforeach()
+    endif()
+endif()
+
 if(BLOOD2_GPU_TESTS AND BLOOD2_TEST_DATA_DIR)
     add_test(NAME gpu.menu_traversal COMMAND blood2_app --menu-smoke --data-dir "${BLOOD2_TEST_DATA_DIR}" --capture "${CMAKE_CURRENT_BINARY_DIR}/menu-traversal.png")
     set_tests_properties(gpu.menu_traversal PROPERTIES LABELS "gpu;private;menus" TIMEOUT 120 RUN_SERIAL TRUE ENVIRONMENT "SDL_AUDIODRIVER=dummy" FAIL_REGULAR_EXPRESSION "Validation Error;VUID-")

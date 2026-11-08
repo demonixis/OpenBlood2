@@ -66,6 +66,7 @@ namespace OpenBlood2
         }
         void clear();
         void begin_frame();
+        const TextureDecoration* decorate_texture = nullptr; // Borrowed for material loads.
         bool add(const Model*, const AnimationTrack&, std::string_view skin, NodePose, DVector scale, bool visible,
                  bool close, ObjectId, std::string_view label, const Resources&, std::string&,
                  std::span<const std::uint8_t> hidden_nodes = {}, float alpha = 1, bool require_skin = false,

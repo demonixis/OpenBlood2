@@ -69,7 +69,8 @@ namespace
             CHECK(!strings.text("dialogue.sounds.events.tavoice1").empty());
             for (auto key : {"network.blue_team", "network.red_team", "hud.touch_fire", "hud.touch_jump",
                              "menu.controls_load_error", "menu.error_details", "menu.demo_version", "loading.chapter",
-                             "credits.line.fd0e3eb2521a2182"})
+                             "credits.line.fd0e3eb2521a2182", "signs.no_spitting", "signs.out_of_order",
+                             "signs.keep_clear", "signs.got_blood"})
                 CHECK(!strings.text(key).empty());
             CHECK(!strings.world("Worlds_AO\\Caleb1_cc_c.DAT").empty());
             CHECK(!strings.pickup_name("Kitchen Key").empty() && strings.pickup_name("Kitchen key").empty());
@@ -81,13 +82,15 @@ namespace
         CHECK(!parse_language("zh") && !parse_language("pt-br") && !parse_language("../../fr"));
 
         constexpr auto partial = "\xef\xbb\xbf; UTF-8 BOM and CRLF\r\n[menu]\r\n language = LANGUE\r\n"
-                                 "[hud]\r\nthird_person=Troisième personne"sv;
+                                 "[hud]\r\nthird_person=Troisième personne\r\n[signs]\r\nexit=SORTIE"sv;
         CHECK(strings.load_catalog(Language::French, partial, error));
         CHECK(strings.text(TextKey::Language, "LANGUAGE") == "LANGUE");
         CHECK(strings.text(TextKey::ThirdPerson, "Third person") == "Troisième personne");
         CHECK(strings.text(TextKey::FirstPerson, "First person") == "First person");
         CHECK(strings.text(502, "OPTIONS") == "OPTIONS");
         CHECK(strings.text("setup.play", "Play") == "Play");
+        CHECK(strings.text("signs.exit", "EXIT") == "SORTIE");
+        CHECK(strings.text("signs.no_smoking", "NO SMOKING") == "NO SMOKING");
         CHECK(strings.dialogue("1ACaleb1.wav").empty());
         CHECK(strings.load_catalog(Language::French, "[setup]\nmessage={1} puis {0}\nbad=seulement {0}", error));
         CHECK(strings.format("setup.message", "{0}, then {1}", {"A", "{0}"}) == "{0} puis A");

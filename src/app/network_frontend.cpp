@@ -14,6 +14,7 @@
 #include "engine/capture.h"
 #include "game/game_settings.h"
 #include "game/localized_font.h"
+#include "game/localized_signs.h"
 #include "game/menu_preferences.h"
 #include "net/address.h"
 #include "server/network.h"
@@ -105,7 +106,11 @@ namespace OpenBlood2
         const bool localized = localized_face && localization.language() != Language::English;
         HudRenderer hud(runtime.gpu);
         if (localized)
+        {
             hud.set_localization(&localization, localized_font);
+            if (localized_font)
+                presenter.set_texture_decoration(sign_texture_decoration(localization, *localized_font));
+        }
         const auto tr = [&](std::string_view key, const char* english)
         { return multiplayer_label(&localization, localized ? localized_font : nullptr, key, english); };
         Menu display_menu;

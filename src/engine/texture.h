@@ -1,7 +1,9 @@
 #pragma once
 #include <cstdint>
+#include <functional>
 #include <span>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace OpenBlood2
@@ -20,5 +22,8 @@ namespace OpenBlood2
     // authored level with the shared palette/masks. Empty output on failure. Later
     // DTX generations and shared palettes are rejected.
     bool read_texture(std::span<const std::uint8_t>, Texture&, std::string&);
-    bool read_texture_resource(const Resources&, std::string_view, Texture&, std::string&);
+    // Optional presentation decoration of decoded pixels, before deriving material alpha variants.
+    using TextureDecoration = std::function<void(const Resources&, std::string_view, Texture&)>;
+    bool read_texture_resource(const Resources&, std::string_view, Texture&, std::string&,
+                               const TextureDecoration* = nullptr);
 } // namespace OpenBlood2
