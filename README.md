@@ -1,14 +1,10 @@
 # OpenBlood2
 
 Rebuild **Blood II: The Chosen** using its original game code and a portable
-C++20 engine with SDL3/SDL_GPU. F10 toggles the development inspector.
+C++20 engine with SDL3/SDL_GPU.
 
 [Roadmap](Documentation/roadmap.md) · [Documentation](Documentation/readme.md) ·
 [Tests](Documentation/testing.md)
-
-M0/M1 are complete on Linux. [M2 is closed with reservation M2-GPU-001](Documentation/implementation/reports/m2_acceptance.md).
-M3 is next; full campaign support remains unaccepted. Linux/NVIDIA is tested,
-macOS/Metal is user-confirmed; Windows graphical qualification, mobile and VR are pending.
 
 ## Build and run
 
@@ -36,45 +32,6 @@ Normal launch shows the original title screen and menu; Esc pauses. Add `--view-
 entry. Single Player saves and loads the original slots; F5 quicksaves, F6
 quickloads. Use `release` for an optimized build without the
 inspector, `debug` for debugging. See [setup and controls](Documentation/getting_started.md).
-
-The ongoing [M9 network work](Documentation/implementation/reports/m9_network_frontend.md)
-adds `--host multi/bb_crypt` and `--connect HOST:27888` for graphical admission and
-movement. The [basic Bloodbath combat loop](Documentation/implementation/reports/m9_pvp.md)
-now supports held primary/alternate fire and USE respawn. [Server sounds](Documentation/implementation/reports/m9_network_audio.md)
-play through each client's independent audio mixer. [Private speech and startup
-announcements](Documentation/implementation/reports/m9_client_speech.md) now play
-through original VoiceMgr/CommLink. [Weapon animation sounds and loops](Documentation/implementation/reports/m9_weapon_sounds.md)
-now come from the validated server timeline. The [client roster](Documentation/implementation/reports/m9_roster.md)
-now receives names, characters and scores with reliable arrival/departure updates.
-[Combat announcements](Documentation/implementation/reports/m9_combat_announcer.md) now
-play original frag/suicide/FinishHim voices privately and show frag text to other players.
-The [original Bloodbath scoreboard](Documentation/implementation/reports/m9_scoreboard.md)
-toggles with Tab or gamepad Back, opens on death and closes on revival. Arrival
-and departure notices use the original localized text. Unknown ping displays `(-)`.
-[Match limits and rotation](Documentation/implementation/reports/m9_rotation.md) now
-cycle maps without reconnecting: `--end either --frag-limit 25 --time-limit 10
---map multi/bb_fields`. [Team](Documentation/implementation/reports/m9_team_network.md)
-adds `--mode team` for hosting and `--team auto|blue|red` for joining/hosting,
-original team HUD/scores and retained teams across rotations. Team rules accept
-`--friendly-fire on|off` and `--negative-team-frags on|off` (both default on).
-[CTF](Documentation/implementation/reports/m9_ctf_network.md) adds `--mode ctf`
-and the four `multi/ctf_*` maps, carried flags and capture scores/notices.
-The [Jam capture check](Documentation/implementation/reports/m9_ctf_capture.md) drives
-independent clients through grabbing, carrying, scoring and rotating the map.
-[Ballistic effects](Documentation/implementation/reports/m9_ballistic_network.md) now
-create casings, marks, smoke, fragments, liquid effects and tracers on each client,
-with local impact audio. [Explosions, fragments and instant beams](Documentation/implementation/reports/m9_instant_network.md)
-now execute on independent network clients. [Impact sprites, sparks and blood](Documentation/implementation/reports/m9_impact_network.md)
-now share ordered delivery and independent child splat/audio execution.
-Communication portraits, music, other visual effects,
-chat and broader qualification remain in progress.
-
-## CI builds
-
-[GitHub Actions](https://github.com/demonixis/OpenBlood2/actions/workflows/ci.yml)
-builds and tests Release versions for Windows x64, Linux x64 and macOS Apple
-Silicon. Each successful job provides a game archive; see
-[CI builds](Documentation/ci_builds.md) for downloads, test scope and pushing to both remotes.
 
 ## Contributing and license
 
