@@ -109,12 +109,15 @@ def main():
     check(statuses(document) == {"worlds/a.dat": "PASS", "worlds/b.dat": "FAIL", "worlds/c.dat": "PASS"},
           "report statuses %s" % statuses(document))
     check(document["totals"]["pass"] == 2 and document["totals"]["fail"] == 1, "report totals")
-    check(document["worlds"][0]["probes"] == 3 and document["worlds"][0]["quality"] == "final", "report fields")
+    check(document["worlds"][0]["probes"] == 3 and document["worlds"][0]["quality"] == "ultra", "report fields")
+    check(document["quality"] == "ultra" and document["emissive"] == "1", "Gate H defaults in the report")
     check(document["worlds"][1]["error"] == 'broken "face" list', "report error")
     calls = [json.loads(line) for line in open(log)]
     bakes = [call for call in calls if "--bake-gi" in call]
     check(all("--gi-if-stale" in call and call[call.index("--gi-jobs") + 1] == "3" for call in bakes),
           "bakes pass --gi-if-stale and --gi-jobs")
+    check(all(call[call.index("--gi-quality") + 1] == "ultra" and call[call.index("--gi-emissive") + 1] == "1"
+              for call in bakes), "bakes default to Ultra with emission (Gate H)")
     check(all(call[call.index("--log-level") + 1] == "error" for call in calls), "quiet log level")
 
     # Second run: everything current is skipped.

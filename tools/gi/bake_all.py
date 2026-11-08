@@ -51,8 +51,8 @@ def parse_arguments(argv):
                            help="world kinds to bake (default single: single-player and add-on worlds)")
     selection.add_argument("--worlds", nargs="+", metavar="WORLD",
                            help="worlds by path, file name or stem, case-insensitive")
-    parser.add_argument("--quality", choices=("preview", "final", "ultra", "custom"), default="final",
-                        help="bake preset (default final); ultra and the custom settings are lot GQ1")
+    parser.add_argument("--quality", choices=("preview", "final", "ultra", "custom"), default="ultra",
+                        help="bake preset (default ultra since Gate H); ultra and the custom settings are lot GQ1")
     parser.add_argument("--direct", choices=("original", "rebaked"), default="rebaked",
                         help="direct light on lightmapped faces: re-baked (default, lot GD2) or the stored lightmaps")
     parser.add_argument("--bounces", type=int, help="custom quality bounces (1-4)")
@@ -64,7 +64,9 @@ def parse_arguments(argv):
     parser.add_argument("--shadow-rays", type=int, help="custom quality soft-shadow rays per light (1-64)")
     parser.add_argument("--reflection-strata", type=int, help="custom quality reflection capture strata (2-8)")
     parser.add_argument("--reflection-samples", type=int, help="custom quality GGX samples (32-1024)")
-    parser.add_argument("--emissive", help="bake the manifest's emissive textures at this scale (0-4, lot GE1)")
+    parser.add_argument("--emissive", default="1",
+                        help="scale of the manifest's emissive textures in the bake (0-4, lot GE1; default 1 "
+                             "since Gate H, 0 turns it off)")
     parser.add_argument("--jobs", type=int, default=1, help="worlds baked at once (default 1)")
     parser.add_argument("--threads", type=int, default=0,
                         help="threads per bake, --gi-jobs (default: processors / jobs)")
@@ -150,8 +152,7 @@ def bake_command(base, world, arguments, threads):
     for name, flag in CUSTOM_SETTINGS:
         if getattr(arguments, name) is not None:
             command += [flag, str(getattr(arguments, name))]
-    if arguments.emissive is not None:
-        command += ["--gi-emissive", arguments.emissive]
+    command += ["--gi-emissive", arguments.emissive]
     if arguments.direct != "rebaked":  # The game's default since Gate G.
         command += ["--gi-direct", arguments.direct]
     if not arguments.force:

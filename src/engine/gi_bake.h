@@ -38,6 +38,7 @@ namespace OpenBlood2
         constexpr std::uint32_t min_reflection_strata = 2, max_reflection_strata = 8;
         constexpr std::uint32_t min_reflection_samples = 32, max_reflection_samples = 1024;
         constexpr std::uint32_t max_emissive = 400; // Lot GE1, hundredths.
+        constexpr std::uint32_t default_emissive = 100; // Gate H (2026-11-08): emission on at scale 1.
     } // namespace gi_bake_settings_limits
     // The direct light the bake composes and bounces on lightmapped faces (lot GD2, decision D17);
     // re-baked by default since Gate G (2026-11-07).
@@ -46,8 +47,9 @@ namespace OpenBlood2
         Original, // D = O - A_eff, the stored 1998 texel without its ambient fill.
         Rebaked   // D', the re-baked direct light (gi_direct.h), stored in the DIR section.
     };
-    // Every field defaults to the behaviour of earlier lots (decision D21): a bake with the defaults
-    // keeps its bytes and its settings text.
+    // Every field defaults to the behaviour of earlier lots (decision D21): settings with these values
+    // keep the bytes and the settings text of earlier files. The default request (no preset, no
+    // emission scale) is Ultra with emission at scale 1 since Gate H (make_gi_bake_settings).
     struct GiBakeSettings
     {
         GiQuality quality = GiQuality::Final;
@@ -63,7 +65,8 @@ namespace OpenBlood2
         std::uint32_t reflection_strata = 2, reflection_samples = 0;
         std::uint32_t emissive = 0; // Lot GE1: manifest emission scale in hundredths (0: not baked).
     };
-    // What the command line gives; zero or -1 where not given.
+    // What the command line gives; zero or -1 where not given. No preset means Ultra and no emission
+    // scale means default_emissive (Gate H); --gi-emissive 0 turns emission off.
     struct GiBakeArguments
     {
         std::string_view quality;
@@ -77,9 +80,10 @@ namespace OpenBlood2
     const char* gi_quality_name(GiQuality);
     const char* gi_direct_source_name(GiDirectSource); // "original", "rebaked".
     bool gi_direct_source(std::string_view name, GiDirectSource&);
-    // A preset name ("preview", "final", "ultra" or "custom"); the quality settings only with "custom",
-    // where they default to Final's. The emission scale goes with any preset.
+    // A preset name ("preview", "final", "ultra" or "custom", empty for Ultra); the quality settings
+    // only with "custom", where they default to Final's. The emission scale goes with any preset.
     bool make_gi_bake_settings(const GiBakeArguments&, GiBakeSettings&, std::string& error);
+    // The earlier lots' form: the same without emission (scale 0).
     bool make_gi_bake_settings(std::string_view quality, std::uint32_t bounces, std::uint32_t rays, std::int32_t sky,
                                GiBakeSettings&, std::string& error);
     // The canonical INFO text; the thread count is never part of it. A re-baked direct source adds

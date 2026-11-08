@@ -34,7 +34,7 @@ defaults to HIGH on desktop and LOW on Android, Quest and iOS (preferences versi
 the user asked for better bake settings and emissive light sources: lots
 [GQ1 and GE1](#bake-quality-and-emission-lots-gq1-ge1) with decisions D21–D24, both implemented the
 same day ([GQ1 report](reports/gi_gq1_bake_quality.md), [GE1 report](reports/gi_ge1_emissive.md)).
-Gate H (the default preset and emission) awaits the user's A/B.
+At Gate H the user made Ultra with emission at scale 1 the default bake the same day.
 
 ## The request
 
@@ -293,6 +293,7 @@ file stale under `--gi-if-stale`.
 
 **Gate H** (after GE1): the user plays an A/B of Final against Ultra, with and without emission,
 on the four test worlds, and picks the default preset and whether emission is on by default.
+Accepted on 2026-11-08: Ultra, with emission on at scale 1.
 
 ## Lots
 
@@ -351,7 +352,7 @@ baked data and generated artifacts.
 | E | G12 | Reflection cost, and the default per platform. **Accepted** 2026-11-08: HIGH on desktop, LOW on Android (Quest included) and iOS; preferences version 15 reads a version 14 OFF as the default. |
 | F | GD1 | The re-baked direct term (fit per world, N·L or not, occluders). |
 | G | GD2 | Look of the re-baked direct light in game, and the default direct source. Accepted on 2026-11-07: `rebaked` is the default. |
-| H | GE1 | The default preset (Final or Ultra) and whether emission is on by default, from an A/B on the four test worlds. |
+| H | GE1 | The default preset (Final or Ultra) and whether emission is on by default, from an A/B on the four test worlds. Accepted on 2026-11-08: Ultra with emission at scale 1. |
 
 ### Lot details
 
@@ -570,9 +571,9 @@ Decisions for the bake quality and emission lots, taken with the user's choice o
 
 | # | Question | Options | Recommendation (taken 2026-11-08) |
 | --- | --- | --- | --- |
-| D21 | How do the new settings reach existing bakes? | (a) opt-in settings whose defaults keep today's bytes and settings text, plus an Ultra preset; (b) raise Final itself. | **(a)**; Gate H may make Ultra the default. |
+| D21 | How do the new settings reach existing bakes? | (a) opt-in settings whose defaults keep today's bytes and settings text, plus an Ultra preset; (b) raise Final itself. | **(a)**; Gate H made Ultra the default preset. |
 | D22 | How are a texel's sample points weighted? | (a) the texel's rays split evenly between n × n stratum centres, invalid points dropped; (b) n × n times the rays. | **(a)**: same cost, and `--gi-rays` still sets the budget. |
-| D23 | D10 again: are manifest emissive classes baked? | (a) no; (b) yes, opt-in with a scale, into the bounce of both renderers (GI is already a replacement option). | **(b)**; the original renderer then shows their bounce without the glow itself. |
+| D23 | D10 again: are manifest emissive classes baked? | (a) no; (b) yes, opt-in with a scale, into the bounce of both renderers (GI is already a replacement option). | **(b)**; the original renderer then shows their bounce without the glow itself. On by default at scale 1 since Gate H. |
 | D24 | Which emission does the bake use? | (a) the renderer's per-texel formula box-filtered down the albedo mip; (b) the class strength times the mean albedo of the face. | **(a)** |
 
 ## Defaults taken (the user may override)
@@ -582,7 +583,8 @@ Decisions for the bake quality and emission lots, taken with the user's choice o
 | Light-probe spacing | 128 units (about 2.8 m) |
 | Light-probe budget | 16,384 probes per world |
 | Reflection probes | 64² with 2×2 supersampling; at most 42 per world on desktop, 16 on mobile |
-| Bake presets | Preview: 1 bounce, 64 rays. Final: 2 bounces, 256 rays. Custom: up to 3 bounces. |
+| Bake presets | Ultra since Gate H (3 bounces, 512 rays, 4 texel samples, denoise 1, soft shadows 8/16, reflection strata 4, 256 GGX samples). Preview: 1 bounce, 64 rays. Final: 2 bounces, 256 rays. Custom: up to 4 bounces, from Final's values. |
+| Bake emission | Scale 1 since Gate H (`--gi-emissive 0` turns it off) |
 | Runtime intensities | k = 2 (Gate B; first planned at 1), f = 1, probe 1, reflection 1, sky 1 |
 | Direct source | `rebaked` since Gate G (D17; `original` until then) |
 | Names | Folder `data/gi`, extension `.ob2gi`, script `tools/gi/bake_all.py`, contract `gi_contracts.md` |

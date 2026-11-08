@@ -424,7 +424,10 @@ namespace
         std::string error;
         CHECK(make_gi_bake_settings("preview", 0, 0, -1, s, error) && s.quality == GiQuality::Preview);
         CHECK(s.bounces == 1 && s.rays == 64 && s.sky == 100);
-        CHECK(make_gi_bake_settings("", 0, 0, -1, s, error) && s.quality == GiQuality::Final && s.rays == 256);
+        // Ultra is the default preset since Gate H (this form never emits).
+        CHECK(make_gi_bake_settings("", 0, 0, -1, s, error) && s.quality == GiQuality::Ultra && s.rays == 512);
+        CHECK(s.emissive == 0);
+        CHECK(make_gi_bake_settings("final", 0, 0, -1, s, error) && s.quality == GiQuality::Final && s.rays == 256);
         // Re-baked is the default direct source since Gate G; its settings line comes last.
         CHECK(s.direct == GiDirectSource::Rebaked);
         CHECK(gi_settings_text(s) ==
@@ -463,16 +466,24 @@ namespace
                        "--gi-shadow-rays, --gi-reflection-strata and --gi-reflection-samples need --gi-quality custom");
         CHECK(!make_gi_bake_settings("best", 0, 0, -1, s, error));
 
-        // Lots GQ1 and GE1 (decision D21): explicit defaults keep the text; each other value adds a line
-        // before "direct rebaked".
+        // Lots GQ1 and GE1 (decision D21): Final without emission keeps the text of earlier files; each
+        // other value adds a line before "direct rebaked".
         const std::string final_text = "openblood2-gi-settings 2\nquality final\nbounces 2\nrays 256\nsky 1.00\n";
+        const auto digest = gi_manifest_digest_prefix();
+        CHECK(digest.size() == 16 && digest.find_first_not_of("0123456789abcdef") == std::string::npos);
+        // Gate H: the default request is Ultra with emission at scale 1.
         GiBakeArguments arguments;
+        CHECK(make_gi_bake_settings(arguments, s, error) && s.quality == GiQuality::Ultra && s.emissive == 100);
+        CHECK(gi_settings_text(s).ends_with("reflection-samples 256\nemissive 1.00 " + digest + "\ndirect rebaked\n"));
+        arguments = {"final"};
+        CHECK(make_gi_bake_settings(arguments, s, error) && s.emissive == 100);
+        CHECK(gi_settings_text(s) == final_text + "emissive 1.00 " + digest + "\ndirect rebaked\n");
+        arguments.emissive = 0; // --gi-emissive 0: the text of earlier files.
         CHECK(make_gi_bake_settings(arguments, s, error) && gi_settings_text(s) == final_text + "direct rebaked\n");
         CHECK(s.texel_grid == 1 && s.denoise == 0 && s.shadow_radius == 0 && s.shadow_rays == 0);
         CHECK(s.reflection_strata == 2 && s.reflection_samples == 0 && s.emissive == 0);
-        arguments.emissive = 0; // Given as zero: still the defaults.
-        CHECK(make_gi_bake_settings(arguments, s, error) && gi_settings_text(s) == final_text + "direct rebaked\n");
         arguments = {"ultra"};
+        arguments.emissive = 0;
         CHECK(make_gi_bake_settings(arguments, s, error) && s.quality == GiQuality::Ultra);
         CHECK(s.bounces == 3 && s.rays == 512 && s.sky == 100 && s.texel_grid == 2 && s.denoise == 1);
         CHECK(s.shadow_radius == 8 && s.shadow_rays == 16 && s.reflection_strata == 4 && s.reflection_samples == 256);
@@ -480,8 +491,6 @@ namespace
                                      "texel-samples 4\ndenoise 1\nshadows 8 16\nreflection-strata 4\n"
                                      "reflection-samples 256\ndirect rebaked\n");
         CHECK(std::string(gi_quality_name(GiQuality::Ultra)) == "ultra");
-        const auto digest = gi_manifest_digest_prefix();
-        CHECK(digest.size() == 16 && digest.find_first_not_of("0123456789abcdef") == std::string::npos);
         arguments.emissive = 150;
         CHECK(make_gi_bake_settings(arguments, s, error) && s.emissive == 150);
         CHECK(gi_settings_text(s).ends_with("reflection-samples 256\nemissive 1.50 " + digest + "\ndirect rebaked\n"));
@@ -499,7 +508,7 @@ namespace
                                      "reflection-samples 1024\nemissive 4.00 " + digest + "\ndirect rebaked\n");
         s.direct = GiDirectSource::Original; // The original source drops only its own line.
         CHECK(gi_settings_text(s).ends_with("emissive 4.00 " + digest + "\n"));
-        arguments = {"custom", 0, 0, -1, 1, 0, 4, 9, 2, 32};
+        arguments = {"custom", 0, 0, -1, 1, 0, 4, 9, 2, 32, 0};
         CHECK(make_gi_bake_settings(arguments, s, error) && gi_settings_text(s).ends_with(
                   "sky 1.00\nshadows 4 9\nreflection-samples 32\ndirect rebaked\n"));
         const auto kept = s;

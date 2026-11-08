@@ -220,13 +220,15 @@ namespace
         original.quality = GiQuality::Preview;
         original.direct = GiDirectSource::Original;
         auto args = gi_bake_arguments(config, "worlds/01_subwaya.dat", preview, {}, {});
-        CHECK((args == std::vector<std::string>{"--bake-gi", "worlds/01_subwaya.dat", "--gi-quality", "preview"}));
+        CHECK((args == std::vector<std::string>{"--bake-gi", "worlds/01_subwaya.dat", "--gi-quality", "preview",
+                                                "--gi-emissive", "0.00"}));
         config.data_dir = "/games/blood 2";
         config.demo = true;
         config.nightmares = true;
         config.overlays = {"/mods/a.rez", "/mods/b c.rez"};
         args = gi_bake_arguments(config, "worlds/x.dat", final_quality, "/p q", "/o", 6);
-        CHECK((args == std::vector<std::string>{"--bake-gi", "worlds/x.dat", "--gi-quality", "final", "--data-dir",
+        CHECK((args == std::vector<std::string>{"--bake-gi", "worlds/x.dat", "--gi-quality", "final",
+                                                "--gi-emissive", "0.00", "--data-dir",
                                                 "/games/blood 2", "--demo", "--nightmares", "--rez", "/mods/a.rez",
                                                 "--rez", "/mods/b c.rez", "--gi-placement-dir", "/p q", "--gi-out",
                                                 "/o", "--gi-jobs", "6"}));
@@ -234,15 +236,17 @@ namespace
         // source follows the quality.
         auto lone = gi_bake_arguments(config, "worlds/01_subwaya.dat", original, {}, {}, 0);
         CHECK((lone == std::vector<std::string>{"--bake-gi", "worlds/01_subwaya.dat", "--gi-quality", "preview",
-                                                "--gi-direct", "original", "--data-dir", "/games/blood 2", "--demo",
-                                                "--nightmares", "--rez", "/mods/a.rez", "--rez", "/mods/b c.rez"}));
+                                                "--gi-emissive", "0.00", "--gi-direct", "original", "--data-dir",
+                                                "/games/blood 2", "--demo", "--nightmares", "--rez", "/mods/a.rez",
+                                                "--rez", "/mods/b c.rez"}));
 
         // Lots GQ1 and GE1: Ultra is its name alone; Custom gives every setting (shadow rays and GGX
-        // samples only when set); emission goes with any preset; the child parses them all back into
-        // the same settings.
+        // samples only when set); the emission scale always goes, 0.00 included, since the child emits
+        // by default (Gate H); the child parses them all back into the same settings.
         GiBakeSettings ultra;
         ultra.quality = GiQuality::Ultra;
-        CHECK((gi_quality_arguments(ultra) == std::vector<std::string>{"--gi-quality", "ultra"}));
+        CHECK((gi_quality_arguments(ultra) ==
+               std::vector<std::string>{"--gi-quality", "ultra", "--gi-emissive", "0.00"}));
         ultra.emissive = 5;
         CHECK((gi_quality_arguments(ultra) == std::vector<std::string>{"--gi-quality", "ultra", "--gi-emissive", "0.05"}));
         GiBakeSettings custom;
@@ -250,7 +254,7 @@ namespace
         CHECK((gi_quality_arguments(custom) ==
                std::vector<std::string>{"--gi-quality", "custom", "--gi-bounces", "2", "--gi-rays", "256", "--gi-sky",
                                         "1.00", "--gi-texel-samples", "1", "--gi-denoise", "0",
-                                        "--gi-reflection-strata", "2"}));
+                                        "--gi-reflection-strata", "2", "--gi-emissive", "0.00"}));
         custom = {GiQuality::Custom, 4, 1024, 250, GiDirectSource::Original, 3, 2, 10, 7, 5, 512, 400};
         const auto tuned = gi_quality_arguments(custom);
         CHECK((tuned == std::vector<std::string>{"--gi-quality", "custom", "--gi-bounces", "4", "--gi-rays", "1024",
@@ -280,6 +284,11 @@ namespace
         CHECK(make_gi_bake_settings(parsed, back, parse_error));
         back.direct = options.gi_direct == "original" ? GiDirectSource::Original : GiDirectSource::Rebaked;
         CHECK(gi_settings_text(back) == gi_settings_text(custom));
+        // The panel's 0.00 reaches the child as no emission (the child emits by default, Gate H).
+        const std::vector<std::string_view> off{"--bake-gi", "worlds/x.dat", "--gi-quality", "ultra", "--gi-emissive",
+                                                "0.00"};
+        Options off_options;
+        CHECK(parse_options(off, off_options, parse_error) && off_options.gi_emissive == 0);
 
         CHECK(std::string(gi_bake_state_name(GiBakeProcess::State::Idle)) == "idle");
         CHECK(std::string(gi_bake_state_name(GiBakeProcess::State::Cancelled)) == "cancelled");

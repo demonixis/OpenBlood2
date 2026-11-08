@@ -19,8 +19,8 @@ namespace OpenBlood2
     // The running executable (the child is the same binary).
     bool gi_executable_path(std::filesystem::path&, std::string& error);
     // The child's quality arguments (lots GQ1, GE1): "--gi-quality <preset>"; for Custom, every quality
-    // setting of `settings` (the shadow rays and GGX samples only when set); "--gi-emissive S" for any
-    // preset when the emission scale is not zero; "--gi-direct original" for the original direct source
+    // setting of `settings` (the shadow rays and GGX samples only when set); "--gi-emissive S" always
+    // (0.00 turns off the child's default emission, Gate H); "--gi-direct original" for the original direct source
     // (lot GD2; re-baked is the child's default since Gate G).
     std::vector<std::string> gi_quality_arguments(const GiBakeSettings&);
     // The child's arguments after the executable: the world, the quality arguments, the game's content

@@ -142,9 +142,11 @@ namespace OpenBlood2
         {
             GiBakeProcess process;
             // Preset (Preview, Final, Ultra or Custom with its settings, lot GQ1), emission scale (lot
-            // GE1) and direct light (re-baked, lot GD2's default, or the original lightmaps). The Custom
-            // fields start at Final's values and survive switching presets.
-            GiBakeSettings settings;
+            // GE1) and direct light (re-baked, lot GD2's default, or the original lightmaps). Ultra with
+            // emission at scale 1 by default (Gate H); the Custom fields start at Final's values and
+            // survive switching presets.
+            GiBakeSettings settings{.quality = GiQuality::Ultra,
+                                    .emissive = gi_bake_settings_limits::default_emissive};
             bool suspend_scene = false; // "Suspend scene rendering during bake".
             std::string world;          // The world path being (or last) baked.
             Sha256Digest world_digest{};

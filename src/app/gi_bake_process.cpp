@@ -61,8 +61,7 @@ namespace OpenBlood2
             if (settings.reflection_samples)
                 args.insert(args.end(), {"--gi-reflection-samples", std::to_string(settings.reflection_samples)});
         }
-        if (settings.emissive)
-            args.insert(args.end(), {"--gi-emissive", hundredths(settings.emissive)});
+        args.insert(args.end(), {"--gi-emissive", hundredths(settings.emissive)}); // On by default (Gate H).
         if (settings.direct == GiDirectSource::Original)
             args.insert(args.end(), {"--gi-direct", "original"});
         return args;

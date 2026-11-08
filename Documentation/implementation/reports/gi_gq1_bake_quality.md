@@ -118,5 +118,6 @@ moves by less than 2 %, except 06_Airship2 (+5 %).
 
 ## Open
 
-- **Gate H:** the default preset (Final or Ultra), from the A/B in the GE1 report.
+- None for the settings: Gate H (2026-11-08) made Ultra, with emission at scale 1, the default bake
+  ([GE1 report](gi_ge1_emissive.md#gate-h)).
 - The full rebake of the 36 worlds, at the end of the GI work.

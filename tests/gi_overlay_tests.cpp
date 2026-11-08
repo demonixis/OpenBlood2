@@ -347,7 +347,10 @@ namespace
         // The fake baker (Custom, lot GQ1, with emission, lot GE1): the child's arguments, the reload
         // at the next frame.
         tools.bake_executable = stub;
-        CHECK(tools.bake.settings.quality == GiQuality::Final && tools.bake.settings.emissive == 0);
+        // Gate H: Ultra with emission at scale 1; the Custom fields keep Final's values.
+        CHECK(tools.bake.settings.quality == GiQuality::Ultra && tools.bake.settings.emissive == 100);
+        CHECK(tools.bake.settings.bounces == 2 && tools.bake.settings.rays == 256 &&
+              tools.bake.settings.texel_grid == 1);
         tools.bake.settings.quality = GiQuality::Custom;
         tools.bake.settings.texel_grid = 2;
         tools.bake.settings.shadow_radius = 4;

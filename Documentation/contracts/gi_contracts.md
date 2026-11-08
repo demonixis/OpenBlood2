@@ -6,7 +6,8 @@ GLOBAL ILLUMINATION is on (off by default, decision D11); lot G9 adds light prob
 models. Lot G11 bakes reflection probes and lot G12 draws them in the enhanced renderer when Options >
 Display REFLECTION PROBES is LOW or HIGH (HIGH on desktop and LOW on Android, Quest and iOS by default since Gate E). Lot GQ1
 adds bake quality settings and the Ultra preset, and lot GE1 bakes the enhanced renderer's emissive
-textures as light sources; both are opt-in and leave default bakes byte for byte. With both off, or without a Ready file,
+textures as light sources; since Gate H a bake is Ultra with emission at scale 1 unless told otherwise, and
+`--gi-quality final --gi-emissive 0` still bakes the earlier files byte for byte. With GI off, or without a Ready file,
 every frame is unchanged; nothing in this contract changes a save or the simulation.
 
 - [World queries (lot G1)](#world-queries-lot-g1)
@@ -704,7 +705,7 @@ splitmix64 sequence seeded from their own indices. `gi_default_jobs()` is the lo
 | Preset | Bounces | Rays |
 | --- | --- | --- |
 | `preview` | 1 | 64 |
-| `final` (default) | 2 | 256 |
+| `final` (the default until Gate H, lot GQ1) | 2 | 256 |
 | `custom` | `--gi-bounces` 1–3 (default 2) | `--gi-rays` 16–4096 (default 256) |
 
 Lot G5's INFO text was `openblood2-gi-settings 1`, then `quality`, `bounces` and `rays` lines;
@@ -1019,7 +1020,7 @@ u32 RGB9E5 values and the validity bits:
 | Preset | Bounces | Rays | Sky scale |
 | --- | --- | --- | --- |
 | `preview` | 1 | 64 | 1.00 |
-| `final` (default) | 2 | 256 | 1.00 |
+| `final` (the default until Gate H, lot GQ1) | 2 | 256 | 1.00 |
 | `custom` | `--gi-bounces` 1–3 | `--gi-rays` 16–4096 | `--gi-sky` 0–4, at most two decimals |
 
 - The INFO text is `openblood2-gi-settings 2`, then the `quality`, `bounces`, `rays` and
@@ -1895,8 +1896,9 @@ also passes on Vulkan through MoltenVK (`SDL_GPU_DRIVER=vulkan`) with the same c
 
 ## Bake quality settings (lot GQ1)
 
-Lot GQ1 adds bake settings for better bakes (decision D21: opt-in, the defaults keep every byte) and
-the Ultra preset. The measurements are in the [GQ1 report](../implementation/reports/gi_gq1_bake_quality.md).
+Lot GQ1 adds bake settings for better bakes (decision D21: the field defaults keep every byte) and
+the Ultra preset, the default preset since Gate H (2026-11-08). The measurements are in the
+[GQ1 report](../implementation/reports/gi_gq1_bake_quality.md).
 
 ### Settings and presets
 
@@ -1907,8 +1909,8 @@ bake exactly what G11 baked. `make_gi_bake_settings(GiBakeArguments, ...)` build
 | Preset | Bounces | Rays | Sky | Texel samples | Denoise | Shadows (radius, rays) | Reflection strata | GGX samples |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `preview` | 1 | 64 | 1.00 | 1 | 0 | hard | 2 | 64 (32 above a 128 face) |
-| `final` (default) | 2 | 256 | 1.00 | 1 | 0 | hard | 2 | 64 (32 above a 128 face) |
-| `ultra` | 3 | 512 | 1.00 | 4 | 1 | 8, 16 | 4 | 256 |
+| `final` | 2 | 256 | 1.00 | 1 | 0 | hard | 2 | 64 (32 above a 128 face) |
+| `ultra` (default since Gate H) | 3 | 512 | 1.00 | 4 | 1 | 8, 16 | 4 | 256 |
 | `custom` | 1–4 | 16–4096 | 0–4 | 1, 4, 9, 16 | 0–4 | 1–64, 1–64 (default 16) | 2–8 | 32–1024 |
 
 - The quality settings need `custom` (their message names all nine flags); `custom` starts from
@@ -1923,14 +1925,18 @@ bake exactly what G11 baked. `make_gi_bake_settings(GiBakeArguments, ...)` build
   `GI_RESULT` adds `texel_samples`, `denoise`, `shadow_radius`, `shadow_rays`, `reflection_strata`,
   `reflection_samples` and `emissive` after `jobs`, `texel_points`, `solid_points` and `back_points`
   when texels have points, and `denoised` and `denoise_ms` when the filter runs.
+- **Default (Gate H):** no `--gi-quality` means `ultra`, in the CLI, `bake_all.py` (`--quality`
+  defaults to `ultra`, `--emissive` to 1) and the F8 Bake panel (Ultra and emission at scale 1 when it
+  opens). The two-argument `make_gi_bake_settings(quality, bounces, rays, sky)` form of earlier lots
+  never emits.
 - **`tools/gi/bake_all.py`:** `--quality ultra`, and `--sky`, `--texel-samples`, `--denoise`,
   `--shadow-radius`, `--shadow-rays`, `--reflection-strata`, `--reflection-samples` with `--quality
   custom`; its report records them (`settings`) and each world's values.
 - **F8 Bake panel:** Preview, Final, Ultra and Custom; Custom shows the settings (bounces, rays, sky,
   samples per texel, denoise radius, light radius and shadow rays, reflection strata, GGX samples, with
   0 shown as auto). `gi_quality_arguments(GiBakeSettings)` gives the child's arguments: the preset,
-  every Custom setting (the shadow rays and GGX samples only when set), `--gi-emissive` for any preset
-  and `--gi-direct original` for the original source; `gi_bake_arguments` now takes the settings.
+  every Custom setting (the shadow rays and GGX samples only when set), `--gi-emissive S` always
+  (`0.00` included, since the child emits by default) and `--gi-direct original` for the original source; `gi_bake_arguments` now takes the settings.
 
 ### Texel points (decision D22)
 
@@ -1997,10 +2003,12 @@ arguments reach the child. **`gi_bake_all`** the script with the new options.
 ## Emissive texels (lot GE1)
 
 Lot GE1 bakes the enhanced renderer's emissive texture classes as light sources (decisions D23 and
-D24), opt-in with a scale. The measurements are in the [GE1 report](../implementation/reports/gi_ge1_emissive.md).
+D24) with a scale, on at scale 1 by default since Gate H (2026-11-08). The measurements are in the
+[GE1 report](../implementation/reports/gi_ge1_emissive.md).
 
 - **Setting:** `GiBakeSettings::emissive`, a scale in hundredths (0–400, 0 = off), with any preset;
-  `--gi-emissive 0-4` (two decimals), `bake_all.py --emissive`, and the F8 Bake panel's "Emissive
+  a request without a scale gets `default_emissive` (100, Gate H); `--gi-emissive 0-4` (two decimals, 0
+  turns it off), `bake_all.py --emissive`, and the F8 Bake panel's "Emissive
   textures light the bake" with its scale. The settings line `emissive S M` names the scale and the
   first 16 hex digits of the built-in manifest's SHA-256 (`gi_manifest_digest_prefix`), so editing
   `config/materials.json` makes the file stale under `--gi-if-stale`. An emission of 0 adds no line.
@@ -2020,8 +2028,8 @@ D24), opt-in with a scale. The measurements are in the [GE1 report](../implement
   Composed) read radiance through `gi_hit_radiance`, so all three receive the bounce of the glow. The
   stored light of the emissive face itself does not include its own glow: the enhanced renderer adds
   it, and the original renderer shows only its bounce (D23).
-- **Identity:** without `--gi-emissive` (or with 0) the scene prepares nothing and the bake is byte for
-  byte the G11/GQ1 one.
+- **Identity:** with `--gi-emissive 0` the scene prepares nothing and the bake is byte for byte the
+  G11/GQ1 one (`--gi-quality final --gi-emissive 0` gives the G11 files).
 
 ### Tests
 

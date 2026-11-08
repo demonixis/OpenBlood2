@@ -67,8 +67,18 @@ textures light the bake"), or with the command line into separate folders, then 
 `--gi-dir <folder>`, Options > Display GLOBAL ILLUMINATION on. The bakes and captures stay local,
 because they contain retail art (decision D3).
 
+## Gate H
+
+Accepted on 2026-11-08: the default bake is Ultra with emission at scale 1. A request with no preset
+is Ultra and one with no emission scale emits at 1, in the CLI, `bake_all.py` (`--quality ultra`,
+`--emissive 1` by default) and the F8 Bake panel (Ultra and emission checked when it opens). The
+panel always passes `--gi-emissive`, so an unchecked box reaches the child as 0.00.
+`--gi-emissive 0` turns emission off.
+
+- A bake of 01_SubwayA with no option gives the same bytes as the Ultra + emission bake above
+  (SHA-256 `d3b5613c…5a30`).
+- `--gi-quality final --gi-emissive 0` still gives the G11 file (`21bff4f3…3e44`).
+
 ## Open
 
-- **Gate H:** the default preset (Final or Ultra) and whether emission is on by default (and at
-  which scale).
 - The full rebake of the 36 worlds, at the end of the GI work.

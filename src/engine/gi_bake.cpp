@@ -87,9 +87,9 @@ namespace OpenBlood2
                            a.shadow_radius || a.shadow_rays || a.reflection_strata || a.reflection_samples;
         if (a.quality == "preview")
             out = {GiQuality::Preview, 1, 64, 100};
-        else if (a.quality == "final" || a.quality.empty())
+        else if (a.quality == "final")
             out = {GiQuality::Final, 2, 256, 100};
-        else if (a.quality == "ultra")
+        else if (a.quality == "ultra" || a.quality.empty()) // The default preset since Gate H.
         {
             out = {GiQuality::Ultra, 3, 512, 100};
             out.texel_grid = 2;
@@ -186,8 +186,7 @@ namespace OpenBlood2
             error = "--gi-emissive must be 0 to 4";
             return false;
         }
-        if (a.emissive >= 0)
-            out.emissive = static_cast<std::uint32_t>(a.emissive);
+        out.emissive = a.emissive >= 0 ? static_cast<std::uint32_t>(a.emissive) : S::default_emissive;
         settings = out;
         return true;
     }
@@ -199,6 +198,7 @@ namespace OpenBlood2
         a.bounces = bounces;
         a.rays = rays;
         a.sky = sky;
+        a.emissive = 0;
         return make_gi_bake_settings(a, settings, error);
     }
     std::string gi_manifest_digest_prefix()
