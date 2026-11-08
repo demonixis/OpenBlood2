@@ -4,6 +4,9 @@
 #include "game/menu_resources.h"
 #include <array>
 #include <optional>
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#endif
 
 namespace OpenBlood2
 {
@@ -92,6 +95,11 @@ namespace OpenBlood2
         std::vector<int> refresh_rates{0};
         int current_refresh_rate = 0;
     };
+#if defined(__ANDROID__) || (defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE)
+    inline constexpr int default_reflection_probes = 1; // Gate E: LOW on mobile and Quest.
+#else
+    inline constexpr int default_reflection_probes = 2; // Gate E: HIGH on desktop.
+#endif
     struct MenuSettings
     {
         bool sound = true, music = true, invert_y = false;
@@ -132,8 +140,9 @@ namespace OpenBlood2
         // light of both renderers when the world has a current bake. Off by default (decision D11).
         bool global_illumination = false;
         // Replacement REFLECTION PROBES row (lot G12): 0 off, 1 low, 2 high (GiReflectionMode order). The
-        // enhanced renderer draws the current bake's reflection probes; off by default (decision D11).
-        int reflection_probes = 0;
+        // enhanced renderer draws the current bake's reflection probes; HIGH on desktop, LOW on Android
+        // (Quest included) and iOS by default (Gate E).
+        int reflection_probes = default_reflection_probes;
 
         bool operator==(const MenuSettings&) const = default;
     };

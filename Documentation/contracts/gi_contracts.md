@@ -4,7 +4,7 @@ Baked GI for the M10 [GI plan](../implementation/gi_plan.md). Each lot adds its 
 Lot G7 bakes the GI lightmaps and lot G8 composes them into the world when Options > Display
 GLOBAL ILLUMINATION is on (off by default, decision D11); lot G9 adds light probes that light the
 models. Lot G11 bakes reflection probes and lot G12 draws them in the enhanced renderer when Options >
-Display REFLECTION PROBES is LOW or HIGH (OFF by default). With both off, or without a Ready file,
+Display REFLECTION PROBES is LOW or HIGH (HIGH on desktop and LOW on Android, Quest and iOS by default since Gate E). With both off, or without a Ready file,
 every frame is unchanged; nothing in this contract changes a save or the simulation.
 
 - [World queries (lot G1)](#world-queries-lot-g1)
@@ -1770,8 +1770,10 @@ the alpha that separates direct from GI light. The measurements are in the
 ### Switch, preferences and command line
 
 - **Options > Display row 32:** REFLECTION PROBES [OFF/LOW/HIGH], after GLOBAL ILLUMINATION,
-  enabled only with the enhanced renderer. OFF by default; preferences version 14
-  (`reflection_probes`, 0–2), version 13 files load OFF.
+  enabled only with the enhanced renderer. Gate E (2026-11-08): HIGH by default on desktop, LOW on
+  Android (Quest included) and iOS (`default_reflection_probes`). Preferences version 14 added
+  `reflection_probes` (0–2); version 15 keeps the keys and reads a version 14 OFF (the earlier
+  default) as the platform default; version 13 files load the platform default.
 - **Independent of GI:** with GLOBAL ILLUMINATION off the presenter still looks the file up for the
   probes (same lookup and staleness as G8), reads it without composing it (status line "GI read for
   reflection probes only") and draws the Original set. Light probes still need GI.
@@ -1877,7 +1879,7 @@ priorities, the fallback's share), the intensity, the level choice, and directio
 prefiltered chain with and without box projection. **`gi_reflections.world`** REFL decoded with its
 PLAC probes; refused without PLAC, malformed or not matching. **`gi_runtime.override`** and
 **`gi_direct.bake`** the page alpha per view against its formula. **`config.gi`**
-`--gi-reflections` and its refusals. **`menus.state`** / **`menus.preferences`** row 32 and version 14.
+`--gi-reflections` and its refusals. **`menus.state`** / **`menus.preferences`** row 32, versions 14 and 15 and the platform default.
 **`gpu.gi`** (private, GPU) for CityHub and SubwayA, with the world's fog switched off
 (`FogEnable 0`): a constant probe over the world keeps the frame while REFLECTION PROBES is off; LOW
 and HIGH change it identically; Reflections only draws the CPU mirror's radiance times the scene

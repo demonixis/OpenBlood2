@@ -13,7 +13,9 @@ namespace OpenBlood2
         // the renderer selection; version 4 the VR options; version 5 the VR movement reference;
         // version 6 the cheat switch and god mode; version 7 the post-processing rows; version 8
         // ambient occlusion; version 9 reflections; version 10 display; version 11 control toggles;
-        // version 12 the field of view; version 13 global illumination; version 14 reflection probes.
+        // version 12 the field of view; version 13 global illumination; version 14 reflection probes;
+        // version 15 has the same keys and reads a version 14 OFF (the earlier default) as the platform
+        // default (Gate E).
         constexpr std::array<const char*, 38> names{"version",
                                                     "sound",
                                                     "music",
@@ -52,7 +54,7 @@ namespace OpenBlood2
                                                     "field_of_view",
                                                     "global_illumination",
                                                     "reflection_probes"};
-        constexpr std::array<std::size_t, 14> version_keys{7, 9, 12, 15, 16, 18, 21, 22, 23, 31, 35, 36, 37, 38};
+        constexpr std::array<std::size_t, 15> version_keys{7, 9, 12, 15, 16, 18, 21, 22, 23, 31, 35, 36, 37, 38, 38};
         bool valid(const MenuSettings& s)
         {
             const bool turn = s.vr_turn == 0 || s.vr_turn == 15 || s.vr_turn == 30 || s.vr_turn == 45 ||
@@ -208,7 +210,7 @@ namespace OpenBlood2
             result.field_of_view = values[35];
         if (required >= version_keys[12])
             result.global_illumination = values[36];
-        if (required >= version_keys[13])
+        if (required >= version_keys[13] && (values[0] >= 15 || values[37] != 0))
             result.reflection_probes = values[37];
         if (!valid(result))
         {
@@ -226,7 +228,7 @@ namespace OpenBlood2
             error = "Preferences out of range";
             return false;
         }
-        const std::array<int, names.size()> values{14,
+        const std::array<int, names.size()> values{15,
                                                    settings.sound,
                                                    settings.music,
                                                    settings.sound_volume,

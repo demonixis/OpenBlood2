@@ -345,11 +345,14 @@ namespace
         CHECK(menu.settings.global_illumination);
         menu.adjust(-1);
         CHECK(!menu.settings.global_illumination);
-        // REFLECTION PROBES (lot G12): off by default, cycles OFF/LOW/HIGH; the enhanced renderer only.
+        // REFLECTION PROBES (lot G12): the platform default (Gate E: HIGH on desktop, LOW on mobile),
+        // cycles OFF/LOW/HIGH; the enhanced renderer only.
         menu.selected = 16;
-        CHECK(menu.items[16].setting == 32 && menu.settings.reflection_probes == 0 && !menu.enabled(menu.items[16]));
+        CHECK(menu.items[16].setting == 32 && menu.settings.reflection_probes == default_reflection_probes &&
+              !menu.enabled(menu.items[16]));
         menu.settings.renderer = true;
         CHECK(menu.enabled(menu.items[16]));
+        menu.settings.reflection_probes = 0;
         menu.adjust(1);
         CHECK(menu.settings.reflection_probes == 1);
         menu.adjust(1);
@@ -361,6 +364,7 @@ namespace
         menu.adjust(-1);
         menu.adjust(-1);
         CHECK(menu.settings.reflection_probes == 0);
+        menu.settings.reflection_probes = default_reflection_probes;
         menu.settings.renderer = false;
         menu.settings.field_of_view = 90;
         menu.vr = true;

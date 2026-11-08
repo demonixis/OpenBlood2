@@ -105,8 +105,8 @@ The world needs a file baked since G11 in a GI search root (`--gi-dir` or `user_
 
 ## Open
 
-- **Gate E:** the user plays the A/B and decides the default per platform. REFLECTION PROBES stays
-  OFF by default until then.
+- **Gate E:** accepted on 2026-11-08 after this report: HIGH by default on desktop, LOW on Android
+  (Quest included) and iOS, preferences version 15 (a version 14 OFF reads as the default).
 - The full rebake of the 36 worlds waits for the end of M10. Files baked before G11 have no REFL
   section; the panel says so.
 - Vulkan ran through MoltenVK only; a native Vulkan driver (Linux NVIDIA, Windows) is not tested.

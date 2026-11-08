@@ -29,7 +29,8 @@ edges); the user accepted Gate F (the term). GD2 (the re-baked direct bake,
 direct source the same day. G11 (the reflection bake, `gi_algorithm_version` 4) and G12 (the
 reflection runtime: the 24 `-DGI` shader artifacts, Options > Display REFLECTION PROBES, preferences
 v14) are implemented on 2026-11-07, tested on four worlds as the user asked. Gate D decided D12 as
-(a) after measuring the Metal allocation; Gate E (cost and the A/B) awaits the user.
+(a) after measuring the Metal allocation. Gate E was accepted on 2026-11-08: REFLECTION PROBES
+defaults to HIGH on desktop and LOW on Android, Quest and iOS (preferences version 15).
 
 ## The request
 
@@ -295,7 +296,7 @@ baked data and generated artifacts.
 | B | G7 | Bake time, determinism and look of the raw bake. Accepted 2026-11-07 with k = 2. |
 | C | G8 | Look in game, and whether GI becomes a player option. Accepted on 2026-11-07: the original lightmaps stay the default, GLOBAL ILLUMINATION is a player option, and F8 and the in-game bake are built with the inspector only (D4 (b)). |
 | D | G11 | Reflection memory and GPU layout. Decided on 2026-11-07: D12 (a), the octahedral RGBA16F 2D array (SDL_GPU allocates Metal cube arrays six times over). |
-| E | G12 | Reflection cost, and the default per platform. Pending the user's A/B; REFLECTION PROBES is OFF by default until then. |
+| E | G12 | Reflection cost, and the default per platform. **Accepted** 2026-11-08: HIGH on desktop, LOW on Android (Quest included) and iOS; preferences version 15 reads a version 14 OFF as the default. |
 | F | GD1 | The re-baked direct term (fit per world, N·L or not, occluders). |
 | G | GD2 | Look of the re-baked direct light in game, and the default direct source. Accepted on 2026-11-07: `rebaked` is the default. |
 
@@ -393,7 +394,7 @@ baked data and generated artifacts.
 - Octahedral encoding with borders, RGBA16F (R11G11B10 optional), and optional miniz compression of the REFL section.
 - Measures the Metal allocation needed for D12.
 
-**G12, reflection runtime (max).** Implemented on 2026-11-07 ([report](reports/gi_g12_reflection_runtime.md)); Gate E pending.
+**G12, reflection runtime (max).** Implemented on 2026-11-07 ([report](reports/gi_g12_reflection_runtime.md)); Gate E accepted on 2026-11-08.
 - `-DGI` variants of `pbr.frag`, for enhanced pipelines only.
 - GPU data:
   - storage buffers for probe records and the cell grid;

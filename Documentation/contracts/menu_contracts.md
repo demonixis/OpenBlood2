@@ -319,13 +319,15 @@ are rejected.
 ### Reflection probes (GI lot G12)
 
 A replacement `REFLECTION PROBES [OFF/LOW/HIGH]` row (setting 32) follows GLOBAL ILLUMINATION and
-now ends the Display page (17 rows). It is off by default, enabled only with the enhanced renderer
+now ends the Display page (17 rows). It defaults to HIGH on desktop and LOW on Android (Quest
+included) and iOS (Gate E, `default_reflection_probes`), is enabled only with the enhanced renderer
 (like LIGHTING and NORMAL MAPS), and cycles OFF → LOW → HIGH. On, the enhanced renderer draws the
 current world's baked reflection probes, with or without GLOBAL ILLUMINATION; see the
 [reflection runtime](gi_contracts.md#reflection-runtime-lot-g12). The F8 Runtime panel's mode is
-the same setting. `preferences.cfg` **version 14** adds `reflection_probes` (0–2, default 0);
-versions 1–13 load it off, a version 13 file carrying the key and a version 14 file without it are
-rejected.
+the same setting. `preferences.cfg` **version 14** adds `reflection_probes` (0–2); versions 1–13
+load the platform default, a version 13 file carrying the key and a version 14 file without it are
+rejected. **Version 15** (Gate E) has the same keys: a version 14 value of 0, the earlier default,
+reads as the platform default, other version 14 values and every version 15 value are kept.
 
 ## Controls (CMenuControls)
 
