@@ -2,11 +2,27 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [0.6.0] - xxxx-xx-xx
+## [0.6.0] - 2026-11-09
 
 ### Added
 
+- Language selection in Setup and Options. Alongside English, the game offers French, German, Italian, Spanish, Brazilian Portuguese, Simplified Chinese and Korean. Translations cover menus, HUD and objectives, loading screens, credits, multiplayer notices, and original signs and billboards.
+- The original CommLink portraits and text, plus localized subtitles for stock cutscenes and selected in-game dialogue.
+- Playback of the original Monolith and GTI logos and The Chosen introduction from installed Smacker movies, with localized subtitles for the introduction. Nightmares plays the logos before its own title screen.
+- The Nightmare boss and its homing fireballs, the Combat Shotgun and its gas grenades, and the Flayer's chains and portals in The Nightmare Levels. Save support for these new expansion objects is pending.
+- Soccer ball and goal behavior for the two original expansion maps, including kicks, scoring and ball respawns.
+- Support for 39 previously missing server classes, including cranes and wrecking balls, fire, rain, scripted scene objects, and additional projectiles and visual effects.
+
+### Changed
+
+- The Chosen's desktop Bloodbath hub now uses the original menu layout. Host, Join, Character Setup, LAN discovery, map rotation and the in-game Resume and Leave controls use the same interface for Bloodbath, Team and Capture the Flag.
+
 ### Fixed
+
+- Authored enemy spawns and progression triggers in Cathedral, Ancient City and the Arena, including fights where the next enemy spawns before the previous body is removed.
+- Music during Gideon's death sequence in Ancient City now handles overlapping instrument note ranges.
+- Ophelia's Nightmares level now loads with untextured faces marked `Default` by the original editor.
+- Older prototype PBR preferences load as Enhanced rendering with High lighting.
 
 ## [0.5.2] - 2026-11-05
 
@@ -91,5 +107,6 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Simulation failure logs reporting unrelated startup warnings.
 - Xcode archives including dependencies and triggering nested builds.
 
-[Unreleased]: https://github.com/demonixis/OpenBlood2/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/demonixis/OpenBlood2/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/demonixis/OpenBlood2/compare/v0.5.2...v0.6.0
 [0.4.0]: https://github.com/demonixis/OpenBlood2/compare/v0.3.1...v0.4.0
