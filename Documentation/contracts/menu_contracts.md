@@ -492,6 +492,12 @@ bounded SDL text entry with a visible caret. Enter accepts, and Esc or controlle
 cancel the draft before they can go back through the menu. During editing, the field
 owns text and play controls stay released.
 
+Numeric validation uses the selected language and includes the actual bounds or
+reserved discovery port. The character names reuse the solo catalog entries.
+The suggested nickname follows the UI language until the player edits it. LAN
+offers use the host's translated suffix and keep the 32-byte UTF-8 name bound.
+The scoreboard uses the shared Unicode face for supported nicknames.
+
 The in-session menu uses the same canvas for connecting, resuming and leaving.
 The [M9 network contract](multiplayer_contracts.md#hostjoin-menus-and-lan-discovery-2026-10-31)
 defines session replacement, LAN limits and admission. The

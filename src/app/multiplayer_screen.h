@@ -71,7 +71,7 @@ namespace OpenBlood2
         const Localization* locale_ = nullptr;
         const LocalizedFont* font_ = nullptr;
         MenuPage page_ = MenuPage::Main;
-        bool browsing_ = false, dirty_ = false;
+        bool browsing_ = false, dirty_ = false, custom_name_ = false;
         double refresh_ = -10;
         std::string error_, discovery_error_;
         std::string_view error_key_;

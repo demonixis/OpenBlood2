@@ -25,7 +25,8 @@ namespace OpenBlood2::Net
         {
             const auto& o = *m.offer;
             if (!o.instance || !o.port || !o.protocol || !network_game_type(o.mode) || !o.capacity ||
-                o.capacity > max_players || o.players > o.capacity || !text_ok(o.name, 32) || !text_ok(o.world, 100))
+                o.capacity > max_players || o.players > o.capacity || !text_ok(o.name, discovery_name_limit) ||
+                !text_ok(o.world, 100))
                 return false;
         }
         Writer w(discovery_packet_limit);
@@ -42,7 +43,7 @@ namespace OpenBlood2::Net
             w.u8(o.mode);
             w.u8(o.players);
             w.u8(o.capacity);
-            w.text(o.name, 32);
+            w.text(o.name, discovery_name_limit);
             w.text(o.world, 100);
         }
         if (!w.good())
@@ -72,7 +73,7 @@ namespace OpenBlood2::Net
             o.mode = r.u8();
             o.players = r.u8();
             o.capacity = r.u8();
-            o.name = r.text(32);
+            o.name = r.text(discovery_name_limit);
             o.world = r.text(100);
         }
         std::vector<std::uint8_t> checked;

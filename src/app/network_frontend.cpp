@@ -17,7 +17,9 @@
 #include "game/localized_signs.h"
 #include "game/menu_preferences.h"
 #include "net/address.h"
+#include "net/discovery.h"
 #include "server/network.h"
+#include <algorithm>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlgpu3.h>
 #include <cfloat>
@@ -106,12 +108,6 @@ namespace OpenBlood2
             network = std::make_unique<ServerNetwork>(*server);
             if (!network->listen("0.0.0.0", options.network_port, unsigned(Net::max_players), error))
                 return failed();
-            // Cut on a UTF-8 boundary: the advertised name must stay valid text.
-            auto name = profile.name.substr(0, 20);
-            if (name.size() < profile.name.size())
-                while (!name.empty() && (std::uint8_t(profile.name[name.size()]) & 0xC0) == 0x80)
-                    name.pop_back();
-            network->server_name = name + " (host)";
             if (!network->discovery_error.empty())
                 spdlog::warn("{}", network->discovery_error);
             address = {"127.0.0.1", network->port()};
@@ -154,6 +150,19 @@ namespace OpenBlood2
             const auto value = translated(key);
             return value.empty() ? english : value;
         };
+        if (network)
+        {
+            auto suffix = tr("network.host_suffix", "(host)");
+            if (suffix.size() > Net::discovery_name_limit - 5 || suffix.find('\t') != suffix.npos)
+                suffix = "(host)";
+            const auto limit = std::min<std::size_t>(20, Net::discovery_name_limit - 1 - suffix.size());
+            // Fit the offer limit including the translated suffix and preserve UTF-8 character boundaries.
+            auto name = profile.name.substr(0, limit);
+            if (name.size() < profile.name.size())
+                while (!name.empty() && (std::uint8_t(profile.name[name.size()]) & 0xC0) == 0x80)
+                    name.pop_back();
+            network->server_name = name + " " + std::string(suffix);
+        }
         Menu menu;
         menu.settings = settings;
         DisplayOptions display(runtime);
@@ -194,6 +203,20 @@ namespace OpenBlood2
         bool native_menu = menu_canvas.initialize(menu_error);
         if (!native_menu)
             spdlog::warn("Multiplayer menu artwork: {}", menu_error);
+        const auto unicode_text = [&](std::string_view text)
+        {
+            return localized_font && std::ranges::any_of(text, [](unsigned char c) { return c >= 128; }) &&
+                   localized_font->supports(text);
+        };
+        if (localized_font)
+            frag_table.set_player_label([&](std::string_view name, HudSurface& image, const HudFont& bitmap,
+                                           const HudRect& row)
+            {
+                if (!unicode_text(name))
+                    return false;
+                LocalizedBitmapLine(bitmap, *localized_font, name).draw(image, row);
+                return true;
+            });
         if (localized && localized_font && !localization_resource_overridden(client.resources(), "cres.dll"))
         {
             client.set_announcer_translations([&](unsigned id)
@@ -470,7 +493,9 @@ namespace OpenBlood2
                 {
                     // Original MessageMgr coordinates/line height; the portable
                     // UI font replaces its Windows Arial surface renderer.
-                    ImGui::GetForegroundDrawList()->AddText(localized ? localized_face : ImGui::GetFont(), 16,
+                    auto* face = localized_face && (localized || unicode_text(line.text))
+                                     ? localized_face : ImGui::GetFont();
+                    ImGui::GetForegroundDrawList()->AddText(face, 16,
                                                             {origin.x + 1, y},
                                                             IM_COL32(255, 255, 255, 255), line.text.c_str());
                     y += 16;

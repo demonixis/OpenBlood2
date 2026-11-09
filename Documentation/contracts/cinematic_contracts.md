@@ -146,6 +146,8 @@ suppressed for audio replaced by a mod.
 Nightmares uses the same full-path matching for its stock WAVs. Long monologues
 split into consecutive cards selected by the local sound cursor in source samples.
 The same times apply to every language, including the English transcript.
+Ishmael's `ishint11.wav` is a short nonverbal reaction. Its descriptive caption
+follows the entire voice in both authored cinematic sequences that use it.
 
 Verified authored gameplay lines can also draw a subtitle while the listener is in
 the sound's original audible range. The list includes player-triggered remarks and

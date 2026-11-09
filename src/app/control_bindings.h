@@ -202,6 +202,9 @@ namespace OpenBlood2
                     {SDL_SCANCODE_UP, direction[2]}, {SDL_SCANCODE_DOWN, direction[3]},
                     {SDL_SCANCODE_NUMLOCKCLEAR, "control.key_num_lock"},
                     {SDL_SCANCODE_KP_ENTER, "control.key_keypad_enter"}, {SDL_SCANCODE_APPLICATION, "control.key_menu"},
+                    {SDL_SCANCODE_HELP, "control.key_help"}, {SDL_SCANCODE_MUTE, "control.key_mute"},
+                    {SDL_SCANCODE_VOLUMEUP, "control.key_volume_up"},
+                    {SDL_SCANCODE_VOLUMEDOWN, "control.key_volume_down"},
                 };
                 for (const auto& [scan, key] : named_keys)
                     if (code == scan)
@@ -218,6 +221,13 @@ namespace OpenBlood2
                 if (code >= SDL_SCANCODE_KP_1 && code <= SDL_SCANCODE_KP_0)
                     return locale->format("control.keypad_number", name,
                                           {std::to_string((code - SDL_SCANCODE_KP_1 + 1) % 10)});
+                if (code >= SDL_SCANCODE_KP_DIVIDE && code <= SDL_SCANCODE_KP_PLUS)
+                    return locale->format("control.keypad_number", name,
+                                          {std::string_view("/*-+").substr(code - SDL_SCANCODE_KP_DIVIDE, 1)});
+                if (code == SDL_SCANCODE_KP_PERIOD || code == SDL_SCANCODE_KP_COMMA)
+                    return locale->format("control.keypad_number", name, {code == SDL_SCANCODE_KP_PERIOD ? "." : ","});
+                if (code == SDL_SCANCODE_KP_EQUALS || code == SDL_SCANCODE_KP_EQUALSAS400)
+                    return locale->format("control.keypad_number", name, {"="});
                 return name;
             }
             case InputSource::MouseButton:

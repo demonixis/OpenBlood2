@@ -33,6 +33,9 @@ namespace OpenBlood2
             Texel backdrop_offset{};
             std::uint32_t secondary_ink = 0;
             unsigned secondary_threshold_percent = 25;
+            unsigned palette_tolerance = 0;
+            std::string_view clean_path{};
+            std::uint64_t clean_hash = 0;
         };
 
         struct SignRecipe
@@ -117,9 +120,20 @@ namespace OpenBlood2
             const auto matches = [&](const std::uint8_t* pixel, const std::array<int, 3>& contrast, int cutoff)
             {
                 int projection = 0;
+                int distance_squared = 0, contrast_squared = 0;
                 for (unsigned channel = 0; channel < 3; ++channel)
-                    projection += (int(pixel[channel]) - backdrop[channel]) * contrast[channel];
-                return cutoff && projection * 100 >= cutoff;
+                {
+                    const int delta = int(pixel[channel]) - backdrop[channel];
+                    projection += delta * contrast[channel];
+                    distance_squared += delta * delta;
+                    contrast_squared += contrast[channel] * contrast[channel];
+                }
+                if (!cutoff || projection * 100 < cutoff)
+                    return false;
+                // Where an illustration touches the letters, retain colors off the paint-to-background axis.
+                return !label.palette_tolerance ||
+                       std::int64_t(distance_squared) * contrast_squared - std::int64_t(projection) * projection <=
+                           std::int64_t(label.palette_tolerance) * label.palette_tolerance * contrast_squared;
             };
             const auto is_ink = [&](const std::uint8_t* pixel)
             {
@@ -215,7 +229,8 @@ namespace OpenBlood2
         }
 
         void replace_label(HudSurface& canvas, const Texture& source, const SignText& label,
-                           const Localization& catalog, const LocalizedFont& font, bool opaque_skin)
+                           const Localization& catalog, const LocalizedFont& font, bool opaque_skin,
+                           const Texture* clean = nullptr)
         {
             const auto& bounds = label.bounds;
             const HudRect image{0, 0, int(source.width), int(source.height)};
@@ -262,7 +277,17 @@ namespace OpenBlood2
                 if (!draw_text_mask(mask, std::span(lines).first(count), font))
                     return;
             }
-            erase_letters(canvas, source, label, region, opaque_skin);
+            if (clean)
+            {
+                for (int y = bounds.top; y < bounds.bottom; ++y)
+                    for (int x = bounds.left; x < bounds.right; ++x)
+                    {
+                        const auto offset = pixel_offset(source.width, x, y);
+                        std::copy_n(clean->rgba.data() + offset, 3, canvas.rgba.data() + offset);
+                    }
+            }
+            else
+                erase_letters(canvas, source, label, region, opaque_skin);
             if (label.erase_only)
                 return;
             const auto blend = [](std::uint8_t* pixel, std::uint32_t ink, unsigned coverage)
@@ -449,7 +474,16 @@ namespace OpenBlood2
             opaque_skin = image.rgba[a] == 0;
         HudSurface canvas{image.width, image.height, image.rgba};
         for (const auto& label : recipe->labels)
-            replace_label(canvas, image, label, catalog, font, opaque_skin);
+        {
+            // Repeated prop artwork can provide a clean patch with the same wood or metal grain.
+            Texture clean;
+            std::string ignored;
+            const bool use_clean =
+                !label.clean_path.empty() && !localization_resource_overridden(resources, label.clean_path) &&
+                read_texture_resource(resources, label.clean_path, clean, ignored) && clean.width == image.width &&
+                clean.height == image.height && texture_content_hash(clean) == label.clean_hash;
+            replace_label(canvas, image, label, catalog, font, opaque_skin, use_clean ? &clean : nullptr);
+        }
         update_pixels(image, canvas, opaque_skin);
     }
 

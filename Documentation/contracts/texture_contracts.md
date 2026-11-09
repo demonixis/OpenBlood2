@@ -52,6 +52,11 @@ mip levels. Dimensions, decoded alpha, material paths, UVs and draw order remain
 same, so world faces, animated material frames and model skins use the same
 geometry, lighting and sampling.
 
+Some prop recipes copy a measured patch from matching unlettered stock artwork
+to restore wood or metal grain before drawing the localized text. The source
+patch uses its own fingerprint. Illustrated signs can limit erasure to pixels
+whose color follows the contrast between the sampled background and the ink.
+
 Large billboards are composed in their original tile layout before the translated
 lettering is split back into the texture tiles. All tiles must match the stock
 fingerprints for the billboard to use the replacement.

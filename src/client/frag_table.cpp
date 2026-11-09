@@ -35,6 +35,27 @@ namespace OpenBlood2
         bar_ = bar;
         return true;
     }
+    void ClientFragTable::draw_player(std::string text, int x, int y)
+    {
+        constexpr int max_width = 145;
+        const HudRect row{x, y, x + max_width, y + int(font_.height)};
+        if (player_label_ && player_label_(text, surface_, font_, row))
+            return;
+        // Original DrawClip draws the whole string if it fits, then also
+        // draws the shortened string; preserve that harmless repeated draw.
+        if (font_.text_width(text) < max_width)
+            font_.draw(surface_, text, x, y, 0);
+        while (text.size() > 1)
+        {
+            text.pop_back();
+            if (font_.text_width(text) < max_width)
+            {
+                font_.draw(surface_, text, x, y, 0);
+                break;
+            }
+        }
+    }
+
     bool ClientFragTable::compose(std::span<const Net::RosterPlayer> players, unsigned width, unsigned height,
                                   std::string& error)
     {
@@ -82,20 +103,8 @@ namespace OpenBlood2
                 canvas_.DrawSurfaceToSurface(&surface_, portrait, nullptr, 0, row);
             }
             const int text_y = row + int((bar_->height - font_.height) / 2);
-            std::string text = "(-) " + p.name; // Original unknown-ping branch; measured pings remain separate.
-            // Original DrawClip draws the whole string if it fits, then also
-            // draws the shortened string; preserve that harmless repeated draw.
-            if (font_.text_width(text) < 145)
-                font_.draw(surface_, text, int(portrait->width), text_y, 0);
-            while (text.size() > 1)
-            {
-                text.pop_back();
-                if (font_.text_width(text) < 145)
-                {
-                    font_.draw(surface_, text, int(portrait->width), text_y, 0);
-                    break;
-                }
-            }
+            // Original unknown-ping branch; measured pings remain separate.
+            draw_player("(-) " + p.name, int(portrait->width), text_y);
             font_.draw(surface_, std::to_string(p.frags), int(bar_->width) - 20, text_y, 1);
         }
         for (std::size_t i = 0; i < surface_.rgba.size(); i += 4)
@@ -211,19 +220,7 @@ namespace OpenBlood2
                         font_.draw(surface_, text, text_x, text_y, 0);
                 }
                 else
-                {
-                    if (font_.text_width(text) < 145)
-                        font_.draw(surface_, text, text_x, text_y, 0);
-                    while (text.size() > 1)
-                    {
-                        text.pop_back();
-                        if (font_.text_width(text) < 145)
-                        {
-                            font_.draw(surface_, text, text_x, text_y, 0);
-                            break;
-                        }
-                    }
-                }
+                    draw_player(std::move(text), text_x, text_y);
                 font_.draw(surface_, std::to_string(score), left + int(bar_->width) - 20, text_y, 1);
             };
             for (unsigned team = first; team < first + columns; ++team)

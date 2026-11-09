@@ -39,7 +39,7 @@ namespace
             for (const auto key : {TextKey::Language, TextKey::Setup, TextKey::Cheats, TextKey::UnavailableOptions,
                                    TextKey::FirstPerson, TextKey::ThirdPerson})
                 CHECK(!strings.text(key, {}).empty());
-            for (const auto id : {502u, 503u, 521u, 522u, 523u, 524u, 525u, 526u, 5053u, 6053u})
+            for (const auto id : {502u, 503u, 521u, 522u, 523u, 524u, 525u, 526u, 5023u, 5053u, 6023u, 6053u})
                 CHECK(!strings.text(id, {}).empty());
             for (const auto key : {"setup.language", "setup.play", "loading.continue", "menu.main_title",
                                    "hud.quicksave", "objectives.empty", "objectives.authored.1b23dee31a697548.text"})
@@ -67,13 +67,21 @@ namespace
             CHECK(!strings.dialogue("Sounds\\Chosen\\Caleb\\1ACaleb1.WAV").empty());
             CHECK(!strings.text("dialogue.sounds.events.cwvoice8").empty());
             CHECK(!strings.text("dialogue.sounds.events.tavoice1").empty());
+            CHECK(!strings.text("dialogue.sounds_ao.chosen.ishmael.ishint11").empty());
             for (auto key : {"network.blue_team", "network.red_team", "hud.touch_fire", "hud.touch_jump",
                              "menu.controls_load_error", "menu.error_details", "menu.demo_version", "loading.chapter",
                              "credits.line.fd0e3eb2521a2182", "signs.no_spitting", "signs.out_of_order",
                              "signs.keep_clear", "signs.got_blood"})
                 CHECK(!strings.text(key).empty());
             CHECK(!strings.world("Worlds_AO\\Caleb1_cc_c.DAT").empty());
+            CHECK(!strings.world("Worlds_AO\\Multi_AO\\bb_sewers.DAT").empty());
             CHECK(!strings.pickup_name("Kitchen Key").empty() && strings.pickup_name("Kitchen key").empty());
+            CHECK(!strings.format("network.numeric_range", {}, {"1", "65535"}).empty());
+            CHECK(!strings.format("network.discovery_port_reserved", {}, {"27889"}).empty());
+            for (auto key : {"network.character_setup", "network.default_player_name", "network.host_suffix",
+                             "control.key_volume_up", "signs.caution_step", "signs.emergency_exit_only",
+                             "signs.book_life_brennon", "signs.museum_occult_mysteries"})
+                CHECK(!strings.text(key).empty());
             for (auto key : {"intro.line01", "intro.line02", "intro.line03", "intro.line04", "intro.line05",
                              "intro.line06", "intro.line07", "intro.line08", "intro.line09", "intro.line10",
                              "intro.line11", "intro.line12", "intro.line13"})

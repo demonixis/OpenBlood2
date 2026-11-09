@@ -29,7 +29,15 @@ namespace OpenBlood2
                                   {"network.time", "Time"},
                                   {"network.first_limit", "First limit reached"},
                                   {"network.no_limit", "No limit"}};
-        constexpr const char* characters[]{"Caleb", "Ophelia", "Ishmael", "Gabriella"};
+        struct CharacterLabel
+        {
+            unsigned resource;
+            const char* english;
+        };
+        constexpr CharacterLabel characters[]{{IDS_MENU_CHARSELECT_CALEB, "Caleb"},
+                                              {IDS_MENU_CHARSELECT_OPHELIA, "Ophelia"},
+                                              {IDS_MENU_CHARSELECT_ISHMAEL, "Ishmael"},
+                                              {IDS_MENU_CHARSELECT_GABRIELLA, "Gabriella"}};
 
         std::size_t previous_character(const std::string& value, std::size_t cursor)
         {
@@ -66,6 +74,14 @@ namespace OpenBlood2
             return false;
         locale_ = &locale;
         font_ = font;
+        if (!custom_name_)
+        {
+            Net::JoinProfile profile;
+            profile.name = label("network.default_player_name", "Player");
+            if (!Net::valid_profile(profile))
+                profile.name = "Player";
+            std::copy(profile.name.c_str(), profile.name.c_str() + profile.name.size() + 1, setup_.name.begin());
+        }
         for (const auto& path : setup_.maps)
         {
             std::vector<std::uint8_t> header;
@@ -252,13 +268,18 @@ namespace OpenBlood2
             case MenuPage::Bloodbath:
                 original(Join, IDS_MENU_BLOODBATH_JOIN, "JOIN GAME", "network.join");
                 original(Host, IDS_MENU_BLOODBATH_HOST, "HOST GAME", "network.host");
-                original(Profile, IDS_MENU_BLOODBATH_CHARSETUP, "CHARACTER SETUP", "network.character");
+                original(Profile, IDS_MENU_BLOODBATH_CHARSETUP, "CHARACTER SETUP", "network.character_setup");
                 break;
             case MenuPage::MultiplayerProfile:
+            {
+                const auto& character = characters[setup_.character];
+                const auto name = locale_->text(character.resource, character.english);
                 value(Name, player_name, setup_.name.data(), false);
-                value(Character, {"network.character", "Character"}, characters[setup_.character]);
+                value(Character, {"network.character", "Character"},
+                      font_ && font_->supports(name) ? name : character.english);
                 choice(Team, {"network.preferred_team", "Preferred team"}, teams[setup_.team]);
                 break;
+            }
             case MenuPage::MultiplayerHost:
                 choice(Mode, {"network.mode", "Mode"}, modes[setup_.mode]);
                 if (maps.empty())
@@ -520,9 +541,17 @@ namespace OpenBlood2
             if (result.ec != std::errc{} || result.ptr != end || parsed < minimum || parsed > maximum ||
                 (field_ == Port && parsed == Net::discovery_port))
             {
-                error_ = "Enter a value from " + std::to_string(minimum) + " to " + std::to_string(maximum) + ".";
+                const auto lower = std::to_string(minimum), upper = std::to_string(maximum);
+                error_ = "Enter a value from " + lower + " to " + upper + ".";
+                auto detail = font_ ? locale_->format("network.numeric_range", error_, {lower, upper}) : error_;
                 if (field_ == Port && result.ec == std::errc{} && parsed == Net::discovery_port)
-                    error_ = "Port " + std::to_string(Net::discovery_port) + " is reserved for LAN discovery.";
+                {
+                    const auto reserved = std::to_string(Net::discovery_port);
+                    error_ = "Port " + reserved + " is reserved for LAN discovery.";
+                    detail = font_ ? locale_->format("network.discovery_port_reserved", error_, {reserved}) : error_;
+                }
+                if (font_ && font_->supports(detail))
+                    error_ = std::move(detail);
                 cancel_edit(menu);
                 return;
             }
@@ -531,6 +560,8 @@ namespace OpenBlood2
         else
         {
             char* target = field_ == Name ? setup_.name.data() : setup_.address.data();
+            if (field_ == Name && draft_ != target)
+                custom_name_ = true;
             std::copy(draft_.c_str(), draft_.c_str() + draft_.size() + 1, target);
         }
         dirty_ = true;

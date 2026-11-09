@@ -8,6 +8,7 @@ namespace OpenBlood2::Net
 {
     inline constexpr std::uint16_t discovery_port = 27889;
     inline constexpr std::size_t discovery_packet_limit = 256;
+    inline constexpr std::size_t discovery_name_limit = 32;
     struct LanOffer
     {
         std::uint16_t protocol = protocol_version, port = default_port;

@@ -18,6 +18,12 @@ namespace OpenBlood2
             team_label_ = std::move(label);
             width_ = 0; // Recompose the next visible table, including with an unchanged roster.
         }
+        using PlayerLabel = std::function<bool(std::string_view, HudSurface&, const HudFont&, const HudRect&)>;
+        void set_player_label(PlayerLabel label)
+        {
+            player_label_ = std::move(label);
+            width_ = 0;
+        }
         bool compose(std::span<const Net::RosterPlayer>, unsigned width, unsigned height, std::string& error);
         bool compose_teams(std::span<const Net::RosterPlayer>, const std::array<int, 2>& totals, DBYTE column,
                            unsigned width, unsigned height, std::string& error);
@@ -34,6 +40,7 @@ namespace OpenBlood2
         HudCanvas canvas_;
         ClientAnnouncer text_;
         TeamLabel team_label_;
+        PlayerLabel player_label_;
         const HudSurface* voice_ = nullptr;
         std::array<std::string, 2> team_names_;
         std::array<std::vector<Net::RosterPlayer>, 2> team_order_;
@@ -47,5 +54,6 @@ namespace OpenBlood2
         std::vector<Net::RosterPlayer> previous_;
         unsigned width_ = 0, height_ = 0;
         bool initialize(std::string&);
+        void draw_player(std::string text, int x, int y);
     };
 } // namespace OpenBlood2

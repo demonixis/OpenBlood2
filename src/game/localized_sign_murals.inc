@@ -58,3 +58,57 @@
     {"videos_books_magazines_toys", {8, 198, 375, 225}, {8, 222}, 0xbdc1c9, false, false, 0, 47},
     {"two_blocks_from_bus_depot", {21, 232, 368, 255}, {16, 234}, 0x171620},
 }},
+{{
+    {"textures/blueyellow/boardg1.dtx", 0x761313c33256a64dULL, {0, 0}},
+    {"textures/blueyellow/boardg2.dtx", 0x16d69937a21422eaULL, {128, 0}},
+    {"textures/blueyellow/boardg3.dtx", 0x4a55ac80c21d85abULL, {256, 0}},
+    {"textures/blueyellow/boardg4.dtx", 0x575e39163a877f73ULL, {0, 128}},
+    {"textures/blueyellow/boardg5.dtx", 0xab63e4da7893337eULL, {128, 128}},
+    {"textures/blueyellow/boardg6.dtx", 0x22af3fbf5368619eULL, {256, 128}},
+}, {
+    {"shady_side_club", {6, 124, 298, 177}, {10, 127}, 0xca2920, false, true, 0, 25, {}, 0xd3dcd5, 19},
+    {"shady_side_club", {298, 124, 346, 177}, {10, 127}, 0xca2920, false, true, 0, 25, {}, 0xd3dcd5, 19, 35},
+    {"shady_side_club", {6, 124, 346, 177}, {10, 127}, 0xca2920, false, false, 0, 0, {}, 0xd3dcd5, 0},
+    {"shady_side_open_24_hours", {8, 229, 153, 250}, {8, 232}, 0xb29710, false, false, 0, 22},
+    {"shady_side_proprietor", {160, 229, 376, 253}, {180, 248}, 0xb29710, false, false, 0, 22},
+}},
+{{
+    {"textures/blueyellow/cabalcoa.dtx", 0x1aafd0a9a251f31dULL, {0, 0}},
+    {"textures/blueyellow/cabalcob.dtx", 0x9c250a293aedb05eULL, {128, 0}},
+}, {
+    {"cabalco_better_tomorrow", {4, 105, 252, 125}, {4, 116}, 0xe6e8ef, false, false, 0, 9},
+}},
+{{
+    {"textures/blueyellow/cabalco3a.dtx", 0xf9f9b40f7bebbd17ULL, {0, 0}},
+    {"textures/blueyellow/cabalco3b.dtx", 0x35b92739dc5bf5b8ULL, {128, 0}},
+}, {
+    {"cabalco_wave_of_the_future", {3, 3, 254, 27}, {20, 26}, 0x79a59c, false, false, 0, 14, {}, 0x07110b, 35},
+}},
+{{
+    {"textures/greys/cabalco4a.dtx", 0x7864bca40f011fb7ULL, {0, 0}},
+    {"textures/greys/cabalco4b.dtx", 0x6127e4dbdafe44e4ULL, {128, 0}},
+}, {
+    {"cabalco_who_else", {9, 93, 249, 124}, {6, 101}, 0x45627b, false, false, 0, 10, {}, 0x000103, 24},
+}},
+{{
+    {"textures/reds/cabalco5a.dtx", 0xfbab332f23dd9361ULL, {0, 0}},
+    {"textures/reds/cabalco5b.dtx", 0x8d360e44ab6a1462ULL, {128, 0}},
+}, {
+    {"cabalco_life_insurance", {8, 48, 248, 74}, {18, 72}, 0xab2617, false, false, 0, 12, {}, 0x0e0601, 28},
+    {"cabalco_why_not_get_paid", {10, 78, 246, 118}, {12, 119}, 0x140c06, false, false, 0, 22},
+}},
+{{
+    {"textures/blueyellow/cabalco6a.dtx", 0x13aaf7c9a7aefe81ULL, {0, 0}},
+    {"textures/blueyellow/cabalco6b.dtx", 0x1b57b1bcf3b8d0b9ULL, {128, 0}},
+}, {
+    {"cabalco_trust_us", {56, 95, 198, 119}, {58, 102}, 0xb1b8c9, false, false, 0, 22},
+}},
+{{
+    {"textures_ao/carnival/carnysign7a.dtx", 0x2c0842b7033a3104ULL, {0, 0}},
+    {"textures_ao/carnival/carnysign7b.dtx", 0xc8d26bb7086d3b65ULL, {128, 0}},
+}, {
+    {"carnival_amazing", {102, 8, 149, 18}, {94, 13}, 0x573305, false, false, 0, 34},
+    {"carnival_circus_sideshow", {144, 4, 222, 62}, {239, 36}, 0xc71521, false, true, 0, 15, {}, 0, 25, 64},
+    {"carnival_circus_sideshow", {147, 33, 241, 78}, {231, 60}, 0xad0800, false, true, 0, 15, {}, 0, 25, 62},
+    {"carnival_circus_sideshow", {140, 7, 245, 80}, {239, 36}, 0xcf1721, false, false, -22.0, 0},
+}},

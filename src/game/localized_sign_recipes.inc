@@ -574,3 +574,98 @@
 {"textures_ao/sorority/beaversign2.dtx", 0xe5f700c04efc0c8dULL, {
     {"beavers_are_number_one", {3, 15, 125, 31}, {4, 18}, 0xb6a7cc},
 }},
+{"skins/worldobjects/museumbanner.dtx", 0xe31339248938a7e9ULL, {
+    {"museum_occult_mysteries", {2, 22, 126, 104}, {18, 55}, 0x9fa2a3, false, false, 0, 15, {}, 0x07090b, 42},
+    {"museum_this_month_only", {5, 110, 124, 126}, {4, 120}, 0x992211, false, false, 0, 19},
+}},
+{"skins/worldobjects/museumbanner2.dtx", 0x4a7d2e0e8b2fc17dULL, {
+    {"museum_wonders_of_egypt", {3, 23, 125, 105}, {64, 22}, 0x1a1d28, false, false, 0, 43},
+}},
+{"skins/worldobjects/museumbanner3.dtx", 0xb92b8086ad5dc0c3ULL, {
+    {"museum_incan_treasures", {3, 37, 125, 90}, {25, 42}, 0xc4c1b6, false, false, 0, 17, {}, 0x273b2b, 22},
+}},
+{"textures/blueyellow/cabalco.dtx", 0x2c1c45c86ecb75a3ULL, {
+    {"cabalco_better_tomorrow", {4, 105, 252, 125}, {4, 116}, 0xe6e8ef, false, false, 0, 9},
+}},
+{"textures_ao/sorority/beaversign3.dtx", 0xb3237350a87dab87ULL, {
+    {"beavers_team", {5, 1, 124, 16}, {58, 15}, 0x185384, false, false, 0, 11},
+    {"beavers_red_hot", {11, 16, 120, 31}, {10, 26}, 0xb42215, false, false, 0, 17},
+}},
+
+// Additional door notices, props and readable book and chalkboard lettering.
+{"textures/blueyellow/cautionstep.dtx", 0x908ecb3bd5e07a01ULL, {
+    {"caution", {4, 3, 61, 12}, {5, 3}, 0xe7d119, true},
+    {"caution_step", {3, 14, 61, 30}, {3, 20}, 0x121414, true},
+}},
+{"textures/blueyellow/aprtmntdoor2.dtx", 0x67aeee52fa619942ULL, {
+    {"keep_out", {11, 44, 52, 54}, {14, 44}, 0x131508, true},
+    {"condemned_building", {11, 54, 52, 65}, {14, 44}, 0x131508, true},
+    {"keep_out", {73, 46, 115, 56}, {75, 46}, 0x131508, true},
+    {"condemned_building", {73, 56, 115, 68}, {75, 46}, 0x131508, true},
+}},
+{"textures/greys/aprtmntdoor4.dtx", 0x42cca4d81302d412ULL, {
+    {"eviction_notice", {20, 40, 48, 56}, {20, 56}, 0x1b1515},
+    {"eviction_notice", {82, 41, 112, 58}, {83, 53}, 0x1b1515},
+}},
+{"textures/reds/mtldoors2.dtx", 0x6b34c0470456d424ULL, {
+    {"emergency_exit_only", {4, 37, 61, 56}, {52, 36}, 0x7f1209, false, false, 0, 24, {}, 0, 25, 53},
+    {"emergency_exit_only", {66, 37, 122, 56}, {66, 36}, 0xbd1814, false, false, 0, 24, {}, 0, 25, 55},
+}},
+{"textures/blueyellow/doormetal2.dtx", 0xd23c6bfc28aab280ULL, {
+    {"emergency_exit_only", {9, 65, 49, 81}, {9, 65}, 0x3d0d0d, false, false, 0, 31, {}, 0, 25, 30},
+    {"emergency_exit_only", {78, 65, 116, 81}, {79, 65}, 0x3d0d0d, false, false, 0, 31, {}, 0, 25, 30},
+}},
+{"textures/greys/cratemetal2.dtx", 0x9826d202eb24cf8eULL, {
+    {"this_end_up", {20, 14, 36, 27}, {36, 14}, 0x7e4c2e, false, true, 0, 16, {}, 0, 25, 35},
+    {.key = "this_end_up", .bounds = {36, 14, 95, 27}, .backdrop = {36, 14}, .ink = 0x7e4c2e,
+     .clean_path = "textures/greys/cratemetal3.dtx", .clean_hash = 0x2cc74b31362fd268ULL},
+    {.key = "do_not_drop", .bounds = {53, 83, 112, 112}, .backdrop = {55, 98}, .ink = 0x060606,
+     .clean_path = "textures/greys/cratemetal4.dtx", .clean_hash = 0x1fdbfbfe9a60a420ULL},
+}},
+{"textures/reds/cratewood4.dtx", 0x431010de55e3698eULL, {
+    {.key = "this_end_up", .bounds = {17, 16, 77, 29}, .backdrop = {26, 18}, .ink = 0x0a0907,
+     .clean_path = "textures/reds/cratewood1.dtx", .clean_hash = 0xa4b9bc46d7c900c9ULL},
+}},
+{"textures/reds/cratewood5.dtx", 0x323c8ba5ee000670ULL, {
+    {.key = "this_end_up", .bounds = {17, 16, 77, 29}, .backdrop = {26, 18}, .ink = 0x0a0907,
+     .clean_path = "textures/reds/cratewood1.dtx", .clean_hash = 0xa4b9bc46d7c900c9ULL},
+    {.key = "fragile", .bounds = {12, 52, 120, 95}, .backdrop = {26, 59}, .ink = 0x080705,
+     .degrees_clockwise = 13,
+     .clean_path = "textures/reds/cratewood1.dtx", .clean_hash = 0xa4b9bc46d7c900c9ULL},
+}},
+{"textures/blueyellow/sewerwall1b.dtx", 0x70311d88bb17debaULL, {
+    {"graffiti_home", {42, 23, 114, 49}, {42, 24}, 0x090909, false, false, 0, 36},
+}},
+{"textures/blueyellow/chalkboard.dtx", 0x03b02af517288687ULL, {
+    {"watch_schedule", {3, 3, 61, 12}, {3, 4}, 0xbbc3ae},
+}},
+{"textures/blueyellow/chalkboard1.dtx", 0x6f5ebf211a1c9c22ULL, {
+    {"chalk_love_mom", {4, 32, 63, 41}, {4, 33}, 0x898f76},
+    {"chalk_ernie", {18, 86, 86, 108}, {17, 90}, 0x878e74},
+}},
+{"textures/blueyellow/chalkboard2.dtx", 0xe01505de23873941ULL, {
+    {"chalk_jojo", {60, 32, 109, 51}, {60, 32}, 0x92947e},
+    {"chalk_smartest", {62, 94, 123, 119}, {66, 94}, 0x92947e},
+}},
+{"textures/greys/newspaper.dtx", 0xa76fdfc8770aadc8ULL, {
+    {"newspaper_headline", {13, 12, 53, 20}, {13, 18}, 0x292b25},
+}},
+{"skins_ao/worldobjects_ao/book1.dtx", 0xa23ae970bba14126ULL, {
+    {"book_spells", {7, 39, 36, 47}, {5, 40}, 0xb28560},
+}},
+{"skins_ao/worldobjects_ao/book2.dtx", 0x1a0e286515938b89ULL, {
+    {"book_pick_up", {3, 5, 34, 42}, {4, 6}, 0x899ca5},
+}},
+{"skins_ao/worldobjects_ao/book3.dtx", 0xfb18b238147d5e27ULL, {
+    {"book_life_brennon", {2, 6, 39, 24}, {3, 8}, 0xbc6b38},
+    {"book_by_mo_balls", {4, 28, 38, 46}, {6, 27}, 0xb56b24},
+    {"book_life_brennon_spine", {10, 53, 55, 61}, {10, 55}, 0x977370},
+}},
+{"skins_ao/worldobjects_ao/book4.dtx", 0x0c10a6f337c1e12dULL, {
+    {"book_raven", {5, 6, 37, 26}, {7, 8}, 0xa3836f},
+    {"book_raven_spine", {12, 53, 55, 61}, {8, 53}, 0xa3836f},
+}},
+{"skins_ao/worldobjects_ao/book5.dtx", 0xe774a3540d34e7b9ULL, {
+    {"book_evil_dead", {4, 3, 36, 36}, {5, 5}, 0x969c15},
+    {"book_evil_dead_spine", {10, 53, 53, 61}, {9, 54}, 0x969c15},
+}},

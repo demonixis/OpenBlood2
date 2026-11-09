@@ -339,6 +339,8 @@
  "Oh, hello there! Have you any bananas by chance?"},
 {"sounds_ao/chosen/ishmael/ish35.wav", "dialogue.sounds_ao.chosen.ishmael.ish35",
  "Quite."},
+{"sounds_ao/chosen/ishmael/ishint11.wav", "dialogue.sounds_ao.chosen.ishmael.ishint11",
+ "[Chuckles]"},
 {"sounds_ao/chosen/ishmael/ishint21.wav", "dialogue.sounds_ao.chosen.ishmael.ishint21.1",
  "Well, I suppose it is my turn, yes? My, my. Like Ophelia, I have a secret.", false, 0, 6.64},
 {"sounds_ao/chosen/ishmael/ishint21.wav", "dialogue.sounds_ao.chosen.ishmael.ishint21.2",
