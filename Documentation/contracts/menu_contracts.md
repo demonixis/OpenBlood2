@@ -223,6 +223,10 @@ the original renderer) after LIGHTING. With ENHANCED, the LIGHTING row cycles
 version 3, versions 1 and 2 load with the renderer defaults, and keys of a later version
 are rejected. This supersedes the version 2 write statement above.
 
+Prototype version 3 files with `renderer=pbr` and `pbr_profile=full` load as Enhanced
+with High lighting. The two absent settings, `pixel_lighting` and `normal_maps`, use
+their defaults. The next settings save uses the current preferences format.
+
 In an XR session (`Menu::vr`) Options ends with a replacement large-font `VR` row opening the
 replacement VR page (small font, `options.pcx`, Back returns to Options): `TURN [SNAP n/SMOOTH]`
 (setting 10), `AIM LASER [ON/OFF]` (11), `CROSSHAIR [ON/OFF]` (12) and `MOVE [HEAD/RIGHT HAND]`

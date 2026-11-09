@@ -171,6 +171,28 @@ int test_menu_preferences(int argc, char** argv)
     CHECK(load_menu_preferences(path, loaded, error) && loaded.renderer == 1 && loaded.quality == 1 &&
           !loaded.normal_maps && loaded.vr_turn == 45 && loaded.vr_laser && loaded.vr_crosshair);
     {
+        constexpr auto legacy = "version=3\nsound=1\nmusic=1\nsound_volume=50\nmusic_volume=50\nsensitivity=150\n"
+                                "invert_y=0\ndetail=2\nrenderer=pbr\npbr_profile=full\n";
+        {
+            std::ofstream out(path);
+            out << legacy;
+        }
+        MenuSettings migrated;
+        migrated.music_volume = 50;
+        migrated.renderer = migrated.quality = 1;
+        CHECK(load_menu_preferences(path, loaded, error) && loaded == migrated);
+        for (const auto extra : {"quality=1\n", "pbr_profile=full\n", "normal_maps=1\n", "pixel_lighting=0\n"})
+        {
+            {
+                std::ofstream out(path);
+                out << legacy << extra;
+            }
+            CHECK(!load_menu_preferences(path, loaded, error) && loaded == migrated);
+        }
+        CHECK(save_menu_preferences(path, loaded, error));
+        CHECK(load_menu_preferences(path, loaded, error) && loaded == migrated);
+    }
+    {
         // Version 4 adds the VR options, version 5 the movement reference; a turn step outside the
         // offered values is refused.
         MenuSettings vr;

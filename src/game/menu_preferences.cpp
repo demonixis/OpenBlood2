@@ -5,6 +5,7 @@
 #include <array>
 #include <charconv>
 #include <fstream>
+#include <string_view>
 namespace OpenBlood2
 {
     namespace
@@ -52,6 +53,8 @@ namespace OpenBlood2
                                                     "field_of_view",
                                                     "language"};
         constexpr std::array<std::size_t, 13> version_keys{7, 9, 12, 15, 16, 18, 21, 22, 23, 31, 35, 36, 37};
+        constexpr std::size_t pixel_lighting_key = 8;
+        constexpr std::size_t normal_maps_key = 11;
         bool valid(const MenuSettings& s)
         {
             const bool turn = s.vr_turn == 0 || s.vr_turn == 15 || s.vr_turn == 30 || s.vr_turn == 45 ||
@@ -106,6 +109,7 @@ namespace OpenBlood2
         std::array<int, names.size() - 1> values{};
         std::array<bool, names.size()> seen{};
         Language language = Language::English;
+        bool legacy_renderer = false, legacy_profile = false;
         std::string line;
         while (std::getline(input, line))
         {
@@ -113,19 +117,32 @@ namespace OpenBlood2
                 line.pop_back();
             if (line.empty() || line.front() == '#')
                 continue;
-            const auto equal = line.find('=');
+            std::string_view entry = line;
+            // The prototype used text for the enhanced renderer and its full quality profile.
+            if (entry == "renderer=pbr")
+            {
+                legacy_renderer = true;
+                entry = "renderer=1";
+            }
+            else if (entry == "pbr_profile=full")
+            {
+                legacy_profile = true;
+                entry = "quality=1";
+            }
+            const auto equal = entry.find('=');
+            const auto name = entry.substr(0, equal);
             unsigned key = 0;
             for (; key < names.size(); ++key)
-                if (line.substr(0, equal) == names[key])
+                if (name == names[key])
                     break;
-            if (key == names.size() || equal == line.npos || seen[key])
+            if (key == names.size() || equal == entry.npos || seen[key])
             {
                 error = "Unknown or duplicate preferences key";
                 return false;
             }
             if (key == values.size())
             {
-                const auto parsed = parse_language(std::string_view(line).substr(equal + 1));
+                const auto parsed = parse_language(entry.substr(equal + 1));
                 if (!parsed)
                 {
                     error = "Unknown language in preferences";
@@ -135,7 +152,7 @@ namespace OpenBlood2
             }
             else
             {
-                auto first = line.data() + equal + 1, last = line.data() + line.size();
+                auto first = entry.data() + equal + 1, last = entry.data() + entry.size();
                 const auto parsed = std::from_chars(first, last, values[key]);
                 if (parsed.ec != std::errc{} || parsed.ptr != last)
                 {
@@ -145,19 +162,31 @@ namespace OpenBlood2
             }
             seen[key] = true;
         }
+        MenuSettings result;
+        if (legacy_renderer || legacy_profile)
+        {
+            if (!legacy_renderer || !legacy_profile || values[0] != 3 || seen[pixel_lighting_key] ||
+                seen[normal_maps_key])
+            {
+                error = "Incomplete or unsupported preferences";
+                return false;
+            }
+            seen[pixel_lighting_key] = seen[normal_maps_key] = true;
+            values[pixel_lighting_key] = result.pixel_lighting;
+            values[normal_maps_key] = result.normal_maps;
+        }
         const bool known = values[0] >= 1 && values[0] <= int(version_keys.size());
         const std::size_t required = known ? version_keys[values[0] - 1] : 0;
         auto flag = [&](std::size_t key) { return key >= required || (values[key] >= 0 && values[key] <= 1); };
         if (input.bad() || !known ||
             std::find(seen.begin(), seen.begin() + required, false) != seen.begin() + required ||
             std::find(seen.begin() + required, seen.end(), true) != seen.end() || !flag(1) || !flag(2) || !flag(6) ||
-            !flag(8) || !flag(11) || !flag(13) || !flag(14) || !flag(15) || !flag(16) || !flag(17) || !flag(19) ||
-            !flag(23) || !flag(27) || !flag(31) || !flag(32) || !flag(33))
+            !flag(pixel_lighting_key) || !flag(normal_maps_key) || !flag(13) || !flag(14) || !flag(15) || !flag(16) ||
+            !flag(17) || !flag(19) || !flag(23) || !flag(27) || !flag(31) || !flag(32) || !flag(33))
         {
             error = "Incomplete or unsupported preferences";
             return false;
         }
-        MenuSettings result;
         result.sound = values[1];
         result.music = values[2];
         result.sound_volume = values[3];
@@ -167,13 +196,13 @@ namespace OpenBlood2
         if (required >= version_keys[1])
         {
             result.detail = values[7];
-            result.pixel_lighting = values[8];
+            result.pixel_lighting = values[pixel_lighting_key];
         }
         if (required >= version_keys[2])
         {
             result.renderer = values[9];
             result.quality = values[10];
-            result.normal_maps = values[11];
+            result.normal_maps = values[normal_maps_key];
         }
         if (required >= version_keys[3])
         {
