@@ -18,4 +18,5 @@ namespace OpenBlood2
 {
     // Checked source waveform, including original sample tables and phase thresholds.
     bool light_wave_value(DBYTE wave, float min, float max, float theta, float& output);
+    LightSettings native_light_settings(DVector color, float radius, DDWORD flags = 0);
 } // namespace OpenBlood2

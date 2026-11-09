@@ -163,6 +163,13 @@ namespace OpenBlood2
         state = {};
         return r && movement_state(*r, state);
     }
+    bool ServerAdapter::GetContactNormal(HOBJECT h, DVector& normal)
+    {
+        trace_service("GetContactNormal");
+        const auto* r = objects_.get(h);
+        normal = r && r->life == Life::Alive ? r->contact_normal : DVector{};
+        return vector_dot(normal, normal) > 0;
+    }
     bool ServerAdapter::movement_state(const ObjectRecord& record, MovementState& state)
     {
         state = {};

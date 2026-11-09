@@ -35,5 +35,7 @@ namespace OpenBlood2
         flesh_gibs.clear();
         destruction_debris.clear();
         light_effects.clear();
+        detached_lines.clear();
+        next_line_id = 1;
     }
 } // namespace OpenBlood2

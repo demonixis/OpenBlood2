@@ -44,6 +44,7 @@ namespace OpenBlood2
         error.clear();
         const unsigned surface = debris ? (debris->flags & 0xff) * 10 : 100;
         const bool custom = debris && (debris->flags & 0x4000);
+        const bool demo = resources.demo();
         FleshGibReport report;
         if (debris)
             report.source = debris->source;
@@ -109,12 +110,26 @@ namespace OpenBlood2
                 }
                 else
                 {
-                    // B2_LITE NRES limits model and sound choices to 1..3 for every material.
-                    const int model = integer(random_, 1, 3);
+                    // The Demo binary uses the full ranges. Retail B2_LITE caps each at three.
+                    const int demo_models = surface == 100  ? 8
+                                            : surface == 50 ? 3
+                                            : surface == 30 ? 4
+                                            : surface == 10 ? 9
+                                                            : 5;
+                    int model = integer(random_, 1, demo ? demo_models : 3);
+                    // The shipped demo omits stone pairs 1, 4 and 5. Use the next mounted pair.
+                    if (demo && surface == 10 && (model == 1 || model == 4 || model == 5))
+                        for (; model < demo_models; ++model)
+                        {
+                            const auto variant = "gibs/stone/gib" + std::to_string(model);
+                            if (resources.find("models/" + variant + ".abc") &&
+                                resources.find("skins/" + variant + ".dtx"))
+                                break;
+                        }
                     g.bounces = surface == 100 ? (integer(random_, 0, 4) == 4 ? 1 : 0)
                                 : surface == 10 || surface == 70 || surface == 90 ? 2
                                                                                   : 1;
-                    const int sound = integer(random_, 1, 3);
+                    const int sound = integer(random_, 1, demo ? 5 : 3);
                     const std::string material = surface == 50    ? "glass"
                                                  : surface == 30  ? "wood"
                                                  : surface == 10  ? "stone"

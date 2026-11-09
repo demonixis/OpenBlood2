@@ -54,7 +54,8 @@ bool VolumeBrush::ReadProp(ObjectCreateStruct& state)
     }
     if (g_pServerDE->GetPropGeneric("Code", &prop) == DE_OK)
     {
-        if (prop.m_Long < CC_NOTHING || prop.m_Long > CC_FREEFALL || prop.m_Long == CC_CRANECONTROL)
+        if (prop.m_Long < CC_NOTHING || prop.m_Long > CC_FREEFALL ||
+            (prop.m_Long == CC_CRANECONTROL && info.code != CC_CRANECONTROL))
             return false;
         info.code = static_cast<ContainerCode>(prop.m_Long);
     }

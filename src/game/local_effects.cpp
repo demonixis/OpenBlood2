@@ -1,8 +1,11 @@
 #include "game/local_effects.h"
 #include "client/effect_snapshot.h"
 #include "game/original/CampaignProjectiles.h"
+#include "game/original/ClientSmokeTrail.h"
 #include "game/original/FlareProjectile.h"
 #include "game/original/LeechProjectile.h"
+#include "game/original/LegacyEffects.h"
+#include "game/original/LegacyLines.h"
 #include "game/original/TeslaProjectile.h"
 #include "game/original/VolumeBrush.h"
 #include "game/server_adapter.h"
@@ -44,13 +47,50 @@ namespace OpenBlood2
                 ++frame.shadow_lights_unshadowed;
             frame.lights.push_back({{position, color, radius}, flags});
         };
-        // Presentation-only equivalent of the source's owned projectile OT_LIGHT child.
-        // No extra server record, game RNG draw or saved-payload change.
+        std::map<std::uint64_t, LegacySmokeSource> smoke_sources;
         for (auto id : game.objects.snapshot())
         {
             const auto* r = game.objects.get(id);
             if (!r || r->life != Life::Alive)
                 continue;
+            if (const auto* line = dynamic_cast<const CClientCastLineSFX*>(r->game.get()))
+            {
+                LineEffectGeometry geometry;
+                if (line->Geometry(r->state.m_Pos, r->state.m_Rotation, geometry))
+                    frame.lines.push_back(
+                        {{EffectKind::CastLine, (std::uint64_t(id.generation) << 32) | (std::uint64_t(id.slot) + 1)},
+                         geometry});
+                continue;
+            }
+            if (const auto* laser = dynamic_cast<const CClientLaserFX*>(r->game.get()); laser && laser->visible)
+            {
+                const auto owner = (std::uint64_t(id.generation) << 32) | (std::uint64_t(id.slot) + 1);
+                for (unsigned i = 0; i < laser->lines.size(); ++i)
+                    frame.lines.push_back({{EffectKind::CastLine, owner, i + 1}, laser->lines[i]});
+                continue;
+            }
+            if (const auto* smoke = dynamic_cast<const CClientSmokeTrail*>(r->game.get()))
+            {
+                if (!smoke->configured || smoke_sources.size() >= LegacySmokeTrails::source_limit)
+                    continue;
+                const auto at = r->state.m_Pos;
+                bool liquid = false;
+                for (auto volume_id : game.objects.container_snapshot())
+                {
+                    const auto* volume = game.objects.get(volume_id);
+                    ContainerInfo info;
+                    if (volume && volume->life == Life::Alive && volume->container() &&
+                        volume->container()->contains(at) && container_info(*volume, info))
+                    {
+                        liquid = IsLiquid(info.code);
+                        break;
+                    }
+                }
+                const auto owner = (std::uint64_t(id.slot) << 32) | id.generation;
+                smoke_sources.emplace(owner, LegacySmokeSource{at, smoke->velocity, smoke->small, liquid});
+                continue;
+            }
+            // Presentation-only equivalent of the source's owned projectile OT_LIGHT child.
             const auto* projectile = dynamic_cast<const CProjectile*>(r->game.get());
             if (!projectile || !projectile->configured || projectile->failed || projectile->exploded)
                 continue;
@@ -74,6 +114,7 @@ namespace OpenBlood2
             else if (dynamic_cast<const CGroundStrikeProjectile*>(projectile))
                 add(position, {1, .75f, 0}, 150);
         }
+        legacy_smoke_.append(smoke_sources, game.resources, frame);
         auto variable = [&](const char* key)
         {
             const auto found = game.server.variables().find(key);

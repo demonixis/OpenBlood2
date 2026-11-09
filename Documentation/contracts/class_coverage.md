@@ -1,66 +1,69 @@
 # Original server-class coverage
 
-Reviewed 2026-10-25 against the runtime registry and the optional LithTech reference tree.
-This is a class-name inventory, **not** a claim that every registered class has complete retail
-behavior. It is separate from save-payload support and from missing artwork/audio.
+This inventory tracks direct server class registrations in `src/game/registration.cpp`.
+Registration, active behavior, edition availability, and save-payload coverage are tracked separately.
+The optional reference tree and the original ObjectDLL binaries are audit inputs. The runtime uses its own factories.
 
-The original `Blood2/ObjectDLL/ObjectDLL.dsp` sources contain 224 unique active
-`END_CLASS_DEFAULT*` names, including conditional add-on names. The current runtime registers
-192 names: 184 of those ObjectDLL classes, plus BaseClass, six native classes and StartPoint.
-The following **40 names are not registered**. Source comments must be stripped lexically
-before counting (a block-comment marker inside a line comment must not hide live declarations).
-Runtime names are returned by `Objects::classes()` after `GameSession::initialize()` and are
-registered in `src/game/registration.cpp`; the reference tree is not a build dependency.
+The October source audit found 40 names without a factory. `CRockProjectile` and `GremlinAI`
+were subsequently registered. The binary audit added the Demo-specific `CClientGibFX`, bringing the
+follow-up list to 39. The historical [class catalog](../implementation/save_load_audit/class_catalog.md#3d-original-compiled-classes-not-registered-in-openblood2)
+records source locations and world usage for the earlier audit.
 
-The historical [class catalog](../implementation/save_load_audit/class_catalog.md#3d-original-compiled-classes-not-registered-in-openblood2)
-contains source locations and measured world usage. Its 40-name difference still matches this
-registry. None of those names was placed in the 58 shipped DATs in that audit. This does not
-exclude a missing dynamically spawned class or a failure later in a level.
+## Follow-up registrations
 
-## Absent object registrations with replacement services
-
-A replacement covers the listed paths, not every possible original caller or mod.
-
-| Name | Current coverage |
+| Family | Class names |
 | --- | --- |
-| `CClientSmokeTrail` | Particle services cover selected trail callers; no server class. |
-| `CClientSparksSFX` | Typed sparks service. |
-| `CClientWeaponSFX` | WeaponFX dispatch to the typed effect services. |
-| `CImpact` | Explosion/weapon sprites. |
-| `CModelObject` | Explosion model service. |
-| `CViewWeaponModel` | Client CViewWeapon instances. |
-| `Explosion` | Typed explosion services; no generic Explosion object. |
+| Projectile combat | `CProjectile`, `CFireballProjectile`, `CGooProjectile`, `CSingularityAltProjectile` |
+| Nightmares | `CFlayerChain`, `CFlayerPortal`, `CGasGrenade`, `CNightmareFireball`, `CombatShotgunPU`, `FlayerPU`, `Nightmare` |
+| Scene and scripting | `CraneControl`, `Explosion`, `FireFX`, `LightFX`, `Rain`, `RotatingSprite`, `Script`, `WreckingBall` |
+| Soccer | `SoccerBall`, `SoccerGoal` |
+| Effect carriers | `CBulletImpactSFX`, `CClientBloodTrail`, `CClientCastLineSFX`, `CClientDebugLine`, `CClientLaserBeamSFX`, `CClientLaserFX`, `CClientMarkSFX`, `CClientSmokeTrail`, `CClientSparksSFX`, `CClientSplashSFX`, `CClientTracer`, `CClientWeaponSFX`, `CImpact`, `CImpactRicochet`, `CModelObject`, `CShellCasing` |
+| View model | `CViewWeaponModel` |
+| Demo | `CClientGibFX` |
 
-`CProjectile` is the implemented C++ projectile base, without a directly constructible class registration.
+The `CProjectile` factory creates the legacy base defaults and its registered subclasses inherit
+the original class relationship. Fireball and goo retain their separate collision and particle
+behavior. Gideon's goo weapon uses the original ID. The alternate Singularity is constructible and
+has its own attraction behavior. Stock Singularity firing retains the source projectile selection.
+The new active projectile and add-on pickup payloads remain unsupported for saving.
 
-## Unported add-on registrations
+The blood-trail carrier places splats on nearby surfaces and follows its linked parent. The source
+airborne payload used the particle-explosion message ID with a different layout. The port covers
+the surface-splat behavior. The Demo debris carrier uses the same typed debris service as existing
+destructible objects. The Demo binary's wider model and sound ranges are selected in that edition.
+`B2Demo.rez` omits stone model/skin pairs 1, 4 and 5, so those draws advance to the next mounted
+pair. Standalone marks, tracers and lasers use the local presentation pools.
 
-`CFlayerChain`, `CFlayerPortal`, `CGasGrenade`, `CNightmareFireball`, `CRockProjectile`, `CombatShotgunPU`, `FlayerPU`, `GremlinAI`, `Nightmare`.
+The [Nightmares](nightmares_edition_contracts.md), [scene classes](legacy_scene_classes_contracts.md),
+[crane](crane_objects_contracts.md), [soccer](soccer_objects_contracts.md),
+[model effects](legacy_model_effect_contracts.md), [weapon effects](shotgun_contracts.md) and
+[particle stream](particle_stream_contracts.md) contracts describe their behavior and boundaries.
+The dedicated tests exercise stock maps or small fixtures, without requiring campaign traversal.
 
-## Other absent registrations
+## Targeted verification
 
-`CBulletImpactSFX`, `CClientBloodTrail`, `CClientCastLineSFX`, `CClientDebugLine`, `CClientLaserBeamSFX`, `CClientLaserFX`, `CClientMarkSFX`, `CClientSplashSFX`, `CClientTracer`, `CFireballProjectile`, `CGooProjectile`, `CImpactRicochet`, `CShellCasing`, `CSingularityAltProjectile`, `CraneControl`, `FireFX`, `LightFX`, `Rain`, `RotatingSprite`, `Script`, `SoccerBall`, `SoccerGoal`, `WreckingBall`.
-
-`CClientLaserBeamSFX` is not a placeable server class; the existing weapon beam service is not
-an implementation of that class. `LightFX` is distinct from the registered `ClientLightFX`
-family. Absence here must not be hidden by an alias or a placeholder object.
+- `legacy_classes.registry` checks all 39 factory names independently of mounted resources.
+- `spawner.cathedral`, `spawner.ancient_city` and `spawner.arena` trigger the authored unlocks.
+- `nightmares.installed` inspects 13 original expansion maps. `nightmare_boss.world` exercises
+  the boss death relay on the original map. The two `soccer` cases kick, score and respawn the
+  ball on their original maps.
+- `legacy_classes`, `fire_effects`, `rain`, `script`, `crane`, `client_splash`,
+  `client_weapon_sfx`, `legacy_smoke`, `weapons.legacy_view_model` and `nightmares_weapons`
+  cover setup, live behavior, effect publication and cleanup on focused scenes. The destruction
+  and death suites check existing brush, crate, glass and gib callers.
 
 ## Names absent from the original as well
 
-These are not missing ports: authored `Gremlin` and `RocketAmmoPU`, and the original dynamic
-lookup spellings `DieBugDieAmmo`, `FareAmmoPU`, `LifeEssencePU`, `BatterAmmoPU`, `TheAngerPU`.
-They remain explicit absent-original-class reports. In particular, do not alias `TheAngerPU`
-to `AngerPU` or `Gremlin` to the add-on `GremlinAI`.
+The authored `Gremlin` and `RocketAmmoPU` names and the dynamic lookup spellings `DieBugDieAmmo`,
+`FareAmmoPU`, `LifeEssencePU`, `BatterAmmoPU`, and `TheAngerPU` remain explicit absent-original-class
+reports. In particular, `TheAngerPU` and `Gremlin` retain their original identities.
 
-Original files not included in ObjectDLL.dsp (BirdAI, BugAI, RatAI, WurmAI, DefenseGlobeAI,
-DefenseGlobeLegs and SpellPickup), commented registrations and duplicate variants are excluded
-from the 224-name compiled-source set.
+Original files outside the compiled project, including BirdAI, BugAI, RatAI, WurmAI,
+DefenseGlobeAI, DefenseGlobeLegs, and SpellPickup, were excluded from the inventory along with
+commented registrations and duplicate variants.
 
 ## Museum report
 
-The 2026-10-25 report has no crash location, action, build identification or crash log.
-`03_museum` passes current world inspection, 30 seconds of entry simulation, the duct regression,
-and the difficulty-1 whole-world save audit (entry and after combat, restoration and subsequent
-simulation). That audit saves 444 records / 478303 bytes. This is **not a reproduction or fix of
-the reported crash**, and gives no evidence that one of the absent names above caused it.
-A failing route/action and build, or a save immediately before the failure, is still needed.
+The 2026-10-25 report lacks a crash location, action, build identification and log.
+The earlier `03_museum` audit covered world inspection, 30 seconds of entry simulation, the duct
+regression and difficulty-1 world saves at entry and after combat. It did not reproduce the crash.

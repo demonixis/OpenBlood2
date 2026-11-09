@@ -113,8 +113,8 @@ namespace OpenBlood2
         }
         for (const auto& fx : runtime.shotgun_effects.splashes)
         {
-            auto& out = particles(EffectKind::BallisticSplash, fx.id, 0, "SpriteTextures/drop32_1.dtx", 100.f / 640, 1);
-            out.origin = fx.position;
+            auto& out = particles(EffectKind::BallisticSplash, fx.id, 0, fx.settings.texture, fx.settings.radius / 640, 1);
+            out.origin = fx.settings.position;
             out.particles = fx.particles;
             out.batched = true;
         }
@@ -236,6 +236,9 @@ namespace OpenBlood2
         }
         for (const auto& fx : runtime.shotgun_effects.tracers)
             frame.tracers.push_back({{EffectKind::Tracer, fx.id}, fx.center, fx.forward, fx.right});
+        for (const auto& fx : runtime.detached_lines)
+            if (frame.time < fx.expires)
+                frame.lines.push_back({{EffectKind::DetachedLine, fx.id}, fx.line});
 
         auto add = [&](DVector position, DVector color, float radius, DDWORD flags = 0)
         {

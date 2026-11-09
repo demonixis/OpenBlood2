@@ -4,14 +4,14 @@
 #include "game/weapon_messages.h"
 #include <cmath>
 using namespace OpenBlood2;
-CSingularityProjectile::CSingularityProjectile() : CProjectile(OT_MODEL)
+CSingularityProjectile::CSingularityProjectile(bool alternate) : CProjectile(OT_MODEL), alternate_(alternate)
 {
     // No projectile file: the original PostPropRead falls back to the grenade model/skin,
     // and the zeroed m_vInitScale keeps it invisible. ScaleObject refuses zero model scales
     // here, so the port keeps scale 1 and drops FLAG_VISIBLE instead (its 1-unit box and
     // RAYHIT flag are unchanged: dimensions do not follow the scale).
-    filename = "Models\\Ammo\\Grenade.abc";
-    skin = "Skins\\Ammo\\Grenade.dtx";
+    filename = alternate ? "Models\\Ammo\\Lightining.abc" : "Models\\Ammo\\Grenade.abc";
+    skin = alternate ? "Skins\\Ammo\\Pulsebeam.dtx" : "Skins\\Ammo\\Grenade.dtx";
     damage_type = DamageType::Singularity;
     flags = FLAG_TOUCH_NOTIFY | FLAG_REMOVEIFOUTSIDE | FLAG_FORCECLIENTUPDATE | FLAG_SHADOW | FLAG_MODELGOURAUDSHADE |
             FLAG_RAYHIT | FLAG_POINTCOLLIDE | FLAG_NOSLIDING;
@@ -33,12 +33,15 @@ bool CSingularityProjectile::Update()
     s->SetNextUpdate(m_hObject, .1f);
     if (!configured)
         return Fail("Projectile never received Setup");
+    if (alternate_ && !s->IsObjectAlive(m_hFiredFrom))
+        return false;
+    const float radius = alternate_ ? 350.f : attract_radius;
     if (armed)
     {
-        if (s->GetTime() - arm_time > attract_time)
+        if (s->GetTime() - arm_time > (alternate_ ? 2 * attract_time : attract_time))
             return false;
         DVector position;
-        if (s->GetObjectPos(m_hObject, &position) != DE_OK)
+        if (s->GetObjectPos(alternate_ ? m_hFiredFrom : m_hObject, &position) != DE_OK)
             return Fail("Singularity position unavailable");
         const auto character = s->GetClass("CBaseCharacter");
         // Suck stuff in: walk the original destructable list. Removal is deferred, so the
@@ -51,7 +54,8 @@ bool CSingularityProjectile::Update()
             const HOBJECT target = destructable ? destructable->m_hObject : nullptr;
             if (!target)
                 break;
-            if (target == m_hObject || !s->IsObjectAlive(target) || s->GetObjectType(target) != OT_MODEL ||
+            if (target == m_hObject || (alternate_ && target == m_hFiredFrom) || !s->IsObjectAlive(target) ||
+                s->GetObjectType(target) != OT_MODEL ||
                 !(s->GetObjectUserFlags(target) & (1u << 5))) // USRFLG_SINGULARITY_ATTRACT
                 continue;
             DVector at;
@@ -59,7 +63,7 @@ bool CSingularityProjectile::Update()
                 continue;
             const auto delta = vector_subtract(at, position);
             const float distance2 = vector_dot(delta, delta);
-            if (distance2 > attract_radius * attract_radius)
+            if (distance2 > radius * radius)
                 continue;
             const bool is_character = s->IsKindOf(s->GetObjectClass(target), character);
             if (distance2 <= kill_radius * kill_radius)
@@ -75,25 +79,35 @@ bool CSingularityProjectile::Update()
                     if (!s->PublishObjectParticles(m_hObject, 9, object_fx_error) || !object_fx_error.empty())
                         ++object_fx_unavailable;
                 }
-                else
+                else if (!alternate_)
                     Damage(target, m_fDamage * 2, position);
                 continue;
             }
             // Halfway in: characters start taking damage.
-            if (distance2 <= attract_radius * attract_radius / 2 && is_character)
+            if (distance2 <= radius * radius / 2 && is_character)
                 Damage(target, m_fDamage, position);
             if (!s->IsObjectAlive(target))
                 continue;
-            const float acceleration = attract_radius - distance2 / attract_radius;
+            const float acceleration = radius - distance2 / radius;
             DVector velocity;
             if (s->GetVelocity(target, &velocity) != DE_OK)
                 continue;
-            const auto pull = vector_scale(vector_scale(delta, -1 / std::sqrt(distance2)), acceleration * .75f);
+            const auto pull =
+                vector_scale(vector_scale(delta, -1 / std::sqrt(distance2)), acceleration * (alternate_ ? .5f : .75f));
             velocity = vector_add(velocity, pull);
             s->SetVelocity(target, &velocity);
             ++pulls;
         }
         return !failed;
+    }
+    if (alternate_)
+    {
+        for (unsigned recipe : {10u, 11u})
+            if (!s->PublishObjectParticles(m_hFiredFrom, recipe, object_fx_error))
+                ++object_fx_unavailable;
+        armed = true;
+        arm_time = s->GetTime();
+        return true;
     }
     // Where does the beam stop: forward 3000 units, solid objects, liquid filter, one
     // recast from the shooter's hit point when it is the first object.

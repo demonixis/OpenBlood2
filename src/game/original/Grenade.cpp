@@ -54,6 +54,20 @@ bool CGrenade::Update()
     const bool alive = CProjectile::Update();
     if (failed || !g_pServerDE->IsObjectAlive(m_hObject))
         return false;
+    if (!UpdateRotation())
+        return false;
+    // Preserve source precedence: (!alive && gravity) || dead. Base contact/death
+    // already calls Explode; the source intentionally reaches a second sequential
+    // explosion pass here. Reentrant calls are still guarded by the base.
+    if ((!alive && (flags & FLAG_GRAVITY)) || m_damage.IsDead())
+    {
+        StopSound();
+        Explode(true);
+    }
+    return alive;
+}
+bool CGrenade::UpdateRotation()
+{
     DVector velocity;
     if (g_pServerDE->GetVelocity(m_hObject, &velocity) != DE_OK)
         return Fail("Grenade velocity unavailable");
@@ -78,15 +92,7 @@ bool CGrenade::Update()
         if (g_pServerDE->SetObjectRotation(m_hObject, &rotation) != DE_OK)
             return Fail("Grenade rotation rejected");
     }
-    // Preserve source precedence: (!alive && gravity) || dead. Base contact/death
-    // already calls Explode; the source intentionally reaches a second sequential
-    // explosion pass here. Reentrant calls are still guarded by the base.
-    if ((!alive && (flags & FLAG_GRAVITY)) || m_damage.IsDead())
-    {
-        StopSound();
-        Explode(true);
-    }
-    return alive;
+    return true;
 }
 void CGrenade::HandleContact(const SegmentHit& hit)
 {

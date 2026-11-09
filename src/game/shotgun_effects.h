@@ -6,6 +6,8 @@
 #include "game/ballistic_settings.h"
 #include "game/original/SurfaceTypes.h"
 #include "game/original/WeaponDefs.h"
+#include "game/splash_settings.h"
+#include <optional>
 #include <random>
 namespace OpenBlood2
 {
@@ -46,7 +48,7 @@ namespace OpenBlood2
     };
     struct ShotgunSplash
     {
-        DVector position{}, normal{}, color1{}, color2{};
+        SplashSettings settings;
         std::vector<Particle> particles;
         double start = 0, last_time = 0;
         std::uint64_t id = 0;
@@ -71,6 +73,12 @@ namespace OpenBlood2
       public:
         std::uint64_t publish(const EffectOwner&, const ShotgunEffectSettings&, ModelStore&, SpriteStore&,
                               const Resources&, double, const EffectServices&, std::string&);
+        std::uint64_t publish(const EffectOwner&, const ShotgunEffectSettings&, ModelStore&, SpriteStore&,
+                              const Resources&, double, const EffectServices&, std::string&,
+                              std::optional<std::uint32_t> selected);
+        std::uint64_t publish_mark(const ImpactMarkSettings&, std::vector<DVector> polygon, SpriteStore&,
+                                   const Resources&, double, bool& reused, std::string&);
+        std::uint64_t publish_splash(const SplashSettings&, SpriteStore&, const Resources&, double, std::string&);
         void advance(double, const EffectServices&);
         void clear();
         std::vector<ShotgunCasing> casings;
@@ -82,6 +90,7 @@ namespace OpenBlood2
         std::uint64_t started = 0, failed = 0;
 
       private:
+        std::uint64_t add_sprite(ShotgunSprite, SpriteStore&, const Resources&, double, bool& reused, std::string&);
         float random(float, float);
         unsigned integer(unsigned, unsigned);
         void emit(ShotgunSplash&);

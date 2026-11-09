@@ -22,6 +22,20 @@ ShotgunPU::ShotgunPU()
     display_name = "Sawed-off Shotgun";
     resource_id = IDS_WEAPON_SHOTGUN;
 }
+CombatShotgunPU::CombatShotgunPU()
+{
+    value = {OpenBlood2::PickupKind::Weapon, WEAP_COMBATSHOTGUN, 8};
+    file = "CombatShotgun_pu";
+    display_name = "Combat Shotgun";
+    resource_id = IDS_WEAPON_COMBATSHOTGUN;
+}
+FlayerPU::FlayerPU()
+{
+    value = {OpenBlood2::PickupKind::Weapon, WEAP_FLAYER, 0};
+    file = "Flayer_pu";
+    display_name = "Flayer";
+    resource_id = IDS_WEAPON_FLAYER;
+}
 OrbPU::OrbPU()
 {
     value = {OpenBlood2::PickupKind::Weapon, WEAP_ORB, 0};
@@ -108,6 +122,10 @@ const char* WeaponPickupClass(DDWORD type)
             return "VoodooDollPU";
         case WEAP_SHOTGUN:
             return "ShotgunPU";
+        case WEAP_COMBATSHOTGUN:
+            return "CombatShotgunPU";
+        case WEAP_FLAYER:
+            return "FlayerPU";
         case WEAP_SINGULARITY:
             return "SingularityPU";
         case WEAP_BUGSPRAY:

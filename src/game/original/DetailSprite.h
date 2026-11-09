@@ -1,5 +1,6 @@
 #pragma once
 #include "B2BaseClass.h"
+#include "Rotating.h"
 #include "game/weapon_messages.h"
 #include <string>
 #include <vector>
@@ -26,4 +27,16 @@ class DetailSprite : public B2BaseClass
     bool CreateAnotherSprite(DVector, DRotation);
     void Save(HMESSAGEWRITE);
     void Load(HMESSAGEREAD);
+};
+
+class RotatingSprite final : public DetailSprite
+{
+  public:
+    RotatingSprite();
+
+  protected:
+    DDWORD EngineMessageFn(DDWORD, void*, DFLOAT) override;
+
+  private:
+    Rotating rotating;
 };

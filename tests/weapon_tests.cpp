@@ -104,16 +104,16 @@ namespace
         CHECK(inv.ObtainWeapon(WEAP_BERETTA) == InventoryResult::Ok && inv.GetWeapon(1, true));
         CHECK(inv.ObtainWeapon(WEAP_BERETTA) == InventoryResult::AlreadyHave);
         CHECK(inv.ObtainWeapon(WEAP_MELEE) == InventoryResult::AlreadyHave);
-        CHECK(inv.ObtainWeapon(35) == InventoryResult::NotAvailable && // Nightmare bite: no original WeaponData.
+        CHECK(inv.ObtainWeapon(WEAP_NIGHTMARE_BITE) == InventoryResult::NotAvailable && // NPC-only view assets.
               inv.ObtainWeapon(1, 99) == InventoryResult::Invalid);
         // Superset numbering (nightmares_plan.md): retail numbers unchanged, the four add-on weapons
-        // appended after the inventory bombs, still without data; the original's
+        // appended after the inventory bombs. The original's
         // `<= WEAP_LASTPLAYERWEAPON` test becomes a predicate covering the two add-on player weapons.
         static_assert(WEAP_MELEE == 17 && WEAP_SHIKARI_CLAW == 18 && WEAP_SKULL == 48 && WEAP_PROXIMITYBOMB == 49 &&
                       WEAP_TIMEBOMB == 51 && WEAP_COMBATSHOTGUN == 52 && WEAP_FLAYER == 53 && WEAP_GREMLIN_ROCK == 54 &&
                       WEAP_NIGHTMARE_FIREBALLS == 55);
         for (const DBYTE type : {WEAP_COMBATSHOTGUN, WEAP_FLAYER, WEAP_NIGHTMARE_FIREBALLS})
-            CHECK(!weapon_definition(type) && inv.ObtainWeapon(type) == InventoryResult::NotAvailable);
+            CHECK(weapon_definition(type) && inv.ObtainWeapon(type) == InventoryResult::NotAvailable);
         // Lot N6: the Gremlin's rocks carry the original data (TYPE_MELEE with a projectile class).
         const auto* rocks = weapon_definition(WEAP_GREMLIN_ROCK);
         CHECK(rocks && rocks->m_nFireType == TYPE_MELEE && rocks->m_nAmmoType == AMMO_NONE &&

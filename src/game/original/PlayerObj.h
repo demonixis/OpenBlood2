@@ -25,6 +25,7 @@ class CBaseCharacter : public B2BaseClass
     CInventoryMgr m_InventoryMgr;
     CDestructable m_damage;
     CMovement m_MoveObj;
+    int m_nTrapped = 0;
     CAnim_Sound m_Anim_Sound;
     std::uint64_t motion_keys = 0, motion_actions = 0, motion_failures = 0;
     unsigned motion_applied = 0; // RotY, ForwVel, RightVel, UpVel, AddXYZ, DimsXYZ bits.
@@ -277,6 +278,7 @@ class CPlayerObj : public CBaseCharacter
     bool UpdateInventoryClient(bool force = false);
     std::uint64_t inventory_item_messages = 0;
     bool command_run = false;
+    int crane_turn = 0; // Left takes precedence, as in CraneControl's source commands.
     bool movement_blocked = false, camera_movement_blocked = false;
     bool m_bImprisoned = false;
     float m_fImprisonStart = 0, m_fImprisonLength = 0;
@@ -286,7 +288,7 @@ class CPlayerObj : public CBaseCharacter
     bool CheckImprisonment();
     bool MovementBlocked() const
     {
-        return movement_blocked || m_bImprisoned;
+        return movement_blocked || m_bImprisoned || m_nTrapped > 0;
     }
     bool door_push_pending = false;
     DVector door_push_velocity{};

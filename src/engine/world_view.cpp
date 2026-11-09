@@ -363,7 +363,9 @@ namespace OpenBlood2
                     if (found == material_ids.end())
                     {
                         std::uint32_t id = 0;
-                        if (!key.ends_with(".spr"))
+                        if (key == "default") // The original editor's untextured face sentinel.
+                            material_ids.emplace(key, 0);
+                        else if (!key.ends_with(".spr"))
                         {
                             if (!add_image(key, id))
                                 return fail("World texture count/memory budget exceeded");

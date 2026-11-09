@@ -15,12 +15,12 @@ namespace OpenBlood2
             return 0;
         }
         ExplosionFragmentReport report{next_event_++, type, std::string(source), {}, {}, {}, {}};
-        if (!physics_vector(pos) || !physics_vector(normal) || vector_dot(normal, normal) < 1e-12f || type > 31)
+        if (!physics_vector(pos) || !physics_vector(normal) || vector_dot(normal, normal) < 1e-12f || type > 36)
         {
             report.error = "Invalid explosion or unavailable fragment recipe";
             ++failed;
         }
-        else if (type == 3 || type == 9 || type == 21 || type == 29 || type == 30)
+        else if (type == 3 || type == 9 || type == 21 || type == 29 || type == 30 || type == 36)
         {
             normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
             auto draw = [&](float lo, float hi)
@@ -29,7 +29,7 @@ namespace OpenBlood2
                                 float(std::minstd_rand::max() - std::minstd_rand::min());
             };
             // Original loop draws a NEW bound at every condition, not one count.
-            for (unsigned i = 0; (type == 21 ? i < 10
+            for (unsigned i = 0; (type == 21 || type == 36 ? i < (type == 21 ? 10u : 20u)
                                              : i < (type == 30                ? 3
                                                     : type == 9 || type == 29 ? 5
                                                                               : 2) +
@@ -67,6 +67,18 @@ namespace OpenBlood2
                     s.trail_type = 0;
                     s.spread = draw(40, 80);
                     s.velocity = type == 30 ? draw(15, 30) : draw(20, 40);
+                }
+                if (type == 36)
+                {
+                    s.model = "Models_ao\\Ammo_ao\\chainlink.abc";
+                    s.skin = "Skins_ao\\Ammo_ao\\chainlink.dtx";
+                    s.scale = {5, 5, 5};
+                    s.bounce = .5f;
+                    s.duration = 7;
+                    s.gravity = .2f;
+                    s.trail_type = 0;
+                    s.spread = draw(2, 15);
+                    s.velocity = draw(3, 6);
                 }
                 CExplosionFragFX fx;
                 std::string failure;

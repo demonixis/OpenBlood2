@@ -9,8 +9,10 @@ namespace OpenBlood2
             n += i.effect.particles.size();
         return n;
     }
-    std::uint64_t ParticleStreams::publish(const EffectOwner& owner, const ParticleStreamSettings& settings,
-                                           const Resources* resources, double now, std::string& error)
+    template <class Settings>
+    std::uint64_t ParticleStreams::publish_effect(const EffectOwner& owner, const Settings& settings,
+                                                  const Resources* resources, double now, std::string& error,
+                                                  bool unique_owner)
     {
         error.clear();
         ParticleStreamReport report;
@@ -18,7 +20,8 @@ namespace OpenBlood2
         if (!owner || !resources)
             error = "Particle stream owner/resources/pose unavailable";
         else if (active.size() >= 128 || next_id_ == UINT64_MAX ||
-                 std::any_of(active.begin(), active.end(), [&](const auto& i) { return i.owner == owner.id; }))
+                 (unique_owner && std::any_of(active.begin(), active.end(),
+                                              [&](const auto& i) { return i.owner == owner.id; })))
             error = "Particle stream capacity exhausted or duplicate owner";
         else
         {
@@ -41,6 +44,16 @@ namespace OpenBlood2
             reports.erase(reports.begin());
         reports.push_back(std::move(report));
         return id;
+    }
+    std::uint64_t ParticleStreams::publish(const EffectOwner& owner, const ParticleStreamSettings& settings,
+                                           const Resources* resources, double now, std::string& error)
+    {
+        return publish_effect(owner, settings, resources, now, error, true);
+    }
+    std::uint64_t ParticleStreams::publish(const EffectOwner& owner, const RainSettings& settings,
+                                           const Resources* resources, double now, std::string& error)
+    {
+        return publish_effect(owner, settings, resources, now, error, false);
     }
     bool ParticleStreams::advance(double now, const ClientWorld& world)
     {

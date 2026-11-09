@@ -26,7 +26,7 @@ namespace OpenBlood2
         std::string type, props;
         if (!split_spawn(input, type, props))
             return false;
-        bool supported = false;
+        bool supported = AddonBuild() && (same_name(type, "SoccerBall") || same_name(type, "Nightmare"));
         // Original map requests with a ported string-creation path. Item and weapon pickups
         // bounce, and AI leaves share AI_Mgr's string precreate and damage properties.
         for (auto name : {"BulletAmmoPU",   "ShellAmmoPU",    "BMGAmmoPU",         "FlareAmmoPU",    "DieBugDieAmmoPU",
@@ -42,6 +42,7 @@ namespace OpenBlood2
                           "Behemoth",       "DeathShroud",    "DrudgeLord",       "DrudgePriest",     "EnhancedGideon",
                           "Naga",           "ShikariAI",      "SoulDrudge",       "UndeadGideon",     "ZealotAI"})
             supported |= same_name(type, name);
+        supported |= IsAddonBuild() && (same_name(type, "CombatShotgunPU") || same_name(type, "FlayerPU"));
         Properties parsed;
         return supported && objects_.parse_properties(objects_.find_class(type), props, parsed);
     }

@@ -62,6 +62,7 @@ class CProjectile : public BaseClass
     virtual bool InitialUpdate();
     virtual bool Update();
     virtual void AddExplosion(DVector, DVector) = 0;
+    bool AdvancePointFlight(double seconds, bool gravity);
     bool AddImpact(DVector);
     bool exploding_ = false;
     void Finish(const char*);
@@ -73,6 +74,37 @@ class CProjectile : public BaseClass
     virtual void SaveBlock(ProjectileBlock&) const;
     virtual std::string CheckBlock(const ProjectileBlock&) const;
     virtual std::string LoadBlock(const ProjectileBlock&); // A service failure after the change.
+};
+
+class CStandardProjectile final : public CProjectile
+{
+  public:
+    CStandardProjectile();
+
+  protected:
+    void AddExplosion(DVector, DVector) override {} // Original base defaults to m_bExplosion = false.
+};
+
+class CFireballProjectile final : public CProjectile
+{
+  public:
+    CFireballProjectile();
+
+  protected:
+    bool InitialUpdate() override;
+    bool Update() override;
+    void AddExplosion(DVector, DVector) override;
+};
+
+class CGooProjectile final : public CProjectile
+{
+  public:
+    CGooProjectile();
+    bool AdvanceFlight(double seconds) override;
+
+  protected:
+    bool InitialUpdate() override;
+    void AddExplosion(DVector, DVector) override {} // Original m_bExplosion is false.
 };
 class CEnergyBlastProjectile final : public CProjectile
 {

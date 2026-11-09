@@ -155,6 +155,11 @@ namespace OpenBlood2
         std::function<std::uint64_t(ObjectId, std::string_view, unsigned, float, DVector, std::string&)>
             remote_object_particle_sink;
         std::uint64_t PublishShotgunEffects(HOBJECT, const ShotgunEffectSettings&, std::string&) override;
+        std::uint64_t PublishBallistics(HOBJECT, const ShotgunEffectSettings&, std::string&,
+                                        std::optional<std::uint32_t> selected = std::nullopt);
+        std::uint64_t PublishImpactMark(HOBJECT, const ImpactMarkSettings&, bool& reused, std::string&) override;
+        void RemoveImpactMark(std::uint64_t) override;
+        std::vector<DVector> impact_mark_polygon(HOBJECT, DVector position, DVector normal);
         WeaponSprites& weapon_sprites;
         std::uint64_t PublishWeaponSprites(HOBJECT, const WeaponSpriteSettings&, std::string&) override;
         ExplosionModels& explosion_models;
@@ -168,6 +173,8 @@ namespace OpenBlood2
         std::uint64_t PublishPolyGrid(HOBJECT, const PolyGridSettings&, std::string&) override;
         ParticleStreams& particle_streams;
         std::uint64_t PublishParticleStream(HOBJECT, const ParticleStreamSettings&, std::string&) override;
+        std::uint64_t PublishRain(HOBJECT, const RainSettings&, std::string&) override;
+        std::uint64_t PublishSplash(HOBJECT, const SplashSettings&, std::string&) override;
         std::uint64_t PublishObjectParticles(HOBJECT, unsigned, std::string&, float lifetime_scale = 1,
                                              DVector offset = {}) override;
         std::uint64_t PublishLaserBeam(HOBJECT, DVector, DVector, std::string&, DBYTE type = 0) override;
@@ -192,6 +199,7 @@ namespace OpenBlood2
         std::vector<BrushDestruction> brush_destructions; // Latest 32, reset on unload.
         DRESULT WriteKeyMessage(HMESSAGEWRITE, const KeyMessage&) override;
         bool ReadKeyMessage(HMESSAGEREAD, KeyMessage&) override;
+        bool ReadScriptText(std::string_view, std::string&) override;
         MoverResult MoveWorldModel(HOBJECT, DVector destination) override;
         MoverResult RotateWorldModel(HOBJECT, const RotationMove&) override;
         bool GetPointContainerCode(DVector, ContainerCode&, bool visible_only = false) override;
@@ -245,6 +253,7 @@ namespace OpenBlood2
         bool PlaceNonSolidModel(HOBJECT, DVector requested, DVector anchor, DVector anchor_half,
                                 BodyPlacement&) override;
         bool GetMovementState(HOBJECT, MovementState&) override;
+        bool GetContactNormal(HOBJECT, DVector&) override;
         SegmentResult CastRay(DVector, DVector, SegmentHit&, HOBJECT ignore = nullptr) override;
         SegmentResult CastWorldRay(DVector from, DVector direction, SegmentHit&) override;
         SegmentResult IntersectWorldSegment(DVector from, DVector to, SegmentHit&) override;
@@ -283,6 +292,7 @@ namespace OpenBlood2
         std::vector<CLightFX>& light_effects;
         bool RandomFloat(float, float, float&) override;
         bool PublishLightEffect(HOBJECT, const LightSettings&) override;
+        bool PublishLine(HOBJECT, const LineEffectGeometry&, float lifetime) override;
         void RemoveLightEffect(HOBJECT) override;
         const CLightFX* GetLightEffect(HOBJECT) const;
         std::vector<CameraView> camera_effects;

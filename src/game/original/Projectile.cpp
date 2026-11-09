@@ -1,8 +1,10 @@
 // Original ObjectDLL/Projectile.cpp and GameProjectiles.cpp, selected energy path including the Zealot divine impact.
 #include "Projectile.h"
 #include "AI_Mgr.h"
+#include "CampaignProjectiles.h"
 #include "FlareProjectile.h"
 #include "Grenade.h"
+#include "LightFX.h"
 #include "ProximityBomb.h"
 #include "RemoteBomb.h"
 #include "SurfaceTypes.h"
@@ -217,21 +219,33 @@ void CProjectile::HandleContact(const SegmentHit& hit)
 }
 bool CProjectile::AdvanceFlight(double seconds)
 {
+    return AdvancePointFlight(seconds, false);
+}
+bool CProjectile::AdvancePointFlight(double seconds, bool gravity)
+{
     if (seconds == 0 || m_bExplode || failed || !configured)
         return !failed;
     if (!std::isfinite(seconds) || seconds < 0 || seconds > .5)
         return Fail("Projectile flight exceeds 0.5-second catch-up bound");
-    if (g_pServerDE->GetObjectFlags(m_hObject) & FLAG_GRAVITY)
+    const bool falls = (g_pServerDE->GetObjectFlags(m_hObject) & FLAG_GRAVITY) != 0;
+    if (falls && !gravity)
         return Fail("Energy projectile gravity is unsupported");
     DVector from, velocity, acceleration;
     if (g_pServerDE->GetObjectPos(m_hObject, &from) != DE_OK ||
         g_pServerDE->GetVelocity(m_hObject, &velocity) != DE_OK ||
         g_pServerDE->GetAcceleration(m_hObject, &acceleration) != DE_OK || vector_dot(acceleration, acceleration) != 0)
         return Fail("Projectile motion state unavailable");
+    if (falls && g_pServerDE->GetGlobalForce(&acceleration) != DE_OK)
+        return Fail("Projectile gravity unavailable");
     ++flight_steps;
-    if (vector_dot(velocity, velocity) < 1e-12f)
+    if (!falls && vector_dot(velocity, velocity) < 1e-12f)
         return true;
-    const auto to = vector_add(from, vector_scale(velocity, float(seconds)));
+    const auto dt = static_cast<float>(seconds);
+    const auto motion = vector_add(vector_scale(velocity, dt), vector_scale(acceleration, .5f * dt * dt));
+    velocity = vector_add(velocity, vector_scale(acceleration, dt));
+    if (vector_dot(motion, motion) == 0)
+        return g_pServerDE->SetVelocity(m_hObject, &velocity) == DE_OK || Fail("Projectile velocity rejected");
+    const auto to = vector_add(from, motion);
     SegmentHit hit;
     const auto result = g_pServerDE->IntersectSegment(from, to, m_hObject, hit, false, SegmentObjects::SolidOnly,
                                                       SegmentFilter::ProjectileContact);
@@ -251,6 +265,8 @@ bool CProjectile::AdvanceFlight(double seconds)
             return Fail("Projectile contact velocity rejected");
         HandleContact(hit);
     }
+    else if (falls && g_pServerDE->SetVelocity(m_hObject, &velocity) != DE_OK)
+        return Fail("Projectile gravity velocity rejected");
     return !failed;
 }
 void CProjectile::Explode(bool repeat)
@@ -321,6 +337,58 @@ bool CProjectile::AddImpact(DVector position)
     }
     AddExplosion(point, normal);
     return !failed;
+}
+
+CStandardProjectile::CStandardProjectile() : CProjectile(OT_MODEL)
+{
+    damage_type = DamageType::Normal;
+    flags = FLAG_VISIBLE | FLAG_TOUCH_NOTIFY | FLAG_REMOVEIFOUTSIDE | FLAG_FORCECLIENTUPDATE | FLAG_SHADOW |
+            FLAG_MODELGOURAUDSHADE | FLAG_RAYHIT;
+}
+
+CFireballProjectile::CFireballProjectile()
+{
+    filename = "Sprites\\napalmprime.spr";
+    skin = nullptr;
+    damage_type = DamageType::Normal;
+}
+bool CFireballProjectile::InitialUpdate()
+{
+    if (!CProjectile::InitialUpdate() || !g_pServerDE->ScaleObject(m_hObject, {}))
+        return false;
+    g_pServerDE->PublishObjectParticles(m_hObject, 3, trail_error, .5f);
+    g_pServerDE->SetObjectUserFlags(m_hObject, g_pServerDE->GetObjectUserFlags(m_hObject) | 1u);
+    g_pServerDE->PublishLightEffect(m_hObject, native_light_settings({1, .75f, 0}, 150));
+    return true;
+}
+bool CFireballProjectile::Update()
+{
+    const float scale = g_pServerDE->GetTime() - scale_start < .01f ? 0 : .25f;
+    return (g_pServerDE->ScaleObject(m_hObject, {scale, scale, scale}) || Fail("Fireball scale rejected")) &&
+           CProjectile::Update();
+}
+void CFireballProjectile::AddExplosion(DVector position, DVector normal)
+{
+    PublishCampaignExplosion(m_hObject, position, normal, 12, "Sounds\\Weapons\\Tesla\\impact.wav", 750);
+}
+
+CGooProjectile::CGooProjectile() : CProjectile(OT_NORMAL)
+{
+    filename = "Sprites\\napalmprime.spr";
+    skin = nullptr;
+    damage_type = DamageType::Normal;
+    flags |= FLAG_GRAVITY;
+}
+bool CGooProjectile::InitialUpdate()
+{
+    if (!CProjectile::InitialUpdate())
+        return false;
+    g_pServerDE->PublishObjectParticles(m_hObject, 31, trail_error, .4f);
+    return true;
+}
+bool CGooProjectile::AdvanceFlight(double seconds)
+{
+    return AdvancePointFlight(seconds, true);
 }
 
 bool CEnergyBlastProjectile::InitialUpdate()

@@ -4,6 +4,13 @@
 #include <set>
 namespace OpenBlood2
 {
+    bool valid_line_effect(const LineEffectGeometry& line)
+    {
+        const auto unit = [](float n) { return std::isfinite(n) && n >= 0 && n <= 1; };
+        const auto color = [&](DVector c) { return unit(c.x) && unit(c.y) && unit(c.z); };
+        return physics_vector(line.from) && physics_vector(line.to) && color(line.start_color) &&
+               color(line.end_color) && unit(line.start_alpha) && unit(line.end_alpha);
+    }
     namespace
     {
         bool pose(NodePose p)
@@ -48,16 +55,17 @@ namespace OpenBlood2
             return fail("Invalid client far plane or sky fog");
         if (next.billboards.size() > record_limit || next.models.size() > record_limit ||
             next.polygrids.size() > record_limit || next.tracers.size() > record_limit ||
+            next.lines.size() > record_limit ||
             next.lights.size() > record_limit || next.volumes.size() > record_limit)
             return fail("Client effects record limit exceeded");
         std::set<EffectId> ids;
         auto id = [&](EffectId i)
-        { return i.value && i.value != UINT64_MAX && i.kind <= EffectKind::Tracer && ids.insert(i).second; };
+        { return i.value && i.value != UINT64_MAX && i.kind <= EffectKind::LegacySmoke && ids.insert(i).second; };
         std::size_t particles = 0, heights = 0;
         // Returns the refusal reason for one item, or nullptr when it is valid.
         auto billboard = [&](const auto& item) -> const char*
         {
-            if (!id(item.id) || item.id.kind > EffectKind::ParticleStream)
+            if (!id(item.id) || (item.id.kind > EffectKind::ParticleStream && item.id.kind != EffectKind::LegacySmoke))
                 return "Invalid/duplicate billboard identity";
             if (const auto* s = std::get_if<EffectSprite>(&item.value))
             {
@@ -133,6 +141,14 @@ namespace OpenBlood2
         filter(next.models, model);
         filter(next.polygrids, polygrid);
         filter(next.tracers, tracer);
+        filter(next.lines,
+               [&](const auto& line) -> const char*
+               {
+                   return id(line.id) && (line.id.kind == EffectKind::CastLine || line.id.kind == EffectKind::DetachedLine) &&
+                                  valid_line_effect(line.geometry)
+                              ? nullptr
+                              : "Invalid effect line";
+               });
         filter(next.volumes, volume);
         if (reason)
             return fail(reason);

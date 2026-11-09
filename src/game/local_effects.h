@@ -1,5 +1,6 @@
 #pragma once
 #include "client/effects.h"
+#include "client/legacy_smoke_trails.h"
 #include <map>
 namespace OpenBlood2
 {
@@ -11,6 +12,7 @@ namespace OpenBlood2
         void clear()
         {
             shapes_.clear();
+            legacy_smoke_ = {};
             shape_copies = 0;
         }
         std::uint64_t shape_copies = 0;
@@ -23,5 +25,6 @@ namespace OpenBlood2
             std::shared_ptr<const ContainerShape> copy;
         };
         std::map<std::uint32_t, ShapeCopy> shapes_;
+        LegacySmokeTrails legacy_smoke_;
     };
 } // namespace OpenBlood2

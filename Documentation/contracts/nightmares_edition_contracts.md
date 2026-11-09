@@ -1,4 +1,4 @@
-# Nightmares edition contracts (lots N1, N2, N6, N8)
+# Nightmares edition contracts (lots N1, N2, N6–N8)
 
 Lot N1 of the [Nightmares plan](../implementation/nightmares_plan.md): the expansion becomes a
 selectable **edition** beside retail and the demo. It mounts the expansion archive and exposes the
@@ -55,11 +55,11 @@ loading still requires a `worlds/` DAT path.
 Every retail weapon, ammo, cheat and save number is unchanged. The four add-on weapons are
 appended after the inventory bombs: `WEAP_COMBATSHOTGUN 52`, `WEAP_FLAYER 53`,
 `WEAP_GREMLIN_ROCK 54`, `WEAP_NIGHTMARE_FIREBALLS 55` (the 1999 build numbers them 18, 19,
-`WEAP_LASTPLAYERWEAPON + 32/+33` and shifts the others). Only the rocks have `WeaponData` (lot N6);
-the other three cannot be obtained yet. The original `type <= WEAP_LASTPLAYERWEAPON` test is
+`WEAP_LASTPLAYERWEAPON + 32/+33` and shifts the others). These use the add-on weapon
+definitions and original data paths. The original `type <= WEAP_LASTPLAYERWEAPON` test is
 `IsPlayerWeaponType` (WEAP_NONE included, as in the source; it also covers the two add-on player
-weapons), used by the AI weapon-switch ammo check. Add-on cheats will be appended to the cheat
-codes with their weapons (lot N4).
+weapons), used by the AI weapon-switch ammo check. The original per-weapon cheats remain outside
+the pickup and inventory paths.
 
 ## Tests
 
@@ -109,13 +109,13 @@ before lot N2's original path branch.
     distance, and OPHELIA_CC_O keeps the four valid copies of the same `SoundFX18`;
   - any other class stays a `Failed` entry until reviewed.
 
-Real data (2026-10-26): `nightmares.installed` inspects all 13 `WORLDS_AO` DATs. Unported
-classes are exactly `FlayerPU`, `GremlinAI` (Ophelia), `FlayerPU` (Ishmael), `CombatShotgunPU`,
+At the 2026-10-26 checkpoint, `nightmares.installed` inspected all 13 `WORLDS_AO` DATs. Unported
+classes were `FlayerPU`, `GremlinAI` (Ophelia), `FlayerPU` (Ishmael), `CombatShotgunPU`,
 `GremlinAI` (Gabby), `Nightmare` (EndBoss) and `SoccerBall`/`SoccerGoal` (the two SOC maps).
 Not-created entries: 19 + 28 robe Cultists (Caleb1/Caleb2, lot N8), the NaN-positioned rows
 above, three chrome `CDestructableModel` (Gabby, the existing environment-map limit) and one
 `DetailSprite` whose `spritetextures\scorch1.dtx` is not an SPR (Ophelia). END starts and rolls
-CREDITS_AO; the menu's Nightmares new game reaches CALEB1_CC_C and is refused on its 20 failed
+CREDITS_AO; the menu's Nightmares new game reached CALEB1_CC_C and was refused on its 20 failed
 entries. Headless: `nightmares.paths`, `nightmares.menu`, `nightmares.strings`.
 
 ## Lot N8: robe Cultists
@@ -148,7 +148,7 @@ menu's Nightmares new game enters it, `object1` sits at the origin and still del
 Cold" objective through a trigger relay, and 30 s simulate without frame failures. OPHELIA_CC_O
 omits its four NaN copies and creates its DetailSprite authored with `spritetextures\scorch1.dtx`
 as the empty sprite the reference engine reads it as ([sprite contracts](sprite_contracts.md#non-spr-sprite-object-files));
-its start now refuses only on 10 unported entries (9 GremlinAI, a FlayerPU; lots N5/N6).
+its remaining startup failures at the N8 checkpoint were 9 `GremlinAI` and a `FlayerPU` (lots N5/N6).
 
 ## Lot N6: Gremlins and their rocks
 
@@ -190,6 +190,67 @@ Tests: `weapon` (rock data), `gremlin.configuration` (constructor values, model,
 mapping, ComputeState), `gremlin.claw` (a same-height target clawed), `gremlin.rock` (a far target:
 rock clip, 791-unit speed and upward unit direction, floor contact, bounce sound, fade and removal
 at 6.5 s; a direct unbounced hit deals its full 15 damage), `gremlin.retail` (no GremlinAI, ROCK is
-the Beretta). Real data: OPHELIA_CC_O creates its 9 Gremlins and GABBY_CC_G its 12; OPHELIA now
-waits only for its FlayerPU (lot N5) and GABBY for its CombatShotgunPU (lot N4). Neither world can
-start yet, so the throw is verified on a synthetic floor with the real assets, not in those worlds.
+the Beretta). Real data at N6 created 9 Gremlins in OPHELIA_CC_O and 12 in GABBY_CC_G. The
+throw test uses a synthetic floor and the real assets.
+
+## Lot N7: Nightmare boss and fireballs
+
+`Nightmare` uses the original add-on model, distinct animation/sound table and
+constructor stats. The shared AI reads `RandomHitPoints`, state, weapons and
+trigger properties. The `HitPoints`, `ArmorPoints` and `AIBrain` registration
+fields follow the source schema and remain unread by the boss. Its sight test
+bypasses ray occlusion for valid targets. Close attacks choose the shockwave and
+bite clips, while the far attack fires, taunts and runs at the original distance
+thresholds. The bite (35) and fireballs (55) aim from `jaw`, and the boss sends the
+initial health and later damage ratios through the existing HUD event.
+
+`CNightmareFireball` uses the `lleechproj` sprite, fire trail, moving orange light,
+napalm flight loop, radius damage and Life Leech primary impact recipe. It looks
+3000 units down its firing direction, homes on a linked character or turns toward
+the impact location, and keeps its launch speed as it steers. The acquisition ray
+runs after `Setup` so the initial shot alignment and owner are available. The
+source's random initial rotation is overwritten by that alignment. The port
+keeps the draw order. A miss flies straight for the authored 6.5 seconds in place
+of using the source's undefined hit position. The boss and projectile save policy
+is Unsupported until the add-on save lot.
+
+`nightmare_boss.edition`, `nightmare_boss.attack` and `nightmare_boss.world` check
+the edition gate, the boss's real assets and weapon, fireball steering and impact,
+and the `NMspawner` death relay in `ENDBOSS_CC_C` with the installed data.
+
+## Combat Shotgun and Flayer (lots N4 and N5)
+
+- The Combat Shotgun pickup grants eight shells. Primary fire spends two shells
+  for 16 vectors. Alternate fire spends five Die Bug Die rounds and launches
+  CGasGrenade at 1,500 units/s. The add-on-only COMBAT prefix uses the same
+  weapon in AI inventories.
+- CGasGrenade uses the checked grenade body and contact rules. It opens on the
+  first living-character impact, damage, or after its three-second fuse. The
+  original explosion and green trail use typed effects. The invisible smoke
+  owner then remains for ten seconds. Every strict half second it deals linearly
+  attenuated normal damage of up to three within 200 units and sends the original
+  timed WonkyVision message to players. Client camera distortion still awaits a
+  receiver.
+- The Flayer pickup grants the original weapon without ammunition. Its primary
+  fire uses 25 focus. A chain flies at 500 units/s, turns toward a character in its
+  initial sight line and traps the first solid character it hits. It damages the
+  trapped actor every strict second, releases it after eight seconds or loss of
+  the target and retracts a model gib over 1.5 seconds. The trap counter and
+  attached gib are released on teardown. The stock collision path handles chain
+  shattering. The hook, retraction gib and original rift/shatter recipes render.
+  The original 25-link client IK trail is a separate presentation path.
+- Alternate Flayer fire spends 100 focus and creates a stationary 20-second
+  portal. Its first search is strictly after four seconds, then it searches
+  every two seconds for the first character in original destructible-list order
+  within 800 units. The chain is independent and retains the firing actor for
+  damage attribution.
+- Tests use the installed retail and expansion archives. The
+  `nightmares_weapons` cases check actual pickup acknowledgement and view weapon
+  selection, both Combat Shotgun ammo costs, the gas fuse/damage/lifetime, the
+  chain trap/retraction and portal launch timing on a bounded floor.
+
+The current `nightmares.installed` test resolves every authored class name across the 13 `WORLDS_AO`
+DATs and checks the existing omissions separately. It starts Ophelia's world directly. Its
+texture name `Default` is the LithTech editor's untextured-face sentinel
+(`tools/PreProcessor/PreTexture.h`). World mesh construction resolves that exact name to its
+untextured material and continues to check authored texture paths independently.

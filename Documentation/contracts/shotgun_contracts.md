@@ -107,3 +107,26 @@ parentless splash is retired after its final particle; the original can retain i
 These engine adaptations, CRT-independent random bits and no manual headset validation
 prevent claiming pixel-identical retail parity. M2 closure/reservation and M3 acceptance
 are unchanged; the remaining VFX inventory is lot 3.
+
+### Explicit splash publisher
+
+The hidden `CClientSplashSFX` schedules its own removal on its first update. `Setup` creates
+the original detached splash at the requested position using the same client particles as
+ballistic liquid impacts. Texture, radius, initial offsets, direction and height, spread,
+color endpoints, density, spray time, duration and gravity come from the caller. If requested,
+the original aligned one-second ripple has constant authored scale and 0.25 alpha. Invalid
+payloads or missing resources fail before admitting the effect. No stock caller or remote
+transport for this detached publisher is active. `client_splash.detached` covers the request,
+publisher removal, particle and ripple updates, and the render snapshot.
+
+### Explicit weapon effect publisher
+
+`CClientWeaponSFX` creates detached visuals and removes its carrier on the first update.
+Its original `WFX_*` bits independently select muzzle smoke, casing ejection (with the
+left-hand option), tracer, mark, splash/ripple, surface fragments, impact flash, smoke,
+sparks, audio, blood splat/spurt and explosion recipes. A request with only the tracer bit
+uses the original normal-directed world ray and never ejects a casing. Muzzle light,
+particle trail and impact light have empty handlers in the source. Screen shake returns
+an explicit unavailable result while other requested effects still execute. Standalone
+selected ballistics use the local effect pool. `client_weapon_sfx.selected` covers the
+flag selection and carrier lifetime independently of live weapons.

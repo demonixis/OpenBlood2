@@ -1,7 +1,7 @@
 #pragma once
 #include "Projectile.h"
 // Original GameProjectiles.cpp CGrenade. The bounded box flight is an engine service.
-class CGrenade final : public CProjectile
+class CGrenade : public CProjectile
 {
   public:
     CGrenade();
@@ -19,10 +19,10 @@ class CGrenade final : public CProjectile
   protected:
     bool InitialUpdate() override;
     bool Update() override;
+    bool UpdateRotation();
+    void StopSound();
     void AddExplosion(DVector, DVector) override;
     void SaveBlock(ProjectileBlock&) const override;
     std::string LoadBlock(const ProjectileBlock&) override;
 
-  private:
-    void StopSound();
 };

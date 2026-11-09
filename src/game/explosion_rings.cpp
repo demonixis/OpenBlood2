@@ -14,6 +14,29 @@ namespace OpenBlood2
             error = "Explosion requires a finite position and nonzero normal";
             return false;
         }
+        if (type == 32)
+        {
+            auto draw = [&](float lo, float hi)
+            { return lo + (hi - lo) * float(random() - random.min()) / float(random.max() - random.min()); };
+            ExplosionRingSettings s;
+            s.normal = vector_scale(normal, 1 / std::sqrt(vector_dot(normal, normal)));
+            s.position = vector_add(pos, vector_scale(s.normal, 10));
+            s.color = {0, .5f, 0};
+            s.radius = 6500;
+            s.position_radius = 10;
+            s.velocity = draw(100, 150);
+            s.gravity = draw(0, 30);
+            s.count = 32;
+            s.duration = 1.5f;
+            s.alpha = .5f;
+            s.delay = draw(0, .5f);
+            s.fade = 1;
+            s.texture = "SpriteTextures\\Smoke32_4.dtx";
+            out.push_back(s);
+            return true;
+        }
+        if (type >= 33 && type <= 36)
+            return true;
         if (type == 18 || type == 23 || type == 24 || type == 29 || type == 31)
         {
             auto draw = [&](float lo, float hi)

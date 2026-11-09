@@ -155,15 +155,15 @@ namespace
         }
         return game;
     }
-    // The installed expansion: every WORLDS_AO world inspects with exactly the unported add-on
-    // classes and the known not-created entries; the bumper, the menu strings, CREDITS_AO and
+    // The installed expansion: check the new objects and the known not-created entries
+    // across WORLDS_AO, then the bumper, the menu strings, CREDITS_AO and
     // the END credits roll.
     bool installed(const char* root)
     {
         auto game = mount(root, true);
         CHECK(game);
         std::string error;
-        const std::map<std::string, std::set<std::string>> unported{
+        const std::map<std::string, std::set<std::string>> placed_additions{
             {"caleb1_cc_c", {}},
             {"ophelia_cc_o", {"FlayerPU"}},
             {"ishmael_cc_i", {"FlayerPU"}},
@@ -180,7 +180,7 @@ namespace
         // Known not-created entries, each explicit.
         const auto known_failure = [](std::string_view detail)
         { return detail.find("Chrome environment mapping") != detail.npos; };
-        for (const auto& [name, expected] : unported)
+        for (const auto& [name, expected] : placed_additions)
         {
             const auto world = "worlds_ao\\" + name;
             CHECK(game->request_world(world, error));
@@ -202,6 +202,11 @@ namespace
                 const auto& entry = game->entries[i];
                 const auto& cls = game->world.objects[i].class_name;
                 if (entry.state == EntryState::Unsupported)
+                {
+                    std::cerr << world << ": unsupported " << cls << '\n';
+                    return false;
+                }
+                else if (entry.state == EntryState::Created && expected.contains(cls))
                     found.insert(cls);
                 else if (entry.state == EntryState::Created && cls == "GremlinAI")
                     ++gremlins; // Lot N6.
@@ -217,7 +222,11 @@ namespace
                 }
                 else if (entry.state == EntryState::Failed)
                 {
-                    CHECK(known_failure(entry.detail));
+                    if (!known_failure(entry.detail))
+                    {
+                        std::cerr << world << ": " << cls << ": " << entry.detail << '\n';
+                        return false;
+                    }
                     ++failed[cls];
                 }
             }
@@ -293,10 +302,12 @@ namespace
         CHECK(game->frame_failures.empty() && game->client_shell.m_bInWorld);
         std::cout << "CALEB1_CC_C: started, objective delivered, 30 s simulated\n";
         // OPHELIA_CC_O omits its NaN ambient copies, creates its .dtx DetailSprite empty (the
-        // reference spr_Create reading) and its nine Gremlins (lot N6), but still waits for FlayerPU (N5).
-        CHECK(!GameSession::start_new_game(game, "worlds_ao\\ophelia_cc_o", DIFFICULTY_MEDIUM, 1, error));
-        std::cout << "OPHELIA_CC_O: " << error << "\n";
-        CHECK(error.find(" 1 unsupported") != error.npos && error.find(" 0 failed entries") != error.npos);
+        // reference spr_Create reading) and starts with the Flayer and nine Gremlins.
+        if (!GameSession::start_new_game(game, "worlds_ao\\ophelia_cc_o", DIFFICULTY_MEDIUM, 1, error))
+        {
+            std::cerr << "OPHELIA_CC_O: " << error << '\n';
+            return false;
+        }
         // Lot N8: CALEB2_CC_C starts with its 28 robe Cultists on the RetroCultist table (the
         // oldschool model's body-damage policy) and simulates 30 seconds without NPC failures.
         CHECK(GameSession::start_new_game(game, "worlds_ao\\caleb2_cc_c", DIFFICULTY_MEDIUM, 0, error));

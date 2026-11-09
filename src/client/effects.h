@@ -1,4 +1,5 @@
 #pragma once
+#include "client/line_effects.h"
 #include "client/world.h"
 #include "engine/container.h"
 #include "engine/particles.h"
@@ -31,7 +32,10 @@ namespace OpenBlood2
         Laser,
         Casing,
         PolyGrid,
-        Tracer
+        Tracer,
+        CastLine,
+        DetachedLine,
+        LegacySmoke
     };
     struct EffectId
     {
@@ -94,6 +98,11 @@ namespace OpenBlood2
         EffectId id{EffectKind::Tracer};
         DVector center{}, forward{}, right{};
     };
+    struct EffectLine
+    {
+        EffectId id{EffectKind::CastLine};
+        LineEffectGeometry geometry;
+    };
     struct EffectFog
     {
         bool enabled = false;
@@ -115,6 +124,7 @@ namespace OpenBlood2
         std::vector<EffectModel> models;
         std::vector<EffectPolyGrid> polygrids;
         std::vector<EffectTracer> tracers;
+        std::vector<EffectLine> lines;
         std::vector<SceneEffectLight> lights;
         std::size_t fog_lights_unsupported = 0, shadow_lights_unshadowed = 0;
         EffectFog fog;

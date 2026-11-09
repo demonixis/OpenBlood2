@@ -19,6 +19,7 @@ namespace OpenBlood2
       public:
         std::uint64_t publish(const EffectOwner&, const ParticleStreamSettings&, const Resources*, double,
                               std::string&);
+        std::uint64_t publish(const EffectOwner&, const RainSettings&, const Resources*, double, std::string&);
         bool advance(double, const ClientWorld&);
         void clear();
         std::size_t particle_count() const;
@@ -28,6 +29,9 @@ namespace OpenBlood2
         std::string update_error;
 
       private:
+        template <class Settings>
+        std::uint64_t publish_effect(const EffectOwner&, const Settings&, const Resources*, double, std::string&,
+                                     bool unique_owner);
         std::uint64_t next_id_ = 1;
         std::minstd_rand random_{1};
     };

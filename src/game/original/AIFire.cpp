@@ -139,24 +139,28 @@ bool AI_Mgr::Fire(bool alternate)
         weapon->data.m_nType != WEAP_MELEE && weapon->data.m_nType != WEAP_NAGA_EYEBEAM &&
         weapon->data.m_nType != WEAP_ZEALOT_ENERGYBLAST && weapon->data.m_nType != WEAP_GIDEON_WIND &&
         weapon->data.m_nType != WEAP_GIDEON_SHIELD && weapon->data.m_nType != WEAP_SOUL_HOOK &&
-        weapon->data.m_nType != WEAP_DRUDGE_FIREBALL &&
-        weapon->data.m_nType != WEAP_GREMLIN_ROCK) // _ADD_ON rocks: the default r_gun/body branch.
+        weapon->data.m_nType != WEAP_DRUDGE_FIREBALL && weapon->data.m_nType != WEAP_NIGHTMARE_BITE &&
+        weapon->data.m_nType != WEAP_NIGHTMARE_FIREBALLS && weapon->data.m_nType != WEAP_GREMLIN_ROCK)
         return fail(FireResult::Unavailable, "AI weapon-specific aiming is not integrated");
     DRotation rotation;
     const bool ancient_beam = weapon->data.m_nType == WEAP_ANCIENTONE_BEAM;
     const bool ancient_tentacle = weapon->data.m_nType == WEAP_ANCIENTONE_TENTACLE;
     const bool naga = ancient_beam || weapon->data.m_nType == WEAP_NAGA_EYEBEAM || weapon->data.m_nType == WEAP_SKULL;
     const bool energy = weapon->data.m_nType == WEAP_ZEALOT_ENERGYBLAST;
+    const bool jaw = weapon->data.m_nType == WEAP_NIGHTMARE_BITE || weapon->data.m_nType == WEAP_NIGHTMARE_FIREBALLS;
     fire_gun_node =
         server->GetModelNodeTransform(m_hObject,
                                       (energy || weapon->data.m_nType == WEAP_ZEALOT_GROUNDFIRE) ? "r_hand_extra2"
                                       : naga                                                     ? "head_gun"
+                                      : jaw                                                      ? "jaw"
                                                                                                  : "r_gun",
                                       &fire_origin, &rotation);
     if (energy && !fire_gun_node)
         return fail(FireResult::Unavailable, "Energy blast r_hand_extra2 node unavailable");
     if (naga && !fire_gun_node)
         return fail(FireResult::Unavailable, "Projectile head_gun node unavailable");
+    if (jaw && !fire_gun_node)
+        return fail(FireResult::Unavailable, "Nightmare jaw node unavailable");
     const auto type = weapon->data.m_nType;
     if (ancient_beam)
     {

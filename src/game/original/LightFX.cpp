@@ -213,3 +213,13 @@ bool CLightFX::Update(float time, DVector pos, bool on)
     ++updates;
     return true;
 }
+
+LightSettings OpenBlood2::native_light_settings(DVector color, float radius, DDWORD flags)
+{
+    LightSettings settings;
+    // Client waveform lights add .5 to the authored color. Native lights supply their output directly.
+    settings.color = vector_subtract(color, {.5f, .5f, .5f});
+    settings.radius = {radius, radius, 0, 0, WAVE_NONE};
+    settings.flags = flags & 0xf8u;
+    return settings;
+}

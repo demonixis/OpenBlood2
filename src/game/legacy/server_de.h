@@ -3,6 +3,7 @@
 namespace OpenBlood2
 {
     struct ShotgunEffectSettings;
+    struct ImpactMarkSettings;
     struct LightningSettings;
     struct WarpGateSettings;
 } // namespace OpenBlood2
@@ -78,8 +79,11 @@ namespace OpenBlood2
     struct BloodSpurtSettings;
     struct WeaponSpriteSettings;
     struct ParticleStreamSettings;
+    struct RainSettings;
+    struct SplashSettings;
     struct PolyGridSettings;
     struct SkyDefinition;
+    struct LineEffectGeometry;
 } // namespace OpenBlood2
 // Original SaveObjects/RestoreObjects flags (1998 server_de.h).
 inline constexpr DDWORD RESTOREOBJECTS_RESTORETIME = 1;
@@ -143,6 +147,8 @@ class ServerDE : public CSBase, public OpenBlood2::EffectQueries
     virtual void RecordDebrisEffect(const OpenBlood2::DebrisEffect&) = 0;
     virtual std::uint64_t PublishPolyGrid(HOBJECT, const OpenBlood2::PolyGridSettings&, std::string&) = 0;
     virtual std::uint64_t PublishParticleStream(HOBJECT, const OpenBlood2::ParticleStreamSettings&, std::string&) = 0;
+    virtual std::uint64_t PublishRain(HOBJECT, const OpenBlood2::RainSettings&, std::string&) = 0;
+    virtual std::uint64_t PublishSplash(HOBJECT, const OpenBlood2::SplashSettings&, std::string&) = 0;
     virtual std::uint64_t PublishSparks(HOBJECT, const OpenBlood2::SparkSettings&, std::string&) = 0;
     virtual std::uint64_t PublishClientBloodSplat(const OpenBlood2::BloodSplatSettings&, std::string_view,
                                                   std::string&) = 0;
@@ -160,12 +166,16 @@ class ServerDE : public CSBase, public OpenBlood2::EffectQueries
     virtual std::uint64_t PublishExplosionLights(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
     virtual std::uint64_t PublishExplosionModels(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
     virtual std::uint64_t PublishShotgunEffects(HOBJECT, const OpenBlood2::ShotgunEffectSettings&, std::string&) = 0;
+    virtual std::uint64_t PublishImpactMark(HOBJECT, const OpenBlood2::ImpactMarkSettings&, bool& reused,
+                                            std::string&) = 0;
+    virtual void RemoveImpactMark(std::uint64_t) = 0;
     virtual std::uint64_t PublishWeaponSprites(HOBJECT, const OpenBlood2::WeaponSpriteSettings&, std::string&) = 0;
     virtual std::uint64_t PublishExplosionSprites(HOBJECT, DDWORD, DVector, DVector, std::string&) = 0;
     virtual void RecordSceneExplosion(const OpenBlood2::SceneExplosionReport&) = 0;
     virtual void RecordExplosionEffect(const OpenBlood2::ExplosionEffect&) = 0;
     virtual DRESULT WriteKeyMessage(HMESSAGEWRITE, const OpenBlood2::KeyMessage&) = 0;
     virtual bool ReadKeyMessage(HMESSAGEREAD, OpenBlood2::KeyMessage&) = 0;
+    virtual bool ReadScriptText(std::string_view, std::string&) = 0;
     virtual OpenBlood2::MoverResult MoveWorldModel(HOBJECT, DVector destination) = 0;
     virtual OpenBlood2::MoverResult RotateWorldModel(HOBJECT, const OpenBlood2::RotationMove&) = 0;
     virtual bool GetPointContainerCode(DVector, ContainerCode&, bool visible_only = false) = 0;
@@ -177,6 +187,7 @@ class ServerDE : public CSBase, public OpenBlood2::EffectQueries
     virtual bool PlaceNonSolidModel(HOBJECT, DVector requested, DVector anchor, DVector anchor_half,
                                     OpenBlood2::BodyPlacement&) = 0;
     virtual bool GetMovementState(HOBJECT, OpenBlood2::MovementState&) = 0;
+    virtual bool GetContactNormal(HOBJECT, DVector&) = 0;
     virtual float GetWorldTime() = 0;
     // Replaces the original compile-time _DEMO switch; fixed by the mounted edition.
     virtual bool DemoBuild() = 0;
@@ -208,6 +219,7 @@ class ServerDE : public CSBase, public OpenBlood2::EffectQueries
     virtual bool RandomFloat(float, float, float&) = 0;
     virtual std::uint64_t PublishLightning(HOBJECT, const OpenBlood2::LightningSettings&, std::string&) = 0;
     virtual bool PublishLightEffect(HOBJECT, const OpenBlood2::LightSettings&) = 0;
+    virtual bool PublishLine(HOBJECT, const OpenBlood2::LineEffectGeometry&, float lifetime) = 0;
     virtual void RemoveLightEffect(HOBJECT) = 0;
     virtual bool PublishCameraEffect(HOBJECT, const OpenBlood2::CameraSettings&) = 0;
     virtual void RemoveCameraEffect(HOBJECT) = 0;
@@ -231,6 +243,11 @@ class ServerDE : public CSBase, public OpenBlood2::EffectQueries
     // GAME_GAMETYPE console variable (B2BaseClass::GetGameType) holds their actual type.
     DBYTE net_game_type = 0;
     OpenBlood2::MultiplayerPickups multiplayer_pickups;
+    struct SoccerRules
+    {
+        int goal_value = 5;
+        bool use_team_size = false, zombie_skin = false;
+    } soccer;
     bool friendly_fire = true, negative_team_frags = true; // Original host/dedicated defaults.
     std::array<int, 2> team_frags{}; // TeamMgr totals survive member departure, reset with the world.
     DBOOL IsMultiplayerGame() const

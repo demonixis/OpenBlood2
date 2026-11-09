@@ -234,6 +234,20 @@ class CFlareGun final : public CWeapon
   public:
     CFlareGun() : CWeapon(WEAP_FLAREGUN) {}
 };
+class CCombatShotgun final : public CWeapon
+{
+  public:
+    CCombatShotgun() : CWeapon(WEAP_COMBATSHOTGUN) {}
+    DBYTE GetAmmoType(bool alternate = false) const override
+    {
+        return alternate ? AMMO_DIEBUGDIE : AMMO_SHELL;
+    }
+};
+class CFlayer final : public CWeapon
+{
+  public:
+    CFlayer() : CWeapon(WEAP_FLAYER) {}
+};
 // Original CTeslaCannon: only the second alternate shot since creation is a ball;
 // the source never initializes or resets numAltFires (SetSpecialData has no caller).
 class CTeslaCannon final : public CWeapon
@@ -297,6 +311,12 @@ class CShikariClaw final : public CWeapon
 };
 // Original CGremlinRock (_ADD_ON): each shot draws a speed in [500, 1000] for both fire modes,
 // adds a world-up bias of 1 - (speed - 500) / 1000 to the fire direction and normalizes it.
+class CGooSpit final : public CWeapon
+{
+  public:
+    CGooSpit() : CWeapon(WEAP_GIDEON_GOO) {}
+};
+
 class CGremlinRock final : public CWeapon
 {
   public:

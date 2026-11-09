@@ -1,6 +1,7 @@
 #include "InventoryMgr.h"
 #include "AI_Mgr.h"
 #include "CampaignWeapons.h"
+#include "Nightmare.h"
 #include "PlayerObj.h"
 #include "game/game_settings.h"
 #include <algorithm>
@@ -177,11 +178,13 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
     const auto* definition = weapon_definition(type);
     if (!definition)
         return InventoryResult::NotAvailable;
+    if ((type == WEAP_COMBATSHOTGUN || type == WEAP_FLAYER) && !IsAddonBuild())
+        return InventoryResult::NotAvailable;
     if (!m_hOwner || !BaseClass::GetServerDE()->HandleToObject(m_hOwner) || slot < -1 ||
         slot >= int(inventory_weapon_slots))
         return InventoryResult::Invalid;
     if ((type == WEAP_NAGA_EYEBEAM || type == WEAP_ZEALOT_ENERGYBLAST || type == WEAP_GIDEON_WIND ||
-         type == WEAP_GIDEON_SHIELD) &&
+         type == WEAP_GIDEON_SHIELD || type == WEAP_NIGHTMARE_BITE) &&
         dynamic_cast<CPlayerObj*>(BaseClass::GetServerDE()->HandleToObject(m_hOwner)))
         return InventoryResult::NotAvailable; // Player view/save support is a separate contract.
     if (inventory_bomb(type))
@@ -244,6 +247,8 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         weapon = std::make_unique<CAncientOneTentacle>();
     else if (type == WEAP_GIDEON_VOMIT)
         weapon = std::make_unique<CVomit>();
+    else if (type == WEAP_GIDEON_GOO)
+        weapon = std::make_unique<CGooSpit>();
     else if (type == WEAP_GIDEON_SPEAR)
         weapon = std::make_unique<CGideonSpear>();
     else if (type == WEAP_ORB)
@@ -294,6 +299,10 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         weapon = std::make_unique<CSniperRifle>();
     else if (type == WEAP_SHOTGUN)
         weapon = std::make_unique<CShotgun>();
+    else if (type == WEAP_COMBATSHOTGUN)
+        weapon = std::make_unique<CCombatShotgun>();
+    else if (type == WEAP_FLAYER)
+        weapon = std::make_unique<CFlayer>();
     else if (type == WEAP_SINGULARITY)
         weapon = std::make_unique<CSingularity>();
     else if (type == WEAP_ASSAULTRIFLE)
@@ -310,6 +319,10 @@ InventoryResult CInventoryMgr::ObtainWeapon(DBYTE type, int slot)
         weapon = std::make_unique<CShikariSpit>();
     else if (type == WEAP_GREMLIN_ROCK)
         weapon = std::make_unique<CGremlinRock>();
+    else if (type == WEAP_NIGHTMARE_BITE)
+        weapon = std::make_unique<CBoneleechSuck>(type); // Same original melee and primary slash draw.
+    else if (type == WEAP_NIGHTMARE_FIREBALLS && IsAddonBuild())
+        weapon = std::make_unique<CNightmareFireballs>();
     else if (type == WEAP_SOUL_CROWBAR || type == WEAP_SOUL_AXE || type == WEAP_SOUL_PIPE)
         weapon = std::make_unique<CSoulWeapon>(type);
     else if (type == WEAP_SOUL_HOOK)

@@ -7,11 +7,12 @@ inline constexpr DBYTE WEAP_BERETTA = 1, WEAP_SUBMACHINEGUN = 2, WEAP_FLAREGUN =
                        WEAP_SOUL_HOOK = 23, WEAP_GIDEON_SHIELD = 41, WEAP_GIDEON_WIND = 42, WEAP_PROXIMITYBOMB = 49,
                        WEAP_REMOTEBOMB = 50;
 inline constexpr DBYTE WEAP_DRUDGE_FIREBALL = 30, WEAP_BONELEECH_SUCK = 33;
+inline constexpr DBYTE WEAP_NIGHTMARE_BITE = 35;
 inline constexpr DBYTE WEAP_TESLACANNON = 13, WEAP_VOODOO = 14, WEAP_ORB = 15, WEAP_LIFELEECH = 16;
 inline constexpr DBYTE WEAP_SHOTGUN = 4, WEAP_SINGULARITY = 8, WEAP_BUGSPRAY = 10;
 inline constexpr DBYTE WEAP_SNIPERRIFLE = 5, WEAP_MINIGUN = 11, WEAP_BEHEMOTH_CLAW = 24, WEAP_DRUDGE_LIGHTNING = 31,
                        WEAP_HAND_SQUEEZE = 32, WEAP_BEHEMOTH_SHOCKWAVE = 36, WEAP_SKULL = 48;
-inline constexpr DBYTE WEAP_GIDEON_VOMIT = 43, WEAP_GIDEON_SPEAR = 45;
+inline constexpr DBYTE WEAP_GIDEON_VOMIT = 43, WEAP_GIDEON_GOO = 44, WEAP_GIDEON_SPEAR = 45;
 inline constexpr DBYTE WEAP_ANCIENTONE_BEAM = 46, WEAP_ANCIENTONE_TENTACLE = 47;
 inline constexpr int IDS_WEAPON_MINIGUN = 359;
 inline constexpr DBYTE WEAP_HOWITZER = 6, WEAP_NAPALMCANNON = 7, WEAP_DEATHRAY = 12, WEAP_ZEALOT_HEAL = 25,
@@ -24,8 +25,8 @@ inline constexpr DBYTE AMMO_PROXIMITYBOMB = 10, AMMO_REMOTEBOMB = 11;
 // Nightmares (_ADD_ON) weapons in superset numbering: appended after the retail inventory weapons
 // so every retail number stays unchanged. The 1999 add-on build instead numbers them 18, 19 and
 // WEAP_LASTPLAYERWEAPON + 32/+33 and shifts the later ones (nightmares_plan.md, decision 1).
-// Their data and behaviour are not ported yet; weapon_definition() has no entry for them.
 inline constexpr DBYTE WEAP_COMBATSHOTGUN = 52, WEAP_FLAYER = 53, WEAP_GREMLIN_ROCK = 54, WEAP_NIGHTMARE_FIREBALLS = 55;
+inline constexpr int IDS_WEAPON_COMBATSHOTGUN = 370, IDS_WEAPON_FLAYER = 371;
 // The original `type <= WEAP_LASTPLAYERWEAPON` test (WEAP_NONE included, as in the source),
 // which also covers the two add-on player weapons in the add-on build.
 inline constexpr bool IsPlayerWeaponType(DBYTE type)

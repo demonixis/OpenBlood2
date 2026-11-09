@@ -63,6 +63,9 @@ namespace
         CHECK(mesh.build(w, error, &resources) && mesh.fullbright == 1 && near(mesh.vertices[2].color, {1, 1, 1}));
         // Unresolved materials keep the explicit marker; no resources keep orientation colors.
         w = floor_world();
+        w.models[0].textures = {"Default"};
+        CHECK(mesh.build(w, error, &resources) && mesh.materials.size() == 1 && mesh.materials[0].error.empty());
+        CHECK(mesh.vertices.size() == 6);
         w.models[0].textures = {"missing.dtx"};
         CHECK(mesh.build(w, error, &resources) && mesh.lit == 0 && near(mesh.vertices[0].color, {1, 0, 1}));
         CHECK(mesh.build(floor_world(), error) && mesh.lit == 0 && !near(mesh.vertices[0].color, {0, 0, 0}));

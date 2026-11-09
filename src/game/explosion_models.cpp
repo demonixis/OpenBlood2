@@ -128,9 +128,9 @@ namespace OpenBlood2
             return true;
         }
         if (type == 6 || type == 12 || (type >= 13 && type <= 16) || type == 21 || type == 26 || type == 27 ||
-            (type >= 29 && type <= 31))
+            (type >= 29 && type <= 31) || (type >= 33 && type <= 36))
             return true; // Original napalm fireball has no model component.
-        if (type > 3 && type != 8)
+        if (type > 3 && type != 8 && type != 32)
         {
             error = "Explosion model recipe is unavailable";
             return false;

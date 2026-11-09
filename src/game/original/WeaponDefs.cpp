@@ -2,6 +2,124 @@
 namespace
 {
     constexpr WeaponData definitions[] = {
+        // Combat Shotgun
+        {
+            "Models_ao\\Weapons_ao\\CombatShotgun_pv.abc",  // Model
+            "Models_ao\\Weapons_ao\\CombatShotgun_pv.abc",  // LH Model
+            "Skins_ao\\Weapons_ao\\C_ComShot_pv_t.dtx",     // Skin
+            "Models_ao\\Powerups_ao\\CombatShotgun_pu.abc", // 3rd person model
+            "Skins_ao\\Powerups_ao\\CombatShotgun_pu.dtx",  // 3rd person skin
+            WEAP_COMBATSHOTGUN,                             // Type
+            TYPE_RIFLE,                                     // Fire type
+            AMMO_SHELL,                                     // Ammo type
+            2,                                              // Ammo Use
+            5,                                              // Alt Ammo Use
+            4.0f,                                           // Min Damage
+            6.0f,                                           // Max Damage
+            50.0f,                                          // Min Alt damage
+            70.0f,                                          // Max Alt damage
+            0.33f,                                          // Reload time
+            2.0f,                                           // Alt reload time
+            {200.0f, 100.0f},                               // Spread
+            {0.0f, 0.0f},                                   // Alt Spread
+            0.0f,                                           // Projectile Velocity
+            1500.0f,                                        // Alt Projectile Velocity
+            3500.0f,                                        // Range
+            400.0f,                                         // Alt Range
+            16,                                             // Shots per fire
+            1,                                              // Alt Shots per fire
+            3,                                              // Strength or Magic required
+            0,                                              // Two-handed Strength or Magic required
+            0,                                              // Damage Radius (projectiles)
+            200,                                            // Alt Damage Radius (projectiles)
+            false,                                          // Alt fire zoom
+            true,                                           // Semi-auto
+            "Sounds_ao\\Weapons\\combatshotgun\\fire.wav",  // Fire sound
+            "Sounds_ao\\Weapons\\combatshotgun\\alt.wav",   // Alt Fire sound
+            "",                                             // Empty weapon sound
+            "",                                             // Alt Empty weapon sound
+            nullptr,                                        // Projectile class
+            "CGasGrenade",                                  // Alt Projectile class
+            125,                                            // Muzzle Flash radius
+            {1.0f, 0.68f, 0.35f},                           // Muzzle Flash color
+            "Combat Shotgun",                               // Name
+            IDS_WEAPON_COMBATSHOTGUN,	// Name ID (resource)
+            "Sprites\\shotgun2.spr",                        // flash sprite name
+            "Sprites\\m16altflare.spr",                     // alt flash Sprite name
+            0.05f,                                          // Flash duration
+            0.22f,                                          // Flash scale
+            {0.0f, 0.0f, 0.0f},                             // 3rd person gun offset
+            {0.6f, -0.6f, 0.7f},                            // Gun Offset
+            {0.08f, 0.5f, 2.0f},                            // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                          // Recoil
+            {5.0f, -3.5f, 30.0f},                           // Flash position
+            0.625f,                                         // Eject interval
+            2.5f,                                           // View kick
+            false,                                          // View kick is Cumulative
+            false,                                          // Animation looping
+            false,                                          // Alt anim looping
+            "interface_ao\\hammericon.pcx",                 // Icon for status bar
+            "interface_ao\\hammericonH.pcx",                // Highlighted icon for status bar
+        },
+        // Flayer
+        {
+            "Models_ao\\Weapons_ao\\Flayer_pv.abc",         // Model
+            "Models_ao\\Weapons_ao\\Flayer_pv.abc",         // Model
+            "Skins_ao\\Weapons_ao\\C_Flayer_pv_t.dtx",      // Skin
+            "Models_ao\\Powerups_ao\\Flayer_pu.abc",        // 3rd person model
+            "Skins_ao\\Powerups_ao\\Flayer_pu.dtx",         // 3rd person skin
+            WEAP_FLAYER,                                    // Type
+            TYPE_MELEE,                                     // Fire type
+            AMMO_FOCUS,                                     // Ammo type
+            25,                                             // Ammo Use
+            100,                                            // Alt Ammo Use
+            8.0f,                                           // Min Damage
+            12.0f,                                          // Max Damage
+            8.0f,                                           // Min Alt damage
+            12.0f,                                          // Max Alt damage
+            0.15f,                                          // Reload time
+            1.0f,                                           // Alt reload time
+            {0.0f, 0.0f},                                   // Spread
+            {0.0f, 0.0f},                                   // Alt Spread
+            500.0f,                                         // Projectile Velocity
+            0.0f,                                           // Alt Projectile Velocity
+            3500.0f,                                        // Range
+            0.0f,                                           // Alt Range
+            1,                                              // Shots per fire
+            1,                                              // Alt Shots per fire
+            1,                                              // Strength or Magic required
+            0,                                              // Two-handed Strength or Magic required
+            100,                                            // Damage Radius (projectiles)
+            0,                                              // Alt Damage Radius (projectiles)
+            false,                                          // Alt fire zoom
+            false,                                          // Semi-auto
+            "Sounds_ao\\Weapons\\flayer\\fire.wav",         // Fire sound
+            "Sounds_ao\\Weapons\\flayer\\fire.wav",         // Alt Fire sound
+            "",                                             // Empty weapon sound
+            "",                                             // Alt Empty weapon sound
+            "CFlayerChain",                                 // Projectile class
+            "CFlayerPortal",                                // Alt Projectile class
+            0,                                              // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                             // Muzzle Flash color
+            "Flayer",                                       // Name
+            IDS_WEAPON_FLAYER,		// Name ID (resource)
+            "",                                             // flash sprite name
+            "",                                             // alt flash Sprite name
+            0.25f,                                          // Flash duration
+            0.10f,                                          // Flash scale
+            {0.0f, 0.0f, 0.0f},                             // 3rd person gun offset
+            {1.0f, -1.0f, 2.5f},                            // Gun Offset
+            {0.0f, 0.0f, 0.0f},                             // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                          // Recoil
+            {0.0f, -10.0f, 25.0f},                          // Flash position
+            0.625f,                                         // Eject interval
+            0.0f,                                           // View kick
+            false,                                          // View kick is Cumulative
+            false,                                          // Animation looping
+            false,                                          // Alt anim looping
+            "interface_ao\\flayericon.pcx",                 // Icon for status bar
+            "interface_ao\\flayericonH.pcx",                // Highlighted icon for status bar
+        },
         // Ancient One eyebeam attack
         {
             "Models\\Weapons\\knifec_pv.abc",  // Model
@@ -179,6 +297,65 @@ namespace
             DFALSE,                             // Alt anim looping
             nullptr,                            // Icon for status bar
             nullptr,                            // Highlighted icon for status bar
+        },
+        // Undead Gideon goo attack
+        {
+            "Models\\Weapons\\knifec_pv.abc",       // Model
+            "Models\\Weapons\\knifec_pv.abc",       // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",      // Skin
+            nullptr,                                // Model
+            nullptr,                                // Skin
+            WEAP_GIDEON_GOO,                        // Type
+            TYPE_MAGIC,                             // Fire type
+            AMMO_NONE,                              // Ammo type
+            1,                                      // Ammo Use
+            1,                                      // Alt Ammo Use
+            10.0f,                                  // Min Damage
+            20.0f,                                  // Max Damage
+            10.0f,                                  // Min Alt damage
+            20.0f,                                  // Max Alt damage
+            1.00f,                                  // Reload time
+            0.0f,                                   // Alt reload time
+            {0.0f, 0.0f},                           // Spread
+            {0.0f, 0.0f},                           // Alt Spread
+            400.0f,                                 // Projectile Velocity
+            400.0f,                                 // Alt Projectile Velocity
+            2000.0f,                                // Range
+            2000.0f,                                // Alt Range
+            1,                                      // Shots per fire
+            1,                                      // Alt Shots per fire
+            1,                                      // Strength or Magic required
+            0,                                      // Two-handed Strength or Magic required
+            0,                                      // Damage Radius (projectiles)
+            0,                                      // Alt Damage Radius (projectiles)
+            DFALSE,                                 // Alt fire zoom
+            DFALSE,                                 // Semi-auto
+            "Sounds\\Weapons\\Knife\\fire.wav",     // Fire sound
+            "Sounds\\Weapons\\Knife\\alt.wav",      // Alt Fire sound
+            "",                                     // Empty weapon sound
+            "",                                     // Alt Empty weapon sound
+            "CGooProjectile",                       // Projectile class
+            "CGooProjectile",                       // Alt Projectile class
+            0,                                      // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                     // Muzzle Flash color
+            "Gideon_Goo",                           // Name
+            0,                                      // Name ID (resource)
+            "",                                     // flash sprite name
+            "",                                     // alt flash Sprite name
+            0.25f,                                  // Flash duration
+            0.10f,                                  // Flash scale
+            {0.0f, 0.0f, 0.0f},                     // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                    // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                     // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                  // Recoil
+            {0.0f, 0.0f, 0.1f},                     // Flash position
+            0.625f,                                 // Eject interval
+            0.0f,                                   // View kick
+            DFALSE,                                 // View kick is Cumulative
+            DFALSE,                                 // Animation looping
+            DFALSE,                                 // Alt anim looping
+            nullptr,                                // Icon for status bar
+            nullptr,                                // Highlighted icon for status bar
         },
         // Undead Gideon spear attack
         {
@@ -2860,6 +3037,65 @@ namespace
             nullptr,                            // Icon for status bar
             nullptr,                            // Highlighted icon for status bar
         },
+        // Nightmare bite
+        {
+            "Models\\Weapons\\knifec_pv.abc",           // Model
+            "Models\\Weapons\\knifec_pv.abc",           // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",          // Skin
+            nullptr,                                    // Model
+            nullptr,                                    // Skin
+            WEAP_NIGHTMARE_BITE,                        // Type
+            TYPE_MELEE,                                 // Fire type
+            AMMO_NONE,                                  // Ammo type
+            1,                                          // Ammo Use
+            1,                                          // Alt Ammo Use
+            40.0f,                                      // Min Damage
+            80.0f,                                      // Max Damage
+            40.0f,                                      // Min Alt damage
+            80.0f,                                      // Max Alt damage
+            1.00f,                                      // Reload time
+            0.0f,                                       // Alt reload time
+            {0.0f, 0.0f},                               // Spread
+            {0.0f, 0.0f},                               // Alt Spread
+            0.0f,                                       // Projectile Velocity
+            0.0f,                                       // Alt Projectile Velocity
+            100.0f,                                     // Range
+            100.0f,                                     // Alt Range
+            1,                                          // Shots per fire
+            1,                                          // Alt Shots per fire
+            1,                                          // Strength or Magic required
+            0,                                          // Two-handed Strength or Magic required
+            0,                                          // Damage Radius (projectiles)
+            0,                                          // Alt Damage Radius (projectiles)
+            DFALSE,                                     // Alt fire zoom
+            DFALSE,                                     // Semi-auto
+            "Sounds\\Weapons\\Knife\\fire.wav",         // Fire sound
+            "Sounds\\Weapons\\Knife\\alt.wav",          // Alt Fire sound
+            "",                                         // Empty weapon sound
+            "",                                         // Alt Empty weapon sound
+            nullptr,                                    // Projectile class
+            nullptr,                                    // Alt Projectile class
+            0,                                          // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                         // Muzzle Flash color
+            "Nightmare_Bite",                           // Name
+            0,                                          // Name ID (resource)
+            "",                                         // flash sprite name
+            "",                                         // alt flash Sprite name
+            0.25f,                                      // Flash duration
+            0.10f,                                      // Flash scale
+            {0.0f, 0.0f, 0.0f},                         // 3rd person gun offset
+            {0.0f, -1.4f, 0.3f},                        // 1st person gun Offset
+            {0.0f, 0.0f, 0.0f},                         // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                      // Recoil
+            {0.0f, 0.0f, 0.1f},                         // Flash position
+            0.625f,                                     // Eject interval
+            0.0f,                                       // View kick
+            DFALSE,                                     // View kick is Cumulative
+            DFALSE,                                     // Animation looping
+            DFALSE,                                     // Alt anim looping
+            nullptr,                                    // Icon for status bar
+            nullptr,                                    // Highlighted icon for status bar
+        },
         // The Gremlin's Rocks (_ADD_ON; superset ID 54)
         {
             "Models\\Weapons\\knifec_pv.abc",         // Model
@@ -2918,6 +3154,65 @@ namespace
             DFALSE,                                  // Alt anim looping
             nullptr,                                 // Icon for status bar
             nullptr,                                 // Highlighted icon for status bar
+        },
+        // Nightmare fireballs (_ADD_ON; superset ID 55)
+        {
+            "Models\\Weapons\\knifec_pv.abc",           // Model
+            "Models\\Weapons\\knifec_pv.abc",           // Model
+            "Skins\\Weapons\\knifec_pv_t.dtx",          // Skin
+            nullptr,                                    // Model
+            nullptr,                                    // Skin
+            WEAP_NIGHTMARE_FIREBALLS,                   // Type
+            TYPE_PISTOL,                                // Fire type
+            AMMO_NONE,                                  // Ammo type
+            1,                                          // Ammo Use
+            1,                                          // Alt Ammo Use
+            20.0f,                                      // Min Damage
+            30.0f,                                      // Max Damage
+            20.0f,                                      // Min Alt damage
+            30.0f,                                      // Max Alt damage
+            1.0f,                                       // Reload time
+            1.0f,                                       // Alt reload time
+            {0.0f, 0.0f},                               // Spread
+            {0.0f, 0.0f},                               // Alt Spread
+            1000.0f,                                    // Projectile Velocity
+            1000.0f,                                    // Alt Projectile Velocity
+            3500.0f,                                    // Range
+            3500.0f,                                    // Alt Range
+            1,                                          // Shots per fire
+            1,                                          // Alt Shots per fire
+            1,                                          // Strength or Magic required
+            0,                                          // Two-handed Strength or Magic required
+            100,                                        // Damage Radius (projectiles)
+            100,                                        // Alt Damage Radius (projectiles)
+            DFALSE,                                     // Alt fire zoom
+            DFALSE,                                     // Semi-auto
+            "",                                         // Fire sound
+            "",                                         // Alt Fire sound
+            "",                                         // Empty weapon sound
+            "",                                         // Alt Empty weapon sound
+            "CNightmareFireball",                       // Projectile class
+            "CNightmareFireball",                       // Alt Projectile class
+            0,                                          // Muzzle Flash radius
+            {0.0f, 0.0f, 0.0f},                         // Muzzle Flash color
+            "Nightmare Fireballs",                      // Name
+            0,                                          // Name ID (resource)
+            "",                                         // flash sprite name
+            "",                                         // alt flash Sprite name
+            0.0f,                                       // Flash duration
+            0.0f,                                       // Flash scale
+            {0.0f, 0.0f, 0.0f},                         // 3rd person gun offset
+            {0.0f, -0.5f, 2.4f},                        // Gun Offset
+            {0.0f, 0.0f, 0.0f},                         // Muzzle Offset
+            {0.03f, 0.03f, 0.15f},                      // Recoil
+            {0.0f, -5.0f, 20.0f},                       // Flash position
+            0.625f,                                     // Eject interval
+            0.0f,                                       // View kick
+            DFALSE,                                     // View kick is Cumulative
+            DFALSE,                                     // Animation looping
+            DFALSE,                                     // Alt anim looping
+            nullptr,                                    // Icon for status bar
+            nullptr,                                    // Highlighted icon for status bar
         },
     };
 }

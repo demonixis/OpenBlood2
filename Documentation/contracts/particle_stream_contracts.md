@@ -88,3 +88,24 @@ position/velocity/lifetime/color. General object properties expose all original
 fields and difficulty settings. Named failures survive object deletion. Hidden UI
 and inspector-free builds run the same simulation; presentation counters indicate
 prepared geometry, not GPU visibility or gameplay success.
+
+## Rain
+
+Rain publishes the original `SFX_RAIN_ID` settings through the local typed
+particle service. Its client effect shares the existing stream pool and follows
+the owner pose. The first tick establishes the clock. Further ticks accumulate
+`Density * Dims.x * Dims.z / 250` drops per second, honor the authored time limit
+and sample the next interval from `Pulse * [0.01, 1]` when Pulse exceeds 0.001.
+The owner forward vector replaces the serialized Direction each tick. Position
+is drawn independently per box axis, and the RGB channels each draw between
+their two authored endpoints. No-gravity rain and vertical rain without spread
+draw the original six-drop streak, with cumulative spacings 3, 4, 5, 6 and 7.
+Other rain emits six independent particles. The bounded renderer counts
+overflow samples and retains leading whole streaks.
+
+A Rain object starts automatically unless Triggered is set. Each case-insensitive
+TRIGGER creates an independent effect, and TRIGGEROFF has no source handler.
+Save/load preserves the authored payload in its original field order and restarts
+automatic effects. The client pool ends an effect on timeout or owner removal.
+The current effect transport supports local clients. The Rain-specific descriptor
+is outside the multiplayer particle stream protocol.

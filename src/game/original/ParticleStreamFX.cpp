@@ -39,6 +39,24 @@ bool CParticleStreamFX::Init(const ParticleStreamSettings& s, std::string& failu
     initialized_ = true;
     return true;
 }
+bool CParticleStreamFX::Init(const RainSettings& rain, std::string& failure)
+{
+    if (!valid_rain(rain))
+    {
+        failure = "Invalid Rain descriptor";
+        return false;
+    }
+    ParticleStreamSettings rendering;
+    rendering.system = true;
+    rendering.on = true;
+    rendering.radius = 200 * rain.scale;
+    rendering.gravity = rain.gravity ? -500.f : 0.f;
+    rendering.texture = "SpriteTextures\\blooddrop2.dtx";
+    if (!Init(rendering, failure))
+        return false;
+    rain_ = rain;
+    return true;
+}
 bool CParticleStreamFX::AddParticles(float now, std::minstd_rand& random, std::size_t budget, std::string& failure)
 {
     if (!state)
@@ -156,6 +174,8 @@ bool CParticleStreamFX::Update(double now, const NodePose* pose, bool visible, s
         return false;
     const auto dt = now - last_time;
     last_time = now;
+    if (rain_)
+        return RainUpdate(now, *pose, random, budget);
     if (settings.system)
         return SystemUpdate(now, dt, *pose, visible, random, budget);
     if (now < next_update)
@@ -177,6 +197,66 @@ bool CParticleStreamFX::Update(double now, const NodePose* pose, bool visible, s
     }
     // The original SFXMgr never reads the sound tail; no sound enters this client effect.
     return time <= last_add + settings.delay || AddParticles(time, random, budget, error);
+}
+
+bool CParticleStreamFX::RainUpdate(double now, const NodePose& pose, std::minstd_rand& random, std::size_t budget)
+{
+    if (first_system_update_)
+    {
+        first_system_update_ = false;
+        rain_start_ = now;
+        next_update = now + .01;
+        return true;
+    }
+    if (now < next_update)
+        return true;
+    const auto& rain = *rain_;
+    const double elapsed = now - rain_start_;
+    if (rain.time_limit && elapsed > rain.time_limit)
+        return false;
+    position = pose.position;
+    system_rotation = pose.rotation;
+    // The source overwrites the authored direction with the owner's forward vector each tick.
+    direction = rotate_vector(pose.rotation, {0, 0, 1});
+    const bool trails = !rain.gravity || (!rain.spread && direction.x == 0 && direction.z == 0);
+    const double rate = double(rain.density) * rain.dims.x * rain.dims.z / 250;
+    const auto samples = static_cast<std::uint64_t>(std::floor(rate * elapsed));
+    const auto demand = (samples - rain_samples_) * (trails ? 1u : 6u);
+    rain_samples_ = samples;
+    budget = std::min<std::size_t>(2048, budget);
+    const auto room = particles.size() < budget ? budget - particles.size() : 0;
+    const unsigned width = trails ? 6 : 1;
+    const auto groups = std::min<std::uint64_t>(demand, room / width);
+    dropped += (demand - groups) * width;
+    particles.reserve(particles.size() + groups * width);
+    for (std::uint64_t i = 0; i < groups; ++i)
+    {
+        Particle particle;
+        particle.lifetime = rain.lifetime;
+        particle.position = {draw(random, -rain.dims.x, rain.dims.x), draw(random, -rain.dims.y, rain.dims.y),
+                             draw(random, -rain.dims.z, rain.dims.z)};
+        particle.velocity = vector_scale(direction, draw(random, .8f, 1.2f));
+        if (rain.spread)
+        {
+            particle.velocity.x += draw(random, -rain.spread, rain.spread);
+            particle.velocity.z += draw(random, -rain.spread, rain.spread);
+        }
+        const DVector color{draw(random, rain.color1.x, rain.color2.x) / 255,
+                            draw(random, rain.color1.y, rain.color2.y) / 255,
+                            draw(random, rain.color1.z, rain.color2.z) / 255};
+        constexpr float brightness[]{1, .8f, .6f, .4f, .2f, .2f};
+        for (unsigned j = 0; j < width; ++j)
+        {
+            particle.color = vector_scale(color, brightness[j]);
+            particles.push_back(particle);
+            particle.position = vector_subtract(particle.position, vector_scale(direction, float(j + 3)));
+        }
+    }
+    emitted += groups * width;
+    ++updates;
+    ++bursts;
+    next_update = now + (rain.pulse > .001f ? rain.pulse * draw(random, .01f, 1) : .01f);
+    return true;
 }
 
 // Selected ClientShellDLL/ParticleSystemFX: floor(rate * elapsed), no fractional carry or catch-up loop.

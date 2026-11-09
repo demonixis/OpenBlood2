@@ -16,10 +16,14 @@
 #include "game/original/ClientLightFX.h"
 #include "game/original/ClientLightningSFX.h"
 #include "game/original/ClientParticleStreamSFX.h"
+#include "game/original/ClientSmokeTrail.h"
 #include "game/original/ClientSplatFX.h"
+#include "game/original/ClientSplashSFX.h"
 #include "game/original/ClientWarpGateSFX.h"
+#include "game/original/ClientWeaponSFX.h"
 #include "game/original/ConversationTrigger.h"
 #include "game/original/Corpse.h"
+#include "game/original/CraneObjects.h"
 #include "game/original/CultistAI.h"
 #include "game/original/DestructableModel.h"
 #include "game/original/DetailSprite.h"
@@ -29,6 +33,7 @@
 #include "game/original/ExitHint.h"
 #include "game/original/ExitTrigger.h"
 #include "game/original/Fanatic.h"
+#include "game/original/FireEffects.h"
 #include "game/original/FlagObjects.h"
 #include "game/original/FlareProjectile.h"
 #include "game/original/GameStartPoint.h"
@@ -37,6 +42,7 @@
 #include "game/original/AddonProjectiles.h"
 #include "game/original/Grenade.h"
 #include "game/original/HandWeaponModel.h"
+#include "game/original/ViewWeaponModel.h"
 #include "game/original/IshmaelAI.h"
 #include "game/original/ItemPickups.h"
 #include "game/original/Key.h"
@@ -44,10 +50,15 @@
 #include "game/original/KeyPickup.h"
 #include "game/original/LaterEnemies.h"
 #include "game/original/LeechProjectile.h"
+#include "game/original/LegacyEffects.h"
+#include "game/original/LegacyLines.h"
 #include "game/original/MadScientistAI.h"
 #include "game/original/Minefield.h"
 #include "game/original/Naga.h"
 #include "game/original/NapalmProjectile.h"
+#include "game/original/NativeLight.h"
+#include "game/original/Nightmare.h"
+#include "game/original/NightmaresProjectiles.h"
 #include "game/original/ObjectivesTrigger.h"
 #include "game/original/OrbProjectile.h"
 #include "game/original/ParticleSystem.h"
@@ -57,6 +68,7 @@
 #include "game/original/Projectile.h"
 #include "game/original/Prophet.h"
 #include "game/original/ProximityBomb.h"
+#include "game/original/Rain.h"
 #include "game/original/RandomSoundFX.h"
 #include "game/original/RemoteBomb.h"
 #include "game/original/RotatingBrush.h"
@@ -67,12 +79,14 @@
 #include "game/original/ShikariAI.h"
 #include "game/original/SingularityProjectile.h"
 #include "game/original/SkyObjects.h"
+#include "game/original/SoccerObjects.h"
 #include "game/original/SmellHint.h"
 #include "game/original/SoulDrudge.h"
 #include "game/original/Sound.h"
 #include "game/original/SoundFX.h"
 #include "game/original/SparksObj.h"
 #include "game/original/Spawner.h"
+#include "game/original/Script.h"
 #include "game/original/Tchernotronic.h"
 #include "game/original/TeslaProjectile.h"
 #include "game/original/Thief.h"
@@ -168,70 +182,83 @@ namespace OpenBlood2
                                         {"Color", DVector{255, 255, 255}},
                                         {"Alpha", 1.0f}},
                                        SaveSupport::AlwaysLoad};
+        const ClassInfo projectile_base{"CProjectile", &base, construct<CStandardProjectile>, {},
+                                        SaveSupport::Unsupported};
         const ClassInfo shockwave_projectile{
-            "CBehemothShockwaveProjectile", &base, construct<CBehemothShockwaveProjectile>, {},
+            "CBehemothShockwaveProjectile", &projectile_base, construct<CBehemothShockwaveProjectile>, {},
             SaveSupport::Original,          1};
-        const ClassInfo remote{"CRemoteBomb", &base, construct<CRemoteBomb>, {}, SaveSupport::Original, 1};
-        const ClassInfo proximity{"CProximityBomb", &base, construct<CProximityBomb>, {}, SaveSupport::Original, 1};
-        const ClassInfo grenade{"CGrenade", &base, construct<CGrenade>, {}, SaveSupport::Original, 1};
-        const ClassInfo flare_projectile{"CFlareProjectile",    &base, construct<CFlareProjectile>, {},
+        const ClassInfo remote{"CRemoteBomb", &projectile_base, construct<CRemoteBomb>, {}, SaveSupport::Original, 1};
+        const ClassInfo proximity{"CProximityBomb", &projectile_base, construct<CProximityBomb>, {}, SaveSupport::Original, 1};
+        const ClassInfo grenade{"CGrenade", &projectile_base, construct<CGrenade>, {}, SaveSupport::Original, 1};
+        const ClassInfo flare_projectile{"CFlareProjectile",    &projectile_base, construct<CFlareProjectile>, {},
                                          SaveSupport::Original, 1};
-        const ClassInfo tesla_projectile{"CTeslaProjectile",    &base, construct<CTeslaProjectile>, {},
+        const ClassInfo tesla_projectile{"CTeslaProjectile",    &projectile_base, construct<CTeslaProjectile>, {},
                                          SaveSupport::Original, 1};
-        const ClassInfo tesla_bolt{"CTeslaBoltProjectile", &base, construct<CTeslaBoltProjectile>, {},
+        const ClassInfo tesla_bolt{"CTeslaBoltProjectile", &projectile_base, construct<CTeslaBoltProjectile>, {},
                                    SaveSupport::Original,  1};
-        const ClassInfo tesla_ball{"CTeslaBallProjectile", &base, construct<CTeslaBallProjectile>, {},
+        const ClassInfo tesla_ball{"CTeslaBallProjectile", &projectile_base, construct<CTeslaBallProjectile>, {},
                                    SaveSupport::Original,  1};
         const ClassInfo seeing_eye{"SeeingEye", &base, construct<SeeingEye>, {}, SaveSupport::Original, 1};
-        const ClassInfo bugspray_projectile{"CBugSprayProjectile", &base, construct<CBugSprayProjectile>, {},
+        const ClassInfo bugspray_projectile{"CBugSprayProjectile", &projectile_base, construct<CBugSprayProjectile>, {},
                                             SaveSupport::Original, 1};
-        const ClassInfo bugspray_alt_projectile{"CBugSprayAltProjectile", &base, construct<CBugSprayAltProjectile>, {},
+        const ClassInfo bugspray_alt_projectile{"CBugSprayAltProjectile", &projectile_base, construct<CBugSprayAltProjectile>, {},
                                                 SaveSupport::Original,    1};
-        const ClassInfo napalm_projectile{"CNapalmProjectile",   &base, construct<CNapalmProjectile>, {},
+        const ClassInfo napalm_projectile{"CNapalmProjectile",   &projectile_base, construct<CNapalmProjectile>, {},
                                           SaveSupport::Original, 1};
         // _ADD_ON CRockProjectile (BEGIN_CLASS CF_HIDDEN): Unsupported until the add-on save lot (N9).
-        const ClassInfo rock_projectile{"CRockProjectile", &base, construct<CRockProjectile>, {},
+        const ClassInfo rock_projectile{"CRockProjectile", &projectile_base, construct<CRockProjectile>, {},
                                         SaveSupport::Unsupported};
-        const ClassInfo loogie{"CShikariLoogieProjectile", &base, construct<CShikariLoogieProjectile>, {},
+        const ClassInfo nightmare_fireball{"CNightmareFireball", &projectile_base, construct<CNightmareFireball>, {},
+                                            SaveSupport::Unsupported};
+        const ClassInfo gas_grenade{"CGasGrenade", &projectile_base, construct<CGasGrenade>, {}, SaveSupport::Unsupported};
+        const ClassInfo flayer_chain{"CFlayerChain", &projectile_base, construct<CFlayerChain>, {}, SaveSupport::Unsupported};
+        const ClassInfo flayer_portal{"CFlayerPortal", &projectile_base, construct<CFlayerPortal>, {}, SaveSupport::Unsupported};
+        const ClassInfo loogie{"CShikariLoogieProjectile", &projectile_base, construct<CShikariLoogieProjectile>, {},
                                SaveSupport::Original,      1};
-        const ClassInfo orb_prime{"COrbProjectile", &base, construct<COrbProjectile>, {}, SaveSupport::Original, 1};
-        const ClassInfo orb_alt{"COrbAltProjectile", &base, construct<COrbAltProjectile>, {}, SaveSupport::Original, 1};
-        const ClassInfo leech_prime{"CLeechPrimeProjectile", &base, construct<CLeechPrimeProjectile>, {},
+        const ClassInfo orb_prime{"COrbProjectile", &projectile_base, construct<COrbProjectile>, {}, SaveSupport::Original, 1};
+        const ClassInfo orb_alt{"COrbAltProjectile", &projectile_base, construct<COrbAltProjectile>, {}, SaveSupport::Original, 1};
+        const ClassInfo leech_prime{"CLeechPrimeProjectile", &projectile_base, construct<CLeechPrimeProjectile>, {},
                                     SaveSupport::Original,   1};
-        const ClassInfo leech_alt{"CLeechAltProjectile", &base, construct<CLeechAltProjectile>, {},
+        const ClassInfo leech_alt{"CLeechAltProjectile", &projectile_base, construct<CLeechAltProjectile>, {},
                                   SaveSupport::Original, 1};
-        const ClassInfo singularity_projectile{"CSingularityProjectile", &base, construct<CSingularityProjectile>, {},
+        const ClassInfo fireball_projectile{"CFireballProjectile", &projectile_base, construct<CFireballProjectile>, {},
+                                            SaveSupport::Unsupported};
+        const ClassInfo goo_projectile{"CGooProjectile", &projectile_base, construct<CGooProjectile>, {}, SaveSupport::Unsupported};
+        const ClassInfo singularity_projectile{"CSingularityProjectile", &projectile_base, construct<CSingularityProjectile>, {},
                                                SaveSupport::Original,    1};
-        const ClassInfo flare_alt{"CFlareAltProjectile", &base, construct<CFlareAltProjectile>, {},
+        const ClassInfo singularity_alt_projectile{"CSingularityAltProjectile", &projectile_base,
+                                                   construct<CSingularityAltProjectile>, {}, SaveSupport::Unsupported};
+        const ClassInfo flare_alt{"CFlareAltProjectile", &projectile_base, construct<CFlareAltProjectile>, {},
                                   SaveSupport::Original, 1};
-        const ClassInfo flare_burst{"CFlareBurstProjectile", &base, construct<CFlareBurstProjectile>, {},
+        const ClassInfo flare_burst{"CFlareBurstProjectile", &projectile_base, construct<CFlareBurstProjectile>, {},
                                     SaveSupport::Original,   1};
-        const ClassInfo energy_projectile{"CEnergyBlastProjectile", &base, construct<CEnergyBlastProjectile>, {},
+        const ClassInfo energy_projectile{"CEnergyBlastProjectile", &projectile_base, construct<CEnergyBlastProjectile>, {},
                                           SaveSupport::Original,    1};
-        const ClassInfo campaign_CTimeBomb{"CTimeBomb", &base, construct<CTimeBomb>, {}, SaveSupport::Original, 1};
+        const ClassInfo campaign_CTimeBomb{"CTimeBomb", &projectile_base, construct<CTimeBomb>, {}, SaveSupport::Original, 1};
         const ClassInfo campaign_CNagaSpikeProjectile{
-            "CNagaSpikeProjectile", &base, construct<CNagaSpikeProjectile>, {}, SaveSupport::Original, 1};
+            "CNagaSpikeProjectile", &projectile_base, construct<CNagaSpikeProjectile>, {}, SaveSupport::Original, 1};
         const ClassInfo campaign_CNagaDebrisProjectile{
-            "CNagaDebrisProjectile", &base, construct<CNagaDebrisProjectile>, {}, SaveSupport::Original, 1};
+            "CNagaDebrisProjectile", &projectile_base, construct<CNagaDebrisProjectile>, {}, SaveSupport::Original, 1};
         const ClassInfo campaign_NagaCeilingDebris{
             "NagaCeilingDebris", &base, construct<NagaCeilingDebris>, {}, SaveSupport::NotSaved};
         const ClassInfo campaign_CGroundStrikeProjectile{
-            "CGroundStrikeProjectile", &base, construct<CGroundStrikeProjectile>, {}, SaveSupport::Original, 1};
+            "CGroundStrikeProjectile", &projectile_base, construct<CGroundStrikeProjectile>, {}, SaveSupport::Original, 1};
         const ClassInfo campaign_CShockwaveProjectile{
-            "CShockwaveProjectile", &base, construct<CShockwaveProjectile>, {}, SaveSupport::Original, 1};
-        const ClassInfo campaign_CDeathRayProjectile{"CDeathRayProjectile", &base, construct<CDeathRayProjectile>, {},
+            "CShockwaveProjectile", &projectile_base, construct<CShockwaveProjectile>, {}, SaveSupport::Original, 1};
+        const ClassInfo campaign_CDeathRayProjectile{"CDeathRayProjectile", &projectile_base, construct<CDeathRayProjectile>, {},
                                                      SaveSupport::Original, 1};
-        const ClassInfo campaign_CHowitzerAltShell{"CHowitzerAltShell",   &base, construct<CHowitzerAltShell>, {},
+        const ClassInfo campaign_CHowitzerAltShell{"CHowitzerAltShell",   &projectile_base, construct<CHowitzerAltShell>, {},
                                                    SaveSupport::Original, 1};
-        const ClassInfo campaign_CHowitzerAltFrag{"CHowitzerAltFrag",    &base, construct<CHowitzerAltFrag>, {},
+        const ClassInfo campaign_CHowitzerAltFrag{"CHowitzerAltFrag",    &projectile_base, construct<CHowitzerAltFrag>, {},
                                                   SaveSupport::Original, 1};
         const ClassInfo campaign_CNapalmAltProjectile{
-            "CNapalmAltProjectile", &base, construct<CNapalmAltProjectile>, {}, SaveSupport::Original, 1};
-        const ClassInfo campaign_CNapalmFireball{"CNapalmFireball",     &base, construct<CNapalmFireball>, {},
+            "CNapalmAltProjectile", &projectile_base, construct<CNapalmAltProjectile>, {}, SaveSupport::Original, 1};
+        const ClassInfo campaign_CNapalmFireball{"CNapalmFireball",     &projectile_base, construct<CNapalmFireball>, {},
                                                  SaveSupport::Original, 1};
-        const ClassInfo howitzer_shell{"CHowitzerShell",      &base, construct<CHowitzerShell>, {},
+        const ClassInfo howitzer_shell{"CHowitzerShell",      &projectile_base, construct<CHowitzerShell>, {},
                                        SaveSupport::Original, 1};
         const ClassInfo hand_model{"CHandWeaponModel", &base, construct<CHandWeaponModel>, {}, SaveSupport::NotSaved};
+        const ClassInfo view_weapon_model{"CViewWeaponModel", &base, construct<CViewWeaponModel>, {}, SaveSupport::NotSaved};
         const ClassInfo b2base{
             "B2BaseClass",
             &base,
@@ -412,6 +439,39 @@ namespace OpenBlood2
             SaveSupport::Original,
             1};
         const ClassInfo client_sfx{"CClientSFX", &b2base, construct<CClientSFX>, {}, SaveSupport::NotSaved};
+        const ClassInfo legacy_smoke_trail{"CClientSmokeTrail", &client_sfx, construct<CClientSmokeTrail>, {},
+                                            SaveSupport::NotSaved};
+        const ClassInfo cast_line{"CClientCastLineSFX", &client_sfx, construct<CClientCastLineSFX>, {},
+                                   SaveSupport::NotSaved};
+        const ClassInfo debug_line{"CClientDebugLine", &client_sfx, construct<CClientDebugLine>, {},
+                                    SaveSupport::NotSaved};
+        const ClassInfo legacy_beam{"CClientLaserBeamSFX", &client_sfx, construct<CClientLaserBeamSFX>,
+                                    {{"BeamType", std::int32_t(0)}, {"Damage", 100.f}, {"DamageRadius", 100.f},
+                                     {"Sound", std::string("Sounds\\Thunder.wav")}, {"SoundRadius", 500.f}},
+                                    SaveSupport::Original, 1};
+        const ClassInfo legacy_sparks{"CClientSparksSFX", &client_sfx, construct<CClientSparksSFX>, {},
+                                      SaveSupport::NotSaved};
+        const ClassInfo legacy_impact_mark{"CBulletImpactSFX", &client_sfx, construct<CBulletImpactSFX>, {},
+                                            SaveSupport::NotSaved};
+        const ClassInfo legacy_mark{"CClientMarkSFX", &client_sfx, construct<CClientMarkSFX>, {}, SaveSupport::NotSaved};
+        const ClassInfo demo_gib_fx{"CClientGibFX", &client_sfx, construct<CClientGibFX>, {}, SaveSupport::NotSaved};
+        const ClassInfo legacy_blood_trail{"CClientBloodTrail", &client_sfx, construct<CClientBloodTrail>, {},
+                                            SaveSupport::NotSaved};
+        const ClassInfo legacy_tracer{"CClientTracer", &client_sfx, construct<CClientTracer>, {}, SaveSupport::NotSaved};
+        const ClassInfo legacy_laser{"CClientLaserFX", &client_sfx, construct<CClientLaserFX>, {}, SaveSupport::NotSaved};
+        const ClassInfo legacy_casing{"CShellCasing", &base, construct<CShellCasing>, {}, SaveSupport::NotSaved};
+        const ClassInfo rain{"Rain", &client_sfx, construct<Rain>,
+                             {{"Density", 0.f}, {"Dims", DVector{}}, {"Lifetime", 1.f}, {"Direction", DVector{}},
+                              {"AddGravity", true}, {"ParticleScale", 1.f}, {"Spread", 0.f}, {"Triggered", false},
+                              {"Color1", DVector{200, 255, 255}}, {"Color2", DVector{40, 50, 50}},
+                              {"TimeLimit", 0.f}, {"Pulse", 0.f}}, SaveSupport::Original, 1};
+        const ClassInfo client_splash{"CClientSplashSFX", &client_sfx, construct<CClientSplashSFX>, {},
+                                      SaveSupport::NotSaved};
+        const ClassInfo client_weapon_effect{"CClientWeaponSFX", &client_sfx, construct<CClientWeaponSFX>, {},
+                                             SaveSupport::NotSaved};
+        const ClassInfo legacy_model{"CModelObject", &base, construct<CModelObject>, {}, SaveSupport::NotSaved};
+        const ClassInfo legacy_impact{"CImpact", &base, construct<CImpact>, {}, SaveSupport::NotSaved};
+        const ClassInfo legacy_ricochet{"CImpactRicochet", &base, construct<CImpactRicochet>, {}, SaveSupport::NotSaved};
         const ClassInfo client_splat{
             "CClientSplatFX", &client_sfx, construct<CClientSplatFX>, {}, SaveSupport::NotSaved};
         const ClassInfo particle_stream{"CClientParticleStreamSFX",
@@ -453,6 +513,58 @@ namespace OpenBlood2
                                          {"WaveFile", std::string("Sounds\\exp_tnt.wav")}},
                                         SaveSupport::Original,
                                         1};
+        const ClassInfo legacy_explosion{"Explosion", &b2base, construct<Explosion>,
+                                         {{"Model", std::string("Models\\Explosions\\Explosion_3.abc")},
+                                          {"Skin", std::string("Skins\\Explosions\\Explosion_1.dtx")},
+                                          {"Sound", std::string("Sounds\\exp_tnt.wav")},
+                                          {"SoundRadius", 1000.f},
+                                          {"DamageRadius", 200.f},
+                                          {"MaxDamage", 50.f},
+                                          {"RotateSpeed", DVector{}},
+                                          {"MinScale", .1f},
+                                          {"MaxScale", 1.f},
+                                          {"Duration", 0.f, false},
+                                          {"CreateLight", true},
+                                          {"LightColor", DVector{255, 255, 255}},
+                                          {"CreateSmoke", true},
+                                          {"CreateShockwave", false},
+                                          {"ShockwaveFile", std::string("Sprites\\Shockring.spr")},
+                                          {"ShockwaveScaleMin", DVector{}},
+                                          {"ShockwaveScaleMax", DVector{}},
+                                          {"ShockwaveDuration", 0.f},
+                                          {"Delay", 0.f}},
+                                         SaveSupport::NotSaved};
+        const ClassInfo fire_fx{"FireFX", &b2base, construct<FireFX>,
+                                {{"PlaceFireOn", std::string("MyName")}, {"BurnTime", 0.f, false}},
+                                SaveSupport::NotSaved};
+        const ClassInfo native_light{
+            "LightFX", &base, construct<LightFX>, []
+            {
+                std::vector<PropertySpec> properties{{"LightSwitch", true}, {"LifeTime", 0.f}, {"HitPoints", 1.f},
+                                                      {"RampUpSound", std::string{}}, {"RampDownSound", std::string{}},
+                                                      {"NumColorCycles", std::int32_t(0)}};
+                for (unsigned i = 1; i <= 3; ++i)
+                {
+                    const auto name = "Color" + std::to_string(i);
+                    properties.push_back({name, DVector{255, 255, 255}});
+                    properties.push_back({name + "Time", 0.f});
+                }
+                for (const std::string name : {"Intensity", "Radius"})
+                {
+                    properties.push_back({"Num" + name + "Cycles", std::int32_t(0)});
+                    properties.push_back({name + "Min", name == "Radius" ? 500.f : .5f});
+                    properties.push_back({name + "Max", name == "Radius" ? 0.f : 1.f});
+                    for (const auto* timing : {"MinTime", "MaxTime", "RampUpTime", "RampDownTime"})
+                        properties.push_back({name + timing, 0.f});
+                }
+                for (const auto* message : {"DamageTriggerTarget", "DamageTriggerMessage", "DeathTriggerTarget",
+                                            "DeathTriggerMessage"})
+                    properties.push_back({message, std::string{}});
+                properties.push_back({"TriggerDestroyOnly", false});
+                properties.push_back({"SpawnObject", std::string{}, true, MAX_GP_STRING_LEN});
+                properties.push_back({"SpawnObjectVel", DVector{}});
+                return properties;
+            }(), SaveSupport::AlwaysLoad};
         const ClassInfo client_light{"ClientLightFX",
                                      &client_sfx,
                                      construct<ClientLightFX>,
@@ -752,6 +864,19 @@ namespace OpenBlood2
                                    construct<FlagStand>,
                                    {{"ObjectName", std::string("CTF_FlagStand")}, {"TeamID", std::int32_t(0)}},
                                    SaveSupport::NotSaved};
+        const ClassInfo soccer_ball{"SoccerBall", &b2base, construct<SoccerBall>, {}, SaveSupport::NotSaved};
+        const ClassInfo soccer_goal{"SoccerGoal",
+                                    &b2base,
+                                    construct<SoccerGoal>,
+                                    {{"TeamID", std::int32_t(1)},
+                                     {"Directional", false},
+                                     {"GoalDirection", DRotation{}},
+                                     {"BoxPhysics", true},
+                                     {"ScoreSound", std::string{}},
+                                     {"ScoreSoundRadius", 1000.f},
+                                     {"ScoreTarget", std::string{}},
+                                     {"ScoreMsg", std::string{}}},
+                                    SaveSupport::AlwaysLoad};
         const ClassInfo sparks_obj{"SparksObj",
                                    &b2base,
                                    construct<SparksObj>,
@@ -794,9 +919,9 @@ namespace OpenBlood2
             {{"RandomHitPoints", 0.f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{4, 4, 5}}},
             SaveSupport::Original,
             1};
-        const ClassInfo vomit_projectile{"CVomitProjectile",    &base, construct<CVomitProjectile>, {},
+        const ClassInfo vomit_projectile{"CVomitProjectile",    &projectile_base, construct<CVomitProjectile>, {},
                                          SaveSupport::Original, 1};
-        const ClassInfo skull_projectile{"CSkullProjectile",    &base, construct<CSkullProjectile>, {},
+        const ClassInfo skull_projectile{"CSkullProjectile",    &projectile_base, construct<CSkullProjectile>, {},
                                          SaveSupport::Original, 1};
         const ClassInfo campaign_Thief{
             "Thief",
@@ -898,6 +1023,16 @@ namespace OpenBlood2
             construct_npc<GremlinAI, AI_Mgr::NPCType::Gremlin>,
             {{"RandomHitPoints", 10.0f}, {"AIState", std::string("IDLE"), true, 31}, {"Dims", DVector{19, 30, 24}}},
             SaveSupport::Unsupported};
+        const ClassInfo nightmare{"Nightmare", &ai_manager, construct_npc<Nightmare, AI_Mgr::NPCType::Nightmare>,
+                                  {{"HitPoints", 200000.f},
+                                   {"RandomHitPoints", 400.f},
+                                   {"ArmorPoints", 0.f},
+                                   {"AIState", std::string("IDLE"), true, 31},
+                                   {"AIBrain", std::string("STRONG"), true, 31},
+                                   {"AIWeapon1", std::string("NIGHTMARE_BITE"), true, 31},
+                                   {"AIWeapon2", std::string("NIGHTMARE_FIREBALLS"), true, 31},
+                                   {"AIWeapon3", std::string("BEHEMOTH_SHOCKWAVE"), true, 31}},
+                                  SaveSupport::Unsupported};
         // Original BEGIN_CLASS(ShikariAI): RandomHitPoints, AIState and hidden Dims only.
         const ClassInfo shikari{
             "ShikariAI",
@@ -1154,6 +1289,9 @@ namespace OpenBlood2
         const ClassInfo voodoo_pickup{
             "VoodooDollPU", &weapon_pickup, construct<VoodooDollPU>, {}, SaveSupport::Original, 1};
         const ClassInfo shotgun_pickup{"ShotgunPU", &weapon_pickup, construct<ShotgunPU>, {}, SaveSupport::Original, 1};
+        const ClassInfo combat_shotgun_pickup{"CombatShotgunPU", &weapon_pickup, construct<CombatShotgunPU>, {},
+                                              SaveSupport::Unsupported};
+        const ClassInfo flayer_pickup{"FlayerPU", &weapon_pickup, construct<FlayerPU>, {}, SaveSupport::Unsupported};
         const ClassInfo orb_pickup{"OrbPU", &weapon_pickup, construct<OrbPU>, {}, SaveSupport::Original, 1};
         const ClassInfo leech_pickup{
             "LifeLeechPU", &weapon_pickup, construct<LifeLeechPU>, {}, SaveSupport::Original, 1};
@@ -1218,6 +1356,8 @@ namespace OpenBlood2
                                     {"PickupTriggerMessage", std::string{}}},
                                    SaveSupport::Original,
                                    1};
+        const ClassInfo script{"Script", &b2base, construct<Script>,
+                               {{"ScriptName", std::string("script.txt")}, {"StartTime", 0.f}}, SaveSupport::AlwaysLoad};
         const ClassInfo trigger{
             "Trigger",
             &b2base,
@@ -1464,6 +1604,8 @@ namespace OpenBlood2
                                        }(),
                                        SaveSupport::Original,
                                        1};
+        const ClassInfo rotating_sprite{"RotatingSprite", &detail_sprite, construct<RotatingSprite>,
+                                        rotating_model.properties, SaveSupport::Original, 1};
         const ClassInfo world_debris{"WorldModelDebris",
                                      &destructable_brush,
                                      construct<WorldModelDebris>,
@@ -1504,6 +1646,21 @@ namespace OpenBlood2
                                   {"YScaleDuration", 10.0f}},
                                  SaveSupport::Original,
                                  1};
+        const ClassInfo crane_control{"CraneControl",
+                                       &volume,
+                                       construct<CraneControl>,
+                                       {{"Code", std::int32_t(CC_CRANECONTROL)},
+                                        {"ShowSurface", false},
+                                        {"SurfaceHeight", 0.f},
+                                        {"SurfaceColor1", DVector{}},
+                                        {"SurfaceColor2", DVector{}},
+                                        {"XScaleDuration", 10.f},
+                                        {"YScaleDuration", 10.f},
+                                        {"Locked", true},
+                                        {"UnlockKeyRemove", true},
+                                        {"UnlockKeyName", std::string("Lever")}},
+                                       SaveSupport::Unsupported};
+        const ClassInfo wrecking_ball{"WreckingBall", &b2base, construct<WreckingBall>, {}, SaveSupport::AlwaysLoad};
         const ClassInfo damage{"Damage",
                                &volume,
                                construct<::Damage>,
@@ -1563,13 +1720,25 @@ namespace OpenBlood2
     } // namespace
     bool register_original_classes(Objects& objects)
     {
-        return objects.register_class(base) && objects.register_class(sky_model) &&
+        return objects.register_class(base) && objects.register_class(projectile_base) && objects.register_class(sky_model) &&
                objects.register_class(sky_pointer) && objects.register_class(builtin_model) &&
                objects.register_class(builtin_container) && objects.register_class(builtin_sprite) &&
                objects.register_class(b2base) && objects.register_class(camera) && objects.register_class(client_sfx) &&
+               objects.register_class(cast_line) && objects.register_class(debug_line) &&
+               objects.register_class(legacy_smoke_trail) &&
+               objects.register_class(legacy_beam) && objects.register_class(legacy_sparks) &&
+               objects.register_class(legacy_model) && objects.register_class(legacy_impact) &&
+               objects.register_class(legacy_ricochet) && objects.register_class(legacy_impact_mark) &&
+               objects.register_class(legacy_mark) && objects.register_class(demo_gib_fx) &&
+               objects.register_class(legacy_blood_trail) && objects.register_class(legacy_tracer) &&
+               objects.register_class(legacy_laser) && objects.register_class(legacy_casing) &&
+               objects.register_class(rain) &&
+               objects.register_class(client_splash) && objects.register_class(client_weapon_effect) &&
                objects.register_class(client_splat) && objects.register_class(particle_stream) &&
                objects.register_class(warp_gate_sfx) && objects.register_class(lightning_sfx) &&
                objects.register_class(scene_explosion) && objects.register_class(client_light) &&
+               objects.register_class(native_light) && objects.register_class(legacy_explosion) &&
+               objects.register_class(fire_fx) &&
                objects.register_class(light_SquareWaveLightFX) && objects.register_class(light_SawWaveLightFX) &&
                objects.register_class(light_RampUpWaveLightFX) && objects.register_class(light_RampDownWaveLightFX) &&
                objects.register_class(light_SineWaveLightFX) && objects.register_class(light_Flicker1WaveLightFX) &&
@@ -1590,6 +1759,8 @@ namespace OpenBlood2
                objects.register_class(chosen_GabriellaREV) && objects.register_class(chosen_OpheliaAI) &&
                objects.register_class(chosen_OpheliaREV) && objects.register_class(caleb_ai) &&
                objects.register_class(flag_object) && objects.register_class(flag_stand) &&
+               objects.register_class(soccer_ball) && objects.register_class(soccer_goal) &&
+               objects.register_class(wrecking_ball) &&
                objects.register_class(sparks_obj) && objects.register_class(later_Behemoth) &&
                objects.register_class(later_DrudgePriest) && objects.register_class(later_DeathShroud) &&
                objects.register_class(later_TheHandAI) && objects.register_class(vomit_projectile) &&
@@ -1601,13 +1772,14 @@ namespace OpenBlood2
                objects.register_class(fanatic) && objects.register_class(prophet) &&
                objects.register_class(bone_leech) && objects.register_class(drudge_lord) &&
                objects.register_class(soul_drudge) && objects.register_class(shikari) &&
-               objects.register_class(gremlin) &&
+               objects.register_class(gremlin) && objects.register_class(nightmare) &&
                objects.register_class(mad_scientist) && objects.register_class(player) &&
                objects.register_class(particle_system) && objects.register_class(polygrid) &&
-               objects.register_class(volume) && objects.register_class(water) && objects.register_class(blood) &&
+               objects.register_class(volume) && objects.register_class(crane_control) &&
+               objects.register_class(water) && objects.register_class(blood) &&
                objects.register_class(acid) && objects.register_class(ladder) && objects.register_class(conveyor) &&
                objects.register_class(damage) && objects.register_class(minefield) &&
-               objects.register_class(freefall) && objects.register_class(trigger) &&
+               objects.register_class(freefall) && objects.register_class(script) && objects.register_class(trigger) &&
                objects.register_class(key_pickup) && objects.register_class(pickup) &&
                objects.register_class(item_pickup) && objects.register_class(item_weapon) &&
                objects.register_class(proximity_pickup) && objects.register_class(remote_pickup) &&
@@ -1618,6 +1790,7 @@ namespace OpenBlood2
                objects.register_class(beretta_pickup) && objects.register_class(assault_pickup) &&
                objects.register_class(flare_pickup) && objects.register_class(tesla_pickup) &&
                objects.register_class(voodoo_pickup) && objects.register_class(shotgun_pickup) &&
+               objects.register_class(combat_shotgun_pickup) && objects.register_class(flayer_pickup) &&
                objects.register_class(singularity_pickup) && objects.register_class(mac10_pickup) &&
                objects.register_class(campaign_HowitzerPU) && objects.register_class(campaign_NapalmCannonPU) &&
                objects.register_class(campaign_DeathRayPU) && objects.register_class(campaign_TimeBombPU) &&
@@ -1638,7 +1811,9 @@ namespace OpenBlood2
                objects.register_class(door) && objects.register_class(rotating_door) &&
                objects.register_class(destructable_brush) && objects.register_class(destructable_model) &&
                objects.register_class(rotating_brush) && objects.register_class(rotating_model) &&
+               objects.register_class(rotating_sprite) &&
                objects.register_class(world_debris) && objects.register_class(hand_model) &&
+               objects.register_class(view_weapon_model) &&
                objects.register_class(gib) && objects.register_class(corpse) && objects.register_class(proximity) &&
                objects.register_class(remote) && objects.register_class(grenade) &&
                objects.register_class(flare_projectile) && objects.register_class(flare_alt) &&
@@ -1646,11 +1821,15 @@ namespace OpenBlood2
                objects.register_class(tesla_ball) && objects.register_class(napalm_projectile) &&
                objects.register_class(seeing_eye) && objects.register_class(bugspray_projectile) &&
                objects.register_class(bugspray_alt_projectile) && objects.register_class(loogie) &&
-               objects.register_class(rock_projectile) &&
+               objects.register_class(rock_projectile) && objects.register_class(nightmare_fireball) &&
+               objects.register_class(gas_grenade) &&
+               objects.register_class(flayer_chain) && objects.register_class(flayer_portal) &&
                objects.register_class(orb_prime) && objects.register_class(orb_alt) &&
                objects.register_class(orb_pickup) && objects.register_class(leech_prime) &&
                objects.register_class(leech_alt) && objects.register_class(leech_pickup) &&
-               objects.register_class(singularity_projectile) && objects.register_class(flare_burst) &&
+               objects.register_class(singularity_projectile) && objects.register_class(singularity_alt_projectile) &&
+               objects.register_class(fireball_projectile) && objects.register_class(goo_projectile) &&
+               objects.register_class(flare_burst) &&
                objects.register_class(energy_projectile) && objects.register_class(campaign_CTimeBomb) &&
                objects.register_class(campaign_CNagaSpikeProjectile) &&
                objects.register_class(campaign_CNagaDebrisProjectile) &&

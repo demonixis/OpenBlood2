@@ -56,7 +56,7 @@ namespace
                                              {"HAND_SQUEEZE", WEAP_HAND_SQUEEZE, true},
                                              {"THIEF_SUCK", WEAP_THIEF_SUCK, true},
                                              {"BONELEECH_SUCK", WEAP_BONELEECH_SUCK, true},
-                                             {"NIGHTMARE_BITE", 0, false},
+                                             {"NIGHTMARE_BITE", WEAP_NIGHTMARE_BITE, true},
                                              {"BEHEMOTH_SHOCKWAVE", WEAP_BEHEMOTH_SHOCKWAVE, true},
                                              {"DEATHSHROUD_ZAP", 0, false},
                                              {"NAGA_BLAST", WEAP_NAGA_EYEBEAM, true},
@@ -64,7 +64,7 @@ namespace
                                              {"NAGA_DEBRIS", WEAP_NAGA_DEBRIS, true},
                                              {"GIDEON_SHIELD", WEAP_GIDEON_SHIELD, true},
                                              {"GIDEON_WIND", WEAP_GIDEON_WIND, true},
-                                             {"GIDEON_GOO", 0, false},
+                                             {"GIDEON_GOO", WEAP_GIDEON_GOO, true},
                                              {"GIDEON_VOMIT", WEAP_GIDEON_VOMIT, true},
                                              {"ANCIENTONE_BEAM", WEAP_ANCIENTONE_BEAM, true},
                                              {"ANCIENTONE_TENTACLE", WEAP_ANCIENTONE_TENTACLE, true},
@@ -75,7 +75,8 @@ namespace
     float type_mass(AI_Mgr::NPCType type)
     {
         using T = AI_Mgr::NPCType;
-        return type == T::UndeadGideon                                          ? 3000
+        return type == T::Nightmare                                             ? 3750
+               : type == T::UndeadGideon                                        ? 3000
                : type == T::BoneLeech || type == T::Thief || type == T::TheHand ? 125
                                                                                 : 250;
     }
@@ -90,6 +91,11 @@ namespace
 } // namespace
 bool AI_Mgr::WeaponStrToInt(std::string_view name, DBYTE& id)
 {
+    if (IsAddonBuild() && (name.starts_with("COMBAT") || name.starts_with("FLAYER")))
+    {
+        id = name.starts_with("COMBAT") ? WEAP_COMBATSHOTGUN : WEAP_FLAYER;
+        return true;
+    }
     // _ADD_ON (AI_Mgr.cpp:650): "ROCK", compared on four bytes, after every base-game name.
     const bool rock = IsAddonBuild() && name.starts_with("ROCK");
     for (const auto& entry : weapon_prefixes)
@@ -101,6 +107,11 @@ bool AI_Mgr::WeaponStrToInt(std::string_view name, DBYTE& id)
     if (rock)
     {
         id = WEAP_GREMLIN_ROCK;
+        return true;
+    }
+    if (IsAddonBuild() && name.starts_with("NIGHTMARE_FIREBALL"))
+    {
+        id = WEAP_NIGHTMARE_FIREBALLS;
         return true;
     }
     id = WEAP_BERETTA; // Source default for a name matching no compiled branch (e.g. COMBAT).
@@ -192,6 +203,23 @@ void AI_Mgr::ConfigureRuntime(NPCType type)
         npc_armor = 0;
         npc_weapons[0] = "SHIKARI_CLAW";
         npc_weapons[1] = "ROCK";
+    }
+    if (type == NPCType::Nightmare)
+    {
+        m_fHearingDist = 2000;
+        m_fSensingDist = 6000;
+        m_fSmellingDist = 4000;
+        m_fSeeingDist = 2200;
+        m_fWalkSpeed = 800;
+        m_fRunSpeed = 1200;
+        m_fJumpSpeed = 900;
+        m_fRollSpeed = 3.5f;
+        m_dwFlags = 0xc02; // FLAG_JUMP | FLAG_NIGHTMAREDEATH | FLAG_NEVERGIB.
+        m_bCabal = false;
+        m_damage.apply_damage_physics = false;
+        npc_hp = 30000;
+        npc_random_hp = 400;
+        npc_weapons = {"NIGHTMARE_BITE", "NIGHTMARE_FIREBALLS", "BEHEMOTH_SHOCKWAVE", "NONE", "NONE"};
     }
     if (type == NPCType::BoneLeech || type == NPCType::DrudgeLord)
     {
@@ -421,6 +449,8 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
     // The class exists only in the add-on build's object.lto.
     if (npc_type == NPCType::Gremlin && !IsAddonBuild())
         return RuntimeFailure("GremlinAI is an add-on class (Nightmares edition only)");
+    if (npc_type == NPCType::Nightmare && !IsAddonBuild())
+        return RuntimeFailure("Nightmare is an add-on class (Nightmares edition only)");
     if (npc_type == NPCType::SoulDrudge)
     {
         // Original SoulDrudge constructor draw, before any property (AIWeapon1 still overrides it).
@@ -579,6 +609,11 @@ bool AI_Mgr::RuntimePrecreate(ObjectCreateStruct* state, int reason)
         model = "Models_ao/Enemies_ao/Gremlin.abc";
         skin = "Skins_ao/Enemies_ao/Gremlin.dtx";
     }
+    else if (npc_type == NPCType::Nightmare)
+    {
+        model = "Models_ao/Enemies_ao/Nightmare.abc";
+        skin = "Skins_ao/Enemies_ao/Nightmare.dtx";
+    }
     else if (npc_type == NPCType::SoulDrudge)
     {
         // Original PostPropRead: one of three skins on the shared model.
@@ -653,7 +688,8 @@ bool AI_Mgr::InitializeSharedTable(std::string& error)
         return false;
     }
     const bool male_group = npc_male || (npc_type == NPCType::Civilian && npc_labtech);
-    const auto group = npc_type == NPCType::Gremlin              ? 31
+    const auto group = npc_type == NPCType::Nightmare            ? 32
+                       : npc_type == NPCType::Gremlin           ? 31
                        : npc_type == NPCType::AncientOne         ? 28
                        : npc_type == NPCType::AncientOneTentacle ? 29
                        : npc_type == NPCType::UndeadGideon       ? 27
@@ -785,6 +821,7 @@ bool AI_Mgr::InitializeSharedTable(std::string& error)
                  : npc_type == NPCType::SoulDrudge         ? "sounds/enemies/souldrudge"
                  : npc_type == NPCType::Shikari            ? "sounds/enemies/shikari"
                  : npc_type == NPCType::Gremlin            ? "sounds_ao/enemies/Gremlin"
+                 : npc_type == NPCType::Nightmare          ? "sounds_ao/enemies/Nightmare"
                  : npc_type == NPCType::MadScientist       ? "sounds/enemies/madscientist"
                  : male_group                              ? "sounds/enemies/m_cultist"
                                                            : "sounds/enemies/f_cultist"))
@@ -818,7 +855,9 @@ bool AI_Mgr::RuntimeInitialize(int reason)
         return RuntimeFailure(table_error);
     if (!m_InventoryMgr.Init(m_hObject, nullptr) || !m_damage.Init(m_hObject, &m_InventoryMgr))
         return RuntimeFailure("NPC aggregates unavailable");
-    m_InventoryMgr.SetStrength((npc_type == NPCType::Gideon || npc_type == NPCType::EnhancedGideon) ? 10 : 5);
+    m_InventoryMgr.SetStrength((npc_type == NPCType::Gideon || npc_type == NPCType::EnhancedGideon) ? 10
+                              : npc_type == NPCType::Nightmare                                   ? 9
+                                                                                                 : 5);
     // Original weapon IDs are sparse (Gideon's loadout reaches 42). Track the
     // at-most-five requested IDs, not an array sized for player-only weapons.
     std::array<DBYTE, 5> obtained{};

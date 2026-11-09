@@ -59,7 +59,8 @@ namespace OpenBlood2
     {
         trace_service("AssignClientTeam");
         auto found = clients_.find(client);
-        if (!team_game_type(net_game_type) || preferred > 2 || found == clients_.end() || found->second.team ||
+        if ((!team_game_type(net_game_type) && net_game_type != GAMETYPE_SOCCER) || preferred > 2 ||
+            found == clients_.end() || found->second.team ||
             found->second.player || objects_.busy())
             return false;
         if (!preferred)
@@ -95,7 +96,7 @@ namespace OpenBlood2
     {
         trace_service("AddClientTeamFrags");
         const auto team = GetClientTeam(client);
-        if (!team_game_type(net_game_type) || !team || !GetClientUserData(client))
+        if ((!team_game_type(net_game_type) && net_game_type != GAMETYPE_SOCCER) || !team || !GetClientUserData(client))
             return false;
         const auto next = std::int64_t(team_frags[team - 1]) + delta;
         if (next < -1000000 || next > 1000000)

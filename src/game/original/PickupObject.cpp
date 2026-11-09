@@ -42,8 +42,17 @@ DDWORD PickupObject::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
         }
         // PostPropRead runs for every reason, a restore included: it re-adds TOUCH_NOTIFY,
         // VISIBLE and GRAVITY to the saved flags (an original rewrite) before Load sets m_dwFlags.
-        SAFE_STRCPY(create.m_Filename, ("Models/Powerups/" + file + ".abc").c_str());
-        SAFE_STRCPY(create.m_SkinName, ("Skins/Powerups/" + file + ".dtx").c_str());
+        const bool addon_weapon = value.kind == PickupKind::Weapon &&
+                                  (value.type == WEAP_COMBATSHOTGUN || value.type == WEAP_FLAYER);
+        if (addon_weapon && !IsAddonBuild())
+        {
+            g_pServerDE->RejectPrecreate("Nightmares weapon pickup requires the add-on edition");
+            return 0;
+        }
+        SAFE_STRCPY(create.m_Filename,
+                    ((addon_weapon ? "Models_ao/Powerups_ao/" : "Models/Powerups/") + file + ".abc").c_str());
+        SAFE_STRCPY(create.m_SkinName,
+                    ((addon_weapon ? "Skins_ao/Powerups_ao/" : "Skins/Powerups/") + file + ".dtx").c_str());
         create.m_ObjectType = OT_MODEL;
         create.m_Flags |= FLAG_TOUCH_NOTIFY | FLAG_VISIBLE | FLAG_GRAVITY;
         create.m_Flags &= ~FLAG_SHADOW;

@@ -106,6 +106,13 @@ FireResult CWeapon::Fire(const WeaponFire& request)
             last_shot.collision = SegmentResult::Miss;
             return server->GetObjectPos(m_hOwner, &last_shot.request.position) == DE_OK;
         }
+        if (data.m_nType == WEAP_FLAYER && request.alternate)
+        {
+            // The portal is stationary at the muzzle and has an authored range of zero.
+            last_shot.direction = direction;
+            last_shot.collision = SegmentResult::Miss;
+            return true;
+        }
         // Source FireSpread aligns the eye only for a player. NPCs fire the
         // spread direction from their actual gun node (or body fallback).
         if (const auto* player = dynamic_cast<CPlayerObj*>(server->HandleToObject(m_hOwner)))
@@ -115,7 +122,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
             eye.y += player->eye_level;
             last_shot.request.position = request.position;
             if (inventory_bomb(data.m_nType) || data.m_nType == WEAP_FLAREGUN ||
-                (data.m_nType == WEAP_ASSAULTRIFLE && request.alternate))
+                ((data.m_nType == WEAP_ASSAULTRIFLE || data.m_nType == WEAP_COMBATSHOTGUN) && request.alternate))
             {
                 SegmentHit close_hit;
                 const auto close = server->IntersectSegment(eye, vector_add(eye, vector_scale(forward, 60)), m_hOwner,

@@ -15,7 +15,7 @@ namespace OpenBlood2
             return false;
         }
         if (type <= 7 || (type >= 9 && type <= 11) || (type >= 13 && type <= 25) || type == 27 ||
-            (type >= 29 && type <= 31))
+            (type >= 29 && type <= 36))
             return true;
         if (type == 12)
         {

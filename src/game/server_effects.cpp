@@ -3,6 +3,20 @@
 #include <cmath>
 namespace OpenBlood2
 {
+    bool ServerAdapter::PublishLine(HOBJECT owner, const LineEffectGeometry& line, float lifetime)
+    {
+        trace_service("PublishLine");
+        if (!IsObjectAlive(owner) || !valid_line_effect(line) || !std::isfinite(lifetime) || lifetime <= 0 ||
+            lifetime > 60 || client_effects.next_line_id == UINT64_MAX)
+            return false;
+        const double now = world_time();
+        auto& lines = client_effects.detached_lines;
+        std::erase_if(lines, [&](const auto& item) { return item.expires <= now; });
+        if (lines.size() >= 256)
+            lines.erase(lines.begin());
+        lines.push_back({client_effects.next_line_id++, now + lifetime, line});
+        return true;
+    }
     EffectServices ServerAdapter::effect_services()
     {
         return {*this,        client_effects,  client_resources, objects_.sprites,
@@ -186,6 +200,28 @@ namespace OpenBlood2
         }
         return particle_streams.publish(effect_owner(owner), settings, client_resources, objects_.time(), error);
     }
+    std::uint64_t ServerAdapter::PublishRain(HOBJECT owner, const RainSettings& settings, std::string& error)
+    {
+        if (!trace_service("PublishRain"))
+            return 0;
+        if (remote_stream_sink)
+        {
+            error = "Rain client transport unavailable";
+            return 0;
+        }
+        return particle_streams.publish(effect_owner(owner), settings, client_resources, objects_.time(), error);
+    }
+    std::uint64_t ServerAdapter::PublishSplash(HOBJECT owner, const SplashSettings& settings, std::string& error)
+    {
+        if (!trace_service("PublishSplash"))
+            return 0;
+        if (!IsObjectAlive(owner) || !objects_.sprites || !client_resources || remote_effect_sink)
+        {
+            error = "Splash owner, resources or local client unavailable";
+            return 0;
+        }
+        return shotgun_effects.publish_splash(settings, *objects_.sprites, *client_resources, objects_.time(), error);
+    }
     std::uint64_t ServerAdapter::PublishObjectParticles(HOBJECT owner, unsigned type, std::string& error,
                                                         float lifetime_scale, DVector offset)
     {
@@ -220,25 +256,16 @@ namespace OpenBlood2
         return laser_beams.publish(from, to, GetObjectName(source), *objects_.models, *client_resources,
                                    objects_.time(), error, type);
     }
-    std::uint64_t ServerAdapter::PublishShotgunEffects(HOBJECT source, const ShotgunEffectSettings& settings,
-                                                       std::string& error)
+    std::vector<DVector> ServerAdapter::impact_mark_polygon(HOBJECT source, DVector position, DVector normal)
     {
-        if (!trace_service("PublishShotgunEffects"))
-            return 0;
-        if (!IsObjectAlive(source) || !objects_.models || !objects_.sprites || !client_resources)
-        {
-            error = "Shotgun effect source/resources unavailable";
-            return 0;
-        }
-        auto clipped = settings;
-        clipped.clip_polygon.clear();
+        std::vector<DVector> points;
         // Original CMarkSFX asks ClipSprite for the surface immediately behind the mark.
         // Use the actual mark position (the source accidentally reuses its list-loop vPos)
         // and cross the port's 1.25-unit impact bias. No game random draw or damage query.
         SegmentHit hit;
         if (objects_.world &&
-            IntersectSegment(settings.destination,
-                             vector_subtract(settings.destination, vector_scale(settings.normal, 3)), source, hit,
+            IntersectSegment(position,
+                             vector_subtract(position, vector_scale(normal, 3)), source, hit,
                              false, SegmentObjects::All) == SegmentResult::Hit &&
             hit.polygon != UINT32_MAX)
         {
@@ -256,7 +283,7 @@ namespace OpenBlood2
                         {
                             if (polygon.points[i] >= model.points.size())
                             {
-                                clipped.clip_polygon.clear();
+                                points.clear();
                                 break;
                             }
                             auto point = model.points[polygon.points[i]];
@@ -264,15 +291,59 @@ namespace OpenBlood2
                                 point = vector_add(
                                     object->state.m_Pos,
                                     rotate_vector(vector_subtract(point, model.translation), object->state.m_Rotation));
-                            clipped.clip_polygon.push_back(point);
+                            points.push_back(point);
                         }
                 }
             }
         }
+        return points;
+    }
+    std::uint64_t ServerAdapter::PublishImpactMark(HOBJECT source, const ImpactMarkSettings& settings,
+                                                    bool& reused, std::string& error)
+    {
+        if (!trace_service("PublishImpactMark"))
+            return 0;
+        if (!IsObjectAlive(source) || !objects_.sprites || !client_resources || remote_effect_sink)
+        {
+            error = "Impact mark owner, resources or local client unavailable";
+            return 0;
+        }
+        return shotgun_effects.publish_mark(settings, impact_mark_polygon(source, settings.position, settings.normal),
+                                             *objects_.sprites, *client_resources, objects_.time(), reused, error);
+    }
+    void ServerAdapter::RemoveImpactMark(std::uint64_t id)
+    {
+        if (!trace_service("RemoveImpactMark") || !id)
+            return;
+        std::erase_if(shotgun_effects.sprites, [id](const auto& sprite) { return sprite.id == id; });
+    }
+
+    std::uint64_t ServerAdapter::PublishShotgunEffects(HOBJECT source, const ShotgunEffectSettings& settings,
+                                                       std::string& error)
+    {
+        return PublishBallistics(source, settings, error);
+    }
+    std::uint64_t ServerAdapter::PublishBallistics(HOBJECT source, const ShotgunEffectSettings& settings,
+                                                    std::string& error, std::optional<std::uint32_t> selected)
+    {
+        if (!trace_service("PublishShotgunEffects"))
+            return 0;
+        if (!IsObjectAlive(source) || !objects_.models || !objects_.sprites || !client_resources)
+        {
+            error = "Shotgun effect source/resources unavailable";
+            return 0;
+        }
+        auto clipped = settings;
+        clipped.clip_polygon = impact_mark_polygon(source, settings.destination, settings.normal);
+        if (remote_effect_sink && selected)
+        {
+            error = "Selected ballistic effect transport unavailable";
+            return 0;
+        }
         if (remote_effect_sink)
             return remote_effect_sink(objects_.get(source)->id, GetObjectName(source), clipped, error);
         return shotgun_effects.publish(effect_owner(source), clipped, *objects_.models, *objects_.sprites,
-                                       *client_resources, objects_.time(), effect_services(), error);
+                                       *client_resources, objects_.time(), effect_services(), error, selected);
     }
     std::uint64_t ServerAdapter::PublishWeaponSprites(HOBJECT source, const WeaponSpriteSettings& settings,
                                                       std::string& error)

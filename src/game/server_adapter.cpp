@@ -14,6 +14,23 @@ namespace OpenBlood2
         return *active_;
     }
 
+    bool ServerAdapter::ReadScriptText(std::string_view name, std::string& text)
+    {
+        text.clear();
+        if (!trace_service("ReadScriptText") || !client_resources)
+            return false;
+        const auto* resource = client_resources->find(name);
+        if (!resource || !resource->size || resource->size > 64 * 1024)
+            return false;
+        std::vector<std::uint8_t> bytes;
+        std::string error;
+        if (!client_resources->read(name, bytes, error) ||
+            std::find(bytes.begin(), bytes.end(), std::uint8_t{}) != bytes.end())
+            return false;
+        text.assign(bytes.begin(), bytes.end());
+        return true;
+    }
+
     bool ServerAdapter::GetObjectColor(HOBJECT h, DVector& color, float& alpha)
     {
         trace_service("GetObjectColor");

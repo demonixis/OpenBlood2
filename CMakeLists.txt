@@ -150,8 +150,17 @@ add_library(blood2_game STATIC src/game/original/ScreenFade.cpp src/game/origina
     src/game/service_coverage.cpp)
 target_sources(blood2_game PRIVATE src/game/original/NewStatusBar.cpp src/game/original/MessageMgr.cpp src/game/original/ClientExplosionSFX.cpp src/game/server_sprites.cpp src/game/original/DetailSprite.cpp src/game/server_audio.cpp src/game/original/CinematicTrigger.cpp src/game/original/RandomSoundFX.cpp src/game/original/Sound.cpp src/game/original/SoundFX.cpp)
 target_sources(blood2_game PRIVATE src/game/original/PlayerLanding.cpp src/game/original/PlayerDeath.cpp)
+target_sources(blood2_game PRIVATE src/game/original/Nightmare.cpp)
+target_sources(blood2_game PRIVATE src/game/original/FireEffects.cpp src/game/original/Script.cpp)
+target_sources(blood2_game PRIVATE src/game/original/SoccerObjects.cpp)
+target_sources(blood2_game PRIVATE src/game/original/CraneObjects.cpp src/game/original/LegacyLines.cpp)
+target_sources(blood2_game PRIVATE src/game/original/ClientSmokeTrail.cpp src/client/legacy_smoke_trails.cpp)
+target_sources(blood2_game PRIVATE src/game/original/ViewWeaponModel.cpp)
 target_sources(blood2_game PRIVATE src/game/server_lights.cpp src/game/original/ClientLightFX.cpp)
 target_sources(blood2_game PRIVATE src/game/server_keyframes.cpp src/game/original/KeyData.cpp src/game/original/KeyFramer.cpp)
+target_sources(blood2_game PRIVATE src/game/original/NightmaresProjectiles.cpp src/game/original/NativeLight.cpp)
+target_sources(blood2_game PRIVATE src/game/original/LegacyEffects.cpp src/game/original/Rain.cpp)
+target_sources(blood2_game PRIVATE src/game/original/ClientSplashSFX.cpp src/game/original/ClientWeaponSFX.cpp)
 target_sources(blood2_game PRIVATE src/game/server_cameras.cpp src/game/original/CameraObj.cpp src/game/server_objectives.cpp src/game/original/ObjectivesTrigger.cpp src/game/original/ConversationTrigger.cpp src/game/original/ConversationStrings.cpp src/game/local_voices.cpp src/game/original/PlayerVoice.cpp src/game/original/PlayerWeaponSound.cpp src/game/server_models.cpp src/game/original/WorldProperties.cpp src/game/original/SmellHint.cpp)
 target_sources(blood2_game PRIVATE src/game/original/WeaponPickups.cpp src/game/server_pickups.cpp src/game/original/PickupObject.cpp
     src/game/original/ItemPickups.cpp src/game/original/GameInvItems.cpp src/game/original/Flashlight.cpp src/game/original/AmmoPickups.cpp src/game/original/PowerupPickups.cpp src/game/original/spawn_object.cpp

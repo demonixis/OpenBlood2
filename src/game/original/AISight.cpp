@@ -21,6 +21,8 @@ namespace OpenBlood2
                 return "Invalid query/identity";
             case AISightOutcome::Unavailable:
                 return "Collision unavailable";
+            case AISightOutcome::Always:
+                return "Visible: Nightmare always sees";
         }
         return "Unknown sight outcome";
     }
@@ -36,6 +38,11 @@ bool AI_Mgr::CanSee(HOBJECT target)
     {
         sight.outcome = AISightOutcome::Invalid;
         return false;
+    }
+    if (npc_type == NPCType::Nightmare)
+    {
+        sight.outcome = AISightOutcome::Always;
+        return true;
     }
     DRotation rotation;
     sight.origin_head = server->GetModelNodeTransform(m_hObject, "head", &sight.origin, &rotation);

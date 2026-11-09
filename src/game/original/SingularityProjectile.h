@@ -3,10 +3,10 @@
 // Original GameProjectiles.cpp CSingularityProjectile; see singularity_contracts.md.
 // A still, zero-scale grenade model: its first update arms it where its forward ray
 // stops; then for five seconds it pulls, damages and swallows attractable models.
-class CSingularityProjectile final : public CProjectile
+class CSingularityProjectile : public CProjectile
 {
   public:
-    CSingularityProjectile();
+    CSingularityProjectile() : CSingularityProjectile(false) {}
     static constexpr float attract_radius = 600, kill_radius = 50, attract_time = 5; // SINGULARITY_ATTRACT_*.
     bool armed = false;
     float arm_time = 0; // Source m_fStartTime, set when armed.
@@ -22,11 +22,19 @@ class CSingularityProjectile final : public CProjectile
     } // Zero projectile velocity; the source never flies it.
 
   protected:
+    explicit CSingularityProjectile(bool alternate);
     bool Update() override;
     void AddExplosion(DVector, DVector) override;
     void SaveBlock(ProjectileBlock&) const override;
     std::string LoadBlock(const ProjectileBlock&) override;
 
   private:
+    const bool alternate_;
     void Damage(HOBJECT, float amount, DVector at);
+};
+
+class CSingularityAltProjectile final : public CSingularityProjectile
+{
+  public:
+    CSingularityAltProjectile() : CSingularityProjectile(true) {}
 };

@@ -54,7 +54,8 @@ namespace OpenBlood2
         Blocked,
         Miss,
         Invalid,
-        Unavailable
+        Unavailable,
+        Always
     };
     const char* ai_sight_outcome_name(AISightOutcome);
     struct AISight
@@ -128,14 +129,15 @@ class AI_Mgr : public CBaseCharacter
         UndeadGideon,
         AncientOne,
         AncientOneTentacle,
-        Gremlin // _ADD_ON GremlinAI (Nightmares edition only).
+        Gremlin,  // _ADD_ON GremlinAI (Nightmares edition only).
+        Nightmare // _ADD_ON boss.
     };
     static void ResetRuntimeTables();
     // Shared class/gender tables: Cultist m/f, Civilian m/f, Gideon, Fanatic, Prophet, SoulDrudge, Shikari,
     // MadScientist, BoneLeech, DrudgeLord, Thief, Naga, Zealot, Behemoth, Priest, Shroud, Hand, Caleb,
     // Gabriella/REV, Ophelia/REV and Ishmael/REV (six independent original static tables), Ancient
-    // One/Tentacle, the add-on robe Cultist (CultistAI::m_Robe_Anim_Sound, slot 30) and GremlinAI (31).
-    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 32>;
+    // One/Tentacle, the add-on robe Cultist (30), GremlinAI (31) and Nightmare (32).
+    using RuntimeTables = std::array<std::shared_ptr<CAnim_Sound>, 33>;
     // Original WeaponStrToInt prefixes; false for a matched family not integrated here.
     static bool WeaponStrToInt(std::string_view, DBYTE&);
     static void ExchangeRuntimeTables(RuntimeTables&);
@@ -366,7 +368,7 @@ class AI_Mgr : public CBaseCharacter
     bool AI_STATE_Passive();
     virtual bool AI_STATE_Teleport();
     virtual bool AI_STATE_Special(int); // Consolidates the eight original virtual handlers.
-    int m_nLastState = StateIdle, m_nCurMetacmd = 1, m_nTrapped = 0;
+    int m_nLastState = StateIdle, m_nCurMetacmd = 1;
     DDWORD m_nCurAnimation = 999;
     bool m_bAnimating = false, m_bHasTargeted = false, animation_blocked = false;
     float m_fWaitForIdleTime = 0;

@@ -357,6 +357,18 @@ namespace OpenBlood2
                 ballistic_vertices.push_back({{a.x, a.y, a.z}, {tracer_color.x, .8f * tracer_color.y, 0, .1f}});
                 ballistic_vertices.push_back({{b.x, b.y, b.z}, {tracer_color.x, 0, 0, .9f}});
             }
+        for (const auto& line : source.effects.frame().lines)
+        {
+            const auto& geometry = line.geometry;
+            auto push = [&](DVector pos, DVector color, float alpha)
+            {
+                ballistic_vertices.push_back(
+                    {{pos.x, pos.y, pos.z}, {color.x * tracer_color.x, color.y * tracer_color.y,
+                                            color.z * tracer_color.z, alpha}});
+            };
+            push(geometry.from, geometry.start_color, geometry.start_alpha);
+            push(geometry.to, geometry.end_color, geometry.end_alpha);
+        }
         rebuilt = client_world_epoch_ != replica.frame().world || mesh_revision != source.world_revision ||
                   built_lightmaps_ != lightmaps || texture_decoration_changed_;
         const auto model_revision = model_scene.revision, effect_revision = explosion_model_scene.revision,
@@ -481,7 +493,7 @@ namespace OpenBlood2
                                                   : 1,
                                       true) ||
              !ballistic_lines.upload(commands, ballistic_vertices, error)))
-            return fail("Ballistic tracers");
+            return fail("Scene lines");
         // Renderers stage uploads in the shared registry; one copy pass in the frame's
         // command buffer records them all before the scene pass.
         if (!world_renderer.prepare(world_mesh, mesh_revision, format, width, height, error))

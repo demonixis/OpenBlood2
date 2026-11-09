@@ -1,4 +1,6 @@
 #include "game/original/ClientLightFX.h"
+#include "game/original/NativeLight.h"
+#include "game/original/Projectile.h"
 #include "game/server_adapter.h"
 #include <algorithm>
 #include <cmath>
@@ -18,16 +20,25 @@ namespace OpenBlood2
     {
         if (!trace_service("PublishLightEffect"))
             return false;
+        if (!IsObjectAlive(h))
+            return objects_.fail(ObjectError::Unsupported, "Invalid light source");
+        const auto* record = objects_.get(h);
+        const bool native = dynamic_cast<LightFX*>(record->game.get());
+        if (!native && !dynamic_cast<ClientLightFX*>(record->game.get()) &&
+            !dynamic_cast<CProjectile*>(record->game.get()))
+            return objects_.fail(ObjectError::Unsupported, "Invalid light source class");
         const auto reference = effect_reference(h);
-        if (!IsObjectAlive(h) || !dynamic_cast<ClientLightFX*>(objects_.get(h)->game.get()) ||
-            light_effects.size() >= 4096 ||
-            std::any_of(light_effects.begin(), light_effects.end(),
-                        [reference](const auto& l) { return l.source == reference; }))
+        auto existing = std::find_if(light_effects.begin(), light_effects.end(),
+                                     [reference](const auto& l) { return l.source == reference; });
+        if (existing != light_effects.end() ? !native : light_effects.size() >= 4096)
             return objects_.fail(ObjectError::Unsupported, "Invalid/duplicate light source or light limit exceeded");
         CLightFX effect;
-        if (!effect.Init(reference, settings, GetTime(), objects_.get(h)->state.m_Pos))
+        if (!effect.Init(reference, settings, GetTime(), record->state.m_Pos))
             return objects_.fail(ObjectError::InvalidProperty, "Invalid light descriptor/pose");
-        light_effects.push_back(std::move(effect));
+        if (existing == light_effects.end())
+            light_effects.push_back(std::move(effect));
+        else
+            *existing = std::move(effect);
         return true;
     }
     void ServerAdapter::RemoveLightEffect(HOBJECT h)

@@ -14,6 +14,20 @@ namespace OpenBlood2
             error = "Explosion requires a finite position and nonzero normal";
             return false;
         }
+        if (type == 36)
+            return true;
+        if (type >= 33 && type <= 35)
+        {
+            ExplosionLightSettings s;
+            s.position = position;
+            s.color1 = {0, .75f, 0};
+            s.color2 = {.5f, .5f, .5f};
+            s.duration = type == 33 ? 1.25f : type == 34 ? 20.f : 10.f;
+            s.radius1 = type == 34 ? 125.f : 75.f;
+            s.radius2 = type == 34 ? 50.f : 25.f;
+            out.push_back(s);
+            return true;
+        }
         if (type == 21 || type == 26 || type == 30 || type == 31)
             return true;
         if (type == 18 || type == 23 || type == 24 || type == 25 || type == 28 || type == 29)
@@ -130,7 +144,7 @@ namespace OpenBlood2
             out.push_back(s);
             return true;
         }
-        if (type > 6 && type != 8 && (type < 9 || type > 11))
+        if (type > 6 && type != 8 && (type < 9 || type > 11) && type != 32)
         {
             error = "Explosion light recipe is unavailable";
             return false;

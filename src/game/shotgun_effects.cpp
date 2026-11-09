@@ -3,6 +3,7 @@
 #include "client/effect_services.h"
 #include "engine/collision.h"
 #include "engine/texture.h"
+#include "game/legacy_weapon_effect.h"
 #include "game/original/SparksFX.h"
 #include "game/weapon_sprites.h"
 #include <algorithm>
@@ -12,6 +13,8 @@ namespace OpenBlood2
 {
     namespace
     {
+        constexpr std::size_t splash_particles = 2048;
+
         DVector unit(DVector v)
         {
             return vector_scale(v, 1 / std::sqrt(vector_dot(v, v)));
@@ -44,21 +47,139 @@ namespace OpenBlood2
     {
         return lo + random_() % (hi - lo + 1);
     }
+    std::uint64_t ShotgunEffects::add_sprite(ShotgunSprite fx, SpriteStore& store, const Resources& resources,
+                                            double now, bool& reused, std::string& error)
+    {
+        reused = false;
+        if (fx.kind == ShotgunSpriteKind::Mark)
+        {
+            ShotgunSprite* closest = nullptr;
+            float distance = 100;
+            unsigned nearby = 0;
+            for (auto& old : sprites)
+            {
+                if (old.kind != ShotgunSpriteKind::Mark)
+                    continue;
+                const auto delta = vector_subtract(old.position, fx.position);
+                const auto squared = vector_dot(delta, delta);
+                if (squared >= 100)
+                    continue;
+                if (squared < distance)
+                {
+                    closest = &old;
+                    distance = squared;
+                }
+                if (++nearby > 10)
+                {
+                    closest->position = fx.position;
+                    reused = true;
+                    return closest->id;
+                }
+            }
+        }
+        if (!sprite(store, resources, fx.resource, fx.sprite, error))
+            return 0;
+        const auto id = fx.id = next_id_++;
+        fx.last_time = now;
+        const auto limit = fx.kind == ShotgunSpriteKind::Mark ? 300 : 80;
+        const auto same_kind = [&](const auto& old) { return old.kind == fx.kind; };
+        if (std::count_if(sprites.begin(), sprites.end(), same_kind) >= limit)
+            sprites.erase(std::find_if(sprites.begin(), sprites.end(), same_kind));
+        sprites.push_back(std::move(fx));
+        return id;
+    }
+
+    std::uint64_t ShotgunEffects::publish_mark(const ImpactMarkSettings& settings, std::vector<DVector> polygon,
+                                               SpriteStore& store, const Resources& resources, double now,
+                                               bool& reused, std::string& error)
+    {
+        error.clear();
+        ShotgunSprite mark;
+        if (!physics_vector(settings.position) || !std::isfinite(settings.scale) || settings.scale <= 0 ||
+            settings.scale > 100 || !align_rotation(settings.normal, settings.normal, mark.rotation))
+        {
+            error = "Invalid impact mark";
+            return 0;
+        }
+        mark.position = settings.position;
+        mark.resource = settings.sprite;
+        mark.clip_polygon = std::move(polygon);
+        mark.scale = {settings.scale, settings.scale, settings.scale};
+        mark.color = {.1f, .1f, .1f};
+        return add_sprite(std::move(mark), store, resources, now, reused, error);
+    }
     void ShotgunEffects::emit(ShotgunSplash& s)
     {
-        for (unsigned i = 0; i < 4; ++i)
+        const auto& fx = s.settings;
+        const auto base_velocity = vector_scale(fx.direction, fx.height);
+        const auto count = std::min(static_cast<std::size_t>(std::ceil(fx.density)),
+                                    splash_particles - s.particles.size());
+        for (std::size_t i = 0; i < count; ++i)
         {
             Particle p;
-            p.position = {random(-1, 1), random(-1, 1), random(-1, 1)};
-            p.velocity = vector_add(vector_scale(s.normal, 175), {random(-10, 10), random(-10, 10), random(-10, 10)});
-            p.color = vector_scale(integer(0, 1) ? s.color1 : s.color2, 1.f / 255);
-            p.lifetime = .75f;
+            p.position = {random(-fx.position_radius, fx.position_radius), random(-fx.position_radius, fx.position_radius),
+                          random(-fx.position_radius, fx.position_radius)};
+            p.velocity = vector_add(base_velocity, {random(-fx.spread, fx.spread), random(-fx.spread, fx.spread),
+                                                    random(-fx.spread, fx.spread)});
+            p.color = vector_scale(integer(0, 1) ? fx.color1 : fx.color2, 1.f / 255);
+            p.lifetime = fx.duration;
             s.particles.push_back(p);
         }
+    }
+    std::uint64_t ShotgunEffects::publish_splash(const SplashSettings& settings, SpriteStore& store,
+                                                const Resources& resources, double now, std::string& error)
+    {
+        error.clear();
+        const auto in_range = [](float value, float min, float max) { return value >= min && value <= max; };
+        ShotgunSprite ripple;
+        if (!std::isfinite(now) || now < 0 || !physics_vector(settings.position) ||
+            !physics_vector(settings.direction) || !physics_vector(vector_scale(settings.direction, settings.height)) ||
+            !color(settings.color1) || !color(settings.color2) || !in_range(settings.radius, 0, 32000) ||
+            !in_range(settings.position_radius, 0, 10000) || !in_range(settings.density, 0, splash_particles) ||
+            !in_range(settings.spread, 0, 10000) || !in_range(settings.spray_time, 0, 60) ||
+            !in_range(settings.duration, 0, 60) || !in_range(settings.gravity, -10000, 10000) ||
+            (settings.ripple && (!physics_vector(settings.ripple_scale) ||
+                                 !align_rotation(settings.direction, {0, 1, 0}, ripple.rotation))))
+        {
+            error = "Invalid splash payload";
+            return 0;
+        }
+        ShotgunSplash splash;
+        splash.settings = settings;
+        if (splash.settings.texture.empty())
+            splash.settings.texture = SplashSettings{}.texture;
+        if (!texture(resources, splash.settings.texture, error))
+            return 0;
+        if (settings.ripple)
+        {
+            ripple.kind = ShotgunSpriteKind::Ripple;
+            ripple.position = settings.position;
+            ripple.scale = settings.ripple_scale;
+            ripple.alpha = .25f;
+            ripple.duration = 1;
+            ripple.resource = "Sprites/ripple.spr";
+            bool reused;
+            if (!add_sprite(std::move(ripple), store, resources, now, reused, error))
+                return 0;
+        }
+        const auto id = splash.id = next_id_++;
+        splash.start = splash.last_time = now;
+        emit(splash);
+        if (splashes.size() == 80)
+            splashes.erase(splashes.begin());
+        splashes.push_back(std::move(splash));
+        return id;
     }
     std::uint64_t ShotgunEffects::publish(const EffectOwner& owner, const ShotgunEffectSettings& s, ModelStore& models,
                                           SpriteStore& store, const Resources& resources, double now,
                                           const EffectServices& services, std::string& error)
+    {
+        return publish(owner, s, models, store, resources, now, services, error, std::nullopt);
+    }
+    std::uint64_t ShotgunEffects::publish(const EffectOwner& owner, const ShotgunEffectSettings& s, ModelStore& models,
+                                          SpriteStore& store, const Resources& resources, double now,
+                                          const EffectServices& services, std::string& error,
+                                          std::optional<std::uint32_t> selected)
     {
         error.clear();
         ShotgunEffectReport report;
@@ -73,12 +194,15 @@ namespace OpenBlood2
                 error += message;
             }
         };
+        const bool bullet = s.ammo == AMMO_BULLET || s.ammo == AMMO_SHELL || s.ammo == AMMO_BMG;
+        const auto enabled = [&](WeaponEffectFlag flag, bool standard)
+        { return selected ? (*selected & flag) != 0 : standard; };
         if (!owner || owner.name.size() > 100 || s.clip_polygon.size() > 512 ||
             std::any_of(s.clip_polygon.begin(), s.clip_polygon.end(), [](auto p) { return !physics_vector(p); }) ||
             !physics_vector(s.source) || !physics_vector(s.destination) || !physics_vector(s.forward) ||
             !physics_vector(s.normal) || vector_dot(s.forward, s.forward) < 1e-12f ||
             vector_dot(s.normal, s.normal) < 1e-12f || !color(s.color1) || !color(s.color2) || !std::isfinite(now) ||
-            now < 0 || (s.ammo != AMMO_BULLET && s.ammo != AMMO_SHELL && s.ammo != AMMO_BMG))
+            now < 0 || (!selected && !bullet))
             error = "Invalid ballistic effect payload";
         else
         {
@@ -111,7 +235,7 @@ namespace OpenBlood2
                     ++report.bubbles;
                 failure(e);
             };
-            if (s.eject)
+            if (bullet && enabled(WFX_MUZZLESMOKE, s.eject))
             {
                 if (containers && IsLiquid(source_code) && s.surface != SURFTYPE_LIQUID)
                     bubble(s.source);
@@ -140,6 +264,9 @@ namespace OpenBlood2
                     report.smoke = services.weapon_sprite(ws, owner.name, e);
                     failure(e);
                 }
+            }
+            if (enabled(WFX_EJECTSHELL, s.eject))
+            {
                 DRotation eject_rotation;
                 align_rotation(direction, {0, 1, 0}, eject_rotation);
                 for (unsigned i = 0; i < (s.ammo == AMMO_SHELL ? 2u : s.ammo == AMMO_BULLET ? 1u : 0u); ++i)
@@ -176,7 +303,7 @@ namespace OpenBlood2
                     failure(e);
                 }
             }
-            if (s.eject && s.ammo == AMMO_BULLET)
+            if (enabled(WFX_TRACER, s.eject && s.ammo == AMMO_BULLET))
             {
                 // CTracerFX uses the impact-normal rotation, not the velocity/damage direction.
                 // It is stationary for .1 s; its supplied velocity is never applied.
@@ -204,50 +331,16 @@ namespace OpenBlood2
                 else if (result != SegmentResult::Miss)
                     failure("Tracer world ray unavailable");
             }
-            auto add_sprite = [&](ShotgunSprite fx)
+            auto publish_sprite = [&](ShotgunSprite fx)
             {
-                if (fx.kind == ShotgunSpriteKind::Mark)
-                {
-                    ShotgunSprite* closest = nullptr;
-                    float distance = 100;
-                    unsigned nearby = 0;
-                    for (auto& old : sprites)
-                    {
-                        if (old.kind != ShotgunSpriteKind::Mark)
-                            continue;
-                        const auto delta = vector_subtract(old.position, fx.position);
-                        const auto d = vector_dot(delta, delta);
-                        if (d >= 100)
-                            continue;
-                        if (d < distance)
-                        {
-                            closest = &old;
-                            distance = d;
-                        }
-                        if (++nearby > 10)
-                        {
-                            closest->position = fx.position;
-                            return true;
-                        }
-                    }
-                }
                 std::string e;
-                if (sprite(store, resources, fx.resource, fx.sprite, e))
-                {
-                    fx.id = next_id_++;
-                    fx.last_time = now;
-                    const auto limit = fx.kind == ShotgunSpriteKind::Mark ? 300 : 80;
-                    if (std::count_if(sprites.begin(), sprites.end(),
-                                      [&](const auto& old) { return old.kind == fx.kind; }) >= limit)
-                        sprites.erase(std::find_if(sprites.begin(), sprites.end(),
-                                                   [&](const auto& old) { return old.kind == fx.kind; }));
-                    sprites.push_back(std::move(fx));
-                    return true;
-                }
+                bool reused;
+                const auto id = add_sprite(std::move(fx), store, resources, now, reused, e);
                 failure(e);
-                return false;
+                return id != 0;
             };
-            if (s.surface != SURFTYPE_UNKNOWN && s.surface != SURFTYPE_FLESH && s.surface != SURFTYPE_SKY &&
+            if (enabled(WFX_MARK, true) && s.surface != SURFTYPE_UNKNOWN && s.surface != SURFTYPE_FLESH &&
+                s.surface != SURFTYPE_SKY &&
                 s.surface != SURFTYPE_GLASS)
             {
                 ShotgunSprite fx;
@@ -274,12 +367,12 @@ namespace OpenBlood2
                         break;
                 }
                 fx.resource = "Sprites/blthole" + suffix + ".spr";
-                if (add_sprite(std::move(fx)))
+                if (publish_sprite(std::move(fx)))
                     ++report.marks;
             }
-            if (s.surface == SURFTYPE_WOOD || s.surface == SURFTYPE_STONE)
+            if (enabled(WFX_FRAGMENTS, true) && (s.surface == SURFTYPE_WOOD || s.surface == SURFTYPE_STONE))
             {
-                if (containers && IsLiquid(dest_code))
+                if (!selected && containers && IsLiquid(dest_code))
                     bubble(s.destination);
                 DVector velocity = vector_scale(normal, normal.y > .5f ? 3.f : 1.f);
                 const auto count = integer(1, 3);
@@ -303,28 +396,20 @@ namespace OpenBlood2
                     fx.yaw_velocity = random(-2 * std::numbers::pi_v<float>, 2 * std::numbers::pi_v<float>);
                     fx.resource = std::string("Sprites/") + (wood ? "woodsplint" : "stonechip") +
                                   std::to_string(integer(1, 3)) + ".spr";
-                    if (add_sprite(std::move(fx)))
+                    if (publish_sprite(std::move(fx)))
                         ++report.fragments;
                 }
             }
-            if (s.surface == SURFTYPE_LIQUID)
+            if (enabled(WFX_SPLASH, s.surface == SURFTYPE_LIQUID))
             {
                 std::string e;
-                if (texture(resources, "SpriteTextures/drop32_1.dtx", e))
-                {
-                    ShotgunSplash splash;
-                    splash.id = next_id_++;
-                    splash.position = s.destination;
-                    splash.normal = normal;
-                    splash.color1 = s.color1;
-                    splash.color2 = s.color2;
-                    splash.start = splash.last_time = now;
-                    emit(splash);
-                    if (splashes.size() == 80)
-                        splashes.erase(splashes.begin());
-                    splashes.push_back(std::move(splash));
+                SplashSettings splash;
+                splash.position = s.destination;
+                splash.direction = normal;
+                splash.color1 = s.color1;
+                splash.color2 = s.color2;
+                if (publish_splash(splash, store, resources, now, e))
                     ++report.splashes;
-                }
                 failure(e);
                 ShotgunSprite ripple;
                 ripple.kind = ShotgunSpriteKind::Ripple;
@@ -334,7 +419,7 @@ namespace OpenBlood2
                 ripple.alpha = .25f;
                 ripple.duration = 1;
                 ripple.resource = "Sprites/ripple.spr";
-                add_sprite(std::move(ripple));
+                publish_sprite(std::move(ripple));
             }
         }
         report.error = error;
@@ -468,14 +553,15 @@ namespace OpenBlood2
             if (dt < .001)
                 continue;
             s.last_time = now;
-            if (!advance_particles(s.particles, -500, dt, s.error))
+            if (!advance_particles(s.particles, s.settings.gravity, dt, s.error, splash_particles))
                 update_error = s.error;
-            if (now < s.start + .3)
+            else if (now < s.start + s.settings.spray_time)
                 emit(s);
         }
         // Source can retain an empty parentless splash indefinitely; retire once no particle remains.
         std::erase_if(splashes,
-                      [&](const auto& s) { return !s.error.empty() || (now >= s.start + .3 && s.particles.empty()); });
+                      [&](const auto& s)
+                      { return !s.error.empty() || (now >= s.start + s.settings.spray_time && s.particles.empty()); });
     }
     void ShotgunEffects::clear()
     {

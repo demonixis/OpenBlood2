@@ -1,5 +1,6 @@
 #pragma once
 #include "client/effect_runtime.h"
+#include "client/line_effects.h"
 #include "game/blood_splats.h"
 #include "game/blood_spurts.h"
 #include "game/explosion_flames.h"
@@ -51,5 +52,7 @@ namespace OpenBlood2
         FleshGibs flesh_gibs, destruction_debris;
         ExplosionFragments explosion_fragments;
         std::vector<CLightFX> light_effects;
+        std::vector<DetachedEffectLine> detached_lines;
+        std::uint64_t next_line_id = 1;
     };
 } // namespace OpenBlood2

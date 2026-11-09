@@ -4,6 +4,21 @@
 #include "engine/collision.h"
 #include <algorithm>
 using namespace OpenBlood2;
+
+RotatingSprite::RotatingSprite()
+{
+    rotating.model_rotation = true; // Rotate the sprite's pose using the ordinary-object path.
+    AddAggregate(&rotating);
+}
+
+DDWORD RotatingSprite::EngineMessageFn(DDWORD message, void* data, DFLOAT reason)
+{
+    if (message == MID_INITIALUPDATE)
+        rotating.Init(m_hObject);
+    const auto accepted = DetailSprite::EngineMessageFn(message, data, reason);
+    return message == MID_PRECREATE ? accepted && rotating.valid : accepted;
+}
+
 bool DetailSprite::ReadProp()
 {
     GenericProp p;

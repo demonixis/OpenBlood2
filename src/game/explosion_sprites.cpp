@@ -39,6 +39,22 @@ namespace OpenBlood2
             s.resource = path;
             out.push_back(std::move(s));
         };
+        if (type == 32)
+        {
+            add(25, .5f, .5f, 1.5f, 1, 0, 0, "Sprites\\fireball2.spr");
+            add(25, .5f, 3, 15, .85f, 1, 0, "Sprites_ao\\greensmoke.spr");
+            return true;
+        }
+        if (type >= 33 && type <= 35)
+        {
+            if (type == 34)
+                normal = {0, 1, 0};
+            add(0, 0, type == 33 ? .35f : type == 34 ? .45f : .2f, type == 33 ? 2.f : type == 34 ? 22.f : 11.f,
+                .85f, 1, type == 34 ? 2 : 0, "Sprites_ao\\greenrift.spr");
+            return true;
+        }
+        if (type == 36)
+            return true;
         if (type == 29 || type == 30 || type == 31)
         {
             if (type == 31)
