@@ -95,6 +95,10 @@ namespace OpenBlood2
         first = 0;
         binding = -1;
         pressed_ = -1;
+        multiplayer_status.clear();
+        multiplayer_edit.reset();
+        if (pending_.action == MenuAction::MultiplayerOption)
+            pending_ = {};
         ++revision;
         switch (page)
         {
@@ -263,6 +267,14 @@ namespace OpenBlood2
                 items.back().localization_key = "menu.no";
                 selected = 1;
                 break;
+            case MenuPage::Bloodbath:
+            case MenuPage::MultiplayerHost:
+            case MenuPage::MultiplayerJoin:
+            case MenuPage::MultiplayerProfile:
+            case MenuPage::MultiplayerRotation:
+            case MenuPage::MultiplayerLan:
+            case MenuPage::MultiplayerPause:
+                break; // The application owns the multiplayer options and LAN results.
         }
         for (auto& item : items)
         {
@@ -355,12 +367,54 @@ namespace OpenBlood2
             first = top_row;
         }
     }
+    bool Menu::in_multiplayer() const
+    {
+        switch (page)
+        {
+            case MenuPage::Bloodbath:
+            case MenuPage::MultiplayerHost:
+            case MenuPage::MultiplayerJoin:
+            case MenuPage::MultiplayerProfile:
+            case MenuPage::MultiplayerRotation:
+            case MenuPage::MultiplayerLan:
+            case MenuPage::MultiplayerPause:
+                return true;
+            default:
+                return false;
+        }
+    }
+    void Menu::set_multiplayer_rows(std::vector<MenuItem> next)
+    {
+        if (!in_multiplayer() || std::ranges::equal(items, next,
+                                                    [](const MenuItem& a, const MenuItem& b)
+                                                    {
+                                                        return a.string_id == b.string_id && a.command == b.command &&
+                                                               a.enabled == b.enabled && a.adjustable == b.adjustable &&
+                                                               a.literal == b.literal &&
+                                                               a.localized_literal == b.localized_literal &&
+                                                               a.localization_key == b.localization_key;
+                                                    }))
+            return;
+        cancel_pointer();
+        items = std::move(next);
+        selected = std::clamp(selected, 0, std::max(0, int(items.size()) - 1));
+        if (!items.empty() && !enabled(items[selected]))
+        {
+            const auto row = std::ranges::find_if(items, [this](const MenuItem& item) { return enabled(item); });
+            if (row != items.end())
+                selected = int(row - items.begin());
+        }
+        first = std::min(first, selected);
+        ++revision;
+    }
     void Menu::close()
     {
         active = false;
         binding = -1;
         promotion = MenuPromotion::None;
         promotion_exit = false;
+        multiplayer_status.clear();
+        multiplayer_edit.reset();
         cancel_pointer();
         ++revision;
     }
@@ -400,7 +454,20 @@ namespace OpenBlood2
             case MenuPage::Solo:
             case MenuPage::Options:
             case MenuPage::Quit:
+            case MenuPage::Bloodbath:
+            case MenuPage::MultiplayerPause:
                 build(MenuPage::Main);
+                break;
+            case MenuPage::MultiplayerHost:
+            case MenuPage::MultiplayerJoin:
+            case MenuPage::MultiplayerProfile:
+                build(MenuPage::Bloodbath);
+                break;
+            case MenuPage::MultiplayerRotation:
+                build(MenuPage::MultiplayerHost);
+                break;
+            case MenuPage::MultiplayerLan:
+                build(MenuPage::MultiplayerJoin);
                 break;
             case MenuPage::Difficulty:
                 build(story || nightmares ? MenuPage::Solo : MenuPage::Character);
@@ -452,8 +519,18 @@ namespace OpenBlood2
             !enabled(items[selected]) || binding >= 0 || pending_.action == MenuAction::NewGame ||
             pending_.action == MenuAction::Credits || pending_.action == MenuAction::Quit ||
             pending_.action == MenuAction::SaveGame || pending_.action == MenuAction::LoadGame ||
-            pending_.action == MenuAction::Warp)
+            pending_.action == MenuAction::Warp || pending_.action == MenuAction::MultiplayerOption)
             return;
+        if (in_multiplayer())
+        {
+            if (items[selected].command < 0)
+                return;
+            cue(MenuCue::Enter);
+            pending_.action = MenuAction::MultiplayerOption;
+            pending_.option = items[selected].command;
+            pending_.direction = 0;
+            return;
+        }
         if (items[selected].setting >= 0)
         {
             adjust(1);
@@ -601,6 +678,17 @@ namespace OpenBlood2
         if (!active || promotion != MenuPromotion::None || selected < 0 || selected >= int(items.size()) ||
             !enabled(items[selected]) || binding >= 0)
             return;
+        if (in_multiplayer())
+        {
+            if (items[selected].command >= 0 && items[selected].adjustable && pending_.action == MenuAction::None)
+            {
+                cue(MenuCue::Select);
+                pending_.action = MenuAction::MultiplayerOption;
+                pending_.option = items[selected].command;
+                pending_.direction = direction < 0 ? -1 : 1;
+            }
+            return;
+        }
         auto before = settings;
         const auto cycle = [direction](const auto& values, auto value)
         {
@@ -780,6 +868,8 @@ namespace OpenBlood2
             const int pressed = std::exchange(pressed_, -1);
             if (hit >= 0 && pressed == hit)
             {
+                if (selected != hit && in_multiplayer())
+                    ++revision;
                 selected = hit;
                 const auto& item = items[hit];
                 const auto r = item.slider_rect;
@@ -810,10 +900,13 @@ namespace OpenBlood2
     {
         return page == MenuPage::Audio || page == MenuPage::Mouse || page == MenuPage::Display ||
                page == MenuPage::Controls || page == MenuPage::Vr || page == MenuPage::Cheats ||
-               page == MenuPage::Save || page == MenuPage::Load || page == MenuPage::Quit;
+               page == MenuPage::Save || page == MenuPage::Load || page == MenuPage::Quit ||
+               (in_multiplayer() && page != MenuPage::Bloodbath && page != MenuPage::MultiplayerPause);
     }
     const char* Menu::title() const
     {
+        if (in_multiplayer())
+            return "bloodbath.pcx";
         switch (page)
         {
             case MenuPage::Options:

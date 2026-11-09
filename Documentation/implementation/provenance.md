@@ -44,6 +44,14 @@ loop. Original character/team and host rule defaults are retained; ENet discover
 and UI lifecycle are new engine code, not retail wire compatibility. See the
 [source ledger](sources/m9_multiplayer_menu_sources.json).
 
+The [native Bloodbath menu](../contracts/menu_contracts.md#m9-network-entry) ports
+the `CMenuMain` and `CMainMenus` route to the `CMenuBloodBath` hub. Its title path,
+three row IDs, order and large-font layout follow `CMenuBloodBath::Build`. The
+portable configuration and in-session pages use the existing menu renderer and the
+M9 session flow. The original commands opened the Windows networking wizard and
+character screen. The [source ledger](sources/bloodbath_menu_sources.json) records
+the selected source and resources.
+
 The M9 [network ObjectFX lot](reports/m9_object_network.md) carries the existing
 25 original owner-particle recipes as bounded value metadata. Original emission,
 texture selection, finite duration and multiplayer stop/resume remain in the client

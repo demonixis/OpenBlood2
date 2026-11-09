@@ -4,8 +4,8 @@
 #include "app/display_options.h"
 #include "app/gamepad_devices.h"
 #include "app/hud.h"
-#include "app/movement_controls.h"
-#include "app/multiplayer_screen.h"
+#include "app/menu_input.h"
+#include "app/menu_renderer.h"
 #include "app/network_controls.h"
 #include "app/scene_presenter.h"
 #include "app/scoreboard.h"
@@ -20,13 +20,45 @@
 #include "server/network.h"
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlgpu3.h>
-#include <imgui.h>
 #include <cfloat>
+#include <imgui.h>
 #include <memory>
 #include <spdlog/spdlog.h>
 
 namespace OpenBlood2
 {
+    namespace
+    {
+        constexpr int resume_option = 0, leave_option = 1;
+
+        // CLI sessions can still use the same menu controls if their data is missing the original menu art.
+        void draw_network_menu_fallback(Menu& menu, std::string_view title, ImFont* font)
+        {
+            const auto* viewport = ImGui::GetMainViewport();
+            const auto fit = MenuViewport::fit(viewport->Size.x, viewport->Size.y);
+            auto* draw = ImGui::GetBackgroundDrawList();
+            draw->AddRectFilled(viewport->Pos, {viewport->Pos.x + viewport->Size.x, viewport->Pos.y + viewport->Size.y},
+                                IM_COL32(0, 0, 0, 255));
+            const auto text = [&](std::string_view value, int y, float size, ImU32 color, float wrap = 0.f)
+            {
+                if (!value.empty())
+                    draw->AddText(font, size * fit.scale,
+                                  {viewport->Pos.x + fit.x + 60 * fit.scale, viewport->Pos.y + fit.y + y * fit.scale},
+                                  color, value.data(), value.data() + value.size(), wrap * fit.scale);
+            };
+            text(title, 95, 36, IM_COL32(220, 40, 30, 255));
+            for (std::size_t i = 0; i < menu.items.size(); ++i)
+            {
+                auto& item = menu.items[i];
+                const int y = 175 + 40 * int(i);
+                item.rect = {60, y, 580, y + 40};
+                text(item.localized_literal.empty() ? item.literal : item.localized_literal, y, 26,
+                     int(i) == menu.selected ? IM_COL32(255, 255, 255, 255) : IM_COL32(185, 185, 185, 255));
+            }
+            text(menu.multiplayer_status, 385, 18, IM_COL32(220, 220, 220, 255), 520);
+        }
+    } // namespace
+
     int run_network_session(const Options& options, const Config& config, Runtime& runtime, std::string& error,
                             bool& quit, const LocalizedFont* localized_font, ImFont* localized_face)
     {
@@ -88,10 +120,11 @@ namespace OpenBlood2
         else if (!Net::parse_address(options.connect_address, options.network_port, address, error))
             return failed();
 
-        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad;
+        ImGui::GetIO().ConfigFlags &= ~(ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad);
         ScenePresenter presenter(runtime.gpu);
         GamepadDevices devices;
-        MovementControls controls;
+        MenuInput menu_input;
+        auto& controls = menu_input.controls;
         NetworkControls actions;
         std::vector<Net::CommandAction> sampled_actions;
         MenuSettings settings;
@@ -111,12 +144,20 @@ namespace OpenBlood2
             if (localized_font)
                 presenter.set_texture_decoration(sign_texture_decoration(localization, *localized_font));
         }
-        const auto tr = [&](std::string_view key, const char* english)
-        { return multiplayer_label(&localization, localized ? localized_font : nullptr, key, english); };
-        Menu display_menu;
-        display_menu.settings = settings;
+        const auto translated = [&](std::string_view key)
+        {
+            const auto value = localization.text(key);
+            return localized && localized_font && localized_font->supports(value) ? value : std::string_view{};
+        };
+        const auto tr = [&](std::string_view key, std::string_view english)
+        {
+            const auto value = translated(key);
+            return value.empty() ? english : value;
+        };
+        Menu menu;
+        menu.settings = settings;
         DisplayOptions display(runtime);
-        if (!display.apply(display_menu, error))
+        if (!display.apply(menu, error))
             return failed();
         controls.mouse_sensitivity = .0025f * (settings.sensitivity / 150.f);
         controls.invert_y = settings.invert_y;
@@ -145,6 +186,14 @@ namespace OpenBlood2
         ScoreboardControl scores;
         if (!client.prepare(config, error))
             return failed();
+        MenuCanvas menu_canvas(client.resources());
+        menu_canvas.localization = &localization;
+        menu_canvas.localized_font = localized ? localized_font : nullptr;
+        MenuRenderer menu_renderer(runtime.gpu);
+        std::string menu_error;
+        bool native_menu = menu_canvas.initialize(menu_error);
+        if (!native_menu)
+            spdlog::warn("Multiplayer menu artwork: {}", menu_error);
         if (localized && localized_font && !localization_resource_overridden(client.resources(), "cres.dll"))
         {
             client.set_announcer_translations([&](unsigned id)
@@ -171,7 +220,7 @@ namespace OpenBlood2
         client.audio().mixer.output_lead = AudioMixer::interactive_output_lead;
         ServerClock server_clock;
         auto previous = NetworkClient::Clock::now();
-        bool menu = false, leaving = false, captured = false;
+        bool paused = false, leaving = false, captured = false;
         std::uint64_t entered_world = 0, weapon_wait_seen = 0, weapon_frames_seen = 0;
         bool weapon_stalled = false;
         unsigned frames = 0;
@@ -186,18 +235,75 @@ namespace OpenBlood2
                 return false;
             }
             leaving = true;
+            menu_input.reset(menu, false);
             return true;
         };
+        const auto sync_menu = [&]()
+        {
+            const bool ready = client.ready();
+            if (ready && !paused && !leaving)
+            {
+                if (menu.active)
+                {
+                    menu.close();
+                    menu_input.reset(menu, true);
+                }
+                return;
+            }
+            if (!menu.active)
+            {
+                menu.open(ready);
+                menu.build(MenuPage::MultiplayerPause);
+                menu.top = MenuPage::MultiplayerPause;
+            }
+            menu.in_world = ready;
+            std::vector<MenuItem> rows;
+            const auto add = [&](int command, std::string_view key, const char* label)
+            {
+                MenuItem item;
+                item.command = command;
+                item.literal = label;
+                item.localized_literal = translated(key);
+                rows.push_back(std::move(item));
+            };
+            if (ready && !leaving)
+                add(resume_option, "network.resume", "Resume");
+            if (!leaving)
+            {
+                if (server)
+                    add(leave_option, "network.end_host", "End hosted game");
+                else
+                    add(leave_option, "network.leave_game", "Leave game");
+            }
+            menu.set_multiplayer_rows(std::move(rows));
+            std::string status(leaving ? tr("network.leaving", "Leaving...")
+                               : ready ? tr("network.continues", "Game continues while this menu is open.")
+                                       : tr("network.connecting", "Connecting / loading world..."));
+            if (network && !network->discovery_error.empty())
+            {
+                status += '\n';
+                status += localization.format("network.discovery_failed", "{0}", {network->discovery_error});
+            }
+            if (menu.multiplayer_status != status)
+            {
+                menu.multiplayer_status = std::move(status);
+                ++menu.revision;
+            }
+        };
+        sync_menu();
         while (client.phase() != NetworkClient::Phase::Closed)
         {
             const auto frame_start = SDL_GetTicksNS();
+            int window_width = 0, window_height = 0;
+            SDL_GetWindowSize(runtime.window, &window_width, &window_height);
             SDL_Event event;
             while (SDL_PollEvent(&event))
             {
                 ImGui_ImplSDL3_ProcessEvent(&event);
                 devices.event(event);
                 scores.event(event, window,
-                             client.ready() && !client.changing_level() && controls.focused && !menu && !leaving);
+                             client.ready() && !client.changing_level() && controls.focused && !menu.active &&
+                                 !leaving);
                 if (event.type == SDL_EVENT_QUIT ||
                     (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == window))
                 {
@@ -205,20 +311,45 @@ namespace OpenBlood2
                     if (!leave())
                         return failed();
                 }
-                if ((event.type == SDL_EVENT_KEY_DOWN && event.key.windowID == window && !event.key.repeat &&
-                     event.key.scancode == SDL_SCANCODE_ESCAPE) ||
-                    (event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN && event.gbutton.button == SDL_GAMEPAD_BUTTON_START))
+                if (menu.active && !leaving)
                 {
-                    menu = !menu;
-                    if (!menu)
-                        controls.request_play();
+                    menu_input.event(event, window, menu, client.ready(), true, false, float(window_width),
+                                     float(window_height));
+                    const auto command = menu.take_command();
+                    if (command.action == MenuAction::Resume ||
+                        (command.action == MenuAction::MultiplayerOption && command.option == resume_option))
+                    {
+                        paused = false;
+                        if (menu.active)
+                        {
+                            menu.close();
+                            menu_input.reset(menu, client.ready());
+                        }
+                    }
+                    else if (command.action == MenuAction::MultiplayerOption && command.option == leave_option &&
+                             !leave())
+                        return failed();
+                    menu.cues.clear();
                 }
-                controls.enabled = !menu && !leaving;
-                controls.event(event, window, menu);
+                else
+                {
+                    if (!leaving && controls.focused &&
+                        ((event.type == SDL_EVENT_KEY_DOWN && event.key.windowID == window && !event.key.repeat &&
+                          event.key.scancode == SDL_SCANCODE_ESCAPE) ||
+                         (event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN &&
+                          event.gbutton.button == SDL_GAMEPAD_BUTTON_START)))
+                    {
+                        paused = true;
+                        sync_menu();
+                        menu_input.reset(menu, false);
+                    }
+                    controls.enabled = !menu.active && !leaving;
+                    controls.event(event, window, menu.active || leaving);
+                }
                 if (event.type == SDL_EVENT_WINDOW_FOCUS_GAINED && event.window.windowID == window)
                 {
                     devices.resync(controls);
-                    if (!menu)
+                    if (!menu.active && !leaving)
                         controls.request_play();
                 }
             }
@@ -240,20 +371,21 @@ namespace OpenBlood2
                 if (!network->pump(now, error))
                     return failed();
             }
-            controls.enabled = !menu && !leaving;
-            const auto input = controls.sample(menu);
+            const bool play_blocked = menu.active || leaving;
+            controls.enabled = !play_blocked;
+            const auto input = controls.sample(play_blocked);
             PlayerRotation aim{client.pitch(), client.yaw()};
-            controls.look(aim, seconds, menu, client.zoomed());
+            controls.look(aim, seconds, play_blocked, client.zoomed());
             if (!client.look(aim.pitch - client.pitch(), aim.yaw - client.yaw()))
                 return failed();
-            actions.sample(controls, menu || leaving || !client.ready() || client.changing_level(),
-                           {client.pitch(), client.yaw()}, sampled_actions);
+            const bool commands_blocked = play_blocked || !client.ready() || client.changing_level();
+            actions.sample(controls, commands_blocked, {client.pitch(), client.yaw()}, sampled_actions);
             for (const auto& action : sampled_actions)
                 if (!client.command(action, error))
                     spdlog::info("Player command: {}", error);
             // Preserve reliable Control order: selection/use precede this frame's
             // weapon timeline. Existing bindings suppress held fire across menus/focus.
-            const auto fire = controls.sample_fire(menu || leaving || !client.ready() || client.changing_level());
+            const auto fire = controls.sample_fire(commands_blocked);
             if (!client.update(now, input, controls.enabled && controls.focused, error, {fire.primary, fire.alternate}))
             {
                 if (server)
@@ -292,7 +424,8 @@ namespace OpenBlood2
                 scores.receive(applied);
             if (client.changing_level())
                 scores.visible = true;
-            if (!controls.sync_mouse(runtime.window, client.ready(), menu || leaving, error))
+            sync_menu();
+            if (!controls.sync_mouse(runtime.window, client.ready(), menu.active || leaving, error))
                 return failed();
             if (client.phase() == NetworkClient::Phase::Closed)
                 break;
@@ -300,8 +433,9 @@ namespace OpenBlood2
             ImGui_ImplSDL3_NewFrame();
             ImGui::NewFrame();
             const bool visible = client.ready();
+            const bool world_visible = visible && !menu.active;
             const auto& camera = client.camera();
-            if (visible)
+            if (world_visible)
             {
                 const auto& values = client.hud();
                 auto state =
@@ -317,7 +451,7 @@ namespace OpenBlood2
                 if (!hud.draw(state, client.resources(), error))
                     return failed();
                 draw_letterbox(camera.view.object && camera.view.settings.type == 1);
-                if (scores.visible && !menu && !leaving)
+                if (scores.visible)
                 {
                     const auto size = ImGui::GetMainViewport()->Size;
                     const auto density = ImGui::GetIO().DisplayFramebufferScale;
@@ -357,42 +491,21 @@ namespace OpenBlood2
                     draw->AddText(localized_face, height, pos, IM_COL32(255, 255, 255, 255), caption.data(), end, wrap);
                 }
             }
-            if (menu || !visible || leaving)
+            if (menu.active)
             {
-                if (localized)
-                    ImGui::PushFont(localized_face, 0);
-                ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, {0.5f, 0.5f});
-                ImGui::Begin(tr("network.title", "Multiplayer"), nullptr,
-                             ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
-                ImGui::TextUnformatted(leaving   ? tr("network.leaving", "Leaving...")
-                                       : visible ? tr("network.continues", "Game continues while this menu is open.")
-                                                 : tr("network.connecting", "Connecting / loading world..."));
-                if (network && !network->discovery_error.empty())
+                if (native_menu && !menu_canvas.compose(menu, 0, menu_error))
                 {
-                    const auto message = localization.format("network.discovery_failed", "{0}",
-                                                             {network->discovery_error});
-                    ImGui::TextWrapped("%s", message.c_str());
+                    spdlog::warn("Multiplayer menu artwork: {}", menu_error);
+                    native_menu = false;
                 }
-                if (!leaving)
+                if (native_menu)
                 {
-                    if (visible && ImGui::Button(tr("network.resume", "Resume")))
-                    {
-                        menu = false;
-                        controls.request_play();
-                    }
-                    if (ImGui::Button(server ? tr("network.end_host", "End hosted game")
-                                             : tr("network.leave_game", "Leave game")))
-                        if (!leave())
-                        {
-                            ImGui::End();
-                            if (localized)
-                                ImGui::PopFont();
-                            return failed();
-                        }
+                    if (!menu_renderer.draw(menu_canvas, error))
+                        return failed();
                 }
-                ImGui::End();
-                if (localized)
-                    ImGui::PopFont();
+                else
+                    draw_network_menu_fallback(menu, tr("network.title", "BLOODBATH"),
+                                               localized ? localized_face : ImGui::GetFont());
             }
             ImGui::Render();
             auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
@@ -421,7 +534,7 @@ namespace OpenBlood2
                 return failed();
             }
             auto* target = capture_frame ? capture.texture : swapchain;
-            if (visible)
+            if (world_visible)
             {
                 ClientScene scene{client.geometry(), client.resources(), client.world(), client.effects().scene()};
                 scene.world_revision = client.joined().world;
@@ -445,7 +558,7 @@ namespace OpenBlood2
             ImGui_ImplSDLGPU3_PrepareDrawData(ImGui::GetDrawData(), commands);
             SDL_GPUColorTargetInfo color{};
             color.texture = target;
-            color.load_op = visible ? SDL_GPU_LOADOP_LOAD : SDL_GPU_LOADOP_CLEAR;
+            color.load_op = world_visible ? SDL_GPU_LOADOP_LOAD : SDL_GPU_LOADOP_CLEAR;
             color.store_op = SDL_GPU_STOREOP_STORE;
             color.clear_color = {0, 0, 0, 1};
             auto* pass = SDL_BeginGPURenderPass(commands, &color, 1, nullptr);

@@ -776,23 +776,45 @@ namespace OpenBlood2
         }
         const auto& assets = menu_resources(menu_edition(resources_));
         canvas.DrawSurfaceToSurface(surface, background_, nullptr, 0, 0);
+        const std::string_view title_role = menu.title();
+        const bool bloodbath = title_role == "bloodbath.pcx";
+        if (bloodbath && !titles_.contains("bloodbath.pcx"))
+        {
+            // Stock retail artwork is optional for this page, and is never a solo startup requirement.
+            const auto* path = assets.title(title_role);
+            titles_["bloodbath.pcx"] = path ? canvas.CreateSurfaceFromBitmap(path) : nullptr;
+            canvas.error.clear();
+        }
         const auto title = titles_.find(menu.title());
-        if (title == titles_.end() || !title->second)
+        if (!bloodbath && (title == titles_.end() || !title->second))
         {
             error = std::string("Unavailable menu title: ") + menu.title();
             return false;
         }
-        const std::string_view title_role = menu.title();
         const unsigned title_id = title_role == "singleplayer.pcx" ? IDS_MENU_MAIN_SINGLEPLAYER
                                   : title_role == "options.pcx"    ? IDS_MENU_MAIN_OPTIONS
                                   : title_role == "savegame.pcx"   ? IDS_MENU_SINGLEPLAYER_SAVEGAME
                                   : title_role == "loadgame.pcx"   ? IDS_MENU_SINGLEPLAYER_LOADGAME
-                                                                  : 0;
+                                  : bloodbath                      ? IDS_MENU_TITLE_BLOODBATH
+                                                                   : 0;
         const auto original_title = strings.strings.find(title_id);
-        const std::string_view english_title = original_title == strings.strings.end() ? std::string_view("MAIN MENU")
-                                                                                      : original_title->second;
-        const auto translated_title = title_id ? translated(title_id) : translated("menu.main_title");
-        if (translated_title.empty() || translated_title == english_title || !localized_font->supports(translated_title))
+        const std::string_view fallback_title = bloodbath ? "BLOODBATH" : "MAIN MENU";
+        const std::string_view english_title =
+            original_title == strings.strings.end() ? fallback_title : original_title->second;
+        auto translated_title = title_id ? translated(title_id) : translated("menu.main_title");
+        if (bloodbath && translated_title.empty())
+            translated_title = translated(IDS_MENU_MAIN_BLOODBATH);
+        const bool use_translation = !translated_title.empty() && translated_title != english_title &&
+                                     localized_font->supports(translated_title);
+        if (!title->second)
+        {
+            if (use_translation)
+                LocalizedBitmapLine(normal_, *localized_font, translated_title)
+                    .draw(*surface, {assets.title_x, assets.title_y, 625, assets.title_y + int(normal_.height)});
+            else
+                text(*surface, normal_, english_title, assets.title_x, assets.title_y);
+        }
+        else if (!use_translation)
             canvas.DrawSurfaceToSurfaceTransparent(surface, title->second, nullptr, assets.title_x, assets.title_y,
                                                    hud_magenta);
         else
@@ -824,6 +846,7 @@ namespace OpenBlood2
         // large-font rows then share the list height evenly. The demo's glyph cells carry a
         // margin, so its nine-row XR Options page (30 pixels per row) stays legible.
         const int rows = int(menu.items.size());
+        const bool multiplayer = menu.in_multiplayer();
         const int large = int(normal_.height);
         const int step = !menu.small() && rows > 1 && y + rows * large > 425 ? (425 - y - large) / (rows - 1) : large;
         if (step < large * 2 / 3)
@@ -860,12 +883,13 @@ namespace OpenBlood2
             if (item.string_id)
             {
                 const auto it = strings.strings.find(item.string_id);
-                if (it == strings.strings.end())
+                if (it == strings.strings.end() && (!multiplayer || label.empty()))
                 {
                     error = "Missing original menu string " + std::to_string(item.string_id);
                     return false;
                 }
-                label = it->second;
+                if (it != strings.strings.end())
+                    label = it->second;
                 translation = translated(item.string_id);
                 if (menu.page == MenuPage::Load)
                 {
@@ -891,12 +915,15 @@ namespace OpenBlood2
                                                                          : translated_insertion);
                     label.replace(marker, placeholder.size(), item.insertion);
                 }
-                item.literal = label;
+                if (!multiplayer)
+                    item.literal = label;
             }
-            else if (!item.localization_key.empty())
+            if (translation.empty() && (!item.string_id || multiplayer) && !item.localization_key.empty())
                 translation = translated(item.localization_key);
-            else if (!localized_slot.empty())
+            else if (!item.string_id && !localized_slot.empty())
                 translation = std::move(localized_slot);
+            if (!item.localized_literal.empty())
+                translation = item.localized_literal;
             if (item.setting >= 0)
             {
                 auto setting = setting_label(menu, item.setting, localized_font ? localization : nullptr, resources_);
@@ -913,9 +940,13 @@ namespace OpenBlood2
                                                          : normal_;
             const int row_height = std::min(int(font.height), step);
             std::optional<LocalizedBitmapLine> translated_label;
-            if (!translation.empty() && (item.setting != menu_language_setting || translation != label) &&
+            if (localized_font && !translation.empty() &&
+                (item.setting != menu_language_setting || translation != label) &&
                 localized_font->supports(translation))
                 translated_label.emplace(font, *localized_font, translation);
+            else if (multiplayer && localized_font &&
+                     (width(font, label) > 445 || std::ranges::any_of(label, [](unsigned char c) { return c > 127; })))
+                translated_label.emplace(font, *localized_font, label);
             const int label_width = translated_label ? translated_label->advance() : width(font, label);
             item.rect = {180, y, std::min(625, 180 + label_width), y + row_height};
             if (item.setting >= 0)
@@ -964,7 +995,7 @@ namespace OpenBlood2
                     text(*surface, small_, std::to_string(value), 460, y);
                 }
             }
-            if (menu.small() && !enabled)
+            if (menu.small() && (!enabled || (multiplayer && item.command < 0)))
             {
                 for (int py = item.rect.top; py < item.rect.bottom; ++py)
                     for (int px = item.rect.left; px < item.rect.right; ++px)
@@ -1006,7 +1037,63 @@ namespace OpenBlood2
         if (menu.demo() &&
             (menu.page == MenuPage::Options || menu.page == MenuPage::Audio || menu.page == MenuPage::Mouse))
             draw_small("Grey options are unavailable in OpenBlood2.", translated("menu.unavailable_options"), 180, 440);
-        if (menu.audio_failed)
+        if (multiplayer)
+        {
+            constexpr int left = 180, right = 625;
+            const auto footer_width = [&](std::string_view line)
+            {
+                return localized_font ? LocalizedBitmapLine(small_, *localized_font, line).advance()
+                                      : width(small_, line);
+            };
+            const auto footer_fit = [&](std::string_view line)
+            {
+                if (footer_width(line) <= right - left)
+                    return line.size();
+                std::size_t fitted = 0, remaining = line.size();
+                auto* cursor = line.data();
+                while (remaining)
+                {
+                    SDL_StepUTF8(&cursor, &remaining);
+                    const auto prefix = line.substr(0, line.size() - remaining);
+                    if (footer_width(prefix) > right - left)
+                        break;
+                    fitted = prefix.size();
+                }
+                return fitted;
+            };
+            const auto footer = [&](std::string_view line, int top)
+            {
+                if (line.empty())
+                    return;
+                if (localized_font)
+                    LocalizedBitmapLine(small_, *localized_font, line)
+                        .draw(*surface, {left, top, right, top + int(small_.height)});
+                else
+                    text(*surface, small_, line, left, top);
+            };
+            const std::string_view status = menu.multiplayer_status;
+            const auto newline = status.find('\n');
+            const auto first_line = status.substr(0, newline);
+            auto second_line = newline != status.npos ? status.substr(newline + 1) : std::string_view{};
+            auto end = footer_fit(first_line);
+            if (newline == status.npos && !menu.multiplayer_edit && end < first_line.size())
+            {
+                const auto space = first_line.rfind(' ', end);
+                if (space != first_line.npos && space > end / 2)
+                    end = space;
+                second_line = first_line.substr(end);
+                if (second_line.starts_with(' '))
+                    second_line.remove_prefix(1);
+            }
+            footer(first_line.substr(0, end), 440);
+            if (menu.multiplayer_edit)
+                footer(std::string_view(*menu.multiplayer_edit).substr(0, footer_fit(*menu.multiplayer_edit)), 460);
+            else if (!second_line.empty())
+                footer(second_line.substr(0, footer_fit(second_line)), 460);
+            else if (menu.audio_failed)
+                draw_small("Menu audio unavailable - see log.", translated("menu.audio_unavailable"), 180, 460);
+        }
+        else if (menu.audio_failed)
             draw_small("Menu audio unavailable - see log.", translated("menu.audio_unavailable"), 180, 460);
         ++revision;
         composed_ = menu.revision;

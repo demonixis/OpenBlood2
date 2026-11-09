@@ -71,6 +71,8 @@ namespace OpenBlood2
     }
     const char* MenuResources::title(std::string_view semantic) const
     {
+        if (semantic == "bloodbath.pcx" && edition == MenuEdition::Retail)
+            return "interface/mainmenus/bloodbath.pcx";
         constexpr std::string_view keys[]{"mainmenu.pcx", "singleplayer.pcx", "options.pcx", "loadgame.pcx",
                                           "savegame.pcx"};
         for (unsigned i = 0; i < titles.size(); ++i)

@@ -427,7 +427,7 @@ namespace OpenBlood2
                 }
             };
             menu.vr = xr_mode;
-            // Desktop only: the replacement screen needs a keyboard for names and addresses.
+            // Bloodbath's portable Host/Join forms are offered only on desktop retail.
 #if SDL_PLATFORM_ANDROID || SDL_PLATFORM_IOS
             menu.multiplayer = false;
 #else
@@ -674,7 +674,6 @@ namespace OpenBlood2
                 {
                     network_request = std::move(*multiplayer.pending);
                     multiplayer.close();
-                    SDL_StopTextInput(runtime.window);
                     return enter_multiplayer;
                 }
                 if (const auto result = std::exchange(setup_result, SetupScreen::Result::None);
@@ -737,10 +736,10 @@ namespace OpenBlood2
                 saves.notice.advance(delta);
                 if (menu.active && !canvas->compose(menu, 0, error))
                     return failed(4);
-                if (options.menu_smoke && !(config.demo ? demo_menu_smoke.before(frames, runtime.window, *game, menu,
-                                                                                 input, *menu_audio, error)
-                                                        : smoke.before(frames, runtime.window, *game, menu, input,
-                                                                       *menu_audio, error, multiplayer.active)))
+                if (options.menu_smoke &&
+                    !(config.demo
+                          ? demo_menu_smoke.before(frames, runtime.window, *game, menu, input, *menu_audio, error)
+                          : smoke.before(frames, runtime.window, *game, menu, input, *menu_audio, error)))
                     return failed(4);
                 if (options.menu_smoke && frames == (config.demo ? 33u : 224u) &&
                     !MenuSmoke::trigger_caption(*game, config.demo ? "jaycin1" : "hankgermconv", error))
@@ -788,16 +787,42 @@ namespace OpenBlood2
                                                          event.window.windowID == SDL_GetWindowID(runtime.window)))
                         return false;
                     gamepads.event(event);
-                    if (input.setup_screen || multiplayer.active)
+                    if (input.setup_screen)
                     {
-                        if (multiplayer.active)
-                        {
-                            // Retain releases/focus while the replacement screen owns actions;
-                            // its text fields own every key, so no play key is pressed.
-                            input.controls.event(event, SDL_GetWindowID(runtime.window), true);
-                        }
                         ImGui_ImplSDL3_ProcessEvent(&event);
                         return true;
+                    }
+                    if (multiplayer.editing())
+                    {
+                        const auto window = SDL_GetWindowID(runtime.window);
+                        if (event.type == SDL_EVENT_WINDOW_FOCUS_LOST && event.window.windowID == window)
+                            multiplayer.cancel_edit(menu);
+                        else
+                        {
+                            if (MovementControls::gamepad_event(event))
+                            {
+                                const auto edges = input.controls.track(event);
+                                multiplayer.edit_event(menu, event, input.pressed(edges, InputAction::MenuAccept),
+                                                       input.pressed(edges, InputAction::MenuBack) ||
+                                                           input.pressed(edges, InputAction::Menu));
+                            }
+                            else
+                            {
+                                input.controls.event(event, window, true);
+                                if (event.type == SDL_EVENT_TEXT_INPUT && event.text.windowID == window)
+                                    multiplayer.edit_event(menu, event, false, false);
+                                if (event.type == SDL_EVENT_KEY_DOWN && event.key.windowID == window)
+                                {
+                                    const auto key = event.key.scancode;
+                                    const bool fresh = !event.key.repeat;
+                                    multiplayer.edit_event(
+                                        menu, event,
+                                        fresh && (key == SDL_SCANCODE_RETURN || key == SDL_SCANCODE_KP_ENTER),
+                                        fresh && key == SDL_SCANCODE_ESCAPE);
+                                }
+                            }
+                            return true;
+                        }
                     }
                     if (!menu.error.empty())
                     {
@@ -958,13 +983,14 @@ namespace OpenBlood2
                 }
                 if (command.action == MenuAction::Multiplayer)
                 {
-                    if (!multiplayer.open(artwork, config, game->client_shell.m_bInWorld, error))
+                    if (!multiplayer.open(menu, artwork, config, localization, canvas->localized_font, error))
                         menu_error("menu.multiplayer_error", error);
                     input.reset(menu, game->client_shell.m_bInWorld);
                     neutralize_app_input(game->client_shell);
-                    ImGui::GetIO().ClearInputKeys();
-                    ImGui::GetIO().ClearInputMouse();
                 }
+                if (command.action == MenuAction::MultiplayerOption)
+                    multiplayer.command(menu, command, runtime.window);
+                multiplayer.update(menu);
                 if (command.action == MenuAction::Setup)
                 {
                     std::string why;
@@ -1501,9 +1527,9 @@ namespace OpenBlood2
                 }
 #endif
                 ImGui::GetIO().ConfigFlags &= ~(ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad);
-                if (input.inspector || input.setup_screen || multiplayer.active)
+                if (input.inspector || input.setup_screen)
                     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-                if (input.setup_screen || multiplayer.active)
+                if (input.setup_screen)
                     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
                 ImGui::NewFrame();
                 if (input.demo.finished())
@@ -1528,12 +1554,6 @@ namespace OpenBlood2
                 {
                     if (!loading_renderer.draw_surface(loading.screen.surface(), loading.screen.revision(), error))
                         return failed(4);
-                }
-                else if (multiplayer.active)
-                {
-                    multiplayer.draw(&localization, &localized_font, ui.localized);
-                    if (!multiplayer.active)
-                        input.reset(menu, game->client_shell.m_bInWorld);
                 }
                 else if (input.setup_screen)
                 {
@@ -1757,8 +1777,9 @@ namespace OpenBlood2
                     startup_smoke.capture || (options.menu_smoke && config.demo && DemoMenuSmoke::capture(frames)) ||
                     (options.menu_smoke && !config.demo &&
                      (frames == 4 || frames == 8 || frames == 15 || frames == 17 || frames == 32 || frames == 23 ||
-                      frames == 120 || frames == 38 || frames == 208 || frames == 214 || frames == 226 || frames == 230 ||
-                      frames == 234)) ||
+                      frames == 120 || frames == 38 || frames == 208 || frames == 214 || frames == 226 ||
+                      frames == 230 || frames == 234 ||
+                      (menu.multiplayer && (frames == 41 || frames == 46 || frames == 51)))) ||
                     (options.demo_smoke && (frames == 4 || frames == 14 || frames == 45 || frames == 62));
                 const bool save =
                     target && ((frames >= 2 && !captured) || phase_capture) && !options.capture_file.empty();
@@ -1922,7 +1943,6 @@ namespace OpenBlood2
             preferences.settings.language = Language::French;
         preferences.load_language(ui.localized != nullptr);
         MultiplayerScreen multiplayer;
-        multiplayer.font = ui.proportional;
         SetupScreen setup;
         setup.font = ui.proportional;
         setup.localized_font = ui.localized;

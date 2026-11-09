@@ -1,12 +1,16 @@
 #pragma once
 // Selected original identifiers from Shared/ClientRes.h and ClientShellDLL/MenuCommands.h.
 inline constexpr unsigned IDS_CREDITSFONT = 206;
+inline constexpr unsigned IDS_MENU_TITLE_BLOODBATH = 453;
 inline constexpr unsigned IDS_MENU_MAIN_SINGLEPLAYER = 500;
 inline constexpr unsigned IDS_MENU_MAIN_BLOODBATH = 501;
 inline constexpr unsigned IDS_MENU_MAIN_OPTIONS = 502;
 inline constexpr unsigned IDS_MENU_MAIN_PRIMEGIBS = 503;
 inline constexpr unsigned IDS_MENU_MAIN_CREDITS = 504;
 inline constexpr unsigned IDS_MENU_MAIN_QUIT = 505;
+inline constexpr unsigned IDS_MENU_BLOODBATH_JOIN = 506;
+inline constexpr unsigned IDS_MENU_BLOODBATH_HOST = 507;
+inline constexpr unsigned IDS_MENU_BLOODBATH_CHARSETUP = 508;
 inline constexpr unsigned IDS_MENU_CHARSELECT_CALEB = 509;
 inline constexpr unsigned IDS_MENU_CHARSELECT_GABRIELLA = 510;
 inline constexpr unsigned IDS_MENU_CHARSELECT_ISHMAEL = 511;

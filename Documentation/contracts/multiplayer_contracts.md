@@ -1776,20 +1776,25 @@ Protocol bytes in the network tests come from `Net::protocol_version`.
 
 ## Host/Join menus and LAN discovery (2026-10-31)
 
-The retail desktop Main/BLOODBATH command opens the replacement Host/Join
-screen (desktop only, with [localized labels](menu_contracts.md#language)). The demo uses its original promotional screen and other editions keep their admission rules.
-Use the same validated host/connect options and network session loop as CLI entry;
-name, original character/team preference, Bloodbath/Team/CTF maps and match/rotation
-rules are selected in the UI. Defaults remain 25 frags, host 15 timed minutes and
-dedicated 10. Only the 22 mounted retail multiplayer DATs are listed.
+The retail desktop Main > BLOODBATH command opens the
+[native Bloodbath hub](menu_contracts.md#m9-network-entry) and its portable Join,
+Host and Character Setup pages. Character Setup supplies the name, character and
+team preference to both Host and Join. Host selects a mounted Bloodbath, Team or
+CTF map and the match rules and rotation. Join accepts a direct address or a LAN
+listing. Both paths use the same validated options and network session loop as CLI
+entry. Defaults are 25 frags, 15 minutes for a hosted timed match and 10 minutes
+for dedicated. The map list uses the 22 mounted retail multiplayer DATs. The demo
+uses its original promotional screen.
 
-Closing the setup screen retains the paused solo world and logical audio exactly.
-Starting multiplayer retires its local GameSession before creating the host server:
-one server per process. SDL/GPU/ImGui survive the transition; network resources are
-released before returning to Main. Leave/End returns to Main, window close exits,
-and admission failures return with a visible reason. Local commands are neutral
-while menus are open; hosted simulation continues. No gameplay, CMoveMgr integration,
-server sound clocks or PBR rendering algorithms change.
+Backing out of the Bloodbath pages retains the paused solo world and logical audio.
+Starting multiplayer retires the local `GameSession` before creating the host
+server, so one server runs in the process. The shared SDL/GPU frontend survives the
+transition. The native in-session menu presents Resume and Leave Game or End Hosted
+Game. It shows connection and departure status while those operations run. CLI
+sessions with incomplete menu artwork use a plain presentation with the same
+controls. Local commands are neutral while menus are open, and hosted simulation
+continues. Leave and End release network resources and return to Main. Closing the
+window exits. Admission failures return with a visible reason.
 
 LAN discovery is a separate connectionless ENet UDP socket on 27889, sharing the
 reference-counted ENet runtime. Schema 1 uses explicit little-endian fields, magic,
@@ -1811,3 +1816,10 @@ server directory, IPv6, relay, NAT traversal or server-driven download is added.
 
 The [report](../implementation/reports/m9_multiplayer_menu.md) distinguishes bounded
 codec/UDP checks, native graphical tests and still-unqualified human/machine LAN.
+
+The native menu was checked on Linux in an inspector-free Release build. Seventeen
+targeted headless tests passed, including seven using private retail or demo data.
+Six GPU tests passed for menu rendering and traversal, dedicated play, hosting and
+shutdown. A separate SDL-driven check hosted with a UTF-8 name and custom port,
+joined by discovery and direct address, then left and ended the game through the
+native menu. The host and both clients ran on the same machine.

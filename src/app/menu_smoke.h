@@ -71,8 +71,8 @@ namespace OpenBlood2
             error = "Cannot trigger the authored dialogue for menu smoke: " + std::string(name);
             return false;
         }
-        bool before(std::uint64_t frame, SDL_Window* window, GameSession& game, const Menu& menu,
-                    MenuInput& input, const MenuAudio& audio, std::string& error, bool multiplayer_active = false)
+        bool before(std::uint64_t frame, SDL_Window* window, GameSession& game, const Menu& menu, MenuInput& input,
+                    const MenuAudio& audio, std::string& error)
         {
             auto fail = [&](const char* why)
             {
@@ -119,10 +119,32 @@ namespace OpenBlood2
                 return fail("Options > SETUP");
             if (frame == 34 && (input.setup_screen || menu.page != MenuPage::Options))
                 return fail("setup screen Back");
-            if (frame == 39 && menu.multiplayer && !multiplayer_active)
-                return fail("Bloodbath did not open Host/Join");
-            if (frame == 41 && multiplayer_active)
-                return fail("Host/Join Back did not return to the paused solo menu");
+            if (menu.multiplayer)
+            {
+                if (frame == 39 && (menu.page != MenuPage::Bloodbath || menu.items.size() != 3))
+                    return fail("native Bloodbath hub");
+                if (frame == 40 && menu.page != MenuPage::MultiplayerJoin)
+                    return fail("native Join page");
+                if (frame == 42 && (!menu.multiplayer_edit || !SDL_TextInputActive(window) ||
+                                    !menu.multiplayer_edit->starts_with("example.test:28900")))
+                    return fail("address editor and SDL text input");
+                if (frame == 43 && (menu.page != MenuPage::MultiplayerJoin || SDL_TextInputActive(window) ||
+                                    menu.items.front().literal.find("127.0.0.1:27888") == std::string::npos))
+                    return fail("gamepad Back cancels editing without leaving Join");
+                if (frame == 46 && (SDL_TextInputActive(window) ||
+                                    menu.items.front().literal.find("example.test:28900") == std::string::npos))
+                    return fail("Enter applies the edited address");
+                if (frame == 47 && menu.page != MenuPage::MultiplayerLan)
+                    return fail("native LAN browser");
+                if (frame == 52 && (menu.page != MenuPage::MultiplayerHost || menu.items.size() != 13))
+                    return fail("CTF host rules");
+                if (frame == 53 && menu.page != MenuPage::MultiplayerRotation)
+                    return fail("native map rotation");
+                if (frame == 54 && menu.items.size() != 5)
+                    return fail("adding a map to rotation");
+                if (frame == 57 && menu.page != MenuPage::Main)
+                    return fail("Bloodbath Back returns to the paused solo menu");
+            }
             if (frame == 207)
             {
                 if (audio.mixer.mixed_frames <= ambient_frames_ + 48000 * 3)
@@ -172,6 +194,71 @@ namespace OpenBlood2
                 e.key.repeat = false;
                 SDL_PushEvent(&e);
             };
+            const auto text_input = [&](const char* value)
+            {
+                SDL_Event e{};
+                e.type = SDL_EVENT_TEXT_INPUT;
+                e.text.timestamp = device;
+                e.text.windowID = SDL_GetWindowID(window);
+                e.text.text = value;
+                SDL_PushEvent(&e);
+            };
+            if (menu.multiplayer)
+            {
+                switch (frame)
+                {
+                    case 39:
+                    case 40:
+                    case 43:
+                    case 45:
+                        key(SDL_SCANCODE_RETURN);
+                        break;
+                    case 41:
+                    case 44:
+                        text_input("example.test:28900");
+                        break;
+                    case 42:
+                    {
+                        SDL_Event e{};
+                        e.type = SDL_EVENT_GAMEPAD_BUTTON_DOWN;
+                        e.gbutton.which = device;
+                        e.gbutton.button = SDL_GAMEPAD_BUTTON_EAST;
+                        SDL_PushEvent(&e);
+                        e.type = SDL_EVENT_GAMEPAD_BUTTON_UP;
+                        SDL_PushEvent(&e);
+                        break;
+                    }
+                    case 46:
+                        key(SDL_SCANCODE_DOWN);
+                        key(SDL_SCANCODE_DOWN);
+                        key(SDL_SCANCODE_RETURN);
+                        break;
+                    case 47:
+                    case 48:
+                    case 54:
+                    case 55:
+                    case 56:
+                        key(SDL_SCANCODE_ESCAPE);
+                        break;
+                    case 49:
+                    case 53:
+                        key(SDL_SCANCODE_DOWN);
+                        key(SDL_SCANCODE_RETURN);
+                        break;
+                    case 50:
+                    case 51:
+                        key(SDL_SCANCODE_RIGHT);
+                        break;
+                    case 52:
+                        key(SDL_SCANCODE_UP);
+                        key(SDL_SCANCODE_UP);
+                        key(SDL_SCANCODE_UP);
+                        key(SDL_SCANCODE_RETURN);
+                        break;
+                    default:
+                        break;
+                }
+            }
             switch (frame)
             {
                 case 1:
@@ -278,10 +365,6 @@ namespace OpenBlood2
                     if (menu.multiplayer)
                         key(SDL_SCANCODE_RETURN);
                     break;
-                case 39:
-                    if (menu.multiplayer)
-                        key(SDL_SCANCODE_ESCAPE);
-                    break;
                 case 120:
                     SDL_SetWindowSize(window, 900, 500);
                     break;
@@ -306,15 +389,8 @@ namespace OpenBlood2
                     key(SDL_SCANCODE_T);
                     break;
                 case 213:
-                {
-                    SDL_Event text{};
-                    text.type = SDL_EVENT_TEXT_INPUT;
-                    text.text.timestamp = device;
-                    text.text.windowID = SDL_GetWindowID(window);
-                    text.text.text = "Control test";
-                    SDL_PushEvent(&text);
+                    text_input("Control test");
                     break;
-                }
                 case 214:
                     key(SDL_SCANCODE_RETURN);
                     break;

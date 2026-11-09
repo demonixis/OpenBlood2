@@ -1,0 +1,39 @@
+{
+  "date": "2026-11-09",
+  "baseline": "4a871bdd711292dedadcf97ca333c0d0afa6b4ba",
+  "source": "sources/blood2",
+  "source_revision": "006b4aabd3fb348f6846cad03799cf8df685ea95",
+  "scope": "Native CMenuBloodBath hub and portable multiplayer configuration and in-session pages.",
+  "references": [
+    {
+      "path": "ClientShellDLL/MenuMain.cpp",
+      "sha256": "5333fe0cc6a98782b9c1695d075556fd9f23f3ba8edfe8b279ab2c9aef3a0f5a",
+      "purpose": "Main's BLOODBATH row opens the hub in retail and a promotional screen in the demo."
+    },
+    {
+      "path": "ClientShellDLL/MainMenus.cpp",
+      "sha256": "8ee76af4b06a037093e04df5e3be33cdab6d03f49018884d5385a429b270db07",
+      "purpose": "The Bloodbath menu has Main as its parent and uses the shared title and options positions."
+    },
+    {
+      "path": "ClientShellDLL/MenuBloodBath.cpp",
+      "sha256": "9b1b3053dbad6f4804c00eec79c22f5d81b935682a0eaf73c19525780863f558",
+      "purpose": "Build uses interface/mainmenus/bloodbath.pcx, zero extra spacing and the three large rows in Join, Host and Character Setup order."
+    },
+    {
+      "path": "Shared/ClientRes.h",
+      "sha256": "c3d03e97f8d29013d7f3cfed23667d3bf761a1906f15266e74316335cd4c820b",
+      "purpose": "IDS_MENU_TITLE_BLOODBATH 453 and IDS_MENU_BLOODBATH_JOIN, HOST and CHARSETUP 506–508."
+    },
+    {
+      "path": "ClientRes/ClientRes.rc",
+      "sha256": "cc635e26e01b93e83e6202a336e7dda6af70bf681dbe731eedd82b450bcedfbd",
+      "purpose": "English title and action labels corresponding to the mounted cres.dll strings."
+    }
+  ],
+  "adaptations": [
+    "The application supplies the hub rows and uses the same typed native menu for Host, Join, Character Setup, rotation, LAN and in-session commands.",
+    "The original networking wizard and character screen have portable menu pages that drive the M9 ENet session and profile.",
+    "The title artwork is read from the player's mounted data, with a native bitmap font title available as a fallback."
+  ]
+}

@@ -472,10 +472,24 @@ See the [implementation report](../implementation/reports/menu_credits.md) and t
 
 ## M9 network entry
 
-Retail desktop (never Android, iOS or XR) enables the original BLOODBATH row and emits an
-application-owned Multiplayer command. The replacement Host/Join screens use the existing
-ImGui SDL_GPU backend and keyboard/gamepad navigation; Esc/B go back only while no text
-field or combo is active, and play keys stay released while the screen is open. Demo
-keeps its original promotional command. The [M9 contract](multiplayer_contracts.md#hostjoin-menus-and-lan-discovery-2026-10-31)
-specifies session replacement, LAN limits and admission; the [verification report](../implementation/reports/m9_multiplayer_menu.md)
-records solo pause/resume preservation. Original menu artwork is unchanged.
+On desktop, The Chosen retail data without mods enables Main > BLOODBATH in the
+standard frontend. The hub follows `CMenuBloodBath::Build` with the mounted
+`interface/mainmenus/bloodbath.pcx` title and the large JOIN GAME, HOST GAME and
+CHARACTER SETUP rows in that order. If the title bitmap is unavailable, the
+menu draws the title in its large bitmap font. The demo opens its original
+promotional screen.
+
+The portable Host, Join, Character Setup, Map Rotation and LAN Games pages share
+the original menu canvas, background, fonts and navigation cues. Secondary pages
+use the small font and scroll to keep the selection visible. Up/Down or the mouse
+wheel move through the list. Left/Right cycle choices and adjust numbers. Enter,
+controller A or a click activates a row. Enter on a text or number field starts
+bounded SDL text entry with a visible caret. Enter accepts, and Esc or controller B
+cancel the draft before they can go back through the menu. During editing, the field
+owns text and play controls stay released.
+
+The in-session menu uses the same canvas for connecting, resuming and leaving.
+The [M9 network contract](multiplayer_contracts.md#hostjoin-menus-and-lan-discovery-2026-10-31)
+defines session replacement, LAN limits and admission. The
+[source ledger](../implementation/sources/bloodbath_menu_sources.json) records the
+original hub and the portable adaptations.

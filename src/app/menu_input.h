@@ -351,6 +351,8 @@ namespace OpenBlood2
                     menu.select(-1);
                 if (navigated(edges, InputAction::MenuDown))
                     menu.select(1);
+                if (menu.in_multiplayer() && e.type == SDL_EVENT_MOUSE_WHEEL && e.wheel.windowID == window && e.wheel.y)
+                    menu.select(e.wheel.y > 0 ? -1 : 1);
                 if (navigated(edges, InputAction::MenuLeft))
                     menu.adjust(-1);
                 if (navigated(edges, InputAction::MenuRight))

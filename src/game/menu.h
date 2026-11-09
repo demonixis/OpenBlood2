@@ -26,12 +26,20 @@ namespace OpenBlood2
         Cheats, // Replacement Options > CHEATS page.
         Save,
         Load,
-        Quit
+        Quit,
+        Bloodbath,
+        MultiplayerHost,
+        MultiplayerJoin,
+        MultiplayerProfile,
+        MultiplayerRotation,
+        MultiplayerLan,
+        MultiplayerPause
     };
     enum class MenuAction
     {
         None,
         Multiplayer,
+        MultiplayerOption,
         Resume,
         NewGame,
         Credits, // Original MenuCredits: StartNewGame("Credits", CUSTOM, MEDIUM), or GS_CREDITS in a world.
@@ -59,6 +67,8 @@ namespace OpenBlood2
         int slot = 0;            // SaveGame/LoadGame only.
         int cheat = -1;          // Cheat only: the original CheatCodes value (game_settings.h).
         std::string world;       // Warp only: the world to start.
+        int option = -1;         // MultiplayerOption only: the owner's row command.
+        int direction = 0;       // MultiplayerOption only: zero activates, +/-1 adjusts.
     };
     // The owner's slot listing (CSavedGameInfo): names as the original menus print them, and
     // whether a row can be activated. Load rows are enabled for readable and unreadable files, so
@@ -156,6 +166,8 @@ namespace OpenBlood2
         std::string insertion; // FormatMessage %1!s! argument of the Load page's RESTART/QUICKLOAD strings.
         int cheat = -1;        // A Cheats action row's CheatCodes value.
         std::string_view localization_key{}, insertion_key{};
+        bool adjustable = false;         // The owner handles left/right on this multiplayer row.
+        std::string localized_literal{}; // Precomposed translation of a multiplayer row with dynamic text.
     };
     // Typed service adapter for the selected original menu Build/OnCommand code.
     // No original client ABI or hidden dependency on ImGui/SDL input.
@@ -186,6 +198,10 @@ namespace OpenBlood2
         // Replaces the Controls rows; a visible Controls page is rebuilt, keeping its selection.
         void set_controls(std::vector<MenuControlRow>);
         std::vector<MenuControlRow> controls;
+        bool in_multiplayer() const;
+        void set_multiplayer_rows(std::vector<MenuItem>);
+        std::string multiplayer_status;
+        std::optional<std::string> multiplayer_edit;
         // CMenuControls: the row tracking the next device input (its "=" column), or -1. The owner
         // binds or cancels; Back cancels too.
         int binding = -1;
