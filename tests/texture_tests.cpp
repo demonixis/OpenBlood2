@@ -199,8 +199,10 @@ namespace
         for (const auto& material : mesh.materials)
             CHECK(material.error.empty());
         world.models[0].surfaces[0].flags = 0;
-        CHECK(mesh.build(world, error, &resources) &&
-              !mesh.materials[1].error.empty()); // Same path on an ordinary face still fails.
+        // "Default" is the original editor's untextured sentinel, on ordinary faces too.
+        CHECK(mesh.build(world, error, &resources) && mesh.ranges[0].batches[0].material == 0);
+        for (const auto& material : mesh.materials)
+            CHECK(material.error.empty());
         world.models[0].textures[0] = "ANIMATED.SPR";
         CHECK(mesh.build(world, error, &resources));
         const auto animation = mesh.ranges[0].batches[0].material;

@@ -157,6 +157,10 @@ namespace OpenBlood2
         std::uint64_t PublishShotgunEffects(HOBJECT, const ShotgunEffectSettings&, std::string&) override;
         std::uint64_t PublishBallistics(HOBJECT, const ShotgunEffectSettings&, std::string&,
                                         std::optional<std::uint32_t> selected = std::nullopt);
+        // Untraced body behind PublishShotgunEffects.
+        std::uint64_t publish_ballistics(HOBJECT, const ShotgunEffectSettings&, std::string&,
+                                         std::optional<std::uint32_t> selected);
+        std::optional<std::uint32_t> ballistic_selection; // PublishBallistics -> PublishShotgunEffects.
         std::uint64_t PublishImpactMark(HOBJECT, const ImpactMarkSettings&, bool& reused, std::string&) override;
         void RemoveImpactMark(std::uint64_t) override;
         std::vector<DVector> impact_mark_polygon(HOBJECT, DVector position, DVector normal);

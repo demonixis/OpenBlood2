@@ -100,12 +100,13 @@ namespace
                                                         {"HEAL", WEAP_ZEALOT_HEAL},
                                                         {"SHIELD", WEAP_ZEALOT_SHIELD},
                                                         {"GROUND_FIRE", WEAP_ZEALOT_GROUNDFIRE},
-                                                        {"SHOCKWAVE", WEAP_ZEALOT_SHOCKWAVE}};
+                                                        {"SHOCKWAVE", WEAP_ZEALOT_SHOCKWAVE},
+                                                        {"GIDEON_GOO", WEAP_GIDEON_GOO}};
         for (auto [name, expected] : supported)
             CHECK(AI_Mgr::WeaponStrToInt(name, id) && id == expected);
         CHECK(AI_Mgr::WeaponStrToInt("SKULL", id) && id == WEAP_SKULL);
         // A matched branch whose weapon is not integrated is never replaced by Beretta.
-        for (auto name : {"PROX_BOMB", "GIDEON_GOO"})
+        for (auto name : {"PROX_BOMB"})
             CHECK(!AI_Mgr::WeaponStrToInt(name, id));
         return true;
     }

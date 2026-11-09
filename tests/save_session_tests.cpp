@@ -512,11 +512,23 @@ namespace
                                            "Sprite",
                                            "StartPoint",
                                            "WorldProperties",
-                                           "Key"};
+                                           "Key",
+                                           // Legacy server classes ported for 0.6.0.
+                                           "LightFX",
+                                           "Script",
+                                           "SoccerGoal",
+                                           "WreckingBall"};
         // Never marked USRFLG_SAVEABLE by the original and lost on its restore.
         const std::set<std::string> not_saved{"B2BaseClass",    "BaseClass", "CClientSFX",
                                               "CClientSplatFX", "CGib",      "CHandWeaponModel",
-                                              "FlagObject",     "FlagStand", "NagaCeilingDebris"};
+                                              "FlagObject",     "FlagStand", "NagaCeilingDebris",
+                                              // Legacy server classes ported for 0.6.0.
+                                              "CBulletImpactSFX", "CClientBloodTrail", "CClientCastLineSFX",
+                                              "CClientDebugLine", "CClientGibFX", "CClientLaserFX", "CClientMarkSFX",
+                                              "CClientSmokeTrail", "CClientSparksSFX", "CClientSplashSFX",
+                                              "CClientTracer", "CClientWeaponSFX", "CImpact", "CImpactRicochet",
+                                              "CModelObject", "CShellCasing", "CViewWeaponModel", "Explosion",
+                                              "FireFX", "SoccerBall"};
         // Lot 5: the player. Lot 8: movers, brushes, volumes, TripLaser and Tchernotronic. Lots 11
         // and 12: AI_Mgr's NPC subclasses and CCorpse. Lot 10: effect publishers and audio emitters.
         const std::set<std::string> original{
@@ -533,7 +545,9 @@ namespace
             "Tchernotronic", "TripLaser", "VolumeBrush", "Water", "WorldModelDebris",
             // Lot 7: world logic.
             "BigTrigger", "CameraObj", "CinematicTrigger", "ConversationTrigger", "ExitTrigger", "KeyFramer",
-            "ObjectivesTrigger", "Spawner", "ToggleTrigger", "Trigger"};
+            "ObjectivesTrigger", "Spawner", "ToggleTrigger", "Trigger",
+            // Legacy server classes ported for 0.6.0.
+            "CClientLaserBeamSFX", "Rain", "RotatingSprite"};
         // Lot 9: every pickup, KeyPickup, the projectile family and SeeingEye.
         const std::set<std::string> lot9{"AmmoPickup",
                                          "AngerPU",
@@ -651,7 +665,7 @@ namespace
         for (const auto& name : declared)
             CHECK(g.objects.find_class(name));
         // Original always-load classes OpenBlood2 does not register: none is placed in a shipped world.
-        for (auto name : {"Script", "LightFX", "WreckingBall", "SoccerGoal", "WorldModel", "FogSphere"})
+        for (auto name : {"WorldModel", "FogSphere"})
             CHECK(!g.objects.find_class(name));
         const auto build_schema = save_class_schema(g.objects);
         CHECK(unsupported > 0 && build_schema.size() == declared.size()); // Lot 12 remains.

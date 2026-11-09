@@ -1,6 +1,7 @@
 #include "client/effect_services.h"
 #include "game/server_adapter.h"
 #include <cmath>
+#include <utility>
 namespace OpenBlood2
 {
     bool ServerAdapter::PublishLine(HOBJECT owner, const LineEffectGeometry& line, float lifetime)
@@ -321,13 +322,20 @@ namespace OpenBlood2
     std::uint64_t ServerAdapter::PublishShotgunEffects(HOBJECT source, const ShotgunEffectSettings& settings,
                                                        std::string& error)
     {
-        return PublishBallistics(source, settings, error);
+        const auto selected = std::exchange(ballistic_selection, std::nullopt);
+        if (!trace_service("PublishShotgunEffects"))
+            return 0;
+        return publish_ballistics(source, settings, error, selected);
     }
     std::uint64_t ServerAdapter::PublishBallistics(HOBJECT source, const ShotgunEffectSettings& settings,
                                                     std::string& error, std::optional<std::uint32_t> selected)
     {
-        if (!trace_service("PublishShotgunEffects"))
-            return 0;
+        ballistic_selection = selected; // Consumed by the single traced service boundary.
+        return PublishShotgunEffects(source, settings, error);
+    }
+    std::uint64_t ServerAdapter::publish_ballistics(HOBJECT source, const ShotgunEffectSettings& settings,
+                                                     std::string& error, std::optional<std::uint32_t> selected)
+    {
         if (!IsObjectAlive(source) || !objects_.models || !objects_.sprites || !client_resources)
         {
             error = "Shotgun effect source/resources unavailable";
