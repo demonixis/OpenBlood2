@@ -374,6 +374,29 @@ namespace
         sampler.clear();
         guard->instruments[0].regions[0].settings.loop = DlsLoop{0, 6};
         CHECK(!sampler.play(guard, 0, 60, 127, 1, 1, error)); // Nothing past the guard frame.
+
+        // AncientCity's program 4 overlaps at keys 36–43. MSynth25 selects the later authored region.
+        auto overlap = fixture();
+        overlap->waves.push_back({0, 48000, {.5f, .5f, .5f, .5f}, {}});
+        auto& regions = overlap->instruments[0].regions;
+        regions[0].key_low = 36;
+        regions[0].key_high = 67;
+        auto later = regions[0];
+        later.key_low = 0;
+        later.key_high = 43;
+        later.velocity_low = 64;
+        later.wave = 1;
+        regions.push_back(later);
+        CHECK(sampler.receive(overlap, 0x90, 36, 78, 1, error) && sampler.voices().size() == 1);
+        CHECK(sampler.voices()[0].region == 1);
+        out.assign(2, 0);
+        CHECK(sampler.advance(1, out) && near(out[0], .5 * gain * std::pow(78.0 / 127, 2)));
+        CHECK(sampler.play(overlap, 0, 36, 63, 1, 1, error) && sampler.voices().back().region == 0);
+        CHECK(sampler.play(overlap, 0, 44, 78, 1, 1, error) && sampler.voices().back().region == 0);
+        sampler.clear();
+        regions[1].wave = 2;
+        CHECK(!sampler.play(overlap, 0, 36, 78, 1, 1, error) && error == "Invalid DLS region wave");
+        CHECK(sampler.voices().empty());
         std::cout << "PCM interpolation, loop seam/tail exclusion, guard-frame loops, tuning, velocity, gain, pan and "
                      "one-shot completion verified\n";
         return true;
@@ -534,9 +557,6 @@ namespace
         malformed = fixture();
         connection(*malformed, 0, 4, 0);
         connection(*malformed, 0, 4, 0);
-        CHECK(!a.play(malformed, 0, 60, 127, 1, 1, error));
-        malformed = fixture();
-        malformed->instruments[0].regions.push_back(malformed->instruments[0].regions[0]);
         CHECK(!a.play(malformed, 0, 60, 127, 1, 1, error));
         malformed = fixture();
         malformed->instruments[0].regions[0].key_group = 1;

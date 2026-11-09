@@ -1,5 +1,8 @@
 #include "audio_fixture.h"
+#include "game/original/AI_Mgr.h"
+#include "game/original/Door.h"
 #include "game/original/Spawner.h"
+#include "game/original/Trigger.h"
 #include <cmath>
 #include <iostream>
 #include <limits>
@@ -212,6 +215,13 @@ namespace
         // Properties in the spawn string are validated before creation.
         auto props = make(g, {{"SpawnObject", std::string("HealthPU Bogus 1")}});
         CHECK(send(g, nullptr, props, "TRIGGER") && !g.server.spawn_reports.back().child);
+        for (const char* type :
+             {"Behemoth", "CalebAI", "DeathShroud", "DrudgeLord", "DrudgePriest", "EnhancedGideon", "GabriellaREV",
+              "IshmaelAI", "IshmaelREV", "Naga", "OpheliaAI", "OpheliaREV", "ShikariAI", "SoulDrudge", "UndeadGideon",
+              "ZealotAI"})
+            CHECK(g.server.ValidateSpawnObject(type));
+        CHECK(g.server.ValidateSpawnObject("GabriellaAI Name GabriellaAI;AIState PASSIVE;TriggerDestroyObject TRUE;"));
+        CHECK(!g.server.ValidateSpawnObject("GabriellaAI TriggerDestroyObject invalid;"));
         CHECK(g.unload_world() && !g.server.string_count());
         return true;
     }
@@ -241,12 +251,158 @@ namespace
         CHECK(count == 2 && g.unload_world());
         return true;
     }
+    template <class T> T* named(GameSession& g, std::string_view name)
+    {
+        for (auto id : g.objects.snapshot())
+            if (auto* r = g.objects.get(id); r && r->life == Life::Alive && same_name(r->state.m_Name, name))
+                if (auto* object = dynamic_cast<T*>(r->game.get()))
+                    return object;
+        return nullptr;
+    }
+    bool step(GameSession& g, unsigned ticks)
+    {
+        for (unsigned i = 0; i < ticks; ++i)
+            if (!g.step(1. / 60))
+            {
+                for (const auto& error : g.step_errors())
+                    std::cerr << error << '\n';
+                return false;
+            }
+        return true;
+    }
+    bool spawned(GameSession& g, const Spawner* s, std::string_view type)
+    {
+        if (s && s->spawned && !s->spawn_failures)
+            if (auto* r = g.objects.get(s->last_child); r && r->life == Life::Alive && r->type->name == type)
+                if (const auto* actor = dynamic_cast<const AI_Mgr*>(r->game.get()); actor && actor->RuntimeReady())
+                    return true;
+        std::cerr << type << " spawn: " << (s ? s->error : "missing spawner") << '\n';
+        for (const auto& error : g.objects.diagnostics())
+            std::cerr << error << '\n';
+        return false;
+    }
+    bool cathedral(GameSession& g, HOBJECT player)
+    {
+        auto* door_trigger = named<Trigger>(g, "maindoor1trigger1");
+        auto* unlocker = named<Trigger>(g, "maindoor1trigger1unlocker");
+        auto* wave_trigger = named<Trigger>(g, "Trigger1");
+        CHECK(door_trigger && door_trigger->locked && unlocker && wave_trigger && wave_trigger->activations == 1);
+        // The player touches Trigger1 at entry. Run its first three delayed spawns.
+        for (const auto* name : {"spawn100", "spawn5", "spawn101"})
+        {
+            auto* spawner = named<Spawner>(g, name);
+            CHECK(spawner);
+            for (unsigned i = 0; i < 420 && !spawner->spawn_attempts; ++i)
+                CHECK(step(g, 1));
+            CHECK(spawned(g, spawner, "ShikariAI"));
+            CHECK(step(g, 15) && send(g, player, spawner->last_child, "KILL"));
+        }
+        CHECK(unlocker->activations == 1 && !door_trigger->locked);
+        CHECK(send(g, player, door_trigger->m_hObject, "TRIGGER"));
+        auto* naga = named<Spawner>(g, "nagaspawn");
+        auto* gabriella = named<Spawner>(g, "gabspawn");
+        auto* endrelay = named<Trigger>(g, "endrelay");
+        const auto* wall = named<BaseClass>(g, "gabbywall");
+        CHECK(naga && gabriella && endrelay && !endrelay->activations && wall);
+        const auto exit_wall = wall->m_hObject;
+        std::vector<HOBJECT> guards;
+        for (auto id : g.objects.snapshot())
+            if (const auto* r = g.objects.get(id); r && r->life == Life::Alive && same_name(r->state.m_Name, "ShikariAI2"))
+                guards.push_back(r->handle);
+        CHECK(guards.size() == 2);
+        for (auto guard : guards)
+            CHECK(send(g, player, guard, "KILL"));
+        CHECK(spawned(g, naga, "Naga"));
+        CHECK(step(g, 60) && send(g, player, naga->last_child, "KILL"));
+        CHECK(endrelay->activations == 1 && spawned(g, gabriella, "GabriellaAI"));
+        const auto* actor = named<AI_Mgr>(g, "GabriellaAI");
+        CHECK(actor && actor->m_hObject == gabriella->last_child && !actor->m_damage.trigger_only);
+        CHECK(step(g, 300) && !g.server.IsObjectAlive(exit_wall));
+        for (const auto* name : {"maindoor1left", "maindoor1right"})
+        {
+            const auto* door = named<Door>(g, name);
+            CHECK(door && door->state != Door::Closed);
+        }
+        return true;
+    }
+    bool ancient_city(GameSession& g, HOBJECT player)
+    {
+        auto* enhanced = named<Spawner>(g, "Spawner-Gideon");
+        auto* undead = named<Spawner>(g, "Spawner-UndeadGideon");
+        auto* soul = named<Spawner>(g, "Spawner-SoulMan");
+        auto* death_relay = named<Trigger>(g, "Trigger-Gideon'sDeath");
+        auto* left = named<Door>(g, "Door-ShikariDenLeft");
+        auto* right = named<Door>(g, "Door-ShikariDenRight");
+        CHECK(enhanced && undead && soul && death_relay && left && right);
+        CHECK(left->state == Door::Closed && right->state == Door::Closed);
+        auto* enhanced_trigger = named<Trigger>(g, "Trigger-Gideon'sSpawner");
+        auto* undead_trigger = named<Trigger>(g, "Trigger-UndeadGideon'sSpawner");
+        auto* soul_trigger = named<Trigger>(g, "Trigger-SoulMan");
+        auto* enhanced_keyframer = named<BaseClass>(g, "KeyFramer-Camera-GidA");
+        auto* undead_keyframer = named<BaseClass>(g, "KeyFramer-Camera-GidC");
+        CHECK(enhanced_trigger && undead_trigger && soul_trigger && enhanced_keyframer && undead_keyframer);
+        // Replay the keyframe messages that enter the encounters.
+        CHECK(send(g, enhanced_keyframer->m_hObject, enhanced_trigger->m_hObject, "TRIGGER") &&
+              spawned(g, enhanced, "EnhancedGideon"));
+        CHECK(send(g, player, soul_trigger->m_hObject, "TRIGGER") && spawned(g, soul, "SoulDrudge"));
+        CHECK(send(g, undead_keyframer->m_hObject, undead_trigger->m_hObject, "TRIGGER") &&
+              spawned(g, undead, "UndeadGideon"));
+        CHECK(step(g, 60) && send(g, player, undead->last_child, "KILL"));
+        CHECK(death_relay->activations == 1 && step(g, 990));
+        CHECK(left->state != Door::Closed && right->state != Door::Closed);
+        return true;
+    }
+    bool arena(GameSession& g, HOBJECT player)
+    {
+        auto* ishmael = named<Spawner>(g, "Spawner-Ishmael");
+        auto* ophelia = named<Spawner>(g, "Spawner-Ophelia");
+        auto* gabriella = named<Spawner>(g, "Spawner-Gabriella");
+        auto* portal = named<Trigger>(g, "BloodPortalTrigger");
+        auto* cinematic = named<Trigger>(g, "Trigger-ChosenCinematic3");
+        CHECK(ishmael && ophelia && gabriella && portal && cinematic && !portal->activations);
+        // Enter at the end of the opening cinematic. Only the first spawner is
+        // triggered manually. The original death messages run the rest.
+        CHECK(send(g, cinematic->m_hObject, ishmael->m_hObject, "TRIGGER") && spawned(g, ishmael, "IshmaelREV"));
+        CHECK(step(g, 30) && send(g, player, ishmael->last_child, "KILL"));
+        CHECK(spawned(g, ophelia, "OpheliaREV") && step(g, 30) && send(g, player, ophelia->last_child, "KILL"));
+        CHECK(spawned(g, gabriella, "GabriellaREV") && step(g, 30) && send(g, player, gabriella->last_child, "KILL"));
+        CHECK(portal->activations == 1 && step(g, 210));
+        for (const auto* name : {"BloodPortalDoor-UpperRight", "BloodPortalDoor-UpperLeft",
+                                 "BloodPortalDoor-LowerRight", "BloodPortalDoor-LowerLeft"})
+        {
+            const auto* door = named<Door>(g, name);
+            CHECK(door && door->state != Door::Closed);
+        }
+        return true;
+    }
+    bool private_progression(const char* path, std::string_view mode)
+    {
+        const auto world = mode == "cathedral" ? "07_cathedral" : mode == "ancient_city" ? "24_ancientcity" : "24b_arena";
+        Config config;
+        config.data_dir = path;
+        auto g = std::make_unique<GameSession>();
+        std::string error;
+        if (!g->initialize() || !g->resources.mount_game(config, error) ||
+            !GameSession::start_new_game(g, world, 1, 0, error))
+        {
+            std::cerr << world << ": " << error << '\n';
+            return false;
+        }
+        const auto* player = g->server_shell.Player(g->local_client);
+        CHECK(player);
+        const auto handle = player->m_hObject;
+        return mode == "cathedral" ? cathedral(*g, handle)
+               : mode == "ancient_city" ? ancient_city(*g, handle)
+                                         : arena(*g, handle);
+    }
 } // namespace
 int main(int argc, char** argv)
 {
     if (argc != 3)
         return 2;
     const std::string mode = argv[1];
+    if (mode == "cathedral" || mode == "ancient_city" || mode == "arena")
+        return private_progression(argv[2], mode) ? 0 : 1;
     return (mode == "properties" ? properties(argv[2])
             : mode == "commands" ? commands(argv[2])
             : mode == "respawn"  ? respawn(argv[2])

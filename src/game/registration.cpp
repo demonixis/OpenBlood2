@@ -679,7 +679,10 @@ namespace OpenBlood2
                                            {{"AIState", std::string("PASSIVE"), true, 31},
                                             {"AIWeapon1", std::string("MINIGUN"), true, 31},
                                             {"AIWeapon2", std::string("NAPALM"), true, 31},
-                                            {"Dims", DVector{12, 46, 12}}},
+                                            {"Dims", DVector{12, 46, 12}},
+                                            // Cathedral's gabspawn supplies this unread property. The original
+                                            // damage aggregate reads TriggerDestroyOnly instead.
+                                            {"TriggerDestroyObject", false, false}},
                                            SaveSupport::Original,
                                            1};
         const ClassInfo chosen_GabriellaREV{"GabriellaREV",

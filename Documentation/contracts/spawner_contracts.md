@@ -44,10 +44,17 @@ spawner for one more spawn.
 An empty spawn string makes no attempt, no sound and no report. Otherwise the
 velocity is drawn x, y, z in that order as `min + (max - min) * unit`, the linear
 interval formula already used for reversed endpoints in the
-[AI runtime](ai_runtime_contracts.md). The existing helper validates the class
-and the property string (pickups plus Fanatic and Prophet), creates
-the object at the chosen pose and applies the velocity. Children are independent:
-removing the spawner never removes them.
+[AI runtime](ai_runtime_contracts.md). The helper validates the class against the
+supported pickups and NPCs and checks the inherited property schema. It then
+creates the object at the chosen pose and applies the velocity. Removing the
+spawner never removes its children.
+
+The string-spawn path separates a new NPC from an overlapping character at
+initialization using the existing bounded placement solver. A death trigger can
+spawn the next opponent before the dying body is removed. The solver checks the
+candidate and route against the scene before moving the new actor. The spawn
+velocity is applied after placement, and the start-inside-brush movement rule
+still covers the Museum skylight.
 
 After creation the source sends a rift explosion (`SFX_EXPLOSIONFX_ID`,
 `EXP_RIFT_1`) when CreateRiftEffect is set. No client rift effect exists yet: the
@@ -75,12 +82,15 @@ See the [source ledger](../implementation/sources/cdmb_world_sources.json).
 
 SpawnObject strings follow the original MAX_GP_STRING_LEN (200 bytes) of
 GenericProp and the `szSpawn` buffer, for Spawner and the destructable aggregate.
-24_AncientCity and 24B_Arena author 112–141-byte requests; their Spawners are now
-created. Requests naming unported classes (UndeadGideon, the Revenant Chosen)
-still fail when triggered.
+24_AncientCity and 24B_Arena author 112–141-byte requests. The allowlist includes the
+registered NPCs requested in shipped maps, including UndeadGideon and the three
+Revenants. These use the same string precreate path as Fanatic and Prophet.
 
-GabriellaAI (0.5.2): the spawn allowlist accepts GabriellaAI, so 03_Museum's `conv1` cut-scene
-`spawn0` creates her ([#8](https://github.com/demonixis/OpenBlood2/issues/8)). Other registered
-AI classes that retail spawners request (ShikariAI, DrudgeLord, ZealotAI, SoulDrudge, Behemoth,
-DeathShroud, DrudgePriest, Naga and the Chosen/Gideon variants) are still refused by the
-allowlist; widening it is separate work.
+GabriellaAI can be spawned by both Museum's `spawn0` and Cathedral's `gabspawn`.
+The latter supplies the legacy `TriggerDestroyObject` boolean. It is admitted as
+an optional unread property on GabriellaAI, matching the original damage aggregate,
+which only reads `TriggerDestroyOnly`.
+
+The private `spawner.cathedral`, `spawner.ancient_city` and `spawner.arena` tests
+advance the authored death triggers and check the resulting unlock, doors and
+portal sequence in the retail maps.

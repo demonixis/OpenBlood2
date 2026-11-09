@@ -917,6 +917,9 @@ bool AI_Mgr::RuntimeInitialize(int reason)
     if ((reason != INITIALUPDATE_WORLDFILE || npc_type == NPCType::DrudgePriest) && npc_type != NPCType::Gideon &&
         npc_type != NPCType::EnhancedGideon && s->ResolveInitialWorldOverlap(m_hObject) != DE_OK)
         return RuntimeFailure("NPC spawned world-overlap placement failed");
+    // A death trigger can spawn the next actor before the dying body is removed.
+    if (reason == INITIALUPDATE_STRINGPROP && s->ResolveInitialActorOverlap(m_hObject) != DE_OK)
+        return RuntimeFailure("NPC spawned character-overlap placement failed");
     m_fLastUpdate = s->GetTime();
     m_damage.ai_body_hits = body_hits(npc_type, npc_robe);
     m_damage.ai_hit_localization = !m_damage.ai_body_hits;

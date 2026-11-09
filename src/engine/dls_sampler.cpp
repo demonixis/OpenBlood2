@@ -336,19 +336,16 @@ namespace OpenBlood2
         if (voices_.size() >= max_voices || next_id_ == std::numeric_limits<std::uint64_t>::max())
             return fail("DLS voice/identity limit reached");
         const auto& inst = bank->instruments[instrument];
-        std::size_t selected = inst.regions.size();
-        for (std::size_t i = 0; i < inst.regions.size(); ++i)
-        {
-            const auto& r = inst.regions[i];
-            if (key < r.key_low || key > r.key_high || velocity < r.velocity_low || velocity > r.velocity_high)
-                continue;
-            if (selected != inst.regions.size())
-                return fail("Overlapping DLS note regions are unsupported");
-            selected = i;
-        }
-        if (selected == inst.regions.size())
+        // MSynth25 prepends regions while loading the file, then selects the first covering region.
+        const auto match = std::find_if(inst.regions.rbegin(), inst.regions.rend(),
+                                        [&](const DlsRegion& r)
+                                        {
+                                            return key >= r.key_low && key <= r.key_high &&
+                                                   velocity >= r.velocity_low && velocity <= r.velocity_high;
+                                        });
+        if (match == inst.regions.rend())
             return fail("No DLS region for this key/velocity");
-        const auto& region = inst.regions[selected];
+        const auto& region = *match;
         if (region.wave >= bank->waves.size())
             return fail("Invalid DLS region wave");
         const auto& wave = bank->waves[region.wave];
@@ -362,7 +359,7 @@ namespace OpenBlood2
             return fail("Unsupported DLS sample, phase link or exclusive key group");
         DlsVoice v;
         v.instrument = instrument;
-        v.region = selected;
+        v.region = std::size_t(match.base() - inst.regions.begin() - 1);
         v.key = key;
         v.velocity = velocity;
         v.controllers = controllers;

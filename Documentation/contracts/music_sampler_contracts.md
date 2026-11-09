@@ -10,13 +10,20 @@ not a MIDI sequencer or a successful `MUSIC` service. Read the
 ## Selection and synthesis
 
 `DlsSampler::play` takes an immutable decoded bank, instrument index, key,
-nonzero velocity, finite gate duration and gain. Exactly one matching key/velocity
-region is required. It uses that region's already-resolved sample settings, never
+nonzero velocity, finite gate duration and gain. The last authored matching key/velocity
+region supplies its already-resolved sample settings, never
 an invalid overridden wave default. The present region articulation replaces the
 global graph; only an absent graph falls back. An explicitly empty local graph
 selects defaults. This rule follows Microsoft's later `DMUS_REGION` documentation;
 its use for these older assets is a declared compatibility adaptation, not a trace
 of the 1998 executable. No instrument/drum bank bit is rewritten.
+
+The installed MSynth25 loader prepends each region in file order (RVA 0x8a24–0x8a29).
+Note-on calls the region lookup at RVA 0x6620, which returns the first entry in
+that list covering the key. The port searches the authored list in reverse and
+retains its velocity bounds. In AncientCity's Gideon death sequence, MIDI key 36
+in bank 0, program 4 of `Music/A1/Ancient.dls` matches regions 0 and 2.
+Region 2 supplies wave 22.
 
 The independent implementation supports constant amplitude/pitch ADSR parameters,
 velocity-to-attack and key-to-decay scaling, pitch-envelope depth, constant pan,
@@ -85,8 +92,8 @@ and held note gates, but there is no voice stealing or dynamic channel allocator
 Diagnostic gate duration is at most 10 seconds; receiver notes remain held until
 stop or natural completion. Release is at most 60 seconds (Track1 authors a roughly 40-second release), attack at most
 20 seconds and decay at most 40 seconds. Total possible pitch modulation is bounded
-to eight octaves in either direction. Phase-linked/stereo sample records, exclusive
-key groups and overlapping regions refuse playback. The selected graph's legal
+to eight octaves in either direction. Phase-linked/stereo sample records and exclusive
+key groups refuse playback. The selected graph's legal
 parameter ranges are checked before publication. The public API requires banks
 produced by the checked reader and kept immutable, not arbitrary mutable PCM.
 

@@ -424,7 +424,17 @@ namespace OpenBlood2
         const auto ids = objects_.snapshot();
         CollisionHit contact;
         const auto origin = r->state.m_Pos;
-        const auto query = sweep_scene(h, origin, origin, r->dimensions, contact, ids);
+        // String spawns retain the existing start-inside-brush movement policy. Look
+        // for overlapping characters only, then check the chosen escape against the full scene.
+        const bool spawned = r->reason == Creation::String;
+        auto characters = spawned ? ids : std::vector<ObjectId>{};
+        std::erase_if(characters,
+                      [this](ObjectId id)
+                      {
+                          const auto* record = objects_.get(id);
+                          return !record || !record->character_body;
+                      });
+        const auto query = sweep_scene(h, origin, origin, r->dimensions, contact, spawned ? characters : ids);
         if (query == CollisionQuery::Invalid)
             return DE_ERROR;
         if (query == CollisionQuery::Hit && contact.start_solid && contact.object)
