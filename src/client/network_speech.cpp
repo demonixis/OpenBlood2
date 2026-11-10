@@ -31,7 +31,7 @@ namespace OpenBlood2
         last_need_flag_ = 0;
         notices_.clear();
         known_players_.clear();
-        announcer_caption_.clear();
+        announcer_translation_.clear();
     }
     void NetworkSpeech::retire_flag_voices()
     {
@@ -51,10 +51,16 @@ namespace OpenBlood2
             notices_.erase(notices_.begin());
         notices_.push_back({std::move(text), time_ + 5});
     }
-    void NetworkSpeech::start_announcement(const Conversation& line, std::string caption)
+    CinematicCaption NetworkSpeech::subtitle() const
+    {
+        if (communication.level < 2 || !communication.text_level || !communication.play_voice)
+            return {};
+        return {communication.message.text, announcer_translation_};
+    }
+    void NetworkSpeech::start_announcement(const Conversation& line, std::string translation)
     {
         if (communication.Start(*this, line, false))
-            announcer_caption_ = std::move(caption);
+            announcer_translation_ = std::move(translation);
     }
     bool NetworkSpeech::set_time(double now, std::string& error)
     {
@@ -207,7 +213,7 @@ namespace OpenBlood2
         {
             manager.StopAll(); // Even a busy CommLink refusal stops the player's voice.
             if (communication.Start(*this, *conversation))
-                announcer_caption_.clear();
+                announcer_translation_.clear();
         }
         else if (const auto* voice = std::get_if<VoiceEvent>(&event.value))
         {

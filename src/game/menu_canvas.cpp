@@ -208,6 +208,8 @@ namespace OpenBlood2
                     return row("menu.render_scale", "RENDER SCALE", {std::to_string(display.vr_render_scale) + "%"});
                 case 30:
                     return row("menu.field_of_view", "FIELD OF VIEW", {std::to_string(display.field_of_view)});
+                case menu_subtitles_setting:
+                    return row("menu.subtitles", "SUBTITLES", toggle(display.subtitles));
                 case menu_language_setting:
                 {
                     const auto fallback = display.language == Language::English ? std::string_view("English")
@@ -929,7 +931,9 @@ namespace OpenBlood2
                 auto setting = setting_label(menu, item.setting, localized_font ? localization : nullptr, resources_);
                 if (!setting.english.empty())
                 {
-                    label = item.literal = std::move(setting.english);
+                    label = std::move(setting.english);
+                    if (!multiplayer)
+                        item.literal = label;
                     translation = std::move(setting.localized);
                 }
             }

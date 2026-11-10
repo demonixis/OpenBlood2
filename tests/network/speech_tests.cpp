@@ -87,8 +87,9 @@ namespace
         id = speech.manager.voice;
         CHECK(send(Conversation{"tone.wav", "busy replacement", 0}, 1.1) && speech.communication.busy == 1);
         CHECK(!speech.manager.voice && !audio.mixer.get(id) && speech.communication.message.file == "long.wav");
-        CHECK(speech.update(1.19, error) && !speech.communication.voice);
+        CHECK(speech.update(1.19, error) && !speech.communication.voice && speech.subtitle().english.empty());
         CHECK(speech.update(1.21, error) && speech.communication.level == 2 && speech.communication.voice);
+        CHECK(speech.subtitle().english == "abc" && speech.subtitle().translated.empty());
         id = speech.communication.voice;
         const auto* cue = audio.mixer.get(id);
         CHECK(cue && !cue->request.streaming && cue->request.priority == 2 && !cue->request.reverb_requested);
@@ -96,7 +97,7 @@ namespace
         CHECK(std::abs(speech.manager.next_play_time - 5.71f) < .00001f);
         CHECK(audio.advance(.25, world, {}, {}) && audio.mixer.peak == .5f && !audio.mixer.get(id)->done);
         CHECK(speech.update(3.72, error) && !speech.communication.voice && !audio.mixer.get(id));
-        CHECK(speech.update(3.93, error) && !speech.communication.level);
+        CHECK(speech.update(3.93, error) && !speech.communication.level && speech.subtitle().english.empty());
         CHECK(send(VoiceEvent{true, 0, 9}, 4) && speech.manager.reason == "cooldown");
         CHECK(send(VoiceEvent{true, 0, 9}, 5.72) && speech.manager.voice);
         id = speech.manager.voice;
@@ -114,13 +115,16 @@ namespace
         const auto attempts = speech.communication.sound_attempts;
         CHECK(send(BloodbathStart{0}, 6.1));
         CHECK(speech.manager.voice == id && speech.communication.level == 1 &&
-              speech.communication.voice_manager_requests == requests);
+              speech.communication.voice_manager_requests == requests && speech.subtitle().english.empty());
         CHECK(speech.update(6.31, error) && speech.communication.voice &&
               speech.communication.sound_attempts == attempts + 1 && !speech.manager.voice && !audio.mixer.get(id));
         CHECK(speech.communication.message.file == "Sounds\\Voice\\Voice248.wav" && speech.announcer.messages == 1);
+        CHECK(speech.subtitle().english == "Let The Bloodbath Begin!" && speech.subtitle().translated.empty());
         CHECK(audio.advance(.1, world, {}, {}) && audio.mixer.peak == .5f);
         speech.clear();
         CHECK(audio.mixer.voices().empty());
+        CHECK(send(Conversation{"default.wav", "Text only", 2}, 7));
+        CHECK(speech.update(7.21, error) && speech.communication.text_level && speech.subtitle().english.empty());
         CHECK(speech.manager.PlaySound("missing.wav", true) == false && speech.manager.failures &&
               !speech.manager.error.empty());
         CHECK(audio.local_started && !audio.started);

@@ -92,10 +92,10 @@ NIGHTMARES row and `MenuNewNightmaresGame` ([edition contracts](nightmares_editi
 
 - **Two game-type views.** `LoadWorld` stores the request type in the `GAME_GAMETYPE`
   console variable (`SetGameInfo`, NEW_GAME only). `B2BaseClass::GetGameType` reads it,
-  so `InitialUpdate` removes objects whose `TypeActionMode` is false: every
-  `CameraObj`, `CinematicTrigger` and `ConversationTrigger`, and the authored triggers
-  and sounds that set it. The world plays without cut scenes; startup reports these
-  entries as "Original filter". The server shell's own `GetGameType`/`IsMultiplayerGame`
+  so `InitialUpdate` removes objects whose `TypeActionMode` is false. Startup reports
+  these entries as "Original filter". Authored scenes that enable action mode, such as
+  the civilian exchanges in the Slaughterhouse and Train Station, still play and
+  use the same subtitle setting as Story. The server shell's own `GetGameType`/`IsMultiplayerGame`
   read `m_GameInfo.m_byType`, copied from the engine's NetGame. Every local start
   (story, Chosen, custom levels, Credits, loads) is `STARTGAME_NORMAL` with a zeroed
   request, so that type stays `NGT_SINGLE`. `ServerDE::net_game_type` models it
@@ -315,9 +315,13 @@ the key is rejected.
 Options > Language applies immediately in the demo and the full game. Enter or Right
 cycles forward, and Left cycles backward. The [setup screen](setup_screen_contracts.md)
 offers the same preference before an installation is selected. `preferences.cfg`
-version 13 stores the language tag. Fresh installations and earlier versions
-default to English. The other choices are French, Simplified Chinese, German,
+has stored the language tag since version 13. Fresh installations and versions
+1–12 default to English. The other choices are French, Simplified Chinese, German,
 Italian, Spanish, Brazilian Portuguese and Korean.
+
+Options > Audio > Subtitles toggles caption visibility. Preferences version 14
+stores `subtitles=0` or `subtitles=1`. Fresh installations and versions 1–13
+enable subtitles by default.
 
 `lang/` contains one UTF-8 INI per translation. `[resources]` uses the original numeric
 string IDs. Other sections group named keys for menus, controls, setup, loading, network,

@@ -41,7 +41,7 @@ namespace
                 CHECK(!strings.text(key, {}).empty());
             for (const auto id : {502u, 503u, 521u, 522u, 523u, 524u, 525u, 526u, 5023u, 5053u, 6023u, 6053u})
                 CHECK(!strings.text(id, {}).empty());
-            for (const auto key : {"setup.language", "setup.play", "loading.continue", "menu.main_title",
+            for (const auto key : {"setup.language", "setup.play", "loading.continue", "menu.main_title", "menu.subtitles",
                                    "hud.quicksave", "objectives.empty", "objectives.authored.1b23dee31a697548.text"})
                 CHECK(!strings.text(key).empty());
             CHECK(!strings.text(5000).empty() && !strings.text(6000).empty());

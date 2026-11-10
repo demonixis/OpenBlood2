@@ -136,6 +136,10 @@ the inspected demo and retail maps contain no `Script` instances. OpenBlood2 dra
 the recognized spoken cues in the existing lower letterbox bar or above the bottom
 of the gameplay canvas when the view has no bars.
 
+Options > Audio > Subtitles controls this display in Story, Chosen and Nightmares.
+It defaults to on, including after upgrading older preferences, and also controls
+the intro movie, voiced CommLink text and Bloodbath announcer captions.
+
 Local sound frames identify the exact voice owned by each active cinematic trigger.
 The presenter reads those descriptors and uses the original conversation text where
 it matches, or a transcription of the stock WAV keyed by its full resource path.

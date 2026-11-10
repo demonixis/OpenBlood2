@@ -1,6 +1,7 @@
 #pragma once
 #include "client/announcer.h"
 #include "client/network_audio.h"
+#include "game/cinematic_captions.h"
 #include "game/original/CommLink.h"
 #include "game/original/VoiceMgr.h"
 #include "net/player_events.h"
@@ -29,10 +30,7 @@ namespace OpenBlood2
         CVoiceMgr manager;
         CCommLink communication;
         ClientAnnouncer announcer;
-        std::string_view announcer_caption() const
-        {
-            return communication.text_level ? std::string_view(announcer_caption_) : std::string_view{};
-        }
+        CinematicCaption subtitle() const;
         struct Notice
         {
             std::string text;
@@ -81,8 +79,8 @@ namespace OpenBlood2
         bool set_time(double, std::string&);
         std::vector<Notice> notices_;
         std::vector<Net::RosterPlayer> known_players_;
-        std::string announcer_caption_;
-        void start_announcement(const Conversation&, std::string caption);
+        std::string announcer_translation_;
+        void start_announcement(const Conversation&, std::string translation);
         void notice(std::string);
     };
 } // namespace OpenBlood2

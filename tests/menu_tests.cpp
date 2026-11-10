@@ -117,6 +117,23 @@ namespace
         menu.selected = 1;
         menu.adjust(-1);
         CHECK(menu.settings.sound_volume == 45);
+        menu.select(-1);
+        menu.select(-1);
+        CHECK(menu.selected == int(menu.items.size()) - 1 &&
+              menu.items[menu.selected].setting == menu_subtitles_setting && menu.settings.subtitles);
+        menu.activate();
+        CHECK(!menu.settings.subtitles && menu.take_command().action == MenuAction::Settings);
+        menu.adjust(-1);
+        CHECK(menu.settings.subtitles && menu.take_command().action == MenuAction::Settings);
+        menu.build(MenuPage::MultiplayerPause);
+        MenuItem multiplayer_subtitles;
+        multiplayer_subtitles.command = 1;
+        multiplayer_subtitles.setting = menu_subtitles_setting;
+        menu.set_multiplayer_rows({multiplayer_subtitles});
+        menu.activate();
+        CHECK(!menu.settings.subtitles && menu.take_command().action == MenuAction::Settings);
+        menu.adjust(1);
+        CHECK(menu.settings.subtitles && menu.take_command().action == MenuAction::Settings);
         menu.build(MenuPage::Mouse);
         menu.selected = 0;
         for (int i = 0; i < 100; ++i)

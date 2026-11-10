@@ -1,6 +1,9 @@
 #include "app/ui_runtime.h"
+#include "game/cinematic_captions.h"
 #include "game/localized_font.h"
 #include "ui_font.h"
+#include <algorithm>
+#include <cfloat>
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlgpu3.h>
@@ -71,6 +74,54 @@ namespace OpenBlood2
                                                                  int(bytes.size()), 0.0f, &config);
         }
         return localized != nullptr;
+    }
+
+    void UiRuntime::draw_subtitle(CinematicCaption caption, CaptionPlacement placement, const LocalizedFont& font) const
+    {
+        if (caption.english.empty())
+            return;
+        const bool translated = localized && !caption.translated.empty() && font.supports(caption.translated);
+        const auto text = translated ? caption.translated : caption.english;
+        auto* face = proportional ? proportional : ImGui::GetFont();
+        if (localized)
+        {
+            auto* cursor = text.data();
+            auto remaining = text.size();
+            while (remaining)
+            {
+                const auto codepoint = SDL_StepUTF8(&cursor, &remaining);
+                if (codepoint > IM_UNICODE_CODEPOINT_MAX || !face->IsGlyphInFont(ImWchar(codepoint)))
+                {
+                    if (translated || font.supports(text))
+                        face = localized;
+                    break;
+                }
+            }
+        }
+
+        const auto& viewport = *ImGui::GetMainViewport();
+        const float scale = std::min(viewport.Size.x / 640.f, viewport.Size.y / 480.f);
+        if (scale <= 0)
+            return;
+        const bool letterbox = placement == CaptionPlacement::Letterbox;
+        const float wrap = std::min(viewport.Size.x - 16 * scale, 544 * scale);
+        const float available = letterbox ? viewport.Size.y / 6 - 8 * scale : 96 * scale;
+        const auto end = text.data() + text.size();
+        float size = 16 * scale;
+        auto bounds = face->CalcTextSizeA(size, FLT_MAX, wrap, text.data(), end);
+        while (bounds.y > available && size > 11 * scale)
+        {
+            size -= scale;
+            bounds = face->CalcTextSizeA(size, FLT_MAX, wrap, text.data(), end);
+        }
+        const float bottom = placement == CaptionPlacement::Movie ? (viewport.Size.y + 480 * scale) / 2
+                                                                   : viewport.Size.y;
+        const float inset = placement == CaptionPlacement::Movie ? 12 * scale : 74 * scale;
+        const float top = bottom - (letterbox ? (viewport.Size.y / 6 + bounds.y) / 2 : inset + bounds.y);
+        const ImVec2 pos{viewport.Pos.x + (viewport.Size.x - bounds.x) / 2, viewport.Pos.y + top};
+        auto* draw = ImGui::GetForegroundDrawList();
+        draw->AddText(face, size, {pos.x + scale, pos.y + scale}, IM_COL32(0, 0, 0, 255), text.data(), end, wrap);
+        draw->AddText(face, size, pos, IM_COL32(255, 255, 255, 255), text.data(), end, wrap);
     }
 
     UiRuntime::~UiRuntime()

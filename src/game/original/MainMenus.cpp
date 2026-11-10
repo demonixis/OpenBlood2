@@ -160,6 +160,8 @@ namespace OpenBlood2
                 AddLargeTextItemOption(IDS_MENU_AUDIO_16BIT_SOUND, -1);
                 setting(IDS_MENU_AUDIO_MUSIC, 2);
                 setting(IDS_MENU_AUDIO_MUSIC_VOLUME, 3);
+                setting(0, menu_subtitles_setting);
+                items.back().literal = "SUBTITLES";
                 break;
             case MenuPage::Display:
                 // Source CMenuDisplay offers renderer, resolution and DETAIL LEVEL. Additional
@@ -390,6 +392,7 @@ namespace OpenBlood2
                                                     {
                                                         return a.string_id == b.string_id && a.command == b.command &&
                                                                a.enabled == b.enabled && a.adjustable == b.adjustable &&
+                                                               a.setting == b.setting &&
                                                                a.literal == b.literal &&
                                                                a.localized_literal == b.localized_literal &&
                                                                a.localization_key == b.localization_key;
@@ -521,6 +524,11 @@ namespace OpenBlood2
             pending_.action == MenuAction::SaveGame || pending_.action == MenuAction::LoadGame ||
             pending_.action == MenuAction::Warp || pending_.action == MenuAction::MultiplayerOption)
             return;
+        if (items[selected].setting >= 0)
+        {
+            adjust(1);
+            return;
+        }
         if (in_multiplayer())
         {
             if (items[selected].command < 0)
@@ -529,11 +537,6 @@ namespace OpenBlood2
             pending_.action = MenuAction::MultiplayerOption;
             pending_.option = items[selected].command;
             pending_.direction = 0;
-            return;
-        }
-        if (items[selected].setting >= 0)
-        {
-            adjust(1);
             return;
         }
         cue(MenuCue::Enter);
@@ -678,7 +681,7 @@ namespace OpenBlood2
         if (!active || promotion != MenuPromotion::None || selected < 0 || selected >= int(items.size()) ||
             !enabled(items[selected]) || binding >= 0)
             return;
-        if (in_multiplayer())
+        if (in_multiplayer() && items[selected].setting < 0)
         {
             if (items[selected].command >= 0 && items[selected].adjustable && pending_.action == MenuAction::None)
             {
@@ -796,6 +799,9 @@ namespace OpenBlood2
                 break;
             case menu_language_setting:
                 settings.language = cycle(languages(), settings.language);
+                break;
+            case menu_subtitles_setting:
+                settings.subtitles = !settings.subtitles;
                 break;
             case 10:
             {

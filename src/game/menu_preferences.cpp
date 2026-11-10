@@ -14,8 +14,8 @@ namespace OpenBlood2
         // the renderer selection; version 4 the VR options; version 5 the VR movement reference;
         // version 6 the cheat switch and god mode; version 7 the post-processing rows; version 8
         // ambient occlusion; version 9 reflections; version 10 display; version 11 control toggles;
-        // version 12 the field of view; version 13 the UI language tag.
-        constexpr std::array<const char*, 37> names{"version",
+        // version 12 the field of view; version 13 the UI language tag; version 14 subtitles.
+        constexpr std::array<const char*, 38> names{"version",
                                                     "sound",
                                                     "music",
                                                     "sound_volume",
@@ -51,10 +51,13 @@ namespace OpenBlood2
                                                     "crosshair",
                                                     "crosshair_number",
                                                     "field_of_view",
-                                                    "language"};
-        constexpr std::array<std::size_t, 13> version_keys{7, 9, 12, 15, 16, 18, 21, 22, 23, 31, 35, 36, 37};
+                                                    "language",
+                                                    "subtitles"};
+        constexpr std::array<std::size_t, 14> version_keys{7, 9, 12, 15, 16, 18, 21, 22, 23, 31, 35, 36, 37, 38};
         constexpr std::size_t pixel_lighting_key = 8;
         constexpr std::size_t normal_maps_key = 11;
+        constexpr std::size_t language_key = 36;
+        constexpr std::size_t subtitles_key = 37;
         bool valid(const MenuSettings& s)
         {
             const bool turn = s.vr_turn == 0 || s.vr_turn == 15 || s.vr_turn == 30 || s.vr_turn == 45 ||
@@ -106,7 +109,7 @@ namespace OpenBlood2
             error = "Cannot open preferences";
             return false;
         }
-        std::array<int, names.size() - 1> values{};
+        std::array<int, names.size()> values{};
         std::array<bool, names.size()> seen{};
         Language language = Language::English;
         bool legacy_renderer = false, legacy_profile = false;
@@ -140,7 +143,7 @@ namespace OpenBlood2
                 error = "Unknown or duplicate preferences key";
                 return false;
             }
-            if (key == values.size())
+            if (key == language_key)
             {
                 const auto parsed = parse_language(entry.substr(equal + 1));
                 if (!parsed)
@@ -182,7 +185,8 @@ namespace OpenBlood2
             std::find(seen.begin(), seen.begin() + required, false) != seen.begin() + required ||
             std::find(seen.begin() + required, seen.end(), true) != seen.end() || !flag(1) || !flag(2) || !flag(6) ||
             !flag(pixel_lighting_key) || !flag(normal_maps_key) || !flag(13) || !flag(14) || !flag(15) || !flag(16) ||
-            !flag(17) || !flag(19) || !flag(23) || !flag(27) || !flag(31) || !flag(32) || !flag(33))
+            !flag(17) || !flag(19) || !flag(23) || !flag(27) || !flag(31) || !flag(32) || !flag(33) ||
+            !flag(subtitles_key))
         {
             error = "Incomplete or unsupported preferences";
             return false;
@@ -248,6 +252,8 @@ namespace OpenBlood2
         if (required >= version_keys[11])
             result.field_of_view = values[35];
         result.language = language;
+        if (seen[subtitles_key])
+            result.subtitles = values[subtitles_key];
         if (!valid(result))
         {
             error = "Preferences out of range";
@@ -264,7 +270,7 @@ namespace OpenBlood2
             error = "Preferences out of range";
             return false;
         }
-        const std::array<int, names.size() - 1> values{13,
+        const std::array<int, language_key> values{int(version_keys.size()),
                                                    settings.sound,
                                                    settings.music,
                                                    settings.sound_volume,
@@ -306,6 +312,8 @@ namespace OpenBlood2
         text += "language=";
         text += language_tag(settings.language);
         text += '\n';
+        text += "subtitles=";
+        text += settings.subtitles ? "1\n" : "0\n";
         return write_file_atomic(path, std::span(reinterpret_cast<const std::uint8_t*>(text.data()), text.size()),
                                  "preferences", error);
     }

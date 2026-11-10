@@ -3507,7 +3507,9 @@ set_tests_properties(chosen_mode.requests PROPERTIES LABELS "headless")
 if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME chosen_mode.subway COMMAND chosen_mode_tests subway "${BLOOD2_TEST_DATA_DIR}")
     add_test(NAME chosen_mode.continuation COMMAND chosen_mode_tests continuation "${BLOOD2_TEST_DATA_DIR}")
-    set_tests_properties(chosen_mode.subway chosen_mode.continuation PROPERTIES LABELS "headless;private" TIMEOUT 600)
+    add_test(NAME chosen_mode.captions COMMAND chosen_mode_tests captions "${BLOOD2_TEST_DATA_DIR}" "${PROJECT_SOURCE_DIR}/lang/fr.ini")
+    set_tests_properties(chosen_mode.subway chosen_mode.continuation chosen_mode.captions
+        PROPERTIES LABELS "headless;private" TIMEOUT 600)
 endif()
 
 add_executable(nightmares_tests nightmares_tests.cpp)

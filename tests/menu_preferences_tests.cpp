@@ -27,7 +27,7 @@ int test_menu_preferences(int argc, char** argv)
     std::filesystem::remove(path, ec);
     MenuSettings defaults, settings;
     CHECK(load_menu_preferences(path, settings, error) && settings == defaults &&
-          settings.language == Language::English);
+          settings.language == Language::English && settings.subtitles);
     settings = {false, true, true, 15, 35, 730};
     CHECK(save_menu_preferences(path, settings, error));
     MenuSettings loaded;
@@ -36,13 +36,14 @@ int test_menu_preferences(int argc, char** argv)
         // The shared atomic writer keeps the exact preference bytes.
         std::ifstream in(path, std::ios::binary);
         const std::string bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        CHECK(bytes == "version=13\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
+        CHECK(bytes == "version=14\nsound=0\nmusic=1\nsound_volume=15\nmusic_volume=35\nsensitivity=730\n"
                        "invert_y=1\ndetail=2\npixel_lighting=0\nrenderer=0\nquality=0\nnormal_maps=1\n"
                        "vr_turn=45\nvr_laser=1\nvr_crosshair=1\nvr_move_hand=0\ncheats=0\ngod_mode=0\n"
                        "antialiasing=0\nbloom=1\ntonemap=1\nambient_occlusion=2\nreflections=2\n"
                        "fullscreen=0\nfullscreen_mode=0\nresolution_width=0\nresolution_height=0\nvsync=1\n"
                        "fps_limit=0\nvr_refresh_rate=0\nvr_render_scale=100\n"
-                       "run_lock=0\nmouse_look=1\ncrosshair=1\ncrosshair_number=1\nfield_of_view=90\nlanguage=en\n");
+                       "run_lock=0\nmouse_look=1\ncrosshair=1\ncrosshair_number=1\nfield_of_view=90\nlanguage=en\n"
+                       "subtitles=1\n");
     }
     {
         MenuSettings video;
@@ -375,8 +376,28 @@ int test_menu_preferences(int argc, char** argv)
         }
         CHECK(load_menu_preferences(path, loaded, error) && loaded == MenuSettings{});
         localized.language = Language::Korean;
+        localized.subtitles = false;
         CHECK(save_menu_preferences(path, localized, error));
-        CHECK(load_menu_preferences(path, loaded, error) && loaded.language == Language::Korean);
+        CHECK(load_menu_preferences(path, loaded, error) && loaded == localized);
+        std::ifstream updated(path);
+        const std::string with_subtitles((std::istreambuf_iterator<char>(updated)), {});
+        updated.close();
+        const auto subtitles = with_subtitles.find("subtitles=0\n");
+        CHECK(subtitles != with_subtitles.npos);
+        const auto old = with_subtitles.substr(10, subtitles - 10);
+        {
+            std::ofstream output(path);
+            output << "version=13" << old;
+        }
+        CHECK(load_menu_preferences(path, loaded, error) && loaded.language == Language::Korean && loaded.subtitles);
+        for (const auto* invalid : {"", "subtitles=2\n"})
+        {
+            {
+                std::ofstream output(path);
+                output << "version=14" << old << invalid;
+            }
+            CHECK(!load_menu_preferences(path, loaded, error) && loaded.subtitles);
+        }
     }
     CHECK(save_menu_preferences(path, settings, error));
     auto invalid = settings;

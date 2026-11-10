@@ -2,6 +2,16 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.6.1] - 2026-11-10
+
+### Added
+
+- A Subtitles option in Options > Audio and the multiplayer pause menu. It is on by default and controls subtitles for the introduction, cutscenes in Story and Chosen, supported in-game dialogue, voiced CommLink messages, and multiplayer announcements.
+
+### Fixed
+
+- Bloodbath announcer subtitles now appear in English, including when a translation is unavailable.
+
 ## [0.6.0] - 2026-11-09
 
 ### Added
@@ -107,6 +117,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Simulation failure logs reporting unrelated startup warnings.
 - Xcode archives including dependencies and triggering nested builds.
 
-[Unreleased]: https://github.com/demonixis/OpenBlood2/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/demonixis/OpenBlood2/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/demonixis/OpenBlood2/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/demonixis/OpenBlood2/compare/v0.5.2...v0.6.0
 [0.4.0]: https://github.com/demonixis/OpenBlood2/compare/v0.3.1...v0.4.0

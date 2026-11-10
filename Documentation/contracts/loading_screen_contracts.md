@@ -89,7 +89,8 @@ Nightmares plays the logos and proceeds to its own title.
 Smacker playback preserves the source frames, palette, frame intervals and
 soundtrack. The frame fits the display with black margins where needed. Only
 `Intro.smk` has timed captions. The selected language uses the `[intro]` catalog,
-with the English cue as fallback. Esc advances the current movie and consumes
+with the English cue as fallback. Options > Audio > Subtitles also controls
+these captions. Esc advances the current movie and consumes
 the event. Direct world entry, networking and diagnostic menu traversal skip
 the movies. Switching installations through Setup in-process does not replay
 them.

@@ -37,7 +37,6 @@
 #include <imgui_impl_sdlgpu3.h>
 #include <spdlog/spdlog.h>
 #include <array>
-#include <cfloat>
 #include <utility>
 
 namespace OpenBlood2
@@ -49,57 +48,6 @@ namespace OpenBlood2
     {
         // run_game's requests to run_frontend.
         constexpr int restart_game = -1, return_to_setup = -2, enter_multiplayer = -3;
-
-        enum class CaptionPlacement { Play, Letterbox, Movie };
-
-        void draw_cinematic_caption(CinematicCaption caption, CaptionPlacement placement, const UiRuntime& ui,
-                                    const LocalizedFont& font)
-        {
-            if (caption.english.empty())
-                return;
-            const bool translated = ui.localized && !caption.translated.empty() && font.supports(caption.translated);
-            const auto text = translated ? caption.translated : caption.english;
-            auto* face = ui.proportional ? ui.proportional : ImGui::GetFont();
-            if (translated)
-            {
-                // Prefer the proportional face for Latin punctuation, including narrow apostrophes.
-                auto* cursor = text.data();
-                auto remaining = text.size();
-                while (remaining)
-                {
-                    const auto codepoint = SDL_StepUTF8(&cursor, &remaining);
-                    if (codepoint > IM_UNICODE_CODEPOINT_MAX || !face->IsGlyphInFont(ImWchar(codepoint)))
-                    {
-                        face = ui.localized;
-                        break;
-                    }
-                }
-            }
-
-            const auto& viewport = *ImGui::GetMainViewport();
-            const float scale = std::min(viewport.Size.x / 640.f, viewport.Size.y / 480.f);
-            if (scale <= 0)
-                return;
-            const bool letterbox = placement == CaptionPlacement::Letterbox;
-            const float wrap = std::min(viewport.Size.x - 16 * scale, 544 * scale);
-            const float available = letterbox ? viewport.Size.y / 6 - 8 * scale : 96 * scale;
-            const auto end = text.data() + text.size();
-            float size = 16 * scale;
-            auto bounds = face->CalcTextSizeA(size, FLT_MAX, wrap, text.data(), end);
-            while (bounds.y > available && size > 11 * scale)
-            {
-                size -= scale;
-                bounds = face->CalcTextSizeA(size, FLT_MAX, wrap, text.data(), end);
-            }
-            const float bottom = placement == CaptionPlacement::Movie ? (viewport.Size.y + 480 * scale) / 2
-                                                                       : viewport.Size.y;
-            const float inset = placement == CaptionPlacement::Movie ? 12 * scale : 74 * scale;
-            const float top = bottom - (letterbox ? (viewport.Size.y / 6 + bounds.y) / 2 : inset + bounds.y);
-            const ImVec2 pos{viewport.Pos.x + (viewport.Size.x - bounds.x) / 2, viewport.Pos.y + top};
-            auto* draw = ImGui::GetForegroundDrawList();
-            draw->AddText(face, size, {pos.x + scale, pos.y + scale}, IM_COL32(0, 0, 0, 255), text.data(), end, wrap);
-            draw->AddText(face, size, pos, IM_COL32(255, 255, 255, 255), text.data(), end, wrap);
-        }
 
         struct StartupSmoke
         {
@@ -1541,9 +1489,9 @@ namespace OpenBlood2
                 {
                     if (!title_renderer.draw_surface(movies.surface(), movies.revision(), error))
                         return failed(4);
-                    if (movies.name() == "Intro.smk")
-                        draw_cinematic_caption(intro_caption(movies.elapsed(), &localization), CaptionPlacement::Movie,
-                                               ui, localized_font);
+                    if (settings.subtitles && movies.name() == "Intro.smk")
+                        ui.draw_subtitle(intro_caption(movies.elapsed(), &localization), CaptionPlacement::Movie,
+                                         localized_font);
                 }
                 else if (input.title_screen)
                 {
@@ -1592,6 +1540,8 @@ namespace OpenBlood2
                     }
                     // XR aims with the controller (laser and reticle): no screen-centred crosshair.
                     auto state = client.HudSnapshot(xr_mode);
+                    if (!settings.subtitles && client.communication.play_voice)
+                        state.communication.text_ratio = 0;
                     hud_panels(state, client);
                     if (std::exchange(input.weapon_tabs, false))
                         hud.toggle_weapons(state.time);
@@ -1616,7 +1566,7 @@ namespace OpenBlood2
                     }
                     if (!hud.draw(state, game->resources, error))
                         return failed(4);
-                    if (client.m_bInWorld)
+                    if (settings.subtitles && client.m_bInWorld)
                     {
                         const auto caption = cinematic_caption(game->client_session.audio, game->resources, &localization,
                                                                &client.listener_position, client.communication.voice);
@@ -1627,8 +1577,8 @@ namespace OpenBlood2
                             error = "The authored dialogue did not render in the selected language";
                             return failed(4);
                         }
-                        draw_cinematic_caption(caption, letterbox ? CaptionPlacement::Letterbox : CaptionPlacement::Play,
-                                               ui, localized_font);
+                        ui.draw_subtitle(caption, letterbox ? CaptionPlacement::Letterbox : CaptionPlacement::Play,
+                                         localized_font);
                     }
                     if (options.menu_smoke && (config.demo ? DemoMenuSmoke::phase(frames) == 78 : frames == 230) &&
                         (!hud.status_bar() || hud.status_bar()->objectives_level() != OBJTAB_STOPPED))
@@ -2015,8 +1965,8 @@ namespace OpenBlood2
             if (code == enter_multiplayer)
             {
                 bool quit = false;
-                const int result = run_network_session(network_request, *next, runtime, refusal, quit, &localized_font,
-                                                       ui.localized);
+                const int result = run_network_session(network_request, *next, ui, refusal, quit, localized_font,
+                                                       &preferences.settings);
                 if (quit)
                     return result;
                 show_title = false;

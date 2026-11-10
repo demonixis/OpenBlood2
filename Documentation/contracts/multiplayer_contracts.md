@@ -1307,9 +1307,10 @@ names fail without changing the output. Never execute commercial DLL code.
 
 For translated clients, the same resource IDs can supply UTF-8 catalog strings.
 Numbered placeholders let languages reorder names while inserting each name as
-literal text. An unusable translation keeps the original string. Translated
-CommLink captions follow the existing text visibility clock, and clients retain
-the original voice clips and server-selected index.
+literal text. An unusable translation uses the original string. Announcer
+captions follow the existing text visibility clock in every language. The
+Subtitles setting is shared with solo play and can also be changed in the
+multiplayer pause menu. Clients retain the original voice clips and server-selected index.
 
 Resolve both names and characters from the already-applied roster using exact
 object generations. Missing identities produce no announcement, as in the source.

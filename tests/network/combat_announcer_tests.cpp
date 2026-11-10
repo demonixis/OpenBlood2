@@ -218,7 +218,7 @@ namespace
             CHECK(clients[i]->receive({owners[i], 1, 0, FragEvent{{1, 1}, {0, 1}, 1, 30}}, .1, false, roster, error));
         }
         CHECK(a.communication.level == 1 && a.communication.message.text == "A%s slagged Victim" &&
-              a.communication.length == 2.5f && a.announcer_caption().empty() && a.notices().empty());
+              a.communication.length == 2.5f && a.subtitle().english.empty() && a.notices().empty());
         CHECK(b.notices().size() == 1 && c.notices().size() == 1 && !b.communication.level && !c.communication.level);
         CHECK(b.notices().back().text.starts_with("A%s a réduit Victim en scories.") &&
               c.notices().back().text == "A%s slagged Victim");
@@ -227,20 +227,22 @@ namespace
         CHECK(a.receive({owners[0], 1, 0, FragEvent{{1, 1}, {0, 1}, 1, 30}}, .2, false, roster, error));
         CHECK(a.frag_events == 1 && a.manager.voice == prior && a.communication.received == 1);
         CHECK(a.update(.31, error) && a.communication.voice && !a.manager.voice && !audio[0].mixer.get(prior));
-        CHECK(a.announcer_caption() ==
+        const auto subtitle = a.subtitle();
+        CHECK(subtitle.english == "A%s slagged Victim" && subtitle.translated ==
               "A%s a réduit Victim en scories. Ce texte allongé ne change pas la durée de la voix.");
         CHECK(audio[0].advance(.1, world, {}, {}) && audio[0].mixer.peak == .5f);
         CHECK(!audio[1].local_started && !audio[2].local_started);
         const auto voice = a.communication.voice;
         CHECK(a.receive({owners[0], 2, 0, FinishHimVoice{0, 0, 1}}, .4, false, roster, error));
-        CHECK(a.communication.busy == 1 && a.communication.voice == voice && !a.announcer_caption().empty());
+        CHECK(a.communication.busy == 1 && a.communication.voice == voice && a.subtitle().english == subtitle.english);
         a.clear();
-        CHECK(a.announcer_caption().empty());
+        CHECK(a.subtitle().english.empty());
         CHECK(a.receive({owners[0], 3, 0, FinishHimVoice{0, 0, 1}}, 4, false, roster, error));
         CHECK(a.communication.message.text == "Humiliate Her!" &&
               a.communication.message.file == "Sounds\\Voice\\Voice241.wav");
         CHECK(a.update(4.21, error) && a.communication.voice && audio[0].advance(.1, world, {}, {}) &&
               audio[0].mixer.peak == .5f);
+        CHECK(a.subtitle().english == "Humiliate Her!" && a.subtitle().translated.empty());
         for (unsigned i = 1; i <= 5; ++i)
             CHECK(b.receive({owners[1], i + 1, 0, FragEvent{{1, 1}, {0, 1}, int(i), 30}}, i, false, roster, error));
         CHECK(b.frag_notices == 6 && b.notices().size() == 4 && b.notices()[0].expires == 7);

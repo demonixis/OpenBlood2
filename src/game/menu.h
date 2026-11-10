@@ -10,6 +10,7 @@ namespace OpenBlood2
 {
     class LocalizedFont;
     inline constexpr int menu_language_setting = 31;
+    inline constexpr int menu_subtitles_setting = 32;
 
     enum class MenuPage
     {
@@ -147,6 +148,7 @@ namespace OpenBlood2
         int vr_render_scale = 100;                       // Percentage of recommended eye dimensions (50..100, step 10).
         int field_of_view = 90; // Horizontal degrees at 4:3 (60..120, step 5); 90 is the original FOV_NORMAL.
         Language language = Language::English;
+        bool subtitles = true;
 
         bool operator==(const MenuSettings&) const = default;
     };
@@ -160,7 +162,7 @@ namespace OpenBlood2
         // renderer, normal maps, VR turn, VR laser, VR crosshair, VR movement reference, cheats,
         // god mode, cheat level, anti-aliasing, bloom, tonemap, ambient occlusion, reflections,
         // fullscreen, fullscreen mode, resolution, vsync, frame limit, VR refresh rate, VR render scale,
-        // (29) mouse look, (30) field of view.
+        // (29) mouse look, (30) field of view, (31) language, (32) subtitles.
         int setting = -1;
         HudRect rect{}, slider_rect{};
         std::string insertion; // FormatMessage %1!s! argument of the Load page's RESTART/QUICKLOAD strings.

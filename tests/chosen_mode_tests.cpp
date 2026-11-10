@@ -1,14 +1,19 @@
-// Single Player > CHOSEN: the original CMenuDifficulty::StartGame starts GAMETYPE_ACTION, whose
-// TypeActionMode=false objects (cameras, cinematic and conversation triggers) are refused by
-// B2BaseClass::InitialUpdate, while the server shell (m_GameInfo, no NetGame) stays single player.
+// Single Player > CHOSEN starts GAMETYPE_ACTION. B2BaseClass::InitialUpdate filters objects
+// marked TypeActionMode=false while the server shell (m_GameInfo, no NetGame) stays single player.
 #include "app/session_playback.h"
+#include "engine/localization.h"
+#include "game/cinematic_captions.h"
 #include "game/game_settings.h"
 #include "game/original/CameraObj.h"
+#include "game/original/CinematicTrigger.h"
 #include "game/original/MenuIds.h"
 #include "game/original/PlayerObj.h"
 #include "game/original/Trigger.h"
 #include "game/server_adapter.h"
+#include <algorithm>
+#include <fstream>
 #include <iostream>
+#include <iterator>
 #include <map>
 using namespace OpenBlood2;
 #define CHECK(x)                                                                                                       \
@@ -123,14 +128,15 @@ namespace
                 ++c.alive_cut_scene;
         return c;
     }
-    bool start(std::unique_ptr<GameSession>& game, unsigned character, bool story, std::string& error)
+    bool start(std::unique_ptr<GameSession>& game, unsigned character, bool story, std::string& error,
+               const char* world = "01_SubwayA")
     {
         MenuCommand command;
         command.action = MenuAction::NewGame;
         command.character = character;
         command.difficulty = DIFFICULTY_MEDIUM;
         command.story = story;
-        return start_menu_world(game, menu_world_start(*game, command, "01_SubwayA"), error);
+        return start_menu_world(game, menu_world_start(*game, command, world), error);
     }
     std::unique_ptr<GameSession> mount(const char* root)
     {
@@ -172,6 +178,80 @@ namespace
                 CHECK(g.step(1. / 60));
             CHECK(!g.client_shell.view.object && !player->camera_movement_blocked && !g_hActiveCamera);
         }
+        return true;
+    }
+    bool caption_sequence(std::unique_ptr<GameSession>& game, const char* world, std::string_view activator,
+                          std::string_view sequence, std::span<const std::string_view> expected,
+                          const Localization& english, const Localization& french)
+    {
+        std::string error;
+        CHECK(start(game, 1, false, error, world) && game_type(*game) == float(GAMETYPE_ACTION));
+        const auto* player = game->server_shell.Player(game->local_client);
+        CHECK(player);
+        HOBJECT trigger = nullptr, cinematic = nullptr;
+        for (auto id : game->objects.snapshot())
+        {
+            const auto* entry = game->objects.get(id);
+            if (entry->life != Life::Alive)
+                continue;
+            if (same_name(entry->state.m_Name, activator))
+            {
+                // Slaughter House has two Trigger8 objects. Select the one wired to this scene.
+                const auto* source = dynamic_cast<const Trigger*>(entry->game.get());
+                if (source && std::ranges::any_of(source->slots, [&](const Trigger::Slot& slot)
+                    { return same_name(slot.target, sequence); }))
+                    trigger = entry->handle;
+            }
+            if (entry->type->name == "CinematicTrigger" && same_name(entry->state.m_Name, sequence))
+                cinematic = entry->handle;
+        }
+        // Replay the player's touch of the original map trigger. Its own targets and delays start the scene.
+        CHECK(trigger && cinematic && game->objects.engine_message(trigger, MID_TOUCHNOTIFY, player->m_hObject));
+        std::size_t next = 0;
+        for (unsigned frame = 0; frame < 2400 && next < expected.size(); ++frame)
+        {
+            CHECK(game->step(1. / 60) && !game->client_shell.view.object);
+            const auto* cue = dynamic_cast<const CinematicTrigger*>(game->server.HandleToObject(cinematic));
+            CHECK(cue && !cue->failures);
+            if (!cue->sound || cue->current < next)
+                continue;
+            CHECK(cue->current == next);
+            const auto caption = [&](const Localization& language)
+            {
+                return cinematic_caption(game->client_session.audio, game->resources, &language,
+                                         &game->client_shell.listener_position, game->client_shell.communication.voice);
+            };
+            const auto original = caption(english), translated = caption(french);
+            CHECK(original.english == expected[next] && original.translated.empty());
+            CHECK(translated.english == original.english && !translated.translated.empty() &&
+                  translated.translated != original.english);
+            ++next;
+        }
+        CHECK(next == expected.size());
+        return true;
+    }
+    bool captions(const char* root, const char* french_catalog)
+    {
+        using namespace std::string_view_literals;
+        auto game = mount(root);
+        CHECK(game);
+        std::ifstream file(french_catalog, std::ios::binary);
+        CHECK(file);
+        const std::string ini(std::istreambuf_iterator<char>{file}, std::istreambuf_iterator<char>{});
+        Localization english, french;
+        std::string error;
+        CHECK(english.load(Language::English, error) && french.load_catalog(Language::French, ini, error));
+        constexpr std::array slaughter_house{
+            "Man, all this gristle is making me hungry. What do you want for lunch?"sv, "Anything except hamburgers."sv,
+            "How about a hot dog?"sv, "Yeah, I got a hot dog for you."sv};
+        constexpr std::array train_station{"Leave me alone!"sv};
+        constexpr std::array scared_hank{
+            "Oh, crap!"sv, "There's nobody home. Go away."sv, "Leave me alone!"sv, "I don't want any!"sv,
+            "Leave me alone!"sv, "There's nobody home. Go away."sv, "I don't want any!"sv, "Leave me alone!"sv,
+            "There's nobody home. Go away."sv, "Oh, crap!"sv};
+        CHECK(caption_sequence(game, "11_Slaughter_House", "Trigger8", "cin1hi", slaughter_house, english, french));
+        CHECK(caption_sequence(game, "12_Train_Station", "Trigger2", "civcin1", train_station, english, french));
+        CHECK(caption_sequence(game, "12_Train_Station", "trig1", "hankscaredcin1", scared_hank, english, french));
         return true;
     }
     // The audited single-player branches in a Chosen game: action-only lock feedback, cheats,
@@ -254,6 +334,8 @@ int main(int argc, char** argv)
     const std::string_view name = argv[1];
     if (name == "requests")
         return requests() ? 0 : 1;
+    if (name == "captions" && argc == 4)
+        return captions(argv[2], argv[3]) ? 0 : 1;
     if (argc != 3)
         return 2;
     if (name == "subway")

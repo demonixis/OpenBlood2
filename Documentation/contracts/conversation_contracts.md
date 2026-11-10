@@ -64,6 +64,8 @@ when the communication text matches the source table. It fills missing bitmap
 glyphs with the bundled Unicode face and reveals whole UTF-8 characters. Absent
 or unsupported translations draw the source text. The selected language never
 changes the bytes used for the original deadline, the voice path or arbitration.
+Turning Subtitles off hides the transcript of voiced messages while preserving the
+portrait, the voice and text-only messages.
 Save/Load follow the original block ([save/load lot 7](save_load_contracts.md#implemented-world-logic-lot-7)). Safe
 NEW_LEVEL is covered by the later [transition contract](level_change_contracts.md).
 

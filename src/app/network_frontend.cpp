@@ -16,13 +16,13 @@
 #include "game/localized_font.h"
 #include "game/localized_signs.h"
 #include "game/menu_preferences.h"
+#include "game/original/ConversationTrigger.h"
 #include "net/address.h"
 #include "net/discovery.h"
 #include "server/network.h"
 #include <algorithm>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlgpu3.h>
-#include <cfloat>
 #include <imgui.h>
 #include <memory>
 #include <spdlog/spdlog.h>
@@ -31,10 +31,11 @@ namespace OpenBlood2
 {
     namespace
     {
-        constexpr int resume_option = 0, leave_option = 1;
+        constexpr int resume_option = 0, leave_option = 1, subtitles_option = 2;
 
         // CLI sessions can still use the same menu controls if their data is missing the original menu art.
-        void draw_network_menu_fallback(Menu& menu, std::string_view title, ImFont* font)
+        void draw_network_menu_fallback(Menu& menu, std::string_view title, ImFont* font,
+                                        std::string_view subtitles_label)
         {
             const auto* viewport = ImGui::GetMainViewport();
             const auto fit = MenuViewport::fit(viewport->Size.x, viewport->Size.y);
@@ -54,16 +55,20 @@ namespace OpenBlood2
                 auto& item = menu.items[i];
                 const int y = 175 + 40 * int(i);
                 item.rect = {60, y, 580, y + 40};
-                text(item.localized_literal.empty() ? item.literal : item.localized_literal, y, 26,
+                const auto label = item.setting == menu_subtitles_setting ? subtitles_label
+                    : std::string_view(item.localized_literal.empty() ? item.literal : item.localized_literal);
+                text(label, y, 26,
                      int(i) == menu.selected ? IM_COL32(255, 255, 255, 255) : IM_COL32(185, 185, 185, 255));
             }
             text(menu.multiplayer_status, 385, 18, IM_COL32(220, 220, 220, 255), 520);
         }
     } // namespace
 
-    int run_network_session(const Options& options, const Config& config, Runtime& runtime, std::string& error,
-                            bool& quit, const LocalizedFont* localized_font, ImFont* localized_face)
+    int run_network_session(const Options& options, const Config& config, UiRuntime& ui, std::string& error,
+                            bool& quit, const LocalizedFont& localized_font, MenuSettings* shared_settings)
     {
+        auto& runtime = ui.runtime;
+        auto* localized_face = ui.localized;
         error.clear();
         quit = false;
         struct RestoreInput
@@ -123,9 +128,11 @@ namespace OpenBlood2
         auto& controls = menu_input.controls;
         NetworkControls actions;
         std::vector<Net::CommandAction> sampled_actions;
-        MenuSettings settings;
+        MenuSettings local_settings;
+        auto& settings = shared_settings ? *shared_settings : local_settings;
         std::filesystem::path preferences, bindings;
-        if (!menu_preferences_path(preferences, error) || !load_menu_preferences(preferences, settings, error) ||
+        if (!menu_preferences_path(preferences, error) ||
+            (!shared_settings && !load_menu_preferences(preferences, settings, error)) ||
             !controls_path(bindings, error) || !load_controls(bindings, controls.bindings, error))
             return failed();
         Localization localization;
@@ -136,14 +143,13 @@ namespace OpenBlood2
         HudRenderer hud(runtime.gpu);
         if (localized)
         {
-            hud.set_localization(&localization, localized_font);
-            if (localized_font)
-                presenter.set_texture_decoration(sign_texture_decoration(localization, *localized_font));
+            hud.set_localization(&localization, &localized_font);
+            presenter.set_texture_decoration(sign_texture_decoration(localization, localized_font));
         }
         const auto translated = [&](std::string_view key)
         {
             const auto value = localization.text(key);
-            return localized && localized_font && localized_font->supports(value) ? value : std::string_view{};
+            return localized && localized_font.supports(value) ? value : std::string_view{};
         };
         const auto tr = [&](std::string_view key, std::string_view english)
         {
@@ -197,7 +203,7 @@ namespace OpenBlood2
             return failed();
         MenuCanvas menu_canvas(client.resources());
         menu_canvas.localization = &localization;
-        menu_canvas.localized_font = localized ? localized_font : nullptr;
+        menu_canvas.localized_font = localized ? &localized_font : nullptr;
         MenuRenderer menu_renderer(runtime.gpu);
         std::string menu_error;
         bool native_menu = menu_canvas.initialize(menu_error);
@@ -205,8 +211,7 @@ namespace OpenBlood2
             spdlog::warn("Multiplayer menu artwork: {}", menu_error);
         const auto unicode_text = [&](std::string_view text)
         {
-            return localized_font && std::ranges::any_of(text, [](unsigned char c) { return c >= 128; }) &&
-                   localized_font->supports(text);
+            return std::ranges::any_of(text, [](unsigned char c) { return c >= 128; }) && localized_font.supports(text);
         };
         if (localized_font)
             frag_table.set_player_label([&](std::string_view name, HudSurface& image, const HudFont& bitmap,
@@ -214,22 +219,22 @@ namespace OpenBlood2
             {
                 if (!unicode_text(name))
                     return false;
-                LocalizedBitmapLine(bitmap, *localized_font, name).draw(image, row);
+                LocalizedBitmapLine(bitmap, localized_font, name).draw(image, row);
                 return true;
             });
-        if (localized && localized_font && !localization_resource_overridden(client.resources(), "cres.dll"))
+        if (localized && !localization_resource_overridden(client.resources(), "cres.dll"))
         {
             client.set_announcer_translations([&](unsigned id)
             {
                 const auto value = localization.text(id);
-                return localized_font->supports(value) ? value : std::string_view{};
+                return localized_font.supports(value) ? value : std::string_view{};
             });
             frag_table.set_team_label([&](DBYTE team, HudSurface& image, const HudFont& bitmap, const HudRect& row)
             {
                 const auto value = localization.text(team == 1 ? "network.blue_team" : "network.red_team");
-                if (value.empty() || !localized_font->supports(value))
+                if (value.empty() || !localized_font.supports(value))
                     return false;
-                LocalizedBitmapLine(bitmap, *localized_font, value).draw(image, row);
+                LocalizedBitmapLine(bitmap, localized_font, value).draw(image, row);
                 return true;
             });
         }
@@ -298,6 +303,14 @@ namespace OpenBlood2
                 else
                     add(leave_option, "network.leave_game", "Leave game");
             }
+            if (ready && !leaving)
+            {
+                MenuItem item;
+                item.command = subtitles_option;
+                item.setting = menu_subtitles_setting;
+                item.literal = "SUBTITLES";
+                rows.push_back(std::move(item));
+            }
             menu.set_multiplayer_rows(std::move(rows));
             std::string status(leaving ? tr("network.leaving", "Leaving...")
                                : ready ? tr("network.continues", "Game continues while this menu is open.")
@@ -352,6 +365,13 @@ namespace OpenBlood2
                     else if (command.action == MenuAction::MultiplayerOption && command.option == leave_option &&
                              !leave())
                         return failed();
+                    else if (command.action == MenuAction::Settings && settings.subtitles != menu.settings.subtitles)
+                    {
+                        settings.subtitles = menu.settings.subtitles;
+                        std::string save_error;
+                        if (!save_menu_preferences(preferences, settings, save_error))
+                            spdlog::error("Save preferences failed: {}", save_error);
+                    }
                     menu.cues.clear();
                 }
                 else
@@ -473,7 +493,8 @@ namespace OpenBlood2
                 state.world_revision = client.joined().world;
                 if (!hud.draw(state, client.resources(), error))
                     return failed();
-                draw_letterbox(camera.view.object && camera.view.settings.type == 1);
+                const bool letterbox = camera.view.object && camera.view.settings.type == 1;
+                draw_letterbox(letterbox);
                 if (scores.visible)
                 {
                     const auto size = ImGui::GetMainViewport()->Size;
@@ -500,20 +521,20 @@ namespace OpenBlood2
                                                             IM_COL32(255, 255, 255, 255), line.text.c_str());
                     y += 16;
                 }
-                const auto caption = client.speech().announcer_caption();
-                if (!caption.empty() && localized)
+                if (settings.subtitles)
                 {
-                    const auto* viewport = ImGui::GetMainViewport();
-                    constexpr float height = 16;
-                    const float wrap = std::max(1.f, std::min(560.f, viewport->Size.x - 24));
-                    const auto end = caption.data() + caption.size();
-                    const auto size = localized_face->CalcTextSizeA(height, FLT_MAX, wrap, caption.data(), end);
-                    const ImVec2 pos{origin.x + (viewport->Size.x - size.x) / 2,
-                                     origin.y + std::max(0.f, viewport->Size.y - size.y - 64)};
-                    auto* draw = ImGui::GetForegroundDrawList();
-                    draw->AddText(localized_face, height, {pos.x + 1, pos.y + 1}, IM_COL32(0, 0, 0, 255),
-                                  caption.data(), end, wrap);
-                    draw->AddText(localized_face, height, pos, IM_COL32(255, 255, 255, 255), caption.data(), end, wrap);
+                    const auto& speech = client.speech();
+                    auto caption = speech.subtitle();
+                    if (localized && !caption.english.empty() && caption.translated.empty())
+                    {
+                        const auto& file = speech.communication.message.file;
+                        const auto* original = conversation_text(file);
+                        if (original && caption.english == original &&
+                            !localization_resource_overridden(client.resources(), file))
+                            caption.translated = localization.dialogue(file);
+                    }
+                    ui.draw_subtitle(caption,
+                                     letterbox ? CaptionPlacement::Letterbox : CaptionPlacement::Play, localized_font);
                 }
             }
             if (menu.active)
@@ -529,8 +550,13 @@ namespace OpenBlood2
                         return failed();
                 }
                 else
+                {
+                    const auto state = settings.subtitles ? tr("menu.on", "ON") : tr("menu.off", "OFF");
+                    const auto subtitle_label = std::string(tr("menu.subtitles", "SUBTITLES")) + " [" +
+                                                std::string(state) + "]";
                     draw_network_menu_fallback(menu, tr("network.title", "BLOODBATH"),
-                                               localized ? localized_face : ImGui::GetFont());
+                                               localized ? localized_face : ImGui::GetFont(), subtitle_label);
+                }
             }
             ImGui::Render();
             auto* commands = SDL_AcquireGPUCommandBuffer(runtime.gpu);
@@ -663,6 +689,6 @@ namespace OpenBlood2
         else if (!ui.set_localized_font(localized_font))
             spdlog::warn("Cannot initialize the language font. Using English.");
         bool quit = false;
-        return run_network_session(options, config, runtime, error, quit, &localized_font, ui.localized);
+        return run_network_session(options, config, ui, error, quit, localized_font);
     }
 } // namespace OpenBlood2
