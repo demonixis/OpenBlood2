@@ -21,7 +21,7 @@ namespace
     struct Target : BaseClass
     {
         CDestructable damage;
-        bool remove_owner = false;
+        bool remove_owner = false, remove_self = false;
         Target()
         {
             AddAggregate(&damage);
@@ -39,9 +39,10 @@ namespace
         DDWORD ObjectMessageFn(HOBJECT sender, DDWORD message, HMESSAGEREAD read) override
         {
             auto result = BaseClass::ObjectMessageFn(sender, message, read);
-            if (remove_owner && message == damage_message)
+            if ((remove_owner || remove_self) && message == damage_message)
             {
-                g_pServerDE->RemoveObject(sender);
+                if (remove_owner)
+                    g_pServerDE->RemoveObject(sender);
                 g_pServerDE->RemoveObject(m_hObject);
             }
             return result;
@@ -329,6 +330,33 @@ namespace
         }
         return true;
     }
+    bool pellet_removal(const std::filesystem::path& root)
+    {
+        GameSession game;
+        CHECK(entry(game, root));
+        auto& inventory = game.server_shell.Player(game.local_client)->m_InventoryMgr;
+        CHECK(inventory.ObtainWeapon(WEAP_SHOTGUN, 3) == InventoryResult::Ok);
+        inventory.SetAmmoCount(AMMO_SHELL, 4);
+        auto* gun = inventory.GetWeapon(3);
+        CHECK(gun);
+        for (const bool alternate : {false, true})
+        {
+            const auto fire = shot(game, WEAP_SHOTGUN, alternate);
+            auto* victim = target(game, vector_add(fire.position, {0, 0, 40}), {20, 20, 10});
+            auto* behind = target(game, vector_add(fire.position, {0, 0, 80}), {20, 20, 10});
+            CHECK(victim && behind);
+            victim->remove_self = true;
+            behind->damage.SetHitPoints(1000);
+            const auto removed = victim->m_hObject;
+            CHECK(gun->Fire(fire) == FireResult::Fired && gun->last_pellets == 16);
+            CHECK(!game.server.IsObjectAlive(removed) && behind->damage.accepted_damage == 15);
+            CHECK(gun->impacts.size() == 16 && gun->impacts.front().hit.object == removed &&
+                  gun->impacts.front().damage_delivered && game.server.message_count() == 0);
+            CHECK(inventory.GetAmmoCount(AMMO_SHELL) == (alternate ? 1 : 3));
+            CHECK(game.objects.remove(behind->m_hObject) && game.objects.finish_frame());
+        }
+        return true;
+    }
     bool private_weapons(const char* root)
     {
         GameSession game;
@@ -414,6 +442,8 @@ int main(int argc, char** argv)
         ok = lifetime(root);
     else if (name == "rollback")
         ok = rollback(root);
+    else if (name == "pellet_removal")
+        ok = pellet_removal(root);
     else if (name == "private")
         ok = private_weapons(argv[2]);
     return ok ? 0 : 1;

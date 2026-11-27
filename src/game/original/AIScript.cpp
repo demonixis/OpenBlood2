@@ -125,6 +125,10 @@ bool AI_Mgr::PrepareScript(std::string_view text)
     std::string error;
     if (!ParseScript(text, m_dwScriptFlags, parsed, error))
         return ScriptFailure(error);
+    return InstallScript(std::move(parsed));
+}
+bool AI_Mgr::InstallScript(ScriptProgram parsed)
+{
     if (!SetNewState(StateScript))
         return ScriptFailure(state_error);
     script_commands = std::move(parsed.commands);

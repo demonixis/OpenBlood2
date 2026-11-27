@@ -286,10 +286,16 @@ bool ZealotAI::AI_STATE_Teleport()
                 return StateFailure("Zealot teleport ray unavailable");
             // Bounded replacement movement must check the body before restoring solidity.
             // Keep the source ray/backoff and one movement attempt; do not materialize inside a solid.
-            s->SetObjectFlags(m_hObject, s->GetObjectFlags(m_hObject) | FLAG_SOLID);
+            const auto flags = s->GetObjectFlags(m_hObject);
+            s->SetObjectFlags(m_hObject, flags | FLAG_SOLID);
             const int before = m_nState;
-            if (s->MoveObject(m_hObject, &to) != DE_OK || !s->IsObjectAlive(m_hObject) || m_nState != before ||
-                Metacmd != 3)
+            if (s->MoveObject(m_hObject, &to) != DE_OK)
+            {
+                if (s->IsObjectAlive(m_hObject) && m_nState == before)
+                    s->SetObjectFlags(m_hObject, flags);
+                return StateFailure("Zealot teleport movement or callback state failed");
+            }
+            if (!s->IsObjectAlive(m_hObject) || m_nState != before || Metacmd != 3)
                 return StateFailure("Zealot teleport movement or callback state failed");
             ++Metacmd;
             return true;

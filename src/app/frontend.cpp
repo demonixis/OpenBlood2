@@ -608,7 +608,7 @@ namespace OpenBlood2
             DemoSmoke demo_smoke;
             DemoMenuSmoke demo_menu_smoke;
             StartupSmoke startup_smoke;
-            bool done = false, captured = false, dismiss_error = false;
+            bool done = false, captured = false, dismiss_error = false, screenshot_requested = false;
             // Options > SETUP over the paused menu (input.setup_screen); its result applies next frame.
             auto setup_result = SetupScreen::Result::None;
             std::uint64_t frames = 0;
@@ -785,6 +785,16 @@ namespace OpenBlood2
                         return true;
                     }
                     auto* player = game->server_shell.Player(game->local_client);
+                    if (!xr_mode && event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat &&
+                        event.key.windowID == SDL_GetWindowID(runtime.window) && event.key.scancode == SDL_SCANCODE_F12 &&
+                        player && input.controls.focused && !input.paused(menu) && !input.inspector &&
+                        std::none_of(input.controls.bindings.entries.begin(), input.controls.bindings.entries.end(),
+                                     [](const InputBinding& b)
+                                     { return b.source == InputSource::Key && b.code == SDL_SCANCODE_F12; }))
+                    {
+                        screenshot_requested = true;
+                        return true;
+                    }
                     const bool old_message = input.message.active;
                     const bool old_inspector = input.inspector, old_menu = input.paused(menu);
                     const bool forward =
@@ -1733,16 +1743,22 @@ namespace OpenBlood2
                     (options.demo_smoke && (frames == 4 || frames == 14 || frames == 45 || frames == 62));
                 const bool save =
                     target && ((frames >= 2 && !captured) || phase_capture) && !options.capture_file.empty();
-                if (save && !capture.initialize(runtime.gpu,
-                                                SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), w, h))
+                bool screenshot = target && std::exchange(screenshot_requested, false);
+                if ((save || screenshot) &&
+                    !capture.initialize(runtime.gpu, SDL_GetGPUSwapchainTextureFormat(runtime.gpu, runtime.window), w, h))
                 {
-                    error = SDL_GetError();
-                    SDL_CancelGPUCommandBuffer(commands);
-                    return failed(3);
+                    if (save)
+                    {
+                        error = SDL_GetError();
+                        SDL_CancelGPUCommandBuffer(commands);
+                        return failed(3);
+                    }
+                    spdlog::warn("Screenshot capture unavailable: {}", SDL_GetError());
+                    screenshot = false;
                 }
                 if (target)
                 {
-                    auto* color_target = save ? capture.texture : target;
+                    auto* color_target = save || screenshot ? capture.texture : target;
                     const bool world = !menu.active && !input.credits_screen && !input.demo.finished() &&
                                        !screen_shown && presenter.render_world;
                     if (world &&
@@ -1766,11 +1782,16 @@ namespace OpenBlood2
                     }
                     ImGui_ImplSDLGPU3_RenderDrawData(ImGui::GetDrawData(), commands, pass);
                     SDL_EndGPURenderPass(pass);
-                    if (save && !capture.enqueue(commands, target, w, h))
+                    if ((save || screenshot) && !capture.enqueue(commands, target, w, h))
                     {
-                        error = SDL_GetError();
-                        SDL_CancelGPUCommandBuffer(commands);
-                        return failed(3);
+                        if (save)
+                        {
+                            error = SDL_GetError();
+                            SDL_CancelGPUCommandBuffer(commands);
+                            return failed(3);
+                        }
+                        spdlog::warn("Screenshot readback unavailable: {}", SDL_GetError());
+                        screenshot = false;
                     }
                 }
                 if (!SDL_SubmitGPUCommandBuffer(commands))
@@ -1792,6 +1813,29 @@ namespace OpenBlood2
                         return failed(3);
                     }
                     captured = true;
+                }
+                if (screenshot)
+                {
+                    std::filesystem::path directory;
+                    std::string screenshot_error;
+                    SDL_Time now;
+                    if (!user_directory(directory, screenshot_error))
+                        spdlog::warn("Screenshot unavailable: {}", screenshot_error);
+                    else if (!SDL_GetCurrentTime(&now))
+                        spdlog::warn("Screenshot unavailable: {}", SDL_GetError());
+                    else
+                    {
+                        directory /= "screenshots";
+                        std::error_code ec;
+                        std::filesystem::create_directories(directory, ec);
+                        const auto path = directory / ("blood2-" + std::to_string(now) + ".png");
+                        if (ec)
+                            spdlog::warn("Cannot create screenshot directory: {}", ec.message());
+                        else if (capture.save(path_text(path).c_str()))
+                            spdlog::info("Screenshot saved to {}", path_text(path));
+                        else
+                            spdlog::warn("Cannot save screenshot: {}", SDL_GetError());
+                    }
                 }
                 if (!options.menu_smoke && !options.demo_smoke)
                     DisplayOptions::pace(tick, menu.settings.fps_limit);

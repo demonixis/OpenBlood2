@@ -29,11 +29,13 @@ is no numeric parsing, deduplication, whole-suffix validation or invented alias.
 
 Despite its name, original AddToSortedList does **not sort**. It begins at the
 list sentinel, whose data is null, breaks immediately and inserts after that
-sentinel. The resulting query order is the reverse of enumeration. The port
-iterates the stored array backwards to preserve that behavior without allocating
-an intermediate linked list. Original DLink initialization/insertion was checked
-to establish this result; the misleading sorting comment is not the specification.
-The engine's stable slot enumeration is not claimed to reproduce retail load order.
+sentinel. The resulting query order reverses engine enumeration. The donor
+engine inserts world objects at the head of its list while reading the DAT in
+file order, so the two reversals cancel for authored paths. Abandoned Buildings
+reads the PathPoint snapshot forward to preserve Gideon's and the scientist's
+authored route. Other worlds keep the existing reverse slot order pending
+scene-specific verification. The snapshot digest and the active route stored
+in a save retain their layout.
 
 Invalid/empty prefix and an empty manager preserve the caller's previous result,
 as in the source's preflight returns. With a nonempty manager and valid prefix,
@@ -83,7 +85,7 @@ not a moving AI route. Queries are rebuilt from current manager state when drawn
 so unload/reload cannot retain a borrowed entry or stale engine selection.
 
 Synthetic tests cover typed copy and string ownership, case/suffix/duplicate rules,
-reverse order, preflight versus no-match output behavior, aliased prefixes, removal,
+reverse slot order, preflight versus no-match output behavior, aliased prefixes, removal,
 SMELL expiry, rebuild/unload, active/inactive enumeration and the exact 4096/4097
 boundary. The private test performs two SubwayA entry/unload cycles, checking the
 seven real points and these exact selected orders:

@@ -91,6 +91,18 @@ FireResult CWeapon::Fire(const WeaponFire& request)
         direction = vector_scale(direction, 1 / std::sqrt(vector_dot(direction, direction)));
     }
     const auto range = request.alternate ? data.m_fAltRange : data.m_fRange;
+    const auto trace_vector = [&]()
+    {
+        last_shot.collision =
+            server->IntersectSegment(last_shot.request.position, last_shot.end, m_hOwner, last_shot.hit, false,
+                                     SegmentObjects::SolidOrRayHit, SegmentFilter::None, SegmentStart::SkipInterior);
+        if (last_shot.collision == SegmentResult::Invalid || last_shot.collision == SegmentResult::Unavailable)
+        {
+            last_shot.result = FireResult::Unavailable;
+            return false;
+        }
+        return true;
+    };
     const auto trace = [&](DVector direction)
     {
         if (data.m_nType == WEAP_VOODOO)
@@ -165,16 +177,7 @@ FireResult CWeapon::Fire(const WeaponFire& request)
             last_shot.collision = SegmentResult::Unavailable; // Visual-only source branch: no damage ray.
             return true;
         }
-        const auto query =
-            server->IntersectSegment(last_shot.request.position, last_shot.end, m_hOwner, last_shot.hit, false,
-                                     SegmentObjects::SolidOrRayHit, SegmentFilter::None, SegmentStart::SkipInterior);
-        last_shot.collision = query;
-        if (query == SegmentResult::Invalid || query == SegmentResult::Unavailable)
-        {
-            last_shot.result = FireResult::Unavailable;
-            return false;
-        }
-        return true;
+        return trace_vector();
     };
     // No-consumption collision preflight of every vector.
     const auto base = last_shot;
@@ -217,6 +220,13 @@ FireResult CWeapon::Fire(const WeaponFire& request)
     {
         last_shot = traced[i];
         last_shot.result = FireResult::Fired;
+        // A previous pellet's damage or impact callback can remove the target
+        // found during preflight. Keep this pellet's direction and range.
+        if (!projectile && last_shot.hit.object && !server->IsObjectAlive(last_shot.hit.object) && !trace_vector())
+        {
+            result = last_shot.result;
+            continue;
+        }
         const auto vector_result = projectile ? FireProjectile() : FireVector();
         if (vector_result != FireResult::Fired)
             result = vector_result;

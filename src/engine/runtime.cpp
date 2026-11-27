@@ -14,7 +14,12 @@ namespace OpenBlood2
             return false;
         }
         sdl_initialized = true;
-        window = SDL_CreateWindow("OpenBlood 2", 1200, 780, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+        SDL_WindowFlags window_flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY;
+#if defined(SDL_PLATFORM_ANDROID)
+        // SDL's Android fullscreen path owns the immersive system bars.
+        window_flags |= SDL_WINDOW_FULLSCREEN;
+#endif
+        window = SDL_CreateWindow("OpenBlood 2", 1200, 780, window_flags);
         if (!window)
         {
             error = SDL_GetError();

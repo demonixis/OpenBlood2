@@ -164,6 +164,20 @@ solid nor gravity flags remains ineligible. Dimensions and simulation collision
 semantics are unchanged. services.start_departure verifies the nonsolid floor
 case, following integration and refusal for a nonphysical object.
 
+## World and actor recovery in 0.6.2
+
+- CityHubC's `spawn6` overlaps the metal crate at the Shikari's marker. A string
+  spawn can clear a destructible box using a face-normal correction bounded by
+  the moving body's extent, with a checked path and destination. Solo movement
+  uses the same check if an older save already contains the overlap.
+- Solo characters use that check when a solidifying Zealot overlaps another
+  character. A rejected Zealot teleport restores its previous flags.
+- A previously bounced M16 grenade uses the checked separation before an
+  ordinary contact with a live character. An unbounced grenade still delivers
+  its original immediate contact without moving. Primary-world refusals remain.
+- A dropped hand weapon can reuse the bounded primary-world placement after
+  a failed physics move. If the nudge fails, the body stops with a diagnostic.
+
 ## Floor-edge and world-model initial placement
 
 Train Station SoulDrudge0 is centered at (-1984,256,-4800) on a primary-world

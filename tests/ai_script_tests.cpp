@@ -282,6 +282,24 @@ namespace
     }
     bool lifetime(const char*)
     {
+        {
+            GameSession g;
+            CHECK(setup(g));
+            auto* a = actor(g);
+            CHECK(a);
+            const auto change_speed = std::string("SCRIPT 0; SETMOVEMENT WALK;");
+            const auto replace_script = std::string("SCRIPT 0; WAIT 0; SETSTATE INACTIVE;");
+            CHECK(point(g, "route1", {0, 10, 3}, {{"ActionMessage", replace_script}}));
+            CHECK(point(g, "route0", {0, 10, 0}, {{"ActionMessage", change_speed}}));
+            CHECK(g.server_shell.paths.BuildPathList());
+            CHECK(a->PrepareScript("SCRIPT 0; SETMOVEMENT RUN; FOLLOWPATH route; WAIT 10;"));
+            a->driving = true;
+            g.server.SetNextUpdate(a->m_hObject, .001f);
+            for (int i = 0; i < 100 && a->driving; ++i)
+                CHECK(g.step(.1) && a->ok);
+            CHECK(!a->driving && a->m_nState == AI_Mgr::StateInactive && a->m_eScriptMovement == AI_Mgr::SM_WALK);
+            CHECK(a->path_arrivals == 2 && a->path_deliveries == 2 && a->script_failures == 0);
+        }
         for (bool remove : {false, true})
         {
             GameSession g;

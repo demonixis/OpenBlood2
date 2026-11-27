@@ -1,4 +1,6 @@
 #include "engine/world_model.h"
+#include "game/game_settings.h"
+#include "game/original/HandWeaponModel.h"
 #include "game/original/PickupObject.h"
 #include "game/original/PolyGrid.h"
 #include "game/original/Projectile.h"
@@ -81,6 +83,25 @@ namespace OpenBlood2
         }
         nearest.departed = departed;
         return result;
+    }
+    std::optional<DVector> ServerAdapter::leave_box_overlap(HOBJECT owner, DVector center, DVector half,
+                                                           const CollisionHit& overlap,
+                                                           const std::vector<ObjectId>& ids)
+    {
+        // Only the named box can be ignored, and only along the separating route.
+        // Bound the correction by the moving box's full extent along the contact normal.
+        const auto normal = overlap.normal;
+        const auto extent = 2 * vector_dot(half, {std::abs(normal.x), std::abs(normal.y), std::abs(normal.z)});
+        if (!overlap.object || overlap.polygon != UINT32_MAX || !physics_vector(normal) ||
+            vector_dot(normal, normal) < .99f || !(overlap.penetration > 0 && overlap.penetration <= extent))
+            return std::nullopt;
+        const auto clear = vector_add(center, vector_scale(normal, float(overlap.penetration) + .001f));
+        CollisionHit check;
+        if (sweep_scene(owner, center, clear, half, check, ids, overlap.object, .01, StartOverlap::Leave) !=
+                CollisionQuery::Miss ||
+            sweep_scene(owner, clear, clear, half, check, ids, nullptr, .01) != CollisionQuery::Miss)
+            return std::nullopt;
+        return clear;
     }
     ResizeResult ServerAdapter::ResizeObject(HOBJECT h, DVector dimensions)
     {
@@ -425,6 +446,26 @@ namespace OpenBlood2
                 ++r->brush_start_passes;
                 continue;
             }
+            // A destructible model can overlap an NPC at a spawn marker or in an
+            // older save. A Zealot can overlap another character while fading.
+            if (iteration == 0 && found && nearest.start_solid && obstacle && !network_game_type(net_game_type) &&
+                r->character_body)
+            {
+                const auto* zealot = objects_.find_class("ZealotAI");
+                const bool fade_contact = obstacle->character_body &&
+                                          (Objects::is_kind_of(r->type, zealot) ||
+                                           Objects::is_kind_of(obstacle->type, zealot));
+                const bool model_contact =
+                    !r->client_movement && Objects::is_kind_of(obstacle->type, objects_.find_class("CDestructableModel"));
+                if (fade_contact || model_contact)
+                    if (auto clear = leave_box_overlap(h, vector_subtract(position, lower), box, nearest, ids))
+                    {
+                        position = vector_add(*clear, lower);
+                        ++r->overlap_contacts;
+                        r->last_overlap_depth = static_cast<float>(nearest.penetration);
+                        continue;
+                    }
+            }
             if (found && !nearest.start_solid && std::abs(nearest.normal.y) < .01f && obstacle &&
                 (obstacle->world_body || obstacle->model_body) && obstacle->body_properties.pushable &&
                 r->blocking_priority > obstacle->blocking_priority)
@@ -767,6 +808,19 @@ namespace OpenBlood2
                     // that changes nothing it stops falling where it is, still collectible, and
                     // the failure stays recorded. Every other body keeps the strict failure.
                     auto* pickup = dynamic_cast<PickupObject*>(r->game.get());
+                    if (auto* hand = dynamic_cast<CHandWeaponModel*>(r->game.get());
+                        hand && hand->dropped && r->life == Life::Alive)
+                    {
+                        const auto nudges = r->placement_nudges;
+                        if (ResolveInitialWorldOverlap(r->handle) != DE_OK || r->placement_nudges == nudges)
+                        {
+                            r->state.m_Flags &= ~FLAG_GRAVITY;
+                            r->velocity = r->acceleration = {};
+                            hand->drop_error = "Dropped weapon cannot leave world geometry";
+                            SetNextUpdate(r->handle, 0);
+                        }
+                        break;
+                    }
                     // Same policy for a gravity CDestructableModel authored overlapping geometry
                     // (MoveObjectToGround keeps its pose): it stays where it was placed, as the
                     // original's downward-only helper left it. No separation is attempted.

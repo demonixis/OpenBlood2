@@ -235,6 +235,26 @@ namespace
         first->remove_on_touch = removed;
         CHECK(p->AdvanceFlight(.1) && first->touches == 2 && second->touches == 0);
         CHECK(g.objects.finish_frame() && !g.objects.get(removed));
+        first->remove_on_touch = nullptr;
+        for (const int remaining : {1, 2})
+        {
+            auto shallow = g.objects.get(first->m_hObject)->state.m_Pos;
+            DVector dims, grenade_dims;
+            CHECK(g.server.GetObjectDims(first->m_hObject, &dims) == DE_OK);
+            p = test_assault::grenade(g, {300, 150, 300}, {0, -1, 0}, 20);
+            CHECK(p && g.server.GetObjectDims(p->m_hObject, &grenade_dims) == DE_OK);
+            shallow.y = 150 - dims.y - grenade_dims.y + .75f;
+            shallow.x = 300;
+            shallow.z = 300;
+            CHECK(g.server.TeleportObject(first->m_hObject, &shallow) == DE_OK);
+            p->bounces_left = remaining;
+            const auto touches = first->touches;
+            CHECK(p->AdvanceFlight(.01) && !p->failed && !p->m_bExplode && p->bounces_left == remaining - 1);
+            CHECK(g.objects.get(p->m_hObject)->state.m_Pos.y > 150.75f && first->touches == touches + 1);
+            CHECK(p->AdvanceFlight(.01) && !p->m_bExplode && p->bounces_left == remaining - 1 &&
+                  first->touches == touches + 1);
+            CHECK(g.objects.remove(p->m_hObject) && g.objects.finish_frame());
+        }
         CHECK(g.unload_world());
         return true;
     }

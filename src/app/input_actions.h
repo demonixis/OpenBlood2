@@ -382,7 +382,8 @@ namespace OpenBlood2
         // Console layout: left stick moves, right stick looks, L3 latches run, R3 crouches,
         // triggers fire (right primary, left alternate), bumpers cycle weapons, Start menu,
         // north (Y) jump, south (A) use and menu accept, east (B) menu back, west (X) use item,
-        // Back (Select) next item, D-pad up detonate; the D-pad and left stick also navigate menus.
+        // Back (Select) next item, D-pad up detonate, D-pad down objectives.
+        // The D-pad and left stick also navigate menus.
         static void add_gamepad(InputBindings& b)
         {
             const auto button = [&b](SDL_GamepadButton code, InputAction action)
@@ -410,6 +411,7 @@ namespace OpenBlood2
             button(SDL_GAMEPAD_BUTTON_BACK, InputAction::NextItem);
             button(SDL_GAMEPAD_BUTTON_DPAD_UP, InputAction::Detonate);
             button(SDL_GAMEPAD_BUTTON_DPAD_UP, InputAction::MenuUp);
+            button(SDL_GAMEPAD_BUTTON_DPAD_DOWN, InputAction::Objectives);
             button(SDL_GAMEPAD_BUTTON_DPAD_DOWN, InputAction::MenuDown);
             button(SDL_GAMEPAD_BUTTON_DPAD_LEFT, InputAction::MenuLeft);
             button(SDL_GAMEPAD_BUTTON_DPAD_RIGHT, InputAction::MenuRight);

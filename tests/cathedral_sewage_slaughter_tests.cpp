@@ -208,8 +208,20 @@ namespace
             CHECK(g.objects.finish_frame());
         }
         CHECK(z->SetNewState(AI_Mgr::StateTeleport));
+        DVector player_origin;
+        CHECK(g.server.GetObjectPos(p.m_hObject, &player_origin) == DE_OK);
+        bool overlapped = false;
         for (unsigned i = 0; i < 21; ++i)
         {
+            if (z->Metacmd == 3 && !overlapped)
+            {
+                auto* zealot = g.objects.get(zh);
+                auto* player = g.objects.get(p.m_hObject);
+                auto pose = vector_add(zealot->state.m_Pos, {zealot->dimensions.x + player->dimensions.x - 2, 0, 0});
+                CHECK(!(g.server.GetObjectFlags(zh) & FLAG_SOLID) &&
+                      g.server.TeleportObject(p.m_hObject, &pose) == DE_OK);
+                overlapped = true;
+            }
             CHECK(z->m_MoveObj.Update());
             if (!z->AI_STATE_Teleport())
             {
@@ -217,6 +229,8 @@ namespace
                 return false;
             }
         }
+        CHECK(overlapped && g.objects.get(zh)->overlap_contacts > 0);
+        CHECK(g.server.TeleportObject(p.m_hObject, &player_origin) == DE_OK);
         CHECK(g.server.GetObjectFlags(zh) & FLAG_SOLID);
         CHECK(z->state_error.empty() && z->runtime_error.empty());
 

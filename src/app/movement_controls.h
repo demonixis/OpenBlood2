@@ -431,7 +431,7 @@ namespace OpenBlood2
                                  held(InputAction::MoveBackward),
                                  held(InputAction::StrafeLeft) || (strafe && held(InputAction::TurnLeft)),
                                  held(InputAction::StrafeRight) || (strafe && held(InputAction::TurnRight)),
-                                 held(InputAction::Run) || run_latched || run_lock,
+                                 run_latched || (held(InputAction::Run) != run_lock),
                                  held(InputAction::Jump),
                                  held(InputAction::Crouch)};
             if (mouse_captured)

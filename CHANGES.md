@@ -2,6 +2,25 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.6.2] - 2026-11-27
+
+### Added
+
+- D-pad down and a touch button open mission objectives in supported solo games. Tab still opens the same page on a keyboard.
+- F12 saves a PNG with the HUD to the screenshots directory during desktop solo play when the key is available.
+
+### Fixed
+
+- Shikari spawned by the hard hat area ambush in CityHubC can clear the destructible crate at the spawn marker. An already embedded NPC can recover on its next move if the separating path is clear.
+- Shotgun pellets recheck their path when an earlier pellet removes the target during the same discharge.
+- An M16 grenade that has already bounced can separate from a living character before processing the ordinary bounce.
+- A dropped weapon that starts inside a world face can recover and finish becoming a pickup.
+- Steam Tunnels swinging doors can push an enemy along an available wall-side path when the direct push is blocked.
+- A fading Zealot can reappear next to another character without leaving a blocking overlap when a clear separation is available.
+- Authored AI path points can change the current movement mode or hand off to another script without recursively updating the actor.
+- Android phone builds request immersive fullscreen through SDL.
+- Holding Run while auto-run is enabled temporarily switches to walking.
+
 ## [0.6.1] - 2026-11-10
 
 ### Added

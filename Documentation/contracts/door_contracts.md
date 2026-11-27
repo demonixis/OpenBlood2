@@ -125,6 +125,12 @@ its body, refreshes support/contents and feeds the same-frame camera and weapons
 Transport does not inject an additional player velocity or duplicate integration.
 The current solver makes no claim to original blocking-priority arbitration.
 
+When the swing of a solo RotatingDoor would drive an NPC into a solid obstacle,
+the rotation planner can use a bounded push along the door face normal or
+along the adjacent wall. It validates the swept route and the next door pose
+before committing the transaction. The Steam Tunnels regression places a
+Shikari by `rotdoorgubgub99` after activating the three nearby steam controls.
+
 ## Inspection and remaining gate
 
 The **Doors** tab lists hidden/inactive live doors, shows current transformed

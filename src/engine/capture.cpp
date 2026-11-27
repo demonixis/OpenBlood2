@@ -39,19 +39,20 @@ namespace OpenBlood2
                           Uint32 target_height)
     {
         SDL_GPUCopyPass* copy = SDL_BeginGPUCopyPass(commands);
-        if (!copy)
-            return false;
-        SDL_GPUTextureRegion source{};
-        source.texture = texture;
-        source.w = width;
-        source.h = height;
-        source.d = 1;
-        SDL_GPUTextureTransferInfo destination{};
-        destination.transfer_buffer = transfer;
-        destination.pixels_per_row = width;
-        destination.rows_per_layer = height;
-        SDL_DownloadFromGPUTexture(copy, &source, &destination);
-        SDL_EndGPUCopyPass(copy);
+        if (copy)
+        {
+            SDL_GPUTextureRegion source{};
+            source.texture = texture;
+            source.w = width;
+            source.h = height;
+            source.d = 1;
+            SDL_GPUTextureTransferInfo destination{};
+            destination.transfer_buffer = transfer;
+            destination.pixels_per_row = width;
+            destination.rows_per_layer = height;
+            SDL_DownloadFromGPUTexture(copy, &source, &destination);
+            SDL_EndGPUCopyPass(copy);
+        }
         SDL_GPUBlitInfo blit{};
         blit.source.texture = texture;
         blit.source.w = width;
@@ -62,7 +63,7 @@ namespace OpenBlood2
         blit.load_op = SDL_GPU_LOADOP_DONT_CARE;
         blit.filter = SDL_GPU_FILTER_NEAREST;
         SDL_BlitGPUTexture(commands, &blit);
-        return true;
+        return copy != nullptr;
     }
 
     bool Capture::save(const char* filename)

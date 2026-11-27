@@ -519,6 +519,8 @@ namespace OpenBlood2
         CollisionQuery sweep_scene(HOBJECT, DVector, DVector, DVector, CollisionHit&, const std::vector<ObjectId>&,
                                    HOBJECT ignore_extra = nullptr, double allowed_penetration = 0,
                                    StartOverlap start = StartOverlap::Block);
+        std::optional<DVector> leave_box_overlap(HOBJECT, DVector center, DVector half, const CollisionHit&,
+                                                 const std::vector<ObjectId>&);
         bool affect_containers(HOBJECT, ContainerPhysics&);
         struct BodyPath
         {

@@ -1,9 +1,13 @@
 #include "engine/collision.h"
 #include "engine/container.h"
+#include "engine/world_model.h"
+#include "game/original/AI_Mgr.h"
 #include "game/original/BoneLeech.h"
 #include "game/original/DrudgeLord.h"
 #include "game/original/NapalmProjectile.h"
 #include "game/original/PickupObject.h"
+#include "game/original/RotatingDoor.h"
+#include "game/original/Spawner.h"
 #include "game/server_adapter.h"
 #include "game/world_validation.h"
 #include <algorithm>
@@ -108,6 +112,145 @@ namespace
               !g->server.list_count());
         return true;
     }
+    ObjectRecord* named(GameSession& g, std::string_view name)
+    {
+        for (const auto id : g.objects.snapshot())
+            if (auto* r = g.objects.get(id); r && r->state.m_Name == name)
+                return r;
+        return nullptr;
+    }
+    bool trigger(GameSession& g, HOBJECT target, const char* text)
+    {
+        auto string = g.server.CreateString(text);
+        auto msg = g.server.StartMessageToObject(nullptr, target, 1000);
+        CHECK(string && msg);
+        const auto wrote = g.server.WriteToMessageHString(msg, string);
+        g.server.FreeString(string);
+        CHECK(wrote == DE_OK && g.server.EndMessage(msg) == DE_OK);
+        return true;
+    }
+    bool city_spawn6(const char* root)
+    {
+        auto game = std::make_unique<GameSession>();
+        CHECK(mount(*game, root));
+        std::string error;
+        CHECK(GameSession::start_new_game(game, "02_cityhubc", 1, 0, error));
+        auto* r = named(*game, "spawn6");
+        auto* spawn = r ? dynamic_cast<Spawner*>(r->game.get()) : nullptr;
+        CHECK(spawn && trigger(*game, r->handle, "TRIGGER"));
+        auto* actor = game->objects.get(spawn->last_child);
+        CHECK(actor && actor->type->name == "ShikariAI" && actor->placement_nudges > 0);
+        auto* shikari = dynamic_cast<AI_Mgr*>(actor->game.get());
+        CHECK(shikari && shikari->RuntimeReady() && actor->state.m_Pos.z < -817);
+        CHECK(game->step(1. / 60));
+
+        // Reproduce the older save's recorded pose, then use the ordinary restore
+        // path. A prior save can already contain the actor inside the crate.
+        DVector embedded{2624, 880, -816};
+        CHECK(game->server.TeleportObject(actor->handle, &embedded) == DE_OK);
+        SAFE_STRCPY(actor->state.m_Name, "spawn6 regression");
+        GameSave save;
+        if (!game->save_game(save, error) || !GameSession::load_game(game, save, error))
+        {
+            std::cerr << error << '\n';
+            return false;
+        }
+        actor = named(*game, "spawn6 regression");
+        CHECK(actor && actor->state.m_Pos.z == embedded.z);
+        // The player starts on the other side of the map. Activate this loaded
+        // actor as the visibility ping would when the player returns.
+        game->server.SetObjectState(actor->handle, OBJSTATE_ACTIVE);
+        CHECK(actor->activity == OBJSTATE_ACTIVE);
+        DVector falling{0, -10, 0};
+        CHECK(game->server.SetVelocity(actor->handle, &falling) == DE_OK);
+        if (!game->server.advance_physics(1. / 60))
+        {
+            for (const auto& message : game->objects.diagnostics())
+                std::cerr << message << '\n';
+            return false;
+        }
+        CHECK(actor->state.m_Pos.z < -817 && actor->overlap_contacts > 0);
+        CHECK(game->step(1. / 60));
+        return true;
+    }
+    bool steam_swing(const char* root)
+    {
+        GameSession game;
+        CHECK(mount(game, root));
+        std::string error;
+        CHECK(game.request_world("04_steamtunnels", error) && game.enter_player(error));
+        for (const auto* name : {"endventmaster1", "endventmaster2", "endventmaster3"})
+        {
+            auto* valve = named(game, name);
+            CHECK(valve && trigger(game, valve->handle, "TRIGGER"));
+        }
+        auto* door_record = named(game, "rotdoorgubgub99");
+        auto* door = door_record ? dynamic_cast<RotatingDoor*>(door_record->game.get()) : nullptr;
+        CHECK(door && door->state == Door::Closed);
+        ObjectRecord* shikari = nullptr;
+        for (const auto id : game.objects.snapshot())
+            if (auto* r = game.objects.get(id); r && r->type->name == "ShikariAI")
+            {
+                shikari = r;
+                break;
+            }
+        CHECK(shikari);
+        auto beside_door = vector_add(door_record->state.m_Pos, {0, -32, 27});
+        CHECK(game.server.TeleportObject(shikari->handle, &beside_door) == DE_OK);
+        game.server.SetNextUpdate(shikari->handle, 0);
+        game.server.SetObjectFlags(shikari->handle, shikari->state.m_Flags & ~FLAG_GRAVITY);
+        CHECK(trigger(game, door_record->handle, "TRIGGER"));
+        for (int i = 0; i < 180 && door->state != Door::Open; ++i)
+            CHECK(game.step(1. / 60));
+        CHECK(door->state == Door::Open && door_record->mover_pushes > 0 && game.server.IsObjectAlive(shikari->handle));
+        const auto at = shikari->state.m_Pos;
+        CollisionHit hit;
+        CHECK(game.collision.sweep(at, at, shikari->dimensions, hit) == CollisionQuery::Miss);
+        CHECK(sweep_object(*door_record, at, at, shikari->dimensions, hit) == CollisionQuery::Miss);
+        return true;
+    }
+    bool abandoned_chopper(const char* root)
+    {
+        GameSession game;
+        CHECK(mount(game, root));
+        std::string error;
+        CHECK(game.request_world("09_abandoned_buildings", error) && game.enter_player(error));
+        PathList path;
+        CHECK(game.server_shell.paths.GetPath("GideonPathA", path, error) && path.size() == 9 &&
+              path.front().name == "GideonPathA0" && path.back().name == "GideonPathA8");
+        CHECK(game.server_shell.paths.GetPath("MadScientistPathC", path, error) && path.size() == 2 &&
+              path.front().name == "MadScientistPathC0" && path.back().name == "MadScientistPathC1");
+        auto* record = named(game, "MadScientist");
+        auto* actor = record ? dynamic_cast<AI_Mgr*>(record->game.get()) : nullptr;
+        const auto* scene = named(game, "Trigger-Remove");
+        CHECK(actor && scene);
+        const auto& movement = std::get<std::string>(scene->properties.at("MessageName4"));
+        auto start = path.front().position;
+        start.y = record->state.m_Pos.y;
+        const auto handle = record->handle;
+        CHECK(game.server.TeleportObject(handle, &start) == DE_OK && trigger(game, handle, movement.c_str()));
+        // This isolated sequence starts at the boarding marker, without the
+        // scripted camera that normally keeps its actors in the visible set.
+        CHECK(game.server.SetDeactivationTime(handle, 60));
+        for (int i = 0; i < 600 && game.server.IsObjectAlive(handle); ++i)
+        {
+            CHECK(game.step(1. / 60));
+            if (game.server.IsObjectAlive(handle) && actor->runtime_failed)
+            {
+                std::cerr << actor->runtime_error << '\n';
+                return false;
+            }
+        }
+        if (game.server.IsObjectAlive(handle))
+        {
+            const auto at = record->state.m_Pos;
+            std::cerr << "Scientist stopped at " << at.x << ',' << at.y << ',' << at.z << ", arrivals "
+                      << actor->path_arrivals << ", activity " << record->activity << ", script " << actor->script_error
+                      << '\n';
+            return false;
+        }
+        return true;
+    }
     bool actors(const char* root)
     {
         GameSession g;
@@ -202,5 +345,11 @@ int main(int argc, char** argv)
         return 2;
     if (std::string_view(argv[1]) == "actors")
         return actors(argv[2]) ? 0 : 1;
+    if (std::string_view(argv[1]) == "city_spawn6")
+        return city_spawn6(argv[2]) ? 0 : 1;
+    if (std::string_view(argv[1]) == "steam_swing")
+        return steam_swing(argv[2]) ? 0 : 1;
+    if (std::string_view(argv[1]) == "abandoned_chopper")
+        return abandoned_chopper(argv[2]) ? 0 : 1;
     return entry(argv[2], argv[1]) ? 0 : 1;
 }

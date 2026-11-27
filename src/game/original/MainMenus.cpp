@@ -644,8 +644,11 @@ namespace OpenBlood2
                 build(MenuPage::Controls);
                 break;
             case MENU_CMD_CHANGE_CONTROL: // CMenuControls::OnCommand: "=" and StartTrackingDevices.
-                binding = selected;
-                ++revision;
+                if (std::size_t(selected) < controls.size() && controls[selected].rebindable)
+                {
+                    binding = selected;
+                    ++revision;
+                }
                 break;
             case MENU_CMD_RESTORE_CONTROLS:
                 pending_.action = MenuAction::RestoreControls;

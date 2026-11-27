@@ -1,6 +1,7 @@
 #include "game/original/CultistAI.h"
 #include "game/original/HandWeaponModel.h"
 #include "game/original/WeaponPickups.h"
+#include "brush_fixture.h"
 #include "player_fixture.h"
 #include <functional>
 #include <limits>
@@ -155,6 +156,32 @@ namespace
         std::cout << "Drop flight -> BerettaPU at y=" << g.objects.get(ph)->state.m_Pos.y << " with 12 bullets\n";
         CHECK(touch(g, ph) && !g.server.IsObjectAlive(ph) && g.objects.finish_frame());
         CHECK(g.unload_world() && g.server.spawn_reports.empty() && !g.server.message_count());
+        return true;
+    }
+    bool embedded(const std::filesystem::path& path)
+    {
+        GameSession g;
+        CHECK(setup(g, path));
+        auto* c = owner(g);
+        CHECK(c);
+        const auto hand = c->m_InventoryMgr.CurrentWeapon()->m_hHandModel;
+        CHECK(c->m_InventoryMgr.DropCurrentWeapon() == InventoryResult::Ok);
+        const auto* dropped = g.objects.get(hand);
+        const float x = dropped->state.m_Pos.x + dropped->dimensions.x - .44f;
+        WorldModel room;
+        test_brush::face(room, {{-1000, 0, -1000}, {1000, 0, -1000}, {1000, 0, 1000}, {-1000, 0, 1000}},
+                         {0, 1, 0});
+        test_brush::face(room, {{x, 0, 200}, {x, 0, 500}, {x, 300, 500}, {x, 300, 200}}, {-1, 0, 0});
+        for (auto& surface : room.surfaces)
+            surface.flags = 1;
+        std::string error;
+        CHECK(g.collision.build(room, error));
+        CHECK(g.objects.remove(c->m_hObject) && g.objects.finish_frame());
+        CHECK(g.server.advance_physics(.01) && dropped->placement_nudges == 1);
+        for (int i = 0; i < 180 && g.server.IsObjectAlive(hand); ++i)
+            CHECK(g.server.advance_physics(.01) && g.objects.advance(.01));
+        CHECK(!g.server.IsObjectAlive(hand) && g.server.spawn_reports.size() == 1);
+        CHECK(dynamic_cast<WeaponPickup*>(g.server.HandleToObject(g.server.spawn_reports.back().child)));
         return true;
     }
     bool guards(const std::filesystem::path& path)
@@ -350,7 +377,7 @@ int main(int argc, char** argv)
 {
     const std::map<std::string, std::function<bool(const std::filesystem::path&)>> cases{
         {"collect", collect},     {"protocol", protocol}, {"drop", drop},
-        {"falling", falling},     {"guards", guards},     {"failures", failures},
+        {"falling", falling},     {"guards", guards},     {"failures", failures}, {"embedded", embedded},
         {"nosliding", nosliding}, {"callback", callback}, {"missing_pickup", missing_pickup},
         {"catalog", catalog}};
     if (argc != 3)

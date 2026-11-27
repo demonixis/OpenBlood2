@@ -203,7 +203,7 @@ bool AI_Mgr::FaceScriptPoint(DVector point)
     }
     return MC_FacePos(point) || MotionFailure("Script facing failed");
 }
-bool AI_Mgr::DeliverPathAction(const PathListData& point)
+bool AI_Mgr::DeliverPathAction(const PathListData& point, std::optional<ScriptProgram>& next_script)
 {
     if (!point.action_message)
         return true;
@@ -237,7 +237,19 @@ bool AI_Mgr::DeliverPathAction(const PathListData& point)
             return MotionFailure("Path owner removed during action");
         if (!server->IsObjectAlive(target))
             continue;
-        if (point.action_target && equal(*point.action_message, "REMOVE"))
+        const std::string_view text = *point.action_message;
+        if (target == m_hObject && script_busy && equal(text.substr(0, text.find_first_of(" \t\r\n;")), "SCRIPT"))
+        {
+            // The authored route can send SCRIPT to its own actor. Validate it
+            // here and apply it after the path cursor has advanced.
+            ScriptProgram parsed;
+            std::string error;
+            if (!ParseScript(text, m_dwScriptFlags, parsed, error))
+                return MotionFailure(error.c_str());
+            next_script = std::move(parsed);
+            ++path_deliveries;
+        }
+        else if (point.action_target && equal(text, "REMOVE"))
         {
             server->SetObjectUserFlags(target, 0);
             server->RemoveObject(target);
@@ -307,13 +319,29 @@ bool AI_Mgr::UpdateFollowPathCmd()
             return MotionFailure("FOLLOWPATH owner removed during arrival");
         if (script_motion_outcome == MotionOutcome::Failed)
             return false; // A touch callback may have rejected a recursive command.
-        if (!DeliverPathAction(point))
+        std::optional<ScriptProgram> next_script;
+        if (!DeliverPathAction(point, next_script))
             return false;
         script_path.erase(script_path.begin());
         ++path_arrivals;
         if (script_motion_outcome == MotionOutcome::Failed)
             return false;
         script_motion_outcome = MotionOutcome::Arrived;
+        if (next_script)
+        {
+            // A standalone movement directive at a route marker changes the rest
+            // of that route (GideonPathA6 and MadScientistPathC0).
+            if (next_script->commands.size() == 1 && next_script->commands.front().command == ScriptCommand::SetMovement)
+            {
+                const auto& mode = next_script->commands.front().argument;
+                if (equal(mode, "WALK"))
+                    m_eScriptMovement = SM_WALK;
+                else if (equal(mode, "RUN"))
+                    m_eScriptMovement = SM_RUN;
+            }
+            else
+                return InstallScript(std::move(*next_script));
+        }
     }
     else
     {

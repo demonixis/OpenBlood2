@@ -1,4 +1,6 @@
 #include "engine/world_model.h"
+#include "game/game_settings.h"
+#include "game/original/RotatingDoor.h"
 #include "game/server_adapter.h"
 #include <algorithm>
 #include <cmath>
@@ -57,6 +59,8 @@ namespace OpenBlood2
             pad, angles.x == 0 && angles.z == 0 ? std::abs(residual.y) / static_cast<float>(count) + .00001f : pad,
             pad};
         const auto ids = objects_.snapshot();
+        const bool swing_push =
+            !network_game_type(net_game_type) && !mover->world_body && dynamic_cast<RotatingDoor*>(mover->game.get());
         struct Body
         {
             ObjectRecord* object;
@@ -169,14 +173,65 @@ namespace OpenBlood2
                 // separation handles that corner growth; otherwise reject atomically.
                 for (unsigned attempt = 0; overlaps(end) && distance > 1e-6f && attempt < 8; ++attempt)
                     end = vector_add(end, vector_scale(displacement, pad / distance));
-                if (overlaps(end))
-                    return blocked(record.handle);
                 CollisionHit obstruction;
-                const auto result =
-                    sweep_scene(record.handle, body.position, end, record.dimensions, obstruction, ids, handle);
-                if (result == CollisionQuery::Invalid ||
-                    (result == CollisionQuery::Hit && (obstruction.start_solid || obstruction.fraction < 1 - 1e-6)))
-                    return blocked(result == CollisionQuery::Hit ? obstruction.object : record.handle);
+                auto obstruction_result = CollisionQuery::Invalid;
+                const auto clear_route = [&](DVector destination)
+                {
+                    obstruction_result =
+                        sweep_scene(record.handle, body.position, destination, record.dimensions, obstruction, ids,
+                                    handle);
+                    return obstruction_result == CollisionQuery::Miss ||
+                           (obstruction_result == CollisionQuery::Hit && !obstruction.start_solid &&
+                            obstruction.fraction >= 1 - 1e-6);
+                };
+                bool clear = !overlaps(end) && clear_route(end);
+                if (!clear && swing_push && !body.rider && record.character_body && !record.client_movement)
+                {
+                    // The arc around the hinge can drive a pursuing NPC into an
+                    // adjacent wall. Try the shortest face-normal displacement
+                    // instead, keeping both the new door pose and the path clear.
+                    CollisionHit contact;
+                    const auto query =
+                        box ? sweep_box(body.position, body.position, record.dimensions,
+                                        vector_scale(vector_add(shape->min, shape->max), .5f),
+                                        vector_scale(vector_subtract(shape->max, shape->min), .5f), contact)
+                            : shape->sweep(body.position, body.position, record.dimensions, contact);
+                    if (query == CollisionQuery::Miss)
+                        continue;
+                    if (query == CollisionQuery::Hit && contact.start_solid && contact.penetration <= 2 * pad &&
+                        vector_dot(contact.normal, contact.normal) >= .99f)
+                    {
+                        const auto candidate =
+                            vector_add(body.position, vector_scale(contact.normal, float(contact.penetration) + .002f));
+                        if (!overlaps(candidate) && clear_route(candidate))
+                        {
+                            end = candidate;
+                            clear = true;
+                        }
+                        else if (obstruction_result == CollisionQuery::Hit && !obstruction.start_solid &&
+                                 std::abs(obstruction.normal.y) < .1f)
+                        {
+                            // A wall can block the normal push while leaving a
+                            // clear route along either side of its face.
+                            const DVector tangent{obstruction.normal.z, 0, -obstruction.normal.x};
+                            for (unsigned i = 1; i <= 8 && !clear; ++i)
+                                for (const auto sign : {1, -1})
+                                {
+                                    const auto escape =
+                                        vector_add(body.position, vector_scale(tangent, float(sign) * float(i) * pad));
+                                    if (vector_dot(vector_subtract(escape, body.position), contact.normal) >= 0 &&
+                                        !overlaps(escape) && clear_route(escape))
+                                    {
+                                        end = escape;
+                                        clear = true;
+                                        break;
+                                    }
+                                }
+                        }
+                    }
+                }
+                if (!clear)
+                    return blocked(obstruction_result == CollisionQuery::Hit ? obstruction.object : record.handle);
                 if (!body.moved)
                     body.path.push_back(body.position);
                 body.path.push_back(end);

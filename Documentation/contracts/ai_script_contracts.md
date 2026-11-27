@@ -55,6 +55,12 @@ SETMOVEMENT and PLAYSOUND complete immediately for selection on the next update.
 FOLLOWPATH/MOVETOOBJECT run their initial helper and first update in the same state
 callback, retaining source cached-basis timing and residual velocity.
 
+A FOLLOWPATH marker can send SCRIPT to its own actor. The route advances past
+that marker before installing a replacement program, which starts on the next
+scheduled update. A standalone SETMOVEMENT at a marker changes the remainder of
+the active route. These rules cover the Abandoned Buildings helicopter routes.
+Other reentrant script requests retain their existing refusal.
+
 WAIT sets an absolute original game-clock deadline and completes inclusively at
 `time >= deadline`. It does not stop residual movement. PLAYANIMATION selects a
 named clip, disables looping, and waits for MS_PLAYDONE. Validation/clearance happen

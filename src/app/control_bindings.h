@@ -26,7 +26,7 @@ namespace OpenBlood2
         std::optional<InputAction> action;
         std::string_view localization_key{};
     };
-    inline constexpr std::array<ControlRow, 49> control_rows{{
+    inline constexpr std::array<ControlRow, 50> control_rows{{
         {705, {}, InputAction::MoveForward},  // Forward
         {706, {}, InputAction::MoveBackward}, // Backward
         {707, {}, InputAction::TurnLeft},     // Left
@@ -77,11 +77,14 @@ namespace OpenBlood2
         {0, "Night Goggles", InputAction::NightGoggles, "control.night_goggles"},
         {0, "The Eye", InputAction::TheEye, "control.the_eye"},
         {0, "Third Person", InputAction::ThirdPerson, "control.third_person"},
+        {0, "Objectives", InputAction::Objectives, "hud.touch_objectives"},
     }};
 
     // Actions the Controls page rebinds; menu/system and analog look bindings stay fixed.
     inline bool rebindable(InputAction action)
     {
+        if (action == InputAction::Objectives)
+            return false;
         for (const auto& row : control_rows)
             if (row.action == action)
                 return true;
@@ -301,7 +304,8 @@ namespace OpenBlood2
                             row.localization_key,
                             row.action && locale && locale->language() != Language::English
                                 ? control_text(bindings, *row.action, locale)
-                                : std::string{}});
+                                : std::string{},
+                            row.action && rebindable(*row.action)});
         return rows;
     }
 

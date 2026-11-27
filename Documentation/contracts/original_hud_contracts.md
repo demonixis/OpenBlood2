@@ -151,12 +151,11 @@ is unavailable).
 - **Updated icon.** `interface/objectives/skull.pcx` (38x66) shows at
   (width - 38 - 5, 5) when an update arrives while the page is hidden or scaling
   down. Opening the page hides it.
-- **Tab.** The original VK_TAB key calls `ToggleObjectives` in single and custom
+- **Objectives.** The original VK_TAB key calls `ToggleObjectives` in single and custom
   games, with `Sounds\Interface\MainMenus\missionobj.wav` on each accepted toggle.
-  It is the fixed `objectives` Interface action (Tab). It is not a Controls row:
-  CMenuControls ignored Tab, so `controls.cfg` and its version are unchanged.
-  There is no gamepad default. The multiplayer frag-bar branch is not
-  implemented.
+  The fixed `objectives` action also accepts D-pad down in play and the touch
+  Objectives button. Controls shows its keyboard and gamepad bindings in a
+  read-only row. These bindings are outside `controls.cfg`.
 - **Scaling.** The page scales up or down over 0.1 s through the original
   `g_ObjScale*` tables. A toggle during a scale is ignored. There is no display
   timeout.

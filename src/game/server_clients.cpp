@@ -425,15 +425,17 @@ namespace OpenBlood2
         const auto ids = objects_.snapshot();
         CollisionHit contact;
         const auto origin = r->state.m_Pos;
-        // String spawns retain the existing start-inside-brush movement policy. Look
-        // for overlapping characters only, then check the chosen escape against the full scene.
+        // String spawns retain the start-inside-brush movement policy. Characters
+        // and solid destructible models still need clear placement (CityHubC spawn6).
         const bool spawned = r->reason == Creation::String;
         auto characters = spawned ? ids : std::vector<ObjectId>{};
+        const auto* destructible = objects_.find_class("CDestructableModel");
         std::erase_if(characters,
-                      [this](ObjectId id)
+                      [this, destructible](ObjectId id)
                       {
                           const auto* record = objects_.get(id);
-                          return !record || !record->character_body;
+                          return !record ||
+                                 (!record->character_body && !Objects::is_kind_of(record->type, destructible));
                       });
         const auto query = sweep_scene(h, origin, origin, r->dimensions, contact, spawned ? characters : ids);
         if (query == CollisionQuery::Invalid)
@@ -441,6 +443,15 @@ namespace OpenBlood2
         if (query == CollisionQuery::Hit && contact.start_solid && contact.object)
         {
             const auto* other = objects_.get(contact.object);
+            if (spawned && other && Objects::is_kind_of(other->type, destructible))
+            {
+                auto clear = leave_box_overlap(h, origin, r->dimensions, contact, ids);
+                if (!clear || TeleportObject(h, &*clear) != DE_OK)
+                    return DE_ERROR;
+                r->placement_nudge = vector_add(r->placement_nudge, vector_subtract(*clear, origin));
+                ++r->placement_nudges;
+                return DE_OK;
+            }
             // Multiplayer start markers may already contain a player. Reuse the
             // bounded horizontal separation, never ignore a world/model obstacle
             // or select another random marker. This is entry placement only.

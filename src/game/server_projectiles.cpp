@@ -39,7 +39,10 @@ namespace OpenBlood2
                 flag = false;
             }
         } reset{moving_};
-        const auto ids = objects_.snapshot();
+        auto ids = objects_.snapshot();
+        if (const auto* shooter = objects_.get(grenade->m_hFiredFrom))
+            std::erase(ids, shooter->id);
+        const bool m16_grenade = assault && record->type == objects_.find_class("CGrenade");
         const auto steps = static_cast<unsigned>(std::max(1.0, std::ceil(seconds * 120)));
         const float dt = static_cast<float>(seconds / steps);
         for (unsigned step = 0; step < steps && record->life == Life::Alive && !grenade->m_bExplode &&
@@ -61,7 +64,7 @@ namespace OpenBlood2
             auto down = record->state.m_Pos;
             down.y -= .02f;
             auto supported =
-                sweep_scene(h, record->state.m_Pos, down, record->dimensions, support, ids, grenade->m_hFiredFrom);
+                sweep_scene(h, record->state.m_Pos, down, record->dimensions, support, ids);
             if (supported == CollisionQuery::Invalid)
                 return false;
             bool resting = physics.gravity && supported == CollisionQuery::Hit && !support.start_solid &&
@@ -90,19 +93,25 @@ namespace OpenBlood2
             const auto destination = vector_add(record->state.m_Pos, displacement);
             CollisionHit hit;
             const auto query =
-                sweep_scene(h, record->state.m_Pos, destination, record->dimensions, hit, ids, grenade->m_hFiredFrom);
+                sweep_scene(h, record->state.m_Pos, destination, record->dimensions, hit, ids);
             // Nonsolid grenades can be overtaken by a character during the preceding
             // body phase. The source's first live-character touch explodes even when
             // the boxes already overlap. Deliver that contact at the current position;
-            // never turn this into a generic embedded-world escape or a later bounce.
+            // a previously bounced M16 grenade separates before running its normal solid contact.
             auto* character = hit.object ? dynamic_cast<CBaseCharacter*>(HandleToObject(hit.object)) : nullptr;
             // The same first-contact rule covers an unbounced Gremlin rock (its touch damages).
             const bool overlapping_impact =
                 query == CollisionQuery::Hit && hit.start_solid &&
                 ((assault && assault->bounces_left == 5) || (rock && rock->bounces_left == 5)) && character &&
                 !character->m_damage.IsDead();
+            std::optional<DVector> separated_bounce;
+            if (query == CollisionQuery::Hit && hit.start_solid && m16_grenade && assault->bounces_left < 5 &&
+                character && !character->m_damage.IsDead())
+            {
+                separated_bounce = leave_box_overlap(h, record->state.m_Pos, record->dimensions, hit, ids);
+            }
             if (query == CollisionQuery::Invalid ||
-                (query == CollisionQuery::Hit && hit.start_solid && !overlapping_impact) ||
+                (query == CollisionQuery::Hit && hit.start_solid && !overlapping_impact && !separated_bounce) ||
                 !physics_vector(destination) || !physics_vector(velocity))
             {
                 std::ostringstream reason;
@@ -129,7 +138,9 @@ namespace OpenBlood2
             {
                 // Commit one box segment per bounded substep, then run the original
                 // callback on post-projection velocity. No fabricated bounce impulse.
-                if (!overlapping_impact)
+                if (separated_bounce)
+                    record->state.m_Pos = *separated_bounce;
+                else if (!overlapping_impact)
                     record->state.m_Pos = vector_add(hit.point, vector_scale(hit.normal, .001f));
                 const auto into = vector_dot(velocity, hit.normal);
                 if (into < 0)

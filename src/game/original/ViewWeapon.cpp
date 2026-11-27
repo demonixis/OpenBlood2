@@ -186,7 +186,12 @@ bool CViewWeapon::Update(WeaponServices& services, const WeaponInput& input, DVe
         }
         if (result == FireResult::Dry || result == FireResult::Blocked)
             return true;
-        error = "Original weapon fire rejected or damage delivery failed";
+        const char* reason = result == FireResult::Invalid       ? "invalid request"
+                             : result == FireResult::Unavailable ? "collision or target unavailable"
+                                                                 : "damage delivery failed";
+        error = "Original weapon fire failed (" + std::string(reason) + ", weapon " + std::to_string(type) +
+                (left ? ", left" : ", right") + (alternate ? ", alternate" : ", primary") +
+                ", seed " + std::to_string(next_seed_) + ")";
         return false;
     };
     const float time = services.time();

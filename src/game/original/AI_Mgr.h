@@ -2,6 +2,7 @@
 #include "PathMgr.h"
 #include "PlayerObj.h"
 #include <memory>
+#include <optional>
 
 namespace OpenBlood2
 {
@@ -621,6 +622,7 @@ class AI_Mgr : public CBaseCharacter
     std::vector<ScriptInstruction> script_commands;
     ScriptInstruction script_current;
     bool ScriptFailure(std::string_view);
+    bool InstallScript(ScriptProgram);
     bool UpdateScriptCommand(PathMgr&);
     bool FinishScript();
     bool trigger_busy = false;
@@ -631,7 +633,7 @@ class AI_Mgr : public CBaseCharacter
 
     bool ScriptFire(ScriptFireMode, bool& engaged);
     bool FaceScriptPoint(DVector);
-    bool DeliverPathAction(const PathListData&);
+    bool DeliverPathAction(const PathListData&, std::optional<ScriptProgram>&);
     DLink m_Link{};
     bool registered_cabal = true;
     static void InitLists();

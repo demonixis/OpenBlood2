@@ -26,7 +26,7 @@ namespace OpenBlood2
         int button;         // SDL_GamepadButton, or -1 for a trigger axis.
         int axis;           // SDL_GamepadAxis of a trigger, or -1.
     };
-    inline constexpr std::array<TouchControl, 10> touch_layout{{
+    inline constexpr std::array<TouchControl, 11> touch_layout{{
         {"FIRE", "hud.touch_fire", true, .20f, .24f, .10f, -1, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER},
         {"ALT", "hud.touch_alt", true, .43f, .13f, .07f, -1, SDL_GAMEPAD_AXIS_LEFT_TRIGGER},
         {"JUMP", "hud.touch_jump", true, .13f, .47f, .07f, SDL_GAMEPAD_BUTTON_NORTH, -1},
@@ -37,6 +37,7 @@ namespace OpenBlood2
         {"NEXT", "hud.touch_next", true, .42f, .86f, .055f, SDL_GAMEPAD_BUTTON_BACK, -1},
         {"RUN", "hud.touch_run", false, .10f, .55f, .06f, SDL_GAMEPAD_BUTTON_LEFT_STICK, -1},
         {"MENU", "hud.touch_menu", false, .08f, .90f, .05f, SDL_GAMEPAD_BUTTON_START, -1},
+        {"OBJECTIVES", "hud.touch_objectives", false, .24f, .90f, .06f, SDL_GAMEPAD_BUTTON_DPAD_DOWN, -1},
     }};
 
     struct TouchControls

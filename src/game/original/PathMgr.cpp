@@ -51,9 +51,10 @@ bool PathListData::Copy(ServerDE& server, HOBJECT object, std::string& error)
 void PathMgr::ClearPathList()
 {
     paths_.clear();
+    dat_order_ = false;
     error_.clear();
 }
-bool PathMgr::BuildPathList()
+bool PathMgr::BuildPathList(bool dat_order)
 {
     ClearPathList();
     const auto type = server_.GetClass("PathPoint");
@@ -79,6 +80,7 @@ bool PathMgr::BuildPathList()
         // Source comment mentions SMELL filtering/removal, but neither is executed.
     }
     paths_ = std::move(snapshot); // Failed builds publish no partial world snapshot.
+    dat_order_ = dat_order;
     return true;
 }
 bool PathMgr::GetPath(std::string_view base, PathList& output, std::string& error) const
@@ -97,15 +99,17 @@ bool PathMgr::GetPath(std::string_view base, PathList& output, std::string& erro
     // Copy the prefix before clearing output: callers may supply output[0].name.
     const std::string prefix(base);
     output.clear();
-    // AddToSortedList starts at the null-data sentinel and always inserts after it.
-    // The observed source algorithm reverses enumeration; it never compares names.
-    for (auto i = paths_.rbegin(); i != paths_.rend(); ++i)
+    // Keep the established port order unless the scene has been checked against
+    // the donor engine's head-inserted list and its reverse PathMgr selection.
+    // The snapshot itself is shared with the save format's digest.
+    for (std::size_t i = 0; i < paths_.size(); ++i)
     {
-        if (i->name.size() <= prefix.size() || i->name[prefix.size()] < '0' || i->name[prefix.size()] > '9')
+        const auto& point = paths_[dat_order_ ? i : paths_.size() - i - 1];
+        if (point.name.size() <= prefix.size() || point.name[prefix.size()] < '0' || point.name[prefix.size()] > '9')
             continue;
-        if (std::equal(prefix.begin(), prefix.end(), i->name.begin(),
+        if (std::equal(prefix.begin(), prefix.end(), point.name.begin(),
                        [](unsigned char a, unsigned char b) { return lower(a) == lower(b); }))
-            output.push_back(*i); // Owned copies replace the source's borrowed PathListData pointers.
+            output.push_back(point); // Owned copies replace the source's borrowed PathListData pointers.
     }
     if (output.empty())
     {

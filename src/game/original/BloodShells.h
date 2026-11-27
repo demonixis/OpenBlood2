@@ -23,7 +23,7 @@ class CBloodServerShell
   public:
     explicit CBloodServerShell(ServerDE& server) : paths(server), server_(server) {}
     void PreStartWorld();
-    bool PostStartWorld();
+    bool PostStartWorld(std::string_view world = {});
     CPlayerObj* OnClientEnterWorld(HCLIENT, std::string* error = nullptr, DBYTE team = 0);
     CPlayerObj* OnRestoredClientEnterWorld(HCLIENT, HOBJECT, const char* start_name = nullptr);
     void OnClientExitWorld(HCLIENT);

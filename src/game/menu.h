@@ -100,6 +100,7 @@ namespace OpenBlood2
         bool enabled = true;
         std::string_view localization_key{};
         std::string localized_binding{};
+        bool rebindable = true;
         bool operator==(const MenuControlRow&) const = default;
     };
     struct MenuVideoCapabilities

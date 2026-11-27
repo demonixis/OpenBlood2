@@ -22,7 +22,7 @@ class PathMgr
   public:
     static constexpr std::size_t max_points = 4096;
     explicit PathMgr(ServerDE& server) : server_(server) {}
-    bool BuildPathList();
+    bool BuildPathList(bool dat_order = false);
     void ClearPathList();
     bool GetPath(std::string_view base, PathList& output, std::string& error) const;
     const PathList& entries() const
@@ -41,5 +41,6 @@ class PathMgr
   private:
     ServerDE& server_;
     PathList paths_;
+    bool dat_order_ = false;
     std::string error_;
 };

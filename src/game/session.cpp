@@ -438,7 +438,7 @@ namespace OpenBlood2
             server.SetGameConVar("GAME_DOAUTOSAVE", "1");
         }
         client_shell.m_nLastLoadType = request.load_type; // The client's m_nLastLoadType.
-        if (!server_shell.PostStartWorld())
+        if (!server_shell.PostStartWorld(world_path))
         {
             error = "Original shell path snapshot failed: " + server_shell.paths.error();
             server.trace_enabled = false;

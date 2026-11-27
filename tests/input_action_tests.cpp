@@ -240,6 +240,13 @@ namespace
         CHECK(c.sample(false).run);
         c.event(key(SDL_SCANCODE_RSHIFT, false), window);
         CHECK(!c.sample(false).run);
+        c.run_lock = true;
+        CHECK(c.sample(false).run);
+        c.event(key(SDL_SCANCODE_LSHIFT, true), window);
+        CHECK(!c.sample(false).run);
+        c.event(key(SDL_SCANCODE_LSHIFT, false), window);
+        CHECK(c.sample(false).run);
+        c.run_lock = false;
         // A rebound press action keeps the fresh-press guard after focus loss.
         CHECK(c.bindings.add(InputSource::Key, SDL_SCANCODE_O, InputAction::Use));
         c.event(key(SDL_SCANCODE_O, true), window);
@@ -548,7 +555,7 @@ namespace
         send(pad_button(SDL_GAMEPAD_BUTTON_START, false));
         send(pad_button(SDL_GAMEPAD_BUTTON_DPAD_DOWN, true));
         const int first = m.selected;
-        CHECK(first != 0);
+        CHECK(first != 0 && !input.objectives);
         send(pad_button(SDL_GAMEPAD_BUTTON_DPAD_DOWN, false));
         send(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, .6f)); // One step per threshold crossing.
         send(pad_axis(SDL_GAMEPAD_AXIS_LEFTY, .9f));
@@ -578,6 +585,11 @@ namespace
         send(pad_button(SDL_GAMEPAD_BUTTON_START, false));
         send(pad_button(SDL_GAMEPAD_BUTTON_EAST, true));
         CHECK(!m.active);
+        send(pad_button(SDL_GAMEPAD_BUTTON_DPAD_DOWN, true));
+        CHECK(std::exchange(input.objectives, false));
+        send(pad_button(SDL_GAMEPAD_BUTTON_DPAD_DOWN, true));
+        CHECK(!input.objectives);
+        send(pad_button(SDL_GAMEPAD_BUTTON_DPAD_DOWN, false));
         // Bumpers reach play through the menu input path.
         send(pad_button(SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, true));
         CHECK(input.controls.sample_command(InputAction::NextWeapon, false));
@@ -698,6 +710,12 @@ namespace
         m.selected = 2;
         tap(SDL_SCANCODE_RETURN);
         CHECK(m.page == MenuPage::Controls && m.items.size() == control_rows.size() + 1 && m.binding < 0);
+        m.selected = int(row_of(InputAction::Objectives));
+        CHECK(m.controls[std::size_t(m.selected)].binding == "TAB or PAD DOWN");
+        tap(SDL_SCANCODE_RETURN);
+        CHECK(m.binding < 0);
+        tap(SDL_SCANCODE_DELETE);
+        CHECK(m.controls[std::size_t(m.selected)].binding == "TAB or PAD DOWN");
         const auto jump = int(row_of(InputAction::Jump)), use = int(row_of(InputAction::Use));
         const auto fire = int(row_of(InputAction::FirePrimary)), item = int(row_of(InputAction::UseItem));
         auto& bindings = input.controls.bindings;
@@ -835,6 +853,10 @@ namespace
         };
         input.reset(m, true);
         CHECK(!input.touch.visible);
+        const auto [ox, oy] = control("OBJECTIVES");
+        send(at(SDL_EVENT_FINGER_DOWN, 11, ox, oy));
+        CHECK(std::exchange(input.objectives, false));
+        send(at(SDL_EVENT_FINGER_UP, 11, ox, oy));
         // A held control is its gamepad source: FIRE is the right trigger.
         const auto [fx, fy] = control("FIRE");
         send(at(SDL_EVENT_FINGER_DOWN, 1, fx, fy));

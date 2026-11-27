@@ -26,10 +26,10 @@ void CBloodServerShell::PreStartWorld()
     player_capture = {};
     server_.ResetTeams(); // Original TeamMgr::Term/Init at a world boundary.
 }
-bool CBloodServerShell::PostStartWorld()
+bool CBloodServerShell::PostStartWorld(std::string_view world)
 {
     world_started = false;
-    if (!paths.BuildPathList())
+    if (!paths.BuildPathList(world == "worlds/09_abandoned_buildings.dat"))
         return false;
     world_started = true;
     return true;
