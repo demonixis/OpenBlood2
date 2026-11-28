@@ -719,16 +719,16 @@ The [autonomous locomotion continuation](Documentation/implementation/reports/m2
 walk/run/moving-fire commands and Cultist close/far attack sequencing. Read
 [contracts](Documentation/contracts/ai_locomotion_contracts.md). Preserve first-hit self exclusion, false-on-throttled ledge
 queries, injury/support timing, independent fire/completion increments and cached
-attack thresholds. Missing shade recovery and crawl/jump execution remain explicit
-failures. Diagnostic drivers are not production AI_Update; NPC initialization,
-remaining states, required FX and ExitTrigger keep M2 incomplete. Counts are unchanged.
+attack thresholds. Obstacle recovery uses the first forward sample per hit as in retail.
+Older saves carrying the missing FindPosAroundObj failure resume the actor on load.
+NPC initialization, remaining states, required FX and ExitTrigger were outside this increment.
 
 The [AI recovery/navigation continuation](Documentation/implementation/reports/m2_ai_recovery.md) connects original jump/crouch/crawl,
 firing crawl, JumpOver/CrawlUnder, ToPos/Around and visual-search states. Read
 [contracts](Documentation/contracts/ai_recovery_contracts.md). Preserve landing-based completion, cached movement, crawl's
 recovery overwrite, arrival/ledge short circuits and independent fire markers.
 Failed plans cannot be followed until replanning succeeds. Earlier crawl/jump-body
-omissions are superseded; shade recovery, smell/escape/recoil/death, full NPC
+omissions are superseded; smell/escape/recoil/death, full NPC
 initialization/AI_Update, required FX and ExitTrigger keep M2 incomplete.
 
 The [AI escape/guard continuation](Documentation/implementation/reports/m2_ai_escape.md) connects original Cultist/Civilian

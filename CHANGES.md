@@ -2,6 +2,13 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Fixed
+
+- Enemies can resume movement when they encounter the obstacle that froze them in Steam Tunnels. Existing saves affected by this error can be loaded again.
+- If another enemy error would prevent a save from loading, the game reports it before overwriting the player's slot.
+
 ## [0.6.2] - 2026-11-27
 
 ### Added
@@ -136,7 +143,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Simulation failure logs reporting unrelated startup warnings.
 - Xcode archives including dependencies and triggering nested builds.
 
-[Unreleased]: https://github.com/demonixis/OpenBlood2/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/demonixis/OpenBlood2/compare/v0.6.2...HEAD
 [0.6.1]: https://github.com/demonixis/OpenBlood2/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/demonixis/OpenBlood2/compare/v0.5.2...v0.6.0
 [0.4.0]: https://github.com/demonixis/OpenBlood2/compare/v0.3.1...v0.4.0

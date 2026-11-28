@@ -186,7 +186,8 @@ foreach(case naming meta roundtrip corrupt mismatch keys demo restart reset trav
 endforeach()
 if(BLOOD2_TEST_DATA_DIR)
     add_test(NAME save_slots.private COMMAND save_slot_tests private "${CMAKE_CURRENT_BINARY_DIR}/save-slots-private" "${BLOOD2_TEST_DATA_DIR}")
-    set_tests_properties(save_slots.private PROPERTIES LABELS "private;headless;save" TIMEOUT 300)
+    add_test(NAME save_slots.steam_tunnels COMMAND save_slot_tests steam_tunnels "${CMAKE_CURRENT_BINARY_DIR}/save-slots-steam-tunnels" "${BLOOD2_TEST_DATA_DIR}")
+    set_tests_properties(save_slots.private save_slots.steam_tunnels PROPERTIES LABELS "private;headless;save" TIMEOUT 300)
 endif()
 
 add_executable(save_pickups_tests save_pickups_tests.cpp)

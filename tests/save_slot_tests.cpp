@@ -2,6 +2,7 @@
 #include "engine/atomic_file.h"
 #include "engine/save_objects.h"
 #include "game/game_settings.h"
+#include "game/original/AI_Mgr.h"
 #include "game/original/MenuIds.h"
 #include "save_world_fixture.h"
 #include "scratch_dir.h"
@@ -660,6 +661,79 @@ namespace
         CHECK(flow.slots.load(game, SLOT_CURRENT, error) == SaveSlots::LoadResult::Loaded);
         return true;
     }
+
+    bool steam_tunnels_quickload(const std::filesystem::path& data)
+    {
+        auto game = std::make_unique<GameSession>();
+        Config config;
+        config.data_dir = data;
+        std::string error;
+        CHECK(game->initialize() && game->resources.mount_game(config, error));
+        CHECK(GameSession::start_new_game(game, "04_SteamTunnels", 1, 0, error) && game->step(.025));
+        const auto drudge = [&]() -> AI_Mgr*
+        {
+            for (auto id : game->objects.snapshot())
+            {
+                const auto* r = game->objects.get(id);
+                if (std::string_view(r->state.m_Name) == "drudge1")
+                    return dynamic_cast<AI_Mgr*>(r->game.get());
+            }
+            return nullptr;
+        };
+        auto* ai = drudge();
+        CHECK(ai && ai->RuntimeReady());
+        SaveSlots slots(fresh("steam-tunnels"));
+        const auto file = slots.path(SLOT_QUICK);
+        health(*game) = 61;
+        CHECK(slots.save(*game, SLOT_QUICK, error));
+        SaveContainer healthy;
+        SaveError fault;
+        CHECK(read_save_file(file, healthy, fault));
+
+        // Recreate a pre-fix quicksave using the original shell and the v1 actor payload.
+        const auto write_legacy_save = [&]
+        {
+            const auto request = game->server.StartHMessageWrite();
+            CHECK(request);
+            game->server.WriteToMessageString(request, game->world_path.c_str());
+            game->server.WriteToMessageByte(request, SAVETYPE_CURRENT);
+            game->client_shell.SaveClientData(request);
+            const bool saved = game->server_shell.OnSaveGameMessage(game->local_client, request);
+            game->server.EndHMessageWrite(request);
+            CHECK(saved);
+            const auto* image = game->server.save_store.find(SaveStoreSlot::Current);
+            SaveContainer legacy;
+            CHECK(image &&
+                  save_container({game->world_path, healthy.fingerprint, *image}, healthy.meta, legacy, error));
+            return write_save_file(file, legacy, fault);
+        };
+        const std::string legacy_error = "AI_Update: FindPosAroundObj/GetPointShade obstacle recovery is not integrated";
+        ai->RuntimeFailure(legacy_error + " (other fault)");
+        const auto store_revision = game->server.save_store.revision();
+        CHECK(!slots.save(*game, SLOT_QUICK, error) && contains(error, "other fault"));
+        SaveContainer retained;
+        CHECK(game->server.save_store.revision() == store_revision && read_save_file(file, retained, fault) &&
+              retained == healthy);
+        CHECK(write_legacy_save());
+        CHECK(slots.load(game, SLOT_QUICK, error) == SaveSlots::LoadResult::Refused && contains(error, "other fault"));
+
+        ai->RuntimeFailure(legacy_error);
+        CHECK(ai->runtime_failed && game->server.GetObjectState(ai->m_hObject) == OBJSTATE_INACTIVE &&
+              !game->objects.get(ai->m_hObject)->scheduled);
+        CHECK(write_legacy_save());
+        health(*game) = 33;
+        const auto clock = game->objects.time();
+        CHECK(slots.load(game, SLOT_QUICK, error) == SaveSlots::LoadResult::Loaded);
+        ai = drudge();
+        CHECK(ai && ai->RuntimeReady() && ai->runtime_error.empty() && game->objects.get(ai->m_hObject)->scheduled);
+        CHECK(game->objects.time() == clock && health(*game) == 61);
+        CHECK(game->step(.025) && ai->runtime_updates > 0 && ai->RuntimeReady());
+        CHECK(slots.save(*game, SLOT_QUICK, error));
+        CHECK(slots.load(game, SLOT_QUICK, error) == SaveSlots::LoadResult::Loaded);
+        ai = drudge();
+        CHECK(ai && ai->RuntimeReady());
+        return true;
+    }
 } // namespace
 
 int main(int argc, char** argv)
@@ -672,6 +746,8 @@ int main(int argc, char** argv)
         return 1;
     if (mode == "private")
         return argc > 3 && private_world(argv[3]) ? 0 : 1;
+    if (mode == "steam_tunnels")
+        return argc > 3 && steam_tunnels_quickload(argv[3]) ? 0 : 1;
     const bool ok = mode == "naming"      ? naming()
                     : mode == "meta"      ? meta()
                     : mode == "roundtrip" ? roundtrip()

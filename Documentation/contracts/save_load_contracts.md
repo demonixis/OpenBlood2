@@ -1287,8 +1287,11 @@ lot 12.
 - **OpenBlood2 tail** (after the path list), the port state that the original keeps in links or
   loses, as LoadSave references and bytes: attacker memory, smell cursor, sought ammunition
   pickup, pending self-removal, the target and tracked-position flags, the failed-plan latch, the
-  script and motion outcomes, and a runtime failure with its text. A suspended actor therefore
-  stays suspended; a script resumes its current command.
+  script and motion outcomes, and a runtime failure with its text. A script resumes its current
+  command. During load, the exact legacy failure `AI_Update: FindPosAroundObj/GetPointShade
+  obstacle recovery is not integrated` reactivates the suspended actor and schedules its next
+  update in 0.001 seconds. The saved AI state and visibility deadline govern its continuation.
+  Other saved failures still reach candidate validation.
 - **Restore branches.** `PRECREATE_SAVEGAME` reads no property and draws no random number; the
   engine record's model and skin apply (D13). `INITIALUPDATE_SAVEGAME` runs the original
   subclass statics and AI_Mgr's inventory and damage `Init`, then stops: no weapons, health,
@@ -1453,6 +1456,7 @@ The private certification runs every original rule above on the retail data, wor
 
 - **Save failures** leave the game running and the previous slot file intact:
   - refused preconditions;
+  - a live NPC runtime failure that would prevent loading;
   - an unsupported class;
   - a payload over its bound;
   - an impure callback;

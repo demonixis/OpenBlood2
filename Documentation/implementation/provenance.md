@@ -987,10 +987,15 @@ Donor: `sources/blood2` at `006b4aabd3fb348f6846cad03799cf8df685ea95`.
 [Selected source ranges/hashes](sources/m2_ai_locomotion_sources.json) cover AI_Mgr and CultistAI.
 Four parallel command bodies are consolidated with source differences preserved;
 checked existing services, owned diagnostics and callback guards are adaptations.
-Shade-dependent recovery fails explicitly; no production class or complete AI_Update
-is claimed. See [contracts](../contracts/ai_locomotion_contracts.md) and
+See [contracts](../contracts/ai_locomotion_contracts.md) and
 [evidence](reports/m2_ai_locomotion.md). No reference
 repository, dependency revision or commercial asset was changed/imported.
+
+The Steam Tunnels correction follows `ObjectDLL/AI_Mgr.cpp` lines 2888–2905 and
+`ObjectDLL/movement.cpp` lines 205–235. The retail server binds `GetPointShade`
+at `0x1002288c`. Its implementation at `0x100211c6–0x1002121c` returns success
+after sampling the loaded world's light grid. The movement code consumes only
+that return value. The binary is identified in the [retail server ledger](sources/m2_activation_visibility_sources.json).
 
 ## M2 AI recovery and destination states
 

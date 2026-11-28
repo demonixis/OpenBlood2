@@ -109,6 +109,9 @@ namespace OpenBlood2
             }
         if (!unmarked.empty())
             return refuse("Objects of saveable classes are not marked USRFLG_SAVEABLE: " + joined(unmarked));
+        // Keep the previous save if the load candidate would reject a suspended NPC.
+        if (!check_npc_runtime(*this, error))
+            return false;
         // The fingerprint first: once SaveGame replaced Current, nothing else may fail.
         GameSave next;
         next.world_path = world_path;
@@ -314,13 +317,8 @@ namespace OpenBlood2
                 error = "Restored publications: " + error;
                 return false;
             }
-            for (auto id : candidate->objects.snapshot())
-                if (const auto* r = candidate->objects.get(id); r && r->life == Life::Alive)
-                    if (const auto* ai = dynamic_cast<const AI_Mgr*>(r->game.get()); ai && ai->runtime_failed)
-                    {
-                        error = "Original NPC failure: " + std::string(r->state.m_Name) + ": " + ai->runtime_error;
-                        return false;
-                    }
+            if (!check_npc_runtime(*candidate, error))
+                return false;
             // RunWorld's player checks: the attached player must be live and associated.
             const auto* player = candidate->server_shell.Player(candidate->local_client);
             if (!candidate->client_shell.m_bInWorld || !player || candidate->client_shell.player != player->m_hObject ||

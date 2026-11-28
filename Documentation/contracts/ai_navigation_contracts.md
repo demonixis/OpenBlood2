@@ -113,17 +113,17 @@ through callbacks and checks results while hidden and after reload. This is labe
 diagnostic placement; the headless private case separately queries real SubwayA
 spawn geometry through two load/unload cycles.
 
-FindPosAroundObj remains excluded because its required GetPointShade service is
-missing. Original debug-line object spawning, save/restore, autonomous following,
-full AI initialization/update/deactivation, production CivilianAI/CultistAI/Gideon,
-required FX and ExitTrigger remain open. No authored class counts change.
+The [obstacle recovery contract](ai_locomotion_contracts.md#obstruction-and-ledges)
+describes the later integration of FindPosAroundObj. Original debug-line object
+spawning, save/restore, autonomous following, full AI initialization/update/deactivation,
+production CivilianAI/CultistAI/Gideon, required FX and ExitTrigger were outside this increment.
 
 The [autonomous locomotion continuation](ai_locomotion_contracts.md) now supplies
 walk/run/moving fire, obstruction/ledge probes and Cultist close/far attack sequencing.
 Earlier blanket omissions are superseded only for this subset. Full initialization,
-AI_Update/deactivation, remaining states and shade recovery stay unavailable.
+AI_Update/deactivation and remaining states were outside that increment.
 
 The [AI recovery/navigation continuation](ai_recovery_contracts.md) now executes
 jump/crouch/crawl and seven destination/recovery/visual-search states. Earlier
 blanket omissions for those bodies are superseded. Failed partial routes remain
-unusable; shade recovery, other states and full production AI_Update remain open.
+unusable. Other states and full production AI_Update were outside that increment.

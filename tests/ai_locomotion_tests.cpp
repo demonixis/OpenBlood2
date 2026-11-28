@@ -227,8 +227,14 @@ namespace
         CHECK(g.collision.build(wall, error));
         CHECK(a->CalculateObstruction() == 0x77 && !a->obstacle_rays[4].hit.object &&
               a->obstacle_rays[4].hit.polygon != UINT32_MAX);
+        a->m_dwFlags = 0;
+        CHECK(a->NavigateObstacle() && a->m_nState == AI_Mgr::StateRunAround);
+        CHECK(near(a->m_vDestPos.x, -1) && near(a->m_vDestPos.y, 9) &&
+              near(a->m_vDestPos.z, 3 + std::sqrt(2.f) + .1f));
         g.server.collision_ready = false;
-        CHECK(a->CalculateObstruction() == -1 && a->obstacle_rays[0].result == SegmentResult::Unavailable);
+        const auto changes = a->state_changes;
+        CHECK(!a->NavigateObstacle() && a->state_changes == changes &&
+              a->obstacle_rays[0].result == SegmentResult::Unavailable);
         return true;
     }
     bool navigate(const char*)
@@ -251,7 +257,24 @@ namespace
         CHECK(a->SetNewState(AI_Mgr::StateAttackClose) && a->NavigateObstacle() &&
               a->m_nState == AI_Mgr::StateAttackClose);
         a->m_dwFlags = 0;
-        CHECK(!a->NavigateObstacle() && a->locomotion_error.find("GetPointShade") != std::string::npos);
+        // The nine feelers use cached AI dimensions (1,2,1); the destination step reads the live body.
+        auto* owner = g.objects.get(a->m_hObject);
+        owner->dimensions = {3, 2, 4};
+        const auto changes = a->state_changes;
+        CHECK(a->NavigateObstacle() && a->m_nState == AI_Mgr::StateRunAround &&
+              a->m_nLastState == AI_Mgr::StateAttackClose && a->state_changes == changes + 9);
+        CHECK(near(a->m_vDestPos.x, -1) && near(a->m_vDestPos.y, 9) && near(a->m_vDestPos.z, 2.8f + 5.1f));
+        // The right column hits the obstacle. The centre hits self and the left misses.
+        // Once a non-self hit selects recovery, the later self hits also supply destinations.
+        owner->state.m_Flags = FLAG_SOLID;
+        owner->dimensions = {.5f, 2, .5f};
+        b->state.m_Pos.x = 1;
+        b->dimensions.x = .2f;
+        CHECK(a->NavigateObstacle() && a->block_flags == 0x17 && a->state_changes == changes + 15);
+        CHECK(a->obstacle_rays[5].hit.object == a->m_hObject && a->obstacle_rays[6].result == SegmentResult::Miss);
+        CHECK(near(a->m_vDestPos.x, 0) && near(a->m_vDestPos.y, 9) &&
+              near(a->m_vDestPos.z, std::hypot(.5f, .5f) + .1f));
+        owner->state.m_Flags = 0;
         CHECK(a->SetNewState(AI_Mgr::StateSearchVisual));
         a->Metacmd = 4;
         CHECK(a->NavigateObstacle() && a->Metacmd == 1 && a->m_nState == AI_Mgr::StateSearchVisual);

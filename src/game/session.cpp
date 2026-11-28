@@ -738,21 +738,8 @@ namespace OpenBlood2
             error = "RunWorld refused while a level change is pending";
             return reject();
         }
-        if (!check_world_initialization(*this, startup, error))
+        if (!check_world_initialization(*this, startup, error) || !check_npc_runtime(*this, error))
             return reject();
-        const auto check_actors = [&]
-        {
-            for (auto id : objects.snapshot())
-                if (const auto* record = objects.get(id); record->life == Life::Alive)
-                    if (const auto* ai = dynamic_cast<const AI_Mgr*>(record->game.get()); ai && ai->runtime_failed)
-                    {
-                        error = "Original NPC failure: " + std::string(record->state.m_Name) + ": " + ai->runtime_error;
-                        return reject();
-                    }
-            return true;
-        };
-        if (!check_actors())
-            return false;
         if (!local_client)
         {
             if (!enter_player(error))
@@ -774,10 +761,9 @@ namespace OpenBlood2
             error = "Start trigger requested another level during entry";
             return reject();
         }
-        if (!check_world_initialization(*this, startup, error) || !check_world_presentation(*this, startup, error))
+        if (!check_world_initialization(*this, startup, error) || !check_world_presentation(*this, startup, error) ||
+            !check_npc_runtime(*this, error))
             return reject();
-        if (!check_actors())
-            return false;
         if (client_shell.music.failures || !client_session.audio.mixer.music_error.empty())
         {
             error = "Original client music failed: " + client_shell.music.error + " " +

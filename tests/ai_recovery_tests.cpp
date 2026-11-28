@@ -225,11 +225,13 @@ namespace
         r->velocity = {};
         CHECK(a->m_MoveObj.Update() && a->m_MoveObj.Update());
         CHECK(a->MC_Fire_Crawl() && a->m_nState == AI_Mgr::StateWalkAround);
-        // Missing shade cannot be interpreted as success then overwritten.
+        // A wall selects RunAround using the last feeler hit; the crawl command then switches to WalkAround.
         CHECK(object(g, "block", {0, -8, 3}, {2, 2, .2f}));
         CHECK(a->MC_Crawl());
         r->velocity = {};
-        CHECK(!a->MC_Crawl() && a->locomotion_error.find("GetPointShade") != std::string::npos);
+        CHECK(a->MC_Crawl() && a->m_nState == AI_Mgr::StateWalkAround && a->locomotion_failures == 0);
+        CHECK(near(a->m_vDestPos.x, -1) && near(a->m_vDestPos.y, -9) &&
+              near(a->m_vDestPos.z, 2.8f + std::sqrt(2.f) + .1f));
         return true;
     }
     bool clearance(const char*)

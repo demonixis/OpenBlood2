@@ -31,10 +31,21 @@ may be inferred from an unavailable query.
 NavigateObstacle returns to last state with no obstruction; search states restart
 themselves. Upper+CRAWL has priority over lower+JUMP. An enabled upper branch with
 other blocked rows consumes the source else-if chain without selecting recovery.
-The lower branch has the analogous rule. Selecting CrawlUnder/JumpOver is supported;
-executing those state bodies is still unavailable. FindPosAroundObj requires the
-missing GetPointShade service and fails explicitly. The unused, unsafe original
-CalculateTurn is not imported. No guessed recovery point is supplied.
+The lower branch has the analogous rule. CrawlUnder and JumpOver execute through
+the [recovery states](ai_recovery_contracts.md).
+
+When neither branch applies, `NavigateObstacle` visits every hit in feeler order.
+This includes primary-world hits and self hits once another hit set an obstruction
+flag. For each hit, `CMovement::FindPosAroundObj` samples one horizontal body radius
+(`sqrt(dims.x² + dims.z²) + 0.1`) along the cached forward vector beyond the impact.
+The dimensions come from the current engine body. The game code tests only the
+success flag of `GetPointShade`. In the retail `Server.dll`, the function at
+`0x100211c6` returns success whenever a world is loaded, including for points
+outside the light grid. The successful obstruction query meets that condition.
+Each hit therefore selects the first sample and requests RunAround, or the last
+state if the sample rounds to the impact point. The final hit supplies the
+destination used by the next state update. See Blood II `ObjectDLL/movement.cpp`
+lines 205–235 and `ObjectDLL/AI_Mgr.cpp` lines 2888–2905.
 
 IsLedge tests at most once per 0.05 game seconds; a throttled call returns false,
 not the last sampled result. Its origin is cached position plus the **unnormalized**
@@ -105,8 +116,12 @@ inspection and world reload use the same game clocks and deferred ownership. Rea
 model clip availability is checked without substituting missing civilian fire clips.
 
 The [AI recovery/navigation continuation](ai_recovery_contracts.md) now executes
-jump/crouch/crawl and seven destination/recovery/visual-search states. Earlier
-blanket omissions for those bodies are superseded. Failed partial routes remain
-unusable; shade recovery, other states and full production AI_Update remain open.
+jump/crouch/crawl and seven destination/recovery/visual-search states. Failed
+partial routes require replanning.
+
+The Steam Tunnels regression was reproduced on a map-authored SoulDrudge named
+`noname` with a controlled crawl obstruction. The old build suspended it and
+refused its quicksave with the reported error. The corrected build loaded the
+same file, ran the actor through four updates and saved and loaded a new slot.
 
 The [Gideon attack continuation](gideon_attack_contracts.md) supersedes the selected attack/dodge/recoil sequencing omissions and adds original Bold taunt. Production boss lifecycle and the M2 gate remain incomplete.

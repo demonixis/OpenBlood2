@@ -102,8 +102,10 @@ Synthetic tests use real collision, perception, model clocks, damage and deferre
 ownership. A named decision-recording fixture observes requested ComputeState calls;
 it does not replace ComputeStimuli or assert complete NPC decisions. Private tests
 attempt all four command clips on six real NPC models without substituting missing
-animations. GetPointShade/FindPosAroundObj, smell following, escape/recoil/death,
-complete NPC initialization/update, required client FX and ExitTrigger remain open.
+animations. The [obstacle recovery contract](ai_locomotion_contracts.md#obstruction-and-ledges)
+describes how FindPosAroundObj supplies a RunAround destination. Smell following,
+escape/recoil/death, complete NPC initialization/update, required client FX and ExitTrigger
+were outside this increment.
 
 The [escape/guard continuation](ai_escape_contracts.md) supplies selected original
 escape/hide/guard and beg bodies, plus checked non-owning tracking. Earlier blanket

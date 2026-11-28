@@ -1,5 +1,6 @@
 #include "game/world_validation.h"
 #include "engine/world_view.h"
+#include "game/original/AI_Mgr.h"
 #include "game/original/ClientLightningSFX.h"
 #include "game/original/ClientWarpGateSFX.h"
 #include "game/original/FlagObjects.h"
@@ -52,6 +53,22 @@ namespace OpenBlood2
             return false;
         }
     } // namespace
+
+    bool check_npc_runtime(const GameSession& game, std::string& error)
+    {
+        for (auto id : game.objects.snapshot())
+        {
+            const auto* record = game.objects.get(id);
+            if (!record || record->life != Life::Alive)
+                continue;
+            if (const auto* ai = dynamic_cast<const AI_Mgr*>(record->game.get()); ai && ai->runtime_failed)
+            {
+                error = "Original NPC failure: " + std::string(record->state.m_Name) + ": " + ai->runtime_error;
+                return false;
+            }
+        }
+        return true;
+    }
 
     bool check_world_initialization(GameSession& game, WorldValidation& report, std::string& error)
     {

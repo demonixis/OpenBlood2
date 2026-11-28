@@ -1,5 +1,5 @@
 // Original AI_Mgr obstruction/ledge queries and MC_Walk/Run/Fire_Walk/Fire_Run.
-// Checked typed boundaries and missing shade recovery: ai_locomotion_contracts.md.
+// Checked typed boundaries and obstacle recovery: ai_locomotion_contracts.md.
 #include "AI_Mgr.h"
 #include "engine/collision.h"
 #include <cmath>
@@ -101,9 +101,30 @@ bool AI_Mgr::NavigateObstacle()
             return SetNewState(StateJumpOver) || LocomotionFailure(state_error);
         return true;
     }
-    // Source FindPosAroundObj needs the actual GetPointShade service. Do not
-    // substitute a guessed position or successful RunAround state transition.
-    return LocomotionFailure("FindPosAroundObj/GetPointShade obstacle recovery is not integrated");
+    // FindPosAroundObj uses only the boolean from GetPointShade. Retail Server.dll
+    // (0x100211c6) accepts the first sample whenever a world is loaded, even outside
+    // its light grid. The completed obstruction rays already require that world.
+    DVector dimensions;
+    if (GetServerDE()->GetObjectDims(m_hObject, &dimensions) != DE_OK || !physics_vector(dimensions) ||
+        dimensions.x < 0 || dimensions.y < 0 || dimensions.z < 0)
+        return LocomotionFailure("Obstacle recovery requires valid body dimensions");
+    const auto step = vector_scale(m_MoveObj.GetForwardVector(), std::hypot(dimensions.x, dimensions.z) + .1f);
+    for (const auto& ray : obstacle_rays)
+    {
+        if (ray.result != SegmentResult::Hit)
+            continue;
+        // NavigateObstacle processes every hit in order, including the primary world
+        // (a null handle here) and self hits once another ray has set a block flag.
+        const auto point = ray.hit.point;
+        const auto destination = vector_add(point, step);
+        if (!physics_vector(destination))
+            return LocomotionFailure("Obstacle recovery destination exceeds the physics domain");
+        m_vDestPos = destination;
+        const bool advanced = destination.x != point.x || destination.y != point.y || destination.z != point.z;
+        if (!SetNewState(advanced ? StateRunAround : m_nLastState))
+            return LocomotionFailure(state_error);
+    }
+    return true;
 }
 bool AI_Mgr::IsLedge(DVector direction, bool& out)
 {

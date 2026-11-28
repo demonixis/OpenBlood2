@@ -324,6 +324,16 @@ void AI_Mgr::Load(HMESSAGEREAD h, DDWORD)
     script_motion_command = static_cast<MotionCommand>(motion);
     runtime_failed = failed;
     runtime_error = std::move(failure);
+    // Older saves kept this missing obstacle branch as a permanent RuntimeFailure.
+    // The engine has already restored its manual inactivity and cancelled update.
+    if (runtime_failed &&
+        runtime_error == "AI_Update: FindPosAroundObj/GetPointShade obstacle recovery is not integrated")
+    {
+        runtime_failed = false;
+        runtime_error.clear();
+        s->SetObjectState(m_hObject, OBJSTATE_ACTIVE); // Keep the saved visibility/deactivation deadline.
+        s->SetNextUpdate(m_hObject, .001f);
+    }
     ++restored_loads;
 }
 
